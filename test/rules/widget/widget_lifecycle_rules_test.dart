@@ -199,6 +199,11 @@ void main() {
       'avoid_expensive_did_change_dependencies',
       () => AvoidExpensiveDidChangeDependenciesRule(),
     );
+    testRule(
+      'AvoidPublicMembersInStatesRule',
+      'avoid_public_members_in_states',
+      () => AvoidPublicMembersInStatesRule(),
+    );
   });
   group('Widget Lifecycle Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/widget_lifecycle');

@@ -2980,3 +2980,116 @@ class _LabeledStatementVisitor extends RecursiveAstVisitor<void> {
     super.visitLabeledStatement(node);
   }
 }
+
+/// Warns when an `else` block follows an `if` body that already exits via
+/// return, throw, break, or continue.
+///
+/// Since: v15.3.0 | Rule version: v1
+///
+/// The `else` is dead structure: since the `if` branch unconditionally
+/// exits the enclosing scope, the code in the `else` branch would run
+/// regardless of whether it is wrapped in `else` or simply placed after the
+/// `if` block. Keeping the `else` adds an unnecessary indentation level and
+/// forces readers to mentally verify that the branches are in fact
+/// mutually exclusive by control flow rather than by the `else` keyword.
+///
+/// This rule is closely related to [AvoidRedundantElseRule], but is scoped
+/// to Professional tier as a simplification suggestion rather than a
+/// reliability-tagged issue, and reports readability/simplification tags.
+///
+/// Example of **bad** code:
+/// ```dart
+/// if (x == null) {
+///   return;
+/// } else {
+///   doSomething();
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// if (x == null) return;
+/// doSomething();
+/// ```
+class AvoidUnnecessaryElseAfterControlFlowRule extends SaropaLintRule {
+  AvoidUnnecessaryElseAfterControlFlowRule() : super(code: _code);
+
+  /// Readability issue, not a correctness risk — the else is dead structure
+  /// but produces identical runtime behavior either way.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'readability', 'simplification'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  // Gate the visitor to files that actually contain an `else` keyword so
+  // files with only bare `if` statements skip this rule's callback entirely.
+  @override
+  Set<String>? get requiredPatterns => const {'else'};
+
+  static const LintCode _code = LintCode(
+    'avoid_unnecessary_else_after_control_flow',
+    '[avoid_unnecessary_else_after_control_flow] Else block follows an if branch that already exits unconditionally via return, throw, break, or continue. Because the if branch never falls through, the else block executes in exactly the same cases as unwrapped code placed after the if statement, so the else adds an indentation level with no effect on behavior. {v1}',
+    correctionMessage:
+        'Remove the else keyword and un-indent its block so the code runs directly after the if statement, reducing nesting depth without changing behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addIfStatement((IfStatement node) {
+      // Only relevant when there is an else branch to potentially remove.
+      final Statement? elseStatement = node.elseStatement;
+      if (elseStatement == null) return;
+
+      // The else keyword is the token we flag — removing it (and
+      // un-indenting the else block) is the entire suggested fix.
+      final Token? elseKeyword = node.elseKeyword;
+      if (elseKeyword == null) return;
+
+      // Only flag when the if-branch already exits the enclosing scope;
+      // otherwise the else is structurally required to separate the paths.
+      if (_endsInControlFlowExit(node.thenStatement)) {
+        reporter.atToken(elseKeyword, code);
+      }
+    });
+  }
+
+  /// Returns true when [statement] unconditionally exits the enclosing
+  /// scope via return, throw, break, or continue — making a following
+  /// `else` redundant.
+  bool _endsInControlFlowExit(Statement statement) {
+    // A block's exit behavior is determined by its LAST statement, since
+    // that is the statement that actually determines whether control falls
+    // through past the if-body.
+    if (statement is Block) {
+      if (statement.statements.isEmpty) return false;
+      return _endsInControlFlowExit(statement.statements.last);
+    }
+
+    // return/break/continue are direct exit statements.
+    if (statement is ReturnStatement ||
+        statement is BreakStatement ||
+        statement is ContinueStatement) {
+      return true;
+    }
+
+    // throw expr; is parsed as an ExpressionStatement wrapping a
+    // ThrowExpression, not a dedicated statement type.
+    if (statement is ExpressionStatement &&
+        statement.expression is ThrowExpression) {
+      return true;
+    }
+
+    return false;
+  }
+}

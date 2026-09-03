@@ -1,6 +1,6 @@
 # PROPOSAL: Avoid Unnecessary Else After Control Flow
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 

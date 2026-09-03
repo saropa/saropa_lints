@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.10] — Unreleased
 
-Cross-platform SARIF output fix, dead-link hardening for published docs, and orphan-publish recovery for the publish script. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
+Nine new lint rules across testing, equality, control flow, constructor style, and widget lifecycle. Cross-platform SARIF output fix, dead-link hardening for published docs, and orphan-publish recovery for the publish script. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
 
 ### Fixed
 
@@ -85,6 +85,12 @@ Cross-platform SARIF output fix, dead-link hardening for published docs, and orp
 - New rule `avoid_focused_tests` (Essential) — flags `test()`/`group()` calls with `solo: true` left in committed code, which silently skips the rest of the suite in CI.
 - New rule `avoid_exit_outside_entrypoint` (Recommended) — flags `exit()` calls outside the top-level `main()` function, which kill the process bypassing cleanup and `finally` blocks.
 - New rule `avoid_labeled_statements` (Comprehensive) — flags labeled statements (`label: for/while/switch`) that force readers to track names across nested blocks instead of reasoning locally.
+- New rule `avoid_null_checks_in_equality_operators` (Recommended) — flags dead `other == null` checks inside `operator ==` overrides under sound null safety.
+- New rule `avoid_unnecessary_else_after_control_flow` (Recommended) — flags `else` blocks after `if` bodies that end with `return`, `throw`, `break`, or `continue`.
+- New rule `prefer_initializing_formals` (Comprehensive) — flags constructor body assignments that could be `this.param` initializing formals.
+- New rule `avoid_skipped_tests` (Recommended) — flags `test()`/`group()` calls with `skip: true` or a skip message left in committed code.
+- New rule `no_optional_operators_in_tests` (Comprehensive) — flags `?.` and `??` operators in test files that silently swallow failures.
+- New rule `avoid_public_members_in_states` (Recommended) — flags public fields and methods in `State` subclasses that leak internal state as public API.
 
 ### Changed
 

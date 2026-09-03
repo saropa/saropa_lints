@@ -1,6 +1,6 @@
 # PROPOSAL: Prefer Initializing Formals Over Constructor Body Assignment
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

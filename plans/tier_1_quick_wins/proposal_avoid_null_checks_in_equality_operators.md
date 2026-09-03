@@ -1,6 +1,6 @@
 # PROPOSAL: Avoid Null Checks In Equality Operators
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 

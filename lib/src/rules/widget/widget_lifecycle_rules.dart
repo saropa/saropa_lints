@@ -5022,3 +5022,162 @@ class AvoidExpensiveDidChangeDependenciesRule extends SaropaLintRule {
 /// // Or use a getter
 /// GoRouter get router => GoRouter(routes: [...]);
 /// ```
+
+// =============================================================================
+// avoid_public_members_in_states
+// =============================================================================
+
+/// Warns when a `State<T>` subclass declares a public (non-underscore) field
+/// or method.
+///
+/// Since: v15.3.0 | Rule version: v1
+///
+/// A `State` object is Flutter-internal implementation detail — the framework
+/// creates and owns it via `createState()`, and the only supported way for
+/// external code to interact with a widget is through its constructor. A
+/// public member on `State` invites callers to reach into mutable state via
+/// `GlobalKey<MyWidgetState>()`, bypassing the widget's declared API and
+/// coupling external code to internal implementation. Framework-required
+/// lifecycle overrides (`build`, `initState`, `dispose`, etc.) are exempt
+/// because their public visibility is mandated by the `State` base class
+/// contract, not a design choice made by the author.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   int count = 0; // public field — reachable via GlobalKey
+///   void increment() { setState(() => count++); } // public method
+///   @override
+///   Widget build(BuildContext context) => Text('$count');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   int _count = 0; // private — only this State can touch it
+///   void _increment() { setState(() => _count++); }
+///   @override
+///   Widget build(BuildContext context) => Text('$_count');
+/// }
+/// ```
+class AvoidPublicMembersInStatesRule extends SaropaLintRule {
+  AvoidPublicMembersInStatesRule() : super(code: _code);
+
+  /// Code quality / encapsulation issue, not a runtime hazard — warning tier.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'encapsulation'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  // Restrict the hot-path gate to files that even mention `State`, so files
+  // with no State subclass never pay for the class-declaration visitor.
+  @override
+  Set<String>? get requiredPatterns => const {'State'};
+
+  static const LintCode _code = LintCode(
+    'avoid_public_members_in_states',
+    '[avoid_public_members_in_states] Public (non-underscore) member declared directly on a State<T> subclass. '
+        'State objects are Flutter-internal implementation detail owned by the framework via createState() — the only supported way for '
+        'external code to interact with a widget is through its constructor API. A public field or method on State invites external code to '
+        'reach directly into mutable state through a GlobalKey<State>(), bypassing the widget contract and coupling callers to internals that can '
+        'change without notice. {v1}',
+    correctionMessage:
+        'Prefix the member with an underscore to make it private to the State class, or move the value/behavior into the StatefulWidget '
+        'constructor so external code goes through the public widget API instead of the internal State object.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Lifecycle/framework methods the `State` base class requires to be
+  /// public (the override contract itself mandates the visibility), plus
+  /// `setState` which is inherited, not authored, by every subclass.
+  /// Flagging any of these would fire on code the author has no choice
+  /// about, so they are excluded regardless of an explicit `@override`.
+  static const Set<String> _frameworkRequiredMethods = <String>{
+    'build',
+    'initState',
+    'dispose',
+    'didUpdateWidget',
+    'didChangeDependencies',
+    'deactivate',
+    'activate',
+    'reassemble',
+    'debugFillProperties',
+    'setState',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      // Only State<T> subclasses are in scope — a public member on any
+      // other class is a normal, supported part of that class's API.
+      if (!_isStateSubclass(node)) return;
+
+      for (final ClassMember member in node.bodyMembers) {
+        if (member is FieldDeclaration) {
+          _checkField(reporter, member);
+        } else if (member is MethodDeclaration) {
+          _checkMethod(reporter, member);
+        }
+      }
+    });
+  }
+
+  /// Flags each public (non-underscore) variable in a field declaration.
+  /// A single `FieldDeclaration` can declare multiple variables
+  /// (`int a = 0, b = 0;`), so each is checked and reported individually.
+  void _checkField(SaropaDiagnosticReporter reporter, FieldDeclaration node) {
+    // Static constants/fields are part of the class's namespace, not
+    // instance state reachable via a GlobalKey — out of scope for this rule.
+    if (node.isStatic) return;
+
+    for (final VariableDeclaration variable in node.fields.variables) {
+      final String name = variable.name.lexeme;
+      if (name.startsWith('_')) continue;
+      reporter.atToken(variable.name);
+    }
+  }
+
+  /// Flags a public (non-underscore) method unless it is one of the
+  /// framework-mandated lifecycle overrides, or explicitly marked as an
+  /// intentional public surface via `@visibleForTesting` / `@protected`.
+  void _checkMethod(SaropaDiagnosticReporter reporter, MethodDeclaration node) {
+    final String name = node.name.lexeme;
+    if (name.startsWith('_')) return;
+    if (_frameworkRequiredMethods.contains(name)) return;
+
+    // Operators (==, [], etc.) have a mandatory public spelling defined by
+    // the language, not the author — excluding them avoids flagging a
+    // required `operator ==` override on State.
+    if (node.isOperator) return;
+
+    // @visibleForTesting / @protected mark a deliberate, narrow public
+    // surface (test harness access, or a documented extension point for
+    // subclasses) rather than an accidental leak of internal state.
+    if (_hasAnnotation(node.metadata, 'visibleForTesting') ||
+        _hasAnnotation(node.metadata, 'protected')) {
+      return;
+    }
+
+    reporter.atToken(node.name);
+  }
+
+  /// True when [metadata] carries an annotation literally named [name]
+  /// (e.g. `@protected`). Matches on the annotation's source name rather
+  /// than a resolved element so the check works without a Flutter SDK in
+  /// the analysis context, consistent with this file's other syntactic
+  /// (non-type-resolved) rules.
+  bool _hasAnnotation(NodeList<Annotation> metadata, String name) {
+    return metadata.any((Annotation a) => a.name.name == name);
+  }
+}

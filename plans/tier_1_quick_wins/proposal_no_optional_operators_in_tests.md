@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Null-Aware/Bang Operators Inside Test Files
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

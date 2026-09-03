@@ -3953,3 +3953,239 @@ class AvoidFocusedTestsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when a test is disabled via `skip:` (test/testWidgets/group) or a
+/// file-level `@Skip(...)` annotation.
+///
+/// Since: v15.2.11 | Rule version: v1
+///
+/// A `skip:` argument — whether `true` or a string reason — means the test
+/// never runs while CI still reports success for the suite. Left in
+/// committed code, the test silently rots: the code it once verified can
+/// regress with nobody noticing, because the "test" no longer exercises it.
+///
+/// Example of **bad** code:
+/// ```dart
+/// test('computes total', () {
+///   expect(calculateTotal([1, 2, 3]), 6);
+/// }, skip: 'flaky on CI'); // LINT
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// test('computes total', () {
+///   expect(calculateTotal([1, 2, 3]), 6);
+/// });
+/// ```
+class AvoidSkippedTestsRule extends SaropaLintRule {
+  AvoidSkippedTestsRule() : super(code: _code);
+
+  /// CI safety issue. A skipped test silently stops verifying anything.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  // Skip files that don't mention 'skip'/'Skip' before running the visitor —
+  // covers both the `skip:` named argument and the `@Skip(...)` annotation.
+  @override
+  Set<String>? get requiredPatterns => const {'skip', 'Skip'};
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    'avoid_skipped_tests',
+    '[avoid_skipped_tests] A test, testWidgets, or group call passes a skip: argument (or the file carries a top-level @Skip annotation) that is not explicitly false, which disables the test entirely while the suite keeps reporting a green CI run. The code the test was meant to protect can regress silently because nothing is left exercising it, so the skip either needs a tracked follow-up ticket or the test must be fixed and re-enabled. {v1}',
+    correctionMessage:
+        'Remove the skip argument (or the @Skip annotation) and fix the test, or track its re-enablement with a ticket instead of leaving it silently disabled.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Check every method invocation; only test()/testWidgets()/group() calls
+    // accept a `skip:` named parameter.
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (methodName != 'test' &&
+          methodName != 'testWidgets' &&
+          methodName != 'group') {
+        return;
+      }
+
+      // Look for a named `skip:` argument whose value isn't the literal
+      // `false` — `true` or any string reason both disable the test.
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'skip') {
+          final Expression value = arg.expression;
+          final bool isExplicitlyFalse =
+              value is BooleanLiteral && value.value == false;
+          if (!isExplicitlyFalse) {
+            // Flag the `skip:` argument itself for a precise error location.
+            reporter.atNode(arg);
+          }
+          return;
+        }
+      }
+    });
+
+    // A file-level `@Skip(...)` annotation (from package:test) disables
+    // every test declared in the file, regardless of individual skip: args.
+    context.addAnnotation((Annotation node) {
+      if (node.name.name == 'Skip') {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when null-aware operators (`?.`, `??`, `??=`) or the null-assertion
+/// operator (`!`) are used inside `_test.dart` files.
+///
+/// Since: v15.2.11 | Rule version: v1
+///
+/// Tests exist to assert exact behavior, not to degrade gracefully. A `?.`
+/// or `??` in a test can silently let a `null` pass through to a matcher —
+/// hiding the very bug the test was written to catch — and a bare `!` just
+/// converts that same hidden `null` into an unrelated, confusing crash
+/// instead of a clear assertion failure that names the missing value.
+///
+/// Example of **bad** code:
+/// ```dart
+/// test('has a name', () {
+///   final user = repository.find(1);
+///   expect(user?.name, 'Alice'); // LINT — null silently becomes null
+/// });
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// test('has a name', () {
+///   final user = repository.find(1);
+///   expect(user, isNotNull);
+///   expect(user!.name, 'Alice'); // fine after an explicit assertion — but
+///   // prefer asserting the non-null user variable directly, e.g.:
+///   final foundUser = repository.find(1) ?? fail('user not found');
+///   expect(foundUser.name, 'Alice');
+/// });
+/// ```
+class NoOptionalOperatorsInTestsRule extends SaropaLintRule {
+  NoOptionalOperatorsInTestsRule() : super(code: _code);
+
+  /// Advisory only. A null-aware or bang operator in a test is a smell, not
+  /// necessarily a bug, so this stays informational rather than a warning.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  // Requires a full-body RecursiveAstVisitor traversal per compilation unit
+  // rather than a single targeted node callback.
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  // Deliberately no requiredPatterns: `?.`, `??`, and `!` are too common as
+  // substrings (e.g. inside string literals) to pre-filter reliably, and the
+  // operators themselves are cheap to detect once the visitor runs.
+  @override
+  Set<String>? get requiredPatterns => null;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    'no_optional_operators_in_tests',
+    '[no_optional_operators_in_tests] A null-aware operator (?., ??, ??=) or the null-assertion operator (!) is used inside a test file. Tests exist to assert exact, deterministic behavior — a null-aware operator can silently pass a null value through to a matcher without failing, hiding the very regression the test was written to catch, while a bare ! turns that same hidden null into an unrelated crash instead of a readable assertion failure. {v1}',
+    correctionMessage:
+        'Assert the value directly instead of degrading gracefully: use expect(value, isNotNull) before dereferencing, or assert the exact expected value so a null failure is explicit and readable.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Single full-file pass: one RecursiveAstVisitor catches all four
+    // operator shapes instead of registering four separate node callbacks,
+    // each of which would independently re-walk the same tree.
+    context.addCompilationUnit((CompilationUnit unit) {
+      unit.accept(_OptionalOperatorVisitor(reporter));
+    });
+  }
+}
+
+/// Walks a compilation unit once, flagging every null-aware/null-assertion
+/// operator usage found for [NoOptionalOperatorsInTestsRule].
+class _OptionalOperatorVisitor extends RecursiveAstVisitor<void> {
+  _OptionalOperatorVisitor(this._reporter);
+
+  final SaropaDiagnosticReporter _reporter;
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    // `foo?.bar` — the null-aware property read lets a null foo silently
+    // produce a null result instead of failing loudly.
+    if (node.isNullAware) {
+      _reporter.atNode(node);
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // `foo?.bar()` — same silent-null risk as property access, but for a
+    // method call target.
+    if (node.isNullAware) {
+      _reporter.atNode(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    // `foo ?? bar` — substitutes a fallback value instead of asserting that
+    // foo was actually present, which can mask a missing/broken value.
+    if (node.operator.type == TokenType.QUESTION_QUESTION) {
+      _reporter.atNode(node);
+    }
+    super.visitBinaryExpression(node);
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    // `foo ??= bar` — same fallback-substitution risk as `??`, applied as
+    // an assignment.
+    if (node.operator.type == TokenType.QUESTION_QUESTION_EQ) {
+      _reporter.atNode(node);
+    }
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    // `foo!` — the null-assertion operator. In production code this is a
+    // deliberate contract; in a test it converts a hidden null into an
+    // unrelated crash instead of a clear, named assertion failure.
+    if (node.operator.type == TokenType.BANG) {
+      _reporter.atNode(node);
+    }
+    super.visitPostfixExpression(node);
+  }
+}

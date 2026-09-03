@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Public Fields/Methods on `State<StatefulWidget>` Classes
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

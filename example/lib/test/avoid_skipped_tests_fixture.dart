@@ -100,41 +100,41 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_focused_tests
+// Test fixture for: avoid_skipped_tests
 // Source: lib\src\rules\testing\test_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_focused_tests — solo: true on test() restricts
-// the runner to only this test, silently skipping the rest of the suite.
-// expect_lint: avoid_focused_tests
-void _badFocusedTest() {
+// BAD: Should trigger avoid_skipped_tests — skip: true on test() disables
+// the test entirely while the suite still reports a green CI run.
+// expect_lint: avoid_skipped_tests
+void _badSkippedTestBoolean() {
   test(
     'computes total',
     () {
       expect(1, equals(1));
     },
-    solo: true, // LINT
+    skip: true, // LINT
   );
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on testWidgets()
-// silently skips every other widget test when left in committed code.
-// expect_lint: avoid_focused_tests
-void _badFocusedTestWidgets() {
-  testWidgets(
-    'renders the widget',
-    (tester) async {
+// BAD: Should trigger avoid_skipped_tests — a string reason still disables
+// the test; the reason documents intent but does not run any code.
+// expect_lint: avoid_skipped_tests
+void _badSkippedTestReason() {
+  test(
+    'computes total',
+    () {
       expect(1, equals(1));
     },
-    solo: true, // LINT
+    skip: 'flaky on CI', // LINT
   );
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on group() skips
-// every other group/test in the suite, giving CI a false-green signal.
-// expect_lint: avoid_focused_tests
-void _badFocusedGroup() {
+// BAD: Should trigger avoid_skipped_tests — skip: true on group() disables
+// every test nested inside the group, not just one test case.
+// expect_lint: avoid_skipped_tests
+void _badSkippedGroup() {
   group(
     'checkout flow',
     () {
@@ -142,29 +142,20 @@ void _badFocusedGroup() {
         expect(1, equals(1));
       });
     },
-    solo: true, // LINT
+    skip: true, // LINT
   );
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — no solo argument at all.
+// GOOD: Should NOT trigger avoid_skipped_tests — no skip argument at all.
 void _goodTest() {
   test('computes total', () {
     expect(1, equals(1));
   });
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — solo explicitly disabled.
-void _goodTestExplicitlyNotSolo() {
+// GOOD: Should NOT trigger avoid_skipped_tests — skip explicitly disabled.
+void _goodTestExplicitlyNotSkipped() {
   test('computes total', () {
     expect(1, equals(1));
-  }, solo: false);
-}
-
-// GOOD: Should NOT trigger avoid_focused_tests — group() with no solo arg.
-void _goodGroup() {
-  group('checkout flow', () {
-    test('adds item', () {
-      expect(1, equals(1));
-    });
-  });
+  }, skip: false);
 }

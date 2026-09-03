@@ -103,6 +103,12 @@ void main() {
       'prefer_rethrow_over_throw_e',
       () => PreferRethrowOverThrowERule(),
     );
+
+    testRule(
+      'PreferInitializingFormalsRule',
+      'prefer_initializing_formals',
+      () => PreferInitializingFormalsRule(),
+    );
   });
 
   group('Stylistic Whitespace Constructor Rules - Fixture Verification', () {

@@ -100,71 +100,75 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_focused_tests
-// Source: lib\src\rules\testing\test_rules.dart
+// Test fixture for: avoid_null_checks_in_equality_operators
+// Source: lib\src\rules\data\equality_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_focused_tests — solo: true on test() restricts
-// the runner to only this test, silently skipping the rest of the suite.
-// expect_lint: avoid_focused_tests
-void _badFocusedTest() {
-  test(
-    'computes total',
-    () {
-      expect(1, equals(1));
-    },
-    solo: true, // LINT
-  );
+// BAD: operator== contains a redundant `other == null` check. Under sound
+// null safety `other` is non-nullable Object, so this branch is dead code.
+class _BadPoint {
+  const _BadPoint(this.x, this.y);
+  final int x;
+  final int y;
+
+  @override
+  // expect_lint: avoid_null_checks_in_equality_operators
+  bool operator ==(Object other) {
+    if (other == null) return false; // dead: other can never be null here
+    return other is _BadPoint && other.x == x && other.y == y;
+  }
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on testWidgets()
-// silently skips every other widget test when left in committed code.
-// expect_lint: avoid_focused_tests
-void _badFocusedTestWidgets() {
-  testWidgets(
-    'renders the widget',
-    (tester) async {
-      expect(1, equals(1));
-    },
-    solo: true, // LINT
-  );
+// BAD: same defect spelled with `null == other` and `identical`.
+class _BadPointReversed {
+  const _BadPointReversed(this.x);
+  final int x;
+
+  @override
+  // expect_lint: avoid_null_checks_in_equality_operators
+  bool operator ==(Object other) {
+    if (null == other) return false; // dead: reversed operand order
+    if (identical(other, null)) return false; // dead: identical() form
+    return other is _BadPointReversed && other.x == x;
+  }
+
+  @override
+  int get hashCode => x.hashCode;
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on group() skips
-// every other group/test in the suite, giving CI a false-green signal.
-// expect_lint: avoid_focused_tests
-void _badFocusedGroup() {
-  group(
-    'checkout flow',
-    () {
-      test('adds item', () {
-        expect(1, equals(1));
-      });
-    },
-    solo: true, // LINT
-  );
+// GOOD: no null check on the operator== parameter — relies on the
+// non-nullable `Object other` contract directly via the `is` check.
+class _GoodPoint {
+  const _GoodPoint(this.x, this.y);
+  final int x;
+  final int y;
+
+  @override
+  bool operator ==(Object other) =>
+      other is _GoodPoint && other.x == x && other.y == y; // OK — no null check
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — no solo argument at all.
-void _goodTest() {
-  test('computes total', () {
-    expect(1, equals(1));
-  });
-}
+// GOOD: null checks on OTHER parameters (not the operator== parameter) are
+// legitimate and must not be flagged.
+class _GoodWithOtherNullCheck {
+  const _GoodWithOtherNullCheck(this.label);
+  final String? label;
 
-// GOOD: Should NOT trigger avoid_focused_tests — solo explicitly disabled.
-void _goodTestExplicitlyNotSolo() {
-  test('computes total', () {
-    expect(1, equals(1));
-  }, solo: false);
-}
+  @override
+  bool operator ==(Object other) {
+    // Null-checking a different, nullable field is a real, necessary check —
+    // unrelated to the non-nullable `other` parameter.
+    if (label == null) return false;
+    return other is _GoodWithOtherNullCheck && other.label == label;
+  }
 
-// GOOD: Should NOT trigger avoid_focused_tests — group() with no solo arg.
-void _goodGroup() {
-  group('checkout flow', () {
-    test('adds item', () {
-      expect(1, equals(1));
-    });
-  });
+  @override
+  int get hashCode => label.hashCode;
 }

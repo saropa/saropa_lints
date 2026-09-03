@@ -218,6 +218,17 @@ void main() {
       'avoid_focused_tests',
       () => AvoidFocusedTestsRule(),
     );
+
+    testRule(
+      'AvoidSkippedTestsRule',
+      'avoid_skipped_tests',
+      () => AvoidSkippedTestsRule(),
+    );
+    testRule(
+      'NoOptionalOperatorsInTestsRule',
+      'no_optional_operators_in_tests',
+      () => NoOptionalOperatorsInTestsRule(),
+    );
   });
 
   group('Test Rules Rules - Fixture Verification', () {

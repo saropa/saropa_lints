@@ -100,71 +100,64 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_focused_tests
-// Source: lib\src\rules\testing\test_rules.dart
+// Test fixture for: avoid_unnecessary_else_after_control_flow
+// Source: lib\src\rules\flow\control_flow_rules.dart
 
-import 'package:saropa_lints_example/flutter_mocks.dart';
+void doSomething() {}
+void process(bool error) {}
+int a(int x) => x;
+int b(int x) => -x;
 
-// BAD: Should trigger avoid_focused_tests — solo: true on test() restricts
-// the runner to only this test, silently skipping the rest of the suite.
-// expect_lint: avoid_focused_tests
-void _badFocusedTest() {
-  test(
-    'computes total',
-    () {
-      expect(1, equals(1));
-    },
-    solo: true, // LINT
-  );
+// BAD: else follows a then-branch that returns — the else is dead
+// structure since the if-body already exits the function.
+// expect_lint: avoid_unnecessary_else_after_control_flow
+void _bad_returnThenElse(int? x) {
+  if (x == null) {
+    return;
+  } else {
+    doSomething();
+  }
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on testWidgets()
-// silently skips every other widget test when left in committed code.
-// expect_lint: avoid_focused_tests
-void _badFocusedTestWidgets() {
-  testWidgets(
-    'renders the widget',
-    (tester) async {
-      expect(1, equals(1));
-    },
-    solo: true, // LINT
-  );
+// BAD: else follows a then-branch that throws — same problem, the else
+// only ever runs when the if-condition is false, exactly like flat code.
+// expect_lint: avoid_unnecessary_else_after_control_flow
+void _bad_throwThenElse(bool error) {
+  if (error) {
+    throw Exception('failed');
+  } else {
+    process(error);
+  }
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on group() skips
-// every other group/test in the suite, giving CI a false-green signal.
-// expect_lint: avoid_focused_tests
-void _badFocusedGroup() {
-  group(
-    'checkout flow',
-    () {
-      test('adds item', () {
-        expect(1, equals(1));
-      });
-    },
-    solo: true, // LINT
-  );
+// BAD: else follows a then-branch that breaks out of the loop — the else
+// branch (which continues) is unreachable structure, since falling past
+// the if without breaking already continues naturally.
+void _bad_breakThenElse(List<int> items) {
+  for (final item in items) {
+    // expect_lint: avoid_unnecessary_else_after_control_flow
+    if (item < 0) {
+      break;
+    } else {
+      continue;
+    }
+  }
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — no solo argument at all.
-void _goodTest() {
-  test('computes total', () {
-    expect(1, equals(1));
-  });
+// GOOD: no else — flat structure, the guard return makes the remaining
+// code the "else" path implicitly.
+void _good_flatGuard(int? x) {
+  if (x == null) return;
+  doSomething();
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — solo explicitly disabled.
-void _goodTestExplicitlyNotSolo() {
-  test('computes total', () {
-    expect(1, equals(1));
-  }, solo: false);
-}
-
-// GOOD: Should NOT trigger avoid_focused_tests — group() with no solo arg.
-void _goodGroup() {
-  group('checkout flow', () {
-    test('adds item', () {
-      expect(1, equals(1));
-    });
-  });
+// GOOD: neither branch exits the enclosing scope unconditionally (both
+// just call a function and fall through), so the else is structurally
+// required to distinguish the two paths — removing it would run both.
+void _good_neitherExits(int x) {
+  if (x > 0) {
+    a(x);
+  } else {
+    b(x);
+  }
 }

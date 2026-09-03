@@ -185,6 +185,11 @@ void main() {
       'avoid_labeled_statements',
       () => AvoidLabeledStatementsRule(),
     );
+    testRule(
+      'AvoidUnnecessaryElseAfterControlFlowRule',
+      'avoid_unnecessary_else_after_control_flow',
+      () => AvoidUnnecessaryElseAfterControlFlowRule(),
+    );
   });
 
   group('Control Flow Rules - Fixture Verification', () {

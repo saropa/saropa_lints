@@ -1334,3 +1334,165 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
     });
   }
 }
+
+/// Flags constructor parameters manually assigned to matching fields when
+/// `this.field` initializing-formal shorthand could be used instead.
+///
+/// This is the **inverse** of [PreferConstructorBodyAssignmentRule]
+/// (`prefer_constructor_body_assignment`). These two rules are mutually
+/// exclusive — enabling both creates an unresolvable conflict, since one
+/// asks for the shorthand and the other asks to avoid it.
+///
+/// Since: v15.3.0 | Updated: v15.3.0 | Rule version: v1
+///
+/// **BAD:**
+/// ```dart
+/// class User {
+///   final String name;
+///   User(String name) : this.name = name;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class User {
+///   final String name;
+///   User(this.name);
+/// }
+/// ```
+class PreferInitializingFormalsRule extends SaropaLintRule {
+  PreferInitializingFormalsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'simplification', 'dart-idiom'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  String get exampleBad => 'User(String name) : this.name = name;';
+
+  @override
+  String get exampleGood => 'User(this.name);';
+
+  static const LintCode _code = LintCode(
+    'prefer_initializing_formals',
+    '[prefer_initializing_formals] Constructor parameter is manually '
+        'assigned to a matching field with no transformation, which is '
+        'exactly what Dart initializing formals (this.field) exist to '
+        'replace. The manual assignment adds boilerplate without adding any '
+        'validation or conversion logic, so the shorthand form communicates '
+        'the same behavior more concisely and is easier to scan at a '
+        'glance. {v1}',
+    correctionMessage:
+        'Replace the manual field assignment with the this.field '
+        'initializing-formal shorthand in the parameter list.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((node) {
+      // Build a lookup of simple (non-field-formal, non-super) parameter
+      // names declared on this constructor — only these are eligible to be
+      // rewritten as `this.field`, since field-formal and super parameters
+      // already use shorthand or delegate elsewhere.
+      final paramNames = <String>{};
+      for (final param in node.parameters.parameters) {
+        final normalized = param is DefaultFormalParameter
+            ? param.parameter
+            : param;
+        if (normalized is SimpleFormalParameter) {
+          final name = normalized.name?.lexeme;
+          if (name != null) paramNames.add(name);
+        }
+      }
+      if (paramNames.isEmpty) return;
+
+      _checkInitializerList(node, paramNames, reporter);
+      _checkBodyAssignments(node, paramNames, reporter);
+    });
+  }
+
+  /// Checks `: field = param` initializer entries for a bare-identifier
+  /// assignment where the field name matches the parameter name exactly —
+  /// anything else (a method call, a binary expression, a different name)
+  /// is a real transformation and must keep the explicit form.
+  void _checkInitializerList(
+    ConstructorDeclaration node,
+    Set<String> paramNames,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final initializer in node.initializers) {
+      if (initializer is! ConstructorFieldInitializer) continue;
+
+      final fieldName = initializer.fieldName.name;
+      final expr = initializer.expression;
+
+      // Only a bare identifier that exactly matches both the field name and
+      // a declared parameter name is a candidate — `value.trim()` or
+      // `value ?? defaultValue` legitimately need the explicit form.
+      if (expr is SimpleIdentifier &&
+          expr.name == fieldName &&
+          paramNames.contains(fieldName)) {
+        reporter.atNode(initializer);
+      }
+    }
+  }
+
+  /// Checks constructor body statements for `this.field = param;` (or
+  /// `field = param;`) assignments that could instead be declared as
+  /// initializing formals. Only direct top-level statements are checked —
+  /// assignments inside conditionals or loops imply real logic that the
+  /// shorthand cannot express.
+  void _checkBodyAssignments(
+    ConstructorDeclaration node,
+    Set<String> paramNames,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final body = node.body;
+    if (body is! BlockFunctionBody) return;
+
+    for (final stmt in body.block.statements) {
+      if (stmt is! ExpressionStatement) continue;
+      final expr = stmt.expression;
+      if (expr is! AssignmentExpression) continue;
+      // Only a plain `=` counts — compound assignments (`??=`, `+=`) imply
+      // the field already has a prior value and cannot be a formal.
+      if (expr.operator.lexeme != '=') continue;
+
+      final fieldName = _extractFieldName(expr.leftHandSide);
+      if (fieldName == null) continue;
+
+      final rhs = expr.rightHandSide;
+      if (rhs is SimpleIdentifier &&
+          rhs.name == fieldName &&
+          paramNames.contains(fieldName)) {
+        reporter.atNode(expr);
+      }
+    }
+  }
+
+  /// Extracts the field name from either `this.field` (PropertyAccess with
+  /// a `this` target) or a bare `field` identifier on the left-hand side of
+  /// an assignment. Returns null for anything else (e.g. index expressions)
+  /// since those can never correspond to an initializing formal.
+  String? _extractFieldName(Expression lhs) {
+    if (lhs is PropertyAccess && lhs.target is ThisExpression) {
+      return lhs.propertyName.name;
+    }
+    if (lhs is SimpleIdentifier) {
+      return lhs.name;
+    }
+    return null;
+  }
+}

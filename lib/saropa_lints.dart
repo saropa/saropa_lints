@@ -3302,6 +3302,14 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidFocusedTestsRule.new,
   AvoidExitOutsideEntrypointRule.new,
   AvoidLabeledStatementsRule.new,
+
+  // Tier 1 quick wins — batch 2
+  AvoidNullChecksInEqualityOperatorsRule.new,
+  AvoidUnnecessaryElseAfterControlFlowRule.new,
+  PreferInitializingFormalsRule.new,
+  AvoidSkippedTestsRule.new,
+  NoOptionalOperatorsInTestsRule.new,
+  AvoidPublicMembersInStatesRule.new,
 ];
 
 // =============================================================================

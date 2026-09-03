@@ -100,71 +100,64 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_focused_tests
+// Test fixture for: no_optional_operators_in_tests
 // Source: lib\src\rules\testing\test_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_focused_tests — solo: true on test() restricts
-// the runner to only this test, silently skipping the rest of the suite.
-// expect_lint: avoid_focused_tests
-void _badFocusedTest() {
-  test(
-    'computes total',
-    () {
-      expect(1, equals(1));
-    },
-    solo: true, // LINT
-  );
+// A tiny stand-in "repository" so bad/good examples can look up a nullable
+// user without pulling in real app code.
+class _User {
+  _User(this.name);
+  final String name;
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on testWidgets()
-// silently skips every other widget test when left in committed code.
-// expect_lint: avoid_focused_tests
-void _badFocusedTestWidgets() {
-  testWidgets(
-    'renders the widget',
-    (tester) async {
-      expect(1, equals(1));
-    },
-    solo: true, // LINT
-  );
-}
+_User? _findUser(int id) => id == 1 ? _User('Alice') : null;
 
-// BAD: Should trigger avoid_focused_tests — solo: true on group() skips
-// every other group/test in the suite, giving CI a false-green signal.
-// expect_lint: avoid_focused_tests
-void _badFocusedGroup() {
-  group(
-    'checkout flow',
-    () {
-      test('adds item', () {
-        expect(1, equals(1));
-      });
-    },
-    solo: true, // LINT
-  );
-}
-
-// GOOD: Should NOT trigger avoid_focused_tests — no solo argument at all.
-void _goodTest() {
-  test('computes total', () {
-    expect(1, equals(1));
+// BAD: Should trigger no_optional_operators_in_tests — the null-aware `?.`
+// lets a missing user silently produce a null name instead of failing the
+// test with a clear "user not found" assertion.
+void _badNullAwarePropertyAccess() {
+  test('has a name', () {
+    final user = _findUser(1);
+    // expect_lint: no_optional_operators_in_tests
+    expect(user?.name, 'Alice'); // LINT
   });
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — solo explicitly disabled.
-void _goodTestExplicitlyNotSolo() {
-  test('computes total', () {
-    expect(1, equals(1));
-  }, solo: false);
+// BAD: Should trigger no_optional_operators_in_tests — `??` substitutes a
+// fallback value instead of asserting the real value was actually present.
+void _badNullCoalescing() {
+  test('falls back safely', () {
+    final Map<String, String> map = <String, String>{};
+    // expect_lint: no_optional_operators_in_tests
+    final String value = map['key'] ?? 'default'; // LINT
+    expect(value, 'default');
+  });
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — group() with no solo arg.
-void _goodGroup() {
-  group('checkout flow', () {
-    test('adds item', () {
-      expect(1, equals(1));
-    });
+// BAD: Should trigger no_optional_operators_in_tests — the bang operator
+// converts a hidden null into an unrelated crash instead of a readable
+// assertion failure naming what was missing.
+void _badNullAssertion() {
+  test('reads a required key', () {
+    final Map<String, String> map = <String, String>{'key': 'value'};
+    // expect_lint: no_optional_operators_in_tests
+    final String value = map['key']!; // LINT
+    expect(value, 'value');
+  });
+}
+
+// GOOD: Should NOT trigger no_optional_operators_in_tests — the user is
+// asserted non-null explicitly before its field is read directly, so a
+// missing user fails the test with a clear, named assertion.
+void _goodExplicitAssertion() {
+  test('has a name', () {
+    final user = _findUser(1);
+    expect(user, isNotNull);
+    final foundUser = user;
+    if (foundUser != null) {
+      expect(foundUser.name, 'Alice');
+    }
   });
 }

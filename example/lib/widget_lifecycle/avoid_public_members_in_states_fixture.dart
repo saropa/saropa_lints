@@ -100,71 +100,81 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_focused_tests
-// Source: lib\src\rules\testing\test_rules.dart
+// Test fixture for: avoid_public_members_in_states
+// Source: lib\src\rules\widget\widget_lifecycle_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger avoid_focused_tests — solo: true on test() restricts
-// the runner to only this test, silently skipping the rest of the suite.
-// expect_lint: avoid_focused_tests
-void _badFocusedTest() {
-  test(
-    'computes total',
-    () {
-      expect(1, equals(1));
-    },
-    solo: true, // LINT
-  );
+// BAD: public field and public method declared directly on State — both
+// are reachable from external code via GlobalKey<_BadCounterState>(),
+// bypassing the widget's constructor API.
+class _BadCounterState extends State<MyWidget> {
+  // expect_lint: avoid_public_members_in_states
+  int count = 0;
+
+  // expect_lint: avoid_public_members_in_states
+  void increment() {
+    setState(() => count++);
+  }
+
+  @override
+  Widget build(BuildContext context) => Text('$count');
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on testWidgets()
-// silently skips every other widget test when left in committed code.
-// expect_lint: avoid_focused_tests
-void _badFocusedTestWidgets() {
-  testWidgets(
-    'renders the widget',
-    (tester) async {
-      expect(1, equals(1));
-    },
-    solo: true, // LINT
-  );
+// GOOD: private field and private method — only this State can touch them,
+// so the widget's public surface stays limited to its constructor.
+class _GoodCounterState extends State<MyWidget> {
+  int _count = 0;
+
+  void _increment() {
+    setState(() => _count++);
+  }
+
+  @override
+  Widget build(BuildContext context) => Text('$_count');
 }
 
-// BAD: Should trigger avoid_focused_tests — solo: true on group() skips
-// every other group/test in the suite, giving CI a false-green signal.
-// expect_lint: avoid_focused_tests
-void _badFocusedGroup() {
-  group(
-    'checkout flow',
-    () {
-      test('adds item', () {
-        expect(1, equals(1));
-      });
-    },
-    solo: true, // LINT
-  );
+// GOOD: framework-required lifecycle overrides stay public because the
+// State contract itself mandates their visibility — not a design choice
+// the author made, so flagging them would fire on unavoidable code.
+class _GoodLifecycleState extends State<MyWidget> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(MyWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  Widget build(BuildContext context) => Text('static');
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — no solo argument at all.
-void _goodTest() {
-  test('computes total', () {
-    expect(1, equals(1));
-  });
+// GOOD: a static field is part of the class namespace, not instance state
+// reachable via a GlobalKey, so it is out of scope for this rule.
+class _GoodStaticFieldState extends State<MyWidget> {
+  static int sharedCount = 0;
+
+  @override
+  Widget build(BuildContext context) => Text('$sharedCount');
 }
 
-// GOOD: Should NOT trigger avoid_focused_tests — solo explicitly disabled.
-void _goodTestExplicitlyNotSolo() {
-  test('computes total', () {
-    expect(1, equals(1));
-  }, solo: false);
-}
+// GOOD: @visibleForTesting / @protected mark a deliberate, narrow public
+// surface (test harness access) rather than an accidental leak of state.
+class _GoodTestHookState extends State<MyWidget> {
+  @visibleForTesting
+  void debugReset() {}
 
-// GOOD: Should NOT trigger avoid_focused_tests — group() with no solo arg.
-void _goodGroup() {
-  group('checkout flow', () {
-    test('adds item', () {
-      expect(1, equals(1));
-    });
-  });
+  @protected
+  void extensionHook() {}
+
+  @override
+  Widget build(BuildContext context) => Text('hooked');
 }

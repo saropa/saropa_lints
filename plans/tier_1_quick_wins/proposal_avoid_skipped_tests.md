@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Skipped Tests (`skip: true` / Skip Reason)
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

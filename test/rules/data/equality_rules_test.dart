@@ -70,6 +70,19 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
+    test('AvoidNullChecksInEqualityOperatorsRule', () {
+      final rule = AvoidNullChecksInEqualityOperatorsRule();
+      expect(
+        rule.code.lowerCaseName,
+        'avoid_null_checks_in_equality_operators',
+      );
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_null_checks_in_equality_operators]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
   });
 
   group('Equality Rules - Fixture Verification', () {

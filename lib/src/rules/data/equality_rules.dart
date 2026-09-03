@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -664,4 +665,148 @@ class AvoidDatetimeComparisonWithoutPrecisionRule extends SaropaLintRule {
 
     return false;
   }
+}
+
+// =============================================================================
+// operator== Null-Check Rules
+// =============================================================================
+
+/// Warns when `operator ==` overrides contain a redundant null check on the
+/// parameter.
+///
+/// Since: v15.2.11 | Rule version: v1
+///
+/// Under sound null safety, `operator ==(Object other)` declares `other` as
+/// non-nullable `Object`. A check like `other == null` can therefore never be
+/// true — it is dead code left over from a pre-null-safety codebase, or
+/// copied from Java/C# `equals()` boilerplate where the parameter really
+/// could be null. The check silently never executes its branch, which can
+/// mask an actual equality bug (e.g. an early `return false` that never
+/// fires) and adds noise for reviewers who must reason about an impossible
+/// path.
+///
+/// Example of **bad** code:
+/// ```dart
+/// class Point {
+///   @override
+///   bool operator ==(Object other) {
+///     if (other == null) return false; // dead: other is Object, non-nullable
+///     return other is Point && other.x == x && other.y == y;
+///   }
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// class Point {
+///   @override
+///   bool operator ==(Object other) =>
+///       other is Point && other.x == x && other.y == y;
+/// }
+/// ```
+class AvoidNullChecksInEqualityOperatorsRule extends SaropaLintRule {
+  AvoidNullChecksInEqualityOperatorsRule() : super(code: _code);
+
+  /// Dead-code smell, not a correctness bug — informational severity.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dead-code', 'null-safety'};
+
+  // Requires walking the method body with a visitor, not a single-node
+  // check, so classify as medium cost.
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  // Cheap pre-filter: a file with no literal `null` token cannot contain a
+  // null-vs-parameter comparison, so skip the AST walk entirely for it.
+  @override
+  Set<String>? get requiredPatterns => const {'null'};
+
+  static const LintCode _code = LintCode(
+    'avoid_null_checks_in_equality_operators',
+    '[avoid_null_checks_in_equality_operators] The operator== override contains a null check on its parameter (e.g. other == null, identical(other, null)), but under sound null safety the parameter is declared as non-nullable Object, so this comparison can never be true and the branch is unreachable dead code. This is typically leftover from a pre-null-safety codebase or copied from Java/C# equals() boilerplate where the parameter really could be null, and it can mask a real equality bug by making an early-return branch look like it handles a case it never actually reaches. {v1}',
+    correctionMessage:
+        'Remove the redundant null check on the operator== parameter; it is unreachable under sound null safety.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodDeclaration((MethodDeclaration node) {
+      // Only inspect operator== overrides — other operators (<, +, etc.)
+      // can legitimately compare a nullable operand, so must not be flagged.
+      if (!node.isOperator || node.name.lexeme != '==') return;
+
+      // Extract the single parameter's name so the visitor can match null
+      // comparisons specifically against it (not any other identifier).
+      final FormalParameter? firstParam = node.parameters?.parameters
+          .firstOrNull;
+      if (firstParam is! SimpleFormalParameter) return;
+      final String? paramName = firstParam.name?.lexeme;
+      if (paramName == null) return;
+
+      // Walk the method body (block or expression form) looking for
+      // `param == null` / `identical(param, null)` in any shape.
+      node.body.accept(_NullCheckVisitor(reporter, paramName));
+    });
+  }
+}
+
+/// Walks an `operator ==` body to find redundant comparisons of the
+/// non-nullable parameter against `null`.
+class _NullCheckVisitor extends RecursiveAstVisitor<void> {
+  _NullCheckVisitor(this._reporter, this._paramName);
+
+  final SaropaDiagnosticReporter _reporter;
+  final String _paramName;
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    final TokenType op = node.operator.type;
+    // Only == and != comparisons are relevant; other operators can't form
+    // a null check.
+    if (op == TokenType.EQ_EQ || op == TokenType.BANG_EQ) {
+      if (_isParamNullPair(node.leftOperand, node.rightOperand)) {
+        _reporter.atNode(node);
+      }
+    }
+    // Continue descending so nested null checks (inside && / || chains,
+    // for example) are still found.
+    super.visitBinaryExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // `identical(other, null)` / `identical(null, other)` is the other
+    // idiomatic spelling of a reference-equality null check.
+    if (node.methodName.name == 'identical' &&
+        node.argumentList.arguments.length == 2) {
+      final Expression a = node.argumentList.arguments[0];
+      final Expression b = node.argumentList.arguments[1];
+      if (_isParamNullPair(a, b)) {
+        _reporter.atNode(node);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  /// True when one side is a bare reference to the operator's parameter and
+  /// the other side is the `null` literal, in either order.
+  bool _isParamNullPair(Expression left, Expression right) {
+    return (_isParamRef(left) && right is NullLiteral) ||
+        (_isParamRef(right) && left is NullLiteral);
+  }
+
+  /// True when [expr] is a plain identifier referring to the operator's
+  /// parameter (not a property access or method call on it).
+  bool _isParamRef(Expression expr) =>
+      expr is SimpleIdentifier && expr.name == _paramName;
 }
