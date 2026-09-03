@@ -50,9 +50,19 @@ Built an automated code-generation pipeline for migration pack rule sets and fix
 - Added `--check` mode: `dart run tool/generate_migration_pack_codes.dart -- --check` exits non-zero if the pack file would change, suitable for CI enforcement.
 - Documented migration pack generator steps in `doc/guides/rule_packs.md`.
 
+### Hardening Round 2 (2026-09-03)
+
+- `extractBlock` rewritten to use balanced brace counting instead of `\n};` string search — handles nested map/set literals correctly.
+- `extractPackCodes` likewise switched from `\n  },` end marker to balanced brace counting.
+- `activeQuotedIdentifiers` now strips `/* ... */` block comments (dotAll regex) in addition to `//` line comments.
+- `.dart_tool/` temp directory created with `createSync(recursive: true)` before writing the format temp file — no longer fails on fresh checkouts where `.dart_tool/` doesn't exist yet.
+- Diff output integrated into both normal and `--check` modes: normal run prints `+ added_code` / `- removed_code` per pack after regenerating; `--check` prints drifted codes before the re-run instruction. Not a separate flag — always shown when there are changes.
+- `diffPackEntries()` added to `migration_pack_guide_sync.dart` as the shared diff engine.
+- `_reportCheckResult()` extracted from `main()` to keep function length under 50 lines.
+
 ### Known Limitations
 
 - `flutter_skill_lints`'s 229 codes are validated per-code against tiers.dart (catches renames/removals) but cannot be re-derived from the guide. A removed code replaced by a different code at the same count would pass the count-only drift test.
-- `extractBlock` uses `\n};` as the end marker — safe for the current flat map literal but would break if the block ever contained a nested map with `};` on its own line.
 - `kFlutterSkillLintsDedupDelta = 2` must be updated manually if a third dedup collision appears.
-- `activeQuotedIdentifiers` only strips `//` line comments, not `/* */` block comments — tiers.dart does not use block comments (verified 2026-09-02) but this assumption is not enforced.
+- `activeQuotedIdentifiers` uses a greedy dotAll regex for block comments (`/\*.*?\*/`) — correctly handles non-greedy matching but would break on pathological nested `/* /* */ */` (Dart doesn't support nested block comments, so this is safe).
+- `dart format` determinism across SDK versions is assumed — the generated file is formatted with whatever SDK is on PATH.

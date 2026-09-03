@@ -9,14 +9,11 @@ import 'dart:io';
 
 import 'migration_pack_guide_sync.dart';
 
-/// Header stamped into the generated output.
 const _generatedHeader =
-    '// GENERATED FILE — DO NOT EDIT BY HAND.\n'
-    '//\n'
+    '// GENERATED FILE — DO NOT EDIT BY HAND.\n//\n'
     '// Produced by tool/generate_migration_pack_codes.dart from the HAVE/\n'
     '// ENHANCED rows in doc/guides/migration_guides/*.md. Re-run after edits:\n'
-    '//   dart run tool/generate_migration_pack_codes.dart\n'
-    '//\n'
+    '//   dart run tool/generate_migration_pack_codes.dart\n//\n'
     '// Exceptions: see tool/migration_pack_guide_sync.dart.\n'
     '// Spread into [kRulePackRuleCodes] in rule_packs.dart.\n'
     '// ignore_for_file: always_specify_types\n';
@@ -29,9 +26,7 @@ void main(List<String> args) {
   );
   final tiersContent = File('$repoRoot/lib/src/tiers.dart').readAsStringSync();
   final guideDir = Directory('$repoRoot/doc/guides/migration_guides');
-
-  // Strip comment lines before matching so commented-out rule names
-  // (e.g. "// 'old_rule' removed v4.2") don't false-pass validation.
+  // Strip comment lines so commented-out rule names don't false-pass.
   final knownRuleCodes = activeQuotedIdentifiers(tiersContent);
   final oldContent = targetFile.readAsStringSync();
 
@@ -42,34 +37,48 @@ void main(List<String> args) {
   );
   if (entries == null) return;
 
-  // Assemble the generated source and format it via a temp file.
   final generated = _assembleSource(entries, oldContent);
   final formatted = _formatSource(generated, repoRoot);
   if (formatted == null) return;
+  // Per-pack code additions/removals vs the current file.
+  final diff = diffPackEntries(oldContent, entries);
 
   if (checkOnly) {
-    // Compare against the current file without writing.
-    if (oldContent == formatted) {
-      stdout.writeln('OK: ${targetFile.path} is up to date.');
-    } else {
-      stderr.writeln(
-        'DRIFT: ${targetFile.path} is out of date. '
-        'Re-run: dart run tool/generate_migration_pack_codes.dart',
-      );
-      exitCode = 1;
-    }
+    _reportCheckResult(targetFile, oldContent, formatted, diff);
     return;
   }
-
   targetFile.writeAsStringSync(formatted);
   stdout.writeln('Regenerated ${targetFile.path}: ${entries.length} packs.');
-  for (final e in entries) {
-    stdout.writeln('  ${e.id}: ${e.codes.length} codes');
+  if (diff.isNotEmpty) {
+    stdout.writeln('Changes:');
+    for (final l in diff) stdout.writeln(l);
+  } else {
+    stdout.writeln('No code changes (formatting/comments only).');
   }
 }
 
+/// Reports --check result: up-to-date or drifted with per-code diff.
+void _reportCheckResult(
+  File target,
+  String oldContent,
+  String formatted,
+  List<String> diff,
+) {
+  if (oldContent == formatted) {
+    stdout.writeln('OK: ${target.path} is up to date.');
+    return;
+  }
+  stderr.writeln('DRIFT: ${target.path} is out of date.');
+  if (diff.isNotEmpty) {
+    stderr.writeln('Drifted codes:');
+    for (final l in diff) stderr.writeln(l);
+  }
+  stderr.writeln('Re-run: dart run tool/generate_migration_pack_codes.dart');
+  exitCode = 1;
+}
+
 /// Derives one pack entry per migration pack from the guides. Returns
-/// null and prints errors to stderr if any pack has unknown rule codes.
+/// null and prints errors if any pack has unknown rule codes.
 List<({String id, Set<String> codes, String comment})>? _buildPackEntries({
   required Directory guideDir,
   required Set<String> knownRuleCodes,
@@ -77,16 +86,13 @@ List<({String id, Set<String> codes, String comment})>? _buildPackEntries({
 }) {
   final entries = <({String id, Set<String> codes, String comment})>[];
   final errors = <String>[];
-
   for (final packId in kMigrationPackGuideFiles.keys) {
     final guideFile = File(
       '${guideDir.path}/${kMigrationPackGuideFiles[packId]}',
     );
     final guideContent = guideFile.readAsStringSync();
-
     late final Set<String> codes;
     late final String comment;
-
     if (kMigrationPacksWithoutGuideTable.contains(packId)) {
       // Carry forward from previously-generated file, then validate.
       codes = extractPackCodes(oldContent, packId);
@@ -115,19 +121,14 @@ List<({String id, Set<String> codes, String comment})>? _buildPackEntries({
       }
       comment = buildPackComment(packId, tag, codes, guideContent);
     }
-
     entries.add((id: packId, codes: codes, comment: comment));
   }
-
   if (errors.isNotEmpty) {
     stderr.writeln('Migration pack generation failed:\n');
-    for (final e in errors) {
-      stderr.writeln('  - $e');
-    }
+    for (final e in errors) stderr.writeln('  - $e');
     exitCode = 1;
     return null;
   }
-
   // Largest packs first so the file stays scannable.
   entries.sort((a, b) {
     final byCoverage = b.codes.length.compareTo(a.codes.length);
@@ -176,11 +177,12 @@ String _assembleSource(
   return buf.toString();
 }
 
-/// Formats [source] via a temp file and returns the formatted string,
-/// or null on failure (sets exitCode and prints to stderr).
+/// Formats [source] via a temp file. Returns formatted string or null.
 String? _formatSource(String source, String repoRoot) {
   final tmp = File('$repoRoot/.dart_tool/migration_gen_tmp.dart');
   try {
+    // Ensure .dart_tool/ exists (may be absent in fresh checkouts).
+    tmp.parent.createSync(recursive: true);
     tmp.writeAsStringSync(source);
     final fmt = Process.runSync('dart', [
       'format',
@@ -193,7 +195,6 @@ String? _formatSource(String source, String repoRoot) {
     }
     return tmp.readAsStringSync();
   } finally {
-    // Clean up the temp file.
     if (tmp.existsSync()) tmp.deleteSync();
   }
 }

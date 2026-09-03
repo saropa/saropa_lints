@@ -132,6 +132,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Added `test/config/rule_packs_migration_guide_sync_test.dart` — re-derives each migration pack's expected rule set from its guide's HAVE/ENHANCED table and fails if the pack file drifts from the guide (caught the 4 packs fixed above).
 - `rule_pack_migration_codes.dart` is now generated, not hand-maintained: `tool/generate_migration_pack_codes.dart` parses the HAVE/ENHANCED rows out of every migration guide, validates each referenced saropa rule against `tiers.dart`, and rewrites the pack file — run it after editing any migration guide instead of hand-syncing the pack's `Set<String>`. Shared parsing lives in `tool/migration_pack_guide_sync.dart` so the generator and the drift test can't disagree.
 - Hardened the migration pack generator's tiers.dart validation to skip comment lines (commented-out rule names were false-passing), added validation for the carried-forward `flutter_skill_lints` code set, and extracted a shared dedup constant so the generator and drift test can't silently disagree on the count.
+- Hardened migration pack generator further: `extractBlock`/`extractPackCodes` now use balanced brace counting instead of fragile `\n};`/`\n  },` string markers; `activeQuotedIdentifiers` strips `/* */` block comments in addition to `//` lines; `.dart_tool/` temp directory is created before use; diff output shows per-pack `+ added`/`- removed` codes in both normal and `--check` modes.
 
 </details>
 

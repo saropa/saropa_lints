@@ -1,18 +1,10 @@
-// Shared guide-parsing logic for migration pack rule codes. Used by both
-// tool/generate_migration_pack_codes.dart (regenerates
-// lib/src/config/rule_pack_migration_codes.dart from the guides) and
-// test/config/rule_packs_migration_guide_sync_test.dart (verifies the
-// generated file hasn't drifted from the guides). Keeping the guide-file
-// map and row-parsing regex in one place means the generator and its
-// drift test can never disagree about how to read a guide.
+// Shared guide-parsing for migration pack rule codes. Used by the generator
+// and drift test so they can never disagree about how to read a guide.
 library;
 
 import 'dart:io';
 
 /// Guide filename per pack id, relative to doc/guides/migration_guides/.
-/// Matches `migration_from_<suffix>.md` for every pack except
-/// very_good_analysis, whose guide uses the "vga" shorthand instead of the
-/// full package name.
 const Map<String, String> kMigrationPackGuideFiles = {
   'migrate_dcm': 'migration_from_dcm.md',
   'migrate_flutter_skill_lints': 'migration_from_flutter_skill_lints.md',
@@ -42,40 +34,23 @@ const Map<String, String> kMigrationPackGuideFiles = {
   'migrate_accessibility_lint': 'migration_from_accessibility_lint.md',
 };
 
-/// Packs whose guide uses `**ENHANCED**` instead of `HAVE` in its mapping
-/// table's status column. very_good_analysis is a preset-only package
-/// where saropa only ever supersedes a stock rule with a strictly better
-/// version — every other row is `N/A (stock analyzer rule)`, never `HAVE`.
+/// Packs using `**ENHANCED**` instead of `HAVE` in their guide table.
 const Set<String> kMigrationPacksUsingEnhancedTag = {
   'migrate_very_good_analysis',
 };
 
-/// Packs with no per-rule mapping table in their guide at all, so their
-/// code set can't be re-derived from guide text and must be carried
-/// forward from the existing generated file instead. flutter_skill_lints
-/// points readers at plans/GAP_ANALYSIS.md rather than enumerating its 231
-/// HAVE rows inline — enumerating them requires cross-referencing the
-/// source package's GitHub rule tree, not just parsing the guide.
+/// Packs with no per-rule mapping table — codes carried forward.
 const Set<String> kMigrationPacksWithoutGuideTable = {
   'migrate_flutter_skill_lints',
 };
 
-/// Known dedup count for flutter_skill_lints: this many source rules map
-/// to a saropa rule that another source rule already claims, so the final
-/// unique code count is (total - GAP - PARTIAL - knownDedupDelta). Shared
-/// between the generator and the drift test so neither can silently drift.
-/// As of 2026-09-02: prefer_dedicated_media_query_method and
-/// prefer_sliver_prefix each have two source rules mapping to them.
+/// Known dedup count for flutter_skill_lints (2 source rules share targets).
 const int kFlutterSkillLintsDedupDelta = 2;
 
-/// Extracts backtick-wrapped identifiers from a guide table cell.
 final _codePattern = RegExp(r'`([a-zA-Z0-9_]+)`');
 
-/// Extracts the set of saropa rule codes a guide's `HAVE`/`ENHANCED` rows
-/// declare, expanding `a / b` fan-out cells (one source rule mapping to
-/// multiple saropa rules) into multiple codes.
+/// Extracts saropa rule codes from a guide's HAVE/ENHANCED rows.
 Set<String> codesFromGuideTable(String guideContent, String statusTag) {
-  // Build the full pattern dynamically because the status tag varies.
   final rowPattern = RegExp(
     r'^\| `[A-Za-z0-9_-]+` \| '
     '\\*{0,2}$statusTag\\*{0,2}'
@@ -84,9 +59,8 @@ Set<String> codesFromGuideTable(String guideContent, String statusTag) {
   );
   final codes = <String>{};
   for (final row in rowPattern.allMatches(guideContent)) {
-    final eqCell = row.group(1)!;
     // Split on "/" for fan-out cells (e.g. "`rule_a` / `rule_b`").
-    for (final part in eqCell.split('/')) {
+    for (final part in row.group(1)!.split('/')) {
       final match = _codePattern.firstMatch(part);
       if (match != null) codes.add(match.group(1)!);
     }
@@ -94,47 +68,40 @@ Set<String> codesFromGuideTable(String guideContent, String statusTag) {
   return codes;
 }
 
-/// Matches the standard `Coverage: N rules — X HAVE (Y%)` summary line.
+/// Matches `Coverage: N rules — X HAVE (Y%)` summary lines.
 final _coveragePattern = RegExp(
   r'Coverage: (\d+) rules? — (\d+) HAVE \((\d+)%\)',
 );
 
-/// Parses a guide's `Coverage: N rules — X HAVE (Y%), ...` summary line.
-/// Returns null if the line is missing or doesn't match the expected shape
-/// (some tiny guides phrase coverage differently — callers should fall
-/// back to a generic comment in that case).
-({int total, int have, int percent})? parseCoverageLine(String guideContent) {
-  final match = _coveragePattern.firstMatch(guideContent);
-  if (match == null) return null;
+/// Parses a guide's coverage summary line. Null if not found.
+({int total, int have, int percent})? parseCoverageLine(String content) {
+  final m = _coveragePattern.firstMatch(content);
+  if (m == null) return null;
   return (
-    total: int.parse(match.group(1)!),
-    have: int.parse(match.group(2)!),
-    percent: int.parse(match.group(3)!),
+    total: int.parse(m.group(1)!),
+    have: int.parse(m.group(2)!),
+    percent: int.parse(m.group(3)!),
   );
 }
 
-/// Builds the descriptive comment line that appears above a pack's code
-/// set in the generated file, using the guide's coverage summary when
-/// available.
+/// Builds the comment line above a pack's code set in the generated file.
 String buildPackComment(
   String packId,
   String tag,
   Set<String> codes,
   String guideContent,
 ) {
-  final coverage = parseCoverageLine(guideContent);
+  final cov = parseCoverageLine(guideContent);
   final name = packId.replaceFirst('migrate_', '');
-  if (coverage == null) return '  // $name — ${codes.length} $tag codes.';
-  final fanOut = codes.length != coverage.have
+  if (cov == null) return '  // $name — ${codes.length} $tag codes.';
+  final fanOut = codes.length != cov.have
       ? ' (${codes.length} unique saropa codes after fan-out)'
       : '';
-  return '  // $name — ${coverage.have} $tag rules covering '
-      '${coverage.percent}% of ${coverage.total} total$fanOut.';
+  return '  // $name — ${cov.have} $tag rules covering '
+      '${cov.percent}% of ${cov.total} total$fanOut.';
 }
 
-/// Resolves the saropa_lints repo root by walking up from [Directory.current]
-/// until a directory containing pubspec.yaml is found. Used by generator
-/// tools that need absolute paths to lib/, doc/, and tiers.dart.
+/// Walks up from cwd to find the repo root (directory with pubspec.yaml).
 String findRepoRoot() {
   var dir = Directory.current;
   while (!File('${dir.path}/pubspec.yaml').existsSync()) {
@@ -147,14 +114,13 @@ String findRepoRoot() {
   return dir.path;
 }
 
-/// Returns every single-quoted identifier in [content] that appears on
-/// a non-comment line, so commented-out rule names (e.g.
-/// `// 'old_rule' removed v4.2`) don't false-pass validation.
-/// Only strips `//` line comments — tiers.dart does not use `/* */`
-/// block comments (verified 2026-09-02).
+/// Returns single-quoted identifiers from active (non-comment) lines.
+/// Strips both `//` line comments and `/* */` block comments.
 Set<String> activeQuotedIdentifiers(String content) {
+  // Strip block comments first (may span multiple lines).
+  final noBlock = content.replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '');
   final pattern = RegExp(r"'([a-zA-Z0-9_]+)'");
-  return content
+  return noBlock
       .split('\n')
       .where((line) => !line.trimLeft().startsWith('//'))
       .expand((line) => pattern.allMatches(line))
@@ -162,37 +128,69 @@ Set<String> activeQuotedIdentifiers(String content) {
       .toSet();
 }
 
-/// Extracts a `const ... = { ... };` block starting at [startMarker]
-/// up to and including its matching closing `};`. Uses the first `};`
-/// after the marker — safe for flat map/set literals but not nested
-/// blocks containing `};` on their own line.
+/// Extracts a top-level `const ... = { ... };` block via balanced braces.
 String extractBlock(String content, String startMarker) {
   final start = content.indexOf(startMarker);
-  if (start == -1) {
-    throw StateError('Could not find block starting with: $startMarker');
+  if (start == -1) throw StateError('Block not found: $startMarker');
+  final braceStart = content.indexOf('{', start);
+  if (braceStart == -1) throw StateError('No brace in: $startMarker');
+  // Walk forward counting braces until balanced.
+  var depth = 0;
+  for (var i = braceStart; i < content.length; i++) {
+    if (content[i] == '{') depth++;
+    if (content[i] == '}') depth--;
+    if (depth == 0) {
+      // Include the trailing semicolon if present.
+      final end = (i + 1 < content.length && content[i + 1] == ';')
+          ? i + 2
+          : i + 1;
+      return content.substring(start, end);
+    }
   }
-  final end = content.indexOf('\n};', start);
-  if (end == -1) {
-    throw StateError('Could not find end of block starting with: $startMarker');
-  }
-  return content.substring(start, end + 3);
+  throw StateError('Unbalanced braces in block: $startMarker');
 }
 
-/// Extracts the quoted rule codes inside a single `'packId': { ... },`
-/// set literal from the existing generated file. Used to carry forward
-/// flutter_skill_lints' code set (no guide table to re-derive from).
+/// Extracts quoted rule codes from a `'packId': { ... },` entry using
+/// balanced braces so nested sets don't truncate the extraction.
 Set<String> extractPackCodes(String content, String packId) {
-  final keyPattern = RegExp("'$packId': \\{");
-  final start = keyPattern.firstMatch(content);
-  if (start == null) {
-    throw StateError('Could not find existing entry for $packId');
+  final start = RegExp("'$packId': \\{").firstMatch(content);
+  if (start == null) throw StateError('No entry for $packId');
+  // Walk from the opening brace until the matching close.
+  var depth = 1;
+  for (var i = start.end; i < content.length; i++) {
+    if (content[i] == '{') depth++;
+    if (content[i] == '}') depth--;
+    if (depth == 0) {
+      return RegExp(r"'([a-zA-Z0-9_]+)'")
+          .allMatches(content.substring(start.end, i))
+          .map((m) => m.group(1)!)
+          .toSet();
+    }
   }
-  final end = content.indexOf('\n  },', start.end);
-  if (end == -1) {
-    throw StateError('Could not find end of entry for $packId');
+  throw StateError('Unbalanced braces for $packId');
+}
+
+/// Computes per-pack added/removed codes between old generated content
+/// and new entries. Returns human-readable diff lines (empty = no change).
+List<String> diffPackEntries(
+  String oldContent,
+  List<({String id, Set<String> codes, String comment})> entries,
+) {
+  final lines = <String>[];
+  for (final e in entries) {
+    Set<String> oldCodes;
+    try {
+      oldCodes = extractPackCodes(oldContent, e.id);
+    } on StateError {
+      // New pack — all codes are additions.
+      oldCodes = {};
+    }
+    final added = e.codes.difference(oldCodes);
+    final removed = oldCodes.difference(e.codes);
+    if (added.isEmpty && removed.isEmpty) continue;
+    lines.add('  ${e.id}:');
+    for (final c in added.toList()..sort()) lines.add('    + $c');
+    for (final c in removed.toList()..sort()) lines.add('    - $c');
   }
-  final block = content.substring(start.end, end);
-  return RegExp(
-    r"'([a-zA-Z0-9_]+)'",
-  ).allMatches(block).map((m) => m.group(1)!).toSet();
+  return lines;
 }
