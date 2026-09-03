@@ -56,18 +56,18 @@ Twelve of `logd_linters`' 13 rules are specific to the `logd` package's arena-po
 
 | logd_linters Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `logd_document_retained_across_cycles` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_missing_release_in_engine` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_checkout_without_release` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_formatter_performs_string_rendering` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_decorator_not_immutable` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_formatter_not_immutable` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_avoid_print_sink_in_production` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_logtag_use_bitmask` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_log_buffer_not_sunk` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_handler_missing_engine` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_handler_missing_dispose` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
-| `logd_freeze_on_unconfigured_logger` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_document_retained_across_cycles` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_missing_release_in_engine` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_checkout_without_release` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_formatter_performs_string_rendering` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_decorator_not_immutable` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_formatter_not_immutable` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_avoid_print_sink_in_production` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_logtag_use_bitmask` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_log_buffer_not_sunk` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_handler_missing_engine` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_handler_missing_dispose` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
+| `logd_freeze_on_unconfigured_logger` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_logd_linters_rules.md) (logd-specific) |
 | `logd_metadata_set_duplicate` | HAVE | `avoid_duplicate_object_elements` (generic collection-literal duplicate detection covers duplicate metadata Set entries) |
 
 ## What You Gain

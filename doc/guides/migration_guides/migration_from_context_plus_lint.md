@@ -56,10 +56,10 @@ Coverage: 4 rules — 4 TODO (100%)
 
 | context_plus_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `context_use_unique_key` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_context_use_unique_key.md) |
-| `context_ref_reassignment` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_context_ref_reassignment.md) |
-| `wrong_ref_declaration` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_context_plus_ref_validation_rules.md) |
-| `wrong_ref_type` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_context_plus_ref_validation_rules.md) |
+| `context_use_unique_key` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_context_use_unique_key.md) |
+| `context_ref_reassignment` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_context_ref_reassignment.md) |
+| `wrong_ref_declaration` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_context_plus_ref_validation_rules.md) |
+| `wrong_ref_type` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_context_plus_ref_validation_rules.md) |
 
 ## What You Gain
 

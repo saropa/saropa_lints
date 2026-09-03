@@ -18,7 +18,7 @@ Add `function_lines_of_code` to flag functions/methods whose body exceeds a conf
 
 ## Motivation
 
-Saropa already has a `bugs/tier_2_high_value/proposal_extend_avoid_long_functions_dcm_parity.md`-adjacent gap around long functions, but per the project's own CLAUDE.md hard limit ("Functions ≤50 lines" self-reviewer enforced), a pure line-count metric is the project's own primary readability signal — cyclomatic complexity and LOC catch different smells (a function can be short but deeply branchy, or long but linear), so both metrics have independent value and `solid_lints` ships LOC as a distinct rule from complexity-based ones.
+Saropa already has a `plans/tier_2_high_value/proposal_extend_avoid_long_functions_dcm_parity.md`-adjacent gap around long functions, but per the project's own CLAUDE.md hard limit ("Functions ≤50 lines" self-reviewer enforced), a pure line-count metric is the project's own primary readability signal — cyclomatic complexity and LOC catch different smells (a function can be short but deeply branchy, or long but linear), so both metrics have independent value and `solid_lints` ships LOC as a distinct rule from complexity-based ones.
 
 ---
 

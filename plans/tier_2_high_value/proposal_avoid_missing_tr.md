@@ -5,7 +5,7 @@
 Created: 2026-09-02
 Type: New rule (package-specific — depends on the `easy_localization` package)
 Related rules: `avoid-missing-tr-on-strings` (companion, narrower variant covering only bare string-literal
-arguments — see `bugs/tier_2_high_value/proposal_avoid_missing_tr_on_strings.md`)
+arguments — see `plans/tier_2_high_value/proposal_avoid_missing_tr_on_strings.md`)
 
 ---
 

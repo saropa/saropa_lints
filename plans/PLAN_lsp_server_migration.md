@@ -1,7 +1,8 @@
 # Plan: Standalone LSP Server Migration
 
-**Status:** design / pre-implementation
+**Status:** Phase 0 implemented — pending manual VS Code test
 **Created:** 2026-09-02
+**Updated:** 2026-09-03
 **Audience:** maintainers planning the migration from `analysis_server_plugin` to a standalone LSP server
 
 ## Problem statement
@@ -176,12 +177,16 @@ automatically.
 
 ## Migration phases
 
-### Phase 0 — Fake LSP plumbing test (opt-in, zero risk)
+### Phase 0 — Fake LSP plumbing test (opt-in, zero risk) ✓ IMPLEMENTED
 
 **Goal:** Prove the VS Code extension can spawn a second LSP server for Dart
 files and that its diagnostics merge into the same Problems panel alongside the
 Dart analyzer's diagnostics. No real analysis, no rules, no
 `AnalysisContextCollection`. Just: does the plumbing work?
+
+**Implementation status:** Code complete (commits `157e3c4e`, `67ed0562`,
+`38968fe9`). Locale catalogs regenerated (`93734f21`). Pending manual VS Code
+test (F5 Extension Development Host) to verify exit criteria.
 
 **Control surface — extension Debug Panel:**
 
@@ -198,13 +203,11 @@ This is the master control for both diagnostic engines:
 │  ─────────────────                          │
 │  ● Analyzer Plugin    [ON]  [OFF]  (pid: —) │
 │    Status: active via analysis_options.yaml  │
-│    Rules: 203 (light lane)                  │
 │    RSS: — (in-process, not separately       │
 │         measurable)                         │
 │                                             │
 │  ● Scan Daemon        [ON]  [OFF]  (pid: —) │
 │    Status: idle / running / suspended       │
-│    Rules: 2,140 (full lane)                 │
 │    RSS: 1.02 GB                             │
 │                                             │
 │  ● LSP Server         [ON]  [OFF]  (pid: —) │
@@ -243,10 +246,11 @@ triggers this via `dart.restartAnalysisServer` command).
 - `saropaLints.debug.enabled` (boolean, default: true) — shows the Debug
   Panel in the sidebar. When false, the panel is hidden and the LSP server
   is never spawned. No overhead.
-- `saropaLints.lspServer.enabled` (boolean, default: true) — persisted
-  independently from the debug panel. When the debug panel is hidden, this
-  setting still controls whether the LSP server runs (for headless/CI use
-  or for users who just want to flip a setting without the full debug UI).
+- `saropaLints.lspServer.enabled` (boolean, default: false) — persisted
+  independently from the debug panel. Off by default (opt-in during Phase 0).
+  When the debug panel is hidden, this setting still controls whether the
+  LSP server runs (for headless/CI use or for users who just want to flip
+  a setting without the full debug UI).
 
 **Commands (command palette):**
 - `Saropa Lints: Toggle Debug Panel`
@@ -350,6 +354,20 @@ off doesn't affect the others.
 - Rule registration / diagnostic reporting through `SaropaLintRule`
 - `AnalysisContextCollection` memory cost
 - Config loading or tier/pack filtering
+
+**Implementation notes (2026-09-02):**
+- `SPAWN_USE_SHELL` added to LSP server spawn for Windows `dart.bat` PATHEXT
+- Diagnostic source `saropa_lsp_test` with filter in `liveDiagnosticsModel.ts`
+  (prevents fake diagnostics from affecting the status bar score)
+- `LSP_TEST_DIAGNOSTIC_SOURCE` constant extracted in TS; cross-language sync
+  test (`test/integrity/lsp_source_string_sync_test.dart`) ensures Dart and
+  TS source strings stay aligned
+- `SaropaLspClient` constructor pushes itself to `context.subscriptions`
+  (once per instance — do NOT also push from call sites)
+- `engine.status` is a machine key (not translated); translation happens at
+  display time in `debugPanel-html.ts` via `l10n('debug.engine.statusValue.${engine.status}')`
+- Kill All / Restart All log strings routed through `l10n()`
+- All new en.json keys regenerated across 24 locales via Qwen
 
 **Risk:** `LanguageClient` might conflict with the Dart extension's own
 `LanguageClient`. Mitigation: use a different `documentSelector` scheme

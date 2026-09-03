@@ -88,18 +88,18 @@ Note: the official riverpod_lint package ships 15 rules, not the 13 quoted by ea
 |---|---|---|
 | `async_value_nullable_pattern` | HAVE | `avoid_nullable_async_value_pattern` |
 | `avoid_build_context_in_providers` | HAVE | `avoid_build_context_in_providers` |
-| `avoid_public_notifier_properties` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_public_notifier_properties.md) |
+| `avoid_public_notifier_properties` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_public_notifier_properties.md) |
 | `avoid_ref_inside_state_dispose` | HAVE | `avoid_ref_inside_state_dispose` |
-| `functional_ref` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_functional_ref.md) |
+| `functional_ref` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_functional_ref.md) |
 | `missing_provider_scope` | HAVE | `require_provider_scope` |
-| `notifier_build` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_notifier_build.md) |
-| `notifier_extends` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_notifier_extends.md) |
-| `only_use_keep_alive_inside_keep_alive` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_only_use_keep_alive_inside_keep_alive.md) |
-| `protected_notifier_properties` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_protected_notifier_properties.md) |
-| `provider_dependencies` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_provider_dependencies.md) |
-| `provider_parameters` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_provider_parameters.md) |
+| `notifier_build` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_notifier_build.md) |
+| `notifier_extends` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_notifier_extends.md) |
+| `only_use_keep_alive_inside_keep_alive` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_only_use_keep_alive_inside_keep_alive.md) |
+| `protected_notifier_properties` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_protected_notifier_properties.md) |
+| `provider_dependencies` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_provider_dependencies.md) |
+| `provider_parameters` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_provider_parameters.md) |
 | `riverpod_syntax_error` | N/A | Framework-internal `@riverpod` codegen syntax validation — no code-quality equivalent needed |
-| `scoped_providers_should_specify_dependencies` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_scoped_providers_should_specify_dependencies.md) |
+| `scoped_providers_should_specify_dependencies` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_scoped_providers_should_specify_dependencies.md) |
 | `unsupported_provider_value` | N/A | Framework-internal codegen validation — no code-quality equivalent needed |
 
 ## What You Gain
@@ -107,10 +107,10 @@ Note: the official riverpod_lint package ships 15 rules, not the 13 quoted by ea
 riverpod_lint only checks Riverpod. saropa_lints adds Riverpod naming and file-structure conventions that riverpod_lint doesn't attempt, plus everything outside Riverpod:
 
 **Riverpod naming/structure (DCM-parity rules, not in riverpod_lint)**
-- `prefer_riverpod_notifier_suffix` (TODO, see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_riverpod_notifier_suffix.md))
-- `prefer_riverpod_provider_suffix` (TODO, see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_riverpod_provider_suffix.md))
-- `prefer_correct_notifier_file_name` (TODO, see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_notifier_file_name.md))
-- `avoid_calling_notifier_members_inside_build` (TODO, see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_calling_notifier_members_inside_build.md))
+- `prefer_riverpod_notifier_suffix` (TODO, see [proposal](../../../plans/tier_2_high_value/proposal_prefer_riverpod_notifier_suffix.md))
+- `prefer_riverpod_provider_suffix` (TODO, see [proposal](../../../plans/tier_2_high_value/proposal_prefer_riverpod_provider_suffix.md))
+- `prefer_correct_notifier_file_name` (TODO, see [proposal](../../../plans/tier_2_high_value/proposal_prefer_correct_notifier_file_name.md))
+- `avoid_calling_notifier_members_inside_build` (TODO, see [proposal](../../../plans/tier_2_high_value/proposal_avoid_calling_notifier_members_inside_build.md))
 - `use_ref_and_state_synchronously`, `use_ref_read_synchronously` — HAVE today
 
 **Other state management**

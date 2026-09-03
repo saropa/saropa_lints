@@ -65,7 +65,7 @@ Coverage: 63 rules — 41 HAVE (65%), 2 PARTIAL, 20 TODO (31%)
 
 ### bloc.yaml (22 rules — 21 HAVE, 1 PARTIAL)
 
-Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_from_dcm.md#bloc) for the full mapping. Only `handle-bloc-event-subclasses` is PARTIAL (`require_bloc_event_sealed` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_require_bloc_event_sealed_dcm_parity.md)); the remaining 21 rules are all HAVE.
+Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_from_dcm.md#bloc) for the full mapping. Only `handle-bloc-event-subclasses` is PARTIAL (`require_bloc_event_sealed` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_require_bloc_event_sealed_dcm_parity.md)); the remaining 21 rules are all HAVE.
 
 ### riverpod.yaml (18 rules — 11 HAVE, 7 TODO)
 
@@ -75,27 +75,27 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 | `avoid-ref-watch-outside-build` | HAVE | `avoid_ref_watch_outside_build` |
 | `avoid-unnecessary-consumer-widgets` | HAVE | `avoid_unnecessary_consumer_widgets` |
 | `use-ref-read-synchronously` | HAVE | `use_ref_read_synchronously` |
-| `avoid-calling-notifier-members-inside-build` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_calling_notifier_members_inside_build.md) |
+| `avoid-calling-notifier-members-inside-build` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_calling_notifier_members_inside_build.md) |
 | `avoid-notifier-constructors` | HAVE | `avoid_notifier_constructors` |
 | `dispose-provided-instances` | HAVE | `dispose_provided_instances` |
 | `prefer-immutable-provider-arguments` | HAVE | `prefer_immutable_provider_arguments` |
-| `avoid-public-notifier-properties` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_public_notifier_properties.md) |
+| `avoid-public-notifier-properties` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_public_notifier_properties.md) |
 | `avoid-ref-inside-state-dispose` | HAVE | `avoid_ref_inside_state_dispose` |
 | `avoid-nullable-async-value-pattern` | HAVE | `avoid_nullable_async_value_pattern` |
 | `use-ref-and-state-synchronously` | HAVE | `use_ref_and_state_synchronously` |
 | `avoid-assigning-notifiers` | HAVE | `avoid_assigning_notifiers` |
-| `prefer-single-notifier-per-file` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_single_notifier_per_file.md) |
-| `prefer-riverpod-provider-suffix` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_riverpod_provider_suffix.md) |
-| `prefer-riverpod-notifier-suffix` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_riverpod_notifier_suffix.md) |
-| `prefer-correct-notifier-file-name` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_notifier_file_name.md) |
-| `prefer-correct-provider-file-name` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_provider_file_name.md) |
+| `prefer-single-notifier-per-file` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_single_notifier_per_file.md) |
+| `prefer-riverpod-provider-suffix` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_riverpod_provider_suffix.md) |
+| `prefer-riverpod-notifier-suffix` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_riverpod_notifier_suffix.md) |
+| `prefer-correct-notifier-file-name` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_correct_notifier_file_name.md) |
+| `prefer-correct-provider-file-name` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_correct_provider_file_name.md) |
 
 ### provider.yaml (7 rules — 5 HAVE, 2 PARTIAL)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid-watch-outside-build` | PARTIAL | `avoid_ref_watch_outside_build` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_ref_watch_outside_build_dcm_parity.md) |
-| `avoid-read-inside-build` | PARTIAL | `avoid_ref_read_inside_build` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_ref_read_inside_build_dcm_parity.md) |
+| `avoid-watch-outside-build` | PARTIAL | `avoid_ref_watch_outside_build` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_ref_watch_outside_build_dcm_parity.md) |
+| `avoid-read-inside-build` | PARTIAL | `avoid_ref_read_inside_build` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_ref_read_inside_build_dcm_parity.md) |
 | `dispose-providers` | HAVE | `dispose_provider_instances` / `require_provider_dispose` |
 | `prefer-multi-provider` | HAVE | `prefer_multi_provider` |
 | `avoid-instantiating-in-value-provider` | HAVE | `avoid_instantiating_in_value_provider` |
@@ -142,8 +142,8 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 | `prefer-providing-intl-description` | HAVE | `prefer_providing_intl_description` |
 | `provide-correct-intl-args` | HAVE | `provide_correct_intl_args` |
 | `prefer-providing-intl-examples` | HAVE | `prefer_providing_intl_examples` |
-| `prefer-number-format` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_number_format.md). |
-| `prefer-date-format` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_date_format.md). |
+| `prefer-number-format` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_number_format.md). |
+| `prefer-date-format` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_date_format.md). |
 
 ### flame.yaml (4 rules — 2 HAVE, 2 TODO)
 
@@ -151,8 +151,8 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 |---|---|---|
 | `avoid-creating-vector-in-update` | HAVE | `avoid_creating_vector_in_update` |
 | `avoid-redundant-async-on-load` | HAVE | `avoid_redundant_async_on_load` |
-| `avoid-initializing-in-on-mount` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_initializing_in_on_mount.md). |
-| `correct-game-instantiating` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_correct_game_instantiating.md). |
+| `avoid-initializing-in-on-mount` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_initializing_in_on_mount.md). |
+| `correct-game-instantiating` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_correct_game_instantiating.md). |
 
 ### firebase_analytics.yaml (2 rules — 2 HAVE)
 
@@ -172,35 +172,35 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `prefer-symbol-over-key` | HAVE | `prefer_symbol_over_key` |
-| `prefer-custom-finder-over-find` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_custom_finder_over_find.md). |
+| `prefer-custom-finder-over-find` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_custom_finder_over_find.md). |
 
 ### mocktail.yaml (4 rules — 4 TODO)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `use-then-answer` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_use_then_answer.md). |
-| `pass-mock-object` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_pass_mock_object.md). |
-| `avoid-implementation-in-mocks` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_implementation_in_mocks.md). |
-| `prefer-correct-any-matcher` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_any_matcher.md). |
+| `pass-mock-object` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_pass_mock_object.md). |
+| `avoid-implementation-in-mocks` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_implementation_in_mocks.md). |
+| `prefer-correct-any-matcher` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_correct_any_matcher.md). |
 
 ### easy_localization.yaml (2 rules — 2 TODO)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid-missing-tr` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_missing_tr.md). |
-| `avoid-missing-tr-on-strings` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_missing_tr_on_strings.md). |
+| `avoid-missing-tr` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_missing_tr.md). |
+| `avoid-missing-tr-on-strings` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_missing_tr_on_strings.md). |
 
 ### get_it.yaml (1 rule — 1 TODO)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid-functions-in-register-singleton` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_functions_in_register_singleton.md). |
+| `avoid-functions-in-register-singleton` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_functions_in_register_singleton.md). |
 
 ### json_serializable.yaml (1 rule — 1 TODO)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `specify-unknown-enum-value` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_specify_unknown_enum_value.md). |
+| `specify-unknown-enum-value` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_specify_unknown_enum_value.md). |
 
 ## What You Gain
 

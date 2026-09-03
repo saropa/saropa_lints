@@ -35,7 +35,8 @@ status fields was judged lower value than surfacing the actual open list below.
 
 ## Genuinely open (37 unique rules, no implementation and no filed proposal)
 
-Cross-checked against the 336 proposals filed this session (`bugs/proposal_*.md`) — none of these 37
+Cross-checked against the 336 proposals filed this session (`plans/tier_*/proposal_*.md`,
+`plans/declined/`, `plans/deferred/fpdart/`) — none of these 37
 overlap with a competitor-package migration-guide gap, meaning they are saropa's own internal roadmap
 ideas rather than DCM/alternative-package parity items.
 
@@ -123,7 +124,7 @@ state `bin/cross_file.dart` is in today); treat this section as the historical r
 
 ## Next step
 
-Proposals now exist for all 37 items above (`bugs/*/proposal_*.md`). Of those, 4 turned out to be
+Proposals now exist for all 37 items above (`plans/tier_*/proposal_*.md`). Of those, 4 turned out to be
 duplicates of already-shipped rules and 1 needs a decision on extend-vs-new (see RESOLVED / NEEDS
 DECISION annotations above) — leaving 32 genuinely open. The actionable next step is implementing
 the open items in the tier order set out in `plans/PLAN_gap_theme_priorities.md`.

@@ -82,7 +82,7 @@ Coverage: 0 HAVE (0%), 0 PARTIAL (0%), 1 TODO (100%).
 
 | team_guard Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `team_guard.forbidden_widget` — generic project-configurable "ban this widget/class, suggest this replacement" mechanism with an import-fixing quick fix | TODO | see [proposal](../../../bugs/tier_3_infrastructure/proposal_infra_configurable_widget_ban_mechanism.md) (see [GAP_ANALYSIS.md](../../../plans/GAP_ANALYSIS.md) Gap Theme 2 — generic, user-configurable architecture/import-boundary engines) |
+| `team_guard.forbidden_widget` — generic project-configurable "ban this widget/class, suggest this replacement" mechanism with an import-fixing quick fix | TODO | see [proposal](../../../plans/tier_3_infrastructure/proposal_infra_configurable_widget_ban_mechanism.md) (see [GAP_ANALYSIS.md](../../../plans/GAP_ANALYSIS.md) Gap Theme 2 — generic, user-configurable architecture/import-boundary engines) |
 
 saropa_lints' closest fixed-relationship equivalent is `banned_identifier_usage`
 (name-only matching, no replacement-import quick fix, not project-configurable via a

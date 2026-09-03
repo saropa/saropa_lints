@@ -54,11 +54,11 @@ Coverage: 9 rules — 3 PARTIAL, 6 TODO (66%)
 | `must_await_all_futures` | PARTIAL | `avoid_unawaited_future` — fires generally; theirs is annotation-scoped (`@mustAwaitAllFutures`) with a separate error-severity tier |
 | `must_handle_return` | PARTIAL | `avoid_ignoring_return_values` / `missing_use_result_annotation` — same generic-discard concept, not annotation-driven with two severity tiers |
 | `no_future_outcome_type` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_no_future_outcome_type.md) |
-| `must_be_anonymous` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_must_be_anonymous.md) |
-| `must_be_strong_ref` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_must_be_strong_ref.md) |
+| `must_be_anonymous` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_must_be_anonymous.md) |
+| `must_be_strong_ref` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_must_be_strong_ref.md) |
 | `no_futures` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_no_futures.md) |
-| `must_use_unsafe_wrapper` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_must_use_unsafe_wrapper.md) |
-| `sendable` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_sendable.md) |
+| `must_use_unsafe_wrapper` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_must_use_unsafe_wrapper.md) |
+| `sendable` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_sendable.md) |
 
 All 6 `TODO` rows are gated on `df_safer_dart_lints`' own annotation markers (`@sendable`, `@unsafe`, etc.) that saropa_lints does not recognize.
 

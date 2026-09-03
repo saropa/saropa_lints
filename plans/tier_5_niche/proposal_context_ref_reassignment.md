@@ -4,7 +4,7 @@
 
 Created: 2026-09-02
 Type: New rule
-Related rules: `context_use_unique_key` (`context_plus_lint` companion proposal, same source package — see `bugs/tier_5_niche/proposal_context_use_unique_key.md`)
+Related rules: `context_use_unique_key` (`context_plus_lint` companion proposal, same source package — see `plans/tier_5_niche/proposal_context_use_unique_key.md`)
 
 ---
 

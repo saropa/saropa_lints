@@ -45,14 +45,14 @@ tests affected. All work landed in commits `6a3b7048` through `b611439d` on
 `plans/PLAN_gap_theme_priorities.md` was the last file with stale proposal
 references. Fixed 9 bare filenames → tier-folder-qualified paths, corrected the
 proposal count 298 → 336, and updated the glob `bugs/proposal_*.md` →
-`bugs/*/proposal_*.md`. All 9 referenced proposals verified on disk. Separately
+`plans/tier_*/proposal_*.md`. All 9 referenced proposals verified on disk. Separately
 verified: all 5 RESOLVED annotations in `PLAN_open_legacy_tasks.md` point at
 rules that exist in `lib/src/rules/` and are functionally equivalent to the
 proposals they replace (confirmed by reading rule implementations and proposal
 specs; one minor acknowledged gap: `avoid_large_objects_in_state` does not cover
 `ui.Image`/`Picture` types, per the proposal's own known-limitations note).
 Migration guide links: 422 references, 289 unique paths, 0 dead links. Glob
-`bugs/*/proposal_*.md` is safe — only 6 tier subdirectories exist under `bugs/`.
+`plans/tier_*/proposal_*.md` is safe — only 6 tier subdirectories exist under `bugs/`.
 
 Added a clarifying note to the plan header distinguishing per-theme gap counts
 (~24/~50/~42) from per-folder file counts (121/74/59) to prevent confusion.

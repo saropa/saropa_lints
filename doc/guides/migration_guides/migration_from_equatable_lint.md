@@ -49,7 +49,7 @@ Coverage: 2 rules — 1 HAVE (50%), 1 TODO (50%)
 | equatable_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `missing_field_in_equatable_props` | HAVE | `list_all_equatable_fields` |
-| `always_call_super_props_when_overriding_equatable_props` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_always_call_super_props_when_overriding_equatable_props.md) (checked existing Equatable proposals — `proposal_avoid_equatable_call_on_equality_base_class.md` covers a different concept, incorrectly *calling* base equality members, not a missing `super.props` call when overriding `props` in a subclass chain; `proposal_prefer_equatable_key_name.md` and `proposal_prefer_sorted_equatable_props.md` are unrelated) |
+| `always_call_super_props_when_overriding_equatable_props` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_always_call_super_props_when_overriding_equatable_props.md) (checked existing Equatable proposals — `proposal_avoid_equatable_call_on_equality_base_class.md` covers a different concept, incorrectly *calling* base equality members, not a missing `super.props` call when overriding `props` in a subclass chain; `proposal_prefer_equatable_key_name.md` and `proposal_prefer_sorted_equatable_props.md` are unrelated) |
 
 ## What You Gain
 

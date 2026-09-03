@@ -77,7 +77,7 @@ Coverage: 6 rules — 2 HAVE (33%), 3 PARTIAL, 1 TODO (16%)
 |---|---|---|
 | `avoid_hardcoded_strings_in_widgets` | HAVE | `avoid_hardcoded_strings_in_ui` |
 | `avoid_string_literals_in_logic` | HAVE | `no_magic_string` |
-| `class_length` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_function_lines_of_code.md). `avoid_god_class` exists but measures member count, not LOC — a different metric, not a substitute |
+| `class_length` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_function_lines_of_code.md). `avoid_god_class` exists but measures member count, not LOC — a different metric, not a substitute |
 | `cognitive_complexity` | PARTIAL | `avoid_high_cyclomatic_complexity` — flat McCabe count, no nesting weight or two-tier severity like klin_dart's SonarSource-style metric |
 | `file_length` | PARTIAL | `avoid_long_length_files` — fixed 500-line tier-gated threshold, not configurable, doesn't exclude import lines like klin_dart's 700-line default |
 | `function_length` | PARTIAL | `avoid_long_functions` — 100-line default (excludes comments/blank lines), no `build()`-specific higher threshold like klin_dart's 150-line allowance |

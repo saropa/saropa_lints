@@ -59,9 +59,9 @@ Coverage: 5 rules — 2 HAVE (40%), 1 PARTIAL, 2 TODO (40%)
 |---|---|---|
 | `dispose_controllers` | HAVE | `dispose_class_fields` / `dispose_widget_fields` |
 | `no_as_type_assertion` | PARTIAL | `avoid_unsafe_cast` — only flags casts that can actually fail at runtime (more precise than flutter_custom_lints' unconditional flag on every `as`, but misses the "any `as` at all" strict-mode case) |
-| `no_direct_iterable_access` | TODO | Flags any direct `[]` index access on `Iterable`/`List`, suggesting a project-defined `safeAt()` extension. TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_no_direct_iterable_access.md) |
+| `no_direct_iterable_access` | TODO | Flags any direct `[]` index access on `Iterable`/`List`, suggesting a project-defined `safeAt()` extension. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_no_direct_iterable_access.md) |
 | `no_null_force` | HAVE | `avoid_non_null_assertion` |
-| `use_compare_without_case` | TODO | Flags `==`/`!=` between `String` operands, suggesting a `compareWithoutCase()` extension; saropa's `avoid_case_sensitive_path_comparison` is scoped to file paths only, not general string comparison. TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_use_compare_without_case.md) |
+| `use_compare_without_case` | TODO | Flags `==`/`!=` between `String` operands, suggesting a `compareWithoutCase()` extension; saropa's `avoid_case_sensitive_path_comparison` is scoped to file paths only, not general string comparison. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_use_compare_without_case.md) |
 
 ## What You Lose
 

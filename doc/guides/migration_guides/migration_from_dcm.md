@@ -144,16 +144,16 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-accessing-other-classes-private-members` | HAVE | `avoid_accessing_other_classes_private_members` |
 | `avoid-adjacent-strings` | HAVE | `avoid_adjacent_strings` |
 | `avoid-always-null-parameters` | HAVE | `avoid_always_null_parameters` |
-| `avoid-always-null-variables` | PARTIAL | `avoid_always_null_parameters` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_always_null_parameters_dcm_parity.md) |
+| `avoid-always-null-variables` | PARTIAL | `avoid_always_null_parameters` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_always_null_parameters_dcm_parity.md) |
 | `avoid-assigning-to-static-field` | HAVE | `avoid_assigning_to_static_field` |
 | `avoid-assignments-as-conditions` | HAVE | `avoid_assignments_as_conditions` |
 | `avoid-async-call-in-sync-function` | HAVE | `avoid_async_call_in_sync_function` |
-| `avoid-banned-annotations` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_annotations.md) |
-| `avoid-banned-exports` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_exports.md) |
-| `avoid-banned-file-names` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_file_names.md) |
-| `avoid-banned-imports` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_imports.md) |
-| `avoid-banned-names` | PARTIAL | `banned_identifier_usage` — TODO extend, see [proposal](../../../bugs/tier_3_infrastructure/proposal_extend_banned_identifier_usage_dcm_parity.md) |
-| `avoid-banned-types` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_types.md) |
+| `avoid-banned-annotations` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_annotations.md) |
+| `avoid-banned-exports` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_exports.md) |
+| `avoid-banned-file-names` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_file_names.md) |
+| `avoid-banned-imports` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_imports.md) |
+| `avoid-banned-names` | PARTIAL | `banned_identifier_usage` — TODO extend, see [proposal](../../../plans/tier_3_infrastructure/proposal_extend_banned_identifier_usage_dcm_parity.md) |
+| `avoid-banned-types` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_types.md) |
 | `avoid-barrel-files` | HAVE | `avoid_barrel_files` |
 | `avoid-bitwise-operators-with-booleans` | HAVE | `avoid_bitwise_operators_with_booleans` |
 | `avoid-bottom-type-in-patterns` | HAVE | `avoid_bottom_type_in_patterns` |
@@ -219,7 +219,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-inferrable-type-arguments` | HAVE | `prefer_inferred_type_arguments` |
 | `avoid-inverted-boolean-checks` | HAVE | `avoid_inverted_boolean_checks` |
 | `avoid-keywords-in-wildcard-pattern` | HAVE | `avoid_keywords_in_wildcard_pattern` |
-| `avoid-labels` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_labeled_statements.md) |
+| `avoid-labels` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_labeled_statements.md) |
 | `avoid-late-final-reassignment` | HAVE | `avoid_late_final_reassignment` |
 | `avoid-late-keyword` | HAVE | `avoid_late_keyword` |
 | `avoid-local-functions` | HAVE | `avoid_local_functions` |
@@ -232,13 +232,13 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-missing-completer-stack-trace` | HAVE | `avoid_missing_completer_stack_trace` |
 | `avoid-missing-enum-constant-in-map` | HAVE | `avoid_missing_enum_constant_in_map` |
 | `avoid-missing-interpolation` | HAVE | `avoid_missing_interpolation` |
-| `avoid-missing-test-files` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_missing_test_files.md) |
+| `avoid-missing-test-files` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_missing_test_files.md) |
 | `avoid-misused-test-matchers` | HAVE | `avoid_misused_test_matchers` |
 | `avoid-misused-set-literals` | HAVE | `avoid_misused_set_literals` |
-| `avoid-misused-wildcard-pattern` | PARTIAL | `avoid_keywords_in_wildcard_pattern` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_keywords_in_wildcard_pattern_dcm_parity.md) |
+| `avoid-misused-wildcard-pattern` | PARTIAL | `avoid_keywords_in_wildcard_pattern` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_keywords_in_wildcard_pattern_dcm_parity.md) |
 | `avoid-mixing-named-and-positional-fields` | HAVE | `avoid_mixing_named_and_positional_fields` |
 | `avoid-multi-assignment` | HAVE | `avoid_multi_assignment` |
-| `avoid-mutating-constant-collections` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_mutating_constant_collections.md) |
+| `avoid-mutating-constant-collections` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_mutating_constant_collections.md) |
 | `avoid-mutating-parameters` | HAVE | `avoid_parameter_mutation` |
 | `avoid-negated-conditions` | HAVE | `avoid_negated_conditions` |
 | `avoid-negations-in-equality-checks` | HAVE | `avoid_negations_in_equality_checks` |
@@ -257,7 +257,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-non-empty-constructor-bodies` | HAVE | `avoid_non_empty_constructor_bodies` |
 | `avoid-non-final-exception-class-fields` | HAVE | `avoid_non_final_exception_class_fields` |
 | `avoid-non-null-assertion` | HAVE | `avoid_non_null_assertion` |
-| `avoid-not-assignable-collection-types` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_not_assignable_collection_types.md) |
+| `avoid-not-assignable-collection-types` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_not_assignable_collection_types.md) |
 | `avoid-not-encodable-in-to-json` | HAVE | `avoid_not_encodable_in_to_json` |
 | `avoid-nullable-interpolation` | HAVE | `avoid_nullable_interpolation` |
 | `avoid-nullable-parameters-with-default-values` | HAVE | `avoid_nullable_parameters_with_default_values` |
@@ -289,21 +289,21 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-slow-collection-methods` | HAVE | `avoid_slow_collection_methods` |
 | `avoid-stream-tostring` | HAVE | `avoid_stream_tostring` |
 | `avoid-substring` | HAVE | `avoid_string_substring` |
-| `avoid-suspicious-global-reference` | PARTIAL | `avoid_global_state` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_global_state_dcm_parity.md) |
-| `avoid-suspicious-super-overrides` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_suspicious_super_overrides.md) |
+| `avoid-suspicious-global-reference` | PARTIAL | `avoid_global_state` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_global_state_dcm_parity.md) |
+| `avoid-suspicious-super-overrides` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_suspicious_super_overrides.md) |
 | `avoid-throw-in-catch-block` | HAVE | `avoid_throw_in_catch_block` |
 | `avoid-throw-objects-without-tostring` | HAVE | `avoid_throw_objects_without_tostring` |
-| `avoid-throw` | PARTIAL | `avoid_throw_in_finally` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_throw_in_finally_dcm_parity.md) |
+| `avoid-throw` | PARTIAL | `avoid_throw_in_finally` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_throw_in_finally_dcm_parity.md) |
 | `avoid-top-level-members-in-tests` | HAVE | `avoid_top_level_members_in_tests` |
 | `avoid-type-casts` | HAVE | `avoid_type_casts` |
 | `avoid-unassigned-fields` | HAVE | `avoid_unassigned_fields` |
 | `avoid-unassigned-late-fields` | HAVE | `avoid_unassigned_late_fields` |
-| `avoid-unassigned-local-variable` | PARTIAL | `avoid_unassigned_late_fields` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_unassigned_late_fields_dcm_parity.md) |
+| `avoid-unassigned-local-variable` | PARTIAL | `avoid_unassigned_late_fields` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_unassigned_late_fields_dcm_parity.md) |
 | `avoid-unassigned-stream-subscriptions` | HAVE | `avoid_unassigned_stream_subscriptions` |
 | `avoid-uncaught-future-errors` | HAVE | `avoid_uncaught_future_errors` |
 | `avoid-unconditional-break` | HAVE | `avoid_unconditional_break` |
 | `avoid-unknown-pragma` | HAVE | `avoid_unknown_pragma` |
-| `avoid-unmodified-loop-condition` | PARTIAL | `avoid_complex_loop_conditions` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_complex_loop_conditions_dcm_parity.md) |
+| `avoid-unmodified-loop-condition` | PARTIAL | `avoid_complex_loop_conditions` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_complex_loop_conditions_dcm_parity.md) |
 | `avoid-unnecessary-block` | HAVE | `avoid_unnecessary_block` |
 | `avoid-unnecessary-call` | HAVE | `avoid_unnecessary_call` |
 | `avoid-unnecessary-collections` | HAVE | `avoid_unnecessary_collections` |
@@ -315,7 +315,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-unnecessary-enum-arguments` | HAVE | `avoid_unnecessary_enum_arguments` |
 | `avoid-unnecessary-enum-prefix` | HAVE | `avoid_unnecessary_enum_prefix` |
 | `avoid-unnecessary-extends` | HAVE | `avoid_unnecessary_extends` |
-| `avoid-unnecessary-factory` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_unnecessary_factory_constructor.md) |
+| `avoid-unnecessary-factory` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_factory_constructor.md) |
 | `avoid-unnecessary-futures` | HAVE | `avoid_unnecessary_futures` |
 | `avoid-unnecessary-getter` | HAVE | `avoid_unnecessary_getter` |
 | `avoid-unnecessary-if` | HAVE | `avoid_unnecessary_if` |
@@ -329,7 +329,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-unnecessary-nullable-parameters` | HAVE | `avoid_unnecessary_nullable_parameters` |
 | `avoid-unnecessary-nullable-return-type` | HAVE | `avoid_unnecessary_nullable_return_type` |
 | `avoid-unnecessary-overrides` | HAVE | `avoid_unnecessary_overrides` |
-| `avoid-unnecessary-parentheses` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_unnecessary_parentheses.md) |
+| `avoid-unnecessary-parentheses` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_parentheses.md) |
 | `avoid-unnecessary-patterns` | HAVE | `avoid_unnecessary_patterns` |
 | `avoid-unnecessary-reassignment` | HAVE | `avoid_unnecessary_reassignment` |
 | `avoid-unnecessary-return` | HAVE | `avoid_unnecessary_return` |
@@ -362,7 +362,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `function-always-returns-null` | HAVE | `function_always_returns_null` |
 | `function-always-returns-same-value` | HAVE | `function_always_returns_same_value` |
 | `handle-throwing-invocations` | HAVE | `handle_throwing_invocations` |
-| `initializers-ordering` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_initializers_ordering.md) |
+| `initializers-ordering` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_initializers_ordering.md) |
 | `map-keys-ordering` | HAVE | `map_keys_ordering` |
 | `match-base-class-default-value` | HAVE | `match_base_class_default_value` |
 | `match-class-name-pattern` | HAVE | `match_class_name_pattern` |
@@ -370,20 +370,20 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `match-lib-folder-structure` | HAVE | `match_lib_folder_structure` |
 | `match-positional-field-names-on-assignment` | HAVE | `match_positional_field_names_on_assignment` |
 | `max-imports` | HAVE | `limit_max_imports` |
-| `max-statements` | PARTIAL | `avoid_long_functions` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_long_functions_dcm_parity.md) |
+| `max-statements` | PARTIAL | `avoid_long_functions` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_long_functions_dcm_parity.md) |
 | `member-ordering` | HAVE | `prefer_member_ordering` |
 | `missing-test-assertion` | HAVE | `missing_test_assertion` |
 | `missing-use-result-annotation` | HAVE | `missing_use_result_annotation` |
 | `move-records-to-typedefs` | HAVE | `move_records_to_typedefs` |
 | `move-variable-closer-to-its-usage` | HAVE | `move_variable_closer_to_its_usage` |
 | `move-variable-outside-iteration` | HAVE | `move_variable_outside_iteration` |
-| `newline-before-break` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_blank_line_before_break.md) |
+| `newline-before-break` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_blank_line_before_break.md) |
 | `newline-before-case` | HAVE | `prefer_blank_line_before_case` |
 | `newline-before-constructor` | HAVE | `prefer_blank_line_before_constructor` |
-| `newline-before-continue` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_blank_line_before_continue.md) |
+| `newline-before-continue` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_blank_line_before_continue.md) |
 | `newline-before-method` | HAVE | `prefer_blank_line_before_method` |
 | `newline-before-return` | HAVE | `prefer_blank_line_before_return` |
-| `newline-before-throw` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_blank_line_before_throw.md) |
+| `newline-before-throw` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_blank_line_before_throw.md) |
 | `no-boolean-literal-compare` | HAVE | `no_boolean_literal_compare` |
 | `no-empty-block` | HAVE | `no_empty_block` |
 | `no-empty-string` | HAVE | `no_empty_string` |
@@ -443,7 +443,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-for-in` | HAVE | `prefer_for_in` |
 | `prefer-getter-over-method` | HAVE | `prefer_getter_over_method` |
 | `prefer-immediate-return` | HAVE | `prefer_immediate_return` |
-| `prefer-initializing-formals` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_initializing_formals.md) |
+| `prefer-initializing-formals` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_initializing_formals.md) |
 | `prefer-iterable-of` | HAVE | `prefer_iterable_of` |
 | `prefer-last` | HAVE | `prefer_list_last` |
 | `prefer-match-file-name` | HAVE | `prefer_match_file_name` |
@@ -451,14 +451,14 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-named-boolean-parameters` | HAVE | `prefer_named_boolean_parameters` |
 | `prefer-named-imports` | HAVE | `prefer_named_imports` |
 | `prefer-named-parameters` | HAVE | `prefer_named_parameters` |
-| `prefer-non-nulls` | PARTIAL | `avoid_unnecessary_nullable_parameters` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_unnecessary_nullable_parameters_dcm_parity.md) |
+| `prefer-non-nulls` | PARTIAL | `avoid_unnecessary_nullable_parameters` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_unnecessary_nullable_parameters_dcm_parity.md) |
 | `prefer-null-aware-elements` | HAVE | `prefer_null_aware_elements` |
 | `prefer-null-aware-spread` | HAVE | `prefer_null_aware_spread` |
 | `prefer-overriding-parent-equality` | HAVE | `prefer_overriding_parent_equality` |
 | `prefer-parentheses-with-if-null` | HAVE | `prefer_parentheses_with_if_null` |
 | `prefer-prefixed-global-constants` | HAVE | `prefer_prefixed_global_constants` |
 | `prefer-private-extension-type-field` | HAVE | `prefer_private_extension_type_field` |
-| `prefer-private-named-parameters` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_private_named_parameters.md) |
+| `prefer-private-named-parameters` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_private_named_parameters.md) |
 | `prefer-public-exception-classes` | HAVE | `prefer_public_exception_classes` |
 | `prefer-pushing-conditional-expressions` | HAVE | `prefer_pushing_conditional_expressions` |
 | `prefer-random-secure` | HAVE | `prefer_secure_random_for_crypto` |
@@ -486,12 +486,12 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-type-over-var` | HAVE | `prefer_type_over_var` |
 | `prefer-typedefs-for-callbacks` | HAVE | `prefer_typedefs_for_callbacks` |
 | `prefer-unique-test-names` | HAVE | `prefer_unique_test_names` |
-| `prefer-unmodifiable-of` | PARTIAL | `prefer_unmodifiable_collections` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_prefer_unmodifiable_collections_dcm_parity.md) |
+| `prefer-unmodifiable-of` | PARTIAL | `prefer_unmodifiable_collections` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_prefer_unmodifiable_collections_dcm_parity.md) |
 | `prefer-unwrapping-future-or` | HAVE | `prefer_unwrapping_future_or` |
 | `prefer-visible-for-testing-on-members` | HAVE | `prefer_visible_for_testing_on_members` |
 | `prefer-wildcard-pattern` | HAVE | `prefer_wildcard_pattern` |
 | `record-fields-ordering` | HAVE | `prefer_sorted_record_fields` |
-| `require-atomic-async-updates` | PARTIAL | `require_mounted_check_after_await` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_require_mounted_check_after_await_dcm_parity.md) |
+| `require-atomic-async-updates` | PARTIAL | `require_mounted_check_after_await` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_require_mounted_check_after_await_dcm_parity.md) |
 | `tag-name` | HAVE | `prefer_kebab_tag_name` |
 | `unnecessary-trailing-comma` | HAVE | `unnecessary_trailing_comma` |
 | `use-existing-destructuring` | HAVE | `use_existing_destructuring` |
@@ -502,23 +502,23 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | DCM Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `add-copy-with` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_add_copy_with_code_assist.md) |
-| `always-pass-global-key` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_require_global_key_for_widget.md) |
+| `always-pass-global-key` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_require_global_key_for_widget.md) |
 | `always-remove-listener` | HAVE | `always_remove_listener` |
 | `avoid-border-all` | HAVE | `avoid_border_all` |
-| `avoid-disposing-late-fields` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_disposing_late_fields.md) |
+| `avoid-disposing-late-fields` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_disposing_late_fields.md) |
 | `avoid-empty-setstate` | HAVE | `avoid_empty_setstate` |
 | `avoid-expanded-as-spacer` | HAVE | `avoid_expanded_as_spacer` |
 | `avoid-flexible-outside-flex` | HAVE | `avoid_flexible_outside_flex` |
-| `avoid-focusable-offstage` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_focusable_offstage.md) |
+| `avoid-focusable-offstage` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_focusable_offstage.md) |
 | `avoid-incomplete-copy-with` | HAVE | `avoid_incomplete_copy_with` |
 | `avoid-incorrect-image-opacity` | HAVE | `avoid_incorrect_image_opacity` |
 | `avoid-inherited-widget-in-initstate` | HAVE | `avoid_inherited_widget_in_initstate` |
 | `avoid-late-context` | HAVE | `avoid_late_context` |
-| `avoid-merge-semantics-list-tile` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_merge_semantics_list_tile.md) |
+| `avoid-merge-semantics-list-tile` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_merge_semantics_list_tile.md) |
 | `avoid-missing-controller` | HAVE | `require_form_field_controller` |
 | `provide-image-semantic-label` | HAVE | `require_image_semantics` |
 | `avoid-mounted-in-setstate` | HAVE | `avoid_mounted_in_setstate` |
-| `avoid-nested-interactive-semantics` | PARTIAL | `avoid_merged_semantics_hiding_info` — TODO extend, see [proposal](../../../bugs/tier_3_infrastructure/proposal_extend_avoid_merged_semantics_hiding_info_dcm_parity.md) |
+| `avoid-nested-interactive-semantics` | PARTIAL | `avoid_merged_semantics_hiding_info` — TODO extend, see [proposal](../../../plans/tier_3_infrastructure/proposal_extend_avoid_merged_semantics_hiding_info_dcm_parity.md) |
 | `avoid-recursive-widget-calls` | HAVE | `avoid_recursive_widget_calls` |
 | `avoid-redundant-semantics-wrapper` | HAVE | `avoid_redundant_semantics` |
 | `avoid-returning-widgets` | HAVE | `avoid_returning_widgets` |
@@ -537,7 +537,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `check-for-equals-in-render-object-setters` | HAVE | `check_for_equals_in_render_object_setters` |
 | `consistent-update-render-object` | HAVE | `consistent_update_render_object` |
 | `dispose-fields` | HAVE | `dispose_widget_fields` / `dispose_class_fields` |
-| `keep-state-below-its-widget` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_state_class_below_widget.md) |
+| `keep-state-below-its-widget` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_state_class_below_widget.md) |
 | `pass-existing-future-to-future-builder` | HAVE | `pass_existing_future_to_future_builder` |
 | `pass-existing-stream-to-stream-builder` | HAVE | `pass_existing_stream_to_stream_builder` |
 | `prefer-action-button-tooltip` | HAVE | `prefer_action_button_tooltip` |
@@ -549,14 +549,14 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-constrained-box-over-container` | HAVE | `prefer_constrained_box_over_container` |
 | `prefer-container` | TODO | TODO — see [proposal](../../../plans/declined/proposal_prefer_container.md) |
 | `prefer-correct-edge-insets-constructor` | HAVE | `prefer_correct_edge_insets_constructor` |
-| `prefer-correct-static-icon-provider` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_correct_static_icon_provider.md) |
-| `prefer-dedicated-media-query-methods` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |
+| `prefer-correct-static-icon-provider` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_correct_static_icon_provider.md) |
+| `prefer-dedicated-media-query-methods` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |
 | `prefer-define-hero-tag` | HAVE | `prefer_define_hero_tag` |
 | `prefer-extracting-callbacks` | HAVE | `prefer_extracting_callbacks` |
 | `prefer-for-loop-in-children` | HAVE | `prefer_for_loop_in_children` |
-| `prefer-haptic-feedback-on-interaction` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_haptic_feedback_on_interaction.md) |
+| `prefer-haptic-feedback-on-interaction` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_haptic_feedback_on_interaction.md) |
 | `prefer-icon-button-tooltip` | HAVE | `avoid_icon_buttons_without_tooltip` |
-| `prefer-localized-semantic-labels` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_prefer_localized_semantic_labels.md) |
+| `prefer-localized-semantic-labels` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_prefer_localized_semantic_labels.md) |
 | `prefer-padding-over-container` | HAVE | `prefer_padding_over_container` |
 | `prefer-semantics-header` | HAVE | `require_heading_semantics` |
 | `prefer-single-setstate` | HAVE | `prefer_single_setstate` |
@@ -572,11 +572,11 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `proper-super-calls` | HAVE | `proper_super_calls` |
 | `provide-autofill-hints` | HAVE | `require_autofill_hints` |
 | `provide-icon-semantic-label` | HAVE | `require_semantic_label_icons` |
-| `provide-input-field-label` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_require_input_field_label.md) |
-| `provide-progress-indicator-semantics` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_require_progress_indicator_semantics.md) |
-| `provide-slider-semantic-formatter` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_require_slider_semantic_formatter.md) |
+| `provide-input-field-label` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_require_input_field_label.md) |
+| `provide-progress-indicator-semantics` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_require_progress_indicator_semantics.md) |
+| `provide-slider-semantic-formatter` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_require_slider_semantic_formatter.md) |
 | `use-closest-build-context` | HAVE | `use_closest_build_context` |
-| `use-existing-widget` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_existing_widget_over_reimplementation.md) |
+| `use-existing-widget` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_existing_widget_over_reimplementation.md) |
 | `use-setstate-synchronously` | HAVE | `use_setstate_synchronously` |
 
 ### Provider
@@ -584,8 +584,8 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | DCM Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `avoid-instantiating-in-value-provider` | HAVE | `avoid_instantiating_in_value_provider` |
-| `avoid-read-inside-build` | PARTIAL | `avoid_ref_read_inside_build` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_ref_read_inside_build_dcm_parity.md) |
-| `avoid-watch-outside-build` | PARTIAL | `avoid_ref_watch_outside_build` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_ref_watch_outside_build_dcm_parity.md) |
+| `avoid-read-inside-build` | PARTIAL | `avoid_ref_read_inside_build` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_ref_read_inside_build_dcm_parity.md) |
+| `avoid-watch-outside-build` | PARTIAL | `avoid_ref_watch_outside_build` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_ref_watch_outside_build_dcm_parity.md) |
 | `dispose-providers` | HAVE | `dispose_provider_instances` / `require_provider_dispose` |
 | `prefer-immutable-selector-value` | HAVE | `prefer_immutable_selector_value` |
 | `prefer-multi-provider` | HAVE | `prefer_multi_provider` |
@@ -608,7 +608,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-returning-value-from-cubit-methods` | HAVE | `avoid_returning_value_from_cubit_methods` |
 | `check-is-not-closed-after-async-gap` | HAVE | `check_is_not_closed_after_async_gap` |
 | `emit-new-bloc-state-instances` | HAVE | `emit_new_bloc_state_instances` |
-| `handle-bloc-event-subclasses` | PARTIAL | `require_bloc_event_sealed` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_require_bloc_event_sealed_dcm_parity.md) |
+| `handle-bloc-event-subclasses` | PARTIAL | `require_bloc_event_sealed` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_require_bloc_event_sealed_dcm_parity.md) |
 | `prefer-bloc-event-suffix` | HAVE | `prefer_bloc_event_suffix` |
 | `prefer-bloc-extensions` | HAVE | `prefer_bloc_extensions` |
 | `prefer-bloc-state-suffix` | HAVE | `prefer_bloc_state_suffix` |
@@ -624,21 +624,21 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | DCM Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `avoid-assigning-notifiers` | HAVE | `avoid_assigning_notifiers` |
-| `avoid-calling-notifier-members-inside-build` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_calling_notifier_members_inside_build.md) |
+| `avoid-calling-notifier-members-inside-build` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_calling_notifier_members_inside_build.md) |
 | `avoid-notifier-constructors` | HAVE | `avoid_notifier_constructors` |
 | `avoid-nullable-async-value-pattern` | HAVE | `avoid_nullable_async_value_pattern` |
-| `avoid-public-notifier-properties` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_public_notifier_properties.md) |
+| `avoid-public-notifier-properties` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_public_notifier_properties.md) |
 | `avoid-ref-inside-state-dispose` | HAVE | `avoid_ref_inside_state_dispose` |
 | `avoid-ref-read-inside-build` | HAVE | `avoid_ref_read_inside_build` |
 | `avoid-ref-watch-outside-build` | HAVE | `avoid_ref_watch_outside_build` |
 | `avoid-unnecessary-consumer-widgets` | HAVE | `avoid_unnecessary_consumer_widgets` |
 | `dispose-provided-instances` | HAVE | `dispose_provided_instances` |
-| `prefer-correct-notifier-file-name` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_notifier_file_name.md) |
-| `prefer-correct-provider-file-name` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_provider_file_name.md) |
+| `prefer-correct-notifier-file-name` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_correct_notifier_file_name.md) |
+| `prefer-correct-provider-file-name` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_correct_provider_file_name.md) |
 | `prefer-immutable-provider-arguments` | HAVE | `prefer_immutable_provider_arguments` |
-| `prefer-riverpod-notifier-suffix` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_riverpod_notifier_suffix.md) |
-| `prefer-riverpod-provider-suffix` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_riverpod_provider_suffix.md) |
-| `prefer-single-notifier-per-file` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_single_notifier_per_file.md) |
+| `prefer-riverpod-notifier-suffix` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_riverpod_notifier_suffix.md) |
+| `prefer-riverpod-provider-suffix` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_riverpod_provider_suffix.md) |
+| `prefer-single-notifier-per-file` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_single_notifier_per_file.md) |
 | `use-ref-and-state-synchronously` | HAVE | `use_ref_and_state_synchronously` |
 | `use-ref-read-synchronously` | HAVE | `use_ref_read_synchronously` |
 
@@ -647,9 +647,9 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | DCM Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `add-equatable-props` | HAVE | `list_all_equatable_fields` |
-| `avoid-equatable-call-on-equality-base-class` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_equatable_call_on_equality_base_class.md) |
-| `prefer-equatable-key-name` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_equatable_key_name.md) |
-| `sort-equatable-props` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_sorted_equatable_props.md) |
+| `avoid-equatable-call-on-equality-base-class` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_equatable_call_on_equality_base_class.md) |
+| `prefer-equatable-key-name` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_equatable_key_name.md) |
+| `sort-equatable-props` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_sorted_equatable_props.md) |
 
 ## What You Gain
 

@@ -5,7 +5,7 @@
 Created: 2026-09-02
 Type: New rule (package-specific — depends on the `easy_localization` package)
 Related rules: `avoid-missing-tr` (companion, broader variant covering user-facing widget properties — see
-`bugs/tier_2_high_value/proposal_avoid_missing_tr.md`)
+`plans/tier_2_high_value/proposal_avoid_missing_tr.md`)
 
 ---
 

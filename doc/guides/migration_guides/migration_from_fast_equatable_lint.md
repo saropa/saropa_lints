@@ -65,8 +65,8 @@ Coverage: 0 HAVE (0%), 0 PARTIAL (0%), 2 TODO (100%).
 
 | fast_equatable_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `missing_field_in_equatable_props` (flags an instance field missing from `hashParameters`) | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_missing_field_in_equatable_props.md) |
-| `always_call_super_props_when_overriding_equatable_props` (flags a `hashParameters` override that drops the parent's fields) | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_always_call_super_props_when_overriding_equatable_props.md) |
+| `missing_field_in_equatable_props` (flags an instance field missing from `hashParameters`) | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_missing_field_in_equatable_props.md) |
+| `always_call_super_props_when_overriding_equatable_props` (flags a `hashParameters` override that drops the parent's fields) | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_always_call_super_props_when_overriding_equatable_props.md) |
 
 ## Suppressing Rules
 
