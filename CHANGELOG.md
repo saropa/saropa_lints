@@ -86,7 +86,7 @@ Hardens the LSP server against normal editor traffic and adds a `doctor` command
 - `migrate-config` now removes orphan `rule_packs:` keys that have no `enabled:` child, and handles trailing comments on the key line.
 - Config parser (`_leadingSpaces`) now counts tabs as indentation, matching the scalar parser — fixes silent parse failures on tab-indented YAML.
 - `doctor` command now scopes key detection to the `saropa_lints:` plugin block — no longer false-positives on identically named top-level keys.
-- Publish script supports `--log-file <path>` for plain-text output logging, `--mode <name>` for non-interactive execution, and `--auto-retry <n>` for automatic step retries. Auto-detects non-TTY stdin for remote/CI use. Auto-retry is also prompted interactively at startup.
+- Publish script supports `--log-file`, `--log-append`, `--mode`, `--auto-retry`, and `--output-level` flags for non-interactive/CI execution. Auto-detects non-TTY stdin. Mode definitions are unified in a single table driving both CLI and interactive menu.
 
 </details>
 

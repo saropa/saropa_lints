@@ -25,8 +25,10 @@ Flags:
                             publish_existing_vsix, ci_fallback,
                             pubdev_only, dry_run
     --log-file <path>     Mirror all output (ANSI-stripped) to a plain-text file
+    --log-append          Append to log file instead of overwriting
     --auto-retry <n>      Auto-retry failed steps up to n times before aborting
                             (also prompted interactively at startup)
+    --output-level <lvl>  Console verbosity: silent, warnings, normal, verbose
 
 When --mode or --log-file is given (or stdin is not a TTY), the script
 runs non-interactively: prompts auto-answer with safe defaults and
@@ -260,8 +262,14 @@ def main(
     if mode is None:
         mode = _prompt_publish_mode()
 
-    # Auto-retry: prompt in interactive mode if not already set via CLI
-    if get_auto_retry_limit() == 0:
+    # Auto-retry: only prompt for modes that run pipeline steps with
+    # failure paths. Quick modes (audit, fix_docs, analyze) exit early
+    # and never hit prompt_step_failure, so asking is noise.
+    _RETRY_WORTHY_MODES = {
+        "full", "full_skip_audit", "dry_run",
+        "extension_only", "pubdev_only", "publish_existing_vsix",
+    }
+    if mode in _RETRY_WORTHY_MODES and get_auto_retry_limit() == 0:
         raw_retry = safe_input(
             "  Auto-retry failed steps? Enter count [0]: ", "0"
         ).strip()
@@ -308,27 +316,52 @@ def main(
     return run_full_publish(ctx, mode, timer)
 
 
-def _parse_args(argv: list[str]) -> tuple[str | None, Path | None, int]:
-    """Parse CLI arguments into (mode, log_file_path, auto_retry).
+# Valid --output-level names (maps to OutputLevel enum)
+_OUTPUT_LEVELS = {
+    "silent": OutputLevel.SILENT,
+    "warnings": OutputLevel.WARNINGS_ONLY,
+    "warnings_only": OutputLevel.WARNINGS_ONLY,
+    "normal": OutputLevel.NORMAL,
+    "verbose": OutputLevel.VERBOSE,
+}
+
+
+class _ParsedArgs:
+    """Parsed CLI arguments for the publish script."""
+
+    __slots__ = ("mode", "log_path", "log_append", "auto_retry", "output_level")
+
+    def __init__(self) -> None:
+        self.mode: str | None = None
+        self.log_path: Path | None = None
+        self.log_append: bool = False
+        self.auto_retry: int = 0
+        self.output_level: OutputLevel | None = None
+
+
+def _parse_args(argv: list[str]) -> _ParsedArgs:
+    """Parse CLI arguments into a structured result.
 
     Supports:
-        --dry-run             Shorthand for --mode dry_run
-        --mode <name>         Set publish mode (see _VALID_MODES)
-        --log-file <path>     Tee all output to a plain-text log file
-        --auto-retry <n>      Auto-retry failed steps up to n times
+        --dry-run               Shorthand for --mode dry_run
+        --mode <name>           Set publish mode (see _VALID_MODES)
+        --log-file <path>       Tee all output (ANSI-stripped) to a file
+        --log-append            Append to log file instead of overwriting
+        --auto-retry <n>        Auto-retry failed steps up to n times
+        --output-level <level>  Set console verbosity:
+                                  silent, warnings, normal, verbose
 
     When --mode or --log-file is given, the script also enables
     non-interactive mode (prompts auto-answer with defaults).
-    Returns (None, None, 0) for fully interactive operation.
     """
-    mode: str | None = None
-    log_path: Path | None = None
-    auto_retry: int = 0
+    result = _ParsedArgs()
     i = 0
     while i < len(argv):
         arg = argv[i]
         if arg == "--dry-run":
-            mode = "dry_run"
+            result.mode = "dry_run"
+        elif arg == "--log-append":
+            result.log_append = True
         elif arg == "--mode":
             if i + 1 >= len(argv):
                 print("  ERROR: --mode requires a value")
@@ -340,48 +373,60 @@ def _parse_args(argv: list[str]) -> tuple[str | None, Path | None, int]:
                 print(f"  ERROR: Unknown mode '{argv[i]}'")
                 print(f"  Valid modes: {', '.join(sorted(_VALID_MODES))}")
                 sys.exit(1)
-            mode = _VALID_MODES[raw]
+            result.mode = _VALID_MODES[raw]
         elif arg == "--log-file":
             if i + 1 >= len(argv):
                 print("  ERROR: --log-file requires a file path")
                 sys.exit(1)
             i += 1
-            log_path = Path(argv[i])
+            result.log_path = Path(argv[i])
         elif arg == "--auto-retry":
             if i + 1 >= len(argv):
                 print("  ERROR: --auto-retry requires a number")
                 sys.exit(1)
             i += 1
             try:
-                auto_retry = int(argv[i])
+                result.auto_retry = int(argv[i])
             except ValueError:
                 print(f"  ERROR: --auto-retry value must be a number, got '{argv[i]}'")
                 sys.exit(1)
+        elif arg == "--output-level":
+            if i + 1 >= len(argv):
+                print("  ERROR: --output-level requires a value")
+                print(f"  Valid levels: {', '.join(sorted(_OUTPUT_LEVELS))}")
+                sys.exit(1)
+            i += 1
+            raw_level = argv[i].lower().replace("-", "_")
+            if raw_level not in _OUTPUT_LEVELS:
+                print(f"  ERROR: Unknown output level '{argv[i]}'")
+                print(f"  Valid levels: {', '.join(sorted(_OUTPUT_LEVELS))}")
+                sys.exit(1)
+            result.output_level = _OUTPUT_LEVELS[raw_level]
         i += 1
-    return mode, log_path, auto_retry
+    return result
 
 
 if __name__ == "__main__":
-    parsed_mode, parsed_log, parsed_retry = _parse_args(sys.argv[1:])
+    args = _parse_args(sys.argv[1:])
 
     # Enable non-interactive mode when a log file or explicit mode is given,
     # or when stdin is not a terminal (piped / remote execution)
-    if parsed_log or parsed_mode or not sys.stdin.isatty():
+    if args.log_path or args.mode or not sys.stdin.isatty():
         set_non_interactive(True)
         print_info("Running in non-interactive mode (prompts auto-answered)")
 
     # Set auto-retry before any pipeline steps run
-    if parsed_retry > 0:
-        set_auto_retry_limit(parsed_retry)
-        print_info(f"Auto-retry limit: {parsed_retry}")
+    if args.auto_retry > 0:
+        set_auto_retry_limit(args.auto_retry)
+        print_info(f"Auto-retry limit: {args.auto_retry}")
 
     # Open the log file before any output so the logo is captured
-    if parsed_log:
-        set_log_file(parsed_log)
-        print_info(f"Logging to {parsed_log.resolve()}")
+    if args.log_path:
+        set_log_file(args.log_path, append=args.log_append)
+        print_info(f"Logging to {args.log_path.resolve()}")
 
     try:
-        sys.exit(main(mode=parsed_mode))
+        sys.exit(main(mode=args.mode, output_level=args.output_level))
     finally:
         # Ensure the log file is flushed and closed on any exit path
         close_log_file()

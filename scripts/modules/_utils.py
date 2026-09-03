@@ -97,19 +97,24 @@ _log_file: io.TextIOWrapper | None = None
 _non_interactive: bool = False
 
 
-def set_log_file(path: Path | str) -> None:
+def set_log_file(path: Path | str, *, append: bool = False) -> None:
     """Open a UTF-8 log file for tee-style output.
 
     All print_* output is mirrored to this file with ANSI codes
     stripped. Call close_log_file() at exit to flush and close.
     Prints a warning and continues without logging if the path
     is unwritable (e.g. missing parent directory, read-only).
+
+    Args:
+        path: File path for the log.
+        append: If True, append to existing file instead of overwriting.
     """
     global _log_file
     # Close any previously opened log file
     close_log_file()
+    file_mode = "a" if append else "w"
     try:
-        _log_file = open(path, "w", encoding="utf-8", errors="replace")
+        _log_file = open(path, file_mode, encoding="utf-8", errors="replace")
     except OSError as exc:
         # Don't crash the whole publish pipeline for a bad log path
         print(f"  WARNING: Cannot open log file '{path}': {exc}")
