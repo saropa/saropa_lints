@@ -69,7 +69,7 @@ Coverage: 2 rules — 1 HAVE (50%), 1 TODO (50%)
 | equatable_lint_ultimate Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `missing_field_in_equatable_props` | HAVE | `list_all_equatable_fields` |
-| `always_call_super_props_when_overriding_equatable_props` | TODO | TODO — closest existing proposal (not an exact scope match): [proposal](../../../bugs/proposal_avoid_equatable_call_on_equality_base_class.md) |
+| `always_call_super_props_when_overriding_equatable_props` | TODO | TODO — closest existing proposal (not an exact scope match): [proposal](../../../bugs/tier_2_high_value/proposal_avoid_equatable_call_on_equality_base_class.md) |
 | "Make class extend Equatable" (assist) | PARTIAL | `require_extend_equatable` — proactively fires only on a class that manually overrides `==`/`hashCode`; it has no unprompted "convert any plain class to extend Equatable" assist |
 
 ## Suppressing Rules

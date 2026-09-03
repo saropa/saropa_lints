@@ -58,9 +58,9 @@ Coverage: 7 rules — 4 HAVE (57%), 1 PARTIAL, 2 TODO (28%)
 | `hooks_avoid_nesting` | HAVE | `avoid_hooks_outside_build` |
 | `hooks_avoid_within_class` | HAVE | `avoid_hooks_outside_build` (same detection: a hook call not directly inside a widget's `build()` method, including one wrapped in a class method) |
 | `hooks_name_convention` | HAVE | `prefer_use_prefix` |
-| `hooks_extends` | TODO | TODO — see [proposal](../../../bugs/proposal_hooks_extends.md) (checks the widget extends `HookWidget`/`HookConsumerWidget`, not just call location) |
+| `hooks_extends` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_hooks_extends.md) (checks the widget extends `HookWidget`/`HookConsumerWidget`, not just call location) |
 | `hooks_unuse_widget` | HAVE | `avoid_unnecessary_hook_widgets` |
-| `hooks_memoized_consideration` | TODO | TODO — see [proposal](../../../bugs/proposal_hooks_memoized_consideration.md) (flags expensive initializers not wrapped in `useMemoized()`) |
+| `hooks_memoized_consideration` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_hooks_memoized_consideration.md) (flags expensive initializers not wrapped in `useMemoized()`) |
 | `hooks_callback_consideration` | PARTIAL | `prefer_use_callback` — only flags inline closures passed directly as callback props, not `useMemoized(() => fn, [...])` rewritten as `useCallback` |
 
 ## What You Gain

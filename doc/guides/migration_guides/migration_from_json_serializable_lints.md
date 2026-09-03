@@ -57,9 +57,9 @@ Coverage: 3 rules — 3 TODO (100%)
 
 | json_serializable_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `require_json_serializable_from_json` | TODO | TODO — see [proposal](../../../bugs/proposal_json_serializable_enforcement_rules.md) |
-| `require_json_serializable_to_json` | TODO | TODO — see [proposal](../../../bugs/proposal_json_serializable_enforcement_rules.md) |
-| `require_annotation_from_json` | TODO | TODO — see [proposal](../../../bugs/proposal_json_serializable_enforcement_rules.md) |
+| `require_json_serializable_from_json` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_json_serializable_enforcement_rules.md) |
+| `require_json_serializable_to_json` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_json_serializable_enforcement_rules.md) |
+| `require_annotation_from_json` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_json_serializable_enforcement_rules.md) |
 
 All three rules validate the same underlying contract: that `@JsonSerializable()`
 classes (and `@RequireFromJson()`-annotated hierarchies) actually implement the

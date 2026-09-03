@@ -55,8 +55,8 @@ Coverage: 3 rules — 1 HAVE (33%), 2 TODO (66%)
 | subpackage_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `avoid_package_import_for_same_package` | HAVE | `prefer_relative_imports_enforced` |
-| `avoid_src_import_from_other_subpackage` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_src_import_from_other_subpackage.md) |
-| `avoid_src_import_from_same_package` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_src_import_from_same_package.md) |
+| `avoid_src_import_from_other_subpackage` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_src_import_from_other_subpackage.md) |
+| `avoid_src_import_from_same_package` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_src_import_from_same_package.md) |
 
 **Note**: saropa's `prefer_relative_imports_enforced` catches absolute `package:`-style imports reaching into the same package generally — it is not scoped to `/src/` specifically, so it is a broader (not narrower) match for `avoid_package_import_for_same_package`. The two `/src/`-boundary rules (blocking imports that reach into another subpackage's, or the same package's, private `/src/` directory instead of its public barrel file) have no saropa equivalent yet; if this monorepo boundary enforcement is load-bearing for your project, keep `subpackage_lint` installed alongside `saropa_lints`.
 

@@ -79,7 +79,7 @@ Coverage: 128 rules — 110 HAVE (85%), 7 PARTIAL, 11 TODO (8%)
 | `avoid_returning_value_from_cubit_methods` | HAVE | `avoid_returning_value_from_cubit_methods` |
 | `check_is_not_closed_after_async_gap` | HAVE | `check_is_not_closed_after_async_gap` |
 | `emit_new_bloc_state_instances` | HAVE | `emit_new_bloc_state_instances` |
-| `handle_bloc_event_subclasses` | PARTIAL | `require_bloc_event_sealed` — TODO extend, see [proposal](../../../bugs/proposal_extend_require_bloc_event_sealed_dcm_parity.md) |
+| `handle_bloc_event_subclasses` | PARTIAL | `require_bloc_event_sealed` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_require_bloc_event_sealed_dcm_parity.md) |
 | `prefer_bloc_event_suffix` | HAVE | `prefer_bloc_event_suffix` |
 | `prefer_bloc_extensions` | HAVE | `prefer_bloc_extensions` |
 | `prefer_bloc_state_suffix` | HAVE | `prefer_bloc_state_suffix` |
@@ -94,10 +94,10 @@ Coverage: 128 rules — 110 HAVE (85%), 7 PARTIAL, 11 TODO (8%)
 
 | awesome_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `arguments_ordering` | TODO | TODO — see [proposal](../../../bugs/proposal_arguments_ordering.md) |
-| `avoid_accessing_collections_by_constant_index` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_accessing_collections_by_constant_index.md) |
+| `arguments_ordering` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_arguments_ordering.md) |
+| `avoid_accessing_collections_by_constant_index` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_accessing_collections_by_constant_index.md) |
 | `avoid_accessing_other_classes_private_members` | HAVE | `avoid_accessing_other_classes_private_members` |
-| `avoid_adjacent_strings` | TODO | TODO — saropa's `prefer_adjacent_strings` enforces the opposite convention — see [proposal](../../../bugs/proposal_avoid_adjacent_strings.md) |
+| `avoid_adjacent_strings` | TODO | TODO — saropa's `prefer_adjacent_strings` enforces the opposite convention — see [proposal](../../../bugs/declined/proposal_avoid_adjacent_strings.md) |
 | `avoid_always_null_parameters` | HAVE | `avoid_always_null_parameters` |
 | `avoid_assigning_to_static_field` | HAVE | `avoid_assigning_to_static_field` |
 | `avoid_assignments_as_conditions` | HAVE | `avoid_assignments_as_conditions` |
@@ -115,27 +115,27 @@ Coverage: 128 rules — 110 HAVE (85%), 7 PARTIAL, 11 TODO (8%)
 | `avoid_commented_out_code` | HAVE | `prefer_no_commented_out_code` |
 | `avoid_complex_arithmetic_expressions` | HAVE | `avoid_complex_arithmetic_expressions` |
 | `avoid_complex_conditions` | HAVE | `avoid_complex_conditions` |
-| `avoid_complex_loop_conditions` | PARTIAL | `avoid_complex_loop_conditions` — narrower threshold, TODO extend, see [proposal](../../../bugs/proposal_extend_avoid_complex_loop_conditions_dcm_parity.md) |
+| `avoid_complex_loop_conditions` | PARTIAL | `avoid_complex_loop_conditions` — narrower threshold, TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_complex_loop_conditions_dcm_parity.md) |
 | `avoid_conditions_with_boolean_literals` | HAVE | `avoid_conditions_with_boolean_literals` |
 | `avoid_constant_assert_conditions` | HAVE | `avoid_constant_assert_conditions` |
 | `avoid_constant_conditions` | HAVE | `avoid_constant_conditions` |
 | `avoid_constant_switches` | HAVE | `avoid_constant_switches` |
-| `avoid_continue` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_continue.md) |
+| `avoid_continue` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_continue.md) |
 | `avoid_contradictory_expressions` | HAVE | `avoid_contradictory_expressions` |
 | `avoid_declaring_call_method` | HAVE | `avoid_declaring_call_method` |
 | `avoid_default_tostring` | HAVE | `avoid_default_tostring` |
 | `avoid_deprecated_usage` | HAVE | `avoid_deprecated_usage` |
 | `avoid_double_slash_imports` | HAVE | `avoid_double_slash_imports` |
 | `avoid_duplicate_cascades` | HAVE | `avoid_duplicate_cascades` |
-| `avoid_duplicate_collection_elements` | TODO | TODO — unconfirmed — see [proposal](../../../bugs/proposal_avoid_duplicate_collection_elements.md) |
+| `avoid_duplicate_collection_elements` | TODO | TODO — unconfirmed — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_duplicate_collection_elements.md) |
 | `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
 | `binary_expression_operand_order` | HAVE | `binary_expression_operand_order` |
 | `dispose_class_fields` | HAVE | `dispose_class_fields` |
 | `double_literal_format` | HAVE | `double_literal_format` |
-| `newline_before_case` | TODO | TODO — see [proposal](../../../bugs/proposal_newline_before_case.md) |
-| `newline_before_constructor` | TODO | TODO — see [proposal](../../../bugs/proposal_newline_before_constructor.md) |
-| `newline_before_method` | TODO | TODO — see [proposal](../../../bugs/proposal_newline_before_method.md) |
-| `newline_before_return` | TODO | TODO — see [proposal](../../../bugs/proposal_newline_before_return.md) |
+| `newline_before_case` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_newline_before_case.md) |
+| `newline_before_constructor` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_newline_before_constructor.md) |
+| `newline_before_method` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_newline_before_method.md) |
+| `newline_before_return` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_newline_before_return.md) |
 | `no_boolean_literal_compare` | HAVE | `no_boolean_literal_compare` |
 | `no_empty_block` | HAVE | `no_empty_block` |
 | `no_empty_string` | HAVE | `no_empty_string` |
@@ -180,12 +180,12 @@ Coverage: 128 rules — 110 HAVE (85%), 7 PARTIAL, 11 TODO (8%)
 | `pass_existing_stream_to_stream_builder` | HAVE | `pass_existing_stream_to_stream_builder` |
 | `prefer_action_button_tooltip` | HAVE | `prefer_action_button_tooltip` |
 | `prefer_align_over_container` | HAVE | `prefer_align_over_container` |
-| `prefer_async_callback` | TODO | TODO — saropa has the opposite rule, `prefer_future_void_function_over_async_callback` — see [proposal](../../../bugs/proposal_prefer_async_callback.md) |
+| `prefer_async_callback` | TODO | TODO — saropa has the opposite rule, `prefer_future_void_function_over_async_callback` — see [proposal](../../../bugs/declined/proposal_prefer_async_callback.md) |
 | `prefer_center_over_align` | HAVE | `prefer_center_over_align` |
 | `prefer_compute_over_isolate_run` | HAVE | `prefer_compute_over_isolate_run` |
 | `prefer_constrained_box_over_container` | HAVE | `prefer_constrained_box_over_container` |
-| `prefer_container` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_container.md) |
-| `prefer_dedicated_media_query_methods` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../bugs/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |
+| `prefer_container` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_prefer_container.md) |
+| `prefer_dedicated_media_query_methods` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |
 | `prefer_for_loop_in_children` | HAVE | `prefer_for_loop_in_children` |
 | `prefer_padding_over_container` | HAVE | `prefer_padding_over_container` |
 | `prefer_single_setstate` | HAVE | `prefer_single_setstate` |

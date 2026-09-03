@@ -67,7 +67,7 @@ Coverage: 0 HAVE (0%), 0 PARTIAL (0%), 1 TODO (100%).
 
 | import_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `target`/`from`/`except` glob DSL (user-defined import-boundary rules) | TODO | see [proposal](../../../bugs/proposal_infra_configurable_import_boundary_dsl.md). saropa_lints has no generic, project-configurable import-boundary DSL; it ships fixed rules for specific layering patterns instead (see below). |
+| `target`/`from`/`except` glob DSL (user-defined import-boundary rules) | TODO | see [proposal](../../../bugs/tier_3_infrastructure/proposal_infra_configurable_import_boundary_dsl.md). saropa_lints has no generic, project-configurable import-boundary DSL; it ships fixed rules for specific layering patterns instead (see below). |
 
 ## What You Gain
 

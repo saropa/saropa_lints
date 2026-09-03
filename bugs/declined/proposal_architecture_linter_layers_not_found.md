@@ -46,7 +46,7 @@ n/a.
 ## Alternatives Considered
 
 - **Treat as a prerequisite check bundled with the `arch_*` config engine** (see
-  `bugs/proposal_architecture_lints_enforcement_rules.md`) — considered, but that proposal's engine is
+  `bugs/tier_3_infrastructure/proposal_architecture_lints_enforcement_rules.md`) — considered, but that proposal's engine is
   no-op-by-default when unconfigured, so an explicit "you forgot to configure layers" nag is unnecessary
   noise rather than a defect signal; a project simply not using the feature is not an error state.
 

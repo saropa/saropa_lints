@@ -4,7 +4,7 @@
 
 Created: 2026-09-02
 
-**Conflicts with:** [`prefer_caret_version_syntax`](proposal_prefer_caret_version_syntax.md) — mutually exclusive; a project enables at most one.
+**Conflicts with:** [`prefer_caret_version_syntax`](../tier_1_quick_wins/proposal_prefer_caret_version_syntax.md) — mutually exclusive; a project enables at most one.
 
 **Tier disposition — conflicting pair.** Both rules ship in the **stylistic tier** per the established `tiers.dart` convention for opposed rules (documented at the top of `stylisticRules`, e.g. `prefer_single_quotes_strict` vs `prefer_double_quotes_with_fix`): neither is enabled by default and the project explicitly opts into one. Add both to `stylisticRules` and list the pair in `README_STYLISTIC.md`. Never assign either to a default-on tier — there is no correct default here (apps favor reproducible pins, published packages need ranges so consumers can resolve).
 

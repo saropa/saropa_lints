@@ -62,17 +62,17 @@ Coverage: 3 HAVE (25%), 2 PARTIAL (17%), 7 TODO (58%) — 12 rules actually ship
 | flutter_a11y_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `A01` — interactive control must have an accessible label | HAVE | `require_button_semantics` |
-| `A02` — label contains redundant role words ("button"/"icon") | TODO | TODO — see [proposal](../../../bugs/proposal_a02_redundant_role_words.md). |
+| `A02` — label contains redundant role words ("button"/"icon") | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_a02_redundant_role_words.md). |
 | `A03` — decorative images should be excluded from semantics | PARTIAL | `require_image_semantics` / `require_accessible_images` require a `semanticLabel` on every `Image` (stricter overall) but don't specifically suggest `excludeFromSemantics: true` for likely-decorative images by filename heuristic. |
 | `A04` — informative images must provide semantic labels | HAVE | `require_image_semantics` / `require_accessible_images` |
-| `A05` — remove redundant `Semantics(button: true)` wrapper on a primitive button | TODO | TODO — see [proposal](../../../bugs/proposal_a05_redundant_semantics_button_wrapper.md). |
+| `A05` — remove redundant `Semantics(button: true)` wrapper on a primitive button | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_a05_redundant_semantics_button_wrapper.md). |
 | `A06` — interactive control with multiple semantic parts should use `MergeSemantics` | HAVE | `prefer_merge_semantics` |
-| `A07` — `Semantics()` label replacement must exclude children (prevents double announcement) | TODO | TODO — see [proposal](../../../bugs/proposal_a07_semantics_label_excludes_children.md). |
-| `A09` — numeric-only label missing units | TODO | TODO — see [proposal](../../../bugs/proposal_a09_numeric_label_missing_units.md). |
-| `A13` — composite control should present a single semantic role (2+ focusable descendants) | TODO | TODO — see [proposal](../../../bugs/proposal_a13_composite_control_single_role.md). |
+| `A07` — `Semantics()` label replacement must exclude children (prevents double announcement) | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_a07_semantics_label_excludes_children.md). |
+| `A09` — numeric-only label missing units | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_a09_numeric_label_missing_units.md). |
+| `A13` — composite control should present a single semantic role (2+ focusable descendants) | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_a13_composite_control_single_role.md). |
 | `A15` — custom gesture recognizer should surface a semantic action | PARTIAL | `require_button_semantics` flags `GestureDetector`/`InkWell` missing a `Semantics(button: true)` wrapper generally, but doesn't map non-tap gestures (long-press, double-tap) to distinct semantic actions the way `A15` does. |
-| `A21` — use `IconButton.tooltip` instead of wrapping with `Tooltip` | TODO | TODO — see [proposal](../../../bugs/proposal_a21_prefer_iconbutton_tooltip.md). |
-| `A22` — avoid `MergeSemantics` on the `ListTile` family (double-announcement) | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_merge_semantics_list_tile.md) |
+| `A21` — use `IconButton.tooltip` instead of wrapping with `Tooltip` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_a21_prefer_iconbutton_tooltip.md). |
+| `A22` — avoid `MergeSemantics` on the `ListTile` family (double-announcement) | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_merge_semantics_list_tile.md) |
 
 ## What You Gain
 

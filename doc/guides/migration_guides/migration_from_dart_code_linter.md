@@ -100,7 +100,7 @@ Coverage: 87 rules — 77 HAVE (88%), 2 PARTIAL, 8 TODO (9%)
 |---|---|---|
 | `always_remove_listener` | HAVE | `always_remove_listener` |
 | `arguments_ordering` | HAVE | `prefer_arguments_ordering` |
-| `avoid_banned_imports` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_banned_imports.md) |
+| `avoid_banned_imports` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_imports.md) |
 | `avoid_border_all` | HAVE | `avoid_border_all` |
 | `avoid_cascade_after_if_null` | HAVE | `avoid_cascade_after_if_null` |
 | `avoid_collection_methods_with_unrelated_types` | HAVE | `avoid_collection_methods_with_unrelated_types` |
@@ -111,12 +111,12 @@ Coverage: 87 rules — 77 HAVE (88%), 2 PARTIAL, 8 TODO (9%)
 | `avoid_expanded_as_spacer` | HAVE | `avoid_expanded_as_spacer` |
 | `avoid_global_state` | HAVE | `avoid_global_state` |
 | `avoid_ignoring_return_values` | HAVE | `avoid_ignoring_return_values` |
-| `avoid_initializing_in_on_mount` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_initializing_in_on_mount.md) (Flame-specific) |
+| `avoid_initializing_in_on_mount` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_initializing_in_on_mount.md) (Flame-specific) |
 | `avoid_late_keyword` | HAVE | `avoid_late_keyword` |
 | `avoid_missing_enum_constant_in_map` | HAVE | `avoid_missing_enum_constant_in_map` |
 | `avoid_nested_conditional_expressions` | HAVE | `avoid_nested_conditional_expressions` |
 | `avoid_non_ascii_symbols` | HAVE | `avoid_non_ascii_symbols` |
-| `avoid_non_configurable_callbacks_in_init_state` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_non_configurable_callbacks_in_init_state.md) |
+| `avoid_non_configurable_callbacks_in_init_state` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_non_configurable_callbacks_in_init_state.md) |
 | `avoid_non_exhaustive_switch_on_sealed_classes` | HAVE | `require_exhaustive_sealed_switch` |
 | `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
 | `avoid_passing_async_when_sync_expected` | HAVE | `avoid_passing_async_when_sync_expected` |
@@ -138,21 +138,21 @@ Coverage: 87 rules — 77 HAVE (88%), 2 PARTIAL, 8 TODO (9%)
 | `binary_expression_operand_order` | HAVE | `binary_expression_operand_order` |
 | `check_for_equals_in_render_object_setters` | HAVE | `check_for_equals_in_render_object_setters` |
 | `consistent_update_render_object` | HAVE | `consistent_update_render_object` |
-| `correct_game_instantiating` | TODO | TODO — see [proposal](../../../bugs/proposal_correct_game_instantiating.md) (Flame-specific) |
+| `correct_game_instantiating` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_correct_game_instantiating.md) (Flame-specific) |
 | `double_literal_format` | HAVE | `double_literal_format` |
 | `format_comment` | HAVE | `format_comment_style` |
 | `list_all_equatable_fields` | HAVE | `list_all_equatable_fields` |
 | `member_ordering` | HAVE | `prefer_member_ordering` |
 | `missing_test_assertion` | HAVE | `missing_test_assertion` |
 | `newline_before_return` | HAVE | `prefer_blank_line_before_return` |
-| `no_blank_line_before_single_return` | TODO | TODO — see [proposal](../../../bugs/proposal_no_blank_line_before_single_return.md) |
+| `no_blank_line_before_single_return` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_no_blank_line_before_single_return.md) |
 | `no_boolean_literal_compare` | HAVE | `no_boolean_literal_compare` |
 | `no_empty_block` | HAVE | `no_empty_block` |
 | `no_equal_arguments` | HAVE | `no_equal_arguments` |
 | `no_equal_then_else` | HAVE | `no_equal_then_else` |
 | `no_magic_number` | HAVE | `no_magic_number` |
 | `no_object_declaration` | HAVE | `no_object_declaration` |
-| `only_barrel_import` | TODO | TODO — see [proposal](../../../bugs/proposal_only_barrel_import.md) |
+| `only_barrel_import` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_only_barrel_import.md) |
 | `prefer_async_await` | HAVE | `prefer_async_await` |
 | `prefer_commenting_analyzer_ignores` | HAVE | `prefer_commenting_analyzer_ignores` |
 | `prefer_conditional_expressions` | HAVE | `prefer_conditional_expressions` |
@@ -166,13 +166,13 @@ Coverage: 87 rules — 77 HAVE (88%), 2 PARTIAL, 8 TODO (9%)
 | `prefer_enums_by_name` | HAVE | `prefer_enums_by_name` |
 | `prefer_extracting_callbacks` | HAVE | `prefer_extracting_callbacks` |
 | `prefer_first` | HAVE | `prefer_list_first` |
-| `prefer_first_or_null` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_first_or_null.md) |
+| `prefer_first_or_null` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_first_or_null.md) |
 | `prefer_immediate_return` | HAVE | `prefer_immediate_return` |
 | `prefer_intl_name` | HAVE | `prefer_intl_name` |
 | `prefer_iterable_of` | HAVE | `prefer_iterable_of` |
 | `prefer_last` | HAVE | `prefer_list_last` |
 | `prefer_match_file_name` | HAVE | `prefer_match_file_name` |
-| `prefer_media_query_direct_access` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../bugs/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |
+| `prefer_media_query_direct_access` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |
 | `prefer_moving_to_variable` | HAVE | `prefer_moving_to_variable` |
 | `prefer_named_record_fields` | PARTIAL | `avoid_positional_record_field_access` — saropa only flags accessing positional records via `$1`/`$2`, not declaring fields without names |
 | `prefer_provide_intl_description` | HAVE | `prefer_providing_intl_description` |
@@ -183,7 +183,7 @@ Coverage: 87 rules — 77 HAVE (88%), 2 PARTIAL, 8 TODO (9%)
 | `prefer_using_list_view` | HAVE | `prefer_using_list_view` |
 | `provide_correct_intl_args` | HAVE | `provide_correct_intl_args` |
 | `tag_name` | HAVE | `prefer_kebab_tag_name` |
-| `use_design_system` | TODO | TODO — see [proposal](../../../bugs/proposal_use_design_system.md) |
+| `use_design_system` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_use_design_system.md) |
 | `use_setstate_synchronously` | HAVE | `use_setstate_synchronously` |
 
 Also reports continuous metrics (cyclomatic complexity, LOC, Halstead-style maintainability index) via an HTML/console report — see [Architecture Differences](#architecture-differences).

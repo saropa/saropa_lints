@@ -85,7 +85,7 @@ scoping contract, matching saropa's placement for other single-package API-usage
 
 ## Alternatives Considered
 
-- See `bugs/proposal_avoid_ad_hoc_left_type.md` Alternatives Considered — same fpdart-adoption-scope
+- See `bugs/tier_4_needs_decision/proposal_avoid_ad_hoc_left_type.md` Alternatives Considered — same fpdart-adoption-scope
   discussion applies uniformly across the fpdart-family proposals.
 
 ---

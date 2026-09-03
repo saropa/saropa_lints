@@ -58,7 +58,7 @@ Declined. This is a tool self-diagnostic about `architecture_linter`'s own confi
 code-quality rule against user Dart source. Per `plans/GAP_ANALYSIS.md` "architecture_linter" section, this
 is one of 3 meta-diagnostics correctly excluded from HAVE/PARTIAL/GAP code-quality comparison. The actual
 enforcement mechanism (banning specific imports) is already tracked separately in
-`bugs/proposal_avoid_banned_imports.md`.
+`bugs/tier_3_infrastructure/proposal_avoid_banned_imports.md`.
 
 ---
 

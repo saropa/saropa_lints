@@ -57,7 +57,7 @@ Coverage: 0 HAVE (0%), 0 PARTIAL (0%), 1 TODO (100%).
 
 | json_parser_linter Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `json_parser_requirements` (toJson half + fromJson half) | TODO | TODO — see [proposal](../../../bugs/proposal_json_parser_requirements.md) |
+| `json_parser_requirements` (toJson half + fromJson half) | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_json_parser_requirements.md) |
 
 `json_parser_requirements` verifies that a `@GenerateJsonParser`-annotated class has a
 `Map<String, dynamic> toJson()` instance method and a matching factory/static
