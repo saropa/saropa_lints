@@ -314,6 +314,23 @@ def git_commit_and_push(
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
 
+    # Final safety net: strip any surviving "— Unreleased" suffix from
+    # versioned CHANGELOG headings before staging.  The version-sync step
+    # already does this, but an intermediate step (orphan recovery, manual
+    # edit, retry loop) can re-introduce the suffix.  Stripping here
+    # guarantees the committed changelog never carries it.
+    changelog_path = project_dir / "CHANGELOG.md"
+    if changelog_path.exists():
+        from scripts.modules._version_changelog import strip_unreleased_suffix
+
+        original = changelog_path.read_text(encoding="utf-8")
+        cleaned = strip_unreleased_suffix(original)
+        if cleaned != original:
+            changelog_path.write_text(cleaned, encoding="utf-8")
+            print_info(
+                'Stripped residual "— Unreleased" suffix from CHANGELOG heading'
+            )
+
     # Capture instead of run_command so git's per-file "CRLF will be replaced
     # by LF" warnings (one stderr line per touched file — dozens on a locale
     # regen) don't flood the log. They are not errors: core.autocrlf is set

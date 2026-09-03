@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2334,
+  "ruleCount": 2352,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -32,6 +32,22 @@
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
         "description": "Bug rule default target: zero false positives."
+      }
+    },
+    "always_put_doc_comments_before_annotations": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "convention",
+        "documentation"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
       }
     },
     "always_remove_getx_listener": {
@@ -3601,6 +3617,21 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "avoid_exit_outside_entrypoint": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "reliability"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "avoid_expanded_as_spacer": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -4031,6 +4062,21 @@
       "tags": [
         "flutter",
         "ui"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_focused_tests": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "testing"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
@@ -6219,6 +6265,21 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "avoid_labeled_statements": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "readability"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "avoid_large_bloc": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -7734,6 +7795,22 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "avoid_null_checks_in_equality_operators_extended": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "dead-code",
+        "null-safety"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "avoid_nullable_async_value_pattern": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -8551,6 +8628,22 @@
       "certIds": [],
       "tags": [
         "packages"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_public_members_in_states": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "encapsulation",
+        "flutter"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
@@ -10101,6 +10194,21 @@
       "tags": [],
       "accuracyTarget": null
     },
+    "avoid_skipped_tests": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "testing"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "avoid_slow_collection_methods": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -11450,6 +11558,22 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "avoid_unnecessary_else_after_control_flow": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "readability",
+        "simplification"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "avoid_unnecessary_enum_arguments": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -11726,6 +11850,22 @@
       "tags": [
         "flutter",
         "ui"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_unnecessary_parentheses": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "maintainability",
+        "style"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
@@ -12774,6 +12914,21 @@
       "tags": [
         "flutter",
         "ui"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "constructor_parameters_and_fields_should_have_the_same_order": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "architecture"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
@@ -14895,6 +15050,21 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "no_optional_operators_in_tests": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "testing"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "no_runtimetype_tostring": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -15739,6 +15909,21 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "prefer_blank_line_before_break": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "convention"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "prefer_blank_line_before_case": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -15755,6 +15940,21 @@
       }
     },
     "prefer_blank_line_before_constructor": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "convention"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "prefer_blank_line_before_continue": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -15800,6 +16000,21 @@
       }
     },
     "prefer_blank_line_before_return": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "convention"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "prefer_blank_line_before_throw": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -17868,6 +18083,22 @@
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
         "description": "Bug rule default target: zero false positives."
+      }
+    },
+    "prefer_doc_comment_after_annotations": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "convention",
+        "documentation"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
       }
     },
     "prefer_doc_comments_over_regular": {
@@ -20105,6 +20336,22 @@
       "certIds": [],
       "tags": [
         "dart-core"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "prefer_initializing_formals_extended": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "dart-idiom",
+        "simplification"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
@@ -35433,6 +35680,21 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "start_comments_with_space": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "convention"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "subtype_of_disallowed_type": {
       "ruleType": "bug",
       "ruleStatus": "ready",
@@ -35518,6 +35780,21 @@
       "certIds": [],
       "tags": [
         "packages"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "todo_with_story_links": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "convention"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,

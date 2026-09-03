@@ -6,6 +6,139 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [15.1.1]
+
+Five new quick fixes for stylistic rules: convert regular comments to doc comments, remove redundant type annotations, replace string `+` concatenation with adjacent literals, simplify `BorderRadius.all(Radius.circular(r))` to `BorderRadius.circular(r)`, and replace sizing-only `Container` with `SizedBox`. [log](https://github.com/saropa/saropa_lints/blob/v15.1.1/CHANGELOG.md)
+
+### Added
+
+- Quick fix for `prefer_doc_comments_over_regular`: converts `//` comments to `///` doc comments with one click. No action required.
+- Quick fix for `avoid_explicit_type_declaration`: removes the redundant type annotation, letting the compiler infer the type. No action required.
+- Quick fix for `prefer_adjacent_strings`: strips `+` operators between string literals, producing idiomatic adjacent-string syntax. No action required.
+- Quick fix for `prefer_borderradius_circular`: rewrites `BorderRadius.all(Radius.circular(r))` to the shorter `BorderRadius.circular(r)`. No action required.
+- Quick fix for `prefer_sizedbox_over_container`: replaces sizing-only `Container` with `SizedBox`. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Publish script now strips `- Unreleased` suffix (and typo variants) from versioned CHANGELOG headings at publish time, so `## [X.Y.Z] - Unreleased` is cleaned to `## [X.Y.Z]` before version sync.
+
+</details>
+
+---
+
+## [15.1.0]
+
+**Breaking:** 35 rule names that collided with core Dart/Flutter lint names are renamed with semantic suffixes (e.g. `prefer_single_quotes` → `prefer_single_quotes_strict`); 3 duplicates with no behavioral difference are removed. Old names are deprecated aliases for one release cycle. Use `--fix-ignores` to migrate downstream projects. [log](https://github.com/saropa/saropa_lints/blob/v15.1.0/CHANGELOG.md)
+
+`require_ignore_comment_plugin_prefix` now validates prefixed ignore comments against the rule registry. Four false-positive fixes across gradient-in-build, dartdoc cross-refs, cyclomatic-complexity flat switches, and large-objects-in-state recomputed caches.
+
+### Fixed
+
+- `avoid_gradient_in_build` no longer flags gradients inside `AnimatedBuilder.builder`, `TweenAnimationBuilder.builder`, `ListenableBuilder.builder`, or `ValueListenableBuilder.builder` closures, where the gradient intentionally varies every animation frame. Also exempts gradients in any `builder:` closure when the gradient's arguments reference a closure-unique parameter (e.g. a tween value), making the gate work for custom animation builders too. No action required.
+- `verify_documented_parameters_exist` no longer flags valid dartdoc cross-references to methods, functions, or getters as stale parameter names. No action required.
+- `require_ignore_comment_plugin_prefix` now validates the suffix of already-prefixed ignore comments against the rule registry. A prefixed name that doesn't match any registered rule (typo, renamed rule, or fabricated name) now produces a diagnostic with a "did you mean?" suggestion and a quick fix to auto-replace the typo. No action required.
+- `avoid_high_cyclomatic_complexity` no longer flags flat switch dispatch tables where every case is a single return, break, or expression with no nested branching — these are enum-to-value lookups with mechanical complexity, not logical branching. No action required.
+- `avoid_large_objects_in_state` no longer flags collection fields that are reassigned wholesale in method bodies without accumulating mutations. Accumulation detection now uses element-resolved field matching (immune to shadowed locals), per-variable tracking for multi-variable declarations, constructor initializer list walking, and treats `??=` as a conditional reassignment instead of growth. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Consolidated animation-builder widget name sets into `kAnimatedRebuilders` in `compound_performance_patterns.dart`, used by both compound-performance rules and `avoid_gradient_in_build`.
+- Publish audit now blocks on core Dart lint name collisions (Check 8 in tier integrity), auto-updated from dart-lang/linter via `python scripts/update_core_lint_names.py`.
+- Publish pipeline steps now prompt Retry / Ignore / Abort on failure instead of hard-exiting, so the developer can fix issues in another terminal without losing the publish session. Irreversible steps (git push, tag, pub.dev publish, GitHub release) only offer Retry / Abort.
+- Removed unused `tiers.dart` import from formatting rules.
+- MT cache serialization (`mt_fallback.py`) now streams entries to disk one-by-one instead of building the full JSON string in memory, fixing a `MemoryError` crash on large caches.
+
+</details>
+
+### Added (Extension)
+
+- **Diagnostics** sidebar section — four severity toggles (`saropaLints.severity.error`, `.warning`, `.info`, `.hint`) plus the Lint integration, Analyzer plugin, and Tier controls (moved from Settings). Each severity has a colored icon (red/yellow/blue/green), requires double-click to toggle (preventing accidental flips), and shows an inline eye button on hover as a single-click fallback. No action required.
+
+### Changed
+
+- **Breaking:** 35 rules renamed with semantic suffixes to resolve name collisions with core Dart/Flutter lints. Update `analysis_options.yaml` and `// ignore:` comments to use the new names (e.g. `prefer_single_quotes` → `prefer_single_quotes_strict`). Old names remain as deprecated aliases for one release cycle.
+
+### Removed
+
+- **Breaking:** `avoid_private_typedef_functions`, `missing_code_block_language_in_doc_comment`, and `prefer_initializing_formals` removed — identical to core Dart lints with no behavioral difference. Use the core Dart lint instead; no action required if already enabled.
+
+---
+
+## [15.0.4]
+
+Switching Lint integration on is now near-instant instead of a two-minute wait that looked like a freeze. Every command the extension shells out to a Dart tool for now uses the Dart executable directly rather than routing through Flutter, and the dependency resolve is skipped altogether when nothing needs resolving. [log](https://github.com/saropa/saropa_lints/blob/v15.0.4/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- Turning Lint integration on took around two minutes on a Flutter project and looked frozen, so it got canceled and the project seemed impossible to re-enable. The extension now runs `dart` rather than `flutter` for `pub get` and `analyze` — the same work without the Flutter tool's startup cost, measured at 1.9 s versus 116 s on the same project — and skips `pub get` entirely when `pubspec.yaml` is unchanged and the package is already resolved. No action required.
+- Upgrading the saropa_lints version from the extension paid the same two-minute Flutter startup cost on every upgrade. It now uses the same fast path, falling back to Flutter only when the resolve genuinely fails on the Flutter SDK. No action required.
+
+<details><summary>Maintenance</summary>
+
+- (Extension) Every command the extension shells out to is now timed into the extension report and output channel, so a slowness report carries its own measurements instead of needing a stopwatch. No action required.
+
+</details>
+
+---
+
+## [15.0.3]
+
+The scan CLI now lets users filter diagnostics by severity, so AI agents and CI pipelines can suppress info-level noise and focus on warnings and errors. The extension also stops losing the in-editor analyzer plugin when Lint integration is switched off and back on, and now reports that plugin's real state instead of implying it from a setting that does not control it. [log](https://github.com/saropa/saropa_lints/blob/v15.0.3/CHANGELOG.md)
+
+### Added
+
+- `--min-severity` flag for the `scan` command filters diagnostics by severity threshold — `--min-severity warning` excludes info-level output from both stdout and the report file, reducing noise for AI agents and CI pipelines. No action required.
+- `--max-severity` flag for the `scan` command caps output at a severity ceiling — `--max-severity warning` hides errors so you can triage lower-priority noise in isolation. No action required.
+
+### Added (Extension)
+
+- When Lint integration and the analyzer plugin disagree in a way you probably did not intend — scan-on-save on with in-editor diagnostics silently off, or the multi-gigabyte plugin still loading while lints read as off — the extension now offers once to reconcile it either way. Answer or dismiss it and it does not ask again for that project.
+
+### Fixed (Extension)
+
+- Clicking a finding in the Problems panel now highlights the full diagnostic span instead of a single character — eliminates the "highlight every matching letter" noise caused by VS Code's occurrence-highlight when the range was only one character wide. No action required.
+- Turning Lint integration off and then on again left the in-editor analyzer plugin switched off — the off step comments out the `plugins:` block in `analysis_options.yaml`, and the on step never put it back, so a project silently lost live diagnostics with no indication of why. Enable now restores the block when it was this extension's own Off that commented it out, leaving new projects (which default to the lighter scan-on-save delivery) untouched. This has proven to be tricky!
+- The sidebar now reports the analyzer plugin's actual on-disk state as its own row, so "Lint integration: On" can no longer sit above a project whose `plugins:` block is commented out — clicking that row while it reads Off restores the plugin. No action required.
+- The record of which side switched the analyzer plugin off is now stored twice, so a VS Code profile switch or extension-storage reset can no longer make Enable silently stop restoring the plugin. No action required.
+- The analyzer plugin row and its restore logic now track every folder in a multi-root window and start working in a window that had no folder open at startup, instead of only the one folder present when the extension activated. No action required.
+- Changing the tier froze the whole window until the config rewrite finished, behind a notification that showed one static title and no Cancel button — on a large project that is indistinguishable from a hang. The tier change now runs in the background with a live elapsed-time counter and a working Cancel, joins a second invocation to the one already running instead of racing on the same file, and restores the previous tier setting if the change does not complete. No action required.
+
+<details><summary>Maintenance</summary>
+
+- (Extension) Added explicit `"types"` field to both `tsconfig.json` and `tsconfig.test.json` so the TypeScript compiler reliably resolves Node.js globals and test framework types instead of relying on auto-discovery. No action required.
+- (Extension) Added `verify-tsconfig-types` build gate that validates both tsconfig files during `precompile` — fails when an imported `@types/*` package is missing from either config's `"types"` array. No action required.
+- (Extension) Pinned Filipino translation of "Analyzer plugin" in the curated dictionary so the MT pipeline stops overwriting it with untranslated English on every run. No action required.
+- (Extension) The i18n pipeline now warns at the start of every run when a curated dictionary key no longer matches any English source string — catches silent regressions where a renamed en.json string causes the dictionary entry to stop matching and MT takes over. Pass `--fail-on-drift` to hard-gate (added to publish pipeline). No action required.
+- (Extension) Fixed 9 orphaned curated dictionary keys across nl, fr, ur, bn, fil, and he — stale from prior en.json renames ("Search Packages" → "Search packages", "Open Lints Config" → "Manage Rule Packs"). No action required.
+- Added fixture coverage for `avoid_positioned_outside_stack` — covers the Positioned-in-list-passed-to-custom-widget false positive that was already fixed in v4.13.0 but had no test. No action required.
+
+</details>
+
+---
+
+## [15.0.2]
+
+This release focuses on improving the reliability and user experience of the extension's setup workflows. Progress notifications now provide real-time feedback during lengthy operations to clearly communicate the current status. Safeguards have also been introduced to prevent duplicate, conflicting tasks from executing concurrently if a command is triggered multiple times. [log](https://github.com/saropa/saropa_lints/blob/v15.0.2/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- The "Enabling Saropa Lints" progress notification stayed on a single static title for the entire `pub get` step, which can take over a minute on projects with many plugins — with nothing on screen to distinguish "still working" from "stuck," clicking Cancel (or clicking "Enable" again) mid-run was a reasonable reaction. The notification now shows which step is running and a live elapsed-time counter (e.g. "Running pub get… (45s)"). No action required.
+- Clicking "Enable" again while an enable flow was already running started a second, fully concurrent flow — both writing `pubspec.yaml`/`analysis_options.yaml` and shelling out to `pub get`/`write_config` at the same time — instead of joining the one already in progress, which could stack duplicate progress notifications and race on the same files. A second call now joins the in-flight run instead of starting a new one. The same fix applies to "Create Baseline" (`saropa_baseline.json`), which had the same gap. No action required.
+
+---
+
+## [15.0.1]
+
+Version 15.0.1 improves the editor extension's responsiveness and resolves a file-parsing bug that prevented the plugin from re-enabling. The setup flow now executes asynchronously to prevent UI freezes, while deactivated lint configurations generate significantly smaller files by omitting unused inline documentation. [log](https://github.com/saropa/saropa_lints/blob/v15.0.1/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- A project whose `plugins:` block is written commented-out (new projects, or one where "Turn Off Lint Integration" was used) no longer gets the full per-rule description dump on every regenerate — the disabled block now keeps only the `rule_name: true/false` lines needed to restore the exact configured tier, dropping the multi-hundred-line prose and box-drawing headers that served no purpose while inert. A live (uncommented) block is unaffected and keeps its full inline documentation. No action required; re-run `dart run saropa_lints:init` or trigger a config write to see the smaller file.
+- "Enabling Saropa Lints" could appear to hang forever on larger projects — the enable flow ran `pub get`, config write, and analysis synchronously, freezing the whole editor for as long as those took instead of just showing progress. The flow now runs them without blocking the UI and can be canceled from the progress notification. Canceling during the final analysis step also no longer silently reports "Enable" as successful — it now stops and logs the cancellation instead of turning the plugin on as if the flow had completed. No action required.
+- "Re-enable Plugin" could report "nothing to restore" on a project whose `analysis_options.yaml` mixed CRLF and plain-LF line endings, even though the disabled `plugins:` block was plainly present — line detection now tolerates mixed endings instead of assuming one for the whole file. No action required.
+
+---
+
 ## [15.0.0]
 
 Version 15.0.0 adds new quick fixes for error logging and variable placement while introducing a persistent background daemon for significantly faster IDE save-scans. This release resolves false positives across exception handling, lifecycle timers, static method detection, and platform target checks. Project tier management is now unified directly through project configuration, reducing default editor memory overhead. [log](https://github.com/saropa/saropa_lints/blob/v15.0.0/CHANGELOG.md)

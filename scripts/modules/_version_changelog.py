@@ -37,7 +37,7 @@ from scripts.modules._git_ops import tag_exists_on_remote
 _UNRELEASED_SUFFIX_PAT = r"\s*(?:-|—)\s*unreleas\w*"
 
 
-def _strip_unreleased_suffix(content: str) -> str:
+def strip_unreleased_suffix(content: str) -> str:
     """Remove ' - Unreleased' (and typo variants) from versioned headings.
 
     Handles headings like ``## [15.1.0] - Unreleased`` that carry a version
@@ -466,7 +466,7 @@ def rename_unreleased_to_version(
     # Strip " - Unreleased" suffix from versioned headings BEFORE any
     # other matching — converts ``## [15.1.0] - Unreleased`` to
     # ``## [15.1.0]`` so the rest of the pipeline sees a clean heading.
-    content = _strip_unreleased_suffix(original)
+    content = strip_unreleased_suffix(original)
     suffix_was_stripped = content != original
 
     # Anchor every heading match to line start (MULTILINE). Unanchored patterns
@@ -846,7 +846,7 @@ def _promote_top_section_to_version(
     # Strip " - Unreleased" suffix before matching so versioned-but-unreleased
     # headings are handled cleanly (the suffix would otherwise survive in the
     # output because match.end() only covers ``## [X.Y.Z]``).
-    content = _strip_unreleased_suffix(original)
+    content = strip_unreleased_suffix(original)
 
     # Match the first ## [...] heading anywhere in the file — there are no
     # version-like headings before the first release section in this repo's

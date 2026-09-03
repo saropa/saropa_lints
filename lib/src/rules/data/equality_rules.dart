@@ -747,8 +747,8 @@ class AvoidNullChecksInEqualityOperatorsRule extends SaropaLintRule {
 
       // Extract the single parameter's name so the visitor can match null
       // comparisons specifically against it (not any other identifier).
-      final FormalParameter? firstParam = node.parameters?.parameters
-          .firstOrNull;
+      final FormalParameter? firstParam =
+          node.parameters?.parameters.firstOrNull;
       if (firstParam is! SimpleFormalParameter) return;
       final String? paramName = firstParam.name?.lexeme;
       if (paramName == null) return;

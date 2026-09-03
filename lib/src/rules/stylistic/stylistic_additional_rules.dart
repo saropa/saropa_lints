@@ -2333,8 +2333,7 @@ class PreferDocCommentAfterAnnotationsRule extends SaropaLintRule {
         'rather than above the annotations, for readability. Move the /// '
         'block below the last annotation so the doc comment sits directly '
         'above the declaration it describes. {v1}',
-    correctionMessage:
-        'Move the /// doc comment below the last annotation.',
+    correctionMessage: 'Move the /// doc comment below the last annotation.',
     severity: DiagnosticSeverity.INFO,
   );
 

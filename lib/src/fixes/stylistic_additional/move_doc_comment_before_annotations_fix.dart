@@ -49,8 +49,7 @@ class MoveDocCommentBeforeAnnotationsFix extends SaropaFixProducer {
     final deletion = lineBoundaryRange(doc);
 
     // Extract the raw doc comment text for reinsertion at the new location.
-    final String docText =
-        unitResult.content.substring(doc.offset, doc.end);
+    final String docText = unitResult.content.substring(doc.offset, doc.end);
 
     // Match the indentation of the first annotation so the reinserted doc
     // comment aligns with the surrounding code.
@@ -62,10 +61,7 @@ class MoveDocCommentBeforeAnnotationsFix extends SaropaFixProducer {
 
       // Insert the doc comment before the first annotation, with a trailing
       // newline so the annotation stays on its own line.
-      b.addSimpleInsertion(
-        firstAnnotation.offset,
-        '$docText\n$indent',
-      );
+      b.addSimpleInsertion(firstAnnotation.offset, '$docText\n$indent');
     });
   }
 }

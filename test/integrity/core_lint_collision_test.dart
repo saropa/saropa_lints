@@ -29,10 +29,9 @@ Set<String> _parseCoreNamesFromPython() {
   }
 
   // Extract all double-quoted identifiers from the block body.
-  final names = RegExp(r'"(\w+)"')
-      .allMatches(blockMatch.group(1)!)
-      .map((m) => m.group(1)!)
-      .toSet();
+  final names = RegExp(
+    r'"(\w+)"',
+  ).allMatches(blockMatch.group(1)!).map((m) => m.group(1)!).toSet();
 
   // Sanity check: the set should have a reasonable number of entries.
   expect(

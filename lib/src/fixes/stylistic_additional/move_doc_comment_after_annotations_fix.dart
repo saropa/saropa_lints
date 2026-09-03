@@ -72,10 +72,7 @@ class MoveDocCommentAfterAnnotationsFix extends SaropaFixProducer {
 
       // Insert the doc comment after the last annotation, with the
       // annotation's indentation and a trailing newline.
-      b.addSimpleInsertion(
-        insertOffset,
-        '$indent$docText\n',
-      );
+      b.addSimpleInsertion(insertOffset, '$indent$docText\n');
     });
   }
 }
