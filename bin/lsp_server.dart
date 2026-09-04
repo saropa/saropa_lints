@@ -434,12 +434,97 @@ Future<void> _buildCollection() async {
       'analyzer ready in '
       '${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s',
     );
+
+    // Full workspace scan — analyze all Dart files so the Problems panel
+    // shows diagnostics project-wide, not just for open files. Runs after
+    // the prewarm so the first user interaction isn't delayed.
+    unawaited(_analyzeWorkspace(root));
   } on Object catch (e) {
     _log('failed to build analyzer context: $e');
     _collection = null;
   } finally {
     _collectionBuilding = false;
   }
+}
+
+/// Whether a workspace scan is currently running. Checked by didSave so
+/// user-initiated analysis can preempt the background scan for that file.
+bool _workspaceScanRunning = false;
+
+/// Analyzes all Dart files under lib/, bin/, and test/ so the Problems panel
+/// shows project-wide diagnostics on startup — not just for open files.
+/// Runs sequentially in the background after the analyzer is warmed up.
+/// Skips generated files, build/, .dart_tool/, and example/ directories.
+Future<void> _analyzeWorkspace(String root) async {
+  _workspaceScanRunning = true;
+  final sw = Stopwatch()..start();
+
+  // Directories to scan — same scope as the analyzer plugin.
+  final scanDirs = ['lib', 'bin', 'test'];
+  final dartFiles = <String>[];
+
+  for (final dir in scanDirs) {
+    final dirPath = p.join(root, dir);
+    final directory = Directory(dirPath);
+    if (!directory.existsSync()) continue;
+
+    // Walk the directory tree for .dart files, skipping generated/build dirs.
+    await for (final entity in directory.list(recursive: true)) {
+      if (entity is! File || !entity.path.endsWith('.dart')) continue;
+
+      final relative = p.relative(entity.path, from: root);
+      // Skip generated files and build artifacts
+      if (relative.contains('.g.dart') ||
+          relative.contains('.freezed.dart') ||
+          relative.contains('.gr.dart') ||
+          relative.contains('.dart_tool') ||
+          relative.contains('build${p.separator}')) {
+        continue;
+      }
+      dartFiles.add(entity.path);
+    }
+  }
+
+  if (dartFiles.isEmpty) {
+    _log('workspace scan: no Dart files found');
+    _workspaceScanRunning = false;
+    return;
+  }
+
+  _log('workspace scan: analyzing ${dartFiles.length} files…');
+  var analyzed = 0;
+  var diagnosticCount = 0;
+
+  for (final filePath in dartFiles) {
+    // Bail if the analyzer context was torn down (server shutting down).
+    if (_collection == null) break;
+
+    final fileUri = Uri.file(p.normalize(p.absolute(filePath))).toString();
+
+    // Skip files that already have published diagnostics (e.g. from a
+    // didSave that raced ahead of the workspace scan).
+    if (_fileDiagnostics.containsKey(fileUri)) {
+      analyzed++;
+      continue;
+    }
+
+    await _analyzeFile({
+      'textDocument': {'uri': fileUri},
+    });
+
+    analyzed++;
+    diagnosticCount += _fileDiagnostics[fileUri]?.length ?? 0;
+
+    // Yield to the event loop between files so didSave/codeAction requests
+    // aren't starved by a long scan.
+    await Future<void>.delayed(Duration.zero);
+  }
+
+  _workspaceScanRunning = false;
+  _log(
+    'workspace scan complete: $analyzed files, $diagnosticCount diagnostic(s) '
+    'in ${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s',
+  );
 }
 
 /// Re-reads the tier from analysis_options.yaml and re-analyzes every file
