@@ -109,6 +109,20 @@ export class HealthPanel implements vscode.Disposable {
   }
 
   private collectEngines(): EngineStatus[] | undefined {
+    // Delegates to the static accessor so the Home hub KPI band (which never
+    // opens this panel) can read the identical engine snapshot — one source
+    // of truth for "what are the engines doing right now".
+    return HealthPanel.getEngineStatuses();
+  }
+
+  /**
+   * Public, panel-free snapshot of the three diagnostic engines. Added for the
+   * Home hub KPI band (`saropaDashboardsView.ts`), which needs an "engines
+   * running" count without creating/opening the Health Panel webview. Mirrors
+   * `collectEngines()` exactly (same gate, same deps) so the two surfaces can
+   * never disagree.
+   */
+  static getEngineStatuses(): EngineStatus[] | undefined {
     // saropaLints.debug.enabled now gates the Engines section within this
     // panel (it used to gate the standalone Debug Panel sidebar webview's
     // existence entirely).

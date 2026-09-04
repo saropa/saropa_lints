@@ -46,6 +46,14 @@ let lastReportRawStdout = '';
 // surfaces this as a click-to-copy / open / reveal-in-Explorer row so the user
 // has a real artifact to share or version, not just a transient webview.
 let lastReportFilePath: string | undefined;
+// Most recent scan's parsed payload (grade/score/functionCount), kept only in
+// memory for the lifetime of the extension host. The Home hub KPI band reads
+// this via [getLastProjectVibrancyPayload] so it can show the real
+// last-known grade without triggering its own `dart run` scan (Code Health is
+// heavy; Home must stay instant). `undefined` until a scan has completed at
+// least once this session — the KPI band shows a "not scanned yet" placeholder
+// in that case rather than a fabricated number.
+let lastPayload: ProjectVibrancyPayload | undefined;
 // Single-flight guard: a project vibrancy scan spawns a full-project AST walk
 // via `dart run`, which is heavy. Without this, every command invocation
 // (sidebar item, rescan button, command palette) starts a fresh dart process
@@ -96,6 +104,15 @@ export function refreshCodeHealthDashboardIfOpen(): void {
   void openProjectVibrancyReport();
 }
 
+/**
+ * The most recently completed scan's payload (grade/score/functionCount), or
+ * `undefined` if Code Health has not been scanned this session. Read-only
+ * accessor for the Home hub KPI band — never triggers a scan itself.
+ */
+export function getLastProjectVibrancyPayload(): ProjectVibrancyPayload | undefined {
+  return lastPayload;
+}
+
 async function runScanAndRender(projectRoot: string): Promise<void> {
   // Open the panel in its scanning state immediately so the user sees live
   // progress (bar, current file, counters) instead of a frozen notification —
@@ -135,6 +152,7 @@ async function runStreamingScan(
     return;
   }
   lastReportRawStdout = scan.rawStdout;
+  lastPayload = scan.payload;
   // Persist BEFORE rendering so the dashboard can show the real path it can be
   // copied / opened / revealed from. A failed write is non-fatal — the panel
   // still renders, just without a file row.

@@ -240,9 +240,24 @@
   "dashboards": {
     "heroTitle": "Dashboards",
     "openFull": "Open full screen",
-    "rescan": "Rescan",
-    "retry": "Retry",
-    "paneFailed": "Scan failed.",
+    "kpi": {
+      "health": "Health score",
+      "healthPending": "Run analysis",
+      "issues": "Open issues",
+      "engines": "Engines",
+      "enginesValue": "{running}/{total} running",
+      "enginesOff": "Off",
+      "packages": "Packages",
+      "packagesValue": "{count} scanned",
+      "packagesAttention": "{count} need attention",
+      "codeHealthGrade": "Code health",
+      "projectSize": "Project size",
+      "projectSizeMapped": "Mapped — see Project Map",
+      "notScanned": "Not scanned"
+    },
+    "card": {
+      "open": "Open"
+    },
     "controls": {
       "actions": "Actions",
       "settings": "Settings",
@@ -276,13 +291,23 @@
       "lintsConfig": "Lints Config",
       "findings": "Findings",
       "package": "Package Dashboard",
-      "commandCatalog": "Command Catalog"
+      "commandCatalog": "Command Catalog",
+      "fullAudit": "Full Audit"
     },
     "projectMap": {
-      "scanning": "Scanning project map…"
+      "scanning": "Scanning project map…",
+      "empty": "Not mapped yet — open Project Map to run a scan.",
+      "lastMapped": "Last mapped"
     },
     "codeHealth": {
-      "scanning": "Scanning code health…"
+      "scanning": "Scanning code health…",
+      "empty": "Not scanned this session — open Code Health to run a scan.",
+      "grade": "Grade",
+      "score": "Score",
+      "functions": "Functions scanned"
+    },
+    "fullAudit": {
+      "description": "One-shot report covering every enabled rule. Run it to generate a fresh audit."
     },
     "config": {
       "tier": "Tier",

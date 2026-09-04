@@ -1,91 +1,100 @@
 /**
- * Pins the "Saropa Dashboards" launchpad shell contract.
+ * Pins the "Saropa Dashboards" Home hub shell contract (plan Phase 3).
  *
- * The launchpad sets its webview HTML once: a hero, the four fast dashboards as live summary cards,
- * and the two heavy dashboards (Project Map, Code Health) as "Scanning…" placeholders that stream in
- * later via `paneReady` messages. These assertions guard the properties that make that safe: exactly
- * one `acquireVsCodeApi()` handle is acquired and re-exposed (the API may be acquired only once per
- * document); ECharts loads exactly once; all six panes are present; the heavy panes carry a rescan
- * control; the four summaries are embedded; and the client injects Project Map's `<style>` verbatim
- * rather than re-wrapping it (the double-wrap that previously spilled CSS onto the page).
+ * The hub sets its webview HTML once: a hero, a 6-tile KPI band, the controls band, and one card
+ * per first-class dashboard (Findings, Rules & Tiers, Packages, Code Health, Project Map, Full
+ * Audit) carrying its top signals plus an "Open" deep-link. Unlike the pre-Phase-3 version, nothing
+ * here streams in later — every value is a cheap read, so the shell is the whole page.
  */
 import '../vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
-import { buildShell, type ShellSummaries } from '../../views/saropaDashboardsView';
+import { buildShell, type HomeCardSummaries } from '../../views/saropaDashboardsView';
+import type { HomeKpis } from '../../views/dashboardSummaries';
 
-const summaries: ShellSummaries = {
-  config: '<div class="summary-grid" data-test="config"></div>',
-  package: '<div class="summary-grid" data-test="package"></div>',
+const cards: HomeCardSummaries = {
   findings: '<div class="summary-grid" data-test="findings"></div>',
-  catalog: '<div class="summary-grid" data-test="catalog"></div>',
+  rulesAndTiers: '<div class="summary-grid" data-test="rulesAndTiers"></div>',
+  packages: '<div class="summary-grid" data-test="packages"></div>',
+  codeHealth: '<div class="summary-grid" data-test="codeHealth"></div>',
+  projectMap: '<div class="summary-grid" data-test="projectMap"></div>',
+  fullAudit: '<p class="summary-empty" data-test="fullAudit"></p>',
 };
 
-const ECHARTS = 'vscode-resource:/media/echarts.min.js';
+const EMPTY_KPIS: HomeKpis = {
+  healthScore: null,
+  issueCount: null,
+  enginesRunning: null,
+  enginesTotal: 3,
+  packagesTotal: 0,
+  packagesAttention: 0,
+  codeHealthGrade: null,
+  projectMapScanned: false,
+};
 
 describe('saropaDashboardsView buildShell', () => {
-  it('acquires the VS Code API once and re-exposes it for the embedded engines', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
-    assert.ok(
-      out.includes('window.acquireVsCodeApi = function () { return api; };'),
-      'shell does not re-expose a shared acquireVsCodeApi handle',
-    );
-    const realAcquire = out.match(/var api = acquireVsCodeApi\(\);/g) ?? [];
-    assert.strictEqual(realAcquire.length, 1, 'expected exactly one host-side API acquisition');
+  it('renders the KPI band with all 6 tiles', () => {
+    const out = buildShell('vscode-resource:', EMPTY_KPIS, cards);
+    const tiles = out.match(/class="metric kpi-tile/g) ?? [];
+    assert.strictEqual(tiles.length, 6, 'expected exactly 6 KPI tiles');
   });
 
-  it('loads ECharts exactly once in the shell head', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
-    const echarts = out.match(/echarts\.min\.js/g) ?? [];
-    assert.strictEqual(echarts.length, 1, 'expected exactly one ECharts loader');
-  });
-
-  it('renders all six panes', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
-    for (const engine of ['projectMap', 'codeHealth', 'findings', 'lintsConfig', 'package', 'commandCatalog']) {
-      assert.ok(out.includes(`id="paneBody-${engine}"`), `pane ${engine} missing`);
+  it('renders all six dashboard cards', () => {
+    const out = buildShell('vscode-resource:', EMPTY_KPIS, cards);
+    for (const id of ['findings', 'lintsConfig', 'package', 'codeHealth', 'projectMap', 'fullAudit']) {
+      assert.ok(out.includes(`id="paneBody-${id}"`), `card ${id} missing`);
     }
   });
 
-  it('embeds the four fast-dashboard summary cards', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
-    for (const key of ['config', 'package', 'findings', 'catalog']) {
+  it('embeds every card summary body', () => {
+    const out = buildShell('vscode-resource:', EMPTY_KPIS, cards);
+    for (const key of ['findings', 'rulesAndTiers', 'packages', 'codeHealth', 'projectMap', 'fullAudit']) {
       assert.ok(out.includes(`data-test="${key}"`), `summary ${key} not embedded`);
     }
   });
 
-  it('shows the heavy panes scanning and gives each a rescan + deep-link control', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
-    // Heavy panes start in a scanning state, not blank.
-    const scanning = out.match(/class="pane-status"/g) ?? [];
-    assert.ok(scanning.length >= 2, 'both heavy panes should start in a scanning state');
-    assert.ok(out.includes('data-rescan="projectMap"'), 'Project Map rescan control missing');
-    assert.ok(out.includes('data-rescan="codeHealth"'), 'Code Health rescan control missing');
-    assert.ok(
-      out.includes('data-command="saropaLints.openProjectHealthDashboard"'),
-      'Project Map open-full deep-link missing',
-    );
-    assert.ok(
-      out.includes('data-command="saropaLints.openProjectVibrancyReport"'),
-      'Code Health open-full deep-link missing',
-    );
-  });
-
-  it('deep-links every light pane to its standalone command', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
+  it('deep-links every card to its standalone dashboard command', () => {
+    const out = buildShell('vscode-resource:', EMPTY_KPIS, cards);
     for (const cmd of [
       'saropaLints.openConfigDashboard',
       'saropaLints.packageVibrancy.showReport',
       'saropaLints.openViolationsWideReport',
-      'saropaLints.showCommandCatalog',
+      'saropaLints.openProjectVibrancyReport',
+      'saropaLints.openProjectHealthDashboard',
+      'saropaLints.fullAudit',
     ]) {
-      assert.ok(out.includes(`data-command="${cmd}"`), `light deep-link ${cmd} missing`);
+      assert.ok(out.includes(`data-command="${cmd}"`), `card deep-link ${cmd} missing`);
     }
   });
 
+  it('shows the honest "not scanned" state when a KPI has no data yet', () => {
+    const out = buildShell('vscode-resource:', EMPTY_KPIS, cards);
+    // Health/issues/engines/packages/code-health/project-size all lack data in EMPTY_KPIS.
+    const notScanned = out.match(/Not scanned/g) ?? [];
+    assert.ok(notScanned.length > 0, 'expected at least one "not scanned" KPI tile');
+  });
+
+  it('renders real KPI values when data is present', () => {
+    const kpis: HomeKpis = {
+      healthScore: 82,
+      issueCount: 143,
+      enginesRunning: 2,
+      enginesTotal: 3,
+      packagesTotal: 40,
+      packagesAttention: 3,
+      codeHealthGrade: 'B',
+      projectMapScanned: true,
+    };
+    const out = buildShell('vscode-resource:', kpis, cards);
+    assert.ok(out.includes('82%'), 'health score value missing');
+    assert.ok(out.includes('143'), 'issue count value missing');
+    assert.ok(out.includes('2/3'), 'engines running value missing');
+    assert.ok(out.includes('>B<'), 'code health grade value missing');
+  });
+
   it('surfaces the Actions / Settings / Help controls in the band', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
-    // The launchpad is a full entry point: every merged-sidebar command appears
+    const out = buildShell('vscode-resource:', EMPTY_KPIS, cards);
+    // The hub is a full entry point: every merged-sidebar command appears
     // in the controls band so users do not have to leave it to operate or configure.
     for (const cmd of [
       // Actions
@@ -105,7 +114,7 @@ describe('saropaDashboardsView buildShell', () => {
       assert.ok(out.includes(`data-command="${cmd}"`), `control command ${cmd} missing from band`);
     }
     // The lint-integration button toggles, so its command flips with state.
-    const enabled = buildShell('vscode-resource:', ECHARTS, summaries, {
+    const enabled = buildShell('vscode-resource:', EMPTY_KPIS, cards, {
       lintEnabled: true,
       tier: 'recommended',
       runAfterConfig: true,
@@ -113,7 +122,7 @@ describe('saropaDashboardsView buildShell', () => {
       uiLanguageLabel: 'English',
     });
     assert.ok(enabled.includes('data-command="saropaLints.disable"'), 'enabled state must offer disable');
-    const disabled = buildShell('vscode-resource:', ECHARTS, summaries, {
+    const disabled = buildShell('vscode-resource:', EMPTY_KPIS, cards, {
       lintEnabled: false,
       tier: 'recommended',
       runAfterConfig: true,
@@ -124,20 +133,14 @@ describe('saropaDashboardsView buildShell', () => {
   });
 
   it('patches only the controls band on a settings toggle (no full re-render)', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
+    const out = buildShell('vscode-resource:', EMPTY_KPIS, cards);
     assert.ok(out.includes('id="dashControls"'), 'controls band needs an id to patch');
     assert.ok(out.includes("m.type === 'controlsUpdated'"), 'client must handle controlsUpdated');
   });
 
-  it('keeps Project Map theme tokens + height fixups in the static head, scoped under .pm-pane', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
-    assert.ok(out.includes('.dash-pane .pm-pane { min-height: 0; }'), 'pane height fixup missing');
-  });
-
-  it('injects an arriving pane style verbatim (no double <style> wrap that spilled CSS)', () => {
-    const out = buildShell('vscode-resource:', ECHARTS, summaries);
-    // The client must insert the engine-provided style as raw HTML, not wrap it in another <style>.
-    assert.ok(out.includes("insertAdjacentHTML('beforeend', style)"), 'style not injected verbatim');
-    assert.ok(!/<style>\s*<style>/.test(out), 'shell must not nest <style> elements');
+  it('acquires the VS Code API exactly once', () => {
+    const out = buildShell('vscode-resource:', EMPTY_KPIS, cards);
+    const acquire = out.match(/acquireVsCodeApi\(\)/g) ?? [];
+    assert.strictEqual(acquire.length, 1, 'expected exactly one acquireVsCodeApi() call');
   });
 });

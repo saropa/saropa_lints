@@ -50,7 +50,6 @@
   "command.findStaleIgnores.title": "Saropa Lints: Find Stale Ignore Comments",
   "command.fixStaleIgnores.title": "Saropa Lints: Fix Stale Ignore Comments",
   "command.openViolationsWideReport.title": "Saropa Lints: Open Findings Dashboard",
-  "command.openConsolidatedDashboard.title": "Saropa Lints: Open Dashboard",
   "command.openViolationsWideReport.category": "Saropa",
   "command.revealFindingsDashboard.title": "Saropa Lints: Open Findings Dashboard (preserve filters)",
   "command.focusView.title": "Saropa Lints: Focus Saropa Lints Sidebar",
