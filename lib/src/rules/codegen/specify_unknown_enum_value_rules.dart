@@ -103,10 +103,6 @@ class SpecifyUnknownEnumValueRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
-  // Enum-element resolution requires the field's static type.
-  @override
-  bool get usesTypeResolution => true;
-
   // Cheap pre-filter: every candidate file must reference the annotation
   // class name literally before we bother walking fields.
   @override

@@ -58,6 +58,11 @@ class AvoidFutureorReturnTypeRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Uses declaredFragment.element to walk the resolved supertype chain
+  // and isDartAsyncFutureOr on the resolved DartType.
+  @override
+  bool get usesTypeResolution => true;
+
   // Fast pre-filter: skip files that never mention FutureOr at all before
   // paying for AST traversal.
   //
