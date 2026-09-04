@@ -674,3 +674,45 @@ Panel (live poll), Known Issues (live), Comparison (static), Package Detail (unr
 **Prior art (do not redo):** `plans/history/**/sidebar_view_inventory.md`,
 `dashboard-style-unification.md`, `consolidated-dashboards-iframe-to-composed.md`,
 `severity-filter-sidebar-toggles.md`, `extension_sidebar_view_icons.md`.
+
+## Finish Report (2026-09-04)
+
+Two defects were fixed and one deferred style-migration item (§1.5) was completed.
+
+**Sidebar Status and Home hub KPIs disagreeing with the Problems panel.** Both read
+`reports/.saropa_lints/violations.json`, a file only written by an explicit scan; a project with
+the LSP server running (default) and real diagnostics visible could still show "No violations" if
+no scan had ever run. Both now source from `readVisibleLiveViolations` (`liveViolationsData.ts`),
+matching the status bar and Issues tree. A new `computeLiveHealthScore(root, liveData)` supplies
+the health-score density denominator (`filesAnalyzed`/`filesExpected`) from the last cached export
+since live diagnostics have no equivalent count, while using live severity counts as the numerator
+— the score can no longer lag the Problems panel. The extension's `onDidChangeDiagnostics` handler
+now calls `refreshAllSections()` so the sidebar re-renders on every diagnostic change, not only on
+explicit user actions. The status bar's own `computeHealthScore` call site
+(`extension.ts:1103-1106`) was deliberately left on the old cached-only path — same latent gap,
+out of scope for this pass, a one-line follow-up if wanted.
+
+**`violationsDashboardStylesParts.ts` migrated onto `dashboardChromeStyles`** — the second of the
+three parallel CSS systems this plan's §1.5 had re-deferred at Phases 5 and 7. The file shrank
+from 1337 lines to a much smaller extras sheet carrying only what the shared chrome doesn't cover.
+A multi-angle code review of the diff (8 independent passes: line-by-line, removed-behavior,
+cross-file trace, reuse/duplication, simplification, efficiency, i18n/convention, altitude) found
+one real, confirmed regression: the extras sheet re-declared `.gauge-label .lg`/`.sm` with the
+pre-migration values, and because that duplicate carried the same specificity and a later source
+position, it silently overrode the chrome's `font-variant-numeric: tabular-nums`/`margin-top: 2px`
+additions on this dashboard alone — fixed by deleting the duplicate. A second finding
+(`computeLiveHealthScore` doing a synchronous `violations.json` read on every call on a
+live-refresh-frequency path) was judged low-severity and deferred rather than fixed — see Section
+8 of the session handoff for detail. Verified with a full `ux:gen && ux:test --workers=2` run both
+before and after the CSS fix: the same 6 pre-existing `findings-populated` a11y failures (traced to
+`views/violations-dashboard-tables.ts`, untouched by this migration) occur identically on the
+pre-migration baseline (confirmed by stashing the diff and re-running), so this migration
+introduces no regression of its own beyond the one fixed above.
+
+**Remaining scope (§1.5):** `vibrancy/views/report-styles-parts.ts` (Package Dashboard, ~1190
+lines) is the one style system still unmigrated — deferred for the same reason as before
+(component-parity rewrite too large for a single pass, needs a real Extension Development Host
+render verification, not just static tsc+Playwright).
+
+Commits: `975ce316` (live-diagnostics fix), `93a51771` (style migration), `20573ce2` (gauge-label
+regression fix).
