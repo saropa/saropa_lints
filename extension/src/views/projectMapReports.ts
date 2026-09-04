@@ -254,7 +254,12 @@ function buildReportCard(spec: ReportCardSpec): string {
     <button type="button" class="btn tier-1 report-run-btn" data-report-id="${spec.id}">
       ${escapeHtml(l10n('projectMap.reports.runButton'))}
     </button>
-    <span class="report-status" id="report-status-${spec.id}"></span>
+    ${/* Explicit idle-state text (Phase 7 state-coverage audit): before this pass the status span
+        was empty until the first run, which read as unstyled blank space rather than a designed
+        "nothing has happened yet" state -- the same honesty bar the Home hub KPIs already hold to
+        ("Not scanned" rather than a fabricated number). The client script overwrites this text
+        on 'running'/exit, so it only shows before the first run of a session. */ ''}
+    <span class="report-status" id="report-status-${spec.id}">${escapeHtml(l10n('projectMap.reports.notRunYet'))}</span>
   </div>
   <div class="dash-table-wrap report-output-wrap" id="report-output-wrap-${spec.id}" hidden>
     <table class="dash-table">
