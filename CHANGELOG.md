@@ -68,6 +68,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0-beta.2] — Unreleased
 
+Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)
+
 ### Fixed
 
 - Fixed VS Code "Switch to Pre-Release Version" button failing with `net::ERR_FAILED` — pre-release extension versions now use an odd minor number as VS Code requires.
