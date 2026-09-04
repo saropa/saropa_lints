@@ -1616,6 +1616,67 @@
       "weeksAgo": "{wk}w ago"
     }
   },
+  "projectMap": {
+    "panelTitle": "Saropa Project Map",
+    "tabs": {
+      "map": "Map",
+      "reports": "Reports",
+      "aria": "Project Map sections"
+    },
+    "scan": {
+      "subtitle": "Scanning project size, complexity, and hotspots…",
+      "elapsed": "Elapsed",
+      "cancel": "Cancel",
+      "restart": "Restart",
+      "stopped": "Stopped",
+      "logHeading": "Activity",
+      "logEmpty": "No output yet — project_health does not report step-by-step progress, so this log only fills if the scan prints a diagnostic message."
+    },
+    "reports": {
+      "intro": "One-click CLI reports that previously required a terminal. Each Run button streams the tool's live output below its card and saves a copy under reports/.saropa_lints/reports-tab/.",
+      "runButton": "Run",
+      "running": "Running…",
+      "exitOk": "Exit 0 — pass",
+      "exitFail": "Non-zero exit — see output",
+      "colLine": "#",
+      "colText": "Output",
+      "severity": {
+        "title": "Severity Report",
+        "desc": "Runs dart analyze and groups every issue by severity (errors, warnings, info) — the terminal command dart run saropa_lints:severity_report, without the terminal."
+      },
+      "impact": {
+        "title": "Impact Report (legacy alias)",
+        "desc": "Identical output to Severity Report — impact_report is the pre-2026-06-05 name, kept only so existing scripts and muscle memory keep working."
+      },
+      "qualityGate": {
+        "title": "Quality Gate",
+        "desc": "Evaluates the latest violations.json against the thresholds in saropa_quality_gate.yaml and prints PASS, WARN, or FAIL. Edit the thresholds below, then run."
+      },
+      "stubTest": {
+        "title": "Stub Test Report",
+        "desc": "Scans test/*.dart for placeholder assertions (expect(true, isTrue), expect('literal', isNotNull)) that never actually test anything."
+      },
+      "accuracy": {
+        "title": "Accuracy Report",
+        "desc": "Confirms every rule with an expect_lint marker in the fixtures actually fires there — catches a rule that silently stopped working. Most useful when developing saropa_lints itself."
+      },
+      "memory": {
+        "title": "Memory Report",
+        "desc": "Summarizes the analyzer plugin's RSS trend from reports/.saropa_lints/plugin.log — first/last/min/max memory since the plugin last started."
+      },
+      "doctor": {
+        "title": "Doctor",
+        "desc": "Checks analysis_options.yaml and analysis_options_custom.yaml for common misconfigurations: keys in the wrong file, a missing custom file, or a missing version constraint."
+      },
+      "gate": {
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
+        "placeholder": "quality_gate:\n  conditions:\n    - metric: new_critical_issues\n      op: eq\n      value: 0\n      on_fail: fail",
+        "save": "Save",
+        "saved": "Saved",
+        "saveError": "Could not save"
+      }
+    }
+  },
   "suppressionsStrip": {
     "noData": "No violations.json yet — run analysis to populate the suppression snapshot.",
     "zeroTotal": "0 analyzer suppressions in the latest export.",

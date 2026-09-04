@@ -202,12 +202,55 @@ project-wide without the user opening every file. It is ON by default, so the En
 typical LSP card state is now "running", not "stopped" — the Phase 1 deferred sidebar-summary work
 above should say "LSP live" not "LSP off" as its example.
 
-### Phase 3 — Home hub (2 days, Sonnet)
-Files: `views/saropaDashboardsView.ts`, consolidation plan list C.
-- [ ] KPI band (6 tiles) + one card per dashboard, each with 3 live signals and an Open button.
-- [ ] Replace the consolidated view's grade gauge with the Home KPI band; retire
-      `views/consolidated/*` if nothing else uses it (check `showConsolidated` command usage).
-- [ ] Status bar click → Home.
+### Phase 3 — Home hub (2 days, Sonnet) — DONE 2026-09-04
+Files: `views/saropaDashboardsView.ts`, `views/dashboardSummaries.ts`, `systemHealth/healthPanel.ts`,
+`views/projectVibrancyReportView.ts`, `extension.ts`, `en.json`.
+- [x] KPI band (6 tiles: health score, open issue count, engines, packages, Code Health grade,
+      project size) + one card per other first-class dashboard (Findings, Rules & Tiers/Lints
+      Config, Packages, Code Health, Project Map, Full Audit), each with its top live signals and an
+      "Open" button. Every value is a cheap read (JSON export / in-memory cache / config / file
+      stat) — nothing on Home triggers a `dart run` scan, which also removes the old
+      sequential-heavy-scan-on-every-open cost the pre-Phase-3 launchpad paid. Code Health's card
+      reads the last in-session scan result (`getLastProjectVibrancyPayload`, new); Project Map's
+      card reads only its last report's file mtime (`getLastProjectMapMtime`, new) — the CLI emits
+      HTML only, no structured size/hotspot JSON, so a numeric "project size" is not cheaply
+      available; both surfaces show an honest "not scanned" state instead of a fabricated number.
+      Added `HealthPanel.getEngineStatuses()` (new public static accessor) so the KPI band can read
+      the same engine snapshot the Health Panel shows without opening that panel.
+- [x] Replaced the consolidated dashboard's (`saropaLints.openConsolidatedDashboard`,
+      `views/consolidated/*`) grade-gauge hero with the Home KPI band. Confirmed nothing else
+      referenced it (`grep` for the command id found only its own registration, the manifest
+      contribution, the command-catalog listing, and its own tests) and deleted it outright:
+      `views/consolidated/{consolidatedModel,consolidatedView,consolidatedClient,consolidatedStyles}.ts`,
+      `test/{consolidatedModel,consolidatedClient}.test.ts`, the command registration + import in
+      `extension.ts`, the `package.json` command contribution, the `package.nls.json` title string,
+      the `commandCatalogEntriesProject.ts` entry, and both dead entries in `tsconfig.test.json` +
+      the `npm test` mocha spec list.
+- [x] Status bar's enabled-state click target repointed from `saropaLints.openViolationsWideReport`
+      to `saropaLints.openDashboards` (`extension.ts`, the `updateAllStatusBars` closure). The
+      disabled-state target already pointed at `openDashboards` since Phase 0.
+- [x] `tsc --noEmit -p .` and `tsc -p tsconfig.test.json` both clean; `npm run verify-nls-keys`
+      clean (347 keys). Rewrote `test/views/saropaDashboardsView.test.ts` for the new KPI-band + card
+      contract (9/9 passing) since the shell's HTML shape changed.
+
+**Deferred — not done:**
+- [ ] Project size KPI/card shows presence-only ("Mapped — see Project Map" / "Not scanned"), not a
+      real size number — the `project_health` CLI's `--format html` output carries no structured
+      size/dead-weight JSON to read cheaply; scraping the generated report markup for a number was
+      rejected as fragile (see `saropa-lints-extension-development` skill's guidance against reading
+      generated HTML as a data source). A real number needs a Dart-side `--format json` (or similar
+      machine-readable summary) addition to `bin/project_health.dart`, out of scope for a
+      TS-only hub phase.
+- [ ] Code Health's KPI tile/card only reflects a scan that happened *this VS Code session* (the
+      cache is in-memory, not persisted) — reopening VS Code resets it to "not scanned" even if a
+      report file exists on disk from an earlier session. A persisted-report reader (parallel to
+      Project Map's mtime check) would need to pick the latest of potentially many
+      `reports/<yyyymmdd>/..._saropa_code_health.json` files, which was judged not worth the added
+      file-system-glob cost for this phase; revisit if users report the KPI looking stale on first
+      open.
+- [ ] Translated locale catalogs (`package.nls.*.json`, `src/i18n/locales/<lang>.json`) are stale for
+      the new/changed keys — not regenerated, per the hard rule against running the MT pipeline
+      without an explicit in-the-moment request.
 
 ### Phase 4 — Rules & Tiers becomes the config surface (3 days, Sonnet; Opus for the yaml editor design only)
 Files: `rulePacks/rulePacksWebviewProvider.ts`, `configDashboardStyles.ts`,
@@ -229,14 +272,58 @@ Files: `vibrancy/views/*`.
 - [ ] Reduce the ~90 `packageVibrancy.*` commands: keep the ones bound to buttons/tabs, mark the
       rest `commandPalette: false` or delete if unreachable. Target ≤ 25.
 
-### Phase 6 — Project Map live + CLI reports (2 days, Sonnet)
-Files: `views/projectMapView.ts`, `bin/*.dart`.
-- [ ] Convert Project Map from one-shot render to the Code Health stream pattern
-      (`projectVibrancyReportView.ts:123-134`).
-- [ ] Reports tab: one card per `bin/*_report.dart` + `quality_gate` + `doctor`. Run button streams
-      output; result parsed into a `.dash-table`. `quality_gate` card includes an inline editor for
-      `saropa_quality_gate.yaml` thresholds.
-- [ ] Project Map bespoke CSS → chrome.
+### Phase 6 — Project Map live + CLI reports (2 days, Sonnet) — DONE 2026-09-04
+Files: `views/projectMapView.ts`, `views/projectMapShell.ts` (new), `views/projectMapReports.ts` (new),
+`bin/*.dart` (read-only reference).
+- [x] Convert Project Map from one-shot render to a live pattern. The panel now opens immediately
+      showing a scanning state (spinner, elapsed timer, a streamed activity log fed by the CLI's real
+      stdout/stderr) instead of the old `vscode.window.withProgress` notification that rendered
+      nothing until the scan finished. On completion the panel swaps in the extracted report fragment
+      in place — no full-document reload, no lost tab state. Cancel and Restart both act on a real
+      `CancellationTokenSource` against the actual child process.
+- [x] Reports tab: one card per `severity_report`, `impact_report`, `quality_gate`, `stub_test_report`,
+      `accuracy_report`, `memory_report`, `doctor` — all 7 CLIs the plan listed. Each Run button
+      spawns its CLI and streams stdout/stderr live into a `.dash-table` (real `<table>`, sticky
+      header, chrome-styled). `quality_gate`'s card has an inline `<textarea>` YAML editor for
+      `saropa_quality_gate.yaml` (Save writes the file; Run re-evaluates against it). Every run
+      persists its combined output to `reports/.saropa_lints/reports-tab/<id>.log`.
+- [x] Project Map's own chrome (hero, tab bar, scanning state, report cards) now builds from
+      `getDashboardChromeStyles()` plus a small supplementary stylesheet layered on top — the same
+      pattern Code Health's scanning view already uses (`codeHealthScanProgress.ts`), not a second
+      bespoke system.
+- [x] `tsc --noEmit -p .` clean. `tsc -p tsconfig.test.json` clean for every file this phase touched
+      (an unrelated, already-in-progress edit to `views/saropaDashboardsView.ts` from a concurrent
+      session fails that same test compile independently of this phase — verified via `git status`
+      showing it modified before this phase started; not caused by or fixed in this change).
+
+**Deferred — not done, do NOT treat as complete:**
+- [ ] **No true percentage progress bar for the Map scan.** `bin/project_health.dart` has no
+      `--progress` NDJSON protocol the way `bin/project_vibrancy.dart` does (verified: no `--progress`
+      flag exists in the file, and `bin/*.dart` was explicitly out of scope for this phase to edit).
+      The scanning state is genuinely live (real elapsed timer, a real activity log, a real process
+      kill on Cancel) but cannot show "43% — 812/1900 files" the way Code Health does, because the CLI
+      never emits that data. Adding it requires a Dart-side change to `project_health.dart` mirroring
+      `project_vibrancy.dart`'s `--progress`/`--control` flags — a follow-up, not a TS-only fix.
+- [ ] **Report cards show raw output, not per-tool structured columns.** All 7 CLIs are
+      `print()`-based text tools with no shared machine-readable contract (only `accuracy_report` and
+      `stub_test_report` have a `--format json` option). Rather than write a bespoke, fragile regex
+      parser per tool's wording, every card streams a generic two-column `.dash-table` (line number +
+      raw text) — live-updating, but not "File / Line / Rule" columns for `severity_report` specifically.
+      A follow-up could add per-tool parsers for the highest-value cards (severity_report, doctor).
+- [ ] **The embedded `project_health --format html` report itself keeps its own `.pm-pane` styles**,
+      not `dashboardChromeStyles` — deliberate, not an oversight: `health_html_template.dart`'s output
+      is also a portable standalone artifact (CI export, shareable file with no VS Code host), and
+      rebinding its internals onto the webview-only chrome system would break that use case. Only the
+      NEW shell this phase built (hero, tabs, scanning state, report cards) uses the chrome directly.
+- [ ] **No dedicated unit test for `projectMapView.ts` / `projectMapShell.ts` / `projectMapReports.ts`.**
+      No test file existed for this view before this phase (only `saropaDashboardsView.test.ts`
+      references "projectMap" incidentally, and it currently fails to compile for unrelated reasons —
+      see above). Correctness evidence here is `tsc --noEmit` clean plus manual review of the generated
+      client script; it has not been evaluated in a real Extension Development Host.
+- [ ] `transformProjectMapHtml()` / `webviewThemeOverride()` in `projectMapView.ts` are now dead code
+      (their only caller, the old single-command `renderPanel()`, was replaced) but were left in place
+      rather than deleted, since deleting is out of scope for a feature phase and nothing else in this
+      review confirmed they're safe to remove — a cleanup candidate for Phase 7.
 
 ### Phase 7 — Design-system sweep + polish (1 day, Sonnet)
 - [ ] Grep for any `<style>` not sourced from `dashboardChromeStyles*`; migrate or justify inline.

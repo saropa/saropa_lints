@@ -114,6 +114,13 @@ bool _workspaceScanEnabled = true;
 /// saropaLints.lspServer.scanDirectories in VS Code settings.
 List<String> _scanDirectories = const ['lib', 'bin', 'test'];
 
+/// Last-known modification time per file path, populated after each
+/// workspace scan. Used for incremental re-scans: if a file's mtime
+/// hasn't changed since the last scan, it's skipped. This lives in memory
+/// (lost on server restart) so the first scan is always full; subsequent
+/// re-scans (e.g. triggered by config changes) are incremental.
+final Map<String, DateTime> _lastScannedMtimes = {};
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
@@ -539,6 +546,9 @@ Future<void> _analyzeWorkspace(String root) async {
         final relative = p.relative(entity.path, from: root);
         // Skip code-gen output and build artifacts — these are never
         // user-authored and would just produce noise in the Problems panel.
+        // Covers: build_runner (.g.dart), freezed (.freezed.dart),
+        // auto_route (.gr.dart). If a new codegen tool appears, add its
+        // suffix here.
         if (relative.contains('.g.dart') ||
             relative.contains('.freezed.dart') ||
             relative.contains('.gr.dart') ||
@@ -555,11 +565,46 @@ Future<void> _analyzeWorkspace(String root) async {
       return;
     }
 
-    _log('workspace scan: analyzing ${dartFiles.length} files…');
+    // Safety cap: very large monorepos (10k+ Dart files) could exhaust
+    // memory or take so long the scan never finishes. Cap at 5000 files —
+    // still large enough for any typical project. The user can narrow
+    // scanDirectories to stay under the cap.
+    const maxFiles = 5000;
+    if (dartFiles.length > maxFiles) {
+      _log('workspace scan: ${dartFiles.length} files exceeds $maxFiles cap, '
+          'scanning first $maxFiles only — narrow scanDirectories to cover all');
+      dartFiles.length = maxFiles;
+    }
+
+    // Incremental scan: compare each file's mtime against the last-known
+    // mtime from a previous scan. Unchanged files are skipped — their
+    // diagnostics from the prior scan are still valid. On the first scan
+    // (empty _lastScannedMtimes) every file is analyzed.
+    final filesToAnalyze = <String>[];
+    var skippedUnchanged = 0;
+    for (final filePath in dartFiles) {
+      final mtime = File(filePath).lastModifiedSync();
+      final lastMtime = _lastScannedMtimes[filePath];
+      if (lastMtime != null && !mtime.isAfter(lastMtime)) {
+        // File hasn't been modified since the last scan — skip it.
+        skippedUnchanged++;
+        continue;
+      }
+      filesToAnalyze.add(filePath);
+      // Record the mtime now so a concurrent didSave won't re-queue it.
+      _lastScannedMtimes[filePath] = mtime;
+    }
+
+    if (skippedUnchanged > 0) {
+      _log('workspace scan: $skippedUnchanged unchanged files skipped '
+          '(incremental)');
+    }
+
+    _log('workspace scan: analyzing ${filesToAnalyze.length} files…');
     var analyzed = 0;
     var diagnosticCount = 0;
 
-    for (final filePath in dartFiles) {
+    for (final filePath in filesToAnalyze) {
       // Bail if the analyzer context was torn down (server shutting down).
       if (_collection == null) break;
 

@@ -156,13 +156,43 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   /// because only kIsWeb reliably means "we are on web right now."
   /// `Platform.isAndroid` returning early does NOT protect from web.
   bool _isWebExitGuard(IfStatement stmt) {
-    final String condition = stmt.expression.toSource();
-    // Must mention kIsWeb specifically, not just any platform check.
-    // Negated forms (!kIsWeb) exit on non-web — the opposite of what we want.
-    if (!condition.contains('kIsWeb') || condition.contains('!kIsWeb')) {
+    // AST-based check: walk the condition expression tree looking for a
+    // SimpleIdentifier named 'kIsWeb'. This is immune to aliased imports
+    // (e.g. `foundation.kIsWeb`) and local variable names that happen to
+    // contain 'kIsWeb' as a substring — unlike the old string-based check.
+    final expr = stmt.expression;
+
+    // Negated `kIsWeb` (`!kIsWeb`) exits on NON-web — wrong polarity.
+    if (expr is PrefixExpression &&
+        expr.operator.type == TokenType.BANG &&
+        _containsKIsWebIdentifier(expr.operand)) {
       return false;
     }
+
+    // The condition must reference kIsWeb (positive polarity only).
+    if (!_containsKIsWebIdentifier(expr)) return false;
+
     return _isEarlyExit(stmt.thenStatement);
+  }
+
+  /// Recursively checks whether [expr] contains a `SimpleIdentifier`
+  /// named `kIsWeb`. Handles bare references, prefixed imports
+  /// (`foundation.kIsWeb`), parenthesized expressions, and binary
+  /// conditions (`kIsWeb && someOtherCheck`).
+  bool _containsKIsWebIdentifier(Expression expr) {
+    if (expr is SimpleIdentifier) return expr.name == 'kIsWeb';
+    if (expr is PrefixedIdentifier) return expr.identifier.name == 'kIsWeb';
+    if (expr is ParenthesizedExpression) {
+      return _containsKIsWebIdentifier(expr.expression);
+    }
+    if (expr is BinaryExpression) {
+      return _containsKIsWebIdentifier(expr.leftOperand) ||
+          _containsKIsWebIdentifier(expr.rightOperand);
+    }
+    if (expr is PrefixExpression) {
+      return _containsKIsWebIdentifier(expr.operand);
+    }
+    return false;
   }
 
   /// True when [stmt] guarantees the function exits — the body of an

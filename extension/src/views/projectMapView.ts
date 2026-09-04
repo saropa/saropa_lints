@@ -13,6 +13,16 @@ import * as vscode from 'vscode';
 import { getProjectRoot } from '../projectRoot';
 import { hasSaropaLintsDep } from '../pubspecReader';
 import { killProcessTree, resolveCliCwd } from './devCliRoot';
+import {
+  buildDoneMapPaneHtml,
+  buildScanningMapPaneHtml,
+  buildShellHtml,
+} from './projectMapShell';
+import {
+  buildReportsTabHtml,
+  handleReportsPanelMessage,
+  type ReportRunControl,
+} from './projectMapReports';
 import { l10n } from '../i18n/runtime';
 import { saropaLintsDataPath } from '../reportsPaths';
 
@@ -20,6 +30,18 @@ let panel: vscode.WebviewPanel | undefined;
 let extensionUri: vscode.Uri;
 let inflight: Promise<void> | undefined;
 let lastRoot: string | undefined; // resolves relative paths from row clicks
+// Live cancel handle for the in-flight Project Map scan shown in the webview's
+// own scanning state (replaces the old vscode.window.withProgress notification
+// token — the scan's stop/cancel affordance now lives in the panel itself, per
+// design principle 6 "Live or gone").
+let scanCancelSource: vscode.CancellationTokenSource | undefined;
+// One CLI process per report card id, keyed so a card's own Run/Cancel only
+// affects that card. See projectMapReports.ts for the run/stream mechanism.
+const reportControls = new Map<string, ReportRunControl>();
+// Monotonic epoch: a Restart from the scanning view must not let a stale scan's
+// completion clobber a newer one's rendered fragment (same guard shape as
+// projectVibrancyReportView's scanEpoch).
+let scanEpoch = 0;
 
 /** Registers the `Saropa Project Map` command; call once at activation. */
 export function registerProjectMapCommand(context: vscode.ExtensionContext): void {
@@ -53,32 +75,92 @@ function openProjectMap(): Promise<void> {
   return inflight;
 }
 
+/**
+ * Opens the panel immediately in its live scanning state (spinner + elapsed
+ * timer + a streamed activity log of any stdout/stderr the CLI emits), runs
+ * the scan, then swaps in the finished report — replacing the old
+ * `vscode.window.withProgress` notification, which rendered nothing in the
+ * panel until the whole scan finished (a "screenshot, not a dashboard" per
+ * design principle 6). `project_health.dart` has no `--progress` NDJSON
+ * protocol the way `project_vibrancy` does (verified: no `--progress` flag in
+ * bin/project_health.dart), so this cannot show a percentage bar the way Code
+ * Health does — but the panel is live from the first click, streams whatever
+ * the process actually prints, and its Cancel button works against a real
+ * process kill instead of a notification token.
+ */
 async function runAndRender(root: string): Promise<void> {
   lastRoot = root;
+  const epoch = ++scanEpoch;
+  const p = getOrCreatePanel();
+  p.webview.html = buildShellHtml(p.webview, buildScanningMapPaneHtml(), buildReportsTabHtml());
+  p.reveal(vscode.ViewColumn.One);
+  await runStreamingScan(root, p, epoch);
+}
+
+/** Runs the scan for [epoch], streaming raw output lines into the already-open scanning pane. */
+async function runStreamingScan(
+  root: string,
+  p: vscode.WebviewPanel,
+  epoch: number,
+): Promise<void> {
   // Shared helper builds the `reports/.saropa_lints` prefix; append the view-specific subdir.
   const outputDir = path.join(saropaLintsDataPath(root), 'health');
-  const ok = await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: 'Saropa Lints: scanning Saropa Project Map…',
-      cancellable: true,
-    },
-    (_progress, token) => runScan(root, outputDir, token),
-  );
-  if (!ok) return;
+  scanCancelSource?.dispose();
+  scanCancelSource = new vscode.CancellationTokenSource();
+  const ok = await runScan(root, outputDir, scanCancelSource.token, (line, stream) => {
+    if (epoch !== scanEpoch) return; // superseded by a Restart — drop stale output
+    void p.webview.postMessage({ type: 'mapLog', text: line, stream });
+  });
+  if (epoch !== scanEpoch) return; // a newer scan (Restart) already owns the panel
+  if (!ok) {
+    void p.webview.postMessage({ type: 'mapStopped' });
+    return;
+  }
   const indexPath = path.join(outputDir, 'index.html');
   if (!fs.existsSync(indexPath)) {
     void vscode.window.showWarningMessage(l10n('notify.commands.projectMapNoHtml'));
+    void p.webview.postMessage({ type: 'mapStopped' });
     return;
   }
-  renderPanel(indexPath);
+  const raw = fs.readFileSync(indexPath, 'utf8');
+  // Extract just the report's fragment (style/body/script) rather than a full
+  // standalone document — the panel now owns one <head>/<body>/CSP for both
+  // tabs, mirroring how the consolidated dashboard already embeds this same
+  // report (scanProjectMapToParts) instead of nesting a second <html>.
+  const parts = extractProjectMapParts(raw, p.webview, extensionUri);
+  if (!parts) {
+    void vscode.window.showWarningMessage(l10n('notify.commands.projectMapNoHtml'));
+    void p.webview.postMessage({ type: 'mapStopped' });
+    return;
+  }
+  p.webview.html = buildShellHtml(
+    p.webview,
+    buildDoneMapPaneHtml(parts),
+    buildReportsTabHtml(),
+  );
 }
 
-/** Spawns the scan asynchronously so the extension host never blocks. */
+/** Cancels the in-flight scan (if any) and starts a fresh one in the same panel. */
+async function restartScan(): Promise<void> {
+  if (!panel || !lastRoot) return;
+  scanCancelSource?.cancel();
+  const epoch = ++scanEpoch;
+  panel.webview.html = buildShellHtml(panel.webview, buildScanningMapPaneHtml(), buildReportsTabHtml());
+  await runStreamingScan(lastRoot, panel, epoch);
+}
+
+/**
+ * Spawns the scan asynchronously so the extension host never blocks.
+ * [onOutputLine], when given, streams each stdout/stderr line as it arrives —
+ * the mechanism [runStreamingScan] uses to keep the panel live. Optional so
+ * `scanProjectMapToParts` (the consolidated dashboard's embed path) keeps its
+ * original buffered behavior unchanged.
+ */
 function runScan(
   root: string,
   outputDir: string,
   token: vscode.CancellationToken,
+  onOutputLine?: (line: string, stream: 'stdout' | 'stderr') => void,
 ): Promise<boolean> {
   return new Promise((resolve) => {
     const child = cp.spawn(
@@ -104,7 +186,24 @@ function runScan(
       { cwd: resolveCliCwd(root), shell: true },
     );
     let stderr = '';
-    child.stderr.on('data', (d: Buffer) => (stderr += d.toString()));
+    // Buffers an incomplete trailing line between chunks so streamed output
+    // never splits mid-word — same shape as projectMapReports.ts's runner.
+    let stdoutBuf = '';
+    let stderrBuf = '';
+    const flush = (buf: string, chunk: string, stream: 'stdout' | 'stderr'): string => {
+      const combined = buf + chunk;
+      const lines = combined.split('\n');
+      const remainder = lines.pop() ?? '';
+      for (const line of lines) onOutputLine?.(line.replace(/\r$/, ''), stream);
+      return remainder;
+    };
+    child.stdout.on('data', (d: Buffer) => {
+      stdoutBuf = flush(stdoutBuf, d.toString(), 'stdout');
+    });
+    child.stderr.on('data', (d: Buffer) => {
+      stderr += d.toString();
+      stderrBuf = flush(stderrBuf, d.toString(), 'stderr');
+    });
     // Tree-kill on cancel — shell:true means child is cmd.exe; child.kill()
     // alone orphans the dart grandchild (runaway scan).
     token.onCancellationRequested(() => killProcessTree(child));
@@ -113,6 +212,8 @@ function runScan(
       resolve(false);
     });
     child.on('close', (code: number | null) => {
+      if (stdoutBuf.length > 0) onOutputLine?.(stdoutBuf, 'stdout');
+      if (stderrBuf.length > 0) onOutputLine?.(stderrBuf, 'stderr');
       if (code !== 0) {
         const first = stderr.split('\n').find((l) => l.trim().length > 0) ?? '';
         void vscode.window.showErrorMessage(l10n('notify.commands.projectMapScanFailed', { code: String(code), details: first }));
@@ -124,13 +225,6 @@ function runScan(
   });
 }
 
-function renderPanel(indexPath: string): void {
-  const p = getOrCreatePanel();
-  const raw = fs.readFileSync(indexPath, 'utf8');
-  p.webview.html = transformProjectMapHtml(raw, p.webview, extensionUri);
-  p.reveal(vscode.ViewColumn.One);
-}
-
 /**
  * Applies the in-editor transforms to a raw `project_health --format html` document: swaps the CDN
  * ECharts `<script>` for the vendored copy (webviews have no network), injects a CSP that permits
@@ -140,6 +234,13 @@ function renderPanel(indexPath: string): void {
  *
  * Exported so the consolidated "Saropa Dashboards" view can embed the EXACT same interactive report
  * (treemap, scatter, hot-spots) without re-deriving these transforms or rebuilding the engine.
+ *
+ * NOTE (2026-09-04, Phase 6): the standalone panel no longer calls this — it now composes the
+ * `dashboardChromeStyles`-based shell (see projectMapShell.ts) via [extractProjectMapParts] instead
+ * of swapping in a full second `<html>` document. Left in place (still exported, still exercised by
+ * nothing that requires deleting it this phase) rather than removed, since deleting an exported
+ * helper is a bigger call than a feature phase should make unilaterally — see the plan doc's
+ * "Deferred" note for Phase 6.
  */
 export function transformProjectMapHtml(
   raw: string,
@@ -193,11 +294,38 @@ const _pmBodyRe = /<!--PM_BODY_START-->([\s\S]*?)<!--PM_BODY_END-->/;
 const _pmScriptRe = /<!--PM_SCRIPT_START-->([\s\S]*?)<!--PM_SCRIPT_END-->/;
 
 /**
+ * Extracts the `<!--PM_*-->`-delimited fragment from a raw
+ * `project_health --format html` document, or null if the markers are
+ * missing (a template/version mismatch — fail closed rather than embed a
+ * broken fragment). Shared by [scanProjectMapToParts] (the consolidated
+ * dashboard's embed path) and the standalone panel's own live-scan render, so
+ * both surfaces parse the SAME report the SAME way.
+ */
+function extractProjectMapParts(
+  raw: string,
+  webview: vscode.Webview,
+  extUri: vscode.Uri,
+): ProjectMapParts | null {
+  const style = _pmStyleRe.exec(raw);
+  const body = _pmBodyRe.exec(raw);
+  const script = _pmScriptRe.exec(raw);
+  if (!style || !body || !script) return null;
+  const echartsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extUri, 'media', 'echarts.min.js'),
+  );
+  return {
+    styleHtml: style[1].trim(),
+    bodyHtml: body[1].trim(),
+    scriptHtml: script[1].trim(),
+    echartsUri: echartsUri.toString(),
+  };
+}
+
+/**
  * Runs the Project Map scan for [root] and returns its composable pieces for the consolidated
  * dashboard, or null if the scan failed, produced no output, or the report is missing its
- * `<!--PM_*-->` markers (a template/version mismatch — fail closed rather than embed a broken
- * fragment). [token] cancels the scan (e.g. when the host panel closes). Reuses the SAME scan the
- * standalone panel runs, so both render identical data.
+ * `<!--PM_*-->` markers. [token] cancels the scan (e.g. when the host panel closes). Reuses the
+ * SAME scan the standalone panel runs, so both render identical data.
  */
 export async function scanProjectMapToParts(
   root: string,
@@ -212,19 +340,7 @@ export async function scanProjectMapToParts(
   const indexPath = path.join(outputDir, 'index.html');
   if (!fs.existsSync(indexPath)) return null;
   const raw = fs.readFileSync(indexPath, 'utf8');
-  const style = _pmStyleRe.exec(raw);
-  const body = _pmBodyRe.exec(raw);
-  const script = _pmScriptRe.exec(raw);
-  if (!style || !body || !script) return null;
-  const echartsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extUri, 'media', 'echarts.min.js'),
-  );
-  return {
-    styleHtml: style[1].trim(),
-    bodyHtml: body[1].trim(),
-    scriptHtml: script[1].trim(),
-    echartsUri: echartsUri.toString(),
-  };
+  return extractProjectMapParts(raw, webview, extUri);
 }
 
 /**
@@ -272,7 +388,7 @@ function getOrCreatePanel(): vscode.WebviewPanel {
   if (panel) return panel;
   panel = vscode.window.createWebviewPanel(
     'saropaProjectMap',
-    'Saropa Project Map',
+    l10n('projectMap.panelTitle'),
     vscode.ViewColumn.One,
     {
       enableScripts: true,
@@ -281,15 +397,44 @@ function getOrCreatePanel(): vscode.WebviewPanel {
     },
   );
   panel.onDidDispose(() => {
+    // Closing the panel is an implicit cancel — otherwise the dart scan (or any
+    // still-running report card) keeps burning CPU with no visible surface to
+    // stop it, the same "runaway scan" failure mode the Code Health dashboard
+    // already guards against.
+    scanCancelSource?.cancel();
+    scanCancelSource = undefined;
+    for (const control of reportControls.values()) control.cancel();
+    reportControls.clear();
     panel = undefined;
   });
   panel.webview.onDidReceiveMessage((msg: unknown) => {
-    const data = msg as { type?: string; file?: string };
-    if (data.type === 'openFile' && typeof data.file === 'string' && lastRoot) {
-      void openFileFromReport(lastRoot, data.file);
-    }
+    void handlePanelMessage(msg);
   });
   return panel;
+}
+
+/**
+ * Routes every inbound webview message. Project Map's own concerns (file
+ * drill-down, scan cancel/restart) are handled inline; Reports-tab concerns
+ * delegate to [handleReportsPanelMessage] so the CLI-report logic stays in one
+ * module instead of duplicated per dashboard.
+ */
+async function handlePanelMessage(msg: unknown): Promise<void> {
+  const data = msg as { type?: string; file?: string; line?: number; reportId?: string; text?: string };
+  if (data.type === 'openFile' && typeof data.file === 'string' && lastRoot) {
+    await openFileFromReport(lastRoot, data.file);
+    return;
+  }
+  if (data.type === 'cancelScan') {
+    scanCancelSource?.cancel();
+    return;
+  }
+  if (data.type === 'restartScan') {
+    await restartScan();
+    return;
+  }
+  if (!panel || !lastRoot) return;
+  await handleReportsPanelMessage(data, lastRoot, panel, reportControls);
 }
 
 /// Opens a report-relative file path in the editor (drill-down from a row click).
