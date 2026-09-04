@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "No log entries yet.",
       "killAll": "Kill All: stopped all controllable engines.",
-      "restartAll": "Restart All: restarted all controllable engines."
+      "restartAll": "Restart All: restarted all controllable engines.",
+      "lspToggleOn": "LSP Server: enabling…",
+      "lspToggleOff": "LSP Server: disabling…",
+      "lspStarted": "LSP Server: started.",
+      "lspStopped": "LSP Server: stopped.",
+      "analyzerToggleOn": "Analyzer Plugin: enabling…",
+      "analyzerToggleOff": "Analyzer Plugin: disabling…",
+      "daemonToggleOn": "Scan Daemon: resuming…",
+      "daemonToggleOff": "Scan Daemon: suspending…"
     }
   },
   "detailView": {

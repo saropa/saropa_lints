@@ -97,11 +97,32 @@ export class SaropaLspClient implements vscode.Disposable {
     };
 
     // Client configuration — route Dart files through this server and
-    // send log output to the dedicated channel.
+    // send log output to the dedicated channel. The middleware filter
+    // prevents the 200+-file didOpen flood VS Code sends on activation —
+    // only files in visible editors get forwarded, so the server only
+    // analyzes what the user is actually looking at.
     const clientOptions: LanguageClientOptions = {
       documentSelector: [{ scheme: 'file', language: 'dart' }],
       outputChannel: this._outputChannel,
       outputChannelName: OUTPUT_CHANNEL_NAME,
+      middleware: {
+        didOpen: (document, next) => {
+          // Only forward didOpen for files the user has in a visible editor
+          // tab. VS Code's LanguageClient sends didOpen for ALL matching
+          // documents on connect (~200+ Dart files in a real workspace),
+          // each of which triggers a full ScanRunner pass in the LSP server.
+          // This filter reduces that to ~1-3 files (the visible tabs).
+          const isVisible = vscode.window.visibleTextEditors.some(
+            (editor) => editor.document.uri.toString() === document.uri.toString(),
+          );
+          if (isVisible) {
+            return next(document);
+          }
+          // Silently drop — the server will analyze on didSave when the
+          // user actually edits this file.
+          return Promise.resolve();
+        },
+      },
     };
 
     const client = new LanguageClient(

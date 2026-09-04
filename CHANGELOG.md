@@ -68,11 +68,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.13] — Unreleased
 
-Auto-migrates legacy plugin-block config keys that broke CI under `--fatal-warnings`.
+The LSP server now provides quick fixes (lightbulb menu) and respects per-rule config overrides from your project's analysis options — it is no longer a flat tier-only scanner. Projects with legacy plugin-block config keys auto-migrate on load, and the debug panel's engine toggles are fully wired. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Fixed
 
 - **Auto-migrate legacy plugin-block config keys.** Projects with `log_level`, `lane`, `memory_mode`, or `rule_packs` under `plugins > saropa_lints:` in `analysis_options.yaml` triggered `unsupported_option` warnings that were fatal under `--fatal-warnings`, breaking CI. The plugin now auto-migrates these keys to `analysis_options_custom.yaml` at load time — no manual action required.
+- **LSP server: fix 0 diagnostics on opened files.** The CLI scanner's built-in path exclusions (which drop `example/`, `bin/`, generated files) were silently filtering out files the user opened in the editor, producing 0 diagnostics. The LSP server now bypasses scan exclusions since the user explicitly requested analysis by opening the file, and falls back to the `recommended` tier when the project has no `saropa_lints: tier:` shorthand.
+- **LSP server: fix didOpen flood.** VS Code sends `textDocument/didOpen` for every Dart file in the workspace on activation (~200+ for real projects), each triggering a full rule scan. The server now debounces didOpen — only the last file opened within a 1.5-second window gets analyzed. The extension also filters didOpen to only forward files in visible editors. Save still triggers immediate analysis.
+
+### Added
+
+- **LSP server: quick fixes (lightbulb menu).** `textDocument/codeAction` now returns real quick fixes for rules that have fix generators. The server resolves the file, instantiates the rule's `SaropaFixProducer`, and returns workspace edits — same fixes the native plugin offers, without the in-process memory cost. No action required.
+- **LSP server: per-rule config overrides.** The server now reads per-rule enable/disable from both `analysis_options.yaml` (`diagnostics:` section) and `analysis_options_custom.yaml` (`severities:` section), layered on top of the tier. Rules the user disabled stay off; rules they enabled run even if the tier wouldn't include them.
+- **Debug panel: all three engine toggles now work.** The "Analyzer Plugin" card's ON/OFF buttons previously did nothing — only the LSP Server card was wired up. Toggling the analyzer card now runs the same enable/disable mechanism as the "Lint integration" sidebar toggle, and the card reflects the real on-disk state instead of always showing "active". The Scan Daemon toggle now suspends/resumes the daemon process. The LSP Server toggle persists to `saropaLints.lspServer.enabled` in settings. All toggles log their action to the debug panel's LOG section for immediate user feedback.
+- **LSP server: live config reload.** `workspace/didChangeConfiguration` now re-reads the tier from `analysis_options.yaml` and re-analyzes every file with published diagnostics, so editing per-rule overrides or the tier takes effect immediately instead of requiring a server restart.
 
 ---
 

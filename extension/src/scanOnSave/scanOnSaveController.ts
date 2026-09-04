@@ -132,6 +132,23 @@ export class ScanOnSaveController implements vscode.Disposable {
     return this._daemonSuspended;
   }
 
+  /** Manually suspend the scan daemon — kills the process and prevents
+   *  respawning on save. Used by the debug panel toggle. */
+  suspendDaemon(): void {
+    if (this._daemonSuspended) return;
+    this._daemonSuspended = true;
+    this._daemonManager.dispose();
+    console.log('saropa_lints: scan daemon suspended via debug panel');
+  }
+
+  /** Manually resume the scan daemon — lifts the suspension so the next
+   *  save triggers a respawn. Used by the debug panel toggle. */
+  resumeDaemon(): void {
+    if (!this._daemonSuspended) return;
+    this._daemonSuspended = false;
+    console.log('saropa_lints: scan daemon resumed via debug panel');
+  }
+
   constructor(
     private readonly _collection: vscode.DiagnosticCollection,
     private readonly _getProjectRoot: () => string | undefined,

@@ -18,6 +18,7 @@ import {
   runEnable,
   runDisable,
   runReenablePlugin,
+  getPluginsIntegrationState,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
   runInitializeConfig,
@@ -1308,19 +1309,29 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   }
 
   // React to setting changes — start/stop the LSP server without reload.
+  // Refresh the debug panel after each lifecycle change so the toggle
+  // shows the updated state (the toggle handler's own refresh() fires
+  // before this listener runs, so it sees stale status).
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('saropaLints.lspServer.enabled')) {
         const enabled = vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled');
         if (enabled && !lspClient && lspRoot) {
           lspClient = new SaropaLspClient(context, lspRoot);
-          void lspClient.start();
+          void lspClient.start().then(() => {
+            debugPanelProvider.addLogEntry(l10n('debug.log.lspStarted'));
+            debugPanelProvider.refresh();
+          });
         } else if (!enabled && lspClient) {
           // Await stop before dispose to avoid a double-stop race —
           // dispose() calls stop() again if _client is still set.
           const client = lspClient;
           lspClient = undefined;
-          void client.stop().then(() => client.dispose());
+          void client.stop().then(() => {
+            client.dispose();
+            debugPanelProvider.addLogEntry(l10n('debug.log.lspStopped'));
+            debugPanelProvider.refresh();
+          });
         }
       }
     }),
@@ -1350,17 +1361,23 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     context.extensionUri,
     {
       // Analyzer Plugin status — in-process, no PID or RSS available.
-      // Analyzer Plugin status — in-process, no PID or RSS available.
       // status is a machine key matching debug.engine.statusValue.* in en.json —
       // translated at display time in debugPanel-html.ts, NOT here, so
       // statusColorClass() can still match against the English key.
-      getAnalyzerPluginStatus: (): EngineStatus => ({
-        key: 'analyzer',
-        name: l10n('debug.engine.analyzerPlugin'),
-        enabled: true, // Always on when plugins: saropa_lints: is in analysis_options
-        status: 'active',
-        rssNote: l10n('debug.engine.rssNote.inProcess'),
-      }),
+      // Reads the real on-disk state (live plugins: block vs. commented-out
+      // sentinel) rather than assuming "always on" — a debug panel toggle
+      // must reflect what runDisable/runReenablePlugin actually did.
+      getAnalyzerPluginStatus: (): EngineStatus => {
+        const analyzerRoot = getProjectRoot();
+        const state = analyzerRoot ? getPluginsIntegrationState(analyzerRoot) : 'absent';
+        return {
+          key: 'analyzer',
+          name: l10n('debug.engine.analyzerPlugin'),
+          enabled: state === 'live',
+          status: state === 'live' ? 'active' : 'stopped',
+          rssNote: l10n('debug.engine.rssNote.inProcess'),
+        };
+      },
       // Scan Daemon status — read from the scan-on-save controller.
       getScanDaemonStatus: (): EngineStatus => ({
         key: 'scanDaemon',
@@ -1376,7 +1393,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         name: l10n('debug.engine.lspServer'),
         enabled: lspClient?.isRunning ?? false,
         status: lspClient?.isRunning ? 'running' : 'stopped',
-        ruleCount: 4, // Fake test diagnostics — fixed count for Phase 0
         rssNote: lspClient?.isRunning ? undefined : l10n('debug.engine.rssNote.notRunning'),
       }),
     },
@@ -1414,18 +1430,43 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Wire debug panel toggle events to actual engine start/stop actions.
   debugPanelProvider.onToggle(async ({ engine, enabled }) => {
     if (engine === 'lspServer') {
-      if (enabled && lspRoot) {
-        if (!lspClient) {
-          lspClient = new SaropaLspClient(context, lspRoot);
-
-        }
-        await lspClient.start();
-      } else if (!enabled && lspClient) {
-        await lspClient.stop();
+      // Write the setting — the onDidChangeConfiguration listener starts/stops
+      // the client and refreshes the panel with a log entry.
+      debugPanelProvider.addLogEntry(
+        enabled ? l10n('debug.log.lspToggleOn') : l10n('debug.log.lspToggleOff'),
+      );
+      await vscode.workspace
+        .getConfiguration('saropaLints.lspServer')
+        .update('enabled', enabled, vscode.ConfigurationTarget.Workspace);
+    } else if (engine === 'analyzer') {
+      // Reuses the exact mechanism behind the "Lint integration" sidebar
+      // toggle (saropaLints.disable / .reenablePlugin) so the debug panel
+      // isn't a second, subtly different way to flip the same YAML block.
+      debugPanelProvider.addLogEntry(
+        enabled ? l10n('debug.log.analyzerToggleOn') : l10n('debug.log.analyzerToggleOff'),
+      );
+      if (enabled) {
+        await runReenablePlugin(context);
+        updateContext(true, issuesProvider.hasViolations());
+      } else {
+        await runDisable(context);
+        await cfg.update('enabled', false, vscode.ConfigurationTarget.Workspace);
+        updateContext(false, false);
+      }
+      refreshAll();
+      updateAllStatusBars();
+    } else if (engine === 'scanDaemon') {
+      // Suspend/resume the scan daemon — kills the process on suspend,
+      // lifts the flag on resume so the next save respawns it.
+      debugPanelProvider.addLogEntry(
+        enabled ? l10n('debug.log.daemonToggleOn') : l10n('debug.log.daemonToggleOff'),
+      );
+      if (enabled) {
+        scanOnSaveController.resumeDaemon();
+      } else {
+        scanOnSaveController.suspendDaemon();
       }
     }
-    // Analyzer Plugin and Scan Daemon toggles are deferred — they require
-    // analysis_options.yaml edits and analysis server restarts respectively.
     debugPanelProvider.refresh();
   });
 
