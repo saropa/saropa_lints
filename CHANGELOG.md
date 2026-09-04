@@ -66,6 +66,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.2] — Unreleased
+
+### Fixed
+
+- Fixed VS Code "Switch to Pre-Release Version" button failing with `net::ERR_FAILED` — pre-release extension versions now use an odd minor number as VS Code requires.
+- Fixed CI watch blocking publish by defaulting to skip (press `y` to opt in).
+
 ## [16.0.0-beta.1]
 
 *--- IMPORTANT NOTE ---*

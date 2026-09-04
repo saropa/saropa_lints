@@ -86,14 +86,21 @@ def extension_version_for(version: str) -> str:
     A prerelease *version* (e.g. "16.0.0-beta.1") gets PATCH offset by
     _PRERELEASE_PATCH_OFFSET, plus a channel-derived band from the text
     before the trailing number ("beta" in "beta.1"), plus the trailing
-    iteration number itself — producing e.g. "16.0.1858" for "beta.1" and
+    iteration number itself — producing e.g. "16.1.913" for "beta.1" and
     a different value for "rc.1" of the same base version.
 
-    Without this, every prerelease iteration of the same pub.dev base
-    version strips down to the identical extension version ("16.0.0"), and
-    the second publish collides with the first at the Marketplace/Open VSX
-    level — pub.dev's hyphenated prerelease identifier has no equivalent in
-    the extension version field, so a distinct signal has to be
+    The MINOR is forced to odd for prerelease versions. VS Code uses an
+    odd/even minor convention to distinguish pre-release from stable: even
+    minor = stable, odd minor = pre-release. Without an odd minor, the
+    "Switch to Pre-Release Version" button in VS Code fails with
+    ``net::ERR_FAILED`` because it can't find a version on the pre-release
+    channel.
+
+    Without the PATCH offset, every prerelease iteration of the same pub.dev
+    base version strips down to the identical extension version ("16.0.0"),
+    and the second publish collides with the first at the Marketplace/Open
+    VSX level — pub.dev's hyphenated prerelease identifier has no equivalent
+    in the extension version field, so a distinct signal has to be
     manufactured from the numbers that ARE available.
     """
     base = strip_prerelease_suffix(version)
@@ -105,10 +112,13 @@ def extension_version_for(version: str) -> str:
     channel = suffix[: match.start()].rstrip(".") if match else suffix
     channel_band = sum(ord(c) for c in channel) % _PRERELEASE_CHANNEL_BAND
     major, minor, patch = base.split(".")
+    # VS Code requires an odd minor version for pre-release extensions;
+    # even minor = stable. Force odd so "Switch to Pre-Release" works.
+    prerelease_minor = int(minor) | 1
     new_patch = (
         int(patch) + _PRERELEASE_PATCH_OFFSET + channel_band + iteration
     )
-    return f"{major}.{minor}.{new_patch}"
+    return f"{major}.{prerelease_minor}.{new_patch}"
 
 
 # =============================================================================
