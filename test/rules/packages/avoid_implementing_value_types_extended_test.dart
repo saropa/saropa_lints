@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/packages/avoid_implementing_value_types_rules.dart';
+import 'package:saropa_lints/src/rules/packages/avoid_implementing_value_types_extended_rules.dart';
 
 import '../../support/resolved_rule_harness.dart';
 
@@ -44,12 +44,12 @@ void main() {
 
     testRule(
       'AvoidImplementingValueTypesRule',
-      'avoid_implementing_value_types',
+      'avoid_implementing_value_types_extended',
       () => AvoidImplementingValueTypesRule(),
     );
   });
 
-  group('avoid_implementing_value_types - firing', () {
+  group('avoid_implementing_value_types_extended - firing', () {
     test('fires on implements Equatable without == or hashCode', () async {
       final codes = await reportedRuleCodes(
         AvoidImplementingValueTypesRule(),
@@ -67,7 +67,7 @@ class UserId implements Equatable {
 }
 ''',
       );
-      expect(codes, contains('avoid_implementing_value_types'));
+      expect(codes, contains('avoid_implementing_value_types_extended'));
     });
 
     test('does not fire on extends Equatable', () async {
@@ -87,7 +87,7 @@ class UserId extends Equatable {
 }
 ''',
       );
-      expect(codes, isNot(contains('avoid_implementing_value_types')));
+      expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
     });
 
     test(
@@ -116,7 +116,7 @@ class UserId implements Equatable {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
 
@@ -135,7 +135,7 @@ class UserId implements Comparable<UserId> {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
 
@@ -166,7 +166,7 @@ class OrderId implements BaseId {
 }
 ''',
         );
-        expect(codes, contains('avoid_implementing_value_types'));
+        expect(codes, contains('avoid_implementing_value_types_extended'));
       },
     );
 
@@ -201,7 +201,7 @@ class Money with EquatableMixin implements ValueObject {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
 
@@ -230,7 +230,7 @@ class Money extends Equatable implements ValueObject {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
 
@@ -269,7 +269,7 @@ class UserId extends BaseValue implements Equatable {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
 
@@ -305,7 +305,7 @@ class RegionId extends MidValue implements Equatable {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
 
@@ -338,7 +338,7 @@ class ShardId with IdentityEquality implements Equatable {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
 
@@ -368,7 +368,7 @@ class UserId extends PlainBase implements Equatable {
 }
 ''',
         );
-        expect(codes, contains('avoid_implementing_value_types'));
+        expect(codes, contains('avoid_implementing_value_types_extended'));
       },
     );
 
@@ -398,7 +398,7 @@ class UserId extends HalfBase implements Equatable {
 }
 ''',
         );
-        expect(codes, contains('avoid_implementing_value_types'));
+        expect(codes, contains('avoid_implementing_value_types_extended'));
       },
     );
 
@@ -432,7 +432,7 @@ class UserId implements EqualityContract, Equatable {
 }
 ''',
         );
-        expect(codes, contains('avoid_implementing_value_types'));
+        expect(codes, contains('avoid_implementing_value_types_extended'));
       },
     );
 
@@ -462,7 +462,7 @@ class ConfigKey implements Equatable {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
 
@@ -488,7 +488,7 @@ class ConfigKey implements EquatableMixin {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types')));
+        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
       },
     );
   });

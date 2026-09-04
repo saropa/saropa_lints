@@ -130,8 +130,8 @@ class AvoidEqualsAndHashCodeOnMutableClassesRule extends SaropaLintRule {
   bool get requiresClassDeclaration => true;
 
   static const LintCode _code = LintCode(
-    'avoid_equals_and_hash_code_on_mutable_classes',
-    '[avoid_equals_and_hash_code_on_mutable_classes] This non-final '
+    'avoid_equals_and_hash_code_on_mutable_classes_extended',
+    '[avoid_equals_and_hash_code_on_mutable_classes_extended] This non-final '
         'instance field is read by the hand-written operator == or hashCode '
         'of its class. == and hashCode must stay consistent with an '
         "object's state for as long as it lives inside a hash-based "

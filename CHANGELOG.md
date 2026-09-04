@@ -109,10 +109,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **Packages and Project Map dashboards: number-key tab shortcuts.** Pressing `1`-`6` on the Package Dashboard, or `1`/`2` on Project Map, jumps straight to that tab — matching the shortcut Rules & Tiers already had. Ignored while typing in a search box or form field.
 - **19 new tier-1 quick-win lint rules.** No action required.
   - `avoid_disposing_late_fields` flags `.dispose()` on conditionally-initialized `late` fields (Recommended).
-  - `avoid_dynamic_calls` catches method/property/index access through resolved `dynamic` (Recommended).
-  - `avoid_equals_and_hash_code_on_mutable_classes` prevents `==`/`hashCode` overrides on classes with non-final fields (Essential).
+  - `avoid_dynamic_calls_extended` catches method/property/index access through resolved `dynamic` (Recommended). Named `_extended` — `avoid_dynamic_calls` is a core Dart analyzer lint name.
+  - `avoid_equals_and_hash_code_on_mutable_classes_extended` prevents `==`/`hashCode` overrides on classes with non-final fields (Essential). Named `_extended` — the base name is a core Dart analyzer lint name.
   - `avoid_futureor_return_type` flags `FutureOr<T>` as a declared return type (Recommended).
-  - `avoid_implementing_value_types` catches classes that `implements` a known value-equality type (Comprehensive).
+  - `avoid_implementing_value_types_extended` catches classes that `implements` a known value-equality type (Comprehensive). Named `_extended` — the base name is a core Dart analyzer lint name.
   - `avoid_mounted_check_in_finally` flags `mounted` guards inside `finally` blocks (Recommended).
   - `document_enum` requires doc comments on public enums and enum values (Stylistic opt-in).
   - `duplicate_value` detects repeated sub-expressions in boolean chains (Recommended).

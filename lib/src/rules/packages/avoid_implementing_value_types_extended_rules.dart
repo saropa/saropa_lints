@@ -135,8 +135,8 @@ class AvoidImplementingValueTypesRule extends SaropaLintRule {
   bool get requiresClassDeclaration => true;
 
   static const LintCode _code = LintCode(
-    'avoid_implementing_value_types',
-    '[avoid_implementing_value_types] Class implements a value-equality '
+    'avoid_implementing_value_types_extended',
+    '[avoid_implementing_value_types_extended] Class implements a value-equality '
         'type (Equatable or a class built on it) without redeclaring both '
         '== and hashCode. The "implements" keyword only enforces the '
         "interface's member signatures — it does not inherit Equatable's "

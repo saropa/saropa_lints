@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:saropa_lints/src/rules/data/avoid_dynamic_calls_rules.dart';
+import 'package:saropa_lints/src/rules/data/avoid_dynamic_calls_extended_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
 
-/// Tests for the `avoid_dynamic_calls` lint rule.
+/// Tests for the `avoid_dynamic_calls_extended` lint rule.
 ///
-/// Test fixture: example/lib/type_safety/avoid_dynamic_calls_fixture.dart
+/// Test fixture: example/lib/type_safety/avoid_dynamic_calls_extended_fixture.dart
 /// The fixture's `expect_lint` markers cover all seven detection paths this
 /// rule wires up in `runWithReporter` — MethodInvocation, PropertyAccess,
 /// PrefixedIdentifier, IndexExpression (including null-aware `?.`/`?[]`),
@@ -21,8 +21,8 @@ void main() {
   group('AvoidDynamicCallsRule - Rule Instantiation', () {
     test('AvoidDynamicCallsRule', () {
       final rule = AvoidDynamicCallsRule();
-      expect(rule.code.lowerCaseName, 'avoid_dynamic_calls');
-      expect(rule.code.problemMessage, contains('[avoid_dynamic_calls]'));
+      expect(rule.code.lowerCaseName, 'avoid_dynamic_calls_extended');
+      expect(rule.code.problemMessage, contains('[avoid_dynamic_calls_extended]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -36,9 +36,9 @@ void main() {
       expect(fixtures, isNotEmpty);
     });
 
-    test('avoid_dynamic_calls fixture exists', () {
+    test('avoid_dynamic_calls_extended fixture exists', () {
       final file = File(
-        'example/lib/type_safety/avoid_dynamic_calls_fixture.dart',
+        'example/lib/type_safety/avoid_dynamic_calls_extended_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });

@@ -309,7 +309,7 @@ const Set<String> flutterStylisticRules = <String>{
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
 /// A single violation causes real harm: app crashes, data exposed, resources never released.
 const Set<String> essentialRules = <String>{
-  'avoid_equals_and_hash_code_on_mutable_classes',
+  'avoid_equals_and_hash_code_on_mutable_classes_extended',
   // receive_sharing_intent (receive_sharing_intent_rules.dart) - cold-start data loss
   'rsi_missing_initial_media',
   // awesome_notifications (awesome_notifications_rules.dart) - runtime-fatal handler defects
@@ -1757,7 +1757,7 @@ const Set<String> recommendedOnlyRules = <String>{
   // Tier 1 quick wins — batch 4
   'avoid_disposing_late_fields',
   'is_future',
-  'avoid_dynamic_calls',
+  'avoid_dynamic_calls_extended',
   'duplicate_value',
   'avoid_mounted_check_in_finally',
   'never_discard_build_context',
@@ -3286,7 +3286,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Tier 1 quick wins — batch 4
   'specify_unknown_enum_value',
   'prefer_typed_exceptions',
-  'avoid_implementing_value_types',
+  'avoid_implementing_value_types_extended',
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.

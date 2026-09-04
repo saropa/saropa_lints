@@ -1,6 +1,6 @@
 // ignore_for_file: unused_element
 
-/// Fixtures for avoid_implementing_value_types.
+/// Fixtures for avoid_implementing_value_types_extended.
 library;
 
 // Deliberately not importing package:equatable here (fixtures avoid adding
@@ -22,7 +22,7 @@ mixin EquatableMixin {
 // BAD: implements a value-equality type without redeclaring == / hashCode
 // =============================================================================
 
-// expect_lint: avoid_implementing_value_types
+// expect_lint: avoid_implementing_value_types_extended
 class UserId implements Equatable {
   UserId(this.value);
   final String value;
@@ -33,7 +33,7 @@ class UserId implements Equatable {
   // silently applies, so this class breaks Set/Map-key/dedup semantics.
 }
 
-// expect_lint: avoid_implementing_value_types
+// expect_lint: avoid_implementing_value_types_extended
 class Money implements EquatableMixin {
   Money(this.cents);
   final int cents;
@@ -45,7 +45,7 @@ class Money implements EquatableMixin {
 // Indirect case: OrderId doesn't name Equatable directly, but its supertype
 // (extends Equatable) does — the rule walks resolved supertypes to catch
 // this. Requires a resolved analysis context to fire (see scan --resolve).
-// expect_lint: avoid_implementing_value_types
+// expect_lint: avoid_implementing_value_types_extended
 class OrderId implements BaseId {
   OrderId(this.raw);
   final String raw;

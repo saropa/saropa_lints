@@ -1,5 +1,5 @@
-// Test fixture for: avoid_dynamic_calls
-// Source: lib/src/rules/data/avoid_dynamic_calls_rules.dart
+// Test fixture for: avoid_dynamic_calls_extended
+// Source: lib/src/rules/data/avoid_dynamic_calls_extended_rules.dart
 
 // ignore_for_file: unused_local_variable, unused_element
 // ignore_for_file: prefer_typing_uninitialized_variables
@@ -18,27 +18,27 @@ Invoice typedInvoice = Invoice();
 // BAD: method call on a receiver whose static type is dynamic — no
 // compile-time check that calculateTotal() exists.
 void _badMethodCall() {
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   dynamicInvoice.calculateTotal();
 }
 
 // BAD: property access on a dynamic receiver.
 void _badPropertyAccess() {
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   final double value = dynamicInvoice.total;
 }
 
 // BAD: index operator invoked on a dynamic receiver.
 void _badIndexAccess() {
   dynamic list = <int>[1, 2, 3];
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   final int first = list[0] as int;
 }
 
 // BAD: arithmetic operator resolved dynamically.
 void _badOperator() {
   dynamic value = 10;
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   final dynamic result = value + 1;
 }
 
@@ -61,10 +61,10 @@ void _goodExplicitCast() {
 // the same as it does on plain `.`/`[]`.
 void _badNullAwareAccess() {
   dynamic maybeInvoice = Invoice();
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   maybeInvoice?.calculateTotal();
   dynamic maybeList = <int>[1, 2, 3];
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   final int? first = maybeList?[0] as int?;
 }
 
@@ -73,7 +73,7 @@ void _badNullAwareAccess() {
 // itself is checked; expect exactly one diagnostic for the whole cascade.
 void _badCascade() {
   dynamic value = Invoice();
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   value
     ..calculateTotal()
     ..toString();
@@ -90,7 +90,7 @@ void _goodCascade() {
 // `dynamicValue + 1` does.
 void _badCompoundAssignment() {
   dynamic counter = 0;
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   counter += 1;
 }
 
@@ -106,12 +106,12 @@ void _goodPlainAssignment() {
 // operand, same risk class as the covered binary-operator case.
 void _badPrefixPostfix() {
   dynamic counter = 0;
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   counter++;
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   --counter;
   dynamic flags = 0;
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   final dynamic inverted = ~flags;
 }
 
@@ -120,7 +120,7 @@ void _badPrefixPostfix() {
 // method call.
 void _badDynamicFunctionCall() {
   dynamic fn = () => 1;
-  // expect_lint: avoid_dynamic_calls
+  // expect_lint: avoid_dynamic_calls_extended
   fn();
 }
 
@@ -147,7 +147,7 @@ class DynamicProxy {
     // BAD: an unrelated dynamic call in the same override body, not
     // derived from `invocation` — the narrowed exemption still flags this.
     dynamic fallback = 0;
-    // expect_lint: avoid_dynamic_calls
+    // expect_lint: avoid_dynamic_calls_extended
     return fallback.toString();
   }
 }

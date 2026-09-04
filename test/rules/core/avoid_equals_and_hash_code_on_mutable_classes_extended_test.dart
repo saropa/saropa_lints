@@ -1,4 +1,4 @@
-// Regression/behavior tests for avoid_equals_and_hash_code_on_mutable_classes.
+// Regression/behavior tests for avoid_equals_and_hash_code_on_mutable_classes_extended.
 //
 // The rule IS registered in all three required places (lib/saropa_lints.dart,
 // lib/src/tiers.dart `essentialRules`, lib/src/rules/all_rules.dart) and
@@ -9,13 +9,13 @@
 // context/project — faster and more isolated than a full-plugin test.
 library;
 
-import 'package:saropa_lints/src/rules/core/avoid_equals_and_hash_code_on_mutable_classes_rules.dart';
+import 'package:saropa_lints/src/rules/core/avoid_equals_and_hash_code_on_mutable_classes_extended_rules.dart';
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
 
 void main() {
-  group('avoid_equals_and_hash_code_on_mutable_classes', () {
+  group('avoid_equals_and_hash_code_on_mutable_classes_extended', () {
     test('fires on a mutable field referenced by == and hashCode', () async {
       final codes = await reportedRuleCodes(
         AvoidEqualsAndHashCodeOnMutableClassesRule(),
@@ -34,7 +34,7 @@ class Point {
 }
 ''',
       );
-      expect(codes, contains('avoid_equals_and_hash_code_on_mutable_classes'));
+      expect(codes, contains('avoid_equals_and_hash_code_on_mutable_classes_extended'));
     });
 
     test('flags each mutable field, one diagnostic per field', () async {
@@ -56,7 +56,7 @@ class Point {
 ''',
       );
       final ownRule = diags.where(
-        (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes',
+        (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes_extended',
       );
       // x is declared on line 3, y on line 4.
       expect(ownRule.map((d) => d.line), containsAll(<int>[3, 4]));
@@ -213,7 +213,7 @@ class MutableUser {
 ''',
         );
         final ownRule = diags.where(
-          (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes',
+          (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes_extended',
         );
         // Only `email` (line 4) is mutable; `name` (line 3) is final.
         expect(ownRule.map((d) => d.line).toList(), <int>[4]);
@@ -271,7 +271,7 @@ class Session {
 ''',
         );
         final ownRule = diags.where(
-          (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes',
+          (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes_extended',
         );
         // `id` is on line 3 and is read by both members; `hitCount` (line 4)
         // is outside the equality contract.
@@ -301,7 +301,7 @@ class Tag {
         );
         expect(
           codes,
-          contains('avoid_equals_and_hash_code_on_mutable_classes'),
+          contains('avoid_equals_and_hash_code_on_mutable_classes_extended'),
         );
       },
     );
@@ -398,7 +398,7 @@ class ImplementsEquatablePoint implements Equatable {
 }
 ''',
       );
-      expect(codes, contains('avoid_equals_and_hash_code_on_mutable_classes'));
+      expect(codes, contains('avoid_equals_and_hash_code_on_mutable_classes_extended'));
     });
   });
 }

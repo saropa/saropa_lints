@@ -1,6 +1,6 @@
 // ignore_for_file: unused_element
 
-/// Fixtures for avoid_equals_and_hash_code_on_mutable_classes.
+/// Fixtures for avoid_equals_and_hash_code_on_mutable_classes_extended.
 library;
 
 // =============================================================================
@@ -10,9 +10,9 @@ library;
 class MutablePoint {
   MutablePoint(this.x, this.y);
 
-  // expect_lint: avoid_equals_and_hash_code_on_mutable_classes
+  // expect_lint: avoid_equals_and_hash_code_on_mutable_classes_extended
   int x;
-  // expect_lint: avoid_equals_and_hash_code_on_mutable_classes
+  // expect_lint: avoid_equals_and_hash_code_on_mutable_classes_extended
   int y;
 
   @override
@@ -27,7 +27,7 @@ class MutableUser {
   MutableUser({required this.name, required this.email});
 
   final String name;
-  // expect_lint: avoid_equals_and_hash_code_on_mutable_classes
+  // expect_lint: avoid_equals_and_hash_code_on_mutable_classes_extended
   String email; // mutable field used by equality below
 
   @override

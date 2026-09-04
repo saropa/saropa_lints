@@ -76,8 +76,8 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_dynamic_calls',
-    '[avoid_dynamic_calls] Calling a method, accessing a property, or using '
+    'avoid_dynamic_calls_extended',
+    '[avoid_dynamic_calls_extended] Calling a method, accessing a property, or using '
         'an operator on a receiver typed dynamic bypasses the analyzer\'s '
         'static type checking entirely. Typos in member names, wrong '
         'argument counts, and type mismatches all compile silently and only '
@@ -330,7 +330,7 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
 }
 
 /// Searches an AST subtree for any [SimpleIdentifier] resolving to
-/// [_target], used to confirm a dynamic call site inside a `noSuchMethod`
+/// `_target`, used to confirm a dynamic call site inside a `noSuchMethod`
 /// override actually derives from the override's `Invocation` parameter
 /// (rather than exempting the whole method body).
 class _ElementReferenceFinder extends RecursiveAstVisitor<void> {

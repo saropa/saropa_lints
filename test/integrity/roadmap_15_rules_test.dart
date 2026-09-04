@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 /// avoid_field_initializers_in_const_classes_relaxed, avoid_positional_boolean_parameters_with_fix,
 /// avoid_setters_without_getters_local, avoid_js_rounded_ints_extended.
 /// Deferred (no implementation yet): avoid_redundant_argument_values,
-/// avoid_equals_and_hash_code_on_mutable_classes, avoid_implementing_value_types,
+/// avoid_equals_and_hash_code_on_mutable_classes_extended, avoid_implementing_value_types_extended,
 /// avoid_null_checks_in_equality_operators.
 ///
 /// Test fixture: example/lib/roadmap_15_rules_fixture.dart
@@ -30,8 +30,8 @@ void main() {
 
   const deferredRuleNames = <String>[
     'avoid_redundant_argument_values',
-    'avoid_equals_and_hash_code_on_mutable_classes',
-    'avoid_implementing_value_types',
+    'avoid_equals_and_hash_code_on_mutable_classes_extended',
+    'avoid_implementing_value_types_extended',
     'avoid_null_checks_in_equality_operators',
   ];
 
