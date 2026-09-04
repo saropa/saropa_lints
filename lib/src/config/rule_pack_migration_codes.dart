@@ -1215,12 +1215,13 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'require_mounted_check_after_await',
   },
 
-  // essential_lints — 9 HAVE rules covering 29% of 31 total.
+  // essential_lints — 9 HAVE rules covering 29% of 31 total (10 unique saropa codes after fan-out).
   'migrate_essential_lints': {
     'avoid_assignments_as_conditions',
     'avoid_missing_completer_stack_trace',
     'avoid_positional_boolean_parameters_with_fix',
     'avoid_redundant_else',
+    'getters_in_member_list',
     'prefer_list_first',
     'prefer_list_last',
     'prefer_optional_positional_params',

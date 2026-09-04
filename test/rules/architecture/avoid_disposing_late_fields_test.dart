@@ -28,23 +28,27 @@ void main() {
       expect(File(path).existsSync(), isTrue, reason: 'Fixture must exist');
     });
 
-    test('fixture has exactly two BAD (expect_lint) cases', () {
+    test('fixture has exactly five BAD (expect_lint) cases', () {
       final content = File(path).readAsStringSync();
       final count = RegExp(
         r'// expect_lint: avoid_disposing_late_fields',
       ).allMatches(content).length;
       expect(
         count,
-        2,
+        5,
         reason:
-            'Two BAD dispose() calls on conditionally-initialized late '
-            'fields should declare expect_lint (plain and null-aware call)',
+            'Five BAD cases should declare expect_lint: plain dispose(), '
+            'null-aware dispose(), arrow-bodied dispose(), widened '
+            '.cancel() matching, and a `??=` assignment that is not proof '
+            'of safe initialization',
       );
     });
 
     test(
       'fixture GOOD cases cover unconditional init, full branch coverage, '
-      'guarded dispose, lazy init, and nullable field near-misses',
+      'guarded dispose, lazy init, nullable field near-misses, arrow-bodied '
+      'initState(), and the accepted false-negative trade-offs (helper-'
+      'method delegation, try/catch assignment, mismatched dispose guard)',
       () {
         final content = File(path).readAsStringSync();
         expect(content.contains('_good1_VideoPlayerWidgetState'), isTrue);
@@ -52,6 +56,24 @@ void main() {
         expect(content.contains('_good3_GuardedDisposeState'), isTrue);
         expect(content.contains('_good4_LazyControllerState'), isTrue);
         expect(content.contains('_good5_NullableControllerState'), isTrue);
+        expect(content.contains('_good6_HelperDelegationState'), isTrue);
+        expect(content.contains('_good7_TryCatchAssignmentState'), isTrue);
+        expect(content.contains('_good8_ArrowInitStateState'), isTrue);
+        expect(content.contains('_good9_MountedGuardedDisposeState'), isTrue);
+      },
+    );
+
+    test(
+      'fixture BAD cases cover arrow-bodied dispose(), widened .cancel() '
+      'matching, and rejection of `??=` as safe initialization',
+      () {
+        final content = File(path).readAsStringSync();
+        expect(content.contains('_bad3_ArrowDisposeState'), isTrue);
+        expect(
+          content.contains('_bad4_ConditionalSubscriptionState'),
+          isTrue,
+        );
+        expect(content.contains('_bad5_NullAwareAssignmentState'), isTrue);
       },
     );
   });

@@ -178,3 +178,202 @@ class _good5_NullableControllerState extends State<StatefulWidget> {
   @override
   Widget build(BuildContext context) => const SizedBox();
 }
+
+// GOOD (documented false negative): the field is assigned unconditionally
+// by a helper method, not by a top-level assignment statement in
+// initState() itself. The rule cannot see inside `_setupController()`, so
+// it accepts this as "cannot prove unsafe" rather than flagging — this is
+// the accepted false-negative trade-off from the class doc comment (v1
+// scope accepts false negatives on helper-method delegation rather than
+// risk flagging this always-safe pattern, which is exactly what happened
+// before the Finish Report 2026-09-04 Priority 1 fix).
+class _good6_HelperDelegationState extends State<StatefulWidget>
+    with SingleTickerProviderStateMixin<StatefulWidget> {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupController();
+  }
+
+  void _setupController() {
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+// GOOD (documented false negative): the field is assigned unconditionally
+// inside a try/catch block, another statement shape `_branchAssigns` does
+// not analyze. Same accepted trade-off as the helper-delegation case above.
+class _good7_TryCatchAssignmentState extends State<StatefulWidget>
+    with SingleTickerProviderStateMixin<StatefulWidget> {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _controller = AnimationController(vsync: this);
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+// BAD: arrow-bodied dispose() (`=> expr;` instead of `{ ... }`) on a
+// conditionally-initialized field. Previously this whole class was
+// silently skipped because the rule only accepted `BlockFunctionBody`
+// dispose() implementations (Finish Report 2026-09-04, Issue: "Silent
+// whole-class skip for arrow-bodied dispose()").
+class _bad3_ArrowDisposeState extends State<StatefulWidget> {
+  late final AnimationController _controller;
+
+  bool autoPlay = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (autoPlay) {
+      _controller = AnimationController(vsync: this);
+    }
+  }
+
+  @override
+  // expect_lint: avoid_disposing_late_fields
+  void dispose() => _controller.dispose();
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+// GOOD: arrow-bodied initState() with an unconditional assignment — proves
+// the field is always set before dispose() runs. Previously this shape was
+// only correctly handled "by luck" (every non-block initState() body was
+// treated as safe regardless of what it actually did); now it is verified
+// explicitly (Finish Report 2026-09-04, Issue: "Silent per-class miss for
+// arrow-bodied initState()").
+class _good8_ArrowInitStateState extends State<StatefulWidget>
+    with SingleTickerProviderStateMixin<StatefulWidget> {
+  late final AnimationController _controller;
+
+  @override
+  void initState() => _controller = AnimationController(vsync: this);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+// GOOD (documented false negative, real crash risk): the dispose() call is
+// guarded by `mounted`, an unrelated condition to the field's init guard
+// (`autoPlay`). `_isGuarded` accepts ANY enclosing `IfStatement` as proof
+// of safety, not just one matching the initialization condition, so this
+// still throws `LateInitializationError` when `autoPlay` was false — this
+// is an accepted, documented false negative (Finish Report 2026-09-04,
+// Concern: "Guard detection at the dispose() call site does not check that
+// the guard condition matches the initialization condition"), not a fix
+// target for this pass.
+class _good9_MountedGuardedDisposeState extends State<StatefulWidget> {
+  late final AnimationController _controller;
+
+  bool autoPlay = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (autoPlay) {
+      _controller = AnimationController(vsync: this);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (mounted) {
+      _controller.dispose(); // NOT actually safe — `mounted` != `autoPlay`
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+// BAD: widened call-site matching now also catches `.cancel()` on a
+// conditionally-initialized late `StreamSubscription`, not just
+// `.dispose()` (Finish Report 2026-09-04, Priority 4: widen call-site
+// matching to `.close()`/`.cancel()`).
+class _bad4_ConditionalSubscriptionState extends State<StatefulWidget> {
+  late final StreamSubscription<void> _subscription;
+
+  bool listenEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (listenEnabled) {
+      _subscription = Stream.periodic(
+        const Duration(seconds: 1),
+      ).listen((_) {});
+    }
+  }
+
+  @override
+  // expect_lint: avoid_disposing_late_fields
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+// BAD: the only "assignment" to `_controller` is `??=`, which is NOT proof
+// of safe unconditional initialization — `??=` reads the field before
+// deciding whether to assign it, so on a genuinely uninitialized `late`
+// field the read itself throws `LateInitializationError` before the
+// assignment can run. Regression case for the fix in `_isPlainAssignment`
+// (Finish Report 2026-09-04, Concern: "`??=` counted as a full/safe
+// assignment") — this must still be flagged, not treated as initialized.
+class _bad5_NullAwareAssignmentState extends State<StatefulWidget> {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller ??= AnimationController(vsync: this);
+  }
+
+  @override
+  // expect_lint: avoid_disposing_late_fields
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}

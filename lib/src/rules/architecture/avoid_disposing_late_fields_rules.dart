@@ -34,7 +34,14 @@ import '../../target_matcher_utils.dart';
 /// as safe). It intentionally accepts false negatives on more complex
 /// control flow (loops, switch, try/catch, helper-method delegation) rather
 /// than risk false positives — see disposal_rules.dart for the same
-/// trade-off applied to sibling lifecycle rules.
+/// trade-off applied to sibling lifecycle rules. Concretely: any top-level
+/// `initState()` statement this heuristic cannot classify (a helper-method
+/// call, `try`/`catch`, a loop, a `switch`) is treated as "possibly
+/// initializes it, cannot prove otherwise" and skips the whole field —
+/// never as proof the field is *unsafe* (Finish Report 2026-09-04,
+/// Priority 1: fixes a default-safe/unsafe polarity bug where unanalyzable
+/// shapes were previously mis-scored as unsafe, false-positiving on the
+/// common `_setupController();` delegation pattern).
 ///
 /// **BAD:**
 /// ```dart
@@ -130,22 +137,7 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       if (!_extendsState(node)) return;
 
-      // Only `late` fields with no inline initializer are candidates — a
-      // `late final _x = _compute();` lazy initializer always runs exactly
-      // once on first read and cannot throw at dispose() unless the field
-      // was never read at all before dispose(), which is a different
-      // (unreachable-initialization) problem out of scope for this rule.
-      final List<String> candidateFields = <String>[];
-      for (final ClassMember member in node.bodyMembers) {
-        if (member is FieldDeclaration && member.fields.isLate) {
-          for (final VariableDeclaration variable
-              in member.fields.variables) {
-            if (variable.initializer == null) {
-              candidateFields.add(variable.name.lexeme);
-            }
-          }
-        }
-      }
+      final List<String> candidateFields = _lateUninitializedFields(node);
       if (candidateFields.isEmpty) return;
 
       MethodDeclaration? initState;
@@ -159,20 +151,46 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
       // No dispose() at all means there is nothing to flag here — a
       // sibling rule (require_*_dispose) already covers "missing dispose".
       if (disposeMethod == null) return;
+      // `disposeBody.accept()` walks either a `{ ... }` block body or a
+      // `=> expr;` arrow body — both are AstNodes, so the visitor traverses
+      // into either shape. Previously this bailed out entirely for
+      // arrow-bodied dispose() (`void dispose() => _controller.dispose();`),
+      // a legal and not-uncommon single-statement override, silently
+      // skipping every field in the class (Finish Report 2026-09-04, Issue:
+      // "Silent whole-class skip for arrow-bodied dispose()").
       final FunctionBody disposeBody = disposeMethod.body;
-      if (disposeBody is! BlockFunctionBody) return;
 
       for (final String fieldName in candidateFields) {
         if (_isProvablyInitialized(fieldName, initState)) continue;
 
         final _DisposeCallFinder finder = _DisposeCallFinder(fieldName);
-        disposeBody.block.accept(finder);
+        disposeBody.accept(finder);
         final MethodInvocation? call = finder.match;
         if (call != null) {
           reporter.atNode(call);
         }
       }
     });
+  }
+
+  /// Collects `late` fields declared with no inline initializer — a
+  /// `late final _x = _compute();` lazy initializer always runs exactly once
+  /// on first read and cannot throw at dispose() unless the field was never
+  /// read at all before dispose(), which is a different
+  /// (unreachable-initialization) problem out of scope for this rule.
+  ///
+  /// Extracted from `runWithReporter` to keep that method's nesting within
+  /// the project's ≤3-levels guideline (Finish Report 2026-09-04, Concern:
+  /// the inline version nested five levels deep).
+  static List<String> _lateUninitializedFields(ClassDeclaration node) {
+    final List<String> fields = <String>[];
+    for (final ClassMember member in node.bodyMembers) {
+      if (member is! FieldDeclaration || !member.fields.isLate) continue;
+      for (final VariableDeclaration variable in member.fields.variables) {
+        if (variable.initializer == null) fields.add(variable.name.lexeme);
+      }
+    }
+    return fields;
   }
 
   /// True when [fieldName] is assigned unconditionally somewhere at the top
@@ -188,8 +206,64 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
   ) {
     if (initState == null) return true;
     final FunctionBody body = initState.body;
+    if (body is ExpressionFunctionBody) {
+      // Arrow-bodied initState() (`void initState() => _x = Foo();`) has a
+      // single expression instead of statements. Only an unconditional
+      // assignment to this exact field is provably safe; any other shape
+      // (a helper call, a cascade, a conditional expression) can't be
+      // classified by this heuristic, so — consistent with the
+      // false-negative-preferring design used everywhere else in this rule —
+      // it is treated as "cannot prove unsafe" rather than flagged.
+      // Previously this branch didn't exist and ALL arrow bodies fell
+      // through to `body is! BlockFunctionBody` returning true unconditionally,
+      // which happened to be correct only by luck for the assignment case
+      // (Finish Report 2026-09-04, Issue: "Silent per-class miss for
+      // arrow-bodied initState()").
+      final Expression expr = body.expression;
+      if (expr is AssignmentExpression) {
+        return assignmentTargetFieldName(expr) == fieldName &&
+            _isPlainAssignment(expr);
+      }
+      return true;
+    }
     if (body is! BlockFunctionBody) return true;
+    // A top-level statement shape this heuristic can't analyze (helper-method
+    // delegation, try/catch, loops, switch) might still assign the field
+    // unconditionally — treating it as "unsafe" would false-positive on
+    // exactly the patterns the class doc promises are false-negative-only,
+    // so bail to "safe" instead of falling through to _blockAssigns' `false`.
+    if (_hasUnanalyzableStatement(body.block)) return true;
     return _blockAssigns(fieldName, body.block);
+  }
+
+  /// True only for a plain `=` assignment, not a compound operator like
+  /// `??=`, `+=`, etc. This matters specifically for `late` fields: `_x ??=
+  /// value;` READS `_x` before deciding whether to assign it, so if `_x` was
+  /// never initialized, the read itself throws `LateInitializationError`
+  /// before the assignment can run — treating `??=` as proof of safe
+  /// initialization is backwards (Finish Report 2026-09-04, Concern: "`??=`
+  /// counted as a full/safe assignment").
+  static bool _isPlainAssignment(AssignmentExpression expr) {
+    return expr.operator.lexeme == '=';
+  }
+
+  /// True if [block] contains a top-level statement whose shape
+  /// `_branchAssigns` cannot reason about (anything but `Block`, an
+  /// assignment `ExpressionStatement`, or `IfStatement`) — e.g. a helper
+  /// method call, `try`/`catch`, a loop, or a `switch`.
+  static bool _hasUnanalyzableStatement(Block block) {
+    for (final Statement statement in block.statements) {
+      if (statement is IfStatement) continue;
+      if (statement is ExpressionStatement && statement.expression is AssignmentExpression) {
+        continue;
+      }
+      if (statement is Block) {
+        if (_hasUnanalyzableStatement(statement)) return true;
+        continue;
+      }
+      return true;
+    }
+    return false;
   }
 
   /// True when [fieldName] is provably assigned by walking the top-level
@@ -209,7 +283,11 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
     if (statement is ExpressionStatement) {
       final Expression expr = statement.expression;
       if (expr is AssignmentExpression) {
-        return assignmentTargetFieldName(expr) == fieldName;
+        // See `_isPlainAssignment` doc: a compound operator like `??=` reads
+        // the (possibly-uninitialized) field before assigning it, so it is
+        // not proof of safe initialization.
+        return assignmentTargetFieldName(expr) == fieldName &&
+            _isPlainAssignment(expr);
       }
       return false;
     }
@@ -235,10 +313,20 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
   }
 }
 
+/// Cleanup verbs this rule treats as "dispose()-shaped" — matching the
+/// scope the rule's own doc comment and the originating proposal describe
+/// ("another `.dispose()`-shaped call") and the sibling rules in
+/// disposal_rules.dart, which cover `StreamSubscription.cancel()` and
+/// `StreamController.close()` alongside `.dispose()` (Finish Report
+/// 2026-09-04, Priority 4: ".dispose()-only matching narrower than the
+/// stated scope").
+const Set<String> _cleanupVerbs = {'dispose', 'close', 'cancel'};
+
 /// Finds the first unguarded `fieldName.dispose()` / `fieldName?.dispose()`
-/// call inside a dispose() method body. "Unguarded" means no `IfStatement`
-/// ancestor between the call and the enclosing method — a dispose() call
-/// already wrapped in a conditional (e.g. `if (widget.autoPlay) {
+/// (or `.close()` / `.cancel()`, see [_cleanupVerbs]) call inside a
+/// dispose() method body. "Unguarded" means no `IfStatement` ancestor
+/// between the call and the enclosing method — a dispose() call already
+/// wrapped in a conditional (e.g. `if (widget.autoPlay) {
 /// _controller.dispose(); }`) is treated as intentionally guarded and is
 /// not flagged, matching edge case 4 in the proposal: the guard at the call
 /// site proves safety even though initialization was conditional.
@@ -251,7 +339,7 @@ class _DisposeCallFinder extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (match == null &&
-        node.methodName.name == 'dispose' &&
+        _cleanupVerbs.contains(node.methodName.name) &&
         node.target != null &&
         extractTargetName(node.target!) == fieldName &&
         !_isGuarded(node)) {
