@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Getters Declared Outside the Class Member List Grouping
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule
@@ -106,5 +106,36 @@ Implemented (2026-09-04).
 - **Unrelated observation:** mid-task, the newly-created rule and test files (but not the fixture) were deleted from disk by an unknown external process between two verification runs in this session — consistent with a concurrent/parallel process in the same working tree. Files were recreated from this session's own content and re-verified; flagging here in case it recurs.
 
 ---
+
+## Finish Report (2026-09-04)
+
+### Issues
+
+- **Proposal's own "Implementation Notes" / "Issues" section is stale and factually wrong.** It states `lib/saropa_lints.dart` (`_allRuleFactories`) and `lib/src/tiers.dart` were "deliberately NOT touched" and that the rule is "not yet reachable via the scan CLI or the analyzer plugin." That is false as of this review: `GettersInMemberListRule.new` is registered in `_allRuleFactories` (`lib/saropa_lints.dart:2918`), `'getters_in_member_list'` is in `pedanticOnlyRules` (`lib/src/tiers.dart:3325`), it's exported from `all_rules.dart:203`, and it's mapped in `rule_category_map.dart:922`. The rule is fully live. This stale text will mislead the next reader into re-doing registration work or filing a false "not wired up" bug — it should be corrected, not left standing.
+- **Enums are not covered — a real false-negative gap, not just a documented limitation.** `runWithReporter` (lines 116-124) hooks `ClassDeclaration`, `MixinDeclaration`, `ExtensionDeclaration` but not `EnumDeclaration`. Enhanced enums (Dart 2.17+) can declare fields, getters, methods, and constructors exactly like a class body, so a getter scattered among enum methods is silently missed. This isn't a hard case: `lib/src/analyzer_compat.dart:94-101` already defines `EnumDeclaration.bodyMembers` (and `ExtensionTypeDeclaration.bodyMembers` at line 157-164), and `SaropaContext` already exposes `addEnumDeclaration`/`addExtensionTypeDeclaration` (`lib/src/native/saropa_context.dart:745`, `:770`) — `_checkMembers` already takes a plain `List<ClassMember>`, so both are a 4-line addition, not new plumbing.
+- **CHANGELOG.md mislabels the tier.** The entry (`CHANGELOG.md` line 101) describes `getters_in_member_list` as "Stylistic opt-in," but the actual registration is in `pedanticOnlyRules`, not `stylisticRules`. Pedantic and Stylistic have different enablement semantics in this project (tier preset vs. opt-in rule pack) — a reader following the changelog to enable it via the stylistic pack won't get it.
+- **No ROADMAP.md entry.** Grep of `ROADMAP.md` for `getters_in_member_list` / `GettersInMemberList` returns nothing. Per this project's own registration checklist (root `CLAUDE.md`, "Adding a New Lint Rule" step 3), every new rule needs a ROADMAP entry; this one is missing.
+
+### Concerns
+
+- **`@override` exemption is name-only, not type-checked.** Line 161's check is `a.name.name == 'override'` — a false positive is very unlikely (nobody names a custom annotation exactly `@override`), but it means the exemption would also silently apply to any hypothetical non-`dart:core` `@override`-named annotation. Low risk, but worth a one-line comment noting it's intentionally a syntactic check (matches how the rest of the codebase likely does override detection — not verified here).
+- **Static getters/fields are not distinguished from instance ones.** A `static` getter declared after an instance method (or vice versa) is treated identically to instance members for grouping purposes. Static and instance members are frequently grouped separately by convention (statics at the top or bottom), so a class that intentionally separates `static final` constants from instance fields/getters could get a technically-correct-per-this-rule flag that fights an equally valid, different convention. Not a bug, but a plausible source of pushback once this rule sees real-world pedantic-tier usage.
+- **Constructor exemption is a byproduct of matching two hand-picked examples, not a general design decision.** The rationale (lines 148-153, and proposal "Implementation Notes") is "the proposal's own GOOD/BAD examples require it." That's a legitimate reason, but it means the constructor-exclusion behavior was reverse-engineered from two examples rather than derived from a stated ordering policy (e.g., "constructors are body/init noise, not behavior"). Future edits to this rule should re-derive the rule from a stated policy, not just re-fit new examples, or the exemption will drift.
+- **Fixture is not exercised by an automated `expect_lint`-runner tied to `dart test`.** Per the proposal's own "Issues" note, the fixture's correctness was checked once via "a throwaway harness script," not via a persisted test. `test/scan/fixture_lint_integration_test.dart` exists in this repo and may already do fixture-wide `expect_lint` verification for other rules — if `getters_in_member_list_fixture.dart` isn't wired into that (not confirmed either way here), a future edit to the rule could silently desync the fixture from the five inline-code oracle tests without any test failing.
+
+### Opportunities
+
+- **Extend `runWithReporter` to `addEnumDeclaration` and `addExtensionTypeDeclaration`.** As noted under Issues, the compat shim and context hooks already exist; this is two more `context.addXDeclaration(...)` lines reusing the existing `_checkMembers`, not a rewrite.
+- **Fix the CHANGELOG tier label** (`Stylistic opt-in` → `Pedantic`) in the same pass as any other doc cleanup, since it's a one-line, low-risk correction.
+- **Add a ROADMAP.md entry** to close the gap called out in root `CLAUDE.md`'s own rule-addition checklist.
+
+### Recommendations
+
+1. **(High)** Correct the stale "not wired into tiers.dart" / "not reachable" claims in this proposal's own Implementation Notes section — leaving factually wrong status text in a proposal marked "Implemented" will cost someone real time later.
+2. **(High)** Fix the CHANGELOG.md tier mislabel (Stylistic → Pedantic) so users following the changelog can actually find/enable the rule.
+3. **(Medium)** Add `EnumDeclaration` (and ideally `ExtensionTypeDeclaration`) coverage — cheap, closes a real false-negative gap, and the plumbing is already in the codebase.
+4. **(Medium)** Add a ROADMAP.md entry per the project's own checklist.
+5. **(Low)** Add test coverage for the currently-untested branches: a setter used as the "earlier property member," an operator method counted as behavior, `MixinDeclaration`/`ExtensionDeclaration` bodies (the rule explicitly handles them per "Implementation Notes" edge case 3, but no test or fixture exercises either), and multiple getters after a single offending method (verify each is flagged independently).
+6. **(Low)** Confirm whether `test/scan/fixture_lint_integration_test.dart` (or equivalent) actually runs `expect_lint` assertions against `getters_in_member_list_fixture.dart`; if not, either wire it in or note explicitly that fixture verification for this rule is manual-only.
 
 ## Commits

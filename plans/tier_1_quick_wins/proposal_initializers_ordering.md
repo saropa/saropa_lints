@@ -1,6 +1,6 @@
 # PROPOSAL: Require Constructor Initializer List to Match Field Declaration Order
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule
@@ -97,5 +97,27 @@ Implemented.
 - **Verification:** `dart test test/rules/code_quality/initializers_ordering_test.dart` — 6/6 passing (resolved-analyzer oracle harness, not the syntactic scan CLI). Confirms both BAD fixture cases are flagged and all 4 GOOD cases are silent.
 
 ---
+
+## Finish Report (2026-09-04)
+
+### Issues
+None identified. All 6 existing tests (`test/rules/code_quality/initializers_ordering_test.dart`) pass. Registration is complete in all three required places (`lib/saropa_lints.dart:2919`, `lib/src/tiers.dart:3326` under `pedanticOnlyRules`, `lib/src/rules/all_rules.dart:204`), contradicting the "Not wired into tiers.dart yet" note this proposal's own Implementation Notes section left behind — that note is now stale and should be corrected or removed.
+
+### Concerns
+- **Enclosing-declaration scope is `ClassDeclaration` only** (`initializers_ordering_rules.dart:156`, `_fieldDeclarationOrder`). `thisOrAncestorOfType<ClassDeclaration>()` returns `null` for a constructor inside an `EnumDeclaration`. Enum constructors commonly have initializer lists (e.g. `const Suit(this.symbol) : ...` isn't representative, but multi-field enum constructors with explicit `ConstructorFieldInitializer` entries do exist), and those are silently skipped — a false-negative gap, not tested or documented as an explicit exclusion. Worth either extending to enums or stating the exclusion explicitly in the doc comment (currently only mentions "assert/super/this excluded," not "enums excluded").
+- **`requiredPatterns => const {':'}`** (line 77): the comment claims this "skips parsing for the large fraction of files with no constructors at all," but a bare `':'` substring matches ternary expressions, named-parameter defaults, switch/case labels, and any `dart:...`/`package:...` import string — i.e. almost every non-trivial Dart file. The pre-filter is real but far weaker than the comment implies; it will rarely skip a file in practice. Not a correctness bug, just a misleading efficiency claim.
+- **Only the first regression is reported per constructor** (loop `return`s at the first `indices[i] < indices[i-1]`, lines 135-140). A constructor with multiple out-of-order pairs needs multiple lint-fix-relint cycles to fully clean up. Standard practice for this rule shape, but worth a one-line doc note since a reader might expect all violations flagged at once.
+- Bug-history in this same file's Implementation Notes (two real defects: `.members` not compiling against analyzer 12, then `node.parent` never matching `ClassDeclaration` under the declaring-constructors AST shape) shows the fragility of relying on AST shape assumptions here. The fix (`thisOrAncestorOfType`) is the right general pattern, but it's evidence this exact code path failed silently once already (rule registered, tests green due to being new, but zero real detections) — worth a smoke check after any future analyzer bump that this rule still fires, since the failure mode is silent-zero-lints, not a crash.
+
+### Opportunities
+- **Edge case 3 from this proposal is implemented but untested.** The proposal explicitly calls out "fields declared via constructor shorthand (`this.x`) mixed with explicit initializer-list assignments for other fields" (line 68) as a case to handle, and the implementation does handle it correctly (only `ConstructorFieldInitializer` nodes participate; `this.x` shorthand params never enter `fieldInitializers`, so they're implicitly skipped rather than mis-ordering the comparison). But neither the fixture nor the test file has a case exercising this — a class with a `this.`-shorthand parameter plus 2+ explicit initializer-list entries, in both a passing and failing arrangement. This is the one edge case in the proposal with zero direct coverage; the "fields not found in the enclosing class are skipped" comment at line 118-121 covers a different (unresolved-field) scenario, not this one.
+- **Auto-fix companion, proposed as "Alternatives Considered" (line 75) and flagged as "recommended... if straightforward,"** was not implemented. Reordering `ConstructorFieldInitializer` entries to match `declOrder` is a pure structural transform (no side-effect risk between field assignments, per the proposal's own reasoning) and would be a good quick-fix candidate for a follow-up pass — ordering issues are exactly the class of lint people want auto-fixed rather than hand-corrected.
+- The declaration-index map building (`_fieldDeclarationOrder`) walks every `FieldDeclaration` including static fields, which cannot appear in a constructor initializer list. This is harmless (relative order is preserved either way) but the map could be pre-filtered on `!member.fields.isStatic` for a marginally cleaner mental model — not a bug, low priority.
+
+### Recommendations
+1. **(Coverage)** Add one fixture class + one test case for the `this.x` shorthand mixed with explicit field initializers (edge case 3) — both a GOOD case (correctly ordered subset) and, if easy to construct, confirmation that a `this.x` field's position never taints the comparison of the remaining explicit entries.
+2. **(Doc accuracy)** Correct or remove the stale "Not wired into `lib/src/tiers.dart` yet" line in this file's own Implementation Notes section — the rule is fully registered in all three required places today.
+3. **(Doc precision, low priority)** Add "enum declarations are not currently checked" to the rule's DartDoc alongside the existing assert/super/this exclusions, so the scope limitation is discoverable without reading the source.
+4. **(Follow-up, optional)** Consider the auto-fix companion the proposal already flagged as low-risk and recommended — natural next increment, not required for this rule to ship as-is.
 
 ## Commits

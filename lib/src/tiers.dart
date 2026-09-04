@@ -773,14 +773,6 @@ const Set<String> essentialRules = <String>{
   'require_ignore_comment_plugin_prefix', // WARNING - bare ignore silently ineffective in IDE
   // Tier 1 quick wins — batch 1
   'avoid_focused_tests', // WARNING - solo:true silently skips entire suite in CI
-  // Tier 1 quick wins — batch 4
-  'avoid_disposing_late_fields',
-  'is_future',
-  'avoid_dynamic_calls',
-  'duplicate_value',
-  'avoid_mounted_check_in_finally',
-  'never_discard_build_context',
-  'avoid_futureor_return_type',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1763,6 +1755,13 @@ const Set<String> recommendedOnlyRules = <String>{
   // Tier 1 quick wins — batch 3
   'always_put_doc_comments_before_annotations', // INFO - doc comment after annotation breaks dartdoc
   // Tier 1 quick wins — batch 4
+  'avoid_disposing_late_fields',
+  'is_future',
+  'avoid_dynamic_calls',
+  'duplicate_value',
+  'avoid_mounted_check_in_finally',
+  'never_discard_build_context',
+  'avoid_futureor_return_type',
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -3326,6 +3325,8 @@ const Set<String> pedanticOnlyRules = <String>{
   'initializers_ordering',
   'document_enum',
   'new_instance_cascade',
+  'named_parameters_ordering',
+  'use_compare_without_case',
 };
 
 /// Returns the set of rule names for a given tier.

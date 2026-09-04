@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Duplicate Values Within a Single Boolean Expression
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule
@@ -75,3 +75,33 @@ Compare sub-expressions structurally (AST equality, not source-text equality) wi
 ---
 
 ## Commits
+
+---
+
+## Finish Report (2026-09-04)
+
+### Issues
+
+1. **False negative: same-operator chain broken by explicit parentheses is never flattened across the paren boundary** (`lib/src/rules/flow/duplicate_value_rules.dart`, `_collectOperands` line 120 and the root-skip check at lines 83-86). `_collectOperands` only descends when `expr is BinaryExpression` — a `ParenthesizedExpression` wrapping a nested `BinaryExpression` of the *same* operator fails that check and is treated as one opaque leaf instead of being flattened. Concretely, `a == 1 || (b == 2 || a == 1)` is NOT flagged: the outer collector sees leaves `["a == 1", "(b == 2 || a == 1)"]` (no match), and the inner `BinaryExpression(b == 2 || a == 1)` is visited separately by `context.addBinaryExpression` — its parent is the `ParenthesizedExpression`, not a `BinaryExpression`, so the root-skip check at line 84 does not fire and it is evaluated as an independent, isolated root with leaves `["b == 2", "a == 1"]` (also no match, since it has no visibility into the sibling operand outside the parens). Net effect: a duplicate comparison split across an explicit parenthesis group — a very common way to write grouped boolean conditions — silently evades detection. This is the mirror-image bug of the "mixed operators" case the rule correctly guards against (fixture `mixedOperators`), except here the operator *is* the same and it should have been flattened.
+   - Fix direction: when descending in `_collectOperands`, unwrap parentheses first (analyzer's `Expression.unParenthesized` — not currently used anywhere in the codebase) before checking `expr is BinaryExpression`, and apply the same unwrap when computing `node.parent` for the root-skip check.
+
+### Concerns
+
+1. **No fixture/test exercises the parenthesized-same-operator case**, so the false negative above shipped undetected. All three BAD fixture entries (`isEditable`, `bothChecksMatch`, `sideEffectCall`) are flat, unparenthesized chains; the only parenthesized fixture (`mixedOperators`) deliberately uses *different* operators inside vs. outside, which the rule handles correctly — it does not probe the same-operator case at all.
+2. **The unit test never proves the rule actually fires.** `test/rules/flow/duplicate_value_test.dart` only checks rule instantiation (code name, message contents, correction message non-null) and that the fixture file exists on disk — it never runs the rule against the fixture and asserts the `expect_lint` markers are satisfied. This matches the project-wide known limitation (unit tests are instantiation pins only; the scan CLI is the only way to prove firing — see `memory/reference_verify_rule_behavior_scan_cli.md`), so it is not unique to this PR, but combined with concern #1 it means the false negative was never going to surface from `dart test` alone.
+3. **Tier placement diverges from the proposal without the "Decision" section being filled in.** The proposal (this file, "Proposed Tier" section) specifies Recommended; the rule is actually registered in `essentialRules` (`lib/src/tiers.dart` line 780, in the "Tier 1 quick wins — batch 4" block), one tier stricter/broader than proposed. The "Decision" section above (line 67-68) is blank, so there is no record of why the tier was escalated from Recommended to Essential. Functionally Essential is a defensible (arguably better) choice given the "negligible false-positive risk" justification already in the proposal, but the doc should reflect what actually shipped.
+4. **Overlap with `avoid_conditions_with_boolean_literals` is untested.** A duplicate boolean-literal operand, e.g. `if (true || true)`, will be flagged by both `duplicate_value` and the existing literal-condition rule, producing two diagnostics on the same span. Not necessarily wrong, but worth a fixture/test to confirm the double-reporting is intentional rather than an oversight.
+5. **Reporting cardinality for 3+ identical operands is implicit, not verified.** For `a==1 || a==1 || a==1`, the `seen`-set algorithm (lines 95-103) reports the 2nd and 3rd occurrences (two diagnostics), never the 1st. This is reasonable but isn't asserted anywhere, and a reviewer skimming the fixture (`bothChecksMatch` only has one duplicate pair among three operands) wouldn't learn the multi-duplicate behavior from it.
+6. **Proposal's "Implementation Notes" section is factually inaccurate but harmless.** It instructs to "reuse any existing structural-equality helper already used by `no_equal_conditions` if one exists" and frames the choice as "AST equality, not source-text equality." No such helper exists — `no_equal_conditions` (`lib/src/rules/flow/control_flow_rules.dart` line 1664) also compares via `.toSource()` text, exactly like this rule. The shipped implementation is consistent with the sibling rule; the proposal document is just wrong about what `no_equal_conditions` does. Low priority since the code itself is fine and well-commented about the source-text choice.
+
+### Opportunities
+
+1. Introduce (or confirm/adopt if it exists elsewhere in the codebase) a shared `unParenthesized`-aware flattening helper for same-operator boolean chains, since both this rule and any future boolean-chain rule will need to handle explicit grouping parens correctly — fixing issue #1 here is also an opportunity to harden the pattern for reuse.
+2. `duplicate_value_test.dart` could adopt the shared `discoverFixtures`/fixture-existence helper (`test/helpers/fixture_discovery.dart`) already used by `control_flow_rules_test.dart` instead of hand-rolling a single `File(...).existsSync()` check — minor consistency win, not a defect.
+
+### Recommendations
+
+1. **(High)** Fix the parenthesized same-operator flattening gap in `_collectOperands` and the root-skip check using `Expression.unParenthesized`, then add a fixture case (e.g. `a == 1 || (b == 2 || a == 1)`) with `expect_lint` and verify it fires via the scan CLI (`dart run saropa_lints scan <dir> --tier comprehensive --files <fixture> --format json`), per the project's standard verification path — unit tests alone won't catch this.
+2. **(Medium)** Add a fixture/test for the boolean-literal overlap with `avoid_conditions_with_boolean_literals` to confirm double-reporting is expected, or suppress one of the two if it's noise.
+3. **(Low)** Fill in the proposal's blank "Decision" section noting the actual shipped tier (Essential, not Recommended) and why.
+4. **(Low)** Correct the "Implementation Notes" section's claim about `no_equal_conditions` using structural AST equality — it uses `.toSource()` text comparison, same as this rule.

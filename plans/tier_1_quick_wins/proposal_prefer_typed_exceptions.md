@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `throw 'string'`/`throw Exception('message')` — Use a Typed Exception Class
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule
@@ -87,3 +87,28 @@ Justification: architectural-hygiene rule with real long-term maintainability va
 ---
 
 ## Commits
+
+## Finish Report (2026-09-04)
+
+### Issues
+
+None identified. Core AST logic (`lib/src/rules/flow/prefer_typed_exceptions_rules.dart:96-115`) is correct for its declared scope: the `StringLiteral` branch (line 102) catches both plain and interpolated string literals without needing type resolution, and the `staticType.isDartCoreString` branch (line 111-113) catches non-literal String-typed expressions (variables, method calls). No false-negative was found within that scope, and no crash/exception path was found (both branches are null-safe: `staticType` is nullable and checked before use).
+
+### Concerns
+
+- **Test assertion weaker than the documented standard.** `test/rules/flow/prefer_typed_exceptions_test.dart:15` asserts `problemMessage.length, greaterThan(50)`, but the project's own Problem Message Requirement (CLAUDE.md) is >200 chars. The actual message is ~420 chars today, so it currently passes both thresholds, but the test as written would not catch a future edit that shrinks the message to, say, 100 chars. Recommend tightening to `greaterThan(200)`.
+- **Proposal/implementation scope mismatch never reconciled in this doc.** The proposal's Detection/Behavior section (lines 25-40) and its "Should flag" example (line 37: `throw Exception('Age is unrealistic'); // LINT`) describe flagging both bare-`String` throws AND generic `Exception(...)`/`Error(...)` calls. The shipped rule deliberately narrows to bare-`String` only (see doc comment at `prefer_typed_exceptions_rules.dart:19-22`), delegating the `Exception(...)`/`Error(...)` case to the pre-existing `avoid_generic_exceptions` rule (`lib/src/rules/flow/error_handling_rules.dart:272`, already at `{v4}`) to avoid double-reporting the same violation under two rule names. This is the right call — verified: `avoid_generic_exceptions` already fires on `InstanceCreationExpression` throws (`error_handling_rules.dart:307`) — but the proposal's own "Decision" and "Implementation Notes" sections (lines 81-87) were left blank, so nothing in this document records that the scope was intentionally narrowed. A future reader skimming only the proposal would expect `throw Exception(...)` to be flagged by this rule and be confused when it isn't.
+- **Edge Case 3 (test-file exemption, proposal line 70) was never explicitly verified against this rule**, per the proposal's own instruction to "verify against saropa's existing test-file exemption conventions before finalizing." It works out fine: `PreferTypedExceptionsRule` does not override `testRelevance`, so it inherits `SaropaLintRule`'s default `TestRelevance.never` (`lib/src/saropa_lint_rule.dart:2825-2832`), which skips test files automatically. But this is implicit inheritance, not a checked-off verification, and there's no fixture/test proving it.
+- Unexercised (low-risk) type-resolution paths: a ternary mixing a string literal and a typed-exception branch (`throw cond ? 'a' : SomeException();`), and a `const`/top-level `String` value thrown directly, both hit the same `staticType.isDartCoreString` branch already covered by `validateVariable`/`validateBuiltMessage` in the fixture, so risk of an actual bug here is low.
+
+### Opportunities
+
+- `avoid_generic_exceptions`'s doc comment does not cross-reference `prefer_typed_exceptions` (only this rule's doc links back to that one, at lines 19-22). Adding the reverse link would make the scope split discoverable from either rule.
+- No code duplication found — the `context.addThrowExpression` visitor hook and `requiredPatterns` prefilter pattern are reused consistently with the existing `avoid_generic_exceptions` rule; no further consolidation opportunity.
+
+### Recommendations
+
+1. **(Do first, trivial)** Tighten `test/rules/flow/prefer_typed_exceptions_test.dart:15` from `greaterThan(50)` to `greaterThan(200)` to match the documented Problem Message Requirement and make the test actually guard against message-length regression.
+2. **(Documentation, low effort)** Fill in this proposal's "Decision" and "Implementation Notes" sections to record that the rule was intentionally scoped to bare-`String` throws only, with `Exception(...)`/`Error(...)` throws left to `avoid_generic_exceptions` — so the proposal stops disagreeing with the shipped code.
+3. **(Optional)** Add one fixture case exercising the test-file exemption assumption (or at minimum a one-line note in the fixture file confirming `TestRelevance.never` is inherited, not overridden) so the proposal's Edge Case 3 has a recorded verification instead of an implicit default.
+4. **(Optional, cosmetic)** Add a reverse doc-comment cross-reference from `avoid_generic_exceptions` to `prefer_typed_exceptions`.

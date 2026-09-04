@@ -76,4 +76,36 @@ Implemented. Same correctness-bug class as the already-shipped `avoid_mutable_fi
   - Equatable-based classes are correctly skipped via a structural `extends`/`with` clause name check (`Equatable` / `EquatableMixin`) — verified in the added fixture/test that this skip fires even when the class independently satisfies this rule's own trigger pattern.
   - No false positive found during verification; scan output for the fixture matched line-for-line with the `expect_lint` markers (lines 14, 16, 31) and showed zero hits on the two GOOD sections.
 
+## Finish Report (2026-09-04)
+
+### Issues
+
+- **Stale/incorrect comment in the test file.** `test/rules/core/avoid_equals_and_hash_code_on_mutable_classes_test.dart` lines 2-8 claim "The rule is not yet wired into the global tier registry (a separate process handles the three-way registration centrally...)". This is false as of this review: the rule IS registered in all three required places — `lib/saropa_lints.dart:2922` (`AvoidEqualsAndHashCodeOnMutableClassesRule.new`), `lib/src/tiers.dart:312` (`essentialRules` set), and `lib/src/rules/all_rules.dart:207` (export). CHANGELOG.md:101 also already documents it as part of the 19-rule quick-win batch. The comment should be removed or corrected so future readers don't think registration is still pending.
+- **No test/fixture for inherited mutable fields.** `_findMutableFields` (rule file, lines 177-188) only walks `node.bodyMembers` of the class that declares `==`/`hashCode`. A subclass that declares `==`/`hashCode` referencing a mutable field inherited from a plain (non-Equatable) superclass is a false negative — not caught, not tested, not documented as a known limitation. Given the sibling `avoid_mutable_field_in_equatable` rule's scope, this is likely an accepted conservative boundary, but it isn't called out anywhere (proposal's "False-positive risks" section only discusses false positives, not this false negative).
+
+### Concerns
+
+- **Equatable detection is name-only, not type-resolved.** `_extendsOrMixesInEquatable` (lines 135-150) matches on `superclass.name.lexeme == 'Equatable'` / `mixin.name.lexeme == 'EquatableMixin'` — a textual/structural check, not a resolved-type check against `package:equatable`. Any project-local class or mixin that happens to be named `Equatable`/`EquatableMixin` for unrelated reasons will silently skip this rule (false negative). The fixture at `example/lib/core/avoid_equals_and_hash_code_on_mutable_classes_fixture.dart` lines 77-79 deliberately declares such a stand-in to test the skip path, which is good, but it also documents the exact scenario that would misfire in a real (if unlikely) codebase collision. Consider a comment in the rule acknowledging this tradeoff explicitly (currently only implied by the DartDoc, not stated as a known limitation).
+- **Only direct `extends`/`with` is checked, not transitive inheritance.** A class extending an intermediate class that itself extends `Equatable` (`class A extends Equatable {} class B extends A { ... }`) is not recognized as Equatable-covered by `_extendsOrMixesInEquatable`, so `B` could get double-flagged by both this rule and (if `B` also has mutable fields) potentially miss the Equatable-specific rule's own inheritance handling — worth confirming the sibling rule has the same limitation for consistency, but not verified here.
+- **Abstract `==`/`hashCode` declarations (no body) still count as "hand-written".** `_findEqualsOperator`/`_findHashCodeGetter` (lines 153-174) match on operator/getter name alone, not on whether the member has a `FunctionBody` beyond an empty/abstract declaration (`bool operator ==(Object other);`). An abstract class merely declaring these signatures without implementing them, plus a mutable field, would still fire — arguably correct (contract still applies to concrete subclasses) but not tested either way.
+- **Conservative "any mutable field" trigger is a known, documented tradeoff** (proposal's "Alternatives Considered" and "False-positive risks" sections) — consistent with the sibling Equatable rule, not a defect, but will produce noise on classes with unrelated mutable cache/counter fields alongside a `==`/`hashCode` pair keyed only on immutable fields. No `// ignore:`-friendly narrowing exists for this case beyond suppressing the whole field.
+
+### Opportunities
+
+- **Test coverage gaps that are cheap to close:**
+  - No test for the inverse of the "only ==" case: a class overriding only `hashCode` without `==` (asymmetric — currently only "only ==, no hashCode" at test file lines 141-158 is covered).
+  - No test for `late final` fields (should be silent — `isFinal` returns true for `late final`, but this is never exercised).
+  - No test for multiple mixins where `EquatableMixin` is not first (`with Foo, EquatableMixin`) — the loop at lines 143-146 handles it correctly, but there's no regression test pinning that.
+  - No test replicating the fixture's `MutableUser` case (one final + one mutable field, mixed) at the unit-test level — only exercised via the fixture, not via `resolved_rule_harness`.
+  - No test for `implements Equatable` (as opposed to `extends`/`with`) — an unusual but legal way to satisfy an interface; currently would NOT be skipped (false negative, since `_extendsOrMixesInEquatable` never checks `implementsClause`). Minor, but worth a one-line test or an explicit "not handled" note.
+- **Message length/format:** the `LintCode` message (rule file lines 83-91) is well over 200 chars, starts with `[avoid_equals_and_hash_code_on_mutable_classes]`, and has a `correctionMessage` — meets all documented message requirements. No changes needed here.
+- **Code quality is solid:** every private helper is under 15 lines, each has a doc comment explaining intent (not just what), `SaropaLintRule` base class is used correctly with `impact`/`cost`/`ruleType`/`tags` all set, and `requiredPatterns` is used as a legitimate cheap pre-filter. No simplification opportunities found beyond the test/documentation gaps above.
+
+### Recommendations
+
+1. **(High)** Fix the stale test-file header comment (lines 2-8) claiming the rule isn't registered — it is, in all three places plus CHANGELOG. Leaving it will mislead the next person who touches this file.
+2. **(Medium)** Add a one-line acknowledgment (DartDoc or inline comment) that `_extendsOrMixesInEquatable` is a structural/name-based check, not a resolved-type check, so a project-local `Equatable`-named class/mixin unrelated to `package:equatable` will be skipped — matches existing fixture behavior, just needs to be stated as an explicit known limitation rather than left implicit.
+3. **(Low)** Add the handful of cheap regression tests listed under Opportunities (late final field, hashCode-only without ==, multi-mixin ordering, mixed final/mutable fields, `implements Equatable`) to close the coverage gaps without requiring any rule changes.
+4. **(Low)** Consider whether inherited mutable fields (from a non-Equatable superclass) should be in scope for a future iteration; if not, add one sentence to the proposal's "False-positive risks" section (which currently only lists false positives) noting this as an accepted false-negative boundary, for symmetry with how the Equatable-skip tradeoff is documented.
+
 ## Commits
