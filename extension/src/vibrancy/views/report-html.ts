@@ -193,6 +193,10 @@ export function buildReportHtml(options: ReportOptions): string {
         { key: 'Enter / Space', label: l10n('packageDashboard.shortcuts.toggleDetail') },
         { key: 'Esc', label: l10n('packageDashboard.shortcuts.escapeSearch') },
         { key: 'Alt + ←', label: l10n('packageDashboard.shortcuts.historyBack') },
+        // Phase 7: the tab bar's digit shortcut (packages-tabs.ts's SCRIPT keydown handler) had no
+        // discoverable entry in this overlay before this pass -- a user pressing '?' would never
+        // learn the tabs were even keyboard-reachable.
+        { key: '1-6', label: l10n('packageDashboard.shortcuts.jumpToTab') },
         { key: '?', label: l10n('packageDashboard.shortcuts.showOverlay') },
     ])}
     <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();${getPackagesTabsScript()}${getSettingsTabScript()}</script>

@@ -149,6 +149,19 @@ export function getPackagesTabsScript(): string {
     tabBtns.forEach(function(btn) {
         btn.addEventListener('click', function() { selectTab(btn.getAttribute('data-tab')); });
     });
+    /* Digit shortcuts 1-6 jump directly to a tab (Phase 7, UX_UI_GUIDELINES "every dashboard
+       tab reachable by 1-9" convention -- the Rules & Tiers dashboard already had this from
+       Phase 4; this tab bar did not). Ignored while focus is in a text input/select/textarea so
+       typing a digit into a Settings-tab field does not hijack the view. */
+    document.addEventListener('keydown', function(e) {
+        var tag = (document.activeElement && document.activeElement.tagName) || '';
+        if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') { return; }
+        var n = parseInt(e.key, 10);
+        if (!n || n < 1 || n > tabBtns.length) { return; }
+        var target = tabBtns[n - 1];
+        selectTab(target.getAttribute('data-tab'));
+        target.focus();
+    });
     /* Deep-link "Open" buttons: ask the host (report-webview.ts) to run the
        real command that opens the existing standalone panel for that tab. */
     Array.prototype.slice.call(document.querySelectorAll('[data-open-command]')).forEach(function(btn) {

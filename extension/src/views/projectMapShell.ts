@@ -189,6 +189,17 @@ function pmShellScript(): string {
   document.getElementById('pmTabBtnMap').addEventListener('click', function(){ selectTab('map'); });
   document.getElementById('pmTabBtnReports').addEventListener('click', function(){ selectTab('reports'); });
 
+  // Digit shortcuts 1-2 jump directly to a tab (Phase 7, UX_UI_GUIDELINES "every dashboard tab
+  // reachable by 1-9" convention -- matches the pattern already shipped on Rules & Tiers (Phase 4)
+  // and Packages (Phase 7). Ignored while focus is in the gate-editor textarea or an input so
+  // typing does not hijack the view.
+  document.addEventListener('keydown', function(e){
+    var tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') { return; }
+    if (e.key === '1') { selectTab('map'); document.getElementById('pmTabBtnMap').focus(); }
+    else if (e.key === '2') { selectTab('reports'); document.getElementById('pmTabBtnReports').focus(); }
+  });
+
   // --- Scanning-state elapsed timer + cancel/restart + activity log ---
   var scanStarted = Date.now();
   var scanTimer = setInterval(function(){
