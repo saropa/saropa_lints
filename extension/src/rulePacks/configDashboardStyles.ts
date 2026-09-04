@@ -36,7 +36,104 @@ export function getConfigDashboardStyles(): string {
     diagnosticsStyles(),
     sharedAtomStyles(),
     gaugeAndRulesCellStyles(),
+    tabStyles(),
+    configFileStyles(),
+    settingsGridStyles(),
   ].join('\n');
+}
+
+/**
+ * Phase 4 tab bar + tab panel chrome. Deliberately local to this stylesheet rather than added to
+ * `dashboardChromeStyles.ts`: no other dashboard has adopted a tabbed layout yet (Phase 7's
+ * design-system sweep is the place to promote this to shared chrome if a second dashboard needs
+ * it — see PLAN_extension_ui_redesign.md Phase 7 checklist item "migrate or justify inline").
+ */
+function tabStyles(): string {
+  return `
+.rt-tabbar {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--vscode-panel-border, var(--border));
+  margin: 8px 0 12px;
+  overflow-x: auto;
+}
+.rt-tab-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--vscode-foreground);
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.95em;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rt-tab-btn:hover { background: var(--vscode-list-hoverBackground); }
+.rt-tab-btn:focus-visible { outline: 2px solid var(--vscode-focusBorder); outline-offset: -2px; }
+.rt-tab-btn[aria-selected="true"] {
+  border-bottom-color: var(--vscode-textLink-foreground);
+  color: var(--vscode-textLink-foreground);
+  font-weight: 600;
+}
+.rt-tab-kbd {
+  font-size: 0.75em;
+  color: var(--vscode-descriptionForeground);
+  border: 1px solid var(--vscode-panel-border, var(--border));
+  border-radius: 3px;
+  padding: 0 4px;
+  line-height: 1.4;
+}
+.rt-tab-panel { display: block; }
+.rt-tab-panel[hidden] { display: none; }
+`;
+}
+
+/** Config file tab: field rows, add-row forms, platform checkbox grid, optimizer embed frame. */
+function configFileStyles(): string {
+  return `
+.cf-field-row { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0; }
+.cf-field { display: flex; flex-direction: column; gap: 4px; font-size: 0.9em; }
+.cf-field input, .cf-field select {
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, var(--border));
+  border-radius: 3px;
+  padding: 4px 6px;
+  min-width: 160px;
+}
+.cf-platform-grid { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 8px 0; }
+.cf-platform-row { display: flex; align-items: center; gap: 6px; font-size: 0.9em; }
+.cf-add-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; align-items: center; }
+.cf-add-row input, .cf-add-row select {
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, var(--border));
+  border-radius: 3px;
+  padding: 4px 6px;
+}
+.optimizer-embed { border-top: 1px solid var(--vscode-panel-border, var(--border)); padding-top: 12px; margin-top: 12px; }
+.optimizer-embed-body .dash-hero { padding: 0 0 8px; }
+`;
+}
+
+/** Automation / Extension tabs: the generic settings grid table. */
+function settingsGridStyles(): string {
+  return `
+.settings-table td { padding: 6px 8px; vertical-align: middle; }
+.settings-table .settings-label { color: var(--vscode-foreground); cursor: help; max-width: 420px; }
+.settings-table .settings-control { text-align: right; }
+.cf-number-input, .cf-array-input {
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, var(--border));
+  border-radius: 3px;
+  padding: 4px 6px;
+}
+.cf-array-input { min-width: 220px; }
+`;
 }
 
 /**

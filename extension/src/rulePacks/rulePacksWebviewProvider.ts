@@ -44,9 +44,81 @@ import type { MemoryPressureState } from '../systemHealth/memoryPressureWatcher'
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePackYaml';
 import { computeConfigSuggestions } from '../config/configSuggestions';
 import { fetchRuleCounts, type RuleCountSummary } from '../views/ruleCountCliRunner';
+import type { AnalysisOptimizerWebviewProvider } from '../analysisOptimizer/analysisOptimizerWebviewProvider';
+import {
+  readScalarKey,
+  writeScalarKey,
+  readPlatforms,
+  writePlatforms,
+  readSeverities,
+  writeSeverityEntry,
+  removeSeverityEntry,
+  readBannedUsage,
+  writeBannedUsage,
+  readDiagnosticThresholds,
+  writeDiagnosticThresholds,
+  OUTPUT_MODES,
+  CUSTOM_YAML_TIERS,
+  CUSTOM_YAML_TOP_LEVEL_KEYS,
+  type SeverityLevel,
+  type BannedUsageEntry,
+  type DiagnosticThreshold,
+  type CustomYamlTopLevelKey,
+} from './customConfigYaml';
+import { readBaselineSummary, baselineFilePath } from './baselineReader';
+import { buildSettingsCatalog, findSettingEntry, flatSettingKey, type SettingCatalogEntry } from './settingsCatalog';
 
 const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
 const TIERS = ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic'] as const;
+
+/**
+ * The 7 tabs the Config Dashboard renders (Phase 4, PLAN_extension_ui_redesign.md §2.2 Rules &
+ * Tiers row). Order here fixes both the tab bar's left-to-right order and each tab's `1`-`7`
+ * keyboard shortcut (UX_UI_GUIDELINES keyboard-shortcuts convention: tabs reachable by digit).
+ */
+const TAB_IDS = ['tier', 'packs', 'overrides', 'sdk', 'configFile', 'automation', 'extension'] as const;
+type TabId = (typeof TAB_IDS)[number];
+const DEFAULT_TAB: TabId = 'tier';
+
+/** Type guard validating an untrusted postMessage `tab` string against {@link TAB_IDS}. */
+function isTabId(value: string): value is TabId {
+  return (TAB_IDS as readonly string[]).includes(value);
+}
+
+/**
+ * The Config file tab's card ids. Exported so
+ * `extension/src/test/rulePacks/configFileCardCoverage.test.ts` can assert every
+ * {@link CUSTOM_YAML_TOP_LEVEL_KEYS} entry maps (via {@link CONFIG_FILE_KEY_TO_CARD}) to one of
+ * these — the guard against a 9th custom-yaml key shipping with no UI (Phase 4 design requirement,
+ * PLAN_extension_ui_redesign.md §1 principle 4).
+ */
+export const CONFIG_FILE_CARD_IDS = [
+  'analysisSettings',
+  'tierCap',
+  'platforms',
+  'severities',
+  'bannedUsage',
+  'diagnosticStatistics',
+] as const;
+export type ConfigFileCardId = (typeof CONFIG_FILE_CARD_IDS)[number];
+
+/**
+ * Maps each of the 8 `analysis_options_custom.yaml` top-level keys to the Config file tab card
+ * that renders its control. Two keys share a card where they are naturally one concern
+ * (`max_issues`+`output` are both "analysis settings"; `saropa_tier`+`runtime_tier` are both
+ * "tier caps") — the coverage test checks every KEY maps somewhere, not a strict 1:1 key:card
+ * ratio, since that pairing is a deliberate UI grouping decision, not an oversight.
+ */
+export const CONFIG_FILE_KEY_TO_CARD: Record<CustomYamlTopLevelKey, ConfigFileCardId> = {
+  max_issues: 'analysisSettings',
+  output: 'analysisSettings',
+  saropa_tier: 'tierCap',
+  runtime_tier: 'tierCap',
+  platforms: 'platforms',
+  severities: 'severities',
+  banned_usage: 'bannedUsage',
+  diagnostic_statistics: 'diagnosticStatistics',
+};
 
 // Pack id → version-group dependency, computed once from the static registry.
 // Packs in a multi-version group (dio+dio_5, riverpod+riverpod_2+riverpod_3, …)
@@ -340,6 +412,20 @@ export class RulePacksWebviewProvider {
   // Latest memory pressure snapshot pushed from MemoryPressureWatcher via
   // extension.ts — drives the "Shed rules" section and per-rule shed badges.
   private _memoryPressureState: MemoryPressureState | null = null;
+  // Set post-construction via {@link setAnalysisOptimizerProvider} once extension.ts has
+  // constructed both providers — injecting it at construction time would force an ordering
+  // dependency between the two activation call sites. Optional because the Config file tab's
+  // Analysis Optimizer subsection degrades to a "not available" note if never wired (defensive;
+  // extension.ts always wires it today).
+  private _analysisOptimizerProvider?: AnalysisOptimizerWebviewProvider;
+  // Tracks which tab the client last reported active (via `setActiveTab`) so a host-triggered
+  // refresh (config file watcher, memory pressure update, locale change) re-renders with the
+  // SAME tab open instead of resetting to the Tier tab every time — satisfies Phase 4's "wire the
+  // config file watcher to re-render whichever tab is active" without needing the host to track
+  // DOM state itself; the client script is still the source of truth for the CSS visibility toggle
+  // (see `SCRIPT_TABS` in configDashboardScript.ts), this only decides which tab's data-heavy
+  // subsections (e.g. re-reading the baseline file) get rebuilt into the fresh HTML string.
+  private _activeTab: TabId = DEFAULT_TAB;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -347,6 +433,15 @@ export class RulePacksWebviewProvider {
   setMemoryPressureState(state: MemoryPressureState | null): void {
     this._memoryPressureState = state;
     this.refresh();
+  }
+
+  /**
+   * Wires the Analysis Optimizer provider so the Config file tab can embed its live body HTML
+   * and forward its button clicks (Phase 4 "Analysis Optimizer moves in as a tab"). Called once
+   * from `extension.ts` right after both providers are constructed.
+   */
+  setAnalysisOptimizerProvider(provider: AnalysisOptimizerWebviewProvider): void {
+    this._analysisOptimizerProvider = provider;
   }
 
   /** Opens or focuses the Config Dashboard in the editor area and rebuilds HTML. */
@@ -385,6 +480,20 @@ export class RulePacksWebviewProvider {
         id?: string;
         tier?: string;
         rule?: string;
+        // --- Phase 4 additions: tab persistence, generic settings grid, Config file tab writers,
+        // and Analysis Optimizer message forwarding. See each handler for the shape it expects.
+        tab?: string;
+        key?: string;
+        value?: unknown;
+        scalarKey?: string;
+        platforms?: Record<string, boolean>;
+        level?: string;
+        identifier?: string;
+        reason?: string;
+        entries?: BannedUsageEntry[];
+        warn?: number | null;
+        fail?: number | null;
+        optimizer?: { type: string; pattern?: string; patterns?: string[] };
       }) => {
         if (msg.type === 'toggle' && msg.packId !== undefined && msg.enabled !== undefined) {
           void this._handleToggle(msg.packId, msg.enabled);
@@ -421,6 +530,48 @@ export class RulePacksWebviewProvider {
         }
         if (msg.type === 'refresh') {
           this.refresh();
+        }
+        // Client-side tab switches persist via vscode.setState, but the host still needs to
+        // know the active tab so a config-file-watcher-triggered refresh (see extension.ts) can
+        // re-render without the client needing to re-post its remembered tab on every refresh.
+        if (msg.type === 'setActiveTab' && typeof msg.tab === 'string' && isTabId(msg.tab)) {
+          this._activeTab = msg.tab;
+        }
+        // Generic `saropaLints.*` settings grid (Automation / Extension tabs). `key` is
+        // validated against the static catalog below — never trust a postMessage key directly
+        // into `workspace.getConfiguration().update()`.
+        if (msg.type === 'updateSetting' && typeof msg.key === 'string') {
+          void this._handleUpdateSetting(msg.key, msg.value);
+        }
+        // Config file tab: the 8 previously-UI-less analysis_options_custom.yaml keys.
+        if (msg.type === 'writeScalar' && typeof msg.scalarKey === 'string') {
+          void this._handleWriteScalar(msg.scalarKey, typeof msg.value === 'string' ? msg.value : undefined);
+        }
+        if (msg.type === 'writePlatforms' && msg.platforms) {
+          void this._handleWritePlatforms(msg.platforms);
+        }
+        if (msg.type === 'writeSeverity' && typeof msg.rule === 'string' && typeof msg.level === 'string') {
+          void this._handleWriteSeverity(msg.rule, msg.level);
+        }
+        if (msg.type === 'removeSeverity' && typeof msg.rule === 'string') {
+          void this._handleRemoveSeverity(msg.rule);
+        }
+        if (msg.type === 'addBannedUsage' && typeof msg.identifier === 'string') {
+          void this._handleAddBannedUsage(msg.identifier, msg.reason ?? '');
+        }
+        if (msg.type === 'removeBannedUsage' && typeof msg.identifier === 'string') {
+          void this._handleRemoveBannedUsage(msg.identifier);
+        }
+        if (msg.type === 'setDiagnosticThreshold' && typeof msg.rule === 'string') {
+          void this._handleSetDiagnosticThreshold(msg.rule, msg.warn ?? undefined, msg.fail ?? undefined);
+        }
+        if (msg.type === 'removeDiagnosticThreshold' && typeof msg.rule === 'string') {
+          void this._handleRemoveDiagnosticThreshold(msg.rule);
+        }
+        // Analysis Optimizer embed: forward the exact message shape its own standalone panel
+        // script would have sent, then re-render this tab from the updated embedded body.
+        if (msg.type === 'optimizerCommand' && msg.optimizer) {
+          void this._handleOptimizerCommand(msg.optimizer);
         }
       },
     );
@@ -465,11 +616,13 @@ export class RulePacksWebviewProvider {
   }
 
   /**
-   * Build the Lints Config webview body.
+   * Build the Rules & Tiers webview body.
    *
-   * Layout per UX_UI_GUIDELINES §14.7 (density-first ordering): header → KPIs → tier → toolbar →
-   * filter strip → primary table → conditional chart → diagnostics. Suppressions, target platforms,
-   * and docs are bottom-band reference content (§14.14 fix), not above-the-fold.
+   * Phase 4 (PLAN_extension_ui_redesign.md §2.2) turned this dashboard from one long scrolling
+   * page into 7 tabs: Tier · Rule packs · Overrides · SDK rollout · Config file · Automation ·
+   * Extension. The header + KPI strip stay OUTSIDE the tab body (persistent context — tier,
+   * coverage, and freshness matter no matter which tab is open); everything else moved into
+   * exactly one tab per the mapping documented on each `_build*Tab` method.
    */
   private _buildHtml(): string {
     const root = getProjectRoot();
@@ -489,31 +642,124 @@ export class RulePacksWebviewProvider {
     const body = [
       this._buildHeader(ctx),
       this._buildKpiStrip(ctx),
-      this._buildTierSection(ctx),
-      this._buildToolbar(ctx),
-      // Empty placeholder; the script populates it whenever filter state diverges from defaults.
-      // Per §8.5 / §14.10 the strip must exist in the DOM so it can render synchronously.
-      '<div class="chip-strip" id="filter-strip" hidden></div>',
-      // Flat "Matching rules" finder — populated by the script while searching so a
-      // rule is reachable by name without knowing which pack owns it. Empty/hidden
-      // until there is a query with rule matches.
-      '<div class="rule-finder" id="rule-finder" hidden></div>',
-      this._buildPackTable(ctx),
-      // Style & opinions: the third configuration zone. Off by default, opt-in
-      // per rule, collapsed so it never dominates the screen. Conflicting groups
-      // render as pick-one radios; the rest as independent toggles.
-      this._buildStylisticSection(ctx),
-      // Disabled-rules section sits directly under the pack table because both
-      // edit the same effective rule set: packs + tier set the baseline, and
-      // these overrides remove individual rules from it. Users coming from
-      // the sidebar's "X rules disabled by override" row land here.
-      this._buildDisabledRulesSection(ctx),
-      this._buildShedRulesSection(ctx),
-      this._buildChartSection(ctx),
-      this._buildDiagnostics(ctx),
+      this._buildTabBar(),
+      this._buildTierTab(ctx),
+      this._buildPacksTab(ctx),
+      this._buildOverridesTab(ctx),
+      this._buildSdkRolloutTab(ctx),
+      this._buildConfigFileTab(root),
+      this._buildAutomationTab(),
+      this._buildExtensionTab(ctx),
     ].join('\n');
 
     return this._wrapHtml(body, true);
+  }
+
+  /**
+   * Renders the tab bar as `<button role="tab">` elements — same real-control convention
+   * `buildTierControl` established for the tier segmented control, so keyboard users can Tab to
+   * the strip and arrow between tabs (wired in `configDashboardScript.ts` `SCRIPT_TABS`).
+   * `data-active-tab` on the wrapping element (set from {@link _activeTab}) is what a full HTML
+   * rebuild (e.g. the config-file-watcher-triggered refresh) uses to reopen on the same tab
+   * instead of resetting to Tier — the client script reads this attribute once on load and then
+   * owns visibility from there via its own click handlers.
+   */
+  private _buildTabBar(): string {
+    const labelKeys: Record<TabId, string> = {
+      tier: 'rulesTiers.tab.tier',
+      packs: 'rulesTiers.tab.packs',
+      overrides: 'rulesTiers.tab.overrides',
+      sdk: 'rulesTiers.tab.sdk',
+      configFile: 'rulesTiers.tab.configFile',
+      automation: 'rulesTiers.tab.automation',
+      extension: 'rulesTiers.tab.extension',
+    };
+    const buttons = TAB_IDS.map((id, index) => {
+      const active = id === this._activeTab;
+      return [
+        '<button type="button" class="rt-tab-btn"',
+        ' role="tab"',
+        ` id="rt-tab-${id}"`,
+        ` aria-controls="rt-panel-${id}"`,
+        ` aria-selected="${active ? 'true' : 'false'}"`,
+        ` tabindex="${active ? '0' : '-1'}"`,
+        ` data-tab="${id}">`,
+        // Digit shortcut hint (1-7) — matches UX_UI_GUIDELINES "every dashboard tab reachable by
+        // 1-9" convention already used elsewhere (Findings, Code Health).
+        `<span class="rt-tab-kbd">${index + 1}</span> ${escapeHtml(l10n(labelKeys[id]))}`,
+        '</button>',
+      ].join('');
+    }).join('');
+    return `<div class="rt-tabbar" role="tablist" aria-label="${escapeHtml(l10n('rulesTiers.tabBar.ariaLabel'))}" data-active-tab="${this._activeTab}">${buttons}</div>`;
+  }
+
+  /** Wraps one tab's content in the shared `role="tabpanel"` shell the client script shows/hides. */
+  private _tabPanel(id: TabId, contentHtml: string): string {
+    const hidden = id === this._activeTab ? '' : ' hidden';
+    return `<div class="rt-tab-panel" id="rt-panel-${id}" role="tabpanel" aria-labelledby="rt-tab-${id}"${hidden}>${contentHtml}</div>`;
+  }
+
+  /** Tier tab: the segmented tier control only — coverage/freshness context lives in the persistent header above the tabs. */
+  private _buildTierTab(ctx: DashboardContext): string {
+    return this._tabPanel('tier', this._buildTierSection(ctx));
+  }
+
+  /**
+   * Rule packs tab: toolbar (search/filter/enable-all), the detected/all pack tables, and the
+   * coverage chart. This is the dashboard's original primary content, unchanged in substance —
+   * only the SDK-specific bulk-enable overflow moved out to the new SDK rollout tab so this tab
+   * stays about "which packs are on", not "which migrations are pending".
+   */
+  private _buildPacksTab(ctx: DashboardContext): string {
+    const content = [
+      this._buildToolbar(ctx),
+      '<div class="chip-strip" id="filter-strip" hidden></div>',
+      '<div class="rule-finder" id="rule-finder" hidden></div>',
+      this._buildPackTable(ctx),
+      this._buildChartSection(ctx),
+    ].join('\n');
+    return this._tabPanel('packs', content);
+  }
+
+  /**
+   * Overrides tab: absorbs the Style & opinions (stylistic) section AND the standalone Lints
+   * Config dashboard's "Disabled rules" section (Phase 4 requirement #5) — both edit the same
+   * concept, "deviate a specific rule from what the tier/packs would otherwise set", so they
+   * belong together even though one is an opt-IN (stylistic) and the other an opt-OUT (disabled).
+   */
+  private _buildOverridesTab(ctx: DashboardContext): string {
+    const content = [this._buildStylisticSection(ctx), this._buildDisabledRulesSection(ctx), this._buildShedRulesSection(ctx)].join('\n');
+    return this._tabPanel('overrides', content);
+  }
+
+  /**
+   * SDK rollout tab: the SDK-migration-specific bulk-enable actions (previously an overflow menu
+   * buried in the packs toolbar) plus a table scoped to ONLY the SDK migration packs — pulling
+   * these out of the general pack table means a user planning a Dart/Flutter version bump sees
+   * just the packs relevant to that decision, not all ~86 rows.
+   */
+  private _buildSdkRolloutTab(ctx: DashboardContext): string {
+    const sdkRows = ctx.packRows.filter((r) => isSdkPackId(r.id)).sort((a, b) => a.label.localeCompare(b.label));
+    const total = ctx.detectedSdkPacks.length;
+    const breaking = ctx.detectedBreakingSdkCount;
+    const deprecation = ctx.detectedDeprecationSdkCount;
+    const summary = `<p class="hint">${escapeHtml(l10n('rulesTiers.sdk.summary', { total: String(total), breaking: String(breaking), deprecation: String(deprecation) }))}</p>`;
+    const actions = total === 0
+      ? `<p class="hint">${escapeHtml(l10n('rulesTiers.sdk.noneApplicable'))}</p>`
+      : `<div class="toolbar-row" style="gap:6px;">
+    <button class="btn tier-1" data-command="enableDetectedSdkPacks" title="${escapeHtml(l10n('rulesTiers.sdk.enableAllTitle'))}">${escapeHtml(l10n('rulesTiers.sdk.enableAll', { count: String(total) }))}</button>
+    <button class="btn" data-command="enableDetectedBreakingSdkPacks"${breaking === 0 ? ' disabled' : ''} title="${escapeHtml(l10n('rulesTiers.sdk.enableBreakingTitle'))}">${escapeHtml(l10n('rulesTiers.sdk.enableBreaking', { count: String(breaking) }))}</button>
+    <button class="btn" data-command="enableDetectedDeprecationSdkPacks"${deprecation === 0 ? ' disabled' : ''} title="${escapeHtml(l10n('rulesTiers.sdk.enableDeprecationTitle'))}">${escapeHtml(l10n('rulesTiers.sdk.enableDeprecation', { count: String(deprecation) }))}</button>
+  </div>`;
+    const rows = sdkRows.map((row) => this._buildPackRow(row, false, ctx.shedRuleNames)).join('\n');
+    const empty = `<tr><td colspan="6" class="hint">${escapeHtml(l10n('rulesTiers.sdk.noPacksInCatalogue'))}</td></tr>`;
+    const table = `<div class="dash-table-wrap">
+    <table class="dash-table packs" id="sdk-packs-table">
+      ${this._packTableHead()}
+      <tbody class="packs-tbody">${sdkRows.length > 0 ? rows : empty}</tbody>
+    </table>
+  </div>`;
+    return this._tabPanel('sdk', `<section aria-label="${escapeHtml(l10n('rulesTiers.tab.sdk'))}"><h2>${escapeHtml(l10n('rulesTiers.tab.sdk'))}</h2>${summary}${actions}${table}</section>`);
   }
 
   /** Resolve the pubspec, tier, violations snapshot, and pack rows in one pass. */
@@ -1403,6 +1649,308 @@ ${detailRow}`;
   </div>`;
   }
 
+  // ---------------------------------------------------------------------------------------------
+  // Config file tab — the 8 previously-UI-less `analysis_options_custom.yaml` top-level keys
+  // (Phase 4 requirement #1) plus Baseline (create/view) and the embedded Analysis Optimizer
+  // (requirement #4). Every control here round-trips through `customConfigYaml.ts`, which edits
+  // only the byte range of the one key it owns — see that module's header comment for why a
+  // generic YAML library was rejected in favor of this scoped-block approach.
+  // ---------------------------------------------------------------------------------------------
+
+  private _buildConfigFileTab(root: string): string {
+    // Render strictly from CONFIG_FILE_CARD_IDS (not a hand-ordered literal array of builder
+    // calls) so the coverage test's assumption — every CUSTOM_YAML_TOP_LEVEL_KEYS entry maps to
+    // an id in this list — is checked against the SAME list that actually renders, not a second
+    // copy that could silently drift from it.
+    const builders = this._configFileCardBuilders();
+    const yamlKeyCards = CONFIG_FILE_CARD_IDS.map((id) => builders[id](root));
+    const content = [...yamlKeyCards, this._buildBaselineCard(root), this._buildOptimizerCard()].join('\n');
+    return this._tabPanel('configFile', content);
+  }
+
+  /** Maps each {@link CONFIG_FILE_CARD_IDS} entry to the instance method that renders it, bound to `this` — see {@link _buildConfigFileTab}'s doc comment for why this indirection exists (coverage-test guarantee) instead of a literal call list. */
+  private _configFileCardBuilders(): Record<ConfigFileCardId, (root: string) => string> {
+    return {
+      analysisSettings: (root) => this._buildAnalysisSettingsCard(root),
+      tierCap: (root) => this._buildTierCapCard(root),
+      platforms: (root) => this._buildPlatformsCard(root),
+      severities: (root) => this._buildSeveritiesCard(root),
+      bannedUsage: (root) => this._buildBannedUsageCard(root),
+      diagnosticStatistics: (root) => this._buildDiagnosticStatisticsCard(root),
+    };
+  }
+
+  /** `max_issues:` and `output:` — the two ProgressTracker scalars. */
+  private _buildAnalysisSettingsCard(root: string): string {
+    const maxIssues = readScalarKey(root, 'max_issues') ?? '500';
+    const output = readScalarKey(root, 'output') ?? 'terminal';
+    const outputOptions = OUTPUT_MODES.map(
+      (mode) => `<option value="${mode}"${mode === output ? ' selected' : ''}>${escapeHtml(mode)}</option>`,
+    ).join('');
+    return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.analysisSettings.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.analysisSettings.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.analysisSettings.hint'))}</p>
+  <div class="cf-field-row">
+    <label class="cf-field">
+      <span>${escapeHtml(l10n('rulesTiers.configFile.maxIssues.label'))}</span>
+      <input type="number" min="0" step="1" id="cf-max-issues" data-scalar-key="max_issues" value="${escapeHtml(maxIssues)}" title="${escapeHtml(l10n('rulesTiers.configFile.maxIssues.desc'))}" />
+    </label>
+    <label class="cf-field">
+      <span>${escapeHtml(l10n('rulesTiers.configFile.output.label'))}</span>
+      <select id="cf-output" data-scalar-key="output" title="${escapeHtml(l10n('rulesTiers.configFile.output.desc'))}">${outputOptions}</select>
+    </label>
+  </div>
+</section>`;
+  }
+
+  /** `saropa_tier:` and `runtime_tier:` — the custom.yaml-level tier caps (distinct from the `saropaLints.tier` setting the Tier tab's segmented control writes). */
+  private _buildTierCapCard(root: string): string {
+    const saropaTier = readScalarKey(root, 'saropa_tier');
+    const runtimeTier = readScalarKey(root, 'runtime_tier');
+    const buildSelect = (id: string, scalarKey: string, current: string | undefined): string => {
+      const noneSelected = current === undefined ? ' selected' : '';
+      const options = [
+        `<option value=""${noneSelected}>${escapeHtml(l10n('rulesTiers.configFile.tierCap.none'))}</option>`,
+        ...CUSTOM_YAML_TIERS.map(
+          (t) => `<option value="${t}"${t === current ? ' selected' : ''}>${escapeHtml(t)}</option>`,
+        ),
+      ].join('');
+      return `<select id="${id}" data-scalar-key="${scalarKey}">${options}</select>`;
+    };
+    return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.tierCap.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.tierCap.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.tierCap.hint'))}</p>
+  <div class="cf-field-row">
+    <label class="cf-field"><span>${escapeHtml(l10n('rulesTiers.configFile.saropaTier.label'))}</span>${buildSelect('cf-saropa-tier', 'saropa_tier', saropaTier)}</label>
+    <label class="cf-field"><span>${escapeHtml(l10n('rulesTiers.configFile.runtimeTier.label'))}</span>${buildSelect('cf-runtime-tier', 'runtime_tier', runtimeTier)}</label>
+  </div>
+</section>`;
+  }
+
+  /** `platforms:` — one checkbox per Flutter embedder platform. Always saves the full map (see `writePlatforms`'s doc comment for why a partial update is never needed here). */
+  private _buildPlatformsCard(root: string): string {
+    const platforms = readPlatforms(root);
+    const rows = FLUTTER_EMBEDDER_PLATFORMS.map((p) => {
+      const on = platforms.get(p) ?? false;
+      return `<label class="cf-platform-row"><input type="checkbox" data-platform="${escapeHtml(p)}" ${on ? 'checked' : ''} /> ${escapeHtml(p)}</label>`;
+    }).join('');
+    return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.platforms.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.platforms.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.platforms.hint'))}</p>
+  <div class="cf-platform-grid">${rows}</div>
+</section>`;
+  }
+
+  /** `severities:` — a table of rule → override level, add/remove per row (mirrors the Disabled rules table's row shape). */
+  private _buildSeveritiesCard(root: string): string {
+    const entries = readSeverities(root);
+    const rows = entries
+      .map((e) => {
+        const ruleEsc = escapeHtml(e.rule);
+        const levelOptions = ['ERROR', 'WARNING', 'INFO', 'false']
+          .map((lvl) => `<option value="${lvl}"${lvl === e.level ? ' selected' : ''}>${escapeHtml(lvl)}</option>`)
+          .join('');
+        return `<tr data-severity-row="${ruleEsc}">
+    <td><code>${ruleEsc}</code></td>
+    <td><select class="cf-severity-level" data-rule="${ruleEsc}">${levelOptions}</select></td>
+    <td><button type="button" class="btn tier-3" data-remove-severity="${ruleEsc}">${escapeHtml(l10n('rulesTiers.common.remove'))}</button></td>
+  </tr>`;
+      })
+      .join('\n');
+    const empty = `<tr><td colspan="3" class="hint">${escapeHtml(l10n('rulesTiers.configFile.severities.empty'))}</td></tr>`;
+    return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.severities.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.severities.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.severities.hint'))}</p>
+  <table class="dash-table"><thead><tr><th>${escapeHtml(l10n('rulesTiers.common.rule'))}</th><th>${escapeHtml(l10n('rulesTiers.configFile.severities.level'))}</th><th></th></tr></thead>
+    <tbody id="cf-severities-tbody">${entries.length > 0 ? rows : empty}</tbody>
+  </table>
+  <div class="cf-add-row">
+    <input type="text" id="cf-severity-rule" placeholder="${escapeHtml(l10n('rulesTiers.configFile.severities.rulePlaceholder'))}" />
+    <select id="cf-severity-new-level"><option value="ERROR">ERROR</option><option value="WARNING">WARNING</option><option value="INFO">INFO</option><option value="false">false</option></select>
+    <button type="button" class="btn tier-2" id="cf-severity-add">${escapeHtml(l10n('rulesTiers.common.add'))}</button>
+  </div>
+</section>`;
+  }
+
+  /** `banned_usage.entries:` — identifier + reason pairs (e.g. banning `print` in favor of a logger). */
+  private _buildBannedUsageCard(root: string): string {
+    const entries = readBannedUsage(root);
+    const rows = entries
+      .map(
+        (e) => `<tr data-banned-row="${escapeHtml(e.identifier)}">
+    <td><code>${escapeHtml(e.identifier)}</code></td>
+    <td>${escapeHtml(e.reason)}</td>
+    <td><button type="button" class="btn tier-3" data-remove-banned="${escapeHtml(e.identifier)}">${escapeHtml(l10n('rulesTiers.common.remove'))}</button></td>
+  </tr>`,
+      )
+      .join('\n');
+    const empty = `<tr><td colspan="3" class="hint">${escapeHtml(l10n('rulesTiers.configFile.bannedUsage.empty'))}</td></tr>`;
+    return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.bannedUsage.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.bannedUsage.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.bannedUsage.hint'))}</p>
+  <table class="dash-table"><thead><tr><th>${escapeHtml(l10n('rulesTiers.configFile.bannedUsage.identifier'))}</th><th>${escapeHtml(l10n('rulesTiers.configFile.bannedUsage.reason'))}</th><th></th></tr></thead>
+    <tbody id="cf-banned-tbody">${entries.length > 0 ? rows : empty}</tbody>
+  </table>
+  <div class="cf-add-row">
+    <input type="text" id="cf-banned-identifier" placeholder="${escapeHtml(l10n('rulesTiers.configFile.bannedUsage.identifierPlaceholder'))}" />
+    <input type="text" id="cf-banned-reason" placeholder="${escapeHtml(l10n('rulesTiers.configFile.bannedUsage.reasonPlaceholder'))}" />
+    <button type="button" class="btn tier-2" id="cf-banned-add">${escapeHtml(l10n('rulesTiers.common.add'))}</button>
+  </div>
+</section>`;
+  }
+
+  /** `diagnostic_statistics.thresholds:` — per-rule warn/fail counts (CI-style budget gates). */
+  private _buildDiagnosticStatisticsCard(root: string): string {
+    const thresholds = readDiagnosticThresholds(root);
+    const rows = thresholds
+      .map((t) => {
+        const ruleEsc = escapeHtml(t.rule);
+        return `<tr data-threshold-row="${ruleEsc}">
+    <td><code>${ruleEsc}</code></td>
+    <td>${t.warn ?? ''}</td>
+    <td>${t.fail ?? ''}</td>
+    <td><button type="button" class="btn tier-3" data-remove-threshold="${ruleEsc}">${escapeHtml(l10n('rulesTiers.common.remove'))}</button></td>
+  </tr>`;
+      })
+      .join('\n');
+    const empty = `<tr><td colspan="4" class="hint">${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.empty'))}</td></tr>`;
+    return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.hint'))}</p>
+  <table class="dash-table"><thead><tr><th>${escapeHtml(l10n('rulesTiers.common.rule'))}</th><th>${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.warn'))}</th><th>${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.fail'))}</th><th></th></tr></thead>
+    <tbody id="cf-thresholds-tbody">${thresholds.length > 0 ? rows : empty}</tbody>
+  </table>
+  <div class="cf-add-row">
+    <input type="text" id="cf-threshold-rule" placeholder="${escapeHtml(l10n('rulesTiers.configFile.severities.rulePlaceholder'))}" />
+    <input type="number" min="0" id="cf-threshold-warn" placeholder="${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.warn'))}" />
+    <input type="number" min="0" id="cf-threshold-fail" placeholder="${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.fail'))}" />
+    <button type="button" class="btn tier-2" id="cf-threshold-add">${escapeHtml(l10n('rulesTiers.common.add'))}</button>
+  </div>
+</section>`;
+  }
+
+  /**
+   * Baseline: create/refresh (delegates to the existing `saropaLints.createBaseline` command,
+   * which both writes `saropa_baseline.json` AND the config block that activates it — see
+   * `baselineReader.ts`'s header comment for why there is no separate "apply" step) and a summary
+   * table of the current file's contents.
+   */
+  private _buildBaselineCard(root: string): string {
+    const summary = readBaselineSummary(root);
+    const actions = `<div class="toolbar-row" style="gap:6px;">
+    <button class="btn tier-1" data-command="createBaseline" title="${escapeHtml(l10n('rulesTiers.configFile.baseline.createTitle'))}">${escapeHtml(l10n('rulesTiers.configFile.baseline.createButton'))}</button>
+    ${summary ? `<button class="btn" data-command="openBaselineFile" title="${escapeHtml(l10n('rulesTiers.configFile.baseline.openTitle'))}">${escapeHtml(l10n('rulesTiers.configFile.baseline.openButton'))}</button>` : ''}
+  </div>`;
+    if (!summary) {
+      return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.baseline.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.baseline.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.baseline.emptyHint'))}</p>
+  ${actions}
+</section>`;
+    }
+    const generated = summary.generated ? formatRelativeFreshness(summary.generated) : l10n('rulesTiers.configFile.baseline.unknownDate');
+    const ruleRows = summary.topRules
+      .map((r) => `<tr><td><code>${escapeHtml(r.rule)}</code></td><td class="num">${r.count}</td></tr>`)
+      .join('');
+    return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.baseline.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.baseline.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.baseline.hint'))}</p>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.baseline.summary', {
+    files: String(summary.fileCount),
+    violations: String(summary.totalViolations),
+    generated,
+  }))}</p>
+  ${actions}
+  <table class="dash-table"><thead><tr><th>${escapeHtml(l10n('rulesTiers.common.rule'))}</th><th>${escapeHtml(l10n('rulesTiers.configFile.baseline.count'))}</th></tr></thead>
+    <tbody>${ruleRows}</tbody>
+  </table>
+</section>`;
+  }
+
+  /** Embeds the Analysis Optimizer's live body (Phase 4 requirement #4 — its standalone command remains a working deep link; this is the SAME render logic, not a copy). */
+  private _buildOptimizerCard(): string {
+    const inner = this._analysisOptimizerProvider
+      ? this._analysisOptimizerProvider.getEmbeddedBodyHtml()
+      : `<p class="hint">${escapeHtml(l10n('rulesTiers.configFile.optimizer.unavailable'))}</p>`;
+    return `<section class="section optimizer-embed" aria-label="${escapeHtml(l10n('analysisOptimizer.title'))}">
+  <h3>${escapeHtml(l10n('analysisOptimizer.title'))} <button type="button" class="btn tier-3" data-command="openOptimizerPanel" title="${escapeHtml(l10n('rulesTiers.configFile.optimizer.openStandaloneTitle'))}">${escapeHtml(l10n('rulesTiers.configFile.optimizer.openStandalone'))}</button></h3>
+  <div class="optimizer-embed-body">${inner}</div>
+</section>`;
+  }
+
+  // ---------------------------------------------------------------------------------------------
+  // Automation + Extension tabs — the generic `saropaLints.*` settings grid (Phase 4 requirement
+  // #2). Schema-driven from `buildSettingsCatalog()` (reads the manifest directly — see
+  // `settingsCatalog.ts`'s header comment) so a setting added to `package.json` appears here with
+  // ZERO changes to this file; only the manifest-key EXCLUSION list is hand-maintained.
+  // ---------------------------------------------------------------------------------------------
+
+  private _buildAutomationTab(): string {
+    const rows = buildSettingsCatalog().filter((e) => e.tab === 'automation').map((e) => this._buildSettingRow(e)).join('\n');
+    const content = `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.tab.automation'))}">
+  <p class="hint">${escapeHtml(l10n('rulesTiers.automation.hint'))}</p>
+  <table class="dash-table settings-table"><tbody>${rows}</tbody></table>
+</section>`;
+    return this._tabPanel('automation', content);
+  }
+
+  private _buildExtensionTab(ctx?: DashboardContext): string {
+    const rows = buildSettingsCatalog().filter((e) => e.tab === 'extension').map((e) => this._buildSettingRow(e)).join('\n');
+    const parts = [
+      `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.tab.extension'))}">
+  <p class="hint">${escapeHtml(l10n('rulesTiers.extension.hint'))}</p>
+  <table class="dash-table settings-table"><tbody>${rows}</tbody></table>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.extension.linkNote'))}</p>
+</section>`,
+    ];
+    // The pubspec-detected platform reference table + suppressions snapshot + doc links used to
+    // sit in a catch-all "Diagnostics" band at the bottom of the single-page dashboard; the
+    // Extension tab is their new home as general reference content about this installation.
+    if (ctx) parts.push(this._buildDiagnostics(ctx));
+    return this._tabPanel('extension', parts.join('\n'));
+  }
+
+  /**
+   * One settings-grid row for a single catalog entry. Reads the CURRENT value from VS Code
+   * configuration on every render, so the grid never drifts from a change made elsewhere
+   * (Settings UI, settings.json, another dashboard). Label and description come straight from
+   * the manifest entry (see `settingsCatalog.ts`) rather than `l10n()` — see that module's header
+   * comment for why: they are derived from `package.json`/`package.nls.json`, which is already
+   * the single authored copy of that text.
+   */
+  private _buildSettingRow(entry: SettingCatalogEntry): string {
+    const cfg = vscode.workspace.getConfiguration('saropaLints');
+    const flat = flatSettingKey(entry.key);
+    const label = escapeHtml(entry.label);
+    const desc = escapeHtml(entry.description);
+    let control: string;
+    if (entry.kind === 'boolean') {
+      const value = cfg.get<boolean>(entry.key) ?? false;
+      control = `<label class="switch"><input type="checkbox" data-setting-key="${escapeHtml(entry.key)}" ${value ? 'checked' : ''} aria-label="${label}" /><span class="slider"></span></label>`;
+    } else if (entry.kind === 'number') {
+      const value = cfg.get<number>(entry.key) ?? 0;
+      control = `<input type="number" data-setting-key="${escapeHtml(entry.key)}" value="${value}" class="cf-number-input" />`;
+    } else if (entry.kind === 'select') {
+      const value = cfg.get<string>(entry.key) ?? '';
+      const options = (entry.options ?? [])
+        .map((o) => `<option value="${escapeHtml(o)}"${o === value ? ' selected' : ''}>${escapeHtml(o)}</option>`)
+        .join('');
+      control = `<select data-setting-key="${escapeHtml(entry.key)}">${options}</select>`;
+    } else if (entry.kind === 'stringArray') {
+      // Rendered as a comma-separated text field — simplest control that round-trips an array
+      // setting without a bespoke multi-value widget.
+      const value = (cfg.get<string[]>(entry.key) ?? []).join(', ');
+      control = `<input type="text" data-setting-key="${escapeHtml(entry.key)}" data-setting-array="1" value="${escapeHtml(value)}" class="cf-array-input" />`;
+    } else {
+      // 'text': a free-form string setting with no enum — none of today's in-scope settings hit
+      // this branch, but a future one (e.g. a new free-text preference) renders correctly without
+      // needing this file touched, per the schema-driven design.
+      const value = cfg.get<string>(entry.key) ?? '';
+      control = `<input type="text" data-setting-key="${escapeHtml(entry.key)}" value="${escapeHtml(value)}" class="cf-array-input" />`;
+    }
+    return `<tr id="setting-row-${escapeHtml(flat)}"><td class="settings-label" title="${desc}">${label}</td><td class="settings-control">${control}</td></tr>`;
+  }
+
   private _wrapHtml(body: string, scripts: boolean): string {
     const nonce = createWebviewCspNonce();
     // 'unsafe-inline' on style-src: hero coverage gauge sets dynamic CSS vars
@@ -1530,6 +2078,143 @@ ${detailRow}`;
     this.refresh();
   }
 
+  /**
+   * Writes one `saropaLints.*` setting from the Automation/Extension tabs' generic grid. `key` is
+   * validated against the LIVE manifest-derived catalog (not a cached list) before the write —
+   * `findSettingEntry` rebuilds the catalog on every call (see `settingsCatalog.ts`), so a key
+   * that has been removed from the manifest (or was never a real setting) is rejected even if a
+   * stale webview somehow still has it in its DOM.
+   *
+   * `ConfigurationTarget.Workspace`: matches `_handleSetTier`'s choice elsewhere in this file — a
+   * lint configuration preference is a project decision, not a personal one, so it belongs in
+   * `.vscode/settings.json` (committed) rather than the user's global settings.
+   */
+  private async _handleUpdateSetting(key: string, value: unknown): Promise<void> {
+    const entry = findSettingEntry(key);
+    if (!entry) return;
+    let coerced: unknown = value;
+    if (entry.kind === 'stringArray' && typeof value === 'string') {
+      // The grid posts the comma-separated text field's raw string; split/trim/drop-empty here so
+      // "lib, bin,  test" and "lib,bin,test" both round-trip to the same array.
+      coerced = value
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    } else if (entry.kind === 'number' && typeof value === 'string') {
+      const n = Number(value);
+      if (Number.isNaN(n)) return;
+      coerced = n;
+    }
+    await vscode.workspace.getConfiguration('saropaLints').update(key, coerced, vscode.ConfigurationTarget.Workspace);
+    this.refresh();
+  }
+
+  /** Config file tab: `max_issues` / `output` / `saropa_tier` / `runtime_tier` scalars. `scalarKey` is checked against the fixed key set the UI can post — it is never taken from arbitrary postMessage text. */
+  private async _handleWriteScalar(scalarKey: string, value: string | undefined): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    const allowed = new Set(['max_issues', 'output', 'saropa_tier', 'runtime_tier']);
+    if (!allowed.has(scalarKey)) return;
+    // An empty string from a "None" select option means "remove the key", matching the tier-cap
+    // selects' `<option value="">` sentinel built in `_buildTierCapCard`.
+    writeScalarKey(root, scalarKey, value === '' ? undefined : value);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /** Config file tab: rewrites the whole `platforms:` map from the checkbox grid's current state. */
+  private async _handleWritePlatforms(platforms: Record<string, boolean>): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    // Only accept known platform names — postMessage is untrusted and this writes a YAML block.
+    const known = new Set<string>(FLUTTER_EMBEDDER_PLATFORMS);
+    const map = new Map<string, boolean>();
+    for (const [name, on] of Object.entries(platforms)) {
+      if (known.has(name)) map.set(name, Boolean(on));
+    }
+    writePlatforms(root, map);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /** Config file tab: sets one `severities:` override. `level` is validated against the fixed enum before reaching the yaml writer. */
+  private async _handleWriteSeverity(rule: string, level: string): Promise<void> {
+    const root = getProjectRoot();
+    if (!root || !this._isValidRuleName(rule)) return;
+    if (level !== 'ERROR' && level !== 'WARNING' && level !== 'INFO' && level !== 'false') return;
+    writeSeverityEntry(root, rule, level as SeverityLevel);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /** Config file tab: removes one `severities:` override. */
+  private async _handleRemoveSeverity(rule: string): Promise<void> {
+    const root = getProjectRoot();
+    if (!root || !this._isValidRuleName(rule)) return;
+    removeSeverityEntry(root, rule);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /** Config file tab: appends one `banned_usage.entries` item. Identifier shape mirrors the Dart parser's expectation (`^\S+$`, matched loosely as "no whitespace") rather than the stricter lint-id pattern, since a banned identifier can be a class or member name, not only a rule name. */
+  private async _handleAddBannedUsage(identifier: string, reason: string): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    const trimmedId = identifier.trim();
+    if (trimmedId.length === 0 || /\s/.test(trimmedId)) return;
+    const current = readBannedUsage(root);
+    const next = [...current.filter((e) => e.identifier !== trimmedId), { identifier: trimmedId, reason: reason.trim() }];
+    writeBannedUsage(root, next);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /** Config file tab: removes one `banned_usage.entries` item by identifier. */
+  private async _handleRemoveBannedUsage(identifier: string): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    const current = readBannedUsage(root).filter((e) => e.identifier !== identifier);
+    writeBannedUsage(root, current);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /** Config file tab: sets one `diagnostic_statistics.thresholds` entry's warn/fail counts. */
+  private async _handleSetDiagnosticThreshold(rule: string, warn: number | undefined, fail: number | undefined): Promise<void> {
+    const root = getProjectRoot();
+    if (!root || !this._isValidRuleName(rule)) return;
+    const current = readDiagnosticThresholds(root).filter((t) => t.rule !== rule);
+    const entry: DiagnosticThreshold = { rule };
+    if (typeof warn === 'number' && Number.isFinite(warn)) entry.warn = warn;
+    if (typeof fail === 'number' && Number.isFinite(fail)) entry.fail = fail;
+    writeDiagnosticThresholds(root, [...current, entry]);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /** Config file tab: removes one `diagnostic_statistics.thresholds` entry. */
+  private async _handleRemoveDiagnosticThreshold(rule: string): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    const current = readDiagnosticThresholds(root).filter((t) => t.rule !== rule);
+    writeDiagnosticThresholds(root, current);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /**
+   * Forwards a click from the embedded Analysis Optimizer card to the optimizer provider's own
+   * message handler (`handleEmbeddedMessage`), then re-renders this tab so the embedded body
+   * reflects whatever changed (a new scan result, an applied exclusion, …). See
+   * `analysisOptimizerWebviewProvider.ts`'s `handleEmbeddedMessage` doc comment for why this
+   * mirrors the standalone panel's own message switch exactly.
+   */
+  private async _handleOptimizerCommand(msg: { type: string; pattern?: string; patterns?: string[] }): Promise<void> {
+    if (!this._analysisOptimizerProvider) return;
+    await this._analysisOptimizerProvider.handleEmbeddedMessage(msg);
+    this.refresh();
+  }
+
   private async _runDashboardCommand(id: string): Promise<void> {
     // The legacy 'setTier' id is preserved for any toolbar entry points that still post it (e.g.
     // command palette callers); the in-page tier radio control posts a typed `setTier` message
@@ -1583,6 +2268,28 @@ ${detailRow}`;
     // memory on a fresh start.
     if (id === 'restartAnalyzer') {
       await vscode.commands.executeCommand('dart.restartAnalysisServer');
+      return;
+    }
+    // Config file tab — Baseline card. `saropaLints.createBaseline` already writes both
+    // saropa_baseline.json AND the config block that activates it (see baselineReader.ts's header
+    // comment), so this is create+apply in one command.
+    if (id === 'createBaseline') {
+      await vscode.commands.executeCommand('saropaLints.createBaseline');
+      this.refresh();
+      return;
+    }
+    if (id === 'openBaselineFile') {
+      const root = getProjectRoot();
+      if (!root) return;
+      const uri = vscode.Uri.file(baselineFilePath(root));
+      await vscode.commands.executeCommand('vscode.open', uri);
+      return;
+    }
+    // Config file tab — Analysis Optimizer card's "open standalone" deep link. The tab embed
+    // stays live in this panel; this just also opens the optimizer's own editor tab, matching
+    // "its existing standalone panel command still opens it directly" (Phase 4 requirement #4).
+    if (id === 'openOptimizerPanel') {
+      this._analysisOptimizerProvider?.openEditorPanel();
       return;
     }
     // Per-rule re-enable from the Disabled rules section. The id arrives as

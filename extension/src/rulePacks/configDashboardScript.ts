@@ -21,6 +21,7 @@
 export function getConfigDashboardScript(): string {
   return [
     SCRIPT_PREAMBLE,
+    SCRIPT_TABS,
     SCRIPT_TIER_AND_TOGGLES,
     SCRIPT_TOOLBAR_ACTIONS,
     SCRIPT_FILTER_STATE,
@@ -31,6 +32,9 @@ export function getConfigDashboardScript(): string {
     SCRIPT_GAUGE,
     SCRIPT_DISABLED_RULES_SEARCH,
     SCRIPT_STYLISTIC,
+    SCRIPT_SETTINGS_GRID,
+    SCRIPT_CONFIG_FILE_TAB,
+    SCRIPT_OPTIMIZER_EMBED,
     SCRIPT_INIT,
   ].join('\n');
 }
@@ -742,6 +746,245 @@ const SCRIPT_GAUGE = `
         gauge.style.setProperty('--gauge-target', target);
       });
     });
+  })();
+`;
+
+/**
+ * Tab bar wiring (Phase 4). Click OR arrow-key navigation on `.rt-tab-btn[data-tab]` shows the
+ * matching `#rt-panel-<id>` and hides the rest; `vscode.setState`/`getState` remembers the choice
+ * across a full HTML rebuild (config file watcher refresh, memory-pressure update, …) — the SAME
+ * persistence mechanism the Analysis Optimizer's own script already uses for its sort state (see
+ * `analysisOptimizerScript.ts`), so this is a consistent pattern across the two panels rather than
+ * a new one invented for this feature. Also posts `setActiveTab` so the HOST knows which tab is
+ * active without needing to re-parse DOM state (used by nothing today beyond bookkeeping, but
+ * keeps host and client from disagreeing about "the active tab" if a future refresh path needs it).
+ */
+const SCRIPT_TABS = `
+  (function initTabs() {
+    var bar = document.querySelector('.rt-tabbar');
+    if (!bar) return;
+    var buttons = Array.from(bar.querySelectorAll('.rt-tab-btn[data-tab]'));
+    if (buttons.length === 0) return;
+
+    function activate(tab, focusButton) {
+      buttons.forEach(function(btn) {
+        var isActive = btn.getAttribute('data-tab') === tab;
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        btn.setAttribute('tabindex', isActive ? '0' : '-1');
+        var panel = document.getElementById('rt-panel-' + btn.getAttribute('data-tab'));
+        if (panel) panel.hidden = !isActive;
+        if (isActive && focusButton) btn.focus();
+      });
+      bar.setAttribute('data-active-tab', tab);
+      var state = vscode.getState() || {};
+      state.activeTab = tab;
+      vscode.setState(state);
+      vscode.postMessage({ type: 'setActiveTab', tab: tab });
+    }
+
+    buttons.forEach(function(btn) {
+      btn.addEventListener('click', function() { activate(btn.getAttribute('data-tab'), false); });
+      btn.addEventListener('keydown', function(e) {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Home' && e.key !== 'End') return;
+        e.preventDefault();
+        var idx = buttons.indexOf(btn);
+        var nextIdx = idx;
+        if (e.key === 'ArrowRight') nextIdx = (idx + 1) % buttons.length;
+        else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + buttons.length) % buttons.length;
+        else if (e.key === 'Home') nextIdx = 0;
+        else if (e.key === 'End') nextIdx = buttons.length - 1;
+        activate(buttons[nextIdx].getAttribute('data-tab'), true);
+      });
+    });
+
+    // Digit shortcuts 1-7 jump directly to a tab (UX_UI_GUIDELINES "every dashboard tab reachable
+    // by 1-9" convention). Ignored while focus is in a text input/select so typing "1" into the
+    // max_issues field does not hijack the view.
+    document.addEventListener('keydown', function(e) {
+      var tag = (document.activeElement && document.activeElement.tagName) || '';
+      if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+      var n = parseInt(e.key, 10);
+      if (!n || n < 1 || n > buttons.length) return;
+      activate(buttons[n - 1].getAttribute('data-tab'), true);
+    });
+
+    // Restore the remembered tab from THIS webview session's state, falling back to whatever the
+    // host rendered as active (data-active-tab, from RulePacksWebviewProvider._activeTab) — the
+    // client-remembered choice wins because it reflects the user's most recent in-session click,
+    // which can be newer than what the host had when it built this HTML.
+    var saved = (vscode.getState() || {}).activeTab;
+    var initial = saved && buttons.some(function(b) { return b.getAttribute('data-tab') === saved; })
+      ? saved
+      : bar.getAttribute('data-active-tab');
+    if (initial) activate(initial, false);
+  })();
+`;
+
+/**
+ * Generic settings grid (Automation / Extension tabs). Every control carries `data-setting-key`
+ * matching a `saropaLints.<key>` suffix; `data-setting-array` marks the comma-separated text
+ * fields that need splitting on the host side (done in `_handleUpdateSetting`, not here, so the
+ * host's coercion logic has one implementation instead of duplicating it client + host).
+ */
+const SCRIPT_SETTINGS_GRID = `
+  document.querySelectorAll('[data-setting-key]').forEach(function(el) {
+    var eventName = (el.tagName === 'SELECT' || el.type === 'checkbox') ? 'change' : 'change';
+    el.addEventListener(eventName, function() {
+      var key = el.getAttribute('data-setting-key');
+      var value = el.type === 'checkbox' ? el.checked : el.value;
+      vscode.postMessage({ type: 'updateSetting', key: key, value: value });
+    });
+  });
+`;
+
+/**
+ * Config file tab wiring: the 8 previously-UI-less `analysis_options_custom.yaml` keys.
+ * Scalars/platforms post immediately on change; the three list sections (severities, banned
+ * usage, diagnostic thresholds) use an explicit Add button plus a delegated remove-button
+ * listener, since a new list row does not exist in the DOM yet for a `change` listener to attach to.
+ */
+const SCRIPT_CONFIG_FILE_TAB = `
+  document.querySelectorAll('[data-scalar-key]').forEach(function(el) {
+    el.addEventListener('change', function() {
+      vscode.postMessage({ type: 'writeScalar', scalarKey: el.getAttribute('data-scalar-key'), value: el.value });
+    });
+  });
+
+  (function wirePlatforms() {
+    var boxes = document.querySelectorAll('[data-platform]');
+    if (boxes.length === 0) return;
+    function postAll() {
+      var platforms = {};
+      boxes.forEach(function(b) { platforms[b.getAttribute('data-platform')] = b.checked; });
+      vscode.postMessage({ type: 'writePlatforms', platforms: platforms });
+    }
+    boxes.forEach(function(b) { b.addEventListener('change', postAll); });
+  })();
+
+  document.querySelectorAll('.cf-severity-level').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      vscode.postMessage({ type: 'writeSeverity', rule: sel.getAttribute('data-rule'), level: sel.value });
+    });
+  });
+
+  var severityAddBtn = document.getElementById('cf-severity-add');
+  if (severityAddBtn) {
+    severityAddBtn.addEventListener('click', function() {
+      var ruleInput = document.getElementById('cf-severity-rule');
+      var levelSelect = document.getElementById('cf-severity-new-level');
+      var rule = (ruleInput && ruleInput.value || '').trim();
+      if (!rule) return;
+      vscode.postMessage({ type: 'writeSeverity', rule: rule, level: levelSelect ? levelSelect.value : 'ERROR' });
+      if (ruleInput) ruleInput.value = '';
+    });
+  }
+
+  var bannedAddBtn = document.getElementById('cf-banned-add');
+  if (bannedAddBtn) {
+    bannedAddBtn.addEventListener('click', function() {
+      var idInput = document.getElementById('cf-banned-identifier');
+      var reasonInput = document.getElementById('cf-banned-reason');
+      var identifier = (idInput && idInput.value || '').trim();
+      if (!identifier) return;
+      vscode.postMessage({ type: 'addBannedUsage', identifier: identifier, reason: reasonInput ? reasonInput.value : '' });
+      if (idInput) idInput.value = '';
+      if (reasonInput) reasonInput.value = '';
+    });
+  }
+
+  var thresholdAddBtn = document.getElementById('cf-threshold-add');
+  if (thresholdAddBtn) {
+    thresholdAddBtn.addEventListener('click', function() {
+      var ruleInput = document.getElementById('cf-threshold-rule');
+      var warnInput = document.getElementById('cf-threshold-warn');
+      var failInput = document.getElementById('cf-threshold-fail');
+      var rule = (ruleInput && ruleInput.value || '').trim();
+      if (!rule) return;
+      var warn = warnInput && warnInput.value !== '' ? parseInt(warnInput.value, 10) : null;
+      var fail = failInput && failInput.value !== '' ? parseInt(failInput.value, 10) : null;
+      vscode.postMessage({ type: 'setDiagnosticThreshold', rule: rule, warn: warn, fail: fail });
+      if (ruleInput) ruleInput.value = '';
+      if (warnInput) warnInput.value = '';
+      if (failInput) failInput.value = '';
+    });
+  }
+
+  // Delegated remove-button handling: severities/banned-usage/thresholds rows are rebuilt on every
+  // refresh, so per-row listeners would need to be re-attached each time anyway — one delegated
+  // listener on document covers every current and future row without that bookkeeping.
+  document.addEventListener('click', function(e) {
+    var target = e.target;
+    if (!target || !target.getAttribute) return;
+    var removeSeverityRule = target.getAttribute('data-remove-severity');
+    if (removeSeverityRule !== null) {
+      vscode.postMessage({ type: 'removeSeverity', rule: removeSeverityRule });
+      return;
+    }
+    var removeBannedId = target.getAttribute('data-remove-banned');
+    if (removeBannedId !== null) {
+      vscode.postMessage({ type: 'removeBannedUsage', identifier: removeBannedId });
+      return;
+    }
+    var removeThresholdRule = target.getAttribute('data-remove-threshold');
+    if (removeThresholdRule !== null) {
+      vscode.postMessage({ type: 'removeDiagnosticThreshold', rule: removeThresholdRule });
+      return;
+    }
+  });
+`;
+
+/**
+ * Forwards clicks inside the embedded Analysis Optimizer card using the SAME id/class contract
+ * its own standalone script (`analysisOptimizerScript.ts`) listens for — see that file for the
+ * canonical list. Column-sort and the select-all checkbox bulk-select are intentionally NOT
+ * replicated here (Phase 4 scope decision: the embedded card covers the primary actions —
+ * scan/apply/remove/fix-syntax — sorting is a nicety available in the standalone panel via the
+ * "Open standalone" deep link). Every button here posts through the SAME `vscode` handle already
+ * acquired in {@link SCRIPT_PREAMBLE} — a second `acquireVsCodeApi()` call would throw (VS Code
+ * allows exactly one per webview document), so this reuses it rather than re-acquiring.
+ */
+const SCRIPT_OPTIMIZER_EMBED = `
+  (function wireOptimizerEmbed() {
+    var embed = document.querySelector('.optimizer-embed-body');
+    if (!embed) return;
+    embed.addEventListener('click', function(e) {
+      var target = e.target;
+      if (!target) return;
+      if (target.id === 'scan-btn') { vscode.postMessage({ type: 'optimizerCommand', optimizer: { type: 'scan' } }); return; }
+      if (target.id === 'open-config-btn') { vscode.postMessage({ type: 'optimizerCommand', optimizer: { type: 'openConfig' } }); return; }
+      if (target.id === 'fix-syntax-btn') { vscode.postMessage({ type: 'optimizerCommand', optimizer: { type: 'fixSyntax' } }); return; }
+      if (target.id === 'apply-all-btn') { vscode.postMessage({ type: 'optimizerCommand', optimizer: { type: 'applyAll' } }); return; }
+      if (target.id === 'apply-selected-btn') {
+        var checked = embed.querySelectorAll('.rec-cb:checked');
+        var patterns = Array.from(checked).map(function(cb) { return cb.dataset.pattern; });
+        if (patterns.length > 0) vscode.postMessage({ type: 'optimizerCommand', optimizer: { type: 'applySelected', patterns: patterns } });
+        return;
+      }
+      if (target.classList.contains('apply-one-btn')) {
+        vscode.postMessage({ type: 'optimizerCommand', optimizer: { type: 'applyExclusion', pattern: target.dataset.pattern } });
+        return;
+      }
+      if (target.classList.contains('remove-btn')) {
+        vscode.postMessage({ type: 'optimizerCommand', optimizer: { type: 'removeExclusion', pattern: target.dataset.pattern } });
+        return;
+      }
+      if (target.classList.contains('preview-toggle-btn')) {
+        var previewRow = document.getElementById(target.dataset.target);
+        if (previewRow) {
+          var ownerRow = target.closest('tr');
+          if (ownerRow && ownerRow.nextSibling !== previewRow) ownerRow.after(previewRow);
+          previewRow.hidden = !previewRow.hidden;
+        }
+        return;
+      }
+    });
+    var selectAll = embed.querySelector('#select-all-cb');
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+        var cbs = embed.querySelectorAll('.rec-cb');
+        for (var i = 0; i < cbs.length; i++) { cbs[i].checked = selectAll.checked; }
+      });
+    }
   })();
 `;
 
