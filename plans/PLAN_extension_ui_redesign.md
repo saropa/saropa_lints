@@ -263,14 +263,66 @@ Files: `rulePacks/rulePacksWebviewProvider.ts`, `configDashboardStyles.ts`,
 - [ ] Analysis Optimizer moves in as a tab; its panel command becomes a deep link.
 - [ ] Config file watcher already exists for live reload; wire it to re-render the active tab.
 
-### Phase 5 — Packages consolidation (2 days, Sonnet)
+### Phase 5 — Packages consolidation (2 days, Sonnet) — PARTIALLY DONE 2026-09-04
 Files: `vibrancy/views/*`.
-- [ ] Tabs: Overview · Upgrades · Full report · Known issues · Compare · Settings.
-- [ ] Migrate `report-styles*.ts` onto `dashboardChromeStyles`; delete the parallel system.
-- [ ] Settings tab renders all 60 `packageVibrancy.*` settings as grouped forms (token, weights,
-      budget, watch, upgrade, vuln). Group the 7 nullable budget gates as one "Budget" card.
-- [ ] Reduce the ~90 `packageVibrancy.*` commands: keep the ones bound to buttons/tabs, mark the
-      rest `commandPalette: false` or delete if unreachable. Target ≤ 25.
+- [x] Tabs: Overview · Upgrades · Full report · Known issues · Compare · Settings. Added a real tab
+      bar (`packages-tabs.ts`) to the Package Dashboard, which had NO existing tab mechanism (the
+      plan's assumption that one existed was wrong — verified by reading `report-webview.ts` /
+      `report-html.ts` before starting). Overview is the dashboard's existing content, now wrapped
+      as the default tab panel. Settings is new and renders fully in-document. Upgrades / Full
+      report / Known issues / Compare are deep-link panels: each shows a short description and an
+      "Open" button that runs the exact command the old standalone dashboard row used
+      (`showOpportunities`, `exportOpportunitiesReport`, `browseKnownIssues`, `comparePackages`).
+      This is real navigation, not stub labels — see the Deferred note below for why it is not full
+      DOM-embedding. `package-detail-html.ts` was confirmed NOT an orphaned/unregistered view (the
+      appendix's "unregistered view" note was stale) — it already renders as the dashboard's docked
+      master-detail `<aside id="detail-pane">`, i.e. it already meets the plan's own target of "a
+      drawer, not a tab." No change was needed there.
+- [x] Settings tab renders all 54 `packageVibrancy.*` settings (the plan's "~60" had drifted) as 8
+      grouped cards: Access & Registries, Scan, Display, Score Weights, Upgrade, Watch, Budget,
+      Vulnerabilities. The 7 nullable budget gates are one "Budget" card. Each control posts to
+      `report-webview.ts`, which writes through
+      `workspace.getConfiguration('saropaLints.packageVibrancy').update(key, value, Workspace)`.
+- [x] Reduced palette-visible `packageVibrancy.*` commands from 56 to 25 (of 63 total registered —
+      the plan's "~90" had drifted) via the existing `commandPalette: {"when":"false"}` manifest
+      pattern, not deletion. Hidden: 27 argument-only commands (package/line/url/category args with
+      no palette way to supply them), `sortDependencies`/`showCodeLens`/`hideCodeLens`/
+      `toggleCodeLens` (already menu-bound or redundant), bulk `updateAllMajor/Minor/Patch` +
+      `logAllDetails` (now covered by the Upgrades tab), and `addRegistryAuth`/`removeRegistryAuth`
+      (niche setup, belongs in the Settings tab's Access group). Nothing was deleted — every hidden
+      command still works from its real call site (CodeLens, hover, context menu, webview message).
+- [ ] Migrate `report-styles*.ts` onto `dashboardChromeStyles`; delete the parallel system. **Not
+      done** — see Deferred below.
+
+**Deferred — not done, do NOT treat as complete:**
+- [ ] `report-styles*.ts` / `report-script-parts.ts` (52KB + 99KB) were NOT migrated onto
+      `dashboardChromeStyles`, and were not deleted. This is the single largest remaining Phase 5
+      item. New Phase 5 code (`packages-tabs.ts`, `settings-tab.ts`) draws only from
+      `getDashboardTokens()` (the canonical token layer, no bespoke component CSS), which is
+      forward progress but does not touch the existing 1600+ lines of report chrome. Attempting the
+      full migration in this pass risked a broad, hard-to-verify visual regression against a system
+      with 10 other live consumers, for a component-parity rewrite too large to complete and verify
+      (tsc + rendering check across every existing report section: chart, table, detail pane,
+      network diagram, keyboard overlay) inside this session. Needs its own dedicated pass.
+- [ ] Upgrades / Full report / Known issues / Compare tabs are deep-link cards, not full
+      DOM-embedded content. Each of those four already exists as an independent full
+      `<!DOCTYPE html>` webview document with its own CSP nonce, `<script>`, and
+      `acquireVsCodeApi()` call. The extension-development skill's documented constraint —
+      `acquireVsCodeApi()` may be called only once per webview document — means embedding all four
+      verbatim into the Package Dashboard's one document would require first extracting body-only
+      render functions (and a single shared message-bridge) out of each of
+      `opportunities-panel.ts`, `feature-inventory-export.ts`, `known-issues-webview.ts`, and
+      `comparison-webview.ts` — a controller-level refactor of four subsystems, not a tab-shell
+      addition. Clicking a deep-link tab does open the real, live panel; it just opens as its own
+      editor tab rather than swapping in place.
+- [ ] Command reduction stopped at exactly the ≤25 target via conservative, mechanical rules
+      (argument-only commands, already-menu-bound duplicates, tab-superseded bulk actions, niche
+      setup). No command was inspected individually for "is this actually still useful in the
+      palette" beyond that; a future pass could re-review the remaining 25 against real usage.
+- [ ] `npm run compile` / a live Extension Development Host render of the new tabs was not run in
+      this pass (only `tsc --noEmit`, `tsc -p tsconfig.test.json`, and the touched mocha suite) —
+      visual layout of the tab bar and settings cards is unverified against the actual VS Code
+      webview chrome/theme, only against the design-token CSS variables compiling correctly.
 
 ### Phase 6 — Project Map live + CLI reports (2 days, Sonnet) — DONE 2026-09-04
 Files: `views/projectMapView.ts`, `views/projectMapShell.ts` (new), `views/projectMapReports.ts` (new),
