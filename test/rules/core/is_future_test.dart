@@ -14,6 +14,7 @@ import 'package:saropa_lints/src/rules/core/is_future_rules.dart';
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/rule_instantiation_assertions.dart';
 
 void main() {
   group('is_future', () {
@@ -191,11 +192,7 @@ void handle(dynamic result) {
   // Rule Instantiation: metadata smoke test.
   group('is_future - Rule Instantiation', () {
     test('IsFutureRule', () {
-      final rule = IsFutureRule();
-      expect(rule.code.lowerCaseName, 'is_future');
-      expect(rule.code.problemMessage, contains('[is_future]'));
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
+      assertRuleMetadata(IsFutureRule(), 'is_future');
     });
   });
 }

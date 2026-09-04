@@ -12,6 +12,7 @@ import 'package:saropa_lints/src/rules/core/avoid_futureor_return_type_rules.dar
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/rule_instantiation_assertions.dart';
 
 void main() {
   group('avoid_futureor_return_type', () {
@@ -271,14 +272,10 @@ extension StringExt on String {
   // Rule Instantiation: metadata smoke test.
   group('avoid_futureor_return_type - Rule Instantiation', () {
     test('AvoidFutureorReturnTypeRule', () {
-      final rule = AvoidFutureorReturnTypeRule();
-      expect(rule.code.lowerCaseName, 'avoid_futureor_return_type');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_futureor_return_type]'),
+      assertRuleMetadata(
+        AvoidFutureorReturnTypeRule(),
+        'avoid_futureor_return_type',
       );
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
     });
   });
 }

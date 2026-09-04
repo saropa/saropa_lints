@@ -27,6 +27,7 @@ import 'package:saropa_lints/src/rules/widget/avoid_mounted_check_in_finally_rul
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/rule_instantiation_assertions.dart';
 
 void main() {
   group('avoid_mounted_check_in_finally', () {
@@ -435,14 +436,10 @@ class PlainService {
   // Rule Instantiation: metadata smoke test.
   group('avoid_mounted_check_in_finally - Rule Instantiation', () {
     test('AvoidMountedCheckInFinallyRule', () {
-      final rule = AvoidMountedCheckInFinallyRule();
-      expect(rule.code.lowerCaseName, 'avoid_mounted_check_in_finally');
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_mounted_check_in_finally]'),
+      assertRuleMetadata(
+        AvoidMountedCheckInFinallyRule(),
+        'avoid_mounted_check_in_finally',
       );
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
     });
   });
 }

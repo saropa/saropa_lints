@@ -15,6 +15,7 @@ import 'package:saropa_lints/src/rules/code_quality/getters_in_member_list_rules
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/rule_instantiation_assertions.dart';
 
 const String _rule = 'getters_in_member_list';
 
@@ -280,11 +281,7 @@ class Multi {
   // Rule Instantiation: metadata smoke test.
   group('getters_in_member_list - Rule Instantiation', () {
     test('GettersInMemberListRule', () {
-      final rule = GettersInMemberListRule();
-      expect(rule.code.lowerCaseName, _rule);
-      expect(rule.code.problemMessage, contains('[$_rule]'));
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
+      assertRuleMetadata(GettersInMemberListRule(), _rule);
     });
   });
 }

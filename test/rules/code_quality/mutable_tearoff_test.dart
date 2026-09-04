@@ -12,6 +12,7 @@ import 'package:saropa_lints/src/rules/code_quality/mutable_tearoff_rules.dart';
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/rule_instantiation_assertions.dart';
 
 void main() {
   group('mutable_tearoff', () {
@@ -524,11 +525,7 @@ void run(Handler handler) {
   // Rule Instantiation: metadata smoke test.
   group('mutable_tearoff - Rule Instantiation', () {
     test('MutableTearoffRule', () {
-      final rule = MutableTearoffRule();
-      expect(rule.code.lowerCaseName, 'mutable_tearoff');
-      expect(rule.code.problemMessage, contains('[mutable_tearoff]'));
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
+      assertRuleMetadata(MutableTearoffRule(), 'mutable_tearoff');
     });
   });
 }

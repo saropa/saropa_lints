@@ -13,6 +13,7 @@ import 'package:saropa_lints/src/rules/core/avoid_equals_and_hash_code_on_mutabl
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/rule_instantiation_assertions.dart';
 
 void main() {
   group('avoid_equals_and_hash_code_on_mutable_classes_extended', () {
@@ -405,17 +406,10 @@ class ImplementsEquatablePoint implements Equatable {
   // Rule Instantiation: metadata smoke test.
   group('avoid_equals_and_hash_code_on_mutable_classes_extended - Rule Instantiation', () {
     test('AvoidEqualsAndHashCodeOnMutableClassesRule', () {
-      final rule = AvoidEqualsAndHashCodeOnMutableClassesRule();
-      expect(
-        rule.code.lowerCaseName,
+      assertRuleMetadata(
+        AvoidEqualsAndHashCodeOnMutableClassesRule(),
         'avoid_equals_and_hash_code_on_mutable_classes_extended',
       );
-      expect(
-        rule.code.problemMessage,
-        contains('[avoid_equals_and_hash_code_on_mutable_classes_extended]'),
-      );
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
     });
   });
 }

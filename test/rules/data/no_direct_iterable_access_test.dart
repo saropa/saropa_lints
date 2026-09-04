@@ -12,6 +12,7 @@ import 'package:saropa_lints/src/rules/data/no_direct_iterable_access_rules.dart
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/rule_instantiation_assertions.dart';
 
 void main() {
   group('no_direct_iterable_access', () {
@@ -326,14 +327,10 @@ int firstByte(Uint8List bytes) {
   // Rule Instantiation: metadata smoke test.
   group('no_direct_iterable_access - Rule Instantiation', () {
     test('NoDirectIterableAccessRule', () {
-      final rule = NoDirectIterableAccessRule();
-      expect(rule.code.lowerCaseName, 'no_direct_iterable_access');
-      expect(
-        rule.code.problemMessage,
-        contains('[no_direct_iterable_access]'),
+      assertRuleMetadata(
+        NoDirectIterableAccessRule(),
+        'no_direct_iterable_access',
       );
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
     });
   });
 }

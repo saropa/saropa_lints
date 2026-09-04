@@ -12,6 +12,7 @@ import 'package:saropa_lints/src/rules/stylistic/new_instance_cascade_rules.dart
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/rule_instantiation_assertions.dart';
 
 void main() {
   group('new_instance_cascade', () {
@@ -245,11 +246,7 @@ void build() {
   // Rule Instantiation: metadata smoke test.
   group('new_instance_cascade - Rule Instantiation', () {
     test('NewInstanceCascadeRule', () {
-      final rule = NewInstanceCascadeRule();
-      expect(rule.code.lowerCaseName, 'new_instance_cascade');
-      expect(rule.code.problemMessage, contains('[new_instance_cascade]'));
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
+      assertRuleMetadata(NewInstanceCascadeRule(), 'new_instance_cascade');
     });
   });
 }
