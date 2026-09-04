@@ -57,7 +57,7 @@ describe('sidebar Status section — Engines row', () => {
     });
     // Short-circuits appendHealthRow (returns before it reaches history), so
     // this test isolates the Engines row without needing a health fixture.
-    sinon.stub(liveViolationsData, 'computeLiveHealthScore').returns(undefined);
+    sinon.stub(liveViolationsData, 'computeLiveHealthScore').returns(null);
     sinon.stub(suppressionsStore, 'loadSuppressions').returns({
       hiddenFiles: [],
       hiddenFolders: [],

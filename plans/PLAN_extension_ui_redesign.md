@@ -804,3 +804,28 @@ per this repo's own "mixed commits fine" convention rather than rewriting histor
   still never been executed.
 
 Commit: (pending — see the Finalization step of this session's `/finish` run for the actual hash).
+
+**Follow-up session (2026-09-04, resumed from handover):** `npm test` (compile-then-mocha) ran
+successfully this time — the earlier permission denials were environment-specific, not a
+persistent block. Running it surfaced two real, previously-hidden bugs in the "never executed"
+test file:
+- `sidebarStatusEngines.test.ts` was missing from `tsconfig.test.json`'s `include` array, so `tsc`
+  silently skipped it — it never compiled, so mocha's glob never found a `.js` for it. No error,
+  no test output, nothing: it simply didn't exist as far as the suite was concerned. Fixed by
+  adding the file (plus its two direct dependencies, `healthPanel.ts` and `engineCardsHtml.ts`) to
+  the include list.
+- Once compiling, a real type error: the test stubbed `computeLiveHealthScore` to return
+  `undefined`, but its signature is `HealthScoreResult | null` — `undefined` isn't assignable.
+  Fixed by stubbing `null` instead.
+- All 4 Engines-row tests now pass for real (`npm test` executes them, not just type-checks).
+  47 pre-existing, unrelated failures remain in the suite (`commandCatalogRegistry`, `issuesTree`,
+  `stale-ignore commands`, `pubdev-changelog`, etc.) — confirmed none reference Engines/sidebar
+  work; out of scope for this plan.
+- Also resolved the CHANGELOG's "Engines (LSP / Analyzer)" Settings-panel row claim, previously
+  flagged as unverified: the row is real, implemented in `configTree.ts:154-159` (commit
+  `1d6e3a59`), reachable via the existing `dashboards.controls.processHealth` /
+  `processHealthOpen` l10n keys. The prior session's grep only checked `sectionedSidebar.ts` and
+  missed it — different file, same feature. No code changes needed; claim confirmed accurate.
+
+Still open: the F5 (Extension Development Host) manual visual check for the Engines row, and the
+two LSP manual-verification items — none of these can be done without a human driving VS Code.
