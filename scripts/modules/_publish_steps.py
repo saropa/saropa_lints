@@ -1363,29 +1363,36 @@ def _prompt_test_failure(is_crash: bool = False) -> str:
     When is_crash is True, offers a "retry with fewer workers" option that
     halves the concurrency to work around compiler crashes.
     """
-    print_warning("Tests failed. Choose an action:")
-    print_colored("  [R]etry (re-run tests after fixing the issue)", Color.CYAN)
-    if is_crash:
-        print_colored(
-            "  [F]ewer workers (retry with halved concurrency — fixes compiler crashes)",
-            Color.CYAN,
-        )
-    print_colored("  [C]ontinue anyway (proceed with publish)", Color.CYAN)
-    print_colored("  [A]bort (stop publish)", Color.CYAN)
+    valid = {"r", "c", "a"} | ({"f"} if is_crash else set())
     prompt = "  Choice [r/f/c/a]: " if is_crash else "  Choice [r/c/a]: "
-    try:
-        raw = input(prompt).strip().lower() or "a"
+    # Loop until a valid choice is entered — typos no longer abort.
+    while True:
+        print_warning("Tests failed. Choose an action:")
+        print_colored("  [R]etry (re-run tests after fixing the issue)", Color.CYAN)
+        if is_crash:
+            print_colored(
+                "  [F]ewer workers (retry with halved concurrency — fixes compiler crashes)",
+                Color.CYAN,
+            )
+        print_colored("  [C]ontinue anyway (proceed with publish)", Color.CYAN)
+        print_colored("  [A]bort (stop publish)", Color.CYAN)
+        try:
+            raw = input(prompt).strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            return "abort"
+        if not raw:
+            print_warning("No input — please enter one of: " + ", ".join(sorted(valid)))
+            continue
+        if raw[0] not in valid:
+            print_warning(f"Invalid choice '{raw}' — please enter one of: " + ", ".join(sorted(valid)))
+            continue
         if raw.startswith("r"):
             return "retry"
-        if is_crash and raw.startswith("f"):
+        if raw.startswith("f"):
             return "retry_fewer"
         if raw.startswith("c"):
             return "continue"
-        if raw.startswith("a"):
-            return "abort"
-    except (EOFError, KeyboardInterrupt):
         return "abort"
-    return "abort"
 
 
 def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
