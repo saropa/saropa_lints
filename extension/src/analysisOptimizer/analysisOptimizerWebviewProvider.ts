@@ -106,6 +106,66 @@ export class AnalysisOptimizerWebviewProvider {
     this._refreshExclusions();
   }
 
+  /**
+   * Body-only HTML (no page chrome) for embedding inside the Rules & Tiers dashboard's "Config
+   * file" tab (Phase 4, PLAN_extension_ui_redesign.md §3 "Analysis Optimizer moves in as a tab").
+   * Reuses the exact same builders the standalone panel calls from {@link _buildHtml} so the two
+   * surfaces can never visually diverge — there is only one implementation of "what the optimizer
+   * looks like", just two places that request it.
+   *
+   * If no scan has ever run in THIS session, kick one off automatically (mirrors
+   * `openEditorPanel`'s own first-open behavior) so the embedded tab is not stuck on the empty
+   * "click Scan" state the very first time a user opens the Config file tab.
+   */
+  getEmbeddedBodyHtml(): string {
+    if (!this._result && !this._scanInFlight) {
+      void this._runScan();
+    }
+    return this._result ? this._buildResultView() : this._buildEmptyView();
+  }
+
+  /**
+   * Handles a message forwarded from an embedding host's webview (the Rules & Tiers dashboard's
+   * script posts the SAME message shapes the standalone panel's own script sends — see
+   * `configDashboardScript.ts`'s optimizer-forwarding block). Mirrors `openEditorPanel`'s
+   * `onDidReceiveMessage` switch exactly so an edit made from the embedded tab is indistinguishable
+   * from one made in the optimizer's own panel: same validation, same side effects (config
+   * writes, re-scans), same result.
+   *
+   * Returns void because every branch already re-renders via `_renderPanel()`/`refresh()`
+   * internally (a no-op when `_panel` is undefined, which is always true while embedded) — the
+   * caller (RulePacksWebviewProvider) re-fetches {@link getEmbeddedBodyHtml} and re-renders its
+   * own tab afterward regardless of whether the standalone panel exists.
+   */
+  async handleEmbeddedMessage(msg: { type: string; pattern?: string; patterns?: string[] }): Promise<void> {
+    switch (msg.type) {
+      case 'scan':
+        await this._runScan();
+        break;
+      case 'applyExclusion':
+        if (typeof msg.pattern === 'string') await this._applyExclusion(msg.pattern);
+        break;
+      case 'removeExclusion':
+        if (typeof msg.pattern === 'string') await this._removeExclusion(msg.pattern);
+        break;
+      case 'applyAll':
+        await this._applyAllRecommendations();
+        break;
+      case 'applySelected':
+        if (Array.isArray(msg.patterns)) await this._applySelected(msg.patterns);
+        break;
+      case 'openConfig':
+        await this._openConfig();
+        break;
+      case 'refresh':
+        this._refreshExclusions();
+        break;
+      case 'fixSyntax':
+        await this._fixSyntax();
+        break;
+    }
+  }
+
   private _refreshExclusions(): void {
     if (!this._result) {
       this._renderPanel();
