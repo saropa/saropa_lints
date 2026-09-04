@@ -252,16 +252,88 @@ Files: `views/saropaDashboardsView.ts`, `views/dashboardSummaries.ts`, `systemHe
       the new/changed keys — not regenerated, per the hard rule against running the MT pipeline
       without an explicit in-the-moment request.
 
-### Phase 4 — Rules & Tiers becomes the config surface (3 days, Sonnet; Opus for the yaml editor design only)
-Files: `rulePacks/rulePacksWebviewProvider.ts`, `configDashboardStyles.ts`,
-`analysisOptimizer/*`, `setup.ts` (baseline), `lib/src/config/*` for key names.
-- [ ] Tabs as in §2.2. Every `analysis_options_custom.yaml` top-level key gets a control that writes
-      the file (round-trip through the existing YAML writer; do not regex the file).
-- [ ] Every `saropaLints.*` extension setting outside the vibrancy/health/todo/drift groups gets a
-      control that calls `workspace.getConfiguration().update`.
-- [ ] Baseline: create / view diff / apply, with the current baseline file rendered as a table.
-- [ ] Analysis Optimizer moves in as a tab; its panel command becomes a deep link.
-- [ ] Config file watcher already exists for live reload; wire it to re-render the active tab.
+### Phase 4 — Rules & Tiers becomes the config surface (3 days, Sonnet; Opus for the yaml editor design only) — DONE 2026-09-04
+Files: `rulePacks/rulePacksWebviewProvider.ts`, `rulePacks/configDashboardScript.ts`,
+`rulePacks/configDashboardStyles.ts`, `rulePacks/customConfigYaml.ts` (new),
+`rulePacks/settingsCatalog.ts` (new), `rulePacks/baselineReader.ts` (new),
+`analysisOptimizer/analysisOptimizerWebviewProvider.ts`, `extension.ts`,
+`test/rulePacks/configFileCardCoverage.test.ts` (new). `lib/src/config/*` / `setup.ts` read only,
+not edited.
+- [x] Tabs as in §2.2: Tier · Rule packs · Overrides · SDK rollout · Config file · Automation ·
+      Extension. The header + KPI strip stay persistent above the tab bar (tier/coverage/freshness
+      apply regardless of which tab is open); everything else moved into exactly one tab. The
+      previously-standalone "Disabled rules" section moved into Overrides, alongside Style &
+      opinions. SDK-specific bulk-enable actions moved out of the Rule packs toolbar overflow into
+      their own SDK rollout tab, with a table scoped to only the SDK migration packs.
+- [x] Every `analysis_options_custom.yaml` top-level key (`max_issues`, `output`, `platforms`,
+      `severities`, `banned_usage`, `saropa_tier`, `runtime_tier`, `diagnostic_statistics`) has a
+      Config file tab control that writes the file. New `customConfigYaml.ts` round-trips each key
+      through a scoped-block reader/writer (mirrors `rulePackYaml.ts`'s existing top-level-block
+      pattern — edits only the byte range of the one key it owns, never a full-file regex rewrite).
+      A new coverage test (`configFileCardCoverage.test.ts`) asserts every key in
+      `CUSTOM_YAML_TOP_LEVEL_KEYS` maps to a rendered card id, so a 9th key added later without a
+      card fails CI instead of shipping silently invisible.
+- [x] Every in-scope `saropaLints.*` setting has a live control on the Automation or Extension tab.
+      Made this SCHEMA-DRIVEN per an explicit design correction during implementation: `settingsCatalog.ts`
+      reads `contributes.configuration` directly from the running extension's manifest (plus
+      `package.nls.json` for the description text) and renders a control from each property's JSON-schema
+      `type`/`enum` — a setting added to `package.json` later appears here with zero code changes. Only the
+      EXCLUSION list is hand-maintained: the `packageVibrancy.*` / `projectVibrancy.*` / `todosAndHacks.*` /
+      `driftAdvisor.*` prefixes (owned by other dashboards / out of scope) and the exact keys `enabled` /
+      `tier` (already have richer dedicated controls elsewhere — see `settingsCatalog.ts`'s header comment).
+- [x] Baseline: create/refresh (delegates to the existing `saropaLints.createBaseline` command,
+      which already writes `saropa_baseline.json` AND activates it via `analysis_options.yaml` in
+      one run) plus a summary table (file count, violation count, top rules by count, generated
+      timestamp) read from the JSON file. See "Deferred" below — this is create+view, not a diff.
+- [x] Analysis Optimizer moves in as a tab (embedded inside Config file): `getEmbeddedBodyHtml()` /
+      `handleEmbeddedMessage()` added to `AnalysisOptimizerWebviewProvider` so the SAME render/message
+      logic serves both surfaces (no duplication). Its standalone panel command still opens it directly
+      as a deep link ("Open standalone" button in the embedded card + the pre-existing command).
+- [x] The config file watcher (`extension.ts`'s `onDidSaveTextDocument`) now refreshes the Rules &
+      Tiers dashboard on a save to EITHER `analysis_options.yaml` OR `analysis_options_custom.yaml`
+      — previously it only fired for the main file, so an external edit to the custom file (another
+      editor, git pull, another VS Code window) never live-updated an open dashboard. The active tab
+      survives the refresh via the webview's own `getState`/`setState` (same mechanism the Analysis
+      Optimizer's script already uses for its sort state).
+- [x] `tsc --noEmit -p .` and `tsc -p tsconfig.test.json` both clean. Scoped test run
+      (`rulePacks/**`, `analysisOptimizer/**`) passes for every file touched or added this phase; 6
+      pre-existing failures in `rulePackYaml.test.ts` / `scanner.test.ts` reproduce in isolation on
+      an unmodified checkout of those files too (confirmed by not touching either file) — flagged as
+      a pre-existing test-isolation issue, not a Phase 4 regression, and left for whoever owns that
+      area next.
+
+**Deferred — not done, do NOT treat as complete:**
+- [ ] Baseline is create + view (a summary table), not a DIFF view. The original checklist wording
+      was "create / view diff / apply" — there is no UI that diffs the baseline file against the
+      CURRENT violations set (e.g. "3 violations no longer match the baseline"). "Apply" needed no
+      separate step: the `saropaLints.createBaseline` command already writes the config block that
+      activates the baseline file in the same run.
+- [ ] `runtime_tier:` written by the Config file tab's Tier cap card goes to the TOP LEVEL of
+      `analysis_options_custom.yaml`, matching where the other 7 keys live and where this phase's
+      task brief said all 8 keys live. Per `saropa-lints-config-and-tiers`'s provenance notes,
+      `RuntimeTierCap`'s documented precedence reads `runtime_tier`/`saropa_tier` from
+      `plugins.saropa_lints` in `analysis_options.yaml` (not a custom.yaml top-level key) as its
+      3rd-priority source — `saropa_tier` at the custom.yaml top level is separately confirmed as
+      priority 2. Whether the Dart loader ALSO honors a top-level `runtime_tier:` in the custom file
+      was not verified (would require reading/testing `config_loader.dart`, out of scope — no .dart
+      files were edited or should be for this phase). If it does not, the control still round-trips
+      the file correctly but the value may not affect analysis; `saropa_tier` is the key confirmed
+      to work from that location. Flagging for Dart-side verification rather than silently shipping
+      an unverified claim.
+- [ ] The embedded Analysis Optimizer card does not replicate its standalone panel's column-sort or
+      select-all-checkbox bulk-select interactions — only the primary actions (scan, apply one/all/
+      selected, remove, fix-syntax, preview toggle) are wired in the embed. Sorting/bulk-select
+      remain available via the "Open standalone" deep link. Documented as a scope decision in
+      `configDashboardScript.ts`'s `SCRIPT_OPTIMIZER_EMBED` comment, not an oversight.
+- [ ] No screenshot verification — the extension was not run in an Extension Development Host
+      during this phase (tsc + scoped unit tests only). Visual/keyboard-navigation correctness of
+      the tab bar, digit shortcuts, and every new card's layout against
+      `docs/design/SAROPA_DASHBOARD_STYLE_GUIDE.md` / `plans/guides/UX_UI_GUIDELINES.md` is
+      UNVERIFIED — a follow-up should launch the host (`python scripts/run_extension_local.py`) and
+      confirm against the acceptance table in §4 before this phase is treated as visually complete.
+- [ ] Locale catalogs (`package.nls.<lang>.json`, `src/i18n/locales/<lang>.json`) are now stale for
+      the ~40 new `rulesTiers.*` en.json keys — NOT regenerated, per the hard rule against an agent
+      running the translation pipeline without an explicit in-the-moment request.
 
 ### Phase 5 — Packages consolidation (2 days, Sonnet) — PARTIALLY DONE 2026-09-04
 Files: `vibrancy/views/*`.

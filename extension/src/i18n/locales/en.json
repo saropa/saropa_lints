@@ -213,6 +213,112 @@
   "tierPicker": {
     "ruleCount": "{count} rules"
   },
+  "rulesTiers": {
+    "tabBar": {
+      "ariaLabel": "Rules & Tiers dashboard tabs"
+    },
+    "tab": {
+      "tier": "Tier",
+      "packs": "Rule packs",
+      "overrides": "Overrides",
+      "sdk": "SDK rollout",
+      "configFile": "Config file",
+      "automation": "Automation",
+      "extension": "Extension"
+    },
+    "common": {
+      "rule": "Rule",
+      "add": "Add",
+      "remove": "Remove"
+    },
+    "sdk": {
+      "summary": "{total} SDK migration pack(s) apply to this project — {breaking} breaking, {deprecation} deprecation.",
+      "noneApplicable": "No SDK migration packs apply to this project's pubspec environment yet.",
+      "enableAllTitle": "Turn on every SDK migration pack whose Dart/Flutter version gate this project already satisfies.",
+      "enableAll": "Enable all applicable ({count})",
+      "enableBreakingTitle": "Turn on only the SDK packs that flag APIs already removed in your target version.",
+      "enableBreaking": "Enable breaking only ({count})",
+      "enableDeprecationTitle": "Turn on only the SDK packs that flag APIs deprecated (but still working) in your target version.",
+      "enableDeprecation": "Enable deprecation only ({count})",
+      "noPacksInCatalogue": "No SDK migration packs are registered."
+    },
+    "configFile": {
+      "analysisSettings": {
+        "title": "Analysis settings",
+        "hint": "Controls how many issues the Problems tab shows and where the analysis report is written."
+      },
+      "maxIssues": {
+        "label": "Max issues",
+        "desc": "Caps the number of non-error issues shown in the Problems tab. 0 means unlimited. Overflow still appears in the full report file."
+      },
+      "output": {
+        "label": "Output",
+        "desc": "Where the analysis report is written: terminal only, a file only, or both."
+      },
+      "tierCap": {
+        "title": "Tier cap",
+        "hint": "Caps which tiers run at analysis time, independent of which rules are explicitly enabled. Leave as None to use the extension's Tier setting.",
+        "none": "None (use the Tier tab's setting)"
+      },
+      "saropaTier": {
+        "label": "saropa_tier"
+      },
+      "runtimeTier": {
+        "label": "runtime_tier"
+      },
+      "platforms": {
+        "title": "Target platforms",
+        "hint": "Disable platforms this project does not target so platform-specific rules for them stay off."
+      },
+      "severities": {
+        "title": "Severity overrides",
+        "hint": "Overrides a specific rule's severity, or turns it off entirely, independent of tier and rule packs.",
+        "level": "Level",
+        "empty": "No severity overrides are set.",
+        "rulePlaceholder": "rule_name"
+      },
+      "bannedUsage": {
+        "title": "Banned usage",
+        "hint": "Flags a specific identifier (a function, class, or member name) anywhere it appears in the project, with a custom reason shown in the diagnostic.",
+        "identifier": "Identifier",
+        "identifierPlaceholder": "e.g. print",
+        "reason": "Reason",
+        "reasonPlaceholder": "e.g. Use Logger instead",
+        "empty": "No identifiers are banned."
+      },
+      "diagnosticStats": {
+        "title": "Diagnostic thresholds",
+        "hint": "CI-style budget gates: warn or fail when a rule's violation count crosses a threshold.",
+        "warn": "Warn at",
+        "fail": "Fail at",
+        "empty": "No diagnostic thresholds are set."
+      },
+      "baseline": {
+        "title": "Baseline",
+        "hint": "A baseline suppresses the project's EXISTING violations so only newly-introduced findings surface afterward.",
+        "emptyHint": "No baseline has been created yet. Creating one suppresses today's violations and activates baseline suppression in the config.",
+        "createButton": "Create / refresh baseline",
+        "createTitle": "Runs dart run saropa_lints:baseline — writes saropa_baseline.json and activates it in the config.",
+        "openButton": "Open baseline file",
+        "openTitle": "Open saropa_baseline.json in the editor.",
+        "summary": "{files} file(s), {violations} violation(s) baselined — generated {generated}.",
+        "unknownDate": "at an unknown time",
+        "count": "Count"
+      },
+      "optimizer": {
+        "openStandalone": "Open standalone",
+        "openStandaloneTitle": "Open the Analysis Optimizer in its own editor tab.",
+        "unavailable": "The Analysis Optimizer is not available in this session."
+      }
+    },
+    "automation": {
+      "hint": "Extension settings that control when analysis runs and how findings are shown. These mirror the same settings in File > Preferences > Settings under Saropa Lints."
+    },
+    "extension": {
+      "hint": "Extension-wide display preferences.",
+      "linkNote": "Lint integration on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
+    }
+  },
   "consolidated": {
     "kicker": "Security · Quality",
     "searchPlaceholder": "Filter rules…",
