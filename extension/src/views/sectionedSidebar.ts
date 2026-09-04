@@ -250,15 +250,6 @@ function buildEditorDashboardItems(): LeafItem[] {
         ? `Dependency vibrancy report · ${needles} to adopt`
         : 'Dependency vibrancy report';
     return [
-        // Launchpad first: it consolidates every dashboard below onto one page, so it is the
-        // natural entry point for the section.
-        new LeafItem(
-            'Saropa Dashboards',
-            'All dashboards on one page',
-            'saropaLints.openDashboards',
-            'dashboard',
-            new vscode.ThemeColor('charts.blue'),
-        ),
         new LeafItem(
             'Lints Config',
             'Tiers, rule packs, SDK rollout',

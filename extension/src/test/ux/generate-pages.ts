@@ -22,16 +22,20 @@ import { rankPackages } from '../../vibrancy/scoring/comparison-ranker';
 import { buildPackageDetailHtml } from '../../vibrancy/views/package-detail-html';
 import { buildKnownIssuesHtml } from '../../vibrancy/views/known-issues-html';
 import { renderViolationsDashboardHtml } from '../../views/violationsDashboardHtml';
+// Style-system migration (plan §1.5): a populated Findings fixture, built through the same
+// buildFilteredIndex -> buildDashboardSections pipeline the live view uses, so the migration
+// onto dashboardChromeStyles gets real table/chart/toolbar coverage instead of only the empty
+// state the harness previously pinned.
+import { buildFilteredIndex, buildDashboardSections } from '../../views/issuesTreeModel';
+import { DEFAULT_SUPPRESSIONS } from '../../suppressionsStore';
+import type { Violation } from '../../violationsReader';
 import type { VibrancyResult, ComparisonData } from '../../vibrancy/types';
-// Phase 7 additions: the three brand-new Phase 3/4/6 surfaces had zero visual-harness coverage
-// before this pass (tsc + unit tests only). Home hub and Rules & Tiers are pure builders (data in,
-// HTML string out) so they slot into the existing fixture pattern directly. Project Map's shell
-// needs a `vscode.Webview`-shaped stub only for its `cspSource` field, and Rules & Tiers needs a
-// real project root on disk (it reads pubspec.yaml / analysis_options*.yaml directly, not through
-// an injectable seam) — this repo's own root satisfies that, the same way other fixtures below use
-// real ranking/scoring code rather than re-mocking it.
-import { buildShell, type HomeCardSummaries } from '../../views/saropaDashboardsView';
-import type { HomeKpis } from '../../views/dashboardSummaries';
+// Phase 7 additions: Rules & Tiers had zero visual-harness coverage before this pass (tsc + unit
+// tests only). It is a pure builder (data in, HTML string out) so it slots into the existing
+// fixture pattern directly, but needs a real project root on disk (it reads pubspec.yaml /
+// analysis_options*.yaml directly, not through an injectable seam) — this repo's own root
+// satisfies that, the same way other fixtures below use real ranking/scoring code rather than
+// re-mocking it.
 import { RulePacksWebviewProvider } from '../../rulePacks/rulePacksWebviewProvider';
 import { buildShellHtml as buildProjectMapShellHtml, buildScanningMapPaneHtml } from '../../views/projectMapShell';
 import { buildReportsTabHtml } from '../../views/projectMapReports';
@@ -142,6 +146,46 @@ function comparisonFixture() {
   ]);
 }
 
+/** A populated Findings dashboard fixture: real Violation rows run through the same
+ *  buildFilteredIndex -> buildDashboardSections pipeline the live view uses (see
+ *  violationsWideReportView.ts), so the findings table, top-rules table, chip strip, and
+ *  charts all render with real data instead of the empty state. Added for the style-system
+ *  migration onto dashboardChromeStyles (plan §1.5) — before this the harness only ever
+ *  exercised the empty state (`findings-empty`), never the table/chart/toolbar CSS this
+ *  migration actually touched. */
+function violationsPopulatedFixture() {
+  const violations: Violation[] = [
+    { file: '/proj/lib/a.dart', line: 12, rule: 'avoid_print', message: 'Avoid print() in production code.', severity: 'warning', impact: 'medium' },
+    { file: '/proj/lib/a.dart', line: 40, rule: 'avoid_print', message: 'Avoid print() in production code.', severity: 'warning', impact: 'medium' },
+    { file: '/proj/lib/b.dart', line: 7, rule: 'unsafe_cast', message: 'Unchecked cast may throw at runtime.', severity: 'error', impact: 'critical' },
+    { file: '/proj/lib/c.dart', line: 3, rule: 'missing_doc', message: 'Public API member is missing documentation.', severity: 'info', impact: 'low' },
+  ];
+  const index = buildFilteredIndex(violations, '', new Set(['error', 'warning', 'info']), new Set(['error', 'warning', 'info', 'critical', 'medium', 'low']), new Set(), DEFAULT_SUPPRESSIONS);
+  const sections = buildDashboardSections(index, 'severity');
+  return {
+    exportViolations: violations, totalRawAfterDisable: violations.length, filteredCount: violations.length, truncatedSource: false,
+    maxSourceViolations: 4000, pageSize: 50, groupBy: 'severity' as const, textFilter: '',
+    severities: ['error', 'warning', 'info'], impacts: ['error', 'warning', 'info'],
+    sections,
+    analyzerSuppressions: { total: 2, byKind: [['ignore_for_file', 2]] as [string, number][], byRule: [['avoid_print', 2]] as [string, number][], byFile: [] as [string, number][] },
+    viewSuppressions: {
+      active: false, folderCount: 0, fileCount: 0, ruleCount: 0, ruleInFileEntryCount: 0,
+      severityCount: 0, impactCount: 0, sampleFolders: [], sampleFiles: [], sampleRules: [],
+      sampleRuleInFileLines: [],
+    },
+    todoHackSnapshot: { enabled: true, capped: false, todos: [{ file: '/proj/lib/a.dart', line: 20, snippet: 'TODO: extract to a service' }], hacks: [] },
+    driftAdvisorSnapshot: { integrationEnabled: false, connected: false, issues: [] as [] },
+    severityCounts: { error: 1, warning: 2, info: 1 },
+    impactCounts: { error: 1, warning: 2, info: 1 },
+    reportTimestamp: '2026-09-04T00:00:00Z',
+    extensionVersion: '16.0.0',
+    topRule: { name: 'avoid_print', count: 2 },
+    topRules: [{ name: 'avoid_print', count: 2, severity: 'warning' }],
+    filesAffected: 3,
+    enabledRuleCount: 480,
+  };
+}
+
 function violationsEmptyFixture() {
   return {
     exportViolations: [], totalRawAfterDisable: 0, filteredCount: 0, truncatedSource: false,
@@ -158,32 +202,6 @@ function violationsEmptyFixture() {
     driftAdvisorSnapshot: { integrationEnabled: false, connected: false, issues: [] as [] },
     severityCounts: { error: 0, warning: 0, info: 0 },
     impactCounts: { error: 0, warning: 0, info: 0 },
-  };
-}
-
-/** Home hub fixture: a populated KPI band (not the "not scanned" empty state, which
- *  `saropaDashboardsView.test.ts` already pins) plus one representative body string per card. */
-function homeKpisFixture(): HomeKpis {
-  return {
-    healthScore: 82,
-    issueCount: 143,
-    enginesRunning: 2,
-    enginesTotal: 3,
-    packagesTotal: 40,
-    packagesAttention: 3,
-    codeHealthGrade: 'B',
-    projectMapScanned: true,
-  };
-}
-
-function homeCardsFixture(): HomeCardSummaries {
-  return {
-    findings: '<div class="summary-grid"><span class="metric">143 issues</span></div>',
-    rulesAndTiers: '<div class="summary-grid"><span class="metric">Recommended tier</span></div>',
-    packages: '<div class="summary-grid"><span class="metric">40 packages · 3 need attention</span></div>',
-    codeHealth: '<div class="summary-grid"><span class="metric">Grade B</span></div>',
-    projectMap: '<div class="summary-grid"><span class="metric">Last scanned 2h ago</span></div>',
-    fullAudit: '<p class="summary-empty">Not run yet.</p>',
   };
 }
 
@@ -248,8 +266,8 @@ const PAGES: Array<{ name: string; html: () => string }> = [
   { name: 'package-detail', html: () => buildPackageDetailHtml(makeResult('http', 92), [], null) },
   { name: 'known-issues', html: () => buildKnownIssuesHtml() },
   { name: 'findings-empty', html: () => renderViolationsDashboardHtml(violationsEmptyFixture()) },
-  // Phase 7: previously-uncovered Phase 3/4/6 surfaces (see the import comment above).
-  { name: 'home-hub', html: () => buildShell('vscode-resource:', homeKpisFixture(), homeCardsFixture()) },
+  { name: 'findings-populated', html: () => renderViolationsDashboardHtml(violationsPopulatedFixture()) },
+  // Phase 7: previously-uncovered Rules & Tiers surface (see the import comment above).
   { name: 'rules-and-tiers-tier', html: () => buildRulesAndTiersTabHtml('tier') },
   { name: 'rules-and-tiers-config-file', html: () => buildRulesAndTiersTabHtml('configFile') },
   {

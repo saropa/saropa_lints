@@ -232,15 +232,12 @@ function runScan(
  * the host theme. Returns a self-contained HTML document usable either as `webview.html` (the
  * standalone Project Map panel) or as an `<iframe srcdoc>` inside the consolidated dashboard.
  *
- * Exported so the consolidated "Saropa Dashboards" view can embed the EXACT same interactive report
- * (treemap, scatter, hot-spots) without re-deriving these transforms or rebuilding the engine.
- *
  * NOTE (2026-09-04, Phase 6): the standalone panel no longer calls this — it now composes the
  * `dashboardChromeStyles`-based shell (see projectMapShell.ts) via [extractProjectMapParts] instead
- * of swapping in a full second `<html>` document. Left in place (still exported, still exercised by
- * nothing that requires deleting it this phase) rather than removed, since deleting an exported
- * helper is a bigger call than a feature phase should make unilaterally — see the plan doc's
- * "Deferred" note for Phase 6.
+ * of swapping in a full second `<html>` document. Nothing in this codebase calls it any more (the
+ * consolidated "Saropa Dashboards" hub that was its other caller was deleted — see
+ * `PLAN_sidebar_and_hub_reset.md` §4); left exported rather than removed since deleting a public
+ * helper is a bigger call than this phase should make unilaterally.
  */
 export function transformProjectMapHtml(
   raw: string,
@@ -270,8 +267,8 @@ export function transformProjectMapHtml(
 
 /**
  * The three composable pieces of the Project Map report, extracted from the generated HTML by its
- * `<!--PM_*-->` boundary markers so the consolidated "Saropa Dashboards" view can drop the report
- * into one shared document beside Code Health:
+ * `<!--PM_*-->` boundary markers so the standalone panel's shell (projectMapShell.ts) can drop the
+ * report into one shared document beside the Reports tab:
  *
  *   - [styleHtml]  — the `<style>` block. Every rule is scoped under `.pm-pane`, so it cannot leak
  *                    onto the host chrome or the Code Health pane.
@@ -297,9 +294,9 @@ const _pmScriptRe = /<!--PM_SCRIPT_START-->([\s\S]*?)<!--PM_SCRIPT_END-->/;
  * Extracts the `<!--PM_*-->`-delimited fragment from a raw
  * `project_health --format html` document, or null if the markers are
  * missing (a template/version mismatch — fail closed rather than embed a
- * broken fragment). Shared by [scanProjectMapToParts] (the consolidated
- * dashboard's embed path) and the standalone panel's own live-scan render, so
- * both surfaces parse the SAME report the SAME way.
+ * broken fragment). Shared by [scanProjectMapToParts] and the standalone
+ * panel's own live-scan render, so both call sites parse the SAME report
+ * the SAME way.
  */
 function extractProjectMapParts(
   raw: string,

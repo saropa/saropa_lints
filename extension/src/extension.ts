@@ -68,7 +68,6 @@ import { registerL10nDeadKeys } from './i18n/l10nDeadKeys';
 // Shared path-segment constants/helpers — keeps 'reports'/'.saropa_lints' in one place.
 import { saropaLintsDataPath } from './reportsPaths';
 import { registerProjectMapCommand } from './views/projectMapView';
-import { registerSaropaDashboardsCommand } from './views/saropaDashboardsView';
 import { registerHealthCodeLens } from './views/healthCodeLens';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
@@ -683,7 +682,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Dead-key detection — hints on en.json keys never referenced in source.
   registerL10nDeadKeys(context);
   registerProjectMapCommand(context);
-  registerSaropaDashboardsCommand(context);
   registerHealthCodeLens(context);
   let driftAdvisorRefreshInProgress = false;
 
@@ -1205,17 +1203,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         }
       }
       statusBarItem.tooltip = tooltipLines.join('\n');
-      // Click opens the Home hub (plan Phase 3, §2.3) — it now surfaces the
-      // same health/issue numbers this item carries (via the KPI band) plus
-      // one-click links to every other dashboard, so it is the more useful
-      // landing spot than jumping straight into Findings. Was
-      // saropaLints.openViolationsWideReport.
-      statusBarItem.command = 'saropaLints.openDashboards';
+      statusBarItem.command = 'saropaLints.openViolationsWideReport';
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
       statusBarItem.backgroundColor = undefined;
-      statusBarItem.command = 'saropaLints.openDashboards';
+      statusBarItem.command = 'saropaLints.openViolationsWideReport';
     }
     statusBarItem.show();
   };

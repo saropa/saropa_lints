@@ -480,13 +480,13 @@ ${buildCodeHealthBody(payload, summary, problemCount, complexCount, reportFilePa
  * The Code Health report's in-`<body>` content: skip link, live-region announcer, hero status
  * line, optional gate banner, KPI preset-filter strip, saved-file row, toolbar, active-filter
  * chip strip, the sortable function table (with its embedded row-data JSON block), and the
- * keyboard-shortcuts overlay. Factored out of [buildHtml] so the standalone panel and the
- * consolidated "Saropa Dashboards" pane assemble the SAME markup from one source — the only
- * difference between them is the surrounding document (CSP, `<style>`, the client `<script>`).
+ * keyboard-shortcuts overlay. Factored out of [buildHtml] so any embedding host could assemble
+ * the SAME markup from one source — the only difference would be the surrounding document (CSP,
+ * `<style>`, the client `<script>`).
  *
  * [nonce] is applied only to the row-data `<script type="application/json">` block; it is data,
- * not executed code, so under the consolidated host's `'unsafe-inline'` script policy a fresh
- * nonce here is simply ignored rather than required.
+ * not executed code, so under an embedding host's `'unsafe-inline'` script policy a fresh nonce
+ * here is simply ignored rather than required.
  */
 function buildCodeHealthBody(
   payload: ProjectVibrancyPayload,

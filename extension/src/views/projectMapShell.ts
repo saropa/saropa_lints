@@ -45,9 +45,7 @@ export function buildShellHtml(
   const cspSource = webview.cspSource;
   // 'unsafe-inline' (not a nonce) for style/script: the embedded Project Map
   // report fragment carries its own un-nonced <style>/<script> tags (see
-  // extractProjectMapParts in projectMapView.ts) — the same tradeoff the
-  // consolidated "Saropa Dashboards" host already makes for the identical
-  // embed (saropaDashboardsView.ts).
+  // extractProjectMapParts in projectMapView.ts).
   const csp =
     `default-src 'none'; img-src ${cspSource} data:; ` +
     `style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource} 'unsafe-inline';`;
@@ -166,7 +164,7 @@ function pmShellStyles(): string {
  * embedded Project Map report script (which also calls `acquireVsCodeApi()`)
  * gets the same handle instead of throwing "an instance has already been
  * acquired" (the exact bug this pattern exists to avoid — see
- * healthPanel-script.ts / saropaDashboardsView.ts for the same shim).
+ * healthPanel-script.ts for the same shim).
  */
 function pmShellScript(): string {
   const strings = jsonForScriptBlock(shellStrings());

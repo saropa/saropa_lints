@@ -345,102 +345,17 @@
     }
   },
   "dashboards": {
-    "heroTitle": "Dashboards",
-    "openFull": "Open full screen",
-    "kpi": {
-      "health": "Health score",
-      "healthPending": "Run analysis",
-      "issues": "Open issues",
-      "engines": "Engines",
-      "enginesValue": "{running}/{total} running",
-      "enginesOff": "Off",
-      "packages": "Packages",
-      "packagesValue": "{count} scanned",
-      "packagesAttention": "{count} need attention",
-      "codeHealthGrade": "Code health",
-      "projectSize": "Project size",
-      "projectSizeMapped": "Mapped — see Project Map",
-      "notScanned": "Not scanned"
-    },
-    "card": {
-      "open": "Open"
-    },
     "controls": {
-      "actions": "Actions",
-      "settings": "Settings",
-      "help": "Help",
-      "runAnalysis": "Run analysis",
-      "initializeConfig": "Initialize / Update config",
-      "on": "On",
-      "off": "Off",
-      "yes": "Yes",
-      "no": "No",
-      "lintIntegrationState": "Lint integration: {state}",
       "analyzerPlugin": "Analyzer plugin",
       "analyzerPluginLive": "On — live in-editor diagnostics",
       "analyzerPluginDisabled": "Off — scan-on-save only",
       "analyzerPluginAbsent": "Not configured",
-      "tierState": "Tier: {tier}",
       "lane": "Lane",
       "laneLight": "Light — ~200 rules in-editor, rest on save",
       "laneFull": "Full — every enabled rule in-editor",
       "processHealth": "Engines (LSP / Analyzer)",
-      "processHealthOpen": "Open Process Health to toggle",
-      "runAfterConfigState": "Run analysis after config change: {state}",
-      "runAfterDependencyState": "Run analysis after dependency change: {state}",
-      "uiLanguageState": "UI language: {language}",
-      "gettingStarted": "Getting Started",
-      "about": "About Saropa Lints",
-      "pubDev": "Package on pub.dev",
-      "aiInstructions": "Create AI agent instructions"
-    },
-    "pane": {
-      "projectMap": "Project Map",
-      "codeHealth": "Code Health",
-      "lintsConfig": "Lints Config",
-      "findings": "Findings",
-      "package": "Package Dashboard",
-      "commandCatalog": "Command Catalog",
-      "fullAudit": "Full Audit"
-    },
-    "projectMap": {
-      "scanning": "Scanning project map…",
-      "empty": "Not mapped yet — open Project Map to run a scan.",
-      "lastMapped": "Last mapped"
-    },
-    "codeHealth": {
-      "scanning": "Scanning code health…",
-      "empty": "Not scanned this session — open Code Health to run a scan.",
-      "grade": "Grade",
-      "score": "Score",
-      "functions": "Functions scanned"
-    },
-    "fullAudit": {
-      "description": "One-shot report covering every enabled rule. Run it to generate a fresh audit."
-    },
-    "config": {
-      "tier": "Tier",
-      "enabledRules": "Enabled rules",
-      "rulePacks": "Rule packs",
-      "packages": "Packages"
-    },
-    "package": {
-      "total": "Packages",
-      "attention": "Needs attention",
-      "blocked": "Blocked",
-      "empty": "No package scan yet — open the dashboard to run one."
-    },
-    "findings": {
-      "total": "Total",
-      "errors": "Errors",
-      "warnings": "Warnings",
-      "info": "Info"
-    },
-    "catalog": {
-      "commands": "Commands",
-      "recent": "Recently used"
-    },
-    "scanFailed": "Scan failed. Open the full dashboard to see details and retry."
+      "processHealthOpen": "Open Process Health to toggle"
+    }
   },
   "configSuggestions": {
     "enabledToast": "Enabled the {pack} rule pack in analysis_options.yaml",
@@ -1995,6 +1910,11 @@
       "rssNote": {
         "inProcess": "in-process, not separately measurable",
         "notRunning": "not running"
+      },
+      "description": {
+        "analyzerPlugin": "Runs inside the Dart analysis server — live squiggles in the editor as you type, no scan needed. Toggling rewrites the plugins: block in analysis_options.yaml.",
+        "scanDaemon": "Background process that rescans the whole project on save and writes reports/.saropa_lints/violations.json. Toggling off suspends it; the next save resumes it.",
+        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting."
       }
     },
     "toggle": {
@@ -2003,7 +1923,9 @@
     },
     "action": {
       "killAll": "Kill All",
-      "restartAll": "Restart All"
+      "restartAll": "Restart All",
+      "killAllDescription": "Force-stops the LSP Server only. Analyzer Plugin and Scan Daemon cannot be killed independently yet — use each engine's own ON/OFF toggle instead.",
+      "restartAllDescription": "Stops and relaunches the LSP Server (or starts it if it isn't running). Analyzer Plugin and Scan Daemon are unaffected — use each engine's own ON/OFF toggle instead."
     },
     "log": {
       "empty": "No log entries yet.",

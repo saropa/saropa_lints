@@ -62,6 +62,14 @@ function buildEngineCard(engine: EngineStatus): string {
   // unlike the display name which goes through l10n().
   const engineKey = engine.key;
 
+  // "What does this engine do" subtitle — the sidebar's own "users have to
+  // guess" complaint applies here too, so this is a visible line, not a
+  // hover-only tooltip. Description keys use 'analyzerPlugin' (matching the
+  // existing debug.engine.analyzerPlugin name key) rather than the terser
+  // 'analyzer' EngineStatus.key.
+  const descriptionKey = engineKey === 'analyzer' ? 'analyzerPlugin' : engineKey;
+  const description = escapeHtml(l10n(`debug.engine.description.${descriptionKey}`));
+
   // Toggle button labels — ON is highlighted when enabled, OFF when disabled.
   const onLabel = escapeHtml(l10n('debug.toggle.on'));
   const offLabel = escapeHtml(l10n('debug.toggle.off'));
@@ -90,6 +98,7 @@ function buildEngineCard(engine: EngineStatus): string {
     </span>
     ${pidValue}
   </div>
+  <div class="engine-description">${description}</div>
   <div class="engine-detail">
     <span class="engine-status"><span class="status-label">${statusLabel}</span> <span class="status-value ${statusClass}">${statusText}</span></span>
   </div>
@@ -130,14 +139,28 @@ function buildMetricsLine(engine: EngineStatus): string {
   return `<div class="engine-metrics">${parts.join(' <span class="metric-sep">·</span> ')}</div>`;
 }
 
-/** Render the Kill All / Restart All action buttons. */
+/**
+ * Render the Kill All / Restart All action buttons plus a visible subtitle
+ * for each — both buttons currently only affect the LSP Server (see
+ * extension.ts `HealthPanel.onKillAll`/`onRestartAll`), so the subtitle
+ * says that explicitly rather than letting the "All" in the label imply
+ * more than the buttons actually do.
+ */
 export function buildActionsBar(): string {
   const killLabel = escapeHtml(l10n('debug.action.killAll'));
   const restartLabel = escapeHtml(l10n('debug.action.restartAll'));
+  const killDescription = escapeHtml(l10n('debug.action.killAllDescription'));
+  const restartDescription = escapeHtml(l10n('debug.action.restartAllDescription'));
 
   return `<div class="actions-bar">
-  <button class="btn-danger" data-action="killAll">${killLabel}</button>
-  <button class="btn-secondary" data-action="restartAll">${restartLabel}</button>
+  <div class="action-item">
+    <button class="btn-danger" data-action="killAll" title="${killDescription}">${killLabel}</button>
+    <div class="action-description">${killDescription}</div>
+  </div>
+  <div class="action-item">
+    <button class="btn-secondary" data-action="restartAll" title="${restartDescription}">${restartLabel}</button>
+    <div class="action-description">${restartDescription}</div>
+  </div>
 </div>`;
 }
 
@@ -238,6 +261,11 @@ export function getEngineCardsStyles(): string {
   color: var(--vscode-descriptionForeground, #94a3b8);
   font-family: var(--vscode-editor-font-family, monospace);
 }
+.engine-description {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+}
 .engine-detail {
   margin-top: 4px;
   font-size: 12px;
@@ -296,9 +324,20 @@ export function getEngineCardsStyles(): string {
 /* ── Actions bar ──────────────────────────────────────────── */
 .actions-bar {
   display: flex;
-  gap: 8px;
+  gap: 16px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--vscode-widget-border, #e5e7eb);
+}
+.action-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 220px;
+}
+.action-description {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+  line-height: 1.35;
 }
 .btn-danger {
   padding: 4px 12px;

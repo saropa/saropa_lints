@@ -226,8 +226,6 @@
     "src/test/views/overviewTreeFlat.test.ts",
     "src/views/aboutView.ts",
     "src/test/views/aboutView.test.ts",
-    "src/views/saropaDashboardsView.ts",
-    "src/test/views/saropaDashboardsView.test.ts",
     "src/i18n/l10nParsers.ts",
     "src/test/l10nParsers.test.ts",
     "src/audit/audit-command.ts",
