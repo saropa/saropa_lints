@@ -12,6 +12,9 @@ import { ReviewStateService } from '../services/review-state';
 import { CacheService } from '../services/cache-service';
 import { l10n } from '../../i18n/runtime';
 import { reportsUri } from '../../reportsPaths';
+// Phase 5 Settings tab: the flat key list to read from config, plus the
+// grouping helper that turns raw values into the shape report-html.ts renders.
+import { ALL_VIBRANCY_SETTING_KEYS, buildVibrancySettingGroups } from './settings-tab';
 
 /** Singleton webview panel for the vibrancy report. */
 export class VibrancyReportPanel {
@@ -106,11 +109,21 @@ export class VibrancyReportPanel {
 
     private _updateContent(options: ReportOptions): void {
         this._pubspecUri = options.pubspecUri;
-        this._options = options;
+        /* Settings tab (Phase 5): read every managed packageVibrancy.* key
+           fresh on each render so the form always reflects the current
+           workspace settings, including edits made outside the dashboard
+           (Settings UI, settings.json, another window). Cheap -- 54 sync
+           config reads, no I/O. */
+        const config = vscode.workspace.getConfiguration('saropaLints.packageVibrancy');
+        const rawValues: Record<string, unknown> = {};
+        for (const key of ALL_VIBRANCY_SETTING_KEYS) {
+            rawValues[key] = config.get(key);
+        }
+        this._options = { ...options, vibrancySettingGroups: buildVibrancySettingGroups(rawValues) };
         /* New HTML means the script re-inits; wait for its ready signal again
            before flushing any queued package selection. */
         this._ready = false;
-        this._panel.webview.html = buildReportHtml(options);
+        this._panel.webview.html = buildReportHtml(this._options);
     }
 
     /** Package the pane should open once the webview is ready. */
@@ -140,12 +153,33 @@ export class VibrancyReportPanel {
     }
 
     private async _handleMessage(
-        msg: { type: string; package?: string; path?: string; line?: number; url?: string; data?: unknown }
+        msg: { type: string; package?: string; path?: string; line?: number; url?: string; data?: unknown; command?: string; key?: string; value?: unknown }
             & PaneMessage,
     ): Promise<void> {
         if (msg.type === 'dashboardReady') {
             this._ready = true;
             this._flushPendingSelect();
+            return;
+        }
+
+        if (msg.type === 'openTab' && msg.command) {
+            /* Deep-link tabs (Upgrades/Full report/Known issues/Compare, Phase
+               5): the tab panel is a lightweight in-document card, not a copy
+               of the target panel's markup (see packages-tabs.ts doc comment
+               for why). Opening it just runs the same command the old
+               standalone dashboard row used. */
+            await vscode.commands.executeCommand(msg.command);
+            return;
+        }
+
+        if (msg.type === 'updateVibrancySetting' && msg.key !== undefined) {
+            /* Settings tab (Phase 5): write straight through to the real
+               setting, Workspace-scoped like the rest of the codebase's
+               config writers (see setup.ts's tier/enabled writers). No
+               re-render is triggered here -- the next createOrShow/rescan
+               will pick up the new value via _updateContent's fresh read. */
+            await vscode.workspace.getConfiguration('saropaLints.packageVibrancy')
+                .update(msg.key, msg.value, vscode.ConfigurationTarget.Workspace);
             return;
         }
 

@@ -16,6 +16,9 @@
 import { VibrancyResult } from '../types';
 import { scoreToGrade } from '../scoring/status-classifier';
 import { l10n } from '../../i18n/runtime';
+// Only the TYPE is needed here (ReportOptions carries pre-built groups, not
+// raw config) -- avoids this "pure renderer" module importing `vscode`.
+import type { VibrancySettingGroup } from './settings-tab';
 
 /** Options passed to the report builder beyond just results. */
 export interface ReportOptions {
@@ -47,6 +50,16 @@ export interface ReportOptions {
     // has completed since the panel opened, or the displayed data came from
     // a pre-timestamp persisted snapshot.
     readonly lastScanTimestamp?: number;
+    /**
+     * Pre-built Settings-tab groups (Phase 5). Optional so every other
+     * `ReportOptions` construction site (tests, `_updateContent`'s callers
+     * that predate this field) keeps compiling unchanged -- an absent value
+     * just renders the Settings tab with no fields rather than crashing.
+     * report-webview.ts populates this by reading
+     * `workspace.getConfiguration('saropaLints.packageVibrancy')` for every
+     * key in `ALL_VIBRANCY_SETTING_KEYS`.
+     */
+    readonly vibrancySettingGroups?: readonly VibrancySettingGroup[];
 }
 
 /** Resolve the canonical repository URL (trailing slashes stripped). */

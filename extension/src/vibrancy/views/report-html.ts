@@ -43,6 +43,12 @@ import {
     buildRepoShareMap,
     buildPackageDataScript,
 } from './report-html-data';
+// Phase 5 tab shell: tab bar + deep-link panels (Upgrades/Full report/Known
+// issues/Compare) and the in-document Settings tab. See packages-tabs.ts for
+// why the deep-link tabs open the existing standalone panels rather than
+// re-rendering their markup inline.
+import { buildTabBar, buildDeepLinkPanels, getPackagesTabsStyles, getPackagesTabsScript } from './packages-tabs';
+import { buildSettingsTab, getSettingsTabStyles, getSettingsTabScript, VibrancySettingGroup } from './settings-tab';
 
 // Re-export the public surface so existing importers (report-webview.ts,
 // package-detail-html.ts, the report tests) keep referencing report-html.ts
@@ -117,7 +123,7 @@ export function buildReportHtml(options: ReportOptions): string {
          via SMIL <animate>, so no inline style attributes are needed. -->
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
-    <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}</style>
+    <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}${getPackagesTabsStyles()}${getSettingsTabStyles()}</style>
 </head>
 <body>
     <header class="report-header">
@@ -141,7 +147,14 @@ export function buildReportHtml(options: ReportOptions): string {
             <span id="scan-progress-pct" class="scan-progress-pct"></span>
         </div>
     </div>
-    <main>
+    ${/* Phase 5 tab shell: Overview (this existing dashboard content, now
+        wrapped as the 'overview' tab panel), Upgrades / Full report / Known
+        issues / Compare (deep-link panels that open the existing standalone
+        webviews), and Settings (in-document form over every
+        packageVibrancy.* setting). See packages-tabs.ts for why the
+        deep-link tabs don't re-render their target's markup inline. */ ''}
+    ${buildTabBar()}
+    <main id="pkg-tab-overview" class="pkg-tab-panel" role="tabpanel" aria-labelledby="pkg-tab-btn-overview">
     ${buildGradeBreakdown(results, avg)}
     ${buildReportSummary(options)}
     ${buildChartSection(results)}
@@ -171,6 +184,8 @@ export function buildReportHtml(options: ReportOptions): string {
        * table) immediately visible and treats the network as a drill-down. */ ''}
     ${buildNetworkSection(results)}
     </main>
+    ${buildDeepLinkPanels()}
+    ${buildSettingsTab(options.vibrancySettingGroups ?? [])}
     ${buildKeyboardShortcutsOverlay([
         { key: '/', label: l10n('packageDashboard.shortcuts.focusSearch') },
         { key: '↓ / j', label: l10n('packageDashboard.shortcuts.nextRow') },
@@ -180,7 +195,7 @@ export function buildReportHtml(options: ReportOptions): string {
         { key: 'Alt + ←', label: l10n('packageDashboard.shortcuts.historyBack') },
         { key: '?', label: l10n('packageDashboard.shortcuts.showOverlay') },
     ])}
-    <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();</script>
+    <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();${getPackagesTabsScript()}${getSettingsTabScript()}</script>
 </body>
 </html>`;
 }

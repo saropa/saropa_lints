@@ -1050,6 +1050,34 @@
   "packageDashboard": {
     "documentTitle": "Saropa Package Dashboard",
     "heroTitle": "Saropa Package Dashboard",
+    "tabs": {
+      "aria": "Package dashboard sections",
+      "overview": "Overview",
+      "upgrades": "Upgrades",
+      "upgradesDesc": "Review available package upgrades, grouped by risk, with one-click apply.",
+      "fullReport": "Full report",
+      "fullReportDesc": "Export the exhaustive feature-usage report (every scanned package, every mined changelog feature) as an HTML/Markdown/JSON file and open it.",
+      "knownIssues": "Known issues",
+      "knownIssuesDesc": "Browse known vulnerabilities and advisories reported against your dependencies.",
+      "compare": "Compare",
+      "compareDesc": "Compare two or more packages side by side on score, size, and activity.",
+      "settings": "Settings",
+      "openButton": "Open {tab}"
+    },
+    "settingsTab": {
+      "intro": "Every packageVibrancy.* setting, grouped. Changes save immediately to your workspace settings.",
+      "noLimit": "no limit",
+      "group": {
+        "access": "Access & Registries",
+        "scan": "Scan",
+        "display": "Display",
+        "weights": "Score Weights",
+        "upgrade": "Upgrade",
+        "watch": "Watch",
+        "budget": "Budget",
+        "vuln": "Vulnerabilities"
+      }
+    },
     "detailPane": {
       "aria": "Package detail",
       "title": "Package detail",
