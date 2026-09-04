@@ -16,6 +16,10 @@
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
 import { createWebviewCspNonce, escapeHtml, escapeJsonStringForScriptBlock, jsonForScriptBlock } from '../vibrancy/views/html-utils';
+// Canonical chrome (design principle 5, "one design system") supplies the hero,
+// KPI chip strip, toolbar/field/button, and table primitives; buildAuditStyles()
+// now holds only the audit-specific remainder (severity pills, baseline badges).
+import { getDashboardChromeStyles } from '../views/dashboardChromeStyles';
 import { buildAuditStyles } from './audit-report-styles';
 import { buildAuditScript } from './audit-report-script';
 
@@ -141,33 +145,38 @@ export function buildAuditReportHtml(
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(l10n('audit.report.title'))}</title>
-  <style nonce="${nonce}">${buildAuditStyles()}</style>
+  <style nonce="${nonce}">${getDashboardChromeStyles()}${buildAuditStyles()}</style>
 </head>
 <body>
-  <!-- Summary header -->
-  <header class="audit-header">
-    <h1>${escapeHtml(l10n('audit.report.heading'))}</h1>
-    <p class="audit-subtitle">
-      ${escapeHtml(l10n('audit.report.subtitle', { count: String(totalCount), timestamp }))}
-      ${hasBaseline ? `<br/><span class="audit-baseline-tag">${escapeHtml(l10n('audit.report.baselineSubtitle', { date: String(baseline?.['comparedTo'] ?? '') }))}</span>` : ''}
-    </p>
-    <div class="audit-kpi-strip">
-      ${buildKpiStrip(tierCounts, severityCounts)}
+  <!-- Summary header — canonical .dash-hero (design principle 5, one design system). -->
+  <header class="dash-hero">
+    <div class="hero-text">
+      <h1>${escapeHtml(l10n('audit.report.heading'))}</h1>
+      <p class="status-line">
+        ${escapeHtml(l10n('audit.report.subtitle', { count: String(totalCount), timestamp }))}
+        ${hasBaseline ? `<span class="dot">·</span><span class="audit-baseline-tag">${escapeHtml(l10n('audit.report.baselineSubtitle', { date: String(baseline?.['comparedTo'] ?? '') }))}</span>` : ''}
+      </p>
     </div>
   </header>
+  <div class="chip-strip">
+    ${buildKpiStrip(tierCounts, severityCounts)}
+  </div>
 
   <!-- Shown only while a deferred (>10MB) payload is still loading. -->
   ${ctx.deferredUri ? `<div class="audit-loading-banner" id="audit-loading-banner" data-fail-message="${escapeHtml(l10n('audit.report.deferredLoadFailed', { pageSize: String(PAGE_SIZE) }))}">${escapeHtml(l10n('audit.report.deferredLoading'))}</div>` : ''}
 
-  <!-- Controls: search + filters + actions -->
-  <div class="audit-controls">
-    <input
-      type="text"
-      id="audit-search"
-      class="audit-search"
-      placeholder="${escapeHtml(l10n('audit.report.searchPlaceholder'))}"
-    />
-    <div class="audit-filters">
+  <!-- Controls: search + filters + actions — canonical .toolbar-band/.field/.btn. -->
+  <div class="toolbar-band">
+    <div class="toolbar-row">
+      <div class="field">
+        <input
+          type="text"
+          id="audit-search"
+          placeholder="${escapeHtml(l10n('audit.report.searchPlaceholder'))}"
+        />
+      </div>
+    </div>
+    <div class="toolbar-row">
       <div class="audit-filter-group">
         <span class="audit-filter-label">${escapeHtml(l10n('audit.report.filterTier'))}</span>
         ${buildFilterChips('tier', tiers, tierCounts)}
@@ -180,22 +189,22 @@ export function buildAuditReportHtml(
         <span class="audit-filter-label">${escapeHtml(l10n('audit.report.filterImpact'))}</span>
         ${buildFilterChips('impact', impacts, impactCounts)}
       </div>
-    </div>
-    ${hasBaseline ? `<div class="audit-filter-group">
+      ${hasBaseline ? `<div class="audit-filter-group">
         <span class="audit-filter-label">${escapeHtml(l10n('audit.report.filterBaselineStatus'))}</span>
-        <button class="audit-chip audit-chip-active audit-baseline-new" data-dim="baselineStatus" data-val="new">${escapeHtml(l10n('audit.report.baselineNew'))} <span class="audit-chip-count">(${baseline?.['new'] ?? 0})</span></button>
-        <button class="audit-chip audit-chip-active" data-dim="baselineStatus" data-val="unchanged">${escapeHtml(l10n('audit.report.baselineUnchanged'))} <span class="audit-chip-count">(${baseline?.['unchanged'] ?? 0})</span></button>
+        <button class="chip audit-chip audit-chip-active audit-baseline-new" data-dim="baselineStatus" data-val="new">${escapeHtml(l10n('audit.report.baselineNew'))} <span class="audit-chip-count">(${baseline?.['new'] ?? 0})</span></button>
+        <button class="chip audit-chip audit-chip-active" data-dim="baselineStatus" data-val="unchanged">${escapeHtml(l10n('audit.report.baselineUnchanged'))} <span class="audit-chip-count">(${baseline?.['unchanged'] ?? 0})</span></button>
       </div>` : ''}
-    <div class="audit-actions">
-      <button id="audit-save-baseline" class="audit-btn">${escapeHtml(l10n('audit.report.saveBaseline'))}</button>
-      <button id="audit-copy-json" class="audit-btn">${escapeHtml(l10n('audit.report.copyJson'))}</button>
-      <button id="audit-toggle-group" class="audit-btn">${escapeHtml(l10n('audit.report.toggleGroup'))}</button>
+    </div>
+    <div class="toolbar-row">
+      <button id="audit-save-baseline" class="btn tier-3">${escapeHtml(l10n('audit.report.saveBaseline'))}</button>
+      <button id="audit-copy-json" class="btn tier-3">${escapeHtml(l10n('audit.report.copyJson'))}</button>
+      <button id="audit-toggle-group" class="btn tier-3">${escapeHtml(l10n('audit.report.toggleGroup'))}</button>
     </div>
   </div>
 
-  <!-- Diagnostics table -->
-  <div class="audit-table-wrap">
-    <table class="audit-table" id="audit-table">
+  <!-- Diagnostics table — canonical .dash-table. -->
+  <div class="dash-table-wrap">
+    <table class="dash-table" id="audit-table">
       <thead>
         <tr>
           <th class="audit-col-file" data-sort="file">${escapeHtml(l10n('audit.report.colFile'))}</th>
@@ -210,17 +219,17 @@ export function buildAuditReportHtml(
         ${buildDiagnosticRows(initialPage, ctx.root)}
       </tbody>
     </table>
-    ${diagnostics.length === 0 ? `<div class="audit-empty"><span class="audit-empty-icon">✓</span><p>${escapeHtml(l10n('audit.report.empty'))}</p></div>` : ''}
+    ${diagnostics.length === 0 ? `<div class="empty-cta"><span class="audit-empty-icon" aria-hidden="true">✓</span><p class="empty-msg">${escapeHtml(l10n('audit.report.empty'))}</p></div>` : ''}
     <!-- Shown when filters/search produce zero results but diagnostics exist. -->
-    <div class="audit-filtered-empty" id="audit-filtered-empty" hidden>
-      <span class="audit-empty-icon">⊘</span>
-      <p>${escapeHtml(l10n('audit.report.filteredEmpty'))}</p>
+    <div class="empty-cta" id="audit-filtered-empty" hidden>
+      <span class="audit-empty-icon" aria-hidden="true">⊘</span>
+      <p class="empty-msg">${escapeHtml(l10n('audit.report.filteredEmpty'))}</p>
     </div>
   </div>
 
   <!-- Pagination controls for large result sets -->
   <div class="audit-pagination" id="audit-pagination" hidden>
-    <button id="audit-load-more" class="audit-btn">${escapeHtml(l10n('audit.report.loadMore'))}</button>
+    <button id="audit-load-more" class="btn tier-3">${escapeHtml(l10n('audit.report.loadMore'))}</button>
     <span id="audit-shown-count"></span>
   </div>
 
@@ -258,13 +267,13 @@ export function buildAuditErrorHtml(
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(l10n('audit.report.title'))}</title>
-  <style nonce="${nonce}">${buildAuditStyles()}</style>
+  <style nonce="${nonce}">${getDashboardChromeStyles()}${buildAuditStyles()}</style>
 </head>
 <body>
-  <div class="audit-error-state ${stateClass}">
-    <span class="audit-empty-icon">${icon}</span>
-    <h2>${escapeHtml(heading)}</h2>
-    <p>${escapeHtml(message)}</p>
+  <div class="empty-cta ${stateClass}">
+    <span class="audit-empty-icon" aria-hidden="true">${icon}</span>
+    <p class="empty-title">${escapeHtml(heading)}</p>
+    <p class="empty-msg">${escapeHtml(message)}</p>
   </div>
 </body>
 </html>`;
@@ -280,12 +289,12 @@ function buildKpiStrip(
   const pills: string[] = [];
   for (const [severity, count] of severityCounts) {
     pills.push(
-      `<span class="audit-kpi audit-kpi-${escapeHtml(severity)}">${escapeHtml(severity)}: ${count}</span>`,
+      `<span class="chip audit-kpi-${escapeHtml(severity)}">${escapeHtml(severity)}: ${count}</span>`,
     );
   }
   for (const [tier, count] of tierCounts) {
     pills.push(
-      `<span class="audit-kpi audit-kpi-tier">${escapeHtml(tier)}: ${count}</span>`,
+      `<span class="chip audit-kpi-tier">${escapeHtml(tier)}: ${count}</span>`,
     );
   }
   return pills.join('');
@@ -300,7 +309,7 @@ function buildFilterChips(
   return values
     .map(
       (v) =>
-        `<button class="audit-chip audit-chip-active" data-dim="${escapeHtml(dimension)}" data-val="${escapeHtml(v)}">${escapeHtml(v)} <span class="audit-chip-count">(${counts.get(v) ?? 0})</span></button>`,
+        `<button class="chip audit-chip audit-chip-active" data-dim="${escapeHtml(dimension)}" data-val="${escapeHtml(v)}">${escapeHtml(v)} <span class="audit-chip-count">(${counts.get(v) ?? 0})</span></button>`,
     )
     .join('');
 }

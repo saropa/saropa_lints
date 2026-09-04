@@ -37,6 +37,11 @@ import { buildShellHtml as buildProjectMapShellHtml, buildScanningMapPaneHtml } 
 import { buildReportsTabHtml } from '../../views/projectMapReports';
 import { mockWorkspaceFolders } from '../vibrancy/vscode-mock';
 import type * as vscode from 'vscode';
+// Style-system migration pass (plan §1.5 "one design system"): the audit report had ZERO visual
+// harness coverage before this pass (only `deferredPayload.test.ts`, which tests the temp-file
+// write path, never the rendered HTML). Adding it here is how this migration gets a real
+// Chromium/axe-core check instead of relying on tsc + eyeballing the diff.
+import { buildAuditReportHtml } from '../../audit/audit-report-html';
 
 const OUT_DIR = path.resolve(__dirname, '../../../test-ux/.pages');
 
@@ -208,6 +213,22 @@ function buildRulesAndTiersTabHtml(tab: 'tier' | 'configFile'): string {
 /** Minimal stand-in for `vscode.Webview` — `buildShellHtml` only reads `.cspSource`. */
 const FAKE_WEBVIEW = { cspSource: 'vscode-resource:' } as unknown as vscode.Webview;
 
+/** A small populated audit JSON payload: a few diagnostics across every severity + a baseline,
+ *  so the hero, chip-strip KPIs, filter chips, and severity-tinted table rows all render. */
+function auditReportFixture(): Record<string, unknown> {
+  const diagnostics = [
+    { filePath: '/proj/lib/a.dart', line: 12, column: 3, ruleName: 'avoid_print', severity: 'warning', impact: 'medium', tier: 'recommended', problemMessage: 'Avoid print() in production code.', correctionMessage: null, baselineStatus: 'new' },
+    { filePath: '/proj/lib/b.dart', line: 40, column: 1, ruleName: 'missing_doc', severity: 'info', impact: 'low', tier: 'pedantic', problemMessage: 'Public API member is missing documentation.', correctionMessage: null, baselineStatus: 'unchanged' },
+    { filePath: '/proj/lib/c.dart', line: 7, column: 10, ruleName: 'unsafe_cast', severity: 'error', impact: 'critical', tier: 'essential', problemMessage: 'Unchecked cast may throw at runtime.', correctionMessage: null, baselineStatus: 'unchanged' },
+  ];
+  return {
+    timestamp: '2026-09-04T00:00:00Z',
+    diagnostics,
+    summary: { totalCount: diagnostics.length },
+    baseline: { comparedTo: '2026-09-01', new: 1, unchanged: 2 },
+  };
+}
+
 /* ------------------------------------------------------------------- pages */
 
 const PAGES: Array<{ name: string; html: () => string }> = [
@@ -246,6 +267,19 @@ const PAGES: Array<{ name: string; html: () => string }> = [
         .replace('id="pmTabBtnReports" data-tab="reports" role="tab" aria-selected="false"', 'id="pmTabBtnReports" data-tab="reports" role="tab" aria-selected="true"')
         .replace('id="pmTabMap" class="pm-tab-panel"', 'id="pmTabMap" class="pm-tab-panel" hidden')
         .replace('id="pmTabReports" class="pm-tab-panel" role="tabpanel" aria-labelledby="pmTabBtnReports" hidden', 'id="pmTabReports" class="pm-tab-panel" role="tabpanel" aria-labelledby="pmTabBtnReports"'),
+  },
+  // Style-system migration: first-ever visual-harness coverage for the Full Audit report, now
+  // rebuilt on the canonical chrome (dash-hero/chip-strip/toolbar-band/dash-table) — see the
+  // import comment above.
+  {
+    name: 'audit-report',
+    html: () =>
+      buildAuditReportHtml(auditReportFixture(), {
+        webview: FAKE_WEBVIEW,
+        root: '/proj',
+        deferredUri: null,
+        serializedDiagnostics: null,
+      }),
   },
 ];
 
