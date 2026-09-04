@@ -520,4 +520,15 @@ void run(Handler handler) {
       expect(codes, isEmpty);
     });
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('mutable_tearoff - Rule Instantiation', () {
+    test('MutableTearoffRule', () {
+      final rule = MutableTearoffRule();
+      expect(rule.code.lowerCaseName, 'mutable_tearoff');
+      expect(rule.code.problemMessage, contains('[mutable_tearoff]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }

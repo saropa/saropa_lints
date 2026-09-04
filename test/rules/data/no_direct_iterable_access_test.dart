@@ -322,4 +322,18 @@ int firstByte(Uint8List bytes) {
       expect(codes, contains('no_direct_iterable_access'));
     });
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('no_direct_iterable_access - Rule Instantiation', () {
+    test('NoDirectIterableAccessRule', () {
+      final rule = NoDirectIterableAccessRule();
+      expect(rule.code.lowerCaseName, 'no_direct_iterable_access');
+      expect(
+        rule.code.problemMessage,
+        contains('[no_direct_iterable_access]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }

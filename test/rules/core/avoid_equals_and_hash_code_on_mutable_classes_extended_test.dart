@@ -401,4 +401,21 @@ class ImplementsEquatablePoint implements Equatable {
       expect(codes, contains('avoid_equals_and_hash_code_on_mutable_classes_extended'));
     });
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('avoid_equals_and_hash_code_on_mutable_classes_extended - Rule Instantiation', () {
+    test('AvoidEqualsAndHashCodeOnMutableClassesRule', () {
+      final rule = AvoidEqualsAndHashCodeOnMutableClassesRule();
+      expect(
+        rule.code.lowerCaseName,
+        'avoid_equals_and_hash_code_on_mutable_classes_extended',
+      );
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_equals_and_hash_code_on_mutable_classes_extended]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }

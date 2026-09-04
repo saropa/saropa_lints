@@ -20,6 +20,7 @@ import 'package:test/test.dart';
 /// reports on its fixture) is verified separately — see
 /// `example/lib/widget_lifecycle/never_discard_build_context_fixture.dart`.
 void main() {
+  // Rule Instantiation: metadata smoke test.
   group('NeverDiscardBuildContextRule — instantiation', () {
     test('rule metadata satisfies the LintCode message contract', () {
       final rule = NeverDiscardBuildContextRule();

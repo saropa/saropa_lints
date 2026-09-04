@@ -267,4 +267,18 @@ extension StringExt on String {
       expect(codes, contains('avoid_futureor_return_type'));
     });
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('avoid_futureor_return_type - Rule Instantiation', () {
+    test('AvoidFutureorReturnTypeRule', () {
+      final rule = AvoidFutureorReturnTypeRule();
+      expect(rule.code.lowerCaseName, 'avoid_futureor_return_type');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_futureor_return_type]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }

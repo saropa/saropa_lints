@@ -22,6 +22,7 @@ Future<Set<String>> _codes(String code) =>
 const String _rule = 'use_compare_without_case';
 
 void main() {
+  // Rule Instantiation: metadata smoke test.
   group('$_rule metadata', () {
     test('code, message prefix, length and correction message', () {
       final rule = UseCompareWithoutCaseRule();

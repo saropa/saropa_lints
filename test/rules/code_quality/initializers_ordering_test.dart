@@ -249,4 +249,15 @@ class Four {
       });
     });
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('initializers_ordering - Rule Instantiation', () {
+    test('InitializersOrderingRule', () {
+      final rule = InitializersOrderingRule();
+      expect(rule.code.lowerCaseName, _rule);
+      expect(rule.code.problemMessage, contains('[$_rule]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }

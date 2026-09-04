@@ -276,4 +276,15 @@ class Multi {
       expect(matches, hasLength(2));
     });
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('getters_in_member_list - Rule Instantiation', () {
+    test('GettersInMemberListRule', () {
+      final rule = GettersInMemberListRule();
+      expect(rule.code.lowerCaseName, _rule);
+      expect(rule.code.problemMessage, contains('[$_rule]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }

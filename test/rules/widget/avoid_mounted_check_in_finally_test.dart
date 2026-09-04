@@ -431,4 +431,18 @@ class PlainService {
       expect(codes, isEmpty);
     });
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('avoid_mounted_check_in_finally - Rule Instantiation', () {
+    test('AvoidMountedCheckInFinallyRule', () {
+      final rule = AvoidMountedCheckInFinallyRule();
+      expect(rule.code.lowerCaseName, 'avoid_mounted_check_in_finally');
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_mounted_check_in_finally]'),
+      );
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }

@@ -241,4 +241,15 @@ void build() {
       },
     );
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('new_instance_cascade - Rule Instantiation', () {
+    test('NewInstanceCascadeRule', () {
+      final rule = NewInstanceCascadeRule();
+      expect(rule.code.lowerCaseName, 'new_instance_cascade');
+      expect(rule.code.problemMessage, contains('[new_instance_cascade]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }

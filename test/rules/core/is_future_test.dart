@@ -187,4 +187,15 @@ void handle(dynamic result) {
       expect(codes, isEmpty);
     });
   });
+
+  // Rule Instantiation: metadata smoke test.
+  group('is_future - Rule Instantiation', () {
+    test('IsFutureRule', () {
+      final rule = IsFutureRule();
+      expect(rule.code.lowerCaseName, 'is_future');
+      expect(rule.code.problemMessage, contains('[is_future]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+  });
 }
