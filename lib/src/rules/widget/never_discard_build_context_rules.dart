@@ -216,7 +216,7 @@ class NeverDiscardBuildContextRule extends SaropaLintRule {
   /// `Builder(...)` is an [InstanceCreationExpression], but in the syntactic
   /// scan path (and in `parseString`-based unit tests) an unprefixed
   /// constructor call with no `new` parses as a [MethodInvocation]. Reading
-  /// the syntactic type name rather than `staticType` keeps detection
+  /// the syntactic type name rather than the resolved type keeps detection
   /// identical in both modes; a resolved-only check would silently disable
   /// the rule for every unresolved scan.
   static bool _isContextSupplyingBuilderWidget(NamedExpression namedArgument) {

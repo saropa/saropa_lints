@@ -227,8 +227,8 @@ def offer_retrigger_ci(limit: int = 10) -> None:
     print()
     print_success(f"Re-triggered {len(triggered)} run(s).")
     try:
-        w = input("  Watch until runs complete? [Y/n]: ").strip().lower()
-        watch = w != "n"
+        w = input("  Watch until runs complete? [y/N]: ").strip().lower()
+        watch = w == "y"
     except (EOFError, KeyboardInterrupt):
         return
     if watch:
