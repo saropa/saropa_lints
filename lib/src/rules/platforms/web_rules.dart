@@ -163,6 +163,9 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
     return false;
   }
 
+  /// Whether [condition] source text mentions a web/platform detection API.
+  /// Substring match is intentional — covers negated forms (!kIsWeb),
+  /// property access (Platform.isAndroid), and enum comparisons.
   bool _containsPlatformCheck(String condition) {
     return condition.contains('kIsWeb') ||
         condition.contains('Platform.') ||

@@ -159,8 +159,7 @@ import { HealthPanel } from './systemHealth/healthPanel';
 import { HealthLevel } from './systemHealth/types';
 import type { DartProcessSnapshot } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
-import { DebugPanelProvider } from './debug/debugPanel';
-import type { EngineStatus } from './debug/debugPanel';
+import type { EngineStatus } from './systemHealth/engineCardsHtml';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
@@ -1261,21 +1260,27 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
 
   // ── Standalone LSP Server (Phase 0) ──
-  // Controlled by saropaLints.lspServer.enabled setting (default: false).
-  // Users enable via the debug panel toggle or the start command.
+  // Controlled by saropaLints.lspServer.enabled setting (default: true).
+  // When ON, the analyzer plugin is automatically disabled to save ~10GB RAM.
+  // When turned OFF, the analyzer plugin is re-enabled so the user keeps
+  // diagnostics. Users can also toggle via the Health Panel engine cards.
   let lspClient: SaropaLspClient | undefined;
   const lspRoot = getProjectRoot();
 
   // Start LSP server on activation if the setting is already enabled.
+  // When LSP is on, the analyzer plugin is redundant (and costs ~10GB RAM),
+  // so disable it. The plugin block gets commented out — reversible via the
+  // debug panel's analyzer toggle or by turning LSP off.
   if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
     lspClient = new SaropaLspClient(context, lspRoot);
     void lspClient.start();
+    void runDisable(context);
   }
 
   // React to setting changes — start/stop the LSP server without reload.
-  // Refresh the debug panel after each lifecycle change so the toggle
-  // shows the updated state (the toggle handler's own refresh() fires
-  // before this listener runs, so it sees stale status).
+  // Log to the Health Panel's engine log after each lifecycle change so the
+  // toggle shows the updated state (the toggle handler's own log entry
+  // fires before this listener runs, so it sees stale status).
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('saropaLints.lspServer.enabled')) {
@@ -1283,9 +1288,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         if (enabled && !lspClient && lspRoot) {
           lspClient = new SaropaLspClient(context, lspRoot);
           void lspClient.start().then(() => {
-            debugPanelProvider.addLogEntry(l10n('debug.log.lspStarted'));
-            debugPanelProvider.refresh();
+            HealthPanel.addLogEntry(l10n('debug.log.lspStarted'));
           });
+          // LSP replaces the analyzer plugin — disable the plugin to free
+          // the ~10GB RAM the in-process plugin consumes. Comments out
+          // the plugins: block in analysis_options.yaml (same mechanism
+          // as the sidebar "Lint integration: OFF" toggle).
+          void runDisable(context);
         } else if (!enabled && lspClient) {
           // Await stop before dispose to avoid a double-stop race —
           // dispose() calls stop() again if _client is still set.
@@ -1293,9 +1302,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           lspClient = undefined;
           void client.stop().then(() => {
             client.dispose();
-            debugPanelProvider.addLogEntry(l10n('debug.log.lspStopped'));
-            debugPanelProvider.refresh();
+            HealthPanel.addLogEntry(l10n('debug.log.lspStopped'));
           });
+          // Re-enable the analyzer plugin when LSP is turned off so the
+          // user doesn't lose all diagnostics.
+          void runReenablePlugin(context);
         }
       }
     }),
@@ -1318,85 +1329,75 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
   );
 
-  // ── Debug Panel (sidebar webview) ─────────────────────────────────────
-  // Shows status + toggle controls for the three diagnostic engines.
-  // Only registered when saropaLints.debug.enabled is true.
-  const debugPanelProvider = new DebugPanelProvider(
-    context.extensionUri,
-    {
-      // Analyzer Plugin status — in-process, no PID or RSS available.
-      // status is a machine key matching debug.engine.statusValue.* in en.json —
-      // translated at display time in debugPanel-html.ts, NOT here, so
-      // statusColorClass() can still match against the English key.
-      // Reads the real on-disk state (live plugins: block vs. commented-out
-      // sentinel) rather than assuming "always on" — a debug panel toggle
-      // must reflect what runDisable/runReenablePlugin actually did.
-      getAnalyzerPluginStatus: (): EngineStatus => {
-        const analyzerRoot = getProjectRoot();
-        const state = analyzerRoot ? getPluginsIntegrationState(analyzerRoot) : 'absent';
-        return {
-          key: 'analyzer',
-          name: l10n('debug.engine.analyzerPlugin'),
-          enabled: state === 'live',
-          status: state === 'live' ? 'active' : 'stopped',
-          rssNote: l10n('debug.engine.rssNote.inProcess'),
-        };
-      },
-      // Scan Daemon status — read from the scan-on-save controller.
-      getScanDaemonStatus: (): EngineStatus => ({
-        key: 'scanDaemon',
-        name: l10n('debug.engine.scanDaemon'),
-        enabled: !scanOnSaveController.isDaemonSuspended,
-        status: scanOnSaveController.isDaemonSuspended ? 'suspended' : 'idle',
-        rssBytes: systemHealthSnapshot?.saropaRssBytes,
-        pid: undefined, // TODO: expose daemon PID from ScanDaemonManager
-      }),
-      // LSP Server status — read from the client wrapper.
-      getLspServerStatus: (): EngineStatus => ({
-        key: 'lspServer',
-        name: l10n('debug.engine.lspServer'),
-        enabled: lspClient?.isRunning ?? false,
-        status: lspClient?.isRunning ? 'running' : 'stopped',
-        rssNote: lspClient?.isRunning ? undefined : l10n('debug.engine.rssNote.notRunning'),
-      }),
+  // ── Diagnostic engine status (Health Panel "Engines" section) ──────────
+  // Shows status + toggle controls for the three diagnostic engines. Used
+  // to be its own standalone sidebar webview (Debug Panel); it now renders
+  // inside the Health Panel editor-tab dashboard (see systemHealth/healthPanel.ts)
+  // so engine controls and the raw process table live in one place instead
+  // of two. Only shown when saropaLints.debug.enabled is true.
+  HealthPanel.configureEngines({
+    // Analyzer Plugin status — in-process, no PID or RSS available.
+    // status is a machine key matching debug.engine.statusValue.* in en.json —
+    // translated at display time in engineCardsHtml.ts, NOT here, so
+    // statusColorClass() can still match against the English key.
+    // Reads the real on-disk state (live plugins: block vs. commented-out
+    // sentinel) rather than assuming "always on" — the toggle must reflect
+    // what runDisable/runReenablePlugin actually did.
+    getAnalyzerPluginStatus: (): EngineStatus => {
+      const analyzerRoot = getProjectRoot();
+      const state = analyzerRoot ? getPluginsIntegrationState(analyzerRoot) : 'absent';
+      return {
+        key: 'analyzer',
+        name: l10n('debug.engine.analyzerPlugin'),
+        enabled: state === 'live',
+        status: state === 'live' ? 'active' : 'stopped',
+        rssNote: l10n('debug.engine.rssNote.inProcess'),
+      };
     },
-  );
+    // Scan Daemon status — read from the scan-on-save controller.
+    getScanDaemonStatus: (): EngineStatus => ({
+      key: 'scanDaemon',
+      name: l10n('debug.engine.scanDaemon'),
+      enabled: !scanOnSaveController.isDaemonSuspended,
+      status: scanOnSaveController.isDaemonSuspended ? 'suspended' : 'idle',
+      rssBytes: systemHealthSnapshot?.saropaRssBytes,
+      pid: undefined, // TODO: expose daemon PID from ScanDaemonManager
+    }),
+    // LSP Server status — read from the client wrapper.
+    getLspServerStatus: (): EngineStatus => ({
+      key: 'lspServer',
+      name: l10n('debug.engine.lspServer'),
+      enabled: lspClient?.isRunning ?? false,
+      status: lspClient?.isRunning ? 'running' : 'stopped',
+      rssNote: lspClient?.isRunning ? undefined : l10n('debug.engine.rssNote.notRunning'),
+    }),
+  });
 
-  // Register the debug panel as a webview view provider.
-  context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(
-      DebugPanelProvider.viewType,
-      debugPanelProvider,
-    ),
-  );
-
-  // Wire debug panel Kill All / Restart All to the LSP server lifecycle.
-  // Analyzer Plugin and Scan Daemon aren't independently killable yet, so
-  // these only affect LSP for now — but emit visible feedback either way.
-  debugPanelProvider.onKillAll(async () => {
+  // Wire Kill All / Restart All to the LSP server lifecycle. Analyzer
+  // Plugin and Scan Daemon aren't independently killable yet, so these
+  // only affect LSP for now — but emit visible feedback either way.
+  HealthPanel.onKillAll(async () => {
     if (lspClient) {
       await lspClient.stop();
     }
-    debugPanelProvider.addLogEntry(l10n('debug.log.killAll'));
-    debugPanelProvider.refresh();
+    HealthPanel.addLogEntry(l10n('debug.log.killAll'));
   });
-  debugPanelProvider.onRestartAll(async () => {
+  HealthPanel.onRestartAll(async () => {
     if (lspClient) {
       await lspClient.restart();
     } else if (lspRoot) {
       lspClient = new SaropaLspClient(context, lspRoot);
       await lspClient.start();
     }
-    debugPanelProvider.addLogEntry(l10n('debug.log.restartAll'));
-    debugPanelProvider.refresh();
+    HealthPanel.addLogEntry(l10n('debug.log.restartAll'));
   });
 
-  // Wire debug panel toggle events to actual engine start/stop actions.
-  debugPanelProvider.onToggle(async ({ engine, enabled }) => {
+  // Wire engine toggle events to actual engine start/stop actions.
+  HealthPanel.onToggle(async ({ engine, enabled }) => {
     if (engine === 'lspServer') {
       // Write the setting — the onDidChangeConfiguration listener starts/stops
-      // the client and refreshes the panel with a log entry.
-      debugPanelProvider.addLogEntry(
+      // the client and logs the result.
+      HealthPanel.addLogEntry(
         enabled ? l10n('debug.log.lspToggleOn') : l10n('debug.log.lspToggleOff'),
       );
       await vscode.workspace
@@ -1404,9 +1405,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         .update('enabled', enabled, vscode.ConfigurationTarget.Workspace);
     } else if (engine === 'analyzer') {
       // Reuses the exact mechanism behind the "Lint integration" sidebar
-      // toggle (saropaLints.disable / .reenablePlugin) so the debug panel
-      // isn't a second, subtly different way to flip the same YAML block.
-      debugPanelProvider.addLogEntry(
+      // toggle (saropaLints.disable / .reenablePlugin) so this isn't a
+      // second, subtly different way to flip the same YAML block.
+      HealthPanel.addLogEntry(
         enabled ? l10n('debug.log.analyzerToggleOn') : l10n('debug.log.analyzerToggleOff'),
       );
       if (enabled) {
@@ -1426,7 +1427,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     } else if (engine === 'scanDaemon') {
       // Suspend/resume the scan daemon — kills the process on suspend,
       // lifts the flag on resume so the next save respawns it.
-      debugPanelProvider.addLogEntry(
+      HealthPanel.addLogEntry(
         enabled ? l10n('debug.log.daemonToggleOn') : l10n('debug.log.daemonToggleOff'),
       );
       if (enabled) {
@@ -1435,15 +1436,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         scanOnSaveController.suspendDaemon();
       }
     }
-    debugPanelProvider.refresh();
   });
 
-  // Toggle debug panel visibility command.
+  // Kept as a command-palette/history-compatible alias now that the
+  // formerly separate Debug Panel sidebar webview merged into the Health
+  // Panel — opens the same panel as "Saropa Lints: Show Process Health".
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.toggleDebugPanel', () => {
-      const config = vscode.workspace.getConfiguration('saropaLints.debug');
-      const current = config.get<boolean>('enabled', false);
-      void config.update('enabled', !current, vscode.ConfigurationTarget.Workspace);
+      HealthPanel.createOrShow(context);
     }),
   );
 

@@ -68,6 +68,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0] — Unreleased
 
+* --- CRITICAL NOTE --- *
+
 **Major release — LSP server (BETA).** The new standalone LSP server replaces the in-process analyzer plugin as the default diagnostic engine. It runs in its own process, consuming a fraction of the RAM the plugin needed, and delivers diagnostics, quick fixes (lightbulb menu), and per-rule config overrides without loading the full analyzer into the IDE's analysis server. The LSP server is now **ON by default** — review its status in the extension's debug panel (Command Palette → "Saropa Lints: Toggle Debug Panel"). This is a BETA feature: if you encounter issues, toggle "LSP Server" OFF in the debug panel and re-enable the Analyzer Plugin. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Fixed
@@ -82,8 +84,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Changed
 
-- **LSP server is now ON by default (BETA).** New installations start with `saropaLints.lspServer.enabled: true`. To revert: toggle "LSP Server" OFF in the debug panel, or set the setting to `false` in VS Code workspace settings.
-- **Sidebar: severity toggles are single-click; Diagnostics and Help panels folded away.** The Show errors/warnings/infos/hints rows previously required an undiscoverable double-click; they now toggle on a single click. The standalone Diagnostics panel (severity toggles, Lint integration, Analyzer plugin, Tier) merged into the Settings panel, and the standalone Help panel (Getting Started, About, pub.dev, AI agent instructions) moved into the Dashboards panel's "..." menu — cutting the sidebar from 7 stacked panels to 5 with no loss of functionality. Clicking the status bar while lint integration is off now opens the Dashboards view instead of doing nothing.
+- **LSP server is now ON by default (BETA).** New installations start with `saropaLints.lspServer.enabled: true`. The analyzer plugin is automatically disabled when the LSP server is on — it's no longer needed and its ~10GB RAM footprint is eliminated. Turning the LSP server off re-enables the analyzer plugin. To revert: toggle "LSP Server" OFF in the Health Panel, or set the setting to `false` in VS Code workspace settings.
+- **Sidebar: severity toggles are single-click; Diagnostics and Help panels folded away.** The Show errors/warnings/infos/hints rows previously required an undiscoverable double-click; they now toggle on a single click. The standalone Diagnostics panel (severity toggles, Lint integration, Analyzer plugin, Tier) merged into the Settings panel, and the standalone Help panel (Getting Started, About, pub.dev, AI agent instructions) moved into the Dashboards panel's "..." menu. Clicking the status bar while lint integration is off now opens the Dashboards view instead of doing nothing.
+- **Debug Panel merged into the Health Panel.** The sidebar's standalone Debug Panel (engine toggles, PID/RSS, Kill All / Restart All, log) is gone — that content now lives inside "Saropa Lints: Show Process Health" alongside the Dart process table, so engine controls and process diagnostics are in one place instead of two. The engine log is now a collapsed-by-default expander. The sidebar container is down to 4 panels total (from 7).
 
 ### Added
 
@@ -496,73 +499,6 @@ The scan CLI gains three new flags that make it easier to wire into CI and autom
 <details><summary>Maintenance</summary>
 
 - Publish script test runner now detects Dart VM heap corruption crashes and Windows file-lock races as transient infrastructure failures, shows a clear diagnosis, and recommends Retry instead of leaving the user to parse raw stack traces.
-
-</details>
-
----
-
-## [15.2.0]
-
-Rule execution is roughly twice as fast, and the analysis server now reports the ~200 most important error and warning rules by default without holding the full resolved type model in memory — the remaining rules fire on save via the scan daemon so nothing is lost. Measured at +0.6% memory over the plugin-off baseline (vs +77.2% for full in-process coverage), so this is safe for every project with the `plugins:` block enabled, with no config change required. The About panel and tier picker now show live rule counts from a single source of truth, replacing stale hand-typed numbers. [log](https://github.com/saropa/saropa_lints/blob/v15.2.0/CHANGELOG.md)
-
-### Added
-
-- New `rule_count` CLI (`dart run saropa_lints:rule_count`, or `--format json`) reports the live rule count per tier plus opt-in stylistic rules, computed directly from `lib/src/tiers.dart`. No action required.
-- New `--profile` flag on the scan CLI records per-rule execution timing and writes it to `reports/.saropa_lints/rule_timings.json` (slowest first, with call counts and averages). Timing was previously collected but never written anywhere; this makes slow rules measurable so performance work targets real offenders. No action required.
-- New `lane` setting under `plugins.saropa_lints` controls which rules run inside the analysis server. `light` (the default when the key is absent) runs only the ~200 error and warning rules that need no type resolution, so those findings appear in the editor shortly after typing pauses rather than only after a save, without the editor holding the whole project's resolved type model; the rest still fire on save via the scan daemon. Set `lane: full` to keep the previous behavior of running every enabled rule in-process.
-
-### Changed
-
-- Rule execution is roughly twice as fast: project-root lookups are now memoized instead of re-walking the directory tree on every AST node, the hottest platform/import rules run their cheap syntactic checks before project gates, repeated file probes are cached, and deprecation checks are computed once per API element instead of once per reference — a 47% rule-time reduction on a 165-file before/after benchmark, confirmed at scale on a 4,487-file production app. No action required.
-
-### Fixed
-
-- `prefer_moving_to_variable`, `prefer_pattern_destructuring`, `avoid_multiple_stream_listeners`, and `require_sqflite_transaction` no longer re-scan nested scopes once per enclosing block, which removes duplicate diagnostics for the same code. Each nested block (an `if`/`else` arm, a loop or `try` body, any brace-delimited scope) is now judged on its own rather than summed with its enclosing scope — this also means a pattern split across a block boundary (e.g. 2 writes before a loop plus 1 inside it) may no longer trigger `require_sqflite_transaction` or `avoid_multiple_stream_listeners` where it previously did. No action required.
-- Dropping a `.saropa_stop` file in the scan target root now actually aborts a running scan between files with a partial report, instead of being silently ignored by the scan CLI; the sentinel is consumed so the next scan runs normally. No action required.
-
-### Added (Extension)
-
-- (Extension) The About Saropa Lints panel now shows a live rule-count strip (total plus per-tier breakdown) fetched from the new `rule_count` CLI when a project is open, replacing the static number previously baked into the panel's markdown copy. No action required.
-- (Extension) The Manage Rule Packs tier picker now shows each tier's live rule count next to its name (e.g. "essential 331 rules"), fetched once per panel open from the same `rule_count` CLI. No action required.
-- (Extension) On-save scans now skip the rules the in-process plugin already reports when a project runs `lane: light`, so a finding is not listed twice in the Problems panel; the skip applies only while the plugin is verifiably reporting, so nothing is hidden if it is off or silent. No action required.
-- (Extension) New "Saropa Lints: Set Analysis Lane" command (command palette, or the sidebar's Lane row) switches between `light` and `full` in-process analysis without hand-editing `analysis_options.yaml`. Picking a lane restarts the Dart analysis server so the change takes effect immediately.
-
-<details>
-<summary>Maintenance</summary>
-
-- Widened the `rule_count` CLI's extension-side timeout from 10s to 25s — a cold `dart run` invocation measured at 8.4s, leaving too little margin under the old cap on a slower first run.
-- Fixed the pre-commit hook's dart-fix and recommended.yaml gates: `subprocess.run(['dart', ...])` silently failed to find `dart` on Windows (Flutter ships `dart.bat`, which Python's subprocess can't resolve without `shell=True`), so both gates had been no-op'ing on every commit. Now resolved via `shutil.which('dart')`.
-
-</details>
-
----
-
-## [15.1.2]
-
-The Upgrade Opportunities panel's AI prompt is more accurate and less noisy: it now surfaces the deprecated APIs a project actually calls, dual-dependency version risk, and possible local reimplementations of library code, while dropping dev-only and transitive dependencies that aren't actionable. The old per-card clipboard copy is replaced by "Write Report" buttons — global (all packages in one file) and per-card (single package) — that save dated files and copy the path. Seven actively-maintained packages were removed from the known-issues database after being incorrectly flagged as end-of-life. [log](https://github.com/saropa/saropa_lints/blob/v15.1.2/CHANGELOG.md)
-
-### Added (Extension)
-
-- (Extension) The Upgrade Opportunities AI prompt now includes deprecated APIs the project actually calls (with call sites), the package's vibrancy score/license/vulnerabilities/known-issue status, and any GitHub issues flagged as breaking or deprecation-related — previously only new-feature changelog bullets were included. No action required.
-- (Extension) The Upgrade Opportunities panel no longer lists dev-only or transitive dependencies with zero source imports (e.g. `build_runner`), since new features in a package the project never calls are not actionable. No action required.
-- (Extension) The AI prompt now flags "dual dependency" risk — a direct dependency that is also required transitively through another direct dependency — since a major version bump on either side can diverge type identity for shared exported classes. No action required.
-- (Extension) The AI prompt now flags possible local reimplementation — project code (a class, mixin, extension, or function) whose name matches something the dependency's own source already exports — as a candidate for deletion in favor of the library version. No action required.
-
-### Changed (Extension)
-
-- (Extension) The Upgrade Opportunities panel replaces the per-card "Copy for AI" clipboard button with "Write Report" buttons — a global one in the header that writes all packages' prompts to one file, and a per-card one that writes just that package's prompt. Both save a dated markdown file under `reports/` and copy the absolute path to the clipboard. No action required.
-- (Extension) The AI prompt's task instruction now asks two separate questions per feature — does it replace something the project does manually (retrofit), and does it solve a problem the project has never addressed (greenfield) — instead of only "does it fit an existing call site". No action required.
-
-### Fixed (Extension)
-
-- (Extension) Removed 7 stale entries from the Package Dashboard's known-issues database (`timezone`, `retrofit`, `sqflite_sqlcipher`, `intl_translation`, `window_size`, `routemaster`, `flutter_keychain`) that flagged actively-maintained packages as end-of-life based on outdated data. No action required.
-
-<details><summary>Maintenance</summary>
-
-- Added a pre-publish audit check that cross-checks `known_issues.json` lifecycle claims (end-of-life/caution/maintenance-mode) against live pub.dev data and warns when a package has since shipped a non-discontinued release contradicting the recorded reason. Non-blocking (network-dependent, 5s per-request timeout); run standalone with `python scripts/check_known_issues_freshness.py`.
-- The pre-publish audit now also regenerates `plans/known_issues_review.md` on every publish run (previously only via manually running `scripts/generate_known_issues_review.py`), sharing one pub.dev fetch pass with the freshness check above instead of double-fetching the overlapping entries.
-- Added unit test coverage for the freshness-check and review-report generator modules, and promoted their shared internals (candidate loading, pub.dev fetch, staleness rule) from private cross-module imports to an explicit shared surface.
-- Corrected the advertised rule count from a stale "2100+"/"2134" to the current 2332 (2109 tiered + 223 opt-in stylistic) across the README, extension manifest, and marketing copy.
 
 </details>
 

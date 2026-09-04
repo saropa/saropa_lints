@@ -164,13 +164,43 @@ Files: `views/sectionedSidebar.ts`, `views/configTree.ts`, `package.json` (views
 - [ ] Row-count target (≤14) NOT met — full redesign needs Phases 4-6 to land first so dashboard
       rows have somewhere to go. Revisit this phase once those land.
 
-### Phase 2 — Health Panel merge (1 day, Sonnet)
-Files: `systemHealth/healthPanel.ts`, `debug/debugPanel*.ts`, `extension.ts:1330-1425`.
-- [ ] Move engine cards (ON/OFF, PID, RSS, Kill/Restart all) into the Health Panel webview on the
-      chrome design system; log becomes a collapsed expander.
-- [ ] Delete `debug/debugPanel-html.ts` bespoke markup. Keep `debug.enabled` setting only as a
-      gate for the log expander, not for a view.
-- [ ] Engines status row in sidebar summarizes: "plugin live · daemon idle · LSP off".
+### Phase 2 — Health Panel merge (1 day, Sonnet) — DONE 2026-09-04
+- [x] Engine cards (ON/OFF, PID, RSS, Kill/Restart all) moved into the Health Panel editor-tab
+      webview, on the shared chrome stylesheet (`healthPanel-styles.ts` already extended
+      `getDashboardChromeStyles()`; engine-card CSS now layers on top of it via the new
+      `systemHealth/engineCardsHtml.ts:getEngineCardsStyles()`). Log renders as a native
+      `<details>`/`<summary>` expander, collapsed by default.
+- [x] Deleted `debug/debugPanel.ts` and `debug/debugPanel-html.ts` outright (not just the bespoke
+      markup) — their content (types, builders, styles) moved into `systemHealth/engineCardsHtml.ts`
+      and `systemHealth/healthPanel.ts`. `debug/saropaLspClient.ts` is untouched, still in `debug/`.
+- [x] `saropaLints.debugPanel` view contribution removed from `package.json` — the sidebar is back
+      down to 4 views (banner, editorDashboards, settings, status), meeting Phase 1's original view
+      count target as a side effect.
+- [x] `saropaLints.debug.enabled` setting repurposed (not deleted): it now gates whether the Engines
+      section renders inside the Health Panel (`HealthPanel.collectEngines()`), instead of gating a
+      standalone view's existence. Description updated in `package.nls.json`.
+- [x] `saropaLints.toggleDebugPanel` command kept (palette/history compatibility) but now opens the
+      Health Panel via `HealthPanel.createOrShow`, same as `showProcessHealth`; title updated.
+- [x] Engine deps, the log buffer, and the toggle/killAll/restartAll event emitters moved to
+      `HealthPanel` **static** members so they survive the tab being closed and reopened — the
+      former sidebar webview view was always resolved at activation and never really closed, so this
+      preserves that "always tracking" behavior despite the panel itself now being a lazily-opened tab.
+      `tsc --noEmit` clean on both the main and test projects; 13/13 sidebar-contract tests plus the
+      broader affected sweep (81 tests) pass.
+
+**Deferred — not done:**
+- [ ] Engines status row in the sidebar ("plugin live · daemon idle · LSP live") — still part of the
+      undone Phase 1 status-row redesign, not this phase. Blocked on the same Phases 4-6 dependency
+      noted under Phase 1.
+- [ ] LSP scan-progress surfacing in the Engines card (file count, diagnostic count) — the server only
+      logs this to stderr today; exposing it requires a protocol change on the LSP side, out of scope
+      for a webview-merge phase.
+
+**LSP server state (v16.0.0) — context carried forward:** the LSP server now runs a full workspace
+scan on startup (all `.dart` files under `lib/`, `bin/`, `test/`), so the Problems panel populates
+project-wide without the user opening every file. It is ON by default, so the Engines section's
+typical LSP card state is now "running", not "stopped" — the Phase 1 deferred sidebar-summary work
+above should say "LSP live" not "LSP off" as its example.
 
 ### Phase 3 — Home hub (2 days, Sonnet)
 Files: `views/saropaDashboardsView.ts`, consolidation plan list C.

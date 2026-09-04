@@ -340,12 +340,11 @@
   "config.property.systemHealth.warningOrphanCount.description": "Show warning when orphaned Flutter daemon count reaches this value.",
   "config.property.systemHealth.criticalOrphanCount.description": "Show critical alert when orphaned Flutter daemon count reaches this value.",
   "config.property.systemHealth.showNotifications.description": "Show a notification when system health reaches critical level.",
-  "views.debugPanel.name": "Debug",
-  "command.toggleDebugPanel.title": "Saropa Lints: Toggle Debug Panel",
+  "command.toggleDebugPanel.title": "Saropa Lints: Show Health Panel (Engines + Processes)",
   "command.lspServer.start.title": "Saropa Lints: Start LSP Server",
   "command.lspServer.stop.title": "Saropa Lints: Stop LSP Server",
   "command.lspServer.restart.title": "Saropa Lints: Restart LSP Server",
   "config.section.Debug.title": "Debug & Diagnostics Engines",
-  "config.property.debug.enabled.description": "Show the Debug Panel in the Saropa Lints sidebar. Displays status and controls for the three diagnostic engines (Analyzer Plugin, Scan Daemon, LSP Server).",
-  "config.property.lspServer.enabled.description": "Run the standalone Saropa Lints LSP server for diagnostics. When enabled, spawns a separate Dart process that delivers squiggles and quick fixes via the Language Server Protocol. Runs alongside (not instead of) the analyzer plugin."
+  "config.property.debug.enabled.description": "Show the Diagnostic Engines section (status and controls for the Analyzer Plugin, Scan Daemon, and LSP Server) in the Health Panel.",
+  "config.property.lspServer.enabled.description": "Run the standalone Saropa Lints LSP server for diagnostics. When enabled, spawns a separate Dart process that delivers squiggles and quick fixes via the Language Server Protocol. Automatically disables the analyzer plugin to save ~10GB of RAM. Turning this off re-enables the analyzer plugin."
 }
