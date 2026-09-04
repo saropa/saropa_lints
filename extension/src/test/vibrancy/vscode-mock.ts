@@ -208,6 +208,11 @@ export const languages = {
         createdDiagnosticCollections.push(col);
         return col;
     },
+    // Sidebar/dashboard code now reads live diagnostics via this call by default
+    // (liveDiagnosticsModel.ts). Tests that don't care about diagnostic content
+    // just need the no-arg overload to return an empty tuple array rather than
+    // throwing "not a function".
+    getDiagnostics: (_uri?: any): any => [],
     registerHoverProvider: (_selector: any, _provider: any) => {
         return { dispose: () => { /* no-op */ } };
     },

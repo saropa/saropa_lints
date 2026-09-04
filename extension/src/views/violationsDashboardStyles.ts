@@ -1,6 +1,13 @@
 /**
  * CSS for the **Findings Dashboard** editor webview (`violationsDashboardHtml.ts`).
  *
+ * Migrated onto the canonical dashboard chrome (`views/dashboardChromeStyles.ts`) per design
+ * principle 5 ("one design system", plans/PLAN_extension_ui_redesign.md §1.5). The chrome's
+ * class vocabulary (.dash-hero, .kpi-row/.kpi-card, .toolbar-band/.field/.seg/.btn,
+ * .chip-strip/.chip, .chart-card/.bar-row/.donut) was originally modeled on THIS dashboard's own
+ * markup, so no HTML or client-script changes were needed to adopt it — see the header comment
+ * in `violationsDashboardStylesParts.ts` for exactly what stayed bespoke and why.
+ *
  * Aligned to the gold-standard editor-area dashboard patterns documented in
  * `plan/guides/UX_UI_GUIDELINES.md` (§4 layout, §6 charts, §7 tables,
  * §8 affordances, §14 anti-pattern catalog). Key invariants:
@@ -13,31 +20,31 @@
  *     after the title, otherwise the dashboard fails its glance test.
  */
 
+import { getDashboardChromeStyles } from './dashboardChromeStyles';
 import {
-  vdsPart1,
-  vdsPart2,
-  vdsPart3,
-  vdsPart4,
-  vdsPart5,
-  vdsPart6,
-  vdsPart7,
-  vdsPart8,
-  vdsPart9,
+  vdsFindingsAndTopRulesTables,
+  vdsHeroExtras,
+  vdsKpiAndChartExtras,
+  vdsMicroExtras,
+  vdsSecondaryLists,
+  vdsSectionExtras,
+  vdsToolbarExtras,
 } from './violationsDashboardStylesParts';
 // Dashboard CSS is injected as one string; keep selectors stable with `violationsDashboardHtml.ts`.
-// Surfaces use three depth tiers (page/panel/inset) so hierarchy reads without heavy outlines.
-// Charts/tables follow UX_UI_GUIDELINES spacing; prefer `color-mix` over hard-coded tints.
+// The chrome supplies tokens/hero/toolbar/kpi/chip/chart/table bases; the extras below layer the
+// findings-specific bespoke content and the small set of intentional overrides on top, in source
+// order, so a same-selector override always wins over the chrome default (see the parts file's
+// header comment for which overrides are load-bearing vs. purely cosmetic convergence).
 export function getViolationsDashboardStyles(): string {
   return (
-    vdsPart1() +
-    vdsPart2() +
-    vdsPart3() +
-    vdsPart4() +
-    vdsPart5() +
-    vdsPart6() +
-    vdsPart7() +
-    vdsPart8() +
-    vdsPart9()
+    getDashboardChromeStyles() +
+    vdsHeroExtras() +
+    vdsToolbarExtras() +
+    vdsKpiAndChartExtras() +
+    vdsSectionExtras() +
+    vdsFindingsAndTopRulesTables() +
+    vdsSecondaryLists() +
+    vdsMicroExtras()
   );
 }
 

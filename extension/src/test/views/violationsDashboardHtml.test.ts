@@ -354,11 +354,26 @@ describe('violationsDashboardHtml', () => {
   it('renders the health gauge without a /100 suffix and without the restart-prone animation', () => {
     /* Item 1 + 2: the visible score dropped its "/100" denominator, and the
        gauge fill is a static SVG dasharray (the gauge-fill-in keyframe that
-       collapsed the ring to a dot on every rebuild is gone). */
+       collapsed the ring to a dot on every rebuild no longer plays).
+       Style-system migration note: this dashboard now imports the shared
+       dashboardChromeStyles chrome (design principle 5, "one design system"),
+       which legitimately defines @keyframes gauge-fill-in and the
+       --gauge-target/--gauge-arc custom properties for OTHER dashboards that
+       DO want the entrance animation -- so those strings are now correctly
+       present in the <style> block. What must still hold is that THIS
+       dashboard's gauge never plays it: violationsDashboardStylesParts.ts's
+       vdsHeroExtras() overrides it with `animation: none !important`, loaded
+       after the chrome so the override wins the cascade. */
     const html = renderViolationsDashboardHtml(minimalInput({}));
     assert.ok(!html.includes('/100'), 'gauge label and tooltip must not show /100');
-    assert.ok(!html.includes('gauge-fill-in'), 'entrance keyframe must be removed');
-    assert.ok(!html.includes('--gauge-target'), 'inline gauge CSS vars must be removed');
+    assert.ok(
+      html.includes('.gauge-fill { animation: none !important'),
+      'the entrance animation inherited from the shared chrome must be canceled',
+    );
+    // Inline per-instance CSS vars (a style="" attribute on the SVG markup itself, not the
+    // custom-property NAMES inside the shared <style> block) must still be gone -- the fill is a
+    // static dasharray attribute set once at render time, not animated via a CSS variable.
+    assert.ok(!html.includes('style="--gauge-target'), 'inline gauge CSS vars must be removed from the SVG markup');
   });
 
   it('wires the pending gauge state for in-flight analysis (whiplash guard)', () => {

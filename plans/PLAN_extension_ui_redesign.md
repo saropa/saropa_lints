@@ -549,17 +549,39 @@ stub), `test/ux/generate-pages.ts` (new fixtures), `i18n/locales/en.json`.
       pass, including the 12 new Home/Rules & Tiers/Project Map pages.
 
 **Deferred — not done, do NOT treat as complete:**
-- [ ] **`violationsDashboardStylesParts.ts` / `report-styles-parts.ts` / `audit-report-styles.ts`
-      NOT migrated onto `dashboardChromeStyles`.** Combined ~2,777 lines of CSS across three files,
-      each with its own live consumer set (Findings; the Package Dashboard's original ~10
-      consumers per Phase 5's note; the standalone Full Audit report). This is the same migration
-      Phase 5 already re-deferred for `report-styles-parts.ts` specifically — this phase confirms
-      the other two are in the identical unmigrated state and extends the same reasoning to all
-      three: a full migration is a component-parity rewrite (chart, table, detail pane, network
-      diagram, keyboard overlay, severity chips, audit's own report chrome) that cannot be safely
-      completed AND visually re-verified across three surfaces inside one polish-phase budget. Needs
-      its own dedicated multi-day pass with a real Extension Development Host render pass per
-      surface, not a repeat of Phase 5's static-tsc-only verification.
+- [x] **`audit/audit-report-styles.ts` migrated onto `dashboardChromeStyles`** — done 2026-09-04,
+      commit `718f6f1d` ("refactor: migrate Full Audit report onto the canonical dashboard chrome"),
+      after this phase closed. Rebuilt on `getDashboardChromeStyles()` (`.dash-hero`, `.chip-strip`/
+      `.chip`, `.toolbar-band`/`.field`, `.btn`, `.dash-table`, `.empty-cta`); only severity-tinted
+      pills, baseline badges, and the deferred-load banner stay bespoke. Added the report's first
+      Playwright UX-harness fixture, which caught and fixed real WCAG AA contrast failures
+      (solid-fill KPI chips/severity pills as low as 2.93:1). `audit-report-styles.ts` is DONE —
+      remove it from any future "3 remaining systems" framing.
+- [x] **`violationsDashboardStylesParts.ts` migrated onto `dashboardChromeStyles`** — done
+      2026-09-04. `violationsDashboardStylesParts.ts` shrank from 1337 to a much smaller "extras"
+      file (874 lines removed, 190 added) that now only carries the rules the shared chrome
+      genuinely doesn't cover (severity-tinted pills, the hero gauge's `animation: none !important`
+      override — see `violationsDashboardHtml.test.ts`'s updated gauge test for why the chrome's
+      `@keyframes gauge-fill-in` legitimately still appears in this dashboard's `<style>` block
+      without playing). Verified: `tsc` clean, unit tests pass (31/31 in
+      `violationsDashboardHtml.test.ts`), and a full `ux:gen && ux:test --workers=2` run produces the
+      *same* 6 pre-existing `findings-populated` a11y failures (aria-conditional-attr on
+      `.group-row`'s `aria-expanded`, plus unrelated color-contrast) as the unmigrated baseline —
+      confirmed by re-running the suite with this diff stashed out. Those 6 failures are a
+      pre-existing gap in `views/violations-dashboard-tables.ts` (untouched by this migration), not
+      a regression; tracked separately, not blocking this item.
+- [ ] **`vibrancy/views/report-styles-parts.ts` (1190 lines, the Package Dashboard's ~10 live
+      consumers per Phase 5's note) is NOT migrated onto `dashboardChromeStyles`.** Confirmed by
+      reading the file directly: it still has its own header/inline comment saying it duplicates a
+      `dashboardChromeStyles` rule (e.g. `.sr-only`, the `#announcer` live-region hiding) because
+      "this sheet doesn't load that stylesheet" — grepping the file for `dashboardChromeStyles` turns
+      up only that comment, no import. This is the migration Phase 5 already deferred for this file
+      specifically, and Phase 7 re-deferred: a full migration is a component-parity rewrite (chart,
+      table, detail pane, network diagram, keyboard overlay, severity chips) that cannot be safely
+      completed AND visually re-verified inside one polish-phase budget. Needs its own dedicated pass
+      with a real Extension Development Host render pass, not a repeat of Phase 5/audit's
+      static-tsc-plus-Playwright-only verification — this file is larger and feeds a live interactive
+      dashboard, not a mostly-static report.
 - [ ] **Rules & Tiers and Project Map do not surface their tab digit-shortcuts in a `?`-overlay.**
       Both already had (or, for Project Map, now have) the actual keyboard behavior; neither uses
       `keyboard-shortcuts.ts`'s shared overlay module the way Findings and Packages do, so a user
