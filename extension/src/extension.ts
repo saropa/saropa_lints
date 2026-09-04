@@ -659,6 +659,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
   registerAnalyzerExcludeDiffProvider(context);
   const analysisOptimizerProvider = new AnalysisOptimizerWebviewProvider(context.extensionUri);
+  // Phase 4 (PLAN_extension_ui_redesign.md): the Rules & Tiers dashboard's Config file tab embeds
+  // the optimizer's live body and forwards its button clicks — wire the reference once both
+  // providers exist rather than at either constructor (avoids an activation ordering dependency).
+  rulePacksWebviewProvider.setAnalysisOptimizerProvider(analysisOptimizerProvider);
   const reloadOpenDashboardsForLocale = (): void => {
     refreshFindingsDashboardIfOpen(context);
     rulePacksWebviewProvider.refresh();
@@ -691,10 +695,17 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         // Invalidate the disabled-rules cache so tree views pick up
         // rule enable/disable changes on the next refresh.
         invalidateDisabledRulesCache();
-        if (base.endsWith('/analysis_options.yaml')) {
-          rulePacksWebviewProvider.refresh();
-          analysisOptimizerProvider.refresh();
-        }
+        // Refresh on EITHER file now (Phase 4 fix): the Rules & Tiers dashboard's Config file tab
+        // reads and writes 8 top-level keys that live ONLY in analysis_options_custom.yaml
+        // (max_issues, output, platforms, severities, banned_usage, saropa_tier, runtime_tier,
+        // diagnostic_statistics — see customConfigYaml.ts). Before Phase 4, this branch only fired
+        // for analysis_options.yaml, so an external edit to the custom file (another editor, git
+        // pull, another VS Code window) never re-rendered the open dashboard — it silently went
+        // stale until the user manually clicked Refresh. The optimizer panel only reads
+        // analysis_options.yaml's `analyzer.exclude`, so it does not need the custom-file trigger,
+        // but refreshing it unconditionally here is harmless (it no-ops without an open panel).
+        rulePacksWebviewProvider.refresh();
+        analysisOptimizerProvider.refresh();
       }
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
       if (!cfg.get<boolean>('workspaceScanEnabled', false)) return;
