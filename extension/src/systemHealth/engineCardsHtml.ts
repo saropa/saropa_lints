@@ -1,46 +1,37 @@
-import * as vscode from 'vscode';
-import { createWebviewCspNonce, escapeHtml } from '../vibrancy/views/html-utils';
+import { escapeHtml } from '../vibrancy/views/html-utils';
 import { l10n } from '../i18n/runtime';
-import { formatBytes } from '../systemHealth/processQuery';
-import type { EngineStatus } from './debugPanel';
-
-// ────────────────────────────────────────────────────────────────
-// Public entry point
-// ────────────────────────────────────────────────────────────────
+import { formatBytes } from './processQuery';
 
 /**
- * Build the full HTML document for the Debug Panel sidebar webview.
- *
- * The panel shows engine status cards, bulk action buttons, and a
- * timestamped scrollable log. Every user-facing string is routed
- * through `l10n()` for translation readiness.
+ * Runtime snapshot of a single diagnostic engine (analyzer, scan daemon, LSP).
+ * Moved here (from the former standalone Debug Panel sidebar webview) when
+ * the engine cards merged into the Health Panel editor-tab dashboard.
  */
-export function buildDebugPanelHtml(
-  _webview: vscode.Webview,
-  _extensionUri: vscode.Uri,
-  engines: EngineStatus[],
-  logEntries: string[],
-): string {
-  const nonce = createWebviewCspNonce();
-  const title = l10n('debug.panel.title');
+export interface EngineStatus {
+  /** Stable machine key for toggle messages and data-attributes.
+   *  Must match the message union: 'analyzer' | 'scanDaemon' | 'lspServer'. */
+  key: 'analyzer' | 'scanDaemon' | 'lspServer';
+  /** Display name shown in the panel header row — must come from l10n(). */
+  name: string;
+  /** Whether the user has toggled this engine on. */
+  enabled: boolean;
+  /** Freeform lifecycle label: "active", "idle", "running", "stopped", "starting", etc. */
+  status: string;
+  /** OS process ID when the engine is running. */
+  pid?: number;
+  /** Number of lint rules loaded by this engine. */
+  ruleCount?: number;
+  /** Resident set size in bytes. */
+  rssBytes?: number;
+  /** Explanatory note when RSS cannot be measured (e.g. in-process engines). */
+  rssNote?: string;
+}
 
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(title)}</title>
-  <style nonce="${nonce}">${getStyles()}</style>
-</head>
-<body>
-  ${buildEnginesSection(engines)}
-  ${buildActionsBar()}
-  ${buildLogSection(logEntries)}
-  <script nonce="${nonce}">${getScript()}</script>
-</body>
-</html>`;
+/** Callback signatures the host supplies so the panel can read engine state. */
+export interface EngineStatusDeps {
+  getAnalyzerPluginStatus: () => EngineStatus;
+  getScanDaemonStatus: () => EngineStatus;
+  getLspServerStatus: () => EngineStatus;
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -48,7 +39,7 @@ export function buildDebugPanelHtml(
 // ────────────────────────────────────────────────────────────────
 
 /** Render the "Diagnostic Engines" heading and one card per engine. */
-function buildEnginesSection(engines: EngineStatus[]): string {
+export function buildEnginesSection(engines: EngineStatus[]): string {
   const heading = escapeHtml(l10n('debug.section.engines'));
   const cards = engines.map(buildEngineCard).join('');
 
@@ -84,13 +75,10 @@ function buildEngineCard(engine: EngineStatus): string {
     : '';
 
   // Status pill — color class varies by lifecycle state.
-  // Status label is the "Status:" prefix; the value is translated from
-  // the machine key via debug.engine.statusValue.<key>.
   const statusLabel = escapeHtml(l10n('debug.engine.statusLabel'));
   const statusClass = statusColorClass(engine.status);
   const statusText = escapeHtml(l10n(`debug.engine.statusValue.${engine.status}`));
 
-  // Rules and RSS on a secondary line.
   const metricsLine = buildMetricsLine(engine);
 
   return `<div class="engine-card" data-engine="${escapeHtml(engineKey)}">
@@ -116,13 +104,17 @@ function buildEngineCard(engine: EngineStatus): string {
 function buildMetricsLine(engine: EngineStatus): string {
   const parts: string[] = [];
 
-  // Rule count — only shown when the engine reports loaded rules.
+  // Rule count only applies to the analyzer engine — omitted for the scan
+  // daemon and LSP server, which don't report a loaded-rule figure.
   if (engine.ruleCount !== undefined) {
     const rulesLabel = escapeHtml(l10n('debug.engine.rules'));
     parts.push(`${rulesLabel} ${engine.ruleCount}`);
   }
 
-  // RSS — shown as formatted bytes, or as a note when not measurable.
+  // rssBytes and rssNote are mutually exclusive: an out-of-process engine
+  // (scan daemon, LSP server) reports a real measured RSS, while an
+  // in-process one (the analyzer plugin) can't be isolated from the host
+  // extension's own memory, so it reports an explanatory note instead.
   if (engine.rssBytes !== undefined) {
     const rssLabel = escapeHtml(l10n('debug.engine.rss'));
     parts.push(`${rssLabel} ${escapeHtml(formatBytes(engine.rssBytes))}`);
@@ -139,7 +131,7 @@ function buildMetricsLine(engine: EngineStatus): string {
 }
 
 /** Render the Kill All / Restart All action buttons. */
-function buildActionsBar(): string {
+export function buildActionsBar(): string {
   const killLabel = escapeHtml(l10n('debug.action.killAll'));
   const restartLabel = escapeHtml(l10n('debug.action.restartAll'));
 
@@ -149,35 +141,34 @@ function buildActionsBar(): string {
 </div>`;
 }
 
-/** Render the scrollable log section with timestamped entries. */
-function buildLogSection(logEntries: string[]): string {
+/**
+ * Render the scrollable log section with timestamped entries.
+ *
+ * A native `<details>`/`<summary>` collapsed-by-default expander — no
+ * script needed to toggle it, and it keeps the engine cards above the
+ * fold instead of the log's scrollback dominating the panel.
+ */
+export function buildLogSection(logEntries: string[]): string {
   const heading = escapeHtml(l10n('debug.section.log'));
 
-  // Empty-state message when no log entries have been recorded yet.
   if (logEntries.length === 0) {
     const emptyMsg = escapeHtml(l10n('debug.log.empty'));
-    return `<section class="log-section">
-  <h2 class="section-heading">${heading}</h2>
+    return `<details class="log-section">
+  <summary class="section-heading">${heading}</summary>
   <div class="log-empty">${emptyMsg}</div>
-</section>`;
+</details>`;
   }
 
-  // Render each entry as a single <div> — newest at the bottom so the
-  // CSS-anchored scroll stays at the tail.
+  // Newest at the bottom so the CSS-anchored scroll stays at the tail.
   const lines = logEntries
     .map((entry) => `<div class="log-line">${escapeHtml(entry)}</div>`)
     .join('');
 
-  return `<section class="log-section">
-  <h2 class="section-heading">${heading}</h2>
+  return `<details class="log-section">
+  <summary class="section-heading">${heading}</summary>
   <div class="log-container">${lines}</div>
-</section>`;
+</details>`;
 }
-
-// ────────────────────────────────────────────────────────────────
-// Helpers
-// ────────────────────────────────────────────────────────────────
-
 
 /**
  * Return a CSS class name that colors the status text according to
@@ -194,33 +185,21 @@ function statusColorClass(status: string): string {
     case 'error':
       return 'status-stopped';
     default:
-      // Idle, unknown, or custom states get the default foreground.
       return 'status-default';
   }
 }
 
 // ────────────────────────────────────────────────────────────────
-// Inline CSS
+// Inline CSS — appended to healthPanel-styles.ts's stylesheet.
 // ────────────────────────────────────────────────────────────────
 
 /**
- * All styles for the debug panel.
- *
- * Uses `var(--vscode-*)` custom properties so colors adapt to the
- * active VS Code theme (light, dark, high-contrast). Follows the
- * same token/spacing conventions as healthPanel-styles.ts.
+ * Styles for the engine cards, actions bar, and log section. Uses
+ * `var(--vscode-*)` custom properties so colors adapt to the active
+ * VS Code theme (light, dark, high-contrast).
  */
-function getStyles(): string {
+export function getEngineCardsStyles(): string {
   return `
-/* ── Base ──────────────────────────────────────────────────── */
-body {
-  font-family: var(--vscode-font-family, system-ui, sans-serif);
-  font-size: 13px;
-  color: var(--vscode-foreground);
-  padding: 0;
-  margin: 0;
-}
-
 /* ── Section headings ─────────────────────────────────────── */
 .section-heading {
   font-size: 13px;
@@ -303,13 +282,11 @@ body {
 .toggle-btn:hover {
   opacity: 0.85;
 }
-/* ON button highlighted green when the engine is enabled. */
 .toggle-on.active {
   background: var(--vscode-testing-iconPassed, #73c991);
   color: #000;
   border-color: var(--vscode-testing-iconPassed, #73c991);
 }
-/* OFF button highlighted red when the engine is disabled. */
 .toggle-off.active {
   background: var(--vscode-editorError-foreground, #f14c4c);
   color: #fff;
@@ -349,6 +326,26 @@ body {
 }
 
 /* ── Log section ──────────────────────────────────────────── */
+/* .log-section is a <details> element — its .section-heading <summary>
+   needs the pointer cursor a plain heading doesn't, and the default
+   marker/list-item spacing suppressed so it still reads as a heading. */
+.log-section > summary.section-heading {
+  cursor: pointer;
+  list-style: none;
+  display: block;
+}
+.log-section > summary.section-heading::-webkit-details-marker {
+  display: none;
+}
+.log-section > summary.section-heading::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.1s ease;
+}
+.log-section[open] > summary.section-heading::before {
+  transform: rotate(90deg);
+}
 .log-container {
   max-height: 200px;
   overflow-y: auto;
@@ -372,74 +369,4 @@ body {
   font-size: 12px;
 }
 `;
-}
-
-// ────────────────────────────────────────────────────────────────
-// Inline script
-// ────────────────────────────────────────────────────────────────
-
-/**
- * Client-side script that wires button clicks to vscode.postMessage.
- *
- * Runs inside the webview sandbox — `acquireVsCodeApi()` is the
- * only bridge back to the extension host.
- */
-function getScript(): string {
-  return `(function() {
-  // Acquire the VS Code API handle (can only be called once per
-  // webview lifetime — the result is cached by the host).
-  const vscode = acquireVsCodeApi();
-
-  // Delegate all button clicks via a single document listener to
-  // avoid per-button addEventListener boilerplate.
-  document.addEventListener('click', function(e) {
-    const btn = e.target.closest('button[data-action]');
-    if (!btn) return;
-
-    const action = btn.dataset.action;
-
-    // Toggle ON — tell the host this engine should be enabled.
-    if (action === 'toggleOn') {
-      const card = btn.closest('.engine-card');
-      if (card) {
-        vscode.postMessage({
-          command: 'toggle',
-          engine: card.dataset.engine,
-          enabled: true
-        });
-      }
-      return;
-    }
-
-    // Toggle OFF — tell the host this engine should be disabled.
-    if (action === 'toggleOff') {
-      const card = btn.closest('.engine-card');
-      if (card) {
-        vscode.postMessage({
-          command: 'toggle',
-          engine: card.dataset.engine,
-          enabled: false
-        });
-      }
-      return;
-    }
-
-    // Bulk actions.
-    if (action === 'killAll') {
-      vscode.postMessage({ command: 'killAll' });
-      return;
-    }
-    if (action === 'restartAll') {
-      vscode.postMessage({ command: 'restartAll' });
-      return;
-    }
-  });
-
-  // Auto-scroll the log container to the bottom on load so the
-  // newest entries are visible without manual scrolling.
-  var logContainer = document.querySelector('.log-container');
-  if (logContainer) {
-    logContainer.scrollTop = logContainer.scrollHeight;
-  }
-})();`;
 }

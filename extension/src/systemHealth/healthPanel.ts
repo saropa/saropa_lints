@@ -3,12 +3,50 @@ import { l10n } from '../i18n/runtime';
 import { queryDartProcesses, buildSnapshot, killProcess } from './processQuery';
 import { buildHealthPanelHtml } from './healthPanel-html';
 import type { HealthPanelData } from './healthPanel-html';
+import type { EngineStatus, EngineStatusDeps } from './engineCardsHtml';
+
+/** Maximum number of engine-log entries retained in the scrollback buffer. */
+const MAX_LOG_ENTRIES = 100;
+
+// All variants use a `type` discriminant (not `command`, which the former
+// Debug Panel webview used) so this merged panel has one consistent
+// vocabulary across both the process-table messages that already existed
+// here and the engine-control messages folded in from that panel.
+/** Message shapes the webview can post back to the extension host. */
+type HealthPanelMessage =
+  | { type: 'refresh' }
+  | { type: 'killProcess'; pid: number }
+  | { type: 'toggle'; engine: 'analyzer' | 'scanDaemon' | 'lspServer'; enabled: boolean }
+  | { type: 'killAll' }
+  | { type: 'restartAll' };
 
 // Singleton webview panel: only one System Health view makes sense at a
 // time, so re-invoking the command reveals + refreshes the existing panel
 // instead of spawning a duplicate.
+//
+// Engine-status deps, the log buffer, and the toggle/killAll/restartAll
+// event emitters are STATIC — they must survive across the panel being
+// closed and reopened (the host wires them once at activation, the same
+// way the former standalone Debug Panel sidebar webview did), whereas the
+// `panel` (WebviewPanel) instance itself only exists while the tab is open.
 export class HealthPanel implements vscode.Disposable {
   private static instance: HealthPanel | undefined;
+  private static engineDeps: EngineStatusDeps | undefined;
+  private static readonly logEntries: string[] = [];
+  private static readonly _onToggle = new vscode.EventEmitter<{
+    engine: 'analyzer' | 'scanDaemon' | 'lspServer';
+    enabled: boolean;
+  }>();
+  private static readonly _onKillAll = new vscode.EventEmitter<void>();
+  private static readonly _onRestartAll = new vscode.EventEmitter<void>();
+
+  /** Subscribe to engine toggle requests from the panel UI. */
+  static readonly onToggle = HealthPanel._onToggle.event;
+  /** Subscribe to kill-all requests from the panel UI. */
+  static readonly onKillAll = HealthPanel._onKillAll.event;
+  /** Subscribe to restart-all requests from the panel UI. */
+  static readonly onRestartAll = HealthPanel._onRestartAll.event;
+
   private readonly panel: vscode.WebviewPanel;
   private readonly disposables: vscode.Disposable[] = [];
   // Guards async callbacks (refresh/kill) that may resolve after the user
@@ -16,6 +54,32 @@ export class HealthPanel implements vscode.Disposable {
   // on a disposed webview.
   private disposed = false;
 
+  /** Wire the engine-status callbacks once at activation. */
+  static configureEngines(deps: EngineStatusDeps): void {
+    HealthPanel.engineDeps = deps;
+  }
+
+  /**
+   * Append a timestamped entry to the engine log and refresh the panel if
+   * it is currently open. Safe to call before the panel has ever been
+   * shown — the entry is retained in the static buffer either way.
+   */
+  static addLogEntry(message: string): void {
+    const timestamp = new Date().toLocaleTimeString();
+    HealthPanel.logEntries.push(`[${timestamp}] ${message}`);
+    while (HealthPanel.logEntries.length > MAX_LOG_ENTRIES) {
+      HealthPanel.logEntries.shift();
+    }
+    if (HealthPanel.instance) void HealthPanel.instance.refresh();
+  }
+
+  /**
+   * Open the panel, or bring it to front and refresh if already open.
+   * Refreshing on reveal matters because process state (RSS, orphans) and
+   * engine state (plugin live/dead) can both have changed while the tab
+   * was in the background — `retainContextWhenHidden` keeps the webview
+   * alive but does not re-query anything on its own.
+   */
   static createOrShow(context: vscode.ExtensionContext): void {
     if (HealthPanel.instance) {
       HealthPanel.instance.panel.reveal();
@@ -35,7 +99,7 @@ export class HealthPanel implements vscode.Disposable {
 
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
     this.panel.webview.onDidReceiveMessage(
-      (msg) => this.handleMessage(msg),
+      (msg: HealthPanelMessage) => this.handleMessage(msg),
       null,
       this.disposables,
     );
@@ -44,10 +108,24 @@ export class HealthPanel implements vscode.Disposable {
     void this.refresh();
   }
 
+  private collectEngines(): EngineStatus[] | undefined {
+    // saropaLints.debug.enabled now gates the Engines section within this
+    // panel (it used to gate the standalone Debug Panel sidebar webview's
+    // existence entirely).
+    const showEngines = vscode.workspace.getConfiguration('saropaLints.debug').get<boolean>('enabled', true);
+    const deps = HealthPanel.engineDeps;
+    if (!showEngines || !deps) return undefined;
+    return [
+      deps.getAnalyzerPluginStatus(),
+      deps.getScanDaemonStatus(),
+      deps.getLspServerStatus(),
+    ];
+  }
+
   private async refresh(): Promise<void> {
     const data = await this.queryData();
     if (this.disposed) return;
-    this.panel.webview.html = buildHealthPanelHtml(data);
+    this.panel.webview.html = buildHealthPanelHtml(data, this.collectEngines(), HealthPanel.logEntries);
   }
 
   private async queryData(): Promise<HealthPanelData | null> {
@@ -65,11 +143,32 @@ export class HealthPanel implements vscode.Disposable {
     };
   }
 
-  private handleMessage(msg: { type: string; pid?: number }): void {
-    if (msg.type === 'refresh') {
-      void this.refresh();
-    } else if (msg.type === 'killProcess' && msg.pid !== undefined) {
-      void this.killAndNotify(msg.pid);
+  /**
+   * Route a webview message to its handler. The process-table messages
+   * (refresh/killProcess) are handled directly here because this class
+   * owns that data. The engine-control messages (toggle/killAll/restartAll)
+   * only re-fire as events instead — the actual start/stop/kill mechanics
+   * live in extension.ts, which has the closures (lspClient,
+   * scanOnSaveController, runDisable/runReenablePlugin) this class has no
+   * business owning.
+   */
+  private handleMessage(msg: HealthPanelMessage): void {
+    switch (msg.type) {
+      case 'refresh':
+        void this.refresh();
+        break;
+      case 'killProcess':
+        void this.killAndNotify(msg.pid);
+        break;
+      case 'toggle':
+        HealthPanel._onToggle.fire({ engine: msg.engine, enabled: msg.enabled });
+        break;
+      case 'killAll':
+        HealthPanel._onKillAll.fire();
+        break;
+      case 'restartAll':
+        HealthPanel._onRestartAll.fire();
+        break;
     }
   }
 

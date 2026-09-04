@@ -74,13 +74,6 @@
           "name": "%views.settings.name%",
           "when": "saropaLints.isDartProject",
           "icon": "$(gear)"
-        },
-        {
-          "id": "saropaLints.debugPanel",
-          "name": "%views.debugPanel.name%",
-          "when": "saropaLints.isDartProject && config.saropaLints.debug.enabled",
-          "type": "webview",
-          "icon": "$(bug)"
         }
       ]
     },
@@ -2039,6 +2032,17 @@
             "type": "boolean",
             "default": true,
             "description": "%config.property.lspServer.enabled.description%"
+          },
+          "saropaLints.lspServer.workspaceScan": {
+            "type": "boolean",
+            "default": true,
+            "description": "%config.property.lspServer.workspaceScan.description%"
+          },
+          "saropaLints.lspServer.scanDirectories": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": ["lib", "bin", "test"],
+            "description": "%config.property.lspServer.scanDirectories.description%"
           }
         }
       }

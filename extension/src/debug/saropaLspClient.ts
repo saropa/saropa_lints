@@ -101,10 +101,19 @@ export class SaropaLspClient implements vscode.Disposable {
     // prevents the 200+-file didOpen flood VS Code sends on activation —
     // only files in visible editors get forwarded, so the server only
     // analyzes what the user is actually looking at.
+    // Pass user-configurable LSP settings as initialization options so the
+    // server knows which directories to scan and whether to run a startup
+    // workspace scan at all. These mirror the saropaLints.lspServer.*
+    // settings in package.json.
+    const lspConfig = vscode.workspace.getConfiguration('saropaLints.lspServer');
     const clientOptions: LanguageClientOptions = {
       documentSelector: [{ scheme: 'file', language: 'dart' }],
       outputChannel: this._outputChannel,
       outputChannelName: OUTPUT_CHANNEL_NAME,
+      initializationOptions: {
+        workspaceScan: lspConfig.get<boolean>('workspaceScan', true),
+        scanDirectories: lspConfig.get<string[]>('scanDirectories', ['lib', 'bin', 'test']),
+      },
       middleware: {
         didOpen: (document, next) => {
           // Only forward didOpen for files the user has in a visible editor

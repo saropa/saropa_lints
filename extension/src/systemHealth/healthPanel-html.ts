@@ -3,6 +3,7 @@ import { l10n } from '../i18n/runtime';
 import { getHealthPanelStyles } from './healthPanel-styles';
 import { getHealthPanelScript } from './healthPanel-script';
 import { formatBytes, isDaemonProcess, isSaropaProcess } from './processQuery';
+import { buildEnginesSection, buildActionsBar, buildLogSection, type EngineStatus } from './engineCardsHtml';
 import type { DartProcessInfo } from './types';
 
 export interface HealthPanelData {
@@ -15,7 +16,15 @@ export interface HealthPanelData {
 // webview has no incremental-DOM path — every refresh/kill action
 // reassigns webview.html wholesale, so client-side JS re-applies its own
 // sort/scroll state on load (see healthPanel-script.ts).
-export function buildHealthPanelHtml(data: HealthPanelData | null): string {
+//
+// `engines` and `logEntries` render the "Diagnostic Engines" section that
+// moved in from the former standalone Debug Panel sidebar webview — omitted
+// entirely when the caller has no engine deps configured yet.
+export function buildHealthPanelHtml(
+  data: HealthPanelData | null,
+  engines?: EngineStatus[],
+  logEntries?: string[],
+): string {
   const nonce = createWebviewCspNonce();
   const styles = getHealthPanelStyles();
   const script = getHealthPanelScript();
@@ -24,6 +33,10 @@ export function buildHealthPanelHtml(data: HealthPanelData | null): string {
   const body = data && data.processes.length > 0
     ? buildTableHtml(data)
     : `<div class="empty-state">${escapeHtml(l10n('systemHealth.panel.empty'))}</div>`;
+
+  const enginesHtml = engines && engines.length > 0
+    ? `${buildEnginesSection(engines)}${buildActionsBar()}${buildLogSection(logEntries ?? [])}`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -36,6 +49,7 @@ export function buildHealthPanelHtml(data: HealthPanelData | null): string {
   <style nonce="${nonce}">${styles}</style>
 </head>
 <body>
+  ${enginesHtml}
   ${data ? buildSummaryBar(data) : ''}
   ${body}
   <script nonce="${nonce}">${script}</script>

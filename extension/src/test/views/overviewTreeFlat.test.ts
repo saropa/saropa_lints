@@ -97,11 +97,18 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
     const ids = views.map((v) => v.id).sort();
-    // The container holds the tree-based section views (managed by
-    // sectionedSidebar) plus the webview Debug panel, which is registered
-    // separately (see debugPanel.ts) and is not one of SECTION_VIEW_IDS.
-    const expected = [...Object.values(SECTION_VIEW_IDS), 'saropaLints.debugPanel'].sort();
-    assert.deepStrictEqual(ids, expected, 'container = section views + debug webview');
+    // The container holds exactly the tree-based section views (managed by
+    // sectionedSidebar). The former standalone Debug Panel webview view
+    // merged into the Health Panel editor-tab dashboard and no longer
+    // exists as a sidebar view (see systemHealth/healthPanel.ts).
+    const expected = [...Object.values(SECTION_VIEW_IDS)].sort();
+    assert.deepStrictEqual(ids, expected, 'container = section views');
+  });
+
+  it('the debug panel is no longer a standalone sidebar view (merged into Health Panel)', () => {
+    const pkg = loadPackageJson();
+    const ids = pkg.contributes.views.saropaLints.map((v) => v.id);
+    assert.ok(!ids.includes('saropaLints.debugPanel'), 'debugPanel view must not return');
   });
 
   it('the legacy single saropaLints.overview view is no longer registered', () => {

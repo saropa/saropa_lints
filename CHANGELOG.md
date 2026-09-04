@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0] — Unreleased
 
-* --- CRITICAL NOTE --- *
+*--- IMPORTANT NOTE ---*
 
 **Major release — LSP server (BETA).** The new standalone LSP server replaces the in-process analyzer plugin as the default diagnostic engine. It runs in its own process, consuming a fraction of the RAM the plugin needed, and delivers diagnostics, quick fixes (lightbulb menu), and per-rule config overrides without loading the full analyzer into the IDE's analysis server. The LSP server is now **ON by default** — review its status in the extension's debug panel (Command Palette → "Saropa Lints: Toggle Debug Panel"). This is a BETA feature: if you encounter issues, toggle "LSP Server" OFF in the debug panel and re-enable the Analyzer Plugin. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
@@ -94,7 +94,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **LSP server: per-rule config overrides.** The server now reads per-rule enable/disable from both `analysis_options.yaml` (`diagnostics:` section) and `analysis_options_custom.yaml` (`severities:` section), layered on top of the tier. Rules the user disabled stay off; rules they enabled run even if the tier wouldn't include them.
 - **Debug panel: all three engine toggles now work.** The "Analyzer Plugin" card's ON/OFF buttons previously did nothing — only the LSP Server card was wired up. Toggling the analyzer card now runs the same enable/disable mechanism as the "Lint integration" sidebar toggle, and the card reflects the real on-disk state instead of always showing "active". The Scan Daemon toggle now suspends/resumes the daemon process. The LSP Server toggle persists to `saropaLints.lspServer.enabled` in settings. All toggles log their action to the debug panel's LOG section for immediate user feedback.
 - **LSP server: live config reload.** `workspace/didChangeConfiguration` now re-reads the tier from `analysis_options.yaml` and re-analyzes every file with published diagnostics, so editing per-rule overrides or the tier takes effect immediately instead of requiring a server restart.
-- **LSP server: full workspace scan on startup.** After the analyzer warms up, the server now scans all Dart files under `lib/`, `bin/`, and `test/` — diagnostics appear project-wide in the Problems panel, not just for files you open. Generated files are skipped. No action required.
+- **LSP server: full workspace scan on startup.** After the analyzer warms up, the server scans all Dart files project-wide so diagnostics appear in the Problems panel without opening every file. Which directories are scanned and whether the scan runs at all are configurable via `saropaLints.lspServer.scanDirectories` and `saropaLints.lspServer.workspaceScan` in VS Code settings.
 
 ---
 

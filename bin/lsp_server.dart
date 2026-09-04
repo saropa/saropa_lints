@@ -103,6 +103,17 @@ final _fileDiagnostics = <String, List<ScanDiagnostic>>{};
 /// Null until _buildCollection reads the config.
 ScanConfig? _scanConfig;
 
+/// Whether to run a full workspace scan after the analyzer warms up.
+/// Read from initializationOptions.workspaceScan (default: true).
+/// Configurable via saropaLints.lspServer.workspaceScan in VS Code settings.
+bool _workspaceScanEnabled = true;
+
+/// Directories to scan during the startup workspace scan, relative to the
+/// project root. Read from initializationOptions.scanDirectories
+/// (default: ['lib', 'bin', 'test']). Configurable via
+/// saropaLints.lspServer.scanDirectories in VS Code settings.
+List<String> _scanDirectories = const ['lib', 'bin', 'test'];
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
@@ -245,9 +256,11 @@ Future<void> _handleMessage(Map<String, dynamic> message) async {
     case 'initialize':
       // Client is asking for our capabilities. Extract the project root
       // from rootUri so we know where to build the analyzer context.
+      // Also reads initializationOptions for user-configurable scan settings.
       _log('initialize request received');
       _projectRoot = _extractProjectRoot(params);
       _log('project root: ${_projectRoot ?? '(unknown)'}');
+      _parseInitializationOptions(params);
       _sendResponse(id, _handleInitialize());
       _log('initialize response sent');
     case 'initialized':
@@ -380,6 +393,32 @@ String _fileUriToPath(String uriStr) {
   return uri.toFilePath();
 }
 
+/// Reads user-configurable scan settings from the initialize request's
+/// initializationOptions. These settings are passed by the VS Code extension
+/// from saropaLints.lspServer.* configuration. Falls back to defaults when
+/// the client doesn't send options (e.g. standalone CLI usage).
+void _parseInitializationOptions(Map<String, dynamic> params) {
+  final options = params['initializationOptions'] as Map<String, dynamic>?;
+  if (options == null) {
+    _log('no initializationOptions — using defaults '
+        '(workspaceScan: true, dirs: [lib, bin, test])');
+    return;
+  }
+
+  // Whether to scan all project files on startup.
+  if (options['workspaceScan'] case final bool scan) {
+    _workspaceScanEnabled = scan;
+  }
+
+  // Which directories to include in the workspace scan.
+  if (options['scanDirectories'] case final List<dynamic> dirs) {
+    _scanDirectories = dirs.cast<String>();
+  }
+
+  _log('initializationOptions: workspaceScan=$_workspaceScanEnabled, '
+      'dirs=$_scanDirectories');
+}
+
 // ---------------------------------------------------------------------------
 // Analyzer context
 // ---------------------------------------------------------------------------
@@ -438,7 +477,13 @@ Future<void> _buildCollection() async {
     // Full workspace scan — analyze all Dart files so the Problems panel
     // shows diagnostics project-wide, not just for open files. Runs after
     // the prewarm so the first user interaction isn't delayed.
-    unawaited(_analyzeWorkspace(root));
+    // Gated on the user-configurable workspaceScan setting — large projects
+    // can disable this to avoid a slow startup.
+    if (_workspaceScanEnabled) {
+      unawaited(_analyzeWorkspace(root));
+    } else {
+      _log('workspace scan disabled by user setting');
+    }
   } on Object catch (e) {
     _log('failed to build analyzer context: $e');
     _collection = null;
@@ -459,8 +504,9 @@ Future<void> _analyzeWorkspace(String root) async {
   _workspaceScanRunning = true;
   final sw = Stopwatch()..start();
 
-  // Directories to scan — same scope as the analyzer plugin.
-  final scanDirs = ['lib', 'bin', 'test'];
+  // Directories to scan — configurable via saropaLints.lspServer.scanDirectories.
+  // Defaults to ['lib', 'bin', 'test'] (same scope as the analyzer plugin).
+  final scanDirs = _scanDirectories;
   final dartFiles = <String>[];
 
   for (final dir in scanDirs) {

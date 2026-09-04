@@ -1,9 +1,13 @@
 import { getDashboardChromeStyles } from '../views/dashboardChromeStyles';
+import { getEngineCardsStyles } from './engineCardsHtml';
 
 // Extends the shared dashboard chrome so this panel matches the other
 // vibrancy/views panels without duplicating base layout/typography rules.
+// Also carries the engine-card / actions-bar / log-section styles that
+// moved in from the former standalone Debug Panel webview.
 export function getHealthPanelStyles(): string {
   return `${getDashboardChromeStyles()}
+${getEngineCardsStyles()}
 .health-table {
   width: 100%;
   border-collapse: collapse;

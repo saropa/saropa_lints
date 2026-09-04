@@ -1,18 +1,35 @@
 // Returned as a raw string, not a .js file, because it is injected inline
 // into the webview's <script nonce="..."> tag — the extension host has no
 // build step for webview-side code, so the script text lives here.
+//
+// Owns the single `acquireVsCodeApi()` call for the whole panel (VS Code
+// throws if it is called more than once per webview) — this is why the
+// former Debug Panel's engine-toggle / kill-all / restart-all handling was
+// folded into this script rather than concatenated as its own IIFE that
+// also called acquireVsCodeApi().
 export function getHealthPanelScript(): string {
   return `
 const vscode = acquireVsCodeApi();
 
 document.addEventListener('click', function(e) {
-  const target = e.target;
-  if (!target || !target.dataset) return;
-  if (target.dataset.action === 'refresh') {
+  const btn = e.target.closest('button[data-action], [data-action]');
+  if (!btn || !btn.dataset) return;
+  const action = btn.dataset.action;
+
+  if (action === 'refresh') {
     vscode.postMessage({ type: 'refresh' });
-  } else if (target.dataset.action === 'kill' && target.dataset.pid) {
-    target.disabled = true;
-    vscode.postMessage({ type: 'killProcess', pid: Number(target.dataset.pid) });
+  } else if (action === 'kill' && btn.dataset.pid) {
+    btn.disabled = true;
+    vscode.postMessage({ type: 'killProcess', pid: Number(btn.dataset.pid) });
+  } else if (action === 'toggleOn' || action === 'toggleOff') {
+    const card = btn.closest('.engine-card');
+    if (card) {
+      vscode.postMessage({ type: 'toggle', engine: card.dataset.engine, enabled: action === 'toggleOn' });
+    }
+  } else if (action === 'killAll') {
+    vscode.postMessage({ type: 'killAll' });
+  } else if (action === 'restartAll') {
+    vscode.postMessage({ type: 'restartAll' });
   }
 });
 
@@ -29,5 +46,12 @@ window.addEventListener('message', function(event) {
     }
   }
 });
+
+// Auto-scroll the engine log to the bottom on load so the newest entries
+// are visible without manual scrolling.
+var logContainer = document.querySelector('.log-container');
+if (logContainer) {
+  logContainer.scrollTop = logContainer.scrollHeight;
+}
 `;
 }
