@@ -275,7 +275,8 @@
         "hint": "Overrides a specific rule's severity, or turns it off entirely, independent of tier and rule packs.",
         "level": "Level",
         "empty": "No severity overrides are set.",
-        "rulePlaceholder": "rule_name"
+        "rulePlaceholder": "rule_name",
+        "newLevelAria": "New severity level"
       },
       "bannedUsage": {
         "title": "Banned usage",
@@ -1415,7 +1416,8 @@
       "toggleDetail": "Toggle the highlighted package detail expander",
       "escapeSearch": "Clear focused search; second Esc collapses all expanded rows",
       "historyBack": "Go back through the package navigation history",
-      "showOverlay": "Show this shortcut overlay"
+      "showOverlay": "Show this shortcut overlay",
+      "jumpToTab": "Jump to tab 1-6 (Overview, Upgrades, Full report, Known issues, Compare, Settings)"
     },
     "versionTooltip": {
       "installed": "Installed: {version} ({date})",
@@ -1794,6 +1796,7 @@
     "reports": {
       "intro": "One-click CLI reports that previously required a terminal. Each Run button streams the tool's live output below its card and saves a copy under reports/.saropa_lints/reports-tab/.",
       "runButton": "Run",
+      "notRunYet": "Not run yet",
       "running": "Running…",
       "exitOk": "Exit 0 — pass",
       "exitFail": "Non-zero exit — see output",

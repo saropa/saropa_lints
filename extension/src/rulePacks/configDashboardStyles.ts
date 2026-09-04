@@ -250,7 +250,14 @@ function tierControlStyles(): string {
    Active option gets an inactive-selection backdrop tint; inactive options stay
    transparent at slightly reduced opacity. The track band groups them. */
 .tier-control {
-  display: inline-flex;
+  /* flex (not inline-flex) + flex-wrap: the Phase 7 UX-harness sweep found this segmented control
+     (5 pill buttons, ~498px unwrapped) blowing out the document's scrollWidth at a 380px webview
+     width -- inline-flex sizes to its max-content width and, unlike a block-level flex container,
+     that width is free to exceed its containing block and bleed into the page's horizontal scroll
+     extent. flex-wrap lets the pills drop to a second row instead of forcing horizontal scroll on
+     the whole dashboard for what is, at narrow widths, a five-button toggle. */
+  display: flex;
+  flex-wrap: wrap;
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 2px;
@@ -267,14 +274,16 @@ function tierControlStyles(): string {
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  opacity: 0.7;
-  transition: background 0.15s, opacity 0.15s;
+  /* No opacity dimming on the unselected state: opacity fades the INHERITED foreground toward
+     the segmented control's background, and the Phase 7 UX-harness sweep measured the blended
+     result at 4.21:1 against --surface-3 -- under the 4.5:1 AA floor. The selected/unselected
+     distinction is carried by the checked state's background + bold weight below; dimming legible
+     text to convey "not selected" cost more contrast than the segmented control needed to spend. */
+  transition: background 0.15s;
 }
-.tier-btn:hover { opacity: 1; }
 .tier-btn:focus-visible {
   outline: 2px solid var(--vscode-focusBorder);
   outline-offset: 1px;
-  opacity: 1;
 }
 .tier-btn[aria-checked="true"] {
   background: var(--vscode-list-activeSelectionBackground);

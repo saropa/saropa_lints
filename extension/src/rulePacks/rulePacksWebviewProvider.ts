@@ -1766,7 +1766,7 @@ ${detailRow}`;
   </table>
   <div class="cf-add-row">
     <input type="text" id="cf-severity-rule" placeholder="${escapeHtml(l10n('rulesTiers.configFile.severities.rulePlaceholder'))}" />
-    <select id="cf-severity-new-level"><option value="ERROR">ERROR</option><option value="WARNING">WARNING</option><option value="INFO">INFO</option><option value="false">false</option></select>
+    <select id="cf-severity-new-level" aria-label="${escapeHtml(l10n('rulesTiers.configFile.severities.newLevelAria'))}"><option value="ERROR">ERROR</option><option value="WARNING">WARNING</option><option value="INFO">INFO</option><option value="false">false</option></select>
     <button type="button" class="btn tier-2" id="cf-severity-add">${escapeHtml(l10n('rulesTiers.common.add'))}</button>
   </div>
 </section>`;
@@ -1968,8 +1968,13 @@ ${detailRow}`;
     const script = scripts
       ? `<script nonce="${nonce}">${getConfigDashboardScript()}</script>`
       : '';
+    // lang="en": the Phase 7 UX-harness sweep flagged the missing attribute as a serious a11y
+    // violation (html-has-lang) — screen readers fall back to the OS locale's pronunciation rules
+    // without it. All of this dashboard's static chrome/labels are English; per-string translation
+    // happens through l10n() but the document's declared language is unaffected by that (matches
+    // the convention already used by the other dashboard shells in this codebase).
     return `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>Saropa Lints Config</title><meta http-equiv="Content-Security-Policy" content="${csp}">
+<html lang="en"><head><meta charset="UTF-8"><title>Saropa Lints Config</title><meta http-equiv="Content-Security-Policy" content="${csp}">
 <style nonce="${nonce}">${getConfigDashboardStyles()}</style></head><body>${body}${script}</body></html>`;
   }
 

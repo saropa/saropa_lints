@@ -393,9 +393,20 @@ export function chromeToolbarAndButtons(): string {
   border-radius: 6px;
 }
 .btn.tier-3:hover:not(:disabled) { background: var(--vscode-list-hoverBackground); }
+/* Filled like the primary (.tier-1) button rather than colored text on the secondary-button
+   background: axe's UX-harness sweep (Phase 7) measured --accent-error text on
+   --vscode-button-secondaryBackground at 3.05:1 dark / 3.76:1 light -- both below the 4.5:1 AA
+   floor, since the "danger" semantic was carried entirely by an under-contrast text color. VS
+   Code's button-background/button-foreground pair is contract-guaranteed AA-compliant by every
+   shipped theme (it is what every primary button already relies on), so reusing it here and moving
+   the red accent to the border keeps the "destructive action" cue without gambling on contrast. */
 .btn.danger {
-  color: var(--accent-error);
-  border-color: color-mix(in srgb, var(--accent-error) 50%, transparent);
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border-color: var(--accent-error);
+}
+.btn.danger:hover:not(:disabled) {
+  background: var(--vscode-button-hoverBackground, var(--vscode-button-background));
 }
 .btn.icon-only { padding: 6px 10px; }
 details.more { position: relative; }
@@ -695,7 +706,12 @@ export function chromeTableBase(): string {
   font-size: 0.82em;
   letter-spacing: 0.3px;
   text-transform: uppercase;
-  color: var(--muted);
+  /* --muted (descriptionForeground) on --surface-3 measured 4.02:1 in the Phase 7 UX-harness
+     sweep -- just under the 4.5:1 AA floor for text this size/weight, and every .dash-table
+     consumer in the extension inherits whichever color is set here. --vscode-foreground is the
+     theme's guaranteed-contrast body-text color against editor-family surfaces, so it clears AA in
+     every shipped theme without needing a per-theme tuned value. */
+  color: var(--vscode-foreground);
   padding: 6px 10px;
   border-bottom: 1px solid var(--border);
   user-select: none;

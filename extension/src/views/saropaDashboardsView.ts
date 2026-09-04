@@ -420,12 +420,24 @@ function hostStyles(): string {
   padding: var(--space-3, 12px);
   border: 1px solid var(--border, var(--vscode-widget-border));
   border-radius: var(--radius-md, 8px);
-  background: var(--surface-2, var(--vscode-editor-inactiveSelectionBackground));
+  /* --surface-1 (editorWidget-background), not --surface-2 (inactiveSelectionBackground): the
+     Phase 7 UX-harness sweep measured .metric-label's muted text at 4.02:1 against surface-2,
+     under the 4.5:1 AA floor. Selection-highlight surfaces are tuned to sit close to muted text by
+     design (a selection tint deliberately doesn't fight the description-foreground color it was
+     drawn behind); a static card background needs the wider margin editorWidget-background gives. */
+  background: var(--surface-1, var(--vscode-editorWidget-background));
 }
 .metric-value { font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
 .metric-label { font-size: 0.8rem; color: var(--muted, var(--vscode-descriptionForeground)); }
-.metric-warn .metric-value { color: var(--accent-warning, var(--vscode-editorWarning-foreground)); }
-.metric-bad .metric-value { color: var(--accent-error, var(--vscode-errorForeground)); }
+/* A left-border accent, not a recolored value: the Phase 7 UX-harness sweep measured
+   --accent-warning (editorWarning-foreground, a yellow/amber tuned for small icons on the editor
+   background) at 2.93:1 against this card's surface in the light theme -- badly under the 4.5:1 AA
+   floor for 1.5rem body text. Warning/amber and error/red tones are reliable for a THIN accent
+   stripe or an icon at any size, but not guaranteed-readable as full-size text color across every
+   shipped theme; the value stays at full-contrast foreground and the tone is carried by the border
+   instead, so the KPI's "this needs attention" signal survives without gambling on contrast. */
+.metric-warn { border-left: 3px solid var(--accent-warning, var(--vscode-editorWarning-foreground)); }
+.metric-bad { border-left: 3px solid var(--accent-error, var(--vscode-errorForeground)); }
 .summary-empty { color: var(--muted, var(--vscode-descriptionForeground)); margin: 0; padding: var(--space-3, 12px) 0; }
 `;
 }
