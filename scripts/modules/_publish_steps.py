@@ -2509,6 +2509,20 @@ def pre_publish_validation(project_dir: Path) -> bool:
 
     if result.returncode in (0, 65):
         print_success("Package validated successfully")
+        # `dart pub publish` prints its own pre-release caveat (e.g. "this
+        # is a prerelease version") on stdout, but until now that text was
+        # discarded on the success path along with everything else — the
+        # operator never saw pub.dev's own warning before the irreversible
+        # commit/tag/publish stage that follows. Surface it explicitly
+        # instead of relying on the operator to have watched raw output.
+        output = (result.stdout or "") + (result.stderr or "")
+        prerelease_lines = [
+            line.strip()
+            for line in output.splitlines()
+            if "pre-release" in line.lower() or "prerelease" in line.lower()
+        ]
+        for line in prerelease_lines:
+            print_warning(f"dart pub publish: {line}")
         return True
 
     output = (result.stdout or "") + (result.stderr or "")
