@@ -25,8 +25,8 @@ import {
   renderTreeItem,
 } from './triageTree';
 
-function setting(label: string, description?: string, commandId?: string): ConfigSettingNode {
-  return { kind: 'configSetting', label, description, commandId };
+function setting(label: string, description?: string, commandId?: string, icon?: string): ConfigSettingNode {
+  return { kind: 'configSetting', label, description, commandId, icon };
 }
 
 export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNode> {
@@ -108,7 +108,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
         command: 'saropaLints.initializeConfig',
       },
     }[state];
-    return [setting(l10n('dashboards.controls.analyzerPlugin'), byState.description, byState.command)];
+    return [setting(l10n('dashboards.controls.analyzerPlugin'), byState.description, byState.command, 'plug')];
   }
 
   /**
@@ -121,7 +121,12 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
     const root = getProjectRoot();
     return [
-      setting('Lint integration', enabled ? 'On' : 'Off', enabled ? 'saropaLints.disable' : 'saropaLints.enable'),
+      setting(
+        'Lint integration',
+        enabled ? 'On' : 'Off',
+        enabled ? 'saropaLints.disable' : 'saropaLints.enable',
+        enabled ? 'check' : 'circle-slash',
+      ),
       // The in-process analyzer plugin is a SEPARATE subsystem from the row
       // above: "Lint integration" gates scan-on-save delivery, this gates the
       // plugins: block the Dart analysis server reads for live in-editor
@@ -134,13 +139,24 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       // descriptions per tier — far richer than the bare quickpick the row
       // used to launch (`saropaLints.setTier`). Users get the full context of
       // each option instead of guessing from a one-line label.
-      setting('Tier', tier, 'saropaLints.openConfigDashboard'),
+      setting('Tier', tier, 'saropaLints.openConfigDashboard', 'layers'),
       // Lane click → the light/full QuickPick (`saropaLints.setLane`), not the
       // dashboard: unlike Tier's 5-way segmented control, this is a plain
       // binary switch with no rule list to browse, so a QuickPick with two
       // detailed items is the right amount of UI — same reasoning that used to
       // apply to Tier before it grew a dedicated dashboard section.
       ...this.buildLaneNode(root),
+      // The Analyzer Plugin / LSP Server / Scan Daemon ON/OFF toggles live in
+      // the Health Panel (`saropaLints.showProcessHealth`), but until this row
+      // existed that command had no reachable UI path at all — Command
+      // Palette only. Every diagnostic-affecting control in this sidebar
+      // section gets a click target; this was the one exception.
+      setting(
+        l10n('dashboards.controls.processHealth'),
+        l10n('dashboards.controls.processHealthOpen'),
+        'saropaLints.showProcessHealth',
+        'pulse',
+      ),
     ];
   }
 
@@ -160,7 +176,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     const lane = raw === 'full' ? 'full' : 'light';
     const description =
       lane === 'full' ? l10n('dashboards.controls.laneFull') : l10n('dashboards.controls.laneLight');
-    return [setting(l10n('dashboards.controls.lane'), description, 'saropaLints.setLane')];
+    return [setting(l10n('dashboards.controls.lane'), description, 'saropaLints.setLane', 'arrow-swap')];
   }
 
   /** Run-after-config, UI language, detected packages. */
@@ -175,9 +191,19 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       // Each settings row needs a click target — the user expects every visible
       // sidebar item to navigate somewhere. Toggling a boolean in one click
       // beats opening the Settings UI just to flip a checkbox.
-      setting('Run analysis after config change', runAfter ? 'Yes' : 'No', 'saropaLints.toggleRunAnalysisAfterConfigChange'),
-      setting('Run analysis after dependency change', runAfterDep ? 'Yes' : 'No', 'saropaLints.toggleRunAnalysisAfterDependencyChange'),
-      setting('UI language', localeLabel, 'saropaLints.pickUiLanguage'),
+      setting(
+        'Run analysis after config change',
+        runAfter ? 'Yes' : 'No',
+        'saropaLints.toggleRunAnalysisAfterConfigChange',
+        'sync',
+      ),
+      setting(
+        'Run analysis after dependency change',
+        runAfterDep ? 'Yes' : 'No',
+        'saropaLints.toggleRunAnalysisAfterDependencyChange',
+        'sync',
+      ),
+      setting('UI language', localeLabel, 'saropaLints.pickUiLanguage', 'globe'),
     ];
 
     // Detected platform/packages from pubspec.
@@ -192,7 +218,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       }
       // The Detected row summarizes what's in pubspec.yaml — clicking should
       // open that file so the user can edit it directly.
-      if (parts.length > 0) items.push(setting('Detected', parts.join(' · '), 'saropaLints.openPubspec'));
+      if (parts.length > 0) items.push(setting('Detected', parts.join(' · '), 'saropaLints.openPubspec', 'package'));
     }
 
     return items;
@@ -201,9 +227,9 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
   /** Open config, initialize, run analysis. */
   private buildActionNodes(): ConfigTreeNode[] {
     return [
-      setting('Open analysis_options_custom.yaml', undefined, 'saropaLints.openConfig'),
-      setting('Initialize / Update config', undefined, 'saropaLints.initializeConfig'),
-      setting('Migrate config keys', undefined, 'saropaLints.migrateConfig'),
+      setting('Open analysis_options_custom.yaml', undefined, 'saropaLints.openConfig', 'file-code'),
+      setting('Initialize / Update config', undefined, 'saropaLints.initializeConfig', 'tools'),
+      setting('Migrate config keys', undefined, 'saropaLints.migrateConfig', 'arrow-right'),
       // Composite analyzer plugin scaffold is intentionally NOT exposed here.
       // The action targets a tiny audience (teams shipping their own custom
       // analyzer rules alongside Saropa) and the term is jargon to everyone
@@ -213,15 +239,15 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       // (`dart run saropa_lints:init --emit-composite-plugin-scaffold`),
       // and `doc/guides/composite_analyzer_plugin.md`. Keeping it out of the
       // sidebar avoids confusing the 99% of users who only want Saropa rules.
-      setting('Run analysis', undefined, 'saropaLints.runAnalysis'),
+      setting('Run analysis', undefined, 'saropaLints.runAnalysis', 'play'),
     ];
   }
 
   /** Quick links to the richer web dashboards. */
   private buildDashboardShortcutNodes(): ConfigTreeNode[] {
     return [
-      setting('Open Lints Config', 'Editor tab: tiers, packs, charts, docs', 'saropaLints.openConfigDashboard'),
-      setting('Open Package Vibrancy', 'Dependency health and reports', 'saropaLints.openPackageVibrancy'),
+      setting('Open Lints Config', 'Editor tab: tiers, packs, charts, docs', 'saropaLints.openConfigDashboard', 'settings-gear'),
+      setting('Open Package Vibrancy', 'Dependency health and reports', 'saropaLints.openPackageVibrancy', 'graph'),
     ];
   }
 

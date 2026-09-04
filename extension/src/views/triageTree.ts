@@ -10,6 +10,10 @@ export interface ConfigSettingNode {
   label: string;
   description?: string;
   commandId?: string;
+  // VS Code codicon id (e.g. 'gear', 'plug'). Falls back to 'gear' in
+  // renderTreeItem when omitted — every row in this section used to render
+  // with no icon at all, reading as broken/missing rather than deliberate.
+  icon?: string;
 }
 
 export interface TriageGroupNode {
@@ -173,6 +177,10 @@ export function renderTreeItem(node: ConfigTreeNode): vscode.TreeItem {
       if (node.commandId) item.command = { command: node.commandId, title: node.label, arguments: [] };
       // contextValue enables context menu actions (e.g. "Copy as JSON").
       item.contextValue = 'configSetting';
+      // Every row here used to render with no icon — a wall of unlabeled text
+      // that reads as broken UI. 'gear' is a neutral settings-row default;
+      // call sites pass something more specific where one fits.
+      item.iconPath = new vscode.ThemeIcon(node.icon ?? 'gear');
       return item;
     }
     case 'triageGroup':

@@ -384,6 +384,8 @@
       "lane": "Lane",
       "laneLight": "Light — ~200 rules in-editor, rest on save",
       "laneFull": "Full — every enabled rule in-editor",
+      "processHealth": "Engines (LSP / Analyzer)",
+      "processHealthOpen": "Open Process Health to toggle",
       "runAfterConfigState": "Run analysis after config change: {state}",
       "runAfterDependencyState": "Run analysis after dependency change: {state}",
       "uiLanguageState": "UI language: {language}",
