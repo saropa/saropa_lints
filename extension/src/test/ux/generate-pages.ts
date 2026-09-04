@@ -23,6 +23,20 @@ import { buildPackageDetailHtml } from '../../vibrancy/views/package-detail-html
 import { buildKnownIssuesHtml } from '../../vibrancy/views/known-issues-html';
 import { renderViolationsDashboardHtml } from '../../views/violationsDashboardHtml';
 import type { VibrancyResult, ComparisonData } from '../../vibrancy/types';
+// Phase 7 additions: the three brand-new Phase 3/4/6 surfaces had zero visual-harness coverage
+// before this pass (tsc + unit tests only). Home hub and Rules & Tiers are pure builders (data in,
+// HTML string out) so they slot into the existing fixture pattern directly. Project Map's shell
+// needs a `vscode.Webview`-shaped stub only for its `cspSource` field, and Rules & Tiers needs a
+// real project root on disk (it reads pubspec.yaml / analysis_options*.yaml directly, not through
+// an injectable seam) — this repo's own root satisfies that, the same way other fixtures below use
+// real ranking/scoring code rather than re-mocking it.
+import { buildShell, type HomeCardSummaries } from '../../views/saropaDashboardsView';
+import type { HomeKpis } from '../../views/dashboardSummaries';
+import { RulePacksWebviewProvider } from '../../rulePacks/rulePacksWebviewProvider';
+import { buildShellHtml as buildProjectMapShellHtml, buildScanningMapPaneHtml } from '../../views/projectMapShell';
+import { buildReportsTabHtml } from '../../views/projectMapReports';
+import { mockWorkspaceFolders } from '../vibrancy/vscode-mock';
+import type * as vscode from 'vscode';
 
 const OUT_DIR = path.resolve(__dirname, '../../../test-ux/.pages');
 
@@ -142,6 +156,58 @@ function violationsEmptyFixture() {
   };
 }
 
+/** Home hub fixture: a populated KPI band (not the "not scanned" empty state, which
+ *  `saropaDashboardsView.test.ts` already pins) plus one representative body string per card. */
+function homeKpisFixture(): HomeKpis {
+  return {
+    healthScore: 82,
+    issueCount: 143,
+    enginesRunning: 2,
+    enginesTotal: 3,
+    packagesTotal: 40,
+    packagesAttention: 3,
+    codeHealthGrade: 'B',
+    projectMapScanned: true,
+  };
+}
+
+function homeCardsFixture(): HomeCardSummaries {
+  return {
+    findings: '<div class="summary-grid"><span class="metric">143 issues</span></div>',
+    rulesAndTiers: '<div class="summary-grid"><span class="metric">Recommended tier</span></div>',
+    packages: '<div class="summary-grid"><span class="metric">40 packages · 3 need attention</span></div>',
+    codeHealth: '<div class="summary-grid"><span class="metric">Grade B</span></div>',
+    projectMap: '<div class="summary-grid"><span class="metric">Last scanned 2h ago</span></div>',
+    fullAudit: '<p class="summary-empty">Not run yet.</p>',
+  };
+}
+
+/**
+ * Rules & Tiers fixture. `_buildHtml()`/`_activeTab` are private — the class was designed to be
+ * driven through the panel lifecycle (`openEditorPanel()` / postMessage), not rendered statically.
+ * Reading them via a cast is the same escape hatch the harness already needs for any builder that
+ * was not written with a pure "state in, HTML out" seam; documented here rather than silently
+ * reaching past `private` with no explanation. `_buildHtml()` reads pubspec.yaml and
+ * analysis_options*.yaml straight off disk via `getProjectRoot()` (no injectable data layer), so
+ * the workspace-folder mock below points at THIS repo's own root — it has both files already,
+ * making it a real, not fabricated, fixture (same spirit as reusing real ranking code elsewhere in
+ * this file rather than re-mocking it).
+ */
+function buildRulesAndTiersTabHtml(tab: 'tier' | 'configFile'): string {
+  const repoRoot = path.resolve(__dirname, '../../../..');
+  mockWorkspaceFolders.value = [{ uri: { fsPath: repoRoot } }];
+  const provider = new RulePacksWebviewProvider({ fsPath: repoRoot } as unknown as vscode.Uri);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see doc comment above.
+  (provider as any)._activeTab = tab;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see doc comment above.
+  const html: string = (provider as any)._buildHtml();
+  mockWorkspaceFolders.value = undefined;
+  return html;
+}
+
+/** Minimal stand-in for `vscode.Webview` — `buildShellHtml` only reads `.cspSource`. */
+const FAKE_WEBVIEW = { cspSource: 'vscode-resource:' } as unknown as vscode.Webview;
+
 /* ------------------------------------------------------------------- pages */
 
 const PAGES: Array<{ name: string; html: () => string }> = [
@@ -161,6 +227,26 @@ const PAGES: Array<{ name: string; html: () => string }> = [
   { name: 'package-detail', html: () => buildPackageDetailHtml(makeResult('http', 92), [], null) },
   { name: 'known-issues', html: () => buildKnownIssuesHtml() },
   { name: 'findings-empty', html: () => renderViolationsDashboardHtml(violationsEmptyFixture()) },
+  // Phase 7: previously-uncovered Phase 3/4/6 surfaces (see the import comment above).
+  { name: 'home-hub', html: () => buildShell('vscode-resource:', homeKpisFixture(), homeCardsFixture()) },
+  { name: 'rules-and-tiers-tier', html: () => buildRulesAndTiersTabHtml('tier') },
+  { name: 'rules-and-tiers-config-file', html: () => buildRulesAndTiersTabHtml('configFile') },
+  {
+    name: 'project-map-scanning',
+    html: () => buildProjectMapShellHtml(FAKE_WEBVIEW, buildScanningMapPaneHtml(), buildReportsTabHtml()),
+  },
+  // Same document, but with the Reports tab flipped active (mirrors the package-dashboard-detail
+  // trick above) — otherwise the Reports pane sits behind `hidden` and never gets measured for
+  // overflow/contrast, defeating the point of adding it as a fixture.
+  {
+    name: 'project-map-reports',
+    html: () =>
+      buildProjectMapShellHtml(FAKE_WEBVIEW, buildScanningMapPaneHtml(), buildReportsTabHtml())
+        .replace('id="pmTabBtnMap" data-tab="map" role="tab" aria-selected="true"', 'id="pmTabBtnMap" data-tab="map" role="tab" aria-selected="false"')
+        .replace('id="pmTabBtnReports" data-tab="reports" role="tab" aria-selected="false"', 'id="pmTabBtnReports" data-tab="reports" role="tab" aria-selected="true"')
+        .replace('id="pmTabMap" class="pm-tab-panel"', 'id="pmTabMap" class="pm-tab-panel" hidden')
+        .replace('id="pmTabReports" class="pm-tab-panel" role="tabpanel" aria-labelledby="pmTabBtnReports" hidden', 'id="pmTabReports" class="pm-tab-panel" role="tabpanel" aria-labelledby="pmTabBtnReports"'),
+  },
 ];
 
 function main(): void {

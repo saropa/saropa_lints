@@ -284,6 +284,29 @@ export enum StatusBarAlignment {
     Right = 2,
 }
 
+/**
+ * `vscode.extensions.getExtension` stub. `settingsCatalog.ts`'s schema-driven Automation/Extension
+ * tab (Phase 4) reads THIS extension's own `contributes.configuration` off the real manifest at
+ * render time — the mock had no `extensions` export at all before Phase 7's UX-harness work added
+ * static rendering for the Rules & Tiers dashboard, so any caller of `buildSettingsCatalog()`
+ * (previously untested outside a live VS Code host) threw `Cannot read properties of undefined`.
+ * Reads the actual `extension/package.json` for the one real id this extension ever queries, so a
+ * static render sees genuine settings instead of an empty catalog; any other id (a bug, or a future
+ * caller checking a different extension) returns undefined like the real API would pre-activation.
+ */
+export const extensions = {
+    getExtension: (id: string): { packageJSON: Record<string, unknown> } | undefined => {
+        if (id !== 'saropa.saropa-lints') return undefined;
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires -- runtime-relative load, not a static import cycle.
+            const pkg = require('../../../package.json');
+            return { packageJSON: pkg };
+        } catch {
+            return undefined;
+        }
+    },
+};
+
 /** Reset all shared mock state between tests. */
 export function resetMocks(): void {
     createdPanels.length = 0;
