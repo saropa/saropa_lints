@@ -132,9 +132,9 @@ stock Dart SDK style/correctness rules and belong to VGA's layer, not saropa's.
 | `avoid_bool_literals_in_conditional_expressions` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `avoid_catching_errors` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `avoid_double_and_int_checks` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
-| `avoid_dynamic_calls` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
+| `avoid_dynamic_calls` | **ENHANCED** | `avoid_dynamic_calls_extended` (any dynamic-receiver call/property/operator, not just the stock rule's narrower cases; noSuchMethod-override exemption) |
 | `avoid_empty_else` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
-| `avoid_equals_and_hash_code_on_mutable_classes` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
+| `avoid_equals_and_hash_code_on_mutable_classes` | **ENHANCED** | `avoid_equals_and_hash_code_on_mutable_classes_extended` (flags each mutable field individually referenced by a hand-written equality and hashCode override) |
 | `avoid_escaping_inner_quotes` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `avoid_field_initializers_in_const_classes` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `avoid_final_parameters` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |

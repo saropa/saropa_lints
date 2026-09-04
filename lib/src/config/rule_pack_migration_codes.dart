@@ -1176,6 +1176,27 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'require_mounted_check_after_await',
   },
 
+  // very_good_analysis — 17 ENHANCED codes.
+  'migrate_very_good_analysis': {
+    'avoid_dynamic_calls_extended',
+    'avoid_equals_and_hash_code_on_mutable_classes_extended',
+    'avoid_null_checks_in_equality_operators_extended',
+    'avoid_positional_boolean_parameters_with_fix',
+    'avoid_print_in_production',
+    'avoid_print_in_release',
+    'avoid_returning_this_with_fix',
+    'check_mounted_after_async',
+    'prefer_declaring_const_constructor',
+    'prefer_final_locals_with_fix',
+    'prefer_initializing_formals_extended',
+    'prefer_readable_line_length',
+    'prefer_single_quotes_strict',
+    'prefer_sized_box_for_whitespace',
+    'prefer_trailing_comma',
+    'prefer_trailing_comma_always',
+    'require_mounted_check_after_await',
+  },
+
   // solid_lints — 16 HAVE rules covering 48% of 33 total.
   'migrate_solid_lints': {
     'avoid_global_state',
@@ -1194,25 +1215,6 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_early_return',
     'prefer_match_file_name',
     'proper_super_calls',
-  },
-
-  // very_good_analysis — 15 ENHANCED codes.
-  'migrate_very_good_analysis': {
-    'avoid_null_checks_in_equality_operators_extended',
-    'avoid_positional_boolean_parameters_with_fix',
-    'avoid_print_in_production',
-    'avoid_print_in_release',
-    'avoid_returning_this_with_fix',
-    'check_mounted_after_async',
-    'prefer_declaring_const_constructor',
-    'prefer_final_locals_with_fix',
-    'prefer_initializing_formals_extended',
-    'prefer_readable_line_length',
-    'prefer_single_quotes_strict',
-    'prefer_sized_box_for_whitespace',
-    'prefer_trailing_comma',
-    'prefer_trailing_comma_always',
-    'require_mounted_check_after_await',
   },
 
   // essential_lints — 9 HAVE rules covering 29% of 31 total (10 unique saropa codes after fan-out).

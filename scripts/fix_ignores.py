@@ -3,7 +3,7 @@
 Migrate ignore comments and analysis_options.yaml from old saropa_lints
 rule names to their renamed equivalents.
 
-35 rules were renamed with semantic suffixes to avoid collision with
+38 rules were renamed with semantic suffixes to avoid collision with
 core Dart/Flutter analyzer lint names. This script rewrites:
   - `// ignore: old_name` → `// ignore: new_name`
   - `// ignore_for_file: old_name` → `// ignore_for_file: new_name`
@@ -29,6 +29,9 @@ from pathlib import Path
 # Users with ignore comments for dropped rules should remove them.
 RENAME_MAP: dict[str, str] = {
     "avoid_classes_with_only_static_members": "avoid_classes_with_only_static_members_with_fix",
+    "avoid_dynamic_calls": "avoid_dynamic_calls_extended",
+    "avoid_equals_and_hash_code_on_mutable_classes": "avoid_equals_and_hash_code_on_mutable_classes_extended",
+    "avoid_implementing_value_types": "avoid_implementing_value_types_extended",
     "avoid_double_and_int_checks": "avoid_double_and_int_checks_extended",
     "avoid_escaping_inner_quotes": "avoid_escaping_inner_quotes_with_fix",
     "avoid_field_initializers_in_const_classes": "avoid_field_initializers_in_const_classes_relaxed",
