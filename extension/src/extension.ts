@@ -1387,6 +1387,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       rssNote: lspClient?.isRunning ? undefined : l10n('debug.engine.rssNote.notRunning'),
     }),
   });
+  // The sidebar Status section's Engines row (sectionedSidebar.ts) reads
+  // HealthPanel.getEngineStatuses(), but the section providers were created
+  // earlier in activate() (several `await`s before this point) and may have
+  // already rendered with engineDeps still unset — that first render would
+  // silently omit the row. Refresh once now that deps exist so the row
+  // appears without waiting for an unrelated refresh trigger.
+  refreshAllSections();
 
   // Wire Kill All / Restart All to the LSP server lifecycle. Analyzer
   // Plugin and Scan Daemon aren't independently killable yet, so these

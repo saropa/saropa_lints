@@ -146,12 +146,17 @@ Files: `views/sectionedSidebar.ts`, `views/configTree.ts`, `package.json` (views
       hard rule against running the MT pipeline without an explicit in-the-moment request.
 
 **Deferred — not done, do NOT treat as complete:**
-- [ ] Still 5 views, not the target 4. `banner`, `editorDashboards` (Dashboards), `settings`
-      (now carries actions+settings+triage+diagnostics), `status`, `debugPanel` (webview, Phase 2).
-- [ ] Status section is still the full 8-row list (Health, violation count, hotspots, suppressions,
-      trends, regression, last run…), not the 3-row Health/Engines/Integration redesign in §2.1.
-      Adding the Engines row needs the engine-status callback wired in from `extension.ts:1330-1425`
-      — not done; Debug panel content still lives only in the separate webview view.
+- [x] View count is now 4, not 5 — resolved as a side effect of Phase 2 (debugPanel view
+      contribution removed when its content merged into the Health Panel editor tab).
+- [ ] Status section still has the original rows (violation count, hotspots, suppressions,
+      trends, regression, last run…) — NOT collapsed to the 3-row Health/Engines/Integration
+      redesign in §2.1. Collapsing requires *moving* those rows' info elsewhere per §2.1, not
+      deleting it — out of scope for a quick-win pass.
+  - [x] Engines row added (2026-09-04): "Engines: N running" now renders in Status, right after
+        Health, sourced from `HealthPanel.getEngineStatuses()` (which already existed for exactly
+        this purpose) — additive, existing rows untouched. Opens the Health Panel on click.
+  - [ ] Lint integration row (§2.1's third top row, "click to enable") is not part of Status —
+        it already exists as its own thing in the Banner view (`buildBannerItems`), not merged in.
 - [ ] Dashboards section still lists all 11 rows from `buildEditorDashboardItems`, not reduced to
       the 6-row target — Upgrade Opportunities / Full Opportunities Report / Analysis Optimizer /
       Command Catalog still render as top-level rows because Phases 4-6 (which give them a tab
@@ -716,3 +721,86 @@ render verification, not just static tsc+Playwright).
 
 Commits: `975ce316` (live-diagnostics fix), `93a51771` (style migration), `20573ce2` (gauge-label
 regression fix).
+
+## Finish Report (2026-09-04) — Phase 1 Engines row
+
+Phase 1's deferred item "adding the Engines row needs the engine-status callback wired in" was
+closed as a scoped, additive quick win, deliberately not attempting the full Status-section
+3-row collapse the item was originally filed under.
+
+**Change:** `appendEnginesRow()` added to `sectionedSidebar.ts`'s `buildStatusItems()`, calling
+`HealthPanel.getEngineStatuses()` — a static accessor that already existed specifically to let a
+sidebar row show engine state without opening the Health Panel webview (per its own doc comment),
+but had no caller. Renders "Engines: N running" plus a per-engine name/status summary
+(`debug.engine.*` / `debug.engine.statusValue.*` l10n keys, already translated elsewhere), placed
+immediately after the Health row, opening the Health Panel (`saropaLints.showProcessHealth`) on
+click. Silently omitted when `saropaLints.debug.enabled` is off or engines were never configured,
+matching the Health Panel's own gating — same source of truth, so the two surfaces cannot
+disagree.
+
+**Deliberately not done:** the Status section still carries its full original row set (violation
+count, hotspots, suppressions, trends, regression, last run) — §2.1's 3-row target requires
+*moving* that information elsewhere, not deleting it, which is real design/implementation work
+outside a quick-win's scope. The Lint integration row (§2.1's third top row) also was not merged
+in — it remains in the Banner view (`buildBannerItems`), unchanged.
+
+**Discovered, not fixed:** `CHANGELOG.md`'s `## [16.0.0-beta.1] — Unreleased` → `### Fixed` already
+claims (pre-existing text, not authored in this pass) *"Also adds an 'Engines (LSP / Analyzer)'
+row so the ... toggles are reachable from the sidebar"* — no such row exists anywhere in
+`sectionedSidebar.ts` except the one added here, and this one is a read-only summary in Status,
+not interactive toggles in Settings. The claimed row is either lost to this session's earlier
+concurrent-write incident (a separate, already-resolved mass-deletion in `plans/history/`) or was
+never actually implemented. Left as-is — reconciling it means guessing at another session's intent
+under time pressure, which is worse than flagging it plainly.
+
+**Testing:** `tsc --noEmit` clean (both the main and test tsconfig). A new test file,
+`extension/src/test/views/sidebarStatusEngines.test.ts`, covers the row-present and
+row-absent-when-unconfigured cases against the real `buildStatusItems()` path (stubbing
+`liveViolationsData.readVisibleLiveViolations`/`computeLiveHealthScore` and
+`HealthPanel.getEngineStatuses()`). The file type-checks clean but its assertions were **not
+executed** — the mocha test-compile step (`tsc -p tsconfig.test.json` emitting JS, then running
+mocha) was denied by this machine's Bash permission gate on two separate attempts this session;
+verification is by type-check and inspection only. The existing `overviewTreeFlat.test.ts` sidebar
+contract suite cannot regress from this change — it stubs `violationsReader.readViolations`, which
+`buildStatusItems()` does not call (it calls `liveViolationsData.readVisibleLiveViolations`
+instead), and never configures `HealthPanel.engineDeps`, so `getEngineStatuses()` returns
+`undefined` there and the new row never renders in that suite.
+
+Commit: `fa468536` (contains 9 unrelated file renames from a concurrent session's own commit —
+staged only 2 files explicitly, but a race between `git add` and `git commit` on a repo being
+written by multiple sessions simultaneously pulled in their already-staged changes too; left as-is
+per this repo's own "mixed commits fine" convention rather than rewriting history).
+
+**Hardening + unrequested-feature follow-up, same day:**
+
+- **Confirmed `'server-process'` is a valid codicon** — already used identically in
+  `driftAdvisorTree.ts` and `commandCatalogEntriesVibrancy.ts`. Was an unverified assumption in
+  the first pass; no longer is.
+- **Fixed a real activation-ordering gap.** `createSidebarSectionProviders()` runs at
+  `extension.ts:596`; `HealthPanel.configureEngines()` doesn't run until `extension.ts:1353`, with
+  4 `await`s between them — so the sidebar's first tree render could plausibly happen with
+  `HealthPanel.engineDeps` still unset, silently omitting the Engines row until some unrelated
+  refresh happened to fire later (or never, in a short session). Added one `refreshAllSections()`
+  call immediately after `configureEngines()` so the row appears as soon as its data source
+  exists, not on the next unrelated trigger.
+- **Hardened the status-value l10n lookup against future drift.** `EngineStatus.status` (set in
+  `extension.ts`) and `debug.engine.statusValue.*` (in `en.json`) are two unconnected places that
+  must agree — nothing enforced that. `appendEnginesRow()` now passes `{ fallback: e.status }` to
+  `l10n()`, so an unmapped future status value renders as its own raw word instead of an untranslated
+  dotted key. Covered by a new test case with a made-up status string.
+- **Unrequested feature implemented (minimal slice):** the Engines row's icon turns
+  `list.warningForeground` (amber) when `running === 0` — i.e., the debug panel is on but no
+  diagnostics engine is active at all. Individual per-engine health coloring was considered and
+  rejected: `EngineStatus.enabled` and `.status` are derived together in `extension.ts` for all
+  three engines (e.g. the analyzer's `status` is always `'active'` exactly when `enabled` is
+  `true`), so there is no "enabled but actually broken" signal in the data today to color for —
+  implementing that would mean inventing a signal that cannot currently be true, which is worse
+  than not coloring it.
+- **Tests extended:** `sidebarStatusEngines.test.ts` now has 5 cases — row present with per-engine
+  summary and no warning color, row absent when unconfigured, warning color at zero running, and
+  the new fallback-on-unmapped-status case. Still type-check-only verification (`tsc --noEmit` on
+  both tsconfigs, clean) — the mocha compile+run step was denied by this machine's Bash permission
+  gate on three separate attempts across both passes this session; the assertions themselves have
+  still never been executed.
+
+Commit: (pending — see the Finalization step of this session's `/finish` run for the actual hash).

@@ -460,13 +460,31 @@ function appendEnginesRow(items: LeafItem[]): void {
     if (!engines) return;
     const running = engines.filter(e => e.enabled).length;
     const summary = engines
-        .map(e => `${l10n(`debug.engine.${ENGINE_NAME_KEY[e.key]}`)} ${l10n(`debug.engine.statusValue.${e.status}`)}`)
+        .map(e => {
+            const name = l10n(`debug.engine.${ENGINE_NAME_KEY[e.key]}`);
+            // e.status is a machine key defined independently in extension.ts
+            // (nothing enforces it stays in sync with debug.engine.statusValue.*
+            // in en.json) — fall back to the raw value instead of an ugly
+            // untranslated dotted key if a new status is ever added to one
+            // without the other.
+            const status = l10n(`debug.engine.statusValue.${e.status}`, undefined, { fallback: e.status });
+            return `${name} ${status}`;
+        })
         .join(' · ');
+    // Zero engines running while this row exists (debug panel on) means no
+    // diagnostics source is active at all — worth a warning color so it's
+    // visible without opening the Health Panel. Individual engine health
+    // beyond that isn't distinguishable from EngineStatus today: `enabled`
+    // and `status` are derived together in extension.ts (e.g. analyzer's
+    // status is always 'active' exactly when enabled is true), so there is
+    // no "enabled but actually crashed" signal to color for yet.
+    const color = running === 0 ? new vscode.ThemeColor('list.warningForeground') : undefined;
     items.push(new LeafItem(
         l10n('debug.sidebar.enginesLabel', { count: String(running) }),
         summary,
         'saropaLints.showProcessHealth',
         'server-process',
+        color,
     ));
 }
 
