@@ -1195,6 +1195,130 @@
         {
           "command": "saropaLints.toggleSidebarSection",
           "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.goToPackage",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.goToLine",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.openOnPubDev",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.showChangelog",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateToLatest",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.copyAsJson",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.upgradeAndTest",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.suppressPackage",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.unsuppressPackage",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.openUrl",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.openSourceFolder",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.commentOutUnused",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.deleteUnused",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.goToOverride",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.suppressPackageByName",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.suppressByCategory",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.focusDetails",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.logDetails",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.copyHoverToClipboard",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.filterBySeverity",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.filterByProblemType",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.filterByCategory",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.filterBySection",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.sortDependencies",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.toggleCodeLens",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateAllMajor",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateAllMinor",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.updateAllPatch",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.logAllDetails",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.addRegistryAuth",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.packageVibrancy.removeRegistryAuth",
+          "when": "false"
         }
       ]
     },
