@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 ///
 /// Regression: double-report on `.size` and `.size.width`; false positives on
 /// `* 0.85`, breakpoint comparisons, and `MediaQuery.sizeOf` parity — see
-/// `plan/history/2026.04/2026.04.26/prefer_layout_builder_for_constraints_false_positive_intentional_screen_percentage.md`.
+/// `plans/history/2026.04/2026.04.26/prefer_layout_builder_for_constraints_false_positive_intentional_screen_percentage.md`.
 void main() {
   const ruleName = 'prefer_layout_builder_for_constraints';
 
@@ -54,7 +54,7 @@ void main() {
       'static-utility classes appear AFTER OkScreenFraction with no markers',
       () {
         // Guards Hypothesis B from
-        // plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md:
+        // plans/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md:
         // `static` methods that take BuildContext are utilities, not
         // build-scope, and must not fire the rule. The fixture lives in
         // the GOOD/OK section so the existing "no expect_lint after

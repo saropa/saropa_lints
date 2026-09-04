@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 
 /// Regression tests for the `avoid_gradient_in_build` exemption gates.
 ///
-/// Bug (shaderCallback): `plan/history/2026.05/2026.05.03/avoid_gradient_in_build_false_positive_shadermask_shadercallback.md`
+/// Bug (shaderCallback): `plans/history/2026.05/2026.05.03/avoid_gradient_in_build_false_positive_shadermask_shadercallback.md`
 /// Bug (AnimatedBuilder): `plans/history/2026.08/2026.08.16/avoid_gradient_in_build_fp_animated_builder_closure.md`
 ///
 /// The rule reports non-const `LinearGradient` / `RadialGradient` /

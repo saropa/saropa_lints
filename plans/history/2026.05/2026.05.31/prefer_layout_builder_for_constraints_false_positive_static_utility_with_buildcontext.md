@@ -294,7 +294,7 @@ should include:
 
 **Changelog entry:** `CHANGELOG.md` [Unreleased] § Fixed.
 
-**Related closed report:** `plan/history/2026.04/2026.04.28/prefer_layout_builder_for_constraints_false_positive_non_build_method.md` (the `BuildContext`-parameter scope gate this report extends).
+**Related closed report:** `plans/history/2026.04/2026.04.28/prefer_layout_builder_for_constraints_false_positive_non_build_method.md` (the `BuildContext`-parameter scope gate this report extends).
 
 ---
 
@@ -304,14 +304,14 @@ should include:
 
 **Files changed:**
 
-- `lib/src/rules/widget/widget_layout_constraints_rules.dart` — added `if (cur.isStatic) return true;` short-circuit at the top of the `MethodDeclaration` arm of `_isInNonBuildScope` (line ~2711). Multi-line `// Why` comment cites this report and names the failure mode. After moving the bug file to `plan/history/...`, the comment's report-path reference was repointed in the same commit.
+- `lib/src/rules/widget/widget_layout_constraints_rules.dart` — added `if (cur.isStatic) return true;` short-circuit at the top of the `MethodDeclaration` arm of `_isInNonBuildScope` (line ~2711). Multi-line `// Why` comment cites this report and names the failure mode. After moving the bug file to `plans/history/...`, the comment's report-path reference was repointed in the same commit.
 - `example/lib/widget_layout/prefer_layout_builder_for_constraints_fixture.dart` — added three fixture classes:
   - `BadInstanceBuildContextHelper` (BAD, before `OkScreenFraction`) — pins the instance-method-with-BuildContext true-positive case from 2026-04-28.
   - `OkStaticMenuConstraintsUtils` (OK, after `OkScreenFraction`) — static `BoxConstraints` utility; expect no lint.
   - `OkStaticSizeUtils` (OK, after `OkScreenFraction`) — static `Size` utility; expect no lint.
 - `test/rules/widget/prefer_layout_builder_for_constraints_fixture_test.dart` — marker count 7 → 8; new `static-utility classes appear AFTER OkScreenFraction with no markers` test asserts both static fixture classes exist (the existing `no expect_lint after OkScreenFraction` test continues to enforce the no-marker requirement on them). Report-path reference repointed.
 - `CHANGELOG.md` — new `[Unreleased] § Fixed` bullet: "`prefer_layout_builder_for_constraints` no longer fires inside `static` utility methods that take a `BuildContext`."
-- `bugs/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` → `plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` — `git mv`; `Status:` flipped to `Fixed`; `Fixed: 2026-05-31` date added.
+- `bugs/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` → `plans/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` — `git mv`; `Status:` flipped to `Fixed`; `Fixed: 2026-05-31` date added.
 
 **Diff summary of core logic change:**
 
@@ -353,8 +353,8 @@ No other code paths modified. `MethodDeclaration.isStatic` is an analyzer AST ge
 - `test/rules/widget/widget_layout_rules_test.dart` carries a registration smoke test and a registry list assertion for `prefer_layout_builder_for_constraints`. No update needed — name, class, and tier are unchanged.
 - `test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart` matched only on a dartdoc comment mentioning `widget_layout_constraints_rules.dart`; no behavior assertion involved.
 
-**Bug archived:** `bugs/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` → `plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md`.
+**Bug archived:** `bugs/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md` → `plans/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md`.
 
-**Finish report appended:** `plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md`.
+**Finish report appended:** `plans/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md`.
 
 **Outstanding work:** None for this task. The downstream silencing comment in `saropa_contacts/lib/components/primitive/menu/menu_utils.dart` (referenced in the bug's "Downstream site this surfaced on") can be removed once the next `saropa_lints` release ships — out of scope for this repo.

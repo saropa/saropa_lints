@@ -14,7 +14,7 @@
 // non-color indicators when paired with conditional background colors.
 //
 // Wrapper companions (Common*/App*/Brand* + known suffix): see
-// plan/history/2026.04/2026.04.25/avoid_color_only_meaning_false_positive_project_wrapper_widgets.md
+// plans/history/2026.04/2026.04.25/avoid_color_only_meaning_false_positive_project_wrapper_widgets.md
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 

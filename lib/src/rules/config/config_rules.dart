@@ -734,7 +734,7 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
     // [registerNodeProcessors] time [SaropaContext.filePath] is often empty
     // (`currentUnit` not set yet), so a top-level `hasWebSupport` check would
     // always see "unknown → true" and never suppress mobile-only projects.
-    // See plan/history/2026.04/2026.04.26/avoid_platform_specific_imports_false_positive_mobile_only_no_web_dir.md.
+    // See plans/history/2026.04/2026.04.26/avoid_platform_specific_imports_false_positive_mobile_only_no_web_dir.md.
     context.addImportDirective((ImportDirective node) {
       // PERF: the literal URI check is the cheapest and most selective gate —
       // almost no import is `dart:io` — so it runs first. The web-support and

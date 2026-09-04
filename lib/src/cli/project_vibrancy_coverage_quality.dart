@@ -12,7 +12,7 @@ import 'package:path/path.dart' as p;
 ///
 /// Standard Dart `lcov.info` does not attribute hits per test; importer + triviality
 /// is an approximation aligned with
-/// `plan/history/2026.04/2026.04.28/project_vibrancy_report.md`.
+/// `plans/history/2026.04/2026.04.28/project_vibrancy_report.md`.
 class ProjectCoverageQualityIndex {
   ProjectCoverageQualityIndex({
     required this.testsImportingLib,

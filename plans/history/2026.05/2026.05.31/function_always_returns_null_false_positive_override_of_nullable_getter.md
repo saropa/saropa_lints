@@ -299,7 +299,7 @@ containing this fix is consumed by that repo.
 - `lib/src/rules/code_quality/code_quality_variables_rules.dart` — added `_hasOverrideAnnotation()` helper; wired both `addFunctionDeclaration` and `addMethodDeclaration` callbacks to early-exit when the declaration carries `@override`.
 - `example/lib/code_quality/function_always_returns_null_fixture.dart` — added `_NullableParent` abstract class and `_NullableChild` override implementations (expression-body getter, block-body getter, expression-body method) with no `expect_lint` markers, plus an unannotated negative guard that still carries `expect_lint`.
 - `CHANGELOG.md` — added `### Fixed` entry under `[Unreleased]`.
-- `bugs/function_always_returns_null_false_positive_override_of_nullable_getter.md` — flipped `Status` to `Fixed`, populated `Changes Made`, appended this finish report. The file is renamed in the same commit to `plan/history/2026.05/2026.05.31/`.
+- `bugs/function_always_returns_null_false_positive_override_of_nullable_getter.md` — flipped `Status` to `Fixed`, populated `Changes Made`, appended this finish report. The file is renamed in the same commit to `plans/history/2026.05/2026.05.31/`.
 
 **Files explicitly excluded from this commit** (other workstreams' unverified changes already in the working tree at the start of this task; out of scope for this commit):
 
@@ -349,6 +349,6 @@ contract that permits null. No need to resolve the parent.
 
 **Outstanding work:** none in this repo. Downstream `saropa_contacts/lib/components/primitive/menu/menu_utils.dart` carries two `// ignore: function_always_returns_null` comments pointing at this bug — they can be removed once a `saropa_lints` release containing this fix is consumed.
 
-**Bug archived:** `bugs/function_always_returns_null_false_positive_override_of_nullable_getter.md` → `plan/history/2026.05/2026.05.31/function_always_returns_null_false_positive_override_of_nullable_getter.md`.
+**Bug archived:** `bugs/function_always_returns_null_false_positive_override_of_nullable_getter.md` → `plans/history/2026.05/2026.05.31/function_always_returns_null_false_positive_override_of_nullable_getter.md`.
 
-**Finish report appended:** `plan/history/2026.05/2026.05.31/function_always_returns_null_false_positive_override_of_nullable_getter.md`.
+**Finish report appended:** `plans/history/2026.05/2026.05.31/function_always_returns_null_false_positive_override_of_nullable_getter.md`.

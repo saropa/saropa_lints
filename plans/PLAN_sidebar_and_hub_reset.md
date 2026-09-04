@@ -170,7 +170,7 @@ the `saropaLints.openDashboards` command + manifest entry + command-catalog entr
 `saropaLints.openDashboards` (status bar `extension.ts:1074-1215`; `enable` post-focus at
 `extension.ts:1563`; walkthrough steps if any — grep) to `saropaLints.openViolationsWideReport`
 (Findings). Keep `HealthPanel.getEngineStatuses()` — the Engines STATUS row uses it.
-Retire `plans/guides/SAROPA_DASHBOARDS_HUB.md` to `plan/history/` (it documents a two-pane
+Retire `plans/guides/SAROPA_DASHBOARDS_HUB.md` to `plans/history/` (it documents a two-pane
 composition that Phase 3 already replaced; it is stale twice over).
 
 **Alternative, if a one-page overview is wanted later:** rebuild as KPI-only — six

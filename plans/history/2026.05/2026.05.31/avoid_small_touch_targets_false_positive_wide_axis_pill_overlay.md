@@ -305,7 +305,7 @@ FP was reported) does full resolution, so the fix lands as designed.
 
 ### Scope
 
-(A) Dart lint rules — touched `lib/src/rules/ui/accessibility_rules.dart`, expanded `example/lib/accessibility/avoid_small_touch_targets_fixture.dart`, added a `### Fixed` entry to `CHANGELOG.md`, archived this bug file from `bugs/` to `plan/history/2026.05/2026.05.31/`.
+(A) Dart lint rules — touched `lib/src/rules/ui/accessibility_rules.dart`, expanded `example/lib/accessibility/avoid_small_touch_targets_fixture.dart`, added a `### Fixed` entry to `CHANGELOG.md`, archived this bug file from `bugs/` to `plans/history/2026.05/2026.05.31/`.
 
 ### Change Summary
 
@@ -364,11 +364,11 @@ Rule version stamp bumped: DartDoc `v5` → `v6`, problem-message `{v5}` → `{v
 - pubspec: no dependency or version change.
 - Roadmap: no completed lint entries to remove.
 - Guides: reviewed; no developer-facing change.
-- Bug archival: this file `git mv`'d from `bugs/` to `plan/history/2026.05/2026.05.31/` with `Status: Fixed`.
+- Bug archival: this file `git mv`'d from `bugs/` to `plans/history/2026.05/2026.05.31/` with `Status: Fixed`.
 
-`Bug archived: bugs/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md → plan/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md`
+`Bug archived: bugs/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md → plans/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md`
 
-`Finish report appended: plan/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md`
+`Finish report appended: plans/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md`
 
 ### Files Touched
 
@@ -377,7 +377,7 @@ Rule version stamp bumped: DartDoc `v5` → `v6`, problem-message `{v5}` → `{v
 | edited | `lib/src/rules/ui/accessibility_rules.dart` |
 | edited | `example/lib/accessibility/avoid_small_touch_targets_fixture.dart` |
 | edited | `CHANGELOG.md` |
-| renamed | `bugs/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md` → `plan/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md` |
+| renamed | `bugs/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md` → `plans/history/2026.05/2026.05.31/avoid_small_touch_targets_false_positive_wide_axis_pill_overlay.md` |
 | appended | this file (Finish Report section) |
 
 ### Outstanding Work

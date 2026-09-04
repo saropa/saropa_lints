@@ -1,4 +1,4 @@
-// Fixture: plan/history/20260323/plan_additional_rules_31_through_40.md
+// Fixture: plans/history/20260323/plan_additional_rules_31_through_40.md
 // ignore_for_file: unused_element, dead_code, body_might_complete_normally
 
 import 'dart:ffi';

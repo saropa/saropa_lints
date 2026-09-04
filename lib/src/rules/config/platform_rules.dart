@@ -316,7 +316,7 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
     // [SaropaContext.filePath] is often empty, so a top-level check would
     // default [hasWebSupport] to true and never suppress mobile-only apps.
     // Same pattern as `avoid_platform_specific_imports`; see
-    // plan/history/2026.04/2026.04.26/prefer_foundation_platform_check_false_positive_mobile_only_no_web_dir.md.
+    // plans/history/2026.04/2026.04.26/prefer_foundation_platform_check_false_positive_mobile_only_no_web_dir.md.
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
       // PERF: cheap name checks before the web-support gate — hasWebSupport
       // resolves the project root, and running it on every identifier (12k+

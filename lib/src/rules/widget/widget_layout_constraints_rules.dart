@@ -3003,7 +3003,7 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
         // `MenuUtils.popupMenuConstraints(BuildContext)` compute absolute
         // viewport-fraction dimensions for non-widget return types, and
         // `LayoutBuilder` is structurally inapplicable. See
-        // plan/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md.
+        // plans/history/2026.05/2026.05.31/prefer_layout_builder_for_constraints_false_positive_static_utility_with_buildcontext.md.
         if (cur.isStatic) return true;
         final String methodName = cur.name.lexeme;
         if (methodName == 'build') return false;
