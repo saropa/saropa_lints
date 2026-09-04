@@ -69,8 +69,11 @@ export function vdsHeroExtras(): string {
        (reads as a lone round-cap dot). Cancel the inherited animation and keep only the
        pending-state opacity fade, which is the ONLY transition this gauge should ever play. */
     .gauge-fill { animation: none !important; transition: opacity 160ms ease-out; }
-    .gauge-label .lg { font-size: 1.55em; font-weight: 700; line-height: 1; }
-    .gauge-label .sm { font-size: .7em; opacity: .7; }
+    /* .gauge-label .lg/.sm are NOT redeclared here — the chrome's versions
+       (dashboardChromeStylesComponents.ts) are byte-identical plus
+       font-variant-numeric/margin-top refinements the chrome added later. A leftover
+       duplicate here with the same specificity would win the cascade purely on source
+       order and silently regress those two properties on this dashboard alone. */
 
     /* Pending state (analysis streaming results in) — not in the chrome at all: dim the ring,
        hide the grade, and show a compact "computing" glyph so a not-yet-settled score never
