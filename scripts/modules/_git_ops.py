@@ -23,6 +23,7 @@ from scripts.modules._utils import (
     Color,
     VERSION_RE as _VERSION_RE,
     get_shell_mode,
+    is_prerelease_version,
     print_colored,
     print_error,
     print_header,
@@ -802,12 +803,17 @@ def create_github_release(
         ) as f:
             f.write(release_notes)
             notes_path = Path(f.name)
+        release_cmd = [
+            "gh", "release", "create", tag_name,
+            "--title", f"Release {tag_name}",
+            "--notes-file", str(notes_path),
+        ]
+        if is_prerelease_version(version):
+            # A prerelease-suffixed version (e.g. "1.2.3-beta.1") marks the
+            # GitHub release as a prerelease so it's excluded from "latest".
+            release_cmd.append("--prerelease")
         result = subprocess.run(
-            [
-                "gh", "release", "create", tag_name,
-                "--title", f"Release {tag_name}",
-                "--notes-file", str(notes_path),
-            ],
+            release_cmd,
             cwd=project_dir,
             capture_output=True,
             text=True,

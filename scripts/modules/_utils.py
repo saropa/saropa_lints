@@ -35,6 +35,82 @@ from typing import NoReturn
 VERSION_RE = r"\d+\.\d+\.\d+(?:-[\w]+(?:\.[\w]+)*)?"
 
 
+def is_prerelease_version(version: str) -> bool:
+    """Return True when *version* has a semver prerelease suffix (e.g. "1.2.3-beta.1").
+
+    Single source of truth for "is this publish a prerelease" — vsce,
+    ovsx, and `gh release create` all need an explicit --pre-release (or
+    --prerelease) flag to route to their prerelease channel instead of
+    the default (stable) one.
+    """
+    return "-" in version
+
+
+def strip_prerelease_suffix(version: str) -> str:
+    """Return the plain MAJOR.MINOR.PATCH core of *version*.
+
+    The VS Code Marketplace requires extension/package.json's "version"
+    field to be a plain three-part semver — vsce hard-rejects a hyphenated
+    version like "1.2.3-beta.1" outright, even with --pre-release (that
+    flag marks the channel; the version field itself must stay plain).
+    pub.dev has no such restriction, so the .vsix filename and the
+    publish-flag decision keep using the full pub.dev version, while only
+    the value written into package.json is stripped down to its numeric
+    core before reaching vsce.
+    """
+    return version.split("-", 1)[0]
+
+
+# Base offset band added to PATCH for every prerelease extension version.
+# Large enough that it will never collide with a genuine stable PATCH
+# release (this project's patch history tops out in the low teens), small
+# enough to stay legible. See extension_version_for() for why this exists.
+_PRERELEASE_PATCH_OFFSET = 500
+
+# Second band, added on top of _PRERELEASE_PATCH_OFFSET, derived from the
+# prerelease CHANNEL name (the "beta" in "beta.1") so different channels of
+# the same base version ("16.0.0-beta.1" vs "16.0.0-rc.1") don't collide —
+# the version prompt accepts any channel tag, not just "beta". Bounded to
+# keep the final number readable; collisions between two DIFFERENT channel
+# names are reduced, not mathematically ruled out (this is a hash band, not
+# a registry of issued versions).
+_PRERELEASE_CHANNEL_BAND = 1000
+
+_PRERELEASE_ITERATION_RE = _re.compile(r"(\d+)\s*$")
+
+
+def extension_version_for(version: str) -> str:
+    """Return the extension/package.json version to publish for *version*.
+
+    A stable *version* passes through strip_prerelease_suffix() unchanged.
+    A prerelease *version* (e.g. "16.0.0-beta.1") gets PATCH offset by
+    _PRERELEASE_PATCH_OFFSET, plus a channel-derived band from the text
+    before the trailing number ("beta" in "beta.1"), plus the trailing
+    iteration number itself — producing e.g. "16.0.1858" for "beta.1" and
+    a different value for "rc.1" of the same base version.
+
+    Without this, every prerelease iteration of the same pub.dev base
+    version strips down to the identical extension version ("16.0.0"), and
+    the second publish collides with the first at the Marketplace/Open VSX
+    level — pub.dev's hyphenated prerelease identifier has no equivalent in
+    the extension version field, so a distinct signal has to be
+    manufactured from the numbers that ARE available.
+    """
+    base = strip_prerelease_suffix(version)
+    if not is_prerelease_version(version):
+        return base
+    suffix = version.split("-", 1)[1]
+    match = _PRERELEASE_ITERATION_RE.search(suffix)
+    iteration = int(match.group(1)) if match else 1
+    channel = suffix[: match.start()].rstrip(".") if match else suffix
+    channel_band = sum(ord(c) for c in channel) % _PRERELEASE_CHANNEL_BAND
+    major, minor, patch = base.split(".")
+    new_patch = (
+        int(patch) + _PRERELEASE_PATCH_OFFSET + channel_band + iteration
+    )
+    return f"{major}.{minor}.{new_patch}"
+
+
 # =============================================================================
 # OUTPUT LEVEL
 # =============================================================================

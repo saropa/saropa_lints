@@ -126,7 +126,7 @@ class TestMarketplacePublishFallback(unittest.TestCase):
                 with mock.patch.object(
                     self._mod, "_prompt_for_vsce_pat", return_value=""
                 ) as prompt:
-                    ok = self._mod.publish_extension_to_marketplace(self.root, self.vsix)
+                    ok = self._mod.publish_extension_to_marketplace(self.root, self.vsix, "1.0.0")
 
         self.assertTrue(ok)
         self.assertFalse(prompt.called, "stored login must skip the PAT prompt")
@@ -151,7 +151,7 @@ class TestMarketplacePublishFallback(unittest.TestCase):
                 with mock.patch.object(
                     self._mod, "_prompt_for_vsce_pat", return_value=""
                 ):
-                    ok = self._mod.publish_extension_to_marketplace(self.root, self.vsix)
+                    ok = self._mod.publish_extension_to_marketplace(self.root, self.vsix, "1.0.0")
 
         self.assertTrue(ok)
         self.assertFalse(

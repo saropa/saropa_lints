@@ -44,6 +44,8 @@ class StorePublicationResult(NamedTuple):
     open_vsx_ok: bool
 
 from scripts.modules._utils import (
+    extension_version_for,
+    is_prerelease_version,
     print_colored,
     print_error,
     print_header,
@@ -266,9 +268,15 @@ def run_extension_package(project_dir: Path, version: str) -> Path | None:
     for old_vsix in project_dir.glob("*.vsix"):
         old_vsix.unlink()
 
+    package_cmd = ["npx", "@vscode/vsce", "package", "--no-dependencies",
+                   "--out", str(out_path)]
+    if is_prerelease_version(version):
+        # vsce rejects a prerelease-suffixed version unless --pre-release
+        # is passed — without it, packaging a "1.2.3-beta.1" version fails.
+        package_cmd.append("--pre-release")
+
     r = run_command(
-        ["npx", "@vscode/vsce", "package", "--no-dependencies",
-         "--out", str(out_path)],
+        package_cmd,
         ext_dir,
         "Package .vsix",
         capture_output=True,
@@ -401,7 +409,7 @@ def _has_stored_vsce_credential(publisher: str) -> bool:
 
 
 def publish_extension_to_marketplace(
-    project_dir: Path, vsix_path: Path
+    project_dir: Path, vsix_path: Path, version: str
 ) -> bool:
     """Publish .vsix to VS Code Marketplace via vsce. Returns True on success or skip."""
     # vsce authenticates from the VSCE_PAT env var OR a stored `vsce login`
@@ -421,14 +429,17 @@ def publish_extension_to_marketplace(
                 print_info("Skipping VS Code Marketplace publish.")
                 return True
     ext_dir = _extension_dir(project_dir)
+    publish_cmd = [
+        "npx",
+        "@vscode/vsce",
+        "publish",
+        "--packagePath",
+        str(vsix_path),
+    ]
+    if is_prerelease_version(version):
+        publish_cmd.append("--pre-release")
     r = run_command(
-        [
-            "npx",
-            "@vscode/vsce",
-            "publish",
-            "--packagePath",
-            str(vsix_path),
-        ],
+        publish_cmd,
         ext_dir,
         "Publish to VS Code Marketplace",
         capture_output=True,
@@ -493,7 +504,7 @@ def _prompt_for_ovsx_pat() -> str:
     return token
 
 
-def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path) -> bool:
+def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path, version: str) -> bool:
     """Publish .vsix to Open VSX. Prompts for PAT if not set. Returns True on success or skip."""
     ovsx_pat = os.environ.get("OVSX_PAT", "").strip()
     if not ovsx_pat:
@@ -502,8 +513,11 @@ def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path) -> bool:
             print_info("Skipping Open VSX publish.")
             return True
     ext_dir = _extension_dir(project_dir)
+    ovsx_cmd = ["npx", "ovsx", "publish", str(vsix_path), "-p", ovsx_pat]
+    if is_prerelease_version(version):
+        ovsx_cmd.append("--pre-release")
     r = run_command(
-        ["npx", "ovsx", "publish", str(vsix_path), "-p", ovsx_pat],
+        ovsx_cmd,
         ext_dir,
         "Publish to Open VSX",
         capture_output=True,
@@ -519,8 +533,17 @@ def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path) -> bool:
 
 
 def package_extension(project_dir: Path, version: str) -> Path | None:
-    """Sync version, copy root changelog + readme, compile, and package .vsix. Returns path to .vsix or None."""
-    if not set_extension_version(project_dir, version):
+    """Sync version, copy root changelog + readme, compile, and package .vsix. Returns path to .vsix or None.
+
+    *version* is the pub.dev-style version and may carry a prerelease
+    suffix (e.g. "1.2.3-beta.1"). The .vsix filename keeps that full
+    version for identification, but package.json's "version" field gets
+    extension_version_for(version) — vsce hard-rejects a hyphenated
+    version string there even when --pre-release is passed, and successive
+    beta iterations need distinct PATCH values or they collide at the
+    Marketplace (see extension_version_for's docstring).
+    """
+    if not set_extension_version(project_dir, extension_version_for(version)):
         print_warning("Could not set extension version in package.json")
     if not copy_changelog_to_extension(project_dir):
         print_warning("Root CHANGELOG.md not found; extension .vsix will have no changelog.")
@@ -570,7 +593,7 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
     return vsix
 
 
-def publish_extension(project_dir: Path, vsix_path: Path) -> bool:
+def publish_extension(project_dir: Path, vsix_path: Path, version: str) -> bool:
     """Publish to the VS Code Marketplace, then to Open VSX.
 
     Open VSX is always attempted after the Marketplace step. A failed
@@ -578,18 +601,21 @@ def publish_extension(project_dir: Path, vsix_path: Path) -> bool:
     `npx ovsx publish`, so the registry at open-vsx.org can still receive
     the .vsix when OVSX_PAT is valid.
 
+    A *version* containing a prerelease suffix (e.g. "1.2.3-beta.1") is
+    routed to each store's prerelease channel via --pre-release.
+
     Returns True when Marketplace succeeded and Open VSX either published
     or was skipped (user declined a PAT). Returns False if either required
     publish step failed.
     """
-    marketplace_ok = publish_extension_to_marketplace(project_dir, vsix_path)
+    marketplace_ok = publish_extension_to_marketplace(project_dir, vsix_path, version)
     if marketplace_ok:
         print_info(f"  Manage: {MARKETPLACE_MANAGE_URL}")
     else:
         print_warning(
             "VS Code Marketplace publish failed — still attempting Open VSX."
         )
-    ovsx_ok = publish_extension_to_ovsx(project_dir, vsix_path)
+    ovsx_ok = publish_extension_to_ovsx(project_dir, vsix_path, version)
     return marketplace_ok and ovsx_ok
 
 

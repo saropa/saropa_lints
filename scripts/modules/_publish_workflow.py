@@ -25,6 +25,8 @@ from scripts.modules._utils import (
     Color,
     ExitCode,
     exit_with_error,
+    extension_version_for,
+    is_prerelease_version,
     print_colored,
     print_error,
     print_header,
@@ -250,10 +252,24 @@ def print_success_banner(
     print_colored("  Add to your pubspec.yaml:", Color.DIM)
     print()
     print_colored("      dev_dependencies:", Color.WHITE)
-    print_colored(
-        f"        {package_name}: ^{version}",
-        Color.WHITE,
-    )
+    if is_prerelease_version(version):
+        # A caret constraint on a prerelease (^1.2.3-beta.1) still resolves
+        # forward through later stable majors — pin the exact prerelease
+        # instead so consumers opt into upgrades deliberately.
+        print_colored(
+            f"        {package_name}: {version}",
+            Color.WHITE,
+        )
+        print_colored(
+            "      (exact pin — this is a prerelease; a caret constraint "
+            "would resolve past it)",
+            Color.DIM,
+        )
+    else:
+        print_colored(
+            f"        {package_name}: ^{version}",
+            Color.WHITE,
+        )
     print()
 
 
@@ -548,6 +564,11 @@ def _verify_marketplace_and_ovsx(
     returns 0 but the Marketplace silently drops the upload (expired PAT
     or missing scope), leaving the user thinking the publish worked when
     it never propagated.
+
+    *version* is the pub.dev-style version (may carry a prerelease suffix).
+    The stores themselves only ever report extension_version_for(version)
+    (package_extension() writes that value, not the raw pub.dev version,
+    into package.json), so the poll compares against that same derived form.
     """
     publisher, ext_name = get_extension_identity(project_dir)
     if not (publisher and ext_name):
@@ -561,7 +582,7 @@ def _verify_marketplace_and_ovsx(
     result = verify_extension_store_publication(
         publisher=publisher,
         extension_name=ext_name,
-        expected_version=version,
+        expected_version=extension_version_for(version),
         vsix_path=vsix_path,
         interval_seconds=30,
         timeout_seconds=600,
@@ -614,7 +635,7 @@ def run_extension_only_mode(
             ExitCode.VALIDATION_FAILED,
         )
     if _prompt_extension_install_and_publish(vsix):
-        if not publish_extension(project_dir, vsix):
+        if not publish_extension(project_dir, vsix, ext_version):
             exit_with_error(
                 "Extension publish failed",
                 ExitCode.PUBLISH_FAILED,
@@ -667,18 +688,19 @@ def run_publish_existing_vsix_mode(
             print_colored(f"      {idx}) {candidate.name}{marker}", Color.CYAN)
     vsix = vsix_files[0]
     print_success(f"Selected: {vsix.name}")
+    # Derive version from the vsix filename rather than package.json:
+    # in this mode the user is intentionally publishing an older .vsix
+    # (e.g. one matching the live pub.dev release) while package.json
+    # may already point at the next pre-bumped version. Filename is
+    # the source of truth for what was actually published — including
+    # whether it's a prerelease, which gates the --pre-release flag.
+    vsix_version = _version_from_vsix_filename(vsix)
     if _prompt_extension_install_and_publish(vsix):
-        if not publish_extension(project_dir, vsix):
+        if not publish_extension(project_dir, vsix, vsix_version or ""):
             exit_with_error(
                 "Extension publish failed",
                 ExitCode.PUBLISH_FAILED,
             )
-        # Derive version from the vsix filename rather than package.json:
-        # in this mode the user is intentionally publishing an older .vsix
-        # (e.g. one matching the live pub.dev release) while package.json
-        # may already point at the next pre-bumped version. Filename is
-        # the source of truth for what was actually published.
-        vsix_version = _version_from_vsix_filename(vsix)
         if vsix_version:
             _verify_marketplace_and_ovsx(project_dir, vsix_version, vsix)
         else:
@@ -1265,7 +1287,7 @@ def run_extension_after_publish(
             ),
         ):
             return expected, False
-        if publish_extension(project_dir, expected):
+        if publish_extension(project_dir, expected, version):
             return expected, True
         print_warning(
             "Extension publish to Marketplace/Open VSX failed. "
