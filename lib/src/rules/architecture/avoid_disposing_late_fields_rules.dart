@@ -140,14 +140,10 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
       final List<String> candidateFields = _lateUninitializedFields(node);
       if (candidateFields.isEmpty) return;
 
-      MethodDeclaration? initState;
-      MethodDeclaration? disposeMethod;
-      for (final ClassMember member in node.bodyMembers) {
-        if (member is MethodDeclaration) {
-          if (member.name.lexeme == 'initState') initState = member;
-          if (member.name.lexeme == 'dispose') disposeMethod = member;
-        }
-      }
+      final (
+        MethodDeclaration? initState,
+        MethodDeclaration? disposeMethod,
+      ) = _findLifecycleMethods(node);
       // No dispose() at all means there is nothing to flag here — a
       // sibling rule (require_*_dispose) already covers "missing dispose".
       if (disposeMethod == null) return;
@@ -191,6 +187,23 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
       }
     }
     return fields;
+  }
+
+  /// Locates the `initState()` and `dispose()` overrides on [node], if
+  /// present. Extracted alongside [_lateUninitializedFields] to keep
+  /// `runWithReporter` shallow (Finish Report 2026-09-04, Concern: nesting
+  /// depth).
+  static (MethodDeclaration?, MethodDeclaration?) _findLifecycleMethods(
+    ClassDeclaration node,
+  ) {
+    MethodDeclaration? initState;
+    MethodDeclaration? disposeMethod;
+    for (final ClassMember member in node.bodyMembers) {
+      if (member is! MethodDeclaration) continue;
+      if (member.name.lexeme == 'initState') initState = member;
+      if (member.name.lexeme == 'dispose') disposeMethod = member;
+    }
+    return (initState, disposeMethod);
   }
 
   /// True when [fieldName] is assigned unconditionally somewhere at the top
@@ -247,21 +260,62 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
     return expr.operator.lexeme == '=';
   }
 
-  /// True if [block] contains a top-level statement whose shape
-  /// `_branchAssigns` cannot reason about (anything but `Block`, an
-  /// assignment `ExpressionStatement`, or `IfStatement`) — e.g. a helper
-  /// method call, `try`/`catch`, a loop, or a `switch`.
+  /// True if [block] contains a top-level statement that MIGHT assign
+  /// [fieldName] through a path this heuristic can't see into: a bare
+  /// (implicit-`this`) helper-method call (`_setupController();`), a
+  /// `try`/`catch`, a loop, or a `switch`.
+  ///
+  /// This must NOT treat `super.initState();` — present at the top of
+  /// nearly every real `initState()` override — as unanalyzable: an
+  /// earlier version of this check flagged ANY unrecognized
+  /// `ExpressionStatement` (super calls included), which bailed to "safe,
+  /// don't flag" on almost every class in existence and silently defeated
+  /// the whole rule (caught via manual verification against the fixture
+  /// after the Finish Report 2026-09-04 Priority 1 fix landed — the
+  /// original _bad1/_bad2 cases stopped firing). The fix: only a
+  /// `MethodInvocation` with NO explicit target (`node.target == null`) —
+  /// an implicit-`this` call that could be a private helper method
+  /// defined on this same class — is ambiguous enough to bail on.
+  /// `super.foo()`, `widget.foo()`, `SomeClass.foo()`, and any other
+  /// invocation with an explicit target cannot assign a private field of
+  /// this class through ordinary method-call semantics, so those are safe
+  /// to skip over rather than bail on.
   static bool _hasUnanalyzableStatement(Block block) {
     for (final Statement statement in block.statements) {
+      // `if`/assignment shapes are handled by `_branchAssigns` elsewhere —
+      // neither can hide an assignment from this heuristic, so skip both.
       if (statement is IfStatement) continue;
-      if (statement is ExpressionStatement && statement.expression is AssignmentExpression) {
-        continue;
-      }
+      // A nested `{ ... }` block (e.g. from a labeled statement) is walked
+      // the same way as the outer one.
       if (statement is Block) {
         if (_hasUnanalyzableStatement(statement)) return true;
         continue;
       }
-      return true;
+      // `try`/loop/`switch` bodies are invisible to `_branchAssigns` — bail
+      // rather than risk mis-scoring a hidden assignment as "unsafe".
+      if (statement is TryStatement ||
+          statement is ForStatement ||
+          statement is WhileStatement ||
+          statement is DoStatement ||
+          statement is SwitchStatement) {
+        return true;
+      }
+      // Only an `ExpressionStatement` can possibly be a helper-delegation
+      // call; everything else (`return`, `assert`, a bare variable
+      // declaration) cannot assign the field, so it's safe to move on.
+      if (statement is! ExpressionStatement) continue;
+      final Expression expr = statement.expression;
+      // A plain assignment is handled by `_branchAssigns`; anything that
+      // isn't a `MethodInvocation` either (a bare identifier, an index
+      // expression) can't assign a field, so it's also safe to skip.
+      if (expr is! MethodInvocation) continue;
+      // A bare (implicit-`this`) call like `_setupController();` might be
+      // a private helper that assigns the field — this heuristic can't
+      // see inside it, so bail. A call with an explicit target
+      // (`super.foo()`, `widget.foo()`, `SomeClass.foo()`) cannot assign a
+      // private field of this class through ordinary method-call
+      // semantics, so it's safe to keep scanning past it.
+      if (expr.target == null) return true;
     }
     return false;
   }
