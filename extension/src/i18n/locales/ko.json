@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "아직 로그 항목이 없습니다.",
       "killAll": "모두 중단: 모든 조작 가능한 엔진 중단.",
-      "restartAll": "모든 재시작: 모든 조작 가능한 엔진을 재시작했습니다."
+      "restartAll": "모든 재시작: 모든 조작 가능한 엔진을 재시작했습니다.",
+      "lspToggleOn": "LSP 서버: 활성화 중…",
+      "lspToggleOff": "LSP 서버: 비활성화 중…",
+      "lspStarted": "LSP 서버: 시작됨.",
+      "lspStopped": "LSP 서버: 중지됨.",
+      "analyzerToggleOn": "분석기 플러그인: 활성화 중…",
+      "analyzerToggleOff": "분석기 플러그인: 비활성화 중…",
+      "daemonToggleOn": "스캔 Daemon: 재개…",
+      "daemonToggleOff": "스캔 Daemon: 중단 중…"
     }
   },
   "detailView": {

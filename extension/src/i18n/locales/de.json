@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Noch keine Log-Einträge.",
       "killAll": "Kill All: Alle steuerbaren Motoren beenden.",
-      "restartAll": "Restart alle: alle steuerbaren Motoren neu gestartet."
+      "restartAll": "Restart alle: alle steuerbaren Motoren neu gestartet.",
+      "lspToggleOn": "LSP Server: aktivieren…",
+      "lspToggleOff": "LSP Server: deaktivieren…",
+      "lspStarted": "LSP Server: gestartet.",
+      "lspStopped": "LSP Server: gestoppt.",
+      "analyzerToggleOn": "Analyzer Plugin: aktivieren…",
+      "analyzerToggleOff": "Analyzer Plugin: Deaktivierung…",
+      "daemonToggleOn": "Scan Daemon: Fortsetzen…",
+      "daemonToggleOff": "Scan Daemon: Suspendieren…"
     }
   },
   "detailView": {

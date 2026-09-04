@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Belum ada entri log.",
       "killAll": "Matikan Semua: semua mesin yang dapat dikendalikan telah dihentikan.",
-      "restartAll": "Restart Semua: mesin yang dapat dikendalikan telah di重启."
+      "restartAll": "Restart Semua: mesin yang dapat dikendalikan telah di重启.",
+      "lspToggleOn": "Server LSP: mengaktifkan…",
+      "lspToggleOff": "LSP Server: menonaktifkan…",
+      "lspStarted": "LSP Server: dimulai.",
+      "lspStopped": "LSP Server: berhenti.",
+      "analyzerToggleOn": "Plugin Analis: mengaktifkan…",
+      "analyzerToggleOff": "Plugin Analis: mematikan…",
+      "daemonToggleOn": "Scan Daemon: melanjutkan…",
+      "daemonToggleOff": "Scan Daemon: menghentikan…"
     }
   },
   "detailView": {

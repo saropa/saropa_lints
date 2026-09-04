@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Nenhuma entrada de log ainda.",
       "killAll": "Matar Todos: parou todos os motores controláveis.",
-      "restartAll": "Reiniciar Todos: todos os motores controláveis foram reiniciados."
+      "restartAll": "Reiniciar Todos: todos os motores controláveis foram reiniciados.",
+      "lspToggleOn": "Servidor LSP: ativando…",
+      "lspToggleOff": "Servidor LSP: desativando…",
+      "lspStarted": "Servidor LSP: iniciado.",
+      "lspStopped": "Servidor LSP: parado.",
+      "analyzerToggleOn": "Analizador de Plugin: ativando…",
+      "analyzerToggleOff": "Analizador de Plugin: desativando…",
+      "daemonToggleOn": "Varredura Daemon: retomando…",
+      "daemonToggleOff": "Varredura Daemon: suspensão..."
     }
   },
   "detailView": {

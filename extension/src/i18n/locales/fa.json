@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "هنوز ورودی لاگی وجود ندارد.",
       "killAll": "کیل All: تمام موتورهای قابل کنترل را متوقف کن.",
-      "restartAll": "تکرار تمام: تمام موتورهای قابل کنترل بازگردانی شدند."
+      "restartAll": "تکرار تمام: تمام موتورهای قابل کنترل بازگردانی شدند.",
+      "lspToggleOn": "سرور LSP: فعال سازی...",
+      "lspToggleOff": "سرویس LSP: غیر فعال کردن…",
+      "lspStarted": "سرویس LSP: شروع شد.",
+      "lspStopped": "سرور LSP: متوقف شد.",
+      "analyzerToggleOn": "پلاگین تحلیلگر: فعال سازی...",
+      "analyzerToggleOff": "پلاگین تحلیلگر: غیر فعال کردن…",
+      "daemonToggleOn": "اسкан Daemon: ادامه دادن…",
+      "daemonToggleOff": "اسкан Daemon: متوقف شدن…"
     }
   },
   "detailView": {

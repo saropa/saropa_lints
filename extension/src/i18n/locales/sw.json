@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Hakuna mstari ya log yet.",
       "killAll": "Kifua Kote: imekifua kote moto ya engine ya kuchapisha.",
-      "restartAll": "Restart All: controllable engines ya zilizopatikana."
+      "restartAll": "Restart All: controllable engines ya zilizopatikana.",
+      "lspToggleOn": "Server ya LSP: inakabiliana...",
+      "lspToggleOff": "Server ya LSP: imetumia...",
+      "lspStarted": "LSP Server: imeshinda.",
+      "lspStopped": "LSP Server: imetokea.",
+      "analyzerToggleOn": "Plugin ya Analizer: inakubali...",
+      "analyzerToggleOff": "Analizator Plugin: imetumia...",
+      "daemonToggleOn": "Tafuta Daemon: inakubali…",
+      "daemonToggleOff": "Tafuta Daemon: inapakia…"
     }
   },
   "detailView": {

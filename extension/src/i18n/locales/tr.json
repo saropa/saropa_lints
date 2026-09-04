@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Henüz log kaydı yok.",
       "killAll": "Kilitle: tüm kontrol edilebilir motorları durdurdu.",
-      "restartAll": "Tümü Yeniden Başlat: tüm kontrol edilebilir motorları yeniden başlatıldı."
+      "restartAll": "Tümü Yeniden Başlat: tüm kontrol edilebilir motorları yeniden başlatıldı.",
+      "lspToggleOn": "LSP Sunucu: etkinleştirme…",
+      "lspToggleOff": "LSP Sunucusu: devre dışı bırakılıyor...",
+      "lspStarted": "LSP Sunucusu: başlatıldı.",
+      "lspStopped": "LSP Sunucusu: durduruldu.",
+      "analyzerToggleOn": "Analiz Eklentisi: etkinleştiriliyor...",
+      "analyzerToggleOff": "Analiz Eklentisi: devre dışı bırakılıyor...",
+      "daemonToggleOn": "Tarama Daemon: devam ediyor...",
+      "daemonToggleOff": "Tarama Daemon: durduruluyor…"
     }
   },
   "detailView": {

@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Brak jeszcze wpisów dziennika.",
       "killAll": "Zabij Wszystko: zatrzymano wszystkie kontrolowane silniki.",
-      "restartAll": "Restart All: zrestartowano wszystkie kontrolowane silniki."
+      "restartAll": "Restart All: zrestartowano wszystkie kontrolowane silniki.",
+      "lspToggleOn": "Serwer LSP: włączanie…",
+      "lspToggleOff": "Serwer LSP: wyłączanie…",
+      "lspStarted": "Serwer LSP: uruchomiony.",
+      "lspStopped": "Serwer LSP: zatrzymany.",
+      "analyzerToggleOn": "Analizator wtyczki: włączanie…",
+      "analyzerToggleOff": "Analizator wtyczki: wyłączanie…",
+      "daemonToggleOn": "Skanowanie Daemon: wznowienie…",
+      "daemonToggleOff": "Skanuj Daemon: wstrzymanie…"
     }
   },
   "detailView": {

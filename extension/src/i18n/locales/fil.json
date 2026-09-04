@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Walang mga entry sa log pa.",
       "killAll": "Iwanan Lahat: nagsilbi na ang lahat ng mga engine na maaaring kontrolin.",
-      "restartAll": "Restart All: restarted lahat ng kontrolable nga engines."
+      "restartAll": "Restart All: restarted lahat ng kontrolable nga engines.",
+      "lspToggleOn": "LSP Server: nagtatanggal...",
+      "lspToggleOff": "LSP Server: nagtatanggal...",
+      "lspStarted": "LSP Server: nagsimula.",
+      "lspStopped": "LSP Server: nakatiklop.",
+      "analyzerToggleOn": "Analyzer Plugin: nagpapalagay...",
+      "analyzerToggleOff": "Analyzer Plugin: nagtatanggal...",
+      "daemonToggleOn": "I-scan Daemon: nagsisimula...",
+      "daemonToggleOff": "I-scan Daemon: suspending…"
     }
   },
   "detailView": {

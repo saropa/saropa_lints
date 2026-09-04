@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Nessuna voce dei log per ora.",
       "killAll": "Uccidi Tutti: arrestati tutti i motori controllabili.",
-      "restartAll": "Riavvia Tutti: tutti i motori controllabili riavviati."
+      "restartAll": "Riavvia Tutti: tutti i motori controllabili riavviati.",
+      "lspToggleOn": "Server LSP: abilitazione…",
+      "lspToggleOff": "Server LSP: disattivando…",
+      "lspStarted": "Server LSP: avviato.",
+      "lspStopped": "Server LSP: arrestato.",
+      "analyzerToggleOn": "Plugin Analizzatore: abilitazione…",
+      "analyzerToggleOff": "Plugin Analizzatore: disattivazione…",
+      "daemonToggleOn": "Scansiona Daemon: ripresa…",
+      "daemonToggleOff": "Scansiona Daemon: sospeso…"
     }
   },
   "detailView": {

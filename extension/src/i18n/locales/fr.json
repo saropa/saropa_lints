@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Aucune entrée de journal pour l'instant.",
       "killAll": "Tuer Tout : arrêté tous les moteurs contrôlables.",
-      "restartAll": "Redémarrer tout : tous les moteurs contrôlables redémarrés."
+      "restartAll": "Redémarrer tout : tous les moteurs contrôlables redémarrés.",
+      "lspToggleOn": "Serveur LSP : activation…",
+      "lspToggleOff": "Serveur LSP : désactivation…",
+      "lspStarted": "Serveur LSP : démarré.",
+      "lspStopped": "Serveur LSP : arrêté.",
+      "analyzerToggleOn": "Analyseur de plug-in : activation…",
+      "analyzerToggleOff": "Analyseur de plug-in : désactivation…",
+      "daemonToggleOn": "Analyse Daemon : reprise…",
+      "daemonToggleOff": "Analyse Daemon : en pause…"
     }
   },
   "detailView": {

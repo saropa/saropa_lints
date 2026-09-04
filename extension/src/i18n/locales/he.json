@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "אין רשומות לוג עדיין.",
       "killAll": "הכבה הכל: עצמה כל מנועים שוטפים.",
-      "restartAll": "إعادة تشغيل جميع: تم إعادة تشغيل جميع المحركات القابلة للتحكم."
+      "restartAll": "إعادة تشغيل جميع: تم إعادة تشغيل جميع المحركات القابلة للتحكم.",
+      "lspToggleOn": "שרת LSP: הפעלה...",
+      "lspToggleOff": "שרת LSP: אכיפה...",
+      "lspStarted": "שרת LSP: התחיל.",
+      "lspStopped": "שרת LSP: עצם.",
+      "analyzerToggleOn": "מפענח תוסף: הפעלה...",
+      "analyzerToggleOff": "מפענח תוסף: כיבוי...",
+      "daemonToggleOn": "סריקה Daemon: המשך...",
+      "daemonToggleOff": "סריקה Daemon: עצירה..."
     }
   },
   "detailView": {

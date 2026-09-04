@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "No hay entradas de registro aún.",
       "killAll": "Detener Todo: detenido todos los motores controlables.",
-      "restartAll": "Reiniciar todo: todos los motores controlables reiniciados."
+      "restartAll": "Reiniciar todo: todos los motores controlables reiniciados.",
+      "lspToggleOn": "Servidor LSP: activando…",
+      "lspToggleOff": "Servidor LSP: desactivando…",
+      "lspStarted": "Servidor LSP: iniciado.",
+      "lspStopped": "Servidor LSP: detenido.",
+      "analyzerToggleOn": "Analizador de plugin: activando…",
+      "analyzerToggleOff": "Analizador de plugin: desactivando…",
+      "daemonToggleOn": "Escaneo Daemon: reanudando…",
+      "daemonToggleOff": "Escaneo Daemon: suspendiendo…"
     }
   },
   "detailView": {

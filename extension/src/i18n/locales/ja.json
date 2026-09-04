@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "まだログエントリがありません。",
       "killAll": "すべて停止: すべての制御可能なエンジンを停止しました。",
-      "restartAll": "すべて再起動: すべての制御可能なエンジンを再起動しました。"
+      "restartAll": "すべて再起動: すべての制御可能なエンジンを再起動しました。",
+      "lspToggleOn": "LSPサーバー: 有効化中…",
+      "lspToggleOff": "LSPサーバー: 無効化中…",
+      "lspStarted": "LSPサーバー: 開始しました。",
+      "lspStopped": "LSPサーバー: 停止しました。",
+      "analyzerToggleOn": "分析プラグイン: 有効化中…",
+      "analyzerToggleOff": "アナライザープラグイン: 無効化中…",
+      "daemonToggleOn": "スキャン Daemon: 再開中…",
+      "daemonToggleOff": "スキャン Daemon: 一時停止中…"
     }
   },
   "detailView": {

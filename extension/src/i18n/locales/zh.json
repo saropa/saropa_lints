@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "尚未有日志条目。",
       "killAll": "全部停止：已停止所有可控制的引擎。",
-      "restartAll": "全部重启：已重启所有可控制的引擎。"
+      "restartAll": "全部重启：已重启所有可控制的引擎。",
+      "lspToggleOn": "LSP服务器：正在启用…",
+      "lspToggleOff": "LSP服务器：禁用…",
+      "lspStarted": "LSP 服务器: 已启动。",
+      "lspStopped": "LSP 服务器: 已停止。",
+      "analyzerToggleOn": "分析器插件：启用中…",
+      "analyzerToggleOff": "分析器插件：禁用…",
+      "daemonToggleOn": "扫描 Daemon：继续…",
+      "daemonToggleOff": "扫描 Daemon: 暂停中…"
     }
   },
   "detailView": {

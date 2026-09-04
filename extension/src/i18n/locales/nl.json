@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Geen logboekregistraties nog.",
       "killAll": "Stop Alles: alle bestuurbare motoren gestopt.",
-      "restartAll": "Herstart alles: alle bestuurbare motoren herstarten."
+      "restartAll": "Herstart alles: alle bestuurbare motoren herstarten.",
+      "lspToggleOn": "LSP Server: inschakelen…",
+      "lspToggleOff": "LSP Server: uitschakelen…",
+      "lspStarted": "LSP Server: gestart.",
+      "lspStopped": "LSP Server: gestopt.",
+      "analyzerToggleOn": "Analyseer Plug-in: inschakelen…",
+      "analyzerToggleOff": "Analyseer Plug-in: uitschakelen…",
+      "daemonToggleOn": "Scan Daemon: verdergaan…",
+      "daemonToggleOff": "Scan Daemon: suspenderen…"
     }
   },
   "detailView": {

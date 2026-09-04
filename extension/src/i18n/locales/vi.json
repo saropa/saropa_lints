@@ -1784,7 +1784,15 @@
     "log": {
       "empty": "Chưa có mục nhật ký nào.",
       "killAll": "Kill All: dừng tất cả các engine có thể điều khiển được.",
-      "restartAll": "Khởi động lại tất cả: đã khởi động lại tất cả các engine có thể điều khiển được."
+      "restartAll": "Khởi động lại tất cả: đã khởi động lại tất cả các engine có thể điều khiển được.",
+      "lspToggleOn": "LSP Server: đang kích hoạt…",
+      "lspToggleOff": "LSP Server: đang vô hiệu hóa…",
+      "lspStarted": "LSP Server: đã bắt đầu.",
+      "lspStopped": "LSP Server: đã dừng.",
+      "analyzerToggleOn": "Analyzer Plugin: đang kích hoạt…",
+      "analyzerToggleOff": "Analyzer Plugin: đang vô hiệu hóa…",
+      "daemonToggleOn": "Quét Daemon: tiếp tục…",
+      "daemonToggleOff": "Quét Daemon: đang tạm dừng…"
     }
   },
   "detailView": {
