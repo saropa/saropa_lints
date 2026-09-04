@@ -121,7 +121,44 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
           return true;
         }
       }
+      // Handle early-return guards: `if (kIsWeb) return;` before this node.
+      // The MethodChannel is a sibling statement after the guard, not nested
+      // inside the IfStatement, so the ancestor walk above never finds it.
+      if (current is Block) {
+        if (_hasPrecedingPlatformGuard(current, node)) {
+          return true;
+        }
+      }
       current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks whether [block] contains an early-return/throw guard that exits
+  /// before [node] when a platform check is true (e.g. `if (kIsWeb) return;`).
+  bool _hasPrecedingPlatformGuard(Block block, AstNode node) {
+    for (final Statement stmt in block.statements) {
+      // Only look at statements that precede the target node
+      if (stmt.offset >= node.offset) break;
+
+      if (stmt is IfStatement && _containsPlatformCheck(stmt.expression.toSource())) {
+        // Guard body must be a return/throw (early exit)
+        if (_isEarlyExit(stmt.thenStatement)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /// True when [stmt] is a return or throw — the body of an early-exit guard.
+  bool _isEarlyExit(Statement stmt) {
+    if (stmt is ReturnStatement || stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
+      return true;
+    }
+    // Block with a single return/throw: `if (kIsWeb) { return; }`
+    if (stmt is Block && stmt.statements.length == 1) {
+      return _isEarlyExit(stmt.statements.first);
     }
     return false;
   }

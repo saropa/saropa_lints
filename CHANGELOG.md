@@ -78,6 +78,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **LSP server: message queue resilience.** A malformed or unexpected JSON-RPC message could crash the async queue processor, silently dropping all subsequent messages. Each message is now handled in its own try-catch so one bad message doesn't stall the server.
 - **LSP server: Windows CRLF config parsing.** The tier config reader failed to match `tier:` when `analysis_options.yaml` had Windows `\r\n` line endings with lines between `saropa_lints:` and `tier:`. Line endings are now normalized before parsing.
 - **Debug panel: analyzer toggle restores extension setting.** Toggling the Analyzer Plugin OFF correctly set `saropaLints.enabled = false`, but toggling it back ON never restored the setting — the extension stayed disabled until manually re-enabled in VS Code settings. No action required.
+- **`avoid_platform_channel_on_web`: false positive with early-return guards.** The rule fired on `MethodChannel(...)` even when preceded by `if (kIsWeb) return;` or `if (kIsWeb) throw ...;`, because it only recognized platform checks that *wrapped* the node as an ancestor, not preceding sibling guard statements. No action required.
 
 ### Changed
 

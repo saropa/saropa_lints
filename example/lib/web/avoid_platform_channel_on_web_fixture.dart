@@ -126,3 +126,26 @@ void _good_0939() async {
 void _good_1939() {
   final MethodChannel? _channel = kIsWeb ? null : MethodChannel('my_channel');
 }
+
+// GOOD: Early-return guard — kIsWeb check exits before the channel is created
+void _good_2939() async {
+  if (kIsWeb) return;
+  final platform = MethodChannel('my_channel');
+  final result = await platform.invokeMethod('getData');
+}
+
+// GOOD: Early-return guard with block body
+void _good_3939() async {
+  if (kIsWeb) {
+    return;
+  }
+  final platform = MethodChannel('my_channel');
+  final result = await platform.invokeMethod('getData');
+}
+
+// GOOD: Early-throw guard — throws before the channel is created
+void _good_4939() async {
+  if (kIsWeb) throw UnsupportedError('Not supported on web');
+  final platform = MethodChannel('my_channel');
+  final result = await platform.invokeMethod('getData');
+}
