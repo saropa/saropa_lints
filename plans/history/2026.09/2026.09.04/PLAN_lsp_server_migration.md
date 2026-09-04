@@ -1,9 +1,15 @@
-# Plan: Standalone LSP Server Migration
+# Plan: Standalone LSP Server Migration (ARCHIVED — Phases 0-2 shipped)
 
-**Status:** Phase 0 implemented — pending manual VS Code test
+**Status:** ARCHIVED. This document went stale after 2026-09-03 — it still
+described Phase 0's fake-diagnostic crash blocker while Phases 0, 1, and most
+of Phase 2 shipped and went BETA-default-on. See `CHANGELOG.md` (LSP server
+entries, `## [16.0.0]` and earlier BETA releases) for the authoritative
+record of what shipped. Remaining work (Phase 3: remove the in-process
+plugin; Phase 4: optimize and harden) continues in
+`PLAN_lsp_server_hardening.md`.
 **Created:** 2026-09-02
-**Updated:** 2026-09-03
-**Audience:** maintainers planning the migration from `analysis_server_plugin` to a standalone LSP server
+**Archived:** 2026-09-04
+**Audience:** historical record of the Phase 0-2 design decisions and rationale
 
 ## Problem statement
 
