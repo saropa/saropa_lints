@@ -65,7 +65,7 @@ Coverage: 31 rules — 9 HAVE (29%), 5 PARTIAL, 17 TODO (54%)
 | `equal_statement` | PARTIAL | Likely overlaps `no_equal_switch_case`, not fully confirmed as identical trigger logic |
 | `explicit_casts` | PARTIAL | `avoid_unsafe_cast` — only flags casts that can fail at runtime, narrower than "all explicit casts" |
 | `first_getter` | HAVE | `prefer_list_first` |
-| `getters_in_member_list` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_getters_in_member_list.md) |
+| `getters_in_member_list` | HAVE | `getters_in_member_list` (Pedantic) |
 | `is_future` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_is_future.md) |
 | `last_getter` | HAVE | `prefer_list_last` |
 | `mutable_tearoff` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_mutable_tearoff.md) |

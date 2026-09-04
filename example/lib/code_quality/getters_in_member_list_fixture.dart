@@ -78,3 +78,22 @@ class NoEarlierPropertyMember {
 
   int get result => 42;
 }
+
+// Status: BAD — enhanced enums can declare fields/getters/methods just like
+// a class body, so the same grouping rule applies to the enum's `label`
+// getter, which trails a method after an earlier field.
+enum Status {
+  active(1),
+  inactive(0);
+
+  const Status(this.code);
+
+  final int code;
+
+  void log() {
+    // no-op
+  }
+
+  // expect_lint: getters_in_member_list
+  String get label => code == 1 ? 'active' : 'inactive';
+}

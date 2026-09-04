@@ -7,6 +7,16 @@ import '../../helpers/fixture_discovery.dart';
 /// Tests for the `avoid_dynamic_calls` lint rule.
 ///
 /// Test fixture: example/lib/type_safety/avoid_dynamic_calls_fixture.dart
+/// The fixture's `expect_lint` markers cover all seven detection paths this
+/// rule wires up in `runWithReporter` — MethodInvocation, PropertyAccess,
+/// PrefixedIdentifier, IndexExpression (including null-aware `?.`/`?[]`),
+/// BinaryExpression, CascadeExpression, compound AssignmentExpression,
+/// PrefixExpression/PostfixExpression, and FunctionExpressionInvocation —
+/// plus the narrowed `noSuchMethod` exemption (only calls that actually
+/// derive from the `Invocation` parameter are skipped). Verified against
+/// the fixture with `dart run saropa_lints scan` (see CLAUDE.md /
+/// `Skill(lint-rules)`); this file only pins rule metadata, per project
+/// convention — `dart test` does not execute rules against fixtures.
 void main() {
   group('AvoidDynamicCallsRule - Rule Instantiation', () {
     test('AvoidDynamicCallsRule', () {

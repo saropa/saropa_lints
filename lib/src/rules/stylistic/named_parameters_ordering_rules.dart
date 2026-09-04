@@ -74,9 +74,7 @@ class NamedParametersOrderingRule extends SaropaLintRule {
   /// Back-compat / discovery aliases matching the solid_lints rule this
   /// closes the competitive gap against.
   @override
-  List<String> get configAliases => const <String>[
-    'named_arguments_ordering',
-  ];
+  List<String> get configAliases => const <String>['named_arguments_ordering'];
 
   static const LintCode _code = LintCode(
     'named_parameters_ordering',
@@ -109,6 +107,28 @@ class NamedParametersOrderingRule extends SaropaLintRule {
 
     context.addMethodInvocation((MethodInvocation node) {
       _checkOrder(node.methodName.element, node.argumentList, reporter);
+    });
+
+    // A call through a function-typed variable/field/tear-off (e.g.
+    // `final f = exampleFunction; f(gamma: 'g', alpha: 'a');`) is a distinct
+    // AST node from MethodInvocation — without this hook such call sites
+    // were a silent false-negative even though the callee's declared named
+    // order is fully knowable via `node.element`.
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
+      _checkOrder(node.element, node.argumentList, reporter);
+    });
+
+    // `enum E { a(y: 2, x: 1) }` invokes a constructor with named arguments
+    // just like InstanceCreationExpression does, but is a separate AST node
+    // with its own (nullable) `arguments` wrapper — handled here rather than
+    // guessed at, since `arguments` is `null` for a constant with no explicit
+    // argument list (the implicit-default-constructor case).
+    context.addEnumConstantDeclaration((EnumConstantDeclaration node) {
+      final EnumConstantArguments? arguments = node.arguments;
+      if (arguments == null) return;
+      _checkOrder(node.constructorElement, arguments.argumentList, reporter);
     });
   }
 

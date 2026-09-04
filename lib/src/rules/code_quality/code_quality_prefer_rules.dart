@@ -1571,7 +1571,17 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
       }
     });
 
-    // Also check for FutureOr return types that could be simplified
+    // Also check for FutureOr return types that could be simplified.
+    //
+    // Cross-reference: `avoid_futureor_return_type_rules.dart` also flags
+    // a bare `FutureOr<T>` return type, unconditionally and on functions,
+    // methods, AND getters (this branch only reaches top-level
+    // FunctionDeclarations with a no-await BlockFunctionBody). The two
+    // rules are EXPECTED to double-fire on that overlapping subset — this
+    // rule's INFO-severity diagnostic plus the other rule's WARNING one on
+    // the same line is a known, accepted overlap, not a duplicate-report
+    // bug. Do not narrow this branch to "fix" the overlap without checking
+    // whether that also silences a case the other rule doesn't cover.
     context.addFunctionDeclaration((FunctionDeclaration node) {
       final TypeAnnotation? returnType = node.returnType;
       if (returnType is NamedType && returnType.name.lexeme == 'FutureOr') {

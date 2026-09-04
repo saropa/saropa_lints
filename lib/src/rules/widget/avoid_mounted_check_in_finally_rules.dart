@@ -116,9 +116,15 @@ class AvoidMountedCheckInFinallyRule extends SaropaLintRule {
 
       final TryStatement tryStatement = finallyBlock.parent! as TryStatement;
 
-      // Edge case 3: no `await` in the try block means there is no async
-      // gap for `mounted` to guard against in the first place.
-      if (!_containsAwait(tryStatement.body)) return;
+      // Edge case 3: no `await` in the try block (or a catch clause that ran
+      // instead of it) means there is no async gap for `mounted` to guard
+      // against in the first place. A `try { sync(); } catch (e) { await
+      // recover(); } finally { ... }` shape crosses the same async gap via
+      // the catch branch, so catch clauses must be scanned too — checking
+      // only `tryStatement.body` missed this exact bug class (the recovery
+      // path is the one place code intentionally awaits after a failure,
+      // then falls into `finally` with a stale `mounted` guard).
+      if (!_containsAwait(tryStatement)) return;
 
       // Must be inside a State (or State-like: ConsumerState, etc.) class —
       // `mounted` is only meaningful on Flutter's widget lifecycle types.
@@ -182,13 +188,22 @@ class AvoidMountedCheckInFinallyRule extends SaropaLintRule {
     return false;
   }
 
-  /// True when [tryBody] contains an `await` expression, not descending
-  /// into nested closures (an await inside a nested function literal opens
-  /// its own async gap, unrelated to this try/finally's lifecycle risk).
-  static bool _containsAwait(Block tryBody) {
+  /// True when [tryStatement]'s `try` body OR any of its `catch` clauses
+  /// contains an `await` expression, not descending into nested closures
+  /// (an await inside a nested function literal opens its own async gap,
+  /// unrelated to this try/finally's lifecycle risk). Catch clauses matter
+  /// because a recovery path (`catch (e) { await recover(); }`) crosses the
+  /// same kind of async gap as the try body does, and control still falls
+  /// into the same `finally` afterward.
+  static bool _containsAwait(TryStatement tryStatement) {
     final visitor = _AwaitVisitor();
-    tryBody.accept(visitor);
-    return visitor.found;
+    tryStatement.body.accept(visitor);
+    if (visitor.found) return true;
+    for (final CatchClause catchClause in tryStatement.catchClauses) {
+      catchClause.body.accept(visitor);
+      if (visitor.found) return true;
+    }
+    return false;
   }
 
   /// Method names that mutate widget state or the navigation/overlay stack

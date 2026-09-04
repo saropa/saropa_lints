@@ -119,3 +119,88 @@ class _CheckInTryState extends State<StatefulWidget> {
     }
   }
 }
+
+// =============================================================================
+// BAD: the async gap is opened by an `await` in the `catch` clause, not the
+// `try` body — the recovery path still falls into the same `finally`, so the
+// `mounted` guard there is just as stale as the try-body case.
+// =============================================================================
+
+class _AwaitInCatchState extends State<StatefulWidget> {
+  Future<void> _save() async {
+    try {
+      _syncOp();
+    } catch (e) {
+      await _recover();
+    } finally {
+      // expect_lint: avoid_mounted_check_in_finally
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  void _syncOp() {}
+
+  Future<void> _recover() async {}
+}
+
+// =============================================================================
+// BAD: `ScaffoldMessenger` (not just `Navigator`) is one of the unsafe
+// targets — showing a snack bar after disposal is the same class of bug.
+// =============================================================================
+
+class _ShowSnackBarState extends State<StatefulWidget> {
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      // expect_lint: avoid_mounted_check_in_finally
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Done')),
+        );
+      }
+    }
+  }
+}
+
+// =============================================================================
+// GOOD near-miss: a compound condition (`mounted && x`) is intentionally out
+// of scope — the rule only matches the exact `mounted` / `!mounted` shapes,
+// not arbitrary boolean expressions that happen to reference `mounted`.
+// =============================================================================
+
+class _CompoundConditionState extends State<StatefulWidget> {
+  bool _shouldUpdate = true;
+
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      if (mounted && _shouldUpdate) {
+        setState(() {});
+      }
+    }
+  }
+}
+
+// =============================================================================
+// GOOD near-miss: the `mounted` check lives inside a nested closure created
+// within `finally`, not directly in the `finally` block's own statement
+// list — that closure has its own, unrelated execution context.
+// =============================================================================
+
+class _NestedClosureState extends State<StatefulWidget> {
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      Future<void>(() async {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
+  }
+}

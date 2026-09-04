@@ -224,3 +224,60 @@ class _GoodFutureBuilderState extends State<StatefulWidget> {
     );
   }
 }
+
+// GOOD: the builder-scoped context is read inside a nested `onPressed`
+// closure rather than directly in the builder body. This is one of the most
+// common real-world uses of a builder context — deferring a
+// Navigator/ScaffoldMessenger call to a button callback — and must not be
+// flagged just because the read happens one closure deeper.
+class _GoodNestedOnPressedState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (BuildContext ctx) {
+        return ElevatedButton(
+          onPressed: () {
+            Navigator.of(ctx).pop();
+          },
+          child: const Text('Close'),
+        );
+      },
+    );
+  }
+}
+
+// GOOD: the builder-scoped context is read inside a `Future.then` callback
+// nested in the builder body — still a genuine use of the outer context.
+class _GoodNestedThenState extends State<StatefulWidget> {
+  Future<void>? _pending;
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (BuildContext ctx) {
+        _pending?.then((_) {
+          Navigator.of(ctx).pop();
+        });
+        return const SizedBox();
+      },
+    );
+  }
+}
+
+// GOOD: the builder-scoped context is read inside a locally-declared named
+// function (a `FunctionDeclarationStatement`, not a closure literal) — the
+// same "context used one level deeper" pattern via different syntax.
+class _GoodNestedLocalFunctionState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (BuildContext ctx) {
+        void handleTap() {
+          Navigator.of(ctx).pop();
+        }
+
+        return ElevatedButton(onPressed: handleTap, child: const Text('Go'));
+      },
+    );
+  }
+}

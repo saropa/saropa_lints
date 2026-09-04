@@ -213,6 +213,8 @@ export 'data/no_direct_iterable_access_rules.dart';
 export 'flow/duplicate_value_rules.dart';
 export 'flow/prefer_typed_exceptions_rules.dart';
 export 'packages/avoid_implementing_value_types_rules.dart';
+export 'stylistic/named_parameters_ordering_rules.dart';
 export 'stylistic/new_instance_cascade_rules.dart';
+export 'data/use_compare_without_case_rules.dart';
 export 'widget/avoid_mounted_check_in_finally_rules.dart';
 export 'widget/never_discard_build_context_rules.dart';

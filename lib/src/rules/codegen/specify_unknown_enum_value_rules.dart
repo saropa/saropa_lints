@@ -29,16 +29,25 @@ import '../../saropa_lint_rule.dart';
 /// payload carrying the new value — including for enums as innocuous as a
 /// "notification type" or "status" field, which can crash the app open on
 /// the home screen. This rule flags enum fields (including `List<Enum>` and
-/// `Map<K, Enum>` fields) inside a `@JsonSerializable()`/`@JsonEnum()` class
-/// whose own `@JsonKey` (or absence of one) carries no `unknownEnumValue`,
-/// and the enclosing class has no class-level `@JsonEnum(unknownEnumValue:
-/// ...)` covering it. A field explicitly excluded from JSON decoding via
-/// `@JsonKey(ignore: true)` or `@JsonKey(includeFromJson: false)` is exempt
-/// — it is never populated from JSON, so no fallback is needed. Detection is
-/// scoped to annotations visible in the same file as the field declaration;
-/// an `@JsonEnum(unknownEnumValue: ...)` placed directly on the enum
+/// `Map<K, Enum>` fields, checked on the map's value type — an enum-typed
+/// map *key* is not checked) inside a class carrying `@JsonSerializable()`
+/// and/or a class-level `@JsonEnum(...)` whose own `@JsonKey` (or absence of
+/// one) carries no `unknownEnumValue`, and the enclosing class has no
+/// class-level `@JsonEnum(unknownEnumValue: ...)` covering it. A class
+/// annotated `@JsonSerializable(createFactory: false)` is out of scope
+/// entirely — no `.fromJson` decoder is generated, so there is no decode
+/// path that can throw. A field is also exempt when its `@JsonKey` carries
+/// `ignore: true`, `includeFromJson: false`, or a custom `fromJson:`
+/// converter — each removes the field from the generated decoder's enum-map
+/// lookup, so `unknownEnumValue` would not apply to it. Detection is scoped
+/// to annotations visible in the same file as the field declaration; an
+/// `@JsonEnum(unknownEnumValue: ...)` placed directly on the enum
 /// declaration in a different file is not currently tracked — see the
 /// Alternatives section of the originating proposal for the reasoning.
+/// Annotation matching is by simple name only (with basic support for a
+/// prefixed import, e.g. `@json.JsonSerializable()`), not by resolved
+/// import — an unrelated local class that happens to be named
+/// `JsonSerializable`/`JsonKey`/`JsonEnum` would also match.
 ///
 /// **BAD:**
 /// ```dart
@@ -116,7 +125,10 @@ class SpecifyUnknownEnumValueRule extends SaropaLintRule {
         'Add @JsonKey(unknownEnumValue: MyEnum.unknown) to the field (adding '
         'an unknown/unrecognized member to the enum first if it does not '
         'already have one), or a class-level @JsonEnum(unknownEnumValue: '
-        '...) covering the enum type.',
+        '...) covering the enum type. For a nullable enum field, an '
+        'unrecognized value silently decodes to null instead of throwing — '
+        'if that is the intended fallback, suppress with `// ignore:` and a '
+        'one-line reason rather than leaving the gap undocumented.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -134,21 +146,38 @@ class SpecifyUnknownEnumValueRule extends SaropaLintRule {
       if (enclosingClass == null) return;
 
       // Only classes that actually generate a JSON decoder are in scope —
-      // otherwise there is no `.fromJson` call site that can throw.
-      final bool classInScope = _hasAnnotation(
+      // otherwise there is no `.fromJson` call site that can throw. A class
+      // is in scope via either @JsonSerializable() (the common pairing) or
+      // a bare class-level @JsonEnum(...) (a shared enum-decoding config
+      // class with no @JsonSerializable of its own) — matching the
+      // proposal's stated scope rather than requiring @JsonSerializable
+      // unconditionally.
+      final Annotation? jsonSerializable = _findAnnotation(
         enclosingClass.metadata,
         'JsonSerializable',
       );
-      if (!classInScope) return;
+      final Annotation? jsonEnum = _findAnnotation(
+        enclosingClass.metadata,
+        'JsonEnum',
+      );
+      if (jsonSerializable == null && jsonEnum == null) return;
+
+      // @JsonSerializable(createFactory: false) generates toJson-only code —
+      // no `.fromJson` decoder is emitted at all, so there is no decode path
+      // that can ever throw on an unrecognized enum value. Bail out rather
+      // than flag a class that has no fallible decode site. A bare
+      // @JsonEnum with no @JsonSerializable has no `createFactory` argument
+      // of its own, so this only applies when @JsonSerializable is present.
+      if (jsonSerializable != null &&
+          _argumentIsFalse(jsonSerializable, 'createFactory')) {
+        return;
+      }
 
       // A class-level @JsonEnum(unknownEnumValue: ...) is treated as
       // covering every enum field in the class (a simplification — see the
       // class doc comment's known-limitation note).
-      final bool classHasUnknownEnumValue = _annotationHasArgument(
-        enclosingClass.metadata,
-        annotationName: 'JsonEnum',
-        argumentName: 'unknownEnumValue',
-      );
+      final bool classHasUnknownEnumValue =
+          jsonEnum != null && _hasNamedArgument(jsonEnum, 'unknownEnumValue');
       if (classHasUnknownEnumValue) return;
 
       final TypeAnnotation? typeAnnotation = node.fields.type;
@@ -167,37 +196,37 @@ class SpecifyUnknownEnumValueRule extends SaropaLintRule {
         if (_argumentIsTrue(jsonKey, 'ignore')) return;
         if (_argumentIsFalse(jsonKey, 'includeFromJson')) return;
         if (_hasNamedArgument(jsonKey, 'unknownEnumValue')) return;
+        // A custom `fromJson:` converter routes decoding through a
+        // hand-written function instead of the generated enum-map lookup —
+        // json_serializable ignores `unknownEnumValue` entirely when a
+        // custom converter is present, so any unknown-value handling (or
+        // lack of it) lives inside that function, out of this rule's reach.
+        if (_hasNamedArgument(jsonKey, 'fromJson')) return;
       }
 
       reporter.atNode(node);
     });
   }
 
-  /// True when [metadata] contains an annotation whose simple name is
-  /// [name] (e.g. `@JsonSerializable(...)` matches `'JsonSerializable'`).
-  bool _hasAnnotation(NodeList<Annotation> metadata, String name) =>
-      _findAnnotation(metadata, name) != null;
-
   Annotation? _findAnnotation(NodeList<Annotation> metadata, String name) {
     for (final Annotation annotation in metadata) {
-      if (annotation.name.name == name) return annotation;
+      final String annotationName = annotation.name.name;
+      // Plain `@JsonSerializable()` resolves `name.name` to the bare class
+      // name, but a prefixed import (`import '...' as json;` then
+      // `@json.JsonSerializable()`) makes `name` a PrefixedIdentifier whose
+      // `.name` returns the full "json.JsonSerializable" lexeme — never
+      // equal to the bare literal, so match the trailing ".Name" segment
+      // too rather than silently treating the class as out of scope.
+      if (annotationName == name || annotationName.endsWith('.$name')) {
+        return annotation;
+      }
     }
     return null;
   }
 
-  /// True when [metadata] has an annotation named [annotationName] carrying
-  /// a named argument [argumentName] (value not inspected — presence alone
-  /// means a fallback was configured).
-  bool _annotationHasArgument(
-    NodeList<Annotation> metadata, {
-    required String annotationName,
-    required String argumentName,
-  }) {
-    final Annotation? annotation = _findAnnotation(metadata, annotationName);
-    if (annotation == null) return false;
-    return _hasNamedArgument(annotation, argumentName);
-  }
-
+  /// True when [annotation] carries a named argument [argumentName] (value
+  /// not inspected — presence alone means a fallback/converter was
+  /// configured, which is all the call sites above need).
   bool _hasNamedArgument(Annotation annotation, String argumentName) {
     final ArgumentList? args = annotation.arguments;
     if (args == null) return false;
@@ -244,12 +273,19 @@ class SpecifyUnknownEnumValueRule extends SaropaLintRule {
     final Element element = type.element;
     if (element is EnumElement) return element;
 
-    final String typeName = element.name ?? '';
-    if ((typeName == 'List' || typeName == 'Set' || typeName == 'Iterable') &&
-        type.typeArguments.length == 1) {
+    // Prefer the analyzer's own dart:core type predicates over comparing
+    // bare type names — a user-defined class literally named `List`/`Map`
+    // (in an unrelated library) would otherwise be misidentified as the
+    // core collection type it merely shares a name with.
+    final bool isSingleTypeArgCollection =
+        type.isDartCoreList || type.isDartCoreSet || type.isDartCoreIterable;
+    if (isSingleTypeArgCollection && type.typeArguments.length == 1) {
       return _findEnumElement(type.typeArguments.first);
     }
-    if (typeName == 'Map' && type.typeArguments.length == 2) {
+    // Map value (not key) is the JSON-decode target `unknownEnumValue`
+    // applies to — enum-typed map keys are not checked (see class doc
+    // comment's known-limitation note).
+    if (type.isDartCoreMap && type.typeArguments.length == 2) {
       return _findEnumElement(type.typeArguments[1]);
     }
     return null;

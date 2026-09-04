@@ -3,6 +3,11 @@
 // of a typed `Exception`/`Error` subclass. Scoped only to the bare-`String`
 // case -- `throw Exception(...)` is a related but distinct smell covered by
 // `avoid_generic_exceptions`.
+//
+// Test-file exemption (proposal Edge Case 3): this rule does not override
+// `testRelevance`, so it inherits SaropaLintRule's default
+// TestRelevance.never and skips *_test.dart files automatically -- verified
+// by test/rules/flow/prefer_typed_exceptions_test.dart, not just assumed.
 
 /// A project-defined exception with a real type callers can branch on.
 class InvalidAgeException implements Exception {

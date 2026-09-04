@@ -1,7 +1,5 @@
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:saropa_lints/src/rules/widget/never_discard_build_context_rules.dart';
 import 'package:test/test.dart';
 
@@ -10,9 +8,13 @@ import 'package:test/test.dart';
 /// The rule's detection is purely syntactic (first-parameter name/type of a
 /// `builder:` closure, plus a body-scoped identifier-usage scan) — no
 /// resolved-type information is required, so these tests parse source
-/// directly via `parseString` and re-run the rule's own detection helpers
-/// against the resulting AST, mirroring the pattern used by
-/// `avoid_builder_index_out_of_bounds_behavior_test.dart`.
+/// directly via `parseString` and call the rule's own
+/// [NeverDiscardBuildContextRule.wouldReportForTesting] entry point, which
+/// runs the SAME detection code path the live rule registers via
+/// `context.addFunctionExpression`. There is no hand-copied mirror here to
+/// drift out of sync with the rule (see Finish Report 2026-09-04,
+/// Recommendation 4) — a rule change is automatically exercised by these
+/// tests without any parallel edit.
 ///
 /// End-to-end firing (via the scan CLI, confirming the rule actually
 /// reports on its fixture) is verified separately — see
@@ -203,6 +205,125 @@ Object w() {
         isFalse,
       );
     });
+
+    test(
+      'context used inside a nested onPressed callback is not reported',
+      () {
+        // Regression for Finish Report 2026-09-04 Issue #1: a very common
+        // Flutter pattern is deferring a Navigator/ScaffoldMessenger call to
+        // a button callback declared inside the builder body. That read must
+        // count as a genuine use of the outer context.
+        expect(
+          _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      return ElevatedButton(
+        onPressed: () {
+          Navigator.of(ctx).pop();
+        },
+        child: const Text('Close'),
+      );
+    },
+  );
+}
+'''),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'context used inside a nested Future.then callback is not reported',
+      () {
+        expect(
+          _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      future.then((value) {
+        Navigator.of(ctx).pop();
+      });
+      return const SizedBox();
+    },
+  );
+}
+'''),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'context used inside addPostFrameCallback is not reported',
+      () {
+        expect(
+          _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Scrollable.ensureVisible(ctx);
+      });
+      return const SizedBox();
+    },
+  );
+}
+'''),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'context used inside a locally-declared named function is not '
+      'reported',
+      () {
+        // Regression for Finish Report 2026-09-04 Issue #2:
+        // FunctionDeclarationStatement (a local named function) hides the
+        // read the same way a FunctionExpression closure did.
+        expect(
+          _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      void handleTap() {
+        Navigator.of(ctx).pop();
+      }
+      return ElevatedButton(onPressed: handleTap, child: const Text('Go'));
+    },
+  );
+}
+'''),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'nested onPressed that redeclares its own `ctx` param shadows the '
+      'outer one, so the outer context is still unused',
+      () {
+        // True shadowing must still stop descent — the inner `ctx` here
+        // refers to the inner parameter, not the outer builder's context.
+        expect(
+          _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      return Builder(
+        builder: (ctx) {
+          return Text(ctx.toString());
+        },
+      );
+    },
+  );
+}
+'''),
+          isTrue,
+        );
+      },
+    );
   });
 
   group('NeverDiscardBuildContextRule — non-builder callbacks', () {
@@ -221,109 +342,14 @@ Object w() {
   });
 }
 
-/// Locates the `builder:` [FunctionExpression] in [unitSource] and applies
-/// the same first-parameter type/usage checks as
-/// [NeverDiscardBuildContextRule.runWithReporter].
+/// Parses [unitSource] and delegates to
+/// [NeverDiscardBuildContextRule.wouldReportForTesting] so every test above
+/// exercises the actual rule implementation.
 bool _wouldReport(String unitSource) {
   final result = parseString(
     content: unitSource,
     featureSet: FeatureSet.latestLanguageVersion(),
     throwIfDiagnostics: false,
   );
-  var reported = false;
-  result.unit.accept(_BuilderCallbackVisitor((node) => reported = true));
-  return reported;
-}
-
-/// Mirror of the rule's `addFunctionExpression` callback body. Kept in sync
-/// manually with `lib/src/rules/widget/never_discard_build_context_rules.dart`.
-class _BuilderCallbackVisitor extends RecursiveAstVisitor<void> {
-  _BuilderCallbackVisitor(this._onReport);
-
-  final void Function(FunctionExpression node) _onReport;
-
-  static const Set<String> _untypedContextNames = {
-    'context',
-    'ctx',
-    'innerContext',
-    'outerContext',
-    'buildContext',
-    'buildCtx',
-  };
-
-  @override
-  void visitFunctionExpression(FunctionExpression node) {
-    final parent = node.parent;
-    if (parent is NamedExpression && parent.name.label.name == 'builder') {
-      final parameters = node.parameters?.parameters;
-      if (parameters != null && parameters.isNotEmpty) {
-        final firstParam = parameters.first;
-        final paramName = _parameterName(firstParam);
-        if (paramName != null && !paramName.startsWith('_')) {
-          if (_looksLikeBuildContext(firstParam, paramName)) {
-            if (!_isNameUsed(node.body, paramName)) {
-              _onReport(node);
-            }
-          }
-        }
-      }
-    }
-    super.visitFunctionExpression(node);
-  }
-
-  static String? _parameterName(FormalParameter param) {
-    final normalized = param is DefaultFormalParameter
-        ? param.parameter
-        : param;
-    return normalized.name?.lexeme;
-  }
-
-  static bool _looksLikeBuildContext(FormalParameter param, String name) {
-    final normalized = param is DefaultFormalParameter
-        ? param.parameter
-        : param;
-    if (normalized is SimpleFormalParameter) {
-      final type = normalized.type;
-      if (type is NamedType) {
-        return type.name.lexeme == 'BuildContext';
-      }
-      if (type == null) {
-        return _untypedContextNames.contains(name);
-      }
-    }
-    return false;
-  }
-
-  static bool _isNameUsed(FunctionBody body, String name) {
-    final visitor = _IdentifierUsageVisitor(name);
-    body.accept(visitor);
-    return visitor.found;
-  }
-}
-
-class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
-  _IdentifierUsageVisitor(this.targetName);
-
-  final String targetName;
-  bool found = false;
-
-  @override
-  void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (found) return;
-    if (node.name == targetName) {
-      found = true;
-      return;
-    }
-    super.visitSimpleIdentifier(node);
-  }
-
-  @override
-  void visitFunctionExpression(FunctionExpression node) {
-    if (found) return;
-  }
-
-  @override
-  void visitFunctionDeclarationStatement(FunctionDeclarationStatement node) {
-    if (found) return;
-  }
+  return NeverDiscardBuildContextRule.wouldReportForTesting(result.unit);
 }

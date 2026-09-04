@@ -10,12 +10,16 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 
-/// Warns when a call, property access, or operator is invoked on a
-/// receiver whose static type is `dynamic`.
+/// Warns when a call, property access, or operator (including compound
+/// assignment `+=`, increment/decrement `++`/`--`, cascades, and calling a
+/// dynamic value as a function) is invoked on a receiver whose static type
+/// is `dynamic`.
 ///
 /// Since: v15.2.12 | Rule version: v1
 ///
@@ -25,8 +29,10 @@ import '../../saropa_lint_rule.dart';
 /// a `NoSuchMethodError` in production. This defeats the entire point of
 /// Dart's static type system for that call site.
 ///
-/// **Exemption**: calls inside a `noSuchMethod` override are intentional
-/// dynamic dispatch and are skipped.
+/// **Exemption**: inside a `noSuchMethod` override, only call sites that
+/// actually derive from the override's `Invocation` parameter are
+/// intentional dynamic dispatch and are skipped — an unrelated dynamic call
+/// elsewhere in the same override body is still flagged.
 ///
 /// **BAD:**
 /// ```dart
@@ -93,9 +99,60 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
   /// comparison operator call is, and flagging them would just be noise on
   /// ordinary null/bool checks.
   static const Set<String> _operatorInvocationTokens = <String>{
-    '+', '-', '*', '/', '~/', '%',
-    '<', '<=', '>', '>=',
-    '&', '|', '^', '<<', '>>', '>>>',
+    '+',
+    '-',
+    '*',
+    '/',
+    '~/',
+    '%',
+    '<',
+    '<=',
+    '>',
+    '>=',
+    '&',
+    '|',
+    '^',
+    '<<',
+    '>>',
+    '>>>',
+  };
+
+  /// Compound-assignment operators (`dynamicValue += 1`) mapped to the base
+  /// operator they dispatch through on the receiver (`+`). Deliberately
+  /// excludes plain `=` and `??=` — neither invokes a member on the
+  /// left-hand side's existing value, so there is nothing "unchecked"
+  /// about them the way `dynamicValue += 1` invoking the dynamic `+`
+  /// operator is. Reuses [_operatorInvocationTokens] as the source of
+  /// truth for which base operators count, keeping the "meaningful
+  /// operator, not `==`/`&&`/`||`" policy in one place.
+  static final Map<String, String> _compoundAssignmentBaseOperators =
+      <String, String>{
+        for (final String operator in _operatorInvocationTokens)
+          if (operator != '<' &&
+              operator != '<=' &&
+              operator != '>' &&
+              operator != '>=')
+            '$operator=': operator,
+      };
+
+  /// Prefix operators that invoke an operator method on the operand
+  /// (`-dynamicValue`, `~dynamicValue`, `++dynamicValue`, `--dynamicValue`).
+  /// Excludes logical `!` — like `==`/`&&`/`||` on the binary side, boolean
+  /// negation is not a meaningfully "unchecked" dispatch on a dynamic
+  /// receiver.
+  static const Set<String> _prefixOperatorInvocationTokens = <String>{
+    '-',
+    '~',
+    '++',
+    '--',
+  };
+
+  /// Postfix operators that invoke an operator method on the operand
+  /// (`dynamicValue++`, `dynamicValue--`). Dart has no other postfix
+  /// operators.
+  static const Set<String> _postfixOperatorInvocationTokens = <String>{
+    '++',
+    '--',
   };
 
   @override
@@ -141,6 +198,71 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+
+    // `dynamicValue..foo()..bar()` — the cascade's sections have no
+    // explicit target (`node.target` on the inner MethodInvocation/
+    // PropertyAccess/IndexExpression is null), so they never trip the
+    // hooks above. Check the cascade's own target once and report on the
+    // whole CascadeExpression rather than per-section, so `x..a()..b()`
+    // produces a single diagnostic instead of one per cascaded call.
+    context.addCascadeExpression((CascadeExpression node) {
+      if (_isInsideNoSuchMethod(node)) return;
+      if (_hasDynamicStaticType(node.target)) {
+        reporter.atNode(node);
+      }
+    });
+
+    // `dynamicValue += 1` dispatches through the dynamic `+` operator the
+    // same way `dynamicValue + 1` does, but it is an AssignmentExpression
+    // rather than a BinaryExpression and was previously unchecked. Plain
+    // `=` and `??=` are excluded via the map (they don't invoke a member
+    // on the existing left-hand value).
+    context.addAssignmentExpression((AssignmentExpression node) {
+      final String? baseOperator =
+          _compoundAssignmentBaseOperators[node.operator.lexeme];
+      if (baseOperator == null) return;
+      if (_isInsideNoSuchMethod(node)) return;
+      if (_hasDynamicReceiverType(node.leftHandSide, node)) {
+        reporter.atNode(node);
+      }
+    });
+
+    // `dynamicValue++`, `--dynamicValue`, `-dynamicValue`, `~dynamicValue`
+    // invoke dynamic operator methods on the operand exactly like the
+    // already-covered BinaryExpression case, but through
+    // PrefixExpression/PostfixExpression nodes.
+    context.addPrefixExpression((PrefixExpression node) {
+      if (!_prefixOperatorInvocationTokens.contains(node.operator.lexeme)) {
+        return;
+      }
+      if (_isInsideNoSuchMethod(node)) return;
+      if (_hasDynamicReceiverType(node.operand, node)) {
+        reporter.atNode(node);
+      }
+    });
+
+    context.addPostfixExpression((PostfixExpression node) {
+      if (!_postfixOperatorInvocationTokens.contains(node.operator.lexeme)) {
+        return;
+      }
+      if (_isInsideNoSuchMethod(node)) return;
+      if (_hasDynamicReceiverType(node.operand, node)) {
+        reporter.atNode(node);
+      }
+    });
+
+    // `dynamic fn = ...; fn();` calls through the dynamic value's
+    // synthetic `call()` dispatch — a FunctionExpressionInvocation, not a
+    // MethodInvocation (there is no member name to resolve), and was
+    // previously unchecked.
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
+      if (_isInsideNoSuchMethod(node)) return;
+      if (_hasDynamicStaticType(node.function)) {
+        reporter.atNode(node);
+      }
+    });
   }
 
   /// Returns true when [expression]'s resolved static type is exactly
@@ -152,12 +274,80 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
     return expression.staticType is DynamicType;
   }
 
-  /// `noSuchMethod` overrides intentionally dispatch dynamically; a call
-  /// made on `invocation.positionalArguments[0]` or similar inside one is
-  /// the whole point of the override, not an oversight to flag.
+  /// Returns true when [receiver]'s dynamic-dispatch type is `dynamic`, for
+  /// receivers used inside a [CompoundAssignmentExpression] (compound
+  /// assignment `+=`, or increment/decrement `++`/`--`).
+  ///
+  /// A quirk of the resolved AST: when an identifier is used as the
+  /// left-hand side of `+=` or as the operand of `++`/`--`, it is in a
+  /// "write" position and its own `.staticType` (via [_hasDynamicStaticType])
+  /// is `null` — the analyzer instead exposes the type of the value that
+  /// gets READ (before the operator is applied) via `node.readType` on the
+  /// [CompoundAssignmentExpression] mixin. Plain unary operators (`-`, `~`,
+  /// `!`) use the same [PrefixExpression] AST node type but are NOT compound
+  /// assignments, so `node.readType` is null for them and [receiver]'s own
+  /// `.staticType` is populated normally — hence the fallback below.
+  bool _hasDynamicReceiverType(
+    Expression receiver,
+    CompoundAssignmentExpression node,
+  ) {
+    final DartType? readType = node.readType;
+    if (readType != null) return readType is DynamicType;
+    return _hasDynamicStaticType(receiver);
+  }
+
+  /// `noSuchMethod` overrides intentionally dispatch dynamically, but ONLY
+  /// for call sites derived from the override's `Invocation` parameter
+  /// (`invocation.positionalArguments[0]...`, `invocation.memberName`,
+  /// etc.) — that dispatch is the whole point of the override. A dynamic
+  /// call elsewhere in the same body (e.g. a typo'd call on an unrelated
+  /// dynamic local) is not part of that contract and must still be
+  /// flagged, so the exemption is scoped to the parameter rather than the
+  /// entire method.
   bool _isInsideNoSuchMethod(AstNode node) {
-    final MethodDeclaration? method =
-        node.thisOrAncestorOfType<MethodDeclaration>();
-    return method?.name.lexeme == 'noSuchMethod';
+    final MethodDeclaration? method = node
+        .thisOrAncestorOfType<MethodDeclaration>();
+    if (method == null || method.name.lexeme != 'noSuchMethod') return false;
+
+    // `noSuchMethod(Invocation invocation)` always has exactly one formal
+    // parameter; if that shape is missing (malformed override) there is
+    // nothing to scope the exemption to.
+    final List<FormalParameter>? parameters = method.parameters?.parameters;
+    if (parameters == null || parameters.isEmpty) return false;
+    final Element? invocationParam = parameters.first.declaredFragment?.element;
+    if (invocationParam == null) return false;
+
+    // Walk this call site's own subtree for a reference back to the
+    // `Invocation` parameter. Only THAT call site is exempt — sibling
+    // dynamic calls elsewhere in the body are unaffected since each is
+    // checked independently against its own subtree.
+    final _ElementReferenceFinder finder = _ElementReferenceFinder(
+      invocationParam,
+    );
+    node.accept(finder);
+    return finder.found;
+  }
+}
+
+/// Searches an AST subtree for any [SimpleIdentifier] resolving to
+/// [_target], used to confirm a dynamic call site inside a `noSuchMethod`
+/// override actually derives from the override's `Invocation` parameter
+/// (rather than exempting the whole method body).
+class _ElementReferenceFinder extends RecursiveAstVisitor<void> {
+  _ElementReferenceFinder(this._target);
+
+  final Element _target;
+
+  /// Set true the moment a matching identifier is found; traversal is not
+  /// short-circuited (RecursiveAstVisitor has no early-exit), but that's
+  /// cheap given these are small call-site subtrees.
+  bool found = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.element == _target) {
+      found = true;
+    }
+    super.visitSimpleIdentifier(node);
   }
 }

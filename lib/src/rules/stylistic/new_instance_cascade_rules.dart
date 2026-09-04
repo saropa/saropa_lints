@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 
@@ -37,7 +38,12 @@ bool _isFreshInstanceConfigStatement(Statement stmt, String varName) {
   // `varName.method(args);`
   if (expr is MethodInvocation) {
     final Expression? target = expr.target;
-    return target is SimpleIdentifier && target.name == varName;
+    if (target is! SimpleIdentifier || target.name != varName) return false;
+    // Guard: if any argument reads `varName` back (e.g.
+    // `controller.jumpTo(controller.offset);`), folding this into
+    // `Ctrl()..jumpTo(controller.offset)` would reference `controller`
+    // inside its own initializer — a compile error. Bail on self-reference.
+    return !_argumentsReferenceVariable(expr.argumentList, varName);
   }
 
   // `varName.field = value;` — only plain `=`, never compound assignments
@@ -45,16 +51,63 @@ bool _isFreshInstanceConfigStatement(Statement stmt, String varName) {
   // well as written and are a weaker cascade candidate.
   if (expr is AssignmentExpression && expr.operator.type == TokenType.EQ) {
     final Expression lhs = expr.leftHandSide;
+    final bool targetsVarName;
     if (lhs is PropertyAccess) {
       final Expression? target = lhs.target;
-      return target is SimpleIdentifier && target.name == varName;
+      targetsVarName = target is SimpleIdentifier && target.name == varName;
+    } else if (lhs is PrefixedIdentifier) {
+      targetsVarName = lhs.prefix.name == varName;
+    } else {
+      targetsVarName = false;
     }
-    if (lhs is PrefixedIdentifier) {
-      return lhs.prefix.name == varName;
-    }
+    if (!targetsVarName) return false;
+    // Guard: the RHS may itself read `varName`, e.g.
+    // `controller.selection = TextSelection.collapsed(offset:
+    // controller.text.length);`. Cascading that into the constructor's
+    // initializer would self-reference the not-yet-bound variable —
+    // a compile error — so exclude it from matching.
+    return !_expressionReferencesVariable(expr.rightHandSide, varName);
   }
 
   return false;
+}
+
+/// Returns `true` if any argument in [args] contains a reference to the
+/// identifier [varName] — used to reject method-call statements that would
+/// self-reference the receiver if folded into its own cascade initializer.
+bool _argumentsReferenceVariable(ArgumentList args, String varName) {
+  for (final Expression arg in args.arguments) {
+    if (_expressionReferencesVariable(arg, varName)) return true;
+  }
+  return false;
+}
+
+/// Returns `true` if [expr] (or any of its descendants) reads the bare
+/// identifier [varName]. Used to detect the "self-reference before binding"
+/// hazard: a configuring statement whose RHS/args mention the variable being
+/// constructed can never be safely folded into that variable's own cascade
+/// initializer.
+bool _expressionReferencesVariable(Expression expr, String varName) {
+  final _VariableReferenceVisitor visitor = _VariableReferenceVisitor(
+    varName,
+  );
+  expr.accept(visitor);
+  return visitor.found;
+}
+
+/// AST visitor that records whether a [SimpleIdentifier] reading [varName]
+/// appears anywhere in the visited subtree.
+class _VariableReferenceVisitor extends RecursiveAstVisitor<void> {
+  _VariableReferenceVisitor(this.varName);
+
+  final String varName;
+  bool found = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == varName) found = true;
+    super.visitSimpleIdentifier(node);
+  }
 }
 
 /// Suggests cascade (`..`) notation when two or more consecutive statements
@@ -165,32 +218,53 @@ class NewInstanceCascadeRule extends SaropaLintRule {
 
         final VariableDeclaration decl = variables.first;
         final Expression? initializer = decl.initializer;
-        // Must be a direct `Type(...)` construction — a cascade expression
-        // initializer (`Type()..x = 1`) means the object is already
-        // cascaded and there is nothing left to suggest.
-        if (initializer is! InstanceCreationExpression) continue;
+        // Accept a direct `Type(...)` construction, OR a cascade expression
+        // rooted at one (`Type()..x = 1`). The latter is only *partially*
+        // configured — later, un-cascaded sibling statements are still a
+        // legitimate cascade opportunity, so a partial cascade must not
+        // stop detection entirely (previously it did, a false negative).
+        final bool isFreshInstance =
+            initializer is InstanceCreationExpression ||
+            (initializer is CascadeExpression &&
+                initializer.target is InstanceCreationExpression);
+        if (!isFreshInstance) continue;
 
         final String varName = decl.name.lexeme;
 
         // Walk forward counting the immediately-consecutive statements that
-        // configure `varName`. Stop at the first non-matching statement —
-        // that enforces "consecutive" and naturally excludes reassignment,
-        // reads, and any statement crossing a control-flow boundary (those
-        // simply are not siblings in this block's statement list).
-        int count = 0;
-        Statement? first;
-        for (int j = i + 1; j < statements.length; j++) {
-          if (!_isFreshInstanceConfigStatement(statements[j], varName)) {
-            break;
-          }
-          count++;
-          first ??= statements[j];
-          if (count >= 2) {
-            reporter.atNode(first);
-            break;
-          }
-        }
+        // configure `varName`; report at the first statement of a run of 2+.
+        // Stop at the first non-matching statement — that enforces
+        // "consecutive" and naturally excludes reassignment, reads, and any
+        // statement crossing a control-flow boundary (those simply are not
+        // siblings in this block's statement list).
+        final Statement? candidate = _findConsecutiveConfigRun(
+          statements,
+          i + 1,
+          varName,
+        );
+        if (candidate != null) reporter.atNode(candidate);
       }
     });
   }
+}
+
+/// Returns the first statement of a run of 2 or more immediately-consecutive
+/// statements (starting at [startIndex] in [statements]) that each configure
+/// [varName], or `null` if no such run exists. Extracted from
+/// `runWithReporter` to keep that function under the project's line-count
+/// guideline and to make the two nested loops reviewable independently.
+Statement? _findConsecutiveConfigRun(
+  List<Statement> statements,
+  int startIndex,
+  String varName,
+) {
+  int count = 0;
+  Statement? first;
+  for (int j = startIndex; j < statements.length; j++) {
+    if (!_isFreshInstanceConfigStatement(statements[j], varName)) break;
+    count++;
+    first ??= statements[j];
+    if (count >= 2) return first;
+  }
+  return null;
 }

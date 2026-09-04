@@ -1,7 +1,8 @@
 // named_parameters_ordering: smoke-test the rule class for stable
-// `LintCode` metadata strings. Real firing behavior is verified separately
-// via the scan CLI against example/lib/stylistic/named_parameters_ordering_fixture.dart
-// (see plans/tier_1_quick_wins/proposal_named_parameters_ordering.md).
+// `LintCode` metadata strings. Firing behavior against
+// example/lib/stylistic/named_parameters_ordering_fixture.dart is covered by
+// the fixture's `expect_lint` markers, which the project's fixture-based
+// integrity checks validate.
 library;
 
 import 'package:test/test.dart';
@@ -13,11 +14,11 @@ void main() {
     test('NamedParametersOrderingRule', () {
       final rule = NamedParametersOrderingRule();
       expect(rule.code.lowerCaseName, 'named_parameters_ordering');
-      expect(
-        rule.code.problemMessage,
-        contains('[named_parameters_ordering]'),
-      );
-      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.problemMessage, contains('[named_parameters_ordering]'));
+      // Project-wide rule: problem messages must exceed 200 chars total
+      // (CLAUDE.md "Problem Message Requirements") so they carry enough
+      // context to stand alone in an IDE tooltip without truncation.
+      expect(rule.code.problemMessage.length, greaterThan(200));
       expect(rule.code.correctionMessage, isNotNull);
     });
   });

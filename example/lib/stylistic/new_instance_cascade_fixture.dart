@@ -68,3 +68,44 @@ void buildGoodControlFlowSplit(bool flag) {
     controller.selection = const TextSelection.collapsed(offset: 0);
   }
 }
+
+/// GOOD: the second statement's RHS reads the receiver back
+/// (`controller.text.length`) — folding it into a cascade would reference
+/// `controller` inside its own not-yet-bound initializer, a compile error.
+void buildGoodSelfReferencingAssignment() {
+  final controller = TextEditingController();
+  controller.text = 'hello';
+  controller.selection = TextSelection.collapsed(
+    offset: controller.text.length,
+  );
+}
+
+/// GOOD: the second statement's argument reads the receiver back
+/// (`controller.text`) — same self-reference hazard as above, but via a
+/// method-call argument instead of an assignment's RHS.
+void buildGoodSelfReferencingArgument() {
+  final controller = TextEditingController();
+  controller.addListener(() {});
+  controller.value = controller.value.copyWith(text: controller.text);
+}
+
+/// BAD: three consecutive configuring statements on a freshly-constructed
+/// receiver — the rule reports once, at the first statement, and does not
+/// re-report for the trailing statements in the same run.
+void buildBadThreeConsecutiveStatements() {
+  final controller = TextEditingController();
+  // expect_lint: new_instance_cascade
+  controller.text = 'hello';
+  controller.selection = const TextSelection.collapsed(offset: 5);
+  controller.addListener(() {});
+}
+
+/// BAD: the declaration already carries a partial cascade, but two further
+/// un-cascaded statements follow — that is still a legitimate (if smaller)
+/// cascade opportunity, so detection must not stop at the partial cascade.
+void buildBadPartiallyCascadedInitializer() {
+  final controller = TextEditingController()..text = 'hello';
+  // expect_lint: new_instance_cascade
+  controller.selection = const TextSelection.collapsed(offset: 5);
+  controller.addListener(() {});
+}

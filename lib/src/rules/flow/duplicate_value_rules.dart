@@ -80,7 +80,17 @@ class DuplicateValueRule extends SaropaLintRule {
       // binary expressions using the identical operator are visited
       // again by the outer AST walk, so skip them here to avoid
       // reporting the same duplicate pair once per nesting level.
-      final AstNode? parent = node.parent;
+      //
+      // Explicit grouping parentheses (`a || (b || a)`) must not defeat
+      // this skip: unwrap any `ParenthesizedExpression` ancestors before
+      // testing for a same-operator parent, otherwise the inner
+      // expression is treated as an independent root and its operands
+      // are compared in isolation from the sibling outside the parens --
+      // silently missing duplicates split across a paren boundary.
+      AstNode? parent = node.parent;
+      while (parent is ParenthesizedExpression) {
+        parent = parent.parent;
+      }
       if (parent is BinaryExpression && parent.operator.type == operatorType) {
         return;
       }
@@ -112,16 +122,25 @@ class DuplicateValueRule extends SaropaLintRule {
   /// opaque `&&` operands of the outer `||`, rather than incorrectly
   /// merged into a single flat list -- this avoids misreporting operator
   /// precedence groups as duplicated scalar values.
+  ///
+  /// Explicit grouping parentheses must not break the flattening of a
+  /// same-operator chain (`a || (b || a)` is one flat `||` chain, not an
+  /// opaque `||` leaf plus a lone `a`), so [Expression.unParenthesized] is
+  /// applied before the [BinaryExpression] check and before the leaf is
+  /// added -- otherwise `(b || a)` would be compared as a single opaque
+  /// operand and the duplicate `a` inside it would never be seen against
+  /// the `a` outside the parens.
   void _collectOperands(
     Expression expr,
     TokenType operatorType,
     List<Expression> out,
   ) {
-    if (expr is BinaryExpression && expr.operator.type == operatorType) {
-      _collectOperands(expr.leftOperand, operatorType, out);
-      _collectOperands(expr.rightOperand, operatorType, out);
+    final Expression unwrapped = expr.unParenthesized;
+    if (unwrapped is BinaryExpression && unwrapped.operator.type == operatorType) {
+      _collectOperands(unwrapped.leftOperand, operatorType, out);
+      _collectOperands(unwrapped.rightOperand, operatorType, out);
     } else {
-      out.add(expr);
+      out.add(unwrapped);
     }
   }
 }

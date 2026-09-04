@@ -148,5 +148,97 @@ void build() {
 ''');
       expect(codes, isEmpty);
     });
+
+    test(
+      'does NOT fire when the second statement\'s RHS self-references the receiver',
+      () async {
+        // `controller.selection = TextSelection(offset: controller.text.length)`
+        // could not be folded into `Ctrl()..selection = ...controller...`
+        // without referencing `controller` before it is bound — a compile
+        // error, so the rule must stay silent.
+        final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
+class TextEditingController {
+  String text = '';
+  int selection = 0;
+}
+
+void build() {
+  final controller = TextEditingController();
+  controller.text = 'hello';
+  controller.selection = controller.text.length;
+}
+''');
+        expect(codes, isEmpty);
+      },
+    );
+
+    test(
+      'does NOT fire when a method-call argument self-references the receiver',
+      () async {
+        // Same self-reference hazard as the assignment case above, but via
+        // a method-call argument instead of an assignment's RHS.
+        final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
+class TextEditingController {
+  String text = '';
+  void jumpTo(int offset) {}
+}
+
+void build() {
+  final controller = TextEditingController();
+  controller.text = 'hello';
+  controller.jumpTo(controller.text.length);
+}
+''');
+        expect(codes, isEmpty);
+      },
+    );
+
+    test(
+      'fires once on 3+ consecutive configuring statements, at the first',
+      () async {
+        // Guards the "report once, at the first match" behavior the
+        // `count >= 2` early-return relies on but was previously unasserted
+        // for runs longer than 2.
+        final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
+class TextEditingController {
+  String text = '';
+  int selection = 0;
+  void addListener(void Function() f) {}
+}
+
+void build() {
+  final controller = TextEditingController();
+  controller.text = 'hello';
+  controller.selection = 5;
+  controller.addListener(() {});
+}
+''');
+        expect(codes.where((c) => c == 'new_instance_cascade').length, 1);
+      },
+    );
+
+    test(
+      'fires on trailing statements after a partially-cascaded initializer',
+      () async {
+        // A declaration that already carries a partial cascade
+        // (`Ctrl()..text = 'a'`) must not stop detection entirely — two or
+        // more further un-cascaded statements are still a legitimate
+        // cascade opportunity.
+        final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
+class TextEditingController {
+  String text = '';
+  int selection = 0;
+  void addListener(void Function() f) {}
+}
+
+void build() {
+  final controller = TextEditingController()..text = 'hello';
+  controller.selection = 5;
+  controller.addListener(() {});
+}
+''');
+        expect(codes, contains('new_instance_cascade'));
+      },
+    );
   });
 }

@@ -19,6 +19,24 @@ import '../../saropa_lint_rule.dart';
 ///
 /// Fires on both `x is Future` and the negated `x is! Future` — the negation
 /// does not change the underlying fragility, only which branch runs first.
+/// It also fires on the nullable form `x is Future<T>?`, since
+/// `isDartAsyncFuture` is true for both `Future<T>` and `Future<T>?`.
+///
+/// **Known gap:** this rule only inspects `IsExpression` nodes, so Dart 3
+/// pattern-matching equivalents such as `switch (result) { case Future(): }`
+/// or `if (result case Future _)` are structurally different AST nodes
+/// (object/type patterns, not `is` checks) and are NOT currently flagged,
+/// even though they express the same fragile runtime check. Left as a
+/// follow-up rather than in scope for v1.
+///
+/// **Scope note:** this rule only matches the literal `Future` type written
+/// in the `is` clause — it does not walk supertypes to catch a custom class
+/// that merely *extends/implements* `Future` (e.g. `x is MyCustomFuture`).
+/// That is a deliberate, narrower scope than `_staticTypeIsFuture` in
+/// `async_rules.dart` (which walks `allSupertypes` to catch such custom
+/// subclasses when checking a *value's* static type) — matching a
+/// user-written custom-Future type isn't the same fragile pattern this rule
+/// targets, since the author controls that type directly.
 ///
 /// **BAD:**
 /// ```dart
@@ -91,9 +109,15 @@ class IsFutureRule extends SaropaLintRule {
       // Only the literal `Future` / `Future<T>` type-check is fragile in the
       // way this rule documents. `isDartAsyncFuture` is false for
       // `FutureOr<T>` (it is a distinct DartType), so this check does not
-      // need to worry about that near-miss separately — verified against
-      // the identical `_staticTypeIsFuture` helper pattern used elsewhere
-      // in this package (lib/src/rules/core/async_rules.dart).
+      // need to worry about that near-miss separately. `isDartAsyncFuture`
+      // is also true for the nullable form `Future<T>?`, so this
+      // deliberately fires on `x is Future<T>?` too — nullability doesn't
+      // change the underlying fragility. Note this is NOT the same check as
+      // `_staticTypeIsFuture` in async_rules.dart: that helper walks
+      // `allSupertypes` to also catch custom classes that extend/implement
+      // `Future`, whereas this rule intentionally checks only the literal
+      // annotation type and does not walk supertypes (see the "Scope note"
+      // in the class DartDoc above).
       if (testedType.isDartAsyncFuture) {
         reporter.atNode(node);
       }

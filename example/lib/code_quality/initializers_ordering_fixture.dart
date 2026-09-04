@@ -81,3 +81,56 @@ class SingleInitializer {
   final int x;
   final int y = 0;
 }
+
+// ThisShorthandOk: GOOD — `this.x` shorthand fills one field directly (never
+// appears as a ConstructorFieldInitializer), and the remaining two explicit
+// initializer-list entries (`y`, `z`) are in declaration order. The
+// shorthand field's position must not taint the comparison of the rest.
+class ThisShorthandOk {
+  ThisShorthandOk(this.x, int b, int c) : y = b, z = c;
+
+  final int x;
+  final int y;
+  final int z;
+}
+
+// ThisShorthandBad: BAD — `this.x` shorthand fills the first field, but the
+// two explicit initializer-list entries (`z`, `y`) are reversed relative to
+// their declaration order.
+class ThisShorthandBad {
+  ThisShorthandBad(this.x, int b, int c)
+      // expect_lint: initializers_ordering
+      : z = c,
+        y = b;
+
+  final int x;
+  final int y;
+  final int z;
+}
+
+// EnumBad: BAD — an enum's const constructor initializer list can be
+// out of order too; `label` (2nd field) assigned before `code` (1st field).
+enum EnumBad {
+  a(1, 'one'),
+  b(2, 'two');
+
+  const EnumBad(int code, String label)
+      // expect_lint: initializers_ordering
+      : label = label,
+        code = code;
+
+  final int code;
+  final String label;
+}
+
+// EnumOk: GOOD near-miss — same shape as EnumBad but correctly ordered, so
+// enum constructors are not flagged just for existing.
+enum EnumOk {
+  a(1, 'one'),
+  b(2, 'two');
+
+  const EnumOk(int code, String label) : code = code, label = label;
+
+  final int code;
+  final String label;
+}

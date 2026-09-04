@@ -96,3 +96,37 @@ class DeviceId implements Comparable<DeviceId> {
   @override
   int compareTo(DeviceId other) => value.compareTo(other.value);
 }
+
+// =============================================================================
+// GOOD: Dart 3 "interface class" idiom — `with`/`extends` supplies real
+// equality behavior, `implements` separately names a marker/contract
+// interface purely for typing. The marker itself extends Equatable (so
+// `_implementsValueEqualityType` correctly flags it as value-equality-based),
+// but the concrete class's OWN extends/with clause already provides working
+// equality, so the implements clause did not cause the footgun and must not
+// fire.
+// =============================================================================
+
+// Contract-only marker: no fields, no equality declared directly here — it
+// is never instantiated on its own, only used as an interface target.
+abstract class ValueObject extends Equatable {}
+
+// Equality comes from `with EquatableMixin`, not from `implements
+// ValueObject` — the implements clause is purely a typing contract.
+class Balance with EquatableMixin implements ValueObject {
+  Balance(this.cents);
+  final int cents;
+
+  @override
+  List<Object?> get props => <Object?>[cents];
+}
+
+// Equality comes from `extends Equatable`; `implements ValueObject` on top
+// of that is a redundant-but-harmless marker, not the source of equality.
+class Credit extends Equatable implements ValueObject {
+  Credit(this.cents);
+  final int cents;
+
+  @override
+  List<Object?> get props => <Object?>[cents];
+}

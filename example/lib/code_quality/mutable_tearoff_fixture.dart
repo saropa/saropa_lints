@@ -101,3 +101,29 @@ void storeFieldValue(Handler handler) {
   final VoidCallback cb = handler.onTapField;
   cb();
 }
+
+/// BAD: tear-off stored as an element of a list literal — retained as
+/// long as the list itself, same staleness risk as a direct assignment.
+void collectionLiteralTearoff(Handler handler) {
+  // expect_lint: mutable_tearoff
+  final List<VoidCallback> callbacks = [handler.handleTap];
+  callbacks.first();
+}
+
+/// BAD: tear-off handed back to the caller via an arrow-bodied function —
+/// the caller is free to store it, so the staleness risk travels with it.
+VoidCallback getCallback(Handler handler) =>
+    // expect_lint: mutable_tearoff
+    handler.handleTap;
+
+/// BAD: tear-off stored via a constructor initializer-list assignment.
+/// `handlerParam` is a plain (non-`final`) constructor parameter, so the
+/// tear-off it produces is just as stale-prone as one from a mutable
+/// field or local variable.
+class InitializerListController {
+  final VoidCallback onTap;
+
+  // expect_lint: mutable_tearoff
+  InitializerListController(Handler handlerParam)
+    : onTap = handlerParam.handleTap;
+}

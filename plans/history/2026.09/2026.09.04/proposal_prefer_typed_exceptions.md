@@ -80,9 +80,41 @@ Justification: architectural-hygiene rule with real long-term maintainability va
 
 ## Decision
 
----
+Approved with a narrower scope than originally drafted: this rule flags ONLY
+bare-`String` throws (`throw 'text';`, `throw someStringVariable;`, `throw
+buildMessage();` where the static type is `String`). The proposal's
+Detection/Behavior section and "Should flag" example (line 37) originally
+described this rule as also flagging `throw Exception(...)`/`throw
+Error(...)`, but that case is already owned by the pre-existing
+`avoid_generic_exceptions` rule (`lib/src/rules/flow/error_handling_rules.dart`,
+`{v4}`). Flagging both cases here would double-report the same
+`throw Exception(...)` call site under two different rule names, so the
+scope was narrowed at implementation time rather than shipping a duplicate
+diagnostic.
 
 ## Implementation Notes
+
+- `PreferTypedExceptionsRule` (`lib/src/rules/flow/prefer_typed_exceptions_rules.dart`)
+  handles two AST shapes: a `StringLiteral` thrown directly (no type
+  resolution needed, also covers interpolated strings), and any other
+  expression whose resolved `staticType.isDartCoreString` is true (covers
+  `String`-typed variables and function calls). `Exception(...)`/`Error(...)`
+  constructor calls are `InstanceCreationExpression` nodes, not
+  `StringLiteral` and not `String`-typed, so they fall through untouched and
+  are left to `avoid_generic_exceptions`.
+- Doc comments on both rules now cross-reference each other
+  (`prefer_typed_exceptions_rules.dart:19-22` and
+  `error_handling_rules.dart`'s `AvoidGenericExceptionsRule` doc comment) so
+  the scope split is discoverable from either rule.
+- Test-file exemption (proposal Edge Case 3) is inherited, not overridden:
+  the rule does not implement `testRelevance`, so it uses `SaropaLintRule`'s
+  default `TestRelevance.never`. This is now pinned by an explicit test
+  (`test/rules/flow/prefer_typed_exceptions_test.dart`) rather than left as
+  an unverified assumption.
+- Problem message length assertion in the test was tightened from
+  `greaterThan(50)` to `greaterThan(200)` to match the project's Problem
+  Message Requirement (CLAUDE.md) and actually guard against a future
+  message-length regression.
 
 ---
 

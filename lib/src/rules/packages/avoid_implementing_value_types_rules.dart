@@ -142,35 +142,67 @@ class AvoidImplementingValueTypesRule extends SaropaLintRule {
     });
   }
 
-  /// Returns true when any interface in [clause] is exactly a known
-  /// value-equality type, or is a resolved class whose own supertype chain
-  /// (extends/with) reaches a known value-equality type. Uses resolved
-  /// element identity (`allSupertypes`) rather than name substring
-  /// matching, so an unrelated `MyEquatableLike` class does not false
-  /// positive, while a genuine `class Money extends Equatable {}` used as
-  /// an interface target is correctly caught.
-  bool _implementsValueEqualityType(ImplementsClause clause) {
-    for (final NamedType interfaceType in clause.interfaces) {
-      final String name = interfaceType.name.lexeme;
-      if (_knownValueEqualityNames.contains(name)) return true;
+  /// Returns true when [type] is itself a known value-equality type, or is
+  /// a resolved class/mixin whose own supertype chain (extends/with/
+  /// implements) reaches one. Shared by [_implementsValueEqualityType] (is
+  /// the *implemented* interface a value type?) and
+  /// [_declaresOwnEqualityContract] (does the class's *own* extends/with
+  /// clause already provide value equality?) so both walk the exact same
+  /// resolved-type logic instead of drifting apart. Uses resolved element
+  /// identity (`allSupertypes`) rather than name substring matching, so an
+  /// unrelated `MyEquatableLike` class does not false positive.
+  bool _resolvesToValueEqualityType(DartType? type) {
+    if (type is! InterfaceType) return false;
+    if (_knownValueEqualityNames.contains(type.element.name)) return true;
 
-      final DartType? resolved = interfaceType.type;
-      if (resolved is! InterfaceType) continue;
-
-      for (final InterfaceType supertype in resolved.element.allSupertypes) {
-        if (_knownValueEqualityNames.contains(supertype.element.name)) {
-          return true;
-        }
+    for (final InterfaceType supertype in type.element.allSupertypes) {
+      if (_knownValueEqualityNames.contains(supertype.element.name)) {
+        return true;
       }
     }
     return false;
   }
 
-  /// Returns true when [node] redeclares both `operator ==` and `hashCode`
-  /// itself. Both are required together — declaring only one still leaves
-  /// the equality contract broken (mismatched == and hashCode is its own
-  /// bug class, but is out of scope for this rule).
+  /// Returns true when any interface in [clause] is exactly a known
+  /// value-equality type, or is a resolved class whose own supertype chain
+  /// reaches one — e.g. `implements Equatable` directly, or
+  /// `implements BaseId` where `BaseId extends Equatable`.
+  bool _implementsValueEqualityType(ImplementsClause clause) {
+    for (final NamedType interfaceType in clause.interfaces) {
+      final String name = interfaceType.name.lexeme;
+      if (_knownValueEqualityNames.contains(name)) return true;
+      if (_resolvesToValueEqualityType(interfaceType.type)) return true;
+    }
+    return false;
+  }
+
+  /// Returns true when [node] already has a real, working equality
+  /// contract — either because its `extends`/`with` clause resolves to a
+  /// known value-equality type (equality is genuinely inherited that way,
+  /// unlike via `implements`), or because it redeclares both
+  /// `operator ==` and `hashCode` itself.
+  ///
+  /// The extends/with check exists for the Dart 3 "interface class" idiom:
+  /// a class can `with EquatableMixin` (or `extends Equatable`) for real
+  /// behavior while separately `implements` an unrelated, Equatable-based
+  /// marker/contract interface purely for typing, e.g.
+  /// `class Money with EquatableMixin implements ValueObject`. Without this
+  /// check, such a class would be flagged even though its equality is
+  /// correct — the `implements` clause never contributed the equality here.
   bool _declaresOwnEqualityContract(ClassDeclaration node) {
+    final DartType? extendsType = node.extendsClause?.superclass.type;
+    if (_resolvesToValueEqualityType(extendsType)) return true;
+
+    final WithClause? withClause = node.withClause;
+    if (withClause != null) {
+      for (final NamedType mixinType in withClause.mixinTypes) {
+        if (_resolvesToValueEqualityType(mixinType.type)) return true;
+      }
+    }
+
+    // Both members are required together — declaring only one still leaves
+    // the equality contract broken (mismatched == and hashCode is its own
+    // bug class, but is out of scope for this rule).
     bool hasEquals = false;
     bool hasHashCode = false;
     for (final ClassMember member in node.bodyMembers) {

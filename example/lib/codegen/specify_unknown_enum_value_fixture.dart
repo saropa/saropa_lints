@@ -9,20 +9,33 @@
 library;
 
 class JsonSerializable {
-  const JsonSerializable();
+  const JsonSerializable({this.createFactory});
+  final bool? createFactory;
 }
 
 class JsonKey {
-  const JsonKey({this.unknownEnumValue, this.ignore, this.includeFromJson});
+  const JsonKey({
+    this.unknownEnumValue,
+    this.ignore,
+    this.includeFromJson,
+    this.fromJson,
+  });
   final Object? unknownEnumValue;
   final bool? ignore;
   final bool? includeFromJson;
+  final Object? fromJson;
 }
 
 class JsonEnum {
   const JsonEnum({this.unknownEnumValue});
   final Object? unknownEnumValue;
 }
+
+// Local stand-in for the hand-written converter a real project would pass to
+// `@JsonKey(fromJson: ...)` — its body is irrelevant, only its presence as a
+// named argument matters to the rule.
+NotificationType _notificationTypeFromJson(String value) =>
+    NotificationType.message;
 
 enum NotificationType { message, reminder, promo }
 
@@ -92,6 +105,78 @@ class NotificationPayloadNotIncludedGood {
   final NotificationType type;
 
   NotificationPayloadNotIncludedGood(this.type);
+}
+
+@JsonSerializable(createFactory: false)
+class NotificationPayloadCreateFactoryFalseGood {
+  // OK — createFactory: false means json_serializable never generates a
+  // fromJson decoder for this class, so there is no decode path that can
+  // throw on an unrecognized enum value.
+  final NotificationType type;
+
+  NotificationPayloadCreateFactoryFalseGood(this.type);
+}
+
+@JsonSerializable()
+class NotificationPayloadCustomFromJsonGood {
+  // OK — a custom fromJson converter replaces the generated enum-map
+  // lookup entirely; json_serializable ignores unknownEnumValue when a
+  // custom converter is configured, so any unknown-value handling lives
+  // inside the converter function instead.
+  @JsonKey(fromJson: _notificationTypeFromJson)
+  final NotificationType type;
+
+  NotificationPayloadCustomFromJsonGood(this.type);
+}
+
+@JsonSerializable()
+class NotificationPayloadNullableBad {
+  // A nullable enum field with no unknownEnumValue still flags: an
+  // unrecognized backend value silently decodes to null rather than
+  // throwing, which can still surprise downstream non-null-aware code.
+  // expect_lint: specify_unknown_enum_value
+  final NotificationType? type;
+
+  NotificationPayloadNullableBad(this.type);
+}
+
+@JsonSerializable()
+class NotificationPayloadMapBad {
+  // Map<K, Enum> fields are supported by unknownEnumValue on the value type
+  // identically to bare enum fields, so this should flag the same way.
+  // expect_lint: specify_unknown_enum_value
+  final Map<String, NotificationType> typesById;
+
+  NotificationPayloadMapBad(this.typesById);
+}
+
+@JsonSerializable()
+class NotificationPayloadMapGood {
+  // OK — the map value's unrecognized entries fall back to
+  // NotificationTypeSafe.unknown instead of throwing.
+  @JsonKey(unknownEnumValue: NotificationTypeSafe.unknown)
+  final Map<String, NotificationTypeSafe> typesById;
+
+  NotificationPayloadMapGood(this.typesById);
+}
+
+// Class-level @JsonEnum with no @JsonSerializable of its own — a shared
+// enum-decoding config class, still in scope per the rule's doc comment.
+@JsonEnum()
+class NotificationPayloadJsonEnumOnlyBad {
+  // expect_lint: specify_unknown_enum_value
+  final NotificationType type;
+
+  NotificationPayloadJsonEnumOnlyBad(this.type);
+}
+
+@JsonEnum(unknownEnumValue: NotificationTypeSafe.unknown)
+class NotificationPayloadJsonEnumOnlyGood {
+  // OK — the class-level @JsonEnum(unknownEnumValue: ...) covers this field
+  // even though the class carries no @JsonSerializable() of its own.
+  final NotificationTypeSafe type;
+
+  NotificationPayloadJsonEnumOnlyGood(this.type);
 }
 
 // GOOD near-miss: non-enum field, should never be flagged even though the

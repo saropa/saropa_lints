@@ -21,7 +21,7 @@ import '../../saropa_lint_rule.dart';
 /// ordered differently from the corresponding field declarations in the
 /// enclosing class body.
 ///
-/// Since: v15.4.0 | Updated: v15.4.0 | Rule version: v1
+/// Since: v15.4.0 | Updated: v15.4.0 | Rule version: v2
 ///
 /// Only [ConstructorFieldInitializer] entries (`: field = expr`) are
 /// compared against each other, in the relative order they appear in the
@@ -30,7 +30,16 @@ import '../../saropa_lint_rule.dart';
 /// `this(...)` redirecting calls are excluded from the comparison entirely
 /// — they are not a field-declaration-order concept — so a list mixing
 /// asserts with field assignments is only checked among the field
-/// assignments.
+/// assignments. Constructor-shorthand parameters (`this.x`) never appear as
+/// [ConstructorFieldInitializer] nodes, so they are implicitly excluded too
+/// — only the remaining explicit initializer-list entries are compared.
+///
+/// Checks constructors declared inside both classes and enums — an enum's
+/// `const` constructor can have a multi-field initializer list just like a
+/// class constructor.
+///
+/// Only the first out-of-order entry is reported per constructor; fixing it
+/// and re-linting may surface further regressions later in the same list.
 ///
 /// **BAD:**
 /// ```dart
@@ -70,9 +79,12 @@ class InitializersOrderingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
-  // Cheap pre-filter: only files with an initializer-list colon on a
-  // constructor can possibly contain a violation. This skips parsing for
-  // the large fraction of files with no constructors at all.
+  // Cheap pre-filter: a constructor initializer list always starts with a
+  // `:` before the body. NOTE: this is a weak filter in practice — a bare
+  // `:` also matches ternaries, named-parameter defaults, switch/case
+  // labels, and `dart:`/`package:` import URIs, so it rarely skips a real
+  // file. Kept anyway because it is still a correct (if rarely-triggered)
+  // pre-parse skip and costs nothing to check.
   @override
   Set<String>? get requiredPatterns => const {':'};
 
@@ -142,28 +154,45 @@ class InitializersOrderingRule extends SaropaLintRule {
   }
 
   /// Builds a map of field name -> declaration index for every
-  /// [FieldDeclaration] in the constructor's enclosing class body, in
-  /// source order. Multiple variables in one `final int x, y;` declaration
-  /// each get their own index, in the order they appear in that
-  /// declaration, so `final int x, y;` still orders `x` before `y`.
+  /// instance [FieldDeclaration] in the constructor's enclosing class or
+  /// enum body, in source order. Multiple variables in one `final int x,
+  /// y;` declaration each get their own index, in the order they appear in
+  /// that declaration, so `final int x, y;` still orders `x` before `y`.
+  /// Static fields are skipped — they can never appear in a constructor
+  /// initializer list, so including them would only add noise to the index
+  /// map (relative order among instance fields is unaffected either way).
   Map<String, int> _fieldDeclarationOrder(ConstructorDeclaration node) {
-    // `node.parent` is NOT reliably the enclosing ClassDeclaration: in
-    // analyzer 12's declaring-constructors AST, class members live under an
-    // intermediate `ClassBody` (`BlockClassBody`) node, so a constructor's
-    // direct parent is that body, not the class itself. Walk up via
-    // thisOrAncestorOfType instead, which is stable across the analyzer
-    // versions this package supports.
-    final parent = node.thisOrAncestorOfType<ClassDeclaration>();
-    if (parent == null) return const {};
+    // `node.parent` is NOT reliably the enclosing ClassDeclaration/
+    // EnumDeclaration: in analyzer 12's declaring-constructors AST, class
+    // members live under an intermediate `ClassBody`/`EnumBody`
+    // (`BlockClassBody`) node, so a constructor's direct parent is that
+    // body, not the declaration itself. Walk up via thisOrAncestorOfType
+    // instead, which is stable across the analyzer versions this package
+    // supports.
+    //
+    // Enum constructors (`const Suit(this.symbol, this.name) : ...`) can
+    // have multi-field initializer lists just like class constructors, so
+    // both declaration kinds are checked here — a class-only check would
+    // silently skip enum constructors entirely.
+    final classParent = node.thisOrAncestorOfType<ClassDeclaration>();
+    final List<ClassMember> members;
+    if (classParent != null) {
+      // Use the `.bodyMembers` compat shim (lib/src/analyzer_compat.dart)
+      // rather than `.members` directly — ClassDeclaration no longer
+      // exposes `.members` in analyzer 12 (members moved under `.body`),
+      // and older pinned analyzer versions have their own quirks the shim
+      // absorbs.
+      members = classParent.bodyMembers;
+    } else {
+      final enumParent = node.thisOrAncestorOfType<EnumDeclaration>();
+      if (enumParent == null) return const {};
+      members = enumParent.bodyMembers;
+    }
 
     final order = <String, int>{};
     var index = 0;
-    // Use the `.bodyMembers` compat shim (lib/src/analyzer_compat.dart)
-    // rather than `.members` directly — ClassDeclaration no longer exposes
-    // `.members` in analyzer 12 (members moved under `.body`), and older
-    // pinned analyzer versions have their own quirks the shim absorbs.
-    for (final member in parent.bodyMembers) {
-      if (member is! FieldDeclaration) continue;
+    for (final member in members) {
+      if (member is! FieldDeclaration || member.isStatic) continue;
       for (final variable in member.fields.variables) {
         order[variable.name.lexeme] = index;
         index++;

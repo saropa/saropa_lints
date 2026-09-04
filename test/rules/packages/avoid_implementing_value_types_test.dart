@@ -6,12 +6,9 @@ import '../../support/resolved_rule_harness.dart';
 
 /// Tests for AvoidImplementingValueTypesRule.
 ///
-/// The rule is not yet wired into the global tier registry (a separate
-/// process handles the three-way registration centrally to avoid merge
-/// conflicts across parallel rule-authoring agents). The firing tests below
-/// therefore exercise the rule class directly via the resolved-rule
-/// harness, which runs a single rule against inline source without
-/// depending on lib/saropa_lints.dart or lib/src/tiers.dart.
+/// The firing tests below exercise the rule class directly via the
+/// resolved-rule harness, which runs a single rule against inline source
+/// without depending on lib/saropa_lints.dart or lib/src/tiers.dart.
 ///
 /// The example package (which the harness resolves fixtures against) does
 /// not depend on the `equatable` package, so `Equatable` resolves to an
@@ -133,6 +130,101 @@ class UserId implements Comparable<UserId> {
 
   @override
   int compareTo(UserId other) => value.compareTo(other.value);
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_implementing_value_types')));
+      },
+    );
+
+    // Regression test for the headline resolved-supertype walk
+    // (_implementsValueEqualityType iterating allSupertypes): the fixture's
+    // OrderId/BaseId pair exercised this but was never covered by a unit
+    // test (Finish Report Issue #2), so a future analyzer upgrade changing
+    // InterfaceType.element semantics would regress silently.
+    test(
+      'fires on implements of a class that itself extends Equatable '
+      '(indirect supertype)',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+abstract class BaseId extends Equatable {}
+
+class OrderId implements BaseId {
+  OrderId(this.raw);
+  final String raw;
+
+  @override
+  List<Object?> get props => [raw];
+}
+''',
+        );
+        expect(codes, contains('avoid_implementing_value_types'));
+      },
+    );
+
+    // Regression test for Finish Report Issue #1: a class that gets real
+    // equality from `with EquatableMixin` but separately `implements` an
+    // Equatable-derived marker/contract interface (the Dart 3 "interface
+    // class" idiom) must not be flagged — the implements clause did not
+    // cause the identity-equality footgun here.
+    test(
+      'does not fire when equality comes from a mixin and implements '
+      'targets an Equatable-derived marker interface',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+mixin EquatableMixin {
+  List<Object?> get props;
+}
+
+abstract class ValueObject extends Equatable {}
+
+class Money with EquatableMixin implements ValueObject {
+  Money(this.cents);
+  final int cents;
+
+  @override
+  List<Object?> get props => [cents];
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_implementing_value_types')));
+      },
+    );
+
+    // Regression test for the second half of Issue #1: `extends Equatable`
+    // (real equality) plus a redundant `implements` of a derived marker
+    // interface on top of it must also not be flagged.
+    test(
+      'does not fire when equality comes from extends Equatable and '
+      'implements targets a derived marker interface',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+abstract class ValueObject extends Equatable {}
+
+class Money extends Equatable implements ValueObject {
+  Money(this.cents);
+  final int cents;
+
+  @override
+  List<Object?> get props => [cents];
 }
 ''',
         );

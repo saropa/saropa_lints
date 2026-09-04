@@ -260,6 +260,11 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 ///
 /// Generic exceptions provide less context for error handling.
 ///
+/// This rule targets `throw Exception(...)`/`throw Error(...)` calls only.
+/// The related bare-`String` case (`throw 'message';`) is a distinct smell
+/// covered by `prefer_typed_exceptions` — kept as a separate rule so the two
+/// classes of violation don't double-report under each other's name.
+///
 /// **BAD:**
 /// ```dart
 /// throw Exception('Something went wrong');

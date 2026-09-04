@@ -2929,6 +2929,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferTypedExceptionsRule.new,
   AvoidImplementingValueTypesRule.new,
   NewInstanceCascadeRule.new,
+  NamedParametersOrderingRule.new,
+  UseCompareWithoutCaseRule.new,
   AvoidMountedCheckInFinallyRule.new,
   NeverDiscardBuildContextRule.new,
 ];

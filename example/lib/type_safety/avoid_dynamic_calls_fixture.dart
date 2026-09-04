@@ -56,13 +56,98 @@ void _goodExplicitCast() {
   invoice.calculateTotal();
 }
 
-/// GOOD: `noSuchMethod` overrides intentionally dispatch dynamically — the
-/// call on the dynamic-typed local below is the whole point of the
-/// override, so the rule skips this call site.
+// GOOD: null-aware access on a dynamic receiver — null-awareness does not
+// change the target's static type, so the rule still fires on `?.`/`?[]`
+// the same as it does on plain `.`/`[]`.
+void _badNullAwareAccess() {
+  dynamic maybeInvoice = Invoice();
+  // expect_lint: avoid_dynamic_calls
+  maybeInvoice?.calculateTotal();
+  dynamic maybeList = <int>[1, 2, 3];
+  // expect_lint: avoid_dynamic_calls
+  final int? first = maybeList?[0] as int?;
+}
+
+// BAD: cascade on a dynamic receiver — the individual cascaded calls have
+// no explicit target (implicit receiver), so only the CascadeExpression
+// itself is checked; expect exactly one diagnostic for the whole cascade.
+void _badCascade() {
+  dynamic value = Invoice();
+  // expect_lint: avoid_dynamic_calls
+  value
+    ..calculateTotal()
+    ..toString();
+}
+
+// GOOD: cascade on a statically-typed receiver is fully checked.
+void _goodCascade() {
+  typedInvoice
+    ..calculateTotal()
+    ..toString();
+}
+
+// BAD: compound assignment invokes the dynamic `+` operator the same way
+// `dynamicValue + 1` does.
+void _badCompoundAssignment() {
+  dynamic counter = 0;
+  // expect_lint: avoid_dynamic_calls
+  counter += 1;
+}
+
+// GOOD: plain assignment does not invoke any member on the existing
+// left-hand value, so it is never flagged even on a dynamic receiver.
+void _goodPlainAssignment() {
+  dynamic counter = 0;
+  counter = 1;
+  counter ??= 2;
+}
+
+// BAD: prefix/postfix operators invoke dynamic operator methods on the
+// operand, same risk class as the covered binary-operator case.
+void _badPrefixPostfix() {
+  dynamic counter = 0;
+  // expect_lint: avoid_dynamic_calls
+  counter++;
+  // expect_lint: avoid_dynamic_calls
+  --counter;
+  dynamic flags = 0;
+  // expect_lint: avoid_dynamic_calls
+  final dynamic inverted = ~flags;
+}
+
+// BAD: calling a dynamic value as a function dispatches through its
+// synthetic `call()` method — unchecked exactly like a named dynamic
+// method call.
+void _badDynamicFunctionCall() {
+  dynamic fn = () => 1;
+  // expect_lint: avoid_dynamic_calls
+  fn();
+}
+
+// GOOD: calling a statically-typed function value is fully checked.
+void _goodTypedFunctionCall() {
+  int Function() fn = () => 1;
+  fn();
+}
+
+/// `noSuchMethod` overrides intentionally dispatch dynamically for call
+/// sites derived from the `Invocation` parameter — those are the whole
+/// point of the override and are skipped. A dynamic call elsewhere in the
+/// same body that does NOT touch `invocation` is unrelated to that
+/// contract and must still be flagged.
 class DynamicProxy {
   @override
   dynamic noSuchMethod(Invocation invocation) {
+    // GOOD: `positionalArguments[0]` is dynamic (List<dynamic> element),
+    // and calling `.toString()` on it derives from the `invocation`
+    // parameter — this is the intentional dispatch the override exists
+    // for, so it stays exempt.
+    final String first = invocation.positionalArguments[0].toString();
+
+    // BAD: an unrelated dynamic call in the same override body, not
+    // derived from `invocation` — the narrowed exemption still flags this.
     dynamic fallback = 0;
+    // expect_lint: avoid_dynamic_calls
     return fallback.toString();
   }
 }

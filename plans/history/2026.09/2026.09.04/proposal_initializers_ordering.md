@@ -86,7 +86,7 @@ Implemented.
 
 - **Rule class:** `InitializersOrderingRule` in `lib/src/rules/code_quality/initializers_ordering_rules.dart` (pre-existing from a prior interrupted session; only the fixture/test/bugfix work was done in this pass).
 - **Rule name string:** `initializers_ordering`.
-- **Tier:** Recommend **Pedantic**, per the proposal's own "Proposed Tier" section — cosmetic ordering rule with zero runtime/correctness impact, consistent with the proposal's justification. (Not wired into `lib/src/tiers.dart` yet — central registration is out of scope for this pass per instructions; someone still needs to add the name string to `pedanticOnlyRules` and the `MyRule.new` factory to `lib/saropa_lints.dart`.)
+- **Tier:** Pedantic, per the proposal's own "Proposed Tier" section — cosmetic ordering rule with zero runtime/correctness impact, consistent with the proposal's justification. Fully registered in all three required places: `lib/saropa_lints.dart`, `lib/src/tiers.dart` (`pedanticOnlyRules`), and `lib/src/rules/all_rules.dart`.
 - **Files added:**
   - `example/lib/code_quality/initializers_ordering_fixture.dart` — 6 classes: 2 BAD (two-field swap, three-field partial regression) with line-precise `// expect_lint: initializers_ordering` markers, and 4 GOOD near-misses (already-ordered fields, `assert(...)` interleaved between correctly-ordered fields, a `super(...)` redirect call, and a single-field initializer list).
   - `test/rules/code_quality/initializers_ordering_test.dart` — 6 oracle-backed tests via `test/support/resolved_rule_harness.dart` (`reportedRuleCodes`), mirroring the fixture's cases.
@@ -119,5 +119,19 @@ None identified. All 6 existing tests (`test/rules/code_quality/initializers_ord
 2. **(Doc accuracy)** Correct or remove the stale "Not wired into `lib/src/tiers.dart` yet" line in this file's own Implementation Notes section — the rule is fully registered in all three required places today.
 3. **(Doc precision, low priority)** Add "enum declarations are not currently checked" to the rule's DartDoc alongside the existing assert/super/this exclusions, so the scope limitation is discoverable without reading the source.
 4. **(Follow-up, optional)** Consider the auto-fix companion the proposal already flagged as low-risk and recommended — natural next increment, not required for this rule to ship as-is.
+
+## Follow-up (2026-09-04)
+
+All four Finish Report recommendations addressed in `lib/src/rules/code_quality/initializers_ordering_rules.dart`:
+
+1. **Enum support added** (Concern + Recommendation 3, reversed): rather than documenting enums as excluded, `_fieldDeclarationOrder` now also walks `EnumDeclaration.bodyMembers` when the constructor's enclosing declaration is an enum, not a class. Two new fixture cases (`EnumBad`/`EnumOk`) and two new tests cover this.
+2. **`this.x` shorthand coverage added** (Opportunity/Recommendation 1): `ThisShorthandOk`/`ThisShorthandBad` fixture classes plus two matching tests confirm the shorthand field's position is invisible to the ordering comparison and does not shield an out-of-order pair among the remaining explicit entries.
+3. **Doc accuracy fixed** (Recommendation 2): the stale "Not wired into tiers.dart yet" line above is corrected.
+4. **`requiredPatterns` comment corrected** (Concern 2): no longer claims the `:` pre-filter skips "the large fraction of files with no constructors" — now states plainly that it is a weak filter that rarely triggers in practice, kept because it is still a correct free check.
+5. **Static-field filtering added** (Opportunity 3, minor): `_fieldDeclarationOrder` now skips `FieldDeclaration`s with `isStatic == true` when building the index map.
+6. **Multi-regression behavior documented** (Concern 3): the rule's doc comment now states only the first out-of-order entry is reported per constructor.
+7. **Auto-fix companion (Recommendation 4) NOT implemented** — deferred as an optional follow-up, consistent with the Finish Report's own "optional" framing; not required for this rule to ship.
+
+Verification: `dart test test/rules/code_quality/initializers_ordering_test.dart` — 10/10 passing (6 original + 4 new: this.x-ok, this.x-bad, enum-bad, enum-ok).
 
 ## Commits

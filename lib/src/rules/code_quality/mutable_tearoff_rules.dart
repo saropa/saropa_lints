@@ -25,6 +25,21 @@ import '../../saropa_lint_rule.dart';
 /// still flagged — narrowing that away would require full data-flow
 /// analysis, which is out of scope for this check.
 ///
+/// A tear-off is only in scope when it is actually STORED somewhere it
+/// outlives the current expression: a variable/field initializer, a plain
+/// or compound (`??=`) assignment, a constructor initializer-list
+/// assignment, a `return`/arrow-body expression, or an element of a
+/// list/set/map/record literal. A tear-off used only as a one-shot call
+/// argument (`list.forEach(mutableVar.method)`) is deliberately excluded —
+/// it is never retained past the call, so it carries no staleness risk.
+///
+/// Out of scope for v1 (documented, not silently missed): chained
+/// receivers (`obj.field.method`) and a tear-off passed as a named
+/// argument to a call that itself retains it beyond one shot (e.g. a
+/// constructor argument stored into a field elsewhere) — both would
+/// require walking further up the call graph than a single-node check
+/// supports.
+///
 /// **BAD:**
 /// ```dart
 /// class Controller {
@@ -121,18 +136,68 @@ class MutableTearoffRule extends SaropaLintRule {
     });
   }
 
-  /// True when [node] is the right-hand side of a stored assignment: a
-  /// variable/field initializer (`final x = ...`, including field
-  /// declarations, which share the same [VariableDeclaration] shape) or an
-  /// assignment to an existing variable/field (`x = ...`).
+  /// True when [node] is retained past the current statement/expression —
+  /// a variable/field initializer (`final x = ...`, including field
+  /// declarations, which share the same [VariableDeclaration] shape), an
+  /// assignment to an existing variable/field (`x = ...` or `x ??= ...`,
+  /// both parse as [AssignmentExpression] regardless of operator), a
+  /// constructor initializer-list assignment (`C() : x = handler.method;`),
+  /// a value handed back to the caller (`return handler.method;` or the
+  /// arrow-bodied equivalent), or an element of a collection/record literal
+  /// (`[handler.method]`, `{k: handler.method}`, `(handler.method,)`) —
+  /// all of these keep the tear-off alive at least as long as the
+  /// container that holds it, which is the same staleness risk a direct
+  /// assignment carries.
   bool _isStored(PrefixedIdentifier node) {
     final AstNode? parent = node.parent;
+
     if (parent is VariableDeclaration && parent.initializer == node) {
       return true;
     }
     if (parent is AssignmentExpression && parent.rightHandSide == node) {
       return true;
     }
+    if (parent is ConstructorFieldInitializer && parent.expression == node) {
+      // `Controller() : onTap = handler.handleTap;` — stores the tear-off
+      // into a field via the initializer list, same risk as a field
+      // initializer or plain assignment.
+      return true;
+    }
+    if (parent is ReturnStatement && parent.expression == node) {
+      // `return handler.handleTap;` hands the tear-off to the caller,
+      // which is free to store it — the staleness risk moves with it.
+      return true;
+    }
+    if (parent is ExpressionFunctionBody && parent.expression == node) {
+      // `VoidCallback getCallback() => handler.handleTap;` — the
+      // arrow-bodied equivalent of a return statement.
+      return true;
+    }
+    if (parent is ListLiteral || parent is SetOrMapLiteral) {
+      // A direct element of `[...]` or `{...}` (set form) — retained as
+      // long as the collection itself.
+      return true;
+    }
+    if (parent is MapLiteralEntry && parent.value == node) {
+      // Value side of `key: handler.handleTap` in a map literal.
+      return true;
+    }
+    if (parent is RecordLiteral) {
+      // Positional record field: `(handler.handleTap,)`.
+      return true;
+    }
+    if (parent is NamedExpression &&
+        parent.expression == node &&
+        parent.parent is RecordLiteral) {
+      // Named record field: `(named: handler.handleTap,)`. Deliberately
+      // NOT true for a named expression whose parent is an argument list
+      // (`fn(named: handler.handleTap)`) — that shape is a call argument,
+      // out of scope per the "Alternatives Considered" one-shot exclusion,
+      // unless the call itself is not one-shot (already out of scope for
+      // v1; see the rule's dartdoc "Known limitation").
+      return true;
+    }
+
     return false;
   }
 

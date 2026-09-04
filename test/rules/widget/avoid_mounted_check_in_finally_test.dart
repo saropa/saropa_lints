@@ -1,11 +1,11 @@
 // Regression/behavior tests for avoid_mounted_check_in_finally.
 //
-// The rule is not yet wired into the global tier registry (a separate
-// process handles the three-way registration centrally to avoid merge
-// conflicts across parallel rule-authoring agents). This test therefore
-// exercises the rule class directly via the resolved-rule harness, which
-// runs a single rule against inline source without depending on
-// lib/saropa_lints.dart or lib/src/tiers.dart.
+// The rule is fully registered (export in lib/src/rules/all_rules.dart,
+// factory in lib/saropa_lints.dart, tier assignment in lib/src/tiers.dart).
+// This test exercises the rule class directly via the resolved-rule harness,
+// which runs a single rule against inline source without depending on any
+// of those three registration points — that keeps the test fast and immune
+// to unrelated registration churn elsewhere in the codebase.
 //
 // The harness resolves fixtures against the `example` package, which has no
 // Flutter dependency — `State`/`Widget` resolve to InvalidType there. The
@@ -185,6 +185,122 @@ class MyState extends State<StatefulWidget> {
       }
     } finally {
       print('load attempted');
+    }
+  }
+}
+''',
+        );
+        expect(codes, isEmpty);
+      },
+    );
+
+    test(
+      'fires when the async gap is opened by an await in a catch clause '
+      'rather than the try body',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  Future<void> _save() async {
+    try {
+      _syncOp();
+    } catch (e) {
+      await _recover();
+    } finally {
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  void _syncOp() {}
+
+  Future<void> _recover() async {}
+}
+''',
+        );
+        expect(codes, contains('avoid_mounted_check_in_finally'));
+      },
+    );
+
+    test(
+      'fires when the guarded call targets ScaffoldMessenger, not just '
+      'Navigator',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Done')),
+        );
+      }
+    }
+  }
+}
+''',
+        );
+        expect(codes, contains('avoid_mounted_check_in_finally'));
+      },
+    );
+
+    test(
+      'does NOT fire on a compound condition (mounted && x) — out of scope '
+      'by design, only the exact mounted/!mounted shapes are matched',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  bool _shouldUpdate = true;
+
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      if (mounted && _shouldUpdate) {
+        setState(() {});
+      }
+    }
+  }
+}
+''',
+        );
+        expect(codes, isEmpty);
+      },
+    );
+
+    test(
+      'does NOT fire when the mounted check is inside a nested closure '
+      'created within finally, not the finally block itself',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      Future<void>(() async {
+        if (mounted) {
+          setState(() {});
+        }
+      });
     }
   }
 }

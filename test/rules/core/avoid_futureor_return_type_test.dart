@@ -1,11 +1,11 @@
 // Regression/behavior tests for avoid_futureor_return_type.
 //
-// The rule is not yet wired into the global tier registry (a separate
-// process handles the three-way registration centrally to avoid merge
-// conflicts across parallel rule-authoring agents). This test therefore
-// exercises the rule class directly via the resolved-rule harness, which
-// runs a single rule against inline source without depending on
-// lib/saropa_lints.dart or lib/src/tiers.dart.
+// This test exercises the rule class directly via the resolved-rule
+// harness, which runs a single rule against inline source without
+// depending on lib/saropa_lints.dart or lib/src/tiers.dart. (The rule IS
+// fully registered there — see lib/saropa_lints.dart, lib/src/tiers.dart,
+// and lib/src/rules/all_rules.dart — this harness is just the project's
+// standard fast unit-test path, independent of global wiring.)
 library;
 
 import 'package:saropa_lints/src/rules/core/avoid_futureor_return_type_rules.dart';
@@ -126,6 +126,101 @@ class Holder {
 ''',
       );
       expect(codes, isEmpty);
+    });
+
+    test('fires on a nullable FutureOr<T>? return type', () async {
+      // Nullability is a separate AST field from the NamedType's lexeme, so
+      // the exact-name check must still match `FutureOr<int>?`.
+      final codes = await reportedRuleCodes(
+        AvoidFutureorReturnTypeRule(),
+        '''
+import 'dart:async';
+
+FutureOr<int>? getValue() => null;
+''',
+      );
+      expect(codes, contains('avoid_futureor_return_type'));
+    });
+
+    test(
+      'does NOT fire on a getter override — same exemption as method '
+      'overrides',
+      () async {
+        final diags = await runRuleResolved(
+          AvoidFutureorReturnTypeRule(),
+          '''
+import 'dart:async';
+
+abstract class Base {
+  FutureOr<int> get cachedTotal;
+}
+
+class Impl extends Base {
+  @override
+  FutureOr<int> get cachedTotal => 1;
+}
+''',
+        );
+        // The base declaration (line 4) is flagged; the override (line 9) is not.
+        expect(diags.map((d) => d.line), contains(4));
+        expect(diags.map((d) => d.line), isNot(contains(9)));
+      },
+    );
+
+    test(
+      'does NOT fire on an override that omits @override — the exemption '
+      'is resolution-based (checks the supertype chain), not '
+      'annotation-based, since Dart never requires @override to correctly '
+      'implement an interface member',
+      () async {
+        final diags = await runRuleResolved(
+          AvoidFutureorReturnTypeRule(),
+          '''
+import 'dart:async';
+
+abstract class Base {
+  FutureOr<int> compute();
+}
+
+class Impl implements Base {
+  FutureOr<int> compute() => 1;
+}
+''',
+        );
+        // The base declaration (line 4) is flagged; the unannotated
+        // override (line 8) must NOT be — this is the FP the resolution-
+        // based _isOverride check exists to prevent.
+        expect(diags.map((d) => d.line), contains(4));
+        expect(diags.map((d) => d.line), isNot(contains(8)));
+      },
+    );
+
+    test('fires on a mixin method returning FutureOr<T>', () async {
+      final codes = await reportedRuleCodes(
+        AvoidFutureorReturnTypeRule(),
+        '''
+import 'dart:async';
+
+mixin Mixin {
+  FutureOr<int> mixinMethod() => 1;
+}
+''',
+      );
+      expect(codes, contains('avoid_futureor_return_type'));
+    });
+
+    test('fires on an extension method returning FutureOr<T>', () async {
+      final codes = await reportedRuleCodes(
+        AvoidFutureorReturnTypeRule(),
+        '''
+import 'dart:async';
+
+extension StringExt on String {
+  FutureOr<int> extensionMethod() => 1;
+}
+''',
+      );
+      expect(codes, contains('avoid_futureor_return_type'));
     });
   });
 }

@@ -541,7 +541,7 @@ PARTIAL if a rule with this exact name already exists), `functional_ref`, `notif
 
 - **Source**: github.com/solid-software/solid_lints
 - **Total rules**: 31
-- **Coverage**: HAVE: 15, PARTIAL: 3, GAP: 13
+- **Coverage**: HAVE: 16, PARTIAL: 3, GAP: 12
 
 **Bug found in saropa_lints itself (not an alternative-package gap):** `use_closest_build_context`
 (`lib/src/rules/core/context_rules.dart:1483`, class `UseClosestBuildContextRule`) is registered with a real
@@ -551,12 +551,16 @@ PARTIAL if a rule with this exact name already exists), `functional_ref`, `notif
 
 `avoid_duplicate_code` (cross-project AST clone detector), `avoid_final_with_getter`,
 `avoid_unnecessary_return_variable`, `avoid_using_api` (generic config-driven banned-API mechanism),
-`feature_envy`, `function_lines_of_code`, `named_parameters_ordering`, `newline_before_return`,
+`feature_envy`, `function_lines_of_code`, `newline_before_return`,
 `prefer_first`/`prefer_last` (index-0/length-1 → `.first`/`.last`), `use_descriptive_names_for_type_parameters`,
 `use_nearest_context` (effectively a gap — corresponds to the empty-stub bug above), and two name-collision
 false-HAVEs reclassified to GAP after reading actual doc content: `avoid_returning_widgets` (their check is
 different from saropa's same-named rule) and `avoid_similar_names` (same — saropa's same-named rule is
 actually about enum-indexed Map literals).
+
+#### Closed (saropa now covers)
+
+`named_parameters_ordering`.
 
 #### Partial
 
@@ -570,14 +574,18 @@ actually about enum-indexed Map literals).
 - **Source**: github.com/leancodepl/flutter_corelibrary (packages/leancode_lint), v27.0.0, already migrated to
   `analysis_server_plugin`
 - **Total rules**: 23
-- **Coverage**: HAVE: 9, PARTIAL: 5, GAP: 9
+- **Coverage**: HAVE: 10, PARTIAL: 5, GAP: 8
 
 #### Gaps
 
 `add_cubit_suffix_for_your_cubits`, `avoid_catch_error` (saropa's `prefer_then_catcherror` recommends the
 opposite), `bloc_subclasses_naming`, `constructor_parameters_and_fields_should_have_the_same_order`,
-`never_discard_build_context`, `prefer_center_over_align` (not active upstream), `start_comments_with_space`,
+`prefer_center_over_align` (not active upstream), `start_comments_with_space`,
 `use_design_system_item`, `use_padding` (`Container(margin:, [key], [child])` only → `Padding`).
+
+#### Closed (saropa now covers)
+
+`never_discard_build_context`.
 
 #### Partial
 
@@ -915,14 +923,12 @@ see Gap Theme 6 (JSON-codegen annotation-contract enforcement).
 
 - **Source**: github.com/bahricanyesil/flutter-custom-lints
 - **Total rules**: 5
-- **Coverage**: HAVE: 2, PARTIAL: 1, GAP: 2
+- **Coverage**: HAVE: 4, PARTIAL: 1, GAP: 0
 
-#### Gaps
+#### Closed (saropa now covers)
 
-- `no_direct_iterable_access` — flags any direct `[]` index access on Iterable/List, suggesting a project-defined
-  `safeAt()` extension; no saropa equivalent (`prefer_list_first`/`prefer_list_last` are stylistic aliases only).
-- `use_compare_without_case` — flags `==`/`!=` between `String` operands, suggesting a `compareWithoutCase()`
-  extension; saropa's `avoid_case_sensitive_path_comparison` is scoped to file paths only.
+- `no_direct_iterable_access` — saropa now has this rule directly.
+- `use_compare_without_case` — saropa now has this rule directly.
 
 #### Partial
 
@@ -961,15 +967,18 @@ see Gap Theme 6 (JSON-codegen annotation-contract enforcement).
 
 - **Source**: github.com/FMorschel/essential_lints
 - **Total rules**: 27 (23 in `rules/`, 4 in `warnings/`)
-- **Coverage**: HAVE: 9, PARTIAL: 5, GAP: 13
+- **Coverage**: HAVE: 14, PARTIAL: 5, GAP: 8
 
 #### Gaps
 
 `alphabetize_arguments`, `alphabetize_enum_constants`, `border_all`, `closure_incorrect_type`,
-`duplicate_value` (within one boolean expression, distinct from saropa's cross-branch `no_equal_conditions`),
-`empty_container`, `getters_in_member_list`, `is_future`, `mutable_tearoff`, `new_instance_cascade`,
+`empty_container`,
 `prefer_explicitly_named_parameters`, `returning_widgets`, `sorting_members` (own annotation-driven
 member-sort system), `standard_comment_style`, `subtype_annotating`, `subtype_naming`, `variable_shadowing`.
+
+#### Closed (saropa now covers)
+
+`duplicate_value`, `getters_in_member_list`, `is_future`, `mutable_tearoff`, `new_instance_cascade`.
 
 #### Partial
 
@@ -1007,14 +1016,14 @@ equivalents are stricter and actually working.
 
 - **Source**: github.com/ripplearc/ripplearc-flutter-lint (one company's internal linter, open-sourced as-is)
 - **Total rules**: 24
-- **Coverage**: HAVE: 5, PARTIAL: 4, GAP: 15
+- **Coverage**: HAVE: 6, PARTIAL: 4, GAP: 14
 
 Most GAPs here are single-company internal conventions (specific class names, one issue-tracker URL pattern,
 one DI framework's API) rather than broadly applicable rules.
 
 #### Gaps
 
-`document_enum`, `document_fake_parameters`, `document_interface`, `forbid_helper_util_naming`,
+`document_fake_parameters`, `document_interface`, `forbid_helper_util_naming`,
 `forbid_manual_screenshot_theme` (project-specific golden-test convention), `forbid_raw_icon_and_image_usage`,
 `no_direct_instantiation`, `no_internal_method_docs`, `no_optional_operators_in_tests`,
 `prevent_feature_module_dependencies`, `prevent_library_module_dependencies`, `private_subject`,
@@ -1029,6 +1038,10 @@ reference a ticket" concept has no saropa equivalent either, even setting aside 
 - `forbid_modular_get_outside_module` — saropa's `avoid_service_locator_in_widgets` is narrower (widgets only).
 - `prefer_fake_over_mock` — saropa has a same-named rule but its doc describes "excessive mocking" generally,
   not specifically the `extends Mock` → `extends Fake` pattern; needs verification.
+
+#### Closed (saropa now covers)
+
+`document_enum`.
 
 ### subpackage_lint
 
@@ -1089,14 +1102,16 @@ saropa's `avoid_hardcoded_strings_in_ui` and `prefer_switch_with_enums`.
 
 - **Source**: github.com/Nikoro/many_lints
 - **Total rules**: 261
-- **Coverage**: HAVE: 190, PARTIAL: 3, GAP: 68
+- **Coverage**: HAVE: 192, PARTIAL: 3, GAP: 66
 
 See Gap Themes 1 (fpdart, ~26 of the 68), 2 (banned-* config engines), 3 (Riverpod), 9 (budget rules), 10
 (test hygiene), 11 (new Dart syntax). Remaining non-themed gaps: `avoid_commented_out_code`,
 `avoid_exit_outside_entrypoint`, `avoid_single_child_in_multi_child_widgets`,
-`avoid_unmodified_loop_condition`, `member_ordering`/`match_pattern` config engines, `never_discard_build_context`,
+`avoid_unmodified_loop_condition`, `member_ordering`/`match_pattern` config engines,
 `prefer_container`, `prefer_immutable_state` (name-pattern-matched, state-management-agnostic variant),
-`prefer_theme_mode_getters`, `prefer_typed_exceptions`, `require_atomic_async_updates`, `use_gap`.
+`prefer_theme_mode_getters`, `require_atomic_async_updates`, `use_gap`.
+
+Closed (saropa now covers): `never_discard_build_context`, `prefer_typed_exceptions`.
 
 #### Partial
 
@@ -1108,15 +1123,15 @@ See Gap Themes 1 (fpdart, ~26 of the 68), 2 (banned-* config engines), 3 (Riverp
 
 - **Source**: github.com/sgaabdu4/flutter_skill_lints
 - **Total rules**: 279
-- **Coverage**: HAVE: 231, PARTIAL: 7, GAP: 41
+- **Coverage**: HAVE: 234, PARTIAL: 6, GAP: 39
 
 #### Gaps
 
 `avoid_any_version`, `avoid_banned_exports`, `avoid_banned_file_names`, `avoid_banned_imports`,
-`avoid_calling_notifier_members_inside_build`, `avoid_dependency_overrides`, `avoid_disposing_late_fields`,
+`avoid_calling_notifier_members_inside_build`, `avoid_dependency_overrides`,
 `avoid_flutter_skill_lint_suppression`, `avoid_implementation_in_mocks`, `avoid_inline_error_codes`,
 `avoid_labels`, `avoid_local_contract_key_constants`, `avoid_missing_test_files`,
-`avoid_misused_wildcard_pattern`, `avoid_mounted_check_in_finally`, `avoid_nullable_async_or_collection_return_type`,
+`avoid_misused_wildcard_pattern`, `avoid_nullable_async_or_collection_return_type`,
 `avoid_parameter_aliases`, `avoid_positional_record_fields`, `avoid_public_late_final_without_initializer`,
 `avoid_public_notifier_properties`, `avoid_repeated_property_aliases`, `avoid_then_return_with_future`,
 `avoid_throw`, `avoid_unassigned_local_variable`, `avoid_unnecessary_parentheses`, `avoid_unnecessary_safe_area`,
@@ -1130,13 +1145,15 @@ See Gap Themes 1 (fpdart, ~26 of the 68), 2 (banned-* config engines), 3 (Riverp
 
 - `avoid_banned_annotations`/`avoid_banned_names`/`avoid_banned_types` — saropa's `banned_identifier_usage`
   matches by identifier name only, not annotation/type-annotation-aware.
-- `avoid_futureor_return_type` — saropa's `prefer_unwrapping_future_or` suggests unwrapping generally, doesn't
-  specifically flag `FutureOr` as a return type.
 - `avoid_missing_controller` — saropa's `require_form_field_controller` only covers `TextFormField`, not all
   controller-accepting input widgets.
 - `avoid_single_child_in_multi_child_widgets` — saropa's `avoid_single_child_column_row` covers only Column/Row.
 - `avoid_unnecessary_else_after_control_flow` — saropa's `avoid_redundant_else` only flags else after
   return/throw/continue/break; theirs bans all else blocks unconditionally.
+
+#### Closed (saropa now covers)
+
+`avoid_disposing_late_fields`, `avoid_futureor_return_type`, `avoid_mounted_check_in_finally`.
 
 ### mad_lint
 

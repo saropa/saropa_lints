@@ -22,6 +22,22 @@ import '../../saropa_lint_rule.dart';
 /// Equatable are skipped here to avoid duplicate diagnostics; use the
 /// Equatable-specific rule for that case.
 ///
+/// **Known limitations (accepted tradeoffs, not defects):**
+/// - The Equatable skip ([_extendsOrMixesInEquatable]) is a structural check
+///   on the `extends`/`with` clause names, not a resolved-type check against
+///   `package:equatable`. A project-local class/mixin that happens to be
+///   named `Equatable`/`EquatableMixin` for unrelated reasons will also be
+///   skipped (false negative). It also only looks at the *direct*
+///   `extends`/`with` clause and does not check `implements Equatable` or
+///   transitive inheritance (`class B extends A` where `A extends
+///   Equatable`) — both are legal but unusual ways to reach Equatable and
+///   are not recognized here.
+/// - Mutable fields are only collected from the class that declares
+///   `==`/`hashCode` itself ([_findMutableFields] walks `node.bodyMembers`
+///   only); a mutable field inherited from a plain (non-Equatable)
+///   superclass and referenced by a subclass's `==`/`hashCode` is not
+///   detected (false negative).
+///
 /// **BAD:**
 /// ```dart
 /// class Point {
@@ -132,6 +148,11 @@ class AvoidEqualsAndHashCodeOnMutableClassesRule extends SaropaLintRule {
   /// Returns true if [node] extends `Equatable` or mixes in
   /// `EquatableMixin`, in which case the dedicated Equatable rule already
   /// covers the mutable-field defect.
+  ///
+  /// Structural/name-based only (see class-level "Known limitations" doc):
+  /// checks the direct `extends`/`with` clause's simple name, not a
+  /// resolved type against `package:equatable`, and does not follow
+  /// `implements` or transitive `extends` chains.
   bool _extendsOrMixesInEquatable(ClassDeclaration node) {
     final ExtendsClause? extendsClause = node.extendsClause;
     if (extendsClause != null &&
