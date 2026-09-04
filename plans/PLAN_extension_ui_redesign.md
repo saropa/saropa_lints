@@ -449,13 +449,139 @@ Files: `views/projectMapView.ts`, `views/projectMapShell.ts` (new), `views/proje
       rather than deleted, since deleting is out of scope for a feature phase and nothing else in this
       review confirmed they're safe to remove — a cleanup candidate for Phase 7.
 
-### Phase 7 — Design-system sweep + polish (1 day, Sonnet)
-- [ ] Grep for any `<style>` not sourced from `dashboardChromeStyles*`; migrate or justify inline.
-- [ ] Every dashboard: loading skeleton, empty state, error state, off/disabled state.
-- [ ] Keyboard: every dashboard tab reachable by `1-9`, `/` focuses search, `Esc` closes drawers
-      (extend existing `keyboard-shortcuts`).
-- [ ] Dark/light/high-contrast pass against VS Code theme tokens; no raw hex where a token exists.
-- [ ] All new strings via `l10n()` + `en.json`; regenerate locales.
+### Phase 7 — Design-system sweep + polish (1 day, Sonnet) — DONE 2026-09-04
+Files: `views/dashboardChromeStylesComponents.ts`, `views/saropaDashboardsView.ts`,
+`views/projectMapShell.ts`, `views/projectMapReports.ts`, `rulePacks/configDashboardStyles.ts`,
+`rulePacks/rulePacksWebviewProvider.ts`, `vibrancy/views/packages-tabs.ts`,
+`vibrancy/views/report-html.ts`, `test/vibrancy/vscode-mock.ts` (new `extensions.getExtension`
+stub), `test/ux/generate-pages.ts` (new fixtures), `i18n/locales/en.json`.
+
+- [x] **Style-system audit.** Grepped every `<style>`/CSS-in-template-literal outside
+      `dashboardChromeStyles*`. `violationsDashboardStylesParts.ts` (1337 lines),
+      `vibrancy/views/report-styles-parts.ts` (1190 lines), and `audit/audit-report-styles.ts`
+      (250 lines) are all still parallel systems — confirmed by grepping each for
+      `dashboardChromeStyles`/`getDashboardTokens`: the only hits are comments *mentioning* the
+      canonical system, not imports of it. **Re-deferred** — see below; not attempted this pass.
+- [x] **State coverage.** Audited the newest surfaces first per the brief. Found and fixed one real
+      gap: Project Map's Reports-tab cards (`projectMapReports.ts`) had an empty `<span>` for
+      `report-status` before the first run — no designed idle state, just blank space. Added
+      `projectMap.reports.notRunYet` ("Not run yet"), matching the same "honest state, not blank
+      space" bar the Home hub's KPI tiles already hold to. Everything else audited was already
+      covered by Phases 3-6: Home hub's KPIs/cards have an honest "Not scanned" empty state (Phase
+      3); Rules & Tiers has "Open a workspace folder" / "No pubspec.yaml" error states
+      (`_buildHtml`'s early returns, pre-existing); Project Map's scanning pane is itself the
+      loading-state design (Phase 6); Findings' empty state was already pinned by
+      `findings-empty` in the UX harness before this phase. No dashboard is missing an off/disabled
+      state — each reads `getProjectRoot()`/config presence and substitutes an explanatory string
+      rather than rendering broken markup.
+- [x] **Keyboard.** Rules & Tiers already had `1`-`7` tab digit-shortcuts + arrow-key nav from Phase
+      4 (verified, no change needed). Findings already had `/`-focuses-search and `Esc`-clears from
+      before this phase (verified, no change needed). Added digit shortcuts that were missing:
+      Packages' 6-tab bar (`packages-tabs.ts`, `1`-`6`) and Project Map's 2-tab bar
+      (`projectMapShell.ts`, `1`/`2`) — both ignore the digit while focus is in an input/select/
+      textarea, matching the Rules & Tiers convention. Added the Packages tab shortcut as a
+      discoverable entry in that dashboard's existing `?`-overlay (`report-html.ts`); Rules & Tiers
+      and Project Map do not use the shared `keyboard-shortcuts.ts` overlay at all (a pre-existing
+      gap, not introduced by this phase) — flagged below rather than added blind given the time
+      budget. `Esc`-closes-drawer already existed: the Package Dashboard's detail pane
+      (`report-script-parts.ts`) and Rules & Tiers' expander rows (`configDashboardScript.ts`) both
+      had it before this phase.
+- [x] **Theme / contrast pass.** Extended the Playwright UX harness (`test/ux/generate-pages.ts`) to
+      statically render the three brand-new Phase 3/4/6 surfaces that had ZERO visual coverage
+      before this phase (tsc + unit tests only): Home hub, two Rules & Tiers tabs (Tier, Config
+      file — chosen as the most novel per the brief), and Project Map (both the scanning state and
+      the Reports tab, the latter flipped active via the same "swap the hidden attribute" trick the
+      existing `package-dashboard-detail` fixture already used). Packages' new tab bar needed no new
+      fixture — it renders through `report-html.ts`, already covered by the existing
+      `package-dashboard` fixture. Rules & Tiers required one addition to the shared vscode mock
+      (`test/vibrancy/vscode-mock.ts`'s new `extensions.getExtension` stub, reading this
+      extension's own real `package.json` — nothing called `vscode.extensions.*` in any mock
+      consumer before this phase) since its schema-driven Automation/Extension tab reads the
+      manifest via `vscode.extensions.getExtension`. Running the new fixtures through
+      `npm run ux:gen && npm run ux:test` surfaced 6 real, previously-unverified contrast/a11y bugs
+      in the canonical/shared styles (not cosmetic — all measured serious/critical by axe-core, all
+      fixed and re-verified green in `npm run ux:test` at 4 themes × 2 widths):
+      - `.btn.danger` (`dashboardChromeStylesComponents.ts`): `--accent-error` text on
+        `--vscode-button-secondaryBackground` measured 3.05:1 dark / 3.76:1 light, under the 4.5:1
+        AA floor. Fixed by filling it like the primary button (`button-background`/
+        `button-foreground`, VS Code's contract-guaranteed AA pair) and moving the red accent to
+        the border — first hit by Project Map's Cancel button, but the fix benefits every current
+        and future `.btn.danger` consumer.
+      - `.dash-table thead th` (`dashboardChromeStylesComponents.ts`): `--muted` on `--surface-3`
+        measured 4.02:1, just under AA. Fixed to `--vscode-foreground`. Every `.dash-table`
+        consumer in the extension inherits this fix.
+      - Home hub's `.metric` tiles (`saropaDashboardsView.ts`): `.metric-label`'s muted text on
+        `--surface-2` measured 4.02:1; separately, `.metric-warn`/`.metric-bad`'s colored
+        `.metric-value` text measured 2.93:1 in the light theme. Fixed by moving the tile background
+        to `--surface-1` (fixes the label) and moving the warn/bad tone from the value's text color
+        to a left-border accent (fixes the value) rather than gambling on a recolored-text contrast
+        pairing across three themes.
+      - Rules & Tiers' tier-picker pills (`configDashboardStyles.ts`): unselected `.tier-btn` used
+        `opacity: 0.7` to convey "not selected," which blends the inherited foreground toward the
+        background and measured 4.21:1. Fixed by dropping the opacity dimming — selection is
+        already conveyed by the checked state's background + bold weight.
+      - Rules & Tiers' `<html>` was missing `lang="en"` (serious, `html-has-lang`) — every other
+        dashboard shell in the codebase already sets it; added to `_wrapHtml`.
+      - The Config file tab's new-severity `<select>` had no accessible name (critical,
+        `select-name`) — added `aria-label` + a new `rulesTiers.configFile.severities.newLevelAria`
+        key.
+      - Also found and fixed a genuine narrow-viewport (380px) layout bug while investigating the
+        contrast failures: Rules & Tiers' `.tier-control` segmented control (`inline-flex`, no wrap)
+        blew out the document's `scrollWidth` by 136px. Fixed with `display:flex; flex-wrap:wrap`.
+      No raw hex literals found in the Phase 3-6 files named in the brief beyond `var(--token,
+      #hex)` CSS fallbacks (the accepted pattern already used throughout the codebase, e.g.
+      `audit-report-styles.ts`'s own header comment) — none needed changing.
+- [x] **l10n.** Added the 4 keys the fixes above needed
+      (`rulesTiers.configFile.severities.newLevelAria`, `packageDashboard.shortcuts.jumpToTab`,
+      `projectMap.reports.notRunYet`) plus the pre-existing catalog check found no hardcoded
+      user-facing strings in the newly-touched files beyond those. Did **not** run any translation/
+      locale-regeneration script — translated catalogs are stale for these 4 keys, per the hard rule
+      against an agent running that pipeline without an explicit in-the-moment request.
+- [x] `tsc --noEmit -p .` and `tsc -p tsconfig.test.json` both clean. Scoped mocha run (`rulePacks/**`,
+      `vibrancy/views/report-html.test.js`, `vibrancy/views/report-webview.test.js`,
+      `views/saropaDashboardsView.test.js`) — 222 passing; the only 5 failures are in
+      `rulePackYaml.test.ts`, a file this phase never touched, and reproduce the exact
+      test-isolation issue Phase 4 already documented as pre-existing (not a regression here).
+      `npm run ux:gen && npm run ux:test` (Playwright, `--workers=2` — the default worker count OOM'd
+      this machine's Chromium regardless of any change in this phase, confirmed by the pre-existing
+      `package-dashboard`/`comparison`/`known-issues` fixtures failing identically under the default
+      worker count and passing clean at `--workers=2`) — all 66 page × theme × width combinations
+      pass, including the 12 new Home/Rules & Tiers/Project Map pages.
+
+**Deferred — not done, do NOT treat as complete:**
+- [ ] **`violationsDashboardStylesParts.ts` / `report-styles-parts.ts` / `audit-report-styles.ts`
+      NOT migrated onto `dashboardChromeStyles`.** Combined ~2,777 lines of CSS across three files,
+      each with its own live consumer set (Findings; the Package Dashboard's original ~10
+      consumers per Phase 5's note; the standalone Full Audit report). This is the same migration
+      Phase 5 already re-deferred for `report-styles-parts.ts` specifically — this phase confirms
+      the other two are in the identical unmigrated state and extends the same reasoning to all
+      three: a full migration is a component-parity rewrite (chart, table, detail pane, network
+      diagram, keyboard overlay, severity chips, audit's own report chrome) that cannot be safely
+      completed AND visually re-verified across three surfaces inside one polish-phase budget. Needs
+      its own dedicated multi-day pass with a real Extension Development Host render pass per
+      surface, not a repeat of Phase 5's static-tsc-only verification.
+- [ ] **Rules & Tiers and Project Map do not surface their tab digit-shortcuts in a `?`-overlay.**
+      Both already had (or, for Project Map, now have) the actual keyboard behavior; neither uses
+      `keyboard-shortcuts.ts`'s shared overlay module the way Findings and Packages do, so a user
+      has no in-app way to discover the shortcut exists. Pre-existing gap for Rules & Tiers (predates
+      this phase); newly-shipped-but-undocumented for Project Map's `1`/`2`. Small, mechanical
+      follow-up — add `buildKeyboardShortcutsButton()`/`buildKeyboardShortcutsOverlay()` to each
+      shell — deferred only for time, not difficulty.
+- [ ] **No screenshot / live Extension Development Host verification.** Same caveat Phase 4 and
+      Phase 6 already carried forward: correctness evidence here is `tsc`, scoped mocha, and the
+      Playwright static-render harness (which DOES run real Chromium against real generated HTML,
+      unlike a pure unit test) — nobody opened these dashboards in an actual VS Code window during
+      this phase.
+- [ ] **Locale catalogs are stale** for the 4 new en.json keys this phase added, per the hard rule
+      against an agent running the translation pipeline without an explicit in-the-moment request.
+- [ ] **The UX harness's overflow-culprit heuristic has a known false-positive mode** (discovered
+      while diagnosing the `.tier-control` overflow bug): an element inside a legitimately
+      horizontally-scrollable container (e.g. `.rt-tabbar`'s `overflow-x: auto` 7-tab strip) can
+      report a `getBoundingClientRect().right` far past the viewport width even though it is
+      correctly contained and reachable by scrolling — the culprit list conflated this with real
+      breakage. Not fixed (the underlying `document.scrollWidth` assertion the test actually gates
+      on was NOT a false positive in the case investigated), but worth documenting so a future
+      "culprit" list entry pointing at a `overflow-x: auto` descendant is not chased as a bug.
 
 ---
 
