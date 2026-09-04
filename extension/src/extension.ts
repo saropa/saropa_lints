@@ -1482,6 +1482,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         diagnosticsRefreshTimer = undefined;
         updateAllStatusBars();
         issuesProvider.refresh();
+        // Sidebar Status/Settings sections now read live diagnostics too (see
+        // sectionedSidebar.ts's loadFilteredViolations) — without this they'd
+        // only refresh on an explicit action (scan-on-save, a severity toggle),
+        // reintroducing the same staleness this migration removes elsewhere.
+        refreshAllSections();
         // Code lenses and inline annotations also read live diagnostics now, so
         // refresh them on the same debounced tick rather than only when
         // violations.json is rewritten.

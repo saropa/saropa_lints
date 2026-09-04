@@ -23,18 +23,18 @@
  *                           former standalone Diagnostics panel
  *   - **Status**          — health / violations / suppressions / trends / last run
  *
- * Each section reads the same upstream data (violations.json, pubspec, history)
+ * Each section reads the same upstream data (live diagnostics, pubspec, history)
  * but renders its own slice. Visibility is gated by `when` clauses on each
  * view in `package.json` so empty sections do not pollute the sidebar.
  */
 
 import * as vscode from 'vscode';
-import { readViolations, filterDisabledFromData, type ViolationsData } from '../violationsReader';
+import type { ViolationsData } from '../violationsReader';
+import { readVisibleLiveViolations, computeLiveHealthScore } from '../liveViolationsData';
 import { loadHistory, getTrendSummary, getScoreTrendSummary, findPreviousScore, detectScoreRegression } from '../runHistory';
-import { computeHealthScore, formatScoreDelta } from '../healthScore';
+import { formatScoreDelta } from '../healthScore';
 import { getProjectRoot } from '../projectRoot';
 import { hasSaropaLintsDep } from '../pubspecReader';
-import { readDisabledRules } from '../configWriter';
 import type { ConfigTreeProvider } from './configTree';
 import type { ConfigTreeNode } from './triageTree';
 import { renderTreeItem } from './triageTree';
@@ -127,14 +127,18 @@ function loadFilteredViolations(
         _cachedFiltered = null;
         return null;
     }
-    const raw = readViolations(root);
-    if (!raw) {
-        _cachedFiltered = null;
-        return null;
-    }
 
-    const disabled = readDisabledRules(root);
-    const afterDisabled = filterDisabledFromData(raw, disabled);
+    // Live diagnostics (vscode.languages.getDiagnostics()), not the cached
+    // reports/.saropa_lints/violations.json export. The status bar and Issues
+    // tree already made this switch (extension.ts's readVisibleViolations /
+    // liveViolationsData.ts) so the Problems panel and this Status section
+    // read the exact same source and cannot disagree. Before this fix, Status
+    // read the cached-report file and showed "No violations / All clear"
+    // whenever no scan had ever been run — even with real diagnostics visible
+    // in the Problems panel (a user-reported trust bug). Live is never "no
+    // report": an empty result means the project is clean. Disabled-rule
+    // filtering is already applied inside readVisibleLiveViolations.
+    const afterDisabled = readVisibleLiveViolations(root);
     const suppressions = loadSuppressions(workspaceState);
 
     const filtered = afterDisabled.violations.filter((v) => {
@@ -410,8 +414,12 @@ function appendHealthRow(
     history: ReturnType<typeof loadHistory>,
     data: ViolationsData,
     total: number,
+    root: string,
 ): void {
-    const health = computeHealthScore(data);
+    // Live severity counts, cached-report file-count denominator — see
+    // computeLiveHealthScore's doc comment for why the score can't be purely
+    // live-sourced.
+    const health = computeLiveHealthScore(root, data);
     if (!health) return;
     const prevScore = findPreviousScore(history);
     const delta = prevScore !== undefined ? formatScoreDelta(health.score, prevScore) : '';
@@ -515,7 +523,7 @@ function appendRegressionAndMilestone(
 function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
     const loaded = loadFilteredViolations(workspaceState);
     if (!loaded) return [];
-    const { data } = loaded;
+    const { data, root } = loaded;
 
     const items: LeafItem[] = [];
     const history = loadHistory(workspaceState);
@@ -529,7 +537,7 @@ function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
         hotspotReviewState,
     );
 
-    appendHealthRow(items, history, data, total);
+    appendHealthRow(items, history, data, total, root);
     appendViolationCountRow(items, total, critical);
     if (hotspotCounts.total > 0) {
         const reviewed = hotspotCounts.reviewedSafe + hotspotCounts.reviewedFixed;

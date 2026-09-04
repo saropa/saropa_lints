@@ -432,8 +432,7 @@
       "total": "Total",
       "errors": "Errors",
       "warnings": "Warnings",
-      "info": "Info",
-      "empty": "No analysis run yet — open Findings to run one."
+      "info": "Info"
     },
     "catalog": {
       "commands": "Commands",

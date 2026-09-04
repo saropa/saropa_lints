@@ -32,11 +32,13 @@ import {
 } from './liveDiagnosticsModel';
 import {
   filterDisabledFromData,
+  readViolations,
   type RuleMetadataData,
   type ViolationsData,
 } from './violationsReader';
 import { readDisabledRules } from './configWriter';
 import { getRuleCatalog } from './ruleCatalog';
+import { computeHealthScore, type HealthScoreResult } from './healthScore';
 
 /**
  * Resolve the user's configured tier without reading a stale file. Only called
@@ -94,4 +96,39 @@ export function hasLiveViolations(
 ): boolean {
   const data = readLiveViolations(root, getDiagnostics);
   return (data.summary?.totalViolations ?? data.violations.length) > 0;
+}
+
+/**
+ * Health score for live-sourced `ViolationsData`, borrowing only the file-count
+ * denominator from the cached `violations.json` export (when one exists).
+ *
+ * Why this exists. `computeHealthScore`'s density formula divides by
+ * `summary.filesAnalyzed` — a real "how many .dart files did the scan cover"
+ * count that only a full `dart run` export produces. Live diagnostics
+ * (`vscode.languages.getDiagnostics()`) have no equivalent: a clean file with
+ * zero diagnostics never appears in the diagnostics map, so there is no way to
+ * count "files analyzed" from the live source alone. Fabricating a denominator
+ * would silently misgrade the project; always withholding the score once a
+ * live source is in play would be a real feature regression versus the
+ * cached-report era (the Health row would vanish for every project, not just
+ * partial-coverage ones). This borrows `filesAnalyzed`/`filesExpected` from
+ * the last export while using LIVE severity counts as the numerator: the
+ * score can never lag behind the Problems panel the way a fully
+ * cached-report-sourced score could, and the coverage caveat (null on a tiny
+ * partial sweep, null when no export has ever run) is unchanged.
+ */
+export function computeLiveHealthScore(
+  root: string,
+  liveData: ViolationsData,
+): HealthScoreResult | null {
+  const cachedSummary = readViolations(root)?.summary;
+  if (!cachedSummary?.filesAnalyzed) return null;
+  return computeHealthScore({
+    ...liveData,
+    summary: {
+      ...liveData.summary,
+      filesAnalyzed: cachedSummary.filesAnalyzed,
+      filesExpected: cachedSummary.filesExpected,
+    },
+  });
 }

@@ -19,6 +19,7 @@ import type * as vscode from 'vscode';
 import * as nodePath from 'node:path';
 import * as nodeFs from 'node:fs';
 import { readViolations } from '../violationsReader';
+import { readVisibleLiveViolations, computeLiveHealthScore } from '../liveViolationsData';
 import { readPubspec } from '../pubspecReader';
 import { readRulePacksEnabled } from '../rulePacks/rulePackYaml';
 import { getLatestResults } from '../vibrancy/extension-activation';
@@ -27,7 +28,6 @@ import { readCommandHistory } from './commandCatalogHistory';
 import { getLastProjectVibrancyPayload } from './projectVibrancyReportView';
 import { formatRelativeTimestamp } from './dashboardHero';
 import { saropaLintsDataPath } from '../reportsPaths';
-import { computeHealthScore } from '../healthScore';
 import { HealthPanel } from '../systemHealth/healthPanel';
 import { l10n } from '../i18n/runtime';
 
@@ -160,10 +160,12 @@ export function buildPackageSummary(limit?: number): string {
  * top-N-signal card; the full-launchpad pane omits it.
  */
 export function buildFindingsSummary(root: string, limit?: number): string {
-  const data = readViolations(root);
-  if (!data) {
-    return summaryCard({ metrics: [], emptyMessage: l10n('dashboards.findings.empty') });
-  }
+  // Live diagnostics, not the cached violations.json export — mirrors the
+  // status-bar/Issues-tree/sidebar-Status live-diagnostics migration so this
+  // card cannot show "no findings" while the Problems panel has real ones.
+  // Never null: an empty result means the project is clean, which renders as
+  // 0/0/0/0 below rather than a separate "not scanned" empty state.
+  const data = readVisibleLiveViolations(root);
   const total = data.summary?.totalViolations ?? data.violations.length;
   const sev = data.summary?.bySeverity ?? {};
   const errors = sev.error ?? 0;
@@ -298,14 +300,20 @@ function isEngineDown(status: string): boolean {
  * instead, which [buildKpiBand] renders as an honest "not scanned" tile.
  */
 export function readHomeKpis(root: string): HomeKpis {
-  const violations = readViolations(root);
-  const health = violations ? computeHealthScore(violations) : null;
+  // Live diagnostics, not the cached violations.json export — same fix as
+  // buildFindingsSummary above and the sidebar's Status section, so the KPI
+  // band's issue count cannot disagree with the Problems panel.
+  // computeLiveHealthScore still borrows the cached export's file-count
+  // denominator (see its doc comment), preserving the 0-vs-never-scanned
+  // distinction this interface documents.
+  const violations = readVisibleLiveViolations(root);
+  const health = computeLiveHealthScore(root, violations);
   const engines = HealthPanel.getEngineStatuses();
   const { total: packagesTotal, attention: packagesAttention } = getPackagesKpi();
   const codeHealth = getLastProjectVibrancyPayload()?.summary;
   return {
     healthScore: health?.score ?? null,
-    issueCount: violations?.summary?.totalViolations ?? null,
+    issueCount: violations.summary?.totalViolations ?? null,
     enginesRunning: engines ? engines.filter((e) => !isEngineDown(e.status)).length : null,
     enginesTotal: 3,
     packagesTotal,
