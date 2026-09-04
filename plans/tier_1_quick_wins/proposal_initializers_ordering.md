@@ -78,9 +78,23 @@ Justification: Cosmetic ordering rule with zero runtime/correctness impact.
 
 ## Decision
 
+Implemented.
+
 ---
 
 ## Implementation Notes
+
+- **Rule class:** `InitializersOrderingRule` in `lib/src/rules/code_quality/initializers_ordering_rules.dart` (pre-existing from a prior interrupted session; only the fixture/test/bugfix work was done in this pass).
+- **Rule name string:** `initializers_ordering`.
+- **Tier:** Recommend **Pedantic**, per the proposal's own "Proposed Tier" section — cosmetic ordering rule with zero runtime/correctness impact, consistent with the proposal's justification. (Not wired into `lib/src/tiers.dart` yet — central registration is out of scope for this pass per instructions; someone still needs to add the name string to `pedanticOnlyRules` and the `MyRule.new` factory to `lib/saropa_lints.dart`.)
+- **Files added:**
+  - `example/lib/code_quality/initializers_ordering_fixture.dart` — 6 classes: 2 BAD (two-field swap, three-field partial regression) with line-precise `// expect_lint: initializers_ordering` markers, and 4 GOOD near-misses (already-ordered fields, `assert(...)` interleaved between correctly-ordered fields, a `super(...)` redirect call, and a single-field initializer list).
+  - `test/rules/code_quality/initializers_ordering_test.dart` — 6 oracle-backed tests via `test/support/resolved_rule_harness.dart` (`reportedRuleCodes`), mirroring the fixture's cases.
+- **Bug found and fixed in the pre-existing rule class** (it did not compile, then did not fire, before this pass):
+  1. `_fieldDeclarationOrder` called `parent.members` directly on a `ClassDeclaration`, which does not compile against the pinned `analyzer` 12.1.0 — `ClassDeclaration.members` was removed; members now live under `.body` (`ClassBody`/`BlockClassBody`). Fixed by using the repo's existing `.bodyMembers` compat shim (`lib/src/analyzer_compat.dart`), the same pattern used elsewhere in the codebase (e.g. `documentation_rules.dart`).
+  2. Even after fixing the compile error, the rule never fired: `_fieldDeclarationOrder` used `node.parent` (the `ConstructorDeclaration`'s direct AST parent) and checked `is! ClassDeclaration`. In analyzer 12's declaring-constructors AST, a constructor's direct parent is the intermediate `ClassBody` node (`BlockClassBody`), not `ClassDeclaration` — so the type check always failed, `declOrder` was always empty, and the rule silently never reported. Fixed by walking up with `node.thisOrAncestorOfType<ClassDeclaration>()` instead, which is stable across analyzer AST-shape versions and is the pattern used elsewhere in this codebase (e.g. `structure_rules.dart`, `avoid_mounted_check_in_finally_rules.dart`).
+- **False-positive risks checked and covered by fixture/tests:** `assert(...)` initializers and `super(...)`/`this(...)` redirecting calls are correctly excluded from the ordering comparison (verified — GOOD cases pass); fields not found in the enclosing class are skipped rather than flagged (defensive, not directly exercised by a fixture case since it requires an unusual resolution edge case); single-initializer lists never fire (verified). No `.contains()`-style substring matching is used — detection is purely structural (declaration-index comparison), so no name-matching false-positive class applies here.
+- **Verification:** `dart test test/rules/code_quality/initializers_ordering_test.dart` — 6/6 passing (resolved-analyzer oracle harness, not the syntactic scan CLI). Confirms both BAD fixture cases are flagged and all 4 GOOD cases are silent.
 
 ---
 

@@ -229,7 +229,7 @@ String _resolveVersion() {
 /// This reduces memory usage from ~4GB (all rules) to ~500MB (essential tier).
 final List<SaropaLintRule Function()>
 _allRuleFactories = <SaropaLintRule Function()>[
-  // Core rules
+  // Core rules,
   AlwaysFailRule.new,
   AvoidNullAssertionRule.new,
   PreferConditionalLoggingRule.new,
@@ -559,8 +559,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferFinalFieldsRule.new,
   PreferFinalFieldsAlwaysRule.new,
   AvoidUnnecessaryIfRule.new,
-
-  // Noisy rules - disabled by default but available
+  // Noisy rules - disabled by default but available,
   AvoidCommentedOutCodeRule.new,
   AvoidDynamicRule.new,
   AvoidLateKeywordRule.new,
@@ -581,8 +580,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidShrinkWrapInListsRule.new,
   PreferExtractingCallbacksRule.new,
   PreferSingleWidgetPerFileRule.new,
-
-  // Collection rules
+  // Collection rules,
   PreferAddAllRule.new,
   PreferAsmapOverIndexedIterationRule.new,
   AvoidDuplicateNumberElementsRule.new,
@@ -591,15 +589,13 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireConstListItemsRule.new,
   PreferReturnAwaitRule.new,
   PreferSetForLookupRule.new,
-
-  // Code quality rules
+  // Code quality rules,
   AvoidUnnecessaryLocalVariableRule.new,
   AvoidUnnecessaryReassignmentRule.new,
   PreferStaticMethodRule.new,
   PreferAbstractFinalStaticClassRule.new,
   AvoidHardcodedColorsRule.new,
-
-  // Flutter widget rules
+  // Flutter widget rules,
   AvoidDeeplyNestedWidgetsRule.new,
   RequireAnimationDisposalRule.new,
   AvoidUncontrolledTextFieldRule.new,
@@ -629,8 +625,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnrestrictedTextFieldLengthRule.new,
   PreferScaffoldMessengerMaybeOfRule.new,
   AvoidFormWithoutKeyRule.new,
-
-  // Async rules
+  // Async rules,
   AvoidUnusedGenericsRule.new,
   PreferTrailingUnderscoreForUnusedRule.new,
   AvoidUnnecessaryFuturesRule.new,
@@ -638,8 +633,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnnecessaryNullableReturnTypeRule.new,
   PreferAsyncCallbackRule.new,
   PreferFutureVoidFunctionOverAsyncCallbackRule.new,
-
-  // Performance rules
+  // Performance rules,
   AvoidListViewWithoutItemExtentRule.new,
   AvoidMediaQueryInBuildRule.new,
   PreferSliverListDelegateRule.new,
@@ -650,8 +644,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidGestureDetectorInScrollViewRule.new,
   AvoidStatefulWidgetInListRule.new,
   PreferOpacityWidgetRule.new,
-
-  // Additional code quality rules
+  // Additional code quality rules,
   AvoidAlwaysNullParametersRule.new,
   AvoidAssigningToStaticFieldRule.new,
   AvoidAsyncCallInSyncFunctionRule.new,
@@ -698,8 +691,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferShorthandsWithConstructorsRule.new,
   PreferShorthandsWithEnumsRule.new,
   PreferShorthandsWithStaticFieldsRule.new,
-
-  // Medium complexity rules
+  // Medium complexity rules,
   PassCorrectAcceptedTypeRule.new,
   PassOptionalArgumentRule.new,
   PreferSingleDeclarationPerFileRule.new,
@@ -708,8 +700,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferSwitchWithSealedClassesRule.new,
   PreferTestMatchersRule.new,
   PreferUnwrappingFutureOrRule.new,
-
-  // Hard complexity rules
+  // Hard complexity rules,
   AvoidInferrableTypeArgumentsRule.new,
   AvoidPassingDefaultValuesRule.new,
   AvoidShadowedExtensionMethodsRule.new,
@@ -721,8 +712,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferSpecificCasesFirstRule.new,
   UseExistingDestructuringRule.new,
   UseExistingVariableRule.new,
-
-  // Flutter-specific rules
+  // Flutter-specific rules,
   AvoidInheritedWidgetInInitStateRule.new,
   AvoidRecursiveWidgetCallsRule.new,
   AvoidUndisposedInstancesRule.new,
@@ -762,8 +752,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferSuperKeyRule.new,
   AvoidChipDeleteInkWellCircleBorderRule.new,
   AvoidParenthesizedButtonCaptionRule.new,
-
-  // Accessibility rules (NEW)
+  // Accessibility rules (NEW),
   AvoidIconButtonsWithoutTooltipRule.new,
   PreferSemanticsSortRule.new,
   AvoidSmallTouchTargetsRule.new,
@@ -775,8 +764,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireLiveRegionRule.new,
   RequireHeadingSemanticsRule.new,
   AvoidImageButtonsWithoutTooltipRule.new,
-
-  // Security rules (NEW)
+  // Security rules (NEW),
   AvoidLoggingSensitiveDataRule.new,
   RequireSecureStorageRule.new,
   PreferRootDetectionRule.new,
@@ -796,8 +784,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidGenericKeyInUrlRule.new,
   AvoidClipboardSensitiveRule.new,
   AvoidStoringPasswordsRule.new,
-
-  // Performance rules (NEW)
+  // Performance rules (NEW),
   RequireKeysInAnimatedListsRule.new,
   PreferBinaryFormatRule.new,
   PreferPoolPatternRule.new,
@@ -815,8 +802,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidSetStateInBuildRule.new,
   AvoidStringConcatenationLoopRule.new,
   AvoidLargeListCopyRule.new,
-
-  // State management rules (NEW)
+  // State management rules (NEW),
   RequireNotifyListenersRule.new,
   RequireStreamControllerDisposeRule.new,
   RequireValueNotifierDisposeRule.new,
@@ -829,14 +815,13 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidGlobalRiverpodProvidersRule.new,
   AvoidStatefulWithoutStateRule.new,
   AvoidGlobalKeyInBuildRule.new,
-
-  // Error handling rules (NEW)
+  // Error handling rules (NEW),
   AvoidSwallowingExceptionsRule.new,
   HandleThrowingInvocationsRule.new,
   RequireErrorContextInLogsRule.new,
   AvoidLosingStackTraceRule.new,
   AvoidPrintErrorRule.new,
-  // RequireFutureErrorHandlingRule merged into AvoidUncaughtFutureErrorsRule
+  // RequireFutureErrorHandlingRule merged into AvoidUncaughtFutureErrorsRule,
   AvoidGenericExceptionsRule.new,
   RequireErrorContextRule.new,
   PreferResultPatternRule.new,
@@ -844,8 +829,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireErrorHandlingGracefulRule.new,
   RequireErrorBoundaryRule.new,
   RequireErrorLoggingRule.new,
-
-  // Architecture rules (NEW)
+  // Architecture rules (NEW),
   AvoidDirectDataAccessInUiRule.new,
   PreferBuilderPatternRule.new,
   AvoidBusinessLogicInUiRule.new,
@@ -854,8 +838,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUiInDomainLayerRule.new,
   AvoidCrossFeatureDependenciesRule.new,
   AvoidSingletonPatternRule.new,
-
-  // Documentation rules (NEW)
+  // Documentation rules (NEW),
   RequirePublicApiDocumentationRule.new,
   PreferCorrectThrowsRule.new,
   AvoidMisleadingDocumentationRule.new,
@@ -866,8 +849,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireExceptionDocumentationRule.new,
   RequireExampleInDocumentationRule.new,
   VerifyDocumentedParametersExistRule.new,
-
-  // NOTE: always_fail is intentionally NOT here - it's a test hook only best practices rules (NEW)
+  // NOTE: always_fail is intentionally NOT here - it's a test hook only best practices rules (NEW),
   RequireTestAssertionsRule.new,
   AvoidVagueTestDescriptionsRule.new,
   AvoidRealNetworkCallsInTestsRule.new,
@@ -875,8 +857,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireTestSetupTeardownRule.new,
   RequirePumpAfterInteractionRule.new,
   AvoidProductionConfigInTestsRule.new,
-
-  // Internationalization rules (NEW)
+  // Internationalization rules (NEW),
   AvoidHardcodedStringsInUiRule.new,
   RequireLocaleAwareFormattingRule.new,
   RequireDirectionalWidgetsRule.new,
@@ -889,8 +870,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireNumberFormatLocaleRule.new,
   AvoidManualDateFormattingRule.new,
   RequireIntlCurrencyFormatRule.new,
-
-  // API & Network rules (NEW)
+  // API & Network rules (NEW),
   RequireHttpStatusCheckRule.new,
   PreferStaleWhileRevalidateRule.new,
   RequireApiResponseValidationRule.new,
@@ -899,14 +879,13 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferBatchRequestsRule.new,
   RequireCompressionRule.new,
   RequireSslPinningSensitiveRule.new,
-  // RequireApiTimeoutRule merged into RequireRequestTimeoutRule
+  // RequireApiTimeoutRule merged into RequireRequestTimeoutRule,
   AvoidHardcodedApiUrlsRule.new,
   RequireRetryLogicRule.new,
   RequireTypedApiResponseRule.new,
   RequireConnectivityCheckRule.new,
   RequireApiErrorMappingRule.new,
-
-  // Dependency Injection rules (NEW)
+  // Dependency Injection rules (NEW),
   AvoidServiceLocatorInWidgetsRule.new,
   AvoidTooManyDependenciesRule.new,
   AvoidInternalDependencyCreationRule.new,
@@ -916,8 +895,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferNullObjectPatternRule.new,
   RequireTypedDiRegistrationRule.new,
   AvoidFunctionsInRegisterSingletonRule.new,
-
-  // Memory Management rules (NEW)
+  // Memory Management rules (NEW),
   AvoidLargeObjectsInStateRule.new,
   RequireExpandoCleanupRule.new,
   RequireImageDisposalRule.new,
@@ -927,8 +905,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferLruCacheRule.new,
   AvoidExpandoCircularReferencesRule.new,
   AvoidLargeIsolateCommunicationRule.new,
-
-  // Type Safety rules (NEW)
+  // Type Safety rules (NEW),
   AvoidUnsafeCastRule.new,
   PreferConstrainedGenericsRule.new,
   RequireCovariantDocumentationRule.new,
@@ -936,8 +913,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireNullSafeExtensionsRule.new,
   PreferSpecificNumericTypesRule.new,
   RequireFutureOrDocumentationRule.new,
-
-  // Resource Management rules (NEW)
+  // Resource Management rules (NEW),
   RequireFileCloseInFinallyRule.new,
   PreferUsingForTempResourcesRule.new,
   RequireHiveDatabaseCloseRule.new,
@@ -946,16 +922,13 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireWebSocketCloseRule.new,
   RequirePlatformChannelCleanupRule.new,
   RequireIsolateKillRule.new,
-
-  // New formatting rules
+  // New formatting rules,
   AvoidDigitSeparatorsRule.new,
   FormatCommentFormattingRule.new,
   RequireIgnoreCommentSpacingRule.new,
   RequireIgnoreCommentPluginPrefixRule.new,
   MemberOrderingFormattingRule.new,
-  ParametersOrderingConventionRule.new,
-
-  // New widget rules
+  // New widget rules,
   RequireTextOverflowHandlingRule.new,
   RequireImageErrorBuilderRule.new,
   RequireImageDimensionsRule.new,
@@ -964,8 +937,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireFocusNodeDisposeRule.new,
   PreferTextThemeRule.new,
   AvoidNestedScrollablesRule.new,
-
-  // New widget rules from roadmap (batch 1)
+  // New widget rules from roadmap (batch 1),
   AvoidHardcodedLayoutValuesRule.new,
   PreferIgnorePointerRule.new,
   AvoidGestureWithoutBehaviorRule.new,
@@ -976,8 +948,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidHardcodedTextStylesRule.new,
   PreferPageStorageKeyRule.new,
   RequireRefreshIndicatorRule.new,
-
-  // New widget rules from roadmap (batch 2 - Very Easy)
+  // New widget rules from roadmap (batch 2 - Very Easy),
   RequireScrollPhysicsRule.new,
   PreferSliverListRule.new,
   PreferKeepAliveRule.new,
@@ -987,8 +958,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferFitCoverForBackgroundRule.new,
   RequireDisabledStateRule.new,
   RequireDragFeedbackRule.new,
-
-  // New widget rules from roadmap (batch 2 - Easy)
+  // New widget rules from roadmap (batch 2 - Easy),
   AvoidGestureConflictRule.new,
   AvoidLargeImagesInMemoryRule.new,
   AvoidLayoutBuilderInScrollableRule.new,
@@ -997,32 +967,26 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireLongPressCallbackRule.new,
   AvoidFindChildInBuildRule.new,
   AvoidUnboundedConstraintsRule.new,
-
-  // New test rules from roadmap
+  // New test rules from roadmap,
   AvoidTestSleepRule.new,
   AvoidFindByTextRule.new,
   RequireTestKeysRule.new,
-
-  // New test rule
+  // New test rule,
   PreferPumpAndSettleRule.new,
-
-  // Testing best practices rules (Section 5.31)
+  // Testing best practices rules (Section 5.31),
   PreferTestFindByKeyRule.new,
   PreferSetupTeardownRule.new,
   RequireTestDescriptionConventionRule.new,
   PreferBlocTestPackageRule.new,
   PreferMockVerifyRule.new,
-
-  // New state management rules
+  // New state management rules,
   RequireBlocCloseRule.new,
   PreferConsumerWidgetRule.new,
   RequireAutoDisposeRule.new,
   AvoidRiverpodStringProviderNameRule.new,
-
-  // New security rule
+  // New security rule,
   AvoidDynamicSqlRule.new,
-
-  // Stylistic / Opinionated rules (not in any tier by default)
+  // Stylistic / Opinionated rules (not in any tier by default),
   PreferRelativeImportsRule.new,
   PreferOneWidgetPerFileRule.new,
   PreferArrowFunctionsRule.new,
@@ -1058,12 +1022,9 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferDocCurlyApostropheRule.new,
   PreferDocStraightApostropheRule.new,
   PreferCurlyApostropheRule.new,
-
-  // =========================================================================
-  // NEW STYLISTIC RULES v2.5.0 (76+ opinionated rules with opposites)
-  // =========================================================================
-
-  // Widget & UI stylistic rules (stylistic_widget_rules.dart)
+  // =========================================================================,
+  // NEW STYLISTIC RULES v2.5.0 (76+ opinionated rules with opposites),
+  // Widget & UI stylistic rules (stylistic_widget_rules.dart),
   PreferSizedBoxOverContainerRule.new,
   PreferContainerOverSizedBoxRule.new,
   PreferTextRichOverRichTextRule.new,
@@ -1077,8 +1038,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferExplicitColorsRule.new,
   PreferClipRSuperellipseRule.new,
   PreferClipRSuperellipseClipperRule.new,
-
-  // Null handling & collection stylistic rules (stylistic_null_collection_rules.dart)
+  // Null handling & collection stylistic rules (stylistic_null_collection_rules.dart),
   PreferNullAwareAssignmentRule.new,
   PreferExplicitNullAssignmentRule.new,
   PreferIfNullOverTernaryRule.new,
@@ -1092,8 +1052,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferWhereTypeOverWhereIsRule.new,
   PreferMapEntriesIterationRule.new,
   PreferKeysIterationRule.new,
-
-  // Control flow stylistic rules (stylistic_control_flow_rules.dart)
+  // Control flow stylistic rules (stylistic_control_flow_rules.dart),
   PreferSingleExitPointRule.new,
   PreferGuardClausesRule.new,
   PreferPositiveConditionsFirstRule.new,
@@ -1112,9 +1071,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferSeparateAssignmentsRule.new,
   PreferIfElseOverGuardsRule.new,
   PreferCascadeAssignmentsRule.new,
-
-  // Whitespace & constructor stylistic rules (stylistic_whitespace_constructor_rules.dart)
-  // PreferBlankLineBeforeReturnRule(), // Not defined
+  // Whitespace & constructor stylistic rules (stylistic_whitespace_constructor_rules.dart),
+  // PreferBlankLineBeforeReturnRule(), // Not defined,
   PreferNoBlankLineBeforeReturnRule.new,
   PreferBlankLineAfterDeclarationsRule.new,
   PreferCompactDeclarationsRule.new,
@@ -1130,8 +1088,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferRequiredBeforeOptionalRule.new,
   PreferGroupedByPurposeRule.new,
   PreferRethrowOverThrowERule.new,
-
-  // Error handling & testing stylistic rules (stylistic_error_testing_rules.dart)
+  // Error handling & testing stylistic rules (stylistic_error_testing_rules.dart),
   PreferSpecificExceptionsRule.new,
   PreferGenericExceptionRule.new,
   PreferExceptionSuffixRule.new,
@@ -1145,8 +1102,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferGroupedExpectationsRule.new,
   PreferTestNameShouldWhenRule.new,
   PreferTestNameDescriptiveRule.new,
-
-  // Additional stylistic rules (stylistic_additional_rules.dart)
+  // Additional stylistic rules (stylistic_additional_rules.dart),
   PreferInterpolationOverConcatenationRule.new,
   PreferConcatenationOverInterpolationRule.new,
   PreferDoubleQuotesRule.new,
@@ -1172,8 +1128,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferExplicitThisRule.new,
   PreferImplicitBooleanComparisonRule.new,
   PreferExplicitBooleanComparisonRule.new,
-
-  // Testing best practices rules (batch 3)
+  // Testing best practices rules (batch 3),
   RequireArrangeActAssertRule.new,
   PreferMockNavigatorRule.new,
   AvoidRealTimerInWidgetTestRule.new,
@@ -1184,8 +1139,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidStatefulTestSetupRule.new,
   PreferMockHttpRule.new,
   RequireGoldenTestRule.new,
-
-  // Widget rules (batch 3)
+  // Widget rules (batch 3),
   PreferFractionalSizingRule.new,
   PreferLayoutBuilderForConstraintsRule.new,
   AvoidUnconstrainedBoxMisuseRule.new,
@@ -1196,8 +1150,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireScrollControllerRule.new,
   PreferPositionedDirectionalRule.new,
   RequireFormValidationRule.new,
-
-  // High-impact rules (batch 4)
+  // High-impact rules (batch 4),
   AvoidShrinkWrapInScrollRule.new,
   AvoidDeepWidgetNestingRule.new,
   PreferSafeAreaAwareRule.new,
@@ -1205,38 +1158,32 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireImmutableBlocStateRule.new,
   RequireRequestTimeoutRule.new,
   AvoidFlakyTestsRule.new,
-
-  // New accessibility rules
+  // New accessibility rules,
   AvoidTextScaleFactorIgnoreRule.new,
   RequireImageSemanticsRule.new,
   RequireTextScaleFactorAwarenessRule.new,
   AvoidHiddenInteractiveRule.new,
-
-  // New animation rules
+  // New animation rules,
   RequireVsyncMixinRule.new,
   AvoidAnimationInBuildRule.new,
   AvoidInertAnimationValueInBuildRule.new,
   RequireAnimationControllerDisposeRule.new,
   RequireHeroTagUniquenessRule.new,
   AvoidLayoutPassesRule.new,
-
-  // New forms rules
+  // New forms rules,
   PreferAutovalidateOnInteractionRule.new,
   PreferFormBlocForComplexRule.new,
   RequireKeyboardTypeRule.new,
   RequireTextOverflowInRowRule.new,
   RequireSecureKeyboardRule.new,
-
-  // New navigation rules
+  // New navigation rules,
   RequireUnknownRouteHandlerRule.new,
   AvoidContextAfterNavigationRule.new,
-
-  // New security/performance rules
+  // New security/performance rules,
   PreferSecureRandomRule.new,
   PreferTypedDataRule.new,
   AvoidUnnecessaryToListRule.new,
-
-  // New Firebase/storage rules
+  // New Firebase/storage rules,
   AvoidFirestoreUnboundedQueryRule.new,
   PreferFirebaseTransactionForCountersRule.new,
   PreferCorrectTopicsRule.new,
@@ -1245,42 +1192,34 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidSecureStorageOnWebRule.new,
   IncorrectFirebaseEventNameRule.new,
   IncorrectFirebaseParameterNameRule.new,
-
-  // New state management rules
   AvoidProviderOfInBuildRule.new,
   AvoidGetFindInBuildRule.new,
   AvoidProviderRecreateRule.new,
-
   AvoidHardcodedDurationRule.new,
   RequireAnimationCurveRule.new,
   AvoidFixedDimensionsRule.new,
   AvoidPrefsForLargeDataRule.new,
   RequireOfflineIndicatorRule.new,
-
   PreferCoarseLocationRule.new,
   RequireCameraDisposeRule.new,
   RequireImageCompressionRule.new,
   RequireThemeColorFromSchemeRule.new,
   PreferColorSchemeFromSeedRule.new,
-
   PreferRichTextForComplexRule.new,
   RequireErrorMessageContextRule.new,
   PreferImplicitAnimationsRule.new,
   RequireStaggeredAnimationDelaysRule.new,
   PreferCubitForSimpleRule.new,
   AvoidCubitsRule.new,
-
   RequireBlocObserverRule.new,
   RequireRouteTransitionConsistencyRule.new,
   RequireTestGroupsRule.new,
-
   AvoidRefInDisposeRule.new,
   RequireProviderScopeRule.new,
   PreferSelectForPartialRule.new,
   AvoidProviderInWidgetRule.new,
   PreferFamilyForParamsRule.new,
-
-  // Riverpod rules (from roadmap)
+  // Riverpod rules (from roadmap),
   AvoidRefReadInsideBuildRule.new,
   AvoidRefWatchOutsideBuildRule.new,
   AvoidRefInsideStateDisposeRule.new,
@@ -1291,31 +1230,26 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferImmutableProviderArgumentsRule.new,
   PreferRiverpodCodeGenRule.new,
   PreferRiverpodKeepAliveRule.new,
-
   AvoidScrollListenerInBuildRule.new,
   PreferValueListenableBuilderRule.new,
   AvoidGlobalKeyMisuseRule.new,
   RequireRepaintBoundaryRule.new,
   AvoidTextSpanInBuildRule.new,
-
   AvoidTestCouplingRule.new,
   RequireTestIsolationRule.new,
   AvoidRealDependenciesInTestsRule.new,
   RequireScrollTestsRule.new,
   RequireTextInputTestsRule.new,
-
   AvoidNavigatorPushUnnamedRule.new,
   RequireRouteGuardsRule.new,
   AvoidCircularRedirectsRule.new,
   AvoidPopWithoutResultRule.new,
   PreferShellRouteForPersistentUiRule.new,
-
   RequireAuthCheckRule.new,
   RequireTokenRefreshRule.new,
   AvoidJwtDecodeClientRule.new,
   RequireLogoutCleanupRule.new,
   AvoidAuthInQueryParamsRule.new,
-
   AvoidBlocEventMutationRule.new,
   PreferMultiBlocProviderRule.new,
   AvoidInstantiatingInBlocValueProviderRule.new,
@@ -1324,8 +1258,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferMultiProviderRule.new,
   AvoidInstantiatingInValueProviderRule.new,
   DisposeProvidersRule.new,
-  // ProperGetxSuperCallsRule(), // Hidden in all_rules.dart
-  // AlwaysRemoveGetxListenerRule(), // Hidden in all_rules.dart
+  // ProperGetxSuperCallsRule(), // Hidden in all_rules.dart,
+  // AlwaysRemoveGetxListenerRule(), // Hidden in all_rules.dart,
   AvoidHooksOutsideBuildRule.new,
   AvoidConditionalHooksRule.new,
   AvoidUnnecessaryHookWidgetsRule.new,
@@ -1341,7 +1275,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferImmutableBlocStateRule.new,
   PreferSealedBlocEventsRule.new,
   PreferSealedBlocStateRule.new,
-
   PreferConstWidgetsRule.new,
   AvoidExpensiveComputationInBuildRule.new,
   AvoidWidgetCreationInLoopRule.new,
@@ -1351,7 +1284,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidClosureMemoryLeakRule.new,
   PreferStaticConstWidgetsRule.new,
   RequireDisposePatternRule.new,
-
   RequireFormKeyRule.new,
   AvoidValidationInBuildRule.new,
   RequireSubmitButtonStateRule.new,
@@ -1363,7 +1295,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireFormAutoValidateModeRule.new,
   RequireAutofillHintsRule.new,
   PreferOnFieldSubmittedRule.new,
-
   PreferSystemThemeDefaultRule.new,
   AvoidAbsorbPointerMisuseRule.new,
   AvoidBrightnessCheckForThemeRule.new,
@@ -1375,114 +1306,95 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireFirebaseInitBeforeUseRule.new,
   RequireFirebaseReauthenticationRule.new,
   RequireFirebaseTokenRefreshRule.new,
-
-  // Security rules
+  // Security rules,
   AvoidAuthStateInPrefsRule.new,
   PreferEncryptedPrefsRule.new,
-  // Accessibility rules
+  // Accessibility rules,
   RequireButtonSemanticsRule.new,
   PreferExplicitSemanticsRule.new,
   AvoidHoverOnlyRule.new,
-  // State management rules
+  // State management rules,
   PreferRefWatchOverReadRule.new,
   AvoidChangeNotifierInWidgetRule.new,
   RequireProviderDisposeRule.new,
-  // Testing rules
+  // Testing rules,
   AvoidHardcodedDelaysRule.new,
-  // Resource management rules
+  // Resource management rules,
   AvoidImagePickerWithoutSourceRule.new,
-  // Platform-specific rules
+  // Platform-specific rules,
   PreferCupertinoForIosFeelRule.new,
   PreferUrlStrategyForWebRule.new,
   RequireWindowSizeConstraintsRule.new,
   PreferOverlayPortalLayoutBuilderRule.new,
   PreferKeyboardShortcutsRule.new,
-  // Notification rules
+  // Notification rules,
   RequireNotificationChannelAndroidRule.new,
   PreferLocalNotificationForImmediateRule.new,
   AvoidNotificationPayloadSensitiveRule.new,
   PreferNotificationCustomSoundRule.new,
-
-  // Widget rules
+  // Widget rules,
   AvoidNullableWidgetMethodsRule.new,
-  // Code quality rules
   AvoidDuplicateStringLiteralsRule.new,
   AvoidDuplicateStringLiteralsPairRule.new,
   AvoidExpensiveLogStringConstructionRule.new,
-  // State management rules
   AvoidSetStateInLargeStateClassRule.new,
-
-  // Widget rules
   RequireOverflowBoxRationaleRule.new,
   AvoidUnconstrainedImagesRule.new,
-  // Accessibility rules
   RequireErrorIdentificationRule.new,
   RequireMinimumContrastRule.new,
-  // Testing rules
   RequireErrorCaseTestsRule.new,
-  // Security rules
   RequireDeepLinkValidationRule.new,
-  // Network performance rules
+  // Network performance rules,
   PreferStreamingResponseRule.new,
-
-  // Riverpod rules
+  // Riverpod rules,
   AvoidCircularProviderDepsRule.new,
   RequireErrorHandlingInAsyncRule.new,
   PreferNotifierOverStateRule.new,
   AvoidRiverpodStateNotifierRule.new,
-  // GetX rules (hidden in all_rules.dart)
+  // GetX rules (hidden in all_rules.dart),
   // RequireGetxControllerDisposeRule(),
   // AvoidObsOutsideControllerRule(),
-  // Bloc rules
+  // Bloc rules,
   RequireBlocTransformerRule.new,
   AvoidLongEventHandlersRule.new,
-  // Performance rules
   RequireListPreallocateRule.new,
   PreferBuilderForConditionalRule.new,
   RequireWidgetKeyStrategyRule.new,
-
-  // Network performance rules (batch 5)
+  // Network performance rules (batch 5),
   PreferHttpConnectionReuseRule.new,
   AvoidRedundantRequestsRule.new,
   RequireResponseCachingRule.new,
   PreferPaginationRule.new,
   AvoidOverFetchingRule.new,
   RequireCancelTokenRule.new,
-
-  // State management rules (batch 5)
+  // State management rules (batch 5),
   RequireRiverpodLintRule.new,
   RequireMultiProviderRule.new,
   AvoidNestedProvidersRule.new,
-
-  // Testing rules (batch 5)
+  // Testing rules (batch 5),
   PreferFakeOverMockRule.new,
   RequireEdgeCaseTestsRule.new,
   PreferTestDataBuilderRule.new,
   AvoidTestImplementationDetailsRule.new,
-
-  // Security rules (batch 5)
+  // Security rules (batch 5),
   RequireDataEncryptionRule.new,
   PreferDataMaskingRule.new,
   AvoidScreenshotSensitiveRule.new,
   RequireSecurePasswordFieldRule.new,
   AvoidPathTraversalRule.new,
   PreferHtmlEscapeRule.new,
-
-  // Database rules (batch 5)
+  // Database rules (batch 5),
   RequireDatabaseMigrationRule.new,
   RequireDatabaseIndexRule.new,
   PreferTransactionForBatchRule.new,
-  RequireHiveDatabaseCloseRule.new,
   RequireTypeAdapterRegistrationRule.new,
   PreferLazyBoxForLargeRule.new,
-
-  // Disposal rules (NEW)
+  // Disposal rules (NEW),
   RequireMediaPlayerDisposeRule.new,
   RequireTabControllerDisposeRule.new,
   RequireTextEditingControllerDisposeRule.new,
   RequirePageControllerDisposeRule.new,
-
-  // Build method anti-pattern rules (NEW)
+  // Build method anti-pattern rules (NEW),
   AvoidGradientInBuildRule.new,
   AvoidDialogInBuildRule.new,
   AvoidSnackbarInBuildRule.new,
@@ -1491,9 +1403,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidGetItInBuildRule.new,
   AvoidCanvasInBuildRule.new,
   AvoidHardcodedFeatureFlagsRule.new,
-
-  // Compound (context-aware) performance rules — expensive widget inside a
-  // costly parent (per-frame / per-scrolled-item). Context-gated, not presence.
+  // Compound (context-aware) performance rules — expensive widget inside a,
+  // costly parent (per-frame / per-scrolled-item). Context-gated, not presence.,
   AvoidOpacityInAnimatedBuilderRule.new,
   AvoidOpacityInScrollableRule.new,
   AvoidBackdropFilterInScrollableRule.new,
@@ -1501,8 +1412,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidImageFilterInScrollableRule.new,
   AvoidClipPathInAnimatedBuilderRule.new,
   PreferStaticFinalForSessionConstantRule.new,
-
-  // Scroll and list rules (NEW)
+  // Scroll and list rules (NEW),
   AvoidShrinkWrapInScrollViewRule.new,
   AvoidNestedScrollablesConflictRule.new,
   AvoidListViewChildrenForLargeListsRule.new,
@@ -1519,51 +1429,42 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferPrototypeItemRule.new,
   RequireKeyForReorderableRule.new,
   RequireKeyForCollectionRule.new,
-  RequireAddAutomaticKeepAlivesOffRule.new,
-
-  // Cryptography rules (NEW)
+  // Cryptography rules (NEW),
   AvoidHardcodedEncryptionKeysRule.new,
   PreferSecureRandomForCryptoRule.new,
   AvoidDeprecatedCryptoAlgorithmsRule.new,
   RequireUniqueIvPerEncryptionRule.new,
-
-  // JSON and DateTime rules (NEW)
+  // JSON and DateTime rules (NEW),
   RequireJsonDecodeTryCatchRule.new,
   PreferCorrectJsonCastsRule.new,
   PreferJsonCodegenRule.new,
   AvoidDateTimeParseUnvalidatedRule.new,
   PreferTryParseForDynamicDataRule.new,
   AvoidDoubleForMoneyRule.new,
-  // AvoidSensitiveDataInLogsRule removed v4.2.3 - use AvoidSensitiveInLogsRule (alias works)
+  // AvoidSensitiveDataInLogsRule removed v4.2.3 - use AvoidSensitiveInLogsRule (alias works),
   RequireGetItResetInTestsRule.new,
   RequireWebSocketErrorHandlingRule.new,
   AvoidAutoplayAudioRule.new,
-
-  // Accessibility rules (Plan Group C)
+  // Accessibility rules (Plan Group C),
   RequireAvatarAltTextRule.new,
   RequireBadgeSemanticsRule.new,
   RequireBadgeCountLimitRule.new,
-
-  // Image & Media rules (Plan Group A)
+  // Image & Media rules (Plan Group A),
   AvoidImageRebuildOnScrollRule.new,
   RequireAvatarFallbackRule.new,
   PreferVideoLoadingPlaceholderRule.new,
-
-  // Dialog & Snackbar rules (Plan Group D)
+  // Dialog & Snackbar rules (Plan Group D),
   RequireSnackbarDurationRule.new,
   RequireDialogBarrierDismissibleRule.new,
   RequireDialogResultHandlingRule.new,
   AvoidSnackbarQueueBuildupRule.new,
-
-  // Form & Input rules (Plan Group E)
+  // Form & Input rules (Plan Group E),
   RequireKeyboardActionTypeRule.new,
   RequireKeyboardDismissOnScrollRule.new,
-
-  // Duration & DateTime rules (Plan Group F)
+  // Duration & DateTime rules (Plan Group F),
   PreferDurationConstantsRule.new,
   AvoidDatetimeNowInTestsRule.new,
-
-  // UI/UX Pattern rules (Plan Groups G, J, K)
+  // UI/UX Pattern rules (Plan Groups G, J, K),
   RequireResponsiveBreakpointsRule.new,
   PreferCachedPaintObjectsRule.new,
   RequireCustomPainterShouldRepaintRule.new,
@@ -1574,108 +1475,85 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferLoggerOverPrintRule.new,
   PreferItemExtentWhenKnownRule.new,
   RequireTabStatePreservationRule.new,
-
-  // Bluetooth & Hardware rules (Plan Group H)
+  // Bluetooth & Hardware rules (Plan Group H),
   AvoidBluetoothScanWithoutTimeoutRule.new,
   RequireBluetoothStateCheckRule.new,
   RequireBleDisconnectHandlingRule.new,
   RequireAudioFocusHandlingRule.new,
   RequireQrPermissionCheckRule.new,
   PreferBleMtuNegotiationRule.new,
-
-  // QR Scanner rules (Plan Group I)
+  // QR Scanner rules (Plan Group I),
   RequireQrScanFeedbackRule.new,
   AvoidQrScannerAlwaysActiveRule.new,
   RequireQrContentValidationRule.new,
-
-  // File & Error Handling rules (Plan Group G)
+  // File & Error Handling rules (Plan Group G),
   RequireFileExistsCheckRule.new,
   RequirePdfErrorHandlingRule.new,
   RequireGraphqlErrorHandlingRule.new,
   AvoidLoadingFullPdfInMemoryRule.new,
-
-  // go_router migration rules (go_router_6 pack)
+  // go_router migration rules (go_router_6 pack),
   AvoidGoRouterLegacyRedirectRule.new,
-
-  // GraphQL rules
+  // GraphQL rules,
   AvoidGraphqlStringQueriesRule.new,
-
-  // Image rules (Plan Group A)
+  // Image rules (Plan Group A),
   PreferImageSizeConstraintsRule.new,
-
-  // Lifecycle rules (Plan Group B)
+  // Lifecycle rules (Plan Group B),
   RequireLifecycleObserverRule.new,
-
-  // Collection & Loop rules (Phase 2)
+  // Collection & Loop rules (Phase 2),
   PreferCorrectForLoopIncrementRule.new,
   AvoidUnreachableForLoopRule.new,
-
-  // Widget Optimization rules (Phase 2)
+  // Widget Optimization rules (Phase 2),
   PreferSingleSetStateRule.new,
   PreferComputeOverIsolateRunRule.new,
   PreferForLoopInChildrenRule.new,
   PreferContainerRule.new,
-
-  // Flame Engine rules (Phase 2)
+  // Flame Engine rules (Phase 2),
   AvoidCreatingVectorInUpdateRule.new,
   AvoidRedundantAsyncOnLoadRule.new,
-
-  // Bloc Naming rules (Phase 2)
+  // Bloc Naming rules (Phase 2),
   PreferBlocEventSuffixRule.new,
   PreferBlocStateSuffixRule.new,
-
-  // Code Quality rules (Phase 2)
+  // Code Quality rules (Phase 2),
   PreferTypedefsForCallbacksRule.new,
   PreferRedirectingSuperclassConstructorRule.new,
   AvoidEmptyBuildWhenRule.new,
   PreferUsePrefixRule.new,
-
-  // Provider Advanced rules (Phase 2)
+  // Provider Advanced rules (Phase 2),
   PreferImmutableSelectorValueRule.new,
   PreferProviderExtensionsRule.new,
-
-  // Riverpod Widget rules (Phase 2)
+  // Riverpod Widget rules (Phase 2),
   AvoidUnnecessaryConsumerWidgetsRule.new,
   AvoidNullableAsyncValuePatternRule.new,
-
-  // GetX Build rules (Phase 2) - hidden in all_rules.dart
+  // GetX Build rules (Phase 2) - hidden in all_rules.dart,
   // AvoidGetxRxInsideBuildRule(),
   // AvoidMutableRxVariablesRule(),
-
-  // Remaining ROADMAP_NEXT rules
+  // Remaining ROADMAP_NEXT rules,
   DisposeProvidedInstancesRule.new,
-  // DisposeGetxFieldsRule(), // Hidden in all_rules.dart
+  // DisposeGetxFieldsRule(), // Hidden in all_rules.dart,
   PreferNullableProviderTypesRule.new,
-
-  // Internationalization rules (ROADMAP_NEXT)
+  // Internationalization rules (ROADMAP_NEXT),
   PreferDateFormatRule.new,
   PreferIntlNameRule.new,
   PreferProvidingIntlDescriptionRule.new,
   PreferProvidingIntlExamplesRule.new,
-
-  // Error handling rules (ROADMAP_NEXT)
+  // Error handling rules (ROADMAP_NEXT),
   AvoidUncaughtFutureErrorsRule.new,
-
-  // Type safety rules (ROADMAP_NEXT)
+  // Type safety rules (ROADMAP_NEXT),
   PreferExplicitTypeArgumentsRule.new,
-
-  // Image rules (roadmap_up_next)
+  // Image rules (roadmap_up_next),
   RequireImageLoadingPlaceholderRule.new,
   RequireMediaLoadingStateRule.new,
   RequirePdfLoadingIndicatorRule.new,
   PreferClipboardFeedbackRule.new,
-
-  // Disposal rules (roadmap_up_next)
+  // Disposal rules (roadmap_up_next),
   RequireStreamSubscriptionCancelRule.new,
-
-  // Async rules (roadmap_up_next)
+  // Async rules (roadmap_up_next),
   AvoidDialogContextAfterAsyncRule.new,
   RequireWebsocketMessageValidationRule.new,
   RequireFeatureFlagDefaultRule.new,
   PreferUtcForStorageRule.new,
   RequireLocationTimeoutRule.new,
-
-  // Firebase/Maps rules (roadmap_up_next)
+  // Firebase/Maps rules (roadmap_up_next),
   PreferFirestoreBatchWriteRule.new,
   AvoidFirestoreInWidgetBuildRule.new,
   PreferFirebaseRemoteConfigDefaultsRule.new,
@@ -1684,8 +1562,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidMapMarkersInBuildRule.new,
   RequireMapIdleCallbackRule.new,
   PreferMarkerClusteringRule.new,
-
-  // Accessibility rules (roadmap_up_next)
+  // Accessibility rules (roadmap_up_next),
   RequireImageDescriptionRule.new,
   AvoidSemanticsExclusionRule.new,
   PreferMergeSemanticsRule.new,
@@ -1696,24 +1573,21 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireSemanticLabelIconsRule.new,
   RequireAccessibleImagesRule.new,
   AvoidAutoPlayMediaRule.new,
-
-  // Navigation rules (roadmap_up_next)
+  // Navigation rules (roadmap_up_next),
   RequireDeepLinkFallbackRule.new,
   AvoidDeepLinkSensitiveParamsRule.new,
   PreferTypedRouteParamsRule.new,
   RequireStepperValidationRule.new,
   RequireStepCountIndicatorRule.new,
   RequireRefreshIndicatorOnListsRule.new,
-
-  // Animation rules (roadmap_up_next)
+  // Animation rules (roadmap_up_next),
   PreferTweenSequenceRule.new,
   RequireAnimationStatusListenerRule.new,
   AvoidOverlappingAnimationsRule.new,
   AvoidAnimationRebuildWasteRule.new,
   PreferPhysicsSimulationRule.new,
   PreferListenableBuilderRule.new,
-
-  // Platform-specific rules (roadmap_up_next)
+  // Platform-specific rules (roadmap_up_next),
   AvoidPlatformChannelOnWebRule.new,
   PreferCsrfProtectionRule.new,
   RequireCorsHandlingRule.new,
@@ -1723,20 +1597,17 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidCircularImportsRule.new,
   RequireWindowCloseConfirmationRule.new,
   PreferNativeFileDialogsRule.new,
-
-  // Test rules (roadmap_up_next)
+  // Test rules (roadmap_up_next),
   RequireTestCleanupRule.new,
   PreferTestVariantRule.new,
   RequireAccessibilityTestsRule.new,
   RequireAnimationTestsRule.new,
-
-  // Part 5 - SharedPreferences Security rules
+  // Part 5 - SharedPreferences Security rules,
   AvoidSharedPrefsSensitiveDataRule.new,
   RequireSecureStorageForAuthRule.new,
   RequireSharedPrefsNullHandlingRule.new,
   RequireSharedPrefsKeyConstantsRule.new,
-
-  // Part 5 - Drift Database rules
+  // Part 5 - Drift Database rules,
   AvoidDriftEnumIndexReorderRule.new,
   RequireDriftDatabaseCloseRule.new,
   AvoidDriftUpdateWithoutWhereRule.new,
@@ -1770,16 +1641,14 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferDriftForeignKeyDeclarationRule.new,
   RequireDriftOnUpgradeHandlerRule.new,
   RequireNamedForAcronymDriftColumnsRule.new,
-
-  // Part 5 - sqflite Database rules
+  // Part 5 - sqflite Database rules,
   RequireSqfliteWhereArgsRule.new,
   RequireSqfliteTransactionRule.new,
   RequireSqfliteErrorHandlingRule.new,
   PreferSqfliteBatchRule.new,
   RequireSqfliteCloseRule.new,
   AvoidSqfliteReservedWordsRule.new,
-
-  // Part 5 - Hive Database rules
+  // Part 5 - Hive Database rules,
   RequireHiveInitializationRule.new,
   RequireHiveTypeAdapterRule.new,
   RequireHiveBoxCloseRule.new,
@@ -1789,8 +1658,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferHiveWebAwareRule.new,
   RequireHiveEncryptionKeySecureRule.new,
   AvoidHiveFieldIndexReuseRule.new,
-
-  // Part 5 - Dio HTTP Client rules
+  // Part 5 - Dio HTTP Client rules,
   RequireDioTimeoutRule.new,
   AvoidDioErrorRule.new,
   RequireDioErrorHandlingRule.new,
@@ -1798,117 +1666,96 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferDioCancelTokenRule.new,
   RequireDioSslPinningRule.new,
   AvoidDioFormDataLeakRule.new,
-
-  // Part 5 - Stream/Future rules
+  // Part 5 - Stream/Future rules,
   AvoidStreamInBuildRule.new,
   RequireStreamControllerCloseRule.new,
   AvoidMultipleStreamListenersRule.new,
   RequireStreamErrorHandlingRule.new,
   RequireFutureTimeoutRule.new,
-
-  // Part 5 - go_router Navigation rules
+  // Part 5 - go_router Navigation rules,
   AvoidGoRouterInlineCreationRule.new,
   RequireGoRouterErrorHandlerRule.new,
   RequireGoRouterRefreshListenableRule.new,
   AvoidGoRouterStringPathsRule.new,
-
-  // Part 5 - Riverpod rules
+  // Part 5 - Riverpod rules,
   RequireRiverpodErrorHandlingRule.new,
   AvoidRiverpodStateMutationRule.new,
   PreferRiverpodSelectRule.new,
-
-  // Part 5 - cached_network_image rules
+  // Part 5 - cached_network_image rules,
   RequireCachedImageDimensionsRule.new,
   RequireCachedImagePlaceholderRule.new,
   RequireCachedImageErrorWidgetRule.new,
-
-  // Part 5 - Geolocator rules
+  // Part 5 - Geolocator rules,
   RequireGeolocatorPermissionCheckRule.new,
   RequireGeolocatorServiceEnabledRule.new,
   RequireGeolocatorStreamCancelRule.new,
   RequireGeolocatorErrorHandlingRule.new,
-
-  // Part 6 - State Management rules
+  // Part 6 - State Management rules,
   AvoidYieldInOnEventRule.new,
   PreferConsumerOverProviderOfRule.new,
   AvoidListenInAsyncRule.new,
-  // PreferGetxBuilderRule(), // Hidden in all_rules.dart
+  // PreferGetxBuilderRule(), // Hidden in all_rules.dart,
   EmitNewBlocStateInstancesRule.new,
   AvoidBlocPublicFieldsRule.new,
   AvoidBlocPublicMethodsRule.new,
   RequireAsyncValueOrderRule.new,
   RequireBlocSelectorRule.new,
   PreferSelectorRule.new,
-  // RequireGetxBindingRule(), // Hidden in all_rules.dart
-
-  // Provider dependency rules
+  // RequireGetxBindingRule(), // Hidden in all_rules.dart,
+  // Provider dependency rules,
   PreferProxyProviderRule.new,
   RequireUpdateCallbackRule.new,
-
-  // GetX context safety rules
+  // GetX context safety rules,
   AvoidGetxContextOutsideWidgetRule.new,
-
-  // Part 6 - Theming rules
+  // Part 6 - Theming rules,
   RequireDarkModeTestingRule.new,
   PreferDarkModeColorsRule.new,
   PreferHighContrastModeRule.new,
   AvoidElevationOpacityInDarkRule.new,
   PreferThemeExtensionsRule.new,
-
-  // Part 6 - UI/UX rules
+  // Part 6 - UI/UX rules,
   PreferSkeletonOverSpinnerRule.new,
   RequireEmptyResultsStateRule.new,
   RequireSearchLoadingIndicatorRule.new,
   RequireSearchDebounceRule.new,
   RequirePaginationLoadingStateRule.new,
   RequirePaginationErrorRecoveryRule.new,
-
-  // Part 6 - Lifecycle rules
+  // Part 6 - Lifecycle rules,
   AvoidWorkInPausedStateRule.new,
   RequireConflictResolutionStrategyRule.new,
   RequireResumeStateRefreshRule.new,
-
-  // Part 6 - Security rules
+  // Part 6 - Security rules,
   RequireUrlValidationRule.new,
   AvoidRedirectInjectionRule.new,
   AvoidExternalStorageSensitiveRule.new,
   PreferLocalAuthRule.new,
-
-  // Part 6 - Firebase rules
+  // Part 6 - Firebase rules,
   RequireCrashlyticsUserIdRule.new,
   RequireFirebaseAppCheckRule.new,
   AvoidStoringUserDataInAuthRule.new,
-
-  // Part 6 - Collection/Performance rules
-  PreferNullAwareElementsRule.new,
+  // Part 6 - Collection/Performance rules,
   PreferIterableOperationsRule.new,
   PreferInheritedWidgetCacheRule.new,
   PreferLayoutBuilderOverMediaQueryRule.new,
-
-  // Part 6 - Flutter Widget rules
+  // Part 6 - Flutter Widget rules,
   RequireShouldRebuildRule.new,
   RequireOrientationHandlingRule.new,
   RequireWebRendererAwarenessRule.new,
-
-  // Part 6 - Additional rules
+  // Part 6 - Additional rules,
   RequireExifHandlingRule.new,
-  RequireRefreshIndicatorOnListsRule.new,
   PreferAdaptiveDialogRule.new,
   RequireSnackbarActionForUndoRule.new,
   RequireContentTypeCheckRule.new,
   AvoidWebsocketWithoutHeartbeatRule.new,
   AvoidKeyboardOverlapRule.new,
-  RequireLocationTimeoutRule.new,
   PreferCameraResolutionSelectionRule.new,
   PreferAudioSessionConfigRule.new,
   AvoidAudioInBackgroundWithoutConfigRule.new,
   PreferDotShorthandRule.new,
-  AvoidTouchOnlyGesturesRule.new,
   RequireFutureWaitErrorHandlingRule.new,
   RequireStreamOnDoneRule.new,
   RequireCompleterErrorHandlingRule.new,
-
-  // Package-specific rules (NEW)
+  // Package-specific rules (NEW),
   RequireGoogleSigninErrorHandlingRule.new,
   RequireAppleSigninNonceRule.new,
   RequireSupabaseErrorHandlingRule.new,
@@ -1928,8 +1775,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireSvgErrorHandlerRule.new,
   RequireGoogleFontsFallbackRule.new,
   PreferUuidV4Rule.new,
-
-  // Disposal pattern detection rules (NEW)
+  // Disposal pattern detection rules (NEW),
   RequireBlocManualDisposeRule.new,
   RequireGetxWorkerDisposeRule.new,
   PreferGetxBuilderOverObxRule.new,
@@ -1937,73 +1783,47 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireAnimationTickerDisposalRule.new,
   RequireImageStreamDisposeRule.new,
   RequireSseSubscriptionCancelRule.new,
-
-  // Late keyword rules (NEW)
+  // Late keyword rules (NEW),
   PreferLateFinalRule.new,
   AvoidLateForNullableRule.new,
-
-  // go_router type safety rules (NEW)
+  // go_router type safety rules (NEW),
   PreferGoRouterExtraTypedRule.new,
-
-  // Firebase Auth persistence rule (NEW)
+  // Firebase Auth persistence rule (NEW),
   PreferFirebaseAuthPersistenceRule.new,
-
-  // Geolocator battery optimization rule (NEW)
+  // Geolocator battery optimization rule (NEW),
   PreferGeolocatorDistanceFilterRule.new,
-
-  // Image picker OOM prevention (NEW)
+  // Image picker OOM prevention (NEW),
   PreferImagePickerMaxDimensionsRule.new,
-
-  // =========================================================================
-  // NEW RULES v2.3.10
-  // =========================================================================
-
-  // Test rules
+  // NEW RULES v2.3.10,
+  // Test rules,
   AvoidTestPrintStatementsRule.new,
   RequireMockHttpClientRule.new,
-
-  // Async rules
   AvoidFutureThenInAsyncRule.new,
   AvoidUnawaitedFutureRule.new,
-
-  // Forms rules
+  // Forms rules,
   RequireTextInputTypeRule.new,
   PreferTextInputActionRule.new,
   RequireFormKeyInStatefulWidgetRule.new,
-
-  // Network rules
+  // Network rules,
   PreferTimeoutOnRequestsRule.new,
   PreferDioOverHttpRule.new,
-
-  // Error handling rules
+  // Error handling rules,
   AvoidCatchAllRule.new,
   AvoidCatchExceptionAloneRule.new,
-
-  // State management rules
   AvoidBlocContextDependencyRule.new,
   AvoidProviderValueRebuildRule.new,
-
-  // Lifecycle rules
+  // Lifecycle rules,
   RequireDidUpdateWidgetCheckRule.new,
-
-  // Equatable rules
+  // Equatable rules,
   RequireEquatableCopyWithRule.new,
-
-  // Notification rules
   AvoidNotificationSameIdRule.new,
-
-  // Internationalization rules
+  // Internationalization rules,
   RequireIntlPluralRulesRule.new,
-
-  // Image rules
+  // Image rules,
   PreferCachedImageCacheManagerRule.new,
-  RequireImageCacheDimensionsRule.new,
-
-  // Navigation rules
+  // Navigation rules,
   PreferUrlLauncherUriOverStringRule.new,
   AvoidGoRouterPushReplacementConfusionRule.new,
-
-  // Widget rules
   AvoidStackWithoutPositionedRule.new,
   AvoidExpandedOutsideFlexRule.new,
   AvoidTableCellOutsideTableRule.new,
@@ -2017,157 +1837,99 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidTextfieldInRowRule.new,
   AvoidFixedSizeInScaffoldBodyRule.new,
   PreferExpandedAtCallSiteRule.new,
-
-  // =========================================================================
-  // NEW RULES v2.3.11
-  // =========================================================================
-
-  // Test rules
+  // NEW RULES v2.3.11,
   RequireTestWidgetPumpRule.new,
   RequireIntegrationTestTimeoutRule.new,
-
-  // Hive rules
+  // Hive rules,
   RequireHiveFieldDefaultValueRule.new,
   RequireHiveAdapterRegistrationOrderRule.new,
   RequireHiveNestedObjectAdapterRule.new,
   AvoidHiveBoxNameCollisionRule.new,
-
-  // Security rules
   AvoidApiKeyInCodeRule.new,
   AvoidStoringSensitiveUnencryptedRule.new,
-
-  // OWASP Coverage Gap Rules (v3.2.0)
+  // OWASP Coverage Gap Rules (v3.2.0),
   AvoidIgnoringSslErrorsRule.new,
   RequireHttpsOnlyRule.new,
   RequireHttpsOnlyTestRule.new,
   AvoidUnsafeDeserializationRule.new,
   AvoidUserControlledUrlsRule.new,
   RequireCatchLoggingRule.new,
-
-  // State management rules
   AvoidRiverpodNotifierInBuildRule.new,
   RequireRiverpodAsyncValueGuardRule.new,
   AvoidBlocBusinessLogicInUiRule.new,
-
-  // Navigation rules
   RequireUrlLauncherEncodingRule.new,
   AvoidNestedRoutesWithoutParentRule.new,
-
-  // Equatable rules
   RequireCopyWithNullHandlingRule.new,
-
-  // Internationalization rules
   RequireIntlArgsMatchRule.new,
   AvoidStringConcatenationForL10nRule.new,
-
-  // Performance rules
   AvoidBlockingDatabaseUiRule.new,
   AvoidMoneyArithmeticOnDoubleRule.new,
   AvoidRebuildOnScrollRule.new,
-
-  // Error handling rules
   AvoidExceptionInConstructorRule.new,
   RequireCacheKeyDeterminismRule.new,
   RequirePermissionPermanentDenialHandlingRule.new,
   RequireErrorMessageClarityRule.new,
   RequireErrorRecoveryRule.new,
-
-  // Firebase rules
+  // Firebase rules,
   RequireFirebaseEmailEnumerationProtectionRule.new,
   RequireFirebaseCompositeIndexRule.new,
   RequireFirebaseOfflinePersistenceRule.new,
-
-  // Accessibility rules
   RequireFocusOrderRule.new,
   RequireHeadingHierarchyRule.new,
   RequireReducedMotionSupportRule.new,
-
-  // GetIt rules
+  // GetIt rules,
   RequireGetitDisposeRegistrationRule.new,
-
-  // Test rules
   RequirePerformanceTestRule.new,
-
-  // Image rules
   RequireImageMemoryCacheLimitRule.new,
-
-  // Dependency injection rules
+  // Dependency injection rules,
   RequireGetItRegistrationOrderRule.new,
   RequireDefaultConfigRule.new,
   RequireInterfaceForDependencyRule.new,
-
-  // JSON rules
+  // JSON rules,
   RequireJsonDateFormatConsistencyRule.new,
-
-  // Security rules
   RequireKeychainAccessRule.new,
-
-  // Permission rules
+  // Permission rules,
   RequirePermissionLifecycleObserverRule.new,
-
-  // Provider rules
+  // Provider rules,
   RequireProviderUpdateShouldNotifyRule.new,
-
-  // Internationalization rules
   RequireRtlSupportRule.new,
-
-  // Sqflite rules
+  // Sqflite rules,
   RequireSqfliteIndexForQueriesRule.new,
-
-  // Async rules
   RequireStreamCancelOnErrorRule.new,
   RequireSubscriptionCompositeRule.new,
-
-  // Security rules (batch 4)
+  // Security rules (batch 4),
   RequireWebviewUserAgentRule.new,
   RequireMultiFactorRule.new,
-
-  // Navigation rules
   RequireWillPopScopeRule.new,
-
-  // Context rules
+  // Context rules,
   UseClosestBuildContextRule.new,
-
-  // Code quality avoid
+  // Code quality avoid,
   UseSpecificDeprecationRule.new,
-
-  // Test rules (batch 4)
+  // Test rules (batch 4),
   AvoidScreenshotInCiRule.new,
   PreferTestReportRule.new,
-
-  // Accessibility (batch 4)
+  // Accessibility (batch 4),
   AvoidSemanticsInAnimationRule.new,
   PreferAnnounceForChangesRule.new,
   PreferShowHideRule.new,
   RequireLinkDistinctionRule.new,
   RequireSwitchControlRule.new,
   PreferExternalKeyboardRule.new,
-
-  // Structure rules
+  // Structure rules,
   PreferDeferredImportsRule.new,
   PreferPartOverImportRule.new,
-
-  // Memory management
+  // Memory management,
   PreferWeakReferencesRule.new,
-
-  // Error handling
+  // Error handling,
   PreferZoneErrorHandlerRule.new,
-
-  // Isar rules
+  // Isar rules,
   PreferIsarForComplexQueriesRule.new,
-
-  // UI/UX rules
+  // UI/UX rules,
   PreferOutlinedIconsRule.new,
-
-  // Widget rules
   AvoidBuilderIndexOutOfBoundsRule.new,
-
-  // =========================================================================
-  // v2.4.0 - Apple Platform Rules (76 rules)
-  // See doc/guides/apple_platform_rules.md for documentation
-  // =========================================================================
-
-  // iOS Core Rules
+  // v2.4.0 - Apple Platform Rules (76 rules),
+  // See doc/guides/apple_platform_rules.md for documentation,
+  // iOS Core Rules,
   PreferIosSafeAreaRule.new,
   AvoidIosHardcodedStatusBarRule.new,
   PreferIosHapticFeedbackRule.new,
@@ -2180,8 +1942,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosDynamicIslandSafeZonesRule.new,
   RequireIosDeploymentTargetConsistencyRule.new,
   RequireIosSceneDelegateAwarenessRule.new,
-
-  // App Store Review Rules
+  // App Store Review Rules,
   RequireIosAppTrackingTransparencyRule.new,
   RequireIosFaceIdUsageDescriptionRule.new,
   RequireIosPhotoLibraryAddUsageRule.new,
@@ -2195,8 +1956,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosPermissionDescriptionRule.new,
   RequireIosPrivacyManifestRule.new,
   RequireHttpsForIosRule.new,
-
-  // Security & Authentication Rules
+  // Security & Authentication Rules,
   RequireIosKeychainAccessibilityRule.new,
   RequireIosKeychainSyncAwarenessRule.new,
   RequireIosKeychainForCredentialsRule.new,
@@ -2205,8 +1965,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosHealthKitAuthorizationRule.new,
   AvoidIosHardcodedBundleIdRule.new,
   AvoidIosDebugCodeInReleaseRule.new,
-
-  // Platform Integration Rules
+  // Platform Integration Rules,
   RequireIosPushNotificationCapabilityRule.new,
   RequireIosBackgroundAudioCapabilityRule.new,
   RequireIosBackgroundRefreshDeclarationRule.new,
@@ -2220,8 +1979,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosMethodChannelCleanupRule.new,
   AvoidIosForceUnwrapInCallbacksRule.new,
   PreferIosAppIntentsFrameworkRule.new,
-
-  // Device & Hardware Rules
+  // Device & Hardware Rules,
   AvoidIosHardcodedDeviceModelRule.new,
   RequireIosOrientationHandlingRule.new,
   RequireIosPhotoLibraryLimitedAccessRule.new,
@@ -2230,19 +1988,16 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosPromotionDisplaySupportRule.new,
   RequireIosPasteboardPrivacyHandlingRule.new,
   PreferIosStoreKit2Rule.new,
-
-  // Data & Storage Rules
+  // Data & Storage Rules,
   RequireIosDatabaseConflictResolutionRule.new,
   RequireIosIcloudKvstoreLimitationsRule.new,
   RequireIosShareSheetUtiDeclarationRule.new,
   RequireIosAppClipSizeLimitRule.new,
   RequireIosAtsExceptionDocumentationRule.new,
   RequireIosLocalNotificationPermissionRule.new,
-
-  // Deep Linking Rules
+  // Deep Linking Rules,
   RequireIosUniversalLinksDomainMatchingRule.new,
-
-  // macOS Platform Rules
+  // macOS Platform Rules,
   PreferMacosMenuBarIntegrationRule.new,
   PreferMacosKeyboardShortcutsRule.new,
   RequireMacosWindowSizeConstraintsRule.new,
@@ -2255,27 +2010,20 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidMacosFullDiskAccessRule.new,
   PreferCupertinoForIosRule.new,
   RequireIosAccessibilityLabelsRule.new,
-
-  // =========================================================================
-  // v2.4.0 Additional Rules - Background Processing, Notifications, Payments
-  // =========================================================================
-
-  // Background Processing Rules
+  // v2.4.0 Additional Rules - Background Processing, Notifications, Payments,
+  // Background Processing Rules,
   AvoidLongRunningIsolatesRule.new,
   RequireWorkmanagerForBackgroundRule.new,
   RequireNotificationForLongTasksRule.new,
   PreferBackgroundSyncRule.new,
   RequireSyncErrorRecoveryRule.new,
-
-  // Notification Rules
+  // Notification Rules,
   PreferDelayedPermissionPromptRule.new,
   AvoidNotificationSpamRule.new,
-
-  // In-App Purchase Rules
+  // In-App Purchase Rules,
   RequirePurchaseVerificationRule.new,
   RequirePurchaseRestorationRule.new,
-
-  // iOS Platform Enhancement Rules
+  // iOS Platform Enhancement Rules,
   AvoidIosWifiOnlyAssumptionRule.new,
   RequireIosLowPowerModeHandlingRule.new,
   RequireIosAccessibilityLargeTextRule.new,
@@ -2292,174 +2040,114 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireIosFocusModeAwarenessRule.new,
   PreferIosHandoffSupportRule.new,
   RequireIosVoiceoverGestureCompatibilityRule.new,
-
-  // macOS Platform Enhancement Rules
+  // macOS Platform Enhancement Rules,
   RequireMacosSandboxExceptionsRule.new,
   AvoidMacosHardenedRuntimeViolationsRule.new,
   RequireMacosAppTransportSecurityRule.new,
   RequireMacosNotarizationReadyRule.new,
   RequireMacosEntitlementsRule.new,
-
-  // v2.6.0 rules (ROADMAP_NEXT implementation)
-  // Code quality
+  // v2.6.0 rules (ROADMAP_NEXT implementation),
+  // Code quality,
   PreferReturningConditionalExpressionsRule.new,
-
-  // Riverpod rules
   PreferRiverpodAutoDisposeRule.new,
   PreferRiverpodFamilyForParamsRule.new,
-
-  // GetX rules
+  // GetX rules,
   AvoidGetxGlobalNavigationRule.new,
   RequireGetxBindingRoutesRule.new,
-
-  // Dio rules
+  // Dio rules,
   RequireDioResponseTypeRule.new,
   RequireDioRetryInterceptorRule.new,
   PreferDioTransformerRule.new,
-
-  // GoRouter rules
+  // GoRouter rules,
   PreferShellRouteSharedLayoutRule.new,
   RequireStatefulShellRouteTabsRule.new,
   RequireGoRouterFallbackRouteRule.new,
-
-  // SQLite rules
+  // SQLite rules,
   PreferSqfliteSingletonRule.new,
   PreferSqfliteColumnConstantsRule.new,
-
-  // Freezed rules
+  // Freezed rules,
   RequireFreezedJsonConverterRule.new,
   RequireFreezedLintPackageRule.new,
-
-  // Geolocation rules
+  // Geolocation rules,
   PreferGeolocatorAccuracyAppropriateRule.new,
   PreferGeolocatorLastKnownRule.new,
-
-  // Image picker rules
+  // Image picker rules,
   PreferImagePickerMultiSelectionRule.new,
-
-  // Notification rules
   RequireNotificationActionHandlingRule.new,
-
-  // Error handling rules
   RequireFinallyCleanupRule.new,
-
-  // DI rules
+  // DI rules,
   RequireDiScopeAwarenessRule.new,
-
-  // Equatable rules
   RequireDeepEqualityCollectionsRule.new,
   AvoidEquatableDatetimeRule.new,
   PreferUnmodifiableCollectionsRule.new,
-
-  // Hive rules
   PreferHiveValueListenableRule.new,
-
-  // NEW ROADMAP STAR RULES
-  // Bloc/Cubit rules
+  // NEW ROADMAP STAR RULES,
+  // Bloc/Cubit rules,
   AvoidPassingBlocToBlocRule.new,
   AvoidPassingBuildContextToBlocsRule.new,
   AvoidReturningValueFromCubitMethodsRule.new,
   RequireBlocRepositoryInjectionRule.new,
   PreferBlocHydrationRule.new,
-
-  // GetX rules
   AvoidGetxDialogSnackbarInControllerRule.new,
   RequireGetxLazyPutRule.new,
-
-  // Hive/SharedPrefs rules
+  // Hive/SharedPrefs rules,
   PreferHiveLazyBoxRule.new,
   AvoidHiveBinaryStorageRule.new,
   RequireSharedPrefsPrefixRule.new,
   PreferSharedPrefsAsyncApiRule.new,
   AvoidSharedPrefsInIsolateRule.new,
-
-  // Stream rules
+  // Stream rules,
   PreferStreamDistinctRule.new,
   PreferBroadcastStreamRule.new,
-
-  // Async/Build rules
+  // Async/Build rules,
   AvoidFutureInBuildRule.new,
   RequireMountedCheckAfterAwaitRule.new,
   AvoidAsyncInBuildRule.new,
   PreferAsyncInitStateRule.new,
-
-  // Widget lifecycle rules
+  // Widget lifecycle rules,
   RequireWidgetsBindingCallbackRule.new,
-
-  // Navigation rules
   PreferRouteSettingsNameRule.new,
-
-  // Internationalization rules
   PreferNumberFormatRule.new,
   ProvideCorrectIntlArgsRule.new,
-
-  // Package-specific rules
+  // Package-specific rules,
   AvoidFreezedForLogicClassesRule.new,
-
-  // Disposal rules
+  // Disposal rules,
   DisposeClassFieldsRule.new,
-
-  // State management rules
   PreferChangeNotifierProxyProviderRule.new,
-
-  // =========================================================================
-  // NEW RULES v4.1.5 (24 new rules)
-  // =========================================================================
-
-  // Dependency Injection rules
+  // NEW RULES v4.1.5 (24 new rules),
+  // Dependency Injection rules,
   AvoidDiInWidgetsRule.new,
   PreferAbstractionInjectionRule.new,
-
-  // Accessibility rules
   PreferLargeTouchTargetsRule.new,
   AvoidTimeLimitsRule.new,
   RequireDragAlternativesRule.new,
-
-  // Flutter widget rules
   AvoidGlobalKeysInStateRule.new,
   AvoidStaticRouteConfigRule.new,
-
-  // State management rules
   RequireFlutterRiverpodNotRiverpodRule.new,
   AvoidRiverpodNavigationRule.new,
-
-  // Firebase rules
   RequireFirebaseErrorHandlingRule.new,
   AvoidFirebaseRealtimeInBuildRule.new,
-
-  // Security rules
   RequireSecureStorageErrorHandlingRule.new,
   AvoidSecureStorageLargeDataRule.new,
   PreferBiometricProtectionRule.new,
-
-  // Navigation rules
   AvoidNavigatorContextIssueRule.new,
   RequirePopResultTypeRule.new,
   AvoidPushReplacementMisuseRule.new,
   AvoidNestedNavigatorsMisuseRule.new,
   RequireDeepLinkTestingRule.new,
-
-  // Internationalization rules
   AvoidStringConcatenationL10nRule.new,
   PreferIntlMessageDescriptionRule.new,
   AvoidHardcodedLocaleStringsRule.new,
-
-  // Async rules
   RequireNetworkStatusCheckRule.new,
   AvoidSyncOnEveryChangeRule.new,
   RequirePendingChangesIndicatorRule.new,
-
-  // =========================================================================
-  // NEW RULES v4.1.6 (14 new rules)
-  // =========================================================================
-
-  // Logging rules (debug_rules.dart)
+  // NEW RULES v4.1.6 (14 new rules),
+  // Logging rules (debug_rules.dart),
   AvoidPrintInReleaseRule.new,
   RequireStructuredLoggingRule.new,
   AvoidSensitiveInLogsRule.new,
   PreferDebugPrintRule.new,
-
-  // Platform rules (platform_rules.dart)
+  // Platform rules (platform_rules.dart),
   RequirePlatformCheckRule.new,
   RequireEnvFileGitignoreRule.new,
   PreferPlatformIoConditionalRule.new,
@@ -2470,18 +2158,15 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidPackageJsForWasmRule.new,
   PreferJsInteropOverDartJsRule.new,
   PreferFoundationPlatformCheckRule.new,
-
-  // MethodChannel instrumentation (method_channel_rules.dart)
+  // MethodChannel instrumentation (method_channel_rules.dart),
   RequireMethodChannelInstrumentedRule.new,
   PreferMethodChannelNoteIfSlowRule.new,
-
-  // JSON/API rules (json_datetime_rules.dart)
+  // JSON/API rules (json_datetime_rules.dart),
   RequireDateFormatSpecificationRule.new,
   PreferIso8601DatesRule.new,
   AvoidOptionalFieldCrashRule.new,
   PreferExplicitJsonKeysRule.new,
-
-  // Configuration rules (config_rules.dart)
+  // Configuration rules (config_rules.dart),
   AvoidHardcodedConfigRule.new,
   PreferCompileTimeConfigRule.new,
   PreferFlavorConfigurationRule.new,
@@ -2489,58 +2174,43 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidHardcodedConfigTestRule.new,
   PreferSemverVersionRule.new,
   AvoidMixedEnvironmentsRule.new,
-
-  // Lifecycle rules (lifecycle_rules.dart)
+  // Lifecycle rules (lifecycle_rules.dart),
   RequireLateInitializationInInitStateRule.new,
-
-  // =========================================================================
-  // NEW RULES v4.1.7 (25 new rules)
-  // =========================================================================
-
-  // State management rules (v417_state_rules.dart)
+  // NEW RULES v4.1.7 (25 new rules),
+  // State management rules (v417_state_rules.dart),
   AvoidRiverpodForNetworkOnlyRule.new,
   AvoidLargeBlocRule.new,
   AvoidOverengineeredBlocStatesRule.new,
   AvoidGetxStaticContextRule.new,
   AvoidTightCouplingWithGetxRule.new,
-
-  // Performance rules (v417_performance_rules.dart)
+  // Performance rules (v417_performance_rules.dart),
   PreferElementRebuildRule.new,
   RequireIsolateForHeavyRule.new,
   AvoidFinalizerMisuseRule.new,
   AvoidJsonInMainRule.new,
-
-  // Security rules (v417_security_rules.dart)
+  // Security rules (v417_security_rules.dart),
   AvoidSensitiveDataInClipboardRule.new,
   RequireClipboardPasteValidationRule.new,
   AvoidEncryptionKeyInMemoryRule.new,
-
-  // Caching rules (v417_caching_rules.dart)
+  // Caching rules (v417_caching_rules.dart),
   RequireCacheExpirationRule.new,
   AvoidUnboundedCacheGrowthRule.new,
   RequireCacheKeyUniquenessRule.new,
-
-  // Testing rules (v417_testing_rules.dart)
+  // Testing rules (v417_testing_rules.dart),
   RequireDialogTestsRule.new,
   PreferFakePlatformRule.new,
   RequireTestDocumentationRule.new,
-
-  // Widget rules (v417_widget_rules.dart)
+  // Widget rules (v417_widget_rules.dart),
   PreferCustomSingleChildLayoutRule.new,
   RequireLocaleForTextRule.new,
   RequireDialogBarrierConsiderationRule.new,
   PreferFeatureFolderStructureRule.new,
-
-  // Misc rules (v417_misc_rules.dart)
+  // Misc rules (v417_misc_rules.dart),
   RequireWebsocketReconnectionRule.new,
   RequireCurrencyCodeWithAmountRule.new,
   PreferLazySingletonRegistrationRule.new,
-
-  // =========================================================================
-  // v4.2.0 ROADMAP ⭐ Rules
-  // =========================================================================
-
-  // Android rules (android_rules.dart)
+  // v4.2.0 ROADMAP ⭐ Rules,
+  // Android rules (android_rules.dart),
   RequireAndroidManifestEntriesRule.new,
   RequireNotificationIconKeptRule.new,
   RequireAndroidPermissionRequestRule.new,
@@ -2552,97 +2222,83 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferPendingIntentFlagsRule.new,
   AvoidAndroidCleartextTrafficRule.new,
   RequireAndroidBackupRulesRule.new,
-
-  // IAP rules (iap_rules.dart)
+  // IAP rules (iap_rules.dart),
   AvoidPurchaseInSandboxProductionRule.new,
   RequireSubscriptionStatusCheckRule.new,
   RequirePriceLocalizationRule.new,
-
-  // URL Launcher rules (url_launcher_rules.dart)
+  // URL Launcher rules (url_launcher_rules.dart),
   RequireUrlLauncherCanLaunchCheckRule.new,
   AvoidUrlLauncherSimulatorTestsRule.new,
   PreferUrlLauncherFallbackRule.new,
-
-  // QuickActions rules (quick_actions_rules.dart)
+  // QuickActions rules (quick_actions_rules.dart),
   QuickActionsSetBeforeInitializeRule.new,
   QuickActionsMissingInitializeRule.new,
   QuickActionsEmptyShortcutTypeRule.new,
   QuickActionsEmptyLocalizedTitleRule.new,
   QuickActionsFlutterAssetIconRule.new,
-
-  // In-App Review rules (in_app_review_rules.dart)
+  // In-App Review rules (in_app_review_rules.dart),
   InAppReviewMissingAvailabilityCheckRule.new,
   InAppReviewButtonCallbackRequestRule.new,
   InAppReviewRequestInInitStateRule.new,
   InAppReviewMissingStoreListingFallbackRule.new,
   InAppReviewIosStoreListingMissingAppIdRule.new,
-
-  // Image Picker rules (image_picker_rules.dart) - new-coverage only; the repo
-  // already ships result/source/large-file/max-dimension image_picker rules.
+  // Image Picker rules (image_picker_rules.dart) - new-coverage only; the repo,
+  // already ships result/source/large-file/max-dimension image_picker rules.,
   ImagePickerMissingRetrieveLostDataRule.new,
   ImagePickerInvalidImageQualityRule.new,
   ImagePickerCameraSourceWithoutSupportCheckRule.new,
   ImagePickerLostDataEmptyCheckMissingRule.new,
   ImagePickerMultiResultUncheckedEmptyRule.new,
-
-  // Google Maps Flutter rules (google_maps_flutter_rules.dart)
+  // Google Maps Flutter rules (google_maps_flutter_rules.dart),
   GoogleMapsMarkersRebuiltInBuildRule.new,
   GoogleMapsCloudMapIdDeprecatedRule.new,
   GoogleMapsSetMapStyleDeprecatedRule.new,
   GoogleMapsBitmapDescriptorInBuildRule.new,
   GoogleMapsUnknownMapIdErrorUncheckedRule.new,
   GoogleMapsAnimateCameraInBuildRule.new,
-
-  // audioplayers rules (audioplayers_rules.dart)
+  // audioplayers rules (audioplayers_rules.dart),
   AudioplayersPoolNotDisposedRule.new,
   AudioplayersLowLatencyWithStreamListenRule.new,
   AudioplayersLowLatencyWithSeekRule.new,
   AudioplayersReleaseModeLoopWithCompleteListenerRule.new,
   AudioplayersUrlSourceInAssetContextRule.new,
   AudioplayersHardcodedVolumeAboveOneRule.new,
-
-  // flutter_map rules (flutter_map_rules.dart)
+  // flutter_map rules (flutter_map_rules.dart),
   FlutterMapMissingUserAgentRule.new,
   FlutterMapDeprecatedTileSizeRule.new,
   FlutterMapLegacyMapOptionsCenterRule.new,
   FlutterMapMissingErrorTileCallbackRule.new,
   FlutterMapDeprecatedPolygonLabelPlacementRule.new,
   FlutterMapFallbackUrlDisablesCacheRule.new,
-
-  // youtube_player_flutter rules (youtube_player_flutter_rules.dart)
+  // youtube_player_flutter rules (youtube_player_flutter_rules.dart),
   YoutubePlayerControllerNotClosedRule.new,
   YoutubePlayerConvertUrlUncheckedRule.new,
   YoutubePlayerScaffoldDeprecatedRule.new,
   YoutubePlayerMuteNotRespectedInParamsRule.new,
   YoutubePlayerAutoFullscreenWithoutPortraitGuardRule.new,
-
-  // cached_network_image rules (cached_network_image_rules.dart)
+  // cached_network_image rules (cached_network_image_rules.dart),
   RequireCachedImageProviderDimensionsRule.new,
   RequireCachedImageProviderErrorListenerRule.new,
   AvoidInlineCacheManagerConstructionRule.new,
-
-  // permission_handler rules (permission_handler_rules.dart)
+  // permission_handler rules (permission_handler_rules.dart),
   PermissionHandlerRequestInBuildRule.new,
   PermissionHandlerLocationAlwaysBeforeWhenInUseRule.new,
   PermissionHandlerDeprecatedCalendarRule.new,
   PermissionHandlerStatusWithoutRequestRule.new,
   PermissionHandlerBatchedRequestPreferredRule.new,
-
-  // http rules (http_rules.dart)
+  // http rules (http_rules.dart),
   RequireHttpPackageClientCloseRule.new,
   AvoidHttpTopLevelInLoopRule.new,
   AvoidHttpStringUrlRule.new,
-
-  // app_links rules (app_links_rules.dart)
+  // app_links rules (app_links_rules.dart),
   AppLinksListenInBuildRule.new,
   AppLinksUncaughtStreamErrorRule.new,
   AppLinksAvoidGetInitialLinkStringRule.new,
-  // app_links v6 pre-upgrade migration (pack app_links_6, gate < 6.0.0)
+  // app_links v6 pre-upgrade migration (pack app_links_6, gate < 6.0.0),
   AppLinksUseGetInitialLinkRule.new,
   AppLinksUseGetLatestLinkRule.new,
   AppLinksUseUriLinkStreamRule.new,
-
-  // Geocoding rules (geocoding_rules.dart)
+  // Geocoding rules (geocoding_rules.dart),
   GeocodingUncheckedFirstRule.new,
   GeocodingMissingExceptionHandlerRule.new,
   GeocodingPreferNoResultFoundCatchRule.new,
@@ -2651,23 +2307,20 @@ _allRuleFactories = <SaropaLintRule Function()>[
   GeocodingMissingIsPresentCheckRule.new,
   GeocodingCallInTextFieldListenerRule.new,
   GeocodingDeprecatedLocaleParamRule.new,
-
-  // Local Auth rules (local_auth_rules.dart)
+  // Local Auth rules (local_auth_rules.dart),
   LocalAuthUncheckedResultRule.new,
   LocalAuthMissingCapabilityCheckRule.new,
   LocalAuthUnhandledExceptionRule.new,
   LocalAuthMissingLockoutHandlingRule.new,
   LocalAuthBiometricOnlySensitiveRule.new,
-
-  // File Picker rules (file_picker_rules.dart)
+  // File Picker rules (file_picker_rules.dart),
   FilePickerUncheckedNullResultRule.new,
   FilePickerPathOnWebRule.new,
   FilePickerCustomTypeMissingExtensionsRule.new,
   FilePickerExtensionsWithoutCustomTypeRule.new,
   FilePickerExtensionWithDotRule.new,
   FilePickerWithDataLargeFilesRule.new,
-
-  // Device Calendar rules (device_calendar_rules.dart)
+  // Device Calendar rules (device_calendar_rules.dart),
   DeviceCalendarMissingPermissionCheckRule.new,
   DeviceCalendarUncheckedResultRule.new,
   DeviceCalendarRetrieveEventsEmptyParamsRule.new,
@@ -2675,92 +2328,71 @@ _allRuleFactories = <SaropaLintRule Function()>[
   DeviceCalendarEventMissingCalendarIdRule.new,
   DeviceCalendarEventUtcTimezoneRule.new,
   DeviceCalendarResultDataBeforeSuccessCheckRule.new,
-
-  // device_calendar_plus rules (device_calendar_plus_rules.dart)
+  // device_calendar_plus rules (device_calendar_plus_rules.dart),
   DeviceCalendarPlusMissingPermissionCheckRule.new,
   DeviceCalendarPlusAllDayEventUtcConversionRule.new,
   DeviceCalendarPlusEmptyUpdateEventRule.new,
-
-  // HomeWidget rules (home_widget_rules.dart)
+  // HomeWidget rules (home_widget_rules.dart),
   HomeWidgetCallbackMissingPragmaRule.new,
   HomeWidgetCallbackNotTopLevelRule.new,
   HomeWidgetSaveWithoutUpdateRule.new,
   HomeWidgetUpdateNoNameRule.new,
   HomeWidgetIosMissingAppGroupRule.new,
   HomeWidgetWidgetClickedWithoutInitialLaunchRule.new,
-
-  // Permission rules (permission_rules.dart)
+  // Permission rules (permission_rules.dart),
   RequireLocationPermissionRationaleRule.new,
   RequireCameraPermissionCheckRule.new,
   PreferImageCroppingRule.new,
-
-  // Connectivity rules (connectivity_rules.dart)
+  // Connectivity rules (connectivity_rules.dart),
   RequireConnectivityErrorHandlingRule.new,
   PreferConnectivityDebounceRule.new,
   PreferInternetConnectionCheckerRule.new,
   RequireConnectivityResumeCheckRule.new,
   RequireConnectivityTimeoutRule.new,
-
-  // Geolocator rules (geolocator_rules.dart)
+  // Geolocator rules (geolocator_rules.dart),
   RequireGeolocatorBatteryAwarenessRule.new,
   AvoidGeolocatorBackgroundWithoutConfigRule.new,
   PreferGeolocationCoarseLocationRule.new,
-
-  // DB yield rules (db_yield_rules.dart)
+  // DB yield rules (db_yield_rules.dart),
   RequireYieldAfterDbWriteRule.new,
   SuggestYieldAfterDbReadRule.new,
   AvoidReturnAwaitDbRule.new,
-
-  // SQLite rules (sqflite_rules.dart)
+  // SQLite rules (sqflite_rules.dart),
   AvoidSqfliteTypeMismatchRule.new,
   PreferSqfliteEncryptionRule.new,
-
-  // Firebase rules (firebase_rules.dart)
+  // Firebase rules (firebase_rules.dart),
   RequireFirestoreIndexRule.new,
   RequireFirestoreSecurityRulesRule.new,
-  RequireFirebaseCompositeIndexRule.new,
-
-  // Notification rules (notification_rules.dart)
+  // Notification rules (notification_rules.dart),
   PreferNotificationGroupingRule.new,
   AvoidNotificationSilentFailureRule.new,
-
-  // Hive rules (hive_rules.dart)
+  // Hive rules (hive_rules.dart),
   RequireHiveMigrationStrategyRule.new,
-
-  // Async rules (async_rules.dart)
+  // Async rules (async_rules.dart),
   AvoidStreamSyncEventsRule.new,
   AvoidSequentialAwaitsRule.new,
-
-  // File handling rules (file_handling_rules.dart)
+  // File handling rules (file_handling_rules.dart),
   PreferStreamingForLargeFilesRule.new,
   RequireFilePathSanitizationRule.new,
-
-  // Error handling rules (error_handling_rules.dart)
+  // Error handling rules (error_handling_rules.dart),
   RequireAppStartupErrorHandlingRule.new,
   AvoidAssertInProductionRule.new,
-
-  // Accessibility rules (accessibility_rules.dart)
+  // Accessibility rules (accessibility_rules.dart),
   PreferFocusTraversalOrderRule.new,
-
-  // UI/UX rules (ui_ux_rules.dart)
+  // UI/UX rules (ui_ux_rules.dart),
   AvoidLoadingFlashRule.new,
-
-  // Performance rules (performance_rules.dart)
+  // Performance rules (performance_rules.dart),
   AvoidAnimationInLargeListRule.new,
   PreferLazyLoadingImagesRule.new,
-
-  // JSON/DateTime rules (json_datetime_rules.dart)
+  // JSON/DateTime rules (json_datetime_rules.dart),
   RequireJsonSchemaValidationRule.new,
   PreferJsonSerializableRule.new,
-
-  // Forms rules (forms_rules.dart)
+  // Forms rules (forms_rules.dart),
   PreferRegexValidationRule.new,
-
-  // Package-specific rules (package_specific_rules.dart)
+  // Package-specific rules (package_specific_rules.dart),
   PreferTypedPrefsWrapperRule.new,
   PreferFreezedForDataClassesRule.new,
-
-  // Previously unregistered rules (restored)
+  // Previously unregistered rules (restored),
   AlwaysRemoveGetxListenerRule.new,
   AvoidBlocEmitAfterCloseRule.new,
   AvoidBlocStateMutationRule.new,
@@ -2904,22 +2536,19 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireWebViewNavigationDelegateRule.new,
   RequireWebViewProgressIndicatorRule.new,
   RequireWssOverWsRule.new,
-
-  // Windows platform rules (windows_rules.dart)
+  // Windows platform rules (windows_rules.dart),
   AvoidHardcodedDriveLettersRule.new,
   AvoidForwardSlashPathAssumptionRule.new,
   AvoidCaseSensitivePathComparisonRule.new,
   RequireWindowsSingleInstanceCheckRule.new,
   AvoidMaxPathRiskRule.new,
-
-  // Linux platform rules (linux_rules.dart)
+  // Linux platform rules (linux_rules.dart),
   AvoidHardcodedUnixPathsRule.new,
   PreferXdgDirectoryConventionRule.new,
   AvoidX11OnlyAssumptionsRule.new,
   RequireLinuxFontFallbackRule.new,
   AvoidSudoShellCommandsRule.new,
-
-  // ROADMAP ⭐ Rules (new batch)
+  // ROADMAP ⭐ Rules (new batch),
   AvoidContextDependencyInCallbackRule.new,
   AvoidDatetimeComparisonWithoutPrecisionRule.new,
   AvoidGetxStaticGetRule.new,
@@ -2930,23 +2559,20 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidHiveSynchronousInUiRule.new,
   RequireSemanticColorsRule.new,
   PreferAvatarLoadingPlaceholderRule.new,
-
-  // ROADMAP 🚨 Rules (Essential - ERROR severity)
+  // ROADMAP 🚨 Rules (Essential - ERROR severity),
   PreferCorrectPackageNameRule.new,
   AvoidGetxBuildContextBypassRule.new,
   AvoidPermissionHandlerNullSafetyRule.new,
   AvoidRetainingDisposedWidgetsRule.new,
   RequireSecureKeyGenerationRule.new,
   RequireHiveWebSubdirectoryRule.new,
-
-  // v4.14.0 - GitHub issue rules
+  // v4.14.0 - GitHub issue rules,
   AvoidBlockingMainThreadRule.new,
   RequireLogLevelForProductionRule.new,
   RequireFeatureFlagTypeSafetyRule.new,
   RequireAnalyticsEventNamingRule.new,
   RequireTimezoneDisplayRule.new,
-
-  // v4.15.0 - ROADMAP ⭐ Rules
+  // v4.15.0 - ROADMAP ⭐ Rules,
   PreferSemanticsContainerRule.new,
   AvoidRedundantSemanticsRule.new,
   AvoidImagePickerQuickSuccessionRule.new,
@@ -2975,30 +2601,26 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferInfiniteScrollPreloadRule.new,
   PreferUseCallbackRule.new,
   RequireStepperStateManagementRule.new,
-
-  // v4.15.0 - ROADMAP ⭐ Rules (batch 2)
+  // v4.15.0 - ROADMAP ⭐ Rules (batch 2),
   AvoidIgnoringReturnValuesRule.new,
   PreferOptimisticUpdatesRule.new,
   AvoidFullSyncOnEveryLaunchRule.new,
   AvoidCachedImageUnboundedListRule.new,
   RequireSessionTimeoutRule.new,
-
-  // v4.16.0 - ROADMAP ⭐ Rules
+  // v4.16.0 - ROADMAP ⭐ Rules,
   AvoidColorOnlyMeaningRule.new,
   AvoidExcessiveRebuildsAnimationRule.new,
   AvoidMisusedHooksRule.new,
   RequireRtlLayoutSupportRule.new,
   AvoidMisusedTestMatchersRule.new,
   RequireDisposeVerificationTestsRule.new,
-
-  // v5.1.0 - Migration rules (Flutter SDK deprecations)
+  // v5.1.0 - Migration rules (Flutter SDK deprecations),
   AvoidAssetManifestJsonRule.new,
   PreferDropdownInitialValueRule.new,
   PreferDropdownMenuItemButtonOpacityAnimationRule.new,
   PreferOnPopWithResultRule.new,
   PreferTabbarThemeIndicatorColorRule.new,
-
-  // v9.10.0 - Migration rules (Flutter SDK deprecations)
+  // v9.10.0 - Migration rules (Flutter SDK deprecations),
   PreferPlatformMenuBarChildRule.new,
   PreferKeepaliveDisposeRule.new,
   PreferContextMenuBuilderRule.new,
@@ -3008,8 +2630,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferM3TextThemeRule.new,
   PreferOverflowBarOverButtonBarRule.new,
   AvoidDeprecatedFlutterTestWindowRule.new,
-
-  // Dart SDK 3.0 removed APIs (migration)
+  // Dart SDK 3.0 removed APIs (migration),
   AvoidDeprecatedListConstructorRule.new,
   AvoidRemovedProxyAnnotationRule.new,
   AvoidRemovedProvisionalAnnotationRule.new,
@@ -3026,11 +2647,9 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidRemovedDartDeveloperMetricsRule.new,
   AvoidDeprecatedNetworkInterfaceListSupportedRule.new,
   AvoidRemovedNullThrownErrorRule.new,
-
-  // Dart SDK 3.4 deprecated APIs (migration)
+  // Dart SDK 3.4 deprecated APIs (migration),
   AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule.new,
-
-  // Flutter SDK migration rules (various versions)
+  // Flutter SDK migration rules (various versions),
   PreferIterableCastRule.new,
   AvoidDeprecatedUseInheritedMediaQueryRule.new,
   PreferUtf8EncodeRule.new,
@@ -3041,8 +2660,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidLegacyJsBooleanReturnAssumptionsRule.new,
   PreferStringForTypeofEqualsRule.new,
   PreferIntForJsarrayWithLengthRule.new,
-
-  // SDK migration batch 2 rules (plan files 057–094)
+  // SDK migration batch 2 rules (plan files 057–094),
   PreferIsNanOverNanEqualityRule.new,
   PreferCodeUnitAtRule.new,
   PreferNeverOverAlwaysThrowsRule.new,
@@ -3053,14 +2671,12 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidExtendingSecurityContextRule.new,
   AvoidDeprecatedPointerArithmeticRule.new,
   PreferExtractingRepeatedMapLookupRule.new,
-
-  // Flutter deprecation migration rules (various versions)
+  // Flutter deprecation migration rules (various versions),
   AvoidRemovedRenderObjectElementMethodsRule.new,
   AvoidDeprecatedAnimatedListTypedefsRule.new,
   AvoidDeprecatedUseMaterial3CopyWithRule.new,
   AvoidDeprecatedOnSurfaceDestroyedRule.new,
-
-  // v5.1.0 - New lint rules
+  // v5.1.0 - New lint rules,
   AvoidCachedImageWebRule.new,
   AvoidClipDuringAnimationRule.new,
   AvoidAutoRouteContextNavigationRule.new,
@@ -3070,8 +2686,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidBehaviorSubjectLastValueRule.new,
   PreferRxdartForComplexStreamsRule.new,
   AvoidCacheStampedeRule.new,
-
-  // v5.1.0 - Batch 2
+  // v5.1.0 - Batch 2,
   AvoidDeepNestingRule.new,
   AvoidHighCyclomaticComplexityRule.new,
   AvoidVoidAsyncRule.new,
@@ -3092,8 +2707,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireAutoRouteFullHierarchyRule.new,
   AvoidFirebaseUserDataInAuthRule.new,
   RequireFirebaseAppCheckProductionRule.new,
-
-  // v5.1.0 — New rules
+  // v5.1.0 — New rules,
   AvoidStringEnvParsingRule.new,
   AvoidConnectivityEqualsInternetRule.new,
   AvoidPlatformSpecificImportsRule.new,
@@ -3108,7 +2722,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidExpensiveDidChangeDependenciesRule.new,
   AvoidPermissionRequestLoopRule.new,
   AvoidEntitlementWithoutServerRule.new,
-  // Roadmap detail requirements (15 new rules)
+  // Roadmap detail requirements (15 new rules),
   AvoidBoolInWidgetConstructorsRule.new,
   AvoidClassesWithOnlyStaticMembersRule.new,
   AvoidDoubleAndIntChecksRule.new,
@@ -3140,8 +2754,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferStaticBeforeInstanceRule.new,
   UseTruncatingDivisionRule.new,
   PreferVerbMethodNamesRule.new,
-
-  // Additional rules (plan_additional_rules_1_through_10)
+  // Additional rules (plan_additional_rules_1_through_10),
   ArgumentMustBeNativeRule.new,
   DuplicateIgnoreRule.new,
   ExternalWithInitializerRule.new,
@@ -3150,8 +2763,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   TypeCheckWithNullRule.new,
   UnnecessaryLibraryNameRule.new,
   WrongNumberOfParametersForSetterRule.new,
-
-  // Additional rules (plan_additional_rules_11_through_20)
+  // Additional rules (plan_additional_rules_11_through_20),
   UnintendedHtmlInDocCommentRule.new,
   UriDoesNotExistInDocImportRule.new,
   PreferForElementsToMapFromIterableRule.new,
@@ -3159,27 +2771,26 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PackageNamesRule.new,
   SortPubDependenciesRule.new,
   SecurePubspecUrlsRule.new,
-  // Dart SDK 3.13+ migration (dart_sdk_migration_rules.dart)
+  // Dart SDK 3.13+ migration (dart_sdk_migration_rules.dart),
   PreferPrimaryConstructorRule.new,
-  // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
+  // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart),
   RequireSdkUpperBoundRule.new,
   AvoidUnboundedDependencyRule.new,
   RequireDependencyLowerBoundRule.new,
   PreferCaretConstraintInAppRule.new,
   AvoidOverlyWideAppConstraintRule.new,
-  // SDK syntax vs constraint cross-check (sdk_syntax_match_rule.dart)
+  // SDK syntax vs constraint cross-check (sdk_syntax_match_rule.dart),
   RequireSdkSyntaxMatchRule.new,
-  // Removed: `DependOnReferencedPackagesRule` — the Dart SDK already ships
-  // `depend_on_referenced_packages` via `package:lints/core.yaml` (transitively
-  // via `package:flutter_lints/flutter.yaml`), so duplicating it here only
-  // produced double-reporting (pre-rename) or a parallel implementation that
-  // kept failing on real-world pubspecs (post-rename). Delegating to the SDK
-  // lint — which is tested against the full Dart ecosystem — removes a whole
-  // class of false-positive storms. Users who want this check keep getting
-  // it from `flutter_lints` / `lints`; no config change required.
+  // Removed: `DependOnReferencedPackagesRule` — the Dart SDK already ships,
+  // `depend_on_referenced_packages` via `package:lints/core.yaml` (transitively,
+  // via `package:flutter_lints/flutter.yaml`), so duplicating it here only,
+  // produced double-reporting (pre-rename) or a parallel implementation that,
+  // kept failing on real-world pubspecs (post-rename). Delegating to the SDK,
+  // lint — which is tested against the full Dart ecosystem — removes a whole,
+  // class of false-positive storms. Users who want this check keep getting,
+  // it from `flutter_lints` / `lints`; no config change required.,
   UriDoesNotExistRule.new,
-
-  // Additional rules (plan_additional_rules_21_through_30)
+  // Additional rules (plan_additional_rules_21_through_30),
   ConflictingConstructorAndStaticMemberRule.new,
   DuplicateConstructorRule.new,
   DuplicateRecordFieldNameRule.new,
@@ -3190,8 +2801,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   InvalidNonVirtualAnnotationRule.new,
   InvalidRecordFieldNameRule.new,
   InvalidSuperFormalParameterLocationRule.new,
-
-  // Additional rules (plan_additional_rules_31_through_40)
+  // Additional rules (plan_additional_rules_31_through_40),
   AbstractFieldInitializerRule.new,
   AbiSpecificIntegerInvalidRule.new,
   AnnotateRedeclaresRule.new,
@@ -3202,36 +2812,31 @@ _allRuleFactories = <SaropaLintRule Function()>[
   SubtypeOfDisallowedTypeRule.new,
   UndefinedEnumConstructorRule.new,
   YieldInNonGeneratorRule.new,
-
-  // receive_sharing_intent rules (receive_sharing_intent_rules.dart)
+  // receive_sharing_intent rules (receive_sharing_intent_rules.dart),
   ReceiveSharingIntentMissingInitialMediaRule.new,
   ReceiveSharingIntentMissingResetRule.new,
   ReceiveSharingIntentUnfilteredTypeRule.new,
-
-  // sign_in_with_apple rules (sign_in_with_apple_rules.dart)
+  // sign_in_with_apple rules (sign_in_with_apple_rules.dart),
   AppleSignInUnhandledAuthorizationExceptionRule.new,
   AppleSignInUnhandledCancelRule.new,
   AppleSignInUncheckedAvailabilityRule.new,
   AppleSignInNullIdentityTokenRule.new,
   AppleSignInRelyingOnNameEmailRule.new,
   AppleSignInUncheckedCredentialStateRule.new,
-
-  // lottie rules (lottie_rules.dart)
+  // lottie rules (lottie_rules.dart),
   LottieControllerMissingOnLoadedRule.new,
   LottieNetworkMissingErrorBuilderRule.new,
   LottieFrameRateMaxWithoutRenderCacheRule.new,
   LottieRenderCacheRasterLargeRiskRule.new,
   LottieNetworkMissingBackgroundLoadingRule.new,
-
-  // flutter_animate rules (flutter_animate_rules.dart)
+  // flutter_animate rules (flutter_animate_rules.dart),
   FlutterAnimateUnconditionalRepeatInOnPlayRule.new,
   FlutterAnimateRestartOnHotReloadInReleaseRule.new,
   FlutterAnimateNoKeyInListRule.new,
   FlutterAnimateEmptyAnimateListRule.new,
   FlutterAnimateFixedTargetLiteralRule.new,
   FlutterAnimateAutoPlayFalseNoDriverRule.new,
-
-  // awesome_notifications rules (awesome_notifications_rules.dart)
+  // awesome_notifications rules (awesome_notifications_rules.dart),
   AwesomeNotificationsNonStaticListenerRule.new,
   AwesomeNotificationsHandlerWrongParameterTypeRule.new,
   AwesomeNotificationsMissingPragmaAnnotationRule.new,
@@ -3239,79 +2844,67 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AwesomeNotificationsCreateWithoutPermissionCheckRule.new,
   AwesomeNotificationsNegativeNotificationIdRule.new,
   AwesomeNotificationsListenersBeforeDisplayRule.new,
-
-  // share_plus rules (share_plus_rules.dart) — prefer_shareplus_instance is
-  // the version-gated migration code (relocated to share_plus_11).
+  // share_plus rules (share_plus_rules.dart) — prefer_shareplus_instance is,
+  // the version-gated migration code (relocated to share_plus_11).,
   PreferSharePlusInstanceRule.new,
   SharePlusMissingPositionOriginRule.new,
   SharePlusUncheckedResultRule.new,
   SharePlusEmptyShareParamsRule.new,
   SharePlusUriAndTextConflictRule.new,
-
-  // sensors_plus rules (sensors_plus_rules.dart) — prefer_sensors_event_stream
-  // is the version-gated migration code (relocated to sensors_plus_4).
+  // sensors_plus rules (sensors_plus_rules.dart) — prefer_sensors_event_stream,
+  // is the version-gated migration code (relocated to sensors_plus_4).,
   PreferSensorsEventStreamRule.new,
   SensorsPlusNoSamplingPeriodRule.new,
   SensorsPlusFastestIntervalRule.new,
   SensorsPlusMissingOnErrorRule.new,
-
-  // flutter_svg rules (flutter_svg_rules.dart) — prefer_svg_color_filter is the
-  // version-gated migration code (relocated to flutter_svg_2).
+  // flutter_svg rules (flutter_svg_rules.dart) — prefer_svg_color_filter is the,
+  // version-gated migration code (relocated to flutter_svg_2).,
   PreferSvgColorFilterRule.new,
   SvgNetworkMissingErrorBuilderRule.new,
   SvgNetworkMissingPlaceholderRule.new,
   SvgMissingSemanticsLabelRule.new,
   SvgStringMissingErrorBuilderRule.new,
-
-  // file_picker migration rules (file_picker_rules.dart) — all relocated to
-  // file_picker_10 / file_picker_12 gated packs.
+  // file_picker migration rules (file_picker_rules.dart) — all relocated to,
+  // file_picker_10 / file_picker_12 gated packs.,
   FilePickerDeprecatedWithDataRule.new,
   FilePickerDeprecatedWithReadStreamRule.new,
   FilePickerDeprecatedAllowMultipleRule.new,
   FilePickerDeprecatedAllowCompressionRule.new,
-
-  // connectivity_plus rules (connectivity_plus_rules.dart) — migration code
-  // avoid_pre_v6_single_connectivity_result relocated to connectivity_plus_6.
+  // connectivity_plus rules (connectivity_plus_rules.dart) — migration code,
+  // avoid_pre_v6_single_connectivity_result relocated to connectivity_plus_6.,
   AvoidPreV6SingleConnectivityResultRule.new,
   ConnectivitySatelliteMissingRule.new,
-
-  // google_sign_in rules (google_sign_in_rules.dart) — avoid_pre_v7 migration
-  // relocated to google_sign_in_7 (<7); the 5 usage rules gate on google_sign_in >=7.
+  // google_sign_in rules (google_sign_in_rules.dart) — avoid_pre_v7 migration,
+  // relocated to google_sign_in_7 (<7); the 5 usage rules gate on google_sign_in >=7.,
   AvoidPreV7GoogleSignInRule.new,
   GoogleSignInMissingExceptionHandlerRule.new,
   GoogleSignInUncheckedSupportsAuthenticateRule.new,
   GoogleSignInAuthTokenFromAuthenticateRule.new,
   GoogleSignInCanceledNotHandledRule.new,
   GoogleSignInAuthenticateBeforeInitializeRule.new,
-
-  // json_datetime rules (json_datetime_rules.dart)
+  // json_datetime rules (json_datetime_rules.dart),
   AvoidDateTimeConstructorRule.new,
   AvoidDateTimeConstructorUnvalidatedRule.new,
-
-  // webview_flutter rules (webview_flutter_rules.dart) — the base webview_flutter
-  // pack is whole-gated < 4.0.0 (pre-upgrade), so no relocation is needed.
+  // webview_flutter rules (webview_flutter_rules.dart) — the base webview_flutter,
+  // pack is whole-gated < 4.0.0 (pre-upgrade), so no relocation is needed.,
   AvoidPreV4WebviewWidgetRule.new,
-
-  // local_auth migration rules (local_auth_rules.dart) — all relocated to local_auth_3.
+  // local_auth migration rules (local_auth_rules.dart) — all relocated to local_auth_3.,
   LocalAuthDeprecatedOptionsClassRule.new,
   LocalAuthUseErrorDialogsRemovedRule.new,
   LocalAuthStickyAuthRenamedRule.new,
   LocalAuthPlatformExceptionCatchRule.new,
-
-  // Tier 1 quick wins — batch 1
+  // Tier 1 quick wins — batch 1,
   AvoidFocusedTestsRule.new,
   AvoidExitOutsideEntrypointRule.new,
   AvoidLabeledStatementsRule.new,
-
-  // Tier 1 quick wins — batch 2
+  // Tier 1 quick wins — batch 2,
   AvoidNullChecksInEqualityOperatorsRule.new,
   AvoidUnnecessaryElseAfterControlFlowRule.new,
   PreferInitializingFormalsRule.new,
   AvoidSkippedTestsRule.new,
   NoOptionalOperatorsInTestsRule.new,
   AvoidPublicMembersInStatesRule.new,
-
-  // Tier 1 quick wins — batch 3
+  // Tier 1 quick wins — batch 3,
   PreferBlankLineBeforeBreakRule.new,
   PreferBlankLineBeforeContinueRule.new,
   PreferBlankLineBeforeThrowRule.new,
@@ -3321,6 +2914,23 @@ _allRuleFactories = <SaropaLintRule Function()>[
   StartCommentsWithSpaceRule.new,
   ConstructorParametersAndFieldsShouldHaveTheSameOrderRule.new,
   TodoWithStoryLinksRule.new,
+  AvoidDisposingLateFieldsRule.new,
+  GettersInMemberListRule.new,
+  InitializersOrderingRule.new,
+  MutableTearoffRule.new,
+  SpecifyUnknownEnumValueRule.new,
+  AvoidEqualsAndHashCodeOnMutableClassesRule.new,
+  AvoidFutureorReturnTypeRule.new,
+  DocumentEnumRule.new,
+  IsFutureRule.new,
+  AvoidDynamicCallsRule.new,
+  NoDirectIterableAccessRule.new,
+  DuplicateValueRule.new,
+  PreferTypedExceptionsRule.new,
+  AvoidImplementingValueTypesRule.new,
+  NewInstanceCascadeRule.new,
+  AvoidMountedCheckInFinallyRule.new,
+  NeverDiscardBuildContextRule.new,
 ];
 
 // =============================================================================

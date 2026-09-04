@@ -309,6 +309,7 @@ const Set<String> flutterStylisticRules = <String>{
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
 /// A single violation causes real harm: app crashes, data exposed, resources never released.
 const Set<String> essentialRules = <String>{
+  'avoid_equals_and_hash_code_on_mutable_classes',
   // receive_sharing_intent (receive_sharing_intent_rules.dart) - cold-start data loss
   'rsi_missing_initial_media',
   // awesome_notifications (awesome_notifications_rules.dart) - runtime-fatal handler defects
@@ -772,6 +773,14 @@ const Set<String> essentialRules = <String>{
   'require_ignore_comment_plugin_prefix', // WARNING - bare ignore silently ineffective in IDE
   // Tier 1 quick wins — batch 1
   'avoid_focused_tests', // WARNING - solo:true silently skips entire suite in CI
+  // Tier 1 quick wins — batch 4
+  'avoid_disposing_late_fields',
+  'is_future',
+  'avoid_dynamic_calls',
+  'duplicate_value',
+  'avoid_mounted_check_in_finally',
+  'never_discard_build_context',
+  'avoid_futureor_return_type',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1753,11 +1762,14 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_public_members_in_states', // INFO - public API leak from State class
   // Tier 1 quick wins — batch 3
   'always_put_doc_comments_before_annotations', // INFO - doc comment after annotation breaks dartdoc
+  // Tier 1 quick wins — batch 4
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
 /// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
+  'mutable_tearoff',
+  'no_direct_iterable_access',
   // Android 14 partial photo/video access (android_rules.dart). Advisory (INFO),
   // and only fires when broad media permissions are already declared.
   'require_android_partial_media_permission',
@@ -3272,6 +3284,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Tier 1 quick wins — batch 3
   'avoid_unnecessary_parentheses', // INFO - redundant parens that don't change precedence
   'constructor_parameters_and_fields_should_have_the_same_order', // INFO - param order matches field order
+  // Tier 1 quick wins — batch 4
+  'specify_unknown_enum_value',
+  'prefer_typed_exceptions',
+  'avoid_implementing_value_types',
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.
@@ -3305,6 +3321,11 @@ const Set<String> pedanticOnlyRules = <String>{
   'avoid_duplicate_test_assertions', // no repeated assertions
   // Tier 1 quick wins — batch 3
   'start_comments_with_space', // INFO - // comment needs space after slashes
+  // Tier 1 quick wins — batch 4 (stylistic)
+  'getters_in_member_list',
+  'initializers_ordering',
+  'document_enum',
+  'new_instance_cascade',
 };
 
 /// Returns the set of rule names for a given tier.
