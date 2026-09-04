@@ -6,16 +6,28 @@ import 'package:analyzer/dart/element/type.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when a runtime `is Future` / `is Future<T>` type check is used to
-/// branch behavior on whether a value is asynchronous.
+/// branch behavior on a value that carries NO static evidence of being
+/// asynchronous — typically a `dynamic` or `Object` value.
 ///
-/// Since: v14.3.3 | Updated: v14.3.3 | Rule version: v1
+/// Since: v14.3.3 | Updated: v14.3.4 | Rule version: v2
 ///
-/// A runtime `is Future` check is fragile: `Future<T>` erasure and
-/// `FutureOr<T>` make the test unreliable across generic boundaries, and a
-/// value that is synchronously available under `FutureOr<T>` still needs
-/// uniform handling. The correct fix is almost always to type the parameter
-/// as `FutureOr<T>` and `await` it directly — `await` on a non-Future value
-/// simply returns that value, so the branch becomes unnecessary.
+/// A runtime `is Future` check on an untyped value is fragile: `Future<T>`
+/// generic erasure makes the test unreliable across generic boundaries, and
+/// the branch usually duplicates logic that `await` would unify. The fix is
+/// almost always to type the value as `FutureOr<T>` and `await` it directly —
+/// `await` on a non-Future value simply returns that value, so the branch
+/// becomes unnecessary.
+///
+/// **FutureOr narrowing is exempt (v2).** When the tested expression is
+/// ALREADY statically typed `FutureOr<T>` and the `is` clause names the
+/// matching `Future<T>`, the check is the canonical, analyzer-recommended way
+/// to narrow a `FutureOr<T>` — and it is the ONLY way to do so in a
+/// synchronous context, where `await` is not available because the enclosing
+/// function cannot be made `async` (an overridden synchronous interface
+/// method, a getter, a `build()` method). Reporting there was a false
+/// positive: the rule's own correction ("type the parameter as `FutureOr<T>`")
+/// was already satisfied, so the diagnostic was unactionable. v2 therefore
+/// consults `node.expression.staticType` and stays silent on that idiom.
 ///
 /// Fires on both `x is Future` and the negated `x is! Future` — the negation
 /// does not change the underlying fragility, only which branch runs first.
@@ -56,6 +68,17 @@ import '../../saropa_lint_rule.dart';
 ///   print(value);
 /// }
 /// ```
+///
+/// **GOOD (FutureOr narrowing in a synchronous context):**
+/// ```dart
+/// // Overriding a synchronous interface method — `await` is unavailable
+/// // because the signature forbids making this function async, so the
+/// // `is Future<T>` narrowing of an already-FutureOr<T> value is correct.
+/// int? tryReadSync(FutureOr<int> value) {
+///   if (value is Future<int>) return null;
+///   return value; // Promoted to int by the narrowing above.
+/// }
+/// ```
 class IsFutureRule extends SaropaLintRule {
   IsFutureRule() : super(code: _code);
 
@@ -84,15 +107,20 @@ class IsFutureRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'is_future',
-    '[is_future] Runtime "is Future" type check used to branch on whether a '
-        'value is asynchronous. This is fragile: Future<T> generic erasure '
-        'and FutureOr<T> make the check unreliable across generic '
-        'boundaries, and a Future subclass or a synchronously-available '
-        'FutureOr<T> value can produce surprising results. {v1}',
+    '[is_future] Runtime "is Future" type check used to branch on whether an '
+        'untyped value is asynchronous. This is fragile: the tested value has '
+        'no static type saying it may be async (typically dynamic or Object), '
+        'Future<T> generic erasure makes the check unreliable across generic '
+        'boundaries, and the two branches usually duplicate logic that a '
+        'single await would unify. Narrowing a value already typed '
+        'FutureOr<T> with "is Future<T>" is the correct idiom and is NOT '
+        'reported. {v2}',
     correctionMessage:
-        'Type the parameter as FutureOr<T> and use "await value" directly — '
-        'awaiting a non-Future value simply returns it, making the runtime '
-        'check unnecessary. If the source type is genuinely outside your '
+        'Type the value as FutureOr<T> instead of dynamic/Object, then use '
+        '"await value" directly — awaiting a non-Future value simply returns '
+        'it, making the runtime check unnecessary. If the enclosing function '
+        'cannot be async, keep FutureOr<T> and narrow with "is Future<T>", '
+        'which this rule allows. If the source type is genuinely outside your '
         'control, wrap it with "await Future.value(x)" instead of branching.',
     severity: DiagnosticSeverity.WARNING,
   );
@@ -118,9 +146,56 @@ class IsFutureRule extends SaropaLintRule {
       // `Future`, whereas this rule intentionally checks only the literal
       // annotation type and does not walk supertypes (see the "Scope note"
       // in the class DartDoc above).
-      if (testedType.isDartAsyncFuture) {
-        reporter.atNode(node);
-      }
+      if (!testedType.isDartAsyncFuture) return;
+
+      // v2 false-positive guard: consult the type of the VALUE being tested,
+      // not just the type written in the `is` clause. `FutureOr<T>` values
+      // legitimately need `is Future<T>` to narrow, and in a synchronous
+      // context (an overridden sync interface method, a getter) that is the
+      // only available mechanism because `await` would force the function to
+      // become async. Reporting there produced an unactionable diagnostic.
+      if (_isFutureOrNarrowing(node.expression.staticType, testedType)) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// True when [valueType] is `FutureOr<T>` and [testedType] is the matching
+  /// `Future<T>` — i.e. the `is` check is a legitimate narrowing rather than
+  /// a fragile runtime probe of an untyped value.
+  ///
+  /// Deliberately narrow: it demands STATIC evidence (a `FutureOr` value
+  /// type) before suppressing. Anything else — `dynamic`, `Object`, an
+  /// unresolved type, or a mismatched type argument — still reports, so the
+  /// intended target (`dynamic result; if (result is Future)`) is untouched.
+  static bool _isFutureOrNarrowing(DartType? valueType, DartType testedType) {
+    // No resolution (syntactic scan pass) or a non-FutureOr value: the rule
+    // has no evidence this is a narrowing, so keep reporting.
+    if (valueType == null || !valueType.isDartAsyncFutureOr) return false;
+
+    // Both `FutureOr<T>` and `Future<T>` are modeled as InterfaceType by the
+    // analyzer, so the type arguments are directly comparable. A missing
+    // argument list means the type is raw/erased; treat that as a match
+    // because a raw `is Future` on a FutureOr value is still narrowing.
+    final DartType? valueArg = _singleTypeArgument(valueType);
+    final DartType? testedArg = _singleTypeArgument(testedType);
+    if (valueArg == null || testedArg == null) return true;
+
+    // `FutureOr<int>` narrowed by `is Future<int>` — the canonical idiom.
+    // A mismatch (e.g. `FutureOr<int>` tested against `Future<String>`) is
+    // NOT narrowing and stays reported.
+    return valueArg == testedArg;
+  }
+
+  /// The sole type argument of [type], or null when [type] is not a
+  /// single-argument interface type (raw `Future`, `dynamic`, InvalidType).
+  static DartType? _singleTypeArgument(DartType type) {
+    if (type is! InterfaceType) return null;
+    final List<DartType> args = type.typeArguments;
+    if (args.length != 1) return null;
+    // A `dynamic` argument means the annotation was written raw (`Future`),
+    // which carries no distinguishing information — report it as "no
+    // argument" so the caller treats it as a match.
+    return args.first is DynamicType ? null : args.first;
   }
 }

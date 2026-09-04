@@ -11,11 +11,13 @@ import '../../support/resolved_rule_harness.dart';
 /// without depending on lib/saropa_lints.dart or lib/src/tiers.dart.
 ///
 /// The example package (which the harness resolves fixtures against) does
-/// not depend on the `equatable` package, so `Equatable` resolves to an
-/// unresolved/invalid type here. Detection still fires because the rule's
-/// fast path matches the exact `implements` clause name lexeme
-/// ('Equatable'/'EquatableMixin') before falling back to resolved-type
-/// supertype walking for indirect cases.
+/// not depend on the `equatable` package, so every test source below
+/// declares its own local `Equatable`/`EquatableMixin` stand-in. Those
+/// stand-ins DO resolve (they are declared in the same library), and the
+/// rule accepts a non-`package:equatable` element named `Equatable` only
+/// when it structurally corroborates the contract with a `props` getter —
+/// which the stand-ins deliberately declare. A stand-in WITHOUT `props` is
+/// the false-positive case pinned by the last test in this file.
 void main() {
   group('Avoid Implementing Value Types Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -225,6 +227,264 @@ class Money extends Equatable implements ValueObject {
 
   @override
   List<Object?> get props => [cents];
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_implementing_value_types')));
+      },
+    );
+
+    // ---------------------------------------------------------------------
+    // HIGH false positive: inherited manual equality was invisible because
+    // _declaresOwnEqualityContract only scanned the class's OWN body
+    // members. `extends` inherits implementation, so a base class that
+    // hand-rolls ==/hashCode gives the subclass working value equality —
+    // nothing is broken and nothing should be reported.
+    // ---------------------------------------------------------------------
+    test(
+      'does not fire when == and hashCode are inherited from an ordinary '
+      'base class',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+class BaseValue {
+  @override
+  bool operator ==(Object other) => runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+class UserId extends BaseValue implements Equatable {
+  UserId(this.value);
+  final String value;
+
+  @override
+  List<Object?> get props => [value];
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_implementing_value_types')));
+      },
+    );
+
+    // The declaring ancestor may sit several levels up, so the fix must walk
+    // the whole extends chain rather than checking only the direct parent.
+    test(
+      'does not fire when inherited == and hashCode come from a '
+      'grandparent class',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+class BaseValue {
+  @override
+  bool operator ==(Object other) => runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+class MidValue extends BaseValue {}
+
+class RegionId extends MidValue implements Equatable {
+  RegionId(this.value);
+  final String value;
+
+  @override
+  List<Object?> get props => [value];
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_implementing_value_types')));
+      },
+    );
+
+    // Mixins copy implementation in, so a mixin hand-rolling the pair is
+    // just as sound a source of equality as a base class.
+    test(
+      'does not fire when == and hashCode are inherited from a mixin',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+mixin IdentityEquality {
+  @override
+  bool operator ==(Object other) => runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+class ShardId with IdentityEquality implements Equatable {
+  ShardId(this.value);
+  final String value;
+
+  @override
+  List<Object?> get props => [value];
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_implementing_value_types')));
+      },
+    );
+
+    // Guard against over-correcting the chain walk: Object declares == and
+    // hashCode for EVERY class, so a walk that fails to stop at dart:core's
+    // Object would silence the rule entirely. This is the canonical BAD
+    // case with an explicit (implicit-Object) parent chain.
+    test(
+      'still fires when the only inherited == and hashCode come from '
+      'Object',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+class PlainBase {}
+
+class UserId extends PlainBase implements Equatable {
+  UserId(this.value);
+  final String value;
+
+  @override
+  List<Object?> get props => [value];
+}
+''',
+        );
+        expect(codes, contains('avoid_implementing_value_types'));
+      },
+    );
+
+    // A base class declaring only ONE half of the pair does not supply a
+    // working contract, so the rule must still fire.
+    test(
+      'still fires when the base class declares == but not hashCode',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+class HalfBase {
+  @override
+  bool operator ==(Object other) => runtimeType == other.runtimeType;
+}
+
+class UserId extends HalfBase implements Equatable {
+  UserId(this.value);
+  final String value;
+
+  @override
+  List<Object?> get props => [value];
+}
+''',
+        );
+        expect(codes, contains('avoid_implementing_value_types'));
+      },
+    );
+
+    // `implements` inherits NO implementation, so an interface that merely
+    // DECLARES ==/hashCode must not be mistaken for a working contract.
+    test(
+      'still fires when == and hashCode are only declared on an implemented '
+      'interface',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  List<Object?> get props;
+}
+
+abstract class EqualityContract {
+  @override
+  bool operator ==(Object other);
+
+  @override
+  int get hashCode;
+}
+
+class UserId implements EqualityContract, Equatable {
+  UserId(this.value);
+  final String value;
+
+  @override
+  List<Object?> get props => [value];
+}
+''',
+        );
+        expect(codes, contains('avoid_implementing_value_types'));
+      },
+    );
+
+    // ---------------------------------------------------------------------
+    // MEDIUM false positive: name-only matching without library
+    // qualification. A project-local `Equatable` that is NOT a value type
+    // (no `props`) used to be flagged with a completely misleading
+    // diagnosis. The resolved element is now the authority.
+    // ---------------------------------------------------------------------
+    test(
+      'does not fire on a project-local interface that merely reuses the '
+      'name Equatable',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+abstract class Equatable {
+  bool matches(Object other);
+}
+
+class ConfigKey implements Equatable {
+  ConfigKey(this.name);
+  final String name;
+
+  @override
+  bool matches(Object other) => other is ConfigKey && other.name == name;
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_implementing_value_types')));
+      },
+    );
+
+    // Same for the mixin half of the name set: a local `EquatableMixin`
+    // with no `props` is not the equatable package's mixin.
+    test(
+      'does not fire on a project-local mixin that merely reuses the name '
+      'EquatableMixin',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidImplementingValueTypesRule(),
+          '''
+mixin EquatableMixin {
+  bool matches(Object other);
+}
+
+class ConfigKey implements EquatableMixin {
+  ConfigKey(this.name);
+  final String name;
+
+  @override
+  bool matches(Object other) => other is ConfigKey && other.name == name;
 }
 ''',
         );

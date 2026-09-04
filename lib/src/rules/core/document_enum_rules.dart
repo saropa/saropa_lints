@@ -29,6 +29,14 @@ import '../../saropa_lint_rule.dart';
 /// starting with `_`) are not public API and are skipped, matching
 /// `require_public_api_documentation`'s treatment of private classes.
 ///
+/// Enum constants that carry an annotation (e.g. `@Deprecated(...)`,
+/// `@JsonValue(...)`) are documented correctly regardless of whether the
+/// `///` doc comment is placed before, after, or on the same line as the
+/// annotation — the analyzer's `documentationComment` resolution is
+/// annotation-order-agnostic, verified by a resolved-rule-harness test
+/// (`document_enum_rules_test.dart`) and locked in by the annotated-constant
+/// fixture cases.
+///
 /// **BAD:**
 /// ```dart
 /// enum OrderStatus {

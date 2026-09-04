@@ -27,6 +27,32 @@ import '../../saropa_lint_rule.dart';
 /// against the immediate signature actually being invoked, not a redirect
 /// target several hops away.
 ///
+/// ## CONFLICTS WITH `prefer_arguments_ordering` — enable one, not both
+///
+/// `prefer_arguments_ordering` requires named arguments to be sorted
+/// ALPHABETICALLY; this rule requires them to follow the callee's
+/// DECLARATION order. For any callee whose declared named-parameter order
+/// is not already alphabetical, the two demands are mutually exclusive:
+/// whichever order the call site uses, exactly one of the two rules fires,
+/// and applying `prefer_arguments_ordering`'s `SortArgumentsFix` quick fix
+/// mechanically introduces a violation of this rule (and vice versa).
+/// Both rules live in the opt-in `stylisticRules` set, so neither is on by
+/// default — but a project that enables the whole stylistic set gets both
+/// and will see permanent, unfixable churn. Pick the convention you want and
+/// disable the other rule explicitly in `analysis_options.yaml`.
+///
+/// ## Flutter friction: the `key:` first / `child:` last convention
+///
+/// Flutter call sites conventionally put `key:` first and `child:` /
+/// `children:` last, regardless of how the widget's constructor happens to
+/// declare its parameters. This rule knows nothing about that convention —
+/// it compares against the declared order only. Whenever a widget's
+/// constructor does not itself declare `key` first and `child`/`children`
+/// last (which is common in hand-written widgets, and in some framework
+/// widgets too), idiomatic Flutter call sites will be flagged. Before
+/// enabling this rule in a Flutter codebase, decide which convention wins;
+/// there is no configuration that exempts `key`/`child` today.
+///
 /// ### Example
 ///
 /// #### BAD:
@@ -76,6 +102,16 @@ class NamedParametersOrderingRule extends SaropaLintRule {
   @override
   List<String> get configAliases => const <String>['named_arguments_ordering'];
 
+  /// Machine-readable form of the DartDoc conflict warning above:
+  /// `prefer_arguments_ordering` demands ALPHABETICAL named-argument order
+  /// while this rule demands DECLARATION order, so for any callee whose
+  /// declaration is not alphabetical exactly one of the pair always fires and
+  /// each one's quick fix creates a violation of the other.
+  @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_arguments_ordering',
+  ];
+
   static const LintCode _code = LintCode(
     'named_parameters_ordering',
     '[named_parameters_ordering] Named arguments at this call site are not '
@@ -111,9 +147,16 @@ class NamedParametersOrderingRule extends SaropaLintRule {
 
     // A call through a function-typed variable/field/tear-off (e.g.
     // `final f = exampleFunction; f(gamma: 'g', alpha: 'a');`) is a distinct
-    // AST node from MethodInvocation — without this hook such call sites
-    // were a silent false-negative even though the callee's declared named
-    // order is fully knowable via `node.element`.
+    // AST node from MethodInvocation, so it needs its own hook.
+    //
+    // KNOWN LIMITATION (pinned by a test): `node.element` is null whenever the
+    // callee is a function-TYPED variable rather than a resolvable
+    // declaration, so `_checkOrder` bails on its `is! ExecutableElement`
+    // guard and that — the most common shape — is a false negative. The
+    // declared named order for those call sites lives on `staticInvokeType`
+    // (a FunctionType), which this rule deliberately does not consult yet.
+    // The hook is kept so the case is covered the moment `element` does
+    // resolve, and so the gap has one obvious place to be closed.
     context.addFunctionExpressionInvocation((
       FunctionExpressionInvocation node,
     ) {
@@ -129,6 +172,23 @@ class NamedParametersOrderingRule extends SaropaLintRule {
       final EnumConstantArguments? arguments = node.arguments;
       if (arguments == null) return;
       _checkOrder(node.constructorElement, arguments.argumentList, reporter);
+    });
+
+    // `: super(port: port, host: host)` and `: this.named(b: b, a: a)` are
+    // real named-argument call sites, but `SaropaContext` exposes no
+    // `addSuperConstructorInvocation` / `addRedirectingConstructorInvocation`
+    // hook (the underlying registry has one; the facade does not expose it).
+    // Rather than leave those as a silent false negative, reach them through
+    // the enclosing ConstructorDeclaration and walk its initializer list —
+    // an initializer list is always short, so the extra traversal is free.
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      for (final ConstructorInitializer init in node.initializers) {
+        if (init is SuperConstructorInvocation) {
+          _checkOrder(init.element, init.argumentList, reporter);
+        } else if (init is RedirectingConstructorInvocation) {
+          _checkOrder(init.element, init.argumentList, reporter);
+        }
+      }
     });
   }
 

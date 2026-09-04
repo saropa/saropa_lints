@@ -97,3 +97,82 @@ enum Status {
   // expect_lint: getters_in_member_list
   String get label => code == 1 ? 'active' : 'inactive';
 }
+
+// Counter: BAD — mixin bodies carry the same field/getter/method split as a
+// class, so a getter trailing `increment()` after the `count` field is the
+// same readability gap.
+mixin Counter {
+  int count = 0;
+
+  void increment() {
+    count++;
+  }
+
+  // expect_lint: getters_in_member_list
+  int get doubledCount => count * 2;
+}
+
+// NumberOps: BAD — extensions cannot declare instance fields, so the earlier
+// property member is the `doubled` getter; `tripled` trails a method and
+// should have been grouped with it.
+extension NumberOps on int {
+  int get doubled => this * 2;
+
+  void logSelf() {
+    // no-op
+  }
+
+  // expect_lint: getters_in_member_list
+  int get tripled => this * 3;
+}
+
+// Meters: BAD — extension-type bodies are member lists like any other; the
+// representation field aside, `feet` is the earlier property member and
+// `inches` trails `log()`.
+extension type Meters(int value) {
+  int get feet => value * 3;
+
+  void log() {
+    // no-op
+  }
+
+  // expect_lint: getters_in_member_list
+  int get inches => value * 39;
+}
+
+// FeetOk: GOOD near-miss — same extension-type shape with both getters ahead
+// of the method. Nothing to reorder.
+extension type FeetOk(int value) {
+  int get inches => value * 12;
+
+  int get yards => value ~/ 3;
+
+  void log() {
+    // no-op
+  }
+}
+
+// MathUtils: GOOD near-miss — a static-only utility holder. The rule's
+// rationale is about an instance's data shape versus its behavior, and a
+// class with no instance members has neither, so `piSquared` trailing
+// `square` is not flagged even though the shape mirrors the BAD cases above.
+class MathUtils {
+  static const double pi = 3.14;
+
+  static double square(double x) => x * x;
+
+  static double get piSquared => pi * pi;
+}
+
+// MixedStatics: GOOD near-miss — a static method sitting between the
+// instance field and the instance getter does not start the "behavior"
+// section, so the getter is still considered grouped with the field.
+class MixedStatics {
+  MixedStatics(this.value);
+
+  final int value;
+
+  static int parse(String raw) => int.parse(raw);
+
+  int get doubled => value * 2;
+}

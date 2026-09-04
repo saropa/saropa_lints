@@ -15,7 +15,7 @@ import '../../target_matcher_utils.dart';
 /// assignment inside `initState()` is conditional, since Dart does not
 /// verify at compile time that a `late` field is assigned before every read.
 ///
-/// Since: v14.5.11 | Updated: v14.5.11 | Rule version: v1
+/// Since: v14.5.11 | Updated: v14.5.11 | Rule version: v2
 ///
 /// Closes a competitive gap with DCM's `avoid-disposing-late-fields`.
 ///
@@ -42,6 +42,16 @@ import '../../target_matcher_utils.dart';
 /// Priority 1: fixes a default-safe/unsafe polarity bug where unanalyzable
 /// shapes were previously mis-scored as unsafe, false-positiving on the
 /// common `_setupController();` delegation pattern).
+///
+/// v2 extends that bail-to-safe policy INSIDE `if`/`else` branches, which
+/// previously had no bail-out at all: an unanalyzable shape nested in a
+/// branch fell through to "this branch does not assign", so a fully-covered
+/// `if (x) { _setupA(); } else { _setupB(); }` was reported as unsafe even
+/// though both arms initialize the field. v2 also recognizes `switch`,
+/// `switch` expression and ternary guards at the dispose() call site (not
+/// just `if`), and matches the cascade disposal form
+/// `_controller..dispose();`, which the target-based call matcher could
+/// never see because a cascade section carries no target of its own.
 ///
 /// **BAD:**
 /// ```dart
@@ -121,7 +131,7 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
         'the code path that skips initialization, this dispose() call '
         'throws LateInitializationError during widget teardown — a crash '
         'that is easy to miss in manual testing because it only reproduces '
-        'on the specific navigation path that skipped the conditional. {v1}',
+        'on the specific navigation path that skipped the conditional. {v2}',
     correctionMessage:
         'Assign the late field unconditionally in initState(), assign it in '
         'every branch of the if/else chain (including an else), or guard '
@@ -161,7 +171,9 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
 
         final _DisposeCallFinder finder = _DisposeCallFinder(fieldName);
         disposeBody.accept(finder);
-        final MethodInvocation? call = finder.match;
+        // AstNode, not MethodInvocation: a cascade section reaches this via
+        // _DisposeCallFinder.visitCascadeExpression (see that method's doc).
+        final AstNode? call = finder.match;
         if (call != null) {
           reporter.atNode(call);
         }
@@ -282,42 +294,75 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
   /// to skip over rather than bail on.
   static bool _hasUnanalyzableStatement(Block block) {
     for (final Statement statement in block.statements) {
-      // `if`/assignment shapes are handled by `_branchAssigns` elsewhere —
-      // neither can hide an assignment from this heuristic, so skip both.
-      if (statement is IfStatement) continue;
-      // A nested `{ ... }` block (e.g. from a labeled statement) is walked
-      // the same way as the outer one.
-      if (statement is Block) {
-        if (_hasUnanalyzableStatement(statement)) return true;
-        continue;
-      }
-      // `try`/loop/`switch` bodies are invisible to `_branchAssigns` — bail
-      // rather than risk mis-scoring a hidden assignment as "unsafe".
-      if (statement is TryStatement ||
-          statement is ForStatement ||
-          statement is WhileStatement ||
-          statement is DoStatement ||
-          statement is SwitchStatement) {
-        return true;
-      }
-      // Only an `ExpressionStatement` can possibly be a helper-delegation
-      // call; everything else (`return`, `assert`, a bare variable
-      // declaration) cannot assign the field, so it's safe to move on.
-      if (statement is! ExpressionStatement) continue;
-      final Expression expr = statement.expression;
-      // A plain assignment is handled by `_branchAssigns`; anything that
-      // isn't a `MethodInvocation` either (a bare identifier, an index
-      // expression) can't assign a field, so it's also safe to skip.
-      if (expr is! MethodInvocation) continue;
-      // A bare (implicit-`this`) call like `_setupController();` might be
-      // a private helper that assigns the field — this heuristic can't
-      // see inside it, so bail. A call with an explicit target
-      // (`super.foo()`, `widget.foo()`, `SomeClass.foo()`) cannot assign a
-      // private field of this class through ordinary method-call
-      // semantics, so it's safe to keep scanning past it.
-      if (expr.target == null) return true;
+      if (_isUnanalyzableStatement(statement)) return true;
     }
     return false;
+  }
+
+  /// Statement-level half of [_hasUnanalyzableStatement], split out so the
+  /// same "can this shape hide an assignment?" test can be applied
+  /// RECURSIVELY to the arms of an `if`/`else` chain, not just to the
+  /// top-level statements of `initState()`'s block.
+  ///
+  /// Why the recursion matters (the bug this fixes): the previous version
+  /// `continue`d past every `IfStatement` without looking inside it, on the
+  /// theory that `_branchAssigns` handles `if` shapes. But `_branchAssigns`
+  /// has no bail-out of its own — a helper call, `try`, loop, or `switch`
+  /// nested INSIDE a branch simply falls through to `return false` ("this
+  /// branch does not assign"), which the caller then reads as proof the
+  /// field is unsafe. The result was a false positive on the fully-covered
+  /// delegation pattern:
+  ///
+  /// ```dart
+  /// if (widget.useAdvanced) { _setupAdvancedController(); }
+  /// else { _setupBasicController(); }
+  /// ```
+  ///
+  /// Both branches genuinely initialize the field, but neither is a shape
+  /// this heuristic can see into. Recursing here makes the whole field bail
+  /// to "safe" — exactly the policy already applied to the identical shapes
+  /// at the top level, so the two levels are now consistent rather than
+  /// silently opposite.
+  ///
+  /// The trade-off is a deliberate false negative: an `if` whose OTHER arm
+  /// is unanalyzable no longer proves the field unsafe. That matches this
+  /// rule's stated design (accept false negatives, never false positives).
+  static bool _isUnanalyzableStatement(Statement statement) {
+    // A nested `{ ... }` block (a branch body, or a labeled statement) is
+    // walked the same way as the enclosing one.
+    if (statement is Block) return _hasUnanalyzableStatement(statement);
+    // Recurse into BOTH arms: either one hiding an assignment behind a shape
+    // this heuristic can't read makes the whole chain unprovable.
+    if (statement is IfStatement) {
+      if (_isUnanalyzableStatement(statement.thenStatement)) return true;
+      final Statement? elseBranch = statement.elseStatement;
+      return elseBranch != null && _isUnanalyzableStatement(elseBranch);
+    }
+    // `try`/loop/`switch` bodies are invisible to `_branchAssigns` — bail
+    // rather than risk mis-scoring a hidden assignment as "unsafe".
+    if (statement is TryStatement ||
+        statement is ForStatement ||
+        statement is WhileStatement ||
+        statement is DoStatement ||
+        statement is SwitchStatement) {
+      return true;
+    }
+    // Only an `ExpressionStatement` can possibly be a helper-delegation
+    // call; everything else (`return`, `assert`, a bare variable
+    // declaration) cannot assign the field, so it's safe to move on.
+    if (statement is! ExpressionStatement) return false;
+    final Expression expr = statement.expression;
+    // A plain assignment is handled by `_branchAssigns`; anything that
+    // isn't a `MethodInvocation` either (a bare identifier, an index
+    // expression) can't assign a field, so it's also safe to skip.
+    if (expr is! MethodInvocation) return false;
+    // A bare (implicit-`this`) call like `_setupController();` might be
+    // a private helper that assigns the field — this heuristic can't
+    // see inside it, so bail. A call with an explicit target
+    // (`super.foo()`, `widget.foo()`, `SomeClass.foo()`) cannot assign a
+    // private field of this class through ordinary method-call
+    // semantics, so it's safe to keep scanning past it.
+    return expr.target == null;
   }
 
   /// True when [fieldName] is provably assigned by walking the top-level
@@ -377,18 +422,24 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
 const Set<String> _cleanupVerbs = {'dispose', 'close', 'cancel'};
 
 /// Finds the first unguarded `fieldName.dispose()` / `fieldName?.dispose()`
-/// (or `.close()` / `.cancel()`, see [_cleanupVerbs]) call inside a
-/// dispose() method body. "Unguarded" means no `IfStatement` ancestor
-/// between the call and the enclosing method — a dispose() call already
-/// wrapped in a conditional (e.g. `if (widget.autoPlay) {
-/// _controller.dispose(); }`) is treated as intentionally guarded and is
-/// not flagged, matching edge case 4 in the proposal: the guard at the call
-/// site proves safety even though initialization was conditional.
+/// / `fieldName..dispose()` (or `.close()` / `.cancel()`, see
+/// [_cleanupVerbs]) call inside a dispose() method body. "Unguarded" means
+/// no conditional ancestor between the call and the enclosing method — a
+/// dispose() call already wrapped in a conditional (e.g.
+/// `if (widget.autoPlay) { _controller.dispose(); }`) is treated as
+/// intentionally guarded and is not flagged, matching edge case 4 in the
+/// proposal: the guard at the call site proves safety even though
+/// initialization was conditional.
 class _DisposeCallFinder extends RecursiveAstVisitor<void> {
   _DisposeCallFinder(this.fieldName);
 
   final String fieldName;
-  MethodInvocation? match;
+
+  /// The offending call node. Typed as [AstNode] rather than
+  /// [MethodInvocation] because a cascade section is also a
+  /// [MethodInvocation] but is reached through [visitCascadeExpression];
+  /// keeping the wider type documents that either entry point can fill it.
+  AstNode? match;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -402,10 +453,65 @@ class _DisposeCallFinder extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
   }
 
+  /// Catches the cascade form `_controller..dispose();`.
+  ///
+  /// [visitMethodInvocation] cannot see this case: in a cascade the section
+  /// `..dispose()` is a [MethodInvocation] with a NULL target — the real
+  /// target lives on the enclosing [CascadeExpression] — so the
+  /// `node.target != null` guard above rejects it and the field was never
+  /// flagged (a silent false negative for a perfectly ordinary disposal
+  /// style). Target-name extraction reuses [extractTargetName], the same
+  /// helper `_CascadeCleanupVisitor` in target_matcher_utils.dart resolves
+  /// cascade targets with (Simple/Prefixed/PropertyAccess identifiers). That
+  /// visitor itself is not reused directly because its public entry points
+  /// (`hasCascadeCleanup*`) return only a `bool` over a whole
+  /// [FunctionBody], while this rule needs the offending NODE to report at,
+  /// and needs to apply the [_isGuarded] check per call site.
+  @override
+  void visitCascadeExpression(CascadeExpression node) {
+    if (match == null && extractTargetName(node.target) == fieldName) {
+      for (final Expression section in node.cascadeSections) {
+        if (section is MethodInvocation &&
+            _cleanupVerbs.contains(section.methodName.name) &&
+            !_isGuarded(node)) {
+          match = section;
+          break;
+        }
+      }
+    }
+    super.visitCascadeExpression(node);
+  }
+
+  /// True when [node] sits inside any conditional construct within the
+  /// enclosing method.
+  ///
+  /// `IfStatement` alone was too narrow: a dispose() call placed in a
+  /// `switch` case arm, a `switch` expression arm, or a ternary is just as
+  /// deliberately conditional as one inside an `if`, but was treated as
+  /// unguarded and flagged. Since the whole point of the guard check is
+  /// "the author gated this call on something", every conditional ancestor
+  /// shape has to count, or the rule false-positives on hand-written
+  /// switch-based teardown.
+  ///
+  /// `SwitchPatternCase`/`SwitchCase` are matched in addition to
+  /// `SwitchStatement` because a `SwitchMember` is not always reached
+  /// through a `SwitchStatement` parent chain in every analyzer AST shape
+  /// (a `SwitchExpressionCase` hangs off a `SwitchExpression`), and matching
+  /// the member directly is the cheaper, shape-independent test.
   static bool _isGuarded(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is IfStatement) return true;
+      if (current is IfStatement ||
+          current is SwitchStatement ||
+          current is SwitchExpression ||
+          current is SwitchMember ||
+          current is SwitchExpressionCase ||
+          current is ConditionalExpression) {
+        return true;
+      }
+      // Stop at the method boundary: a conditional wrapping the whole
+      // dispose() method (impossible in valid Dart) is not the target, and
+      // walking past it would leak into unrelated enclosing code.
       if (current is MethodDeclaration) break;
       current = current.parent;
     }

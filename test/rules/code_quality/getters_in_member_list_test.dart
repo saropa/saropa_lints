@@ -6,7 +6,8 @@
 // earlier to reorder against, `@override` getters, and setters (which are
 // never the flagged member type). Also covers: a setter (not a field) as
 // the earlier property member, an operator method counted as a behavior
-// member, mixin/extension bodies, enum bodies, and multiple offending
+// member, mixin/extension/extension-type bodies, enum bodies, static members
+// being excluded from the ordering check entirely, and multiple offending
 // getters each flagged independently.
 library;
 
@@ -152,10 +153,13 @@ mixin Counter {
       expect(codes, contains(_rule));
     });
 
+    // Extensions cannot declare instance fields, so the earlier property
+    // member here has to be an instance getter — a `static const` no longer
+    // counts (statics are excluded from the ordering check).
     test('LINT: extension body applies the same grouping rule', () async {
       const String code = '''
 extension NumberOps on int {
-  static const int base = 1;
+  int get doubled => this * 2;
 
   void logSelf() {}
 
@@ -164,6 +168,74 @@ extension NumberOps on int {
 ''';
       final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
       expect(codes, contains(_rule));
+    });
+
+    // Extension types were a registered node kind with zero coverage. Like
+    // extensions they have no instance fields, so the leading instance
+    // getter is what the trailing getter should have been grouped with.
+    test('LINT: extension type body applies the same grouping rule', () async {
+      const String code = '''
+extension type Meters(int value) {
+  int get feet => value * 3;
+
+  void log() {}
+
+  int get inches => value * 39;
+}
+''';
+      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+      expect(codes, contains(_rule));
+    });
+
+    // Negative half of the extension-type pair: same body, getters grouped
+    // ahead of the method, so the shim path is exercised without reporting.
+    test('NO lint: extension type with getters grouped before the method', () async {
+      const String code = '''
+extension type Feet(int value) {
+  int get inches => value * 12;
+
+  int get yards => value ~/ 3;
+
+  void log() {}
+}
+''';
+      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+      expect(codes, isNot(contains(_rule)));
+    });
+
+    // The documented static false positive, now fixed: a static-only utility
+    // holder has no instance data shape, so the ordering convention does not
+    // apply and nothing is reported.
+    test('NO lint: static-only utility class is exempt', () async {
+      const String code = '''
+class MathUtils {
+  static const double pi = 3.14;
+
+  static double square(double x) => x * x;
+
+  static double get piSquared => pi * pi;
+}
+''';
+      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+      expect(codes, isNot(contains(_rule)));
+    });
+
+    // A static method in the middle of an instance body must not count as
+    // the "behavior member" that makes the following instance getter late.
+    test('NO lint: static method does not start the behavior section', () async {
+      const String code = '''
+class Mixed {
+  Mixed(this.value);
+
+  final int value;
+
+  static int parse(String raw) => int.parse(raw);
+
+  int get doubled => value * 2;
+}
+''';
+      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+      expect(codes, isNot(contains(_rule)));
     });
 
     test('LINT: enum body applies the same grouping rule', () async {

@@ -208,18 +208,109 @@ class _UntypedUnusedState extends State<StatefulWidget> {
   }
 }
 
-// GOOD near-miss: FutureBuilder's `snapshot` parameter is unrelated to the
-// context-discard check — only the FIRST parameter (context) is examined,
-// so an unused `snapshot` must never trigger this rule.
-class _GoodFutureBuilderState extends State<StatefulWidget> {
+// GOOD: FutureBuilder is NOT a context-supplying builder. Its callback exists
+// to deliver `snapshot`; the context parameter is incidental and resolves the
+// same scope the enclosing build() already has, so discarding it is idiomatic.
+// This was the single largest source of v1 false positives.
+class _GoodFutureBuilderDiscardedContextState
+    extends State<StatefulWidget> {
   Future<String>? _future;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
       future: _future,
-      builder: (BuildContext ctx, AsyncSnapshot<String> snapshot) {
-        return Text('${Theme.of(ctx)}');
+      builder: (BuildContext innerContext, AsyncSnapshot<String> snapshot) {
+        return Text('${snapshot.data}');
+      },
+    );
+  }
+}
+
+// GOOD: StreamBuilder — same reasoning as FutureBuilder above.
+class _GoodStreamBuilderDiscardedContextState
+    extends State<StatefulWidget> {
+  Stream<String>? _stream;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<String>(
+      stream: _stream,
+      builder: (BuildContext innerContext, AsyncSnapshot<String> snapshot) {
+        return Text('${snapshot.data}');
+      },
+    );
+  }
+}
+
+// GOOD: AnimatedBuilder's callback exists to signal a repaint driven by the
+// animation, not to scope a context — discarding the context is the norm.
+class _GoodAnimatedBuilderDiscardedContextState
+    extends State<StatefulWidget> {
+  // `ValueNotifier` implements `Listenable`, which is all AnimatedBuilder
+  // needs — avoids the mock AnimationController's required `vsync`.
+  final ValueNotifier<int> _repaint = ValueNotifier<int>(0);
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _repaint,
+      builder: (BuildContext innerContext, Widget? child) {
+        return const Text('animating');
+      },
+    );
+  }
+}
+
+// GOOD: ValueListenableBuilder delivers the listenable's value; its context
+// parameter carries no extra scope.
+class _GoodValueListenableBuilderDiscardedContextState
+    extends State<StatefulWidget> {
+  final ValueNotifier<int> _counter = ValueNotifier<int>(0);
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<int>(
+      valueListenable: _counter,
+      builder: (BuildContext innerContext, int value, Widget? child) {
+        return Text('$value');
+      },
+    );
+  }
+}
+
+// GOOD: Provider's `Consumer<T>` callback exists to deliver the provided
+// value. Its context is the same scope the caller already had.
+class _CartModel {
+  int total = 0;
+}
+
+class _GoodConsumerDiscardedContextState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<_CartModel>(
+      builder: (BuildContext innerContext, _CartModel cart, Widget? child) {
+        return Text('${cart.total}');
+      },
+    );
+  }
+}
+
+// BAD: a nested block declares its OWN local named `ctx`, shadowing the
+// builder's context. Every `ctx` read inside that block belongs to the local,
+// so the builder-supplied context is still entirely unused. v1 counted those
+// reads as a genuine use and silently missed this violation.
+class _BadShadowedByLocalVariableState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      // expect_lint: never_discard_build_context
+      builder: (BuildContext ctx) {
+        {
+          final String ctx = 'unrelated value that merely reuses the name';
+          debugPrint(ctx);
+        }
+        return Text('${Theme.of(context)}');
       },
     );
   }

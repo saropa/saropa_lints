@@ -6,7 +6,7 @@ import '../../saropa_lint_rule.dart';
 /// Flags a method tear-off (`final callback = someVar.method;`) whose
 /// receiver is a non-`final` local variable, field, or parameter.
 ///
-/// Since: v14.4.0 | Updated: v14.4.0 | Rule version: v1
+/// Since: v14.4.0 | Updated: v14.4.0 | Rule version: v2
 ///
 /// A tear-off captures the *object* the receiver holds at the moment the
 /// tear-off is taken, not a live reference to "whatever the receiver holds
@@ -59,6 +59,19 @@ import '../../saropa_lint_rule.dart';
 ///   late final VoidCallback onTap = handler.handleTap;
 /// }
 /// ```
+///
+/// **GOOD:** a receiver reached through a hand-written getter is never
+/// flagged. The rule cannot see through an arbitrary getter body to decide
+/// whether it returns a stable object, so per its "skip when uncertain"
+/// doctrine it stays silent — this is the mainstream private-field +
+/// public-getter encapsulation idiom and flagging it was a false positive.
+/// ```dart
+/// class Controller {
+///   final Handler _handler = Handler();
+///   Handler get handler => _handler; // read-only getter, no setter
+///   late final VoidCallback onTap = handler.handleTap; // not flagged
+/// }
+/// ```
 class MutableTearoffRule extends SaropaLintRule {
   MutableTearoffRule() : super(code: _code);
 
@@ -90,7 +103,7 @@ class MutableTearoffRule extends SaropaLintRule {
         'callback bug that is easy to introduce and hard to notice, '
         'especially in controller/notifier patterns where a field is '
         'swapped out after the tear-off was already handed to a listener. '
-        '{v1}',
+        '{v2}',
     correctionMessage:
         'Make the receiver final so the tear-off is guaranteed to stay '
         'bound to the same object, or replace the stored tear-off with a '
@@ -178,8 +191,13 @@ class MutableTearoffRule extends SaropaLintRule {
       // long as the collection itself.
       return true;
     }
-    if (parent is MapLiteralEntry && parent.value == node) {
-      // Value side of `key: handler.handleTap` in a map literal.
+    if (parent is MapLiteralEntry &&
+        (parent.value == node || parent.key == node)) {
+      // Either side of `key: value` in a map literal. The KEY side matters
+      // too: `{handler.handleTap: 'label'}` retains the tear-off for the
+      // life of the map exactly as the value side does (and, being a key,
+      // it is additionally hashed by identity — a stale tear-off there
+      // silently fails lookups). Checking only `parent.value` missed it.
       return true;
     }
     if (parent is RecordLiteral) {
@@ -208,10 +226,14 @@ class MutableTearoffRule extends SaropaLintRule {
   /// the rule never guesses.
   ///
   /// An unqualified (or `this.`-qualified) field reference resolves to its
-  /// synthetic [GetterElement], not directly to a [FieldElement] — so a
-  /// getter/setter-pair element is unwrapped via [PropertyAccessorElement]
-  /// (analyzer 12's split element model) to reach the underlying
+  /// SYNTHETIC getter, not directly to a [FieldElement] — so a
+  /// variable-induced [PropertyAccessorElement] (analyzer 12's split
+  /// element model) is unwrapped to the underlying
   /// [PropertyInducingElement], which is where `isFinal` actually lives.
+  /// A NON-synthetic (hand-written) getter is
+  /// deliberately NOT unwrapped and never treated as mutable; see the
+  /// inline comment on that branch for why unwrapping it produced a false
+  /// positive on every read-only getter.
   bool _isMutableReceiver(Element element) {
     if (element is LocalVariableElement) {
       return !element.isFinal && !element.isConst;
@@ -224,6 +246,35 @@ class MutableTearoffRule extends SaropaLintRule {
       return !element.isFinal && !element.isConst;
     }
     if (element is PropertyAccessorElement) {
+      // ONLY a SYNTHETIC (variable-induced) accessor may be unwrapped.
+      // `isOriginVariable` is analyzer 12's spelling for "this accessor was
+      // induced by a real FieldElement / TopLevelVariableElement" — note
+      // `Element.isSynthetic` no longer exists in this element model, so
+      // the origin flags are the supported way to ask. When it is true,
+      // `element.variable` is that genuine variable and its
+      // `isFinal`/`isConst` describe the actual declaration — exactly the
+      // mutability this rule cares about.
+      //
+      // Any other origin is NOT unwrappable. The important case is
+      // `isOriginDeclaration` — a hand-written getter
+      // (`Handler get handler => _handler;`). There the relationship is
+      // inverted: the ACCESSOR is real and `element.variable` is a
+      // synthetic PropertyInducingElement standing in for it, whose
+      // `isFinal` is ALWAYS false no matter what the getter body returns.
+      // Unwrapping it therefore reported every read-only getter as a
+      // "mutable receiver" — a confirmed false positive on the mainstream
+      // private-field + public-getter encapsulation idiom:
+      //
+      //   final Handler _handler = Handler();   // truly final
+      //   Handler get handler => _handler;      // read-only getter
+      //   late final VoidCallback onTap = handler.handleTap; // was flagged
+      //
+      // The rule cannot know whether an arbitrary getter body returns a
+      // stable object without whole-body data-flow analysis, so per this
+      // rule's own "skip when uncertain" doctrine a real getter falls
+      // through to the conservative `false` below and is never flagged.
+      if (!element.isOriginVariable) return false;
+
       final PropertyInducingElement variable = element.variable;
       return !variable.isFinal && !variable.isConst;
     }

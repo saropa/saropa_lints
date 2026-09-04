@@ -50,6 +50,57 @@ bool isAdminRoleNullable(String? role) {
 }
 
 // =============================================================================
+// BAD: MISMATCHED normalization — the worst form of the bug
+//
+// `toLowerCase()` on one side and `toUpperCase()` on the other can only ever
+// be true for strings containing no cased characters at all. Before rule v2
+// this was silently exempted, because a normalization call on EITHER side was
+// accepted as proof the comparison was safe.
+// =============================================================================
+
+bool sameEmailMismatchedNormalization(String typed, String stored) {
+  // expect_lint: use_compare_without_case
+  return typed.toLowerCase() == stored.toUpperCase();
+}
+
+// =============================================================================
+// BAD: normalized on one side only, other side an unnormalized variable
+//
+// Normalizing the typed value while leaving the stored value untouched still
+// mismatches whenever the stored value carries different casing.
+// =============================================================================
+
+bool sameEmailHalfNormalized(String typed, String stored) {
+  // expect_lint: use_compare_without_case
+  return typed.toLowerCase() == stored;
+}
+
+// =============================================================================
+// BAD: normalized against a literal written in the WRONG case
+//
+// `role.toLowerCase()` can never equal 'Admin' — the comparison is dead code.
+// =============================================================================
+
+bool isAdminRoleWrongCaseLiteral(String role) {
+  // expect_lint: use_compare_without_case
+  return role.toLowerCase() == 'Admin';
+}
+
+// =============================================================================
+// BAD: a parameter compared against a single const still fires
+//
+// Only ONE side (the const) is under our own control; the parameter can carry
+// any casing, so the "at least one side is not a compile-time constant"
+// trigger condition applies. This backs the note on the both-const exemption
+// below with real code rather than a prose claim.
+// =============================================================================
+
+bool isInternalRoute(String route) {
+  // expect_lint: use_compare_without_case
+  return route == kInternalRouteNameA;
+}
+
+// =============================================================================
 // GOOD: normalized with toLowerCase()/toUpperCase() before comparing
 // =============================================================================
 
@@ -61,14 +112,24 @@ bool isNotAdminRoleNormalized(String role) {
   return role.toUpperCase() != 'ADMIN';
 }
 
+/// Both sides normalized with the SAME function — the canonical correct form
+/// for two runtime values.
+bool sameEmailNormalized(String typed, String stored) {
+  return typed.toLowerCase() == stored.toLowerCase();
+}
+
+/// Same, via the compareTo(...) == 0 shape.
+bool sameEmailNormalizedCompareTo(String typed, String stored) {
+  return typed.toUpperCase().compareTo(stored.toUpperCase()) == 0;
+}
+
 // =============================================================================
 // GOOD: both sides are compile-time constants under our own control
 //
-// NOTE: a parameter compared against a single const (e.g.
-// `route == kRouteName`) still fires — the parameter side is not a
-// compile-time constant, so the "at least one side is not constant"
-// trigger condition still applies. The exemption requires BOTH sides to be
-// constants we author ourselves, e.g. two internal route-name constants.
+// NOTE: a parameter compared against a single const still fires — see
+// `isInternalRoute` above, which asserts that behavior with an expect_lint
+// marker. The exemption requires BOTH sides to be constants we author
+// ourselves, e.g. two internal route-name constants.
 // =============================================================================
 
 const String kInternalRouteNameA = 'settings_page';

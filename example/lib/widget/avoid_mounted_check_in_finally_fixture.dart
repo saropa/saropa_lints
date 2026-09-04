@@ -2,16 +2,93 @@
 
 import 'package:flutter/material.dart';
 
-/// Fixtures for avoid_mounted_check_in_finally.
+/// Fixtures for avoid_mounted_check_in_finally (v2 premise).
+///
+/// The rule targets an ORDERING bug inside a `finally` block: an unguarded
+/// widget-tree call followed by a `mounted`-guarded one in the same block.
+/// A `mounted` guard inside `finally` is CORRECT — `finally` runs on both the
+/// success and the exception path, and code placed after the try/finally never
+/// runs when the try body throws (verified against the Dart VM; the analyzer
+/// reports such a trailing statement as `dead_code`). So every "guard lives in
+/// finally" shape below is a GOOD case, not a violation.
 library;
 
 // =============================================================================
-// BAD: `mounted` guard placed inside `finally`, after an `await` — the
-// unconditional `_controller.dispose()` above it still runs regardless of
-// disposal state, so the guard gives a false sense of safety.
+// BAD: unguarded `setState` runs first, then a `mounted`-guarded Navigator
+// call in the same block. The guard proves the author knew the widget could
+// be disposed — the earlier setState therefore crashes on that path.
 // =============================================================================
 
-class _SubmitFormState extends State<StatefulWidget> {
+class _OrderingBugState extends State<StatefulWidget> {
+  bool _isLoading = false;
+
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      // expect_lint: avoid_mounted_check_in_finally
+      setState(() => _isLoading = false);
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+}
+
+// =============================================================================
+// BAD: same ordering bug expressed with an early-return guard clause — the
+// `Navigator` call above `if (!mounted) return;` is unprotected.
+// =============================================================================
+
+class _EarlyReturnOrderingBugState extends State<StatefulWidget> {
+  Future<void> _save() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      // expect_lint: avoid_mounted_check_in_finally
+      Navigator.of(context).pop();
+      if (!mounted) return;
+      setState(() {});
+    }
+  }
+}
+
+// =============================================================================
+// BAD (nested try): the inner `finally`'s guard protects against the OUTER
+// try's `await`. The inner try contains no await of its own, which v1 missed
+// entirely — the unguarded setState above the guard is still a real crash.
+// =============================================================================
+
+class _NestedTryOrderingBugState extends State<StatefulWidget> {
+  Future<void> _save() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      try {
+        _syncOp();
+      } finally {
+        // expect_lint: avoid_mounted_check_in_finally
+        setState(() {});
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      }
+    } finally {
+      _cleanup();
+    }
+  }
+
+  void _syncOp() {}
+
+  void _cleanup() {}
+}
+
+// =============================================================================
+// GOOD: the canonical error-resilient shape — plain cleanup, then a guarded
+// state reset, all inside `finally` so it runs on the exception path too.
+// This is the pattern v1 wrongly flagged; it must stay silent.
+// =============================================================================
+
+class _CorrectGuardInFinallyState extends State<StatefulWidget> {
   bool _isLoading = false;
   final TextEditingController _controller = TextEditingController();
 
@@ -20,8 +97,7 @@ class _SubmitFormState extends State<StatefulWidget> {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
-      _controller.dispose(); // Runs unconditionally, even if unmounted
-      // expect_lint: avoid_mounted_check_in_finally
+      _controller.dispose(); // Plain cleanup — safe when unmounted
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -30,63 +106,47 @@ class _SubmitFormState extends State<StatefulWidget> {
 }
 
 // =============================================================================
-// BAD: `if (!mounted) return;` inside `finally`, guarding a Navigator call.
+// GOOD: every widget-tree operation sits inside the single guard — nothing
+// unguarded precedes it.
 // =============================================================================
 
-class _NavigateAfterSaveState extends State<StatefulWidget> {
-  Future<void> _save() async {
-    try {
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-    } finally {
-      // expect_lint: avoid_mounted_check_in_finally
-      if (!mounted) return;
-      Navigator.of(context).pop();
-    }
-  }
-}
-
-// =============================================================================
-// GOOD: mounted checked immediately after the await, outside the finally
-// block — the point-of-use guard the rule pushes developers toward.
-// =============================================================================
-
-class _SubmitFormGoodState extends State<StatefulWidget> {
+class _AllInsideGuardState extends State<StatefulWidget> {
   bool _isLoading = false;
-  final TextEditingController _controller = TextEditingController();
 
   Future<void> _submit() async {
-    setState(() => _isLoading = true);
-    try {
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-    } finally {
-      _controller.dispose();
-    }
-    if (!mounted) return; // OK — checked at point of use, not in finally
-    setState(() => _isLoading = false);
-  }
-}
-
-// =============================================================================
-// GOOD near-miss: `mounted` check in `finally`, but it only guards a
-// diagnostic log — no setState/navigation, so this is not the unsafe
-// widget-tree-operation risk the rule targets.
-// =============================================================================
-
-class _LogOnlyState extends State<StatefulWidget> {
-  Future<void> _refresh() async {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
       if (mounted) {
-        debugPrint('refresh finished while still mounted');
+        setState(() => _isLoading = false);
+        Navigator.of(context).pop();
       }
     }
   }
 }
 
 // =============================================================================
-// GOOD near-miss: `try`/`finally` with no `await` in the try body — there is
-// no async gap for `mounted` to guard against.
+// GOOD: the early-return guard comes FIRST, so every call below it is
+// protected — correct ordering, the fix this rule asks for.
+// =============================================================================
+
+class _EarlyReturnFirstState extends State<StatefulWidget> {
+  bool _isLoading = false;
+
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.of(context).pop();
+    }
+  }
+}
+
+// =============================================================================
+// GOOD near-miss: no `await` anywhere before the finally block — no async gap
+// means no disposal risk, so the unguarded call is fine.
 // =============================================================================
 
 class _NoAwaitState extends State<StatefulWidget> {
@@ -96,70 +156,54 @@ class _NoAwaitState extends State<StatefulWidget> {
     try {
       _busy = true;
     } finally {
+      setState(() => _busy = false);
       if (mounted) {
-        setState(() => _busy = false);
+        Navigator.of(context).pop();
       }
     }
   }
 }
 
 // =============================================================================
-// GOOD near-miss: `mounted` checked in the `try`/`catch` body, not `finally`.
+// GOOD near-miss: the outer `await` happens AFTER the inner try/finally, so
+// it cannot have opened an async gap before that finally block ran.
 // =============================================================================
 
-class _CheckInTryState extends State<StatefulWidget> {
-  Future<void> _load() async {
-    try {
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      if (mounted) {
-        setState(() {});
-      }
-    } finally {
-      debugPrint('load attempted');
-    }
-  }
-}
-
-// =============================================================================
-// BAD: the async gap is opened by an `await` in the `catch` clause, not the
-// `try` body — the recovery path still falls into the same `finally`, so the
-// `mounted` guard there is just as stale as the try-body case.
-// =============================================================================
-
-class _AwaitInCatchState extends State<StatefulWidget> {
+class _AwaitAfterInnerTryState extends State<StatefulWidget> {
   Future<void> _save() async {
     try {
-      _syncOp();
-    } catch (e) {
-      await _recover();
-    } finally {
-      // expect_lint: avoid_mounted_check_in_finally
-      if (mounted) {
+      try {
+        _syncOp();
+      } finally {
         setState(() {});
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       }
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      _cleanup();
     }
   }
 
   void _syncOp() {}
 
-  Future<void> _recover() async {}
+  void _cleanup() {}
 }
 
 // =============================================================================
-// BAD: `ScaffoldMessenger` (not just `Navigator`) is one of the unsafe
-// targets — showing a snack bar after disposal is the same class of bug.
+// GOOD near-miss: the guard only logs — no evidence the author was reasoning
+// about disposal, so it cannot convict the statement above it.
 // =============================================================================
 
-class _ShowSnackBarState extends State<StatefulWidget> {
-  Future<void> _submit() async {
+class _LogOnlyGuardState extends State<StatefulWidget> {
+  Future<void> _refresh() async {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
-      // expect_lint: avoid_mounted_check_in_finally
+      setState(() {});
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Done')),
-        );
+        debugPrint('refresh finished while still mounted');
       }
     }
   }
@@ -167,8 +211,7 @@ class _ShowSnackBarState extends State<StatefulWidget> {
 
 // =============================================================================
 // GOOD near-miss: a compound condition (`mounted && x`) is intentionally out
-// of scope — the rule only matches the exact `mounted` / `!mounted` shapes,
-// not arbitrary boolean expressions that happen to reference `mounted`.
+// of scope — only the exact `mounted` / `!mounted` shapes are matched.
 // =============================================================================
 
 class _CompoundConditionState extends State<StatefulWidget> {
@@ -178,17 +221,18 @@ class _CompoundConditionState extends State<StatefulWidget> {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
+      setState(() {});
       if (mounted && _shouldUpdate) {
-        setState(() {});
+        Navigator.of(context).pop();
       }
     }
   }
 }
 
 // =============================================================================
-// GOOD near-miss: the `mounted` check lives inside a nested closure created
-// within `finally`, not directly in the `finally` block's own statement
-// list — that closure has its own, unrelated execution context.
+// GOOD near-miss: the guard lives inside a nested closure created within
+// `finally`, not in the block's own statement list — its execution order
+// relative to the surrounding statements is not lexical.
 // =============================================================================
 
 class _NestedClosureState extends State<StatefulWidget> {
@@ -196,9 +240,10 @@ class _NestedClosureState extends State<StatefulWidget> {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
+      setState(() {});
       Future<void>(() async {
         if (mounted) {
-          setState(() {});
+          Navigator.of(context).pop();
         }
       });
     }

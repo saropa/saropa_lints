@@ -57,13 +57,31 @@ enum ExampleEnum {
 
 // Edge case 2 (proposal doc): a subclass constructor forwarding to `super`
 // with its named arguments reordered relative to the base constructor's
-// declaration. `SuperConstructorInvocation` has no visitor hook anywhere in
-// `SaropaContext` yet (a framework gap, not something this rule can fix
-// alone — see the Finish Report), so this is a DOCUMENTED false negative:
-// the reorder below is exactly the kind of mistake this rule exists to
-// catch, but it will not fire here until that framework hook is added.
+// declaration. `SaropaContext` exposes no `addSuperConstructorInvocation`
+// hook, so the rule reaches this node via `addConstructorDeclaration` and
+// walks the initializer list — this used to be a documented false negative
+// and is now covered.
 class ConfigSubclass extends Config {
+  // expect_lint: named_parameters_ordering
   ConfigSubclass(String host, int port) : super(port: port, host: host);
+}
+
+// GOOD counterpart: the same forwarding pattern with the super arguments in
+// the base constructor's declared order (host before port) must stay silent.
+class ConfigSubclassGood extends Config {
+  ConfigSubclassGood(String host, int port) : super(host: host, port: port);
+}
+
+// Redirecting generative constructor (`: this(...)`) is the other initializer
+// form the same hook covers — same AST position, different node type.
+class RedirectTarget {
+  RedirectTarget({required this.alpha, required this.beta});
+
+  // expect_lint: named_parameters_ordering
+  RedirectTarget.reordered(String a, String b) : this(beta: b, alpha: a);
+
+  final String alpha;
+  final String beta;
 }
 
 void goodExamples() {
@@ -87,7 +105,9 @@ void goodExamples() {
 
   // GOOD: FunctionExpressionInvocation call site (`fn(...)` where `fn` is a
   // function-typed variable, not the function's own name) with named args
-  // in declaration order.
+  // in declaration order. Note this stays silent for the trivial reason that
+  // the rule cannot resolve such callees at all — see the false-negative note
+  // in badExamples() below.
   final void Function({required String alpha, required String beta}) fn =
       exampleAlphaBetaFunction;
   fn(alpha: 'a', beta: 'b');
@@ -108,9 +128,15 @@ void badExamples() {
   // while the leading positional `label` argument is unaffected.
   exampleMixedFunction('x', beta: 'b', alpha: 'a');
 
-  // expect_lint: named_parameters_ordering
-  // FunctionExpressionInvocation call site with reordered named args —
-  // proves the rule now checks this AST node, not just MethodInvocation.
+  // DOCUMENTED FALSE NEGATIVE — deliberately carries NO expect_lint marker.
+  // This is a FunctionExpressionInvocation with reordered named args, and the
+  // rule does register a hook for that node type, but
+  // `FunctionExpressionInvocation.element` is null when the callee is a
+  // function-TYPED variable (there is no ExecutableElement to read a declared
+  // parameter order from), so `_checkOrder` bails immediately. The declared
+  // order is only reachable via `staticInvokeType`, which the rule does not
+  // consult. Pinned by the "documented false negative" test in
+  // test/rules/stylistic/named_parameters_ordering_test.dart.
   final void Function({required String alpha, required String beta}) fn =
       exampleAlphaBetaFunction;
   fn(beta: 'b', alpha: 'a');

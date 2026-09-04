@@ -51,6 +51,24 @@ class PreferTypedExceptionsBad {
     }
   }
 
+  // Nesting depth is irrelevant: the visitor is registered per
+  // ThrowExpression node, so a throw inside a callback body is reached the
+  // same as one in a method body. Previously unverified -- pinned here and in
+  // test/rules/flow/prefer_typed_exceptions_test.dart.
+  void validateInClosure(List<int> ages) {
+    ages.forEach((int age) {
+      if (age < 0) {
+        // expect_lint: prefer_typed_exceptions
+        throw 'Age cannot be negative';
+      }
+    });
+  }
+
+  // `throw` used as an EXPRESSION (arrow body / `??` right operand) rather
+  // than as a statement. Still a ThrowExpression node, so it must fire.
+  // expect_lint: prefer_typed_exceptions
+  String requireName(String? name) => name ?? (throw 'Name is required');
+
   String _buildMessage(int age) => 'Age cannot be negative: $age';
 }
 
@@ -69,6 +87,44 @@ class PreferTypedExceptionsGood {
   void validateGeneric(int age) {
     if (age < 0) {
       throw Exception('Age cannot be negative');
+    }
+  }
+
+  // HIGHEST-VALUE NEAR-MISS. The rule deliberately does NOT walk the
+  // Exception/Error hierarchy -- it only asks "is the thrown expression a
+  // StringLiteral, or is its static type String?". ArgumentError's static
+  // type is ArgumentError, so it is exempt STRUCTURALLY, not by an explicit
+  // allow-list. These cases exist so that design decision is verifiable from
+  // the fixture rather than only inferable from the rule source: a future
+  // "improvement" that added hierarchy inspection, or that started looking at
+  // the String ARGUMENT instead of the thrown expression's own type, would
+  // start flagging these and reintroduce exactly the false-positive class the
+  // current scoping avoids.
+  void validateArgument(int age) {
+    if (age < 0) {
+      throw ArgumentError('Age cannot be negative');
+    }
+  }
+
+  void commit({required bool isOpen}) {
+    if (!isOpen) {
+      throw StateError('Transaction is not open');
+    }
+  }
+
+  int computeTotal() {
+    throw UnimplementedError('computeTotal is not implemented yet');
+  }
+
+  // KNOWN LIMITATION, pinned as current behavior (not a desired one): the
+  // declared type is `dynamic`, so `staticType.isDartCoreString` is false and
+  // this bare-String throw is MISSED. Inherent to static-type-only detection;
+  // catching it would need value/flow analysis the rule deliberately avoids.
+  // Intentionally carries no expect_lint marker.
+  void validateDynamic(int age) {
+    if (age < 0) {
+      final dynamic message = 'Age cannot be negative';
+      throw message;
     }
   }
 

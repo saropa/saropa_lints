@@ -340,6 +340,247 @@ Object w() {
       );
     });
   });
+
+  // v2 false-positive fix. Before the widget-type gate, ANY `builder:`
+  // argument was checked, so every one of these extremely common Flutter
+  // patterns produced a warning by default in the Recommended tier. The
+  // callbacks below exist to deliver snapshot/animation/provider values —
+  // their context parameter is incidental and discarding it is idiomatic.
+  group('NeverDiscardBuildContextRule — non-context-supplying builders', () {
+    test('FutureBuilder with an unused context is not reported', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return FutureBuilder<int>(
+    future: f,
+    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+      return Text('${snapshot.data}');
+    },
+  );
+}
+'''),
+        isFalse,
+      );
+    });
+
+    test('StreamBuilder with an unused context is not reported', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return StreamBuilder<int>(
+    stream: s,
+    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+      return Text('${snapshot.data}');
+    },
+  );
+}
+'''),
+        isFalse,
+      );
+    });
+
+    test('AnimatedBuilder with an unused context is not reported', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return AnimatedBuilder(
+    animation: controller,
+    builder: (BuildContext context, Widget? child) {
+      return Opacity(opacity: controller.value, child: child);
+    },
+  );
+}
+'''),
+        isFalse,
+      );
+    });
+
+    test('ValueListenableBuilder with an unused context is not reported', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return ValueListenableBuilder<int>(
+    valueListenable: notifier,
+    builder: (BuildContext context, int value, Widget? child) {
+      return Text('$value');
+    },
+  );
+}
+'''),
+        isFalse,
+      );
+    });
+
+    test('Provider Consumer with an unused context is not reported', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return Consumer<CartModel>(
+    builder: (BuildContext context, CartModel cart, Widget? child) {
+      return Text('${cart.total}');
+    },
+  );
+}
+'''),
+        isFalse,
+      );
+    });
+
+    test('Provider Selector with an unused context is not reported', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return Selector<CartModel, int>(
+    selector: (_, model) => model.count,
+    builder: (BuildContext context, int count, Widget? child) {
+      return Text('$count');
+    },
+  );
+}
+'''),
+        isFalse,
+      );
+    });
+
+    test('DraggableScrollableSheet with an unused context is not reported', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return DraggableScrollableSheet(
+    builder: (BuildContext context, ScrollController controller) {
+      return ListView(controller: controller);
+    },
+  );
+}
+'''),
+        isFalse,
+      );
+    });
+
+    test('a third-party *Builder widget is not reported', () {
+      // Guards against ever "simplifying" the exact-match set into a
+      // `.contains('Builder')` suffix test, which would re-admit every
+      // builder-named widget in the ecosystem.
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return ResponsiveBuilder(
+    builder: (BuildContext context, SizingInformation sizing) {
+      return Text('${sizing.screenSize}');
+    },
+  );
+}
+'''),
+        isFalse,
+      );
+    });
+
+    test('StatefulBuilder with an unused context IS still reported', () {
+      // The third context-supplying widget must stay in scope.
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return StatefulBuilder(
+    builder: (BuildContext ctx, StateSetter setState) {
+      return Text(Theme.of(context).toString());
+    },
+  );
+}
+'''),
+        isTrue,
+      );
+    });
+  });
+
+  // v2 false-NEGATIVE fix: the shadow check used to inspect only nested
+  // PARAMETER lists, so a nested local variable that merely reused the
+  // context parameter's name made every later read look like a genuine use
+  // and suppressed a real violation.
+  group('NeverDiscardBuildContextRule — local-variable shadowing', () {
+    test(
+      'nested block redeclaring the name as a local does not count as a use',
+      () {
+        expect(
+          _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      {
+        final ctx = computeSomethingElse();
+        print(ctx.toString());
+      }
+      return const SizedBox();
+    },
+  );
+}
+'''),
+          isTrue,
+        );
+      },
+    );
+
+    test('for-in loop variable reusing the name does not count as a use', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      for (final ctx in items) {
+        print(ctx);
+      }
+      return const SizedBox();
+    },
+  );
+}
+'''),
+        isTrue,
+      );
+    });
+
+    test('catch clause variable reusing the name does not count as a use', () {
+      expect(
+        _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      try {
+        risky();
+      } catch (ctx) {
+        print(ctx);
+      }
+      return const SizedBox();
+    },
+  );
+}
+'''),
+        isTrue,
+      );
+    });
+
+    test(
+      'a genuine read outside the shadowing block is still counted as a use',
+      () {
+        // The shadow skip must be scoped to the declaring block only — a real
+        // read elsewhere in the builder body still clears the violation.
+        expect(
+          _wouldReport(r'''
+Object w() {
+  return Builder(
+    builder: (BuildContext ctx) {
+      {
+        final ctx = computeSomethingElse();
+        print(ctx.toString());
+      }
+      return Text(Theme.of(ctx).toString());
+    },
+  );
+}
+'''),
+          isFalse,
+        );
+      },
+    );
+  });
 }
 
 /// Parses [unitSource] and delegates to

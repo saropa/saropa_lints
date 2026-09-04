@@ -110,6 +110,45 @@ void collectionLiteralTearoff(Handler handler) {
   callbacks.first();
 }
 
+/// GOOD: the mainstream private-field + public-getter encapsulation idiom.
+/// `handler` is a hand-written (non-synthetic) getter over a `final` field,
+/// with no setter, so the tear-off can never go stale. The analyzer models
+/// a real getter's `variable` as a synthetic stand-in whose `isFinal` is
+/// always false, so unwrapping it would report every read-only getter —
+/// the rule therefore skips non-synthetic accessors entirely.
+class GetterBackedController {
+  final Handler _handler = Handler();
+
+  Handler get handler => _handler;
+
+  late final VoidCallback onTap = handler.handleTap;
+}
+
+/// GOOD (deliberate under-report): a getter over a MUTABLE backing field is
+/// also skipped. The rule cannot see through an arbitrary getter body to
+/// prove the returned object is stable, so its "skip when uncertain"
+/// doctrine takes precedence over catching this narrower case.
+class MutableGetterBackedController {
+  Handler _handler = Handler();
+
+  Handler get handler => _handler;
+
+  late final VoidCallback onTap = handler.handleTap;
+
+  void swapHandler(Handler next) {
+    _handler = next;
+  }
+}
+
+/// BAD: tear-off stored as the KEY of a map literal — the map retains it
+/// for its whole lifetime just as a value would, and hashes it by identity,
+/// so a stale key silently stops matching.
+void mapKeyTearoff(Handler handler) {
+  // expect_lint: mutable_tearoff
+  final Map<VoidCallback, String> labels = {handler.handleTap: 'tap'};
+  labels.keys.first();
+}
+
 /// BAD: tear-off handed back to the caller via an arrow-bodied function —
 /// the caller is free to store it, so the staleness risk travels with it.
 VoidCallback getCallback(Handler handler) =>

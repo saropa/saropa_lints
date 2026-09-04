@@ -1,17 +1,26 @@
-// Regression/behavior tests for avoid_mounted_check_in_finally.
+// Regression/behavior tests for avoid_mounted_check_in_finally (v2 premise).
+//
+// PREMISE NOTE: v1 of this rule flagged every `if (mounted) { setState(); }`
+// inside a `finally` block and told authors to move it after the try/finally.
+// That was verified WRONG against the Dart VM: when the try body throws, the
+// finally runs and the exception keeps propagating, so statements after the
+// try/finally never execute (the analyzer reports them as `dead_code`). The
+// v1 advice left `_isLoading` stuck true on every error path. v2 keeps the
+// rule name but retargets it at an ordering bug — an UNGUARDED widget-tree
+// call written above a `mounted`-guarded one in the SAME finally block.
 //
 // The rule is fully registered (export in lib/src/rules/all_rules.dart,
 // factory in lib/saropa_lints.dart, tier assignment in lib/src/tiers.dart).
 // This test exercises the rule class directly via the resolved-rule harness,
-// which runs a single rule against inline source without depending on any
-// of those three registration points — that keeps the test fast and immune
-// to unrelated registration churn elsewhere in the codebase.
+// which runs a single rule against inline source without depending on any of
+// those three registration points — that keeps the test fast and immune to
+// unrelated registration churn elsewhere in the codebase.
 //
 // The harness resolves fixtures against the `example` package, which has no
 // Flutter dependency — `State`/`Widget` resolve to InvalidType there. The
-// rule's State-class gate (`isWidgetOrStateClass`) is lexeme-based (matches
-// a superclass name literally ending in "State"/"Widget"), not a resolved
-// type check, so it still gates correctly under this harness.
+// rule's State-class gate (`isWidgetOrStateClass`) is lexeme-based (matches a
+// superclass name literally ending in "State"/"Widget"), not a resolved type
+// check, so it still gates correctly under this harness.
 library;
 
 import 'package:saropa_lints/src/rules/widget/avoid_mounted_check_in_finally_rules.dart';
@@ -22,8 +31,8 @@ import '../../support/resolved_rule_harness.dart';
 void main() {
   group('avoid_mounted_check_in_finally', () {
     test(
-      'fires on `if (mounted)` inside finally, after an await, guarding '
-      'setState',
+      'fires on an unguarded setState above a mounted-guarded Navigator call '
+      'in the same finally block',
       () async {
         final codes = await reportedRuleCodes(
           AvoidMountedCheckInFinallyRule(),
@@ -32,6 +41,134 @@ void main() {
 // dependency (State/StatefulWidget resolve to InvalidType), but the rule's
 // requiresFlutterImport gate is a text check on the import string — not on
 // resolution — so this import is required for the rule to run at all.
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  bool _isLoading = false;
+
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+}
+''',
+        );
+        expect(codes, contains('avoid_mounted_check_in_finally'));
+      },
+    );
+
+    test(
+      'fires on an unguarded Navigator call above an "if (!mounted) return;" '
+      'guard clause in the same finally block',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  Future<void> _save() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      Navigator.of(context).pop();
+      if (!mounted) return;
+      setState(() {});
+    }
+  }
+}
+''',
+        );
+        expect(codes, contains('avoid_mounted_check_in_finally'));
+      },
+    );
+
+    test(
+      'fires when the async gap comes from an OUTER try (nested-try false '
+      'negative fixed in v2)',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  Future<void> _save() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      try {
+        _syncOp();
+      } finally {
+        setState(() {});
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      }
+    } finally {
+      _cleanup();
+    }
+  }
+
+  void _syncOp() {}
+
+  void _cleanup() {}
+}
+''',
+        );
+        expect(codes, contains('avoid_mounted_check_in_finally'));
+      },
+    );
+
+    test(
+      'fires when the async gap comes from an await in a catch clause '
+      '(recovery path still falls into the same finally)',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  Future<void> _save() async {
+    try {
+      _syncOp();
+    } catch (e) {
+      await _recover();
+    } finally {
+      setState(() {});
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
+  void _syncOp() {}
+
+  Future<void> _recover() async {}
+}
+''',
+        );
+        expect(codes, contains('avoid_mounted_check_in_finally'));
+      },
+    );
+
+    // ---------------------------------------------------------------------
+    // Premise regression: the shapes v1 wrongly flagged must now stay silent.
+    // ---------------------------------------------------------------------
+
+    test(
+      'does NOT fire on the canonical guarded state reset inside finally — '
+      'the v1 "BAD" example, which is actually correct code',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
@@ -53,38 +190,13 @@ class MyState extends State<StatefulWidget> {
 }
 ''',
         );
-        expect(codes, contains('avoid_mounted_check_in_finally'));
+        expect(codes, isEmpty);
       },
     );
 
     test(
-      'fires on `if (!mounted) return;` inside finally guarding a '
-      'Navigator call',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
-import 'package:flutter/material.dart';
-
-class MyState extends State<StatefulWidget> {
-  Future<void> _save() async {
-    try {
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-    } finally {
-      if (!mounted) return;
-      Navigator.of(context).pop();
-    }
-  }
-}
-''',
-        );
-        expect(codes, contains('avoid_mounted_check_in_finally'));
-      },
-    );
-
-    test(
-      'does NOT fire when mounted is checked immediately after the await, '
-      'outside the finally block',
+      'does NOT fire when every widget-tree operation sits inside the single '
+      'mounted guard',
       () async {
         final codes = await reportedRuleCodes(
           AvoidMountedCheckInFinallyRule(),
@@ -95,40 +207,12 @@ class MyState extends State<StatefulWidget> {
   bool _isLoading = false;
 
   Future<void> _submit() async {
-    setState(() => _isLoading = true);
-    try {
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-    } finally {
-      _dispose();
-    }
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-  }
-
-  void _dispose() {}
-}
-''',
-        );
-        expect(codes, isEmpty);
-      },
-    );
-
-    test(
-      'does NOT fire when the mounted-gated body only logs (no setState/'
-      'navigation)',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
-import 'package:flutter/material.dart';
-
-class MyState extends State<StatefulWidget> {
-  Future<void> _refresh() async {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
       if (mounted) {
-        print('refresh finished while still mounted');
+        setState(() => _isLoading = false);
+        Navigator.of(context).pop();
       }
     }
   }
@@ -140,8 +224,39 @@ class MyState extends State<StatefulWidget> {
     );
 
     test(
-      'does NOT fire when the try block has no await (no async gap to '
-      'guard against)',
+      'does NOT fire when the early-return guard comes first, protecting '
+      'every call below it',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidMountedCheckInFinallyRule(),
+          '''
+import 'package:flutter/material.dart';
+
+class MyState extends State<StatefulWidget> {
+  bool _isLoading = false;
+
+  Future<void> _submit() async {
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      Navigator.of(context).pop();
+    }
+  }
+}
+''',
+        );
+        expect(codes, isEmpty);
+      },
+    );
+
+    // ---------------------------------------------------------------------
+    // Gate controls.
+    // ---------------------------------------------------------------------
+
+    test(
+      'does NOT fire without an await — no async gap means no disposal risk',
       () async {
         final codes = await reportedRuleCodes(
           AvoidMountedCheckInFinallyRule(),
@@ -155,8 +270,9 @@ class MyState extends State<StatefulWidget> {
     try {
       _busy = true;
     } finally {
+      setState(() => _busy = false);
       if (mounted) {
-        setState(() => _busy = false);
+        Navigator.of(context).pop();
       }
     }
   }
@@ -168,35 +284,8 @@ class MyState extends State<StatefulWidget> {
     );
 
     test(
-      'does NOT fire when mounted is checked in the try body, not finally '
-      '(control)',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
-import 'package:flutter/material.dart';
-
-class MyState extends State<StatefulWidget> {
-  Future<void> _load() async {
-    try {
-      await Future<void>.delayed(const Duration(milliseconds: 10));
-      if (mounted) {
-        setState(() {});
-      }
-    } finally {
-      print('load attempted');
-    }
-  }
-}
-''',
-        );
-        expect(codes, isEmpty);
-      },
-    );
-
-    test(
-      'fires when the async gap is opened by an await in a catch clause '
-      'rather than the try body',
+      'does NOT fire when the outer await happens AFTER the inner '
+      'try/finally (offset bound on the async-gap search)',
       () async {
         final codes = await reportedRuleCodes(
           AvoidMountedCheckInFinallyRule(),
@@ -206,29 +295,33 @@ import 'package:flutter/material.dart';
 class MyState extends State<StatefulWidget> {
   Future<void> _save() async {
     try {
-      _syncOp();
-    } catch (e) {
-      await _recover();
-    } finally {
-      if (mounted) {
+      try {
+        _syncOp();
+      } finally {
         setState(() {});
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       }
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+    } finally {
+      _cleanup();
     }
   }
 
   void _syncOp() {}
 
-  Future<void> _recover() async {}
+  void _cleanup() {}
 }
 ''',
         );
-        expect(codes, contains('avoid_mounted_check_in_finally'));
+        expect(codes, isEmpty);
       },
     );
 
     test(
-      'fires when the guarded call targets ScaffoldMessenger, not just '
-      'Navigator',
+      'does NOT fire when the guard only logs — no evidence the author was '
+      'reasoning about disposal',
       () async {
         final codes = await reportedRuleCodes(
           AvoidMountedCheckInFinallyRule(),
@@ -236,21 +329,20 @@ class MyState extends State<StatefulWidget> {
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
-  Future<void> _submit() async {
+  Future<void> _refresh() async {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
+      setState(() {});
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Done')),
-        );
+        print('refresh finished while still mounted');
       }
     }
   }
 }
 ''',
         );
-        expect(codes, contains('avoid_mounted_check_in_finally'));
+        expect(codes, isEmpty);
       },
     );
 
@@ -270,8 +362,9 @@ class MyState extends State<StatefulWidget> {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
+      setState(() {});
       if (mounted && _shouldUpdate) {
-        setState(() {});
+        Navigator.of(context).pop();
       }
     }
   }
@@ -296,9 +389,10 @@ class MyState extends State<StatefulWidget> {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
+      setState(() {});
       Future<void>(() async {
         if (mounted) {
-          setState(() {});
+          Navigator.of(context).pop();
         }
       });
     }
@@ -323,6 +417,7 @@ class PlainService {
     try {
       await Future<void>.delayed(const Duration(milliseconds: 10));
     } finally {
+      setState();
       if (mounted) {
         setState();
       }

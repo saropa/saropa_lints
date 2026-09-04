@@ -10,7 +10,13 @@ import '../../saropa_lint_rule.dart';
 /// `compareTo(...) == 0`) without normalizing case first, when at least one
 /// side is not a compile-time constant.
 ///
-/// Since: v15.3.0 | Rule version: v1
+/// Since: v15.3.0 | Updated: v15.4.0 | Rule version: v2
+///
+/// v2 detection change: a normalization call on ONE side no longer exempts
+/// the comparison. Normalization must match on both sides (same function),
+/// or the non-normalized side must be a constant already written in the
+/// matching case — so `typed.toLowerCase() == stored.toUpperCase()` is now
+/// correctly reported instead of silently passing.
 ///
 /// Case-sensitive string comparison is the far more common real-world
 /// cousin of `avoid_case_sensitive_path_comparison` (which is scoped to
@@ -78,7 +84,10 @@ class UseCompareWithoutCaseRule extends SaropaLintRule {
         'API responses are extremely common, and an unnormalized comparison '
         'silently returns false for a semantically matching value (e.g. '
         'rejecting "Admin" when the stored role is "admin"), producing a '
-        'hard-to-diagnose logic bug rather than a crash. {v1}',
+        'hard-to-diagnose logic bug rather than a crash. Mismatched '
+        'normalization (one side .toLowerCase(), the other .toUpperCase()) '
+        'is reported for the same reason: it can only ever be true for '
+        'strings with no cased characters at all. {v2}',
     correctionMessage:
         'Normalize both sides with .toLowerCase() (or .toUpperCase()) '
         'before comparing, or use a case-insensitive comparison helper.',
@@ -103,12 +112,20 @@ class UseCompareWithoutCaseRule extends SaropaLintRule {
       final _StringPair? pair = _stringPairFor(left, right);
       if (pair == null) return;
 
-      // Already normalized on at least one side: the rule's job is done.
-      // Only .toLowerCase()/.toUpperCase() count — anything else is not a
-      // recognized case-normalization call, so still flag it.
-      if (_isCaseNormalized(pair.left) || _isCaseNormalized(pair.right)) {
-        return;
-      }
+      // Case normalization only makes a comparison safe when it lands on
+      // BOTH sides in a compatible way. A normalization call on one side
+      // alone is not evidence of correctness — historically this rule
+      // skipped whenever EITHER side had a toLowerCase()/toUpperCase()
+      // call, which silently passed the worst form of the very bug it
+      // exists to catch:
+      //
+      //   typed.toLowerCase() == stored.toUpperCase()
+      //
+      // That can only ever be true for strings containing no cased
+      // characters at all. `_isSafelyNormalized` therefore requires either
+      // matching normalization functions on both sides, or a constant on
+      // the other side that is already written in the matching case.
+      if (_isSafelyNormalized(pair.left, pair.right)) return;
 
       // Both sides are compile-time constants under our own control (two
       // literals, or const fields/variables): casing is intentional and
@@ -165,13 +182,77 @@ class UseCompareWithoutCaseRule extends SaropaLintRule {
     return displayName == 'String' || displayName == 'String?';
   }
 
-  /// True when [expr] is `<something>.toLowerCase()` or
-  /// `<something>.toUpperCase()` — an exact method-name match, never a
-  /// substring check on source text, per the false-positive doctrine.
-  static bool _isCaseNormalized(Expression expr) {
-    if (expr is! MethodInvocation) return false;
+  /// True when the comparison of [a] against [b] is genuinely
+  /// case-insensitive.
+  ///
+  /// Two shapes qualify, and only these two:
+  ///
+  /// 1. BOTH operands are normalized with the SAME function — `toLowerCase()`
+  ///    on both, or `toUpperCase()` on both. Mixing the two
+  ///    (`x.toLowerCase() == y.toUpperCase()`) is a bug, not a normalization,
+  ///    so it deliberately does NOT qualify.
+  /// 2. ONE operand is normalized and the other is a constant string already
+  ///    written in that same case (`role.toLowerCase() == 'admin'`). If the
+  ///    constant carries the wrong case (`role.toLowerCase() == 'Admin'`) the
+  ///    comparison is dead code, so it stays flagged.
+  ///
+  /// A constant whose value cannot be read statically (a `const` reference
+  /// rather than a literal) is treated as matching: we cannot prove the case
+  /// is wrong, and the false-positive doctrine says do not flag on a guess.
+  static bool _isSafelyNormalized(Expression a, Expression b) {
+    final String? normA = _caseNormalizationOf(a);
+    final String? normB = _caseNormalizationOf(b);
+
+    // Neither side normalized: nothing exempts this comparison here.
+    if (normA == null && normB == null) return false;
+
+    // Both sides normalized: safe only when the SAME function is used.
+    if (normA != null && normB != null) return normA == normB;
+
+    // Exactly one side normalized — the other side must be a constant
+    // already spelled in the matching case.
+    final String normalization = normA ?? normB!;
+    final Expression other = normA != null ? b : a;
+    return _isConstantInCase(other, normalization);
+  }
+
+  /// Returns `'toLowerCase'` / `'toUpperCase'` when [expr] is a
+  /// zero-argument call of that method on a `String` receiver; null
+  /// otherwise.
+  ///
+  /// The receiver-type and argument-count checks matter: an unrelated
+  /// user-defined `toLowerCase(locale)` on some other type is NOT String
+  /// case normalization, and matching it by method name alone would silently
+  /// exempt a real case-sensitivity bug. Name matching is exact (never a
+  /// substring check on source text) per the false-positive doctrine.
+  static String? _caseNormalizationOf(Expression expr) {
+    if (expr is! MethodInvocation) return null;
     final String name = expr.methodName.name;
-    return name == 'toLowerCase' || name == 'toUpperCase';
+    if (name != 'toLowerCase' && name != 'toUpperCase') return null;
+    // `String.toLowerCase()`/`toUpperCase()` take no arguments.
+    if (expr.argumentList.arguments.isNotEmpty) return null;
+    // Must be invoked ON a String (`role.toLowerCase()`), not a bare
+    // top-level/local function that happens to share the name.
+    final Expression? target = expr.target;
+    if (target == null || !_isStringTyped(target)) return null;
+    return name;
+  }
+
+  /// True when [expr] is a constant String that is already written in the
+  /// case produced by [normalization] (or a constant whose value we cannot
+  /// read — see `_isSafelyNormalized` for why unknown counts as matching).
+  /// A non-constant operand never qualifies: it must be normalized itself.
+  static bool _isConstantInCase(Expression expr, String normalization) {
+    if (!_isConstantString(expr)) return false;
+
+    // Only string literals expose their value here; `stringValue` is null
+    // for interpolated strings, which we cannot case-check.
+    final String? value = expr is StringLiteral ? expr.stringValue : null;
+    if (value == null) return true; // const reference / interpolation: unknown
+
+    return normalization == 'toLowerCase'
+        ? value == value.toLowerCase()
+        : value == value.toUpperCase();
   }
 
   /// True when [expr] is a compile-time-constant String: a literal, or a

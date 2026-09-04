@@ -2,7 +2,10 @@
 // `x is Future<T>?` (nullable form), stays silent on FutureOr<T> (a distinct
 // DartType, not a Future subtype), on unrelated `is` checks, and on a custom
 // class that extends Future (rule matches only the literal `Future`
-// annotation, not supertypes — see is_future_rules.dart's "Scope note").
+// annotation, not supertypes — see is_future_rules.dart's "Scope note"), and
+// stays silent on the v2 exemption: narrowing an already-FutureOr<T> value
+// with `is Future<T>` / `is! Future<T>`, which is the only way to unwrap a
+// FutureOr in a synchronous context.
 // Runs the real rule against resolved source via the oracle so detection
 // logic — not just metadata — is verified.
 library;
@@ -109,6 +112,68 @@ Future<void> handle(FutureOr<Object?> result) async {
 }
 ''');
       expect(codes, isEmpty);
+    });
+
+    test(
+      'does NOT fire when narrowing a FutureOr<T> in a SYNCHRONOUS context',
+      () async {
+        // Regression guard for the v2 false positive: this is the canonical,
+        // analyzer-recommended way to narrow a FutureOr<T>, and it is the
+        // ONLY way here because the override cannot be made async without
+        // breaking the synchronous SyncReader contract — so the rule's own
+        // correction ("type the parameter as FutureOr<T> and await it") is
+        // both already satisfied and impossible to apply.
+        final codes = await reportedRuleCodes(IsFutureRule(), '''
+import 'dart:async';
+
+abstract class SyncReader {
+  int? tryReadSync(FutureOr<int> value);
+}
+
+class EagerReader implements SyncReader {
+  @override
+  int? tryReadSync(FutureOr<int> value) {
+    if (value is Future<int>) {
+      return null;
+    }
+    return value;
+  }
+}
+''');
+        expect(codes, isEmpty);
+      },
+    );
+
+    test('does NOT fire on negated FutureOr<T> narrowing', () async {
+      // The `is!` form of the same idiom must be exempt too — negation
+      // changes only which branch runs first, not the legitimacy.
+      final codes = await reportedRuleCodes(IsFutureRule(), '''
+import 'dart:async';
+
+FutureOr<String> label(FutureOr<String> value) {
+  if (value is! Future<String>) {
+    return value.toUpperCase();
+  }
+  return value;
+}
+''');
+      expect(codes, isEmpty);
+    });
+
+    test('still fires when the FutureOr type argument does NOT match', () async {
+      // The exemption requires STATIC evidence of a real narrowing. A
+      // FutureOr<int> tested against Future<String> narrows nothing, so the
+      // guard must not swallow it.
+      final codes = await reportedRuleCodes(IsFutureRule(), '''
+import 'dart:async';
+
+void handle(FutureOr<int> value) {
+  if (value is Future<String>) {
+    print(value);
+  }
+}
+''');
+      expect(codes, contains('is_future'));
     });
 
     test('does NOT fire on an unrelated "is" check', () async {

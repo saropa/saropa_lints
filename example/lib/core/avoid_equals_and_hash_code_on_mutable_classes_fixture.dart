@@ -57,6 +57,31 @@ class ImmutablePoint {
 }
 
 // =============================================================================
+// GOOD near-miss: identity key plus mutable payload. `value` and
+// `lastAccessed` are mutated constantly but are deliberately excluded from the
+// equality contract, which only depends on the final `key`. Mutating them
+// cannot corrupt a hash-based collection, so neither may be flagged.
+// =============================================================================
+
+class CacheEntry {
+  CacheEntry(this.key, this.value);
+
+  final String key;
+
+  // Mutable, but never read by == / hashCode -> must NOT be flagged.
+  dynamic value;
+
+  // Bookkeeping only, also outside the equality contract.
+  DateTime? lastAccessed;
+
+  @override
+  bool operator ==(Object other) => other is CacheEntry && other.key == key;
+
+  @override
+  int get hashCode => key.hashCode;
+}
+
+// =============================================================================
 // GOOD near-miss: mutable field present but no hand-written == / hashCode
 // =============================================================================
 

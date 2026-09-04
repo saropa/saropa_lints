@@ -128,6 +128,96 @@ List<String> _copyAll(List<String> items) {
 }
 
 // =============================================================================
+// GOOD near-miss: `isNotEmpty` guard around a literal `[0]` access — the most
+// common bounds-guard idiom in Dart, and a getter access rather than a
+// comparison, so it must be recognized without a BinaryExpression
+// =============================================================================
+
+int? _firstWhenNotEmpty(List<int> values) {
+  if (values.isNotEmpty) {
+    return values[0];
+  }
+  return null;
+}
+
+// =============================================================================
+// GOOD near-miss: `isEmpty` early-return guard — the mirror image of the
+// isNotEmpty form; every statement after it runs on a non-empty list
+// =============================================================================
+
+int _firstWithEmptyEarlyReturn(List<int> values) {
+  if (values.isEmpty) return -1;
+  return values[0];
+}
+
+// =============================================================================
+// BAD near-miss for the emptiness guards: `isNotEmpty` only proves
+// `length >= 1`, so it makes ONLY index 0 safe — an arbitrary index can still
+// throw and must still be flagged
+// =============================================================================
+
+int? _nthWhenNotEmpty(List<int> values, int index) {
+  if (values.isNotEmpty) {
+    // expect_lint: no_direct_iterable_access
+    return values[index];
+  }
+  return null;
+}
+
+// =============================================================================
+// GOOD near-miss: ternary guards — the same conditions written as an
+// expression body, in both branch orientations
+// =============================================================================
+
+int _firstViaEmptyTernary(List<int> v) => v.isEmpty ? -1 : v[0];
+
+int _firstViaLengthTernary(List<int> v) => v.length > 0 ? v[0] : -1;
+
+// =============================================================================
+// BAD near-miss for the ternary guard: branches inverted, so the access runs
+// exactly when the list IS empty — a real crash
+// =============================================================================
+
+// expect_lint: no_direct_iterable_access
+int _firstViaInvertedTernary(List<int> v) => v.isEmpty ? v[0] : -1;
+
+// =============================================================================
+// GOOD near-miss: `while` / `do-while` loops bounded by `list.length` — the
+// hand-rolled cursor loop, previously unrecognized because only `for` forms
+// were inspected
+// =============================================================================
+
+void _printAllWhile(List<String> items) {
+  var i = 0;
+  while (i < items.length) {
+    print(items[i]);
+    i++;
+  }
+}
+
+void _printAllDoWhile(List<String> items) {
+  var i = 0;
+  do {
+    print(items[i]);
+    i++;
+  } while (i < items.length);
+}
+
+// =============================================================================
+// BAD near-miss for the while guard: the loop bound is on a DIFFERENT list,
+// so it proves nothing about `items`
+// =============================================================================
+
+void _printAllWhileWrongBound(List<String> items, List<String> other) {
+  var i = 0;
+  while (i < other.length) {
+    // expect_lint: no_direct_iterable_access
+    print(items[i]);
+    i++;
+  }
+}
+
+// =============================================================================
 // GOOD near-miss: constant list literal with a constant, in-range index
 // (edge case 3 — statically provable safety)
 // =============================================================================

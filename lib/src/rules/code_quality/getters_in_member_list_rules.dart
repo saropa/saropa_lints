@@ -24,7 +24,7 @@ import '../../saropa_lint_rule.dart';
 /// the body already has an earlier field, getter, or setter the getter
 /// could have been grouped with instead.
 ///
-/// Since: v15.4.0 | Updated: v15.4.0 | Rule version: v1
+/// Since: v15.4.0 | Updated: v15.4.0 | Rule version: v2
 ///
 /// Only plain (non-`@override`) getters are flagged. Overriding getters are
 /// exempt: they are frequently kept next to other overridden members for
@@ -35,6 +35,13 @@ import '../../saropa_lint_rule.dart';
 /// against. Constructors are not treated as a "behavior member" that trips
 /// this rule: their position relative to getters is a separate convention
 /// this rule does not enforce.
+///
+/// `static` members are ignored entirely — neither flagged nor counted as
+/// the earlier property member or the preceding behavior member. The rule's
+/// rationale is about an *instance's* "data shape vs behavior" reading
+/// order; a static-only utility holder (`static double get piSquared` after
+/// `static double square(...)`) has no instance data shape to scan for, so
+/// applying the ordering convention there was a false positive.
 ///
 /// **BAD:**
 /// ```dart
@@ -96,7 +103,7 @@ class GettersInMemberListRule extends SaropaLintRule {
         'wants to know "what does this object look like" to scan the whole '
         'class body instead of stopping at the first method; keeping '
         'getters grouped with fields near the top keeps the data contract '
-        'scannable independent of when each member was added. {v1}',
+        'scannable independent of when each member was added. {v2}',
     correctionMessage:
         'Move this getter up next to the class\'s field declarations and '
         'other getters/setters, before the first method.',
@@ -142,13 +149,11 @@ class GettersInMemberListRule extends SaropaLintRule {
   /// regular method AND has an earlier field/getter/setter it could have
   /// been grouped with.
   ///
-  /// Known limitation: `static` members are not distinguished from instance
-  /// members here. A `static` getter/field/method is tracked identically to
-  /// its instance counterpart, so a body that intentionally separates a
-  /// `static` block from the instance section (a different, equally valid
-  /// convention) can still get flagged. Not fixed here — it would require
-  /// tracking static/instance as a second axis, doubling the state this
-  /// walk carries, for a case the source proposal doesn't call out.
+  /// `static` members are skipped outright (see the class doc): they are
+  /// neither reported nor allowed to set either tracking flag, so a
+  /// static-only utility holder is silent and a static helper sitting in the
+  /// middle of an instance body cannot manufacture a violation for the
+  /// instance getter that follows it.
   void _checkMembers(
     SaropaDiagnosticReporter reporter,
     List<ClassMember> members,
@@ -163,6 +168,12 @@ class GettersInMemberListRule extends SaropaLintRule {
 
     for (final member in members) {
       if (member is FieldDeclaration) {
+        // A `static` field is class-level storage, not part of the
+        // instance's data shape, so it must not seed
+        // `hasEarlierPropertyMember` — otherwise a lone `static const`
+        // (the only kind of field an `extension` can even declare) would
+        // make every later getter reportable.
+        if (member.isStatic) continue;
         hasEarlierPropertyMember = true;
         continue;
       }
@@ -177,6 +188,13 @@ class GettersInMemberListRule extends SaropaLintRule {
       if (member is ConstructorDeclaration) continue;
 
       if (member is! MethodDeclaration) continue;
+
+      // Static methods/getters/setters are outside the instance data-shape
+      // vs behavior split this rule enforces. Skipping them before any flag
+      // is read or written means an idiomatic static-only utility class
+      // (`static double get piSquared` trailing `static double square(...)`)
+      // is never flagged — the previously documented false positive.
+      if (member.isStatic) continue;
 
       if (member.isGetter) {
         // Overriding getters are exempt (edge case: they are often kept

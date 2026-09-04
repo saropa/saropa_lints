@@ -21,6 +21,29 @@ import '../../saropa_lint_rule.dart';
 /// smell already covered by `avoid_generic_exceptions` — flagging both here
 /// too would double-report the same violation under two rule names.
 ///
+/// ## Deliberate scoping — do NOT add Exception-hierarchy walking
+///
+/// Detection asks only two questions about the thrown expression: is it a
+/// `StringLiteral`, or is its resolved static type `String`? It never inspects
+/// the Exception/Error class hierarchy. That is why `throw ArgumentError(...)`,
+/// `throw StateError(...)` and `throw UnimplementedError(...)` are exempt
+/// STRUCTURALLY rather than via an allow-list, and why classes that implement
+/// `Exception` indirectly (through a base class or a mixin) are never
+/// mis-flagged. Adding hierarchy inspection — or looking at a constructor's
+/// `String` ARGUMENT instead of the thrown expression's own type — would
+/// reintroduce exactly that false-positive class. Guarded by the GOOD cases in
+/// `test/rules/flow/prefer_typed_exceptions_test.dart`.
+///
+/// ## Known limitation: `dynamic`-typed holders are missed
+///
+/// `final dynamic message = 'boom'; throw message;` is NOT reported. The
+/// declared type is `dynamic`, so `staticType.isDartCoreString` is false even
+/// though the value is a `String` at runtime. This is inherent to
+/// static-type-only detection; closing it would require value/flow analysis
+/// that this rule deliberately avoids, and the resulting heuristic would cost
+/// far more in false positives than the rare `dynamic` holder is worth. The
+/// miss is pinned as current behavior by a test so it cannot change silently.
+///
 /// **BAD:**
 /// ```dart
 /// void validate(int age) {

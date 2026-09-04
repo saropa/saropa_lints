@@ -209,6 +209,50 @@ mixin Mixin {
       expect(codes, contains('avoid_futureor_return_type'));
     });
 
+    test(
+      'does NOT fire on a user-defined class NAMED FutureOr — the check is '
+      'resolution-based, so a local type that merely shares the name is not '
+      'dart:async.FutureOr and carries no sync/async ambiguity',
+      () async {
+        // Regression: the old lexeme comparison flagged this, and the
+        // correction message ("make it async / return Future<T>") is
+        // nonsense for a plain value wrapper. Note there is no
+        // `import 'dart:async'` here — the only FutureOr in scope is local.
+        final codes = await reportedRuleCodes(
+          AvoidFutureorReturnTypeRule(),
+          '''
+class FutureOr<T> {
+  const FutureOr(this.value);
+  final T value;
+}
+
+FutureOr<int> wrap(int v) => FutureOr<int>(v);
+''',
+        );
+        expect(codes, isEmpty);
+      },
+    );
+
+    test(
+      'fires through a typedef alias to dart:async FutureOr — the alias '
+      'hides the lexeme but resolves to the very type this rule targets',
+      () async {
+        // Regression: the old lexeme comparison saw 'MyFutureOr' and bailed,
+        // so the caller-side sync/async ambiguity shipped unflagged.
+        final codes = await reportedRuleCodes(
+          AvoidFutureorReturnTypeRule(),
+          '''
+import 'dart:async';
+
+typedef MyFutureOr<T> = FutureOr<T>;
+
+MyFutureOr<int> getValue() => 42;
+''',
+        );
+        expect(codes, contains('avoid_futureor_return_type'));
+      },
+    );
+
     test('fires on an extension method returning FutureOr<T>', () async {
       final codes = await reportedRuleCodes(
         AvoidFutureorReturnTypeRule(),

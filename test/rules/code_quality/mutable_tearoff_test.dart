@@ -405,6 +405,101 @@ void run() {
       expect(codes, isEmpty);
     });
 
+    // Regression pin: a hand-written getter is a NON-synthetic
+    // PropertyAccessorElement whose `variable` is a synthetic stand-in with
+    // `isFinal == false` regardless of the getter body. Unwrapping it (the
+    // pre-v2 behavior) flagged the standard private-field + public-getter
+    // encapsulation idiom — a confirmed false positive. The rule now only
+    // unwraps SYNTHETIC accessors, so this must stay silent.
+    test('does NOT fire on a receiver reached through a read-only '
+        'hand-written getter backed by a final field', () async {
+      final codes = await reportedRuleCodes(MutableTearoffRule(), '''
+typedef VoidCallback = void Function();
+
+class Handler {
+  void handleTap() {}
+}
+
+class Controller {
+  final Handler _handler = Handler();
+  Handler get handler => _handler;
+
+  late final VoidCallback onTap = handler.handleTap;
+}
+''');
+      expect(codes, isEmpty);
+    });
+
+    // Companion pin: even a getter over a MUTABLE backing field stays
+    // silent. The rule cannot prove anything about an arbitrary getter
+    // body, so "skip when uncertain" applies uniformly to all non-synthetic
+    // accessors rather than being special-cased per backing field.
+    test('does NOT fire on a hand-written getter over a mutable backing '
+        'field — the rule cannot see through the getter body', () async {
+      final codes = await reportedRuleCodes(MutableTearoffRule(), '''
+typedef VoidCallback = void Function();
+
+class Handler {
+  void handleTap() {}
+}
+
+class Controller {
+  Handler _handler = Handler();
+  Handler get handler => _handler;
+
+  late final VoidCallback onTap = handler.handleTap;
+}
+''');
+      expect(codes, isEmpty);
+    });
+
+    // The synthetic-accessor path must keep working: an unqualified field
+    // reference resolves to a synthetic getter, and unwrapping THAT is
+    // still correct and still required for the rule to fire at all.
+    test('still fires through the synthetic accessor of an unqualified '
+        'mutable field reference', () async {
+      final codes = await reportedRuleCodes(MutableTearoffRule(), '''
+typedef VoidCallback = void Function();
+
+class Handler {
+  void handleTap() {}
+}
+
+class Controller {
+  Handler handler = Handler();
+  VoidCallback? cached;
+
+  void bind() {
+    cached = handler.handleTap;
+  }
+}
+''');
+      expect(codes, contains('mutable_tearoff'));
+    });
+
+    // `_isStored` previously checked only `parent.value`, so a tear-off
+    // used as a map KEY escaped the rule even though the map retains it
+    // exactly as a value would (and hashes it by identity, so a stale
+    // key silently breaks lookups).
+    test(
+      'fires on a tear-off stored as the KEY of a map literal entry',
+      () async {
+        final codes = await reportedRuleCodes(MutableTearoffRule(), '''
+typedef VoidCallback = void Function();
+
+class Handler {
+  void handleTap() {}
+}
+
+void run(Handler handler) {
+  final Map<VoidCallback, String> labels = {handler.handleTap: 'tap'};
+  labels.keys.first();
+}
+''');
+        expect(codes, contains('mutable_tearoff'));
+      },
+    );
+
     test('does NOT fire on a tear-off passed as a named argument to a '
         'one-shot call, even though it resembles a record field', () async {
       final codes = await reportedRuleCodes(MutableTearoffRule(), '''

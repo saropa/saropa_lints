@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../analyzer_compat.dart';
 import '../../saropa_lint_rule.dart';
@@ -6,7 +7,7 @@ import '../../saropa_lint_rule.dart';
 /// Warns when a class overrides both `operator ==` and `hashCode` while
 /// still declaring one or more non-final (mutable) instance fields.
 ///
-/// Since: v14.4.0 | Rule version: v1
+/// Since: v14.4.0 | Rule version: v2
 ///
 /// `==` and `hashCode` are contractually required to stay in sync with the
 /// object's observable state for the lifetime the object spends in a
@@ -22,7 +23,25 @@ import '../../saropa_lint_rule.dart';
 /// Equatable are skipped here to avoid duplicate diagnostics; use the
 /// Equatable-specific rule for that case.
 ///
+/// Only mutable fields that are *actually referenced* inside the `==` or
+/// `hashCode` body are flagged. The extremely common "identity key plus
+/// mutable payload" shape — a `final` key used for equality alongside
+/// mutable cache/bookkeeping fields deliberately excluded from the equality
+/// contract — is correct code and is NOT reported.
+///
 /// **Known limitations (accepted tradeoffs, not defects):**
+/// - Reference detection ([_findReferencedMutableFields]) is a structural
+///   identifier scan of the `==` / `hashCode` bodies, not data-flow
+///   analysis. A mutable field reached *indirectly* — read inside a helper
+///   method that `==` calls, or through a getter that wraps the field — is
+///   not seen, so that class is not reported (false negative). This
+///   direction is chosen deliberately: at ERROR severity in the Essential
+///   tier, a missed report costs a user nothing, whereas a false report on
+///   correct code trains users to blanket-`// ignore:` the rule. The scan
+///   also matches on name only, so a same-named local variable, parameter,
+///   or unrelated method inside those bodies counts as a reference (an
+///   over-report guard that can only make the rule *quieter* about nothing
+///   — it never invents a field that does not exist on the class).
 /// - The Equatable skip ([_extendsOrMixesInEquatable]) is a structural check
 ///   on the `extends`/`with` clause names, not a resolved-type check against
 ///   `package:equatable`. A project-local class/mixin that happens to be
@@ -69,6 +88,22 @@ import '../../saropa_lint_rule.dart';
 ///   int get hashCode => Object.hash(x, y);
 /// }
 /// ```
+///
+/// **GOOD** (mutable payload deliberately excluded from equality):
+/// ```dart
+/// class CacheEntry {
+///   CacheEntry(this.key, this.value);
+///   final String key;
+///   dynamic value;          // mutated constantly, not part of equality
+///   DateTime? lastAccessed; // bookkeeping, not part of equality
+///
+///   @override
+///   bool operator ==(Object other) => other is CacheEntry && other.key == key;
+///
+///   @override
+///   int get hashCode => key.hashCode;
+/// }
+/// ```
 class AvoidEqualsAndHashCodeOnMutableClassesRule extends SaropaLintRule {
   AvoidEqualsAndHashCodeOnMutableClassesRule() : super(code: _code);
 
@@ -96,19 +131,22 @@ class AvoidEqualsAndHashCodeOnMutableClassesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_equals_and_hash_code_on_mutable_classes',
-    '[avoid_equals_and_hash_code_on_mutable_classes] Class overrides both '
-        'operator == and hashCode but declares one or more non-final '
-        'instance fields. == and hashCode must stay consistent with an '
+    '[avoid_equals_and_hash_code_on_mutable_classes] This non-final '
+        'instance field is read by the hand-written operator == or hashCode '
+        'of its class. == and hashCode must stay consistent with an '
         "object's state for as long as it lives inside a hash-based "
         'collection (HashSet, HashMap, a Set, or a Map key). Mutating a '
-        'field after the object is inserted silently corrupts the '
-        'collection: lookups fail, duplicates appear, and remove() stops '
-        'working, producing intermittent bugs that are rarely caught by '
-        'tests that do not mutate-then-query. {v1}',
+        'field the equality contract depends on, after the object is '
+        'inserted, silently corrupts the collection: lookups fail, '
+        'duplicates appear, and remove() stops working, producing '
+        'intermittent bugs that are rarely caught by tests that do not '
+        'mutate-then-query. Mutable fields that == and hashCode ignore are '
+        'not reported. {v2}',
     correctionMessage:
-        'Make the fields referenced by == and hashCode final, or stop '
-        'overriding == and hashCode on this mutable class. Making fields '
-        'final may require a copyWith method for updates.',
+        'Make this field final, drop it from == and hashCode so the equality '
+        'contract only depends on immutable state, or stop overriding == and '
+        'hashCode on this mutable class. Making fields final may require a '
+        'copyWith method for updates.',
     severity: DiagnosticSeverity.ERROR,
   );
 
@@ -130,13 +168,15 @@ class AvoidEqualsAndHashCodeOnMutableClassesRule extends SaropaLintRule {
       final MethodDeclaration? hashCodeGetter = _findHashCodeGetter(node);
       if (hashCodeGetter == null) return;
 
-      // Collect non-final, non-static instance fields. Conservative: any
-      // such field is flagged, matching the sibling Equatable rule's
-      // approach rather than attempting data-flow analysis of which fields
-      // are actually read inside == / hashCode.
-      final List<VariableDeclaration> mutableFields = _findMutableFields(
-        node,
-      );
+      // Only mutable fields the equality contract actually depends on are a
+      // defect. Flagging every mutable field (the rule's original v1
+      // behavior) false-positived on the idiomatic "final identity key plus
+      // mutable payload" shape — e.g. a cache entry whose `value` and
+      // `lastAccessed` are deliberately excluded from `==`. At ERROR
+      // severity in the Essential tier that trained users to blanket-ignore
+      // the rule, so detection is narrowed to referenced fields only.
+      final List<VariableDeclaration> mutableFields =
+          _findReferencedMutableFields(node, equalsMethod, hashCodeGetter);
       if (mutableFields.isEmpty) return;
 
       for (final VariableDeclaration field in mutableFields) {
@@ -194,17 +234,75 @@ class AvoidEqualsAndHashCodeOnMutableClassesRule extends SaropaLintRule {
     return null;
   }
 
-  /// Collects non-final, non-static instance field declarations.
-  List<VariableDeclaration> _findMutableFields(ClassDeclaration node) {
+  /// Collects the non-final, non-static instance fields of [node] whose name
+  /// appears somewhere inside the body of [equalsMethod] or [hashCodeGetter].
+  ///
+  /// A mutable field that neither member reads cannot break the equality
+  /// contract — mutating it changes nothing that `==`/`hashCode` observe — so
+  /// excluding it is what keeps the "identity key plus mutable payload"
+  /// pattern quiet. See the class-level "Known limitations" for the
+  /// indirection false negative this structural scan accepts.
+  List<VariableDeclaration> _findReferencedMutableFields(
+    ClassDeclaration node,
+    MethodDeclaration equalsMethod,
+    MethodDeclaration hashCodeGetter,
+  ) {
+    // Names mentioned anywhere in either body. Collected once so the field
+    // loop below is a set lookup rather than a re-walk per field.
+    final Set<String> referenced = _collectIdentifierNames(<AstNode?>[
+      equalsMethod.body,
+      hashCodeGetter.body,
+    ]);
+    if (referenced.isEmpty) return const <VariableDeclaration>[];
+
     final List<VariableDeclaration> mutableFields = <VariableDeclaration>[];
     for (final ClassMember member in node.bodyMembers) {
-      if (member is FieldDeclaration &&
-          !member.isStatic &&
-          !member.fields.isFinal &&
-          !member.fields.isConst) {
-        mutableFields.addAll(member.fields.variables);
+      // `isFinal` is true for `late final`, so those are correctly treated as
+      // immutable; `isConst` fields are implicitly static but are excluded
+      // explicitly for clarity.
+      if (member is! FieldDeclaration ||
+          member.isStatic ||
+          member.fields.isFinal ||
+          member.fields.isConst) {
+        continue;
+      }
+      for (final VariableDeclaration variable in member.fields.variables) {
+        if (referenced.contains(variable.name.lexeme)) {
+          mutableFields.add(variable);
+        }
       }
     }
     return mutableFields;
+  }
+
+  /// Returns every simple identifier name appearing in [roots].
+  ///
+  /// Walking raw identifiers deliberately catches BOTH access shapes a
+  /// hand-written `==` uses for the same field: the bare `field` reference on
+  /// `this`, and the `other.field` property access (whose property name is
+  /// itself a [SimpleIdentifier]). Names of unrelated locals, parameters and
+  /// methods are swept up too — harmless, because the result is only ever
+  /// intersected with the class's own declared field names.
+  Set<String> _collectIdentifierNames(List<AstNode?> roots) {
+    final _IdentifierNameCollector collector = _IdentifierNameCollector();
+    for (final AstNode? root in roots) {
+      root?.accept(collector);
+    }
+    return collector.names;
+  }
+}
+
+/// Gathers the lexemes of all [SimpleIdentifier]s under a subtree.
+///
+/// A recursive visitor is used instead of a source-text scan so that
+/// identifiers inside comments and string literals — which do not read the
+/// field — cannot suppress a real diagnostic.
+class _IdentifierNameCollector extends RecursiveAstVisitor<void> {
+  final Set<String> names = <String>{};
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    names.add(node.name);
+    super.visitSimpleIdentifier(node);
   }
 }

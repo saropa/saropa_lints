@@ -79,6 +79,44 @@ Future<void> handleFutureOr(FutureOr<Object?> result) async {
   print(value);
 }
 
+/// A synchronous interface whose contract forbids an `async` implementation —
+/// the reason the narrowing below cannot be replaced by `await`.
+abstract class SyncReader {
+  int? tryReadSync(FutureOr<int> value);
+}
+
+class EagerReader implements SyncReader {
+  // GOOD (v2 exemption): the value is ALREADY typed FutureOr<int>, and this
+  // override cannot be made async without breaking the SyncReader contract,
+  // so `is Future<int>` is the only way to narrow it. The rule must stay
+  // silent here — no expect_lint marker.
+  @override
+  int? tryReadSync(FutureOr<int> value) {
+    if (value is Future<int>) {
+      return null; // Not yet available synchronously.
+    }
+    return value; // Promoted to int by the narrowing above.
+  }
+}
+
+FutureOr<String> _label(FutureOr<String> value) {
+  // GOOD (v2 exemption), negated form: `is!` narrowing of a FutureOr<T> value
+  // is the same legitimate idiom and is likewise not reported.
+  if (value is! Future<String>) {
+    return value.toUpperCase();
+  }
+  return value;
+}
+
+void handleMismatchedFutureOrArgument(FutureOr<int> value) {
+  // BAD: the value is FutureOr<int> but the check names Future<String>, so
+  // this is NOT a narrowing of that FutureOr — the exemption does not apply.
+  // expect_lint: is_future
+  if (value is Future<String>) {
+    print(value);
+  }
+}
+
 void handleUnrelatedTypeCheck(dynamic result) {
   // Near-miss: type-checking against an unrelated type is not what this
   // rule targets.

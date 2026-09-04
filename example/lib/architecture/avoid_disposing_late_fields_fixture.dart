@@ -351,6 +351,109 @@ class _bad4_ConditionalSubscriptionState extends State<StatefulWidget> {
   Widget build(BuildContext context) => const SizedBox();
 }
 
+// GOOD (regression case for the v2 branch-recursion fix): BOTH arms of the
+// if/else initialize the field, but each does so through a private helper
+// this heuristic cannot see inside. Before v2 the unanalyzable-shape
+// bail-out only applied to TOP-LEVEL initState() statements — a helper call
+// nested inside a branch fell through to "this branch does not assign", so
+// this always-safe, fully-covered pattern was flagged. It must stay silent.
+class _good10_BranchDelegationState extends State<StatefulWidget>
+    with SingleTickerProviderStateMixin<StatefulWidget> {
+  late final AnimationController _controller;
+
+  bool useAdvanced = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (useAdvanced) {
+      _setupAdvancedController();
+    } else {
+      _setupBasicController();
+    }
+  }
+
+  void _setupAdvancedController() {
+    _controller = AnimationController(vsync: this, duration: null);
+  }
+
+  void _setupBasicController() {
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+// GOOD (v2 guard widening): the dispose() call is gated by a `switch`, not
+// an `if`. The author has clearly conditioned teardown on the same state
+// that drove initialization; before v2 only an `IfStatement` ancestor
+// counted as a guard, so switch-based teardown false-positived.
+class _good11_SwitchGuardedDisposeState extends State<StatefulWidget> {
+  late final AnimationController _controller;
+
+  int mode = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (mode == 1) {
+      _controller = AnimationController(vsync: this);
+    }
+  }
+
+  @override
+  void dispose() {
+    switch (mode) {
+      case 1:
+        _controller.dispose();
+        break;
+      default:
+        break;
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
+// BAD (v2 cascade matching): `_controller..dispose();` is the same
+// unconditional teardown of a conditionally-initialized late field as
+// `_controller.dispose();`, but the cascade section carries no target of
+// its own (the target lives on the enclosing CascadeExpression), so the
+// target-based call matcher never saw it — a silent false negative before
+// v2.
+class _bad6_CascadeDisposeState extends State<StatefulWidget> {
+  late final AnimationController _controller;
+
+  bool autoPlay = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (autoPlay) {
+      _controller = AnimationController(vsync: this);
+    }
+  }
+
+  @override
+  // expect_lint: avoid_disposing_late_fields
+  void dispose() {
+    _controller..dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+
 // BAD: the only "assignment" to `_controller` is `??=`, which is NOT proof
 // of safe unconditional initialization — `??=` reads the field before
 // deciding whether to assign it, so on a genuinely uninitialized `late`

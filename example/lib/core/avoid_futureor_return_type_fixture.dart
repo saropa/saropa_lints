@@ -92,3 +92,34 @@ extension _Extension on String {
   // expect_lint: avoid_futureor_return_type
   FutureOr<int> extensionMethod() => 1;
 }
+
+// =============================================================================
+// BAD: a typedef alias hides the `FutureOr` lexeme but resolves to exactly
+// dart:async's FutureOr<T>, so the caller-side sync/async ambiguity is
+// identical and must still be flagged. Detection is resolution-based
+// (DartType.isDartAsyncFutureOr), not a source-text comparison.
+// =============================================================================
+
+typedef _MyFutureOr<T> = FutureOr<T>;
+
+// expect_lint: avoid_futureor_return_type
+_MyFutureOr<int> _getAliasedValue() => 42;
+
+// =============================================================================
+// GOOD near-miss: a user-defined class that merely SHARES the name FutureOr
+// is not dart:async.FutureOr. It is an ordinary value wrapper with no
+// sync/async ambiguity at all, so flagging it would be a false positive and
+// the correction message ("make it async, return Future<T>") would be
+// nonsense. This is the case the old lexeme-comparison check got wrong.
+// =============================================================================
+
+class _FakeFutureOr<T> {
+  const _FakeFutureOr(this.value);
+  final T value;
+}
+
+// This file already imports dart:async, so the real `FutureOr` name is taken
+// and the wrapper cannot literally reuse it here; the unit test in
+// test/rules/core/avoid_futureor_return_type_test.dart covers the exact
+// `class FutureOr<T>` shadowing case in an import-free library.
+_FakeFutureOr<int> _wrapValue(int v) => _FakeFutureOr<int>(v);

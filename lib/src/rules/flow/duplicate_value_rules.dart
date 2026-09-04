@@ -30,6 +30,37 @@ import '../../saropa_lint_rule.dart';
 ///   return status == Status.open || status == Status.draft;
 /// }
 /// ```
+///
+/// ## Known tradeoff: repeated impure calls are flagged
+///
+/// Operands are compared by their `toSource()` text. There is deliberately
+/// NO purity analysis, so an *intentionally* repeated side-effecting call is
+/// reported even though the repetition is the point:
+///
+/// ```dart
+/// // Skip every other element: each moveNext() advances the iterator.
+/// while (iterator.moveNext() && iterator.moveNext()) { ... }
+/// ```
+///
+/// This is accepted rather than fixed because proving an arbitrary call is
+/// impure requires whole-program effect analysis that the analyzer cannot
+/// supply, and the cautious alternative -- exempting every operand that
+/// contains a method call -- would blind the rule to the copy-paste bug it
+/// exists to catch (`getStatus() == Open || getStatus() == Open` is far more
+/// often a typo than a deliberate double-advance). The idiom is rare and
+/// intentional, so suppress it at the call site with a one-line reason:
+///
+/// ```dart
+/// // ignore: duplicate_value -- intentional: each moveNext() advances the
+/// // iterator, skipping every other element.
+/// while (iterator.moveNext() && iterator.moveNext()) { ... }
+/// ```
+///
+/// Negated duplicates (`a && !a`) are out of scope by design: `toSource()`
+/// differs, so they never match. That contradiction shape belongs to the
+/// broader `no_equal_conditions` sibling rule; this rule stays deliberately
+/// narrow and text-exact to keep its false-positive rate at zero for the
+/// pure-comparison case it targets.
 class DuplicateValueRule extends SaropaLintRule {
   DuplicateValueRule() : super(code: _code);
 
@@ -118,10 +149,16 @@ class DuplicateValueRule extends SaropaLintRule {
   ///
   /// Only descends into a nested [BinaryExpression] when it uses the exact
   /// same operator as the chain being flattened. A mixed-operator
-  /// expression such as `a && b || a && b` is therefore treated as two
+  /// expression such as `(a && b) || (a && c)` is therefore treated as two
   /// opaque `&&` operands of the outer `||`, rather than incorrectly
   /// merged into a single flat list -- this avoids misreporting operator
-  /// precedence groups as duplicated scalar values.
+  /// precedence groups as duplicated scalar values just because they share
+  /// the `a` fragment.
+  ///
+  /// Note the opaque operands are still compared to EACH OTHER, so
+  /// `a && b || a && b` -- two textually identical `&&` groups -- does fire.
+  /// That is correct and intended: it is `x || x`, a genuine duplicate, not
+  /// a cross-operator false positive.
   ///
   /// Explicit grouping parentheses must not break the flattening of a
   /// same-operator chain (`a || (b || a)` is one flat `||` chain, not an
@@ -136,7 +173,8 @@ class DuplicateValueRule extends SaropaLintRule {
     List<Expression> out,
   ) {
     final Expression unwrapped = expr.unParenthesized;
-    if (unwrapped is BinaryExpression && unwrapped.operator.type == operatorType) {
+    if (unwrapped is BinaryExpression &&
+        unwrapped.operator.type == operatorType) {
       _collectOperands(unwrapped.leftOperand, operatorType, out);
       _collectOperands(unwrapped.rightOperand, operatorType, out);
     } else {

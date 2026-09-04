@@ -17,6 +17,21 @@ import '../../support/resolved_rule_harness.dart';
 
 const String _rule = 'initializers_ordering';
 
+/// The 1-based lines on which [_rule] was reported for [code].
+///
+/// Exists because `reportedRuleCodes` collapses diagnostics to a code set,
+/// which cannot distinguish "reported on the right node" from "reported
+/// anywhere in the file". The fixture's `// expect_lint:` markers had drifted
+/// onto the wrong initializer entry precisely because nothing asserted
+/// position — the expect_lint machinery only checks the marker string exists
+/// somewhere in the file. These line assertions are the guard that keeps the
+/// documented reporting convention (report the SECOND entry of the
+/// out-of-order pair) honest.
+Future<List<int>> _reportLines(String code) async {
+  final diags = await runRuleResolved(InitializersOrderingRule(), code);
+  return [for (final d in diags) if (d.ruleName == _rule) d.line];
+}
+
 void main() {
   group('initializers_ordering', () {
     test('LINT: two-field initializer list out of declaration order', () async {
@@ -170,6 +185,68 @@ enum EnumOk {
 ''';
       final codes = await reportedRuleCodes(InitializersOrderingRule(), code);
       expect(codes, isNot(contains(_rule)));
+    });
+
+    // Position assertions. Each fixture below puts one initializer entry per
+    // line so the reported line uniquely identifies the reported node. They
+    // pin the rule's documented convention: the diagnostic lands on the
+    // SECOND entry of the first out-of-order pair (the entry whose
+    // declaration index regresses), never on the first entry, and never on
+    // the constructor header.
+    group('reported node position', () {
+      test('two-field list: reports the second entry (`x = a`), not `y = b`', () async {
+        // Line 3 is `: y = b,`; line 4 is `x = a;`. Declaration indices are
+        // [y=1, x=0], so the regression is detected at `x = a` on line 4.
+        const String code = '''
+class Point {
+  Point(int a, int b)
+      : y = b,
+        x = a;
+  final int x;
+  final int y;
+}
+''';
+        expect(await _reportLines(code), <int>[4]);
+      });
+
+      test('three-field list: reports `b = b`, the entry that regresses', () async {
+        // Indices [a=0, c=2, b=1]: the first regression is 1 < 2 at the third
+        // entry, so line 5 (`b = b;`) is reported — not line 4 (`c = c,`),
+        // which is merely the first half of the offending pair.
+        const String code = '''
+class ThreeFields {
+  ThreeFields(int a, int b, int c)
+      : a = a,
+        c = c,
+        b = b;
+  final int a;
+  final int b;
+  final int c;
+}
+''';
+        expect(await _reportLines(code), <int>[5]);
+      });
+
+      test('reports exactly once per constructor, at the first regression', () async {
+        // Indices [c=2, d=3, b=1, a=0] contain two regressions (b<d at the
+        // third entry, a<b at the fourth). The rule returns after the first,
+        // so only line 5 (`b = b`) is reported — pinning the early `return`
+        // that keeps one constructor from emitting a cascade of diagnostics.
+        const String code = '''
+class Four {
+  Four(int a, int b, int c, int d)
+      : c = c,
+        d = d,
+        b = b,
+        a = a;
+  final int a;
+  final int b;
+  final int c;
+  final int d;
+}
+''';
+        expect(await _reportLines(code), <int>[5]);
+      });
     });
   });
 }
