@@ -18,6 +18,8 @@ import {
   runEnable,
   runDisable,
   runReenablePlugin,
+  disablePluginsIntegration,
+  restorePluginsIntegration,
   getPluginsIntegrationState,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
@@ -165,7 +167,6 @@ import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, postDashboardAnalysisProgress, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
-import { openConsolidatedDashboard } from './views/consolidated/consolidatedView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
 import { setCurrentLocale, l10n } from './i18n/runtime';
 import { buildUiLanguageQuickPickItems, type LanguagePickItem } from './i18n/languagePick';
@@ -1193,9 +1194,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         }
       }
       statusBarItem.tooltip = tooltipLines.join('\n');
-      // Click opens the Findings Dashboard (the most actionable destination)
-      // now that this item also carries the finding count.
-      statusBarItem.command = 'saropaLints.openViolationsWideReport';
+      // Click opens the Home hub (plan Phase 3, §2.3) — it now surfaces the
+      // same health/issue numbers this item carries (via the KPI band) plus
+      // one-click links to every other dashboard, so it is the more useful
+      // landing spot than jumping straight into Findings. Was
+      // saropaLints.openViolationsWideReport.
+      statusBarItem.command = 'saropaLints.openDashboards';
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
@@ -1269,12 +1273,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   // Start LSP server on activation if the setting is already enabled.
   // When LSP is on, the analyzer plugin is redundant (and costs ~10GB RAM),
-  // so disable it. The plugin block gets commented out — reversible via the
-  // debug panel's analyzer toggle or by turning LSP off.
+  // so disable it by commenting out the plugins: block in analysis_options.yaml.
+  // IMPORTANT: we call disablePluginsIntegration directly — NOT runDisable,
+  // which would also set saropaLints.enabled=false and kill the entire
+  // extension UI (sidebar views, status bar, scan-on-save).
   if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
     lspClient = new SaropaLspClient(context, lspRoot);
     void lspClient.start();
-    void runDisable(context);
+    disablePluginsIntegration(lspRoot);
   }
 
   // React to setting changes — start/stop the LSP server without reload.
@@ -1292,9 +1298,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           });
           // LSP replaces the analyzer plugin — disable the plugin to free
           // the ~10GB RAM the in-process plugin consumes. Comments out
-          // the plugins: block in analysis_options.yaml (same mechanism
-          // as the sidebar "Lint integration: OFF" toggle).
-          void runDisable(context);
+          // the plugins: block in analysis_options.yaml only. Does NOT
+          // touch saropaLints.enabled (that would kill the whole extension UI).
+          if (lspRoot) {
+            disablePluginsIntegration(lspRoot);
+          }
         } else if (!enabled && lspClient) {
           // Await stop before dispose to avoid a double-stop race —
           // dispose() calls stop() again if _client is still set.
@@ -1305,8 +1313,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
             HealthPanel.addLogEntry(l10n('debug.log.lspStopped'));
           });
           // Re-enable the analyzer plugin when LSP is turned off so the
-          // user doesn't lose all diagnostics.
-          void runReenablePlugin(context);
+          // user doesn't lose all diagnostics. restorePluginsIntegration
+          // uncomments the plugins: block — does NOT touch saropaLints.enabled.
+          if (lspRoot) {
+            restorePluginsIntegration(lspRoot);
+          }
         }
       }
     }),
@@ -1864,9 +1875,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.revealFindingsDashboard', async () => {
       await openViolationsWideReport(context);
-    }),
-    vscode.commands.registerCommand('saropaLints.openConsolidatedDashboard', () => {
-      openConsolidatedDashboard(context);
     }),
     vscode.commands.registerCommand('saropaLints.openProjectVibrancyReport', async () => {
       await openProjectVibrancyReport();

@@ -398,25 +398,43 @@ String _fileUriToPath(String uriStr) {
 /// from saropaLints.lspServer.* configuration. Falls back to defaults when
 /// the client doesn't send options (e.g. standalone CLI usage).
 void _parseInitializationOptions(Map<String, dynamic> params) {
-  final options = params['initializationOptions'] as Map<String, dynamic>?;
-  if (options == null) {
-    _log('no initializationOptions — using defaults '
-        '(workspaceScan: true, dirs: [lib, bin, test])');
-    return;
-  }
+  // Defensive: initializationOptions can be any JSON value — a malformed
+  // client config (or user-edited settings.json) must not crash the
+  // initialize handshake. Log and fall back to defaults on bad input.
+  try {
+    final raw = params['initializationOptions'];
+    if (raw is! Map<String, dynamic>) {
+      _log('no initializationOptions — using defaults '
+          '(workspaceScan: true, dirs: [lib, bin, test])');
+      return;
+    }
 
-  // Whether to scan all project files on startup.
-  if (options['workspaceScan'] case final bool scan) {
-    _workspaceScanEnabled = scan;
-  }
+    // Whether to scan all project files on startup.
+    if (raw['workspaceScan'] case final bool scan) {
+      _workspaceScanEnabled = scan;
+    }
 
-  // Which directories to include in the workspace scan.
-  if (options['scanDirectories'] case final List<dynamic> dirs) {
-    _scanDirectories = dirs.cast<String>();
-  }
+    // Which directories to include in the workspace scan. Validate each
+    // element is a String — a bare string value or numeric entries from
+    // malformed JSON would otherwise crash later in _analyzeWorkspace.
+    if (raw['scanDirectories'] case final List<dynamic> dirs) {
+      final valid = dirs.whereType<String>().toList();
+      if (valid.isNotEmpty) {
+        _scanDirectories = valid;
+      }
+      if (valid.length != dirs.length) {
+        _log('warning: scanDirectories contained non-string entries, '
+            'ignored ${dirs.length - valid.length} invalid value(s)');
+      }
+    }
 
-  _log('initializationOptions: workspaceScan=$_workspaceScanEnabled, '
-      'dirs=$_scanDirectories');
+    _log('initializationOptions: workspaceScan=$_workspaceScanEnabled, '
+        'dirs=$_scanDirectories');
+  } on Object catch (e) {
+    // Parse failure must never break the handshake — fall back to defaults.
+    _log('warning: failed to parse initializationOptions ($e), '
+        'using defaults');
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -492,85 +510,92 @@ Future<void> _buildCollection() async {
   }
 }
 
-/// Whether a workspace scan is currently running. Checked by didSave so
-/// user-initiated analysis can preempt the background scan for that file.
-bool _workspaceScanRunning = false;
-
-/// Analyzes all Dart files under lib/, bin/, and test/ so the Problems panel
-/// shows project-wide diagnostics on startup — not just for open files.
-/// Runs sequentially in the background after the analyzer is warmed up.
-/// Skips generated files, build/, .dart_tool/, and example/ directories.
+/// Analyzes all Dart files under the configured scan directories so the
+/// Problems panel shows project-wide diagnostics on startup — not just for
+/// open files. Runs sequentially in the background after the analyzer is
+/// warmed up. Skips generated files, build/, and .dart_tool/ directories.
+///
+/// The entire scan is wrapped in try/catch so a filesystem error (permission
+/// denied, symlink cycle, path deleted mid-scan) doesn't crash the isolate
+/// via an unhandled async error from the unawaited() call site.
 Future<void> _analyzeWorkspace(String root) async {
-  _workspaceScanRunning = true;
   final sw = Stopwatch()..start();
 
-  // Directories to scan — configurable via saropaLints.lspServer.scanDirectories.
-  // Defaults to ['lib', 'bin', 'test'] (same scope as the analyzer plugin).
-  final scanDirs = _scanDirectories;
-  final dartFiles = <String>[];
+  try {
+    // Directories to scan — configurable via saropaLints.lspServer.scanDirectories.
+    // Defaults to ['lib', 'bin', 'test'] (same scope as the analyzer plugin).
+    final scanDirs = _scanDirectories;
+    final dartFiles = <String>[];
 
-  for (final dir in scanDirs) {
-    final dirPath = p.join(root, dir);
-    final directory = Directory(dirPath);
-    if (!directory.existsSync()) continue;
+    for (final dir in scanDirs) {
+      final dirPath = p.join(root, dir);
+      final directory = Directory(dirPath);
+      if (!directory.existsSync()) continue;
 
-    // Walk the directory tree for .dart files, skipping generated/build dirs.
-    await for (final entity in directory.list(recursive: true)) {
-      if (entity is! File || !entity.path.endsWith('.dart')) continue;
+      // Walk the directory tree for .dart files, skipping generated/build dirs.
+      await for (final entity in directory.list(recursive: true)) {
+        if (entity is! File || !entity.path.endsWith('.dart')) continue;
 
-      final relative = p.relative(entity.path, from: root);
-      // Skip generated files and build artifacts
-      if (relative.contains('.g.dart') ||
-          relative.contains('.freezed.dart') ||
-          relative.contains('.gr.dart') ||
-          relative.contains('.dart_tool') ||
-          relative.contains('build${p.separator}')) {
+        final relative = p.relative(entity.path, from: root);
+        // Skip code-gen output and build artifacts — these are never
+        // user-authored and would just produce noise in the Problems panel.
+        if (relative.contains('.g.dart') ||
+            relative.contains('.freezed.dart') ||
+            relative.contains('.gr.dart') ||
+            relative.contains('.dart_tool') ||
+            relative.contains('build${p.separator}')) {
+          continue;
+        }
+        dartFiles.add(entity.path);
+      }
+    }
+
+    if (dartFiles.isEmpty) {
+      _log('workspace scan: no Dart files found');
+      return;
+    }
+
+    _log('workspace scan: analyzing ${dartFiles.length} files…');
+    var analyzed = 0;
+    var diagnosticCount = 0;
+
+    for (final filePath in dartFiles) {
+      // Bail if the analyzer context was torn down (server shutting down).
+      if (_collection == null) break;
+
+      final fileUri = Uri.file(p.normalize(p.absolute(filePath))).toString();
+
+      // Skip files that already have published diagnostics (e.g. from a
+      // didSave that raced ahead of the workspace scan).
+      if (_fileDiagnostics.containsKey(fileUri)) {
+        analyzed++;
         continue;
       }
-      dartFiles.add(entity.path);
-    }
-  }
 
-  if (dartFiles.isEmpty) {
-    _log('workspace scan: no Dart files found');
-    _workspaceScanRunning = false;
-    return;
-  }
+      await _analyzeFile({
+        'textDocument': {'uri': fileUri},
+      });
 
-  _log('workspace scan: analyzing ${dartFiles.length} files…');
-  var analyzed = 0;
-  var diagnosticCount = 0;
-
-  for (final filePath in dartFiles) {
-    // Bail if the analyzer context was torn down (server shutting down).
-    if (_collection == null) break;
-
-    final fileUri = Uri.file(p.normalize(p.absolute(filePath))).toString();
-
-    // Skip files that already have published diagnostics (e.g. from a
-    // didSave that raced ahead of the workspace scan).
-    if (_fileDiagnostics.containsKey(fileUri)) {
       analyzed++;
-      continue;
+      diagnosticCount += _fileDiagnostics[fileUri]?.length ?? 0;
+
+      // Yield to the event loop between files so didSave/codeAction requests
+      // aren't starved by a long scan.
+      await Future<void>.delayed(Duration.zero);
     }
 
-    await _analyzeFile({
-      'textDocument': {'uri': fileUri},
-    });
-
-    analyzed++;
-    diagnosticCount += _fileDiagnostics[fileUri]?.length ?? 0;
-
-    // Yield to the event loop between files so didSave/codeAction requests
-    // aren't starved by a long scan.
-    await Future<void>.delayed(Duration.zero);
+    _log(
+      'workspace scan complete: $analyzed files, $diagnosticCount diagnostic(s) '
+      'in ${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s',
+    );
+  } on Object catch (e, st) {
+    // A filesystem error (permission denied, symlink cycle, path deleted
+    // mid-walk) must not crash the isolate — the scan is fire-and-forget
+    // via unawaited(), so an unhandled error would be an uncaught future.
+    _log('workspace scan failed after '
+        '${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s: $e');
+    _logTrace('workspace scan stack trace: $st');
   }
-
-  _workspaceScanRunning = false;
-  _log(
-    'workspace scan complete: $analyzed files, $diagnosticCount diagnostic(s) '
-    'in ${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s',
-  );
 }
 
 /// Re-reads the tier from analysis_options.yaml and re-analyzes every file

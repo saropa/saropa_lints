@@ -135,30 +135,48 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   }
 
   /// Checks whether [block] contains an early-return/throw guard that exits
-  /// before [node] when a platform check is true (e.g. `if (kIsWeb) return;`).
+  /// before [node] when running on web (e.g. `if (kIsWeb) return;`).
+  /// The guard must exit ON WEB — `if (!kIsWeb) return;` exits on non-web
+  /// and does NOT protect subsequent code from web execution.
   bool _hasPrecedingPlatformGuard(Block block, AstNode node) {
     for (final Statement stmt in block.statements) {
       // Only look at statements that precede the target node
       if (stmt.offset >= node.offset) break;
 
-      if (stmt is IfStatement && _containsPlatformCheck(stmt.expression.toSource())) {
-        // Guard body must be a return/throw (early exit)
-        if (_isEarlyExit(stmt.thenStatement)) {
-          return true;
-        }
+      if (stmt is IfStatement && _isWebExitGuard(stmt)) {
+        return true;
       }
     }
     return false;
   }
 
-  /// True when [stmt] is a return or throw — the body of an early-exit guard.
+  /// Whether [stmt] is an if-statement that exits when running on web.
+  /// Only `if (kIsWeb) return/throw` qualifies — the condition must be a
+  /// positive kIsWeb check (not negated, not Platform.isAndroid, etc.)
+  /// because only kIsWeb reliably means "we are on web right now."
+  /// `Platform.isAndroid` returning early does NOT protect from web.
+  bool _isWebExitGuard(IfStatement stmt) {
+    final String condition = stmt.expression.toSource();
+    // Must mention kIsWeb specifically, not just any platform check.
+    // Negated forms (!kIsWeb) exit on non-web — the opposite of what we want.
+    if (!condition.contains('kIsWeb') || condition.contains('!kIsWeb')) {
+      return false;
+    }
+    return _isEarlyExit(stmt.thenStatement);
+  }
+
+  /// True when [stmt] guarantees the function exits — the body of an
+  /// early-exit guard. Handles bare return/throw and block bodies where
+  /// the LAST statement exits (e.g. `if (kIsWeb) { log('skip'); return; }`).
   bool _isEarlyExit(Statement stmt) {
     if (stmt is ReturnStatement || stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
       return true;
     }
-    // Block with a single return/throw: `if (kIsWeb) { return; }`
-    if (stmt is Block && stmt.statements.length == 1) {
-      return _isEarlyExit(stmt.statements.first);
+    // Block body: check the last statement. A multi-statement block like
+    // `{ log('not supported'); return; }` still exits — only the last
+    // statement matters for control flow.
+    if (stmt is Block && stmt.statements.isNotEmpty) {
+      return _isEarlyExit(stmt.statements.last);
     }
     return false;
   }
