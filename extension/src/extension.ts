@@ -43,7 +43,6 @@ import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type
 import {
   createSidebarSectionProviders,
   SECTION_VIEW_IDS,
-  SeverityToggleItem,
   updateSidebarSectionContext,
 } from './views/sectionedSidebar';
 import { showHelpHubQuickPick } from './views/helpHub';
@@ -601,56 +600,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     updateSidebarSectionContext(context.workspaceState);
   };
   for (const provider of sectionProviders) {
-    // The Help panel surfaces the installed version in its title. The version
-    // must NOT be baked into the localized view name (package.nls used
-    // "Help (vX.Y.Z)"): that froze the string per release, forced a manual bump
-    // every version, and made it a perpetual missing translation in all 24
-    // locales. Inject it at runtime via createTreeView().title so it tracks
-    // package.json automatically while the word "Help" stays localized through
-    // the runtime catalog. Other panels keep the lighter registerTreeDataProvider.
-    if (provider.viewId === SECTION_VIEW_IDS.help) {
-      const helpView = vscode.window.createTreeView(provider.viewId, {
+    // The Dashboards panel (which now also hosts Help via its "..." overflow
+    // menu) surfaces the installed version in its title. The version must NOT
+    // be baked into the localized view name: that would freeze the string per
+    // release, force a manual bump every version, and become a perpetual
+    // missing translation in all 24 locales. Inject it at runtime via
+    // createTreeView().title so it tracks package.json automatically while
+    // the view name stays localized through package.nls. Other panels keep
+    // the lighter registerTreeDataProvider.
+    if (provider.viewId === SECTION_VIEW_IDS.editorDashboards) {
+      const dashboardsView = vscode.window.createTreeView(provider.viewId, {
         treeDataProvider: provider,
       });
-      const helpExtVersion = (context.extension.packageJSON as { version: string }).version;
-      helpView.title = `${l10n('findingsDash.menuPalette.help')} (v${helpExtVersion})`;
-      context.subscriptions.push(helpView);
-      continue;
-    }
-    // Diagnostics section — severity toggles require double-click to
-    // prevent accidental flips while browsing. SeverityToggleItem has no
-    // single-click command; we detect double-click via rapid
-    // re-selection of the same item within a short window.
-    if (provider.viewId === SECTION_VIEW_IDS.severityFilters) {
-      const diagView = vscode.window.createTreeView(provider.viewId, {
-        treeDataProvider: provider,
-      });
-      // Double-click detection: track last-selected item + timestamp.
-      // 400ms matches VS Code's own internal double-click window for
-      // editor tabs and list views (see vscode src workbench/browser).
-      const DOUBLE_CLICK_MS = 400;
-      let lastSelectedId: string | undefined;
-      let lastSelectedTime = 0;
-      context.subscriptions.push(
-        diagView.onDidChangeSelection((e) => {
-          const selected = e.selection[0];
-          if (!(selected instanceof SeverityToggleItem)) return;
-          const now = Date.now();
-          const itemId = selected.toggleCommandId;
-          // Fire only when the same item is selected twice in rapid succession.
-          if (itemId === lastSelectedId && (now - lastSelectedTime) < DOUBLE_CLICK_MS) {
-            void vscode.commands.executeCommand(selected.toggleCommandId);
-            // Reset state so a third click doesn't re-fire, and the
-            // next single-click starts a fresh detection window.
-            lastSelectedId = undefined;
-            lastSelectedTime = 0;
-          } else {
-            lastSelectedId = itemId;
-            lastSelectedTime = now;
-          }
-        }),
-        diagView,
-      );
+      const extVersion = (context.extension.packageJSON as { version: string }).version;
+      dashboardsView.title = `${l10n('sidebarShell.dashboardsViewTitle')} (v${extVersion})`;
+      context.subscriptions.push(dashboardsView);
       continue;
     }
     context.subscriptions.push(
@@ -1237,7 +1201,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
       statusBarItem.backgroundColor = undefined;
-      statusBarItem.command = 'saropaLints.editorDashboards.focus';
+      statusBarItem.command = 'saropaLints.openDashboards';
     }
     statusBarItem.show();
   };
@@ -1806,17 +1770,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     ...registerSeverityToggle('saropaLints.toggleSeverityWarning', 'severity.warning', refreshAllSections),
     ...registerSeverityToggle('saropaLints.toggleSeverityInfo', 'severity.info', refreshAllSections),
     ...registerSeverityToggle('saropaLints.toggleSeverityHint', 'severity.hint', refreshAllSections),
-    // Inline icon button fallback — VS Code passes the tree item as the
-    // first arg for view/item/context inline commands. Delegates to the
-    // item's own toggleCommandId so each severity fires its correct toggle.
-    vscode.commands.registerCommand(
-      'saropaLints.toggleSeverityInline',
-      (item: unknown) => {
-        if (item instanceof SeverityToggleItem) {
-          void vscode.commands.executeCommand(item.toggleCommandId);
-        }
-      },
-    ),
     vscode.commands.registerCommand(
       'saropaLints.toggleTodosAndHacksScanner',
       async () => {

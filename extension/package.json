@@ -76,18 +76,6 @@
           "icon": "$(gear)"
         },
         {
-          "id": "saropaLints.severityFilters",
-          "name": "%views.severityFilters.name%",
-          "when": "saropaLints.isDartProject",
-          "icon": "$(filter)"
-        },
-        {
-          "id": "saropaLints.help",
-          "name": "%views.help.name%",
-          "when": "saropaLints.isDartProject",
-          "icon": "$(question)"
-        },
-        {
           "id": "saropaLints.debugPanel",
           "name": "%views.debugPanel.name%",
           "when": "saropaLints.isDartProject && config.saropaLints.debug.enabled",
@@ -184,11 +172,6 @@
       {
         "command": "saropaLints.toggleSeverityHint",
         "title": "%command.toggleSeverityHint.title%"
-      },
-      {
-        "command": "saropaLints.toggleSeverityInline",
-        "title": "%command.toggleSeverityInline.title%",
-        "icon": "$(eye)"
       },
       {
         "command": "saropaLints.toggleTodosAndHacksScanner",
@@ -1013,6 +996,26 @@
           "command": "saropaLints.runAnalysis",
           "when": "view == saropaLints.settings && saropaLints.isDartProject && saropaLints.enabled",
           "group": "navigation"
+        },
+        {
+          "command": "saropaLints.openWalkthrough",
+          "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject",
+          "group": "9_help@1"
+        },
+        {
+          "command": "saropaLints.showAbout",
+          "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject",
+          "group": "9_help@2"
+        },
+        {
+          "command": "saropaLints.openPubDevSaropaLints",
+          "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject",
+          "group": "9_help@3"
+        },
+        {
+          "command": "saropaLints.createSaropaInstructions",
+          "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject",
+          "group": "9_help@4"
         }
       ],
       "view/item/context": [
@@ -1020,11 +1023,6 @@
           "command": "saropaLints.focusIssuesForActiveFile",
           "when": "view == workbench.panel.markers.view",
           "group": "navigation"
-        },
-        {
-          "command": "saropaLints.toggleSeverityInline",
-          "when": "view == saropaLints.severityFilters && viewItem == severityToggle",
-          "group": "inline"
         }
       ],
       "editor/title": [
@@ -1069,10 +1067,6 @@
         },
         {
           "command": "saropaLints.enableRulePack",
-          "when": "false"
-        },
-        {
-          "command": "saropaLints.toggleSeverityInline",
           "when": "false"
         },
         {

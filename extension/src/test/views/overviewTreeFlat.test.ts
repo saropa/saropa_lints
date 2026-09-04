@@ -1,20 +1,21 @@
 /**
  * Pins the multi-panel sidebar contract for the Saropa Lints activity-bar
  * container. Each section is its own VS Code view (Banner / Editor dashboards
- * / Settings / Diagnostics / Status / Help), and inside every section the
- * rows are flat clickable leaves only — no chevrons, no nested expansion.
+ * / Settings / Status), and inside every section the rows are flat clickable
+ * leaves only — no chevrons, no nested expansion.
  *
- * Diagnostics holds severity toggles (double-click only, no single-click
- * command) plus Lint integration, Analyzer plugin, and Tier. Settings holds
- * run-after-config, UI language, and detected packages; Triage rows append
- * when triage data exists.
+ * Diagnostics (severity toggles, single click each) plus Lint integration,
+ * Analyzer plugin, and Tier render as rows appended to the Settings panel —
+ * they no longer have their own view. Settings also holds run-after-config,
+ * UI language, and detected packages; Triage rows append when triage data
+ * exists. Help (Getting Started / About / pub.dev / AI instructions) moved
+ * out of the tree entirely, into the Dashboards view's "..." title menu.
  *
  * Regression guards:
  *   - View IDs match what package.json declares.
  *   - Every leaf returned by every provider has `CollapsibleState.None`
  *     (no chevrons inside any section).
- *   - Every leaf has a click `command` (except SeverityToggleItem, which
- *     toggles on double-click) so nothing in the sidebar is dead.
+ *   - Every leaf has a click `command` so nothing in the sidebar is dead.
  *   - Run analysis appears exactly once across all sections.
  */
 import '../vibrancy/register-vscode-mock';
@@ -96,12 +97,11 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
     const ids = views.map((v) => v.id).sort();
-    // The container holds exactly the section views (managed by sectionedSidebar).
-    // The standalone config-Suggestions view was removed: its long "Enable the X
-    // rule pack" list was noise, replaced by the startup toast → Manage Rule Packs
-    // webview flow.
-    const expected = [...Object.values(SECTION_VIEW_IDS)].sort();
-    assert.deepStrictEqual(ids, expected, 'container = section views');
+    // The container holds the tree-based section views (managed by
+    // sectionedSidebar) plus the webview Debug panel, which is registered
+    // separately (see debugPanel.ts) and is not one of SECTION_VIEW_IDS.
+    const expected = [...Object.values(SECTION_VIEW_IDS), 'saropaLints.debugPanel'].sort();
+    assert.deepStrictEqual(ids, expected, 'container = section views + debug webview');
   });
 
   it('the legacy single saropaLints.overview view is no longer registered', () => {
@@ -132,9 +132,6 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
       const rows = provider.getChildren() as Array<unknown>;
       for (const node of rows) {
         const item = provider.getTreeItem(node as never);
-        // SeverityToggleItem intentionally has no single-click command —
-        // toggles fire on double-click only to prevent accidental flips.
-        if (item.contextValue === 'severityToggle') continue;
         assert.ok(
           item.command !== undefined,
           `${provider.viewId} leaf "${String(item.label)}" has no command`,
@@ -179,12 +176,31 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     assert.ok(labels.includes('Command Catalog'));
   });
 
-  it('Help section omits the dead "Lints" info row that had no command', () => {
-    const help = providers.find((p) => p.viewId === SECTION_VIEW_IDS.help)!;
-    const labels = help.getChildren().map((n) => String((n as { label?: unknown }).label ?? ''));
-    assert.ok(!labels.includes('Lints'), 'Lints info row was removed (no click target)');
-    assert.ok(labels.includes('Getting Started'));
-    assert.ok(labels.includes('About Saropa Lints'));
+  it('Help commands are reachable from the Dashboards view "..." overflow menu', () => {
+    interface MenusShape { 'view/title': Array<{ command: string; when?: string }> }
+    const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as { contributes: { menus: MenusShape } };
+    const dashboardsMenuCommands = pkg.contributes.menus['view/title']
+      .filter((m) => m.when?.includes('view == saropaLints.editorDashboards'))
+      .map((m) => m.command);
+    for (const cmd of [
+      'saropaLints.openWalkthrough',
+      'saropaLints.showAbout',
+      'saropaLints.openPubDevSaropaLints',
+      'saropaLints.createSaropaInstructions',
+    ]) {
+      assert.ok(dashboardsMenuCommands.includes(cmd), `${cmd} missing from Dashboards view/title menu`);
+    }
+  });
+
+  it('Settings section carries the diagnostics rows (severity toggles + integration controls)', () => {
+    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
+    const items = (settings.getChildren() as Array<unknown>).map((n) => settings.getTreeItem(n as never));
+    const toggles = items.filter((item) => item.contextValue === 'severityToggle');
+    assert.strictEqual(toggles.length, 4, 'expected 4 severity toggle rows folded into Settings');
+    for (const item of toggles) {
+      assert.ok(item.command !== undefined, `severity toggle "${String(item.label)}" must be single-click`);
+    }
   });
 
   // Pin removal of the composite analyzer plugin scaffold row.

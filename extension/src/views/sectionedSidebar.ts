@@ -11,12 +11,17 @@
  *
  * View contents:
  *   - **Banner**          — setup banner / lint integration off (auto-hides)
- *   - **Editor dashboards** — open Saropa editor-tab dashboards
+ *   - **Editor dashboards** — open Saropa editor-tab dashboards; the "..."
+ *                           view/title menu carries Help (walkthrough, About,
+ *                           pub.dev, AI agent template) so it needs no panel
+ *                           of its own
  *   - **Settings**        — run analyzer + initialize config (actions), lint
  *                           integration toggle, tier selector, UI language,
- *                           and triage rows (volume groups / override counts)
+ *                           triage rows (volume groups / override counts),
+ *                           and diagnostics controls (severity toggles,
+ *                           analyzer plugin, tier) — folded in from the
+ *                           former standalone Diagnostics panel
  *   - **Status**          — health / violations / suppressions / trends / last run
- *   - **Help**            — walkthrough, About, pub.dev, AI agent template
  *
  * Each section reads the same upstream data (violations.json, pubspec, history)
  * but renders its own slice. Visibility is gated by `when` clauses on each
@@ -84,14 +89,9 @@ class LeafItem extends vscode.TreeItem {
     }
 }
 
-/**
- * Severity toggle row — no single-click command. The toggle fires on
- * double-click only (detected via `onDidChangeSelection` timing in
- * extension.ts) so users don't accidentally flip a severity while
- * browsing the sidebar.
- */
+/** Severity toggle row — single click flips the severity's visibility. */
 export class SeverityToggleItem extends vscode.TreeItem {
-    /** The command to execute on double-click. */
+    /** The command executed on click. */
     readonly toggleCommandId: string;
 
     constructor(
@@ -104,10 +104,12 @@ export class SeverityToggleItem extends vscode.TreeItem {
         super(label, vscode.TreeItemCollapsibleState.None);
         this.description = description;
         this.toggleCommandId = toggleCommandId;
-        // Tooltip tells the user to double-click since single-click only selects.
         this.tooltip = l10n('diagnostics.sidebar.severityToggleTooltip', { severity: label.toLowerCase() });
         this.contextValue = 'severityToggle';
         this.iconPath = new vscode.ThemeIcon(iconId, iconColor);
+        // Single-click toggles directly — the prior double-click gesture required
+        // undiscoverable rapid re-selection with no visible affordance.
+        this.command = { command: toggleCommandId, title: label, arguments: [] };
     }
 }
 
@@ -390,25 +392,10 @@ function buildActionItems(): LeafItem[] {
     ];
 }
 
-function buildHelpItems(): LeafItem[] {
-    return [
-        new LeafItem('Getting Started', 'Walkthrough', 'saropaLints.openWalkthrough', 'compass'),
-        new LeafItem('About Saropa Lints', 'Documentation', 'saropaLints.showAbout', 'book'),
-        new LeafItem(
-            'Package on pub.dev',
-            'saropa_lints',
-            'saropaLints.openPubDevSaropaLints',
-            'link-external',
-            new vscode.ThemeColor('textLink.foreground'),
-        ),
-        new LeafItem(
-            'Create AI agent instructions',
-            '.cursor/rules template',
-            'saropaLints.createSaropaInstructions',
-            'sparkle',
-        ),
-    ];
-}
+// Help commands (Getting Started, About, pub.dev, AI agent instructions) no
+// longer render as a stacked sidebar panel — they moved to the "..." overflow
+// on the Dashboards view/title menu (package.json `view/title`), reachable in
+// one click without a dedicated scroll section for 4 rarely-used rows.
 
 // ── Status section builders ───────────────────────────────────────────────
 
@@ -616,14 +603,20 @@ function buildSettingsItems(configProvider: ConfigTreeProvider): SectionNode[] {
     // group nodes, but `getTreeItem` overrides it back to None so no chevrons
     // appear next to any row inside this panel.
     const triage = configProvider.getTriageNodes();
-    return [...actions, ...settings, ...triage];
+    // Diagnostics (severity toggles + lint integration/plugin/tier controls)
+    // folded in here — they were their own stacked panel, which meant a 7th
+    // scroll section for 8 rows that are all "things that control what
+    // diagnostics you see", the same story this panel already tells.
+    const diagnostics = buildDiagnosticsItems(configProvider);
+    return [...actions, ...settings, ...triage, ...diagnostics];
 }
 
 /**
- * Diagnostics section — severity filter toggles plus the 3 core
- * diagnostic controls (Lint integration, Analyzer plugin, Tier)
- * that were previously in the Settings section. Grouped here because
- * they all govern what diagnostics the user sees.
+ * Diagnostics rows — severity filter toggles plus the 3 core diagnostic
+ * controls (Lint integration, Analyzer plugin, Tier). Appended to the
+ * Settings panel by `buildSettingsItems` rather than rendered as their own
+ * view — they govern the same "what do I see and how is it configured"
+ * story as the rest of that panel.
  */
 function buildDiagnosticsItems(configProvider: ConfigTreeProvider): SectionNode[] {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
@@ -634,8 +627,6 @@ function buildDiagnosticsItems(configProvider: ConfigTreeProvider): SectionNode[
     return [
         // Each severity gets a distinct icon + theme color so the user can
         // visually distinguish them at a glance without reading the label.
-        // SeverityToggleItem (not LeafItem) — no single-click command;
-        // toggle fires on double-click only to prevent accidental flips.
         new SeverityToggleItem(
             'Show errors', showErrors ? 'On' : 'Off',
             'saropaLints.toggleSeverityError', 'error',
@@ -714,8 +705,6 @@ export const SECTION_VIEW_IDS = {
     // Actions and Triage views were merged in: the user wanted a single panel
     // to operate and configure the project's lints in one place.
     settings: 'saropaLints.settings',
-    severityFilters: 'saropaLints.severityFilters',
-    help: 'saropaLints.help',
 } as const;
 
 /**
@@ -736,9 +725,7 @@ export function createSidebarSectionProviders(
         // Merged Actions + Settings + Triage panel, placed at the former Actions
         // slot (above Status) so the run/initialize operations stay prominent.
         new FlatSectionProvider(SECTION_VIEW_IDS.settings, () => buildSettingsItems(configProvider)),
-        new FlatSectionProvider(SECTION_VIEW_IDS.severityFilters, () => buildDiagnosticsItems(configProvider)),
         new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState)),
-        new FlatSectionProvider(SECTION_VIEW_IDS.help, () => buildHelpItems()),
     ];
 }
 

@@ -83,6 +83,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Changed
 
 - **LSP server is now ON by default (BETA).** New installations start with `saropaLints.lspServer.enabled: true`. To revert: toggle "LSP Server" OFF in the debug panel, or set the setting to `false` in VS Code workspace settings.
+- **Sidebar: severity toggles are single-click; Diagnostics and Help panels folded away.** The Show errors/warnings/infos/hints rows previously required an undiscoverable double-click; they now toggle on a single click. The standalone Diagnostics panel (severity toggles, Lint integration, Analyzer plugin, Tier) merged into the Settings panel, and the standalone Help panel (Getting Started, About, pub.dev, AI agent instructions) moved into the Dashboards panel's "..." menu — cutting the sidebar from 7 stacked panels to 5 with no loss of functionality. Clicking the status bar while lint integration is off now opens the Dashboards view instead of doing nothing.
 
 ### Added
 
