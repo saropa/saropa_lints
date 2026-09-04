@@ -96,7 +96,7 @@ from scripts.modules._version_changelog import (
     has_unreleased_section,
     increment_version,
     parse_version,
-    prompt_version_until_valid,
+    prompt_version_with_prerelease_toggle,
     set_version_in_pubspec,
     sync_version_with_changelog,
 )
@@ -775,7 +775,7 @@ def run_pubdev_only_mode(
             default_version
         ):
             default_version = changelog_version
-        version = prompt_version_until_valid(default_version)
+        version = prompt_version_with_prerelease_toggle(default_version)
         with timer.step("Version sync"):
             version = sync_version_with_changelog(
                 ctx.project_dir,
@@ -1353,7 +1353,7 @@ def run_full_publish(
             default_version
         ):
             default_version = changelog_version
-        version = prompt_version_until_valid(default_version)
+        version = prompt_version_with_prerelease_toggle(default_version)
         with timer.step("Version sync"):
             version = sync_version_with_changelog(
                 ctx.project_dir,

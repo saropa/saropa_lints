@@ -115,7 +115,14 @@ def _detect_stale_plugin_version(output: str) -> tuple[str, str] | None:
 
 
 def get_latest_published_version(package_name: str) -> str | None:
-    """Query pub.dev for the latest published version of *package_name*."""
+    """Query pub.dev for the latest STABLE published version of *package_name*.
+
+    Pub.dev's "latest" field never points at a pre-release (a version with
+    a ``-beta.N``/``-dev.N`` suffix) even after that pre-release publishes
+    successfully — it always reflects the newest stable release. Callers
+    that may be polling for a pre-release must use
+    ``is_version_published`` instead, which checks the full version list.
+    """
     import json
     import urllib.request
     import urllib.error
@@ -129,6 +136,36 @@ def get_latest_published_version(package_name: str) -> str | None:
         return None
 
 
+def is_version_published(package_name: str, version: str) -> bool:
+    """Return True if pub.dev has *version* published for *package_name*.
+
+    Checks the full ``versions`` list from the package API rather than the
+    ``latest`` field, because ``latest`` only ever tracks the newest STABLE
+    release — a published pre-release (e.g. ``16.0.0-beta.1``) never
+    appears there, only in ``versions``.
+    """
+    import json
+    import urllib.request
+    import urllib.error
+
+    url = f"https://pub.dev/api/packages/{package_name}"
+    try:
+        with urllib.request.urlopen(url, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+    except (urllib.error.URLError, json.JSONDecodeError):
+        return False
+    # `versions` is expected to be a list of {"version": ...} objects; treat
+    # any other shape (missing key, non-list, non-dict entries) as "not
+    # found" rather than raising, so a pub.dev API change degrades to a
+    # slower manual-check warning instead of crashing the publish pipeline.
+    versions = data.get("versions")
+    if not isinstance(versions, list):
+        return False
+    return any(
+        isinstance(v, dict) and v.get("version") == version for v in versions
+    )
+
+
 def verify_pubdev_publication(
     package_name: str,
     expected_version: str,
@@ -139,6 +176,12 @@ def verify_pubdev_publication(
 
     Checks every *interval_seconds* for up to *timeout_seconds*.
     Returns True when pub.dev reports *expected_version*, False on timeout.
+
+    A pre-release *expected_version* (contains "-") is checked against the
+    full ``versions`` list, since pub.dev's "latest" pointer only ever
+    tracks the newest stable release and would never match a beta — using
+    it here would make every beta publish report a false timeout even
+    though the publish succeeded.
     """
     # Labeled "FINAL STEP:" so it matches the parallel extension store check.
     # The run_full_publish pipeline calls this at the very end alongside the
@@ -150,14 +193,21 @@ def verify_pubdev_publication(
         f"{timeout_seconds // 60} minutes..."
     )
     attempts = (timeout_seconds // interval_seconds) + 1
+    is_prerelease = "-" in expected_version
+    display = "unavailable"
 
     for attempt in range(1, attempts + 1):
-        latest = get_latest_published_version(package_name)
-        display = latest or "unavailable"
+        if is_prerelease:
+            published = is_version_published(package_name, expected_version)
+            display = expected_version if published else "not yet listed"
+        else:
+            latest = get_latest_published_version(package_name)
+            display = latest or "unavailable"
+            published = latest == expected_version
 
-        if latest == expected_version:
+        if published:
             print_success(
-                f"pub.dev reports v{latest} — publication confirmed."
+                f"pub.dev reports v{expected_version} — publication confirmed."
             )
             return True
 

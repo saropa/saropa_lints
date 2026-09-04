@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0] — Unreleased
+## [16.0.0-beta.1] — Unreleased
 
 *--- IMPORTANT NOTE ---*
 

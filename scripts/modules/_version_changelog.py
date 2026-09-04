@@ -656,6 +656,34 @@ def prompt_version_until_valid(default_version: str) -> str:
         )
 
 
+def prompt_version_with_prerelease_toggle(default_version: str) -> str:
+    """Offer a pre-release (beta) toggle, then prompt for the version to publish.
+
+    If *default_version* is already a pre-release (contains "-"), the
+    toggle is skipped — the CHANGELOG/pubspec already committed to a
+    pre-release string, so re-asking would be redundant. Otherwise asks a
+    plain yes/no question first (blocking, no timeout — this is a cheap
+    gate, unlike the version field itself): answering yes rewrites the
+    default to ``<default_version>-beta.1`` before handing off to
+    ``prompt_version_until_valid``, so the operator confirms with Enter
+    instead of hand-typing the full pre-release string (a hand-typed
+    version is the one publish input with no downstream gate to catch a
+    typo before it becomes a permanent, burned version number).
+    """
+    if "-" in default_version:
+        return prompt_version_until_valid(default_version)
+
+    try:
+        answer = input(
+            f"  Publish {default_version} as a pre-release (beta)? [y/N]: "
+        ).strip().lower()
+    except EOFError:
+        answer = ""
+    if answer in ("y", "yes"):
+        default_version = f"{default_version}-beta.1"
+    return prompt_version_until_valid(default_version)
+
+
 # =============================================================================
 # VERSION / CHANGELOG SYNCHRONIZATION
 # =============================================================================
