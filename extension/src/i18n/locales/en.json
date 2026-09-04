@@ -1939,6 +1939,9 @@
       "analyzerToggleOff": "Analyzer Plugin: disabling…",
       "daemonToggleOn": "Scan Daemon: resuming…",
       "daemonToggleOff": "Scan Daemon: suspending…"
+    },
+    "sidebar": {
+      "enginesLabel": "Engines: {count} running"
     }
   },
   "detailView": {

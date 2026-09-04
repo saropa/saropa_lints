@@ -46,6 +46,7 @@ import {
     countSecurityHotspotReviewStates,
 } from '../securityHotspotReviewState';
 import { getLatestResults } from '../vibrancy/extension-activation';
+import { HealthPanel } from '../systemHealth/healthPanel';
 
 export type SectionNode = vscode.TreeItem | ConfigTreeNode;
 
@@ -439,6 +440,36 @@ function appendViolationCountRow(items: LeafItem[], total: number, critical: num
     ));
 }
 
+// Maps the machine-readable EngineStatus.key to the debug.engine.* l10n
+// namespace, which uses 'analyzerPlugin' rather than 'analyzer'.
+const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer', string> = {
+    analyzer: 'analyzerPlugin',
+    scanDaemon: 'scanDaemon',
+    lspServer: 'lspServer',
+};
+
+/**
+ * "Engines: N running" summary row, sourced from the same snapshot the
+ * Health Panel shows (HealthPanel.getEngineStatuses() — see its doc comment:
+ * built specifically so the sidebar and panel can never disagree). Silently
+ * omitted when saropaLints.debug.enabled is off or engines aren't wired up
+ * yet, matching the panel's own behavior.
+ */
+function appendEnginesRow(items: LeafItem[]): void {
+    const engines = HealthPanel.getEngineStatuses();
+    if (!engines) return;
+    const running = engines.filter(e => e.enabled).length;
+    const summary = engines
+        .map(e => `${l10n(`debug.engine.${ENGINE_NAME_KEY[e.key]}`)} ${l10n(`debug.engine.statusValue.${e.status}`)}`)
+        .join(' · ');
+    items.push(new LeafItem(
+        l10n('debug.sidebar.enginesLabel', { count: String(running) }),
+        summary,
+        'saropaLints.showProcessHealth',
+        'server-process',
+    ));
+}
+
 function appendSuppressionRow(items: LeafItem[], data: ViolationsData): void {
     const sup = data.summary?.suppressions;
     const total = sup?.total ?? 0;
@@ -529,6 +560,7 @@ function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
     );
 
     appendHealthRow(items, history, data, total, root);
+    appendEnginesRow(items);
     appendViolationCountRow(items, total, critical);
     if (hotspotCounts.total > 0) {
         const reviewed = hotspotCounts.reviewedSafe + hotspotCounts.reviewedFixed;
