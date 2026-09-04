@@ -115,5 +115,3 @@ plans/known_issues_review.md
 *.vsix
 /docs/handover
 self_check/pubspec.lock
-D.claude_tempclauded--src-saropa-lintsa7c48fff-4eb6-45f6-8a86-278d6db42333scratchpadperf_errors2.txt
-D.claude_tempclauded--src-saropa-lintsa7c48fff-4eb6-45f6-8a86-278d6db42333scratchpadperf_errors.txt
