@@ -136,9 +136,7 @@ void main() {
     test('enum constant declaration fires', () async {
       // EnumConstantDeclaration wraps its arguments differently from
       // InstanceCreationExpression and needs its own hook.
-      final codes = await reportedRuleCodes(
-        NamedParametersOrderingRule(),
-        '''
+      final codes = await reportedRuleCodes(NamedParametersOrderingRule(), '''
 enum ExampleEnum {
   bad(beta: 'b', alpha: 'a');
 
@@ -147,8 +145,7 @@ enum ExampleEnum {
   final String alpha;
   final String beta;
 }
-''',
-      );
+''');
       expect(codes, contains(_ruleName));
     });
 
@@ -169,17 +166,14 @@ enum ExampleEnum {
 
     test('redirecting constructor invocation fires', () async {
       // `: this(...)` is the other initializer form the same hook covers.
-      final codes = await reportedRuleCodes(
-        NamedParametersOrderingRule(),
-        '''
+      final codes = await reportedRuleCodes(NamedParametersOrderingRule(), '''
 class RedirectTarget {
   RedirectTarget({required this.alpha, required this.beta});
   RedirectTarget.reordered(String a, String b) : this(beta: b, alpha: a);
   final String alpha;
   final String beta;
 }
-''',
-      );
+''');
       expect(codes, contains(_ruleName));
     });
   });
@@ -273,9 +267,7 @@ class RedirectTarget {
     });
 
     test('enum constant in declaration order', () async {
-      final codes = await reportedRuleCodes(
-        NamedParametersOrderingRule(),
-        '''
+      final codes = await reportedRuleCodes(NamedParametersOrderingRule(), '''
 enum ExampleEnum {
   good(alpha: 'a', beta: 'b');
 
@@ -284,8 +276,7 @@ enum ExampleEnum {
   final String alpha;
   final String beta;
 }
-''',
-      );
+''');
       expect(codes, isNot(contains(_ruleName)));
     });
   });

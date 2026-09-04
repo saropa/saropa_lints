@@ -30,7 +30,10 @@ const String _rule = 'initializers_ordering';
 /// out-of-order pair) honest.
 Future<List<int>> _reportLines(String code) async {
   final diags = await runRuleResolved(InitializersOrderingRule(), code);
-  return [for (final d in diags) if (d.ruleName == _rule) d.line];
+  return [
+    for (final d in diags)
+      if (d.ruleName == _rule) d.line,
+  ];
 }
 
 void main() {
@@ -72,8 +75,10 @@ class Point {
       expect(codes, isNot(contains(_rule)));
     });
 
-    test('NO lint: assert() interleaved between correctly-ordered fields', () async {
-      const String code = '''
+    test(
+      'NO lint: assert() interleaved between correctly-ordered fields',
+      () async {
+        const String code = '''
 class AssertBetween {
   AssertBetween(int a, int b)
       : assert(a >= 0),
@@ -84,12 +89,15 @@ class AssertBetween {
   final int y;
 }
 ''';
-      final codes = await reportedRuleCodes(InitializersOrderingRule(), code);
-      expect(codes, isNot(contains(_rule)));
-    });
+        final codes = await reportedRuleCodes(InitializersOrderingRule(), code);
+        expect(codes, isNot(contains(_rule)));
+      },
+    );
 
-    test('NO lint: super() redirect excluded from ordering comparison', () async {
-      const String code = '''
+    test(
+      'NO lint: super() redirect excluded from ordering comparison',
+      () async {
+        const String code = '''
 class Base {
   Base(this.label);
   final String label;
@@ -104,9 +112,10 @@ class RedirectingSuper extends Base {
   final int y;
 }
 ''';
-      final codes = await reportedRuleCodes(InitializersOrderingRule(), code);
-      expect(codes, isNot(contains(_rule)));
-    });
+        final codes = await reportedRuleCodes(InitializersOrderingRule(), code);
+        expect(codes, isNot(contains(_rule)));
+      },
+    );
 
     test('NO lint: single field initializer has nothing to compare', () async {
       const String code = '''
@@ -131,10 +140,7 @@ class ThisShorthandOk {
   final int z;
 }
 ''';
-        final codes = await reportedRuleCodes(
-          InitializersOrderingRule(),
-          code,
-        );
+        final codes = await reportedRuleCodes(InitializersOrderingRule(), code);
         expect(codes, isNot(contains(_rule)));
       },
     );
@@ -150,10 +156,7 @@ class ThisShorthandBad {
   final int z;
 }
 ''';
-        final codes = await reportedRuleCodes(
-          InitializersOrderingRule(),
-          code,
-        );
+        final codes = await reportedRuleCodes(InitializersOrderingRule(), code);
         expect(codes, contains(_rule));
       },
     );
@@ -195,10 +198,12 @@ enum EnumOk {
     // declaration index regresses), never on the first entry, and never on
     // the constructor header.
     group('reported node position', () {
-      test('two-field list: reports the second entry (`x = a`), not `y = b`', () async {
-        // Line 3 is `: y = b,`; line 4 is `x = a;`. Declaration indices are
-        // [y=1, x=0], so the regression is detected at `x = a` on line 4.
-        const String code = '''
+      test(
+        'two-field list: reports the second entry (`x = a`), not `y = b`',
+        () async {
+          // Line 3 is `: y = b,`; line 4 is `x = a;`. Declaration indices are
+          // [y=1, x=0], so the regression is detected at `x = a` on line 4.
+          const String code = '''
 class Point {
   Point(int a, int b)
       : y = b,
@@ -207,14 +212,17 @@ class Point {
   final int y;
 }
 ''';
-        expect(await _reportLines(code), <int>[4]);
-      });
+          expect(await _reportLines(code), <int>[4]);
+        },
+      );
 
-      test('three-field list: reports `b = b`, the entry that regresses', () async {
-        // Indices [a=0, c=2, b=1]: the first regression is 1 < 2 at the third
-        // entry, so line 5 (`b = b;`) is reported — not line 4 (`c = c,`),
-        // which is merely the first half of the offending pair.
-        const String code = '''
+      test(
+        'three-field list: reports `b = b`, the entry that regresses',
+        () async {
+          // Indices [a=0, c=2, b=1]: the first regression is 1 < 2 at the third
+          // entry, so line 5 (`b = b;`) is reported — not line 4 (`c = c,`),
+          // which is merely the first half of the offending pair.
+          const String code = '''
 class ThreeFields {
   ThreeFields(int a, int b, int c)
       : a = a,
@@ -225,15 +233,18 @@ class ThreeFields {
   final int c;
 }
 ''';
-        expect(await _reportLines(code), <int>[5]);
-      });
+          expect(await _reportLines(code), <int>[5]);
+        },
+      );
 
-      test('reports exactly once per constructor, at the first regression', () async {
-        // Indices [c=2, d=3, b=1, a=0] contain two regressions (b<d at the
-        // third entry, a<b at the fourth). The rule returns after the first,
-        // so only line 5 (`b = b`) is reported — pinning the early `return`
-        // that keeps one constructor from emitting a cascade of diagnostics.
-        const String code = '''
+      test(
+        'reports exactly once per constructor, at the first regression',
+        () async {
+          // Indices [c=2, d=3, b=1, a=0] contain two regressions (b<d at the
+          // third entry, a<b at the fourth). The rule returns after the first,
+          // so only line 5 (`b = b`) is reported — pinning the early `return`
+          // that keeps one constructor from emitting a cascade of diagnostics.
+          const String code = '''
 class Four {
   Four(int a, int b, int c, int d)
       : c = c,
@@ -246,8 +257,9 @@ class Four {
   final int d;
 }
 ''';
-        expect(await _reportLines(code), <int>[5]);
-      });
+          expect(await _reportLines(code), <int>[5]);
+        },
+      );
     });
   });
 

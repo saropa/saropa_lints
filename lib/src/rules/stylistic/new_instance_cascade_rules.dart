@@ -88,9 +88,7 @@ bool _argumentsReferenceVariable(ArgumentList args, String varName) {
 /// constructed can never be safely folded into that variable's own cascade
 /// initializer.
 bool _expressionReferencesVariable(Expression expr, String varName) {
-  final _VariableReferenceVisitor visitor = _VariableReferenceVisitor(
-    varName,
-  );
+  final _VariableReferenceVisitor visitor = _VariableReferenceVisitor(varName);
   expr.accept(visitor);
   return visitor.found;
 }

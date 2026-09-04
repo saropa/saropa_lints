@@ -161,11 +161,13 @@ FutureOr<String> label(FutureOr<String> value) {
       expect(codes, isEmpty);
     });
 
-    test('still fires when the FutureOr type argument does NOT match', () async {
-      // The exemption requires STATIC evidence of a real narrowing. A
-      // FutureOr<int> tested against Future<String> narrows nothing, so the
-      // guard must not swallow it.
-      final codes = await reportedRuleCodes(IsFutureRule(), '''
+    test(
+      'still fires when the FutureOr type argument does NOT match',
+      () async {
+        // The exemption requires STATIC evidence of a real narrowing. A
+        // FutureOr<int> tested against Future<String> narrows nothing, so the
+        // guard must not swallow it.
+        final codes = await reportedRuleCodes(IsFutureRule(), '''
 import 'dart:async';
 
 void handle(FutureOr<int> value) {
@@ -174,8 +176,9 @@ void handle(FutureOr<int> value) {
   }
 }
 ''');
-      expect(codes, contains('is_future'));
-    });
+        expect(codes, contains('is_future'));
+      },
+    );
 
     test('does NOT fire on an unrelated "is" check', () async {
       final codes = await reportedRuleCodes(IsFutureRule(), '''

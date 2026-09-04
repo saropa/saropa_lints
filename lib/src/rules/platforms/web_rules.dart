@@ -199,7 +199,8 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   /// early-exit guard. Handles bare return/throw and block bodies where
   /// the LAST statement exits (e.g. `if (kIsWeb) { log('skip'); return; }`).
   bool _isEarlyExit(Statement stmt) {
-    if (stmt is ReturnStatement || stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
+    if (stmt is ReturnStatement ||
+        stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
       return true;
     }
     // Block body: check the last statement. A multi-statement block like

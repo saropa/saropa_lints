@@ -16,8 +16,10 @@ import '../../support/rule_instantiation_assertions.dart';
 
 void main() {
   group('new_instance_cascade', () {
-    test('fires on 2 consecutive property assignments on a fresh instance', () async {
-      final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
+    test(
+      'fires on 2 consecutive property assignments on a fresh instance',
+      () async {
+        final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
 class TextEditingController {
   String text = '';
   int selection = 0;
@@ -29,8 +31,9 @@ void build() {
   controller.selection = 5;
 }
 ''');
-      expect(codes, contains('new_instance_cascade'));
-    });
+        expect(codes, contains('new_instance_cascade'));
+      },
+    );
 
     test('fires on 2 consecutive method calls on a fresh instance', () async {
       final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
@@ -81,8 +84,10 @@ void build() {
       expect(codes, isEmpty);
     });
 
-    test('does NOT fire when the receiver is reassigned instead of configured', () async {
-      final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
+    test(
+      'does NOT fire when the receiver is reassigned instead of configured',
+      () async {
+        final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
 class TextEditingController {
   String text = '';
 }
@@ -93,8 +98,9 @@ void build() {
   controller.text = 'hello';
 }
 ''');
-      expect(codes, isEmpty);
-    });
+        expect(codes, isEmpty);
+      },
+    );
 
     test('does NOT fire when calls are split across an if block', () async {
       final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
@@ -114,8 +120,10 @@ void build(bool flag) {
       expect(codes, isEmpty);
     });
 
-    test('does NOT fire when the intermediate statement reads the variable', () async {
-      final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
+    test(
+      'does NOT fire when the intermediate statement reads the variable',
+      () async {
+        final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''
 class Value {
   int amount = 0;
 }
@@ -131,8 +139,9 @@ void build() {
   builder.configure(value.amount);
 }
 ''');
-      expect(codes, isEmpty);
-    });
+        expect(codes, isEmpty);
+      },
+    );
 
     test('does NOT fire on an already-cascaded initializer', () async {
       final codes = await reportedRuleCodes(NewInstanceCascadeRule(), '''

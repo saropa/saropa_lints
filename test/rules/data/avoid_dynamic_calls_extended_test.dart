@@ -22,7 +22,10 @@ void main() {
     test('AvoidDynamicCallsRule', () {
       final rule = AvoidDynamicCallsRule();
       expect(rule.code.lowerCaseName, 'avoid_dynamic_calls_extended');
-      expect(rule.code.problemMessage, contains('[avoid_dynamic_calls_extended]'));
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_dynamic_calls_extended]'),
+      );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

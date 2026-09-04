@@ -150,10 +150,8 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
       final List<String> candidateFields = _lateUninitializedFields(node);
       if (candidateFields.isEmpty) return;
 
-      final (
-        MethodDeclaration? initState,
-        MethodDeclaration? disposeMethod,
-      ) = _findLifecycleMethods(node);
+      final (MethodDeclaration? initState, MethodDeclaration? disposeMethod) =
+          _findLifecycleMethods(node);
       // No dispose() at all means there is nothing to flag here — a
       // sibling rule (require_*_dispose) already covers "missing dispose".
       if (disposeMethod == null) return;
@@ -390,7 +388,8 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
       }
       return false;
     }
-    if (statement is IfStatement) return _ifCoversAllBranches(fieldName, statement);
+    if (statement is IfStatement)
+      return _ifCoversAllBranches(fieldName, statement);
     return false;
   }
 

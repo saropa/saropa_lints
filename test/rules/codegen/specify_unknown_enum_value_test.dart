@@ -94,26 +94,21 @@ void main() {
     const ruleName = 'specify_unknown_enum_value';
 
     test('fires on an enum field with no @JsonKey at all', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
   final Status status;
   Payload(this.status);
 }
-''',
-      );
+''');
       expect(codes, contains(ruleName));
     });
 
     test(
       'fires on a @JsonKey field with no unknownEnumValue argument',
       () async {
-        final codes = await reportedRuleCodes(
-          SpecifyUnknownEnumValueRule(),
-          '''
+        final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
@@ -121,16 +116,13 @@ class Payload {
   final Status status;
   Payload(this.status);
 }
-''',
-        );
+''');
         expect(codes, contains(ruleName));
       },
     );
 
     test('does NOT fire when @JsonKey configures unknownEnumValue', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
@@ -138,17 +130,14 @@ class Payload {
   final StatusSafe status;
   Payload(this.status);
 }
-''',
-      );
+''');
       expect(codes, isEmpty);
     });
 
     test(
       'does NOT fire when a class-level @JsonEnum covers the field',
       () async {
-        final codes = await reportedRuleCodes(
-          SpecifyUnknownEnumValueRule(),
-          '''
+        final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonEnum(unknownEnumValue: StatusSafe.unknown)
 @JsonSerializable()
@@ -156,16 +145,13 @@ class Payload {
   final StatusSafe status;
   Payload(this.status);
 }
-''',
-        );
+''');
         expect(codes, isEmpty);
       },
     );
 
     test('does NOT fire on a @JsonKey(ignore: true) field', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
@@ -173,15 +159,12 @@ class Payload {
   final Status status;
   Payload(this.status);
 }
-''',
-      );
+''');
       expect(codes, isEmpty);
     });
 
     test('does NOT fire on a @JsonKey(includeFromJson: false) field', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
@@ -189,74 +172,61 @@ class Payload {
   final Status status;
   Payload(this.status);
 }
-''',
-      );
+''');
       expect(codes, isEmpty);
     });
 
     test('does NOT fire on a non-enum field', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
   final String status;
   Payload(this.status);
 }
-''',
-      );
+''');
       expect(codes, isEmpty);
     });
 
     test('does NOT fire on an enum field with no JSON annotation', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 class Payload {
   final Status status;
   Payload(this.status);
 }
-''',
-      );
+''');
       expect(codes, isEmpty);
     });
 
     test('fires on a List<Enum> field with no fallback', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
   final List<Status> statuses;
   Payload(this.statuses);
 }
-''',
-      );
+''');
       expect(codes, contains(ruleName));
     });
 
     test('fires on a Map<K, Enum> field with no fallback', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
   final Map<String, Status> statusesById;
   Payload(this.statusesById);
 }
-''',
-      );
+''');
       expect(codes, contains(ruleName));
     });
 
-    test('does NOT fire on a Map<K, Enum> field with unknownEnumValue', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+    test(
+      'does NOT fire on a Map<K, Enum> field with unknownEnumValue',
+      () async {
+        final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
@@ -264,23 +234,20 @@ class Payload {
   final Map<String, StatusSafe> statusesById;
   Payload(this.statusesById);
 }
-''',
-      );
-      expect(codes, isEmpty);
-    });
+''');
+        expect(codes, isEmpty);
+      },
+    );
 
     test('fires on a nullable enum field with no fallback', () async {
-      final codes = await reportedRuleCodes(
-        SpecifyUnknownEnumValueRule(),
-        '''
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
   final Status? status;
   Payload(this.status);
 }
-''',
-      );
+''');
       expect(codes, contains(ruleName));
     });
 
@@ -288,17 +255,14 @@ class Payload {
       'does NOT fire on @JsonSerializable(createFactory: false) — no '
       'fromJson decoder is generated, so there is no throwing decode path',
       () async {
-        final codes = await reportedRuleCodes(
-          SpecifyUnknownEnumValueRule(),
-          '''
+        final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable(createFactory: false)
 class Payload {
   final Status status;
   Payload(this.status);
 }
-''',
-        );
+''');
         expect(codes, isEmpty);
       },
     );
@@ -307,9 +271,7 @@ class Payload {
       'does NOT fire on a @JsonKey(fromJson: ...) custom converter — '
       'json_serializable ignores unknownEnumValue when a converter is set',
       () async {
-        final codes = await reportedRuleCodes(
-          SpecifyUnknownEnumValueRule(),
-          '''
+        final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonSerializable()
 class Payload {
@@ -317,30 +279,23 @@ class Payload {
   final Status status;
   Payload(this.status);
 }
-''',
-        );
+''');
         expect(codes, isEmpty);
       },
     );
 
-    test(
-      'fires on a class-level @JsonEnum with no @JsonSerializable of its '
-      'own — a bare enum-decoding config class is still in scope',
-      () async {
-        final codes = await reportedRuleCodes(
-          SpecifyUnknownEnumValueRule(),
-          '''
+    test('fires on a class-level @JsonEnum with no @JsonSerializable of its '
+        'own — a bare enum-decoding config class is still in scope', () async {
+      final codes = await reportedRuleCodes(SpecifyUnknownEnumValueRule(), '''
 $_annotationStubs
 @JsonEnum()
 class Payload {
   final Status status;
   Payload(this.status);
 }
-''',
-        );
-        expect(codes, contains(ruleName));
-      },
-    );
+''');
+      expect(codes, contains(ruleName));
+    });
 
     // Prefixed-annotation-import support (`@json.JsonSerializable()`) needs
     // a real cross-file `import '...' as prefix;`, which the single-file

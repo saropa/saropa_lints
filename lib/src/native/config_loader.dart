@@ -1038,9 +1038,10 @@ void _autoMigrateLegacyPluginKeys(String? mainOptions, String? projectRoot) {
     // Read the custom file to check what's already migrated.
     final customFile = File('$basePath${sep}analysis_options_custom.yaml');
     var customContent = customFile.existsSync()
-        ? customFile.readAsStringSync()
-            .replaceAll('\r\n', '\n')
-            .replaceAll('\r', '\n')
+        ? customFile
+              .readAsStringSync()
+              .replaceAll('\r\n', '\n')
+              .replaceAll('\r', '\n')
         : '';
 
     // Write scalar keys to the custom file if not already present.

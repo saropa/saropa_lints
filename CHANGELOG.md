@@ -66,11 +66,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.1] — Unreleased
+## [16.0.0-beta.1]
 
 *--- IMPORTANT NOTE ---*
 
-**Major release — LSP server (BETA).** The new standalone LSP server replaces the in-process analyzer plugin as the default diagnostic engine. It runs in its own process, consuming a fraction of the RAM the plugin needed, and delivers diagnostics, quick fixes (lightbulb menu), and per-rule config overrides without loading the full analyzer into the IDE's analysis server. The LSP server is now **ON by default** — review its status in the extension's debug panel (Command Palette → "Saropa Lints: Toggle Debug Panel"). This is a BETA feature: if you encounter issues, toggle "LSP Server" OFF in the debug panel and re-enable the Analyzer Plugin. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+**Major release — LSP server (BETA).** The new standalone LSP server replaces the in-process analyzer plugin as the default diagnostic engine. It runs in its own process, consuming a fraction of the RAM the plugin needed, and delivers diagnostics, quick fixes (lightbulb menu), and per-rule config overrides without loading the full analyzer into the IDE's analysis server. The LSP server is now **ON by default** — review its status in the Health Panel (Command Palette → "Saropa Lints: Process Health"). This is a BETA feature: if you encounter issues, toggle "LSP Server" OFF in the Health Panel and re-enable the Analyzer Plugin. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.1/CHANGELOG.md)
 
 ### Fixed
 
@@ -115,19 +115,19 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
   - `avoid_futureor_return_type` flags `FutureOr<T>` as a declared return type (Recommended).
   - `avoid_implementing_value_types_extended` catches classes that `implements` a known value-equality type (Comprehensive). Named `_extended` — the base name is a core Dart analyzer lint name.
   - `avoid_mounted_check_in_finally` flags `mounted` guards inside `finally` blocks (Recommended).
-  - `document_enum` requires doc comments on public enums and enum values (Stylistic opt-in).
+  - `document_enum` requires doc comments on public enums and enum values (Pedantic).
   - `duplicate_value` detects repeated sub-expressions in boolean chains (Recommended).
   - `getters_in_member_list` flags getters declared after behavior members (Pedantic).
-  - `initializers_ordering` enforces field-declaration order in constructor initializer lists (Stylistic opt-in).
+  - `initializers_ordering` enforces field-declaration order in constructor initializer lists (Pedantic).
   - `is_future` catches runtime `x is Future` type checks (Recommended).
   - `mutable_tearoff` flags method tear-offs from non-final fields (Professional).
-  - `named_parameters_ordering` enforces declaration-order named arguments at call sites (Stylistic opt-in).
+  - `named_parameters_ordering` enforces declaration-order named arguments at call sites (Pedantic).
   - `never_discard_build_context` catches unused `BuildContext` params in builder callbacks (Recommended).
-  - `new_instance_cascade` suggests cascades for consecutive statements on a freshly-created instance (Stylistic opt-in).
+  - `new_instance_cascade` suggests cascades for consecutive statements on a freshly-created instance (Pedantic).
   - `no_direct_iterable_access` flags `list[i]` index access without a bounds guard (Professional).
   - `prefer_typed_exceptions` catches `throw` of raw String/non-Exception values (Comprehensive).
   - `specify_unknown_enum_value` requires `unknownEnumValue` on `@JsonSerializable` enum fields (Comprehensive).
-  - `use_compare_without_case` flags `toLowerCase() ==` patterns that should use `compareTo` (Stylistic opt-in).
+  - `use_compare_without_case` flags `toLowerCase() ==` patterns that should use `compareTo` (Pedantic).
 
 <details>
 <summary>Maintenance</summary>
@@ -514,37 +514,6 @@ Major scan CLI expansion: lane control (`--lane full|light`, `--lane-stats`), CI
 - **`scan_cli_args_test.dart`: five untagged process groups now marked `tags: ['slow']`** — the `(process)` groups shell out to real `dart run saropa_lints:scan` subprocesses (including full essential-tier scans of the project itself) and were timing out at 2 minutes each under full-suite `-j` contention, failing the fast publish pass. Only the process-spawning groups are tagged; the ~250 in-memory `parseScanArgs` unit tests in the same file remain in the fast pass.
 - **Publish script: fixed `dart fix` audit crash on Windows** — the two `dart fix` subprocess calls in the pre-publish audit were the only `dart` invocations in the publish modules missing shell mode, so they crashed with `WinError 2` on Windows where `dart` resolves to a `.bat` wrapper that `CreateProcess` cannot launch directly. Both calls now pass shell mode like every other subprocess in the pipeline.
 - **`scan_cli_args_test.dart`: slow process groups given an explicit 5-minute timeout** — the publish delta pass runs changed test files with tag filters deliberately ignored, so the `slow` tag alone could not protect these tests there; each cold-starts an uncompiled scan CLI that can exceed the 2-minute default. Known limitation: the `--fail-on` group can still exceed even 5 minutes under contention — the durable fix (a precompiled scan snapshot) is tracked separately.
-
-</details>
-
----
-
-## [15.2.2]
-
-**[CLI reference guide](https://github.com/saropa/saropa_lints/blob/v15.2.1/doc/guides/cli.md)** — complete flag tables, CI examples, and exit codes for every CLI command.
-
-The scan CLI gains three new flags that make it easier to wire into CI and automation pipelines. `--min-impact` filters by the rule author's declared impact rather than the configurable analyzer severity, `--fail-on` decouples the exit code from display filtering so you can show everything but fail only on errors, and `--json-file-path` writes machine-readable output to a file without stdout redirection. A `--quiet` flag silences all progress chatter for fully headless runs. The Problems-tab cap (`max_issues`) is now actually enforced instead of just tracked. [log](https://github.com/saropa/saropa_lints/blob/v15.2.2/CHANGELOG.md)
-
-### Added
-
-- Scan CLI: `--min-impact` flag filters diagnostics by the rule's declared impact level (error, warning, info) instead of the analyzer severity. Some rules have info severity but warning impact; `--min-impact warning` excludes the truly-info ones. JSON output now includes an `impact` field per diagnostic. ([#308](https://github.com/saropa/saropa_lints/issues/308))
-- Scan CLI: `--json-file-path <path>` writes JSON output directly to a file instead of stdout, so automation harnesses can consume the result without stdout redirection. Implies `--format json`. ([#310](https://github.com/saropa/saropa_lints/issues/310))
-- Scan CLI: `--fail-on <severity>` decouples the exit code from display filtering — the scan shows all diagnostics (or those matching `--min-severity`) but exits 1 only when the full set contains at least one diagnostic at or above the threshold (e.g. `--fail-on error`). Pair with `--fail-on-count <n>` to tolerate a known baseline (exit 1 only when the count exceeds n). JSON output includes a `failOn` metadata object when the flag is active. ([#309](https://github.com/saropa/saropa_lints/issues/309))
-- Scan CLI: `--quiet` / `-q` flag suppresses all stderr progress and status messages. The caller gets only the exit code and stdout output (report or JSON). Useful for fully silent automation paired with `--json-file-path`.
-- Scan CLI: `--json-file-path` now creates parent directories if they don't exist, so callers don't need to `mkdir` first.
-
-### Fixed
-
-- The `max_issues` Problems-tab cap (default 500, configurable via `max_issues:` in `analysis_options_custom.yaml`) is now actually enforced. It previously tracked the count and printed a "N issues in Problems tab" message without withholding anything — every issue still reached the Problems tab regardless of the configured limit. ERROR-severity diagnostics always surface regardless of the cap; `violations.json` and the text report remain uncapped either way. No action required.
-- Scan CLI progress messages ("Loaded N rules…", "Scanning N files…") now go to stderr instead of stdout, so `--format json` output is valid JSON when redirected to a file. No action required. ([#310](https://github.com/saropa/saropa_lints/issues/310))
-
-### Added (docs)
-
-- New standalone [CLI reference guide](doc/guides/cli.md) documents every CLI command (`init`, `scan`, `cross_file`, `project_vibrancy`, `quality_gate`, `baseline`, `rule_count`, `project_health`) with complete flag tables, CI examples, exit codes, and JSON output schema. The README scanner section is also updated with the full flag set. No action required.
-
-<details><summary>Maintenance</summary>
-
-- Publish script test runner now detects Dart VM heap corruption crashes and Windows file-lock races as transient infrastructure failures, shows a clear diagnosis, and recommends Retry instead of leaving the user to parse raw stack traces.
 
 </details>
 

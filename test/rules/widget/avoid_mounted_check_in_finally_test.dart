@@ -90,13 +90,11 @@ class MyState extends State<StatefulWidget> {
       },
     );
 
-    test(
-      'fires when the async gap comes from an OUTER try (nested-try false '
-      'negative fixed in v2)',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
+    test('fires when the async gap comes from an OUTER try (nested-try false '
+        'negative fixed in v2)', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMountedCheckInFinallyRule(),
+        '''
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
@@ -121,18 +119,15 @@ class MyState extends State<StatefulWidget> {
   void _cleanup() {}
 }
 ''',
-        );
-        expect(codes, contains('avoid_mounted_check_in_finally'));
-      },
-    );
+      );
+      expect(codes, contains('avoid_mounted_check_in_finally'));
+    });
 
-    test(
-      'fires when the async gap comes from an await in a catch clause '
-      '(recovery path still falls into the same finally)',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
+    test('fires when the async gap comes from an await in a catch clause '
+        '(recovery path still falls into the same finally)', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMountedCheckInFinallyRule(),
+        '''
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
@@ -154,22 +149,19 @@ class MyState extends State<StatefulWidget> {
   Future<void> _recover() async {}
 }
 ''',
-        );
-        expect(codes, contains('avoid_mounted_check_in_finally'));
-      },
-    );
+      );
+      expect(codes, contains('avoid_mounted_check_in_finally'));
+    });
 
     // ---------------------------------------------------------------------
     // Premise regression: the shapes v1 wrongly flagged must now stay silent.
     // ---------------------------------------------------------------------
 
-    test(
-      'does NOT fire on the canonical guarded state reset inside finally — '
-      'the v1 "BAD" example, which is actually correct code',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
+    test('does NOT fire on the canonical guarded state reset inside finally — '
+        'the v1 "BAD" example, which is actually correct code', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMountedCheckInFinallyRule(),
+        '''
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
@@ -190,10 +182,9 @@ class MyState extends State<StatefulWidget> {
   void _dispose() {}
 }
 ''',
-        );
-        expect(codes, isEmpty);
-      },
-    );
+      );
+      expect(codes, isEmpty);
+    });
 
     test(
       'does NOT fire when every widget-tree operation sits inside the single '
@@ -224,13 +215,11 @@ class MyState extends State<StatefulWidget> {
       },
     );
 
-    test(
-      'does NOT fire when the early-return guard comes first, protecting '
-      'every call below it',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
+    test('does NOT fire when the early-return guard comes first, protecting '
+        'every call below it', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMountedCheckInFinallyRule(),
+        '''
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
@@ -247,10 +236,9 @@ class MyState extends State<StatefulWidget> {
   }
 }
 ''',
-        );
-        expect(codes, isEmpty);
-      },
-    );
+      );
+      expect(codes, isEmpty);
+    });
 
     // ---------------------------------------------------------------------
     // Gate controls.
@@ -284,13 +272,11 @@ class MyState extends State<StatefulWidget> {
       },
     );
 
-    test(
-      'does NOT fire when the outer await happens AFTER the inner '
-      'try/finally (offset bound on the async-gap search)',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
+    test('does NOT fire when the outer await happens AFTER the inner '
+        'try/finally (offset bound on the async-gap search)', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMountedCheckInFinallyRule(),
+        '''
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
@@ -315,18 +301,15 @@ class MyState extends State<StatefulWidget> {
   void _cleanup() {}
 }
 ''',
-        );
-        expect(codes, isEmpty);
-      },
-    );
+      );
+      expect(codes, isEmpty);
+    });
 
-    test(
-      'does NOT fire when the guard only logs — no evidence the author was '
-      'reasoning about disposal',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
+    test('does NOT fire when the guard only logs — no evidence the author was '
+        'reasoning about disposal', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMountedCheckInFinallyRule(),
+        '''
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
@@ -342,10 +325,9 @@ class MyState extends State<StatefulWidget> {
   }
 }
 ''',
-        );
-        expect(codes, isEmpty);
-      },
-    );
+      );
+      expect(codes, isEmpty);
+    });
 
     test(
       'does NOT fire on a compound condition (mounted && x) — out of scope '
@@ -376,13 +358,11 @@ class MyState extends State<StatefulWidget> {
       },
     );
 
-    test(
-      'does NOT fire when the mounted check is inside a nested closure '
-      'created within finally, not the finally block itself',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidMountedCheckInFinallyRule(),
-          '''
+    test('does NOT fire when the mounted check is inside a nested closure '
+        'created within finally, not the finally block itself', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMountedCheckInFinallyRule(),
+        '''
 import 'package:flutter/material.dart';
 
 class MyState extends State<StatefulWidget> {
@@ -400,10 +380,9 @@ class MyState extends State<StatefulWidget> {
   }
 }
 ''',
-        );
-        expect(codes, isEmpty);
-      },
-    );
+      );
+      expect(codes, isEmpty);
+    });
 
     test('does NOT fire outside a State/Widget class (control)', () async {
       final codes = await reportedRuleCodes(

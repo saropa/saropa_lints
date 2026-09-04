@@ -307,8 +307,7 @@ class AvoidImplementingValueTypesRule extends SaropaLintRule {
       if (member is! MethodDeclaration) continue;
       if (member.isOperator && member.name.lexeme == _equalsOperatorName) {
         hasEquals = true;
-      } else if (member.isGetter &&
-          member.name.lexeme == _hashCodeGetterName) {
+      } else if (member.isGetter && member.name.lexeme == _hashCodeGetterName) {
         hasHashCode = true;
       }
     }
@@ -381,6 +380,5 @@ class AvoidImplementingValueTypesRule extends SaropaLintRule {
   /// Whether [element] is `dart:core`'s `Object`. Name alone is not enough
   /// — a project-local class may also be called `Object`.
   bool _isCoreObject(InterfaceElement element) =>
-      element.name == 'Object' &&
-      element.library.uri.toString() == 'dart:core';
+      element.name == 'Object' && element.library.uri.toString() == 'dart:core';
 }

@@ -35,7 +35,10 @@ class Point {
 }
 ''',
       );
-      expect(codes, contains('avoid_equals_and_hash_code_on_mutable_classes_extended'));
+      expect(
+        codes,
+        contains('avoid_equals_and_hash_code_on_mutable_classes_extended'),
+      );
     });
 
     test('flags each mutable field, one diagnostic per field', () async {
@@ -57,7 +60,9 @@ class Point {
 ''',
       );
       final ownRule = diags.where(
-        (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes_extended',
+        (d) =>
+            d.ruleName ==
+            'avoid_equals_and_hash_code_on_mutable_classes_extended',
       );
       // x is declared on line 3, y on line 4.
       expect(ownRule.map((d) => d.line), containsAll(<int>[3, 4]));
@@ -214,7 +219,9 @@ class MutableUser {
 ''',
         );
         final ownRule = diags.where(
-          (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes_extended',
+          (d) =>
+              d.ruleName ==
+              'avoid_equals_and_hash_code_on_mutable_classes_extended',
         );
         // Only `email` (line 4) is mutable; `name` (line 3) is final.
         expect(ownRule.map((d) => d.line).toList(), <int>[4]);
@@ -272,7 +279,9 @@ class Session {
 ''',
         );
         final ownRule = diags.where(
-          (d) => d.ruleName == 'avoid_equals_and_hash_code_on_mutable_classes_extended',
+          (d) =>
+              d.ruleName ==
+              'avoid_equals_and_hash_code_on_mutable_classes_extended',
         );
         // `id` is on line 3 and is read by both members; `hitCount` (line 4)
         // is outside the equality contract.
@@ -399,17 +408,23 @@ class ImplementsEquatablePoint implements Equatable {
 }
 ''',
       );
-      expect(codes, contains('avoid_equals_and_hash_code_on_mutable_classes_extended'));
+      expect(
+        codes,
+        contains('avoid_equals_and_hash_code_on_mutable_classes_extended'),
+      );
     });
   });
 
   // Rule Instantiation: metadata smoke test.
-  group('avoid_equals_and_hash_code_on_mutable_classes_extended - Rule Instantiation', () {
-    test('AvoidEqualsAndHashCodeOnMutableClassesRule', () {
-      assertRuleMetadata(
-        AvoidEqualsAndHashCodeOnMutableClassesRule(),
-        'avoid_equals_and_hash_code_on_mutable_classes_extended',
-      );
-    });
-  });
+  group(
+    'avoid_equals_and_hash_code_on_mutable_classes_extended - Rule Instantiation',
+    () {
+      test('AvoidEqualsAndHashCodeOnMutableClassesRule', () {
+        assertRuleMetadata(
+          AvoidEqualsAndHashCodeOnMutableClassesRule(),
+          'avoid_equals_and_hash_code_on_mutable_classes_extended',
+        );
+      });
+    },
+  );
 }

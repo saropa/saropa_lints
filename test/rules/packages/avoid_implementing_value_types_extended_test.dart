@@ -116,7 +116,10 @@ class UserId implements Equatable {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+        expect(
+          codes,
+          isNot(contains('avoid_implementing_value_types_extended')),
+        );
       },
     );
 
@@ -135,7 +138,10 @@ class UserId implements Comparable<UserId> {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+        expect(
+          codes,
+          isNot(contains('avoid_implementing_value_types_extended')),
+        );
       },
     );
 
@@ -144,13 +150,11 @@ class UserId implements Comparable<UserId> {
     // OrderId/BaseId pair exercised this but was never covered by a unit
     // test (Finish Report Issue #2), so a future analyzer upgrade changing
     // InterfaceType.element semantics would regress silently.
-    test(
-      'fires on implements of a class that itself extends Equatable '
-      '(indirect supertype)',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('fires on implements of a class that itself extends Equatable '
+        '(indirect supertype)', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 abstract class Equatable {
   List<Object?> get props;
 }
@@ -165,23 +169,20 @@ class OrderId implements BaseId {
   List<Object?> get props => [raw];
 }
 ''',
-        );
-        expect(codes, contains('avoid_implementing_value_types_extended'));
-      },
-    );
+      );
+      expect(codes, contains('avoid_implementing_value_types_extended'));
+    });
 
     // Regression test for Finish Report Issue #1: a class that gets real
     // equality from `with EquatableMixin` but separately `implements` an
     // Equatable-derived marker/contract interface (the Dart 3 "interface
     // class" idiom) must not be flagged — the implements clause did not
     // cause the identity-equality footgun here.
-    test(
-      'does not fire when equality comes from a mixin and implements '
-      'targets an Equatable-derived marker interface',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('does not fire when equality comes from a mixin and implements '
+        'targets an Equatable-derived marker interface', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 abstract class Equatable {
   List<Object?> get props;
 }
@@ -200,21 +201,18 @@ class Money with EquatableMixin implements ValueObject {
   List<Object?> get props => [cents];
 }
 ''',
-        );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
-      },
-    );
+      );
+      expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+    });
 
     // Regression test for the second half of Issue #1: `extends Equatable`
     // (real equality) plus a redundant `implements` of a derived marker
     // interface on top of it must also not be flagged.
-    test(
-      'does not fire when equality comes from extends Equatable and '
-      'implements targets a derived marker interface',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('does not fire when equality comes from extends Equatable and '
+        'implements targets a derived marker interface', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 abstract class Equatable {
   List<Object?> get props;
 }
@@ -229,10 +227,9 @@ class Money extends Equatable implements ValueObject {
   List<Object?> get props => [cents];
 }
 ''',
-        );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
-      },
-    );
+      );
+      expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+    });
 
     // ---------------------------------------------------------------------
     // HIGH false positive: inherited manual equality was invisible because
@@ -241,13 +238,11 @@ class Money extends Equatable implements ValueObject {
     // hand-rolls ==/hashCode gives the subclass working value equality —
     // nothing is broken and nothing should be reported.
     // ---------------------------------------------------------------------
-    test(
-      'does not fire when == and hashCode are inherited from an ordinary '
-      'base class',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('does not fire when == and hashCode are inherited from an ordinary '
+        'base class', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 abstract class Equatable {
   List<Object?> get props;
 }
@@ -268,20 +263,17 @@ class UserId extends BaseValue implements Equatable {
   List<Object?> get props => [value];
 }
 ''',
-        );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
-      },
-    );
+      );
+      expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+    });
 
     // The declaring ancestor may sit several levels up, so the fix must walk
     // the whole extends chain rather than checking only the direct parent.
-    test(
-      'does not fire when inherited == and hashCode come from a '
-      'grandparent class',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('does not fire when inherited == and hashCode come from a '
+        'grandparent class', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 abstract class Equatable {
   List<Object?> get props;
 }
@@ -304,10 +296,9 @@ class RegionId extends MidValue implements Equatable {
   List<Object?> get props => [value];
 }
 ''',
-        );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
-      },
-    );
+      );
+      expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+    });
 
     // Mixins copy implementation in, so a mixin hand-rolling the pair is
     // just as sound a source of equality as a base class.
@@ -338,7 +329,10 @@ class ShardId with IdentityEquality implements Equatable {
 }
 ''',
         );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+        expect(
+          codes,
+          isNot(contains('avoid_implementing_value_types_extended')),
+        );
       },
     );
 
@@ -346,13 +340,11 @@ class ShardId with IdentityEquality implements Equatable {
     // hashCode for EVERY class, so a walk that fails to stop at dart:core's
     // Object would silence the rule entirely. This is the canonical BAD
     // case with an explicit (implicit-Object) parent chain.
-    test(
-      'still fires when the only inherited == and hashCode come from '
-      'Object',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('still fires when the only inherited == and hashCode come from '
+        'Object', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 abstract class Equatable {
   List<Object?> get props;
 }
@@ -367,10 +359,9 @@ class UserId extends PlainBase implements Equatable {
   List<Object?> get props => [value];
 }
 ''',
-        );
-        expect(codes, contains('avoid_implementing_value_types_extended'));
-      },
-    );
+      );
+      expect(codes, contains('avoid_implementing_value_types_extended'));
+    });
 
     // A base class declaring only ONE half of the pair does not supply a
     // working contract, so the rule must still fire.
@@ -404,13 +395,11 @@ class UserId extends HalfBase implements Equatable {
 
     // `implements` inherits NO implementation, so an interface that merely
     // DECLARES ==/hashCode must not be mistaken for a working contract.
-    test(
-      'still fires when == and hashCode are only declared on an implemented '
-      'interface',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('still fires when == and hashCode are only declared on an implemented '
+        'interface', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 abstract class Equatable {
   List<Object?> get props;
 }
@@ -431,10 +420,9 @@ class UserId implements EqualityContract, Equatable {
   List<Object?> get props => [value];
 }
 ''',
-        );
-        expect(codes, contains('avoid_implementing_value_types_extended'));
-      },
-    );
+      );
+      expect(codes, contains('avoid_implementing_value_types_extended'));
+    });
 
     // ---------------------------------------------------------------------
     // MEDIUM false positive: name-only matching without library
@@ -442,13 +430,11 @@ class UserId implements EqualityContract, Equatable {
     // (no `props`) used to be flagged with a completely misleading
     // diagnosis. The resolved element is now the authority.
     // ---------------------------------------------------------------------
-    test(
-      'does not fire on a project-local interface that merely reuses the '
-      'name Equatable',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('does not fire on a project-local interface that merely reuses the '
+        'name Equatable', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 abstract class Equatable {
   bool matches(Object other);
 }
@@ -461,20 +447,17 @@ class ConfigKey implements Equatable {
   bool matches(Object other) => other is ConfigKey && other.name == name;
 }
 ''',
-        );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
-      },
-    );
+      );
+      expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+    });
 
     // Same for the mixin half of the name set: a local `EquatableMixin`
     // with no `props` is not the equatable package's mixin.
-    test(
-      'does not fire on a project-local mixin that merely reuses the name '
-      'EquatableMixin',
-      () async {
-        final codes = await reportedRuleCodes(
-          AvoidImplementingValueTypesRule(),
-          '''
+    test('does not fire on a project-local mixin that merely reuses the name '
+        'EquatableMixin', () async {
+      final codes = await reportedRuleCodes(
+        AvoidImplementingValueTypesRule(),
+        '''
 mixin EquatableMixin {
   bool matches(Object other);
 }
@@ -487,9 +470,8 @@ class ConfigKey implements EquatableMixin {
   bool matches(Object other) => other is ConfigKey && other.name == name;
 }
 ''',
-        );
-        expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
-      },
-    );
+      );
+      expect(codes, isNot(contains('avoid_implementing_value_types_extended')));
+    });
   });
 }

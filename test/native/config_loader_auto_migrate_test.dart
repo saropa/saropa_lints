@@ -14,9 +14,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/native/config_loader.dart'
-    show
-        loadNativePluginConfigFromProjectRoot,
-        resetLegacyMigrationForTesting;
+    show loadNativePluginConfigFromProjectRoot, resetLegacyMigrationForTesting;
 import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:test/test.dart';
 
@@ -40,14 +38,12 @@ void main() {
 
   /// Writes [content] into `analysis_options.yaml` inside [dir].
   void writeMain(Directory dir, String content) {
-    File(p.join(dir.path, 'analysis_options.yaml'))
-        .writeAsStringSync(content);
+    File(p.join(dir.path, 'analysis_options.yaml')).writeAsStringSync(content);
   }
 
   /// Reads `analysis_options.yaml` from [dir], or null if absent.
   String readMain(Directory dir) {
-    return File(p.join(dir.path, 'analysis_options.yaml'))
-        .readAsStringSync();
+    return File(p.join(dir.path, 'analysis_options.yaml')).readAsStringSync();
   }
 
   /// Reads `analysis_options_custom.yaml` from [dir], or empty if absent.
@@ -58,8 +54,9 @@ void main() {
 
   /// Writes [content] into `analysis_options_custom.yaml` inside [dir].
   void writeCustom(Directory dir, String content) {
-    File(p.join(dir.path, 'analysis_options_custom.yaml'))
-        .writeAsStringSync(content);
+    File(
+      p.join(dir.path, 'analysis_options_custom.yaml'),
+    ).writeAsStringSync(content);
   }
 
   group('auto-migrate legacy plugin keys', () {
@@ -208,8 +205,11 @@ plugins:
       // Second call is a no-op (guard flag prevents re-migration).
       loadNativePluginConfigFromProjectRoot(tmpDir.path);
       final main = readMain(tmpDir);
-      expect(main, contains('lane: full'),
-          reason: 'guard flag should prevent second migration');
+      expect(
+        main,
+        contains('lane: full'),
+        reason: 'guard flag should prevent second migration',
+      );
     });
   });
 }

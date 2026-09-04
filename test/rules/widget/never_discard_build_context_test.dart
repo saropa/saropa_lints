@@ -207,15 +207,13 @@ Object w() {
       );
     });
 
-    test(
-      'context used inside a nested onPressed callback is not reported',
-      () {
-        // Regression for Finish Report 2026-09-04 Issue #1: a very common
-        // Flutter pattern is deferring a Navigator/ScaffoldMessenger call to
-        // a button callback declared inside the builder body. That read must
-        // count as a genuine use of the outer context.
-        expect(
-          _wouldReport(r'''
+    test('context used inside a nested onPressed callback is not reported', () {
+      // Regression for Finish Report 2026-09-04 Issue #1: a very common
+      // Flutter pattern is deferring a Navigator/ScaffoldMessenger call to
+      // a button callback declared inside the builder body. That read must
+      // count as a genuine use of the outer context.
+      expect(
+        _wouldReport(r'''
 Object w() {
   return Builder(
     builder: (BuildContext ctx) {
@@ -229,10 +227,9 @@ Object w() {
   );
 }
 '''),
-          isFalse,
-        );
-      },
-    );
+        isFalse,
+      );
+    });
 
     test(
       'context used inside a nested Future.then callback is not reported',
@@ -255,11 +252,9 @@ Object w() {
       },
     );
 
-    test(
-      'context used inside addPostFrameCallback is not reported',
-      () {
-        expect(
-          _wouldReport(r'''
+    test('context used inside addPostFrameCallback is not reported', () {
+      expect(
+        _wouldReport(r'''
 Object w() {
   return Builder(
     builder: (BuildContext ctx) {
@@ -271,20 +266,17 @@ Object w() {
   );
 }
 '''),
-          isFalse,
-        );
-      },
-    );
+        isFalse,
+      );
+    });
 
-    test(
-      'context used inside a locally-declared named function is not '
-      'reported',
-      () {
-        // Regression for Finish Report 2026-09-04 Issue #2:
-        // FunctionDeclarationStatement (a local named function) hides the
-        // read the same way a FunctionExpression closure did.
-        expect(
-          _wouldReport(r'''
+    test('context used inside a locally-declared named function is not '
+        'reported', () {
+      // Regression for Finish Report 2026-09-04 Issue #2:
+      // FunctionDeclarationStatement (a local named function) hides the
+      // read the same way a FunctionExpression closure did.
+      expect(
+        _wouldReport(r'''
 Object w() {
   return Builder(
     builder: (BuildContext ctx) {
@@ -296,19 +288,16 @@ Object w() {
   );
 }
 '''),
-          isFalse,
-        );
-      },
-    );
+        isFalse,
+      );
+    });
 
-    test(
-      'nested onPressed that redeclares its own `ctx` param shadows the '
-      'outer one, so the outer context is still unused',
-      () {
-        // True shadowing must still stop descent — the inner `ctx` here
-        // refers to the inner parameter, not the outer builder's context.
-        expect(
-          _wouldReport(r'''
+    test('nested onPressed that redeclares its own `ctx` param shadows the '
+        'outer one, so the outer context is still unused', () {
+      // True shadowing must still stop descent — the inner `ctx` here
+      // refers to the inner parameter, not the outer builder's context.
+      expect(
+        _wouldReport(r'''
 Object w() {
   return Builder(
     builder: (BuildContext ctx) {
@@ -321,25 +310,27 @@ Object w() {
   );
 }
 '''),
-          isTrue,
-        );
-      },
-    );
+        isTrue,
+      );
+    });
   });
 
   group('NeverDiscardBuildContextRule — non-builder callbacks', () {
-    test('unused first param on a non-`builder:` named argument is ignored', () {
-      expect(
-        _wouldReport(r'''
+    test(
+      'unused first param on a non-`builder:` named argument is ignored',
+      () {
+        expect(
+          _wouldReport(r'''
 Object w() {
   return GestureDetector(
     onTap: (BuildContext unused) {},
   );
 }
 '''),
-        isFalse,
-      );
-    });
+          isFalse,
+        );
+      },
+    );
   });
 
   // v2 false-positive fix. Before the widget-type gate, ANY `builder:`

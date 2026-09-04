@@ -127,7 +127,8 @@ class AvoidMountedCheckInFinallyRule extends SaropaLintRule {
         'State and throws — while the guard below shows the author already '
         'knew disposal was possible. The guard was simply placed too far '
         'down the block. {v2}',
-    correctionMessage: 'Hoist the existing `mounted` guard above this call '
+    correctionMessage:
+        'Hoist the existing `mounted` guard above this call '
         '(or move this call inside that guard) so every widget-tree '
         'operation in the finally block is covered by one check. Keep the '
         'guard inside `finally` — code placed after the try/finally never '

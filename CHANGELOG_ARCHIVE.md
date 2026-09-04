@@ -6,6 +6,37 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [15.2.2]
+
+**[CLI reference guide](https://github.com/saropa/saropa_lints/blob/v15.2.1/doc/guides/cli.md)** — complete flag tables, CI examples, and exit codes for every CLI command.
+
+The scan CLI gains three new flags that make it easier to wire into CI and automation pipelines. `--min-impact` filters by the rule author's declared impact rather than the configurable analyzer severity, `--fail-on` decouples the exit code from display filtering so you can show everything but fail only on errors, and `--json-file-path` writes machine-readable output to a file without stdout redirection. A `--quiet` flag silences all progress chatter for fully headless runs. The Problems-tab cap (`max_issues`) is now actually enforced instead of just tracked. [log](https://github.com/saropa/saropa_lints/blob/v15.2.2/CHANGELOG.md)
+
+### Added
+
+- Scan CLI: `--min-impact` flag filters diagnostics by the rule's declared impact level (error, warning, info) instead of the analyzer severity. Some rules have info severity but warning impact; `--min-impact warning` excludes the truly-info ones. JSON output now includes an `impact` field per diagnostic. ([#308](https://github.com/saropa/saropa_lints/issues/308))
+- Scan CLI: `--json-file-path <path>` writes JSON output directly to a file instead of stdout, so automation harnesses can consume the result without stdout redirection. Implies `--format json`. ([#310](https://github.com/saropa/saropa_lints/issues/310))
+- Scan CLI: `--fail-on <severity>` decouples the exit code from display filtering — the scan shows all diagnostics (or those matching `--min-severity`) but exits 1 only when the full set contains at least one diagnostic at or above the threshold (e.g. `--fail-on error`). Pair with `--fail-on-count <n>` to tolerate a known baseline (exit 1 only when the count exceeds n). JSON output includes a `failOn` metadata object when the flag is active. ([#309](https://github.com/saropa/saropa_lints/issues/309))
+- Scan CLI: `--quiet` / `-q` flag suppresses all stderr progress and status messages. The caller gets only the exit code and stdout output (report or JSON). Useful for fully silent automation paired with `--json-file-path`.
+- Scan CLI: `--json-file-path` now creates parent directories if they don't exist, so callers don't need to `mkdir` first.
+
+### Fixed
+
+- The `max_issues` Problems-tab cap (default 500, configurable via `max_issues:` in `analysis_options_custom.yaml`) is now actually enforced. It previously tracked the count and printed a "N issues in Problems tab" message without withholding anything — every issue still reached the Problems tab regardless of the configured limit. ERROR-severity diagnostics always surface regardless of the cap; `violations.json` and the text report remain uncapped either way. No action required.
+- Scan CLI progress messages ("Loaded N rules…", "Scanning N files…") now go to stderr instead of stdout, so `--format json` output is valid JSON when redirected to a file. No action required. ([#310](https://github.com/saropa/saropa_lints/issues/310))
+
+### Added (docs)
+
+- New standalone [CLI reference guide](doc/guides/cli.md) documents every CLI command (`init`, `scan`, `cross_file`, `project_vibrancy`, `quality_gate`, `baseline`, `rule_count`, `project_health`) with complete flag tables, CI examples, exit codes, and JSON output schema. The README scanner section is also updated with the full flag set. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Publish script test runner now detects Dart VM heap corruption crashes and Windows file-lock races as transient infrastructure failures, shows a clear diagnosis, and recommends Retry instead of leaving the user to parse raw stack traces.
+
+</details>
+
+---
+
 ## [15.2.0]
 
 Rule execution is roughly twice as fast, and the analysis server now reports the ~200 most important error and warning rules by default without holding the full resolved type model in memory — the remaining rules fire on save via the scan daemon so nothing is lost. Measured at +0.6% memory over the plugin-off baseline (vs +77.2% for full in-process coverage), so this is safe for every project with the `plugins:` block enabled, with no config change required. The About panel and tier picker now show live rule counts from a single source of truth, replacing stale hand-typed numbers. [log](https://github.com/saropa/saropa_lints/blob/v15.2.0/CHANGELOG.md)

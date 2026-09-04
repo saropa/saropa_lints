@@ -46,29 +46,23 @@ void main() {
   // source with full type/element resolution.
   group('Document Enum Rule - Behavior', () {
     test('fires on an undocumented public enum declaration', () async {
-      final codes = await reportedRuleCodes(
-        DocumentEnumRule(),
-        '''
+      final codes = await reportedRuleCodes(DocumentEnumRule(), '''
 enum OrderStatus {
   /// Order has been placed but not yet shipped.
   pending,
 }
-''',
-      );
+''');
       expect(codes, contains('document_enum'));
     });
 
     test('fires independently on each undocumented constant', () async {
-      final diags = await runRuleResolved(
-        DocumentEnumRule(),
-        '''
+      final diags = await runRuleResolved(DocumentEnumRule(), '''
 /// Lifecycle states for a customer order.
 enum OrderStatus {
   pending,
   shipped,
 }
-''',
-      );
+''');
       // Enum declaration is documented (no fire); both constants are not
       // (one fire each) — three lines total, two of them constants.
       expect(diags.where((d) => d.ruleName == 'document_enum'), hasLength(2));
@@ -77,9 +71,7 @@ enum OrderStatus {
     test(
       'does NOT fire when the enum and all constants are documented',
       () async {
-        final codes = await reportedRuleCodes(
-          DocumentEnumRule(),
-          '''
+        final codes = await reportedRuleCodes(DocumentEnumRule(), '''
 /// Lifecycle states for a customer order.
 enum OrderStatus {
   /// Order has been placed but not yet shipped.
@@ -88,22 +80,18 @@ enum OrderStatus {
   /// Order has left the warehouse.
   shipped,
 }
-''',
-        );
+''');
         expect(codes, isNot(contains('document_enum')));
       },
     );
 
     test('does NOT fire on a private enum, even when undocumented', () async {
-      final codes = await reportedRuleCodes(
-        DocumentEnumRule(),
-        '''
+      final codes = await reportedRuleCodes(DocumentEnumRule(), '''
 enum _InternalRetryPhase {
   initial,
   backoff,
 }
-''',
-      );
+''');
       expect(codes, isNot(contains('document_enum')));
     });
 
@@ -117,51 +105,39 @@ enum _InternalRetryPhase {
     test(
       'annotated constant: doc comment BEFORE the annotation is recognized',
       () async {
-        final codes = await reportedRuleCodes(
-          DocumentEnumRule(),
-          '''
+        final codes = await reportedRuleCodes(DocumentEnumRule(), '''
 /// Serialization-format identifiers.
 enum ApiVersion {
   /// Original payload format.
   @Deprecated('Use v2 instead')
   v1,
 }
-''',
-        );
+''');
         expect(codes, isNot(contains('document_enum')));
       },
     );
 
-    test(
-      'annotated constant: doc comment AFTER the annotation is also '
-      'recognized (not a false positive)',
-      () async {
-        final codes = await reportedRuleCodes(
-          DocumentEnumRule(),
-          '''
+    test('annotated constant: doc comment AFTER the annotation is also '
+        'recognized (not a false positive)', () async {
+      final codes = await reportedRuleCodes(DocumentEnumRule(), '''
 /// Serialization-format identifiers.
 enum ApiVersion {
   @Deprecated('Use v2 instead')
   /// Original payload format.
   v1,
 }
-''',
-        );
-        expect(codes, isNot(contains('document_enum')));
-      },
-    );
+''');
+      expect(codes, isNot(contains('document_enum')));
+    });
 
     test('annotated constant with no doc comment still fires', () async {
-      final codes = await reportedRuleCodes(
-        DocumentEnumRule(),
-        '''
+      final codes = await reportedRuleCodes(DocumentEnumRule(), '''
 /// Serialization-format identifiers.
 enum ApiVersion {
   @Deprecated('Never shipped')
   v0,
 }
-''',
-      );
+''');
       expect(codes, contains('document_enum'));
     });
   });

@@ -109,7 +109,8 @@ class NeverDiscardBuildContextRule extends SaropaLintRule {
         'Consumer/Selector are NOT checked, because their context parameter is '
         'incidental to the data they deliver. If the parameter is genuinely '
         'unneeded, rename it to `_` to make that explicit. {v2}',
-    correctionMessage: 'Use the Builder/LayoutBuilder/StatefulBuilder-supplied '
+    correctionMessage:
+        'Use the Builder/LayoutBuilder/StatefulBuilder-supplied '
         'context for InheritedWidget lookups, or rename the unused parameter '
         'to `_`.',
     severity: DiagnosticSeverity.WARNING,
@@ -441,10 +442,7 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
   /// Whether [parameters] declares a formal parameter named [name],
   /// unwrapping [DefaultFormalParameter] down to the underlying
   /// [SimpleFormalParameter]/other formal to reach the declared name.
-  static bool _declaresParameter(
-    FormalParameterList? parameters,
-    String name,
-  ) {
+  static bool _declaresParameter(FormalParameterList? parameters, String name) {
     if (parameters == null) return false;
     for (final param in parameters.parameters) {
       final normalized = param is DefaultFormalParameter

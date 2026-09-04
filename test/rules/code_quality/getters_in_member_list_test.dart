@@ -21,8 +21,10 @@ const String _rule = 'getters_in_member_list';
 
 void main() {
   group('getters_in_member_list', () {
-    test('LINT: getter declared after a method, with an earlier field', () async {
-      const String code = '''
+    test(
+      'LINT: getter declared after a method, with an earlier field',
+      () async {
+        const String code = '''
 class Order {
   Order(this.items);
 
@@ -35,12 +37,15 @@ class Order {
   double get total => items.fold(0, (sum, i) => sum + i);
 }
 ''';
-      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
-      expect(codes, contains(_rule));
-    });
+        final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+        expect(codes, contains(_rule));
+      },
+    );
 
-    test('NO lint: getter grouped with the field before the first method', () async {
-      const String code = '''
+    test(
+      'NO lint: getter grouped with the field before the first method',
+      () async {
+        const String code = '''
 class Order {
   Order(this.items);
 
@@ -53,9 +58,10 @@ class Order {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
-      expect(codes, isNot(contains(_rule)));
-    });
+        final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+        expect(codes, isNot(contains(_rule)));
+      },
+    );
 
     test('NO lint: lone getter with no preceding method', () async {
       const String code = '''
@@ -69,17 +75,20 @@ class Value {
       expect(codes, isNot(contains(_rule)));
     });
 
-    test('NO lint: getter trails a method but nothing earlier to group with', () async {
-      const String code = '''
+    test(
+      'NO lint: getter trails a method but nothing earlier to group with',
+      () async {
+        const String code = '''
 class NoEarlierProperty {
   void run() {}
 
   int get result => 42;
 }
 ''';
-      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
-      expect(codes, isNot(contains(_rule)));
-    });
+        final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+        expect(codes, isNot(contains(_rule)));
+      },
+    );
 
     test('NO lint: @override getter is exempt even after a method', () async {
       const String code = '''
@@ -102,8 +111,10 @@ class OverrideExempt implements Labeled {
       expect(codes, isNot(contains(_rule)));
     });
 
-    test('LINT: setter (not a field) counts as the earlier property member', () async {
-      const String code = '''
+    test(
+      'LINT: setter (not a field) counts as the earlier property member',
+      () async {
+        const String code = '''
 class Box {
   int _value = 0;
 
@@ -118,9 +129,10 @@ class Box {
   int get value => _value;
 }
 ''';
-      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
-      expect(codes, contains(_rule));
-    });
+        final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+        expect(codes, contains(_rule));
+      },
+    );
 
     test('LINT: operator method counts as a behavior member', () async {
       const String code = '''
@@ -190,8 +202,10 @@ extension type Meters(int value) {
 
     // Negative half of the extension-type pair: same body, getters grouped
     // ahead of the method, so the shim path is exercised without reporting.
-    test('NO lint: extension type with getters grouped before the method', () async {
-      const String code = '''
+    test(
+      'NO lint: extension type with getters grouped before the method',
+      () async {
+        const String code = '''
 extension type Feet(int value) {
   int get inches => value * 12;
 
@@ -200,9 +214,10 @@ extension type Feet(int value) {
   void log() {}
 }
 ''';
-      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
-      expect(codes, isNot(contains(_rule)));
-    });
+        final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+        expect(codes, isNot(contains(_rule)));
+      },
+    );
 
     // The documented static false positive, now fixed: a static-only utility
     // holder has no instance data shape, so the ordering convention does not
@@ -223,8 +238,10 @@ class MathUtils {
 
     // A static method in the middle of an instance body must not count as
     // the "behavior member" that makes the following instance getter late.
-    test('NO lint: static method does not start the behavior section', () async {
-      const String code = '''
+    test(
+      'NO lint: static method does not start the behavior section',
+      () async {
+        const String code = '''
 class Mixed {
   Mixed(this.value);
 
@@ -235,9 +252,10 @@ class Mixed {
   int get doubled => value * 2;
 }
 ''';
-      final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
-      expect(codes, isNot(contains(_rule)));
-    });
+        final codes = await reportedRuleCodes(GettersInMemberListRule(), code);
+        expect(codes, isNot(contains(_rule)));
+      },
+    );
 
     test('LINT: enum body applies the same grouping rule', () async {
       const String code = '''
@@ -258,8 +276,10 @@ enum Status {
       expect(codes, contains(_rule));
     });
 
-    test('LINT: multiple offending getters are each flagged independently', () async {
-      const String code = '''
+    test(
+      'LINT: multiple offending getters are each flagged independently',
+      () async {
+        const String code = '''
 class Multi {
   Multi(this.value);
 
@@ -272,10 +292,11 @@ class Multi {
   int get second => value * 2;
 }
 ''';
-      final diags = await runRuleResolved(GettersInMemberListRule(), code);
-      final matches = diags.where((d) => d.ruleName == _rule).toList();
-      expect(matches, hasLength(2));
-    });
+        final diags = await runRuleResolved(GettersInMemberListRule(), code);
+        final matches = diags.where((d) => d.ruleName == _rule).toList();
+        expect(matches, hasLength(2));
+      },
+    );
   });
 
   // Rule Instantiation: metadata smoke test.
