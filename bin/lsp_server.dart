@@ -648,7 +648,7 @@ Future<void> _analyzeWorkspace(String root) async {
 /// server restart. Per-rule overrides in analysis_options_custom.yaml
 /// already reload on every analysis pass (ScanRunner._applyConfigOverrides
 /// calls loadScanConfig fresh each time) — what's stale is the cached
-/// [_tier] and diagnostics already sitting in the Problems panel for files
+/// `_tier` and diagnostics already sitting in the Problems panel for files
 /// that won't be saved/reopened soon. The AnalysisContextCollection itself
 /// doesn't depend on rule config, so it's left untouched — rebuilding it is
 /// the expensive step (~1s+ plus a re-prewarm) and buys nothing here.

@@ -137,7 +137,7 @@ class AvoidFutureorReturnTypeRule extends SaropaLintRule {
   ///
   /// - FALSE POSITIVE: a user-defined `class FutureOr<T>` that has nothing
   ///   to do with `dart:async` was flagged, and the correction message
-  ///   ("make it async and return Future<T>") is nonsense for it — there
+  ///   ("make it async and return `Future<T>`") is nonsense for it — there
   ///   is no sync/async ambiguity in a plain value wrapper.
   /// - FALSE NEGATIVE: `typedef MyFutureOr<T> = FutureOr<T>;` used as a
   ///   return type has the lexeme 'MyFutureOr' but resolves to exactly the
