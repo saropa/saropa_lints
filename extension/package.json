@@ -2043,7 +2043,7 @@
           },
           "saropaLints.lspServer.enabled": {
             "type": "boolean",
-            "default": false,
+            "default": true,
             "description": "%config.property.lspServer.enabled.description%"
           }
         }

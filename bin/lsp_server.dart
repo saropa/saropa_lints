@@ -215,7 +215,14 @@ Future<void> _processQueue() async {
   try {
     while (_messageQueue.isNotEmpty) {
       final message = _messageQueue.removeAt(0);
-      await _handleMessage(message);
+      try {
+        await _handleMessage(message);
+      } on Object catch (e, st) {
+        // Per-message catch so one bad message doesn't drop the rest of
+        // the queue or surface as an uncaught future error.
+        _log('unhandled error processing message: $e');
+        _logTrace('stack trace: $st');
+      }
     }
   } finally {
     _processing = false;
@@ -811,7 +818,7 @@ Diagnostic _buildDiagnostic(
     source: unitResult.libraryFragment.source,
     offset: diag.offset,
     length: diag.length,
-    diagnosticCode: _ScanDiagnosticCode(diag.ruleName),
+    diagnosticCode: _ScanDiagnosticCode(diag.ruleName, diag.severity),
     message: diag.problemMessage ?? diag.ruleName,
     correctionMessage: diag.correctionMessage,
   );
@@ -881,15 +888,31 @@ Map<String, int> _offsetToPosition(String content, int offset) {
 /// a Diagnostic for the CorrectionProducerContext. Only severity and type
 /// matter for fix dispatch — the rest is pass-through.
 class _ScanDiagnosticCode extends DiagnosticCode {
-  _ScanDiagnosticCode(String ruleName)
-      : super(
+  _ScanDiagnosticCode(String ruleName, String severityStr)
+      : _severity = _parseSeverity(severityStr),
+        super(
           name: ruleName,
           problemMessage: ruleName,
           uniqueName: 'saropa_lints.$ruleName',
         );
 
+  /// Converts a ScanDiagnostic severity string to the analyzer enum.
+  static DiagnosticSeverity _parseSeverity(String s) {
+    return switch (s.toUpperCase()) {
+      'ERROR' => DiagnosticSeverity.ERROR,
+      'WARNING' => DiagnosticSeverity.WARNING,
+      'INFO' => DiagnosticSeverity.INFO,
+      _ => DiagnosticSeverity.WARNING,
+    };
+  }
+
+  /// Maps the scan diagnostic's severity string to the analyzer's enum.
+  /// Defaults to WARNING for unknown values — doesn't affect which fix
+  /// is generated, but keeps the Diagnostic metadata consistent.
+  final DiagnosticSeverity _severity;
+
   @override
-  DiagnosticSeverity get severity => DiagnosticSeverity.WARNING;
+  DiagnosticSeverity get severity => _severity;
 
   @override
   DiagnosticType get type => DiagnosticType.LINT;
@@ -952,7 +975,9 @@ String? _readTierFromConfig(String projectRoot) {
   final configFile = File(p.join(projectRoot, 'analysis_options.yaml'));
   if (!configFile.existsSync()) return null;
 
-  final content = configFile.readAsStringSync();
+  // Normalize \r\n → \n so the regex works on Windows, where
+  // readAsStringSync preserves CRLF from the file on disk.
+  final content = configFile.readAsStringSync().replaceAll('\r\n', '\n');
   // Match `tier:` under `saropa_lints:` — the value is the tier name.
   // Regex: look for `saropa_lints:` then any lines, then `tier: <value>`.
   final match = RegExp(

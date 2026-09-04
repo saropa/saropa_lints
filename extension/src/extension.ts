@@ -1447,6 +1447,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       );
       if (enabled) {
         await runReenablePlugin(context);
+        // Restore the extension-level enabled flag that the OFF branch
+        // cleared — without this, the YAML plugin block is live but the
+        // extension stays disabled in workspace settings.
+        await cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
         updateContext(true, issuesProvider.hasViolations());
       } else {
         await runDisable(context);
