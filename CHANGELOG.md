@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.2] — Unreleased
+## [16.0.0-beta.2]
 
 Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)
 

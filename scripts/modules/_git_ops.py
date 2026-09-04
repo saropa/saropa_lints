@@ -180,6 +180,10 @@ def _verify_versions_on_disk(
     print_success(f"Verified pubspec.yaml version is {version}")
 
     # --- extension/package.json (expected but non-fatal if absent) ---
+    # package.json uses the converted extension version (odd minor for
+    # pre-release, offset patch), not the raw pub.dev version.
+    from scripts.modules._utils import extension_version_for
+    expected_ext = extension_version_for(version)
     pkg_path = project_dir / "extension" / "package.json"
     pkg_version = _read_package_json_version(pkg_path)
     if pkg_version is None:
@@ -187,15 +191,15 @@ def _verify_versions_on_disk(
             "extension/package.json not found or has no parseable version — "
             "skipping package.json verification."
         )
-    elif pkg_version != version:
+    elif pkg_version != expected_ext:
         print_error(
             f"extension/package.json version mismatch: "
-            f"expected {version}, found {pkg_version}. "
+            f"expected {expected_ext}, found {pkg_version}. "
             f"Refusing to proceed."
         )
         return False
     else:
-        print_success(f"Verified extension/package.json version is {version}")
+        print_success(f"Verified extension/package.json version is {expected_ext}")
 
     return True
 
@@ -269,15 +273,19 @@ def _verify_versions_in_commit(
         )
         return True
 
+    # Compare against the converted extension version, not the raw pub.dev
+    # version — package.json carries the odd-minor, offset-patch form.
+    from scripts.modules._utils import extension_version_for
+    expected_ext = extension_version_for(version)
     pkg_actual = pkg_match.group(1)
-    if pkg_actual != version:
+    if pkg_actual != expected_ext:
         print_error(
             f"HEAD commit extension/package.json version mismatch: "
-            f"expected {version}, found {pkg_actual}."
+            f"expected {expected_ext}, found {pkg_actual}."
         )
         return False
     print_success(
-        f"Verified HEAD:extension/package.json version is {version}",
+        f"Verified HEAD:extension/package.json version is {expected_ext}",
     )
 
     return True
