@@ -104,8 +104,15 @@
 // Source: lib\src\rules\platforms\web_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
+// Prefixed import so `foundation.kIsWeb` exercises the PrefixedIdentifier
+// branch of _containsKIsWebIdentifier rather than the bare SimpleIdentifier
+// branch — this is what an aliased `package:flutter/foundation.dart` import
+// looks like in real code.
+import 'package:saropa_lints_example/flutter_mocks.dart' as foundation;
 
 dynamic result;
+
+bool someCheck = true;
 
 // BAD: Should trigger avoid_platform_channel_on_web
 // expect_lint: avoid_platform_channel_on_web
@@ -146,6 +153,22 @@ void _good_3939() async {
 // GOOD: Early-throw guard — throws before the channel is created
 void _good_4939() async {
   if (kIsWeb) throw UnsupportedError('Not supported on web');
+  final platform = MethodChannel('my_channel');
+  final result = await platform.invokeMethod('getData');
+}
+
+// GOOD: Prefixed-import guard (`foundation.kIsWeb`) — exercises the
+// PrefixedIdentifier branch of _containsKIsWebIdentifier.
+void _good_5939() async {
+  if (foundation.kIsWeb) return;
+  final platform = MethodChannel('my_channel');
+  final result = await platform.invokeMethod('getData');
+}
+
+// GOOD: Compound guard (`kIsWeb && someCheck`) — exercises the
+// BinaryExpression branch of _containsKIsWebIdentifier.
+void _good_6939() async {
+  if (kIsWeb && someCheck) return;
   final platform = MethodChannel('my_channel');
   final result = await platform.invokeMethod('getData');
 }
