@@ -88,6 +88,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Changed
 
+- `prefer_state_class_below_widget` now detects third-party widget/state pairs — Riverpod's `ConsumerStatefulWidget`/`ConsumerState` and flutter_hooks' `HookStatefulWidget`/`HookState` — in addition to core Flutter's `StatefulWidget`/`State`. No action required.
 - Renamed engine names throughout the extension: "Analyzer Plugin" → "Live Analysis", "Scan Daemon" → "Scan on Save" in the Health Panel; "Turn Off Lint Integration" → "Disable Saropa Lints" and "Re-enable In-Process Plugin" → "Re-enable Live Analysis" in the command catalog. Updated notification strings that referenced "Lint integration" to say "Scan on save". No action required.
 
 - Sidebar restructured into three sections totalling 14 rows: Dashboards, Status, and Actions. Rows that open a screen, rows that report state, and rows that run something are now separated, so a row's section tells you what clicking it will do. No setting is flipped from the sidebar any more. No action required.
@@ -143,6 +144,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Removed a duplicate `.sr-only` accessibility rule from the token layer after confirming every consumer already pairs it with the accessibility helper; the test suite now pins that rule as defined exactly once.
 - Adopted the shared hero animation and reduced-motion rules in the Package Dashboard stylesheet. The summary cards, table toolbar, and footprint toggle stay local by decision, not omission — each differs from its chrome counterpart in layout semantics, domain color vocabulary, or ARIA interaction model, and the reasons are documented in the code. See `plans/PLAN_ext_ui_report_styles.md` for the full disposition.
 - Fixed 2 stale curated dictionary keys in `dictionaries.py`: removed the `de` entry whose English source text was rewritten (daemon label, LSP/plugin separation), and capitalized the `fil` "Analyzer Plugin" key to match the current source strings.
+- Added "Make member public (remove underscore)" quick fix for `no_internal_method_docs` — strips the leading `_` from the declaration name as an alternative to the existing "Convert to a regular comment" fix.
+- Added fixture files for `no_internal_method_docs`, `prefer_state_class_below_widget`, and `prefer_sorted_equatable_props`. Extended `avoid_public_late_final_without_initializer` fixture with static and multi-variable edge cases.
+- Added `DeprecatedNewInCommentReferenceRule` instantiation test to the documentation rules test suite.
 
 </details>
 

@@ -13,6 +13,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../fixes/core/no_internal_method_docs_fix.dart';
+import '../../fixes/core/no_internal_method_docs_make_public_fix.dart';
 import '../../fixes/stylistic/deprecated_new_in_comment_reference_fix.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -1675,5 +1676,7 @@ class NoInternalMethodDocsRule extends SaropaLintRule {
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         NoInternalMethodDocsFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        NoInternalMethodDocsMakePublicFix(context: context),
   ];
 }
