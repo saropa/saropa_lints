@@ -70,7 +70,11 @@
       "scanning": "Saropa: scanning {count} file(s)…",
       "done": "Saropa: {count} issue(s), {elapsed}s",
       "failed": "Saropa: scan failed",
-      "warming": "Saropa: warming up the analyzer… the first scan after opening can take a minute"
+      "warming": "Saropa: warming up the analyzer… the first scan after opening can take a minute",
+      "ready": "Saropa: ready",
+      "disabled": "Saropa: disabled",
+      "noProject": "Saropa: no Dart project",
+      "doneTooltip": "{total} finding(s), {shown} shown after filter"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: scanning whole project",
@@ -86,10 +90,6 @@
       "failed": "The opportunities report could not be written: {error}",
       "large": "The report is {megabytes} MB and may be slow to browse. The JSON file alongside it holds the same data for tooling.",
       "done": "Opportunities report written to {path}"
-    },
-    "sidebar": {
-      "label": "Full Opportunities Report",
-      "description": "Every package and feature, with usage counts"
     },
     "documentTitle": "Package Feature Inventory",
     "heroTitle": "Package Feature Inventory",
@@ -352,9 +352,7 @@
       "analyzerPluginAbsent": "Not configured",
       "lane": "Lane",
       "laneLight": "Light — ~200 rules in-editor, rest on save",
-      "laneFull": "Full — every enabled rule in-editor",
-      "processHealth": "Engines (LSP / Analyzer)",
-      "processHealthOpen": "Open Process Health to toggle"
+      "laneFull": "Full — every enabled rule in-editor"
     }
   },
   "configSuggestions": {
@@ -637,7 +635,8 @@
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",
-      "critical": "🔴 {size}"
+      "critical": "🔴 {size}",
+      "openHint": "Click to open Process Health"
     },
     "tooltip": {
       "processCount": "Dart processes: {count} ({size} RSS)",
@@ -2346,10 +2345,6 @@
     "scanning": "Scanning workspace…",
     "openConfig": "Open analysis_options.yaml",
     "lastScan": "Last scan: {time}",
-    "sidebar": {
-      "label": "Analysis Optimizer",
-      "description": "Reduce analyzer memory"
-    },
     "kpi": {
       "filesInScope": "Files in scope",
       "lines": "lines",
@@ -2445,16 +2440,15 @@
     },
     "confirm": {
       "fixMessage": "This will remove stale ignore comments from your source files. The changes can be undone with git. Continue?",
+      "fixMessageWithCount": "This will remove {count} stale ignore comment(s) from your source files. The changes can be undone with git. Continue?",
       "fixAction": "Remove stale ignores"
     },
     "diagnostic": {
       "message": "Stale ignore: rule '{ruleName}' no longer fires on this line."
     },
     "sidebar": {
-      "findLabel": "Find stale ignores",
-      "findDescription": "Detect dead // ignore: comments",
       "fixLabel": "Fix stale ignores",
-      "fixDescription": "Auto-remove dead // ignore: comments"
+      "fixDescription": "Detect and auto-remove dead // ignore: comments"
     },
     "quickFix": {
       "title": "Fix stale ignores in this file"

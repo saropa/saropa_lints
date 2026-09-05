@@ -149,9 +149,53 @@ export class ScanOnSaveController implements vscode.Disposable {
     console.log('saropa_lints: scan daemon resumed via debug panel');
   }
 
+  /**
+   * Dumps the full pipeline state to the output channel and reveals it.
+   * Wired to the status bar item click — one-click "why is nothing happening?"
+   * diagnostic for users and bug reporters.
+   */
+  diagnose(): void {
+    const ch = this._outputChannel;
+    if (!ch) return;
+    ch.appendLine('');
+    ch.appendLine('=== Scan-on-save pipeline diagnosis ===');
+    ch.appendLine(`  enabled:          ${this._isEnabled()}`);
+    const root = this._getProjectRoot();
+    ch.appendLine(`  project root:     ${root ?? '(none — no pubspec.yaml found)'}`);
+    // Daemon state: not spawned → warming → alive → backoff (after crash).
+    const daemonState = this._daemonSuspended
+      ? 'suspended (memory pressure)'
+      : this._daemonManager.isInBackoff
+        ? 'backoff (crashed recently, waiting to respawn)'
+        : this._daemonManager.isWarming
+          ? 'warming up (first scan in progress)'
+          : this._daemonManager.isAlive
+            ? 'alive'
+            : 'not spawned (starts on first Dart save)';
+    ch.appendLine(`  daemon:           ${daemonState}`);
+    ch.appendLine(`  scan in flight:   ${this._scanInFlight}`);
+    ch.appendLine(`  rescan queued:    ${this._rescanQueued}`);
+    ch.appendLine(`  pending files:    ${this._pendingFiles.size}`);
+    ch.appendLine(`  cached results:   ${this._lastDiagnosticsByFile.size} file(s)`);
+    // Severity filter state — shows which severities are turned off.
+    const enabled = getEnabledSeverities();
+    const severityNames = ['Error', 'Warning', 'Information', 'Hint'];
+    const severityState = severityNames
+      .map((name, i) => `${name}=${enabled.has(i) ? 'on' : 'OFF'}`)
+      .join(', ');
+    ch.appendLine(`  severity filters: ${severityState}`);
+    const cfg = vscode.workspace.getConfiguration('saropaLints');
+    ch.appendLine(`  tier:             ${cfg.get<string>('tier', 'recommended')}`);
+    ch.appendLine(`  resolveTypes:     ${cfg.get<boolean>('scanOnSave.resolveTypes', true)}`);
+    ch.appendLine(`  baseline running: ${this._baselineScanInFlight}`);
+    ch.appendLine('=======================================');
+    ch.show(true);
+  }
+
   constructor(
     private readonly _collection: vscode.DiagnosticCollection,
     private readonly _getProjectRoot: () => string | undefined,
+    private readonly _outputChannel?: vscode.OutputChannel,
   ) {
     this._statusBarItem = vscode.window.createStatusBarItem(
       'saropaLints.scanOnSave',
@@ -159,7 +203,14 @@ export class ScanOnSaveController implements vscode.Disposable {
       99,
     );
     this._statusBarItem.name = l10n('scanOnSave.statusBar.name');
+    // Click → dump full pipeline state to the output channel and reveal it.
+    this._statusBarItem.command = 'saropaLints.scanOnSave.diagnose';
     this._disposables.push(this._statusBarItem);
+
+    // Show initial state immediately so the user never stares at silence.
+    // A missing project root or disabled state is visible from the first tick.
+    this._showInitialState();
+
     this._disposables.push(
       vscode.workspace.onDidSaveTextDocument((doc) => this._onSave(doc)),
     );
@@ -186,8 +237,10 @@ export class ScanOnSaveController implements vscode.Disposable {
             // Clear the raw-diagnostic cache so a future severity toggle
             // doesn't re-publish stale data from before the feature was off.
             this._lastDiagnosticsByFile.clear();
-            this._statusBarItem.hide();
           }
+          // Refresh state whether enabling or disabling — _showInitialState
+          // handles both (disabled text vs. ready/noProject).
+          this._showInitialState();
         }
         // When a severity toggle changes, re-filter the existing
         // diagnostics in-place. A clear+rescan approach fails because
@@ -226,16 +279,68 @@ export class ScanOnSaveController implements vscode.Disposable {
     return scanOnSaveIsEnabled(cfg.get<boolean>('enabled', true) ?? true);
   }
 
-  private _onSave(doc: vscode.TextDocument): void {
-    if (!this._isEnabled()) return;
-    if (doc.languageId !== 'dart') return;
+  /** Logs to the Saropa Lints output channel so silent failures are diagnosable. */
+  private _log(message: string): void {
+    this._outputChannel?.appendLine(`[scan-on-save] ${message}`);
+  }
+
+  /**
+   * Sets the status bar to the correct initial state on activation, so the
+   * user sees feedback before any save event fires. Without this, a broken
+   * pipeline (no project root, disabled) produces absolute silence — the
+   * extension looks dead.
+   */
+  private _showInitialState(): void {
+    if (!this._isEnabled()) {
+      this._statusBarItem.text = l10n('scanOnSave.statusBar.disabled');
+      this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.disabled');
+      this._statusBarItem.show();
+      this._log('disabled via saropaLints.enabled setting');
+      return;
+    }
     const root = this._getProjectRoot();
-    if (!root) return;
+    if (!root) {
+      this._statusBarItem.text = l10n('scanOnSave.statusBar.noProject');
+      this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.noProject');
+      this._statusBarItem.show();
+      this._log('no Dart project root found (no pubspec.yaml at workspace root or one level deep)');
+      return;
+    }
+    // Everything looks viable — show "ready" and wait for saves.
+    this._statusBarItem.text = l10n('scanOnSave.statusBar.ready');
+    this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.ready');
+    this._statusBarItem.show();
+    this._log(`ready — project root: ${root}`);
+  }
+
+  private _onSave(doc: vscode.TextDocument): void {
+    // Check language FIRST — non-Dart saves should exit silently without
+    // hitting the config read or writing to the output channel. Logging
+    // every JSON/MD/etc. save when disabled is pure spam.
+    if (doc.languageId !== 'dart') return;
+    if (!this._isEnabled()) {
+      // Gate C: master toggle is off — log so the output channel reveals
+      // why a Dart save produced nothing.
+      this._log(`skipped ${doc.uri.fsPath}: saropaLints.enabled is false`);
+      return;
+    }
+    const root = this._getProjectRoot();
+    if (!root) {
+      // Gate E: no pubspec.yaml found — the most common silent killer.
+      this._log(`skipped ${doc.uri.fsPath}: no Dart project root found`);
+      this._statusBarItem.text = l10n('scanOnSave.statusBar.noProject');
+      this._statusBarItem.show();
+      return;
+    }
     // Only queue files under the resolved Dart project root — a save in an
     // unrelated open file (e.g. a sibling non-Dart workspace folder) must
     // not trigger or pollute this project's scan.
     const relative = path.relative(root, doc.uri.fsPath);
-    if (relative.startsWith('..') || path.isAbsolute(relative)) return;
+    if (relative.startsWith('..') || path.isAbsolute(relative)) {
+      // Gate F: file is outside the project boundary.
+      this._log(`skipped ${doc.uri.fsPath}: outside project root ${root}`);
+      return;
+    }
 
     this._pendingFiles.add(doc.uri.fsPath);
     if (this._debounceTimer) clearTimeout(this._debounceTimer);
@@ -259,7 +364,9 @@ export class ScanOnSaveController implements vscode.Disposable {
 
   private async _scan(root: string, files: string[]): Promise<void> {
     this._scanInFlight = true;
+    this._log(`scanning ${files.length} file(s): ${files.join(', ')}`);
     this._statusBarItem.text = l10n('scanOnSave.statusBar.scanning', { count: String(files.length) });
+    this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.scanning', { count: String(files.length) });
     this._statusBarItem.show();
     const start = Date.now();
     const cfg = vscode.workspace.getConfiguration('saropaLints');
@@ -274,11 +381,16 @@ export class ScanOnSaveController implements vscode.Disposable {
       // the lightweight syntactic scan — better partial coverage than a
       // multi-GB daemon holding memory while most rules are shed anyway.
       const useDaemon = resolveTypes && !this._daemonSuspended;
+      this._log(`tier=${tier}, resolveTypes=${resolveTypes}, useDaemon=${useDaemon}, daemonSuspended=${this._daemonSuspended}`);
       const result = useDaemon
         ? await this._scanViaDaemon(root, files, tier)
         : await runScanOnSave(root, files, tier, false);
       if (result.errorMessage) {
+        // Log the full error so it's visible in the output channel even
+        // after the transient warning toast auto-dismisses.
+        this._log(`scan FAILED (exit ${result.exitCode}): ${result.errorMessage}`);
         this._statusBarItem.text = l10n('scanOnSave.statusBar.failed');
+        this._statusBarItem.tooltip = result.errorMessage;
         void vscode.window.showWarningMessage(
           l10n('notify.commands.scanOnSaveFailedDetails', { details: result.errorMessage }),
         );
@@ -287,9 +399,14 @@ export class ScanOnSaveController implements vscode.Disposable {
       const diagnostics = result.payload?.diagnostics ?? [];
       const publishedCount = this._applyDiagnostics(files, diagnostics);
       const elapsedS = ((Date.now() - start) / 1000).toFixed(1);
+      this._log(`scan complete: ${diagnostics.length} raw finding(s), ${publishedCount} published after severity filter, ${elapsedS}s`);
       this._statusBarItem.text = l10n('scanOnSave.statusBar.done', {
         count: String(publishedCount),
         elapsed: elapsedS,
+      });
+      this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.doneTooltip', {
+        total: String(diagnostics.length),
+        shown: String(publishedCount),
       });
     } finally {
       this._scanInFlight = false;

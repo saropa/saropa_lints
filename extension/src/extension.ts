@@ -488,6 +488,57 @@ function countOutdatedPackages(): number | undefined {
   }).length;
 }
 
+// Commands the main status bar tooltip is allowed to link to. VS Code refuses
+// to execute a `command:` link from a MarkdownString unless the command id is
+// explicitly allow-listed via `isTrusted.enabledCommands` — mirrors the
+// pattern saropa-log-capture uses for its own status bar menu tooltip.
+const STATUS_BAR_TRUSTED_COMMANDS = [
+  'saropaLints.enable',
+  'saropaLints.disable',
+  'saropaLints.openViolationsWideReport',
+  'saropaLints.openProjectVibrancyReport',
+  'saropaLints.showProcessHealth',
+  'saropaLints.showCommandCatalog',
+  'saropaLints.showAbout',
+];
+
+/** One `[icon label](command:id)` markdown link followed by a blank line. */
+function statusBarCmdLink(icon: string, label: string, commandId: string): string {
+  return `[${icon} ${label}](command:${commandId})\n\n`;
+}
+
+/**
+ * Builds the main status bar's tooltip as a clickable action menu instead of
+ * plain text — a hover-activated toolbar of checkbox-style toggle links and
+ * shortcuts to the reports/panels the plain text used to only describe.
+ * `infoLines` renders first as read-only context, then a divider, then the
+ * menu links.
+ */
+function buildStatusBarTooltipMarkdown(infoLines: string[], enabled: boolean): vscode.MarkdownString {
+  const md = new vscode.MarkdownString('', true);
+  md.isTrusted = { enabledCommands: [...STATUS_BAR_TRUSTED_COMMANDS] };
+
+  for (const line of infoLines) {
+    md.appendMarkdown(`${line}\n\n`);
+  }
+  md.appendMarkdown('---\n\n');
+
+  // Checkbox-style toggle: filled check when analysis is on, empty circle
+  // when off — clicking flips it via whichever command is the opposite of
+  // the current state (there is no single toggle command to link to).
+  md.appendMarkdown(enabled
+    ? statusBarCmdLink('$(check)', 'Analysis enabled (click to disable)', 'saropaLints.disable')
+    : statusBarCmdLink('$(circle-outline)', 'Analysis disabled (click to enable)', 'saropaLints.enable'));
+  md.appendMarkdown(statusBarCmdLink('$(checklist)', 'Open Violations Report', 'saropaLints.openViolationsWideReport'));
+  md.appendMarkdown(statusBarCmdLink('$(package)', 'Open Package Dashboard', 'saropaLints.openProjectVibrancyReport'));
+  md.appendMarkdown(statusBarCmdLink('$(pulse)', 'Open Process Health', 'saropaLints.showProcessHealth'));
+  md.appendMarkdown('---\n\n');
+  md.appendMarkdown(statusBarCmdLink('$(list-unordered)', 'Command Catalog', 'saropaLints.showCommandCatalog'));
+  md.appendMarkdown(`[$(info) About](command:saropaLints.showAbout)`);
+
+  return md;
+}
+
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const applyUiLocalePreference = (): string => {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
@@ -555,7 +606,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // analyzer plugin (which Lane 2 makes opt-in).
   const scanOnSaveDiagCollection = vscode.languages.createDiagnosticCollection('saropa_lints');
   context.subscriptions.push(scanOnSaveDiagCollection);
-  const scanOnSaveController = new ScanOnSaveController(scanOnSaveDiagCollection, getProjectRoot);
+  const scanOnSaveController = new ScanOnSaveController(scanOnSaveDiagCollection, getProjectRoot, getSharedOutputChannel());
   context.subscriptions.push(scanOnSaveController);
 
   // Pubspec validation: inline diagnostics for dependency ordering,
@@ -828,6 +879,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       invalidateProjectRoot();
       refreshAll();
     }),
+    // A pubspec.yaml created after activation (clone finishing, mount settling,
+    // `dart create`) means the cached "no project" verdict is stale. Invalidate
+    // so the next getProjectRoot() call re-discovers it and the status bar /
+    // scan-on-save pipeline recover without a window reload.
+    ...(() => {
+      const watcher = vscode.workspace.createFileSystemWatcher('**/pubspec.yaml', false, true, true);
+      watcher.onDidCreate(() => {
+        invalidateProjectRoot();
+        refreshAll();
+      });
+      return [watcher];
+    })(),
   );
 
   const violationsPath = (): string | null => {
@@ -1026,6 +1089,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   context.subscriptions.push(statusBarItem);
 
+  // Dedicated memory/system-health item, separate from the lint-score item
+  // above. Previously this state was crammed as a text suffix onto the main
+  // item (e.g. "90% ▲2 · V4/10 · ⚠ 4.2G"), which both read as clutter and
+  // had no click target of its own — the main item's command always opened
+  // the violations report, so clicking a memory warning never led anywhere
+  // memory-related. Hidden entirely when there is nothing to report.
+  const memoryStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
+  memoryStatusBarItem.command = 'saropaLints.showProcessHealth';
+  context.subscriptions.push(memoryStatusBarItem);
+
   // Vibrancy data pushed from the vibrancy subsystem via callback.
   let vibrancyData: VibrancyStatusData | null = null;
 
@@ -1035,6 +1108,81 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Plugin-level memory pressure state — fed by the MemoryPressureWatcher
   // watching memory_state.json. Takes priority over process-level health.
   let memoryPressureState: MemoryPressureState | null = null;
+
+  /**
+   * Drive the dedicated memory/system-health status bar item. Hidden when
+   * there is nothing to report — plugin-level memory pressure takes
+   * priority over aggregate process RSS (matches the old suffix priority).
+   * Clicking always opens the System Health panel (the memory breakdown
+   * page), which the old crammed-in text suffix never linked to.
+   */
+  const updateMemoryStatusBar = () => {
+    const memPressureSuffix = memoryPressureSuffix(memoryPressureState);
+    let text: string | undefined;
+    const tooltipLines: string[] = [];
+
+    if (memPressureSuffix) {
+      text = memPressureSuffix;
+      const line = memoryPressureTooltipLine(memoryPressureState);
+      if (line) tooltipLines.push(line);
+    } else if (systemHealthSnapshot && systemHealthLevel !== HealthLevel.Healthy) {
+      // Show saropa-specific RSS when available — the system-wide total
+      // wrongly blames saropa_lints for every dart.exe on the machine.
+      const size = systemHealthSnapshot.saropaProcessCount > 0
+        ? formatBytes(systemHealthSnapshot.saropaRssBytes)
+        : formatBytes(systemHealthSnapshot.totalRssBytes);
+      text = systemHealthLevel === HealthLevel.Critical
+        ? l10n('systemHealth.statusBar.critical', { size })
+        : l10n('systemHealth.statusBar.warning', { size });
+    }
+
+    if (systemHealthSnapshot) {
+      const sSize = formatBytes(systemHealthSnapshot.totalRssBytes);
+      const sCount = String(systemHealthSnapshot.processCount);
+      const sTotal = String(systemHealthSnapshot.legitimateDaemonCount + systemHealthSnapshot.orphanedDaemonPids.length);
+      const sOrphaned = String(systemHealthSnapshot.orphanedDaemonPids.length);
+      tooltipLines.push(
+        l10n('systemHealth.tooltip.processCount', { count: sCount, size: sSize }),
+      );
+      if (systemHealthSnapshot.saropaProcessCount > 0) {
+        tooltipLines.push(
+          l10n('systemHealth.tooltip.saropaProcessCount', {
+            count: String(systemHealthSnapshot.saropaProcessCount),
+            size: formatBytes(systemHealthSnapshot.saropaRssBytes),
+          }),
+        );
+      }
+      tooltipLines.push(
+        l10n('systemHealth.tooltip.daemonCount', { total: sTotal, orphaned: sOrphaned }),
+      );
+      const scanOrphans = systemHealthSnapshot.orphanedScanDaemonPids.length;
+      if (scanOrphans > 0) {
+        tooltipLines.push(
+          l10n('systemHealth.tooltip.scanDaemonOrphans', { count: String(scanOrphans) }),
+        );
+      }
+      if (systemHealthLevel === HealthLevel.Warning) {
+        tooltipLines.push(l10n('systemHealth.tooltip.warningHint'));
+      } else if (systemHealthLevel === HealthLevel.Critical) {
+        tooltipLines.push(l10n('systemHealth.tooltip.criticalHint'));
+      }
+    }
+
+    if (!text) {
+      memoryStatusBarItem.hide();
+      return;
+    }
+    memoryStatusBarItem.text = `$(pulse) ${text}`;
+    memoryStatusBarItem.tooltip = [
+      l10n('systemHealth.panel.title'),
+      ...tooltipLines,
+      l10n('systemHealth.statusBar.openHint'),
+    ].join('\n');
+    memoryStatusBarItem.backgroundColor = memPressureSuffix || systemHealthLevel === HealthLevel.Critical
+      ? new vscode.ThemeColor('statusBarItem.errorBackground')
+      : new vscode.ThemeColor('statusBarItem.warningBackground');
+    memoryStatusBarItem.show();
+  };
 
   /** Build tooltip lines for the status bar (version, tier, score, vibrancy details). */
   function buildStatusBarTooltipLines(
@@ -1081,6 +1229,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.backgroundColor = undefined;
       statusBarItem.command = 'saropaLints.showAbout';
       statusBarItem.show();
+      memoryStatusBarItem.hide();
       return;
     }
     const en = getConfig().get<boolean>('enabled', true) ?? true;
@@ -1106,23 +1255,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const badge = findingsBadge(data);
       const badgeSuffix = badge?.suffix ?? '';
 
-      // Memory-pressure suffix takes priority — plugin-level shedding is more
-      // actionable than aggregate process RSS. Falls back to system health.
-      const memPressureSuffix = memoryPressureSuffix(memoryPressureState);
-      let sysHealthSuffix: string | undefined;
-      if (memPressureSuffix) {
-        sysHealthSuffix = memPressureSuffix;
-      } else if (systemHealthSnapshot && systemHealthLevel !== HealthLevel.Healthy) {
-        // Show saropa-specific RSS in the suffix when available — the
-        // system-wide total wrongly blames saropa_lints for the entire
-        // Dart analysis server and every other dart.exe on the machine.
-        const size = systemHealthSnapshot.saropaProcessCount > 0
-          ? formatBytes(systemHealthSnapshot.saropaRssBytes)
-          : formatBytes(systemHealthSnapshot.totalRssBytes);
-        sysHealthSuffix = systemHealthLevel === HealthLevel.Critical
-          ? l10n('systemHealth.statusBar.critical', { size })
-          : l10n('systemHealth.statusBar.warning', { size });
-      }
+      // Memory/system-health state now renders in its own status bar item
+      // (updateMemoryStatusBar) rather than as a text suffix here.
+      updateMemoryStatusBar();
 
       if (health) {
         const history = loadHistory(context.workspaceState);
@@ -1135,7 +1270,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           tier,
           showVibrancy,
           vibrancyLabel,
-          systemHealthSuffix: sysHealthSuffix,
         });
         statusBarItem.text = `$(checklist) Saropa: ${detailLabel}${badgeSuffix}`;
         statusBarItem.backgroundColor = undefined;
@@ -1145,7 +1279,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           tier,
           showVibrancy,
           vibrancyLabel,
-          systemHealthSuffix: sysHealthSuffix,
         })}${badgeSuffix}`;
         statusBarItem.backgroundColor = undefined;
       }
@@ -1160,55 +1293,22 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         scorePending,
       );
       if (badge) tooltipLines.push(badge.tooltip);
-      // Memory pressure tooltip — shed level and hard-limit status. Shares
-      // its priority order with the status-bar suffix via
-      // memoryPressureTooltipLine (see memoryPressureWatcher.ts) so the two
-      // surfaces can't drift out of sync.
-      const memPressureTooltipLine = memoryPressureTooltipLine(memoryPressureState);
-      if (memPressureTooltipLine) {
-        tooltipLines.push(memPressureTooltipLine);
-      }
-      if (systemHealthSnapshot) {
-        const sSize = formatBytes(systemHealthSnapshot.totalRssBytes);
-        const sCount = String(systemHealthSnapshot.processCount);
-        const sTotal = String(systemHealthSnapshot.legitimateDaemonCount + systemHealthSnapshot.orphanedDaemonPids.length);
-        const sOrphaned = String(systemHealthSnapshot.orphanedDaemonPids.length);
-        tooltipLines.push(
-          l10n('systemHealth.tooltip.processCount', { count: sCount, size: sSize }),
-        );
-        // Show saropa_lints' own footprint separately so users know what's
-        // ours vs the Dart analysis server and other system-wide processes.
-        if (systemHealthSnapshot.saropaProcessCount > 0) {
-          tooltipLines.push(
-            l10n('systemHealth.tooltip.saropaProcessCount', {
-              count: String(systemHealthSnapshot.saropaProcessCount),
-              size: formatBytes(systemHealthSnapshot.saropaRssBytes),
-            }),
-          );
-        }
-        tooltipLines.push(
-          l10n('systemHealth.tooltip.daemonCount', { total: sTotal, orphaned: sOrphaned }),
-        );
-        // Surface orphaned scan daemons — these leak memory after VS Code crashes.
-        const scanOrphans = systemHealthSnapshot.orphanedScanDaemonPids.length;
-        if (scanOrphans > 0) {
-          tooltipLines.push(
-            l10n('systemHealth.tooltip.scanDaemonOrphans', { count: String(scanOrphans) }),
-          );
-        }
-        if (systemHealthLevel === HealthLevel.Warning) {
-          tooltipLines.push(l10n('systemHealth.tooltip.warningHint'));
-        } else if (systemHealthLevel === HealthLevel.Critical) {
-          tooltipLines.push(l10n('systemHealth.tooltip.criticalHint'));
-        }
-      }
-      statusBarItem.tooltip = tooltipLines.join('\n');
+      // Memory/system-health detail moved to its own status bar item
+      // (updateMemoryStatusBar) — no longer duplicated in this tooltip.
+      // Rich tooltip: clickable action menu (toggle + report/panel shortcuts)
+      // instead of plain read-only text — mirrors saropa-log-capture's
+      // status bar menu tooltip pattern.
+      statusBarItem.tooltip = buildStatusBarTooltipMarkdown(tooltipLines, en);
       statusBarItem.command = 'saropaLints.openViolationsWideReport';
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
-      statusBarItem.tooltip = `Saropa Lints v${extVersion} — Disabled`;
+      statusBarItem.tooltip = buildStatusBarTooltipMarkdown(
+        [`Saropa Lints v${extVersion} — Disabled`],
+        en,
+      );
       statusBarItem.backgroundColor = undefined;
       statusBarItem.command = 'saropaLints.openViolationsWideReport';
+      memoryStatusBarItem.hide();
     }
     statusBarItem.show();
   };
@@ -2332,6 +2432,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       },
     ),
     vscode.commands.registerCommand('saropaLints.showOutput', showOutputChannel),
+    // Diagnose: dumps full scan-on-save pipeline state to the output channel.
+    // Wired to the status bar item click — one-click triage for users seeing
+    // zero diagnostics. Not registered in package.json contributes.commands
+    // because it's only reachable via the status bar (UI surface, not palette).
+    vscode.commands.registerCommand('saropaLints.scanOnSave.diagnose', () => {
+      scanOnSaveController.diagnose();
+    }),
     vscode.commands.registerCommand('saropaLints.showRelatedRuleTelemetry', () => {
       showRelatedRuleTelemetryPanel(relatedRuleTelemetry);
     }),

@@ -39,6 +39,16 @@ export class ScanDaemonManager {
     return this._client?.isWarming ?? false;
   }
 
+  /** True when a daemon process is alive (spawned and not yet exited). */
+  get isAlive(): boolean {
+    return this._client?.isAlive ?? false;
+  }
+
+  /** True when the manager is refusing to respawn (backoff window active). */
+  get isInBackoff(): boolean {
+    return Date.now() < this._blockedUntilEpochMs;
+  }
+
   /**
    * Scans [files] via the daemon, spawning or respawning it as needed.
    * Never rejects; failures settle with `payload: null` + `errorMessage`.
