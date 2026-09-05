@@ -32,7 +32,11 @@ TODO/HACK tree, and status bar. ~238 distinct items total.
   expander. This is now the highest-value remaining step (was item 4).
 - **Not done: list C (summarize + deep-link cards).** No package-health / code-health /
   project-size / rule-packs / quality-gates-banner / disabled-rules-quick-re-enable cards exist on
-  the central dashboard (item 5).
+  the central dashboard (item 5). **Note (2026-09-05):** the Home hub that was meant to host these
+  cards was removed (commit `ea2c7a8e`). These cards need a new home — either the Findings
+  dashboard itself or the sidebar row descriptions (which already carry per-dashboard summaries
+  per `PLAN_ext_ui_sidebar_reset.md` §3). Evaluate whether these cards are still needed given the
+  sidebar's live descriptions now surface the same top-line signals.
 - **Not done: item 7** (decomposing the other oversized linked surfaces — Package Vibrancy
   report files, `projectVibrancyReportView.ts`, `commandCatalogWebviewHtml.ts`,
   `commandCatalogRegistry.ts`, `issuesTree.ts`, `dashboardChromeStyles.ts`) — unchecked, likely

@@ -1,7 +1,7 @@
 # Plan — Dart-side deferred work (extension UI redesign)
 
 **Created:** 2026-09-05 · **Status:** Not started
-**Parent:** `PLAN_extension_ui_redesign.md` Phases 2, 4, 6 deferred items
+**Parent:** `PLAN_ext_ui_redesign.md` Phases 2, 4, 6 deferred items
 **Scope:** Dart (`lib/`, `bin/`) + corresponding TS consumers. Requires `dart test` and
 `flutter test` runs.
 **Model:** Sonnet for each work item. They are independent and can run in parallel.
@@ -109,12 +109,16 @@ channels. The only non-standard method is `_internal/analyzeFromDidOpen` (intern
 
 ---
 
-## WP5 — Project size JSON (low priority)
+## WP5 — Project size JSON (low priority, TS-only)
 
-**Problem:** The Home hub (removed) and Project Map's KPI tile show "Mapped — see Project Map"
-instead of a real project size number, because the structured size data is only available via
-`--format json` (which IS supported by `project_health.dart` already) but the TS side never
-reads it after the scan.
+**Note (2026-09-05):** Despite being in the "Dart-side deferred" plan, this work item requires
+NO Dart changes — `project_health.dart` already supports `--format json`. This is purely a TS
+consumer task. Kept here because it originated from the same deferred-items triage.
+
+**Problem:** The Home hub (removed — commit `ea2c7a8e`) and Project Map's KPI tile show
+"Mapped — see Project Map" instead of a real project size number, because the structured size
+data is only available via `--format json` (which IS supported by `project_health.dart` already)
+but the TS side never reads it after the scan.
 
 **Research found:** `project_health.dart` already supports `--format json` and outputs file
 counts, LOC (code/comment/blank), and size in bytes. The data exists — it just isn't consumed.
@@ -138,7 +142,7 @@ WP1 (progress bar) — independent
 WP2 (report columns) — independent, incremental per CLI
 WP3 (runtime_tier) — independent, < 1 hour
 WP4 (LSP progress) — independent
-WP5 (project size) — independent, TS-only
+WP5 (project size) — independent, TS-only (no Dart changes needed)
 ```
 
 All five are independent. WP3 and WP5 are the smallest. WP1 and WP4 follow the same

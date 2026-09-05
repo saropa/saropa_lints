@@ -8,7 +8,15 @@ and the single most important fact ("Lint integration: Off") shown as a warning 
 one-click fix. Navigation requires reading every row.
 **Baseline inventory:** the 7 views, 191 commands, 108 settings, 19 webviews, 5 style systems, and
 the CLI-only features are catalogued in the appendix. Do not re-inventory.
-**Relationship to `PLAN_central_dashboard_consolidation.md`:** that plan defines what folds into
+**Related plans (all prefixed `PLAN_ext_ui_`):**
+- `PLAN_ext_ui_dashboard_consolidation.md` — sibling: what folds into the findings hub (lists A–D)
+- `PLAN_ext_ui_sidebar_reset.md` — child: supersedes §2.1 sidebar target + Phase 3 Home hub
+- `PLAN_ext_ui_report_styles.md` — child: Phase 5/7 deferred `report-styles-parts.ts` migration
+- `PLAN_ext_ui_dart_deferred.md` — child: Phases 2/4/6 deferred Dart-side work (5 WPs)
+- `PLAN_ext_ui_optimizer_embed.md` — child: Phase 4 deferred sort/bulk-select embed
+- `PLAN_ext_ui_package_tabs.md` — child: Phase 5 deferred embedded tab content
+
+**Relationship to `PLAN_ext_ui_dashboard_consolidation.md`:** that plan defines what folds into
 the findings hub (lists A–D). This plan defines the *navigation shell* around it. They do not
 conflict; Phase 3 here consumes its list C ("summarize + deep-link").
 
@@ -491,15 +499,12 @@ Files: `views/projectMapView.ts`, `views/projectMapShell.ts` (new), `views/proje
       is also a portable standalone artifact (CI export, shareable file with no VS Code host), and
       rebinding its internals onto the webview-only chrome system would break that use case. Only the
       NEW shell this phase built (hero, tabs, scanning state, report cards) uses the chrome directly.
-- [ ] **No dedicated unit test for `projectMapView.ts` / `projectMapShell.ts` / `projectMapReports.ts`.**
-      No test file existed for this view before this phase (only `saropaDashboardsView.test.ts`
-      references "projectMap" incidentally, and it currently fails to compile for unrelated reasons —
-      see above). Correctness evidence here is `tsc --noEmit` clean plus manual review of the generated
-      client script; it has not been evaluated in a real Extension Development Host.
-- [ ] `transformProjectMapHtml()` / `webviewThemeOverride()` in `projectMapView.ts` are now dead code
-      (their only caller, the old single-command `renderPanel()`, was replaced) but were left in place
-      rather than deleted, since deleting is out of scope for a feature phase and nothing else in this
-      review confirmed they're safe to remove — a cleanup candidate for Phase 7.
+- [x] **Unit tests for `projectMapShell.ts` / `projectMapReports.ts` added** (2026-09-05) —
+      `test/views/projectMapShell.test.ts` (~120 lines) and `test/views/projectMapReports.test.ts`
+      (~192 lines) cover tab roles/aria/CSP/keyboard shortcuts, report card specs, quality-gate
+      config round-trip, and message handling.
+- [x] **Dead code removed** (2026-09-05) — `transformProjectMapHtml()`, `webviewThemeOverride()`,
+      and `pmPaneThemeTokens()` deleted from `projectMapView.ts` (~60 lines total).
 
 ### Phase 7 — Design-system sweep + polish (1 day, Sonnet) — DONE 2026-09-04
 Files: `views/dashboardChromeStylesComponents.ts`, `views/saropaDashboardsView.ts`,
@@ -634,13 +639,9 @@ stub), `test/ux/generate-pages.ts` (new fixtures), `i18n/locales/en.json`.
       with a real Extension Development Host render pass, not a repeat of Phase 5/audit's
       static-tsc-plus-Playwright-only verification — this file is larger and feeds a live interactive
       dashboard, not a mostly-static report.
-- [ ] **Rules & Tiers and Project Map do not surface their tab digit-shortcuts in a `?`-overlay.**
-      Both already had (or, for Project Map, now have) the actual keyboard behavior; neither uses
-      `keyboard-shortcuts.ts`'s shared overlay module the way Findings and Packages do, so a user
-      has no in-app way to discover the shortcut exists. Pre-existing gap for Rules & Tiers (predates
-      this phase); newly-shipped-but-undocumented for Project Map's `1`/`2`. Small, mechanical
-      follow-up — add `buildKeyboardShortcutsButton()`/`buildKeyboardShortcutsOverlay()` to each
-      shell — deferred only for time, not difficulty.
+- [x] **Keyboard shortcuts overlay added to Rules & Tiers and Project Map** (2026-09-05) —
+      both now use `buildKeyboardShortcutsButton()`/`buildKeyboardShortcutsOverlay()` from the shared
+      `keyboard-shortcuts.ts` module, with l10n keys for jump-to-tab, prev/next tab, and show overlay.
 - [ ] **No screenshot / live Extension Development Host verification.** Same caveat Phase 4 and
       Phase 6 already carried forward: correctness evidence here is `tsc`, scoped mocha, and the
       Playwright static-render harness (which DOES run real Chromium against real generated HTML,
