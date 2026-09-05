@@ -867,6 +867,20 @@ def publish_to_pubdev_step(
             f"Monitor: https://github.com/{repo_path}/actions"
         )
         return False
+    except KeyboardInterrupt:
+        # The tag push already triggered the workflow, so it keeps running on
+        # GitHub Actions regardless of whether this terminal is watching it —
+        # Ctrl-C here only detaches the local `gh run watch` display. Must not
+        # propagate as an unhandled KeyboardInterrupt: that crashes publish.py
+        # with a raw traceback after the tag is already live, which reads as
+        # "publish failed" when nothing about the actual publish failed.
+        print()
+        print_warning(
+            f"Stopped watching workflow {run_id} — it keeps running on "
+            f"GitHub Actions independent of this terminal. "
+            f"Monitor: https://github.com/{repo_path}/actions/runs/{run_id}"
+        )
+        return False
 
     if watch_result.returncode == 0:
         print_success(
