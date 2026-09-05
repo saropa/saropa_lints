@@ -1625,6 +1625,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_singlechildscrollview_with_column',
   'avoid_throw_in_catch_block',
   'avoid_unassigned_late_fields',
+  'avoid_public_late_final_without_initializer',
   'avoid_unconditional_break',
   'avoid_unguarded_debug',
   'avoid_unknown_pragma',
@@ -2542,6 +2543,9 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_unnecessary_enum_arguments',
   'avoid_unnecessary_enum_prefix',
   'avoid_unnecessary_extends',
+  // Unconditional `return ClassName(...)` factory forward (unnecessary_code_rules.dart).
+  // Comprehensive, not Essential: purely stylistic (INFO) and syntactic, no quick fix.
+  'avoid_unnecessary_factory_constructor',
   'avoid_unnecessary_getter',
   'avoid_unnecessary_if',
   'avoid_unnecessary_late_fields',
@@ -2759,6 +2763,9 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_snake_case_files' moved to stylisticRules (opinionated)
   // 'prefer_specific_exceptions' moved to stylisticRules (opinionated)
   // 'prefer_spread_over_addall' moved to stylisticRules (opinionated)
+  // Widget/State declaration reading order — purely stylistic (no
+  // correctness or perf impact), so it lives in comprehensive not a lower tier.
+  'prefer_state_class_below_widget',
   'prefer_static_class',
   'prefer_static_const_widgets',
   // 'prefer_static_members_first' moved to stylisticRules (conflicting pair)
@@ -3104,6 +3111,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_js_rounded_ints_extended',
   // Import sorting
   'prefer_sorted_imports', // alphabetical import sorting within groups
+  // Equatable props ordering — mismatched order is only a readability
+  // hazard (equality still works, order-independent), so comprehensive tier.
+  'prefer_sorted_equatable_props',
   // Performance micro-optimizations (moved from Professional)
   'prefer_item_extent', // scroll performance hint
   'prefer_cache_extent', // scroll performance - tune off-screen cache
@@ -3327,6 +3337,10 @@ const Set<String> pedanticOnlyRules = <String>{
   'new_instance_cascade',
   'named_parameters_ordering',
   'use_compare_without_case',
+  // Private-member DartDoc pedantry — `///` on a `_`-prefixed member never
+  // renders (private members are excluded from generated docs), so this is
+  // opinionated cleanup rather than a correctness or bug-risk signal.
+  'no_internal_method_docs',
 };
 
 /// Returns the set of rule names for a given tier.
@@ -3893,6 +3907,7 @@ const Set<String> equatablePackageRules = <String>{
   'prefer_unmodifiable_collections',
   'require_equatable_props_override',
   'avoid_equatable_nested_equality',
+  'prefer_sorted_equatable_props',
 };
 
 /// Rules specific to the Freezed code generation package.

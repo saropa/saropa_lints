@@ -72,7 +72,7 @@ plus Flutter-specific rules solid_lints doesn't attempt.
 
 ## Rule Mapping
 
-Coverage: 33 rules — 18 HAVE (55%), 3 PARTIAL, 12 TODO (36%)
+Coverage: 33 rules — 21 HAVE (63%), 3 PARTIAL, 9 TODO (27%)
 current published rule set (33 rules as of this audit; verified directly against
 `github.com/solid-software/solid_lints` `lib/main.dart`, not just documentation).
 
@@ -86,13 +86,13 @@ current published rule set (33 rules as of this audit; verified directly against
 |---|---|---|
 | `avoid_debug_print_in_release` | PARTIAL | `avoid_print_in_release` guards `print()`, not `debugPrint()` |
 | `avoid_duplicate_code` | TODO | Cross-project AST clone detector — no saropa equivalent. TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_duplicate_code.md) |
-| `avoid_final_with_getter` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_final_with_getter.md) |
+| `avoid_final_with_getter` | HAVE | `avoid_unnecessary_getter` |
 | `avoid_global_state` | HAVE | `avoid_global_state` |
 | `avoid_late_keyword` | HAVE | `avoid_late_keyword` |
 | `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
 | `avoid_returning_widgets` | TODO | Name collision only — saropa's same-named rule checks a different shape. TODO — see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_returning_widgets_solid_lints_parity.md) |
 | `avoid_similar_names` | TODO | Name collision only — saropa's same-named rule targets enum-indexed Map literals, not similar identifiers. TODO — see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_similar_names_solid_lints_parity.md) |
-| `avoid_unnecessary_return_variable` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_return_variable.md) |
+| `avoid_unnecessary_return_variable` | HAVE | `prefer_immediate_return` |
 | `avoid_unnecessary_setstate` | HAVE | `avoid_unnecessary_setstate` |
 | `avoid_unnecessary_type_assertions` | HAVE | `avoid_unnecessary_type_assertions` |
 | `avoid_unrelated_type_assertions` | HAVE | `avoid_unrelated_type_assertions` |
@@ -104,7 +104,7 @@ current published rule set (33 rules as of this audit; verified directly against
 | `function_lines_of_code` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_function_lines_of_code.md) |
 | `member_ordering` | PARTIAL | `prefer_member_ordering` is a flat 3-bucket order vs. solid_lints' fully configurable DSL |
 | `named_parameters_ordering` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_named_parameters_ordering.md) |
-| `newline_before_return` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_newline_before_return.md) |
+| `newline_before_return` | HAVE | `prefer_blank_line_before_return` (alias `newline_before_return`) |
 | `no_empty_block` | HAVE | `no_empty_block` |
 | `no_equal_then_else` | HAVE | `no_equal_then_else` |
 | `no_magic_number` | HAVE | `no_magic_number` |

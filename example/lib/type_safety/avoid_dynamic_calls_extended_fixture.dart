@@ -146,8 +146,55 @@ class DynamicProxy {
 
     // BAD: an unrelated dynamic call in the same override body, not
     // derived from `invocation` — the narrowed exemption still flags this.
+    // Uses a non-Object method (`describe`) rather than `toString()` so the
+    // Object-method exemption below doesn't also suppress this case.
     dynamic fallback = 0;
     // expect_lint: avoid_dynamic_calls_extended
-    return fallback.toString();
+    return fallback.describe();
+  }
+}
+
+// GOOD: Object methods (toString/hashCode/runtimeType) are defined on every
+// Dart value and cannot throw NoSuchMethodError, so calling them on a
+// dynamic receiver is statically guaranteed safe — no analyzer bypass risk.
+void _goodObjectMethodsOnDynamic() {
+  // Pattern from analyzer-version compat shims: `.toString()` on values
+  // typed `dynamic` by SDK design (ProcessResult.stdout, ambiguous Map
+  // values, etc.) — see bugs/avoid_dynamic_calls_extended_false_positive_
+  // analyzer_compat_shims.md.
+  final String text = dynamicInvoice.toString();
+  final int hash = dynamicInvoice.hashCode;
+  final Type type = dynamicInvoice.runtimeType;
+  // `==` never reaches the operator-invocation check at all (see
+  // `_operatorInvocationTokens`, which deliberately excludes `==`), so it is
+  // safe on a dynamic receiver by construction, not by this Object-method
+  // guard — included here for documentation completeness.
+  final bool same = dynamicInvoice == typedInvoice;
+  text.length;
+  hash.isEven;
+  type.toString();
+  same.toString();
+}
+
+// GOOD: dynamic dispatch guarded by a `try`/`on NoSuchMethodError` (or
+// `on TypeError` / bare `on Object`) catch is the documented cross-analyzer-
+// version duck-typing pattern — the developer has already handled the
+// failure mode the rule exists to warn about, so flagging it here is noise.
+bool _goodTryCatchGuardedDynamicCall(Object element) {
+  try {
+    // expect: NOT flagged — inside a `try` whose catch handles
+    // NoSuchMethodError, so the unchecked dispatch is intentional and safe.
+    return (element as dynamic).hasDeprecated as bool;
+  } on NoSuchMethodError {
+    return false; // this analyzer version lacks the API
+  }
+}
+
+// GOOD: same guard pattern for a property access rather than a method call.
+Object? _goodTryCatchGuardedPropertyAccess(Object element) {
+  try {
+    return (element as dynamic).staticElement;
+  } on TypeError {
+    return null; // older analyzer versions expose `.element` instead
   }
 }

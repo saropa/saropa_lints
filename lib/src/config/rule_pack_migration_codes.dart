@@ -895,7 +895,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'use_setstate_synchronously',
   },
 
-  // awesome_lints — 114 HAVE rules covering 89% of 128 total (117 unique saropa codes after fan-out).
+  // awesome_lints — 115 HAVE rules covering 89% of 128 total (118 unique saropa codes after fan-out).
   'migrate_awesome_lints': {
     'avoid_accessing_collections_by_constant_index',
     'avoid_accessing_other_classes_private_members',
@@ -974,6 +974,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_align_over_container',
     'prefer_arguments_ordering',
     'prefer_async_await',
+    'prefer_blank_line_before_return',
     'prefer_bloc_event_suffix',
     'prefer_bloc_extensions',
     'prefer_bloc_state_suffix',
@@ -1177,6 +1178,31 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'proper_super_calls',
   },
 
+  // solid_lints — 21 HAVE rules covering 63% of 33 total.
+  'migrate_solid_lints': {
+    'avoid_global_state',
+    'avoid_high_cyclomatic_complexity',
+    'avoid_late_keyword',
+    'avoid_non_null_assertion',
+    'avoid_unnecessary_getter',
+    'avoid_unnecessary_setstate',
+    'avoid_unnecessary_type_assertions',
+    'avoid_unrelated_type_assertions',
+    'avoid_unused_parameters',
+    'double_literal_format',
+    'no_empty_block',
+    'no_equal_then_else',
+    'no_magic_number',
+    'prefer_blank_line_before_return',
+    'prefer_conditional_expressions',
+    'prefer_early_return',
+    'prefer_immediate_return',
+    'prefer_list_first',
+    'prefer_list_last',
+    'prefer_match_file_name',
+    'proper_super_calls',
+  },
+
   // flutter_quality_lints — 16 HAVE rules covering 89% of 18 total (18 unique saropa codes after fan-out).
   'migrate_flutter_quality_lints': {
     'avoid_cross_feature_dependencies',
@@ -1197,28 +1223,6 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_sliver_for_mixed_scroll',
     'prefer_trailing_comma',
     'require_mounted_check_after_await',
-  },
-
-  // solid_lints — 18 HAVE rules covering 55% of 33 total.
-  'migrate_solid_lints': {
-    'avoid_global_state',
-    'avoid_high_cyclomatic_complexity',
-    'avoid_late_keyword',
-    'avoid_non_null_assertion',
-    'avoid_unnecessary_setstate',
-    'avoid_unnecessary_type_assertions',
-    'avoid_unrelated_type_assertions',
-    'avoid_unused_parameters',
-    'double_literal_format',
-    'no_empty_block',
-    'no_equal_then_else',
-    'no_magic_number',
-    'prefer_conditional_expressions',
-    'prefer_early_return',
-    'prefer_list_first',
-    'prefer_list_last',
-    'prefer_match_file_name',
-    'proper_super_calls',
   },
 
   // very_good_analysis — 17 ENHANCED codes.

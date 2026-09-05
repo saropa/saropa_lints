@@ -12,7 +12,7 @@ equivalent for **~75%** (1,258/1,670).
 | all_observer_lint | [migration_from_all_observer_lint.md](migration_from_all_observer_lint.md) | 21 rules — 21 TODO (100%) |
 | architecture_linter | [migration_from_architecture_linter.md](migration_from_architecture_linter.md) | 3 rules — 3 TODO (100%) |
 | architecture_lints | [migration_from_architecture_lints.md](migration_from_architecture_lints.md) | 26 rules — 4 PARTIAL, 22 TODO (84%) |
-| awesome_lints | [migration_from_awesome_lints.md](migration_from_awesome_lints.md) | 128 rules — 114 HAVE (89%), 7 PARTIAL, 7 TODO (5%) |
+| awesome_lints | [migration_from_awesome_lints.md](migration_from_awesome_lints.md) | 128 rules — 115 HAVE (89%), 7 PARTIAL, 6 TODO (4%) |
 | bloc_lint | [migration_from_bloc_lint.md](migration_from_bloc_lint.md) | 8 rules — 3 HAVE (37%), 5 PARTIAL |
 | clean_architecture_kit | [migration_from_clean_architecture_kit.md](migration_from_clean_architecture_kit.md) | 16 rules — 3 PARTIAL, 13 TODO (81%) |
 | context_plus_lint | [migration_from_context_plus_lint.md](migration_from_context_plus_lint.md) | 4 rules — 4 TODO (100%) |
@@ -50,7 +50,7 @@ equivalent for **~75%** (1,258/1,670).
 | pyramid_lint | [migration_from_pyramid_lint.md](migration_from_pyramid_lint.md) | 37 rules — 29 HAVE (78%), 3 PARTIAL, 5 TODO (14%) |
 | ripplearc_linter | [migration_from_ripplearc_linter.md](migration_from_ripplearc_linter.md) | 24 rules — 7 HAVE (29%), 4 PARTIAL, 13 TODO (54%) |
 | riverpod_lint | [migration_from_riverpod_lint.md](migration_from_riverpod_lint.md) | 13 rules — 4 HAVE (30%), 9 TODO (69%) |
-| solid_lints | [migration_from_solid_lints.md](migration_from_solid_lints.md) | 33 rules — 18 HAVE (55%), 3 PARTIAL, 12 TODO (36%) |
+| solid_lints | [migration_from_solid_lints.md](migration_from_solid_lints.md) | 33 rules — 21 HAVE (63%), 3 PARTIAL, 9 TODO (27%) |
 | subpackage_lint | [migration_from_subpackage_lint.md](migration_from_subpackage_lint.md) | 3 rules — 1 HAVE (33%), 2 TODO (66%) |
 | team_guard | [migration_from_team_guard.md](migration_from_team_guard.md) | 0 HAVE (0%), 0 PARTIAL (0%), 1 TODO (100%). |
 | VGA (very_good_analysis) | [migration_from_vga.md](migration_from_vga.md) | 191 stock rules audited. ~10 have an enhanced saropa custom equivalent (optional |

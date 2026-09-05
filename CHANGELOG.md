@@ -68,13 +68,61 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0-beta.4] — Unreleased
 
+### Added
+
+- New rule `avoid_public_late_final_without_initializer`: flags public `late final` fields with no initializer — a runtime crash waiting to happen if any caller reads the field before it is assigned. No action required.
+- New rule `avoid_unnecessary_factory_constructor`: flags `factory` constructors whose body just returns `ClassName(...)` — a factory keyword adds indirection with no benefit when the constructor could be a regular named or unnamed constructor. No action required.
+- New rule `no_internal_method_docs`: flags DartDoc comments on private methods in non-library code — internal-only methods rarely benefit from doc comments and the noise makes public API docs harder to find. No action required.
+- New rule `prefer_state_class_below_widget`: flags a `State<X>` class declared above its `StatefulWidget X` — the conventional Flutter ordering places the widget's public API first. Closes the DCM `keep-state-below-its-widget` gap. No action required.
+- New rule `prefer_sorted_equatable_props`: flags an Equatable `props` getter whose field order doesn't match the class's field declaration order — props that drift out of declaration order are harder to audit for missing fields. Closes the DCM `sort-equatable-props` gap. No action required.
+- Findings dashboard: the top-rules expander now shows each rule's how-to-fix guidance, OWASP mapping, related rules, and supersedes/migration notes inline, instead of requiring a jump to the separate Rule Explain screen. This detail is now also available during live analysis, not only after a batch export. No action required.
+- Package Dashboard: the Upgrades, Full report, and Known issues tabs now render their content inline instead of opening a separate editor tab. Compare still opens as its own panel. No action required.
+- Analysis Optimizer (embedded in the Lints Config dashboard): sortable columns and a working select-all, matching the standalone panel. Sort choice is remembered per dashboard. No action required.
+- Project Map: a live percentage progress bar with a file count during scanning, plus pause and cancel, and a Files / Lines / Size summary in the header. Older engines without progress support fall back to the previous elapsed-time view. No action required.
+- Project Map reports: the severity and doctor reports now render as sortable typed tables rather than preformatted text, via a new `--format json` mode on both command-line tools. No action required.
+- Health Panel: engine cards now show live scan progress ("Scan: N/M files") while the language server is scanning a workspace. No action required.
+- Lints Config, Config file tab: a "Migrate config keys" action now appears there when legacy plugin-block keys remain, replacing the sidebar row that previously carried it. No action required.
+
 ### Changed
 
 - Renamed engine names throughout the extension: "Analyzer Plugin" → "Live Analysis", "Scan Daemon" → "Scan on Save" in the Health Panel; "Turn Off Lint Integration" → "Disable Saropa Lints" and "Re-enable In-Process Plugin" → "Re-enable Live Analysis" in the command catalog. Updated notification strings that referenced "Lint integration" to say "Scan on save". No action required.
 
+- Sidebar restructured into three sections totalling 14 rows: Dashboards, Status, and Actions. Rows that open a screen, rows that report state, and rows that run something are now separated, so a row's section tells you what clicking it will do. No setting is flipped from the sidebar any more. No action required.
+- Package Dashboard now uses the shared dashboard chrome for page spacing and typography. Body padding, base font size, and line height change slightly as a result; layout is otherwise unchanged.
+- The bundled rule catalog now carries correction text and OWASP mappings for every rule, so live analysis can show them without a batch export. This grows the packaged catalog by roughly 0.5 MB. No action required.
+
+### Fixed
+
+- Fixed `avoid_string_substring` false positives where the index was already guaranteed in bounds by a regex `hasMatch()` guard, an `indexOf()`/`lastIndexOf()` result, or a `RegExpMatch`'s `.start`/`.end`/`.group()`. No action required.
+- Fixed `avoid_case_sensitive_path_comparison` false positives on non-path string comparisons: CLI flag literals, Dart import URI comparisons, filesystem root-detection idioms (`dir.path != dir.parent.path`), and identifiers where "path" was embedded in an unrelated word (e.g. "pathology"). No action required.
+- Fixed `avoid_unsafe_cast` false positives on `ProcessResult.stdout`/`.stderr` cast to `String` — the SDK default encoding always decodes to `String`, so the cast is only unsafe when the call explicitly passes a `null` encoding to request raw bytes. No action required.
+- Fixed `avoid_nullable_interpolation` false positive when a `!= null` guard for the interpolated expression is buried inside a compound `&&` condition (e.g. `if (isChurning(f) && f.churn != null)`), not just a bare `if (expr != null)`. No action required.
+- Fixed `avoid_stack_trace_in_production` false positives in developer-tool code: `dart:developer`'s `log()` is now recognized as a diagnostics API (never user-visible output) regardless of package type, and files under a `bin/`/`tool/` directory are skipped even in mixed packages that aren't wholly CLI tools. No action required.
+- Fixed `require_url_validation` false positive on local `file://` path validation — the scheme-guard heuristic now also recognizes `.isScheme('file')` checks and the `file` scheme, not just `.scheme` reads against `https`/`http`. No action required.
+
+- Fixed `runtime_tier` being silently ignored when set in `analysis_options_custom.yaml`. The Config file tab writes this key, but the parser only ever recognized `saropa_tier`, so the chosen value was written to disk and then dropped with no warning. It is now recognized as a deprecated alias and reports a migration warning. Set the tier in the `plugins: saropa_lints:` block to have it take effect.
+- Fixed the Health Panel reporting scan-on-save as "idle" while it was actually disabled — the status only tracked memory-pressure suspension and never read the master switch, so a disabled scanner looked healthy. No action required.
+- Fixed `--format` being swallowed as the target path by the severity report and doctor command-line tools, so the flag had no effect and the positional path was lost. No action required.
+- Fixed selecting a package from the embedded Upgrades tab opening the detail pane behind a hidden tab; the dashboard now switches back to Overview first. No action required.
+
 <details><summary>Maintenance</summary>
 
 - Archived 36 tier-1 quick-win proposals already covered by existing rules — 19 implemented under the same name, 8 under a different name or alias, and 9 identified as functional duplicates of rules shipped in prior versions. Updated 15 migration guides to reflect the closures (TODO → HAVE with correct saropa rule name). No action required.
+- Added fixture coverage for `require_ios_deployment_target_consistency`'s collection-literal guard — GOOD cases with a rule-name string inside a `Set` and as a `Map` value, confirming `isDataLiteralElement()` (shipped in beta.3) already prevents the false positive reported in a duplicate bug report. No action required.
+- Added GOOD fixture cases for `require_catch_logging` and `avoid_swallowing_exceptions` covering fallback-return, loop-continue, and loop-break catch bodies, confirming the return/continue/break handling guard closes the intentional-fallback false positive reported against both rules. No action required.
+- Fixed 12 false-positive rule implementations: `avoid_unsafe_reduce` now skips non-empty list/set literals; `avoid_accessing_collections_by_constant_index` now skips write targets (DP row init); `require_catch_logging` and `avoid_swallowing_exceptions` now accept return/continue/break as valid handling; `avoid_dynamic_calls_extended` now exempts Object methods and try/catch-guarded duck-typing; `avoid_unsafe_cast` now recognizes preceding `is` checks; `avoid_global_state` now exempts lazy-init (`??=`) and managed-lifecycle globals; `avoid_case_sensitive_path_comparison` now skips root-detection idioms and CLI flag literals; `avoid_platform_specific_imports`, `avoid_stack_trace_in_production`, `require_cache_expiration`, `avoid_unbounded_cache_growth`, and `require_url_validation` now skip CLI tool and analyzer plugin packages via new `ProjectContext.isCliOrToolPackage()`. No action required.
+- Extended `avoid_global_state`'s managed-lifecycle exemption to also recognize a same-file `dispose*` function (previously only `clear*`/`reset*`), and confirmed `late final` globals were already exempt via the existing const/final skip. No action required.
+- Fixed unsafe `as Map<String, dynamic>` cast in `audit_baseline.dart` — `jsonDecode` on a valid-but-non-object baseline file (e.g. `[]`) threw `TypeError` instead of returning `null` per the documented contract. Replaced with `is!` type check.
+- Fixed 6 broken `// ignore:` comments missing the `saropa_lints/` prefix — suppressions in `project_context.dart`, `pubspec_constraint_parser.dart` (3), `project_context_parallel_batch.dart`, and `project_vibrancy_resolved_usage.dart` were silently ineffective.
+- Fixed case-sensitive path comparison in `project_vibrancy.dart` — `--file` CLI argument now compared with `p.equals()` for Windows/macOS compatibility.
+- Fixed nullable interpolation in `health_export_markdown.dart` — `churn` field interpolated without null guard, producing "null commits" in markdown export.
+- Fixed forward-slash path construction in `log_writer.dart` (2 sites) and `init_runner.dart` — replaced string interpolation with `p.join()`/`p.basename()` for cross-platform correctness.
+- Filed 13 false-positive bug reports across 13 rules against own-dogfood scan findings (305 total, 295 confirmed FP). See `bugs/` for details.
+- Fixed remaining `require_cache_expiration` / `avoid_unbounded_cache_growth` false positives on content-addressed caches: both rules now skip classes keyed by hash/sha/fingerprint/digest (a stale entry under an unchanged key is structurally impossible), skip files under a `bin/`/`tool/` directory in addition to the existing whole-package check, and skip caches with an explicit `.clear()` call anywhere in the same file. No action required.
+
+- Partially migrated the Package Dashboard's parallel stylesheet onto the shared dashboard chrome: the accessibility helper, hero header, status line, and page layout families now come from the shared layer. The remaining duplicated families cannot be adopted piecemeal because the shared chrome's exported functions bundle unrelated rules — adopting the motion helper would also restyle inline code, and adopting the layout helper drags a full body reset with it. Splitting the chrome into single-concern exports is a prerequisite for finishing this.
+- Reworked the embedded Known issues tab to prefix element ids and scope its script, preventing collisions with the host dashboard's own search and table when both render in one document.
+- Added regression coverage for the areas above: the scan progress event schema and cancel path, the language server's progress notification shape, the rule-catalog correction/OWASP backfill, the report totals parser, the optimizer sort and bulk-select, the rule-detail expander, and the embedded tab contracts.
 
 </details>
 
@@ -125,12 +173,6 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 - Extracted shared `sanitizePath()` utility to `path_guard.dart` — centralizes the normalize-and-reject-traversal pattern so future CLI entry points get path safety automatically. No action required.
 - README rewritten for readability — cut from 1,598 lines to ~430. Extension detail moved to `doc/guides/extension.md`, configuration reference to `doc/guides/configuration.md`, troubleshooting merged into `doc/troubleshooting.md`, FAQ to `doc/faq.md`. Added alternative package coverage table (46 packages audited, ~75% rule coverage). Deleted redundant `plans/GAP_ANALYSIS.md` — per-package data lives in migration guides.
 - Suppressed own-dogfood false positives in `analyzer_compat.dart` (dynamic dispatch, bare catches, swallowed exceptions are intentional version-probing shims) and `scan_runner.dart` (safe-by-construction cast). Fixed nullable interpolation in `DiagnosticCodeLowerCaseCompat.lowerCaseName`.
-- Fixed unsafe `as Map<String, dynamic>` cast in `audit_baseline.dart` — `jsonDecode` on a valid-but-non-object baseline file (e.g. `[]`) threw `TypeError` instead of returning `null` per the documented contract. Replaced with `is!` type check.
-- Fixed 6 broken `// ignore:` comments missing the `saropa_lints/` prefix — suppressions in `project_context.dart`, `pubspec_constraint_parser.dart` (3), `project_context_parallel_batch.dart`, and `project_vibrancy_resolved_usage.dart` were silently ineffective.
-- Fixed case-sensitive path comparison in `project_vibrancy.dart` — `--file` CLI argument now compared with `p.equals()` for Windows/macOS compatibility.
-- Fixed nullable interpolation in `health_export_markdown.dart` — `churn` field interpolated without null guard, producing "null commits" in markdown export.
-- Fixed forward-slash path construction in `log_writer.dart` (2 sites) and `init_runner.dart` — replaced string interpolation with `p.join()`/`p.basename()` for cross-platform correctness.
-- Filed 13 false-positive bug reports across 13 rules against own-dogfood scan findings (305 total, 295 confirmed FP). See `bugs/` for details.
 
 </details>
 

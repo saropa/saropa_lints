@@ -12,6 +12,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../../fixes/core/no_internal_method_docs_fix.dart';
 import '../../fixes/stylistic/deprecated_new_in_comment_reference_fix.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -1561,4 +1562,118 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
       }
     }
   }
+}
+
+// =============================================================================
+// no_internal_method_docs
+// =============================================================================
+
+/// Warns when a `///` DartDoc comment is attached to a private
+/// (leading-underscore) method, function, or constructor.
+///
+/// Since: v14.4.0 | Rule version: v1
+///
+/// DartDoc comments (`///`) are extracted by `dartdoc`/pub.dev to build the
+/// PUBLISHED API reference. Private members (name starts with `_`) are never
+/// part of that surface — a library's own barrel file cannot even export
+/// them — so a `///` comment on a private method or function is either dead
+/// documentation that no reader will ever see rendered, or a signal that the
+/// method was meant to be public and the leading underscore is a mistake.
+/// Either way, the fix is the same: use a plain `//` implementation comment
+/// instead, which still explains the WHY to maintainers reading the source
+/// without implying a public contract that does not exist.
+///
+/// A `@visibleForTesting` annotation does not change this: the annotation
+/// only widens who is *allowed* to call the member, it does not make the
+/// member part of the published API, so DartDoc is still the wrong comment
+/// style for it.
+///
+/// **BAD:**
+/// ```dart
+/// class Parser {
+///   /// Parses the raw header bytes into a [Header].
+///   Header _parseHeader(List<int> bytes) => Header.fromBytes(bytes);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class Parser {
+///   // Parses the raw header bytes; kept private since callers only need
+///   // parse().
+///   Header _parseHeader(List<int> bytes) => Header.fromBytes(bytes);
+/// }
+/// ```
+///
+/// **Quick fix available:** converts each `///` line to `//`.
+class NoInternalMethodDocsRule extends SaropaLintRule {
+  NoInternalMethodDocsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'dart-core', 'documentation'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'no_internal_method_docs',
+    '[no_internal_method_docs] DartDoc (`///`) comment found on a private '
+        '(leading-underscore) method, function, or constructor. Private '
+        'members are never published to dartdoc/pub.dev, so a `///` '
+        'comment on one is either dead documentation nobody will ever see '
+        'rendered, or a sign the member should actually be public. Use a '
+        'plain `//` implementation comment instead so the explanatory text '
+        "is preserved without implying a public API contract. This still "
+        'applies when the member carries @visibleForTesting — that '
+        'annotation widens who may call it, it does not make it part of '
+        'the published API. {v1}',
+    correctionMessage:
+        'Convert the `///` doc comment to a `//` comment (strip one slash '
+        'from each line) or, if the member truly belongs in the public '
+        'API, remove the leading underscore and make it public.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Private instance/static methods and getters/setters.
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.name.lexeme.startsWith('_')) return;
+      final Comment? docComment = node.documentationComment;
+      if (docComment != null) reporter.atNode(docComment);
+    });
+
+    // Private top-level functions. Top-level `main()` is never private by
+    // convention, so no special-case is needed there.
+    context.addFunctionDeclaration((FunctionDeclaration node) {
+      if (!node.name.lexeme.startsWith('_')) return;
+      final Comment? docComment = node.documentationComment;
+      if (docComment != null) reporter.atNode(docComment);
+    });
+
+    // Private (named, underscore-prefixed) constructors, e.g. `Foo._()`.
+    // The unnamed default constructor has no name token to check, so it is
+    // skipped here — its privacy is governed by the enclosing class instead.
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      final Token? nameToken = node.name;
+      if (nameToken == null || !nameToken.lexeme.startsWith('_')) return;
+      final Comment? docComment = node.documentationComment;
+      if (docComment != null) reporter.atNode(docComment);
+    });
+  }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        NoInternalMethodDocsFix(context: context),
+  ];
 }

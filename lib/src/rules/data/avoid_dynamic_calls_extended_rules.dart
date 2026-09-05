@@ -163,6 +163,12 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (_isInsideNoSuchMethod(node)) return;
       if (_hasDynamicStaticType(node.target)) {
+        // Object methods are safe on any dynamic receiver — defined on
+        // Object and cannot throw NoSuchMethodError.
+        if (_isObjectMethod(node.methodName.name)) return;
+        // Dynamic dispatch inside a try with on-NoSuchMethodError catch
+        // is intentional version-probing / duck-typing.
+        if (_isInsideTryCatchGuard(node)) return;
         reporter.atNode(node);
       }
     });
@@ -170,6 +176,9 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
     context.addPropertyAccess((PropertyAccess node) {
       if (_isInsideNoSuchMethod(node)) return;
       if (_hasDynamicStaticType(node.target)) {
+        // hashCode and runtimeType are defined on Object — always safe.
+        if (_isObjectProperty(node.propertyName.name)) return;
+        if (_isInsideTryCatchGuard(node)) return;
         reporter.atNode(node);
       }
     });
@@ -180,6 +189,8 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
       // a PrefixElement with no static type — the DynamicType check below
       // naturally excludes them without needing an explicit element check.
       if (_hasDynamicStaticType(node.prefix)) {
+        if (_isObjectProperty(node.identifier.name)) return;
+        if (_isInsideTryCatchGuard(node)) return;
         reporter.atNode(node);
       }
     });
@@ -326,6 +337,49 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
     );
     node.accept(finder);
     return finder.found;
+  }
+
+  /// Methods defined on Object — always safe to call on `dynamic` because
+  /// every Dart value is an Object. toString/hashCode/runtimeType/noSuchMethod
+  /// cannot throw NoSuchMethodError.
+  static const Set<String> _objectMethods = <String>{
+    'toString',
+    'noSuchMethod',
+  };
+
+  /// Properties defined on Object — always safe to access on `dynamic`.
+  static const Set<String> _objectProperties = <String>{
+    'hashCode',
+    'runtimeType',
+  };
+
+  bool _isObjectMethod(String name) => _objectMethods.contains(name);
+  bool _isObjectProperty(String name) => _objectProperties.contains(name);
+
+  /// Returns true when the node is inside a `try` block whose catch clauses
+  /// include `on NoSuchMethodError`, `on TypeError`, or `on Object` — a
+  /// pattern used for intentional duck-typing across API versions.
+  bool _isInsideTryCatchGuard(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is TryStatement) {
+        for (final CatchClause clause in current.catchClauses) {
+          final TypeAnnotation? exType = clause.exceptionType;
+          if (exType == null) return true; // bare `catch` catches everything
+          final String typeName = exType.toSource();
+          if (typeName == 'NoSuchMethodError' ||
+              typeName == 'TypeError' ||
+              typeName == 'Object') {
+            return true;
+          }
+        }
+      }
+      // Don't escape past function boundaries — a try in an outer scope
+      // does not guard an inner closure.
+      if (current is FunctionBody) return false;
+      current = current.parent;
+    }
+    return false;
   }
 }
 

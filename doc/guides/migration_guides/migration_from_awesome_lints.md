@@ -61,7 +61,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 128 rules — 114 HAVE (89%), 7 PARTIAL, 7 TODO (5%)
+Coverage: 128 rules — 115 HAVE (89%), 7 PARTIAL, 6 TODO (4%)
 
 ### Bloc
 
@@ -135,7 +135,7 @@ Coverage: 128 rules — 114 HAVE (89%), 7 PARTIAL, 7 TODO (5%)
 | `newline_before_case` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_newline_before_case.md) |
 | `newline_before_constructor` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_newline_before_constructor.md) |
 | `newline_before_method` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_newline_before_method.md) |
-| `newline_before_return` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_newline_before_return.md) |
+| `newline_before_return` | HAVE | `prefer_blank_line_before_return` (alias `newline_before_return`) |
 | `no_boolean_literal_compare` | HAVE | `no_boolean_literal_compare` |
 | `no_empty_block` | HAVE | `no_empty_block` |
 | `no_empty_string` | HAVE | `no_empty_string` |

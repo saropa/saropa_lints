@@ -4,7 +4,7 @@ import 'package:saropa_lints/src/rules/packages/equatable_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
 
-/// Tests for 13 Equatable lint rules.
+/// Tests for 14 Equatable lint rules.
 ///
 /// Test fixtures: example_packages/lib/equatable/*
 void main() {
@@ -88,6 +88,11 @@ void main() {
       'AvoidEquatableNestedEqualityRule',
       'avoid_equatable_nested_equality',
       () => AvoidEquatableNestedEqualityRule(),
+    );
+    testRule(
+      'PreferSortedEquatablePropsRule',
+      'prefer_sorted_equatable_props',
+      () => PreferSortedEquatablePropsRule(),
     );
   });
   group('Equatable Rules - Fixture Verification', () {

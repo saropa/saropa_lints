@@ -45,6 +45,12 @@ void main() {
     );
 
     testRule(
+      'AvoidUnnecessaryFactoryConstructorRule',
+      'avoid_unnecessary_factory_constructor',
+      () => AvoidUnnecessaryFactoryConstructorRule(),
+    );
+
+    testRule(
       'AvoidUnnecessaryEnumArgumentsRule',
       'avoid_unnecessary_enum_arguments',
       () => AvoidUnnecessaryEnumArgumentsRule(),

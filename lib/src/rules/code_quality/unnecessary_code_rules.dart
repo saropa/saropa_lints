@@ -361,6 +361,162 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   }
 }
 
+/// Warns when a `factory` constructor's entire body is a single unconditional
+/// `return ClassName(...)` (or `=> ClassName(...)`) forwarding to the class's
+/// own generative constructor with no branching, caching, or side effects.
+///
+/// Since: v14.4.0 | Updated: v14.4.0 | Rule version: v1
+///
+/// The `factory` keyword signals that the constructor may return a
+/// subtype, a cached instance, or choose between multiple construction
+/// paths at runtime. A factory that unconditionally forwards to a plain
+/// `ClassName(...)` call on the SAME class buys nothing over a normal
+/// generative constructor or a redirecting constructor (`Foo.bar() :
+/// this(...)`) — it just adds an extra allocation-free indirection layer
+/// for readers to trace through.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class Point {
+///   Point(this.x, this.y);
+///   final double x, y;
+///
+///   factory Point.origin() {
+///     return Point(0, 0); // factory adds nothing here
+///   }
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Point {
+///   Point(this.x, this.y);
+///   final double x, y;
+///
+///   Point.origin() : this(0, 0); // redirecting constructor instead
+/// }
+///
+/// class Shape {
+///   factory Shape.fromType(String type) { // genuine factory: branches
+///     if (type == 'circle') return Circle();
+///     return Rectangle();
+///   }
+/// }
+///
+/// class Singleton {
+///   static final Singleton _instance = Singleton._();
+///   Singleton._();
+///   factory Singleton() => _instance; // returns a cached instance
+/// }
+/// ```
+class AvoidUnnecessaryFactoryConstructorRule extends SaropaLintRule {
+  AvoidUnnecessaryFactoryConstructorRule() : super(code: _code);
+
+  /// Style/consistency finding — never a correctness issue, so INFO.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  // Single constructor body inspection — cheap AST walk, no resolution needed.
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_unnecessary_factory_constructor',
+    '[avoid_unnecessary_factory_constructor] This factory constructor '
+        'unconditionally forwards to a plain constructor of the same class '
+        'with no branching, caching, or side effects, so the factory '
+        'keyword buys nothing over a normal generative constructor. Readers '
+        'expect factory to mean "may return a subtype, a cached instance, '
+        'or pick between construction paths" — an unconditional forward '
+        'breaks that expectation and adds a pointless indirection layer to '
+        'trace through. {v1}',
+    correctionMessage:
+        'Replace the factory constructor with a plain generative '
+        'constructor, or a redirecting constructor (e.g. '
+        'Foo.name() : this(...)) if it forwards to another constructor of '
+        'the same class.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      // Only factory constructors are in scope — plain/redirecting
+      // constructors are already the "good" shape this rule recommends.
+      if (node.factoryKeyword == null) return;
+
+      // Need the enclosing class name to confirm the forward targets the
+      // SAME class (a forward to a different class is a legitimate factory
+      // pattern, e.g. an interface class dispatching to an impl class).
+      final ClassDeclaration? enclosingClass = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (enclosingClass == null) return;
+      // Use nameToken (not .name) — ClassDeclaration.name was removed
+      // in analyzer 12.x; nameToken is the stable accessor for the class
+      // identifier's Token.
+      final String className = enclosingClass.nameToken.lexeme;
+
+      // Pull the single forwarded InstanceCreationExpression out of either
+      // body shape. Anything other than exactly one bare return/expression
+      // means there is branching, a variable, a cache check, or other logic
+      // — i.e. a genuine factory — so bail out immediately.
+      final InstanceCreationExpression? forwarded = _extractSoleForward(
+        node.body,
+      );
+      if (forwarded == null) return;
+
+      // A caching factory (`=> _instance;`) returns a SimpleIdentifier, not
+      // an InstanceCreationExpression, so it never reaches here — but a
+      // forward to a DIFFERENT class's constructor is still legitimate
+      // (subtype selection), so only flag same-class forwards.
+      final String forwardedTypeName = forwarded.constructorName.type.name
+          .lexeme;
+      if (forwardedTypeName != className) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  /// Returns the [InstanceCreationExpression] that a constructor body
+  /// unconditionally returns, or `null` if the body is anything other than
+  /// exactly one `return expr;` / `=> expr` whose expression is itself a
+  /// bare instance creation (no ternaries, no null-coalescing fallbacks).
+  InstanceCreationExpression? _extractSoleForward(FunctionBody body) {
+    if (body is ExpressionFunctionBody) {
+      final Expression expr = body.expression;
+      return expr is InstanceCreationExpression ? expr : null;
+    }
+
+    if (body is BlockFunctionBody) {
+      // Any statement besides the single return — a null check, a local
+      // variable, an assert, a cache-population line — means this is real
+      // factory logic, not a bare forward.
+      final NodeList<Statement> statements = body.block.statements;
+      if (statements.length != 1) return null;
+
+      final Statement onlyStatement = statements.first;
+      if (onlyStatement is! ReturnStatement) return null;
+
+      final Expression? returned = onlyStatement.expression;
+      return returned is InstanceCreationExpression ? returned : null;
+    }
+
+    // EmptyFunctionBody / NativeFunctionBody etc. — not a forward.
+    return null;
+  }
+}
+
 /// Warns when enum arguments match the default and can be omitted.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4

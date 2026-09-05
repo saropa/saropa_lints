@@ -868,6 +868,146 @@ class PreferVoidCallbackRule extends SaropaLintRule {
   }
 }
 
+/// Flags a `State<X>` class declared above its corresponding `StatefulWidget
+/// X` class in the same file.
+///
+/// Since: v14.4.0 | Updated: v14.4.0 | Rule version: v1
+///
+/// Convention places the `StatefulWidget` first, since it is the public API
+/// surface, with its private `State` implementation below it. A `State`
+/// class declared above its widget inverts this expected top-down reading
+/// order, forcing readers to scroll further down to find the widget the
+/// `State` belongs to.
+///
+/// **BAD:**
+/// ```dart
+/// class _CounterState extends State<Counter> {
+///   int _count = 0;
+/// }
+///
+/// class Counter extends StatefulWidget {
+///   const Counter({super.key});
+///   @override
+///   State<Counter> createState() => _CounterState();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class Counter extends StatefulWidget {
+///   const Counter({super.key});
+///   @override
+///   State<Counter> createState() => _CounterState();
+/// }
+///
+/// class _CounterState extends State<Counter> {
+///   int _count = 0;
+/// }
+/// ```
+class PreferStateClassBelowWidgetRule extends SaropaLintRule {
+  PreferStateClassBelowWidgetRule() : super(code: _code);
+
+  /// Purely a reading-order convention; no correctness or performance impact.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui', 'style'};
+
+  // Needs a full compilation-unit walk to collect every top-level class
+  // declaration and compare offsets across the file (not a single-node
+  // check), so this sits in the more expensive cost bucket.
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'prefer_state_class_below_widget',
+    '[prefer_state_class_below_widget] This State<X> class is declared above its corresponding StatefulWidget X class in the same file, inverting the expected top-down reading order. Convention places the StatefulWidget declaration first, since it is the public API surface, with its private State implementation below it. Reading the file top-to-bottom therefore encounters the State class before knowing which widget it belongs to, forcing readers to scroll further down to locate the corresponding widget declaration. {v1}',
+    correctionMessage:
+        'Move the State<X> class declaration below its corresponding StatefulWidget X class so the widget appears first in the file.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      // Collect every top-level class declaration once, partitioned into
+      // "State<X> subclasses" and "StatefulWidget subclasses" keyed by the
+      // widget's name X, so each Widget/State pair in the file can be
+      // compared independently of how many other pairs exist.
+      final Map<String, ClassDeclaration> stateClassesByWidgetName =
+          <String, ClassDeclaration>{};
+      final Map<String, ClassDeclaration> widgetClassesByName =
+          <String, ClassDeclaration>{};
+
+      for (final CompilationUnitMember member in node.declarations) {
+        if (member is! ClassDeclaration) continue;
+
+        final ExtendsClause? extendsClause = member.extendsClause;
+        if (extendsClause == null) continue;
+        final NamedType superclass = extendsClause.superclass;
+        final String superclassName = superclass.name.lexeme;
+
+        if (superclassName == 'State') {
+          // Extract the concrete widget name from the generic argument,
+          // e.g. `State<Counter>` -> `Counter`. A bare `State` or
+          // `State<dynamic>` has no concrete widget name to correlate
+          // against, so it is skipped rather than guessed at.
+          final String? widgetName = _widgetNameFromStateSuperclass(
+            superclass,
+          );
+          if (widgetName != null) {
+            stateClassesByWidgetName[widgetName] = member;
+          }
+        } else if (superclassName == 'StatefulWidget') {
+          widgetClassesByName[member.nameToken.lexeme] = member;
+        }
+      }
+
+      // Only flag a State<X> class when a matching StatefulWidget X exists
+      // in the SAME file and the State's offset precedes it. A State class
+      // with no matching widget in this file has nothing to compare
+      // against and is intentionally left unreported.
+      for (final MapEntry<String, ClassDeclaration> entry
+          in stateClassesByWidgetName.entries) {
+        final ClassDeclaration? widgetClass = widgetClassesByName[entry.key];
+        if (widgetClass == null) continue;
+
+        final ClassDeclaration stateClass = entry.value;
+        if (stateClass.offset < widgetClass.offset) {
+          reporter.atToken(stateClass.nameToken, code);
+        }
+      }
+    });
+  }
+
+  /// Returns the concrete widget type name from a `State<X>` superclass
+  /// (e.g. `Counter` from `State<Counter>`), or null when there is no
+  /// single named type argument to correlate against (bare `State`,
+  /// `State<dynamic>`, or a superclass with more than one type argument).
+  static String? _widgetNameFromStateSuperclass(NamedType superclass) {
+    final TypeArgumentList? typeArguments = superclass.typeArguments;
+    if (typeArguments == null) return null;
+    final NodeList<TypeAnnotation> arguments = typeArguments.arguments;
+    if (arguments.length != 1) return null;
+
+    final TypeAnnotation argument = arguments.first;
+    if (argument is! NamedType) return null;
+    final String name = argument.name.lexeme;
+    if (name == 'dynamic') return null;
+    return name;
+  }
+}
+
 /// Warns when InheritedWidget doesn't override updateShouldNotify.
 ///
 /// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v3

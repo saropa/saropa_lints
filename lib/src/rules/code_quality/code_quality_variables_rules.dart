@@ -1763,6 +1763,100 @@ bool _isRenderObjectParentDataClass(ClassDeclaration node) {
 bool _isParentDataTypeName(String? typeName) =>
     typeName == 'ParentData' || (typeName?.endsWith('ParentData') ?? false);
 
+/// Warns when a public `late final` field has no inline initializer.
+///
+/// A public `late final` field with no initializer is an implicit contract:
+/// something outside the class must assign it exactly once before its first
+/// read. Nothing in the public API communicates when that assignment must
+/// happen, so callers can easily read the field too early and trigger a
+/// `LateInitializationError` at runtime. Private fields (leading `_`) are
+/// exempt because the declaring class alone controls every assignment site,
+/// so the "external contract" risk this rule targets does not apply.
+///
+/// Since: v14.4.0 | Updated: v14.4.0 | Rule version: v1
+///
+/// Example of **bad** code:
+/// ```dart
+/// class UploadTask {
+///   late final String uploadId; // public, no initializer - crash risk
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// class UploadTask {
+///   late final String _uploadId; // private - class controls assignment
+/// }
+///
+/// class UploadTask {
+///   late final String uploadId = _generateId(); // has an initializer
+/// }
+/// ```
+class AvoidPublicLateFinalWithoutInitializerRule extends SaropaLintRule {
+  AvoidPublicLateFinalWithoutInitializerRule() : super(code: _code);
+
+  // Design-contract issue: a public API with a hidden required assignment
+  // step. Nothing is broken yet, but it is a LateInitializationError waiting
+  // to happen, so this is a warning rather than merely informational.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  // Single-node check on the field declaration's syntax (late/final/name/
+  // initializer presence) with no traversal of constructors or methods.
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_public_late_final_without_initializer',
+    '[avoid_public_late_final_without_initializer] Public late final field '
+        'has no inline initializer. This is an implicit contract that '
+        'something outside the class must assign the field exactly once '
+        'before its first read, but nothing in the public API communicates '
+        'when that assignment must happen. Reading the field before it is '
+        'assigned throws a LateInitializationError at runtime, a failure '
+        'the compiler cannot catch statically because the assignment is '
+        'deferred to code outside this declaration. {v1}',
+    correctionMessage:
+        'Make the field private (prefix with _) so the class controls '
+        'when it is assigned, or add an inline initializer if the value '
+        'can be computed eagerly or lazily at declaration time.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addFieldDeclaration((FieldDeclaration node) {
+      final VariableDeclarationList fields = node.fields;
+
+      // Only "late final" is the implicit "assign me exactly once, later"
+      // contract this rule targets; late-non-final and non-late fields are
+      // out of scope.
+      if (fields.lateKeyword == null || !fields.isFinal) return;
+
+      for (final VariableDeclaration variable in fields.variables) {
+        // An inline initializer makes the field self-documenting about its
+        // value, so it is exempt regardless of visibility.
+        if (variable.initializer != null) continue;
+
+        // Private fields are exempt: the declaring class controls every
+        // assignment site, so there is no "external contract" risk.
+        if (variable.name.lexeme.startsWith('_')) continue;
+
+        reporter.atToken(variable.name);
+      }
+    });
+  }
+}
+
 /// Warns when late is used but field is assigned in constructor.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5

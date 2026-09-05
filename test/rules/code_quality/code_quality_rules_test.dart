@@ -382,6 +382,12 @@ void main() {
     );
 
     testRule(
+      'AvoidPublicLateFinalWithoutInitializerRule',
+      'avoid_public_late_final_without_initializer',
+      () => AvoidPublicLateFinalWithoutInitializerRule(),
+    );
+
+    testRule(
       'AvoidUnnecessaryLateFieldsRule',
       'avoid_unnecessary_late_fields',
       () => AvoidUnnecessaryLateFieldsRule(),

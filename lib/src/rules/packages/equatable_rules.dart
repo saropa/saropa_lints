@@ -1519,3 +1519,195 @@ class AvoidEquatableNestedEqualityRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_sorted_equatable_props
+// =============================================================================
+
+/// Warns when `props` lists fields in a different order than they were
+/// declared in the class body.
+///
+/// Since: v14.4.0 | Rule version: v1
+///
+/// `props` order has no effect on equality or hashing — `Equatable`
+/// compares element-by-element position-independently of the source field
+/// layout, so a reordered list is never a functional bug. It is, however, a
+/// maintenance hazard: a reviewer skimming the field declarations naturally
+/// expects `props` to mirror that order, and a `props` list that silently
+/// drifts out of sync makes it much easier to miss a genuinely *missing*
+/// field (see `list_all_equatable_fields`) because the reviewer can no
+/// longer just diff the two lists positionally.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class Person extends Equatable {
+///   final String name;
+///   final int age;
+///   final String email;
+///   const Person(this.name, this.age, this.email);
+///   @override
+///   List<Object?> get props => [age, name, email]; // out of order
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Person extends Equatable {
+///   final String name;
+///   final int age;
+///   final String email;
+///   const Person(this.name, this.age, this.email);
+///   @override
+///   List<Object?> get props => [name, age, email]; // matches declaration order
+/// }
+/// ```
+class PreferSortedEquatablePropsRule extends SaropaLintRule {
+  PreferSortedEquatablePropsRule() : super(code: _code);
+
+  /// Readability-only concern: props order never affects equality/hashCode.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  // Cheap pre-filter: skip parsing files that can't possibly declare an
+  // Equatable subclass at all.
+  @override
+  Set<String>? get requiredPatterns => const <String>{'Equatable'};
+
+  static const LintCode _code = LintCode(
+    'prefer_sorted_equatable_props',
+    '[prefer_sorted_equatable_props] The props getter of this Equatable '
+        'subclass lists fields in a different order than they were '
+        'declared in the class body. Equatable compares props '
+        'element-by-element, so the order has no effect on equality or '
+        'hashCode correctness — but a props list that has drifted out of '
+        'sync with the field declaration order is a maintenance hazard: '
+        'reviewers naturally expect to diff the two lists positionally to '
+        'confirm every field is covered, and a silently reordered list '
+        'makes it far easier to overlook a field that is missing entirely, '
+        'or to introduce a copy-paste mistake the next time a field is '
+        'added. Keeping props in declaration order keeps the getter '
+        'self-documenting and trivial to audit at a glance. {v1}',
+    correctionMessage:
+        'Reorder the props list so its fields appear in the same order as '
+        'the corresponding field declarations in the class body.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      // Only Equatable/EquatableMixin classes carry a meaningful `props`.
+      if (!isEquatable(node)) return;
+
+      // Field declaration order, as written in the class body. Static
+      // fields are excluded since they can never appear in an instance
+      // props list.
+      final List<String> declaredOrder = <String>[];
+      for (final ClassMember member in node.bodyMembers) {
+        if (member is FieldDeclaration && !member.isStatic) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            declaredOrder.add(variable.name.lexeme);
+          }
+        }
+      }
+      if (declaredOrder.isEmpty) return;
+
+      // Locate the props getter; nothing to compare without one (the
+      // missing-getter case is already covered by
+      // require_equatable_props_override / list_all_equatable_fields).
+      MethodDeclaration? propsGetter;
+      for (final ClassMember member in node.bodyMembers) {
+        if (member is MethodDeclaration &&
+            member.isGetter &&
+            member.name.lexeme == 'props') {
+          propsGetter = member;
+          break;
+        }
+      }
+      if (propsGetter == null) return;
+
+      // Extract the props list literal, from either an arrow body or a
+      // single return statement inside a block body.
+      final ListLiteral? propsList = _extractPropsListLiteral(
+        propsGetter.body,
+      );
+      if (propsList == null) return;
+
+      // Only plain identifiers count as "a field reference" for ordering
+      // purposes — anything else (a method call, `DeepCollectionEquality`
+      // wrapper, literal) can't be matched back to a declared field name
+      // and is skipped rather than guessed at.
+      final List<String> propsOrder = <String>[];
+      for (final CollectionElement element in propsList.elements) {
+        if (element is SimpleIdentifier) {
+          propsOrder.add(element.name);
+        } else if (element is PropertyAccess &&
+            element.target is ThisExpression) {
+          propsOrder.add(element.propertyName.name);
+        }
+      }
+
+      // Compare only the names that appear in BOTH lists — a field missing
+      // from props (or an extra props entry with no matching field) is a
+      // different, already-covered concern, not an ordering one.
+      final Set<String> declaredSet = declaredOrder.toSet();
+      final List<String> filteredDeclaredOrder = declaredOrder
+          .where(propsOrder.toSet().contains)
+          .toList();
+      final List<String> filteredPropsOrder = propsOrder
+          .where(declaredSet.contains)
+          .toList();
+
+      // Fewer than two shared fields means there is no possible ordering
+      // to violate.
+      if (filteredDeclaredOrder.length < 2) return;
+
+      if (!_sameOrder(filteredDeclaredOrder, filteredPropsOrder)) {
+        reporter.atNode(propsList);
+      }
+    });
+  }
+
+  /// Pulls the returned list literal out of an expression-bodied or
+  /// block-bodied getter. Returns null for any other shape (e.g. a getter
+  /// that computes props via a helper call rather than a literal).
+  ListLiteral? _extractPropsListLiteral(FunctionBody body) {
+    if (body is ExpressionFunctionBody) {
+      final Expression expr = body.expression;
+      return expr is ListLiteral ? expr : null;
+    }
+    if (body is BlockFunctionBody) {
+      for (final Statement statement in body.block.statements) {
+        if (statement is ReturnStatement) {
+          final Expression? expr = statement.expression;
+          if (expr is ListLiteral) return expr;
+        }
+      }
+    }
+    return null;
+  }
+
+  /// True when [a] and [b] are the same length and equal element-by-element
+  /// (i.e. identical order, not just identical membership).
+  bool _sameOrder(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+}
