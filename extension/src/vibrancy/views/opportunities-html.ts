@@ -18,6 +18,15 @@ import { VibrancyResult } from '../types';
 import { createWebviewCspNonce, escapeHtml } from './html-utils';
 import { getReportStyles } from './report-styles';
 import { getPackageDetailStylesScoped } from './package-detail-styles';
+// Phase 5 style migration: pull the canonical :root tokens (spacing/radius/type
+// scale, semantic colors) in ADDITIVELY alongside the legacy report-styles
+// system. This view's markup uses report-styles-parts.ts class names almost
+// exclusively (only ~14/171 selectors already overlap dashboardChromeStyles'
+// component vocabulary), so swapping to the full chrome component stylesheet
+// would require rewriting this file's markup, not just its CSS import -- out
+// of scope for this incremental step. Adding the token layer is zero-risk: it
+// only defines new CSS custom properties, it never overrides an existing rule.
+import { getDashboardTokens } from '../../views/dashboardChromeStyles';
 import { l10n } from '../../i18n/runtime';
 import { activeFileUsages } from '../types';
 
@@ -71,7 +80,7 @@ export function buildOpportunitiesHtml(
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; img-src https: data:; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
-    <style nonce="${nonce}">${getReportStyles()}${getPackageDetailStylesScoped()}${getOpportunitiesStyles()}</style>
+    <style nonce="${nonce}">${getDashboardTokens()}${getReportStyles()}${getPackageDetailStylesScoped()}${getOpportunitiesStyles()}</style>
 </head>
 <body>
     <header class="report-header">

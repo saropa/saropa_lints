@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.3] - Unreleased
+## [16.0.0-beta.3] — Unreleased
 
 ### Changed
 
@@ -89,11 +89,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - Fixed 15 pre-existing extension test failures: added missing `onDidChangeConfiguration` mock (13 issuesTree tests), updated stale locale coverage assertions (languagePick), and updated sidebar panel count from 5 to 4 after Help view removal (uxLabels). No action required.
 - Updated stale path reference in the UI redesign plan after archiving completed sub-plans. No action required.
+- Package Dashboard (Overview and Upgrades tabs): now pulls its color/spacing/radius design tokens from the same canonical token layer already used by the Settings and tab-bar surfaces, instead of only the legacy report stylesheet. No visible change — additive groundwork for retiring the older parallel styling system.
 
 </details>
 
 ---
-
 ## [16.0.0-beta.2]
 
 Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)

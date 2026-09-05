@@ -13,6 +13,16 @@
 
 import { countByCategory, scoreToGrade } from '../scoring/status-classifier';
 import { getReportStyles } from './report-styles';
+// Phase 5 style migration (see plans/PLAN_extension_ui_redesign.md, Phase 5):
+// pull in the canonical :root token layer alongside the legacy report-styles
+// system. This is the main Package Dashboard shell -- its markup vocabulary
+// (report-header, dash-split, scan-progress, ...) is almost entirely disjoint
+// from dashboardChromeStyles' component classes, so a full swap to
+// getDashboardChromeStyles() would break rendering until the markup itself is
+// rewritten. Adding only the token subset is additive (new custom properties,
+// no rule overrides) so it carries zero visual-regression risk while moving
+// this consumer one step closer to the single design-system goal.
+import { getDashboardTokens } from '../../views/dashboardChromeStyles';
 import { getPackageDetailStylesScoped } from './package-detail-styles';
 import { getPillButtonStyles } from './pill-button-styles';
 import { getReportScript } from './report-script';
@@ -123,7 +133,7 @@ export function buildReportHtml(options: ReportOptions): string {
          via SMIL <animate>, so no inline style attributes are needed. -->
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
-    <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}${getPackagesTabsStyles()}${getSettingsTabStyles()}</style>
+    <style nonce="${cspNonce}">${getDashboardTokens()}${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}${getPackagesTabsStyles()}${getSettingsTabStyles()}</style>
 </head>
 <body>
     <header class="report-header">
