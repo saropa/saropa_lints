@@ -27,6 +27,7 @@ library;
 // warning / info). `bin/impact_report.dart` remains as a thin forwarder so
 // existing `dart run saropa_lints:impact_report` invocations keep working.
 
+import 'dart:convert' show JsonEncoder;
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';
@@ -40,10 +41,33 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final path = args.isNotEmpty ? args.first : '.';
+  // WP2 (plans/PLAN_ext_ui_dart_deferred.md): `--format json` is the first of
+  // 7 report CLIs to grow a machine-readable output so the Project Map
+  // Reports tab can render real File/Line/Rule/Message columns instead of a
+  // generic line-number table. Parsed by hand (not `_readOption`, which lives
+  // only in accuracy_report.dart) so this CLI keeps zero new dependencies;
+  // `--format` consumes its value here so it is never mistaken for the
+  // positional <path> below (previously `args.first` — a bare `--format`
+  // would have been swallowed as the project path).
+  String? path;
+  String? format;
+  for (var i = 0; i < args.length; i++) {
+    final arg = args[i];
+    if (arg == '--format' && i + 1 < args.length) {
+      format = args[++i];
+    } else if (!arg.startsWith('-') && path == null) {
+      path = arg;
+    }
+  }
+  path ??= '.';
+  final asJson = format == 'json';
 
-  print('Running lint analysis...');
-  print('');
+  // JSON mode never prints the human progress banner — its stdout must be
+  // pure JSON for the extension's JSON.parse to succeed.
+  if (!asJson) {
+    print('Running lint analysis...');
+    print('');
+  }
 
   final result = await Process.run(
     'dart',
@@ -56,14 +80,29 @@ Future<void> main(List<String> args) async {
   final stderr = result.stderr.toString();
 
   if (stderr.isNotEmpty && !stderr.contains('Analyzing')) {
-    print('Error running dart analyze:');
-    print(stderr);
+    // JSON mode: an error object instead of freeform text, so a consumer that
+    // always JSON.parse()s stdout (the extension's Reports tab) never trips
+    // over a non-JSON failure payload.
+    if (asJson) {
+      print(
+        const JsonEncoder.withIndent('  ').convert({'error': stderr.trim()}),
+      );
+    } else {
+      print('Error running dart analyze:');
+      print(stderr);
+    }
     exit(1);
   }
 
   final violations = parseViolations(output);
 
   if (violations.isEmpty) {
+    if (asJson) {
+      // Empty array, not `{}` — the TS row parser always expects a JSON
+      // array to map over regardless of violation count.
+      print(const JsonEncoder.withIndent('  ').convert(<Object?>[]));
+      return;
+    }
     print('No issues found!');
     print('');
     print('Severity Summary');
@@ -72,6 +111,22 @@ Future<void> main(List<String> args) async {
     print('WARNINGS: 0');
     print('INFO:     0');
 
+    return;
+  }
+
+  // JSON mode short-circuits before any of the human-readable print()s below
+  // — `violationsToJsonRows` is the single source of truth for the schema,
+  // exercised directly by test/report/severity_report_json_test.dart.
+  if (asJson) {
+    print(
+      const JsonEncoder.withIndent(
+        '  ',
+      ).convert(violationsToJsonRows(violations)),
+    );
+    // Exit code contract is unchanged by --format: caller (CI, the extension)
+    // still gets a non-zero code proportional to the error count.
+    final errorCount = violations.where((v) => v.impact == LintImpact.error).length;
+    if (errorCount > 0) exit(errorCount > 125 ? 125 : errorCount);
     return;
   }
 
@@ -144,6 +199,27 @@ Future<void> main(List<String> args) async {
   }
 }
 
+/// Converts violations into the `--format json` row shape: `file`, `line`,
+/// `column`, `rule`, `severity`, `message`. Extracted (public, no leading
+/// underscore) so a unit test can pin the schema without spawning
+/// `dart analyze` — `main()` is otherwise untestable in isolation because it
+/// always shells out to the real analyzer. `severity` mirrors
+/// `Violation.impact` (error/warning/info) with `warning` as the fallback for
+/// the rare violation whose rule has no registered impact.
+List<Map<String, Object?>> violationsToJsonRows(List<Violation> violations) {
+  return [
+    for (final v in violations)
+      {
+        'file': v.file,
+        'line': v.line,
+        'column': v.column,
+        'rule': v.rule,
+        'severity': v.impact?.name ?? 'warning',
+        'message': v.message,
+      },
+  ];
+}
+
 void _printUsage() {
   print('saropa_lints Severity Report');
   print('');
@@ -153,7 +229,9 @@ void _printUsage() {
   print('Errors are shown first, then warnings, then info.');
   print('');
   print('Options:');
-  print('  --help, -h    Show this help message');
+  print('  --help, -h        Show this help message');
+  print('  --format json     Machine-readable JSON array of');
+  print('                    {file,line,column,rule,severity,message} rows');
   print('');
   print('Exit codes:');
   print('  0             No errors');
@@ -162,4 +240,5 @@ void _printUsage() {
   print('Example:');
   print('  dart run saropa_lints:severity_report');
   print('  dart run saropa_lints:severity_report ./my_project');
+  print('  dart run saropa_lints:severity_report --format json ./my_project');
 }

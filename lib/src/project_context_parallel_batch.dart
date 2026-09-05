@@ -176,7 +176,7 @@ class ParallelAnalyzer {
   /// Returns analysis results for each file. Results are cached automatically.
   /// Uses Isolate.run() for true parallel execution when available.
   static Future<List<ParallelAnalysisResult>> analyzeFiles({
-    // ignore: avoid_redundant_async
+    // ignore: saropa_lints/avoid_redundant_async
     required List<String> filePaths,
     required Set<String> patterns,
   }) async {

@@ -25,6 +25,7 @@ import 'line_metrics.dart';
 import 'maintainability_index.dart';
 import 'metrics_model.dart';
 import 'perf_gravity.dart';
+import 'scan_progress.dart';
 
 /// Directory names whose subtrees never count toward project size (build
 /// artifacts, VCS internals, tool caches) — they are not source the developer
@@ -56,6 +57,7 @@ class SizeScanOptions {
     this.coupling,
     this.complexityCache,
     this.cacheSink,
+    this.progress,
   });
 
   final String projectPath;
@@ -100,6 +102,12 @@ class SizeScanOptions {
   /// Mutable sink the scan fills with the current run's cache (hits carried
   /// forward, misses recomputed) for the caller to persist.
   final Map<String, CacheEntry>? cacheSink;
+
+  /// Opt-in live progress + pause/cancel sink (WP1, `--progress`/`--control`
+  /// on `bin/project_health.dart`). Null (the default) makes this scan
+  /// byte-for-byte identical to before the feature existed — CI/non-streaming
+  /// callers pay no extra enumeration pass and see no behavior change.
+  final ProjectScanProgress? progress;
 }
 
 /// Scans `.dart` files under [SizeScanOptions.projectPath] and returns the
@@ -115,6 +123,25 @@ Future<HealthAggregator> runSizeScan(SizeScanOptions options) async {
   final dir = Directory(root);
   if (!dir.existsSync()) return agg;
 
+  // --progress needs a total up front to render "43% — 812/1900 files", but
+  // this scan is normally a single streaming pass (module header: "only one
+  // file's content is ever held in memory"). Rather than break that guarantee,
+  // pay for a SECOND, content-free enumeration (just stat + path checks, no
+  // file reads) purely to count eligible files — and only when a progress
+  // sink was actually supplied, so the non-streaming (CI/default) path is
+  // completely unaffected.
+  final total = options.progress == null
+      ? null
+      : await _countEligibleFiles(dir, root, excludes);
+  if (options.progress != null) {
+    options.progress!.onEvent(<String, Object?>{
+      'event': 'phase',
+      'phase': 'size',
+      'total': total,
+    });
+  }
+
+  var scanned = 0;
   await for (final entity in dir.list(recursive: true, followLinks: false)) {
     if (entity is! File || !entity.path.endsWith('.dart')) continue;
     final rel = p.relative(entity.path, from: root).replaceAll('\\', '/');
@@ -125,12 +152,52 @@ Future<HealthAggregator> runSizeScan(SizeScanOptions options) async {
     // filter Code Health (project_vibrancy) already applies.
     if (isGeneratedDartPath(rel)) continue;
     if (excludes.any((re) => re.hasMatch(rel))) continue;
+    // Cooperative pause/cancel point (mirrors project_vibrancy's per-file
+    // gate): checked before the file is read so a paused scan holds here
+    // instead of mid-measurement, and a canceled scan throws before doing any
+    // more work.
+    await options.progress?.gate();
+    // Emit BEFORE measuring (not after) so the panel shows the file currently
+    // being scanned rather than the one just finished — same rationale as
+    // project_vibrancy's 'tick' event.
+    options.progress?.onEvent(<String, Object?>{
+      'event': 'tick',
+      'phase': 'size',
+      'done': scanned,
+      'total': total,
+      'file': rel,
+    });
+    scanned++;
     final row = await _measure(entity, rel, options);
     if (row == null) continue;
     agg.add(row);
     await options.onRow?.call(row);
   }
+  if (options.progress != null) {
+    options.progress!.onEvent(<String, Object?>{'event': 'done'});
+  }
   return agg;
+}
+
+/// Content-free companion pass to the main scan loop above: applies the SAME
+/// eligibility filters (extension, excluded dirs, exclude globs, generated-file
+/// skip) but only stats paths — never reads file content — so computing the
+/// `--progress` total is cheap even on a large project.
+Future<int> _countEligibleFiles(
+  Directory dir,
+  String root,
+  List<RegExp> excludes,
+) async {
+  var count = 0;
+  await for (final entity in dir.list(recursive: true, followLinks: false)) {
+    if (entity is! File || !entity.path.endsWith('.dart')) continue;
+    final rel = p.relative(entity.path, from: root).replaceAll('\\', '/');
+    if (_hasExcludedSegment(rel)) continue;
+    if (isGeneratedDartPath(rel)) continue;
+    if (excludes.any((re) => re.hasMatch(rel))) continue;
+    count++;
+  }
+  return count;
 }
 
 /// Reads one file and builds its [FileHealth], or null if it cannot be read.

@@ -99,7 +99,7 @@ List<String> _actions(Hotspot spot) {
         : '${f.deadSymbols} unreferenced symbol(s) — verify (not reflection/generated), then remove.';
     actions.add('Remove dead weight: $what');
   }
-  if (spot.reasons.contains('churning')) {
+  if (spot.reasons.contains('churning') && spot.file.churn != null) {
     actions.add(
       'High churn (${spot.file.churn} commits): stabilize the interface and add '
       'tests — frequently-changed code with low coverage is the top risk.',

@@ -32,6 +32,14 @@ void main() {
       );
     }
 
+    // Several tests below assert on side effects (platform section survives,
+    // overrides section survives) of the identical "template + single pack
+    // write" setup — factor it out so those tests only differ in the assert.
+    void writeTemplateWithPacks(List<String> packs) {
+      writeTemplate();
+      writeRulePacksToCustomFile(customFile, packs);
+    }
+
     test('writes packs into a fresh template file', () {
       writeTemplate();
       writeRulePacksToCustomFile(customFile, ['drift', 'collection_compat']);
@@ -46,8 +54,7 @@ void main() {
     });
 
     test('preserves PLATFORM SETTINGS section when writing packs', () {
-      writeTemplate();
-      writeRulePacksToCustomFile(customFile, ['drift']);
+      writeTemplateWithPacks(['drift']);
       final content = customFile.readAsStringSync();
 
       // The platform section header must survive.
@@ -83,8 +90,7 @@ void main() {
     });
 
     test('preserves RULE OVERRIDES section', () {
-      writeTemplate();
-      writeRulePacksToCustomFile(customFile, ['drift']);
+      writeTemplateWithPacks(['drift']);
       final content = customFile.readAsStringSync();
 
       expect(content.contains('# RULE OVERRIDES'), isTrue);

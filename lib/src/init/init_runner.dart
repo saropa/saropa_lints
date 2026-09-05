@@ -594,10 +594,13 @@ Future<void> runInit(List<String> args) async {
     // Create backup before overwriting
     try {
       final outputDir = outputFile.parent.path;
-      final outputName = cliArgs.outputPath.split('/').last.split('\\').last;
+      // Use p.basename for platform-safe filename extraction.
+      final outputName = p.basename(cliArgs.outputPath);
       // Default nullable timestamp to 'unset' (avoid_nullable_interpolation).
-      final backupPath =
-          '$outputDir/${log.timestamp ?? 'unset'}_$outputName.bak';
+      final backupPath = p.join(
+        outputDir,
+        '${log.timestamp ?? 'unset'}_$outputName.bak',
+      );
       outputFile.copySync(backupPath);
     } on Exception catch (e, st) {
       dev.log('Backup before overwrite failed', error: e, stackTrace: st);

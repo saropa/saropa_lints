@@ -11,6 +11,7 @@ library;
 
 // ignore_for_file: avoid_print
 
+import 'dart:convert' show JsonEncoder;
 import 'dart:io';
 
 import 'package:saropa_lints/src/cli/path_guard.dart';
@@ -32,9 +33,27 @@ void main(List<String> args) {
     return;
   }
 
+  // WP2 (plans/PLAN_ext_ui_dart_deferred.md): `--format json` for the
+  // Project Map Reports tab. `--format` must consume its own value here —
+  // the old `args.where((a) => !a.startsWith('-')).firstOrNull` picked the
+  // FIRST non-dash token as the project directory, which would have silently
+  // swallowed a bare "json" value as the directory the moment this flag was
+  // added.
+  String? format;
+  final positional = <String>[];
+  for (var i = 0; i < args.length; i++) {
+    final arg = args[i];
+    if (arg == '--format' && i + 1 < args.length) {
+      format = args[++i];
+    } else if (!arg.startsWith('-')) {
+      positional.add(arg);
+    }
+  }
+  final asJson = format == 'json';
+
   // Sanitize the user-supplied project directory to block path traversal.
   final dir = sanitizePath(
-    args.where((a) => !a.startsWith('-')).firstOrNull ?? '.',
+    positional.firstOrNull ?? '.',
     label: 'project directory',
   );
   final sep = Platform.pathSeparator;
@@ -57,6 +76,19 @@ void main(List<String> args) {
   final issues = _diagnose(mainContent, customExists: customFile.existsSync());
 
   // --- Report ---
+  // JSON mode short-circuits before any human-readable print()s — the row
+  // schema (`issueToJson`) is the single source of truth, exercised directly
+  // by test/config/doctor_test.dart so it can never drift from the text path.
+  if (asJson) {
+    print(
+      const JsonEncoder.withIndent(
+        '  ',
+      ).convert([for (final issue in issues) issueToJson(issue)]),
+    );
+    exitCode = issues.isEmpty ? 0 : 1;
+    return;
+  }
+
   if (issues.isEmpty) {
     print('No configuration issues found.');
     exitCode = 0;
@@ -79,6 +111,26 @@ void main(List<String> args) {
   }
 
   exitCode = 1;
+}
+
+/// Converts one `[key] message` diagnostic string (the shape `_diagnose`
+/// already produces and `doctor_test.dart` already asserts on) into a
+/// structured `--format json` row. Reusing the existing bracket-prefixed
+/// string as the single source of truth avoids a second, parallel
+/// structured-issue model that could drift from the text output.
+///
+/// Public (no leading underscore) so a unit test can pin the schema.
+Map<String, Object?> issueToJson(String issue) {
+  final match = RegExp(r'^\[(\w+)\]\s*(.*)$').firstMatch(issue);
+  final key = match?.group(1) ?? 'unknown';
+  final message = match?.group(2) ?? issue;
+  return {
+    'key': key,
+    // '[plugin]' means the plugin never loads at all — that's fatal, not a
+    // tolerated misconfiguration, so it alone gets 'error' severity.
+    'severity': key == 'plugin' ? 'error' : 'warning',
+    'message': message,
+  };
 }
 
 /// Runs all diagnostic checks and returns a list of issue descriptions.
@@ -211,5 +263,7 @@ void _printUsage() {
   print('  - Missing version constraint');
   print('');
   print('Options:');
-  print('  -h, --help    Show this help message');
+  print('  -h, --help        Show this help message');
+  print('  --format json     Machine-readable JSON array of');
+  print('                    {key,severity,message} rows');
 }

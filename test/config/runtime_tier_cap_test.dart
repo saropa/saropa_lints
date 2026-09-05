@@ -33,6 +33,30 @@ void main() {
         'essential',
       );
     });
+
+    // WP3 regression test (PLAN_ext_ui_dart_deferred.md): the Config file tab
+    // (rulePacksWebviewProvider.ts) offers a SEPARATE `runtime_tier` select
+    // that writes top-level `runtime_tier:` into analysis_options_custom.yaml
+    // — distinct from the `saropa_tier` select. Before this fix the regex here
+    // only matched the literal `saropa_tier`, so a value written via the
+    // `runtime_tier` select was parsed as `null` (silently dropped, no
+    // deprecation warning, no effect) even though the extension had written
+    // it to disk. This is a POSITIVE test — it asserts the real config value
+    // actually flows through the parser, not just that null/absent input is
+    // handled (see MEMORY.md: "Parsers need positive tests").
+    test('parses top-level runtime_tier (Config file tab writes this key)', () {
+      expect(
+        parseSaropaTierFromCustomYaml('runtime_tier: comprehensive\n'),
+        'comprehensive',
+      );
+    });
+
+    test('parses quoted top-level runtime_tier', () {
+      expect(
+        parseSaropaTierFromCustomYaml("runtime_tier: 'pedantic'\n"),
+        'pedantic',
+      );
+    });
   });
 
   group('parseSaropaTierFromPluginBlock', () {
@@ -99,6 +123,45 @@ plugins:
       expect(RuntimeTierCap.ruleAllowedByCap(essentialRule), isTrue);
       expect(RuntimeTierCap.ruleAllowedByCap('avoid_unguarded_debug'), isFalse);
     });
+
+    // WP3 end-to-end pin: top-level `runtime_tier:` in analysis_options_custom.yaml
+    // is now PARSED (see parseSaropaTierFromCustomYaml above — no longer a
+    // silent no-op), but by design it still does NOT resolve the active cap:
+    // analysis_options.yaml's plugins.saropa_lints block remains the sole
+    // source of truth (doc comment atop this file). This test asserts BOTH
+    // halves of that contract in one place so a future change can't silently
+    // start honoring the deprecated key without a deliberate test update —
+    // the plugin-block tier below must still win even though the custom file
+    // also sets a (different) tier.
+    test(
+      'top-level runtime_tier in custom yaml is parsed but does not override '
+      'the plugins.saropa_lints tier',
+      () {
+        final tmp = Directory.systemTemp.createTempSync(
+          'saropa_runtime_tier_custom_',
+        );
+        addTearDown(() => safeDeleteDir(tmp));
+
+        File('${tmp.path}/analysis_options.yaml').writeAsStringSync('''
+plugins:
+  saropa_lints:
+    runtime_tier: essential
+''');
+        // Deliberately a DIFFERENT tier than the plugin block, so the test can
+        // tell whether this deprecated key silently won (it must not).
+        File(
+          '${tmp.path}/analysis_options_custom.yaml',
+        ).writeAsStringSync('runtime_tier: pedantic\n');
+
+        reloadRuntimeTierCapFromProject(tmp.path, {});
+
+        // The plugin-block tier (essential) wins; the custom-yaml runtime_tier
+        // (pedantic) is recognized by the parser (proven above) but has no
+        // effect on resolution — matching saropa_tier's existing deprecation
+        // contract.
+        expect(RuntimeTierCap.activeCap, RuleTier.essential);
+      },
+    );
   });
 
   // The in-process analyzer plugin must NOT run the full enabled rule set, or the

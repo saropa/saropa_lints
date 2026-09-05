@@ -96,7 +96,7 @@ void main() {
         expect(CommentPatterns.isLikelyCode('true means success'), isFalse);
       });
 
-      test('empty content', () {
+      test('empty string is not classified as likely code', () {
         expect(CommentPatterns.isLikelyCode(''), isFalse);
       });
 
@@ -250,35 +250,35 @@ void main() {
     });
 
     group('should still detect actual code after tightening', () {
-      test('this.name = value', () {
+      test("'this.name = value' is still detected as code", () {
         expect(CommentPatterns.isLikelyCode('this.name = value'), isTrue);
       });
 
-      test('super.dispose()', () {
+      test("'super.dispose()' is still detected as code", () {
         expect(CommentPatterns.isLikelyCode('super.dispose()'), isTrue);
       });
 
-      test('new MyClass()', () {
+      test("'new MyClass()' is still detected as code", () {
         expect(CommentPatterns.isLikelyCode('new MyClass()'), isTrue);
       });
 
-      test('else {', () {
+      test("'else {' is still detected as code", () {
         expect(CommentPatterns.isLikelyCode('else {'), isTrue);
       });
 
-      test('String name;', () {
+      test("'String name;' is still detected as code", () {
         expect(CommentPatterns.isLikelyCode('String name;'), isTrue);
       });
 
-      test('int value = 5;', () {
+      test("'int value = 5;' is still detected as code", () {
         expect(CommentPatterns.isLikelyCode('int value = 5;'), isTrue);
       });
 
-      test('return null;', () {
+      test("'return null;' is still detected as code", () {
         expect(CommentPatterns.isLikelyCode('return null;'), isTrue);
       });
 
-      test('list.sort()', () {
+      test("'list.sort()' is still detected as code", () {
         expect(CommentPatterns.isLikelyCode('list.sort()'), isTrue);
       });
 

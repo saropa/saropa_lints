@@ -113,11 +113,25 @@ String _stripYamlScalarQuotes(String raw) {
   return raw;
 }
 
-/// `saropa_tier: recommended` at top level of custom options.
+/// `saropa_tier: recommended` OR `runtime_tier: recommended` at top level of
+/// `analysis_options_custom.yaml`.
+///
+/// BUG FIX (WP3, `PLAN_ext_ui_dart_deferred.md`): the VS Code Config file tab
+/// (`rulePacksWebviewProvider.ts` `buildConfigFileTabHtml` / its postMessage
+/// handler) offers TWO separate top-level scalar selects on the custom yaml —
+/// `saropa_tier` AND `runtime_tier` (`allowed` set in
+/// `handleConfigFileScalarChange`, `rulePacksWebviewProvider.ts:2282`). Before
+/// this fix, only `saropa_tier:` was matched here, so a user who touched the
+/// `runtime_tier` select in that tab had the value written to disk but SILENTLY
+/// dropped by this parser — no cap applied, no warning logged, because the old
+/// regex only ever looked for the literal string `saropa_tier`. `runtime_tier`
+/// is now recognized as an equal deprecated alias of `saropa_tier` here, so
+/// both drive the same (loud, migrate-me) warning path in `_reload` instead of
+/// one of them vanishing without a trace.
 String? parseSaropaTierFromCustomYaml(String? content) {
   if (content == null || content.isEmpty) return null;
   final m = RegExp(
-    r'^saropa_tier:\s*([^\s#]+)\s*(?:#.*)?$',
+    r'^(?:saropa_tier|runtime_tier):\s*([^\s#]+)\s*(?:#.*)?$',
     multiLine: true,
   ).firstMatch(content);
   final raw = m?.group(1)?.trim();
@@ -280,17 +294,21 @@ abstract final class RuntimeTierCap {
       source = 'analysis_options.yaml (plugins.saropa_lints)';
     }
 
-    // saropa_tier: in analysis_options_custom.yaml is deprecated — it no
-    // longer resolves the tier, but a project still using it gets a loud
-    // one-line warning pointing at the replacement so drift is visible
-    // instead of silently ignored.
+    // Top-level `saropa_tier:` OR `runtime_tier:` in analysis_options_custom.yaml
+    // are both deprecated — neither resolves the tier any more (this file is
+    // not read for tier resolution, only to detect and warn about stale
+    // config), but a project still writing either one gets a loud one-line
+    // warning pointing at the replacement so drift is visible instead of
+    // silently ignored. See parseSaropaTierFromCustomYaml's doc comment for
+    // why `runtime_tier` must be recognized here too — the extension's Config
+    // file tab can write either key.
     final custom = readFile('analysis_options_custom.yaml');
     final customTier = parseSaropaTierFromCustomYaml(custom);
     if (customTier != null) {
       PluginLogger.warning(
-        'analysis_options_custom.yaml saropa_tier="$customTier" is deprecated '
-        'and no longer used — set plugins.saropa_lints.runtime_tier in '
-        'analysis_options.yaml instead.',
+        'analysis_options_custom.yaml top-level tier key (saropa_tier/'
+        'runtime_tier) = "$customTier" is deprecated and no longer used — set '
+        'plugins.saropa_lints.runtime_tier in analysis_options.yaml instead.',
       );
     }
 

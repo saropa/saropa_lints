@@ -16,7 +16,7 @@ void main() {
   const fixturePath =
       'example/lib/widget_layout/avoid_positioned_outside_stack_fixture.dart';
 
-  test('fixture exists', () {
+  test('avoid_positioned_outside_stack fixture file exists on disk', () {
     expect(File(fixturePath).existsSync(), isTrue);
   });
 

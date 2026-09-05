@@ -200,7 +200,7 @@ class _ResolvedUsageVisitor extends RecursiveAstVisitor<void> {
   /// a pure analyzer-based scanner with no widget tree. The scan CLI's
   /// default syntactic pass has no type information to distinguish the two
   /// same-named classes from the bare `List<Element>` source text.
-  // ignore: avoid_retaining_disposed_widgets
+  // ignore: saropa_lints/avoid_retaining_disposed_widgets
   final List<Element> _enclosing = <Element>[];
 
   @override

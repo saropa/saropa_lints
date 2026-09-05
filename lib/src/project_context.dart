@@ -1,4 +1,4 @@
-// ignore_for_file: always_specify_types, avoid_catching_generic_exception
+// ignore_for_file: always_specify_types, saropa_lints/avoid_catching_generic_exception
 
 /// Project-wide context and caches for saropa_lints rules.
 ///

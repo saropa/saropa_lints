@@ -14,6 +14,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/saropa_lints.dart' show saropaLintsVersion;
 import 'package:saropa_lints/src/cli/project_health/ai_fix_handoff.dart';
 import 'package:saropa_lints/src/cli/project_health/asset_scanner.dart';
 import 'package:saropa_lints/src/cli/project_health/coupling_metrics.dart';
@@ -37,6 +38,7 @@ import 'package:saropa_lints/src/cli/project_health/health_model.dart';
 import 'package:saropa_lints/src/cli/project_health/health_summary.dart';
 import 'package:saropa_lints/src/cli/project_health/hotspot_ranking.dart';
 import 'package:saropa_lints/src/cli/project_health/perf_gravity.dart';
+import 'package:saropa_lints/src/cli/project_health/scan_progress.dart';
 import 'package:saropa_lints/src/cli/project_health/size_scanner.dart';
 
 Future<void> main(List<String> args) async {
@@ -99,34 +101,64 @@ Future<void> main(List<String> args) async {
   // here so it outlives runSizeScan, which returns only the size aggregate.
   final perfAgg = cli.performance ? PerfGravityAggregator() : null;
 
+  // --progress streams NDJSON scan events to stderr (Project Map's webview
+  // renders a live "N% — done/total files" bar from them); --control <path>
+  // points at a tiny text file the webview rewrites with run/pause/cancel so
+  // a long scan can be suspended or aborted. Both are opt-in; without them
+  // this CLI's stdout/behavior is byte-for-byte unchanged. Mirrors
+  // project_vibrancy's identical flags (see scan_progress.dart doc comment
+  // for why the two are separate classes rather than a shared import).
+  final progress = cli.progress
+      ? ProjectScanProgress(onEvent: _emitEvent, gate: _makeGate(cli.control))
+      : null;
+  // saropaLintsVersion reads the SCANNED project's resolved saropa_lints, so
+  // its presence/absence tells the dashboard whether it's talking to an
+  // engine new enough to emit progress at all (a published CLI predating
+  // this feature emits no 'meta' event, which is itself the "legacy" signal).
+  if (progress != null) {
+    _emitEvent(<String, Object?>{'event': 'meta', 'version': saropaLintsVersion});
+  }
+
   final shard = File(p.join(outputDir, 'files.ndjson')).openWrite();
   // Periodically flush the NDJSON sink so its buffer cannot grow with the file
   // count on a large project — the scan awaits onRow, which gives the flush
   // real backpressure. Flushing every row would be needlessly slow.
   var rowsWritten = 0;
-  final agg = await runSizeScan(
-    SizeScanOptions(
-      projectPath: cli.path,
-      excludeGlobs: excludes,
-      topN: cli.top,
-      withComplexity: cli.complexity,
-      withPerformance: cli.performance,
-      perfAggregator: perfAgg,
-      unusedFiles: unusedFiles,
-      deadSymbols: deadSymbols,
-      coverage: coverage,
-      gitSignals: git,
-      coupling: importCoupling,
-      complexityCache: cacheIn,
-      cacheSink: cacheSink,
-      onRow: (row) async {
-        shard.writeln(jsonEncode(row.toJson()));
-        if (++rowsWritten % 256 == 0) {
-          await shard.flush();
-        }
-      },
-    ),
-  );
+  late final HealthAggregator agg;
+  try {
+    agg = await runSizeScan(
+      SizeScanOptions(
+        projectPath: cli.path,
+        excludeGlobs: excludes,
+        topN: cli.top,
+        withComplexity: cli.complexity,
+        withPerformance: cli.performance,
+        perfAggregator: perfAgg,
+        unusedFiles: unusedFiles,
+        deadSymbols: deadSymbols,
+        coverage: coverage,
+        gitSignals: git,
+        coupling: importCoupling,
+        complexityCache: cacheIn,
+        cacheSink: cacheSink,
+        progress: progress,
+        onRow: (row) async {
+          shard.writeln(jsonEncode(row.toJson()));
+          if (++rowsWritten % 256 == 0) {
+            await shard.flush();
+          }
+        },
+      ),
+    );
+  } on _ScanCanceled {
+    // User canceled from the Project Map webview mid-scan. Flush what was
+    // written so far and exit clean with no stdout payload — the extension
+    // treats an empty result after a cancel request as "stopped", not
+    // "failed" (same contract project_vibrancy uses).
+    await shard.flush();
+    await shard.close();
+    exit(0);
+  }
   await shard.flush();
   await shard.close();
   if (cacheSink != null) saveComplexityCache(cachePath, cacheSink);
@@ -314,6 +346,58 @@ void _handleBaseline(_CliArgs cli, HealthAggregator agg, String defaultPath) {
   if (cmp.hasRegression) exitCode = 1; // fail CI on regression
 }
 
+/// Writes one scan event as a single NDJSON line on stderr. stdout is reserved
+/// for the report output (text/json/markdown/prompts/html), so the extension
+/// parses the two streams separately — identical contract to
+/// project_vibrancy's `--progress`.
+void _emitEvent(Map<String, Object?> event) {
+  stderr.writeln(jsonEncode(event));
+}
+
+/// Thrown by the control gate when the webview requests cancel; caught in
+/// [main] to exit cleanly without emitting a partial report.
+class _ScanCanceled implements Exception {
+  const _ScanCanceled();
+}
+
+/// Builds the cooperative pause/cancel gate the scan awaits before each file.
+/// With no control file it is a no-op. With one, it reads the file's current
+/// command: `pause` blocks (re-checking every 150 ms) until the command
+/// changes; `cancel` throws [_ScanCanceled]; anything else resumes
+/// immediately. Duplicated from project_vibrancy's `_makeGate` (see
+/// scan_progress.dart doc comment for why these stay separate).
+Future<void> Function() _makeGate(String? controlPath) {
+  if (controlPath == null) {
+    return () async {};
+  }
+  return () async {
+    while (true) {
+      final command = _readControl(controlPath);
+      if (command == 'cancel') {
+        throw const _ScanCanceled();
+      }
+      if (command != 'pause') {
+        return;
+      }
+      // Poll while paused. 150 ms is responsive to a Resume click without
+      // busy-spinning a CPU core during a long pause.
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    }
+  };
+}
+
+/// Reads the control command, defaulting to `run` on any miss/error so a
+/// missing or transiently-locked control file never wedges the scan.
+String _readControl(String controlPath) {
+  try {
+    final file = File(controlPath);
+    if (!file.existsSync()) return 'run';
+    return file.readAsStringSync().trim().toLowerCase();
+  } on Object {
+    return 'run';
+  }
+}
+
 void _printMap(String title, Map<String, Object?>? data) {
   if (data == null || data.isEmpty) return;
   print('');
@@ -348,6 +432,12 @@ typedef _CliArgs = ({
   bool cycles,
   bool cache,
   bool performance,
+  // --progress/--control: opt-in NDJSON scan progress + pause/cancel, WP1 of
+  // plans/PLAN_ext_ui_dart_deferred.md. Mirrors project_vibrancy's flags of
+  // the same name so the extension's existing scan-runner UX pattern applies
+  // unchanged to Project Map.
+  bool progress,
+  String? control,
 });
 
 _CliArgs _parseArgs(List<String> args) {
@@ -373,6 +463,8 @@ _CliArgs _parseArgs(List<String> args) {
   var cycles = false;
   var cache = false;
   var performance = false;
+  var progress = false;
+  String? control;
   for (var i = 0; i < args.length; i++) {
     final arg = args[i];
     if (arg == '--path' && i + 1 < args.length) {
@@ -420,6 +512,10 @@ _CliArgs _parseArgs(List<String> args) {
       cache = true;
     } else if (arg == '--performance') {
       performance = true;
+    } else if (arg == '--progress') {
+      progress = true;
+    } else if (arg == '--control' && i + 1 < args.length) {
+      control = args[++i];
     }
   }
   return (
@@ -445,6 +541,8 @@ _CliArgs _parseArgs(List<String> args) {
     cycles: cycles,
     cache: cache,
     performance: performance,
+    progress: progress,
+    control: control,
   );
 }
 
@@ -541,6 +639,8 @@ Options:
   --cycles             Import cycles + suggested cut per cycle (builds the graph)
   --cache              Reuse cached parse for unchanged files (faster rescans)
   --performance        Per-feature performance gravity (compound widget patterns)
+  --progress           Stream NDJSON scan-progress events on stderr (stdout unchanged)
+  --control <path>     Control file for --progress: contents "pause"/"run"/"cancel"
   -h, --help           Show this help
 ''');
 }

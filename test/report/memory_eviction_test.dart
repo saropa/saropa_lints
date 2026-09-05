@@ -87,7 +87,7 @@ void main() {
       expect(SuppressionTracker.estimatedBytes, 120);
     });
 
-    test('resets to zero', () {
+    test('reset() clears estimatedBytes back to zero after recording', () {
       SuppressionTracker.record(
         rule: 'r',
         file: 'c.dart',

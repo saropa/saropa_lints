@@ -728,7 +728,10 @@ List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
         continue;
       }
       if (!posix.contains('/lib/')) continue;
-      if (selectedFile != null && p.normalize(selectedFile) != path) continue;
+      // Case-insensitive comparison for Windows/macOS filesystem compatibility.
+      if (selectedFile != null && !p.equals(p.normalize(selectedFile), path)) {
+        continue;
+      }
       if (selectedFolder != null &&
           !path.startsWith(p.normalize(selectedFolder))) {
         continue;

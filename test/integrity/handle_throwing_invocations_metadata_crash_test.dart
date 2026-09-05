@@ -36,41 +36,39 @@ Directory _findRepoRoot([Directory? start]) {
   return Directory.current;
 }
 
-/// Regression test for handle_throwing_invocations rule.
-///
-/// Ensures the rule does not crash the analyzer plugin when reading
-/// element metadata (MetadataImpl vs Iterable across analyzer versions).
-/// Includes non-thrower and try/catch cases to guard against false positives.
-void main() {
-  test(
-    'handle_throwing_invocations does not crash analyzer plugin (MetadataImpl)',
-    () async {
-      final repoRoot = _findRepoRoot();
-      final pubspecFile = File(
-        '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
-      );
-      expect(
-        pubspecFile.existsSync(),
-        isTrue,
-        reason:
-            'Run tests from the saropa_lints repo (or a subdir). '
-            'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
-      );
+/// Builds a temp consumer project (pubspec.yaml pointing at this repo via
+/// path dependency + analysis_options.yaml enabling the rule) containing
+/// [mainDartContent] as lib/main.dart. Shared by all three regression cases
+/// below, which differ only in that content and in what they assert about
+/// the resulting `dart analyze` output.
+Future<Directory> _createConsumerProject(
+  String tempPrefix,
+  String mainDartContent,
+) async {
+  final repoRoot = _findRepoRoot();
+  final pubspecFile = File(
+    '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
+  );
+  expect(
+    pubspecFile.existsSync(),
+    isTrue,
+    reason:
+        'Run tests from the saropa_lints repo (or a subdir). '
+        'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
+  );
 
-      final tempDir = await Directory.systemTemp.createTemp(
-        'saropa_lints_handle_throwing_',
-      );
-      addTearDown(() => _deleteTempDir(tempDir));
+  final tempDir = await Directory.systemTemp.createTemp(tempPrefix);
+  addTearDown(() => _deleteTempDir(tempDir));
 
-      final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
+  final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
 
-      await Directory(
-        '${tempDir.path}${Platform.pathSeparator}lib',
-      ).create(recursive: true);
+  await Directory(
+    '${tempDir.path}${Platform.pathSeparator}lib',
+  ).create(recursive: true);
 
-      await File(
-        '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
-      ).writeAsString('''
+  await File(
+    '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
+  ).writeAsString('''
 name: tmp_saropa_lints_consumer
 publish_to: none
 
@@ -82,23 +80,40 @@ dev_dependencies:
     path: "$repoPathForYaml"
 ''');
 
-      await File(
-        '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
-      ).writeAsString('''
+  await File(
+    '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
+  ).writeAsString('''
 plugins:
   saropa_lints:
     diagnostics:
       handle_throwing_invocations: true
 ''');
 
+  await File(
+    '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
+  ).writeAsString(mainDartContent);
+
+  return tempDir;
+}
+
+/// Regression test for handle_throwing_invocations rule.
+///
+/// Ensures the rule does not crash the analyzer plugin when reading
+/// element metadata (MetadataImpl vs Iterable across analyzer versions).
+/// Includes non-thrower and try/catch cases to guard against false positives.
+void main() {
+  test(
+    'handle_throwing_invocations does not crash analyzer plugin (MetadataImpl)',
+    () async {
       // Method invocation so the rule runs and reads element.metadata.
-      await File(
-        '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
-      ).writeAsString('''
+      final tempDir = await _createConsumerProject(
+        'saropa_lints_handle_throwing_',
+        '''
 void main() {
   int.parse('1');
 }
-''');
+''',
+      );
 
       final pubGet = await Process.run(
         'dart',
@@ -140,61 +155,16 @@ void main() {
   );
 
   test('handle_throwing_invocations does not report when inside try/catch', () async {
-    final repoRoot = _findRepoRoot();
-    final pubspecFile = File(
-      '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
-    );
-    expect(
-      pubspecFile.existsSync(),
-      isTrue,
-      reason:
-          'Run tests from the saropa_lints repo (or a subdir). '
-          'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
-    );
-
-    final tempDir = await Directory.systemTemp.createTemp(
+    final tempDir = await _createConsumerProject(
       'saropa_lints_handle_throwing_try_',
-    );
-    addTearDown(() => _deleteTempDir(tempDir));
-
-    final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
-
-    await Directory(
-      '${tempDir.path}${Platform.pathSeparator}lib',
-    ).create(recursive: true);
-
-    await File(
-      '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
-    ).writeAsString('''
-name: tmp_saropa_lints_consumer
-publish_to: none
-
-environment:
-  sdk: ">=3.10.0 <4.0.0"
-
-dev_dependencies:
-  saropa_lints:
-    path: "$repoPathForYaml"
-''');
-
-    await File(
-      '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
-    ).writeAsString('''
-plugins:
-  saropa_lints:
-    diagnostics:
-      handle_throwing_invocations: true
-''');
-
-    await File(
-      '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
-    ).writeAsString('''
+      '''
 void main() {
   try {
     int.parse('1');
   } catch (_) {}
 }
-''');
+''',
+    );
 
     final pubGet = await Process.run(
       'dart',
@@ -227,60 +197,15 @@ void main() {
   test(
     'handle_throwing_invocations does not report on non-thrower (no false positive)',
     () async {
-      final repoRoot = _findRepoRoot();
-      final pubspecFile = File(
-        '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
-      );
-      expect(
-        pubspecFile.existsSync(),
-        isTrue,
-        reason:
-            'Run tests from the saropa_lints repo (or a subdir). '
-            'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
-      );
-
-      final tempDir = await Directory.systemTemp.createTemp(
-        'saropa_lints_handle_throwing_fp_',
-      );
-      addTearDown(() => _deleteTempDir(tempDir));
-
-      final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
-
-      await Directory(
-        '${tempDir.path}${Platform.pathSeparator}lib',
-      ).create(recursive: true);
-
-      await File(
-        '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
-      ).writeAsString('''
-name: tmp_saropa_lints_consumer
-publish_to: none
-
-environment:
-  sdk: ">=3.10.0 <4.0.0"
-
-dev_dependencies:
-  saropa_lints:
-    path: "$repoPathForYaml"
-''');
-
-      await File(
-        '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
-      ).writeAsString('''
-plugins:
-  saropa_lints:
-    diagnostics:
-      handle_throwing_invocations: true
-''');
-
       // Ordinary call (not a known thrower, no @Throws) — should not report.
-      await File(
-        '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
-      ).writeAsString('''
+      final tempDir = await _createConsumerProject(
+        'saropa_lints_handle_throwing_fp_',
+        '''
 void main() {
   print('hello');
 }
-''');
+''',
+      );
 
       final pubGet = await Process.run(
         'dart',

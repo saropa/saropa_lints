@@ -96,10 +96,17 @@ void main() {
   });
 
   group('fixture: cross_file_fixture (orphan + cycle)', () {
+    // Shared across every test in this group: all assertions read the same
+    // fixture analysis result, so run it once in setUp instead of per-test.
+    late CrossFileResult result;
+
+    setUp(() async {
+      result = await runCrossFileAnalysis(projectPath: fixturePath);
+    });
+
     test(
       'unused-files: fixture has exactly one unused file (orphan.dart)',
-      () async {
-        final result = await runCrossFileAnalysis(projectPath: fixturePath);
+      () {
         expect(
           result.unusedFiles.any((path) => path.endsWith('orphan.dart')),
           isTrue,
@@ -109,8 +116,7 @@ void main() {
       },
     );
 
-    test('circular-deps: fixture has one cycle (a -> b -> c -> a)', () async {
-      final result = await runCrossFileAnalysis(projectPath: fixturePath);
+    test('circular-deps: fixture has one cycle (a -> b -> c -> a)', () {
       expect(result.circularDependencies, isNotEmpty);
       final cycle = result.circularDependencies.first;
       expect(cycle.any((path) => path.endsWith('a.dart')), isTrue);
@@ -118,16 +124,14 @@ void main() {
       expect(cycle.any((path) => path.endsWith('c.dart')), isTrue);
     });
 
-    test('import-stats: fixture has 4 files and 3 imports', () async {
-      final result = await runCrossFileAnalysis(projectPath: fixturePath);
+    test('import-stats: fixture has 4 files and 3 imports', () {
       expect(result.stats['fileCount'], 4);
       expect(result.stats['totalImports'], 3);
     });
 
     test(
       'missing mirror tests: only orphan.dart lacks test/orphan_test.dart',
-      () async {
-        final result = await runCrossFileAnalysis(projectPath: fixturePath);
+      () {
         expect(result.missingMirrorTests, hasLength(1));
         expect(result.missingMirrorTests.single, endsWith('orphan.dart'));
       },

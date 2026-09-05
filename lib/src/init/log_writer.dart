@@ -7,6 +7,7 @@ library;
 import 'dart:developer' as dev;
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart'
     show AnalysisReporter;
@@ -120,13 +121,17 @@ class LogWriter {
 
     try {
       final dateFolder = AnalysisReporter.dateFolder(logTimestamp);
-      final reportsDir = Directory('reports/$dateFolder');
+      // Use p.join for cross-platform path construction.
+      final reportsDir = Directory(p.join('reports', dateFolder));
       if (!reportsDir.existsSync()) {
         reportsDir.createSync(recursive: true);
       }
 
-      final logPath =
-          'reports/$dateFolder/${logTimestamp}_saropa_lints_init.log';
+      final logPath = p.join(
+        'reports',
+        dateFolder,
+        '${logTimestamp}_saropa_lints_init.log',
+      );
       final logContent = stripAnsi(buffer.toString());
       File(logPath).writeAsStringSync(logContent);
 
@@ -230,8 +235,9 @@ Future<String?> findNewestPluginReport(
             ..sort((a, b) => b.path.compareTo(a.path));
 
       if (reports.isNotEmpty) {
-        final name = reports.first.path.split('/').last.split('\\').last;
-        return 'reports/$dateFolderName/$name';
+        // Use p.basename for platform-safe filename extraction.
+        final name = p.basename(reports.first.path);
+        return p.join('reports', dateFolderName, name);
       }
     } on Object catch (e, st) {
       dev.log(

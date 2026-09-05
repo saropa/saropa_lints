@@ -158,6 +158,39 @@ class ProjectContext {
     return getProjectInfo(filePath)?.hasWebSupport ?? true;
   }
 
+  /// Returns true when the package is a CLI tool, analyzer plugin, or
+  /// other VM-only package. Rules about user-facing UI or web
+  /// compatibility should skip these packages.
+  static bool isCliOrToolPackage(String? filePath) {
+    return getProjectInfo(filePath)?.isCliOrToolPackage ?? false;
+  }
+
+  /// Returns true when [filePath] sits under a `bin/` or `tool/` directory —
+  /// the conventional home for short-lived, single-invocation Dart scripts
+  /// (build steps, CLI entrypoints, one-off generators).
+  ///
+  /// This is a PER-FILE check, complementary to [isCliOrToolPackage] (which
+  /// only catches whole PACKAGES declaring `executables:` in pubspec.yaml or
+  /// depending on `custom_lint_builder`/`analyzer_plugin`) — a `tool/`
+  /// script can live inside an otherwise long-lived, web-targeting app
+  /// package that has no such package-level signal at all. Both checks are
+  /// needed: a whole package can be VM-only without a `bin/`/`tool/` file
+  /// (e.g. a server package), and a single script can be VM-only inside an
+  /// otherwise browser-facing package.
+  ///
+  /// Single source of truth for this heuristic — originally duplicated as a
+  /// private helper in `memory_management_rules.dart`; promoted here so
+  /// `avoid_platform_specific_imports` (config_rules.dart) can share it
+  /// rather than re-implementing the same path check.
+  /// See bugs/avoid_platform_specific_imports_false_positive_analyzer_plugin.md.
+  static bool isInShortLivedToolDirectory(String? filePath) {
+    if (filePath == null) return false;
+    // Normalize to forward slashes so the check works on both POSIX paths
+    // and Windows paths (which use backslash separators).
+    final String normalized = filePath.replaceAll(r'\', '/');
+    return normalized.contains('/bin/') || normalized.contains('/tool/');
+  }
+
   /// Returns `true` when the project containing [filePath] targets any
   /// non-web platform (android, ios, macos, windows, linux) OR is a pure
   /// Dart library — i.e. when rules whose failure mode is "breaks on
@@ -358,6 +391,7 @@ class _ProjectInfo {
     required this.hasNonWebPlatform,
     required this.hasPointerPlatform,
     required this.targetPlatforms,
+    required this.isCliOrToolPackage,
   });
 
   factory _ProjectInfo._fromProjectRoot(String projectRoot) {
@@ -379,6 +413,8 @@ class _ProjectInfo {
         // avoid_platform_incompatible_dependency stays silent rather than
         // assert "builds for X" about a project we can't read.
         targetPlatforms: const <String>{},
+        // Unknown → false: don't suppress rules when we can't read pubspec.
+        isCliOrToolPackage: false,
       );
     }
 
@@ -488,6 +524,19 @@ class _ProjectInfo {
           if (hasMacosDir) 'macos',
           if (hasLinuxDir) 'linux',
         },
+        // CLI tools and analyzer plugins run on the VM only — rules
+        // framed around "user-facing UI" or "breaks on web" don't apply.
+        // Signals: `executables:` section (declares CLI entrypoints), or a
+        // dependency on `custom_lint_builder`/`analyzer_plugin` (the two
+        // packages used to build a native analyzer plugin — see
+        // bugs/avoid_platform_specific_imports_false_positive_analyzer_plugin.md).
+        // `deps` is over-inclusive by design (see comment above), so a false
+        // match here only means "we skipped a rule we shouldn't have" — the
+        // safe failure direction.
+        isCliOrToolPackage:
+            content.contains(RegExp(r'^executables:', multiLine: true)) ||
+            deps.contains('custom_lint_builder') ||
+            deps.contains('analyzer_plugin'),
       );
     } on FormatException {
       return _ProjectInfo._(
@@ -502,6 +551,8 @@ class _ProjectInfo {
         // avoid_platform_incompatible_dependency stays silent rather than
         // assert "builds for X" about a project we can't read.
         targetPlatforms: const <String>{},
+        // Unknown → false: don't suppress rules when we can't read pubspec.
+        isCliOrToolPackage: false,
       );
     } on IOException {
       return _ProjectInfo._(
@@ -516,6 +567,8 @@ class _ProjectInfo {
         // avoid_platform_incompatible_dependency stays silent rather than
         // assert "builds for X" about a project we can't read.
         targetPlatforms: const <String>{},
+        // Unknown → false: don't suppress rules when we can't read pubspec.
+        isCliOrToolPackage: false,
       );
     }
   }
@@ -562,6 +615,12 @@ class _ProjectInfo {
   /// [ProjectContext.targetsPlatform] for why this rule deliberately stays
   /// silent on unknown targets instead of assuming all of them.
   final Set<String> targetPlatforms;
+
+  /// True when the package is a CLI tool, analyzer plugin, or other
+  /// VM-only package — never runs in a Flutter UI or web context. Signals:
+  /// pubspec `executables:` section, or a `custom_lint_builder`/
+  /// `analyzer_plugin` dependency.
+  final bool isCliOrToolPackage;
 
   /// Check if the project has a specific dependency.
   bool hasDependency(String name) => dependencies.contains(name);

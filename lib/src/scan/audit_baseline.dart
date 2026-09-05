@@ -39,9 +39,12 @@ BaselineData? loadBaseline(String projectRoot, {String? overridePath}) {
   if (!file.existsSync()) return null;
 
   try {
-    final json = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
-    final timestamp = json['timestamp'] as String? ?? '';
-    final diagnostics = (json['diagnostics'] as List<dynamic>?) ?? [];
+    final decoded = jsonDecode(file.readAsStringSync());
+    // Guard against valid JSON that isn't an object (e.g. `[]`, `null`).
+    if (decoded is! Map<String, dynamic>) return null;
+
+    final timestamp = decoded['timestamp'] as String? ?? '';
+    final diagnostics = (decoded['diagnostics'] as List<dynamic>?) ?? [];
 
     // Build a set of diagnostic identity keys for diffing.
     final keys = <String>{};
@@ -53,6 +56,7 @@ BaselineData? loadBaseline(String projectRoot, {String? overridePath}) {
 
     return BaselineData(timestamp: timestamp, diagnosticKeys: keys);
   } on FormatException {
+    // Malformed JSON — treat as missing baseline.
     return null;
   }
 }

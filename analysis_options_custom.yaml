@@ -5,6 +5,10 @@
 max_issues: 1000
 output: both
 
+rule_packs:
+  enabled:
+    - collection_compat
+
 # PLATFORM SETTINGS
 # Disable platforms your project doesn't target.
 platforms:

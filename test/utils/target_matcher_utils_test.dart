@@ -11,7 +11,7 @@ void main() {
   // Regex path operates on raw source text, so it must be checked
   // against dot-call, null-aware, and cascade syntax independently.
   group('isFieldCleanedUpInSource - regex path', () {
-    test('plain dot call', () {
+    test('plain dot call (_ctrl.dispose()) is detected as cleanup', () {
       expect(
         isFieldCleanedUpInSource('_ctrl', 'dispose', '_ctrl.dispose();'),
         isTrue,
@@ -25,7 +25,7 @@ void main() {
       );
     });
 
-    test('cascade call', () {
+    test('cascade call with an unrelated method before dispose() detects cleanup', () {
       expect(
         isFieldCleanedUpInSource(
           '_ctrl',
@@ -47,7 +47,7 @@ void main() {
       );
     });
 
-    test('cascade close', () {
+    test('cascade with cancel() as the target method detects cleanup', () {
       expect(
         isFieldCleanedUpInSource('_sub', 'cancel', '_sub..pause()..cancel();'),
         isTrue,
@@ -116,7 +116,7 @@ class S {
       expect(hasCascadeCleanup('_ctrl', 'dispose', body), isTrue);
     });
 
-    test('three sections', () {
+    test('three-section cascade via AST detects cleanup on the last call', () {
       final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {

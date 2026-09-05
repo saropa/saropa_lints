@@ -26,36 +26,54 @@ void main() {
       expect(rule.code.correctionMessage, isNotNull);
     }
 
-    test('RequireSdkUpperBoundRule', () {
+    test('RequireSdkUpperBoundRule reports correct name and messages', () {
       expectMetadata(RequireSdkUpperBoundRule(), 'require_sdk_upper_bound');
     });
-    test('AvoidUnboundedDependencyRule', () {
-      expectMetadata(
-        AvoidUnboundedDependencyRule(),
-        'avoid_unbounded_dependency',
-      );
-    });
-    test('RequireDependencyLowerBoundRule', () {
-      expectMetadata(
-        RequireDependencyLowerBoundRule(),
-        'require_dependency_lower_bound',
-      );
-    });
-    test('PreferCaretConstraintInAppRule', () {
-      expectMetadata(
-        PreferCaretConstraintInAppRule(),
-        'prefer_caret_constraint_in_app',
-      );
-    });
-    test('AvoidOverlyWideAppConstraintRule', () {
-      expectMetadata(
-        AvoidOverlyWideAppConstraintRule(),
-        'avoid_overly_wide_app_constraint',
-      );
-    });
-    test('RequireSdkSyntaxMatchRule', () {
-      expectMetadata(RequireSdkSyntaxMatchRule(), 'require_sdk_syntax_match');
-    });
+    test(
+      'AvoidUnboundedDependencyRule reports correct name and messages',
+      () {
+        expectMetadata(
+          AvoidUnboundedDependencyRule(),
+          'avoid_unbounded_dependency',
+        );
+      },
+    );
+    test(
+      'RequireDependencyLowerBoundRule reports correct name and messages',
+      () {
+        expectMetadata(
+          RequireDependencyLowerBoundRule(),
+          'require_dependency_lower_bound',
+        );
+      },
+    );
+    test(
+      'PreferCaretConstraintInAppRule reports correct name and messages',
+      () {
+        expectMetadata(
+          PreferCaretConstraintInAppRule(),
+          'prefer_caret_constraint_in_app',
+        );
+      },
+    );
+    test(
+      'AvoidOverlyWideAppConstraintRule reports correct name and messages',
+      () {
+        expectMetadata(
+          AvoidOverlyWideAppConstraintRule(),
+          'avoid_overly_wide_app_constraint',
+        );
+      },
+    );
+    test(
+      'RequireSdkSyntaxMatchRule reports correct name and messages',
+      () {
+        expectMetadata(
+          RequireSdkSyntaxMatchRule(),
+          'require_sdk_syntax_match',
+        );
+      },
+    );
   });
 
   group('parseConstraint', () {

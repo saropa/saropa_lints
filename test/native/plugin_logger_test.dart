@@ -27,6 +27,21 @@ import 'package:test/test.dart';
 
 import '../support/safe_delete.dart';
 
+/// Creates a temp directory containing a minimal pubspec.yaml (so
+/// [PluginLogger.setProjectRoot] recognizes it as a Dart project root),
+/// runs [body], and always cleans up afterward — replaces the repeated
+/// create-dir/write-pubspec/try-finally-delete boilerplate that used to be
+/// duplicated across nearly every test below.
+void _withTempProjectDir(String prefix, void Function(Directory dir) body) {
+  final tempDir = Directory.systemTemp.createTempSync(prefix);
+  File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+  try {
+    body(tempDir);
+  } finally {
+    safeDeleteDir(tempDir);
+  }
+}
+
 void main() {
   setUp(() {
     PluginLogger.resetForTesting();
@@ -70,10 +85,7 @@ void main() {
     test(
       'setProjectRoot creates the log file and flushes buffered entries',
       () {
-        final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-        // setProjectRoot requires pubspec.yaml to identify a Dart project.
-        File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-        try {
+        _withTempProjectDir('plugin_logger_', (tempDir) {
           PluginLogger.log('pre-root entry one');
           PluginLogger.log('pre-root entry two');
           expect(PluginLogger.bufferSizeForTesting, 2);
@@ -93,17 +105,12 @@ void main() {
           expect(contents, contains('session started'));
           expect(contents, contains('pre-root entry one'));
           expect(contents, contains('pre-root entry two'));
-        } finally {
-          // Retry-tolerant cleanup: Windows file handles can linger after tests
-          safeDeleteDir(tempDir);
-        }
+        });
       },
     );
 
     test('log entries after setProjectRoot bypass the buffer and hit disk', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         PluginLogger.setProjectRoot(tempDir.path);
         expect(PluginLogger.bufferSizeForTesting, 0);
 
@@ -116,9 +123,7 @@ void main() {
           PluginLogger.logFilePathForTesting!,
         ).readAsStringSync();
         expect(contents, contains('post-root entry'));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('setProjectRoot is idempotent — first root wins', () {
@@ -160,6 +165,7 @@ void main() {
     });
 
     test('setProjectRoot rejects directories without pubspec.yaml', () {
+      // No pubspec.yaml written — deliberately not a Dart project root.
       final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
       try {
         PluginLogger.log('should stay buffered');
@@ -177,9 +183,7 @@ void main() {
     });
 
     test('emits restart-rate warning when threshold exceeded', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         final logDir = Directory(
           p.join(tempDir.path, 'reports', '.saropa_lints'),
         )..createSync(recursive: true);
@@ -203,15 +207,11 @@ void main() {
         final contents = logFile.readAsStringSync();
         expect(contents, contains('WARNING:'));
         expect(contents, contains('plugin restarts in last'));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('no restart-rate warning when all entries are old', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         final logDir = Directory(
           p.join(tempDir.path, 'reports', '.saropa_lints'),
         )..createSync(recursive: true);
@@ -233,15 +233,11 @@ void main() {
 
         final contents = logFile.readAsStringSync();
         expect(contents, isNot(contains('WARNING:')));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('no restart-rate warning when below threshold', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         final logDir = Directory(
           p.join(tempDir.path, 'reports', '.saropa_lints'),
         )..createSync(recursive: true);
@@ -263,15 +259,11 @@ void main() {
 
         final contents = logFile.readAsStringSync();
         expect(contents, isNot(contains('WARNING:')));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('handles corrupted log file without crashing', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         final logDir = Directory(
           p.join(tempDir.path, 'reports', '.saropa_lints'),
         )..createSync(recursive: true);
@@ -288,15 +280,11 @@ void main() {
         expect(PluginLogger.logFilePathForTesting, isNotNull);
         final contents = logFile.readAsStringSync();
         expect(contents, contains('session started'));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('rotates log file when exceeding size cap', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         final logDir = Directory(
           p.join(tempDir.path, 'reports', '.saropa_lints'),
         )..createSync(recursive: true);
@@ -324,15 +312,11 @@ void main() {
           reason: 'Old content at the start should be rotated away',
         );
         expect(contents, contains('session started'));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('rotates CRLF log file without orphaned carriage returns', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         final logDir = Directory(
           p.join(tempDir.path, 'reports', '.saropa_lints'),
         )..createSync(recursive: true);
@@ -353,15 +337,11 @@ void main() {
         // First kept line must not start with \r.
         expect(contents.startsWith('\r'), isFalse);
         expect(contents, contains('session started'));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('rotates single huge line by truncating entirely', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         final logDir = Directory(
           p.join(tempDir.path, 'reports', '.saropa_lints'),
         )..createSync(recursive: true);
@@ -377,15 +357,11 @@ void main() {
         // the new session header.
         expect(contents, contains('session started'));
         expect(contents.length, lessThan(600 * 1024));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('log level filters messages below minLevel from disk', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         PluginLogger.setProjectRoot(tempDir.path);
         PluginLogger.minLevel = PluginLogLevel.error;
 
@@ -399,15 +375,11 @@ void main() {
         expect(contents, contains('error message'));
         expect(contents, isNot(contains('info message')));
         expect(contents, isNot(contains('debug message')));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('log level off suppresses all messages from disk', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         PluginLogger.setProjectRoot(tempDir.path);
         PluginLogger.minLevel = PluginLogLevel.off;
 
@@ -418,15 +390,11 @@ void main() {
         ).readAsStringSync();
         expect(contents, isNot(contains('should not appear')));
         expect(contents, contains('session started'));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
 
     test('log entries include error and stack trace when provided', () {
-      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
-      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
-      try {
+      _withTempProjectDir('plugin_logger_', (tempDir) {
         PluginLogger.setProjectRoot(tempDir.path);
 
         try {
@@ -441,9 +409,7 @@ void main() {
         expect(contents, contains('caught an error'));
         expect(contents, contains('deliberate test error'));
         expect(contents, contains('stack:'));
-      } finally {
-        safeDeleteDir(tempDir);
-      }
+      });
     });
   });
 }

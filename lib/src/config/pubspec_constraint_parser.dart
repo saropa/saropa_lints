@@ -31,13 +31,13 @@ class SemverParts {
     // Verified false positive: `_pattern`'s capture groups are `(\d+)`, so
     // every non-null group is digit-only by construction — int.parse cannot
     // throw here. tryParse would only hide an unreachable null branch.
-    // ignore: prefer_try_parse_for_dynamic_data
+    // ignore: saropa_lints/prefer_try_parse_for_dynamic_data
     final major = int.parse(match.group(1)!);
     // Same regex guarantee as above: group 2 is `(?:\.(\d+))?`, digit-only.
-    // ignore: prefer_try_parse_for_dynamic_data
+    // ignore: saropa_lints/prefer_try_parse_for_dynamic_data
     final minor = int.parse(match.group(2) ?? '0');
     // Same regex guarantee as above: group 3 is `(?:\.(\d+))?`, digit-only.
-    // ignore: prefer_try_parse_for_dynamic_data
+    // ignore: saropa_lints/prefer_try_parse_for_dynamic_data
     final patch = int.parse(match.group(3) ?? '0');
     return SemverParts(major, minor, patch);
   }
