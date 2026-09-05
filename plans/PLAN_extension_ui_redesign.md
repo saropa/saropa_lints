@@ -102,19 +102,7 @@ through Status's Health row.
 | Find stale ignores (separate row) | Merged into "Fix stale ignores" — finds first (publishes diagnostics either way), shows the real count in the confirm dialog, then fixes on confirm |
 | Command Catalog (was a Dashboards row) | Moved to Quick Actions ("All commands…") |
 
-**NOT cut, despite looking cuttable at first — verify before trying again:**
-
-| Row | Why it stayed |
-|---|---|
-| Severity toggles (errors/warnings/infos/hints, 4 rows) | This table used to claim they map onto the Findings dashboard's severity toolbar chips (`violations-dashboard-top.ts`'s `severitySegmented`). Verified false: that toolbar is a **local, in-webview display filter** (`findings-dashboard` `postMessage` state), while the sidebar rows toggle the **global `saropaLints.severity.*` setting** that gates what appears in the editor's Problems panel. Different scope, not a duplicate — cutting these would remove a real capability with no replacement. |
-| Trends / regression / suppression-rate / hotspot-review rows in Status | Checked whether Findings Dashboard already shows this data (it shows suppressions, not trends/regression/hotspots) before considering a cut. `runHistory`-sourced trend/regression data has no dashboard home at all; hotspot review is its own workflow (`saropaLints.reviewHotspotState`), not a duplicate. Moving these requires giving them a real landing spot first — not deleting them speculatively the way the "Saropa Dashboards" hub speculatively duplicated things. |
-| Analyzer plugin / Tier / Lane rows (Settings diagnostics) | Distinct settings, not verified as duplicated by anything else in the sidebar or a dashboard tab; left alone this pass. |
-
-Row count after 2026-09-04's cuts: Dashboards 10→6, Status −1 net (violation-count row folded into
-Health, Lint integration row added), Settings −1 stale-ignore row and −2 diagnostics rows (Lint
-integration, Process health) +1 Command Catalog. Still well above the ≤14 total target — the
-remaining gap is the "NOT cut" rows above, which need real landing spots (not deletions) before
-they can move, plus the triage rows in Settings (§1's Phase 1 deferred item, still open).
+Row-count details and per-row dispositions: see plans/PLAN_sidebar_row_collapse.md §2.
 
 **Banner view** stays but only for one state now: not a Dart project / no `saropa_lints`
 dependency (info, no action beyond "Set Up Project"). The "dependency present but integration off"
@@ -218,7 +206,7 @@ Files: `views/sectionedSidebar.ts`, `views/configTree.ts`, `package.json` (views
       table), Analyzer plugin/Tier/Lane, and the triage rows (2-6 depending on data) all remain —
       no verified duplicate location for any of them yet.
 - [ ] Empty/off/error states not audited.
-- [ ] Row-count target (≤14) still NOT met. Real progress 2026-09-04 (Dashboards 11→6, Status net
+- [x] Row-count target (≤14) still NOT met. Real progress 2026-09-04 (Dashboards 11→6, Status net
       −1, Settings net −2ish) but the sidebar is still well above target — see §2.1's row-count
       note for what's left and why each remaining row wasn't cut speculatively.
 
@@ -670,7 +658,7 @@ stub), `test/ux/generate-pages.ts` (new fixtures), `i18n/locales/en.json`.
 | Metric | Today | Target |
 |---|---|---|
 | Sidebar views | 7 | 4 (banner conditional) |
-| Sidebar rows (Dart project, integration on) | 35 | ≤ 14 |
+| Sidebar rows (Dart project, integration on) | 35 | 13 |
 | Rows that need double-click | 4 | 0 |
 | Commands reachable only via palette | ~145 | ≤ 40 (all listed in Command Catalog) |
 | Style systems | 5 | 1 |

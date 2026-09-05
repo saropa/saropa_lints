@@ -15,13 +15,44 @@
  *                           view/title menu carries Help (walkthrough, About,
  *                           pub.dev, AI agent template) so it needs no panel
  *                           of its own
- *   - **Settings**        — run analyzer + initialize config (actions), lint
- *                           integration toggle, tier selector, UI language,
- *                           triage rows (volume groups / override counts),
- *                           and diagnostics controls (severity toggles,
- *                           analyzer plugin, tier) — folded in from the
- *                           former standalone Diagnostics panel
- *   - **Status**          — health / violations / suppressions / trends / last run
+ *   - **Settings**        — 4 action rows only (run analysis, initialize/
+ *                           update config, fix stale ignores, command
+ *                           catalog), plus a conditional 5th ("Migrate
+ *                           config keys") that appears only while legacy
+ *                           plugin-block keys remain. Everything else that
+ *                           used to live here was a verified duplicate of a
+ *                           richer surface and was cut, not lost:
+ *                             - severity toggles (show errors/warnings/
+ *                               infos/hints)  → Rules & Tiers Automation tab
+ *                             - run-after-config / run-after-dependency /
+ *                               UI language settings                → Rules
+ *                               & Tiers Automation tab (config-change/
+ *                               dependency-change toggles) / Extension tab
+ *                               (UI language)
+ *                             - "Detected: <packages>"          → Package
+ *                               Dashboard (full dependency list) / Extension
+ *                               tab platforms block
+ *                             - triage rows (volume groups, critical group,
+ *                               zero-issue/override counts, stylistic group)
+ *                               → Findings Dashboard's top-rules triage table
+ *                             - Tier / Lane                     → folded into
+ *                               the Lints Config row's description
+ *                             - Analyzer plugin (live/disabled/absent) → moved
+ *                               to Status, as a conditional warning row (only
+ *                               rendered when NOT live) — see WP3
+ *                           See plans/PLAN_sidebar_row_collapse.md §2.1 for
+ *                           the row-by-row evidence behind each move.
+ *   - **Status**          — health (tooltip carries last-run time) / engines
+ *                           / lint integration / analyzer plugin warning
+ *                           (conditional, disabled/absent only — WP3).
+ *                           Hotspots, Suppressed, Trends, Score dropped, and
+ *                           Fewer issues all moved to the Findings dashboard's
+ *                           status-line pills (WP4) or were straight cuts of
+ *                           duplicate data (Suppressed) — WP5,
+ *                           plans/PLAN_sidebar_row_collapse.md §2.2. The
+ *                           view's `when` clause no longer requires
+ *                           `saropaLints.hasViolations` (WP5), so the panel
+ *                           stays visible on a clean project.
  *
  * Each section reads the same upstream data (live diagnostics, pubspec, history)
  * but renders its own slice. Visibility is gated by `when` clauses on each
@@ -31,7 +62,14 @@
 import * as vscode from 'vscode';
 import type { ViolationsData } from '../violationsReader';
 import { readVisibleLiveViolations, computeLiveHealthScore } from '../liveViolationsData';
-import { loadHistory, getTrendSummary, getScoreTrendSummary, findPreviousScore, detectScoreRegression } from '../runHistory';
+// `getTrendSummary` / `getScoreTrendSummary` / `detectScoreRegression` were
+// dropped from this import (WP5, sidebar row collapse): the Trends /
+// Score-dropped / Fewer-issues rows they backed all moved to the Findings
+// dashboard's status-line pills (WP4, `violations-dashboard-top.ts`
+// `buildStatusLine`), which reads the same `runHistory.ts` data directly.
+// `findPreviousScore` stays — the Health row's score-delta description still
+// needs it.
+import { loadHistory, findPreviousScore } from '../runHistory';
 import { formatScoreDelta } from '../healthScore';
 import { getProjectRoot } from '../projectRoot';
 import { hasSaropaLintsDep } from '../pubspecReader';
@@ -41,12 +79,16 @@ import { renderTreeItem } from './triageTree';
 import { OVERVIEW_EMBEDDED_CONFIG_KINDS } from '../overviewEmbeddedConfigKinds';
 import { loadSuppressions, isPathHidden, isRuleHidden } from '../suppressionsStore';
 import { l10n } from '../i18n/runtime';
-import {
-    SecurityHotspotReviewStateService,
-    countSecurityHotspotReviewStates,
-} from '../securityHotspotReviewState';
+// `SecurityHotspotReviewStateService` / `countSecurityHotspotReviewStates`
+// were dropped from this import (WP5): the Hotspots row moved to the
+// Findings dashboard's status-line pill (WP4), which computes its own
+// hotspot counts from `violationsWideReportView.ts`.
 import { getLatestResults } from '../vibrancy/extension-activation';
 import { HealthPanel } from '../systemHealth/healthPanel';
+// Lane value for the Lints Config row description (WP2, sidebar row collapse
+// plan) — same reader the removed configTree.ts `buildLaneNode` used, so the
+// folded description agrees with what the in-process plugin actually reads.
+import { readRawLaneFromCustomConfig } from '../config/laneConfig';
 
 export type SectionNode = vscode.TreeItem | ConfigTreeNode;
 
@@ -90,29 +132,13 @@ class LeafItem extends vscode.TreeItem {
     }
 }
 
-/** Severity toggle row — single click flips the severity's visibility. */
-export class SeverityToggleItem extends vscode.TreeItem {
-    /** The command executed on click. */
-    readonly toggleCommandId: string;
-
-    constructor(
-        label: string,
-        description: string,
-        toggleCommandId: string,
-        iconId: string,
-        iconColor: vscode.ThemeColor,
-    ) {
-        super(label, vscode.TreeItemCollapsibleState.None);
-        this.description = description;
-        this.toggleCommandId = toggleCommandId;
-        this.tooltip = l10n('diagnostics.sidebar.severityToggleTooltip', { severity: label.toLowerCase() });
-        this.contextValue = 'severityToggle';
-        this.iconPath = new vscode.ThemeIcon(iconId, iconColor);
-        // Single-click toggles directly — the prior double-click gesture required
-        // undiscoverable rapid re-selection with no visible affordance.
-        this.command = { command: toggleCommandId, title: label, arguments: [] };
-    }
-}
+// `SeverityToggleItem` was removed here (2026-09-04, sidebar row collapse
+// WP1): the 4 severity toggle rows it rendered (show errors/warnings/infos/
+// hints) duplicated boolean controls already on the Rules & Tiers Automation
+// tab (`rulePacksWebviewProvider.ts` `_buildAutomationTab`) — same config
+// keys (`severity.error|warning|info|hint`), same `cfg.update` +
+// `refreshAllSections` behavior either way. The `toggleSeverity*` commands
+// stay registered for the command palette; only the sidebar row is gone.
 
 // ── Filtered violation cache (shared across status view) ───────────────────
 
@@ -239,6 +265,35 @@ function countAdoptionNeedles(): number {
 }
 
 /**
+ * The Lints Config row's description: `Tier: {tier} · Lane: {lane}` — folds
+ * in the two rows the sidebar used to carry separately (Settings' "Tier" and
+ * "Lane" rows, both of whose only click target was this same dashboard or a
+ * QuickPick one step removed from it; see plans/PLAN_sidebar_row_collapse.md
+ * §2.1 rows 24-25, WP2). Tier comes from the plain `saropaLints.tier`
+ * extension setting; Lane comes from `analysis_options_custom.yaml`'s `lane:`
+ * key via the SAME reader the removed `configTree.ts` `buildLaneNode` used,
+ * so the folded text never disagrees with what the in-process plugin reads.
+ *
+ * With no project root there is no custom yaml to read `lane:` from, so the
+ * Lane half is omitted entirely rather than guessing — a separate, shorter
+ * catalog key covers that case instead of interpolating an empty/placeholder
+ * value into the full template.
+ */
+function buildLintsConfigDescription(): string {
+    const tier = vscode.workspace.getConfiguration('saropaLints').get<string>('tier', 'recommended') ?? 'recommended';
+    const root = getProjectRoot();
+    if (!root) {
+        return l10n('dashboards.lintsConfig.descriptionNoLane', { tier });
+    }
+    // Absent/unrecognized `lane:` reads as 'light' — matches the Dart-side
+    // default (RuleLane.light) and the same fallback the removed sidebar Lane
+    // row and the Config file tab's Lane card both use.
+    const raw = readRawLaneFromCustomConfig(root);
+    const lane = raw === 'full' ? 'full' : 'light';
+    return l10n('dashboards.lintsConfig.description', { tier, lane });
+}
+
+/**
  * The six first-class dashboards. Analysis Optimizer, Upgrade Opportunities,
  * and the Feature Inventory export are deliberately NOT separate rows here
  * any more — they render as tabs inside Rules & Tiers (Analysis Optimizer,
@@ -263,7 +318,7 @@ function buildEditorDashboardItems(): LeafItem[] {
     return [
         new LeafItem(
             'Lints Config',
-            'Tiers, rule packs, SDK rollout',
+            buildLintsConfigDescription(),
             'saropaLints.openConfigDashboard',
             'settings-gear',
             new vscode.ThemeColor('activityBarBadge.foreground'),
@@ -409,12 +464,23 @@ function appendHealthRow(
     if (!health) return;
     const prevScore = findPreviousScore(history);
     const delta = prevScore !== undefined ? formatScoreDelta(health.score, prevScore) : '';
-    items.push(new LeafItem(
+    const item = new LeafItem(
         `Health: ${health.score}`,
         healthScoreDescription(delta, total, critical),
         'saropaLints.focusIssues',
         'pulse',
-    ));
+    );
+    // The dedicated "Last run" row was folded into this tooltip (WP5, sidebar
+    // row collapse): the Findings dashboard already has its own freshness
+    // pill, so the sidebar only needs the timestamp as hover text rather than
+    // a whole extra row. `LeafItem`'s constructor has no tooltip parameter —
+    // assign after construction. Omitted entirely when history is empty
+    // (no analysis has ever run) rather than showing a misleading tooltip.
+    const lastRunIso = history.at(-1)?.timestamp;
+    if (lastRunIso) {
+        item.tooltip = l10n('status.health.lastRunTooltip', { ago: formatTimeAgo(lastRunIso) });
+    }
+    items.push(item);
 }
 
 // Maps the machine-readable EngineStatus.key to the debug.engine.* l10n
@@ -484,122 +550,71 @@ function appendLintIntegrationRow(items: LeafItem[]): void {
     ));
 }
 
-function appendSuppressionRow(items: LeafItem[], data: ViolationsData): void {
-    const sup = data.summary?.suppressions;
-    const total = sup?.total ?? 0;
-    if (total <= 0) return;
-    const violationsTotal = data.summary?.totalViolations ?? data.violations?.length ?? 0;
-    const denominator = violationsTotal + total;
-    const rate = denominator > 0 ? Math.round((total / denominator) * 1000) / 10 : 0;
+// `appendSuppressionRow`, `appendTrendRow`, and `appendRegressionAndMilestone`
+// were removed here (WP5, sidebar row collapse):
+//   - Suppressions ("N suppressed") was a straight CUT — the Findings
+//     dashboard already renders `analyzerSuppressions` + `viewSuppressions`
+//     (`violationsWideReportView.ts`), so the sidebar row was pure
+//     duplication with no unique information.
+//   - Trends and "Score dropped A → B" MOVED to the Findings dashboard's
+//     status-line pills (WP4, `violations-dashboard-top.ts` `buildStatusLine`)
+//     — same `runHistory.ts` data (`getTrendSummary` /
+//     `getScoreTrendSummary` / `detectScoreRegression`), a landing spot with
+//     more room for detail (tooltip breakdown) than a sidebar row allowed.
+//   - "↓ N fewer issues" FOLDED into the trend pill's `good` CSS class rather
+//     than surviving as its own row — the arrow-series trend text already
+//     conveys direction, so a separate milestone row was noise.
+// See plans/PLAN_sidebar_row_collapse.md §2.2 for the per-row evidence.
 
-    const parts: string[] = [];
-    const byKind = sup?.byKind;
-    if (byKind?.ignore) parts.push(`${byKind.ignore} ignore`);
-    if (byKind?.ignoreForFile) parts.push(`${byKind.ignoreForFile} file-level`);
-    if (byKind?.baseline) parts.push(`${byKind.baseline} baseline`);
-    if (denominator > 0) parts.push(`${rate}% suppression rate`);
-    const desc = parts.length > 0 ? parts.join(', ') : 'View details';
-
-    items.push(new LeafItem(
-        `${total} suppressed`, desc,
-        'saropaLints.focusIssues', 'eye-closed',
-    ));
-}
-
-function appendTrendRow(items: LeafItem[], history: ReturnType<typeof loadHistory>): void {
-    const scoreTrend = getScoreTrendSummary(history);
-    if (scoreTrend) {
-        items.push(new LeafItem('Trends', scoreTrend, 'saropaLints.focusIssues', 'graph-line'));
-        return;
-    }
-    const trend = getTrendSummary(history);
-    if (trend) {
-        items.push(new LeafItem('Trends', trend, 'saropaLints.focusIssues', 'graph-line'));
-    }
-}
-
-function appendRegressionAndMilestone(
-    items: LeafItem[],
-    history: ReturnType<typeof loadHistory>,
-    data: ViolationsData,
-): void {
-    const regression = detectScoreRegression(history);
-    if (regression) {
-        // Headline regression on errors (must-fix). Was previously keyed on
-        // LintImpact.critical (5-bucket taxonomy retired 2026-05-03).
-        const errorCount = data.summary?.byImpact?.error ?? 0;
-        const plural = errorCount === 1 ? '' : 's';
-        const regDesc = errorCount > 0
-            ? `${errorCount} error${plural}`
-            : 'View issues';
-        items.push(new LeafItem(
-            `Score dropped ${regression.previousScore} → ${regression.currentScore}`,
-            regDesc,
-            'saropaLints.focusIssues',
-            'arrow-down',
-            new vscode.ThemeColor('list.errorForeground'),
-        ));
-    }
-
-    if (history.length < 2) return;
-    const prev = history.at(-2)!;
-    const curr = history.at(-1)!;
-    const violationDelta = prev.total - curr.total;
-    if (violationDelta > 0) {
-        items.push(new LeafItem(
-            `↓ ${violationDelta} fewer issues`,
-            'since last run',
-            'saropaLints.focusIssues',
-            'star-full',
-            new vscode.ThemeColor('testing.iconPassed'),
-        ));
-    }
-}
-
-function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
+/**
+ * Status section: Health (with a "Last analysis" tooltip) · Engines
+ * (conditional on debug.enabled) · Lint integration · analyzer plugin
+ * warning (conditional, WP3). Hotspots, Suppressed, Trends, Score dropped,
+ * Fewer issues, and the standalone Last-run row all moved elsewhere or were
+ * cut outright — see the comment block above and
+ * plans/PLAN_sidebar_row_collapse.md §2.2. The view's own `when` clause
+ * (package.json `saropaLints.status`) no longer requires
+ * `saropaLints.hasViolations` (WP5): Lint integration state matters most
+ * exactly when there are no violations to gate the panel on (integration
+ * off → nothing scans → zero violations → panel used to vanish, hiding the
+ * one row that would explain why).
+ */
+function buildStatusItems(workspaceState: vscode.Memento, configProvider: ConfigTreeProvider): SectionNode[] {
     const loaded = loadFilteredViolations(workspaceState);
     if (!loaded) return [];
     const { data, root } = loaded;
 
+    // `items` stays LeafItem[] because every `append*` helper below is typed
+    // against LeafItem[] (they only ever construct vscode.TreeItem leaves).
+    // The analyzer plugin warning row is a ConfigTreeNode (a different arm of
+    // the SectionNode union — see `getAnalyzerPluginWarningNode`'s doc
+    // comment in configTree.ts), so it is appended separately below rather
+    // than threaded through the LeafItem-typed helpers.
     const items: LeafItem[] = [];
     const history = loadHistory(workspaceState);
     const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
     // Was data.summary.byImpact.critical (5-bucket taxonomy retired 2026-05-03).
     const critical = data.summary?.byImpact?.error ?? 0;
-    const hotspotReviewState = new SecurityHotspotReviewStateService(workspaceState);
-    const hotspotCounts = countSecurityHotspotReviewStates(
-        data.violations ?? [],
-        data.config?.ruleMetadataByRule,
-        hotspotReviewState,
-    );
 
     appendHealthRow(items, history, data, total, critical, root);
     appendEnginesRow(items);
     appendLintIntegrationRow(items);
-    if (hotspotCounts.total > 0) {
-        const reviewed = hotspotCounts.reviewedSafe + hotspotCounts.reviewedFixed;
-        const percent = Math.round((reviewed / hotspotCounts.total) * 100);
-        items.push(new LeafItem(
-            `Hotspots: ${percent}% reviewed`,
-            `${hotspotCounts.open} open, ${hotspotCounts.reviewedSafe} safe, ${hotspotCounts.reviewedFixed} fixed`,
-            'saropaLints.reviewHotspotState',
-            'shield',
-        ));
-    }
-    appendSuppressionRow(items, data);
-    appendTrendRow(items, history);
-    appendRegressionAndMilestone(items, history, data);
 
-    const lastEntry = history.at(-1);
-    if (lastEntry) {
-        items.push(new LeafItem(
-            'Last run',
-            formatTimeAgo(lastEntry.timestamp),
-            'saropaLints.runAnalysis',
-            'history',
-        ));
-    }
-    return items;
+    // Analyzer plugin warning row (2026-09-04, sidebar row collapse WP3):
+    // MOVED here from the Settings/Quick Actions section — a plugin state is
+    // a fact about the project, not a setting, and it now sits right after
+    // Lint integration since both rows describe how the project talks to
+    // the analyzer. Only rendered when the plugin is disabled or absent —
+    // `getAnalyzerPluginWarningNode` returns [] for the `live` state (its
+    // `verifyPlugin` probe stays reachable via Command Catalog / Health
+    // Panel instead of a sidebar row). It is now also the LAST row in the
+    // section (WP5 removed everything that used to render after it —
+    // Hotspots/Suppressed/Trends/Score-dropped/Last-run — so the splice this
+    // function used to do at a captured "after Lint integration" index is no
+    // longer needed; a plain append is correct).
+    const pluginWarningRows: SectionNode[] = configProvider.getAnalyzerPluginWarningNode();
+
+    return [...items, ...pluginWarningRows];
 }
 
 // ── ConfigTreeProvider-backed sections (Settings + Triage) ─────────────────
@@ -626,77 +641,28 @@ function isRedundantSettingsAction(node: ConfigTreeNode): boolean {
 }
 
 /**
- * Actions + Settings + Triage rows merged into one panel. Order: actions
- * first (run analysis, initialize config), then settings (lint integration
- * toggle, tier, run-after-config, UI language, detected packages), then
- * triage rows (per-rule volume groups, "X rules disabled by override",
- * "X rules with zero issues") when triage data is available.
+ * Actions-only panel (WP1, 2026-09-04): 4 rows always, +1 conditional.
+ * Order: run analysis, initialize/update config, fix stale ignores, command
+ * catalog, then (only when `configProvider.getSettingAndActionNodes()`
+ * surfaces it) migrate legacy config keys.
  *
- * Why merged: the former standalone Actions panel sat directly above this
- * one and the two read as duplicates — Actions held a handful of operations,
- * Settings held the config those operations target. They are one story
- * ("operate and configure my project's lints"), so they share one panel.
- * Triage was folded in earlier for the same reason. The play-button in the
- * panel title bar still runs analysis (view/title menu moved to this view).
+ * Everything else this panel used to carry — severity toggles, setting-value
+ * rows (run-after-config/dependency, UI language, detected packages), and
+ * triage rows — was a verified duplicate of a richer surface elsewhere and
+ * was cut in the same change; see the file header comment and
+ * plans/PLAN_sidebar_row_collapse.md §2.1 for the per-row evidence. The
+ * `getSettingAndActionNodes()` call below now returns action nodes only
+ * (`buildSettingNodes` was emptied and deleted in configTree.ts), so
+ * `isRedundantSettingsAction` still filters out the handful of actions that
+ * duplicate the top-level Editor dashboard / Actions rows (open config
+ * dashboard, initialize config, run analysis, composite plugin scaffold).
  */
 function buildSettingsItems(configProvider: ConfigTreeProvider): SectionNode[] {
     const actions = buildActionItems();
     const settings = configProvider
         .getSettingAndActionNodes()
         .filter((n) => !isRedundantSettingsAction(n));
-    // Triage rows render flat; renderTreeItem may set collapsibleState on
-    // group nodes, but `getTreeItem` overrides it back to None so no chevrons
-    // appear next to any row inside this panel.
-    const triage = configProvider.getTriageNodes();
-    // Diagnostics (severity toggles + lint integration/plugin/tier controls)
-    // folded in here — they were their own stacked panel, which meant a 7th
-    // scroll section for 8 rows that are all "things that control what
-    // diagnostics you see", the same story this panel already tells.
-    const diagnostics = buildDiagnosticsItems(configProvider);
-    return [...actions, ...settings, ...triage, ...diagnostics];
-}
-
-/**
- * Diagnostics rows — severity filter toggles plus the 3 core diagnostic
- * controls (Lint integration, Analyzer plugin, Tier). Appended to the
- * Settings panel by `buildSettingsItems` rather than rendered as their own
- * view — they govern the same "what do I see and how is it configured"
- * story as the rest of that panel.
- */
-function buildDiagnosticsItems(configProvider: ConfigTreeProvider): SectionNode[] {
-    const cfg = vscode.workspace.getConfiguration('saropaLints');
-    const showErrors = cfg.get<boolean>('severity.error', true) !== false;
-    const showWarnings = cfg.get<boolean>('severity.warning', true) !== false;
-    const showInfos = cfg.get<boolean>('severity.info', true) !== false;
-    const showHints = cfg.get<boolean>('severity.hint', true) !== false;
-    return [
-        // Each severity gets a distinct icon + theme color so the user can
-        // visually distinguish them at a glance without reading the label.
-        new SeverityToggleItem(
-            'Show errors', showErrors ? 'On' : 'Off',
-            'saropaLints.toggleSeverityError', 'error',
-            new vscode.ThemeColor('list.errorForeground'),
-        ),
-        new SeverityToggleItem(
-            'Show warnings', showWarnings ? 'On' : 'Off',
-            'saropaLints.toggleSeverityWarning', 'warning',
-            new vscode.ThemeColor('list.warningForeground'),
-        ),
-        new SeverityToggleItem(
-            'Show infos', showInfos ? 'On' : 'Off',
-            'saropaLints.toggleSeverityInfo', 'info',
-            new vscode.ThemeColor('charts.blue'),
-        ),
-        new SeverityToggleItem(
-            'Show hints', showHints ? 'On' : 'Off',
-            'saropaLints.toggleSeverityHint', 'lightbulb',
-            new vscode.ThemeColor('charts.green'),
-        ),
-        // Lint integration, Analyzer plugin, and Tier — moved here from
-        // the Settings section because they directly control which
-        // diagnostics appear (same concern as the severity toggles above).
-        ...configProvider.getDiagnosticControlNodes(),
-    ];
+    return [...actions, ...settings];
 }
 
 // ── Provider class ────────────────────────────────────────────────────────
@@ -770,7 +736,7 @@ export function createSidebarSectionProviders(
         // Merged Actions + Settings + Triage panel, placed at the former Actions
         // slot (above Status) so the run/initialize operations stay prominent.
         new FlatSectionProvider(SECTION_VIEW_IDS.settings, () => buildSettingsItems(configProvider)),
-        new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState)),
+        new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState, configProvider)),
     ];
 }
 

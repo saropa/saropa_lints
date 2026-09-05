@@ -554,4 +554,49 @@ describe('violationsDashboardHtml', () => {
     const html = withScanner({ enabled: true, hasDartFiles: true });
     assert.ok(!html.includes('data-toggle="scanner"'));
   });
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * WP4 (plans/PLAN_sidebar_row_collapse.md): trend/regression/hotspot
+   * status-line pills. These replace the sidebar Status panel's Trends /
+   * Score dropped / Hotspots rows (cut in WP5) — pinning their presence here
+   * is what makes that later cut safe.
+   * ────────────────────────────────────────────────────────────────────── */
+  it('renders no history/hotspot pills when both slices are omitted', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!html.includes('data-palette-cmd="saropaLints.reviewHotspotState"'));
+    assert.ok(!html.includes('▼'));
+  });
+
+  it('renders a regression pill and an improved-trend pill from the history slice', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        history: {
+          trend: '90 → 85 → 92 over 2 weeks',
+          regression: { previousScore: 82, currentScore: 71, drop: 11 },
+          improved: true,
+        },
+      }),
+    );
+    assert.ok(html.includes('class="pill bad"'));
+    assert.ok(html.includes('▼ 82 → 71'));
+    assert.ok(html.includes('class="pill good"'));
+    assert.ok(html.includes('90 → 85 → 92 over 2 weeks'));
+  });
+
+  it('renders a clickable hotspot pill with the review-QuickPick command and reviewed percentage', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({
+        hotspots: { total: 4, open: 1, reviewedSafe: 2, reviewedFixed: 1 },
+      }),
+    );
+    assert.ok(html.includes('data-palette-cmd="saropaLints.reviewHotspotState"'));
+    assert.ok(html.includes('75%'));
+  });
+
+  it('omits the hotspots pill when total is not supplied positive', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({ hotspots: { total: 0, open: 0, reviewedSafe: 0, reviewedFixed: 0 } }),
+    );
+    assert.ok(!html.includes('data-palette-cmd="saropaLints.reviewHotspotState"'));
+  });
 });

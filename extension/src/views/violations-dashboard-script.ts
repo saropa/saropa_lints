@@ -346,13 +346,28 @@ export function buildScript(): string {
     handleToggleEvent(t);
   });
 
-  /* More actions menu */
-  document.querySelectorAll('.menu-item[data-palette-cmd]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var id = btn.getAttribute('data-palette-cmd');
-      if (id) vscode.postMessage({ type: 'paletteCommand', commandId: id });
-      var det = btn.closest('details.more');
-      if (det) det.removeAttribute('open');
+  /* Palette-command dispatch: the More-actions menu items AND the status-line
+     hotspot pill (WP4) share this one wiring. Widened from '.menu-item[data-palette-cmd]'
+     to any '[data-palette-cmd]' element so the hotspot pill (a '.pill.toggle' with
+     role="button") can open the review QuickPick without inventing a second dispatch
+     path; the extension host applies its own 'saropaLints.' prefix allow-list
+     (violationsWideReportView.ts, 'paletteCommand' handler) so widening the DOM
+     selector cannot execute an arbitrary command. */
+  function firePaletteCommand(el) {
+    var id = el.getAttribute('data-palette-cmd');
+    if (id) vscode.postMessage({ type: 'paletteCommand', commandId: id });
+    var det = el.closest('details.more');
+    if (det) det.removeAttribute('open');
+  }
+  document.querySelectorAll('[data-palette-cmd]').forEach(function (btn) {
+    btn.addEventListener('click', function () { firePaletteCommand(btn); });
+    /* Keyboard parity for role="button" elements (the hotspot pill) — menu-item
+       buttons are real <button>s and already get a synthetic click from the browser
+       on Enter/Space, but a non-button element with role="button" does not. */
+    btn.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      firePaletteCommand(btn);
     });
   });
   /* Close menu on outside click */

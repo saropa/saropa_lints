@@ -108,6 +108,73 @@ export function buildScannerPromoPill(input: ViolationsDashboardHtmlInput): stri
 }
 
 
+/**
+ * Regression + trend pills — replaces the sidebar Status panel's "Score
+ * dropped A → B" and "Trends" rows (plan §2.2 rows 6-8). Both come from
+ * `input.history`, built in violationsWideReportView.ts from the same
+ * runHistory.ts functions the sidebar used, so the two surfaces read
+ * identically while the sidebar row still exists (pre-WP5).
+ *
+ * The regression pill's visible text is numbers and arrow glyphs only (no
+ * English words), so it is written directly rather than through l10n — only
+ * its `title` attribute carries translatable text. The trend pill's visible
+ * text comes straight from runHistory.ts, which still concatenates English
+ * fragments ("First run: N violations", "over 2 weeks") — TODO(i18n): that
+ * belongs to runHistory.ts, not this pill; localizing only the wrapper here
+ * while the payload stays English would be a half-measure.
+ */
+function buildHistoryPills(input: ViolationsDashboardHtmlInput): string[] {
+  const history = input.history;
+  if (!history) return [];
+  const pills: string[] = [];
+  const reg = history.regression;
+  if (reg) {
+    const title = escapeHtml(
+      l10n('findingsDash.status.regressionTitle', {
+        previousScore: String(reg.previousScore),
+        currentScore: String(reg.currentScore),
+      }),
+    );
+    pills.push(`<span class="pill bad" title="${title}">▼ ${reg.previousScore} → ${reg.currentScore}</span>`);
+  }
+  if (history.trend) {
+    const cls = history.improved ? 'pill good' : 'pill';
+    const title = escapeHtml(l10n('findingsDash.status.trendTitle'));
+    pills.push(`<span class="${cls}" title="${title}">${escapeHtml(history.trend)}</span>`);
+  }
+  return pills;
+}
+
+/**
+ * Hotspot review-progress pill — replaces the sidebar Status panel's
+ * "Hotspots: N% reviewed" row (plan §2.2 row 4). Clickable: posts a
+ * `paletteCommand` for `saropaLints.reviewHotspotState`, which with no target
+ * violation shows a QuickPick of open hotspots (issuesViewCommands.ts) — the
+ * same command the sidebar row used. `data-palette-cmd` dispatch was widened
+ * in violations-dashboard-script.ts from '.menu-item[...]' to any element so
+ * this non-menu pill can use the same wiring.
+ */
+function buildHotspotsPill(input: ViolationsDashboardHtmlInput): string[] {
+  const h = input.hotspots;
+  if (!h || h.total <= 0) return [];
+  const reviewed = h.reviewedSafe + h.reviewedFixed;
+  const percent = Math.round((reviewed / h.total) * 100);
+  const cls = h.open > 0 ? 'pill warn toggle' : 'pill good toggle';
+  const title = escapeHtml(
+    l10n('findingsDash.status.hotspotsTitle', {
+      open: String(h.open),
+      safe: String(h.reviewedSafe),
+      fixed: String(h.reviewedFixed),
+    }),
+  );
+  const pillText = escapeHtml(
+    l10n('findingsDash.status.hotspotsPill', { open: String(h.open), percent: String(percent) }),
+  );
+  return [
+    `<span class="${cls}" role="button" tabindex="0" data-palette-cmd="saropaLints.reviewHotspotState" title="${title}">🛡 ${pillText}</span>`,
+  ];
+}
+
 /** Status line under the title — freshness + highest-signal facts (§4.1). */
 export function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const parts: string[] = [];
@@ -144,6 +211,13 @@ export function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const findings = input.totalRawAfterDisable;
   const findingsClass = findings === 0 ? 'good' : findings > 100 ? 'bad' : 'warn';
   parts.push(`<span class="pill ${findingsClass}" title="${escapeHtml(l10n('findingsDash.status.findingsAfterFilterTitle'))}">${pluralize(findings, { one: l10n('findingsDash.status.findingOne'), other: l10n('findingsDash.status.findingOther') })}</span>`);
+  // WP4 (plans/PLAN_sidebar_row_collapse.md §3): trend/regression/hotspot pills
+  // replace the sidebar Status panel's Trends / Score dropped / "N fewer
+  // issues" / Hotspots rows, which are cut in WP5 once this landing spot
+  // exists. Ordered right after the findings-count pill and before the
+  // TODO/HACK pill per the plan's status-line ordering.
+  parts.push(...buildHistoryPills(input));
+  parts.push(...buildHotspotsPill(input));
   const todos = input.todoHackSnapshot.todos.length;
   const hacks = input.todoHackSnapshot.hacks.length;
   if (input.todoHackSnapshot.enabled) {

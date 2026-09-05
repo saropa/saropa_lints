@@ -850,6 +850,15 @@ const SCRIPT_CONFIG_FILE_TAB = `
     });
   });
 
+  // \`lane\` posts its OWN message type ('writeLane', not 'writeScalar') so the host handler
+  // never routes it through the generic scalar writer — see rulePacksWebviewProvider.ts's
+  // _buildLaneCard doc comment for why lane needs its dedicated reader/writer.
+  document.querySelectorAll('[data-lane-select]').forEach(function(el) {
+    el.addEventListener('change', function() {
+      vscode.postMessage({ type: 'writeLane', value: el.value });
+    });
+  });
+
   (function wirePlatforms() {
     var boxes = document.querySelectorAll('[data-platform]');
     if (boxes.length === 0) return;

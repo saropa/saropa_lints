@@ -66,6 +66,13 @@ import {
   type CustomYamlTopLevelKey,
 } from './customConfigYaml';
 import { readBaselineSummary, baselineFilePath } from './baselineReader';
+// `lane:` is a top-level `analysis_options_custom.yaml` key like the ones in
+// `customConfigYaml.ts`, but it has deprecation-fallback read semantics (an
+// old `plugins > saropa_lints:` location is still honored) the generic
+// `readScalarKey`/`writeScalarKey` helpers there do not implement — its
+// reader/writer lives in `laneConfig.ts` instead. See
+// `CUSTOM_YAML_TOP_LEVEL_KEYS`'s `lane` entry comment in `customConfigYaml.ts`.
+import { readRawLaneFromCustomConfig, writeLaneToCustomConfig, type RuleLaneValue } from '../config/laneConfig';
 import { buildSettingsCatalog, findSettingEntry, flatSettingKey, type SettingCatalogEntry } from './settingsCatalog';
 
 const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
@@ -95,6 +102,7 @@ function isTabId(value: string): value is TabId {
 export const CONFIG_FILE_CARD_IDS = [
   'analysisSettings',
   'tierCap',
+  'lane',
   'platforms',
   'severities',
   'bannedUsage',
@@ -103,17 +111,21 @@ export const CONFIG_FILE_CARD_IDS = [
 export type ConfigFileCardId = (typeof CONFIG_FILE_CARD_IDS)[number];
 
 /**
- * Maps each of the 8 `analysis_options_custom.yaml` top-level keys to the Config file tab card
+ * Maps each of the 9 `analysis_options_custom.yaml` top-level keys to the Config file tab card
  * that renders its control. Two keys share a card where they are naturally one concern
  * (`max_issues`+`output` are both "analysis settings"; `saropa_tier`+`runtime_tier` are both
  * "tier caps") — the coverage test checks every KEY maps somewhere, not a strict 1:1 key:card
- * ratio, since that pairing is a deliberate UI grouping decision, not an oversight.
+ * ratio, since that pairing is a deliberate UI grouping decision, not an oversight. `lane` gets
+ * its OWN card (not folded into `tierCap`) because it round-trips through `laneConfig.ts`'s
+ * dedicated reader/writer, not the generic scalar helpers the other cards share (WP2, sidebar row
+ * collapse plan) — sharing a card would blur that distinction for the next person editing it.
  */
 export const CONFIG_FILE_KEY_TO_CARD: Record<CustomYamlTopLevelKey, ConfigFileCardId> = {
   max_issues: 'analysisSettings',
   output: 'analysisSettings',
   saropa_tier: 'tierCap',
   runtime_tier: 'tierCap',
+  lane: 'lane',
   platforms: 'platforms',
   severities: 'severities',
   banned_usage: 'bannedUsage',
@@ -543,9 +555,15 @@ export class RulePacksWebviewProvider {
         if (msg.type === 'updateSetting' && typeof msg.key === 'string') {
           void this._handleUpdateSetting(msg.key, msg.value);
         }
-        // Config file tab: the 8 previously-UI-less analysis_options_custom.yaml keys.
+        // Config file tab: the previously-UI-less analysis_options_custom.yaml keys.
         if (msg.type === 'writeScalar' && typeof msg.scalarKey === 'string') {
           void this._handleWriteScalar(msg.scalarKey, typeof msg.value === 'string' ? msg.value : undefined);
+        }
+        // `lane` gets its own message type (not `writeScalar`) so it never routes through the
+        // generic scalar allow-list in `_handleWriteScalar` — see `_buildLaneCard`'s doc comment
+        // for why `lane`'s read/write must stay on `laneConfig.ts`'s dedicated functions.
+        if (msg.type === 'writeLane' && typeof msg.value === 'string') {
+          void this._handleWriteLane(msg.value);
         }
         if (msg.type === 'writePlatforms' && msg.platforms) {
           void this._handleWritePlatforms(msg.platforms);
@@ -1673,6 +1691,7 @@ ${detailRow}`;
     return {
       analysisSettings: (root) => this._buildAnalysisSettingsCard(root),
       tierCap: (root) => this._buildTierCapCard(root),
+      lane: (root) => this._buildLaneCard(root),
       platforms: (root) => this._buildPlatformsCard(root),
       severities: (root) => this._buildSeveritiesCard(root),
       bannedUsage: (root) => this._buildBannedUsageCard(root),
@@ -1723,6 +1742,45 @@ ${detailRow}`;
   <div class="cf-field-row">
     <label class="cf-field"><span>${escapeHtml(l10n('rulesTiers.configFile.saropaTier.label'))}</span>${buildSelect('cf-saropa-tier', 'saropa_tier', saropaTier)}</label>
     <label class="cf-field"><span>${escapeHtml(l10n('rulesTiers.configFile.runtimeTier.label'))}</span>${buildSelect('cf-runtime-tier', 'runtime_tier', runtimeTier)}</label>
+  </div>
+</section>`;
+  }
+
+  /**
+   * `lane:` — the in-process analyzer plugin's light/full split
+   * (`rule_lane.dart`'s `RuleLane`). This was the sidebar's Lane row before
+   * the 2026-09-04 row collapse (plans/PLAN_sidebar_row_collapse.md WP2); it
+   * moved here because `lane` is a `analysis_options_custom.yaml` top-level
+   * key with no Config file tab card before this change, and the row's click
+   * target (`saropaLints.setLane`'s QuickPick) is a worse UI than a persistent
+   * select next to every other custom-yaml key.
+   *
+   * Deliberately reads/writes through `laneConfig.ts`
+   * (`readRawLaneFromCustomConfig` / `writeLaneToCustomConfig`), NOT the
+   * generic `readScalarKey`/`writeScalarKey` helpers the other scalar cards
+   * use — `lane` has a deprecation-fallback read path (the old
+   * `plugins > saropa_lints:` block in `analysis_options.yaml`) that the
+   * generic helpers do not implement, so routing it through them would silently
+   * disagree with what the in-process plugin is actually honoring.
+   */
+  private _buildLaneCard(root: string): string {
+    const raw = readRawLaneFromCustomConfig(root);
+    // Absent/unrecognized reads as 'light' — matches the Dart-side default
+    // (RuleLane.light), the same fallback the removed sidebar Lane row and
+    // the `setLane` QuickPick both use, so this card never disagrees with them.
+    const lane: RuleLaneValue = raw === 'full' ? 'full' : 'light';
+    const buildOption = (value: RuleLaneValue, label: string): string =>
+      `<option value="${value}"${value === lane ? ' selected' : ''}>${escapeHtml(label)}</option>`;
+    return `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.configFile.lane.title'))}">
+  <h3>${escapeHtml(l10n('rulesTiers.configFile.lane.title'))}</h3>
+  <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.lane.hint'))}</p>
+  <div class="cf-field-row">
+    <label class="cf-field">
+      <select id="cf-lane" data-lane-select>
+        ${buildOption('light', l10n('dashboards.controls.laneLight'))}
+        ${buildOption('full', l10n('dashboards.controls.laneFull'))}
+      </select>
+    </label>
   </div>
 </section>`;
   }
@@ -2123,6 +2181,23 @@ ${detailRow}`;
     // An empty string from a "None" select option means "remove the key", matching the tier-cap
     // selects' `<option value="">` sentinel built in `_buildTierCapCard`.
     writeScalarKey(root, scalarKey, value === '' ? undefined : value);
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /**
+   * Config file tab: `lane` scalar. Routes through `writeLaneToCustomConfig`
+   * (not `writeScalarKey`) because `lane` has deprecation-fallback read
+   * semantics the generic helper does not implement — see `_buildLaneCard`'s
+   * doc comment. Only `'light'`/`'full'` are accepted; anything else arriving
+   * from the untrusted postMessage channel is silently dropped rather than
+   * written, same defensive posture as `_handleWritePlatforms`'s known-name check.
+   */
+  private async _handleWriteLane(value: string): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    if (value !== 'light' && value !== 'full') return;
+    writeLaneToCustomConfig(root, value);
     await this._runAnalysisIfEnabled();
     this.refresh();
   }

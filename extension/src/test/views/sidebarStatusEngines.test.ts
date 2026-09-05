@@ -20,6 +20,7 @@ import * as pubspecReader from '../../pubspecReader';
 import * as liveViolationsData from '../../liveViolationsData';
 import * as suppressionsStore from '../../suppressionsStore';
 import * as runHistory from '../../runHistory';
+import * as setupModule from '../../setup';
 import { HealthPanel } from '../../systemHealth/healthPanel';
 import type { EngineStatus } from '../../systemHealth/engineCardsHtml';
 import { setTestConfig, clearTestConfig } from '../vibrancy/vscode-mock';
@@ -218,5 +219,182 @@ describe('sidebar Status section — Lint integration row', () => {
     const label = typeof row!.label === 'string' ? row!.label : row!.label?.label;
     assert.strictEqual(label, 'Lint integration: Off');
     assert.strictEqual(row!.command?.command, 'saropaLints.enable');
+  });
+});
+
+/**
+ * Pins the Status section's analyzer plugin warning row — MOVED here from the
+ * Settings/Quick Actions panel (2026-09-04, sidebar row collapse WP3,
+ * `getAnalyzerPluginWarningNode` in configTree.ts). A plugin state is a fact,
+ * not a setting: it belongs beside Health/Engines/Lint integration, and it
+ * should only cost a row when there is actually something to fix.
+ *
+ * Regression guards:
+ *   - `live` → no row at all (the `verifyPlugin` liveness probe stays behind
+ *     Command Catalog / Health Panel instead of a sidebar row for the
+ *     expected-good state).
+ *   - `disabled` → row present, clicking it runs `saropaLints.reenablePlugin`.
+ *   - `absent` → row present, clicking it runs `saropaLints.initializeConfig`.
+ *
+ * Unlike the Engines/Lint-integration rows above, this row is a raw
+ * `ConfigSettingNode` object (see triageTree.ts), not a rendered
+ * `vscode.TreeItem` — `FlatSectionProvider.getChildren()` returns the
+ * unrendered `SectionNode[]`; `getTreeItem()` (not exercised by this test)
+ * is what later calls `renderTreeItem` on it. So the click target here is
+ * `commandId`, not `command.command`, and the visible text is `label`
+ * directly rather than `label.label`.
+ */
+/**
+ * Pins the WP5 (sidebar row collapse) cut: Status carries only Health /
+ * Engines / Lint integration (+ the conditional plugin warning). Hotspots,
+ * Trends, Score-dropped, and Suppression rows moved to the Findings
+ * dashboard's status-line pills or were cut outright — stubbing history with
+ * a regression AND hotspot counts > 0 proves those rows genuinely don't
+ * render any more, not merely that this particular fixture happens not to
+ * trigger them.
+ */
+describe('sidebar Status section — row collapse (WP5)', () => {
+  beforeEach(() => {
+    sinon.restore();
+    clearTestConfig();
+    sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
+    sinon.stub(pubspecReader, 'hasSaropaLintsDep').returns(true);
+    sinon.stub(liveViolationsData, 'readVisibleLiveViolations').returns({
+      violations: [],
+      summary: { totalViolations: 0 },
+    });
+    sinon.stub(liveViolationsData, 'computeLiveHealthScore').returns({ score: 90, filesAnalyzed: 10 } as never);
+    sinon.stub(suppressionsStore, 'loadSuppressions').returns({
+      hiddenFiles: [],
+      hiddenFolders: [],
+      hiddenRules: [],
+      hiddenRuleInFile: {},
+      hiddenSeverities: [],
+      hiddenImpacts: [],
+    });
+    // History carrying BOTH a score regression (previous run scored higher)
+    // and two entries whose totals fell — exactly the fixture that used to
+    // fire Score-dropped, Trends, and the "fewer issues" milestone rows.
+    // If any of those rows survived the WP5 cut, this stub would surface it.
+    sinon.stub(runHistory, 'loadHistory').returns([
+      { timestamp: '2026-09-01T00:00:00.000Z', score: 95, total: 10 },
+      { timestamp: '2026-09-02T00:00:00.000Z', score: 80, total: 5 },
+    ] as never);
+    sinon.stub(HealthPanel, 'getEngineStatuses').returns(undefined);
+    sinon.stub(setupModule, 'getPluginsIntegrationState').returns('live');
+  });
+
+  afterEach(() => {
+    sinon.restore();
+    clearTestConfig();
+  });
+
+  function getStatusItems(): unknown[] {
+    const providers = createSidebarSectionProviders(
+      new MockMemento() as unknown as Parameters<typeof createSidebarSectionProviders>[0],
+      new ConfigTreeProvider(),
+    );
+    const status = providers.find((p) => p.viewId === SECTION_VIEW_IDS.status);
+    assert.ok(status, 'status provider must exist');
+    return status!.getChildren();
+  }
+
+  it('carries only Health / Engines / Lint integration (+ plugin warning) — no hotspot/trend/regression/suppression/last-run rows', () => {
+    const items = getStatusItems() as TestLeaf[];
+
+    assert.ok(
+      !items.some((i) => (i as unknown as { commandId?: string }).commandId === 'reviewHotspotState'
+        || i.command?.command === 'saropaLints.reviewHotspotState'),
+      'no row must be wired to the hotspot review command any more',
+    );
+
+    for (const item of items) {
+      const label = typeof item.label === 'string' ? item.label : item.label?.label ?? '';
+      assert.ok(!label.startsWith('Trends'), `label "${label}" must not be a Trends row`);
+      assert.ok(!label.startsWith('Score dropped'), `label "${label}" must not be a Score-dropped row`);
+      assert.ok(!label.startsWith('↓'), `label "${label}" must not be a "fewer issues" milestone row`);
+      assert.ok(!label.startsWith('Last run'), `label "${label}" must not be a standalone Last-run row`);
+    }
+
+    assert.ok(
+      !items.some((i) => i.iconPath && (i.iconPath as unknown as { id?: string }).id === 'eye-closed'),
+      'no eye-closed (suppressions) icon should render any more',
+    );
+  });
+
+  it('Health row tooltip carries the relative last-run time when history has a timestamp', () => {
+    const items = getStatusItems() as TestLeaf[];
+    const healthRow = items.find((i) => {
+      const label = typeof i.label === 'string' ? i.label : i.label?.label;
+      return typeof label === 'string' && label.startsWith('Health:');
+    }) as unknown as { tooltip?: string } | undefined;
+    assert.ok(healthRow, 'Health row must be present');
+    assert.ok(healthRow!.tooltip, 'Health row must carry a tooltip when history has a timestamp');
+    assert.match(String(healthRow!.tooltip), /ago|just now/);
+  });
+});
+
+describe('sidebar Status section — Analyzer plugin warning row', () => {
+  beforeEach(() => {
+    sinon.restore();
+    clearTestConfig();
+    sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
+    sinon.stub(pubspecReader, 'hasSaropaLintsDep').returns(true);
+    sinon.stub(liveViolationsData, 'readVisibleLiveViolations').returns({
+      violations: [],
+      summary: { totalViolations: 0 },
+    });
+    sinon.stub(liveViolationsData, 'computeLiveHealthScore').returns(null);
+    sinon.stub(suppressionsStore, 'loadSuppressions').returns({
+      hiddenFiles: [],
+      hiddenFolders: [],
+      hiddenRules: [],
+      hiddenRuleInFile: {},
+      hiddenSeverities: [],
+      hiddenImpacts: [],
+    });
+    sinon.stub(runHistory, 'loadHistory').returns([]);
+    sinon.stub(HealthPanel, 'getEngineStatuses').returns(undefined);
+  });
+
+  afterEach(() => {
+    sinon.restore();
+    clearTestConfig();
+  });
+
+  function getStatusItems(): unknown[] {
+    const providers = createSidebarSectionProviders(
+      new MockMemento() as unknown as Parameters<typeof createSidebarSectionProviders>[0],
+      new ConfigTreeProvider(),
+    );
+    const status = providers.find((p) => p.viewId === SECTION_VIEW_IDS.status);
+    assert.ok(status, 'status provider must exist');
+    return status!.getChildren();
+  }
+
+  type TestConfigSettingNode = { kind?: string; label?: string; commandId?: string };
+
+  function findAnalyzerPluginRow(items: unknown[]): TestConfigSettingNode | undefined {
+    return (items as TestConfigSettingNode[]).find((i) => i.kind === 'configSetting' && i.label === 'Analyzer plugin');
+  }
+
+  it('renders no row when the plugin is live', () => {
+    sinon.stub(setupModule, 'getPluginsIntegrationState').returns('live');
+    const row = findAnalyzerPluginRow(getStatusItems());
+    assert.strictEqual(row, undefined, 'a live plugin is the expected-good state and must not cost a row');
+  });
+
+  it('renders a row wired to reenablePlugin when the plugin is disabled', () => {
+    sinon.stub(setupModule, 'getPluginsIntegrationState').returns('disabled');
+    const row = findAnalyzerPluginRow(getStatusItems());
+    assert.ok(row, 'Analyzer plugin row must be present when disabled');
+    assert.strictEqual(row!.commandId, 'saropaLints.reenablePlugin');
+  });
+
+  it('renders a row wired to initializeConfig when the plugin config is absent', () => {
+    sinon.stub(setupModule, 'getPluginsIntegrationState').returns('absent');
+    const row = findAnalyzerPluginRow(getStatusItems());
+    assert.ok(row, 'Analyzer plugin row must be present when absent');
+    assert.strictEqual(row!.commandId, 'saropaLints.initializeConfig');
   });
 });

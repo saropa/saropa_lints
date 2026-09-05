@@ -266,6 +266,10 @@
       "runtimeTier": {
         "label": "runtime_tier"
       },
+      "lane": {
+        "title": "Analysis lane",
+        "hint": "Which rules the in-process analyzer plugin runs live in the editor versus only on save (via the scan daemon)."
+      },
       "platforms": {
         "title": "Target platforms",
         "hint": "Disable platforms this project does not target so platform-specific rules for them stay off."
@@ -345,14 +349,18 @@
     }
   },
   "dashboards": {
+    "lintsConfig": {
+      "description": "Tier: {tier} · Lane: {lane}",
+      "descriptionNoLane": "Tier: {tier}"
+    },
     "controls": {
       "analyzerPlugin": "Analyzer plugin",
-      "analyzerPluginLive": "On — live in-editor diagnostics",
       "analyzerPluginDisabled": "Off — scan-on-save only",
       "analyzerPluginAbsent": "Not configured",
-      "lane": "Lane",
       "laneLight": "Light — ~200 rules in-editor, rest on save",
-      "laneFull": "Full — every enabled rule in-editor"
+      "laneFull": "Full — every enabled rule in-editor",
+      "migrateLegacyKeys": "Migrate {count} legacy config key(s)",
+      "migrateLegacyKeysDesc": "Move legacy plugin-block keys to analysis_options_custom.yaml"
     }
   },
   "configSuggestions": {
@@ -768,7 +776,11 @@
       "driftOfflineTitle": "Drift Advisor enabled but no server found",
       "driftOfflinePill": "Drift offline",
       "enabledRulesTitle": "Enabled rules in current tier",
-      "rulesCount": "{count} rules"
+      "rulesCount": "{count} rules",
+      "regressionTitle": "Health score dropped from {previousScore} to {currentScore}",
+      "trendTitle": "Health score / violation trend since earlier runs",
+      "hotspotsTitle": "{open} open, {safe} marked safe, {fixed} fixed — click to review",
+      "hotspotsPill": "{open} open · {percent}% reviewed"
     },
     "groupBy": {
       "severity": "Severity",
@@ -2424,13 +2436,13 @@
     },
     "diffTitle": "Analysis Optimizer: Proposed Exclusions"
   },
-  "diagnostics": {
-    "sidebar": {
-      "severityToggleTooltip": "Click to toggle {severity}"
-    }
-  },
   "sidebarShell": {
     "dashboardsViewTitle": "Dashboards"
+  },
+  "status": {
+    "health": {
+      "lastRunTooltip": "Last analysis: {ago}"
+    }
   },
   "staleIgnores": {
     "progress": {

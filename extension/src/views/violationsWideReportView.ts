@@ -21,6 +21,17 @@ import type { Suppressions } from '../suppressionsStore';
 import { readDisabledRules } from '../configWriter';
 import { loadSuppressions } from '../suppressionsStore';
 import { scanWorkspace } from '../services/todosAndHacksScanner';
+// WP4 (plans/PLAN_sidebar_row_collapse.md): these four give the Findings status
+// line the same trend/regression/hotspot data the sidebar Status panel used to
+// show in its own rows (Trends / Score dropped / "N fewer issues" / Hotspots),
+// before those rows are cut in WP5. Reusing the sidebar's exact functions keeps
+// the two surfaces from ever disagreeing on what a "regression" or "reviewed"
+// hotspot means.
+import { loadHistory, getScoreTrendSummary, getTrendSummary, detectScoreRegression } from '../runHistory';
+import {
+  SecurityHotspotReviewStateService,
+  countSecurityHotspotReviewStates,
+} from '../securityHotspotReviewState';
 import {
   DEFAULT_TODOS_AND_HACKS_EXCLUDE_GLOBS,
   DEFAULT_TODOS_AND_HACKS_INCLUDE_GLOBS,
@@ -45,6 +56,7 @@ import {
   type AnalyzerSuppressionsSlice,
   type ViewSuppressionsSlice,
 } from './violationsDashboardHtml';
+import type { ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
 import {
   buildScannerSlice,
   countBySeverity,
@@ -126,6 +138,55 @@ function buildAnalyzerSuppressionsSlice(data: ViolationsData): AnalyzerSuppressi
     byKind: sortedNumericCountEntries(sup.byKind),
     byRule: sortedNumericCountEntries(sup.byRule),
     byFile: sortedNumericCountEntries(sup.byFile),
+  };
+}
+
+/**
+ * History slice for the status-line trend/regression pills (WP4). Prefers the
+ * score-driven summary (`getScoreTrendSummary`) over the raw violation-count
+ * summary (`getTrendSummary`) exactly as the sidebar's `appendTrendRow` did —
+ * score reflects severity-weighted decay, not just a shrinking count, so it is
+ * the more meaningful trend when both are available. `improved` folds in what
+ * was the sidebar's separate "↓ N fewer issues" row (plan §2.2 row 8): rather
+ * than a second pill, the trend pill itself picks up the 'good' styling.
+ */
+function buildHistorySlice(
+  history: ReturnType<typeof loadHistory>,
+): NonNullable<ViolationsDashboardHtmlInput['history']> {
+  const trend = getScoreTrendSummary(history) ?? getTrendSummary(history);
+  const regression = detectScoreRegression(history);
+  let improved = false;
+  if (history.length >= 2) {
+    const prev = history.at(-2)!;
+    const curr = history.at(-1)!;
+    improved = curr.total < prev.total;
+  }
+  return { trend, regression, improved };
+}
+
+/**
+ * Hotspot review-state slice for the status-line pill (WP4). Reuses the exact
+ * counting function the sidebar's Hotspots row used
+ * (`countSecurityHotspotReviewStates`) so the Findings pill and the (soon
+ * to be cut, WP5) sidebar row can never disagree while both exist. Omit the
+ * whole slice when `total === 0` — the caller does this, not this function —
+ * so a project with no security-sensitive rules renders no pill.
+ */
+function buildHotspotsSlice(
+  afterDisabled: ViolationsData,
+  workspaceState: vscode.Memento,
+): NonNullable<ViolationsDashboardHtmlInput['hotspots']> {
+  const service = new SecurityHotspotReviewStateService(workspaceState);
+  const counts = countSecurityHotspotReviewStates(
+    afterDisabled.violations ?? [],
+    afterDisabled.config?.ruleMetadataByRule,
+    service,
+  );
+  return {
+    total: counts.total,
+    open: counts.open,
+    reviewedSafe: counts.reviewedSafe,
+    reviewedFixed: counts.reviewedFixed,
   };
 }
 
@@ -312,6 +373,19 @@ async function rebuildDashboardHtml(
     enabledRuleCount: raw.config?.enabledRuleCount,
     scanner,
     firstPaint: !hasPaintedOnce,
+    /* WP4: history/hotspots slices for the status-line pills (see the doc
+       comment on ViolationsDashboardHtmlInput.history for why these exist).
+       UNLIKE reportTimestamp/firstPaint below, these two MUST stay part of the
+       no-op-guard signature: a new analysis run can change the trend/regression
+       without moving reportTimestamp's neutralized value, and a hotspot
+       review-state change (via the pill's own QuickPick) changes nothing else
+       in this input at all — without these in the signature that click would
+       silently fail to repaint its own pill. */
+    history: buildHistorySlice(loadHistory(context.workspaceState)),
+    hotspots: (() => {
+      const slice = buildHotspotsSlice(afterDisabled, context.workspaceState);
+      return slice.total > 0 ? slice : undefined;
+    })(),
   };
 
   // No-op guard: when nothing the user sees has changed, skip the html

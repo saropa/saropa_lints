@@ -8,12 +8,19 @@
  */
 
 import * as vscode from 'vscode';
-import { readPubspec } from '../pubspecReader';
 import { getProjectRoot } from '../projectRoot';
-import { formatLanguageChoiceLabel } from '../i18n/languagePick';
 import { l10n } from '../i18n/runtime';
 import { getPluginsIntegrationState } from '../setup';
-import { readRawLaneFromCustomConfig } from '../config/laneConfig';
+// `readRawLaneFromCustomConfig` (Lane row reader) was removed here (2026-09-04,
+// sidebar row collapse WP2) along with `buildLaneNode`, its only caller — Lane
+// is now read in `sectionedSidebar.ts`'s `buildEditorDashboardItems` for the
+// folded Lints Config row description, and in `rulePacksWebviewProvider.ts`'s
+// `_buildLaneCard` for the Config file tab card.
+// Dry-run probe for the conditional Migrate row in buildActionNodes — see
+// its doc comment. `readPubspec` / `formatLanguageChoiceLabel` were removed
+// here (2026-09-04, sidebar row collapse WP1) along with buildSettingNodes,
+// their only caller.
+import { migrateConfigKeys } from '../config/migrateConfig';
 import { getViolationsTriageState, readViolations } from '../violationsReader';
 import {
   type ConfigTreeNode,
@@ -57,48 +64,62 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     return [...this.buildDashboardShortcutNodes(), ...this.buildTriageSection()];
   }
 
-  /** Settings + action nodes (no triage). Used by the overview "Settings" section. */
+  /**
+   * Action nodes for the overview "Settings" (now Quick Actions) section.
+   * Was `[...buildSettingNodes(), ...buildActionNodes()]` — `buildSettingNodes`
+   * (run-after-config/dependency toggles, UI language, detected packages) was
+   * deleted in the 2026-09-04 sidebar row collapse (WP1): every row in it
+   * duplicated a richer control elsewhere (Rules & Tiers Automation/Extension
+   * tabs, Package Dashboard). Only the action rows remain.
+   */
   getSettingAndActionNodes(): ConfigTreeNode[] {
-    return [...this.buildSettingNodes(), ...this.buildActionNodes()];
+    return this.buildActionNodes();
   }
+
+  // `getTriageNodes()` (public wrapper around `buildTriageSection()`) was
+  // removed here (2026-09-04, sidebar row collapse WP1): its only caller was
+  // the Settings overview section's `triage` spread in sectionedSidebar.ts,
+  // which is gone — those rows duplicated the Findings Dashboard's top-rules
+  // triage table. `getChildren()` below still calls `buildTriageSection()`
+  // directly for the ConfigTreeProvider's own (unregistered) triage view —
+  // that data source is intentionally untouched, see
+  // plans/PLAN_sidebar_row_collapse.md §5.
 
   /**
-   * Lint integration, Analyzer plugin, and Tier nodes — the 3 core
-   * diagnostic-control settings now displayed in the Diagnostics sidebar
-   * section alongside severity toggles.
-   */
-  getDiagnosticControlNodes(): ConfigTreeNode[] {
-    return this.buildDiagnosticControlNodes();
-  }
-
-  /** Triage nodes only (groups + info). Used by the overview "Issues" section. */
-  getTriageNodes(): ConfigTreeNode[] {
-    return this.buildTriageSection();
-  }
-
-  /**
-   * Row reporting the `plugins:` block's real on-disk state.
+   * Row reporting the `plugins:` block's real on-disk state — MOVED here from
+   * the Settings section to the Status section (2026-09-04, sidebar row
+   * collapse WP3). A plugin state is a fact about the project, not a
+   * configurable setting, so it belongs with the other Status facts
+   * (Health / Engines / Lint integration) rather than in Quick Actions.
    *
-   * Clicking it offers "Re-enable Plugin" when the block is commented out —
-   * previously the only route back was a command-palette entry a user had no
-   * reason to look for. Omitted entirely when there is no project root, since
-   * there is no analysis_options.yaml to describe.
+   * Renamed from the former private `buildAnalyzerPluginNode` to a public
+   * `getAnalyzerPluginWarningNode` because `sectionedSidebar.ts`'s
+   * `buildStatusItems` now calls it directly — the analyzer plugin no longer
+   * has a home in `buildDiagnosticControlNodes` / `getDiagnosticControlNodes`
+   * (both deleted here, WP3; they existed only to wrap this single call
+   * after Tier/Lane moved out in WP2).
    *
-   * Every state maps to a real command: this view's invariant is that no row
-   * is dead (see the "every leaf has a click command" assertion in
-   * test/views/overviewTreeFlat.test.ts, and the dead "Lints" row removed
-   * next to it). A live plugin offers the liveness probe — the useful question
-   * about a plugin that claims to be on is whether it is actually reporting.
+   * Returns `[]` for the `live` state: a plugin that is live and reporting is
+   * not a warning — it is the expected state, already implied by the Status
+   * section's Engines row when debug mode is on. The `live` → verifyPlugin
+   * liveness probe is NOT deleted; it stays reachable via Command Catalog and
+   * the Health Panel for the case where a user wants to double-check a
+   * plugin that claims to be on. Only `disabled` (re-enable) and `absent`
+   * (initialize config) render a row here — both are actionable warnings,
+   * hence "warning" in the method name and the `list.warningForeground`
+   * color applied at the call site in `sectionedSidebar.ts`.
+   *
+   * Omitted entirely when there is no project root, since there is no
+   * analysis_options.yaml to describe.
    */
-  private buildAnalyzerPluginNode(): ConfigTreeNode[] {
+  getAnalyzerPluginWarningNode(): ConfigTreeNode[] {
     const root = getProjectRoot();
     if (!root) return [];
     const state = getPluginsIntegrationState(root);
+    // Live: nothing to warn about — the probe command stays reachable
+    // elsewhere (Command Catalog / Health Panel), not as a sidebar row.
+    if (state === 'live') return [];
     const byState = {
-      live: {
-        description: l10n('dashboards.controls.analyzerPluginLive'),
-        command: 'saropaLints.verifyPlugin',
-      },
       disabled: {
         description: l10n('dashboards.controls.analyzerPluginDisabled'),
         command: 'saropaLints.reenablePlugin',
@@ -111,127 +132,70 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     return [setting(l10n('dashboards.controls.analyzerPlugin'), byState.description, byState.command, 'plug')];
   }
 
-  /**
-   * Analyzer plugin, Tier, and Lane — diagnostic controls surfaced in the
-   * Settings sidebar section. "Lint integration" and "Process health" used
-   * to be two more rows here, but both are now pure duplicates: Lint
-   * integration merged into the Status section's own row (see
-   * appendLintIntegrationRow in sectionedSidebar.ts — same enable/disable
-   * commands, same on/off state, now shown once instead of twice), and
-   * Process health is the exact same "saropaLints.showProcessHealth" command
-   * the Status section's Engines row already opens on click. Removing them
-   * here is the PLAN_extension_ui_redesign.md §2.1 collapse, not a feature
-   * cut — Process health is still one click away via Command Catalog for
-   * the (debug-disabled) case where the Engines row itself doesn't render.
-   */
-  private buildDiagnosticControlNodes(): ConfigTreeNode[] {
-    const cfg = vscode.workspace.getConfiguration('saropaLints');
-    const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
-    const root = getProjectRoot();
-    return [
-      // The in-process analyzer plugin is a SEPARATE subsystem from "Lint
-      // integration": that setting gates scan-on-save delivery, this gates
-      // the plugins: block the Dart analysis server reads for live in-editor
-      // squiggles. Reporting only the first one made the sidebar claim
-      // "Lint integration: On" over an analysis_options.yaml whose plugins
-      // block was commented out, which reads as the extension lying.
-      ...this.buildAnalyzerPluginNode(),
-      // Tier click → Lints Config dashboard. The dashboard's tier control is a
-      // visual segmented radio (Essential → Pedantic) with rule counts and
-      // descriptions per tier — far richer than the bare quickpick the row
-      // used to launch (`saropaLints.setTier`). Users get the full context of
-      // each option instead of guessing from a one-line label.
-      setting('Tier', tier, 'saropaLints.openConfigDashboard', 'layers'),
-      // Lane click → the light/full QuickPick (`saropaLints.setLane`), not the
-      // dashboard: unlike Tier's 5-way segmented control, this is a plain
-      // binary switch with no rule list to browse, so a QuickPick with two
-      // detailed items is the right amount of UI — same reasoning that used to
-      // apply to Tier before it grew a dedicated dashboard section.
-      ...this.buildLaneNode(root),
-    ];
-  }
+  // `buildSettingNodes()` (run-after-config/dependency toggles, UI language,
+  // detected packages) was removed here (2026-09-04, sidebar row collapse
+  // WP1). Each row was a verified duplicate of a richer control: the two
+  // "run analysis after X change" toggles and UI language now render as
+  // boolean/choice controls on the Rules & Tiers Automation/Extension tabs
+  // (`settingsCatalog.ts` already routed them there; only the sidebar copy
+  // was cut), and "Detected: <packages>" duplicated the Package Dashboard's
+  // full dependency list plus the Extension tab's platforms block. The
+  // `toggleRunAnalysisAfterConfigChange` / `toggleRunAnalysisAfterDependencyChange`
+  // / `pickUiLanguage` / `openPubspec` commands stay registered for the
+  // command palette; only the sidebar rows are gone.
 
   /**
-   * Row reporting the configured analysis lane (`lane:` top-level key in
-   * `analysis_options_custom.yaml`). Falls back to the old plugin-block
-   * location for unmigrated projects — matches the Dart engine's deprecation
-   * fallback. Omitted with no project root, mirroring
-   * {@link buildAnalyzerPluginNode} — there is no yaml to describe.
+   * Open config, initialize, run analysis, plus a conditional Migrate row.
+   *
+   * The Migrate row is conditional (unlike the other actions): it runs the
+   * migration in dry-run mode first (`migrateConfigKeys(root, { dryRun: true })`)
+   * and only renders when there are legacy plugin-block keys left to move.
+   * This is a one-shot migration (legacy `plugins > saropa_lints:` keys →
+   * top-level `analysis_options_custom.yaml` keys) — once a project has
+   * migrated, the row has nothing to do and would sit dead in the sidebar
+   * forever if shown unconditionally. Steady state after migration: 0 rows
+   * for this action, matching plans/PLAN_sidebar_row_collapse.md §2.1 row 9.
    */
-  private buildLaneNode(root: string | undefined): ConfigTreeNode[] {
-    if (!root) return [];
-    // Absent/unrecognized reads as 'light' — matches the Dart-side default
-    // (RuleLane.light) so the sidebar agrees with what the in-process plugin
-    // is actually doing when the key was never written.
-    const raw = readRawLaneFromCustomConfig(root);
-    const lane = raw === 'full' ? 'full' : 'light';
-    const description =
-      lane === 'full' ? l10n('dashboards.controls.laneFull') : l10n('dashboards.controls.laneLight');
-    return [setting(l10n('dashboards.controls.lane'), description, 'saropaLints.setLane', 'arrow-swap')];
-  }
-
-  /** Run-after-config, UI language, detected packages. */
-  private buildSettingNodes(): ConfigTreeNode[] {
-    const cfg = vscode.workspace.getConfiguration('saropaLints');
-    const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
-    const runAfterDep = cfg.get<boolean>('runAnalysisAfterDependencyChange', true) ?? true;
-    const uiLanguage = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
-    const localeLabel = formatLanguageChoiceLabel(uiLanguage);
-
-    const items: ConfigTreeNode[] = [
-      // Each settings row needs a click target — the user expects every visible
-      // sidebar item to navigate somewhere. Toggling a boolean in one click
-      // beats opening the Settings UI just to flip a checkbox.
-      setting(
-        'Run analysis after config change',
-        runAfter ? 'Yes' : 'No',
-        'saropaLints.toggleRunAnalysisAfterConfigChange',
-        'sync',
-      ),
-      setting(
-        'Run analysis after dependency change',
-        runAfterDep ? 'Yes' : 'No',
-        'saropaLints.toggleRunAnalysisAfterDependencyChange',
-        'sync',
-      ),
-      setting('UI language', localeLabel, 'saropaLints.pickUiLanguage', 'globe'),
-    ];
-
-    // Detected platform/packages from pubspec.
-    const root = getProjectRoot();
-    if (root) {
-      const pubspec = readPubspec(root);
-      const parts: string[] = [];
-      if (pubspec.isFlutter) parts.push('Flutter');
-      if (pubspec.packages.length > 0) {
-        const pkgs = pubspec.packages.slice(0, 5).join(', ');
-        parts.push(pubspec.packages.length > 5 ? pkgs + '…' : pkgs);
-      }
-      // The Detected row summarizes what's in pubspec.yaml — clicking should
-      // open that file so the user can edit it directly.
-      if (parts.length > 0) items.push(setting('Detected', parts.join(' · '), 'saropaLints.openPubspec', 'package'));
-    }
-
-    return items;
-  }
-
-  /** Open config, initialize, run analysis. */
   private buildActionNodes(): ConfigTreeNode[] {
-    return [
+    const nodes: ConfigTreeNode[] = [
       setting('Open analysis_options_custom.yaml', undefined, 'saropaLints.openConfig', 'file-code'),
       setting('Initialize / Update config', undefined, 'saropaLints.initializeConfig', 'tools'),
-      setting('Migrate config keys', undefined, 'saropaLints.migrateConfig', 'arrow-right'),
-      // Composite analyzer plugin scaffold is intentionally NOT exposed here.
-      // The action targets a tiny audience (teams shipping their own custom
-      // analyzer rules alongside Saropa) and the term is jargon to everyone
-      // else. It remains discoverable via the command palette
-      // (`Saropa Lints: Create Composite Analyzer Plugin (scaffold)`),
-      // `Saropa Lints: Show All Commands`, the CLI
-      // (`dart run saropa_lints:init --emit-composite-plugin-scaffold`),
-      // and `doc/guides/composite_analyzer_plugin.md`. Keeping it out of the
-      // sidebar avoids confusing the 99% of users who only want Saropa rules.
-      setting('Run analysis', undefined, 'saropaLints.runAnalysis', 'play'),
     ];
+
+    // No project root → no yaml to probe → no row (mirrors getAnalyzerPluginWarningNode).
+    const root = getProjectRoot();
+    if (root) {
+      const probe = migrateConfigKeys(root, { dryRun: true });
+      // Show the row when ANY legacy keys remain in the plugins block — not
+      // just movable ones. `skipped` keys are already in the custom file but
+      // their legacy copies still sit in analysis_options.yaml's plugin block,
+      // causing `unsupported_option` warnings; the non-dry-run path removes
+      // those too (migrateConfig.ts line 128-130). Without this check a
+      // skipped-only project gets stuck with warnings and no sidebar row.
+      const legacyCount = probe.moved.length + probe.skipped.length;
+      if (!probe.error && legacyCount > 0) {
+        nodes.push(
+          setting(
+            l10n('dashboards.controls.migrateLegacyKeys', { count: String(legacyCount) }),
+            l10n('dashboards.controls.migrateLegacyKeysDesc'),
+            'saropaLints.migrateConfig',
+            'arrow-right',
+          ),
+        );
+      }
+    }
+
+    // Composite analyzer plugin scaffold is intentionally NOT exposed here.
+    // The action targets a tiny audience (teams shipping their own custom
+    // analyzer rules alongside Saropa) and the term is jargon to everyone
+    // else. It remains discoverable via the command palette
+    // (`Saropa Lints: Create Composite Analyzer Plugin (scaffold)`),
+    // `Saropa Lints: Show All Commands`, the CLI
+    // (`dart run saropa_lints:init --emit-composite-plugin-scaffold`),
+    // and `doc/guides/composite_analyzer_plugin.md`. Keeping it out of the
+    // sidebar avoids confusing the 99% of users who only want Saropa rules.
+    nodes.push(setting('Run analysis', undefined, 'saropaLints.runAnalysis', 'play'));
+    return nodes;
   }
 
   /** Quick links to the richer web dashboards. */

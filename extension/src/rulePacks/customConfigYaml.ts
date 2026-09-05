@@ -44,6 +44,15 @@ export const CUSTOM_YAML_TOP_LEVEL_KEYS = [
   'saropa_tier',
   'runtime_tier',
   'diagnostic_statistics',
+  // `lane` is listed here only so the Config file tab coverage guard
+  // (configFileCardCoverage.test.ts) knows a card must exist for it — this
+  // module does NOT provide a reader/writer for it. `lane` has deprecation-
+  // fallback semantics (an old `plugins > saropa_lints:` location is still
+  // honored) that the generic `readScalarKey`/`writeScalarKey` helpers above
+  // do not implement, so its actual read/write lives in
+  // `../config/laneConfig.ts` (`readRawLaneFromCustomConfig` /
+  // `writeLaneToCustomConfig`). Never route `lane` through the scalar helpers.
+  'lane',
 ] as const;
 export type CustomYamlTopLevelKey = (typeof CUSTOM_YAML_TOP_LEVEL_KEYS)[number];
 

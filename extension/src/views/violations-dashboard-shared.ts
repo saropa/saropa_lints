@@ -133,6 +133,30 @@ export interface ViolationsDashboardHtmlInput {
    * entrance animation.
    */
   firstPaint?: boolean;
+  /**
+   * Run-history signals (`runHistory.ts`) — replaces the sidebar Status panel's
+   * Trends / Score dropped / "↓ N fewer issues" rows (WP4 of
+   * plans/PLAN_sidebar_row_collapse.md §3). Those rows had no Findings-dashboard
+   * equivalent before this slice, so their information would vanish entirely
+   * once the sidebar rows are cut in WP5 — this field is that landing spot.
+   * MUST stay in the render signature (see `rebuildDashboardHtml`'s history/
+   * hotspots comment): a new analysis run changes the trend/regression without
+   * changing `reportTimestamp`'s neutralized comparison key.
+   */
+  history?: {
+    /** getScoreTrendSummary ?? getTrendSummary output — an arrow series like "72 -> 78 -> 81"; undefined with < 2 snapshots of history. */
+    trend?: string;
+    /** detectScoreRegression result — present only when the health score fell between the last two snapshots. */
+    regression?: { previousScore: number; currentScore: number; drop: number };
+    /** True when the last two snapshots' violation totals fell — was the standalone "↓ N fewer issues" sidebar row; folded into the trend pill's color instead of a separate pill (plan §2.2 row 8). */
+    improved: boolean;
+  };
+  /**
+   * Security-hotspot review counts (was the sidebar Status panel's "Hotspots:
+   * N% reviewed" row). Omitted by the caller when `total === 0` so a project
+   * with no security-sensitive rules renders no pill at all.
+   */
+  hotspots?: { total: number; open: number; reviewedSafe: number; reviewedFixed: number };
 }
 
 export const SEVERITY_ORDER: readonly string[] = ['error', 'warning', 'info'];

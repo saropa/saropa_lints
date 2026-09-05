@@ -66,6 +66,23 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.3] - Unreleased
+
+### Changed
+
+- Sidebar collapsed from 25–39 rows to 13 steady-state (15 worst case). Severity toggles, setting-value rows (run-after-config/dependency, UI language, detected packages), and triage rows removed from the Settings panel — each was a duplicate of a richer control on the Rules & Tiers Automation/Extension tabs, Package Dashboard, or Findings Dashboard's top-rules table. No action required.
+- Sidebar Tier and Lane rows folded into the Dashboards "Lints Config" row description (`Tier: recommended · Lane: light`), replacing two click-only rows with always-visible state. No action required.
+- Sidebar "Migrate config keys" row now appears only while legacy plugin-block keys remain to clean up, instead of rendering unconditionally. No action required.
+- Findings dashboard status line gains trend, regression, and security-hotspot pills — the same data the sidebar Status rows showed, now persistent and clickable instead of buried in a collapsible panel. No action required.
+- Sidebar Status section: Hotspots, Trends, Score regression, Suppression count, and Last-run rows removed — all now live on the Findings dashboard's status line or are straight duplicates of Findings data. Health row gains a "Last analysis: {ago}" tooltip. No action required.
+- Sidebar Status panel now visible on all Dart projects, not just those with violations — Lint integration status was hidden exactly when it mattered most (integration off = no violations = panel gone). No action required.
+
+### Added
+
+- Rules & Tiers Config file tab: Lane card. Switch between Light (~200 rules in-editor) and Full (all enabled rules) from the same dashboard that already shows every other `analysis_options_custom.yaml` key. No action required.
+
+---
+
 ## [16.0.0-beta.2]
 
 Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)
@@ -75,10 +92,12 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
 - Sidebar: "Lint integration" is now one row in the Status section that toggles on a single click, instead of two separate copies of the same state in different panels. No action required.
 - Sidebar: "Find stale ignores" and "Fix stale ignores" merged into one row that detects, shows the count, then asks to confirm before removing anything. No action required.
 - Sidebar: Analysis Optimizer, Upgrade Opportunities, and the Feature Inventory export are no longer separate Dashboards rows — each is reachable as a tab inside Rules & Tiers or the Package Dashboard. Command Catalog moved next to Run analysis and Fix stale ignores. No action required.
+- Sidebar: "Engines (LSP / Analyzer)" and "Process health" rows — announced in beta.1 — removed from the Settings panel. Engine toggles remain accessible from the Status section's Engines row (visible when debug mode is on), Health Panel, and Command Catalog. No action required.
 
 ### Fixed
 
 - Fixed VS Code "Switch to Pre-Release Version" button failing with `net::ERR_FAILED` — pre-release extension versions now use an odd minor number as VS Code requires.
+- Fixed status-bar click behavior: beta.1 stated clicking while lint integration is off opens the Dashboards view — it actually opens Findings in every state (`extension.ts:1310`). The click target is intentionally Findings regardless of integration state. No action required.
 - Fixed CI watch blocking publish by defaulting to skip (press `y` to opt in).
 - Fixed the status bar cramming memory/system-health warnings into the same text as the lint score, with no way to click through to the details — split into a second status bar item that only appears when there's something to report and opens the Process Health panel on click. No action required.
 - Fixed the status bar's hover tooltip being read-only text with no way to act on it — it's now a clickable menu (toggle analysis on/off, jump to the Violations Report, Package Dashboard, Process Health, Command Catalog, or About). No action required.
