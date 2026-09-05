@@ -48,7 +48,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 31 rules — 9 HAVE (29%), 5 PARTIAL, 17 TODO (54%)
+Coverage: 31 rules — 13 HAVE (42%), 5 PARTIAL, 13 TODO (42%)
 
 | essential_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
@@ -61,7 +61,7 @@ Coverage: 31 rules — 9 HAVE (29%), 5 PARTIAL, 17 TODO (54%)
 | `closure_incorrect_type` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_closure_incorrect_type.md) |
 | `completer_error_no_stack` | HAVE | `avoid_missing_completer_stack_trace` |
 | `duplicate_value` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_duplicate_value.md). Their rule flags duplicate values within one boolean expression, distinct from saropa's cross-branch `no_equal_conditions`. |
-| `empty_container` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_empty_container.md) |
+| `empty_container` | HAVE | `avoid_unnecessary_containers_resolved` |
 | `equal_statement` | PARTIAL | Likely overlaps `no_equal_switch_case`, not fully confirmed as identical trigger logic |
 | `explicit_casts` | PARTIAL | `avoid_unsafe_cast` — only flags casts that can fail at runtime, narrower than "all explicit casts" |
 | `first_getter` | HAVE | `prefer_list_first` |
@@ -74,9 +74,9 @@ Coverage: 31 rules — 9 HAVE (29%), 5 PARTIAL, 17 TODO (54%)
 | `padding_over_container` | HAVE | `prefer_padding_over_container` |
 | `pending_listener` | PARTIAL | saropa's disposal-family rules (e.g. `always_remove_listener`) are type-specific, not a general "any `add()`-style listener needs a matching `remove()`" check |
 | `prefer_explicitly_named_parameters` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_explicitly_named_parameters.md) |
-| `returning_widgets` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_returning_widgets.md) |
+| `returning_widgets` | HAVE | `avoid_returning_widgets` |
 | `same_package_direct_import` | HAVE | `prefer_relative_imports_enforced` |
-| `sorting_members` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_sorting_members.md) (own annotation-driven member-sort system) |
+| `sorting_members` | HAVE | `prefer_member_ordering` |
 | `standard_comment_style` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_standard_comment_style.md) |
 | `subtype_annotating` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_subtype_annotating.md) |
 | `subtype_naming` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_subtype_naming.md) |

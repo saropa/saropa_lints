@@ -50,7 +50,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 24 rules — 5 HAVE (20%), 4 PARTIAL, 15 TODO (62%)
+Coverage: 24 rules — 7 HAVE (29%), 4 PARTIAL, 13 TODO (54%)
 
 | ripplearc_linter Rule | Status | Saropa Rule / Action |
 |---|---|---|
@@ -68,7 +68,7 @@ Coverage: 24 rules — 5 HAVE (20%), 4 PARTIAL, 15 TODO (62%)
 | `forbid_raw_icon_and_image_usage` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_forbid_raw_icon_and_image_usage.md) |
 | `no_direct_instantiation` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_no_direct_instantiation.md) |
 | `no_internal_method_docs` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_no_internal_method_docs.md) |
-| `no_optional_operators_in_tests` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_no_optional_operators_in_tests.md) |
+| `no_optional_operators_in_tests` | HAVE | `no_optional_operators_in_tests` |
 | `prefer_fake_over_mock` | PARTIAL | `prefer_fake_over_mock` exists but its doc describes "excessive mocking" generally, not specifically the `extends Mock` → `extends Fake` pattern — needs verification |
 | `prevent_feature_module_dependencies` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_prevent_feature_module_dependencies.md) |
 | `prevent_library_module_dependencies` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_prevent_library_module_dependencies.md) |
@@ -77,7 +77,7 @@ Coverage: 24 rules — 5 HAVE (20%), 4 PARTIAL, 15 TODO (62%)
 | `sealed_over_dynamic` | HAVE | `prefer_switch_with_sealed_classes` |
 | `specific_exception_types` | HAVE | `avoid_catch_all` / `avoid_catching_generic_exception` |
 | `test_file_mutation_coverage` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_test_file_mutation_coverage.md) |
-| `todo_with_story_links` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_todo_with_story_links.md). The general "TODO must reference a ticket" concept has no saropa equivalent either, even setting aside the YouTrack-specific URL pattern. |
+| `todo_with_story_links` | HAVE | `todo_with_story_links` |
 
 ## Suppressing Rules
 

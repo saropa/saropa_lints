@@ -12,7 +12,7 @@
 /// Each set contains saropa rule codes that cover functionality from
 /// the named alternative lint package, replacing its coverage.
 const Map<String, Set<String>> kRulePackMigrationCodes = {
-  // dcm — 425 HAVE rules covering 87% of 487 total (431 unique saropa codes after fan-out).
+  // dcm — 431 HAVE rules covering 89% of 487 total (436 unique saropa codes after fan-out).
   'migrate_dcm': {
     'always_remove_listener',
     'avoid_accessing_collections_by_constant_index',
@@ -101,6 +101,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_instantiating_in_value_provider',
     'avoid_inverted_boolean_checks',
     'avoid_keywords_in_wildcard_pattern',
+    'avoid_labeled_statements',
     'avoid_late_context',
     'avoid_late_final_reassignment',
     'avoid_late_keyword',
@@ -218,6 +219,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_unnecessary_nullable_return_type',
     'avoid_unnecessary_overrides',
     'avoid_unnecessary_overrides_in_state',
+    'avoid_unnecessary_parentheses',
     'avoid_unnecessary_patterns',
     'avoid_unnecessary_reassignment',
     'avoid_unnecessary_return',
@@ -306,10 +308,13 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_assigning_await_expressions',
     'prefer_async_await',
     'prefer_async_callback',
+    'prefer_blank_line_before_break',
     'prefer_blank_line_before_case',
     'prefer_blank_line_before_constructor',
+    'prefer_blank_line_before_continue',
     'prefer_blank_line_before_method',
     'prefer_blank_line_before_return',
+    'prefer_blank_line_before_throw',
     'prefer_bloc_event_suffix',
     'prefer_bloc_extensions',
     'prefer_bloc_state_suffix',
@@ -680,7 +685,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'use_setstate_synchronously',
   },
 
-  // many_lints — 198 HAVE rules covering 74% of 266 total (201 unique saropa codes after fan-out).
+  // many_lints — 204 HAVE rules covering 77% of 266 total (206 unique saropa codes after fan-out).
   'migrate_many_lints': {
     'always_remove_listener',
     'avoid_accessing_collections_by_constant_index',
@@ -709,8 +714,10 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_empty_setstate',
     'avoid_empty_spread',
     'avoid_equal_expressions',
+    'avoid_exit_outside_entrypoint',
     'avoid_expanded_as_spacer',
     'avoid_flexible_outside_flex',
+    'avoid_focused_tests',
     'avoid_future_ignore',
     'avoid_generics_shadowing',
     'avoid_high_cyclomatic_complexity',
@@ -753,7 +760,9 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_shadowed_extension_methods',
     'avoid_shrink_wrap_in_lists',
     'avoid_single_field_destructuring',
+    'avoid_skipped_tests',
     'avoid_state_constructors',
+    'avoid_swallowing_exceptions',
     'avoid_throw_in_catch_block',
     'avoid_unassigned_stream_subscriptions',
     'avoid_unnecessary_call',
@@ -850,6 +859,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_overriding_parent_equality',
     'prefer_padding_over_container',
     'prefer_prefixed_global_constants',
+    'prefer_primary_constructor',
     'prefer_return_await',
     'prefer_returning_condition',
     'prefer_shorthands_with_constructors',
@@ -885,8 +895,9 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'use_setstate_synchronously',
   },
 
-  // awesome_lints — 110 HAVE rules covering 85% of 128 total (111 unique saropa codes after fan-out).
+  // awesome_lints — 114 HAVE rules covering 89% of 128 total (117 unique saropa codes after fan-out).
   'migrate_awesome_lints': {
+    'avoid_accessing_collections_by_constant_index',
     'avoid_accessing_other_classes_private_members',
     'avoid_always_null_parameters',
     'avoid_assigning_to_static_field',
@@ -918,6 +929,9 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_double_slash_imports',
     'avoid_duplicate_bloc_event_handlers',
     'avoid_duplicate_cascades',
+    'avoid_duplicate_number_elements',
+    'avoid_duplicate_object_elements',
+    'avoid_duplicate_string_elements',
     'avoid_empty_setstate',
     'avoid_existing_instances_in_bloc_provider',
     'avoid_instantiating_in_bloc_value_provider',
@@ -958,6 +972,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'pass_existing_stream_to_stream_builder',
     'prefer_action_button_tooltip',
     'prefer_align_over_container',
+    'prefer_arguments_ordering',
     'prefer_async_await',
     'prefer_bloc_event_suffix',
     'prefer_bloc_extensions',
@@ -981,6 +996,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_multi_provider',
     'prefer_named_boolean_parameters',
     'prefer_no_commented_out_code',
+    'prefer_no_continue_statement',
     'prefer_nullable_provider_types',
     'prefer_padding_over_container',
     'prefer_provider_extensions',
@@ -1081,7 +1097,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'use_setstate_synchronously',
   },
 
-  // dart_code_metrics_presets — 41 HAVE rules covering 65% of 63 total.
+  // dart_code_metrics_presets — 43 HAVE rules covering 68% of 63 total.
   'migrate_dart_code_metrics_presets': {
     'always_remove_getx_listener',
     'avoid_assigning_notifiers',
@@ -1107,11 +1123,13 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'incorrect_firebase_event_name',
     'incorrect_firebase_parameter_name',
     'list_all_equatable_fields',
+    'prefer_date_format',
     'prefer_equatable_mixin',
     'prefer_immutable_provider_arguments',
     'prefer_immutable_selector_value',
     'prefer_intl_name',
     'prefer_multi_provider',
+    'prefer_number_format',
     'prefer_provider_extensions',
     'prefer_providing_intl_description',
     'prefer_providing_intl_examples',
@@ -1126,9 +1144,11 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'use_ref_read_synchronously',
   },
 
-  // pyramid_lint — 25 HAVE rules covering 67% of 37 total.
+  // pyramid_lint — 29 HAVE rules covering 78% of 37 total.
   'migrate_pyramid_lint': {
+    'always_put_doc_comments_before_annotations',
     'avoid_border_all',
+    'avoid_duplicate_named_imports',
     'avoid_dynamic_type',
     'avoid_expanded_as_spacer',
     'avoid_flexible_outside_flex',
@@ -1137,7 +1157,9 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_long_functions',
     'avoid_long_length_files',
     'avoid_positional_record_field_access',
+    'avoid_public_members_in_states',
     'avoid_self_compare',
+    'avoid_single_child_column_row',
     'avoid_unnecessary_nullable_return_type',
     'avoid_unused_parameters',
     'avoid_very_long_length_files',
@@ -1155,7 +1177,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'proper_super_calls',
   },
 
-  // flutter_quality_lints — 15 HAVE rules covering 83% of 18 total (17 unique saropa codes after fan-out).
+  // flutter_quality_lints — 16 HAVE rules covering 89% of 18 total (18 unique saropa codes after fan-out).
   'migrate_flutter_quality_lints': {
     'avoid_cross_feature_dependencies',
     'avoid_hardcoded_credentials',
@@ -1165,6 +1187,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_long_length_files',
     'avoid_swallowing_exceptions',
     'avoid_ui_in_domain_layer',
+    'avoid_unnecessary_stateful_widgets',
     'avoid_very_long_length_files',
     'no_magic_number',
     'prefer_const_widgets',
@@ -1174,6 +1197,28 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_sliver_for_mixed_scroll',
     'prefer_trailing_comma',
     'require_mounted_check_after_await',
+  },
+
+  // solid_lints — 18 HAVE rules covering 55% of 33 total.
+  'migrate_solid_lints': {
+    'avoid_global_state',
+    'avoid_high_cyclomatic_complexity',
+    'avoid_late_keyword',
+    'avoid_non_null_assertion',
+    'avoid_unnecessary_setstate',
+    'avoid_unnecessary_type_assertions',
+    'avoid_unrelated_type_assertions',
+    'avoid_unused_parameters',
+    'double_literal_format',
+    'no_empty_block',
+    'no_equal_then_else',
+    'no_magic_number',
+    'prefer_conditional_expressions',
+    'prefer_early_return',
+    'prefer_list_first',
+    'prefer_list_last',
+    'prefer_match_file_name',
+    'proper_super_calls',
   },
 
   // very_good_analysis — 17 ENHANCED codes.
@@ -1197,51 +1242,49 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'require_mounted_check_after_await',
   },
 
-  // solid_lints — 16 HAVE rules covering 48% of 33 total.
-  'migrate_solid_lints': {
-    'avoid_global_state',
-    'avoid_high_cyclomatic_complexity',
-    'avoid_late_keyword',
-    'avoid_non_null_assertion',
-    'avoid_unnecessary_setstate',
-    'avoid_unnecessary_type_assertions',
-    'avoid_unrelated_type_assertions',
-    'avoid_unused_parameters',
-    'double_literal_format',
-    'no_empty_block',
-    'no_equal_then_else',
-    'no_magic_number',
-    'prefer_conditional_expressions',
-    'prefer_early_return',
-    'prefer_match_file_name',
-    'proper_super_calls',
-  },
-
-  // essential_lints — 9 HAVE rules covering 29% of 31 total (10 unique saropa codes after fan-out).
+  // essential_lints — 13 HAVE rules covering 42% of 31 total.
   'migrate_essential_lints': {
     'avoid_assignments_as_conditions',
     'avoid_missing_completer_stack_trace',
     'avoid_positional_boolean_parameters_with_fix',
     'avoid_redundant_else',
+    'avoid_returning_widgets',
+    'avoid_unnecessary_containers_resolved',
     'getters_in_member_list',
     'prefer_list_first',
     'prefer_list_last',
+    'prefer_member_ordering',
     'prefer_optional_positional_params',
     'prefer_padding_over_container',
     'prefer_relative_imports_enforced',
   },
 
-  // leancode_lint — 9 HAVE rules covering 39% of 23 total.
+  // leancode_lint — 12 HAVE rules covering 52% of 23 total.
   'migrate_leancode_lint': {
     'avoid_collection_equality_checks',
     'avoid_conditional_hooks',
     'avoid_deprecated_use_inherited_media_query',
     'avoid_passing_build_context_to_blocs',
     'avoid_unnecessary_hook_widgets',
+    'constructor_parameters_and_fields_should_have_the_same_order',
     'list_all_equatable_fields',
     'prefer_align_over_container',
+    'prefer_center_over_align',
     'prefer_sliver_prefix',
     'require_extend_equatable',
+    'start_comments_with_space',
+  },
+
+  // ripplearc_linter — 7 HAVE rules covering 29% of 24 total (8 unique saropa codes after fan-out).
+  'migrate_ripplearc_linter': {
+    'avoid_catch_all',
+    'avoid_catching_generic_exception',
+    'avoid_hardcoded_colors',
+    'avoid_non_null_assertion',
+    'no_optional_operators_in_tests',
+    'prefer_switch_with_sealed_classes',
+    'require_integration_test_timeout',
+    'todo_with_story_links',
   },
 
   // mad_lint — 7 HAVE rules covering 53% of 13 total.
@@ -1263,16 +1306,6 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'dispose_class_fields',
     'dispose_widget_fields',
     'require_mounted_check_after_await',
-  },
-
-  // ripplearc_linter — 5 HAVE rules covering 20% of 24 total (6 unique saropa codes after fan-out).
-  'migrate_ripplearc_linter': {
-    'avoid_catch_all',
-    'avoid_catching_generic_exception',
-    'avoid_hardcoded_colors',
-    'avoid_non_null_assertion',
-    'prefer_switch_with_sealed_classes',
-    'require_integration_test_timeout',
   },
 
   // accessibility_lint — 4 HAVE rules covering 80% of 5 total.

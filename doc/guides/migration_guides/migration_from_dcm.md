@@ -132,7 +132,7 @@ DCM has granular metric thresholds. saropa_lints uses progressive tiers:
 
 ## Rule Mapping
 
-Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
+Coverage: 487 rules — 431 HAVE (89%), 16 PARTIAL, 40 TODO (8%)
 
 ### Common Dart
 
@@ -219,7 +219,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-inferrable-type-arguments` | HAVE | `prefer_inferred_type_arguments` |
 | `avoid-inverted-boolean-checks` | HAVE | `avoid_inverted_boolean_checks` |
 | `avoid-keywords-in-wildcard-pattern` | HAVE | `avoid_keywords_in_wildcard_pattern` |
-| `avoid-labels` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_labeled_statements.md) |
+| `avoid-labels` | HAVE | `avoid_labeled_statements` |
 | `avoid-late-final-reassignment` | HAVE | `avoid_late_final_reassignment` |
 | `avoid-late-keyword` | HAVE | `avoid_late_keyword` |
 | `avoid-local-functions` | HAVE | `avoid_local_functions` |
@@ -329,7 +329,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-unnecessary-nullable-parameters` | HAVE | `avoid_unnecessary_nullable_parameters` |
 | `avoid-unnecessary-nullable-return-type` | HAVE | `avoid_unnecessary_nullable_return_type` |
 | `avoid-unnecessary-overrides` | HAVE | `avoid_unnecessary_overrides` |
-| `avoid-unnecessary-parentheses` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_parentheses.md) |
+| `avoid-unnecessary-parentheses` | HAVE | `avoid_unnecessary_parentheses` |
 | `avoid-unnecessary-patterns` | HAVE | `avoid_unnecessary_patterns` |
 | `avoid-unnecessary-reassignment` | HAVE | `avoid_unnecessary_reassignment` |
 | `avoid-unnecessary-return` | HAVE | `avoid_unnecessary_return` |
@@ -377,13 +377,13 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `move-records-to-typedefs` | HAVE | `move_records_to_typedefs` |
 | `move-variable-closer-to-its-usage` | HAVE | `move_variable_closer_to_its_usage` |
 | `move-variable-outside-iteration` | HAVE | `move_variable_outside_iteration` |
-| `newline-before-break` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_blank_line_before_break.md) |
+| `newline-before-break` | HAVE | `prefer_blank_line_before_break` |
 | `newline-before-case` | HAVE | `prefer_blank_line_before_case` |
 | `newline-before-constructor` | HAVE | `prefer_blank_line_before_constructor` |
-| `newline-before-continue` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_blank_line_before_continue.md) |
+| `newline-before-continue` | HAVE | `prefer_blank_line_before_continue` |
 | `newline-before-method` | HAVE | `prefer_blank_line_before_method` |
 | `newline-before-return` | HAVE | `prefer_blank_line_before_return` |
-| `newline-before-throw` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_blank_line_before_throw.md) |
+| `newline-before-throw` | HAVE | `prefer_blank_line_before_throw` |
 | `no-boolean-literal-compare` | HAVE | `no_boolean_literal_compare` |
 | `no-empty-block` | HAVE | `no_empty_block` |
 | `no-empty-string` | HAVE | `no_empty_string` |

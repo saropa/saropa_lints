@@ -72,7 +72,7 @@ plus Flutter-specific rules solid_lints doesn't attempt.
 
 ## Rule Mapping
 
-Coverage: 33 rules — 16 HAVE (48%), 3 PARTIAL, 14 TODO (42%)
+Coverage: 33 rules — 18 HAVE (55%), 3 PARTIAL, 12 TODO (36%)
 current published rule set (33 rules as of this audit; verified directly against
 `github.com/solid-software/solid_lints` `lib/main.dart`, not just documentation).
 
@@ -111,8 +111,8 @@ current published rule set (33 rules as of this audit; verified directly against
 | `number_of_parameters` | PARTIAL | `prefer_named_parameters` targets excess positional params, not a pure count ceiling |
 | `prefer_conditional_expressions` | HAVE | `prefer_conditional_expressions` |
 | `prefer_early_return` | HAVE | `prefer_early_return` |
-| `prefer_first` | TODO | index-0 → `.first` — TODO, see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_first.md) |
-| `prefer_last` | TODO | length-1 index → `.last` — TODO, see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_last.md) |
+| `prefer_first` | HAVE | `prefer_list_first` |
+| `prefer_last` | HAVE | `prefer_list_last` |
 | `prefer_match_file_name` | HAVE | `prefer_match_file_name` |
 | `proper_super_calls` | HAVE | `proper_super_calls` |
 | `use_descriptive_names_for_type_parameters` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_use_descriptive_names_for_type_parameters.md) |

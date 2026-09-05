@@ -66,6 +66,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.4] — Unreleased
+
+### Changed
+
+- Renamed sidebar "Analyzer plugin" row to "Live analysis" — users confused it with the extension's scan-on-save engine because both names sounded like the same thing. "Live analysis" (real-time squiggles from the Dart analyzer) vs "Scan on save" (batch scan by the extension) makes the two mechanisms distinguishable without knowing the architecture. Updated notification strings that referenced "Lint integration" to say "Scan on save" for the same reason.
+
+<details><summary>Maintenance</summary>
+
+- Archived 36 tier-1 quick-win proposals already covered by existing rules — 19 implemented under the same name, 8 under a different name or alias, and 9 identified as functional duplicates of rules shipped in prior versions. Updated 15 migration guides to reflect the closures (TODO → HAVE with correct saropa rule name). No action required.
+
+</details>
+
+---
+
 ## [16.0.0-beta.3]
 
 Streamlines the extension sidebar, cutting it roughly in half by removing rows that duplicated richer controls already available on the dashboards, and moves that information onto the Findings dashboard's status line and a new Lane switch and live baseline diff on the Rules & Tiers config tab. Fixes path traversal vulnerabilities in the cross-file HTML reporter and project package detection, a false positive in the case-sensitive path comparison rule, and false positives across six iOS rules on collection-literal data tables. Also fixes a startup crash on large workspaces and makes the in-editor workspace scan progressive and cancelable. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.3/CHANGELOG.md)
@@ -111,6 +125,12 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 - Extracted shared `sanitizePath()` utility to `path_guard.dart` — centralizes the normalize-and-reject-traversal pattern so future CLI entry points get path safety automatically. No action required.
 - README rewritten for readability — cut from 1,598 lines to ~430. Extension detail moved to `doc/guides/extension.md`, configuration reference to `doc/guides/configuration.md`, troubleshooting merged into `doc/troubleshooting.md`, FAQ to `doc/faq.md`. Added alternative package coverage table (46 packages audited, ~75% rule coverage). Deleted redundant `plans/GAP_ANALYSIS.md` — per-package data lives in migration guides.
 - Suppressed own-dogfood false positives in `analyzer_compat.dart` (dynamic dispatch, bare catches, swallowed exceptions are intentional version-probing shims) and `scan_runner.dart` (safe-by-construction cast). Fixed nullable interpolation in `DiagnosticCodeLowerCaseCompat.lowerCaseName`.
+- Fixed unsafe `as Map<String, dynamic>` cast in `audit_baseline.dart` — `jsonDecode` on a valid-but-non-object baseline file (e.g. `[]`) threw `TypeError` instead of returning `null` per the documented contract. Replaced with `is!` type check.
+- Fixed 6 broken `// ignore:` comments missing the `saropa_lints/` prefix — suppressions in `project_context.dart`, `pubspec_constraint_parser.dart` (3), `project_context_parallel_batch.dart`, and `project_vibrancy_resolved_usage.dart` were silently ineffective.
+- Fixed case-sensitive path comparison in `project_vibrancy.dart` — `--file` CLI argument now compared with `p.equals()` for Windows/macOS compatibility.
+- Fixed nullable interpolation in `health_export_markdown.dart` — `churn` field interpolated without null guard, producing "null commits" in markdown export.
+- Fixed forward-slash path construction in `log_writer.dart` (2 sites) and `init_runner.dart` — replaced string interpolation with `p.join()`/`p.basename()` for cross-platform correctness.
+- Filed 13 false-positive bug reports across 13 rules against own-dogfood scan findings (305 total, 295 confirmed FP). See `bugs/` for details.
 
 </details>
 
@@ -494,30 +514,6 @@ This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `
 ### Changed (Extension)
 
 - The lane picker now reads and writes `lane:` from `analysis_options_custom.yaml` instead of `analysis_options.yaml`. No action required — the extension handles the new location transparently.
-
----
-
-## [15.2.4]
-
-This patch release focuses on refining the avoid_unguarded_debug rule to eliminate several false positives. The rule now correctly recognizes early-exit returns and safely resolves variable-indirection chains for debug mode checks. Behind the scenes, early-exit and guard-evaluation utilities were unified across multiple core rules to ensure consistent behavior moving forward. [log](https://github.com/saropa/saropa_lints/blob/v15.2.4/CHANGELOG.md)
-
-### Fixed
-
-- `avoid_unguarded_debug` no longer false-positives when `debugPrint()` is dominated by an early-return guard (`if (!kDebugMode) return;`) at the top of the enclosing block. Also recognizes `kDebugMode == false`, `kDebugMode != true`, reversed operand order (`false == kDebugMode`), and multi-statement then-blocks ending in `return`. No action required.
-
-### Added
-
-- `avoid_unguarded_debug` now recognizes variable-indirection guards: `final isDebug = kDebugMode; if (!isDebug) return;` is accepted, including chained assignments up to 3 levels deep and top-level/static `const` fields in the same file. Only `final` and `const` are trusted — mutable assignments are correctly rejected. No action required.
-
-<details><summary>Maintenance</summary>
-
-- Extracted shared `early_exit_guard_utils.dart` — `containsEarlyExit`, `endsWithEarlyExit`, `findPrecedingGuardInBlock`, and `hasDominatingEarlyExitGuard` replace five independent reimplementations across `debug_rules.dart`, `collection_rules.dart`, `async_rules.dart`, `type_rules.dart`, and `code_quality_avoid_rules.dart`.
-- `hasDominatingEarlyExitGuard` now supports a `stopAtClosureBoundary` parameter — runtime-mutable guards (collection emptiness) stop at closure/function boundaries; compile-time constants (`kDebugMode`) opt out since closures in the guarded zone are safe.
-- `endsWithEarlyExit` now recognizes `break` and `continue` statements, matching the coverage of `containsEarlyExit`.
-- Variable-indirection resolver follows chained `final`/`const` assignments up to 3 levels with cycle detection, and resolves top-level/static class fields via pure AST walk (no type resolution — rule stays in the light analysis lane).
-- `_findLocalInitializer` now only considers declarations preceding the usage site (offset-based guard prevents forward-reference resolution).
-
-</details>
 
 ---
 

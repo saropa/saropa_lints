@@ -79,7 +79,7 @@ leancode_lint ships one fixed rule set (with optional programmatic customization
 
 ## Rule Mapping
 
-Coverage: 23 rules — 9 HAVE (39%), 5 PARTIAL, 9 TODO (39%)
+Coverage: 23 rules — 12 HAVE (52%), 5 PARTIAL, 6 TODO (26%)
 
 | leancode_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
@@ -93,14 +93,14 @@ Coverage: 23 rules — 9 HAVE (39%), 5 PARTIAL, 9 TODO (39%)
 | `bloc_related_class_naming` | PARTIAL | `prefer_bloc_event_suffix` / `prefer_bloc_state_suffix` — saropa only checks suffix presence, not that the name matches the related Bloc's subject |
 | `bloc_subclasses_naming` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_bloc_subclasses_naming.md) |
 | `catch_parameter_names` | PARTIAL | `prefer_correct_error_name` — checks only the exception parameter name, not the stack-trace parameter, and isn't configurable |
-| `constructor_parameters_and_fields_should_have_the_same_order` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_constructor_parameters_and_fields_should_have_the_same_order.md) |
+| `constructor_parameters_and_fields_should_have_the_same_order` | HAVE | `constructor_parameters_and_fields_should_have_the_same_order` |
 | `hook_widget_does_not_use_hooks` | HAVE | `avoid_unnecessary_hook_widgets` |
 | `never_discard_build_context` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_never_discard_build_context.md) |
 | `prefer_abstract_final_class` | PARTIAL | `prefer_extension_over_utility_class` — detects the same static-methods-only class shape but recommends `extension` instead of `abstract final class` |
-| `prefer_center_over_align` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_center_over_align.md) (not active upstream in leancode_lint either) |
+| `prefer_center_over_align` | HAVE | `prefer_center_over_align` |
 | `prefer_equatable_mixin` | HAVE | `require_extend_equatable` |
 | `prefix_widgets_returning_slivers` | HAVE | `prefer_sliver_prefix` |
-| `start_comments_with_space` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_start_comments_with_space.md) |
+| `start_comments_with_space` | HAVE | `start_comments_with_space` |
 | `use_align` | HAVE | `prefer_align_over_container` |
 | `use_dedicated_media_query_methods` | HAVE | `avoid_deprecated_use_inherited_media_query` |
 | `use_design_system_item` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_use_design_system_item.md) |

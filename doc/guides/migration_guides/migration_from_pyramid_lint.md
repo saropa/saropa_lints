@@ -53,13 +53,13 @@ dart run saropa_lints:init --tier recommended
 
 ## Rule Mapping
 
-Coverage: 37 rules — 25 HAVE (67%), 4 PARTIAL, 8 TODO (21%)
+Coverage: 37 rules — 29 HAVE (78%), 3 PARTIAL, 5 TODO (14%)
 
 ### Dart Lints
 
 | pyramid_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `always_put_doc_comments_before_annotations` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_always_put_doc_comments_before_annotations.md) |
+| `always_put_doc_comments_before_annotations` | HAVE | `always_put_doc_comments_before_annotations` |
 | `always_specify_parameter_names` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_always_specify_parameter_names.md) |
 | `avoid_dynamic` | HAVE | `avoid_dynamic_type` |
 | `avoid_empty_blocks` | HAVE | `no_empty_block` |
@@ -69,7 +69,7 @@ Coverage: 37 rules — 25 HAVE (67%), 4 PARTIAL, 8 TODO (21%)
 | `class_members_ordering` | HAVE | `prefer_member_ordering` |
 | `max_lines_for_file` | HAVE | `avoid_long_length_files` / `avoid_very_long_length_files` |
 | `max_lines_for_function` | HAVE | `avoid_long_functions` |
-| `no_duplicate_imports` | PARTIAL | `avoid_duplicate_named_imports` — pyramid catches byte-identical duplicate imports regardless of prefix; unclear whether saropa's rule also fires on a verbatim duplicate with no prefix at all. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_no_duplicate_imports.md) |
+| `no_duplicate_imports` | HAVE | `avoid_duplicate_named_imports` |
 | `no_self_comparisons` | HAVE | `avoid_self_compare` |
 | `prefer_async_await` | HAVE | `prefer_async_await` |
 | `prefer_iterable_any` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_iterable_any.md) (`.where().isNotEmpty` → `.any()`; saropa's similarly-named `prefer_any_or_every` is a false cognate — it targets explicit-null named arguments, not iterable-chain rewrites) |
@@ -86,8 +86,8 @@ Coverage: 37 rules — 25 HAVE (67%), 4 PARTIAL, 8 TODO (21%)
 
 | pyramid_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid_public_members_in_states` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_public_members_in_states.md) |
-| `avoid_single_child_in_flex` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_single_child_in_flex.md) |
+| `avoid_public_members_in_states` | HAVE | `avoid_public_members_in_states` |
+| `avoid_single_child_in_flex` | HAVE | `avoid_single_child_column_row` |
 | `dispose_controllers` | PARTIAL | `require_form_field_controller` — pyramid's is type-checker-based (any disposable-typed field); saropa's is a fixed enumeration of known controller types, so a novel custom controller type would be missed by saropa but caught by pyramid. TODO — see [proposal](../../../plans/tier_2_high_value/proposal_dispose_controllers.md) |
 | `prefer_async_callback` | HAVE | `prefer_async_callback` |
 | `prefer_border_from_border_side` | HAVE | `avoid_border_all` |

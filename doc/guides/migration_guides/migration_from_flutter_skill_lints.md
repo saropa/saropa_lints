@@ -51,7 +51,7 @@ dart run saropa_lints:init --tier recommended
 
 ## Rule Mapping
 
-Coverage: 48 rules — 7 PARTIAL, 41 TODO (85%)
+Coverage: 48 rules — 5 HAVE (10%), 6 PARTIAL, 37 TODO (77%)
 
 flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (architecture, Riverpod, Freezed, router, persistence, UI, tests, etc.) rather than one rule per file, so the 231 HAVE rules are not individually enumerated below — each was confirmed to have a same- or similar-named saropa equivalent during the gap audit (see `plans/GAP_ANALYSIS.md` → `### flutter_skill_lints`). The tables below list every named GAP and PARTIAL rule.
 
@@ -69,21 +69,21 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `avoid_flutter_skill_lint_suppression` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_lint_suppression_abuse.md) (package-specific: bans suppressing flutter_skill_lints itself) |
 | `avoid_implementation_in_mocks` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_implementation_in_mocks.md) |
 | `avoid_inline_error_codes` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_inline_error_codes.md) |
-| `avoid_labels` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_labeled_statements.md) |
+| `avoid_labels` | HAVE | `avoid_labeled_statements` |
 | `avoid_local_contract_key_constants` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_local_contract_key_constants.md) |
 | `avoid_missing_test_files` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_missing_test_files.md) |
 | `avoid_misused_wildcard_pattern` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_keywords_in_wildcard_pattern_dcm_parity.md) |
 | `avoid_mounted_check_in_finally` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_avoid_mounted_check_in_finally.md) |
 | `avoid_nullable_async_or_collection_return_type` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_nullable_async_or_collection_return_type.md) |
 | `avoid_parameter_aliases` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_parameter_aliases.md) |
-| `avoid_positional_record_fields` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_positional_record_fields.md) |
+| `avoid_positional_record_fields` | HAVE | `avoid_positional_record_field_access` |
 | `avoid_public_late_final_without_initializer` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_public_late_final_without_initializer.md) |
 | `avoid_public_notifier_properties` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_public_notifier_properties.md) |
 | `avoid_repeated_property_aliases` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_repeated_property_aliases.md) |
-| `avoid_then_return_with_future` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_then_return_with_future.md) |
+| `avoid_then_return_with_future` | HAVE | `avoid_returning_null_for_future_strict` |
 | `avoid_throw` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_throw_in_finally_dcm_parity.md) |
 | `avoid_unassigned_local_variable` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_unassigned_late_fields_dcm_parity.md) |
-| `avoid_unnecessary_parentheses` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_parentheses.md) |
+| `avoid_unnecessary_parentheses` | HAVE | `avoid_unnecessary_parentheses` |
 | `avoid_unnecessary_safe_area` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_safe_area.md) |
 | `avoid_unused_local_variable` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_avoid_unused_local_variable_na.md) |
 | `keep_state_below_its_widget` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_state_class_below_widget.md) |
@@ -111,7 +111,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `avoid_futureor_return_type` | PARTIAL | `prefer_unwrapping_future_or` — suggests unwrapping generally, doesn't specifically flag `FutureOr` as a return type. TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_avoid_futureor_return_type.md) |
 | `avoid_missing_controller` | PARTIAL | `require_form_field_controller` — only covers `TextFormField`, not all controller-accepting input widgets. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_missing_controller.md) |
 | `avoid_single_child_in_multi_child_widgets` | PARTIAL | `avoid_single_child_column_row` — covers only Column/Row, not all multi-child widgets. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_single_child_in_multi_child_widgets.md) |
-| `avoid_unnecessary_else_after_control_flow` | PARTIAL | `avoid_redundant_else` — only flags else after return/throw/continue/break; flutter_skill_lints bans all else blocks unconditionally. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_else_after_control_flow.md) |
+| `avoid_unnecessary_else_after_control_flow` | HAVE | `avoid_unnecessary_else_after_control_flow` |
 
 ## Getting Help
 

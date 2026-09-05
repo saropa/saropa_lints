@@ -61,7 +61,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 63 rules — 41 HAVE (65%), 2 PARTIAL, 20 TODO (31%)
+Coverage: 63 rules — 43 HAVE (68%), 2 PARTIAL, 18 TODO (29%)
 
 ### bloc.yaml (22 rules — 21 HAVE, 1 PARTIAL)
 
@@ -142,8 +142,8 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 | `prefer-providing-intl-description` | HAVE | `prefer_providing_intl_description` |
 | `provide-correct-intl-args` | HAVE | `provide_correct_intl_args` |
 | `prefer-providing-intl-examples` | HAVE | `prefer_providing_intl_examples` |
-| `prefer-number-format` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_number_format.md). |
-| `prefer-date-format` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_date_format.md). |
+| `prefer-number-format` | HAVE | `prefer_number_format` |
+| `prefer-date-format` | HAVE | `prefer_date_format` |
 
 ### flame.yaml (4 rules — 2 HAVE, 2 TODO)
 

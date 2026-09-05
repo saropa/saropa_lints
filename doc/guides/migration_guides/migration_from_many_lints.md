@@ -100,7 +100,7 @@ many_lints' presets are cumulative rule counts; saropa_lints uses progressive ti
 
 ## Rule Mapping
 
-Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
+Coverage: 266 rules — 204 HAVE (77%), 7 PARTIAL, 51 TODO (19%)
 [nikoro.github.io/many_lints/docs/rules](https://nikoro.github.io/many_lints/docs/rules/).
 
 | many_lints Rule | Status | Saropa Rule / Action |
@@ -142,14 +142,14 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `avoid_duplicate_collection_elements` | HAVE | `avoid_duplicate_number_elements` / `avoid_duplicate_string_elements` / `avoid_duplicate_object_elements` |
 | `avoid_duplicate_mixins` | HAVE | `avoid_duplicate_mixins` |
 | `avoid_either_of_future` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_avoid_either_of_future.md) (fpdart family, see Gap Theme 1) |
-| `avoid_empty_catch` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_empty_catch.md) |
+| `avoid_empty_catch` | HAVE | `avoid_swallowing_exceptions` |
 | `avoid_empty_setstate` | HAVE | `avoid_empty_setstate` |
 | `avoid_empty_spread` | HAVE | `avoid_empty_spread` |
 | `avoid_equal_expressions` | HAVE | `avoid_equal_expressions` |
-| `avoid_exit_outside_entrypoint` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_exit_outside_entrypoint.md) |
+| `avoid_exit_outside_entrypoint` | HAVE | `avoid_exit_outside_entrypoint` |
 | `avoid_expanded_as_spacer` | HAVE | `avoid_expanded_as_spacer` |
 | `avoid_flexible_outside_flex` | HAVE | `avoid_flexible_outside_flex` |
-| `avoid_focused_tests` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_skipped_tests.md) (test hygiene, see Gap Theme 10) |
+| `avoid_focused_tests` | HAVE | `avoid_focused_tests` |
 | `avoid_future_ignore` | HAVE | `avoid_future_ignore` |
 | `avoid_future_of_either` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_avoid_future_of_either.md) (fpdart family, see Gap Theme 1) |
 | `avoid_future_of_option` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_avoid_future_of_option.md) (fpdart family, see Gap Theme 1) |
@@ -199,7 +199,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `avoid_shrink_wrap_in_lists` | HAVE | `avoid_shrink_wrap_in_lists` |
 | `avoid_single_child_in_multi_child_widgets` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_single_child_in_multi_child_widgets.md) |
 | `avoid_single_field_destructuring` | HAVE | `avoid_single_field_destructuring` |
-| `avoid_skipped_tests` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_skipped_tests.md) (test hygiene, see Gap Theme 10) |
+| `avoid_skipped_tests` | HAVE | `avoid_skipped_tests` |
 | `avoid_state_constructors` | HAVE | `avoid_state_constructors` |
 | `avoid_throw_in_catch_block` | HAVE | `avoid_throw_in_catch_block` |
 | `avoid_throw_in_fp_callback` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_avoid_throw_in_fp_callback.md) (fpdart family, see Gap Theme 1) |
@@ -309,7 +309,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_getter_over_method` | HAVE | `prefer_getter_over_method` |
 | `prefer_immediate_return` | HAVE | `prefer_immediate_return` |
 | `prefer_immutable_bloc_state` | HAVE | `prefer_immutable_bloc_state` |
-| `prefer_immutable_state` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_immutable_state.md) (state-management-agnostic variant) |
+| `prefer_immutable_state` | HAVE | `prefer_immutable_bloc_state` |
 | `prefer_iterable_of` | HAVE | `prefer_iterable_of` |
 | `prefer_match_file_name` | HAVE | `prefer_match_file_name` |
 | `prefer_moving_to_variable` | HAVE | `prefer_moving_to_variable` |
@@ -318,7 +318,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_overriding_parent_equality` | HAVE | `prefer_overriding_parent_equality` |
 | `prefer_padding_over_container` | HAVE | `prefer_padding_over_container` |
 | `prefer_prefixed_global_constants` | HAVE | `prefer_prefixed_global_constants` |
-| `prefer_primary_constructors` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_primary_constructors.md) (Dart 3.13 syntax, see Gap Theme 11) |
+| `prefer_primary_constructors` | HAVE | `prefer_primary_constructor` |
 | `prefer_private_named_parameters` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_private_named_parameters.md) |
 | `prefer_return_await` | HAVE | `prefer_return_await` |
 | `prefer_returning_condition` | HAVE | `prefer_returning_condition` |

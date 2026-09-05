@@ -50,7 +50,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 18 rules — 15 HAVE (83%), 2 PARTIAL, 1 TODO (5%)
+Coverage: 18 rules — 16 HAVE (89%), 2 PARTIAL, 0 TODO (0%)
 
 | flutter_quality_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
@@ -70,7 +70,7 @@ Coverage: 18 rules — 15 HAVE (83%), 2 PARTIAL, 1 TODO (5%)
 | `prefer_named_parameters` | HAVE | `prefer_named_parameters` |
 | `prefer_single_widget_per_file` | HAVE | `prefer_single_widget_per_file` |
 | `prefer_slivers_over_columns` | HAVE | `prefer_sliver_for_mixed_scroll` |
-| `prefer_stateless_widgets` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_stateless_widgets.md). Their rule inspects a `State` class's actual mutable-state usage (setState calls, uninitialized fields, lifecycle methods, controller fields) to suggest converting to `StatelessWidget`; saropa has no rule that performs this specific cross-check. |
+| `prefer_stateless_widgets` | HAVE | `avoid_unnecessary_stateful_widgets` |
 | `prefer_trailing_commas` | HAVE | `prefer_trailing_comma` (their comma-detection logic is a stub as shipped and never fires) |
 
 ## Suppressing Rules
