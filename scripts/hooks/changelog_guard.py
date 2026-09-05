@@ -74,8 +74,26 @@ def _count_unreleased_sections(changelog: Path) -> int:
     return pure + suffixed
 
 
+def _version_sort_key(version: str) -> tuple:
+    """Sort key where prerelease < stable of the same base
+    (16.0.0-beta.1 < 16.0.0-beta.2 < 16.0.0), matching
+    scripts/modules/_version_changelog.parse_version."""
+    match = re.match(r"^(\d+\.\d+\.\d+)(?:-(.+))?$", version)
+    if not match:
+        return (0, 0, 0, 0, "")
+    base = tuple(int(x) for x in match.group(1).split("."))
+    pre = match.group(2)
+    return (*base, 1, "") if pre is None else (*base, 0, pre)
+
+
 def _get_last_published_tag() -> str | None:
-    """Return the latest vX.Y.Z tag, or None if no tags exist."""
+    """Return the latest vX.Y.Z(-prerelease) tag, or None if no tags exist.
+
+    Must accept prerelease tags — a stable-only regex misses the true
+    last-published version during a beta cycle (e.g. v16.0.0-beta.1) and
+    falls back to an older stable tag instead, which turns a one-step
+    forward bump into what looks like a many-version rollback.
+    """
     try:
         result = subprocess.run(
             ["git", "tag", "--sort=-v:refname"],
@@ -83,10 +101,13 @@ def _get_last_published_tag() -> str | None:
         )
         if result.returncode != 0:
             return None
-        for line in result.stdout.strip().splitlines():
-            # Match vX.Y.Z (not pre-release tags)
-            if re.match(r"^v\d+\.\d+\.\d+$", line.strip()):
-                return line.strip()
+        candidates = [
+            line.strip() for line in result.stdout.strip().splitlines()
+            if re.match(r"^v\d+\.\d+\.\d+(-[\w.]+)?$", line.strip())
+        ]
+        if not candidates:
+            return None
+        return max(candidates, key=lambda t: _version_sort_key(t.lstrip("v")))
     except FileNotFoundError:
         pass
     return None
