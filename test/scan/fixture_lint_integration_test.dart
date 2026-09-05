@@ -14,17 +14,28 @@ final Set<String> _saropaRuleCodes = allSaropaRules
     .map((r) => r.code.lowerCaseName)
     .toSet();
 
-/// Runs `dart analyze` and `dart run custom_lint` in [exampleDir], parses both,
-/// and returns the **union** of violations (deduped by file/line/column/rule).
-Future<List<Violation>> _violationsForExample(Directory exampleDir) async {
+/// Result of running both linters over the example package once: the two
+/// raw source lists plus their deduped union.
+typedef ExampleAnalysis = ({
+  List<Violation> fromAnalyze,
+  List<Violation> fromCustom,
+  List<Violation> combined,
+});
+
+/// Runs `dart analyze` and `dart run custom_lint` in [exampleDir] exactly
+/// once and returns both raw result lists plus their union (deduped by
+/// file/line/column/rule) — cached via setUpAll below so every test in the
+/// group shares one (slow) analysis run instead of re-invoking the linters.
+Future<ExampleAnalysis> _analyzeExample(Directory exampleDir) async {
   final analyzeResult = await Process.run(
     'dart',
     ['analyze'],
     workingDirectory: exampleDir.path,
     runInShell: true,
   );
-  final analyzeOut = '${analyzeResult.stdout}${analyzeResult.stderr}';
-  final fromAnalyze = parseDartAnalyzeHumanOutput(analyzeOut);
+  final fromAnalyze = parseDartAnalyzeHumanOutput(
+    '${analyzeResult.stdout}${analyzeResult.stderr}',
+  );
 
   final customLintResult = await Process.run(
     'dart',
@@ -43,7 +54,11 @@ Future<List<Violation>> _violationsForExample(Directory exampleDir) async {
 
   addAll(fromAnalyze);
   addAll(fromCustom);
-  return byKey.values.toList();
+  return (
+    fromAnalyze: fromAnalyze,
+    fromCustom: fromCustom,
+    combined: byKey.values.toList(),
+  );
 }
 
 /// Integration test: run custom_lint on an example package and assert
@@ -55,15 +70,41 @@ void main() {
   // Process.run('dart', ['run', 'custom_lint']) can hang if the analyzer
   // plugin stalls or package resolution deadlocks — cap each test.
   group('Fixture lint integration', timeout: const Timeout(Duration(minutes: 2)), () {
+    // Every test below needs the same example/ dir, the same "skip when
+    // absent" guard, and the same analysis result — computed once here
+    // instead of duplicated at the top of each test.
+    late Directory exampleDir;
+    late bool exampleMissing;
+    late ExampleAnalysis analysis;
+    late List<Violation> violations;
+
+    setUpAll(() async {
+      exampleDir = Directory('example');
+      exampleMissing = !exampleDir.existsSync();
+      // Run the expensive analysis once; individual tests filter from this.
+      // Timeout guards against a hung analyzer plugin or package-resolution
+      // deadlock — setUpAll has no group-level timeout, so without this the
+      // entire suite stalls indefinitely.
+      analysis = exampleMissing
+          ? (
+              fromAnalyze: <Violation>[],
+              fromCustom: <Violation>[],
+              combined: <Violation>[],
+            )
+          : await _analyzeExample(exampleDir).timeout(
+              const Duration(minutes: 3),
+            );
+      violations = analysis.combined;
+    });
+
     test(
-      'dart analyze (or custom_lint) on example produces parseable violations',
-      () async {
-        final exampleDir = Directory('example');
-        if (!exampleDir.existsSync()) {
+      'dart analyze (or custom_lint) on example should produce parseable violations',
+      () {
+        if (exampleMissing) {
           return; // Skip when example not present (e.g. in some CI)
         }
 
-        final violations = await _violationsForExample(exampleDir);
+        // violations already computed in setUpAll via _analyzeExample.
         expect(violations, isA<List>());
         if (violations.isEmpty) {
           return;
@@ -76,29 +117,14 @@ void main() {
     /// fire on fixture code (proves linter-on-code when `dart analyze` or
     /// `dart run custom_lint` runs). When neither yields parseable violations,
     /// skip per-rule assertions so the test still passes.
-    test('example analysis reports expected rules from fixtures', () async {
-      final exampleDir = Directory('example');
-      if (!exampleDir.existsSync()) {
-        return;
+    test('example analysis reports expected rules from fixtures', () {
+      if (exampleMissing) {
+        return; // Skip when example not present (e.g. in some CI)
       }
 
-      final analyzeResult = await Process.run(
-        'dart',
-        ['analyze'],
-        workingDirectory: exampleDir.path,
-        runInShell: true,
-      );
-      final fromAnalyze = parseDartAnalyzeHumanOutput(
-        '${analyzeResult.stdout}${analyzeResult.stderr}',
-      );
-
-      final customLintResult = await Process.run(
-        'dart',
-        ['run', 'custom_lint'],
-        workingDirectory: exampleDir.path,
-        runInShell: true,
-      );
-      final fromCustom = parseViolations(customLintResult.stdout as String);
+      // fromAnalyze/fromCustom already computed once in setUpAll.
+      final fromAnalyze = analysis.fromAnalyze;
+      final fromCustom = analysis.fromCustom;
 
       if (fromAnalyze.isEmpty && fromCustom.isEmpty) {
         return;
@@ -248,14 +274,12 @@ void main() {
     /// avoid_unawaited_future: only the BAD case (bare Future) must trigger;
     /// unawaited(...) and unawaited(... .then()) must NOT trigger (false positive fix).
     test(
-      'avoid_unawaited_future fixture has exactly one violation (unawaited() lines do not trigger)',
-      () async {
-        final exampleDir = Directory('example');
-        if (!exampleDir.existsSync()) {
-          return;
+      'avoid_unawaited_future fixture should have exactly one violation (unawaited() lines do not trigger)',
+      () {
+        if (exampleMissing) {
+          return; // Skip when example not present (e.g. in some CI)
         }
 
-        final violations = await _violationsForExample(exampleDir);
         final fixtureViolations = violations
             .where(
               (v) =>
@@ -284,14 +308,12 @@ void main() {
     );
 
     test(
-      'prefer_skeleton_over_spinner fixture only reports indeterminate cases',
-      () async {
-        final exampleDir = Directory('example');
-        if (!exampleDir.existsSync()) {
-          return;
+      'prefer_skeleton_over_spinner fixture should only report indeterminate cases',
+      () {
+        if (exampleMissing) {
+          return; // Skip when example not present (e.g. in some CI)
         }
 
-        final violations = await _violationsForExample(exampleDir);
         final fixtureViolations = violations
             .where(
               (v) =>
@@ -324,14 +346,12 @@ void main() {
     );
 
     test(
-      'prefer_try_parse_for_dynamic_data skips provably safe regex/literal inputs',
-      () async {
-        final exampleDir = Directory('example');
-        if (!exampleDir.existsSync()) {
-          return;
+      'prefer_try_parse_for_dynamic_data should skip provably safe regex/literal inputs',
+      () {
+        if (exampleMissing) {
+          return; // Skip when example not present (e.g. in some CI)
         }
 
-        final violations = await _violationsForExample(exampleDir);
         final fixtureViolations = violations
             .where(
               (v) =>
@@ -376,14 +396,12 @@ void main() {
     );
 
     test(
-      'avoid_memory_intensive_operations fixture only reports string concat in loop',
-      () async {
-        final exampleDir = Directory('example');
-        if (!exampleDir.existsSync()) {
-          return;
+      'avoid_memory_intensive_operations fixture should only report string concat in loop',
+      () {
+        if (exampleMissing) {
+          return; // Skip when example not present (e.g. in some CI)
         }
 
-        final violations = await _violationsForExample(exampleDir);
         final fixtureViolations = violations
             .where(
               (v) =>
@@ -415,13 +433,11 @@ void main() {
 
     /// Behavioral test: compliant-only file must produce no violations.
     /// Proves "compliant code → no lint" for the rules exercised in that file.
-    test('compliant-only fixture has no violations', () async {
-      final exampleDir = Directory('example');
-      if (!exampleDir.existsSync()) {
-        return;
+    test('compliant-only fixture should have no violations', () {
+      if (exampleMissing) {
+        return; // Skip when example not present (e.g. in some CI)
       }
 
-      final violations = await _violationsForExample(exampleDir);
       final compliantFileViolations = violations
           .where((v) => v.file.contains('behavioral_test_compliant_only.dart'))
           .where((v) => _saropaRuleCodes.contains(v.rule))

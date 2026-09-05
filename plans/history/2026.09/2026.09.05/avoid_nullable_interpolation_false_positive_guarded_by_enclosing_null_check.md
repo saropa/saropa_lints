@@ -82,7 +82,7 @@ Finding 1 (RegExpMatch group guaranteed by pattern, `health_summary.dart:51`)
 is NOT addressed by this fix — it is a structurally different problem
 (reasoning about regex capture-group guarantees, not control-flow guards)
 and was split out to a new bug file:
-`bugs/avoid_nullable_interpolation_false_positive_regexpmatch_group_guaranteed_by_pattern.md`.
+`plans/history/2026.09/2026.09.05/avoid_nullable_interpolation_false_positive_regexpmatch_group_guaranteed_by_pattern.md` (fixed in v8).
 
 ### Verification
 

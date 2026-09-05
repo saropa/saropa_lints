@@ -60,10 +60,13 @@ import 'package:test/test.dart';
 void main() {
   group('Rule quick fix presence', () {
     void hasFix(String name, dynamic Function() create) {
-      test('$name has at least one quick fix', () {
-        final rule = create();
-        expect(rule.fixGenerators, isNotEmpty, reason: name);
-      });
+      test(
+        '$name should register at least one fixGenerator (quick fix is offered)',
+        () {
+          final rule = create();
+          expect(rule.fixGenerators, isNotEmpty, reason: name);
+        },
+      );
     }
 
     test('rule without quick fix has empty fixGenerators', () {

@@ -3491,7 +3491,9 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  /// Words that indicate a good test description.
+  /// Words that indicate a good test description — presence of any one
+  /// is enough to skip the lint, so only add words that genuinely signal
+  /// a what-is-tested / expected-behavior intent.
   static const Set<String> _goodDescriptionWords = <String>{
     'should',
     'returns',
@@ -3510,6 +3512,28 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
     'navigates',
     'renders',
     'displays',
+    'exists',
+    'contains',
+    'matches',
+    'produces',
+    'reports',
+    'parses',
+    'rejects',
+    'accepts',
+    'ignores',
+    'skips',
+    'detects',
+    'fires',
+    'triggers',
+    'prevents',
+    'allows',
+    'blocks',
+    'converts',
+    'maps',
+    'filters',
+    'sorts',
+    'merges',
+    'splits',
   };
 
   @override
@@ -3527,7 +3551,13 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
       final firstArg = args.first;
       if (firstArg is! StringLiteral) return;
 
-      final description = firstArg.stringValue?.toLowerCase() ?? '';
+      // `.stringValue` is null for any non-constant literal (StringInterpolation,
+      // or AdjacentStrings containing one), so a common data-driven idiom like
+      // test('${c.rule} should ...', ...) always produced an empty description
+      // here and got flagged regardless of its actual wording. Extract the
+      // literal text segments instead so interpolated descriptions are judged
+      // by what they actually say.
+      final description = _literalText(firstArg).toLowerCase();
 
       // Check if description has any good indicator words
       final hasGoodWord = _goodDescriptionWords.any(
@@ -3546,6 +3576,24 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
       }
     });
   }
+}
+
+/// Concatenates the literal (non-interpolated) text of [literal], so a
+/// description like `'${c.rule} should exist'` is judged on "should exist"
+/// rather than treated as empty just because the whole expression isn't a
+/// compile-time constant.
+String _literalText(StringLiteral literal) {
+  if (literal is SimpleStringLiteral) return literal.value;
+  if (literal is StringInterpolation) {
+    return literal.elements
+        .whereType<InterpolationString>()
+        .map((e) => e.value)
+        .join();
+  }
+  if (literal is AdjacentStrings) {
+    return literal.strings.map(_literalText).join();
+  }
+  return literal.stringValue ?? '';
 }
 
 /// Warns when Bloc is tested without bloc_test package.

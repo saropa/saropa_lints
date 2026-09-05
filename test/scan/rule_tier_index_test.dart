@@ -141,8 +141,12 @@ void main() {
       }
     });
 
-    test('every value in the generated ruleCategoryMap is a known slug '
-        '(exhaustive, all ${ruleCategoryMap.length} entries)', () {
+    test(
+        'ruleCategoryMap: every one of the ${ruleCategoryMap.length} '
+        'generated entries should map to a known category slug, so a '
+        'generator bug producing a misspelled slug is caught even for '
+        'rules not wired into any tier',
+        () {
       // The previous test filters through getAllDefinedRules() (the union
       // of tier sets), so a rule present in the generated map but NOT
       // wired into any tier — a real registration-drift scenario, since

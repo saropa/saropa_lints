@@ -79,16 +79,20 @@ void main() {
     // matched, but individual test names make failures visible in the
     // runner when the set drifts.
     for (final fixture in ruleFixtures) {
-      test('${fixture.name} matches a registered rule', () {
-        expect(
-          registeredRules,
-          contains(fixture.name),
-          reason:
-              'Fixture ${fixture.path} does not match any rule in '
-              'tiers.dart.  Either the rule was renamed/deleted (remove '
-              'the fixture) or the filename is misspelled.',
-        );
-      });
+      test(
+        '${fixture.name} fixture file name should match a rule registered in '
+        'tiers.dart',
+        () {
+          expect(
+            registeredRules,
+            contains(fixture.name),
+            reason:
+                'Fixture ${fixture.path} does not match any rule in '
+                'tiers.dart.  Either the rule was renamed/deleted (remove '
+                'the fixture) or the filename is misspelled.',
+          );
+        },
+      );
     }
 
     // Group fixtures are logged but not failed — they cover multiple

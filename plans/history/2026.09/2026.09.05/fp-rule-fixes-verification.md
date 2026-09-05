@@ -40,9 +40,9 @@ Seven bug reports moved from `bugs/` to `plans/history/2026.09/2026.09.05/`:
 - `require_catch_logging_false_positive_intentional_fallback.md`
 - `require_url_validation_false_positive_local_file_paths.md`
 
-Six more had been archived in the prior session. One remains open:
-`avoid_nullable_interpolation_false_positive_regexpmatch_group_guaranteed_by_pattern.md`
-(different FP class — `RegExpMatch.group()` guaranteed by pattern, not yet fixed).
+Six more had been archived in the prior session. The remaining one —
+`plans/history/2026.09/2026.09.05/avoid_nullable_interpolation_false_positive_regexpmatch_group_guaranteed_by_pattern.md`
+— was fixed in v8 (`_isMatchGroupAccess` guard added to `AvoidNullableInterpolationRule`).
 
 ### Code-review finding addressed
 

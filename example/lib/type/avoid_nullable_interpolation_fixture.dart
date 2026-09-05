@@ -185,6 +185,33 @@ void _goodBreadcrumbString(String? name) {
   breadcrumb('checkout-step: $name');
 }
 
+// GOOD (v8): Match.group(n) / Match[n] — the Dart type system returns
+// String? but for required capture groups the value is always non-null.
+// The rule cannot parse the regex, so suppress all match group accesses.
+String _goodReplaceAllMatchedGroup(String input) {
+  return input.replaceAllMapped(
+    RegExp(r'(\d)(?=(\d{3})+$)'),
+    (m) => '${m[1]},',
+  );
+}
+
+// GOOD (v8): Match.group() explicit call form — same exemption.
+String _goodMatchGroupCall(String input) {
+  return input.replaceAllMapped(
+    RegExp(r'([a-z])([A-Z])'),
+    (Match m) => '${m.group(1)}_${m.group(2)}',
+  );
+}
+
+// GOOD (v8): firstMatch + null check + group access.
+String _goodFirstMatchGroup(String input) {
+  final match = RegExp(r'(\d+)').firstMatch(input);
+  if (match != null) {
+    return 'Found: ${match[1]}';
+  }
+  return 'none';
+}
+
 // BAD: Real UI bug — nullable in a string built for the UI, no guard.
 class _UiCard {
   _UiCard(this.name);

@@ -1,6 +1,6 @@
 # BUG: `avoid_nullable_interpolation` — False positive on `RegExpMatch` group guaranteed present by the pattern
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-09-05
 Rule: `avoid_nullable_interpolation`
@@ -25,6 +25,20 @@ structure, so it flags the interpolation as if the value could be null.
 
 ---
 
+## Fix (v8)
+
+Added `_isMatchGroupAccess()` guard to the rule. When the interpolated
+expression is an `IndexExpression` or `.group()` `MethodInvocation` whose
+receiver is typed as `Match` or `RegExpMatch` (dart:core), the lint is
+suppressed. The false-positive rate on these accesses is very high and
+invalid group indices throw `RangeError` at runtime, not null.
+
+A shared `isDartCoreMatchType()` top-level helper was extracted to
+deduplicate the identical type check that already existed in
+`AvoidNullAssertionRule._isSafeRegExpMatchGroup()`.
+
+---
+
 ## Reproducer
 
 ```dart
@@ -41,18 +55,6 @@ Originally observed at `health_summary.dart:51`.
 
 ---
 
-## Suggested Fix
-
-Consider suppressing when the group index is a literal ≤ the pattern's
-required (non-optional) capture-group count. Flagged as hard / may not be
-worth the complexity in the original report — parsing the regex pattern
-string to determine which groups are optional (inside `(...)?`, `(...)*`,
-alternation, etc.) is nontrivial and error-prone to get right. A narrower,
-safer heuristic (e.g. only when the pattern literal has no `?`, `*`, `|`
-at all) may be a reasonable first cut if this is picked up.
-
----
-
 ## Affected Files (FP only)
 
 - `health_summary.dart:51` — RegExpMatch group
@@ -62,3 +64,43 @@ at all) may be a reasonable first cut if this is picked up.
 ## Environment
 
 - saropa_lints version: current (unreleased)
+
+---
+
+## Finish Report (2026-09-05)
+
+**Defect:** `AvoidNullableInterpolationRule` (v7) flagged `Match[n]` and
+`Match.group(n)` in string interpolations as nullable. The Dart type system
+returns `String?` from these accessors, but for required capture groups the
+value is guaranteed non-null on a successful match. The rule could not
+distinguish required from optional groups without parsing the regex pattern.
+
+**Fix (v8):** Added `_isMatchGroupAccess()` to the rule's suppression
+chain. The method detects `IndexExpression` (`m[n]`) and `.group()`
+`MethodInvocation` on `Match`/`RegExpMatch` from `dart:core`.
+
+When the regex pattern literal is visible in the AST (e.g. inside a
+`replaceAllMapped(RegExp(r'...'), ...)` call), a new
+`countRequiredCaptureGroups()` parser counts required (non-optional)
+capture groups and only suppresses when the accessed group index is
+within that count. When the pattern can't be found or is too complex
+to parse, the suppression falls back to blanket exemption.
+
+**Regex group counter:** `countRequiredCaptureGroups(String pattern)`
+walks the pattern character-by-character with a stack, handling:
+escaped chars, character classes `[...]`, non-capturing groups `(?:)`,
+lookahead/lookbehind `(?=)` / `(?!)` / `(?<=)` / `(?<!)`, named
+groups `(?<name>)`, alternation `|`, and quantifiers `?`/`*` on
+groups. Returns null for patterns too complex to analyze.
+
+**Deduplication:** The dart:core Match/RegExpMatch type check was
+duplicated between `AvoidNullableInterpolationRule._isMatchType()` and
+`AvoidNullAssertionRule._isSafeRegExpMatchGroup()`. Both now delegate
+to a shared top-level `isDartCoreMatchType(DartType)` helper.
+
+**Testing:** Three GOOD fixture cases added to the fixture file.
+16 unit tests for `countRequiredCaptureGroups` covering simple groups,
+optional quantifiers, alternation, non-capturing groups, named groups,
+lookbehind/lookahead, escaped/character-class parens, nested groups,
+and two real-world patterns. Scan CLI confirmed zero FP hits on
+`health_summary.dart:51`. All 71 tests pass.

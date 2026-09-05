@@ -234,4 +234,93 @@ void main() {
 
   // Stub-only behavior tests were removed from this file. Keep rule metadata,
   // fixture verification, and targeted non-stub metadata checks.
+
+  group('countRequiredCaptureGroups', () {
+    // Verifies the regex group counter used by avoid_nullable_interpolation
+    // (v8) to narrow match-group suppression from blanket to precise.
+
+    test('simple required groups in lookahead', () {
+      // `(\d)(?=(\d{3})+$)` — two capturing groups, both required.
+      // The lookahead `(?=...)` is non-capturing, but `(\d{3})` inside
+      // it IS a capture group in Dart's RegExp. It's followed by `+`
+      // (not `?`/`*`), so both groups are required.
+      expect(countRequiredCaptureGroups(r'(\d)(?=(\d{3})+$)'), 2);
+    });
+
+    test('all groups required — no optional quantifiers', () {
+      // `([a-z])([A-Z])` — two simple required groups
+      expect(countRequiredCaptureGroups(r'([a-z])([A-Z])'), 2);
+    });
+
+    test('optional group followed by ?', () {
+      // `(\w+)(?: (\w+))?` — group 1 required, group 2 optional
+      expect(countRequiredCaptureGroups(r'(\w+)(?: (\w+))?'), 1);
+    });
+
+    test('optional group followed by *', () {
+      // `(a)(b)*` — group 1 required, group 2 optional
+      expect(countRequiredCaptureGroups(r'(a)(b)*'), 1);
+    });
+
+    test('alternation makes groups optional', () {
+      // `(a)|(b)` — alternation: only one side matches
+      expect(countRequiredCaptureGroups(r'(a)|(b)'), 0);
+    });
+
+    test('non-capturing group does not count', () {
+      // `(?:prefix)(value)` — only one capture group
+      expect(countRequiredCaptureGroups(r'(?:prefix)(value)'), 1);
+    });
+
+    test('escaped parens are not groups', () {
+      // `\(literal\)(capture)` — only one capture group
+      expect(countRequiredCaptureGroups(r'\(literal\)(capture)'), 1);
+    });
+
+    test('parens inside character class are literal', () {
+      // `[()](capture)` — `[()]` is a char class, one capture group
+      expect(countRequiredCaptureGroups(r'[()](capture)'), 1);
+    });
+
+    test('group 0 is always safe — not counted', () {
+      // Empty pattern — zero capture groups, but group 0 still safe
+      expect(countRequiredCaptureGroups(r'hello'), 0);
+    });
+
+    test('named capture group counts', () {
+      // `(?<name>\w+)` — one named capture group, required
+      expect(countRequiredCaptureGroups(r'(?<name>\w+)'), 1);
+    });
+
+    test('lookbehind is not a capture group', () {
+      // `(?<=prefix)(value)` — lookbehind + one capture group
+      expect(countRequiredCaptureGroups(r'(?<=prefix)(value)'), 1);
+    });
+
+    test('negative lookbehind is not a capture group', () {
+      // `(?<!prefix)(value)` — negative lookbehind + one capture
+      expect(countRequiredCaptureGroups(r'(?<!prefix)(value)'), 1);
+    });
+
+    test('unbalanced parens return null', () {
+      // Missing closing paren — too malformed to parse
+      expect(countRequiredCaptureGroups(r'(unclosed'), isNull);
+    });
+
+    test('nested groups — inner optional, outer required', () {
+      // `(outer(inner)?)` — outer required, inner optional
+      expect(countRequiredCaptureGroups(r'(outer(inner)?)'), 1);
+    });
+
+    test('real-world comma formatting pattern', () {
+      // The pattern from health_summary.dart — 2 required groups
+      // (group 2 is inside a lookahead but still a capture group)
+      expect(countRequiredCaptureGroups(r'(\d)(?=(\d{3})+$)'), 2);
+    });
+
+    test('real-world camelCase splitter', () {
+      // `([a-z0-9])([A-Z])` — 2 required groups
+      expect(countRequiredCaptureGroups(r'([a-z0-9])([A-Z])'), 2);
+    });
+  });
 }
