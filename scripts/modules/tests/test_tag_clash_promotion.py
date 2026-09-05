@@ -45,7 +45,9 @@ class TestPromoteTopSectionToVersion(unittest.TestCase):
         return Path(fh.name)
 
     def _top_heading(self, path: Path) -> str | None:
-        match = re.search(r"## \[([^\]]+)\]", path.read_text(encoding="utf-8"))
+        match = re.search(
+            r"^## \[([^\]]+)\]", path.read_text(encoding="utf-8"), re.MULTILINE,
+        )
         return match.group(1) if match else None
 
     def test_renames_top_section_matching_colliding_version(self) -> None:
@@ -126,6 +128,26 @@ class TestPromoteTopSectionToVersion(unittest.TestCase):
         self.assertEqual(result, "13.11.8")
         content = path.read_text(encoding="utf-8")
         self.assertNotIn("Unreleasted", content)
+
+    def test_ignores_heading_example_in_leading_doc_comment(self) -> None:
+        # 2026-09-04 incident: this repo's real CHANGELOG.md carries a
+        # maintenance doc-comment above the first release describing the
+        # heading convention with literal inline-code text like
+        # "## [X.Y.Z] - Unreleased". An unanchored search matched that
+        # placeholder as the "top heading" (label "X.Y.Z"), which is
+        # neither the expected nor next version nor "Unreleased", so the
+        # script refused to auto-rename a heading that was already correct.
+        path = self._write(
+            "# Changelog\n\n"
+            "<!--\n"
+            "Convention: use \"## [X.Y.Z] - Unreleased\" while in progress.\n"
+            "-->\n\n"
+            "## [13.11.8]\n\n### Fixed\n\n- avoid_nullable_interpolation fix\n\n"
+            "## [13.11.7]\n\n- prior release\n"
+        )
+        result = self._promote(path, "13.11.8", "13.11.9")
+        self.assertEqual(result, "13.11.8")
+        self.assertEqual(self._top_heading(path), "13.11.9")
 
 
 if __name__ == "__main__":

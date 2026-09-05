@@ -878,15 +878,20 @@ def _promote_top_section_to_version(
 
     # Match the first ## [...] heading anywhere in the file — there are no
     # version-like headings before the first release section in this repo's
-    # CHANGELOG layout (the header block uses no `## [...]` form).
-    match = re.search(r"## \[([^\]]+)\]", content)
+    # CHANGELOG layout (the header block uses no `## [...]` form). Anchored
+    # to line start: the maintenance doc-comment above the first release
+    # illustrates the heading convention with literal inline-code text like
+    # `## [X.Y.Z] — Unreleased`, which an unanchored search matches first,
+    # capturing the placeholder "X.Y.Z" as the "heading" instead of the
+    # real top section.
+    match = re.search(r"^## \[([^\]]+)\]", content, re.MULTILINE)
     if not match:
         return None
     label = match.group(1)
     if label == next_version:
         # If expected_version still has its own section, this heading
         # was NOT promoted from it — two separate histories exist.
-        if re.search(rf"## \[{re.escape(expected_version)}\]", content):
+        if re.search(rf"^## \[{re.escape(expected_version)}\]", content, re.MULTILINE):
             return None
         # Write back in case the suffix strip changed content.
         if content != original:
@@ -896,7 +901,7 @@ def _promote_top_section_to_version(
         return None
     # Refuse if the target version already has its own *separate* section —
     # silently merging two histories is unsafe.
-    if re.search(rf"## \[{re.escape(next_version)}\]", content):
+    if re.search(rf"^## \[{re.escape(next_version)}\]", content, re.MULTILINE):
         return None
     new_content = (
         content[: match.start()]
