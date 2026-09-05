@@ -123,8 +123,10 @@ void f(String filePath, String otherPath) {
     // idiom, CLI flag literals, import URI comparisons, and "path" embedded
     // in an unrelated word all used to fire incorrectly.
 
-    test('does NOT fire on root-detection idiom (dir.path != dir.parent.path)', () async {
-      await assertFixtureMarkers(rule, '''
+    test(
+      'does NOT fire on root-detection idiom (dir.path != dir.parent.path)',
+      () async {
+        await assertFixtureMarkers(rule, '''
 class D {
   String get path => '';
   D get parent => this;
@@ -135,10 +137,13 @@ void f(D dir) {
   while (dir.path != dir.parent.path) {}
 }
 ''');
-    });
+      },
+    );
 
-    test('does NOT fire on reversed root-detection idiom (dir.parent.path == dir.path)', () async {
-      await assertFixtureMarkers(rule, '''
+    test(
+      'does NOT fire on reversed root-detection idiom (dir.parent.path == dir.path)',
+      () async {
+        await assertFixtureMarkers(rule, '''
 class D {
   String get path => '';
   D get parent => this;
@@ -149,42 +154,53 @@ void f(D dir) {
   if (dir.parent.path == dir.path) {}
 }
 ''');
-    });
+      },
+    );
 
-    test('does NOT fire on CLI flag string literal containing "path"', () async {
-      await assertFixtureMarkers(rule, '''
+    test(
+      'does NOT fire on CLI flag string literal containing "path"',
+      () async {
+        await assertFixtureMarkers(rule, '''
 void f(String arg) {
   // LINT_NOT: avoid_case_sensitive_path_comparison
   if (arg == '--json-file-path') {}
 }
 ''');
-    });
+      },
+    );
 
     test('does NOT fire on import URI comparison by name', () async {
+      // Both operands have URI-related names — `namedUri` triggers the
+      // import-URI suppression via camelCase word boundary detection.
       await assertFixtureMarkers(rule, '''
-void f(String namedUri, String pathFirst) {
+void f(String namedUri, String otherUri) {
   // LINT_NOT: avoid_case_sensitive_path_comparison
-  if (namedUri == pathFirst) {}
+  if (namedUri == otherUri) {}
 }
 ''');
     });
 
-    test('does NOT fire on import URI comparison via abbreviated loop variable', () async {
-      await assertFixtureMarkers(rule, '''
-void f(List<String> imports, String? pathFirst) {
+    test(
+      'does NOT fire on import URI comparison via abbreviated loop variable',
+      () async {
+        await assertFixtureMarkers(rule, '''
+void f(List<String> imports, String? firstSpec) {
   for (final imp in imports) {
     // LINT_NOT: avoid_case_sensitive_path_comparison
-    if (pathFirst != null && imp == pathFirst) {}
+    if (firstSpec != null && imp == firstSpec) {}
   }
 }
 ''');
-    });
+      },
+    );
 
     // Regression: C15 — mismatched base expressions in root-detection idiom
     // must NOT be suppressed (a.path == b.parent.path where a != b).
 
-    test('fires on mismatched root-detection idiom (a.path == b.parent.path)', () async {
-      await assertFixtureMarkers(rule, '''
+    test(
+      'fires on mismatched root-detection idiom (a.path == b.parent.path)',
+      () async {
+        await assertFixtureMarkers(rule, '''
 class D {
   String get path => '';
   D get parent => this;
@@ -195,10 +211,13 @@ void f(D a, D b) {
   if (a.path == b.parent.path) {}
 }
 ''');
-    });
+      },
+    );
 
-    test('fires on reversed mismatched root-detection idiom (b.parent.path == a.path)', () async {
-      await assertFixtureMarkers(rule, '''
+    test(
+      'fires on reversed mismatched root-detection idiom (b.parent.path == a.path)',
+      () async {
+        await assertFixtureMarkers(rule, '''
 class D {
   String get path => '';
   D get parent => this;
@@ -209,15 +228,52 @@ void f(D a, D b) {
   if (b.parent.path == a.path) {}
 }
 ''');
-    });
+      },
+    );
 
-    test('does NOT fire when "path" is embedded in an unrelated word', () async {
-      await assertFixtureMarkers(rule, '''
+    test(
+      'does NOT fire when "path" is embedded in an unrelated word',
+      () async {
+        await assertFixtureMarkers(rule, '''
 void f(String pathologyReport, String empathyNote) {
   // LINT_NOT: avoid_case_sensitive_path_comparison
   if (pathologyReport == empathyNote) {}
 }
 ''');
-    });
+      },
+    );
+
+    // False-positive guards: "uri" embedded in unrelated words must NOT
+    // trigger the import-URI suppression and then bypass the path check.
+
+    test(
+      'does NOT fire when "uri" is embedded in an unrelated word',
+      () async {
+        // "security" and "mercurial" both contain "uri" as a substring
+        // but not at a camelCase word boundary — rule should ignore them,
+        // and since neither looks like a path variable either, no diagnostic.
+        await assertFixtureMarkers(rule, '''
+void f(String securityLevel, String mercurialBuild) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (securityLevel == mercurialBuild) {}
+}
+''');
+      },
+    );
+
+    test(
+      'does NOT suppress a path comparison when "uri" is embedded in operand',
+      () async {
+        // "filePath" is a path variable — the rule should fire even though
+        // "securityToken" contains "uri" as a substring, because "uri"
+        // inside "security" is not a camelCase word boundary.
+        await assertFixtureMarkers(rule, '''
+void f(String filePath, String securityToken) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (filePath == securityToken) {}
+}
+''');
+      },
+    );
   });
 }

@@ -78,26 +78,46 @@ bool _containsPathPattern(String source) {
 }
 
 /// Returns true if [source] contains "path" as a standalone camelCase word
-/// component rather than as a substring buried inside an unrelated word.
+/// component — delegates to the generic [_hasCamelCaseWord].
+bool _hasPathAsWord(String source) =>
+    _hasCamelCaseWord(source, _pathOccurrenceRegex);
+
+/// Returns true if [source] contains "uri" as a standalone camelCase word
+/// component — e.g. "namedUri", "uriString", "URI" match, but "security"
+/// or "burial" do not. Delegates to the generic [_hasCamelCaseWord].
+bool _hasUriAsWord(String source) =>
+    _hasCamelCaseWord(source, _uriOccurrenceRegex);
+
+/// Matches the literal text "path" case-insensitively.
+final RegExp _pathOccurrenceRegex = RegExp('path', caseSensitive: false);
+
+/// Matches the literal text "uri" case-insensitively.
+final RegExp _uriOccurrenceRegex = RegExp('uri', caseSensitive: false);
+
+/// Returns true if [source] contains [wordRegex] at a camelCase word
+/// boundary rather than as a substring buried inside an unrelated word.
 ///
 /// A match at `[start, end)` counts as a real word boundary when:
 /// - the character before it is missing, not a lowercase letter, or the
-///   match itself starts with capital 'P' (a camelCase transition, as in
-///   `filePath`) — so a lowercase 'path' glued onto a preceding lowercase
-///   letter (as in "empathy", "warpath") is rejected, and
+///   match itself starts with an uppercase letter (a camelCase transition,
+///   as in `filePath` or `namedUri`) — so a lowercase match glued onto a
+///   preceding lowercase letter (as in "empathy", "security") is rejected,
 /// - the character after it is missing or not a lowercase letter — so
-///   "pathVariable"/"PathValue" count (capital letter follows), but
+///   "pathVariable"/"UriString" count (capital letter follows), but
 ///   "pathology" does not (lowercase 'o' continues the same word).
-bool _hasPathAsWord(String source) {
-  for (final RegExpMatch match in _pathOccurrenceRegex.allMatches(source)) {
+bool _hasCamelCaseWord(String source, RegExp wordRegex) {
+  for (final RegExpMatch match in wordRegex.allMatches(source)) {
     final int start = match.start;
     final int end = match.end;
-    final bool startsUpperP = source.codeUnitAt(start) == 0x50; // 'P'
+    // Uppercase first letter means a camelCase transition (e.g. filePath,
+    // namedUri) — the preceding character is irrelevant.
+    final bool startsUpper =
+        source.codeUnitAt(start) >= 0x41 && source.codeUnitAt(start) <= 0x5A;
 
     final bool beforeOk =
         start == 0 ||
         !_isLowerAsciiLetter(source.codeUnitAt(start - 1)) ||
-        startsUpperP;
+        startsUpper;
     final bool afterOk =
         end == source.length || !_isLowerAsciiLetter(source.codeUnitAt(end));
 
@@ -105,11 +125,6 @@ bool _hasPathAsWord(String source) {
   }
   return false;
 }
-
-/// Matches the literal text "path" case-insensitively, used by
-/// [_hasPathAsWord] to locate candidate occurrences before applying the
-/// camelCase boundary check.
-final RegExp _pathOccurrenceRegex = RegExp('path', caseSensitive: false);
 
 /// Returns true if [codeUnit] is an ASCII lowercase letter ('a'-'z').
 bool _isLowerAsciiLetter(int codeUnit) => codeUnit >= 0x61 && codeUnit <= 0x7A;
@@ -510,14 +525,14 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
   /// filesystem paths.
   bool _isDartImportUri(Expression expr) {
     if (expr is! SimpleIdentifier) return false;
-    final String name = expr.name.toLowerCase();
-    // Match 'import' anywhere, but 'uri' only as a camelCase segment —
-    // plain `contains('uri')` would match e.g. `fileUri` (a real path
-    // variable) and suppress a genuine case-sensitive comparison finding.
-    if (name.contains('import') ||
-        RegExp(r'(?:^|[^a-z])uri(?:$|[^a-z])').hasMatch(name)) {
-      return true;
-    }
+    final String lower = expr.name.toLowerCase();
+    // Match 'import' anywhere (case-insensitive substring is fine).
+    if (lower.contains('import')) return true;
+    // Match 'uri' as a camelCase word boundary — check the ORIGINAL name
+    // (not lowercased) so that camelCase transitions like 'namedUri' are
+    // visible. After lowercasing, 'namedUri' → 'nameduri' hides the
+    // boundary and the regex misses it.
+    if (_hasUriAsWord(expr.name)) return true;
     return _isLoopVariableOverImportsCollection(expr);
   }
 
@@ -546,8 +561,7 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
     if (loopVarName != expr.name) return false;
 
     final String iterableSource = parts.iterable.toSource().toLowerCase();
-    return iterableSource.contains('import') ||
-        iterableSource.contains('uri');
+    return iterableSource.contains('import') || iterableSource.contains('uri');
   }
 }
 
