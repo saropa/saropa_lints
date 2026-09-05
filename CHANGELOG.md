@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.3] — Unreleased
+## [16.0.0-beta.3]
 
 Streamlines the extension sidebar, cutting it roughly in half by removing rows that duplicated richer controls already available on the dashboards, and moves that information onto the Findings dashboard's status line and a new Lane switch and live baseline diff on the Rules & Tiers config tab. Fixes path traversal vulnerabilities in the cross-file HTML reporter and project package detection, a false positive in the case-sensitive path comparison rule, and false positives across six iOS rules on collection-literal data tables. Also fixes a startup crash on large workspaces and makes the in-editor workspace scan progressive and cancelable. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.3/CHANGELOG.md)
 

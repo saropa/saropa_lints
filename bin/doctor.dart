@@ -13,6 +13,8 @@ library;
 
 import 'dart:io';
 
+import 'package:saropa_lints/src/cli/path_guard.dart';
+
 /// Keys that belong in `analysis_options_custom.yaml`, NOT under `plugins:`.
 const _customFileKeys = <String>{
   'log_level',
@@ -30,7 +32,11 @@ void main(List<String> args) {
     return;
   }
 
-  final dir = args.where((a) => !a.startsWith('-')).firstOrNull ?? '.';
+  // Sanitize the user-supplied project directory to block path traversal.
+  final dir = sanitizePath(
+    args.where((a) => !a.startsWith('-')).firstOrNull ?? '.',
+    label: 'project directory',
+  );
   final sep = Platform.pathSeparator;
 
   // --- Check analysis_options.yaml exists ---

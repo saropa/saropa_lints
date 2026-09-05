@@ -31,6 +31,8 @@ library;
 
 import 'dart:io';
 
+import 'package:saropa_lints/src/cli/path_guard.dart';
+
 /// Matches a periodic memory trend line written by `PluginLogger.log`, e.g.
 /// `2026-08-28T04:12:33.123Z | [memory] RSS 4200MB (cap 6144MB)`.
 final _memoryLinePattern = RegExp(
@@ -50,7 +52,11 @@ void main(List<String> args) {
     return;
   }
 
-  final projectRoot = args.isNotEmpty ? args.first : '.';
+  // Sanitize the user-supplied project root to block path traversal.
+  final projectRoot = sanitizePath(
+    args.isNotEmpty ? args.first : '.',
+    label: 'project root',
+  );
   final sep = Platform.pathSeparator;
   final logFile = File(
     '$projectRoot${sep}reports$sep.saropa_lints${sep}plugin.log',

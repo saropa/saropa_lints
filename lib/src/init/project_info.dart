@@ -125,6 +125,9 @@ String getPackageSource() {
 /// parses dependencies + dev_dependencies, and returns a map of
 /// saropa_lints package names to whether they were found.
 /// [targetDir] is the absolute path to the project being configured.
+/// The analysis server always provides an absolute resolved path; if a
+/// caller supplies a relative path with `..` segments, [sanitizePath]
+/// throws rather than silently traversing outside the project.
 /// If [logLine] is null, no terminal output is produced (for headless use).
 Map<String, bool> detectProjectPackages(
   LogWriter log, {

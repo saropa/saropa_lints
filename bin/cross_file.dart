@@ -21,6 +21,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_analyzer.dart';
 import 'package:saropa_lints/src/cli/cross_file_baseline.dart';
+import 'package:saropa_lints/src/cli/path_guard.dart';
 import 'package:saropa_lints/src/cli/cross_file_dot_reporter.dart';
 import 'package:saropa_lints/src/cli/cross_file_duplicates.dart';
 import 'package:saropa_lints/src/cli/cross_file_html_reporter.dart';
@@ -144,6 +145,9 @@ Future<int> _run(List<String> args) async {
     return 2;
   }
 
+  // Sanitize user-supplied paths at the CLI boundary.
+  projectPath = sanitizePath(projectPath, label: 'project path');
+
   final dir = Directory(projectPath);
   if (!dir.existsSync()) {
     print('Error: path does not exist: $projectPath');
@@ -172,7 +176,10 @@ Future<int> _run(List<String> args) async {
     outputDir = rest[outputDirIdx + 1];
   }
 
-  final resolvedOutputDir = outputDir ?? 'reports';
+  final resolvedOutputDir = sanitizePath(
+    outputDir ?? 'reports',
+    label: 'output directory',
+  );
   final normalizedWatchDebounceMs = watchDebounceMs < 100
       ? 100
       : watchDebounceMs;

@@ -12,6 +12,7 @@ library;
 
 import 'dart:io';
 
+import 'package:saropa_lints/src/cli/path_guard.dart';
 import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart'
     show parseRulePacksEnabledList;
 import 'package:saropa_lints/src/config/runtime_tier_cap.dart'
@@ -39,7 +40,11 @@ void main(List<String> args) {
   // Parse --dry-run flag and extract the directory argument.
   final dryRun = args.contains('--dry-run');
   final positional = args.where((a) => a != '--dry-run').toList();
-  final dir = positional.isNotEmpty ? positional.first : '.';
+  // Sanitize the user-supplied project directory to block path traversal.
+  final dir = sanitizePath(
+    positional.isNotEmpty ? positional.first : '.',
+    label: 'project directory',
+  );
   final sep = Platform.pathSeparator;
 
   final mainFile = File('$dir${sep}analysis_options.yaml');

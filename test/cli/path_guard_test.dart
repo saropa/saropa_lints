@@ -10,10 +10,7 @@ void main() {
     test('returns normalized clean paths unchanged', () {
       // Relative and absolute paths without traversal pass through.
       expect(sanitizePath('reports'), equals('reports'));
-      expect(
-        sanitizePath('build/output'),
-        equals('build${p.separator}output'),
-      );
+      expect(sanitizePath('build/output'), equals('build${p.separator}output'));
     });
 
     test('resolves embedded .. and passes safe result', () {
@@ -23,17 +20,11 @@ void main() {
 
     test('rejects leading .. segments', () {
       // Leading ".." escapes the working directory — must throw.
-      expect(
-        () => sanitizePath('../escape'),
-        throwsA(isA<ArgumentError>()),
-      );
+      expect(() => sanitizePath('../escape'), throwsA(isA<ArgumentError>()));
     });
 
     test('rejects multiple leading .. segments', () {
-      expect(
-        () => sanitizePath('../../etc'),
-        throwsA(isA<ArgumentError>()),
-      );
+      expect(() => sanitizePath('../../etc'), throwsA(isA<ArgumentError>()));
     });
 
     test('uses custom label in error message', () {
