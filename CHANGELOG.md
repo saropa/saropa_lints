@@ -85,6 +85,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Findings dashboard status line and the sidebar's Code Health row now show quality-gate state. A failing gate previously appeared only inside the Code Health screen, so it was invisible unless you went looking for it. No action required.
 - Sidebar Code Health and Project Map rows now show live data — health grade and score, and how long ago the project was last scanned — instead of fixed descriptive text. Both read already-computed results and never start a scan. No action required.
 - Scan CLI: `--no-exclude` flag disables all hardcoded path exclusions (`example/`, `build/`, `.dart_tool/`, etc.) so the scan covers every `.dart` file it finds. User-supplied `--exclude-globs` still apply. No action required.
+- LSP Server: new `saropaLints.lspServer.workspaceScanDelay` setting (default 5 seconds) defers the workspace scan after the analyzer is ready, letting VS Code's startup burst settle first. Set to 0 for immediate scan. No action required.
 
 ### Changed
 
@@ -99,6 +100,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
+- Fixed LSP Server flooding the output channel with `didClose` messages on startup — VS Code sends a burst of didClose notifications for files from the previous session; these are now trace-level and only visible with verbose logging. No action required.
 - Fixed `avoid_string_substring` false positives where the index was already guaranteed in bounds by a regex `hasMatch()` guard, an `indexOf()`/`lastIndexOf()` result, or a `RegExpMatch`'s `.start`/`.end`/`.group()`. No action required.
 - Fixed `avoid_case_sensitive_path_comparison` false positives on non-path string comparisons: CLI flag literals, Dart import URI comparisons, filesystem root-detection idioms (`dir.path != dir.parent.path`), and identifiers where "path" was embedded in an unrelated word (e.g. "pathology"). No action required.
 - Fixed `avoid_unsafe_cast` false positives on `ProcessResult.stdout`/`.stderr` cast to `String` — the SDK default encoding always decodes to `String`, so the cast is only unsafe when the call explicitly passes a `null` encoding to request raw bytes. Also fixed a false positive when a cast is preceded by an exact-type `is` check on the same expression in an enclosing `if` condition (e.g. `if (v is List) { v as List }`); only `&&` compounds are recognized as guards — an `is` check inside `||` does not guarantee the type. No action required.
@@ -162,7 +164,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Fixed three CodeQL `js/bad-tag-filter` alerts (two reported, one preemptive) in test infrastructure — closing-tag regexes now tolerate attributes and case variants. No action required.
 - Added `check_html_tag_regex.py` CI script that detects HTML tag regexes missing case-insensitive flags or attribute-tolerant closing tags before CodeQL reports them on push. No action required.
 - Moved `require_test_description_convention` fixture from `example/lib/testing_best_practices/` (where `isTestPath` never matched, so the `FileType.test`-gated rule silently never ran) to `example/lib/test/` with real BAD/GOOD examples covering simple strings and interpolated descriptions. Added to `expectedFromFixtures` in the integration test.
-- Added `check_fixture_filetype_match.py` CI script that audits all rules with `applicableFileTypes => {FileType.test}` and verifies their fixture files live at paths matching `isTestPath()`. Currently detects 39 misplaced fixtures across the codebase. No action required.
+- Added `check_fixture_filetype_match.py` CI script that audits all rules with `applicableFileTypes => {FileType.test}` and verifies their fixture files live at paths matching `isTestPath()` — wired into the publish pipeline as a blocking check via `run_pre_publish_audits()`, and supports `--fix` to bulk-relocate misplaced fixtures via `git mv`. No action required.
 
 ---
 

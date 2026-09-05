@@ -663,12 +663,46 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
             [],
         ))
 
+    # --- Fixture file-type path check (blocking) ---
+    # Rules with applicableFileTypes => {FileType.test} are silently skipped
+    # when their fixture lives at a path that doesn't match isTestPath().
+    # This catches the silent-no-coverage class of bug before publish.
+    fixture_path_check: list[tuple[str, str, list[str]]] = []
+    try:
+        from scripts.check_fixture_filetype_match import (
+            collect_mismatched_fixtures,
+        )
+        mismatched = collect_mismatched_fixtures(project_dir)
+        if mismatched:
+            fixture_path_check.append((
+                "fail",
+                f"{len(mismatched)} FileType.test fixture(s) at non-isTestPath "
+                f"paths — run `python scripts/check_fixture_filetype_match.py "
+                f"--fix` to relocate them",
+                [f"{name}: {old}" for name, old, _new in mismatched[:10]],
+            ))
+        else:
+            fixture_path_check.append((
+                "pass",
+                "All FileType.test fixtures at isTestPath-matching paths",
+                [],
+            ))
+    except Exception as exc:  # noqa: BLE001
+        fixture_path_check.append((
+            "warn",
+            f"Fixture path check errored ({exc}); skipped",
+            [],
+        ))
+
     # --- Full audit (includes tier integrity + quality checks) ---
     audit_result = run_full_audit(
         project_dir=project_dir,
         skip_dx=False,
         compact=True,
-        extra_checks=spelling_check + known_issues_check + core_lint_check,
+        extra_checks=(
+            spelling_check + known_issues_check + core_lint_check
+            + fixture_path_check
+        ),
     )
 
     # --- Run dart analyze as part of audit (fail fast; same as Step 6) ---
