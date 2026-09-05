@@ -6,7 +6,7 @@
  */
 
 import * as vscode from 'vscode';
-import type { Violation } from '../violationsReader';
+import type { OwaspData, Violation } from '../violationsReader';
 
 export function buildScannerSlice(
   cfg: vscode.WorkspaceConfiguration,
@@ -71,6 +71,20 @@ interface TopRuleEntry {
   severity: string;
   /** Representative finding message (first occurrence), shown on expand. */
   message: string;
+  /**
+   * Representative "how to fix" text (first occurrence carrying one). Undefined
+   * when the source is the live-diagnostics model (Phase #1a), which has no
+   * correction field — see liveDiagnosticsModel.ts. Folds the Rule Explain
+   * panel's "How to fix" section onto this row (plan §B item 14) instead of
+   * requiring a jump to the standalone panel.
+   */
+  correction?: string;
+  /**
+   * Representative OWASP mapping (first occurrence carrying one). Same
+   * live-vs-batch-export availability caveat as `correction` above. Folds the
+   * Rule Explain panel's "OWASP" section (plan §B item 15).
+   */
+  owasp?: OwaspData;
   /** Files carrying this rule, highest-count first, with a representative line. */
   files: Array<{ file: string; count: number; line: number }>;
 }
@@ -79,11 +93,13 @@ interface RuleAccumulator {
   count: number;
   severity: string;
   message: string;
+  correction?: string;
+  owasp?: OwaspData;
   /** file path → { occurrence count, lowest line seen } for that rule. */
   files: Map<string, { count: number; line: number }>;
 }
 
-/** Single pass: tally per-rule count, severity, first message, and per-file stats. */
+/** Single pass: tally per-rule count, severity, first message/correction/owasp, and per-file stats. */
 function accumulateRuleStats(violations: readonly Violation[]): Map<string, RuleAccumulator> {
   const acc = new Map<string, RuleAccumulator>();
   for (const v of violations) {
@@ -94,12 +110,20 @@ function accumulateRuleStats(violations: readonly Violation[]): Map<string, Rule
         count: 0,
         severity: (v.severity ?? 'info').toLowerCase(),
         message: v.message ?? '',
+        correction: v.correction,
+        owasp: v.owasp,
         files: new Map(),
       };
       acc.set(v.rule, entry);
     }
     entry.count += 1;
     if (!entry.message && v.message) entry.message = v.message;
+    // Same first-seen-wins rule as message: a rule's correction/OWASP text is
+    // static per rule (not per-occurrence), so the first violation carrying it
+    // is representative and later occurrences without it (e.g. a stale export
+    // row) must not clobber the value already captured.
+    if (!entry.correction && v.correction) entry.correction = v.correction;
+    if (!entry.owasp && v.owasp) entry.owasp = v.owasp;
     const line = v.line ?? 1;
     const perFile = entry.files.get(v.file);
     if (perFile) {
@@ -115,8 +139,10 @@ function accumulateRuleStats(violations: readonly Violation[]): Map<string, Rule
 /**
  * Top-N rules by violation count. Sorted by count desc; ties broken by rule
  * name for stable rendering between rebuilds. Each entry carries the data the
- * dashboard's expandable Top-Rules row needs (message + affected files), so
- * the user can triage without scrolling to the findings table.
+ * dashboard's expandable Top-Rules row needs (message + correction + OWASP +
+ * affected files), so the user can triage — and now read the fuller Rule
+ * Explain content — without scrolling to the findings table or opening the
+ * standalone panel.
  */
 export function pickTopRules(violations: readonly Violation[], limit: number): TopRuleEntry[] {
   if (violations.length === 0) return [];
@@ -127,7 +153,15 @@ export function pickTopRules(violations: readonly Violation[], limit: number): T
     const files = Array.from(stats.files, ([file, s]) => ({ file, count: s.count, line: s.line }))
       .sort((a, b) => b.count - a.count || a.file.localeCompare(b.file))
       .slice(0, TOP_RULE_FILES_LIMIT);
-    return { name, count: stats.count, severity: stats.severity, message: stats.message, files };
+    return {
+      name,
+      count: stats.count,
+      severity: stats.severity,
+      message: stats.message,
+      correction: stats.correction,
+      owasp: stats.owasp,
+      files,
+    };
   });
 }
 

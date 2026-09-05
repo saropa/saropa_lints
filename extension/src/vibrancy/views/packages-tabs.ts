@@ -10,16 +10,17 @@
  *
  * Overview and Settings render natively in this document (their content is
  * cheap and self-contained). Upgrades / Full report / Known issues / Compare
- * each already live as their OWN full `<!DOCTYPE html>` webview document with
- * an independent CSP nonce, `<script>`, and `acquireVsCodeApi()` call
+ * each ALSO live as their OWN full `<!DOCTYPE html>` webview document with an
+ * independent CSP nonce, `<script>`, and `acquireVsCodeApi()` call
  * (`opportunities-panel.ts`, `feature-inventory-export.ts`,
- * `known-issues-webview.ts`, `comparison-webview.ts`). Re-parsing their
- * markup into this document would collide on both constraints, so those four
- * tabs render a lightweight "deep-link" card in-document and open the real
- * panel via the same command the old standalone dashboard row used — real
- * navigation (the click does something concrete), not a stub label, just not
- * full DOM-embedding. Full embedding is listed as deferred future work in the
- * plan (see the Phase 5 "Deferred" section added to the plan file).
+ * `known-issues-webview.ts`, `comparison-webview.ts`) — those standalone
+ * panels are never deleted, only reused: PLAN_ext_ui_package_tabs.md converts
+ * each of the four into an inline embed one at a time (easiest first), via a
+ * `getEmbeddedBodyHtml()` extracted from that tab's own HTML builder so the
+ * embedded and standalone renders can never visually diverge. A tab not yet
+ * converted falls back to the original lightweight "deep-link" card below —
+ * real navigation (the click does something concrete), not a stub label —
+ * so shipping the conversions incrementally never leaves a tab broken.
  */
 
 import { escapeHtml } from './html-utils';
@@ -89,12 +90,31 @@ function buildDeepLinkPanel(tab: PackagesTabDef): string {
     </div>`;
 }
 
-/** All four deep-link panels (Upgrades, Full report, Known issues, Compare),
- *  in tab order. Overview and Settings are built by their own callers. */
-export function buildDeepLinkPanels(): string {
+/** One embedded tab panel: the caller-supplied body fragment (already stripped of any document
+ *  shell / `acquireVsCodeApi()` call by its own `getEmbeddedBodyHtml`) wrapped in the same
+ *  `role="tabpanel"` shell every panel uses so the tab-switch script (`getPackagesTabsScript`
+ *  below) cannot tell an embedded tab apart from Overview/Settings. Deliberately NOT given the
+ *  `dash-empty` class the deep-link card uses — that class centers content and caps width for a
+ *  one-line description, which would squash a full report table. */
+function buildEmbeddedTabPanel(tab: PackagesTabDef, bodyHtml: string): string {
+    return `<div id="pkg-tab-${tab.id}" class="pkg-tab-panel" role="tabpanel" aria-labelledby="pkg-tab-btn-${tab.id}" hidden>${bodyHtml}</div>`;
+}
+
+/**
+ * All four Upgrades/Full report/Known issues/Compare panels, in tab order. Each renders as an
+ * inline embed when `embeddedBodies` supplies that tab's id (PLAN_ext_ui_package_tabs.md §5
+ * converts them one at a time, easiest first) or falls back to the original deep-link "Open"
+ * card for any tab not yet converted — the plan's explicit incremental-shipping requirement:
+ * "a tab you do not convert keeps working as a deep link". Overview and Settings are built by
+ * their own callers, not this function.
+ */
+export function buildTabPanels(embeddedBodies: Readonly<Partial<Record<string, string>>> = {}): string {
     return PACKAGES_TABS
         .filter(t => t.command)
-        .map(buildDeepLinkPanel)
+        .map(t => {
+            const body = embeddedBodies[t.id];
+            return body !== undefined ? buildEmbeddedTabPanel(t, body) : buildDeepLinkPanel(t);
+        })
         .join('\n');
 }
 
@@ -146,6 +166,12 @@ export function getPackagesTabsScript(): string {
             if (panel) { panel.hidden = key !== id; }
         });
     }
+    /* Exposed globally so report-script-parts.ts's 'selectPackage' handler (fired when a
+       user picks "Open in dashboard" from an embedded tab, or from the sidebar/hover while
+       the dashboard is already open) can switch back to the Overview tab before opening the
+       docked detail pane -- without this the pane would open behind whichever tab is
+       currently visible and the click would look like it did nothing. */
+    window.saropaSelectPkgTab = selectTab;
     tabBtns.forEach(function(btn) {
         btn.addEventListener('click', function() { selectTab(btn.getAttribute('data-tab')); });
     });
@@ -168,6 +194,82 @@ export function getPackagesTabsScript(): string {
         btn.addEventListener('click', function() {
             var command = btn.getAttribute('data-open-command');
             if (command) { vscode.postMessage({ type: 'openTab', command: command }); }
+        });
+    });
+})();
+`;
+}
+
+/**
+ * Client-side wiring for the embedded Upgrades tab (PLAN_ext_ui_package_tabs.md §4 Tab 3).
+ *
+ * `opportunities-html.ts`'s standalone script (`getOpportunitiesScript`) calls its OWN
+ * `acquireVsCodeApi()` -- that call must not run a second time in this shared document (VS Code
+ * throws on a second call per document), so this is a SEPARATE hand-wired script that reuses the
+ * document's single `vscode` handle and posts every action wrapped as `{ type: 'upgradesCommand',
+ * upgrades: {...} }` (mirrors the `optimizerCommand` wrapper `configDashboardScript.ts` uses to
+ * embed the Analysis Optimizer -- see `SCRIPT_OPTIMIZER_EMBED` there for the precedent this
+ * follows). `report-webview.ts` unwraps `upgrades` and forwards it to
+ * `handleOpportunitiesEmbeddedMessage`, which mirrors `OpportunitiesPanel`'s own
+ * `onDidReceiveMessage` switch exactly, so an action from the embedded tab has identical effect
+ * to the same action in the standalone panel.
+ *
+ * All DOM queries are scoped to `.opp-embed-body` (never bare `document`) so this cannot match
+ * anything on the rest of the dashboard -- same discipline `SCRIPT_OPTIMIZER_EMBED` follows.
+ * No regex literals (see this file's own doc comment on the webview template-literal backslash
+ * trap): line numbers parse with `parseInt`, nothing here needs pattern matching.
+ */
+export function getUpgradesEmbedScript(): string {
+    return `
+(function wireUpgradesEmbed() {
+    var embed = document.querySelector('.opp-embed-body');
+    if (!embed) { return; }
+
+    function post(inner) { vscode.postMessage({ type: 'upgradesCommand', upgrades: inner }); }
+
+    var writeReportBtn = embed.querySelector('#writeReportBtn');
+    if (writeReportBtn) {
+        var writeLabel = writeReportBtn.textContent || 'Write Report';
+        writeReportBtn.addEventListener('click', function() {
+            if (writeReportBtn.disabled) { return; }
+            writeReportBtn.disabled = true;
+            writeReportBtn.textContent = '\\u2026';
+            post({ type: 'writeReport' });
+        });
+    }
+    /* Host replies with upgradesReportWritten/upgradesReportFailed (prefixed, distinct from the
+       standalone panel's own bare 'reportWritten'/'reportFailed' -- this document is shared with
+       every other tab's messages, so every embed's host->client reply is namespaced). */
+    window.addEventListener('message', function(event) {
+        var msg = event.data;
+        if (!writeReportBtn || !msg) { return; }
+        if (msg.type === 'upgradesReportWritten' || msg.type === 'upgradesReportFailed') {
+            writeReportBtn.disabled = false;
+            writeReportBtn.textContent = writeLabel;
+        }
+    });
+
+    Array.prototype.slice.call(embed.querySelectorAll('.opp-write-card')).forEach(function(btn) {
+        var cardLabel = btn.textContent || 'Write Report';
+        btn.addEventListener('click', function() {
+            if (btn.disabled) { return; }
+            btn.disabled = true;
+            btn.textContent = '\\u2026';
+            post({ type: 'writeCardReport', package: btn.dataset.pkg });
+            setTimeout(function() { btn.disabled = false; btn.textContent = cardLabel; }, 2000);
+        });
+    });
+
+    Array.prototype.slice.call(embed.querySelectorAll('.opp-open')).forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            post({ type: 'openPackage', package: btn.dataset.pkg });
+        });
+    });
+
+    Array.prototype.slice.call(embed.querySelectorAll('.opp-loc')).forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            post({ type: 'openFile', file: link.dataset.file, line: parseInt(link.dataset.line, 10) || 1 });
         });
     });
 })();

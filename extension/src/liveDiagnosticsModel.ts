@@ -20,9 +20,12 @@
  *
  * Phase #1a. Findings, severity, file, line, and rule come straight from the
  * Diagnostic. Per-rule enrichment (correctionMessage, OWASP, tier-aware
- * metadata) is phase #1b, sourced from a bundled rule catalog — absent here,
- * exactly the way a legacy export without those fields is already tolerated
- * downstream by the dashboard renderer.
+ * metadata) is phase #1b, sourced from a bundled rule catalog and applied by
+ * [applyRuleCatalog] below — including backfilling `correction` and `owasp`
+ * onto each Violation itself (not just the `ruleMetadataByRule` map), so the
+ * Findings dashboard's "How to fix" / "OWASP mapping" rule-detail sections
+ * are populated on the live-diagnostics path exactly as they are for a batch
+ * `violations.json` export.
  */
 
 import * as path from 'path';
@@ -166,19 +169,25 @@ export function buildViolationsDataFromDiagnostics(
  * Attach per-rule metadata from the bundled rule catalog to a live model.
  *
  * Why this is a separate step. A live `Diagnostic` carries only file / line /
- * rule / severity / message — no rule type, lifecycle status, or security-review
- * flag. The Issues-panel rule-type/status filters and security-hotspot review
- * need that metadata. The catalog (rule name → metadata, generated from the
- * analyzer package) supplies it; this enriches the already-built model so the
- * pure diagnostic-to-violation builder stays catalog-agnostic and its many
- * callers/tests are untouched.
+ * rule / severity / message — no rule type, lifecycle status, security-review
+ * flag, correction text, or OWASP mapping. The Issues-panel rule-type/status
+ * filters, security-hotspot review, AND the Findings dashboard's rule-detail
+ * expander (Problem / How to fix / OWASP) all need that metadata. The catalog
+ * (rule name → metadata, generated from the analyzer package by
+ * `bin/generate_rule_catalog.dart`) supplies it; this enriches the
+ * already-built model so the pure diagnostic-to-violation builder stays
+ * catalog-agnostic and its many callers/tests are untouched.
  *
  * Only rules actually present in the model are copied into `ruleMetadataByRule`
  * (keeps the payload to what the surfaces read), and `byRuleType` / `byRuleStatus`
  * are issue-weighted exactly like the export's [_MetadataIssueBreakdown] — rules
  * with no catalog entry fall into `unspecified` / `ready`, matching the export's
- * defaults so the filter UI reads identically from either source. An empty
- * catalog returns the model unchanged.
+ * defaults so the filter UI reads identically from either source. `correction`
+ * and `owasp` are ALSO copied onto each Violation directly (not just the
+ * metadata map) because that is where the dashboard's rule-detail renderer
+ * reads them from — matching the shape a batch `violations.json` export
+ * already produces per-violation. An empty catalog returns the model
+ * unchanged.
  */
 export function applyRuleCatalog(
   data: ViolationsData,
@@ -202,8 +211,26 @@ export function applyRuleCatalog(
     byRuleStatus[status] = (byRuleStatus[status] ?? 0) + count;
   }
 
+  // Backfill `correction` / `owasp` onto each live Violation. A live
+  // Diagnostic never carries these (see the module header) — the Findings
+  // dashboard's "How to fix" / "OWASP mapping" rule-detail sections would
+  // otherwise render empty for every live-diagnostics finding, even though
+  // the batch `violations.json` export always has them. Only fill in a
+  // field the violation is missing (`??`) so a batch-sourced Violation that
+  // already has these values (e.g. a hybrid caller) is never overwritten.
+  const violations = data.violations.map((v) => {
+    const meta = catalog[v.rule];
+    if (!meta) return v;
+    return {
+      ...v,
+      correction: v.correction ?? meta.correction,
+      owasp: v.owasp ?? meta.owasp,
+    };
+  });
+
   return {
     ...data,
+    violations,
     summary: { ...data.summary, byRuleType, byRuleStatus },
     config: { ...data.config, ruleMetadataByRule },
   };

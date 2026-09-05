@@ -21,6 +21,7 @@
  */
 
 import { getDashboardChromeStyles } from './dashboardChromeStyles';
+import { vdsRuleDetailExtras } from './violations-dashboard-rule-detail-styles';
 import {
   vdsFindingsAndTopRulesTables,
   vdsHeroExtras,
@@ -43,6 +44,7 @@ export function getViolationsDashboardStyles(): string {
     vdsKpiAndChartExtras() +
     vdsSectionExtras() +
     vdsFindingsAndTopRulesTables() +
+    vdsRuleDetailExtras() +
     vdsSecondaryLists() +
     vdsMicroExtras()
   );

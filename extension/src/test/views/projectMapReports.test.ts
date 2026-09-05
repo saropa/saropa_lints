@@ -23,6 +23,7 @@ import {
   readQualityGateConfig,
   writeQualityGateConfig,
   handleReportsPanelMessage,
+  reportJsonColumnsForScript,
   type ReportRunControl,
 } from '../../views/projectMapReports';
 
@@ -43,8 +44,13 @@ describe('projectMapReports reportCardSpecs', () => {
   });
 
   it('passes the project root as a bare path arg for tools that accept one', () => {
-    const severity = reportCardSpecs().find((s) => s.id === 'severity')!;
-    assert.deepStrictEqual(severity.buildArgs('/proj'), ['/proj']);
+    // `impact` (the legacy severity_report alias) and `memory` never gained
+    // `--format json` (see the module's supportsJson doc comments), so they
+    // still exercise the plain bare-path shape this test originally covered.
+    const impact = reportCardSpecs().find((s) => s.id === 'impact')!;
+    const memory = reportCardSpecs().find((s) => s.id === 'memory')!;
+    assert.deepStrictEqual(impact.buildArgs('/proj'), ['/proj']);
+    assert.deepStrictEqual(memory.buildArgs('/proj'), ['/proj']);
   });
 
   it('passes --project-root for quality_gate (its report/config paths default off cwd)', () => {
@@ -57,6 +63,35 @@ describe('projectMapReports reportCardSpecs', () => {
     const accuracy = reportCardSpecs().find((s) => s.id === 'accuracy')!;
     assert.deepStrictEqual(stubTest.buildArgs('/proj'), []);
     assert.deepStrictEqual(accuracy.buildArgs('/proj'), []);
+  });
+
+  // WP2 (plans/PLAN_ext_ui_dart_deferred.md): severity_report and doctor are
+  // the first two CLIs to grow `--format json`, each with a typed column set
+  // the Reports tab's typed table renders from — pin both the argv and the
+  // schema so a future edit can't silently drop the flag or a column.
+  it('severity and doctor append --format json and declare their typed columns', () => {
+    const severity = reportCardSpecs().find((s) => s.id === 'severity')!;
+    const doctor = reportCardSpecs().find((s) => s.id === 'doctor')!;
+    assert.deepStrictEqual(severity.buildArgs('/proj'), ['/proj', '--format', 'json']);
+    assert.strictEqual(severity.supportsJson, true);
+    assert.deepStrictEqual(
+      severity.jsonColumns?.map((c) => c.field),
+      ['file', 'line', 'rule', 'severity', 'message'],
+    );
+    assert.deepStrictEqual(doctor.buildArgs('/proj'), ['/proj', '--format', 'json']);
+    assert.strictEqual(doctor.supportsJson, true);
+    assert.deepStrictEqual(
+      doctor.jsonColumns?.map((c) => c.field),
+      ['key', 'severity', 'message'],
+    );
+  });
+
+  it('every other card leaves supportsJson unset (the generic table is still correct for them)', () => {
+    const jsonIds = new Set(['severity', 'doctor']);
+    for (const spec of reportCardSpecs()) {
+      if (jsonIds.has(spec.id)) continue;
+      assert.strictEqual(spec.supportsJson, undefined, `unexpected supportsJson on ${spec.id}`);
+    }
   });
 });
 
@@ -102,6 +137,40 @@ describe('projectMapReports buildReportsTabHtml', () => {
         `expected report-output-wrap-${spec.id} to start hidden`,
       );
     }
+  });
+
+  // WP2: severity/doctor render real column headers (File/Line/Rule/...,
+  // Key/Severity/Message) instead of the generic "#"/"Output" pair the other
+  // 5 cards still use — this is the whole point of the typed table, so pin it.
+  it('renders real column headers for the JSON-enabled cards, generic headers for the rest', () => {
+    const html = buildReportsTabHtml();
+    assert.ok(html.includes('data-json-table="1"'), 'expected at least one typed table');
+    for (const spec of reportCardSpecs()) {
+      const sectionMatch = html.match(
+        new RegExp(`<section[^>]*data-report-id="${spec.id}"[\\s\\S]*?</section>`),
+      );
+      assert.ok(sectionMatch, `missing card section for ${spec.id}`);
+      const section = sectionMatch![0];
+      if (spec.supportsJson) {
+        assert.ok(section.includes('data-json-table="1"'), `${spec.id} should render a typed table`);
+        assert.ok(!section.includes('class="col-line"'), `${spec.id} should not keep the generic # column`);
+      } else {
+        assert.ok(section.includes('class="col-line"'), `${spec.id} should keep the generic # column`);
+      }
+    }
+  });
+});
+
+describe('projectMapReports reportJsonColumnsForScript', () => {
+  it('maps each JSON-enabled report id to its field list, in header order', () => {
+    const columns = reportJsonColumnsForScript();
+    assert.deepStrictEqual(columns.severity, ['file', 'line', 'rule', 'severity', 'message']);
+    assert.deepStrictEqual(columns.doctor, ['key', 'severity', 'message']);
+    // Non-JSON cards are absent entirely, not present with an empty array —
+    // the client script's `if (cols)` branch in projectMapShell.ts relies on
+    // that to fall back to the generic num+text row shape.
+    assert.strictEqual(columns.impact, undefined);
+    assert.strictEqual(columns.memory, undefined);
   });
 });
 

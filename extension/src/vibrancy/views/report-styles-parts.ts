@@ -7,121 +7,64 @@
 
 export function reportStylesPart1(): string {
     return `
-        /* Content max-width with full-width override (guideline §4). Editor panes can be 4000+px
-           wide on ultrawide monitors — long-line text and dense tables become unreadable past
-           ~1300px. Body[data-full-width="true"] removes the cap when the user clicks the toggle. */
-        body {
-            font-family: var(--vscode-font-family);
-            color: var(--vscode-foreground);
-            background: var(--vscode-editor-background);
-            padding: 16px;
-            margin: 0 auto;
-            max-width: 1280px;
-        }
-        body[data-full-width="true"] { max-width: none; }
+        /* PLAN_ext_ui_report_styles.md Pass 1: the local body reset (16px all-round padding,
+           default browser font-size/line-height, no box-sizing normalization) was dropped in
+           favor of dashboardChromeStylesTokens.ts' chromeBaseLayout(), now composed into
+           report-styles.ts. This is a deliberate, describable visual change, not a silent
+           regression: chromeBaseLayout sets padding 18px/18px/28px (was 16px all round),
+           font-size 13px + line-height 1.45 (was the browser default, ~14px/normal), and adds
+           a global box-sizing:border-box reset. known-issues-html.ts already renders with this
+           exact body (it loads getDashboardChromeStyles() alongside getReportStyles()), so this
+           change makes the Package Dashboard and Upgrades tab match a body treatment already
+           shipping elsewhere rather than introducing an unproven one. body[data-full-width=true]
+           and .full-width-toggle moved the same way (chromeBaseLayout defines both; the only
+           difference is the toggle grows from 26x26 to 28x28 and gains a border-color hover/
+           focus tell -- verify at F5 in both themes, see the report footer for the checklist).
+           NOTE: this comment must never contain a backtick -- this whole file is one JS template
+           literal per function, and a stray backtick here would silently close the CSS string
+           early (that bug shipped once already in this same edit and was caught by tsc). */
         h1 { font-size: 1.4em; margin-bottom: 8px; }
 
-        /* ---- Report header with floating gauge ----
-           Matches the Findings dashboard hero (the gold standard): gradient tint, rounded
-           panel surface, padding, mount-in animation. The CSS vars used here mirror the
-           chrome's tokens so the hero reads identically across the three editor surfaces
-           (Findings, Code Health, Lints Config) and the vibrancy panels. */
-        .report-header {
-            position: relative;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 18px;
-            align-items: center;
-            padding: 18px 20px;
-            margin-bottom: 14px;
-            border: 1px solid color-mix(in srgb, var(--vscode-focusBorder) 35%, var(--vscode-widget-border));
-            border-radius: 12px;
-            background:
-                radial-gradient(900px 220px at 0% 0%,
-                    color-mix(in srgb, var(--vscode-textLink-foreground) 14%, transparent),
-                    transparent 60%),
-                var(--vscode-editorWidget-background);
-            animation: hero-in 360ms ease-out;
-        }
-        .report-header .hero-text { flex: 1; min-width: 0; }
-        .report-header h1 {
-            margin: 0 0 4px;
-            font-size: 1.55em;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-        }
-        .header-version {
-            font-size: 0.55em; font-weight: normal;
-            opacity: 0.5; margin-inline-start: 10px;
-            vertical-align: middle;
-            letter-spacing: 0.4px;
-        }
-        @keyframes hero-in {
-            from { opacity: 0; transform: translateY(-4px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .report-header { animation: none; }
-        }
-        /* Status line (guideline §4.1) — muted facts row under the title. */
-        .status-line {
-            margin: 0 0 12px;
-            color: var(--vscode-descriptionForeground);
-            font-size: 0.92em;
-            display: flex; flex-wrap: wrap; gap: 4px 10px;
-            align-items: center;
-        }
-        .status-line .dot { opacity: 0.55; }
-        .status-line .pill {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 1px 8px;
-            border-radius: 999px;
-            background: var(--vscode-editor-inactiveSelectionBackground);
-            color: var(--vscode-foreground);
-            font-size: 0.95em;
-        }
-        /* Status pills mix the semantic hue toward the editor foreground so the
-         * text clears WCAG AA on the tinted pill background while staying clearly
-         * green / red / amber. The mix auto-adapts: it lightens on dark themes
-         * and darkens on light ones. Amber needs the heaviest lift (it is the
-         * brightest hue and fails worst on light backgrounds). */
-        .status-line .pill.good { color: color-mix(in srgb, var(--vscode-testing-iconPassed) 58%, var(--vscode-foreground)); }
-        .status-line .pill.bad  { color: color-mix(in srgb, var(--vscode-editorError-foreground) 44%, var(--vscode-foreground)); }
-        .status-line .pill.warn { color: color-mix(in srgb, var(--vscode-editorWarning-foreground) 55%, var(--vscode-foreground)); }
-        /* Interactive "Scanned X ago" pill: reset button chrome to pill shape but
-         * keep pointer cursor, hover feedback, and a keyboard focus ring. */
-        .status-line .pill.pill-action {
-            cursor: pointer;
-            font: inherit;
-            border: 1px solid transparent;
-        }
-        .status-line .pill.pill-action:hover {
-            background: color-mix(in srgb, var(--vscode-focusBorder) 24%, var(--vscode-editor-inactiveSelectionBackground));
-        }
-        .status-line .pill.pill-action:focus-visible {
-            outline: 1px solid var(--vscode-focusBorder);
-            outline-offset: 2px;
-        }
-        /* Full-width toggle (guideline §4) — flips body[data-full-width]. */
-        .full-width-toggle {
-            flex: 0 0 auto;
-            width: 26px; height: 26px;
-            display: inline-flex; align-items: center; justify-content: center;
-            border: 1px solid var(--vscode-widget-border);
-            border-radius: 6px;
-            background: var(--vscode-editor-inactiveSelectionBackground);
-            color: var(--vscode-foreground);
-            font-size: 13px;
-            cursor: pointer;
-            margin-inline-start: auto;
-            transition: background 0.12s, border-color 0.12s;
-        }
-        .full-width-toggle:hover { background: var(--vscode-list-hoverBackground); }
-        .full-width-toggle:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
-        body[data-full-width="true"] .full-width-toggle {
-            background: var(--vscode-list-activeSelectionBackground);
-            border-color: var(--vscode-focusBorder);
-        }
+        /* PLAN_ext_ui_report_styles.md Pass 1: .report-header, .hero-text, h1 and
+           .header-version were a byte-for-byte-equivalent duplicate of
+           dashboardChromeStylesComponents.ts' chromeHeroAndGauge() (.dash-hero, .hero-text,
+           .hero-text h1, .stamp -- identical once resolved through chromeTokens(), confirmed
+           by comparing every property). Deleted here; report-html.ts and opportunities-html.ts
+           now emit dash-hero / stamp class markup and rely on the chrome import in
+           report-styles.ts. The one real difference is .stamp's opacity (chrome: 0.55, this
+           report used 0.5) -- a difference too small to be worth a scoped override for.
+           PLAN_ext_ui_report_styles.md Phase 1 (2026-09-05): @keyframes hero-in used to stay
+           local here because chromeMicroAndMotion() bundled it with an unrelated code/.mono
+           font-family:monospace rule that would have repainted opportunities-html.ts' code-tagged
+           opp-chip elements. That bundle has since been split (dashboardChromeStylesSystem.ts) into
+           single-concern exports, including chromeKeyframeHeroIn() with ONLY this keyframe -- no
+           monospace rule attached. report-styles.ts now composes chromeKeyframeHeroIn() (plus
+           chromeReducedMotion() for the .dash-hero reduced-motion override, which used to be a
+           local 3-line media query here), so the local copies are deleted. */
+        /* PLAN_ext_ui_report_styles.md Pass 1/2: .status-line/.pill were a
+           byte-for-byte-equivalent duplicate of
+           dashboardChromeStylesComponents.ts' chromeHeroAndGauge() (same
+           colors once resolved through the --vscode-* aliases in
+           chromeTokens(), which report-styles.ts now also composes in).
+           Deleted here and left to the chrome import in report-styles.ts.
+           The single real difference (chrome's .status-line has margin:0,
+           this report kept a 12px trailing gap) is restored below as a
+           scoped 1-line override instead of re-duplicating the whole
+           block, per the plan's "adapt with <=10 lines of override"
+           guidance. */
+        /* Chrome's shared .status-line resets margin to 0 (other dashboards
+           nest it directly against following content); the Package
+           Dashboard's hero keeps its original 12px gap so the status row
+           doesn't crowd its own bottom padding. Every hero consumer of
+           this stylesheet now shares the identical .dash-hero class (see
+           the .report-header removal note above), so the override can no
+           longer be scoped by that selector alone -- known-issues-html.ts's
+           buildDashboardHero() ALSO emits .dash-hero and must keep the
+           chrome's zero-margin default. report-html.ts/opportunities-html.ts
+           therefore keep an extra report-header marker class purely as a
+           CSS scoping hook (no styling of its own) so this 1-line override
+           targets only the Package Dashboard / Upgrades hero. */
+        .dash-hero.report-header .status-line { margin-bottom: 12px; }
 
         /* ---- Radial gauge ---- */
         .radial-gauge {
@@ -136,7 +79,14 @@ export function reportStylesPart1(): string {
            approach using inline style="..." attributes collapsed under CSP3
            and left the gauge as a single dot. Do NOT reintroduce a
            stroke-dasharray rule here: it would override the attribute. */
-        .gauge-label {
+        /* Named .radial-gauge-label, NOT .gauge-label: report-styles.ts now composes
+           dashboardChromeStylesComponents.ts' chromeHeroAndGauge(), which defines an
+           UNSCOPED .gauge-label rule (position:absolute; inset:0) for its own
+           .hero-gauge widget. This report's 72px SMIL-driven gauge is deliberately
+           distinct from chrome's 96px CSS-keyframe .hero-gauge (plan §7: "do NOT
+           conflate them"), so the label class was renamed to avoid the collision
+           rather than adopting chrome's gauge markup. See report-html-top.ts. */
+        .radial-gauge-label {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -55%);
             font-size: 1.3em; font-weight: bold;
@@ -373,7 +323,32 @@ export function reportStylesPart3(): string {
         .dep-cloud span { margin-inline-end: 6px; }
         .dep-shared { font-weight: bold; color: var(--vscode-editorInfo-foreground); }
 
-        /* ---- Summary cards ---- */
+        /* ---- Summary cards ----
+           PLAN_ext_ui_report_styles.md Phase 2 (2026-09-05): evaluated against
+           dashboardChromeStylesComponents.ts' chromeKpiCards() (.kpi-row/.kpi-card) and KEPT
+           local -- this is not an oversight, it is a genuine visual-model mismatch, not a
+           small-override case:
+             1. Layout is inverted. .summary-card renders .count (large number) ABOVE .label
+                (small caption), centered, on a flat --vscode-editor-inactiveSelectionBackground
+                tile with no border. .kpi-card renders .kpi-k (small caption) ABOVE .kpi-v
+                (large number), left-aligned, on a bordered var(--surface-2) card with its own
+                border-radius/padding scale. Applying both classes to the same element (as
+                known-issues-html.ts does for its 4 simple cards) would let .kpi-card's later
+                cascade rules silently override .summary-card's centering/flat-background --
+                not a merge, a redesign of the strip's look with no way to verify it at F5 in
+                this pass.
+             2. Nine bespoke semantic categories (.vibrant/.stable/.outdated/.abandoned/.eol/
+                .updates/.unused/.vulns/.overrides below) map package-health LETTER GRADES to
+                color -- a different domain from chromeKpiCards' four hardcoded categories
+                (.errors/.warnings/.crit/.todos, a lint-severity vocabulary). chromeTokens()
+                does define --grade-a..--grade-f, so the color RAMP could theoretically be
+                reused, but chromeKpiCards() has no .kpi-card.vibrant/.stable/etc. selectors to
+                hang them on -- adding nine new selectors to the shared chrome file to serve
+                one consumer is a blast-radius change to shared infrastructure (CLAUDE.md
+                Scope & Safety gate), not something this pass does without asking.
+           Net: migrating would mean either accepting an unreviewed layout change or extending
+           the shared chrome component for a single caller. Both are out of proportion to the
+           ~20 lines of CSS this local block costs. Kept, not forgotten. */
         .summary {
             display: flex; gap: 16px; margin-bottom: 16px;
             flex-wrap: wrap;
@@ -417,7 +392,29 @@ export function reportStylesPart3(): string {
         .vulns .count { color: var(--vscode-editorError-foreground); }
         .overrides .count { color: var(--vscode-descriptionForeground); }
 
-        /* ---- Toolbar (search + pubspec button) ---- */
+        /* ---- Toolbar (search + pubspec button) ----
+           PLAN_ext_ui_report_styles.md Phase 2 (2026-09-05): evaluated against
+           dashboardChromeStylesComponents.ts' chromeToolbarAndButtons() (.toolbar-band/.field/
+           .btn) and KEPT local:
+             1. .toolbar-band is 'position: sticky; top: 0; z-index: 10'. The Package Dashboard
+                is the most interaction-heavy surface in the extension (detail pane, network
+                diagram, dependency popovers -- see the plan's own Risks section). Making its
+                filter row sticky is a real functional/UX change to scroll behavior around
+                those overlays, not a CSS-only swap, and this pass has no Extension Dev Host or
+                Playwright run to verify it doesn't clip a popover under the newly-fixed band.
+                Not something to ship unverified.
+             2. .toolbar-btn's shape was a DELIBERATE prior decision, already documented a few
+                lines below (see the "Rounded-rect toolbar buttons" comment on .toolbar-btn):
+                6px radius + 0.85em font, chosen specifically so these buttons read as one
+                family with the .table-toolbar container's own 6px radius. Chrome's '.btn' is a
+                999px PILL at 0.95em with a 0.45 disabled-opacity floor (vs this file's 0.65).
+                Reusing '.btn' here would mean either (a) accepting the pill shape, undoing the
+                earlier deliberate decision, or (b) re-overriding radius + font-size +
+                disabled-opacity back to this file's values on every one of the 8 toolbar
+                buttons -- which is not deduplication, it's carrying the same three
+                overrides eight times instead of once.
+           Net: adopting either half of this family costs more than it saves without a visual
+           verification pass this session cannot run. Kept, not forgotten. */
         .table-toolbar {
             display: flex; gap: 12px; align-items: center;
             margin: 12px 0 8px;
@@ -427,16 +424,13 @@ export function reportStylesPart3(): string {
             border-radius: 6px;
             background: var(--vscode-editor-inactiveSelectionBackground);
         }
-        /* Accessibility helper — visually hide the search label but keep
-           it readable to screen readers. The class is in the HTML, but
-           without this rule the label paints over the toolbar (redundant
-           with the input placeholder). dashboardChromeStyles defines the
-           same rule for other webviews; the vibrancy report doesn't load
-           that stylesheet, so we duplicate it here. */
-        .sr-only {
-            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
-        }
+        /* PLAN_ext_ui_report_styles.md Pass 1: .sr-only used to be duplicated here
+           (see git history) because this webview didn't load any dashboardChromeStyles
+           module. report-styles.ts now composes chromeAccessibility() (byte-identical
+           rule) alongside the report parts, so the local copy was deleted — single
+           source of truth for the visually-hidden-but-readable-by-screen-readers
+           helper used by the search-field <label> below and report-html-table.ts'
+           column header. */
         /* Relative wrapper anchors the absolutely-positioned clear (X)
            button inside the search field. inline-flex keeps the wrapper
            sized to the input so the toolbar layout is unchanged. */
@@ -625,6 +619,24 @@ export function reportStylesPart4(): string {
         /* Segmented control sits beside the rounded-rect toolbar buttons,
            so its radius is matched (6px container + 4px segments) instead
            of the prior full-pill 999px. */
+        /* PLAN_ext_ui_report_styles.md Phase 2 (2026-09-05): evaluated against
+           dashboardChromeStylesComponents.ts' chromeToolbarAndButtons() '.seg' segmented
+           control and KEPT local -- the two controls solve DIFFERENT interaction problems,
+           not the same one with different CSS:
+             '.seg' is an ADDITIVE multi-select whose state lives entirely in 'aria-pressed':
+             [aria-pressed="true"] renders plain/included, [aria-pressed="false"] renders
+             ghosted+strike-through/excluded (see the inversion comment on '.seg' in
+             dashboardChromeStylesComponents.ts). '.footprint-toggle' is a single-select RADIO
+             group -- report-html-top.ts (footprintToggle markup, 'role="group"', one
+             '.active' class on the current button, no 'aria-pressed' attribute anywhere) and
+             report-script-parts.ts' setFootprintMode() (toggles '.active' via
+             'data-footprint', never touches 'aria-pressed') both encode "exactly one of
+             own/unique/total is selected," never "each option independently included or
+             excluded." Adopting '.seg' would mean rewriting the markup to add
+             'aria-pressed' to all three buttons AND rewriting setFootprintMode() to flip
+             'aria-pressed' instead of '.active' -- a script + markup + a11y-semantics rewrite
+             to save roughly 35 lines of CSS, disproportionate per the plan's own guidance.
+           Kept, not forgotten. */
         .footprint-toggle {
             display: inline-flex; align-items: center; gap: 2px;
             padding: 2px 4px;

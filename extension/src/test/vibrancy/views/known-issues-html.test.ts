@@ -6,7 +6,10 @@
  */
 
 import * as assert from 'assert';
-import { buildKnownIssuesHtml } from '../../../vibrancy/views/known-issues-html';
+import {
+    buildKnownIssuesHtml, getEmbeddedBodyHtml, getKnownIssuesEmbedStyles,
+} from '../../../vibrancy/views/known-issues-html';
+import { getKnownIssuesScript, getKnownIssuesEmbedScript } from '../../../vibrancy/views/known-issues-script';
 
 describe('buildKnownIssuesHtml', () => {
     it('should return valid HTML with doctype', () => {
@@ -197,5 +200,68 @@ describe('buildKnownIssuesHtml', () => {
             html.includes('--vscode-editor-findMatchHighlightBackground'),
             'highlight background should bind to the host find-match token',
         );
+    });
+});
+
+// PLAN_ext_ui_package_tabs.md §4 Tab 5: the embedded Known issues tab shares its markup/script
+// builders with the standalone panel above (idPrefix/root parameters, defaulting to the
+// standalone's exact prior behavior -- covered by every test above still passing unchanged).
+// These tests guard the embed-specific contract: no document shell, no id collisions with the
+// Package Dashboard's own table, and no duplicate host chrome (hero/full-width-toggle/shortcuts).
+describe('known-issues embed (PLAN_ext_ui_package_tabs.md Tab 5)', () => {
+    it('renders body-only markup with no document shell or acquireVsCodeApi call', () => {
+        const html = getEmbeddedBodyHtml();
+        assert.ok(!html.includes('<!DOCTYPE'), 'embed must not include a document shell');
+        assert.ok(!html.includes('<html'), 'embed must not include <html>');
+        assert.ok(!html.includes('acquireVsCodeApi'), 'embed must not call acquireVsCodeApi itself');
+        assert.ok(html.includes('class="ki-embed-body"'), 'expected the ki-embed-body wrapper');
+    });
+
+    it('prefixes every id the Package Dashboard also uses, to avoid DOM id collisions', () => {
+        const html = getEmbeddedBodyHtml();
+        for (const id of ['ki-search-input', 'ki-pkg-body', 'ki-visible-count', 'ki-announcer']) {
+            assert.ok(html.includes(`id="${id}"`), `expected id="${id}"`);
+        }
+        // Regression guard for the idPrefix-on-already-prefixed-id bug caught during
+        // development: __id__('ki-chip-strip') must never render 'kiki-chip-strip'.
+        assert.ok(!html.includes('kiki-'), 'an id must never be double-prefixed');
+    });
+
+    it('omits the host chrome the Package Dashboard already renders once', () => {
+        const html = getEmbeddedBodyHtml();
+        assert.ok(!html.includes('dash-hero'), 'embed must not render its own hero band');
+        assert.ok(!html.includes('dashFullWidthToggle'), 'embed must not render a second full-width toggle (duplicate id)');
+    });
+
+    it('standalone panel keeps its original unprefixed ids (test-safe rename)', () => {
+        const html = buildKnownIssuesHtml();
+        assert.ok(html.includes('id="search-input"'), 'standalone ids must stay unprefixed');
+        assert.ok(html.includes('id="pkg-body"'));
+        assert.ok(html.includes('class="ki-search-field"'), 'search input keeps the new class alongside its id');
+    });
+
+    it('embed styles scope .search-clear so it cannot repaint the host table\'s own clear button', () => {
+        const styles = getKnownIssuesEmbedStyles();
+        assert.ok(styles.includes('.ki-embed-body .search-clear'), 'expected the scoped override');
+        assert.ok(!styles.includes('.mono'), 'must not pull in chromeMicroAndMotion (code/.mono side effect)');
+    });
+
+    it('embed script is a self-contained IIFE scoped to .ki-embed-body', () => {
+        const script = getKnownIssuesEmbedScript();
+        assert.ok(script.trim().startsWith('(function() {'), 'must wrap itself in an IIFE');
+        assert.ok(
+            script.includes("document.querySelector('.ki-embed-body')"),
+            'must scope __ROOT__ to the embed wrapper',
+        );
+        assert.ok(
+            !script.includes("getElementById('dashFullWidthToggle')"),
+            'embed must not wire the host full-width toggle',
+        );
+    });
+
+    it('standalone script keeps wiring the full-width toggle and document-level shortcuts', () => {
+        const script = getKnownIssuesScript();
+        assert.ok(script.includes("getElementById('dashFullWidthToggle')"));
+        assert.ok(script.includes("e.key === '/'"));
     });
 });

@@ -11,7 +11,7 @@
  */
 
 import { l10n } from '../i18n/runtime';
-import type { Violation } from '../violationsReader';
+import type { OwaspData, Violation } from '../violationsReader';
 import type { DashboardSection } from './issuesTreeModel';
 import type { GroupByMode } from './issuesTreeGrouping';
 
@@ -98,6 +98,20 @@ export interface ViolationsDashboardHtmlInput {
      */
     message?: string;
     /**
+     * Representative "how to fix" text — folds the Rule Explain panel's
+     * "How to fix" section onto this row instead of requiring a jump to the
+     * standalone panel (plan §B item 14). Undefined when the source is the
+     * live-diagnostics model, which carries no correction field, or when no
+     * occurrence of this rule had one.
+     */
+    correction?: string;
+    /**
+     * Representative OWASP mobile/web mapping — folds the Rule Explain
+     * panel's "OWASP" section onto this row (plan §B item 15). Same
+     * live-vs-batch-export availability caveat as `correction`.
+     */
+    owasp?: OwaspData;
+    /**
      * Files contributing this rule's findings, highest-count first and capped
      * host-side, each with a representative (lowest) line so the expander can
      * deep-link into the source. Optional for the same reason as `message`.
@@ -157,6 +171,19 @@ export interface ViolationsDashboardHtmlInput {
    * with no security-sensitive rules renders no pill at all.
    */
   hotspots?: { total: number; open: number; reviewedSafe: number; reviewedFixed: number };
+  /**
+   * Code Health quality-gate state (TASK B: surface the gate where users
+   * already look, not only inside the Code Health dashboard). Sourced by the
+   * caller straight from `getLastProjectVibrancyPayload()?.gates`
+   * (`projectVibrancyReportView.ts`) — the SAME already-computed field
+   * `buildHero`/`buildGateBanner` render there, so this dashboard's pill can
+   * never disagree with Code Health's own gate verdict. `undefined` until a
+   * Code Health scan has completed at least once this session; the caller
+   * must NOT synthesize a placeholder value — the status-line pill renders
+   * nothing at all in that case (see `buildQualityGatePill` in
+   * violations-dashboard-top.ts).
+   */
+  qualityGate?: { pass: boolean; violationCount: number };
 }
 
 export const SEVERITY_ORDER: readonly string[] = ['error', 'warning', 'info'];

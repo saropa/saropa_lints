@@ -20,12 +20,31 @@ import { getFeatureInventoryScript } from './feature-inventory-script';
 import { buildPackageIndex, buildSummaryTable } from './feature-inventory-html-table';
 import { buildPackageSection } from './feature-inventory-html-package';
 
-/** Build the complete report document. */
-export function buildFeatureInventoryHtml(report: FeatureInventoryReport): string {
-    const nonce = createWebviewCspNonce();
+/**
+ * Body-only HTML (no `<!DOCTYPE>`/`<html>`/`<head>`/nonce-bearing tags) for embedding inside the
+ * Package Dashboard's "Full report" tab (PLAN_ext_ui_package_tabs.md §4 Tab 4). This is the exact
+ * same markup {@link buildFeatureInventoryHtml} wraps in a document shell for the browser-opened
+ * standalone report — extracted so the two surfaces render identically and never drift, matching
+ * the `getEmbeddedBodyHtml` pattern proven by `analysisOptimizerWebviewProvider.ts`. No
+ * `handleEmbeddedMessage` companion is needed: this report has zero webview interactions (no
+ * `acquireVsCodeApi` call anywhere in its own script), only client-side DOM filtering, so there is
+ * nothing to forward to a host message handler.
+ */
+export function getEmbeddedBodyHtml(report: FeatureInventoryReport): string {
     const sections = report.packages.length === 0
         ? `<p class="fi-note">${escapeHtml(l10n('featureInventory.empty.body'))}</p>`
         : report.packages.map(buildPackageSection).join('\n');
+    return `${buildHeader(report)}
+${buildControls()}
+${buildPackageIndex(report)}
+${buildSummaryTable(report)}
+<h2>${escapeHtml(l10n('featureInventory.packages.title'))}</h2>
+${sections}`;
+}
+
+/** Build the complete report document (the browser-opened standalone file). */
+export function buildFeatureInventoryHtml(report: FeatureInventoryReport): string {
+    const nonce = createWebviewCspNonce();
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -38,12 +57,7 @@ export function buildFeatureInventoryHtml(report: FeatureInventoryReport): strin
     <style nonce="${nonce}">${getFeatureInventoryStyles()}</style>
 </head>
 <body>
-${buildHeader(report)}
-${buildControls()}
-${buildPackageIndex(report)}
-${buildSummaryTable(report)}
-<h2>${escapeHtml(l10n('featureInventory.packages.title'))}</h2>
-${sections}
+${getEmbeddedBodyHtml(report)}
 <script nonce="${nonce}">${getFeatureInventoryScript()}</script>
 </body>
 </html>`;

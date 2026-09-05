@@ -796,6 +796,24 @@ export function buildScript(): string {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
       });
     });
+
+    /* Rule Explain fold (plan §B) — related/same-tag/supersedes chips inside
+       the expanded row's "extras" block. These are '<a href="#">' anchors
+       (not real navigation targets), so preventDefault before posting, same
+       pattern ruleExplainView.ts uses for its own related-rule links. The
+       target rule may not be one of the current Top N rows, so this always
+       routes to the standalone Rule Explain panel rather than trying to
+       scroll/expand a row that might not exist in this table.
+       Delegated on tbody (not per-link) — the extras block is only present
+       inside trow-detail rows added/removed by row expansion, not present at
+       initial bind time for rows a user has not opened yet. */
+    tbody.addEventListener('click', function (e) {
+      var t = e.target;
+      var link = t && t.closest ? t.closest('a.related-rule-link[data-rule]') : null;
+      if (!link) return;
+      e.preventDefault();
+      vscode.postMessage({ type: 'openRuleExplain', rule: link.getAttribute('data-rule') || '' });
+    });
   })();
 
   /* TODOs / Drift section action bindings */

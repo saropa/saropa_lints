@@ -27,6 +27,15 @@ export interface RuleMetadataData {
   requiresReview?: boolean;
   defaultReviewState?: string;
   accuracyTarget?: AccuracyTargetData;
+  /**
+   * Rule-level correction/fix-it text ("How to fix"). Present on both the
+   * batch export's per-violation `metadata` snapshot AND the bundled rule
+   * catalog (`bin/generate_rule_catalog.dart`) — same source
+   * (`rule.code.correctionMessage`) either way.
+   */
+  correction?: string;
+  /** Rule-level OWASP mapping, same shape/source as `Violation.owasp`. */
+  owasp?: OwaspData;
 }
 
 export interface Violation {

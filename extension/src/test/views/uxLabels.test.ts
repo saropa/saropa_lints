@@ -68,24 +68,32 @@ describe('UX labels in package.json', () => {
     // Adding or removing a section here means updating SECTION_VIEW_IDS too.
     // Help was removed in Phase 1 sidebar collapse — its four commands moved
     // to the Dashboards view's "..." overflow menu (package.json group 9_help).
-    // Triage was merged into Settings — there is no longer a standalone
-    // saropaLints.triage view. Triage rows render inside the Settings panel.
-    // The standalone Actions view was likewise merged into Settings: its
-    // run/initialize operations render at the top of the Settings panel.
+    // Triage was merged into Actions — there is no longer a standalone
+    // saropaLints.triage view. Triage rows render inside the Actions panel's
+    // ConfigTreeProvider-backed nodes (now none, post row-reset — see
+    // overviewTreeFlat.test.ts's "carries no triage rows" guard).
+    // The panel formerly named `saropaLints.settings` was RENAMED to
+    // `saropaLints.actions` (PLAN_ext_ui_sidebar_reset.md P1): once every
+    // setting-value row moved to the Rules & Tiers tabs (2026-09-04 row
+    // collapse) and the Migrate row moved to the Config file tab (P2), this
+    // panel is provably just 3 verbs (Run/Fix/Initialize) — "Actions" is
+    // what it does, "Settings" was a name left over from when it also
+    // carried config-value rows. This is a rename of that SAME panel, not a
+    // resurrection of some other historical "Actions" view.
     // The standalone config-Suggestions view was removed (its "Enable the X rule
     // pack" list moved to the Manage Rule Packs webview + startup toast).
     const expected = [
       'saropaLints.banner',
       'saropaLints.editorDashboards',
       'saropaLints.status',
-      'saropaLints.settings',
+      'saropaLints.actions',
     ].sort();
     const actual = views.map((v) => v.id).sort();
     assert.deepStrictEqual(actual, expected, 'sidebar = four section panels');
     assert.ok(!views.some((v) => v.id === 'saropaLints.overview'), 'monolithic overview view removed');
     assert.ok(!views.some((v) => v.id === 'saropaLints.dashboardHub'), 'dashboardHub view removed');
-    assert.ok(!views.some((v) => v.id === 'saropaLints.triage'), 'triage view merged into settings');
-    assert.ok(!views.some((v) => v.id === 'saropaLints.actions'), 'actions view merged into settings');
+    assert.ok(!views.some((v) => v.id === 'saropaLints.triage'), 'triage view merged into actions');
+    assert.ok(!views.some((v) => v.id === 'saropaLints.settings'), 'settings view id was renamed to actions');
     assert.ok(!views.some((v) => v.id === 'saropaLints.help'), 'help view moved to overflow menu');
   });
 

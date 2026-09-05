@@ -1,21 +1,27 @@
 /**
  * Pins the multi-panel sidebar contract for the Saropa Lints activity-bar
- * container. Each section is its own VS Code view (Banner / Editor dashboards
- * / Settings / Status), and inside every section the rows are flat clickable
- * leaves only — no chevrons, no nested expansion.
+ * container after PLAN_ext_ui_sidebar_reset.md P1 (14-row target, §3): each
+ * section is its own VS Code view (Banner / Dashboards / Status / Actions),
+ * and inside every section the rows are flat clickable leaves only — no
+ * chevrons, no nested expansion.
  *
- * Settings (aka Quick Actions) is now action-rows-only: run analysis,
- * initialize/update config, fix stale ignores, command catalog, plus a
- * conditional Migrate row (only while legacy plugin-block config keys
- * remain). Severity toggles, setting-value rows (run-after-config/
- * dependency, UI language, detected packages), and triage rows were CUT here
- * (2026-09-04, sidebar row collapse WP1) — each was a verified duplicate of
- * a richer surface: severity toggles and the setting-value rows now live on
- * the Rules & Tiers Automation/Extension tabs, triage rows duplicated the
- * Findings Dashboard's top-rules table. See
- * plans/PLAN_sidebar_row_collapse.md §2.1. Help (Getting Started / About /
- * pub.dev / AI instructions) moved out of the tree entirely, into the
- * Dashboards view's "..." title menu.
+ * Actions (renamed from "Settings"/"Quick Actions", package.json
+ * `saropaLints.actions`) is exactly 3 rows: Run analysis, Fix stale ignores,
+ * Initialize/Update config. Command Catalog moved OUT to Dashboards (it
+ * opens a picker, it doesn't run anything — the wrong section per §2's
+ * table). Migrate config keys moved OUT of the sidebar entirely — it is now
+ * a conditional button on the Lints Config › Config file tab
+ * (`rulePacksWebviewProvider.ts`'s `_buildMigrateCard`), reachable from a UI
+ * surface without permanently occupying an ACTIONS row for a one-shot
+ * migration. Severity toggles, setting-value rows, and triage rows stay cut
+ * from the prior "sidebar row collapse" pass (still duplicates of richer
+ * surfaces elsewhere).
+ *
+ * Status is Health / Engines / Hotspots (conditional) / Last run
+ * (conditional) — see sidebarStatusEngines.test.ts for the row-level
+ * regression guards on that section; this file only pins the section-level
+ * contract (§2's STATUS/DASHBOARDS invariant: no row runs or toggles
+ * anything).
  *
  * Regression guards:
  *   - View IDs match what package.json declares.
@@ -23,10 +29,13 @@
  *     (no chevrons inside any section).
  *   - Every leaf has a click `command` so nothing in the sidebar is dead.
  *   - Run analysis appears exactly once across all sections.
- *   - Settings carries no severity toggles, no setting-value rows, no
- *     triage rows; the Migrate row appears only when legacy keys exist.
- *   - Tier and Lane (formerly separate Settings rows, WP2 sidebar row
- *     collapse) are folded into the Dashboards "Lints Config" row
+ *   - No STATUS or DASHBOARDS row targets a run/toggle command — the
+ *     executable form of §2's rule that those sections "never change
+ *     anything."
+ *   - Actions carries exactly Run analysis / Fix stale ignores /
+ *     Initialize-Update config — no Command Catalog, no Migrate row, no
+ *     severity toggles, no setting-value rows, no triage rows.
+ *   - Tier and Lane are folded into the Dashboards "Lints Config" row
  *     description; no row anywhere still targets `saropaLints.setLane`.
  */
 import '../vibrancy/register-vscode-mock';
@@ -35,6 +44,7 @@ import * as assert from 'node:assert';
 import * as sinon from 'sinon';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as os from 'node:os';
 
 import * as projectRoot from '../../projectRoot';
 import * as pubspecReader from '../../pubspecReader';
@@ -42,11 +52,19 @@ import * as violationsReader from '../../violationsReader';
 import * as suppressionsStore from '../../suppressionsStore';
 import * as configWriter from '../../configWriter';
 import * as runHistory from '../../runHistory';
-import * as migrateConfig from '../../config/migrateConfig';
-// Stubbed in the new "Lints Config row" test below — lets the test control
+import * as securityHotspotReviewState from '../../securityHotspotReviewState';
+// Stubbed in the "Lints Config row" test below — lets the test control
 // the lane value without a real analysis_options_custom.yaml on disk.
 import * as laneConfig from '../../config/laneConfig';
 import { setTestConfig, clearTestConfig } from '../vibrancy/vscode-mock';
+// TASK A regression coverage (bugfix): the Code Health / Project Map row
+// descriptions used to be hardcoded static strings even though the plan
+// specified live data — stubbed here so the tests below can assert the
+// description actually reflects INJECTED payload/mtime values, closing the
+// hole where a static-string regression previously passed silently (the
+// existing tests only asserted section membership and command ids, never
+// description content).
+import * as projectVibrancyReportView from '../../views/projectVibrancyReportView';
 
 import { ConfigTreeProvider } from '../../views/configTree';
 import {
@@ -80,6 +98,26 @@ function loadPackageJson(): PackageJsonShape {
   return JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as PackageJsonShape;
 }
 
+interface MenusShape { 'view/title': Array<{ command: string; when?: string }> }
+
+function loadPackageJsonMenus(): { contributes: { menus: MenusShape } } {
+  const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
+  return JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as { contributes: { menus: MenusShape } };
+}
+
+// Commands that RUN or TOGGLE something — §2's table says a STATUS or
+// DASHBOARDS row's click "never changes anything," so none of these may
+// ever be the command target of a row in either section.
+const RUN_OR_TOGGLE_COMMANDS = [
+  'saropaLints.enable',
+  'saropaLints.disable',
+  'saropaLints.reenablePlugin',
+  'saropaLints.runAnalysis',
+  'saropaLints.initializeConfig',
+  'saropaLints.findAndFixStaleIgnores',
+  'saropaLints.migrateConfig',
+];
+
 describe('Saropa Lints sidebar — multi-panel section providers', () => {
   let memento: MockMemento;
   let configProvider: ConfigTreeProvider;
@@ -100,9 +138,13 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     });
     sinon.stub(configWriter, 'readDisabledRules').returns(new Set<string>());
     sinon.stub(runHistory, 'loadHistory').returns([]);
-    // Default: no legacy keys to migrate, so the conditional Migrate row is
-    // absent in every test except the ones that explicitly stub it present.
-    sinon.stub(migrateConfig, 'migrateConfigKeys').returns({ moved: [], skipped: [] });
+    // No hotspots by default — isolates unrelated tests from the Hotspots row.
+    sinon.stub(securityHotspotReviewState, 'countSecurityHotspotReviewStates').returns({
+      total: 0,
+      open: 0,
+      reviewedSafe: 0,
+      reviewedFixed: 0,
+    });
     memento = new MockMemento();
     configProvider = new ConfigTreeProvider();
     providers = createSidebarSectionProviders(memento, configProvider);
@@ -113,7 +155,7 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     clearTestConfig();
   });
 
-  it('package.json declares exactly the section views (Actions merged into Settings)', () => {
+  it('package.json declares exactly the section views (banner / dashboards / status / actions)', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
     const ids = views.map((v) => v.id).sort();
@@ -125,15 +167,6 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     assert.deepStrictEqual(ids, expected, 'container = section views');
   });
 
-  // WP5, sidebar row collapse: the Status view used to require
-  // `saropaLints.hasViolations` in its `when` clause, which hid the entire
-  // panel — including the Lint integration row — on a clean project. That
-  // gate is exactly wrong: a clean project with integration OFF also shows
-  // zero violations, so the one row that would explain why was hidden
-  // whenever it mattered most. Pin the clause directly against package.json
-  // rather than against sectionedSidebar.ts's runtime output, since the
-  // `when` clause is VS Code manifest data this suite has no other way to
-  // exercise.
   it('the Status view is no longer gated on saropaLints.hasViolations', () => {
     const pkg = loadPackageJson();
     const statusView = pkg.contributes.views.saropaLints.find((v) => v.id === SECTION_VIEW_IDS.status);
@@ -159,12 +192,12 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     const ids = pkg.contributes.views.saropaLints.map((v) => v.id);
     assert.ok(!ids.includes('saropaLints.overview'), 'monolithic overview view must not return');
     assert.ok(!ids.includes('saropaLints.dashboardHub'), 'dashboardHub view must not return');
+    assert.ok(!ids.includes('saropaLints.settings'), 'settings view id was renamed to saropaLints.actions');
   });
 
   it('every leaf rendered by every provider is CollapsibleState.None (no chevrons inside any panel)', () => {
     for (const provider of providers) {
       const items = provider.getChildren();
-      // getChildren may be async in TS but the implementation here is sync.
       const rows = items as Array<unknown>;
       for (const node of rows) {
         const item = provider.getTreeItem(node as never);
@@ -216,9 +249,26 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     assert.strictEqual(count, 1, 'Run analysis must not be duplicated');
   });
 
-  it('Editor dashboards section surfaces exactly the six first-class dashboards', () => {
+  // Executable form of §2's rule: a STATUS or DASHBOARDS row's click never
+  // runs or toggles anything — only ACTIONS rows may.
+  it('no STATUS or DASHBOARDS row targets a run/toggle command', () => {
+    for (const sectionId of [SECTION_VIEW_IDS.status, SECTION_VIEW_IDS.editorDashboards]) {
+      const provider = providers.find((p) => p.viewId === sectionId)!;
+      const items = (provider.getChildren() as Array<unknown>).map((n) => provider.getTreeItem(n as never));
+      for (const item of items) {
+        const cmd = item.command?.command;
+        assert.ok(
+          !cmd || !RUN_OR_TOGGLE_COMMANDS.includes(cmd),
+          `${sectionId} row "${String(item.label)}" targets "${cmd}" — a run/toggle command does not belong in this section`,
+        );
+      }
+    }
+  });
+
+  it('Dashboards section surfaces exactly the seven rows, Findings first', () => {
     const editor = providers.find((p) => p.viewId === SECTION_VIEW_IDS.editorDashboards)!;
     const labels = editor.getChildren().map((n) => String((n as { label?: unknown }).label ?? ''));
+    assert.strictEqual(labels[0], 'Findings Dashboard', 'Findings must be the first row');
     assert.ok(labels.includes('Lints Config'));
     assert.ok(labels.includes('Package Dashboard'));
     assert.ok(labels.includes('Code Health Dashboard'));
@@ -226,19 +276,28 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     assert.ok(labels.includes('Findings Dashboard'));
     // Analysis Optimizer, Upgrade Opportunities, and the Feature Inventory
     // export are reachable as tabs inside Rules & Tiers / Package Dashboard
-    // (PLAN_extension_ui_redesign.md §2.1) — no longer separate rows here.
-    // Command Catalog moved to the Settings panel's action rows.
+    // (PLAN_ext_ui_sidebar_reset.md §3.1) — no longer separate rows here.
     assert.ok(!labels.includes('Analysis Optimizer'));
     assert.ok(!labels.includes('Upgrade Opportunities'));
     assert.ok(!labels.includes('Full Opportunities Report'));
-    assert.ok(!labels.includes('Command Catalog'));
   });
 
-  // WP2, sidebar row collapse plan: the Settings panel's separate Tier and
-  // Lane rows are gone (see the "carries no setting-value rows"-style guards
-  // below) — both values now fold into the Dashboards section's "Lints
-  // Config" row description instead, so the information survives even though
-  // the two rows and the `saropaLints.setLane` QuickPick click target do not.
+  it('Command Catalog is reachable from Dashboards, not Actions', () => {
+    const editor = providers.find((p) => p.viewId === SECTION_VIEW_IDS.editorDashboards)!;
+    const items = editor.getChildren().map((n) => editor.getTreeItem(n as never));
+    assert.ok(
+      items.some((i) => i.command?.command === 'saropaLints.showCommandCatalog'),
+      'Command Catalog must be reachable from the Dashboards section',
+    );
+
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    const actionItems = actions.getChildren().map((n) => actions.getTreeItem(n as never));
+    assert.ok(
+      !actionItems.some((i) => i.command?.command === 'saropaLints.showCommandCatalog'),
+      'Command Catalog must not duplicate into Actions any more',
+    );
+  });
+
   it('Lints Config row carries tier and lane in its description', () => {
     sinon.stub(laneConfig, 'readRawLaneFromCustomConfig').returns('full');
     setTestConfig('saropaLints', 'tier', 'comprehensive');
@@ -264,18 +323,20 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     }
   });
 
-  it('Command Catalog is reachable from the Settings panel, not Dashboards', () => {
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const items = settings.getChildren().map((n) => settings.getTreeItem(n as never));
-    assert.ok(
-      items.some((i) => i.command?.command === 'saropaLints.showCommandCatalog'),
-      'Command Catalog must be reachable from the Settings/Quick Actions rows',
+  it('Actions section is exactly Run analysis / Fix stale ignores / Initialize-Update config', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    const items = actions.getChildren().map((n) => actions.getTreeItem(n as never));
+    const commands = items.map((i) => i.command?.command);
+    assert.deepStrictEqual(
+      commands,
+      ['saropaLints.runAnalysis', 'saropaLints.findAndFixStaleIgnores', 'saropaLints.initializeConfig'],
+      'Actions must be exactly these 3 rows, in this order',
     );
   });
 
   it('stale-ignore rows collapse to one merged find-and-fix row', () => {
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const items = settings.getChildren().map((n) => settings.getTreeItem(n as never));
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    const items = actions.getChildren().map((n) => actions.getTreeItem(n as never));
     assert.ok(
       !items.some((i) => i.command?.command === 'saropaLints.findStaleIgnores'),
       'the standalone Find row must be gone from the sidebar',
@@ -286,23 +347,21 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     );
   });
 
-  it('Settings panel diagnostics no longer duplicate Lint integration / Process health', () => {
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const items = settings.getChildren().map((n) => settings.getTreeItem(n as never));
+  it('Actions section no longer duplicates Lint integration / Process health', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    const items = actions.getChildren().map((n) => actions.getTreeItem(n as never));
     assert.ok(
       !items.some((i) => i.command?.command === 'saropaLints.enable' || i.command?.command === 'saropaLints.disable'),
-      'Lint integration now lives only in the Status section',
+      'Lint integration is not represented as a toggle row anywhere any more',
     );
     assert.ok(
       !items.some((i) => i.command?.command === 'saropaLints.showProcessHealth'),
-      'Process health is now reachable only via the Status section\'s Engines row',
+      'Process health is reachable only via the Status section\'s Engines row',
     );
   });
 
   it('Help commands are reachable from the Dashboards view "..." overflow menu', () => {
-    interface MenusShape { 'view/title': Array<{ command: string; when?: string }> }
-    const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json');
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as { contributes: { menus: MenusShape } };
+    const pkg = loadPackageJsonMenus();
     const dashboardsMenuCommands = pkg.contributes.menus['view/title']
       .filter((m) => m.when?.includes('view == saropaLints.editorDashboards'))
       .map((m) => m.command);
@@ -316,29 +375,33 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     }
   });
 
-  // 2026-09-04 sidebar row collapse (WP1): severity toggles were CUT from
-  // Settings — they duplicate boolean controls on the Rules & Tiers
-  // Automation tab (`severity.error|warning|info|hint`, same config keys,
-  // same behavior). Only the palette commands (`saropaLints.toggleSeverity*`)
-  // remain; the sidebar row and its `SeverityToggleItem` class are gone.
-  it('Settings section carries no severity toggles — they live on the Rules & Tiers Automation tab', () => {
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const items = (settings.getChildren() as Array<unknown>).map((n) => settings.getTreeItem(n as never));
-    const toggles = items.filter((item) => item.contextValue === 'severityToggle');
-    assert.strictEqual(toggles.length, 0, 'severity toggles must not render in Settings any more');
+  it('Run analysis is on the Dashboards view/title, not the old Actions view id', () => {
+    const pkg = loadPackageJsonMenus();
+    const runAnalysisEntries = pkg.contributes.menus['view/title'].filter((m) => m.command === 'saropaLints.runAnalysis');
     assert.ok(
-      !items.some((i) => /^saropaLints\.toggleSeverity/.test(i.command?.command ?? '')),
-      'no toggleSeverity* command should be reachable from a Settings row',
+      runAnalysisEntries.some((m) => m.when?.includes('view == saropaLints.editorDashboards')),
+      'Run analysis view/title icon must target the Dashboards view',
+    );
+    assert.ok(
+      !runAnalysisEntries.some((m) => m.when?.includes('view == saropaLints.settings')),
+      'Run analysis view/title icon must not still target the renamed-away saropaLints.settings id',
     );
   });
 
-  // Setting-value rows (run-after-config/dependency toggles, UI language,
-  // detected packages) were CUT in the same change: run-after-* and UI
-  // language now render on the Rules & Tiers Automation/Extension tabs;
-  // "Detected" duplicated the Package Dashboard's dependency list.
-  it('Settings section carries no setting-value rows', () => {
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const items = (settings.getChildren() as Array<unknown>).map((n) => settings.getTreeItem(n as never));
+  it('Actions section carries no severity toggles — they live on the Rules & Tiers Automation tab', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    const items = (actions.getChildren() as Array<unknown>).map((n) => actions.getTreeItem(n as never));
+    const toggles = items.filter((item) => item.contextValue === 'severityToggle');
+    assert.strictEqual(toggles.length, 0, 'severity toggles must not render in Actions any more');
+    assert.ok(
+      !items.some((i) => /^saropaLints\.toggleSeverity/.test(i.command?.command ?? '')),
+      'no toggleSeverity* command should be reachable from an Actions row',
+    );
+  });
+
+  it('Actions section carries no setting-value rows', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    const items = (actions.getChildren() as Array<unknown>).map((n) => actions.getTreeItem(n as never));
     const removedCommands = [
       'saropaLints.toggleRunAnalysisAfterConfigChange',
       'saropaLints.toggleRunAnalysisAfterDependencyChange',
@@ -348,69 +411,36 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     for (const cmd of removedCommands) {
       assert.ok(
         !items.some((i) => i.command?.command === cmd),
-        `${cmd} must not be a Settings row any more`,
+        `${cmd} must not be an Actions row any more`,
       );
     }
   });
 
-  // Triage rows (volume groups, critical group, zero-issue/override counts,
-  // stylistic group) were CUT: they duplicated the Findings Dashboard's
-  // top-rules triage table and Errors KPI card.
-  it('Settings section carries no triage rows', () => {
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const rows = settings.getChildren() as Array<{ kind?: unknown }>;
+  it('Actions section carries no triage rows', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    const rows = actions.getChildren() as Array<{ kind?: unknown }>;
     assert.ok(
       !rows.some((n) => typeof n.kind === 'string' && n.kind.startsWith('triage')),
-      'no triage-kind node should render inside the Settings panel',
+      'no triage-kind node should render inside the Actions panel',
     );
   });
 
-  // The Migrate row is a one-shot action: it should only appear while legacy
-  // plugin-block config keys remain to be moved (see buildActionNodes'
-  // dry-run probe in configTree.ts). Two cases: absent by default (stubbed
-  // via beforeEach), present when the probe reports moved keys.
-  it('Migrate row is absent when no legacy keys exist', () => {
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const items = (settings.getChildren() as Array<unknown>).map((n) => settings.getTreeItem(n as never));
-    assert.ok(
-      !items.some((i) => i.command?.command === 'saropaLints.migrateConfig'),
-      'Migrate row must not render when the dry-run probe finds nothing to move',
-    );
+  // The Migrate row moved off the sidebar entirely in P1/P2 — it is now a
+  // conditional button on the Lints Config › Config file tab
+  // (`rulePacksWebviewProvider.ts`'s `_buildMigrateCard`), not a sidebar row
+  // in any state.
+  it('Migrate config keys never renders as a sidebar row, in Actions or anywhere else', () => {
+    for (const provider of providers) {
+      const items = (provider.getChildren() as Array<unknown>).map((n) => provider.getTreeItem(n as never));
+      assert.ok(
+        !items.some((i) => i.command?.command === 'saropaLints.migrateConfig'),
+        `${provider.viewId} must not surface saropaLints.migrateConfig as a row`,
+      );
+    }
   });
 
-  it('Migrate row is present when legacy keys need moving', () => {
-    (migrateConfig.migrateConfigKeys as sinon.SinonStub).returns({ moved: ['max_issues'], skipped: [] });
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const items = (settings.getChildren() as Array<unknown>).map((n) => settings.getTreeItem(n as never));
-    assert.ok(
-      items.some((i) => i.command?.command === 'saropaLints.migrateConfig'),
-      'Migrate row must render when the dry-run probe finds legacy keys to move',
-    );
-  });
-
-  // Skipped-only state: keys already exist in the custom file but their
-  // legacy copies still sit in the plugins block causing unsupported_option
-  // warnings. The non-dry-run migration cleans those up (migrateConfig.ts
-  // line 128-130), so the row must appear to give the user a path to it.
-  it('Migrate row is present when legacy keys are skipped (already in custom file)', () => {
-    (migrateConfig.migrateConfigKeys as sinon.SinonStub).returns({ moved: [], skipped: ['log_level'] });
-    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
-    const items = (settings.getChildren() as Array<unknown>).map((n) => settings.getTreeItem(n as never));
-    assert.ok(
-      items.some((i) => i.command?.command === 'saropaLints.migrateConfig'),
-      'Migrate row must render when skipped-only legacy keys remain in the plugins block',
-    );
-  });
-
-  // Pin removal of the composite analyzer plugin scaffold row.
-  // The action targets a tiny audience (teams shipping their own custom
-  // analyzer rules) and the term is jargon for the typical Saropa user.
-  // It must remain reachable only via the command palette, the command
-  // catalog, the CLI flag, and the guide — never as a sidebar row.
-  // Asserting on the command id (not the label) keeps the guard robust
-  // against future copy edits.
-  it('Settings section does not surface the composite analyzer plugin scaffold', () => {
-    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
+  it('Actions section does not surface the composite analyzer plugin scaffold', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
     for (const node of actions.getChildren()) {
       const item = actions.getTreeItem(node as never);
       assert.notStrictEqual(
@@ -421,13 +451,8 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     }
   });
 
-  // The findings dashboard is reachable from the Dashboards section
-  // ("Findings Dashboard" → openViolationsWideReport). A second row in the
-  // merged Settings panel that opened the same dashboard was redundant, so it
-  // was removed. Pin its absence so a future copy edit does not reintroduce the
-  // duplicate.
-  it('Settings section does not duplicate the findings dashboard', () => {
-    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
+  it('Actions section does not duplicate the findings dashboard', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
     for (const node of actions.getChildren()) {
       const item = actions.getTreeItem(node as never);
       assert.notStrictEqual(
@@ -436,6 +461,104 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
         'findings dashboard is already in the Dashboards section — no Actions-panel duplicate',
       );
     }
+  });
+
+  // TASK A regression suite: pins the bugfix that the Code Health / Project
+  // Map row descriptions are LIVE (PLAN_ext_ui_sidebar_reset.md §5 P1), not
+  // the hardcoded static strings a previous pass left in place. Each test
+  // injects a specific payload/mtime and asserts that EXACT value shows up
+  // in the rendered description — a bare "description is non-empty" check
+  // would have passed on the static-string bug just as well, so these assert
+  // real values flowing through.
+  describe('Code Health / Project Map row descriptions are live (TASK A bugfix)', () => {
+    function findEditorRow(label: string, allProviders: FlatSectionProvider[]): { description?: unknown } {
+      const editor = allProviders.find((p) => p.viewId === SECTION_VIEW_IDS.editorDashboards)!;
+      const items = editor.getChildren().map((n) => editor.getTreeItem(n as never));
+      const row = items.find((i) => (i as { label?: unknown }).label === label);
+      assert.ok(row, `"${label}" row must exist in Dashboards`);
+      return row! as { description?: unknown };
+    }
+
+    it('Code Health description shows the injected grade and score, gate passing', () => {
+      sinon.stub(projectVibrancyReportView, 'getLastProjectVibrancyPayload').returns({
+        summary: { averageGrade: 'B', averageScore: 82.4 },
+        gates: { pass: true },
+      } as never);
+      providers = createSidebarSectionProviders(memento, configProvider);
+      const description = String(findEditorRow('Code Health Dashboard', providers).description ?? '');
+      assert.ok(description.includes('B'), `description "${description}" must include the injected grade`);
+      assert.ok(description.includes('82'), `description "${description}" must include the injected score`);
+      assert.ok(
+        !/gate/i.test(description),
+        `description "${description}" must not claim a failing gate when gates.pass is true`,
+      );
+      // Guards against reverting to the old static string this bugfix removed.
+      assert.ok(!description.includes('Function-level code health'), 'must not be the old static description');
+    });
+
+    it('Code Health description renders the gate-failing variant when the injected payload says the gate failed', () => {
+      sinon.stub(projectVibrancyReportView, 'getLastProjectVibrancyPayload').returns({
+        summary: { averageGrade: 'D', averageScore: 41 },
+        gates: { pass: false, violations: [{ metric: 'averageScore', message: 'below threshold' } as never] },
+      } as never);
+      providers = createSidebarSectionProviders(memento, configProvider);
+      const description = String(findEditorRow('Code Health Dashboard', providers).description ?? '');
+      assert.ok(description.includes('D'), `description "${description}" must include the injected grade`);
+      assert.ok(description.includes('41'), `description "${description}" must include the injected score`);
+      assert.ok(/gate/i.test(description), `description "${description}" must call out the failing gate`);
+    });
+
+    it('Code Health description degrades to "never scanned" text when no scan has run this session', () => {
+      sinon.stub(projectVibrancyReportView, 'getLastProjectVibrancyPayload').returns(undefined);
+      providers = createSidebarSectionProviders(memento, configProvider);
+      const description = String(findEditorRow('Code Health Dashboard', providers).description ?? '');
+      assert.strictEqual(description, 'Run Code Health to see your score');
+      assert.ok(!description.includes('Function-level code health'), 'must not be the old static description');
+    });
+
+    // `fs.statSync`'s property descriptor is non-configurable/non-writable on
+    // this Node version, so sinon cannot stub it directly (verified: sinon
+    // throws "Cannot stub properties that are immutable"). Real files against
+    // a real scratch directory exercise the exact same `fs.statSync` code
+    // path without needing to replace the function.
+    let pmTmpRoot: string | undefined;
+
+    afterEach(() => {
+      if (pmTmpRoot) {
+        fs.rmSync(pmTmpRoot, { recursive: true, force: true });
+        pmTmpRoot = undefined;
+      }
+    });
+
+    it('Project Map description shows an age derived from the injected report mtime', () => {
+      pmTmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-pm-mtime-'));
+      const healthDir = path.join(pmTmpRoot, 'reports', '.saropa_lints', 'health');
+      fs.mkdirSync(healthDir, { recursive: true });
+      const indexPath = path.join(healthDir, 'index.html');
+      fs.writeFileSync(indexPath, '<html></html>');
+      const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
+      fs.utimesSync(indexPath, fiveMinAgo, fiveMinAgo);
+      // Re-point getProjectRoot (already stubbed in the outer beforeEach) at
+      // the real scratch root so getLastProjectMapMtime's statSync call
+      // resolves to the fixture file above rather than the fake '/fake/root'.
+      (projectRoot.getProjectRoot as sinon.SinonStub).returns(pmTmpRoot);
+      providers = createSidebarSectionProviders(memento, configProvider);
+      const description = String(findEditorRow('Saropa Project Map', providers).description ?? '');
+      assert.ok(description.includes('5 min ago'), `description "${description}" must include the injected mtime's age`);
+      assert.ok(
+        !description.includes('Size · dead-weight · complexity · hot spots'),
+        'must not be the old static description',
+      );
+    });
+
+    it('Project Map description renders the "never scanned" text when no report file exists', () => {
+      // The outer beforeEach's getProjectRoot stub returns '/fake/root', a
+      // path that genuinely does not exist — statSync on it throws ENOENT for
+      // real, no stubbing of fs itself required.
+      providers = createSidebarSectionProviders(memento, configProvider);
+      const description = String(findEditorRow('Saropa Project Map', providers).description ?? '');
+      assert.strictEqual(description, 'Run Project Map to see size & hot spots');
+    });
   });
 
   it('Config tree does not surface the composite analyzer plugin scaffold', () => {

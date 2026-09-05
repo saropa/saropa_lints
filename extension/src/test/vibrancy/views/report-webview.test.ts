@@ -11,6 +11,12 @@ import * as vscode from 'vscode';
 import { VibrancyResult } from '../../../vibrancy/types';
 import { ReportOptions } from '../../../vibrancy/views/report-html';
 import { VibrancyReportPanel } from '../../../vibrancy/views/report-webview';
+// Imported as a namespace (not a named import) so `sinon.stub` can replace the
+// exported function on the actual module object that report-webview.ts reads
+// from at call time (TS compiles named imports to property access under
+// `module: commonjs`, so both this test file and report-webview.ts share one
+// module object).
+import * as featureInventoryExport from '../../../vibrancy/services/feature-inventory-export';
 import { createdPanels, messageMock, mockWorkspaceFolders, resetMocks } from '../vscode-mock';
 
 function makeResult(
@@ -234,5 +240,33 @@ describe('report-webview message handling', () => {
         assert.ok(writtenFiles.length > 0);
         assert.ok(writtenFiles[0].path.endsWith('pubspec_upgrade.json'));
         assert.ok(messageMock.infos.some(msg => msg.includes('Saved report JSON')));
+    });
+
+    it('kicks off the Full report build on the very first open (BUG 1 regression)', async () => {
+        const rootUri = vscode.Uri.file('D:/workspace');
+        mockWorkspaceFolders.value = [{ uri: rootUri }];
+
+        /* BUG 1: `_updateContent` used to build `this._options` as a single object literal whose
+           `fullReportBodyHtml: this._getFullReportEmbed()` property ran INSIDE the literal, so
+           `_getFullReportEmbed` (and the `_buildFeatureInventoryReport` it kicks off) read
+           `this._options` while it was still the OLD value -- `null` on the very first open. That
+           null short-circuited `_buildFeatureInventoryReport`'s `if (!root || !options) return;`
+           guard before it ever called the actual scan, so `buildFeatureInventoryReport` below was
+           never invoked and the tab was stuck on the loading placeholder forever. */
+        const buildStub = sinon.stub(featureInventoryExport, 'buildFeatureInventoryReport')
+            .resolves({ generatedAt: 't', extensionVersion: 'v', groups: [], stats: {} } as any);
+
+        VibrancyReportPanel.createOrShow(makeOptions('file:///workspace/pubspec.yaml'));
+
+        // Flush the microtask queue so the fire-and-forget `_buildFeatureInventoryReport()` call
+        // (kicked off synchronously inside `_updateContent`) gets a chance to run.
+        await Promise.resolve();
+        await Promise.resolve();
+
+        assert.strictEqual(
+            buildStub.called, true,
+            'buildFeatureInventoryReport must be invoked on the first _updateContent, not skipped ' +
+            'because this._options was still null when _getFullReportEmbed read it',
+        );
     });
 });

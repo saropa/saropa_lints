@@ -1863,6 +1863,13 @@ export function reportScriptPart9(): string {
                     detailPane.scrollTop = 0;
                 }
             } else if (msg.type === 'selectPackage' && msg.package) {
+                /* The docked detail pane lives inside the Overview tab's markup. A selection can
+                   arrive while a different tab (e.g. the embedded Upgrades tab's own "Open in
+                   dashboard" button) is active, so switch back to Overview first -- otherwise the
+                   pane opens behind a hidden panel and the click looks like it did nothing.
+                   saropaSelectPkgTab is set by packages-tabs.ts's own script; guarded because
+                   this file is also reused by pages that never load that script (defensive). */
+                if (window.saropaSelectPkgTab) { window.saropaSelectPkgTab('overview'); }
                 openDetailPane(msg.package);
             } else if (msg.type === 'scanStarted') {
                 showScanProgress();

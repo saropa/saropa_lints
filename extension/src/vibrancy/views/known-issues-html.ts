@@ -11,6 +11,17 @@ import { createWebviewCspNonce, escapeHtml } from './html-utils';
 import { getReportStyles } from './report-styles';
 import { getKnownIssuesScript } from './known-issues-script';
 import { getDashboardChromeStyles } from '../../views/dashboardChromeStyles';
+// Embed-only (PLAN_ext_ui_package_tabs.md §4 Tab 5): the standalone panel pulls in the FULL
+// getDashboardChromeStyles() bundle, but report-html.ts deliberately does NOT compose that whole
+// bundle (see report-styles.ts's Pass 1 comment) -- chromeMicroAndMotion() inside it would repaint
+// the embedded Upgrades tab's <code class="opp-chip"> elements in the editor monospace font, an
+// unaudited side effect out of scope for either tab's plan. getEmbeddedBodyHtml therefore composes
+// only the three component bands its OWN markup (.toolbar-band/.seg, .kpi-card, .chip-strip)
+// actually needs, plus chromeReducedMotion() for the .kpi-card a11y guarantee.
+import {
+    chromeToolbarAndButtons, chromeKpiCards, chromeChipStrip,
+} from '../../views/dashboardChromeStylesComponents';
+import { chromeReducedMotion } from '../../views/dashboardChromeStylesSystem';
 import {
     buildDashboardHero,
     buildDocumentTitle,
@@ -82,6 +93,67 @@ export function buildKnownIssuesHtml(): string {
 }
 
 /**
+ * Body-only HTML (no `<!DOCTYPE>`/`<html>`/`<head>`/nonce-bearing tags, and no
+ * `acquireVsCodeApi()` call) for embedding inside the Package Dashboard's "Known issues" tab
+ * (PLAN_ext_ui_package_tabs.md §4 Tab 5), following the same `getEmbeddedBodyHtml` pattern
+ * `opportunities-html.ts` (Tab 3) and `feature-inventory-html.ts` (Tab 4) already proved.
+ *
+ * Two things this tab needs that the earlier two did not:
+ *   - The data is a static, synchronous registry (`allKnownIssues()`) with no project scan, so
+ *     (unlike Tabs 3/4) `report-webview.ts` never needs to lazily build-and-cache anything here —
+ *     this function can render the real content on the very first paint.
+ *   - Every id the standalone panel uses (`search-input`, `pkg-body`, `visible-count`, ...) is
+ *     generic enough to collide with the Package Dashboard's OWN packages-table markup once both
+ *     documents' HTML coexists in one DOM. Every builder below takes the `'ki-'` idPrefix (see
+ *     {@link buildSummaryCards}) to sidestep that; the hero, skip-link, and keyboard-shortcuts
+ *     overlay are omitted entirely rather than prefixed, because the host dashboard already
+ *     supplies its own equivalents (title/gauge header, `#dashFullWidthToggle`, `?`-triggered
+ *     shortcuts overlay) and a second copy of any of those would be visually redundant or, for
+ *     `#dashFullWidthToggle` specifically, a genuine duplicate-id bug.
+ *
+ * No `handleEmbeddedMessage` companion is exported here: the only host round-trip this tab needs
+ * (persisting recent searches to `workspaceState`) reuses the existing `saveKnownIssuesRecent` /
+ * `hydrateKnownIssuesRecent` message names verbatim -- see `report-webview.ts`'s message switch
+ * and `getKnownIssuesEmbedScript()` in `known-issues-script.ts` for the wiring.
+ */
+export function getEmbeddedBodyHtml(): string {
+    const issues = Array.from(allKnownIssues().values()).flat();
+    const withReplacement = issues.filter(i => i.replacement).length;
+    const idPrefix = 'ki-';
+    return `<div class="ki-embed-body">
+    <div id="ki-announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+    <section class="ki-controls" aria-label="Summary and filters">
+    ${buildSummaryCards(issues.length, withReplacement, idPrefix)}
+    ${buildToolbar(idPrefix)}
+    ${buildChipStrip()}
+    </section>
+    <main id="ki-main">
+    ${buildTable(issues, idPrefix)}
+    ${buildEmptyState()}
+    </main>
+</div>`;
+}
+
+/**
+ * CSS for {@link getEmbeddedBodyHtml}. Kept separate from `getEmbeddedBodyHtml` itself (rather
+ * than folded into one function) so `report-html.ts` can put it in its single shared `<style>`
+ * block while the HTML goes in `<body>`, matching how `getOpportunitiesStyles()` /
+ * `getFeatureInventoryStyles()` are split from their tabs' `getEmbeddedBodyHtml`. See the import
+ * comment above for exactly which chrome bands this composes and why not the full bundle.
+ */
+export function getKnownIssuesEmbedStyles(): string {
+    return (
+        chromeToolbarAndButtons()
+        + chromeKpiCards()
+        + chromeChipStrip()
+        + chromeReducedMotion()
+        // '.ki-embed-body ' scopes .search-clear so it cannot repaint the Package Dashboard's
+        // OWN table search-clear button -- see getExtraStyles's doc comment.
+        + getExtraStyles('.ki-embed-body ')
+    );
+}
+
+/**
  * §8.5 / §14.10 — Active filter chip strip. Hidden by default; the script
  * reveals it and populates chips when filter state diverges from defaults
  * (both replacement buckets pressed). Each chip has a remove [×]; the
@@ -109,7 +181,14 @@ function buildEmptyState(): string {
     </div>`;
 }
 
-function buildSummaryCards(total: number, withReplacement: number): string {
+/**
+ * @param idPrefix Prepended to every id this function emits. Empty string (the default) for the
+ * standalone panel, keeping its ids exactly as they were before the embed existed (test-safe --
+ * `known-issues-html.test.ts` asserts on the bare ids). `'ki-'` for {@link getEmbeddedBodyHtml},
+ * so `#visible-count` cannot collide with the Package Dashboard's own package-table ids when both
+ * documents' markup coexist in one DOM (PLAN_ext_ui_package_tabs.md §9 "DOM id collisions").
+ */
+function buildSummaryCards(total: number, withReplacement: number, idPrefix = ''): string {
     /* KPI cards as preset filters (guideline §4.2 / §14.8): clicking a card sets the
        replacement filter to the matching state. Showing & Total reset; Has & No drive
        the filter to "has" / "no". The filter element used to be a binary checkbox; it
@@ -118,7 +197,7 @@ function buildSummaryCards(total: number, withReplacement: number): string {
         <div class="summary-card kpi-card interactive" role="button" tabindex="0"
              data-kpi="visible" data-kpi-action="reset" title="Click to clear filters">
             <div class="kpi-k">Showing</div>
-            <div class="kpi-v" id="visible-count">${total}</div>
+            <div class="kpi-v" id="${idPrefix}visible-count">${total}</div>
         </div>
         <div class="summary-card kpi-card interactive ki-metric-total" role="button" tabindex="0"
              data-kpi="total" data-kpi-action="reset" title="Click to clear filters">
@@ -138,27 +217,28 @@ function buildSummaryCards(total: number, withReplacement: number): string {
     </div>`;
 }
 
-function buildToolbar(): string {
+/** @param idPrefix see {@link buildSummaryCards}. */
+function buildToolbar(idPrefix = ''): string {
     // Search field wrapped so we can absolutely position a clear (X) button inside it.
     // The replacement filter is now a tri-state segmented control (`.seg`) instead of a
     // binary checkbox so the four KPI cards each map to a distinct filter state.
     return `<div class="known-issues-toolbar toolbar-band">
         <div class="toolbar-row">
             <div class="search-wrapper">
-                <label class="sr-only" for="search-input">Search packages</label>
-                <input id="search-input" type="text"
+                <label class="sr-only" for="${idPrefix}search-input">Search packages</label>
+                <input id="${idPrefix}search-input" type="text" class="ki-search-field"
                     placeholder="Search packages..." autocomplete="off">
-                <button type="button" id="search-clear" class="search-clear"
+                <button type="button" id="${idPrefix}search-clear" class="search-clear"
                     title="Clear search" aria-label="Clear search" hidden>&times;</button>
                 <!-- §8.5.2 — recent-searches popover (workspace-persisted via host). -->
-                <div id="recent-searches" class="recent-searches" hidden>
+                <div id="${idPrefix}recent-searches" class="recent-searches" hidden>
                     <div class="recent-searches-head">
                         <span class="recent-searches-title">Recent searches</span>
-                        <button type="button" id="recent-searches-clear"
+                        <button type="button" id="${idPrefix}recent-searches-clear"
                             class="recent-searches-clear-all"
                             title="Clear all recent searches">Clear</button>
                     </div>
-                    <ul id="recent-searches-list" class="recent-searches-list"
+                    <ul id="${idPrefix}recent-searches-list" class="recent-searches-list"
                         role="listbox" aria-label="Recent searches"></ul>
                 </div>
             </div>
@@ -173,7 +253,8 @@ function buildToolbar(): string {
     </div>`;
 }
 
-function buildTable(issues: KnownIssue[]): string {
+/** @param idPrefix see {@link buildSummaryCards}. */
+function buildTable(issues: KnownIssue[], idPrefix = ''): string {
     return `<div class="table-scroll"><table>
         <thead><tr>
             <th data-col="name">Package<span class="sort-arrow"></span></th>
@@ -181,7 +262,7 @@ function buildTable(issues: KnownIssue[]): string {
             <th data-col="replacement">Replacement<span class="sort-arrow"></span></th>
             <th data-col="migration">Migration<span class="sort-arrow"></span></th>
         </tr></thead>
-        <tbody id="pkg-body">
+        <tbody id="${idPrefix}pkg-body">
             ${issues.map(buildRow).join('\n')}
         </tbody>
     </table></div>`;
@@ -226,7 +307,18 @@ function formatReplacement(text: string): string {
     return escapeHtml(text);
 }
 
-function getExtraStyles(): string {
+/**
+ * @param scopeClass Descendant-selector prefix (e.g. `'.ki-embed-body '`, WITH the trailing
+ * space) applied only to `.search-clear` below. Empty string (the default) for the standalone
+ * panel, which has no ancestor to scope by and does not need one: it is the only document that
+ * ever loads its own styles. The embed passes `'.ki-embed-body '` because `.search-clear` is
+ * ALSO report-styles-parts.ts's class name for the Package Dashboard's own table search field,
+ * with different metrics (16px vs this file's 18px) -- without the scope prefix, whichever rule
+ * is concatenated last into the shared `<style>` block would win for BOTH search fields, silently
+ * resizing the host dashboard's clear button. Every other selector here is Known-Issues-specific
+ * (verified against report-styles-parts.ts) and does not need the same treatment.
+ */
+export function getExtraStyles(scopeClass = ''): string {
     return `
         .ki-metric-total .count { color: var(--vscode-foreground); }
         .ki-metric-positive .count { color: var(--vscode-testing-iconPassed); }
@@ -245,7 +337,11 @@ function getExtraStyles(): string {
             max-width: 400px;
             align-items: center;
         }
-        #search-input {
+        /* Class-based (not id-based): the embed renders this input with a 'ki-'-prefixed id
+           (see buildToolbar's idPrefix), so a plain #search-input rule would silently stop
+           matching there. The class is present on the input in both the standalone and embedded
+           markup regardless of id prefix. */
+        .ki-search-field {
             flex: 1; padding: 6px 28px 6px 10px; /* right pad for clear (X) */
             font-size: 0.95em;
             color: var(--vscode-input-foreground);
@@ -253,13 +349,13 @@ function getExtraStyles(): string {
             border: 1px solid var(--vscode-input-border);
             border-radius: 4px; outline: none;
         }
-        #search-input:focus {
+        .ki-search-field:focus {
             border-color: var(--vscode-focusBorder);
         }
         /* Clear (X) button lives inside the input via absolute positioning.
            Hidden by default via [hidden]; known-issues-script.ts toggles it
            when the input value is non-empty after trim. */
-        .search-clear {
+        ${scopeClass}.search-clear {
             position: absolute;
             /* §23.1 — clear-X stays at the trailing edge of the input;
                LTR puts it on the right (end-of-line), RTL puts it on
@@ -279,7 +375,7 @@ function getExtraStyles(): string {
             cursor: pointer;
             border-radius: 2px;
         }
-        .search-clear:hover {
+        ${scopeClass}.search-clear:hover {
             opacity: 1;
             background: var(--vscode-toolbar-hoverBackground);
         }

@@ -16,7 +16,8 @@
 import * as vscode from 'vscode';
 import { escapeHtml, jsonForScriptBlock } from '../vibrancy/views/html-utils';
 import { getDashboardChromeStyles } from './dashboardChromeStyles';
-import type { ProjectMapParts } from './projectMapView';
+import type { ProjectMapParts, ProjectMapTotals } from './projectMapView';
+import { reportJsonColumnsForScript } from './projectMapReports';
 import { l10n } from '../i18n/runtime';
 // Project Map already ships working digit shortcuts (1-2, see pmShellScript's keydown handler
 // below) but never surfaced the shared '?' overlay that Findings/Packages/Rules & Tiers use —
@@ -37,6 +38,12 @@ function shellStrings(): Record<string, string> {
     restart: l10n('projectMap.scan.restart'),
     stopped: l10n('projectMap.scan.stopped'),
     elapsedPrefix: l10n('projectMap.scan.elapsed'),
+    // WP1 progress bar label. Contains {percent}/{done}/{total} placeholders
+    // the client script fills in per-tick (see handleProgressEvent above) —
+    // interpolation happens client-side rather than resolving three separate
+    // l10n() calls per tick, but the TEMPLATE itself still comes from the
+    // catalog (never concatenated English fragments), per the i18n rule.
+    progressLabel: l10n('projectMap.scan.progress'),
     running: l10n('projectMap.reports.running'),
     exitOk: l10n('projectMap.reports.exitOk'),
     exitFail: l10n('projectMap.reports.exitFail'),
@@ -45,11 +52,21 @@ function shellStrings(): Record<string, string> {
   };
 }
 
-/** Full composite document: chrome CSS + tab bar + the two panes + the one shared script. */
+/**
+ * Full composite document: chrome CSS + tab bar + the two panes + the one
+ * shared script. [heroKpis], added for WP5 (`plans/PLAN_ext_ui_dart_deferred.md`),
+ * is the last successful scan's size totals — cached across panel/window
+ * reopens (see `getCachedProjectMapTotals` in `projectMapView.ts`) so the
+ * hero shows a real Files/Lines/Size readout immediately instead of nothing
+ * until a fresh scan finishes. Undefined before the very first scan ever
+ * completes for this workspace, in which case the hero renders exactly as it
+ * did before this feature existed.
+ */
 export function buildShellHtml(
   webview: vscode.Webview,
   mapPaneHtml: string,
   reportsPaneHtml: string,
+  heroKpis?: ProjectMapTotals,
 ): string {
   const cspSource = webview.cspSource;
   // 'unsafe-inline' (not a nonce) for style/script: the embedded Project Map
@@ -73,6 +90,7 @@ export function buildShellHtml(
     <h1>${escapeHtml(l10n('projectMap.panelTitle'))}</h1>
     <p class="status-line">${buildKeyboardShortcutsButton()}</p>
   </div>
+  ${heroKpis ? buildHeroKpiStrip(heroKpis) : ''}
 </header>
 <nav class="pm-tabs" role="tablist" aria-label="${escapeHtml(l10n('projectMap.tabs.aria'))}">
   <button type="button" class="pm-tab active" id="pmTabBtnMap" data-tab="map" role="tab" aria-selected="true" aria-controls="pmTabMap">${escapeHtml(l10n('projectMap.tabs.map'))}</button>
@@ -92,10 +110,54 @@ ${buildKeyboardShortcutsOverlay([
 </html>`;
 }
 
-/** The Map tab's content while a scan is in flight: spinner, elapsed timer, live activity log. */
+/**
+ * WP5 hero KPI strip: Files / Lines / Size, read from the last known scan
+ * totals (fresh or cached — [buildShellHtml]'s caller decides which). Kept
+ * to 3 tiles (not all 5 `ProjectMapTotals` fields) because the hero is
+ * visible on BOTH tabs at all times — dead-file/hotspot counts are already
+ * one click away in the Map tab's own KPI row (`health_html_template.dart`),
+ * so repeating them here would just be noise in a header that's always on
+ * screen.
+ */
+function buildHeroKpiStrip(totals: ProjectMapTotals): string {
+  return `<dl class="hero-kpis">
+    <div class="hero-kpi"><dt>${escapeHtml(l10n('projectMap.hero.files'))}</dt><dd>${totals.fileCount.toLocaleString()}</dd></div>
+    <div class="hero-kpi"><dt>${escapeHtml(l10n('projectMap.hero.lines'))}</dt><dd>${totals.loc.toLocaleString()}</dd></div>
+    <div class="hero-kpi"><dt>${escapeHtml(l10n('projectMap.hero.size'))}</dt><dd>${humanBytes(totals.bytes)}</dd></div>
+  </dl>`;
+}
+
+/**
+ * Byte formatter for the hero strip. Deliberately a small local copy rather
+ * than importing `health_html_template.dart`'s identical JS `humanBytes` (that
+ * one lives inside a Dart-generated string, not a shared TS module) or reaching
+ * into an unrelated vibrancy formatter — this is genuinely the only place in
+ * the Project Map SHELL (as opposed to the embedded report) that needs it.
+ */
+function humanBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/**
+ * The Map tab's content while a scan is in flight: spinner, elapsed timer,
+ * live activity log, and (WP1) a percentage progress bar. The bar starts
+ * hidden — it only appears once the CLI actually emits a `phase`/`tick`
+ * event, which never happens against a published engine that predates
+ * `--progress` (see projectHealthCliRunner.ts doc comment) — so an old
+ * engine degrades to exactly the previous elapsed-timer-only experience
+ * instead of showing a permanently-stuck 0% bar.
+ */
 export function buildScanningMapPaneHtml(): string {
   return `<div class="pm-scan" id="pmScan">
   <p class="status-line"><span class="spinner" aria-hidden="true"></span><span>${escapeHtml(l10n('projectMap.scan.subtitle'))}</span><span class="dot">·</span><span>${escapeHtml(l10n('projectMap.scan.elapsed'))} <span id="pmScanElapsed">0s</span></span></p>
+  <div class="pm-progress" id="pmProgressWrap" hidden>
+    <div class="pm-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="pmProgressBar">
+      <div class="pm-progress-fill" id="pmProgressFill"></div>
+    </div>
+    <p class="hint" id="pmProgressLabel"></p>
+  </div>
   <div class="controls">
     <button type="button" class="btn danger" id="pmCancelBtn">${escapeHtml(l10n('projectMap.scan.cancel'))}</button>
     <button type="button" class="btn" id="pmRestartBtn">${escapeHtml(l10n('projectMap.scan.restart'))}</button>
@@ -124,6 +186,10 @@ ${parts.scriptHtml}`;
 /** Chrome-adjacent styles this shell adds on top of `dashboardChromeStyles` (tabs, scan state, report cards). */
 function pmShellStyles(): string {
   return `
+.hero-kpis { display: flex; gap: var(--space-5); margin: var(--space-2) 0 0; padding: 0; }
+.hero-kpi { display: flex; flex-direction: column; gap: 2px; }
+.hero-kpi dt { margin: 0; font-size: var(--text-caption); color: var(--muted); }
+.hero-kpi dd { margin: 0; font-size: var(--text-h3); font-weight: 700; }
 .pm-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: var(--space-4); }
 .pm-tab {
   padding: 8px 14px;
@@ -137,6 +203,24 @@ function pmShellStyles(): string {
 .pm-tab.active { color: var(--vscode-foreground); border-bottom-color: var(--vscode-focusBorder); }
 .pm-tab:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: -2px; }
 .pm-tab-panel[hidden] { display: none; }
+.pm-progress { margin: var(--space-3) 0; }
+.pm-progress-track {
+  /* Track uses the neutral border color (not the accent at reduced opacity --
+     the CSS opacity property on this element would also fade the fill child,
+     since opacity creates one shared stacking context for the whole subtree). */
+  width: 100%; height: 8px;
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.pm-progress-fill {
+  height: 100%; width: 0%;
+  background: var(--vscode-progressBar-background, #0e70c0);
+  /* Smooths the bar between tick events (which arrive once per file, not
+     once per frame) instead of visibly snapping on every file scanned. */
+  transition: width 0.2s ease-out;
+}
+#pmProgressLabel { margin: var(--space-1) 0 0; }
 .pm-scan .controls { display: flex; gap: var(--space-2); margin: var(--space-3) 0 var(--space-5); }
 .pm-scan-log h3 { font-size: var(--text-h3); margin: 0 0 var(--space-2); }
 .spinner {
@@ -182,9 +266,15 @@ function pmShellStyles(): string {
  */
 function pmShellScript(): string {
   const strings = jsonForScriptBlock(shellStrings());
+  // WP2: `{reportId: [field,...]}` for every JSON-enabled report card, so the
+  // generic client script below can build a typed row's cells in the SAME
+  // order as the `<th>` headers `buildTypedReportTable` rendered host-side,
+  // without hardcoding per-tool field names in this script.
+  const reportColumns = jsonForScriptBlock(reportJsonColumnsForScript());
   return `
 (function(){
   var S = ${strings};
+  var RC = ${reportColumns};
   var api = acquireVsCodeApi();
   window.acquireVsCodeApi = function () { return api; };
 
@@ -250,17 +340,56 @@ function pmShellScript(): string {
     var wrap = document.getElementById('report-output-wrap-' + reportId);
     if (!wrap) return;
     wrap.hidden = false;
-    reportRowCounts[reportId] = (reportRowCounts[reportId] || 0) + 1;
-    var tr = document.createElement('tr');
-    var tdN = document.createElement('td');
-    tdN.className = 'num';
-    tdN.textContent = String(reportRowCounts[reportId]);
-    var tdT = document.createElement('td');
-    tdT.textContent = text;
-    tr.appendChild(tdN); tr.appendChild(tdT);
     var body = document.getElementById('report-output-' + reportId);
+    var tr = document.createElement('tr');
+    var cols = RC[reportId];
+    if (cols) {
+      // WP2 fallback path (postJsonReportRows in projectMapReports.ts): a
+      // supportsJson CLI's output failed to JSON.parse (older engine or a
+      // real crash). This card's table has N typed columns, not the generic
+      // num+text pair, so a plain 2-cell row would visually misalign under
+      // those headers -- span the whole row instead so the raw text is still
+      // fully readable (never a silently truncated/misaligned failure).
+      var td = document.createElement('td');
+      td.colSpan = cols.length;
+      td.textContent = text;
+      tr.appendChild(td);
+    } else {
+      reportRowCounts[reportId] = (reportRowCounts[reportId] || 0) + 1;
+      var tdN = document.createElement('td');
+      tdN.className = 'num';
+      tdN.textContent = String(reportRowCounts[reportId]);
+      var tdT = document.createElement('td');
+      tdT.textContent = text;
+      tr.appendChild(tdN); tr.appendChild(tdT);
+    }
     body.appendChild(tr);
     wrap.scrollTop = wrap.scrollHeight;
+  }
+  // WP2: renders a JSON-enabled CLI's parsed rows into its typed table, one
+  // <tr> per row with cells pulled from RC[reportId] in header order. Runs
+  // once per report run (on 'reportRows', after the process exits) rather
+  // than incrementally, since the whole array only exists once the CLI's
+  // single JSON document has fully arrived.
+  function addReportRows(reportId, rows){
+    var wrap = document.getElementById('report-output-wrap-' + reportId);
+    var body = document.getElementById('report-output-' + reportId);
+    var cols = RC[reportId];
+    if (!wrap || !body || !cols) return;
+    wrap.hidden = false;
+    body.innerHTML = '';
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var tr = document.createElement('tr');
+      for (var c = 0; c < cols.length; c++) {
+        var td = document.createElement('td');
+        var v = row ? row[cols[c]] : undefined;
+        td.textContent = (v === undefined || v === null) ? '' : String(v);
+        tr.appendChild(td);
+      }
+      body.appendChild(tr);
+    }
+    wrap.scrollTop = 0;
   }
   function setReportStatus(reportId, text, cls){
     var el = document.getElementById('report-status-' + reportId);
@@ -287,9 +416,49 @@ function pmShellScript(): string {
     });
   }
 
+  // --- WP1 progress bar: one 'phase' event carries the total, then one
+  // 'tick' event per file scanned. Reveals the bar lazily (stays hidden for
+  // a legacy engine that never emits these) and never regresses the percent
+  // backwards — a stray out-of-order event should not visibly rewind the bar.
+  var pmProgressTotal = 0;
+  var pmProgressMaxPct = 0;
+  function showProgress(donePct, doneCount, totalCount, currentFile){
+    var wrap = document.getElementById('pmProgressWrap');
+    if (!wrap) return; // done-state markup already replaced the scanning pane
+    wrap.hidden = false;
+    var fill = document.getElementById('pmProgressFill');
+    var bar = document.getElementById('pmProgressBar');
+    var label = document.getElementById('pmProgressLabel');
+    var pct = Math.max(pmProgressMaxPct, Math.min(100, donePct));
+    pmProgressMaxPct = pct;
+    if (fill) fill.style.width = pct + '%';
+    if (bar) bar.setAttribute('aria-valuenow', String(Math.round(pct)));
+    if (label) {
+      label.textContent = S.progressLabel
+        .replace('{percent}', String(Math.round(pct)))
+        .replace('{done}', String(doneCount))
+        .replace('{total}', String(totalCount))
+        + (currentFile ? ' — ' + currentFile : '');
+    }
+  }
+  function handleProgressEvent(ev){
+    if (!ev || typeof ev.event !== 'string') return;
+    if (ev.event === 'phase' && typeof ev.total === 'number') {
+      pmProgressTotal = ev.total;
+      showProgress(0, 0, pmProgressTotal, null);
+    } else if (ev.event === 'tick' && typeof ev.done === 'number') {
+      var total = typeof ev.total === 'number' ? ev.total : pmProgressTotal;
+      var pct = total > 0 ? (ev.done / total) * 100 : 0;
+      showProgress(pct, ev.done, total, ev.file || null);
+    } else if (ev.event === 'done') {
+      showProgress(100, pmProgressTotal, pmProgressTotal, null);
+    }
+  }
+
   window.addEventListener('message', function(e){
     var msg = e.data || {};
     if (msg.type === 'mapLog'){ addScanLogLine(msg.text); }
+    else if (msg.type === 'mapProgress'){ handleProgressEvent(msg.event); }
     else if (msg.type === 'mapStopped'){
       var phase = document.querySelector('.pm-scan .status-line span:last-child');
       if (phase) phase.textContent = S.stopped;
@@ -297,6 +466,7 @@ function pmShellScript(): string {
       if (sp) sp.style.display = 'none';
     }
     else if (msg.type === 'reportLine'){ addReportLine(msg.reportId, msg.text); }
+    else if (msg.type === 'reportRows'){ addReportRows(msg.reportId, msg.rows || []); }
     else if (msg.type === 'reportDone'){
       setReportStatus(msg.reportId, msg.exitCode === 0 ? S.exitOk : S.exitFail, msg.exitCode === 0 ? 'ok' : 'fail');
     }

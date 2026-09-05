@@ -6,13 +6,14 @@
  *
  * Mirrors the Code Health report's in-flight guard + panel reuse pattern.
  */
-import * as cp from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { getProjectRoot } from '../projectRoot';
 import { hasSaropaLintsDep } from '../pubspecReader';
-import { killProcessTree, resolveCliCwd } from './devCliRoot';
+import { resolveCliCwd } from './devCliRoot';
+import { runProjectHealthScan } from './projectHealthCliRunner';
+import type { VibrancyScanEvent } from './projectVibrancyTypes';
 import {
   buildDoneMapPaneHtml,
   buildScanningMapPaneHtml,
@@ -26,8 +27,20 @@ import {
 import { l10n } from '../i18n/runtime';
 import { saropaLintsDataPath } from '../reportsPaths';
 
+/**
+ * WP5 (`plans/PLAN_ext_ui_dart_deferred.md`): `workspaceState` key for the
+ * last scan's size totals. Persisted here (not just held in a module
+ * variable) so a REOPENED panel — after the extension host itself restarted,
+ * not just the panel being closed — can still show a real number instead of
+ * nothing until the next scan finishes; a plain in-memory variable would
+ * reset to undefined on every extension reload.
+ */
+const TOTALS_STATE_KEY = 'saropaLints.projectMap.lastTotals';
+
 let panel: vscode.WebviewPanel | undefined;
 let extensionUri: vscode.Uri;
+/** Set once at activation so scan completion can persist [ProjectMapTotals] across panel/window reopens. */
+let extContext: vscode.ExtensionContext | undefined;
 let inflight: Promise<void> | undefined;
 let lastRoot: string | undefined; // resolves relative paths from row clicks
 // Live cancel handle for the in-flight Project Map scan shown in the webview's
@@ -46,6 +59,7 @@ let scanEpoch = 0;
 /** Registers the `Saropa Project Map` command; call once at activation. */
 export function registerProjectMapCommand(context: vscode.ExtensionContext): void {
   extensionUri = context.extensionUri;
+  extContext = context;
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.openProjectHealthDashboard', () =>
       openProjectMap(),
@@ -81,18 +95,26 @@ function openProjectMap(): Promise<void> {
  * the scan, then swaps in the finished report — replacing the old
  * `vscode.window.withProgress` notification, which rendered nothing in the
  * panel until the whole scan finished (a "screenshot, not a dashboard" per
- * design principle 6). `project_health.dart` has no `--progress` NDJSON
- * protocol the way `project_vibrancy` does (verified: no `--progress` flag in
- * bin/project_health.dart), so this cannot show a percentage bar the way Code
- * Health does — but the panel is live from the first click, streams whatever
- * the process actually prints, and its Cancel button works against a real
- * process kill instead of a notification token.
+ * design principle 6). WP1 (PLAN_ext_ui_dart_deferred.md) added a
+ * `--progress` NDJSON protocol to `bin/project_health.dart`, mirroring
+ * `project_vibrancy`'s exactly — so this pane now also renders a live "N% —
+ * done/total files" bar the same way Code Health does, in addition to the
+ * elapsed timer, activity log, and a Cancel button backed by a real process
+ * kill instead of a notification token.
  */
 async function runAndRender(root: string): Promise<void> {
   lastRoot = root;
   const epoch = ++scanEpoch;
   const p = getOrCreatePanel();
-  p.webview.html = buildShellHtml(p.webview, buildScanningMapPaneHtml(), buildReportsTabHtml());
+  // WP5: render the LAST scan's cached size totals immediately in the hero
+  // strip, before this fresh scan has produced anything — the whole point is
+  // that reopening the panel (or the window) never shows a blank hero again.
+  p.webview.html = buildShellHtml(
+    p.webview,
+    buildScanningMapPaneHtml(),
+    buildReportsTabHtml(),
+    getCachedProjectMapTotals(),
+  );
   p.reveal(vscode.ViewColumn.One);
   await runStreamingScan(root, p, epoch);
 }
@@ -107,10 +129,19 @@ async function runStreamingScan(
   const outputDir = path.join(saropaLintsDataPath(root), 'health');
   scanCancelSource?.dispose();
   scanCancelSource = new vscode.CancellationTokenSource();
-  const ok = await runScan(root, outputDir, scanCancelSource.token, (line, stream) => {
-    if (epoch !== scanEpoch) return; // superseded by a Restart — drop stale output
-    void p.webview.postMessage({ type: 'mapLog', text: line, stream });
-  });
+  const ok = await runScan(
+    root,
+    outputDir,
+    scanCancelSource.token,
+    (line, stream) => {
+      if (epoch !== scanEpoch) return; // superseded by a Restart — drop stale output
+      void p.webview.postMessage({ type: 'mapLog', text: line, stream });
+    },
+    (event) => {
+      if (epoch !== scanEpoch) return; // superseded by a Restart — drop stale progress
+      void p.webview.postMessage({ type: 'mapProgress', event });
+    },
+  );
   if (epoch !== scanEpoch) return; // a newer scan (Restart) already owns the panel
   if (!ok) {
     void p.webview.postMessage({ type: 'mapStopped' });
@@ -133,10 +164,18 @@ async function runStreamingScan(
     void p.webview.postMessage({ type: 'mapStopped' });
     return;
   }
+  // WP5: this scan just produced a fresh totals snapshot embedded in its own
+  // report script (`health_html_template.dart`'s `const DATA = {...totals};`)
+  // — extract and persist it so the NEXT panel open shows a real number
+  // immediately instead of nothing, and use it (not the possibly-stale
+  // cache) for THIS render since it is strictly newer.
+  const totals = extractProjectMapTotals(parts.scriptHtml) ?? getCachedProjectMapTotals();
+  if (totals) cacheProjectMapTotals(totals);
   p.webview.html = buildShellHtml(
     p.webview,
     buildDoneMapPaneHtml(parts),
     buildReportsTabHtml(),
+    totals,
   );
 }
 
@@ -145,84 +184,62 @@ async function restartScan(): Promise<void> {
   if (!panel || !lastRoot) return;
   scanCancelSource?.cancel();
   const epoch = ++scanEpoch;
-  panel.webview.html = buildShellHtml(panel.webview, buildScanningMapPaneHtml(), buildReportsTabHtml());
+  // WP5: a Restart keeps showing the last known totals (cached or from the
+  // scan just superseded) rather than blanking the hero mid-rescan.
+  panel.webview.html = buildShellHtml(
+    panel.webview,
+    buildScanningMapPaneHtml(),
+    buildReportsTabHtml(),
+    getCachedProjectMapTotals(),
+  );
   await runStreamingScan(lastRoot, panel, epoch);
 }
 
 /**
- * Spawns the scan asynchronously so the extension host never blocks.
+ * Spawns the scan asynchronously so the extension host never blocks, via
+ * `projectHealthCliRunner.ts`'s `runProjectHealthScan` (WP1: adds
+ * `--progress` NDJSON parsing on top of the previous plain buffered spawn).
  * [onOutputLine], when given, streams each stdout/stderr line as it arrives —
- * the mechanism [runStreamingScan] uses to keep the panel live. Optional so
- * `scanProjectMapToParts` (the consolidated dashboard's embed path) keeps its
- * original buffered behavior unchanged.
+ * the mechanism [runStreamingScan] uses to keep the panel's activity log
+ * live. [onProgress] receives parsed scan-progress events for the percentage
+ * bar. Both optional so `scanProjectMapToParts` (the consolidated dashboard's
+ * embed path) keeps its original buffered, non-streaming behavior unchanged
+ * — it passes neither, so `--progress` is never added to its spawn.
  */
-function runScan(
+async function runScan(
   root: string,
   outputDir: string,
   token: vscode.CancellationToken,
   onOutputLine?: (line: string, stream: 'stdout' | 'stderr') => void,
+  onProgress?: (event: VibrancyScanEvent) => void,
 ): Promise<boolean> {
-  return new Promise((resolve) => {
-    const child = cp.spawn(
-      'dart',
-      [
-        'run',
-        'saropa_lints:project_health',
-        '--path',
-        root,
-        '--complexity',
-        '--git',
-        // Per-feature performance gravity panel (compound widget patterns).
-        '--performance',
-        '--format',
-        'html',
-        '--output-dir',
-        outputDir,
-        // Re-parse only changed files on rescans (the project_health cache).
-        '--cache',
-      ],
-      // resolveCliCwd: under F5 the in-repo CLI runs (it HAS project_health;
-      // the project's published saropa_lints does not, which caused exit 255).
-      { cwd: resolveCliCwd(root), shell: true },
+  // resolveCliCwd: under F5 the in-repo CLI runs (it HAS project_health; the
+  // project's published saropa_lints does not, which caused exit 255).
+  const cliCwd = resolveCliCwd(root);
+  const streaming = onOutputLine !== undefined || onProgress !== undefined;
+  const result = await runProjectHealthScan(
+    root,
+    outputDir,
+    cliCwd,
+    token,
+    streaming ? { onOutputLine, onProgress } : undefined,
+  );
+  if (result.spawnErrorMessage !== undefined) {
+    // Spawn itself failed (missing/non-executable `dart`), not a scan error.
+    void vscode.window.showErrorMessage(
+      l10n('notify.commands.projectMapFailed', { message: result.spawnErrorMessage }),
     );
-    let stderr = '';
-    // Buffers an incomplete trailing line between chunks so streamed output
-    // never splits mid-word — same shape as projectMapReports.ts's runner.
-    let stdoutBuf = '';
-    let stderrBuf = '';
-    const flush = (buf: string, chunk: string, stream: 'stdout' | 'stderr'): string => {
-      const combined = buf + chunk;
-      const lines = combined.split('\n');
-      const remainder = lines.pop() ?? '';
-      for (const line of lines) onOutputLine?.(line.replace(/\r$/, ''), stream);
-      return remainder;
-    };
-    child.stdout.on('data', (d: Buffer) => {
-      stdoutBuf = flush(stdoutBuf, d.toString(), 'stdout');
-    });
-    child.stderr.on('data', (d: Buffer) => {
-      stderr += d.toString();
-      stderrBuf = flush(stderrBuf, d.toString(), 'stderr');
-    });
-    // Tree-kill on cancel — shell:true means child is cmd.exe; child.kill()
-    // alone orphans the dart grandchild (runaway scan).
-    token.onCancellationRequested(() => killProcessTree(child));
-    child.on('error', (e: Error) => {
-      void vscode.window.showErrorMessage(l10n('notify.commands.projectMapFailed', { message: e.message }));
-      resolve(false);
-    });
-    child.on('close', (code: number | null) => {
-      if (stdoutBuf.length > 0) onOutputLine?.(stdoutBuf, 'stdout');
-      if (stderrBuf.length > 0) onOutputLine?.(stderrBuf, 'stderr');
-      if (code !== 0) {
-        const first = stderr.split('\n').find((l) => l.trim().length > 0) ?? '';
-        void vscode.window.showErrorMessage(l10n('notify.commands.projectMapScanFailed', { code: String(code), details: first }));
-        resolve(false);
-        return;
-      }
-      resolve(true);
-    });
-  });
+    return false;
+  }
+  if (!result.ok && !result.cancelled) {
+    void vscode.window.showErrorMessage(
+      l10n('notify.commands.projectMapScanFailed', {
+        code: String(result.exitCode ?? -1),
+        details: result.firstStderrLine,
+      }),
+    );
+  }
+  return result.ok;
 }
 
 /**
@@ -244,6 +261,80 @@ export interface ProjectMapParts {
   bodyHtml: string;
   scriptHtml: string;
   echartsUri: string;
+}
+
+/**
+ * WP5 (`plans/PLAN_ext_ui_dart_deferred.md`): the size summary
+ * `health_html_reporter.dart`'s `buildHealthHtml` already embeds as
+ * `DATA.totals` in every report — `fileCount`/`loc`/`bytes` are the ones the
+ * hero KPI strip shows; `deadFiles`/`hotspots` ride along since they are the
+ * SAME object, not because the hero renders them.
+ */
+export interface ProjectMapTotals {
+  fileCount: number;
+  loc: number;
+  bytes: number;
+  deadFiles: number;
+  hotspots: number;
+}
+
+/** Narrows to a finite number — guards against a malformed/partial DATA blob before trusting a field. */
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+/**
+ * Pulls `DATA.totals` out of the report's embedded script (the
+ * `<!--PM_SCRIPT_START-->`-delimited fragment `extractProjectMapParts`
+ * already isolates). `health_html_reporter.dart` emits `DATA` via
+ * `jsonEncode` (compact, one line — no `JsonEncoder.withIndent`), so the
+ * whole assignment is exactly one line; matching on THAT line rather than
+ * scanning for the next statement's name keeps this parser from breaking the
+ * moment `health_html_template.dart` reorders what follows it.
+ *
+ * Returns undefined for a template/version mismatch or any field with the
+ * wrong shape — WP5's contract is "cache real data or show nothing", never a
+ * fabricated/partial number.
+ */
+export function extractProjectMapTotals(scriptHtml: string): ProjectMapTotals | undefined {
+  const match = /^const DATA = (.+);$/m.exec(scriptHtml);
+  if (!match) return undefined;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(match[1]);
+  } catch {
+    return undefined;
+  }
+  const totals = (parsed as { totals?: unknown } | null)?.totals as
+    | Partial<Record<keyof ProjectMapTotals, unknown>>
+    | undefined;
+  if (
+    totals &&
+    isFiniteNumber(totals.fileCount) &&
+    isFiniteNumber(totals.loc) &&
+    isFiniteNumber(totals.bytes) &&
+    isFiniteNumber(totals.deadFiles) &&
+    isFiniteNumber(totals.hotspots)
+  ) {
+    return {
+      fileCount: totals.fileCount,
+      loc: totals.loc,
+      bytes: totals.bytes,
+      deadFiles: totals.deadFiles,
+      hotspots: totals.hotspots,
+    };
+  }
+  return undefined;
+}
+
+/** Reads the last cached totals from workspaceState, or undefined before the first successful scan ever ran. */
+function getCachedProjectMapTotals(): ProjectMapTotals | undefined {
+  return extContext?.workspaceState.get<ProjectMapTotals>(TOTALS_STATE_KEY);
+}
+
+/** Persists a fresh totals snapshot; best-effort no-op if called before [registerProjectMapCommand]. */
+function cacheProjectMapTotals(totals: ProjectMapTotals): void {
+  void extContext?.workspaceState.update(TOTALS_STATE_KEY, totals);
 }
 
 const _pmStyleRe = /<!--PM_STYLE_START-->([\s\S]*?)<!--PM_STYLE_END-->/;

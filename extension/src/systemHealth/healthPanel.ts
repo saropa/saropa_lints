@@ -74,6 +74,18 @@ export class HealthPanel implements vscode.Disposable {
   }
 
   /**
+   * Re-renders the panel if it is currently open, without appending a log
+   * entry. WP4: `SaropaLspClient` calls this on every `saropa/scanProgress`
+   * tick so the engine card's live "N/M files" line updates in real time —
+   * `addLogEntry` would work too, but would spam the Activity log with one
+   * line per tick (every 50 files) instead of the single "scan complete"
+   * line that log already gets from the server's own log messages.
+   */
+  static refreshIfOpen(): void {
+    if (HealthPanel.instance) void HealthPanel.instance.refresh();
+  }
+
+  /**
    * Open the panel, or bring it to front and refresh if already open.
    * Refreshing on reveal matters because process state (RSS, orphans) and
    * engine state (plugin live/dead) can both have changed while the tab

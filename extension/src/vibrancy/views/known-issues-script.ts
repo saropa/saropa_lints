@@ -12,26 +12,47 @@
  * template literals; the runtime lives mostly inside the template—keep cross-cutting
  * integration notes here.
  */
-export function getKnownIssuesScript(): string {
+/**
+ * @param idPrefix Prepended to every `getElementById` lookup for the ids that
+ * {@link buildSummaryCards}/`buildToolbar`/`buildTable` in `known-issues-html.ts` render with the
+ * same prefix. Empty string (the default) reproduces today's standalone-panel behavior exactly
+ * (test-safe, no id changes for `KnownIssuesPanel`). `getKnownIssuesEmbedScript` below passes
+ * `'ki-'` to match {@link getEmbeddedBodyHtml}'s markup.
+ * @param root Element (or `document`) every query is scoped to. Left as `document` for the
+ * standalone panel (its own dedicated document, safe to query globally); the embed passes the
+ * `.ki-embed-body` wrapper so none of these queries can ever match the Package Dashboard's own
+ * packages table, which uses several of the SAME unprefixed selectors (`th[data-col]`,
+ * `.kpi-card.interactive[data-kpi]`) for its own sortable columns and KPI cards.
+ */
+export function getKnownIssuesScript(idPrefix = '', root: 'document' | string = 'document'): string {
     // Wire-up order: resolve DOM nodes → bind filters/chips → register sort handlers →
     // `applyFilters()` once so KPI active state matches the default filter on first paint.
     return `
         let sortCol = 'name';
         let sortAsc = true;
 
-        const searchInput = document.getElementById('search-input');
-        const searchClear = document.getElementById('search-clear');
-        const tbody = document.getElementById('pkg-body');
-        const countEl = document.getElementById('visible-count');
-        const filterButtons = Array.from(document.querySelectorAll('.seg .seg-btn[data-filter]'));
-        const chipStripEl = document.getElementById('ki-chip-strip');
-        const chipBodyEl = document.getElementById('ki-chip-body');
-        const clearAllEl = document.getElementById('ki-clear-all');
-        const emptyEl = document.getElementById('ki-empty');
-        const resetFiltersBtn = document.getElementById('ki-reset-filters');
-        const recentEl = document.getElementById('recent-searches');
-        const recentListEl = document.getElementById('recent-searches-list');
-        const recentClearEl = document.getElementById('recent-searches-clear');
+        // __ROOT__ is 'document' for the standalone panel (its own document, global queries are
+        // safe) or a scoped element for the embed -- see this function's doc comment.
+        var __ROOT__ = ${root === 'document' ? 'document' : `document.querySelector('${root}')`};
+        function __id__(raw) { return __ROOT__.querySelector('#' + '${idPrefix}' + raw); }
+
+        const searchInput = __id__('search-input');
+        const searchClear = __id__('search-clear');
+        const tbody = __id__('pkg-body');
+        const countEl = __id__('visible-count');
+        const filterButtons = Array.from(__ROOT__.querySelectorAll('.seg .seg-btn[data-filter]'));
+        // These four are ALREADY 'ki-'-prefixed in known-issues-html.ts's markup for BOTH the
+        // standalone panel and the embed (they never collided, so they were never candidates for
+        // the idPrefix scheme above) -- queried directly, not through __id__, so the embed's
+        // idPrefix='ki-' does not double-prefix them into a nonexistent '#kiki-chip-strip'.
+        const chipStripEl = __ROOT__.querySelector('#ki-chip-strip');
+        const chipBodyEl = __ROOT__.querySelector('#ki-chip-body');
+        const clearAllEl = __ROOT__.querySelector('#ki-clear-all');
+        const emptyEl = __ROOT__.querySelector('#ki-empty');
+        const resetFiltersBtn = __ROOT__.querySelector('#ki-reset-filters');
+        const recentEl = __id__('recent-searches');
+        const recentListEl = __id__('recent-searches-list');
+        const recentClearEl = __id__('recent-searches-clear');
 
         /* §8.5.2 — recent-searches storage. Uses sessionStorage so the list
            survives within the current panel session but resets when the panel
@@ -279,16 +300,25 @@ export function getKnownIssuesScript(): string {
             announce(visible + ' of ' + totalRows + ' packages visible');
         }
 
-        // §15.3 — polite live-region announcer.
+        // §15.3 — polite live-region announcer. __id__('announcer') resolves to '#announcer'
+        // standalone (unchanged) or '#ki-announcer' embedded, matching getEmbeddedBodyHtml's own
+        // announcer div -- see that function's doc comment.
         function announce(message) {
-            const el = document.getElementById('announcer');
+            const el = __id__('announcer');
             if (!el) { return; }
             el.textContent = '';
             setTimeout(() => { el.textContent = message; }, 50);
         }
 
         function syncActiveKpiCard(query, includeHas, includeNo) {
-            const cards = document.querySelectorAll('.kpi-card.interactive[data-kpi]');
+            // Scoped to __ROOT__ defensively: data-kpi is Known-Issues-specific today (the
+            // Package Dashboard's own summary cards use data-filter, not data-kpi), but
+            // scoping every query here to the embed root (rather than bare document) is the
+            // convention every embedded tab follows so a future selector never silently reaches
+            // outside this tab once this script and the host's share one document. NOTE: no
+            // backticks in this comment -- this whole function body is one JS template literal,
+            // and a stray backtick here would silently close the returned script string early.
+            const cards = __ROOT__.querySelectorAll('.kpi-card.interactive[data-kpi]');
             cards.forEach(c => c.classList.remove('active'));
             const isDefault = !query && includeHas && includeNo;
             if (isDefault) { return; }
@@ -296,7 +326,7 @@ export function getKnownIssuesScript(): string {
             if (includeHas && !includeNo) { activeKpi = 'has'; }
             else if (!includeHas && includeNo) { activeKpi = 'no'; }
             if (!activeKpi) { return; }
-            const target = document.querySelector('.kpi-card.interactive[data-kpi="' + activeKpi + '"]');
+            const target = __ROOT__.querySelector('.kpi-card.interactive[data-kpi="' + activeKpi + '"]');
             if (target) { target.classList.add('active'); }
         }
 
@@ -372,7 +402,11 @@ export function getKnownIssuesScript(): string {
         }
 
         function updateArrows() {
-            document.querySelectorAll('th[data-col]').forEach(th => {
+            // th[data-col] is also the Package Dashboard's own sortable-column marker
+            // (report-html-table.ts / report-script-parts.ts) -- __ROOT__ scoping keeps this
+            // table's sort arrows from being drawn on (or read from) the OTHER table's headers
+            // once both scripts share one document.
+            __ROOT__.querySelectorAll('th[data-col]').forEach(th => {
                 const arrow = th.querySelector('.sort-arrow');
                 if (th.dataset.col === sortCol) {
                     arrow.textContent = sortAsc ? ' \\u25B2' : ' \\u25BC';
@@ -452,7 +486,7 @@ export function getKnownIssuesScript(): string {
             });
         });
 
-        document.querySelectorAll('.kpi-card.interactive[data-kpi-action]').forEach(card => {
+        __ROOT__.querySelectorAll('.kpi-card.interactive[data-kpi-action]').forEach(card => {
             function fire() {
                 const action = card.getAttribute('data-kpi-action');
                 if (action === 'reset') {
@@ -478,7 +512,7 @@ export function getKnownIssuesScript(): string {
         if (clearAllEl) { clearAllEl.addEventListener('click', resetAllFilters); }
         if (resetFiltersBtn) { resetFiltersBtn.addEventListener('click', resetAllFilters); }
 
-        document.querySelectorAll('th[data-col]').forEach(th => {
+        __ROOT__.querySelectorAll('th[data-col]').forEach(th => {
             th.addEventListener('click', () => sortTable(th.dataset.col));
         });
 
@@ -487,6 +521,14 @@ export function getKnownIssuesScript(): string {
         // is incorrectly marked active before the first user interaction.
         applyFilters();
 
+        // The full-width toggle and the page-level '/' / Escape shortcuts below are the
+        // standalone panel's OWN document-level chrome. The embed (getKnownIssuesEmbedScript,
+        // root !== document) skips both: the Package Dashboard already renders its own
+        // #dashFullWidthToggle (a second copy here would be a duplicate id, not a second working
+        // toggle) and its own '?'-triggered shortcuts overlay with a document-level '/' handler
+        // for the Overview tab's OWN search field -- adding a second global '/' handler here
+        // would race that one for which input gets focused.
+        ${root === 'document' ? `
         /* Full-width toggle (guideline §4) — flips body[data-full-width]. Idempotent. */
         (function() {
             var btn = document.getElementById('dashFullWidthToggle');
@@ -521,12 +563,42 @@ export function getKnownIssuesScript(): string {
                 }
             }
         });
+        ` : ''}
 
-        /* Close recent dropdown when clicking outside the search wrapper. */
+        /* Close recent dropdown when clicking outside the search wrapper. Kept unconditional
+           (embed included): it only reads this instance's own recentEl/searchInput closures, so
+           there is nothing to collide with even when several embedded tabs' scripts each add
+           their own copy of this listener. */
         document.addEventListener('click', function(e) {
             if (!recentEl || recentEl.hidden) { return; }
             const wrapper = searchInput.closest('.search-wrapper');
             if (wrapper && !wrapper.contains(e.target)) { hideRecent(); }
         });
     `;
+}
+
+/**
+ * Client-side wiring for the embedded Known issues tab (PLAN_ext_ui_package_tabs.md §4 Tab 5).
+ *
+ * Unlike `getUpgradesEmbedScript()` (packages-tabs.ts), this is NOT a hand-written parallel
+ * script -- `getKnownIssuesScript('ki-', '.ki-embed-body')` (the SAME function the standalone
+ * panel calls with its defaults) already produces exactly the right id-prefixed, root-scoped
+ * body, so there is nothing to duplicate. This wrapper only supplies the piece the shared
+ * function cannot: an enclosing `(function(){...})()` so its `let`/`const`/`function`
+ * declarations (`sortCol`, `applyFilters`, `announce`, ...) stay local to this IIFE instead of
+ * colliding with same-named top-level declarations from any other script concatenated into the
+ * Package Dashboard's single shared `<script>` tag (report-html.ts does NOT wrap
+ * `getReportScript()`/`getPackagesTabsScript()`/etc. this way itself, so each embedded script is
+ * responsible for wrapping its own contribution -- `getUpgradesEmbedScript` does the same).
+ *
+ * `vscode.postMessage({ type: 'saveKnownIssuesRecent', ... })` inside the wired script reuses the
+ * document's single `acquireVsCodeApi()` handle (declared once in report-script-parts.ts) via the
+ * bare `vscode` global -- no second call, no message-type wrapper envelope needed, because
+ * `saveKnownIssuesRecent` / `hydrateKnownIssuesRecent` are already unique message names nothing
+ * else in the shared document's switch handles. See report-webview.ts's `_handleMessage`.
+ */
+export function getKnownIssuesEmbedScript(): string {
+    return `(function() {
+${getKnownIssuesScript('ki-', '.ki-embed-body')}
+})();`;
 }

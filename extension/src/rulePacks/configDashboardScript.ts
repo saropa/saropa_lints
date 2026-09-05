@@ -945,17 +945,37 @@ const SCRIPT_CONFIG_FILE_TAB = `
 /**
  * Forwards clicks inside the embedded Analysis Optimizer card using the SAME id/class contract
  * its own standalone script (`analysisOptimizerScript.ts`) listens for — see that file for the
- * canonical list. Column-sort and the select-all checkbox bulk-select are intentionally NOT
- * replicated here (Phase 4 scope decision: the embedded card covers the primary actions —
- * scan/apply/remove/fix-syntax — sorting is a nicety available in the standalone panel via the
- * "Open standalone" deep link). Every button here posts through the SAME `vscode` handle already
- * acquired in {@link SCRIPT_PREAMBLE} — a second `acquireVsCodeApi()` call would throw (VS Code
- * allows exactly one per webview document), so this reuses it rather than re-acquiring.
+ * canonical list. Column-sort and select-all bulk-select are ALSO ported here now (previously
+ * deferred per Phase 4 scope; see PLAN_ext_ui_optimizer_embed.md) using the standalone script as
+ * the reference implementation — the embed and standalone panel must behave identically since
+ * they render from the exact same HTML builder (`getEmbeddedBodyHtml` / `_buildResultView`).
+ * Every button here posts through the SAME `vscode` handle already acquired in
+ * {@link SCRIPT_PREAMBLE} — a second `acquireVsCodeApi()` call would throw (VS Code allows
+ * exactly one per webview document), so this reuses it rather than re-acquiring.
+ *
+ * All DOM queries below are scoped to `embed` (`.optimizer-embed-body`), never `document` —
+ * the host Config dashboard has its own tables/headers elsewhere on the page and an unscoped
+ * `document.querySelectorAll('th')`-style query would also match those, corrupting the host's
+ * own state. Sort state is namespaced under `state.optimizer` in the shared `vscode.getState()`
+ * object (the SAME persistence object `SCRIPT_TABS` uses for `state.activeTab`) so the two
+ * features cannot clobber each other's keys.
  */
 const SCRIPT_OPTIMIZER_EMBED = `
   (function wireOptimizerEmbed() {
     var embed = document.querySelector('.optimizer-embed-body');
     if (!embed) return;
+
+    // Keeps the bulk-apply button's enabled state in sync with checkbox selection — ported from
+    // analysisOptimizerScript.ts's updateApplySelected(). Without this the button stayed
+    // permanently disabled in the embed because nothing ever re-evaluated its disabled state
+    // after the initial (always-empty-selection) render.
+    function updateApplySelected() {
+      var btn = embed.querySelector('#apply-selected-btn');
+      if (!btn) return;
+      var count = embed.querySelectorAll('.rec-cb:checked').length;
+      btn.disabled = count === 0;
+    }
+
     embed.addEventListener('click', function(e) {
       var target = e.target;
       if (!target) return;
@@ -978,7 +998,10 @@ const SCRIPT_OPTIMIZER_EMBED = `
         return;
       }
       if (target.classList.contains('preview-toggle-btn')) {
-        var previewRow = document.getElementById(target.dataset.target);
+        // Scoped to embed (not document) since the preview row id is only unique within the
+        // optimizer's own markup — the host dashboard could in principle reuse the same id
+        // pattern in an unrelated section.
+        var previewRow = embed.querySelector('#' + target.dataset.target);
         if (previewRow) {
           var ownerRow = target.closest('tr');
           if (ownerRow && ownerRow.nextSibling !== previewRow) ownerRow.after(previewRow);
@@ -987,13 +1010,116 @@ const SCRIPT_OPTIMIZER_EMBED = `
         return;
       }
     });
+
     var selectAll = embed.querySelector('#select-all-cb');
     if (selectAll) {
       selectAll.addEventListener('change', function() {
         var cbs = embed.querySelectorAll('.rec-cb');
         for (var i = 0; i < cbs.length; i++) { cbs[i].checked = selectAll.checked; }
+        updateApplySelected();
       });
     }
+
+    // Individual checkbox toggles also need to re-evaluate the bulk-apply button — delegated on
+    // embed (not document) so it never fires for unrelated checkboxes elsewhere in the dashboard.
+    embed.addEventListener('change', function(e) {
+      if (e.target && e.target.classList && e.target.classList.contains('rec-cb')) {
+        updateApplySelected();
+      }
+    });
+
+    var exclusionsTable = embed.querySelector('#exclusions-table');
+    if (exclusionsTable) {
+      // Namespaced under state.optimizer (NOT top-level state.sortKey/state.sortDir) because
+      // vscode.getState()/setState() is a single object shared with the whole Config dashboard —
+      // SCRIPT_TABS already stores state.activeTab on it. A top-level key here would risk
+      // colliding with a future host-dashboard feature that picks the same name.
+      function loadSortState() {
+        var state = vscode.getState() || {};
+        var opt = state.optimizer || {};
+        return { key: opt.sortKey || null, dir: opt.sortDir === -1 ? -1 : 1 };
+      }
+
+      function saveSortState(sortState) {
+        var state = vscode.getState() || {};
+        state.optimizer = state.optimizer || {};
+        state.optimizer.sortKey = sortState.key;
+        state.optimizer.sortDir = sortState.dir;
+        vscode.setState(state);
+      }
+
+      var sortState = loadSortState();
+      var headers = exclusionsTable.querySelectorAll('th.sortable');
+
+      // Ported verbatim from analysisOptimizerScript.ts's applySort() — reorders <tr> elements by
+      // the numeric or string value baked into each row's data-<key> attribute at render time.
+      // Uses parseFloat/localeCompare rather than a regex-based parser: this file is emitted as a
+      // JS template literal into the webview, and a literal backslash in a regex (e.g. \d) is
+      // silently eaten by the outer TS template-literal escaping before it ever reaches the
+      // browser — see .claude project notes on the webview template-literal regex trap.
+      function applySort(key, dir) {
+        var tbody = exclusionsTable.querySelector('tbody');
+        // Preview rows are anchored directly under their owning data row and carry no sort data —
+        // collapse and exclude them from the reorder so a sort can never strand one under the
+        // wrong row.
+        var previewRows = tbody.querySelectorAll('.preview-row');
+        for (var p = 0; p < previewRows.length; p++) { previewRows[p].hidden = true; }
+
+        var rows = Array.from(tbody.querySelectorAll('tr:not(.preview-row)'));
+        var attr = 'data-' + key;
+        var numeric = key === 'files' || key === 'cost' || key === 'priority' || key === 'status';
+
+        rows.sort(function(a, b) {
+          var av = a.getAttribute(attr) || '';
+          var bv = b.getAttribute(attr) || '';
+          if (numeric) {
+            return (parseFloat(av) - parseFloat(bv)) * dir;
+          }
+          return av.localeCompare(bv) * dir;
+        });
+
+        for (var k = 0; k < rows.length; k++) {
+          tbody.appendChild(rows[k]);
+        }
+      }
+
+      function markActiveHeader(key, dir) {
+        for (var j = 0; j < headers.length; j++) {
+          headers[j].classList.remove('sort-asc', 'sort-desc');
+          if (headers[j].dataset.sort === key) {
+            headers[j].classList.add(dir === 1 ? 'sort-asc' : 'sort-desc');
+          }
+        }
+      }
+
+      for (var h = 0; h < headers.length; h++) {
+        headers[h].addEventListener('click', function() {
+          var key = this.dataset.sort;
+          if (sortState.key === key) {
+            sortState.dir = -sortState.dir;
+          } else {
+            sortState.key = key;
+            sortState.dir = 1;
+          }
+          applySort(sortState.key, sortState.dir);
+          markActiveHeader(sortState.key, sortState.dir);
+          saveSortState(sortState);
+        });
+      }
+
+      // Re-applies the sort the user last chose so it survives the full-HTML re-render every
+      // Apply/Remove/tab-switch triggers (the embed has no partial-DOM-update path — the host
+      // redraws the whole card from scratch via getEmbeddedBodyHtml()).
+      if (sortState.key) {
+        applySort(sortState.key, sortState.dir);
+        markActiveHeader(sortState.key, sortState.dir);
+      }
+    }
+
+    // Initial disabled-state sync in case the card re-rendered with pre-checked boxes retained
+    // from a prior DOM (defensive — current renders always start unchecked, but cheap to keep
+    // this correct without depending on that assumption holding forever).
+    updateApplySelected();
   })();
 `;
 

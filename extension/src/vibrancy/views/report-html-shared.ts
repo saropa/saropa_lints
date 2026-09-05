@@ -13,7 +13,7 @@
  * importers keep their paths.
  */
 
-import { VibrancyResult } from '../types';
+import { VibrancyResult, DepEdge } from '../types';
 import { scoreToGrade } from '../scoring/status-classifier';
 import { l10n } from '../../i18n/runtime';
 // Only the TYPE is needed here (ReportOptions carries pre-built groups, not
@@ -60,6 +60,33 @@ export interface ReportOptions {
      * key in `ALL_VIBRANCY_SETTING_KEYS`.
      */
     readonly vibrancySettingGroups?: readonly VibrancySettingGroup[];
+    /**
+     * Precomputed embedded body HTML for the "Full report" (Feature Inventory) tab
+     * (PLAN_ext_ui_package_tabs.md §4 Tab 4). Building the underlying report requires an async
+     * project-source scan (`buildFeatureInventoryReport`), which this "pure renderer" module
+     * cannot run itself — `report-webview.ts` computes it lazily (kicking off the scan on first
+     * request, caching the result) and passes the resulting fragment through here. `undefined`
+     * means the report has not finished building yet (or was never requested): the tab renders a
+     * lightweight loading state instead of falling back to the old deep-link card, since the
+     * scan is already in flight and will re-render this tab in place once it resolves.
+     */
+    readonly fullReportBodyHtml?: string;
+    /**
+     * Precomputed embedded body HTML for the "Upgrades" tab (PLAN_ext_ui_package_tabs.md §4
+     * Tab 3). Same reasoning as {@link fullReportBodyHtml}: `buildOpportunityCards` runs an async
+     * project-source scan `report-html.ts` cannot run itself, so `report-webview.ts` builds and
+     * caches it, then passes the fragment through here. `undefined` falls back to the deep-link
+     * card (only relevant to call sites that never wire this field, e.g. older tests).
+     */
+    readonly upgradesBodyHtml?: string;
+    /**
+     * Reverse-dependency edges from the last scan, needed by `buildOpportunityCards`'s
+     * dual-dependency risk detection (the same map `OpportunitiesPanel.createOrShow` receives).
+     * Optional so existing `ReportOptions` construction sites (tests) keep compiling; an absent
+     * map just means the embedded Upgrades tab's cards render without dual-dependency risk rows,
+     * matching `OpportunitiesPanel`'s own `reverseDeps = new Map()` default.
+     */
+    readonly reverseDeps?: ReadonlyMap<string, readonly DepEdge[]>;
 }
 
 /** Resolve the canonical repository URL (trailing slashes stripped). */

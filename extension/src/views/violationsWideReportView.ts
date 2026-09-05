@@ -28,6 +28,11 @@ import { scanWorkspace } from '../services/todosAndHacksScanner';
 // the two surfaces from ever disagreeing on what a "regression" or "reviewed"
 // hotspot means.
 import { loadHistory, getScoreTrendSummary, getTrendSummary, detectScoreRegression } from '../runHistory';
+// TASK B (findings-dashboard quality-gate pill): read-only accessor for the
+// last Code Health scan's gate verdict, mapped into `qualityGate` below. Pure
+// in-memory read — never spawns `dart run saropa_lints:project_vibrancy`
+// itself (see its own doc comment) — so safe to call on every rebuild.
+import { getLastProjectVibrancyPayload } from './projectVibrancyReportView';
 import {
   SecurityHotspotReviewStateService,
   countSecurityHotspotReviewStates,
@@ -385,6 +390,14 @@ async function rebuildDashboardHtml(
     hotspots: (() => {
       const slice = buildHotspotsSlice(afterDisabled, context.workspaceState);
       return slice.total > 0 ? slice : undefined;
+    })(),
+    // TASK B: mapped straight from the Code Health scan's own `gates` field —
+    // no threshold/pass-fail logic recomputed here. `undefined` (no pill) until
+    // a Code Health scan has completed at least once this session.
+    qualityGate: (() => {
+      const gates = getLastProjectVibrancyPayload()?.gates;
+      if (gates?.pass === undefined) return undefined;
+      return { pass: gates.pass, violationCount: gates.violations?.length ?? 0 };
     })(),
   };
 
@@ -761,6 +774,22 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       const rule = (data as { rule?: unknown }).rule;
       if (typeof rule === 'string' && rule.length > 0) {
         await vscode.commands.executeCommand('saropaLints.disableRules', [rule]);
+      }
+      return;
+    }
+    if (data.type === 'openRuleExplain') {
+      /* Triggered by a related-rule / same-tag / supersedes chip inside a
+         Top-Rules expander row (plan §B fold). Reuses the existing
+         `saropaLints.explainRule` command — which opens the standalone
+         Rule Explain panel — rather than trying to render every linked
+         rule's full detail inline; the fold summarizes on the dashboard's own
+         row, cross-navigation to a DIFFERENT rule still goes through the
+         kept-standalone screen (it may not even be one of the current Top N
+         rows). No dashboard rebuild: opening a side panel does not change
+         anything this webview's own state depends on. */
+      const rule = (data as { rule?: unknown }).rule;
+      if (typeof rule === 'string' && rule.trim().length > 0) {
+        await vscode.commands.executeCommand('saropaLints.explainRule', rule.trim());
       }
       return;
     }

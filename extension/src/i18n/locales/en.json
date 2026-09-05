@@ -798,7 +798,11 @@
       "regressionTitle": "Health score dropped from {previousScore} to {currentScore}",
       "trendTitle": "Health score / violation trend since earlier runs",
       "hotspotsTitle": "{open} open, {safe} marked safe, {fixed} fixed — click to review",
-      "hotspotsPill": "{open} open · {percent}% reviewed"
+      "hotspotsPill": "{open} open · {percent}% reviewed",
+      "qualityGatePassingTitle": "Code Health quality gate passing — click to open Code Health",
+      "qualityGatePassingPill": "Gate passing",
+      "qualityGateFailingTitle": "Code Health quality gate failing ({count} violation(s)) — click to open Code Health",
+      "qualityGateFailingPill": "Gate failing"
     },
     "groupBy": {
       "severity": "Severity",
@@ -1802,11 +1806,22 @@
         "save": "Save",
         "saved": "Saved",
         "saveError": "Could not save"
-      }
+      },
+      "colFile": "File",
+      "colLineNum": "Line",
+      "colRule": "Rule",
+      "colSeverity": "Severity",
+      "colMessage": "Message",
+      "colKey": "Key"
     },
     "shortcuts": {
       "jumpToTab": "Jump to tab 1-2 (Map, Reports)",
       "showOverlay": "Show this shortcut overlay"
+    },
+    "hero": {
+      "files": "Files",
+      "lines": "Lines",
+      "size": "Size"
     }
   },
   "suppressionsStrip": {
@@ -2525,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "All commands…",
-      "commandCatalogDescription": "Search all commands"
+      "commandCatalogDescription": "Search all commands",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
+      "codeHealthNeverScanned": "Run Code Health to see your score",
+      "projectMapDescription": "Scanned {ago}",
+      "projectMapNeverScanned": "Run Project Map to see size & hot spots"
     }
   }
 }

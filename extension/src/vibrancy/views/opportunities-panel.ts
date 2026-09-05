@@ -48,7 +48,7 @@ export class OpportunitiesPanel {
         workspaceRoot: vscode.Uri,
         reverseDeps: ReadonlyMap<string, readonly DepEdge[]> = new Map(),
     ): Promise<void> {
-        const cards = await buildCards(results, workspaceRoot, reverseDeps);
+        const cards = await buildOpportunityCards(results, workspaceRoot, reverseDeps);
         if (OpportunitiesPanel._current) {
             OpportunitiesPanel._current._workspaceRoot = workspaceRoot;
             OpportunitiesPanel._current._panel.reveal();
@@ -119,99 +119,27 @@ export class OpportunitiesPanel {
     /**
      * Write a combined opportunities report containing every card's AI prompt,
      * copy the file's absolute path to the clipboard, and notify the webview
-     * so the button re-enables.
+     * so the button re-enables. Delegates to {@link writeCombinedOpportunitiesReport}
+     * (extracted so the embedded Upgrades tab in `report-webview.ts` can run the exact same
+     * write, notify, and error handling without a `OpportunitiesPanel` instance of its own).
      */
     private async _writeReport(): Promise<void> {
-        try {
-            // Use the scanned workspace root (beside the pubspec), not the
-            // generic first workspace folder — correct in multi-root setups.
-            // Shared helper keeps the `reports/` root in sync with other consumers.
-            const reportDir = reportsUri(this._workspaceRoot);
-            await vscode.workspace.fs.createDirectory(reportDir);
-
-            // Reachable even though the button shows when ranked.length > 0,
-            // because ranked cards can have null aiPrompt (no opportunities).
-            const sections = this._cards
-                .filter(c => c.aiPrompt)
-                .map(c => c.aiPrompt as string);
-
-            if (sections.length === 0) {
-                void vscode.window.showInformationMessage(
-                    l10n('opportunities.report.noContent'),
-                );
-                this._postIfAlive({ type: 'reportFailed' });
-                return;
-            }
-
-            // Combine into one markdown document with separators.
-            const body = sections.join('\n\n---\n\n');
-            const stamp = formatTimestamp(new Date());
-            const filename = `${stamp}_package_opportunities.md`;
-            const fileUri = vscode.Uri.joinPath(reportDir, filename);
-
-            await vscode.workspace.fs.writeFile(
-                fileUri, Buffer.from(body, 'utf8'),
-            );
-
-            // Copy the absolute path — the user pastes it into their AI tool.
-            const absPath = fileUri.fsPath;
-            await vscode.env.clipboard.writeText(absPath);
-
-            void vscode.window.showInformationMessage(
-                l10n('opportunities.report.written', { path: absPath }),
-            );
-            this._postIfAlive({ type: 'reportWritten' });
-        } catch (err: unknown) {
-            void vscode.window.showErrorMessage(l10n(
-                'opportunities.report.failed',
-                { error: err instanceof Error ? err.message : String(err) },
-            ));
-            this._postIfAlive({ type: 'reportFailed' });
-        }
+        const ok = await writeCombinedOpportunitiesReport(this._cards, this._workspaceRoot);
+        this._postIfAlive({ type: ok ? 'reportWritten' : 'reportFailed' });
     }
 
     /**
      * Write a single package's AI prompt to its own dated file and copy the
-     * path — the per-card counterpart to the global `_writeReport`.
+     * path — the per-card counterpart to the global `_writeReport`. Delegates to
+     * {@link writeSingleOpportunityCardReport} for the same reason as {@link _writeReport}.
      */
     private async _writeCardReport(packageName: string): Promise<void> {
-        try {
-            const card = this._cards.find(
-                c => c.result.package.name === packageName,
-            );
-            if (!card?.aiPrompt) {
-                void vscode.window.showInformationMessage(
-                    l10n('opportunities.report.noContent'),
-                );
-                return;
-            }
-
-            // Shared helper keeps the `reports/` root in sync with other consumers.
-            const reportDir = reportsUri(this._workspaceRoot);
-            await vscode.workspace.fs.createDirectory(reportDir);
-
-            const stamp = formatTimestamp(new Date());
-            // Sanitize the package name for use in a filename.
-            const safeName = packageName.replace(/[^a-zA-Z0-9_-]/g, '_');
-            const filename = `${stamp}_opportunity_${safeName}.md`;
-            const fileUri = vscode.Uri.joinPath(reportDir, filename);
-
-            await vscode.workspace.fs.writeFile(
-                fileUri, Buffer.from(card.aiPrompt, 'utf8'),
-            );
-
-            const absPath = fileUri.fsPath;
-            await vscode.env.clipboard.writeText(absPath);
-
-            void vscode.window.showInformationMessage(
-                l10n('opportunities.report.written', { path: absPath }),
-            );
-        } catch (err: unknown) {
-            void vscode.window.showErrorMessage(l10n(
-                'opportunities.report.failed',
-                { error: err instanceof Error ? err.message : String(err) },
-            ));
+        const card = this._cards.find(c => c.result.package.name === packageName);
+        if (!card) {
+            void vscode.window.showInformationMessage(l10n('opportunities.report.noContent'));
+            return;
         }
+        await writeSingleOpportunityCardReport(card, this._workspaceRoot);
     }
 
     /** Post a message to the webview, swallowing if the panel was disposed
@@ -240,8 +168,13 @@ export class OpportunitiesPanel {
  * `build_runner`) is excluded entirely rather than surfaced with an
  * explanatory "not imported anywhere" line: it clutters a panel whose whole
  * point is "packages worth acting on now".
+ *
+ * Exported (not just used internally by {@link OpportunitiesPanel.createOrShow}) so
+ * `report-webview.ts` can build the SAME card data for the Package Dashboard's embedded
+ * "Upgrades" tab (PLAN_ext_ui_package_tabs.md §4 Tab 3) without needing a standalone
+ * `OpportunitiesPanel` instance — the embed has no webview panel of its own to attach one to.
  */
-async function buildCards(
+export async function buildOpportunityCards(
     results: readonly VibrancyResult[],
     workspaceRoot: vscode.Uri,
     reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,
@@ -456,8 +389,13 @@ function buildHealthSnapshot(result: VibrancyResult): PackageHealthSnapshot {
     };
 }
 
-/** Open a workspace-relative file and move the cursor to the given line. */
-async function openAtLine(
+/**
+ * Open a workspace-relative file and move the cursor to the given line. Exported so both
+ * `OpportunitiesPanel._handleMessage` and the embedded Upgrades tab's message handler in
+ * `report-webview.ts` navigate identically -- there is only one implementation of "open this
+ * usage site", just two callers.
+ */
+export async function openAtLine(
     workspaceRoot: vscode.Uri, relativePath: string, line: number,
 ): Promise<void> {
     try {
@@ -477,4 +415,147 @@ async function openAtLine(
             l10n('opportunities.openFileFailed', { file: relativePath }),
         );
     }
+}
+
+/**
+ * Write a combined opportunities report containing every card's AI prompt, copy the file's
+ * absolute path to the clipboard, and notify the user. Returns whether anything was written, so
+ * the caller (the standalone panel's `_writeReport`, or the embedded tab's message handler) can
+ * tell its OWN webview whether to report success or failure without duplicating this logic.
+ *
+ * Extracted from `OpportunitiesPanel._writeReport` (PLAN_ext_ui_package_tabs.md §4 Tab 3) so the
+ * embedded Upgrades tab in the Package Dashboard can trigger the exact same write without a
+ * `OpportunitiesPanel` instance — the embed has no standalone webview panel to construct one on.
+ */
+export async function writeCombinedOpportunitiesReport(
+    cards: readonly OpportunityCardData[], workspaceRoot: vscode.Uri,
+): Promise<boolean> {
+    try {
+        // Use the scanned workspace root (beside the pubspec), not the
+        // generic first workspace folder — correct in multi-root setups.
+        // Shared helper keeps the `reports/` root in sync with other consumers.
+        const reportDir = reportsUri(workspaceRoot);
+        await vscode.workspace.fs.createDirectory(reportDir);
+
+        // Reachable even though the button shows when ranked.length > 0,
+        // because ranked cards can have null aiPrompt (no opportunities).
+        const sections = cards
+            .filter(c => c.aiPrompt)
+            .map(c => c.aiPrompt as string);
+
+        if (sections.length === 0) {
+            void vscode.window.showInformationMessage(l10n('opportunities.report.noContent'));
+            return false;
+        }
+
+        // Combine into one markdown document with separators.
+        const body = sections.join('\n\n---\n\n');
+        const stamp = formatTimestamp(new Date());
+        const filename = `${stamp}_package_opportunities.md`;
+        const fileUri = vscode.Uri.joinPath(reportDir, filename);
+
+        await vscode.workspace.fs.writeFile(fileUri, Buffer.from(body, 'utf8'));
+
+        // Copy the absolute path — the user pastes it into their AI tool.
+        const absPath = fileUri.fsPath;
+        await vscode.env.clipboard.writeText(absPath);
+
+        void vscode.window.showInformationMessage(
+            l10n('opportunities.report.written', { path: absPath }),
+        );
+        return true;
+    } catch (err: unknown) {
+        void vscode.window.showErrorMessage(l10n(
+            'opportunities.report.failed',
+            { error: err instanceof Error ? err.message : String(err) },
+        ));
+        return false;
+    }
+}
+
+/**
+ * Write a single package's AI prompt to its own dated file and copy the path — the per-card
+ * counterpart to {@link writeCombinedOpportunitiesReport}, extracted for the same embedding
+ * reason. `card` must already be resolved by the caller (both call sites look it up from their
+ * own cached card list before calling this).
+ */
+export async function writeSingleOpportunityCardReport(
+    card: OpportunityCardData, workspaceRoot: vscode.Uri,
+): Promise<void> {
+    if (!card.aiPrompt) {
+        void vscode.window.showInformationMessage(l10n('opportunities.report.noContent'));
+        return;
+    }
+    try {
+        // Shared helper keeps the `reports/` root in sync with other consumers.
+        const reportDir = reportsUri(workspaceRoot);
+        await vscode.workspace.fs.createDirectory(reportDir);
+
+        const stamp = formatTimestamp(new Date());
+        // Sanitize the package name for use in a filename.
+        const safeName = card.result.package.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const filename = `${stamp}_opportunity_${safeName}.md`;
+        const fileUri = vscode.Uri.joinPath(reportDir, filename);
+
+        await vscode.workspace.fs.writeFile(fileUri, Buffer.from(card.aiPrompt, 'utf8'));
+
+        const absPath = fileUri.fsPath;
+        await vscode.env.clipboard.writeText(absPath);
+
+        void vscode.window.showInformationMessage(
+            l10n('opportunities.report.written', { path: absPath }),
+        );
+    } catch (err: unknown) {
+        void vscode.window.showErrorMessage(l10n(
+            'opportunities.report.failed',
+            { error: err instanceof Error ? err.message : String(err) },
+        ));
+    }
+}
+
+/** Message shape the Upgrades embed's client script posts, wrapped under `upgradesCommand` by
+ *  the host (see `packages-tabs.ts`'s `getUpgradesEmbedScript`, mirroring the `optimizerCommand`
+ *  wrapper `rulePacksWebviewProvider.ts` uses for the Analysis Optimizer embed). */
+export interface OpportunitiesEmbeddedMessage {
+    readonly type: string;
+    readonly file?: string;
+    readonly line?: number;
+    readonly package?: string;
+}
+
+/**
+ * Handles one message forwarded from the embedded Upgrades tab's script. Mirrors
+ * `OpportunitiesPanel._handleMessage`'s switch exactly (same message shapes, same handlers) so an
+ * action taken from the embedded tab is indistinguishable from the same action in the standalone
+ * panel. The caller (`report-webview.ts`) supplies the CURRENT card list and workspace root since
+ * the embed has no long-lived panel instance to cache them on across calls — see
+ * `_getUpgradesEmbed`'s doc comment there.
+ */
+export async function handleOpportunitiesEmbeddedMessage(
+    msg: OpportunitiesEmbeddedMessage,
+    cards: readonly OpportunityCardData[],
+    workspaceRoot: vscode.Uri,
+): Promise<{ readonly reportResult?: 'written' | 'failed' }> {
+    if (msg.type === 'openFile' && msg.file) {
+        await openAtLine(workspaceRoot, msg.file, msg.line ?? 1);
+        return {};
+    }
+    if (msg.type === 'openPackage' && msg.package) {
+        await vscode.commands.executeCommand('saropaLints.packageVibrancy.showPackagePanel', msg.package);
+        return {};
+    }
+    if (msg.type === 'writeReport') {
+        const ok = await writeCombinedOpportunitiesReport(cards, workspaceRoot);
+        return { reportResult: ok ? 'written' : 'failed' };
+    }
+    if (msg.type === 'writeCardReport' && msg.package) {
+        const card = cards.find(c => c.result.package.name === msg.package);
+        if (!card) {
+            void vscode.window.showInformationMessage(l10n('opportunities.report.noContent'));
+            return { reportResult: 'failed' };
+        }
+        await writeSingleOpportunityCardReport(card, workspaceRoot);
+        return {};
+    }
+    return {};
 }

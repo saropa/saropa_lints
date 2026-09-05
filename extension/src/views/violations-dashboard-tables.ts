@@ -5,6 +5,7 @@
 import { l10n } from '../i18n/runtime';
 import { type Violation } from '../violationsReader';
 import { type DashboardSection } from './issuesTreeModel';
+import { buildRuleDetailExtras, ruleDetailExtrasAvailable } from './violations-dashboard-rule-detail';
 import { escapeHtml, type ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
 import { pluralize } from './webview-format';
 
@@ -82,7 +83,11 @@ export function buildTopRuleRow(r: TopRule, i: number): string {
   const ruleAttr = encodeURIComponent(r.name);
   const files = r.files ?? [];
   const message = r.message ?? '';
-  const expandable = message.length > 0 || files.length > 0;
+  // Expandable when there is a message/file breakdown OR any folded-in Rule
+  // Explain content (how-to-fix, OWASP, related/same-tag/supersedes links) —
+  // widened from the original message-or-files check so the fold (plan §B)
+  // surfaces even for a rule whose only detail is, say, an OWASP mapping.
+  const expandable = message.length > 0 || files.length > 0 || ruleDetailExtrasAvailable(r);
   const chevron = expandable
     ? '<span class="trow-chev" aria-hidden="true">▸</span>'
     : '<span class="trow-chev placeholder" aria-hidden="true"></span>';
@@ -106,7 +111,7 @@ export function buildTopRuleRow(r: TopRule, i: number): string {
       </td>
     </tr>`;
   if (!expandable) return mainRow;
-  return `${mainRow}${buildTopRuleDetailRow(ruleAttr, message, files)}`;
+  return `${mainRow}${buildTopRuleDetailRow(ruleAttr, message, files, r)}`;
 }
 
 
@@ -114,6 +119,7 @@ export function buildTopRuleDetailRow(
   ruleAttr: string,
   message: string,
   files: ReadonlyArray<{ file: string; count: number; line: number }>,
+  rule: TopRule,
 ): string {
   const msgHtml = message.length > 0
     ? `<p class="trd-msg">${escapeHtml(message)}</p>`
@@ -131,8 +137,13 @@ export function buildTopRuleDetailRow(
     ? `<div class="trd-files-head">${escapeHtml(l10n('findingsDash.topRules.filesAffected', { count: String(files.length) }))}</div>
          <ul class="trd-files">${fileItems}</ul>`
     : '';
+  // Rule Explain fold (plan §B): how-to-fix / OWASP / related / same-tag /
+  // supersedes, appended after the message + files so the row reads
+  // top-to-bottom as "what/where" (existing content) then "why/what next"
+  // (the folded-in content). Empty when the rule carries none of it.
+  const extrasHtml = buildRuleDetailExtras(rule);
   return `<tr class="trow-detail" id="trd-${ruleAttr}" data-rule-enc="${ruleAttr}" hidden>
-      <td colspan="5"><div class="trd-body">${msgHtml}${filesHtml}</div></td>
+      <td colspan="5"><div class="trd-body">${msgHtml}${filesHtml}${extrasHtml}</div></td>
     </tr>`;
 }
 

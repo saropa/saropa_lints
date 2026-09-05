@@ -183,6 +183,11 @@ describe('applyRuleCatalog', () => {
       ruleStatus: 'ready',
       requiresReview: true,
       tags: ['security', 'review-required'],
+      // Catalog-sourced fix-it text and OWASP mapping — this is what a live
+      // Diagnostic never carries, and what the dashboard's "How to fix" /
+      // "OWASP mapping" sections read.
+      correction: 'Move the secret to secure storage.',
+      owasp: { mobile: ['m1'], web: ['a07'] },
     },
     avoid_print: { ruleType: 'codeSmell', ruleStatus: 'beta' },
   };
@@ -222,5 +227,46 @@ describe('applyRuleCatalog', () => {
     const model = modelWith(['avoid_print']);
     const data = applyRuleCatalog(model, {});
     assert.strictEqual(data, model);
+  });
+
+  it('backfills correction and owasp onto a live Violation that lacks them', () => {
+    // A live Diagnostic-derived Violation starts with correction/owasp both
+    // undefined (buildViolationsDataFromDiagnostics has no such fields to
+    // set) — this is the exact gap the work package closes: without this
+    // backfill, the Findings dashboard's rule-detail expander has nothing to
+    // show for "How to fix" / "OWASP mapping" on a live-diagnostics finding.
+    const model = modelWith(['avoid_hardcoded_secret']);
+    assert.strictEqual(model.violations[0].correction, undefined);
+    assert.strictEqual(model.violations[0].owasp, undefined);
+
+    const data = applyRuleCatalog(model, catalog);
+    assert.strictEqual(data.violations[0].correction, 'Move the secret to secure storage.');
+    assert.deepStrictEqual(data.violations[0].owasp, { mobile: ['m1'], web: ['a07'] });
+  });
+
+  it('does not overwrite correction/owasp already present on a violation', () => {
+    // Defends the `??` backfill choice: a caller that somehow already
+    // populated these fields (e.g. a hybrid live+batch source) keeps its own
+    // values rather than having the catalog clobber them.
+    const model = modelWith(['avoid_print']);
+    model.violations[0].correction = 'Existing correction text.';
+    model.violations[0].owasp = { mobile: ['m2'], web: [] };
+
+    const catalogWithPrint: Record<string, RuleMetadataData> = {
+      avoid_print: {
+        ...catalog.avoid_print,
+        correction: 'Catalog correction text.',
+        owasp: { mobile: ['m9'], web: ['a01'] },
+      },
+    };
+    const data = applyRuleCatalog(model, catalogWithPrint);
+    assert.strictEqual(data.violations[0].correction, 'Existing correction text.');
+    assert.deepStrictEqual(data.violations[0].owasp, { mobile: ['m2'], web: [] });
+  });
+
+  it('leaves a violation untouched when its rule has no catalog entry', () => {
+    const data = applyRuleCatalog(modelWith(['some_unknown_rule']), catalog);
+    assert.strictEqual(data.violations[0].correction, undefined);
+    assert.strictEqual(data.violations[0].owasp, undefined);
   });
 });

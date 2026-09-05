@@ -70,8 +70,8 @@
           "icon": "$(warning)"
         },
         {
-          "id": "saropaLints.settings",
-          "name": "%views.settings.name%",
+          "id": "saropaLints.actions",
+          "name": "%views.actions.name%",
           "when": "saropaLints.isDartProject",
           "icon": "$(gear)"
         }
@@ -976,7 +976,7 @@
         },
         {
           "command": "saropaLints.runAnalysis",
-          "when": "view == saropaLints.settings && saropaLints.isDartProject && saropaLints.enabled",
+          "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject && saropaLints.enabled",
           "group": "navigation"
         },
         {

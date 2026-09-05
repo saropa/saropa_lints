@@ -266,7 +266,9 @@ export function runActivation(
     // Wire the dashboard's docked detail pane with the same review-state +
     // cache the standalone panel used, so it runs the lazy fetches and persists
     // PR/issue review state (master-detail consolidation).
-    VibrancyReportPanel.configure(reviewStateService, cache);
+    // Third arg (PLAN_ext_ui_package_tabs.md §4 Tab 5): the embedded Known issues tab's
+    // recent-searches persistence needs workspaceState, which only the ExtensionContext exposes.
+    VibrancyReportPanel.configure(reviewStateService, cache, context);
     registryService = new RegistryService(context.secrets);
     context.subscriptions.push(registryService);
 
@@ -753,6 +755,11 @@ function registerCommands(
                     // a Rescan click really produced fresh data (vs. coalescing into
                     // a still-pending scan that returns the same numbers).
                     lastScanTimestamp: lastScanMeta.scanTimestamp,
+                    // Embedded Upgrades tab (PLAN_ext_ui_package_tabs.md §4 Tab 3): the same
+                    // reverse-dependency map `OpportunitiesPanel.createOrShow` uses for its
+                    // dual-dependency risk detection, so the embedded cards match the standalone
+                    // panel's cards exactly rather than silently omitting that risk category.
+                    reverseDeps: lastReverseDeps ?? new Map(),
                 });
             },
         ),

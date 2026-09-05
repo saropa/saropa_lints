@@ -204,7 +204,18 @@ export function buildRadialGauge(avgScore: number): string {
                     keySplines="0.25 0.1 0.25 1" />
             </circle>
         </svg>
-        <div class="gauge-label">${gradeLabel}</div>
+        ${/* Named .radial-gauge-label (NOT the bare .gauge-label used by
+            dashboardChromeStylesComponents.ts' .hero-gauge). This report's
+            72px SMIL-driven radial gauge is a deliberately distinct widget
+            from the chrome's 96px CSS-keyframe hero-gauge (see
+            PLAN_ext_ui_report_styles.md §7 risk note: "do NOT conflate
+            them") -- chrome's .gauge-label rule is unscoped (position:
+            absolute; inset:0) and would silently reposition this label to
+            the corners if the class name were reused here. Renaming keeps
+            the two gauges visually and structurally independent while
+            report-styles-parts.ts still adopts chrome's .status-line/.pill
+            CSS (which does not touch gauge classes). */ ''}
+        <div class="radial-gauge-label">${gradeLabel}</div>
     </div>`;
 }
 

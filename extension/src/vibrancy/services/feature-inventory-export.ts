@@ -75,7 +75,7 @@ export async function exportFeatureInventory(
     const folder = await resolveReportFolder();
     if (!folder) { return null; }
 
-    const report = await buildReport(results, workspaceRoot, meta);
+    const report = await buildFeatureInventoryReport(results, workspaceRoot, meta);
     const stamp = formatTimestamp(new Date());
 
     const htmlContent = buildFeatureInventoryHtml(report);
@@ -108,8 +108,13 @@ export async function exportFeatureInventory(
  * Candidates are every API name mined from every package's changelog — the same
  * set the adoption ranking builds during a scan, rebuilt here because the scan
  * does not retain it.
+ *
+ * Exported (not just used internally by {@link exportFeatureInventory}) so
+ * `report-webview.ts` can build the SAME model for the Package Dashboard's embedded
+ * "Full report" tab (PLAN_ext_ui_package_tabs.md §4 Tab 4) without also writing the three
+ * report files to disk — the embed only needs the in-memory model to render inline.
  */
-async function buildReport(
+export async function buildFeatureInventoryReport(
     results: readonly VibrancyResult[],
     workspaceRoot: vscode.Uri,
     meta: { extensionVersion: string },

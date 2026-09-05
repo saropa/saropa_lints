@@ -86,6 +86,9 @@ import { buildViolationsDataFromDiagnostics } from '../liveDiagnosticsModel';
 // reader/writer lives in `laneConfig.ts` instead. See
 // `CUSTOM_YAML_TOP_LEVEL_KEYS`'s `lane` entry comment in `customConfigYaml.ts`.
 import { readRawLaneFromCustomConfig, writeLaneToCustomConfig, type RuleLaneValue } from '../config/laneConfig';
+// Dry-run legacy-key probe for the Config file tab's Migrate card — see
+// `_buildMigrateCard`'s doc comment (PLAN_ext_ui_sidebar_reset.md P2).
+import { migrateConfigKeys } from '../config/migrateConfig';
 import { buildSettingsCatalog, findSettingEntry, flatSettingKey, type SettingCatalogEntry } from './settingsCatalog';
 
 const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
@@ -1702,7 +1705,12 @@ ${detailRow}`;
     // copy that could silently drift from it.
     const builders = this._configFileCardBuilders();
     const yamlKeyCards = CONFIG_FILE_CARD_IDS.map((id) => builders[id](root));
-    const content = [...yamlKeyCards, this._buildBaselineCard(root), this._buildOptimizerCard()].join('\n');
+    const content = [
+      ...yamlKeyCards,
+      this._buildMigrateCard(root),
+      this._buildBaselineCard(root),
+      this._buildOptimizerCard(),
+    ].join('\n');
     return this._tabPanel('configFile', content);
   }
 
@@ -1904,6 +1912,36 @@ ${detailRow}`;
     <input type="number" min="0" id="cf-threshold-fail" placeholder="${escapeHtml(l10n('rulesTiers.configFile.diagnosticStats.fail'))}" />
     <button type="button" class="btn tier-2" id="cf-threshold-add">${escapeHtml(l10n('rulesTiers.common.add'))}</button>
   </div>
+</section>`;
+  }
+
+  /**
+   * "Migrate legacy config keys" — one-shot button (PLAN_ext_ui_sidebar_reset.md
+   * P2). This used to be a conditional sidebar Actions row (`configTree.ts`'s
+   * `buildActionNodes`, deleted in P1): a migration a project runs at most
+   * once does not belong forever in the 3-verb ACTIONS section next to
+   * Run/Fix/Initialize, which are all repeatable. A card here — hidden the
+   * moment there is nothing left to migrate — is the "add if missing"
+   * Config file tab surface the reset plan calls for, so
+   * `saropaLints.migrateConfig` stays reachable from a UI and not just the
+   * command palette. Reuses the EXACT dry-run probe the deleted sidebar row
+   * used (`migrateConfigKeys(root, { dryRun: true })`), so "how many keys
+   * remain" can never disagree with what the command itself will do.
+   */
+  private _buildMigrateCard(root: string): string {
+    const probe = migrateConfigKeys(root, { dryRun: true });
+    // Same "moved + skipped" count the deleted sidebar row used — `skipped`
+    // keys are already in the custom file but their legacy copies still sit
+    // in analysis_options.yaml's plugin block, causing `unsupported_option`
+    // warnings the non-dry-run migration also cleans up.
+    const legacyCount = probe.moved.length + probe.skipped.length;
+    if (probe.error || legacyCount <= 0) return '';
+    const label = escapeHtml(l10n('dashboards.controls.migrateLegacyKeys', { count: String(legacyCount) }));
+    const desc = escapeHtml(l10n('dashboards.controls.migrateLegacyKeysDesc'));
+    return `<section class="section" aria-label="${label}">
+  <h3>${label}</h3>
+  <p class="hint">${desc}</p>
+  <button class="btn tier-2" data-command="migrateConfigKeys" title="${desc}">${label}</button>
 </section>`;
   }
 
@@ -2458,6 +2496,14 @@ ${detailRow}`;
     // comment), so this is create+apply in one command.
     if (id === 'createBaseline') {
       await vscode.commands.executeCommand('saropaLints.createBaseline');
+      this.refresh();
+      return;
+    }
+    // Config file tab — Migrate card (PLAN_ext_ui_sidebar_reset.md P2).
+    // Refresh afterward so the card disappears once nothing is left to move
+    // (its dry-run probe would then find legacyCount === 0).
+    if (id === 'migrateConfigKeys') {
+      await vscode.commands.executeCommand('saropaLints.migrateConfig');
       this.refresh();
       return;
     }

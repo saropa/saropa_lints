@@ -38,18 +38,43 @@ export interface OpportunityCardData {
 }
 
 /**
- * Build the full Upgrade Opportunities dashboard document.
- *
- * `cards` is the host-prepared list (it owns prompt assembly so this stays a
- * pure renderer). Packages without unadopted features are filtered and the rest
- * sorted by relevance score before rendering; an empty set renders a positive
- * empty state rather than a broken-looking blank page.
+ * Body-only HTML (no `<!DOCTYPE>`/`<html>`/`<head>`/nonce-bearing tags, and no `<script>` — the
+ * embedding host wires clicks itself, see `packages-tabs.ts`'s `getUpgradesEmbedScript`) for
+ * embedding inside the Package Dashboard's "Upgrades" tab (PLAN_ext_ui_package_tabs.md §4 Tab 3).
+ * Wrapped in `.opp-embed-body` so the host's embed script can scope its `querySelector` calls to
+ * just this tab (same convention `analysisOptimizerWebviewProvider`'s embed uses with
+ * `.optimizer-embed-body` — see `configDashboardScript.ts`'s `SCRIPT_OPTIMIZER_EMBED`), rather
+ * than risking a stray unscoped query matching something elsewhere on the dashboard.
  */
-export function buildOpportunitiesHtml(
+export function getEmbeddedBodyHtml(
     cards: readonly OpportunityCardData[],
     extensionVersion: string,
 ): string {
-    const nonce = createWebviewCspNonce();
+    const { subtitle, writeBtn, body } = buildOpportunitiesParts(cards);
+    // PLAN_ext_ui_report_styles.md Pass 1: .report-header/.header-version renamed to chrome's
+    // .dash-hero/.stamp (byte-identical once resolved through chromeTokens(), see
+    // report-styles.ts) -- kept in lockstep with buildOpportunitiesHtml below so the embedded
+    // tab and the standalone panel never drift onto two different hero markups.
+    return `<div class="opp-embed-body">
+    <header class="dash-hero report-header">
+        <div class="hero-text">
+            <h1>${escapeHtml(l10n('opportunities.heroTitle'))} <span class="stamp">v${escapeHtml(extensionVersion)}</span></h1>
+            ${subtitle}
+        </div>
+        ${writeBtn}
+    </header>
+    <main class="opp-list">
+        ${body}
+    </main>
+</div>`;
+}
+
+/** Shared ranking/rendering logic behind both {@link getEmbeddedBodyHtml} and
+ *  {@link buildOpportunitiesHtml} — kept in one place so the embedded tab and the standalone
+ *  panel can never render a different ranked order or a different empty state. */
+function buildOpportunitiesParts(cards: readonly OpportunityCardData[]): {
+    subtitle: string; writeBtn: string; body: string;
+} {
     const ranked = [...cards]
         .filter(c => (c.result.unadoptedApiNames?.length ?? 0) > 0)
         .sort((a, b) =>
@@ -73,6 +98,24 @@ export function buildOpportunitiesHtml(
             l10n('opportunities.actions.writeReport'),
         )}</button>`;
 
+    return { subtitle, writeBtn, body };
+}
+
+/**
+ * Build the full Upgrade Opportunities dashboard document (the standalone panel).
+ *
+ * `cards` is the host-prepared list (it owns prompt assembly so this stays a
+ * pure renderer). Packages without unadopted features are filtered and the rest
+ * sorted by relevance score before rendering; an empty set renders a positive
+ * empty state rather than a broken-looking blank page.
+ */
+export function buildOpportunitiesHtml(
+    cards: readonly OpportunityCardData[],
+    extensionVersion: string,
+): string {
+    const nonce = createWebviewCspNonce();
+    const { subtitle, writeBtn, body } = buildOpportunitiesParts(cards);
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,9 +126,9 @@ export function buildOpportunitiesHtml(
     <style nonce="${nonce}">${getDashboardTokens()}${getReportStyles()}${getPackageDetailStylesScoped()}${getOpportunitiesStyles()}</style>
 </head>
 <body>
-    <header class="report-header">
+    <header class="dash-hero report-header">
         <div class="hero-text">
-            <h1>${escapeHtml(l10n('opportunities.heroTitle'))} <span class="header-version">v${escapeHtml(extensionVersion)}</span></h1>
+            <h1>${escapeHtml(l10n('opportunities.heroTitle'))} <span class="stamp">v${escapeHtml(extensionVersion)}</span></h1>
             ${subtitle}
         </div>
         ${writeBtn}
@@ -200,8 +243,14 @@ function buildEmptyState(): string {
     </section>`;
 }
 
-/** Scoped styles for the cards; the report + detail styles supply the rest. */
-function getOpportunitiesStyles(): string {
+/**
+ * Scoped styles for the cards; the report + detail styles supply the rest. Exported (not just
+ * used internally by {@link buildOpportunitiesHtml}) so `report-html.ts` can fold it into the
+ * Package Dashboard's single shared `<style>` block for the embedded Upgrades tab — see the CSP
+ * risk note in PLAN_ext_ui_package_tabs.md §9: the embed must never carry its own nonce-bearing
+ * `<style>` tag, only contribute plain CSS text to the host's one nonce'd block.
+ */
+export function getOpportunitiesStyles(): string {
     return `
         .opp-subtitle { color: var(--vscode-descriptionForeground); margin: 4px 0 0; }
         .opp-list { display: flex; flex-direction: column; gap: 16px; padding: 16px; }
