@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../fixes/test/replace_expect_with_expect_later_fix.dart';
+import '../../fixes/test/replace_misused_test_matcher_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when duplicate test assertions are made.
@@ -3715,6 +3716,12 @@ class AvoidMisusedTestMatchersRule extends SaropaLintRule {
     }
     return false;
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceMisusedTestMatcherFix(context: context),
+  ];
 }
 
 // =============================================================================

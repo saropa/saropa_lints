@@ -81,6 +81,7 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 
 ### Added
 
+- Quick fix for `avoid_misused_test_matchers` — auto-rewrites `expect(x, true)` → `expect(x, isTrue)`, `expect(x, false)` → `expect(x, isFalse)`, `expect(x, null)` → `expect(x, isNull)`, and `expect(x.length, N)` → `expect(x, hasLength(N))`. No action required.
 - Rules & Tiers Config file tab: Lane card. Switch between Light (~200 rules in-editor) and Full (all enabled rules) from the same dashboard that already shows every other `analysis_options_custom.yaml` key. No action required.
 - Config file tab: the Baseline card now shows a "Diff vs current" subsection listing violations resolved since the baseline and new since the baseline, each with a file/line/rule table. Reads live diagnostics — never triggers a scan and stays current as you edit. No action required.
 - Live sidebar badges: the Status view's Activity Bar icon now carries a numeric badge (critical count when any exist, else total violations), and the Dashboards view carries a badge for packages with unadopted features. No action required.
@@ -106,7 +107,10 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 - Removed `transformProjectMapHtml()` and `webviewThemeOverride()` from `projectMapView.ts` — dead since the standalone Project Map panel switched to the composed `projectMapShell.ts` document in Phase 6; their only remaining reference was a historical code comment.
 - Added unit test coverage for `projectMapShell.ts` (shell tab structure, scanning-state pane, done-state pane) and `projectMapReports.ts` (report-card catalog, Reports tab HTML, quality-gate config read/write, panel-message routing) — both had zero tests before this pass.
 - Fixed null-unsafe map access and direct `as` casts in `asset_scanner.dart`, `health_cache.dart`, and `saropa_lint_rule.dart` — own-dogfood violations from `require_null_safe_json_access` and `avoid_unsafe_cast`. No action required.
+- Fixed 5 own-dogfood `avoid_misused_test_matchers` violations across 4 test files — replaced `expect(x.length, N)` with `expect(x, hasLength(N))`. No action required.
 - Extracted shared `sanitizePath()` utility to `path_guard.dart` — centralizes the normalize-and-reject-traversal pattern so future CLI entry points get path safety automatically. No action required.
+- README rewritten for readability — cut from 1,598 lines to ~430. Extension detail moved to `doc/guides/extension.md`, configuration reference to `doc/guides/configuration.md`, troubleshooting merged into `doc/troubleshooting.md`, FAQ to `doc/faq.md`. Added alternative package coverage table (46 packages audited, ~75% rule coverage). Deleted redundant `plans/GAP_ANALYSIS.md` — per-package data lives in migration guides.
+- Suppressed own-dogfood false positives in `analyzer_compat.dart` (dynamic dispatch, bare catches, swallowed exceptions are intentional version-probing shims) and `scan_runner.dart` (safe-by-construction cast). Fixed nullable interpolation in `DiagnosticCodeLowerCaseCompat.lowerCaseName`.
 
 </details>
 
