@@ -1287,6 +1287,17 @@ class AvoidSubstringRule extends SaropaLintRule {
     final String receiverSource = receiver.toSource();
     final argNames = _substringArgNames(substringCall);
 
+    // Data-flow shortcut: if every index argument is itself provably
+    // in-bounds (a direct `indexOf`/`lastIndexOf` call, a regex match's
+    // `.start`/`.end`/`.group(n)`, or a local variable initialized from one
+    // of those), no control-flow guard is needed at all — the API contract
+    // of the source already guarantees the index is valid. Without this,
+    // `line.substring(0, line.indexOf(pattern))` and
+    // `content.substring(headerMatch.end)` are flagged even though nothing
+    // upstream needs to be checked; see
+    // bugs/avoid_string_substring_false_positive_guarded_by_regex_or_indexof.md.
+    if (_hasOnlySafeIndexArguments(substringCall)) return true;
+
     AstNode? prev = substringCall;
     AstNode? current = substringCall.parent;
     while (current != null) {
@@ -1295,9 +1306,14 @@ class AvoidSubstringRule extends SaropaLintRule {
               _nodeWithin(current.expression, substringCall))) {
         // Substring is in the then-branch OR evaluated inside the `if`
         // CONDITION itself (e.g. `if (i > 0 && r.hasMatch(s.substring(0, i)))`).
-        // Either way the condition's receiver/arg checks bound it.
+        // Either way the condition's receiver/arg checks bound it. Also
+        // accept a regex `hasMatch(receiver)` guard — a passing match against
+        // an anchored pattern (e.g. `^/[A-Za-z]:/`) proves a minimum receiver
+        // length just as reliably as an explicit `.length` check, but was
+        // previously only recognized in the early-exit-block branch below.
         if (_conditionGuardsLength(current.expression, receiverSource) ||
-            _conditionInvolvesArgs(current.expression, argNames)) {
+            _conditionInvolvesArgs(current.expression, argNames) ||
+            _conditionHasRegexGuard(current.expression, receiverSource)) {
           return true;
         }
       } else if (current is ConditionalExpression &&
@@ -1307,7 +1323,8 @@ class AvoidSubstringRule extends SaropaLintRule {
         // handles "not found". The arg/receiver checks are polarity-agnostic —
         // a condition mentioning the bounding variable proves intent either way.
         if (_conditionGuardsLength(current.condition, receiverSource) ||
-            _conditionInvolvesArgs(current.condition, argNames)) {
+            _conditionInvolvesArgs(current.condition, argNames) ||
+            _conditionHasRegexGuard(current.condition, receiverSource)) {
           return true;
         }
       } else if (current is WhileStatement) {
@@ -1495,6 +1512,83 @@ class AvoidSubstringRule extends SaropaLintRule {
   }
 
   // Exit detection uses shared containsEarlyExit from early_exit_guard_utils
+
+  /// True when every argument passed to [substringCall] is provably a valid
+  /// index — either directly ([_isSafeIndexSource]) or via a local variable
+  /// whose initializer was one. Requires at least one argument (an empty
+  /// argument list, i.e. `substring()` with no args, is meaningless here and
+  /// falls through to the normal guard search).
+  static bool _hasOnlySafeIndexArguments(MethodInvocation substringCall) {
+    final arguments = substringCall.argumentList.arguments;
+    if (arguments.isEmpty) return false;
+    for (final arg in arguments) {
+      if (_isSafeIndexSource(arg)) continue;
+      if (arg is SimpleIdentifier) {
+        final Expression? initializer = _findLocalInitializer(arg);
+        if (initializer != null && _isSafeIndexSource(initializer)) continue;
+      }
+      // At least one argument isn't provably safe — fall back to the
+      // control-flow guard search in the caller.
+      return false;
+    }
+    return true;
+  }
+
+  /// True when [expr] is an expression whose value is guaranteed to be a
+  /// valid string index by the API contract of the call/property itself:
+  /// `indexOf`/`lastIndexOf` (return `-1` or an offset within the searched
+  /// string — callers that don't check for `-1` are a separate concern, not
+  /// an out-of-bounds one) or a `RegExpMatch`'s `.start`/`.end`/`.group(n)`
+  /// (always within the matched string's bounds). Detected by property/method
+  /// name only (no resolved-type check) — see the false-positive doctrine in
+  /// Skill(lint-rules): these names are specific enough (`.start`/`.end` on a
+  /// match object, not e.g. a generic range type) that the name-based check
+  /// is an acceptable, narrowly-scoped exception.
+  static bool _isSafeIndexSource(Expression arg) {
+    Expression expr = arg;
+    while (expr is ParenthesizedExpression) {
+      expr = expr.expression;
+    }
+    if (expr is MethodInvocation) {
+      final String name = expr.methodName.name;
+      return name == 'indexOf' || name == 'lastIndexOf' || name == 'group';
+    }
+    if (expr is PropertyAccess) {
+      final String name = expr.propertyName.name;
+      return name == 'start' || name == 'end';
+    }
+    if (expr is PrefixedIdentifier) {
+      final String name = expr.identifier.name;
+      return name == 'start' || name == 'end';
+    }
+    return false;
+  }
+
+  /// Walks up from [arg] through enclosing blocks (stopping at the function
+  /// boundary) looking for a local variable declaration matching [arg]'s
+  /// name, returning its initializer. This is a single-hop, order-agnostic
+  /// lookup (it does not verify the declaration precedes the use, or that
+  /// the variable is never reassigned) — deliberately shallow, since the
+  /// only thing it feeds into ([_isSafeIndexSource]) is a narrow allowlist
+  /// of provably-safe initializers, not general guard reasoning.
+  static Expression? _findLocalInitializer(SimpleIdentifier arg) {
+    AstNode? node = arg.parent;
+    while (node != null && node is! FunctionBody) {
+      if (node is Block) {
+        for (final stmt in node.statements) {
+          if (stmt is VariableDeclarationStatement) {
+            for (final decl in stmt.variables.variables) {
+              if (decl.name.lexeme == arg.name) {
+                return decl.initializer;
+              }
+            }
+          }
+        }
+      }
+      node = node.parent;
+    }
+    return null;
+  }
 
   /// Collects all identifier names referenced in the substring arguments.
   ///
@@ -2770,6 +2864,23 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
   void visitIndexExpression(IndexExpression node) {
     final Expression index = node.index;
     if (index is IntegerLiteral) {
+      // A constant-index WRITE (this IndexExpression is the LHS of an
+      // assignment) is a different pattern from a constant-index READ: the
+      // rule's premise — "retrieves the same element every iteration" — only
+      // applies to reads. A write like `curr[0] = i` in a DP row
+      // initialization stores a DIFFERENT value each iteration into a fixed
+      // slot, which is intentional, not a copy-paste bug. Suppression here is
+      // deliberately unconditional on the RHS value (even `curr[0] = 42`,
+      // a genuinely wasteful constant write, is suppressed) rather than
+      // trying to detect whether the assigned value varies with the loop —
+      // that would need value-flow analysis this rule does not attempt. See
+      // plans/history/2026.09/2026.09.05/avoid_accessing_collections_by_constant_index_false_positive_dp_algorithm.md.
+      final AstNode? parent = node.parent;
+      if (parent is AssignmentExpression && parent.leftHandSide == node) {
+        super.visitIndexExpression(node);
+        return;
+      }
+
       reporter.atNode(node);
     }
     super.visitIndexExpression(node);

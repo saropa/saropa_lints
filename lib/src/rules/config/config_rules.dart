@@ -659,6 +659,14 @@ class AvoidStringEnvParsingRule extends SaropaLintRule {
 /// compile failures when targeting web. Use conditional imports or
 /// `package:universal_io` for cross-platform code.
 ///
+/// Suppressed for CLI tools and analyzer plugins (pubspec `executables:`,
+/// or a `custom_lint_builder`/`analyzer_plugin` dependency — see
+/// [ProjectContext.isCliOrToolPackage]), and for individual files under a
+/// `bin/`/`tool/` directory (see [ProjectContext.isInShortLivedToolDirectory]):
+/// both run on the VM only and never target web, so `dart:io` is a
+/// legitimate, required dependency rather than a portability risk.
+/// See bugs/avoid_platform_specific_imports_false_positive_analyzer_plugin.md.
+///
 /// **BAD:**
 /// ```dart
 /// import 'dart:io';
@@ -751,6 +759,20 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
       // mode is structurally impossible, so every diagnostic we'd raise is
       // noise. Bug: bugs/avoid_platform_specific_imports_false_positive_non_web_project.md.
       if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
+      // CLI tools and analyzer plugins run on the VM — dart:io is a
+      // legitimate, required dependency. The "shared code" heuristic
+      // is wrong for these package types. Two independent signals: a
+      // whole-package one (pubspec `executables:` or a
+      // custom_lint_builder/analyzer_plugin dependency) and a per-file one
+      // (the file itself lives under `bin/`/`tool/`) — a build script can
+      // sit in `tool/` inside an otherwise browser-facing app package that
+      // carries none of the whole-package signals.
+      // Bug: bugs/avoid_platform_specific_imports_false_positive_analyzer_plugin.md.
+      if (ProjectContext.isCliOrToolPackage(context.filePath) ||
+          ProjectContext.isInShortLivedToolDirectory(context.filePath)) {
+        return;
+      }
 
       final String path = context.filePath.replaceAll('\\', '/');
       for (final String dir in _platformDirs) {

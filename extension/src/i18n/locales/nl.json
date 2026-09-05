@@ -798,7 +798,11 @@
       "regressionTitle": "Gezondheidscore is gedaald van {previousScore} naar {currentScore}",
       "trendTitle": "Gezondheidscore / schendingstrend sinds vorige runs",
       "hotspotsTitle": "{open} open, {safe} gemarkeerd als veilig, {fixed} gefixeerd — klik om te beoordelen",
-      "hotspotsPill": "{open} open · {percent}% beoordeeld"
+      "hotspotsPill": "{open} open · {percent}% beoordeeld",
+      "qualityGatePassingTitle": "Code Health-kwaliteitspoort passeren - klik om Code Health te openen",
+      "qualityGatePassingPill": "Poort passeren",
+      "qualityGateFailingTitle": "Kwaliteitspoort codestatus mislukt ({count}-overtreding(en)) — klik om Codestatus te openen",
+      "qualityGateFailingPill": "Poort mislukt"
     },
     "groupBy": {
       "severity": "De ernst van de situatie",
@@ -2531,12 +2535,17 @@
   "sidebar": {
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% beoordeeld",
-      "hotspotsDescription": "{open} open",
+      "hotspotsDescription": "{open} geopend",
       "lastRunLabel": "Laatste run · {ago}"
     },
     "dashboards": {
       "commandCatalogLabel": "Alle commando's…",
-      "commandCatalogDescription": "Alle opdrachten zoeken"
+      "commandCatalogDescription": "Alle opdrachten zoeken",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Poort defect",
+      "codeHealthNeverScanned": "Voer Code Health uit om je score te zien",
+      "projectMapDescription": "{ago} gescand",
+      "projectMapNeverScanned": "Voer Project Map uit om de grootte en hotspots te zien"
     }
   }
 }

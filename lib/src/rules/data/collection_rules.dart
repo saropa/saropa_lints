@@ -1123,6 +1123,31 @@ bool _isEmptinessCheck(Expression condition, String name) {
   return false;
 }
 
+/// True when every element of a collection literal is a plain expression —
+/// no [SpreadElement], [IfElement], or [ForElement] — so the literal's
+/// element count is fixed at compile time and cannot resolve to zero.
+///
+/// This guards [AvoidUnsafeReduceRule] against two failure directions:
+///   - A `SpreadElement` (`...otherList`) can spread zero elements at
+///     runtime even though the literal itself has one syntactic entry
+///     (`[...otherList]` has length 1 in the AST but 0+ at runtime).
+///   - An `IfElement` (`[if (cond) x]`) or `ForElement`
+///     (`[for (v in xs) v]`) can likewise contribute zero elements.
+/// Only when every element is a plain value/key-value pair is the runtime
+/// element count guaranteed to equal the syntactic element count (which is
+/// checked separately via `elements.isNotEmpty`).
+bool _isStaticallyNonEmptyLiteral(List<CollectionElement> elements) {
+  if (elements.isEmpty) return false;
+  for (final CollectionElement element in elements) {
+    if (element is SpreadElement ||
+        element is IfElement ||
+        element is ForElement) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /// Warns when reduce() is called on a potentially empty collection.
 ///
 /// Since: v0.1.8 | Updated: v4.13.0 | Rule version: v6
@@ -1181,6 +1206,24 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
       // Check if target is an Iterable type
       final Expression? target = node.realTarget;
       if (target == null) return;
+
+      // Non-empty literal collections can never throw StateError — the
+      // element count is known at compile time, UNLESS the literal contains
+      // a spread (`...list`), conditional (`if (c) x`), or loop
+      // (`for (x in xs) x`) element. Those can still produce zero elements
+      // at runtime even though the literal syntactically has entries, so
+      // `_isStaticallyNonEmptyLiteral` requires every element to be a plain
+      // (unconditional, non-spread) expression before treating the literal
+      // as provably non-empty.
+      if (target is ListLiteral &&
+          _isStaticallyNonEmptyLiteral(target.elements)) {
+        return;
+      }
+      if (target is SetOrMapLiteral &&
+          target.isSet &&
+          _isStaticallyNonEmptyLiteral(target.elements)) {
+        return;
+      }
 
       final DartType? targetType = target.staticType;
       if (targetType == null) return;

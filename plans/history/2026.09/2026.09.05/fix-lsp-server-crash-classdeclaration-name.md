@@ -25,12 +25,27 @@ for `||` and converted the existing GOOD case to use `&&`.
 
 **Fix 3 — CI compile gate:** Added a `dart compile kernel` step to
 `.github/workflows/ci.yml` that compile-checks all 4 `bin/` entry points
-(`lsp_server`, `project_health`, `severity_report`, `doctor`). Catches
-build-breaking API changes the analyzer package introduces at runtime load
-time, not at static analysis time.
+(`lsp_server`, `project_health`, `severity_report`, `doctor`). Uses a temp
+directory for output (not `/dev/null` — `dart compile kernel -o /dev/null`
+fails on some platforms trying to open it as a regular file).
+
+**Fix 4 — CI API compat checker:** Added `scripts/check_analyzer_api_compat.py`
+that greps `lib/src/rules/` for known-removed analyzer package API patterns
+(e.g. `ClassDeclaration.name.lexeme`, `ClassDeclaration.members`). Runs in CI
+alongside the compile gate. New removed APIs are added to the script's
+`_REMOVED_APIS` list when the analyzer package drops them.
+
+**Hardening:**
+- Verified `/dev/null` fails for `dart compile kernel -o` — switched CI to
+  temp directory with cleanup trap.
+- Confirmed `_conditionHasRegexGuard` (avoid_string_substring) uses source-text
+  matching, not AST recursion into `||`/`&&` — no equivalent bug there.
+- Confirmed fixture `// expect_lint:` markers are the project's standard
+  annotation for scan-runner verification.
 
 **Verification:**
 - All 38 tests in `unnecessary_code_rules_test.dart` pass.
 - All 36 tests in `type_safety_rules_test.dart` pass.
 - All 4 entry points compile cleanly via `dart compile kernel`.
+- `check_analyzer_api_compat.py` passes clean (0 violations).
 - No other `ClassDeclaration.name.` references remain in `lib/`.

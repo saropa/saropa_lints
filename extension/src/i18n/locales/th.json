@@ -798,7 +798,11 @@
       "regressionTitle": "คะแนนสุขภาพลดลงจาก {previousScore} เป็น {currentScore}",
       "trendTitle": "คะแนนสุขภาพ / แนวโน้มการละเมิดตั้งแต่การวิ่งครั้งก่อน",
       "hotspotsTitle": "{open} เปิดอยู่ {safe} ทำเครื่องหมายว่าปลอดภัย {fixed} แก้ไขแล้ว — คลิกเพื่อตรวจสอบ",
-      "hotspotsPill": "{open} เปิด · {percent}% ตรวจสอบแล้ว"
+      "hotspotsPill": "{open} เปิด · {percent}% ตรวจสอบแล้ว",
+      "qualityGatePassingTitle": "การส่งผ่านประตูคุณภาพ Code Health — คลิกเพื่อเปิด Code Health",
+      "qualityGatePassingPill": "ด่านผ่าน",
+      "qualityGateFailingTitle": "ประตูคุณภาพความสมบูรณ์ของโค้ดล้มเหลว (การละเมิด {count}) — คลิกเพื่อเปิดความสมบูรณ์ของโค้ด",
+      "qualityGateFailingPill": "ประตูล้มเหลว"
     },
     "groupBy": {
       "severity": "ความรุนแรง Severity",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "ทุกคำสั่ง…",
-      "commandCatalogDescription": "ค้นหาคำสั่งทั้งหมด"
+      "commandCatalogDescription": "ค้นหาคำสั่งทั้งหมด",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · ประตูขัดข้อง",
+      "codeHealthNeverScanned": "เรียกใช้ Code Health เพื่อดูคะแนนของคุณ",
+      "projectMapDescription": "สแกน {ago} แล้ว",
+      "projectMapNeverScanned": "เรียกใช้ Project Map เพื่อดูขนาดและฮอตสปอต"
     }
   }
 }

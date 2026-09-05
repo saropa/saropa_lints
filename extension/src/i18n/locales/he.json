@@ -798,7 +798,11 @@
       "regressionTitle": "ציון הבריאות ירד מ{previousScore} ל{currentScore}",
       "trendTitle": "ציון בריאות / עלייה/ירידה בבעלות סכנת תקופות קודמות",
       "hotspotsTitle": "{open} פתוח, {safe} סימן כבטוח, {fixed} מותאם — לחץ כדי לסקור",
-      "hotspotsPill": "{open} פתוח · {percent}% נקרא"
+      "hotspotsPill": "{open} פתוח · {percent}% נקרא",
+      "qualityGatePassingTitle": "תהליך בדיקה של גובה קוד — לחץ כדי לפתוח מצביע על גובה קוד",
+      "qualityGatePassingPill": "מעבר דלתות",
+      "qualityGateFailingTitle": "מבחן סטנדרט של תקינות קוד נכשל ({count} סכימה(ים)) — לחץ כדי לפתוח תקינות קוד",
+      "qualityGateFailingPill": "שער כישלון"
     },
     "groupBy": {
       "severity": "חומרת החמורות",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "כל הפקודות…",
-      "commandCatalogDescription": "ה cerca של כל הפקודות"
+      "commandCatalogDescription": "ה cerca של כל הפקודות",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · שער נכשל",
+      "codeHealthNeverScanned": "הרץ את Code Health כדי לראות את הציון שלך",
+      "projectMapDescription": "הסריקה {ago}",
+      "projectMapNeverScanned": "הרץ תרשים פרויקט כדי לראות גודל ונקודות חום"
     }
   }
 }

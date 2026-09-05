@@ -176,10 +176,9 @@ void _goodObjectMethodsOnDynamic() {
   same.toString();
 }
 
-// GOOD: dynamic dispatch guarded by a `try`/`on NoSuchMethodError` (or
-// `on TypeError` / bare `on Object`) catch is the documented cross-analyzer-
-// version duck-typing pattern — the developer has already handled the
-// failure mode the rule exists to warn about, so flagging it here is noise.
+// GOOD: dynamic dispatch guarded by a `try`/`on NoSuchMethodError` catch is
+// the documented cross-analyzer-version duck-typing pattern — the developer
+// has already handled the failure mode the rule exists to warn about.
 bool _goodTryCatchGuardedDynamicCall(Object element) {
   try {
     // expect: NOT flagged — inside a `try` whose catch handles
@@ -196,5 +195,53 @@ Object? _goodTryCatchGuardedPropertyAccess(Object element) {
     return (element as dynamic).staticElement;
   } on TypeError {
     return null; // older analyzer versions expose `.element` instead
+  }
+}
+
+// BAD (C3 fix): dynamic calls inside a catch clause body should NOT be
+// exempted by the try/catch guard — the guard only makes the try-body
+// dispatch intentional, not error-handling code in the catch.
+void _badDynamicCallInsideCatch(Object element) {
+  try {
+    (element as dynamic).hasDeprecated;
+  } on NoSuchMethodError catch (e) {
+    // expect_lint: avoid_dynamic_calls_extended
+    (element as dynamic).fallbackMethod();
+  }
+}
+
+// BAD (C3 fix): dynamic calls inside a finally block should NOT be exempted
+// by the try/catch guard — finally is cleanup code, not guarded dispatch.
+void _badDynamicCallInsideFinally(Object element) {
+  try {
+    (element as dynamic).hasDeprecated;
+  } on NoSuchMethodError {
+    // fallback
+  } finally {
+    // expect_lint: avoid_dynamic_calls_extended
+    (element as dynamic).cleanup();
+  }
+}
+
+// BAD (C4 fix): bare `catch(e)` catches everything generically — it does
+// not indicate awareness of dynamic dispatch, so the try body should still
+// be flagged.
+void _badBareCatchDoesNotSuppress(Object element) {
+  try {
+    // expect_lint: avoid_dynamic_calls_extended
+    (element as dynamic).someMethod();
+  } catch (e) {
+    // generic error handling, not dynamic-dispatch-aware
+  }
+}
+
+// BAD (C4 fix): `on Object catch(e)` catches everything — same as bare
+// catch, it does not indicate dynamic dispatch awareness.
+void _badOnObjectCatchDoesNotSuppress(Object element) {
+  try {
+    // expect_lint: avoid_dynamic_calls_extended
+    (element as dynamic).someMethod();
+  } on Object catch (e) {
+    // generic error handling, not dynamic-dispatch-aware
   }
 }

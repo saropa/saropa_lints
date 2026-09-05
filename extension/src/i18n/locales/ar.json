@@ -798,7 +798,11 @@
       "regressionTitle": "نسبة الصحة انخفضت من {previousScore} إلى {currentScore}",
       "trendTitle": "نسبة الصحة / اتجاه الانتهاكات منذ الإصدارات السابقة",
       "hotspotsTitle": "مغلق {open}، {safe} مارك كامن، {fixed} مصلح — انقر للتحقق",
-      "hotspotsPill": "{open} مفتوح · {percent}% مراجعة"
+      "hotspotsPill": "{open} مفتوح · {percent}% مراجعة",
+      "qualityGatePassingTitle": "ممر جودة الصحة البرمجية — اضغط للحصول على الصحة البرمجية",
+      "qualityGatePassingPill": "المرور عبر البوابة",
+      "qualityGateFailingTitle": "معدل جودة الصحة الكودية فاشل ({count} انتهاك(ات)) — انقر لفتح الصحة الكودية",
+      "qualityGateFailingPill": "الباب فاشل"
     },
     "groupBy": {
       "severity": "شدة الحالة:",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "جميع الأوامر…",
-      "commandCatalogDescription": "ابحث عن جميع الأوامر"
+      "commandCatalogDescription": "ابحث عن جميع الأوامر",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate فاشل",
+      "codeHealthNeverScanned": "تشغيل صحة الكود لرؤية درجتك",
+      "projectMapDescription": "تم التحقق من {ago}",
+      "projectMapNeverScanned": "تشغيل خريطة المشروع لرؤية الحجم ونقاط الحرارة"
     }
   }
 }

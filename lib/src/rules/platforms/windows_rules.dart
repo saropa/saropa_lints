@@ -57,10 +57,62 @@ const Set<String> _pathVariablePatterns = <String>{
 };
 
 /// Returns true if [source] contains a path-like variable name pattern.
+///
+/// The bare word 'path' is handled separately via [_hasPathAsWord] because
+/// naive substring matching lit up unrelated identifiers and string
+/// literals that merely contain "path" as embedded text — e.g.
+/// "pathology", "empathy", "warpath", or a CLI flag like
+/// '--json-file-path'. The remaining entries are multi-syllable compounds
+/// ('directory', 'filepath', ...) that are already specific enough that
+/// plain substring matching does not misfire on them.
 bool _containsPathPattern(String source) {
   final String lower = source.toLowerCase();
-  return _pathVariablePatterns.any(lower.contains);
+  for (final String pattern in _pathVariablePatterns) {
+    if (pattern == 'path') {
+      if (_hasPathAsWord(source)) return true;
+      continue;
+    }
+    if (lower.contains(pattern)) return true;
+  }
+  return false;
 }
+
+/// Returns true if [source] contains "path" as a standalone camelCase word
+/// component rather than as a substring buried inside an unrelated word.
+///
+/// A match at `[start, end)` counts as a real word boundary when:
+/// - the character before it is missing, not a lowercase letter, or the
+///   match itself starts with capital 'P' (a camelCase transition, as in
+///   `filePath`) — so a lowercase 'path' glued onto a preceding lowercase
+///   letter (as in "empathy", "warpath") is rejected, and
+/// - the character after it is missing or not a lowercase letter — so
+///   "pathVariable"/"PathValue" count (capital letter follows), but
+///   "pathology" does not (lowercase 'o' continues the same word).
+bool _hasPathAsWord(String source) {
+  for (final RegExpMatch match in _pathOccurrenceRegex.allMatches(source)) {
+    final int start = match.start;
+    final int end = match.end;
+    final bool startsUpperP = source.codeUnitAt(start) == 0x50; // 'P'
+
+    final bool beforeOk =
+        start == 0 ||
+        !_isLowerAsciiLetter(source.codeUnitAt(start - 1)) ||
+        startsUpperP;
+    final bool afterOk =
+        end == source.length || !_isLowerAsciiLetter(source.codeUnitAt(end));
+
+    if (beforeOk && afterOk) return true;
+  }
+  return false;
+}
+
+/// Matches the literal text "path" case-insensitively, used by
+/// [_hasPathAsWord] to locate candidate occurrences before applying the
+/// camelCase boundary check.
+final RegExp _pathOccurrenceRegex = RegExp('path', caseSensitive: false);
+
+/// Returns true if [codeUnit] is an ASCII lowercase letter ('a'-'z').
+bool _isLowerAsciiLetter(int codeUnit) => codeUnit >= 0x61 && codeUnit <= 0x7A;
 
 /// Returns true if both sides of [node] resolve to `String` at the type level.
 /// Falls back to AST-level null/bool literal exclusion when static types are
@@ -366,6 +418,26 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
         return;
       }
 
+      // Root-detection idiom: `dir.path == dir.parent.path` — both
+      // sides come from the same Directory API call so casing is
+      // always consistent; this is a standard Dart filesystem-root test.
+      if (_isRootDetectionIdiom(leftSource, rightSource)) return;
+
+      // String literal that doesn't contain a path separator is a CLI
+      // flag or label, not a filesystem path. The word "path" in the
+      // name (e.g. '--json-file-path') triggered the heuristic wrongly.
+      if (_isNonPathStringLiteral(node.leftOperand) ||
+          _isNonPathStringLiteral(node.rightOperand)) {
+        return;
+      }
+
+      // Dart import URIs are case-sensitive by language spec — these
+      // are not filesystem path comparisons.
+      if (_isDartImportUri(node.leftOperand) ||
+          _isDartImportUri(node.rightOperand)) {
+        return;
+      }
+
       // Check if .toLowerCase() is already applied
       if (leftSource.contains('.toLowerCase()') ||
           rightSource.contains('.toLowerCase()') ||
@@ -376,6 +448,100 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
 
       reporter.atNode(node);
     });
+  }
+
+  /// Detects the standard Dart root-detection idiom where a Directory's
+  /// `.path` is compared to its `.parent.path` — both sides come from the
+  /// same API so casing is always consistent.
+  ///
+  /// Verifies that both sides share the same base expression (e.g.
+  /// `dir.path == dir.parent.path` is OK, but `a.path == b.parent.path`
+  /// is NOT — `a` and `b` are different variables so casing consistency
+  /// is not guaranteed).
+  bool _isRootDetectionIdiom(String left, String right) {
+    // Try both orderings: `dir.path == dir.parent.path` and the reverse.
+    return _isRootDetectionPair(left, right) ||
+        _isRootDetectionPair(right, left);
+  }
+
+  /// Returns true when [simple] is `<base>.path` and [parent] is
+  /// `<base>.parent.path` with the SAME `<base>` prefix.
+  ///
+  /// Without the base-expression check, `a.path == b.parent.path` would
+  /// be falsely suppressed — `a` and `b` might be different directories
+  /// with different casing (C15).
+  bool _isRootDetectionPair(String simple, String parent) {
+    // The simple side must end with `.path` but NOT `.parent.path`.
+    if (!simple.endsWith('.path')) return false;
+    if (simple.endsWith('.parent.path')) return false;
+
+    // The parent side must end with `.parent.path`.
+    if (!parent.endsWith('.parent.path')) return false;
+
+    // Extract the base expression from each side and compare.
+    // `dir.path`        → base = `dir`
+    // `dir.parent.path` → base = `dir`
+    final String simpleBase = simple.substring(
+      0,
+      simple.length - '.path'.length,
+    );
+    final String parentBase = parent.substring(
+      0,
+      parent.length - '.parent.path'.length,
+    );
+
+    // Both sides must refer to the same variable/expression.
+    return simpleBase == parentBase;
+  }
+
+  /// Returns true when [expr] is a string literal that does not contain
+  /// a filesystem path separator — it's a CLI flag or label name, not
+  /// an actual path, even if the variable name contains "path".
+  bool _isNonPathStringLiteral(Expression expr) {
+    if (expr is! SimpleStringLiteral) return false;
+    final String value = expr.value;
+    return !value.contains('/') && !value.contains(r'\');
+  }
+
+  /// Returns true when [expr]'s own name suggests a Dart import URI
+  /// (contains "import" or "uri"), or when [expr] is a for-each loop
+  /// variable iterating over an import-like collection — import
+  /// specifiers are case-sensitive by language spec and are not
+  /// filesystem paths.
+  bool _isDartImportUri(Expression expr) {
+    if (expr is! SimpleIdentifier) return false;
+    final String name = expr.name.toLowerCase();
+    if (name.contains('import') || name.contains('uri')) return true;
+    return _isLoopVariableOverImportsCollection(expr);
+  }
+
+  /// Returns true when [expr] is a for-each loop variable whose iterable
+  /// expression looks like an import list — e.g. `for (final imp in
+  /// node.imports)`. Loop variables over import collections are commonly
+  /// abbreviated ('imp') and don't themselves contain "import"/"uri", so
+  /// the direct name check above misses them. This walks up to the
+  /// nearest enclosing for-each loop and inspects what it iterates over
+  /// instead, matching on the loop variable's own name to make sure
+  /// [expr] actually refers to that loop variable and not an unrelated
+  /// identifier that merely shares scope with the loop.
+  bool _isLoopVariableOverImportsCollection(SimpleIdentifier expr) {
+    final ForStatement? forStatement = expr
+        .thisOrAncestorOfType<ForStatement>();
+    final ForEachParts? parts = forStatement?.forLoopParts is ForEachParts
+        ? forStatement!.forLoopParts as ForEachParts
+        : null;
+    if (parts == null) return false;
+
+    final String? loopVarName = switch (parts) {
+      ForEachPartsWithDeclaration d => d.loopVariable.name.lexeme,
+      ForEachPartsWithIdentifier i => i.identifier.name,
+      _ => null,
+    };
+    if (loopVarName != expr.name) return false;
+
+    final String iterableSource = parts.iterable.toSource().toLowerCase();
+    return iterableSource.contains('import') ||
+        iterableSource.contains('uri');
   }
 }
 

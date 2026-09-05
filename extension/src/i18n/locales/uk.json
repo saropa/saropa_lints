@@ -798,7 +798,11 @@
       "regressionTitle": "Показник здоров’я знизився з {previousScore} до {currentScore}",
       "trendTitle": "Оцінка здоров’я/тенденція порушення з попередніх запусків",
       "hotspotsTitle": "{open} відкрито, {safe} позначено як безпечний, {fixed} виправлено — натисніть, щоб переглянути",
-      "hotspotsPill": "{open} відкрито · {percent}% переглянуто"
+      "hotspotsPill": "{open} відкрито · {percent}% переглянуто",
+      "qualityGatePassingTitle": "Проходження воріт якості працездатності коду — натисніть, щоб відкрити працездатність коду",
+      "qualityGatePassingPill": "Проїзд воріт",
+      "qualityGateFailingTitle": "Помилка перевірки якості працездатності коду ({count} порушень) — натисніть, щоб відкрити працездатність коду",
+      "qualityGateFailingPill": "Несправність воріт"
     },
     "groupBy": {
       "severity": "Важкість тяжкості.",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Всі команди…",
-      "commandCatalogDescription": "Шукати всі команди"
+      "commandCatalogDescription": "Шукати всі команди",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Помилка воріт",
+      "codeHealthNeverScanned": "Run Code Health to see your score",
+      "projectMapDescription": "Відсканований {ago}",
+      "projectMapNeverScanned": "Запустіть карту проекту, щоб побачити розмір і гарячі точки"
     }
   }
 }

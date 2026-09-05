@@ -466,11 +466,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "de": {
-        # Manual: cached MT output only bolded "on" (not "off"), breaking the source's
-        # **on**/**off** bold pairing, and dropped the code-literal backtick styling
-        # around `saropa_lints`/`analysis_options`. Curated here — checked before
-        # cache/MT on every mode — so a future `upgrade`/`all` run cannot regress it.
-        "When **on** (default), Saropa Lints scans Dart files on save and shows findings as squiggles and Problems panel entries. Turn **off** to stop scanning, pause integration notifications, and clear the status-bar score—without hiding sidebar options. Use **Saropa Lints: Set Up Project** when you need to add `saropa_lints` to pubspec and write `analysis_options`.": "Bei **ein** (Standard) durchsucht Saropa Lints Dart-Dateien beim Speichern und zeigt Befunde als Wellenlinien und Einträge im Problembereich an. Bei **aus** wird das Scannen gestoppt, werden Integrationsbenachrichtigungen pausiert und die Bewertung in der Statusleiste gelöscht – ohne die Optionen in der Seitenleiste auszublenden. Verwenden Sie **Saropa Lints: Projekt einrichten**, um `saropa_lints` zur pubspec hinzuzufügen und `analysis_options` zu schreiben.",
+        # Removed: old "enabled" description curated here for bold/backtick fidelity.
+        # Source text changed substantially (daemon label, LSP/plugin separation,
+        # Engines row reference) — old German no longer matches. Let MT re-translate;
+        # re-curate if bold/backtick formatting regresses.
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1282,7 +1281,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Manual: MT returned the English unchanged for this drift label.
         "Cross-project drift": "Drift sa iba't ibang proyekto",
         # Manual: MT returns English unchanged — technical terms kept as loanwords, Filipino word order.
-        "Analyzer plugin": "Plugin ng analyzer",
+        "Analyzer Plugin": "Plugin ng Analyzer",
         # Manual: MT returned English unchanged — "Ulat ng Pag-audit" is the standard Filipino rendering
         # for a formal report document ("ulat" = report, "pag-audit" = audit process).
         "Audit Report": "Ulat ng Pag-audit",

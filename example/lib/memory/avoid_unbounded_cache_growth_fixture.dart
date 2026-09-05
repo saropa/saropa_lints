@@ -266,3 +266,21 @@ class BadCacheServiceCopy {
     _cache[key] = value;
   }
 }
+
+// =============================================================================
+// GOOD: Content-addressed caches - should NOT trigger (false positive fix)
+// =============================================================================
+
+// OK: keyed by the sha256 hash of the content. Key space is bounded by
+// distinct content, not by request volume, so unbounded growth is not the
+// right failure mode to warn about. Regression case for
+// bugs/require_cache_expiration_false_positive_content_addressed_caches.md.
+class ContentHashResultCache {
+  final Map<String, String> _cache = {};
+
+  void put(String sha256Hash, String result) {
+    _cache[sha256Hash] = result;
+  }
+
+  String? get(String sha256Hash) => _cache[sha256Hash];
+}

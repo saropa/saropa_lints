@@ -798,7 +798,11 @@
       "regressionTitle": "Điểm máu giảm từ {previousScore} xuống {currentScore}",
       "trendTitle": "Điểm sức khỏe / xu hướng vi phạm kể từ lần chạy trước",
       "hotspotsTitle": "{open} mở, {safe} được đánh dấu an toàn, {fixed} đã sửa - nhấp để xem lại",
-      "hotspotsPill": "{open} mở · {percent}% được đánh giá"
+      "hotspotsPill": "{open} mở · {percent}% được đánh giá",
+      "qualityGatePassingTitle": "Vượt qua cổng chất lượng Code Health — nhấp để mở Code Health",
+      "qualityGatePassingPill": "Cổng đi qua",
+      "qualityGateFailingTitle": "Cổng chất lượng Code Health không thành công ((các) vi phạm {count}) - nhấp để mở Code Health",
+      "qualityGateFailingPill": "Cổng bị lỗi"
     },
     "groupBy": {
       "severity": "Mức độ nghiêm trọng",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Tất cả các lệnh…",
-      "commandCatalogDescription": "Tìm kiếm tất cả lệnh"
+      "commandCatalogDescription": "Tìm kiếm tất cả lệnh",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Cổng bị lỗi",
+      "codeHealthNeverScanned": "Chạy Code Health để xem điểm của bạn",
+      "projectMapDescription": "Đã quét {ago}",
+      "projectMapNeverScanned": "Chạy Project Map để xem quy mô và các điểm nóng"
     }
   }
 }

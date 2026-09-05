@@ -118,5 +118,106 @@ void f(String filePath, String otherPath) {
 }
 ''');
     });
+
+    // Regression coverage for the false-positive bug report: root-detection
+    // idiom, CLI flag literals, import URI comparisons, and "path" embedded
+    // in an unrelated word all used to fire incorrectly.
+
+    test('does NOT fire on root-detection idiom (dir.path != dir.parent.path)', () async {
+      await assertFixtureMarkers(rule, '''
+class D {
+  String get path => '';
+  D get parent => this;
+}
+
+void f(D dir) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  while (dir.path != dir.parent.path) {}
+}
+''');
+    });
+
+    test('does NOT fire on reversed root-detection idiom (dir.parent.path == dir.path)', () async {
+      await assertFixtureMarkers(rule, '''
+class D {
+  String get path => '';
+  D get parent => this;
+}
+
+void f(D dir) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (dir.parent.path == dir.path) {}
+}
+''');
+    });
+
+    test('does NOT fire on CLI flag string literal containing "path"', () async {
+      await assertFixtureMarkers(rule, '''
+void f(String arg) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (arg == '--json-file-path') {}
+}
+''');
+    });
+
+    test('does NOT fire on import URI comparison by name', () async {
+      await assertFixtureMarkers(rule, '''
+void f(String namedUri, String pathFirst) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (namedUri == pathFirst) {}
+}
+''');
+    });
+
+    test('does NOT fire on import URI comparison via abbreviated loop variable', () async {
+      await assertFixtureMarkers(rule, '''
+void f(List<String> imports, String? pathFirst) {
+  for (final imp in imports) {
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (pathFirst != null && imp == pathFirst) {}
+  }
+}
+''');
+    });
+
+    // Regression: C15 — mismatched base expressions in root-detection idiom
+    // must NOT be suppressed (a.path == b.parent.path where a != b).
+
+    test('fires on mismatched root-detection idiom (a.path == b.parent.path)', () async {
+      await assertFixtureMarkers(rule, '''
+class D {
+  String get path => '';
+  D get parent => this;
+}
+
+void f(D a, D b) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (a.path == b.parent.path) {}
+}
+''');
+    });
+
+    test('fires on reversed mismatched root-detection idiom (b.parent.path == a.path)', () async {
+      await assertFixtureMarkers(rule, '''
+class D {
+  String get path => '';
+  D get parent => this;
+}
+
+void f(D a, D b) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (b.parent.path == a.path) {}
+}
+''');
+    });
+
+    test('does NOT fire when "path" is embedded in an unrelated word', () async {
+      await assertFixtureMarkers(rule, '''
+void f(String pathologyReport, String empathyNote) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (pathologyReport == empathyNote) {}
+}
+''');
+    });
   });
 }

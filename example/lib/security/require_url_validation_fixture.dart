@@ -123,3 +123,28 @@ void _good1016() {
   }
   http.get(url);
 }
+
+// GOOD: file:// scheme checked via .isScheme() right after parsing.
+// Mirrors info_plist_utils.dart's _toFilesystemPath: the string being
+// parsed is a local analyzer path/URI, not attacker-controlled network
+// input, and the scheme is explicitly validated before use — same
+// SSRF-mitigation shape as the .scheme != 'https' case above, just
+// using the .isScheme() Uri API and the file scheme instead of https.
+// See bugs/require_url_validation_false_positive_local_file_paths.md.
+void _good1017() {
+  final parsed = Uri.parse(userInput);
+  if (parsed.isScheme('file')) {
+    final path = parsed.toFilePath();
+    print(path);
+  }
+}
+
+// GOOD: file:// scheme guarded both before parsing (startsWith) and
+// re-verified after parsing (.scheme check) — mirrors saropa_lints.dart's
+// rootUri handling, which double-checks the scheme pre- and post-parse.
+void _good1018() {
+  if (!userInput.startsWith('file://')) return;
+  final parsed = Uri.parse(userInput);
+  if (parsed.scheme != 'file') return;
+  print(parsed.toFilePath());
+}

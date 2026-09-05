@@ -124,3 +124,23 @@ void _bad891() {
 void _good891() {
   unawaited(Future<void>.value());
 }
+
+// GOOD: Should NOT trigger require_ios_deployment_target_consistency — a
+// rule-name string that happens to contain "AttributedString" as a
+// substring would previously fire because it lives inside a Set literal.
+// `isDataLiteralElement()` skips string literals whose immediate parent is
+// a list/set/map literal: these are data tables (rule registries, tier
+// catalogs) enumerating identifiers, not runtime Swift API references. See
+// plans/history/2026.09/2026.09.05/
+// require_ios_deployment_target_consistency_false_positive_rule_name_strings.md.
+const Set<String> _tierRegistrySample = {
+  'require_ios_deployment_target_consistency',
+  'avoid_ios_attributed_string_migration_notes',
+};
+
+// GOOD: Should NOT trigger require_ios_deployment_target_consistency — same
+// data-literal guard, but as a map VALUE rather than a set element. Config
+// tables that map rule codes to descriptions are still just data.
+const Map<String, String> _ruleDescriptionSample = {
+  'require_ios_deployment_target_consistency': 'iOS AttributedString check',
+};

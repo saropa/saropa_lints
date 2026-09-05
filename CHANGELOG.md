@@ -107,6 +107,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Fixed the Health Panel reporting scan-on-save as "idle" while it was actually disabled — the status only tracked memory-pressure suspension and never read the master switch, so a disabled scanner looked healthy. No action required.
 - Fixed `--format` being swallowed as the target path by the severity report and doctor command-line tools, so the flag had no effect and the positional path was lost. No action required.
 - Fixed selecting a package from the embedded Upgrades tab opening the detail pane behind a hidden tab; the dashboard now switches back to Overview first. No action required.
+- Fixed `avoid_dynamic_calls_extended` over-suppression: dynamic calls inside catch clauses and finally blocks are no longer wrongly exempted by the try/catch guard (only the try body is exempted). Bare `catch(e)` and `on Object` no longer suppress dynamic-call warnings — only `on NoSuchMethodError` and `on TypeError` indicate intentional duck-typing. No action required.
+- Fixed `require_catch_logging` over-suppression: `catch (e) { return null; }` with an unused exception variable was falsely exempt — the return/continue/break exemption now fires only when the exception variable is actually referenced. No action required.
+- Fixed `require_url_validation` over-suppression: substring `'file'` no longer matches inside identifiers like `profileId`; `startsWith` guards are now checked against the actual URL variable; CLI exemption is scoped to the file's directory rather than disabling the rule project-wide. No action required.
+- Fixed `avoid_global_state` over-suppression: `_hasClearOrResetFunction` now matches exact identifier tokens instead of substrings; `??=` lazy-init detection uses a word-boundary regex instead of raw source text; multi-variable declarations no longer fire duplicate diagnostics. No action required.
+- Fixed `require_cache_expiration` over-suppression: `.clear()` detection is now scoped to the flagged cache class's own Map fields rather than matching any `.clear()` in the file; `HashMap`/`hashCode` are no longer treated as crypto-hash indicators. No action required.
+- Fixed `avoid_string_substring` over-suppression: `indexOf` results are recognized as safe index sources alongside `RegExpMatch.start`/`.end`/`.group()`; a regex `hasMatch()` guard on the receiver is now accepted in `if`-condition and ternary branches. No action required.
+- Fixed `avoid_case_sensitive_path_comparison` over-suppression: the root-detection idiom check now verifies both sides of a `||` share the same base expression. No action required.
 
 <details><summary>Maintenance</summary>
 
@@ -127,10 +134,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Partially migrated the Package Dashboard's parallel stylesheet onto the shared dashboard chrome: the accessibility helper, hero header, status line, and page layout families now come from the shared layer. The remaining duplicated families cannot be adopted piecemeal because the shared chrome's exported functions bundle unrelated rules — adopting the motion helper would also restyle inline code, and adopting the layout helper drags a full body reset with it. Splitting the chrome into single-concern exports is a prerequisite for finishing this.
 - Reworked the embedded Known issues tab to prefix element ids and scope its script, preventing collisions with the host dashboard's own search and table when both render in one document.
 - Added regression coverage for the areas above: the scan progress event schema and cancel path, the language server's progress notification shape, the rule-catalog correction/OWASP backfill, the report totals parser, the optimizer sort and bulk-select, the rule-detail expander, and the embedded tab contracts.
+- Added CI compile-check gate (`dart compile kernel`) for all `bin/` entry points — catches build-breaking analyzer API changes that `dart analyze` misses because rule files are loaded at runtime.
+- Added CI `check_analyzer_api_compat.py` script that greps rule files for known-removed analyzer package APIs (e.g. `ClassDeclaration.name.lexeme`) before they reach users as a crash.
+
+- Extracted shared `catchHandlesViaControlFlow()` and `catchBodyUsesException()` utilities into `catch_body_logging_utils.dart` — eliminates duplicated return/continue/break and exception-usage checks between `require_catch_logging` and `avoid_swallowing_exceptions`. No action required.
 
 - Split the shared dashboard chrome stylesheet into single-concern exports, with the existing public functions preserved as compositions so every consumer renders identically. The previous bundling made the layer un-adoptable piecemeal: taking the hero animation also took an unrelated monospace rule, and taking the full-width toggle dragged a whole body reset with it. A unit test now pins each composition.
 - Removed a duplicate `.sr-only` accessibility rule from the token layer after confirming every consumer already pairs it with the accessibility helper; the test suite now pins that rule as defined exactly once.
 - Adopted the shared hero animation and reduced-motion rules in the Package Dashboard stylesheet. The summary cards, table toolbar, and footprint toggle stay local by decision, not omission — each differs from its chrome counterpart in layout semantics, domain color vocabulary, or ARIA interaction model, and the reasons are documented in the code. See `plans/PLAN_ext_ui_report_styles.md` for the full disposition.
+- Fixed 2 stale curated dictionary keys in `dictionaries.py`: removed the `de` entry whose English source text was rewritten (daemon label, LSP/plugin separation), and capitalized the `fil` "Analyzer Plugin" key to match the current source strings.
 
 </details>
 

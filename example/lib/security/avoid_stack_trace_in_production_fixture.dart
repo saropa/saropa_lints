@@ -103,6 +103,8 @@
 // Test fixture for: avoid_stack_trace_in_production
 // Source: lib\src\rules\security_rules.dart
 
+import 'dart:developer' as developer;
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 const kDebugMode = true;
@@ -198,6 +200,20 @@ void _falsePositive2() {
     fetchData();
   } catch (e) {
     print('Error occurred: $e');
+  }
+}
+
+// OK: dart:developer's log() is a structured-diagnostics API (IDE /
+// DevTools console) that is purpose-built to carry a stackTrace field —
+// it never renders to end-user-visible UI, so it is not the leak this
+// rule targets. Distinguished from the same-named local `log()` helper
+// below (still flagged in `_bad3`) by resolving the call's library URI.
+// See bugs/avoid_stack_trace_in_production_false_positive_cli_tool.md.
+void _falsePositive3() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    developer.log('Fetch failed', error: e, stackTrace: stackTrace);
   }
 }
 

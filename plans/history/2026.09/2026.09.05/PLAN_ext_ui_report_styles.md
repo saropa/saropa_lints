@@ -115,3 +115,62 @@ Dev Host verification are the time sinks.
 - **Detail pane interaction:** The master-detail split (`.dash-split`) is unique to this
   dashboard and is the most interaction-heavy surface. Test click-to-expand, popover
   positioning, and keyboard navigation after any change to surrounding layout CSS.
+
+---
+
+## Audit finding (2026-09-05) — target not achievable as written
+
+Two independent implementation passes landed only **-46 lines** (1191 -> 1145) against this
+plan's -300..-800 target, and both stopped for the same reason, verified against the code
+rather than assumed:
+
+`dashboardChromeStyles`' exported functions **bundle unrelated rules**, so they cannot be
+adopted piecemeal:
+- `chromeMicroAndMotion()` carries `@keyframes hero-in` **and** `code, .mono { font-family: monospace }`,
+  which would repaint the Upgrades tab's `.opp-chip` elements.
+- `chromeBaseLayout()` carries `.full-width-toggle` **and** a full `body` reset.
+
+What did land: `.sr-only` -> `chromeAccessibility()`; `.status-line`/`.pill` -> `chromeHeroAndGauge()`;
+`.report-header` -> `.dash-hero` across `report-html.ts` and `opportunities-html.ts`; `body` +
+`.full-width-toggle` -> `chromeBaseLayout()` as a deliberate, described visual change. Also renamed
+`.gauge-label` -> `.radial-gauge-label` to avoid a silent collision with chrome's unscoped 96px
+gauge rule.
+
+Kept deliberately (documented, not forgotten): `@keyframes hero-in` + its reduced-motion override,
+and the `.summary` / `.table-toolbar` / `.footprint-toggle` families, whose chrome equivalents
+(`.kpi-row` / `.toolbar-band` / `.seg`) need markup and script rewrites far beyond a small override.
+
+**Prerequisite for the original target:** split `dashboardChromeStyles` into single-concern exports.
+Until that exists, the remaining duplication is not removable without unaudited visual side effects.
+Treat this plan as closed-as-scoped; do not carry the -700 figure forward as outstanding work.
+
+### Final outcome (2026-09-05) — CLOSED, target not achievable
+
+Phase 1 (split `dashboardChromeStyles` into single-concern exports) is DONE and verified
+byte-identical: the bundled functions now compose fine-grained pieces in original order, pinned by
+`extension/src/test/views/dashboardChromeStylesSeams.test.ts` (7 tests).
+
+Phase 2 (adopt the chrome layer) is DONE as far as it can safely go:
+- `@keyframes hero-in` + reduced-motion -> `chromeKeyframeHeroIn()` / `chromeReducedMotion()`. This
+  was the one family blocked purely by the old bundling; the seam split unblocked it as predicted.
+- `chromeSrOnlyLegacyDuplicate()` confirmed a byte-identical duplicate of `chromeAccessibility()`'s
+  `.sr-only` and deleted, after verifying both consumers of `chromeBaseLayout()` always pair it with
+  `chromeAccessibility()`. The seam test now pins `.sr-only` as defined exactly once.
+
+Kept local, with reasons documented in the code itself (structural mismatches, not laziness):
+- `.summary`/`.summary-card` vs `.kpi-row`/`.kpi-card` — inverted layout; 9 package-grade colors with
+  no analog in chrome's 4 lint-severity categories. Extending chrome for one caller is shared-infra work.
+- `.table-toolbar`/`.toolbar-btn` vs `.toolbar-band`/`.field`/`.btn` — chrome's band is
+  `position: sticky`, an unrequested UX change on the most interaction-heavy surface.
+- `.footprint-toggle`/`.toggle-btn` vs `.seg` — different INTERACTION models: `.seg` is
+  `aria-pressed` additive multi-select, this is an `.active`-class single-select radio group.
+  Migrating means rewriting `setFootprintMode()` and the ARIA model to save ~35 lines of CSS.
+
+**Final line count: 1202 (HEAD was 1191, +11).** Real CSS was deduplicated, but the project's
+mandatory WHY-comments documenting each kept-not-migrated decision more than offset it. This is the
+honest number.
+
+**Do not carry the -300..-800 target forward.** It assumed the duplicated families were
+straightforward copies. They are not: the three remaining ones differ in layout semantics, domain
+vocabulary, or ARIA interaction model. Any further reduction requires deliberate UX decisions
+(sticky toolbar? shared multi-select semantics? a shared grade-color vocabulary?), not a CSS sweep.

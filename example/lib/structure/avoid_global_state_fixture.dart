@@ -147,3 +147,42 @@ void _good1039() {
   final List<String> localFinal = const ['a', 'b'];
   var localMutable = 0;
 }
+
+// GOOD: `late final` should NOT trigger — `late` is a separate modifier
+// from `final`; the variable is still effectively immutable after its
+// single (deferred) assignment.
+late final int _lateFinalConfig = 42;
+
+// GOOD: private lazy-init-once cache assigned only via `??=` should NOT
+// trigger — this is the standard Dart single-isolate lazy-cache idiom, not
+// a hidden-dependency hazard (see plans/history/2026.09/2026.09.05/avoid_global_state_false_positive_plugin_cache_pattern.md).
+Map<String, int>? _bad1039_tierIndex;
+Map<String, int> get _bad1039_tierIndexGetter =>
+    _bad1039_tierIndex ??= <String, int>{};
+
+// GOOD: private global with a same-file `clear*` function should NOT
+// trigger — the clear hook is evidence of deliberate, documented lifecycle
+// management rather than an accidental mutable global.
+Map<String, int>? _bad1039_crossFileSnap;
+
+/// Test-only hook to reset the cache between test runs.
+void clearBad1039CrossFileSnapshotCache() {
+  _bad1039_crossFileSnap = null;
+}
+
+// GOOD: private global with a same-file `reset*` function should NOT
+// trigger, same rationale as `clear*` above.
+int _bad1039_resolverVersion = 0;
+
+void resetBad1039ResolverForTests() {
+  _bad1039_resolverVersion = 0;
+}
+
+// GOOD: private global with a same-file `dispose*` function should NOT
+// trigger — `dispose` carries the same "someone explicitly owns tearing
+// this down" signal as `clear`/`reset` (e.g. a plugin-lifetime controller).
+Object? _bad1039_pluginController;
+
+void disposeBad1039PluginController() {
+  _bad1039_pluginController = null;
+}

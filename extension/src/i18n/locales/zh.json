@@ -798,7 +798,11 @@
       "regressionTitle": "健康分数从 {previousScore} 下降到 {currentScore}",
       "trendTitle": "自早期运行以来的健康评分/违规趋势",
       "hotspotsTitle": "{open} 打开，{safe} 标记为安全，{fixed} 已修复 — 点击查看",
-      "hotspotsPill": "{open} 开放 · {percent}% 已审核"
+      "hotspotsPill": "{open} 开放 · {percent}% 已审核",
+      "qualityGatePassingTitle": "Code Health 质量关口 — 点击打开 Code Health",
+      "qualityGatePassingPill": "过门",
+      "qualityGateFailingTitle": "Code Health 质量门失败（{count} 违规） — 单击以打开 Code Health",
+      "qualityGateFailingPill": "门故障"
     },
     "groupBy": {
       "severity": "严重程度的严重性",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "所有命令…",
-      "commandCatalogDescription": "搜索所有命令"
+      "commandCatalogDescription": "搜索所有命令",
+      "codeHealthDescription": "{grade}·{score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · 门故障",
+      "codeHealthNeverScanned": "运行 Code Health 查看您的分数",
+      "projectMapDescription": "已扫描 {ago}",
+      "projectMapNeverScanned": "运行项目地图以查看规模和热点"
     }
   }
 }

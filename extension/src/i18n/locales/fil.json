@@ -798,7 +798,11 @@
       "regressionTitle": "Nabawasan ang health score mula {previousScore} hanggang {currentScore}",
       "trendTitle": "Score ng kalusugan / tren ng pagkakasalungat mula sa mas maagang mga run",
       "hotspotsTitle": "{open} nakabukas, {safe} nakatakdang ligtas, {fixed} tinukoy — klik para magtanong",
-      "hotspotsPill": "{open} buksan · {percent}% tinanaw"
+      "hotspotsPill": "{open} buksan · {percent}% tinanaw",
+      "qualityGatePassingTitle": "Quality gate ng Code Health na ipasok — klik para buksan ang Code Health",
+      "qualityGatePassingPill": "Paghahatag ng pinto",
+      "qualityGateFailingTitle": "Mga batayan ng kalidad ng Code Health na nagkakasira ({count} pagkakasala(s)) — klik para buksain ang Code Health",
+      "qualityGateFailingPill": "Nabigo ang gate"
     },
     "groupBy": {
       "severity": "Grabe ng sakit na ito ay ang pagiging malubhang.",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Lahat ng mga command…",
-      "commandCatalogDescription": "Suriin lahat ng mga command"
+      "commandCatalogDescription": "Suriin lahat ng mga command",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
+      "codeHealthNeverScanned": "Punan ang Code Health upang makita ang iyong score",
+      "projectMapDescription": "Nascan {ago}",
+      "projectMapNeverScanned": "Pangalawang Mapa ng Proyekto upang makita ang laki at mga hot spot"
     }
   }
 }

@@ -798,7 +798,11 @@
       "regressionTitle": "Wynik zdrowia spadł z {previousScore} do {currentScore}",
       "trendTitle": "Wynik zdrowia / trend naruszeń od wcześniejszych uruchomień",
       "hotspotsTitle": "{open} otwarty, {safe} oznaczony jako bezpieczny, {fixed} naprawiony — kliknij, aby przejrzeć",
-      "hotspotsPill": "{open} otwarty · {percent}% przewizualizowanych"
+      "hotspotsPill": "{open} otwarty · {percent}% przewizualizowanych",
+      "qualityGatePassingTitle": "Przejście przez bramkę jakości Code Health — kliknij, aby otworzyć Code Health",
+      "qualityGatePassingPill": "Przejście przez bramę",
+      "qualityGateFailingTitle": "Awaria bramki jakości Code Health (naruszenia {count}) — kliknij, aby otworzyć Code Health",
+      "qualityGateFailingPill": "Brama nie działa"
     },
     "groupBy": {
       "severity": "Poważność Surowość",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Wszystkie polecenia…",
-      "commandCatalogDescription": "Wyszukaj wszystkie polecenia"
+      "commandCatalogDescription": "Wyszukaj wszystkie polecenia",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
+      "codeHealthNeverScanned": "Uruchom Code Health, aby zobaczyć swój wynik",
+      "projectMapDescription": "Zeskanowano {ago}",
+      "projectMapNeverScanned": "Uruchom Mapę projektu, aby zobaczyć rozmiar i gorące punkty"
     }
   }
 }

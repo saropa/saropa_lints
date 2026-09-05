@@ -798,7 +798,11 @@
       "regressionTitle": "Unganisho wa health uchukua kutokana na {previousScore} hadi {currentScore}",
       "trendTitle": "Skore ya health / matokeo ya kifungu kwa ajili ya runi ya kwanza",
       "hotspotsTitle": "{open} imefunguliwa, {safe} imewekwa alama kuwa salama, {fixed} imerekebishwa - bofya ili kukagua",
-      "hotspotsPill": "{open} imefunguliwa · {percent}% imekaguliwa"
+      "hotspotsPill": "{open} imefunguliwa · {percent}% imekaguliwa",
+      "qualityGatePassingTitle": "Kanuni ya lango la Ubora wa Afya — bofya ili kufungua Kanuni ya Afya",
+      "qualityGatePassingPill": "Lango kupita",
+      "qualityGateFailingTitle": "Kanuni lango la ubora wa Afya halikufaulu (ukiukaji wa {count}) — bofya ili kufungua Kanuni ya Afya",
+      "qualityGateFailingPill": "Gate failing"
     },
     "groupBy": {
       "severity": "Ugumu wa Hali.",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Wote matokeo…",
-      "commandCatalogDescription": "Tazama kila matokeo ya kuzungumza"
+      "commandCatalogDescription": "Tazama kila matokeo ya kuzungumza",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Lango limeshindwa",
+      "codeHealthNeverScanned": "Endesha Kanuni ya Afya ili kuona alama zako",
+      "projectMapDescription": "Scanned {ago}",
+      "projectMapNeverScanned": "Endesha Ramani ya Mradi ili kuona ukubwa na maeneo maarufu"
     }
   }
 }

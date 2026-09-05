@@ -4,7 +4,7 @@ import 'package:saropa_lints/src/rules/core/documentation_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
 
-/// Tests for 13 Documentation lint rules.
+/// Tests for 14 Documentation lint rules.
 ///
 /// Test fixtures: example/lib/documentation/*
 void main() {
@@ -83,6 +83,11 @@ void main() {
       'NoInternalMethodDocsRule',
       'no_internal_method_docs',
       () => NoInternalMethodDocsRule(),
+    );
+    testRule(
+      'DeprecatedNewInCommentReferenceRule',
+      'deprecated_new_in_comment_reference',
+      () => DeprecatedNewInCommentReferenceRule(),
     );
   });
   group('Documentation Rules - Fixture Verification', () {

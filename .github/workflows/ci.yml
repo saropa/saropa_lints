@@ -78,12 +78,15 @@ jobs:
         # analyzer package) that dart analyze cannot see because the rule
         # files are loaded at runtime, not statically imported by the entry
         # point. `dart compile kernel` is fast (~2s) and verifies the full
-        # import graph without producing a binary.
+        # import graph without producing a binary. Output goes to a temp dir
+        # (not /dev/null — `dart compile kernel -o /dev/null` fails on some
+        # platforms trying to open /dev/null as a regular file).
         run: |
-          dart compile kernel bin/lsp_server.dart -o /dev/null
-          dart compile kernel bin/project_health.dart -o /dev/null
-          dart compile kernel bin/severity_report.dart -o /dev/null
-          dart compile kernel bin/doctor.dart -o /dev/null
+          tmpdir=$(mktemp -d)
+          trap 'rm -rf "$tmpdir"' EXIT
+          for entry in bin/lsp_server.dart bin/project_health.dart bin/severity_report.dart bin/doctor.dart; do
+            dart compile kernel "$entry" -o "$tmpdir/$(basename "$entry" .dart).dill"
+          done
       - name: Analyze saropa_lints_api package
         run: |
           cd packages/saropa_lints_api
@@ -95,6 +98,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Check for removed analyzer API usage
+        # Rule files are loaded at runtime (not statically imported), so
+        # `dart analyze` cannot catch removed getters — they crash the LSP
+        # server at startup. This script greps for known-removed patterns.
+        run: python scripts/check_analyzer_api_compat.py
       - name: Verify dependency-import consistency
         # Deterministic, version-independent guard: every package imported by
         # shipped code (lib/ + bin/) must be a declared pubspec dependency.

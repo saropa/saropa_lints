@@ -798,7 +798,11 @@
       "regressionTitle": "Punteggio salute sceso da {previousScore} a {currentScore}",
       "trendTitle": "Punteggio salute / tendenza delle violazioni dal momento delle ultime esecuzioni",
       "hotspotsTitle": "{open} aperto, {safe} segnato come sicuro, {fixed} fissato — clicca per revisionare",
-      "hotspotsPill": "{open} aperto · {percent}% revisionati"
+      "hotspotsPill": "{open} aperto · {percent}% revisionati",
+      "qualityGatePassingTitle": "Superamento del gate di qualità di Code Health: fare clic per aprire Code Health",
+      "qualityGatePassingPill": "Passaggio del cancello",
+      "qualityGateFailingTitle": "Guasto al gate di qualità Code Health (violazione/i {count}): fare clic per aprire Code Health",
+      "qualityGateFailingPill": "Cancello difettoso"
     },
     "groupBy": {
       "severity": "Gravità della gravità.",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Tutti i comandi…",
-      "commandCatalogDescription": "Cerca tutti i comandi"
+      "commandCatalogDescription": "Cerca tutti i comandi",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
+      "codeHealthNeverScanned": "Esegui Code Health per vedere il tuo punteggio",
+      "projectMapDescription": "{ago} scansionato",
+      "projectMapNeverScanned": "Esegui Project Map per visualizzare le dimensioni e i punti caldi"
     }
   }
 }

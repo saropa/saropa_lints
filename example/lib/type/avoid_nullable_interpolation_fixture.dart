@@ -148,6 +148,22 @@ void _goodIfGuardChainedAccess(_Widget widget) {
   }
 }
 
+// GOOD (v7): `!= null` guard buried inside a compound `&&` condition still
+// proves non-null in the then-branch — every conjunct must hold to enter.
+// Reproduces ai_fix_handoff.dart:101 (avoid_nullable_interpolation FP bug).
+class _ChurnFile {
+  int? churn;
+}
+
+bool _isChurning(_ChurnFile f) => true;
+
+String _goodCompoundAndGuard(_ChurnFile f) {
+  if (_isChurning(f) && f.churn != null) {
+    return 'Stabilize: ${f.churn} commits';
+  }
+  return 'stable';
+}
+
 // GOOD (v6): interpolation inside developer-facing log call.
 // "null" in the output IS the diagnostic signal.
 void debug(String message) {}

@@ -798,7 +798,11 @@
       "regressionTitle": "Score de santé passé de {previousScore} à {currentScore}",
       "trendTitle": "Score de santé / tendance des violations depuis les exécutions précédentes",
       "hotspotsTitle": "{open} ouvert, {safe} marqué comme sûr, {fixed} corrigé — cliquez pour revérifier",
-      "hotspotsPill": "{open} ouvert · {percent}% revu"
+      "hotspotsPill": "{open} ouvert · {percent}% revu",
+      "qualityGatePassingTitle": "Portée de la qualité du code — cliquez pour ouvrir Code Health",
+      "qualityGatePassingPill": "Passe de porte",
+      "qualityGateFailingTitle": "Porte d'entrée de la qualité du code en échec ({count} violation(s)) — cliquer pour ouvrir Code Health",
+      "qualityGateFailingPill": "Porte en échec"
     },
     "groupBy": {
       "severity": "La gravité de la maladie.",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Toutes les commandes…",
-      "commandCatalogDescription": "Rechercher toutes les commandes"
+      "commandCatalogDescription": "Rechercher toutes les commandes",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Porte en panne",
+      "codeHealthNeverScanned": "Exécutez Code Health pour voir votre score",
+      "projectMapDescription": "Scanné {ago}",
+      "projectMapNeverScanned": "Exécuter Project Map pour voir la taille et les zones chaudes"
     }
   }
 }

@@ -203,3 +203,32 @@ String _goodPostLoopSlice(String source, int start) {
   }
   return source.substring(start, i);
 }
+
+// GOOD: regex hasMatch guard directly inside an if-statement (not a ternary
+// or early-exit) — a passing match against an anchored pattern proves a
+// minimum receiver length. Regression case for the info_plist_utils.dart FP.
+String _goodRegexHasMatchIfBranch(String path) {
+  var normalized = path;
+  if (RegExp(r'^/[A-Za-z]:/').hasMatch(normalized)) {
+    normalized = normalized.substring(1);
+  }
+  return normalized;
+}
+
+// GOOD: indexOf result used directly with no surrounding guard at all — the
+// index is provably in-bounds by the API contract of indexOf() itself.
+// Regression case for the stale_ignore_detector.dart FP.
+String _goodIndexOfDirectNoGuard(String line, String marker) {
+  final commentStart = line.indexOf(marker);
+  return line.substring(0, commentStart).trimRight();
+}
+
+// GOOD: RegExpMatch.end used directly with no surrounding guard — always
+// within the matched string's bounds. Regression case for the
+// custom_overrides_core.dart FP.
+String _goodRegexMatchEndDirectNoGuard(String content, RegExp header) {
+  final headerMatch = header.firstMatch(content);
+  if (headerMatch == null) return content;
+  final pos = headerMatch.end;
+  return content.substring(pos);
+}

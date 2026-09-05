@@ -798,7 +798,11 @@
       "regressionTitle": "امتیاز سلامت از {previousScore} به {currentScore} کاهش یافت",
       "trendTitle": "امتیاز سلامت / روند خطاها از جمله اجرای های قبلی",
       "hotspotsTitle": "{open} باز، {safe} امن نشان داده شده، {fixed} تعمیر شده — کلیک کنید تا بررسی کنید",
-      "hotspotsPill": "{open} باز کردن · {percent}% بررسی شده"
+      "hotspotsPill": "{open} باز کردن · {percent}% بررسی شده",
+      "qualityGatePassingTitle": "کیفیت گیت کد سلامت — کلیک کنید تا کد سلامت را باز کنید",
+      "qualityGatePassingPill": "گیت پاسینگ",
+      "qualityGateFailingTitle": "کیفیت گیت کد سالم نیست ({count} خطا(ها)) — کلیک کنید تا کد سالم را باز کنید",
+      "qualityGateFailingPill": "درگاه شکسته است"
     },
     "groupBy": {
       "severity": "شدت: میزان شدید بودن",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "همه دستورات…",
-      "commandCatalogDescription": "جستجوی تمام دستورات"
+      "commandCatalogDescription": "جستجوی تمام دستورات",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · گیت شکست خورده",
+      "codeHealthNeverScanned": "نمره خود را با اجرا کردن کد سلامت ببینید",
+      "projectMapDescription": "سکن شده {ago}",
+      "projectMapNeverScanned": "پروژه مپ را اجرا کنید تا اندازه و نقاط گرم را ببینید"
     }
   }
 }

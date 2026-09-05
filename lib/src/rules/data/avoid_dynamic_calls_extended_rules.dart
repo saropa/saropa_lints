@@ -356,28 +356,71 @@ class AvoidDynamicCallsRule extends SaropaLintRule {
   bool _isObjectMethod(String name) => _objectMethods.contains(name);
   bool _isObjectProperty(String name) => _objectProperties.contains(name);
 
-  /// Returns true when the node is inside a `try` block whose catch clauses
-  /// include `on NoSuchMethodError`, `on TypeError`, or `on Object` — a
-  /// pattern used for intentional duck-typing across API versions.
+  /// Returns true when the node is inside the `try` body (NOT a catch clause
+  /// or finally block) of a TryStatement whose catch clauses include
+  /// `on NoSuchMethodError` or `on TypeError` — the documented
+  /// duck-typing/version-probing pattern.
+  ///
+  /// C3 fix: dynamic calls inside catch/finally blocks are NOT exempted,
+  /// because the guard only makes the try-body dispatch intentional — a
+  /// dynamic call in the error-handling path is a separate concern.
+  ///
+  /// C4 fix: bare `catch(e)` and `on Object catch(e)` do NOT suppress,
+  /// because they don't indicate awareness of dynamic dispatch specifically.
+  /// Only `on NoSuchMethodError` and `on TypeError` indicate the developer
+  /// is deliberately handling the failure mode this rule warns about.
   bool _isInsideTryCatchGuard(AstNode node) {
+    // Track the child so we can tell which branch of a TryStatement the
+    // node lives in (body vs catch vs finally).
+    AstNode? child = node;
     AstNode? current = node.parent;
     while (current != null) {
       if (current is TryStatement) {
-        for (final CatchClause clause in current.catchClauses) {
-          final TypeAnnotation? exType = clause.exceptionType;
-          if (exType == null) return true; // bare `catch` catches everything
-          final String typeName = exType.toSource();
-          if (typeName == 'NoSuchMethodError' ||
-              typeName == 'TypeError' ||
-              typeName == 'Object') {
-            return true;
-          }
+        // Only exempt nodes inside the try body — catch clauses and
+        // finally blocks are not part of the guarded dispatch pattern.
+        if (_isInTryBody(current, child!)) {
+          if (_hasSpecificExceptionCatch(current)) return true;
         }
       }
       // Don't escape past function boundaries — a try in an outer scope
       // does not guard an inner closure.
       if (current is FunctionBody) return false;
+      child = current;
       current = current.parent;
+    }
+    return false;
+  }
+
+  /// Returns true when [child] is the `body` block of [tryStatement] (or a
+  /// descendant of it that walked up to reach it), as opposed to being
+  /// inside a catch clause or finally block.
+  bool _isInTryBody(TryStatement tryStatement, AstNode child) {
+    // The child that is a direct child of TryStatement is either the body
+    // Block, a CatchClause, or the finallyBlock. If it's the body, the
+    // node is inside the guarded try region.
+    return identical(child, tryStatement.body);
+  }
+
+  /// Returns true when [tryStatement] has at least one catch clause with a
+  /// specific exception type that indicates awareness of dynamic dispatch
+  /// failure (`NoSuchMethodError` or `TypeError`).
+  ///
+  /// Bare `catch(e)` (no `on` type) and `on Object`/`on dynamic` do NOT
+  /// qualify — they catch everything and don't signal that the developer is
+  /// specifically handling a dynamic-dispatch failure.
+  bool _hasSpecificExceptionCatch(TryStatement tryStatement) {
+    for (final CatchClause clause in tryStatement.catchClauses) {
+      final TypeAnnotation? exType = clause.exceptionType;
+      // Bare `catch(e)` — no `on` type, catches everything generically.
+      // Does not indicate dynamic-dispatch awareness.
+      if (exType == null) continue;
+      final String typeName = exType.toSource();
+      // Only these specific types indicate the developer is handling
+      // the exact failure mode (NoSuchMethodError) or its close cousin
+      // (TypeError) that dynamic dispatch produces.
+      if (typeName == 'NoSuchMethodError' || typeName == 'TypeError') {
+        return true;
+      }
     }
     return false;
   }

@@ -871,13 +871,16 @@ class PreferVoidCallbackRule extends SaropaLintRule {
 /// Flags a `State<X>` class declared above its corresponding `StatefulWidget
 /// X` class in the same file.
 ///
-/// Since: v14.4.0 | Updated: v14.4.0 | Rule version: v1
+/// Since: v14.4.0 | Updated: v16.0.0-beta.4 | Rule version: v2
 ///
 /// Convention places the `StatefulWidget` first, since it is the public API
 /// surface, with its private `State` implementation below it. A `State`
 /// class declared above its widget inverts this expected top-down reading
 /// order, forcing readers to scroll further down to find the widget the
-/// `State` belongs to.
+/// `State` belongs to. Also recognizes third-party Widget/State pairs that
+/// follow the same `Foo<X> extends State-like` shape, such as Riverpod's
+/// `ConsumerStatefulWidget`/`ConsumerState` and flutter_hooks'
+/// `HookStatefulWidget`/`HookState`, not just the core Flutter names.
 ///
 /// **BAD:**
 /// ```dart
@@ -926,9 +929,30 @@ class PreferStateClassBelowWidgetRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  // Superclass names that mark a class as the "State-like" half of a
+  // Widget/State pair. Covers core Flutter `State` plus the third-party
+  // equivalents that follow the identical `Foo<X>` shape: Riverpod's
+  // `ConsumerState` and flutter_hooks' `HookState`.
+  static const Set<String> _stateSuperclassNames = <String>{
+    'State',
+    'ConsumerState',
+    'HookState',
+  };
+
+  // Superclass names that mark a class as the "Widget-like" half of a
+  // Widget/State pair. Covers core Flutter `StatefulWidget` plus the
+  // third-party equivalents whose `createState()` returns one of the
+  // `_stateSuperclassNames` types above: Riverpod's `ConsumerStatefulWidget`
+  // and flutter_hooks' `HookStatefulWidget`.
+  static const Set<String> _statefulWidgetSuperclassNames = <String>{
+    'StatefulWidget',
+    'ConsumerStatefulWidget',
+    'HookStatefulWidget',
+  };
+
   static const LintCode _code = LintCode(
     'prefer_state_class_below_widget',
-    '[prefer_state_class_below_widget] This State<X> class is declared above its corresponding StatefulWidget X class in the same file, inverting the expected top-down reading order. Convention places the StatefulWidget declaration first, since it is the public API surface, with its private State implementation below it. Reading the file top-to-bottom therefore encounters the State class before knowing which widget it belongs to, forcing readers to scroll further down to locate the corresponding widget declaration. {v1}',
+    '[prefer_state_class_below_widget] This State<X> class is declared above its corresponding StatefulWidget X class in the same file, inverting the expected top-down reading order. Convention places the StatefulWidget declaration first, since it is the public API surface, with its private State implementation below it. Reading the file top-to-bottom therefore encounters the State class before knowing which widget it belongs to, forcing readers to scroll further down to locate the corresponding widget declaration. This also applies to third-party Widget/State pairs with the same shape, such as Riverpod ConsumerStatefulWidget/ConsumerState and flutter_hooks HookStatefulWidget/HookState. {v2}',
     correctionMessage:
         'Move the State<X> class declaration below its corresponding StatefulWidget X class so the widget appears first in the file.',
     severity: DiagnosticSeverity.INFO,
@@ -941,8 +965,8 @@ class PreferStateClassBelowWidgetRule extends SaropaLintRule {
   ) {
     context.addCompilationUnit((CompilationUnit node) {
       // Collect every top-level class declaration once, partitioned into
-      // "State<X> subclasses" and "StatefulWidget subclasses" keyed by the
-      // widget's name X, so each Widget/State pair in the file can be
+      // "State<X>-like subclasses" and "StatefulWidget-like subclasses" keyed
+      // by the widget's name X, so each Widget/State pair in the file can be
       // compared independently of how many other pairs exist.
       final Map<String, ClassDeclaration> stateClassesByWidgetName =
           <String, ClassDeclaration>{};
@@ -957,18 +981,17 @@ class PreferStateClassBelowWidgetRule extends SaropaLintRule {
         final NamedType superclass = extendsClause.superclass;
         final String superclassName = superclass.name.lexeme;
 
-        if (superclassName == 'State') {
+        if (_stateSuperclassNames.contains(superclassName)) {
           // Extract the concrete widget name from the generic argument,
-          // e.g. `State<Counter>` -> `Counter`. A bare `State` or
-          // `State<dynamic>` has no concrete widget name to correlate
-          // against, so it is skipped rather than guessed at.
-          final String? widgetName = _widgetNameFromStateSuperclass(
-            superclass,
-          );
+          // e.g. `State<Counter>` or `ConsumerState<Counter>` -> `Counter`.
+          // A bare State-like type or one parameterized with `dynamic` has
+          // no concrete widget name to correlate against, so it is skipped
+          // rather than guessed at.
+          final String? widgetName = _widgetNameFromStateSuperclass(superclass);
           if (widgetName != null) {
             stateClassesByWidgetName[widgetName] = member;
           }
-        } else if (superclassName == 'StatefulWidget') {
+        } else if (_statefulWidgetSuperclassNames.contains(superclassName)) {
           widgetClassesByName[member.nameToken.lexeme] = member;
         }
       }
@@ -990,10 +1013,13 @@ class PreferStateClassBelowWidgetRule extends SaropaLintRule {
     });
   }
 
-  /// Returns the concrete widget type name from a `State<X>` superclass
-  /// (e.g. `Counter` from `State<Counter>`), or null when there is no
-  /// single named type argument to correlate against (bare `State`,
-  /// `State<dynamic>`, or a superclass with more than one type argument).
+  /// Returns the concrete widget type name from a `State<X>`-shaped
+  /// superclass (e.g. `Counter` from `State<Counter>`, `ConsumerState<X>`,
+  /// or `HookState<X>`), or null when there is no single named type argument
+  /// to correlate against (bare `State`, `State<dynamic>`, or a superclass
+  /// with more than one type argument). All three State-like superclasses
+  /// take exactly one type parameter naming the widget, so one extraction
+  /// helper serves them all.
   static String? _widgetNameFromStateSuperclass(NamedType superclass) {
     final TypeArgumentList? typeArguments = superclass.typeArguments;
     if (typeArguments == null) return null;

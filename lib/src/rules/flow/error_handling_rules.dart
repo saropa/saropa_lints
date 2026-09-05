@@ -115,6 +115,17 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
       // already owns the no-logging concern (avoid double-flagging).
       if (_bodyLogsOrRethrows(body.toSource())) return;
 
+      // A catch that returns a fallback value, continues a loop, or
+      // breaks is handling the exception via control flow — the caller
+      // gets a safe result or the loop skips the bad item.
+      for (final Statement stmt in body.statements) {
+        if (stmt is ReturnStatement ||
+            stmt is ContinueStatement ||
+            stmt is BreakStatement) {
+          return;
+        }
+      }
+
       reporter.atNode(node);
     });
   }

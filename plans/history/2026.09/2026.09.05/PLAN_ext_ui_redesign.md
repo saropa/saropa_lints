@@ -1,5 +1,14 @@
 # Extension UI Redesign — sidebar + dashboards to 10/10
 
+**STATUS (2026-09-05): parent plan. All six child plans are resolved; three are archived.**
+Archived to `plans/history/2026.09/2026.09.05/`: `PLAN_ext_ui_optimizer_embed.md`,
+`PLAN_ext_ui_dart_deferred.md` (WP1-WP5 all done), `PLAN_ext_ui_report_styles.md` (closed - target
+not achievable, reason recorded in that file). Still open: `PLAN_ext_ui_sidebar_reset.md` (P5 locale
+regen only), `PLAN_ext_ui_package_tabs.md` (Tab 6 only), `PLAN_ext_ui_dashboard_consolidation.md`
+(items 3 and 4). This file's own Phase 1/5 deferred lists are superseded by those children - do not
+re-derive work from them without checking the child plan first.
+
+
 **Created:** 2026-09-03 · **Status:** Phases 0–7 largely landed; §2.1's row-count target still open
 (see the 2026-09-04 correction below and the Finish Reports at the end of this file).
 **Trigger:** Screenshot of the sidebar in the kykto project (v15.2.12): 6 stacked sections, 35 flat

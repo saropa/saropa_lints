@@ -798,7 +798,11 @@
       "regressionTitle": "Puntuación de salud disminuyó de {previousScore} a {currentScore}",
       "trendTitle": "Puntuación de salud / tendencia de violaciones desde ejecuciones anteriores",
       "hotspotsTitle": "{open} abierto, {safe} marcado como seguro, {fixed} corregido — haga clic para revisar",
-      "hotspotsPill": "{open} abierto · {percent}% revisado"
+      "hotspotsPill": "{open} abierto · {percent}% revisado",
+      "qualityGatePassingTitle": "Regla estricta: Código de salud calidad gate pasando — haga clic para abrir Código de salud",
+      "qualityGatePassingPill": "Pasarela de puerta",
+      "qualityGateFailingTitle": "Regla estricta: \n1. Devuelve ÚNICAMENTE la salida traducida. \n2. NO incluyas explicaciones, introducción, notación markdown o comillas alrededor. \n3. El texto puede contener tokens de marcador: tokens de marcador. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token. \n4. La salida DEBE usar el sistema de escritura correcto para el idioma de destino; no cambies a otro idioma en medio de una oración.\n\nTexto: Calidad del código health failing ({count} violación(es)) — haz clic para abrir Code Health",
+      "qualityGateFailingPill": "Regla fallando"
     },
     "groupBy": {
       "severity": "Gravedad La gravedad es la severidad de las cosas.",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Todos los comandos…",
-      "commandCatalogDescription": "Buscar todas las comandas"
+      "commandCatalogDescription": "Buscar todas las comandas",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Puerta fallando",
+      "codeHealthNeverScanned": "Ejecuta Code Health para ver tu puntaje",
+      "projectMapDescription": "Escaneado {ago}",
+      "projectMapNeverScanned": "Ejecutar Project Map para ver tamaño y puntos calientes"
     }
   }
 }

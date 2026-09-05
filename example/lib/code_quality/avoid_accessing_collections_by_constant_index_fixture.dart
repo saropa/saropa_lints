@@ -121,3 +121,28 @@ void _good182() {
     print(items[i]); // Use the loop variable as the index
   }
 }
+
+// GOOD: Constant-index WRITE with a loop-varying value — standard single-row
+// DP initialization (e.g. Levenshtein edit distance). The constant index `0`
+// is intentional (first column of the row); the assigned value `i` changes
+// every iteration, so this is not "retrieving the same element" — it is
+// writing a different value to a fixed slot each time.
+void _goodDpRowInit(List<int> curr, int m) {
+  for (int i = 1; i <= m; i++) {
+    curr[0] = i;
+  }
+}
+
+// GOOD (not flagged): Constant-index WRITE with a constant value is also
+// suppressed, even though it is arguably wasteful (every iteration
+// overwrites the same slot with the same value). The rule's guard is
+// deliberately unconditional on write vs. read — not on whether the
+// assigned value happens to vary — because distinguishing "wasteful
+// constant write" from "intentional re-assertion" (e.g. a sentinel reset)
+// would require value-flow analysis this rule does not attempt. See
+// plans/history/2026.09/2026.09.05/avoid_accessing_collections_by_constant_index_false_positive_dp_algorithm.md.
+void _goodConstantWriteConstantValue(List<int> curr, int m) {
+  for (int i = 1; i <= m; i++) {
+    curr[0] = 42;
+  }
+}

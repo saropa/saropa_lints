@@ -798,7 +798,11 @@
       "regressionTitle": "Gesundheitspunkte gesunken von {previousScore} auf {currentScore}",
       "trendTitle": "Gesundheitsbewertung / Verstoßstrend seit früheren Laufzeitpunkten",
       "hotspotsTitle": "{open} offen, {safe} als sicher markiert, {fixed} repariert — klicken Sie, um zu überprüfen",
-      "hotspotsPill": "{open} öffnen · {percent}% geprüft"
+      "hotspotsPill": "{open} öffnen · {percent}% geprüft",
+      "qualityGatePassingTitle": "Code Health Qualitätsschwellen erreicht — klicken, um Code Health zu öffnen",
+      "qualityGatePassingPill": "Gate passing",
+      "qualityGateFailingTitle": "Code Health Quality Gate fehlschlagend ({count} Verstoß(e)) — klicken, um Code Health zu öffnen",
+      "qualityGateFailingPill": "Tor fehlt"
     },
     "groupBy": {
       "severity": "Schwere der Erkrankung",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Alle Befehle…",
-      "commandCatalogDescription": "Alle Befehle suchen"
+      "commandCatalogDescription": "Alle Befehle suchen",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate fehlt",
+      "codeHealthNeverScanned": "Code Health ausführen, um Ihren Score zu sehen",
+      "projectMapDescription": "Gescannt {ago}",
+      "projectMapNeverScanned": "Projektmappe ausführen, um Größe & Hotspots anzuzeigen"
     }
   }
 }

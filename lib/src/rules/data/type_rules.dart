@@ -405,7 +405,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
 /// Warns when interpolating a nullable value in a string.
 ///
-/// Since: v0.1.4 | Updated: v6 | Rule version: v6
+/// Since: v0.1.4 | Updated: v7 | Rule version: v7
 ///
 /// v6 narrowing — three classes of false-positive suppressed so the
 /// rule's remaining hits represent the actual "user sees null in the UI"
@@ -421,6 +421,12 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 /// 3. Interpolation inside `debug()`, `breadcrumb()`, `debugPrint()`,
 ///    `print()`, or `dart:developer log()` — diagnostic output where
 ///    seeing "null" IS the intended signal.
+///
+/// v7 — the `!= null` guard in (2) now also recognizes a compound `&&`
+/// condition (e.g. `if (a.contains('x') && f.churn != null) { ... }`),
+/// not just a bare `if (expr != null)`. Every conjunct of `&&` must hold
+/// to reach the then-branch, so the guard is just as valid buried in a
+/// larger condition.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableInterpolationRule extends SaropaLintRule {
@@ -444,7 +450,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_nullable_interpolation',
     "[avoid_nullable_interpolation] Nullable value in string interpolation produces the literal text 'null' instead of a meaningful fallback. "
-        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity. {v6}",
+        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity. {v7}",
     correctionMessage:
         "Add a null check before interpolation, or use the null-coalescing operator (??) to provide a sensible default (e.g., '\${name ?? \"Guest\"}'). "
         'For complex formatting, consider a helper method that handles null values with appropriate placeholder text.',
@@ -570,6 +576,16 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
       if (left is NullLiteral) {
         return _normalizeSource(right.toSource()) == exprSource;
       }
+    }
+    // Recurse into `&&` compounds: `if (a.contains('x') && f.churn != null)`
+    // guards the then-branch just as well as a bare `if (f.churn != null)`
+    // — every conjunct must be true to enter. Deliberately NOT recursing
+    // into `||`: an OR does not guarantee any specific conjunct held, so
+    // it cannot prove non-null in the then-branch.
+    if (c is BinaryExpression &&
+        c.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+      return _isNotNullCheckFor(c.leftOperand, exprSource) ||
+          _isNotNullCheckFor(c.rightOperand, exprSource);
     }
     return false;
   }

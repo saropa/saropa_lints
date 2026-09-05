@@ -798,7 +798,11 @@
       "regressionTitle": "स्वास्थ्य स्कोर {previousScore} से {currentScore} तक गिर गया",
       "trendTitle": "स्वास्थ्य स्कोर / पहले के चलाए गए चलाए गए उल्लंघन के प्रवृत्ति",
       "hotspotsTitle": "{open} खुला, {safe} सुरक्षित चिह्नित, {fixed} सुधार कर दिया — पर अपनी जांच करें",
-      "hotspotsPill": "{open} खुला · {percent}% निरीक्षित"
+      "hotspotsPill": "{open} खुला · {percent}% निरीक्षित",
+      "qualityGatePassingTitle": "कोड स्वास्थ्य गुणवत्ता गेट पासिंग - कोड स्वास्थ्य खोलने के लिए क्लिक करें",
+      "qualityGatePassingPill": "गेट पासिंग",
+      "qualityGateFailingTitle": "कोड हेल्थ क्वालिटी गेट विफ़ॉल्ड ({count} उल्लंघन (ओ) स) — क्लिक करें कोड हेल्थ खोलने",
+      "qualityGateFailingPill": "गेट फेल हो रहा है"
     },
     "groupBy": {
       "severity": "गंभीरता की डिग्री।",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "सभी कमांड...",
-      "commandCatalogDescription": "सभी कमांड खोजें"
+      "commandCatalogDescription": "सभी कमांड खोजें",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · गेट फेल होना",
+      "codeHealthNeverScanned": "अपना स्कोर देखने के लिए कोड हेल्थ चलाएँ",
+      "projectMapDescription": "स्कैन किया गया {ago}",
+      "projectMapNeverScanned": "आकार और हॉट स्पॉट देखने के लिए प्रोजेक्ट मैप चलाएँ"
     }
   }
 }

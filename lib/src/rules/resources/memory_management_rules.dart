@@ -1022,6 +1022,158 @@ bool _cacheSourceIsBounded(String classSource) =>
     classSource.contains('lru') ||
     classSource.contains('lfu');
 
+/// Returns true when the lowercased [classSource] suggests the cache is
+/// keyed by content-address (crypto hash / sha / fingerprint / digest /
+/// content key) rather than by a mutable identity.
+///
+/// A content-addressed cache CANNOT serve stale data by construction: the
+/// key itself changes whenever the underlying content changes, so there is
+/// no "old value under an unchanged key" failure mode for either rule to
+/// guard against (`require_cache_expiration`'s staleness concern) or for
+/// growth to be a symptom of unbounded mutation (`avoid_unbounded_cache_growth`
+/// still applies to raw memory growth, but the two rules share this gate so
+/// a class documented as content-addressed is not double-flagged for a
+/// staleness model that does not apply to it). Shared by both cache rules
+/// so the exemption cannot drift between them — see
+/// bugs/require_cache_expiration_false_positive_content_addressed_caches.md.
+///
+/// **Excludes** standard Dart identifiers that contain "hash" but are NOT
+/// crypto indicators: `HashMap`, `HashSet`, `hashCode`, `hashMap`,
+/// `hashset`. These are ordinary Dart collection types / Object members that
+/// appear in virtually every class and would falsely suppress the lint.
+/// Only actual crypto/content-hash patterns match: `sha1`, `sha256`, `md5`,
+/// `digest`, `fingerprint`, `crypto`, `content_key`, `contentkey`, or the
+/// standalone word `hash` when not part of `hashmap`/`hashset`/`hashcode`.
+bool _isContentAddressedCacheKey(String classSource) =>
+    // Crypto algorithm names — unambiguous content-addressing signals
+    classSource.contains('sha1') ||
+    classSource.contains('sha256') ||
+    classSource.contains('sha512') ||
+    classSource.contains('md5') ||
+    classSource.contains('crypto') ||
+    classSource.contains('fingerprint') ||
+    classSource.contains('digest') ||
+    classSource.contains('content_key') ||
+    classSource.contains('contentkey') ||
+    // Match "hash" only when NOT part of HashMap/HashSet/hashCode/hashMap/
+    // hashSet — these are standard Dart identifiers, not crypto indicators.
+    _cryptoHashPattern.hasMatch(classSource);
+
+/// Matches the word "hash" in a context that indicates crypto hashing, NOT
+/// standard Dart identifiers. Excludes `hashmap`, `hashset`, `hashcode` by
+/// requiring "hash" to NOT be followed by `map`, `set`, or `code`.
+final RegExp _cryptoHashPattern = RegExp(
+  r'hash(?!map\b|set\b|code\b)',
+  caseSensitive: false,
+);
+
+/// Returns true when `.clear()` or `.remove()` is called on one of the
+/// cache class's own Map fields — either inside the class itself or
+/// elsewhere in the same compilation unit.
+///
+/// **Scoped to the flagged variable.** The old implementation searched the
+/// entire file for ANY `.clear()` call, so an unrelated `_list.clear()` on
+/// a different collection falsely suppressed the lint (C11 over-suppression
+/// bug). Now we:
+/// 1. Collect the names of Map-typed fields declared in [node].
+/// 2. Walk the enclosing compilation unit for `.clear()` / `.remove(` calls
+///    whose target identifier matches one of those field names.
+///
+/// This still catches external invalidation (a sibling class calling
+/// `cacheInstance._cache.clear()`) without being tripped by an unrelated
+/// `_otherList.clear()`.
+bool _fileHasExplicitCacheClear(ClassDeclaration node) {
+  // Step 1: collect names of Map-typed fields in the flagged cache class.
+  final Set<String> cacheFieldNames = _collectMapFieldNames(node);
+  if (cacheFieldNames.isEmpty) return false;
+
+  // Step 2: walk the compilation unit for .clear()/.remove() on those names.
+  final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
+  if (unit == null) return false;
+
+  final _CacheClearVisitor visitor = _CacheClearVisitor(cacheFieldNames);
+  unit.accept(visitor);
+  return visitor.found;
+}
+
+/// Extracts the names of all Map-typed (or bare `= {}`) fields declared
+/// inside [node]. Used by [_fileHasExplicitCacheClear] to scope the
+/// `.clear()` search to actual cache storage fields.
+Set<String> _collectMapFieldNames(ClassDeclaration node) {
+  final Set<String> names = <String>{};
+  for (final ClassMember member in node.bodyMembers) {
+    if (member is! FieldDeclaration) continue;
+    final String fieldSource = member.toSource().toLowerCase();
+    // Only Map fields or bare `= {}` initializers are cache storage.
+    if (!fieldSource.contains('map<') && !fieldSource.contains('= {}')) {
+      continue;
+    }
+    for (final VariableDeclaration v in member.fields.variables) {
+      names.add(v.name.lexeme);
+    }
+  }
+  return names;
+}
+
+/// AST visitor that finds `.clear()` or `.remove(` calls whose target
+/// identifier matches one of the tracked cache field names. Walks the
+/// entire compilation unit so it catches both internal and external
+/// invalidation sites.
+class _CacheClearVisitor extends RecursiveAstVisitor<void> {
+  _CacheClearVisitor(this._fieldNames);
+
+  /// Field names of the cache class's Map-typed fields.
+  final Set<String> _fieldNames;
+
+  /// Set to true when a matching `.clear()` or `.remove(` is found.
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Short-circuit once a match is found.
+    if (found) return;
+
+    final String method = node.methodName.name;
+    // Only `.clear()` and `.remove()` indicate explicit cache invalidation.
+    if (method != 'clear' && method != 'remove') {
+      super.visitMethodInvocation(node);
+      return;
+    }
+
+    // Walk the target expression chain to find the terminal identifier.
+    // Handles `_cache.clear()`, `instance._cache.clear()`,
+    // `_cache!.clear()`, etc.
+    if (_targetMatchesCacheField(node.realTarget)) {
+      found = true;
+      return;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  /// Whether [expr] ultimately references one of the tracked field names.
+  /// Unwraps property access chains and null-assertion postfix expressions
+  /// to reach the terminal `SimpleIdentifier`.
+  bool _targetMatchesCacheField(Expression? expr) {
+    if (expr == null) return false;
+    // Direct reference: `_cache.clear()`
+    if (expr is SimpleIdentifier) return _fieldNames.contains(expr.name);
+    // Chained access: `instance._cache.clear()` — check the property name
+    if (expr is PrefixedIdentifier) {
+      return _fieldNames.contains(expr.identifier.name);
+    }
+    if (expr is PropertyAccess) {
+      return _fieldNames.contains(expr.propertyName.name);
+    }
+    // Null-asserted: `_cache!.clear()`
+    if (expr is PostfixExpression && expr.operand is SimpleIdentifier) {
+      return _fieldNames.contains(
+        (expr.operand as SimpleIdentifier).name,
+      );
+    }
+    return false;
+  }
+}
+
 /// Returns true when [node] declares a Map (or untyped `= {}`) *field* that
 /// reads as cache storage.
 ///
@@ -1059,6 +1211,17 @@ bool _hasMapCacheField(ClassDeclaration node) {
 ///   (e.g. Guava `maximumSize` without `expireAfter`). Unbounded growth is
 ///   [AvoidUnboundedCacheGrowthRule]'s concern, so firing here too would be
 ///   redundant and wrong.
+/// - Content-addressed caches (key derived from hash/sha/fingerprint/digest
+///   of the content) via [_isContentAddressedCacheKey] — the key itself
+///   changes when the content changes, so a stale entry under an unchanged
+///   key is structurally impossible.
+/// - Caches in a `bin/`/`tool/` script, or a package with pubspec
+///   `executables:`, via [ProjectContext.isInShortLivedToolDirectory] /
+///   [ProjectContext.isCliOrToolPackage] — the process exits after one run,
+///   so "serves stale data indefinitely" cannot happen.
+/// - Files with an explicit `.clear()` call anywhere in the same
+///   compilation unit, via [_fileHasExplicitCacheClear] — invalidation may
+///   be driven from outside the cache class itself.
 ///
 /// **BAD:**
 /// ```dart
@@ -1123,7 +1286,26 @@ class RequireCacheExpirationRule extends SaropaLintRule {
         return;
       }
 
+      // Short-lived CLI processes exit after one run — no OOM or
+      // stale-data risk from unbounded caches. Two independent signals:
+      // whole-package (pubspec `executables:`) and per-file (`bin/`/`tool/`
+      // directory), since a `tool/` script can live inside an otherwise
+      // long-lived app package with no `executables:` entry.
+      if (ProjectContext.isCliOrToolPackage(context.filePath) ||
+          ProjectContext.isInShortLivedToolDirectory(context.filePath)) {
+        return;
+      }
+
       final String classSource = node.toSource().toLowerCase();
+
+      // Content-addressed caches keyed by hash/fingerprint cannot serve
+      // stale data by design — the key changes when the content changes.
+      if (_isContentAddressedCacheKey(classSource)) return;
+
+      // An explicit `.clear()` call anywhere in the file signals the author
+      // already handles invalidation, even if the call site is outside the
+      // cache class itself.
+      if (_fileHasExplicitCacheClear(node)) return;
 
       // Check for expiration-related patterns
       final bool hasExpiration =
@@ -1174,6 +1356,13 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 ///   external cleanup, not in-memory Map caching.
 /// - Maps with enum keys - inherently bounded by the number of enum values.
 /// - Immutable caches with no mutation methods (add, put, set, index assignment).
+/// - Content-addressed caches (key derived from hash/sha/fingerprint/digest)
+///   via [_isContentAddressedCacheKey] - key space is bounded by distinct
+///   content, not by request volume.
+/// - Caches in a `bin/`/`tool/` script, or a package with pubspec
+///   `executables:` - the process exits after one run.
+/// - Files with an explicit `.clear()` call anywhere in the same
+///   compilation unit - invalidation may be driven from outside the class.
 ///
 /// **BAD:**
 /// ```dart
@@ -1251,6 +1440,15 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
         return;
       }
 
+      // Short-lived CLI processes exit after one run — unbounded memory
+      // growth is not a real risk. Two independent signals: whole-package
+      // (pubspec `executables:`) and per-file (`bin/`/`tool/` directory) —
+      // see RequireCacheExpirationRule for why both are needed.
+      if (ProjectContext.isCliOrToolPackage(context.filePath) ||
+          ProjectContext.isInShortLivedToolDirectory(context.filePath)) {
+        return;
+      }
+
       final String classSource = node.toSource().toLowerCase();
 
       // Skip database models - they use disk storage, not memory caches
@@ -1260,6 +1458,20 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
           classSource.contains('@entity')) {
         return;
       }
+
+      // Content-addressed caches (keyed by hash/sha/fingerprint/digest) are
+      // commonly backed by an on-disk store keyed 1:1 with content identity
+      // (e.g. a blob-hash JSON cache) rather than an unbounded in-process
+      // Map — the "grows forever in RAM" failure mode this rule targets
+      // does not apply to a key space that is bounded by distinct content,
+      // not by request volume. Shared with RequireCacheExpirationRule so
+      // the two rules cannot drift apart.
+      if (_isContentAddressedCacheKey(classSource)) return;
+
+      // An explicit `.clear()` call anywhere in the file caps growth even
+      // when the class itself has no size limit — periodic invalidation
+      // driven from outside the class still bounds long-run memory use.
+      if (_fileHasExplicitCacheClear(node)) return;
 
       // Size-limit detection (capacity / maxSize / LRU/LFU eviction / prune
       // calls) is shared with RequireCacheExpirationRule via the top-level

@@ -179,3 +179,34 @@ class _good474_SerializableCache {
 
   Map<String, dynamic> toMap() => {'id': id};
 }
+
+// GOOD: Content-addressed cache keyed by the sha256 hash of the input
+// content. A stale entry under an unchanged key is structurally impossible
+// here — if the content changes, the key changes too, so there is nothing
+// for TTL/expiration to protect against. Must NOT lint. Regression case for
+// bugs/require_cache_expiration_false_positive_content_addressed_caches.md.
+class _good474_ContentHashCache {
+  final Map<String, String> _cache = {};
+
+  String? getByHash(String sha256Hash) => _cache[sha256Hash];
+  void putByHash(String sha256Hash, String rendered) =>
+      _cache[sha256Hash] = rendered;
+}
+
+// GOOD: No TTL field on the cache class itself, but a sibling class in the
+// same file explicitly calls `.clear()` on it — invalidation is driven from
+// outside the cache class. Must NOT lint.
+class _good474_ExternallyManagedCache {
+  final Map<String, User> _cache = {};
+
+  User? get(String id) => _cache[id];
+  void set(String id, User user) => _cache[id] = user;
+}
+
+class _good474_CacheInvalidator {
+  final _good474_ExternallyManagedCache cache = _good474_ExternallyManagedCache();
+
+  // Scheduled/triggered from elsewhere; presence of any `.clear()` call in
+  // the file is the signal, not who calls it or when.
+  void onMemoryPressure() => cache._cache.clear();
+}

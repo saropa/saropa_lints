@@ -10,6 +10,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../catch_body_logging_utils.dart';
 import '../../platform_path_utils.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -2670,12 +2671,34 @@ class RequireUrlValidationRule extends SaropaLintRule {
         return;
       }
 
-      // Check if there's a scheme validation in the same block
+      // Check if there's a scheme validation in the same block. Matches
+      // both `.scheme` property reads (`uri.scheme != 'file'`) and
+      // `.isScheme(` calls (`uri.isScheme('file')`) — both are
+      // equally valid scheme guards, just different Uri APIs. 'file' is
+      // included alongside https/http because rejecting (or requiring)
+      // the file:// scheme is itself a scheme-validation decision — the
+      // whole point of this rule is confirming the scheme was checked,
+      // not that it was checked against http specifically.
       final blockSource = enclosingBlock.toSource();
-      if (blockSource.contains('.scheme') &&
-          (blockSource.contains('https') || blockSource.contains('http'))) {
+      if ((blockSource.contains('.scheme') ||
+              blockSource.contains('.isScheme(')) &&
+          (blockSource.contains('https') ||
+              blockSource.contains('http') ||
+              blockSource.contains('file'))) {
         return;
       }
+
+      // startsWith('file://') or startsWith('http') before parsing is
+      // a scheme guard — the string is pre-validated before parsing.
+      final String argSource = urlArg.toSource();
+      if (blockSource.contains('$argSource.startsWith(') &&
+          (blockSource.contains('file://') || blockSource.contains('http'))) {
+        return;
+      }
+
+      // CLI tools and analyzer plugins parse internal paths, not
+      // attacker-controlled URLs — SSRF does not apply.
+      if (ProjectContext.isCliOrToolPackage(context.filePath)) return;
 
       reporter.atNode(node);
     });
@@ -4598,7 +4621,7 @@ class RequireCatchLoggingRule extends SaropaLintRule {
     context.addCatchClause((CatchClause node) {
       final Block body = node.body;
 
-      // Empty catch blocks are always bad
+      // Empty catch blocks are always bad — nothing handles the error.
       if (body.statements.isEmpty) {
         reporter.atNode(node);
         return;
@@ -4606,39 +4629,76 @@ class RequireCatchLoggingRule extends SaropaLintRule {
 
       final String bodySource = body.toSource().toLowerCase();
 
-      // Check for logging
+      // Check for logging via known method/receiver names.
       final bool hasLogging = _loggingBodyPatterns.any(
         (p) => p.hasMatch(bodySource),
       );
 
       if (hasLogging) return;
 
-      // Check for rethrow
+      // Check for rethrow/throw — the exception is being propagated.
       final bool hasRethrow = _rethrowBodyPatterns.any(
         (p) => p.hasMatch(bodySource),
       );
 
       if (hasRethrow) return;
 
-      // Check if the exception variable is used (might be passed to a function)
+      // Check if the exception variable is actually used in the body.
+      // This MUST come BEFORE the control-flow check (C1 fix): a catch
+      // like `catch (e) { return null; }` where `e` is never referenced
+      // is silently discarding the exception — the exact pattern this
+      // rule exists to catch. The return/continue/break exemption only
+      // applies when the exception IS used (e.g. passed to a handler,
+      // logged to a custom sink, or inspected for type).
       final CatchClauseParameter? exceptionParam = node.exceptionParameter;
-      if (exceptionParam != null) {
-        final String exceptionName = exceptionParam.name.lexeme;
-        // Check if exception is used in a function call (might be custom logging)
-        final String exLower = exceptionName.toLowerCase();
-        if (RegExp(RegExp.escape(exLower)).hasMatch(bodySource)) {
-          // Exception is referenced - might be passed to a custom logger
-          // Only flag if it's just assignment or simple property access
-          final bool isJustAssignment = _isOnlyAssignmentOrPropertyAccess(
-            body,
-            exceptionName,
-          );
-          if (!isJustAssignment) return;
-        }
+      final bool exceptionUsed = _isExceptionUsedMeaningfully(
+        body,
+        bodySource,
+        exceptionParam,
+      );
+
+      // Control-flow handling (return/continue/break) is only a valid
+      // exemption when the exception variable is actually referenced —
+      // otherwise the exception is silently dropped even though the code
+      // path changes. (C1 fix: moved after exception-usage check.)
+      if (exceptionUsed && catchHandlesViaControlFlow(body)) {
+        return;
       }
+
+      // Exception passed to a non-trivial function call counts as handled
+      // (custom logger, error sink, etc.) — skip reporting.
+      if (exceptionUsed) return;
 
       reporter.atNode(node);
     });
+  }
+
+  /// Returns true when the exception variable is referenced in a meaningful
+  /// way — passed to a function, used in a method chain beyond `.toString()`
+  /// or `.message`, etc. Returns false for unnamed exceptions, wildcard
+  /// `_` names, and bodies that only do basic property access on the
+  /// exception without forwarding it.
+  bool _isExceptionUsedMeaningfully(
+    Block body,
+    String bodySource,
+    CatchClauseParameter? exceptionParam,
+  ) {
+    if (exceptionParam == null) return false;
+
+    final String exceptionName = exceptionParam.name.lexeme;
+
+    // Wildcard `_` / `__` is Dart's deliberate discard marker — cannot
+    // be referenced, so never counts as "used".
+    if (RegExp(r'^_+$').hasMatch(exceptionName)) return false;
+
+    // Check whether the exception name appears in the body source at all.
+    final String exLower = exceptionName.toLowerCase();
+    if (!RegExp(RegExp.escape(exLower)).hasMatch(bodySource)) return false;
+
+    // Exception IS referenced — but only count it as meaningful if it's
+    // more than just assignment or basic property access (.toString(),
+    // .message). Passing to a function = custom logging = handled.
+    return !_isOnlyAssignmentOrPropertyAccess(body, exceptionName);
   }
 
   /// Checks if the exception is only used in assignments or property access
@@ -4766,9 +4826,31 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // CLI tools and analyzer plugins are developer diagnostics — stack
+    // traces in their output are expected, not a security leak.
+    if (ProjectContext.isCliOrToolPackage(context.filePath)) return;
+
+    // A mixed package (e.g. a Flutter app that also ships `bin/` or
+    // `tool/` scripts) isn't itself a CLI package, but files under
+    // those directories still run on the VM only, never in front of an
+    // end user — so the leak this rule guards against can't happen there.
+    if (context.isCliBinScript || context.isCliToolScript) return;
+
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_outputMethods.contains(methodName)) return;
+
+      // dart:developer's log() is a structured-diagnostics API meant to
+      // carry arbitrary data (including stack traces) to IDE/DevTools
+      // consoles — it never renders to end-user-visible UI, so it isn't
+      // the "user-visible output" leak this rule targets. A same-named
+      // local `log()` (e.g. a custom logger) still falls through and is
+      // checked normally.
+      if (methodName == 'log' &&
+          node.methodName.element?.library?.uri.toString() ==
+              'dart:developer') {
+        return;
+      }
 
       // Check if any argument references a stack trace
       if (!_hasStackTraceArg(node.argumentList)) return;

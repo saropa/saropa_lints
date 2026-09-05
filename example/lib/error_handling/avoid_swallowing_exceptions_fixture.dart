@@ -127,3 +127,40 @@ void _good352() async {
     rethrow;
   }
 }
+
+// GOOD: catch returns a fallback value. The exception is handled via
+// control flow -- the caller gets a safe result instead of an unhandled
+// throw -- so this is an intentional "degrade gracefully" pattern, not a
+// silent swallow. See
+// bugs/require_catch_logging_false_positive_intentional_fallback.md.
+dynamic _good353Return() {
+  try {
+    return fetchData();
+  } on StateError catch (e) {
+    return null; // Documented fallback: no data available yet.
+  }
+}
+
+// GOOD: catch continues a loop. The bad item is skipped and the walk
+// proceeds, so the exception is acknowledged and handled, not dropped.
+void _good353Continue(List<String> items) {
+  for (final item in items) {
+    try {
+      data = item;
+    } on Exception catch (e) {
+      continue; // Skip this item and keep processing the rest.
+    }
+  }
+}
+
+// GOOD: catch breaks out of a loop. Stopping the walk on first failure is
+// a deliberate, controlled response to the exception.
+void _good353Break(List<String> items) {
+  for (final item in items) {
+    try {
+      data = item;
+    } on Exception catch (e) {
+      break; // Abort the walk once one item fails.
+    }
+  }
+}

@@ -106,6 +106,71 @@ String? _leftmostIdentifierName(Expression? target) {
   return null;
 }
 
+/// Returns true when a catch body's top-level statements include a
+/// `return`, `continue`, or `break` — control-flow constructs that indicate
+/// the catch is intentionally handling the exception by returning a fallback
+/// value, skipping a bad item, or aborting a loop rather than silently
+/// swallowing the error.
+///
+/// Shared between `require_catch_logging` (security) and
+/// `avoid_swallowing_exceptions` (error handling) so both rules apply the
+/// same exemption logic. Extracted here (O2) to eliminate the duplicated
+/// inline check that previously lived in each rule's `runWithReporter`.
+bool catchHandlesViaControlFlow(Block body) {
+  for (final Statement stmt in body.statements) {
+    if (stmt is ReturnStatement ||
+        stmt is ContinueStatement ||
+        stmt is BreakStatement) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Returns true when [body] references [exceptionName] in a meaningful way
+/// (not just assignment or basic property access like `.toString()` or
+/// `.message`).
+///
+/// Uses an AST visitor to check actual identifier nodes rather than
+/// substring-matching the source text — avoids false positives from
+/// exception names that appear inside string literals or unrelated
+/// identifiers.
+bool catchBodyUsesException(Block body, String exceptionName) {
+  bool used = false;
+  body.visitChildren(
+    _IdentifierUsageVisitor(exceptionName, () => used = true),
+  );
+  return used;
+}
+
+/// AST visitor that fires [onFound] when a [SimpleIdentifier] matching
+/// [name] is encountered. Used by [catchBodyUsesException] and by
+/// `avoid_swallowing_exceptions` to detect whether the exception variable
+/// is actually referenced in the catch body.
+class CatchIdentifierUsageVisitor extends RecursiveAstVisitor<void> {
+  CatchIdentifierUsageVisitor(this.name, this.onFound);
+
+  /// The identifier name to search for.
+  final String name;
+
+  /// Callback invoked when a matching identifier is found.
+  final void Function() onFound;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == name) {
+      onFound();
+    }
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// Private convenience wrapper so internal callers don't need to construct
+/// the visitor directly.
+class _IdentifierUsageVisitor extends CatchIdentifierUsageVisitor {
+  _IdentifierUsageVisitor(super.name, super.onFound);
+}
+
 class _LoggingCallVisitor extends RecursiveAstVisitor<void> {
   bool found = false;
 

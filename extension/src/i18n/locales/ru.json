@@ -798,7 +798,11 @@
       "regressionTitle": "Оценка здоровья снизилась с {previousScore} до {currentScore}",
       "trendTitle": "Оценка здоровья / тенденция нарушений с момента предыдущих запусков",
       "hotspotsTitle": "{open} открыто, {safe} помечено как безопасное, {fixed} исправлено — нажмите, чтобы просмотреть",
-      "hotspotsPill": "{open} открыт · {percent}% просмотрено"
+      "hotspotsPill": "{open} открыт · {percent}% просмотрено",
+      "qualityGatePassingTitle": "Прохождение ворот качества Code Health — нажмите, чтобы открыть Code Health",
+      "qualityGatePassingPill": "Прохождение ворот",
+      "qualityGateFailingTitle": "Code Health quality gate failing ({count} violation(s)) — click to open Code Health",
+      "qualityGateFailingPill": "Ворота не работают"
     },
     "groupBy": {
       "severity": "Тяжесть тяжести.",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "Все команды…",
-      "commandCatalogDescription": "Поиск всех команд"
+      "commandCatalogDescription": "Поиск всех команд",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Ошибка ворот",
+      "codeHealthNeverScanned": "Запустите Code Health, чтобы увидеть свой результат",
+      "projectMapDescription": "Отсканировано {ago}",
+      "projectMapNeverScanned": "Запустите карту проекта, чтобы увидеть размер и горячие точки."
     }
   }
 }

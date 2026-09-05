@@ -43,3 +43,14 @@ abstract final class ClearOnRolloverCache {
   static void reset() => _entries.clear();
   static int put(String k, int v) => _entries[k] = v;
 }
+
+// GOOD: content-addressed by sha256 digest — the key space is bounded by
+// distinct content, not by request volume, so "grows forever" is not the
+// right failure mode to warn about here. Should NOT trigger. Regression
+// case for
+// bugs/require_cache_expiration_false_positive_content_addressed_caches.md.
+abstract final class Sha256DigestCache {
+  static final Map<String, String> _entries = <String, String>{};
+  static void put(String sha256Digest, String rendered) =>
+      _entries[sha256Digest] = rendered;
+}

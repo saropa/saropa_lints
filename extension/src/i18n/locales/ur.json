@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "توسیعی ڈسپلے کی ترجیحات۔",
-      "linkNote": "Scan on save on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
+      "linkNote": "سائڈبار کی اسٹیٹس قطار میں جان بچانے کے آن/آف پر اسکین کریں؛ تجزیہ کا درجہ ٹائر ٹیب پر رہتا ہے - دونوں ایک سادہ ترتیب سے زیادہ لکھتے ہیں، لہذا وہ یہاں نقل نہیں کیے گئے ہیں۔"
     },
     "shortcuts": {
       "jumpToTab": "ٹیب 1-7 (ٹیئر، رول پک، اور ڈیٹا، ایس کی ڈی کی رول آوٹ، کانفیگ فائل، اتومیشن، ایکسٹنسن)",
@@ -798,7 +798,11 @@
       "regressionTitle": "صحت کا اسکور {previousScore} سے {currentScore} تک گر گیا۔",
       "trendTitle": "صحت کے اسکور / خلاف ورزی کا رجحان پہلے سے چل رہا ہے۔",
       "hotspotsTitle": "{open} کھلا، {safe} محفوظ نشان زد، {fixed} فکسڈ — جائزہ لینے کے لیے کلک کریں",
-      "hotspotsPill": "{open} کھلا · {percent}% جائزہ لیا گیا۔"
+      "hotspotsPill": "{open} کھلا · {percent}% جائزہ لیا گیا۔",
+      "qualityGatePassingTitle": "کوڈ ہیلتھ کوالٹی گیٹ پاسنگ - کوڈ ہیلتھ کھولنے کے لیے کلک کریں۔",
+      "qualityGatePassingPill": "گیٹ پاسنگ",
+      "qualityGateFailingTitle": "کوڈ ہیلتھ کوالٹی گیٹ فیل ہو رہا ہے ({count} خلاف ورزی(s)) — کوڈ ہیلتھ کو کھولنے کے لیے کلک کریں",
+      "qualityGateFailingPill": "گیٹ فیل ہو رہا ہے۔"
     },
     "groupBy": {
       "severity": "شدت کی حد۔",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "ہر کمینڈ...",
-      "commandCatalogDescription": "ڈیٹا کو ڈھونڈو"
+      "commandCatalogDescription": "ڈیٹا کو ڈھونڈو",
+      "codeHealthDescription": "{grade} · {score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · گیٹ ناکام ہو رہا ہے۔",
+      "codeHealthNeverScanned": "اپنا سکور دیکھنے کے لیے کوڈ ہیلتھ چلائیں۔",
+      "projectMapDescription": "اسکین شدہ {ago}",
+      "projectMapNeverScanned": "سائز اور گرم مقامات دیکھنے کے لیے پروجیکٹ میپ چلائیں۔"
     }
   }
 }

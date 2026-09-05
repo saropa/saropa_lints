@@ -798,7 +798,11 @@
       "regressionTitle": "健康スコアが{previousScore}から{currentScore}に下がりました",
       "trendTitle": "健康スコア / 以前の実行からの違反トレンド",
       "hotspotsTitle": "{open} 開始中、{safe} 安全と判断、{fixed} 修正 — レビューにクリック",
-      "hotspotsPill": "{open} オープン · {percent}％レビュー"
+      "hotspotsPill": "{open} オープン · {percent}％レビュー",
+      "qualityGatePassingTitle": "Code Health 品質ゲート通過 — クリックして Code Health を開きます",
+      "qualityGatePassingPill": "ゲート通過",
+      "qualityGateFailingTitle": "コード ヘルス品質ゲートの失敗 ({count} 違反) — クリックしてコード ヘルスを開きます",
+      "qualityGateFailingPill": "ゲート失敗"
     },
     "groupBy": {
       "severity": "深刻度 (severity) とは,重度の程度を問わず",
@@ -2536,7 +2540,12 @@
     },
     "dashboards": {
       "commandCatalogLabel": "すべてのコマンド…",
-      "commandCatalogDescription": "すべてのコマンドを検索"
+      "commandCatalogDescription": "すべてのコマンドを検索",
+      "codeHealthDescription": "{grade}・{score}/100",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · ゲート障害",
+      "codeHealthNeverScanned": "Code Health を実行してスコアを確認する",
+      "projectMapDescription": "スキャン済み {ago}",
+      "projectMapNeverScanned": "プロジェクト マップを実行してサイズとホット スポットを確認する"
     }
   }
 }

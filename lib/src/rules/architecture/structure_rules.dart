@@ -437,6 +437,17 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
 ///
 /// Mutable global state can lead to hard-to-track bugs and makes testing difficult.
 ///
+/// **Exemptions** (added to fix false positives on legitimate single-isolate
+/// plugin/cache patterns — see
+/// `plans/history/2026.09/2026.09.05/avoid_global_state_false_positive_plugin_cache_pattern.md`):
+/// - `late final` — already covered by the const/final skip below, since
+///   `late` is a separate modifier from `final`.
+/// - Private (`_`-prefixed) variables assigned only via `??=` — the
+///   lazy-init-once idiom, effectively final after first access.
+/// - Private variables referenced from a same-file `clear*`/`reset*`/
+///   `dispose*` function — deliberate, documented lifecycle management
+///   rather than an accidental shared mutable.
+///
 /// Example of **bad** code:
 /// ```dart
 /// int globalCounter = 0;  // Mutable global
@@ -447,6 +458,9 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
 /// ```dart
 /// const int maxItems = 100;  // Immutable
 /// final List<String> defaultItems = const ['a', 'b'];  // Immutable
+/// late final Config _config = _loadConfig();  // Deferred but never reassigned
+/// Map<String, int>? _cache;
+/// Map<String, int> get cache => _cache ??= _buildCache();  // Lazy-init-once
 /// ```
 class AvoidGlobalStateRule extends SaropaLintRule {
   AvoidGlobalStateRule() : super(code: _code);
@@ -484,22 +498,81 @@ class AvoidGlobalStateRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit node) {
-      for (final CompilationUnitMember declaration in node.declarations) {
-        if (declaration is TopLevelVariableDeclaration) {
-          final VariableDeclarationList variables = declaration.variables;
+      final String fileSource = context.fileContent;
 
-          // Skip const and final declarations
-          if (variables.isConst || variables.isFinal) continue;
+      for (final CompilationUnitMember declaration in node.declarations) {
+        if (declaration is! TopLevelVariableDeclaration) continue;
+        final VariableDeclarationList variables = declaration.variables;
+
+        // Skip const and final declarations. `isFinal` is true for both
+        // `final` AND `late final` (the `late` keyword is tracked
+        // separately on `variables.lateKeyword`), so `late final` globals
+        // — effectively immutable after their single deferred assignment —
+        // are already exempt here without any extra check.
+        if (variables.isConst || variables.isFinal) continue;
+
+        for (final VariableDeclaration variable in variables.variables) {
+          final String name = variable.name.lexeme;
+
+          // Lazy-init-once pattern: private variable assigned only via
+          // `??=` is effectively final after first access. This is the
+          // standard Dart lazy cache idiom for single-threaded plugins.
+          // Uses a word-boundary regex (not a plain substring `contains`)
+          // so e.g. `_x ??=` cannot be falsely matched by an unrelated
+          // `_xFoo ??=` assignment elsewhere in the file — a substring hit
+          // would silently suppress a real global-state finding.
+          if (name.startsWith('_') &&
+              RegExp(
+                r'\b' + RegExp.escape(name) + r'\s*\?\?=',
+              ).hasMatch(fileSource)) {
+            continue;
+          }
+
+          // Managed lifecycle: a corresponding clear/reset function
+          // indicates the global has deliberate invalidation hooks
+          // (e.g. `clearCrossFileSnapshotCache()`, `resetForTests()`).
+          if (name.startsWith('_') &&
+              _hasClearOrResetFunction(node, name)) {
+            continue;
+          }
 
           // Report at the TopLevelVariableDeclaration level (not the
           // child VariableDeclaration) so the AnnotatedNode offset
           // adjustment in SaropaDiagnosticReporter correctly skips
-          // any preceding doc comments. Reporting at VariableDeclaration
-          // could produce wrong line numbers when doc comments are present.
+          // any preceding doc comments.
           reporter.atNode(declaration);
         }
       }
     });
+  }
+
+  /// Returns true when the compilation unit contains a top-level function
+  /// whose name starts with `clear`, `reset`, or `dispose` and whose body
+  /// references [varName] — indicating deliberate lifecycle management
+  /// rather than an accidental mutable global. `dispose` is included
+  /// alongside `clear`/`reset` because the same "someone explicitly owns
+  /// tearing this down" signal applies to resource-holding globals
+  /// (e.g. a plugin-lifetime stream controller or file handle).
+  bool _hasClearOrResetFunction(CompilationUnit unit, String varName) {
+    for (final CompilationUnitMember decl in unit.declarations) {
+      if (decl is! FunctionDeclaration) continue;
+      final String fnName = decl.name.lexeme.toLowerCase();
+      if (!fnName.startsWith('clear') &&
+          !fnName.startsWith('reset') &&
+          !fnName.startsWith('dispose')) {
+        continue;
+      }
+      // Check whether the function body references the variable as a whole
+      // identifier — a plain substring `contains` would let a body that only
+      // mentions a longer identifier sharing `varName` as a prefix (e.g.
+      // `_x` inside `_xyz`) falsely count as a reference and suppress a
+      // real global-state finding.
+      final String bodySource = decl.functionExpression.body.toSource();
+      if (RegExp(r'\b' + RegExp.escape(varName) + r'\b').hasMatch(bodySource)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
