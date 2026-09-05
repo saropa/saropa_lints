@@ -10,20 +10,32 @@ regexes were technically incomplete and the fixes are costless.
 ### Defect
 
 GitHub CodeQL alert #21 (`snapshot-harness.ts:52`): the `</script>` and `</style>`
-closing-tag patterns did not allow optional whitespace before `>`, so `</script >`
-would not match. Alert #22 (`projectMapShell.test.ts:87`): the `<script>` count
-regex lacked the `i` flag, so `<SCRIPT>` would not match.
+closing-tag patterns did not allow optional whitespace or attributes before `>`, so
+`</script >` and `</script foo="bar">` would not match. Alert #22
+(`projectMapShell.test.ts:87`): the `<script>` count regex lacked the `i` flag, so
+`<SCRIPT>` would not match.
 
 ### Fix
 
-- `snapshot-harness.ts`: added `\s*` before the closing `>` in both the script and
-  style strip regexes (`<\/script\s*>`, `<\/style\s*>`). The `gi` flags were already
-  present.
+- `snapshot-harness.ts`: changed closing-tag patterns from `\s*>` to `[^>]*>` in both
+  the script and style strip regexes, handling whitespace AND attributes in closing
+  tags. The `gi` flags were already present.
 - `projectMapShell.test.ts`: added the `i` flag to the `/<script>/g` regex used for
   counting inline script tags.
-- `projectVibrancyReportHtml.test.ts`: added `i` flag and `\s*` before closing `>`
-  in the `extractRowData` helper's script-tag regex (hardening — not yet flagged by
-  CodeQL but identical pattern to #21).
+- `projectVibrancyReportHtml.test.ts`: added `i` flag and `[^>]*>` closing-tag
+  pattern in the `extractRowData` helper's script-tag regex (hardening — not yet
+  flagged by CodeQL but identical pattern to #21).
+
+### Hardening
+
+- Upgraded all closing-tag patterns from `\s*>` to `[^>]*>` after confirming that
+  browsers accept `</script foo="bar">` as a valid end tag (per CodeQL docs).
+- Filed pre-existing `commandCatalogRegistry.test.ts` failure as
+  `bugs/commandCatalogRegistry_test_failure_preexisting.md`.
+- Added `scripts/check_html_tag_regex.py` CI script that scans all extension
+  TypeScript files for HTML tag regexes missing case-insensitive flags or
+  attribute-tolerant closing tags, catching future violations before they reach
+  GitHub's CodeQL scanner.
 
 ### Impact
 
@@ -36,5 +48,7 @@ Test infrastructure only. No runtime behavior change. No new dependencies.
 - `projectVibrancyReportHtml.test.ts` suite: 23 passing, 0 failing.
 - The snapshot harness is consumed by snapshot tests; the regex change is strictly
   more permissive (accepts a superset of inputs), so no existing snapshots break.
-- Full grep of `extension/src/**/*.ts` for script/style tag regexes confirms no
-  remaining instances without case-insensitive and whitespace-tolerant patterns.
+- `check_html_tag_regex.py` reports 0 violations on the current codebase.
+- Verified the script detects known-bad patterns (missing `i` flag, bare `>`
+  closing tags) and does not false-positive on the fixed patterns or on HTML
+  template literals.

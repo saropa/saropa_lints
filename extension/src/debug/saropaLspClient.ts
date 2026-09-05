@@ -17,6 +17,7 @@ import {
   type LanguageClientOptions,
   type ServerOptions,
 } from 'vscode-languageclient/node';
+import { HealthPanel } from '../systemHealth/healthPanel';
 
 // CVE-2024-27980 / PATHEXT: on Windows, `dart` resolves to `dart.bat` which
 // needs a shell to execute. Without this, spawn() returns ENOENT.
@@ -25,6 +26,25 @@ const SPAWN_USE_SHELL = process.platform === 'win32';
 
 /** Output channel name surfaced in VS Code's "Output" dropdown. */
 const OUTPUT_CHANNEL_NAME = 'Saropa Lints LSP';
+
+/**
+ * WP4 (`plans/PLAN_ext_ui_dart_deferred.md`): payload shape of the server's
+ * custom `saropa/scanProgress` notification — see
+ * `lib/src/lsp/scan_progress_notification.dart` (the Dart side's pinned
+ * builder) for the authoritative schema this mirrors.
+ */
+export interface LspScanProgress {
+  readonly filesScanned: number;
+  readonly totalFiles: number;
+  readonly diagnosticsPublished: number;
+  /**
+   * True when the scan has terminated (completed or canceled). Without this,
+   * a canceled scan whose `filesScanned < totalFiles` leaves the engine card
+   * stuck on "scanning" forever. Optional: older servers that don't send the
+   * field fall back to the filesScanned < totalFiles ratio.
+   */
+  readonly done?: boolean;
+}
 
 /**
  * Wraps a single `LanguageClient` instance that talks to
@@ -40,6 +60,20 @@ export class SaropaLspClient implements vscode.Disposable {
 
   /** Subscriptions pushed during start(); cleared on stop(). */
   private readonly _disposables: vscode.Disposable[] = [];
+
+  /**
+   * WP4: most recent `saropa/scanProgress` tick, or undefined before the
+   * server's first workspace scan has emitted one (e.g. workspace scan
+   * disabled, or an older engine that predates this notification entirely —
+   * absence here is exactly how the Health Panel tells "no progress data"
+   * from "0/0 scanned").
+   */
+  private _lastScanProgress: LspScanProgress | undefined;
+
+  /** Read-only snapshot of the latest workspace-scan progress (see [_lastScanProgress]). */
+  get lastScanProgress(): LspScanProgress | undefined {
+    return this._lastScanProgress;
+  }
 
   /**
    * @param _context  Extension context — used to register disposables so
@@ -150,6 +184,21 @@ export class SaropaLspClient implements vscode.Disposable {
       await client.start();
       this._client = client;
       this._outputChannel.appendLine('[SaropaLspClient] LSP server started successfully.');
+      // WP4: listen for the server's custom scan-progress notification. Not
+      // part of the LSP spec (see bin/lsp_server.dart's `_sendScanProgress`
+      // doc comment for why this is a plain notification rather than the
+      // standard `$/progress`), so `onNotification` is given the raw method
+      // name string rather than a typed request descriptor.
+      this._disposables.push(
+        client.onNotification('saropa/scanProgress', (params: LspScanProgress) => {
+          this._lastScanProgress = params;
+          // Live-refresh the Health Panel's engine card if it's open. Uses
+          // refreshIfOpen (not addLogEntry) so a long scan's many ticks
+          // don't spam the Activity log — only the server's own "scan
+          // complete" log line does that.
+          HealthPanel.refreshIfOpen();
+        }),
+      );
     } catch (err) {
       // Surface the spawn failure so it's visible in the output channel
       // and doesn't silently vanish.
@@ -182,6 +231,9 @@ export class SaropaLspClient implements vscode.Disposable {
     // Clear diagnostics so stale squigglies don't linger after shutdown.
     this._client.diagnostics?.clear();
     this._client = undefined;
+    // A stopped server cannot still be "scanning 812/1900" — stale progress
+    // from before the stop would otherwise linger and mislead the card.
+    this._lastScanProgress = undefined;
 
     this._outputChannel.appendLine('[SaropaLspClient] LSP server stopped.');
   }

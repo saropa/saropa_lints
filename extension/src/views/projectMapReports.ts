@@ -29,6 +29,20 @@ import { killProcessTree, resolveCliCwd } from './devCliRoot';
 import { l10n } from '../i18n/runtime';
 import { saropaLintsDataPath } from '../reportsPaths';
 
+/**
+ * One typed column in a JSON-enabled report's table (WP2,
+ * `plans/PLAN_ext_ui_dart_deferred.md`). `field` is the JSON property name
+ * the Dart CLI's `--format json` row carries (see `severity_report.dart`'s
+ * `violationsToJsonRows` / `doctor.dart`'s `issueToJson`); `labelKey` is the
+ * i18n key for the visible `<th>` text — column headers are user-facing, so
+ * they go through `l10n()` like every other string here, never a raw field
+ * name.
+ */
+export interface ReportJsonColumn {
+  readonly field: string;
+  readonly labelKey: string;
+}
+
 /** One report card's static description — id, CLI binary name, and how to build its argv. */
 export interface ReportCardSpec {
   /** Stable id used in postMessage routing and DOM element ids (`report-<id>`). */
@@ -41,6 +55,18 @@ export interface ReportCardSpec {
   readonly buildArgs: (root: string) => string[];
   /** Only `quality_gate` gets the inline YAML threshold editor. */
   readonly hasGateEditor?: boolean;
+  /**
+   * WP2: this CLI accepts `--format json` (already appended by `buildArgs`
+   * for these two) and its combined stdout is a JSON array, not free text.
+   * When true the card renders a typed `.dash-table` from [jsonColumns]
+   * instead of the generic line-number table, and `runReportCli` buffers the
+   * whole run rather than streaming raw lines into that generic table (a
+   * pretty-printed JSON array split line-by-line would otherwise put one
+   * brace or field per row, which is strictly worse than the old text view).
+   */
+  readonly supportsJson?: boolean;
+  /** Column set for the typed table. Required when [supportsJson] is true. */
+  readonly jsonColumns?: readonly ReportJsonColumn[];
 }
 
 /**
@@ -60,7 +86,18 @@ export function reportCardSpecs(): ReportCardSpec[] {
       binary: 'severity_report',
       titleKey: 'projectMap.reports.severity.title',
       descKey: 'projectMap.reports.severity.desc',
-      buildArgs: (root) => [root],
+      // --format json goes LAST: severity_report's arg parser reads the
+      // first non-flag token as <path>, so `root` must appear before it —
+      // matches the CLI's own `--format json ./my_project` help example.
+      buildArgs: (root) => [root, '--format', 'json'],
+      supportsJson: true,
+      jsonColumns: [
+        { field: 'file', labelKey: 'projectMap.reports.colFile' },
+        { field: 'line', labelKey: 'projectMap.reports.colLineNum' },
+        { field: 'rule', labelKey: 'projectMap.reports.colRule' },
+        { field: 'severity', labelKey: 'projectMap.reports.colSeverity' },
+        { field: 'message', labelKey: 'projectMap.reports.colMessage' },
+      ],
     },
     {
       id: 'impact',
@@ -68,6 +105,10 @@ export function reportCardSpecs(): ReportCardSpec[] {
       titleKey: 'projectMap.reports.impact.title',
       descKey: 'projectMap.reports.impact.desc',
       buildArgs: (root) => [root],
+      // Deliberately NOT supportsJson: impact_report is documented as a thin
+      // forwarder to severity_report kept only for old muscle memory (see its
+      // card description) — giving the legacy alias its own typed table would
+      // be a second, redundant JSON surface for the identical data.
     },
     {
       id: 'qualityGate',
@@ -106,7 +147,13 @@ export function reportCardSpecs(): ReportCardSpec[] {
       binary: 'doctor',
       titleKey: 'projectMap.reports.doctor.title',
       descKey: 'projectMap.reports.doctor.desc',
-      buildArgs: (root) => [root],
+      buildArgs: (root) => [root, '--format', 'json'],
+      supportsJson: true,
+      jsonColumns: [
+        { field: 'key', labelKey: 'projectMap.reports.colKey' },
+        { field: 'severity', labelKey: 'projectMap.reports.colSeverity' },
+        { field: 'message', labelKey: 'projectMap.reports.colMessage' },
+      ],
     },
   ];
 }
@@ -246,6 +293,11 @@ export function buildReportsTabHtml(): string {
 /** One report card: title, description, optional YAML editor, Run button, and its live output table. */
 function buildReportCard(spec: ReportCardSpec): string {
   const editor = spec.hasGateEditor ? buildGateEditor() : '';
+  // WP2: a JSON-enabled CLI gets real File/Line/Rule/Message-shaped columns;
+  // everything else keeps the original generic line-number table (see the
+  // module doc comment's scope note — this is now true only for the tools
+  // that DON'T have supportsJson).
+  const table = spec.supportsJson ? buildTypedReportTable(spec) : buildGenericReportTable(spec);
   return `<section class="chart-card report-card" id="report-${spec.id}" data-report-id="${spec.id}">
   <h3>${escapeHtml(l10n(spec.titleKey))}</h3>
   <p class="report-desc">${escapeHtml(l10n(spec.descKey))}</p>
@@ -261,7 +313,13 @@ function buildReportCard(spec: ReportCardSpec): string {
         on 'running'/exit, so it only shows before the first run of a session. */ ''}
     <span class="report-status" id="report-status-${spec.id}">${escapeHtml(l10n('projectMap.reports.notRunYet'))}</span>
   </div>
-  <div class="dash-table-wrap report-output-wrap" id="report-output-wrap-${spec.id}" hidden>
+  ${table}
+</section>`;
+}
+
+/** The original generic two-column (line number + raw text) table, unchanged for the 5 CLIs with no `--format json`. */
+function buildGenericReportTable(spec: ReportCardSpec): string {
+  return `<div class="dash-table-wrap report-output-wrap" id="report-output-wrap-${spec.id}" hidden>
     <table class="dash-table">
       <thead><tr>
         <th class="col-line">${escapeHtml(l10n('projectMap.reports.colLine'))}</th>
@@ -269,8 +327,43 @@ function buildReportCard(spec: ReportCardSpec): string {
       </tr></thead>
       <tbody id="report-output-${spec.id}"></tbody>
     </table>
-  </div>
-</section>`;
+  </div>`;
+}
+
+/**
+ * A real-columns table for a `supportsJson` CLI, header cells built from
+ * [ReportCardSpec.jsonColumns]. The `<tbody>` starts empty — populated
+ * client-side from the `reportRows` message once the run finishes (see
+ * `startReportRun` below and the `addReportRows` handler in
+ * `projectMapShell.ts`) — same empty-table-until-first-run shape the generic
+ * table already used.
+ */
+function buildTypedReportTable(spec: ReportCardSpec): string {
+  const headers = (spec.jsonColumns ?? [])
+    .map((col) => `<th>${escapeHtml(l10n(col.labelKey))}</th>`)
+    .join('');
+  return `<div class="dash-table-wrap report-output-wrap" id="report-output-wrap-${spec.id}" hidden>
+    <table class="dash-table" data-json-table="1">
+      <thead><tr>${headers}</tr></thead>
+      <tbody id="report-output-${spec.id}"></tbody>
+    </table>
+  </div>`;
+}
+
+/**
+ * `{reportId: [{field, labelKey}...]}` for every `supportsJson` card, sent to
+ * the webview so its ONE shared client script (`projectMapShell.ts`) knows
+ * which JSON fields to pull into which typed-table row, without hardcoding
+ * per-tool column knowledge in the script itself.
+ */
+export function reportJsonColumnsForScript(): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const spec of reportCardSpecs()) {
+    if (spec.supportsJson && spec.jsonColumns) {
+      out[spec.id] = spec.jsonColumns.map((c) => c.field);
+    }
+  }
+  return out;
 }
 
 /**
@@ -346,17 +439,72 @@ async function startReportRun(
   // A second click while running is treated as cancel-and-restart rather than
   // stacking a duplicate process.
   controls.get(reportId)?.cancel();
-  let combined = '';
+  // Separate buffers: stdout feeds the JSON parser (for supportsJson CLIs);
+  // stderr is kept for the persisted log and diagnostics. Mixing them
+  // corrupted JSON.parse when Dart's "Building package executable..." banner
+  // landed in the parse buffer on first run after install/upgrade/pub-get.
+  let stdout = '';
+  let stderrLog = '';
   const control = runReportCli(root, spec, {
     onLine: (text, stream) => {
-      combined += `${text}\n`;
-      void panel.webview.postMessage({ type: 'reportLine', reportId, text, stream });
+      if (stream === 'stdout') {
+        stdout += `${text}\n`;
+      } else {
+        stderrLog += `${text}\n`;
+      }
+      // WP2: a supportsJson CLI's stdout is one pretty-printed JSON array —
+      // streaming it line-by-line into the OLD generic table would put a
+      // single brace/field per row (strictly worse than before this
+      // feature). Its card no longer has that table in the DOM (see
+      // buildTypedReportTable), so suppress the per-line post entirely and
+      // parse the buffered whole once the process exits, below.
+      if (!spec.supportsJson) {
+        void panel.webview.postMessage({ type: 'reportLine', reportId, text, stream });
+      }
     },
     onDone: (exitCode) => {
       controls.delete(reportId);
-      const savedPath = persistReportOutput(root, reportId, combined);
+      // Persist both streams so saved logs retain stderr diagnostics (error
+      // messages, Dart build banners) alongside the structured stdout output.
+      const savedPath = persistReportOutput(root, reportId, stdout + stderrLog);
+      if (spec.supportsJson) {
+        postJsonReportRows(panel, reportId, stdout);
+      }
       void panel.webview.postMessage({ type: 'reportDone', reportId, exitCode, savedPath });
     },
   });
   controls.set(reportId, control);
+}
+
+/**
+ * Parses a JSON-enabled CLI's combined stdout (a JSON array of row objects —
+ * see `severity_report.dart`'s `violationsToJsonRows` / `doctor.dart`'s
+ * `issueToJson`) and posts it as `reportRows` for the typed table. A parse
+ * failure (e.g. an older CLI without `--format json` support yet, or a
+ * genuine crash whose stderr got mixed into stdout) degrades to ONE
+ * `reportLine` with the raw text — never a silent empty table, since that
+ * would look identical to "0 issues found" and hide a real failure.
+ */
+function postJsonReportRows(panel: vscode.WebviewPanel, reportId: string, stdout: string): void {
+  // Empty stdout means the CLI crashed or exited before printing any JSON.
+  // Fall through to the raw-text path so the card shows "(no output)" rather
+  // than a silent empty table that looks like "0 issues found."
+  const trimmed = stdout.trim();
+  if (trimmed.length > 0) {
+    try {
+      const rows: unknown = JSON.parse(trimmed);
+      if (Array.isArray(rows)) {
+        void panel.webview.postMessage({ type: 'reportRows', reportId, rows });
+        return;
+      }
+    } catch {
+      // Fall through to the raw-text fallback below.
+    }
+  }
+  void panel.webview.postMessage({
+    type: 'reportLine',
+    reportId,
+    text: trimmed.length > 0 ? trimmed : '(no output)',
+    stream: 'stderr',
+  });
 }

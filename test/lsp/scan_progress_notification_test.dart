@@ -9,16 +9,18 @@ import 'package:saropa_lints/src/lsp/scan_progress_notification.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('emits exactly filesScanned/totalFiles/diagnosticsPublished', () {
+  test('emits filesScanned/totalFiles/diagnosticsPublished/done', () {
     final payload = buildScanProgressNotification(
       filesScanned: 812,
       totalFiles: 1900,
       diagnosticsPublished: 47,
     );
+    // In-progress tick: done defaults to false.
     expect(payload, <String, Object?>{
       'filesScanned': 812,
       'totalFiles': 1900,
       'diagnosticsPublished': 47,
+      'done': false,
     });
   });
 
@@ -33,5 +35,29 @@ void main() {
     expect(payload['filesScanned'], 0);
     expect(payload['totalFiles'], 250);
     expect(payload['diagnosticsPublished'], 0);
+    expect(payload['done'], isFalse);
+  });
+
+  test('terminal tick carries done: true (cancel or completion)', () {
+    // A canceled scan's final tick has filesScanned < totalFiles but still
+    // signals completion — without `done`, the client's engine card stays
+    // stuck on "scanning" forever because the ratio never reaches 1.
+    final canceled = buildScanProgressNotification(
+      filesScanned: 300,
+      totalFiles: 1900,
+      diagnosticsPublished: 12,
+      done: true,
+    );
+    expect(canceled['done'], isTrue);
+
+    // A normally completed scan also sends done: true on the final tick.
+    final completed = buildScanProgressNotification(
+      filesScanned: 1900,
+      totalFiles: 1900,
+      diagnosticsPublished: 47,
+      done: true,
+    );
+    expect(completed['done'], isTrue);
+    expect(completed['filesScanned'], completed['totalFiles']);
   });
 }

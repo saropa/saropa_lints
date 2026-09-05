@@ -16,12 +16,16 @@ import { getReportStyles } from './report-styles';
 // Phase 5 style migration (see plans/PLAN_extension_ui_redesign.md, Phase 5):
 // pull in the canonical :root token layer alongside the legacy report-styles
 // system. This is the main Package Dashboard shell -- its markup vocabulary
-// (report-header, dash-split, scan-progress, ...) is almost entirely disjoint
-// from dashboardChromeStyles' component classes, so a full swap to
+// (dash-split, scan-progress, ...) is almost entirely disjoint from
+// dashboardChromeStyles' component classes, so a full swap to
 // getDashboardChromeStyles() would break rendering until the markup itself is
 // rewritten. Adding only the token subset is additive (new custom properties,
 // no rule overrides) so it carries zero visual-regression risk while moving
 // this consumer one step closer to the single design-system goal.
+// PLAN_ext_ui_report_styles.md Pass 1 (later): the hero itself (previously
+// `.report-header`) DID get the full swap -- it now emits `.dash-hero`
+// markup and reads chromeHeroAndGauge()'s CSS via report-styles.ts, since
+// that component was a byte-identical duplicate. See report-styles-parts.ts.
 import { getDashboardTokens } from '../../views/dashboardChromeStyles';
 import { getPackageDetailStylesScoped } from './package-detail-styles';
 import { getPillButtonStyles } from './pill-button-styles';
@@ -57,8 +61,31 @@ import {
 // issues/Compare) and the in-document Settings tab. See packages-tabs.ts for
 // why the deep-link tabs open the existing standalone panels rather than
 // re-rendering their markup inline.
-import { buildTabBar, buildDeepLinkPanels, getPackagesTabsStyles, getPackagesTabsScript } from './packages-tabs';
+import {
+    buildTabBar, buildTabPanels, getPackagesTabsStyles, getPackagesTabsScript, getUpgradesEmbedScript,
+} from './packages-tabs';
 import { buildSettingsTab, getSettingsTabStyles, getSettingsTabScript, VibrancySettingGroup } from './settings-tab';
+// Full report tab embed (PLAN_ext_ui_package_tabs.md §4 Tab 4): the Feature Inventory report's
+// own stylesheet, shared into this document's single CSP-nonce <style> block per the "no
+// nonce-bearing tags inside an embedded fragment" rule -- its script has no acquireVsCodeApi call
+// (pure DOM filtering) so it is safe to concatenate into the shared <script> block below too.
+import { getFeatureInventoryStyles } from './feature-inventory-styles';
+import { getFeatureInventoryEmbedScript } from './feature-inventory-script';
+// Upgrades tab embed (PLAN_ext_ui_package_tabs.md §4 Tab 3): the Upgrade Opportunities cards'
+// own stylesheet, shared the same way. Its wiring script (getUpgradesEmbedScript) is host-owned,
+// not opportunities-html.ts's own getOpportunitiesScript -- see that function's doc comment for
+// why (the standalone script's acquireVsCodeApi() call cannot run a second time in this document).
+import { getOpportunitiesStyles } from './opportunities-html';
+// Known issues tab embed (PLAN_ext_ui_package_tabs.md §4 Tab 5): unlike the two tabs above, the
+// underlying data (allKnownIssues()) is a static, synchronous registry -- no project scan, so
+// report-webview.ts never needs to lazily build-and-cache anything for this tab, and this "pure
+// renderer" module can call getEmbeddedBodyHtml() directly instead of threading the result
+// through ReportOptions. getKnownIssuesEmbedScript is already a self-contained IIFE (unlike
+// getUpgradesEmbedScript, which packages-tabs.ts hand-writes) -- see its doc comment.
+import {
+    getEmbeddedBodyHtml as getKnownIssuesEmbeddedBodyHtml, getKnownIssuesEmbedStyles,
+} from './known-issues-html';
+import { getKnownIssuesEmbedScript } from './known-issues-script';
 
 // Re-export the public surface so existing importers (report-webview.ts,
 // package-detail-html.ts, the report tests) keep referencing report-html.ts
@@ -133,12 +160,20 @@ export function buildReportHtml(options: ReportOptions): string {
          via SMIL <animate>, so no inline style attributes are needed. -->
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
-    <style nonce="${cspNonce}">${getDashboardTokens()}${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}${getPackagesTabsStyles()}${getSettingsTabStyles()}</style>
+    <style nonce="${cspNonce}">${getDashboardTokens()}${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}${getPackagesTabsStyles()}${getSettingsTabStyles()}${getFeatureInventoryStyles()}${getOpportunitiesStyles()}${getKnownIssuesEmbedStyles()}</style>
 </head>
 <body>
-    <header class="report-header">
+    ${/* PLAN_ext_ui_report_styles.md Pass 1: markup migrated from the local .report-header
+        /.hero-text/.header-version trio to dashboardChromeStyles' .dash-hero/.hero-text/.stamp
+        -- the two were byte-identical once resolved through chromeTokens() (see report-styles.ts'
+        import comment), so this is a pure rename with no visual change other than the version
+        stamp's opacity (0.5 -> 0.55, chrome's value) which is imperceptible at that size. The
+        distinct 72px SMIL radial gauge (buildRadialGauge) stays separate from chrome's 96px
+        CSS-keyframe .hero-gauge -- see report-styles-parts.ts' .radial-gauge-label comment for
+        why the two gauges are not unified. */ ''}
+    <header class="dash-hero report-header">
         <div class="hero-text">
-          <h1>${escapeHtml(l10n('packageDashboard.heroTitle'))} <span class="header-version">v${escapeHtml(options.extensionVersion)}</span></h1>
+          <h1>${escapeHtml(l10n('packageDashboard.heroTitle'))} <span class="stamp">v${escapeHtml(options.extensionVersion)}</span></h1>
           ${statusLineHtml.replace('</p>', `${buildKeyboardShortcutsButton()}${buildFullWidthToggle()}</p>`)}
         </div>
         ${buildRadialGauge(avg)}
@@ -194,7 +229,13 @@ export function buildReportHtml(options: ReportOptions): string {
        * table) immediately visible and treats the network as a drill-down. */ ''}
     ${buildNetworkSection(results)}
     </main>
-    ${buildDeepLinkPanels()}
+    ${buildTabPanels({
+        fullReport: options.fullReportBodyHtml,
+        upgrades: options.upgradesBodyHtml,
+        // Static registry, no async scan (see the import comment above) -- rendered directly
+        // instead of threaded through ReportOptions like the two async tabs.
+        knownIssues: getKnownIssuesEmbeddedBodyHtml(),
+    })}
     ${buildSettingsTab(options.vibrancySettingGroups ?? [])}
     ${buildKeyboardShortcutsOverlay([
         { key: '/', label: l10n('packageDashboard.shortcuts.focusSearch') },
@@ -209,7 +250,7 @@ export function buildReportHtml(options: ReportOptions): string {
         { key: '1-6', label: l10n('packageDashboard.shortcuts.jumpToTab') },
         { key: '?', label: l10n('packageDashboard.shortcuts.showOverlay') },
     ])}
-    <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();${getPackagesTabsScript()}${getSettingsTabScript()}</script>
+    <script nonce="${cspNonce}">${buildPackageDataScript(results, options.overrideNames, buildRepoShareMap(results))}${getReportScript()}${getChartScript()}(function(){${getFullWidthToggleScript()}${getKeyboardShortcutsScript()}})();${getPackagesTabsScript()}${getSettingsTabScript()}${getFeatureInventoryEmbedScript()}${getUpgradesEmbedScript()}${getKnownIssuesEmbedScript()}</script>
 </body>
 </html>`;
 }

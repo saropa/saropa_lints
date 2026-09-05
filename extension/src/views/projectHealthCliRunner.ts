@@ -206,8 +206,13 @@ export function runProjectHealthScan(
     });
     child.on('close', (code: number | null) => {
       cleanupControl();
+      // Flush remaining partial lines. stdout goes straight through, but
+      // stderr must go through `flushStderr` so a trailing progress event
+      // without a final '\n' (e.g. `{"event":"done"}`) still gets parsed
+      // by `tryParseHealthProgressEvent` — without this, the progress bar
+      // never reaches 100%.
       if (stdoutBuf.length > 0) handlers?.onOutputLine?.(stdoutBuf, 'stdout');
-      if (stderrBuf.length > 0) handlers?.onOutputLine?.(stderrBuf, 'stderr');
+      if (stderrBuf.length > 0) flushStderr('\n');
       const firstStderrLine = stderr.split('\n').find((l) => l.trim().length > 0) ?? '';
       resolve({ ok: code === 0, cancelled, exitCode: code, firstStderrLine });
     });

@@ -34,6 +34,8 @@ import 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dar
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart' show getRulesFromRegistry;
 import 'package:saropa_lints/scan.dart';
+import 'package:saropa_lints/src/lsp/scan_progress_notification.dart'
+    show buildScanProgressNotification;
 import 'package:saropa_lints/src/report/analysis_reporter.dart'
     show AnalysisReporter;
 
@@ -689,8 +691,21 @@ Future<void> _analyzeWorkspace(String root) async {
     var diagnosticCount = 0;
 
     // Progress logging interval — log every N files so the Output channel
-    // shows the scan is alive on large projects without flooding it.
+    // shows the scan is alive on large projects without flooding it. Also
+    // gates the WP4 `saropa/scanProgress` notification (same interval) so a
+    // large workspace doesn't flood the JSON-RPC channel with one message
+    // per file the way a truly per-file notification would.
     const progressInterval = 50;
+    // WP4 (PLAN_ext_ui_dart_deferred.md): before the loop even starts, tell
+    // the client the total so the Health Panel's engine card can render
+    // "0/N" immediately instead of a dead 0% with no denominator — same
+    // reasoning as the size-scan `phase` event in
+    // lib/src/cli/project_health/scan_progress.dart (WP1).
+    _sendScanProgress(
+      filesScanned: 0,
+      totalFiles: totalToAnalyze,
+      diagnosticsPublished: 0,
+    );
 
     for (final filePath in filesToAnalyze) {
       // Check cancellation between files — shutdown, config reload, or a
@@ -700,6 +715,15 @@ Future<void> _analyzeWorkspace(String root) async {
         _log('workspace scan: canceled after $analyzed/$totalToAnalyze files, '
             '$diagnosticCount diagnostic(s) published '
             'in ${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s');
+        // Terminal tick on cancellation: `done: true` tells the client this
+        // scan has ended, even though filesScanned < totalFiles. Without it
+        // the engine card stays stuck showing "scanning 300/1900" forever.
+        _sendScanProgress(
+          filesScanned: analyzed,
+          totalFiles: totalToAnalyze,
+          diagnosticsPublished: diagnosticCount,
+          done: true,
+        );
         return;
       }
 
@@ -725,6 +749,11 @@ Future<void> _analyzeWorkspace(String root) async {
       if (analyzed % progressInterval == 0) {
         _log('workspace scan: $analyzed/$totalToAnalyze files '
             '($diagnosticCount diagnostics so far)');
+        _sendScanProgress(
+          filesScanned: analyzed,
+          totalFiles: totalToAnalyze,
+          diagnosticsPublished: diagnosticCount,
+        );
       }
 
       // Yield to the event loop between files so didSave/codeAction requests
@@ -735,6 +764,17 @@ Future<void> _analyzeWorkspace(String root) async {
     _log(
       'workspace scan complete: $analyzed files, $diagnosticCount diagnostic(s) '
       'in ${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s',
+    );
+    // Final tick at 100% with `done: true` — without this, a scan whose file
+    // count isn't a multiple of progressInterval would leave the client's
+    // last-seen percentage below 100 forever (the interval-gated ticks above
+    // only fire ON the interval boundary, never on the very last file unless
+    // it lands exactly on one).
+    _sendScanProgress(
+      filesScanned: analyzed,
+      totalFiles: totalToAnalyze,
+      diagnosticsPublished: diagnosticCount,
+      done: true,
     );
   } on Object catch (e, st) {
     // A filesystem error (permission denied, symlink cycle, path deleted
@@ -990,6 +1030,40 @@ void _publishDiagnostics(
 void _clearDiagnostics(String uri) {
   _publishDiagnostics(uri, []);
   _logTrace('cleared diagnostics for $uri');
+}
+
+/// Sends the WP4 `saropa/scanProgress` notification (custom, non-standard
+/// LSP method) so the extension's Health Panel engine card can render
+/// "scanning 812/1900 files" instead of only the Output-channel log line
+/// [_analyzeWorkspace] already writes at the same cadence.
+///
+/// The standard `$/progress` protocol was the plan's PREFERRED mechanism
+/// (`vscode-languageclient` handles it natively via `WorkDoneProgress`), but
+/// it requires the server to first send a `window/workDoneProgress/create`
+/// REQUEST to the client and await its response — this server has no
+/// mechanism yet for a server-initiated request (it only ever sends
+/// notifications/responses in reply to a client request; see `_sendResponse`
+/// / `_sendNotification`). Adding request/response correlation for a single
+/// notification is out of proportion to WP4's scope, so this instead uses
+/// the same fire-and-forget notification pattern as `publishDiagnostics` — a
+/// real, structured progress signal today, with the `$/progress` upgrade
+/// left as a follow-up once the server needs bidirectional requests for
+/// another reason too.
+void _sendScanProgress({
+  required int filesScanned,
+  required int totalFiles,
+  required int diagnosticsPublished,
+  bool done = false,
+}) {
+  _sendNotification(
+    'saropa/scanProgress',
+    buildScanProgressNotification(
+      filesScanned: filesScanned,
+      totalFiles: totalFiles,
+      diagnosticsPublished: diagnosticsPublished,
+      done: done,
+    ),
+  );
 }
 
 // ---------------------------------------------------------------------------

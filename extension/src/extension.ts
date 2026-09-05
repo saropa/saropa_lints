@@ -1464,22 +1464,57 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       };
     },
     // Scan Daemon status — read from the scan-on-save controller.
-    getScanDaemonStatus: (): EngineStatus => ({
-      key: 'scanDaemon',
-      name: l10n('debug.engine.scanDaemon'),
-      enabled: !scanOnSaveController.isDaemonSuspended,
-      status: scanOnSaveController.isDaemonSuspended ? 'suspended' : 'idle',
-      rssBytes: systemHealthSnapshot?.saropaRssBytes,
-      pid: undefined, // TODO: expose daemon PID from ScanDaemonManager
-    }),
-    // LSP Server status — read from the client wrapper.
-    getLspServerStatus: (): EngineStatus => ({
-      key: 'lspServer',
-      name: l10n('debug.engine.lspServer'),
-      enabled: lspClient?.isRunning ?? false,
-      status: lspClient?.isRunning ? 'running' : 'stopped',
-      rssNote: lspClient?.isRunning ? undefined : l10n('debug.engine.rssNote.notRunning'),
-    }),
+    //
+    // BUGFIX (PLAN_ext_ui_sidebar_reset.md P3, "Two truths on one screen"):
+    // this used to report `enabled` from `isDaemonSuspended` alone, which
+    // only tracks memory-pressure shedding — it never goes true when the
+    // user flips the `saropaLints.enabled` master switch off. That made the
+    // Engines row lie: with `enabled=false` the daemon never runs (see
+    // scanOnSaveController.ts `_isEnabled()` / `_showInitialState()`), yet
+    // this card still said "idle" as if scan-on-save were live. Read the
+    // same master-toggle config the controller itself gates on so the
+    // sidebar Engines row and the Health Panel card can't disagree with the
+    // actual on/off state.
+    getScanDaemonStatus: (): EngineStatus => {
+      const scanOnSaveEnabled = vscode.workspace
+        .getConfiguration('saropaLints')
+        .get<boolean>('enabled', true) ?? true;
+      const suspended = scanOnSaveController.isDaemonSuspended;
+      return {
+        key: 'scanDaemon',
+        name: l10n('debug.engine.scanDaemon'),
+        enabled: scanOnSaveEnabled && !suspended,
+        // Master switch off wins over the shed-suspended state — "stopped"
+        // (not "suspended") is the honest word for "will never run".
+        status: !scanOnSaveEnabled ? 'stopped' : suspended ? 'suspended' : 'idle',
+        rssBytes: systemHealthSnapshot?.saropaRssBytes,
+        pid: undefined, // TODO: expose daemon PID from ScanDaemonManager
+      };
+    },
+    // LSP Server status — read from the client wrapper. WP4: while the
+    // server's startup workspace scan is in flight (filesScanned <
+    // totalFiles), report 'scanning' instead of 'running' so the status
+    // pill itself signals "still warming up" — the metrics line then adds
+    // the live file count (buildMetricsLine in engineCardsHtml.ts).
+    getLspServerStatus: (): EngineStatus => {
+      const progress = lspClient?.lastScanProgress;
+      // Use the server's explicit `done` flag when present; fall back to the
+      // filesScanned/totalFiles ratio for older servers that don't send it.
+      // Without `done`, a canceled scan (filesScanned < totalFiles) would
+      // leave this card stuck on "scanning" indefinitely.
+      const scanning = progress !== undefined
+        && (progress.done === true ? false : progress.filesScanned < progress.totalFiles);
+      return {
+        key: 'lspServer',
+        name: l10n('debug.engine.lspServer'),
+        enabled: lspClient?.isRunning ?? false,
+        status: lspClient?.isRunning ? (scanning ? 'scanning' : 'running') : 'stopped',
+        rssNote: lspClient?.isRunning ? undefined : l10n('debug.engine.rssNote.notRunning'),
+        scanProgress: progress
+          ? { filesScanned: progress.filesScanned, totalFiles: progress.totalFiles }
+          : undefined,
+      };
+    },
   });
   // The sidebar Status section's Engines row (sectionedSidebar.ts) reads
   // HealthPanel.getEngineStatuses(), but the section providers were created
@@ -1659,8 +1694,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       refreshAll();
       updateAllStatusBars(data ?? undefined);
 
-      // I5: Auto-focus Overview to show Health Score immediately.
-      await vscode.commands.executeCommand('saropaLints.editorDashboards.focus');
+      // I5: Auto-focus Findings after enabling (PLAN_ext_ui_sidebar_reset.md
+      // P3) — used to reveal the Dashboards sidebar SECTION only, which just
+      // scrolls the tree into view with no numbers on screen yet. Opening
+      // the Findings editor tab directly shows the health score / violation
+      // count the notification below is about to reference, in one action
+      // instead of "look at the sidebar, then click a row".
+      await vscode.commands.executeCommand('saropaLints.openViolationsWideReport');
 
       // I5: Show score-aware notification with actionable buttons.
       const health = data ? computeHealthScore(data) : null;

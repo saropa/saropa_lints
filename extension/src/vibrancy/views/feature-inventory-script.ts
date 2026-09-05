@@ -10,13 +10,18 @@
  * at build time).
  */
 
-/** Text filter plus the mutually exclusive state/category mode buttons. */
-function getFilterScript(): string {
+/**
+ * Text filter plus the mutually exclusive state/category mode buttons.
+ * @param root JS expression resolving to the container element (or `'document'`
+ *   for standalone use). Scoping to a container prevents queries from reaching
+ *   into sibling tabs when this script is embedded in the Package Dashboard.
+ */
+function getFilterScript(root: string): string {
     return `
-        var featureNodes = Array.prototype.slice.call(document.querySelectorAll('.fi-feature'));
-        var groupNodes = Array.prototype.slice.call(document.querySelectorAll('.fi-category, .fi-package'));
-        var modeButtons = Array.prototype.slice.call(document.querySelectorAll('.fi-mode'));
-        var searchBox = document.getElementById('fi-search');
+        var featureNodes = Array.prototype.slice.call(${root}.querySelectorAll('.fi-feature'));
+        var groupNodes = Array.prototype.slice.call(${root}.querySelectorAll('.fi-category, .fi-package'));
+        var modeButtons = Array.prototype.slice.call(${root}.querySelectorAll('.fi-mode'));
+        var searchBox = ${root}.querySelector('#fi-search');
         var mode = 'all';
 
         function matchesMode(node) {
@@ -58,22 +63,29 @@ function getFilterScript(): string {
     `;
 }
 
-/** Expand-all / collapse-all, and opening a package jumped to from a link. */
-function getDisclosureScript(): string {
+/**
+ * Expand-all / collapse-all, and opening a package jumped to from a link.
+ * @param root JS expression for the container — scopes the unqualified
+ *   `details` query so "Expand all" only affects the Feature Inventory tab,
+ *   not every `<details>` in the Package Dashboard (charts, filters, etc.).
+ */
+function getDisclosureScript(root: string): string {
     return `
         function setAllOpen(open) {
-            Array.prototype.slice.call(document.querySelectorAll('details')).forEach(function (node) {
+            Array.prototype.slice.call(${root}.querySelectorAll('details')).forEach(function (node) {
                 node.open = open;
             });
         }
-        var expandButton = document.getElementById('fi-expand');
-        var collapseButton = document.getElementById('fi-collapse');
+        var expandButton = ${root}.querySelector('#fi-expand');
+        var collapseButton = ${root}.querySelector('#fi-collapse');
         if (expandButton) { expandButton.addEventListener('click', function () { setAllOpen(true); }); }
         if (collapseButton) { collapseButton.addEventListener('click', function () { setAllOpen(false); }); }
 
         function openTarget() {
             var hash = window.location.hash;
             if (!hash || hash.length < 2) { return; }
+            // Hash targets are unique IDs — safe to query from document even
+            // when the rest of the script is scoped to a container.
             var target = document.getElementById(hash.substring(1));
             while (target) {
                 if (target.tagName === 'DETAILS') { target.open = true; }
@@ -90,9 +102,9 @@ function getDisclosureScript(): string {
  * cell, pre-formatted by the renderer, so the browser never has to parse a
  * localized number back out of display text.
  */
-function getSortScript(): string {
+function getSortScript(root: string): string {
     return `
-        var table = document.getElementById('fi-summary');
+        var table = ${root}.querySelector('#fi-summary');
         if (table) {
             var headers = Array.prototype.slice.call(table.querySelectorAll('thead th'));
             headers.forEach(function (header, index) {
@@ -118,7 +130,20 @@ function getSortScript(): string {
     `;
 }
 
-/** The complete inline script, injected once under the document's CSP nonce. */
+/** The complete inline script for standalone use (full document scope). */
 export function getFeatureInventoryScript(): string {
-    return getFilterScript() + getDisclosureScript() + getSortScript();
+    return getFilterScript('document') + getDisclosureScript('document') + getSortScript('document');
+}
+
+/**
+ * IIFE-wrapped variant for embedding inside the Package Dashboard's composed
+ * `<script>`. Scopes every DOM query to `#pkg-tab-fullReport` so expand/collapse,
+ * sort clicks, and filter state cannot leak into sibling tabs (Overview, Settings,
+ * etc.). Mirrors `getKnownIssuesEmbedScript` in `known-issues-script.ts`.
+ */
+export function getFeatureInventoryEmbedScript(): string {
+    return `(function(){
+var fiRoot=document.getElementById('pkg-tab-fullReport')||document;
+${getFilterScript('fiRoot')}${getDisclosureScript('fiRoot')}${getSortScript('fiRoot')}
+})();`;
 }

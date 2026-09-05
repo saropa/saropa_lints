@@ -82,9 +82,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Project Map reports: the severity and doctor reports now render as sortable typed tables rather than preformatted text, via a new `--format json` mode on both command-line tools. No action required.
 - Health Panel: engine cards now show live scan progress ("Scan: N/M files") while the language server is scanning a workspace. No action required.
 - Lints Config, Config file tab: a "Migrate config keys" action now appears there when legacy plugin-block keys remain, replacing the sidebar row that previously carried it. No action required.
-
 - Findings dashboard status line and the sidebar's Code Health row now show quality-gate state. A failing gate previously appeared only inside the Code Health screen, so it was invisible unless you went looking for it. No action required.
 - Sidebar Code Health and Project Map rows now show live data — health grade and score, and how long ago the project was last scanned — instead of fixed descriptive text. Both read already-computed results and never start a scan. No action required.
+- Scan CLI: `--no-exclude` flag disables all hardcoded path exclusions (`example/`, `build/`, `.dart_tool/`, etc.) so the scan covers every `.dart` file it finds. User-supplied `--exclude-globs` still apply. No action required.
 
 ### Changed
 
@@ -154,7 +154,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Added fixture files for `no_internal_method_docs`, `prefer_state_class_below_widget`, and `prefer_sorted_equatable_props`. Extended `avoid_public_late_final_without_initializer` fixture with static and multi-variable edge cases.
 - Added `DeprecatedNewInCommentReferenceRule` instantiation test to the documentation rules test suite.
 - Fixed scan CLI silently excluding `example_packages/` fixtures: the hardcoded `/example` substring in `scan_runner.dart` matched `example_packages/`, the `--files` flag applied exclusions to explicitly named files, and `shouldSkipFile`'s fixture-skip exemption missed relative paths and `example_packages/`. Three-part fix: tightened the substring to `/example/`, bypassed exclusions when `--files` is explicitly provided, and added `startsWith` checks for relative paths.
-- Fixed three CodeQL `js/bad-tag-filter` alerts (two reported, one preemptive) in test infrastructure: added `\s*` before closing `>` and `i` flags to script/style tag regexes in the snapshot harness, `projectMapShell.test.ts`, and `projectVibrancyReportHtml.test.ts`.
+- Fixed three CodeQL `js/bad-tag-filter` alerts (two reported, one preemptive) in test infrastructure — closing-tag regexes now tolerate attributes and case variants. No action required.
+- Added `check_html_tag_regex.py` CI script that detects HTML tag regexes missing case-insensitive flags or attribute-tolerant closing tags before CodeQL reports them on push. No action required.
 
 ---
 
