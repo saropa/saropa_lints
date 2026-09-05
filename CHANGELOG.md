@@ -81,6 +81,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - Rules & Tiers Config file tab: Lane card. Switch between Light (~200 rules in-editor) and Full (all enabled rules) from the same dashboard that already shows every other `analysis_options_custom.yaml` key. No action required.
 
+### Fixed
+
+- Fixed `avoid_case_sensitive_path_comparison` false positive on non-string comparisons — null checks, boolean/integer/double/enum guards on path-named variables no longer fire. No action required.
+
 ---
 
 ## [16.0.0-beta.2]
@@ -96,7 +100,6 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
 
 ### Fixed
 
-- Fixed `avoid_case_sensitive_path_comparison` false positive on `== null` and `!= null` checks — null/boolean guards are not case-sensitive string comparisons.
 - Fixed VS Code "Switch to Pre-Release Version" button failing with `net::ERR_FAILED` — pre-release extension versions now use an odd minor number as VS Code requires.
 - Fixed status-bar click behavior: beta.1 stated clicking while lint integration is off opens the Dashboards view — it actually opens Findings in every state (`extension.ts:1310`). The click target is intentionally Findings regardless of integration state. No action required.
 - Fixed CI watch blocking publish by defaulting to skip (press `y` to opt in).

@@ -139,7 +139,9 @@ The `avoid_case_sensitive_path_comparison` rule flagged `== null` and `!= null` 
 
 **Verification:** Scanned the original triggering file (`contacts/.../wikimedia_birthday_service.dart`) — zero `avoid_case_sensitive_path_comparison` hits post-fix. Previously reported a false positive at line 171.
 
-**Fixture:** Replaced the empty placeholder with 9 concrete cases: 2 BAD (string-to-string path comparisons), 4 GOOD (null checks in all orientations), 2 GOOD (integer/boolean comparisons on path-named variables), 1 GOOD (toLowerCase already applied).
+**Fixture:** Replaced the empty placeholder with 12 marker-driven cases: 2 BAD (string-to-string path comparisons with `// LINT:`), 8 GOOD (null/int/bool/double/enum checks and case-normalized comparisons with `// LINT_NOT:`), 1 `// LINT_COUNT:` whole-fixture assertion.
+
+**Resolved-analyzer test:** Added `avoid_case_sensitive_path_comparison_fixture_test.dart` — 11 tests using `assertFixtureMarkers` + `runRuleResolved` with full type resolution. Each test validates one detection or false-positive-guard case against the resolved AST, not just marker counts. Covers: string-to-string (fires), null (skips), int (skips), bool (skips), double (skips), enum (skips), toLowerCase/toUpperCase (skips).
 
 ---
 
