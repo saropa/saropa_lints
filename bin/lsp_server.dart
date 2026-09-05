@@ -121,6 +121,14 @@ List<String> _scanDirectories = const ['lib', 'bin', 'test'];
 /// re-scans (e.g. triggered by config changes) are incremental.
 final Map<String, DateTime> _lastScannedMtimes = {};
 
+/// Maximum concurrent async file I/O operations allowed during the workspace
+/// scan's mtime-check phase. Caps the number of OS threads the Dart VM can
+/// allocate for blocking I/O at any instant, preventing the "Could not start
+/// thread" crash on projects with thousands of files. 20 is well within the
+/// default thread-pool size (~32 on most platforms) while still saturating
+/// disk I/O.
+const _maxConcurrentFileOps = 20;
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
@@ -132,6 +140,26 @@ final Map<String, DateTime> _lastScannedMtimes = {};
 /// `--trace` enables verbose logging from startup without waiting for
 /// the client to send `$/setTrace verbose`.
 void main(List<String> args) {
+  // Guard the server in a zone to catch Dart-level unhandled async errors
+  // (e.g. a failed Future in analysis or message dispatch). Note: native VM
+  // crashes like "Could not start thread" (exit code 0xC0000409) happen
+  // below the Dart runtime and bypass this handler entirely — the async I/O
+  // conversions in _analyzeWorkspace/_prewarm are the real fix for thread-
+  // pool exhaustion, not this zone.
+  runZonedGuarded(
+    () => _startServer(args),
+    (error, stack) {
+      _log('fatal uncaught error: $error');
+      _logTrace('stack: $stack');
+      // Exit 1 so VS Code shows "server exited" instead of looping.
+      exit(1);
+    },
+  );
+}
+
+/// Inner entry point wrapped by runZonedGuarded — reads JSON-RPC messages
+/// from stdin and writes responses to stdout.
+void _startServer(List<String> args) {
   // Suppress debounced report writes — same reason as the scan daemon:
   // a long-lived server would litter the target project with log files.
   AnalysisReporter.disableForProcess();
@@ -151,6 +179,12 @@ void main(List<String> args) {
       // processor drains them one at a time so analysis can await.
       _drainMessages(buffer);
       _processQueue();
+    },
+    onError: (Object error) {
+      // Catch stdin read failures (e.g. broken pipe, socket disposed) so
+      // they surface as a clean exit instead of an unhandled exception.
+      _log('stdin error: $error — shutting down');
+      exit(1);
     },
     onDone: () => exit(0),
   );
@@ -580,19 +614,36 @@ Future<void> _analyzeWorkspace(String root) async {
     // mtime from a previous scan. Unchanged files are skipped — their
     // diagnostics from the prior scan are still valid. On the first scan
     // (empty _lastScannedMtimes) every file is analyzed.
+    // Batched in chunks of _maxConcurrentFileOps to cap the number of
+    // concurrent async I/O operations — each lastModified() call may claim
+    // an OS thread from the Dart VM's fixed-size pool. Without batching,
+    // thousands of concurrent calls exhaust the pool and crash the process
+    // with "Could not start thread".
     final filesToAnalyze = <String>[];
     var skippedUnchanged = 0;
-    for (final filePath in dartFiles) {
-      final mtime = File(filePath).lastModifiedSync();
-      final lastMtime = _lastScannedMtimes[filePath];
-      if (lastMtime != null && !mtime.isAfter(lastMtime)) {
-        // File hasn't been modified since the last scan — skip it.
-        skippedUnchanged++;
-        continue;
+    for (var i = 0; i < dartFiles.length; i += _maxConcurrentFileOps) {
+      final batchEnd = (i + _maxConcurrentFileOps).clamp(0, dartFiles.length);
+      final batch = dartFiles.sublist(i, batchEnd);
+
+      // Fire all mtime checks in this batch concurrently, then await them
+      // together — parallelizes disk I/O within the concurrency cap.
+      final mtimes = await Future.wait(
+        batch.map((path) => File(path).lastModified()),
+      );
+
+      for (var j = 0; j < batch.length; j++) {
+        final filePath = batch[j];
+        final mtime = mtimes[j];
+        final lastMtime = _lastScannedMtimes[filePath];
+        if (lastMtime != null && !mtime.isAfter(lastMtime)) {
+          // File hasn't been modified since the last scan — skip it.
+          skippedUnchanged++;
+          continue;
+        }
+        filesToAnalyze.add(filePath);
+        // Record the mtime now so a concurrent didSave won't re-queue it.
+        _lastScannedMtimes[filePath] = mtime;
       }
-      filesToAnalyze.add(filePath);
-      // Record the mtime now so a concurrent didSave won't re-queue it.
-      _lastScannedMtimes[filePath] = mtime;
     }
 
     if (skippedUnchanged > 0) {
@@ -688,9 +739,12 @@ Future<void> _prewarm(String projectRoot) async {
   if (mainFile.existsSync()) {
     target = mainFile.path;
   } else {
+    // Use async list() instead of listSync() to avoid blocking an OS
+    // thread — listSync on a large lib/ directory contributes to thread-pool
+    // exhaustion that crashes the server.
     final libDir = Directory(p.join(root, 'lib'));
     if (libDir.existsSync()) {
-      for (final entity in libDir.listSync(recursive: true)) {
+      await for (final entity in libDir.list(recursive: true)) {
         if (entity is File && entity.path.endsWith('.dart')) {
           target = p.normalize(entity.path);
           break;
@@ -990,7 +1044,7 @@ Future<List<Map<String, dynamic>>> _handleCodeAction(
         final title = sourceChange.message.isNotEmpty
             ? sourceChange.message
             : fixKind?.message ?? diag.ruleName;
-        final lspEdits = _sourceChangeToWorkspaceEdit(sourceChange);
+        final lspEdits = await _sourceChangeToWorkspaceEdit(sourceChange);
         actions.add({
           'title': title,
           'kind': 'quickfix',
@@ -1031,7 +1085,9 @@ Diagnostic _buildDiagnostic(
 /// those are plain hand-written classes (no protobuf/codegen), so the
 /// import carries no extra dependency weight over the `dynamic` casts this
 /// replaced.
-Map<String, dynamic> _sourceChangeToWorkspaceEdit(SourceChange sourceChange) {
+Future<Map<String, dynamic>> _sourceChangeToWorkspaceEdit(
+  SourceChange sourceChange,
+) async {
   final documentChanges = <Map<String, dynamic>>[];
 
   for (final fileEdit in sourceChange.edits) {
@@ -1039,9 +1095,11 @@ Map<String, dynamic> _sourceChangeToWorkspaceEdit(SourceChange sourceChange) {
     final fileUri = Uri.file(filePath).toString();
 
     // Read the file content once to convert offsets to line:column.
+    // Uses async readAsString to avoid blocking an OS thread — sync file
+    // reads contribute to thread-pool exhaustion under load.
     String? content;
     try {
-      content = File(filePath).readAsStringSync();
+      content = await File(filePath).readAsString();
     } on Object {
       // Skip this file edit if unreadable — non-fatal.
       continue;
