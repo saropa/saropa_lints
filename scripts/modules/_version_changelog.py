@@ -550,7 +550,12 @@ def add_unreleased_section(changelog_path: Path) -> bool:
     """
     content = changelog_path.read_text(encoding="utf-8")
 
-    if re.search(r"## \[Unreleased\]", content):
+    # Anchored to line start — the maintenance doc-comment above the first
+    # release can illustrate the heading convention with inline-code text
+    # containing this same substring (see _promote_top_section_to_version's
+    # identical fix), which an unanchored search would wrongly count as an
+    # existing section.
+    if re.search(r"^## \[Unreleased\]", content, re.MULTILINE):
         return False
 
     # Insert before the first ---\n[optional blank]\n## [version] block

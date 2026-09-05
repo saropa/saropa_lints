@@ -62,6 +62,37 @@ bool _containsPathPattern(String source) {
   return _pathVariablePatterns.any(lower.contains);
 }
 
+/// Returns true if both sides of [node] resolve to `String` at the type level.
+/// Falls back to AST-level null/bool literal exclusion when static types are
+/// unavailable (unresolved code, dynamic expressions).
+bool _isBothSidesString(BinaryExpression node) {
+  final leftType = node.leftOperand.staticType;
+  final rightType = node.rightOperand.staticType;
+
+  // When the analyzer has resolved types, use them — catches null, bool, int,
+  // enum, and every other non-string operand in one check.
+  if (leftType != null && rightType != null) {
+    return leftType.isDartCoreString && rightType.isDartCoreString;
+  }
+
+  // Fallback: exclude obvious non-string literals when types are unresolved.
+  if (node.leftOperand is NullLiteral || node.rightOperand is NullLiteral) {
+    return false;
+  }
+  if (node.leftOperand is BooleanLiteral ||
+      node.rightOperand is BooleanLiteral) {
+    return false;
+  }
+  if (node.leftOperand is IntegerLiteral ||
+      node.rightOperand is IntegerLiteral) {
+    return false;
+  }
+
+  // Types unresolved and no disqualifying literal — assume string to avoid
+  // missing real path comparisons in partially analyzed code.
+  return true;
+}
+
 // =============================================================================
 // avoid_hardcoded_drive_letters
 // =============================================================================
@@ -317,6 +348,11 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
       // Only check equality comparisons
       final String op = node.operator.type.lexeme;
       if (op != '==' && op != '!=') return;
+
+      // Case sensitivity only matters for string-to-string comparisons.
+      // Skip null checks, boolean guards, integer comparisons, enum matches,
+      // and any other non-string operand — none of those are path comparisons.
+      if (!_isBothSidesString(node)) return;
 
       // Check if either side looks like a path variable
       final String leftSource = node.leftOperand.toSource();
