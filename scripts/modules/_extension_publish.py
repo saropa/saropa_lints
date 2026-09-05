@@ -109,18 +109,35 @@ def copy_readme_to_extension(project_dir: Path) -> bool:
 
 
 def set_extension_version(project_dir: Path, version: str) -> bool:
-    """Set extension/package.json version to match the package version.
+    """Set extension/package.json version from a pub.dev-style version string.
+
+    Internally converts *version* via ``extension_version_for()`` so callers
+    never need to remember the conversion — package.json always gets the
+    odd-minor / offset-patch form for prereleases, and the raw value for
+    stable releases.
 
     Returns True if updated (or already matched), False on error.
     """
+    from scripts.modules._utils import extension_version_for
+
+    # Convert once here so every call site is safe by construction.
+    # Double-conversion is safe (converted versions look stable and pass
+    # through unchanged), but the early-return below avoids a needless
+    # file write when the version already matches — cleaner git diffs on
+    # publish retries.
+    ext_version = extension_version_for(version)
     pkg_path = _extension_dir(project_dir) / "package.json"
     if not pkg_path.exists():
         return False
     text = pkg_path.read_text(encoding="utf-8")
-    # Match "version": "X.Y.Z" or "version": "X.Y.Z-pre.N"
+    # Skip the write if the file already has the correct version.
+    existing = re.search(r'"version"\s*:\s*"([^"]*)"', text)
+    if existing and existing.group(1) == ext_version:
+        return True
+    # Write the converted version into package.json.
     new_text, n = re.subn(
         r'"version"\s*:\s*"[^"]*"',
-        f'"version": "{version}"',
+        f'"version": "{ext_version}"',
         text,
         count=1,
     )
@@ -538,12 +555,12 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
     *version* is the pub.dev-style version and may carry a prerelease
     suffix (e.g. "1.2.3-beta.1"). The .vsix filename keeps that full
     version for identification, but package.json's "version" field gets
-    extension_version_for(version) — vsce hard-rejects a hyphenated
+    set_extension_version() internally — vsce hard-rejects a hyphenated
     version string there even when --pre-release is passed, and successive
     beta iterations need distinct PATCH values or they collide at the
     Marketplace (see extension_version_for's docstring).
     """
-    if not set_extension_version(project_dir, extension_version_for(version)):
+    if not set_extension_version(project_dir, version):
         print_warning("Could not set extension version in package.json")
     if not copy_changelog_to_extension(project_dir):
         print_warning("Root CHANGELOG.md not found; extension .vsix will have no changelog.")

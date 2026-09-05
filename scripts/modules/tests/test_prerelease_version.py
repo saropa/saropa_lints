@@ -78,7 +78,9 @@ class TestExtensionVersionFor(unittest.TestCase):
         self.assertEqual(self.fn("15.2.7"), "15.2.7")
 
     def test_first_beta_gets_offset_patch(self) -> None:
-        self.assertEqual(self.fn("16.0.0-beta.1"), "16.0.913")
+        # Minor is forced to odd (0 → 1) for pre-release so the VS Code
+        # "Switch to Pre-Release Version" button works.
+        self.assertEqual(self.fn("16.0.0-beta.1"), "16.1.913")
 
     def test_successive_betas_are_distinct(self) -> None:
         v1 = self.fn("16.0.0-beta.1")
@@ -88,15 +90,17 @@ class TestExtensionVersionFor(unittest.TestCase):
             msg="successive beta iterations of the same base version must "
                 "not collapse to the same extension version",
         )
-        self.assertEqual(v2, "16.0.914")
+        # Minor forced odd (0 → 1), patch offset incremented by iteration.
+        self.assertEqual(v2, "16.1.914")
 
     def test_offset_preserves_original_patch(self) -> None:
         # A prerelease of a non-zero base patch keeps that patch as part
-        # of the offset base, not just the iteration number.
-        self.assertEqual(self.fn("15.2.7-beta.3"), "15.2.922")
+        # of the offset base. Minor forced odd (2 → 3).
+        self.assertEqual(self.fn("15.2.7-beta.3"), "15.3.922")
 
     def test_missing_iteration_number_defaults_to_one(self) -> None:
-        self.assertEqual(self.fn("16.0.0-beta"), "16.0.913")
+        # Minor forced odd (0 → 1).
+        self.assertEqual(self.fn("16.0.0-beta"), "16.1.913")
 
     def test_different_channels_of_same_base_version_are_distinct(self) -> None:
         # The version prompt accepts any prerelease tag, not just "beta" —
@@ -105,6 +109,25 @@ class TestExtensionVersionFor(unittest.TestCase):
         beta = self.fn("16.0.0-beta.1")
         rc = self.fn("16.0.0-rc.1")
         self.assertNotEqual(beta, rc)
+
+    def test_double_conversion_is_idempotent(self) -> None:
+        # set_extension_version() calls extension_version_for() internally.
+        # If a caller also wraps, the double-conversion must not corrupt
+        # the version. Converted pre-release versions look stable (no
+        # hyphen), so the second call hits the identity path.
+        once = self.fn("16.0.0-beta.2")
+        twice = self.fn(once)
+        self.assertEqual(
+            once, twice,
+            msg="double-converting a pre-release version must be idempotent "
+                "— set_extension_version relies on this",
+        )
+
+    def test_stable_double_conversion_is_idempotent(self) -> None:
+        # Stable versions pass through unchanged on every call.
+        once = self.fn("15.2.12")
+        twice = self.fn(once)
+        self.assertEqual(once, twice)
 
 
 class TestPackageExtensionWritesSafeVersion(unittest.TestCase):
@@ -142,10 +165,11 @@ class TestPackageExtensionWritesSafeVersion(unittest.TestCase):
         self.assertEqual(pkg["version"], "15.2.7")
 
     def test_prerelease_version_offset_before_writing(self) -> None:
+        # Minor forced odd (2 → 3) for pre-release channel detection.
         self._package_with_mocks("15.2.7-beta.1")
         pkg = json.loads((self.root / "extension" / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(
-            pkg["version"], "15.2.920",
+            pkg["version"], "15.3.920",
             msg="extension/package.json must never contain a hyphenated "
                 "version — vsce rejects it even with --pre-release",
         )

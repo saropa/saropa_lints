@@ -378,11 +378,13 @@ def check_orphaned_version_bump(
         print_success(
             f"Reset pubspec.yaml to {last_tag_version}"
         )
-        # Reset extension/package.json
+        # Reset extension/package.json — set_extension_version() handles
+        # the pub.dev → extension version conversion internally.
         if extension_exists(project_dir):
             set_extension_version(project_dir, last_tag_version)
             print_success(
-                f"Reset extension/package.json to {last_tag_version}"
+                f"Reset extension/package.json to "
+                f"{extension_version_for(last_tag_version)}"
             )
         print_info(
             "Version files reset. The publish script will prompt for "
@@ -823,7 +825,8 @@ def run_pubdev_only_mode(
         # Keep extension/package.json version in sync even though we
         # skip extension packaging — the preflight check validates it,
         # and a later extension-only publish (mode 6) needs the version
-        # to match the pub.dev release.
+        # to match the pub.dev release. set_extension_version() handles
+        # the pub.dev → extension version conversion internally.
         if extension_exists(ctx.project_dir):
             set_extension_version(ctx.project_dir, version)
         print()
@@ -1403,6 +1406,8 @@ def run_full_publish(
 
         print_colored(f"      Publishing: {version}", Color.CYAN)
         print_colored(f"      Tag:        v{version}", Color.CYAN)
+        # set_extension_version() handles the pub.dev → extension version
+        # conversion internally (odd minor for pre-release, offset patch).
         if extension_exists(ctx.project_dir):
             set_extension_version(ctx.project_dir, version)
         print()

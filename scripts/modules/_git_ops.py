@@ -19,9 +19,11 @@ import tempfile
 from pathlib import Path
 
 from scripts.modules.strip_commit_msg_trailers import strip_commit_message
+from scripts.modules._extension_publish import set_extension_version
 from scripts.modules._utils import (
     Color,
     VERSION_RE as _VERSION_RE,
+    extension_version_for,
     get_shell_mode,
     is_prerelease_version,
     print_colored,
@@ -179,10 +181,11 @@ def _verify_versions_on_disk(
         return False
     print_success(f"Verified pubspec.yaml version is {version}")
 
-    # --- extension/package.json (expected but non-fatal if absent) ---
+    # --- extension/package.json (self-healing) ---
     # package.json uses the converted extension version (odd minor for
-    # pre-release, offset patch), not the raw pub.dev version.
-    from scripts.modules._utils import extension_version_for
+    # pre-release, offset patch), not the raw pub.dev version. The publish
+    # script owns this file's version field, so a mismatch is always safe
+    # to fix in-place — no need to bail and make the user retry.
     expected_ext = extension_version_for(version)
     pkg_path = project_dir / "extension" / "package.json"
     pkg_version = _read_package_json_version(pkg_path)
@@ -192,45 +195,133 @@ def _verify_versions_on_disk(
             "skipping package.json verification."
         )
     elif pkg_version != expected_ext:
-        print_error(
-            f"extension/package.json version mismatch: "
-            f"expected {expected_ext}, found {pkg_version}. "
-            f"Refusing to proceed."
-        )
-        return False
+        # Self-heal: write the correct version instead of failing.
+        # set_extension_version() converts internally, so pass raw version.
+        if set_extension_version(project_dir, version):
+            print_warning(
+                f"extension/package.json had {pkg_version}, "
+                f"expected {expected_ext} — auto-corrected."
+            )
+        else:
+            print_error(
+                f"extension/package.json version mismatch: "
+                f"expected {expected_ext}, found {pkg_version}. "
+                f"Auto-correction failed."
+            )
+            return False
     else:
         print_success(f"Verified extension/package.json version is {expected_ext}")
 
     return True
 
 
+def _is_head_pushed(project_dir: Path) -> bool:
+    """Check whether HEAD has already been pushed to origin.
+
+    Returns True if origin/<branch> contains HEAD's SHA — meaning an
+    amend would diverge local history from the remote.
+    """
+    use_shell = get_shell_mode()
+    # Get current branch name.
+    branch_result = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+        cwd=project_dir, capture_output=True, text=True, shell=use_shell,
+    )
+    if branch_result.returncode != 0:
+        return False
+    branch = branch_result.stdout.strip()
+    # Check if origin/<branch> contains HEAD.
+    contains_result = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", "HEAD", f"origin/{branch}"],
+        cwd=project_dir, capture_output=True, text=True, shell=use_shell,
+    )
+    return contains_result.returncode == 0
+
+
+def _heal_committed_package_json(
+    project_dir: Path,
+    version: str,
+    pkg_actual: str,
+    expected_ext: str,
+) -> bool:
+    """Fix a wrong package.json version in HEAD by amending the commit.
+
+    Called only when the committed tree has the wrong extension version.
+    set_extension_version() converts the raw *version* internally, so
+    pass the pub.dev version, not the already-converted form.
+
+    Refuses to amend if HEAD has already been pushed — amending a pushed
+    commit would diverge local history from the remote.
+    """
+    if _is_head_pushed(project_dir):
+        print_error(
+            f"HEAD commit has {pkg_actual} in package.json (expected "
+            f"{expected_ext}), but HEAD is already pushed — cannot amend. "
+            f"Fix package.json manually and create a new commit."
+        )
+        return False
+
+    if not set_extension_version(project_dir, version):
+        print_error(
+            f"HEAD commit extension/package.json version mismatch: "
+            f"expected {expected_ext}, found {pkg_actual}. "
+            f"Auto-correction failed."
+        )
+        return False
+
+    # Stage the corrected file, then amend HEAD to include it.
+    stage_result = run_command(
+        ["git", "add", "extension/package.json"],
+        cwd=project_dir,
+        description="Stage corrected package.json",
+        allow_failure=True,
+    )
+    if stage_result.returncode != 0:
+        print_error("git add extension/package.json failed after self-heal.")
+        return False
+
+    amend_result = run_command(
+        ["git", "commit", "--amend", "--no-edit"],
+        cwd=project_dir,
+        description="Amend commit with corrected package.json",
+        allow_failure=True,
+    )
+    if amend_result.returncode != 0:
+        print_error(
+            f"Fixed package.json on disk ({pkg_actual} → "
+            f"{expected_ext}) but commit amend failed."
+        )
+        return False
+
+    print_warning(
+        f"HEAD commit had {pkg_actual} in package.json, "
+        f"expected {expected_ext} — auto-corrected and "
+        f"commit amended."
+    )
+    return True
+
+
 def _verify_versions_in_commit(
     project_dir: Path, version: str,
 ) -> bool:
-    """Assert the HEAD commit's pubspec.yaml and package.json carry the expected version.
+    """Verify HEAD commit's pubspec.yaml and package.json carry the expected version.
 
-    Last-resort gate before tagging: even if the disk was right at commit
-    time, a bad staging or partial checkout could produce a commit whose
-    tree has the wrong version. Prints a status line for every file checked.
+    Last-resort gate before tagging. Self-heals package.json mismatches
+    by amending the commit (the publish script owns that field).
     """
     use_shell = get_shell_mode()
 
     # --- pubspec.yaml in the committed tree (mandatory) ---
     result = subprocess.run(
         ["git", "show", "HEAD:pubspec.yaml"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
+        cwd=project_dir, capture_output=True, text=True, shell=use_shell,
     )
     if result.returncode != 0:
         print_error("Cannot read pubspec.yaml from HEAD commit.")
         return False
 
     match = re.search(
-        rf"^version:\s*({_VERSION_RE})",
-        result.stdout,
-        re.MULTILINE,
+        rf"^version:\s*({_VERSION_RE})", result.stdout, re.MULTILINE,
     )
     if not match:
         print_error("No version field found in HEAD:pubspec.yaml.")
@@ -240,8 +331,7 @@ def _verify_versions_in_commit(
     if actual != version:
         print_error(
             f"HEAD commit pubspec.yaml version mismatch: "
-            f"expected {version}, found {actual}. "
-            f"The release commit does not carry the correct version."
+            f"expected {version}, found {actual}."
         )
         return False
     print_success(f"Verified HEAD:pubspec.yaml version is {version}")
@@ -249,13 +339,9 @@ def _verify_versions_in_commit(
     # --- extension/package.json in the committed tree ---
     result = subprocess.run(
         ["git", "show", "HEAD:extension/package.json"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
+        cwd=project_dir, capture_output=True, text=True, shell=use_shell,
     )
     if result.returncode != 0:
-        # package.json not in the commit tree — warn, don't block
         print_warning(
             "extension/package.json not found in HEAD commit — "
             "skipping package.json verification."
@@ -263,8 +349,7 @@ def _verify_versions_in_commit(
         return True
 
     pkg_match = re.search(
-        rf'"version"\s*:\s*"({_VERSION_RE})"',
-        result.stdout,
+        rf'"version"\s*:\s*"({_VERSION_RE})"', result.stdout,
     )
     if not pkg_match:
         print_warning(
@@ -275,19 +360,17 @@ def _verify_versions_in_commit(
 
     # Compare against the converted extension version, not the raw pub.dev
     # version — package.json carries the odd-minor, offset-patch form.
-    from scripts.modules._utils import extension_version_for
     expected_ext = extension_version_for(version)
     pkg_actual = pkg_match.group(1)
     if pkg_actual != expected_ext:
-        print_error(
-            f"HEAD commit extension/package.json version mismatch: "
-            f"expected {expected_ext}, found {pkg_actual}."
-        )
-        return False
+        if not _heal_committed_package_json(
+            project_dir, version, pkg_actual, expected_ext,
+        ):
+            return False
+
     print_success(
         f"Verified HEAD:extension/package.json version is {expected_ext}",
     )
-
     return True
 
 
@@ -305,9 +388,10 @@ def run_preflight_version_check(
     print_header("PREFLIGHT: VERSION VERIFICATION")
     print_info(f"Checking all version files match {version}...")
     if not _verify_versions_on_disk(project_dir, version):
+        # Only reaches here if auto-correction itself failed.
         print_error(
-            "Preflight failed — fix the version mismatch above "
-            "before continuing."
+            "Preflight failed — auto-correction could not resolve "
+            "the version mismatch above."
         )
         return False
     print_success("Preflight version check passed")
