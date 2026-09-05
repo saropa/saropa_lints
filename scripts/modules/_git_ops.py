@@ -576,13 +576,26 @@ def _attempt_push_with_rebase(
     """Single push attempt with auto-rebase on non-fast-forward."""
     for attempt in range(max_retries + 1):
         print_info(f"Pushing to {branch}...")
-        result = subprocess.run(
-            ["git", "push", "origin", branch],
-            cwd=project_dir,
-            capture_output=True,
-            text=True,
-            shell=use_shell,
-        )
+        try:
+            result = subprocess.run(
+                ["git", "push", "origin", branch],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                shell=use_shell,
+            )
+        except KeyboardInterrupt:
+            # Push may have already landed on the remote before the
+            # interrupt — must not let this crash publish.py with a raw
+            # traceback (same failure class fixed for `gh run watch`).
+            # subprocess.run() already kills the child on any exception.
+            print()
+            print_warning(
+                f"Push to {branch} interrupted — it may have already "
+                f"landed on the remote. Check `git log origin/{branch}` "
+                f"before retrying."
+            )
+            return False
         if result.returncode == 0:
             print_success(f"Pushed to {branch}")
             return True
@@ -690,11 +703,25 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
         )
         return False
     else:
-        result = run_command(
-            ["git", "push", "origin", tag_name],
-            project_dir,
-            f"Pushing tag {tag_name}",
-        )
+        try:
+            result = run_command(
+                ["git", "push", "origin", tag_name],
+                project_dir,
+                f"Pushing tag {tag_name}",
+            )
+        except KeyboardInterrupt:
+            # Same failure class fixed for `gh run watch` and the branch
+            # push above: the tag may have already landed on the remote
+            # before the interrupt, so this must not crash with a raw
+            # traceback — a landed tag would already have triggered the
+            # publish workflow regardless of this process's state.
+            print()
+            print_warning(
+                f"Tag push interrupted — {tag_name} may have already "
+                f"landed on the remote. Check `git ls-remote --tags "
+                f"origin {tag_name}` before retrying."
+            )
+            return False
         if result.returncode != 0:
             return False
 
