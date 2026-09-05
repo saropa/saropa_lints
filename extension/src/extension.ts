@@ -150,7 +150,7 @@ import {
 } from './driftAdvisor/driftAdvisorUiState';
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
 import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
-import { buildStatusBarLabel } from './statusBarLabel';
+import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor } from './systemHealth/processMonitor';
@@ -488,31 +488,15 @@ function countOutdatedPackages(): number | undefined {
   }).length;
 }
 
-// Commands the main status bar tooltip is allowed to link to. VS Code refuses
-// to execute a `command:` link from a MarkdownString unless the command id is
-// explicitly allow-listed via `isTrusted.enabledCommands` — mirrors the
-// pattern saropa-log-capture uses for its own status bar menu tooltip.
-const STATUS_BAR_TRUSTED_COMMANDS = [
-  'saropaLints.enable',
-  'saropaLints.disable',
-  'saropaLints.openViolationsWideReport',
-  'saropaLints.openProjectVibrancyReport',
-  'saropaLints.showProcessHealth',
-  'saropaLints.showCommandCatalog',
-  'saropaLints.showAbout',
-];
-
-/** One `[icon label](command:id)` markdown link followed by a blank line. */
-function statusBarCmdLink(icon: string, label: string, commandId: string): string {
-  return `[${icon} ${label}](command:${commandId})\n\n`;
-}
-
 /**
  * Builds the main status bar's tooltip as a clickable action menu instead of
  * plain text — a hover-activated toolbar of checkbox-style toggle links and
  * shortcuts to the reports/panels the plain text used to only describe.
  * `infoLines` renders first as read-only context, then a divider, then the
- * menu links.
+ * menu links from {@link buildStatusBarMenuItems} (mirrors the pattern
+ * saropa-log-capture uses for its own status bar menu tooltip). Menu data
+ * lives in statusBarLabel.ts, not here, so a unit test can assert every
+ * commandId stays covered by STATUS_BAR_TRUSTED_COMMANDS.
  */
 function buildStatusBarTooltipMarkdown(infoLines: string[], enabled: boolean): vscode.MarkdownString {
   const md = new vscode.MarkdownString('', true);
@@ -523,18 +507,13 @@ function buildStatusBarTooltipMarkdown(infoLines: string[], enabled: boolean): v
   }
   md.appendMarkdown('---\n\n');
 
-  // Checkbox-style toggle: filled check when analysis is on, empty circle
-  // when off — clicking flips it via whichever command is the opposite of
-  // the current state (there is no single toggle command to link to).
-  md.appendMarkdown(enabled
-    ? statusBarCmdLink('$(check)', l10n('statusBar.menu.enableOn'), 'saropaLints.disable')
-    : statusBarCmdLink('$(circle-outline)', l10n('statusBar.menu.enableOff'), 'saropaLints.enable'));
-  md.appendMarkdown(statusBarCmdLink('$(checklist)', l10n('statusBar.menu.openViolations'), 'saropaLints.openViolationsWideReport'));
-  md.appendMarkdown(statusBarCmdLink('$(package)', l10n('statusBar.menu.openPackageDashboard'), 'saropaLints.openProjectVibrancyReport'));
-  md.appendMarkdown(statusBarCmdLink('$(pulse)', l10n('statusBar.menu.openProcessHealth'), 'saropaLints.showProcessHealth'));
-  md.appendMarkdown('---\n\n');
-  md.appendMarkdown(statusBarCmdLink('$(list-unordered)', l10n('statusBar.menu.commandCatalog'), 'saropaLints.showCommandCatalog'));
-  md.appendMarkdown(`[$(info) ${l10n('statusBar.menu.about')}](command:saropaLints.showAbout)`);
+  const items = buildStatusBarMenuItems(enabled);
+  items.forEach((item, index) => {
+    md.appendMarkdown(`[${item.icon} ${l10n(item.labelKey)}](command:${item.commandId})`);
+    // Divider after the toggle + report/panel shortcuts (index 3), before the
+    // trailing utility links (Command Catalog / About).
+    md.appendMarkdown(index === items.length - 3 ? '\n\n---\n\n' : '\n\n');
+  });
 
   return md;
 }

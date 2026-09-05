@@ -1,7 +1,7 @@
 /** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
 import * as assert from 'node:assert';
 import { formatSidebarToggleLabel } from '../sidebarToggleLabel';
-import { buildStatusBarLabel } from '../statusBarLabel';
+import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from '../statusBarLabel';
 
 /** Sidebar activity-bar labels with optional issue counts (finite / NaN edge cases). */
 
@@ -68,5 +68,27 @@ describe('buildStatusBarLabel', () => {
             vibrancyLabel: null,
         });
         assert.strictEqual(label, '85% · recommended');
+    });
+});
+
+describe('buildStatusBarMenuItems', () => {
+    // Regression guard for the status bar tooltip action menu: every command
+    // a menu row links to must be allow-listed, or VS Code silently refuses
+    // to execute the `command:` link on click (isTrusted.enabledCommands).
+    // This is the only check tying the two lists together — without it,
+    // renaming a command in one place but not the other breaks the link
+    // with no test failure elsewhere.
+    for (const enabled of [true, false]) {
+        it(`every commandId is covered by STATUS_BAR_TRUSTED_COMMANDS (enabled=${enabled})`, () => {
+            const uncovered = buildStatusBarMenuItems(enabled)
+                .map((item) => item.commandId)
+                .filter((id) => !STATUS_BAR_TRUSTED_COMMANDS.includes(id));
+            assert.deepStrictEqual(uncovered, []);
+        });
+    }
+
+    it('toggle row flips between disable (enabled) and enable (disabled)', () => {
+        assert.strictEqual(buildStatusBarMenuItems(true)[0].commandId, 'saropaLints.disable');
+        assert.strictEqual(buildStatusBarMenuItems(false)[0].commandId, 'saropaLints.enable');
     });
 });
