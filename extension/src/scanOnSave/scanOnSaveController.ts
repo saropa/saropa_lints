@@ -214,6 +214,14 @@ export class ScanOnSaveController implements vscode.Disposable {
     this._disposables.push(
       vscode.workspace.onDidSaveTextDocument((doc) => this._onSave(doc)),
     );
+    // Scan Dart files when opened — diagnostics should appear without
+    // requiring a save. Uses the same debounce+queue as save events.
+    this._disposables.push(
+      vscode.workspace.onDidOpenTextDocument((doc) => this._queueIfDart(doc)),
+    );
+    // Scan all currently open Dart editors on activation so diagnostics
+    // are visible immediately — not just after the first save or open.
+    this._scanOpenEditors();
     // A tier or resolveTypes settings change invalidates the running daemon
     // (it was spawned with the old tier); drop it so the next save respawns
     // with current config. `saropaLints.enabled` is watched too because it
@@ -311,6 +319,52 @@ export class ScanOnSaveController implements vscode.Disposable {
     this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.ready');
     this._statusBarItem.show();
     this._log(`ready — project root: ${root}`);
+  }
+
+  /**
+   * Queues a Dart file for scanning if it passes the same gates as _onSave.
+   * Shared by onDidOpenTextDocument and the activation-time open-editors scan
+   * so files get diagnostics without requiring a save.
+   */
+  private _queueIfDart(doc: vscode.TextDocument): void {
+    if (doc.languageId !== 'dart') return;
+    if (!this._isEnabled()) return;
+    const root = this._getProjectRoot();
+    if (!root) return;
+    const relative = path.relative(root, doc.uri.fsPath);
+    if (relative.startsWith('..') || path.isAbsolute(relative)) return;
+
+    this._pendingFiles.add(doc.uri.fsPath);
+    if (this._debounceTimer) clearTimeout(this._debounceTimer);
+    this._debounceTimer = setTimeout(() => this._runQueuedScan(root), DEBOUNCE_MS);
+  }
+
+  /**
+   * Scans all Dart files currently open in the editor on activation.
+   * Without this, the extension shows zero diagnostics until the user
+   * saves or opens a new file — making it look dead on startup.
+   */
+  private _scanOpenEditors(): void {
+    if (!this._isEnabled()) return;
+    const root = this._getProjectRoot();
+    if (!root) return;
+    let queued = 0;
+    for (const doc of vscode.workspace.textDocuments) {
+      if (doc.languageId !== 'dart') continue;
+      const relative = path.relative(root, doc.uri.fsPath);
+      if (relative.startsWith('..') || path.isAbsolute(relative)) continue;
+      this._pendingFiles.add(doc.uri.fsPath);
+      queued++;
+    }
+    if (queued > 0) {
+      this._log(`activation: queued ${queued} open Dart file(s) for initial scan`);
+      // Longer debounce for the initial batch — VS Code fires
+      // onDidOpenTextDocument for each already-open file during activation,
+      // so the debounce timer will keep resetting. This explicit queue
+      // ensures a single coalesced scan after all open files are collected.
+      if (this._debounceTimer) clearTimeout(this._debounceTimer);
+      this._debounceTimer = setTimeout(() => this._runQueuedScan(root), DEBOUNCE_MS);
+    }
   }
 
   private _onSave(doc: vscode.TextDocument): void {
