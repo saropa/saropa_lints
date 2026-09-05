@@ -116,6 +116,17 @@ bool _workspaceScanEnabled = true;
 /// saropaLints.lspServer.scanDirectories in VS Code settings.
 List<String> _scanDirectories = const ['lib', 'bin', 'test'];
 
+/// Seconds to wait after the analyzer is ready before starting the workspace
+/// scan. Lets VS Code finish its startup didOpen/didClose burst first so
+/// the scan doesn't compete with initial file analysis. Read from
+/// initializationOptions.workspaceScanDelay (default: 5). Clamped to 0–60.
+int _workspaceScanDelaySecs = 5;
+
+/// Timer for the deferred workspace scan. Stored so the shutdown handler
+/// can cancel it — without this, a delayed scan would fire against a
+/// stale or null _collection after a server restart.
+Timer? _workspaceScanTimer;
+
 /// Last-known modification time per file path, populated after each
 /// workspace scan. Used for incremental re-scans: if a file's mtime
 /// hasn't changed since the last scan, it's skipped. This lives in memory
@@ -341,7 +352,9 @@ Future<void> _handleMessage(Map<String, dynamic> message) async {
       // Clear diagnostics so stale squiggles don't linger, remove from
       // the open-cache so the next didOpen re-analyzes, and drop the
       // diagnostic cache so stale fixes aren't offered.
-      _log('didClose: ${_uri(params)}');
+      // Trace-level: VS Code sends a flood of didClose on startup for files
+      // from the previous session — _log would spam the output channel.
+      _logTrace('didClose: ${_uri(params)}');
       _analyzedOnOpen.remove(_uri(params));
       _fileDiagnostics.remove(_uri(params));
       _clearDiagnostics(_uri(params));
@@ -355,9 +368,11 @@ Future<void> _handleMessage(Map<String, dynamic> message) async {
       _traceEnabled = traceValue == 'verbose';
       _log('setTrace: $traceValue (trace logging ${_traceEnabled ? 'on' : 'off'})');
     case 'workspace/didChangeConfiguration':
-      // Cancel any running workspace scan — its results are about to be
-      // invalidated by the config change anyway.
+      // Cancel any running or deferred workspace scan — its results are
+      // about to be invalidated by the config change anyway.
       _workspaceScanCanceled = true;
+      _workspaceScanTimer?.cancel();
+      _workspaceScanTimer = null;
       _log('didChangeConfiguration — reloading tier + re-analyzing open files');
       unawaited(_reloadConfigAndReanalyze());
     case '_internal/analyzeFromDidOpen':
@@ -374,9 +389,11 @@ Future<void> _handleMessage(Map<String, dynamic> message) async {
       final codeActions = await _handleCodeAction(params);
       _sendResponse(id, codeActions);
     case 'shutdown':
-      // Graceful shutdown — cancel any running workspace scan, respond,
-      // then wait for `exit`.
+      // Graceful shutdown — cancel any running or deferred workspace scan,
+      // respond, then wait for `exit`.
       _workspaceScanCanceled = true;
+      _workspaceScanTimer?.cancel();
+      _workspaceScanTimer = null;
       _log('shutdown requested');
       _sendResponse(id, null);
     case 'exit':
@@ -480,8 +497,17 @@ void _parseInitializationOptions(Map<String, dynamic> params) {
       }
     }
 
+    // Startup delay before the workspace scan begins, in seconds.
+    // Clamped to 0–60 to prevent unreasonable values from user settings.
+    if (raw['workspaceScanDelay'] case final int delay) {
+      _workspaceScanDelaySecs = delay.clamp(0, 60);
+    } else if (raw['workspaceScanDelay'] case final double delay) {
+      // JSON numbers can deserialize as double — accept and truncate.
+      _workspaceScanDelaySecs = delay.toInt().clamp(0, 60);
+    }
+
     _log('initializationOptions: workspaceScan=$_workspaceScanEnabled, '
-        'dirs=$_scanDirectories');
+        'delay=${_workspaceScanDelaySecs}s, dirs=$_scanDirectories');
   } on Object catch (e) {
     // Parse failure must never break the handshake — fall back to defaults.
     _log('warning: failed to parse initializationOptions ($e), '
@@ -550,7 +576,24 @@ Future<void> _buildCollection() async {
     // Gated on the user-configurable workspaceScan setting — large projects
     // can disable this to avoid a slow startup.
     if (_workspaceScanEnabled) {
-      unawaited(_analyzeWorkspace(root));
+      // Defer the workspace scan so VS Code's startup didOpen/didClose burst
+      // settles first — the scan would otherwise compete with initial file
+      // analysis and flood the output channel.
+      if (_workspaceScanDelaySecs > 0) {
+        _log('workspace scan deferred ${_workspaceScanDelaySecs}s');
+        // Store the timer so shutdown can cancel it — a fire-and-forget
+        // Future.delayed would run _analyzeWorkspace against a null
+        // _collection if the server restarts during the delay.
+        _workspaceScanTimer = Timer(
+          Duration(seconds: _workspaceScanDelaySecs),
+          () {
+            _workspaceScanTimer = null;
+            unawaited(_analyzeWorkspace(root));
+          },
+        );
+      } else {
+        unawaited(_analyzeWorkspace(root));
+      }
     } else {
       _log('workspace scan disabled by user setting');
     }

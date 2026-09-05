@@ -2151,6 +2151,13 @@
             "default": true,
             "description": "%config.property.lspServer.workspaceScan.description%"
           },
+          "saropaLints.lspServer.workspaceScanDelay": {
+            "type": "integer",
+            "default": 5,
+            "minimum": 0,
+            "maximum": 60,
+            "description": "%config.property.lspServer.workspaceScanDelay.description%"
+          },
           "saropaLints.lspServer.scanDirectories": {
             "type": "array",
             "items": {

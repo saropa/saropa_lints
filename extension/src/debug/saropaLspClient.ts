@@ -146,6 +146,7 @@ export class SaropaLspClient implements vscode.Disposable {
       outputChannelName: OUTPUT_CHANNEL_NAME,
       initializationOptions: {
         workspaceScan: lspConfig.get<boolean>('workspaceScan', true),
+        workspaceScanDelay: lspConfig.get<number>('workspaceScanDelay', 5),
         scanDirectories: lspConfig.get<string[]>('scanDirectories', ['lib', 'bin', 'test']),
       },
       middleware: {
