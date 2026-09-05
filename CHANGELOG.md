@@ -52,7 +52,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
    **Maintenance `<details>` bullets** — Same bans apply (no test counts, no file inventories). The what→why→must-do template is optional for infra-only entries.
 
-   **Maintenance section** — Changes with no end-user impact (publish/CI tooling, internal refactors, test harness, plan housekeeping, developer scripts) belong in a collapsed `<details><summary>Maintenance</summary>...</details>` block at the bottom of the version section, never in `### Added` / `### Changed` / `### Fixed`. Test: if a pub.dev or Marketplace user would notice, it is top-level; otherwise Maintenance.
+   **Maintenance section** — Changes with no end-user impact (publish/CI tooling, internal refactors, test harness, plan housekeeping, developer scripts) belong in a collapsed `### Internal...</details>` block at the bottom of the version section, never in `### Added` / `### Changed` / `### Fixed`. Test: if a pub.dev or Marketplace user would notice, it is top-level; otherwise Maintenance.
 
    **Unreleased convention** — The top changelog section MUST use the heading `## [X.Y.Z] — Unreleased` (with ` — Unreleased` suffix) while work is in progress. All new entries go into this ONE section — never create a second unreleased section or bump the version number. The publish script strips ` — Unreleased` (and typo variants like ` - Unreleased`) at publish time via `_strip_unreleased_suffix()`. The version numbers in `pubspec.yaml` and `package.json` stay at the LAST PUBLISHED version until the publish script updates them. After publishing, manually add a new `## [X.Y.Z] — Unreleased` section for the next cycle.
 
@@ -116,7 +116,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Fixed `avoid_string_substring` over-suppression: `indexOf` results are recognized as safe index sources alongside `RegExpMatch.start`/`.end`/`.group()`; a regex `hasMatch()` guard on the receiver is now accepted in `if`-condition and ternary branches. No action required.
 - Fixed `avoid_case_sensitive_path_comparison` over-suppression: the root-detection idiom check now verifies both sides of a `||` share the same base expression. No action required.
 
-<details><summary>Maintenance</summary>
+### Internal
 
 - Archived 36 tier-1 quick-win proposals already covered by existing rules — 19 implemented under the same name, 8 under a different name or alias, and 9 identified as functional duplicates of rules shipped in prior versions. Updated 15 migration guides to reflect the closures (TODO → HAVE with correct saropa rule name). No action required.
 - Added fixture coverage for `require_ios_deployment_target_consistency`'s collection-literal guard — GOOD cases with a rule-name string inside a `Set` and as a `Map` value, confirming `isDataLiteralElement()` (shipped in beta.3) already prevents the false positive reported in a duplicate bug report. No action required.
@@ -143,12 +143,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Split the shared dashboard chrome stylesheet into single-concern exports, with the existing public functions preserved as compositions so every consumer renders identically. The previous bundling made the layer un-adoptable piecemeal: taking the hero animation also took an unrelated monospace rule, and taking the full-width toggle dragged a whole body reset with it. A unit test now pins each composition.
 - Removed a duplicate `.sr-only` accessibility rule from the token layer after confirming every consumer already pairs it with the accessibility helper; the test suite now pins that rule as defined exactly once.
 - Adopted the shared hero animation and reduced-motion rules in the Package Dashboard stylesheet. The summary cards, table toolbar, and footprint toggle stay local by decision, not omission — each differs from its chrome counterpart in layout semantics, domain color vocabulary, or ARIA interaction model, and the reasons are documented in the code. See `plans/PLAN_ext_ui_report_styles.md` for the full disposition.
-- Fixed 2 stale curated dictionary keys in `dictionaries.py`: removed the `de` entry whose English source text was rewritten (daemon label, LSP/plugin separation), and capitalized the `fil` "Analyzer Plugin" key to match the current source strings.
+- Fixed 2 stale curated dictionary keys in `dictionaries.py`: removed the `de` entry whose English source text was rewritten (daemon label, LSP/plugin separation), and capitalized the `fil` "Analyzer Plugin" key to match the current source strings. Patched 48 missing translations across 21 locales — 4 format/loanword strings added to `DO_NOT_TRANSLATE`, 15 locale-specific entries hand-translated.
 - Added "Make member public (remove underscore)" quick fix for `no_internal_method_docs` — strips the leading `_` from the declaration name as an alternative to the existing "Convert to a regular comment" fix.
 - Added fixture files for `no_internal_method_docs`, `prefer_state_class_below_widget`, and `prefer_sorted_equatable_props`. Extended `avoid_public_late_final_without_initializer` fixture with static and multi-variable edge cases.
 - Added `DeprecatedNewInCommentReferenceRule` instantiation test to the documentation rules test suite.
 
-</details>
 
 ---
 
@@ -184,7 +183,7 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 - Fixed LSP server crash on startup in large projects — the Dart VM exhausted its OS thread pool when the workspace scan called `lastModifiedSync` / `listSync` on hundreds of files. Replaced sync I/O with batched async equivalents (capped at 20 concurrent file operations) and added error handlers so failures exit cleanly instead of triggering an infinite restart loop. No action required.
 - LSP workspace scan is now progressive and cancelable — diagnostics publish incrementally as each file is analyzed, and the scan aborts cleanly on shutdown or config reload instead of racing to completion. Progress is logged every 50 files. No action required.
 
-<details><summary>Maintenance</summary>
+### Internal
 
 - Fixed 15 pre-existing extension test failures: added missing `onDidChangeConfiguration` mock (13 issuesTree tests), updated stale locale coverage assertions (languagePick), and updated sidebar panel count from 5 to 4 after Help view removal (uxLabels). No action required.
 - Updated stale path reference in the UI redesign plan after archiving completed sub-plans. No action required.
@@ -198,7 +197,6 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 - README rewritten for readability — cut from 1,598 lines to ~430. Extension detail moved to `doc/guides/extension.md`, configuration reference to `doc/guides/configuration.md`, troubleshooting merged into `doc/troubleshooting.md`, FAQ to `doc/faq.md`. Added alternative package coverage table (46 packages audited, ~75% rule coverage). Deleted redundant `plans/GAP_ANALYSIS.md` — per-package data lives in migration guides.
 - Suppressed own-dogfood false positives in `analyzer_compat.dart` (dynamic dispatch, bare catches, swallowed exceptions are intentional version-probing shims) and `scan_runner.dart` (safe-by-construction cast). Fixed nullable interpolation in `DiagnosticCodeLowerCaseCompat.lowerCaseName`.
 
-</details>
 
 ---
 
@@ -221,14 +219,13 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
 - Fixed the status bar cramming memory/system-health warnings into the same text as the lint score, with no way to click through to the details — split into a second status bar item that only appears when there's something to report and opens the Process Health panel on click. No action required.
 - Fixed the status bar's hover tooltip being read-only text with no way to act on it — it's now a clickable menu (toggle analysis on/off, jump to the Violations Report, Package Dashboard, Process Health, Command Catalog, or About). No action required.
 
-<details><summary>Maintenance</summary>
+### Internal
 
 - Fixed publish script writing raw pub.dev version to `package.json` instead of the converted extension version — caused preflight version check to fail on every pre-release publish.
 - Hardened publish version verification: `_is_head_pushed()` now handles detached HEAD and unreachable remote, `_verify_versions_in_commit` docstring documents that it runs after HEAD is pushed (step 13 after step 12), and `extension_version_for()` idempotency contract is explicit.
 - Added `--dry-run` mode to `set_extension_version()` — returns the converted extension version without touching the file, useful for preflight checks that need the expected version without side effects.
 - Extracted the status bar tooltip's action-menu rows (`buildStatusBarMenuItems`) and its command allow-list (`STATUS_BAR_TRUSTED_COMMANDS`) into `statusBarLabel.ts`, with a unit test asserting every row's command id is covered by the allow-list — a renamed or added command that falls out of sync would previously break the tooltip link with no test failure.
 
-</details>
 
 ## [16.0.0-beta.1]
 
@@ -304,7 +301,6 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
 - Extended `scripts/fix_ignores.py`'s rename map with the 3 rules renamed 2026-09-04 (`avoid_dynamic_calls`, `avoid_equals_and_hash_code_on_mutable_classes`, `avoid_implementing_value_types`, all now `_extended`), and fixed the corresponding stale "N/A (stock analyzer rule)" rows in `doc/guides/migration_guides/migration_from_vga.md` to `ENHANCED`.
 - `scripts/publish.py` now routes a prerelease version (e.g. `16.0.0-beta.1`, the version this release ships as) to each store's prerelease channel automatically — `vsce package`/`publish`, `ovsx publish`, and `gh release create` all get their prerelease flag derived from the version string, no separate flag or prompt needed. `extension/package.json`'s `version` field, which the Marketplace requires to be a plain `MAJOR.MINOR.PATCH` (no hyphen, even with `--pre-release`), is instead derived via `extension_version_for()`: the stripped core PATCH offset by a channel- and iteration-specific band, so successive beta/rc builds of the same base version get distinct extension versions instead of colliding at the Marketplace/Open VSX level. The `.vsix` filename and store-verification poll stay consistent with whichever version was actually published.
 
-</details>
 
 ---
 
@@ -331,7 +327,6 @@ Hardens the LSP server against normal editor traffic and adds a `doctor` command
 - `doctor` command now scopes key detection to the `saropa_lints:` plugin block — no longer false-positives on identically named top-level keys.
 - Publish script supports `--log-file`, `--log-append`, `--mode`, `--auto-retry`, and `--output-level` flags for non-interactive/CI execution. Auto-detects non-TTY stdin. Mode definitions are unified in a single table driving both CLI and interactive menu.
 
-</details>
 
 ---
 
@@ -352,7 +347,6 @@ Removed Phase 0 fake LSP test diagnostics that shipped in 15.2.10. The standalon
 
 - Regenerated category map and migration pack codes for 18 new rules added in 15.2.10 that were missing from the generated indexes.
 
-</details>
 
 ---
 
@@ -404,7 +398,6 @@ Seventeen new lint rules across testing, equality, control flow, constructor sty
 - Publish audit now checks `CORE_DART_LINT_NAMES` freshness against the live Dart SDK linter — warns (non-blocking) if the reference set is stale.
 - New `test/integrity/core_lint_collision_test.dart` catches rule name collisions with core Dart lints during `dart test`, not only at publish time.
 
-</details>
 
 ---
 
@@ -477,7 +470,6 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Hardened migration pack generator further: `extractBlock`/`extractPackCodes` now use balanced brace counting instead of fragile `\n};`/`\n  },` string markers; `activeQuotedIdentifiers` strips `/* */` block comments in addition to `//` lines; `.dart_tool/` temp directory is created before use; diff output shows per-pack `+ added`/`- removed` codes in both normal and `--check` modes.
 - l10n diagnostic provider: excluded `l10nParsers.test.ts` from validation (false positives from dummy keys in test fixtures), added extra-params detection (Hint when code passes params the template doesn't use), added `// l10n-ignore-next-line` comment directive for per-call suppression, and added dead-key detection with single and bulk quick-fixes to remove unreferenced en.json keys from all 25 locale files at once.
 
-</details>
 
 ---
 
@@ -495,45 +487,6 @@ Rule shedding under memory pressure is now cost-aware — expensive rules that d
 
 - Cost-aware rule shedding: memory pressure now sheds type-resolving and high-cost rules first (level 1), then INFO-severity (level 2), then WARNING-severity (level 3). No action required.
 - Status bar tooltip shows shed rule breakdown by category (type-resolving, high-cost, INFO, WARNING) when shedding is active. No action required.
-
----
-
-## [15.2.7]
-
-Adds graduated rule shedding under memory pressure — the analyzer plugin now progressively disables low-severity rules when RSS approaches its cap, keeping essential rules running. The VS Code extension surfaces shedding state in the status bar and tooltip. Also includes publish script hardening. [log](https://github.com/saropa/saropa_lints/blob/v15.2.7/CHANGELOG.md)
-
-### Added
-
-- Graduated memory-pressure rule shedding (opt-in via `shed_rules: true` in `analysis_options_custom.yaml`): shed level 1 disables INFO-severity rules, level 2 adds WARNING-severity rules, essential-tier rules are always protected. Without opt-in, soft-limit warnings still log but no rules are shed.
-- Memory pressure indicator in the VS Code status bar and tooltip, fed by `memory_state.json` written on shed-level transitions — no polling.
-- VS Code warning notification when the analyzer hits memory pressure but rule shedding is not enabled — "Enable" writes `shed_rules: true` directly into `analysis_options_custom.yaml`, "Learn More" opens the docs. Shows once per workspace root per session, with a persistent status-bar indicator so pressure stays visible after dismissing the toast.
-- `memory_mode: aggressive` option in `analysis_options_custom.yaml` — applies balanced-mode unchanged-file skipping to the scan daemon and CLI too, reducing daemon RSS on incremental scans at the cost of potentially missing violations in unchanged files whose dependencies changed.
-
-<details>
-<summary>Maintenance</summary>
-
-- **Publish script: preflight version verification** — a visible "PREFLIGHT: VERSION VERIFICATION" step now runs early in the publish pipeline (before badge validation, CI gate, and extension packaging), checking that `pubspec.yaml` and `extension/package.json` carry the correct version. Two additional safety-net gates run later (after staging and before tagging) as a last resort. No action required.
-- Severity registration at plugin startup maps each rule to a 0-based shed index for the graduated shedding mechanism.
-- `memory_state.json` state file written alongside `plugin.log` on shed-level transitions for extension consumption.
-- Periodic memory log line now includes soft limit and shed level.
-- `PluginLogger.logFilePath` public getter for the memory-state writer.
-- `getStats()` now includes `softLimitMb`, `softLimitTripped`, `shedLevel`, and `shedRuleCount`.
-- Fixed negative recovery thresholds when the hard RSS limit is below ~366 MB — soft-limit recovery and de-escalation checks now clamp to zero instead of going negative, which would lock shedding on permanently.
-- Shed level updates skip the full rule-set rebuild when the level hasn't actually changed.
-- Shedding opt-in moved from the env-var-only `SAROPA_LINTS_SHED_RULES=true` to a `shed_rules: true` key in `analysis_options_custom.yaml` (the env var still works, but is no longer the only way in — `dart run saropa_lints:init` now writes a commented `shed_rules` line so the setting is discoverable). `_refreshSoftLimit` split into `_tripSoftLimit`/`_recoverSoftLimit`/`_refreshEscalation` helpers. Status-bar and tooltip memory-pressure text now share one priority-order function (`memoryPressureTooltipLine`) instead of two independently maintained decision trees.
-- **`usesTypeResolution` audit complete** — 180 false claims flipped to `false` across 9 rule files, freeing those rules from unnecessary scan-daemon routing. Integrity test unskipped and now guards both directions (missing flag + false claim). Test regex extended with `formalParameters` to catch modern element-model resolution APIs.
-- **Full Audit i18n** — added all 50 missing `audit.*` keys to `en.json` (scope picker, progress, errors, and report webview) plus 3 missing `findingsDash.script.*` accessibility keys, and localized the inline progress-bar message. No action required.
-- **`check_l10n_keys.py`** — new CI script cross-references every `l10n()` call in `extension/src/` against `en.json`, with `--check-params` to validate interpolation tokens match between call sites and catalog values. Handles template-literal `${}` interpolations, spread properties, and dynamic-key prefixes. No action required.
-- **Live l10n diagnostics** — new `saropa-l10n` diagnostic provider shows inline warnings for missing `en.json` keys and param mismatches on save. Re-validates when `en.json` changes. No action required.
-- **`check_l10n_keys.py` param checker hardened** — fixed false positives: consecutive shorthand properties (`{ a, b }`) were missed due to trailing-delimiter consumption; template-literal interpolations (`${suffix}`) were misidentified as extra params; plural keys (`*One`/`*Other`) with `{count}` are now skipped since `pluralize()` handles substitution. No action required.
-- **`usesTypeResolution` false flips fixed** — 8 rules across 4 files (`stylistic_rules.dart`, `ui_ux_rules.dart`, `widget_lifecycle_rules.dart`, `widget_patterns_ux_rules.dart`) were incorrectly set to `usesTypeResolution: false` despite using `NamedType.element` for superclass resolution; integrity test regex now catches `.superclass.element`. No action required.
-- **Reports-dir single source of truth** — extracted `REPORTS_DIR` and `SAROPA_LINTS_DATA_DIR` constants plus path-builder helpers into `reportsPaths.ts`, replacing 27 hardcoded `'reports'`/`'.saropa_lints'` string literals across 18 production files. No action required.
-- **Config loader deduplication** — extracted `_resolveEnvThenYaml` shared helper in `config_loader.dart`, replacing duplicated env-var-then-yaml lookup logic in `_loadShedRulesConfig` and `_loadMemoryMode`. No action required.
-- **Scan-loop RSS guard** — the scan CLI now samples RSS between files and stops early (returning partial results) when memory exceeds the configured hard limit, preventing OOM on very large codebases. No action required.
-- **CodeQL security fixes (13 alerts)** — added `permissions: contents: read` to 2 workflow YAMLs; fixed incomplete Markdown escaping in issue-tree tooltips; replaced substring URL check with parsed-hostname `isGitHubUrl()`; hardened pub.dev changelog HTML-to-markdown against tag-stripping bypasses and double-unescaping. No action required.
-- **Shared `markdownUtils.ts`** — extracted `escapeMarkdown()` and added `buildMarkdownString()` structured builder for safe MarkdownString construction with mixed trusted/untrusted segments. Applied defense-in-depth escaping to hover-provider for external metadata (package names, vulnerability advisories, issue titles, file paths). No action required.
-
-</details>
 
 ---
 

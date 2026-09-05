@@ -24,7 +24,7 @@ if sys.stdout.encoding != "utf-8":
 if sys.stderr.encoding != "utf-8":
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 
-from dictionaries import TRANSLATIONS
+from dictionaries import DO_NOT_TRANSLATE, TRANSLATIONS
 from json_io import read_json, write_json
 from mt_fallback import (
     active_engine_name,
@@ -180,6 +180,41 @@ def _check_dictionary_drift(english_strings: set[str]) -> list[str]:
         )
         print()
     return orphans
+
+
+def _check_dnt_collisions(english_strings: set[str]) -> list[str]:
+    """Warn when a DO_NOT_TRANSLATE entry appears as a substring of a longer source string.
+
+    A DO_NOT_TRANSLATE entry forces every locale to keep the English verbatim.
+    If the same word appears embedded in a longer translatable string, the
+    passthrough is fine (it only matches exact strings), but it signals that the
+    word may need real translation in those longer phrases — worth reviewing.
+    """
+    # Build the set of longer source strings that contain a DNT keyword.
+    collisions: list[str] = []
+    for keyword in DO_NOT_TRANSLATE:
+        for source in english_strings:
+            # Skip exact matches — that's the intended passthrough.
+            if source == keyword:
+                continue
+            if keyword in source:
+                collisions.append(
+                    f"  DO_NOT_TRANSLATE {keyword!r} appears inside: "
+                    f"{source[:80]!r}{'…' if len(source) > 80 else ''}"
+                )
+    if collisions:
+        print(
+            c("yellow", f"  ⚠ {len(collisions)} DO_NOT_TRANSLATE collision(s) — "
+                        "a passthrough keyword appears inside a longer source string:"),
+        )
+        for line in collisions:
+            print(c("yellow", line))
+        print(
+            c("gray", "    Review: the longer string still gets translated normally, "
+                      "but the keyword inside it may need a real translation in some locales."),
+        )
+        print()
+    return collisions
 
 
 def parse_args() -> argparse.Namespace:
@@ -928,6 +963,11 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+
+    # Warn if a DO_NOT_TRANSLATE keyword appears embedded in a longer source
+    # string — the passthrough is exact-match only, but the collision suggests
+    # the keyword may need real translation inside those longer phrases.
+    _check_dnt_collisions(unique_en)
 
     # Interactive launches preview the current gap/low-quality state with a
     # read-only audit BEFORE the menu, so the mode choice is informed by what is

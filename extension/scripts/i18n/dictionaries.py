@@ -10,10 +10,14 @@ from typing import Dict
 # Only add strings whose English source value is a technical identifier, column
 # header keyword, or code-level token — never ordinary user-facing prose.
 DO_NOT_TRANSLATE: list[str] = [
+    "Migration",
+    "Mobile",
+    "Web",
     "runtime_tier",
     "rule_name",
     "saropa_quality_gate.yaml thresholds",
     "saropa_tier",
+    "{grade} · {score}/100",
 ]
 
 # cspell:disable
@@ -464,6 +468,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{total} میں سے {visible} قطاریں نظر آ رہی ہیں",
         "{wk}w ago": "{wk} ہفتے قبل",
         "▾": "▾",
+        # Manual: scan-on-save setting description — preserves **bold**, `backtick`, and brand names.
+        "**Scan on save (saropa_lints daemon).** When **on** (default), rescans Dart files on save and shows findings as squiggles and Problems panel entries. Turn **off** to stop only this scan-on-save path—not the whole extension: the LSP server (`saropaLints.lspServer.enabled`) and the in-editor analyzer plugin are separate switches shown on the sidebar’s Engines row (open **Saropa Lints: Show Process Health** for details). Use **Saropa Lints: Set Up Project** when you need to add `saropa_lints` to pubspec and write `analysis_options`.": "**محفوظ کرنے پر اسکین (saropa_lints ڈیمون)۔** جب **آن** (ڈیفالٹ) ہو، تو محفوظ کرنے پر Dart فائلوں کو دوبارہ اسکین کرتا ہے اور نتائج کو لہروں اور Problems پینل کے اندراجات کے طور پر دکھاتا ہے۔ صرف اس اسکین-آن-سیو راستے کو روکنے کے لیے **آف** کریں — پوری ایکسٹینشن نہیں: LSP سرور (`saropaLints.lspServer.enabled`) اور ایڈیٹر کا analyzer پلگ ان الگ سوئچز ہیں جو سائیڈبار کی Engines قطار میں دکھائے جاتے ہیں (تفصیلات کے لیے **Saropa Lints: Show Process Health** کھولیں)۔ جب آپ کو `saropa_lints` کو pubspec میں شامل کرنا ہو اور `analysis_options` لکھنا ہو تو **Saropa Lints: Set Up Project** استعمال کریں۔",
     },
     "de": {
         # Removed: old "enabled" description curated here for bold/backtick fidelity.
@@ -567,6 +573,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Status:": "Status:",
         # Curated passthrough: MT-failure keyword that stays in English for this locale.
         "Budget": "Budget",
+        # Manual: quality-gate status label — "bestanden" = passed/passing.
+        "Gate passing": "Gate bestanden",
+        # Manual: MT did not translate this log-panel placeholder for German.
+        "No output yet — this log only fills if the scan prints a diagnostic message.": "Noch keine Ausgabe — dieses Protokoll wird nur gefüllt, wenn der Scan eine Diagnosemeldung ausgibt.",
     },
     "es": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -703,6 +713,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} function": "{count} funzione",
         # Curated passthrough: "Debug" is the standard Italian tech term; no translation needed.
         "Debug": "Debug",
+        # Manual: quality-gate status with grade/score prefix — "Gate non superato" = gate not passed.
+        "{grade} · {score}/100 · Gate failing": "{grade} · {score}/100 · Gate non superato",
     },
     "pt": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -770,6 +782,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
         # Curated passthrough: "Status:" is spelled identically in Portuguese; no translation needed.
         "Status:": "Status:",
+        # Manual: quality-gate status with grade/score prefix — "Gate reprovado" = gate failed.
+        "{grade} · {score}/100 · Gate failing": "{grade} · {score}/100 · Gate reprovado",
+        # Manual: quality-gate passing status bar tooltip.
+        "Code Health quality gate passing — click to open Code Health": "Gate de qualidade do Code Health aprovado — clique para abrir o Code Health",
+        # Manual: scan timestamp — {ago} is a relative-time placeholder like "5m ago".
+        "Scanned {ago}": "Escaneado {ago}",
     },
     "ru": {
         # Manual: brand "Saropa Lints" stays untranslated; {error} placeholder preserved.
@@ -827,6 +845,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "отображается {visible} из {total} строк",
         "{wk}w ago": "{wk} нед. назад",
         "▾": "▾",
+        # Manual: quality-gate failing status bar tooltip — "не пройден" = not passed.
+        # Note: "нарушений" (genitive plural) matches the existing {count} convention
+        # in this locale; proper Russian pluralization (1/2-4/5+) is a known limitation.
+        "Code Health quality gate failing ({count} violation(s)) — click to open Code Health": "Контроль качества Code Health не пройден ({count} нарушений) — нажмите, чтобы открыть Code Health",
     },
     "ja": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1438,6 +1460,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Saropa Project Map": "Saropa Project Map",
         "Tier cap": "Tier cap",
         "Tier: {tier} · Lane: {lane}": "Tier: {tier} · Lane: {lane}",
+        # Manual: quality-gate status with grade/score prefix — "Hindi pumasa ang gate" = gate not passed.
+        "{grade} · {score}/100 · Gate failing": "{grade} · {score}/100 · Hindi pumasa ang gate",
     },
     "he": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1622,6 +1646,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "widocznych {visible} z {total} wierszy",
         "{wk}w ago": "{wk} tyg. temu",
         "▾": "▾",
+        # Manual: quality-gate status with grade/score prefix — matches the "Brama nie działa" pattern in pl.json.
+        "{grade} · {score}/100 · Gate failing": "{grade} · {score}/100 · Brama nie działa",
         # Curated passthrough: "Status:" is spelled identically in Polish; no translation needed.
         "Status:": "Status:",
     },
@@ -1711,6 +1737,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "idle": "tulivu",
         # Manual: MT output was repetition-loop garbage ("active active kazi ya kufanya.").
         "active": "hai",
+        # Manual: quality-gate status label — "haijapita" = has not passed.
+        "Gate failing": "Gate haijapita",
+        # Manual: hotspot review progress — "zimepitiwa" = have been reviewed.
+        "Hotspots · {percent}% reviewed": "Hotspots · {percent}% zimepitiwa",
+        # Manual: scan timestamp — {ago} is a relative-time placeholder.
+        "Scanned {ago}": "Imechanganuliwa {ago}",
     },
     "th": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1820,6 +1852,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{total} satırdan {visible} satır görünür",
         "{wk}w ago": "{wk} hft önce",
         "▾": "▾",
+        # Manual: scan timestamp — {ago} is a relative-time placeholder.
+        "Scanned {ago}": "{ago} önce tarandı",
     },
     "uk": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1880,6 +1914,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "відображається {visible} з {total} рядків",
         "{wk}w ago": "{wk} тиж. тому",
         "▾": "▾",
+        # Manual: sidebar prompt to run the Code Health scan.
+        "Run Code Health to see your score": "Запустіть Code Health, щоб побачити свій бал",
     },
     "vi": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
