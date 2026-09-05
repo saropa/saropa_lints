@@ -67,6 +67,9 @@ class AvoidIos13DeprecationsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
+      // Collection-literal elements are data tables, not API calls.
+      if (isDataLiteralElement(node)) return;
+
       final String value = node.value;
 
       for (final String api in _deprecatedApis) {
@@ -181,6 +184,10 @@ class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
         return;
       }
 
+      // Collection-literal elements are data tables (path inventories,
+      // test fixtures) — not runtime Simulator code.
+      if (isDataLiteralElement(node)) return;
+
       for (final String pattern in _simulatorPatterns) {
         if (value.contains(pattern)) {
           reporter.atNode(node);
@@ -289,6 +296,9 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
+      // Collection-literal elements are data tables, not API calls.
+      if (isDataLiteralElement(node)) return;
+
       final String value = node.value;
 
       for (final String api in _versionSpecificApis) {
@@ -401,6 +411,9 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
+      // Collection-literal elements are data tables, not API calls.
+      if (isDataLiteralElement(node)) return;
+
       final String value = node.value;
 
       for (final String pattern in _deprecatedPatterns) {
@@ -878,24 +891,12 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
         return;
       }
 
-      if (_deviceModelPattern.hasMatch(value) && !_isDataLiteralElement(node)) {
+      // Collection-literal elements are data tables, not runtime branches —
+      // skip to avoid FPs on rule-name registries, corpus lists, etc.
+      if (_deviceModelPattern.hasMatch(value) && !isDataLiteralElement(node)) {
         reporter.atNode(node);
       }
     });
-  }
-
-  // A device-model string that is an ELEMENT of a collection literal is DATA, not
-  // a runtime device-capability branch: e.g. a signature noise-filter corpus
-  // `['sent from my iphone', 'sent from my ipad']` is a list of taglines to
-  // strip, never broken by new device releases. Exempting only collection-literal
-  // elements keeps the genuine anti-patterns flagged — an `== 'iPhone 14'`
-  // comparison and a `deviceModel.contains('iPod touch')` device check both sit
-  // outside any collection literal and still fire.
-  static bool _isDataLiteralElement(SimpleStringLiteral node) {
-    final AstNode? parent = node.parent;
-    return parent is ListLiteral ||
-        parent is SetOrMapLiteral ||
-        parent is MapLiteralEntry;
   }
 }
 
@@ -1793,11 +1794,14 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // 'async' was removed — the substring match fires on any Dart string
+  // containing 'async' (rule names, identifiers, docs), producing pervasive
+  // false positives.  Swift concurrency detection needs a context-aware check,
+  // not a naive .contains().
   static const Map<String, String> _ios15PlusApis = {
     'SharePlay': 'iOS 15+',
     'GroupActivities': 'iOS 15+',
     'AttributedString': 'iOS 15+',
-    'async': 'iOS 15+ (Swift concurrency)',
   };
 
   @override
@@ -1821,6 +1825,10 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
       // Swift `async` keyword. See plans/history/2026.08/2026.08.15/
       // require_ios_deployment_target_consistency_false_positive_import_uri_misattribution.md.
       if (isInImportOrExport(node)) return;
+
+      // Collection-literal elements are data tables (rule-name sets,
+      // migration-code maps) — not Swift API references.
+      if (isDataLiteralElement(node)) return;
 
       final String value = node.value;
       for (final String api in _ios15PlusApis.keys) {

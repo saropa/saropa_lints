@@ -144,6 +144,25 @@ bool expressionContainsRawStringLiteral(Expression expr) {
   return false;
 }
 
+/// True when [node] is a direct element of a collection literal (list, set,
+/// or map entry value).
+///
+/// A string that is an ELEMENT of a collection literal is DATA — a lookup
+/// table, a corpus, a set of known identifiers — not a runtime branch or API
+/// call.  Rules that substring-match string literals against keyword lists
+/// should skip data-literal elements to avoid false positives on config tables,
+/// rule-name registries, route catalogs, etc.
+///
+/// Only the immediate parent is tested: nested expressions (e.g. a string
+/// inside a function call inside a list) are NOT exempted because they may
+/// still represent runtime behavior.
+bool isDataLiteralElement(AstNode node) {
+  final AstNode? parent = node.parent;
+  return parent is ListLiteral ||
+      parent is SetOrMapLiteral ||
+      parent is MapLiteralEntry;
+}
+
 /// Checks if a string literal is a test description.
 ///
 /// Test descriptions are the first argument to test framework methods like:

@@ -1150,11 +1150,13 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
     }
 
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
-      // A package import path (e.g. 'package:app/auth/auth_repo.dart')
-      // can contain a folder segment matching one of the sensitive path
-      // patterns below; only endpoint-like strings in ordinary code should
-      // be flagged, not directive URIs.
+      // Import/export URIs contain folder segments like '/auth/' that
+      // substring-match the sensitive patterns — skip directive URIs.
       if (isInImportOrExport(node)) return;
+
+      // Collection-literal elements are data tables (route registries,
+      // path catalogs) — not runtime API calls.
+      if (isDataLiteralElement(node)) return;
 
       final String value = node.value.toLowerCase();
       for (final String pattern in _sensitivePatterns) {
