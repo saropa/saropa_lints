@@ -25,6 +25,13 @@ export interface EngineStatus {
   rssBytes?: number;
   /** Explanatory note when RSS cannot be measured (e.g. in-process engines). */
   rssNote?: string;
+  /**
+   * WP4 (`plans/PLAN_ext_ui_dart_deferred.md`): live workspace-scan progress
+   * for the LSP server, read from its `saropa/scanProgress` custom
+   * notification (see `SaropaLspClient.lastScanProgress`). Undefined for
+   * engines that don't run a workspace scan, or once none has started yet.
+   */
+  scanProgress?: { filesScanned: number; totalFiles: number };
 }
 
 /** Callback signatures the host supplies so the panel can read engine state. */
@@ -62,11 +69,9 @@ function buildEngineCard(engine: EngineStatus): string {
   // unlike the display name which goes through l10n().
   const engineKey = engine.key;
 
-  // "What does this engine do" subtitle — the sidebar's own "users have to
-  // guess" complaint applies here too, so this is a visible line, not a
-  // hover-only tooltip. Description keys use 'analyzerPlugin' (matching the
-  // existing debug.engine.analyzerPlugin name key) rather than the terser
-  // 'analyzer' EngineStatus.key.
+  // "What does this engine do" subtitle — visible line, not hover-only.
+  // Description keys use 'analyzerPlugin' (matching the debug.engine name
+  // key "Live Analysis") rather than the terser 'analyzer' EngineStatus.key.
   const descriptionKey = engineKey === 'analyzer' ? 'analyzerPlugin' : engineKey;
   const description = escapeHtml(l10n(`debug.engine.description.${descriptionKey}`));
 
@@ -130,6 +135,19 @@ function buildMetricsLine(engine: EngineStatus): string {
   } else if (engine.rssNote) {
     const rssLabel = escapeHtml(l10n('debug.engine.rss'));
     parts.push(`${rssLabel} ${escapeHtml(engine.rssNote)}`);
+  }
+
+  // WP4: while a workspace scan is in flight (filesScanned < totalFiles),
+  // show its live progress on the same metrics line — the whole reason for
+  // reading the `saropa/scanProgress` notification instead of just logging
+  // it. A finished/absent scan reports nothing here (no stale "100%" clutter
+  // once the scan is done — the log section already recorded completion).
+  if (engine.scanProgress && engine.scanProgress.filesScanned < engine.scanProgress.totalFiles) {
+    const scanLabel = escapeHtml(l10n('debug.engine.scanProgress', {
+      done: String(engine.scanProgress.filesScanned),
+      total: String(engine.scanProgress.totalFiles),
+    }));
+    parts.push(scanLabel);
   }
 
   if (parts.length === 0) {
@@ -203,6 +221,7 @@ function statusColorClass(status: string): string {
     case 'running':
       return 'status-active';
     case 'starting':
+    case 'scanning':
       return 'status-starting';
     case 'stopped':
     case 'error':

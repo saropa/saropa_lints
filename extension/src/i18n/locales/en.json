@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Extension-wide display preferences.",
-      "linkNote": "Lint integration on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
+      "linkNote": "Scan on save on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
     },
     "shortcuts": {
       "jumpToTab": "Jump to tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: {tier}"
     },
     "controls": {
-      "analyzerPlugin": "Analyzer plugin",
-      "analyzerPluginDisabled": "Off — scan-on-save only",
+      "analyzerPlugin": "Live analysis",
+      "analyzerPluginDisabled": "Off — scan on save only",
       "analyzerPluginAbsent": "Not configured",
       "laneLight": "Light — ~200 rules in-editor, rest on save",
       "laneFull": "Full — every enabled rule in-editor",
@@ -918,7 +918,14 @@
       "colCount": "Count",
       "colSeverity": "Severity",
       "colActionsAria": "Row actions",
-      "filesAffected": "Files affected ({count})"
+      "filesAffected": "Files affected ({count})",
+      "howToFixHeading": "How to fix",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "Related rules",
+      "sameTagHeading": "Same-tag discovery",
+      "migrationHeading": "Migration",
+      "supersedesLabel": "Supersedes:"
     },
     "findings": {
       "sectionAria": "Findings",
@@ -1118,8 +1125,10 @@
       "overview": "Overview",
       "upgrades": "Upgrades",
       "upgradesDesc": "Review available package upgrades, grouped by risk, with one-click apply.",
+      "upgradesGenerating": "Scanning your project for unadopted features and upgrade opportunities. This runs once per scan and stays cached until you rescan.",
       "fullReport": "Full report",
       "fullReportDesc": "Export the exhaustive feature-usage report (every scanned package, every mined changelog feature) as an HTML/Markdown/JSON file and open it.",
+      "fullReportGenerating": "Generating the full report — every scanned package, every mined changelog feature. This runs once per scan and stays cached until you rescan.",
       "knownIssues": "Known issues",
       "knownIssuesDesc": "Browse known vulnerabilities and advisories reported against your dependencies.",
       "compare": "Compare",
@@ -1747,7 +1756,8 @@
       "restart": "Restart",
       "stopped": "Stopped",
       "logHeading": "Activity",
-      "logEmpty": "No output yet — project_health does not report step-by-step progress, so this log only fills if the scan prints a diagnostic message."
+      "logEmpty": "No output yet — this log only fills if the scan prints a diagnostic message.",
+      "progress": "{percent}% — {done}/{total} files"
     },
     "reports": {
       "intro": "One-click CLI reports that previously required a terminal. Each Run button streams the tool's live output below its card and saves a copy under reports/.saropa_lints/reports-tab/.",
@@ -1935,8 +1945,8 @@
       "log": "Log"
     },
     "engine": {
-      "analyzerPlugin": "Analyzer Plugin",
-      "scanDaemon": "Scan Daemon",
+      "analyzerPlugin": "Live Analysis",
+      "scanDaemon": "Scan on Save",
       "lspServer": "LSP Server",
       "pid": "PID:",
       "status": "Status:",
@@ -1949,7 +1959,8 @@
         "running": "running",
         "stopped": "stopped",
         "suspended": "suspended",
-        "starting": "starting"
+        "starting": "starting",
+        "scanning": "scanning"
       },
       "rssNote": {
         "inProcess": "in-process, not separately measurable",
@@ -1959,7 +1970,8 @@
         "analyzerPlugin": "Runs inside the Dart analysis server — live squiggles in the editor as you type, no scan needed. Toggling rewrites the plugins: block in analysis_options.yaml.",
         "scanDaemon": "Background process that rescans the whole project on save and writes reports/.saropa_lints/violations.json. Toggling off suspends it; the next save resumes it.",
         "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting."
-      }
+      },
+      "scanProgress": "Scan: {done}/{total} files"
     },
     "toggle": {
       "on": "ON",
@@ -2154,7 +2166,7 @@
       "actionViewViolations": "View Violations",
       "noErrors": "Saropa Lints: No errors!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: no workspace folder is open. Open your Dart/Flutter project first.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: lint integration is off. Enable it before running analysis.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: scan on save is off. Enable it before running analysis.",
       "pluginAlive": "Saropa Lints is alive: {rules} rules enabled, {files} files analyzed.",
       "openPubspecFailed": "Failed to open pubspec.yaml: {message}",
       "toggleSidebarSectionFailed": "Saropa Lints: failed to toggle sidebar section — {message}",
@@ -2190,7 +2202,7 @@
       "pubGetNotResolved": "Saropa Lints: pub get succeeded but saropa_lints was not resolved. Check pubspec.yaml formatting.",
       "configWriteFailedNs": "Saropa Lints: config write failed. {details}",
       "disabled": "Saropa Lints is disabled. Project files were not changed.",
-      "disabledAnalyzer": "Saropa Lints integration turned off. Analyzer diagnostics will clear shortly; toggle Lint integration On to restore.",
+      "disabledAnalyzer": "Saropa Lints integration turned off. Analyzer diagnostics will clear shortly; toggle Scan on save On to restore.",
       "reenabledPlugin": "Saropa Lints in-process plugin re-enabled. Restarting the Dart analysis server to reload it.",
       "reenableNothingToRestore": "Saropa Lints: nothing to restore. The in-process plugin is not currently disabled via the extension.",
       "noOpenDartFiles": "Saropa Lints: no open Dart files found. Re-open a Dart file or turn off the \"Open editors only\" setting.",
@@ -2281,7 +2293,7 @@
       "scanOnSaveDaemonTimeout": "The scan process did not respond in time.",
       "scanOnSaveDaemonExited": "The scan process stopped unexpectedly. It will restart on the next save.",
       "scanOnSaveDaemonBackoff": "The scan process stopped recently and is waiting to restart. Save again in a moment.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints is turned off — turn on \"Lint integration\" before running a whole-project scan.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints is turned off — turn on \"Scan on save\" before running a whole-project scan.",
       "scanOnSaveBaselineAlreadyRunning": "A whole-project scan is already running.",
       "scanOnSaveBaselineCanceled": "Whole-project scan canceled after {scanned}/{total} files.",
       "scanOnSaveBaselineFailed": "Whole-project scan failed: {details}",
@@ -2503,6 +2515,17 @@
     },
     "quickFix": {
       "title": "Fix stale ignores in this file"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% reviewed",
+      "hotspotsDescription": "{open} open",
+      "lastRunLabel": "Last run · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "All commands…",
+      "commandCatalogDescription": "Search all commands"
     }
   }
 }

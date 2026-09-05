@@ -1,14 +1,13 @@
 /**
- * Keep the sidebar's "Analyzer plugin" row — and the disable-ownership claim
+ * Keep the live-analysis engine state — and the disable-ownership claim
  * behind it — honest against a file that anything can rewrite.
  *
- * The row reads the `plugins:` block straight off disk, but the tree only
- * rebuilds on discrete events, so a block changed outside the extension
- * (`dart run saropa_lints:init`, a git checkout, a hand-edit, a merge) left the
- * row asserting a state analysis_options.yaml contradicted. That silent drift
- * between what the UI claims and what the file says is the whole defect class
- * the row was added to close, so watching the file is what makes the row
- * trustworthy rather than merely usually-right.
+ * The `plugins:` block state is read straight off disk, but the sidebar and
+ * Health Panel only rebuild on discrete events, so a block changed outside
+ * the extension (`dart run saropa_lints:init`, a git checkout, a hand-edit,
+ * a merge) left the UI asserting a state analysis_options.yaml contradicted.
+ * That silent drift between what the UI claims and what the file says is the
+ * whole defect class this watcher was added to close.
  *
  * Lives in its own module rather than inline in activate() because it has to
  * track per-folder state across workspace-folder changes, which is more than a

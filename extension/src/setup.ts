@@ -716,6 +716,11 @@ const ANALYSIS_OPTIONS_FILENAME = 'analysis_options.yaml';
 // integration is off. They let runEnable restore the block byte-for-byte
 // (preserving the user's enabled rule_packs and in-file rule overrides)
 // instead of regenerating from tier defaults and silently dropping them.
+//
+// DO NOT rename "Lint integration" in these markers — they are machine-
+// readable strings already written to users' analysis_options.yaml files.
+// Changing the marker text would orphan previously-disabled blocks so
+// runEnable could never find and restore them.
 const DISABLE_BEGIN_MARKER =
   '# >>> saropa_lints integration turned OFF by the VS Code extension — toggle "Lint integration" On to restore >>>';
 const DISABLE_END_MARKER =

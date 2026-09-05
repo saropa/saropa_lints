@@ -37,7 +37,7 @@
  *                               → Findings Dashboard's top-rules triage table
  *                             - Tier / Lane                     → folded into
  *                               the Lints Config row's description
- *                             - Analyzer plugin (live/disabled/absent) → moved
+ *                             - Live analysis (live/disabled/absent) → moved
  *                               to Status, as a conditional warning row (only
  *                               rendered when NOT live) — see WP3
  *                           See plans/PLAN_sidebar_row_collapse.md §2.1 for
@@ -85,6 +85,13 @@ import { l10n } from '../i18n/runtime';
 // hotspot counts from `violationsWideReportView.ts`.
 import { getLatestResults } from '../vibrancy/extension-activation';
 import { HealthPanel } from '../systemHealth/healthPanel';
+// Hotspot review-progress row (PLAN_ext_ui_sidebar_reset.md §3 STATUS row 3,
+// "Hotspots · N% reviewed"). Reuses the EXACT counting function and service
+// the Findings dashboard's status-line pill uses
+// (`violationsWideReportView.ts` buildHotspotsSlice) — one source of truth
+// for "how many hotspots are open" so the sidebar row and the dashboard pill
+// can never disagree while both exist.
+import { SecurityHotspotReviewStateService, countSecurityHotspotReviewStates } from '../securityHotspotReviewState';
 // Lane value for the Lints Config row description (WP2, sidebar row collapse
 // plan) — same reader the removed configTree.ts `buildLaneNode` used, so the
 // folded description agrees with what the in-process plugin actually reads.
@@ -240,10 +247,10 @@ function invalidateSharedCache(): void {
  *       richer welcome screen, not add to it; checked before touching this
  *       during the empty-state audit, PHASE1_BADGES_AND_EMPTY_STATES);
  *   (b) a Dart project is open but doesn't depend on saropa_lints yet.
- * The "dependency present but integration off" case moved to Status's
- * Lint integration row (see appendLintIntegrationRow) — once the
- * dependency exists, the on/off state belongs next to Health and
- * Engines, not in a separate banner view.
+ * The "dependency present but integration off" case is reflected in the
+ * Engines row's scan-on-save entry — once the dependency exists, the
+ * on/off state belongs next to Health and Engines, not in a separate
+ * banner view.
  */
 function buildBannerItems(): LeafItem[] {
     const root = getProjectRoot();
@@ -304,18 +311,24 @@ function buildLintsConfigDescription(): string {
 }
 
 /**
- * The six first-class dashboards. Analysis Optimizer, Upgrade Opportunities,
- * and the Feature Inventory export are deliberately NOT separate rows here
- * any more — they render as tabs inside Rules & Tiers (Analysis Optimizer,
- * embedded per rulePacksWebviewProvider.ts's getEmbeddedBodyHtml) and inside
- * the Package Dashboard (Upgrades / Full report tabs, packages-tabs.ts).
- * A standalone sidebar row pointing at content one tab-click away inside a
- * dashboard this list already links to was the same kind of duplication the
- * "Saropa Dashboards" home hub was removed for (see CHANGELOG.md, commit
- * ea2c7a8e) — moved, not deleted: both features are still reachable, just
- * from inside the dashboard that now owns them. Command Catalog moved to the
- * Settings panel's action rows (all commands belongs with "run analysis",
- * not the list of dashboards).
+ * The seven DASHBOARDS rows (PLAN_ext_ui_sidebar_reset.md §3): Findings
+ * first (it's the row most users click first — health score + issue count),
+ * then Lints Config, Packages, Code Health, Project Map, Full Audit, and
+ * "All commands…" last as the escape hatch. Analysis Optimizer, Upgrade
+ * Opportunities, and the Feature Inventory export are deliberately NOT
+ * separate rows here — they render as tabs inside Rules & Tiers (Analysis
+ * Optimizer, embedded per rulePacksWebviewProvider.ts's getEmbeddedBodyHtml)
+ * and inside the Package Dashboard (Upgrades / Full report tabs,
+ * packages-tabs.ts). A standalone sidebar row pointing at content one
+ * tab-click away inside a dashboard this list already links to was the same
+ * kind of duplication the "Saropa Dashboards" home hub was removed for (see
+ * CHANGELOG.md, commit ea2c7a8e) — moved, not deleted: both features are
+ * still reachable, just from inside the dashboard that now owns them.
+ *
+ * Command Catalog moved HERE from the Actions panel (reset plan §3.1) — it
+ * opens a page/picker like every other row in this section, it never runs
+ * anything itself, so ACTIONS (whose section semantics are "runs something
+ * now") was the wrong home for it.
  */
 function buildEditorDashboardItems(): LeafItem[] {
     // Append a needle count to the Package Dashboard row when the last scan
@@ -326,6 +339,13 @@ function buildEditorDashboardItems(): LeafItem[] {
         ? `Dependency vibrancy report · ${needles} to adopt`
         : 'Dependency vibrancy report';
     return [
+        new LeafItem(
+            'Findings Dashboard',
+            'Editor tab · filters · JSON',
+            'saropaLints.openViolationsWideReport',
+            'warning',
+            new vscode.ThemeColor('editorWarning.foreground'),
+        ),
         new LeafItem(
             'Lints Config',
             buildLintsConfigDescription(),
@@ -354,13 +374,6 @@ function buildEditorDashboardItems(): LeafItem[] {
             'flame',
             new vscode.ThemeColor('charts.orange'),
         ),
-        new LeafItem(
-            'Findings Dashboard',
-            'Editor tab · filters · JSON',
-            'saropaLints.openViolationsWideReport',
-            'warning',
-            new vscode.ThemeColor('editorWarning.foreground'),
-        ),
         // Full project audit with scope picker and filterable report webview.
         new LeafItem(
             l10n('fullAudit.sidebar.label'),
@@ -369,15 +382,28 @@ function buildEditorDashboardItems(): LeafItem[] {
             'shield',
             new vscode.ThemeColor('charts.red'),
         ),
+        new LeafItem(
+            l10n('sidebar.dashboards.commandCatalogLabel'),
+            l10n('sidebar.dashboards.commandCatalogDescription'),
+            'saropaLints.showCommandCatalog',
+            'symbol-event',
+            new vscode.ThemeColor('charts.purple'),
+        ),
     ];
 }
 
 function buildActionItems(): LeafItem[] {
-    // "Pick UI language" is intentionally NOT here. The Settings rows below
-    // include a "UI language — <current>" row bound to the same
-    // `saropaLints.pickUiLanguage` command; it shows the current language AND
-    // is clickable, so it strictly supersedes a bare action row. Keeping both
-    // put the identical command in the sidebar twice.
+    // "Pick UI language" is intentionally NOT here — it's a select on the
+    // Rules & Tiers Extension tab, not a run action.
+    //
+    // Exactly 3 rows now (PLAN_ext_ui_sidebar_reset.md §3 ACTIONS target):
+    // every row here RUNS something now, with a visible outcome (progress,
+    // toast, diff) — the section's one job per §2's table. Two rows that
+    // used to live here moved out because they don't run anything:
+    // Command Catalog → DASHBOARDS (opens a picker, doesn't act); Migrate
+    // config keys → dropped from the sidebar entirely (P2: a button on the
+    // Lints Config › Config file tab, plus the command palette — see
+    // configTree.ts, `getSettingAndActionNodes` removed).
     return [
         new LeafItem(
             'Run analysis',
@@ -386,30 +412,33 @@ function buildActionItems(): LeafItem[] {
             'play',
             new vscode.ThemeColor('debugIcon.startForeground'),
         ),
-        new LeafItem(
-            'Initialize / Update config',
-            undefined,
-            'saropaLints.initializeConfig',
-            'gear',
-        ),
         // Stale ignore detection and cleanup — was two rows (Find, then Fix)
         // requiring the user to run Find first to learn whether Fix was even
         // needed. One row now: it finds first, reports the count via the
         // existing confirm dialog, and only proceeds to the (destructive)
         // fix after that confirmation — see runFindAndFixStaleIgnores in
-        // stale-ignore-commands.ts. The separate `findStaleIgnores` /
-        // `fixStaleIgnores` commands stay registered for the command palette
-        // and the per-file quick fix; only the sidebar row merged. No extra
-        // `when` gating needed here: the whole Settings VIEW (package.json
-        // "saropaLints.settings") already requires saropaLints.isDartProject,
-        // so this row is hidden together with the rest of the panel on
-        // non-Dart projects — no separate enablement check required.
+        // stale-ignore-commands.ts. This IS the resolution to plan §7.2's
+        // open "one row or two" question: the merged command already shows
+        // what it will remove and asks before writing, so the "keep both if
+        // it deletes silently" fallback never applies — one row is correct.
+        // The separate `findStaleIgnores` / `fixStaleIgnores` commands stay
+        // registered for the command palette and the per-file quick fix;
+        // only the sidebar row merged. No extra `when` gating needed here:
+        // the whole Actions VIEW (package.json "saropaLints.actions")
+        // already requires saropaLints.isDartProject, so this row is hidden
+        // together with the rest of the panel on non-Dart projects.
         new LeafItem(
             l10n('staleIgnores.sidebar.fixLabel'),
             l10n('staleIgnores.sidebar.fixDescription'),
             'saropaLints.findAndFixStaleIgnores',
             'trash',
             new vscode.ThemeColor('charts.red'),
+        ),
+        new LeafItem(
+            'Initialize / Update config',
+            undefined,
+            'saropaLints.initializeConfig',
+            'gear',
         ),
         // `Open analysis_options_custom.yaml` was intentionally REMOVED from the
         // sidebar. The generated file carries a "DO NOT EDIT MANUALLY — use the
@@ -424,18 +453,6 @@ function buildActionItems(): LeafItem[] {
         // custom analyzer rules alongside Saropa) and the term is jargon to
         // everyone else. It remains discoverable via the command palette,
         // the command catalog, the CLI flag, and the guide.
-        //
-        // Command Catalog moved here from the Dashboards section — it is an
-        // action ("search all commands"), not a dashboard, and Quick Actions
-        // is where the plan's target IA (PLAN_extension_ui_redesign.md §2.1)
-        // puts the "All commands…" escape hatch.
-        new LeafItem(
-            'Command Catalog',
-            'Search all commands',
-            'saropaLints.showCommandCatalog',
-            'symbol-event',
-            new vscode.ThemeColor('charts.purple'),
-        ),
     ];
 }
 
@@ -477,13 +494,18 @@ function appendHealthRow(
         // analysis has never run for this project (empty-state audit, case
         // c: "analysis never run"). This row used to just vanish here,
         // leaving Status silently missing its first and most important row
-        // with zero explanation. Show a row that says so and reuses the same
-        // run command Settings' action row and the Quick Actions row use, so
-        // the fix is one click away from the message that explains it.
+        // with zero explanation. Show a row that says so.
         items.push(new LeafItem(
             l10n('status.health.neverRunLabel'),
             l10n('status.health.neverRunDescription'),
-            'saropaLints.runAnalysis',
+            // BUGFIX (PLAN_ext_ui_sidebar_reset.md P1, §2 STATUS invariant):
+            // used to target `saropaLints.runAnalysis` directly — a STATUS
+            // row running something, exactly what the reset plan's "no
+            // STATUS/DASHBOARDS row targets a run/toggle command" guard
+            // exists to catch. Findings' own empty state explains "no
+            // analysis yet" and carries the Run button, so this still opens
+            // "the detail for the fact" (an empty one) rather than acting.
+            'saropaLints.openViolationsWideReport',
             'pulse',
             new vscode.ThemeColor('descriptionForeground'),
         ));
@@ -497,17 +519,66 @@ function appendHealthRow(
         'saropaLints.focusIssues',
         'pulse',
     );
-    // The dedicated "Last run" row was folded into this tooltip (WP5, sidebar
-    // row collapse): the Findings dashboard already has its own freshness
-    // pill, so the sidebar only needs the timestamp as hover text rather than
-    // a whole extra row. `LeafItem`'s constructor has no tooltip parameter —
-    // assign after construction. Omitted entirely when history is empty
-    // (no analysis has ever run) rather than showing a misleading tooltip.
-    const lastRunIso = history.at(-1)?.timestamp;
-    if (lastRunIso) {
-        item.tooltip = l10n('status.health.lastRunTooltip', { ago: formatTimeAgo(lastRunIso) });
-    }
     items.push(item);
+}
+
+/**
+ * "Last run · Nh ago" — reinstated as its own STATUS row
+ * (PLAN_ext_ui_sidebar_reset.md §3, row 4). It used to be folded into the
+ * Health row's tooltip (WP5, sidebar row collapse) on the theory that hover
+ * text was enough — but a tooltip is invisible until you hover, so a fact as
+ * basic as "when did this last run" had no on-screen home. Hidden entirely
+ * before the first run (no history yet), matching the plan's "hidden before
+ * the first run" spec. Opens Findings (same target as the Health row) since
+ * that is where the run this timestamp refers to is fully described.
+ */
+function appendLastRunRow(items: LeafItem[], history: ReturnType<typeof loadHistory>): void {
+    const lastRunIso = history.at(-1)?.timestamp;
+    if (!lastRunIso) return;
+    items.push(new LeafItem(
+        l10n('sidebar.status.lastRunLabel', { ago: formatTimeAgo(lastRunIso) }),
+        undefined,
+        'saropaLints.openViolationsWideReport',
+        'history',
+    ));
+}
+
+/**
+ * "Hotspots · N% reviewed" — reinstated as its own STATUS row
+ * (PLAN_ext_ui_sidebar_reset.md §3, row 3). WP5 (sidebar row collapse) cut
+ * this row on the theory that the Findings dashboard's status-line pill
+ * covered it — but that pill only appears once you've already opened
+ * Findings, which is exactly the "have to guess/explore to find out" problem
+ * the reset plan is fixing. Reuses the identical counting function and
+ * per-viewer review-state service the Findings pill uses
+ * (`violationsWideReportView.ts` buildHotspotsSlice /
+ * securityHotspotReviewState.ts), so the two can never disagree.
+ * Hidden entirely when there are no security-sensitive violations at all
+ * (`total <= 0`) — a project with none has nothing to review.
+ */
+function appendHotspotsRow(
+    items: LeafItem[],
+    data: ViolationsData,
+    workspaceState: vscode.Memento,
+): void {
+    const service = new SecurityHotspotReviewStateService(workspaceState);
+    const counts = countSecurityHotspotReviewStates(
+        data.violations ?? [],
+        data.config?.ruleMetadataByRule,
+        service,
+    );
+    if (counts.total <= 0) return;
+    const reviewed = counts.reviewedSafe + counts.reviewedFixed;
+    const percent = Math.round((reviewed / counts.total) * 100);
+    items.push(new LeafItem(
+        l10n('sidebar.status.hotspotsLabel', { percent: String(percent) }),
+        l10n('sidebar.status.hotspotsDescription', { open: String(counts.open) }),
+        'saropaLints.reviewHotspotState',
+        'shield',
+        // Warning color while any hotspot is still open/unreviewed — matches
+        // the Findings pill's `pill warn` vs `pill good` split.
+        counts.open > 0 ? new vscode.ThemeColor('list.warningForeground') : undefined,
+    ));
 }
 
 // Maps the machine-readable EngineStatus.key to the debug.engine.* l10n
@@ -558,24 +629,23 @@ function appendEnginesRow(items: LeafItem[]): void {
     ));
 }
 
-/**
- * "Lint integration: On/Off" row — merged in from what used to be a
- * dedicated Banner-view row (only shown when off) plus a duplicate toggle
- * buried in the Settings panel's diagnostics block (always shown). One row,
- * always shown once a project has the saropa_lints dependency, single click
- * toggles it (same enable/disable commands both prior locations used) — see
- * PLAN_extension_ui_redesign.md §2.1's 3-row Status target.
- */
-function appendLintIntegrationRow(items: LeafItem[]): void {
-    const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
-    items.push(new LeafItem(
-        enabled ? 'Lint integration: On' : 'Lint integration: Off',
-        enabled ? 'Click to disable' : 'Click to enable',
-        enabled ? 'saropaLints.disable' : 'saropaLints.enable',
-        enabled ? 'check' : 'circle-slash',
-        enabled ? undefined : new vscode.ThemeColor('list.warningForeground'),
-    ));
-}
+// `appendLintIntegrationRow` ("Lint integration: On/Off") was REMOVED here
+// (PLAN_ext_ui_sidebar_reset.md P3, §3.1 row "Lint integration: On/Off
+// (Settings)"). Two reasons:
+//   1. It was a STATUS row whose click FLIPPED a setting
+//      (saropaLints.disable/enable) — a direct violation of §2's rule that a
+//      STATUS row "never changes anything." That is the exact bug class the
+//      reset plan exists to remove (see §2's table).
+//   2. Its only unique fact — whether scan-on-save is delivering — is now
+//      correctly represented in the Engines row's scan-on-save/Scan Daemon
+//      entry (see the bugfix in extension.ts's `getScanDaemonStatus`, which
+//      used to report "idle" even when `saropaLints.enabled=false`). Folding
+//      it there means "off" always sits next to the engine facts that
+//      explain WHY, instead of as a lone alarming word beside live findings
+//      (plan §1 point 5, "two truths on one screen").
+// The `saropaLints.enable` / `saropaLints.disable` commands stay registered
+// for the command palette and the Banner's "Set Up Project" row; only this
+// STATUS row is gone.
 
 // `appendSuppressionRow`, `appendTrendRow`, and `appendRegressionAndMilestone`
 // were removed here (WP5, sidebar row collapse):
@@ -594,29 +664,31 @@ function appendLintIntegrationRow(items: LeafItem[]): void {
 // See plans/PLAN_sidebar_row_collapse.md §2.2 for the per-row evidence.
 
 /**
- * Status section: Health (with a "Last analysis" tooltip) · Engines
- * (conditional on debug.enabled) · Lint integration · analyzer plugin
- * warning (conditional, WP3). Hotspots, Suppressed, Trends, Score dropped,
- * Fewer issues, and the standalone Last-run row all moved elsewhere or were
- * cut outright — see the comment block above and
- * plans/PLAN_sidebar_row_collapse.md §2.2. The view's own `when` clause
- * (package.json `saropaLints.status`) no longer requires
- * `saropaLints.hasViolations` (WP5): Lint integration state matters most
- * exactly when there are no violations to gate the panel on (integration
- * off → nothing scans → zero violations → panel used to vanish, hiding the
- * one row that would explain why).
+ * Status section (PLAN_ext_ui_sidebar_reset.md §3 target — 4 rows, 2
+ * conditional): Health · Engines (conditional on debug.enabled) · Hotspots
+ * (conditional, hidden when there are none) · Last run (conditional, hidden
+ * before the first run).
+ *
+ * Lint integration and the analyzer-plugin warning are GONE from this
+ * section (not merely moved) — both used to run/toggle a command directly
+ * from a STATUS row, which breaks §2's rule that a STATUS click "never
+ * changes anything." Their facts are still visible: scan-on-save state is
+ * now correctly folded into the Engines row's Scan Daemon entry (see
+ * extension.ts's `getScanDaemonStatus` bugfix), and analyzer-plugin state is
+ * one of the three engines Engines already lists. Suppressed/Trends/Score
+ * dropped/Fewer issues stay cut — they live on the Findings dashboard's
+ * status-line pills, which have room for the breakdown a sidebar row does
+ * not.
+ *
+ * The view's own `when` clause (package.json `saropaLints.status`) does not
+ * require `saropaLints.hasViolations`: a clean project with scan-on-save off
+ * still needs the Engines row visible to explain why it's clean.
  */
-function buildStatusItems(workspaceState: vscode.Memento, configProvider: ConfigTreeProvider): SectionNode[] {
+function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
     const loaded = loadFilteredViolations(workspaceState);
     if (!loaded) return [];
     const { data, root } = loaded;
 
-    // `items` stays LeafItem[] because every `append*` helper below is typed
-    // against LeafItem[] (they only ever construct vscode.TreeItem leaves).
-    // The analyzer plugin warning row is a ConfigTreeNode (a different arm of
-    // the SectionNode union — see `getAnalyzerPluginWarningNode`'s doc
-    // comment in configTree.ts), so it is appended separately below rather
-    // than threaded through the LeafItem-typed helpers.
     const items: LeafItem[] = [];
     const history = loadHistory(workspaceState);
     const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
@@ -625,26 +697,22 @@ function buildStatusItems(workspaceState: vscode.Memento, configProvider: Config
 
     appendHealthRow(items, history, data, total, critical, root);
     appendEnginesRow(items);
-    appendLintIntegrationRow(items);
+    appendHotspotsRow(items, data, workspaceState);
+    appendLastRunRow(items, history);
 
-    // Analyzer plugin warning row (2026-09-04, sidebar row collapse WP3):
-    // MOVED here from the Settings/Quick Actions section — a plugin state is
-    // a fact about the project, not a setting, and it now sits right after
-    // Lint integration since both rows describe how the project talks to
-    // the analyzer. Only rendered when the plugin is disabled or absent —
-    // `getAnalyzerPluginWarningNode` returns [] for the `live` state (its
-    // `verifyPlugin` probe stays reachable via Command Catalog / Health
-    // Panel instead of a sidebar row). It is now also the LAST row in the
-    // section (WP5 removed everything that used to render after it —
-    // Hotspots/Suppressed/Trends/Score-dropped/Last-run — so the splice this
-    // function used to do at a captured "after Lint integration" index is no
-    // longer needed; a plain append is correct).
-    const pluginWarningRows: SectionNode[] = configProvider.getAnalyzerPluginWarningNode();
-
-    return [...items, ...pluginWarningRows];
+    return items;
 }
 
-// ── ConfigTreeProvider-backed sections (Settings + Triage) ─────────────────
+// ── ConfigTreeProvider-backed node support ──────────────────────────────────
+// (PLAN_ext_ui_sidebar_reset.md P1/P2: neither remaining section — Actions
+// nor Status — mixes in a raw ConfigTreeNode any more. Status dropped its
+// only ConfigTreeNode row, the analyzer-plugin warning, because a STATUS row
+// running `reenablePlugin`/`initializeConfig` on click violated §2's "a
+// STATUS click never changes anything" rule; that fact is already visible in
+// the Engines row instead. `isConfigTreeNode` / the ConfigTreeNode branch in
+// `FlatSectionProvider.getTreeItem()` below are left in place — they cost
+// nothing at rest and keep the door open for a future section that does need
+// a live ConfigTreeNode row — but nothing currently constructs one.)
 
 function isConfigTreeNode(node: unknown): node is ConfigTreeNode {
     if (typeof node !== 'object' || node === null || !('kind' in node)) return false;
@@ -653,43 +721,19 @@ function isConfigTreeNode(node: unknown): node is ConfigTreeNode {
 }
 
 /**
- * Filter out settings nodes that duplicate top-level Actions / Editor dashboard
- * rows. ConfigTreeProvider stays the source of truth for live settings rows;
- * this view drops the redundant copies so each command has exactly one entry
- * in the sidebar.
+ * Actions panel (PLAN_ext_ui_sidebar_reset.md §3 ACTIONS target): exactly the
+ * 3 rows from `buildActionItems()`, nothing merged in from
+ * `ConfigTreeProvider` any more. It used to also pull in
+ * `configProvider.getSettingAndActionNodes()` (the conditional Migrate row),
+ * filtered through `isRedundantSettingsAction` to drop the entries that
+ * duplicated `buildActionItems()`'s own rows. Both are gone: the Migrate row
+ * was cut from the sidebar outright per the reset plan's row table (P2 adds
+ * a button on the Lints Config › Config file tab instead), which left
+ * `isRedundantSettingsAction` filtering an always-empty list — dead code,
+ * deleted rather than kept "just in case."
  */
-function isRedundantSettingsAction(node: ConfigTreeNode): boolean {
-    if (node.kind !== 'configSetting') return false;
-    const cmd = node.commandId;
-    return cmd === 'saropaLints.runAnalysis'
-        || cmd === 'saropaLints.openConfig'
-        || cmd === 'saropaLints.initializeConfig'
-        || cmd === 'saropaLints.emitCompositePluginScaffold';
-}
-
-/**
- * Actions-only panel (WP1, 2026-09-04): 4 rows always, +1 conditional.
- * Order: run analysis, initialize/update config, fix stale ignores, command
- * catalog, then (only when `configProvider.getSettingAndActionNodes()`
- * surfaces it) migrate legacy config keys.
- *
- * Everything else this panel used to carry — severity toggles, setting-value
- * rows (run-after-config/dependency, UI language, detected packages), and
- * triage rows — was a verified duplicate of a richer surface elsewhere and
- * was cut in the same change; see the file header comment and
- * plans/PLAN_sidebar_row_collapse.md §2.1 for the per-row evidence. The
- * `getSettingAndActionNodes()` call below now returns action nodes only
- * (`buildSettingNodes` was emptied and deleted in configTree.ts), so
- * `isRedundantSettingsAction` still filters out the handful of actions that
- * duplicate the top-level Editor dashboard / Actions rows (open config
- * dashboard, initialize config, run analysis, composite plugin scaffold).
- */
-function buildSettingsItems(configProvider: ConfigTreeProvider): SectionNode[] {
-    const actions = buildActionItems();
-    const settings = configProvider
-        .getSettingAndActionNodes()
-        .filter((n) => !isRedundantSettingsAction(n));
-    return [...actions, ...settings];
+function buildActionsItems(): SectionNode[] {
+    return buildActionItems();
 }
 
 // ── Provider class ────────────────────────────────────────────────────────
@@ -750,12 +794,13 @@ export const SECTION_VIEW_IDS = {
     banner: 'saropaLints.banner',
     editorDashboards: 'saropaLints.editorDashboards',
     status: 'saropaLints.status',
-    // Settings now also hosts the action rows (run analysis, initialize config)
-    // and the triage rows (rules grouped by violation count, plus "X rules
-    // disabled by override" / "X rules with zero issues"). The standalone
-    // Actions and Triage views were merged in: the user wanted a single panel
-    // to operate and configure the project's lints in one place.
-    settings: 'saropaLints.settings',
+    // Renamed from `saropaLints.settings` (PLAN_ext_ui_sidebar_reset.md P1):
+    // this panel has been action-rows-only since the 2026-09-04 row collapse
+    // (severity toggles / setting-value rows / triage all moved out) — the
+    // "Settings" name was left over from when it also carried config-value
+    // rows. Now that it is provably just 3 verbs (run/fix/initialize), the
+    // id and view name match what it actually does.
+    actions: 'saropaLints.actions',
 } as const;
 
 /**
@@ -765,10 +810,17 @@ export const SECTION_VIEW_IDS = {
  * is responsible for `vscode.window.createTreeView(viewId, { treeDataProvider })`
  * for each one and for invoking `refresh()` on every relevant provider when
  * upstream data changes.
+ *
+ * `configProvider` is accepted for call-site stability (extension.ts already
+ * owns a `ConfigTreeProvider` instance with its own lifecycle/refresh wiring
+ * unrelated to this sidebar) but is no longer read here: both places that
+ * used to pull a ConfigTreeNode into a section (Actions' Migrate row,
+ * Status's analyzer-plugin warning) were removed in the P1/P3 row-set
+ * rewrite — see `buildActionsItems` and `buildStatusItems`'s doc comments.
  */
 export function createSidebarSectionProviders(
     workspaceState: vscode.Memento,
-    configProvider: ConfigTreeProvider,
+    _configProvider: ConfigTreeProvider,
 ): FlatSectionProvider[] {
     return [
         new FlatSectionProvider(SECTION_VIEW_IDS.banner, () => buildBannerItems()),
@@ -777,12 +829,10 @@ export function createSidebarSectionProviders(
             () => buildEditorDashboardItems(),
             () => computeDashboardsBadge(),
         ),
-        // Merged Actions + Settings + Triage panel, placed at the former Actions
-        // slot (above Status) so the run/initialize operations stay prominent.
-        new FlatSectionProvider(SECTION_VIEW_IDS.settings, () => buildSettingsItems(configProvider)),
+        new FlatSectionProvider(SECTION_VIEW_IDS.actions, () => buildActionsItems()),
         new FlatSectionProvider(
             SECTION_VIEW_IDS.status,
-            () => buildStatusItems(workspaceState, configProvider),
+            () => buildStatusItems(workspaceState),
             () => computeStatusBadge(workspaceState),
         ),
     ];

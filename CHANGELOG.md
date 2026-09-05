@@ -70,7 +70,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Changed
 
-- Renamed sidebar "Analyzer plugin" row to "Live analysis" — users confused it with the extension's scan-on-save engine because both names sounded like the same thing. "Live analysis" (real-time squiggles from the Dart analyzer) vs "Scan on save" (batch scan by the extension) makes the two mechanisms distinguishable without knowing the architecture. Updated notification strings that referenced "Lint integration" to say "Scan on save" for the same reason.
+- Renamed engine names throughout the extension: "Analyzer Plugin" → "Live Analysis", "Scan Daemon" → "Scan on Save" in the Health Panel; "Turn Off Lint Integration" → "Disable Saropa Lints" and "Re-enable In-Process Plugin" → "Re-enable Live Analysis" in the command catalog. Updated notification strings that referenced "Lint integration" to say "Scan on save". No action required.
 
 <details><summary>Maintenance</summary>
 
