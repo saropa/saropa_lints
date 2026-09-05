@@ -212,6 +212,18 @@ String _goodFirstMatchGroup(String input) {
   return 'none';
 }
 
+// GOOD (v8): Variable-traced regex — `RegExp` stored in a local variable,
+// then used via `.firstMatch(...)`. The rule traces through the variable
+// assignment chain to find the pattern literal.
+String _goodVariableTracedRegExp(String input) {
+  final re = RegExp(r'(\d+)-(\w+)');
+  final m = re.firstMatch(input);
+  if (m != null) {
+    return '${m[1]}: ${m[2]}';
+  }
+  return 'none';
+}
+
 // BAD: Real UI bug — nullable in a string built for the UI, no guard.
 class _UiCard {
   _UiCard(this.name);

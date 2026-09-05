@@ -322,5 +322,47 @@ void main() {
       // `([a-z0-9])([A-Z])` — 2 required groups
       expect(countRequiredCaptureGroups(r'([a-z0-9])([A-Z])'), 2);
     });
+
+    // --- Hardening: alternation inside a group does NOT make the
+    //     containing group optional (only its children) ---
+
+    test('group with internal alternation is still required', () {
+      // `(a|b)` — the group always captures whichever side matches.
+      // Alternation makes children optional, not the containing group.
+      expect(countRequiredCaptureGroups(r'(a|b)'), 1);
+    });
+
+    test('nested alternation — outer required, children optional', () {
+      // `((a)|(b))` — group 1 required, groups 2+3 optional (only
+      // one side of `|` executes, so either group 2 or 3 is null).
+      expect(countRequiredCaptureGroups(r'((a)|(b))'), 1);
+    });
+
+    test('alternation inside optional group — all optional', () {
+      // `((a)|(b))?` — outer group is optional (`?`), and children
+      // inherit optionality from the parent + alternation.
+      expect(countRequiredCaptureGroups(r'((a)|(b))?'), 0);
+    });
+
+    test('nested alternation in lookahead with capture groups', () {
+      // `(?=(a|b)(c))` — lookahead is non-capturing, but `(a|b)` and
+      // `(c)` inside it are capture groups. `(a|b)` has alternation
+      // but is still a required group; `(c)` is also required.
+      expect(countRequiredCaptureGroups(r'(?=(a|b)(c))'), 2);
+    });
+
+    test('deep nesting — mixed required and optional', () {
+      // `((a)(b(c)?))` — group 1 outer required, group 2 `(a)`
+      // required, group 3 `(b(c)?)` required, group 4 `(c)` optional.
+      expect(countRequiredCaptureGroups(r'((a)(b(c)?))'), 3);
+    });
+
+    test('alternation at multiple levels', () {
+      // `(a|(b(c|d)))` — group 1 required (it's the outer group,
+      // alternation makes children optional). Group 2 `(b(...))` is
+      // optional (child of alternation in group 1). Group 3 `(c|d)`
+      // is also optional (nested inside optional group 2).
+      expect(countRequiredCaptureGroups(r'(a|(b(c|d)))'), 1);
+    });
   });
 }

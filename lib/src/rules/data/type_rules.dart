@@ -636,54 +636,135 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   }
 
   /// Walks up from the interpolation node to find the RegExp pattern
-  /// literal, if one is visible in the AST. Handles two common shapes:
+  /// literal, if one is visible in the AST. Handles three shapes:
   ///
   /// 1. `str.replaceAllMapped(RegExp(r'...'), (m) => '${m[1]}')`
+  ///    Also handles `replaceAllMapped(regexVar, ...)` where `regexVar`
+  ///    is a local assigned to `RegExp(r'...')`.
   /// 2. `RegExp(r'...').firstMatch(input)` assigned to a local, then
   ///    accessed inside `if (match != null) { ... match[1] ... }`.
+  /// 3. Variable-tracing: `final re = RegExp(r'...');` then
+  ///    `re.firstMatch(...)` assigned to the match variable — follows
+  ///    the match variable back to its declaration, then the regex
+  ///    variable back to the RegExp constructor.
   ///
   /// Returns null when the pattern isn't a compile-time string literal
   /// or the AST shape doesn't match a recognized idiom.
   String? _findRegExpPattern(AstNode startNode) {
-    // Walk up to find the function expression (callback) containing
-    // this match access, then look at the enclosing method call.
+    // Strategy 1: walk up to find a callback (FunctionExpression) that
+    // is an argument to replaceAllMapped / splitMapJoin / etc.
     AstNode? current = startNode.parent;
     int hops = 0;
     while (current != null && hops < 20) {
       if (current is FunctionExpression) {
-        // Check if this callback is an argument to replaceAllMapped,
-        // splitMapJoin, or similar String methods.
         final AstNode? callParent = current.parent?.parent;
         if (callParent is MethodInvocation) {
           return _extractRegExpFromCallArgs(callParent);
         }
       }
-      // For `final m = regex.firstMatch(...)` patterns, look for the
-      // variable declaration's initializer.
-      if (current is VariableDeclaration) {
-        final Expression? init = current.initializer;
-        if (init is MethodInvocation) {
-          // regex.firstMatch(input) — the regex is the target
-          final Expression? target = init.target;
-          if (target is InstanceCreationExpression) {
-            return _extractPatternFromRegExpCtor(target);
-          }
-        }
-      }
+      // Stop at function bodies — don't escape the enclosing scope.
+      if (current is FunctionBody) break;
       current = current.parent;
       hops++;
+    }
+
+    // Strategy 2: trace the match variable back to its declaration.
+    // From `m[1]` or `m.group(1)`, resolve `m` to the local variable
+    // declaration, then extract the regex from its initializer chain.
+    final Expression? matchTarget = _extractMatchTarget(startNode);
+    if (matchTarget is SimpleIdentifier) {
+      final String? pattern =
+          _traceMatchVarToRegExpPattern(matchTarget);
+      if (pattern != null) return pattern;
+    }
+
+    return null;
+  }
+
+  /// Extracts the target expression from a match-access node.
+  /// For `m[1]` returns `m`; for `m.group(1)` returns `m`.
+  Expression? _extractMatchTarget(AstNode node) {
+    if (node is IndexExpression) return node.realTarget;
+    if (node is MethodInvocation) return node.realTarget;
+    return null;
+  }
+
+  /// Traces a match variable (SimpleIdentifier) back through its
+  /// declaration chain to find the RegExp pattern string.
+  ///
+  /// Handles:
+  /// - `final m = RegExp(r'...').firstMatch(input);` — inline ctor
+  /// - `final re = RegExp(r'...'); final m = re.firstMatch(input);`
+  ///   — one level of variable indirection
+  String? _traceMatchVarToRegExpPattern(SimpleIdentifier matchId) {
+    final Expression? init =
+        _resolveIdentifierToInitializer(matchId);
+    if (init is! MethodInvocation) return null;
+    // Expecting `regex.firstMatch(input)` or similar Match-returning
+    // method. The regex is the call target.
+    final Expression? regexExpr = init.target;
+    if (regexExpr is InstanceCreationExpression) {
+      // `RegExp(r'...').firstMatch(input)` — inline constructor
+      return _extractPatternFromRegExpCtor(regexExpr);
+    }
+    if (regexExpr is SimpleIdentifier) {
+      // `re.firstMatch(input)` — trace `re` to its declaration
+      final Expression? reInit =
+          _resolveIdentifierToInitializer(regexExpr);
+      if (reInit is InstanceCreationExpression) {
+        return _extractPatternFromRegExpCtor(reInit);
+      }
+    }
+    return null;
+  }
+
+  /// Resolves a SimpleIdentifier to the initializer of its variable
+  /// declaration, if it's a local variable in the enclosing block.
+  /// Walks up to the enclosing Block, then scans its statements for
+  /// the matching VariableDeclaration.
+  Expression? _resolveIdentifierToInitializer(SimpleIdentifier id) {
+    final Element? element = id.element;
+    if (element == null) return null;
+    // Walk up to the nearest enclosing Block.
+    AstNode? blockNode = id.parent;
+    int hops = 0;
+    while (blockNode != null && blockNode is! Block && hops < 20) {
+      blockNode = blockNode.parent;
+      hops++;
+    }
+    if (blockNode is! Block) return null;
+    // Scan the block's statements for the variable declaration.
+    for (final Statement stmt in blockNode.statements) {
+      if (stmt is! VariableDeclarationStatement) continue;
+      for (final VariableDeclaration decl
+          in stmt.variables.variables) {
+        if (decl.declaredFragment?.element == element) {
+          return decl.initializer;
+        }
+      }
     }
     return null;
   }
 
   /// Extracts the pattern string from `RegExp(r'...')` when it appears
   /// as the first argument of a method call like `replaceAllMapped`.
+  /// Also handles variable references: `replaceAllMapped(regexVar, ...)`
+  /// where `regexVar` is a local assigned to `RegExp(r'...')`.
   String? _extractRegExpFromCallArgs(MethodInvocation call) {
     final args = call.argumentList.arguments;
     if (args.isEmpty) return null;
     final Expression first = args.first;
+    // Direct inline constructor: `replaceAllMapped(RegExp(r'...'), ...)`
     if (first is InstanceCreationExpression) {
       return _extractPatternFromRegExpCtor(first);
+    }
+    // Variable reference: `replaceAllMapped(regexVar, ...)`
+    if (first is SimpleIdentifier) {
+      final Expression? init =
+          _resolveIdentifierToInitializer(first);
+      if (init is InstanceCreationExpression) {
+        return _extractPatternFromRegExpCtor(init);
+      }
     }
     return null;
   }
@@ -3887,16 +3968,20 @@ int? countRequiredCaptureGroups(String pattern) {
       final bool isOptional = (i + 1 < pattern.length &&
           (pattern[i + 1] == '?' || pattern[i + 1] == '*'));
 
-      // Mark the specific capture group that this `)` closes as
-      // optional if it's followed by `?`/`*` or had alternation.
-      if (closed.captureIndex > 0) {
-        if (isOptional || closed.hadAlternation) {
-          groupOptional[closed.captureIndex - 1] = true;
-        }
+      // Mark the group itself as optional only when followed by a
+      // zero-match quantifier (`?`/`*`). Internal alternation does NOT
+      // make the containing group optional — `(a|b)` always captures
+      // whichever side matches. Alternation only makes CHILDREN
+      // optional because only one branch executes.
+      if (closed.captureIndex > 0 && isOptional) {
+        groupOptional[closed.captureIndex - 1] = true;
       }
-      // If this group is optional or has alternation, propagate to
-      // all child capture groups nested inside it — they only match
-      // when the enclosing group does.
+      // Propagate optionality to all child capture groups nested
+      // inside this group when:
+      //  - the group is optional (`?`/`*`): children can't match
+      //    when the enclosing group doesn't, OR
+      //  - the group has alternation: children on the non-matching
+      //    side of `|` won't capture.
       if (isOptional || closed.hadAlternation) {
         for (int gi = closed.childStartIndex;
             gi < groupOptional.length;
