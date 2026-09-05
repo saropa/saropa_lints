@@ -95,7 +95,7 @@ Coverage: 23 rules — 9 HAVE (39%), 5 PARTIAL, 9 TODO (39%)
 | `catch_parameter_names` | PARTIAL | `prefer_correct_error_name` — checks only the exception parameter name, not the stack-trace parameter, and isn't configurable |
 | `constructor_parameters_and_fields_should_have_the_same_order` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_constructor_parameters_and_fields_should_have_the_same_order.md) |
 | `hook_widget_does_not_use_hooks` | HAVE | `avoid_unnecessary_hook_widgets` |
-| `never_discard_build_context` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_never_discard_build_context.md) |
+| `never_discard_build_context` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_never_discard_build_context.md) |
 | `prefer_abstract_final_class` | PARTIAL | `prefer_extension_over_utility_class` — detects the same static-methods-only class shape but recommends `extension` instead of `abstract final class` |
 | `prefer_center_over_align` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_center_over_align.md) (not active upstream in leancode_lint either) |
 | `prefer_equatable_mixin` | HAVE | `require_extend_equatable` |

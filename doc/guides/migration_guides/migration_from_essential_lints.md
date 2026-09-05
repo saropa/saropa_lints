@@ -60,16 +60,16 @@ Coverage: 31 rules — 9 HAVE (29%), 5 PARTIAL, 17 TODO (54%)
 | `border_radius_all` | PARTIAL | `prefer_const_border_radius` — targets const-ness, not the `.all` vs. `.circular` API choice |
 | `closure_incorrect_type` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_closure_incorrect_type.md) |
 | `completer_error_no_stack` | HAVE | `avoid_missing_completer_stack_trace` |
-| `duplicate_value` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_duplicate_value.md). Their rule flags duplicate values within one boolean expression, distinct from saropa's cross-branch `no_equal_conditions`. |
+| `duplicate_value` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_duplicate_value.md). Their rule flags duplicate values within one boolean expression, distinct from saropa's cross-branch `no_equal_conditions`. |
 | `empty_container` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_empty_container.md) |
 | `equal_statement` | PARTIAL | Likely overlaps `no_equal_switch_case`, not fully confirmed as identical trigger logic |
 | `explicit_casts` | PARTIAL | `avoid_unsafe_cast` — only flags casts that can fail at runtime, narrower than "all explicit casts" |
 | `first_getter` | HAVE | `prefer_list_first` |
 | `getters_in_member_list` | HAVE | `getters_in_member_list` (Pedantic) |
-| `is_future` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_is_future.md) |
+| `is_future` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_is_future.md) |
 | `last_getter` | HAVE | `prefer_list_last` |
-| `mutable_tearoff` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_mutable_tearoff.md) |
-| `new_instance_cascade` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_new_instance_cascade.md) |
+| `mutable_tearoff` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_mutable_tearoff.md) |
+| `new_instance_cascade` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_new_instance_cascade.md) |
 | `optional_positional_parameters` | HAVE | `prefer_optional_positional_params` |
 | `padding_over_container` | HAVE | `prefer_padding_over_container` |
 | `pending_listener` | PARTIAL | saropa's disposal-family rules (e.g. `always_remove_listener`) are type-specific, not a general "any `add()`-style listener needs a matching `remove()`" check |

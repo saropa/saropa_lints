@@ -103,7 +103,7 @@ current published rule set (33 rules as of this audit; verified directly against
 | `feature_envy` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_feature_envy.md) |
 | `function_lines_of_code` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_function_lines_of_code.md) |
 | `member_ordering` | PARTIAL | `prefer_member_ordering` is a flat 3-bucket order vs. solid_lints' fully configurable DSL |
-| `named_parameters_ordering` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_named_parameters_ordering.md) |
+| `named_parameters_ordering` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_named_parameters_ordering.md) |
 | `newline_before_return` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_newline_before_return.md) |
 | `no_empty_block` | HAVE | `no_empty_block` |
 | `no_equal_then_else` | HAVE | `no_equal_then_else` |

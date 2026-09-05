@@ -65,7 +65,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `avoid_banned_imports` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_imports.md) |
 | `avoid_calling_notifier_members_inside_build` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_calling_notifier_members_inside_build.md) |
 | `avoid_dependency_overrides` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_dependency_overrides.md) |
-| `avoid_disposing_late_fields` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_disposing_late_fields.md) |
+| `avoid_disposing_late_fields` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_avoid_disposing_late_fields.md) |
 | `avoid_flutter_skill_lint_suppression` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_lint_suppression_abuse.md) (package-specific: bans suppressing flutter_skill_lints itself) |
 | `avoid_implementation_in_mocks` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_implementation_in_mocks.md) |
 | `avoid_inline_error_codes` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_inline_error_codes.md) |
@@ -73,7 +73,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `avoid_local_contract_key_constants` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_local_contract_key_constants.md) |
 | `avoid_missing_test_files` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_missing_test_files.md) |
 | `avoid_misused_wildcard_pattern` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_keywords_in_wildcard_pattern_dcm_parity.md) |
-| `avoid_mounted_check_in_finally` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_mounted_check_in_finally.md) |
+| `avoid_mounted_check_in_finally` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_avoid_mounted_check_in_finally.md) |
 | `avoid_nullable_async_or_collection_return_type` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_nullable_async_or_collection_return_type.md) |
 | `avoid_parameter_aliases` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_parameter_aliases.md) |
 | `avoid_positional_record_fields` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_positional_record_fields.md) |
@@ -108,7 +108,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `avoid_banned_annotations` | PARTIAL | `banned_identifier_usage` — matches by identifier name only, not annotation-aware. TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_annotations.md) |
 | `avoid_banned_names` | PARTIAL | `banned_identifier_usage` — TODO extend, see [proposal](../../../plans/tier_3_infrastructure/proposal_extend_banned_identifier_usage_dcm_parity.md) |
 | `avoid_banned_types` | PARTIAL | `banned_identifier_usage` — not type-annotation-aware. TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_types.md) |
-| `avoid_futureor_return_type` | PARTIAL | `prefer_unwrapping_future_or` — suggests unwrapping generally, doesn't specifically flag `FutureOr` as a return type. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_futureor_return_type.md) |
+| `avoid_futureor_return_type` | PARTIAL | `prefer_unwrapping_future_or` — suggests unwrapping generally, doesn't specifically flag `FutureOr` as a return type. TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_avoid_futureor_return_type.md) |
 | `avoid_missing_controller` | PARTIAL | `require_form_field_controller` — only covers `TextFormField`, not all controller-accepting input widgets. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_missing_controller.md) |
 | `avoid_single_child_in_multi_child_widgets` | PARTIAL | `avoid_single_child_column_row` — covers only Column/Row, not all multi-child widgets. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_single_child_in_multi_child_widgets.md) |
 | `avoid_unnecessary_else_after_control_flow` | PARTIAL | `avoid_redundant_else` — only flags else after return/throw/continue/break; flutter_skill_lints bans all else blocks unconditionally. TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_else_after_control_flow.md) |

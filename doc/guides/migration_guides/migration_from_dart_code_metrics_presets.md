@@ -200,7 +200,7 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `specify-unknown-enum-value` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_specify_unknown_enum_value.md). |
+| `specify-unknown-enum-value` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_specify_unknown_enum_value.md). |
 
 ## What You Gain
 

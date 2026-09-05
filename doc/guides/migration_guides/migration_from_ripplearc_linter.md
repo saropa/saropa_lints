@@ -57,7 +57,7 @@ Coverage: 24 rules — 5 HAVE (20%), 4 PARTIAL, 15 TODO (62%)
 | `avoid_static_colors` | HAVE | `avoid_hardcoded_colors` |
 | `avoid_static_typography` | PARTIAL | No saropa rule bans raw `TextStyle()` in favor of a theme-extension typography access — TODO, see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_static_typography.md) |
 | `avoid_test_timeouts` | HAVE | `require_integration_test_timeout` |
-| `document_enum` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_document_enum.md) |
+| `document_enum` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_document_enum.md) |
 | `document_fake_parameters` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_document_fake_parameters.md) |
 | `document_interface` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_document_interface.md) |
 | `forbid_datetime_now` | PARTIAL | `avoid_datetime_now_in_tests` — only covers test files, not "always inject a Clock in production code" |
