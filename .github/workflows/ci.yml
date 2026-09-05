@@ -73,6 +73,17 @@ jobs:
           sed -i '/^plugins:/,$d' analysis_options.yaml
       - name: Analyze
         run: dart analyze --fatal-infos
+      - name: Compile-check LSP server and CLI entry points
+        # Catches build-breaking API changes (e.g. removed getters in the
+        # analyzer package) that dart analyze cannot see because the rule
+        # files are loaded at runtime, not statically imported by the entry
+        # point. `dart compile kernel` is fast (~2s) and verifies the full
+        # import graph without producing a binary.
+        run: |
+          dart compile kernel bin/lsp_server.dart -o /dev/null
+          dart compile kernel bin/project_health.dart -o /dev/null
+          dart compile kernel bin/severity_report.dart -o /dev/null
+          dart compile kernel bin/doctor.dart -o /dev/null
       - name: Analyze saropa_lints_api package
         run: |
           cd packages/saropa_lints_api

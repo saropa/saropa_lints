@@ -103,10 +103,14 @@
 // Test fixture for: avoid_unsafe_cast
 // Source: lib\src\rules\type_safety_rules.dart
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 final context = BuildContext();
 dynamic widget;
+dynamic value;
 
 // BAD: Should trigger avoid_unsafe_cast
 // expect_lint: avoid_unsafe_cast
@@ -125,6 +129,85 @@ void _good1235() {
     // Use widget
   }
 }
+
+// GOOD (v6): cast preceded by an `is` check inside an `&&` condition — the
+// conjunction guarantees the type holds in the then-body. Reproduces
+// cross_file_options_config.dart:80 (avoid_unsafe_cast FP bug).
+List<String> _goodGuardedByIsCheckAnd() {
+  if (value != null && value is List) {
+    final items = value as List; // provably safe: `&&` guarantees is-check
+    return items.cast<String>();
+  }
+  return const [];
+}
+
+// BAD (v7): cast preceded by an `is` check inside an `||` condition — the
+// disjunction does NOT guarantee the type in the then-body. The body
+// executes when either operand is true, so `value` may not be a List.
+// expect_lint: avoid_unsafe_cast
+List<String> _badGuardedByIsCheckOr() {
+  if (value is List || value == 42) {
+    final items = value as List; // unsafe: `||` means value might be 42
+    return items.cast<String>();
+  }
+  return const [];
+}
+
+// GOOD (v6): `ProcessResult.stdout`/`.stderr` cast to String is safe when
+// the call did not explicitly opt out of decoding — SDK default encoding
+// (systemEncoding) always yields String. Reproduces the dominant FP
+// pattern from the avoid_unsafe_cast bug report (8 of 10 instances).
+String _goodProcessResultDefaultEncoding() {
+  final result = Process.runSync('git', ['status']);
+  return result.stdout as String; // default stdoutEncoding decodes to String
+}
+
+String _goodProcessResultExplicitEncoding() {
+  final result = Process.runSync('git', ['status'], stdoutEncoding: utf8);
+  return result.stdout as String; // explicit non-null encoding, still String
+}
+
+String _goodProcessResultDirectChain() {
+  return Process.runSync('git', ['status']).stdout as String; // chained
+}
+
+// BAD: `encoding: null` explicitly opts into raw bytes — the cast to
+// String really can throw here, so this must still be flagged.
+// expect_lint: avoid_unsafe_cast
+String _badProcessResultNullEncoding() {
+  final result = Process.runSync('git', ['status'], stdoutEncoding: null);
+  return result.stdout as String; // stdout is List<int> here — unsafe
+}
+
+// BAD (regression guard): an `is` check on an INCOMPATIBLE type must not
+// guard the cast. `value is int` proves nothing about a safe cast to
+// String — an earlier version of the guard accepted any `is` check on the
+// same expression regardless of type, which silently suppressed this.
+// expect_lint: avoid_unsafe_cast
+String _badIsCheckWrongType() {
+  if (value is int) {
+    return value as String;
+  }
+  return '';
+}
+
+// BAD (regression guard): a same-named variable declared in a sibling
+// branch must not be mistaken for the `Process.runSync` result declared in
+// this branch. An earlier version searched the whole function body by
+// source offset and matched the `if`-branch's `result` here, incorrectly
+// suppressing this unsafe cast.
+// expect_lint: avoid_unsafe_cast
+String _badSiblingBranchVariableNotProcessResult(bool cond) {
+  if (cond) {
+    final result = Process.runSync('git', ['status']);
+    return result.stdout as String;
+  } else {
+    final dynamic result = fetchUnrelatedDynamic();
+    return result.stdout as String; // not a ProcessResult — unsafe
+  }
+}
+
+dynamic fetchUnrelatedDynamic() => value;
 
 // GOOD: setupParentData guarantees the cast type in RenderObject workflows.
 class _FixtureRenderObject {

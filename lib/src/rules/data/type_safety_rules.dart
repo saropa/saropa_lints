@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -18,7 +19,7 @@ import '../../type_annotation_utils.dart';
 
 /// Warns when `as` cast is used without null check.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v6 | Rule version: v6
 ///
 /// Direct casting with `as` can throw if the value is null or wrong type.
 /// Prefer `is` check first or use `as?` for nullable result.
@@ -27,6 +28,11 @@ import '../../type_annotation_utils.dart';
 /// - Cast to `Object` (every non-null Dart value is an Object)
 /// - Same-type casts (redundant but safe)
 /// - Upcasts to a supertype (e.g. `int as num`)
+/// - Cast preceded by an `is` check on the same expression in an enclosing
+///   `if` (e.g. `if (v is List) { v as List }`)
+/// - `ProcessResult.stdout`/`.stderr` cast to `String` when the originating
+///   `Process.run`/`Process.runSync` call did not explicitly pass a `null`
+///   encoding (the SDK default always decodes to `String`)
 ///
 /// **BAD:**
 /// ```dart
@@ -65,7 +71,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_unsafe_cast',
-    '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime. Direct casting with as can throw if the value is null or wrong type. Prefer is check first or use as? for nullable result. {v5}',
+    '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime. Direct casting with as can throw if the value is null or wrong type. Prefer is check first or use as? for nullable result. {v6}',
     correctionMessage:
         'Use "is" check or pattern matching instead. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.WARNING,
@@ -86,6 +92,16 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
       // In RenderObject subclasses, setupParentData can guarantee the runtime
       // type for subsequent parentData casts.
       if (_isGuardedRenderObjectParentDataCast(node)) return;
+
+      // Cast preceded by an `is` check on the same expression in an
+      // enclosing if-condition (e.g. `if (v is List) { v as List }`) is
+      // safe — the type check guarantees the cast cannot fail.
+      if (_isGuardedByIsCheck(node)) return;
+
+      // `ProcessResult.stdout`/`.stderr` cast to String, where the value
+      // came from `Process.run`/`Process.runSync` and the call did not
+      // explicitly opt out of decoding — see _isSafeProcessResultStringCast.
+      if (_isSafeProcessResultStringCast(node)) return;
 
       final AstNode? parent = node.parent;
       if (parent == null) return;
@@ -270,6 +286,184 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
         target.propertyName.name == 'parentData' &&
         target.target is SimpleIdentifier &&
         (target.target! as SimpleIdentifier).name == paramName;
+  }
+
+  /// Returns true when the `as` cast is inside the then-branch of an `if`
+  /// whose condition includes an `is` check for the same expression and a
+  /// compatible type. E.g. `if (v is List) { v as List; }`.
+  bool _isGuardedByIsCheck(AsExpression node) {
+    final String castExpr = node.expression.toSource();
+    final String targetType = node.type.toSource().replaceAll('?', '');
+    AstNode child = node;
+    AstNode? parent = node.parent;
+    while (parent != null) {
+      if (parent is IfStatement && identical(parent.thenStatement, child)) {
+        if (_conditionHasIsCheck(parent.expression, castExpr, targetType)) {
+          return true;
+        }
+      }
+      // Don't escape past function boundaries.
+      if (parent is FunctionBody) return false;
+      child = parent;
+      parent = parent.parent;
+    }
+    return false;
+  }
+
+  /// Checks whether [condition] contains `expr is Type` (or a compatible
+  /// supertype) for the given [castExpr] and [targetType]. Handles `||`
+  /// and `&&` compound conditions.
+  bool _conditionHasIsCheck(
+    Expression condition,
+    String castExpr,
+    String targetType,
+  ) {
+    final Expression c = _unwrapParenthesized(condition);
+    // Recurse into `&&` compounds only. An `is` check inside `||` does NOT
+    // guarantee the type in the then-body — `if (v is List || other)` enters
+    // the body when `other` is true even if `v` is not a List, so the cast
+    // would still fail. Only `&&` ensures both operands hold.
+    if (c is BinaryExpression &&
+        c.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+      return _conditionHasIsCheck(c.leftOperand, castExpr, targetType) ||
+          _conditionHasIsCheck(c.rightOperand, castExpr, targetType);
+    }
+    if (c is IsExpression && c.notOperator == null) {
+      final String checkedExpr = c.expression.toSource();
+      final String checkedType = c.type.toSource().replaceAll('?', '');
+      // Require an exact type match. A prior version also accepted ANY
+      // `is` check on the same expression regardless of type (intending to
+      // cover subtype guards like `is YamlList` before `as List`), but that
+      // made `if (value is int) { value as String; }` suppress a genuinely
+      // unsafe cast — a false negative on the rule's core detection path.
+      // Only `&&` compounds are recursed into (not `||`), because `||`
+      // does not guarantee the type in the then-body — `if (v is List ||
+      // other)` enters the body when `other` is true even if `v` is not a
+      // List.
+      if (checkedExpr == castExpr && checkedType == targetType) return true;
+    }
+    return false;
+  }
+
+  /// True for `X.stdout as String` / `X.stderr as String` where `X` was
+  /// produced by `Process.run`/`Process.runSync` (directly chained, or via
+  /// an intermediate variable) and that call did not explicitly opt out of
+  /// decoding.
+  ///
+  /// `ProcessResult.stdout`/`.stderr` are declared `dynamic` because the
+  /// SDK also supports raw-byte output, so the analyzer's static type is
+  /// useless here. But the *runtime* type is determined entirely by the
+  /// `stdoutEncoding`/`stderrEncoding` argument: both default to
+  /// `systemEncoding` (never null), so output decodes to `String` unless
+  /// the caller explicitly passes `encoding: null` to request raw bytes.
+  /// Without this check, every `Process.runSync(...).stdout as String` in
+  /// the codebase (the standard, correct way to read process output) was
+  /// flagged — the dominant false-positive source for this rule.
+  bool _isSafeProcessResultStringCast(AsExpression node) {
+    final String targetType = node.type.toSource().replaceAll('?', '');
+    if (targetType != 'String') return false;
+
+    final Expression expr = node.expression;
+    String? propertyName;
+    Expression? target;
+    if (expr is PropertyAccess) {
+      propertyName = expr.propertyName.name;
+      target = expr.target;
+    } else if (expr is PrefixedIdentifier) {
+      propertyName = expr.identifier.name;
+      target = expr.prefix;
+    }
+    if (propertyName != 'stdout' && propertyName != 'stderr') return false;
+    if (target == null) return false;
+
+    MethodInvocation? call;
+    if (target is MethodInvocation && _isProcessRunCall(target)) {
+      // Directly chained: `Process.runSync(...).stdout as String`.
+      call = target;
+    } else if (target is SimpleIdentifier) {
+      // Via an intermediate variable: `result.stdout as String`.
+      call = _findProcessCallFor(node, target.name);
+    }
+    if (call == null) return false;
+
+    final String encodingArgName = propertyName == 'stdout'
+        ? 'stdoutEncoding'
+        : 'stderrEncoding';
+    for (final Expression arg in call.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == encodingArgName) {
+        // Explicit `null` opts out of decoding — output stays raw bytes,
+        // so the cast really can throw. Any other value still decodes.
+        return arg.expression is! NullLiteral;
+      }
+    }
+    // Argument omitted entirely: the SDK default (systemEncoding) still
+    // decodes to String.
+    return true;
+  }
+
+  /// True when [invocation] is `Process.run(...)` or `Process.runSync(...)`.
+  bool _isProcessRunCall(MethodInvocation invocation) {
+    if (invocation.methodName.name != 'run' &&
+        invocation.methodName.name != 'runSync') {
+      return false;
+    }
+    final Expression? target = invocation.target;
+    return target is SimpleIdentifier && target.name == 'Process';
+  }
+
+  /// Searches enclosing blocks (innermost first) for a
+  /// `var X = Process.run(Sync)(...)` declaration that lexically precedes
+  /// [node] within the SAME block.
+  ///
+  /// A prior version searched the entire enclosing function body via
+  /// unscoped depth-first traversal, matching same-named declarations from
+  /// unrelated lexical scopes (e.g. a sibling `if`/`else` branch) purely by
+  /// source offset. That let `result` declared in an `if` branch mask an
+  /// unrelated `result` used in the `else` branch, incorrectly suppressing
+  /// a genuinely unsafe cast. Walking outward one `Block` at a time and
+  /// only scanning statements that appear before the cast's own statement
+  /// mirrors normal Dart local-variable scoping, so a sibling branch's
+  /// declaration is never visited.
+  MethodInvocation? _findProcessCallFor(AstNode node, String varName) {
+    AstNode child = node;
+    AstNode? parent = node.parent;
+    while (parent != null) {
+      if (parent is Block) {
+        for (final Statement stmt in parent.statements) {
+          // Declarations from this point on are not yet in scope at the
+          // cast site — stop once we reach the statement that contains it.
+          if (identical(stmt, child) || _containsNode(stmt, child)) break;
+          if (stmt is VariableDeclarationStatement) {
+            for (final VariableDeclaration decl
+                in stmt.variables.variables) {
+              if (decl.name.lexeme != varName) continue;
+              final Expression? initializer = decl.initializer;
+              if (initializer is MethodInvocation &&
+                  _isProcessRunCall(initializer)) {
+                return initializer;
+              }
+            }
+          }
+        }
+      }
+      // Don't escape past function boundaries.
+      if (parent is FunctionBody) return null;
+      child = parent;
+      parent = parent.parent;
+    }
+    return null;
+  }
+
+  /// True when [node] is [ancestor] or a descendant of it (walks up from
+  /// [node] rather than down from [ancestor] — cheaper for this call site
+  /// since the cast is always deeply nested under the candidate statement).
+  bool _containsNode(AstNode ancestor, AstNode node) {
+    AstNode? current = node;
+    while (current != null) {
+      if (identical(current, ancestor)) return true;
+      current = current.parent;
+    }
+    return false;
   }
 }
 
