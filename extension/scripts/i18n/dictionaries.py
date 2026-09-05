@@ -469,7 +469,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{wk}w ago": "{wk} ہفتے قبل",
         "▾": "▾",
         # Manual: scan-on-save setting description — preserves **bold**, `backtick`, and brand names.
-        "**Scan on save (saropa_lints daemon).** When **on** (default), rescans Dart files on save and shows findings as squiggles and Problems panel entries. Turn **off** to stop only this scan-on-save path—not the whole extension: the LSP server (`saropaLints.lspServer.enabled`) and the in-editor analyzer plugin are separate switches shown on the sidebar’s Engines row (open **Saropa Lints: Show Process Health** for details). Use **Saropa Lints: Set Up Project** when you need to add `saropa_lints` to pubspec and write `analysis_options`.": "**محفوظ کرنے پر اسکین (saropa_lints ڈیمون)۔** جب **آن** (ڈیفالٹ) ہو، تو محفوظ کرنے پر Dart فائلوں کو دوبارہ اسکین کرتا ہے اور نتائج کو لہروں اور Problems پینل کے اندراجات کے طور پر دکھاتا ہے۔ صرف اس اسکین-آن-سیو راستے کو روکنے کے لیے **آف** کریں — پوری ایکسٹینشن نہیں: LSP سرور (`saropaLints.lspServer.enabled`) اور ایڈیٹر کا analyzer پلگ ان الگ سوئچز ہیں جو سائیڈبار کی Engines قطار میں دکھائے جاتے ہیں (تفصیلات کے لیے **Saropa Lints: Show Process Health** کھولیں)۔ جب آپ کو `saropa_lints` کو pubspec میں شامل کرنا ہو اور `analysis_options` لکھنا ہو تو **Saropa Lints: Set Up Project** استعمال کریں۔",
+        "**Scan on save (saropa_lints daemon).** When **on** (default), rescans Dart files on save and shows findings as squiggles and Problems panel entries. Turn **off** to stop only this scan-on-save path—not the whole extension: the LSP server (`saropaLints.lspServer.enabled`) and the in-editor analyzer plugin are separate switches shown on the sidebar's Engines row (open **Saropa Lints: Show Process Health** for details). Use **Saropa Lints: Set Up Project** when you need to add `saropa_lints` to pubspec and write `analysis_options`.": "**محفوظ کرنے پر اسکین (saropa_lints ڈیمون)۔** جب **آن** (ڈیفالٹ) ہو، تو محفوظ کرنے پر Dart فائلوں کو دوبارہ اسکین کرتا ہے اور نتائج کو لہروں اور Problems پینل کے اندراجات کے طور پر دکھاتا ہے۔ صرف اس اسکین-آن-سیو راستے کو روکنے کے لیے **آف** کریں — پوری ایکسٹینشن نہیں: LSP سرور (`saropaLints.lspServer.enabled`) اور ایڈیٹر کا analyzer پلگ ان الگ سوئچز ہیں جو سائیڈبار کی Engines قطار میں دکھائے جاتے ہیں (تفصیلات کے لیے **Saropa Lints: Show Process Health** کھولیں)۔ جب آپ کو `saropa_lints` کو pubspec میں شامل کرنا ہو اور `analysis_options` لکھنا ہو تو **Saropa Lints: Set Up Project** استعمال کریں۔",
     },
     "de": {
         # Removed: old "enabled" description curated here for bold/backtick fidelity.
@@ -1302,8 +1302,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "fil": {
         # Manual: MT returned the English unchanged for this drift label.
         "Cross-project drift": "Drift sa iba't ibang proyekto",
-        # Manual: MT returns English unchanged — technical terms kept as loanwords, Filipino word order.
-        "Analyzer Plugin": "Plugin ng Analyzer",
+        # Removed: "Analyzer Plugin" is not a standalone source string (only appears
+        # in longer phrases like "Analyzer Plugin: enabling…"), so a passthrough here
+        # never matched. The longer strings are translated by MT.
         # Manual: MT returned English unchanged — "Ulat ng Pag-audit" is the standard Filipino rendering
         # for a formal report document ("ulat" = report, "pag-audit" = audit process).
         "Audit Report": "Ulat ng Pag-audit",
