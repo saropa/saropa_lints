@@ -4,6 +4,18 @@ from __future__ import annotations
 
 from typing import Dict
 
+# Technical keywords that stay identical in every locale. Adding a string here
+# auto-generates a passthrough ("X" → "X") in every TRANSLATIONS locale, so the
+# coverage gate counts it as translated without duplicating the entry 19+ times.
+# Only add strings whose English source value is a technical identifier, column
+# header keyword, or code-level token — never ordinary user-facing prose.
+DO_NOT_TRANSLATE: list[str] = [
+    "runtime_tier",
+    "rule_name",
+    "saropa_quality_gate.yaml thresholds",
+    "saropa_tier",
+]
+
 # cspell:disable
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "nl": {
@@ -20,7 +32,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Search": "Zoeken",
         "Search packages": "Zoeken",
         "Search packages…": "Zoeken",
-        "Editor dashboards": "Editor-dashboards",
+        "Dashboards": "Dashboards",
         "Actions": "Acties",
         "Status": "Status",
         "Settings": "Instellingen",
@@ -156,6 +168,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
         # Curated passthrough: "Status:" is spelled identically in Dutch; no translation needed.
         "Status:": "Status:",
+        # Curated passthrough: technical column-header keyword; no translation needed.
+        "Upgrades": "Upgrades",
     },
     "fr": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -187,7 +201,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Search": "Rechercher",
         "Search packages": "Rechercher",
         "Search packages…": "Rechercher",
-        "Editor dashboards": "Tableaux de bord editeur",
+        "Dashboards": "Tableaux de bord",
         "Action": "Action",
         "Actions": "Actions",
         "Status": "Etat",
@@ -317,6 +331,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{visible} sur {total} lignes visibles",
         "{wk}w ago": "il y a {wk} sem",
         "▾": "▾",
+        # Curated passthroughs: MT-failure keywords that stay in English for this locale.
+        "Budget": "Budget",
+        "Extension": "Extension",
     },
     "ur": {
         # Curated passthrough: Urdu MT echoes this command title unchanged; English (with the Saropa brand) is the correct rendering.
@@ -333,7 +350,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Search": "تلاش",
         "Search packages": "تلاش",
         "Search packages…": "تلاش",
-        "Editor dashboards": "ايڊيٽر ڊيش بورڊز",
+        "Dashboards": "ڈیش بورڈز",
         "Actions": "ايڪشنز",
         "Status": "اسٽيٽس",
         "Settings": "سيٽنگز",
@@ -549,6 +566,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
         # Curated passthrough: "Status:" is spelled identically in German; no translation needed.
         "Status:": "Status:",
+        # Curated passthrough: MT-failure keyword that stays in English for this locale.
+        "Budget": "Budget",
     },
     "es": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -616,6 +635,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{visible} de {total} filas visibles",
         "{wk}w ago": "hace {wk} sem",
         "▾": "▾",
+        # MT-failure passthrough: "Doctor" is a feature title (config-checker); Spanish "Doctor" is identical.
+        "Doctor": "Doctor",
     },
     "it": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1258,8 +1279,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fil": {
-        # Manual: no MT engine translated this single-word settings label; kept as the established English loanword, matching sibling UI labels this locale already keeps untranslated (Activity bar, Code Health, Dependency Network).
-        "Lane": "Lane",
         # Manual: MT returned the English unchanged for this drift label.
         "Cross-project drift": "Drift sa iba't ibang proyekto",
         # Manual: MT returns English unchanged — technical terms kept as loanwords, Filipino word order.
@@ -1411,6 +1430,15 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Log": "Log",
         # Manual: brand-prefixed command title; "I-audit ang Folder" is the Filipino imperative form.
         "Saropa: Audit Folder...": "Saropa: I-audit ang Folder...",
+        # MT-failure passthroughs: no MT engine produced a Filipino translation for these UI labels.
+        # Kept as English — common loanwords in Filipino tech UI contexts.
+        "Extension": "Extension",
+        "Identifier": "Identifier",
+        "Output": "Output",
+        "Previous / next tab": "Previous / next tab",
+        "Saropa Project Map": "Saropa Project Map",
+        "Tier cap": "Tier cap",
+        "Tier: {tier} · Lane: {lane}": "Tier: {tier} · Lane: {lane}",
     },
     "he": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1739,8 +1767,6 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "tr": {
-        # Manual: no MT engine translated this single-word settings label (analysis lane: Light/Full).
-        "Lane": "Şerit",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1914,3 +1940,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
 }
+
+# Merge DO_NOT_TRANSLATE passthroughs into every locale that doesn't already
+# have a curated entry for the string. Runs once at import time.
+for _locale_dict in TRANSLATIONS.values():
+    for _keyword in DO_NOT_TRANSLATE:
+        _locale_dict.setdefault(_keyword, _keyword)
