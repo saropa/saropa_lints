@@ -75,6 +75,20 @@ Accessible via the status bar click (UI surface). Not registered in
 `package.json` contributes.commands (not a palette item — it's a
 one-click diagnostic for "why is nothing happening?").
 
+### Scan on open / activation (follow-up)
+
+Diagnostics previously required a file save to trigger. The controller now
+scans without saving:
+
+- `_scanOpenEditors()`: on activation, iterates all already-open
+  `TextDocument`s, queues every in-project Dart file, and fires a single
+  debounced scan. Users see squiggles as soon as the extension loads.
+- `onDidOpenTextDocument` listener: queues newly opened Dart files via the
+  same `_queueIfDart()` helper, so switching to or opening a file produces
+  diagnostics without saving.
+- Both paths share the existing debounce timer and `_pendingFiles` set, so
+  rapid opens coalesce into one scan invocation.
+
 ### What this does NOT fix
 
 - Pre-existing i18n gaps in `sectionedSidebar.ts` hardcoded strings and
