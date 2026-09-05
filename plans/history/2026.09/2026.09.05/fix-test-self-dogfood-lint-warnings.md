@@ -38,3 +38,9 @@ Added 23 action verbs to the `require_test_description_convention` rule's keywor
 ### Test Results
 
 All 2691 tests pass across the 8 affected files (214 in scan/tier/quickfix, 2407 in integrity, 70 in testing_best_practices_rules).
+
+### Hardening (post-reflection)
+
+**Word-boundary matching**: switched `_goodDescriptionWords` matching from `description.contains(word)` to precomputed `RegExp('\b<word>\b')` patterns. Prevents false negatives where a keyword matches as a substring of a longer word (e.g. `'maps'` inside `'hashmaps'`, `'sorts'` inside `'allsorts'`). The `_goodDescriptionPatterns` list is computed once as a static final field.
+
+**Quick fix for interpolated descriptions**: `SuggestTestDescriptionFix.compute()` previously bailed on interpolated strings because `stringValue` returned null. Added `_fixInterpolatedDescription()` which finds the first non-empty `InterpolationString` segment and inserts `'should '` at its leading edge, preserving interpolation expressions intact. Guarded against double-insertion when "should" is already present.

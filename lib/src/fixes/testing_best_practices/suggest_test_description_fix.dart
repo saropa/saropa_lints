@@ -76,6 +76,22 @@ class SuggestTestDescriptionFix extends SaropaFixProducer {
     final descriptionNode = _resolveStringLiteral(node);
     if (descriptionNode == null) return;
 
+    // For interpolated strings, stringValue is null — prepend "should "
+    // to the first literal segment instead of replacing the whole string.
+    if (descriptionNode is StringInterpolation) {
+      await _fixInterpolatedDescription(builder, descriptionNode);
+      return;
+    }
+    if (descriptionNode is AdjacentStrings &&
+        descriptionNode.strings.any((s) => s is StringInterpolation)) {
+      // AdjacentStrings containing an interpolation — fix the first part.
+      final first = descriptionNode.strings.first;
+      if (first is StringInterpolation) {
+        await _fixInterpolatedDescription(builder, first);
+        return;
+      }
+    }
+
     final originalDescription = descriptionNode.stringValue ?? '';
     if (originalDescription.isEmpty) return;
 
@@ -98,6 +114,39 @@ class SuggestTestDescriptionFix extends SaropaFixProducer {
         replacement,
       );
     });
+  }
+
+  /// Fix an interpolated test description by prepending "should " after
+  /// the first interpolation expression (e.g. `'${c.rule} fixture exists'`
+  /// → `'${c.rule} should fixture exists'`), or at the start of the first
+  /// literal segment when it leads with text. This preserves interpolation
+  /// expressions that the full-replacement path would destroy.
+  Future<void> _fixInterpolatedDescription(
+    ChangeBuilder builder,
+    StringInterpolation node,
+  ) async {
+    // Find the first InterpolationString with non-whitespace text to inject
+    // "should " at its leading edge. Typically this is the segment right
+    // after the first InterpolationExpression.
+    for (final element in node.elements) {
+      if (element is InterpolationString) {
+        final text = element.value;
+        if (text.trim().isEmpty) continue;
+
+        // Insert "should " right after leading whitespace (usually a space
+        // separating the interpolation from the rest of the description).
+        final leadingSpace = text.length - text.trimLeft().length;
+        final insertOffset = element.offset + leadingSpace;
+
+        // Don't add "should" if it's already there.
+        if (text.trimLeft().toLowerCase().startsWith('should ')) return;
+
+        await builder.addDartFileEdit(file, (builder) {
+          builder.addSimpleInsertion(insertOffset, 'should ');
+        });
+        return;
+      }
+    }
   }
 
   /// Resolve the covering node to a StringLiteral.

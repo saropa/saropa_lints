@@ -3492,9 +3492,10 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
   );
 
   /// Words that indicate a good test description — presence of any one
-  /// is enough to skip the lint, so only add words that genuinely signal
-  /// a what-is-tested / expected-behavior intent.
-  static const Set<String> _goodDescriptionWords = <String>{
+  /// (as a whole word, not a substring) is enough to skip the lint, so
+  /// only add words that genuinely signal a what-is-tested /
+  /// expected-behavior intent.
+  static const List<String> _goodDescriptionWords = <String>[
     'should',
     'returns',
     'throws',
@@ -3534,7 +3535,14 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
     'sorts',
     'merges',
     'splits',
-  };
+  ];
+
+  /// Word-boundary patterns for each indicator word, precomputed once.
+  /// Prevents substring matches like 'maps' inside 'hashmaps'.
+  static final List<RegExp> _goodDescriptionPatterns =
+      _goodDescriptionWords
+          .map((w) => RegExp('\\b${RegExp.escape(w)}\\b'))
+          .toList();
 
   @override
   void runWithReporter(
@@ -3559,9 +3567,10 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
       // by what they actually say.
       final description = _literalText(firstArg).toLowerCase();
 
-      // Check if description has any good indicator words
-      final hasGoodWord = _goodDescriptionWords.any(
-        (word) => description.contains(word),
+      // Check if description has any good indicator words (whole-word match
+      // so 'maps' doesn't match inside 'hashmaps').
+      final hasGoodWord = _goodDescriptionPatterns.any(
+        (pattern) => pattern.hasMatch(description),
       );
 
       // Check minimum length (should be descriptive)

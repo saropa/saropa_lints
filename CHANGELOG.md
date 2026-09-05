@@ -88,7 +88,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Changed
 
-- `require_test_description_convention` now recognizes 23 additional action verbs as good description indicators (exists, contains, matches, produces, reports, parses, rejects, accepts, ignores, skips, detects, fires, triggers, prevents, allows, blocks, converts, maps, filters, sorts, merges, splits), reducing false positives on data-driven fixture-existence tests. No action required.
+- `require_test_description_convention` now recognizes 23 additional action verbs as good description indicators and uses word-boundary matching to prevent false negatives on substring matches (e.g. "maps" no longer matches inside "hashmaps"). No action required.
+- `require_test_description_convention` quick fix now handles interpolated test descriptions — previously it silently skipped them because the full string value was null. No action required.
 - `prefer_state_class_below_widget` now detects third-party widget/state pairs — Riverpod's `ConsumerStatefulWidget`/`ConsumerState` and flutter_hooks' `HookStatefulWidget`/`HookState` — in addition to core Flutter's `StatefulWidget`/`State`. No action required.
 - Renamed engine names throughout the extension: "Analyzer Plugin" → "Live Analysis", "Scan Daemon" → "Scan on Save" in the Health Panel; "Turn Off Lint Integration" → "Disable Saropa Lints" and "Re-enable In-Process Plugin" → "Re-enable Live Analysis" in the command catalog. Updated notification strings that referenced "Lint integration" to say "Scan on save". No action required.
 
