@@ -800,5 +800,10 @@ input:checked + .slider:before { transform: translateX(14px); opacity: 1; }
   color: var(--vscode-badge-foreground);
 }
 .hint { font-size: 0.85em; color: var(--muted); margin: 6px 0 0 0; }
+/* Baseline card's diff subsection (Phase 4 deferred item). A plain block, not .section,
+   because it nests INSIDE the Baseline card's own .section — a second full section chrome
+   here would double the padding/border and look like an accidental card-in-a-card. */
+.baseline-diff { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--vscode-widget-border, var(--muted)); }
+.baseline-diff h4 { margin: 0 0 4px 0; font-size: 0.95em; }
 `;
 }

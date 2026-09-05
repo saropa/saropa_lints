@@ -304,7 +304,17 @@
         "openTitle": "Open saropa_baseline.json in the editor.",
         "summary": "{files} file(s), {violations} violation(s) baselined — generated {generated}.",
         "unknownDate": "at an unknown time",
-        "count": "Count"
+        "count": "Count",
+        "diff": {
+          "title": "Diff vs current",
+          "counts": "{resolved} resolved since baseline · {new} new since baseline.",
+          "empty": "No drift — the live violation set matches the baseline exactly.",
+          "resolvedSection": "Resolved ({count})",
+          "newSection": "New since baseline ({count})",
+          "moreRows": "+{count} more not shown.",
+          "fileCol": "File",
+          "lineCol": "Line"
+        }
       },
       "optimizer": {
         "openStandalone": "Open standalone",

@@ -66,6 +66,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.1.0] — Unreleased
+
+Adds a diff view to the Config file tab's Baseline card, so you can see what changed since a baseline was created without leaving the dashboard.
+
+### Added
+
+- Config file tab: the Baseline card now shows a "Diff vs current" subsection listing violations resolved since the baseline (fixed) and new since the baseline (introduced), each with a file/line/rule table. Reads live diagnostics, so it never triggers a scan and stays current as you edit.
+
 ## [16.0.0-beta.2]
 
 Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)

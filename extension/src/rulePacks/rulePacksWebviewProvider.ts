@@ -65,7 +65,11 @@ import {
   type DiagnosticThreshold,
   type CustomYamlTopLevelKey,
 } from './customConfigYaml';
-import { readBaselineSummary, baselineFilePath } from './baselineReader';
+import { readBaselineSummary, baselineFilePath, computeBaselineDiff, type BaselineDiff } from './baselineReader';
+// Bare diagnostic-to-violation builder (not the enriched `readLiveViolations` wrapper) — the
+// diff only needs file/rule/line, so skipping rule-catalog enrichment and tier resolution keeps
+// this read as cheap as the handover's "must not trigger a scan" constraint requires.
+import { buildViolationsDataFromDiagnostics } from '../liveDiagnosticsModel';
 import { buildSettingsCatalog, findSettingEntry, flatSettingKey, type SettingCatalogEntry } from './settingsCatalog';
 
 const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
@@ -1864,7 +1868,87 @@ ${detailRow}`;
   <table class="dash-table"><thead><tr><th>${escapeHtml(l10n('rulesTiers.common.rule'))}</th><th>${escapeHtml(l10n('rulesTiers.configFile.baseline.count'))}</th></tr></thead>
     <tbody>${ruleRows}</tbody>
   </table>
+  ${this._buildBaselineDiffHtml(root)}
 </section>`;
+  }
+
+  /**
+   * Deferred Phase 4 item: diffs the baseline file against the CURRENT live violation set
+   * (read from `vscode.languages.getDiagnostics()` — the same in-memory source the Findings
+   * dashboard already uses, so this never triggers a scan) and renders the result as its own
+   * subsection under the Baseline card's summary table.
+   *
+   * Only called from the `summary` (non-empty) branch of {@link _buildBaselineCard} — with no
+   * baseline file there is nothing to diff against, and that branch already shows the
+   * "no baseline yet" empty hint, so a second empty state here would be redundant noise.
+   */
+  private _buildBaselineDiffHtml(root: string): string {
+    // Bare diagnostic read — deliberately skips `readLiveViolations`'s rule-catalog enrichment
+    // and tier resolution, which the diff (file/rule/line only) does not need.
+    const live = buildViolationsDataFromDiagnostics(root);
+    const diff = computeBaselineDiff(root, live.violations);
+    if (!diff) return '';
+
+    const countsLine = `<p class="hint">${escapeHtml(
+      l10n('rulesTiers.configFile.baseline.diff.counts', {
+        resolved: String(diff.resolvedCount),
+        new: String(diff.newCount),
+      }),
+    )}</p>`;
+
+    if (diff.resolvedCount === 0 && diff.newCount === 0) {
+      return `<div class="baseline-diff">
+    <h4>${escapeHtml(l10n('rulesTiers.configFile.baseline.diff.title'))}</h4>
+    <p class="hint">${escapeHtml(l10n('rulesTiers.configFile.baseline.diff.empty'))}</p>
+  </div>`;
+    }
+
+    return `<div class="baseline-diff">
+    <h4>${escapeHtml(l10n('rulesTiers.configFile.baseline.diff.title'))}</h4>
+    ${countsLine}
+    ${this._buildBaselineDiffTable('resolved', diff.resolved, diff.resolvedCount)}
+    ${this._buildBaselineDiffTable('new', diff.newSince, diff.newCount)}
+  </div>`;
+  }
+
+  /**
+   * One diff bucket's table (resolved OR new-since). `kind` picks the section header/empty-state
+   * copy; the row shape (file/line/rule) is identical for both buckets, so the table markup
+   * itself is shared rather than duplicated per kind.
+   */
+  private _buildBaselineDiffTable(
+    kind: 'resolved' | 'new',
+    entries: readonly { file: string; rule: string; line: number }[],
+    trueCount: number,
+  ): string {
+    const titleKey = kind === 'resolved' ? 'rulesTiers.configFile.baseline.diff.resolvedSection' : 'rulesTiers.configFile.baseline.diff.newSection';
+    // Zero-count bucket: a flat line, not a collapsible `<details>` with an empty table —
+    // there is nothing to expand into.
+    if (trueCount === 0) {
+      return `<p class="hint">${escapeHtml(l10n(titleKey, { count: '0' }))}</p>`;
+    }
+    const rows = entries
+      .map(
+        (e) => `<tr><td><code>${escapeHtml(e.file)}</code></td><td class="num">${e.line}</td><td><code>${escapeHtml(e.rule)}</code></td></tr>`,
+      )
+      .join('');
+    // The reader caps each bucket at MAX_DIFF_ROWS (baselineReader.ts) — when the true count
+    // exceeds what's rendered, say so rather than silently truncating.
+    const moreNote =
+      trueCount > entries.length
+        ? `<p class="hint">${escapeHtml(l10n('rulesTiers.configFile.baseline.diff.moreRows', { count: String(trueCount - entries.length) }))}</p>`
+        : '';
+    return `<details class="section expander">
+    <summary><span class="expander-title">${escapeHtml(l10n(titleKey, { count: String(trueCount) }))}</span></summary>
+    <table class="dash-table"><thead><tr>
+      <th>${escapeHtml(l10n('rulesTiers.configFile.baseline.diff.fileCol'))}</th>
+      <th>${escapeHtml(l10n('rulesTiers.configFile.baseline.diff.lineCol'))}</th>
+      <th>${escapeHtml(l10n('rulesTiers.common.rule'))}</th>
+    </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${moreNote}
+  </details>`;
   }
 
   /** Embeds the Analysis Optimizer's live body (Phase 4 requirement #4 — its standalone command remains a working deep link; this is the SAME render logic, not a copy). */
