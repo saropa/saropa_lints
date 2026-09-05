@@ -102,7 +102,7 @@ through Status's Health row.
 | Find stale ignores (separate row) | Merged into "Fix stale ignores" — finds first (publishes diagnostics either way), shows the real count in the confirm dialog, then fixes on confirm |
 | Command Catalog (was a Dashboards row) | Moved to Quick Actions ("All commands…") |
 
-Row-count details and per-row dispositions: see plans/PLAN_sidebar_row_collapse.md §2.
+Row-count details and per-row dispositions: see plans/history/2026.09/2026.09.04/PLAN_sidebar_row_collapse.md §2.
 
 **Banner view** stays but only for one state now: not a Dart project / no `saropa_lints`
 dependency (info, no action beyond "Set Up Project"). The "dependency present but integration off"

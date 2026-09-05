@@ -192,6 +192,10 @@ export const workspace: Record<string, any> = {
         writeFile: async () => { /* no-op */ },
         createDirectory: async () => { /* no-op */ },
     },
+    // IssuesTreeProvider subscribes to config changes for grouping mode
+    onDidChangeConfiguration: (_listener: (e: any) => void) => ({
+        dispose: () => { /* no-op */ },
+    }),
     onDidSaveTextDocument: (_listener: (doc: any) => void) => ({
         dispose: () => { /* no-op */ },
     }),

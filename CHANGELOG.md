@@ -85,6 +85,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - Fixed `avoid_case_sensitive_path_comparison` false positive on non-string comparisons — null checks, boolean/integer/double/enum guards on path-named variables no longer fire. No action required.
 
+<details><summary>Maintenance</summary>
+
+- Fixed 15 pre-existing extension test failures: added missing `onDidChangeConfiguration` mock (13 issuesTree tests), updated stale locale coverage assertions (languagePick), and updated sidebar panel count from 5 to 4 after Help view removal (uxLabels). No action required.
+- Updated stale path reference in the UI redesign plan after archiving completed sub-plans. No action required.
+
+</details>
+
 ---
 
 ## [16.0.0-beta.2]

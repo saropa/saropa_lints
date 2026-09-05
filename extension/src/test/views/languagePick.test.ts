@@ -4,8 +4,23 @@
 import '../vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 import { buildUiLanguageQuickPickItems } from '../../i18n/languagePick';
+
+/**
+ * Reads the generated locale_coverage.json so assertions track actual
+ * coverage rather than hardcoding percentages that go stale on every
+ * catalog regeneration.
+ */
+function readCoverageData(): Record<string, { coveragePct: number }> {
+  const coveragePath = path.resolve(
+    __dirname, '..', '..', '..', 'src', 'i18n', 'locale_coverage.json',
+  );
+  const raw = JSON.parse(fs.readFileSync(coveragePath, 'utf-8'));
+  return raw.locales;
+}
 
 describe('languagePick', () => {
   it('lists auto first, then locales sorted by English language name', () => {
@@ -50,20 +65,27 @@ describe('languagePick', () => {
   it('badges incomplete locales with their coverage percent and leaves complete ones clean', () => {
     const items = buildUiLanguageQuickPickItems();
     const byValue = new Map(items.map((i) => [i.value, i]));
+    const coverage = readCoverageData();
 
-    // zh ships at 4% per the generated coverage file — must carry a badge so the
-    // user is not silently dropped onto a near-English UI under a Chinese label.
-    const zh = byValue.get('zh');
-    assert.ok(zh, 'zh item present');
-    assert.ok(zh!.description, 'zh has a coverage badge');
-    assert.match(zh!.description!, /4/, 'zh badge states its 4% coverage');
+    // Dynamically check every locale: if coverage < 100%, the badge must
+    // contain the percentage; if >= 100% or absent, no badge.
+    for (const [code, entry] of Object.entries(coverage)) {
+      // Cast needed: Object.entries returns string but the map is keyed by UiLanguageCode
+      const item = byValue.get(code as any);
+      if (!item) continue; // locale in coverage but not in the picker enum
+      if (entry.coveragePct < 100) {
+        assert.ok(item.description, `${code} at ${entry.coveragePct}% should carry a coverage badge`);
+        assert.match(
+          item.description!,
+          new RegExp(String(entry.coveragePct)),
+          `${code} badge should state its ${entry.coveragePct}% coverage`,
+        );
+      } else {
+        assert.strictEqual(item.description, undefined, `${code} at 100% should have no badge`);
+      }
+    }
 
-    // A fully-translated locale gets no description, keeping the list uncluttered.
-    const de = byValue.get('de');
-    assert.ok(de, 'de item present');
-    assert.strictEqual(de!.description, undefined, 'complete locale has no badge');
-
-    // English is the source (100%) and likewise carries no badge.
+    // English is the source (100%) and always carries no badge.
     assert.strictEqual(byValue.get('en')!.description, undefined);
 
     // `auto` keeps its resolved-language hint, not a coverage badge.
