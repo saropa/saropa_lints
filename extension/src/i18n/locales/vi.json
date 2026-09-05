@@ -70,7 +70,11 @@
       "scanning": "Saropa: đang quét {count} tập tin(s)...",
       "done": "Saropa: {count} lỗi, {elapsed}s",
       "failed": "Saropa: quét thất bại",
-      "warming": "Saropa: đang khởi động phân tích... quét lần đầu sau khi mở có thể mất một phút"
+      "warming": "Saropa: đang khởi động phân tích... quét lần đầu sau khi mở có thể mất một phút",
+      "ready": "Saropa: sẵn sàng",
+      "disabled": "Saropa: bị vô hiệu hóa",
+      "noProject": "Saropa: không có dự án Dart",
+      "doneTooltip": "(Các) kết quả {total}, {shown} hiển thị sau bộ lọc"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: quét toàn bộ dự án",
@@ -86,10 +90,6 @@
       "failed": "Báo cáo cơ hội không thể được viết: {error}",
       "large": "Báo cáo có kích thước {megabytes} MB và có thể chậm khi duyệt. Tệp JSON đi kèm chứa dữ liệu giống nhau cho công cụ.",
       "done": "Báo cáo cơ hội được viết cho {path}"
-    },
-    "sidebar": {
-      "label": "Báo cáo Cơ hội Toàn diện",
-      "description": "Mỗi package và tính năng, với số lần sử dụng"
     },
     "documentTitle": "Inventory Tính năng Gói",
     "heroTitle": "Inventory Tính năng Gói",
@@ -213,6 +213,127 @@
   "tierPicker": {
     "ruleCount": "{count} quy tắc"
   },
+  "rulesTiers": {
+    "tabBar": {
+      "ariaLabel": "Tab trang tổng quan Quy tắc & Cấp độ"
+    },
+    "tab": {
+      "tier": "Tier Tier Tier tier tier tier",
+      "packs": "Các gói quy tắc bao gồm các quy tắc.",
+      "overrides": "Bỏ qua các lệnh thay thế",
+      "sdk": "Triển khai SDK",
+      "configFile": "Tập tin cấu hình",
+      "automation": "Tự động hóa",
+      "extension": "Sự mở rộng"
+    },
+    "common": {
+      "rule": "Quy tắc của quy định",
+      "add": "Thêm vào",
+      "remove": "Remove remove loại bỏ"
+    },
+    "sdk": {
+      "summary": "(Các) gói di chuyển SDK {total} áp dụng cho dự án này — phá vỡ {breaking}, ngừng sử dụng {deprecation}.",
+      "noneApplicable": "No SDK migration packs apply to this project's pubspec environment yet.",
+      "enableAllTitle": "Turn on every SDK migration pack whose Dart/Flutter version gate this project already satisfies.",
+      "enableAll": "Kích hoạt tất cả áp dụng ({count})",
+      "enableBreakingTitle": "Turn on only the SDK packs that flag APIs already removed in your target version.",
+      "enableBreaking": "Chỉ cho phép ngắt ({count})",
+      "enableDeprecationTitle": "Turn on only the SDK packs that flag APIs deprecated (but still working) in your target version.",
+      "enableDeprecation": "Chỉ cho phép ngừng sử dụng ({count})",
+      "noPacksInCatalogue": "No SDK migration packs are registered."
+    },
+    "configFile": {
+      "analysisSettings": {
+        "title": "Cài đặt phân tích",
+        "hint": "Kiểm soát số lượng vấn đề mà tab Sự cố hiển thị và nơi viết báo cáo phân tích."
+      },
+      "maxIssues": {
+        "label": "Số vấn đề tối đa",
+        "desc": "Giới hạn số lượng sự cố không phải lỗi được hiển thị trong tab Sự cố. 0 có nghĩa là không giới hạn. Tràn vẫn xuất hiện trong tệp báo cáo đầy đủ."
+      },
+      "output": {
+        "label": "đầu ra",
+        "desc": "Trường hợp báo cáo phân tích được viết: chỉ thiết bị đầu cuối, chỉ một tệp hoặc cả hai."
+      },
+      "tierCap": {
+        "title": "Tier cap",
+        "hint": "Giới hạn cấp nào chạy tại thời điểm phân tích, không phụ thuộc vào quy tắc nào được bật rõ ràng. Để lại là Không có để sử dụng cài đặt Cấp của tiện ích mở rộng.",
+        "none": "Không có (sử dụng cài đặt của tab Cấp)"
+      },
+      "saropaTier": {
+        "label": "saropa_tier"
+      },
+      "runtimeTier": {
+        "label": "thời gian chạy_tier"
+      },
+      "lane": {
+        "title": "Làn phân tích",
+        "hint": "Quy tắc nào mà plugin trình phân tích trong quá trình chạy trực tiếp trong trình chỉnh sửa so với chỉ khi lưu (thông qua trình nền quét)."
+      },
+      "platforms": {
+        "title": "Nền tảng mục tiêu",
+        "hint": "Vô hiệu hóa các nền tảng mà dự án này không nhắm mục tiêu nên các quy tắc dành riêng cho nền tảng sẽ không được áp dụng."
+      },
+      "severities": {
+        "title": "Ghi đè mức độ nghiêm trọng",
+        "hint": "Ghi đè mức độ nghiêm trọng của một quy tắc cụ thể hoặc tắt hoàn toàn quy tắc đó, không phụ thuộc vào cấp độ và gói quy tắc.",
+        "level": "Level",
+        "empty": "No severity overrides are set.",
+        "rulePlaceholder": "tên_quy tắc",
+        "newLevelAria": "New severity level"
+      },
+      "bannedUsage": {
+        "title": "Sử dụng bị cấm",
+        "hint": "Gắn cờ một mã định danh cụ thể (hàm, lớp hoặc tên thành viên) ở bất cứ nơi nào nó xuất hiện trong dự án, với lý do tùy chỉnh được hiển thị trong chẩn đoán.",
+        "identifier": "Identifier",
+        "identifierPlaceholder": "ví dụ. in",
+        "reason": "Lý do",
+        "reasonPlaceholder": "ví dụ. Thay vào đó hãy sử dụng Trình ghi nhật ký",
+        "empty": "Không có định danh nào bị cấm."
+      },
+      "diagnosticStats": {
+        "title": "Ngưỡng chẩn đoán",
+        "hint": "Cổng ngân sách kiểu CI: cảnh báo hoặc thất bại khi số lượng vi phạm của quy tắc vượt quá ngưỡng.",
+        "warn": "Warn at",
+        "fail": "Thất bại ở",
+        "empty": "No diagnostic thresholds are set."
+      },
+      "baseline": {
+        "title": "Đường cơ sở",
+        "hint": "Đường cơ sở ngăn chặn các vi phạm HIỆN TẠI của dự án để chỉ những phát hiện mới được đưa ra sau đó mới xuất hiện.",
+        "emptyHint": "Chưa có đường cơ sở nào được tạo ra. Việc tạo một cơ chế ngăn chặn các vi phạm ngày nay và kích hoạt tính năng ngăn chặn cơ sở trong cấu hình.",
+        "createButton": "Tạo/làm mới đường cơ sở",
+        "createTitle": "Chạy Dart run saropa_lints:baseline — ghi saropa_baseline.json và kích hoạt nó trong config.",
+        "openButton": "Mở tập tin cơ sở",
+        "openTitle": "Mở saropa_baseline.json trong trình chỉnh sửa.",
+        "summary": "(Các) tệp {files}, (các) vi phạm {violations} được căn cứ — {generated} đã tạo.",
+        "unknownDate": "vào một thời điểm không xác định",
+        "count": "Count Count Count đếm đếm",
+        "diff": {
+          "title": "Khác biệt so với hiện tại",
+          "counts": "{resolved} đã được giải quyết kể từ đường cơ sở · {new} mới kể từ đường cơ sở.",
+          "empty": "No drift — the live violation set matches the baseline exactly.",
+          "resolvedSection": "Đã giải quyết ({count})",
+          "newSection": "New since baseline ({count})",
+          "moreRows": "+{count} không hiển thị thêm.",
+          "fileCol": "File file file file File File",
+          "lineCol": "Dòng Đường Đường"
+        }
+      },
+      "optimizer": {
+        "openStandalone": "Mở độc lập",
+        "openStandaloneTitle": "Open the Analysis Optimizer in its own editor tab.",
+        "unavailable": "The Analysis Optimizer is not available in this session."
+      }
+    },
+    "automation": {
+      "hint": "Cài đặt tiện ích mở rộng kiểm soát thời điểm chạy phân tích và cách hiển thị kết quả. Những cài đặt này phản ánh các cài đặt tương tự trong Tệp > Tùy chọn > Cài đặt trong Saropa Lints."
+    },
+    "extension": {
+      "hint": "Tùy chọn hiển thị trên toàn bộ phần mở rộng.",
+      "linkNote": "Lint integration on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
+    }
+  },
   "consolidated": {
     "kicker": "An ninh · Chất lượng",
     "searchPlaceholder": "Quy tắc lọc... quy tắc lọc.",
@@ -238,76 +359,22 @@
     }
   },
   "dashboards": {
-    "heroTitle": "Dashboards Bảng điều khiển",
-    "openFull": "Mở toàn màn hình mở.",
-    "rescan": "Rescan lại quét lại.",
-    "retry": "Retry retry thử lại",
-    "paneFailed": "Quét không thành công.",
+    "lintsConfig": {
+      "description": "Tier: {tier} · Lane: {lane}",
+      "descriptionNoLane": "Tier: cấp bậc nhất. {tier} là Phương pháp"
+    },
     "controls": {
-      "actions": "Hành động Các hành động",
-      "settings": "Settings Settings (Thay đổi định vị)",
-      "help": "Giúp đỡ giúp đỡ",
-      "runAnalysis": "Chạy phân tích chạy.",
-      "initializeConfig": "Initialize / Update config config. (Đặt đầu tiên/ Cập nhật cấu hình)",
-      "on": "Trên, trên, trên",
-      "off": "Off off off off, đi ra ngoài.",
-      "yes": "Vâng, vâng, phải.",
-      "no": "Không, không phải là tôi.",
-      "lintIntegrationState": "Lint integration: lìnt tích hợp: {state} là Phương pháp",
       "analyzerPlugin": "Plugin Phân tích",
-      "analyzerPluginLive": "Bật — chẩn đoán trong trình soạn thảo thời gian thực",
       "analyzerPluginDisabled": "Tắt — quét khi lưu chỉ",
       "analyzerPluginAbsent": "Chưa được cấu hình",
-      "tierState": "Tier: cấp bậc nhất. {tier} là Phương pháp",
-      "lane": "Ngõ",
       "laneLight": "Light — ~200 quy tắc trong trình soạn thảo, còn lại khi lưu",
       "laneFull": "Hoàn chỉnh — mọi quy tắc đã kích hoạt trong trình soạn thảo",
-      "runAfterConfigState": "Chạy phân tích sau khi thay đổi cấu hình: {state} là Phương pháp",
-      "runAfterDependencyState": "Chạy phân tích sau khi thay đổi phụ thuộc: {state} là Phương pháp",
-      "uiLanguageState": "Ngôn ngữ giao diện người dùng: UI language {language} là Phương pháp",
-      "gettingStarted": "Bắt đầu bắt đầu",
-      "about": "Về _Saropa Lints",
-      "pubDev": "Gói vào ngày pub.dev",
-      "aiInstructions": "Tạo ra các hướng dẫn cho đại lý AI."
+      "migrateLegacyKeys": "Di chuyển (các) khóa cấu hình cũ {count}",
+      "migrateLegacyKeysDesc": "Move legacy plugin-block keys to analysis_options_custom.yaml"
     },
-    "pane": {
-      "projectMap": "Project Map Bản đồ dự án",
-      "codeHealth": "Mã Y tế Code Sức khỏe",
-      "lintsConfig": "Lints Config Lints là một cấu hình",
-      "findings": "Những phát hiện của các nhà nghiên cứu",
-      "package": "Package Dashboard là bảng điều khiển của gói.",
-      "commandCatalog": "Command Catalogue - Danh mục chỉ huy"
-    },
-    "projectMap": {
-      "scanning": "Quét bản đồ dự án..."
-    },
-    "codeHealth": {
-      "scanning": "Quét mã sức khỏe..."
-    },
-    "config": {
-      "tier": "Tier Tier Tier tier tier tier",
-      "enabledRules": "Các quy tắc được kích hoạt cho phép",
-      "rulePacks": "Các gói quy tắc bao gồm các quy tắc.",
-      "packages": "Gói hàng gói"
-    },
-    "package": {
-      "total": "Gói hàng gói",
-      "attention": "Cần chú ý.",
-      "blocked": "Blocked Bị chặn",
-      "empty": "Chưa có bản quét gói nào  ⁇ mở bảng điều khiển để chạy một."
-    },
-    "findings": {
-      "total": "Tổng cộng là tổng số.",
-      "errors": "Lỗi lỗi sai lầm",
-      "warnings": "Cảnh báo cảnh báo",
-      "info": "Thông tin thông tin thông báo thông tin",
-      "empty": "Chưa có phân tích nào được chạy  ⁇ mở Findings để chạy một."
-    },
-    "catalog": {
-      "commands": "Commands Commands là những lệnh",
-      "recent": "Gần đây sử dụng gần đây"
-    },
-    "scanFailed": "Quét không thành công. Mở toàn bộ bảng điều khiển để xem chi tiết và thử lại."
+    "badge": {
+      "needlesTooltip": "(Các) gói {count} có các tính năng chưa được áp dụng"
+    }
   },
   "configSuggestions": {
     "enabledToast": "Kích hoạt gói quy tắc {pack} trong analysis_options.yaml",
@@ -586,10 +653,22 @@
     "reloadNow": "Nạp lại bây giờ.",
     "reloadLater": "Sau này sau đó sau này sau này"
   },
+  "statusBar": {
+    "menu": {
+      "enableOn": "Đã bật phân tích (bấm để tắt)",
+      "enableOff": "Phân tích bị vô hiệu hóa (nhấp để bật)",
+      "openViolations": "Open Violations Report",
+      "openPackageDashboard": "Mở bảng điều khiển gói mở",
+      "openProcessHealth": "Open Process Health",
+      "commandCatalog": "Command Catalogue - Danh mục chỉ huy",
+      "about": "Về"
+    }
+  },
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",
-      "critical": "🔴 {size}"
+      "critical": "🔴 {size}",
+      "openHint": "Nhấp để mở Tình trạng quy trình"
     },
     "tooltip": {
       "processCount": "Dart quy trình: {count} ({size} RSS)",
@@ -710,7 +789,11 @@
       "driftOfflineTitle": "Drift Advisor được kích hoạt nhưng không tìm thấy máy chủ nào.",
       "driftOfflinePill": "Drift offline không trực tuyến",
       "enabledRulesTitle": "Các quy tắc được kích hoạt trong cấp hiện tại.",
-      "rulesCount": "{count} quy tắc"
+      "rulesCount": "{count} quy tắc",
+      "regressionTitle": "Điểm máu giảm từ {previousScore} xuống {currentScore}",
+      "trendTitle": "Điểm sức khỏe / xu hướng vi phạm kể từ lần chạy trước",
+      "hotspotsTitle": "{open} mở, {safe} được đánh dấu an toàn, {fixed} đã sửa - nhấp để xem lại",
+      "hotspotsPill": "{open} mở · {percent}% được đánh giá"
     },
     "groupBy": {
       "severity": "Mức độ nghiêm trọng",
@@ -1025,6 +1108,34 @@
   "packageDashboard": {
     "documentTitle": "Saropa Bảng điều khiển gói",
     "heroTitle": "Saropa Bảng điều khiển gói",
+    "tabs": {
+      "aria": "Phần bảng điều khiển gói",
+      "overview": "Tổng quan",
+      "upgrades": "Upgrades",
+      "upgradesDesc": "Xem lại các nâng cấp gói có sẵn, được nhóm theo rủi ro, áp dụng bằng một cú nhấp chuột.",
+      "fullReport": "Báo cáo đầy đủ",
+      "fullReportDesc": "Xuất báo cáo sử dụng tính năng đầy đủ (mọi gói được quét, mọi tính năng nhật ký thay đổi được khai thác) dưới dạng tệp HTML/Markdown/JSON và mở nó.",
+      "knownIssues": "Known issues",
+      "knownIssuesDesc": "Duyệt qua các lỗ hổng đã biết và lời khuyên được báo cáo đối với các phần phụ thuộc của bạn.",
+      "compare": "So sánh so sánh so với so sánh",
+      "compareDesc": "So sánh hai hoặc nhiều gói cạnh nhau về điểm số, kích thước và hoạt động.",
+      "settings": "Settings Settings (Thay đổi định vị)",
+      "openButton": "Mở {tab}"
+    },
+    "settingsTab": {
+      "intro": "Mọi cài đặt packageVibrancy.*, được nhóm lại. Các thay đổi sẽ được lưu ngay vào cài đặt không gian làm việc của bạn.",
+      "noLimit": "không có giới hạn",
+      "group": {
+        "access": "Truy cập & Đăng ký",
+        "scan": "Quét",
+        "display": "Trưng bày",
+        "weights": "Điểm trọng số",
+        "upgrade": "Nâng cấp nâng cấp Upgrade",
+        "watch": "Đồng hồ",
+        "budget": "Ngân sách",
+        "vuln": "Vulnerabilities"
+      }
+    },
     "detailPane": {
       "aria": "Chi tiết gói hàng chi tiết",
       "title": "Chi tiết gói hàng chi tiết",
@@ -1256,7 +1367,8 @@
       "toggleDetail": "Bước chuyển đổi các chi tiết gói được đánh dấu mở rộng.",
       "escapeSearch": "Tìm kiếm rõ ràng tập trung; tìm kiếm giây Esc sụp đổ tất cả các hàng mở rộng.",
       "historyBack": "Quay trở lại thông qua lịch sử điều hướng gói.",
-      "showOverlay": "Hiển thị lớp phủ phím tắt này."
+      "showOverlay": "Hiển thị lớp phủ phím tắt này.",
+      "jumpToTab": "Jump to tab 1-6 (Overview, Upgrades, Full report, Known issues, Compare, Settings)"
     },
     "versionTooltip": {
       "installed": "Được lắp đặt: {version} ({date}) là một dạng của",
@@ -1616,6 +1728,68 @@
       "weeksAgo": "{wk} tuần trước"
     }
   },
+  "projectMap": {
+    "panelTitle": "Bản đồ dự án Saropa",
+    "tabs": {
+      "map": "Map",
+      "reports": "Báo cáo",
+      "aria": "Phần bản đồ dự án"
+    },
+    "scan": {
+      "subtitle": "Quét quy mô dự án, độ phức tạp và các điểm nóng…",
+      "elapsed": "Đã trôi qua",
+      "cancel": "Hủy bỏ hủy bỏ",
+      "restart": "Khởi động lại khởi động lại.",
+      "stopped": "Đã dừng",
+      "logHeading": "Hoạt động hoạt động Activity",
+      "logEmpty": "No output yet — project_health does not report step-by-step progress, so this log only fills if the scan prints a diagnostic message."
+    },
+    "reports": {
+      "intro": "One-click CLI reports that previously required a terminal. Each Run button streams the tool's live output below its card and saves a copy under reports/.saropa_lints/reports-tab/.",
+      "runButton": "Chạy",
+      "notRunYet": "Not run yet",
+      "running": "Đang chạy…",
+      "exitOk": "Thoát 0 - vượt qua",
+      "exitFail": "Non-zero exit — see output",
+      "colLine": "#",
+      "colText": "đầu ra",
+      "severity": {
+        "title": "Báo cáo mức độ nghiêm trọng",
+        "desc": "Chạy dart analyze và nhóm mọi vấn đề theo mức độ nghiêm trọng (lỗi, cảnh báo, thông tin) — lệnh terminal Dart chạy saropa_lints:severity_report mà không cần terminal."
+      },
+      "impact": {
+        "title": "Impact Report (legacy alias)",
+        "desc": "Đầu ra giống hệt với Báo cáo mức độ nghiêm trọng - Impact_report là tên trước ngày 05 tháng 6 năm 2026, chỉ được giữ lại để các tập lệnh hiện có và bộ nhớ cơ tiếp tục hoạt động."
+      },
+      "qualityGate": {
+        "title": "Cổng chất lượng",
+        "desc": "Đánh giá violations.json mới nhất theo các ngưỡng trong saropa_quality_gate.yaml và in PASS, WARN hoặc FAIL. Chỉnh sửa các ngưỡng bên dưới rồi chạy."
+      },
+      "stubTest": {
+        "title": "Báo cáo thử nghiệm sơ khai",
+        "desc": "Quét test/*.dart để tìm các xác nhận giữ chỗ (expect(true, isTrue), Expect('literal', isNotNull)) chưa bao giờ thực sự kiểm tra bất cứ điều gì."
+      },
+      "accuracy": {
+        "title": "Báo cáo chính xác",
+        "desc": "Xác nhận mọi quy tắc bằng điểm đánh dấu Expect_lint trong đồ đạc thực sự kích hoạt ở đó — phát hiện quy tắc đã ngừng hoạt động một cách âm thầm. Hữu ích nhất khi phát triển saropa_lints."
+      },
+      "memory": {
+        "title": "Memory Report",
+        "desc": "Tóm tắt xu hướng RSS của plugin phân tích từ các báo cáo/.saropa_lints/plugin.log — bộ nhớ đầu tiên/cuối cùng/phút/tối đa kể từ lần cuối plugin khởi động."
+      },
+      "doctor": {
+        "title": "Bác sĩ",
+        "desc": "Kiểm tra analysis_options.yaml và analysis_options_custom.yaml để tìm các cấu hình sai phổ biến: khóa sai tệp, thiếu tệp tùy chỉnh hoặc thiếu ràng buộc phiên bản."
+      },
+      "gate": {
+        "editorLabel": "ngưỡng saropa_quality_gate.yaml",
+        "placeholder": "chất lượng_gate:\n  điều kiện:\n    - số liệu: new_cript_issues\n      op: eq\n      giá trị: 0\n      on_fail: thất bại",
+        "save": "Save Save Save Giữ",
+        "saved": "Đã lưu",
+        "saveError": "Không thể lưu"
+      }
+    }
+  },
   "suppressionsStrip": {
     "noData": "No violations.json yet  ⁇  Không có _PH0_ chưa Chạy phân tích để điền vào ảnh chụp nhanh của sự đàn áp.",
     "zeroTotal": "0 sự kìm nén phân tích trong xuất khẩu mới nhất.",
@@ -1771,6 +1945,11 @@
       "rssNote": {
         "inProcess": "trong cùng tiến trình, không thể đo lường riêng biệt",
         "notRunning": "không chạy"
+      },
+      "description": {
+        "analyzerPlugin": "Chạy bên trong máy chủ phân tích Dart - các biểu tượng ngoằn ngoèo trực tiếp trong trình chỉnh sửa khi bạn nhập mà không cần quét. Chuyển đổi viết lại các plugin: chặn trong analysis_options.yaml.",
+        "scanDaemon": "Quá trình nền quét lại toàn bộ dự án khi lưu và ghi báo cáo/.saropa_lints/violations.json. Tắt nó sẽ tạm dừng nó; lần lưu tiếp theo sẽ tiếp tục nó.",
+        "lspServer": "Máy chủ ngôn ngữ riêng biệt — xuất bản chẩn đoán lên bảng Sự cố cho các tệp đang mở và không gian làm việc. Chuyển đổi ghi cài đặt saropaLints.lspServer.enabled."
       }
     },
     "toggle": {
@@ -1779,7 +1958,9 @@
     },
     "action": {
       "killAll": "Giết tất cả",
-      "restartAll": "Khởi động lại Tất cả"
+      "restartAll": "Khởi động lại Tất cả",
+      "killAllDescription": "Buộc dừng chỉ Máy chủ LSP. Plugin Trình phân tích và Quét Daemon chưa thể bị tắt một cách độc lập - thay vào đó hãy sử dụng nút bật/tắt BẬT/TẮT riêng của từng công cụ.",
+      "restartAllDescription": "Dừng và khởi chạy lại Máy chủ LSP (hoặc khởi động nó nếu nó không chạy). Plugin Trình phân tích và Quét Daemon không bị ảnh hưởng - thay vào đó hãy sử dụng nút BẬT/TẮT riêng của từng công cụ."
     },
     "log": {
       "empty": "Chưa có mục nhật ký nào.",
@@ -1793,6 +1974,9 @@
       "analyzerToggleOff": "Analyzer Plugin: đang vô hiệu hóa…",
       "daemonToggleOn": "Quét Daemon: tiếp tục…",
       "daemonToggleOff": "Quét Daemon: đang tạm dừng…"
+    },
+    "sidebar": {
+      "enginesLabel": "Động cơ: {count} đang chạy"
     }
   },
   "detailView": {
@@ -2197,10 +2381,6 @@
     "scanning": "Đang quét không gian làm việc…",
     "openConfig": "Mở analysis_options.yaml",
     "lastScan": "Quét cuối cùng: {time}",
-    "sidebar": {
-      "label": "Trình tối ưu hóa phân tích",
-      "description": "Giảm bộ nhớ phân tích"
-    },
     "kpi": {
       "filesInScope": "Tập tin trong phạm vi",
       "lines": "dòng",
@@ -2269,9 +2449,18 @@
     },
     "diffTitle": "Trình tối ưu hóa phân tích: Loại trừ được đề xuất"
   },
-  "diagnostics": {
-    "sidebar": {
-      "severityToggleTooltip": "Nhấp đúp để bật/tắt {severity}"
+  "sidebarShell": {
+    "dashboardsViewTitle": "Dashboards Bảng điều khiển"
+  },
+  "status": {
+    "health": {
+      "lastRunTooltip": "Phân tích cuối cùng: {ago}",
+      "neverRunLabel": "Health: —",
+      "neverRunDescription": "Chạy phân tích để xem điểm sức khỏe của bạn"
+    },
+    "badge": {
+      "criticalTooltip": "{critical} nghiêm trọng, tổng số {total}",
+      "totalTooltip": "(Các) vi phạm {total}"
     }
   },
   "staleIgnores": {
@@ -2293,16 +2482,15 @@
     },
     "confirm": {
       "fixMessage": "Điều này sẽ xóa các chú thích bỏ qua lỗi cũ từ các tệp nguồn của bạn. Những thay đổi này có thể được hủy bỏ bằng git. Tiếp tục?",
+      "fixMessageWithCount": "This will remove {count} stale ignore comment(s) from your source files. The changes can be undone with git. Continue?",
       "fixAction": "Loại bỏ các ignores lỗi thời"
     },
     "diagnostic": {
       "message": "Quy tắc bỏ qua lỗi: quy tắc '{ruleName}' không còn kích hoạt trên dòng này nữa."
     },
     "sidebar": {
-      "findLabel": "Tìm các ignore lỗi thời",
-      "findDescription": "Nhận diện các chú thích // ignore: chết",
       "fixLabel": "Sửa bỏ các ignore lỗi",
-      "fixDescription": "Tự động loại bỏ các chú thích // ignore: chết"
+      "fixDescription": "Phát hiện và tự động loại bỏ người chết // bỏ qua: ý kiến"
     },
     "quickFix": {
       "title": "Sửa các ignore lỗi thời trong tệp này"

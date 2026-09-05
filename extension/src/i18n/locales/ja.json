@@ -70,7 +70,11 @@
       "scanning": "Saropa: {count}ファイルをスキャン中…",
       "done": "Saropa: {count}件の問題, {elapsed}",
       "failed": "Saropa: スキャン失敗",
-      "warming": "Saropa：分析器をウォームアップ中…開いた後の最初のスキャンは1分ほどかかる"
+      "warming": "Saropa：分析器をウォームアップ中…開いた後の最初のスキャンは1分ほどかかる",
+      "ready": "Saropa: お手伝い準備完了",
+      "disabled": "Saropa: 無効",
+      "noProject": "Saropa: Dart プロジェクトはありません",
+      "doneTooltip": "{total} 件の見つかりました、{shown} はフィルター後の表示"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: 全体プロジェクトをスキャン中",
@@ -86,10 +90,6 @@
       "failed": "レポートの作成に失敗しました: {error}",
       "large": "レポートは{megabytes}MBであり、閲覧が遅くなる可能性があります。その隣接するJSONファイルはツール用に同じデータを保持しています。",
       "done": "機会レポートが{path}に書かれました"
-    },
-    "sidebar": {
-      "label": "フル・オポチュニティーズ・レポート",
-      "description": "すべてのパッケージと機能、使用回数"
     },
     "documentTitle": "パッケージ機能在庫",
     "heroTitle": "パッケージ機能在庫",
@@ -213,6 +213,127 @@
   "tierPicker": {
     "ruleCount": "{count} つのルール"
   },
+  "rulesTiers": {
+    "tabBar": {
+      "ariaLabel": "ルール＆ティアスダッシュボードタブ"
+    },
+    "tab": {
+      "tier": "準額 (Tier) の基準となる.",
+      "packs": "ルールパックとは,ルール・パッケージです.",
+      "overrides": "オーバーライドは,オーバレーズを無視する.",
+      "sdk": "SDK ロールアウト",
+      "configFile": "設定ファイル",
+      "automation": "オートメーション",
+      "extension": "拡張機能"
+    },
+    "common": {
+      "rule": "ルール ルールはルールの規則",
+      "add": "追加",
+      "remove": "削除する Remove remove"
+    },
+    "sdk": {
+      "summary": "{total} SDK マイグレーションパック（ス）はこのプロジェクトに適用されます — {breaking} ブレイキング、{deprecation} デプロケーション。",
+      "noneApplicable": "このプロジェクトのpubspec環境にはまだSDKマиграーションパックが適用されていません。",
+      "enableAllTitle": "すべてのSDKマиграーションパックを有効にしてください。このプロジェクトがすでに満たしているDart/Flutterバージョンゲートを持つものを。",
+      "enableAll": "すべての適用可能なルールを有効にする ({count})",
+      "enableBreakingTitle": "ターゲットバージョンで既に削除されたAPIを警告するSDKパックのみを有効にしてください",
+      "enableBreaking": "有効にするだけ ({count})",
+      "enableDeprecationTitle": "ターゲットバージョンで非推奨（ただし動作は可能）なAPIを警告するSDKパックのみを有効にしてください",
+      "enableDeprecation": "非推奨のみ有効化（{count}）",
+      "noPacksInCatalogue": "SDKマиграーションパックが登録されていません。"
+    },
+    "configFile": {
+      "analysisSettings": {
+        "title": "分析設定",
+        "hint": "問題タブに表示する問題の数を制御し、分析レポートの出力先を指定します。"
+      },
+      "maxIssues": {
+        "label": "最大の問題",
+        "desc": "問題タブに表示される非エラーの問題数を制限します。0は無制限を意味します。オーバーフローは完全なレポートファイルで依然として表示されます。"
+      },
+      "output": {
+        "label": "出力",
+        "desc": "分析レポートがどこに書かれているか: ターミナルのみ、ファイルのみ、または両方"
+      },
+      "tierCap": {
+        "title": "階層制限",
+        "hint": "分析時に実行されるティアを指定します。明示的に有効にされているルールとは関係ありません。Noneに設定すると、拡張機能のティア設定を使用します。",
+        "none": "なし（ティアタブの設定を使用）"
+      },
+      "saropaTier": {
+        "label": "サロパティア_ティア"
+      },
+      "runtimeTier": {
+        "label": "ランタイムティア"
+      },
+      "lane": {
+        "title": "分析レーン",
+        "hint": "どのルールがエディタ内での実行中の解析プラグインで実行され、どのルールが保存時にのみ（スキャンデーモン経由）実行されるかを示します。"
+      },
+      "platforms": {
+        "title": "ターゲットプラットフォーム",
+        "hint": "このプロジェクトで対象としていないプラットフォームを無効化し、それらのプラットフォーム固有のルールがオフのままになるようにします。"
+      },
+      "severities": {
+        "title": "深刻度の上書き",
+        "hint": "特定のルールの重みを上書きするか、あるいは完全に無効にする。階層やルールパックとは関係なく。",
+        "level": "レベル",
+        "empty": "深刻度の上書き設定はありません。",
+        "rulePlaceholder": "ルール名",
+        "newLevelAria": "新規の深刻度レベル"
+      },
+      "bannedUsage": {
+        "title": "禁止された使用方法",
+        "hint": "プロジェクト内のどこに現れても特定の識別子（関数、クラス、またはメンバ名）を特定し、診断にカスタムの理由を表示します。",
+        "identifier": "識別子",
+        "identifierPlaceholder": "例．プリント",
+        "reason": "理由",
+        "reasonPlaceholder": "例えば、Loggerを使用してください",
+        "empty": "識別子は禁止されていません。"
+      },
+      "diagnosticStats": {
+        "title": "診断閾値",
+        "hint": "CIスタイルの予算ゲート: ルールの違反数がしきい値を超えるときに警告するか失敗する。",
+        "warn": "/ノーストリングで警告する",
+        "fail": "失敗する",
+        "empty": "診断閾値が設定されていません。"
+      },
+      "baseline": {
+        "title": "ベースライン",
+        "hint": "ベースラインはプロジェクトの既存の違反を抑制するため、その後にのみ新たに導入された問題が表示されます。",
+        "emptyHint": "まだベースラインが作成されていません。作成することで、今日の違反を抑制し、設定ファイルにベースライン抑制を有効化します。",
+        "createButton": "ベースラインを作成／更新",
+        "createTitle": "dart run saropa_lints:baseline を実行 — saropa_baseline.json を生成し、設定に有効化します。",
+        "openButton": "ベースラインファイルを開く",
+        "openTitle": "エディタでsaropa_baseline.jsonを開く。",
+        "summary": "{files} ファイル（ｓ）、{violations} 違反（ｓ）ベースライン化 — 生成 {generated}。",
+        "unknownDate": "未知のタイミングで",
+        "count": "カウント・カウント・カウンット",
+        "diff": {
+          "title": "差分 vs 現在",
+          "counts": "{resolved} 基準ライン以降で解決済み · {new} 基準ライン以降に新規",
+          "empty": "ノドリフト — ライブ違反セットはベースラインと完全に一致しています。",
+          "resolvedSection": "解決済み({count})",
+          "newSection": "ベースラインからの新機能({count})",
+          "moreRows": "＋{count} 以降は表示されません。",
+          "fileCol": "ファイルは,ファイルの形式で",
+          "lineCol": "ライン・ライン・線・ライン"
+        }
+      },
+      "optimizer": {
+        "openStandalone": "スタンドアロンを開く",
+        "openStandaloneTitle": "分析最適化を個別のエディタータブで開きます。",
+        "unavailable": "このセッションでは分析最適化機能が利用できません。"
+      }
+    },
+    "automation": {
+      "hint": "分析が実行されるタイミングや結果の表示方法を制御する拡張機能の設定です。これらは Saropa Lints の File > Preferences > Settings に同じ設定が存在しています。"
+    },
+    "extension": {
+      "hint": "拡張機能全体の表示設定",
+      "linkNote": "リント統合のオン/オフはサイドバーのステータス行にあり、分析レベルはレベルタブにあります — どちらも単なる設定の書き込み以上を行いますので、ここには重複していません。"
+    }
+  },
   "consolidated": {
     "kicker": "セキュリティー · 品質",
     "searchPlaceholder": "フィルタールール...",
@@ -238,76 +359,22 @@
     }
   },
   "dashboards": {
-    "heroTitle": "ダッシュボード,ダッシュボード",
-    "openFull": "フルスクリーンで開きます.",
-    "rescan": "再スキャンして再スキャニングします.",
-    "retry": "再試行してみる.",
-    "paneFailed": "スキャン失敗.",
+    "lintsConfig": {
+      "description": "階層: {tier} · ライン: {lane}",
+      "descriptionNoLane": "レベル: 一級. {tier} フォローしている"
+    },
     "controls": {
-      "actions": "行動 アクション",
-      "settings": "設定セットは,設定を設定する.",
-      "help": "援助・支援をすること.",
-      "runAnalysis": "分析を実行する.",
-      "initializeConfig": "初期化 / アップデート コンフィギュレーション",
-      "on": "続けて,そしてまた.",
-      "off": "オフ・オフ・オフ オーバー・オフ",
-      "yes": "はい,はい,はい. ありがとうございました.",
-      "no": "違う,違う,いいじゃない.",
-      "lintIntegrationState": "リンツ統合:リントの統合 {state} フォローしている",
       "analyzerPlugin": "アナライザープラグイン",
-      "analyzerPluginLive": "オン — エディタ内でのリアルタイム診断",
       "analyzerPluginDisabled": "オフ — 保存時にスキャンのみ",
       "analyzerPluginAbsent": "未設定",
-      "tierState": "レベル: 一級. {tier} フォローしている",
-      "lane": "レーン",
       "laneLight": "ライト — ~200ルールインエディタ内、残りは保存時に実行",
       "laneFull": "完全 — エディタ内でのすべての有効なルール",
-      "runAfterConfigState": "設定変更後に分析を実行: {state} フォローしている",
-      "runAfterDependencyState": "依存関係変更後の分析を実行: {state} フォローしている",
-      "uiLanguageState": "UI言語: ユーザーインターフェイスの言語 {language} フォローしている",
-      "gettingStarted": "スタートアップのやり方",
-      "about": "について _Saropa Lints",
-      "pubDev": "パッケージは pub.dev に",
-      "aiInstructions": "AIエージェントの指示を作成する."
+      "migrateLegacyKeys": "{count} 既存の設定キーを移行",
+      "migrateLegacyKeysDesc": "古いプラグインブロックのキーをanalysis_options_custom.yamlに移動"
     },
-    "pane": {
-      "projectMap": "プロジェクトマップ,プロジェクトの地図",
-      "codeHealth": "健康コード 保健医療法",
-      "lintsConfig": "リンツはコンフィギュレーション",
-      "findings": "発見結果は,",
-      "package": "パッケージダッシュボード",
-      "commandCatalog": "コマンドカタログ コマンドカタログ"
-    },
-    "projectMap": {
-      "scanning": "スキャンプロジェクトマップ..."
-    },
-    "codeHealth": {
-      "scanning": "スキャンコードの健康..."
-    },
-    "config": {
-      "tier": "準額 (Tier) の基準となる.",
-      "enabledRules": "有効化された規則は,",
-      "rulePacks": "ルールパックとは,ルール・パッケージです.",
-      "packages": "パッケージパッケージは,"
-    },
-    "package": {
-      "total": "パッケージパッケージは,",
-      "attention": "注意が必要である.",
-      "blocked": "ブロックされた,遮断された",
-      "empty": "まだパッケージスキャンされていません. 1 を実行するためにダッシュボードを開きます."
-    },
-    "findings": {
-      "total": "総計は,全体として合計です.",
-      "errors": "エラー 間違い",
-      "warnings": "警告の文字が表示される",
-      "info": "情報は情報,情報が情報.",
-      "empty": "分析はまだ実行されていません. オープンファインディングを1回実行する."
-    },
-    "catalog": {
-      "commands": "コマンドはコマンドです.",
-      "recent": "最近使用した物件"
-    },
-    "scanFailed": "スキャン失敗. 詳細を見るためにダッシュボード全体を開いて,再試してください."
+    "badge": {
+      "needlesTooltip": "{count} パッケージ（s）に未採用の機能があります"
+    }
   },
   "configSuggestions": {
     "enabledToast": "analysis_options.yaml で {pack} ルールパックを有効にしました.",
@@ -586,10 +653,22 @@
     "reloadNow": "今すぐ再充電する.",
     "reloadLater": "後 遅い 後になって"
   },
+  "statusBar": {
+    "menu": {
+      "enableOn": "解析を有効にしています（無効にするにはクリック）",
+      "enableOff": "解析無効（クリックして有効にする）",
+      "openViolations": "違反報告を開く",
+      "openPackageDashboard": "パッケージダッシュボードを開く",
+      "openProcessHealth": "プロセスヘルスを開く",
+      "commandCatalog": "コマンドカタログ コマンドカタログ",
+      "about": "について"
+    }
+  },
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",
-      "critical": "🔴 {size}"
+      "critical": "🔴 {size}",
+      "openHint": "クリックしてプロセスヘルスを開く"
     },
     "tooltip": {
       "processCount": "Dart プロセス: {count} ({size} RSS)",
@@ -710,7 +789,11 @@
       "driftOfflineTitle": "Drift Advisor が有効になっているが,サーバーが見つかりませんでした.",
       "driftOfflinePill": "漂流はオフラインでドリフトする.",
       "enabledRulesTitle": "既存のレベルでの有効なルール",
-      "rulesCount": "{count} つのルール"
+      "rulesCount": "{count} つのルール",
+      "regressionTitle": "健康スコアが{previousScore}から{currentScore}に下がりました",
+      "trendTitle": "健康スコア / 以前の実行からの違反トレンド",
+      "hotspotsTitle": "{open} 開始中、{safe} 安全と判断、{fixed} 修正 — レビューにクリック",
+      "hotspotsPill": "{open} オープン · {percent}％レビュー"
     },
     "groupBy": {
       "severity": "深刻度 (severity) とは,重度の程度を問わず",
@@ -1025,6 +1108,34 @@
   "packageDashboard": {
     "documentTitle": "Saropa パッケージダッシュボード",
     "heroTitle": "Saropa パッケージダッシュボード",
+    "tabs": {
+      "aria": "パッケージダッシュボードセクション",
+      "overview": "概要",
+      "upgrades": "アップグレード",
+      "upgradesDesc": "リスク別に分類されたパッケージのアップグレードを確認し、ワンクリックで適用します。",
+      "fullReport": "フルレポート",
+      "fullReportDesc": "すべてのスキャンされたパッケージ、すべての採掘されたチェンジログ機能をHTML/Markdown/JSONファイルとしてエクスポートし、それを開きます。",
+      "knownIssues": "既知の問題",
+      "knownIssuesDesc": "依存関係に対して報告された既知の脆弱性とアドバイザリを閲覧します。",
+      "compare": "比較して,比べてみる.",
+      "compareDesc": "スコア、サイズ、アクティビティに基づき、2つ以上のパッケージを横断して比較します。",
+      "settings": "設定セットは,設定を設定する.",
+      "openButton": "{tab}を開く"
+    },
+    "settingsTab": {
+      "intro": "すべてのpackageVibrancy.*の設定はグループ化されています。変更は即座にワークスペースの設定に保存されます。",
+      "noLimit": "制限なし",
+      "group": {
+        "access": "アクセス＆レジストリーズ",
+        "scan": "スキャン",
+        "display": "表示",
+        "weights": "スコア重み",
+        "upgrade": "アップグレードアップデート",
+        "watch": "ウォッチ",
+        "budget": "予算",
+        "vuln": "脆弱性"
+      }
+    },
     "detailPane": {
       "aria": "パッケージの詳細は,パッケージに記載されています.",
       "title": "パッケージの詳細は,パッケージに記載されています.",
@@ -1256,7 +1367,8 @@
       "toggleDetail": "ハイライトされたパッケージ詳細の拡張器をトーグリングして切り替えます.",
       "escapeSearch": "明確な焦点検索; 2つ目の Esc は,すべての拡張された行を崩します.",
       "historyBack": "パッケージのナビゲーション履歴を元に戻します.",
-      "showOverlay": "このショートカットでオーバーレイを表示します."
+      "showOverlay": "このショートカットでオーバーレイを表示します.",
+      "jumpToTab": "タブ1-6（概要、アップグレード、詳細レポート、既知の問題、比較、設定）に移動"
     },
     "versionTooltip": {
       "installed": "インストールされている: {version} ({date})",
@@ -1616,6 +1728,68 @@
       "weeksAgo": "{wk} 週間前"
     }
   },
+  "projectMap": {
+    "panelTitle": "Saropa プロジェクトマップ",
+    "tabs": {
+      "map": "マップ",
+      "reports": "レポート",
+      "aria": "プロジェクトマップセクション"
+    },
+    "scan": {
+      "subtitle": "プロジェクトの規模、複雑さ、ホットスポットのスキャン中…",
+      "elapsed": "過ぎ去った時間.",
+      "cancel": "キャンセル キャンセル",
+      "restart": "再起動してリスタートします.",
+      "stopped": "停止",
+      "logHeading": "活動 (アクティビティー)",
+      "logEmpty": "まだ出力はありません — project_health はステップごとの進捗を報告しないので、このログはスキャン中に診断メッセージが表示された場合にのみ埋まります。"
+    },
+    "reports": {
+      "intro": "ワンクリックでCLIレポートを生成でき、以前はターミナルが必要でした。各実行ボタンをクリックすると、ツールのリアルタイム出力をそのカードの下にストリームし、reports/.saropa_lints/reports-tab/以下にコピーを保存します。",
+      "runButton": "実行",
+      "notRunYet": "まだ実行されていません",
+      "running": "実行中…",
+      "exitOk": "終了コード 0 — 通過",
+      "exitFail": "非ゼロエクスイット — 出力をご確認ください",
+      "colLine": "#",
+      "colText": "出力",
+      "severity": {
+        "title": "深刻度レポート",
+        "desc": "dart analyzeを実行し、すべての問題を深刻度（エラー、警告、情報）ごとにグループ化 — テルミナルコマンド dart run saropa_lints:severity_report をテルミナルを使わずに実行します。"
+      },
+      "impact": {
+        "title": "影響レポート（レガシー別名）",
+        "desc": "同一出力を持つ深刻度レポート — impact_report は 2026 年 6 月 5 日以前の名前であり、既存のスクリプトや操作の定着を維持するためのみに保持されています。"
+      },
+      "qualityGate": {
+        "title": "品質ゲート",
+        "desc": "最新のviolations.jsonをsaropa_quality_gate.yaml内のしきい値と比較し、PASS、WARN、またはFAILを出力します。しきい値を編集した後、実行してください。"
+      },
+      "stubTest": {
+        "title": "スタブテストレポート",
+        "desc": "テスト/*。dartでプレースホルダーのアサーション（expect(true, isTrue)、expect('literal', isNotNull)）をスキャンし、実際に何もテストしていないものを検出します。"
+      },
+      "accuracy": {
+        "title": "正確性レポート",
+        "desc": "fixture内のexpect_lintマーカーですべてのルールを確認し、実際に発火することを確認します — 声なしだけで動作しなくなったルールを検出します。saropa_lints自体を開発する際には特に役立ちます。"
+      },
+      "memory": {
+        "title": "メモリーレポート",
+        "desc": "レポート/saropa_lints/plugin.logから分析プラグインのRSSトレンドを要約 — プラグインが最後に起動した以来の最初/最後/最小/最大メモリ。"
+      },
+      "doctor": {
+        "title": "ドクター",
+        "desc": "analysis_options.yaml と analysis_options_custom.yaml を確認し、一般的な構成ミスをチェックします: 間違ったファイルにキーがある、カスタムファイルが不足している、バージョン制約が不足しているなどの問題。"
+      },
+      "gate": {
+        "editorLabel": "saropa_quality_gate.yaml サーティスファクション",
+        "placeholder": "品質ゲート:\n  条件:\n    - メトリック: new_critical_issues\n      OP: 等価\n      値: 0\n      on_fail: 失敗します",
+        "save": "保存する Save",
+        "saved": "保存されました",
+        "saveError": "保存できませんでした"
+      }
+    }
+  },
   "suppressionsStrip": {
     "noData": "まだ violations.json はありません. 分析を実行して,抑制スナップショットを入力します.",
     "zeroTotal": "0 最新の輸出で分析器抑制.",
@@ -1771,6 +1945,11 @@
       "rssNote": {
         "inProcess": "インプロセス、別途測定可能ではない",
         "notRunning": "実行されていない"
+      },
+      "description": {
+        "analyzerPlugin": "Dart分析サーバー内で実行されます — タイピング中にエディタ内でリアルタイムで警告が表示されます（スキャン不要）。トグル操作はプラグインの設定を変更します: analysis_options.yamlにブロックを追加します。",
+        "scanDaemon": "保存時にプロジェクト全体を再スキャンし、レポート/.saropa_lints/violations.json を書き込むバックグラウンド プロセス。オフに切り替えると一時停止します。次に保存すると再開されます。",
+        "lspServer": "別個の言語サーバー — 開いているファイルおよびワークスペースファイルの診断情報を「問題」パネルに公開します。トグル操作は saropaLints.lspServer.enabled 設定に影響します。"
       }
     },
     "toggle": {
@@ -1779,7 +1958,9 @@
     },
     "action": {
       "killAll": "すべてを終了",
-      "restartAll": "すべて再起動"
+      "restartAll": "すべて再起動",
+      "killAllDescription": "LSPサーバーのみを強制終了します。アナライザープラグインとスキャンDaemonは現在、個別に終了できません — 各エンジンの独自のON/OFFトグルを使用してください。",
+      "restartAllDescription": "LSPサーバーを停止し再起動します（動作していない場合は起動します）。アナライザプラグインとスキャンDaemonは影響を受けません — 各エンジンの独自のON/OFFトグルを使用してください。"
     },
     "log": {
       "empty": "まだログエントリがありません。",
@@ -1793,6 +1974,9 @@
       "analyzerToggleOff": "アナライザープラグイン: 無効化中…",
       "daemonToggleOn": "スキャン Daemon: 再開中…",
       "daemonToggleOff": "スキャン Daemon: 一時停止中…"
+    },
+    "sidebar": {
+      "enginesLabel": "エンジン: {count} 実行中"
     }
   },
   "detailView": {
@@ -2197,10 +2381,6 @@
     "scanning": "ワークスペースのスキャン中…",
     "openConfig": "analysis_options.yamlを開く",
     "lastScan": "最終スキャン: {time}",
-    "sidebar": {
-      "label": "分析最適化",
-      "description": "メモリ使用量を減らす"
-    },
     "kpi": {
       "filesInScope": "スコープ内のファイル",
       "lines": "ライン",
@@ -2269,9 +2449,18 @@
     },
     "diffTitle": "分析最適化: 提案された除外項目"
   },
-  "diagnostics": {
-    "sidebar": {
-      "severityToggleTooltip": "ダブルクリックで{severity}を切り替え"
+  "sidebarShell": {
+    "dashboardsViewTitle": "ダッシュボード,ダッシュボード"
+  },
+  "status": {
+    "health": {
+      "lastRunTooltip": "最終分析: {ago}",
+      "neverRunLabel": "健康: —",
+      "neverRunDescription": "分析を実行して健康スコアを確認してください"
+    },
+    "badge": {
+      "criticalTooltip": "{critical} 至急, {total} 総数",
+      "totalTooltip": "{total}違反"
     }
   },
   "staleIgnores": {
@@ -2293,16 +2482,15 @@
     },
     "confirm": {
       "fixMessage": "これは、ソースファイルから古くなった無視コメントを削除します。変更はgitで元に戻せます。続行しますか？",
+      "fixMessageWithCount": "これは、ソースファイルから {count} という古い無視コメントを削除します。変更は git で元に戻せます。続行しますか？",
       "fixAction": "古くなった無視設定を削除"
     },
     "diagnostic": {
       "message": "無効な無視: ルール '{ruleName}' はこの行ではもう発火しません。"
     },
     "sidebar": {
-      "findLabel": "古くなった無視設定を検索",
-      "findDescription": "// 無視: コメントを検出",
       "fixLabel": "不適な無視を修正",
-      "fixDescription": "自動的に無効な// ignore: コメントを削除"
+      "fixDescription": "死んだ // ignore: コメントを検出して自動的に削除する"
     },
     "quickFix": {
       "title": "このファイルの古くなった無視設定を修正してください"

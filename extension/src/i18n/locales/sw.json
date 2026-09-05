@@ -70,7 +70,11 @@
       "scanning": "Saropa: kusimamia faili ya {count}...",
       "done": "Saropa: {count} miongoni mwa, {elapsed}s",
       "failed": "Saropa: uchanganuzi umeshindwa",
-      "warming": "Saropa: kuanza kujaribu analyzer... kujaribu kwanza baada ya kuanza inaweza kusababisha dakika moja"
+      "warming": "Saropa: kuanza kujaribu analyzer... kujaribu kwanza baada ya kuanza inaweza kusababisha dakika moja",
+      "ready": "Saropa: tayari",
+      "disabled": "Saropa: imezimwa",
+      "noProject": "Saropa: hakuna mradi wa Dart",
+      "doneTooltip": "Utafutaji wa {total}, {shown} umeonyeshwa baada ya kichujio"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: kusimamia project kato kato",
@@ -86,10 +90,6 @@
       "failed": "Raporti ya matokeo hakifanyikiwa: {error}",
       "large": "Raporti ina {megabytes} MB na inaweza kubeba kifichwa. Faili JSON ya kati ina data ya jina sawa kwa kifichwa.",
       "done": "Ripoti ya matokeo lilisoma kwa {path}"
-    },
-    "sidebar": {
-      "label": "Ripoti ya Mwaka Mpya",
-      "description": "Kila paketi na mfumo, na idadi ya kuzalishia"
     },
     "documentTitle": "Inventari ya Mipango ya Paki",
     "heroTitle": "Inventari ya Mipango ya Paki",
@@ -213,6 +213,127 @@
   "tierPicker": {
     "ruleCount": "sheria {count}"
   },
+  "rulesTiers": {
+    "tabBar": {
+      "ariaLabel": "Vichupo vya dashibodi vya Sheria na Viwango"
+    },
+    "tab": {
+      "tier": "Tier ya chini ni kiwango cha juu zaidi.",
+      "packs": "Sheria pakiti vifurushi.",
+      "overrides": "Overrides override inazuia.",
+      "sdk": "Utoaji wa SDK",
+      "configFile": "Faili ya mchakato",
+      "automation": "Ungatambua",
+      "extension": "Mlango"
+    },
+    "common": {
+      "rule": "Kanuni ya Sheria Kanuni za sheria.",
+      "add": "Ona",
+      "remove": "Remove remove Kuondoa"
+    },
+    "sdk": {
+      "summary": "Kifurushi cha uhamiaji cha {total} SDK kinatumika kwa mradi huu — {breaking} kuvunja, {deprecation} kuacha kuendesha huduma.",
+      "noneApplicable": "Bado hakuna vifurushi vya uhamishaji vya SDK vinavyotumika kwa mazingira ya pubspec ya mradi huu.",
+      "enableAllTitle": "Washa kila kifurushi cha uhamishaji cha SDK ambacho lango la toleo la Dart/Flutter tayari mradi huu unakidhi.",
+      "enableAll": "Pungua wote kati ya ({count}) ya kifedha kilichotolewa",
+      "enableBreakingTitle": "Washa vifurushi vya SDK pekee ambavyo huripoti API tayari zimeondolewa katika toleo lako lengwa.",
+      "enableBreaking": "Pungua kwa muda mmoja ({count})",
+      "enableDeprecationTitle": "Washa vifurushi vya SDK pekee ambavyo API za ripoti zimeacha kutumika (lakini bado zinafanya kazi) katika toleo lako lengwa.",
+      "enableDeprecation": "Pungua kwa kuzalishwa tu ({count})",
+      "noPacksInCatalogue": "Hakuna vifurushi vya uhamiaji vya SDK vilivyosajiliwa."
+    },
+    "configFile": {
+      "analysisSettings": {
+        "title": "Mipango ya analisi",
+        "hint": "Kuandika idhini ya kosa kwenye sehemu ya Problems na uwanja wa kuhusisha raporti ya analizi."
+      },
+      "maxIssues": {
+        "label": "Masuala ya juu zaidi",
+        "desc": "Kupiga idadi ya masala ya kati ya kosa ambayo inapangwa katika kipengele ya Problems. 0 inaonyesha idadi ya kati ya kosa. Kifungu ya raporti kati inapangwa kwa matokeo ya kati."
+      },
+      "output": {
+        "label": "Pato",
+        "desc": "Ambapo ripoti ya uchambuzi imeandikwa: terminal pekee, faili pekee, au zote mbili."
+      },
+      "tierCap": {
+        "title": "Kofia ya kiwango",
+        "hint": "Caps ya tier ambayo yatajirikana kama kipindi ya analysis, kwa kuzungumza na kipindi ya hadi ya kipindi kizozungumzwa. Pungua kama None kuzingatia kipindi ya extension.",
+        "none": "Hakuna (tumia mpangilio wa kichupo cha Tier)"
+      },
+      "saropaTier": {
+        "label": "saropa_tier"
+      },
+      "runtimeTier": {
+        "label": "Runtime_tier"
+      },
+      "lane": {
+        "title": "Analizi ya mpo",
+        "hint": "Ambayo hudhibiti programu-jalizi ya kichanganuzi cha mchakato hutumika moja kwa moja kwenye kihariri dhidi ya hifadhi pekee (kupitia daemon ya skanisho)."
+      },
+      "platforms": {
+        "title": "Majukwaa lengwa",
+        "hint": "Kifungua platformi ambayo project haujatibu kufungua kwa kuwa kifungua kwa platformi kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifungua kifung."
+      },
+      "severities": {
+        "title": "Ukali unabatilisha",
+        "hint": "Hubatilisha ukali wa sheria mahususi, au huizima kabisa, bila kujali viwango na vifurushi vya sheria.",
+        "level": "Kiwango",
+        "empty": "Hakuna ubatilishaji wa ukali uliowekwa.",
+        "rulePlaceholder": "kanuni_jina",
+        "newLevelAria": "Kiwango kipya cha ukali"
+      },
+      "bannedUsage": {
+        "title": "Motoa ya kufunga",
+        "hint": "Kupiga kipengele kati ya kipengele kati ya kipengele (fungu, klasa, au jina ya mene) kwa kila muda mwingi kwenye project, na sababu ya kipengele kati ya kipengele kati ya kipengele.",
+        "identifier": "Kitambulisho",
+        "identifierPlaceholder": "k.m. chapa",
+        "reason": "Sababu",
+        "reasonPlaceholder": "k.m. Tumia Logger badala yake",
+        "empty": "Hakuna vitambulisho vilivyopigwa marufuku."
+      },
+      "diagnosticStats": {
+        "title": "Safu ya matokeo ya diagnostic",
+        "hint": "Safu ya kifedha kama CI: kuchangia au kufanya kifedha kama idadi ya kivuli ya kipengele kifanywa kuzinga kwa kipengele.",
+        "warn": "Onya kwa",
+        "fail": "Fail na",
+        "empty": "Hakuna vizingiti vya uchunguzi vilivyowekwa."
+      },
+      "baseline": {
+        "title": "Mshirika wa asili",
+        "hint": "Kipengele kifupi kushinda matokeo ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kipindi ya kipindi kwa kuzalisha matokeo ya kip\n<>\n\nIt seems like your message got cut off, and it's a bit unclear what you're asking. Could you please clarify or provide more context? For example, are you asking about a specific topic, seeking help with a problem, or looking for information on something? Let me know so I can assist you better!",
+        "emptyHint": "Bado hakuna msingi ulioundwa. Kuunda moja kunakandamiza ukiukaji wa leo na kuamsha ukandamizaji wa msingi katika usanidi.",
+        "createButton": "Tuma / refresh baseline",
+        "createTitle": "Huendesha dart run saropa_lints:baseline - huandika saropa_baseline.json na kuiwasha kwenye usanidi.",
+        "openButton": "Fungua faili ya msingi",
+        "openTitle": "Fungua saropa_baseline.json kwenye kihariri.",
+        "summary": "{files} faili, ukiukaji wa {violations} msingi - imetolewa {generated}.",
+        "unknownDate": "kwa wakati usiojulikana",
+        "count": "Count Count kuhesabu hesabu.",
+        "diff": {
+          "title": "Diff ya kati",
+          "counts": "{resolved} imetatuliwa tangu msingi · {new} mpya tangu msingi.",
+          "empty": "Hakuna mteremko - seti ya ukiukaji wa moja kwa moja inalingana na msingi haswa.",
+          "resolvedSection": "Imetatuliwa ({count})",
+          "newSection": "Mpya tangu msingi ({count})",
+          "moreRows": "+{count} zaidi sio zilizokazwa.",
+          "fileCol": "File ya faili file.",
+          "lineCol": "Mstari Line Line Line line."
+        }
+      },
+      "optimizer": {
+        "openStandalone": "Fungua pekee",
+        "openStandaloneTitle": "Fungua Kiboresha Uchanganuzi katika kichupo chake cha kuhariri.",
+        "unavailable": "Kiboresha Uchanganuzi hakipatikani katika kipindi hiki."
+      }
+    },
+    "automation": {
+      "hint": "Mipango ya kipango ambayo inakontrola wakati analysis inakwenda na kama uchaguzi inapakawa. Mipango hizi yeye kama wakati ya kipango kwenye File > Preferences > Settings nde Saropa Lints."
+    },
+    "extension": {
+      "hint": "Mipangilio ya kuvutia kwa kati ya extension.",
+      "linkNote": "Lint integration on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
+    }
+  },
   "consolidated": {
     "kicker": "Usalama · Ubora wa ubora.",
     "searchPlaceholder": "Kanuni za kuchuja... sheria za kufuta.",
@@ -238,76 +359,22 @@
     }
   },
   "dashboards": {
-    "heroTitle": "Dashibodi Dashboards Dawati.",
-    "openFull": "Fungua skrini kamili ya skrini.",
-    "rescan": "Rescan upya Scan tena.",
-    "retry": "Jaribu tena, jaribu tena.",
-    "paneFailed": "Scan imeshindwa.",
+    "lintsConfig": {
+      "description": "Ngazi: {tier} · Lane: {lane}",
+      "descriptionNoLane": "Tier: Kiwango cha juu zaidi. {tier} _ PH0__ - Msaada wa kuokoa maisha."
+    },
     "controls": {
-      "actions": "Matendo Matendo Vitendo.",
-      "settings": "Uwekaji wa Mipangilio ya Kuweka.",
-      "help": "Msaada wa Kusaidia Msaidizi.",
-      "runAnalysis": "Run uchambuzi kukimbia.",
-      "initializeConfig": "Initialize / Update configig kwa ajili ya kuanza.",
-      "on": "On on on kwenye kwenye kwenye",
-      "off": "Off off off off mbali mbali",
-      "yes": "Yes, yes, yes - Kinda.",
-      "no": "Hapana, hapana, hakuna kitu kama hicho.",
-      "lintIntegrationState": "Ushirikiano wa Lint: Kuunganisha Lint {state} _ PH0__ - Msaada wa kuokoa maisha.",
       "analyzerPlugin": "Plugin ya Analyzer",
-      "analyzerPluginLive": "Kwenye — diagnostics ya kipengele kipya katikati ya editor",
       "analyzerPluginDisabled": "Off — kusimama kwa kuzalisha",
       "analyzerPluginAbsent": "Hakuna inayozungumzwa",
-      "tierState": "Tier: Kiwango cha juu zaidi. {tier} _ PH0__ - Msaada wa kuokoa maisha.",
-      "lane": "Njia",
       "laneLight": "Light — ~200 hadi kwenye editor, wengine kwenye kuzalisha",
       "laneFull": "Panda — kila neno ya kipengele kizalishwa katika kipengele ya editor",
-      "runAfterConfigState": "Tumia uchambuzi baada ya mabadiliko ya usanidi: {state} _ PH0__ - Msaada wa kuokoa maisha.",
-      "runAfterDependencyState": "Tumia uchambuzi baada ya mabadiliko ya utegemezi: {state} _ PH0__ - Msaada wa kuokoa maisha.",
-      "uiLanguageState": "Lugha ya UI: lugha ya UI. {language} _ PH0__ - Msaada wa kuokoa maisha.",
-      "gettingStarted": "Kuanza kupata kuanza.",
-      "about": "Kuhusu Saropa Lints",
-      "pubDev": "Package kwenye pub.dev.",
-      "aiInstructions": "Unda maagizo ya wakala wa AI kwa agizo la wakala."
+      "migrateLegacyKeys": "Hamisha vitufe vya usanidi vya {count}",
+      "migrateLegacyKeysDesc": "Hamisha funguo za uzuiaji wa programu-jalizi hadi analysis_options_custom.yaml"
     },
-    "pane": {
-      "projectMap": "Ramani ya Mradi wa Mkakati wa Mradi.",
-      "codeHealth": "Kanuni za Afya Code Health.",
-      "lintsConfig": "Lints Config config imewekwa.",
-      "findings": "Matokeo ya Uchunguzi.",
-      "package": "Dashibodi ya Package Dashboard.",
-      "commandCatalog": "Katalogi ya amri ya amri Catalog."
-    },
-    "projectMap": {
-      "scanning": "Kuchunguza ramani ya mradi wa ... ramani..."
-    },
-    "codeHealth": {
-      "scanning": "Scan code ya afya..."
-    },
-    "config": {
-      "tier": "Tier ya chini ni kiwango cha juu zaidi.",
-      "enabledRules": "Sheria zilizowezeshwa sheria zilizodhibitiwa.",
-      "rulePacks": "Sheria pakiti vifurushi.",
-      "packages": "Pakiti za Package Packages"
-    },
-    "package": {
-      "total": "Pakiti za Package Packages",
-      "attention": "Inahitaji tahadhari.",
-      "blocked": "Blocked Imefungwa imezuiwa",
-      "empty": "Hakuna Scan ya Package bado  ⁇ fungua dashibodi ili kuendesha moja."
-    },
-    "findings": {
-      "total": "Jumla ya jumla ya jumla.",
-      "errors": "Makosa Makosa makosa Makosa.",
-      "warnings": "Maonyo ya onyo Maonyo Onyo.",
-      "info": "Habari za habari habari habari taarifa.",
-      "empty": "Hakuna uchambuzi uliofanywa bado  ⁇ Fungua Matokeo ya kukimbia moja."
-    },
-    "catalog": {
-      "commands": "Amri za amri.",
-      "recent": "Hivi karibuni kutumika kutumika."
-    },
-    "scanFailed": "Scan imeshindwa. Fungua dashibodi kamili ili kuona maelezo na ujaribu tena."
+    "badge": {
+      "needlesTooltip": "Vifurushi vya {count} vina vipengele ambavyo havijatumiwa"
+    }
   },
   "configSuggestions": {
     "enabledToast": "Imewezesha pakiti ya sheria {pack} katika analysis_options.yamll.",
@@ -586,10 +653,22 @@
     "reloadNow": "Reload sasa hivi.",
     "reloadLater": "Baadaye baadaye baadaye baadaye"
   },
+  "statusBar": {
+    "menu": {
+      "enableOn": "Analisisi inaonyeshwa (klikua kufuta)",
+      "enableOff": "Analisi zilizofanikwa (klikua kujakokotia)",
+      "openViolations": "Fungua Ripoti ya Ukiukaji",
+      "openPackageDashboard": "Fungua Dashibodi ya Kifurushi cha Package Dashboard.",
+      "openProcessHealth": "Fungua Mchakato wa Afya",
+      "commandCatalog": "Katalogi ya amri ya amri Catalog.",
+      "about": "Kuhusu"
+    }
+  },
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",
-      "critical": "🔴 {size}"
+      "critical": "🔴 {size}",
+      "openHint": "Bofya ili kufungua Mchakato wa Afya"
     },
     "tooltip": {
       "processCount": "Mipangilio ya Dart: {count} ({size} RSS)",
@@ -710,7 +789,11 @@
       "driftOfflineTitle": "Drift Advisor imewezeshwa lakini hakuna seva iliyopatikana.",
       "driftOfflinePill": "Drift nje ya mtandao.",
       "enabledRulesTitle": "Sheria zilizowezeshwa katika kiwango cha sasa cha ngazi.",
-      "rulesCount": "sheria {count}"
+      "rulesCount": "sheria {count}",
+      "regressionTitle": "Unganisho wa health uchukua kutokana na {previousScore} hadi {currentScore}",
+      "trendTitle": "Skore ya health / matokeo ya kifungu kwa ajili ya runi ya kwanza",
+      "hotspotsTitle": "{open} imefunguliwa, {safe} imewekwa alama kuwa salama, {fixed} imerekebishwa - bofya ili kukagua",
+      "hotspotsPill": "{open} imefunguliwa · {percent}% imekaguliwa"
     },
     "groupBy": {
       "severity": "Ugumu wa Hali.",
@@ -1025,6 +1108,34 @@
   "packageDashboard": {
     "documentTitle": "Saropa Dashibodi ya Kifurushi cha Package",
     "heroTitle": "Saropa Dashibodi ya Kifurushi cha Package",
+    "tabs": {
+      "aria": "Sehemu za dashibodi za kifurushi",
+      "overview": "Muhtasari",
+      "upgrades": "Uboreshaji",
+      "upgradesDesc": "Kagua masasisho ya kifurushi yanayopatikana, yaliyowekwa kulingana na hatari, na mbofyo mmoja itatumika.",
+      "fullReport": "Ujumbe Mwili",
+      "fullReportDesc": "Tumia matokeo ya kuhusisha kuhusisha kuhusisha (kila paketi ya kuzingatia, kila kifungu cha changelog ya kuzingatia) kama faili ya HTML/Markdown/JSON na kipande.",
+      "knownIssues": "Masuala yanayojulikana",
+      "knownIssuesDesc": "Tazama vitu vya kifua vya kwanza na matokeo ya mchoro zilizopewa kwa kuzungumza na vikombina vyingi.",
+      "compare": "Linganisha Compare Linganishe.",
+      "compareDesc": "Tafuta kati ya package mbili au zaidi kwa ajili ya skore, ukubwa na uchumi.",
+      "settings": "Uwekaji wa Mipangilio ya Kuweka.",
+      "openButton": "Fungua {tab}"
+    },
+    "settingsTab": {
+      "intro": "Kila maelezo ya packageVibrancy.* ya kutoa, kuzalishwa. Mabadiliko yasiyozalishwa kwa muda muda kwa maelezo ya workspace yako.",
+      "noLimit": "hakuna kikomo",
+      "group": {
+        "access": "Unganisha na Registries",
+        "scan": "Changanua",
+        "display": "Kuonza",
+        "weights": "Alama ya Uzito",
+        "upgrade": "Upgrade Kuboresha.",
+        "watch": "Tazama",
+        "budget": "Budge",
+        "vuln": "Udhaifu"
+      }
+    },
     "detailPane": {
       "aria": "Maelezo ya kifurushi Package Detail.",
       "title": "Maelezo ya kifurushi Package Detail.",
@@ -1256,7 +1367,8 @@
       "toggleDetail": "Toggle highlighted mfuko wa maelezo ya kina expander.",
       "escapeSearch": "Tafuta wazi ililenga; pili Esc huanguka safu zote zilizopanuliwa.",
       "historyBack": "Rudi nyuma kupitia historia ya urambazaji wa kifurushi.",
-      "showOverlay": "Onyesha hii njia ya mkato overlay."
+      "showOverlay": "Onyesha hii njia ya mkato overlay.",
+      "jumpToTab": "Nenda kwenye kichupo cha 1-6 (Muhtasari, Maboresho, Ripoti Kamili, Masuala yanayojulikana, Linganisha, Mipangilio)"
     },
     "versionTooltip": {
       "installed": "Imewekwa: {version} ({date})",
@@ -1616,6 +1728,68 @@
       "weeksAgo": "wiki {wk} zilizopita"
     }
   },
+  "projectMap": {
+    "panelTitle": "Ramani ya mradi wa Saropa",
+    "tabs": {
+      "map": "Ramani",
+      "reports": "Ripoti",
+      "aria": "Sehemu za Ramani ya Mradi"
+    },
+    "scan": {
+      "subtitle": "Inachanganua ukubwa wa mradi, utata, na maeneo maarufu...",
+      "elapsed": "Ilitokea kwamba muda uliopita.",
+      "cancel": "Cancel cancel kufuta",
+      "restart": "Anzisha upya tena kwa kuanza upya.",
+      "stopped": "Imesimamishwa",
+      "logHeading": "Shughuli ya shughuli.",
+      "logEmpty": "Bado hakuna matokeo - project_health hairipoti maendeleo ya hatua kwa hatua, kwa hivyo kumbukumbu hii hujaza tu ikiwa skanisho itachapisha ujumbe wa uchunguzi."
+    },
+    "reports": {
+      "intro": "Mbofyo mmoja CLI inaripoti kwamba hapo awali ilihitaji terminal. Kila kitufe cha Run hutiririsha pato la moja kwa moja la zana chini ya kadi yake na kuhifadhi nakala chini ya ripoti/.saropa_lints/reports-tab/.",
+      "runButton": "Kimbia",
+      "notRunYet": "Bado haijakimbia",
+      "running": "Inakimbia...",
+      "exitOk": "Kifungu 0 — pass",
+      "exitFail": "Toka isiyo ya sifuri - tazama pato",
+      "colLine": "#",
+      "colText": "Pato",
+      "severity": {
+        "title": "Ripoti ya Ukali",
+        "desc": "Huendesha dart analyze na kupanga kila suala kwa ukali (makosa, maonyo, maelezo) - amri ya mwisho dart saropa_lints:severity_report, bila terminal."
+      },
+      "impact": {
+        "title": "Ripoti ya Athari (lakabu za urithi)",
+        "desc": "Matokeo ya kati ya matokeo ya Severity Report — impact_report ni jina la kati ya kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa kila kila kwa k."
+      },
+      "qualityGate": {
+        "title": "Lango la Ubora",
+        "desc": "Kuwasilisha matokeo ya violations.json ya muda mlima kwa saropa_quality_gate.yaml na kuzalisha PASS, WARN, au FAIL. Tafakari kwenye matokeo ya kwanza, kisha tafuta."
+      },
+      "stubTest": {
+        "title": "Ripoti ya Mtihani wa Stub",
+        "desc": "Jaribio la kuchanganua/*.dart kwa madai ya kishikilia nafasi (tarajia(kweli, niKweli), tarajia('halisi', isNotNull)) ambayo kamwe hayajaribu chochote."
+      },
+      "accuracy": {
+        "title": "Ripoti ya Uhusiano",
+        "desc": "Kupangalia kila kundi kwa kuzingatia expect_lint marker katika fixtures kati au kufaniki kwa kundi - kufaniki kundi ambayo inaongezeka kwa njia ya mbele. Kati ya kufaniki kama kwa kuzungumza saropa_lints."
+      },
+      "memory": {
+        "title": "Ripoti ya Kumbukumbu",
+        "desc": "Hutoa muhtasari wa mwenendo wa kichanganuzi cha RSS kutoka kwa ripoti/.saropa_lints/plugin.log — first/last/min/max kumbukumbu tangu programu-jalizi ianze mara ya mwisho."
+      },
+      "doctor": {
+        "title": "Doktori",
+        "desc": "Kutafuta michezo ya analysis_options.yaml na analysis_options_custom.yaml kwa misconfigurations ya kikali: kifile ya kikali, kifile ya kikali inayotumika, au kifile ya kikali inayotumika."
+      },
+      "gate": {
+        "editorLabel": "saropa_quality_gate.yaml vizingiti",
+        "placeholder": "lango_la_ubora:\n  masharti:\n    - kipimo: masuala_mapya_muhimu\n      op: eq\n      thamani: 0\n      on_fail: kushindwa",
+        "save": "Save Sawa Kuokoa",
+        "saved": "Imehifadhiwa",
+        "saveError": "Hakuna kujisajili"
+      }
+    }
+  },
   "suppressionsStrip": {
     "noData": "Hakuna violations.json bado  ⁇  kukimbia uchambuzi kujaza ukandamizaji picha.",
     "zeroTotal": "0 kuondokana na analyzer katika mauzo ya nje ya hivi karibuni.",
@@ -1771,6 +1945,11 @@
       "rssNote": {
         "inProcess": "kati ya programu, sio kati kwa muda mmoja",
         "notRunning": "sio inapata"
+      },
+      "description": {
+        "analyzerPlugin": "Hufanya kazi ndani ya seva ya uchanganuzi ya Dart - hutiririka moja kwa moja kwenye kihariri unapoandika, hakuna uchanganuzi unaohitajika. Kugeuza huandika upya programu-jalizi: zuia katika analysis_options.yaml.",
+        "scanDaemon": "Mchakato wa usuli ambao unachanganua upya mradi mzima kwenye kuhifadhi na kuandika ripoti/.saropa_lints/violations.json. Kuzima kunasimamisha; hifadhi inayofuata inaanza tena.",
+        "lspServer": "Seva ya lugha tofauti - huchapisha uchunguzi kwenye paneli ya Matatizo kwa faili wazi na za nafasi ya kazi. Kugeuza huandika mpangilio wa saropaLints.lspServer.enabled."
       }
     },
     "toggle": {
@@ -1779,7 +1958,9 @@
     },
     "action": {
       "killAll": "Ondoa Wote",
-      "restartAll": "Tumia Kila Mwaka"
+      "restartAll": "Tumia Kila Mwaka",
+      "killAllDescription": "Kupungua server LSP kwa kawaida. Plugin ya analizi na Scan Daemon huchukua kuchapwa kwa kawaida — tafuta toggle ON/OFF ya kila engine kwa kawaida.",
+      "restartAllDescription": "Husimamisha na kuzindua upya Seva ya LSP (au kuiwasha ikiwa haifanyi kazi). Programu-jalizi ya Kichanganuzi na Changanua Daemon haziathiriwi - badala yake tumia kigeuzi cha KUWASHA/KUZIMA cha kila injini."
     },
     "log": {
       "empty": "Hakuna mstari ya log yet.",
@@ -1793,6 +1974,9 @@
       "analyzerToggleOff": "Analizator Plugin: imetumia...",
       "daemonToggleOn": "Tafuta Daemon: inakubali…",
       "daemonToggleOff": "Tafuta Daemon: inapakia…"
+    },
+    "sidebar": {
+      "enginesLabel": "Injini: {count} inayoendesha"
     }
   },
   "detailView": {
@@ -2197,10 +2381,6 @@
     "scanning": "Kusimamia kipengele...",
     "openConfig": "Openda analysis_options.yaml",
     "lastScan": "Scan ya mwisho: {time}",
-    "sidebar": {
-      "label": "Analizi ya Optimizer",
-      "description": "Kuruhisa mifano ya analyzer"
-    },
     "kpi": {
       "filesInScope": "Faili katikati",
       "lines": "moto",
@@ -2269,9 +2449,18 @@
     },
     "diffTitle": "Analizi Optimizer: Matokeo ya Kusimamia"
   },
-  "diagnostics": {
-    "sidebar": {
-      "severityToggleTooltip": "Kilieke kwa muda mmoja ili kuchagua {severity}"
+  "sidebarShell": {
+    "dashboardsViewTitle": "Dashibodi Dashboards Dawati."
+  },
+  "status": {
+    "health": {
+      "lastRunTooltip": "Uchambuzi wa mwisho: {ago}",
+      "neverRunLabel": "Afya:-",
+      "neverRunDescription": "Fanya uchambuzi ili kuona alama yako ya afya"
+    },
+    "badge": {
+      "criticalTooltip": "{critical} muhimu, {total} jumla",
+      "totalTooltip": "Ukiukaji wa {total}"
     }
   },
   "staleIgnores": {
@@ -2293,16 +2482,15 @@
     },
     "confirm": {
       "fixMessage": "Hii inaondosha komento ya ignore ya kipasifika kutoka kwenye faili zako ya michezo. Mabadiliko haya inaweza kubadilishwa na git. Je, unaweza kubegani?",
+      "fixMessageWithCount": "Hii itaondoa {count} maoni ya zamani ya kupuuza kutoka kwa faili zako chanzo. Mabadiliko yanaweza kutenduliwa na git. Ungependa kuendelea?",
       "fixAction": "Ondoa kipengele ya ignore ya kipengele kifupi"
     },
     "diagnostic": {
       "message": "Stale ignore: rule '{ruleName}' hakuna kufanya kwenye linia hii."
     },
     "sidebar": {
-      "findLabel": "Tazama ignores ya kipato",
-      "findDescription": "Tazama kifupi // ignore: comments",
       "fixLabel": "Tuzaliwa kwa kuzalisha ignores ya kipengele",
-      "fixDescription": "Oto-elimina kipengele ya // ignore: comments"
+      "fixDescription": "Tazama na ongeza kusilisisha komento // ignore:"
     },
     "quickFix": {
       "title": "Tumeua kifungu kwenye faili hili"

@@ -226,46 +226,6 @@ function runScan(
 }
 
 /**
- * Applies the in-editor transforms to a raw `project_health --format html` document: swaps the CDN
- * ECharts `<script>` for the vendored copy (webviews have no network), injects a CSP that permits
- * the vendored script + the report's inline data/style, and rebinds the report's palette tokens to
- * the host theme. Returns a self-contained HTML document usable either as `webview.html` (the
- * standalone Project Map panel) or as an `<iframe srcdoc>` inside the consolidated dashboard.
- *
- * NOTE (2026-09-04, Phase 6): the standalone panel no longer calls this — it now composes the
- * `dashboardChromeStyles`-based shell (see projectMapShell.ts) via [extractProjectMapParts] instead
- * of swapping in a full second `<html>` document. Nothing in this codebase calls it any more (the
- * consolidated "Saropa Dashboards" hub that was its other caller was deleted — see
- * `PLAN_sidebar_and_hub_reset.md` §4); left exported rather than removed since deleting a public
- * helper is a bigger call than this phase should make unilaterally.
- */
-export function transformProjectMapHtml(
-  raw: string,
-  webview: vscode.Webview,
-  extUri: vscode.Uri,
-): string {
-  const echartsUri = webview.asWebviewUri(
-    vscode.Uri.joinPath(extUri, 'media', 'echarts.min.js'),
-  );
-  let html = raw.replace(
-    /<script src="https:\/\/cdn[^"]*"><\/script>/,
-    `<script src="${echartsUri.toString()}"></script>`,
-  );
-  // Webview CSP: allow the vendored script + the report's inline data/style.
-  const csp =
-    `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; ` +
-    `img-src ${webview.cspSource} data:; ` +
-    `style-src ${webview.cspSource} 'unsafe-inline'; ` +
-    `script-src ${webview.cspSource} 'unsafe-inline';">`;
-  html = html.replace('<head>', `<head>${csp}`);
-  // Theme-awareness (SAROPA_DASHBOARD_STYLE_GUIDE dual-binding): the standalone export ships a fixed
-  // brand palette since a browser/CI file has no host theme; in the editor we rebind those same token
-  // names to `--vscode-*`. Injected after the template's <style> (incl. its dark @media) so this
-  // :root wins by source order; the brand accent stays fixed.
-  return html.replace('</head>', `${webviewThemeOverride()}</head>`);
-}
-
-/**
  * The three composable pieces of the Project Map report, extracted from the generated HTML by its
  * `<!--PM_*-->` boundary markers so the standalone panel's shell (projectMapShell.ts) can drop the
  * report into one shared document beside the Reports tab:
@@ -338,47 +298,6 @@ export async function scanProjectMapToParts(
   if (!fs.existsSync(indexPath)) return null;
   const raw = fs.readFileSync(indexPath, 'utf8');
   return extractProjectMapParts(raw, webview, extUri);
-}
-
-/**
- * `<style>` that rebinds the Dart report's palette tokens to the host VS Code theme for the
- * in-editor webview. Maps surface/text/border tokens to `--vscode-*` so the HTML chrome
- * (banner, KPI chips, hot-spot table, filters, gravity panel) follows the user's theme; the
- * brand accent, radius, and shadows stay as the template defines them. The ECharts charts read
- * `prefers-color-scheme` (which tracks the theme kind in a webview), so they flip light/dark on
- * their own.
- *
- * The override targets `.pm-pane` — the template now declares its palette tokens on that wrapper
- * (not `:root`) so the consolidated dashboard can host this report beside Code Health without the
- * two stylesheets' `:root` blocks fighting. A `:root` override would be shadowed: a CSS variable
- * resolves from the nearest ancestor that defines it, and `.pm-pane` is nearer than `:root` for
- * every report element. Token names match `health_html_template.dart`'s `.pm-pane` exactly.
- */
-function webviewThemeOverride(): string {
-  return `<style>${pmPaneThemeTokens()}</style>`;
-}
-
-/**
- * The `.pm-pane` palette-token rebind to the host VS Code theme, without the `<style>` wrapper.
- * Exported so the consolidated "Saropa Dashboards" host can apply the SAME rebind to its embedded
- * Project Map pane — otherwise the pane would render in the template's fixed brand palette while the
- * Code Health pane follows the editor theme, and the two panes would not match (the inconsistency the
- * consolidated view exists to remove). The brand accent / radius / shadows stay as the template
- * defines them; only surface/text/border tokens follow the theme.
- */
-export function pmPaneThemeTokens(): string {
-  return `
-.pm-pane {
-  --bg: var(--vscode-editor-background);
-  --surface: var(--vscode-editorWidget-background);
-  --surface-2: var(--vscode-editor-inactiveSelectionBackground);
-  --text: var(--vscode-foreground);
-  --muted: var(--vscode-descriptionForeground);
-  --border: var(--vscode-widget-border);
-  --hover: var(--vscode-list-hoverBackground);
-  --zebra: color-mix(in srgb, var(--vscode-foreground) 4%, transparent);
-}
-`;
 }
 
 function getOrCreatePanel(): vscode.WebviewPanel {

@@ -70,7 +70,11 @@
       "scanning": "Saropa: nag-scan ng {count} file(s)...",
       "done": "Saropa: {count} problema(s), {elapsed}s",
       "failed": "Saropa: nabigo ang pag-scan",
-      "warming": "Saropa: naglalabas ng analysta... ang unang pag-scan sa pagbukas ay maaaring mag-iskedyul ng isang minuto"
+      "warming": "Saropa: naglalabas ng analysta... ang unang pag-scan sa pagbukas ay maaaring mag-iskedyul ng isang minuto",
+      "ready": "Saropa: handa na",
+      "disabled": "Saropa: di nakakatulong",
+      "noProject": "Saropa: walang Dart project",
+      "doneTooltip": "{total} nakahanap, {shown} ipapakita pagkatapos ng filter"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: pag-scan ng buong proyekto",
@@ -86,10 +90,6 @@
       "failed": "Ang report ng mga oportunidad ay hindi maitala: {error}",
       "large": "Ang report ay {megabytes} MB at maaaring maslow ang pagbasa nito. Ang JSON file na kasama nito ay naglalaman ng parehong data para sa tooling.",
       "done": "Report ng mga oportunidad na isulat para sa {path}"
-    },
-    "sidebar": {
-      "label": "Buong Ulat sa Mga Pagkakataon",
-      "description": "Bawat package at feature, kasama ang bilang ng paggamit"
     },
     "documentTitle": "Inventory ng mga Feature ng Package",
     "heroTitle": "Inventory ng mga Feature ng Package",
@@ -213,6 +213,127 @@
   "tierPicker": {
     "ruleCount": "{count} na rule"
   },
+  "rulesTiers": {
+    "tabBar": {
+      "ariaLabel": "Mga Tala ng mga Talaan ng Mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga Tala ng mga T\n\n\n**Note:** The original text seems to be a repetition of \"Rules & Tiers dashboard tabs\" and may have been intended as a placeholder or a test. If the actual text is \"Rules & Tiers dashboard tabs,\" the translation would be:\n\n**Mga Tala at Mga Tiyak na Talaan ng Dashboard**"
+    },
+    "tab": {
+      "tier": "Ang Tier 1 ay ang tier 2 na antas ng pag-uuri.",
+      "packs": "Mga pakete ng patakaran ay may mga pakete.",
+      "overrides": "Nag-iwan ng pansin ang mga overrides.",
+      "sdk": "Paglulunsad ng SDK",
+      "configFile": "File ng configuration",
+      "automation": "Awtomasyon",
+      "extension": "Extension"
+    },
+    "common": {
+      "rule": "Panuntunan ng Pamamahala sa Pamahalaan",
+      "add": "Magdagdag",
+      "remove": "Alisin ang alisan ng pag-alis"
+    },
+    "sdk": {
+      "summary": "{total} SDK migration pack(s) ay nagsisimula sa proyekto — {breaking} breaking, {deprecation} deprecation.",
+      "noneApplicable": "Walang SDK migration packs na nakakaapekto sa environment ng pubspec ng proyekto para sa ngayon.",
+      "enableAllTitle": "I-activate ang bawat SDK migration pack na naglalaman ng Dart/Flutter version gate na kung saan ang proyekto ay nangangailangan na.",
+      "enableAll": "Paganahin ang lahat ng angkop ({count})",
+      "enableBreakingTitle": "I-activate lamang ang mga SDK packs na naglalarawan ng mga API na nangungunang inililipat sa iyong target version.",
+      "enableBreaking": "Paganahin ang pag-ibig lamang ({count})",
+      "enableDeprecationTitle": "I-activate lamang ang mga SDK packs na naglalarawan ng mga API na hindi na inirerekomenda (ngunit pa rin gumagana) sa iyong target version.",
+      "enableDeprecation": "Paganahin ang deprecation lamang ({count})",
+      "noPacksInCatalogue": "Walang nakaregister na mga pack ng migrasyon ng SDK."
+    },
+    "configFile": {
+      "analysisSettings": {
+        "title": "Mga setting ng analisis",
+        "hint": "Nangunguna kung ilang mga isyu ang ipapakita sa tab ng Problems at kung saan isusulat ang ulat ng pagbabalangkas."
+      },
+      "maxIssues": {
+        "label": "Makapangyarihang mga isyu",
+        "desc": "Magbubukas ng bilang ng mga suliranin na hindi error na ipapakita sa tab ng Problems. 0 ay nangangahulugan ng walang limitasyon. Ang overflow pa rin ay makikita sa buong ulat ng file."
+      },
+      "output": {
+        "label": "Output",
+        "desc": "Saan isusulat ang report ng analisis: terminal lamang, isang file lamang, o pareho."
+      },
+      "tierCap": {
+        "title": "Tier cap",
+        "hint": "Mga tier na nagpapatakbo sa panahon ng analysis, walang kaugnayan sa mga rule na naka-enable explicit. I-leave bilang None upang gamitin ang setting ng extension para sa Tier.",
+        "none": "Wala (gamitin ang setting sa tab na Tier)"
+      },
+      "saropaTier": {
+        "label": "saropa_tier"
+      },
+      "runtimeTier": {
+        "label": "runtime_tier"
+      },
+      "lane": {
+        "title": "Lane ng pagsusuri",
+        "hint": "Ano ang mga rule na inilalapat ng plugin ng in-process analyzer na nagtatrabaho live sa editor kumpara sa mga rule na inilalapat lamang sa pag-save (sa pamamagitan ng scan daemon)."
+      },
+      "platforms": {
+        "title": "Mga target na platform",
+        "hint": "I-disable ang mga platform na hindi itinutukoy ng proyekto para manatiling off ang mga rule na partikular para sa mga ito."
+      },
+      "severities": {
+        "title": "Pang-level ng kahimlayan",
+        "hint": "Magbabago ng kahalagahan ng isang partikular na rule, o nagtatanggal nang buo nito, walang kaugnayan sa tier at mga rule packs.",
+        "level": "Antas",
+        "empty": "Walang mga override sa antas ng kahimlayan.",
+        "rulePlaceholder": "rule_name",
+        "newLevelAria": "Bagong antas ng kahimlayan"
+      },
+      "bannedUsage": {
+        "title": "Ipinagbabawal na paggamit",
+        "hint": "Nagsisimbolong ng isang partikular na identifier (isang function, class, o pangalan ng member) saanman ito lumalabas sa proyekto, kasama ang isang custom reason na ipapakita sa diagnostic.",
+        "identifier": "Identifier",
+        "identifierPlaceholder": "s. print",
+        "reason": "Sagot",
+        "reasonPlaceholder": "halimbawa. Gamit ang Logger instead",
+        "empty": "Walang mga identifier na ipagbawal."
+      },
+      "diagnosticStats": {
+        "title": "Mga threshold ng diagnostic",
+        "hint": "Mga porsyon ng budget na estilo CI: umabot o magkamali kapag ang bilang ng paglabag ng isang rule ay lumampas sa isang threshold.",
+        "warn": "Iingat sa",
+        "fail": "Mali at",
+        "empty": "Walang mga threshold para sa diagnostic."
+      },
+      "baseline": {
+        "title": "Batayan",
+        "hint": "Ang baseline ay nagtatanggal ng proyektong mga EXISTING na mga paglabag, kaya ang mga bagong naiintindihang resulta ay lumalabas pagkatapos.",
+        "emptyHint": "Wala pang base line. Ang pagbuo nito ay magpapagawa ng mga paglabag ng araw na ito at magpapatakbo ng pagbabawal sa base line sa configuration.",
+        "createButton": "Lumikha / i-refresh baseline",
+        "createTitle": "Pumoproseso ng dart run saropa_lints:baseline — sumusulat ng saropa_baseline.json at nag-activate ito sa config.",
+        "openButton": "I-Open ang file ng baseline",
+        "openTitle": "Ibukod ang saropa_baseline.json sa editor.",
+        "summary": "{files} file(s), {violations} violation(s) baselined — generated {generated}",
+        "unknownDate": "sa isang di kilalang oras",
+        "count": "Ibilang ang bilang ng mga tao sa county.",
+        "diff": {
+          "title": "Pagkakaiba kumpara sa kasalukuyan",
+          "counts": "{resolved} na napatagalan mula sa baseline · {new} bagong nagsimula mula sa baseline.",
+          "empty": "Walang pag-usbong — ang set ng mga pangangailangan na nangunguna ay sumasalungat sa base line nang direkta.",
+          "resolvedSection": "Nakaresolba ({count})",
+          "newSection": "Bagong nangunguna sa baseline ({count})",
+          "moreRows": "+{count} pangalan ay hindi ipapakita.",
+          "fileCol": "Ang file ay isang file ng file.",
+          "lineCol": "Ang linya ng linya ay ang mga linya na ito."
+        }
+      },
+      "optimizer": {
+        "openStandalone": "I-click ang standalone",
+        "openStandaloneTitle": "Ibigay ang Analysis Optimizer sa sariling tab ng editor.",
+        "unavailable": "Ang Analysis Optimizer ay hindi available sa sesyon na ito."
+      }
+    },
+    "automation": {
+      "hint": "Mga setting ng extension na nagkontrol kung kailan magaganap ang analisis at paano ipapakita ang mga resulta. Ito ay nagmula sa parehong mga setting sa File > Preferences > Settings sa ilalim ng Saropa Lints."
+    },
+    "extension": {
+      "hint": "Pamamaraan ng pagpapakita sa buong extension.",
+      "linkNote": "Ang integrasyon ng lint sa pagsusulit o pagsusulit ay nasa status row ng sidebar; ang antas ng analisis ay nasa tab na Tier — pareho ito ay nagawa ang mas marami kaysa sa isang simple setting write, kaya wala itong duplication dito."
+    }
+  },
   "consolidated": {
     "kicker": "Kaligtasan · Kalidad Security · Kaligtas",
     "searchPlaceholder": "Mga patakaran sa filter...",
@@ -238,76 +359,22 @@
     }
   },
   "dashboards": {
-    "heroTitle": "Mga Dashboard ng dashboard.",
-    "openFull": "Buksan ang buong screen.",
-    "rescan": "Rescan muli ang iyong mga mata.",
-    "retry": "Subukan muli ang Retry.",
-    "paneFailed": "Ang scan ay nabigo.",
+    "lintsConfig": {
+      "description": "Tier: {tier} · Lane: {lane}",
+      "descriptionNoLane": "Tier: Ang antas ng pag-aari. {tier} ang kanyang mga"
+    },
     "controls": {
-      "actions": "Mga Aktibidad mga Aksyon",
-      "settings": "Mga Pag-aayos ng Settings",
-      "help": "Magbigay ng tulong sa mga taong nakakatulong.",
-      "runAnalysis": "Magpatakbo ng pagsusuri sa run analysis.",
-      "initializeConfig": "I-initialize / i-update ang config ng pag-configure.",
-      "on": "Sa pamamagitan ng pag-click sa itaas, maaari mong i-download ang mga ito.",
-      "off": "Off off off off ang mga ito.",
-      "yes": "Oo, oo, ay isang tunay na pag-ibig.",
-      "no": "Hindi, hindi, hindi na.",
-      "lintIntegrationState": "Pagsasama ng Lint: Lint integration: Ang pagsasama sa lint. {state} ang kanyang mga",
       "analyzerPlugin": "Plugin ng analyzer",
-      "analyzerPluginLive": "Sa — live in-editor diagnostics",
       "analyzerPluginDisabled": "Off — scan-on-save lamang",
       "analyzerPluginAbsent": "Hindi nakakonekta",
-      "tierState": "Tier: Ang antas ng pag-aari. {tier} ang kanyang mga",
-      "lane": "Lane",
       "laneLight": "Light — ~200 na mga rule sa loob ng editor, ang iba ay nagsisimula sa pag-save",
       "laneFull": "Full — lahat ng nakarehistro na rule sa loob ng editor",
-      "runAfterConfigState": "Patakbuhin ang pagsusuri pagkatapos ng config pagbabago: {state} ang kanyang mga",
-      "runAfterDependencyState": "Patakbuhin ang pagsusuri pagkatapos ng pagbabago sa dependency: {state} ang kanyang mga",
-      "uiLanguageState": "Wika ng UI: wika ng UI. {language} ang kanyang mga",
-      "gettingStarted": "Ang Pagsimula ay Nagsisimula.",
-      "about": "Tungkol sa _Saropa Lints.",
-      "pubDev": "Pakete sa pub.dev ng _PH0_.",
-      "aiInstructions": "Lumikha ng mga tagubilin sa ahente ng AI na may AI."
+      "migrateLegacyKeys": "I-migrate ang (mga) legacy na config key ng {count}",
+      "migrateLegacyKeysDesc": "Ibahin ang mga key ng legacy plugin-block patungo sa analysis_options_custom.yaml"
     },
-    "pane": {
-      "projectMap": "Proyekto Mapa Project Map Ang proyekto mapa",
-      "codeHealth": "Code Health",
-      "lintsConfig": "Lints Config ay naka-config sa pamamagitan ng mga linya.",
-      "findings": "Mga Natuklasan sa Paghahanap",
-      "package": "Package Dashboard ng Pakete Ang pakete ay isang dashboard na may mga tampok.",
-      "commandCatalog": "Command Catalogue Katalogo ng Pag-uutos"
-    },
-    "projectMap": {
-      "scanning": "Pag-scan ng proyekto mapa ..."
-    },
-    "codeHealth": {
-      "scanning": "Pag-scan ng code sa kalusugan ..."
-    },
-    "config": {
-      "tier": "Ang Tier 1 ay ang tier 2 na antas ng pag-uuri.",
-      "enabledRules": "Ang mga pinagagawa na patakaran ay pinagana ang mga panuntunan.",
-      "rulePacks": "Mga pakete ng patakaran ay may mga pakete.",
-      "packages": "Pakete ng mga pakete ay may isang bagay na dapat gawin upang makakuha ng mas mahusay na"
-    },
-    "package": {
-      "total": "Pakete ng mga pakete ay may isang bagay na dapat gawin upang makakuha ng mas mahusay na",
-      "attention": "Kailangan ng pansin.",
-      "blocked": "Blokado, naka-block na ang mga ito.",
-      "empty": "Walang packet scan  ⁇ Buksan ang dashboard upang patakbuhin ang isa."
-    },
-    "findings": {
-      "total": "Ang kabuuan ng lahat ay sumusumpong.",
-      "errors": "Mga pagkakamali Pagkakamali",
-      "warnings": "Mga Babala ng mga babala",
-      "info": "Ang mga impormasyon ay maaaring i-access sa pamamagitan ng paghahanap.",
-      "empty": "Walang pag-aaral na tumakbo pa  ⁇ Buksan ang mga Natuklasan upang patakbuhin ang isa."
-    },
-    "catalog": {
-      "commands": "Mga Commands ng mga utos.",
-      "recent": "Kamakailan lamang ginamit na ginagamit."
-    },
-    "scanFailed": "Ang scan ay nabigo. Buksan ang buong dashboard upang makita ang mga detalye at subukan muli."
+    "badge": {
+      "needlesTooltip": "{count} package(s) ay may mga hindi inilalagay na mga tampok"
+    }
   },
   "configSuggestions": {
     "enabledToast": "Pinaandar ang {pack} rule pack sa analysis_options.yaml",
@@ -586,10 +653,22 @@
     "reloadNow": "I-reload ngayon.",
     "reloadLater": "Sa huli sa susunod na mga araw, mas maaga."
   },
+  "statusBar": {
+    "menu": {
+      "enableOn": "Analisis na nakalaan (klik para i-disable)",
+      "enableOff": "Analisis di-nag-disable (klik para i-enable)",
+      "openViolations": "I-Open Violations Report",
+      "openPackageDashboard": "Buksan ang Dashboard ng Package na Packet.",
+      "openProcessHealth": "I-Open Process Health",
+      "commandCatalog": "Command Catalogue Katalogo ng Pag-uutos",
+      "about": "Tungkol sa"
+    }
+  },
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",
-      "critical": "🔴 {size}"
+      "critical": "🔴 {size}",
+      "openHint": "Click para magbukas ng Process Health"
     },
     "tooltip": {
       "processCount": "Dart proseso: {count} ({size} RSS)",
@@ -710,7 +789,11 @@
       "driftOfflineTitle": "Drift Advisor na naka-enable ngunit walang server natagpuan.",
       "driftOfflinePill": "Drift offline",
       "enabledRulesTitle": "Pinapayagan na mga patakaran sa kasalukuyang tier.",
-      "rulesCount": "{count} na rule"
+      "rulesCount": "{count} na rule",
+      "regressionTitle": "Nabawasan ang health score mula {previousScore} hanggang {currentScore}",
+      "trendTitle": "Score ng kalusugan / tren ng pagkakasalungat mula sa mas maagang mga run",
+      "hotspotsTitle": "{open} nakabukas, {safe} nakatakdang ligtas, {fixed} tinukoy — klik para magtanong",
+      "hotspotsPill": "{open} buksan · {percent}% tinanaw"
     },
     "groupBy": {
       "severity": "Grabe ng sakit na ito ay ang pagiging malubhang.",
@@ -1025,6 +1108,34 @@
   "packageDashboard": {
     "documentTitle": "Saropa Package Dashboard",
     "heroTitle": "Saropa Package Dashboard",
+    "tabs": {
+      "aria": "Seksyon ng package dashboard",
+      "overview": "Pangkalahatang-ideya",
+      "upgrades": "Pangunahing Paggawa",
+      "upgradesDesc": "Suriin ang mga magagamit na upgrade sa package, na grupo ayon sa panganib, na may isang-click na pagsusumite.",
+      "fullReport": "Buong ulat",
+      "fullReportDesc": "I-export ang komprehensibong report ng paggamit ng feature (bawat inilalarawan na package, bawat mininung silang feature sa changelog) bilang isang HTML/Markdown/JSON file at i-open ito.",
+      "knownIssues": "Nararapat na mga isyu",
+      "knownIssuesDesc": "Surfing mga kilalang mga kahinaan at mga advisory na inilabas laban sa iyong mga dependency.",
+      "compare": "Ihambing ihambing Iparating",
+      "compareDesc": "Sukatin ang dalawang o higit pang mga package sa iba't ibang aspeto tulad ng score, size, at activity.",
+      "settings": "Mga Pag-aayos ng Settings",
+      "openButton": "Ibigay ang {tab}"
+    },
+    "settingsTab": {
+      "intro": "Bawat packageVibrancy.* setting, na grupo. Mga pagbabago ay i-save agad sa iyong workspace settings.",
+      "noLimit": "walang limita",
+      "group": {
+        "access": "Access at Mga Rehistro",
+        "scan": "I-scan",
+        "display": "Ipakita",
+        "weights": "Mga Timbang ng Iskor",
+        "upgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
+        "watch": "Suriin",
+        "budget": "Budjet",
+        "vuln": "Mga Susosyal"
+      }
+    },
     "detailPane": {
       "aria": "Mga detalye ng pakete sa pakete",
       "title": "Mga detalye ng pakete sa pakete",
@@ -1256,7 +1367,8 @@
       "toggleDetail": "I-toggle ang mga naka-highlight na detalye ng pakete expander.",
       "escapeSearch": "I-clear ang nakatuon na paghahanap; pangalawang Esc ay bumagsak lahat ng pinalawak na mga hilera.",
       "historyBack": "Bumalik sa pakete na may kasaysayan ng pag-navigate.",
-      "showOverlay": "Ipakita ang shortcut na ito overlay."
+      "showOverlay": "Ipakita ang shortcut na ito overlay.",
+      "jumpToTab": "Pumunta sa tab 1-6 (Overview, Upgrades, Full report, Known issues, Compare, Settings)"
     },
     "versionTooltip": {
       "installed": "Na-install: {version} ({date}) na may mga tampok ng pag-andar.",
@@ -1616,6 +1728,68 @@
       "weeksAgo": "{wk}l nakalipas"
     }
   },
+  "projectMap": {
+    "panelTitle": "Saropa Project Map",
+    "tabs": {
+      "map": "Mapa",
+      "reports": "Mga Umatagumpay",
+      "aria": "Seksiyon ng Project Map"
+    },
+    "scan": {
+      "subtitle": "Nagsuscan ng laki ng proyekto, komplikasyon, at mga hotspots...",
+      "elapsed": "Naglabas na panahon.",
+      "cancel": "Kanselahin I-cancel ang pagkansela",
+      "restart": "I-restart ang iyong computer at i-reset ito.",
+      "stopped": "Napauwi",
+      "logHeading": "Aktibidad ng aktibidad.",
+      "logEmpty": "Walang output pa — ang project_health ay hindi nagrereport ng progreso sa bawat hakbang, kaya ang log na ito ay nagmumula lamang kung ang scan ay nag-print ng isang diagnostic message."
+    },
+    "reports": {
+      "intro": "Mga tala ng CLI na maaaring i-click na isang click na nangangailangan ng terminal. Bawat pag-click sa button ay nag-stream ng live output ng tool sa ibaba ng card nito at nag-save ng isang kopya sa reports/.saropa_lints/reports-tab/",
+      "runButton": "Pumunta",
+      "notRunYet": "Hindi pa ini-run",
+      "running": "Pumoproseso...",
+      "exitOk": "Exit 0 — pumasa",
+      "exitFail": "Non-zero exit — tingnan ang output",
+      "colLine": "#",
+      "colText": "Output",
+      "severity": {
+        "title": "Report ng Kasalungatang Antas",
+        "desc": "Pumoproseso ng dart analyze at nag-group ng bawat isyu ayon sa kahimik (errors, warnings, info) — ang komandong terminal dart run saropa_lints:severity_report, nang walang terminal."
+      },
+      "impact": {
+        "title": "Ulat sa Epekto (legacy alias)",
+        "desc": "Sama nga output sa Severity Report — impact_report ay ang pangalang nangunguna pa 2026-06-05, pinanatili lamang para magamit pa ang mga nakaraang script at kasanayan."
+      },
+      "qualityGate": {
+        "title": "De-kalidad na Gate",
+        "desc": "Nagsusuri sa pinakabagong violations.json sa mga threshold sa saropa_quality_gate.yaml at inuumpisa ang PASS, WARN, o FAIL. Baguhin ang mga threshold sa ibaba, pagkatapos ay i-run."
+      },
+      "stubTest": {
+        "title": "Report ng Pagsubok sa Stub",
+        "desc": "Nagsuscan ng test/*.dart para sa mga placeholder assertions (expect(true, isTrue), expect('literal', isNotNull)) na walang ganap na pagsusuri."
+      },
+      "accuracy": {
+        "title": "Report ng Tumpatness",
+        "desc": "Sumusukat sa bawat rule na may expect_lint marker sa fixtures na ito ay tumutugon dito — nakakatagumpay sa isang rule na umiiral na walang alalahanin. Kadalasang makatulong kapag nagtatayo ng saropa_lints mismo."
+      },
+      "memory": {
+        "title": "Raporto ng Memory",
+        "desc": "Binubuod ang trend ng RSS ng plugin ng analyzer mula sa mga ulat/.saropa_lints/plugin.log — una/last/min/max na memory mula noong huling nagsimula ang plugin."
+      },
+      "doctor": {
+        "title": "Doktor",
+        "desc": "Nagsusuri sa analysis_options.yaml at analysis_options_custom.yaml para sa karaniwang mga maling configuration: mga key sa tamang file, nawawalang custom file, o nawawalang version constraint."
+      },
+      "gate": {
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
+        "placeholder": "quality_gate:\n  kundisyon:\n    - sukatan: new_critical_issues\n      op: eq\n      halaga: 0\n      on_fail: fail",
+        "save": "I-save ang mga ito sa Save.",
+        "saved": "Nakalaan",
+        "saveError": "Hindi makasave"
+      }
+    }
+  },
   "suppressionsStrip": {
     "noData": "Walang violations.json pa  ⁇  tumakbo sa pagsusuri upang punan ang suppression snapshot.",
     "zeroTotal": "0 analyzer suppressions sa pinakabagong pag-export.",
@@ -1771,6 +1945,11 @@
       "rssNote": {
         "inProcess": "sa proseso, hindi nakakakita ng mas maliit na pagtatangka",
         "notRunning": "walang pagsusulong"
+      },
+      "description": {
+        "analyzerPlugin": "Pumoproseso sa loob ng serbisyong analisis Dart — mga live squiggles sa editor habang nagsusulat ka, walang kinakailangang pag-scan. Ang pagboto ay nagrere-rewrite ng mga plugin: block sa analysis_options.yaml.",
+        "scanDaemon": "Proseso ng background na nagsuscan muli ang buong proyekto sa pag-save at sumusulat ng mga ulat/.saropa_lints/violations.json. Ang pag-off ng opsyon ay sususpende ito; ang susunod na save ay magpapalabas ito muli.",
+        "lspServer": "Makakatagpo ang serbisyong wika — nagpapublish ng mga diagnostic sa panel ng Mga Problema para sa mga nabuksan at mga file ng workspace. Ang pagbubukas ng toggle ay nagpapalit ng setting na saropaLints.lspServer.enabled."
       }
     },
     "toggle": {
@@ -1779,7 +1958,9 @@
     },
     "action": {
       "killAll": "Iwanan Lahat",
-      "restartAll": "Ibalik Lahat"
+      "restartAll": "Ibalik Lahat",
+      "killAllDescription": "Magtatag ng direktang pagbubukas ng LSP Server lamang. Ang Analyzer Plugin at Scan Daemon ay hindi pa maaaring i-kill nang walang pagkakakilanlan — gamitin ang sariling switch ng ON/OFF ng bawat engine.",
+      "restartAllDescription": "Nag-ugat at nagsisimula muli ang LSP Server (o nagsisimula ito kung hindi pa ito nagtatrabaho). Ang Analyzer Plugin at Scan Daemon ay hindi napekin — gamitin ang sariling ON/OFF toggle ng bawat engine."
     },
     "log": {
       "empty": "Walang mga entry sa log pa.",
@@ -1793,6 +1974,9 @@
       "analyzerToggleOff": "Analyzer Plugin: nagtatanggal...",
       "daemonToggleOn": "I-scan Daemon: nagsisimula...",
       "daemonToggleOff": "I-scan Daemon: suspending…"
+    },
+    "sidebar": {
+      "enginesLabel": "Mga Engine: {count} na nagtatrabaho"
     }
   },
   "detailView": {
@@ -2197,10 +2381,6 @@
     "scanning": "Nag-scan ng workspace…",
     "openConfig": "I-Open analysis_options.yaml",
     "lastScan": "Huling pag-scan: {time}",
-    "sidebar": {
-      "label": "Pagsusuri Optimizer",
-      "description": "Ibaan ang memorya ng analyzer"
-    },
     "kpi": {
       "filesInScope": "Mga file sa scope",
       "lines": "mga linya",
@@ -2269,9 +2449,18 @@
     },
     "diffTitle": "Analysis Optimizer: Mga Iminungkahing Pagbubukod"
   },
-  "diagnostics": {
-    "sidebar": {
-      "severityToggleTooltip": "I-double click upang i-toggle ang {severity}"
+  "sidebarShell": {
+    "dashboardsViewTitle": "Mga Dashboard ng dashboard."
+  },
+  "status": {
+    "health": {
+      "lastRunTooltip": "Nangunguna analysis: {ago}",
+      "neverRunLabel": "Kalusugan: -",
+      "neverRunDescription": "Paghahatid ng pag-uusap upang makita ang iyong puna score"
+    },
+    "badge": {
+      "criticalTooltip": "{critical} kritikal, {total} total",
+      "totalTooltip": "{total} pagkakasala(s)"
     }
   },
   "staleIgnores": {
@@ -2293,16 +2482,15 @@
     },
     "confirm": {
       "fixMessage": "Ito ay magpapalit ng mga hindi na kinakailangang komento sa iyong mga source files. Ang mga pagbabago ay maaaring i-undo gamit ang git. Susunod?",
+      "fixMessageWithCount": "Ito ay magpapalit ng mga {count} na hindi inilalarawan na komento (ignore comment) mula sa iyong mga source files. Ang mga pagbabago ay maaaring i-undo gamit ang git. Susunod?",
       "fixAction": "Tanggalin ang mga ignore na hindi aktibo"
     },
     "diagnostic": {
       "message": "Nag-iignore na: ang rule '{ruleName}' ay wala nang magtatag ng alerta sa linya na ito."
     },
     "sidebar": {
-      "findLabel": "Hanapin ang mga hindi ginamit na ignores",
-      "findDescription": "I-detect ang patay // huwag pansinin: mga komento",
       "fixLabel": "Ibahin ang mga hindi kinakailangang ignore",
-      "fixDescription": "Auto-remover ng mga // ignore: komento na walang kahulugan"
+      "fixDescription": "Magdetect at auto-removе ang mga // ignore: komento"
     },
     "quickFix": {
       "title": "Iayos ang mga hindi kinakailangang ignores dito"

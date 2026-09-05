@@ -70,7 +70,11 @@
       "scanning": "Saropa: skanowanie plików {count}…",
       "done": "Saropa: {count} błąd(y), {elapsed}",
       "failed": "Saropa: skanowanie nie powiodło się",
-      "warming": "Saropa: nagrzewanie analizatora… pierwska skanowanie po otwarciu może potrwać minutę"
+      "warming": "Saropa: nagrzewanie analizatora… pierwska skanowanie po otwarciu może potrwać minutę",
+      "ready": "Saropa: gotowy",
+      "disabled": "Saropa: wyłączony",
+      "noProject": "Saropa: brak Dart projektu",
+      "doneTooltip": "Znaleziono {total} wynik(i), {shown} pokazane po filtrowaniu"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: skanowanie całego projektu",
@@ -86,10 +90,6 @@
       "failed": "Zgłoś raport o możliwościach nie można zapisać: {error}",
       "large": "Zgłoś jest {megabytes} MB i może być wolny w przeglądaniu. Plik JSON obok niego zawiera te same dane dla narzędzi.",
       "done": "Sprawozdanie z możliwości napisane dla {path}"
-    },
-    "sidebar": {
-      "label": "Sprawozdanie z pełnych możliwości",
-      "description": "Każdy pakiet i funkcja, z liczbami użycia"
     },
     "documentTitle": "Inwentarz funkcji pakietu",
     "heroTitle": "Inwentarz funkcji pakietu",
@@ -213,6 +213,127 @@
   "tierPicker": {
     "ruleCount": "{count} reguł"
   },
+  "rulesTiers": {
+    "tabBar": {
+      "ariaLabel": "Karty panelu Reguły & Poziomy"
+    },
+    "tab": {
+      "tier": "Poziom Tier 1 - poziom podstawowy.",
+      "packs": "Pakiety reguł zawierają zasady.",
+      "overrides": "Przełącza nadrzędne.",
+      "sdk": "Rozpoczęcie wdrażania SDK",
+      "configFile": "Plik konfiguracyjny",
+      "automation": "Automatyzacja",
+      "extension": "Rozszerzenie"
+    },
+    "common": {
+      "rule": "Regulamin regulaminu",
+      "add": "Dodaj",
+      "remove": "Remove Usunąć Usuń usunięcie"
+    },
+    "sdk": {
+      "summary": "Zestawy migracji SDK {total} stosują się do tego projektu — {breaking} zniszczenia, {deprecation} deprecjacji.",
+      "noneApplicable": "Brak pakietów migracji SDK stosowanych do środowiska pubspec tego projektu.",
+      "enableAllTitle": "Włącz każdy pakiet migracji SDK, którego Dart/Flutter wersja bramki spełnia już ten projekt.",
+      "enableAll": "Włącz wszystkie stosowne ({count})",
+      "enableBreakingTitle": "Włącz tylko zestawy SDK, które oznaczają interfejsy API już usunięte w Twojej wersji docelowej.",
+      "enableBreaking": "Włącz tylko rozrywkę ({count})",
+      "enableDeprecationTitle": "Włącz tylko zestawy SDK, które oznaczają interfejsy API zastarzałe (ale nadal działające) w Twojej wersji docelowej.",
+      "enableDeprecation": "Włącz tylko wygaszenie ({count})",
+      "noPacksInCatalogue": "Brak zarejestrowanych pakietów migracji SDK."
+    },
+    "configFile": {
+      "analysisSettings": {
+        "title": "Ustawienia analizy",
+        "hint": "Zarządza liczbą problemów wyświetlanej w zakładce Problems oraz miejscem zapisu raportu analizy."
+      },
+      "maxIssues": {
+        "label": "Maksymalna liczba błędów",
+        "desc": "Ogranicza liczbę niebędących błędami problemów wyświetlanej w zakładce Problems. 0 oznacza nieograniczoną liczbę. Przeciąganie nadal pojawia się w pełnym pliku raportu."
+      },
+      "output": {
+        "label": "Wyjście",
+        "desc": "Gdzie jest zapisywany raport analizy: tylko terminal, tylko plik, czy oba."
+      },
+      "tierCap": {
+        "title": "Limit poziomu",
+        "hint": "Zasady świdrujące:  \n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.  \n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.  \n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.  \n4. Wyjście MUSI używać poprawnego systemu zapisu dla języka docelowego; nie zmieniaj się do innego języka w środku zdania.",
+        "none": "Brak (użyj ustawień z karty Tier)"
+      },
+      "saropaTier": {
+        "label": "saropa_tier"
+      },
+      "runtimeTier": {
+        "label": "poziom_wykonania"
+      },
+      "lane": {
+        "title": "Analiza kanału",
+        "hint": "Które zasad analizatora wewnętrznych wtyczek działa w czasie rzeczywistym w edytorze w porównaniu do analizy tylko przy zapisie (poprzez demon skanowania)."
+      },
+      "platforms": {
+        "title": "Platformy docelowe",
+        "hint": "Wyłącz platformy, które ten projekt nie obsługuje, aby zasady specyficzne dla platform pozostawały wyłączone."
+      },
+      "severities": {
+        "title": "Priorytet powiązań",
+        "hint": "Zastępuje ważność konkretnego reguły, lub całkowicie wyłączania go, niezależnie od poziomu i pakietów reguł.",
+        "level": "Poziom",
+        "empty": "Brak nadpisanych poziomów poważności.",
+        "rulePlaceholder": "nazwa_reguly",
+        "newLevelAria": "Nowy poziom poważności"
+      },
+      "bannedUsage": {
+        "title": "Zabronione użycie",
+        "hint": "Oznacza określony identyfikator (funkcję, klasę lub nazwę członka) wszędzie, gdzie pojawia się w projekcie, z niestandardowym powodem pokazanym w diagnozie.",
+        "identifier": "Identyfikator",
+        "identifierPlaceholder": "np. print",
+        "reason": "Powód",
+        "reasonPlaceholder": "np. Użyj Loggera zamiast",
+        "empty": "Brak zabronionych identyfikatorów."
+      },
+      "diagnosticStats": {
+        "title": "Progowanie diagnoz",
+        "hint": "Zaawansowane reguły: ostrzegaj lub zakończ niepowodzeniem, gdy liczba naruszeń reguły przekroczy próg.",
+        "warn": "Ostrzegaj przy",
+        "fail": "Błąd w",
+        "empty": "Brak ustawionych progów diagnostycznych."
+      },
+      "baseline": {
+        "title": "Podstawa",
+        "hint": "Podstawowa linia blokuje naruszenia projektu EXISTING, więc tylko nowo wprowadzone wyniki pojawiają się później.",
+        "emptyHint": "Nie utworzono jeszcze żadnej podstawy. Utworzenie jej wycisza dzisiejsze naruszenia i aktywuje wyrównanie podstawy w konfiguracji.",
+        "createButton": "Utwórz / odśwież bazę",
+        "createTitle": "Uruchamia dart run saropa_lints:baseline — zapisuje saropa_baseline.json i aktywuje go w konfiguracji.",
+        "openButton": "Otwórz plik bazowego",
+        "openTitle": "Otwórz saropa_baseline.json w edytorze.",
+        "summary": "Pliki {files}, {violations} naruszeń zaznaczonych jako bazowe — wygenerowano {generated}.",
+        "unknownDate": "w nieznanej chwili",
+        "count": "Liczyć, liczyć, liczyć.",
+        "diff": {
+          "title": "Różnica vs bieżące",
+          "counts": "{resolved} rozwiązane od wersji bazowej · {new} nowe od wersji bazowej.",
+          "empty": "Brak odchylenia — zestaw naruszeń w czasie rzeczywistym dokładnie odpowiada bazie.",
+          "resolvedSection": "Rozwiązane ({count})",
+          "newSection": "Nowe od wersji bazowej ({count})",
+          "moreRows": "+{count} więcej nie pokazano.",
+          "fileCol": "Plik pliku plik plik.",
+          "lineCol": "Linia Linia Linea Linię"
+        }
+      },
+      "optimizer": {
+        "openStandalone": "Otwórz tryb samodzielny",
+        "openStandaloneTitle": "Otwórz Analizator Optymalizacji w osobnym zakładce edytora.",
+        "unavailable": "Optymalizator Analizy nie jest dostępny w tej sesji."
+      }
+    },
+    "automation": {
+      "hint": "Ustawienia rozszerzenia kontrolujące, kiedy analiza jest wykonywana oraz jak są wyświetlane wyniki. Te ustawienia odpowiadają tym samym ustawieniom w File > Preferences > Settings pod kategorią Saropa Lints."
+    },
+    "extension": {
+      "hint": "Preferencje wizualne na poziomie rozszerzenia.",
+      "linkNote": "Integracja lintera włączona/wyłączona znajduje się w wierszu statusu w pasku bocznym; poziom analizy znajduje się na zakładce Tier — oba wykonują więcej niż prosty zapis ustawienia, więc nie są tu powtarzane."
+    }
+  },
   "consolidated": {
     "kicker": "Bezpieczeństwo · Jakość · Jakości.",
     "searchPlaceholder": "Zasady filtracji... zasady filtrów.",
@@ -238,76 +359,22 @@
     }
   },
   "dashboards": {
-    "heroTitle": "Tablice kontrolne, deski rozdzielcze.",
-    "openFull": "Otwórz pełny ekran.",
-    "rescan": "Reskanuj ponownie, aby uzyskać więcej informacji.",
-    "retry": "Spróbuj ponownie.",
-    "paneFailed": "Skanowanie nie powiodło się.",
+    "lintsConfig": {
+      "description": "Poziom: {tier} · Pasek: {lane}",
+      "descriptionNoLane": "Tier: poziom podstawowy. {tier} to odmiana _PH0_."
+    },
     "controls": {
-      "actions": "Działania Działań.",
-      "settings": "Ustawienia Settings",
-      "help": "Pomoc w pomocy Help Help",
-      "runAnalysis": "Przeprowadź analizę, przeprowadzić analizę.",
-      "initializeConfig": "Inicjalizacja / Aktualizacja konfiguracji.",
-      "on": "Wciąż w dalszym ciągu.",
-      "off": "Wypuszczam, wyłączam.",
-      "yes": "Tak, tak, tak... - odparł.",
-      "no": "Nie, nie, nie. - Powiedział mu.",
-      "lintIntegrationState": "Integracja linii: integracja lintowa. {state} to odmiana _PH0_.",
       "analyzerPlugin": "Analizator plugin",
-      "analyzerPluginLive": "W trybie — diagnozy w czasie rzeczywistym w edytorze",
       "analyzerPluginDisabled": "Wyłącz — skanowanie przy zapisie tylko",
       "analyzerPluginAbsent": "Nie skonfigurowano",
-      "tierState": "Tier: poziom podstawowy. {tier} to odmiana _PH0_.",
-      "lane": "Uliczka",
       "laneLight": "Light — ~200 reguł w edytorze, reszta przy zapisie",
       "laneFull": "Pełny — każda włączona reguła w edytorze",
-      "runAfterConfigState": "Przeprowadź analizę po zmianie konfiguracji: {state} to odmiana _PH0_.",
-      "runAfterDependencyState": "Przeprowadź analizę po zmianie zależności: {state} to odmiana _PH0_.",
-      "uiLanguageState": "Język interfejsu użytkownika: język UI: {language} to odmiana _PH0_.",
-      "gettingStarted": "Zaczynamy od początku.",
-      "about": "O Saropa Lints chodziło.",
-      "pubDev": "Pakiet na pub.dev",
-      "aiInstructions": "Stwórz instrukcje dla agenta sztucznej inteligencji."
+      "migrateLegacyKeys": "Przenieś klucze konfiguracji {count} legacy",
+      "migrateLegacyKeysDesc": "Przenieś stare klucze plugin-block do analysis_options_custom.yaml"
     },
-    "pane": {
-      "projectMap": "Mapa projektu Project Map - mapa projektów.",
-      "codeHealth": "Kodeks zdrowia Code Health",
-      "lintsConfig": "Lints Config konfigurować",
-      "findings": "Wyniki badań.",
-      "package": "Panel paneli pakietów (Package Dashboard)",
-      "commandCatalog": "Katalog dowodzenia katalogu poleceń."
-    },
-    "projectMap": {
-      "scanning": "Skanowanie mapy projektu..."
-    },
-    "codeHealth": {
-      "scanning": "Skanowanie kodu zdrowia..."
-    },
-    "config": {
-      "tier": "Poziom Tier 1 - poziom podstawowy.",
-      "enabledRules": "Zasady włączone reguły aktywowane.",
-      "rulePacks": "Pakiety reguł zawierają zasady.",
-      "packages": "Pakiety pakietowe to pakiet."
-    },
-    "package": {
-      "total": "Pakiety pakietowe to pakiet.",
-      "attention": "Potrzebuje uwagi.",
-      "blocked": "Blokada zablokowana.",
-      "empty": "Jeszcze nie skanowano paczki  ⁇ Otwórz deskę rozdzielczą, aby uruchomić jeden."
-    },
-    "findings": {
-      "total": "Całkowity sumowy łączny.",
-      "errors": "Błędy błędy",
-      "warnings": "Ostrzeżenia ostrzeżeń.",
-      "info": "Informacje o informacjach Info Info",
-      "empty": "Jeszcze nie przeprowadzono żadnej analizy  ⁇ otwarte wyniki do uruchomienia pierwszego."
-    },
-    "catalog": {
-      "commands": "Komendy polecenia.",
-      "recent": "Ostatnio używane."
-    },
-    "scanFailed": "Skanowanie nie powiodło się. Otwórz pełny panel kontrolny, aby zobaczyć szczegóły i spróbuj ponownie."
+    "badge": {
+      "needlesTooltip": "Pakiety {count} mają nieadoptowane funkcje"
+    }
   },
   "configSuggestions": {
     "enabledToast": "Włączono pakiet reguł {pack} w analysis_options.yaml",
@@ -586,10 +653,22 @@
     "reloadNow": "Przeładować teraz.",
     "reloadLater": "Później Późniejszy Późniejsze Późne"
   },
+  "statusBar": {
+    "menu": {
+      "enableOn": "Analiza włączona (kliknij, aby wyłączyć)",
+      "enableOff": "Analiza wyłączona (kliknij, aby włączyć)",
+      "openViolations": "Otwórz raport naruszeń",
+      "openPackageDashboard": "Otwórz Panel Paczek (ang. Package Dashboard).",
+      "openProcessHealth": "Otwórz Stan Procesu",
+      "commandCatalog": "Katalog dowodzenia katalogu poleceń.",
+      "about": "O programie"
+    }
+  },
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",
-      "critical": "🔴 {size}"
+      "critical": "🔴 {size}",
+      "openHint": "Kliknij, aby otworzyć Zdrowie Procesu"
     },
     "tooltip": {
       "processCount": "Dart procesy: {count} ({size} RSS)",
@@ -710,7 +789,11 @@
       "driftOfflineTitle": "Drift Advisor włączony, ale nie znaleziono żadnego serwera.",
       "driftOfflinePill": "Drift offline - dryfowanie w trybie offline.",
       "enabledRulesTitle": "Zasady włączone do bieżącego poziomu.",
-      "rulesCount": "{count} reguł"
+      "rulesCount": "{count} reguł",
+      "regressionTitle": "Wynik zdrowia spadł z {previousScore} do {currentScore}",
+      "trendTitle": "Wynik zdrowia / trend naruszeń od wcześniejszych uruchomień",
+      "hotspotsTitle": "{open} otwarty, {safe} oznaczony jako bezpieczny, {fixed} naprawiony — kliknij, aby przejrzeć",
+      "hotspotsPill": "{open} otwarty · {percent}% przewizualizowanych"
     },
     "groupBy": {
       "severity": "Poważność Surowość",
@@ -1025,6 +1108,34 @@
   "packageDashboard": {
     "documentTitle": "Saropa Tablica kontrolna pakietów",
     "heroTitle": "Saropa Tablica kontrolna pakietów",
+    "tabs": {
+      "aria": "Sekcje panelu pakietów",
+      "overview": "Podsumowanie",
+      "upgrades": "Aktualizacje",
+      "upgradesDesc": "Przeglądaj dostępne aktualizacje pakietów, pogrupowane według ryzyka, z możliwością jedno kliknięcie do zastosowania.",
+      "fullReport": "Pełny raport",
+      "fullReportDesc": "Eksportuj wydajny raport użycia funkcji (każdy skanowany pakiet, każda wydobrana funkcja z changeloga) jako plik HTML/Markdown/JSON i otwórz go.",
+      "knownIssues": "Znane problemy",
+      "knownIssuesDesc": "Przeglądaj znane wady i advisorie zgłoszone wobec Twoich zależności.",
+      "compare": "Porównaj porównuj.",
+      "compareDesc": "Porównaj dwa lub więcej pakietów bokiem w sprawie punktu, wielkości i aktywności.",
+      "settings": "Ustawienia Settings",
+      "openButton": "Otwórz {tab}"
+    },
+    "settingsTab": {
+      "intro": "Każda ustawienie packageVibrancy.* grupowane. Zmiany zapisywane natychmiastowo w ustawieniach Twojego przestrzeni roboczej.",
+      "noLimit": "brak ograniczeń",
+      "group": {
+        "access": "Dostęp & Rejestracje",
+        "scan": "Skanuj",
+        "display": "Wyświetl",
+        "weights": "Wagi punktów",
+        "upgrade": "Uaktualnij aktualizację.",
+        "watch": "Śledź",
+        "budget": "Budżet",
+        "vuln": "Uwagi dotyczące bezpieczeństwa"
+      }
+    },
     "detailPane": {
       "aria": "Szczegóły dotyczące opakowania.",
       "title": "Szczegóły dotyczące opakowania.",
@@ -1256,7 +1367,8 @@
       "toggleDetail": "Przełącz wyświetlonego ekspander szczegółów pakietu.",
       "escapeSearch": "Wyczyść wyszukiwanie z zacentralizowanym; w drugim Esc upadają wszystkie rozszerzone wiersze.",
       "historyBack": "Wróć do historii nawigacji pakietu.",
-      "showOverlay": "Pokaż to skrót nałożenie skrótu."
+      "showOverlay": "Pokaż to skrót nałożenie skrótu.",
+      "jumpToTab": "Przejdź do karty 1-6 (Omówienie, Aktualizacje, Pełny raport, Znane problemy, Porównanie, Ustawienia)"
     },
     "versionTooltip": {
       "installed": "Zainstalowane: {version} ({date})",
@@ -1616,6 +1728,68 @@
       "weeksAgo": "{wk} tyg. temu"
     }
   },
+  "projectMap": {
+    "panelTitle": "Mapa projektu Saropa",
+    "tabs": {
+      "map": "Mapa",
+      "reports": "Zgłaszanie",
+      "aria": "Części mapy projektu"
+    },
+    "scan": {
+      "subtitle": "Analizowanie wielkości projektu, złożoności i punktów ciepła…",
+      "elapsed": "Minęło trochę czasu.",
+      "cancel": "Odwołaj Anulować",
+      "restart": "Następnie ponownie uruchom.",
+      "stopped": "Zatrzymano",
+      "logHeading": "Działalność Aktywność.",
+      "logEmpty": "Brak jeszcze wyjścia — project_health nie raportuje postępu krok po kroku, więc ten dziennik zostanie wypełniony tylko wtedy, gdy skan drukuje komunikat diagnostyczny."
+    },
+    "reports": {
+      "intro": "Zasady ścisłe:\n1. Zwróć TŁYMOŚĆ przetłumaczonych ciągów.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumaczy, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Raport CLI w jednym kliknięciu, który wcześniej wymagał terminala. Każdy przycisk „Uruchom” przesyła w czasie rzeczywistym wyjście narzędzia poniżej jego karty i zapisuje kopię pod reports/.saropa_lints/reports-tab/",
+      "runButton": "Uruchom",
+      "notRunYet": "Nie uruchomiono jeszcze",
+      "running": "Uruchamianie…",
+      "exitOk": "Wyjście 0 — przekaz",
+      "exitFail": "Wyjście niezerowe — zobacz wyjście",
+      "colLine": "#",
+      "colText": "Wyjście",
+      "severity": {
+        "title": "Zagrożenie",
+        "desc": "Uruchamia dart analyze i grupuje każde zgłoszenie według jego poważności (błędy, ostrzeżenia, informacje) — komenda terminalowa dart run saropa_lints:severity_report, bez użycia terminalu."
+      },
+      "impact": {
+        "title": "Raport wpływu (starszy alias)",
+        "desc": "Wynik identyczny jak w raporcie poważności — impact_report to starsze nazwa przed 2026-06-05, zachowana tylko tak by istniejące skrypty i nawyki użytkownika nadal działały."
+      },
+      "qualityGate": {
+        "title": "Brama Jakości",
+        "desc": "Ocenia ostatnie violations.json w stosunku do progów w pliku saropa_quality_gate.yaml i wypisuje PASS, WARN lub FAIL. Zmień progów poniżej, a następnie uruchom."
+      },
+      "stubTest": {
+        "title": "Raport testu stubu",
+        "desc": "Analizuje test/*.dart w poszukiwaniu placeholderów assert (expect(true, isTrue), expect('literal', isNotNull)), które nigdy nie faktycznie testują czegoś."
+      },
+      "accuracy": {
+        "title": "Sprawozdanie z dokładności",
+        "desc": "Potwierdza, że każda reguła z markerem expect_lint w fixtureach rzeczywiście wykrywana jest tam — złapie regułę, która cichą przestaje działać. Najbardziej przydatne podczas opracowywania saropa_lints samych."
+      },
+      "memory": {
+        "title": "Raport pamięci",
+        "desc": "Podsumowuje trend analizatora pluginu RSS z raportów/.saropa_lints/plugin.log — pierwsze/ostatnie/min/max pamięci od ostatniego uruchomienia pluginu."
+      },
+      "doctor": {
+        "title": "Doktor",
+        "desc": "Sprawdza analysis_options.yaml i analysis_options_custom.yaml w poszukiwaniu typowych błędów konfiguracji: klucze w złym pliku, brak pliku niestandardowego lub brak ograniczenia wersji."
+      },
+      "gate": {
+        "editorLabel": "saropa_quality_gate.yaml prógów",
+        "placeholder": "bramka jakości:\n  warunki:\n    - metryka: new_critical_issues\n      op: równ\n      wartość: 0\n      on_fail: niepowodzenie",
+        "save": "Save Save Zapisz, zapisać",
+        "saved": "Zapisano",
+        "saveError": "Nie można zapisać"
+      }
+    }
+  },
   "suppressionsStrip": {
     "noData": "Nie violations.json jeszcze  ⁇  przeprowadzić analizę, aby wypełnić zdjęcie z tłumienia.",
     "zeroTotal": "0 tłumienia analizatora w najnowszym wywozie.",
@@ -1771,6 +1945,11 @@
       "rssNote": {
         "inProcess": "w procesie, nie oddzielnie mierzalny",
         "notRunning": "nie uruchamiany"
+      },
+      "description": {
+        "analyzerPlugin": "Uruchamia się wewnętrznie w serwerze analizy Dart — kreski w edytorze podczas wpisywania, bez potrzeby skanowania. Przełączanie zmienia wtyczki: blok w analysis_options.yaml.",
+        "scanDaemon": "Proces w tle, który ponownie skanuje cały projekt przy zapisie i zapisuje raporty/.saropa_lints/violations.json. Wyłączenie procesu zawiesza go; kolejny zapis wznowi jego działanie.",
+        "lspServer": "Zdalny serwer językowy — publikuje diagnozy w panelu Problems dla otwartych i plików z przestrzeni roboczej. Włączanie/wyłączanie zapisuje ustawienie saropaLints.lspServer.enabled."
       }
     },
     "toggle": {
@@ -1779,7 +1958,9 @@
     },
     "action": {
       "killAll": "Zabij Wszystko",
-      "restartAll": "Uruchom ponownie wszystko"
+      "restartAll": "Uruchom ponownie wszystko",
+      "killAllDescription": "Zatrzymuje tylko serwer LSP. Wtyczka Analizatora i Skaner Daemon nie mogą być zakończone niezależnie — użyj włącznika ON/OFF każdego silnika zamiast tego.",
+      "restartAllDescription": "Zatrzymuje i ponownie uruchamia serwer LSP (lub uruchamia go, jeśli nie działa). Wtyczka Analizatora i skaner Daemon nie są w tym przypadku wpływowane — zamiast tego użyj własnego przełącznika WŁ/WW dla każdego silnika."
     },
     "log": {
       "empty": "Brak jeszcze wpisów dziennika.",
@@ -1793,6 +1974,9 @@
       "analyzerToggleOff": "Analizator wtyczki: wyłączanie…",
       "daemonToggleOn": "Skanowanie Daemon: wznowienie…",
       "daemonToggleOff": "Skanuj Daemon: wstrzymanie…"
+    },
+    "sidebar": {
+      "enginesLabel": "Silniki: {count} uruchomione"
     }
   },
   "detailView": {
@@ -2197,10 +2381,6 @@
     "scanning": "Analizowanie przestrzeni roboczej…",
     "openConfig": "Otwórz analysis_options.yaml",
     "lastScan": "Ostatnia skan: {time}",
-    "sidebar": {
-      "label": "Optymalizator Analizy",
-      "description": "Zmniejsz zużycie pamięci analizatora"
-    },
     "kpi": {
       "filesInScope": "Pliki w zakresie",
       "lines": "linie",
@@ -2269,9 +2449,18 @@
     },
     "diffTitle": "Optymalizator Analizy: Zalecane Wykluczenia"
   },
-  "diagnostics": {
-    "sidebar": {
-      "severityToggleTooltip": "Kliknij dwukrotnie, aby przełączyć {severity}"
+  "sidebarShell": {
+    "dashboardsViewTitle": "Tablice kontrolne, deski rozdzielcze."
+  },
+  "status": {
+    "health": {
+      "lastRunTooltip": "Ostatnia analiza: {ago}",
+      "neverRunLabel": "Zdrowie: —",
+      "neverRunDescription": "Uruchom analizę, aby zobaczyć swój wynik zdrowia"
+    },
+    "badge": {
+      "criticalTooltip": "{critical} krytyczny, {total} całkowity",
+      "totalTooltip": "{total} naruszenie(s)"
     }
   },
   "staleIgnores": {
@@ -2293,16 +2482,15 @@
     },
     "confirm": {
       "fixMessage": "Usunie to stare komentarze ignorujące z plików źródłowych. Zmiany można cofnąć za pomocą git. Czy kontynuować?",
+      "fixMessageWithCount": "Usunie to komentarze {count} nieaktywne ignorujace z Twoich plików źródłowych. Zmiany można cofnąć za pomocą git. Czy kontynuować?",
       "fixAction": "Usuń nieaktualne ignorowane"
     },
     "diagnostic": {
       "message": "Ignorujesz regułę: reguła '{ruleName}' nie wykrywa już tego wiersza."
     },
     "sidebar": {
-      "findLabel": "Znajdź nieaktualne ignorowane",
-      "findDescription": "Wykryj martwe // ignore: komentarze",
       "fixLabel": "Popraw nieaktualne ignorowane",
-      "fixDescription": "Auto-usuń martwe // ignore: komentarze"
+      "fixDescription": "Wykryj i automatycznie usuń martwe // ignore: komentarze"
     },
     "quickFix": {
       "title": "Popraw nieaktualne ignorowane w tym pliku"

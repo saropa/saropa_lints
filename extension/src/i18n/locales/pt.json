@@ -70,7 +70,11 @@
       "scanning": "Saropa: varredura {count} arquivo(s)...",
       "done": "Saropa: {count} problema(s), {elapsed}",
       "failed": "Saropa: escaneamento falhou",
-      "warming": "Saropa: aquecendo o analisador... a primeira varredura após abrir pode levar um minuto"
+      "warming": "Saropa: aquecendo o analisador... a primeira varredura após abrir pode levar um minuto",
+      "ready": "Saropa: pronto",
+      "disabled": "Saropa: desativado",
+      "noProject": "Saropa: nenhum projeto Dart",
+      "doneTooltip": "{total} encontrado(s), {shown} mostrado após filtro"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: varredura do projeto inteiro",
@@ -86,10 +90,6 @@
       "failed": "O relatório de oportunidades não pode ser escrito: {error}",
       "large": "O relatório é de {megabytes} MB e pode ser lento para navegar. O arquivo JSON ao lado contém os mesmos dados para ferramentas.",
       "done": "Relatório de oportunidades escrito para {path}"
-    },
-    "sidebar": {
-      "label": "Relatório de Oportunidades Completo",
-      "description": "Todo pacote e recurso, com contagens de uso"
     },
     "documentTitle": "Inventário de Recursos do Pacote",
     "heroTitle": "Inventário de Recursos do Pacote",
@@ -213,6 +213,127 @@
   "tierPicker": {
     "ruleCount": "{count} regras"
   },
+  "rulesTiers": {
+    "tabBar": {
+      "ariaLabel": "Regras & Níveis dashboard tabs"
+    },
+    "tab": {
+      "tier": "A taxa de referência é Tier Tier.",
+      "packs": "Pacotes de regras packs.",
+      "overrides": "Anulações de prioridades.",
+      "sdk": "SDK rollout",
+      "configFile": "Arquivo de configuração",
+      "automation": "Automação",
+      "extension": "Extensão"
+    },
+    "common": {
+      "rule": "Regra de Processo Regra do Processo",
+      "add": "Adicione",
+      "remove": "Remover remover Remover Removação"
+    },
+    "sdk": {
+      "summary": "Pacotes de migração do SDK {total} aplicam-se a este projeto — {breaking} quebra, {deprecation} descontinuação.",
+      "noneApplicable": "Nenhum pacote de migração de SDK se aplica ao ambiente pubspec deste projeto ainda.",
+      "enableAllTitle": "Ative todos os pacotes de migração de SDK cuja versão Dart/Flutter esta projeto já satisfaz.",
+      "enableAll": "Ativar todos os aplicáveis ({count})",
+      "enableBreakingTitle": "Ative apenas os pacotes SDK que marcam APIs já removidas na sua versão de destino.",
+      "enableBreaking": "Ativar apenas quebrar ({count})",
+      "enableDeprecationTitle": "Ative apenas os pacotes SDK que marcam APIs desatualizadas (mas ainda funcionais) na sua versão de destino.",
+      "enableDeprecation": "Ativar apenas desativação ({count})",
+      "noPacksInCatalogue": "Nenhum pacote de migração de SDK está registrado."
+    },
+    "configFile": {
+      "analysisSettings": {
+        "title": "Configurações de análise",
+        "hint": "Controla quantos problemas o painel Problems exibe e onde o relatório de análise é gravado."
+      },
+      "maxIssues": {
+        "label": "Máximos de problemas",
+        "desc": "Limita o número de problemas não de erro exibidos na guia Problemas. 0 significa ilimitado. O fluxo de excesso ainda aparece no arquivo relatório completo."
+      },
+      "output": {
+        "label": "Saída",
+        "desc": "Onde o relatório de análise é escrito: terminal apenas, um arquivo apenas, ou ambos."
+      },
+      "tierCap": {
+        "title": "Tier cap",
+        "hint": "Níveis que são executados no momento da análise, independentemente dos regras que são explicitamente habilitadas. Deixe como None para usar a configuração de nível do extensão.",
+        "none": "Nenhum (use a configuração da aba Tier)"
+      },
+      "saropaTier": {
+        "label": "saropa_tier"
+      },
+      "runtimeTier": {
+        "label": "runtime_tier"
+      },
+      "lane": {
+        "title": "Análise de lane",
+        "hint": "Quais regras o plugin do analisador em processo executa em tempo real no editor versus apenas ao salvar (via o daemon de varredura)."
+      },
+      "platforms": {
+        "title": "Plataformas alvo",
+        "hint": "Desative as plataformas que este projeto não almeja para que as regras específicas de plataforma para elas permaneçam desativadas."
+      },
+      "severities": {
+        "title": "Gravidade de sobreposição",
+        "hint": "Sobrescreve a gravidade de uma regra específica, ou a desativa totalmente, independentemente do nível e dos pacotes de regras.",
+        "level": "Nível",
+        "empty": "Nenhuma sobrescrita de severidade está definida.",
+        "rulePlaceholder": "nome_regra",
+        "newLevelAria": "Nova gravidade de nível"
+      },
+      "bannedUsage": {
+        "title": "Uso proibido",
+        "hint": "Marca um identificador específico (uma função, classe ou nome de membro) em qualquer lugar em que aparece no projeto, com uma razão personalizada mostrada no diagnóstico.",
+        "identifier": "Identificador",
+        "identifierPlaceholder": "p. ex. print",
+        "reason": "Motivo",
+        "reasonPlaceholder": "ex.: Use Logger em vez de",
+        "empty": "Nenhum identificador é proibido."
+      },
+      "diagnosticStats": {
+        "title": "Limiares de diagnóstico",
+        "hint": "Regras de estilo CI: avise ou falhe quando a contagem de violações de uma regra ultrapassar um limiar.",
+        "warn": "Avisar em",
+        "fail": "Falhar em",
+        "empty": "Nenhuma threshold de diagnóstico está definida."
+      },
+      "baseline": {
+        "title": "Linha de base",
+        "hint": "Uma baseline suprime as violações EXISTING do projeto, de modo que apenas os achados novamente introduzidos surjam depois.",
+        "emptyHint": "Nenhuma baseline foi criada ainda. Criar uma suprime as violações de hoje e ativa a supressão de baseline na configuração.",
+        "createButton": "Criar / atualizar baseline",
+        "createTitle": "Executa dart run saropa_lints:baseline — escreve saropa_baseline.json e ativa-o na configuração.",
+        "openButton": "Abrir arquivo de baseline",
+        "openTitle": "Abra saropa_baseline.json no editor.",
+        "summary": "Arquivo(s) {files}, violação(s) {violations} baseado — gerado {generated}.",
+        "unknownDate": "em um tempo desconhecido",
+        "count": "Contagem de contagem.",
+        "diff": {
+          "title": "Diferença vs atual",
+          "counts": "{resolved} resolvido desde a baseline · {new} novo desde a baseline.",
+          "empty": "Nenhum desvio — o conjunto de violações em tempo real corresponde exatamente à linha de base.",
+          "resolvedSection": "Resolvido ({count})",
+          "newSection": "Novo desde a baseline ({count})",
+          "moreRows": "+{count} mais não mostrado.",
+          "fileCol": "Arquivo arquivos arquivo de arquivos.",
+          "lineCol": "Linha linha linha linha."
+        }
+      },
+      "optimizer": {
+        "openStandalone": "Abrir standalone",
+        "openStandaloneTitle": "Abra o Analisador de Otimização em sua própria guia do editor.",
+        "unavailable": "O Analysis Optimizer não está disponível nesta sessão."
+      }
+    },
+    "automation": {
+      "hint": "Configurações da extensão que controlam quando a análise é executada e como os resultados são exibidos. Essas configuram as mesmas configurações presentes em File > Preferences > Settings sob Saropa Lints."
+    },
+    "extension": {
+      "hint": "Preferências de exibição em escopo da extensão",
+      "linkNote": "Integração do lint ligado/desligado está na linha de status da barra lateral; a análise de nível está na aba Tier — ambos fazem mais do que uma simples escrita de configuração, portanto não são duplicados aqui."
+    }
+  },
   "consolidated": {
     "kicker": "Segurança · Qualidade · Qualidades.",
     "searchPlaceholder": "Regras de filtro... regras do filtro.",
@@ -238,76 +359,22 @@
     }
   },
   "dashboards": {
-    "heroTitle": "Painéis de controle Dashboards",
-    "openFull": "Abra o ecrã completo.",
-    "rescan": "Rescan de ressonância",
-    "retry": "Tente novamente.",
-    "paneFailed": "A varredura falhou.",
+    "lintsConfig": {
+      "description": "Nível: {tier} · Pista: {lane}",
+      "descriptionNoLane": "Tier: Nível de nível. {tier} É um termo usado para descrever a"
+    },
     "controls": {
-      "actions": "Ações Ações.",
-      "settings": "Configurações de configuração.",
-      "help": "Ajuda a ajudar.",
-      "runAnalysis": "Execute a análise de execução.",
-      "initializeConfig": "Inicializar / Atualizar a configuração do configurador.",
-      "on": "Em seguida, em seguida.",
-      "off": "Desliga-se, desliga-te e vai embora.",
-      "yes": "Sim, sim, sim. - Não é verdade?",
-      "no": "Não, não, não.",
-      "lintIntegrationState": "Integração da Linha: integração de Lint: {state} É um termo usado para descrever a",
       "analyzerPlugin": "Analisador de plug-in",
-      "analyzerPluginLive": "Ativo — diagnósticos em tempo real no editor",
       "analyzerPluginDisabled": "Desligado — escaneio apenas ao salvar",
       "analyzerPluginAbsent": "Não configurado",
-      "tierState": "Tier: Nível de nível. {tier} É um termo usado para descrever a",
-      "lane": "Faixa",
       "laneLight": "Light — ~200 regras em-editor, restante ao salvar",
       "laneFull": "Completo — todas as regras ativadas em editor",
-      "runAfterConfigState": "Execute a análise após a alteração da configuração: {state} É um termo usado para descrever a",
-      "runAfterDependencyState": "Execute a análise após mudança de dependência: {state} É um termo usado para descrever a",
-      "uiLanguageState": "Idioma da interface do usuário: UI language. {language} É um termo usado para descrever a",
-      "gettingStarted": "Começando a começar.",
-      "about": "Sobre o Saropa Lints.",
-      "pubDev": "Embalagem em pub.dev",
-      "aiInstructions": "Crie instruções para o agente de IA."
+      "migrateLegacyKeys": "Migrar {count} chave(s) de configuração legada",
+      "migrateLegacyKeysDesc": "Mova as chaves do plugin-block legado para analysis_options_custom.yaml"
     },
-    "pane": {
-      "projectMap": "Mapa do projeto Mapear o mapa de projetos",
-      "codeHealth": "Código de Saúde Code Health.",
-      "lintsConfig": "Lints Config config.",
-      "findings": "Constatos de conclusões.",
-      "package": "Painel de painéis do pacote.",
-      "commandCatalog": "Catálogo de comando do catálogo."
-    },
-    "projectMap": {
-      "scanning": "Mapa de projeto de varredura... mapa do projeto..."
-    },
-    "codeHealth": {
-      "scanning": "Código de saúde do scanner..."
-    },
-    "config": {
-      "tier": "A taxa de referência é Tier Tier.",
-      "enabledRules": "Regras habilitadas: regras ativadas.",
-      "rulePacks": "Pacotes de regras packs.",
-      "packages": "Pacotes de Serviços."
-    },
-    "package": {
-      "total": "Pacotes de Serviços.",
-      "attention": "Precisa de atenção.",
-      "blocked": "Bloqueado bloqueado.",
-      "empty": "Ainda não há varredura de pacotes  ⁇ Abra o painel para executar um."
-    },
-    "findings": {
-      "total": "Total total do total.",
-      "errors": "Erros erros Errores.",
-      "warnings": "Aviso de advertências.",
-      "info": "Informações, informações, informações.",
-      "empty": "Ainda não foi executada nenhuma análise  ⁇ Abertura de Resultados para executar um."
-    },
-    "catalog": {
-      "commands": "Comando de comandos.",
-      "recent": "Recentemente usado."
-    },
-    "scanFailed": "A varredura falhou. Abra o painel completo para ver os detalhes e tente novamente."
+    "badge": {
+      "needlesTooltip": "{count} pacote(s) têm recursos não adotados"
+    }
   },
   "configSuggestions": {
     "enabledToast": "Ativou o pacote de regras {pack} em analysis_options.yaml",
@@ -586,10 +653,22 @@
     "reloadNow": "Relocar agora.",
     "reloadLater": "Mais tarde, mais tarde, depois."
   },
+  "statusBar": {
+    "menu": {
+      "enableOn": "Análise ativada (clique para desativar)",
+      "enableOff": "Análise desativada (clique para ativar)",
+      "openViolations": "Abrir Relatório de Violações",
+      "openPackageDashboard": "Abra o Painel de Pacote do pacote.",
+      "openProcessHealth": "Abrir Saúde do Processo",
+      "commandCatalog": "Catálogo de comando do catálogo.",
+      "about": "Sobre"
+    }
+  },
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",
-      "critical": "🔴 {size}"
+      "critical": "🔴 {size}",
+      "openHint": "Clique para abrir Saúde do Processo"
     },
     "tooltip": {
       "processCount": "Processos Dart: {count} ({size} RSS)",
@@ -710,7 +789,11 @@
       "driftOfflineTitle": "Drift Advisor ativado, mas nenhum servidor encontrado.",
       "driftOfflinePill": "Drift offline é uma deriva off-line.",
       "enabledRulesTitle": "Regras habilitadas no nível atual.",
-      "rulesCount": "{count} regras"
+      "rulesCount": "{count} regras",
+      "regressionTitle": "Score de saúde caiu de {previousScore} para {currentScore}",
+      "trendTitle": "Score de saúde / tendência de violações desde as execuções anteriores",
+      "hotspotsTitle": "{open} aberto, {safe} marcado como seguro, {fixed} corrigido — clique para revisar",
+      "hotspotsPill": "{open} aberto · {percent}% revisado"
     },
     "groupBy": {
       "severity": "Gravidade da gravidade.",
@@ -1025,6 +1108,34 @@
   "packageDashboard": {
     "documentTitle": "Saropa Painel de painéis de pacotes",
     "heroTitle": "Saropa Painel de painéis de pacotes",
+    "tabs": {
+      "aria": "Seções do painel de pacotes",
+      "overview": "Visão Geral",
+      "upgrades": "Atualizações",
+      "upgradesDesc": "Revisar atualizações de pacote disponíveis, agrupadas por risco, com aplicação em um clique.",
+      "fullReport": "Relatório completo",
+      "fullReportDesc": "Exporte o relatório exaustivo de uso de recursos (cada pacote escaneado, cada recurso extraído do changelog) como um arquivo HTML/Markdown/JSON e abra-o.",
+      "knownIssues": "Problemas conhecidos",
+      "knownIssuesDesc": "Navegue por vulnerabilidades e advisórios conhecidos reportados contra suas dependências.",
+      "compare": "Compare Comparar Comparação.",
+      "compareDesc": "Compareça dois ou mais pacotes lado a lado em pontuação, tamanho e atividade.",
+      "settings": "Configurações de configuração.",
+      "openButton": "Abrir {tab}"
+    },
+    "settingsTab": {
+      "intro": "Toda configuração packageVibrancy.* agrupada. Alterações salvas imediatamente nas configurações do seu workspace.",
+      "noLimit": "sem limite",
+      "group": {
+        "access": "Acesso & Registries",
+        "scan": "Varredura",
+        "display": "Exibir",
+        "weights": "Peso dos Pontos",
+        "upgrade": "Atualização de atualização.",
+        "watch": "Assista",
+        "budget": "Orçamento",
+        "vuln": "Vulnerabilidades"
+      }
+    },
     "detailPane": {
       "aria": "Detalhes da embalagem.",
       "title": "Detalhes da embalagem.",
@@ -1256,7 +1367,8 @@
       "toggleDetail": "Troque o expansor de detalhes do pacote destacado.",
       "escapeSearch": "Descarregue a pesquisa focada; segundo Esc desmorona todas as linhas expandidas.",
       "historyBack": "Volte ao histórico de navegação do pacote.",
-      "showOverlay": "Mostre esta sobreposição de atalho."
+      "showOverlay": "Mostre esta sobreposição de atalho.",
+      "jumpToTab": "Ir para a guia 1-6 (Visão geral, Atualizações, Relatório completo, Problemas conhecidos, Comparar, Configurações)"
     },
     "versionTooltip": {
       "installed": "Instalado: {version} ({date})",
@@ -1616,6 +1728,68 @@
       "weeksAgo": "há {wk} sem"
     }
   },
+  "projectMap": {
+    "panelTitle": "Mapa do Projeto Saropa",
+    "tabs": {
+      "map": "Mapa",
+      "reports": "Relatórios",
+      "aria": "Seções do Project Map"
+    },
+    "scan": {
+      "subtitle": "Varredura do tamanho do projeto, complexidade e pontos quentes...",
+      "elapsed": "Passou-se um tempo.",
+      "cancel": "Cancelar cancelar Cancelá-lo",
+      "restart": "Reinicie o sistema de modo a reiniciá-lo.",
+      "stopped": "Parado",
+      "logHeading": "Atividade de atividade.",
+      "logEmpty": "Nenhum resultado ainda — project_health não relata progresso passo a passo, então esse log só preenche se a varredura imprimir uma mensagem de diagnóstico."
+    },
+    "reports": {
+      "intro": "Relatórios CLI em um clique que anteriormente exigiam um terminal. Cada botão Run transmite a saída em tempo real do工具 abaixo da sua carta e salva uma cópia sob reports/.saropa_lints/reports-tab/",
+      "runButton": "Executar",
+      "notRunYet": "Ainda não foi executado",
+      "running": "Executando…",
+      "exitOk": "Sair 0 — pass",
+      "exitFail": "Saída não-zero — veja a saída",
+      "colLine": "#",
+      "colText": "Saída",
+      "severity": {
+        "title": "Relatório de Severidade",
+        "desc": "Executa dart analyze e agrupa cada problema por gravidade (erros, avisos, informações) — o comando do terminal dart run saropa_lints:severity_report, sem o terminal."
+      },
+      "impact": {
+        "title": "Relatório de Impacto (alias legado)",
+        "desc": "Saída idêntica ao Relatório de Severidade — impact_report é o nome anterior à 2026-06-05, mantido apenas para que scripts existentes e memória muscular continuem funcionando."
+      },
+      "qualityGate": {
+        "title": "Portão de Qualidade",
+        "desc": "Avalia o último violations.json contra os thresholds em saropa_quality_gate.yaml e imprime PASS, WARN ou FAIL. Edite os thresholds abaixo, então execute."
+      },
+      "stubTest": {
+        "title": "Relatório de Teste de Stub",
+        "desc": "Varre test/*.dart para encontrar afirmações de placeholder (expect(true, isTrue), expect('literal', isNotNull)) que nunca realmente testam algo."
+      },
+      "accuracy": {
+        "title": "Relatório de Precisão",
+        "desc": "Confirma que todas as regras são acionadas por um marcador expect_lint nos fixtures — captura uma regra que parou de funcionar silenciosamente. Mais útil quando está desenvolvendo saropa_lints em si."
+      },
+      "memory": {
+        "title": "Relatório de Memória",
+        "desc": "Resume a tendência do plugin do analisador RSS a partir de reports/.saropa_lints/plugin.log — primeira/última/mínima/máxima memória desde que o plugin foi iniciado pela última vez."
+      },
+      "doctor": {
+        "title": "Doutor",
+        "desc": "Verifica analysis_options.yaml e analysis_options_custom.yaml por configurações comuns incorretas: chaves no arquivo errado, arquivo personalizado ausente ou restrição de versão ausente."
+      },
+      "gate": {
+        "editorLabel": "Limites saropa_quality_gate.yaml",
+        "placeholder": "portão de qualidade:\n  condições:\n    - métrica: new_critical_issues\n      op: eq\n      valor: 0\n      on_fail: falhar",
+        "save": "Salvar Save Save Salvação.",
+        "saved": "Salvo",
+        "saveError": "Não foi possível salvar"
+      }
+    }
+  },
   "suppressionsStrip": {
     "noData": "Não há violations.json ainda  ⁇  executar a análise para preencher o snapshot de supressão.",
     "zeroTotal": "0 supressões de analisadores na última exportação.",
@@ -1771,6 +1945,11 @@
       "rssNote": {
         "inProcess": "em processo, não mensurável separadamente",
         "notRunning": "não está em execução"
+      },
+      "description": {
+        "analyzerPlugin": "Executa dentro do servidor de análise Dart — riscos em tempo real no editor enquanto você digita, sem necessidade de varredura. Alternar reescreve os plugins: bloco em analysis_options.yaml.",
+        "scanDaemon": "Processo em segundo plano que rescaneia todo o projeto ao salvar e escreve relatórios/.saropa_lints/violations.json. Desativar suspende-o; o próximo salvamento retoma-o.",
+        "lspServer": "Regra estrita: Separar servidor de linguagem — publica diagnósticos para o painel Problems para arquivos abertos e do workspace. Alternar grava a configuração saropaLints.lspServer.enabled."
       }
     },
     "toggle": {
@@ -1779,7 +1958,9 @@
     },
     "action": {
       "killAll": "Matar Todos",
-      "restartAll": "Reiniciar Tudo"
+      "restartAll": "Reiniciar Tudo",
+      "killAllDescription": "Para força parar o servidor LSP apenas. O analisador Plugin e Scan Daemon não podem ser encerrados independentemente ainda — use o próprio interruptor ON/OFF de cada motor.",
+      "restartAllDescription": "Para para e relança o servidor LSP (ou inicia se não estiver em execução). Os plug-ins de análise e varredura Daemon não são afetados — use o próprio interruptor ON/OFF de cada motor."
     },
     "log": {
       "empty": "Nenhuma entrada de log ainda.",
@@ -1793,6 +1974,9 @@
       "analyzerToggleOff": "Analizador de Plugin: desativando…",
       "daemonToggleOn": "Varredura Daemon: retomando…",
       "daemonToggleOff": "Varredura Daemon: suspensão..."
+    },
+    "sidebar": {
+      "enginesLabel": "Engines: {count} em execução"
     }
   },
   "detailView": {
@@ -2197,10 +2381,6 @@
     "scanning": "Varredura do workspace…",
     "openConfig": "Abrir analysis_options.yaml",
     "lastScan": "Última verificação: {time}",
-    "sidebar": {
-      "label": "Otimizador de Análise",
-      "description": "Reduzir a memória do analisador"
-    },
     "kpi": {
       "filesInScope": "Arquivos em escopo",
       "lines": "linhas",
@@ -2269,9 +2449,18 @@
     },
     "diffTitle": "Analizador de Otimização: Exclusões Propostas"
   },
-  "diagnostics": {
-    "sidebar": {
-      "severityToggleTooltip": "Clique duas vezes para alternar {severity}"
+  "sidebarShell": {
+    "dashboardsViewTitle": "Painéis de controle Dashboards"
+  },
+  "status": {
+    "health": {
+      "lastRunTooltip": "Última análise: {ago}",
+      "neverRunLabel": "Saúde: —",
+      "neverRunDescription": "Execute análise para ver sua pontuação de saúde"
+    },
+    "badge": {
+      "criticalTooltip": "{critical} crítico, {total} total",
+      "totalTooltip": "{total} violação(s)"
     }
   },
   "staleIgnores": {
@@ -2293,16 +2482,15 @@
     },
     "confirm": {
       "fixMessage": "Isso removerá comentários de ignorar obsoletos dos seus arquivos de origem. As alterações podem ser desfeitas com o git. Continuar?",
+      "fixMessageWithCount": "Isso removerá os comentários {count} obsoletos de suas arquivos de origem. As alterações podem ser desfeitas com o git. Continuar?",
       "fixAction": "Remova ignorados obsoletos"
     },
     "diagnostic": {
       "message": "Ignorar obsoleto: a regra '{ruleName}' não aciona mais nesta linha."
     },
     "sidebar": {
-      "findLabel": "Encontrar ignorados obsoletos",
-      "findDescription": "Detectar comentários mortos // ignore:",
       "fixLabel": "Corrija ignorados obsoletos",
-      "fixDescription": "Auto-remover comentários // ignore: mortos"
+      "fixDescription": "Detectar e remover automaticamente comentários // ignore:"
     },
     "quickFix": {
       "title": "Corrija ignores obsoletos neste arquivo"

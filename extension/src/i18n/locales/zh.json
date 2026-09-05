@@ -70,7 +70,11 @@
       "scanning": "Saropa：正在扫描 {count} 个文件…",
       "done": "Saropa: {count} 个问题，{elapsed}",
       "failed": "Saropa: 扫描失败",
-      "warming": "Saropa：正在启动分析器… 打开后的首次扫描可能需要一分钟"
+      "warming": "Saropa：正在启动分析器… 打开后的首次扫描可能需要一分钟",
+      "ready": "Saropa：准备好了",
+      "disabled": "Saropa：禁用",
+      "noProject": "Saropa：没有 Dart 项目",
+      "doneTooltip": "{total} 结果，{shown} 在过滤器后显示"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: 扫描整个项目",
@@ -86,10 +90,6 @@
       "failed": "机会报告无法生成：{error}",
       "large": "报告大小为 {megabytes} MB，浏览可能会比较慢。与之配套的 JSON 文件包含相同的数据，供工具使用。",
       "done": "机会报告撰写给 {path}"
-    },
-    "sidebar": {
-      "label": "完整机会报告",
-      "description": "每个包和功能，使用次数"
     },
     "documentTitle": "包功能清单",
     "heroTitle": "包功能清单",
@@ -213,6 +213,127 @@
   "tierPicker": {
     "ruleCount": "{count} 个规则"
   },
+  "rulesTiers": {
+    "tabBar": {
+      "ariaLabel": "规则和等级仪表板选项卡"
+    },
+    "tab": {
+      "tier": "资本级别的其他类型",
+      "packs": "规则包包括一个规则.",
+      "overrides": "忽略了重置的原因",
+      "sdk": "SDK推出",
+      "configFile": "Config file",
+      "automation": "自动化",
+      "extension": "扩大"
+    },
+    "common": {
+      "rule": "规则 规章制度 在",
+      "add": "添加",
+      "remove": "删除 去掉 移除"
+    },
+    "sdk": {
+      "summary": "{total} SDK 迁移包适用于此项目 - {breaking} 破坏，{deprecation} 弃用。",
+      "noneApplicable": "No SDK migration packs apply to this project's pubspec environment yet.",
+      "enableAllTitle": "打开此项目已满足 Dart/Flutter 版本门的每个 SDK 迁移包。",
+      "enableAll": "启用所有适用的 ({count})",
+      "enableBreakingTitle": "仅打开标记 API 已在目标版本中删除的 SDK 包。",
+      "enableBreaking": "仅启用中断 ({count})",
+      "enableDeprecationTitle": "仅打开标记 API 在目标版本中已弃用（但仍然有效）的 SDK 包。",
+      "enableDeprecation": "仅启用弃用 ({count})",
+      "noPacksInCatalogue": "未注册任何 SDK 迁移包。"
+    },
+    "configFile": {
+      "analysisSettings": {
+        "title": "分析设置",
+        "hint": "Controls how many issues the Problems tab shows and where the analysis report is written."
+      },
+      "maxIssues": {
+        "label": "最大问题数",
+        "desc": "限制“问题”选项卡中显示的非错误问题的数量。 0 表示无限制。完整报告文件中仍然出现溢出。"
+      },
+      "output": {
+        "label": "输出",
+        "desc": "分析报告写入的位置：仅终端、仅文件或两者。"
+      },
+      "tierCap": {
+        "title": "等级上限",
+        "hint": "限制在分析时运行的层，与显式启用的规则无关。保留为 None 以使用扩展程序的 Tier 设置。",
+        "none": "无（使用“层”选项卡的设置）"
+      },
+      "saropaTier": {
+        "label": "萨罗帕_蒂尔"
+      },
+      "runtimeTier": {
+        "label": "运行时层"
+      },
+      "lane": {
+        "title": "分析泳道",
+        "hint": "哪些规则决定进程内分析器插件在编辑器中实时运行，而不是仅在保存时运行（通过扫描守护程序）。"
+      },
+      "platforms": {
+        "title": "目标平台",
+        "hint": "禁用该项目不针对的平台，因此针对它们的特定于平台的规则将保持关闭状态。"
+      },
+      "severities": {
+        "title": "严重性覆盖",
+        "hint": "覆盖特定规则的严重性，或完全关闭它，独立于层和规则包。",
+        "level": "等级",
+        "empty": "未设置严重性覆盖。",
+        "rulePlaceholder": "规则名称",
+        "newLevelAria": "新的严重级别"
+      },
+      "bannedUsage": {
+        "title": "禁止使用",
+        "hint": "标记出现在项目中任意位置的特定标识符（函数、类或成员名称），并在诊断中显示自定义原因。",
+        "identifier": "标识符",
+        "identifierPlaceholder": "例如打印",
+        "reason": "原因",
+        "reasonPlaceholder": "例如使用记录器代替",
+        "empty": "没有标识符被禁止。"
+      },
+      "diagnosticStats": {
+        "title": "Diagnostic thresholds",
+        "hint": "CI 样式预算门：当规则的违规计数超过阈值时发出警告或失败。",
+        "warn": "警告于",
+        "fail": "失败于",
+        "empty": "未设置诊断阈值。"
+      },
+      "baseline": {
+        "title": "基线",
+        "hint": "基线抑制了项目现有的违规行为，因此之后只有新引入的发现才会浮出水面。",
+        "emptyHint": "尚未创建基线。创建一个可以抑制今天的违规行为并在配置中激活基线抑制。",
+        "createButton": "Create / refresh baseline",
+        "createTitle": "运行 dart run saropa_lints:baseline — 写入 saropa_baseline.json 并在配置中激活它。",
+        "openButton": "打开基线文件",
+        "openTitle": "在编辑器中打开 saropa_baseline.json。",
+        "summary": "{files} 文件、{violations} 违规基线 — 生成 {generated}。",
+        "unknownDate": "在未知的时间",
+        "count": "伯爵计数,计数和计算.",
+        "diff": {
+          "title": "差异与电流",
+          "counts": "{resolved} 自基线以来已解决 · {new} 自基线以来是新的。",
+          "empty": "无漂移——实时违规集与基线完全匹配。",
+          "resolvedSection": "已解决（{count}）",
+          "newSection": "New since baseline ({count})",
+          "moreRows": "+{count} 更多未显示。",
+          "fileCol": "文件的档案,是我们所拥有的.",
+          "lineCol": "线条 线路 线上"
+        }
+      },
+      "optimizer": {
+        "openStandalone": "独立打开",
+        "openStandaloneTitle": "在其自己的编辑器选项卡中打开分析优化器。",
+        "unavailable": "分析优化器在此会话中不可用。"
+      }
+    },
+    "automation": {
+      "hint": "控制分析运行时间以及结果显示方式的扩展设置。这些镜像与 Saropa Lints 下的文件 > 首选项 > 设置中的相同设置。"
+    },
+    "extension": {
+      "hint": "扩展范围内的显示首选项。",
+      "linkNote": "Lint 集成的开/关位于侧边栏的状态行中；分析层位于“层”选项卡上 - 两者都不仅仅是简单的设置写入，因此此处不再重复。"
+    }
+  },
   "consolidated": {
     "kicker": "安全 · 质量 · 品质",
     "searchPlaceholder": "过 ⁇ 器规则...过 ⁇ 的规则是什么",
@@ -238,76 +359,22 @@
     }
   },
   "dashboards": {
-    "heroTitle": "仪表板,控制台",
-    "openFull": "打开全屏幕,然后打开一个完整的画面.",
-    "rescan": "扫描重新进行,再扫描.",
-    "retry": "再次尝试,重新试.",
-    "paneFailed": "扫描失败了. 这是一个错误的结果.",
+    "lintsConfig": {
+      "description": "等级：{tier} · 车道：{lane}",
+      "descriptionNoLane": "层级:是指在资本阶段中,有较高的水平. {tier} 没有任何问题."
+    },
     "controls": {
-      "actions": "行动 行动 是一个动作.",
-      "settings": "设置的设定,这是一个很好的方法.",
-      "help": "帮助帮助帮助帮忙",
-      "runAnalysis": "运行分析,进行分析.",
-      "initializeConfig": "启动 / 更新配置文件",
-      "on": "在这里,在那里.",
-      "off": "开启了,没有任何问题.",
-      "yes": "是的,是的,就是这样.",
-      "no": "没有,没有,不行.",
-      "lintIntegrationState": "连线整合:带电网的整合 {state} 没有任何问题.",
       "analyzerPlugin": "分析器插件",
-      "analyzerPluginLive": "开启 — 实时编辑器内诊断",
       "analyzerPluginDisabled": "关闭 — 仅保存时扫描",
       "analyzerPluginAbsent": "未配置",
-      "tierState": "层级:是指在资本阶段中,有较高的水平. {tier} 没有任何问题.",
-      "lane": "车道",
       "laneLight": "轻量 — ~200条编辑器内规则，其余在保存时执行",
       "laneFull": "完整 — 编辑器中所有启用的规则",
-      "runAfterConfigState": "在配置更改后运行分析: {state} 没有任何问题.",
-      "runAfterDependencyState": "在依赖性变化后运行分析: {state} 没有任何问题.",
-      "uiLanguageState": "界面语言:用户界面的语言 {language} 没有任何问题.",
-      "gettingStarted": "开始的过程",
-      "about": "关于Saropa Lints",
-      "pubDev": "包装在pub.dev上",
-      "aiInstructions": "创建AI代理指令的指示."
+      "migrateLegacyKeys": "迁移 {count} 旧配置密钥",
+      "migrateLegacyKeysDesc": "将旧插件块密钥移至 analysis_options_custom.yaml"
     },
-    "pane": {
-      "projectMap": "项目地图,项目地圖.",
-      "codeHealth": "卫生健康规范码",
-      "lintsConfig": "林特斯配置可以使用.",
-      "findings": "发现结果的研究.",
-      "package": "包装仪表板 这些是",
-      "commandCatalog": "命令目录指令目录"
-    },
-    "projectMap": {
-      "scanning": "扫描项目地图..."
-    },
-    "codeHealth": {
-      "scanning": "扫描代码健康... 在线"
-    },
-    "config": {
-      "tier": "资本级别的其他类型",
-      "enabledRules": "启用规则是指允许使用的规则.",
-      "rulePacks": "规则包包括一个规则.",
-      "packages": "包装包裹是什么意思?"
-    },
-    "package": {
-      "total": "包装包裹是什么意思?",
-      "attention": "需要注意的注意力.",
-      "blocked": "封锁的 被阻止的",
-      "empty": "没有包裹扫描,但 ⁇ 打开仪表板运行一个."
-    },
-    "findings": {
-      "total": "总的来说,这是一个很大的整体.",
-      "errors": "错误的错误,是因为",
-      "warnings": "警告和警示 在线",
-      "info": "信息信息信息的信息信息是什么",
-      "empty": "没有分析运行,但 ⁇ 打开发现运行一."
-    },
-    "catalog": {
-      "commands": "命令指令是指挥的",
-      "recent": "最近使用过的 已用到"
-    },
-    "scanFailed": "扫描失败了. 这是一个错误的结果. 打开整个仪表板,查看详细信息并重新尝试."
+    "badge": {
+      "needlesTooltip": "{count} 软件包具有未采用的功能"
+    }
   },
   "configSuggestions": {
     "enabledToast": "在 analysis_options.yaml 中启用了 {pack} 规则包",
@@ -586,10 +653,22 @@
     "reloadNow": "现在重新加载.",
     "reloadLater": "后来 后来的 之后的"
   },
+  "statusBar": {
+    "menu": {
+      "enableOn": "已启用分析（单击以禁用）",
+      "enableOff": "分析已禁用（单击以启用）",
+      "openViolations": "公开违规报告",
+      "openPackageDashboard": "打开一个包仪表板.",
+      "openProcessHealth": "开放进程健康状况",
+      "commandCatalog": "命令目录指令目录",
+      "about": "关于"
+    }
+  },
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",
-      "critical": "🔴 {size}"
+      "critical": "🔴 {size}",
+      "openHint": "单击打开进程运行状况"
     },
     "tooltip": {
       "processCount": "Dart进程: {count} ({size} RSS)",
@@ -710,7 +789,11 @@
       "driftOfflineTitle": "启用了Drift Advisor,但没有找到服务器.",
       "driftOfflinePill": "漂流在线下载 在线不开机",
       "enabledRulesTitle": "在当前级别中启用规则.",
-      "rulesCount": "{count} 个规则"
+      "rulesCount": "{count} 个规则",
+      "regressionTitle": "健康分数从 {previousScore} 下降到 {currentScore}",
+      "trendTitle": "自早期运行以来的健康评分/违规趋势",
+      "hotspotsTitle": "{open} 打开，{safe} 标记为安全，{fixed} 已修复 — 点击查看",
+      "hotspotsPill": "{open} 开放 · {percent}% 已审核"
     },
     "groupBy": {
       "severity": "严重程度的严重性",
@@ -1025,6 +1108,34 @@
   "packageDashboard": {
     "documentTitle": "Saropa 包装仪表板 在",
     "heroTitle": "Saropa 包装仪表板 在",
+    "tabs": {
+      "aria": "封装仪表板部分",
+      "overview": "概述",
+      "upgrades": "升级",
+      "upgradesDesc": "查看可用的软件包升级，按风险分组，并一键应用。",
+      "fullReport": "完整报告",
+      "fullReportDesc": "将详尽的功能使用报告（每个扫描的包、每个挖掘的变更日志功能）导出为 HTML/Markdown/JSON 文件并打开。",
+      "knownIssues": "已知问题",
+      "knownIssuesDesc": "浏览针对您的依赖项报告的已知漏洞和建议。",
+      "compare": "进行比较,对照.",
+      "compareDesc": "并排比较两个或多个包的分数、大小和活动。",
+      "settings": "设置的设定,这是一个很好的方法.",
+      "openButton": "打开{tab}"
+    },
+    "settingsTab": {
+      "intro": "每个 packageVibrancy.* 设置均已分组。更改会立即保存到您的工作区设置中。",
+      "noLimit": "没有限制",
+      "group": {
+        "access": "访问和注册",
+        "scan": "扫描",
+        "display": "展示",
+        "weights": "分数权重",
+        "upgrade": "升级升级,是为了提高",
+        "watch": "手表",
+        "budget": "预算",
+        "vuln": "漏洞"
+      }
+    },
     "detailPane": {
       "aria": "包装细节 详情",
       "title": "包装细节 详情",
@@ -1256,7 +1367,8 @@
       "toggleDetail": "切换突出显示的包装细节扩展器.",
       "escapeSearch": "清晰的集中搜索;明确的聚焦搜索. 第二 Esc 崩 ⁇ 所有扩展的行.",
       "historyBack": "回到包的导航历史记录,重新查看.",
-      "showOverlay": "显示这个快捷键覆盖."
+      "showOverlay": "显示这个快捷键覆盖.",
+      "jumpToTab": "跳转至选项卡 1-6（概述、升级、完整报告、已知问题、比较、设置）"
     },
     "versionTooltip": {
       "installed": "安装：{version} ({date})",
@@ -1616,6 +1728,68 @@
       "weeksAgo": "{wk} 周前"
     }
   },
+  "projectMap": {
+    "panelTitle": "Saropa 项目地图",
+    "tabs": {
+      "map": "地图",
+      "reports": "报告",
+      "aria": "项目地图部分"
+    },
+    "scan": {
+      "subtitle": "扫描项目规模、复杂性和热点……",
+      "elapsed": "时间过去了,已经过去了.",
+      "cancel": "取消 取缔 在此之前,请注销.",
+      "restart": "重启重新开始",
+      "stopped": "已停止",
+      "logHeading": "活动活动的行为.",
+      "logEmpty": "尚无输出 - project_health 不报告分步进度，因此仅当扫描打印诊断消息时此日志才会填充。"
+    },
+    "reports": {
+      "intro": "一键式 CLI 报告以前需要终端。每个“运行”按钮都会在其卡下方传输该工具的实时输出，并将副本保存在 reports/.saropa_lints/reports-tab/ 下。",
+      "runButton": "跑步",
+      "notRunYet": "尚未运行",
+      "running": "跑步…",
+      "exitOk": "出口 0 — 通过",
+      "exitFail": "非零退出——参见输出",
+      "colLine": "#",
+      "colText": "输出",
+      "severity": {
+        "title": "严重性报告",
+        "desc": "运行 dart analyze 并按严重性（错误、警告、信息）对每个问题进行分组 - 终端命令 dart run saropa_lints:severity_report，无需终端。"
+      },
+      "impact": {
+        "title": "影响报告（旧别名）",
+        "desc": "与严重性报告相同的输出 -impact_report 是 2026 年 6 月 05 日之前的名称，仅保留现有脚本和肌肉记忆继续工作。"
+      },
+      "qualityGate": {
+        "title": "质量门",
+        "desc": "根据 saropa_quality_gate.yaml 中的阈值评估最新的 violations.json 并打印 PASS、WARN 或 FAIL。编辑下面的阈值，然后运行。"
+      },
+      "stubTest": {
+        "title": "存根测试报告",
+        "desc": "扫描 test/*.dart 中的占位符断言（expect(true, isTrue)、expect('literal', isNotNull)），这些占位符断言从未实际测试任何内容。"
+      },
+      "accuracy": {
+        "title": "准确性报告",
+        "desc": "Confirms every rule with an expect_lint marker in the fixtures actually fires there — catches a rule that silently stopped working. Most useful when developing saropa_lints itself."
+      },
+      "memory": {
+        "title": "内存报告",
+        "desc": "从 reports/.saropa_lints/plugin.log 总结分析器插件的 RSS 趋势 - 自插件上次启动以来的第一个/最后一个/最小/最大内存。"
+      },
+      "doctor": {
+        "title": "医生",
+        "desc": "Checks analysis_options.yaml and analysis_options_custom.yaml for common misconfigurations: keys in the wrong file, a missing custom file, or a missing version constraint."
+      },
+      "gate": {
+        "editorLabel": "saropa_quality_gate.yaml 阈值",
+        "placeholder": "质量门：\n  条件：\n    - 指标：新的关键问题\n      操作： eq\n      值：0\n      on_fail: 失败",
+        "save": "保存,拯救和保护一个人.",
+        "saved": "已保存",
+        "saveError": "Could not save"
+      }
+    }
+  },
   "suppressionsStrip": {
     "noData": "还没有 violations.json — 运行分析来填充抑制快照。",
     "zeroTotal": "0分析仪抑制在最新的出口.",
@@ -1771,6 +1945,11 @@
       "rssNote": {
         "inProcess": "进程内，不可单独测量",
         "notRunning": "未运行"
+      },
+      "description": {
+        "analyzerPlugin": "在 Dart 分析服务器内运行 - 当您键入时，编辑器中会实时显示波形曲线，无需扫描。切换会重写 analysis_options.yaml 中的plugins: 块。",
+        "scanDaemon": "后台进程在保存时重新扫描整个项目并写入报告/.saropa_lints/violations.json。关闭会暂停它；下一次保存将恢复它。",
+        "lspServer": "单独的语言服务器 - 将诊断信息发布到“问题”面板以打开和工作区文件。切换写入 saropaLints.lspServer.enabled 设置。"
       }
     },
     "toggle": {
@@ -1779,7 +1958,9 @@
     },
     "action": {
       "killAll": "全部关闭",
-      "restartAll": "全部重启"
+      "restartAll": "全部重启",
+      "killAllDescription": "仅强制停止 LSP 服务器。分析器插件和扫描 Daemon 尚无法独立终止 - 请使用每个引擎自己的开/关切换。",
+      "restartAllDescription": "停止并重新启动 LSP 服务器（如果未运行则启动它）。分析器插件和扫描 Daemon 不受影响 - 使用每个引擎自己的开/关切换。"
     },
     "log": {
       "empty": "尚未有日志条目。",
@@ -1793,6 +1974,9 @@
       "analyzerToggleOff": "分析器插件：禁用…",
       "daemonToggleOn": "扫描 Daemon：继续…",
       "daemonToggleOff": "扫描 Daemon: 暂停中…"
+    },
+    "sidebar": {
+      "enginesLabel": "发动机：{count} 运行"
     }
   },
   "detailView": {
@@ -2197,10 +2381,6 @@
     "scanning": "扫描工作区…",
     "openConfig": "打开 analysis_options.yaml",
     "lastScan": "上次扫描：{time}",
-    "sidebar": {
-      "label": "分析优化器",
-      "description": "减少分析器内存"
-    },
     "kpi": {
       "filesInScope": "作用域内的文件",
       "lines": "行数",
@@ -2269,9 +2449,18 @@
     },
     "diffTitle": "分析优化器：建议排除项"
   },
-  "diagnostics": {
-    "sidebar": {
-      "severityToggleTooltip": "双击切换 {severity}"
+  "sidebarShell": {
+    "dashboardsViewTitle": "仪表板,控制台"
+  },
+  "status": {
+    "health": {
+      "lastRunTooltip": "最后分析：{ago}",
+      "neverRunLabel": "健康： -",
+      "neverRunDescription": "运行分析以查看您的健康评分"
+    },
+    "badge": {
+      "criticalTooltip": "{critical} 关键，{total} 总计",
+      "totalTooltip": "{total} 违规"
     }
   },
   "staleIgnores": {
@@ -2293,16 +2482,15 @@
     },
     "confirm": {
       "fixMessage": "这将从您的源文件中删除过期的忽略注释。更改可以通过 git 撤销。继续吗？",
+      "fixMessageWithCount": "这将从源文件中删除 {count} 过时的忽略注释。可以使用 git 撤消更改。继续？",
       "fixAction": "移除过期的忽略"
     },
     "diagnostic": {
       "message": "过时的忽略：规则 '{ruleName}' 此行不再触发。"
     },
     "sidebar": {
-      "findLabel": "查找过期的忽略项",
-      "findDescription": "检测死 // 忽略: 注释",
       "fixLabel": "修复过时的忽略项",
-      "fixDescription": "自动移除死掉的 // ignore: 注释"
+      "fixDescription": "Detect and auto-remove dead // ignore: comments"
     },
     "quickFix": {
       "title": "修复此文件中过时的忽略项"

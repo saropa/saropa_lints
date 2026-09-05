@@ -40,6 +40,15 @@ import { l10n } from '../i18n/runtime';
 import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
+// Phase 7 leftover (deferred): Rules & Tiers already ships working digit shortcuts (1-7, see
+// _buildTabBar) but never surfaced the shared '?' overlay that Findings/Packages use, so those
+// shortcuts were undiscoverable. Wires the same button + overlay + script + styles pattern.
+import {
+  buildKeyboardShortcutsButton,
+  buildKeyboardShortcutsOverlay,
+  getKeyboardShortcutsScript,
+  getKeyboardShortcutsStyles,
+} from '../views/keyboard-shortcuts';
 import type { MemoryPressureState } from '../systemHealth/memoryPressureWatcher';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePackYaml';
 import { computeConfigSuggestions } from '../config/configSuggestions';
@@ -672,6 +681,13 @@ export class RulePacksWebviewProvider {
       this._buildConfigFileTab(root),
       this._buildAutomationTab(),
       this._buildExtensionTab(ctx),
+      // Phase 7 leftover: pairs the '?' button placed in the header status-line with its overlay
+      // markup — without this the button had nothing to toggle open.
+      buildKeyboardShortcutsOverlay([
+        { key: '1-7', label: l10n('rulesTiers.shortcuts.jumpToTab') },
+        { key: '← / →', label: l10n('rulesTiers.shortcuts.prevNextTab') },
+        { key: '?', label: l10n('rulesTiers.shortcuts.showOverlay') },
+      ]),
     ].join('\n');
 
     return this._wrapHtml(body, true);
@@ -898,7 +914,7 @@ export class RulePacksWebviewProvider {
     return `<header class="dash-hero">
   <div class="hero-text">
     <h1>Saropa Lints Config <button type="button" class="help-icon" title="${escapeHtml(helpTitle)}" aria-label="About this dashboard">?</button></h1>
-    <p class="status-line">${statusLine}</p>
+    <p class="status-line">${statusLine}${buildKeyboardShortcutsButton()}</p>
   </div>
   ${this._buildCoverageGauge(ctx)}
 </header>`;
@@ -2107,8 +2123,11 @@ ${detailRow}`;
     ]
       .filter(Boolean)
       .join('; ');
+    // Append the overlay's own script so the '?' button/keydown wiring runs alongside the rest
+    // of the dashboard's client script under the SAME nonce (a second <script> tag would need its
+    // own nonce authorization and CSP only lists one).
     const script = scripts
-      ? `<script nonce="${nonce}">${getConfigDashboardScript()}</script>`
+      ? `<script nonce="${nonce}">${getConfigDashboardScript()}${getKeyboardShortcutsScript()}</script>`
       : '';
     // lang="en": the Phase 7 UX-harness sweep flagged the missing attribute as a serious a11y
     // violation (html-has-lang) — screen readers fall back to the OS locale's pronunciation rules
@@ -2117,7 +2136,7 @@ ${detailRow}`;
     // the convention already used by the other dashboard shells in this codebase).
     return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><title>Saropa Lints Config</title><meta http-equiv="Content-Security-Policy" content="${csp}">
-<style nonce="${nonce}">${getConfigDashboardStyles()}</style></head><body>${body}${script}</body></html>`;
+<style nonce="${nonce}">${getConfigDashboardStyles()}${getKeyboardShortcutsStyles()}</style></head><body>${body}${script}</body></html>`;
   }
 
   private async _handleToggle(packId: string, enabled: boolean): Promise<void> {

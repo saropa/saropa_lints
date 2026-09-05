@@ -18,6 +18,15 @@ import { escapeHtml, jsonForScriptBlock } from '../vibrancy/views/html-utils';
 import { getDashboardChromeStyles } from './dashboardChromeStyles';
 import type { ProjectMapParts } from './projectMapView';
 import { l10n } from '../i18n/runtime';
+// Project Map already ships working digit shortcuts (1-2, see pmShellScript's keydown handler
+// below) but never surfaced the shared '?' overlay that Findings/Packages/Rules & Tiers use —
+// so those shortcuts were undiscoverable. Same button + overlay + script + styles pattern.
+import {
+  buildKeyboardShortcutsButton,
+  buildKeyboardShortcutsOverlay,
+  getKeyboardShortcutsScript,
+  getKeyboardShortcutsStyles,
+} from './keyboard-shortcuts';
 
 /** Strings the inline client script needs, resolved host-side for i18n. */
 function shellStrings(): Record<string, string> {
@@ -55,13 +64,14 @@ export function buildShellHtml(
 <meta charset="UTF-8" />
 <title>${escapeHtml(l10n('projectMap.panelTitle'))}</title>
 <meta http-equiv="Content-Security-Policy" content="${csp}">
-<style>${getDashboardChromeStyles()}${pmShellStyles()}</style>
-<script>${pmShellScript()}</script>
+<style>${getDashboardChromeStyles()}${pmShellStyles()}${getKeyboardShortcutsStyles()}</style>
+<script>${pmShellScript()}${getKeyboardShortcutsScript()}</script>
 </head>
 <body>
 <header class="dash-hero">
   <div class="hero-text">
     <h1>${escapeHtml(l10n('projectMap.panelTitle'))}</h1>
+    <p class="status-line">${buildKeyboardShortcutsButton()}</p>
   </div>
 </header>
 <nav class="pm-tabs" role="tablist" aria-label="${escapeHtml(l10n('projectMap.tabs.aria'))}">
@@ -74,6 +84,10 @@ ${mapPaneHtml}
 <section id="pmTabReports" class="pm-tab-panel" role="tabpanel" aria-labelledby="pmTabBtnReports" hidden>
 ${reportsPaneHtml}
 </section>
+${buildKeyboardShortcutsOverlay([
+  { key: '1-2', label: l10n('projectMap.shortcuts.jumpToTab') },
+  { key: '?', label: l10n('projectMap.shortcuts.showOverlay') },
+])}
 </body>
 </html>`;
 }
