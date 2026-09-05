@@ -189,19 +189,31 @@ def _check_dnt_collisions(english_strings: set[str]) -> list[str]:
     If the same word appears embedded in a longer translatable string, the
     passthrough is fine (it only matches exact strings), but it signals that the
     word may need real translation in those longer phrases — worth reviewing.
+
+    Skips two known-safe patterns:
+    - Prefix matches: the longer string starts with the keyword (format-string
+      extensions like ``{grade} · {score}/100 · Gate failing``).
+    - Short keywords inside long prose: a keyword ≤15 chars inside a string
+      ≥5× longer is a word embedded in a sentence that MT translates fully.
     """
-    # Build the set of longer source strings that contain a DNT keyword.
     collisions: list[str] = []
     for keyword in DO_NOT_TRANSLATE:
         for source in english_strings:
             # Skip exact matches — that's the intended passthrough.
             if source == keyword:
                 continue
-            if keyword in source:
-                collisions.append(
-                    f"  DO_NOT_TRANSLATE {keyword!r} appears inside: "
-                    f"{source[:80]!r}{'…' if len(source) > 80 else ''}"
-                )
+            if keyword not in source:
+                continue
+            # Skip format-string prefix extensions (e.g. score + "· Gate failing").
+            if source.startswith(keyword):
+                continue
+            # Skip short keywords embedded in much longer prose — MT handles them.
+            if len(keyword) <= 15 and len(source) >= 5 * len(keyword):
+                continue
+            collisions.append(
+                f"  DO_NOT_TRANSLATE {keyword!r} appears inside: "
+                f"{source[:80]!r}{'…' if len(source) > 80 else ''}"
+            )
     if collisions:
         print(
             c("yellow", f"  ⚠ {len(collisions)} DO_NOT_TRANSLATE collision(s) — "
