@@ -18,17 +18,9 @@ temp_output.txt
 test_output.txt
 dx_full.txt
 dx_audit_output.txt
-analyze_output*.txt
-format_output*.txt
 *analyze_output*.txt
 *format_output*.txt
 *format_errors*.txt
-
-# One-off agent / comment-coverage batch scratch (do not commit)
-scripts/comment_coverage_batch/
-/agent_next100_paths.txt
-/agent_tofill_*.txt
-/agent_diff_paths.py
 
 # IDE
 .idea/
@@ -47,7 +39,7 @@ __pycache__/
 # Reports (output ignored, but organize script is tracked)
 /report/
 reports/*
-!reports/organize_reports.py
+!reports/organize_reports.py # keep the organizer script
 
 # Generated analysis reports under packages (batches, sessions, violations)
 packages/saropa_lints_api/reports/
@@ -83,29 +75,17 @@ extension/README.md
 # Extension i18n machine-translation cache (local; never ship secrets here)
 extension/scripts/i18n/.cache/
 
-# Other local config
+# Claude, Cursor & AI (exclude all — do not track or index)
 .github/copilot-instructions.md
-
-# Cursor & AI (exclude all — do not track or index)
 .cursor/
 .cursorignore
-.cursorrules
+*.cursorrules
 mcps/
 agent-transcripts/
-.aider*
 AGENTS.md
-*.cursorrules
-# Claude Code (local only)
-/.claude
 .claude/
-.claude/settings.local.json
-CLAUDE.md
-CLAUDE.local.md
-CLAUDE_SETUP.md
+CLAUDE*.md
 CODEBASE_INDEX.md
-CODE_INDEX.md
-BROKEN_TIERS.md
-bugs/FINISH_GUIDE.md
 
 # Generated publish-pipeline reports (regenerated each publish run)
 plans/known_issues_review.md
