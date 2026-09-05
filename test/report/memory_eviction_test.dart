@@ -58,7 +58,7 @@ void main() {
       expect(ImpactTracker.estimatedBytes, 200);
     });
 
-    test('resets to zero', () {
+    test('reset() clears estimatedBytes back to zero after recording', () {
       ImpactTracker.record(
         impact: LintImpact.info,
         rule: 'r',
