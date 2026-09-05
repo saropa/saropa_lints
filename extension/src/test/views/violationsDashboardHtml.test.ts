@@ -599,4 +599,43 @@ describe('violationsDashboardHtml', () => {
     );
     assert.ok(!html.includes('data-palette-cmd="saropaLints.reviewHotspotState"'));
   });
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * TASK B: quality-gate status-line pill. Before this, gate pass/fail was
+   * visible ONLY inside the Code Health dashboard — invisible from Findings,
+   * where users already look first. `qualityGate` is populated by the
+   * composer straight from `getLastProjectVibrancyPayload()?.gates`
+   * (violationsWideReportView.ts); this dashboard renders whatever it is
+   * handed, with no gate logic of its own — these tests exercise both
+   * states plus the "no scan yet" absence.
+   * ────────────────────────────────────────────────────────────────────── */
+  it('renders a failing-gate pill with the violation count when the gate did not pass', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({ qualityGate: { pass: false, violationCount: 3 } }),
+    );
+    assert.ok(html.includes('class="pill bad toggle"'));
+    assert.ok(html.includes('Gate failing'));
+    assert.ok(html.includes('data-palette-cmd="saropaLints.openProjectVibrancyReport"'));
+    assert.ok(html.includes('3 violation'));
+  });
+
+  it('renders a passing-gate pill when the gate passed', () => {
+    const html = renderViolationsDashboardHtml(
+      minimalInput({ qualityGate: { pass: true, violationCount: 0 } }),
+    );
+    assert.ok(html.includes('class="pill good toggle"'));
+    assert.ok(html.includes('Gate passing'));
+    assert.ok(!html.includes('Gate failing'));
+  });
+
+  it('renders no quality-gate pill at all (not "unknown") when no Code Health scan has run yet', () => {
+    // `qualityGate` omitted, matching what the composer sends before any Code
+    // Health scan has completed this session (see violationsWideReportView.ts's
+    // mapping). `saropaLints.openProjectVibrancyReport` still appears elsewhere
+    // on the page (the More-menu "Open Code Health" item), so the absence
+    // check is scoped to the pill's own text/class, not that command id.
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!html.includes('Gate passing'));
+    assert.ok(!html.includes('Gate failing'));
+  });
 });

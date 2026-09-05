@@ -4,7 +4,7 @@ import 'package:saropa_lints/src/rules/core/documentation_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
 
-/// Tests for 12 Documentation lint rules.
+/// Tests for 13 Documentation lint rules.
 ///
 /// Test fixtures: example/lib/documentation/*
 void main() {
@@ -78,6 +78,11 @@ void main() {
       'UriDoesNotExistInDocImportRule',
       'uri_does_not_exist_in_doc_import',
       () => UriDoesNotExistInDocImportRule(),
+    );
+    testRule(
+      'NoInternalMethodDocsRule',
+      'no_internal_method_docs',
+      () => NoInternalMethodDocsRule(),
     );
   });
   group('Documentation Rules - Fixture Verification', () {

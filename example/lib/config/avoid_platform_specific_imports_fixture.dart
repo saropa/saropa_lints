@@ -142,6 +142,26 @@ import 'dart:convert';
 // import 'dart:math';
 // import 'dart:typed_data';
 
+// OK: dart:io in a CLI tool / analyzer plugin package (pubspec declares
+// `executables:` or depends on custom_lint_builder/analyzer_plugin) is a
+// legitimate, required dependency — such packages run on the VM only and
+// never target web, so the rule's "breaks web builds" rationale does not
+// apply. Gated by ProjectContext.isCliOrToolPackage (whole-package signal).
+// This example fixture package is NOT a CLI/plugin package itself, so this
+// scenario cannot be exercised inline here — see the synthetic-project unit
+// tests in test/rules/platforms/avoid_platform_specific_imports_web_gate_test.dart
+// (group 'ProjectContext.isCliOrToolPackage') for actual coverage, and
+// bugs/avoid_platform_specific_imports_false_positive_analyzer_plugin.md
+// for the false-positive report this guard fixes.
+
+// OK: dart:io in a file under bin/ or tool/ (a short-lived, single-run
+// script) is also exempt even inside an otherwise web-targeting app
+// package — the process exits after one run, so build-time or generator
+// scripts are not subject to the browser-runtime constraint either.
+// Gated by ProjectContext.isInShortLivedToolDirectory (per-file signal),
+// covered by the same test file's
+// 'ProjectContext.isInShortLivedToolDirectory' group.
+
 void _useImports() {
   // Reference imports to suppress unused warnings
   final _ = utf8;

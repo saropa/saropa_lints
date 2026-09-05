@@ -261,7 +261,7 @@
         "none": "لا شيء (استخدم إعدادات القسم Tier)"
       },
       "saropaTier": {
-        "label": "سروпа_تير"
+        "label": "saropa_tier"
       },
       "runtimeTier": {
         "label": "runtime_tier"
@@ -279,7 +279,7 @@
         "hint": "يتجاوز قاعدة معينة مستوى الخطورة، أو يلغيها تمامًا، بشكل مستقل عن المستوى والقوالب الخاصة بالقواعد.",
         "level": "مستوى",
         "empty": "لا توجد إعدادات لتجاوز مستوى الخطورة.",
-        "rulePlaceholder": "Rule_name",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "مستوى خطورة جديد"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "خيارات العرض العامة للملحق",
-      "linkNote": "القواعد الصارمة: 1. توجد ميزة تكامل التحقق من صحة الكود (lint) على/إيقاف في صفوف حالة الشريط الجانبي؛ وتقع طبقة التحليل على علامة التبويب \"Tier\" — كلاهما يقوم بعمل أكثر من مجرد كتابة إعداد بسيط، لذلك لا يتم تكرارها هنا."
+      "linkNote": "القواعد الصارمة:\n1. يتم التحقق من وجود التحليل عند حفظ الملف على/إيقاف تشغيله في صفوف حالة الشريط الجانبي؛ والمستوى التحليلي موجود في علامة التبويب المستوى — كلاهما يقوم بأكثر من مجرد كتابة الإعداد، لذلك لا يتم تكراره هنا."
     },
     "shortcuts": {
       "jumpToTab": "الانتقال إلى التبويب 1-7 (الدرجة، حزم القواعد، التجاوزات، نشر SDK، ملف التكوين، الأتمتة، التمديد)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "المستوى: مستوى من الدرجة. {tier} _ PH0__ الـ (ف) = الحالة التي يمر"
     },
     "controls": {
-      "analyzerPlugin": "مُحلِّل مُوسَّع",
-      "analyzerPluginDisabled": "إيقاف - التحليل عند حفظ الملف فقط",
+      "analyzerPlugin": "تحليل مباشر",
+      "analyzerPluginDisabled": "إيقاف - التحليل فقط عند الحفظ",
       "analyzerPluginAbsent": "غير مُconfigured",
       "laneLight": "خفيف — ~200 قاعدة داخل المحرر، باقي عند حفظ الملف",
       "laneFull": "كامل — كل القواعد المفعلة داخل المحرر",
@@ -918,7 +918,14 @@
       "colCount": "العد Count إحصاء عدد",
       "colSeverity": "شدة الحالة:",
       "colActionsAria": "إجراءات الصف صف.",
-      "filesAffected": "الملفات المتأثرة ({count})"
+      "filesAffected": "الملفات المتأثرة ({count})",
+      "howToFixHeading": "كيفية إصلاح",
+      "owaspMobileLabel": "الهواتف المحمولة",
+      "owaspWebLabel": "ويب",
+      "relatedRulesHeading": "القواعد المرتبطة",
+      "sameTagHeading": "اكتشاف نفس التaggable",
+      "migrationHeading": "الانتقال",
+      "supersedesLabel": "يُلغي:"
     },
     "findings": {
       "sectionAria": "النتائج التي توصلنا إليها",
@@ -1118,8 +1125,10 @@
       "overview": "نظرة عامة",
       "upgrades": "التحديثات",
       "upgradesDesc": "مراجعة التحديثات المتاحة للحزم، مُصنفة حسب المخاطر، مع إمكانية تطبيقها بضغطة زر واحدة.",
+      "upgradesGenerating": "فحص مشروعك للبحث عن الميزات غير المُعتمدة وفرص الترقية. هذا يعمل مرة واحدة لكل فحص ويظل مخزَّنًا حتى تقوم بالفحص مرة أخرى.",
       "fullReport": "تقرير كامل",
       "fullReportDesc": "أصدِر تقرير استخدام الميزات الشامل (كل حزمة تم فحصها، كل ميزة تم استخراجها من سجل التغييرات) كملف HTML/Markdown/JSON وافتحه.",
+      "fullReportGenerating": "توليد التقرير الكامل — كل حزمة تم فحصها، كل ميزة تم استخراجها من سجل التغييرات. هذا يعمل مرة واحدة لكل فحص ويظل مخزَّنًا حتى تقوم بالفحص مرة أخرى.",
       "knownIssues": "القضايا المعروفة",
       "knownIssuesDesc": "تصفح الثغرات المعروفة والإعلانات المقدمة ضد اعتمادياتك",
       "compare": "مقارنة المقارنة.",
@@ -1747,7 +1756,8 @@
       "restart": "إعادة تشغيل: إعادة التشغيل.",
       "stopped": "остان",
       "logHeading": "النشاط النشطة.",
-      "logEmpty": "لا يوجد إخراج بعد — لا تقوم أداة project_health بالإبلاغ عن التقدم خطوة بخطوة، لذا فإن هذا السجل لا يملأ إلا إذا أصدرت عملية المسح رسالة تشخيصية."
+      "logEmpty": "لا يوجد إخراج بعد — هذا السجل يملأ فقط إذا أصدر المسح رسالة تشخيصية.",
+      "progress": "{percent}% — {done}/{total} ملفات"
     },
     "reports": {
       "intro": "تقارير CLI بضغطة زر تُعَدُّ بديلاً عن التَّطبيق القديم الذي يحتاج إلى واجهة سطر الأوامر. كل زر \"التشغيل\" يُرسل مخرجات الأداة مباشرة تحت بطاقة الأداة ويحفظ نسخة تحت reports/.saropa_lints/reports-tab/",
@@ -1787,16 +1797,27 @@
         "desc": "تتحقق من analysis_options.yaml و analysis_options_custom.yaml من الأخطاء الشائعة في التكوين: مفاتيح في ملف خاطئ، أو ملف مخصص مفقود، أو قيود إصدار مفقود."
       },
       "gate": {
-        "editorLabel": "سروпа_كوياليتي_جيت.yaml تهذيبات",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "بوابة_الجودة:\n  الشروط:\n    - المقياس: new_critical_issues\n      المرجع: مكافئ\n      القيمة: 0\n      on_fail: فشل",
         "save": "حفظ Save الاحتفاظ بإنقاذ",
         "saved": "تم الحفظ",
         "saveError": "لم يتم حفظ"
-      }
+      },
+      "colFile": "ملفات الملفات File file",
+      "colLineNum": "خط خط خط",
+      "colRule": "قاعدة قانونية القواعد",
+      "colSeverity": "شدة الحالة:",
+      "colMessage": "رسالة الرسالة الرسالية",
+      "colKey": "الكلمة"
     },
     "shortcuts": {
       "jumpToTab": "الانتقال إلى اللوحة 1-2 (الخريطة، التقارير)",
       "showOverlay": "عرض هذا الاختصار التراكب الرقمي."
+    },
+    "hero": {
+      "files": "ملفات الملفات.",
+      "lines": "السطور",
+      "size": "حجم الحجم الوزن"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "السجل"
     },
     "engine": {
-      "analyzerPlugin": "مُحلِّل المُوسِّع",
-      "scanDaemon": "مسح Daemon",
+      "analyzerPlugin": "تحليل مباشر",
+      "scanDaemon": "التحقق من خلال التخزين المؤقت",
       "lspServer": "خادم LSP",
       "pid": "PID:",
       "status": "الحالة:",
@@ -1949,7 +1970,8 @@
         "running": "التشغيل",
         "stopped": "остودت",
         "suspended": "متوقفة",
-        "starting": "بدء"
+        "starting": "بدء",
+        "scanning": "المسح"
       },
       "rssNote": {
         "inProcess": "قواعد صارمة:\n1. العودة فقط إلى النص المترجم.",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "يُنفَّذ داخل خادم تحليل Dart — تُظهر خطوط التصحيح أثناء الكتابة، لا حاجة للمسح. تبديل الخيار يعيد كتابة المُضافات: حظر في analysis_options.yaml",
         "scanDaemon": "عملية خلفية تقوم بإعادة فحص المشروع بأكمله عند الحفظ وكتابة التقارير/.saropa_lints/violations.json. إيقافها يوقف العملية؛ الحفظ التالي يعاودها.",
         "lspServer": "قواعد صارمة:\n1. عرض فقط النص المترجم."
-      }
+      },
+      "scanProgress": "مسح: {done}/{total} ملفات"
     },
     "toggle": {
       "on": "على",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "مشاهدة انتهاكات الرؤية",
       "noErrors": "Saropa Lints: هيئة إدارة المعلومات لا أخطاء، ولا خطأ!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: هيئة إدارة المعلومات لا يوجد مجلد مساحة عمل مفتوح. افتح مشروعك Dart/Flutter أولاً.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: إнтِكْرُونْتِ لِنْت مُشَغَّل. تَمكَّنْ مِنْهُ قَبْلَ إِنْفَادِ التَّنَافُس.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: التحليل عند الحفظ غير مفعل. تفعيله قبل تشغيل التحليل.",
       "pluginAlive": "Saropa Lints على قيد الحياة: تم تفعيل قواعد {rules} ، وتم تحليل ملفات {files}.",
       "openPubspecFailed": "فشل في فتح pubspec.yaml: {message} _ PH0__ الـ (ف) = الحالة التي يمر",
       "toggleSidebarSectionFailed": "Saropa Lints: هيئة البيانات الحيوية فشل في تبديل قسم الشريط الجانبي  ⁇ {message} _ PH0__ الـ (ف) = الحالة التي يمر",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: هيئة البيانات الجسدية نجحت في الحصول على المضاجعة ولكن لم يتم حل saropa_lints. تحقق من تنسيق pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: هيئة البيانات الحيوية فشل كتابة التكوين. {details}",
       "disabled": "Saropa Lints معطلة. لم يتم تغيير ملفات المشروع.",
-      "disabledAnalyzer": "Saropa Lints تم إيقاف التكامل. سيتم إزالة تشخيصات المحلل قريباً؛ التبديل Lint تكامل على لاستعادة.",
+      "disabledAnalyzer": "التكامل Saropa Lints تم إيقافه. سيتم إزالة إشعارات المدقق قريبًا؛ اضغط على مفتاح المسح عند حفظ الملف لاستعادة الإشعارات.",
       "reenabledPlugin": "تم إعادة تمكين مُساعِد Saropa Lints داخل العملية. إعادة تشغيل خادم تحليل Dart لتحميله مرة أخرى.",
       "reenableNothingToRestore": "Saropa Lints: لا شيء لاستعادة. لا يُعتبر المُتوَقِّف في العملية حاليًا مُعطَّلًا من خلال التوسِيع.",
       "noOpenDartFiles": "Saropa Lints: هيئة إدارة المعلومات لم يتم العثور على أي ملفات مفتوحة Dart. أعد فتح ملف Dart أو قم بإيقاف تشغيل إعداد \"فتح المحررين فقط\".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "لم يتم استجابة عملية المسح في الوقت المحدد.",
       "scanOnSaveDaemonExited": "العملية التحليلية توقفت بشكل غير متوقع. سيتم إعادة تشغيلها عند الحفظ التالي.",
       "scanOnSaveDaemonBackoff": "العملية التحليلية توقفت مؤخرًا وهي تنتظر إعادة التشغيل. احفظ مرة أخرى بعد لحظة.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints مغلق — قم بتشغيل \"دمج التحقق\" قبل تنفيذ مسح المشروع بأكمله.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints مغلق — قم بتشغيل \"المسح عند الحفظ\" قبل تشغيل مسح المشروع بأكمله.",
       "scanOnSaveBaselineAlreadyRunning": "يتم الآن مسح المشروع بأكمله.",
       "scanOnSaveBaselineCanceled": "تم إلغاء مسح المشروع بأكمله بعد {scanned}/{total} ملفات.",
       "scanOnSaveBaselineFailed": "فشل مسح المشروع بأكمله: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "إصلاح الإهمالات القديمة في هذا الملف"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "المناطق الساخنة · {percent}% تقييم",
+      "hotspotsDescription": "{open} فتح",
+      "lastRunLabel": "التشغيل الأخير · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "جميع الأوامر…",
+      "commandCatalogDescription": "ابحث عن جميع الأوامر"
     }
   }
 }

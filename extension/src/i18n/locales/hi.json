@@ -261,10 +261,10 @@
         "none": "कोई नहीं (टीयर टैब के सेटिंग का उपयोग करें)"
       },
       "saropaTier": {
-        "label": "सरोपा_टाइर"
+        "label": "saropa_tier"
       },
       "runtimeTier": {
-        "label": "रनटाइम_टाइर"
+        "label": "runtime_tier"
       },
       "lane": {
         "title": "विश्लेषण लेन",
@@ -279,7 +279,7 @@
         "hint": "किसी विशिष्ट नियम की गंभीरता को बदलता है, या इसे पूरी तरह से बंद कर देता है, स्तर और नियम पैक के अधिकार से स्वतंत्र रूप से।",
         "level": "स्तर",
         "empty": "कोई गंभीरता ओवरराइड सेट नहीं है।",
-        "rulePlaceholder": "नियम_नाम",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "नई गंभीरता स्तर"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "प्रसारण-व्यापी प्रदर्शन प्राथमिकताएं",
-      "linkNote": "लिंट एक्सटेंशन बाई साइडबार के स्टेटस रो में ऑन/ऑफ होता है; एनालिसिस टियर टियर टैब पर होता है — दोनों एक साधारण सेटिंग लिखने से अधिक करते हैं, इसलिए यहां दोहराए गए नहीं हैं।"
+      "linkNote": "सेव करते हुए स्कैन एनालिसिस के स्तर के लिए टैब पर रहता है — दोनों एक साधारण सेटिंग लिखने से अधिक करते हैं, इसलिए यहां दोहराए गए नहीं हैं।"
     },
     "shortcuts": {
       "jumpToTab": "टैब में जाएँ 1-7 (स्तर, नियम पैक, ओवरराइड, एसडीके रोलआउट, कॉन्फिग फ़ाइल, ऑटोमेशन, एक्सटेंशन)",
@@ -369,7 +369,7 @@
       "descriptionNoLane": "स्तर: {tier}"
     },
     "controls": {
-      "analyzerPlugin": "एनालाइजर प्लगइन",
+      "analyzerPlugin": "जीवित विश्लेषण",
       "analyzerPluginDisabled": "अफ ऑफ — सेव करते ही स्कैन करें",
       "analyzerPluginAbsent": "अनुपलब्ध",
       "laneLight": "हलका — ~200 नियम संपादन के समय, बाकी सहेजने पर",
@@ -918,7 +918,14 @@
       "colCount": "गिनती करना Count count",
       "colSeverity": "गंभीरता की डिग्री।",
       "colActionsAria": "पंक्ति क्रियाएँ Row actions",
-      "filesAffected": "प्रभावित फ़ाइलें ({count})"
+      "filesAffected": "प्रभावित फ़ाइलें ({count})",
+      "howToFixHeading": "कैसे ठीक करें",
+      "owaspMobileLabel": "मोबाइल",
+      "owaspWebLabel": "वेब",
+      "relatedRulesHeading": "संबंधित नियम",
+      "sameTagHeading": "समान टैग खोज",
+      "migrationHeading": "मिग्रेशन",
+      "supersedesLabel": "अतिरिक्त:"
     },
     "findings": {
       "sectionAria": "निष्कर्षों की खोज करें।",
@@ -1118,8 +1125,10 @@
       "overview": "ओवरव्यू",
       "upgrades": "अपग्रेड्स",
       "upgradesDesc": "पैकेज अपग्रेड के उपलब्ध विकल्पों की समीक्षा करें, जो जोखिम के आधार पर समूहित हैं, एक-क्लिक लागू करें।",
+      "upgradesGenerating": "आपके प्रोजेक्ट में अपनाए गए फीचर के बिना और अपग्रेड के अवसरों की खोज कर रहे हैं। यह प्रत्येक स्कैन में एक बार चलता है और आप फिर से स्कैन तक छोड़ दिया जाता है।",
       "fullReport": "पूर्ण रिपोर्ट",
       "fullReportDesc": "अपने विस्तारपूर्वक सुविधा-उपयोग रिपोर्ट (प्रत्येक स्कैन किया गया पैकेज, प्रत्येक खोज किया गया चेंजलॉग सुविधा) को HTML/Markdown/JSON फ़ाइल के रूप में निर्यात करें और खोलें।",
+      "fullReportGenerating": "पूर्ण रिपोर्ट बनाना — प्रत्येक स्कैन किया गया पैकेज, प्रत्येक खोज किया गया चेंजलॉग फीचर। यह प्रत्येक स्कैन के लिए एक बार चलता है और आप फिर से स्कैन करने तक कैश में रहता है।",
       "knownIssues": "प्रस्तुत समस्याएँ",
       "knownIssuesDesc": "अपने निर्भरताओं के खिलाफ रिपोर्ट किए गए ज्ञात कमजोरियों और सलाह के बारे में खोजें",
       "compare": "तुलना करें, तुलना करें।",
@@ -1747,7 +1756,8 @@
       "restart": "रिस्टार्ट करें और फिर से शुरू करें।",
       "stopped": "रोक दिया",
       "logHeading": "गतिविधि क्रियाकलाप",
-      "logEmpty": "कोई आउटपुट नहीं — प्रोजेक्ट_हेल्थ स्टेप-बाय-स्टेप प्रगति रिपोर्ट नहीं करता, इसलिए यह लॉग केवल अगर स्कैन एक डायनोस्टिक संदेश प्रिंट करता है तो भरता है।"
+      "logEmpty": "कोई आउटपुट नहीं — यह लॉग केवल वहां भरेगा जहां स्कैन एक डायनोस्टिक संदेश प्रिंट करता है।",
+      "progress": "{percent}% — {done}/{total} फाइलें"
     },
     "reports": {
       "intro": "एक-क्लिक CLI रिपोर्ट जो पहले टर्मिनल की आवश्यकता थी। प्रत्येक रन बटन उपकरण के जीवित आउटपुट को अपने कार्ड के नीचे स्ट्रीम करता है और reports/saropa_lints/reports-tab/ में एक प्रतिलिपि बनाता है।",
@@ -1787,16 +1797,27 @@
         "desc": "analysis_options.yaml और analysis_options_custom.yaml के लिए सामान्य गलतियों की जांच: गलत फ़ाइल में कुंजी, एक अनुपस्थित कस्टम फ़ाइल, या एक अनुपस्थित संस्करण सीमा।"
       },
       "gate": {
-        "editorLabel": "सरोपा_क्वालिटी_गेट.यामल थ्रेशोल्ड्स",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "गुणवत्ता_गेट:\n  शर्तें:\n    - मीट्रिक: new_critical_issues\n      ऑप: eq\n      मान: 0\n      on_fail: विफल",
         "save": "Save सहेजें बचाना बचाओ",
         "saved": "संचित गया",
         "saveError": "/नो_थिंक सेव नहीं किया जा सकता है"
-      }
+      },
+      "colFile": "File फ़ाइल फाइल",
+      "colLineNum": "लाइन लाइन लाइन रेखा",
+      "colRule": "नियम और विनियम।",
+      "colSeverity": "गंभीरता की डिग्री।",
+      "colMessage": "संदेश संदेश संदेश।",
+      "colKey": "की (Key)"
     },
     "shortcuts": {
       "jumpToTab": "टैब 1-2 (मैप, रिपोर्ट्स) पर जाएं",
       "showOverlay": "इस शॉर्टकट ओवरले को दिखाएं।"
+    },
+    "hero": {
+      "files": "फ़ाइलें फाइलें",
+      "lines": "लाइन्स",
+      "size": "आकार का आकार आकार"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "लॉग"
     },
     "engine": {
-      "analyzerPlugin": "एनालाइजर प्लगइन",
-      "scanDaemon": "Daemon स्कैन करें",
+      "analyzerPlugin": "जीवित विश्लेषण",
+      "scanDaemon": "सेव पर स्कैन करें",
       "lspServer": "एलएसपी सर्वर",
       "pid": "PID:",
       "status": "स्थिति:",
@@ -1949,7 +1970,8 @@
         "running": "चल रहा है",
         "stopped": "रोक दिया गया",
         "suspended": "सस्पेंडेड",
-        "starting": "प्रारंभ"
+        "starting": "प्रारंभ",
+        "scanning": "स्कैन कर रहे हैं"
       },
       "rssNote": {
         "inProcess": "अनुप्रक्रिया में, अलग-अलग माप्य नहीं",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Dart विश्लेषण सर्वर में चलता है — आप टाइप करते ही सम्पादक में जीवित छोटी रेखाएं, कोई स्कैन की आवश्यकता नहीं है। स्विच करने से प्लगइन लिखे जाते हैं: analysis_options.yaml में ब्लॉक।",
         "scanDaemon": "पृष्ठभूमि प्रक्रिया जो बचाव के समय पूरे प्रोजेक्ट को पुनः स्कैन करती है और रिपोर्ट लिखती है/.saropa_lints/violations.json। अक्षम करने से यह अक्षम हो जाती है; अगले बचाव इसे फिर से सक्रिय करता है।",
         "lspServer": "अलग भाषा सर्वर — खुले और कार्यस्थल फ़ाइलों के लिए समस्या पैनल में निदान प्रकाशित करता है। स्विच करने पर saropaLints.lspServer.enabled सेटिंग लिखता है।"
-      }
+      },
+      "scanProgress": "स्कैन: {done}/{total} फ़ाइलें"
     },
     "toggle": {
       "on": "ओएन /नो_थिंक",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "View Violations देखें उल्लंघन",
       "noErrors": "Saropa Lints: _PH0_: कोई त्रुटि नहीं!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: कोई कार्यस्थान फ़ोल्डर खुला नहीं है. सबसे पहले अपना Dart/Flutter प्रोजेक्ट खोलें।",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: लिंट एक्सटेंशन बंद है। विश्लेषण करने से पहले इसे सक्षम करें।",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: सेव करते हुए स्कैन बंद है। विश्लेषण चलाने से पहले इसे सक्षम करें।",
       "pluginAlive": "Saropa Lints जीवित है: {rules} नियम सक्षम, {files} फ़ाइलों का विश्लेषण किया गया।",
       "openPubspecFailed": "pubspec.yaml: {message} खोलने में विफल",
       "toggleSidebarSectionFailed": "Saropa Lints: साइडबार अनुभाग को टॉगल करने में विफल - {message}",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: _PH2_: पब प्राप्त करने में सफल रहा लेकिन saropa_lints हल नहीं हुआ। pubspec.yaml स्वरूपण की जाँच करें।",
       "configWriteFailedNs": "Saropa Lints: _PH1_: config लिखना विफल. {details}",
       "disabled": "Saropa Lints अक्षम है। प्रोजेक्ट फ़ाइलों को नहीं बदला गया था।",
-      "disabledAnalyzer": "Saropa Lints एकीकरण बंद कर दिया गया है। विश्लेषक निदान जल्द ही स्पष्ट हो जाएगा; टॉगल करें Lint एकीकरण को बहाल करने के लिए चालू करें।",
+      "disabledAnalyzer": "Saropa Lints एक्सटेंशन बंद कर दिया गया है। एनालाइजर निदान जल्द ही साफ हो जाएगा; स्कैन ऑन सेव करने पर टॉगल करें ताकि बहाल करें।",
       "reenabledPlugin": "Saropa Lints अंतर्निहित प्लगइन पुनः सक्रिय किया गया है। Dart विश्लेषण सर्वर को पुनः शुरू करके इसे पुनः लोड कर रहे हैं।",
       "reenableNothingToRestore": "Saropa Lints: कुछ बहाल करने के लिए नहीं। वर्तमान प्रक्रिया प्लगइन वर्तमान में एक्सटेंशन के माध्यम से अक्षम नहीं है।",
       "noOpenDartFiles": "Saropa Lints: _PH0_: कोई खुली Dart फ़ाइल नहीं मिली। एक Dart फ़ाइल को फिर से खोलें या \"केवल संपादकों खोलें\" सेटिंग बंद करें।",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "स्कैन प्रक्रिया समय पर प्रतिक्रिया नहीं देने वाली।",
       "scanOnSaveDaemonExited": "स्कैन प्रक्रिया अप्रत्यक्ष रूप से रोक दी गई। अगली बचत पर यह पुनः शुरू होगी।",
       "scanOnSaveDaemonBackoff": "स्कैन प्रक्रिया अतीत में रोक दी गई थी और पुनः शुरू होने के लिए इंतज़ार कर रही है। एक क्षण बाद फिर से सेव करें।",
-      "scanOnSaveBaselineDisabled": "Saropa Lints बंद है — पूरे प्रोजेक्ट स्कैन करने से पहले \"लिंट एंटीग्रेशन\" को सक्रिय करें।",
+      "scanOnSaveBaselineDisabled": "Saropa Lints बंद है — \"Save के साथ स्कैन\" को सक्षम करें ताकि पूरे प्रोजेक्ट के स्कैन करने से पहले",
       "scanOnSaveBaselineAlreadyRunning": "एक पूरे प्रोजेक्ट की स्कैनिंग पहले से ही चल रही है।",
       "scanOnSaveBaselineCanceled": "पूरे प्रोजेक्ट की स्कैन बाद में {scanned}/{total} फ़ाइलों के बाद रद्द कर दिया गया।",
       "scanOnSaveBaselineFailed": "पूरे प्रोजेक्ट स्कैन विफल रहा: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "इस फ़ाइल में विस्तारित अनदेखा करें"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "हॉटस्पॉट्स · {percent}% रीव्यू किया",
+      "hotspotsDescription": "{open} खोलें",
+      "lastRunLabel": "पिछला चलान · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "सभी कमांड...",
+      "commandCatalogDescription": "सभी कमांड खोजें"
     }
   }
 }

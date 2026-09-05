@@ -279,7 +279,7 @@
         "hint": "Sobrescreve a gravidade de uma regra específica, ou a desativa totalmente, independentemente do nível e dos pacotes de regras.",
         "level": "Nível",
         "empty": "Nenhuma sobrescrita de severidade está definida.",
-        "rulePlaceholder": "nome_regra",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Nova gravidade de nível"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Preferências de exibição em escopo da extensão",
-      "linkNote": "Integração do lint ligado/desligado está na linha de status da barra lateral; a análise de nível está na aba Tier — ambos fazem mais do que uma simples escrita de configuração, portanto não são duplicados aqui."
+      "linkNote": "A escaneamento ao salvar ligado/desligado está na linha de status da barra lateral; a análise de nível está na aba Tier — ambos fazem mais do que uma simples escrita de configuração, portanto não são duplicados aqui."
     },
     "shortcuts": {
       "jumpToTab": "Ir para a guia 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: Nível de nível. {tier} É um termo usado para descrever a"
     },
     "controls": {
-      "analyzerPlugin": "Analisador de plug-in",
-      "analyzerPluginDisabled": "Desligado — escaneio apenas ao salvar",
+      "analyzerPlugin": "Análise em tempo real",
+      "analyzerPluginDisabled": "Desligado — escaneia apenas ao salvar",
       "analyzerPluginAbsent": "Não configurado",
       "laneLight": "Light — ~200 regras em-editor, restante ao salvar",
       "laneFull": "Completo — todas as regras ativadas em editor",
@@ -918,7 +918,14 @@
       "colCount": "Contagem de contagem.",
       "colSeverity": "Gravidade da gravidade.",
       "colActionsAria": "Ações de linha Ações em fila.",
-      "filesAffected": "Arquivos afetados ({count})"
+      "filesAffected": "Arquivos afetados ({count})",
+      "howToFixHeading": "Como corrigir",
+      "owaspMobileLabel": "Móvel",
+      "owaspWebLabel": "Rede",
+      "relatedRulesHeading": "Regras relacionadas",
+      "sameTagHeading": "Descoberta de tags iguais",
+      "migrationHeading": "Migração",
+      "supersedesLabel": "Substitui:"
     },
     "findings": {
       "sectionAria": "Constatos de conclusões.",
@@ -1118,8 +1125,10 @@
       "overview": "Visão Geral",
       "upgrades": "Atualizações",
       "upgradesDesc": "Revisar atualizações de pacote disponíveis, agrupadas por risco, com aplicação em um clique.",
+      "upgradesGenerating": "Varredura do seu projeto para recursos não adotados e oportunidades de atualização. Isso é executado uma vez por varredura e fica em cache até que você revarredure.",
       "fullReport": "Relatório completo",
       "fullReportDesc": "Exporte o relatório exaustivo de uso de recursos (cada pacote escaneado, cada recurso extraído do changelog) como um arquivo HTML/Markdown/JSON e abra-o.",
+      "fullReportGenerating": "Gerando o relatório completo — cada pacote escaneado, cada recurso extraído do changelog. Isso é executado uma vez por escaneamento e fica em cache até que você reescaneie.",
       "knownIssues": "Problemas conhecidos",
       "knownIssuesDesc": "Navegue por vulnerabilidades e advisórios conhecidos reportados contra suas dependências.",
       "compare": "Compare Comparar Comparação.",
@@ -1747,7 +1756,8 @@
       "restart": "Reinicie o sistema de modo a reiniciá-lo.",
       "stopped": "Parado",
       "logHeading": "Atividade de atividade.",
-      "logEmpty": "Nenhum resultado ainda — project_health não relata progresso passo a passo, então esse log só preenche se a varredura imprimir uma mensagem de diagnóstico."
+      "logEmpty": "Nenhum resultado ainda — este log só preenche se a varredura imprimir uma mensagem de diagnóstico.",
+      "progress": "{percent}% — {done}/{total} arquivos"
     },
     "reports": {
       "intro": "Relatórios CLI em um clique que anteriormente exigiam um terminal. Cada botão Run transmite a saída em tempo real do工具 abaixo da sua carta e salva uma cópia sob reports/.saropa_lints/reports-tab/",
@@ -1787,16 +1797,27 @@
         "desc": "Verifica analysis_options.yaml e analysis_options_custom.yaml por configurações comuns incorretas: chaves no arquivo errado, arquivo personalizado ausente ou restrição de versão ausente."
       },
       "gate": {
-        "editorLabel": "Limites saropa_quality_gate.yaml",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "portão de qualidade:\n  condições:\n    - métrica: new_critical_issues\n      op: eq\n      valor: 0\n      on_fail: falhar",
         "save": "Salvar Save Save Salvação.",
         "saved": "Salvo",
         "saveError": "Não foi possível salvar"
-      }
+      },
+      "colFile": "Arquivo arquivos arquivo de arquivos.",
+      "colLineNum": "Linha linha linha linha.",
+      "colRule": "Regra de Processo Regra do Processo",
+      "colSeverity": "Gravidade da gravidade.",
+      "colMessage": "Mensagem de mensagem da mensagem.",
+      "colKey": "Chave"
     },
     "shortcuts": {
       "jumpToTab": "Ir para a guia 1-2 (Mapa, Relatórios)",
       "showOverlay": "Mostre esta sobreposição de atalho."
+    },
+    "hero": {
+      "files": "Arquivos arquivos.",
+      "lines": "Linhas",
+      "size": "Tamanho Dimensão tamanho Taxa de dimensão"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Registro"
     },
     "engine": {
-      "analyzerPlugin": "Analisador de Plugin",
-      "scanDaemon": "Varredura Daemon",
+      "analyzerPlugin": "Análise em Tempo Real",
+      "scanDaemon": "Escaneie ao Salvar",
       "lspServer": "Servidor LSP",
       "pid": "PID:",
       "status": "Status:",
@@ -1949,7 +1970,8 @@
         "running": "executando",
         "stopped": "parado",
         "suspended": "suspensa",
-        "starting": "iniciando"
+        "starting": "iniciando",
+        "scanning": "escaneando"
       },
       "rssNote": {
         "inProcess": "em processo, não mensurável separadamente",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Executa dentro do servidor de análise Dart — riscos em tempo real no editor enquanto você digita, sem necessidade de varredura. Alternar reescreve os plugins: bloco em analysis_options.yaml.",
         "scanDaemon": "Processo em segundo plano que rescaneia todo o projeto ao salvar e escreve relatórios/.saropa_lints/violations.json. Desativar suspende-o; o próximo salvamento retoma-o.",
         "lspServer": "Regra estrita: Separar servidor de linguagem — publica diagnósticos para o painel Problems para arquivos abertos e do workspace. Alternar grava a configuração saropaLints.lspServer.enabled."
-      }
+      },
+      "scanProgress": "Varredura: {done}/{total} arquivos"
     },
     "toggle": {
       "on": "SOBRE",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "Violações de Visualização",
       "noErrors": "Saropa Lints: é um número de PH0__. Sem erros, sem falhas!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: é um número de PH0__. nenhuma pasta do espaço de trabalho está aberta. Abra primeiro o seu projeto Dart/Flutter.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: integração de lint está desativada. Ative-a antes de executar a análise.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: escaneamento ao salvar está desativado. Ative-o antes de executar a análise.",
       "pluginAlive": "Saropa Lints está vivo: Regras {rules} ativadas, arquivos {files} analisados.",
       "openPubspecFailed": "Não conseguiu abrir pubspec.yaml: {message} É um termo usado para descrever a",
       "toggleSidebarSectionFailed": "Saropa Lints: é um tipo de células falhou em alternar a seção da barra lateral  ⁇ {message} É um termo usado para descrever a",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: pub foi bem-sucedido, mas saropa_lints não foi resolvido. Verifique a formatação pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: é um tipo de células Config write falhou. {details}",
       "disabled": "Saropa Lints está desativado. Os arquivos do projeto não foram alterados.",
-      "disabledAnalyzer": "Saropa Lints integração desligada. Os diagnósticos do analisador serão esclarecidos em breve; Troque a integração Lint para restaurar.",
+      "disabledAnalyzer": "Integração Saropa Lints desativada. Diagnósticos do analisador serão removidos em breve; ative Scan on save para restaurar.",
       "reenabledPlugin": "Saropa Lints plugin reativado no processo. Reiniciando o servidor de análise Dart para re carregar.",
       "reenableNothingToRestore": "Saropa Lints: nada para restaurar. O plugin em processo não está atualmente desativado via extensão.",
       "noOpenDartFiles": "Saropa Lints: é um número de PH0__. Não foram encontrados arquivos abertos Dart. Reabra um arquivo Dart ou desligue a configuração \"Abrir somente editores\".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "O processo de varredura não respondeu a tempo.",
       "scanOnSaveDaemonExited": "O processo de varredura foi interrompido inesperadamente. Ele será reiniciado na próxima salvaguarda.",
       "scanOnSaveDaemonBackoff": "O processo de varredura parou recentemente e está aguardando para reiniciar. Salve novamente em breve.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints está desativado — ative \"Integração de lint\" antes de executar uma varredura de todo o projeto.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints está desativado — ative \"Scan on save\" antes de executar uma varredura de todo o projeto.",
       "scanOnSaveBaselineAlreadyRunning": "Uma varredura de todo o projeto já está em execução.",
       "scanOnSaveBaselineCanceled": "Varredura do projeto inteiro cancelada após {scanned}/{total} arquivos.",
       "scanOnSaveBaselineFailed": "Varredura do projeto inteiro falhou: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Corrija ignores obsoletos neste arquivo"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% revisado",
+      "hotspotsDescription": "{open} abrir",
+      "lastRunLabel": "Última execução · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Todos os comandos…",
+      "commandCatalogDescription": "Procurar todas as comandos"
     }
   }
 }

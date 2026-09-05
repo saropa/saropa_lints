@@ -1,6 +1,6 @@
 # PROPOSAL: `prefer_state_class_below_widget` — Flag `State<X>` Declared Above Its `StatefulWidget X`
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

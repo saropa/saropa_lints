@@ -358,10 +358,14 @@ void main() {
     hasFix('PreferFinalFieldsAlwaysRule', () => PreferFinalFieldsAlwaysRule());
     // Control flow (1)
     hasFix('AvoidDoubleAndIntChecksRule', () => AvoidDoubleAndIntChecksRule());
-    // Documentation (1)
+    // Documentation (2)
     hasFix(
       'DeprecatedNewInCommentReferenceRule',
       () => DeprecatedNewInCommentReferenceRule(),
+    );
+    hasFix(
+      'NoInternalMethodDocsRule',
+      () => NoInternalMethodDocsRule(),
     );
 
     // Widget patterns require (5)

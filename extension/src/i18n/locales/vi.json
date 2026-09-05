@@ -264,7 +264,7 @@
         "label": "saropa_tier"
       },
       "runtimeTier": {
-        "label": "thời gian chạy_tier"
+        "label": "runtime_tier"
       },
       "lane": {
         "title": "Làn phân tích",
@@ -279,7 +279,7 @@
         "hint": "Ghi đè mức độ nghiêm trọng của một quy tắc cụ thể hoặc tắt hoàn toàn quy tắc đó, không phụ thuộc vào cấp độ và gói quy tắc.",
         "level": "Cấp độ",
         "empty": "Không có quy tắc nào được thiết lập để ghi đè mức độ nghiêm trọng.",
-        "rulePlaceholder": "tên_quy tắc",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Mức độ nghiêm trọng mới"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Tùy chọn hiển thị trên toàn bộ phần mở rộng.",
-      "linkNote": "Tích hợp lint bật/tắt nằm trong hàng trạng thái của thanh bên; cấp độ phân tích nằm trên tab Tier — cả hai đều thực hiện nhiều hơn chỉ là ghi thiết lập đơn giản, vì vậy chúng không được sao chép ở đây."
+      "linkNote": "Chế độ quét khi lưu bật/tắt nằm trong hàng trạng thái của thanh bên; cấp độ phân tích nằm trên tab Tier — cả hai đều thực hiện nhiều hơn chỉ là ghi thiết lập đơn giản, vì vậy chúng không được sao chép lại ở đây."
     },
     "shortcuts": {
       "jumpToTab": "Chuyển đến tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,7 +369,7 @@
       "descriptionNoLane": "Tier: cấp bậc nhất. {tier} là Phương pháp"
     },
     "controls": {
-      "analyzerPlugin": "Plugin Phân tích",
+      "analyzerPlugin": "Phân tích thời gian thực",
       "analyzerPluginDisabled": "Tắt — quét khi lưu chỉ",
       "analyzerPluginAbsent": "Chưa được cấu hình",
       "laneLight": "Light — ~200 quy tắc trong trình soạn thảo, còn lại khi lưu",
@@ -918,7 +918,14 @@
       "colCount": "Count Count Count đếm đếm",
       "colSeverity": "Mức độ nghiêm trọng",
       "colActionsAria": "Các hành động hàng Row actions",
-      "filesAffected": "Các tập tin bị ảnh hưởng ({count})"
+      "filesAffected": "Các tập tin bị ảnh hưởng ({count})",
+      "howToFixHeading": "Cách sửa",
+      "owaspMobileLabel": "Di động",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "Quy tắc liên quan",
+      "sameTagHeading": "Phát hiện cùng tag",
+      "migrationHeading": "Di dời",
+      "supersedesLabel": "Thay thế:"
     },
     "findings": {
       "sectionAria": "Những phát hiện của các nhà nghiên cứu",
@@ -1118,8 +1125,10 @@
       "overview": "Tổng quan",
       "upgrades": "Cập nhật",
       "upgradesDesc": "Xem lại các nâng cấp gói có sẵn, được nhóm theo rủi ro, áp dụng bằng một cú nhấp chuột.",
+      "upgradesGenerating": "Đang quét dự án để tìm các tính năng chưa được áp dụng và cơ hội nâng cấp. Hoạt động này chạy mỗi lần quét và được lưu cache cho đến khi bạn quét lại.",
       "fullReport": "Báo cáo đầy đủ",
       "fullReportDesc": "Xuất báo cáo sử dụng tính năng đầy đủ (mọi gói được quét, mọi tính năng nhật ký thay đổi được khai thác) dưới dạng tệp HTML/Markdown/JSON và mở nó.",
+      "fullReportGenerating": "Đang tạo báo cáo đầy đủ — mọi gói được quét, mọi tính năng được khai thác từ changelog. Hoạt động này chạy một lần mỗi lần quét và được lưu cache cho đến khi bạn quét lại.",
       "knownIssues": "Các vấn đề đã biết",
       "knownIssuesDesc": "Duyệt qua các lỗ hổng đã biết và lời khuyên được báo cáo đối với các phần phụ thuộc của bạn.",
       "compare": "So sánh so sánh so với so sánh",
@@ -1747,7 +1756,8 @@
       "restart": "Khởi động lại khởi động lại.",
       "stopped": "Đã dừng",
       "logHeading": "Hoạt động hoạt động Activity",
-      "logEmpty": "Chưa có đầu ra — project_health không báo cáo tiến trình từng bước, vì vậy log này chỉ được điền nếu quét in một thông báo chẩn đoán."
+      "logEmpty": "Chưa có đầu ra — log này chỉ được điền nếu quét in một thông báo chẩn đoán.",
+      "progress": "{percent}% — {done}/{total} tập tin"
     },
     "reports": {
       "intro": "Báo cáo CLI bằng một cú nhấp chuột trước đây yêu cầu thiết bị đầu cuối. Mỗi nút Chạy truyền phát trực tiếp đầu ra của công cụ bên dưới thẻ của nó và lưu một bản sao trong các báo cáo/.saropa_lints/reports-tab/.",
@@ -1787,16 +1797,27 @@
         "desc": "Kiểm tra analysis_options.yaml và analysis_options_custom.yaml để tìm các cấu hình sai phổ biến: khóa sai tệp, thiếu tệp tùy chỉnh hoặc thiếu ràng buộc phiên bản."
       },
       "gate": {
-        "editorLabel": "ngưỡng saropa_quality_gate.yaml",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "chất lượng_gate:\n  điều kiện:\n    - số liệu: new_cript_issues\n      op: eq\n      giá trị: 0\n      on_fail: thất bại",
         "save": "Save Save Save Giữ",
         "saved": "Đã lưu",
         "saveError": "Không thể lưu"
-      }
+      },
+      "colFile": "File file file file File File",
+      "colLineNum": "Dòng Đường Đường",
+      "colRule": "Quy tắc của quy định",
+      "colSeverity": "Mức độ nghiêm trọng",
+      "colMessage": "Thông điệp Tin nhắn Gửi tin",
+      "colKey": "Khóa"
     },
     "shortcuts": {
       "jumpToTab": "Chuyển đến tab 1-2 (Bản đồ, Báo cáo)",
       "showOverlay": "Hiển thị lớp phủ phím tắt này."
+    },
+    "hero": {
+      "files": "Các tập tin File Files",
+      "lines": "Dòng",
+      "size": "Kích thước Size Size Đường ngực"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Nhật ký"
     },
     "engine": {
-      "analyzerPlugin": "Plugin phân tích",
-      "scanDaemon": "Quét Daemon",
+      "analyzerPlugin": "Phân tích Thực tế",
+      "scanDaemon": "Quét khi Lưu",
       "lspServer": "Máy chủ LSP",
       "pid": "PID:",
       "status": "Trạng thái:",
@@ -1949,7 +1970,8 @@
         "running": "đang chạy",
         "stopped": "dừng",
         "suspended": "tạm dừng",
-        "starting": "bắt đầu"
+        "starting": "bắt đầu",
+        "scanning": "quét"
       },
       "rssNote": {
         "inProcess": "trong cùng tiến trình, không thể đo lường riêng biệt",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Chạy bên trong máy chủ phân tích Dart - các biểu tượng ngoằn ngoèo trực tiếp trong trình chỉnh sửa khi bạn nhập mà không cần quét. Chuyển đổi viết lại các plugin: chặn trong analysis_options.yaml.",
         "scanDaemon": "Quá trình nền quét lại toàn bộ dự án khi lưu và ghi báo cáo/.saropa_lints/violations.json. Tắt nó sẽ tạm dừng nó; lần lưu tiếp theo sẽ tiếp tục nó.",
         "lspServer": "Máy chủ ngôn ngữ riêng biệt — xuất bản chẩn đoán lên bảng Sự cố cho các tệp đang mở và không gian làm việc. Chuyển đổi ghi cài đặt saropaLints.lspServer.enabled."
-      }
+      },
+      "scanProgress": "Quét: {done}/{total} tệp"
     },
     "toggle": {
       "on": "BẬT",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "View Violations (Vi phạm chế độ xem)",
       "noErrors": "Saropa Lints: là người có thể Không có lỗi!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: là người có thể không có thư mục workspace nào được mở. Mở dự án Dart/Flutter của bạn trước.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: tích hợp lint đã bị tắt. Vui lòng bật nó trước khi chạy phân tích.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: Chức năng quét khi lưu đang bị tắt. Vui lòng bật nó trước khi chạy phân tích.",
       "pluginAlive": "Saropa Lints còn sống: {rules} quy tắc được kích hoạt, tập tin {files} phân tích.",
       "openPubspecFailed": "Không thể mở pubspec.yaml: {message} là Phương pháp",
       "toggleSidebarSectionFailed": "Saropa Lints: là một loại tế bào có thể failed to toggle sidebar section  ⁇  không thể chuyển đổi phần thanh bên {message} là Phương pháp",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: là một dạng của các tế bào pub get thành công nhưng saropa_lints không được giải quyết. Kiểm tra định dạng pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: là một loại tế bào có thể config write failed. {details} Không có gì để làm",
       "disabled": "Saropa Lints bị vô hiệu hóa. Các tệp dự án không được thay đổi.",
-      "disabledAnalyzer": "Saropa Lints tích hợp bị tắt. Chẩn đoán của máy phân tích sẽ sớm được làm rõ; toggle Lint integration On để khôi phục.",
+      "disabledAnalyzer": "Tích hợp Saropa Lints đã bị tắt. Các thông báo phân tích sẽ được xóa trong vài giây; bật lại Scan on save để khôi phục.",
       "reenabledPlugin": "Saropa Lints plugin được kích hoạt lại trong quá trình xử lý. Đang khởi động lại máy chủ phân tích Dart để tải lại nó.",
       "reenableNothingToRestore": "Saropa Lints: không có gì để khôi phục. Plugin trong quá trình không đang bị vô hiệu hóa bởi tiện ích mở rộng hiện tại.",
       "noOpenDartFiles": "Saropa Lints: là người có thể không tìm thấy tệp Dart mở. Mở lại một tập tin Dart hoặc tắt cài đặt \"Chỉ mở các trình soạn thảo\".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "Quy trình quét không phản hồi kịp thời.",
       "scanOnSaveDaemonExited": "Quy trình quét đã dừng bất ngờ. Nó sẽ khởi động lại khi lưu lần sau.",
       "scanOnSaveDaemonBackoff": "Quy trình quét đã dừng lại gần đây và đang chờ để khởi động lại. Lưu lại lần nữa sau một lúc.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints đã bị tắt — hãy bật \"Lint integration\" trước khi thực hiện quét toàn bộ dự án.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints đã bị tắt — hãy bật \"Quét khi lưu\" trước khi thực hiện quét toàn bộ dự án.",
       "scanOnSaveBaselineAlreadyRunning": "Một quét toàn bộ dự án đang chạy.",
       "scanOnSaveBaselineCanceled": "Quét toàn bộ dự án đã bị hủy sau khi có {scanned}/{total} tệp.",
       "scanOnSaveBaselineFailed": "Quét toàn bộ dự án thất bại: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Sửa các ignore lỗi thời trong tệp này"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% đã xem xét",
+      "hotspotsDescription": "{open} mở",
+      "lastRunLabel": "Lần chạy cuối · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Tất cả các lệnh…",
+      "commandCatalogDescription": "Tìm kiếm tất cả lệnh"
     }
   }
 }

@@ -279,7 +279,7 @@
         "hint": "Sovrascrive la gravità di una specifica regola, o la disattiva completamente, indipendentemente dal livello e dai pacchetti di regole.",
         "level": "Livello",
         "empty": "Nessuna sovrascrittura della gravità è impostata.",
-        "rulePlaceholder": "nome_regola",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Nuovo livello di gravità"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Preferenze di visualizzazione a livello di estensione.",
-      "linkNote": "Integrazione del linter on/off si trova nella riga di stato del lato sinistro; il livello di analisi si trova sulla scheda Tier — entrambi fanno qualcosa di più di un semplice scrittura delle impostazioni, quindi non sono duplicati qui."
+      "linkNote": "La scansione su salvataggio on/off si trova nella riga di stato del lato sinistro; il livello di analisi si trova sulla scheda Tier — entrambi fanno qualcosa di più di un semplice scrittura delle impostazioni, quindi non sono duplicati qui."
     },
     "shortcuts": {
       "jumpToTab": "Vai al tab 1-7 (Livello, Pacchetti di regole, Sovrascrizioni, Rollout SDK, File di configurazione, Automazione, Estensione)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: livello di base. {tier} È il nome di un'altra versione."
     },
     "controls": {
-      "analyzerPlugin": "Plugin Analizzatore",
-      "analyzerPluginDisabled": "Spento — scansione solo su salvataggio",
+      "analyzerPlugin": "Analisi in tempo reale",
+      "analyzerPluginDisabled": "Spento — scansione solo all salvataggio",
       "analyzerPluginAbsent": "Non configurato",
       "laneLight": "Light — ~200 regole in-editor, il resto su salvataggio",
       "laneFull": "Completo — ogni regola abilitata analizzata in-editor",
@@ -918,7 +918,14 @@
       "colCount": "Conto conteggiare contare",
       "colSeverity": "Gravità della gravità.",
       "colActionsAria": "Azioni di riga azioni in fila.",
-      "filesAffected": "File interessati ({count})"
+      "filesAffected": "File interessati ({count})",
+      "howToFixHeading": "Come risolvere",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Rete",
+      "relatedRulesHeading": "Regole correlate",
+      "sameTagHeading": "Scoperta stesso tag",
+      "migrationHeading": "Migrazione",
+      "supersedesLabel": "Rimpiazza:"
     },
     "findings": {
       "sectionAria": "Risultati delle ricerche.",
@@ -1118,8 +1125,10 @@
       "overview": "Panoramica",
       "upgrades": "Aggiornamenti",
       "upgradesDesc": "Rivedi gli aggiornamenti disponibili per i package, raggruppati per rischio, con applicazione in un clic.",
+      "upgradesGenerating": "Analisi del progetto in cerca di funzionalità non adottate e opportunità di aggiornamento. Questo processo viene eseguito una volta per scansione e rimane memorizzato in cache fino a quando non esegui una nuova scansione.",
       "fullReport": "Rapporto completo",
       "fullReportDesc": "Esporta il report completo delle funzionalità utilizzate (ogni pacchetto analizzato, ogni funzionalità estratta dal changelog) come file HTML/Markdown/JSON e aprilo.",
+      "fullReportGenerating": "Generazione del report completo — ogni pacchetto analizzato, ogni funzionalità estratta dal changelog. Questo processo viene eseguito una volta per scansione e rimane memorizzato in cache fino a quando non esegui una nuova scansione.",
       "knownIssues": "Problemi noti",
       "knownIssuesDesc": "Esplora vulnerabilità note e avvisi segnalati contro le tue dipendenze.",
       "compare": "Confrontare confrontare.",
@@ -1747,7 +1756,8 @@
       "restart": "Riavviare il sistema da zero.",
       "stopped": "Fermo",
       "logHeading": "Attività di attività.",
-      "logEmpty": "Nessuna output ancora — project_health non segnala progressi passo passo, quindi questo log si riempie solo se lo scan stampa un messaggio diagnostico."
+      "logEmpty": "Nessuna output ancora — questo log si riempie solo se lo scan stampa un messaggio diagnostico.",
+      "progress": "{percent}% — {done}/{total} file"
     },
     "reports": {
       "intro": "Regole Rigide:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo di una frase.\n\nTesto: Rapporti CLI a un clic che prima richiedevano un terminale. Ogni pulsante Run streaming l'output in tempo reale dell'工具 sotto la sua carta e salva una copia sotto reports/.saropa_lints/reports-tab/",
@@ -1787,16 +1797,27 @@
         "desc": "Verifica analysis_options.yaml e analysis_options_custom.yaml per configurazioni comuni errate: chiavi nel file sbagliato, mancanza di un file personalizzato o mancanza di una restrizione della versione."
       },
       "gate": {
-        "editorLabel": "soglie saropa_quality_gate.yaml",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "qualità_gate:\n  condizioni:\n    - metrica: nuovi_problemi_critici\n      op: eq\n      valore: 0\n      on_fail: fallire",
         "save": "Salvare Save Salva il tuo account.",
         "saved": "Salvato",
         "saveError": "Non è stato possibile salvare"
-      }
+      },
+      "colFile": "File",
+      "colLineNum": "Linea Linea Linea Linea",
+      "colRule": "Regolamento Regola.",
+      "colSeverity": "Gravità della gravità.",
+      "colMessage": "Messaggio di messaggio di messaggio.",
+      "colKey": "Chiave"
     },
     "shortcuts": {
       "jumpToTab": "Vai alla scheda 1-2 (Mappa, Rapporti)",
       "showOverlay": "Mostra questa sovrapposizione di scorciatoie."
+    },
+    "hero": {
+      "files": "File file I file.",
+      "lines": "Linee",
+      "size": "Dimensione Taglia taglia dimensioni"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Tronco d'albero"
     },
     "engine": {
-      "analyzerPlugin": "Plugin Analizzatore",
-      "scanDaemon": "Scansiona Daemon",
+      "analyzerPlugin": "Analisi in tempo reale",
+      "scanDaemon": "Scansiona al salvataggio",
       "lspServer": "Server LSP",
       "pid": "PID:",
       "status": "Stato:",
@@ -1949,7 +1970,8 @@
         "running": "in esecuzione",
         "stopped": "fermato",
         "suspended": "sospeso",
-        "starting": "iniziando"
+        "starting": "iniziando",
+        "scanning": "scansionando"
       },
       "rssNote": {
         "inProcess": "in-process, non misurabile separatamente",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Esegue all'interno del server di analisi Dart — squigglie in tempo reale nell'editor mentre si digita, senza necessità di scansione. L'attivazione riscrive i plugin: blocco in analysis_options.yaml.",
         "scanDaemon": "Processo di background che riscansiona l'intero progetto su salvataggio e scrive report/.saropa_lints/violations.json. Disattivare sospende il processo; il salvataggio successivo lo riprende.",
         "lspServer": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Server linguistico separato — pubblica diagnostiche nel pannello Problemi per i file aperti e del workspace. L'attivazione modifica l'impostazione saropaLints.lspServer.enabled."
-      }
+      },
+      "scanProgress": "Scansiona: {done}/{total} file"
     },
     "toggle": {
       "on": "SU",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "View Violazioni di visualizzazione.",
       "noErrors": "Saropa Lints: è il nome di una delle sue compagne. Nessun errore!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: è il nome di una delle sue compagne. nessuna cartella dello spazio di lavoro è aperta. Apri prima il tuo progetto Dart/Flutter.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: l'integrazione del lint è disattivata. Abilitala prima di eseguire l'analisi.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: lo scan su salvataggio è disattivato. Abilitalo prima di eseguire l'analisi.",
       "pluginAlive": "Saropa Lints è vivo: Regole {rules} attivate, file {files} analizzati.",
       "openPubspecFailed": "Non è riuscito ad aprire pubspec.yaml: {message} È il nome di un'altra versione.",
       "toggleSidebarSectionFailed": "Saropa Lints: è il nome di una cellula che si sviluppa attraverso la crescita non è riuscito a togliere la sezione della barra laterale  ⁇ {message} È il nome di un'altra versione.",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: è il numero di PH che si trova in una cellula. pub get è riuscito ma il problema di saropa_lints non si è risolto. Controllare la formattazione pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: è il nome di una cellula che si sviluppa attraverso la crescita Config write non è riuscito. {details}",
       "disabled": "Saropa Lints è disabilitato. I file del progetto non sono stati modificati.",
-      "disabledAnalyzer": "Saropa Lints integrazione disattivata. Le diagnosi degli analizzatori saranno chiarite a breve; Toggle Lint integrazione On per ripristinare.",
+      "disabledAnalyzer": "Integrazione Saropa Lints disattivata. Le diagnostiche dell'analizzatore si limiteranno presto; attiva Scan on save On per ripristinare.",
       "reenabledPlugin": "Saropa Lints plugin riattivato in-processo. Riavviando il server di analisi Dart per ricollegarlo.",
       "reenableNothingToRestore": "Saropa Lints: nulla da ripristinare. Il plugin in-process non è attualmente disabilitato tramite l'estensione.",
       "noOpenDartFiles": "Saropa Lints: è il nome di una delle sue compagne. non è stato trovato alcun file aperto Dart. Riaprire un file Dart o disattivare l'impostazione \"Apri solo gli editor\".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "Il processo di scansione non ha risposto in tempo.",
       "scanOnSaveDaemonExited": "Il processo di scansione è stato interrotto inaspettatamente. Riinizierà al successivo salvataggio.",
       "scanOnSaveDaemonBackoff": "Il processo di scansione è stato interrotto di recente e attende il riavvio. Salva nuovamente tra un momento.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints è disattivato — attiva \"Integrazione linter\" prima di eseguire uno scan dell'intero progetto.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints è disattivato — attiva \"Scan on save\" prima di eseguire uno scan su tutto il progetto.",
       "scanOnSaveBaselineAlreadyRunning": "Un'analisi dell'intero progetto è già in corso.",
       "scanOnSaveBaselineCanceled": "Scansione dell'intero progetto annullata dopo {scanned}/{total} file.",
       "scanOnSaveBaselineFailed": "Scansione dell'intero progetto fallita: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Correggi ignorati obsoleti in questo file"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% revisionati",
+      "hotspotsDescription": "{open} apri",
+      "lastRunLabel": "Ultima esecuzione · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Tutti i comandi…",
+      "commandCatalogDescription": "Cerca tutti i comandi"
     }
   }
 }

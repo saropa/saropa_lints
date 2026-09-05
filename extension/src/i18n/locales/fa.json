@@ -261,7 +261,7 @@
         "none": "هیچ کدام (از تنظیمات پانل سطح استفاده کنید)"
       },
       "saropaTier": {
-        "label": "ساروپا_تیر"
+        "label": "saropa_tier"
       },
       "runtimeTier": {
         "label": "runtime_tier"
@@ -279,7 +279,7 @@
         "hint": "اهمیت یک قاعده خاص را جایگزین یا کامل غیر فعال می‌کند، مستقل از سطح و جعبه قاعده.",
         "level": "سطح",
         "empty": "هیچ جزییت اسکوییتی انتصاب نشده است.",
-        "rulePlaceholder": "قاعده_نام",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "سطح جدید جدیت"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "گزینه های نمایشی در سطح افزونه",
-      "linkNote": "اعمال قاعده چک کردن در حالت روشن/خاموش در ردیف وضعیت پنل جانبی قرار دارد؛ سطح تحلیل در تب سطح قرار دارد — هر دو بیشتر از یک نوشتن ساده تنظیم است، بنابراین در اینجا تکرار نشده اند."
+      "linkNote": "سکن در زمان ذخیره روشن/خاموش در ردیف وضعیت پنجره جانبی قرار دارد؛ تیر تحلیل در تب تیر قرار دارد — هر دو بیشتر از یک نوشتن ساده تنظیم است، بنابراین در اینجا تکرار نشده اند."
     },
     "shortcuts": {
       "jumpToTab": "به تب ۱-۷ (لایه، پکیج قوانین، جایگزینی، رول آ웃 SDK، فایل پیکربندی، اتوماسیون، افزونه) بروید",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "ردیف: {tier}"
     },
     "controls": {
-      "analyzerPlugin": "تحلیلگر پلاگین",
-      "analyzerPluginDisabled": "غیر فعال — فقط در زمان ذخیره",
+      "analyzerPlugin": "تحلیل زنده",
+      "analyzerPluginDisabled": "غیر فعال — اسکن فقط در زمان ذخیره",
       "analyzerPluginAbsent": "تعریف نشده",
       "laneLight": "نور — ~200 قاعده در داخل ویرایشگر، بقیه در زمان ذخیره",
       "laneFull": "کامل — هر قاعده‌ای که فعال است در داخل ویرایشگر",
@@ -918,7 +918,14 @@
       "colCount": "شمارش و شمردن",
       "colSeverity": "شدت: میزان شدید بودن",
       "colActionsAria": "اقدامات صف (Row actions) اعمال ردیف",
-      "filesAffected": "فایل های تحت تاثیر ({count})"
+      "filesAffected": "فایل های تحت تاثیر ({count})",
+      "howToFixHeading": "چگونه باید رفع کنیم",
+      "owaspMobileLabel": "موبایل",
+      "owaspWebLabel": "وب",
+      "relatedRulesHeading": "قواعد مرتبط",
+      "sameTagHeading": "یافتن همچین جستجو",
+      "migrationHeading": "میگریشن",
+      "supersedesLabel": "جایگزین می‌شود:"
     },
     "findings": {
       "sectionAria": "یافته ها: نتایج حاصل از بررسی",
@@ -1118,8 +1125,10 @@
       "overview": "مقدمه",
       "upgrades": "به‌روزرسانی ها",
       "upgradesDesc": "بررسی ارتقاء پکیج‌های موجود، بر اساس ریسک گروه‌بندی شده، با اعمال یک کلیک",
+      "upgradesGenerating": "پروژه شما را برای ویژگی‌های نااستفاده شده و فرصت‌های به‌روزرسانی اسکن می‌کنیم. این کار هر بار که اسکن می‌شود اجرا می‌شود و تا زمانی که دوباره اسکن نشود در کش ذخیره می‌ماند.",
       "fullReport": "گزارش کامل",
       "fullReportDesc": "گزارش استفاده از ویژگی‌ها را (هر پکیجی که اسکن شده، هر ویژگی ای که از چنلگل اکتشاف شده) به فایل HTML/Markdown/JSON صادر کنید و آن را باز کنید.",
+      "fullReportGenerating": "گزارش کامل را تولید می‌کند — هر بست پaketی که اسکن شده، هر ویژگی لگ اصلاحاتی که استخراج شده. این کار هر بار که اسکن می‌شود اجرا می‌شود و در حافظه نگه داشته می‌شود تا زمانی که دوباره اسکن کنید.",
       "knownIssues": "مشکلات شناخته شده",
       "knownIssuesDesc": "پیکربندی های مرتبط با امنیت را که علیه وابستگی های شما گزارش شده است، مرور کنید.",
       "compare": "مقایسه کنید با هم مقایسه کنید",
@@ -1747,7 +1756,8 @@
       "restart": "راه اندازی مجدد دوباره Restart کردن",
       "stopped": "توقف کرده است",
       "logHeading": "فعالیت های فعالانه",
-      "logEmpty": "خروجی ایجاد نشده است — پروژه_هیلت نتیجه پیشرفت به صورت قدم به قدم گزارش نمی‌دهد، بنابراین این لاگ فقط در صورتی پر می‌شود که اسکن پیامی تشخیصی چاپ کند."
+      "logEmpty": "خروجی ایجاد نشده است — این لاگ فقط در صورتی پر می‌شود که اسکن پیامی دیagnostیک چاپ کند.",
+      "progress": "{percent}% — {done}/{total} فایلها"
     },
     "reports": {
       "intro": "یک کلیک گزارش CLI که پیش از این نیاز به یک ترمینال داشت. هر بار که دکمه اجرا فشرده شود، خروجی زنده ابزار در زیر کارت آن نمایش داده می‌شود و یک کپی در پوشه reports/.saropa_lints/reports-tab/ ذخیره می‌شود.",
@@ -1787,16 +1797,27 @@
         "desc": "بررسی analysis_options.yaml و analysis_options_custom.yaml برای مشکلات رایج در تنظیمات: کلیدهایی که در فایل اشتباه قرار دارند، یک فایل سفارشی که وجود ندارد یا یک محدودیت نسخه که وجود ندارد."
       },
       "gate": {
-        "editorLabel": "سروپا_کیفیت_درگاه.yaml تهیه کردن",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "کیفیت_درگاه:\n  شرایط:\n    - معیار: جدید_مشکلات_حرجی\n      عملگر: برابر\n      مقدار: 0\n      در_صورت_ناموفق: شکست /نیاز_به_فکر",
         "save": "Save Save ذخیره کنید",
         "saved": "ذخیره شده",
         "saveError": "نمی توان ذخیره کرد"
-      }
+      },
+      "colFile": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "colLineNum": "خط خط خط",
+      "colRule": "قاعده قانون اساسی",
+      "colSeverity": "شدت: میزان شدید بودن",
+      "colMessage": "پیام پیغام پیام پیام",
+      "colKey": "کلید"
     },
     "shortcuts": {
       "jumpToTab": "به تب ۱-۲ (نقشه، گزارش) بروید",
       "showOverlay": "این shortcut overlay را نشان دهید."
+    },
+    "hero": {
+      "files": "فایل ها و فایلها",
+      "lines": "خطوط",
+      "size": "اندازه ی سایز: Size"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "لاگ"
     },
     "engine": {
-      "analyzerPlugin": "پلاگین تحلیلگر",
-      "scanDaemon": "اسкан Daemon",
+      "analyzerPlugin": "تحلیل زنده",
+      "scanDaemon": "اسکن در زمان ذخیره",
       "lspServer": "سرور LSP",
       "pid": "PID:",
       "status": "وضعیت:",
@@ -1949,7 +1970,8 @@
         "running": "اجرای کردن",
         "stopped": "توقف کرده است",
         "suspended": "معلق",
-        "starting": "شروع کردن"
+        "starting": "شروع کردن",
+        "scanning": "اسکن کردن"
       },
       "rssNote": {
         "inProcess": "در فرآیند، قابل اندازه گیری به صورت جداگانه نیست",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "در داخل سرور تحلیل Dart اجرا می‌شود — خطاهای زنده در ویرایشگر هنگام تایپ، نیازی به اسکن نیست. فعال کردن/غیرفعال کردن پلاگین‌ها را بازنویسی می‌کند: بلوک در analysis_options.yaml",
         "scanDaemon": "процیس پسزمینه ای که پروژه کامل را در هر ذخیره مجدد اسکن مجدد و گزارشات را نوشته می‌کند/.saropa_lints/violations.json. خاموش کردن آن آن را متوقف می‌کند؛ ذخیره مجدد بعدی آن را مجدد فعال می‌کند.",
         "lspServer": "کنترل سرور زبان — اطلاعات تشخیصی را به پنل مشکلات برای فایل‌های باز و فضای کاری انتشار می‌دهد. فعال کردن یا غیر فعال کردن تنظیم saropaLints.lspServer.enabled را نوشته می‌کند."
-      }
+      },
+      "scanProgress": "اسکن: {done}/{total} فایل ها"
     },
     "toggle": {
       "on": "اون /نیست",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "نقض دیدگاه ها View Violations",
       "noErrors": "Saropa Lints: _PH0_: = PH0__::: -پای بدون خطا!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: _PH0_: = PH0__::: -پای هیچ پوشه ای از فضای کاری باز نیست. ابتدا پروژه Dart/Flutter خود را باز کنید.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ادغام لینت غیر فعال است. قبل از اجرای تحلیل آن را فعال کنید.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: اسکن در زمان ذخیره غیر فعال است. آن را قبل از اجرای تحلیل فعال کنید.",
       "pluginAlive": "Saropa Lints زنده است: {rules} قوانین فعال شده، فایل های {files} تجزیه و تحلیل شدند.",
       "openPubspecFailed": "pubspec.yaml باز نشد: {message}",
       "toggleSidebarSectionFailed": "Saropa Lints: تغییر بخش نوار کناری - {message} انجام نشد",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: _ PH2__::: به صورت یکپارچه و در کنار pub get موفق شد اما saropa_lints حل نشد. چک کردن قالب بندی pubspec.yaml .",
       "configWriteFailedNs": "Saropa Lints: _PH1_: به معنی PH1. config write ناکام شد. {details}",
       "disabled": "Saropa Lints غیرفعال است. فایل های پروژه تغییر نکرده اند.",
-      "disabledAnalyzer": "Saropa Lints یکپارچه سازی غیرفعال شد. تشخیص تجزیه کننده به زودی روشن خواهد شد؛ بر روی Lint integration تا بازیابی شود.",
+      "disabledAnalyzer": "نتیجه ی انتگریسیون Saropa Lints غیر فعال شده است. تشخیصات تحلیل کننده به سرعت پاک خواهند شد؛ برای بازگردانی، گزینه اسکن در زمان ذخیره را به روشن کنید.",
       "reenabledPlugin": "Saropa Lints پلاگین درون پروسه دوباره فعال شد. بازگردانی سرور تحلیل Dart را برای بارگذاری مجدد آن انجام می‌دهیم.",
       "reenableNothingToRestore": "Saropa Lints: چیزی برای بازیابی نیست. پلاگین در процه نیست که اکنون از طریق افزونه غیرفعال شده است.",
       "noOpenDartFiles": "Saropa Lints: _PH0_: = PH0__::: -پای هیچ فایل Dart باز یافت نشد. یک فایل Dart را دوباره باز کنید یا تنظیمات \"فقط ویرایشگرها را باز کنید\" را غیرفعال کنید.",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "فراوردن فرآیند اسکن به موقع پاسخ نداد.",
       "scanOnSaveDaemonExited": "فراوردن فرآیند متوقف شد. در نگهداری بعدی مجدد شروع خواهد شد.",
       "scanOnSaveDaemonBackoff": "فراوردن فرآیند متوقف شده است و منتظر بازگشت به فعال شدن است. لطفاً مجدد ذخیره کنید.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints غیر فعال است — قبل از اجرای اسکن پروژه کامل، \"نتیجه گیری انتگریسیون\" را فعال کنید.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints غیر فعال است — قبل از اجرای یک اسکن پروژه کامل، \"اسکن در زمان ذخیره\" را فعال کنید.",
       "scanOnSaveBaselineAlreadyRunning": "اسکن پروژه کامل در حال اجرا است.",
       "scanOnSaveBaselineCanceled": "اسکن پروژه کامل پس از {scanned}/{total} فایل لغو شد.",
       "scanOnSaveBaselineFailed": "اسکن پروژه کامل ناموفق بود: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "این فایل ایگنورهای قدیمی را رفع کنید"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "گرمایشگر · {percent}% بررسی شده",
+      "hotspotsDescription": "{open} باز کنید",
+      "lastRunLabel": "آخرین اجرا · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "همه دستورات…",
+      "commandCatalogDescription": "جستجوی تمام دستورات"
     }
   }
 }

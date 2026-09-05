@@ -279,7 +279,7 @@
         "hint": "Mengatasi tingkat keparahan aturan tertentu, atau mematikan secara keseluruhan, secara independen dari tier dan paket aturan.",
         "level": "Tingkat",
         "empty": "Tidak ada pengaturan override tingkat keparahan.",
-        "rulePlaceholder": "nama_aturan",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Tingkat keparahan baru"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Pengaturan tampilan secara keseluruhan untuk ekstensi.",
-      "linkNote": "Aturan ketat:\n1. Pengaturan integrasi lint menyala/mati terdapat di baris status sidebar; tingkatan analisis terdapat di tab Tier — keduanya melakukan lebih dari sekadar menulis pengaturan biasa, sehingga tidak diduplikasi di sini."
+      "linkNote": "Atur skan saat menyimpan on/off berada di baris status sidebar; tingkatan analisis berada di tab Tingkatan — keduanya melakukan lebih dari sekadar menulis pengaturan biasa, sehingga tidak duplikat di sini."
     },
     "shortcuts": {
       "jumpToTab": "Lompat ke tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: Tingkat yang lebih rendah. {tier} adalah"
     },
     "controls": {
-      "analyzerPlugin": "Plugin Analyzer",
-      "analyzerPluginDisabled": "Off — scan-on-save hanya",
+      "analyzerPlugin": "Analisis langsung",
+      "analyzerPluginDisabled": "Off — scan saat menyimpan hanya",
       "analyzerPluginAbsent": "Belum dikonfigurasi",
       "laneLight": "Light — ~200 aturan dalam editor, sisanya saat menyimpan",
       "laneFull": "Lengkap — setiap aturan yang diaktifkan dalam editor",
@@ -918,7 +918,14 @@
       "colCount": "Count (penghitungan)",
       "colSeverity": "Tingkat keparahan",
       "colActionsAria": "Tindakan baris Row actions.",
-      "filesAffected": "File yang terkena dampak ({count})"
+      "filesAffected": "File yang terkena dampak ({count})",
+      "howToFixHeading": "Bagaimana cara memperbaiki",
+      "owaspMobileLabel": "Seluler",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "Aturan terkait",
+      "sameTagHeading": "Pemetaan penemuan tag yang sama",
+      "migrationHeading": "Pemindahan",
+      "supersedesLabel": "Menggantikan:"
     },
     "findings": {
       "sectionAria": "Temuan-temuan yang ditemukan.",
@@ -1118,8 +1125,10 @@
       "overview": "Ringkasan",
       "upgrades": "Pembaruan",
       "upgradesDesc": "Tinjau pembaruan paket yang tersedia, dikelompokkan berdasarkan risiko, dengan penerapan satu klik.",
+      "upgradesGenerating": "Mengamati proyek Anda untuk fitur yang belum diadopsi dan kesempatan pembaruan. Ini berjalan sekali per pemindaian dan tetap disimpan di cache hingga Anda memindai kembali.",
       "fullReport": "Laporan lengkap",
       "fullReportDesc": "Ekspor laporan penggunaan fitur yang lengkap (setiap paket yang di-scan, setiap fitur yang di-ekstrak dari changelog) sebagai file HTML/Markdown/JSON dan buka.",
+      "fullReportGenerating": "Menghasilkan laporan lengkap — setiap paket yang diketahui, setiap fitur yang diambil dari changelog. Ini berjalan sekali per pemindaian dan tetap disimpan di cache hingga Anda memindai kembali.",
       "knownIssues": "Masalah yang diketahui",
       "knownIssuesDesc": "Telusuri kerentanan dan advisories yang dilaporkan terhadap dependensi Anda.",
       "compare": "membandingkan dan memperbandingkannya.",
@@ -1747,7 +1756,8 @@
       "restart": "Restart ulang mulai dari awal.",
       "stopped": "Berhenti",
       "logHeading": "Aktivitas Aktifitas.",
-      "logEmpty": "Tidak ada output saat ini — project_health tidak melaporkan kemajuan secara langkah demi langkah, sehingga log ini hanya terisi jika pemindaian mencetak pesan diagnostik."
+      "logEmpty": "Belum ada output — log ini hanya terisi jika pemindaian mencetak pesan diagnostik.",
+      "progress": "{percent}% — {done}/{total} file"
     },
     "reports": {
       "intro": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Laporan CLI satu klik yang sebelumnya memerlukan terminal. Setiap tombol Run mengalirkan output langsung alat di bawah kartu dan menyimpan salinan di bawah reports/.saropa_lints/reports-tab/",
@@ -1787,16 +1797,27 @@
         "desc": "Memeriksa analysis_options.yaml dan analysis_options_custom.yaml untuk kesalahan konfigurasi umum: kunci di file yang salah, file custom yang hilang, atau pembatasan versi yang hilang."
       },
       "gate": {
-        "editorLabel": "ambang batas saropa_quality_gate.yaml",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "gerbang_kualitas:\n  kondisi:\n    - metrik: masalah_kritis_baru\n      op: persamaan\n      nilai: 0\n      on_fail: gagal",
         "save": "Save Save Save (dalam bahasa Inggris).",
         "saved": "Disimpan",
         "saveError": "Tidak dapat menyimpan"
-      }
+      },
+      "colFile": "File yang berupa file.",
+      "colLineNum": "Garis garis garis garis",
+      "colRule": "Peraturan Pemerintah Peraturan Negara",
+      "colSeverity": "Tingkat keparahan",
+      "colMessage": "Pesan pesan pesan pesan.",
+      "colKey": "Kunci"
     },
     "shortcuts": {
       "jumpToTab": "Lompat ke tab 1-2 (Peta, Laporan)",
       "showOverlay": "Tampilkan overlay shortcut ini."
+    },
+    "hero": {
+      "files": "File-file yang ada di dalamnya.",
+      "lines": "Baris",
+      "size": "Ukuran ukuran Size Size."
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Catatan"
     },
     "engine": {
-      "analyzerPlugin": "Analisis Plugin",
-      "scanDaemon": "Pindai Daemon",
+      "analyzerPlugin": "Analisis Langsung",
+      "scanDaemon": "Scan saat Menyimpan",
       "lspServer": "Server LSP",
       "pid": "PID:",
       "status": "Status:",
@@ -1949,7 +1970,8 @@
         "running": "berlari",
         "stopped": "berhenti",
         "suspended": "dihanguskan",
-        "starting": "memulai"
+        "starting": "memulai",
+        "scanning": "memindai"
       },
       "rssNote": {
         "inProcess": "dalam proses, tidak dapat diukur secara terpisah",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Berjalan di dalam server analisis Dart — garis bawah dalam editor saat Anda mengetik, tanpa perlu scan. Mengaktifkan/menonaktifkan mengubah ulang plugin: blok dalam analysis_options.yaml.",
         "scanDaemon": "Proses latar belakang yang mere-scan seluruh proyek saat disimpan dan menulis laporan/.saropa_lints/violations.json. Mengaktifkan/Nonaktifkan akan menghentikannya; penyimpanan berikutnya akan melanjutkannya.",
         "lspServer": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Pemisah server bahasa — menerbitkan diagnosis ke panel Masalah untuk berkas yang terbuka dan berkas kerja. Mengaktifkan/Nonaktifkan menulis pengaturan saropaLints.lspServer.enabled."
-      }
+      },
+      "scanProgress": "Scan: {done}/{total} file"
     },
     "toggle": {
       "on": "NYALA",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "View Pelanggaran-pelanggaran",
       "noErrors": "Saropa Lints: adalah suatu bentuk dari _PH0_. Tidak ada kesalahan!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: adalah suatu bentuk dari _PH0_. tidak ada folder workspace yang terbuka. Buka proyek Dart/Flutter Anda terlebih dahulu.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: integrasi lint dinonaktifkan. Aktifkan sebelum menjalankan analisis.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: scan on save dimatikan. Aktifkan sebelum menjalankan analisis.",
       "pluginAlive": "Saropa Lints masih hidup: {rules} aturan diaktifkan, file {files} dianalisis.",
       "openPubspecFailed": "Gagal membuka pubspec.yaml: {message} adalah",
       "toggleSidebarSectionFailed": "Saropa Lints: adalah suatu senyawa yang gagal untuk toggle bagian sidebar  ⁇ {message} adalah",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: pub berhasil tetapi saropa_lints tidak terselesaikan. Periksa pemformatan pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: adalah suatu senyawa yang config write gagal. {details}",
       "disabled": "Saropa Lints dinonaktifkan. File proyek tidak diubah.",
-      "disabledAnalyzer": "Saropa Lints integrasi dimatikan. Diagnostik analis akan segera dibersihkan; toggle Integrasi Lint Dihidupkan untuk mengembalikan.",
+      "disabledAnalyzer": "Pengintegrasian Saropa Lints dinonaktifkan. Diagnostik analis akan membersihkan segera; aktifkan kembali Scan on save untuk memulihkannya.",
       "reenabledPlugin": "Saropa Lints plugin dalam proses diaktifkan kembali. Mengulang restart server analisis Dart untuk memuat ulangnya.",
       "reenableNothingToRestore": "Saropa Lints: tidak ada yang bisa dikembalikan. Plugin dalam proses tidak saat ini dinonaktifkan melalui ekstensi.",
       "noOpenDartFiles": "Saropa Lints: adalah suatu bentuk dari _PH0_. tidak ada file Dart terbuka yang ditemukan. Buka kembali file Dart atau matikan pengaturan \"Buka editor saja\".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "Proses pemindaian tidak merespons tepat waktu.",
       "scanOnSaveDaemonExited": "Proses pemindaian berhenti secara tidak terduga. Ia akan dijalankan kembali pada penyimpanan berikutnya.",
       "scanOnSaveDaemonBackoff": "Proses pemindaian berhenti beberapa saat lalu dan menunggu untuk dijalankan kembali. Simpan kembali dalam beberapa saat.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints dimatikan — nyalakan \"Lint integration\" sebelum melakukan pemindaian seluruh proyek.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints dimatikan — nyalakan \"Scan saat menyimpan\" sebelum melakukan pemindaian seluruh proyek.",
       "scanOnSaveBaselineAlreadyRunning": "Pindaian seluruh proyek sedang berjalan.",
       "scanOnSaveBaselineCanceled": "Pindaian seluruh proyek dibatalkan setelah {scanned}/{total} file.",
       "scanOnSaveBaselineFailed": "Pindaian seluruh proyek gagal: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Perbaiki ignores yang usang dalam berkas ini"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% diulas",
+      "hotspotsDescription": "{open} buka",
+      "lastRunLabel": "Lalu run · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Semua perintah…",
+      "commandCatalogDescription": "Cari semua perintah"
     }
   }
 }

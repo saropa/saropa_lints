@@ -132,4 +132,141 @@ dependencies:
       expect(ProjectContext.hasWebSupport(orphan), isTrue);
     });
   });
+
+  /// Tests for [ProjectContext.isCliOrToolPackage] — the guard that fixes
+  /// bugs/avoid_platform_specific_imports_false_positive_analyzer_plugin.md
+  /// (46 false positives on saropa_lints' own `dart:io` imports, which are
+  /// legitimate: saropa_lints is a CLI tool and analyzer plugin, never a
+  /// web-targeting package).
+  group('ProjectContext.isCliOrToolPackage', () {
+    late Directory tempRoot;
+
+    setUp(() {
+      ProjectContext.clearCache();
+      tempRoot = Directory.systemTemp.createTempSync('saropa_cli_pkg_gate_');
+    });
+
+    tearDown(() => safeDeleteDir(tempRoot));
+
+    String writeProject(String pubspec) {
+      File(p.join(tempRoot.path, 'pubspec.yaml')).writeAsStringSync(pubspec);
+      final libDir = Directory(p.join(tempRoot.path, 'lib'))
+        ..createSync(recursive: true);
+      final dartFile = File(p.join(libDir.path, 'main.dart'))
+        ..writeAsStringSync('void main() {}\n');
+      return dartFile.path;
+    }
+
+    test('pubspec with executables: section → true', () {
+      // The `executables:` section is what `dart run <pkg>:<name>` uses to
+      // find CLI entrypoints — its presence is a direct declaration that
+      // this package ships command-line tools, matching saropa_lints'
+      // own pubspec.yaml.
+      final path = writeProject('''
+name: my_cli_tool
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+executables:
+  my_cli_tool: my_cli_tool
+''');
+      expect(ProjectContext.isCliOrToolPackage(path), isTrue);
+    });
+
+    test('pubspec depending on custom_lint_builder → true', () {
+      // custom_lint_builder is the SDK used to author a custom_lint plugin
+      // — such a package runs inside the analysis server process, never
+      // in a browser, so dart:io is safe regardless of web-support gate.
+      final path = writeProject('''
+name: my_plugin
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+dependencies:
+  custom_lint_builder: ^0.6.0
+''');
+      expect(ProjectContext.isCliOrToolPackage(path), isTrue);
+    });
+
+    test('pubspec depending on analyzer_plugin → true', () {
+      // analyzer_plugin is the SDK saropa_lints itself depends on to
+      // implement the native analyzer-plugin protocol — the exact
+      // scenario in the bug report (analyzer plugin package flagged for
+      // its own required dart:io import).
+      final path = writeProject('''
+name: my_analyzer_plugin
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+dependencies:
+  analyzer_plugin: ^0.14.0
+''');
+      expect(ProjectContext.isCliOrToolPackage(path), isTrue);
+    });
+
+    test('plain multi-platform package with no CLI/plugin signal → false', () {
+      // The rule must still fire for its intended case: a shared library
+      // or app with no CLI/plugin markers, where a stray dart:io import
+      // really would break a web build.
+      final path = writeProject('''
+name: my_shared_lib
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+dependencies:
+  meta: ^1.12.0
+''');
+      expect(ProjectContext.isCliOrToolPackage(path), isFalse);
+    });
+
+    test('null filePath → false (unknown → do not suppress rules)', () {
+      // Unlike hasWebSupport's "unknown → true / assume strict" default,
+      // isCliOrToolPackage defaults to false on an unreadable project: not
+      // knowing whether a package is a CLI tool must not silently disable
+      // otherwise-applicable rules.
+      expect(ProjectContext.isCliOrToolPackage(null), isFalse);
+    });
+  });
+
+  /// Tests for [ProjectContext.isInShortLivedToolDirectory] — the per-file
+  /// complement to [ProjectContext.isCliOrToolPackage]. A `tool/` script can
+  /// live inside an otherwise browser-facing app package that carries none
+  /// of the whole-package CLI/plugin signals, so the path-based check is
+  /// needed in addition to the pubspec-based one.
+  group('ProjectContext.isInShortLivedToolDirectory', () {
+    test('file under bin/ → true', () {
+      expect(
+        ProjectContext.isInShortLivedToolDirectory('/repo/bin/main.dart'),
+        isTrue,
+      );
+    });
+
+    test('file under tool/ → true', () {
+      expect(
+        ProjectContext.isInShortLivedToolDirectory(
+          '/repo/tool/generate.dart',
+        ),
+        isTrue,
+      );
+    });
+
+    test('Windows-style backslash path under tool/ → true', () {
+      // Path separators must be normalized — Windows callers pass
+      // backslash paths, and a naive '/tool/' substring check would miss
+      // them entirely.
+      expect(
+        ProjectContext.isInShortLivedToolDirectory(
+          r'D:\repo\tool\generate.dart',
+        ),
+        isTrue,
+      );
+    });
+
+    test('file under lib/ → false', () {
+      expect(
+        ProjectContext.isInShortLivedToolDirectory('/repo/lib/main.dart'),
+        isFalse,
+      );
+    });
+
+    test('null filePath → false', () {
+      expect(ProjectContext.isInShortLivedToolDirectory(null), isFalse);
+    });
+  });
 }

@@ -175,6 +175,54 @@ function buildHotspotsPill(input: ViolationsDashboardHtmlInput): string[] {
   ];
 }
 
+/**
+ * Quality-gate pill (TASK B — "surface quality-gate status where users
+ * already look"). Before this, gate pass/fail was computed and rendered
+ * ONLY inside the Code Health dashboard (`projectVibrancyReportView.ts`'s
+ * `buildHero`/`buildGateBanner`, `payload.gates?.pass === false`) — a failing
+ * gate was invisible anywhere else, including here where users already look
+ * first.
+ *
+ * Reads `input.qualityGate` rather than calling `getLastProjectVibrancyPayload()`
+ * itself: that accessor lives in `projectVibrancyReportView.ts`, which imports
+ * `vscode` at module scope, and this file (`violations-dashboard-top.ts`) is a
+ * pure HTML-string builder deliberately free of any `vscode` dependency — its
+ * own test suite (`violationsDashboardHtml.test.ts`) exercises it without the
+ * vscode test mock registered. `violationsWideReportView.ts` (the composer)
+ * populates `input.qualityGate` straight from `getLastProjectVibrancyPayload()
+ * .gates` — same field `buildHero`/`buildGateBanner` already render, so this
+ * pill can never disagree with the Code Health dashboard, and no gate
+ * threshold/logic is duplicated here.
+ *
+ * Absent entirely (not a pill reading "unknown") when no Code Health scan has
+ * run this session — `input.qualityGate` is `undefined` until a scan
+ * completes, matching the "degrade honestly, no fabricated state" contract
+ * the other live pills on this status line already follow (`buildHotspotsPill`,
+ * `buildHistoryPills`).
+ */
+function buildQualityGatePill(input: ViolationsDashboardHtmlInput): string[] {
+  const gate = input.qualityGate;
+  if (!gate) return [];
+  const { pass, violationCount } = gate;
+  const cls = pass ? 'pill good toggle' : 'pill bad toggle';
+  const title = escapeHtml(
+    pass
+      ? l10n('findingsDash.status.qualityGatePassingTitle')
+      : l10n('findingsDash.status.qualityGateFailingTitle', { count: String(violationCount) }),
+  );
+  const pillText = escapeHtml(
+    pass
+      ? l10n('findingsDash.status.qualityGatePassingPill')
+      : l10n('findingsDash.status.qualityGateFailingPill'),
+  );
+  // Clickable through to Code Health, the dashboard that owns the gate's full
+  // breakdown (violation list) — same click-through pattern the Hotspots pill
+  // uses for its own owning surface.
+  return [
+    `<span class="${cls}" role="button" tabindex="0" data-palette-cmd="saropaLints.openProjectVibrancyReport" title="${title}">${pillText}</span>`,
+  ];
+}
+
 /** Status line under the title — freshness + highest-signal facts (§4.1). */
 export function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const parts: string[] = [];
@@ -212,6 +260,11 @@ export function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const findingsClass = findings === 0 ? 'good' : findings > 100 ? 'bad' : 'warn';
   const findingLabel = pluralize(findings, { one: l10n('findingsDash.status.findingOne'), other: l10n('findingsDash.status.findingOther') }); // l10n:passthrough — {count} substituted by pluralize()
   parts.push(`<span class="pill ${findingsClass}" title="${escapeHtml(l10n('findingsDash.status.findingsAfterFilterTitle'))}">${findingLabel}</span>`);
+  // TASK B: quality-gate pill right after the findings-count pill — a failing
+  // gate is a high-priority signal that belongs near the top of the status
+  // line, not buried after trend/hotspot pills. Renders nothing before the
+  // first Code Health scan (see buildQualityGatePill's doc comment).
+  parts.push(...buildQualityGatePill(input));
   // WP4 (plans/PLAN_sidebar_row_collapse.md §3): trend/regression/hotspot pills
   // replace the sidebar Status panel's Trends / Score dropped / "N fewer
   // issues" / Hotspots rows, which are cut in WP5 once this landing spot

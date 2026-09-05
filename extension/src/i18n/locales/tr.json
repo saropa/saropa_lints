@@ -264,7 +264,7 @@
         "label": "saropa_tier"
       },
       "runtimeTier": {
-        "label": "çalışma zamanı_tier"
+        "label": "runtime_tier"
       },
       "lane": {
         "title": "Analiz kanalı",
@@ -279,7 +279,7 @@
         "hint": "Belirli bir kuralın önem derecesini geçersiz kılar veya katman ve kural paketlerinden bağımsız olarak onu tamamen kapatır.",
         "level": "Seviye",
         "empty": "Hiçbir önem derecesi geçersiz kılma ayarı yapılmadı.",
-        "rulePlaceholder": "kural_adı",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Yeni önem düzeyi"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Uzantı çapında görüntüleme tercihleri.",
-      "linkNote": "Lint entegrasyonu açık/kapalı, kenar çubuğunun durum satırında bulunur; analiz katmanı Katman sekmesinde bulunur; her ikisi de basit ayar yazma işleminden daha fazlasını yapar, bu nedenle burada kopyalanmazlar."
+      "linkNote": "Kaydetme sırasında tarayın aç/kapalı, yan menüdeki durum satırında; analiz seviyesi, Seviye sekmesinde bulunur — ikisi de sadece bir ayar yazısı değil, daha fazlası olduğu için burada tekrarlanmamıştır."
     },
     "shortcuts": {
       "jumpToTab": "Tab 1-7'ye (Tier, Kural Paketleri, Üstünlükler, SDK Yayılımı, Yapılandırma Dosyası, Otomasyon, Uzantı) atla",
@@ -369,7 +369,7 @@
       "descriptionNoLane": "Tier: Seviye, seviye. {tier} _PH0___ -Hepimiz birer insanız."
     },
     "controls": {
-      "analyzerPlugin": "Analiz eklentisi",
+      "analyzerPlugin": "Canlı analiz",
       "analyzerPluginDisabled": "Kapalı — sadece kaydedildiğinde taranır",
       "analyzerPluginAbsent": "Ayarlanmamış",
       "laneLight": "Hafif — ~200 kural editörde, kalanlar kaydedilirken",
@@ -918,7 +918,14 @@
       "colCount": "Sayın sayın, sayın sayınız.",
       "colSeverity": "Ciddilik Ağırlık",
       "colActionsAria": "Sıra eylemleri Sıralı eylemler",
-      "filesAffected": "Etkilenen dosyalar ({count})"
+      "filesAffected": "Etkilenen dosyalar ({count})",
+      "howToFixHeading": "Nasıl düzeltilir",
+      "owaspMobileLabel": "Mobil",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "İlgili kurallar",
+      "sameTagHeading": "Aynı etiketle keşif",
+      "migrationHeading": "Geçiş",
+      "supersedesLabel": "İkame eder:"
     },
     "findings": {
       "sectionAria": "Bulgular Bulguları",
@@ -1118,8 +1125,10 @@
       "overview": "Genel Bakış",
       "upgrades": "Yükseltmeler",
       "upgradesDesc": "Tek tıkla uygulamayla, riske göre gruplandırılmış mevcut paket yükseltmelerini inceleyin.",
+      "upgradesGenerating": "Projenizde alınmamış özellikler ve yükseltme fırsatlarını tarıyor. Bu işlem her tarma sırasında bir kez çalışır ve tekrar tarma yapana kadar önbellekte kalır.",
       "fullReport": "Tam rapor",
       "fullReportDesc": "Kapsamlı özellik kullanım raporunu (taranan her paket, çıkarılan her değişiklik günlüğü özelliği) bir HTML/Markdown/JSON dosyası olarak dışa aktarın ve açın.",
+      "fullReportGenerating": "Tam rapor oluşturma — her tarandığı paket, her çıkarılan changelog özelliği. Bu taranma başına bir kez çalışır ve tekrar tarandığına kadar önbellekte kalır.",
       "knownIssues": "Bilinen sorunlar",
       "knownIssuesDesc": "Bilinen açıklar ve uyarılar hakkında tarayın.",
       "compare": "Karşılaştırma Yapın",
@@ -1747,7 +1756,8 @@
       "restart": "Yeniden başlatma, yeniden başlatmak.",
       "stopped": "Durduruldu",
       "logHeading": "Aktivite Faaliyet Etkinliği",
-      "logEmpty": "Henüz çıktı yok — project_health adım adım ilerlemeyi bildirmez, dolayısıyla bu günlük yalnızca tarama bir tanılama mesajı yazdırdığında doldurulur."
+      "logEmpty": "Henüz çıkış yok — bu günlük sadece tarayıcı bir tanımlama mesajı yazarsa doldurulur.",
+      "progress": "{percent}% — {done}/{total} dosyaları"
     },
     "reports": {
       "intro": "Daha önce bir terminal gerektiren tek tıklamayla CLI raporları. Her Çalıştır düğmesi, aracın canlı çıktısını kartının altına aktarır ve bir kopyasını report/.saropa_lints/reports-tab/ altına kaydeder.",
@@ -1787,16 +1797,27 @@
         "desc": "analysis_options.yaml ve analysis_options_custom.yaml'ı yaygın yanlış yapılandırmalara karşı kontrol eder: yanlış dosyadaki anahtarlar, eksik özel dosya veya eksik sürüm kısıtlaması."
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml eşikleri",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "kalite_kapısı:\n  koşullar:\n    - ölçüm: new_critical_issues\n      işlem: eşdeğer\n      değer: 0\n      on_fail: başarısız",
         "save": "Save Save Save Kurtarma ve kurtarma",
         "saved": "Kaydedildi",
         "saveError": "Kaydedilemedi"
-      }
+      },
+      "colFile": "Dosya dosyası dosya dosya.",
+      "colLineNum": "Hattı çizgi çizgi.",
+      "colRule": "Kural Kanun kural",
+      "colSeverity": "Ciddilik Ağırlık",
+      "colMessage": "Mesaj mesajı mesajı",
+      "colKey": "Anahtar"
     },
     "shortcuts": {
       "jumpToTab": "Tab 1-2'ye (Harita, Raporlar) atla",
       "showOverlay": "Bu kısayol örtüsünü göster."
+    },
+    "hero": {
+      "files": "Dosyalar dosyaları.",
+      "lines": "Satırlar",
+      "size": "Boyut boyutu boyutu ölçüsü boyutu"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Kayıt"
     },
     "engine": {
-      "analyzerPlugin": "Analiz Eklentisi",
-      "scanDaemon": "Tarama Daemon",
+      "analyzerPlugin": "Canlı Analiz",
+      "scanDaemon": "Kaydetken Tarama",
       "lspServer": "LSP Sunucusu",
       "pid": "PID:",
       "status": "Durum:",
@@ -1949,7 +1970,8 @@
         "running": "çalışıyor",
         "stopped": "durdu",
         "suspended": "askıya alınmış",
-        "starting": "başlatma"
+        "starting": "başlatma",
+        "scanning": "tarama"
       },
       "rssNote": {
         "inProcess": "içerisinde, ayrı olarak ölçülmez",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Dart analiz sunucusunun içinde çalışır; siz yazdıkça düzenleyicide canlı dalgalı çizgiler oluşur, taramaya gerek yoktur. Geçiş, eklentileri yeniden yazar: analysis_options.yaml'deki blok.",
         "scanDaemon": "Arka plan süreci, kaydedilirken tüm projeyi tekrar taramak ve raporlar/.saropa_lints/violations.json yazmak için kullanılır. Aç/kapat butonu ile devre dışı bırakılır; bir sonraki kaydetme işlemiyle devam eder.",
         "lspServer": "Kısa Kural:  \n1. Sadece çevrilmiş metni döndürün.  \n2. Açıklamalar, giriş, markdown notasyonu veya çevreleyici tırnak işaretlerini içerme.  \n3. Metin içinde yer tutucu tokenlar olabilir: yer tutucu tokenlar. Her birini tam olarak yazılan şekilde, grammatik olarak doğru pozisyonda çeviriyi içine kopyalayın. Hiçbir tokeni çevirme, kaldırma veya biçimlendirme.  \n4. Çıktı, hedef dili için doğru yazım sistemi kullanmalıdır; cümle ortasında başka bir dillere geçme.  \n\nDil sunucusu — açık ve çalışma alanı dosyaları için Sorunlar paneline tanımlamalar yayınlar. Açma-kapatma saropaLints.lspServer.enabled ayarı yazar."
-      }
+      },
+      "scanProgress": "Tarama: {done}/{total} dosyaları"
     },
     "toggle": {
       "on": "AÇIK",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "View Violations İhtiyaçları ihlal edilmiştir.",
       "noErrors": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Hata yok, hata yok!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. hiçbir çalışma alanı klasörü açılmamıştır. Öncelikle Dart/Flutter projenizi açın.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: lint entegrasyonu devre dışı. Analiz çalıştırmadan önce etkinleştirin.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: Kaydetme sırasında tarayıcı devre dışı. Analiz çalıştırmadan önce etkinleştirin.",
       "pluginAlive": "Saropa Lints yaşıyor: {rules} kuralları etkinleştirildi, {files} dosyaları analiz edildi.",
       "openPubspecFailed": "pubspec.yaml açılamadı: {message} _PH0___ -Hepimiz birer insanız.",
       "toggleSidebarSectionFailed": "Saropa Lints: _PH1_: -HİS'in ilk aşamas yan çubuğu bölümünü geçirme başarısız oldu  ⁇ {message} _PH0___ -Hepimiz birer insanız.",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: _PH2_: - PH2__'de bulunan bir hü pub'un başarısı oldu ama saropa_lints çözülmedi. pubspec.yaml biçimlendirmeyi kontrol edin.",
       "configWriteFailedNs": "Saropa Lints: _PH1_: -HİS'in ilk aşamas config write başarısız oldu. {details}",
       "disabled": "Saropa Lints devre dışı bırakıldı. Proje dosyaları değiştirilmedi.",
-      "disabledAnalyzer": "Saropa Lints entegrasyonu kapalı. Analizör teşhisleri kısa sürede temizlenecek; toggle Lint entegrasyonu On restore.",
+      "disabledAnalyzer": "Saropa Lints entegrasyonu devre dışı. Analizci tanımlar kısa sürede temizlenecek; Scan on save'ı açarak geri yükleyin.",
       "reenabledPlugin": "Saropa Lints iç süreç eklentisi yeniden etkinleştirildi. Dart analiz sunucusunu yeniden başlatarak onu yeniden yüklüyor.",
       "reenableNothingToRestore": "Saropa Lints: geri yüklenmesi gereken şey yok. Eklenti aracılığıyla şu anda işlem içi eklenti devre dışı bırakılmamıştır.",
       "noOpenDartFiles": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. hiçbir açık Dart dosyası bulunamadı. Bir Dart dosyasını yeniden açın veya \"Sadece editörleri aç\" ayarını kapatın.",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "Tarama işlemi zamanında yanıt vermedi.",
       "scanOnSaveDaemonExited": "Tarama işlemi beklenmedik şekilde durdu. Bir sonraki kaydedme sırasında yeniden başlatılacak.",
       "scanOnSaveDaemonBackoff": "Tarama işlemi son zamanlarda durduruldu ve yeniden başlatmayı bekliyor. Bir an sonra tekrar kaydedin.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints devre dışı — tam proje taramasını çalıştırmadan önce \"Lint entegrasyonu\"yu açın.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints devre dışı — tam proje taramasını çalıştırmadan önce \"Kaydetken tara\" seçeneğini açın.",
       "scanOnSaveBaselineAlreadyRunning": "Bir proje taraması zaten çalışmaktadır.",
       "scanOnSaveBaselineCanceled": "Proje genel taraması {scanned}/{total} dosyaları ardından iptal edildi.",
       "scanOnSaveBaselineFailed": "Proje genel taraması başarısız: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Bu dosyadaki eski atlananları düzelt"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% inceledi",
+      "hotspotsDescription": "{open} aç",
+      "lastRunLabel": "Son çalıştırma · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Tüm komutlar…",
+      "commandCatalogDescription": "Tüm komutları arayın"
     }
   }
 }

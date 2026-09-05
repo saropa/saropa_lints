@@ -279,7 +279,7 @@
         "hint": "กำหนดความรุนแรงของกฎเฉพาะ หรือปิดใช้งานกฎนั้นโดยสมบูรณ์ ไม่ขึ้นกับระดับหรือชุดกฎ",
         "level": "ระดับ",
         "empty": "ไม่มีการตั้งค่าการแทนที่ความรุนแรง",
-        "rulePlaceholder": "กฎชื่อ",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "ระดับความรุนแรงใหม่"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "การตั้งค่าการแสดงผลทั้งส่วนขยาย",
-      "linkNote": "การเปิด/ปิดการรวม Lint อยู่ในแถวสถานะของแถบด้านข้าง ระดับการวิเคราะห์อยู่บนแท็บ Tier — ทั้งสองทำมากกว่าการเขียนการตั้งค่าธรรมดา ดังนั้นจึงไม่มีการทำซ้ำที่นี่"
+      "linkNote": "การสแกนเมื่อบันทึกเปิด/ปิดอยู่ในแถวสถานะของ Sidebar; ระดับการวิเคราะห์อยู่ในแท็บ Tier — ทั้งสองทำมากกว่าการเขียนค่าทั่วไป ดังนั้นจึงไม่ถูกซ้ำกันในที่นี้"
     },
     "shortcuts": {
       "jumpToTab": "ไปยังแท็บ 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: ระดับชั้น {tier} การตรวจสอบ"
     },
     "controls": {
-      "analyzerPlugin": "ปลั๊กอินวิเคราะห์",
-      "analyzerPluginDisabled": "ปิด — ตรวจเฉพาะเมื่อบันทึกเท่านั้น",
+      "analyzerPlugin": "การวิเคราะห์แบบเรียลไทม์",
+      "analyzerPluginDisabled": "ปิด — ถ่ายโอนเมื่อบันทึกเท่านั้น",
       "analyzerPluginAbsent": "ไม่ได้กำหนด",
       "laneLight": "แสง — ~200 กฎในตัวแก้ไข กฎอื่นๆ บันทึกเมื่อเซฟ",
       "laneFull": "ครบ — กฎทุกกฎที่เปิดใช้งานในตัวแก้ไข",
@@ -918,7 +918,14 @@
       "colCount": "นับนับ นับ นิยม",
       "colSeverity": "ความรุนแรง Severity",
       "colActionsAria": "การกระทํา Row actions กิจกรรมแถว",
-      "filesAffected": "ไฟล์ที่ได้รับผลกระทบ ({count})"
+      "filesAffected": "ไฟล์ที่ได้รับผลกระทบ ({count})",
+      "howToFixHeading": "วิธีแก้ไข",
+      "owaspMobileLabel": "มือถือ",
+      "owaspWebLabel": "เว็บ",
+      "relatedRulesHeading": "กฎที่เกี่ยวข้อง",
+      "sameTagHeading": "การค้นหาที่มีแท็กเดียวกัน",
+      "migrationHeading": "การย้ายข้อมูล",
+      "supersedesLabel": "แทนที่:"
     },
     "findings": {
       "sectionAria": "ผลการค้นพบ รายงาน",
@@ -1118,8 +1125,10 @@
       "overview": "ภาพรวม",
       "upgrades": "การอัพเกรด",
       "upgradesDesc": "ตรวจสอบการอัพเกรดแพ็คเกจที่มีอยู่ จัดกลุ่มตามความเสี่ยง เพียงคลิกเดียว",
+      "upgradesGenerating": "กำลังสแกนโปรเจกต์ของคุณเพื่อค้นหาคุณสมบัติที่ยังไม่ได้รับการนำไปใช้และโอกาสในการอัปเกรด ข้อความนี้จะทำงานทุกครั้งที่สแกนและจะถูกเก็บไว้ในแคชจนกว่าคุณจะสแกนอีกครั้ง",
       "fullReport": "รายงานฉบับเต็ม",
       "fullReportDesc": "ส่งออกรายงานการใช้งานคุณสมบัติทั้งหมด (ทุกแพ็กเกจที่ถูกสแกน ทุกคุณสมบัติที่ได้จากการวิเคราะห์ changelog) เป็นไฟล์ HTML/Markdown/JSON และเปิดไฟล์นั้น",
+      "fullReportGenerating": "กำลังสร้างรายงานทั้งหมด — ทุกแพ็กเกจที่ถูกสแกน ทุกคุณสมบัติที่ถูกขุดจาก changelog ข้อความนี้จะทำงานทุกครั้งที่สแกน และจะถูกเก็บไว้ในแคชจนกว่าคุณจะสแกนอีกครั้ง",
       "knownIssues": "ปัญหาที่ทราบ",
       "knownIssuesDesc": "เรียกดูช่องโหว่และคำแนะนำที่ทราบซึ่งรายงานเกี่ยวกับการพึ่งพาของคุณ",
       "compare": "เปรียบเทียบ Compare",
@@ -1747,7 +1756,8 @@
       "restart": "Restart การเริ่มต้นใหม่",
       "stopped": "หยุดแล้ว",
       "logHeading": "กิจกรรม Activity การดําเนินงาน",
-      "logEmpty": "ยังไม่มีผลลัพธ์ — project_health จะไม่รายงานความคืบหน้าทีละขั้นตอน ดังนั้นบันทึกนี้จะเติมก็ต่อเมื่อการสแกนพิมพ์ข้อความวินิจฉัยเท่านั้น"
+      "logEmpty": "ยังไม่มีผลลัพธ์ — บันทึกนี้จะถูกเติมข้อมูลเฉพาะเมื่อการสแกนพิมพ์ข้อความวินิจฉัย",
+      "progress": "{percent}% — {done}/{total} ไฟล์"
     },
     "reports": {
       "intro": "รายงาน CLI เพียงคลิกเดียวที่ก่อนหน้านี้ต้องใช้เทอร์มินัล ปุ่มเรียกใช้แต่ละปุ่มจะสตรีมเอาต์พุตสดของเครื่องมือด้านล่างการ์ด และบันทึกสำเนาไว้ใต้ Reports/.saropa_lints/reports-tab/",
@@ -1787,16 +1797,27 @@
         "desc": "ตรวจสอบ analysis_options.yaml และ analysis_options_custom.yaml เพื่อดูการกำหนดค่าที่ไม่ถูกต้องทั่วไป เช่น คีย์ในไฟล์ที่ไม่ถูกต้อง ไฟล์ที่กำหนดเองหายไป หรือข้อจำกัดเวอร์ชันที่หายไป"
       },
       "gate": {
-        "editorLabel": "เกณฑ์ saropa_quality_gate.yaml",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "คุณภาพ_ประตู:\n  เงื่อนไข:\n    - ตัวชี้วัด: new_critical_issues\n      สหกรณ์: เทียบเท่า\n      ค่า: 0\n      on_fail: ล้มเหลว",
         "save": "Save Save การรักษา",
         "saved": "บันทึกแล้ว",
         "saveError": "ไม่สามารถบันทึกได้"
-      }
+      },
+      "colFile": "File รายการ",
+      "colLineNum": "สาย เส้น เส้น",
+      "colRule": "กฎหมาย สังกัด",
+      "colSeverity": "ความรุนแรง Severity",
+      "colMessage": "ข้อความข้อความ Message",
+      "colKey": "คีย์"
     },
     "shortcuts": {
       "jumpToTab": "ไปยังแท็บ 1-2 (แผนที่, รายงาน)",
       "showOverlay": "แสดงการ overlay ทางลัดนี้"
+    },
+    "hero": {
+      "files": "ไฟล์ไฟล์ File",
+      "lines": "บรรทัด",
+      "size": "ขนาด Size หน่วยงาน"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "บันทึก"
     },
     "engine": {
-      "analyzerPlugin": "ปลั๊กอินวิเคราะห์",
-      "scanDaemon": "สแกน Daemon",
+      "analyzerPlugin": "การวิเคราะห์แบบเรียลไทม์",
+      "scanDaemon": "สแกนเมื่อบันทึก",
       "lspServer": "เซิร์ฟเวอร์ LSP",
       "pid": "PID:",
       "status": "สถานะ:",
@@ -1949,7 +1970,8 @@
         "running": "กำลังทำงาน",
         "stopped": "หยุด",
         "suspended": "หยุดใช้งาน",
-        "starting": "เริ่มต้น"
+        "starting": "เริ่มต้น",
+        "scanning": "การสแกน"
       },
       "rssNote": {
         "inProcess": "ในกระบวนการเดียวกัน ไม่สามารถวัดแยกได้",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "ทำงานภายในเซิร์ฟเวอร์การวิเคราะห์ Dart — ลายเส้นสดๆ ในโปรแกรมแก้ไขขณะที่คุณพิมพ์ ไม่จำเป็นต้องสแกน การสลับจะเขียนปลั๊กอินใหม่: บล็อกใน analysis_options.yaml",
         "scanDaemon": "กระบวนการเบื้องหลังที่สแกนซ้ำทั้งโปรเจ็กต์ในการบันทึกและเขียนรายงาน/.saropa_lints/violations.json การสลับปิดจะเป็นการระงับ; บันทึกถัดไปจะดำเนินการต่อ",
         "lspServer": "เซิร์ฟเวอร์ภาษาแยกต่างหาก — เผยแพร่การวินิจฉัยไปยังแผงปัญหาสำหรับไฟล์เปิดและพื้นที่ทำงาน การสลับจะเขียนการตั้งค่า saropaLints.lspServer.enabled"
-      }
+      },
+      "scanProgress": "สแกน: {done}/{total} ไฟล์"
     },
     "toggle": {
       "on": "บน",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "View Violations การละเมิดความเห็น",
       "noErrors": "Saropa Lints: เป็นการประกอบของ ไม่มีความผิดพลาด!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: เป็นการประกอบของ ไม่มีโฟลเดอร์ workspace ที่เปิดอยู่ เปิดโครงการ Dart/Flutter ของคุณก่อน",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: การบูรณาการ lint ถูกปิดอยู่ ให้เปิดใช้งานก่อนการวิเคราะห์",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: การสแกนเมื่อบันทึกถูกปิด ให้เปิดใช้งานก่อนเริ่มการวิเคราะห์",
       "pluginAlive": "Saropa Lints ยังมีชีวิตอยู่: {rules} กฎเปิดใช้งาน, {files} ไฟล์วิเคราะห์.",
       "openPubspecFailed": "ไม่สามารถเปิด pubspec.yaml: {message} การตรวจสอบ",
       "toggleSidebarSectionFailed": "Saropa Lints: เป็นการตรวจหา ไม่สามารถเปลี่ยนส่วน Sidebar ได้  ⁇ {message} การตรวจสอบ",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: สารที่ใช้ในการรักษา pub get ประสบความสําเร็จ แต่ saropa_lints ยังไม่ถูกแก้ไข ตรวจสอบการจัดฟอร์ม pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: เป็นการตรวจหา config write ไม่สําเร็จ. {details} การเขียนแบบการตั้งค่า",
       "disabled": "Saropa Lints มีการพิทักษ์. ไฟล์โครงการไม่ได้ถูกเปลี่ยน.",
-      "disabledAnalyzer": "Saropa Lints การรวมตัวถูกปิด. การวินิจฉัย Analyzer จะไถ่ในไม่ช้า; toggle Lint integration เปิดเพื่อฟื้นคืนการ",
+      "disabledAnalyzer": "การผสาน Saropa Lints ถูกปิด ข้อผิดพลาดของเครื่องมือวิเคราะห์จะถูกล้างในไม่ช้า ให้เปิด Scan on save ด้วยการคลิกเพื่อฟื้นฟู",
       "reenabledPlugin": "Saropa Lints ปลั๊กอินในกระบวนการถูกเปิดใช้งานอีกครั้ง กำลังเริ่มต้น Dart เซิร์ฟเวอร์การวิเคราะห์เพื่อโหลดมันใหม่",
       "reenableNothingToRestore": "Saropa Lints: ไม่มีอะไรให้กู้คืน ปลั๊กอินที่ทำงานในกระบวนการไม่ได้ถูกปิดใช้งานผ่านการขยายในขณะนี้",
       "noOpenDartFiles": "Saropa Lints: เป็นการประกอบของ ไม่พบไฟล์ Dart เปิด เปิดไฟล์ Dart อีกครั้ง หรือปิดการตั้งค่า \"เปิดเฉพาะบรรณาธิการ\"",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "กระบวนการสแกนไม่ตอบสนองทันเวลา",
       "scanOnSaveDaemonExited": "กระบวนการสแกนหยุดลงอย่างไม่คาดคิด กระบวนการจะเริ่มต้นใหม่เมื่อทำการบันทึกครั้งต่อไป",
       "scanOnSaveDaemonBackoff": "กระบวนการสแกนหยุดลงเมื่อไม่นานมานี้และกำลังรอเพื่อเริ่มต้นใหม่ บันทึกอีกครั้งในไม่กี่วินาที",
-      "scanOnSaveBaselineDisabled": "Saropa Lints ถูกปิด — เปิด \"การบูรณาการการลินต์\" ก่อนเริ่มการสแกนทั้งโครงการ",
+      "scanOnSaveBaselineDisabled": "Saropa Lints ถูกปิด — เปิด \"Scan on save\" ก่อนที่จะเริ่มการสแกนทั้งโครงการ",
       "scanOnSaveBaselineAlreadyRunning": "การสแกนทั้งโครงการอยู่ในระหว่างการดำเนินการแล้ว",
       "scanOnSaveBaselineCanceled": "การสแกนทั้งโครงการถูกยกเลิกหลังจาก {scanned}/{total} ไฟล์",
       "scanOnSaveBaselineFailed": "การสแกนทั้งโครงการล้มเหลว: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "แก้ไขการละเลยที่ไม่สมควรในไฟล์นี้"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "จุดร้อน · {percent}% รีวิวแล้ว",
+      "hotspotsDescription": "{open} เปิด",
+      "lastRunLabel": "ครั้งที่แล้ว · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "ทุกคำสั่ง…",
+      "commandCatalogDescription": "ค้นหาคำสั่งทั้งหมด"
     }
   }
 }

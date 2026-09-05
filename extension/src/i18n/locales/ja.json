@@ -261,10 +261,10 @@
         "none": "なし（ティアタブの設定を使用）"
       },
       "saropaTier": {
-        "label": "サロパティア_ティア"
+        "label": "saropa_tier"
       },
       "runtimeTier": {
-        "label": "ランタイムティア"
+        "label": "runtime_tier"
       },
       "lane": {
         "title": "分析レーン",
@@ -279,7 +279,7 @@
         "hint": "特定のルールの重みを上書きするか、あるいは完全に無効にする。階層やルールパックとは関係なく。",
         "level": "レベル",
         "empty": "深刻度の上書き設定はありません。",
-        "rulePlaceholder": "ルール名",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "新規の深刻度レベル"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "拡張機能全体の表示設定",
-      "linkNote": "リント統合のオン/オフはサイドバーのステータス行にあり、分析レベルはレベルタブにあります — どちらも単なる設定の書き込み以上を行いますので、ここには重複していません。"
+      "linkNote": "保存時にスキャンをオン/オフする設定はサイドバーのステータス行にあり、分析レベルはレベルタブにあります — どちらも単なる設定の書き込みより多くのことをしますので、ここには重複していません。"
     },
     "shortcuts": {
       "jumpToTab": "タブ1-7にジャンプ（ティア、ルールパック、オーバーライド、SDKロールアウト、設定ファイル、オートメーション、拡張機能）",
@@ -369,7 +369,7 @@
       "descriptionNoLane": "レベル: 一級. {tier} フォローしている"
     },
     "controls": {
-      "analyzerPlugin": "アナライザープラグイン",
+      "analyzerPlugin": "リアルタイム解析",
       "analyzerPluginDisabled": "オフ — 保存時にスキャンのみ",
       "analyzerPluginAbsent": "未設定",
       "laneLight": "ライト — ~200ルールインエディタ内、残りは保存時に実行",
@@ -918,7 +918,14 @@
       "colCount": "カウント・カウント・カウンット",
       "colSeverity": "深刻度 (severity) とは,重度の程度を問わず",
       "colActionsAria": "ローアクション (Row actions) は,行列のアクションをすること.",
-      "filesAffected": "影響を受けたファイル ({count})"
+      "filesAffected": "影響を受けたファイル ({count})",
+      "howToFixHeading": "どう修正する",
+      "owaspMobileLabel": "モバイル",
+      "owaspWebLabel": "ウェブ",
+      "relatedRulesHeading": "関連ルール",
+      "sameTagHeading": "同じタグの発見",
+      "migrationHeading": "移行",
+      "supersedesLabel": "上位:"
     },
     "findings": {
       "sectionAria": "発見結果は,",
@@ -1118,8 +1125,10 @@
       "overview": "概要",
       "upgrades": "アップグレード",
       "upgradesDesc": "リスク別に分類されたパッケージのアップグレードを確認し、ワンクリックで適用します。",
+      "upgradesGenerating": "プロジェクト内の未採用の機能とアップグレード機会をスキャンしています。これは各スキャンごとに実行され、再スキャンするまでキャッシュされます。",
       "fullReport": "フルレポート",
       "fullReportDesc": "すべてのスキャンされたパッケージ、すべての採掘されたチェンジログ機能をHTML/Markdown/JSONファイルとしてエクスポートし、それを開きます。",
+      "fullReportGenerating": "レポートの生成中 — すべてのスキャンされたパッケージ、すべての抽出された変更ログの機能。これは各スキャンごとに実行され、再スキャンするまでキャッシュされます。",
       "knownIssues": "既知の問題",
       "knownIssuesDesc": "依存関係に対して報告された既知の脆弱性とアドバイザリを閲覧します。",
       "compare": "比較して,比べてみる.",
@@ -1747,7 +1756,8 @@
       "restart": "再起動してリスタートします.",
       "stopped": "停止",
       "logHeading": "活動 (アクティビティー)",
-      "logEmpty": "まだ出力はありません — project_health はステップごとの進捗を報告しないので、このログはスキャン中に診断メッセージが表示された場合にのみ埋まります。"
+      "logEmpty": "まだ出力はありません — このログはスキャンが診断メッセージを出力した場合にのみ埋まります。",
+      "progress": "{percent}% — {done}/{total} ファイル"
     },
     "reports": {
       "intro": "ワンクリックでCLIレポートを生成でき、以前はターミナルが必要でした。各実行ボタンをクリックすると、ツールのリアルタイム出力をそのカードの下にストリームし、reports/.saropa_lints/reports-tab/以下にコピーを保存します。",
@@ -1787,16 +1797,27 @@
         "desc": "analysis_options.yaml と analysis_options_custom.yaml を確認し、一般的な構成ミスをチェックします: 間違ったファイルにキーがある、カスタムファイルが不足している、バージョン制約が不足しているなどの問題。"
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml サーティスファクション",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "品質ゲート:\n  条件:\n    - メトリック: new_critical_issues\n      OP: 等価\n      値: 0\n      on_fail: 失敗します",
         "save": "保存する Save",
         "saved": "保存されました",
         "saveError": "保存できませんでした"
-      }
+      },
+      "colFile": "ファイルは,ファイルの形式で",
+      "colLineNum": "ライン・ライン・線・ライン",
+      "colRule": "ルール ルールはルールの規則",
+      "colSeverity": "深刻度 (severity) とは,重度の程度を問わず",
+      "colMessage": "メッセージ・メッセージを伝える",
+      "colKey": "キーポイント"
     },
     "shortcuts": {
       "jumpToTab": "タブ1-2（マップ、レポート）に移動",
       "showOverlay": "このショートカットでオーバーレイを表示します."
+    },
+    "hero": {
+      "files": "ファイルは,ファイルのことです.",
+      "lines": "行",
+      "size": "サイズ サイズは"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "ログ"
     },
     "engine": {
-      "analyzerPlugin": "アナライザープラグイン",
-      "scanDaemon": "スキャン Daemon",
+      "analyzerPlugin": "リアルタイム解析",
+      "scanDaemon": "保存時にスキャン",
       "lspServer": "LSPサーバー",
       "pid": "PID:",
       "status": "状態:",
@@ -1949,7 +1970,8 @@
         "running": "実行中",
         "stopped": "停止",
         "suspended": "一時停止",
-        "starting": "開始"
+        "starting": "開始",
+        "scanning": "スキャン"
       },
       "rssNote": {
         "inProcess": "インプロセス、別途測定可能ではない",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Dart分析サーバー内で実行されます — タイピング中にエディタ内でリアルタイムで警告が表示されます（スキャン不要）。トグル操作はプラグインの設定を変更します: analysis_options.yamlにブロックを追加します。",
         "scanDaemon": "保存時にプロジェクト全体を再スキャンし、レポート/.saropa_lints/violations.json を書き込むバックグラウンド プロセス。オフに切り替えると一時停止します。次に保存すると再開されます。",
         "lspServer": "別個の言語サーバー — 開いているファイルおよびワークスペースファイルの診断情報を「問題」パネルに公開します。トグル操作は saropaLints.lspServer.enabled 設定に影響します。"
-      }
+      },
+      "scanProgress": "スキャン: {done}/{total} ファイル"
     },
     "toggle": {
       "on": "の上",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "ビュー違反を表示する",
       "noErrors": "Saropa Lints: フォローしている 間違いなし! エラーがない!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: 開いているワークスペース フォルダーがありません。まず Dart/Flutter プロジェクトを開きます。",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ライント統合はオフです。分析を実行する前に有効にしてください。",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: 保存時にスキャンをオフにしています。分析を実行する前に有効にしてください。",
       "pluginAlive": "Saropa Lintsは生きている: {rules}ルールが有効になり, {files}ファイルが解析されました.",
       "openPubspecFailed": "pubspec.yaml を開くのに失敗しました: {message} フォローしている",
       "toggleSidebarSectionFailed": "Saropa Lints: ヒトの体内にある サイドバーのセクションを切り替えることができませんでした. {message} フォローしている",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: ヒトの体内にある pub get は成功したが, saropa_lints は解決されなかった. pubspec.yaml フォーマットを確認.",
       "configWriteFailedNs": "Saropa Lints: ヒトの体内にある config 書き込みが失敗しました. {details}",
       "disabled": "Saropa Lints は無効になっています. プロジェクトファイルは変更されていません.",
-      "disabledAnalyzer": "Saropa Lints統合がオフになりました. 分析器の診断は間もなくクリアされる. トグタッチ Lint統合 復元をオンにする.",
+      "disabledAnalyzer": "Saropa Lints インテグレーションがオフになりました。アナライザ診断はすぐにクリアされます。スキャンオンセーブをオンに切り替えることで復元できます。",
       "reenabledPlugin": "Saropa Lints プラグインが再び有効になりました。Dart 分析サーバーを再起動してそのプラグインを再読み込みしています。",
       "reenableNothingToRestore": "Saropa Lints: 恢復するものがありません。拡張機能によって現在、インプロセスプラグインは無効にしていません。",
       "noOpenDartFiles": "Saropa Lints: フォローしている オープンした Dartファイルが見つかりませんでした. Dart ファイルを再開するか\",編集者のみを開く\"の設定をオフにします.",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "スキャンプロセスがタイムアウトしました。",
       "scanOnSaveDaemonExited": "スキャンプロセスが予期せず停止しました。次回の保存時に再開します。",
       "scanOnSaveDaemonBackoff": "スキャンプロセスは最近停止しており、再開を待っています。少々お待ちください。",
-      "scanOnSaveBaselineDisabled": "Saropa Lints はオフになっています — 全プロジェクトスキャンを実行する前に「Lint インテグレーション」をオンにしてください。",
+      "scanOnSaveBaselineDisabled": "Saropa Lintsはオフになっています — 全プロジェクトスキャンを実行する前に「保存時にスキャン」をオンにしてください。",
       "scanOnSaveBaselineAlreadyRunning": "プロジェクト全体のスキャンがすでに実行中です。",
       "scanOnSaveBaselineCanceled": "全体プロジェクトスキャンは {scanned}/{total} ファイルの後でキャンセルされました。",
       "scanOnSaveBaselineFailed": "プロジェクト全体スキャン失敗: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "このファイルの古くなった無視設定を修正してください"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "ホットスポット・{percent}%がレビューしました",
+      "hotspotsDescription": "{open} 開く",
+      "lastRunLabel": "先ほどの実行 · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "すべてのコマンド…",
+      "commandCatalogDescription": "すべてのコマンドを検索"
     }
   }
 }

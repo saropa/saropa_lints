@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Pamamaraan ng pagpapakita sa buong extension.",
-      "linkNote": "Ang integrasyon ng lint sa pagsusulit o pagsusulit ay nasa status row ng sidebar; ang antas ng analisis ay nasa tab na Tier — pareho ito ay nagawa ang mas marami kaysa sa isang simple setting write, kaya wala itong duplication dito."
+      "linkNote": "I-scan sa pag-save on/off ay nasa status row ng sidebar; ang analysis tier ay nasa Tier tab — pareho ay nagawa nang mas mahusay kaysa isang pangkaraniwang setting write, kaya wala silang duplicated dito."
     },
     "shortcuts": {
       "jumpToTab": "Pumunta sa tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: Ang antas ng pag-aari. {tier} ang kanyang mga"
     },
     "controls": {
-      "analyzerPlugin": "Plugin ng analyzer",
-      "analyzerPluginDisabled": "Off — scan-on-save lamang",
+      "analyzerPlugin": "Live na pagsusuri",
+      "analyzerPluginDisabled": "Off — scan sa pag-save lamang",
       "analyzerPluginAbsent": "Hindi nakakonekta",
       "laneLight": "Light — ~200 na mga rule sa loob ng editor, ang iba ay nagsisimula sa pag-save",
       "laneFull": "Full — lahat ng nakarehistro na rule sa loob ng editor",
@@ -918,7 +918,14 @@
       "colCount": "Ibilang ang bilang ng mga tao sa county.",
       "colSeverity": "Grabe ng sakit na ito ay ang pagiging malubhang.",
       "colActionsAria": "Mga aksyon sa hilera ng mga aksyong hilera.",
-      "filesAffected": "Ang mga file na apektado ({count})"
+      "filesAffected": "Ang mga file na apektado ({count})",
+      "howToFixHeading": "Paano mafix",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "Mga nauugnay na pautang",
+      "sameTagHeading": "Pangangalap ng parehong tag",
+      "migrationHeading": "Migrasyon",
+      "supersedesLabel": "Nagmula:"
     },
     "findings": {
       "sectionAria": "Mga Natuklasan sa Paghahanap",
@@ -1118,8 +1125,10 @@
       "overview": "Pangkalahatang-ideya",
       "upgrades": "Pangunahing Paggawa",
       "upgradesDesc": "Suriin ang mga magagamit na upgrade sa package, na grupo ayon sa panganib, na may isang-click na pagsusumite.",
+      "upgradesGenerating": "Nagsuscan ka ng proyekto para sa mga hindi inilapat na mga tampok at mga oportunidad para i-upgrade. Ito ay nagpapatakbo bawat pag-scan at mananatili sa cache hanggang sa i-re-scan mo ito.",
       "fullReport": "Buong ulat",
       "fullReportDesc": "I-export ang komprehensibong report ng paggamit ng feature (bawat inilalarawan na package, bawat mininung silang feature sa changelog) bilang isang HTML/Markdown/JSON file at i-open ito.",
+      "fullReportGenerating": "Nag-generate ng buong report — bawat inilalarawan na package, bawat naitala na feature sa changelog. Ito ay nag-iiwan ng isang scan at nagsisimula sa cache hanggang sa i-re-scan mo ito.",
       "knownIssues": "Nararapat na mga isyu",
       "knownIssuesDesc": "Surfing mga kilalang mga kahinaan at mga advisory na inilabas laban sa iyong mga dependency.",
       "compare": "Ihambing ihambing Iparating",
@@ -1747,7 +1756,8 @@
       "restart": "I-restart ang iyong computer at i-reset ito.",
       "stopped": "Napauwi",
       "logHeading": "Aktibidad ng aktibidad.",
-      "logEmpty": "Walang output pa — ang project_health ay hindi nagrereport ng progreso sa bawat hakbang, kaya ang log na ito ay nagmumula lamang kung ang scan ay nag-print ng isang diagnostic message."
+      "logEmpty": "Wala pang output — ang log na ito ay puno lamang kung ang scan ay nag-print ng isang diagnostic message.",
+      "progress": "{percent}% — {done}/{total} mga file"
     },
     "reports": {
       "intro": "Mga tala ng CLI na maaaring i-click na isang click na nangangailangan ng terminal. Bawat pag-click sa button ay nag-stream ng live output ng tool sa ibaba ng card nito at nag-save ng isang kopya sa reports/.saropa_lints/reports-tab/",
@@ -1792,11 +1802,22 @@
         "save": "I-save ang mga ito sa Save.",
         "saved": "Nakalaan",
         "saveError": "Hindi makasave"
-      }
+      },
+      "colFile": "Ang file ay isang file ng file.",
+      "colLineNum": "Ang linya ng linya ay ang mga linya na ito.",
+      "colRule": "Panuntunan ng Pamamahala sa Pamahalaan",
+      "colSeverity": "Grabe ng sakit na ito ay ang pagiging malubhang.",
+      "colMessage": "Ang mensahe ng mensahe ay isang mensahe na may mga salita.",
+      "colKey": "Susi"
     },
     "shortcuts": {
       "jumpToTab": "Pumunta sa tab 1-2 (Mapa, Ulat)",
       "showOverlay": "Ipakita ang shortcut na ito overlay."
+    },
+    "hero": {
+      "files": "Mga file ng mga file.",
+      "lines": "Linya",
+      "size": "Ang laki ng mga bagay ay may kasamang sukat."
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Log"
     },
     "engine": {
-      "analyzerPlugin": "Plugin ng Analyzer",
-      "scanDaemon": "I-scan Daemon",
+      "analyzerPlugin": "Live na Pagsusuri",
+      "scanDaemon": "I-scan sa Pag-save",
       "lspServer": "LSP Server",
       "pid": "PID:",
       "status": "Katayuan:",
@@ -1949,7 +1970,8 @@
         "running": "nagsisimula",
         "stopped": "nag-stop",
         "suspended": "nagsususpende",
-        "starting": "nagsimula"
+        "starting": "nagsimula",
+        "scanning": "naglalaro"
       },
       "rssNote": {
         "inProcess": "sa proseso, hindi nakakakita ng mas maliit na pagtatangka",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Pumoproseso sa loob ng serbisyong analisis Dart — mga live squiggles sa editor habang nagsusulat ka, walang kinakailangang pag-scan. Ang pagboto ay nagrere-rewrite ng mga plugin: block sa analysis_options.yaml.",
         "scanDaemon": "Proseso ng background na nagsuscan muli ang buong proyekto sa pag-save at sumusulat ng mga ulat/.saropa_lints/violations.json. Ang pag-off ng opsyon ay sususpende ito; ang susunod na save ay magpapalabas ito muli.",
         "lspServer": "Makakatagpo ang serbisyong wika — nagpapublish ng mga diagnostic sa panel ng Mga Problema para sa mga nabuksan at mga file ng workspace. Ang pagbubukas ng toggle ay nagpapalit ng setting na saropaLints.lspServer.enabled."
-      }
+      },
+      "scanProgress": "I-scan: {done}/{total} mga file"
     },
     "toggle": {
       "on": "NAKA-ON",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "Tingnan ang mga paglabag sa pagtingin.",
       "noErrors": "Saropa Lints: ang mga ito ay may _ph0__. Walang pagkakamali!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: walang folder ng workspace na bukas. Buksan muna ang iyong proyektong Dart/Flutter.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ang integrasyon ng lint ay naka-off. I-enable ito bago mag-async analysis.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ang scan sa pag-save ay naka-off. Mag-enable ito bago mag-async analysis.",
       "pluginAlive": "Saropa Lints ay buhay: {rules} mga patakaran na pinagana, {files} file sinusuri.",
       "openPubspecFailed": "Hindi nakabukas ng pubspec.yaml: {message} ang kanyang mga",
       "toggleSidebarSectionFailed": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili nabigo upang i-toggle ang seksyon ng sidebar  ⁇ {message} ang kanyang mga",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: Ang mga bagay na may kaugnayan sa pag-aalaga ng katawan. Nagtagumpay ang pub get ngunit hindi nasulbad ang saropa_lints. Suriin ang pubspec.yaml pag-format.",
       "configWriteFailedNs": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili config write ay nabigo. {details}",
       "disabled": "Saropa Lints ay hindi pinagana. Ang mga file ng proyekto ay hindi binago.",
-      "disabledAnalyzer": "Saropa Lints integration off. _PHO_ pag-iisa ay naka-off na. Ang mga diagnostics ng analyzer ay lilinisin sa lalong madaling panahon; i-toggle ang Lint integration On upang ibalik.",
+      "disabledAnalyzer": "Saropa Lints integration tinanggal. Ang mga diagnostic ng analyzer ay magpapalitaw agad; i-activate ang Scan on save para i-back up.",
       "reenabledPlugin": "Saropa Lints plugin na ginamit sa proseso ay nagsimula muli. Nagrerestart ng server ng analisis ng Dart upang i-load ito muli.",
       "reenableNothingToRestore": "Saropa Lints: walang nangangailangan i-restore. Ang plugin na nasa proseso ay hindi kasalukuyang naka-disable sa pamamagitan ng extension.",
       "noOpenDartFiles": "Saropa Lints: ang mga ito ay may _ph0__. walang bukas na Dart file natagpuan. Buksan muli ang isang Dart file o i-off ang \"Open editors only\" setting.",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "Hindi sumagot ang proseso ng pag-scan sa oras.",
       "scanOnSaveDaemonExited": "Ang proseso ng pag-scan ay nagsimula nang hindi inaasahan. Ito ay magsisimula muli sa susunod na pag-save.",
       "scanOnSaveDaemonBackoff": "Ang proseso ng pag-scan ay nagsiwalat na at nangungunan para muling simulan. I-save muli sa ilang sandali.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints ay naka-off — i-activate ang \"Lint integration\" bago mag-verify ng buong proyekto.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints ay naka-off — i-activate ang \"Scan on save\" bago mag-iba ang buong proyekto scan.",
       "scanOnSaveBaselineAlreadyRunning": "Ang isang buong proyekto scan ay nagsisimula na.",
       "scanOnSaveBaselineCanceled": "Nag-utos ng whole-project scan matapos ang {scanned}/{total} files.",
       "scanOnSaveBaselineFailed": "Nag.Fail ang pagscan ng buong proyekto: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Iayos ang mga hindi kinakailangang ignores dito"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% na inreview",
+      "hotspotsDescription": "{open} buksan",
+      "lastRunLabel": "Nangunguna · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Lahat ng mga command…",
+      "commandCatalogDescription": "Suriin lahat ng mga command"
     }
   }
 }

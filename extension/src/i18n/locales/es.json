@@ -264,7 +264,7 @@
         "label": "saropa_tier"
       },
       "runtimeTier": {
-        "label": "nivel_tiempo de ejecución"
+        "label": "runtime_tier"
       },
       "lane": {
         "title": "Análisis de canal",
@@ -279,7 +279,7 @@
         "hint": "Sobrescribe la gravedad de una regla específica, o la desactiva completamente, independientemente del nivel y los paquetes de reglas.",
         "level": "Nivel",
         "empty": "No se han establecido sobrecargas de severidad.",
-        "rulePlaceholder": "nombre_regla",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Nivel de gravedad nuevo"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Preferencias de visualización a nivel de la extensión.",
-      "linkNote": "La integración de lints encendido/apagado está en la fila de estado del panel lateral; el nivel de análisis está en la pestaña Nivel — ambos hacen más que un simple escritura de configuración, por lo tanto no se duplican aquí."
+      "linkNote": "Escaneo al guardar encendido/apagado está en la fila de estado del panel lateral; el nivel de análisis está en la pestaña Nivel — ambos hacen más que un simple escritura de configuración, por lo tanto no se duplican aquí."
     },
     "shortcuts": {
       "jumpToTab": "Ir a pestaña 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: Nivel de nivel superior, es decir, el nivel que se encuentra por encima del {tier} El hombre de la ciudad"
     },
     "controls": {
-      "analyzerPlugin": "Analizador de plugin",
-      "analyzerPluginDisabled": "Off — escaneo al guardar solo",
+      "analyzerPlugin": "Análisis en vivo",
+      "analyzerPluginDisabled": "Off — escaneo solo al guardar",
       "analyzerPluginAbsent": "No configurado",
       "laneLight": "Light — ~200 reglas en editor, el resto al guardar",
       "laneFull": "Completo — cada regla habilitada en el editor",
@@ -918,7 +918,14 @@
       "colCount": "El conde cuenta el conteo.",
       "colSeverity": "Gravedad La gravedad es la severidad de las cosas.",
       "colActionsAria": "Acciones de fila Las acciones en fila.",
-      "filesAffected": "Los archivos afectados ({count})"
+      "filesAffected": "Los archivos afectados ({count})",
+      "howToFixHeading": "Cómo corregir",
+      "owaspMobileLabel": "Móvil",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "Reglas relacionadas",
+      "sameTagHeading": "Descubrimiento de etiquetas iguales",
+      "migrationHeading": "Migración",
+      "supersedesLabel": "Reemplaza:"
     },
     "findings": {
       "sectionAria": "Los hallazgos de los resultados.",
@@ -1118,8 +1125,10 @@
       "overview": "Visión general",
       "upgrades": "Actualizaciones",
       "upgradesDesc": "Revisar actualizaciones de paquetes disponibles, agrupadas por riesgo, con aplicación en un solo clic.",
+      "upgradesGenerating": "Escaneando tu proyecto para características no adoptadas y oportunidades de actualización. Esto se ejecuta una vez por escaneo y se mantiene en caché hasta que lo escanees nuevamente.",
       "fullReport": "Informe completo",
       "fullReportDesc": "Exportar el informe exhaustivo de uso de características (cada paquete escaneado, cada característica extraída del changelog) como un archivo HTML/Markdown/JSON y abrilo.",
+      "fullReportGenerating": "Generando el informe completo — cada paquete escaneado, cada característica extraída del changelog. Esto se ejecuta una vez por escaneo y se mantiene en caché hasta que lo escanees de nuevo.",
       "knownIssues": "Problemas conocidos",
       "knownIssuesDesc": "Explora vulnerabilidades conocidas y advisories reportados contra tus dependencias.",
       "compare": "Comparar y comparar.",
@@ -1747,7 +1756,8 @@
       "restart": "Reiniciar el sistema de nuevo.",
       "stopped": "Detenido",
       "logHeading": "La actividad de la actividad.",
-      "logEmpty": "No hay salida aún — project_health no reporta el progreso paso a paso, por lo tanto este registro solo se llena si el escaneo imprime un mensaje diagnóstico."
+      "logEmpty": "No hay salida aún — este registro solo se llena si el escaneo imprime un mensaje de diagnóstico.",
+      "progress": "{percent}% — {done}/{total} archivos"
     },
     "reports": {
       "intro": "Informes CLI de un solo clic que anteriormente requerían un terminal. Cada botón Run transmite la salida en vivo del工具 debajo de su tarjeta y guarda una copia bajo reports/.saropa_lints/reports-tab/",
@@ -1787,16 +1797,27 @@
         "desc": "Revisa analysis_options.yaml y analysis_options_custom.yaml por configuraciones comunes incorrectas: claves en el archivo incorrecto, un archivo personalizado faltante o una restricción de versión faltante."
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml umbrales",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "puerta_calidad:\n  condiciones:\n    - métrica: nuevos_problemas_críticos\n      operación: ecuación\n      valor: 0\n      on_fail: falla",
         "save": "Salvar y guardar para salvar.",
         "saved": "Guardado",
         "saveError": "No se pudo guardar"
-      }
+      },
+      "colFile": "El archivo de archivos es un archivo.",
+      "colLineNum": "Línea Linea La línea",
+      "colRule": "El artículo de la ley, el reglamento.",
+      "colSeverity": "Gravedad La gravedad es la severidad de las cosas.",
+      "colMessage": "El mensaje es el mensaje.",
+      "colKey": "Clave"
     },
     "shortcuts": {
       "jumpToTab": "Ir a pestaña 1-2 (Mapa, Informes)",
       "showOverlay": "Mostrar esta superposición de atajos."
+    },
+    "hero": {
+      "files": "Archivos archivos de los archivos.",
+      "lines": "Líneas",
+      "size": "El tamaño de la talla."
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Registro"
     },
     "engine": {
-      "analyzerPlugin": "Analizador de plugin",
-      "scanDaemon": "Escanea Daemon",
+      "analyzerPlugin": "Análisis en Vivo",
+      "scanDaemon": "Escaneo al guardar",
       "lspServer": "Servidor LSP",
       "pid": "PID:",
       "status": "Estado:",
@@ -1949,7 +1970,8 @@
         "running": "ejecutando",
         "stopped": "detenido",
         "suspended": "suspendido",
-        "starting": "iniciando"
+        "starting": "iniciando",
+        "scanning": "escaneando"
       },
       "rssNote": {
         "inProcess": "en proceso, no medible por separado",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Ejecuta dentro del servidor de análisis Dart — resaltados en tiempo real en el editor al escribir, sin necesidad de escaneo. Alternar reescribe los plugins: bloque en analysis_options.yaml.",
         "scanDaemon": "Proceso en segundo plano que rescanea todo el proyecto al guardar y escribe informes/.saropa_lints/violations.json. Desactivarlo suspende el proceso; el siguiente guardado lo reanuda.",
         "lspServer": "Regla estricta: Separar servidor de lenguaje — publica diagnósticos en el panel de Problemas para archivos abiertos y del espacio de trabajo. Alternar escribe la configuración saropaLints.lspServer.enabled."
-      }
+      },
+      "scanProgress": "Escaneo: {done}/{total} archivos"
     },
     "toggle": {
       "on": "EN",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "Violaciones de vistas.",
       "noErrors": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin ¡Sin errores! ¿Qué es esto?",
       "noWorkspaceOpenWorkspace": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin ninguna carpeta del espacio de trabajo está abierta. Abra su proyecto Dart/Flutter primero.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: la integración de lint está desactivada. Actívala antes de ejecutar el análisis.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: escaneo al guardar está desactivado. Actívalo antes de ejecutar el análisis.",
       "pluginAlive": "Saropa Lints está vivo: Reglas {rules} habilitadas, archivos {files} analizados.",
       "openPubspecFailed": "No se pudo abrir pubspec.yaml: {message} El hombre de la ciudad",
       "toggleSidebarSectionFailed": "Saropa Lints: Es el número de células que tiene la persona. no pudo cambiar la sección de barra lateral  ⁇ {message} El hombre de la ciudad",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: es el número de células que contiene la proteína _PH2 pub se logró, pero el problema de saropa_lints no fue resuelto. Compruebe el formato pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: Es el número de células que tiene la persona. La escritura de la configuración falló. {details}",
       "disabled": "Saropa Lints está desactivado. Los archivos del proyecto no se cambiaron.",
-      "disabledAnalyzer": "La integración Saropa Lints está desactivada. Los diagnósticos del analizador se aclararán en breve; Intercambiar la integración de Lint para restaurar.",
+      "disabledAnalyzer": "Integración Saropa Lints desactivada. Los diagnósticos del analizador se limpiarán pronto; active Scan on save para restaurarlos.",
       "reenabledPlugin": "Saropa Lints plugin reactivado en proceso. Reiniciando el servidor de análisis Dart para recargarlo.",
       "reenableNothingToRestore": "Saropa Lints: nada que restaurar. El plugin en proceso no está actualmente desactivado a través de la extensión.",
       "noOpenDartFiles": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin no se encontraron archivos abiertos Dart. Reabre un archivo Dart o desactiva la configuración \"Abrir sólo editores\".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "El proceso de escaneo no respondió a tiempo.",
       "scanOnSaveDaemonExited": "El proceso de escaneo se detuvo inesperadamente. Se reiniciará en la siguiente guardada.",
       "scanOnSaveDaemonBackoff": "El proceso de escaneo se detuvo recientemente y está esperando para reiniciar. Guarde nuevamente en un momento.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints está desactivado — activa \"Integración de lints\" antes de realizar un escaneo de todo el proyecto.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints está desactivado — activa \"Escaneo al guardar\" antes de realizar un escaneo de todo el proyecto.",
       "scanOnSaveBaselineAlreadyRunning": "Un escaneo de toda el proyecto ya está en ejecución.",
       "scanOnSaveBaselineCanceled": "Escaneo de toda la aplicación cancelado después de procesar {scanned}/{total} archivos.",
       "scanOnSaveBaselineFailed": "Escaneo de todo el proyecto falló: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Corrige ignores obsoletos en este archivo"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% revisado",
+      "hotspotsDescription": "{open} abrir",
+      "lastRunLabel": "Última ejecución · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Todos los comandos…",
+      "commandCatalogDescription": "Buscar todas las comandas"
     }
   }
 }

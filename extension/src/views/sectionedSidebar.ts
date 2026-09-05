@@ -60,6 +60,8 @@
  */
 
 import * as vscode from 'vscode';
+import * as nodeFs from 'node:fs';
+import * as nodePath from 'node:path';
 import type { ViolationsData } from '../violationsReader';
 import { readVisibleLiveViolations, computeLiveHealthScore } from '../liveViolationsData';
 // `getTrendSummary` / `getScoreTrendSummary` / `detectScoreRegression` were
@@ -96,6 +98,12 @@ import { SecurityHotspotReviewStateService, countSecurityHotspotReviewStates } f
 // plan) — same reader the removed configTree.ts `buildLaneNode` used, so the
 // folded description agrees with what the in-process plugin actually reads.
 import { readRawLaneFromCustomConfig } from '../config/laneConfig';
+// TASK A (PLAN_ext_ui_sidebar_reset.md §5 P1, "row descriptions are live"):
+// Code Health's row description reads the in-memory result of the last scan
+// this session ran. This is a pure accessor (never spawns `dart run`) so it
+// is safe to call on every sidebar rebuild — see its own doc comment.
+import { getLastProjectVibrancyPayload } from './projectVibrancyReportView';
+import { saropaLintsDataPath } from '../reportsPaths';
 
 export type SectionNode = vscode.TreeItem | ConfigTreeNode;
 
@@ -311,6 +319,114 @@ function buildLintsConfigDescription(): string {
 }
 
 /**
+ * Code Health row description (PLAN_ext_ui_sidebar_reset.md §5 P1: "Code
+ * Health uses `getLastProjectVibrancyPayload()`"). BUGFIX: a previous pass at
+ * the sidebar rebuild left this row's description as the hardcoded literal
+ * "Function-level code health" with no grade, score, or gate state — the
+ * live-data requirement the plan specified was never actually wired up. Now
+ * mirrors the grade/score and the gate-failing flag the Code Health
+ * dashboard's own hero renders (`projectVibrancyReportView.ts`'s `buildHero`,
+ * `payload.gates?.pass === false`) — same field, so the sidebar and the
+ * dashboard can never disagree about whether the gate is passing.
+ *
+ * `getLastProjectVibrancyPayload()` only returns a scan that already
+ * completed THIS session (module-level in-memory cache) — it never spawns
+ * `dart run saropa_lints:project_vibrancy` itself, so this is free to compute
+ * on every sidebar rebuild without triggering a scan (the row-description
+ * contract this plan section requires).
+ */
+function buildCodeHealthDescription(): { description: string; gateFailing: boolean } {
+    const payload = getLastProjectVibrancyPayload();
+    if (!payload) {
+        // No scan has completed this session — degrade honestly rather than
+        // showing a stale/fabricated grade. Matches the Health status row's
+        // own "never run" pattern (`status.health.neverRunDescription`).
+        return { description: l10n('sidebar.dashboards.codeHealthNeverScanned'), gateFailing: false };
+    }
+    const grade = payload.summary?.averageGrade ?? '—';
+    const score = String(Math.round(payload.summary?.averageScore ?? 0));
+    const gateFailing = payload.gates?.pass === false;
+    const description = gateFailing
+        ? l10n('sidebar.dashboards.codeHealthDescriptionGateFailing', { grade, score })
+        : l10n('sidebar.dashboards.codeHealthDescription', { grade, score });
+    return { description, gateFailing };
+}
+
+/**
+ * Project Map's report file — the exact `outputDir`/`index.html` path
+ * `projectMapView.ts`'s `runScanAndRender` writes to (`<root>/reports/
+ * .saropa_lints/health/index.html`). Duplicated here as a path literal rather
+ * than importing from `projectMapView.ts` because this file owns the sidebar
+ * and must not edit — or take on a dependency that could pull in — the
+ * Project Map view module another agent is actively working in; the path
+ * segments themselves come from the shared `saropaLintsDataPath` helper so
+ * only the `health/index.html` suffix is duplicated, not the whole path.
+ */
+function projectMapReportIndexPath(root: string): string {
+    return nodePath.join(saropaLintsDataPath(root), 'health', 'index.html');
+}
+
+/**
+ * Last-scan mtime of the Project Map report (PLAN_ext_ui_sidebar_reset.md §5
+ * P1: "Project Map uses `getLastProjectMapMtime()`"). A plain `fs.statSync`
+ * on the already-written report file is effectively free — nothing here
+ * spawns `dart run saropa_lints:project_health`, so this never triggers a
+ * scan. Returns undefined when no report has ever been written for this
+ * workspace (fresh project, or a scan that never completed) — ENOENT and any
+ * other stat failure collapse to the same "no data yet" outcome for the
+ * caller.
+ *
+ * STATED DECISION (raised in review, not silently repeated): this is a
+ * second synchronous disk read on the sidebar refresh path, the same class
+ * of finding PLAN_ext_ui_sidebar_reset.md §6 already logged and deferred for
+ * `computeLiveHealthScore` ("code-review finding, low"). Left synchronous
+ * here too, deliberately, not by oversight:
+ *   - It runs once per sidebar section rebuild (a user action or a
+ *     diagnostics-change event), never in a hot loop or on a timer — the
+ *     same trigger cadence `computeLiveHealthScore` already accepts.
+ *   - A `fs.statSync` reads only inode metadata, not the (multi-MB) report
+ *     HTML body — orders of magnitude cheaper than the JSON parse
+ *     `computeLiveHealthScore` performs on every call, which is already
+ *     accepted at this same call site.
+ *   - Converting one row's data source to async while the rest of
+ *     `buildEditorDashboardItems`/`buildStatusItems` stay synchronous would
+ *     require a larger refactor of `TreeDataProvider.getChildren`'s
+ *     synchronous contract across every section — a bigger blast radius
+ *     than this bugfix's scope, and not requested.
+ * If this ever shows up as an actual jank complaint, fix it alongside
+ * `computeLiveHealthScore` in one pass rather than diverging one row now.
+ */
+function getLastProjectMapMtime(root: string): Date | undefined {
+    try {
+        return nodeFs.statSync(projectMapReportIndexPath(root)).mtime;
+    } catch {
+        return undefined;
+    }
+}
+
+/**
+ * Project Map row description. Live scan age via [getLastProjectMapMtime],
+ * degrading to the "never scanned" catalog string when no report file exists
+ * yet — same honesty contract as the Code Health description above and the
+ * existing Findings/Health "never run" rows.
+ *
+ * Size/file count (`ProjectMapTotals`) is intentionally NOT surfaced here:
+ * the only place that cache lives is a workspaceState key private to
+ * `projectMapView.ts` (`TOTALS_STATE_KEY`, not exported), and duplicating
+ * that key string here would violate the single-source-of-truth rule the
+ * moment either file changes it independently. The report file's mtime is
+ * the one fact genuinely available without either an import into the file
+ * another agent owns or a duplicated private constant.
+ */
+function buildProjectMapDescription(): string {
+    const root = getProjectRoot();
+    if (!root) return l10n('sidebar.dashboards.projectMapNeverScanned');
+    const mtime = getLastProjectMapMtime(root);
+    if (!mtime) return l10n('sidebar.dashboards.projectMapNeverScanned');
+    return l10n('sidebar.dashboards.projectMapDescription', { ago: formatTimeAgo(mtime.toISOString()) });
+}
+
+/**
  * The seven DASHBOARDS rows (PLAN_ext_ui_sidebar_reset.md §3): Findings
  * first (it's the row most users click first — health score + issue count),
  * then Lints Config, Packages, Code Health, Project Map, Full Audit, and
@@ -360,16 +476,25 @@ function buildEditorDashboardItems(): LeafItem[] {
             'package',
             new vscode.ThemeColor('charts.green'),
         ),
-        new LeafItem(
-            'Code Health Dashboard',
-            'Function-level code health',
-            'saropaLints.openProjectVibrancyReport',
-            'symbol-method',
-            new vscode.ThemeColor('charts.purple'),
-        ),
+        (() => {
+            const codeHealth = buildCodeHealthDescription();
+            return new LeafItem(
+                'Code Health Dashboard',
+                codeHealth.description,
+                'saropaLints.openProjectVibrancyReport',
+                'symbol-method',
+                // Warning color when the last scan's quality gate failed — makes a
+                // failing gate visible from the sidebar without opening the
+                // dashboard (TASK B's "surface quality-gate status where users
+                // already look" applies here too: this row IS one of those places).
+                codeHealth.gateFailing
+                    ? new vscode.ThemeColor('list.warningForeground')
+                    : new vscode.ThemeColor('charts.purple'),
+            );
+        })(),
         new LeafItem(
             'Saropa Project Map',
-            'Size · dead-weight · complexity · hot spots',
+            buildProjectMapDescription(),
             'saropaLints.openProjectHealthDashboard',
             'flame',
             new vscode.ThemeColor('charts.orange'),

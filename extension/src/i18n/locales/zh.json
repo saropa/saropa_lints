@@ -261,10 +261,10 @@
         "none": "无（使用“层”选项卡的设置）"
       },
       "saropaTier": {
-        "label": "萨罗帕_蒂尔"
+        "label": "saropa_tier"
       },
       "runtimeTier": {
-        "label": "运行时层"
+        "label": "runtime_tier"
       },
       "lane": {
         "title": "分析泳道",
@@ -279,7 +279,7 @@
         "hint": "覆盖特定规则的严重性，或完全关闭它，独立于层和规则包。",
         "level": "等级",
         "empty": "未设置严重性覆盖。",
-        "rulePlaceholder": "规则名称",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "新的严重级别"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "扩展范围内的显示首选项。",
-      "linkNote": "Lint 集成的开/关位于侧边栏的状态行中；分析层位于“层”选项卡上 - 两者都不仅仅是简单的设置写入，因此此处不再重复。"
+      "linkNote": "保存时扫描开关位于侧边栏的状态行中；分析层级位于层级标签页中 —— 两者都不仅仅是简单的设置写入，因此此处没有重复显示。"
     },
     "shortcuts": {
       "jumpToTab": "跳转到标签 1-7（层级，规则集，覆盖，SDK 发布，配置文件，自动化，扩展）",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "层级:是指在资本阶段中,有较高的水平. {tier} 没有任何问题."
     },
     "controls": {
-      "analyzerPlugin": "分析器插件",
-      "analyzerPluginDisabled": "关闭 — 仅保存时扫描",
+      "analyzerPlugin": "实时分析",
+      "analyzerPluginDisabled": "关闭 — 仅在保存时扫描",
       "analyzerPluginAbsent": "未配置",
       "laneLight": "轻量 — ~200条编辑器内规则，其余在保存时执行",
       "laneFull": "完整 — 编辑器中所有启用的规则",
@@ -918,7 +918,14 @@
       "colCount": "伯爵计数,计数和计算.",
       "colSeverity": "严重程度的严重性",
       "colActionsAria": "排行行动 行列动作",
-      "filesAffected": "受影响的文件 ({count})"
+      "filesAffected": "受影响的文件 ({count})",
+      "howToFixHeading": "如何修复",
+      "owaspMobileLabel": "移动",
+      "owaspWebLabel": "网络",
+      "relatedRulesHeading": "相关规则",
+      "sameTagHeading": "同标签发现",
+      "migrationHeading": "迁移",
+      "supersedesLabel": "取代:"
     },
     "findings": {
       "sectionAria": "发现结果的研究.",
@@ -1118,8 +1125,10 @@
       "overview": "概述",
       "upgrades": "升级",
       "upgradesDesc": "查看可用的软件包升级，按风险分组，并一键应用。",
+      "upgradesGenerating": "扫描您的项目以查找未采用的功能和升级机会。此操作每次扫描运行一次，并在您重新扫描前保持缓存。",
       "fullReport": "完整报告",
       "fullReportDesc": "将详尽的功能使用报告（每个扫描的包、每个挖掘的变更日志功能）导出为 HTML/Markdown/JSON 文件并打开。",
+      "fullReportGenerating": "生成完整报告 —— 每个扫描的包，每个挖掘的变更日志功能。此操作每次扫描运行一次，并在您重新扫描前保持缓存。",
       "knownIssues": "已知问题",
       "knownIssuesDesc": "浏览针对您的依赖项报告的已知漏洞和建议。",
       "compare": "进行比较,对照.",
@@ -1747,7 +1756,8 @@
       "restart": "重启重新开始",
       "stopped": "已停止",
       "logHeading": "活动活动的行为.",
-      "logEmpty": "尚无输出 - project_health 不报告分步进度，因此仅当扫描打印诊断消息时此日志才会填充。"
+      "logEmpty": "尚未有输出 —— 该日志仅在扫描打印诊断信息时填充。",
+      "progress": "{percent}% — {done}/{total} 文件"
     },
     "reports": {
       "intro": "一键式 CLI 报告以前需要终端。每个“运行”按钮都会在其卡下方传输该工具的实时输出，并将副本保存在 reports/.saropa_lints/reports-tab/ 下。",
@@ -1787,16 +1797,27 @@
         "desc": "检查 analysis_options.yaml 和 analysis_options_custom.yaml 中的常见配置错误：键在错误的文件中，缺少自定义文件，或缺少版本约束。"
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml 阈值",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "质量门：\n  条件：\n    - 指标：新的关键问题\n      操作： eq\n      值：0\n      on_fail: 失败",
         "save": "保存,拯救和保护一个人.",
         "saved": "已保存",
         "saveError": "无法保存"
-      }
+      },
+      "colFile": "文件的档案,是我们所拥有的.",
+      "colLineNum": "线条 线路 线上",
+      "colRule": "规则 规章制度 在",
+      "colSeverity": "严重程度的严重性",
+      "colMessage": "信息的消息是什么?",
+      "colKey": "关键"
     },
     "shortcuts": {
       "jumpToTab": "跳转到标签页1-2（地图，报告）",
       "showOverlay": "显示这个快捷键覆盖."
+    },
+    "hero": {
+      "files": "文件的档案,是我们所做的.",
+      "lines": "行数",
+      "size": "尺寸 大小 尺码 尺度"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "日志"
     },
     "engine": {
-      "analyzerPlugin": "分析器插件",
-      "scanDaemon": "扫描 Daemon",
+      "analyzerPlugin": "实时分析",
+      "scanDaemon": "保存时扫描",
       "lspServer": "LSP 服务器",
       "pid": "PID:",
       "status": "状态:",
@@ -1949,7 +1970,8 @@
         "running": "运行",
         "stopped": "停止",
         "suspended": "暂停",
-        "starting": "开始"
+        "starting": "开始",
+        "scanning": "扫描"
       },
       "rssNote": {
         "inProcess": "进程内，不可单独测量",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "在 Dart 分析服务器内运行 - 当您键入时，编辑器中会实时显示波形曲线，无需扫描。切换会重写 analysis_options.yaml 中的plugins: 块。",
         "scanDaemon": "后台进程在保存时重新扫描整个项目并写入报告/.saropa_lints/violations.json。关闭会暂停它；下一次保存将恢复它。",
         "lspServer": "单独的语言服务器 - 将诊断信息发布到“问题”面板以打开和工作区文件。切换写入 saropaLints.lspServer.enabled 设置。"
-      }
+      },
+      "scanProgress": "扫描：{done}/{total} 文件"
     },
     "toggle": {
       "on": "在",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "视图违规行为",
       "noErrors": "Saropa Lints: 没有一个人. 没有错误!",
       "noWorkspaceOpenWorkspace": "Saropa Lints：没有打开工作区文件夹。首先打开您的 Dart/Flutter 项目。",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints：lint集成已关闭。在运行分析前请启用它。",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints：保存时扫描已关闭。在运行分析前请启用它。",
       "pluginAlive": "Saropa Lints 处于活动状态：启用 {rules} 规则，分析 {files} 文件。",
       "openPubspecFailed": "打开 pubspec.yaml 的失败: {message} 没有任何问题.",
       "toggleSidebarSectionFailed": "Saropa Lints: 已经是 无法切换侧面 ⁇ 部分 {message} 没有任何问题.",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints：pub 成功，但 saropa_lints 未解决。检查 pubspec.yaml 格式。",
       "configWriteFailedNs": "Saropa Lints: 已经是 配置文件写入失败了. {details}",
       "disabled": "Saropa Lints被禁用了. 这是一个非常好的方法. 项目文件没有被更改.",
-      "disabledAnalyzer": "Saropa Lints 集成关闭. 在线电话 分析仪诊断将在不久的将来得到清除; 切换Lint集成 在恢复.",
+      "disabledAnalyzer": "Saropa Lints 集成已关闭。分析器诊断信息将很快清除；切换“保存时扫描”为开启以恢复。",
       "reenabledPlugin": "Saropa Lints 在进程内插件已重新启用。正在重启 Dart 分析服务器以重新加载它。",
       "reenableNothingToRestore": "Saropa Lints：没有内容可还原。当前进程中的插件未通过扩展禁用。",
       "noOpenDartFiles": "Saropa Lints: 没有一个人. 没有找到开放的 Dart 文件. 重新打开一个 Dart 文件或关闭\"仅为编辑器打开\"设置.",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "扫描过程未及时响应。",
       "scanOnSaveDaemonExited": "扫描过程意外停止。下次保存时将重新启动。",
       "scanOnSaveDaemonBackoff": "扫描过程最近已停止，正在等待重新启动。请稍后再次保存。",
-      "scanOnSaveBaselineDisabled": "Saropa Lints 已关闭 — 在执行整个项目扫描前，请开启“lint 集成”",
+      "scanOnSaveBaselineDisabled": "Saropa Lints 已关闭 — 在执行整个项目扫描前，请开启“保存时扫描”",
       "scanOnSaveBaselineAlreadyRunning": "一个整个项目的扫描已经在运行。",
       "scanOnSaveBaselineCanceled": "整个项目扫描在处理 {scanned}/{total} 文件后取消。",
       "scanOnSaveBaselineFailed": "整个项目扫描失败：{details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "修复此文件中过时的忽略项"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "热点 · {percent}% 评审",
+      "hotspotsDescription": "{open} 打开",
+      "lastRunLabel": "上次运行 · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "所有命令…",
+      "commandCatalogDescription": "搜索所有命令"
     }
   }
 }

@@ -279,7 +279,7 @@
         "hint": "Remplace la gravité d'une règle spécifique, ou l'empêche totalement, indépendamment du niveau et des paquets de règles.",
         "level": "Niveau",
         "empty": "Aucune surcharge de gravité n'est définie.",
-        "rulePlaceholder": "nom_règle",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Nouveau niveau de gravité"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Préférences d'affichage applicables à l'extension",
-      "linkNote": "L'intégration de l'analyse de code est activée/désactivée dans la ligne d'état de la barre latérale ; le niveau d'analyse se trouve sur l'onglet Tier — les deux effectuent plus qu'une simple écriture de paramètre, donc ils ne sont pas dupliqués ici."
+      "linkNote": "Les règles strictes :  \n1. Retournez UNIQUEMENT la sortie traduite.  \n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.  \n3. Le texte peut contenir des tokens de placeholder : des tokens de placeholder. Copiez chaque un d'eux dans la traduction EXACTEMENT tel qu'écrit, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.  \n4. LA SORTIE DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase."
     },
     "shortcuts": {
       "jumpToTab": "Aller à l'onglet 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Niveau : {tier}"
     },
     "controls": {
-      "analyzerPlugin": "Analyseur de plugin",
-      "analyzerPluginDisabled": "Hors service — analyse uniquement lors de la sauvegarde",
+      "analyzerPlugin": "Analyse en temps réel",
+      "analyzerPluginDisabled": "Hors service — analyse sur enregistrement uniquement",
       "analyzerPluginAbsent": "Pas configuré",
       "laneLight": "Lumière — ~200 règles en mode édition, le reste sur enregistrement",
       "laneFull": "Complet — toutes les règles activées analysées en ligne",
@@ -918,7 +918,14 @@
       "colCount": "Le comte de Comté compte le comte.",
       "colSeverity": "La gravité de la maladie.",
       "colActionsAria": "Actions de ligne Les actions en rangées.",
-      "filesAffected": "Les fichiers affectés ({count})"
+      "filesAffected": "Les fichiers affectés ({count})",
+      "howToFixHeading": "Comment réparer",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "Règles liées",
+      "sameTagHeading": "Découverte des balises identiques",
+      "migrationHeading": "Migration",
+      "supersedesLabel": "Remplace:"
     },
     "findings": {
       "sectionAria": "Les résultats des recherches.",
@@ -1118,8 +1125,10 @@
       "overview": "Aperçu",
       "upgrades": "Mises à jour",
       "upgradesDesc": "Revoir les mises à jour de packages disponibles, regroupées par risque, avec application en un clic.",
+      "upgradesGenerating": "Analyse de votre projet pour détecter les fonctionnalités non adoptées et les opportunités de mise à niveau. Cela s'exécute une fois par analyse et reste en cache jusqu'à ce que vous relanciez l'analyse.",
       "fullReport": "Rapport complet",
       "fullReportDesc": "Exporter le rapport complet d'utilisation des fonctionnalités (chaque package analysé, chaque fonctionnalité extraite du changelog) sous forme de fichier HTML/Markdown/JSON et l'ouvrir.",
+      "fullReportGenerating": "Génération du rapport complet — chaque package analysé, chaque fonctionnalité extraite du changelog. Cela s'exécute une fois par analyse et reste en cache jusqu'à ce que vous relanciez l'analyse.",
       "knownIssues": "Problèmes connus",
       "knownIssuesDesc": "Parcourir les vulnérabilités et advisories connus signalés contre vos dépendances.",
       "compare": "Il est important de comparer.",
@@ -1747,7 +1756,8 @@
       "restart": "Le redémarrage est à refaire.",
       "stopped": "Arrêté",
       "logHeading": "Activité d'activité.",
-      "logEmpty": "Aucune sortie pour l'instant — project_health ne rapporte pas les progrès étape par étape, donc ce journal ne se remplit que si le scan imprime un message diagnostique."
+      "logEmpty": "Aucune sortie pour l'instant — ce journal ne se remplit que si le scan imprime un message diagnostique.",
+      "progress": "{percent}% — {done}/{total} fichiers"
     },
     "reports": {
       "intro": "Rapports CLI en un clic qui nécessitaient auparavant un terminal. Chaque bouton Exécuter diffuse la sortie en direct de l'outil sous sa carte et enregistre une copie sous reports/.saropa_lints/reports-tab/.",
@@ -1787,16 +1797,27 @@
         "desc": "Vérifie analysis_options.yaml et analysis_options_custom.yaml pour les configurations courantes incorrectes : clés dans le mauvais fichier, un fichier personnalisé manquant ou une contrainte de version manquante."
       },
       "gate": {
-        "editorLabel": "seuil saropa_quality_gate.yaml",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "porte_qualité :\n  conditions :\n    - métrique : new_critical_issues\n      op: eq\n      valeur : 0\n      on_fail : échec",
         "save": "Il est question de Save Save.",
         "saved": "Enregistré",
         "saveError": "Impossible de sauvegarder"
-      }
+      },
+      "colFile": "Le fichier est un fichiers de données.",
+      "colLineNum": "Le lien est en ligne.",
+      "colRule": "Le règlement de l'assemblée",
+      "colSeverity": "La gravité de la maladie.",
+      "colMessage": "Message",
+      "colKey": "Clé"
     },
     "shortcuts": {
       "jumpToTab": "Aller à l'onglet 1-2 (Carte, Rapports)",
       "showOverlay": "Afficher cette superposition de raccourci."
+    },
+    "hero": {
+      "files": "Les fichiers sont des dossiers.",
+      "lines": "Lignes",
+      "size": "La taille de la taille, le format."
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Journal"
     },
     "engine": {
-      "analyzerPlugin": "Analyseur de plugin",
-      "scanDaemon": "Analyser Daemon",
+      "analyzerPlugin": "Analyse en temps réel",
+      "scanDaemon": "Analyser à la sauvegarde",
       "lspServer": "Serveur LSP",
       "pid": "PID:",
       "status": "Statut :",
@@ -1949,7 +1970,8 @@
         "running": "en cours d'exécution",
         "stopped": "arrêté",
         "suspended": "suspendu",
-        "starting": "début"
+        "starting": "début",
+        "scanning": "scannage"
       },
       "rssNote": {
         "inProcess": "en cours de processus, non mesurable séparément",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Exécute à l'intérieur du serveur d'analyse Dart — des squiggles en temps réel dans l'éditeur pendant que vous tapez, pas besoin de scan. L'activation/désactivation reformate les plugins : bloc dans analysis_options.yaml.",
         "scanDaemon": "Processus en arrière-plan qui rescane l'ensemble du projet lors de la sauvegarde et écrit les rapports/.saropa_lints/violations.json. Désactiver le suspend son exécution ; la prochaine sauvegarde le reprend.",
         "lspServer": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite."
-      }
+      },
+      "scanProgress": "Analyse : {done}/{total} fichiers"
     },
     "toggle": {
       "on": "ACTIVÉ",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "Voir les violations de vue.",
       "noErrors": "Saropa Lints: Il s'agit de la réponse à une question. Pas d'erreur !",
       "noWorkspaceOpenWorkspace": "Saropa Lints: Il s'agit de la réponse à une question. aucun dossier d'espace de travail n'est ouvert. Ouvrez d'abord votre projet Dart/Flutter.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints : l'intégration de l'analyse est désactivée. Activez-la avant d'exécuter l'analyse.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints : le scan sur enregistrement est désactivé. Activez-le avant d'exécuter l'analyse.",
       "pluginAlive": "Saropa Lints est vivant: {rules} règles activées, les fichiers {files} analysés.",
       "openPubspecFailed": "Échec de l'ouverture de pubspec.yaml : {message}",
       "toggleSidebarSectionFailed": "Saropa Lints : impossible de basculer la section de la barre latérale – {message}",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: est une protéine de type 2 pub ont réussi mais saropa_lints n'a pas été résolu. Vérifiez le formatage pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: Il s'agit de la protéine du cerveau. L'écriture du configurateur a échoué. {details}",
       "disabled": "Saropa Lints est désactivé. Les fichiers du projet n'ont pas été modifiés.",
-      "disabledAnalyzer": "Saropa Lints l'intégration est désactivée. Les diagnostics des analyseurs seront bientôt effacés; basculez sur Lint intégration On pour restaurer.",
+      "disabledAnalyzer": "Intégration Saropa Lints désactivée. Les diagnostics de l'analyseur vont s'effacer bientôt ; activez Scan on save pour les restaurer.",
       "reenabledPlugin": "Saropa Lints plugin en cours de traitement réactivé. Redémarrage du serveur d'analyse Dart pour le recharger.",
       "reenableNothingToRestore": "Saropa Lints : rien à restaurer. Le plugin en cours de traitement n'est pas actuellement désactivé via l'extension.",
       "noOpenDartFiles": "Saropa Lints: Il s'agit de la réponse à une question. Aucun fichier ouvert Dart n'a été trouvé. Réouvrez un fichier Dart ou désactivez le paramètre \" Ouvrir uniquement les éditeurs \".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "Le processus de scan n'a pas répondu à temps.",
       "scanOnSaveDaemonExited": "Le processus de scan s'est arrêté inopinément. Il redémarrera lors de la prochaine sauvegarde.",
       "scanOnSaveDaemonBackoff": "Le processus de scan s'est arrêté récemment et attend de redémarrer. Sauvegardez à nouveau dans un instant.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints est désactivé — activez \"Intégration des règles de linter\" avant d'exécuter un scan de l'ensemble du projet.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints est désactivé — activez \"Scan lors de la sauvegarde\" avant d'exécuter un scan sur l'ensemble du projet.",
       "scanOnSaveBaselineAlreadyRunning": "Un scan de l'ensemble du projet est déjà en cours.",
       "scanOnSaveBaselineCanceled": "Scan de l'ensemble du projet annulé après {scanned}/{total} fichiers.",
       "scanOnSaveBaselineFailed": "Scan de l'ensemble du projet échoué : {details}",
@@ -2459,7 +2482,7 @@
     "diffTitle": "Optimiseur d'analyse : Exclusions proposées"
   },
   "sidebarShell": {
-    "dashboardsViewTitle": "Les tableaux de bord et les dashboards."
+    "dashboardsViewTitle": "Tableaux de bord"
   },
   "status": {
     "health": {
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Corriger les ignorés périmés dans ce fichier"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% revu",
+      "hotspotsDescription": "{open} ouvrir",
+      "lastRunLabel": "Dernière exécution · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Toutes les commandes…",
+      "commandCatalogDescription": "Rechercher toutes les commandes"
     }
   }
 }

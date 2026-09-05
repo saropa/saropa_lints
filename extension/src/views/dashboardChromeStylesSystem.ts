@@ -6,8 +6,13 @@
  * the composer there joins them with the other bands. No interpolation.
  */
 
-/** Links, animations, reduced-motion fallbacks. */
-export function chromeMicroAndMotion(): string {
+/**
+ * §8 — Plain anchor + `.link`-as-button styling. Split out of the former
+ * `chromeMicroAndMotion` bundle (see that function's doc comment below) so a
+ * consumer that wants only link styling never also pulls in the monospace
+ * font rule, section-heading rules, or keyframes.
+ */
+export function chromeLinks(): string {
   return `
 a { color: var(--link); cursor: pointer; text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -20,10 +25,34 @@ a:hover { text-decoration: underline; }
   font: inherit;
 }
 .link:hover { text-decoration: underline; }
-code, .mono {
+`;
+}
+
+/**
+ * `code, .mono` monospace font-family rule — its own concern.
+ *
+ * THIS is the exact rule PLAN_ext_ui_report_styles.md's audit named as the reason
+ * `report-styles-parts.ts` could not adopt the old bundled `chromeMicroAndMotion()`
+ * just to get `@keyframes hero-in`: opportunities-html.ts' `.opp-chip` elements are
+ * tagged with `code`, so importing this rule alongside the keyframe would silently
+ * repaint them in the editor monospace font. Keeping it as its own export means a
+ * consumer can now take `chromeKeyframeHeroIn()` without this side effect.
+ */
+export function chromeMonospace(): string {
+  // NOTE: no leading newline -- chromeMicroAndMotion() concatenates these pieces
+  // with `+`, no separator, and the preceding chromeLinks() piece already ends in
+  // "\n". Adding one here would insert a blank line the pre-split output never had
+  // and break the Phase 1 byte-identical gate.
+  return `code, .mono {
   font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
 }
-.section { margin-bottom: 14px; }
+`;
+}
+
+/** `.section` heading band (count/meta annotations) — its own concern. */
+export function chromeSectionHeadings(): string {
+  // NOTE: no leading newline -- see chromeMonospace's comment.
+  return `.section { margin-bottom: 14px; }
 .section > h2 {
   margin: 0 0 8px;
   font-size: 1.05em;
@@ -37,12 +66,55 @@ code, .mono {
   font-weight: 500;
 }
 .section > h2 .meta { margin-inline-start: auto; font-weight: 400; }
-@keyframes hero-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes card-in { from { opacity: 0; transform: translateY(4px); }  to { opacity: 1; transform: translateY(0); } }
+`;
+}
+
+/**
+ * `@keyframes hero-in` ONLY — isolated from every other keyframe and from the
+ * unrelated link/monospace/section rules above so a consumer (report-styles-parts.ts)
+ * can adopt exactly this animation for its own `.dash-hero` without also emitting
+ * `code, .mono` or the other four keyframes below. This is the single rule
+ * PLAN_ext_ui_report_styles.md Phase 2 needed unblocked.
+ */
+export function chromeKeyframeHeroIn(): string {
+  // NOTE: no leading newline -- see chromeMonospace's comment.
+  return `@keyframes hero-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+`;
+}
+
+/**
+ * The remaining four chrome keyframes (card/chip/menu-in, grow-x), grouped
+ * together since they are all "supplementary chrome keyframes" used by the
+ * KPI card / chip-strip / overflow-menu / bar-chart components — a single
+ * concern distinct from `chromeKeyframeHeroIn` only because Phase 2 needs
+ * hero-in in isolation, not because these four are unrelated to each other.
+ */
+export function chromeKeyframesSecondary(): string {
+  // NOTE: no leading newline -- see chromeMonospace's comment.
+  return `@keyframes card-in { from { opacity: 0; transform: translateY(4px); }  to { opacity: 1; transform: translateY(0); } }
 @keyframes chip-in { from { opacity: 0; transform: scale(0.92); }       to { opacity: 1; transform: scale(1); } }
 @keyframes menu-in { from { opacity: 0; transform: translateY(-4px); }  to { opacity: 1; transform: translateY(0); } }
 @keyframes grow-x  { from { transform: scaleX(0); }                     to { transform: scaleX(1); } }
 `;
+}
+
+/**
+ * Links, animations, reduced-motion fallbacks — COMPOSED from the fine-grained
+ * exports above in their original textual order. Kept as the public entry point
+ * so every existing consumer (`dashboardChromeStyles.ts`'s `getDashboardChromeStyles()`)
+ * keeps calling exactly what it calls today; output is byte-identical to what the
+ * single monolithic function emitted before the Phase 1 split (verified via a
+ * captured-baseline diff — see PLAN_ext_ui_report_styles.md and
+ * dashboardChromeStylesSeams.test.ts).
+ */
+export function chromeMicroAndMotion(): string {
+  return (
+    chromeLinks() +
+    chromeMonospace() +
+    chromeSectionHeadings() +
+    chromeKeyframeHeroIn() +
+    chromeKeyframesSecondary()
+  );
 }
 
 /**

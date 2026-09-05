@@ -279,7 +279,7 @@
         "hint": "Überschreibt die Schweregrad-Einstellung eines bestimmten Rules oder deaktiviert ihn vollständig, unabhängig von der Tierstufe und den Rule-Packs.",
         "level": "Ebene",
         "empty": "Keine Schweregradsüberschreibungen festgelegt.",
-        "rulePlaceholder": "Regelname",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Neue Schweregrad Ebene"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Globale Anzeigeeinstellungen für die Erweiterung",
-      "linkNote": "Die Lint-Integration ein-/ausgeschaltet wird, befindet sich in der Statuszeile der Seitenleiste; die Analyseebene befindet sich auf der Tier-Registerkarte — beide tun mehr als nur eine einfache Einstellung zu schreiben, daher werden sie hier nicht dupliziert."
+      "linkNote": "Scan bei Speichern ein/aus ist in der Statuszeile der Seitenleiste zu finden; die Analyseebene befindet sich auf der Ebene Registerkarte — beide tun mehr als eine einfache Einstellungsschreibung, daher werden sie hier nicht dupliziert."
     },
     "shortcuts": {
       "jumpToTab": "Sprung zu Tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,7 +369,7 @@
       "descriptionNoLane": "Tier: Die Ebene, auf der sich die Unternehmen befinden. {tier} ist ein _PH0_."
     },
     "controls": {
-      "analyzerPlugin": "Analyser-Plugin",
+      "analyzerPlugin": "Live-Analyse",
       "analyzerPluginDisabled": "Aus — nur beim Speichern scannen",
       "analyzerPluginAbsent": "Nicht konfiguriert",
       "laneLight": "Light — ~200 Regeln in-editor, rest bei Speichern",
@@ -918,7 +918,14 @@
       "colCount": "Zählen, zählen und zählen.",
       "colSeverity": "Schwere der Erkrankung",
       "colActionsAria": "Reihenaktionen Zeilenaktionen",
-      "filesAffected": "Betroffene Dateien ({count})"
+      "filesAffected": "Betroffene Dateien ({count})",
+      "howToFixHeading": "Wie kann ich das beheben",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "Verwandte Regeln",
+      "sameTagHeading": "Gleichheits-Tag-Erkennung",
+      "migrationHeading": "Migration",
+      "supersedesLabel": "Übergeordnet:"
     },
     "findings": {
       "sectionAria": "Ergebnisse der Untersuchung.",
@@ -1118,8 +1125,10 @@
       "overview": "Übersicht",
       "upgrades": "Aktualisierungen",
       "upgradesDesc": "Verfügbare Paket-Updates nach Risiko gruppiert mit einem Klick zum Anwenden.",
+      "upgradesGenerating": "Projekt scannt, um nicht adoptierte Features und Upgrade-Chancen zu finden. Dies wird bei jedem Scan einmal ausgeführt und bleibt im Cache, bis Sie erneut scannen.",
       "fullReport": "Vollständiger Bericht",
       "fullReportDesc": "Exportieren Sie den umfassenden Feature-Usage-Bericht (jeder gescannte Package, jeder extrahierte Changelog-Funktion) als HTML/Markdown/JSON-Datei und öffnen Sie ihn.",
+      "fullReportGenerating": "Vollständiger Bericht wird generiert — jeder analysierte Paket, jede extrahierte Changelog-Funktion. Dies wird pro Scan ausgeführt und bleibt im Cache bis Sie erneut scannen.",
       "knownIssues": "bekannte Probleme",
       "knownIssuesDesc": "Gewusst: Durchsuchen Sie bekannte Sicherheitslücken und Empfehlungen, die gegen Ihre Abhängigkeiten gemeldet wurden.",
       "compare": "Vergleichen Sie vergleichen.",
@@ -1747,7 +1756,8 @@
       "restart": "Wiederherstellen Sie den Restart.",
       "stopped": "Stopp",
       "logHeading": "Aktivität Tätigkeit.",
-      "logEmpty": "No output yet — project_health gibt keine schrittweisen Fortschrittsberichte, daher füllt dieser Log nur dann, wenn der Scan eine Diagnosemeldung ausgibt."
+      "logEmpty": "No output yet — this log only fills if the scan prints a diagnostic message.",
+      "progress": "{percent}% — {done}/{total} Dateien"
     },
     "reports": {
       "intro": "Einfach-klick CLI-Berichte, die zuvor einen Terminal erforderten. Jeder Run-Button streamt das Live-Ausgabe des Tools unterhalb seiner Karte und speichert eine Kopie unter reports/.saropa_lints/reports-tab/",
@@ -1787,16 +1797,27 @@
         "desc": "Überprüft analysis_options.yaml und analysis_options_custom.yaml auf häufige Konfigurationsfehler: Schlüssel in der falschen Datei, fehlende benutzerdefinierte Datei oder fehlende Versionseinschränkung."
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml Schwellwerte",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "qualität_gate:\n  Bedingungen:\n    – Metrik: new_critical_issues\n      op: Gl\n      Wert: 0\n      on_fail: fehlgeschlagen",
         "save": "Save Save Schon jetzt.",
         "saved": "Gespeichert",
         "saveError": "Konnte nicht speichern"
-      }
+      },
+      "colFile": "Dateien-Datei-Datein - Die Datei ist eine Datei.",
+      "colLineNum": "Linie Linie Line Line Line Die Linie",
+      "colRule": "Artikel Regel Regeln",
+      "colSeverity": "Schwere der Erkrankung",
+      "colMessage": "Die Botschaft ist eine Nachricht.",
+      "colKey": "Schlüssel"
     },
     "shortcuts": {
       "jumpToTab": "Sprung zu Tab 1-2 (Karte, Berichte)",
       "showOverlay": "Zeigen Sie diese Verknüpfung überlagern."
+    },
+    "hero": {
+      "files": "Dateien Datei-Dateien",
+      "lines": "Zeilen",
+      "size": "Größe Größenordnung Grösse Größigkeit"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Protokoll"
     },
     "engine": {
-      "analyzerPlugin": "Analyser-Plugin",
-      "scanDaemon": "Scannen Sie Daemon",
+      "analyzerPlugin": "Live Analyse",
+      "scanDaemon": "Scan bei Speichern",
       "lspServer": "LSP-Server",
       "pid": "PID:",
       "status": "Status:",
@@ -1949,7 +1970,8 @@
         "running": "ausführen",
         "stopped": "stoppiert",
         "suspended": "ausgesetzt",
-        "starting": "starten"
+        "starting": "starten",
+        "scanning": "scannen"
       },
       "rssNote": {
         "inProcess": "in-prozess, nicht separat messbar",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Läuft innerhalb des Dart Analyse-Servers — live squiggles im Editor beim Tippen, keine Scan notwendig. Das Schalten ändert die Plugins: block in analysis_options.yaml.",
         "scanDaemon": "Hintergrundprozess, der das gesamte Projekt beim Speichern erneut scannt und Berichte in /saropa_lints/violations.json schreibt. Deaktivieren unterbricht ihn; das nächste Speichern setzt ihn fort.",
         "lspServer": "Separater Sprachserver — veröffentlicht Diagnoseinformationen im Problems-Panel für geöffnete und Arbeitsbereichsdateien. Das Aktivieren/Deaktivieren schreibt die Einstellung saropaLints.lspServer.enabled."
-      }
+      },
+      "scanProgress": "Scan: {done}/{total} Dateien"
     },
     "toggle": {
       "on": "AN",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "Verstöße gegen die Ansichten anzeigen.",
       "noErrors": "Saropa Lints: Das ist ein _PH0_. Keine Fehler, keine Fehler!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: Das ist ein _PH0_. kein Arbeitsplatzordner ist geöffnet. Öffnen Sie zuerst Ihr Dart/Flutter Projekt.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints:Lint-Integration ist deaktiviert. Aktivieren Sie sie, bevor Sie die Analyse durchführen.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: scan on save ist deaktiviert. Aktivieren Sie es vor der Analyse.",
       "pluginAlive": "Saropa Lints lebt: Er ist am Leben. {rules} Regeln aktiviert, {files} Dateien analysiert.",
       "openPubspecFailed": "Es gelang nicht, pubspec.yaml zu öffnen: {message} ist ein _PH0_.",
       "toggleSidebarSectionFailed": "Saropa Lints: Das ist ein _PH1-Präparat. Es ist nicht gelungen, den Bereich der Seitenleiste zu wechseln  ⁇ {message} ist ein _PH0_.",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: Das ist die ________. pub erfolgreich war, aber saropa_lints wurde nicht gelöst. Überprüfen Sie die pubspec.yaml-Formatierung.",
       "configWriteFailedNs": "Saropa Lints: Das ist ein _PH1-Präparat. Config-Schreibfehler. {details}",
       "disabled": "Saropa Lints ist deaktiviert. Projektdateien wurden nicht geändert.",
-      "disabledAnalyzer": "Saropa Lints Integration ausgeschaltet. Die Diagnostik der Analysatoren wird in Kürze geklärt; Schalten Sie die Lint-Integration ein, um wiederherzustellen.",
+      "disabledAnalyzer": "Saropa Lints Integration deaktiviert. Die Analyse-Unterstützung wird in Kürze gelöscht; schalten Sie Scan on save ein, um sie wiederherzustellen.",
       "reenabledPlugin": "Saropa Lints in-process Plugin wurde wieder aktiviert. Der Dart Analyse-Server wird neu gestartet, um es zu laden.",
       "reenableNothingToRestore": "Saropa Lints: nichts zum Wiederherstellen. Der im Prozess laufende Plugin ist derzeit nicht über die Erweiterung deaktiviert.",
       "noOpenDartFiles": "Saropa Lints: Das ist ein _PH0_. keine offenen Dart Dateien gefunden. Öffnen Sie eine Dart Datei erneut oder deaktivieren Sie die Einstellung \"Nur für Redakteure öffnen\".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "Die Scan-Prozess hat nicht in der Zeit geantwortet.",
       "scanOnSaveDaemonExited": "Der Scan-Prozess ist unerwartet abgebrochen. Er wird beim nächsten Speichern neu gestartet.",
       "scanOnSaveDaemonBackoff": "Der Scan-Prozess ist kürzlich abgebrochen und wartet auf Neustart. Speichern Sie erneut in ein paar Minuten.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints ist deaktiviert — aktiviere „Lint Integration“ vor der Durchführung einer vollständigen Projektscan.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints ist deaktiviert — aktiviere „Scan on save“ vor der Durchführung einer vollständigen Projektscan.",
       "scanOnSaveBaselineAlreadyRunning": "Eine vollständige Projektscan läuft bereits.",
       "scanOnSaveBaselineCanceled": "Ganzen-Projekt-Scan abgebrochen nach {scanned}/{total} Dateien.",
       "scanOnSaveBaselineFailed": "Ganzer Projekt-Scan fehlgeschlagen: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Stale Ignores in dieser Datei beheben"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% geprüft",
+      "hotspotsDescription": "{open} öffnen",
+      "lastRunLabel": "Letzte Ausführung · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Alle Befehle…",
+      "commandCatalogDescription": "Alle Befehle suchen"
     }
   }
 }

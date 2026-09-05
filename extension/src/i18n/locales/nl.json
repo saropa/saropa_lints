@@ -279,7 +279,7 @@
         "hint": "Overschrijft de zwaarte van een specifieke regel, of schakelt deze volledig uit, onafhankelijk van de tier en regelpakketten.",
         "level": "Niveau",
         "empty": "Geen zwaarteoverschrijdingen zijn ingesteld.",
-        "rulePlaceholder": "regelnaam",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Nieuwe ernstiveau"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Extensiebrede weergavevoorkeuren",
-      "linkNote": "Lint-integratie aan/uit staat in de statusrij van de zijbalk; de analysegraad staat op de tabblad Graad — beide doen meer dan een eenvoudige instellingsschrijving, dus ze worden hier niet herhaald."
+      "linkNote": "Scan op slaan aan/uit staat in de statusrij van de zijbalk; de analysegraad staat op de Tab graad — beide doen meer dan een platte instelling schrijven, dus ze worden hier niet herhaald."
     },
     "shortcuts": {
       "jumpToTab": "Spring naar tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: de hoogste niveau. {tier} is een PH0__."
     },
     "controls": {
-      "analyzerPlugin": "Analyseer plug-in",
-      "analyzerPluginDisabled": "Off — scan-on-save alleen",
+      "analyzerPlugin": "Live analyse",
+      "analyzerPluginDisabled": "Off — scan bij opslaan alleen",
       "analyzerPluginAbsent": "Niet geconfigureerd",
       "laneLight": "Light — ~200 regels in-editor, rest op slaan",
       "laneFull": "Volledig — elke ingeschakelde regel in de editor",
@@ -918,7 +918,14 @@
       "colCount": "Tellen tellen telen tellen.",
       "colSeverity": "De ernst van de situatie",
       "colActionsAria": "Rij-acties Rijaakties",
-      "filesAffected": "De bestanden die zijn aangetast ({count})"
+      "filesAffected": "De bestanden die zijn aangetast ({count})",
+      "howToFixHeading": "Hoe te fixen",
+      "owaspMobileLabel": "Mobiel",
+      "owaspWebLabel": "Web",
+      "relatedRulesHeading": "Gerelateerde regels",
+      "sameTagHeading": "Gelijk-tag ontdekking",
+      "migrationHeading": "Migratie",
+      "supersedesLabel": "Vervangt:"
     },
     "findings": {
       "sectionAria": "Bevindingen bevindingen.",
@@ -1118,8 +1125,10 @@
       "overview": "Overzicht",
       "upgrades": "Upgrades",
       "upgradesDesc": "Beschouw beschikbare pakket-upgrades, gegroepeerd per risico, met één-klik toepassen.",
+      "upgradesGenerating": "Project wordt gescand op ongebruikte functies en upgrade-gelegenheden. Dit draait één keer per scan en blijft in cache tot u opnieuw scant.",
       "fullReport": "Volledig rapport",
       "fullReportDesc": "Exporteer het uitputtige rapport over feature-gebruik (elke gescande package, elke gemineerde changelog feature) als een HTML/Markdown/JSON bestand en open het.",
+      "fullReportGenerating": "Volledig rapport genereren — elke gescande package, elke uitgegraven changelog feature. Dit draait één keer per scan en blijft in cache tot u opnieuw scant.",
       "knownIssues": "Bekende problemen",
       "knownIssuesDesc": "Blader door bekende kwetsbaarheden en advisories die gerapporteerd zijn tegen uw afhankelijkheden.",
       "compare": "Vergelijk vergelijken.",
@@ -1747,7 +1756,8 @@
       "restart": "Herstart opnieuw opstarten.",
       "stopped": "Gestopt",
       "logHeading": "Activiteit Activiteitsactiviteit",
-      "logEmpty": "Geen output nog — project_health rapporteert geen stapsgewijze vooruitgang, dus deze log vult alleen als de scan een diagnostische bericht print."
+      "logEmpty": "Geen uitvoer nog — deze log vult alleen als de scan een diagnostische bericht print.",
+      "progress": "{percent}% — {done}/{total} bestanden"
     },
     "reports": {
       "intro": "Een-klik CLI-rapporten die eerder een terminal vereisten. Elke Run-knop stroomt de live-uitvoer van het tool onder zijn kaart en slaat een kopie op onder reports/.saropa_lints/reports-tab/",
@@ -1787,16 +1797,27 @@
         "desc": "Controleert analysis_options.yaml en analysis_options_custom.yaml op algemene misconfiguraties: sleutels in het verkeerde bestand, een ontbrekende custom bestand, of een ontbrekende versieconstraining."
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml-drempels",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "quality_gate:\n  voorwaarden:\n    - statistiek: nieuwe_kritieke_problemen\n      op: eq\n      waarde: 0\n      on_fail: mislukt",
         "save": "Save Save Save Bewaar het",
         "saved": "Opgeslagen",
         "saveError": "Kon niet opslaan"
-      }
+      },
+      "colFile": "File File File is een bestand.",
+      "colLineNum": "Lijn Lijnlijn Lijn",
+      "colRule": "Reglement van het reglement",
+      "colSeverity": "De ernst van de situatie",
+      "colMessage": "De boodschap van de boodschap is een boodschap.",
+      "colKey": "Sleutel"
     },
     "shortcuts": {
       "jumpToTab": "Spring naar tab 1-2 (Kaart, Rapporten)",
       "showOverlay": "Toon deze snelkoppeling overlay."
+    },
+    "hero": {
+      "files": "Bestanden bestandenbestanden.",
+      "lines": "Regels:",
+      "size": "Grootte Afmeting Maatwerk"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Logboek"
     },
     "engine": {
-      "analyzerPlugin": "Analyzer Plug-in",
-      "scanDaemon": "Daemon scannen",
+      "analyzerPlugin": "Live Analyse",
+      "scanDaemon": "Scan bij opslaan",
       "lspServer": "LSP-server",
       "pid": "PID:",
       "status": "Status:",
@@ -1949,7 +1970,8 @@
         "running": "uitvoeren",
         "stopped": "gestopt",
         "suspended": "geschorst",
-        "starting": "starten"
+        "starting": "starten",
+        "scanning": "scannen"
       },
       "rssNote": {
         "inProcess": "in-proces, niet afzonderlijk meetbaar",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Werkt binnen de Dart analyse-server — live squiggles in de editor terwijl je typt, geen scan nodig. Schakelen herleest de plug-ins: blok in analysis_options.yaml.",
         "scanDaemon": "Achtergrondproces dat het hele project opslaat en rapporten opnieuw scant/.saropa_lints/violations.json. Uitschakelen onderbreekt het; de volgende opslag herstart het.",
         "lspServer": "Stricte regels:\n1. Geef ALLEEN de vertaalde tekst weer."
-      }
+      },
+      "scanProgress": "Scan: {done}/{total} bestanden"
     },
     "toggle": {
       "on": "AAN",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "View Violaties Bekijk overtredingen",
       "noErrors": "Saropa Lints: Het is een _PH0_. Geen fouten, geen foutjes!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: Het is een _PH0_. geen werkruimte map is open. Open eerst je Dart/Flutter project.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: lint integratie is uitgeschakeld. Schakel het in voordat u de analyse uitvoert.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: scan op slaan is uit. Schakel het in voordat je analyse uitvoert.",
       "pluginAlive": "Saropa Lints leeft: {rules} regels ingeschakeld, {files} bestanden geanalyseerd.",
       "openPubspecFailed": "Kon niet openen pubspec.yaml: {message} is een PH0__.",
       "toggleSidebarSectionFailed": "Saropa Lints: Het is een generieke vorm van _ph1__. is het niet gelukt om de sectie zijbalk te schakelen  ⁇ {message} is een PH0__.",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: Het is een van de twee pub succesvol was, maar saropa_lints werd niet opgelost. Controleer de pubspec.yaml opmaak.",
       "configWriteFailedNs": "Saropa Lints: Het is een generieke vorm van _ph1__. config schrijven mislukte. {details}",
       "disabled": "Saropa Lints is uitgeschakeld. De projectbestanden zijn niet gewijzigd.",
-      "disabledAnalyzer": "Saropa Lints integratie uitgeschakeld. De analyserdiagnostiek zal binnenkort worden opgehelderd; schakel Lint-integratie in om te herstellen.",
+      "disabledAnalyzer": "Saropa Lints integratie uitgeschakeld. Analyse-diagnostiek wordt spoedig opgeruimd; schakel Scan on save aan om te herstellen.",
       "reenabledPlugin": "Saropa Lints in-process plugin is opnieuw ingeschakeld. Herstarten van de Dart analyse-server om het op te laden.",
       "reenableNothingToRestore": "Saropa Lints: niets te herstellen. Het in-proces plugin is momenteel niet gedeactiveerd via de extensie.",
       "noOpenDartFiles": "Saropa Lints: Het is een _PH0_. geen open Dart bestanden gevonden. Heropent een Dart bestand of schakel de instelling \"Alleen editors openen\" uit.",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "De scanprocess is niet op tijd geantwoord.",
       "scanOnSaveDaemonExited": "De scanprocess is onverwacht gestopt. Het zal opnieuw starten bij de volgende opslag.",
       "scanOnSaveDaemonBackoff": "De scanprocess is recentelijk gestopt en wacht op herstart. Bewaar opnieuw over een moment.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints is uitgeschakeld — schakel \"Lint integratie\" in voordat je een volledig project scanne.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints is uitgeschakeld — schakel \"Scan bij opslaan\" in voordat je een volledig project scant.",
       "scanOnSaveBaselineAlreadyRunning": "Een volledig project scan loopt al.",
       "scanOnSaveBaselineCanceled": "Gehele projectscan geannuleerd na {scanned}/{total} bestanden.",
       "scanOnSaveBaselineFailed": "Gehele project scan mislukt: {details}",
@@ -2459,7 +2482,7 @@
     "diffTitle": "Analyse Optimaliseerder: Aangevoerde Uitsluitingen"
   },
   "sidebarShell": {
-    "dashboardsViewTitle": "Dashboards dashboards zijn er."
+    "dashboardsViewTitle": "Dashboards"
   },
   "status": {
     "health": {
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Vermijd verouderde ignores in deze bestand"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% beoordeeld",
+      "hotspotsDescription": "{open} open",
+      "lastRunLabel": "Laatste run · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Alle commando's…",
+      "commandCatalogDescription": "Alle opdrachten zoeken"
     }
   }
 }

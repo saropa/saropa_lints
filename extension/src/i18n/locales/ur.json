@@ -264,7 +264,7 @@
         "label": "saropa_tier"
       },
       "runtimeTier": {
-        "label": "رن ٹائم_ٹیر"
+        "label": "runtime_tier"
       },
       "lane": {
         "title": "تجزیہ لین",
@@ -279,7 +279,7 @@
         "hint": "کسی مخصوص اصول کی شدت کو اوور رائیڈ کرتا ہے، یا اسے مکمل طور پر بند کر دیتا ہے، ٹائر اور رول پیک سے آزاد۔",
         "level": "سطح",
         "empty": "کوئی شدت اوور رائیڈز سیٹ نہیں ہیں۔",
-        "rulePlaceholder": "اصول_نام",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "نئی شدت کی سطح"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "توسیعی ڈسپلے کی ترجیحات۔",
-      "linkNote": "لنٹ انٹیگریشن آن/آف سائڈبار کی سٹیٹس قطار میں رہتا ہے۔ تجزیہ کا درجہ ٹائر ٹیب پر رہتا ہے - دونوں ایک سادہ ترتیب سے زیادہ لکھتے ہیں، لہذا وہ یہاں نقل نہیں کیے گئے ہیں۔"
+      "linkNote": "Scan on save on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
     },
     "shortcuts": {
       "jumpToTab": "ٹیب 1-7 (ٹیئر، رول پک، اور ڈیٹا، ایس کی ڈی کی رول آوٹ، کانفیگ فائل، اتومیشن، ایکسٹنسن)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "ٹائر: {tier}"
     },
     "controls": {
-      "analyzerPlugin": "تحلیل کنندہ پلاگ ان",
-      "analyzerPluginDisabled": "آف — صرف بچھوڑن پر اسکن /نُو_تھِنک",
+      "analyzerPlugin": "زندگی کی تحلیل",
+      "analyzerPluginDisabled": "آف — سکن سیو کے ساتھ ہی",
       "analyzerPluginAbsent": "نہ ترتیب دیا گیا",
       "laneLight": "ہلکا — ~200 قاعدے ان ڈیٹور میں، باقی ذخیرہ کرنے پر",
       "laneFull": "کامل — ہر ایک ایک سے چالو ہوئے قاعدہ داخلہ میں",
@@ -918,7 +918,14 @@
       "colCount": "گنتی کرنا Count شمار کرنا Count",
       "colSeverity": "شدت کی حد۔",
       "colActionsAria": "صفوں کی کارروائیاں۔",
-      "filesAffected": "متاثرہ فائلیں ({count})"
+      "filesAffected": "متاثرہ فائلیں ({count})",
+      "howToFixHeading": "کس طرح ترمیم کریں",
+      "owaspMobileLabel": "موبائل",
+      "owaspWebLabel": "ویب",
+      "relatedRulesHeading": "متعلقہ قواعد",
+      "sameTagHeading": "اکثریت کے نام سے تلاش کریں",
+      "migrationHeading": "میگریشن",
+      "supersedesLabel": "تبدیل کریں:"
     },
     "findings": {
       "sectionAria": "نتائج کے نتائج",
@@ -1118,8 +1125,10 @@
       "overview": "جائزہ",
       "upgrades": "اپ گریڈ",
       "upgradesDesc": "ایک کلک لاگو کرنے کے ساتھ، خطرے کے لحاظ سے گروپ کردہ دستیاب پیکیج اپ گریڈ کا جائزہ لیں۔",
+      "upgradesGenerating": "آپ کے پروجیکٹ کو غیر تسلیم شدہ خصوصیات اور اپ گریڈ کرنے کے مواقع کی تلاش کر رہا ہے۔ یہ ہر اسکن کے لیے ایک بار چلایا جاتا ہے اور تکمیل تک کی حفاظت کی جاتی ہے جب تک آپ اسکن کریں۔",
       "fullReport": "مکمل رپورٹ",
       "fullReportDesc": "HTML/Markdown/JSON فائل کے طور پر مکمل خصوصیت کے استعمال کی رپورٹ (ہر اسکین شدہ پیکج، ہر مائنڈ چینج لاگ فیچر) کو ایکسپورٹ کریں اور اسے کھولیں۔",
+      "fullReportGenerating": "رپورٹ کی تیاری کر رہے ہیں — ہر اسکن کیا گیا پیکیج، ہر نکاسی کردہ چینج لوج فیچر۔ یہ ہر اسکن کے لیے ایک بار چلائی جاتی ہے اور تک رکھی جاتی ہے جب تک آپ اسکن نہیں کریں گے۔",
       "knownIssues": "معلوم مسائل",
       "knownIssuesDesc": "آپ کے انحصار کے خلاف اطلاع دی گئی معلوم کمزوریوں اور مشورے کو براؤز کریں۔",
       "compare": "موازنہ کریں Compare",
@@ -1747,7 +1756,8 @@
       "restart": "دوبارہ شروع کریں اور پھر سے شروع کریں۔",
       "stopped": "روک دیا گیا",
       "logHeading": "سرگرمی کی سرگرمی۔",
-      "logEmpty": "ابھی تک کوئی آؤٹ پٹ نہیں ہے — پروجیکٹ_ہیلتھ مرحلہ وار پیشرفت کی اطلاع نہیں دیتا ہے، لہذا یہ لاگ صرف اس صورت میں بھرتا ہے جب اسکین تشخیصی پیغام کو پرنٹ کرتا ہے۔"
+      "logEmpty": "نکتہ نہیں ہے — اس لاگ صرف اس وقت پر ہوتا ہے جب اسکن ایک تشخیصی پیغام چھاپتا ہے۔",
+      "progress": "{percent}% — {done}/{total} فائلیں"
     },
     "reports": {
       "intro": "ایک کلک سی ایل آئی کی رپورٹ ہے کہ پہلے ٹرمینل کی ضرورت تھی۔ ہر رن بٹن ٹول کے لائیو آؤٹ پٹ کو اپنے کارڈ کے نیچے سٹریم کرتا ہے اور رپورٹس/.saropa_lints/reports-tab/ کے تحت ایک کاپی محفوظ کرتا ہے۔",
@@ -1787,16 +1797,27 @@
         "desc": "عام غلط کنفیگریشنز کے لیے analysis_options.yaml اور analysis_options_custom.yaml کو چیک کرتا ہے: غلط فائل میں کیز، ایک گمشدہ حسب ضرورت فائل، یا ورژن کی گمشدگی۔"
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml کی حد",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "کوالٹی_گیٹ:\n  شرائط:\n    - میٹرک: نئے_تنقیدی_مسائل\n      op: eq\n      قدر: 0\n      on_fail: ناکام",
         "save": "بچاؤ Save محفوظ کریں",
         "saved": "ذخیرہ کیا گیا",
         "saveError": "بچا نہیں سکا"
-      }
+      },
+      "colFile": "فائلوں کی فہرست بنائیں۔",
+      "colLineNum": "لائن لائن لائن لکیری",
+      "colRule": "آرٹیکل آرٹیک رول",
+      "colSeverity": "شدت کی حد۔",
+      "colMessage": "پیغام کا متن پیغام",
+      "colKey": "کیفیت"
     },
     "shortcuts": {
       "jumpToTab": "ٹیب جا 1-2 (میپ، رپورٹس)",
       "showOverlay": "اس شارٹ کٹ اوورلی کو دکھائیں۔"
+    },
+    "hero": {
+      "files": "فائلیں فائلیں",
+      "lines": "لائنز",
+      "size": "سائز کا سائز سائز کی شکل"
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "لاگ"
     },
     "engine": {
-      "analyzerPlugin": "تحلیل کنندہ پلاگ ان",
-      "scanDaemon": "سکن Daemon",
+      "analyzerPlugin": "زندگی کی تحلیل",
+      "scanDaemon": "سکن کریں اور ذخیرہ کریں",
       "lspServer": "LSP سرور",
       "pid": "PID:",
       "status": "حالة:",
@@ -1949,7 +1970,8 @@
         "running": "چلنا",
         "stopped": "روک دیا گیا",
         "suspended": "متوقف کر دیا گیا",
-        "starting": "شروع کریں"
+        "starting": "شروع کریں",
+        "scanning": "اسکننگ"
       },
       "rssNote": {
         "inProcess": "داخلی، الگ سے قابل اندازہ نہیں",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Dart تجزیہ سرور کے اندر چلتا ہے — جیسے ہی آپ ٹائپ کرتے ہیں ایڈیٹر میں لائیو اسکوگلس، اسکین کی ضرورت نہیں ہے۔ ٹوگل کرنا پلگ ان کو دوبارہ لکھتا ہے: analysis_options.yaml میں بلاک۔",
         "scanDaemon": "پس منظر کا عمل جو محفوظ کرنے پر پورے پروجیکٹ کو دوبارہ اسکین کرتا ہے اور رپورٹیں لکھتا ہے/.saropa_lints/violations.json۔ ٹوگل آف کرنا اسے معطل کر دیتا ہے۔ اگلی بچت اسے دوبارہ شروع کرتی ہے۔",
         "lspServer": "اُتاری لینگویج سرور — کھلے ہوئے اور ورک سپیس فائلز کے لیے پروبلمز پینل میں ڈیاگنوسٹکس جاری کرتا ہے۔ تبدیلی کرنے پر saropaLints.lspServer.enabled سیٹنگ کو تبدیل کردیا جاتا ہے۔"
-      }
+      },
+      "scanProgress": "سکن: {done}/{total} فائلیں"
     },
     "toggle": {
       "on": "اُپر /نہ کریں",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "View Violations خلاف ورزیوں کو دیکھیں",
       "noErrors": "Saropa Lints:۔ کوئی غلطی نہیں!",
       "noWorkspaceOpenWorkspace": "Saropa Lints:۔ کوئی ورک اسپیس فولڈر کھلا نہیں ہے۔ پہلے اپنا _Dart/_Flutter پروجیکٹ کھولیں۔",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: لینٹ اندراج غیر فعال ہے۔ تحلیل کے پہلے اسے فعال کریں۔",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ذخیرہ کرنے پر اسکن آف ہے۔ تحلیل شروع کرنے سے پہلے اسے سیشن کریں۔",
       "pluginAlive": "Saropa Lints زندہ ہے: {rules} قواعد فعال، {files} فائلوں کا تجزیہ کیا گیا۔",
       "openPubspecFailed": "pubspec.yaml کھولنے میں ناکام: {message}",
       "toggleSidebarSectionFailed": "Saropa Lints: سائڈبار سیکشن - {message} ٹوگل کرنے میں ناکام",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints:۔ _PH2_: پب حاصل کرنے میں کامیاب رہا لیکن saropa_lints حل نہیں ہوا تھا۔ pubspec.yaml فارمیٹنگ چیک کریں۔",
       "configWriteFailedNs": "Saropa Lints:۔ _PH1_: کنفیگ لکھنے میں ناکامی۔ {details}",
       "disabled": "Saropa Lints غیر فعال ہے۔ پروجیکٹ فائلوں میں کوئی تبدیلی نہیں کی گئی۔",
-      "disabledAnalyzer": "Saropa Lints انضمام بند کر دیا گیا ہے۔ تجزیہ کار تشخیصی جلد ہی صاف ہو جائے گا؛ ٹوگل کریں لنٹ انٹیگریشن بحال کرنے کے لئے آن کریں۔",
+      "disabledAnalyzer": "Saropa Lints انتیگریشن بند کر دیا گیا ہے۔ اینالائزر ڈیاگنوسٹکس جلد ہی ہٹ جائیں گے؛ اسکن اپنے ساتھ ٹوگل کریں تاکہ بحال کر دیا جائے۔",
       "reenabledPlugin": "Saropa Lints ایک پروسیس میں پلاگ ان دوبارہ سے کار کریں۔ Dart تحلیل سرور کو دوبارہ شروع کر کے اس کو لوڈ کرنا۔",
       "reenableNothingToRestore": "Saropa Lints: کچھ بھی بحال نہیں کیا جا سکتا۔ ایک پروسس میں پلاگن موجود ہے اور اسے ایکسٹنسن کے ذریعے اب تک غیر فعال نہیں کیا گیا ہے۔",
       "noOpenDartFiles": "Saropa Lints:۔ کوئی کھلی Dart فائلیں نہیں ملی۔ ایک Dart فائل کو دوبارہ کھولیں یا \"صرف ایڈیٹرز کھولیں\" کی ترتیب بند کردیں۔",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "اسکن پروسس کی جواب دہی وقت کے مطابق نہ ہوئی۔",
       "scanOnSaveDaemonExited": "اسکن پروسس غیر متوقع طور پر رک گیا۔ اگلی بچھا کرنے پر دوبارہ شروع ہو گا۔",
       "scanOnSaveDaemonBackoff": "نیزی کی جانچ کرنا تازہ طور پر روک دی گئی ہے اور دوبارہ شروع ہونے کے لئے انتظار کر رہی ہے۔ اچھی طرح سے بچھا دیں۔",
-      "scanOnSaveBaselineDisabled": "Saropa Lints بند ہے — پوری پروجیکٹ چیک کرنے سے پہلے \"Lint اندراج\" کو چاہیے۔",
+      "scanOnSaveBaselineDisabled": "Saropa Lints بند ہے — \"ذخیرہ کے وقت اسکن کریں\" کو اُنچا کریں پورے پروجیکٹ کے اسکن کرنے سے پہلے۔",
       "scanOnSaveBaselineAlreadyRunning": "ایک پورے پروجیکٹ کی گھماؤ کا ابھی تک چل رہا ہے",
       "scanOnSaveBaselineCanceled": "کامل پروجیکٹ اسکن {scanned}/{total} فائلوں کے بعد منسوخ ہو گیا۔",
       "scanOnSaveBaselineFailed": "کامل پروجیکٹ اسکن فیل ہو گیا: {details}",
@@ -2459,7 +2482,7 @@
     "diffTitle": "تحلیل اپٹیمайزر: پیش کی گئی استثنیات"
   },
   "sidebarShell": {
-    "dashboardsViewTitle": "ڈیش بورڈز ڈیشبورڈ"
+    "dashboardsViewTitle": "ڈیش بورڈز"
   },
   "status": {
     "health": {
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "اس فائل میں گھبرائی ہوئی نظریات ترمیم کریں"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "ہوٹ ہوٹس · {percent}% ریویو کیا گیا",
+      "hotspotsDescription": "{open} کھولیں",
+      "lastRunLabel": "آخری اجرا · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "ہر کمینڈ...",
+      "commandCatalogDescription": "ڈیٹا کو ڈھونڈو"
     }
   }
 }

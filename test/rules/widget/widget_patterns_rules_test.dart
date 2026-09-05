@@ -679,6 +679,11 @@ void main() {
       'avoid_parenthesized_button_caption',
       () => AvoidParenthesizedButtonCaptionRule(),
     );
+    testRule(
+      'PreferStateClassBelowWidgetRule',
+      'prefer_state_class_below_widget',
+      () => PreferStateClassBelowWidgetRule(),
+    );
   });
 
   // example/lib/: BAD lines must trigger; OK/false-positive blocks stay clean under analysis.

@@ -214,3 +214,37 @@ dashboard core or kept linked surfaces):
 None of the oversized files is *deleted* by consolidation (the full screens stay reachable), so the
 earlier worry — "decomposing files we'll merge away" — is smaller than feared: only the per-dashboard
 *landing layout* changes, not the screens themselves.
+
+---
+
+## Audit finding (2026-09-05) — item 2 (list C cards) is CLOSED as obsolete
+
+Re-evaluated against the current code after the Home hub removal (`ea2c7a8e`) and the sidebar
+rebuild. Verdict: **do not build the six deep-link cards as scoped.** Evidence per card:
+
+- **Item 24, disabled-rules quick re-enable — already built.** `rulePacksWebviewProvider.ts:1429-1495`
+  renders the expander with per-row re-enable (wired at `:2524`), one click from the Findings
+  status line. Folding a config *write* into Findings also contradicts `PLAN_ext_ui_sidebar_reset.md`
+  section 2, which confines settings edits to Lints Config.
+- **Item 21, project size — already one click away.** Project Map's hero shows Files/Lines/Size
+  (`projectMapShell.ts:114-128`). A second copy on Findings earns nothing.
+- **Item 19, package health — already has a live sidebar signal.** `sectionedSidebar.ts:334-340`
+  shows the adoption-needle count. Swapping in grade/EOL is a one-line description tweak, not a card.
+
+Two underlying facts ARE genuinely invisible and are re-scoped as small additions instead:
+
+1. **Quality-gate status** is computed and rendered only inside Code Health
+   (`projectVibrancyReportView.ts:500`, `:569-594`) and appears in no status line, sidebar row, or
+   hero. Fix: a gate pill on the Findings status line, reusing the existing computation.
+2. **Rule-pack enabled/detected ratio** is nowhere outside the Lints Config table. Tier
+   (`sectionedSidebar.ts:299-311`) and enabled-rule count (`violations-dashboard-top.ts:245-247`)
+   are already surfaced; the ratio is not. Fix: extend an existing pill or row description.
+
+Also found: the sidebar's Code Health and Project Map row descriptions are **hardcoded static
+strings** (`sectionedSidebar.ts:364-376`), contrary to `PLAN_ext_ui_sidebar_reset.md` section 5 P1,
+which specifies they read `getLastProjectVibrancyPayload()` and `getLastProjectMapMtime()`. The
+row-count contract test passed while the row *content* stayed static. Being fixed under the same
+follow-up.
+
+Item 1 (list B, rule-detail in the expander) is no longer "Not done" either — see
+`violations-dashboard-tables.ts:87-141`.

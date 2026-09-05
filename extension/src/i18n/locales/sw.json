@@ -264,7 +264,7 @@
         "label": "saropa_tier"
       },
       "runtimeTier": {
-        "label": "Runtime_tier"
+        "label": "runtime_tier"
       },
       "lane": {
         "title": "Analizi ya mpo",
@@ -279,7 +279,7 @@
         "hint": "Hubatilisha ukali wa sheria mahususi, au huizima kabisa, bila kujali viwango na vifurushi vya sheria.",
         "level": "Kiwango",
         "empty": "Hakuna ubatilishaji wa ukali uliowekwa.",
-        "rulePlaceholder": "kanuni_jina",
+        "rulePlaceholder": "rule_name",
         "newLevelAria": "Kiwango kipya cha ukali"
       },
       "bannedUsage": {
@@ -331,7 +331,7 @@
     },
     "extension": {
       "hint": "Mipangilio ya kuvutia kwa kati ya extension.",
-      "linkNote": "Unganisha kwa Lint kwenye kifungu ya status ya sidebar; analysis tier kwenye tab ya Tier — wanaochanganya kwa kawaida kuzalisha maelezo, hunaonekani kama matokeo ya kuzalisha maelezo."
+      "linkNote": "Kuzingia kwenye kujifunza kwenye kipengele ya kujifunza; kujifunza kwenye kipengele ya Tier — wanaonekana kujifunza kwa njia mbalimbali ya kujifunza kwenye kipengele ya kujifunza, hunaonekana kujifunza kwenye kipengele ya kujifunza."
     },
     "shortcuts": {
       "jumpToTab": "Kubonya kwa kipengele 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
@@ -369,8 +369,8 @@
       "descriptionNoLane": "Tier: Kiwango cha juu zaidi. {tier} _ PH0__ - Msaada wa kuokoa maisha."
     },
     "controls": {
-      "analyzerPlugin": "Plugin ya Analyzer",
-      "analyzerPluginDisabled": "Off — kusimama kwa kuzalisha",
+      "analyzerPlugin": "Analizi ya kipindi ya kati",
+      "analyzerPluginDisabled": "Off — kusimama kwenye kuzalisha",
       "analyzerPluginAbsent": "Hakuna inayozungumzwa",
       "laneLight": "Light — ~200 hadi kwenye editor, wengine kwenye kuzalisha",
       "laneFull": "Panda — kila neno ya kipengele kizalishwa katika kipengele ya editor",
@@ -918,7 +918,14 @@
       "colCount": "Count Count kuhesabu hesabu.",
       "colSeverity": "Ugumu wa Hali.",
       "colActionsAria": "Hatua za safu Matendo ya safu.",
-      "filesAffected": "Faili zilizoathiriwa ({count})"
+      "filesAffected": "Faili zilizoathiriwa ({count})",
+      "howToFixHeading": "Kama nini kujaribu",
+      "owaspMobileLabel": "Mobilie",
+      "owaspWebLabel": "Mtandao",
+      "relatedRulesHeading": "Rulizi ya kati",
+      "sameTagHeading": "Unganisho wa tagi ya same",
+      "migrationHeading": "Mipangilio",
+      "supersedesLabel": "Unganisha:"
     },
     "findings": {
       "sectionAria": "Matokeo ya Uchunguzi.",
@@ -1118,8 +1125,10 @@
       "overview": "Muhtasari",
       "upgrades": "Uboreshaji",
       "upgradesDesc": "Kagua masasisho ya kifurushi yanayopatikana, yaliyowekwa kulingana na hatari, na mbofyo mmoja itatumika.",
+      "upgradesGenerating": "Kusimamia project yako kwa kuzingatia mfumo mwingi na matokeo ya kushiriki. Hutokea kwa kipili kwa kusimamia na inaonekana kwenye cache hadi unisimamia kipili.",
       "fullReport": "Ujumbe Mwili",
       "fullReportDesc": "Tumia matokeo ya kuhusisha kuhusisha kuhusisha (kila paketi ya kuzingatia, kila kifungu cha changelog ya kuzingatia) kama faili ya HTML/Markdown/JSON na kipande.",
+      "fullReportGenerating": "Kuondoa raporti ya kati — kila paketi ya kuzinga, kila miongo wa changelog. Hiki ina kufanya kila muda mmoja kwa kuzinga na ina kushuka kwenye cache hadi unakuzinga tena.",
       "knownIssues": "Masuala yanayojulikana",
       "knownIssuesDesc": "Tazama vitu vya kifua vya kwanza na matokeo ya mchoro zilizopewa kwa kuzungumza na vikombina vyingi.",
       "compare": "Linganisha Compare Linganishe.",
@@ -1747,7 +1756,8 @@
       "restart": "Anzisha upya tena kwa kuanza upya.",
       "stopped": "Imesimamishwa",
       "logHeading": "Shughuli ya shughuli.",
-      "logEmpty": "Bado hakuna matokeo - project_health hairipoti maendeleo ya hatua kwa hatua, kwa hivyo kumbukumbu hii hujaza tu ikiwa skanisho itachapisha ujumbe wa uchunguzi."
+      "logEmpty": "Hakuna matokeo ya kuzalisha - log huu inakwenda kama scan inapakua pesa pesa.",
+      "progress": "{percent}% — {done}/{total} faili"
     },
     "reports": {
       "intro": "Mbofyo mmoja CLI inaripoti kwamba hapo awali ilihitaji terminal. Kila kitufe cha Run hutiririsha pato la moja kwa moja la zana chini ya kadi yake na kuhifadhi nakala chini ya ripoti/.saropa_lints/reports-tab/.",
@@ -1787,16 +1797,27 @@
         "desc": "Kutafuta michezo ya analysis_options.yaml na analysis_options_custom.yaml kwa misconfigurations ya kikali: kifile ya kikali, kifile ya kikali inayotumika, au kifile ya kikali inayotumika."
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml vizingiti",
+        "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "lango_la_ubora:\n  masharti:\n    - kipimo: masuala_mapya_muhimu\n      op: eq\n      thamani: 0\n      on_fail: kushindwa",
         "save": "Save Sawa Kuokoa",
         "saved": "Imehifadhiwa",
         "saveError": "Hakuna kujisajili"
-      }
+      },
+      "colFile": "File ya faili file.",
+      "colLineNum": "Mstari Line Line Line line.",
+      "colRule": "Kanuni ya Sheria Kanuni za sheria.",
+      "colSeverity": "Ugumu wa Hali.",
+      "colMessage": "Ujumbe ujumbe ujumbe ujumbe.",
+      "colKey": "Moto ya kifedha"
     },
     "shortcuts": {
       "jumpToTab": "Kubonya kipengele 1-2 (Map, Reports)",
       "showOverlay": "Onyesha hii njia ya mkato overlay."
+    },
+    "hero": {
+      "files": "Files files faili.",
+      "lines": "Lini",
+      "size": "Ukubwa wa ukubwa Size Size Size."
     }
   },
   "suppressionsStrip": {
@@ -1935,8 +1956,8 @@
       "log": "Kumbukumbu"
     },
     "engine": {
-      "analyzerPlugin": "Analizator Plugin",
-      "scanDaemon": "Tafuta Daemon",
+      "analyzerPlugin": "Analizi ya Kati",
+      "scanDaemon": "Tafuta kama inzalo",
       "lspServer": "Server ya LSP",
       "pid": "PID:",
       "status": "Hali:",
@@ -1949,7 +1970,8 @@
         "running": "kukimbia",
         "stopped": "mpona",
         "suspended": "mehusikisa",
-        "starting": "kuanza"
+        "starting": "kuanza",
+        "scanning": "kushusha"
       },
       "rssNote": {
         "inProcess": "kati ya programu, sio kati kwa muda mmoja",
@@ -1959,7 +1981,8 @@
         "analyzerPlugin": "Hufanya kazi ndani ya seva ya uchanganuzi ya Dart - hutiririka moja kwa moja kwenye kihariri unapoandika, hakuna uchanganuzi unaohitajika. Kugeuza huandika upya programu-jalizi: zuia katika analysis_options.yaml.",
         "scanDaemon": "Mchakato wa usuli ambao unachanganua upya mradi mzima kwenye kuhifadhi na kuandika ripoti/.saropa_lints/violations.json. Kuzima kunasimamisha; hifadhi inayofuata inaanza tena.",
         "lspServer": "Seva ya lugha tofauti - huchapisha uchunguzi kwenye paneli ya Matatizo kwa faili wazi na za nafasi ya kazi. Kugeuza huandika mpangilio wa saropaLints.lspServer.enabled."
-      }
+      },
+      "scanProgress": "Scan: {done}/{total} faili"
     },
     "toggle": {
       "on": "MWONGOLO",
@@ -2154,7 +2177,7 @@
       "actionViewViolations": "Angalia ukiukaji wa maoni.",
       "noErrors": "Saropa Lints:: kwa hiyo ni sawa. Hakuna makosa!",
       "noWorkspaceOpenWorkspace": "Saropa Lints:: kwa hiyo ni sawa. hakuna folda ya eneo la kazi iliyo wazi. Fungua mradi wako wa Dart/Flutter kwanza.",
-      "lintIntegrationOffCannotAnalyze": "Saropa Lints: uchunguzi wa lint inaofanya. Angalia kwenye kuchangia kila wakati kuchangisha.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: scan on save inakwenda. Angalia kwenye kujaribu analysis.",
       "pluginAlive": "Saropa Lints yuko hai: {rules} sheria kuwezeshwa, faili za {files} kuchambuliwa.",
       "openPubspecFailed": "Imeshindwa kufungua pubspec.yaml: {message} _ PH0__ - Msaada wa kuokoa maisha.",
       "toggleSidebarSectionFailed": "Saropa Lints: _PH1_: - Ni aina ya kiini cha mwili. imeshindwa kugeuza sehemu ya sidebar  ⁇ {message} _ PH0__ - Msaada wa kuokoa maisha.",
@@ -2190,7 +2213,7 @@
       "pubGetNotResolved": "Saropa Lints: _PH2_: - PH2__::: kwa ajili ya pub kupata mafanikio lakini saropa_lints haikuwa kutatuliwa. Angalia pubspec.yaml kuumbiza.",
       "configWriteFailedNs": "Saropa Lints: _PH1_: - Ni aina ya kiini cha mwili. config write failed. {details} kuandika kushindwa.",
       "disabled": "Saropa Lints imezimwa. Faili za mradi hazijabadilishwa.",
-      "disabledAnalyzer": "Saropa Lints ujumuishaji umezuiwa. Diagnostics analyzer itakuwa wazi hivi karibuni; kubadili Lint ushirikiano On kurejesha.",
+      "disabledAnalyzer": "Ungizaji wa Saropa Lints uliopunguzwa. Mdiango ya analizi ya kodi itakapochukua kifupi; tuma Scan on save On kujaribu kushinda.",
       "reenabledPlugin": "Unganisha plugin wa kati Saropa Lints. Kupakia server wa analizi ya Dart kujaribu kujaribu.",
       "reenableNothingToRestore": "Saropa Lints: hapa kujitambua. Plugin in-process haukotambua kwa makini kwa extension.",
       "noOpenDartFiles": "Saropa Lints:: kwa hiyo ni sawa. hakuna faili wazi za Dart zilizopatikana. Fungua tena faili ya Dart au uzime mipangilio \"Fungua wahariri tu\".",
@@ -2281,7 +2304,7 @@
       "scanOnSaveDaemonTimeout": "Mwongozo wa kusimamia haikuwa na muda mwingi.",
       "scanOnSaveDaemonExited": "Mchakato wa uchanganuzi umesimama bila kutarajiwa. Utaanza tena wakati wa uhifadhi ujao.",
       "scanOnSaveDaemonBackoff": "Mchakato wa uchanganuzi umesimama hivi karibuni na unasubiri kuanza upya. Hifadhi tena baada ya muda mfupi.",
-      "scanOnSaveBaselineDisabled": "Saropa Lints imefunguka — angalia \"Lint integration\" na ona kila kipengele ya project kama uweka kujaribu.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints inakwama — angalia \"Scan on save\" kabla ya kuanza scan ya project koko.",
       "scanOnSaveBaselineAlreadyRunning": "Kuzingia kipindi cha project kikamiliki inapakia.",
       "scanOnSaveBaselineCanceled": "Kuzingia kwa kutoa kwa {scanned}/{total} faili.",
       "scanOnSaveBaselineFailed": "Unganisha matokeo ya kujifunza kwa kujitokeza kwa kujifunza kwa kujitokeza: {details}",
@@ -2503,6 +2526,17 @@
     },
     "quickFix": {
       "title": "Tumeua kifungu kwenye faili hili"
+    }
+  },
+  "sidebar": {
+    "status": {
+      "hotspotsLabel": "Hotspots · {percent}% reviewed",
+      "hotspotsDescription": "{open} kifungu",
+      "lastRunLabel": "Jina la kwanza · {ago}"
+    },
+    "dashboards": {
+      "commandCatalogLabel": "Wote matokeo…",
+      "commandCatalogDescription": "Tazama kila matokeo ya kuzungumza"
     }
   }
 }

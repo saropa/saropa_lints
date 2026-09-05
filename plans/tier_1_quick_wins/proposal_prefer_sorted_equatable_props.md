@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `props` List Order Not Matching Field Declaration Order
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule
