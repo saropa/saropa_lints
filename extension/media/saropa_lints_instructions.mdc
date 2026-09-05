@@ -9,7 +9,7 @@ Guidelines when working on the saropa_lints codebase (Dart custom lint rules pac
 # Essential Files to Update
 
 - **New rule:** Register in [lib/src/rules/all_rules.dart](lib/src/rules/all_rules.dart) and [lib/src/tiers.dart](lib/src/tiers.dart). Add entry to [ROADMAP.md](ROADMAP.md).
-- **Structural changes:** Update [CODEBASE_INDEX.md](CODEBASE_INDEX.md) and [CODE_INDEX.md](CODE_INDEX.md) when adding utilities or moving files.
+- **Structural changes:** Update [CODEBASE_INDEX.md](CODEBASE_INDEX.md) when adding utilities or moving files.
 - **Before publish:** Update [CHANGELOG.md](CHANGELOG.md).
 
 # Workflow
@@ -26,7 +26,7 @@ Guidelines when working on the saropa_lints codebase (Dart custom lint rules pac
 
 # Principles
 
-- **Search first:** Check CODE_INDEX.md and lib/src utilities before adding new code.
+- **Search first:** Check CODEBASE_INDEX.md and lib/src utilities before adding new code.
 - **ProjectContext:** Use for package detection, platform detection, file classification—do not reimplement.
 - **Type checking** over string matching; **early returns** for simple checks.
 - **Code quality:** Functions ≤50 lines, parameters ≤3, nesting ≤3, files ≤200 lines (self-reviewer enforces).
