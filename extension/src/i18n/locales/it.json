@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Preferenze di visualizzazione a livello di estensione.",
       "linkNote": "Integrazione del linter on/off si trova nella riga di stato del lato sinistro; il livello di analisi si trova sulla scheda Tier — entrambi fanno qualcosa di più di un semplice scrittura delle impostazioni, quindi non sono duplicati qui."
+    },
+    "shortcuts": {
+      "jumpToTab": "Vai al tab 1-7 (Livello, Pacchetti di regole, Sovrascrizioni, Rollout SDK, File di configurazione, Automazione, Estensione)",
+      "prevNextTab": "Tab precedente / tab successivo",
+      "showOverlay": "Mostra questa sovrapposizione di scorciatoie."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "Salvato",
         "saveError": "Non è stato possibile salvare"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Vai alla scheda 1-2 (Mappa, Rapporti)",
+      "showOverlay": "Mostra questa sovrapposizione di scorciatoie."
     }
   },
   "suppressionsStrip": {

@@ -233,14 +233,14 @@
     },
     "sdk": {
       "summary": "(Các) gói di chuyển SDK {total} áp dụng cho dự án này — phá vỡ {breaking}, ngừng sử dụng {deprecation}.",
-      "noneApplicable": "No SDK migration packs apply to this project's pubspec environment yet.",
-      "enableAllTitle": "Turn on every SDK migration pack whose Dart/Flutter version gate this project already satisfies.",
+      "noneApplicable": "Không có gói di chuyển SDK nào áp dụng cho môi trường pubspec của dự án này hiện tại.",
+      "enableAllTitle": "Bật tất cả các gói chuyển đổi SDK mà phiên bản Dart/Flutter của gói này đã đáp ứng.",
       "enableAll": "Kích hoạt tất cả áp dụng ({count})",
-      "enableBreakingTitle": "Turn on only the SDK packs that flag APIs already removed in your target version.",
+      "enableBreakingTitle": "Chỉ bật các gói SDK mà đánh dấu các API đã bị loại bỏ trong phiên bản mục tiêu của bạn.",
       "enableBreaking": "Chỉ cho phép ngắt ({count})",
-      "enableDeprecationTitle": "Turn on only the SDK packs that flag APIs deprecated (but still working) in your target version.",
+      "enableDeprecationTitle": "Chỉ bật các gói SDK mà đánh dấu các API đã lỗi thời (nhưng vẫn hoạt động) trong phiên bản mục tiêu của bạn.",
       "enableDeprecation": "Chỉ cho phép ngừng sử dụng ({count})",
-      "noPacksInCatalogue": "No SDK migration packs are registered."
+      "noPacksInCatalogue": "Không có gói di chuyển SDK nào được đăng ký."
     },
     "configFile": {
       "analysisSettings": {
@@ -256,7 +256,7 @@
         "desc": "Trường hợp báo cáo phân tích được viết: chỉ thiết bị đầu cuối, chỉ một tệp hoặc cả hai."
       },
       "tierCap": {
-        "title": "Tier cap",
+        "title": "Giới hạn cấp độ",
         "hint": "Giới hạn cấp nào chạy tại thời điểm phân tích, không phụ thuộc vào quy tắc nào được bật rõ ràng. Để lại là Không có để sử dụng cài đặt Cấp của tiện ích mở rộng.",
         "none": "Không có (sử dụng cài đặt của tab Cấp)"
       },
@@ -277,15 +277,15 @@
       "severities": {
         "title": "Ghi đè mức độ nghiêm trọng",
         "hint": "Ghi đè mức độ nghiêm trọng của một quy tắc cụ thể hoặc tắt hoàn toàn quy tắc đó, không phụ thuộc vào cấp độ và gói quy tắc.",
-        "level": "Level",
-        "empty": "No severity overrides are set.",
+        "level": "Cấp độ",
+        "empty": "Không có quy tắc nào được thiết lập để ghi đè mức độ nghiêm trọng.",
         "rulePlaceholder": "tên_quy tắc",
-        "newLevelAria": "New severity level"
+        "newLevelAria": "Mức độ nghiêm trọng mới"
       },
       "bannedUsage": {
         "title": "Sử dụng bị cấm",
         "hint": "Gắn cờ một mã định danh cụ thể (hàm, lớp hoặc tên thành viên) ở bất cứ nơi nào nó xuất hiện trong dự án, với lý do tùy chỉnh được hiển thị trong chẩn đoán.",
-        "identifier": "Identifier",
+        "identifier": "Mã định danh",
         "identifierPlaceholder": "ví dụ. in",
         "reason": "Lý do",
         "reasonPlaceholder": "ví dụ. Thay vào đó hãy sử dụng Trình ghi nhật ký",
@@ -294,9 +294,9 @@
       "diagnosticStats": {
         "title": "Ngưỡng chẩn đoán",
         "hint": "Cổng ngân sách kiểu CI: cảnh báo hoặc thất bại khi số lượng vi phạm của quy tắc vượt quá ngưỡng.",
-        "warn": "Warn at",
+        "warn": "Cảnh báo tại",
         "fail": "Thất bại ở",
-        "empty": "No diagnostic thresholds are set."
+        "empty": "Không có ngưỡng chẩn đoán nào được thiết lập."
       },
       "baseline": {
         "title": "Đường cơ sở",
@@ -312,9 +312,9 @@
         "diff": {
           "title": "Khác biệt so với hiện tại",
           "counts": "{resolved} đã được giải quyết kể từ đường cơ sở · {new} mới kể từ đường cơ sở.",
-          "empty": "No drift — the live violation set matches the baseline exactly.",
+          "empty": "Không có sự lệch lạc — tập hợp vi phạm thực thời chính xác khớp với cơ sở so sánh.",
           "resolvedSection": "Đã giải quyết ({count})",
-          "newSection": "New since baseline ({count})",
+          "newSection": "Mới từ bản cơ sở ({count})",
           "moreRows": "+{count} không hiển thị thêm.",
           "fileCol": "File file file file File File",
           "lineCol": "Dòng Đường Đường"
@@ -322,8 +322,8 @@
       },
       "optimizer": {
         "openStandalone": "Mở độc lập",
-        "openStandaloneTitle": "Open the Analysis Optimizer in its own editor tab.",
-        "unavailable": "The Analysis Optimizer is not available in this session."
+        "openStandaloneTitle": "Mở Analysis Optimizer trong tab trình soạn thảo riêng của nó.",
+        "unavailable": "Tính năng Tối ưu Hóa Phân tích không khả dụng trong phiên này."
       }
     },
     "automation": {
@@ -331,7 +331,12 @@
     },
     "extension": {
       "hint": "Tùy chọn hiển thị trên toàn bộ phần mở rộng.",
-      "linkNote": "Lint integration on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
+      "linkNote": "Tích hợp lint bật/tắt nằm trong hàng trạng thái của thanh bên; cấp độ phân tích nằm trên tab Tier — cả hai đều thực hiện nhiều hơn chỉ là ghi thiết lập đơn giản, vì vậy chúng không được sao chép ở đây."
+    },
+    "shortcuts": {
+      "jumpToTab": "Chuyển đến tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Tab trước / tab sau",
+      "showOverlay": "Hiển thị lớp phủ phím tắt này."
     }
   },
   "consolidated": {
@@ -360,7 +365,7 @@
   },
   "dashboards": {
     "lintsConfig": {
-      "description": "Tier: {tier} · Lane: {lane}",
+      "description": "Cấp: {tier} · Làn đường: {lane}",
       "descriptionNoLane": "Tier: cấp bậc nhất. {tier} là Phương pháp"
     },
     "controls": {
@@ -370,7 +375,7 @@
       "laneLight": "Light — ~200 quy tắc trong trình soạn thảo, còn lại khi lưu",
       "laneFull": "Hoàn chỉnh — mọi quy tắc đã kích hoạt trong trình soạn thảo",
       "migrateLegacyKeys": "Di chuyển (các) khóa cấu hình cũ {count}",
-      "migrateLegacyKeysDesc": "Move legacy plugin-block keys to analysis_options_custom.yaml"
+      "migrateLegacyKeysDesc": "Chuyển các khóa plugin-block lỗi thời sang analysis_options_custom.yaml"
     },
     "badge": {
       "needlesTooltip": "(Các) gói {count} có các tính năng chưa được áp dụng"
@@ -657,9 +662,9 @@
     "menu": {
       "enableOn": "Đã bật phân tích (bấm để tắt)",
       "enableOff": "Phân tích bị vô hiệu hóa (nhấp để bật)",
-      "openViolations": "Open Violations Report",
+      "openViolations": "Mở Báo cáo Vi phạm",
       "openPackageDashboard": "Mở bảng điều khiển gói mở",
-      "openProcessHealth": "Open Process Health",
+      "openProcessHealth": "Mở Trạng thái Duyệt Process",
       "commandCatalog": "Command Catalogue - Danh mục chỉ huy",
       "about": "Về"
     }
@@ -1111,11 +1116,11 @@
     "tabs": {
       "aria": "Phần bảng điều khiển gói",
       "overview": "Tổng quan",
-      "upgrades": "Upgrades",
+      "upgrades": "Cập nhật",
       "upgradesDesc": "Xem lại các nâng cấp gói có sẵn, được nhóm theo rủi ro, áp dụng bằng một cú nhấp chuột.",
       "fullReport": "Báo cáo đầy đủ",
       "fullReportDesc": "Xuất báo cáo sử dụng tính năng đầy đủ (mọi gói được quét, mọi tính năng nhật ký thay đổi được khai thác) dưới dạng tệp HTML/Markdown/JSON và mở nó.",
-      "knownIssues": "Known issues",
+      "knownIssues": "Các vấn đề đã biết",
       "knownIssuesDesc": "Duyệt qua các lỗ hổng đã biết và lời khuyên được báo cáo đối với các phần phụ thuộc của bạn.",
       "compare": "So sánh so sánh so với so sánh",
       "compareDesc": "So sánh hai hoặc nhiều gói cạnh nhau về điểm số, kích thước và hoạt động.",
@@ -1133,7 +1138,7 @@
         "upgrade": "Nâng cấp nâng cấp Upgrade",
         "watch": "Đồng hồ",
         "budget": "Ngân sách",
-        "vuln": "Vulnerabilities"
+        "vuln": "Lỗ hổng"
       }
     },
     "detailPane": {
@@ -1368,7 +1373,7 @@
       "escapeSearch": "Tìm kiếm rõ ràng tập trung; tìm kiếm giây Esc sụp đổ tất cả các hàng mở rộng.",
       "historyBack": "Quay trở lại thông qua lịch sử điều hướng gói.",
       "showOverlay": "Hiển thị lớp phủ phím tắt này.",
-      "jumpToTab": "Jump to tab 1-6 (Overview, Upgrades, Full report, Known issues, Compare, Settings)"
+      "jumpToTab": "Chuyển đến tab 1-6 (Tổng quan, Cập nhật, Báo cáo đầy đủ, Vấn đề đã biết, So sánh, Cài đặt)"
     },
     "versionTooltip": {
       "installed": "Được lắp đặt: {version} ({date}) là một dạng của",
@@ -1731,7 +1736,7 @@
   "projectMap": {
     "panelTitle": "Bản đồ dự án Saropa",
     "tabs": {
-      "map": "Map",
+      "map": "Bản đồ",
       "reports": "Báo cáo",
       "aria": "Phần bản đồ dự án"
     },
@@ -1742,15 +1747,15 @@
       "restart": "Khởi động lại khởi động lại.",
       "stopped": "Đã dừng",
       "logHeading": "Hoạt động hoạt động Activity",
-      "logEmpty": "No output yet — project_health does not report step-by-step progress, so this log only fills if the scan prints a diagnostic message."
+      "logEmpty": "Chưa có đầu ra — project_health không báo cáo tiến trình từng bước, vì vậy log này chỉ được điền nếu quét in một thông báo chẩn đoán."
     },
     "reports": {
-      "intro": "One-click CLI reports that previously required a terminal. Each Run button streams the tool's live output below its card and saves a copy under reports/.saropa_lints/reports-tab/.",
+      "intro": "Báo cáo CLI bằng một cú nhấp chuột trước đây yêu cầu thiết bị đầu cuối. Mỗi nút Chạy truyền phát trực tiếp đầu ra của công cụ bên dưới thẻ của nó và lưu một bản sao trong các báo cáo/.saropa_lints/reports-tab/.",
       "runButton": "Chạy",
-      "notRunYet": "Not run yet",
+      "notRunYet": "Chưa chạy yet",
       "running": "Đang chạy…",
       "exitOk": "Thoát 0 - vượt qua",
-      "exitFail": "Non-zero exit — see output",
+      "exitFail": "Thoát không bằng 0 — xem output",
       "colLine": "#",
       "colText": "đầu ra",
       "severity": {
@@ -1758,7 +1763,7 @@
         "desc": "Chạy dart analyze và nhóm mọi vấn đề theo mức độ nghiêm trọng (lỗi, cảnh báo, thông tin) — lệnh terminal Dart chạy saropa_lints:severity_report mà không cần terminal."
       },
       "impact": {
-        "title": "Impact Report (legacy alias)",
+        "title": "Báo cáo Ảnh hưởng (tên cũ)",
         "desc": "Đầu ra giống hệt với Báo cáo mức độ nghiêm trọng - Impact_report là tên trước ngày 05 tháng 6 năm 2026, chỉ được giữ lại để các tập lệnh hiện có và bộ nhớ cơ tiếp tục hoạt động."
       },
       "qualityGate": {
@@ -1774,7 +1779,7 @@
         "desc": "Xác nhận mọi quy tắc bằng điểm đánh dấu Expect_lint trong đồ đạc thực sự kích hoạt ở đó — phát hiện quy tắc đã ngừng hoạt động một cách âm thầm. Hữu ích nhất khi phát triển saropa_lints."
       },
       "memory": {
-        "title": "Memory Report",
+        "title": "Báo cáo Bộ nhớ",
         "desc": "Tóm tắt xu hướng RSS của plugin phân tích từ các báo cáo/.saropa_lints/plugin.log — bộ nhớ đầu tiên/cuối cùng/phút/tối đa kể từ lần cuối plugin khởi động."
       },
       "doctor": {
@@ -1788,6 +1793,10 @@
         "saved": "Đã lưu",
         "saveError": "Không thể lưu"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Chuyển đến tab 1-2 (Bản đồ, Báo cáo)",
+      "showOverlay": "Hiển thị lớp phủ phím tắt này."
     }
   },
   "suppressionsStrip": {
@@ -2455,7 +2464,7 @@
   "status": {
     "health": {
       "lastRunTooltip": "Phân tích cuối cùng: {ago}",
-      "neverRunLabel": "Health: —",
+      "neverRunLabel": "Sức khỏe: -",
       "neverRunDescription": "Chạy phân tích để xem điểm sức khỏe của bạn"
     },
     "badge": {
@@ -2482,7 +2491,7 @@
     },
     "confirm": {
       "fixMessage": "Điều này sẽ xóa các chú thích bỏ qua lỗi cũ từ các tệp nguồn của bạn. Những thay đổi này có thể được hủy bỏ bằng git. Tiếp tục?",
-      "fixMessageWithCount": "This will remove {count} stale ignore comment(s) from your source files. The changes can be undone with git. Continue?",
+      "fixMessageWithCount": "Điều này sẽ xóa các chú thích bỏ qua lỗi {count} lỗi thời từ các tệp nguồn của bạn. Những thay đổi này có thể được hủy bỏ bằng git. Tiếp tục?",
       "fixAction": "Loại bỏ các ignores lỗi thời"
     },
     "diagnostic": {

@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Preferencias de visualización a nivel de la extensión.",
       "linkNote": "La integración de lints encendido/apagado está en la fila de estado del panel lateral; el nivel de análisis está en la pestaña Nivel — ambos hacen más que un simple escritura de configuración, por lo tanto no se duplican aquí."
+    },
+    "shortcuts": {
+      "jumpToTab": "Ir a pestaña 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Anterior / siguiente pestaña",
+      "showOverlay": "Mostrar esta superposición de atajos."
     }
   },
   "consolidated": {
@@ -1762,7 +1767,7 @@
         "desc": "Salida idéntica al informe de severidad — impact_report es el nombre anterior a 2026-06-05, se mantiene solo para que los scripts existentes y la memoria muscular sigan funcionando."
       },
       "qualityGate": {
-        "title": "Quality Gate",
+        "title": "Puerta de calidad",
         "desc": "Evalúa el último violations.json contra los umbrales en saropa_quality_gate.yaml y imprime PASS, WARN o FAIL. Edita los umbrales a continuación, luego ejecuta."
       },
       "stubTest": {
@@ -1788,6 +1793,10 @@
         "saved": "Guardado",
         "saveError": "No se pudo guardar"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Ir a pestaña 1-2 (Mapa, Informes)",
+      "showOverlay": "Mostrar esta superposición de atajos."
     }
   },
   "suppressionsStrip": {

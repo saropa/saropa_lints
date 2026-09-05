@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Préférences d'affichage applicables à l'extension",
       "linkNote": "L'intégration de l'analyse de code est activée/désactivée dans la ligne d'état de la barre latérale ; le niveau d'analyse se trouve sur l'onglet Tier — les deux effectuent plus qu'une simple écriture de paramètre, donc ils ne sont pas dupliqués ici."
+    },
+    "shortcuts": {
+      "jumpToTab": "Aller à l'onglet 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Précédent / suivant onglet",
+      "showOverlay": "Afficher cette superposition de raccourci."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "Enregistré",
         "saveError": "Impossible de sauvegarder"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Aller à l'onglet 1-2 (Carte, Rapports)",
+      "showOverlay": "Afficher cette superposition de raccourci."
     }
   },
   "suppressionsStrip": {

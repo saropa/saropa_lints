@@ -344,7 +344,7 @@
   "command.lspServer.stop.title": "Saropa Lints: หยุดเซิร์ฟเวอร์ LSP",
   "command.lspServer.restart.title": "Saropa Lints: รีสตาร์ทเซิร์ฟเวอร์ LSP",
   "config.section.Debug.title": "เครื่องมือ Debug & Diagnostics Engines",
-  "config.property.debug.enabled.description": "Show the Diagnostic Engines section (status and controls for the Analyzer Plugin, Scan Daemon, and LSP Server) in the Health Panel.",
+  "config.property.debug.enabled.description": "แสดงส่วน Diagnostic Engines (สถานะและควบคุมสำหรับ Analyzer Plugin, Scan Daemon และ LSP Server) ใน Painel Health",
   "config.property.lspServer.enabled.description": "รันเซิร์ฟเวอร์ Saropa Lints LSP แบบสแตนด์อโลนสำหรับการวินิจฉัย เมื่อเปิดใช้งาน จะทำให้เกิดกระบวนการ Dart แยกต่างหากที่ทำให้เกิดปัญหาและการแก้ไขด่วนผ่านทาง Language Server Protocol ปิดใช้งานปลั๊กอินตัววิเคราะห์โดยอัตโนมัติเพื่อประหยัด RAM ประมาณ 10GB การปิดตัวเลือกนี้จะเปิดใช้งานปลั๊กอินตัววิเคราะห์อีกครั้ง",
   "config.property.lspServer.workspaceScan.description": "สแกนพื้นที่ทำงานทั้งหมดเมื่อเริ่มต้นระบบ เพื่อให้การวินิจฉัยปรากฏขึ้นทั่วทั้งโปรเจ็กต์ในแผงปัญหา ไม่ใช่เฉพาะไฟล์ที่คุณเปิดเท่านั้น ปิดการใช้งานนี้สำหรับโปรเจ็กต์ขนาดใหญ่มากซึ่งการสแกนครั้งแรกใช้เวลานานเกินไป",
   "config.property.lspServer.scanDirectories.description": "ไดเร็กทอรีที่จะสแกนเมื่อเริ่มต้นระบบ (สัมพันธ์กับรูทโปรเจ็กต์) ใช้เมื่อเปิดใช้งานการสแกนพื้นที่ทำงานเท่านั้น ปรับเปลี่ยนให้ตรงกับโครงสร้างโครงการของคุณ — เช่น เพิ่ม 'src' หรือลบ 'test' หากไฟล์ทดสอบไม่เกี่ยวข้อง"

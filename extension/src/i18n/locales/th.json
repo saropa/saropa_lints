@@ -224,7 +224,7 @@
       "sdk": "การเปิดตัว SDK",
       "configFile": "ไฟล์กำหนดค่า",
       "automation": "ระบบอัตโนมัติ",
-      "extension": "Extension"
+      "extension": "ต่อขยาย"
     },
     "common": {
       "rule": "กฎหมาย สังกัด",
@@ -235,11 +235,11 @@
       "summary": "ชุดการย้ายข้อมูล {total} SDK ใช้กับโปรเจ็กต์นี้ - {breaking} ใช้งานไม่ได้, {deprecation} เลิกใช้งานแล้ว",
       "noneApplicable": "ยังไม่มีชุดการย้ายข้อมูล SDK ที่ใช้กับสภาพแวดล้อม pubspec ของโปรเจ็กต์นี้",
       "enableAllTitle": "เปิดชุดการย้ายข้อมูล SDK ทุกชุดที่มีเวอร์ชัน Dart/Flutter เกตเวย์โปรเจ็กต์นี้ตรงตามความต้องการแล้ว",
-      "enableAll": "Enable all applicable ({count})",
+      "enableAll": "เปิดใช้งานทุกข้อที่เหมาะสม ({count})",
       "enableBreakingTitle": "เปิดเฉพาะชุด SDK ที่ทำเครื่องหมายว่า API ที่ถูกลบไปแล้วในเวอร์ชันเป้าหมายของคุณ",
-      "enableBreaking": "Enable breaking only ({count})",
+      "enableBreaking": "เปิดใช้งานเฉพาะการแบ่งแยก ({count})",
       "enableDeprecationTitle": "เปิดเฉพาะชุด SDK ที่ทำเครื่องหมายว่า API เลิกใช้งานแล้ว (แต่ยังคงใช้งานได้) ในเวอร์ชันเป้าหมายของคุณ",
-      "enableDeprecation": "Enable deprecation only ({count})",
+      "enableDeprecation": "เปิดใช้งานเฉพาะการเตือนการใช้งานที่ถูกยกเลิก ({count})",
       "noPacksInCatalogue": "ไม่มีการลงทะเบียนชุดการโยกย้าย SDK"
     },
     "configFile": {
@@ -252,7 +252,7 @@
         "desc": "ปิดจำนวนปัญหาที่ไม่ใช่ข้อผิดพลาดที่แสดงในแท็บปัญหา 0 หมายถึงไม่จำกัด โอเวอร์โฟลว์ยังคงปรากฏในไฟล์รายงานฉบับเต็ม"
       },
       "output": {
-        "label": "Output",
+        "label": "ผลลัพธ์",
         "desc": "ตำแหน่งที่เขียนรายงานการวิเคราะห์: เฉพาะเทอร์มินัล ไฟล์เท่านั้น หรือทั้งสองอย่าง"
       },
       "tierCap": {
@@ -268,7 +268,7 @@
       },
       "lane": {
         "title": "ช่องทางการวิเคราะห์",
-        "hint": "Which rules the in-process analyzer plugin runs live in the editor versus only on save (via the scan daemon)."
+        "hint": "กฎใดที่ปลั๊กอินวิเคราะห์แบบเรียลไทม์ทำงานในตัวแก้ไขข้อความ แทนที่จะทำงานเฉพาะเมื่อบันทึกไฟล์ (ผ่าน Daemon ในการสแกน)"
       },
       "platforms": {
         "title": "แพลตฟอร์มเป้าหมาย",
@@ -276,19 +276,19 @@
       },
       "severities": {
         "title": "การแทนที่ความรุนแรง",
-        "hint": "Overrides a specific rule's severity, or turns it off entirely, independent of tier and rule packs.",
+        "hint": "กำหนดความรุนแรงของกฎเฉพาะ หรือปิดใช้งานกฎนั้นโดยสมบูรณ์ ไม่ขึ้นกับระดับหรือชุดกฎ",
         "level": "ระดับ",
         "empty": "ไม่มีการตั้งค่าการแทนที่ความรุนแรง",
-        "rulePlaceholder": "rule_name",
+        "rulePlaceholder": "กฎชื่อ",
         "newLevelAria": "ระดับความรุนแรงใหม่"
       },
       "bannedUsage": {
         "title": "การใช้งานที่ถูกห้าม",
         "hint": "ติดธงตัวระบุเฉพาะ (ฟังก์ชัน คลาส หรือชื่อสมาชิก) ทุกที่ที่ปรากฏในโครงการ พร้อมเหตุผลที่กำหนดเองแสดงในการวินิจฉัย",
         "identifier": "ตัวระบุ",
-        "identifierPlaceholder": "e.g. print",
+        "identifierPlaceholder": "ตัวอย่างเช่น: พิมพ์",
         "reason": "เหตุผล",
-        "reasonPlaceholder": "e.g. Use Logger instead",
+        "reasonPlaceholder": "ตัวอย่าง: ใช้ Logger แทน",
         "empty": "ไม่มีตัวระบุที่ถูกแบน"
       },
       "diagnosticStats": {
@@ -306,7 +306,7 @@
         "createTitle": "รัน dart run saropa_lints:baseline — เขียน saropa_baseline.json และเปิดใช้งานในการกำหนดค่า",
         "openButton": "เปิดไฟล์พื้นฐาน",
         "openTitle": "เปิด saropa_baseline.json ในตัวแก้ไข",
-        "summary": "{files} file(s), {violations} violation(s) baselined — generated {generated}.",
+        "summary": "ไฟล์ {files} จำนวน {violations} ข้อผิดพลาด ได้รับการตั้งค่าเป็นฐาน — สร้างขึ้น {generated}",
         "unknownDate": "ในเวลาที่ไม่รู้จัก",
         "count": "นับนับ นับ นิยม",
         "diff": {
@@ -322,7 +322,7 @@
       },
       "optimizer": {
         "openStandalone": "เปิดแบบสแตนด์อโลน",
-        "openStandaloneTitle": "Open the Analysis Optimizer in its own editor tab.",
+        "openStandaloneTitle": "เปิดตัวแก้ไขข้อความของเครื่องมือวิเคราะห์ในแท็บของตัวเอง",
         "unavailable": "เครื่องมือเพิ่มประสิทธิภาพการวิเคราะห์ไม่พร้อมใช้งานในเซสชันนี้"
       }
     },
@@ -332,6 +332,11 @@
     "extension": {
       "hint": "การตั้งค่าการแสดงผลทั้งส่วนขยาย",
       "linkNote": "การเปิด/ปิดการรวม Lint อยู่ในแถวสถานะของแถบด้านข้าง ระดับการวิเคราะห์อยู่บนแท็บ Tier — ทั้งสองทำมากกว่าการเขียนการตั้งค่าธรรมดา ดังนั้นจึงไม่มีการทำซ้ำที่นี่"
+    },
+    "shortcuts": {
+      "jumpToTab": "ไปยังแท็บ 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "แท็บก่อนหน้า / แท็บถัดไป",
+      "showOverlay": "แสดงการ overlay ทางลัดนี้"
     }
   },
   "consolidated": {
@@ -1109,12 +1114,12 @@
     "documentTitle": "Saropa แดชบอร์ดแพคเกจ",
     "heroTitle": "Saropa แดชบอร์ดแพคเกจ",
     "tabs": {
-      "aria": "Package dashboard sections",
+      "aria": "ส่วนของแพ็กเกจดัชบอร์ด",
       "overview": "ภาพรวม",
       "upgrades": "การอัพเกรด",
       "upgradesDesc": "ตรวจสอบการอัพเกรดแพ็คเกจที่มีอยู่ จัดกลุ่มตามความเสี่ยง เพียงคลิกเดียว",
       "fullReport": "รายงานฉบับเต็ม",
-      "fullReportDesc": "Export the exhaustive feature-usage report (every scanned package, every mined changelog feature) as an HTML/Markdown/JSON file and open it.",
+      "fullReportDesc": "ส่งออกรายงานการใช้งานคุณสมบัติทั้งหมด (ทุกแพ็กเกจที่ถูกสแกน ทุกคุณสมบัติที่ได้จากการวิเคราะห์ changelog) เป็นไฟล์ HTML/Markdown/JSON และเปิดไฟล์นั้น",
       "knownIssues": "ปัญหาที่ทราบ",
       "knownIssuesDesc": "เรียกดูช่องโหว่และคำแนะนำที่ทราบซึ่งรายงานเกี่ยวกับการพึ่งพาของคุณ",
       "compare": "เปรียบเทียบ Compare",
@@ -1123,15 +1128,15 @@
       "openButton": "เปิด {tab}"
     },
     "settingsTab": {
-      "intro": "Every packageVibrancy.* setting, grouped. Changes save immediately to your workspace settings.",
-      "noLimit": "no limit",
+      "intro": "ทุกการตั้งค่า packageVibrancy.* ที่กำหนด กลุ่มกัน ข้อมูลการเปลี่ยนแปลงจะถูกบันทึกทันทีไปยังตั้งค่าของงานของคุณ",
+      "noLimit": "ไม่มีข้อจำกัด",
       "group": {
         "access": "การเข้าถึงและการลงทะเบียน",
         "scan": "สแกน",
         "display": "แสดง",
         "weights": "น้ำหนักคะแนน",
         "upgrade": "อัพเกรดอัปเดรด Upgrade",
-        "watch": "Watch",
+        "watch": "ดู",
         "budget": "งบประมาณ",
         "vuln": "ช่องโหว่"
       }
@@ -1749,10 +1754,10 @@
       "runButton": "วิ่ง",
       "notRunYet": "ยังไม่วิ่ง.",
       "running": "วิ่ง…",
-      "exitOk": "Exit 0 — pass",
+      "exitOk": "ออก 0 — ผ่าน",
       "exitFail": "ทางออกที่ไม่ใช่ศูนย์ — ดูเอาท์พุท",
       "colLine": "#",
-      "colText": "Output",
+      "colText": "ผลลัพธ์",
       "severity": {
         "title": "รายงานความรุนแรง",
         "desc": "รัน dart analyze และจัดกลุ่มทุกปัญหาตามความรุนแรง (ข้อผิดพลาด คำเตือน ข้อมูล) — คำสั่งเทอร์มินัล dart รัน saropa_lints:severity_report โดยไม่มีเทอร์มินัล"
@@ -1763,7 +1768,7 @@
       },
       "qualityGate": {
         "title": "ประตูคุณภาพ",
-        "desc": "Evaluates the latest violations.json against the thresholds in saropa_quality_gate.yaml and prints PASS, WARN, or FAIL. Edit the thresholds below, then run."
+        "desc": "ประเมินค่า violations.json ล่าสุดเทียบกับเกณฑ์ใน saropa_quality_gate.yaml และพิมพ์ PASS, WARN หรือ FAIL แก้ไขเกณฑ์ด้านล่างแล้วดำเนินการต่อ"
       },
       "stubTest": {
         "title": "รายงานการทดสอบต้นขั้ว",
@@ -1778,7 +1783,7 @@
         "desc": "สรุปแนวโน้ม RSS ของปลั๊กอินตัววิเคราะห์จาก Reports/.saropa_lints/plugin.log — หน่วยความจำแรก/สุดท้าย/นาที/สูงสุดนับตั้งแต่ปลั๊กอินเริ่มทำงานครั้งล่าสุด"
       },
       "doctor": {
-        "title": "Doctor",
+        "title": "แพทย์",
         "desc": "ตรวจสอบ analysis_options.yaml และ analysis_options_custom.yaml เพื่อดูการกำหนดค่าที่ไม่ถูกต้องทั่วไป เช่น คีย์ในไฟล์ที่ไม่ถูกต้อง ไฟล์ที่กำหนดเองหายไป หรือข้อจำกัดเวอร์ชันที่หายไป"
       },
       "gate": {
@@ -1788,6 +1793,10 @@
         "saved": "บันทึกแล้ว",
         "saveError": "ไม่สามารถบันทึกได้"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "ไปยังแท็บ 1-2 (แผนที่, รายงาน)",
+      "showOverlay": "แสดงการ overlay ทางลัดนี้"
     }
   },
   "suppressionsStrip": {
@@ -1976,7 +1985,7 @@
       "daemonToggleOff": "สแกน Daemon: กำลังระงับ…"
     },
     "sidebar": {
-      "enginesLabel": "Engines: {count} running"
+      "enginesLabel": "เครื่องยนต์: {count} กำลังทำงาน"
     }
   },
   "detailView": {

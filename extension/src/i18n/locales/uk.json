@@ -244,12 +244,12 @@
     },
     "configFile": {
       "analysisSettings": {
-        "title": "Analysis settings",
+        "title": "Налаштування аналізу",
         "hint": "Контролює, скільки проблем відображається на вкладці «Проблеми» та місце написання аналізу."
       },
       "maxIssues": {
         "label": "Макс питань",
-        "desc": "Caps the number of non-error issues shown in the Problems tab. 0 means unlimited. Overflow still appears in the full report file."
+        "desc": "Встановлює кількість непомилкових питань, які відображаються в вкладці \"Помилки\". 0 означає без обмежень. Переповнення все одно з'являється в повному звітному файлі."
       },
       "output": {
         "label": "Вихід",
@@ -267,7 +267,7 @@
         "label": "runtime_tier"
       },
       "lane": {
-        "title": "Analysis lane",
+        "title": "Аналіз ланки",
         "hint": "За якими правилами плагін внутрішнього аналізатора працює в режимі реального часу в редакторі, а не лише під час збереження (через демон сканування)."
       },
       "platforms": {
@@ -300,7 +300,7 @@
       },
       "baseline": {
         "title": "Бейслайн",
-        "hint": "A baseline suppresses the project's EXISTING violations so only newly-introduced findings surface afterward.",
+        "hint": "Базова лінія пригніщає порушення проекту, що вже існує, тому після цього виявляються лише нові знайдені порушення.",
         "emptyHint": "Базовий рівень ще не створено. Створення одного пригнічує сьогоднішні порушення та активує придушення базового рівня в конфігурації.",
         "createButton": "Створити/оновити базову лінію",
         "createTitle": "Запускає dart run saropa_lints:baseline — записує saropa_baseline.json і активує його в конфігу.",
@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Параметри відображення на рівні розширення.",
       "linkNote": "Увімкнення/вимкнення інтеграції Lint відображається в рядку стану бічної панелі; рівень аналізу знаходиться на вкладці «Рівень» — обидва роблять більше, ніж просто запис налаштувань, тому вони тут не дублюються."
+    },
+    "shortcuts": {
+      "jumpToTab": "Перейти до вкладки 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Попередня / наступна вкладка",
+      "showOverlay": "Показати цей короткий шлях перегортання."
     }
   },
   "consolidated": {
@@ -655,7 +660,7 @@
   },
   "statusBar": {
     "menu": {
-      "enableOn": "Analysis enabled (click to disable)",
+      "enableOn": "Аналіз увімкнено (клацніть, щоб вимкнути)",
       "enableOff": "Аналіз вимкнено (клацніть, щоб увімкнути)",
       "openViolations": "Відкрийте звіт про порушення",
       "openPackageDashboard": "Відкрийте панель управління пакетом.",
@@ -1132,7 +1137,7 @@
         "weights": "Оцінка ваги",
         "upgrade": "Оновлення оновлення перейменування.",
         "watch": "Дивитися",
-        "budget": "Budget",
+        "budget": "Бюджет",
         "vuln": "Вразливі місця"
       }
     },
@@ -1779,7 +1784,7 @@
       },
       "doctor": {
         "title": "лікар",
-        "desc": "Checks analysis_options.yaml and analysis_options_custom.yaml for common misconfigurations: keys in the wrong file, a missing custom file, or a missing version constraint."
+        "desc": "Перевіряє analysis_options.yaml та analysis_options_custom.yaml на загальні неправильні налаштування: ключі в неправильному файлі, відсутній файл custom або відсутній обмеження версії."
       },
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml пороги",
@@ -1788,6 +1793,10 @@
         "saved": "Збережено",
         "saveError": "Не вдалося зберегти"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Перейти до вкладки 1-2 (Мапа, Звіти)",
+      "showOverlay": "Показати цей короткий шлях перегортання."
     }
   },
   "suppressionsStrip": {

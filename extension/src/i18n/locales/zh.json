@@ -222,7 +222,7 @@
       "packs": "规则包包括一个规则.",
       "overrides": "忽略了重置的原因",
       "sdk": "SDK推出",
-      "configFile": "Config file",
+      "configFile": "配置文件",
       "automation": "自动化",
       "extension": "扩大"
     },
@@ -233,7 +233,7 @@
     },
     "sdk": {
       "summary": "{total} SDK 迁移包适用于此项目 - {breaking} 破坏，{deprecation} 弃用。",
-      "noneApplicable": "No SDK migration packs apply to this project's pubspec environment yet.",
+      "noneApplicable": "目前尚无适用于此项目pubspec环境的SDK迁移包。",
       "enableAllTitle": "打开此项目已满足 Dart/Flutter 版本门的每个 SDK 迁移包。",
       "enableAll": "启用所有适用的 ({count})",
       "enableBreakingTitle": "仅打开标记 API 已在目标版本中删除的 SDK 包。",
@@ -245,7 +245,7 @@
     "configFile": {
       "analysisSettings": {
         "title": "分析设置",
-        "hint": "Controls how many issues the Problems tab shows and where the analysis report is written."
+        "hint": "控制问题面板显示多少问题以及分析报告的输出位置。"
       },
       "maxIssues": {
         "label": "最大问题数",
@@ -292,7 +292,7 @@
         "empty": "没有标识符被禁止。"
       },
       "diagnosticStats": {
-        "title": "Diagnostic thresholds",
+        "title": "诊断阈值",
         "hint": "CI 样式预算门：当规则的违规计数超过阈值时发出警告或失败。",
         "warn": "警告于",
         "fail": "失败于",
@@ -302,7 +302,7 @@
         "title": "基线",
         "hint": "基线抑制了项目现有的违规行为，因此之后只有新引入的发现才会浮出水面。",
         "emptyHint": "尚未创建基线。创建一个可以抑制今天的违规行为并在配置中激活基线抑制。",
-        "createButton": "Create / refresh baseline",
+        "createButton": "创建/刷新基线",
         "createTitle": "运行 dart run saropa_lints:baseline — 写入 saropa_baseline.json 并在配置中激活它。",
         "openButton": "打开基线文件",
         "openTitle": "在编辑器中打开 saropa_baseline.json。",
@@ -314,7 +314,7 @@
           "counts": "{resolved} 自基线以来已解决 · {new} 自基线以来是新的。",
           "empty": "无漂移——实时违规集与基线完全匹配。",
           "resolvedSection": "已解决（{count}）",
-          "newSection": "New since baseline ({count})",
+          "newSection": "自基线版本（{count}）起新增",
           "moreRows": "+{count} 更多未显示。",
           "fileCol": "文件的档案,是我们所拥有的.",
           "lineCol": "线条 线路 线上"
@@ -332,6 +332,11 @@
     "extension": {
       "hint": "扩展范围内的显示首选项。",
       "linkNote": "Lint 集成的开/关位于侧边栏的状态行中；分析层位于“层”选项卡上 - 两者都不仅仅是简单的设置写入，因此此处不再重复。"
+    },
+    "shortcuts": {
+      "jumpToTab": "跳转到标签 1-7（层级，规则集，覆盖，SDK 发布，配置文件，自动化，扩展）",
+      "prevNextTab": "上一个标签 / 下一个标签",
+      "showOverlay": "显示这个快捷键覆盖."
     }
   },
   "consolidated": {
@@ -1771,7 +1776,7 @@
       },
       "accuracy": {
         "title": "准确性报告",
-        "desc": "Confirms every rule with an expect_lint marker in the fixtures actually fires there — catches a rule that silently stopped working. Most useful when developing saropa_lints itself."
+        "desc": "确认每个规则在fixture中使用expect_lint标记确实会触发——捕获那些静默停止工作的规则。在开发saropa_lints本身时最有用。"
       },
       "memory": {
         "title": "内存报告",
@@ -1779,15 +1784,19 @@
       },
       "doctor": {
         "title": "医生",
-        "desc": "Checks analysis_options.yaml and analysis_options_custom.yaml for common misconfigurations: keys in the wrong file, a missing custom file, or a missing version constraint."
+        "desc": "检查 analysis_options.yaml 和 analysis_options_custom.yaml 中的常见配置错误：键在错误的文件中，缺少自定义文件，或缺少版本约束。"
       },
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml 阈值",
         "placeholder": "质量门：\n  条件：\n    - 指标：新的关键问题\n      操作： eq\n      值：0\n      on_fail: 失败",
         "save": "保存,拯救和保护一个人.",
         "saved": "已保存",
-        "saveError": "Could not save"
+        "saveError": "无法保存"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "跳转到标签页1-2（地图，报告）",
+      "showOverlay": "显示这个快捷键覆盖."
     }
   },
   "suppressionsStrip": {
@@ -2490,7 +2499,7 @@
     },
     "sidebar": {
       "fixLabel": "修复过时的忽略项",
-      "fixDescription": "Detect and auto-remove dead // ignore: comments"
+      "fixDescription": "检测并自动删除死掉的 // ignore: 注释"
     },
     "quickFix": {
       "title": "修复此文件中过时的忽略项"

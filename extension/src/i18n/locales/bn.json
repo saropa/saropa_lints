@@ -332,6 +332,11 @@
     "extension": {
       "hint": "প্রস্তুতকরণ ব্যাপক প্রদর্শন পছন্দগুলি",
       "linkNote": "লিংট ইন্টিগ্রেশন চালু/বন্ধ সাইডবারের স্ট্যাটাস সারি এর মধ্যে রয়েছে; এনালাইসিস টার ট্যাবে রয়েছে — উভয়টি সাধারণ সেটিং লেখার চেয়ে বেশি করে কাজ করে, তাই এগুলো এখানে দুটি করে দেখানো হয়নি।"
+    },
+    "shortcuts": {
+      "jumpToTab": "ট্যাবে জাম 1-7 (স্তর, নিয়ম প্যাক, ওভাররাইড, এস ডি কে রোলআউট, কনফিগ ফাইল, অটোমেশন, একসেনশন)",
+      "prevNextTab": "পূর্ববর্তী / পরবর্তী ট্যাব",
+      "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।"
     }
   },
   "consolidated": {
@@ -1783,11 +1788,15 @@
       },
       "gate": {
         "editorLabel": "সারোপা_কোয়ালিটি_গেট.যেম থ্রেশোল্ডস",
-        "placeholder": "quality_gate:\n  conditions:\n    - metric: new_critical_issues\n      op: eq\n      value: 0\n      on_fail: fail",
+        "placeholder": "quality_gate:\n  শর্ত:\n    - মেট্রিক: নতুন_গুরুত্বপূর্ণ_সমস্যা\n      op: eq\n      মান: 0\n      on_fail: ব্যর্থ",
         "save": "Save save সংরক্ষণ করুন",
         "saved": "সংরক্ষিত",
         "saveError": "/নো_থিং সংরক্ষণ করা যায়নি"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "ট্যাব ১-২ (ম্যাপ, রিপোর্টস) এ জম করুন",
+      "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।"
     }
   },
   "suppressionsStrip": {
@@ -1959,7 +1968,7 @@
     "action": {
       "killAll": "কিল সব কিল সব",
       "restartAll": "সমস্ত পুনরাবৃত্তি করুন",
-      "killAllDescription": "Force-stops the LSP Server only. Analyzer Plugin and Scan Daemon cannot be killed independently yet — use each engine's own ON/OFF toggle instead.",
+      "killAllDescription": "শুধুমাত্র LSP সার্ভারকে ফোর্স-স্টপ করে। বিশ্লেষক প্লাগইন এবং স্ক্যান Daemon এখনও স্বাধীনভাবে হত্যা করা যাবে না — পরিবর্তে প্রতিটি ইঞ্জিনের নিজস্ব চালু/বন্ধ টগল ব্যবহার করুন।",
       "restartAllDescription": "LSP সার্ভার বন্ধ করে এবং পুনরায় চালু করে (বা এটি চালু না হলে এটি শুরু করে)। বিশ্লেষক প্লাগইন এবং স্ক্যান Daemon প্রভাবিত হয় না — পরিবর্তে প্রতিটি ইঞ্জিনের নিজস্ব চালু/বন্ধ টগল ব্যবহার করুন।"
     },
     "log": {

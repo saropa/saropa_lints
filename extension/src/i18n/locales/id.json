@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Pengaturan tampilan secara keseluruhan untuk ekstensi.",
       "linkNote": "Aturan ketat:\n1. Pengaturan integrasi lint menyala/mati terdapat di baris status sidebar; tingkatan analisis terdapat di tab Tier — keduanya melakukan lebih dari sekadar menulis pengaturan biasa, sehingga tidak diduplikasi di sini."
+    },
+    "shortcuts": {
+      "jumpToTab": "Lompat ke tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Tab sebelumnya / tab berikutnya",
+      "showOverlay": "Tampilkan overlay shortcut ini."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "Disimpan",
         "saveError": "Tidak dapat menyimpan"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Lompat ke tab 1-2 (Peta, Laporan)",
+      "showOverlay": "Tampilkan overlay shortcut ini."
     }
   },
   "suppressionsStrip": {

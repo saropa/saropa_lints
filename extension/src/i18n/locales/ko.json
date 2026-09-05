@@ -332,6 +332,11 @@
     "extension": {
       "hint": "확장 기능 전체 표시 선호도",
       "linkNote": "리트 통합 케이스 여부는 사이드바의 상태 행에 있으며, 분석 레벨은 레벨 탭에 있습니다 — 둘 다 단순한 설정 쓰기보다 더 많은 기능을 수행하므로 여기에 중복되지 않습니다."
+    },
+    "shortcuts": {
+      "jumpToTab": "탭 1-7로 이동(Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "이전 / 다음 탭",
+      "showOverlay": "이 단축키 오버레이를 표시합니다."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "저장됨",
         "saveError": "저장할 수 없습니다"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "탭 1-2로 이동 (지도, 보고서)",
+      "showOverlay": "이 단축키 오버레이를 표시합니다."
     }
   },
   "suppressionsStrip": {

@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Pamamaraan ng pagpapakita sa buong extension.",
       "linkNote": "Ang integrasyon ng lint sa pagsusulit o pagsusulit ay nasa status row ng sidebar; ang antas ng analisis ay nasa tab na Tier — pareho ito ay nagawa ang mas marami kaysa sa isang simple setting write, kaya wala itong duplication dito."
+    },
+    "shortcuts": {
+      "jumpToTab": "Pumunta sa tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Previous / next tab",
+      "showOverlay": "Ipakita ang shortcut na ito overlay."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "Nakalaan",
         "saveError": "Hindi makasave"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Pumunta sa tab 1-2 (Mapa, Ulat)",
+      "showOverlay": "Ipakita ang shortcut na ito overlay."
     }
   },
   "suppressionsStrip": {

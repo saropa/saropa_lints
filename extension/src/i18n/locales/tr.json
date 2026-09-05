@@ -215,7 +215,7 @@
   },
   "rulesTiers": {
     "tabBar": {
-      "ariaLabel": "Rules & Tiers dashboard tabs"
+      "ariaLabel": "Kurallar & Seviyeler panel sekme"
     },
     "tab": {
       "tier": "Tier Tier Tier'de yer alıyor.",
@@ -223,12 +223,12 @@
       "overrides": "Override'lar geçersiz kılmaktadır.",
       "sdk": "SDK'nın kullanıma sunulması",
       "configFile": "Yapılandırma dosyası",
-      "automation": "Automation",
+      "automation": "Otomasyon",
       "extension": "Eklenti"
     },
     "common": {
       "rule": "Kural Kanun kural",
-      "add": "Add",
+      "add": "Ekle",
       "remove": "Remove remove kaldırmak"
     },
     "sdk": {
@@ -244,7 +244,7 @@
     },
     "configFile": {
       "analysisSettings": {
-        "title": "Analysis settings",
+        "title": "Analiz ayarları",
         "hint": "Sorunlar sekmesinin kaç sorun gösterdiğini ve analiz raporunun nereye yazıldığını kontrol eder."
       },
       "maxIssues": {
@@ -267,7 +267,7 @@
         "label": "çalışma zamanı_tier"
       },
       "lane": {
-        "title": "Analysis lane",
+        "title": "Analiz kanalı",
         "hint": "Bu, süreç içi analiz eklentisinin düzenleyicide canlı olarak çalışmasını ve yalnızca kaydetme sırasında (tarama arka plan programı aracılığıyla) çalışmasını sağlar."
       },
       "platforms": {
@@ -283,9 +283,9 @@
         "newLevelAria": "Yeni önem düzeyi"
       },
       "bannedUsage": {
-        "title": "Banned usage",
+        "title": "Yasaklanmış kullanım",
         "hint": "Belirli bir tanımlayıcıyı (bir işlev, sınıf veya üye adı) projede göründüğü herhangi bir yere, tanılamada gösterilen özel bir neden ile işaretler.",
-        "identifier": "Identifier",
+        "identifier": "Tanımlayıcı",
         "identifierPlaceholder": "örneğin baskı",
         "reason": "Sebep",
         "reasonPlaceholder": "örneğin Bunun yerine Logger'ı kullanın",
@@ -300,7 +300,7 @@
       },
       "baseline": {
         "title": "Temel Seviye",
-        "hint": "A baseline suppresses the project's EXISTING violations so only newly-introduced findings surface afterward.",
+        "hint": "Bir temel, proje'nin mevcut ihlallerini bastırır ve sadece yeni eklenen bulgular sonraki aşamada görünür.",
         "emptyHint": "Henüz bir temel oluşturulmadı. Bir tane oluşturmak, günümüzün ihlallerini bastırır ve yapılandırmada temel bastırmayı etkinleştirir.",
         "createButton": "Temel oluştur / yenile",
         "createTitle": "Dart run saropa_lints:baseline'ı çalıştırır - saropa_baseline.json yazar ve onu yapılandırmada etkinleştirir.",
@@ -315,7 +315,7 @@
           "empty": "Kayma yok — canlı ihlal seti taban çizgisiyle tam olarak eşleşiyor.",
           "resolvedSection": "Çözüldü ({count})",
           "newSection": "Başlangıçtan bu yana yeni ({count})",
-          "moreRows": "+{count} more not shown.",
+          "moreRows": "+{count} daha fazlası gösterilmemiştir.",
           "fileCol": "Dosya dosyası dosya dosya.",
           "lineCol": "Hattı çizgi çizgi."
         }
@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Uzantı çapında görüntüleme tercihleri.",
       "linkNote": "Lint entegrasyonu açık/kapalı, kenar çubuğunun durum satırında bulunur; analiz katmanı Katman sekmesinde bulunur; her ikisi de basit ayar yazma işleminden daha fazlasını yapar, bu nedenle burada kopyalanmazlar."
+    },
+    "shortcuts": {
+      "jumpToTab": "Tab 1-7'ye (Tier, Kural Paketleri, Üstünlükler, SDK Yayılımı, Yapılandırma Dosyası, Otomasyon, Uzantı) atla",
+      "prevNextTab": "Önceki / sonraki sekme",
+      "showOverlay": "Bu kısayol örtüsünü göster."
     }
   },
   "consolidated": {
@@ -655,13 +660,13 @@
   },
   "statusBar": {
     "menu": {
-      "enableOn": "Analysis enabled (click to disable)",
-      "enableOff": "Analysis disabled (click to enable)",
+      "enableOn": "Analiz etkin (devre dışı bırakmak için tıklayın)",
+      "enableOff": "Analiz devre dışı (etkinleştirmek için tıklayın)",
       "openViolations": "İhlaller Raporunu Aç",
       "openPackageDashboard": "Paket Tablosunu Açın",
       "openProcessHealth": "İşlem Sağlığını Aç",
       "commandCatalog": "Komut Kataloğu Komuta Katalogu",
-      "about": "About"
+      "about": "Hakkında"
     }
   },
   "systemHealth": {
@@ -1116,7 +1121,7 @@
       "fullReport": "Tam rapor",
       "fullReportDesc": "Kapsamlı özellik kullanım raporunu (taranan her paket, çıkarılan her değişiklik günlüğü özelliği) bir HTML/Markdown/JSON dosyası olarak dışa aktarın ve açın.",
       "knownIssues": "Bilinen sorunlar",
-      "knownIssuesDesc": "Browse known vulnerabilities and advisories reported against your dependencies.",
+      "knownIssuesDesc": "Bilinen açıklar ve uyarılar hakkında tarayın.",
       "compare": "Karşılaştırma Yapın",
       "compareDesc": "İki veya daha fazla paketi puan, boyut ve etkinlik açısından yan yana karşılaştırın.",
       "settings": "Ayarlar ayarları ayarlar.",
@@ -1126,13 +1131,13 @@
       "intro": "Her packageVibrancy.* ayarı gruplandırılmıştır. Değişiklikler hemen çalışma alanı ayarlarınıza kaydedilir.",
       "noLimit": "sınır yok",
       "group": {
-        "access": "Access & Registries",
+        "access": "Erişim & Kayıt Defterleri",
         "scan": "Tara",
         "display": "Görüntülemek",
         "weights": "Puan Ağırlıkları",
         "upgrade": "Yükseltme Geliştirme Güncelleme",
         "watch": "Kol saati",
-        "budget": "Budget",
+        "budget": "Bütçe",
         "vuln": "Güvenlik açıkları"
       }
     },
@@ -1368,7 +1373,7 @@
       "escapeSearch": "Açık odaklı arama; ikinci Esc tüm genişletilmiş satırları çökertir.",
       "historyBack": "Paketin gezinti geçmişine geri dönün.",
       "showOverlay": "Bu kısayol örtüsünü göster.",
-      "jumpToTab": "Jump to tab 1-6 (Overview, Upgrades, Full report, Known issues, Compare, Settings)"
+      "jumpToTab": "Tab 1-6'ya (Genel Bakış, Yenilikler, Tam Rapor, Bilinen Sorunlar, Karşılaştır, Ayarlar) atla"
     },
     "versionTooltip": {
       "installed": "Kurulu: {version} ({date})",
@@ -1740,7 +1745,7 @@
       "elapsed": "Geçmişte geçmiştir.",
       "cancel": "İptal Et iptal et",
       "restart": "Yeniden başlatma, yeniden başlatmak.",
-      "stopped": "Stopped",
+      "stopped": "Durduruldu",
       "logHeading": "Aktivite Faaliyet Etkinliği",
       "logEmpty": "Henüz çıktı yok — project_health adım adım ilerlemeyi bildirmez, dolayısıyla bu günlük yalnızca tarama bir tanılama mesajı yazdırdığında doldurulur."
     },
@@ -1754,7 +1759,7 @@
       "colLine": "#",
       "colText": "Çıkış",
       "severity": {
-        "title": "Severity Report",
+        "title": "Ciddiyet Raporu",
         "desc": "dart analyze'yi çalıştırır ve her sorunu ciddiyetine göre (hatalar, uyarılar, bilgi) gruplandırır - terminal komutu dart run saropa_lints:severity_report, terminal olmadan."
       },
       "impact": {
@@ -1766,11 +1771,11 @@
         "desc": "En son violations.json'yi saropa_quality_gate.yaml'deki eşiklere göre değerlendirir ve PASS, WARN veya FAIL yazdırır. Aşağıdaki eşikleri düzenleyin ve ardından çalıştırın."
       },
       "stubTest": {
-        "title": "Stub Test Report",
+        "title": "Stub Test Raporu",
         "desc": "aslında hiçbir şeyi test etmeyen yer tutucu iddiaları (expect(true, isTrue), wait('literal', isNotNull)) için test/*.dart'ı tarar."
       },
       "accuracy": {
-        "title": "Accuracy Report",
+        "title": "Doğruluk Raporu",
         "desc": "Fikstürlerdeki her kuralı bir wait_lint işaretçisiyle onaylar, aslında orada tetiklenir - çalışmayı sessizce durduran bir kuralı yakalar. En çok saropa_lints'nin kendisini geliştirirken kullanışlıdır."
       },
       "memory": {
@@ -1788,6 +1793,10 @@
         "saved": "Kaydedildi",
         "saveError": "Kaydedilemedi"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Tab 1-2'ye (Harita, Raporlar) atla",
+      "showOverlay": "Bu kısayol örtüsünü göster."
     }
   },
   "suppressionsStrip": {
@@ -1948,8 +1957,8 @@
       },
       "description": {
         "analyzerPlugin": "Dart analiz sunucusunun içinde çalışır; siz yazdıkça düzenleyicide canlı dalgalı çizgiler oluşur, taramaya gerek yoktur. Geçiş, eklentileri yeniden yazar: analysis_options.yaml'deki blok.",
-        "scanDaemon": "Background process that rescans the whole project on save and writes reports/.saropa_lints/violations.json. Toggling off suspends it; the next save resumes it.",
-        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting."
+        "scanDaemon": "Arka plan süreci, kaydedilirken tüm projeyi tekrar taramak ve raporlar/.saropa_lints/violations.json yazmak için kullanılır. Aç/kapat butonu ile devre dışı bırakılır; bir sonraki kaydetme işlemiyle devam eder.",
+        "lspServer": "Kısa Kural:  \n1. Sadece çevrilmiş metni döndürün.  \n2. Açıklamalar, giriş, markdown notasyonu veya çevreleyici tırnak işaretlerini içerme.  \n3. Metin içinde yer tutucu tokenlar olabilir: yer tutucu tokenlar. Her birini tam olarak yazılan şekilde, grammatik olarak doğru pozisyonda çeviriyi içine kopyalayın. Hiçbir tokeni çevirme, kaldırma veya biçimlendirme.  \n4. Çıktı, hedef dili için doğru yazım sistemi kullanmalıdır; cümle ortasında başka bir dillere geçme.  \n\nDil sunucusu — açık ve çalışma alanı dosyaları için Sorunlar paneline tanımlamalar yayınlar. Açma-kapatma saropaLints.lspServer.enabled ayarı yazar."
       }
     },
     "toggle": {

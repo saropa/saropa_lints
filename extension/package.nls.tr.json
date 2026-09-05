@@ -344,7 +344,7 @@
   "command.lspServer.stop.title": "Saropa Lints: LSP Sunucusunu Durdur",
   "command.lspServer.restart.title": "Saropa Lints: LSP Sunucusunu Yeniden Başlat",
   "config.section.Debug.title": "Debug & Diagnostics Motorları",
-  "config.property.debug.enabled.description": "Show the Diagnostic Engines section (status and controls for the Analyzer Plugin, Scan Daemon, and LSP Server) in the Health Panel.",
+  "config.property.debug.enabled.description": "Diagnostic Engines bölümüne (Analizör Eklentisi, Tarama Daemon ve LSP Sunucusu için durum ve denetimler) Sağlık Panelinde göster.",
   "config.property.lspServer.enabled.description": "Tanılama için bağımsız Saropa Lints LSP sunucusunu çalıştırın. Etkinleştirildiğinde, Dil Sunucusu Protokolü aracılığıyla dalgalı çizgiler ve hızlı düzeltmeler sağlayan ayrı bir Dart işlemi oluşturur. ~10GB RAM tasarrufu sağlamak için analizör eklentisini otomatik olarak devre dışı bırakır. Bunu kapatmak analizör eklentisini yeniden etkinleştirir.",
   "config.property.lspServer.workspaceScan.description": "Başlangıçta tüm çalışma alanını tarayın; böylece tanılamaların yalnızca açtığınız dosyalar için değil, Sorunlar panelinde proje genelinde görünmesi sağlanır. İlk taramanın çok uzun sürdüğü çok büyük projeler için bunu devre dışı bırakın.",
   "config.property.lspServer.scanDirectories.description": "Başlangıçta taranacak dizinler (proje köküne göre). Yalnızca Çalışma Alanı Taraması etkinleştirildiğinde kullanılır. Bunu proje yapınıza uyacak şekilde ayarlayın - ör. Test dosyaları alakalı değilse 'src' ekleyin veya 'test'i kaldırın."

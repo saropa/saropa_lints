@@ -221,7 +221,7 @@
       "tier": "A taxa de referência é Tier Tier.",
       "packs": "Pacotes de regras packs.",
       "overrides": "Anulações de prioridades.",
-      "sdk": "SDK rollout",
+      "sdk": "Implementação do SDK",
       "configFile": "Arquivo de configuração",
       "automation": "Automação",
       "extension": "Extensão"
@@ -256,7 +256,7 @@
         "desc": "Onde o relatório de análise é escrito: terminal apenas, um arquivo apenas, ou ambos."
       },
       "tierCap": {
-        "title": "Tier cap",
+        "title": "Limite de nível",
         "hint": "Níveis que são executados no momento da análise, independentemente dos regras que são explicitamente habilitadas. Deixe como None para usar a configuração de nível do extensão.",
         "none": "Nenhum (use a configuração da aba Tier)"
       },
@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Preferências de exibição em escopo da extensão",
       "linkNote": "Integração do lint ligado/desligado está na linha de status da barra lateral; a análise de nível está na aba Tier — ambos fazem mais do que uma simples escrita de configuração, portanto não são duplicados aqui."
+    },
+    "shortcuts": {
+      "jumpToTab": "Ir para a guia 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Anterior / próximo tab",
+      "showOverlay": "Mostre esta sobreposição de atalho."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "Salvo",
         "saveError": "Não foi possível salvar"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Ir para a guia 1-2 (Mapa, Relatórios)",
+      "showOverlay": "Mostre esta sobreposição de atalho."
     }
   },
   "suppressionsStrip": {

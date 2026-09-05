@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Preferencje wizualne na poziomie rozszerzenia.",
       "linkNote": "Integracja lintera włączona/wyłączona znajduje się w wierszu statusu w pasku bocznym; poziom analizy znajduje się na zakładce Tier — oba wykonują więcej niż prosty zapis ustawienia, więc nie są tu powtarzane."
+    },
+    "shortcuts": {
+      "jumpToTab": "Przejdź do karty 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Poprzedni / następny zakładka",
+      "showOverlay": "Pokaż to skrót nałożenie skrótu."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "Zapisano",
         "saveError": "Nie można zapisać"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Przejdź do zakładki 1-2 (Mapa, Raporty)",
+      "showOverlay": "Pokaż to skrót nałożenie skrótu."
     }
   },
   "suppressionsStrip": {

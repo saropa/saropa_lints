@@ -279,13 +279,13 @@
         "hint": "Überschreibt die Schweregrad-Einstellung eines bestimmten Rules oder deaktiviert ihn vollständig, unabhängig von der Tierstufe und den Rule-Packs.",
         "level": "Ebene",
         "empty": "Keine Schweregradsüberschreibungen festgelegt.",
-        "rulePlaceholder": "rule_name",
+        "rulePlaceholder": "Regelname",
         "newLevelAria": "Neue Schweregrad Ebene"
       },
       "bannedUsage": {
         "title": "Verbotene Nutzung",
         "hint": "Markiert ein bestimmtes Identifikator (eine Funktion, Klasse oder Member-Namen) an jedem Ort, an dem es im Projekt auftritt, mit einer benutzerdefinierten Begründung in der Diagnose.",
-        "identifier": "Identifier",
+        "identifier": "Kennung",
         "identifierPlaceholder": "z. B. print",
         "reason": "Grundursache",
         "reasonPlaceholder": "z. B. Stattdessen Logger verwenden",
@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Globale Anzeigeeinstellungen für die Erweiterung",
       "linkNote": "Die Lint-Integration ein-/ausgeschaltet wird, befindet sich in der Statuszeile der Seitenleiste; die Analyseebene befindet sich auf der Tier-Registerkarte — beide tun mehr als nur eine einfache Einstellung zu schreiben, daher werden sie hier nicht dupliziert."
+    },
+    "shortcuts": {
+      "jumpToTab": "Sprung zu Tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Vorherige / nächste Tab",
+      "showOverlay": "Zeigen Sie diese Verknüpfung überlagern."
     }
   },
   "consolidated": {
@@ -360,7 +365,7 @@
   },
   "dashboards": {
     "lintsConfig": {
-      "description": "Tier: {tier} · Lane: {lane}",
+      "description": "Stufe: {tier} · Spur: {lane}",
       "descriptionNoLane": "Tier: Die Ebene, auf der sich die Unternehmen befinden. {tier} ist ein _PH0_."
     },
     "controls": {
@@ -1749,7 +1754,7 @@
       "runButton": "Ausführen",
       "notRunYet": "Noch nicht ausgeführt",
       "running": "Ausführung…",
-      "exitOk": "Exit 0 — pass",
+      "exitOk": "Ausgang 0 – Pass",
       "exitFail": "Nicht-null Exit — siehe Ausgabe",
       "colLine": "#",
       "colText": "Ausgabe",
@@ -1783,11 +1788,15 @@
       },
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml Schwellwerte",
-        "placeholder": "quality_gate:\n  conditions:\n    - metric: new_critical_issues\n      op: eq\n      value: 0\n      on_fail: fail",
+        "placeholder": "qualität_gate:\n  Bedingungen:\n    – Metrik: new_critical_issues\n      op: Gl\n      Wert: 0\n      on_fail: fehlgeschlagen",
         "save": "Save Save Schon jetzt.",
         "saved": "Gespeichert",
         "saveError": "Konnte nicht speichern"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Sprung zu Tab 1-2 (Karte, Berichte)",
+      "showOverlay": "Zeigen Sie diese Verknüpfung überlagern."
     }
   },
   "suppressionsStrip": {

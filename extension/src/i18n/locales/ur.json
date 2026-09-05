@@ -71,7 +71,7 @@
       "done": "Saropa: {count} مسئلہ(ے)، {elapsed}س",
       "failed": "Saropa: اسکن فیلڈ",
       "warming": "Saropa: تحلیل کنندہ گرم کر رہے ہیں ... کھولنے کے بعد پہلا اسکن ایک منٹ لے سکتا ہے",
-      "ready": "Saropa: ready",
+      "ready": "Saropa: تیار",
       "disabled": "Saropa: غیر فعال",
       "noProject": "Saropa: کوئی Dart پروجیکٹ نہیں۔",
       "doneTooltip": "{total} تلاش(s)، {shown} فلٹر کے بعد دکھایا گیا ہے۔"
@@ -307,7 +307,7 @@
         "openButton": "بیس لائن فائل کھولیں۔",
         "openTitle": "ایڈیٹر میں saropa_baseline.json کھولیں۔",
         "summary": "{files} فائل (زبانیں)، {violations} خلاف ورزی (زبانیں) بنیادی طور پر — تیار کردہ {generated}۔",
-        "unknownDate": "at an unknown time",
+        "unknownDate": "نامعلوم وقت پر",
         "count": "گنتی کرنا Count شمار کرنا Count",
         "diff": {
           "title": "فرق بمقابلہ موجودہ",
@@ -332,6 +332,11 @@
     "extension": {
       "hint": "توسیعی ڈسپلے کی ترجیحات۔",
       "linkNote": "لنٹ انٹیگریشن آن/آف سائڈبار کی سٹیٹس قطار میں رہتا ہے۔ تجزیہ کا درجہ ٹائر ٹیب پر رہتا ہے - دونوں ایک سادہ ترتیب سے زیادہ لکھتے ہیں، لہذا وہ یہاں نقل نہیں کیے گئے ہیں۔"
+    },
+    "shortcuts": {
+      "jumpToTab": "ٹیب 1-7 (ٹیئر، رول پک، اور ڈیٹا، ایس کی ڈی کی رول آوٹ، کانفیگ فائل، اتومیشن، ایکسٹنسن)",
+      "prevNextTab": "پہلی / اگلی تب",
+      "showOverlay": "اس شارٹ کٹ اوورلی کو دکھائیں۔"
     }
   },
   "consolidated": {
@@ -1127,9 +1132,9 @@
       "noLimit": "کوئی حد نہیں",
       "group": {
         "access": "رسائی اور رجسٹریاں",
-        "scan": "Scan",
+        "scan": "سکن",
         "display": "ڈسپلے",
-        "weights": "Score Weights",
+        "weights": "درجہ اہمیت",
         "upgrade": "اپ گریڈ کریں اپ گریڈنگ۔",
         "watch": "دیکھو",
         "budget": "بجٹ",
@@ -1736,11 +1741,11 @@
       "aria": "پروجیکٹ کے نقشے کے حصے"
     },
     "scan": {
-      "subtitle": "Scanning project size, complexity, and hotspots…",
+      "subtitle": "پروجیکٹ کی سائز، کمپلیکسیٹی اور ہوٹ ہوٹس کی تلاش کر رہے ہیں...",
       "elapsed": "گزر گیا ہے گزرا ہوا",
       "cancel": "منسوخ",
       "restart": "دوبارہ شروع کریں اور پھر سے شروع کریں۔",
-      "stopped": "Stopped",
+      "stopped": "روک دیا گیا",
       "logHeading": "سرگرمی کی سرگرمی۔",
       "logEmpty": "ابھی تک کوئی آؤٹ پٹ نہیں ہے — پروجیکٹ_ہیلتھ مرحلہ وار پیشرفت کی اطلاع نہیں دیتا ہے، لہذا یہ لاگ صرف اس صورت میں بھرتا ہے جب اسکین تشخیصی پیغام کو پرنٹ کرتا ہے۔"
     },
@@ -1785,9 +1790,13 @@
         "editorLabel": "saropa_quality_gate.yaml کی حد",
         "placeholder": "کوالٹی_گیٹ:\n  شرائط:\n    - میٹرک: نئے_تنقیدی_مسائل\n      op: eq\n      قدر: 0\n      on_fail: ناکام",
         "save": "بچاؤ Save محفوظ کریں",
-        "saved": "Saved",
+        "saved": "ذخیرہ کیا گیا",
         "saveError": "بچا نہیں سکا"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "ٹیب جا 1-2 (میپ، رپورٹس)",
+      "showOverlay": "اس شارٹ کٹ اوورلی کو دکھائیں۔"
     }
   },
   "suppressionsStrip": {
@@ -1949,7 +1958,7 @@
       "description": {
         "analyzerPlugin": "Dart تجزیہ سرور کے اندر چلتا ہے — جیسے ہی آپ ٹائپ کرتے ہیں ایڈیٹر میں لائیو اسکوگلس، اسکین کی ضرورت نہیں ہے۔ ٹوگل کرنا پلگ ان کو دوبارہ لکھتا ہے: analysis_options.yaml میں بلاک۔",
         "scanDaemon": "پس منظر کا عمل جو محفوظ کرنے پر پورے پروجیکٹ کو دوبارہ اسکین کرتا ہے اور رپورٹیں لکھتا ہے/.saropa_lints/violations.json۔ ٹوگل آف کرنا اسے معطل کر دیتا ہے۔ اگلی بچت اسے دوبارہ شروع کرتی ہے۔",
-        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting."
+        "lspServer": "اُتاری لینگویج سرور — کھلے ہوئے اور ورک سپیس فائلز کے لیے پروبلمز پینل میں ڈیاگنوسٹکس جاری کرتا ہے۔ تبدیلی کرنے پر saropaLints.lspServer.enabled سیٹنگ کو تبدیل کردیا جاتا ہے۔"
       }
     },
     "toggle": {

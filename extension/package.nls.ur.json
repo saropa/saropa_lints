@@ -346,6 +346,6 @@
   "config.section.Debug.title": "ڈیبیگ اور ڈیاگنوسٹک انجنوز",
   "config.property.debug.enabled.description": "ہیلتھ پینل میں ڈائیگنوسٹک انجنز سیکشن (تجزیہ کار پلگ ان، اسکین Daemon، اور LSP سرور کے لیے اسٹیٹس اور کنٹرولز) دکھائیں۔",
   "config.property.lspServer.enabled.description": "تشخیص کے لیے اسٹینڈ اسٹون Saropa Lints LSP سرور چلائیں۔ فعال ہونے پر، ایک علیحدہ Dart عمل پیدا کرتا ہے جو لینگویج سرور پروٹوکول کے ذریعے squiggles اور فوری اصلاحات فراہم کرتا ہے۔ ~10GB RAM بچانے کے لیے تجزیہ کار پلگ ان کو خودکار طور پر غیر فعال کر دیتا ہے۔ اسے آف کرنے سے تجزیہ کار پلگ ان دوبارہ فعال ہو جاتا ہے۔",
-  "config.property.lspServer.workspaceScan.description": "Scan the entire workspace on startup so diagnostics appear project-wide in the Problems panel, not just for files you open. Disable this for very large projects where the initial scan takes too long.",
+  "config.property.lspServer.workspaceScan.description": "کامپیوٹر کے تمام کام کے ماحول کو شروع ہونے پر اس طرح چیک کریں کہ خطاں کے بارے میں پروجیکٹ چھوٹے چھوٹے فائلز کے لیے نہیں بلکہ پرو بیل کے پنل میں دکھائی دے۔ اسے بند کریں جب پروجیکٹ بہت بڑا ہو اور شروع ہونے والی چیک کرنا بہت وقت لے۔",
   "config.property.lspServer.scanDirectories.description": "سٹارٹ اپ پر اسکین کرنے والی ڈائریکٹریز (پروجیکٹ روٹ سے متعلق)۔ صرف اس وقت استعمال کیا جاتا ہے جب ورک اسپیس اسکین فعال ہو۔ اپنے پروجیکٹ کے ڈھانچے سے ملنے کے لیے اسے ایڈجسٹ کریں — جیسے اگر ٹیسٹ فائلیں متعلقہ نہیں ہیں تو 'src' شامل کریں یا 'ٹیسٹ' کو ہٹا دیں۔"
 }

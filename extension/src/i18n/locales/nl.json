@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Extensiebrede weergavevoorkeuren",
       "linkNote": "Lint-integratie aan/uit staat in de statusrij van de zijbalk; de analysegraad staat op de tabblad Graad — beide doen meer dan een eenvoudige instellingsschrijving, dus ze worden hier niet herhaald."
+    },
+    "shortcuts": {
+      "jumpToTab": "Spring naar tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Vorige / volgende tab",
+      "showOverlay": "Toon deze snelkoppeling overlay."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "Opgeslagen",
         "saveError": "Kon niet opslaan"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Spring naar tab 1-2 (Kaart, Rapporten)",
+      "showOverlay": "Toon deze snelkoppeling overlay."
     }
   },
   "suppressionsStrip": {

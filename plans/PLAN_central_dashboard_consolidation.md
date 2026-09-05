@@ -1,6 +1,6 @@
 # Central Dashboard Consolidation — design, status, and remaining work
 
-**Created:** 2026-06-12 · **Consolidated:** 2026-06-14
+**Created:** 2026-06-12 · **Consolidated:** 2026-06-14 · **Status re-verified against code:** 2026-09-05
 **Supersedes:** this file now also carries the diagnostics-residuals that were tracked separately in
 `TODO_consolidated_dashboard_diagnostics.md` (folded in 2026-06-14; that file's completed
 2026-06-12 finish report is archived under `plans/history/2026.06/2026.06.14/`).
@@ -18,11 +18,27 @@ TODO/HACK tree, and status bar. ~238 distinct items total.
   annotations, and the Issues-panel metadata filters / hotspot review all read live analyzer
   diagnostics, and a bundled rule-metadata catalog backfills the per-rule data live diagnostics
   lack. See **Shipped so far**.
-- **The central dashboard itself: not built.** The "Open Dashboard" consolidated view is still the
-  minimal grade-gauge + rule-groups + occurrence-lists surface. The fold/link design below (lists
-  A–D) is the plan for turning it into the hub; none of it is implemented yet.
-- **One open verification residual:** the consolidated webview needs a human render/interaction
-  pass (see **Open TODO** item 1).
+- **The central dashboard: built, list A is folded in.** `violationsDashboardHtml.ts` now composes
+  the dashboard from dedicated section-builder modules — `violations-dashboard-top.ts` (hero, KPI
+  cards, toolbar, analysis progress), `violations-dashboard-tables.ts` (top-rules table, findings
+  block/meta line), `violations-dashboard-panels.ts` (TODO/HACK, drift advisor, charts,
+  suppressions), `violations-dashboard-shared.ts` (types/escaping) — this is Open TODO item 2,
+  done (commit `b07d83fb`, "decompose Findings dashboard into per-section builder modules"), which
+  also delivered essentially all of list A (item 3). Shared chrome (item 6) — keyboard-shortcuts
+  overlay, full-width toggle, recent-searches popover — is also in place.
+- **Not done: list B (rule-detail folded into the rule-group expander).** `ruleExplainView.ts`
+  still stands alone as a separate screen; problem/how-to-fix, OWASP mapping, related rules,
+  supersedes/migration, and "View in ROADMAP" have not been moved onto the dashboard's rule-group
+  expander. This is now the highest-value remaining step (was item 4).
+- **Not done: list C (summarize + deep-link cards).** No package-health / code-health /
+  project-size / rule-packs / quality-gates-banner / disabled-rules-quick-re-enable cards exist on
+  the central dashboard (item 5).
+- **Not done: item 7** (decomposing the other oversized linked surfaces — Package Vibrancy
+  report files, `projectVibrancyReportView.ts`, `commandCatalogWebviewHtml.ts`,
+  `commandCatalogRegistry.ts`, `issuesTree.ts`, `dashboardChromeStyles.ts`) — unchecked, likely
+  still open; not re-verified in this pass.
+- **Item 1 (human render/interaction verification pass)** — status unverified in this pass; treat
+  as still open unless someone confirms an F5 session covered it.
 
 ---
 
@@ -60,33 +76,38 @@ Dashboard became holistic; rebuilding the pill would re-introduce the redundancy
 
 ## Open TODO — remaining work
 
-1. **Consolidated webview: human render verification + tuning.** F5 in the Extension Development
+**Done (verified against code 2026-09-05):**
+
+- ~~Decompose the Findings dashboard into per-section builder modules~~ — done via
+  `violations-dashboard-top.ts` / `-tables.ts` / `-panels.ts` / `-shared.ts` / `-script.ts`,
+  composed by `violationsDashboardHtml.ts` (commit `b07d83fb`).
+- ~~Fold list A (findings-domain items) into the central dashboard as real sections~~ — hero, KPI
+  cards, toolbar, analysis progress strip, top-rules table, findings meta line, TODO/HACK panel,
+  drift advisor panel, charts, suppressions panel are all live in the composed dashboard.
+- ~~Standardize list D shared chrome~~ — keyboard-shortcuts overlay, full-width toggle, and
+  recent-searches popover are all present.
+
+**Still open, in priority order:**
+
+1. **Fold list B (rule-detail items) into the rule-group expander** — see inventory B (problem +
+   how-to-fix, OWASP mapping, related rules, supersedes/migration, view-in-ROADMAP).
+   `ruleExplainView.ts` still exists as a separate screen; this content has not moved onto the
+   dashboard's rule-group expander. **Highest-value remaining step.**
+2. **Add list C (summarize + deep-link cards)** — see inventory C (package health, code health,
+   project size, rule packs, quality-gates banner, disabled-rules quick re-enable). None of these
+   cards exist on the central dashboard yet.
+3. **Consolidated webview: human render verification + tuning.** F5 in the Extension Development
    Host, verify theme / layout / elevated stylesheet, then a tuning pass. Validate click / keyboard
    interaction (DOM tree navigation the headless `consolidatedClient.test.ts` stub cannot model).
    Leave automated event-bubbling coverage out — not worth a jsdom dependency for one webview; keep
-   it a launch-test item.
-2. **Decompose the Findings dashboard into per-section builder modules** —
-   `violationsDashboardHtml.ts` → hero, KPI cards, toolbar, top-rules table, charts, TODO/HACK,
-   drift, suppressions. These builders are the reusable building blocks list A needs. The
-   client-script extraction is already done (`violations-dashboard-script.ts`). **This is the
-   highest-value next step** and is reusable whether or not the full consolidation ships.
-3. **Fold list A (findings-domain items) into the central dashboard as real sections** — see
-   inventory A below (~13 items: top-rules triage table, severity KPI filters, segmented + text
-   filter + recent-searches popover, group-by selector, severity-mix chart, active-filter chips,
-   bulk select + copy, more-actions menu, analysis progress strip, findings meta line, TODO/HACK
-   panel, drift advisor panel, suppressions panel).
-4. **Fold list B (rule-detail items) into the rule-group expander** — see inventory B (problem +
-   how-to-fix, OWASP mapping, related rules, supersedes/migration, view-in-ROADMAP).
-5. **Add list C (summarize + deep-link cards)** — see inventory C (package health, code health,
-   project size, rule packs, quality-gates banner, disabled-rules quick re-enable).
-6. **Standardize list D shared chrome** — keyboard-shortcuts overlay, full-width toggle,
-   recent-searches popover, status-bar trend delta.
-7. **Decompose the kept-linked oversized surfaces (lower priority)** — Package Vibrancy
+   it a launch-test item. Re-run after 1 and 2 land, since they change the DOM being verified.
+4. **Decompose the kept-linked oversized surfaces (lower priority)** — Package Vibrancy
    `report-html.ts` / `report-script.ts` / `report-styles.ts` / `package-detail-html.ts`; and
    independently `projectVibrancyReportView.ts`, `commandCatalogWebviewHtml.ts`,
-   `commandCatalogRegistry.ts`, `issuesTree.ts`, `dashboardChromeStyles.ts`.
+   `commandCatalogRegistry.ts`, `issuesTree.ts`, `dashboardChromeStyles.ts`. Not re-verified in
+   this pass — status unknown.
 
-Sequencing: **1 → 2 → 3 → 4 → 5 → 6**, with 7 in parallel as capacity allows. Item 2 unblocks 3.
+Sequencing: **1 → 2 → 3**, with 4 in parallel as capacity allows.
 
 ---
 

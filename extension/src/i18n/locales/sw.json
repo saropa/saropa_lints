@@ -331,7 +331,12 @@
     },
     "extension": {
       "hint": "Mipangilio ya kuvutia kwa kati ya extension.",
-      "linkNote": "Lint integration on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
+      "linkNote": "Unganisha kwa Lint kwenye kifungu ya status ya sidebar; analysis tier kwenye tab ya Tier — wanaochanganya kwa kawaida kuzalisha maelezo, hunaonekani kama matokeo ya kuzalisha maelezo."
+    },
+    "shortcuts": {
+      "jumpToTab": "Kubonya kwa kipengele 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Tab ya kati ya kiliyo kwa mbili",
+      "showOverlay": "Onyesha hii njia ya mkato overlay."
     }
   },
   "consolidated": {
@@ -1788,6 +1793,10 @@
         "saved": "Imehifadhiwa",
         "saveError": "Hakuna kujisajili"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Kubonya kipengele 1-2 (Map, Reports)",
+      "showOverlay": "Onyesha hii njia ya mkato overlay."
     }
   },
   "suppressionsStrip": {
