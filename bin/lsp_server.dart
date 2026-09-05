@@ -129,6 +129,13 @@ final Map<String, DateTime> _lastScannedMtimes = {};
 /// disk I/O.
 const _maxConcurrentFileOps = 20;
 
+/// Set to true to cancel an in-progress workspace scan. Checked between
+/// each file in the analysis loop so the scan aborts promptly when the
+/// server shuts down, config reloads trigger a fresh scan, or a new
+/// workspace scan supersedes the current one. Reset to false at the start
+/// of each new scan.
+bool _workspaceScanCanceled = false;
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
@@ -346,9 +353,9 @@ Future<void> _handleMessage(Map<String, dynamic> message) async {
       _traceEnabled = traceValue == 'verbose';
       _log('setTrace: $traceValue (trace logging ${_traceEnabled ? 'on' : 'off'})');
     case 'workspace/didChangeConfiguration':
-      // Re-read tier + per-rule overrides and refresh already-published
-      // diagnostics — see _reloadConfigAndReanalyze for why the collection
-      // itself doesn't need rebuilding.
+      // Cancel any running workspace scan — its results are about to be
+      // invalidated by the config change anyway.
+      _workspaceScanCanceled = true;
       _log('didChangeConfiguration — reloading tier + re-analyzing open files');
       unawaited(_reloadConfigAndReanalyze());
     case '_internal/analyzeFromDidOpen':
@@ -365,7 +372,9 @@ Future<void> _handleMessage(Map<String, dynamic> message) async {
       final codeActions = await _handleCodeAction(params);
       _sendResponse(id, codeActions);
     case 'shutdown':
-      // Graceful shutdown — respond, then wait for `exit`.
+      // Graceful shutdown — cancel any running workspace scan, respond,
+      // then wait for `exit`.
+      _workspaceScanCanceled = true;
       _log('shutdown requested');
       _sendResponse(id, null);
     case 'exit':
@@ -560,6 +569,10 @@ Future<void> _buildCollection() async {
 /// denied, symlink cycle, path deleted mid-scan) doesn't crash the isolate
 /// via an unhandled async error from the unawaited() call site.
 Future<void> _analyzeWorkspace(String root) async {
+  // Reset the cancel flag so a previous cancellation doesn't prevent
+  // this scan from starting. A new cancel request during this scan
+  // will set it again.
+  _workspaceScanCanceled = false;
   final sw = Stopwatch()..start();
 
   try {
@@ -622,13 +635,32 @@ Future<void> _analyzeWorkspace(String root) async {
     final filesToAnalyze = <String>[];
     var skippedUnchanged = 0;
     for (var i = 0; i < dartFiles.length; i += _maxConcurrentFileOps) {
+      // Check cancellation between batches so shutdown/config-reload
+      // aborts the mtime-check phase promptly.
+      if (_workspaceScanCanceled) {
+        _log('workspace scan: canceled during mtime check '
+            '(${filesToAnalyze.length} files queued so far)');
+        return;
+      }
+
       final batchEnd = (i + _maxConcurrentFileOps).clamp(0, dartFiles.length);
       final batch = dartFiles.sublist(i, batchEnd);
 
       // Fire all mtime checks in this batch concurrently, then await them
       // together — parallelizes disk I/O within the concurrency cap.
+      // Individual failures (file deleted mid-walk, permission denied) are
+      // caught per-file so one bad path doesn't abort the entire batch.
       final mtimes = await Future.wait(
-        batch.map((path) => File(path).lastModified()),
+        batch.map((path) async {
+          try {
+            return await File(path).lastModified();
+          } on Object {
+            // File vanished or became unreadable between the directory
+            // listing and the mtime check — return epoch so it's treated
+            // as "changed" and analysis will catch any real error.
+            return DateTime.fromMillisecondsSinceEpoch(0);
+          }
+        }),
       );
 
       for (var j = 0; j < batch.length; j++) {
@@ -651,13 +683,25 @@ Future<void> _analyzeWorkspace(String root) async {
           '(incremental)');
     }
 
-    _log('workspace scan: analyzing ${filesToAnalyze.length} files…');
+    final totalToAnalyze = filesToAnalyze.length;
+    _log('workspace scan: analyzing $totalToAnalyze files…');
     var analyzed = 0;
     var diagnosticCount = 0;
 
+    // Progress logging interval — log every N files so the Output channel
+    // shows the scan is alive on large projects without flooding it.
+    const progressInterval = 50;
+
     for (final filePath in filesToAnalyze) {
-      // Bail if the analyzer context was torn down (server shutting down).
-      if (_collection == null) break;
+      // Check cancellation between files — shutdown, config reload, or a
+      // new scan superseding this one sets the flag. Diagnostics published
+      // so far remain valid (each _analyzeFile publishes incrementally).
+      if (_workspaceScanCanceled || _collection == null) {
+        _log('workspace scan: canceled after $analyzed/$totalToAnalyze files, '
+            '$diagnosticCount diagnostic(s) published '
+            'in ${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s');
+        return;
+      }
 
       final fileUri = Uri.file(p.normalize(p.absolute(filePath))).toString();
 
@@ -674,6 +718,14 @@ Future<void> _analyzeWorkspace(String root) async {
 
       analyzed++;
       diagnosticCount += _fileDiagnostics[fileUri]?.length ?? 0;
+
+      // Log progress periodically so the Output channel shows the scan is
+      // alive — especially useful on large projects where the full scan
+      // takes minutes.
+      if (analyzed % progressInterval == 0) {
+        _log('workspace scan: $analyzed/$totalToAnalyze files '
+            '($diagnosticCount diagnostics so far)');
+      }
 
       // Yield to the event loop between files so didSave/codeAction requests
       // aren't starved by a long scan.

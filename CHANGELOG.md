@@ -91,6 +91,7 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 - Fixed `avoid_case_sensitive_path_comparison` false positive on non-string comparisons — null checks, boolean/integer/double/enum guards on path-named variables no longer fire. No action required.
 - Sidebar Status panel no longer silently drops the Health row before any analysis has ever run — it now shows a "Health: —" row explaining why, with a one-click link to run analysis. No action required.
 - Fixed LSP server crash on startup in large projects — the Dart VM exhausted its OS thread pool when the workspace scan called `lastModifiedSync` / `listSync` on hundreds of files. Replaced sync I/O with batched async equivalents (capped at 20 concurrent file operations) and added error handlers so failures exit cleanly instead of triggering an infinite restart loop. No action required.
+- LSP workspace scan is now progressive and cancelable — diagnostics publish incrementally as each file is analyzed, and the scan aborts cleanly on shutdown or config reload instead of racing to completion. Progress is logged every 50 files. No action required.
 
 <details><summary>Maintenance</summary>
 

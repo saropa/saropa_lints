@@ -53,3 +53,21 @@ stdin socket reader.
   together, then starts the next batch. This prevents the Dart VM's I/O thread
   pool (~32 threads) from being overwhelmed even on projects with thousands of
   Dart files.
+- Individual `lastModified()` failures within a batch are caught per-file
+  instead of aborting the entire `Future.wait`. Files that vanish between the
+  directory listing and the mtime check get an epoch timestamp so they're
+  treated as "changed" and analysis catches the real error.
+- Cancellation flag (`_workspaceScanCanceled`) checked between mtime batches
+  and between analysis files. Set on `shutdown` and
+  `workspace/didChangeConfiguration`, reset at each new scan start.
+
+### Progressive scan with cancellation (post-reflection)
+
+- Workspace scan now publishes diagnostics incrementally — each file's results
+  appear in the Problems panel as soon as its analysis completes, not after the
+  full scan finishes.
+- Progress logged every 50 files (`workspace scan: N/M files (D diagnostics
+  so far)`) so the Output channel shows the scan is alive on large projects.
+- Cancellation produces a summary log line showing how many files were analyzed
+  before the abort and how many diagnostics were published, so the user knows
+  partial results are available.
