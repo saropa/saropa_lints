@@ -924,11 +924,11 @@
       "colActionsAria": "صفوں کی کارروائیاں۔",
       "filesAffected": "متاثرہ فائلیں ({count})",
       "howToFixHeading": "کس طرح ترمیم کریں",
-      "owaspMobileLabel": "موبائل",
-      "owaspWebLabel": "ویب",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "متعلقہ قواعد",
       "sameTagHeading": "اکثریت کے نام سے تلاش کریں",
-      "migrationHeading": "میگریشن",
+      "migrationHeading": "Migration",
       "supersedesLabel": "تبدیل کریں:"
     },
     "findings": {
