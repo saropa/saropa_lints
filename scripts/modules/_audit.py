@@ -552,9 +552,15 @@ def run_full_audit(
         tier_checks = get_tier_integrity_checks(tier_result)
         tier_integrity_passed = tier_result.passed
 
-    # Underscore naming data
-    rules_with_0 = [r for r in rules if r.count("_") == 0]
-    rules_with_1 = [r for r in rules if r.count("_") == 1]
+    # Underscore naming data — short names accepted as intentionally terse
+    _KNOWN_SHORT_NAMES = frozenset({
+        "document_enum", "duplicate_value",
+        "initializers_ordering", "is_future", "mutable_tearoff",
+    })
+    rules_with_0 = [r for r in rules if r.count("_") == 0
+                     and r not in _KNOWN_SHORT_NAMES]
+    rules_with_1 = [r for r in rules if r.count("_") == 1
+                     and r not in _KNOWN_SHORT_NAMES]
 
     # ROADMAP sync data
     roadmap_duplicates = implemented & roadmap

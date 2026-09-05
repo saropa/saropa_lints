@@ -3,7 +3,7 @@
 **Deferred:** 2026-07-16
 **Flavor:** blocked — depends on an unfixed precision defect in the layer below.
 **Parent plan (archived):** `plans/history/2026.07/2026.07.16/PLAN_vibrancy_usage_collector_element_resolution.md`
-**Blocking bug:** `bugs/infra_vibrancy_unused_false_positives_context_fragmentation.md`
+**Blocking bug:** `plans/history/2026.07/2026.07.17/infra_vibrancy_unused_false_positives_context_fragmentation.md`
 
 ## Why deferred
 
@@ -37,7 +37,7 @@ time. They are blocked until the blocking bug is fixed and the precision review 
 
 ## To resurrect
 
-1. Fix `bugs/infra_vibrancy_unused_false_positives_context_fragmentation.md` (scope the analyzer
+1. Fix `plans/history/2026.07/2026.07.17/infra_vibrancy_unused_false_positives_context_fragmentation.md` (scope the analyzer
    context to the package; include `bin/` in the target set; protect entry points on the degrade
    path).
 2. Re-run the precision review: `dart run saropa_lints:project_vibrancy --path . --format json`,

@@ -1,6 +1,6 @@
 # PROPOSAL: Publish Audit — 4 Non-Blocking Warnings from the 16.0.0-beta.1 Run
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-09-04
 Type: Infrastructure / doc hygiene
@@ -137,3 +137,37 @@ all three with the `_extended` suffix, per the established convention in
 
 Open — none of these block the 16.0.0-beta.1 publish. Triage individually
 when convenient.
+
+---
+
+## Finish Report (2026-09-04)
+
+All four findings triaged and closed.
+
+**Finding 1** — `_audit.py` gained a `_KNOWN_SHORT_NAMES` frozenset covering the
+5 named rules; both underscore-count filters now exclude it. The warning
+remains active for any future short rule name not in the set.
+
+**Finding 2** — The two real stale references were repointed: `CHANGELOG.md`'s
+mention of the old guide filename was rewritten without a literal `bugs/`-style
+path (so it can no longer false-match the checker's regex), and both
+references in `plans/deferred/vibrancy_usage_cache_subprocess_cascading.md`
+were repointed to the bug's actual archived location,
+`plans/history/2026.07/2026.07.17/infra_vibrancy_unused_false_positives_context_fragmentation.md`.
+`get_dangling_bug_references()` in `_audit_checks.py` gained a skip for
+`ISSUE_REPORT_GUIDE.md` so its own naming-convention example filenames (4
+placeholders) never scan as references again. Verified by direct invocation:
+the 4 guide false positives and the CHANGELOG stale ref no longer appear in
+the checker's output; the remaining hits after the fix were all self-references
+from this bug file's own body (documenting the old paths), which resolve on
+archival since `plans/history/` is already excluded from the scan.
+
+**Finding 3** — Confirmed via pub.dev that the `lint` package (v2.13.0,
+published 2026-09-04) is actively maintained with current Dart 3.12 support,
+contradicting the `known_issues.json` entry's "abandoned" / `end_of_life`
+classification. Updated the entry's `status`, `reason`, `as_of`,
+`replacement`, `migrationNotes`, and `lastUpdated` fields to reflect current
+reality.
+
+**Finding 4** — No action; confirmed routine, self-regenerating backlog per
+the finding's own description.

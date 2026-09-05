@@ -1274,6 +1274,10 @@ def get_dangling_bug_references(project_dir: Path) -> list[tuple[str, str]]:
                     continue
                 except ValueError:
                     pass
+                # Skip the issue guide — its example filenames are
+                # illustrative placeholders, not real references
+                if md.name == "ISSUE_REPORT_GUIDE.md":
+                    continue
                 scan_files.append(md)
 
     dangling: list[tuple[str, str]] = []

@@ -70,10 +70,22 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)
 
+### Changed
+
+- Sidebar: "Lint integration" is now one row in the Status section that toggles on a single click, instead of two separate copies of the same state in different panels. No action required.
+- Sidebar: "Find stale ignores" and "Fix stale ignores" merged into one row that detects, shows the count, then asks to confirm before removing anything. No action required.
+- Sidebar: Analysis Optimizer, Upgrade Opportunities, and the Feature Inventory export are no longer separate Dashboards rows — each is reachable as a tab inside Rules & Tiers or the Package Dashboard. Command Catalog moved next to Run analysis and Fix stale ignores. No action required.
+
 ### Fixed
 
 - Fixed VS Code "Switch to Pre-Release Version" button failing with `net::ERR_FAILED` — pre-release extension versions now use an odd minor number as VS Code requires.
 - Fixed CI watch blocking publish by defaulting to skip (press `y` to opt in).
+
+<details><summary>Maintenance</summary>
+
+- Fixed publish script writing raw pub.dev version to `package.json` instead of the converted extension version — caused preflight version check to fail on every pre-release publish.
+
+</details>
 
 ## [16.0.0-beta.1]
 
@@ -509,7 +521,7 @@ Major scan CLI expansion: lane control (`--lane full|light`, `--lane-stats`), CI
 - **Publish script: further crash-detection hardening** — test-temp-dir contents are wiped before each run instead of accumulating across publish attempts, the temp dir is write-verified before use (falls back to system temp on failure), and the auto-tune concurrency cache key now includes an available-RAM bucket so a level probed safe on an idle machine doesn't get trusted indefinitely under memory pressure.
 - **known_issues review script** — now skips entries with `appliesToMaxVersion` or `replacementObsoleteFromVersion` to avoid false-positive flagging of version-scoped entries that are correct by design.
 - `require_sdk_syntax_match` quick fix: removed dead `Map<Type, String>` lookup (analyzer concrete types are private `*Impl` classes that never matched abstract keys); hardened regex with triple-quoted raw string to handle embedded quotes.
-- `bugs/BUG_REPORT_GUIDE.md` renamed to `bugs/ISSUE_REPORT_GUIDE.md` and extended with a feature request template, proposal naming patterns, and lifecycle, alongside the existing bug report process.
+- `bugs/ISSUE_REPORT_GUIDE.md` (formerly `BUG_REPORT_GUIDE.md`) renamed and extended with a feature request template, proposal naming patterns, and lifecycle, alongside the existing bug report process.
 - `_rule_metrics.py`'s bug counter now reports open feature proposals separately from unsolved bugs in the publish "WORK REPORT" banner, instead of lumping both into one count.
 - Scan daemon and accuracy report now pass `lane: RuleLane.full` explicitly instead of relying on the constructor default.
 - Scan CLI warns when `--lane light` is combined with `--exclude-light-lane` (degenerate: zero rules to scan).
