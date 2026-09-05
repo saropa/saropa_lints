@@ -228,6 +228,9 @@ Future<void> _handleScanRequest(
       lane: RuleLane.full,
       // Keep the IDE issue cap — daemon output feeds the Problems tab.
       // disableIssueCap: false (default),
+      // The extension sends explicit file paths — honor them without
+      // applying hardcoded exclusions (same as lsp_server.dart).
+      applyExclusionsToFileList: false,
     );
     final diagnostics = await runner.runResolvedWithCollection(collection);
     if (diagnostics == null) {

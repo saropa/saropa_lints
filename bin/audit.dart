@@ -123,6 +123,10 @@ Future<void> main(List<String> args) async {
     disableIssueCap: true,
     excludeGlobs: parsed.excludeGlobs,
     includeGlobs: parsed.includeGlobs,
+    // When --since provides an explicit file list from git, honor those
+    // paths without applying hardcoded exclusions — same rationale as
+    // scan.dart and lsp_server.dart.
+    applyExclusionsToFileList: dartFiles == null,
   );
 
   final diagnostics = await runner.runResolved();

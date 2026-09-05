@@ -466,7 +466,12 @@ async function startReportRun(
       controls.delete(reportId);
       // Persist both streams so saved logs retain stderr diagnostics (error
       // messages, Dart build banners) alongside the structured stdout output.
-      const savedPath = persistReportOutput(root, reportId, stdout + stderrLog);
+      // A labeled separator makes it unambiguous where stdout ends and stderr
+      // begins for anyone inspecting the saved .log file.
+      const fullLog = stderrLog.length > 0
+        ? `${stdout}--- stderr ---\n${stderrLog}`
+        : stdout;
+      const savedPath = persistReportOutput(root, reportId, fullLog);
       if (spec.supportsJson) {
         postJsonReportRows(panel, reportId, stdout);
       }

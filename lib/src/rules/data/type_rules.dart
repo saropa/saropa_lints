@@ -405,7 +405,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
 /// Warns when interpolating a nullable value in a string.
 ///
-/// Since: v0.1.4 | Updated: v7 | Rule version: v7
+/// Since: v0.1.4 | Updated: v8 | Rule version: v8
 ///
 /// v6 narrowing — three classes of false-positive suppressed so the
 /// rule's remaining hits represent the actual "user sees null in the UI"
@@ -427,6 +427,14 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 /// not just a bare `if (expr != null)`. Every conjunct of `&&` must hold
 /// to reach the then-branch, so the guard is just as valid buried in a
 /// larger condition.
+///
+/// v8 — suppress for `Match[n]` / `Match.group(n)` interpolations.
+/// `RegExpMatch.group()` returns `String?` by the type system, but for
+/// required (non-optional) capture groups the value is never null when
+/// the match succeeded. The rule cannot parse regex patterns to determine
+/// which groups are optional, so it exempts all match group accesses —
+/// the false-positive rate is very high and invalid indices throw
+/// `RangeError` at runtime rather than producing null.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableInterpolationRule extends SaropaLintRule {
@@ -450,7 +458,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_nullable_interpolation',
     "[avoid_nullable_interpolation] Nullable value in string interpolation produces the literal text 'null' instead of a meaningful fallback. "
-        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity. {v7}",
+        "Users may see 'Hello null' or 'Order #null' in the UI, which looks like a bug and erodes trust in the application quality and data integrity. {v8}",
     correctionMessage:
         "Add a null check before interpolation, or use the null-coalescing operator (??) to provide a sensible default (e.g., '\${name ?? \"Guest\"}'). "
         'For complex formatting, consider a helper method that handles null values with appropriate placeholder text.',
@@ -501,6 +509,47 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
       // Developer-facing log call: see _developerLogCallTargets.
       if (_isInsideDeveloperLogCall(node)) return;
 
+      // Match.group(n) and Match[n] return String? by the Dart type
+      // system, but the value is non-null when the group index refers
+      // to a required (non-optional) capture group.
+      //
+      // When the regex pattern literal is visible in the AST, parse it
+      // to count required groups and only suppress if the accessed
+      // index is within that count (or is 0, the always-present full
+      // match). When the pattern can't be found or parsed, fall back
+      // to blanket suppression — the FP rate is very high and an
+      // invalid index throws RangeError, not null.
+      if (_isMatchGroupAccess(inner)) {
+        final int? groupIdx = _extractGroupIndex(inner);
+        // Group 0 is always the full match — never null on success.
+        if (groupIdx != null && groupIdx == 0) return;
+        // Try to find and parse the regex pattern for precision.
+        // Pass the unwrapped Expression (inner), not the
+        // InterpolationExpression (node) — _findRegExpPattern walks
+        // up from the match-access node to find the regexp literal.
+        final String? pattern = _findRegExpPattern(inner);
+        if (pattern != null) {
+          final int? required = countRequiredCaptureGroups(pattern);
+          if (required != null) {
+            // Suppress only if the group index is within the
+            // required count. Groups beyond that are optional and
+            // genuinely can be null — let the lint fire.
+            if (groupIdx != null && groupIdx <= required) return;
+            // If group index is unknown (non-literal), we can't
+            // verify — let the lint fire for safety.
+            if (groupIdx == null) { /* fall through to reporter */ }
+          } else {
+            // Pattern too complex to parse — fall back to blanket
+            // suppression to avoid false positives.
+            return;
+          }
+        } else {
+          // Pattern not found in AST — fall back to blanket
+          // suppression to avoid false positives.
+          return;
+        }
+      }
+
       reporter.atNode(node);
     });
   }
@@ -532,6 +581,124 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
       hops++;
     }
     return false;
+  }
+
+  /// True when [expr] is `match[n]` or `match.group(n)` where the
+  /// receiver is typed as `Match` or `RegExpMatch` (dart:core). These
+  /// return `String?` generically, but for required capture groups the
+  /// value is never null — and the rule can't parse the regex to tell.
+  ///
+  /// Expects the caller to pass an already-unwrapped expression (no
+  /// enclosing `ParenthesizedExpression`). The type's nullability suffix
+  /// is irrelevant here — `DartType.element` resolves identically for
+  /// both `Match` and `Match?`, and the caller has already confirmed the
+  /// overall type is nullable (otherwise the rule wouldn't fire at all).
+  bool _isMatchGroupAccess(Expression expr) {
+    // m[n] — IndexExpression on Match/RegExpMatch.
+    // `realTarget` is non-nullable on IndexExpression (always has a
+    // target), so no `?.` needed.
+    if (expr is IndexExpression) {
+      final DartType? targetType = expr.realTarget.staticType;
+      if (targetType != null && _isMatchType(targetType)) return true;
+    }
+    // m.group(n) — MethodInvocation on Match/RegExpMatch.
+    // `realTarget` CAN be null for implicit-this calls (e.g. `group(1)`
+    // inside a Match extension method), hence the `?.` guard.
+    if (expr is MethodInvocation) {
+      if (expr.methodName.name == 'group') {
+        final DartType? targetType = expr.realTarget?.staticType;
+        if (targetType != null && _isMatchType(targetType)) return true;
+      }
+    }
+    return false;
+  }
+
+  /// Delegates to the shared top-level isDartCoreMatchType() helper.
+  bool _isMatchType(DartType type) => isDartCoreMatchType(type);
+
+  /// Extracts the integer group index from a match-group access
+  /// expression. Returns null if the index is not a non-negative
+  /// integer literal (runtime values can't be statically verified).
+  int? _extractGroupIndex(Expression expr) {
+    if (expr is IndexExpression) {
+      // m[1] — the index is the argument to operator[]
+      final Expression idx = expr.index;
+      if (idx is IntegerLiteral) return idx.value;
+    }
+    if (expr is MethodInvocation && expr.methodName.name == 'group') {
+      // m.group(1) — the index is the first positional argument
+      final args = expr.argumentList.arguments;
+      if (args.length == 1 && args.first is IntegerLiteral) {
+        return (args.first as IntegerLiteral).value;
+      }
+    }
+    return null;
+  }
+
+  /// Walks up from the interpolation node to find the RegExp pattern
+  /// literal, if one is visible in the AST. Handles two common shapes:
+  ///
+  /// 1. `str.replaceAllMapped(RegExp(r'...'), (m) => '${m[1]}')`
+  /// 2. `RegExp(r'...').firstMatch(input)` assigned to a local, then
+  ///    accessed inside `if (match != null) { ... match[1] ... }`.
+  ///
+  /// Returns null when the pattern isn't a compile-time string literal
+  /// or the AST shape doesn't match a recognized idiom.
+  String? _findRegExpPattern(AstNode startNode) {
+    // Walk up to find the function expression (callback) containing
+    // this match access, then look at the enclosing method call.
+    AstNode? current = startNode.parent;
+    int hops = 0;
+    while (current != null && hops < 20) {
+      if (current is FunctionExpression) {
+        // Check if this callback is an argument to replaceAllMapped,
+        // splitMapJoin, or similar String methods.
+        final AstNode? callParent = current.parent?.parent;
+        if (callParent is MethodInvocation) {
+          return _extractRegExpFromCallArgs(callParent);
+        }
+      }
+      // For `final m = regex.firstMatch(...)` patterns, look for the
+      // variable declaration's initializer.
+      if (current is VariableDeclaration) {
+        final Expression? init = current.initializer;
+        if (init is MethodInvocation) {
+          // regex.firstMatch(input) — the regex is the target
+          final Expression? target = init.target;
+          if (target is InstanceCreationExpression) {
+            return _extractPatternFromRegExpCtor(target);
+          }
+        }
+      }
+      current = current.parent;
+      hops++;
+    }
+    return null;
+  }
+
+  /// Extracts the pattern string from `RegExp(r'...')` when it appears
+  /// as the first argument of a method call like `replaceAllMapped`.
+  String? _extractRegExpFromCallArgs(MethodInvocation call) {
+    final args = call.argumentList.arguments;
+    if (args.isEmpty) return null;
+    final Expression first = args.first;
+    if (first is InstanceCreationExpression) {
+      return _extractPatternFromRegExpCtor(first);
+    }
+    return null;
+  }
+
+  /// Extracts the pattern string from a `RegExp(r'...')` constructor
+  /// call. Returns null if the argument isn't a simple string literal.
+  String? _extractPatternFromRegExpCtor(InstanceCreationExpression expr) {
+    // Verify this is actually a RegExp constructor
+    final String? ctorName = expr.constructorName.type.element?.name;
+    if (ctorName != 'RegExp') return null;
+    final args = expr.argumentList.arguments;
+    if (args.isEmpty) return null;
+    final Expression first = args.first;
+    if (first is SimpleStringLiteral) return first.value;
+    return null;
   }
 
   bool _hasNotNullAncestorGuard(InterpolationExpression node) {
@@ -929,11 +1096,8 @@ class AvoidNullAssertionRule extends SaropaLintRule {
     // explicit `if (match != null)` promotion on a `firstMatch(...)` result.
     if (type.nullabilitySuffix == NullabilitySuffix.question) return false;
 
-    final Element? element = type.element;
-    if (element == null) return false;
-    final String? typeName = element.name;
-    if (typeName != 'RegExpMatch' && typeName != 'Match') return false;
-    return element.library?.name == 'dart.core';
+    // Shared dart:core Match/RegExpMatch check — see isDartCoreMatchType().
+    return isDartCoreMatchType(type);
   }
 
   @override
@@ -3576,4 +3740,219 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
     }
     return false;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
+
+/// True when [type] is `Match` or `RegExpMatch` (or a subtype) from
+/// dart:core. Checks by element name + library — not display string — to
+/// avoid false-matching a user-defined class also named `Match`.
+///
+/// The `element.library.name == 'dart.core'` idiom is the standard
+/// pattern used throughout this codebase (see lines checking for
+/// `dart.core` Null, bool, int, etc.) and is stable across Dart SDK
+/// versions. `DartType.element` resolves identically regardless of
+/// the type's nullability suffix.
+///
+/// Used by both `AvoidNullableInterpolationRule` (v8) and
+/// `AvoidNullAssertionRule` (v5) to recognize match-group accesses.
+bool isDartCoreMatchType(DartType type) {
+  final Element? element = type.element;
+  if (element == null) return false;
+  final String? name = element.name;
+  if (name != 'Match' && name != 'RegExpMatch') return false;
+  return element.library?.name == 'dart.core';
+}
+
+/// Counts the number of required (non-optional) capture groups in a
+/// regex [pattern]. Returns null if the pattern is too complex to
+/// analyze reliably (e.g. contains constructs this parser doesn't
+/// handle).
+///
+/// A capture group is "required" when it is NOT:
+/// - Followed by `?` or `*` (zero-or-more / zero-or-one quantifier)
+/// - Inside an alternation (`|`) at its nesting level
+/// - A non-capturing group `(?:...)`, lookahead `(?=...)` / `(?!...)`,
+///   or lookbehind `(?<=...)` / `(?<!...)`
+///
+/// Group 0 (the full match) is always required on a successful match
+/// and is not counted here — callers should treat index 0 as safe
+/// unconditionally.
+int? countRequiredCaptureGroups(String pattern) {
+  // Each capture group is tracked by its 1-based index and whether
+  // it's optional. The group stack maps opening parens to their
+  // capture group index (or -1 for non-capturing groups).
+  final List<bool> groupOptional = <bool>[]; // indexed by groupIndex-1
+  // Stack of (captureGroupIndex or -1, hadAlternation) per open paren.
+  final List<_OpenGroup> stack = <_OpenGroup>[];
+  // Top-level alternation flag — groups at top level with `|` are
+  // all optional because only one side matches.
+  bool topLevelAlternation = false;
+
+  int i = 0;
+  int groupIndex = 0;
+
+  while (i < pattern.length) {
+    final String c = pattern[i];
+
+    // Skip escaped characters — they are literal, not metacharacters.
+    if (c == r'\') {
+      i += 2;
+      continue;
+    }
+
+    // Skip character classes `[...]` — parens inside are literal.
+    if (c == '[') {
+      i++;
+      // Handle negated class `[^...]`
+      if (i < pattern.length && pattern[i] == '^') i++;
+      // Handle `]` as first char in class (literal `]`)
+      if (i < pattern.length && pattern[i] == ']') i++;
+      while (i < pattern.length && pattern[i] != ']') {
+        if (pattern[i] == r'\') i++; // skip escaped char in class
+        i++;
+      }
+      i++; // skip closing `]`
+      continue;
+    }
+
+    if (c == '(') {
+      // Check for non-capturing and special groups
+      if (i + 1 < pattern.length && pattern[i + 1] == '?') {
+        // Non-capturing (?:...), lookahead (?=...), (?!...),
+        // lookbehind (?<=...), (?<!...), named (?<name>...), etc.
+        i += 2; // skip '(?'
+        if (i < pattern.length) {
+          if (pattern[i] == ':' ||
+              pattern[i] == '=' ||
+              pattern[i] == '!') {
+            // Non-capturing or lookahead — push with -1
+            stack.add(_OpenGroup(
+              captureIndex: -1,
+              childStartIndex: groupOptional.length,
+            ));
+            i++;
+          } else if (pattern[i] == '<') {
+            if (i + 1 < pattern.length &&
+                (pattern[i + 1] == '=' || pattern[i + 1] == '!')) {
+              // Lookbehind — not a capture group
+              stack.add(_OpenGroup(
+                captureIndex: -1,
+                childStartIndex: groupOptional.length,
+              ));
+              i += 2;
+            } else {
+              // Named capture group (?<name>...) — IS a capture group
+              groupIndex++;
+              groupOptional.add(false);
+              stack.add(_OpenGroup(
+                captureIndex: groupIndex,
+                childStartIndex: groupOptional.length,
+              ));
+              // Skip to `>`
+              while (i < pattern.length && pattern[i] != '>') {
+                i++;
+              }
+              i++; // skip `>`
+            }
+          } else {
+            // Unknown special group — bail out as too complex
+            return null;
+          }
+        }
+        continue;
+      }
+
+      // Regular capturing group
+      groupIndex++;
+      groupOptional.add(false);
+      stack.add(_OpenGroup(
+        captureIndex: groupIndex,
+        childStartIndex: groupOptional.length,
+      ));
+      i++;
+      continue;
+    }
+
+    if (c == ')') {
+      if (stack.isEmpty) {
+        // Unbalanced parens — bail out
+        return null;
+      }
+      final _OpenGroup closed = stack.removeLast();
+
+      // Check if this group is followed by `?` or `*` (optional)
+      final bool isOptional = (i + 1 < pattern.length &&
+          (pattern[i + 1] == '?' || pattern[i + 1] == '*'));
+
+      // Mark the specific capture group that this `)` closes as
+      // optional if it's followed by `?`/`*` or had alternation.
+      if (closed.captureIndex > 0) {
+        if (isOptional || closed.hadAlternation) {
+          groupOptional[closed.captureIndex - 1] = true;
+        }
+      }
+      // If this group is optional or has alternation, propagate to
+      // all child capture groups nested inside it — they only match
+      // when the enclosing group does.
+      if (isOptional || closed.hadAlternation) {
+        for (int gi = closed.childStartIndex;
+            gi < groupOptional.length;
+            gi++) {
+          groupOptional[gi] = true;
+        }
+      }
+      i++;
+      continue;
+    }
+
+    // Alternation at current nesting level.
+    if (c == '|') {
+      if (stack.isNotEmpty) {
+        // Mark the innermost open group as having alternation
+        stack.last.hadAlternation = true;
+      } else {
+        // Top-level alternation — all groups become optional
+        topLevelAlternation = true;
+      }
+      i++;
+      continue;
+    }
+
+    i++;
+  }
+
+  // Unbalanced parens — bail out
+  if (stack.isNotEmpty) return null;
+
+  // If there's top-level alternation, all groups are optional
+  if (topLevelAlternation) {
+    return 0;
+  }
+
+  // Count required (non-optional) groups
+  int requiredCount = 0;
+  for (final bool opt in groupOptional) {
+    if (!opt) requiredCount++;
+  }
+  return requiredCount;
+}
+
+/// Tracks an open parenthesis during regex pattern parsing.
+class _OpenGroup {
+  _OpenGroup({required this.captureIndex, required this.childStartIndex});
+
+  /// 1-based capture group index, or -1 for non-capturing groups.
+  final int captureIndex;
+
+  /// Index into groupOptional where child capture groups start. Any
+  /// group at this index or later was opened inside this group and
+  /// should inherit its optionality when this group closes with `?`
+  /// or `*`.
+  final int childStartIndex;
+
+  /// True when an alternation `|` was seen at this nesting level.
+  bool hadAlternation = false;
 }

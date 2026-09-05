@@ -479,7 +479,14 @@ class ScanRunner {
   List<String> _resolveDartFiles() {
     final raw = dartFiles;
     if (raw == null || raw.isEmpty) {
-      return _findDartFiles(targetPath, _excludePatterns, _includePatterns);
+      // Pass noExclude so --no-exclude skips hardcoded path exclusions
+      // (example/, .dart_tool/, build/, etc.) during directory discovery.
+      return _findDartFiles(
+        targetPath,
+        _excludePatterns,
+        _includePatterns,
+        noExclude,
+      );
     }
     final root = p.absolute(targetPath);
     var list = raw
@@ -495,9 +502,16 @@ class ScanRunner {
       // Combined exclusion/inclusion filter: _shouldInclude handles the
       // hardcoded defaults, user-supplied exclude-globs, and include-glob
       // overrides in one pass.
+      // --no-exclude bypasses hardcoded exclusions even when applying
+      // exclusions to an explicit file list.
       list = list
           .where(
-            (path) => _shouldInclude(path, _excludePatterns, _includePatterns),
+            (path) => _shouldInclude(
+              path,
+              _excludePatterns,
+              _includePatterns,
+              noExclude,
+            ),
           )
           .toList();
     }

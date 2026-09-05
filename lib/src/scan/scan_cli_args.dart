@@ -63,6 +63,7 @@ class ScanCliArgs {
     this.quiet = false,
     this.excludeGlobs = const [],
     this.includeGlobs = const [],
+    this.noExclude = false,
   });
 
   final String path;
@@ -211,6 +212,12 @@ class ScanCliArgs {
   /// include wins — letting users force-scan paths the defaults would skip.
   /// Useful for auditing third-party plugin code in platform directories.
   final List<String> includeGlobs;
+
+  /// When true, disables ALL hardcoded path exclusions (example/, build/,
+  /// bin/, .dart_tool/, generated code patterns, etc.) so every discovered
+  /// .dart file is scanned unconditionally. User-supplied --exclude-globs
+  /// still apply. More composable than `--include-globs "**"`.
+  final bool noExclude;
 }
 
 /// Parses [args] for the scan command.
@@ -256,6 +263,7 @@ ScanParseResult parseScanArgs(
   String? lane;
   bool laneStats = false;
   bool quiet = false;
+  bool noExclude = false;
 
   var i = 0;
   while (i < args.length) {
@@ -363,6 +371,13 @@ ScanParseResult parseScanArgs(
         includeGlobs.add(args[i]);
         i++;
       }
+      continue;
+    }
+    // Disable ALL hardcoded path exclusions so every .dart file is scanned.
+    // User-supplied --exclude-globs still apply.
+    if (arg == '--no-exclude') {
+      noExclude = true;
+      i++;
       continue;
     }
     if (arg == '--tier') {
@@ -622,6 +637,7 @@ ScanParseResult parseScanArgs(
       quiet: quiet,
       excludeGlobs: excludeGlobs,
       includeGlobs: includeGlobs,
+      noExclude: noExclude,
     ),
   );
 }

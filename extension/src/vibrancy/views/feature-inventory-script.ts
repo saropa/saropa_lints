@@ -142,8 +142,13 @@ export function getFeatureInventoryScript(): string {
  * etc.). Mirrors `getKnownIssuesEmbedScript` in `known-issues-script.ts`.
  */
 export function getFeatureInventoryEmbedScript(): string {
+    // Bail out if the container is missing rather than falling back to
+    // `document` — that would silently reintroduce the cross-tab leak this
+    // IIFE exists to prevent. The element is always present because the
+    // script runs inside the same HTML that defines the tab panel.
     return `(function(){
-var fiRoot=document.getElementById('pkg-tab-fullReport')||document;
+var fiRoot=document.getElementById('pkg-tab-fullReport');
+if(!fiRoot){return;}
 ${getFilterScript('fiRoot')}${getDisclosureScript('fiRoot')}${getSortScript('fiRoot')}
 })();`;
 }

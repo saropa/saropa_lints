@@ -108,6 +108,13 @@ Future<void> main(List<String> args) async {
     // disableIssueCap: false (default),
     excludeGlobs: parsed.excludeGlobs,
     includeGlobs: parsed.includeGlobs,
+    // When the user explicitly names files via --files, honor that intent —
+    // don't silently drop them because they sit under an excluded path
+    // (example/, bin/, etc.). Same rationale as the LSP server's false.
+    applyExclusionsToFileList: dartFiles.isEmpty,
+    // --no-exclude disables all hardcoded path exclusions (example/, build/,
+    // .dart_tool/, etc.) so the scan covers every .dart file it finds.
+    noExclude: parsed.noExclude,
   );
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
@@ -719,6 +726,15 @@ void _printUsage() {
   );
   print(
     '                      auditing third-party code in ephemeral dirs.',
+  );
+  print(
+    '  --no-exclude        Disable ALL hardcoded path exclusions (example/,',
+  );
+  print(
+    '                      build/, .dart_tool/, etc.). User-supplied',
+  );
+  print(
+    '                      --exclude-globs still apply.',
   );
   print(
     '  --resolve           Fully resolve each file (type/element resolution)',
