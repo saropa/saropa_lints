@@ -31,7 +31,7 @@ closing-tag patterns did not allow optional whitespace or attributes before `>`,
 - Upgraded all closing-tag patterns from `\s*>` to `[^>]*>` after confirming that
   browsers accept `</script foo="bar">` as a valid end tag (per CodeQL docs).
 - Filed pre-existing `commandCatalogRegistry.test.ts` failure as
-  `bugs/commandCatalogRegistry_test_failure_preexisting.md`.
+  `plans/history/2026.09/2026.09.05/commandCatalogRegistry_test_failure_preexisting.md` (fixed and archived).
 - Added `scripts/check_html_tag_regex.py` CI script that scans all extension
   TypeScript files for HTML tag regexes missing case-insensitive flags or
   attribute-tolerant closing tags, catching future violations before they reach

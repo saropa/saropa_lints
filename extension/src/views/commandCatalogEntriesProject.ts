@@ -412,14 +412,14 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     title: 'Kill Orphaned Flutter Daemons',
     description: 'Terminate Flutter and Dart daemon processes that outlived their analysis session.',
     category: 'Analysis',
-    icon: 'trash',
+    icon: 'debug-disconnect',
   },
   {
     // Toggle the Health Panel (engines + processes debug view).
     command: 'saropaLints.toggleDebugPanel',
     title: 'Show Health Panel',
     description: 'Toggle the Health Panel showing engine and process diagnostics.',
-    category: 'Analysis',
+    category: 'Views & Navigation',
     icon: 'bug',
   },
   {

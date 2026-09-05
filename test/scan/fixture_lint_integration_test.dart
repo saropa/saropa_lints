@@ -247,6 +247,8 @@ void main() {
         'avoid_path_traversal',
         'avoid_jwt_decode_client',
         'prefer_local_auth',
+        // Testing-rule fixtures in example/lib/test/ (FileType.test path).
+        'require_test_description_convention',
       ];
 
       for (final rule in expectedCompileTimeFromDartAnalyze) {
