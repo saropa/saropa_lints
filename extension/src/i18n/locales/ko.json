@@ -924,11 +924,11 @@
       "colActionsAria": "행행위 줄의 행동",
       "filesAffected": "영향을 받은 파일 ({count})",
       "howToFixHeading": "어떻게 수정할까요",
-      "owaspMobileLabel": "모바일",
-      "owaspWebLabel": "웹",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "관련 규칙",
       "sameTagHeading": "같은 태그 발견",
-      "migrationHeading": "이전 🚫",
+      "migrationHeading": "Migration",
       "supersedesLabel": "대체:"
     },
     "findings": {

@@ -924,11 +924,11 @@
       "colActionsAria": "Rij-acties Rijaakties",
       "filesAffected": "De bestanden die zijn aangetast ({count})",
       "howToFixHeading": "Hoe te fixen",
-      "owaspMobileLabel": "Mobiel",
+      "owaspMobileLabel": "Mobile",
       "owaspWebLabel": "Web",
       "relatedRulesHeading": "Gerelateerde regels",
       "sameTagHeading": "Gelijk-tag ontdekking",
-      "migrationHeading": "Migratie",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Vervangt:"
     },
     "findings": {

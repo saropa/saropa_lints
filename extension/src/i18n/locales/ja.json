@@ -924,11 +924,11 @@
       "colActionsAria": "ローアクション (Row actions) は,行列のアクションをすること.",
       "filesAffected": "影響を受けたファイル ({count})",
       "howToFixHeading": "どう修正する",
-      "owaspMobileLabel": "モバイル",
-      "owaspWebLabel": "ウェブ",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "関連ルール",
       "sameTagHeading": "同じタグの発見",
-      "migrationHeading": "移行",
+      "migrationHeading": "Migration",
       "supersedesLabel": "上位:"
     },
     "findings": {
@@ -2541,7 +2541,7 @@
     "dashboards": {
       "commandCatalogLabel": "すべてのコマンド…",
       "commandCatalogDescription": "すべてのコマンドを検索",
-      "codeHealthDescription": "{grade}・{score}/100",
+      "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · ゲート障害",
       "codeHealthNeverScanned": "Code Health を実行してスコアを確認する",
       "projectMapDescription": "スキャン済み {ago}",

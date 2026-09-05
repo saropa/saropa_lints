@@ -800,7 +800,7 @@
       "hotspotsTitle": "{open} offen, {safe} als sicher markiert, {fixed} repariert — klicken Sie, um zu überprüfen",
       "hotspotsPill": "{open} öffnen · {percent}% geprüft",
       "qualityGatePassingTitle": "Code Health Qualitätsschwellen erreicht — klicken, um Code Health zu öffnen",
-      "qualityGatePassingPill": "Gate passing",
+      "qualityGatePassingPill": "Gate bestanden",
       "qualityGateFailingTitle": "Code Health Quality Gate fehlschlagend ({count} Verstoß(e)) — klicken, um Code Health zu öffnen",
       "qualityGateFailingPill": "Tor fehlt"
     },
@@ -1760,7 +1760,7 @@
       "restart": "Wiederherstellen Sie den Restart.",
       "stopped": "Stopp",
       "logHeading": "Aktivität Tätigkeit.",
-      "logEmpty": "No output yet — this log only fills if the scan prints a diagnostic message.",
+      "logEmpty": "Noch keine Ausgabe — dieses Protokoll wird nur gefüllt, wenn der Scan eine Diagnosemeldung ausgibt.",
       "progress": "{percent}% — {done}/{total} Dateien"
     },
     "reports": {

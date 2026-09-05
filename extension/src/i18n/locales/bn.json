@@ -924,11 +924,11 @@
       "colActionsAria": "সারি ক্রিয়াকলাপগুলি রোল ক্রিয়া",
       "filesAffected": "ক্ষতিগ্রস্ত ফাইলগুলি ({count})",
       "howToFixHeading": "কিভাবে ঠিক করবেন",
-      "owaspMobileLabel": "মোবাইল",
-      "owaspWebLabel": "ওয়েব",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "সম্পর্কিত নিয়মগুলি",
       "sameTagHeading": "সামান্য ট্যাগ খুঁজুন",
-      "migrationHeading": "মুক্তি প্রক্রিয়া",
+      "migrationHeading": "Migration",
       "supersedesLabel": "বিস্তারিত:"
     },
     "findings": {
@@ -2541,7 +2541,7 @@
     "dashboards": {
       "commandCatalogLabel": "সব কমান্ড...",
       "commandCatalogDescription": "সকল কমান্ড খুঁজুন",
-      "codeHealthDescription": "{grade} · {score}/১০০",
+      "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · গেট ব্যর্থ হচ্ছে",
       "codeHealthNeverScanned": "কোড হেলথ চালান আপনার স্কোর দেখুন",
       "projectMapDescription": "স্ক্যান করা হয়েছে {ago}",

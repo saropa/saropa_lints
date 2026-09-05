@@ -924,11 +924,11 @@
       "colActionsAria": "Діяльність по ряду Роль ролі",
       "filesAffected": "Впливові файли ({count})",
       "howToFixHeading": "Як виправити",
-      "owaspMobileLabel": "Мобільний",
-      "owaspWebLabel": "Веб",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "Пов'язані правила",
       "sameTagHeading": "Знаходження однакових тегів",
-      "migrationHeading": "Міграція",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Відмінить:"
     },
     "findings": {
@@ -2543,7 +2543,7 @@
       "commandCatalogDescription": "Шукати всі команди",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Помилка воріт",
-      "codeHealthNeverScanned": "Run Code Health to see your score",
+      "codeHealthNeverScanned": "Запустіть Code Health, щоб побачити свій бал",
       "projectMapDescription": "Відсканований {ago}",
       "projectMapNeverScanned": "Запустіть карту проекту, щоб побачити розмір і гарячі точки"
     }

@@ -924,11 +924,11 @@
       "colActionsAria": "Các hành động hàng Row actions",
       "filesAffected": "Các tập tin bị ảnh hưởng ({count})",
       "howToFixHeading": "Cách sửa",
-      "owaspMobileLabel": "Di động",
+      "owaspMobileLabel": "Mobile",
       "owaspWebLabel": "Web",
       "relatedRulesHeading": "Quy tắc liên quan",
       "sameTagHeading": "Phát hiện cùng tag",
-      "migrationHeading": "Di dời",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Thay thế:"
     },
     "findings": {

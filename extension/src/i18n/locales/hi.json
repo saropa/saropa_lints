@@ -924,11 +924,11 @@
       "colActionsAria": "पंक्ति क्रियाएँ Row actions",
       "filesAffected": "प्रभावित फ़ाइलें ({count})",
       "howToFixHeading": "कैसे ठीक करें",
-      "owaspMobileLabel": "मोबाइल",
-      "owaspWebLabel": "वेब",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "संबंधित नियम",
       "sameTagHeading": "समान टैग खोज",
-      "migrationHeading": "मिग्रेशन",
+      "migrationHeading": "Migration",
       "supersedesLabel": "अतिरिक्त:"
     },
     "findings": {

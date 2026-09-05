@@ -346,5 +346,6 @@
   "config.property.debug.enabled.description": "디아그노스틱 엔진 섹션(분석기 플러그인, 스캔 Daemon, 및 LSP 서버의 상태 및 제어)을 건강 패널에서 표시합니다.",
   "config.property.lspServer.enabled.description": "스탠다로드 Saropa Lints LSP 서버를 실행하여 진단을 수행합니다. 활성화되면 Language Server Protocol을 통해 squiggles 및 빠른 수정을 제공하는 별도의 Dart 프로세스가 생성됩니다. 분석기 플러그인을 자동으로 비활성화하여 약 10GB의 RAM을 절약합니다. 이 기능을 비활성화하면 분석기 플러그인을 다시 활성화합니다.",
   "config.property.lspServer.workspaceScan.description": "시작 시 전체 워크스페이스를 스캔하여 문제 패널에서 프로젝트 전체에 대한 진단 정보를 표시하고, 단순히 열린 파일에 한정되지 않도록 합니다. 초기 스캔이 너무 오래 걸리는 매우 큰 프로젝트에서는 이 기능을 비활성화하십시오.",
+  "config.property.lspServer.workspaceScanDelay.description": "분석기가 준비된 후 작업 영역 스캔을 시작하기 전에 기다리는 시간(초)입니다. 검사가 초기 파일 분석과 경쟁하지 않도록 VS Code가 시작 버스트를 먼저 완료하도록 합니다. 지연 없이 0으로 설정합니다.",
   "config.property.lspServer.scanDirectories.description": "시작 시 스캔할 디렉토리(프로젝트 루트에 상대적으로). Workspace Scan이 활성화될 때만 사용됩니다. 프로젝트 구조에 맞게 조정하세요 — 예를 들어, 테스트 파일이 중요하지 않다면 'test'를 제거하거나 'src'를 추가하세요."
 }

@@ -802,7 +802,7 @@
       "qualityGatePassingTitle": "Kanuni ya lango la Ubora wa Afya — bofya ili kufungua Kanuni ya Afya",
       "qualityGatePassingPill": "Lango kupita",
       "qualityGateFailingTitle": "Kanuni lango la ubora wa Afya halikufaulu (ukiukaji wa {count}) — bofya ili kufungua Kanuni ya Afya",
-      "qualityGateFailingPill": "Gate failing"
+      "qualityGateFailingPill": "Gate haijapita"
     },
     "groupBy": {
       "severity": "Ugumu wa Hali.",
@@ -924,11 +924,11 @@
       "colActionsAria": "Hatua za safu Matendo ya safu.",
       "filesAffected": "Faili zilizoathiriwa ({count})",
       "howToFixHeading": "Kama nini kujaribu",
-      "owaspMobileLabel": "Mobilie",
-      "owaspWebLabel": "Mtandao",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "Rulizi ya kati",
       "sameTagHeading": "Unganisho wa tagi ya same",
-      "migrationHeading": "Mipangilio",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Unganisha:"
     },
     "findings": {
@@ -2534,7 +2534,7 @@
   },
   "sidebar": {
     "status": {
-      "hotspotsLabel": "Hotspots · {percent}% reviewed",
+      "hotspotsLabel": "Hotspots · {percent}% zimepitiwa",
       "hotspotsDescription": "{open} kifungu",
       "lastRunLabel": "Jina la kwanza · {ago}"
     },
@@ -2544,7 +2544,7 @@
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Lango limeshindwa",
       "codeHealthNeverScanned": "Endesha Kanuni ya Afya ili kuona alama zako",
-      "projectMapDescription": "Scanned {ago}",
+      "projectMapDescription": "Imechanganuliwa {ago}",
       "projectMapNeverScanned": "Endesha Ramani ya Mradi ili kuona ukubwa na maeneo maarufu"
     }
   }

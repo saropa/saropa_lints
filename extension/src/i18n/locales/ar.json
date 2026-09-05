@@ -924,11 +924,11 @@
       "colActionsAria": "إجراءات الصف صف.",
       "filesAffected": "الملفات المتأثرة ({count})",
       "howToFixHeading": "كيفية إصلاح",
-      "owaspMobileLabel": "الهواتف المحمولة",
-      "owaspWebLabel": "ويب",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "القواعد المرتبطة",
       "sameTagHeading": "اكتشاف نفس التaggable",
-      "migrationHeading": "الانتقال",
+      "migrationHeading": "Migration",
       "supersedesLabel": "يُلغي:"
     },
     "findings": {

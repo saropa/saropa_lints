@@ -924,11 +924,11 @@
       "colActionsAria": "Acciones de fila Las acciones en fila.",
       "filesAffected": "Los archivos afectados ({count})",
       "howToFixHeading": "Cómo corregir",
-      "owaspMobileLabel": "Móvil",
+      "owaspMobileLabel": "Mobile",
       "owaspWebLabel": "Web",
       "relatedRulesHeading": "Reglas relacionadas",
       "sameTagHeading": "Descubrimiento de etiquetas iguales",
-      "migrationHeading": "Migración",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Reemplaza:"
     },
     "findings": {

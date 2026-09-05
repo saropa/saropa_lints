@@ -924,11 +924,11 @@
       "colActionsAria": "اقدامات صف (Row actions) اعمال ردیف",
       "filesAffected": "فایل های تحت تاثیر ({count})",
       "howToFixHeading": "چگونه باید رفع کنیم",
-      "owaspMobileLabel": "موبایل",
-      "owaspWebLabel": "وب",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "قواعد مرتبط",
       "sameTagHeading": "یافتن همچین جستجو",
-      "migrationHeading": "میگریشن",
+      "migrationHeading": "Migration",
       "supersedesLabel": "جایگزین می‌شود:"
     },
     "findings": {

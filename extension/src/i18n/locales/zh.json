@@ -924,11 +924,11 @@
       "colActionsAria": "排行行动 行列动作",
       "filesAffected": "受影响的文件 ({count})",
       "howToFixHeading": "如何修复",
-      "owaspMobileLabel": "移动",
-      "owaspWebLabel": "网络",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "相关规则",
       "sameTagHeading": "同标签发现",
-      "migrationHeading": "迁移",
+      "migrationHeading": "Migration",
       "supersedesLabel": "取代:"
     },
     "findings": {
@@ -2541,7 +2541,7 @@
     "dashboards": {
       "commandCatalogLabel": "所有命令…",
       "commandCatalogDescription": "搜索所有命令",
-      "codeHealthDescription": "{grade}·{score}/100",
+      "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · 门故障",
       "codeHealthNeverScanned": "运行 Code Health 查看您的分数",
       "projectMapDescription": "已扫描 {ago}",

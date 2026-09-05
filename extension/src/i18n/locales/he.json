@@ -924,11 +924,11 @@
       "colActionsAria": "פעולות שורה (Row actions)",
       "filesAffected": "קבצים מושפעים ({count})",
       "howToFixHeading": "איך לתקן",
-      "owaspMobileLabel": "מוביל",
-      "owaspWebLabel": "ווב",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "חוקי קשורים",
       "sameTagHeading": "اكتشاف תגיות זהות",
-      "migrationHeading": "העתקה",
+      "migrationHeading": "Migration",
       "supersedesLabel": "החלפת:"
     },
     "findings": {

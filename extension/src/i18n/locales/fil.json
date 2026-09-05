@@ -928,7 +928,7 @@
       "owaspWebLabel": "Web",
       "relatedRulesHeading": "Mga nauugnay na pautang",
       "sameTagHeading": "Pangangalap ng parehong tag",
-      "migrationHeading": "Migrasyon",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Nagmula:"
     },
     "findings": {
@@ -2542,7 +2542,7 @@
       "commandCatalogLabel": "Lahat ng mga command…",
       "commandCatalogDescription": "Suriin lahat ng mga command",
       "codeHealthDescription": "{grade} · {score}/100",
-      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Hindi pumasa ang gate",
       "codeHealthNeverScanned": "Punan ang Code Health upang makita ang iyong score",
       "projectMapDescription": "Nascan {ago}",
       "projectMapNeverScanned": "Pangalawang Mapa ng Proyekto upang makita ang laki at mga hot spot"

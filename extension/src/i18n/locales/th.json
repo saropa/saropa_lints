@@ -924,11 +924,11 @@
       "colActionsAria": "การกระทํา Row actions กิจกรรมแถว",
       "filesAffected": "ไฟล์ที่ได้รับผลกระทบ ({count})",
       "howToFixHeading": "วิธีแก้ไข",
-      "owaspMobileLabel": "มือถือ",
-      "owaspWebLabel": "เว็บ",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "กฎที่เกี่ยวข้อง",
       "sameTagHeading": "การค้นหาที่มีแท็กเดียวกัน",
-      "migrationHeading": "การย้ายข้อมูล",
+      "migrationHeading": "Migration",
       "supersedesLabel": "แทนที่:"
     },
     "findings": {

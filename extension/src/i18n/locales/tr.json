@@ -924,11 +924,11 @@
       "colActionsAria": "Sıra eylemleri Sıralı eylemler",
       "filesAffected": "Etkilenen dosyalar ({count})",
       "howToFixHeading": "Nasıl düzeltilir",
-      "owaspMobileLabel": "Mobil",
-      "owaspWebLabel": "ağ",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "İlgili kurallar",
       "sameTagHeading": "Aynı etiketle keşif",
-      "migrationHeading": "Geçiş",
+      "migrationHeading": "Migration",
       "supersedesLabel": "İkame eder:"
     },
     "findings": {
@@ -2544,7 +2544,7 @@
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Geçit arızalı",
       "codeHealthNeverScanned": "Puanınızı görmek için Code Health'i çalıştırın",
-      "projectMapDescription": "Scanned {ago}",
+      "projectMapDescription": "{ago} önce tarandı",
       "projectMapNeverScanned": "Boyutu ve sıcak noktaları görmek için Proje Haritasını çalıştırın"
     }
   }

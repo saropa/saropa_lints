@@ -925,10 +925,10 @@
       "filesAffected": "File interessati ({count})",
       "howToFixHeading": "Come risolvere",
       "owaspMobileLabel": "Mobile",
-      "owaspWebLabel": "Rete",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "Regole correlate",
       "sameTagHeading": "Scoperta stesso tag",
-      "migrationHeading": "Migrazione",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Rimpiazza:"
     },
     "findings": {
@@ -2542,7 +2542,7 @@
       "commandCatalogLabel": "Tutti i comandi…",
       "commandCatalogDescription": "Cerca tutti i comandi",
       "codeHealthDescription": "{grade} · {score}/100",
-      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate non superato",
       "codeHealthNeverScanned": "Esegui Code Health per vedere il tuo punteggio",
       "projectMapDescription": "{ago} scansionato",
       "projectMapNeverScanned": "Esegui Project Map per visualizzare le dimensioni e i punti caldi"

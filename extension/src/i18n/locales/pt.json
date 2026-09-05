@@ -799,7 +799,7 @@
       "trendTitle": "Score de saúde / tendência de violações desde as execuções anteriores",
       "hotspotsTitle": "{open} aberto, {safe} marcado como seguro, {fixed} corrigido — clique para revisar",
       "hotspotsPill": "{open} aberto · {percent}% revisado",
-      "qualityGatePassingTitle": "Code Health quality gate passing — click to open Code Health",
+      "qualityGatePassingTitle": "Gate de qualidade do Code Health aprovado — clique para abrir o Code Health",
       "qualityGatePassingPill": "Passagem do portão",
       "qualityGateFailingTitle": "Falha no portão de qualidade do Code Health ({count} violação(ões)) — clique para abrir o Code Health",
       "qualityGateFailingPill": "Falha no portão"
@@ -924,11 +924,11 @@
       "colActionsAria": "Ações de linha Ações em fila.",
       "filesAffected": "Arquivos afetados ({count})",
       "howToFixHeading": "Como corrigir",
-      "owaspMobileLabel": "Móvel",
-      "owaspWebLabel": "Rede",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "Regras relacionadas",
       "sameTagHeading": "Descoberta de tags iguais",
-      "migrationHeading": "Migração",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Substitui:"
     },
     "findings": {
@@ -2542,9 +2542,9 @@
       "commandCatalogLabel": "Todos os comandos…",
       "commandCatalogDescription": "Procurar todas as comandos",
       "codeHealthDescription": "{grade} · {score}/100",
-      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate reprovado",
       "codeHealthNeverScanned": "Execute Code Health para ver sua pontuação",
-      "projectMapDescription": "Scanned {ago}",
+      "projectMapDescription": "Escaneado {ago}",
       "projectMapNeverScanned": "Execute o Mapa do Projeto para ver o tamanho e os pontos críticos"
     }
   }

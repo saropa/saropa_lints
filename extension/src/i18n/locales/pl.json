@@ -924,11 +924,11 @@
       "colActionsAria": "Akcje rzędowe akcje rządów",
       "filesAffected": "Uszkodzone pliki ({count})",
       "howToFixHeading": "Jak naprawić",
-      "owaspMobileLabel": "Przenośny",
-      "owaspWebLabel": "Sieć",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "Związane reguły",
       "sameTagHeading": "Odkrywanie tagów identycznych",
-      "migrationHeading": "Migracja",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Zastępuje:"
     },
     "findings": {
@@ -2542,7 +2542,7 @@
       "commandCatalogLabel": "Wszystkie polecenia…",
       "commandCatalogDescription": "Wyszukaj wszystkie polecenia",
       "codeHealthDescription": "{grade} · {score}/100",
-      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
+      "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Brama nie działa",
       "codeHealthNeverScanned": "Uruchom Code Health, aby zobaczyć swój wynik",
       "projectMapDescription": "Zeskanowano {ago}",
       "projectMapNeverScanned": "Uruchom Mapę projektu, aby zobaczyć rozmiar i gorące punkty"

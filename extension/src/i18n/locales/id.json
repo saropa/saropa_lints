@@ -924,11 +924,11 @@
       "colActionsAria": "Tindakan baris Row actions.",
       "filesAffected": "File yang terkena dampak ({count})",
       "howToFixHeading": "Bagaimana cara memperbaiki",
-      "owaspMobileLabel": "Seluler",
-      "owaspWebLabel": "jaring",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "Aturan terkait",
       "sameTagHeading": "Pemetaan penemuan tag yang sama",
-      "migrationHeading": "Pemindahan",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Menggantikan:"
     },
     "findings": {

@@ -801,7 +801,7 @@
       "hotspotsPill": "{open} открыт · {percent}% просмотрено",
       "qualityGatePassingTitle": "Прохождение ворот качества Code Health — нажмите, чтобы открыть Code Health",
       "qualityGatePassingPill": "Прохождение ворот",
-      "qualityGateFailingTitle": "Code Health quality gate failing ({count} violation(s)) — click to open Code Health",
+      "qualityGateFailingTitle": "Контроль качества Code Health не пройден ({count} нарушений) — нажмите, чтобы открыть Code Health",
       "qualityGateFailingPill": "Ворота не работают"
     },
     "groupBy": {
@@ -924,11 +924,11 @@
       "colActionsAria": "Действия в рядах Row actions",
       "filesAffected": "Затронутые файлы ({count})",
       "howToFixHeading": "Как исправить",
-      "owaspMobileLabel": "Мобильный",
-      "owaspWebLabel": "Веб",
+      "owaspMobileLabel": "Mobile",
+      "owaspWebLabel": "Web",
       "relatedRulesHeading": "Связанные правила",
       "sameTagHeading": "Обнаружение с одинаковыми тегами",
-      "migrationHeading": "Миграция",
+      "migrationHeading": "Migration",
       "supersedesLabel": "Поверхностно:"
     },
     "findings": {
