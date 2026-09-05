@@ -68,6 +68,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0-beta.3] — Unreleased
 
+Streamlines the extension sidebar, cutting it roughly in half by removing rows that duplicated richer controls already available on the dashboards. The Findings dashboard status line now surfaces trend, regression, and security-hotspot information directly instead of hiding it in a collapsible panel, and the Rules & Tiers config tab adds a Lane switch and a live baseline diff. Also fixes a false positive in the case-sensitive path comparison rule. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.3/CHANGELOG.md)
+
 ### Changed
 
 - Sidebar collapsed from 25–39 rows to 13 steady-state (15 worst case). Severity toggles, setting-value rows (run-after-config/dependency, UI language, detected packages), and triage rows removed from the Settings panel — each was a duplicate of a richer control on the Rules & Tiers Automation/Extension tabs, Package Dashboard, or Findings Dashboard's top-rules table. No action required.
@@ -80,6 +82,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Added
 
 - Rules & Tiers Config file tab: Lane card. Switch between Light (~200 rules in-editor) and Full (all enabled rules) from the same dashboard that already shows every other `analysis_options_custom.yaml` key. No action required.
+- Config file tab: the Baseline card now shows a "Diff vs current" subsection listing violations resolved since the baseline and new since the baseline, each with a file/line/rule table. Reads live diagnostics — never triggers a scan and stays current as you edit. No action required.
 
 ### Fixed
 
@@ -94,6 +97,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 </details>
 
 ---
+
 ## [16.0.0-beta.2]
 
 Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)

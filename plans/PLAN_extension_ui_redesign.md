@@ -330,7 +330,8 @@ not edited.
 - [x] Baseline: create/refresh (delegates to the existing `saropaLints.createBaseline` command,
       which already writes `saropa_baseline.json` AND activates it via `analysis_options.yaml` in
       one run) plus a summary table (file count, violation count, top rules by count, generated
-      timestamp) read from the JSON file. See "Deferred" below — this is create+view, not a diff.
+      timestamp) read from the JSON file. A diff-vs-current subsection was added later — see
+      "Landed since" below.
 - [x] Analysis Optimizer moves in as a tab (embedded inside Config file): `getEmbeddedBodyHtml()` /
       `handleEmbeddedMessage()` added to `AnalysisOptimizerWebviewProvider` so the SAME render/message
       logic serves both surfaces (no duplication). Its standalone panel command still opens it directly
@@ -348,12 +349,17 @@ not edited.
       a pre-existing test-isolation issue, not a Phase 4 regression, and left for whoever owns that
       area next.
 
+**Landed since (2026-09-05):**
+- [x] Baseline diff view. `computeBaselineDiff()` (`extension/src/rulePacks/baselineReader.ts`)
+      diffs the baseline file's (file, rule, line) entries against the CURRENT live violation set
+      (`buildViolationsDataFromDiagnostics` — same in-memory source the Findings dashboard reads,
+      so the diff never triggers a scan) and reports two buckets: resolved (baselined, no longer
+      present) and new-since (present, never baselined). Rendered as a "Diff vs current" subsection
+      under the Baseline card's existing summary table, each bucket capped at 50 rows
+      (`MAX_DIFF_ROWS`) with a "+N more" note when truncated. Refreshes on the same debounced
+      `onDidChangeDiagnostics` tick the status bar and Issues tree already use (`extension.ts`).
+
 **Deferred — not done, do NOT treat as complete:**
-- [ ] Baseline is create + view (a summary table), not a DIFF view. The original checklist wording
-      was "create / view diff / apply" — there is no UI that diffs the baseline file against the
-      CURRENT violations set (e.g. "3 violations no longer match the baseline"). "Apply" needed no
-      separate step: the `saropaLints.createBaseline` command already writes the config block that
-      activates the baseline file in the same run.
 - [ ] `runtime_tier:` written by the Config file tab's Tier cap card goes to the TOP LEVEL of
       `analysis_options_custom.yaml`, matching where the other 7 keys live and where this phase's
       task brief said all 8 keys live. Per `saropa-lints-config-and-tiers`'s provenance notes,

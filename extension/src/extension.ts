@@ -1576,6 +1576,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           getConfig().get<boolean>('enabled', true) ?? true,
           issuesProvider.hasViolations(),
         );
+        // Config Dashboard's Baseline card diffs the baseline file against this SAME live
+        // diagnostics source (see baselineReader.ts's computeBaselineDiff) — without this
+        // refresh the diff table would only update when the user manually re-opens the
+        // panel, reintroducing the staleness this migration removes elsewhere. `refresh()`
+        // is a no-op cost when the panel isn't open (it checks `this._panel` first).
+        rulePacksWebviewProvider.refresh();
         // R1: refresh the offline envelope mirror the sibling suite tools read
         // (.saropa/diagnostics/lints.json). Same settled live-diagnostics source
         // the surfaces above use, so the mirror never disagrees with the UI. A
