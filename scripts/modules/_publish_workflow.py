@@ -300,7 +300,13 @@ def validate_pubspec_changelog(
 
 
 def _get_last_published_tag_version(project_dir: Path) -> str | None:
-    """Return the version from the latest vX.Y.Z tag, or None."""
+    """Return the version from the latest vX.Y.Z(-prerelease) tag, or None.
+
+    Must accept prerelease tags (v16.0.0-beta.1) as well as stable ones —
+    a stable-only regex misses the true last-published version during a
+    beta cycle and falls back to the last stable tag instead, which makes
+    every mid-cycle beta bump look like it has "no prior tag" at all.
+    """
     import subprocess
     result = subprocess.run(
         ["git", "tag", "--sort=-v:refname"],
@@ -308,10 +314,34 @@ def _get_last_published_tag_version(project_dir: Path) -> str | None:
     )
     if result.returncode != 0:
         return None
-    for line in result.stdout.strip().splitlines():
-        if re.match(r"^v\d+\.\d+\.\d+$", line.strip()):
-            return line.strip().lstrip("v")
-    return None
+    candidates = [
+        line.strip().lstrip("v")
+        for line in result.stdout.strip().splitlines()
+        if re.match(r"^v\d+\.\d+\.\d+(-[\w.]+)?$", line.strip())
+    ]
+    if not candidates:
+        return None
+    return max(candidates, key=parse_version)
+
+
+def _release_commit_exists_without_tag(
+    project_dir: Path, pubspec_version: str, tag_name: str,
+) -> bool:
+    """True only if a "Release v{pubspec_version}" commit exists with no
+    matching tag — the actual signature of an aborted publish (per this
+    module's docstring: version-bump commit pushed, tag never created).
+    A pubspec version bumped ahead of the last tag with no such commit is
+    just normal pre-publish development, not an orphan.
+    """
+    import subprocess
+    if tag_exists_on_remote(project_dir, tag_name):
+        return False
+    result = subprocess.run(
+        ["git", "log", "--oneline", "--all",
+         f"--grep=Release v{pubspec_version}$"],
+        capture_output=True, text=True, cwd=project_dir,
+    )
+    return result.returncode == 0 and bool(result.stdout.strip())
 
 
 def check_orphaned_version_bump(
@@ -339,12 +369,17 @@ def check_orphaned_version_bump(
         # No tags at all — nothing to compare against.
         return
 
-    # Only flag when pubspec is strictly ahead of the last tag AND no
-    # tag exists for the pubspec version (local or remote).
+    # Being ahead of the last tag is the NORMAL pre-publish state (every
+    # version bump precedes its own tag) — it is not itself evidence of
+    # an aborted publish. Only a "Release v{pubspec_version}" commit with
+    # no matching tag proves a publish was actually attempted and left
+    # orphaned; require that before ever prompting.
     if parse_version(pubspec_version) <= parse_version(last_tag_version):
         return
     tag_name = f"v{pubspec_version}"
-    if tag_exists_on_remote(project_dir, tag_name):
+    if not _release_commit_exists_without_tag(
+        project_dir, pubspec_version, tag_name,
+    ):
         return
 
     print_warning(

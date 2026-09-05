@@ -19,14 +19,14 @@ This file states what IS. It contains no recommendation. Direction is the owner'
 | **Computed, but the row lives in the Status view, which is hidden when `hasViolations` is false** (`package.json:69`; Disable forces it false, `extension.ts:1476,1634`) | 5 | Lint integration: Off (the fix row disappears exactly when integration is off and diagnostics stop) · Engines: 0 running (hidden precisely when no engine produces diagnostics) · Hotspots to review · Score regression · Analyzer plugin state via Engines row |
 | **Toast only** — auto-dismisses, no persistent surface anywhere after it closes | 9 | Setup prompt (dep missing; fires on every activation, no memento) · Plugin divergence Restore/Keep · Rule packs available · New saropa_lints on pub.dev · Install Drift Advisor · Install Log Capture · Crash-covered rule · Score crossed a band · Memory shed disabled |
 | **Visible only inside a dashboard the user must already have open** | 3 | Drift Advisor offline (Findings pill) · TODO/HACK scanner off (Findings promo pill) · Package needles (Package Dashboard row description — only after a scan) |
-| **Status-bar tooltip only** (no click target for the fact) | 2 | N package updates available (main item tooltip; click opens Findings, not Packages) · Score is partial |
-| Persistent, actionable, always visible | 4 | Set Up Project (banner row) · Scan-on-save state (own status-bar item — **no click command**) · Violation CodeLens · Memory/system-health status-bar item |
+| **Status-bar tooltip only** (no click target for the fact itself) | 2 | N package updates available (main item tooltip; item click opens Findings — since `2dcc7ffa` the hover tooltip is a menu whose "Open Package Dashboard" link is the only path from this fact to Packages) · Score is partial |
+| Persistent, actionable, always visible | 4 | Set Up Project (banner row) · Scan-on-save state (own status-bar item — **no click command**) · Violation CodeLens · Memory/system-health status-bar item (own item since `2dcc7ffa`, `extension.ts:1098`; shown only when there is something to report; click → Process Health) |
 | Informational / celebration | 6 | You fixed N · No errors · Tier changed · First run · Analysis finished · Vibrancy cached cue (10 s) |
 
 ### 1.2 Structural facts
 
 - **318** `show*Message` call sites; **42** carry action buttons; **17** modal. Hardcoded non-`l10n` English at `config/migrateConfig.ts:177-207`, all of `pluginLiveness.ts`, `extension.ts:2676-2753` (tier change, first run), `extension.ts:349-352,406-409`.
-- **5** status-bar items. Main item click → Findings in every state, including "Saropa Lints: Off" (`extension.ts:1241`) — it does not lead to Enable.
+- **5** `createStatusBarItem` sites (main `extension.ts:1089`, memory `:1098`, scan-on-save, vibrancy, save-task runner). Main item click → Findings in every state, including "Saropa Lints: Off" (`extension.ts:1302,1310`) — the click does not lead to Enable. Since `2dcc7ffa` the main item's hover tooltip is a Markdown menu (`statusBar.menu.*` in `en.json:635-645`: enable/disable toggle, Findings, Package Dashboard, Process Health, Command Catalog, About) — Enable is reachable from the hover, not the click.
 - `needsBanner` is set true for "dep present, integration off" (`sectionedSidebar.ts:793`) but `buildBannerItems` returns `[]` for that case (`:212-225`) → Banner view shows, empty.
 - Activation with `lspServer.enabled=true` (default) calls `disablePluginsIntegration` every start (`extension.ts:1315-1319`); the divergence prompt classifies that as legitimate and stays silent (`pluginDivergencePrompt.ts:55-58`).
 - **7** tree providers are constructed and never registered as views (`extension.ts:577-589`; `package.json` contributes 4). Their guidance nodes (hotspot review, "Enable workspace scan…", drift placeholder, dashboard shortcuts) render nowhere.
@@ -118,6 +118,31 @@ Every phase's finish report (0–7) records "no Extension Development Host verif
 
 ---
 
-## 4. Not in this file
+## 4. CHANGELOG claims for 16.0.0-beta.1 (published, tag `v16.0.0-beta.1`) and beta.2 (unreleased, no tag) — checked against code 2026-09-04
+
+Only the claims that touch the surfaces in §1–§3. "Holds" = code matches the bullet today.
+
+| Version | Changelog claim | Status | Evidence |
+|---|---|---|---|
+| beta.1 | Diagnostics panel merged into Settings; Help panel moved into the Dashboards "…" menu; Debug Panel merged into the Health Panel; sidebar down to 4 panels | **Holds** | `package.json:55-75` contributes exactly banner / editorDashboards / status / settings; Help items are `view/title` menu entries on `saropaLints.editorDashboards` (`package.json:982-999`). These are the three panel ids the owner's installed build still renders as "There is no data provider registered" — the descriptors are cached from the pre-beta install, matching the label "Help (V15.2.12)". |
+| beta.1 | "Clicking the status bar while lint integration is off now opens the Dashboards view instead of doing nothing" | **Does not hold** | Off branch sets `statusBarItem.command = 'saropaLints.openViolationsWideReport'` (`extension.ts:1310`) — same target as the On branch (`:1302`). Published text describes behavior that is not in the code. |
+| beta.1 | Adds an "Engines (LSP / Analyzer)" row to the Settings panel so engine toggles are reachable from the sidebar | **Superseded, unrecorded** | The row (and "Process health") was cut by the beta.2 sidebar slice (`configTree.ts:114-126` doc comment). Engine toggles are now reachable from the sidebar only through the Status section's Engines row, which renders only when `saropaLints.debug.enabled` is on (`sectionedSidebar.ts:429-435`) and only when the Status view itself is visible (`hasViolations` gate, §1.1). The beta.2 section does not mention the cut. |
+| beta.1 | Status "Engines: N running" row, amber at zero, click → Health Panel | **Holds, with the two gates above** | `appendEnginesRow` (`sectionedSidebar.ts:435`). |
+| beta.1 | Sidebar Status / hub KPIs read live diagnostics, cannot disagree with the Problems panel | **Holds for counts; the panel can still be absent** | Health row omitted when no `violations.json` was ever written (`liveViolationsData.ts:125`); whole Status view hidden until `hasViolations` (`package.json:69`). |
+| beta.1 | Home hub removed; status bar and every former hub link open Findings | **Holds** | §3; `extension.ts:1302`. |
+| beta.1 | Severity toggles single-click | **Holds** | `registerSeverityToggle` (`extension.ts:2738`). The same four keys also render on the Rules & Tiers Automation tab (§2.4) — two write paths, same behavior. |
+| beta.1 | Health Panel: engine toggles work; LSP toggle persists `lspServer.enabled` | **Holds for the toggle only** | `healthPanel.ts:19,37` handles `toggle` for analyzer / scanDaemon / lspServer. The panel exposes no other `lspServer.*` / `systemHealth.*` setting (§2.4 stands). |
+| beta.1 | Package palette: 25 general-purpose commands shown instead of 56 | Not re-counted | Outside §1–§3 scope. |
+| beta.2 | "Lint integration" is one row in Status, single click | **Holds** | `appendLintIntegrationRow` (`sectionedSidebar.ts`); the Settings duplicate is gone (`configTree.ts:114-126`). Row is still hidden with the Status view when `hasViolations` is false (§1.1) — so the Off-state fix row disappears exactly when integration is off. |
+| beta.2 | "Find stale ignores" and "Fix stale ignores" merged into one confirm-first row | **Holds** | `stale-ignore-commands.ts`, committed `056648a4`. |
+| beta.2 | Analysis Optimizer, Upgrade Opportunities, Feature Inventory no longer Dashboards rows; each is a tab elsewhere | **Holds** | Dashboards = 6 rows (`buildEditorDashboardItems`). Consequence recorded in §2.5: Upgrade Opportunities and the standalone Optimizer are now reachable from the sidebar only via a dashboard tab. |
+| beta.2 | Memory/system-health split into its own status-bar item, shown only when there is something to report, click → Process Health | **Holds** | `extension.ts:1098,1232,1260,1311`; `en.json:647-651`. |
+| beta.2 | Status-bar hover tooltip is a clickable menu (toggle analysis, Findings, Package Dashboard, Process Health, Command Catalog, About) | **Holds** | `buildStatusBarTooltipMarkdown` (`extension.ts:1301,1305`); `en.json:635-645`. Item click target unchanged (§1.2). |
+
+Recorded, not proposed: the beta.2 section is not headed `— Unreleased` although no `v16.0.0-beta.2` tag exists; `pubspec.yaml` is at beta.2, `extension/package.json` at beta.1.
+
+---
+
+## 5. Not in this file
 
 No design, no priorities, no recommendation. The row-collapse plan (`PLAN_sidebar_row_collapse.md`) is on hold pending the owner's direction from these facts.

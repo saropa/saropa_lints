@@ -328,6 +328,14 @@ clean project; tests green.
    line gains trend/regression/hotspot pills; Rules & Tiers Config file tab gains a Lane card.
    The changelog guard hook will warn about a pre-existing version mismatch — ignore, do not
    touch versions.
+   Two gaps between the shipped changelog and the code must be closed in the same edit
+   (see `AUDIT_extension_ux_facts.md` §4): (a) beta.2 never records that the Settings panel's
+   "Engines (LSP / Analyzer)" and "Process health" rows — announced in beta.1 — were cut by the
+   2026-09-04 slice (`configTree.ts:114-126`); add a bullet saying where engine toggles live now
+   (Status Engines row when debug is on, otherwise Health Panel / Command Catalog). (b) beta.1
+   claims the status bar click opens the Dashboards view while integration is off; code opens
+   Findings in every state (`extension.ts:1310`). Beta.1 is published and its text stays; beta.2
+   must state the actual behavior rather than inherit the claim.
 4. `plans/PLAN_extension_ui_redesign.md`: replace §2.1's "NOT cut" table and the "Row count
    after 2026-09-04's cuts" paragraph with one line pointing here; tick the Phase 1 checklist's
    "Row-count target (≤14)" item; §4 acceptance table "Sidebar rows" → 13. Nothing else.
@@ -391,7 +399,10 @@ issue documented in the parent plan's Phase 4). Same count before and after = no
   21:15 shows three empty panels — "Diagnostics", "Help (V15.2.12)", "Debug" — rendering "There is
   no data provider registered". The installed `16.0.913` manifest (`git show a451467b:extension/package.json`)
   contributes only banner/editorDashboards/settings/status, so those are cached view descriptors
-  from the previous stable install. User-side check: Command Palette → "View: Reset View
+  from the previous stable install. The 16.0.0-beta.1 changelog names exactly those three panels
+  as folded away (Diagnostics → Settings, Help → Dashboards "…" menu, Debug → Health Panel), and
+  the "Help (V15.2.12)" label is the last stable version's own view name — both consistent with
+  stale descriptors rather than a packaging fault. User-side check: Command Palette → "View: Reset View
   Locations" → "Developer: Reload Window". If they persist, inspect
   `%USERPROFILE%\.vscode\extensions\saropa.saropa-lints-16.0.913\package.json`; if it contributes
   those ids the publish pipeline packaged a stale manifest (`scripts/modules/_extension_publish.py`
