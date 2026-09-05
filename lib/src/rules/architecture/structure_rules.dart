@@ -498,8 +498,6 @@ class AvoidGlobalStateRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit node) {
-      final String fileSource = context.fileContent;
-
       for (final CompilationUnitMember declaration in node.declarations) {
         if (declaration is! TopLevelVariableDeclaration) continue;
         final VariableDeclarationList variables = declaration.variables;
@@ -517,14 +515,11 @@ class AvoidGlobalStateRule extends SaropaLintRule {
           // Lazy-init-once pattern: private variable assigned only via
           // `??=` is effectively final after first access. This is the
           // standard Dart lazy cache idiom for single-threaded plugins.
-          // Uses a word-boundary regex (not a plain substring `contains`)
-          // so e.g. `_x ??=` cannot be falsely matched by an unrelated
-          // `_xFoo ??=` assignment elsewhere in the file — a substring hit
-          // would silently suppress a real global-state finding.
+          // Scoped to top-level function bodies only — a class instance
+          // field with the same private name and a `??=` in a method body
+          // must NOT suppress the top-level global finding.
           if (name.startsWith('_') &&
-              RegExp(
-                r'\b' + RegExp.escape(name) + r'\s*\?\?=',
-              ).hasMatch(fileSource)) {
+              _hasTopLevelLazyInit(node, name)) {
             continue;
           }
 
@@ -571,6 +566,21 @@ class AvoidGlobalStateRule extends SaropaLintRule {
       if (RegExp(r'\b' + RegExp.escape(varName) + r'\b').hasMatch(bodySource)) {
         return true;
       }
+    }
+    return false;
+  }
+
+  /// Returns true when a top-level function body contains a `??=` assignment
+  /// to [varName]. Scoped to top-level functions only — class methods and
+  /// constructors are excluded so that a same-named instance field's lazy
+  /// init cannot falsely suppress a top-level global finding.
+  bool _hasTopLevelLazyInit(CompilationUnit unit, String varName) {
+    final pattern = RegExp(r'\b' + RegExp.escape(varName) + r'\s*\?\?=');
+    for (final CompilationUnitMember decl in unit.declarations) {
+      if (decl is! FunctionDeclaration) continue;
+      // Only search the function body source — top-level functions only.
+      final String bodySource = decl.functionExpression.body.toSource();
+      if (pattern.hasMatch(bodySource)) return true;
     }
     return false;
   }

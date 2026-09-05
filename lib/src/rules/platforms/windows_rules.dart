@@ -511,7 +511,13 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
   bool _isDartImportUri(Expression expr) {
     if (expr is! SimpleIdentifier) return false;
     final String name = expr.name.toLowerCase();
-    if (name.contains('import') || name.contains('uri')) return true;
+    // Match 'import' anywhere, but 'uri' only as a camelCase segment —
+    // plain `contains('uri')` would match e.g. `fileUri` (a real path
+    // variable) and suppress a genuine case-sensitive comparison finding.
+    if (name.contains('import') ||
+        RegExp(r'(?:^|[^a-z])uri(?:$|[^a-z])').hasMatch(name)) {
+      return true;
+    }
     return _isLoopVariableOverImportsCollection(expr);
   }
 

@@ -665,6 +665,10 @@ class ViolationExporter {
     _RuleMetadataSnapshot? metadata,
   ) {
     if (metadata == null) {
+      // Mirrors `_RuleMetadataSnapshot.toJson()`'s shape (including the new
+      // correction/owasp keys) so a violation with no metadata snapshot
+      // still serializes the same key set — callers can rely on the keys
+      // always being present rather than conditionally absent.
       return const <String, Object?>{
         'ruleType': null,
         'ruleStatus': 'ready',
@@ -672,6 +676,11 @@ class ViolationExporter {
         'certIds': <String>[],
         'tags': <String>[],
         'accuracyTarget': null,
+        'requiresReview': false,
+        'defaultReviewState': null,
+        'owasp': <String, List<String>>{'mobile': <String>[], 'web': <String>[]},
+        // correction intentionally omitted — mirrors toJson()'s conditional
+        // emit: absent when no correction message exists for the rule.
       };
     }
     return metadata.toJson();
@@ -756,6 +765,8 @@ class _RuleMetadataSnapshot {
     required this.certIds,
     required this.tags,
     required this.accuracyTarget,
+    required this.correction,
+    required this.owasp,
   });
 
   factory _RuleMetadataSnapshot.fromRule(SaropaLintRule rule) {
@@ -776,6 +787,20 @@ class _RuleMetadataSnapshot {
       accuracyTarget: ViolationExporter._accuracyTargetToJson(
         rule.accuracyTarget,
       ),
+      // Single source of truth: `rule.code.correctionMessage` is the SAME
+      // LintCode field `_trackViolation` reads to stamp `ViolationRecord
+      // .correction` for a live violation (see line ~3515 above). Reading
+      // it here — independent of any actual violation having occurred —
+      // lets the static, pre-analysis catalog carry the identical text a
+      // batch export would have shown, so live diagnostics (which have no
+      // ViolationRecord at all) can be backfilled from the catalog instead
+      // of going without a "How to fix" section.
+      correction: rule.code.correctionMessage,
+      // Same reasoning for OWASP: `rule.owasp` is the rule-level mapping
+      // getter the batch export's `owaspLookup` is meant to be built from
+      // (see `AnalysisReporter.setOwaspLookup`); reading it directly here
+      // is the same source, not a second copy.
+      owasp: rule.owasp,
     );
   }
 
@@ -788,6 +813,13 @@ class _RuleMetadataSnapshot {
   final List<String> tags;
   final Map<String, Object?>? accuracyTarget;
 
+  /// Rule-level correction/fix-it text. May be null for rules whose
+  /// [LintCode] carries no correction message.
+  final String? correction;
+
+  /// Rule-level OWASP mapping. Null for non-security rules.
+  final OwaspMapping? owasp;
+
   Map<String, Object?> toJson() {
     return <String, Object?>{
       'ruleType': ruleType,
@@ -798,6 +830,11 @@ class _RuleMetadataSnapshot {
       'certIds': certIds,
       'tags': tags,
       'accuracyTarget': accuracyTarget,
+      if (correction != null) 'correction': correction,
+      // Reuse the exact same conversion the per-violation export uses so
+      // the catalog's OWASP shape (mobile/web lowercase id arrays) is
+      // byte-identical to what a batch export would produce for this rule.
+      'owasp': ViolationExporter._owaspToJson(owasp),
     };
   }
 }
