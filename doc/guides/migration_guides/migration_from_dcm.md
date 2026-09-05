@@ -128,7 +128,7 @@ DCM has granular metric thresholds. saropa_lints uses progressive tiers:
 
 **Start with `recommended`** - it provides broad coverage without overwhelming noise.
 
-**Plus 114 optional stylistic rules** for team preferences (trailing commas, sorting, etc.) - see [stylistic rules](../../README_STYLISTIC.md).
+**Plus 114 optional stylistic rules** for team preferences (trailing commas, sorting, etc.) - see stylistic rules.
 
 ## Rule Mapping
 
@@ -362,7 +362,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `function-always-returns-null` | HAVE | `function_always_returns_null` |
 | `function-always-returns-same-value` | HAVE | `function_always_returns_same_value` |
 | `handle-throwing-invocations` | HAVE | `handle_throwing_invocations` |
-| `initializers-ordering` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_initializers_ordering.md) |
+| `initializers-ordering` | TODO | TODO — Planned |
 | `map-keys-ordering` | HAVE | `map_keys_ordering` |
 | `match-base-class-default-value` | HAVE | `match_base_class_default_value` |
 | `match-class-name-pattern` | HAVE | `match_class_name_pattern` |
@@ -505,7 +505,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `always-pass-global-key` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_require_global_key_for_widget.md) |
 | `always-remove-listener` | HAVE | `always_remove_listener` |
 | `avoid-border-all` | HAVE | `avoid_border_all` |
-| `avoid-disposing-late-fields` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_disposing_late_fields.md) |
+| `avoid-disposing-late-fields` | TODO | TODO — Planned |
 | `avoid-empty-setstate` | HAVE | `avoid_empty_setstate` |
 | `avoid-expanded-as-spacer` | HAVE | `avoid_expanded_as_spacer` |
 | `avoid-flexible-outside-flex` | HAVE | `avoid_flexible_outside_flex` |

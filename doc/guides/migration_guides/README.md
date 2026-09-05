@@ -2,6 +2,10 @@
 
 One guide per alternative lint package, each mapping that package's rules to a saropa_lints equivalent (HAVE / PARTIAL / TODO).
 
+**Aggregate coverage:** across the ~46 audited alternatives that ship custom rules (1,670 rules total,
+excluding preset-only packages that just bundle stock analyzer lints), saropa_lints has a HAVE or PARTIAL
+equivalent for **~75%** (1,258/1,670).
+
 | Package | Guide | Coverage |
 |---|---|---|
 | accessibility_lint | [migration_from_accessibility_lint.md](migration_from_accessibility_lint.md) | 5 rules — 4 HAVE (80%), 1 PARTIAL |
@@ -54,5 +58,3 @@ One guide per alternative lint package, each mapping that package's rules to a s
 ## One-click migration packs
 
 Packages with meaningful HAVE coverage now have a corresponding **migration pack** in the VS Code extension. When a project still depends on one of these packages, the extension surfaces a "Migrate from …" pack in the Rule Packs dashboard under the **Migrations** domain. Toggling it on enables all equivalent saropa rules in one click — no manual rule-by-rule configuration needed.
-
-See also [`plans/GAP_ANALYSIS.md`](../../../plans/GAP_ANALYSIS.md) for the full per-package research behind these guides, including methodology and confidence notes.

@@ -108,7 +108,7 @@ additional signal you want on top of VGA:
 VGA already checks.
 
 **Plus 114 optional stylistic rules** for team preferences (trailing commas, sorting, etc.) — see
-[stylistic rules](../../README_STYLISTIC.md).
+stylistic rules.
 
 ## Rule Mapping
 

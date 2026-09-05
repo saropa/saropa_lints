@@ -18,7 +18,7 @@ Dart/Flutter hygiene, and it goes further than saropa in three areas saropa does
 the `fpdart` functional-programming ecosystem (`Either`/`Option`/`Task`/`TaskEither`/`Do`
 notation, 23 rules), generic project-configurable ban/require engines (`avoid_banned_*`,
 `use_class_prefix`/`use_class_suffix`, `match_pattern`), and lightbulb-menu assists that aren't
-tied to a diagnostic at all. See [GAP_ANALYSIS.md](../../../plans/GAP_ANALYSIS.md) Gap Themes 1,
+tied to a diagnostic at all. See Gap Themes 1,
 2, 3, 9, 10, and 11 for the underlying research behind these gaps.
 
 ## Quick Migration
@@ -254,7 +254,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `max_statements` | PARTIAL | `avoid_long_functions` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_long_functions_dcm_parity.md) |
 | `member_ordering` | HAVE | `prefer_member_ordering` |
 | `missing_provider_scope` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_missing_provider_scope.md) |
-| `never_discard_build_context` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_never_discard_build_context.md) |
+| `never_discard_build_context` | TODO | TODO — Planned |
 | `no_equal_conditions` | HAVE | `no_equal_conditions` |
 | `no_equal_switch_case` | HAVE | `no_equal_switch_case` |
 | `no_equal_then_else` | HAVE | `no_equal_then_else` |
@@ -342,7 +342,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_theme_mode_getters` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_prefer_theme_mode_getters.md) |
 | `prefer_transform_over_container` | HAVE | `prefer_transform_over_container` |
 | `prefer_type_over_var` | HAVE | `prefer_type_over_var` |
-| `prefer_typed_exceptions` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_typed_exceptions.md) |
+| `prefer_typed_exceptions` | TODO | TODO — Planned |
 | `prefer_typedefs_for_callbacks` | HAVE | `prefer_typedefs_for_callbacks` |
 | `prefer_unit_over_void` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_prefer_unit_over_void.md) (fpdart family, see Gap Theme 1) |
 | `prefer_use_callback` | HAVE | `prefer_use_callback` |
