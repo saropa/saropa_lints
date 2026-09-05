@@ -5,7 +5,6 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
-import '../../analyzer_compat.dart';
 import '../../early_exit_guard_utils.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';

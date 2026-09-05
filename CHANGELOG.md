@@ -52,7 +52,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
    **Maintenance `<details>` bullets** — Same bans apply (no test counts, no file inventories). The what→why→must-do template is optional for infra-only entries.
 
-   **Maintenance section** — Changes with no end-user impact (publish/CI tooling, internal refactors, test harness, plan housekeeping, developer scripts) belong in a collapsed `### Internal...</details>` block at the bottom of the version section, never in `### Added` / `### Changed` / `### Fixed`. Test: if a pub.dev or Marketplace user would notice, it is top-level; otherwise Maintenance.
+   **Maintenance section** — Changes with no end-user impact (publish/CI tooling, internal refactors, test harness, plan housekeeping, developer scripts) belong in a `### Internal` block at the bottom of the version section, never in `### Added` / `### Changed` / `### Fixed`. Test: if a pub.dev or Marketplace user would notice, it is top-level; otherwise Maintenance.
 
    **Unreleased convention** — The top changelog section MUST use the heading `## [X.Y.Z] — Unreleased` (with ` — Unreleased` suffix) while work is in progress. All new entries go into this ONE section — never create a second unreleased section or bump the version number. The publish script strips ` — Unreleased` (and typo variants like ` - Unreleased`) at publish time via `_strip_unreleased_suffix()`. The version numbers in `pubspec.yaml` and `package.json` stay at the LAST PUBLISHED version until the publish script updates them. After publishing, manually add a new `## [X.Y.Z] — Unreleased` section for the next cycle.
 
@@ -108,6 +108,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Fixed the Health Panel reporting scan-on-save as "idle" while it was actually disabled — the status only tracked memory-pressure suspension and never read the master switch, so a disabled scanner looked healthy. No action required.
 - Fixed `--format` being swallowed as the target path by the severity report and doctor command-line tools, so the flag had no effect and the positional path was lost. No action required.
 - Fixed selecting a package from the embedded Upgrades tab opening the detail pane behind a hidden tab; the dashboard now switches back to Overview first. No action required.
+- Fixed Package Dashboard's Full report and Upgrades embedded tabs showing "Generating…" forever on first open, and rendering stale data from the previous scan on subsequent opens. The async builders now read the current scan results instead of the not-yet-assigned options object. No action required.
+- Fixed Full report tab's "Expand/Collapse all" button toggling every `<details>` element in the Package Dashboard (charts, package filters, grade breakdown in Overview), not just the Feature Inventory's own disclosures. The script is now IIFE-wrapped and scoped to its own tab container. No action required.
+- Fixed the Health Panel engine card showing "scanning N/M files" indefinitely after a canceled workspace scan. The LSP server's scan progress notification now carries an explicit `done` flag on terminal ticks (cancel or completion), so the client no longer relies solely on the filesScanned/totalFiles ratio. No action required.
+- Fixed severity report and doctor typed tables falling back to raw text on the first run after install or `pub get`, because Dart's "Building package executable…" stderr banner was mixed into the JSON parse buffer. Only stdout is now accumulated for JSON parsing. No action required.
+- Fixed Project Map progress bar never reaching 100% when the CLI's final progress event arrived without a trailing newline. The partial-line flush on process exit now routes through the progress parser instead of bypassing it. No action required.
+- Fixed `avoid_nullable_interpolation` false positive on `Match[n]` and `Match.group(n)` in string interpolations — the Dart type system returns `String?` but for required capture groups the value is always non-null. No action required.
 - Fixed `avoid_dynamic_calls_extended` over-suppression: dynamic calls inside catch clauses and finally blocks are no longer wrongly exempted by the try/catch guard (only the try body is exempted). Bare `catch(e)` and `on Object` no longer suppress dynamic-call warnings — only `on NoSuchMethodError` and `on TypeError` indicate intentional duck-typing. No action required.
 - Fixed `require_catch_logging` over-suppression: `catch (e) { return null; }` with an unused exception variable was falsely exempt — the return/continue/break exemption now fires only when the exception variable is actually referenced. No action required.
 - Fixed `require_url_validation` over-suppression: substring `'file'` no longer matches inside identifiers like `profileId`; `startsWith` guards are now checked against the actual URL variable; CLI exemption is scoped to the file's directory rather than disabling the rule project-wide. No action required.
@@ -143,11 +149,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Split the shared dashboard chrome stylesheet into single-concern exports, with the existing public functions preserved as compositions so every consumer renders identically. The previous bundling made the layer un-adoptable piecemeal: taking the hero animation also took an unrelated monospace rule, and taking the full-width toggle dragged a whole body reset with it. A unit test now pins each composition.
 - Removed a duplicate `.sr-only` accessibility rule from the token layer after confirming every consumer already pairs it with the accessibility helper; the test suite now pins that rule as defined exactly once.
 - Adopted the shared hero animation and reduced-motion rules in the Package Dashboard stylesheet. The summary cards, table toolbar, and footprint toggle stay local by decision, not omission — each differs from its chrome counterpart in layout semantics, domain color vocabulary, or ARIA interaction model, and the reasons are documented in the code. See `plans/PLAN_ext_ui_report_styles.md` for the full disposition.
-- Fixed 2 stale curated dictionary keys in `dictionaries.py`: removed the `de` entry whose English source text was rewritten (daemon label, LSP/plugin separation), and capitalized the `fil` "Analyzer Plugin" key to match the current source strings. Patched 48 missing translations across 21 locales — 4 format/loanword strings added to `DO_NOT_TRANSLATE`, 15 locale-specific entries hand-translated.
+- Fixed 2 stale curated dictionary keys in `dictionaries.py`: removed the `de` entry whose English source text was rewritten (daemon label, LSP/plugin separation), and capitalized the `fil` "Analyzer Plugin" key to match the current source strings. Patched 48 missing translations across 21 locales — 4 format/loanword strings added to `DO_NOT_TRANSLATE`, 15 locale-specific entries hand-translated. Added `--strict-dnt` flag to `generate_locales.py` — treats `DO_NOT_TRANSLATE` collision warnings as errors for CI gating.
 - Added "Make member public (remove underscore)" quick fix for `no_internal_method_docs` — strips the leading `_` from the declaration name as an alternative to the existing "Convert to a regular comment" fix.
 - Added fixture files for `no_internal_method_docs`, `prefer_state_class_below_widget`, and `prefer_sorted_equatable_props`. Extended `avoid_public_late_final_without_initializer` fixture with static and multi-variable edge cases.
 - Added `DeprecatedNewInCommentReferenceRule` instantiation test to the documentation rules test suite.
-
+- Fixed scan CLI silently excluding `example_packages/` fixtures: the hardcoded `/example` substring in `scan_runner.dart` matched `example_packages/`, the `--files` flag applied exclusions to explicitly named files, and `shouldSkipFile`'s fixture-skip exemption missed relative paths and `example_packages/`. Three-part fix: tightened the substring to `/example/`, bypassed exclusions when `--files` is explicitly provided, and added `startsWith` checks for relative paths.
+- Fixed two CodeQL `js/bad-tag-filter` alerts in test infrastructure: added `\s*` before closing `>` in the snapshot harness's script/style strip regexes (matches `</script >`), and added the `i` flag to the `projectMapShell.test.ts` script-tag count regex.
 
 ---
 
@@ -196,7 +203,6 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 - Extracted shared `sanitizePath()` utility to `path_guard.dart` — centralizes the normalize-and-reject-traversal pattern so future CLI entry points get path safety automatically. No action required.
 - README rewritten for readability — cut from 1,598 lines to ~430. Extension detail moved to `doc/guides/extension.md`, configuration reference to `doc/guides/configuration.md`, troubleshooting merged into `doc/troubleshooting.md`, FAQ to `doc/faq.md`. Added alternative package coverage table (46 packages audited, ~75% rule coverage). Deleted redundant `plans/GAP_ANALYSIS.md` — per-package data lives in migration guides.
 - Suppressed own-dogfood false positives in `analyzer_compat.dart` (dynamic dispatch, bare catches, swallowed exceptions are intentional version-probing shims) and `scan_runner.dart` (safe-by-construction cast). Fixed nullable interpolation in `DiagnosticCodeLowerCaseCompat.lowerCaseName`.
-
 
 ---
 
@@ -301,7 +307,6 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
 - Extended `scripts/fix_ignores.py`'s rename map with the 3 rules renamed 2026-09-04 (`avoid_dynamic_calls`, `avoid_equals_and_hash_code_on_mutable_classes`, `avoid_implementing_value_types`, all now `_extended`), and fixed the corresponding stale "N/A (stock analyzer rule)" rows in `doc/guides/migration_guides/migration_from_vga.md` to `ENHANCED`.
 - `scripts/publish.py` now routes a prerelease version (e.g. `16.0.0-beta.1`, the version this release ships as) to each store's prerelease channel automatically — `vsce package`/`publish`, `ovsx publish`, and `gh release create` all get their prerelease flag derived from the version string, no separate flag or prompt needed. `extension/package.json`'s `version` field, which the Marketplace requires to be a plain `MAJOR.MINOR.PATCH` (no hyphen, even with `--pre-release`), is instead derived via `extension_version_for()`: the stripped core PATCH offset by a channel- and iteration-specific band, so successive beta/rc builds of the same base version get distinct extension versions instead of colliding at the Marketplace/Open VSX level. The `.vsix` filename and store-verification poll stay consistent with whichever version was actually published.
 
-
 ---
 
 ## [15.2.12]
@@ -327,7 +332,6 @@ Hardens the LSP server against normal editor traffic and adds a `doctor` command
 - `doctor` command now scopes key detection to the `saropa_lints:` plugin block — no longer false-positives on identically named top-level keys.
 - Publish script supports `--log-file`, `--log-append`, `--mode`, `--auto-retry`, and `--output-level` flags for non-interactive/CI execution. Auto-detects non-TTY stdin. Mode definitions are unified in a single table driving both CLI and interactive menu.
 
-
 ---
 
 ## [15.2.11]
@@ -346,7 +350,6 @@ Removed Phase 0 fake LSP test diagnostics that shipped in 15.2.10. The standalon
 <summary>Maintenance</summary>
 
 - Regenerated category map and migration pack codes for 18 new rules added in 15.2.10 that were missing from the generated indexes.
-
 
 ---
 
@@ -397,7 +400,6 @@ Seventeen new lint rules across testing, equality, control flow, constructor sty
 - New `scripts/fix_ignores.py` migration tool rewrites stale `// ignore:` comments and `analysis_options.yaml` rule names from pre-rename saropa_lints rule names to their current `_extended`/`_strict`/`_with_fix` equivalents. Run `python scripts/fix_ignores.py <dir>` (dry run) or `--apply` to rewrite.
 - Publish audit now checks `CORE_DART_LINT_NAMES` freshness against the live Dart SDK linter — warns (non-blocking) if the reference set is stale.
 - New `test/integrity/core_lint_collision_test.dart` catches rule name collisions with core Dart lints during `dart test`, not only at publish time.
-
 
 ---
 
@@ -469,7 +471,6 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Hardened the migration pack generator's tiers.dart validation to skip comment lines (commented-out rule names were false-passing), added validation for the carried-forward `flutter_skill_lints` code set, and extracted a shared dedup constant so the generator and drift test can't silently disagree on the count.
 - Hardened migration pack generator further: `extractBlock`/`extractPackCodes` now use balanced brace counting instead of fragile `\n};`/`\n  },` string markers; `activeQuotedIdentifiers` strips `/* */` block comments in addition to `//` lines; `.dart_tool/` temp directory is created before use; diff output shows per-pack `+ added`/`- removed` codes in both normal and `--check` modes.
 - l10n diagnostic provider: excluded `l10nParsers.test.ts` from validation (false positives from dummy keys in test fixtures), added extra-params detection (Hint when code passes params the template doesn't use), added `// l10n-ignore-next-line` comment directive for per-call suppression, and added dead-key detection with single and bulk quick-fixes to remove unreferenced en.json keys from all 25 locale files at once.
-
 
 ---
 

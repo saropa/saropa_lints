@@ -388,8 +388,9 @@ class AvoidDisposingLateFieldsRule extends SaropaLintRule {
       }
       return false;
     }
-    if (statement is IfStatement)
+    if (statement is IfStatement) {
       return _ifCoversAllBranches(fieldName, statement);
+    }
     return false;
   }
 

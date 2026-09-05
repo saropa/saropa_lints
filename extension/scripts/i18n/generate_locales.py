@@ -288,6 +288,15 @@ def parse_args() -> argparse.Namespace:
         "--unset", nargs=2, metavar=("LOCALE", "ENGLISH"),
         help="Remove one cached translation so it is re-translated on the next run.",
     )
+    parser.add_argument(
+        "--strict-dnt",
+        action="store_true",
+        help=(
+            "Treat DO_NOT_TRANSLATE collision warnings as errors (exit 1). "
+            "Use in CI to block publishes when a passthrough keyword appears "
+            "embedded in a longer translatable source string."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -976,10 +985,18 @@ def main() -> int:
         )
         return 1
 
-    # Warn if a DO_NOT_TRANSLATE keyword appears embedded in a longer source
-    # string — the passthrough is exact-match only, but the collision suggests
-    # the keyword may need real translation inside those longer phrases.
-    _check_dnt_collisions(unique_en)
+    # Warn (or error with --strict-dnt) if a DO_NOT_TRANSLATE keyword appears
+    # embedded in a longer source string — the passthrough is exact-match only,
+    # but the collision suggests the keyword may need real translation.
+    dnt_collisions = _check_dnt_collisions(unique_en)
+    if dnt_collisions and getattr(args, "strict_dnt", False):
+        print(
+            c("red", f"  ✗ --strict-dnt: {len(dnt_collisions)} collision(s) "
+                      "treated as errors. Fix the DO_NOT_TRANSLATE list or the "
+                      "source strings before publishing."),
+            file=sys.stderr,
+        )
+        return 1
 
     # Interactive launches preview the current gap/low-quality state with a
     # read-only audit BEFORE the menu, so the mode choice is informed by what is

@@ -9,6 +9,11 @@ from typing import Dict
 # coverage gate counts it as translated without duplicating the entry 19+ times.
 # Only add strings whose English source value is a technical identifier, column
 # header keyword, or code-level token — never ordinary user-facing prose.
+# WARNING: a DO_NOT_TRANSLATE entry silently suppresses translation for EVERY
+# locale. Before adding a common word like "Web" or "Mobile", verify it only
+# appears as a standalone source string and is genuinely untranslatable in all
+# 24 locales. generate_locales.py runs _check_dnt_collisions() to catch cases
+# where the keyword is embedded in a longer translatable string.
 DO_NOT_TRANSLATE: list[str] = [
     "Migration",
     "Mobile",

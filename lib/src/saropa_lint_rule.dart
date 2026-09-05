@@ -2851,6 +2851,21 @@ abstract class SaropaLintRule extends AnalysisRule {
   /// Default: `true` - Fixture files often contain intentionally bad code.
   bool get skipFixtureFiles => true;
 
+  /// Single source of truth for whether a normalized (forward-slash) path
+  /// sits inside an example directory. Handles both absolute paths
+  /// (`/project/example/lib/foo.dart`) and relative paths
+  /// (`example/lib/foo.dart`). Covers `example/`, `examples/`, and
+  /// `example_packages/` — the three conventional locations for fixture
+  /// and sample code.
+  static bool isExamplePath(String normalizedPath) {
+    return normalizedPath.contains('/example/') ||
+        normalizedPath.contains('/examples/') ||
+        normalizedPath.contains('/example_packages/') ||
+        normalizedPath.startsWith('example/') ||
+        normalizedPath.startsWith('examples/') ||
+        normalizedPath.startsWith('example_packages/');
+  }
+
   // =========================================================================
   // GLOBAL FILE EXCLUSION PATTERNS
   // =========================================================================
@@ -2956,21 +2971,15 @@ abstract class SaropaLintRule extends AnalysisRule {
     }
     // TestRelevance.always: no skip based on test status
 
-    // Check example files
-    if (skipExampleFiles) {
-      if (normalizedPath.contains('/example/') ||
-          normalizedPath.contains('/examples/')) {
-        return true;
-      }
+    // Check example files — uses the centralized isExamplePath check.
+    if (skipExampleFiles && isExamplePath(normalizedPath)) {
+      return true;
     }
 
-    // Check fixture files - but NOT in example/ directory
-    // (example fixtures are specifically for testing the linter rules)
+    // Check fixture files — but NOT in example directories
+    // (example fixtures are specifically for testing the linter rules).
     if (skipFixtureFiles) {
-      final isInExample =
-          normalizedPath.contains('/example/') ||
-          normalizedPath.contains('/examples/');
-      if (!isInExample) {
+      if (!isExamplePath(normalizedPath)) {
         if (normalizedPath.contains('/fixture/') ||
             normalizedPath.contains('/fixtures/') ||
             normalizedPath.contains('_fixture.dart')) {
@@ -3303,8 +3312,9 @@ class SaropaDiagnosticReporter {
       final length = node.end - adjustedOffset;
       if (_isDuplicateAttempt(adjustedOffset)) return;
       if (_isSuppressed(adjustedOffset, node)) return;
-      if (!_isCappedFromProblemsTab())
+      if (!_isCappedFromProblemsTab()) {
         _rule.reportAtOffset(adjustedOffset, length);
+      }
       _trackViolation(adjustedOffset, node: node);
       return;
     }

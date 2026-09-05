@@ -26,8 +26,6 @@ import 'package:analyzer/src/string_source.dart';
 import 'package:path/path.dart' as p;
 
 import '../config/memory_mode.dart' show MemoryModeConfig;
-import '../config/rule_lane.dart'
-    show RuleLane, lightLaneRuleNames, setActiveRuleLane;
 import '../config/runtime_tier_cap.dart';
 import '../init/cli_args.dart' show tierOrder;
 import '../../saropa_lints.dart';
@@ -63,6 +61,7 @@ class ScanRunner {
     this.lane = RuleLane.full,
     this.laneStats = false,
     this.disableIssueCap = false,
+    this.noExclude = false,
     List<String> excludeGlobs = const [],
     List<String> includeGlobs = const [],
   }) : _excludePatterns = excludeGlobs.map(_globToRegex).toList(),
@@ -109,6 +108,11 @@ class ScanRunner {
   /// pattern, the include wins — letting users force-scan paths the defaults
   /// would skip (e.g. auditing third-party plugins in ephemeral dirs).
   final List<RegExp> _includePatterns;
+
+  /// When true, disables ALL hardcoded path exclusions (example/, build/,
+  /// .dart_tool/, generated patterns, etc.) so every discovered .dart file
+  /// is scanned. User-supplied --exclude-globs still apply.
+  final bool noExclude;
 
   /// Drops light-lane rules from the scan's rule set.
   ///
@@ -900,6 +904,7 @@ class ScanRunner {
     String directory, [
     List<RegExp> excludePatterns = const [],
     List<RegExp> includePatterns = const [],
+    bool skipHardcodedExclusions = false,
   ]) {
     final dir = io.Directory(directory);
     if (!dir.existsSync()) return const [];
@@ -908,7 +913,14 @@ class ScanRunner {
         .listSync(recursive: true)
         .whereType<io.File>()
         .where((f) => f.path.endsWith('.dart'))
-        .where((f) => _shouldInclude(f.path, excludePatterns, includePatterns))
+        .where(
+          (f) => _shouldInclude(
+            f.path,
+            excludePatterns,
+            includePatterns,
+            skipHardcodedExclusions,
+          ),
+        )
         .map((f) => p.normalize(f.path))
         .toList();
   }
@@ -917,15 +929,19 @@ class ScanRunner {
   /// hardcoded exclusions AND user-supplied exclude-globs, OR when it matches
   /// an include-glob (which overrides both). Include wins over exclude so
   /// users can force-scan paths the defaults would skip.
+  /// When [skipHardcodedExclusions] is true (`--no-exclude`), the hardcoded
+  /// `_isExcluded` check is bypassed entirely — only user-supplied
+  /// exclude-globs can drop a file.
   static bool _shouldInclude(
     String path,
     List<RegExp> excludePatterns,
-    List<RegExp> includePatterns,
-  ) {
+    List<RegExp> includePatterns, [
+    bool skipHardcodedExclusions = false,
+  ]) {
     // Include-globs override all exclusions — check first.
     if (_matchesExcludeGlob(path, includePatterns)) return true;
     // Normal exclusion chain: hardcoded defaults + user-supplied globs.
-    if (_isExcluded(path)) return false;
+    if (!skipHardcodedExclusions && _isExcluded(path)) return false;
     if (_matchesExcludeGlob(path, excludePatterns)) return false;
     return true;
   }
@@ -938,7 +954,11 @@ class ScanRunner {
     return n.contains('/.dart_tool/') ||
         n.contains('/build/') ||
         n.contains('/bin/') ||
-        n.contains('/example') ||
+        // Skip example directories — but match only the conventional `/example/`
+        // and `/examples/` paths, not `/example_packages/` which holds
+        // package-specific test fixtures that the scan CLI must be able to reach.
+        n.contains('/example/') ||
+        n.contains('/examples/') ||
         n.contains('/ephemeral/') ||
         n.contains('/.plugin_symlinks/') ||
         n.contains('.g.dart') ||

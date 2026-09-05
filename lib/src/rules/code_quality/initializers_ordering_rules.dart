@@ -2,7 +2,6 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 
-import '../../analyzer_compat.dart';
 import '../../saropa_lint_rule.dart';
 
 // ============================================================================

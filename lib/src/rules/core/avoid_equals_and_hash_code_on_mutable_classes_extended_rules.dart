@@ -1,7 +1,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
-import '../../analyzer_compat.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when a class overrides both `operator ==` and `hashCode` while
