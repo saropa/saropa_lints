@@ -136,27 +136,24 @@ void main() {
 
   group('api_network fixture expect_lint contracts', () {
     for (final c in cases) {
-      test(
-        '${c.rule} fixture should exist at ${c.fixturePath} and declares '
-        'a matching // expect_lint: comment',
-        () {
-          final file = File(c.fixturePath);
-          expect(
-            file.existsSync(),
-            isTrue,
-            reason: 'Missing fixture for ${c.rule}',
-          );
-          final body = file.readAsStringSync();
-          final pattern = RegExp(
-            r'//\s*expect_lint:\s*' + RegExp.escape(c.rule) + r'\b',
-          );
-          expect(
-            pattern.hasMatch(body),
-            isTrue,
-            reason: 'Fixture should declare // expect_lint: ${c.rule}',
-          );
-        },
-      );
+      test('${c.rule} fixture should exist at ${c.fixturePath} and declares '
+          'a matching // expect_lint: comment', () {
+        final file = File(c.fixturePath);
+        expect(
+          file.existsSync(),
+          isTrue,
+          reason: 'Missing fixture for ${c.rule}',
+        );
+        final body = file.readAsStringSync();
+        final pattern = RegExp(
+          r'//\s*expect_lint:\s*' + RegExp.escape(c.rule) + r'\b',
+        );
+        expect(
+          pattern.hasMatch(body),
+          isTrue,
+          reason: 'Fixture should declare // expect_lint: ${c.rule}',
+        );
+      });
     }
   });
 }

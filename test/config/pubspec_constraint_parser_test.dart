@@ -29,15 +29,12 @@ void main() {
     test('RequireSdkUpperBoundRule reports correct name and messages', () {
       expectMetadata(RequireSdkUpperBoundRule(), 'require_sdk_upper_bound');
     });
-    test(
-      'AvoidUnboundedDependencyRule reports correct name and messages',
-      () {
-        expectMetadata(
-          AvoidUnboundedDependencyRule(),
-          'avoid_unbounded_dependency',
-        );
-      },
-    );
+    test('AvoidUnboundedDependencyRule reports correct name and messages', () {
+      expectMetadata(
+        AvoidUnboundedDependencyRule(),
+        'avoid_unbounded_dependency',
+      );
+    });
     test(
       'RequireDependencyLowerBoundRule reports correct name and messages',
       () {
@@ -65,15 +62,9 @@ void main() {
         );
       },
     );
-    test(
-      'RequireSdkSyntaxMatchRule reports correct name and messages',
-      () {
-        expectMetadata(
-          RequireSdkSyntaxMatchRule(),
-          'require_sdk_syntax_match',
-        );
-      },
-    );
+    test('RequireSdkSyntaxMatchRule reports correct name and messages', () {
+      expectMetadata(RequireSdkSyntaxMatchRule(), 'require_sdk_syntax_match');
+    });
   });
 
   group('parseConstraint', () {

@@ -410,43 +410,45 @@ void main() {
       expect(v.containsKey('correction'), isFalse);
     });
 
-    test('null-metadata fallback emits requiresReview and defaultReviewState',
-        () {
-      // A violation whose rule name has no catalog entry hits the
-      // null-metadata fallback in _ruleMetadataToJson. The fallback
-      // must include requiresReview and defaultReviewState so consumers
-      // see the same key set regardless of catalog coverage.
-      final violations = <LintImpact, List<ViolationRecord>>{
-        LintImpact.info: [
-          _violation(
-            rule: 'completely_unknown_rule',
-            file: 'lib/a.dart',
-            line: 1,
-          ),
-        ],
-      };
+    test(
+      'null-metadata fallback emits requiresReview and defaultReviewState',
+      () {
+        // A violation whose rule name has no catalog entry hits the
+        // null-metadata fallback in _ruleMetadataToJson. The fallback
+        // must include requiresReview and defaultReviewState so consumers
+        // see the same key set regardless of catalog coverage.
+        final violations = <LintImpact, List<ViolationRecord>>{
+          LintImpact.info: [
+            _violation(
+              rule: 'completely_unknown_rule',
+              file: 'lib/a.dart',
+              line: 1,
+            ),
+          ],
+        };
 
-      ViolationExporter.write(
-        projectRoot: projectRoot,
-        sessionId: 'test_session',
-        data: buildData(violations: violations),
-        owaspLookup: const <String, OwaspMapping>{},
-      );
+        ViolationExporter.write(
+          projectRoot: projectRoot,
+          sessionId: 'test_session',
+          data: buildData(violations: violations),
+          owaspLookup: const <String, OwaspMapping>{},
+        );
 
-      final exported = readExport()['violations'] as List<dynamic>;
-      final meta =
-          (exported.first as Map<String, dynamic>)['metadata']
-              as Map<String, dynamic>;
+        final exported = readExport()['violations'] as List<dynamic>;
+        final meta =
+            (exported.first as Map<String, dynamic>)['metadata']
+                as Map<String, dynamic>;
 
-      expect(meta['requiresReview'], isFalse);
-      expect(meta['defaultReviewState'], isNull);
-      expect(meta['ruleType'], isNull);
-      expect(meta['ruleStatus'], 'ready');
-      expect(meta['cweIds'], isEmpty);
-      expect(meta['tags'], isEmpty);
-      expect(meta.containsKey('owasp'), isTrue);
-      expect(meta.containsKey('correction'), isFalse);
-    });
+        expect(meta['requiresReview'], isFalse);
+        expect(meta['defaultReviewState'], isNull);
+        expect(meta['ruleType'], isNull);
+        expect(meta['ruleStatus'], 'ready');
+        expect(meta['cweIds'], isEmpty);
+        expect(meta['tags'], isEmpty);
+        expect(meta.containsKey('owasp'), isTrue);
+        expect(meta.containsKey('correction'), isFalse);
+      },
+    );
 
     test('temp file cleaned up after successful write', () {
       ViolationExporter.write(
@@ -907,54 +909,62 @@ void main() {
     // also carries the same correction text / OWASP mapping the batch
     // `violations.json` export uses, from the same source
     // (`rule.code.correctionMessage`, `rule.owasp`).
-    test('carries correction and owasp for every rule, matching per-rule getters', () {
-      final catalog = ViolationExporter.buildRuleMetadataCatalog(
-        allSaropaRules,
-      );
+    test(
+      'carries correction and owasp for every rule, matching per-rule getters',
+      () {
+        final catalog = ViolationExporter.buildRuleMetadataCatalog(
+          allSaropaRules,
+        );
 
-      for (final rule in allSaropaRules) {
-        final meta = catalog[rule.code.lowerCaseName]! as Map<String, Object?>;
-        // `correction` key is present only when non-null (matches the
-        // per-violation JSON shape's `if (correction != null)` guard).
-        if (rule.code.correctionMessage != null) {
-          expect(
-            meta['correction'],
-            rule.code.correctionMessage,
-            reason: rule.code.lowerCaseName,
-          );
-        } else {
-          expect(
-            meta.containsKey('correction'),
-            isFalse,
-            reason: rule.code.lowerCaseName,
-          );
+        for (final rule in allSaropaRules) {
+          final meta =
+              catalog[rule.code.lowerCaseName]! as Map<String, Object?>;
+          // `correction` key is present only when non-null (matches the
+          // per-violation JSON shape's `if (correction != null)` guard).
+          if (rule.code.correctionMessage != null) {
+            expect(
+              meta['correction'],
+              rule.code.correctionMessage,
+              reason: rule.code.lowerCaseName,
+            );
+          } else {
+            expect(
+              meta.containsKey('correction'),
+              isFalse,
+              reason: rule.code.lowerCaseName,
+            );
+          }
+
+          // `owasp` is always present, as `{mobile: [], web: []}` for
+          // non-security rules — same shape `_owaspToJson` produces for the
+          // per-violation export.
+          final owaspJson = meta['owasp']! as Map<String, Object?>;
+          if (rule.owasp == null) {
+            expect(
+              owaspJson['mobile'],
+              isEmpty,
+              reason: rule.code.lowerCaseName,
+            );
+            expect(owaspJson['web'], isEmpty, reason: rule.code.lowerCaseName);
+          } else {
+            // A rule can map to mobile-only, web-only, or both — assert at
+            // least one side is populated rather than assuming mobile.
+            final mobile = owaspJson['mobile']! as List<Object?>;
+            final web = owaspJson['web']! as List<Object?>;
+            expect(
+              mobile.isNotEmpty || web.isNotEmpty,
+              isTrue,
+              reason: rule.code.lowerCaseName,
+            );
+          }
         }
 
-        // `owasp` is always present, as `{mobile: [], web: []}` for
-        // non-security rules — same shape `_owaspToJson` produces for the
-        // per-violation export.
-        final owaspJson = meta['owasp']! as Map<String, Object?>;
-        if (rule.owasp == null) {
-          expect(owaspJson['mobile'], isEmpty, reason: rule.code.lowerCaseName);
-          expect(owaspJson['web'], isEmpty, reason: rule.code.lowerCaseName);
-        } else {
-          // A rule can map to mobile-only, web-only, or both — assert at
-          // least one side is populated rather than assuming mobile.
-          final mobile = owaspJson['mobile']! as List<Object?>;
-          final web = owaspJson['web']! as List<Object?>;
-          expect(
-            mobile.isNotEmpty || web.isNotEmpty,
-            isTrue,
-            reason: rule.code.lowerCaseName,
-          );
-        }
-      }
-
-      // At least one real rule exercises the non-empty OWASP branch above —
-      // otherwise the `else` branch could be silently dead code.
-      final withOwasp = allSaropaRules.where((r) => r.owasp != null);
-      expect(withOwasp, isNotEmpty);
-    });
+        // At least one real rule exercises the non-empty OWASP branch above —
+        // otherwise the `else` branch could be silently dead code.
+        final withOwasp = allSaropaRules.where((r) => r.owasp != null);
+        expect(withOwasp, isNotEmpty);
+      },
+    );
   });
 }
 

@@ -366,10 +366,7 @@ void main() {
       'DeprecatedNewInCommentReferenceRule',
       () => DeprecatedNewInCommentReferenceRule(),
     );
-    hasFix(
-      'NoInternalMethodDocsRule',
-      () => NoInternalMethodDocsRule(),
-    );
+    hasFix('NoInternalMethodDocsRule', () => NoInternalMethodDocsRule());
 
     // Widget patterns require (5)
     hasFix(

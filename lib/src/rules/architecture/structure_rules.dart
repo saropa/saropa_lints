@@ -518,16 +518,14 @@ class AvoidGlobalStateRule extends SaropaLintRule {
           // Scoped to top-level function bodies only — a class instance
           // field with the same private name and a `??=` in a method body
           // must NOT suppress the top-level global finding.
-          if (name.startsWith('_') &&
-              _hasTopLevelLazyInit(node, name)) {
+          if (name.startsWith('_') && _hasTopLevelLazyInit(node, name)) {
             continue;
           }
 
           // Managed lifecycle: a corresponding clear/reset function
           // indicates the global has deliberate invalidation hooks
           // (e.g. `clearCrossFileSnapshotCache()`, `resetForTests()`).
-          if (name.startsWith('_') &&
-              _hasClearOrResetFunction(node, name)) {
+          if (name.startsWith('_') && _hasClearOrResetFunction(node, name)) {
             continue;
           }
 

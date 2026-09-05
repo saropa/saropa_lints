@@ -3539,10 +3539,9 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
 
   /// Word-boundary patterns for each indicator word, precomputed once.
   /// Prevents substring matches like 'maps' inside 'hashmaps'.
-  static final List<RegExp> _goodDescriptionPatterns =
-      _goodDescriptionWords
-          .map((w) => RegExp('\\b${RegExp.escape(w)}\\b'))
-          .toList();
+  static final List<RegExp> _goodDescriptionPatterns = _goodDescriptionWords
+      .map((w) => RegExp('\\b${RegExp.escape(w)}\\b'))
+      .toList();
 
   @override
   void runWithReporter(

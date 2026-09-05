@@ -1166,9 +1166,7 @@ class _CacheClearVisitor extends RecursiveAstVisitor<void> {
     }
     // Null-asserted: `_cache!.clear()`
     if (expr is PostfixExpression && expr.operand is SimpleIdentifier) {
-      return _fieldNames.contains(
-        (expr.operand as SimpleIdentifier).name,
-      );
+      return _fieldNames.contains((expr.operand as SimpleIdentifier).name);
     }
     return false;
   }

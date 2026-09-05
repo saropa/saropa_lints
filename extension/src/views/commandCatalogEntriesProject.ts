@@ -198,10 +198,10 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'replace-all',
   },
   {
-    // Pick which analysis lane to run in.
+    // Pick which analysis lane to run in (light or full).
     command: 'saropaLints.setLane',
     title: 'Set Analysis Lane',
-    description: 'Choose which analysis lane (fast, standard, deep) to use for the current workspace.',
+    description: 'Choose which analysis lane (light or full) to use for the current workspace.',
     category: 'Setup & Configuration',
     icon: 'layers',
   },
@@ -359,10 +359,10 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'file-text',
   },
   {
-    // Full audit runs every rule regardless of the active tier.
+    // Full-project audit, optionally scoped by git ref or baseline.
     command: 'saropaLints.fullAudit',
     title: 'Full Audit (All Rules)',
-    description: 'Run a one-off analysis with every rule enabled, regardless of the current tier.',
+    description: 'Run a full-project audit using configured rules, optionally scoped by git ref or baseline.',
     category: 'Analysis',
     icon: 'shield',
   },
@@ -399,26 +399,26 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'zap',
   },
   {
-    // Process health dashboard — dart/flutter daemon status.
+    // Opens the same Health Panel as toggleDebugPanel.
     command: 'saropaLints.showProcessHealth',
     title: 'Process Health',
-    description: 'Show the status of Dart and Flutter background processes (analysis server, daemons).',
+    description: 'Open the Health Panel showing engine status and background process diagnostics.',
     category: 'Analysis',
     icon: 'pulse',
   },
   {
-    // Kill orphaned Flutter/Dart daemons that outlived their session.
+    // Kill orphaned Flutter/Dart and scan daemon processes.
     command: 'saropaLints.killOrphanedDaemons',
     title: 'Kill Orphaned Flutter Daemons',
-    description: 'Terminate Flutter and Dart daemon processes that outlived their analysis session.',
+    description: 'Terminate orphaned Flutter, Dart, and scan daemon processes that outlived their session.',
     category: 'Analysis',
     icon: 'debug-disconnect',
   },
   {
-    // Toggle the Health Panel (engines + processes debug view).
+    // Opens the Health Panel (engines + processes debug view).
     command: 'saropaLints.toggleDebugPanel',
     title: 'Show Health Panel',
-    description: 'Toggle the Health Panel showing engine and process diagnostics.',
+    description: 'Open the Health Panel showing engine and process diagnostics.',
     category: 'Views & Navigation',
     icon: 'bug',
   },

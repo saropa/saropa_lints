@@ -434,8 +434,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
           // cast site — stop once we reach the statement that contains it.
           if (identical(stmt, child) || _containsNode(stmt, child)) break;
           if (stmt is VariableDeclarationStatement) {
-            for (final VariableDeclaration decl
-                in stmt.variables.variables) {
+            for (final VariableDeclaration decl in stmt.variables.variables) {
               if (decl.name.lexeme != varName) continue;
               final Expression? initializer = decl.initializer;
               if (initializer is MethodInvocation &&

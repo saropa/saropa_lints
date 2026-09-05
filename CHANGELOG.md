@@ -66,7 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.4] — Unreleased
+## [16.0.0-beta.4]
+
+Adds five new lint rules covering unsafe late-final fields, unnecessary factory constructors, internal method docs, widget/state ordering, and Equatable props sorting. Extends the extension dashboards with inline rule guidance on the Findings screen, embedded tabs on the Package Dashboard, live sidebar data, and scan progress on Health Panel and Project Map. Fixes 16 false-positive and over-suppression bugs across rules including substring, nullable interpolation, unsafe cast, catch logging, URL validation, global state, and cache expiration. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.4/CHANGELOG.md)
 
 ### Added
 

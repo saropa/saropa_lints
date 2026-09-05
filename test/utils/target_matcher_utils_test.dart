@@ -25,16 +25,19 @@ void main() {
       );
     });
 
-    test('cascade call with an unrelated method before dispose() detects cleanup', () {
-      expect(
-        isFieldCleanedUpInSource(
-          '_ctrl',
-          'dispose',
-          '_ctrl..removeListener(f)..dispose();',
-        ),
-        isTrue,
-      );
-    });
+    test(
+      'cascade call with an unrelated method before dispose() detects cleanup',
+      () {
+        expect(
+          isFieldCleanedUpInSource(
+            '_ctrl',
+            'dispose',
+            '_ctrl..removeListener(f)..dispose();',
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test('cascade without target method returns false', () {
       expect(

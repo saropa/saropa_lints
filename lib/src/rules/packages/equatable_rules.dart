@@ -1642,9 +1642,7 @@ class PreferSortedEquatablePropsRule extends SaropaLintRule {
 
       // Extract the props list literal, from either an arrow body or a
       // single return statement inside a block body.
-      final ListLiteral? propsList = _extractPropsListLiteral(
-        propsGetter.body,
-      );
+      final ListLiteral? propsList = _extractPropsListLiteral(propsGetter.body);
       if (propsList == null) return;
 
       // Only plain identifiers count as "a field reference" for ordering

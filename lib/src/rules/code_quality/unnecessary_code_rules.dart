@@ -480,8 +480,8 @@ class AvoidUnnecessaryFactoryConstructorRule extends SaropaLintRule {
       // an InstanceCreationExpression, so it never reaches here — but a
       // forward to a DIFFERENT class's constructor is still legitimate
       // (subtype selection), so only flag same-class forwards.
-      final String forwardedTypeName = forwarded.constructorName.type.name
-          .lexeme;
+      final String forwardedTypeName =
+          forwarded.constructorName.type.name.lexeme;
       if (forwardedTypeName != className) return;
 
       reporter.atNode(node);

@@ -137,9 +137,7 @@ bool catchHandlesViaControlFlow(Block body) {
 /// identifiers.
 bool catchBodyUsesException(Block body, String exceptionName) {
   bool used = false;
-  body.visitChildren(
-    _IdentifierUsageVisitor(exceptionName, () => used = true),
-  );
+  body.visitChildren(_IdentifierUsageVisitor(exceptionName, () => used = true));
   return used;
 }
 

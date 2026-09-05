@@ -537,7 +537,9 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
             if (groupIdx != null && groupIdx <= required) return;
             // If group index is unknown (non-literal), we can't
             // verify — let the lint fire for safety.
-            if (groupIdx == null) { /* fall through to reporter */ }
+            if (groupIdx == null) {
+              /* fall through to reporter */
+            }
           } else {
             // Pattern too complex to parse — fall back to blanket
             // suppression to avoid false positives.
@@ -673,8 +675,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
     // declaration, then extract the regex from its initializer chain.
     final Expression? matchTarget = _extractMatchTarget(startNode);
     if (matchTarget is SimpleIdentifier) {
-      final String? pattern =
-          _traceMatchVarToRegExpPattern(matchTarget);
+      final String? pattern = _traceMatchVarToRegExpPattern(matchTarget);
       if (pattern != null) return pattern;
     }
 
@@ -697,8 +698,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   /// - `final re = RegExp(r'...'); final m = re.firstMatch(input);`
   ///   — one level of variable indirection
   String? _traceMatchVarToRegExpPattern(SimpleIdentifier matchId) {
-    final Expression? init =
-        _resolveIdentifierToInitializer(matchId);
+    final Expression? init = _resolveIdentifierToInitializer(matchId);
     if (init is! MethodInvocation) return null;
     // Expecting `regex.firstMatch(input)` or similar Match-returning
     // method. The regex is the call target.
@@ -709,8 +709,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
     }
     if (regexExpr is SimpleIdentifier) {
       // `re.firstMatch(input)` — trace `re` to its declaration
-      final Expression? reInit =
-          _resolveIdentifierToInitializer(regexExpr);
+      final Expression? reInit = _resolveIdentifierToInitializer(regexExpr);
       if (reInit is InstanceCreationExpression) {
         return _extractPatternFromRegExpCtor(reInit);
       }
@@ -736,8 +735,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
     // Scan the block's statements for the variable declaration.
     for (final Statement stmt in blockNode.statements) {
       if (stmt is! VariableDeclarationStatement) continue;
-      for (final VariableDeclaration decl
-          in stmt.variables.variables) {
+      for (final VariableDeclaration decl in stmt.variables.variables) {
         if (decl.declaredFragment?.element == element) {
           return decl.initializer;
         }
@@ -760,8 +758,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
     }
     // Variable reference: `replaceAllMapped(regexVar, ...)`
     if (first is SimpleIdentifier) {
-      final Expression? init =
-          _resolveIdentifierToInitializer(first);
+      final Expression? init = _resolveIdentifierToInitializer(first);
       if (init is InstanceCreationExpression) {
         return _extractPatternFromRegExpCtor(init);
       }
@@ -3906,32 +3903,36 @@ int? countRequiredCaptureGroups(String pattern) {
         // lookbehind (?<=...), (?<!...), named (?<name>...), etc.
         i += 2; // skip '(?'
         if (i < pattern.length) {
-          if (pattern[i] == ':' ||
-              pattern[i] == '=' ||
-              pattern[i] == '!') {
+          if (pattern[i] == ':' || pattern[i] == '=' || pattern[i] == '!') {
             // Non-capturing or lookahead — push with -1
-            stack.add(_OpenGroup(
-              captureIndex: -1,
-              childStartIndex: groupOptional.length,
-            ));
+            stack.add(
+              _OpenGroup(
+                captureIndex: -1,
+                childStartIndex: groupOptional.length,
+              ),
+            );
             i++;
           } else if (pattern[i] == '<') {
             if (i + 1 < pattern.length &&
                 (pattern[i + 1] == '=' || pattern[i + 1] == '!')) {
               // Lookbehind — not a capture group
-              stack.add(_OpenGroup(
-                captureIndex: -1,
-                childStartIndex: groupOptional.length,
-              ));
+              stack.add(
+                _OpenGroup(
+                  captureIndex: -1,
+                  childStartIndex: groupOptional.length,
+                ),
+              );
               i += 2;
             } else {
               // Named capture group (?<name>...) — IS a capture group
               groupIndex++;
               groupOptional.add(false);
-              stack.add(_OpenGroup(
-                captureIndex: groupIndex,
-                childStartIndex: groupOptional.length,
-              ));
+              stack.add(
+                _OpenGroup(
+                  captureIndex: groupIndex,
+                  childStartIndex: groupOptional.length,
+                ),
+              );
               // Skip to `>`
               while (i < pattern.length && pattern[i] != '>') {
                 i++;
@@ -3949,10 +3950,12 @@ int? countRequiredCaptureGroups(String pattern) {
       // Regular capturing group
       groupIndex++;
       groupOptional.add(false);
-      stack.add(_OpenGroup(
-        captureIndex: groupIndex,
-        childStartIndex: groupOptional.length,
-      ));
+      stack.add(
+        _OpenGroup(
+          captureIndex: groupIndex,
+          childStartIndex: groupOptional.length,
+        ),
+      );
       i++;
       continue;
     }
@@ -3965,7 +3968,8 @@ int? countRequiredCaptureGroups(String pattern) {
       final _OpenGroup closed = stack.removeLast();
 
       // Check if this group is followed by `?` or `*` (optional)
-      final bool isOptional = (i + 1 < pattern.length &&
+      final bool isOptional =
+          (i + 1 < pattern.length &&
           (pattern[i + 1] == '?' || pattern[i + 1] == '*'));
 
       // Mark the group itself as optional only when followed by a
@@ -3983,9 +3987,7 @@ int? countRequiredCaptureGroups(String pattern) {
       //  - the group has alternation: children on the non-matching
       //    side of `|` won't capture.
       if (isOptional || closed.hadAlternation) {
-        for (int gi = closed.childStartIndex;
-            gi < groupOptional.length;
-            gi++) {
+        for (int gi = closed.childStartIndex; gi < groupOptional.length; gi++) {
           groupOptional[gi] = true;
         }
       }

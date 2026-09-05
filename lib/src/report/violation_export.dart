@@ -678,7 +678,10 @@ class ViolationExporter {
         'accuracyTarget': null,
         'requiresReview': false,
         'defaultReviewState': null,
-        'owasp': <String, List<String>>{'mobile': <String>[], 'web': <String>[]},
+        'owasp': <String, List<String>>{
+          'mobile': <String>[],
+          'web': <String>[],
+        },
         // correction intentionally omitted — mirrors toJson()'s conditional
         // emit: absent when no correction message exists for the rule.
       };

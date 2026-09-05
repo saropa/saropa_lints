@@ -154,45 +154,49 @@ void main() {
     timeout: const Timeout(Duration(minutes: 2)),
   );
 
-  test('handle_throwing_invocations does not report when inside try/catch', () async {
-    final tempDir = await _createConsumerProject(
-      'saropa_lints_handle_throwing_try_',
-      '''
+  test(
+    'handle_throwing_invocations does not report when inside try/catch',
+    () async {
+      final tempDir = await _createConsumerProject(
+        'saropa_lints_handle_throwing_try_',
+        '''
 void main() {
   try {
     int.parse('1');
   } catch (_) {}
 }
 ''',
-    );
+      );
 
-    final pubGet = await Process.run(
-      'dart',
-      ['pub', 'get'],
-      workingDirectory: tempDir.path,
-      runInShell: true,
-    );
-    expect(pubGet.exitCode, 0);
+      final pubGet = await Process.run(
+        'dart',
+        ['pub', 'get'],
+        workingDirectory: tempDir.path,
+        runInShell: true,
+      );
+      expect(pubGet.exitCode, 0);
 
-    final analyze = await Process.run(
-      'dart',
-      ['analyze', 'lib/main.dart'],
-      workingDirectory: tempDir.path,
-      runInShell: true,
-    );
+      final analyze = await Process.run(
+        'dart',
+        ['analyze', 'lib/main.dart'],
+        workingDirectory: tempDir.path,
+        runInShell: true,
+      );
 
-    expect(
-      analyze.exitCode,
-      0,
-      reason:
-          'Code in try/catch should not trigger:\n${analyze.stdout}\n${analyze.stderr}',
-    );
-    expect(
-      '${analyze.stdout}\n${analyze.stderr}',
-      isNot(contains('handle_throwing_invocations')),
-      reason: 'No lint expected when call is inside try/catch',
-    );
-  }, timeout: const Timeout(Duration(minutes: 2)));
+      expect(
+        analyze.exitCode,
+        0,
+        reason:
+            'Code in try/catch should not trigger:\n${analyze.stdout}\n${analyze.stderr}',
+      );
+      expect(
+        '${analyze.stdout}\n${analyze.stderr}',
+        isNot(contains('handle_throwing_invocations')),
+        reason: 'No lint expected when call is inside try/catch',
+      );
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
 
   test(
     'handle_throwing_invocations does not report on non-thrower (no false positive)',

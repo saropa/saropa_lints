@@ -52,10 +52,7 @@ class NoInternalMethodDocsMakePublicFix extends SaropaFixProducer {
     final AstNode? declaration = comment.parent;
     final SourceRange? nameRange = switch (declaration) {
       MethodDeclaration(:final name) => SourceRange(name.offset, name.length),
-      FunctionDeclaration(:final name) => SourceRange(
-        name.offset,
-        name.length,
-      ),
+      FunctionDeclaration(:final name) => SourceRange(name.offset, name.length),
       ConstructorDeclaration(name: final Token? name) when name != null =>
         SourceRange(name.offset, name.length),
       _ => null,

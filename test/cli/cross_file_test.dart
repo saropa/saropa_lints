@@ -104,17 +104,14 @@ void main() {
       result = await runCrossFileAnalysis(projectPath: fixturePath);
     });
 
-    test(
-      'unused-files: fixture has exactly one unused file (orphan.dart)',
-      () {
-        expect(
-          result.unusedFiles.any((path) => path.endsWith('orphan.dart')),
-          isTrue,
-        );
-        // Fix: hasLength gives clearer failure output than raw int matcher.
-        expect(result.unusedFiles, hasLength(1));
-      },
-    );
+    test('unused-files: fixture has exactly one unused file (orphan.dart)', () {
+      expect(
+        result.unusedFiles.any((path) => path.endsWith('orphan.dart')),
+        isTrue,
+      );
+      // Fix: hasLength gives clearer failure output than raw int matcher.
+      expect(result.unusedFiles, hasLength(1));
+    });
 
     test('circular-deps: fixture has one cycle (a -> b -> c -> a)', () {
       expect(result.circularDependencies, isNotEmpty);

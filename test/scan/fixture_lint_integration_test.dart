@@ -91,9 +91,9 @@ void main() {
               fromCustom: <Violation>[],
               combined: <Violation>[],
             )
-          : await _analyzeExample(exampleDir).timeout(
-              const Duration(minutes: 3),
-            );
+          : await _analyzeExample(
+              exampleDir,
+            ).timeout(const Duration(minutes: 3));
       violations = analysis.combined;
     });
 

@@ -239,9 +239,7 @@ dependencies:
 
     test('file under tool/ → true', () {
       expect(
-        ProjectContext.isInShortLivedToolDirectory(
-          '/repo/tool/generate.dart',
-        ),
+        ProjectContext.isInShortLivedToolDirectory('/repo/tool/generate.dart'),
         isTrue,
       );
     });

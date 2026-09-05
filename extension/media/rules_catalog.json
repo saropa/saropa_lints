@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2371,
+  "ruleCount": 2376,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -11637,6 +11637,26 @@
         "web": []
       }
     },
+    "avoid_public_late_final_without_initializer": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "maintainability"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Make the field private (prefix with _) so the class controls when it is assigned, or add an inline initializer if the value can be computed eagerly or lazily at declaration time.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
     "avoid_public_members_in_states": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -15624,6 +15644,26 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Remove the extends Object clause from your class declaration. Dart will automatically inherit from Object, so this is always implied.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "avoid_unnecessary_factory_constructor": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "maintainability"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Replace the factory constructor with a plain generative constructor, or a redirecting constructor (e.g. Foo.name() : this(...)) if it forwards to another constructor of the same class.",
       "owasp": {
         "mobile": [],
         "web": []
@@ -20318,6 +20358,27 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Remove the if/else entirely and keep only the common code. If different behavior was intended, correct one of the branches.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "no_internal_method_docs": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "dart-core",
+        "documentation"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Convert the `///` doc comment to a `//` comment (strip one slash from each line) or, if the member truly belongs in the public API, remove the leading underscore and make it public.",
       "owasp": {
         "mobile": [],
         "web": []
@@ -32765,6 +32826,26 @@
         "web": []
       }
     },
+    "prefer_sorted_equatable_props": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "packages"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Reorder the props list so its fields appear in the same order as the corresponding field declarations in the class body.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
     "prefer_sorted_imports": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -33102,6 +33183,28 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Serve cached data immediately and refresh in background.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "prefer_state_class_below_widget": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "flutter",
+        "style",
+        "ui"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Move the State<X> class declaration below its corresponding StatefulWidget X class so the widget appears first in the file.",
       "owasp": {
         "mobile": [],
         "web": []

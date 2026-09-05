@@ -73,3 +73,8 @@ No code-review findings at medium level.
   a UI panel, not an analysis action.
 - Changed `killOrphanedDaemons` icon from `trash` (implies data deletion) to
   `debug-disconnect` (process termination).
+- Fixed 5 inaccurate descriptions verified against actual command handlers:
+  `fullAudit` (does not override tier), `setLane` (offers light/full, not
+  fast/standard/deep), `toggleDebugPanel` (creates-or-shows, never hides),
+  `showProcessHealth` (same Health Panel as toggleDebugPanel),
+  `killOrphanedDaemons` (also kills scan daemons, not just Flutter).
