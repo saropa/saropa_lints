@@ -97,3 +97,9 @@ Added `--strict-dnt` CLI flag to `generate_locales.py`. When passed, any
 `DO_NOT_TRANSLATE` collision warnings become fatal errors (exit 1). Intended for
 CI pipelines alongside `--fail-on-missing` and `--fail-on-drift` to prevent
 publishes when a passthrough keyword is embedded in a longer translatable string.
+
+Documented the empirical basis for the 5× collision heuristic threshold
+(smallest real ratio 37.8×) and added re-validation guidance for future keyword
+additions. Marked the 15 hand-translated entries as unverified by native
+speaker, and documented the Russian pluralization limitation ({count} without
+plural selectors reads naturally only for counts ≥5).

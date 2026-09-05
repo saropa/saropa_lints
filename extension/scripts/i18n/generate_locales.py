@@ -207,7 +207,12 @@ def _check_dnt_collisions(english_strings: set[str]) -> list[str]:
             # Skip format-string prefix extensions (e.g. score + "· Gate failing").
             if source.startswith(keyword):
                 continue
-            # Skip short keywords embedded in much longer prose — MT handles them.
+            # Skip short keywords embedded in much longer prose — MT handles
+            # the surrounding sentence. Empirical basis (2026-09-05): smallest
+            # real ratio is 37.8× ("Web" in a 189-char string); 5× is a
+            # conservative floor that avoids false alarms without masking
+            # genuine collisions. Re-validate if adding keywords longer than
+            # ~30 chars or source strings shorter than ~50 chars.
             if len(keyword) <= 15 and len(source) >= 5 * len(keyword):
                 continue
             collisions.append(

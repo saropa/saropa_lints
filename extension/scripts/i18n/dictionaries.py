@@ -26,6 +26,13 @@ DO_NOT_TRANSLATE: list[str] = [
 ]
 
 # cspell:disable
+#
+# UNVERIFIED TRANSLATIONS (2026-09-05): 15 per-locale entries across
+# de/fil/it/pl/pt/ru/sw/tr/uk/ur were hand-translated without native speaker
+# review. Each is marked "# Manual:" in its comment. The ru entry uses
+# {count} without plural forms — Russian requires genitive singular (2-4)
+# and genitive plural (5+), but the l10n runtime doesn't support plural
+# selectors, so the translation reads naturally only for counts ≥5.
 TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "nl": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
