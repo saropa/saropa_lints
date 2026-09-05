@@ -125,6 +125,18 @@ class FileComplexity {
     this.topFunctions = const [],
   });
 
+  /// All-zero fallback for corrupt or missing cache entries — a file with no
+  /// metrics ranks as harmless rather than crashing the cache deserializer.
+  static const zero = FileComplexity(
+    functionCount: 0,
+    maxCyclomatic: 0,
+    maxCognitive: 0,
+    maxVariableCount: 0,
+    maxBooleanTerms: 0,
+    maxNesting: 0,
+    worstLcom: 0,
+  );
+
   final int functionCount;
   final int maxCyclomatic;
   final int maxCognitive;

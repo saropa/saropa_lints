@@ -88,7 +88,11 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 
 ### Fixed
 
+- Fixed path traversal vulnerability in `cross_file report` HTML output — `outputDir` from `--output-dir` is now normalized and rejected if it contains `..` segments. No action required.
+- Fixed `avoid_path_traversal` in `detectProjectPackages` — `targetDir` parameter is now canonicalized before reaching `File()`. No action required.
 - Fixed `avoid_case_sensitive_path_comparison` false positive on non-string comparisons — null checks, boolean/integer/double/enum guards on path-named variables no longer fire. No action required.
+- Fixed `require_ios_deployment_target_consistency` false positive on any string literal containing "async" — the rule's `_ios15PlusApis` map included a bare `'async'` entry intended to detect Swift concurrency, but it substring-matched every Dart string containing "async" (rule names, identifiers, comments). Removed the entry. No action required.
+- Hardened 6 iOS rules against false positives on collection-literal data tables — string literals inside list, set, or map literals (rule-name registries, route catalogs, path inventories) are now skipped by `AvoidIos13DeprecationsRule`, `AvoidIosSimulatorOnlyCodeRule`, `RequireIosMinimumVersionCheckRule`, `AvoidIosDeprecatedUikitRule`, `RequireIosDeploymentTargetConsistencyRule`, and `RequireIosCertificatePinningRule`. No action required.
 - Sidebar Status panel no longer silently drops the Health row before any analysis has ever run — it now shows a "Health: —" row explaining why, with a one-click link to run analysis. No action required.
 - Fixed LSP server crash on startup in large projects — the Dart VM exhausted its OS thread pool when the workspace scan called `lastModifiedSync` / `listSync` on hundreds of files. Replaced sync I/O with batched async equivalents (capped at 20 concurrent file operations) and added error handlers so failures exit cleanly instead of triggering an infinite restart loop. No action required.
 - LSP workspace scan is now progressive and cancelable — diagnostics publish incrementally as each file is analyzed, and the scan aborts cleanly on shutdown or config reload instead of racing to completion. Progress is logged every 50 files. No action required.
@@ -101,6 +105,7 @@ Streamlines the extension sidebar, cutting it roughly in half by removing rows t
 - l10n diagnostics now recognize `// l10n:passthrough` on the same line as a suppress directive for calls whose `{placeholders}` are substituted by caller code (e.g. `pluralize()`) rather than by `l10n()` itself. Annotated all existing `pluralize()`+`l10n()` call sites. No action required.
 - Removed `transformProjectMapHtml()` and `webviewThemeOverride()` from `projectMapView.ts` — dead since the standalone Project Map panel switched to the composed `projectMapShell.ts` document in Phase 6; their only remaining reference was a historical code comment.
 - Added unit test coverage for `projectMapShell.ts` (shell tab structure, scanning-state pane, done-state pane) and `projectMapReports.ts` (report-card catalog, Reports tab HTML, quality-gate config read/write, panel-message routing) — both had zero tests before this pass.
+- Fixed null-unsafe map access and direct `as` casts in `asset_scanner.dart`, `health_cache.dart`, and `saropa_lint_rule.dart` — own-dogfood violations from `require_null_safe_json_access` and `avoid_unsafe_cast`. No action required.
 
 </details>
 

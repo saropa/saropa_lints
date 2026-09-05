@@ -912,9 +912,10 @@ class ProgressTracker {
 
     // Memory pressure stats (always show so users can see plugin footprint)
     final memStats = MemoryPressureHandler.getStats();
-    final estimatedMb = memStats['estimatedUsageMb'] as int;
+    // Null-safe map access: stats keys may be absent if handler is reset
+    final estimatedMb = (memStats['estimatedUsageMb'] as int?) ?? 0;
     final rssMb = memStats['processRssMb'] as int?;
-    final relieveCount = memStats['relieveCount'] as int;
+    final relieveCount = (memStats['relieveCount'] as int?) ?? 0;
     buf.writeln();
     buf.writeln('$dim${'─' * 70}$reset');
     buf.writeln('  $bold MEMORY$reset');

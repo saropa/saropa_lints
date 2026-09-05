@@ -5,6 +5,7 @@
 library;
 
 import 'dart:convert';
+// ignore: avoid_platform_specific_imports — CLI-only file, never runs on web
 import 'dart:io';
 
 import 'metrics_model.dart';
@@ -33,15 +34,21 @@ class CacheEntry {
     if (docCoverage != null) 'docCoverage': docCoverage,
   };
 
-  factory CacheEntry.fromJson(Map<String, Object?> j) => CacheEntry(
-    hash: (j['hash'] as num).toInt(),
-    complexity: FileComplexity.fromJson(
-      (j['complexity'] as Map).cast<String, Object?>(),
-    ),
-    maintainability: (j['mi'] as num?)?.toDouble() ?? 0,
-    maintainabilityRaw: (j['miRaw'] as num?)?.toDouble() ?? 0,
-    docCoverage: (j['docCoverage'] as num?)?.toDouble(),
-  );
+  /// Deserializes a cache entry; tolerates missing/wrong-typed fields so a
+  /// corrupt cache entry degrades to defaults instead of throwing.
+  factory CacheEntry.fromJson(Map<String, Object?> j) {
+    final rawHash = j['hash'];
+    final rawComplexity = j['complexity'];
+    return CacheEntry(
+      hash: rawHash is num ? rawHash.toInt() : 0,
+      complexity: rawComplexity is Map
+          ? FileComplexity.fromJson(rawComplexity.cast<String, Object?>())
+          : FileComplexity.zero,
+      maintainability: (j['mi'] as num?)?.toDouble() ?? 0,
+      maintainabilityRaw: (j['miRaw'] as num?)?.toDouble() ?? 0,
+      docCoverage: (j['docCoverage'] as num?)?.toDouble(),
+    );
+  }
 }
 
 /// Stable 32-bit FNV-1a hash of [content]. Unlike `String.hashCode` this is
@@ -59,15 +66,25 @@ int stableHash(String content) {
 /// unreadable (a corrupt cache must never break a scan).
 Map<String, CacheEntry> loadComplexityCache(String cachePath) {
   final file = File(cachePath);
-  if (!file.existsSync()) return {};
+  if (!file.existsSync()) return <String, CacheEntry>{};
   try {
-    final decoded = jsonDecode(file.readAsStringSync()) as Map<String, Object?>;
-    return {
-      for (final e in decoded.entries)
-        e.key: CacheEntry.fromJson((e.value as Map).cast<String, Object?>()),
-    };
+    // Safe decode: if the JSON is not a map the cache is corrupt
+    final decoded = jsonDecode(file.readAsStringSync());
+    if (decoded is! Map<String, Object?>) return <String, CacheEntry>{};
+    // Build map entry-by-entry so we can promote the value type safely
+    final result = <String, CacheEntry>{};
+    for (final e in decoded.entries) {
+      final v = e.value;
+      if (v is Map) {
+        result[e.key] = CacheEntry.fromJson(v.cast<String, Object?>());
+      }
+    }
+    return result;
+    // ignore: require_catch_logging
   } on Object {
-    return {}; // ignore malformed cache; next scan rebuilds it
+    // Malformed cache — next scan rebuilds it; not worth logging since
+    // the user may have hand-deleted or truncated the file.
+    return <String, CacheEntry>{};
   }
 }
 

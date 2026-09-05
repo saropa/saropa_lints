@@ -27,8 +27,10 @@ List<AssetFinding> scanUnusedAssets(String projectPath) {
   final pubspec = File(p.join(projectPath, 'pubspec.yaml'));
   if (!pubspec.existsSync()) return const [];
   final doc = loadYaml(pubspec.readAsStringSync());
-  if (doc is! YamlMap || doc['flutter'] is! YamlMap) return const [];
-  final flutter = doc['flutter'] as YamlMap;
+  if (doc is! YamlMap) return const [];
+  // Null-safe access: the flutter section may be absent or non-map
+  final flutter = doc['flutter'];
+  if (flutter is! YamlMap) return const [];
 
   final declared = <String>{};
   _collectAssets(flutter['assets'], projectPath, declared);
@@ -71,8 +73,11 @@ void _collectAssets(Object? assets, String projectPath, Set<String> out) {
 void _collectFonts(Object? fonts, Set<String> out) {
   if (fonts is! YamlList) return;
   for (final family in fonts) {
-    if (family is! YamlMap || family['fonts'] is! YamlList) continue;
-    for (final font in family['fonts'] as YamlList) {
+    if (family is! YamlMap) continue;
+    // Null-safe: the fonts list within a family entry may be absent
+    final familyFonts = family['fonts'];
+    if (familyFonts is! YamlList) continue;
+    for (final font in familyFonts) {
       if (font is YamlMap && font['asset'] != null) {
         out.add(font['asset'].toString());
       }
