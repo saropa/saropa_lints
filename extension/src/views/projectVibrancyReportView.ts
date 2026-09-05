@@ -578,7 +578,7 @@ function buildHero(
   const suppTotal = suppCodegen + suppDirective;
   const parts = [
     `${escapeHtml(l10n('codeHealth.hero.generated'))} <strong>${escapeHtml(generated)}</strong>`,
-    pluralize(fnCount, { one: l10n('codeHealth.hero.functionOne'), other: l10n('codeHealth.hero.functionOther') }),
+    pluralize(fnCount, { one: l10n('codeHealth.hero.functionOne'), other: l10n('codeHealth.hero.functionOther') }), // l10n:passthrough
     escapeHtml(l10n('codeHealth.hero.avgFormat', { score: Math.round(avgScore).toString(), grade: avgGrade })),
     `<span class="pill ${problemPillClass}" title="Functions scoring under 50 (grades D, E, F)">${problemCount.toLocaleString('en-US')} problems</span>`,
   ];
@@ -610,7 +610,7 @@ function buildGateBanner(payload: ProjectVibrancyPayload): string {
   const summary =
     violations.length === 0
       ? l10n('codeHealth.gate.fallback')
-      : pluralize(violations.length, { one: l10n('codeHealth.gate.failingOne'), other: l10n('codeHealth.gate.failingOther') });
+      : pluralize(violations.length, { one: l10n('codeHealth.gate.failingOne'), other: l10n('codeHealth.gate.failingOther') }); // l10n:passthrough
   // §8.16 — empty/error states must name the next action with a tier-1 button.
   // Previously this banner only carried explanatory text; the user had to
   // hunt for the *Code Health settings* toolbar button to act on it. The

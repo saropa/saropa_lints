@@ -210,7 +210,8 @@ export function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   }
   const findings = input.totalRawAfterDisable;
   const findingsClass = findings === 0 ? 'good' : findings > 100 ? 'bad' : 'warn';
-  parts.push(`<span class="pill ${findingsClass}" title="${escapeHtml(l10n('findingsDash.status.findingsAfterFilterTitle'))}">${pluralize(findings, { one: l10n('findingsDash.status.findingOne'), other: l10n('findingsDash.status.findingOther') })}</span>`);
+  const findingLabel = pluralize(findings, { one: l10n('findingsDash.status.findingOne'), other: l10n('findingsDash.status.findingOther') }); // l10n:passthrough — {count} substituted by pluralize()
+  parts.push(`<span class="pill ${findingsClass}" title="${escapeHtml(l10n('findingsDash.status.findingsAfterFilterTitle'))}">${findingLabel}</span>`);
   // WP4 (plans/PLAN_sidebar_row_collapse.md §3): trend/regression/hotspot pills
   // replace the sidebar Status panel's Trends / Score dropped / "N fewer
   // issues" / Hotspots rows, which are cut in WP5 once this landing spot

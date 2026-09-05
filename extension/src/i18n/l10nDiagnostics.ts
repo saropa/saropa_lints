@@ -5,7 +5,9 @@
  * l10n() calls and reports missing keys, mismatched interpolation
  * params, and extra (unused) params as diagnostics.
  *
- * Suppress a single call with `// l10n-ignore-next-line` on the line above.
+ * Suppress a single call with `// l10n-ignore-next-line` on the line above,
+ * or `// l10n:passthrough` on the same line (for calls whose {placeholders}
+ * are substituted by caller code like pluralize(), not by l10n() itself).
  * Dead-key detection (unreferenced catalog entries) lives in l10nDeadKeys.ts.
  */
 import * as vscode from 'vscode';
@@ -31,6 +33,10 @@ const L10N_RE = /l10n\(\s*(['"])([a-zA-Z0-9_.]+)\1/g;
 
 // Inline suppress directive — place on the line before the l10n() call.
 const IGNORE_DIRECTIVE = 'l10n-ignore-next-line';
+
+// Same-line suppress — marks calls where {placeholders} are filled by caller
+// code (e.g. pluralize()), not by l10n() itself. Place on the same line.
+const PASSTHROUGH_DIRECTIVE = 'l10n:passthrough';
 
 // Extracts {placeholder} tokens from en.json values.
 const PLACEHOLDER_RE = /\{([a-zA-Z0-9_]+)\}/g;
@@ -114,6 +120,10 @@ function validateDocument(doc: vscode.TextDocument): void {
         : lineIdx >= 0 ? lineIdx : blockIdx;
       if (commentStart >= 0 && prevLine.indexOf(IGNORE_DIRECTIVE, commentStart) >= 0) continue;
     }
+
+    // Same-line passthrough — caller substitutes placeholders, not l10n().
+    const matchLineText = doc.lineAt(matchLine).text;
+    if (matchLineText.includes(PASSTHROUGH_DIRECTIVE)) continue;
 
     if (!catalog.has(key)) {
       diagnostics.push(new vscode.Diagnostic(

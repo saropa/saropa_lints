@@ -332,6 +332,11 @@
     "extension": {
       "hint": "Extension-wide display preferences.",
       "linkNote": "Lint integration on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
+    },
+    "shortcuts": {
+      "jumpToTab": "Jump to tab 1-7 (Tier, Rule packs, Overrides, SDK rollout, Config file, Automation, Extension)",
+      "prevNextTab": "Previous / next tab",
+      "showOverlay": "Show this shortcut overlay"
     }
   },
   "consolidated": {
@@ -371,6 +376,9 @@
       "laneFull": "Full — every enabled rule in-editor",
       "migrateLegacyKeys": "Migrate {count} legacy config key(s)",
       "migrateLegacyKeysDesc": "Move legacy plugin-block keys to analysis_options_custom.yaml"
+    },
+    "badge": {
+      "needlesTooltip": "{count} package(s) have unadopted features"
     }
   },
   "configSuggestions": {
@@ -1785,6 +1793,10 @@
         "saved": "Saved",
         "saveError": "Could not save"
       }
+    },
+    "shortcuts": {
+      "jumpToTab": "Jump to tab 1-2 (Map, Reports)",
+      "showOverlay": "Show this shortcut overlay"
     }
   },
   "suppressionsStrip": {
@@ -2451,7 +2463,13 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "Last analysis: {ago}"
+      "lastRunTooltip": "Last analysis: {ago}",
+      "neverRunLabel": "Health: —",
+      "neverRunDescription": "Run analysis to see your health score"
+    },
+    "badge": {
+      "criticalTooltip": "{critical} critical, {total} total",
+      "totalTooltip": "{total} violation(s)"
     }
   },
   "staleIgnores": {

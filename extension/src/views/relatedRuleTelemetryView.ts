@@ -87,7 +87,7 @@ function buildHtml(snapshot: TelemetryStore): string {
       tone: relative ? 'neutral' : 'warn',
       title: snapshot.lastEventAt ?? 'Never',
     },
-    { label: pluralize(totalEvents, { one: l10n('telemetry.totalEventOne'), other: l10n('telemetry.totalEventOther') }) },
+    { label: pluralize(totalEvents, { one: l10n('telemetry.totalEventOne'), other: l10n('telemetry.totalEventOther') }) }, // l10n:passthrough
   ]);
   const heroHtml = buildDashboardHero({
     title: l10n('telemetry.heroTitle'),

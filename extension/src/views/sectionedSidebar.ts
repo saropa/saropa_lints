@@ -228,8 +228,18 @@ function invalidateSharedCache(): void {
 // ── Per-view item builders ────────────────────────────────────────────────
 
 /**
- * Banner now covers exactly one case: the project doesn't depend on
- * saropa_lints yet, so there is nothing else in the sidebar to click.
+ * Banner covers two cases, both gated by the view's own `when` clause
+ * (`saropaLints.needsBanner || !saropaLints.isDartProject`):
+ *   (a) no Dart project is open at all (no pubspec.yaml found) — handled by
+ *       VS Code's native `viewsWelcome` contribution (package.json, `when:
+ *       "!saropaLints.isDartProject"`), NOT by a tree row: `viewsWelcome`
+ *       content only renders while its view's tree is genuinely empty, so
+ *       this branch must keep returning `[]` (verified against the existing
+ *       "contributes viewsWelcome on the Banner view for non-Dart projects"
+ *       test in uxLabels.test.ts — pushing a row here would suppress that
+ *       richer welcome screen, not add to it; checked before touching this
+ *       during the empty-state audit, PHASE1_BADGES_AND_EMPTY_STATES);
+ *   (b) a Dart project is open but doesn't depend on saropa_lints yet.
  * The "dependency present but integration off" case moved to Status's
  * Lint integration row (see appendLintIntegrationRow) — once the
  * dependency exists, the on/off state belongs next to Health and
@@ -461,7 +471,24 @@ function appendHealthRow(
     // computeLiveHealthScore's doc comment for why the score can't be purely
     // live-sourced.
     const health = computeLiveHealthScore(root, data);
-    if (!health) return;
+    if (!health) {
+        // computeLiveHealthScore returns null when reports/.saropa_lints/
+        // violations.json has never been written (no `filesAnalyzed`) — i.e.
+        // analysis has never run for this project (empty-state audit, case
+        // c: "analysis never run"). This row used to just vanish here,
+        // leaving Status silently missing its first and most important row
+        // with zero explanation. Show a row that says so and reuses the same
+        // run command Settings' action row and the Quick Actions row use, so
+        // the fix is one click away from the message that explains it.
+        items.push(new LeafItem(
+            l10n('status.health.neverRunLabel'),
+            l10n('status.health.neverRunDescription'),
+            'saropaLints.runAnalysis',
+            'pulse',
+            new vscode.ThemeColor('descriptionForeground'),
+        ));
+        return;
+    }
     const prevScore = findPreviousScore(history);
     const delta = prevScore !== undefined ? formatScoreDelta(health.score, prevScore) : '';
     const item = new LeafItem(
@@ -680,7 +707,20 @@ export class FlatSectionProvider implements vscode.TreeDataProvider<SectionNode>
     constructor(
         public readonly viewId: string,
         private readonly buildItems: () => SectionNode[],
+        // Optional view-level badge builder (live sidebar badges, Phase 1).
+        // VS Code's TreeView API only supports ONE badge per VIEW
+        // (`TreeView.badge`, a `ViewBadge {value, tooltip}` rendered on the
+        // view's icon in the Activity Bar) — there is no `TreeItem.badge`
+        // for individual rows, so a section carries at most one summary
+        // count, not a badge per row. Sections with no meaningful single
+        // count (Banner, Settings) simply omit this builder.
+        private readonly buildBadge?: () => vscode.ViewBadge | undefined,
     ) {}
+
+    /** Compute this section's view-level badge, or undefined to clear it. */
+    getBadge(): vscode.ViewBadge | undefined {
+        return this.buildBadge?.();
+    }
 
     refresh(): void {
         invalidateSharedCache();
@@ -732,12 +772,59 @@ export function createSidebarSectionProviders(
 ): FlatSectionProvider[] {
     return [
         new FlatSectionProvider(SECTION_VIEW_IDS.banner, () => buildBannerItems()),
-        new FlatSectionProvider(SECTION_VIEW_IDS.editorDashboards, () => buildEditorDashboardItems()),
+        new FlatSectionProvider(
+            SECTION_VIEW_IDS.editorDashboards,
+            () => buildEditorDashboardItems(),
+            () => computeDashboardsBadge(),
+        ),
         // Merged Actions + Settings + Triage panel, placed at the former Actions
         // slot (above Status) so the run/initialize operations stay prominent.
         new FlatSectionProvider(SECTION_VIEW_IDS.settings, () => buildSettingsItems(configProvider)),
-        new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState, configProvider)),
+        new FlatSectionProvider(
+            SECTION_VIEW_IDS.status,
+            () => buildStatusItems(workspaceState, configProvider),
+            () => computeStatusBadge(workspaceState),
+        ),
     ];
+}
+
+/**
+ * Dashboards view badge: count of packages with unadopted changelog features
+ * (same "needles" the Package Dashboard row's description already surfaces —
+ * see `countAdoptionNeedles`). Undefined (no badge) when there is nothing to
+ * adopt, rather than a distracting "0" pill.
+ */
+function computeDashboardsBadge(): vscode.ViewBadge | undefined {
+    const needles = countAdoptionNeedles();
+    if (needles <= 0) return undefined;
+    return {
+        value: needles,
+        tooltip: l10n('dashboards.badge.needlesTooltip', { count: String(needles) }),
+    };
+}
+
+/**
+ * Status view badge: critical (error-severity) violation count when any
+ * exist, else the total violation count, else undefined (clean project or no
+ * analysis has run yet — matches the Health row's own "no badge when there
+ * is nothing to flag" behavior). Reads the same filtered/live snapshot the
+ * Health row's description is built from, so the two can never disagree.
+ */
+function computeStatusBadge(workspaceState: vscode.Memento): vscode.ViewBadge | undefined {
+    const loaded = loadFilteredViolations(workspaceState);
+    if (!loaded) return undefined;
+    const { data } = loaded;
+    const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
+    if (total <= 0) return undefined;
+    // Was data.summary.byImpact.critical (5-bucket taxonomy retired 2026-05-03).
+    const critical = data.summary?.byImpact?.error ?? 0;
+    if (critical > 0) {
+        return {
+            value: critical,
+            tooltip: l10n('status.badge.criticalTooltip', { critical: String(critical), total: String(total) }),
+        };
+    }
+    return { value: total, tooltip: l10n('status.badge.totalTooltip', { total: String(total) }) };
 }
 
 /**

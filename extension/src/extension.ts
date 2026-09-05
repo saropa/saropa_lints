@@ -46,6 +46,7 @@ import {
   createSidebarSectionProviders,
   SECTION_VIEW_IDS,
   updateSidebarSectionContext,
+  type SectionNode,
 } from './views/sectionedSidebar';
 import { showHelpHubQuickPick } from './views/helpHub';
 import { SummaryTreeProvider } from './views/summaryTree';
@@ -624,31 +625,45 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // inside each panel are flat leaves only — the panel title bar is the
   // only collapse handle, no chevrons appear next to rows.
   const sectionProviders = createSidebarSectionProviders(context.workspaceState, configProvider);
+  // Live sidebar badges (Phase 1, PHASE1_BADGES_AND_EMPTY_STATES): VS Code's
+  // TreeView API only exposes a badge on the `TreeView` handle returned by
+  // `createTreeView` (`treeView.badge = {value, tooltip}`), not on a
+  // `registerTreeDataProvider` registration or on individual `TreeItem`s. All
+  // sections below were switched from `registerTreeDataProvider` to
+  // `createTreeView` (previously only the Dashboards view used it, to set a
+  // version-stamped title) so every section CAN carry a badge; sections
+  // without a badge builder (see `FlatSectionProvider.getBadge`) simply get
+  // `undefined`, which clears/omits the badge instead of showing a stale one.
+  // Keyed by viewId so refreshAllSections can look up the right handle for
+  // each provider without threading extra state through FlatSectionProvider.
+  const sectionTreeViews = new Map<string, vscode.TreeView<SectionNode>>();
   const refreshAllSections = (): void => {
-    for (const p of sectionProviders) p.refresh();
+    for (const p of sectionProviders) {
+      p.refresh();
+      const treeView = sectionTreeViews.get(p.viewId);
+      if (treeView) treeView.badge = p.getBadge();
+    }
     updateSidebarSectionContext(context.workspaceState);
   };
   for (const provider of sectionProviders) {
+    const treeView = vscode.window.createTreeView(provider.viewId, {
+      treeDataProvider: provider,
+    });
     // The Dashboards panel (which now also hosts Help via its "..." overflow
     // menu) surfaces the installed version in its title. The version must NOT
     // be baked into the localized view name: that would freeze the string per
     // release, force a manual bump every version, and become a perpetual
     // missing translation in all 24 locales. Inject it at runtime via
-    // createTreeView().title so it tracks package.json automatically while
-    // the view name stays localized through package.nls. Other panels keep
-    // the lighter registerTreeDataProvider.
+    // `treeView.title` so it tracks package.json automatically while the view
+    // name stays localized through package.nls.
     if (provider.viewId === SECTION_VIEW_IDS.editorDashboards) {
-      const dashboardsView = vscode.window.createTreeView(provider.viewId, {
-        treeDataProvider: provider,
-      });
       const extVersion = (context.extension.packageJSON as { version: string }).version;
-      dashboardsView.title = `${l10n('sidebarShell.dashboardsViewTitle')} (v${extVersion})`;
-      context.subscriptions.push(dashboardsView);
-      continue;
+      treeView.title = `${l10n('sidebarShell.dashboardsViewTitle')} (v${extVersion})`;
     }
-    context.subscriptions.push(
-      vscode.window.registerTreeDataProvider(provider.viewId, provider),
-    );
+    // Set the initial badge — refreshAllSections keeps it current afterward.
+    treeView.badge = provider.getBadge();
+    sectionTreeViews.set(provider.viewId, treeView);
+    context.subscriptions.push(treeView);
   }
   updateSidebarSectionContext(context.workspaceState);
 

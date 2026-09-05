@@ -375,7 +375,7 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
     const dimensionsWithWinners = winners.length;
     const statusLineHtml = buildStatusLine([
         { glyph: '📦', label: l10n('comparison.status.packagesCompared', { count: String(packages.length) }) },
-        { label: pluralize(dimensionsWithWinners, { one: l10n('comparison.status.dimensionsRankedOne'), other: l10n('comparison.status.dimensionsRankedOther') }) },
+        { label: pluralize(dimensionsWithWinners, { one: l10n('comparison.status.dimensionsRankedOne'), other: l10n('comparison.status.dimensionsRankedOther') }) }, // l10n:passthrough
         {
             label: packages.map(p => p.name).slice(0, 3).join(' vs ') + (packages.length > 3 ? ` ${l10n('comparison.status.morePackages', { count: String(packages.length - 3) })}` : ''),
             title: packages.map(p => p.name).join(', '),
@@ -454,7 +454,7 @@ function buildKpiRow(
         <div class="kpi-card" title="${l10n('comparison.kpi.leadingTitle')}">
             <span class="kpi-k">${l10n('comparison.kpi.leading')}</span>
             <span class="kpi-v" style="font-size: 1.4em;">${escapeHtml(leaderName)}</span>
-            <span class="kpi-sub">${pluralize(leaderWins, { one: l10n('comparison.kpi.dimensionWinsOne'), other: l10n('comparison.kpi.dimensionWinsOther') })}</span>
+            <span class="kpi-sub">${pluralize(leaderWins, { one: l10n('comparison.kpi.dimensionWinsOne'), other: l10n('comparison.kpi.dimensionWinsOther') })}</span> <!--l10n:passthrough-->
         </div>
         <div class="kpi-card" title="${l10n('comparison.kpi.packagesTitle')}">
             <span class="kpi-k">${l10n('comparison.kpi.packages')}</span>
