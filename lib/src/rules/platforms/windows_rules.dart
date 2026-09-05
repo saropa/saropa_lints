@@ -87,8 +87,7 @@ bool _isBothSidesString(BinaryExpression node) {
       node.rightOperand is IntegerLiteral) {
     return false;
   }
-  if (node.leftOperand is DoubleLiteral ||
-      node.rightOperand is DoubleLiteral) {
+  if (node.leftOperand is DoubleLiteral || node.rightOperand is DoubleLiteral) {
     return false;
   }
 
