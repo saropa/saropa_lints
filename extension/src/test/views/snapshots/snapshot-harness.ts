@@ -49,13 +49,17 @@ export function normalizeForSnapshot(html: string): string {
   // Case-insensitive to satisfy CodeQL js/bad-tag-filter (catches `<SCRIPT>`).
   // This is snapshot normalization, not security sanitization — but the `i`
   // flag is correct regardless and costs nothing.
-  const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi;
+  // Allow optional whitespace before closing `>` so CodeQL's
+  // js/bad-tag-filter check passes (it flags `</script>` as not
+  // matching `</script >`).
+  const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script\s*>/gi;
   s = s.replace(scriptPattern, '<script><STRIPPED></script>');
 
   // Inline <style>...</style> blocks: same rationale. Token matrix covers
   // theme bindings; this snapshot covers HTML structure.
   // Case-insensitive for the same reason as the script pattern above.
-  s = s.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '<style><STRIPPED></style>');
+  // Same whitespace-before-`>` fix as the script pattern above.
+  s = s.replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, '<style><STRIPPED></style>');
 
   // ISO timestamps (or anything matching the pattern).
   s = s.replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?\b/g, '<TS>');

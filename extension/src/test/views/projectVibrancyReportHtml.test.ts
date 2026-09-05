@@ -24,7 +24,9 @@ import type { ProjectVibrancyPayload } from '../../views/projectVibrancyTypes';
  * either the JSON block or extract+execute the JS helpers.
  */
 function extractRowData(html: string): unknown[] {
-  const m = html.match(/<script id="pvRowData"[^>]*>([\s\S]*?)<\/script>/);
+  // Case-insensitive + whitespace-tolerant closing tag to satisfy CodeQL
+  // js/bad-tag-filter. This is test extraction, not security sanitization.
+  const m = html.match(/<script id="pvRowData"[^>]*>([\s\S]*?)<\/script\s*>/i);
   if (!m) throw new Error('row data script not found');
   return JSON.parse(m[1]) as unknown[];
 }

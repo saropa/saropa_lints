@@ -7,7 +7,19 @@
  * pass) the shared '?' keyboard-shortcuts overlay. These tests pin the HTML
  * shape so a future refactor of the shell cannot silently drop a tab, an aria
  * attribute, or the overlay wiring.
+ *
+ * WP2 (plans/PLAN_ext_ui_dart_deferred.md) made `projectMapShell.ts` import
+ * the real (value, not `type`) `reportJsonColumnsForScript` from
+ * `projectMapReports.ts` to embed the typed-table column map into the client
+ * script — and `projectMapReports.ts` transitively requires the real
+ * 'vscode' module at runtime (via `devCliRoot.ts`'s
+ * `vscode.extensions.getExtension`), so this file no longer gets to skip the
+ * vscode mock the way it used to; the mock must be registered before the
+ * first import that pulls that chain in, same requirement
+ * `projectMapReports.test.ts` already documents.
  */
+import '../vibrancy/register-vscode-mock';
+
 import * as assert from 'node:assert';
 import type * as vscode from 'vscode';
 import {
@@ -19,10 +31,9 @@ import type { ProjectMapParts } from '../../views/projectMapView';
 
 /**
  * Minimal fake `vscode.Webview` — `buildShellHtml` only reads `.cspSource` to
- * build its CSP meta tag, so a full vscode-mock module is unnecessary here
- * (and `projectMapShell.ts` itself never imports 'vscode' at runtime: its
- * `vscode.Webview` parameter type is erased by TypeScript's import elision
- * since nothing in the module touches the `vscode` namespace at runtime).
+ * build its CSP meta tag, so a fake object literal is enough here even though
+ * the module now needs the real vscode mock registered globally (see the
+ * file doc comment above) for its OTHER transitive dependency.
  */
 function fakeWebview(): vscode.Webview {
   return { cspSource: 'vscode-webview://fake-csp-source' } as unknown as vscode.Webview;
@@ -73,7 +84,8 @@ describe('projectMapShell buildShellHtml', () => {
     const html = buildShellHtml(fakeWebview(), '', '');
     // Both scripts share one nonce-less <script> tag (unsafe-inline CSP) rather
     // than a second tag, so a script-src rule need not be duplicated.
-    const scriptMatches = html.match(/<script>/g) ?? [];
+    // Case-insensitive to satisfy CodeQL js/bad-tag-filter.
+    const scriptMatches = html.match(/<script>/gi) ?? [];
     assert.strictEqual(scriptMatches.length, 1, 'expected exactly one inline <script> tag');
     assert.ok(html.includes("e.key === '1'"));
     assert.ok(html.includes("e.key === '2'"));
@@ -95,6 +107,32 @@ describe('projectMapShell buildScanningMapPaneHtml', () => {
     const html = buildScanningMapPaneHtml();
     assert.ok(/id="pmScanLogEmpty"[^>]*>/.test(html));
     assert.ok(/id="pmScanLogWrap"[^>]* hidden/.test(html), 'log table must start hidden until a line arrives');
+  });
+
+  // WP1: the percentage progress bar. Starts hidden (see buildScanningMapPaneHtml's
+  // doc comment) so an engine that never emits --progress events (a published
+  // saropa_lints predating WP1) degrades to the previous elapsed-timer-only view
+  // instead of showing a permanently-stuck 0% bar.
+  it('renders the progress bar hidden with a 0-100 aria progressbar and starts at 0%', () => {
+    const html = buildScanningMapPaneHtml();
+    assert.ok(/id="pmProgressWrap"[^>]* hidden/.test(html), 'progress bar must start hidden');
+    assert.ok(html.includes('role="progressbar"'));
+    assert.ok(html.includes('aria-valuemin="0"'));
+    assert.ok(html.includes('aria-valuemax="100"'));
+    assert.ok(html.includes('aria-valuenow="0"'));
+    assert.ok(html.includes('id="pmProgressFill"'));
+    assert.ok(html.includes('id="pmProgressLabel"'));
+  });
+});
+
+describe('projectMapShell mapProgress client script', () => {
+  it('wires a message handler for the mapProgress event type', () => {
+    // Full DOM/event-loop behavior needs a real webview; this pins the wiring
+    // itself so a refactor can't silently drop the handler the same way the
+    // digit-shortcut test above pins the keydown wiring.
+    const html = buildShellHtml(fakeWebview(), '', '');
+    assert.ok(html.includes("msg.type === 'mapProgress'"));
+    assert.ok(html.includes('handleProgressEvent'));
   });
 });
 

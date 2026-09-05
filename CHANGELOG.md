@@ -154,7 +154,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Added fixture files for `no_internal_method_docs`, `prefer_state_class_below_widget`, and `prefer_sorted_equatable_props`. Extended `avoid_public_late_final_without_initializer` fixture with static and multi-variable edge cases.
 - Added `DeprecatedNewInCommentReferenceRule` instantiation test to the documentation rules test suite.
 - Fixed scan CLI silently excluding `example_packages/` fixtures: the hardcoded `/example` substring in `scan_runner.dart` matched `example_packages/`, the `--files` flag applied exclusions to explicitly named files, and `shouldSkipFile`'s fixture-skip exemption missed relative paths and `example_packages/`. Three-part fix: tightened the substring to `/example/`, bypassed exclusions when `--files` is explicitly provided, and added `startsWith` checks for relative paths.
-- Fixed two CodeQL `js/bad-tag-filter` alerts in test infrastructure: added `\s*` before closing `>` in the snapshot harness's script/style strip regexes (matches `</script >`), and added the `i` flag to the `projectMapShell.test.ts` script-tag count regex.
+- Fixed three CodeQL `js/bad-tag-filter` alerts (two reported, one preemptive) in test infrastructure: added `\s*` before closing `>` and `i` flags to script/style tag regexes in the snapshot harness, `projectMapShell.test.ts`, and `projectVibrancyReportHtml.test.ts`.
 
 ---
 
