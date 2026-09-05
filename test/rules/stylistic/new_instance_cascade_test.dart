@@ -223,7 +223,7 @@ void build() {
   controller.addListener(() {});
 }
 ''');
-        expect(codes.where((c) => c == 'new_instance_cascade').length, 1);
+        expect(codes.where((c) => c == 'new_instance_cascade'), hasLength(1));
       },
     );
 

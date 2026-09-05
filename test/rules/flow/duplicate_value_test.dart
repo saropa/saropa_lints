@@ -118,7 +118,7 @@ void main() {
         DuplicateValueRule(),
         _fixture('a == 1 && b == 2 && c == 3 && a == 1'),
       );
-      expect(diags.where((d) => d.ruleName == 'duplicate_value').length, 1);
+      expect(diags.where((d) => d.ruleName == 'duplicate_value'), hasLength(1));
     });
   });
 

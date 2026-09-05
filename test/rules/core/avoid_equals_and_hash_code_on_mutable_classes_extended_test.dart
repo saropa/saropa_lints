@@ -66,7 +66,7 @@ class Point {
       );
       // x is declared on line 3, y on line 4.
       expect(ownRule.map((d) => d.line), containsAll(<int>[3, 4]));
-      expect(ownRule.length, 2);
+      expect(ownRule, hasLength(2));
     });
 
     test('does NOT fire when all fields are final (GOOD)', () async {

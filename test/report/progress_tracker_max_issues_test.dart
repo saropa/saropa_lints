@@ -49,7 +49,7 @@ class FiveMethods {
     // documented semantics on ProgressTracker.recordViolation), so the
     // 3rd violation is the one that flips isLimitReached — it still
     // reports, and the 4th/5th are withheld.
-    expect(diags.length, 3);
+    expect(diags, hasLength(3));
     expect(ProgressTracker.isLimitReached, isTrue);
     expect(ProgressTracker.reportData.violationsFound, 5);
   });
@@ -67,7 +67,7 @@ class FiveMethods {
 }
 ''');
 
-    expect(diags.length, 5);
+    expect(diags, hasLength(5));
     expect(ProgressTracker.isLimitReached, isFalse);
   });
 }
