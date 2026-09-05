@@ -112,24 +112,26 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
   }
 
   /**
-   * Lint integration, Analyzer plugin, and Tier — the 3 core diagnostic
-   * controls now surfaced in the Diagnostics sidebar section.
+   * Analyzer plugin, Tier, and Lane — diagnostic controls surfaced in the
+   * Settings sidebar section. "Lint integration" and "Process health" used
+   * to be two more rows here, but both are now pure duplicates: Lint
+   * integration merged into the Status section's own row (see
+   * appendLintIntegrationRow in sectionedSidebar.ts — same enable/disable
+   * commands, same on/off state, now shown once instead of twice), and
+   * Process health is the exact same "saropaLints.showProcessHealth" command
+   * the Status section's Engines row already opens on click. Removing them
+   * here is the PLAN_extension_ui_redesign.md §2.1 collapse, not a feature
+   * cut — Process health is still one click away via Command Catalog for
+   * the (debug-disabled) case where the Engines row itself doesn't render.
    */
   private buildDiagnosticControlNodes(): ConfigTreeNode[] {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
-    const enabled = cfg.get<boolean>('enabled', true) ?? true;
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
     const root = getProjectRoot();
     return [
-      setting(
-        'Lint integration',
-        enabled ? 'On' : 'Off',
-        enabled ? 'saropaLints.disable' : 'saropaLints.enable',
-        enabled ? 'check' : 'circle-slash',
-      ),
-      // The in-process analyzer plugin is a SEPARATE subsystem from the row
-      // above: "Lint integration" gates scan-on-save delivery, this gates the
-      // plugins: block the Dart analysis server reads for live in-editor
+      // The in-process analyzer plugin is a SEPARATE subsystem from "Lint
+      // integration": that setting gates scan-on-save delivery, this gates
+      // the plugins: block the Dart analysis server reads for live in-editor
       // squiggles. Reporting only the first one made the sidebar claim
       // "Lint integration: On" over an analysis_options.yaml whose plugins
       // block was commented out, which reads as the extension lying.
@@ -146,17 +148,6 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       // detailed items is the right amount of UI — same reasoning that used to
       // apply to Tier before it grew a dedicated dashboard section.
       ...this.buildLaneNode(root),
-      // The Analyzer Plugin / LSP Server / Scan Daemon ON/OFF toggles live in
-      // the Health Panel (`saropaLints.showProcessHealth`), but until this row
-      // existed that command had no reachable UI path at all — Command
-      // Palette only. Every diagnostic-affecting control in this sidebar
-      // section gets a click target; this was the one exception.
-      setting(
-        l10n('dashboards.controls.processHealth'),
-        l10n('dashboards.controls.processHealthOpen'),
-        'saropaLints.showProcessHealth',
-        'pulse',
-      ),
     ];
   }
 

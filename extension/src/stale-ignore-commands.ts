@@ -81,6 +81,17 @@ export function registerStaleIgnoreCommands(
     ),
   );
 
+  // Sidebar-only merged action: finds first (so the confirm dialog can show
+  // a real count), then fixes — replaces what used to be two separate
+  // sidebar rows (Find, then Fix). The palette keeps the two commands above
+  // separate since a palette user typing "find" or "fix" wants exactly one
+  // of them, not a combined flow.
+  context.subscriptions.push(
+    vscode.commands.registerCommand('saropaLints.findAndFixStaleIgnores', () =>
+      runFindAndFixStaleIgnores(),
+    ),
+  );
+
   // Fix stale ignores in a single file — no confirmation dialog, since this
   // is invoked from a lightbulb quick fix on one diagnostic rather than a
   // bulk sidebar/palette action. Lower blast radius (one file, already
@@ -259,6 +270,52 @@ async function runFixStaleIgnores(): Promise<void> {
   void vscode.window.showInformationMessage(
     l10n('staleIgnores.info.fixed'),
   );
+}
+
+/**
+ * Sidebar's merged "Fix stale ignores" row: runs the find scan first (same
+ * as `runFindStaleIgnores`, publishing diagnostics either way), then either
+ * reports "none found" or continues straight into the same confirm+fix flow
+ * `runFixStaleIgnores` uses — but with the confirm dialog showing the real
+ * count from the scan just run, instead of a generic "this will remove
+ * stale ignores" with no number. One row instead of two: the old "Find"
+ * row's only purpose was letting the user learn whether "Fix" was worth
+ * clicking.
+ */
+async function runFindAndFixStaleIgnores(): Promise<void> {
+  const root = getWorkspaceRootOrError();
+  if (!root) return;
+  if (!ensureSaropaDependency(root)) return;
+
+  const jsonPath = path.join(saropaLintsDataPath(root), 'stale_ignores.json');
+  const scan = await runFindScan(root, jsonPath, l10n('staleIgnores.progress.finding'));
+  if (scan === null) return; // Cancelled or a genuine error already reported.
+
+  publishDiagnostics(scan.staleIgnores);
+
+  if (scan.summary.totalCount === 0) {
+    void vscode.window.showInformationMessage(l10n('staleIgnores.info.noneFound'));
+    return;
+  }
+
+  const confirmLabel = l10n('staleIgnores.confirm.fixAction');
+  const choice = await vscode.window.showWarningMessage(
+    l10n('staleIgnores.confirm.fixMessageWithCount', { count: String(scan.summary.totalCount) }),
+    { modal: true },
+    confirmLabel,
+  );
+  if (choice !== confirmLabel) return;
+
+  const result = await runFixScan(root, l10n('staleIgnores.progress.fixing'));
+  if (result === null) return; // Cancelled.
+
+  if (!result.ok) {
+    void showFixFailure(result);
+    return;
+  }
+
+  getDiagnosticCollection().clear();
+  void vscode.window.showInformationMessage(l10n('staleIgnores.info.fixed'));
 }
 
 // ── Fix stale ignores (single file, from a quick fix) ───────────────────────

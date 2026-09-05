@@ -22,6 +22,7 @@ import * as suppressionsStore from '../../suppressionsStore';
 import * as runHistory from '../../runHistory';
 import { HealthPanel } from '../../systemHealth/healthPanel';
 import type { EngineStatus } from '../../systemHealth/engineCardsHtml';
+import { setTestConfig, clearTestConfig } from '../vibrancy/vscode-mock';
 
 import { ConfigTreeProvider } from '../../views/configTree';
 import { createSidebarSectionProviders, SECTION_VIEW_IDS } from '../../views/sectionedSidebar';
@@ -42,6 +43,13 @@ class MockMemento {
 function fakeEngine(key: EngineStatus['key'], enabled: boolean, status: string): EngineStatus {
   return { key, name: key, enabled, status };
 }
+
+type TestLeaf = {
+  label?: { label: string } | string;
+  description?: string;
+  command?: { command: string };
+  iconPath?: { color?: { id: string } };
+};
 
 describe('sidebar Status section — Engines row', () => {
   beforeEach(() => {
@@ -82,13 +90,6 @@ describe('sidebar Status section — Engines row', () => {
     assert.ok(status, 'status provider must exist');
     return status!.getChildren();
   }
-
-  type TestLeaf = {
-    label?: { label: string } | string;
-    description?: string;
-    command?: { command: string };
-    iconPath?: { color?: { id: string } };
-  };
 
   function findEnginesRow(items: unknown[]): TestLeaf | undefined {
     return (items as TestLeaf[]).find((i) => {
@@ -148,5 +149,74 @@ describe('sidebar Status section — Engines row', () => {
     const enginesRow = findEnginesRow(getStatusItems());
 
     assert.strictEqual(enginesRow, undefined, 'Engines row must not appear when engines are not configured');
+  });
+});
+
+/**
+ * Pins the Status section's merged "Lint integration" row — moved in from
+ * the Banner view and the Settings panel's diagnostics block, which each
+ * used to carry their own copy (PLAN_extension_ui_redesign.md §2.1).
+ */
+describe('sidebar Status section — Lint integration row', () => {
+  beforeEach(() => {
+    sinon.restore();
+    clearTestConfig();
+    sinon.stub(projectRoot, 'getProjectRoot').returns('/fake/root');
+    sinon.stub(pubspecReader, 'hasSaropaLintsDep').returns(true);
+    sinon.stub(liveViolationsData, 'readVisibleLiveViolations').returns({
+      violations: [],
+      summary: { totalViolations: 0 },
+    });
+    sinon.stub(liveViolationsData, 'computeLiveHealthScore').returns(null);
+    sinon.stub(suppressionsStore, 'loadSuppressions').returns({
+      hiddenFiles: [],
+      hiddenFolders: [],
+      hiddenRules: [],
+      hiddenRuleInFile: {},
+      hiddenSeverities: [],
+      hiddenImpacts: [],
+    });
+    sinon.stub(runHistory, 'loadHistory').returns([]);
+    sinon.stub(HealthPanel, 'getEngineStatuses').returns(undefined);
+  });
+
+  afterEach(() => {
+    sinon.restore();
+    clearTestConfig();
+  });
+
+  function getStatusItems(): unknown[] {
+    const providers = createSidebarSectionProviders(
+      new MockMemento() as unknown as Parameters<typeof createSidebarSectionProviders>[0],
+      new ConfigTreeProvider(),
+    );
+    const status = providers.find((p) => p.viewId === SECTION_VIEW_IDS.status);
+    assert.ok(status, 'status provider must exist');
+    return status!.getChildren();
+  }
+
+  function findLintIntegrationRow(items: unknown[]): TestLeaf | undefined {
+    return (items as TestLeaf[]).find((i) => {
+      const label = typeof i.label === 'string' ? i.label : i.label?.label;
+      return typeof label === 'string' && label.startsWith('Lint integration:');
+    });
+  }
+
+  it('shows "On" and a disable command when saropaLints.enabled is true', () => {
+    setTestConfig('saropaLints', 'enabled', true);
+    const row = findLintIntegrationRow(getStatusItems());
+    assert.ok(row, 'Lint integration row must be present');
+    const label = typeof row!.label === 'string' ? row!.label : row!.label?.label;
+    assert.strictEqual(label, 'Lint integration: On');
+    assert.strictEqual(row!.command?.command, 'saropaLints.disable');
+  });
+
+  it('shows "Off" and an enable command when saropaLints.enabled is false', () => {
+    setTestConfig('saropaLints', 'enabled', false);
+    const row = findLintIntegrationRow(getStatusItems());
+    assert.ok(row, 'Lint integration row must be present');
+    const label = typeof row!.label === 'string' ? row!.label : row!.label?.label;
+    assert.strictEqual(label, 'Lint integration: Off');
+    assert.strictEqual(row!.command?.command, 'saropaLints.enable');
   });
 });

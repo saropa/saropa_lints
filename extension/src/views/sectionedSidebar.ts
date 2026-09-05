@@ -201,27 +201,23 @@ function invalidateSharedCache(): void {
 
 // ── Per-view item builders ────────────────────────────────────────────────
 
+/**
+ * Banner now covers exactly one case: the project doesn't depend on
+ * saropa_lints yet, so there is nothing else in the sidebar to click.
+ * The "dependency present but integration off" case moved to Status's
+ * Lint integration row (see appendLintIntegrationRow) — once the
+ * dependency exists, the on/off state belongs next to Health and
+ * Engines, not in a separate banner view.
+ */
 function buildBannerItems(): LeafItem[] {
     const root = getProjectRoot();
     if (!root) return [];
-    const cfg = vscode.workspace.getConfiguration('saropaLints');
-    const enabled = cfg.get<boolean>('enabled', true) ?? true;
-
     if (!hasSaropaLintsDep(root)) {
         return [new LeafItem(
             'Set Up Project',
             'Add saropa_lints to pubspec + configure analysis',
             'saropaLints.enable',
             'rocket',
-            new vscode.ThemeColor('list.warningForeground'),
-        )];
-    }
-    if (!enabled) {
-        return [new LeafItem(
-            'Lint integration: Off',
-            'Set up pubspec + analysis_options',
-            'saropaLints.enable',
-            'warning',
             new vscode.ThemeColor('list.warningForeground'),
         )];
     }
@@ -242,6 +238,20 @@ function countAdoptionNeedles(): number {
     ).length;
 }
 
+/**
+ * The six first-class dashboards. Analysis Optimizer, Upgrade Opportunities,
+ * and the Feature Inventory export are deliberately NOT separate rows here
+ * any more — they render as tabs inside Rules & Tiers (Analysis Optimizer,
+ * embedded per rulePacksWebviewProvider.ts's getEmbeddedBodyHtml) and inside
+ * the Package Dashboard (Upgrades / Full report tabs, packages-tabs.ts).
+ * A standalone sidebar row pointing at content one tab-click away inside a
+ * dashboard this list already links to was the same kind of duplication the
+ * "Saropa Dashboards" home hub was removed for (see CHANGELOG.md, commit
+ * ea2c7a8e) — moved, not deleted: both features are still reachable, just
+ * from inside the dashboard that now owns them. Command Catalog moved to the
+ * Settings panel's action rows (all commands belongs with "run analysis",
+ * not the list of dashboards).
+ */
 function buildEditorDashboardItems(): LeafItem[] {
     // Append a needle count to the Package Dashboard row when the last scan
     // found unadopted features, so under-used dependencies are visible at a
@@ -259,38 +269,11 @@ function buildEditorDashboardItems(): LeafItem[] {
             new vscode.ThemeColor('activityBarBadge.foreground'),
         ),
         new LeafItem(
-            l10n('analysisOptimizer.sidebar.label'),
-            l10n('analysisOptimizer.sidebar.description'),
-            'saropaLints.openAnalysisOptimizer',
-            'zap',
-            new vscode.ThemeColor('charts.yellow'),
-        ),
-        new LeafItem(
             'Package Dashboard',
             packageDesc,
             'saropaLints.packageVibrancy.showReport',
             'package',
             new vscode.ThemeColor('charts.green'),
-        ),
-        // Dedicated focused list of dependencies with unadopted features. Only
-        // shown once a scan has surfaced at least one, so it does not advertise
-        // an empty view.
-        ...(needles > 0 ? [new LeafItem(
-            'Upgrade Opportunities',
-            `${needles} ${needles === 1 ? 'package' : 'packages'} with features to adopt`,
-            'saropaLints.packageVibrancy.showOpportunities',
-            'rocket',
-            new vscode.ThemeColor('charts.blue'),
-        )] : []),
-        // The exhaustive export: every package and every changelog feature with
-        // usage counted from zero upward. Unlike the panel above it is not gated
-        // on unadopted features — a fully-adopted project is a valid report.
-        new LeafItem(
-            l10n('featureInventory.sidebar.label'),
-            l10n('featureInventory.sidebar.description'),
-            'saropaLints.packageVibrancy.exportOpportunitiesReport',
-            'export',
-            new vscode.ThemeColor('charts.blue'),
         ),
         new LeafItem(
             'Code Health Dashboard',
@@ -321,13 +304,6 @@ function buildEditorDashboardItems(): LeafItem[] {
             'shield',
             new vscode.ThemeColor('charts.red'),
         ),
-        new LeafItem(
-            'Command Catalog',
-            'Search all commands',
-            'saropaLints.showCommandCatalog',
-            'symbol-event',
-            new vscode.ThemeColor('charts.purple'),
-        ),
     ];
 }
 
@@ -351,24 +327,22 @@ function buildActionItems(): LeafItem[] {
             'saropaLints.initializeConfig',
             'gear',
         ),
-        // Stale ignore detection and cleanup — surfaces the CLI's
-        // --find-stale-ignores / --fix-stale-ignores as clickable sidebar rows
-        // so the feature is discoverable without knowing CLI flags. No extra
+        // Stale ignore detection and cleanup — was two rows (Find, then Fix)
+        // requiring the user to run Find first to learn whether Fix was even
+        // needed. One row now: it finds first, reports the count via the
+        // existing confirm dialog, and only proceeds to the (destructive)
+        // fix after that confirmation — see runFindAndFixStaleIgnores in
+        // stale-ignore-commands.ts. The separate `findStaleIgnores` /
+        // `fixStaleIgnores` commands stay registered for the command palette
+        // and the per-file quick fix; only the sidebar row merged. No extra
         // `when` gating needed here: the whole Settings VIEW (package.json
         // "saropaLints.settings") already requires saropaLints.isDartProject,
-        // so these rows are hidden together with the rest of the panel on
+        // so this row is hidden together with the rest of the panel on
         // non-Dart projects — no separate enablement check required.
-        new LeafItem(
-            l10n('staleIgnores.sidebar.findLabel'),
-            l10n('staleIgnores.sidebar.findDescription'),
-            'saropaLints.findStaleIgnores',
-            'search-remove',
-            new vscode.ThemeColor('charts.orange'),
-        ),
         new LeafItem(
             l10n('staleIgnores.sidebar.fixLabel'),
             l10n('staleIgnores.sidebar.fixDescription'),
-            'saropaLints.fixStaleIgnores',
+            'saropaLints.findAndFixStaleIgnores',
             'trash',
             new vscode.ThemeColor('charts.red'),
         ),
@@ -385,6 +359,18 @@ function buildActionItems(): LeafItem[] {
         // custom analyzer rules alongside Saropa) and the term is jargon to
         // everyone else. It remains discoverable via the command palette,
         // the command catalog, the CLI flag, and the guide.
+        //
+        // Command Catalog moved here from the Dashboards section — it is an
+        // action ("search all commands"), not a dashboard, and Quick Actions
+        // is where the plan's target IA (PLAN_extension_ui_redesign.md §2.1)
+        // puts the "All commands…" escape hatch.
+        new LeafItem(
+            'Command Catalog',
+            'Search all commands',
+            'saropaLints.showCommandCatalog',
+            'symbol-event',
+            new vscode.ThemeColor('charts.purple'),
+        ),
     ];
 }
 
@@ -395,10 +381,17 @@ function buildActionItems(): LeafItem[] {
 
 // ── Status section builders ───────────────────────────────────────────────
 
-function healthScoreDescription(delta: string, total: number): string {
+/**
+ * Folds in what used to be a separate "N critical, M total" row: on a first
+ * run (no score delta yet) the description carries the same critical/total
+ * breakdown that row showed, so removing it loses no information — it was
+ * otherwise pure duplication of the total this row already renders (see
+ * PLAN_extension_ui_redesign.md §2.1, "one job per row").
+ */
+function healthScoreDescription(delta: string, total: number, critical: number): string {
     if (delta) return `${delta} from last run`;
     if (total === 0) return 'No violations';
-    return `${total} violations`;
+    return critical > 0 ? `${critical} critical, ${total} total` : `${total} violations`;
 }
 
 function appendHealthRow(
@@ -406,6 +399,7 @@ function appendHealthRow(
     history: ReturnType<typeof loadHistory>,
     data: ViolationsData,
     total: number,
+    critical: number,
     root: string,
 ): void {
     // Live severity counts, cached-report file-count denominator — see
@@ -417,26 +411,9 @@ function appendHealthRow(
     const delta = prevScore !== undefined ? formatScoreDelta(health.score, prevScore) : '';
     items.push(new LeafItem(
         `Health: ${health.score}`,
-        healthScoreDescription(delta, total),
+        healthScoreDescription(delta, total, critical),
         'saropaLints.focusIssues',
         'pulse',
-    ));
-}
-
-function appendViolationCountRow(items: LeafItem[], total: number, critical: number): void {
-    if (total > 0) {
-        const issueLabel = critical > 0
-            ? `${critical} critical, ${total} total`
-            : `${total} violations`;
-        items.push(new LeafItem(
-            issueLabel, 'View in Findings', 'saropaLints.focusIssues',
-            'warning', new vscode.ThemeColor('list.warningForeground'),
-        ));
-        return;
-    }
-    items.push(new LeafItem(
-        'No violations', 'All clear', 'saropaLints.focusIssues',
-        'pass', new vscode.ThemeColor('testing.iconPassed'),
     ));
 }
 
@@ -485,6 +462,25 @@ function appendEnginesRow(items: LeafItem[]): void {
         'saropaLints.showProcessHealth',
         'server-process',
         color,
+    ));
+}
+
+/**
+ * "Lint integration: On/Off" row — merged in from what used to be a
+ * dedicated Banner-view row (only shown when off) plus a duplicate toggle
+ * buried in the Settings panel's diagnostics block (always shown). One row,
+ * always shown once a project has the saropa_lints dependency, single click
+ * toggles it (same enable/disable commands both prior locations used) — see
+ * PLAN_extension_ui_redesign.md §2.1's 3-row Status target.
+ */
+function appendLintIntegrationRow(items: LeafItem[]): void {
+    const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
+    items.push(new LeafItem(
+        enabled ? 'Lint integration: On' : 'Lint integration: Off',
+        enabled ? 'Click to disable' : 'Click to enable',
+        enabled ? 'saropaLints.disable' : 'saropaLints.enable',
+        enabled ? 'check' : 'circle-slash',
+        enabled ? undefined : new vscode.ThemeColor('list.warningForeground'),
     ));
 }
 
@@ -577,9 +573,9 @@ function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
         hotspotReviewState,
     );
 
-    appendHealthRow(items, history, data, total, root);
+    appendHealthRow(items, history, data, total, critical, root);
     appendEnginesRow(items);
-    appendViolationCountRow(items, total, critical);
+    appendLintIntegrationRow(items);
     if (hotspotCounts.total > 0) {
         const reviewed = hotspotCounts.reviewedSafe + hotspotCounts.reviewedFixed;
         const percent = Math.round((reviewed / hotspotCounts.total) * 100);

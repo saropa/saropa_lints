@@ -1,6 +1,7 @@
 # Extension UI Redesign — sidebar + dashboards to 10/10
 
-**Created:** 2026-09-03 · **Status:** Planned, not started
+**Created:** 2026-09-03 · **Status:** Phases 0–7 largely landed; §2.1's row-count target still open
+(see the 2026-09-04 correction below and the Finish Reports at the end of this file).
 **Trigger:** Screenshot of the sidebar in the kykto project (v15.2.12): 6 stacked sections, 35 flat
 rows, mixed verbs/nouns/settings/toggles, a raw "DIAGNOSTIC ENGINES" debug webview at the bottom,
 and the single most important fact ("Lint integration: Off") shown as a warning row with no
@@ -10,6 +11,25 @@ the CLI-only features are catalogued in the appendix. Do not re-inventory.
 **Relationship to `PLAN_central_dashboard_consolidation.md`:** that plan defines what folds into
 the findings hub (lists A–D). This plan defines the *navigation shell* around it. They do not
 conflict; Phase 3 here consumes its list C ("summarize + deep-link").
+
+**Correction (2026-09-04, later same day, verified against git history and the current codebase
+— NOT trusted from this file's own prior claims):** Phase 3's "Home hub" — this file's §2.2 row
+for `saropaDashboardsView.ts`, and the `⌂ Home` row in §2.1's sidebar mock — was built, then
+**deliberately removed** in commit `ea2c7a8e` ("feat: remove Saropa Dashboards home hub... The
+Home hub duplicated the sidebar and each dashboard's own settings without adding anything a
+dashboard couldn't already show"). That commit is on `main`, an ancestor of every commit after it.
+The file (`extension/src/views/saropaDashboardsView.ts`) and its test are deleted; only a stale
+`out-ux/` build artifact remains. Every place that used to open the hub (status bar, the former
+Dashboards-section entry point) now opens **Findings** (`saropaLints.openViolationsWideReport`)
+instead — verified directly in `extension/src/extension.ts`'s `updateAllStatusBars`. Treat every
+"DONE" marker on Phase 3 below as **describing a design that was later reversed**, not current
+behavior. §2.1 and §2.2's target IA below are updated to remove Home; do not resurrect it without
+a fresh design rationale — the prior one was explicitly rejected as redundant.
+Also worth noting for future readers of this file: several other "DONE" claims in this document
+turned out, on direct verification, to not match the checked-in code (e.g. Phase 0's claimed
+`saropaLints.openDashboards` command does not exist under that name anywhere in `extension/src`).
+Verify against the actual source before relying on a phase's "DONE" status for anything beyond
+"a session believed this was true at the time."
 
 ---
 
@@ -47,48 +67,66 @@ conflict; Phase 3 here consumes its list C ("summarize + deep-link").
 
 ```
 SAROPA LINTS                                     [▶ Run] [⟳] [...]
-  ● Health 82 · 143 issues · ↓12 since yesterday      → Findings Dashboard
-  ● Engines  plugin live · daemon idle                 → Health Panel
-  ○ Lint integration OFF — click to enable           → enable (one click, then hides)
+  ● Health 82 · 12 critical, 143 total                 → Findings Dashboard
+  ● Engines  2 running                                  → Health Panel
+  ● Lint integration: On/Off                           → enable/disable (bidirectional, always shown)
 
 DASHBOARDS
-  ⌂ Home                 findings, health, packages   → Saropa Dashboards (hub)
   ⚙ Rules & Tiers        tier, packs, overrides, SDK  → Lints Config
   📦 Packages            vibrancy, upgrades, opps     → Package Dashboard
   ♥ Code Health          per-function grades          → Code Health Dashboard
   🗺 Project Map         size, dead weight, hotspots  → Project Map
-  🔍 Full Audit          every rule, one run          → Audit report
+  🔍 Findings            filters, JSON export          → Findings Dashboard
+  🛡 Full Audit          every rule, one run          → Audit report
 
 QUICK ACTIONS
   ▶ Run analysis
-  ✂ Fix stale ignores           (N found)
+  ✂ Fix stale ignores           (finds, shows count, confirms, fixes)
   ⌘ All commands…               → Command Catalog
 ```
 
-**Removed from sidebar (moved, not deleted):**
+`⌂ Home` is gone (see the 2026-09-04 correction above) — Findings is the sidebar's landing
+dashboard now, so it stays a Dashboards-section row of its own rather than being reachable only
+through Status's Health row.
+
+**Removed from sidebar (moved, not deleted) — landed 2026-09-04, verified against the actual
+`.ts` files before cutting, not assumed from this table:**
 
 | Today's row | Goes to |
 |---|---|
-| Show errors / warnings / infos / hints (double-click toggles) | Findings Dashboard toolbar chips (single click, live) + `...` view menu |
-| Run analysis after config change / dependency change | Rules & Tiers dashboard → "Automation" card |
-| UI language | Rules & Tiers dashboard → "Extension" card |
-| Analyzer plugin (row) / Tier (row) | Engines row (plugin state) / Rules & Tiers hero (tier) |
-| Initialize / Update config | Banner state when config missing; otherwise Rules & Tiers → "Config" card |
-| Find stale ignores | Merged into "Fix stale ignores" (finds first, shows count, then offers fix) |
-| Upgrade Opportunities / Full Opportunities Report | Tabs inside Package Dashboard |
-| Getting Started / About / pub.dev / AI instructions | `...` view-title menu (4 items) |
-| Debug webview (DIAGNOSTIC ENGINES) | Health Panel webview, opened from Engines row |
-| Detected packages / Lane / Migrate config keys / triage rows | Rules & Tiers dashboard |
+| Violation count row ("N critical, M total") | Folded into the Health row's own description — was pure duplication, not a move |
+| Lint integration (was 2 copies: Banner "off only" row + Settings diagnostics row) | One row in Status, bidirectional (enable ↔ disable), always shown |
+| Process health (Settings diagnostics row) | Same command as Status's Engines row — verified truly redundant when Engines row renders; only a minor loss when `debug.enabled` is off (still in Command Catalog) |
+| Analysis Optimizer (Dashboards row) | Embedded tab inside Rules & Tiers (`rulePacksWebviewProvider.ts`'s `getEmbeddedBodyHtml` — verified present) |
+| Upgrade Opportunities / Full Opportunities Report (Dashboards rows) | Tabs inside Package Dashboard (`packages-tabs.ts` — verified: `upgrades` / `fullReport` tab ids exist) |
+| Find stale ignores (separate row) | Merged into "Fix stale ignores" — finds first (publishes diagnostics either way), shows the real count in the confirm dialog, then fixes on confirm |
+| Command Catalog (was a Dashboards row) | Moved to Quick Actions ("All commands…") |
 
-**Banner view** stays but only for two states: not a Dart project (info, no action) and
-setup-needed (one button "Set up Saropa Lints", runs `enable` + init). Everything else hides it.
+**NOT cut, despite looking cuttable at first — verify before trying again:**
 
-### 2.2 Dashboards — 6 first-class, everything else is a tab or a drill-down
+| Row | Why it stayed |
+|---|---|
+| Severity toggles (errors/warnings/infos/hints, 4 rows) | This table used to claim they map onto the Findings dashboard's severity toolbar chips (`violations-dashboard-top.ts`'s `severitySegmented`). Verified false: that toolbar is a **local, in-webview display filter** (`findings-dashboard` `postMessage` state), while the sidebar rows toggle the **global `saropaLints.severity.*` setting** that gates what appears in the editor's Problems panel. Different scope, not a duplicate — cutting these would remove a real capability with no replacement. |
+| Trends / regression / suppression-rate / hotspot-review rows in Status | Checked whether Findings Dashboard already shows this data (it shows suppressions, not trends/regression/hotspots) before considering a cut. `runHistory`-sourced trend/regression data has no dashboard home at all; hotspot review is its own workflow (`saropaLints.reviewHotspotState`), not a duplicate. Moving these requires giving them a real landing spot first — not deleting them speculatively the way the "Saropa Dashboards" hub speculatively duplicated things. |
+| Analyzer plugin / Tier / Lane rows (Settings diagnostics) | Distinct settings, not verified as duplicated by anything else in the sidebar or a dashboard tab; left alone this pass. |
+
+Row count after 2026-09-04's cuts: Dashboards 10→6, Status −1 net (violation-count row folded into
+Health, Lint integration row added), Settings −1 stale-ignore row and −2 diagnostics rows (Lint
+integration, Process health) +1 Command Catalog. Still well above the ≤14 total target — the
+remaining gap is the "NOT cut" rows above, which need real landing spots (not deletions) before
+they can move, plus the triage rows in Settings (§1's Phase 1 deferred item, still open).
+
+**Banner view** stays but only for one state now: not a Dart project / no `saropa_lints`
+dependency (info, no action beyond "Set Up Project"). The "dependency present but integration off"
+state that used to live here moved into Status's Lint integration row (always shown, bidirectional)
+— see the table above.
+
+### 2.2 Dashboards — 5 first-class (Home retired 2026-09-04), everything else is a tab or a drill-down
 
 | Dashboard | Tabs / regions | Absorbs (today separate) | Live source |
 |---|---|---|---|
-| **Home** (`saropaDashboardsView`) | KPI band: health, issues, engines, packages, code-health grade, project size. One card per other dashboard with its top-3 signal and an "Open" button. | Status tree rows; consolidated view gauge | live diagnostics model + vibrancy model + engine status |
-| **Findings** (`violationsWideReportView`) | Toolbar chips: severity ×4, tier, pack, file scope. Group-by. Hotspot review. Suppressed. Trends. | Severity toggles; `focusIssues*`; Related Rule Telemetry as a side panel; Rule Explain as a drawer | `onDidChangeDiagnostics` |
+| ~~**Home** (`saropaDashboardsView`)~~ | REMOVED 2026-09-04 (commit `ea2c7a8e`) — "duplicated the sidebar and each dashboard's own settings without adding anything a dashboard couldn't already show." Do not rebuild without a fresh design rationale; see the correction note at the top of this file. | — | — |
+| **Findings** (`violationsWideReportView`) | Toolbar chips: severity ×4 (a **local display filter**, NOT the same thing as the sidebar's global severity-visibility rows — see §2.1's "NOT cut" table), tier, pack, file scope. Group-by. Suppressed. | Severity toggles; `focusIssues*`; Related Rule Telemetry as a side panel; Rule Explain as a drawer | `onDidChangeDiagnostics` |
 | **Rules & Tiers** (`rulePacksWebviewProvider`) | Tabs: Tier · Rule packs · Overrides · SDK rollout · Config file · Automation · Extension | `analysis_options_custom.yaml`: `max_issues`, `output`, `platforms`, `severities`, `banned_usage`, `saropa_tier`, `runtime_tier`, `diagnostic_statistics`; settings: run-after-*, uiLanguage, scanOnSave, inlineAnnotations, issuesPageSize, groupBy; baseline create/view/apply; Analysis Optimizer as a tab | config file watcher + settings change |
 | **Packages** (`vibrancy/report-webview`) | Tabs: Overview · Upgrade opportunities · Full report · Known issues · Compare · Settings | opportunities-panel, feature-inventory, known-issues, comparison, package-detail (drawer); all 60 `packageVibrancy.*` settings as a form | scan events (already live) |
 | **Code Health** (`projectVibrancyReportView`) | existing + Settings tab (lcov path, thresholds) | 7 `projectVibrancy.*` settings | CLI stream (already live) |
@@ -102,8 +140,11 @@ sidebar view.
 
 ### 2.3 Status bar
 
-Unchanged text; click → Home instead of Findings. Fix the dead `saropaLints.editorDashboards.focus`
-target (`extension.ts:1237`) → `saropaLints.openDashboards`.
+Unchanged text; click → Findings (`saropaLints.openViolationsWideReport`), both enabled and
+disabled states — verified current in `extension.ts`'s `updateAllStatusBars`. (This superseded an
+earlier "click → Home" design once Home was removed 2026-09-04; there is no
+`saropaLints.openDashboards` command in the codebase — an earlier version of this plan claimed
+Phase 0 created one, but that claim does not match the checked-in source.)
 
 ---
 
@@ -121,7 +162,7 @@ target (`extension.ts:1237`) → `saropaLints.openDashboards`.
 - [x] "Lint integration: Off" banner row — re-checked: already single-click via `saropaLints.enable`
       (`sectionedSidebar.ts:214-221`, `LeafItem` wires `TreeItem.command`). No fix required.
 
-### Phase 1 — Sidebar shell (2 days, Sonnet) — PARTIALLY DONE 2026-09-03
+### Phase 1 — Sidebar shell (2 days, Sonnet) — PARTIALLY DONE 2026-09-03, extended 2026-09-04
 Files: `views/sectionedSidebar.ts`, `views/configTree.ts`, `package.json` (views, menus),
 `extension.ts:604-658`, `en.json`.
 
@@ -148,26 +189,38 @@ Files: `views/sectionedSidebar.ts`, `views/configTree.ts`, `package.json` (views
 **Deferred — not done, do NOT treat as complete:**
 - [x] View count is now 4, not 5 — resolved as a side effect of Phase 2 (debugPanel view
       contribution removed when its content merged into the Health Panel editor tab).
-- [ ] Status section still has the original rows (violation count, hotspots, suppressions,
-      trends, regression, last run…) — NOT collapsed to the 3-row Health/Engines/Integration
-      redesign in §2.1. Collapsing requires *moving* those rows' info elsewhere per §2.1, not
-      deleting it — out of scope for a quick-win pass.
+- [x] Status section's Health/Engines/Integration 3-row target — the third row landed 2026-09-04
+      (see the Finish Report below): "Lint integration" merged into Status from the Banner view
+      AND the Settings diagnostics block (both had their own copy), now one bidirectional row.
+      The redundant violation-count row was folded into Health's own description rather than
+      deleted outright. **Still open:** hotspots, suppressions, trends, and regression/milestone
+      rows remain in Status — verified (not assumed) that Findings Dashboard does not show
+      trends/regression/hotspots today, so there is nowhere to move them yet; cutting them would
+      be a real feature loss, not a duplication cleanup. Revisit once one of them gets a real home.
   - [x] Engines row added (2026-09-04): "Engines: N running" now renders in Status, right after
         Health, sourced from `HealthPanel.getEngineStatuses()` (which already existed for exactly
         this purpose) — additive, existing rows untouched. Opens the Health Panel on click.
-  - [ ] Lint integration row (§2.1's third top row, "click to enable") is not part of Status —
-        it already exists as its own thing in the Banner view (`buildBannerItems`), not merged in.
-- [ ] Dashboards section still lists all 11 rows from `buildEditorDashboardItems`, not reduced to
-      the 6-row target — Upgrade Opportunities / Full Opportunities Report / Analysis Optimizer /
-      Command Catalog still render as top-level rows because Phases 4-6 (which give them a tab
-      home inside Rules & Tiers / Packages / Project Map) have not landed. Removing them now would
-      have stranded those features.
+  - [x] Lint integration row merged into Status 2026-09-04 (see Finish Report below) — no longer
+        Banner-only; the Settings-panel diagnostics copy was also removed as the resulting
+        duplicate.
+- [x] Dashboards section reduced from 11 rows to 6 (2026-09-04, see Finish Report below): Analysis
+      Optimizer, Upgrade Opportunities, and the Feature Inventory export dropped as standalone rows
+      — each verified (by reading the actual `.ts` files, not assumed from this plan) to already be
+      reachable as a tab inside Rules & Tiers or Package Dashboard from Phases 4/5. Command Catalog
+      moved to Quick Actions. Note: §2.2's target dropped to 5 dashboards after Home's removal, but
+      the sidebar's Dashboards *section* still shows Findings as its own row (6 total) since Home —
+      the thing that used to make Findings reachable without it — is gone.
 - [ ] No live badges added beyond the existing package-adoption-needle count.
-- [ ] Quick Actions not restructured into the 3-row target; Settings panel still holds the full
-      action+setting+triage+diagnostics row list (~15-20 rows depending on triage state).
+- [x] Quick Actions/Settings partially restructured 2026-09-04: the two stale-ignore rows merged
+      into one ("Fix stale ignores" now finds first, shows the real count, then fixes); the
+      diagnostics block's now-redundant Lint integration and Process health rows removed. **Still
+      open:** severity toggles (4 rows, verified NOT a dashboard duplicate — see §2.1's "NOT cut"
+      table), Analyzer plugin/Tier/Lane, and the triage rows (2-6 depending on data) all remain —
+      no verified duplicate location for any of them yet.
 - [ ] Empty/off/error states not audited.
-- [ ] Row-count target (≤14) NOT met — full redesign needs Phases 4-6 to land first so dashboard
-      rows have somewhere to go. Revisit this phase once those land.
+- [ ] Row-count target (≤14) still NOT met. Real progress 2026-09-04 (Dashboards 11→6, Status net
+      −1, Settings net −2ish) but the sidebar is still well above target — see §2.1's row-count
+      note for what's left and why each remaining row wasn't cut speculatively.
 
 ### Phase 2 — Health Panel merge (1 day, Sonnet) — DONE 2026-09-04
 - [x] Engine cards (ON/OFF, PID, RSS, Kill/Restart all) moved into the Health Panel editor-tab
@@ -207,7 +260,7 @@ project-wide without the user opening every file. It is ON by default, so the En
 typical LSP card state is now "running", not "stopped" — the Phase 1 deferred sidebar-summary work
 above should say "LSP live" not "LSP off" as its example.
 
-### Phase 3 — Home hub (2 days, Sonnet) — DONE 2026-09-04
+### Phase 3 — Home hub (2 days, Sonnet) — DONE 2026-09-04, then REVERTED 2026-09-04 (commit `ea2c7a8e`, see the correction note at the top of this file — do not treat anything below this line as current behavior)
 Files: `views/saropaDashboardsView.ts`, `views/dashboardSummaries.ts`, `systemHealth/healthPanel.ts`,
 `views/projectVibrancyReportView.ts`, `extension.ts`, `en.json`.
 - [x] KPI band (6 tiles: health score, open issue count, engines, packages, Code Health grade,
@@ -829,3 +882,82 @@ test file:
 
 Still open: the F5 (Extension Development Host) manual visual check for the Engines row, and the
 two LSP manual-verification items — none of these can be done without a human driving VS Code.
+
+## Finish Report (2026-09-04) — Status/Dashboards/Quick Actions row collapse
+
+Before touching code, re-verified this plan's own claims against the actual repo rather than
+trusting its "DONE" markers — found the Home hub had been built and then deliberately reverted
+(commit `ea2c7a8e`, same day) and that Phase 0's claimed `saropaLints.openDashboards` command does
+not exist anywhere in `extension/src`. Both are now corrected at the top of this file. Scoped this
+pass to changes that were individually verified against the real source (not assumed from §2.1's
+"goes to" table, which itself had at least one wrong claim — see below) before cutting anything.
+
+**Status (`sectionedSidebar.ts`):**
+- Removed the standalone violation-count row (`appendViolationCountRow`) — its "N critical, M
+  total" text is now `appendHealthRow`'s own description when there's no score delta yet, so no
+  information was lost, just de-duplicated.
+- Added `appendLintIntegrationRow`: one row, always shown, single click toggles `saropaLints.enable`
+  / `saropaLints.disable`. This replaces two prior copies of the same state — the Banner view's
+  "Lint integration: Off" (shown only when off) and the Settings panel's diagnostics-block row
+  (shown always) — with one bidirectional row in Status, matching §2.1's target.
+- Deliberately did NOT touch hotspots/suppressions/trends/regression/last-run rows: checked whether
+  Findings Dashboard already renders this data before considering a cut (it renders suppressions,
+  not trends/regression/hotspots), so removing those rows now would be a real feature loss with
+  nowhere for the information to land — the same mistake the Home hub's removal warns against, just
+  in reverse (deleting instead of duplicating).
+
+**Banner (`sectionedSidebar.ts`):** now returns only the "no `saropa_lints` dependency" case. The
+"dependency present but disabled" case moved into Status per above.
+
+**Dashboards (`sectionedSidebar.ts`):** removed Analysis Optimizer, Upgrade Opportunities, and the
+Feature Inventory export as standalone rows — each verified present as a tab inside Rules & Tiers
+(`rulePacksWebviewProvider.ts`'s embedded Analysis Optimizer) or Package Dashboard
+(`packages-tabs.ts`'s `upgrades`/`fullReport` tabs) before cutting, not assumed from this plan's own
+table. 11 rows → 6.
+
+**Settings/Quick Actions (`sectionedSidebar.ts`, `configTree.ts`, `stale-ignore-commands.ts`):**
+- New command `saropaLints.findAndFixStaleIgnores` (sidebar-only, not palette-contributed): runs
+  the find scan, publishes diagnostics, shows "none found" or continues into the same confirm+fix
+  flow with the real count now in the confirm dialog. Replaces the sidebar's separate Find and Fix
+  rows with one. The two original commands stay registered (palette, per-file quick fix) unchanged.
+- Removed `configTree.ts`'s "Lint integration" and "Process health" diagnostics rows — both were
+  now-verified duplicates: Lint integration duplicates Status's new row (same commands), Process
+  health opens the exact same `saropaLints.showProcessHealth` command as Status's Engines row. One
+  real, accepted regression: when `saropaLints.debug.enabled` is off, the Engines row doesn't render
+  either, so Process Health loses its sidebar path entirely in that case — still reachable via
+  Command Catalog / command palette, judged an acceptable trade for removing a 9-row diagnostics
+  block down toward the ≤14 target.
+- Moved Command Catalog from Dashboards into Settings' action rows (Quick Actions target).
+- Removed 6 now-orphaned `en.json` keys (`dashboards.controls.processHealth`/`processHealthOpen`,
+  `analysisOptimizer.sidebar.*`, `featureInventory.sidebar.*`, `staleIgnores.sidebar.findLabel`/
+  `findDescription`) and added `staleIgnores.confirm.fixMessageWithCount`. Did not touch the 24
+  generated locale files, per the hard rule against an agent running the translation pipeline.
+
+**Explicitly NOT cut, with the verification that stopped it** — kept in §2.1's "NOT cut" table so a
+future pass doesn't repeat the check and remove them wrongly:
+- Severity toggles (4 rows): this plan's own §2.1 table claimed they'd map onto the Findings
+  dashboard's severity toolbar chips. Read `violations-dashboard-script.ts` and confirmed those
+  chips are a local, in-webview display filter (`postMessage` state), not the global
+  `saropaLints.severity.*` setting the sidebar rows control (which gates the editor Problems
+  panel). Different feature; the plan's claim was wrong.
+- Analyzer plugin / Tier / Lane rows: no verified duplicate elsewhere; left alone.
+
+**Verification:** `npm run check-types` (main + `tsconfig.test.json`) clean. `npm run
+verify-nls-keys` clean (347 keys, manifest untouched — the new command is sidebar-only, not
+contributed to `package.json`, so no manifest/menu change was needed). Scoped mocha run
+(`test/views/**`, `test/disablePluginsIntegration.test.js`, `test/runAnalysisEnabledGate.test.js`,
+`test/config/**`): 237 passing, 15 pre-existing failures — confirmed identical (same count, same
+messages) by stashing this diff and re-running against unmodified `main` before restoring it. Added
+6 new/updated test cases across `overviewTreeFlat.test.ts` (Dashboards row set, Command Catalog
+location, merged stale-ignore row, no diagnostics duplicates) and `sidebarStatusEngines.test.ts`
+(new "Lint integration row" describe block, bidirectional on/off + command assertions) — all pass.
+
+**Not done — no F5 (Extension Development Host) visual check**, same caveat every prior phase in
+this file carries: correctness evidence here is `tsc` + scoped mocha only, nobody opened the sidebar
+in an actual VS Code window this pass.
+
+**Still open toward the ≤14 row target:** hotspots/suppressions/trends/regression/last-run rows in
+Status, severity toggles + Analyzer plugin/Tier/Lane rows and the triage rows (2-6 depending on
+data) in Settings, and empty/off/error-state auditing (§1's original Phase 1 checklist item, never
+attempted). None of these have a verified duplicate location today — moving them for real requires
+either building one (carefully, unlike the Home hub) or accepting the row count stays above 14.

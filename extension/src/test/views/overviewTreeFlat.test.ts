@@ -173,14 +173,57 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     assert.strictEqual(count, 1, 'Run analysis must not be duplicated');
   });
 
-  it('Editor dashboards section surfaces the five expected dashboards', () => {
+  it('Editor dashboards section surfaces exactly the six first-class dashboards', () => {
     const editor = providers.find((p) => p.viewId === SECTION_VIEW_IDS.editorDashboards)!;
     const labels = editor.getChildren().map((n) => String((n as { label?: unknown }).label ?? ''));
     assert.ok(labels.includes('Lints Config'));
     assert.ok(labels.includes('Package Dashboard'));
     assert.ok(labels.includes('Code Health Dashboard'));
+    assert.ok(labels.includes('Saropa Project Map'));
     assert.ok(labels.includes('Findings Dashboard'));
-    assert.ok(labels.includes('Command Catalog'));
+    // Analysis Optimizer, Upgrade Opportunities, and the Feature Inventory
+    // export are reachable as tabs inside Rules & Tiers / Package Dashboard
+    // (PLAN_extension_ui_redesign.md §2.1) — no longer separate rows here.
+    // Command Catalog moved to the Settings panel's action rows.
+    assert.ok(!labels.includes('Analysis Optimizer'));
+    assert.ok(!labels.includes('Upgrade Opportunities'));
+    assert.ok(!labels.includes('Full Opportunities Report'));
+    assert.ok(!labels.includes('Command Catalog'));
+  });
+
+  it('Command Catalog is reachable from the Settings panel, not Dashboards', () => {
+    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
+    const items = settings.getChildren().map((n) => settings.getTreeItem(n as never));
+    assert.ok(
+      items.some((i) => i.command?.command === 'saropaLints.showCommandCatalog'),
+      'Command Catalog must be reachable from the Settings/Quick Actions rows',
+    );
+  });
+
+  it('stale-ignore rows collapse to one merged find-and-fix row', () => {
+    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
+    const items = settings.getChildren().map((n) => settings.getTreeItem(n as never));
+    assert.ok(
+      !items.some((i) => i.command?.command === 'saropaLints.findStaleIgnores'),
+      'the standalone Find row must be gone from the sidebar',
+    );
+    assert.ok(
+      items.some((i) => i.command?.command === 'saropaLints.findAndFixStaleIgnores'),
+      'the merged find-and-fix row must be present',
+    );
+  });
+
+  it('Settings panel diagnostics no longer duplicate Lint integration / Process health', () => {
+    const settings = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
+    const items = settings.getChildren().map((n) => settings.getTreeItem(n as never));
+    assert.ok(
+      !items.some((i) => i.command?.command === 'saropaLints.enable' || i.command?.command === 'saropaLints.disable'),
+      'Lint integration now lives only in the Status section',
+    );
+    assert.ok(
+      !items.some((i) => i.command?.command === 'saropaLints.showProcessHealth'),
+      'Process health is now reachable only via the Status section\'s Engines row',
+    );
   });
 
   it('Help commands are reachable from the Dashboards view "..." overflow menu', () => {
