@@ -275,5 +275,33 @@ void f(String filePath, String securityToken) {
 ''');
       },
     );
+
+    // Snake_case boundary coverage: underscores are not lowercase ASCII
+    // letters, so `_hasCamelCaseWord` already treats them as word boundaries.
+
+    test('fires on snake_case path variable (file_path)', () async {
+      // "file_path" has an underscore before "path" — the boundary check
+      // sees a non-lowercase character and correctly identifies "path".
+      await assertFixtureMarkers(rule, '''
+void f(String file_path, String other) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (file_path == other) {}
+}
+''');
+    });
+
+    test(
+      'does NOT fire on snake_case URI variables (named_uri)',
+      () async {
+        // "named_uri" has "uri" after an underscore — detected as a URI
+        // variable, so the import-URI suppression should apply.
+        await assertFixtureMarkers(rule, '''
+void f(String named_uri, String other_uri) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (named_uri == other_uri) {}
+}
+''');
+      },
+    );
   });
 }

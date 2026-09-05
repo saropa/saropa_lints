@@ -17,7 +17,8 @@ A secondary issue: the test fixture used `pathFirst` as a variable name, which l
 ## Finish Report (2026-09-05)
 
 - **Files changed:** `lib/src/rules/platforms/windows_rules.dart`, `test/rules/platforms/avoid_case_sensitive_path_comparison_fixture_test.dart`, `CHANGELOG.md`, this report
-- **Tests:** 21/21 pass in the fixture test suite
+- **Tests:** 23/23 pass in the fixture test suite (added snake_case boundary guards)
 - **Code review:** medium + low follow-up — zero findings
 - **Refactoring:** Extracted `_hasCamelCaseWord` generic helper from duplicated `_hasPathAsWord`/`_hasUriAsWord` logic. Uses `startsUpper` (0x41–0x5A range check) instead of hardcoded codepoints per word.
-- **Risk:** Low — the shared helper is a strict superset of the prior logic; all 21 test cases pass including new embedded-word guards
+- **Snake_case:** Verified that underscore boundaries already work (0x5F is not in 0x61–0x7A range) — added test coverage for `file_path` and `named_uri` to pin this.
+- **Risk:** Low — the shared helper is a strict superset of the prior logic; all 23 test cases pass including embedded-word and snake_case guards
