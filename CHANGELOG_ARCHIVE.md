@@ -6,6 +6,52 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [15.2.6]
+
+Restores the Full Audit sidebar button and fixes `require_ignore_comment_plugin_prefix` showing the wrong diagnostic message when an ignore comment uses `saropa_lints/` prefix with an unregistered rule name. No new rules or breaking changes. [log](https://github.com/saropa/saropa_lints/blob/v15.2.6/CHANGELOG.md)
+
+### Fixed
+
+- **Full Audit sidebar button** — the "Full Audit" entry was missing from the extension sidebar despite being documented in 15.2.5. Now appears between Findings Dashboard and Command Catalog with a shield icon, plus a title-bar shortcut icon in the Editor Dashboards view header (visible only in Dart projects).
+- **`require_ignore_comment_plugin_prefix` wrong message for unknown prefixed rule** — `// ignore: saropa_lints/nonexistent_rule` showed the "add prefix" message instead of the "not a registered rule" message. The reporter always reads `diagnosticCode` and ignores per-diagnostic `LintCode` overrides; fixed by temporarily swapping `diagnosticCode` during the unknown-prefix report.
+- **Tier-change toast count mismatch with Findings Dashboard** — changing tier showed a toast with a violation count from the stale `violations.json` file while the dashboard read live diagnostics (often empty during re-analysis), producing "toast says N, dashboard shows 0". The toast now defers until the first diagnostics refresh settles, so both surfaces show the same count. The dashboard shows a "Re-analyzing..." progress indicator during the gap. A 15-second safety fallback fires if the analysis server never produces results.
+
+<details><summary>Maintenance</summary>
+
+- **`generate_translations.py` auto-commits** — the translation wrapper script now auto-detects every file the pipeline touches (no hardcoded path list) and commits them after a successful run. Pre-staged files are left untouched. Null-delimited git output handles unusual filenames. SIGINT is restored before git calls so Ctrl+C can abort a stuck commit. Pass `--no-commit` to skip the auto-commit for CI or review workflows.
+
+</details>
+
+---
+
+## [15.2.5]
+
+This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level keys in `analysis_options_custom.yaml`, eliminating false `unsupported_option` warnings from the Dart SDK's plugin-block validator. Projects using the old location get a deprecation warning and automatic fallback — the keys still work from the plugin block, but moving them to the custom file silences the warnings. [log](https://github.com/saropa/saropa_lints/blob/v15.2.5/CHANGELOG.md)
+
+### Added
+
+- **Full Audit CLI** — `dart run saropa_lints audit <dir>` runs every rule (pedantic + stylistic) against a codebase regardless of the project's configured tier. Produces enriched JSON with per-diagnostic `tier` and `category` fields. Supports `--since <ref>` to audit only changed files, `--min-severity`/`--min-impact` post-filters, `--profile` timing, and `--exclude-globs`/`--include-globs`.
+- **Full Audit sidebar button** — new "Full Audit" entry in the extension sidebar launches the audit with a scope quick-pick (full project, changed vs main, or pick a branch) and opens a filterable report webview with search, tier/severity/impact filter chips, sortable columns, and JSON export. The progress notification shows real-time percentage, file count, issue count, and current filename.
+- **Audit report keyboard navigation** — use ↑/↓ arrow keys to move between rows and Enter to open the file at that diagnostic. A "no matches" state now appears when filters exclude all results.
+- **Audit baseline diffing** — `--save-baseline` saves the current audit as a project baseline at `.saropa/audit_baseline.json`; `--baseline` compares against the saved baseline and tags each diagnostic as new or unchanged. The sidebar quick-pick shows a "Compare to baseline" option when a baseline exists, and the report webview has a "Save as baseline" button and new/unchanged filter chips.
+- **Migrate Config** — `dart run saropa_lints migrate-config` and a sidebar button ("Migrate config keys") automatically move `log_level`, `lane`, and `memory_mode` from the old plugin block to `analysis_options_custom.yaml`. Safe to run multiple times; already-migrated keys are skipped.
+- **Configurable `max_declarations_per_file`** — set `max_declarations_per_file: N` in `analysis_options_custom.yaml` to allow up to N top-level declarations before `prefer_single_declaration_per_file` fires (default 1). No action required — existing behavior is unchanged.
+- **Sealed hierarchy size nudge** — set `max_sealed_hierarchy_lines: N` in `analysis_options_custom.yaml` to get a lint when a sealed class file exceeds N lines, suggesting `part`/`part of` to split subtypes while keeping them in the same library (default 0 = disabled).
+
+### Fixed
+
+- `log_level`, `lane`, and `memory_mode` plugin configuration keys no longer trigger `unsupported_option` warnings from the Dart SDK analyzer. These keys now live as top-level entries in `analysis_options_custom.yaml` instead of under `plugins > saropa_lints:`. Projects still using the old location get a deprecation warning with the key's value honored as a fallback; `dart run saropa_lints init` generates the updated layout automatically.
+- `prefer_sorted_parameters` no longer conflicts with `dart format`. The rule now respects `always_put_required_named_parameters_first`: required named parameters come first, then optional named parameters, each group sorted alphabetically. Includes a quick fix that reorders parameters automatically. ([#321](https://github.com/saropa/saropa_lints/issues/321))
+- `require_text_overflow_handling` and `require_text_overflow_in_row` correction messages no longer default to `TextOverflow.ellipsis`. The guidance now recommends wrapping in `Expanded`/`Flexible` first — ellipsis is a last resort when truncation is intentional. Both rules offer context-aware quick fixes: "Wrap in Expanded" inside Row/Column/Flex, or "Add maxLines" elsewhere. ([#320](https://github.com/saropa/saropa_lints/issues/320))
+- `prefer_single_declaration_per_file` no longer fires on sealed class hierarchies. Dart requires sealed subtypes in the same library, so co-locating them is mandatory, not a style violation. ([#322](https://github.com/saropa/saropa_lints/issues/322))
+- `avoid_unused_parameters` no longer fires on abstract, external, or native method declarations. These methods have no implementation body, so their parameters define the interface contract and cannot be "used." ([#319](https://github.com/saropa/saropa_lints/issues/319))
+
+### Changed (Extension)
+
+- The lane picker now reads and writes `lane:` from `analysis_options_custom.yaml` instead of `analysis_options.yaml`. No action required — the extension handles the new location transparently.
+
+---
+
 ## [15.2.4]
 
 This patch release focuses on refining the avoid_unguarded_debug rule to eliminate several false positives. The rule now correctly recognizes early-exit returns and safely resolves variable-indirection chains for debug mode checks. Behind the scenes, early-exit and guard-evaluation utilities were unified across multiple core rules to ensure consistent behavior moving forward. [log](https://github.com/saropa/saropa_lints/blob/v15.2.4/CHANGELOG.md)
