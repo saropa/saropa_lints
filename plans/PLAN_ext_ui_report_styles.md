@@ -1,7 +1,7 @@
 # Plan — Migrate `report-styles-parts.ts` onto `dashboardChromeStyles`
 
 **Created:** 2026-09-05 · **Status:** Not started
-**Parent:** `PLAN_extension_ui_redesign.md` Phase 5 / Phase 7 deferred item
+**Parent:** `PLAN_ext_ui_redesign.md` Phase 5 / Phase 7 deferred item
 **Scope:** TS-only, extension side. No Dart changes.
 **Model:** Sonnet for implementation. Opus only if the token/component mapping gets ambiguous.
 

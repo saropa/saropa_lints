@@ -2,11 +2,11 @@
 
 **Created:** 2026-09-04 · **Status:** Proposed, awaiting go
 **Trigger:** `bugs/WIP home hub.png` — the live extension after Phases 0–7 of
-`PLAN_extension_ui_redesign.md`. User verdict: rows and buttons that may open a screen, run
+`PLAN_ext_ui_redesign.md`. User verdict: rows and buttons that may open a screen, run
 something, or change a setting with no way to tell which; a bespoke visual language; no logical
 layout; a "hub" page that solves no problem.
 **Supersedes:** the §2.1 sidebar target and the Phase 3 "Home hub" section of
-`PLAN_extension_ui_redesign.md`. Everything else in that plan stands.
+`PLAN_ext_ui_redesign.md`. Everything else in that plan stands.
 
 ---
 
@@ -148,7 +148,7 @@ view with two groups — see §5 P1 for why two views).
 
 ## 4. The hub: delete it
 
-**What problem was it meant to solve?** `PLAN_extension_ui_redesign.md` §2.2: "one page, KPI band,
+**What problem was it meant to solve?** `PLAN_ext_ui_redesign.md` §2.2: "one page, KPI band,
 one card per dashboard with its top-3 signal." The problem that page solves is "I want the numbers
 from six dashboards without opening six tabs."
 
