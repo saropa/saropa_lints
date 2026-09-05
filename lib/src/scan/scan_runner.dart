@@ -790,7 +790,7 @@ class ScanRunner {
       // CLI's default syntactic pass (see ScanRunner.run doc) has no type
       // information to rule that out by itself, so avoid_context_across_async
       // matches on the identifier name alone at each `context.` use below.
-      // ignore: avoid_context_across_async
+      // ignore: avoid_context_across_async, avoid_unsafe_cast -- reg.context is always ResolvedScanRuleContext by construction
       final context = reg.context as ResolvedScanRuleContext;
       // ignore: avoid_context_across_async
       context.currentUnit = ctxUnit;

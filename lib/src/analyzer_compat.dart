@@ -1,4 +1,9 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages -- analyzer is a transitive dep
+// ignore_for_file: avoid_dynamic_calls_extended -- dynamic dispatch is the whole point of version-probing shims
+// ignore_for_file: avoid_unsafe_cast -- casts follow is-checks or are guarded by catch; safe in context
+// ignore_for_file: avoid_catch_all -- bare catches gate version-detection fallbacks, not error handling
+// ignore_for_file: require_catch_logging -- silent fallback is intentional: failure means "API missing, try next"
+// ignore_for_file: avoid_swallowing_exceptions -- same as above: swallowed = "not this analyzer version"
 
 /// Compatibility shims for analyzer 9-11.
 ///
@@ -209,12 +214,16 @@ extension SafeExtensionDeclMembers on ExtensionDeclaration {
 extension DiagnosticCodeLowerCaseCompat on DiagnosticCode {
   /// Canonical snake_case rule name used in config keys and reports.
   String get lowerCaseName {
-    // ignore: deprecated_member_use
+    // ignore: deprecated_member_use -- .name is the only API in analyzer <12
     final name = this.name;
     if (name.isEmpty) return '';
     // analyzer 9 exposes camelCase names for many lints.
     return name
-        .replaceAllMapped(RegExp(r'(?<=[a-z0-9])[A-Z]'), (m) => '_${m[0]}')
+        .replaceAllMapped(
+          RegExp(r'(?<=[a-z0-9])[A-Z]'),
+          // group(0) is always non-null for a successful match
+          (m) => '_${m.group(0)!}',
+        )
         .replaceAll('-', '_')
         .toLowerCase();
   }
