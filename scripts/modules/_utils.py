@@ -102,6 +102,12 @@ def extension_version_for(version: str) -> str:
     VSX level — pub.dev's hyphenated prerelease identifier has no equivalent
     in the extension version field, so a distinct signal has to be
     manufactured from the numbers that ARE available.
+
+    **Idempotency guarantee:** calling this function twice on the same input
+    returns the same result. A converted prerelease version (e.g. "16.1.913")
+    contains no ``-``, so ``is_prerelease_version`` returns False and the
+    function returns the input unchanged via ``strip_prerelease_suffix``.
+    ``set_extension_version`` relies on this property.
     """
     base = strip_prerelease_suffix(version)
     if not is_prerelease_version(version):

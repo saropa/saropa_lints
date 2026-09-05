@@ -108,7 +108,9 @@ def copy_readme_to_extension(project_dir: Path) -> bool:
     return True
 
 
-def set_extension_version(project_dir: Path, version: str) -> bool:
+def set_extension_version(
+    project_dir: Path, version: str, *, dry_run: bool = False,
+) -> bool | str:
     """Set extension/package.json version from a pub.dev-style version string.
 
     Internally converts *version* via ``extension_version_for()`` so callers
@@ -116,7 +118,13 @@ def set_extension_version(project_dir: Path, version: str) -> bool:
     odd-minor / offset-patch form for prereleases, and the raw value for
     stable releases.
 
-    Returns True if updated (or already matched), False on error.
+    When *dry_run* is True, the file is not modified — returns the converted
+    version string that **would** be written (useful for preflight checks
+    that need the expected version without side effects). Returns ``""``
+    on error in dry-run mode.
+
+    When *dry_run* is False (default), returns True if updated (or already
+    matched), False on error.
     """
     from scripts.modules._utils import extension_version_for
 
@@ -126,6 +134,12 @@ def set_extension_version(project_dir: Path, version: str) -> bool:
     # file write when the version already matches — cleaner git diffs on
     # publish retries.
     ext_version = extension_version_for(version)
+
+    # Dry-run: return what would be written without touching the file.
+    if dry_run:
+        pkg_path = _extension_dir(project_dir) / "package.json"
+        return ext_version if pkg_path.exists() else ""
+
     pkg_path = _extension_dir(project_dir) / "package.json"
     if not pkg_path.exists():
         return False

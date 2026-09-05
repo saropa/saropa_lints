@@ -220,9 +220,16 @@ def _is_head_pushed(project_dir: Path) -> bool:
 
     Returns True if origin/<branch> contains HEAD's SHA — meaning an
     amend would diverge local history from the remote.
+
+    Returns False (safe to amend) when:
+    - the remote is unreachable (can't confirm it's pushed)
+    - HEAD is detached (no tracking branch)
+    - the branch has no upstream on origin
+    This is the safe default: blocking an amend on a network failure
+    would stall the publish with no self-heal path.
     """
     use_shell = get_shell_mode()
-    # Get current branch name.
+    # Get current branch name. Returns "HEAD" when detached.
     branch_result = subprocess.run(
         ["git", "rev-parse", "--abbrev-ref", "HEAD"],
         cwd=project_dir, capture_output=True, text=True, shell=use_shell,
@@ -230,7 +237,11 @@ def _is_head_pushed(project_dir: Path) -> bool:
     if branch_result.returncode != 0:
         return False
     branch = branch_result.stdout.strip()
-    # Check if origin/<branch> contains HEAD.
+    # Detached HEAD has no remote branch to diverge from.
+    if branch == "HEAD":
+        return False
+    # Check if origin/<branch> contains HEAD. Fails (returncode != 0)
+    # when origin/<branch> doesn't exist or remote is unreachable.
     contains_result = subprocess.run(
         ["git", "merge-base", "--is-ancestor", "HEAD", f"origin/{branch}"],
         cwd=project_dir, capture_output=True, text=True, shell=use_shell,
@@ -308,6 +319,12 @@ def _verify_versions_in_commit(
 
     Last-resort gate before tagging. Self-heals package.json mismatches
     by amending the commit (the publish script owns that field).
+
+    **Ordering note:** this runs from ``create_git_tag`` (step 13), AFTER
+    ``git_commit_and_push`` (step 12) has already pushed HEAD. The self-heal
+    path in ``_heal_committed_package_json`` checks ``_is_head_pushed`` and
+    refuses to amend if HEAD is on the remote — the caller must fix the
+    file and create a new commit instead.
     """
     use_shell = get_shell_mode()
 

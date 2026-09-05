@@ -27,7 +27,11 @@ A secondary bug: the odd-minor fix (commit 6bb85fe6) introduced `int(minor) | 1`
 - **Amend-after-push guard**: `_is_head_pushed()` checks `git merge-base --is-ancestor HEAD origin/<branch>` before amending. If HEAD is already pushed, the self-heal refuses and prints a manual-fix instruction. Prevents the history-divergence scenario flagged by code review.
 - **Idempotency guard in setter**: `set_extension_version()` reads the current version before writing and skips the write if it already matches. Prevents unnecessary file writes on publish retries.
 - **`run_command()` over raw `subprocess.run`**: Consistent with every other git call in the file — centralizes logging and error formatting. `run_command` returns `CompletedProcess`, checked via `.returncode`.
+- **Push-before-verify ordering documented**: `_verify_versions_in_commit` runs from `create_git_tag` (step 13), after `git_commit_and_push` (step 12) has already pushed HEAD. The `_is_head_pushed()` guard is essential — documented in the docstring so future maintainers understand why the amend path refuses when HEAD is on the remote.
+- **`_is_head_pushed()` hardened**: Handles detached HEAD (returns False — safe to amend during rebase/cherry-pick) and unreachable remote (returns False — conservative fallback). Both edge cases documented in docstring.
+- **`extension_version_for()` idempotency contract explicit**: Docstring documents that converted versions have no `-` and hit the stable pass-through path, so `extension_version_for(extension_version_for(v)) == extension_version_for(v)`.
+- **Dry-run mode for `set_extension_version()`**: `dry_run=True` returns the converted version string without touching the file — useful for preflight checks that need the expected version without side effects. Returns `""` when package.json is missing.
 
 ### Verification
 
-15/15 `test_prerelease_version.py` tests pass (13 original + 2 new idempotency tests). The self-healing path was confirmed by the original failure scenario: package.json had `16.0.0-beta.2` (raw), preflight expected `16.1.914` (converted) — with the fix, the setter writes `16.1.914` and the self-heal auto-corrects any residual mismatch.
+19/19 `test_prerelease_version.py` tests pass (13 original + 2 idempotency + 4 dry-run). The self-healing path was confirmed by the original failure scenario: package.json had `16.0.0-beta.2` (raw), preflight expected `16.1.914` (converted) — with the fix, the setter writes `16.1.914` and the self-heal auto-corrects any residual mismatch.

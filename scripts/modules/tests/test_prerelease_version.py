@@ -176,5 +176,58 @@ class TestPackageExtensionWritesSafeVersion(unittest.TestCase):
         self.assertNotIn("-", pkg["version"])
 
 
+class TestSetExtensionVersionDryRun(unittest.TestCase):
+    """Pin that dry_run returns the expected version without modifying the file."""
+
+    def setUp(self) -> None:
+        import scripts.modules._extension_publish as mod
+
+        self._mod = mod
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        ext_dir = self.root / "extension"
+        ext_dir.mkdir()
+        # Seed with a known version so we can verify it stays unchanged.
+        (ext_dir / "package.json").write_text(
+            json.dumps({"name": "saropa-lints", "version": "0.0.0"}), encoding="utf-8"
+        )
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def test_dry_run_returns_converted_version(self) -> None:
+        # Dry-run should return the extension version string, not a bool.
+        result = self._mod.set_extension_version(
+            self.root, "16.0.0-beta.2", dry_run=True,
+        )
+        self.assertEqual(result, "16.1.914")
+
+    def test_dry_run_does_not_modify_file(self) -> None:
+        # File must keep the seed version after a dry run.
+        self._mod.set_extension_version(
+            self.root, "16.0.0-beta.2", dry_run=True,
+        )
+        pkg = json.loads(
+            (self.root / "extension" / "package.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(pkg["version"], "0.0.0")
+
+    def test_dry_run_stable_returns_passthrough(self) -> None:
+        # Stable versions pass through unchanged.
+        result = self._mod.set_extension_version(
+            self.root, "15.2.7", dry_run=True,
+        )
+        self.assertEqual(result, "15.2.7")
+
+    def test_dry_run_missing_package_json_returns_empty(self) -> None:
+        # When extension dir has no package.json, dry-run returns "".
+        empty_root = Path(self._tmp.name) / "empty_project"
+        empty_root.mkdir()
+        result = self._mod.set_extension_version(
+            empty_root, "16.0.0-beta.2", dry_run=True,
+        )
+        self.assertEqual(result, "")
+
+
 if __name__ == "__main__":
     unittest.main()
