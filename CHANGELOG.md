@@ -66,6 +66,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.3] — Unreleased
+
+<details>
+<summary>Maintenance</summary>
+
+- Package Dashboard (Overview and Upgrades tabs): now pulls its color/spacing/radius design tokens from the same canonical token layer already used by the Settings and tab-bar surfaces, instead of only the legacy report stylesheet. No visible change — this is additive groundwork for retiring the older parallel styling system.
+
+</details>
+
 ## [16.0.0-beta.2]
 
 Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)
