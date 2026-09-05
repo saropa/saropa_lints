@@ -1,6 +1,7 @@
 # PROPOSAL: Enforce Annotation-Opt-In Member Ordering Per Class
 
-**Status: Open**
+**Status: Duplicate**
+**Existing rule:** prefer_member_ordering
 
 Created: 2026-09-02
 Type: New rule

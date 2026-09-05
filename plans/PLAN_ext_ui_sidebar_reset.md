@@ -1,12 +1,19 @@
 # Sidebar + Hub Reset — fix the half-finished redesign
 
+**STATUS (2026-09-05): P0-P4 COMPLETE. Only P5 remains, and it is the user's to run.**
+P0 was already landed in `ea2c7a8e`. P1-P3 implemented: sidebar is 3 sections / 14 rows, status
+rows no longer run commands, Code Health and Project Map row descriptions read live data, and the
+scan-on-save "idle while disabled" bug is fixed. P4 shipped as `.claude/rules/extension-verification.md`.
+P5 (locale regen) is blocked on the user running `generate_translations.py` — agents must not.
+
+
 **Created:** 2026-09-04 · **Status:** Proposed, awaiting go
 **Trigger:** `bugs/WIP home hub.png` — the live extension after Phases 0–7 of
-`PLAN_ext_ui_redesign.md`. User verdict: rows and buttons that may open a screen, run
+`plans/history/2026.09/2026.09.05/PLAN_ext_ui_redesign.md` (archived). User verdict: rows and buttons that may open a screen, run
 something, or change a setting with no way to tell which; a bespoke visual language; no logical
 layout; a "hub" page that solves no problem.
 **Supersedes:** the §2.1 sidebar target and the Phase 3 "Home hub" section of
-`PLAN_ext_ui_redesign.md`. Everything else in that plan stands.
+`plans/history/2026.09/2026.09.05/PLAN_ext_ui_redesign.md` (archived). Everything else in that plan stands.
 
 ---
 
@@ -148,7 +155,7 @@ view with two groups — see §5 P1 for why two views).
 
 ## 4. The hub: delete it
 
-**What problem was it meant to solve?** `PLAN_ext_ui_redesign.md` §2.2: "one page, KPI band,
+**What problem was it meant to solve?** `plans/history/2026.09/2026.09.05/PLAN_ext_ui_redesign.md` (archived) §2.2: "one page, KPI band,
 one card per dashboard with its top-3 signal." The problem that page solves is "I want the numbers
 from six dashboards without opening six tabs."
 

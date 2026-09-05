@@ -1,6 +1,7 @@
 # PROPOSAL: Flag Empty `catch` Blocks That Silently Swallow Errors
 
-**Status: Duplicate — already covered by `AvoidSwallowingExceptionsRule` (alias: `avoid_empty_catch`) in `lib/src/rules/flow/error_handling_rules.dart`**
+**Status: Duplicate**
+**Existing rule:** avoid_swallowing_exceptions
 
 Created: 2026-09-02
 Type: New rule

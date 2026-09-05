@@ -1,6 +1,7 @@
 # PROPOSAL: Flag Duplicate Literal Elements in a Collection Literal
 
-**Status: Duplicate — already covered by `AvoidDuplicateMapKeysRule`, `AvoidDuplicateNumberElementsRule`, `AvoidDuplicateStringElementsRule`, `AvoidDuplicateObjectElementsRule` in `lib/src/rules/data/collection_rules.dart`**
+**Status: Duplicate**
+**Existing rule:** avoid_duplicate_number_elements / avoid_duplicate_string_elements / avoid_duplicate_object_elements
 
 Created: 2026-09-02
 Type: New rule

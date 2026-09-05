@@ -1,6 +1,7 @@
 # PROPOSAL: Flag `StatefulWidget`/`State` Classes with No Actual Mutable-State Usage
 
-**Status: Duplicate — already implemented as `AvoidUnnecessaryStatefulWidgetsRule` (`avoid_unnecessary_stateful_widgets`) in `lib/src/rules/widget/widget_lifecycle_rules.dart`**
+**Status: Duplicate**
+**Existing rule:** avoid_unnecessary_stateful_widgets
 
 Created: 2026-09-02
 Type: New rule

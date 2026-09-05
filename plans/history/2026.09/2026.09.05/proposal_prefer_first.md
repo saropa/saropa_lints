@@ -1,6 +1,7 @@
 # PROPOSAL: Flag `list[0]` — Use `list.first` Instead
 
-**Status: Duplicate — already implemented as `PreferFirstRule` (`prefer_first`) in `lib/src/rules/data/collection_rules.dart`**
+**Status: Duplicate**
+**Existing rule:** prefer_list_first
 
 Created: 2026-09-02
 Type: New rule

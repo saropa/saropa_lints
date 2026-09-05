@@ -1,6 +1,7 @@
 # PROPOSAL: Flag Private `Widget`-Returning Helper Methods That Should Be Widget Classes
 
-**Status: Duplicate** — already exists as `avoid_returning_widgets` in `AvoidReturningWidgetsRule`
+**Status: Duplicate**
+**Existing rule:** avoid_returning_widgets
 
 Created: 2026-09-02
 Type: New rule

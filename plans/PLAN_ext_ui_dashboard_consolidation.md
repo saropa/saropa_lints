@@ -1,5 +1,12 @@
 # Central Dashboard Consolidation — design, status, and remaining work
 
+**STATUS (2026-09-05): items 1 and 2 closed. Items 3 and 4 remain open.**
+Item 1 (fold rule-detail into the rule-group expander) is DONE - see
+`violations-dashboard-tables.ts` and the new `violations-dashboard-rule-detail.ts`. Item 2 (list C
+cards) is CLOSED AS OBSOLETE - see the audit finding at the end of this file. Item 3 (human F5
+render verification) and item 4 (decompose the remaining oversized surfaces) are genuinely open.
+
+
 **Created:** 2026-06-12 · **Consolidated:** 2026-06-14 · **Status re-verified against code:** 2026-09-05
 **Supersedes:** this file now also carries the diagnostics-residuals that were tracked separately in
 `TODO_consolidated_dashboard_diagnostics.md` (folded in 2026-06-14; that file's completed

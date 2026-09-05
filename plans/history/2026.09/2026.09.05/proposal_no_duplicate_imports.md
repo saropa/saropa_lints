@@ -1,6 +1,7 @@
 # PROPOSAL: No Duplicate Imports
 
-**Status: Duplicate** — already exists as `avoid_duplicate_named_imports` in `structure_rules.dart`
+**Status: Duplicate**
+**Existing rule:** avoid_duplicate_named_imports
 
 Created: 2026-09-02
 

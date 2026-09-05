@@ -1,6 +1,7 @@
 # PROPOSAL: Flag List Access by a Hardcoded Constant Index
 
-**Status: Duplicate** — already exists as `avoid_accessing_collections_by_constant_index` in `code_quality_avoid_rules.dart`
+**Status: Duplicate**
+**Existing rule:** avoid_accessing_collections_by_constant_index
 
 Created: 2026-09-02
 Type: New rule

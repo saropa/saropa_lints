@@ -1,6 +1,7 @@
 # PROPOSAL: Flag Classes Eligible for Dart 3.13 Primary Constructor Syntax
 
-**Status: Duplicate — already implemented as `PreferPrimaryConstructorRule` (`prefer_primary_constructor`) in `lib/src/rules/core/dart_sdk_migration_rules.dart`**
+**Status: Duplicate**
+**Existing rule:** prefer_primary_constructor
 
 Created: 2026-09-02
 Type: New rule

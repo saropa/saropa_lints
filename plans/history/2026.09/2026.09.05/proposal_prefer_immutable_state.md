@@ -1,6 +1,7 @@
 # PROPOSAL: Flag Mutable Fields on Name-Pattern-Matched State Classes
 
-**Status: Open**
+**Status: Duplicate**
+**Existing rule:** prefer_immutable_bloc_state
 
 Created: 2026-09-02
 Type: New rule

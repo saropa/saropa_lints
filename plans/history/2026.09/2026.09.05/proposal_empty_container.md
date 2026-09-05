@@ -1,6 +1,7 @@
 # PROPOSAL: Flag `Container()` With No Arguments
 
-**Status: Duplicate — already covered by `AvoidUnnecessaryContainersRule` (`avoid_unnecessary_containers_resolved`) in `lib/src/rules/widget/widget_patterns_avoid_prefer_rules.dart`**
+**Status: Duplicate**
+**Existing rule:** avoid_unnecessary_containers_resolved
 
 Created: 2026-09-02
 Type: New rule

@@ -1,31 +1,41 @@
 # commandCatalogRegistry.test.ts pre-existing failure
 
-## Status: Open
+## Status: Fixed
 
 ## Summary
 
-`npm test` in `extension/` fails on `commandCatalogRegistry.test.ts` with an
-assertion mismatch: the expected command list includes Package Vibrancy commands
-(`saropaLints.packageVibrancy.*`) that are no longer registered, producing an
-empty-array diff against the expected array.
+`npm test` in `extension/` failed on `commandCatalogRegistry.test.ts` with two
+classes of assertion mismatch:
 
-## Reproduction
+1. **17 commands in package.json had no catalog entry** — commands added to the
+   manifest without a matching entry in the command catalog registry.
+2. **15 palette-hidden commands were not marked `internal`** — commands with
+   `when: false` in the `commandPalette` menu but missing `internal: true` in
+   their catalog entry.
 
-```powershell
-cd d:\src\saropa_lints\extension
-npm test
-```
+## Fix
 
-The failure is in `out-test\test\commandCatalogRegistry.test.js:139` — the
-expected commands array no longer matches the actual registered commands.
+- Added 17 missing catalog entries across
+  `commandCatalogEntriesProject.ts` (16) and
+  `commandCatalogEntriesVibrancy.ts` (1: `showOpportunities`).
+- Marked 15 palette-hidden commands as `internal: true` in
+  `commandCatalogEntriesVibrancy.ts`.
 
-## Impact
+All 17 tests in `commandCatalogRegistry.test.ts` now pass.
 
-- Does not block individual test suites (scoped `npx mocha` runs pass).
-- Blocks `npm test` (full suite).
-- Pre-existing as of 2026-09-05; not introduced by any recent change.
+## Commands added to catalog
 
-## Likely cause
+`auditFolder`, `createBaseline`, `enableRule` (internal), `findStaleIgnores`,
+`fixStaleIgnores`, `fullAudit`, `killOrphanedDaemons`, `lspServer.start`,
+`lspServer.stop`, `lspServer.restart`, `migrateConfig`,
+`openAnalysisOptimizer`, `openFinding` (internal), `setLane`,
+`showProcessHealth`, `toggleDebugPanel`,
+`packageVibrancy.showOpportunities`.
 
-Command registrations were removed or renamed without updating the expected
-catalog in the test fixture.
+## Commands marked internal
+
+`suppressPackageByName`, `suppressByCategory`, `focusDetails`,
+`filterBySeverity`, `filterByProblemType`, `filterByCategory`,
+`filterBySection`, `sortDependencies`, `toggleCodeLens`,
+`updateAllMajor`, `updateAllMinor`, `updateAllPatch`,
+`logAllDetails`, `addRegistryAuth`, `removeRegistryAuth`.

@@ -1,6 +1,7 @@
 # PROPOSAL: Flag `Row`/`Column`/`Flex` Widgets With Exactly One Child
 
-**Status: Duplicate — already implemented as `AvoidSingleChildColumnRowRule` (`avoid_single_child_column_row`) in `lib/src/rules/widget/widget_layout_flex_scroll_rules.dart`**
+**Status: Duplicate**
+**Existing rule:** avoid_single_child_column_row
 
 Created: 2026-09-02
 Type: New rule

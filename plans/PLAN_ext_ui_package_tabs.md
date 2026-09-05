@@ -1,7 +1,15 @@
 # Plan — Embed Package Dashboard deep-link tabs as inline content
 
+**STATUS (2026-09-05): 3 of 4 tabs done. Only Tab 6 (Compare) remains.**
+Tab 3 (Upgrades), Tab 4 (Full report) and Tab 5 (Known issues) are embedded inline via
+`getEmbeddedBodyHtml`. Tab 6 is still a working deep link; it is the hardest case because it needs a
+dual-`acquireVsCodeApi()` consolidation. Note for whoever takes it: this plan's section 5 ordering
+is STALE - Tab 5 turned out to be the easiest of the four (static registry, no async data), not a
+mid-difficulty one.
+
+
 **Created:** 2026-09-05 · **Status:** Not started
-**Parent:** `PLAN_ext_ui_redesign.md` Phase 5 deferred item
+**Parent:** `plans/history/2026.09/2026.09.05/PLAN_ext_ui_redesign.md` (archived) Phase 5 deferred item
 **Scope:** TS-only, extension side. No Dart changes.
 **Model:** Sonnet for implementation.
 

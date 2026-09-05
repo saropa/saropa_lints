@@ -1,6 +1,7 @@
 # PROPOSAL: Flag Redundant `.then()` Identity/Constant Callbacks on `Future`
 
-**Status: Open**
+**Status: Duplicate**
+**Existing rule:** avoid_returning_null_for_future_strict
 
 Created: 2026-09-02
 Type: New rule
