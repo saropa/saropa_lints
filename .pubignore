@@ -71,11 +71,8 @@ reports/
 # Bug tracking / internal issue docs
 bugs/
 
-# Internal planning docs / dev-only reference material
-plans/
-
-# Migration guides (link to plans/ proposals that aren't shipped)
-doc/guides/migration_guides/
+# Internal planning docs that shouldn't ship (generated/local-only)
+plans/known_issues_review.md
 
 # Backup files
 *.bak
