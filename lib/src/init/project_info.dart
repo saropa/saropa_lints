@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
+import 'package:saropa_lints/src/cli/path_guard.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 /// Get saropa_lints rootUri from `<projectRoot>/.dart_tool/package_config.json`.
@@ -131,6 +132,9 @@ Map<String, bool> detectProjectPackages(
   void Function(String)? logLine,
 }) {
   final report = logLine ?? log.terminal;
+  // Reject path-traversal segments in the project path.
+  targetDir = sanitizePath(targetDir, label: 'targetDir');
+
   // Start with all disabled — only enable what we find
   final detected = <String, bool>{
     for (final pkg in tiers.allPackages) pkg: false,

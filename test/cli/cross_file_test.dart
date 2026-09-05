@@ -349,5 +349,22 @@ void main() {
         }
       },
     );
+
+    test('rejects outputDir with path-traversal segments', () {
+      // Path containing ".." must throw ArgumentError before any I/O.
+      const result = CrossFileResult(
+        unusedFiles: [],
+        circularDependencies: [],
+        missingMirrorTests: [],
+        stats: {'fileCount': 0, 'totalImports': 0},
+        featureDependencies: {},
+        crossFeatureImports: [],
+        deadImports: {},
+      );
+      expect(
+        () => reportToHtml(result, '../escape/reports'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
   });
 }

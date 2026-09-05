@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
+import 'package:saropa_lints/src/cli/path_guard.dart';
 
 part 'cross_file_html_reporter_part.dart';
 
@@ -44,6 +45,9 @@ const _stylesheetLink = '  <link rel="stylesheet" href="report.css">';
 /// Writes `report.css` and HTML under [outputDir] (index, section pages, and
 /// `feature-deps.html` from the part file).
 void reportToHtml(CrossFileResult result, String outputDir) {
+  // Reject path-traversal segments in user-supplied output dir.
+  outputDir = sanitizePath(outputDir, label: 'outputDir');
+
   final dir = Directory(outputDir);
   if (!dir.existsSync()) {
     dir.createSync(recursive: true);
