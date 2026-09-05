@@ -181,6 +181,30 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     category: 'Setup & Configuration',
     icon: 'book',
   },
+  {
+    // Baseline: snapshot existing violations so only new ones are reported.
+    command: 'saropaLints.createBaseline',
+    title: 'Create Baseline',
+    description: 'Snapshot existing violations so only new ones appear in diagnostics.',
+    category: 'Setup & Configuration',
+    icon: 'bookmark',
+  },
+  {
+    // Migrate deprecated config keys to current names.
+    command: 'saropaLints.migrateConfig',
+    title: 'Migrate Config Keys',
+    description: 'Rename deprecated analysis_options keys to their current equivalents (fixes unsupported_option warnings).',
+    category: 'Setup & Configuration',
+    icon: 'replace-all',
+  },
+  {
+    // Pick which analysis lane to run in.
+    command: 'saropaLints.setLane',
+    title: 'Set Analysis Lane',
+    description: 'Choose which analysis lane (fast, standard, deep) to use for the current workspace.',
+    category: 'Setup & Configuration',
+    icon: 'layers',
+  },
 
   // ── Analysis ─────────────────────────────────────────────────────────────
 
@@ -334,6 +358,94 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     category: 'Analysis',
     icon: 'file-text',
   },
+  {
+    // Full audit runs every rule regardless of the active tier.
+    command: 'saropaLints.fullAudit',
+    title: 'Full Audit (All Rules)',
+    description: 'Run a one-off analysis with every rule enabled, regardless of the current tier.',
+    category: 'Analysis',
+    icon: 'shield',
+  },
+  {
+    // Folder-scoped audit from the explorer context menu.
+    command: 'saropaLints.auditFolder',
+    title: 'Audit Folder',
+    description: 'Run analysis scoped to a selected folder.',
+    category: 'Analysis',
+    icon: 'shield',
+  },
+  {
+    // Find ignore comments whose target rule no longer fires.
+    command: 'saropaLints.findStaleIgnores',
+    title: 'Find Stale Ignore Comments',
+    description: 'Locate // ignore: comments whose target rule no longer fires on that line.',
+    category: 'Analysis',
+    icon: 'search-remove',
+  },
+  {
+    // Auto-remove stale ignore comments found by findStaleIgnores.
+    command: 'saropaLints.fixStaleIgnores',
+    title: 'Fix Stale Ignore Comments',
+    description: 'Remove // ignore: comments that no longer suppress an active diagnostic.',
+    category: 'Analysis',
+    icon: 'trash',
+  },
+  {
+    // Analysis Optimizer dashboard — tuning and performance.
+    command: 'saropaLints.openAnalysisOptimizer',
+    title: 'Analysis Optimizer',
+    description: 'Open the Analysis Optimizer panel showing rule timings and tuning recommendations.',
+    category: 'Analysis',
+    icon: 'zap',
+  },
+  {
+    // Process health dashboard — dart/flutter daemon status.
+    command: 'saropaLints.showProcessHealth',
+    title: 'Process Health',
+    description: 'Show the status of Dart and Flutter background processes (analysis server, daemons).',
+    category: 'Analysis',
+    icon: 'pulse',
+  },
+  {
+    // Kill orphaned Flutter/Dart daemons that outlived their session.
+    command: 'saropaLints.killOrphanedDaemons',
+    title: 'Kill Orphaned Flutter Daemons',
+    description: 'Terminate Flutter and Dart daemon processes that outlived their analysis session.',
+    category: 'Analysis',
+    icon: 'trash',
+  },
+  {
+    // Toggle the Health Panel (engines + processes debug view).
+    command: 'saropaLints.toggleDebugPanel',
+    title: 'Show Health Panel',
+    description: 'Toggle the Health Panel showing engine and process diagnostics.',
+    category: 'Analysis',
+    icon: 'bug',
+  },
+  {
+    // LSP server lifecycle: start.
+    command: 'saropaLints.lspServer.start',
+    title: 'Start LSP Server',
+    description: 'Start the Saropa Lints LSP server for enhanced analysis features.',
+    category: 'Analysis',
+    icon: 'debug-start',
+  },
+  {
+    // LSP server lifecycle: stop.
+    command: 'saropaLints.lspServer.stop',
+    title: 'Stop LSP Server',
+    description: 'Stop the running Saropa Lints LSP server.',
+    category: 'Analysis',
+    icon: 'debug-stop',
+  },
+  {
+    // LSP server lifecycle: restart.
+    command: 'saropaLints.lspServer.restart',
+    title: 'Restart LSP Server',
+    description: 'Restart the Saropa Lints LSP server.',
+    category: 'Analysis',
+    icon: 'debug-restart',
+  },
 
   // ── Violations & Filtering ───────────────────────────────────────────────
 
@@ -362,6 +474,15 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     command: 'saropaLints.openFileAndFocusIssues',
     title: 'Open File and Show Violations',
     description: 'Open a file in the editor and filter the violations view to it.',
+    category: 'Violations & Filtering',
+    icon: 'go-to-file',
+    internal: true,
+  },
+  {
+    // Navigate to a specific finding from a tree-view click.
+    command: 'saropaLints.openFinding',
+    title: 'Open Finding',
+    description: 'Navigate to a specific violation in the editor from a tree or dashboard click.',
     category: 'Violations & Filtering',
     icon: 'go-to-file',
     internal: true,
@@ -616,6 +737,15 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     description: 'Turn on one or more lint rules in the project configuration.',
     category: 'Rules & Fixes',
     icon: 'check',
+  },
+  {
+    // Single-rule enable from a tree-view context action.
+    command: 'saropaLints.enableRule',
+    title: 'Enable Rule',
+    description: 'Enable a single lint rule from a tree-view or context action.',
+    category: 'Rules & Fixes',
+    icon: 'check',
+    internal: true,
   },
 
   // ── Security Posture ─────────────────────────────────────────────────────

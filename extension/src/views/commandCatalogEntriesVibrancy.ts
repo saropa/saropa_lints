@@ -242,6 +242,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Type a package name to suppress its vibrancy diagnostics.',
     category: 'Package Vibrancy',
     icon: 'eye-closed',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.suppressByCategory',
@@ -249,6 +250,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Suppress all vibrancy diagnostics of a given category.',
     category: 'Package Vibrancy',
     icon: 'filter',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.suppressAllProblems',
@@ -270,6 +272,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Reorder dependencies in pubspec.yaml alphabetically.',
     category: 'Package Vibrancy',
     icon: 'list-ordered',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.showCodeLens',
@@ -293,6 +296,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Toggle code lens vibrancy badges on or off.',
     category: 'Package Vibrancy',
     icon: 'eye',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.focusDetails',
@@ -300,6 +304,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Open the package details sidebar panel.',
     category: 'Package Vibrancy',
     icon: 'preview',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.logDetails',
@@ -315,6 +320,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Print all scanned package details to the output channel.',
     category: 'Package Vibrancy',
     icon: 'output',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.updateFromCodeLens',
@@ -361,6 +367,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Update every dependency that has a new major version available.',
     category: 'Package Vibrancy — Updates',
     icon: 'arrow-up',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.updateAllMinor',
@@ -368,6 +375,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Update every dependency that has a new minor version available.',
     category: 'Package Vibrancy — Updates',
     icon: 'arrow-up',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.updateAllPatch',
@@ -375,6 +383,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Update every dependency that has a new patch version available.',
     category: 'Package Vibrancy — Updates',
     icon: 'arrow-up',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.showPrereleases',
@@ -443,6 +452,14 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     icon: 'folder-opened',
     internal: true,
   },
+  {
+    // Upgrade Opportunities dashboard — shows changelog features and usage.
+    command: 'saropaLints.packageVibrancy.showOpportunities',
+    title: 'Open Upgrade Opportunities',
+    description: 'Show changelog features, usage counts, and call sites for upgrade candidates.',
+    category: 'Package Vibrancy',
+    icon: 'rocket',
+  },
 
   // ── Package Vibrancy — Filters ───────────────────────────────────────────
 
@@ -459,6 +476,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Show only packages with a specific severity level.',
     category: 'Package Vibrancy — Filters',
     icon: 'filter',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.filterByProblemType',
@@ -466,6 +484,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Show only packages with a specific type of problem.',
     category: 'Package Vibrancy — Filters',
     icon: 'filter',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.filterByCategory',
@@ -473,6 +492,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Show only packages in a specific health category.',
     category: 'Package Vibrancy — Filters',
     icon: 'filter',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.filterBySection',
@@ -480,6 +500,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Show only packages in a specific pubspec section.',
     category: 'Package Vibrancy — Filters',
     icon: 'filter',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.showProblemsOnly',
@@ -511,6 +532,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Configure credentials for a private package registry.',
     category: 'Package Vibrancy — Registries',
     icon: 'key',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.removeRegistryAuth',
@@ -518,6 +540,7 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     description: 'Delete credentials for a private package registry.',
     category: 'Package Vibrancy — Registries',
     icon: 'trash',
+    internal: true,
   },
   {
     command: 'saropaLints.packageVibrancy.listRegistries',
