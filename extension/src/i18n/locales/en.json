@@ -632,6 +632,17 @@
     "reloadNow": "Reload now",
     "reloadLater": "Later"
   },
+  "statusBar": {
+    "menu": {
+      "enableOn": "Analysis enabled (click to disable)",
+      "enableOff": "Analysis disabled (click to enable)",
+      "openViolations": "Open Violations Report",
+      "openPackageDashboard": "Open Package Dashboard",
+      "openProcessHealth": "Open Process Health",
+      "commandCatalog": "Command Catalog",
+      "about": "About"
+    }
+  },
   "systemHealth": {
     "statusBar": {
       "warning": "⚠ {size}",

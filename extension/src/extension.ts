@@ -527,14 +527,14 @@ function buildStatusBarTooltipMarkdown(infoLines: string[], enabled: boolean): v
   // when off — clicking flips it via whichever command is the opposite of
   // the current state (there is no single toggle command to link to).
   md.appendMarkdown(enabled
-    ? statusBarCmdLink('$(check)', 'Analysis enabled (click to disable)', 'saropaLints.disable')
-    : statusBarCmdLink('$(circle-outline)', 'Analysis disabled (click to enable)', 'saropaLints.enable'));
-  md.appendMarkdown(statusBarCmdLink('$(checklist)', 'Open Violations Report', 'saropaLints.openViolationsWideReport'));
-  md.appendMarkdown(statusBarCmdLink('$(package)', 'Open Package Dashboard', 'saropaLints.openProjectVibrancyReport'));
-  md.appendMarkdown(statusBarCmdLink('$(pulse)', 'Open Process Health', 'saropaLints.showProcessHealth'));
+    ? statusBarCmdLink('$(check)', l10n('statusBar.menu.enableOn'), 'saropaLints.disable')
+    : statusBarCmdLink('$(circle-outline)', l10n('statusBar.menu.enableOff'), 'saropaLints.enable'));
+  md.appendMarkdown(statusBarCmdLink('$(checklist)', l10n('statusBar.menu.openViolations'), 'saropaLints.openViolationsWideReport'));
+  md.appendMarkdown(statusBarCmdLink('$(package)', l10n('statusBar.menu.openPackageDashboard'), 'saropaLints.openProjectVibrancyReport'));
+  md.appendMarkdown(statusBarCmdLink('$(pulse)', l10n('statusBar.menu.openProcessHealth'), 'saropaLints.showProcessHealth'));
   md.appendMarkdown('---\n\n');
-  md.appendMarkdown(statusBarCmdLink('$(list-unordered)', 'Command Catalog', 'saropaLints.showCommandCatalog'));
-  md.appendMarkdown(`[$(info) About](command:saropaLints.showAbout)`);
+  md.appendMarkdown(statusBarCmdLink('$(list-unordered)', l10n('statusBar.menu.commandCatalog'), 'saropaLints.showCommandCatalog'));
+  md.appendMarkdown(`[$(info) ${l10n('statusBar.menu.about')}](command:saropaLints.showAbout)`);
 
   return md;
 }

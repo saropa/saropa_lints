@@ -80,6 +80,8 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
 
 - Fixed VS Code "Switch to Pre-Release Version" button failing with `net::ERR_FAILED` — pre-release extension versions now use an odd minor number as VS Code requires.
 - Fixed CI watch blocking publish by defaulting to skip (press `y` to opt in).
+- Fixed the status bar cramming memory/system-health warnings into the same text as the lint score, with no way to click through to the details — split into a second status bar item that only appears when there's something to report and opens the Process Health panel on click. No action required.
+- Fixed the status bar's hover tooltip being read-only text with no way to act on it — it's now a clickable menu (toggle analysis on/off, jump to the Violations Report, Package Dashboard, Process Health, Command Catalog, or About). No action required.
 
 <details><summary>Maintenance</summary>
 

@@ -19,23 +19,15 @@ export function buildStatusBarLabel(params: {
   tier: string;
   showVibrancy: boolean;
   vibrancyLabel: string | null;
-  systemHealthSuffix?: string;
 }): string {
-  const { hasHealth, healthScore, delta = '', tier, showVibrancy, vibrancyLabel, systemHealthSuffix } = params;
+  const { hasHealth, healthScore, delta = '', tier, showVibrancy, vibrancyLabel } = params;
 
-  let base: string;
   if (hasHealth) {
-    base = showVibrancy
+    return showVibrancy
       ? `${healthScore}%${delta} · V${vibrancyLabel}`
       : `${healthScore}%${delta} · ${tier}`;
-  } else {
-    base = showVibrancy
-      ? `Saropa Lints · V${vibrancyLabel}`
-      : `Saropa Lints · ${tier}`;
   }
-
-  if (systemHealthSuffix) {
-    return `${base} · ${systemHealthSuffix}`;
-  }
-  return base;
+  return showVibrancy
+    ? `Saropa Lints · V${vibrancyLabel}`
+    : `Saropa Lints · ${tier}`;
 }
