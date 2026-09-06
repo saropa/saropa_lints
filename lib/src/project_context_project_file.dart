@@ -381,21 +381,13 @@ class ProjectContext {
     return clean;
   }
 
-  /// Parse a pubspec's `workspace:` list and check if [packageDir] is a
-  /// listed member.
+  /// Extract the raw `workspace:` list entries from a pubspec's content.
   ///
-  /// Returns the [ancestorDir] path when the ancestor pubspec has a
-  /// `workspace:` key whose list (after path normalization) contains the
-  /// relative path from [ancestorDir] to [packageDir]. Returns null
-  /// otherwise.
-  static String? _findWorkspaceMembership(
-    String ancestorDir,
-    String pubspecContent,
-    String packageDir,
-  ) {
-    // Extract workspace: entries via simple line-by-line parsing.
-    // Dart pub workspace: entries are always a YAML list of relative paths
-    // (no globs, no variables) — simple regex extraction is safe here.
+  /// Returns an empty list when the pubspec has no `workspace:` key or the
+  /// list is empty. Handles both block-style (indented `- path`) and
+  /// flow-style (`workspace: [a, b]`) YAML. Column-0 comments inside the
+  /// block are tolerated (not treated as block terminators).
+  static List<String> _parseWorkspaceEntries(String pubspecContent) {
     final lines = pubspecContent.split('\n');
     var inWorkspace = false;
     final members = <String>[];
@@ -435,27 +427,71 @@ class ProjectContext {
       }
     }
 
+    return members;
+  }
+
+  /// Parse a pubspec's `workspace:` list and check if [packageDir] is a
+  /// listed member.
+  ///
+  /// Returns the [ancestorDir] path when the ancestor pubspec has a
+  /// `workspace:` key whose list (after path normalization) contains the
+  /// relative path from [ancestorDir] to [packageDir]. Returns null
+  /// otherwise.
+  static String? _findWorkspaceMembership(
+    String ancestorDir,
+    String pubspecContent,
+    String packageDir,
+  ) {
+    final members = _parseWorkspaceEntries(pubspecContent);
     if (members.isEmpty) return null;
 
     // Normalize both paths for comparison via the shared helper.
     final ancestorClean = _canonicalRelativePath(ancestorDir);
     final packageClean = _canonicalRelativePath(packageDir);
 
+    // Case-insensitive comparison on Windows where filesystem paths are
+    // case-insensitive. Dart's Platform.isWindows is checked once; on other
+    // platforms the lowercase conversion is a no-op cost-wise.
+    final lowerAncestor = Platform.isWindows
+        ? ancestorClean.toLowerCase()
+        : ancestorClean;
+    final lowerPackage = Platform.isWindows
+        ? packageClean.toLowerCase()
+        : packageClean;
+
     // The package must be under the ancestor for the relative path to make
     // sense.
-    if (!packageClean.startsWith('$ancestorClean/')) return null;
+    if (!lowerPackage.startsWith('$lowerAncestor/')) return null;
 
-    final relativePath = packageClean.substring(ancestorClean.length + 1);
+    final relativePath = lowerPackage.substring(lowerAncestor.length + 1);
 
     // Check if any workspace entry matches (after canonicalizing the entry).
     for (final entry in members) {
-      if (_canonicalRelativePath(entry) == relativePath) {
+      final entryClean = _canonicalRelativePath(entry);
+      final lowerEntry = Platform.isWindows
+          ? entryClean.toLowerCase()
+          : entryClean;
+      if (lowerEntry == relativePath) {
         return ancestorDir;
       }
     }
 
     // Ancestor has a workspace: list but this package isn't in it.
     return null;
+  }
+
+  /// Returns the list of workspace member paths declared in the pubspec at
+  /// [projectRoot], or an empty list if the pubspec has no `workspace:` key.
+  ///
+  /// Paths are returned as-is from the pubspec (relative, forward-slash).
+  /// Callers should use [_canonicalRelativePath] before comparing with
+  /// filesystem paths.
+  static List<String> getWorkspaceMembers(String? projectRoot) {
+    if (projectRoot == null) return const [];
+    final pubspecFile = File('$projectRoot/pubspec.yaml');
+    if (!pubspecFile.existsSync()) return const [];
+    final content = pubspecFile.readAsStringSync();
+    return _parseWorkspaceEntries(content);
   }
 
   /// Clear the project cache (useful for testing).

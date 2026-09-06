@@ -898,6 +898,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'file_picker_path_on_web': 'packages',
   'file_picker_unchecked_null_result': 'packages',
   'file_picker_with_data_large_files': 'packages',
+  'flag_missing_workspace_member': 'config',
   'flutter_animate_auto_play_false_no_driver': 'packages',
   'flutter_animate_empty_animate_list': 'packages',
   'flutter_animate_fixed_target_literal': 'packages',

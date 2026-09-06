@@ -71,6 +71,15 @@ void main() {
         'add_resolution_workspace',
       );
     });
+    test(
+      'FlagMissingWorkspaceMemberRule reports correct name and messages',
+      () {
+        expectMetadata(
+          FlagMissingWorkspaceMemberRule(),
+          'flag_missing_workspace_member',
+        );
+      },
+    );
   });
 
   group('parseConstraint', () {

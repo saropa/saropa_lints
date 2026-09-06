@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Missing Workspace Member
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-06
 
@@ -122,3 +122,13 @@ its walk/cache infrastructure exists to extend, since this rule's directory-scan
 bound (see Detection Logic Notes #1-#2) depends on knowing which subdirectories are
 already-listed members — reusing that infrastructure avoids a second, inconsistent
 notion of "workspace member" existing in the codebase at once.
+
+## Finish Report (2026-09-06)
+
+New lint rule `flag_missing_workspace_member` (recommended tier, INFO) implemented and registered. The rule fires on workspace root packages (pubspec.yaml with a `workspace:` key) when subdirectories containing their own `pubspec.yaml` are not listed in the `workspace:` list.
+
+**Detection algorithm:** Extracts workspace entries via the refactored `_parseWorkspaceEntries` helper (shared with the companion `add_resolution_workspace` rule). Scans subdirectories up to 3 levels deep. Skips hidden directories (`.dart_tool`, `.git`), `build/` output, and already-listed member directories (preventing example/ false positives). Path comparison uses the same case-insensitive normalization added to the companion rule for Windows compatibility.
+
+**Infrastructure changes:** Refactored `_findWorkspaceMembership` in `project_context_project_file.dart` to extract `_parseWorkspaceEntries` as a reusable static method. Added public `getWorkspaceMembers(projectRoot)` for the new rule to call. Added case-insensitive path comparison on Windows via `Platform.isWindows` to both the membership check and the scan.
+
+**Limitations:** Same `/lib/`-gating limitation as all pubspec rules — workspace roots without a `lib/` directory never trigger. Scan depth capped at 3 levels — deeply nested packages beyond that are missed. No quick fix (the insertion position and alphabetical ordering logic is more complex than the companion rule's simple append).

@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
-import 'dart:io' show File;
+import 'dart:io'
+    show Directory, File, FileSystemEntity, FileSystemException, Platform;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
@@ -509,5 +510,189 @@ class AddResolutionWorkspaceRule extends SaropaLintRule {
       if (token.isEof) return;
       reporter.atOffset(offset: token.offset, length: token.length);
     });
+  }
+}
+
+// =============================================================================
+// Flag missing workspace member (inverse of add_resolution_workspace)
+// =============================================================================
+
+/// Flags a workspace root pubspec that has subdirectories containing
+/// `pubspec.yaml` files not listed in the root's `workspace:` list.
+///
+/// This is the root-side companion to [AddResolutionWorkspaceRule] (member-side).
+/// A package that exists on disk but isn't listed in the workspace root's
+/// `workspace:` list resolves independently — its own lockfile, its own
+/// dependency graph — silently defeating the shared workspace for that package.
+///
+/// Since: v16.0.0-beta.7 | Rule version: v1
+///
+/// **BAD:**
+/// ```yaml
+/// # pubspec.yaml (workspace root)
+/// name: my_monorepo
+/// workspace:
+///   - packages/foo
+///   # packages/bar exists on disk with a pubspec.yaml but isn't listed
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// # pubspec.yaml (workspace root)
+/// name: my_monorepo
+/// workspace:
+///   - packages/foo
+///   - packages/bar
+/// ```
+class FlagMissingWorkspaceMemberRule extends SaropaLintRule {
+  FlagMissingWorkspaceMemberRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec', 'workspace'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  /// Dedup set: report at most once per workspace root directory.
+  static final Set<String> _reportedRoots = {};
+
+  /// Maximum depth to scan for subdirectory pubspec.yaml files.
+  /// Typical workspace layouts use 1-2 levels (packages/foo, apps/bar).
+  /// Deeper scans risk hitting generated directories and slow analysis.
+  static const int _maxScanDepth = 3;
+
+  static const LintCode _code = LintCode(
+    'flag_missing_workspace_member',
+    '[flag_missing_workspace_member] This workspace root has subdirectories '
+        'containing pubspec.yaml files that are not listed in the workspace: '
+        'list. Unlisted packages resolve independently — their own lockfile, '
+        'their own version graph — silently defeating the shared workspace '
+        'resolution. Add the missing package paths to the workspace: list, or '
+        'move non-member packages outside the workspace root. {v1}',
+    correctionMessage:
+        'Add the missing package directory to the workspace: list in '
+        'pubspec.yaml.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Find this file's project root.
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+    if (_reportedRoots.contains(root)) return;
+
+    // Only attach to lib/ files (same dedup pattern as other pubspec rules).
+    final path = context.filePath.replaceAll('\\', '/');
+    if (!path.contains('/lib/')) return;
+
+    // Check if this project root IS a workspace root (has workspace: key).
+    final members = ProjectContext.getWorkspaceMembers(root);
+    if (members.isEmpty) return;
+
+    // Build a normalized set of listed members for O(1) lookup.
+    final normalizedMembers = <String>{};
+    for (final entry in members) {
+      var clean = entry.replaceAll('\\', '/');
+      if (clean.startsWith('./')) clean = clean.substring(2);
+      if (clean.endsWith('/')) clean = clean.substring(0, clean.length - 1);
+      if (Platform.isWindows) clean = clean.toLowerCase();
+      normalizedMembers.add(clean);
+    }
+
+    // Scan subdirectories (bounded depth) for pubspec.yaml files not listed.
+    final rootDir = Directory(root);
+    final missing = <String>[];
+    _scanForUnlistedPackages(
+      rootDir,
+      root,
+      normalizedMembers,
+      missing,
+      0,
+    );
+
+    if (missing.isEmpty) return;
+
+    // At least one unlisted package found — report on the first lib/ token.
+    _reportedRoots.add(root);
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
+    });
+  }
+
+  /// Recursively scans [dir] for subdirectories containing pubspec.yaml that
+  /// are not in [listedMembers]. Stops at [_maxScanDepth] and skips
+  /// already-listed member directories (their children like example/ are
+  /// intentionally not workspace members).
+  void _scanForUnlistedPackages(
+    Directory dir,
+    String workspaceRoot,
+    Set<String> listedMembers,
+    List<String> missing,
+    int depth,
+  ) {
+    if (depth >= _maxScanDepth) return;
+
+    // List immediate children only (not recursive).
+    List<FileSystemEntity> children;
+    try {
+      children = dir.listSync(followLinks: false);
+    } on FileSystemException {
+      // Permission denied, symlink loop, etc. — skip silently.
+      return;
+    }
+
+    for (final child in children) {
+      if (child is! Directory) continue;
+
+      // Skip hidden directories (., .dart_tool, .git) and build output.
+      final name = child.path.replaceAll('\\', '/').split('/').last;
+      if (name.startsWith('.') || name == 'build') continue;
+
+      // Compute relative path from workspace root to this directory.
+      var relative = child.path
+          .replaceAll('\\', '/')
+          .substring(workspaceRoot.replaceAll('\\', '/').length + 1);
+      if (relative.endsWith('/')) {
+        relative = relative.substring(0, relative.length - 1);
+      }
+      final comparePath = Platform.isWindows
+          ? relative.toLowerCase()
+          : relative;
+
+      // If this directory has a pubspec.yaml and isn't listed, it's missing.
+      final hasPubspec = File('${child.path}/pubspec.yaml').existsSync();
+      if (hasPubspec && !listedMembers.contains(comparePath)) {
+        missing.add(relative);
+        // Don't recurse into unlisted packages — their children aren't
+        // workspace candidates either.
+        continue;
+      }
+
+      // If this directory IS a listed member, skip recursion — its children
+      // (like example/) are intentionally not workspace members.
+      if (listedMembers.contains(comparePath)) continue;
+
+      // Directory has no pubspec and isn't a listed member — recurse to find
+      // packages nested inside container directories (packages/, apps/).
+      _scanForUnlistedPackages(
+        child,
+        workspaceRoot,
+        listedMembers,
+        missing,
+        depth + 1,
+      );
+    }
   }
 }
