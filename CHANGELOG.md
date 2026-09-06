@@ -77,8 +77,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
+- Fixed stale diagnostics persisting in the Problems panel after adding `// ignore:` directives or fixing code. The scan CLI now honors `// ignore:` and `// ignore_for_file:` directives, and "Restart Analysis Server" now also clears scan-on-save diagnostics and rescans open editors. No action required.
 - Fixed hard RSS valve pausing all rules based on the analysis server's total process memory instead of the plugin's own contribution. On large projects the server's AST caches and resolved element model consume 70–90% of RSS, tripping the valve even when the plugin's estimated footprint is under 100 MB. The valve now checks plugin attribution: it only pauses rules when the plugin's estimated memory exceeds 100 MB or 5% of process RSS. A separate unconditional panic threshold at 90% of system RAM provides last-resort OOM protection. No action required.
-
 - Fixed the Drift Advisor integration opening every Dart file in the workspace on each 30-second poll, which could cascade into repeated whole-project scans and exhaust system memory until VS Code crashed. Table lookups now read files directly without creating editor documents, and results are cached until Dart sources change. No action required; the integration is off by default, so only users who enabled it were affected.
 - Fixed scan on save treating a file opened by other extension code as a file the user opened, which let any extension's background file access trigger lint scans. Scans now run only for files you actually have open or have saved. No action required.
 - Fixed a stalled scan permanently disabling scan on save for the rest of the session. Scans now time out, are canceled when a newer save supersedes them, and release their slot on every failure path. No action required.
@@ -100,6 +100,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - Triage script (`scripts/triage_scan.py`): added diagnostic-key validation (warns when `filePath`/`severity`/`ruleName` are missing), and a 29-test unit-test suite covering path classification, bucket assignment, and output formatting. No action required.
 - Changelog guard hook (`scripts/hooks/changelog_guard.py`): removed the `package.json` version-drift check that false-alarmed every beta cycle because VS Code uses a different version scheme. Guard 1 (multiple unreleased sections) still triggers on `package.json` edits. No action required.
+- Extracted shared `isTimerLifecycleBoundToDisposableState()` helper to eliminate duplicate private implementations across timer lifecycle rules. No action required.
 
 ---
 
@@ -520,23 +521,6 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Hardened the migration pack generator's tiers.dart validation to skip comment lines (commented-out rule names were false-passing), added validation for the carried-forward `flutter_skill_lints` code set, and extracted a shared dedup constant so the generator and drift test can't silently disagree on the count.
 - Hardened migration pack generator further: `extractBlock`/`extractPackCodes` now use balanced brace counting instead of fragile `\n};`/`\n  },` string markers; `activeQuotedIdentifiers` strips `/* */` block comments in addition to `//` lines; `.dart_tool/` temp directory is created before use; diff output shows per-pack `+ added`/`- removed` codes in both normal and `--check` modes.
 - l10n diagnostic provider: excluded `l10nParsers.test.ts` from validation (false positives from dummy keys in test fixtures), added extra-params detection (Hint when code passes params the template doesn't use), added `// l10n-ignore-next-line` comment directive for per-call suppression, and added dead-key detection with single and bulk quick-fixes to remove unreferenced en.json keys from all 25 locale files at once.
-
----
-
-## [15.2.8]
-
-Rule shedding under memory pressure is now cost-aware — expensive rules that drive the most memory consumption are shed first, keeping cheap syntactic rules running longer. The Config Dashboard surfaces which rules are currently shed and why, and the status bar tooltip shows shed category breakdowns. [log](https://github.com/saropa/saropa_lints/blob/v15.2.8/CHANGELOG.md)
-
-### Added
-
-- Config Dashboard now shows a "Shed rules" section when memory pressure is active — lists every temporarily disabled rule grouped by shed category (type-resolving, high-cost, INFO, WARNING) with clickable links to each rule's explanation.
-- Shed rules are marked with a "shed" badge inside expanded pack rows so you can see at a glance which rules in a pack are temporarily inactive.
-- "Restart analyzer" button in the shed section clears memory pressure by restarting the analysis server — shed rules restore automatically when RSS resets. No action required.
-
-### Changed
-
-- Cost-aware rule shedding: memory pressure now sheds type-resolving and high-cost rules first (level 1), then INFO-severity (level 2), then WARNING-severity (level 3). No action required.
-- Status bar tooltip shows shed rule breakdown by category (type-resolving, high-cost, INFO, WARNING) when shedding is active. No action required.
 
 ---
 

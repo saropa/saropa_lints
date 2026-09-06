@@ -78,6 +78,40 @@ bool isBackgroundWorkCanceledInDispose(
       isFieldCleanedUp(fieldName, 'close', disposeBody);
 }
 
+/// Returns true when [node] (a `Timer.periodic(...)` call) sits inside a
+/// Flutter `State<T>` subclass (or a subtype like `ConsumerState`,
+/// `TickerProviderStateMixin`) whose `dispose()` method cancels the field
+/// the timer is assigned to.
+///
+/// Such timers are bound to the widget's lifecycle and cannot outlive it —
+/// they stop existing when the widget is removed from the tree, well before
+/// or exactly when the app backgrounds. Used by both
+/// `require_workmanager_for_background` and `avoid_ios_battery_drain_patterns`
+/// to skip false positives on UI-only timers (clock ticks, typewriter
+/// animations, poll-while-visible patterns).
+///
+/// Conservative: returns false for any shape it can't confirm (no enclosing
+/// class, not a State subclass, no dispose(), no cancel on the field).
+bool isTimerLifecycleBoundToDisposableState(MethodInvocation node) {
+  // Walk up to the enclosing class — a top-level function or non-widget
+  // helper has no State lifecycle to lean on.
+  final ClassDeclaration? enclosingClass = node
+      .thisOrAncestorOfType<ClassDeclaration>();
+  if (enclosingClass == null) return false;
+
+  // Only State subclasses get the lifecycle exemption. Uses endsWith('State')
+  // to cover ConsumerState, TickerProviderStateMixin, etc. — same convention
+  // used by isWidgetOrStateClass elsewhere in the codebase.
+  final ExtendsClause? extendsClause = enclosingClass.extendsClause;
+  if (extendsClause == null) return false;
+  final String superName = extendsClause.superclass.name.lexeme;
+  if (!superName.endsWith('State')) return false;
+
+  // Delegate the "is this field canceled in dispose()?" check to the shared
+  // utility directly above, so all rules agree on what counts as cleaned up.
+  return isBackgroundWorkCanceledInDispose(node, enclosingClass);
+}
+
 /// Extracts the final identifier name from a method invocation target.
 ///
 /// Handles the three common target expression types:

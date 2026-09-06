@@ -43,6 +43,25 @@ def _proc(pid: int, ppid: int, name: str, gb: float = 1.0) -> qe._ProcInfo:
     return qe._ProcInfo(pid=pid, ppid=ppid, name=name, commit_bytes=int(gb * 1024**3))
 
 
+def _liveness(dead: set[int] | None = None, unknown: set[int] | None = None):
+    """Patch the single-PID probe so orphan confirmation never touches the OS.
+
+    Orphan detection now requires a POSITIVE "this parent is gone" answer, so
+    every test that expects an orphan has to name the PID that is confirmed
+    dead. Anything unnamed reports alive, which is the safe default and matches
+    what a real machine says about a parent that is still in the snapshot.
+    """
+    dead = dead or set()
+    unknown = unknown or set()
+
+    def probe(pid: int) -> bool | None:
+        if pid in unknown:
+            return None
+        return False if pid in dead else True
+
+    return mock.patch.object(qe, "_pid_liveness", side_effect=probe)
+
+
 class TestWindowsKillShape(unittest.TestCase):
     """The Windows kill must pass /T; without it llama-server.exe is stranded."""
 
@@ -123,7 +142,8 @@ class TestOrphanDetection(unittest.TestCase):
     ]
 
     def test_only_parentless_hosts_are_orphans(self) -> None:
-        with mock.patch.object(qe, "_snapshot_processes", return_value=self.SNAPSHOT):
+        with mock.patch.object(qe, "_snapshot_processes", return_value=self.SNAPSHOT), \
+                _liveness(dead={999}):
             orphans = qe.find_orphan_model_hosts()
         self.assertEqual([p.pid for p in orphans], [102])
 
@@ -135,7 +155,8 @@ class TestOrphanDetection(unittest.TestCase):
 
     def test_legacy_host_image_name_recognized(self) -> None:
         snap = [_proc(200, 4, "ollama.exe"), _proc(201, 555, "ollama_llama_server.exe")]
-        with mock.patch.object(qe, "_snapshot_processes", return_value=snap):
+        with mock.patch.object(qe, "_snapshot_processes", return_value=snap), \
+                _liveness(dead={555}):
             self.assertEqual([p.pid for p in qe.find_orphan_model_hosts()], [201])
 
     def test_description_reports_total_memory(self) -> None:
@@ -145,11 +166,207 @@ class TestOrphanDetection(unittest.TestCase):
         self.assertIn("PID 1", text)
 
 
+class TestOrphanConfirmationCannotMisfire(unittest.TestCase):
+    """The three directions in which orphan detection must never be wrong.
+
+    Nobody has ever run this path against a real orphan, so its defensibility
+    rests entirely on these cases. Each one is a way the OS can lie to us, and
+    each must resolve toward leaving the process alone.
+    """
+
+    def test_reused_parent_pid_makes_a_dead_parent_look_alive_only(self) -> None:
+        # PID reuse is the classic hazard. The dangerous direction would be a
+        # recycled PID making a LIVE parent look dead, which would nominate a
+        # serving daemon's model host for termination. It cannot happen: reuse
+        # only ever puts a PID back INTO the live set, and both the snapshot
+        # test and the confirmation probe read presence as "alive".
+        snap = [
+            _proc(500, 4, "code.exe"),  # PID 500 recycled by an unrelated app
+            _proc(501, 500, "llama-server.exe", 12.0),  # host whose parent died
+        ]
+        with mock.patch.object(qe, "_snapshot_processes", return_value=snap), \
+                _liveness():
+            self.assertEqual(qe.find_orphan_model_hosts(), [])
+
+    def test_a_host_whose_parent_is_alive_is_never_a_candidate(self) -> None:
+        # PID 101's parent (100) is in the snapshot, so it must be excluded
+        # before the probe is even consulted.
+        with mock.patch.object(qe, "_snapshot_processes",
+                               return_value=TestOrphanDetection.SNAPSHOT), \
+                _liveness(dead={999}) as probe:
+            orphans = qe.find_orphan_model_hosts()
+        self.assertNotIn(101, [p.pid for p in orphans])
+        # Only the nominated candidate's parent is probed; the live daemon's
+        # child never reaches the probe at all.
+        self.assertEqual([c.args[0] for c in probe.mock_calls if c.args], [999])
+
+    def test_dropped_snapshot_row_cannot_promote_a_live_parent_to_orphan(self) -> None:
+        # The real hazard behind this hardening: the Windows parser silently
+        # skips any row it cannot parse, and `ps` output can be truncated. Here
+        # the daemon's row is missing from the snapshot, so PID 101 LOOKS
+        # parentless — but its parent is alive, and the probe says so.
+        snap = [_proc(101, 100, "llama-server.exe", 9.5)]  # parent row dropped
+        with mock.patch.object(qe, "_snapshot_processes", return_value=snap), \
+                _liveness():
+            self.assertEqual(qe.find_orphan_model_hosts(), [])
+
+    def test_unknowable_parent_liveness_is_not_permission_to_kill(self) -> None:
+        # A probe that could not answer (tasklist missing, syscall blocked) must
+        # read as "leave it alone", never as "confirmed dead".
+        snap = [_proc(601, 600, "llama-server.exe", 9.5)]
+        with mock.patch.object(qe, "_snapshot_processes", return_value=snap), \
+                _liveness(unknown={600}):
+            self.assertEqual(qe.find_orphan_model_hosts(), [])
+
+    def test_unreadable_parent_pid_field_is_not_permission_to_kill(self) -> None:
+        # A Windows row whose ParentProcessId is null degrades to ppid 0. That
+        # is an absence of information, not evidence of a dead parent.
+        snap = [_proc(701, 0, "llama-server.exe", 9.5)]
+        with mock.patch.object(qe, "_snapshot_processes", return_value=snap):
+            self.assertEqual(qe.find_orphan_model_hosts(), [])
+
+    def test_nonpositive_pids_are_never_probed_or_confirmed(self) -> None:
+        # os.kill treats 0 and negatives as process-GROUP selectors, so they
+        # must not reach the probe at all.
+        for pid in (0, -1, -100):
+            with self.subTest(pid=pid):
+                self.assertIsNone(qe._pid_liveness(pid))
+                self.assertFalse(qe._parent_confirmed_gone(pid))
+
+
+class TestPidLivenessTriState(unittest.TestCase):
+    """A failed liveness query must be "unknown", never "dead"."""
+
+    def _win_probe(self, **run_kwargs):
+        with mock.patch.object(qe.sys, "platform", "win32"), \
+                mock.patch.object(qe.subprocess, "run", **run_kwargs):
+            return qe._pid_liveness(4321)
+
+    def test_tasklist_failure_is_unknown(self) -> None:
+        # Non-zero exit means we learned nothing. Reading that as "gone" is what
+        # would let a broken tool authorize killing a live daemon's child.
+        self.assertIsNone(self._win_probe(
+            return_value=mock.Mock(returncode=1, stdout="")))
+
+    def test_tasklist_missing_or_timed_out_is_unknown(self) -> None:
+        for exc in (FileNotFoundError(), OSError(),
+                    qe.subprocess.TimeoutExpired("tasklist", 10)):
+            with self.subTest(exc=type(exc).__name__):
+                self.assertIsNone(self._win_probe(side_effect=exc))
+
+    def test_no_matching_task_is_confirmed_gone(self) -> None:
+        self.assertIs(self._win_probe(return_value=mock.Mock(
+            returncode=0,
+            stdout="INFO: No tasks are running which match the specified criteria.",
+        )), False)
+
+    def test_matching_csv_row_is_alive(self) -> None:
+        self.assertIs(self._win_probe(return_value=mock.Mock(
+            returncode=0,
+            stdout='"llama-server.exe","4321","Console","1","9,961,472 K"',
+        )), True)
+
+    def test_digits_in_another_column_do_not_fake_a_match(self) -> None:
+        # The old substring test would call PID 42 alive off the "1,242 K" in a
+        # memory column. Matching the quoted PID field closes that.
+        with mock.patch.object(qe.sys, "platform", "win32"), \
+                mock.patch.object(qe.subprocess, "run", return_value=mock.Mock(
+                    returncode=0,
+                    stdout='"code.exe","9999","Console","1","1,242 K"')):
+            self.assertIs(qe._pid_liveness(42), False)
+
+    def test_posix_unexpected_oserror_is_unknown(self) -> None:
+        with mock.patch.object(qe.sys, "platform", "linux"), \
+                mock.patch.object(qe.os, "kill", side_effect=OSError):
+            self.assertIsNone(qe._pid_liveness(4321))
+
+    def test_posix_permission_error_means_alive(self) -> None:
+        with mock.patch.object(qe.sys, "platform", "linux"), \
+                mock.patch.object(qe.os, "kill", side_effect=PermissionError):
+            self.assertIs(qe._pid_liveness(4321), True)
+
+    def test_wait_loop_treats_unknown_as_still_running(self) -> None:
+        # _pid_alive gates only how long we keep polling, so unknown must keep
+        # us waiting rather than declare a kill successful without evidence.
+        with mock.patch.object(qe, "_pid_liveness", return_value=None):
+            self.assertTrue(qe._pid_alive(4321))
+
+
+class TestPortConflictReusesForeignDaemon(unittest.TestCase):
+    """A daemon we did not start is usable; it is just not ours to kill.
+
+    Refusing the run outright whenever our own spawn lost the port punished an
+    operator who simply already had `ollama serve` running. The run may use that
+    daemon; the safety property is that it must never be adopted, because
+    adoption is what authorizes teardown.
+    """
+
+    def setUp(self) -> None:
+        self._saved = qe._daemon_pid
+        qe._daemon_pid = None
+
+    def tearDown(self) -> None:
+        qe._daemon_pid = self._saved
+
+    def _ensure_ready(self, *, our_proc_exited: bool, endpoint_after: bool):
+        # Endpoint sequence: down at the first probe so the spawn is attempted,
+        # then up once so the "did it come up?" wait loop exits immediately,
+        # then whatever the scenario says for every probe after that. The
+        # scripted third state is what distinguishes "somebody else owns the
+        # port" from "nothing is serving at all".
+        probes = iter([False, True])
+        proc = mock.Mock()
+        proc.pid = 31337
+        proc.poll.return_value = 1 if our_proc_exited else None
+        with mock.patch.object(qe.shutil, "which", return_value="ollama"), \
+                mock.patch.object(qe, "preflight_orphan_check",
+                                  return_value=(True, "clean")), \
+                mock.patch.object(
+                    qe, "_endpoint_up",
+                    side_effect=lambda *_a, **_k: next(probes, endpoint_after)), \
+                mock.patch.object(qe, "_has_model", return_value=True), \
+                mock.patch.object(qe.time, "sleep"), \
+                mock.patch.object(qe.subprocess, "Popen", return_value=proc), \
+                mock.patch.object(qe, "restart_ollama",
+                                  return_value=False) as restart:
+            ok, detail = qe._ensure_ready()
+        return ok, detail, restart
+
+    def test_existing_daemon_on_the_port_is_used_not_refused(self) -> None:
+        ok, detail, restart = self._ensure_ready(
+            our_proc_exited=True, endpoint_after=True)
+        self.assertTrue(ok, detail)
+        # No restart attempt: there is nothing wrong to recover from.
+        restart.assert_not_called()
+
+    def test_a_daemon_we_did_not_start_is_never_adopted(self) -> None:
+        # The safety property. An unadopted PID cannot be reached by
+        # shutdown_engine, so the operator's daemon survives the run.
+        self._ensure_ready(our_proc_exited=True, endpoint_after=True)
+        self.assertIsNone(qe._daemon_pid)
+
+    def test_our_own_daemon_is_still_adopted(self) -> None:
+        with mock.patch.object(qe, "_adopt_daemon") as adopt:
+            ok, detail, _ = self._ensure_ready(
+                our_proc_exited=False, endpoint_after=True)
+        self.assertTrue(ok, detail)
+        self.assertEqual(adopt.call_args.args, (31337,))
+
+    def test_dead_spawn_with_a_dead_port_still_restarts(self) -> None:
+        # The narrowing must not swallow the genuine failure case: nothing is
+        # serving and our spawn died, so the restart path must still run.
+        ok, _detail, restart = self._ensure_ready(
+            our_proc_exited=True, endpoint_after=False)
+        self.assertFalse(ok)
+        restart.assert_called_once()
+
+
 class TestSweepSafety(unittest.TestCase):
     def test_sweep_terminates_only_the_orphan(self) -> None:
         with mock.patch.object(qe, "_endpoint_up", return_value=False), \
                 mock.patch.object(qe, "_snapshot_processes",
                                   return_value=TestOrphanDetection.SNAPSHOT), \
+                _liveness(dead={999}), \
                 mock.patch.object(qe, "_terminate_tree", return_value=True) as term:
             self.assertEqual(qe.sweep_orphan_model_hosts(), 1)
         self.assertEqual([c.args[0] for c in term.call_args_list], [102])
@@ -193,7 +410,8 @@ class TestPreflight(unittest.TestCase):
     def test_refuses_to_start_and_reports_memory(self) -> None:
         with mock.patch.dict(qe.os.environ, {}, clear=False), \
                 mock.patch.object(qe, "_snapshot_processes",
-                                  return_value=TestOrphanDetection.SNAPSHOT):
+                                  return_value=TestOrphanDetection.SNAPSHOT), \
+                _liveness(dead={999}):
             qe.os.environ.pop("SAROPA_QWEN_REAP_ORPHANS", None)
             ok, detail = qe.preflight_orphan_check()
         self.assertFalse(ok)
@@ -218,6 +436,7 @@ class TestPreflight(unittest.TestCase):
         with mock.patch.dict(qe.os.environ, {"SAROPA_QWEN_REAP_ORPHANS": "1"}), \
                 mock.patch.object(qe, "_snapshot_processes",
                                   side_effect=lambda: next(snaps)), \
+                _liveness(dead={999}), \
                 mock.patch.object(qe, "_endpoint_up", return_value=False), \
                 mock.patch.object(qe, "_terminate_tree", return_value=True) as term:
             ok, detail = qe.preflight_orphan_check()

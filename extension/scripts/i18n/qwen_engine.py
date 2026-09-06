@@ -37,6 +37,16 @@ Process hygiene (see bugs/infra_translation_engine_orphans_llama_server_processe
   such orphans were once found holding 37 GB and crashing the editor. Every kill
   path in this module therefore terminates the whole tree, and a sweep reaps any
   model host whose parent is gone as a backstop.
+
+  "Parent is gone" is deliberately expensive to prove: a host must be absent
+  from the process-table snapshot AND fail a direct liveness probe of its parent
+  PID. A snapshot alone is not enough, because a dropped or unparsable row makes
+  a live daemon's child look parentless, and killing that is the incident.
+
+  Ownership, not the port, decides what may be stopped. A daemon this run did
+  not start is used as-is when it is already serving — an operator running their
+  own ``ollama serve`` is a normal, supported setup — but it is never adopted,
+  so no teardown path can reach it.
 """
 
 from __future__ import annotations
@@ -447,6 +457,11 @@ def _snapshot_processes_windows() -> list[_ProcInfo] | None:
         try:
             procs.append(_ProcInfo(
                 pid=int(row["ProcessId"]),
+                # A missing/null ParentProcessId degrades to 0, which is not a
+                # usable PID on Windows. That is deliberately safe now:
+                # _parent_confirmed_gone rejects ppid <= 0 as "unknown", so an
+                # unreadable parent field can never nominate a live daemon's
+                # child for termination.
                 ppid=int(row.get("ParentProcessId") or 0),
                 name=str(row.get("Name") or ""),
                 # PageFileUsage is KiB of commit — the figure that actually
@@ -498,15 +513,23 @@ def find_orphan_model_hosts() -> list[_ProcInfo] | None:
       leaving processes alone, which is the safe direction.
     * A failed snapshot yields None, not an empty list, so no caller can read
       "could not look" as "nothing to kill" or as permission to kill.
+    * Absence from the snapshot only NOMINATES a host. The kill is authorized
+      by [_parent_confirmed_gone], a direct probe that must answer "gone"
+      explicitly. Without that second step a dropped or unparsable snapshot row
+      would silently promote a live daemon's child to an orphan.
+
+    The probe runs once per candidate, and on a healthy machine there are no
+    candidates, so the common case costs nothing beyond the snapshot.
     """
     procs = _snapshot_processes()
     if procs is None:
         return None
     live_pids = {p.pid for p in procs}
-    return [
+    candidates = [
         p for p in procs
         if _is_model_host(p.name) and p.ppid not in live_pids
     ]
+    return [p for p in candidates if _parent_confirmed_gone(p.ppid)]
 
 
 def _describe_orphans(orphans: list[_ProcInfo]) -> str:
@@ -518,17 +541,43 @@ def _describe_orphans(orphans: list[_ProcInfo]) -> str:
     return f"{len(orphans)} orphaned model host(s) holding {total_gb:.1f} GB — {detail}"
 
 
-def _pid_alive(pid: int) -> bool:
-    """Cheap single-PID liveness probe used to time the graceful/force escalation."""
+def _pid_liveness(pid: int) -> bool | None:
+    """Tri-state single-PID probe: True alive, False CONFIRMED gone, None unknown.
+
+    The third state is the whole point. A two-state probe has to fold "the
+    query failed" into one of the answers, and folding it into "gone" is what
+    turns a broken ``tasklist`` or a sandboxed ``os.kill`` into permission to
+    terminate somebody else's process. Every caller that could kill something
+    therefore demands an explicit False; only the polling loop, which merely
+    decides how long to wait, treats None as "still there".
+
+    ``pid <= 0`` is rejected outright rather than probed: 0 and negative values
+    are not process identifiers on either platform (POSIX reads them as process
+    *group* selectors), so there is nothing here to confirm dead.
+    """
+    if pid <= 0:
+        return None
     if sys.platform == "win32":
-        out = subprocess.run(  # noqa: S603
-            ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
-            capture_output=True, text=True, encoding="utf-8", errors="replace",
-            timeout=10, check=False,
-        )
-        # tasklist prints an "INFO: No tasks..." banner (no PID) when nothing
-        # matches, so testing for the PID text is enough and avoids parsing.
-        return str(pid) in (out.stdout or "")
+        try:
+            out = subprocess.run(  # noqa: S603
+                ["tasklist", "/FI", f"PID eq {pid}", "/NH", "/FO", "CSV"],
+                capture_output=True, text=True, encoding="utf-8",
+                errors="replace", timeout=10, check=False,
+            )
+        except (OSError, subprocess.SubprocessError):
+            # tasklist missing, blocked, or timed out. We learned nothing.
+            return None
+        if out.returncode != 0:
+            return None
+        text = (out.stdout or "").strip()
+        # The /FI filter guarantees at most the one matching row, so the CSV
+        # quoting is what distinguishes a real row from the "INFO: No tasks are
+        # running which match the specified criteria." banner. Matching the
+        # quoted PID field avoids the substring trap where a PID's digits also
+        # appear inside another column (e.g. "1,242 K" contains "42").
+        if not text or text.upper().startswith("INFO:"):
+            return False
+        return f'"{pid}"' in text
     try:
         os.kill(pid, 0)
     except ProcessLookupError:
@@ -536,7 +585,39 @@ def _pid_alive(pid: int) -> bool:
     except PermissionError:
         # Exists but belongs to another user — alive as far as we are concerned.
         return True
+    except OSError:
+        # Anything else (EINVAL, a sandbox denying the syscall outright) is an
+        # answer we did not get, not an answer of "dead".
+        return None
     return True
+
+
+def _pid_alive(pid: int) -> bool:
+    """Two-state view of [_pid_liveness] for the graceful/force wait loop.
+
+    Unknown counts as alive here on purpose: this only gates how long we keep
+    polling, and over-waiting is harmless where under-waiting would report a
+    kill as successful without evidence.
+    """
+    return _pid_liveness(pid) is not False
+
+
+def _parent_confirmed_gone(ppid: int) -> bool:
+    """True only when [ppid] is POSITIVELY known not to exist.
+
+    Absence from a process-table snapshot is NOT sufficient evidence on its own.
+    A snapshot can lose a row: the Windows parser drops any row whose fields do
+    not parse, ``ps`` output can be truncated mid-write, and a parent that
+    exited and was replaced between two reads leaves a hole. Every one of those
+    makes a *live* daemon's child look parentless, and acting on that would kill
+    the model host of a daemon that is serving right now — the exact incident
+    this module exists to prevent.
+
+    So the snapshot only nominates candidates; this direct probe is what
+    authorizes the kill, and it authorizes it only on an explicit False. Unknown
+    and alive both mean "leave it alone".
+    """
+    return _pid_liveness(ppid) is False
 
 
 def _wait_pid_gone(pid: int, timeout_s: float) -> bool:
@@ -840,16 +921,35 @@ def _ensure_ready() -> tuple[bool, str]:
             return False, "Ollama daemon did not come up within 30 s"
 
         time.sleep(1.5)
-        if proc.poll() is not None:
+        if proc.poll() is None:
+            # Ours: record ownership so the end-of-run teardown may stop it.
+            _adopt_daemon(proc.pid)
+        elif _endpoint_up():
+            # Our spawn lost a race for the port, but SOMETHING is serving on
+            # it. That is overwhelmingly an operator's own daemon (started by
+            # hand, by the Ollama tray app, or by another tool), and refusing
+            # the whole run over it was too blunt: a daemon we did not start is
+            # still a perfectly good daemon to translate against.
+            #
+            # The safety property is preserved by omission: _adopt_daemon is
+            # deliberately NOT called, so this PID is never recorded as ours
+            # and shutdown_engine will neither unload its model nor terminate
+            # it. The "right model on the right port" half of the decision is
+            # settled by the code immediately below, which probes this same
+            # endpoint for the model tag and pulls it if it is absent.
             sys.stderr.write(
-                "[Ollama/Qwen] WARNING: our daemon exited (port conflict?) "
-                "— restarting\n"
+                "[Ollama/Qwen] our daemon lost the port to an existing "
+                "instance — using that daemon (this run will not stop it)\n"
+            )
+        else:
+            # Nothing is serving AND our spawn died: a genuinely failed start,
+            # which is the only case the restart path should have to handle.
+            sys.stderr.write(
+                "[Ollama/Qwen] WARNING: our daemon exited and nothing is "
+                "serving the port — restarting\n"
             )
             if not restart_ollama(log=lambda m: sys.stderr.write(m + "\n")):
                 return False, "Could not start Ollama — another instance keeps reclaiming port"
-        else:
-            # Ours: record ownership so the end-of-run teardown may stop it.
-            _adopt_daemon(proc.pid)
 
     if not _endpoint_up():
         return False, "Ollama daemon not responding after startup sequence"

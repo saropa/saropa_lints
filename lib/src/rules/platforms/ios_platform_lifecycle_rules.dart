@@ -4030,7 +4030,9 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
           // looking at the interval, or every UI clock/countdown timer
           // false-flags. See
           // plans/history/2026.09/2026.09.05/avoid_ios_battery_drain_patterns_disposable_state_fix.md
-          if (_isTimerInDisposableState(node)) {
+          // Shared helper from target_matcher_utils.dart — checks State
+          // ancestry and cancel-in-dispose for widget-lifecycle timers.
+          if (isTimerLifecycleBoundToDisposableState(node)) {
             return;
           }
 
@@ -4063,54 +4065,6 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
       }
     });
   }
-}
-
-/// Returns true when [node] (a `Timer.periodic(...)` call) is lifecycle-bound
-/// to a Flutter `State<T>` subclass: the enclosing class extends `State`,
-/// and its `dispose()` method cancels the field the timer is assigned to.
-///
-/// Such a timer cannot cause background battery drain -- it is destroyed
-/// with the widget, which happens no later than the widget being removed
-/// from the tree, well before (or exactly when) the app backgrounds. This
-/// mirrors the same heuristic already used by
-/// `RequireAppLifecycleHandlingRule` in lifecycle_rules.dart (see
-/// `isBackgroundWorkCanceledInDispose`), applied here to avoid the same
-/// false positive on `avoid_ios_battery_drain_patterns`.
-///
-/// Conservative by design: any class shape this can't confirm (no enclosing
-/// class, not a `State` subclass, no `dispose()`, no `.cancel()` call on the
-/// timer's field) falls through to the existing duration-based check, so we
-/// only suppress when lifecycle-management is actually verifiable.
-bool _isTimerInDisposableState(MethodInvocation node) {
-  // Walk up from the Timer.periodic call to find the enclosing class, if
-  // any -- a top-level function or a non-widget helper class has no State
-  // lifecycle to lean on.
-  ClassDeclaration? enclosingClass;
-  AstNode? current = node.parent;
-  while (current != null) {
-    if (current is ClassDeclaration) {
-      enclosingClass = current;
-      break;
-    }
-    current = current.parent;
-  }
-  if (enclosingClass == null) {
-    return false;
-  }
-
-  // Only `State<T>` subclasses get the widget-lifecycle exemption -- a
-  // plain service/repository class with the same `Timer.periodic` pattern
-  // has no `dispose()` guaranteed to run, so it keeps being flagged.
-  final ExtendsClause? extendsClause = enclosingClass.extendsClause;
-  if (extendsClause == null ||
-      extendsClause.superclass.name.lexeme != 'State') {
-    return false;
-  }
-
-  // Delegate the "is this field canceled in dispose()?" check to the
-  // shared utility already used by the lifecycle rules for the identical
-  // heuristic, so both rules agree on what counts as cleaned up.
-  return isBackgroundWorkCanceledInDispose(node, enclosingClass);
 }
 
 /// Warns when iOS entitlements may be needed for features.

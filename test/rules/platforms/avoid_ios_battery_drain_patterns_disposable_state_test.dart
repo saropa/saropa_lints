@@ -1,5 +1,5 @@
 /// Regression tests for the false positive filed in
-/// `bugs/avoid_ios_battery_drain_patterns_false_positive_ui_timer.md`:
+/// `plans/history/2026.09/2026.09.05/avoid_ios_battery_drain_patterns_disposable_state_fix.md`:
 /// `AvoidIosBatteryDrainPatternsRule` used to fire on every short-interval
 /// `Timer.periodic`, including ones lifecycle-bound to a `State` subclass
 /// and torn down in `dispose()` -- which cannot drain battery in the
@@ -80,6 +80,35 @@ class _S extends State<W> {
       // gone in a leak scenario -- the existing duration check must still
       // apply.
       expect(codes, contains('avoid_ios_battery_drain_patterns'));
+    });
+
+    test('Timer.periodic in ConsumerState, canceled in dispose() -- no lint',
+        () {
+      // ConsumerState (Riverpod) ends with 'State' and should get the same
+      // lifecycle exemption as plain State<T>.
+      final codes = reportedRuleCodesSyntactic(
+        AvoidIosBatteryDrainPatternsRule(),
+        '''
+class _S extends ConsumerState<W> {
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick = Timer.periodic(const Duration(seconds: 1), (_) {});
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+}
+''',
+      );
+
+      // ConsumerState is a State subtype — lifecycle-bound timer must pass.
+      expect(codes, isNot(contains('avoid_ios_battery_drain_patterns')));
     });
 
     test('Timer.periodic in a non-State service class -- lints', () {
