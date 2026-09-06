@@ -71,10 +71,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Added
 
 - Memory debug mode: set `SAROPA_LINTS_DEBUG_MEMORY=1` to log per-cache size breakdowns on every periodic memory trend line. Helps diagnose which plugin caches are growing when investigating memory pressure. No action required.
+- Diagnostic triage script: `python scripts/triage_scan.py` post-processes `--format json` scan output into five priority buckets (errors → bulk fixes → individual triage → dev code → forked code), replacing manual categorization of bulk lint sweeps. Supports `--suppress-dirs`, `--dev-dirs`, `--bulk-threshold`, and `--format json` for machine-readable output. No action required.
 
 ### Fixed
 
 - Fixed hard RSS valve pausing all rules based on the analysis server's total process memory instead of the plugin's own contribution. On large projects the server's AST caches and resolved element model consume 70–90% of RSS, tripping the valve even when the plugin's estimated footprint is under 100 MB. The valve now checks plugin attribution: it only pauses rules when the plugin's estimated memory exceeds 100 MB or 5% of process RSS. A separate unconditional panic threshold at 90% of system RAM provides last-resort OOM protection. No action required.
+
+- Fixed the Drift Advisor integration opening every Dart file in the workspace on each 30-second poll, which could cascade into repeated whole-project scans and exhaust system memory until VS Code crashed. Table lookups now read files directly without creating editor documents, and results are cached until Dart sources change. No action required; the integration is off by default, so only users who enabled it were affected.
+- Fixed scan on save treating a file opened by other extension code as a file the user opened, which let any extension's background file access trigger lint scans. Scans now run only for files you actually have open or have saved. No action required.
+- Fixed a stalled scan permanently disabling scan on save for the rest of the session. Scans now time out, are canceled when a newer save supersedes them, and release their slot on every failure path. No action required.
+- Fixed the memory status bar showing a red critical badge next to a healthy memory figure when the real trigger was orphaned background processes. The badge now names whichever condition actually tripped, and a memory reading shows the same total the warning threshold is compared against. No action required.
+- Fixed every level of memory pressure painting the status bar error red, including informational ones such as a light rule shed. Only genuinely severe states are red now, with moderate states amber and informational states left uncolored. No action required.
 
 ---
 

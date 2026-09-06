@@ -3,8 +3,10 @@
 Prevents the two most common version-drift mistakes:
   1. Multiple unreleased sections in CHANGELOG.md (automated sessions
      creating new sections instead of appending to the existing one).
-  2. Version numbers in pubspec.yaml or extension/package.json that
-     don't match the last published git tag (premature version bumps).
+  2. pubspec.yaml version not matching the last published git tag
+     (premature version bumps).  extension/package.json is excluded
+     because VS Code uses a different version scheme (e.g. 16.1.916)
+     that the publish script derives from the semver tag.
 
 Two invocation modes, one script:
   * **git pre-commit** passes staged file paths as command-line arguments.
@@ -125,18 +127,6 @@ def _read_pubspec_version() -> str | None:
     return None
 
 
-def _read_package_json_version() -> str | None:
-    """Extract version from extension/package.json."""
-    pkg = _REPO_ROOT / "extension" / "package.json"
-    if not pkg.is_file():
-        return None
-    try:
-        data = json.loads(pkg.read_text(encoding="utf-8"))
-        return data.get("version")
-    except (json.JSONDecodeError, OSError):
-        return None
-
-
 def main() -> int:
     """Run all changelog/version guards; exit 2 on any failure."""
     paths = list(sys.argv[1:]) or _paths_from_stdin()
@@ -170,13 +160,10 @@ def main() -> int:
                 f"handles version bumps — reset to {tag_version}."
             )
 
-        pkg_ver = _read_package_json_version()
-        if pkg_ver and pkg_ver != tag_version:
-            errors.append(
-                f"extension/package.json version ({pkg_ver}) does not "
-                f"match last published tag ({last_tag}). The publish "
-                f"script handles version bumps — reset to {tag_version}."
-            )
+        # extension/package.json is NOT checked here — VS Code extensions
+        # use a different version scheme (e.g. 16.1.916) that the publish
+        # script derives from the semver tag.  A naive string comparison
+        # against the git tag always fails during beta cycles.
 
     if not errors:
         return 0
