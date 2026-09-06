@@ -66,6 +66,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.5] — Unreleased
+
+### Added
+
+- Memory debug mode: set `SAROPA_LINTS_DEBUG_MEMORY=1` to log per-cache size breakdowns on every periodic memory trend line. Helps diagnose which plugin caches are growing when investigating memory pressure. No action required.
+
+### Fixed
+
+- Fixed hard RSS valve pausing all rules based on the analysis server's total process memory instead of the plugin's own contribution. On large projects the server's AST caches and resolved element model consume 70–90% of RSS, tripping the valve even when the plugin's estimated footprint is under 100 MB. The valve now checks plugin attribution: it only pauses rules when the plugin's estimated memory exceeds 100 MB or 5% of process RSS. A separate unconditional panic threshold at 90% of system RAM provides last-resort OOM protection. No action required.
+
+---
+
 ## [16.0.0-beta.4]
 
 Adds five new lint rules covering unsafe late-final fields, unnecessary factory constructors, internal method docs, widget/state ordering, and Equatable props sorting. Extends the extension dashboards with inline rule guidance on the Findings screen, embedded tabs on the Package Dashboard, live sidebar data, and scan progress on Health Panel and Project Map. Fixes 16 false-positive and over-suppression bugs across rules including substring, nullable interpolation, unsafe cast, catch logging, URL validation, global state, and cache expiration. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.4/CHANGELOG.md)

@@ -1124,6 +1124,30 @@ class MemoryPressureHandler {
   /// flapping when RSS hovers at the threshold.
   static const int _rssRecoveryMarginMb = 512;
 
+  /// Baseline process RSS at plugin startup, before caches are populated.
+  /// Used for diagnostics and as a secondary attribution signal: if RSS
+  /// hasn't grown much beyond this, the plugin isn't the cause of pressure.
+  static int _baselineRssMb = 0;
+
+  /// Unconditional last-resort OOM protection threshold in MB. Trips
+  /// regardless of plugin attribution — at this point the process is about
+  /// to be killed by the OS, so any shedding is better than crashing.
+  /// Set to 90% of system RAM by [initializeCacheManagement]; 0 disables.
+  static int _panicRssLimitMb = 0;
+
+  /// Minimum plugin-estimated memory (MB) required to trip the hard valve.
+  /// If the plugin's own caches are below this AND below
+  /// [_minPluginContributionPct]% of RSS, the valve stays open because
+  /// pausing rules won't meaningfully reduce memory pressure — the analysis
+  /// server's own model is the dominant consumer.
+  static const int _minPluginContributionMb = 100;
+
+  /// Minimum plugin contribution as a percentage of process RSS. The valve
+  /// only trips (at the normal cap) when the plugin's estimated footprint
+  /// exceeds this fraction of total RSS. At 5%, a plugin consuming <400 MB
+  /// in an 8 GB process is recognized as a bystander, not the cause.
+  static const int _minPluginContributionPct = 5;
+
   /// Wall-clock time of the last periodic RSS trend line written to
   /// `plugin.log`. Separate from [_callsSinceRssCheck] (which throttles the
   /// RSS *syscall*) because the trend log needs its own, coarser cadence —
@@ -1133,12 +1157,28 @@ class MemoryPressureHandler {
   static DateTime? _lastMemoryLogAt;
   static const Duration _memoryLogInterval = Duration(seconds: 30);
 
+  /// Whether verbose per-cache memory breakdown logging is enabled. Set
+  /// via `SAROPA_LINTS_DEBUG_MEMORY=1` env var. Logs individual cache sizes
+  /// on every periodic trend line, helping diagnose which caches are growing.
+  static final bool _debugMemory = _isDebugMemoryEnabled();
+
+  /// Check the env var once at class load time.
+  static bool _isDebugMemoryEnabled() {
+    final v = Platform.environment['SAROPA_LINTS_DEBUG_MEMORY'];
+    return v == '1' || (v != null && v.toLowerCase() == 'true');
+  }
+
   /// True once the RSS-unavailable warning has been logged. Without this,
   /// _refreshHardLimit's early return on rss<=0 would leave the trend log
   /// permanently and silently empty on a platform without RSS support —
   /// indistinguishable from "the plugin never ran". One warning at first
   /// detection surfaces the cause without repeating it on every refresh.
   static bool _loggedRssUnavailable = false;
+
+  /// True once the attribution-skip message has been logged for the current
+  /// RSS excursion above the cap. Reset when RSS drops back below. Prevents
+  /// flooding the log when RSS hovers at the cap with a low plugin footprint.
+  static bool _loggedAttributionSkip = false;
 
   /// The configured hard RSS cap in MB, or 0 if disabled. Used by
   /// FileBudgetTracker to compute its file-skipping threshold.
@@ -1184,8 +1224,9 @@ class MemoryPressureHandler {
     _rebuildShedRuleNames();
   }
 
-  /// Reset all soft-limit and shedding state. Test-only — clears the soft
-  /// flag, shed level, shed rule names, and cost metadata so tests start clean.
+  /// Reset all soft-limit, shedding, and attribution state. Test-only —
+  /// clears the soft flag, shed level, shed rule names, attribution tracking,
+  /// and cost metadata so tests start clean.
   static void resetShedStateForTesting() {
     _shedEnabled = false;
     _softLimitTripped = false;
@@ -1193,6 +1234,9 @@ class MemoryPressureHandler {
     _shedRuleNames.clear();
     _typeResolvingRules.clear();
     _highCostRules.clear();
+    _loggedAttributionSkip = false;
+    _baselineRssMb = 0;
+    _panicRssLimitMb = 0;
   }
 
   /// Whether the process RSS is currently over the hard cap, meaning rule
@@ -1235,34 +1279,75 @@ class MemoryPressureHandler {
     if (_lastMemoryLogAt == null ||
         now.difference(_lastMemoryLogAt!) >= _memoryLogInterval) {
       _lastMemoryLogAt = now;
-      // Include shed level in the periodic log so post-crash diagnosis shows
-      // whether shedding was active and at what level.
+      // Include shed level and plugin estimate in the periodic log so
+      // post-crash diagnosis shows attribution and shedding state.
       final shedInfo = _shedLevel > 0 ? ' shed=$_shedLevel' : '';
+      final pluginEst = _estimateMemoryUsageMb();
       PluginLogger.log(
         '[memory] RSS ${rss}MB (cap ${_hardLimitMb}MB, '
-        'soft ${_softLimitMb}MB$shedInfo)',
+        'soft ${_softLimitMb}MB, plugin ~${pluginEst}MB$shedInfo)',
       );
+
+      // Per-cache breakdown for diagnosing which caches are growing.
+      // Enabled via SAROPA_LINTS_DEBUG_MEMORY=1.
+      if (_debugMemory) {
+        _logCacheBreakdown();
+      }
     }
 
     // ── Soft limit: graduated rule shedding ──
     _refreshSoftLimit(rss);
 
     // ── Hard limit: full rule-execution pause ──
+    // Attribution check: only pause rules when the plugin is a meaningful
+    // contributor to RSS. The analysis server's own AST caches, resolved
+    // element model, and type graph are typically 70-90% of process RSS on
+    // large projects — pausing a 50 MB plugin won't reclaim 8 GB of server
+    // memory. The panic threshold (90% of system RAM) bypasses attribution
+    // because at that point any shedding is better than an OOM kill.
     if (!_hardLimitTripped && rss >= _hardLimitMb) {
-      _hardLimitTripped = true;
-      // Shed the plugin's own caches immediately to give back what we can.
-      relieve(clearAll: true);
-      stderr.writeln(
-        '[saropa_lints] Memory guard tripped: RSS ${rss}MB >= ${_hardLimitMb}MB '
-        'cap. Pausing rule execution to protect the analysis server. Set '
-        'SAROPA_LINTS_MAX_RSS_MB to adjust the cap (0 disables it).',
-      );
+      final pluginMb = _estimateMemoryUsageMb();
+      final isPluginSignificant = pluginMb >= _minPluginContributionMb ||
+          (rss > 0 && pluginMb * 100 ~/ rss >= _minPluginContributionPct);
+      final isPanic = _panicRssLimitMb > 0 && rss >= _panicRssLimitMb;
+
+      if (isPluginSignificant || isPanic) {
+        // Plugin is a real contributor, or we're near OOM — pause.
+        _hardLimitTripped = true;
+        relieve(clearAll: true);
+        final reason = isPanic && !isPluginSignificant
+            ? 'OOM panic threshold (${_panicRssLimitMb}MB)'
+            : 'plugin footprint ${pluginMb}MB';
+        stderr.writeln(
+          '[saropa_lints] Memory guard tripped: RSS ${rss}MB >= '
+          '${_hardLimitMb}MB cap ($reason). Pausing rule execution. '
+          'Set SAROPA_LINTS_MAX_RSS_MB to adjust (0 disables).',
+        );
+      } else {
+        // Plugin is a bystander — the analysis server is the dominant
+        // consumer. Log once per crossing, don't pause rules.
+        if (!_loggedAttributionSkip) {
+          _loggedAttributionSkip = true;
+          PluginLogger.log(
+            '[memory] RSS ${rss}MB >= cap ${_hardLimitMb}MB but plugin '
+            'footprint is only ${pluginMb}MB '
+            '(< ${_minPluginContributionMb}MB / ${_minPluginContributionPct}% '
+            'of RSS) — analysis server is the dominant consumer. '
+            'Not pausing rules.',
+          );
+        }
+      }
     } else if (_hardLimitTripped && rss < _hardLimitMb - _rssRecoveryMarginMb) {
       _hardLimitTripped = false;
+      _loggedAttributionSkip = false;
       stderr.writeln(
         '[saropa_lints] Memory guard released: RSS ${rss}MB. '
         'Resuming rule execution.',
       );
+    } else if (!_hardLimitTripped && rss < _hardLimitMb) {
+      // RSS dropped back below cap — reset the attribution skip log so the
+      // next crossing logs again.
+      _loggedAttributionSkip = false;
     }
   }
 
@@ -1670,6 +1755,13 @@ class MemoryPressureHandler {
   }
 
   /// Estimate current memory usage from known cache sizes.
+  ///
+  /// IMPORTANT: the hard RSS valve's attribution check relies on this
+  /// estimate to decide whether the plugin is a meaningful contributor to
+  /// memory pressure. Any new cache or data structure that grows with
+  /// project size MUST be accounted for here (or via [registerEstimator])
+  /// — an omission would let the attribution check undercount the plugin's
+  /// footprint and skip a trip that should fire.
   static int _estimateMemoryUsageMb() {
     var estimatedBytes = 0;
 
@@ -1720,6 +1812,61 @@ class MemoryPressureHandler {
     return estimatedBytes ~/ bytesPerMb;
   }
 
+  /// Log per-cache size breakdown for memory debugging. Only called when
+  /// SAROPA_LINTS_DEBUG_MEMORY=1 is set — too noisy for production use.
+  static void _logCacheBreakdown() {
+    final lines = <String>[];
+
+    // Built-in caches with known structure.
+    void add(String name, int bytes) {
+      if (bytes > 0) lines.add('  $name: ${bytes ~/ 1024}KB');
+    }
+
+    add('FileContentCache.hashes',
+        FileContentCache._contentHashes.length * 64);
+    var passedBytes = 0;
+    for (final ruleSet in FileContentCache._passedRules.values) {
+      passedBytes += ruleSet.length * 48;
+    }
+    add('FileContentCache.passedRules', passedBytes);
+    add('FileMetricsCache', FileMetricsCache._cache.length * 200);
+    add('SourceLocationCache', SourceLocationCache._lineStarts.length * 1024);
+    var semanticBytes = 0;
+    for (final symbols in SemanticTokenCache._symbols.values) {
+      semanticBytes += symbols.length * 500;
+    }
+    add('SemanticTokenCache', semanticBytes);
+    add('CompilationUnitCache', CompilationUnitCache._cache.length * 2048);
+    add('ImportGraphCache', ImportGraphCache._graph.length * 500);
+    var internBytes = 0;
+    for (final s in StringInterner._pool.keys) {
+      internBytes += s.length * 2;
+    }
+    add('StringInterner', internBytes);
+    var diffBytes = 0;
+    for (final content in DiffBasedAnalysis._previousContent.values) {
+      diffBytes += content.length * 2;
+    }
+    add('DiffBasedAnalysis', diffBytes);
+    add('IncrementalAnalysisTracker',
+        IncrementalAnalysisTracker._state.length * 256);
+    add('ParallelAnalyzer', ParallelAnalyzer._resultCache.length * 512);
+    var profilerBytes = 0;
+    for (final durations in HotPathProfiler._measurements.values) {
+      profilerBytes += durations.length * 16;
+    }
+    add('HotPathProfiler', profilerBytes);
+
+    // External estimators (ImpactTracker, SuppressionTracker, etc.).
+    for (final entry in _externalEstimators.entries) {
+      add(entry.key, entry.value());
+    }
+
+    if (lines.isNotEmpty) {
+      PluginLogger.log('[memory] cache breakdown:\n${lines.join('\n')}');
+    }
+  }
+
   /// Get statistics including process RSS and cache breakdown.
   static Map<String, dynamic> getStats() {
     final rss = _currentRssMb();
@@ -1732,6 +1879,8 @@ class MemoryPressureHandler {
       'rssAvailable': rss > 0,
       'hardLimitMb': _hardLimitMb,
       'hardLimitTripped': _hardLimitTripped,
+      'panicRssLimitMb': _panicRssLimitMb,
+      'baselineRssMb': _baselineRssMb,
       'softLimitMb': _softLimitMb,
       'softRecoveryMarginMb': _softRecoveryMarginMb,
       'softLimitTripped': _softLimitTripped,
@@ -1767,15 +1916,17 @@ class _CacheRegistration {
 /// 32 GB → 8192 MB (ceiling). The 8192 upper bound prevents the plugin
 /// from claiming too much on high-RAM servers where other processes
 /// also need memory.
-int _computeAdaptiveRssCap(int fallbackMb) {
-  final ramMb = _totalPhysicalMemoryMb();
-  if (ramMb < 4096) return fallbackMb;
+int _computeAdaptiveRssCap(int fallbackMb, {int ramMb = -1}) {
+  // Accept pre-detected RAM to avoid redundant subprocess spawns. Falls
+  // back to a fresh detection if the caller didn't pass one.
+  final ram = ramMb > 0 ? ramMb : _totalPhysicalMemoryMb();
+  if (ram < 4096) return fallbackMb;
 
   // 60% of physical RAM: the analysis server shares memory with the IDE,
   // OS, browser, and other dev tools. 60% is aggressive enough to protect
   // 8 GB machines (cap ≈ 4915) while giving 16 GB+ machines real headroom
   // (cap ≈ 9830, clamped to 8192).
-  final adaptive = (ramMb * 0.6).round();
+  final adaptive = (ram * 0.6).round();
 
   // Clamp: never below 2048 (too aggressive — would pause rules on small
   // projects), never above 8192 (enough for large projects; beyond that
@@ -2036,7 +2187,12 @@ void initializeCacheManagement({
   // detection fails or returns an implausible value.
   final envCap = Platform.environment['SAROPA_LINTS_MAX_RSS_MB'];
   final parsedCap = envCap == null ? null : int.tryParse(envCap.trim());
-  final adaptiveCap = _computeAdaptiveRssCap(hardRssLimitMb);
+  // Detect system RAM once — used for adaptive cap and panic threshold.
+  // _totalPhysicalMemoryMb() shells out to PowerShell/wmic on Windows,
+  // so caching avoids a redundant subprocess spawn.
+  final ramMb = _totalPhysicalMemoryMb();
+
+  final adaptiveCap = _computeAdaptiveRssCap(hardRssLimitMb, ramMb: ramMb);
   final effectiveCap = parsedCap ?? adaptiveCap;
   MemoryPressureHandler.setHardRssLimitMb(effectiveCap);
 
@@ -2047,21 +2203,36 @@ void initializeCacheManagement({
   // plugin start. Nothing to do here; kept as a no-op anchor point so a
   // reader tracing "how is shedding armed" lands on this comment.
 
-  // Diagnostic: verify ProcessInfo.currentRss works on this platform.
+  // Panic threshold: 90% of system RAM — unconditional OOM protection that
+  // bypasses attribution checks. At this RSS the OS will start killing
+  // processes, so any memory we can shed is worth it.
+  if (ramMb > 0) {
+    MemoryPressureHandler._panicRssLimitMb = (ramMb * 0.9).round();
+  }
+
+  // Diagnostic: verify ProcessInfo.currentRss works on this platform and
+  // record the baseline before caches are populated.
   final startupRss = MemoryPressureHandler._currentRssMb();
   if (startupRss > 0) {
+    // Baseline RSS: the analysis server's footprint before the plugin adds
+    // any caches. Used for diagnostics and attribution logging.
+    MemoryPressureHandler._baselineRssMb = startupRss;
+
     // Log cap source so users understand the value.
     final capSource = parsedCap != null
         ? 'env SAROPA_LINTS_MAX_RSS_MB'
         : adaptiveCap != hardRssLimitMb
         ? 'adaptive (60% of system RAM)'
         : 'default';
+    final panicInfo = MemoryPressureHandler._panicRssLimitMb > 0
+        ? ', panic at ${MemoryPressureHandler._panicRssLimitMb}MB'
+        : '';
     stderr.writeln(
       '[saropa_lints] Memory management armed: '
       '${MemoryPressureHandler._caches.length} caches registered, '
       'soft relief at ${memoryThresholdMb}MB estimated, '
-      'hard RSS cap at ${effectiveCap}MB ($capSource). '
-      'Current RSS: ${startupRss}MB.',
+      'hard RSS cap at ${effectiveCap}MB ($capSource)$panicInfo. '
+      'Baseline RSS: ${startupRss}MB.',
     );
   } else {
     stderr.writeln(
