@@ -35,6 +35,26 @@ if [ "$status" -ne 0 ]; then
   exit "$status"
 fi
 
+# ── changelog internal heading gate ──
+# Block the retired <details><summary>Maintenance</summary> pattern in CHANGELOG.md.
+# The convention is ### Internal instead — see CHANGELOG.md MAINTENANCE NOTES.
+changelog_staged=$(echo "$files" | grep -E '^CHANGELOG\.md$')
+if [ -n "$changelog_staged" ]; then
+  # Check staged content, not working tree.
+  if git show :CHANGELOG.md | grep -q '<summary>Maintenance</summary>'; then
+    # Allow the one occurrence inside the MAINTENANCE NOTES comment that says "NEVER use".
+    # Count occurrences outside that instruction line.
+    bad_count=$(git show :CHANGELOG.md | grep -c '<summary>Maintenance</summary>')
+    never_count=$(git show :CHANGELOG.md | grep 'NEVER use.*<summary>Maintenance</summary>' | grep -c .)
+    if [ "$bad_count" -gt "$never_count" ]; then
+      echo ""
+      echo "Commit blocked: CHANGELOG.md uses <details><summary>Maintenance</summary>."
+      echo "Use '### Internal' heading instead. See CHANGELOG.md MAINTENANCE NOTES."
+      exit 1
+    fi
+  fi
+fi
+
 # ── shipped doc links gate ──
 # Catch dead or .pubignore-excluded links in shipped docs before they reach CI.
 # Only runs when a shipped doc (.md in doc/ or README.md) is being committed.
