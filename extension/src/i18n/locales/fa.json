@@ -74,7 +74,11 @@
       "ready": "Saropa: آماده",
       "disabled": "Saropa: غیر فعال",
       "noProject": "Saropa: هیچ Dart پروژه ای وجود ندارد",
-      "doneTooltip": "{total} یافته(ها)، {shown} نمایش داده شده پس از فیلتر"
+      "doneTooltip": "{total} یافته(ها)، {shown} نمایش داده شده پس از فیلتر",
+      "dropped": "Saropa: اسکن پرشده ({count} فایل)",
+      "droppedTooltip": "Saropa Lints فایلی که توسط ابزار دیگر باز شده است نادیده گرفته شد {count}. فایلی را ذخیره کنید تا اسکن شود.",
+      "droppedSuffix": "(+{count} نادیده گرفته شد)",
+      "droppedSuffixTooltip": "همچنین فایل‌های {count} که توسط ابزار دیگری باز شده بودند و نه شما، چک نشده‌اند. فایلی را ذخیره کنید تا آن را اسکن کنید."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: اسکن کردن پروژه کامل",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} پردازش‌کننده (ها) ترک شده",
+      "criticalOrphans": "🔴 {count} پرورش دهنده(ها) ترک شده",
       "openHint": "کلیک کنید تا پرچه سلامت را باز کنید"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "کیل یا دمین اورفان شده Flutter"
+    },
+    "orphanPreflight": {
+      "found": "{count} فرآیند(ها) میزبان مدل ترکیبی از جلسه‌ای پیشین در حال حمله {size} از حافظه ویژه مitted است.",
+      "reclaimAction": "حافظه را بازگردانید",
+      "detailsAction": "جزئیات را نمایش دهید",
+      "none": "هیچ فرآیند میزبان مدل گم شده ای پیدا نشد.",
+      "confirmTitle": "پروسه(های) اورفان {count} بازمانده برای {size}؟",
+      "confirmDetail": "این فرآیندها به طور فوری پایان خواهند یافت و قابل بازیابی نیست:",
+      "confirmKill": "پروسه ها را پایان بدهید",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "процیس(های) تکلیف داده شده {count} پایان یافت، تعداد {size} بازگردانی شد.",
+      "reclaimFailed": "процیس(ها) {count} را نتوانست پایان داد. ممکن است نیاز به اجازه‌های بالاتر داشته باشند.",
+      "bannerTitle": "{count} فرآیند میزبان مدل ترکیبی که ایجاد شده است (ها) {size}",
+      "bannerReclaim": "بازگرداندن"
     },
     "panel": {
       "title": "سلامت پردازش",

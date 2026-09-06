@@ -74,7 +74,11 @@
       "ready": "Saropa: พร้อมแล้ว",
       "disabled": "Saropa: ปิดการใช้งาน",
       "noProject": "Saropa: ไม่มีโครงการ Dart",
-      "doneTooltip": "ผลการค้นหา {total} {shown} แสดงหลังตัวกรอง"
+      "doneTooltip": "ผลการค้นหา {total} {shown} แสดงหลังตัวกรอง",
+      "dropped": "Saropa: ข้ามการสแกน ({count} ไฟล์)",
+      "droppedTooltip": "Saropa Lints ข้าม {count} ไฟล์ที่เปิดโดยเครื่องมืออื่นแทนที่จะเปิดโดยคุณ บันทึกไฟล์เพื่อสแกนไฟล์นั้น",
+      "droppedSuffix": "(+) {count} ข้ามผ่าน",
+      "droppedSuffixTooltip": "ยังได้ข้ามไฟล์ {count} ที่เปิดโดยเครื่องมืออื่นแทนที่จะเปิดโดยคุณ บันทึกไฟล์เพื่อสแกนไฟล์นั้น"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: การสแกนทั้งโครงการ",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} daemon(s) ที่ถูกทอดทิ้ง",
+      "criticalOrphans": "🔴 {count} daemon(s) ที่ถูกทอดทิ้ง",
       "openHint": "คลิกเพื่อเปิดความสมบูรณ์ของกระบวนการ"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "กำจัด Daemon Flutter ที่ไม่มีผู้ปกครอง"
+    },
+    "orphanPreflight": {
+      "found": "กระบวนการโฮสต์โมเดลที่ถูกทิ้งไว้ ({count}) จากเซสชันก่อนหน้านี้กำลังใช้งานหน่วยความจำที่ได้รับการยืนยัน ({size})",
+      "reclaimAction": "คืนพื้นที่หน่วยความจำ",
+      "detailsAction": "แสดงรายละเอียด",
+      "none": "ไม่พบกระบวนการโฮสต์โมเดลที่ถูกทิ้งไว้",
+      "confirmTitle": "กระบวนการที่ถูกทอดทิ้ง {count} ยังคงถือครอง {size}?",
+      "confirmDetail": "กระบวนการเหล่านี้จะถูกสิ้นสุดทันทีและไม่สามารถกู้คืนได้:",
+      "confirmKill": "สิ้นสุดกระบวนการ",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "สิ้นสุดกระบวนการที่ถูกทอดทิ้ง {count} ได้ กำลังเรียกคืนประมาณ {size}",
+      "reclaimFailed": "ไม่สามารถสิ้นสุดกระบวนการ {count} (s) ได้ อาจต้องการสิทธิ์ในการเข้าถึงที่เพิ่มขึ้น",
+      "bannerTitle": "กระบวนการโฮสต์โมเดลที่ถูกทิ้งไว้ {count} กำลังถือครอง {size}",
+      "bannerReclaim": "คืนค่า"
     },
     "panel": {
       "title": "สุขภาพกระบวนการ",

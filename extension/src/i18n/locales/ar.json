@@ -74,7 +74,11 @@
       "ready": "Saropa: جاهز",
       "disabled": "Saropa: معطّل",
       "noProject": "Saropa: لا يوجد مشروع Dart",
-      "doneTooltip": "نتيجة(s) {total}، {shown} مُعرضة بعد التصفية"
+      "doneTooltip": "نتيجة(s) {total}، {shown} مُعرضة بعد التصفية",
+      "dropped": "Saropa: تم تجاوز المسح ({count} ملفات)",
+      "droppedTooltip": "Saropa Lints تم تجاوز {count} ملفات تم فتحها بواسطة أداة أخرى بدلًا منك. احفظ ملفًا لمسحه.",
+      "droppedSuffix": "(+{count} تمت الإскаك)",
+      "droppedSuffixTooltip": "تم تخطي أيضًا ملفات {count} التي تم فتحها بواسطة أداة أخرى بدلًا منك. احفظ ملفًا لمسحه."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: مسح المشروع بأكمله",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} عملية(s) خلفية مهجورة",
+      "criticalOrphans": "🔴 {count} daemon(s) مهجور",
       "openHint": "اضغط لفتح صحة العملية"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "القضاء على الديمونز الميتة Flutter"
+    },
+    "orphanPreflight": {
+      "found": "عملية(ات) مضيف نموذج مهجورة {count} من جلسة سابقة تستخدم {size} من الذاكرة المmitted.",
+      "reclaimAction": "استعادة الذاكرة",
+      "detailsAction": "عرض التفاصيل",
+      "none": "لم يتم العثور على عمليات استضافة نموذج مهجورة.",
+      "confirmTitle": "إنهاء عملية {count} المهجورة (Processes) التي تُمسك {size}؟",
+      "confirmDetail": "هذه العمليات ستُغلَّق فورًا ولا يمكن استعادةها:",
+      "confirmKill": "إنهاء العمليات",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "أوقفت عملية(ات) مهجورة {count}، واستعادت {size} تقريبًا.",
+      "reclaimFailed": "لم يتم إيقاف عملية {count} (التي قد تكون متعددة). قد تحتاج إلى صلاحيات مُرتفعة.",
+      "bannerTitle": "عملية استضافة نموذج مهجورة ({count}) تُحتفظ بها ({size})",
+      "bannerReclaim": "استعادة"
     },
     "panel": {
       "title": "صحة العملية",

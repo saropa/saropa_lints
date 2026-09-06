@@ -74,7 +74,11 @@
       "ready": "Saropa: pronto",
       "disabled": "Saropa: desativado",
       "noProject": "Saropa: nenhum projeto Dart",
-      "doneTooltip": "{total} encontrado(s), {shown} mostrado após filtro"
+      "doneTooltip": "{total} encontrado(s), {shown} mostrado após filtro",
+      "dropped": "Saropa: varredura pulada ({count} arquivos)",
+      "droppedTooltip": "Saropa Lints arquivos foram pulados {count} que foram abertos por outra ferramenta em vez de você. Salve um arquivo para escaneá-lo.",
+      "droppedSuffix": "(+{count} pulado)",
+      "droppedSuffixTooltip": "Também pulou os arquivos {count} que foram abertos por outra ferramenta em vez de você. Salve um arquivo para escaneá-lo."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: varredura do projeto inteiro",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} daemon(es) orfã(o)",
+      "criticalOrphans": "🔴 {count} processo(s) órfão(s)",
       "openHint": "Clique para abrir Saúde do Processo"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Matar Flutter Demônios Orfãos"
+    },
+    "orphanPreflight": {
+      "found": "Processos {count} de host de modelo abandonados de uma sessão anterior estão retendo {size} de memória comprometida.",
+      "reclaimAction": "Recuperar Memória",
+      "detailsAction": "Mostrar Detalhes",
+      "none": "Nenhum processo de host de modelo orfão encontrado.",
+      "confirmTitle": "Encerrar {count} processo(s) órfão(s) que estão retendo {size}?",
+      "confirmDetail": "Esses processos serão encerrados imediatamente e não poderão ser recuperados:",
+      "confirmKill": "Encerrar Processos",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Processos {count} orfãos finalizados, recuperando aproximadamente {size}.",
+      "reclaimFailed": "Não foi possível encerrar o processo(s) {count}. Eles podem precisar de permissões elevadas.",
+      "bannerTitle": "{count} processo(s) de host de modelo orfão(s) mantendo {size}",
+      "bannerReclaim": "Recuperar"
     },
     "panel": {
       "title": "Saúde do Processo",

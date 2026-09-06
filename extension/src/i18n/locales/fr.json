@@ -74,7 +74,11 @@
       "ready": "Saropa : prêt",
       "disabled": "Saropa : désactivé",
       "noProject": "Saropa : aucun projet Dart",
-      "doneTooltip": "{total} trouvé(s), {shown} affiché(s) après filtrage"
+      "doneTooltip": "{total} trouvé(s), {shown} affiché(s) après filtrage",
+      "dropped": "Saropa : scan ignoré ({count} fichiers)",
+      "droppedTooltip": "Saropa Lints fichiers {count} ont été ignorés car ils ont été ouverts par un autre outil et non par vous. Enregistrez un fichier pour le scanner.",
+      "droppedSuffix": "(+{count} ignoré)",
+      "droppedSuffixTooltip": "Les fichiers {count} ont également été ignorés car ils ont été ouverts par un autre outil et non par vous. Enregistrez un fichier pour le scanner."
     },
     "baseline": {
       "progressTitle": "Saropa Lints : analyse de l'ensemble du projet",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} daemon(s) orphelin(s)",
+      "criticalOrphans": "🔴 {count} daemon(s) orphelin(s)",
       "openHint": "Cliquez pour ouvrir Process Health"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Tuer les daemons Flutter orphelins"
+    },
+    "orphanPreflight": {
+      "found": "Processus (s) hôte de modèle orphelin(s) {count} provenant d'une session précédente retiennent {size} de la mémoire engagée.",
+      "reclaimAction": "Recouvrer la mémoire",
+      "detailsAction": "Afficher les détails",
+      "none": "Aucun processus hôte de modèle orphelin trouvé.",
+      "confirmTitle": "Processus orphelin(s) {count} terminé(s) tenant {size} ?",
+      "confirmDetail": "Ces processus seront immédiatement terminés et ne pourront pas être récupérés :",
+      "confirmKill": "Fin des processus",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Processus orphelin(s) {count} terminé(s), récupération de {size}.",
+      "reclaimFailed": "Impossible de terminer le processus (ou les processus) {count}. Ils peuvent nécessiter des permissions élevées.",
+      "bannerTitle": "Processus hôte modèle orphelin(s) {count} tenant {size}",
+      "bannerReclaim": "Recouvrer"
     },
     "panel": {
       "title": "Santé du processus",

@@ -74,7 +74,11 @@
       "ready": "Saropa: מוכן",
       "disabled": "Saropa: מוטוע",
       "noProject": "Saropa: אין Dart פרויקט",
-      "doneTooltip": "ממצאים {total}, {shown} מוצגים לאחר מסנן"
+      "doneTooltip": "ממצאים {total}, {shown} מוצגים לאחר מסנן",
+      "dropped": "Saropa: ס캔 נופל ({count} קבצים)",
+      "droppedTooltip": "Saropa Lints שוחרר {count} קבצים שנפתחו על ידי כלי אחר ולא על ידיך. שמור קובץ כדי לסרוק אותו.",
+      "droppedSuffix": "(+{count} מוסק)",
+      "droppedSuffixTooltip": "גם קובצי {count} שנפתחו על ידי כלי אחר ולא על ידיך נדדו. שמור קובץ כדי לסרוק אותו."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: סקרנות פרויקט שלם",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count}daemon(s) מבודדים",
+      "criticalOrphans": "🔴 {count}daemon(s) מוסתרים",
       "openHint": "לחץ כדי לפתוח מצב בריאות תהליך"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "הרג דמונים מיותרים Flutter"
+    },
+    "orphanPreflight": {
+      "found": "{count} תהליך(ים) מארח מודל שונ들 מהסשן הקודם הם מחזיקים {size} של זיכרון מitted.",
+      "reclaimAction": "שחזר זיכרון",
+      "detailsAction": "הצגת פרטים",
+      "none": "לא נמצאו תהליכי מארח מודלים מיותרים.",
+      "confirmTitle": "סיום תהליך(ים) אבויים {count} עם {size}?",
+      "confirmDetail": "ה процססס האלה יסתיימו מיידית ולא ניתן לשחזר:",
+      "confirmKill": "סיום תהליכים",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "הסתיים טיפול בпроцесс(ים) אבוי(ים) {count}, ונקבעו כ {size}.",
+      "reclaimFailed": "לא ניתן לסיים את תהליך {count} (ותהליך). הם עלולים להזדקק ל הרשאות מוגזמות.",
+      "bannerTitle": "{count} תהליך(ים) מארח(ים) מודל(ים) מוזרים שמכילים {size}",
+      "bannerReclaim": "שחזר"
     },
     "panel": {
       "title": "健全性 análise",

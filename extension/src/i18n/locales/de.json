@@ -74,7 +74,11 @@
       "ready": "Saropa: bereit",
       "disabled": "Saropa: deaktiviert",
       "noProject": "Saropa: kein Dart Projekt",
-      "doneTooltip": "{total} gefunden, {shown} nach Filter angezeigt"
+      "doneTooltip": "{total} gefunden, {shown} nach Filter angezeigt",
+      "dropped": "Saropa: scan übersprungen ({count} Dateien)",
+      "droppedTooltip": "Saropa Lints übersprungen {count} Dateien, die von einem anderen Tool geöffnet wurden, nicht von Ihnen. Speichern Sie eine Datei, um sie zu scannen.",
+      "droppedSuffix": "(+{count} übersprungen)",
+      "droppedSuffixTooltip": "Außerdem wurden {count}-Dateien übersprungen, die von einem anderen Tool geöffnet wurden, nicht von Ihnen. Speichern Sie eine Datei, um sie zu scannen."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: Durchsuchung des gesamten Projekts",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} abgekoppelte Daemon(s)",
+      "criticalOrphans": "🔴 {count} abgekoppelte Daemon(s)",
       "openHint": "Klicken Sie, um Process Health zu öffnen"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Kill Orphane Flutter Daemonen"
+    },
+    "orphanPreflight": {
+      "found": "{count} verwaiste Modellhostprozesse (s) aus einer früheren Sitzung halten {size} an verbrauchter Arbeitsspeicher.",
+      "reclaimAction": "Speicherplatz wiederherstellen",
+      "detailsAction": "Details anzeigen",
+      "none": "Keine abgekoppelten Modellhost-Prozesse gefunden.",
+      "confirmTitle": "Ende {count} abgekoppelten Prozess(e) halten {size}?",
+      "confirmDetail": "Diese Prozesse werden sofort beendet und können nicht wiederhergestellt werden:",
+      "confirmKill": "Prozesse beenden",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Ended {count} orphaned process(e)s, reclaiming about {size}.",
+      "reclaimFailed": "Kann den Prozess {count} nicht beenden. Sie benötigen möglicherweise erhöhte Rechte.",
+      "bannerTitle": "{count} verwaiste Modellhostprozess(e) halten {size}",
+      "bannerReclaim": "Wiedererobern"
     },
     "panel": {
       "title": "Prozessgesundheit",

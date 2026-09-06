@@ -74,7 +74,11 @@
       "ready": "Saropa: gotowy",
       "disabled": "Saropa: wyłączony",
       "noProject": "Saropa: brak Dart projektu",
-      "doneTooltip": "Znaleziono {total} wynik(i), {shown} pokazane po filtrowaniu"
+      "doneTooltip": "Znaleziono {total} wynik(i), {shown} pokazane po filtrowaniu",
+      "dropped": "Saropa: skan pominięto ({count} plików)",
+      "droppedTooltip": "Saropa Lints pominięto pliki {count}, które zostały otwarte przez inny program, a nie przez Ciebie. Zapisz plik, aby go przeanalizować.",
+      "droppedSuffix": "(+{count} pominięto)",
+      "droppedSuffixTooltip": "Również pominięto pliki {count} otwarte przez inny narzędzie, a nie przez Ciebie. Zapisz plik, aby go skanować."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: skanowanie całego projektu",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} daemon(s) wypalone",
+      "criticalOrphans": "🔴 {count} daemon(s) wyrzucony /nie_zadziala",
       "openHint": "Kliknij, aby otworzyć Zdrowie Procesu"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Zabij Orfane Flutter Demony"
+    },
+    "orphanPreflight": {
+      "found": "{count} procesy (procesów) hosta modelu zostawione z wcześniejszej sesji trzymają {size} z za-commited pamięci.",
+      "reclaimAction": "Zwolnij pamięć",
+      "detailsAction": "Pokaż szczegóły",
+      "none": "Brak znalezionych niezakończonych procesów hosta modelu.",
+      "confirmTitle": "Zakończ {count} orfanki procesy (szablony) trzymające {size}?",
+      "confirmDetail": "Te procesy zostaną natychmiast zakończone i nie będą mogły zostać odzyskane:",
+      "confirmKill": "Zakończ procesy",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Zakończono {count} procesy orfane, odzyskano około {size}.",
+      "reclaimFailed": "Nie można zakończyć procesu (ów) {count}. Mogą wymagać uprawnień administratora.",
+      "bannerTitle": "{count} procesy hosta modelu opuszczonego (odkryte) trzymające {size}",
+      "bannerReclaim": "Zwolnij"
     },
     "panel": {
       "title": "Stan procesu",

@@ -74,7 +74,11 @@
       "ready": "Saropa: hazır",
       "disabled": "Saropa: devre dışı",
       "noProject": "Saropa: Dart projesi yok",
-      "doneTooltip": "{total} bulguları, {shown} filtreden sonra gösterilir"
+      "doneTooltip": "{total} bulguları, {shown} filtreden sonra gösterilir",
+      "dropped": "Saropa: taranmadı ({count} dosya)",
+      "droppedTooltip": "Saropa Lints başka bir araçla açılmış olan {count} dosyayı atladı. Dosyayı tarayabilmek için kaydedin.",
+      "droppedSuffix": "(+{count} atlanmıştır)",
+      "droppedSuffixTooltip": "Ayrıca başka bir araçla açılmış olan {count} dosyaları atlandı. Dosyayı taramak için kaydedin."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: projeyi tarıyor",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} izole edilmiş daemon(s)",
+      "criticalOrphans": "🔴 {count} izole edilmiş daemon(s)",
       "openHint": "Süreç Sağlığı'nı açmak için tıklayın"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Ölümü Orphaned Flutter Daemonları"
+    },
+    "orphanPreflight": {
+      "found": "{count} önceki bir oturumdan kalma model ana bilgisayar işlem(ler)i, {size} boyutunda tahsis edilmiş belleği tutuyor.",
+      "reclaimAction": "Yerel Belleği Geri Kazan",
+      "detailsAction": "Detayları Göster",
+      "none": "Yoksul model host süreçleri bulunamadı.",
+      "confirmTitle": "Bitmiş {count} sürecini (lerini) tutan {size}?",
+      "confirmDetail": "Bu süreçler anında sona erecek ve geri alınamayacak:",
+      "confirmKill": "İşlemi Bitir",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Bitirildi {count} izole edilmiş süreç(ler), {size} yaklaşık olarak geri kazanıldı.",
+      "reclaimFailed": "{count} işlem(ler)i sona erdirilemedi. Yükseltici izinler gerekebilir.",
+      "bannerTitle": "{count} atılmış model host süreci(ler) {size} tutuyor",
+      "bannerReclaim": "Geri Kazanım"
     },
     "panel": {
       "title": "Proje Sağlığı",

@@ -74,7 +74,11 @@
       "ready": "Saropa: handa na",
       "disabled": "Saropa: di nakakatulong",
       "noProject": "Saropa: walang Dart project",
-      "doneTooltip": "{total} nakahanap, {shown} ipapakita pagkatapos ng filter"
+      "doneTooltip": "{total} nakahanap, {shown} ipapakita pagkatapos ng filter",
+      "dropped": "Saropa: nilaktawan ang pag-scan (mga {count} na file)",
+      "droppedTooltip": "Nag-skip ang Saropa Lints ng {count} mga file na in-open ng iba pang tool, hindi mo. I-save ang isang file upang i-scan ito.",
+      "droppedSuffix": "(+{count} naipasa)",
+      "droppedSuffixTooltip": "Nag-iiwan din ang mga file na {count} na iyon na inilabas ng iba pang tool kaysa sa iyo. I-save ang file upang i-scan ito."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: pag-scan ng buong proyekto",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} na walang magulang na daemon(s)",
+      "criticalOrphans": "🔴 {count} na walang magulang na daemon(s)",
       "openHint": "Click para magbukas ng Process Health"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Iwanan Ang Mga Flutter Daemon Na Walang Ama"
+    },
+    "orphanPreflight": {
+      "found": "{count} na host process (processes) ng modelo na nawala mula sa isang mas mababang sesyon ay nagtatapon ng {size} ng komitido memory.",
+      "reclaimAction": "Ibalik ang Memorya",
+      "detailsAction": "Ipakita ang Detalye",
+      "none": "Walang nakakalat na proseso ng host ng modelo.",
+      "confirmTitle": "Tumutugon {count} na proseso (proseso) na walang magulang {size}?",
+      "confirmDetail": "Ang mga proseso ay magtatapos agad at hindi makapanumbalik:",
+      "confirmKill": "Tumigil sa mga Proseso",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Nagtapos ang {count} proseso (prosesos) na walang magulang, nagmamaneho ng tungkol sa {size}.",
+      "reclaimFailed": "Hindi maaaring itapos ang proseso(s) {count}. Maaaring kinakailangan ang karagdagang pahintulot.",
+      "bannerTitle": "{count} na host process (ng modelo) na walang mga anak na nangunguna {size}",
+      "bannerReclaim": "Ibalik"
     },
     "panel": {
       "title": "Kalusugan ng Proseso",

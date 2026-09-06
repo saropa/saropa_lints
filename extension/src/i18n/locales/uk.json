@@ -74,7 +74,11 @@
       "ready": "Saropa: готовий",
       "disabled": "Saropa: вимкнено",
       "noProject": "Saropa: немає проекту Dart",
-      "doneTooltip": "Знахідка(и) {total}, {shown} показано після фільтра"
+      "doneTooltip": "Знахідка(и) {total}, {shown} показано після фільтра",
+      "dropped": "Saropa: скан пропущено ({count} файлів)",
+      "droppedTooltip": "Saropa Lints пропущено {count} файлів, які були відкриті іншим інструментом, а не вами. Збережіть файл, щоб його проаналізувати.",
+      "droppedSuffix": "(+{count} пропущено)",
+      "droppedSuffixTooltip": "Також пропущені {count} файли, які були відкриті іншим інструментом, а не вами. Збережіть файл, щоб його проаналізувати."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: сканування всього проекту",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} відкинуті демони(а)",
+      "criticalOrphans": "🔴 {count} відкинуті daemon(s)",
       "openHint": "Натисніть, щоб відкрити Process Health"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Видалити Забитих Flutter Демонів"
+    },
+    "orphanPreflight": {
+      "found": "{count} відкинуті моделі процесів хоста з попередньої сесії тримають {size} комітованої пам'яті.",
+      "reclaimAction": "Відновити пам'ять",
+      "detailsAction": "Показати деталі",
+      "none": "Не знайдено орфанізованих процесів хоста моделі",
+      "confirmTitle": "Завершити {count} процес(и) без власника {size}?",
+      "confirmDetail": "Ці процеси будуть завернені відразу ж і не можуть бути відновлені:",
+      "confirmKill": "Кінець процесів",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Завершено {count} процеси(і) без батьків, відновлення приблизно {size}.",
+      "reclaimFailed": "Не вдалося завершити процес(и) {count}. Вони можуть потребувати підвищених прав.",
+      "bannerTitle": "{count} відкинутий модель процес виконання host (і) {size}",
+      "bannerReclaim": "Відновити"
     },
     "panel": {
       "title": "Стан процесу",

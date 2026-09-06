@@ -74,7 +74,11 @@
       "ready": "Saropa：准备好了",
       "disabled": "Saropa：禁用",
       "noProject": "Saropa：没有 Dart 项目",
-      "doneTooltip": "{total} 结果，{shown} 在过滤器后显示"
+      "doneTooltip": "{total} 结果，{shown} 在过滤器后显示",
+      "dropped": "Saropa: 跳过扫描（{count} 个文件）",
+      "droppedTooltip": "Saropa Lints 跳过了 {count} 个由其他工具打开而非您打开的文件。保存文件以扫描它。",
+      "droppedSuffix": "(+{count} 跳过)",
+      "droppedSuffixTooltip": "也跳过了由其他工具打开而非您打开的{count}文件。保存文件以扫描它。"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: 扫描整个项目",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} 已弃用的守护进程(进程)",
+      "criticalOrphans": "🔴 {count} 孤儿守护进程(进程)",
       "openHint": "单击打开进程运行状况"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "杀死孤立的 Flutter 守护进程"
+    },
+    "orphanPreflight": {
+      "found": "{count} 之前会话中遗留的模型主机进程(们)正在占用 {size} 的已提交内存。",
+      "reclaimAction": "释放内存",
+      "detailsAction": "显示详情",
+      "none": "未发现孤立的模型主机进程。",
+      "confirmTitle": "结束 {count} 中孤立的进程(们) {size}？",
+      "confirmDetail": "这些进程将立即终止且无法恢复：",
+      "confirmKill": "结束进程",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "已结束 {count} 个孤儿进程，回收约 {size}。",
+      "reclaimFailed": "无法终止 {count} 进程(们)。它们可能需要提升的权限。",
+      "bannerTitle": "{count} 未托管的模型主机进程(们) 持有 {size}",
+      "bannerReclaim": "收回"
     },
     "panel": {
       "title": "进程健康",

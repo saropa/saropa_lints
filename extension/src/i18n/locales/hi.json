@@ -74,7 +74,11 @@
       "ready": "Saropa: तैयार",
       "disabled": "Saropa: अक्षमित",
       "noProject": "Saropa: कोई भी Dart प्रोजेक्ट नहीं",
-      "doneTooltip": "{total} पाए गए, {shown} फ़िल्टर के बाद दिखाए गए"
+      "doneTooltip": "{total} पाए गए, {shown} फ़िल्टर के बाद दिखाए गए",
+      "dropped": "Saropa: स्कैन छोड़ दिया गया ({count} फ़ाइलें)",
+      "droppedTooltip": "Saropa Lints छोड़ दिया गया है {count} फ़ाइलें जो आपके द्वारा नहीं खोली गई थी। फ़ाइल को बचाने के लिए उसे स्कैन करें।",
+      "droppedSuffix": "(+{count} छोड़ दिया गया)",
+      "droppedSuffixTooltip": "अतिरिक्त रूप से {count} फ़ाइलें छोड़ दी गईं जो आपके द्वारा नहीं खोली गईं बल्कि किसी अन्य टूल द्वारा खोली गईं। एक फ़ाइल को सेव करें ताकि उसे स्कैन किया जा सके।"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: पूरे प्रोजेक्ट की स्कैनिंग",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} अकेले डेमोन (s)",
+      "criticalOrphans": "🔴 {count} अकेले डेमोन(s)",
       "openHint": "क्लिक करें ताकि प्रोसेस हेल्थ खोलें"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "अनाथ Flutter राक्षसों को मार डालो"
+    },
+    "orphanPreflight": {
+      "found": "{count} अलग श्रृंखला में बने मॉडल होस्ट प्रोसेस (es) अतीत श्रृंखला से बचे हैं जो {size} समर्पित स्मृति के अधिकांश भाग को धारण कर रहे हैं।",
+      "reclaimAction": "मेमोरी वापस लें",
+      "detailsAction": "डिटेल दिखाओ",
+      "none": "कोई अकेला मॉडल होस्ट प्रोसेस नहीं पाए गए।",
+      "confirmTitle": "अंत {count} अकेले प्रक्रिया(एं) जो {size} धारण कर रही हैं?",
+      "confirmDetail": "इन प्रक्रियाओं को तुरंत खत्म कर दिया जाएगा और उन्हें बहाल नहीं किया जा सकता:",
+      "confirmKill": "प्रक्रियाओं को अंत दें",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "अंत आए {count} अकेले प्रक्रिया(एं), {size} के लगभग वापस लेने के लिए",
+      "reclaimFailed": "{count} प्रक्रिया(ओं) को समाप्त करने में असमर्थ रहे। उन्हें उच्चतम अधिकारों की आवश्यकता हो सकती है।",
+      "bannerTitle": "{count} अकेला मॉडल होस्ट प्रोसेस (एस) जो {size} को धारण कर रहे हैं",
+      "bannerReclaim": "पुनः प्राप्त करें"
     },
     "panel": {
       "title": "प्रोसेस हेल्थ",

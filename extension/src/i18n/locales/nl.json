@@ -74,7 +74,11 @@
       "ready": "Saropa: klaar",
       "disabled": "Saropa: uitgeschakeld",
       "noProject": "Saropa: geen Dart project",
-      "doneTooltip": "{total} vinden(s), {shown} weergegeven na filter"
+      "doneTooltip": "{total} vinden(s), {shown} weergegeven na filter",
+      "dropped": "Saropa: scan overgeslagen ({count} bestanden)",
+      "droppedTooltip": "Saropa Lints isgeslaagd {count} bestanden die door een ander hulpmiddel zijn geopend in plaats van door u. Bewaar een bestand om het te scannen.",
+      "droppedSuffix": "(+{count} overgeslagen)",
+      "droppedSuffixTooltip": "Ook overgeslagen {count} bestanden die door een ander hulpmiddel zijn geopend in plaats van door jou. Sla een bestand op om het te scannen."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: hele project scannen",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} orphello daemon(s)",
+      "criticalOrphans": "🔴 {count} orphane daemon(s)",
       "openHint": "Klik om Process Health te openen"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Kil Orphane Flutter Daemonen"
+    },
+    "orphanPreflight": {
+      "found": "{count} gescheiden model host process(en) van een vroegere sessie houden {size} van gecommitted geheugen.",
+      "reclaimAction": "Geheugen vrijmaken",
+      "detailsAction": "Toon Details",
+      "none": "Geen orphane model host processen gevonden.",
+      "confirmTitle": "Eind {count} afgezonderde proces(en) vasthoudend {size}?",
+      "confirmDetail": "Deze processen worden onmiddellijk beëindigd en kunnen niet hersteld worden:",
+      "confirmKill": "Eindig processen",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Geëindigd {count} orphane processen, herinnen van ongeveer {size}.",
+      "reclaimFailed": "Kon proces(zen) {count} niet beëindigen. Ze kunnen verhoogde rechten vereisen.",
+      "bannerTitle": "{count} gescheiden model host proces(sen) met {size}",
+      "bannerReclaim": "Herstel"
     },
     "panel": {
       "title": "Project Gezondheid",

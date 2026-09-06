@@ -74,7 +74,11 @@
       "ready": "Saropa: pronto",
       "disabled": "Saropa: disabilitato",
       "noProject": "Saropa: nessun progetto Dart",
-      "doneTooltip": "{total} trovato(i), {shown} mostrati dopo il filtro"
+      "doneTooltip": "{total} trovato(i), {shown} mostrati dopo il filtro",
+      "dropped": "Saropa: scanskipped ({count} file)",
+      "droppedTooltip": "Saropa Lints file ignorati {count} che sono stati aperti da un altro strumento invece che da te. Salva un file per analizzarlo.",
+      "droppedSuffix": "(+{count} saltato)",
+      "droppedSuffixTooltip": "Anche i file {count} sono stati saltati poiché erano stati aperti da un altro strumento e non da te. Salva un file per scansionarlo."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: scansione dell'intero progetto",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} daemoni orfani",
+      "criticalOrphans": "🔴 {count} daemoni orfani",
       "openHint": "Fai clic per aprire Process Health"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Elimina Processi Flutter Orfani"
+    },
+    "orphanPreflight": {
+      "found": "Processi host del modello orfani {count} sono in attesa di {size} di memoria commessa da una sessione precedente.",
+      "reclaimAction": "Riconquista Memoria",
+      "detailsAction": "Mostra Dettagli",
+      "none": "Nessun processo host del modello orfano trovato.",
+      "confirmTitle": "Processo(i) {count} orfano(i) che tiene(n)o {size}?",
+      "confirmDetail": "Questi processi saranno terminati immediatamente e non potranno essere recuperati:",
+      "confirmKill": "Fine Processi",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Processo(i) orfano(i) {count} terminato(i), riavviati circa {size}.",
+      "reclaimFailed": "Non è stato possibile terminare il processo (i) {count}. Potrebbero averne bisogno di permessi elevati.",
+      "bannerTitle": "Processo(i) host del modello orfano {count} che detiene(n)o {size}",
+      "bannerReclaim": "Riconquista"
     },
     "panel": {
       "title": "Salute del processo",

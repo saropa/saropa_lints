@@ -74,7 +74,11 @@
       "ready": "Saropa: listo",
       "disabled": "Saropa: desactivado",
       "noProject": "Saropa: ningún proyecto Dart",
-      "doneTooltip": "{total} encontrado(s), {shown} mostrado después del filtro"
+      "doneTooltip": "{total} encontrado(s), {shown} mostrado después del filtro",
+      "dropped": "Saropa: escaneo omitido ({count} archivos)",
+      "droppedTooltip": "Saropa Lints archivos omitidos {count} que fueron abiertos por otra herramienta en lugar de por usted. Guarde un archivo para escanearlo.",
+      "droppedSuffix": "(+{count} omitido)",
+      "droppedSuffixTooltip": "También se omitieron los archivos {count} que se abrieron con otra herramienta en lugar de con usted. Guarde un archivo para escanearlo."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: escaneando todo el proyecto",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} daemon(es) huérfano(s)",
+      "criticalOrphans": "🔴 {count} daemon(es) huérfano(s)",
       "openHint": "Haga clic para abrir Salud del Proceso"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Matar Daemons Flutter Orfanos"
+    },
+    "orphanPreflight": {
+      "found": "Procesos {count} de host de modelo abandonados de una sesión anterior están utilizando {size} de memoria comprometida.",
+      "reclaimAction": "Recuperar memoria",
+      "detailsAction": "Mostrar detalles",
+      "none": "No se encontraron procesos de host de modelo huérfanos.",
+      "confirmTitle": "Finalizar {count} proceso(s) huérfano(s) que están manteniendo {size}?",
+      "confirmDetail": "Estos procesos se terminarán inmediatamente y no podrán recuperarse:",
+      "confirmKill": "Finalizar procesos",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Proceso(s) {count} huérfano(s) finalizado(s), reclamando aproximadamente {size}.",
+      "reclaimFailed": "No se pudo finalizar el proceso (s) {count}. Pueden necesitar permisos elevados.",
+      "bannerTitle": "{count} proceso(s) de host de modelo abandonado(s) que poseen {size}",
+      "bannerReclaim": "Recuperar"
     },
     "panel": {
       "title": "Salud del proceso",

@@ -74,7 +74,11 @@
       "ready": "Saropa: tayari",
       "disabled": "Saropa: imezimwa",
       "noProject": "Saropa: hakuna mradi wa Dart",
-      "doneTooltip": "Utafutaji wa {total}, {shown} umeonyeshwa baada ya kichujio"
+      "doneTooltip": "Utafutaji wa {total}, {shown} umeonyeshwa baada ya kichujio",
+      "dropped": "Saropa: skana imerukwa (faili za {count})",
+      "droppedTooltip": "Saropa Lints ilifunguka {count} faili ambayo walifunguka na aliyobadilisha asilimia kwa sababu ya kutoa kwa wakati. Tuma faili kujaribu kujaribu.",
+      "droppedSuffix": "(+{count} inakwenda)",
+      "droppedSuffixTooltip": "Hapana kuzingia {count} faili ambayo zilifunguzwa na aliyeyeneza asilimia asilimia. Tuma faili kuzingia kujaribu."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: kusimamia project kato kato",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} daemon(s) ya kifalaki",
+      "criticalOrphans": "🔴 {count} daemon(s) ya kifalaki",
       "openHint": "Bofya ili kufungua Mchakato wa Afya"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Kifungu Ya Flutter Ya Daemons Ya Kifungu"
+    },
+    "orphanPreflight": {
+      "found": "{count} orphaned model host process(es) from an earlier session are holding {size} of committed memory.",
+      "reclaimAction": "Kupungua Moyo",
+      "detailsAction": "Tazama Detalile",
+      "none": "Hakuna kipengele ya host ya model ya kihubu.",
+      "confirmTitle": "End {count} process ya kifalme (kifalme) ambayo inakimba {size}?",
+      "confirmDetail": "Michakato hii itakamilika mara moja na haiwezi kurejeshwa:",
+      "confirmKill": "Tumia Mwongozo",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Mabadiliko ya {count} ya mafunzo ya mabadiliko, kuzalishia kwa makosa ya {size}.",
+      "reclaimFailed": "Hakikisha kubadilisha {count} proses(s). Wao mbalimbali inaweza kushindwa kuzalishwa kwa kujaribu kuzalishwa.",
+      "bannerTitle": "{count} model ya kifalaki ya host ya proses (proses) ya {size}",
+      "bannerReclaim": "Kupungua"
     },
     "panel": {
       "title": "Unganisha Moyo ya Mlango",

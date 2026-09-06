@@ -74,7 +74,11 @@
       "ready": "Saropa: お手伝い準備完了",
       "disabled": "Saropa: 無効",
       "noProject": "Saropa: Dart プロジェクトはありません",
-      "doneTooltip": "{total} 件の見つかりました、{shown} はフィルター後の表示"
+      "doneTooltip": "{total} 件の見つかりました、{shown} はフィルター後の表示",
+      "dropped": "Saropa: スキャンをスキップしました ({count} ファイル)",
+      "droppedTooltip": "Saropa Lints は、他のツールによって開かれたファイル {count} 個をスキップしました。ファイルを保存してスキャンします。",
+      "droppedSuffix": "（＋{count} スキップ）",
+      "droppedSuffixTooltip": "別のツールで開かれた{count}ファイルもスキップされました。ファイルを保存してスキャンします。"
     },
     "baseline": {
       "progressTitle": "Saropa Lints: 全体プロジェクトをスキャン中",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} 廃棄されたデーモン(s)",
+      "criticalOrphans": "🔴 {count} 廃棄されたデーモン(s)",
       "openHint": "クリックしてプロセスヘルスを開く"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "孤立した Flutter デーモンを終了する"
+    },
+    "orphanPreflight": {
+      "found": "以前のセッションから残った{count}の孤立したモデルホストプロセス（es）が{size}のコミット済みメモリを保持しています。",
+      "reclaimAction": "メモリを回復する",
+      "detailsAction": "詳細を表示",
+      "none": "孤立したモデルホストプロセスは見つかりませんでした。",
+      "confirmTitle": "終了 {count} が {size} を保持しているプロセス(たち)はありますか？",
+      "confirmDetail": "これらのプロセスは即座に終了され、復元できません:",
+      "confirmKill": "プロセスを終了する",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "終了しました {count} 孤児プロセス(ス)，約 {size} を回収しました。",
+      "reclaimFailed": "{count}プロセス(たち)を終了できませんでした。管理者権限が必要かもしれません。",
+      "bannerTitle": "{count} 廃棄されたモデルホストプロセス(es) が {size} を保持しています",
+      "bannerReclaim": "リカイン"
     },
     "panel": {
       "title": "プロセスヘルス",

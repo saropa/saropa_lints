@@ -74,7 +74,11 @@
       "ready": "Saropa: sẵn sàng",
       "disabled": "Saropa: bị vô hiệu hóa",
       "noProject": "Saropa: không có dự án Dart",
-      "doneTooltip": "(Các) kết quả {total}, {shown} hiển thị sau bộ lọc"
+      "doneTooltip": "(Các) kết quả {total}, {shown} hiển thị sau bộ lọc",
+      "dropped": "Saropa: quét bị bỏ qua ({count} tập tin)",
+      "droppedTooltip": "Saropa Lints đã bỏ qua {count} tệp mà người khác đã mở thay vì bạn. Lưu một tệp để quét nó.",
+      "droppedSuffix": "(+{count} bỏ qua)",
+      "droppedSuffixTooltip": "Các tệp {count} cũng đã bị bỏ qua vì chúng được mở bởi công cụ khác thay vì bởi bạn. Lưu tệp để quét."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: quét toàn bộ dự án",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} tiến trình daemon bị bỏ rơi",
+      "criticalOrphans": "🔴 {count} daemon(s) bị bỏ rơi",
       "openHint": "Nhấp để mở Tình trạng quy trình"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Tiêu diệt Daemon Flutter mồ côi"
+    },
+    "orphanPreflight": {
+      "found": "{count} quá trình chủ mô hình bị bỏ rơi (s) từ một phiên trước đang chiếm dụng {size} bộ nhớ đã cấp.",
+      "reclaimAction": "Phục hồi Bộ nhớ",
+      "detailsAction": "Hiển thị Chi tiết",
+      "none": "Không tìm thấy quy trình chủ model bị bỏ rơi.",
+      "confirmTitle": "Kết thúc quy trình {count} bị bỏ rơi (số lượng) đang giữ {size}?",
+      "confirmDetail": "Những quy trình này sẽ bị kết thúc ngay lập tức và không thể phục hồi:",
+      "confirmKill": "Kết Thúc Các Quy Trình",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Đã kết thúc {count} quy trình (quy trình) bị bỏ rơi, thu hồi khoảng {size}.",
+      "reclaimFailed": "Không thể kết thúc quy trình {count}. Chúng có thể cần quyền nâng cao.",
+      "bannerTitle": "{count} tiến trình chủ lưu trữ mô hình bị bỏ rơi (s) đang giữ {size}",
+      "bannerReclaim": "Khôi phục"
     },
     "panel": {
       "title": "Trạng thái dự án",

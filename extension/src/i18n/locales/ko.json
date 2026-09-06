@@ -74,7 +74,11 @@
       "ready": "Saropa: 준비됨",
       "disabled": "Saropa: 비활성화",
       "noProject": "Saropa: Dart 프로젝트 없음",
-      "doneTooltip": "{total} 개 발견됨, 필터 후 {shown} 표시됨"
+      "doneTooltip": "{total} 개 발견됨, 필터 후 {shown} 표시됨",
+      "dropped": "Saropa: 스캔 스킵 ({count} 파일)",
+      "droppedTooltip": "Saropa Lints은 다른 도구로 열린 파일 {count}개를 건너뛰었습니다. 파일을 저장하여 스캔하십시오.",
+      "droppedSuffix": "(+{count} 건너뛰기)",
+      "droppedSuffixTooltip": "또한 다른 도구로 열린 {count} 파일은 건너뛰었습니다. 파일을 저장하여 스캔할 수 있습니다."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: 전체 프로젝트 스캔 중",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} 버려진 데몬(s)",
+      "criticalOrphans": "🔴 {count} 버려진 데몬(s)",
       "openHint": "프로세스 헬스를 열려면 클릭하세요"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "사망한 Flutter 데몬 종료"
+    },
+    "orphanPreflight": {
+      "found": "{count} 이전 세션에서 생성된 모델 호스트 프로세스(들)이 {size}의 커밋된 메모리를 차지하고 있습니다.",
+      "reclaimAction": "메모리 회수",
+      "detailsAction": "상세 정보 표시",
+      "none": "orphaned model host processes 없음.",
+      "confirmTitle": "종료 {count} 버려진 프로세스(들)이 {size}를 잡고 있습니까?",
+      "confirmDetail": "이러한 프로세스는 즉시 종료되며 복구할 수 없습니다:",
+      "confirmKill": "프로세스 종료",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "종료된 {count} 고립된 프로세스(들), {size}를 되찾았습니다.",
+      "reclaimFailed": "{count} 프로세스(들)을 종료할 수 없습니다. 관리자 권한이 필요할 수 있습니다.",
+      "bannerTitle": "{count} 버려진 모델 호스트 프로세스(들)이 {size}를 보유하고 있습니다.",
+      "bannerReclaim": "복구"
     },
     "panel": {
       "title": "프로세스 건강",
