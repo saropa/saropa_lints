@@ -728,6 +728,62 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
     return True
 
 
+def _retag_and_push(
+    project_dir: Path, tag_name: str,
+) -> bool:
+    """Delete tag locally+remotely, re-create at HEAD, and force-push.
+
+    Used on publish retry when the previous workflow failed on an older
+    commit. The tag must point to the current HEAD (which contains fixes)
+    so the new workflow run checks out the right code.
+    """
+    use_shell = get_shell_mode()
+
+    # Delete local tag (may not exist if already cleaned up)
+    subprocess.run(
+        ["git", "tag", "-d", tag_name],
+        cwd=project_dir,
+        capture_output=True, text=True, shell=use_shell,
+    )
+    # Delete remote tag
+    result = subprocess.run(
+        ["git", "push", "origin", f":refs/tags/{tag_name}"],
+        cwd=project_dir,
+        capture_output=True, text=True, shell=use_shell,
+    )
+    if result.returncode != 0:
+        print_error(
+            f"Failed to delete remote tag {tag_name}: "
+            f"{result.stderr.strip()}"
+        )
+        return False
+
+    # Re-create at HEAD
+    result = subprocess.run(
+        ["git", "tag", "-a", tag_name, "-m", f"Release {tag_name}"],
+        cwd=project_dir,
+        capture_output=True, text=True, shell=use_shell,
+    )
+    if result.returncode != 0:
+        print_error(
+            f"Failed to create tag {tag_name}: "
+            f"{result.stderr.strip()}"
+        )
+        return False
+
+    # Push new tag
+    result = run_command(
+        ["git", "push", "origin", tag_name],
+        project_dir,
+        f"Re-pushing tag {tag_name}",
+    )
+    if result.returncode != 0:
+        return False
+
+    print_success(f"Tag {tag_name} moved to HEAD and pushed.")
+    return True
+
+
 def _find_workflow_run(
     project_dir: Path, tag_name: str,
 ) -> str | None:
@@ -781,6 +837,11 @@ def _find_workflow_run(
             continue
 
         for run in runs:
+            # Skip runs that already completed with a failure — on retry
+            # we need a fresh (queued/in_progress) run, not the old one.
+            if run.get("conclusion") == "failure":
+                continue
+
             # Prefer run that matches our tag (headBranch can be tag for tag pushes).
             if run.get("headBranch") == tag_name:
                 return str(run["databaseId"])
@@ -866,11 +927,26 @@ def publish_to_pubdev_step(
 
     run_id = _find_workflow_run(project_dir, tag_name)
     if not run_id:
+        # No pending/successful run found — the previous run for this tag
+        # may have failed on an older commit. Move the tag to HEAD and
+        # re-push to trigger a fresh workflow against the current code.
         print_warning(
-            f"No publish workflow found for tag {tag_name} "
-            f"after 10m. Check GitHub Actions manually."
+            f"No active workflow found for tag {tag_name}. "
+            f"Moving tag to HEAD and re-pushing..."
         )
-        return False
+        if not _retag_and_push(project_dir, tag_name):
+            print_warning(
+                f"Could not re-push tag {tag_name}. "
+                f"Check GitHub Actions manually."
+            )
+            return False
+        run_id = _find_workflow_run(project_dir, tag_name)
+        if not run_id:
+            print_warning(
+                f"No publish workflow found for tag {tag_name} "
+                f"after re-push. Check GitHub Actions manually."
+            )
+            return False
 
     print_info(f"Watching workflow run {run_id}...")
     try:
