@@ -20,9 +20,13 @@ All references to the `<details><summary>Maintenance</summary>` pattern were rep
 
 Grep sweep of CONTRIBUTING.md, `.githooks/`, `scripts/`, and `CHANGELOG_ARCHIVE.md` confirmed zero stale `<summary>Maintenance</summary>` references outside archived history files (which are frozen and exempt). No publish or CI scripts parse the changed MAINTENANCE NOTES comment text — only the comment delimiter `MAINTENANCE NOTES` is used programmatically (by `_version_changelog.py` and its test).
 
-### Pre-commit enforcement
+The pre-commit hook was hardened: instead of counting occurrences and comparing against "NEVER use" matches (fragile if the instruction line is reformatted), the hook now strips the entire `<!-- ... -->` comment block with `sed` before checking, making it immune to comment rewording.
 
-Added a gate to `.githooks/pre-commit` that blocks commits introducing `<details><summary>Maintenance</summary>` in CHANGELOG.md. The gate checks staged content (not working tree) and allows the one "NEVER use" instruction in the MAINTENANCE NOTES comment. This prevents the retired pattern from recurring — the same defense-in-depth approach used for British spellings (N9) and AI attribution (N7).
+### Enforcement (two layers)
+
+1. **Pre-commit hook** (`.githooks/pre-commit`): blocks commits introducing `<summary>Maintenance</summary>` in CHANGELOG.md content sections. Strips the HTML comment block before checking so the "NEVER use" instruction does not false-positive.
+
+2. **Publish gate** (`scripts/modules/_publish_steps.py`): `_gate_changelog_internal_heading()` checks the version section at publish time, with the same retry/ignore/abort prompt pattern as the Overview check. Backed by `check_changelog_internal_heading()` in `_version_changelog.py`.
 
 ### Work still to do
 
@@ -35,4 +39,4 @@ None.
 
 ### Done confirmation
 
-Eight files updated (seven convention replacements + one pre-commit gate). The `### Internal` heading is now the sole documented and mechanically enforced convention for non-user-facing changelog entries.
+Convention updated across all documentation, memory, and skills. Enforcement added at both commit time (pre-commit hook) and publish time (changelog validation gate). The `### Internal` heading is the sole documented and mechanically enforced convention.

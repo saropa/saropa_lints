@@ -696,10 +696,13 @@
     },
     "notification": {
       "critical": "Dart processes are using {size} with {orphaned} orphaned daemons. Clean up?",
+      "possibleLeak": "Saropa RSS has been rising steadily ({size} and climbing). Possible memory leak — check the health panel.",
       "result": "Killed {count} orphaned daemons, freed ~{size}"
     },
     "action": {
       "cleanUp": "Clean Up",
+      "openPanel": "Open Health Panel",
+      "dismiss": "Dismiss",
       "optimizeAnalysis": "Optimize Analysis",
       "dontShowAgain": "Don’t Show Again"
     },

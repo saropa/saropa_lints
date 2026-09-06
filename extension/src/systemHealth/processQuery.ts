@@ -208,8 +208,14 @@ const SPARK_CHARS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
  */
 export function renderSparkline(samples: readonly number[]): string {
   if (samples.length < 2) return '';
-  const min = Math.min(...samples);
-  const max = Math.max(...samples);
+  // Reduce instead of Math.min/max spread — spread hits the call stack
+  // limit around 10k+ elements. Safe at 30 today, but future-proof.
+  let min = samples[0];
+  let max = samples[0];
+  for (const v of samples) {
+    if (v < min) min = v;
+    if (v > max) max = v;
+  }
   // Flat line — all values identical, render mid-height bars.
   if (max === min) return SPARK_CHARS[3].repeat(samples.length);
   const range = max - min;
@@ -220,6 +226,40 @@ export function renderSparkline(samples: readonly number[]): string {
       return SPARK_CHARS[idx];
     })
     .join('');
+}
+
+/**
+ * Minimum number of recent samples needed before leak detection kicks in.
+ * 10 samples ≈ 10 minutes at the default 60-second poll.
+ */
+const LEAK_WINDOW = 10;
+
+/**
+ * How many of the last LEAK_WINDOW samples must be rising (each ≥ its
+ * predecessor) to flag a possible leak. 8/10 tolerates brief GC dips
+ * without missing a sustained upward trend.
+ */
+const LEAK_THRESHOLD = 8;
+
+/**
+ * Detect monotonically rising RSS that may indicate a memory leak.
+ * Returns true when at least LEAK_THRESHOLD of the last LEAK_WINDOW
+ * consecutive comparisons show a non-decreasing trend. Exported for testing.
+ *
+ * A "rising comparison" is samples[i] >= samples[i-1] (non-strict: flat
+ * segments count as "not falling", which is conservative — a leak that
+ * plateaus briefly before resuming still triggers).
+ */
+export function detectMonotonicGrowth(samples: readonly number[]): boolean {
+  if (samples.length < LEAK_WINDOW) return false;
+  // Only inspect the most recent window.
+  const window = samples.slice(-LEAK_WINDOW);
+  let risingCount = 0;
+  for (let i = 1; i < window.length; i++) {
+    if (window[i] >= window[i - 1]) risingCount++;
+  }
+  // LEAK_WINDOW samples yield LEAK_WINDOW-1 comparisons.
+  return risingCount >= LEAK_THRESHOLD;
 }
 
 export function killProcess(pid: number): Promise<boolean> {

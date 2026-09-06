@@ -285,6 +285,177 @@ class ProjectContext {
     return loadCrossFileSnapshot(findProjectRoot(filePath));
   }
 
+  // =========================================================================
+  // Workspace Root Cache
+  // =========================================================================
+
+  /// Sibling cache to [_rootByDir] for workspace-root lookups.
+  ///
+  /// Keyed by the normalized package directory (the directory containing the
+  /// package's own pubspec.yaml). Value is the ancestor workspace root path
+  /// when this package is a listed workspace member, or null when no ancestor
+  /// pubspec exists / the ancestor has no workspace: key / this package is
+  /// not listed. The walk stops at the FIRST ancestor pubspec found — it
+  /// must NOT skip past a plain pubspec searching further up for one that
+  /// happens to declare `workspace:`.
+  ///
+  /// This is a separate cache from [_rootByDir] because the two answer
+  /// different questions: _rootByDir answers "what package owns this file"
+  /// (walk from file's parent); this answers "what ancestor workspace owns
+  /// this package directory" (walk from the package root's parent). See
+  /// proposal_add_resolution_workspace.md § Cache Reuse Assessment.
+  static final Map<String, String?> _workspaceRootByPackageDir = {};
+
+  /// Look up the workspace root that lists [packageDir] as a member.
+  ///
+  /// Returns the ancestor workspace root path when an ancestor pubspec.yaml
+  /// declares a `workspace:` list containing a relative path matching
+  /// [packageDir]. Returns null when no ancestor pubspec exists, or when
+  /// the ancestor has no `workspace:` key, or when [packageDir] is not
+  /// listed.
+  static String? getWorkspaceRoot(String? packageDir) {
+    if (packageDir == null || packageDir.isEmpty) return null;
+    final normalized = normalizePath(packageDir);
+    if (normalized.isEmpty) return null;
+
+    // Fast path: already resolved this package directory.
+    if (_workspaceRootByPackageDir.containsKey(normalized)) {
+      return _workspaceRootByPackageDir[normalized];
+    }
+
+    try {
+      // Start one level above the package root to find the ancestor pubspec.
+      var dir = Directory(normalized).parent;
+
+      // Guard: if the package dir IS the filesystem root, there's nothing
+      // above it.
+      if (dir.path == normalized || dir.path.length <= 1) {
+        _workspaceRootByPackageDir[normalized] = null;
+        return null;
+      }
+
+      // Walk up looking for the nearest ancestor pubspec.yaml — stop at the
+      // FIRST one found, whether or not it has a `workspace:` key. This
+      // prevents the example/ FP: example/pubspec.yaml sits under
+      // packages/foo/pubspec.yaml, which is the nearest ancestor and has no
+      // workspace: key, so the walk stops there.
+      while (dir.path.length > 1) {
+        final pubspecFile = File('${dir.path}/pubspec.yaml');
+        if (pubspecFile.existsSync()) {
+          // Found the nearest ancestor pubspec — parse its workspace list.
+          final root = _findWorkspaceMembership(
+            dir.path,
+            pubspecFile.readAsStringSync(),
+            normalized,
+          );
+          _workspaceRootByPackageDir[normalized] = root;
+          return root;
+        }
+        final parent = dir.parent;
+        // Reached the filesystem root without finding a pubspec.
+        if (parent.path == dir.path) break;
+        dir = parent;
+      }
+
+      // No ancestor pubspec found at all.
+      _workspaceRootByPackageDir[normalized] = null;
+      return null;
+    } on OSError {
+      // Filesystem error (permissions, broken symlink) — fail safe.
+      _workspaceRootByPackageDir[normalized] = null;
+      return null;
+    }
+  }
+
+  /// Canonicalize a relative path fragment for workspace member comparison.
+  ///
+  /// Normalizes backslashes to forward slashes, strips leading `./` and
+  /// trailing `/` so all spellings of the same relative path match.
+  static String _canonicalRelativePath(String raw) {
+    // normalizePath always returns non-null for a non-null input.
+    var clean = normalizePath(raw);
+    if (clean.startsWith('./')) clean = clean.substring(2);
+    if (clean.endsWith('/')) clean = clean.substring(0, clean.length - 1);
+    return clean;
+  }
+
+  /// Parse a pubspec's `workspace:` list and check if [packageDir] is a
+  /// listed member.
+  ///
+  /// Returns the [ancestorDir] path when the ancestor pubspec has a
+  /// `workspace:` key whose list (after path normalization) contains the
+  /// relative path from [ancestorDir] to [packageDir]. Returns null
+  /// otherwise.
+  static String? _findWorkspaceMembership(
+    String ancestorDir,
+    String pubspecContent,
+    String packageDir,
+  ) {
+    // Extract workspace: entries via simple line-by-line parsing.
+    // Dart pub workspace: entries are always a YAML list of relative paths
+    // (no globs, no variables) — simple regex extraction is safe here.
+    final lines = pubspecContent.split('\n');
+    var inWorkspace = false;
+    final members = <String>[];
+
+    for (final line in lines) {
+      final trimmed = line.trimLeft();
+      // Start of the workspace: block (top-level key, no leading whitespace
+      // on the key itself).
+      if (line.startsWith('workspace:')) {
+        // Handle flow-style inline list: workspace: [a, b, c]
+        final afterColon = line.substring('workspace:'.length).trim();
+        if (afterColon.startsWith('[') && afterColon.endsWith(']')) {
+          final inner = afterColon.substring(1, afterColon.length - 1);
+          for (final part in inner.split(',')) {
+            final entry = part.trim();
+            if (entry.isNotEmpty) members.add(entry);
+          }
+          // Flow-style is self-contained — no block continuation.
+          break;
+        }
+        inWorkspace = true;
+        continue;
+      }
+      // A non-indented, non-comment line after workspace: ends the block.
+      // Column-0 comments (# ...) are valid inside YAML blocks and must not
+      // truncate the member list.
+      if (inWorkspace &&
+          trimmed.isNotEmpty &&
+          !line.startsWith(' ') &&
+          !trimmed.startsWith('#')) {
+        break;
+      }
+      // Collect list entries (- path/to/package).
+      if (inWorkspace && trimmed.startsWith('- ')) {
+        final entry = trimmed.substring(2).trim();
+        if (entry.isNotEmpty) members.add(entry);
+      }
+    }
+
+    if (members.isEmpty) return null;
+
+    // Normalize both paths for comparison via the shared helper.
+    final ancestorClean = _canonicalRelativePath(ancestorDir);
+    final packageClean = _canonicalRelativePath(packageDir);
+
+    // The package must be under the ancestor for the relative path to make
+    // sense.
+    if (!packageClean.startsWith('$ancestorClean/')) return null;
+
+    final relativePath = packageClean.substring(ancestorClean.length + 1);
+
+    // Check if any workspace entry matches (after canonicalizing the entry).
+    for (final entry in members) {
+      if (_canonicalRelativePath(entry) == relativePath) {
+        return ancestorDir;
+      }
+    }
+
+    // Ancestor has a workspace: list but this package isn't in it.
+    return null;
+  }
+
   /// Clear the project cache (useful for testing).
   static void clearCache() {
     _projectCache.clear();
@@ -292,6 +463,8 @@ class ProjectContext {
     // temp pubspec.yaml files, and a stale directory->root entry would make
     // getProjectInfo resolve the wrong (or a vanished) project root.
     _rootByDir.clear();
+    // Workspace cache must clear too since it depends on pubspec content.
+    _workspaceRootByPackageDir.clear();
     clearCrossFileSnapshotCache();
   }
 }

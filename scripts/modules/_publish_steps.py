@@ -44,6 +44,7 @@ from scripts.modules._pubdev_lint import (
     fix_doc_references,
 )
 from scripts.modules._version_changelog import (
+    check_changelog_internal_heading,
     check_changelog_overview,
     get_version_from_pubspec,
     validate_changelog_version,
@@ -2438,6 +2439,45 @@ def _gate_changelog_overview(project_dir: Path, version: str) -> bool:
         print_info("Re-checking CHANGELOG.md...")
 
 
+def _gate_changelog_internal_heading(
+    project_dir: Path, version: str
+) -> bool:
+    """Block the retired <details><summary>Maintenance</summary> pattern.
+
+    Same retry/ignore/abort prompt as _gate_changelog_overview. The fix is
+    replacing the ``<details>`` block with a ``### Internal`` heading.
+    """
+    changelog_path = project_dir / "CHANGELOG.md"
+    while True:
+        problems = check_changelog_internal_heading(
+            changelog_path, version
+        )
+        if not problems:
+            return True
+        for problem in problems:
+            print_warning(problem)
+        choice = (
+            input(
+                "  Internal-heading check failed. "
+                "[R]etry / [i]gnore / [a]bort? [R] "
+            )
+            .strip()
+            .lower()
+        )
+        if choice.startswith("i"):
+            print_warning(
+                f"Ignoring internal-heading problem for [{version}]."
+            )
+            return True
+        if choice.startswith("a"):
+            print_error(
+                "Publish aborted at internal-heading check."
+            )
+            return False
+        # Retry: re-read the file so a fix is picked up.
+        print_info("Re-checking CHANGELOG.md...")
+
+
 def validate_changelog(
     project_dir: Path, version: str
 ) -> tuple[bool, str]:
@@ -2455,6 +2495,10 @@ def validate_changelog(
     # release notes are accepted. Default-to-retry so the author can fix
     # CHANGELOG.md in place and re-check without losing the publish run.
     if not _gate_changelog_overview(project_dir, version):
+        return False, ""
+
+    # Block the retired <details><summary>Maintenance</summary> pattern.
+    if not _gate_changelog_internal_heading(project_dir, version):
         return False, ""
 
     if not release_notes:

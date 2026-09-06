@@ -57,12 +57,19 @@ The trend arrow is appended to the saropa tooltip header line. Six tests pin the
 
 The tooltip now includes a Unicode sparkline (▁▂▃▄▅▆▇█) visualizing saropa RSS over the last ~30 minutes. The ring buffer was expanded from 5 to 30 samples (`SPARKLINE_WINDOW`); trend computation is sliced to the last 5 (`TREND_WINDOW`) to preserve existing behavior. `renderSparkline()` in `processQuery.ts` is a pure function — maps samples to 8-level block characters, returns empty string below 2 data points, handles flat/zero data. Sparkline line uses the `systemHealth.tooltip.sparkline` l10n key.
 
-### Additional hardening (reflection gate)
+### Monotonic growth detector (second reflection gate — unrequested feature)
+
+`detectMonotonicGrowth()` in `processQuery.ts` checks the last 10 RSS samples for sustained upward movement (8+ of 9 consecutive comparisons non-decreasing). Uses `>=` rather than `>` so a leak that plateaus briefly still triggers. `ProcessMonitor` calls it after each poll and fires a one-time `showInformationMessage` with "Open Health Panel" / "Dismiss" actions. The `leakNotificationShown` flag prevents repeat notifications within a session. Three new l10n keys: `systemHealth.notification.possibleLeak`, `systemHealth.action.openPanel`, `systemHealth.action.dismiss`.
+
+### Additional hardening (reflection gates)
 
 - Partition assertion in `buildProcessTooltipLines`: filters processes into saropa/daemon/other arrays, warns to console if the sum doesn't equal the total. Catches filter coupling drift without runtime cost in the happy path.
+- Sparkline renderer uses reduce loop instead of `Math.min(...spread)` / `Math.max(...spread)` — future-proofing against call stack limits if `SPARKLINE_WINDOW` ever grows.
+- `getRssHistory()` returns a defensive copy (`[...array]`) so callers cannot mutate the internal ring buffer.
 - Ring buffer boundary test at exactly 5 samples (TREND_WINDOW boundary).
 - `truncateLabel` tests for 31-char input (one over limit) and empty string.
 - 6 `renderSparkline` tests: empty/single input, flat data, rising, falling, minimum 2-sample input, all-zero.
+- 7 `detectMonotonicGrowth` tests: under-window, perfect rise, rise with GC dip, flat (triggers), falling, oscillating, longer array windowing.
 
 ### Not addressed (out of scope)
 
@@ -73,4 +80,4 @@ The tooltip now includes a Unicode sparkline (▁▂▃▄▅▆▇█) visualiz
 
 ### Verification status
 
-TypeScript compiles clean. All 71 systemHealth tests pass (45 original + 16 initial hardening + 10 additional: 2 trend boundary, 2 truncateLabel edge, 6 renderSparkline). **Unverified** in the Extension Development Host — tooltip rendering (including sparkline) in both themes needs F5 confirmation.
+TypeScript compiles clean. All 78 systemHealth tests pass (45 original + 16 initial hardening + 10 sparkline/boundary + 7 leak detection). **Unverified** in the Extension Development Host — tooltip rendering (including sparkline and leak notification) in both themes needs F5 confirmation.

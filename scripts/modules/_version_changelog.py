@@ -278,6 +278,35 @@ def _extract_changelog_section_body(
     return match.group(1) if match else None
 
 
+def check_changelog_internal_heading(
+    changelog_path: Path, version: str
+) -> list[str]:
+    """Check the ``[version]`` section uses ``### Internal``, not the retired
+    ``<details><summary>Maintenance</summary>`` HTML pattern.
+
+    The convention was changed to a plain ``### Internal`` heading for
+    readability. The ``<details>`` expander is banned — see CHANGELOG.md
+    MAINTENANCE NOTES.
+
+    Returns a list of problems (empty if valid).
+    """
+    if not changelog_path.exists():
+        return ["CHANGELOG.md not found."]
+    content = changelog_path.read_text(encoding="utf-8")
+    body = _extract_changelog_section_body(content, version)
+    if body is None:
+        return [f"No [{version}] section found in CHANGELOG.md."]
+
+    # Check for the banned pattern in the version section body.
+    if "<summary>Maintenance</summary>" in body:
+        return [
+            f"The [{version}] section uses "
+            "<details><summary>Maintenance</summary> — "
+            "use a ### Internal heading instead."
+        ]
+    return []
+
+
 def check_changelog_overview(
     changelog_path: Path, version: str
 ) -> list[str]:

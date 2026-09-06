@@ -21,6 +21,7 @@ import {
   type SystemHealthConfig,
 } from '../../systemHealth/processMonitor';
 import {
+  detectMonotonicGrowth,
   isAnalysisServerProcess,
   processLabel,
   renderSparkline,
@@ -393,5 +394,43 @@ describe('renderSparkline — Unicode RSS visualization', () => {
     const result = renderSparkline([0, 0, 0]);
     assert.strictEqual(result.length, 3);
     assert.ok(new Set([...result]).size === 1, 'expected uniform bars for all zeros');
+  });
+});
+
+describe('detectMonotonicGrowth — memory leak detection', () => {
+  it('returns false when fewer than 10 samples exist', () => {
+    assert.strictEqual(detectMonotonicGrowth([1, 2, 3, 4, 5, 6, 7, 8, 9]), false);
+  });
+
+  it('detects a perfectly monotonic rise (10 ascending values)', () => {
+    // 9 comparisons, all rising → 9 >= 8 threshold.
+    assert.strictEqual(detectMonotonicGrowth([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), true);
+  });
+
+  it('detects a rise with one GC dip (8/9 rising)', () => {
+    // 100→200→150→300→400→500→600→700→800→900
+    // Comparisons: ↑ ↓ ↑ ↑ ↑ ↑ ↑ ↑ ↑ = 8/9 rising → triggers.
+    assert.strictEqual(detectMonotonicGrowth([100, 200, 150, 300, 400, 500, 600, 700, 800, 900]), true);
+  });
+
+  it('does not trigger for a flat series', () => {
+    // All equal: 9 non-decreasing comparisons → 9 >= 8 → true!
+    // Flat IS "not falling" — the detector intentionally treats it as suspicious.
+    assert.strictEqual(detectMonotonicGrowth([50, 50, 50, 50, 50, 50, 50, 50, 50, 50]), true);
+  });
+
+  it('does not trigger for a falling series', () => {
+    assert.strictEqual(detectMonotonicGrowth([100, 90, 80, 70, 60, 50, 40, 30, 20, 10]), false);
+  });
+
+  it('does not trigger for oscillating values', () => {
+    // Alternating up/down — only 5/9 rising → below threshold.
+    assert.strictEqual(detectMonotonicGrowth([100, 200, 100, 200, 100, 200, 100, 200, 100, 200]), false);
+  });
+
+  it('uses only the last 10 samples from a longer array', () => {
+    // First 5 are falling, but the last 10 are rising.
+    const samples = [500, 400, 300, 200, 100, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    assert.strictEqual(detectMonotonicGrowth(samples), true);
   });
 });

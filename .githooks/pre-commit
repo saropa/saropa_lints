@@ -38,20 +38,17 @@ fi
 # ── changelog internal heading gate ──
 # Block the retired <details><summary>Maintenance</summary> pattern in CHANGELOG.md.
 # The convention is ### Internal instead — see CHANGELOG.md MAINTENANCE NOTES.
+# Strips the <!-- MAINTENANCE NOTES --> comment block first so the "NEVER use"
+# instruction inside it does not false-positive.
 changelog_staged=$(echo "$files" | grep -E '^CHANGELOG\.md$')
 if [ -n "$changelog_staged" ]; then
-  # Check staged content, not working tree.
-  if git show :CHANGELOG.md | grep -q '<summary>Maintenance</summary>'; then
-    # Allow the one occurrence inside the MAINTENANCE NOTES comment that says "NEVER use".
-    # Count occurrences outside that instruction line.
-    bad_count=$(git show :CHANGELOG.md | grep -c '<summary>Maintenance</summary>')
-    never_count=$(git show :CHANGELOG.md | grep 'NEVER use.*<summary>Maintenance</summary>' | grep -c .)
-    if [ "$bad_count" -gt "$never_count" ]; then
-      echo ""
-      echo "Commit blocked: CHANGELOG.md uses <details><summary>Maintenance</summary>."
-      echo "Use '### Internal' heading instead. See CHANGELOG.md MAINTENANCE NOTES."
-      exit 1
-    fi
+  # Strip the HTML comment block, then check only the content sections.
+  if git show :CHANGELOG.md | sed '/^<!--/,/^-->/d' \
+       | grep -q '<summary>Maintenance</summary>'; then
+    echo ""
+    echo "Commit blocked: CHANGELOG.md uses <details><summary>Maintenance</summary>."
+    echo "Use '### Internal' heading instead. See CHANGELOG.md MAINTENANCE NOTES."
+    exit 1
   fi
 fi
 

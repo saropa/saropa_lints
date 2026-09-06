@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
 import type { DartProcessSnapshot, HealthAssessment } from './types';
 import { HealthLevel, HealthTrigger } from './types';
-import { buildSnapshot, formatBytes, queryDartProcesses } from './processQuery';
+import { buildSnapshot, detectMonotonicGrowth, formatBytes, queryDartProcesses } from './processQuery';
 
 const BYTES_PER_GB = 1_073_741_824;
 
@@ -166,6 +166,8 @@ export class ProcessMonitor implements vscode.Disposable {
   private lastSnapshot: DartProcessSnapshot | undefined;
   /** Ring buffer of recent saropa RSS values for trend detection. */
   private readonly saropaRssHistory: number[] = [];
+  /** Whether a leak-detection notification has already been shown this session. */
+  private leakNotificationShown = false;
 
   start(): void {
     if (this.disposed) return;
@@ -200,9 +202,10 @@ export class ProcessMonitor implements vscode.Disposable {
     return computeRssTrend(this.saropaRssHistory.slice(-TREND_WINDOW));
   }
 
-  /** Returns the full RSS history for sparkline rendering. */
+  /** Returns a snapshot of the RSS history for sparkline rendering. */
   getRssHistory(): readonly number[] {
-    return this.saropaRssHistory;
+    // Defensive copy — callers must not mutate the ring buffer.
+    return [...this.saropaRssHistory];
   }
 
   private async poll(): Promise<void> {
@@ -223,6 +226,16 @@ export class ProcessMonitor implements vscode.Disposable {
 
       if (assessment.level === HealthLevel.Critical && config.showNotifications) {
         this.showCriticalNotification(snapshot);
+      }
+      // Leak detection: check for monotonic RSS growth even when the
+      // absolute value is below the warning threshold. Fires once per
+      // session — a persistent leak will eventually trip the threshold,
+      // but the early nudge gives the user time to investigate.
+      if (!this.leakNotificationShown && config.showNotifications) {
+        if (detectMonotonicGrowth(this.saropaRssHistory)) {
+          this.leakNotificationShown = true;
+          this.showLeakNotification(snapshot);
+        }
       }
     } catch {
       // Next poll will retry.
@@ -253,6 +266,23 @@ export class ProcessMonitor implements vscode.Disposable {
         void vscode.workspace
           .getConfiguration('saropaLints.systemHealth')
           .update('showNotifications', false, vscode.ConfigurationTarget.Global);
+      }
+    });
+  }
+
+  /**
+   * Nudge the user when saropa RSS has been rising steadily, even though
+   * it hasn't hit the red/yellow threshold yet. Fires once per session.
+   */
+  private showLeakNotification(snapshot: DartProcessSnapshot): void {
+    const size = formatBytes(snapshot.saropaRssBytes);
+    const msg = l10n('systemHealth.notification.possibleLeak', { size });
+    const openPanel = l10n('systemHealth.action.openPanel');
+    const dismiss = l10n('systemHealth.action.dismiss');
+
+    void vscode.window.showInformationMessage(msg, openPanel, dismiss).then((choice) => {
+      if (choice === openPanel) {
+        void vscode.commands.executeCommand('saropaLints.showHealthPanel');
       }
     });
   }

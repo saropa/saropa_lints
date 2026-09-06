@@ -3,7 +3,6 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 
-import '../../analyzer_compat.dart';
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
 
