@@ -1854,6 +1854,34 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
     test_dir = project_dir / "test"
     delta_files: set[str] = set()
 
+    # Changes to rule files, config, or migration data can break integrity
+    # tests (type-resolution audit, pack sync, registration, etc.) that
+    # scan the whole codebase. Always include them when these areas change.
+    _INTEGRITY_TRIGGERS = (
+        "lib/src/rules/",
+        "lib/src/config/",
+        "lib/src/scan/",
+        "tool/",
+        "doc/guides/migration_guides/",
+    )
+    if any(
+        any(p.startswith(trigger) for trigger in _INTEGRITY_TRIGGERS)
+        for p in changed
+    ):
+        integrity_dir = test_dir / "integrity"
+        if integrity_dir.is_dir():
+            for t in integrity_dir.glob("*_test.dart"):
+                delta_files.add(
+                    str(t.relative_to(project_dir)).replace("\\", "/")
+                )
+        # Config tests too — pack sync, rule packs, etc.
+        config_test_dir = test_dir / "config"
+        if config_test_dir.is_dir():
+            for t in config_test_dir.glob("*_test.dart"):
+                delta_files.add(
+                    str(t.relative_to(project_dir)).replace("\\", "/")
+                )
+
     for path in changed:
         # Directly changed test files — include as-is.
         if path.startswith("test/") and path.endswith("_test.dart"):
