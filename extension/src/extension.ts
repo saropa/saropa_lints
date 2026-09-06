@@ -154,8 +154,8 @@ import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
 import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
-import { ProcessMonitor, systemHealthStatusBarText } from './systemHealth/processMonitor';
-import { formatBytes } from './systemHealth/processQuery';
+import { ProcessMonitor, RssTrend, systemHealthStatusBarText } from './systemHealth/processMonitor';
+import { formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, processLabel } from './systemHealth/processQuery';
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
 import { registerOrphanPreflight } from './systemHealth/orphanPreflight';
 import { HealthPanel } from './systemHealth/healthPanel';
@@ -1100,6 +1100,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   // System health snapshot pushed from the process monitor.
   let systemHealthSnapshot: DartProcessSnapshot | null = null;
+  // Saropa RSS trend from the process monitor's ring buffer.
+  let saropaTrend: RssTrend = RssTrend.Unknown;
   // Full assessment (level plus what tripped it), not just the level: the
   // status bar has to name the trigger, and re-deriving it here would let
   // this file and the monitor disagree the next time thresholds change.
@@ -1150,6 +1152,92 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
    * Clicking always opens the System Health panel (the memory breakdown
    * page), which the old crammed-in text suffix never linked to.
    */
+  /**
+   * Build per-process tooltip lines from a snapshot. Three sections:
+   * saropa-owned (health-colored), Flutter daemons, and other Dart
+   * processes (informational only). Top 3 by RSS shown per section.
+   *
+   * COUPLING: the "other" filter excludes processes matched by
+   * isSaropaProcess and isDaemonProcess. If a new process category
+   * gets its own section, add it to the "other" exclusion filter
+   * here to avoid double-counting.
+   */
+  function buildProcessTooltipLines(
+    snap: DartProcessSnapshot,
+    assessment: HealthAssessment,
+    trend: RssTrend,
+  ): string[] {
+    const lines: string[] = [];
+
+    // --- Saropa-owned section (colored by health level) ---
+    // Derive count from the filtered array (single source of truth) rather
+    // than the snapshot scalar, which could diverge if isSaropaProcess and
+    // buildSnapshot's classification ever drift apart.
+    const saropaProcs = snap.processes.filter(isSaropaProcess);
+    const saropaRss = saropaProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
+    const isHealthy = assessment.level === HealthLevel.Healthy;
+    // Show the healthy check mark only when saropa-owned RSS is clean.
+    const saropaHeader = isHealthy ? 'systemHealth.tooltip.saropaHealthy' : 'systemHealth.tooltip.saropaSection';
+    // Trend arrow after the header — rising RSS is an early leak warning
+    // even when the absolute value is below the red threshold.
+    const trendSuffix = trend === RssTrend.Rising ? ' ↑'
+      : trend === RssTrend.Falling ? ' ↓'
+      : trend === RssTrend.Stable ? ' →' : '';
+    lines.push(l10n(saropaHeader, {
+      count: String(saropaProcs.length),
+      size: formatBytes(saropaRss),
+    }) + trendSuffix);
+    // Top 3 saropa processes by RSS for actionable detail.
+    const topSaropa = [...saropaProcs].sort((a, b) => b.workingSetSize - a.workingSetSize).slice(0, 3);
+    for (const p of topSaropa) {
+      lines.push(l10n('systemHealth.tooltip.saropaProcessEntry', {
+        label: processLabel(p), size: formatBytes(p.workingSetSize),
+      }));
+    }
+
+    // --- Flutter daemons ---
+    const sTotal = String(snap.legitimateDaemonCount + snap.orphanedDaemonPids.length);
+    lines.push(l10n('systemHealth.tooltip.daemonCount', {
+      total: sTotal, orphaned: String(snap.orphanedDaemonPids.length),
+    }));
+    if (snap.orphanedScanDaemonPids.length > 0) {
+      lines.push(l10n('systemHealth.tooltip.scanDaemonOrphans', {
+        count: String(snap.orphanedScanDaemonPids.length),
+      }));
+    }
+
+    // --- Other Dart processes (informational, never red) ---
+    // Uses isDaemonProcess (the same predicate the daemon section uses) so
+    // no process falls through the cracks between the two filters.
+    const otherProcs = snap.processes.filter((p) => !isSaropaProcess(p) && !isDaemonProcess(p));
+    if (otherProcs.length > 0) {
+      const otherRss = otherProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
+      lines.push(l10n('systemHealth.tooltip.otherSection', {
+        count: String(otherProcs.length), size: formatBytes(otherRss),
+      }));
+      // Top 3 other processes by RSS so users can identify memory hogs.
+      const topOther = [...otherProcs].sort((a, b) => b.workingSetSize - a.workingSetSize).slice(0, 3);
+      for (const p of topOther) {
+        lines.push(l10n('systemHealth.tooltip.otherProcessEntry', {
+          label: processLabel(p), size: formatBytes(p.workingSetSize),
+        }));
+      }
+      // Hint when multiple analysis servers are detected.
+      const serverCount = otherProcs.filter(isAnalysisServerProcess).length;
+      if (serverCount >= 2) {
+        lines.push(l10n('systemHealth.tooltip.otherHint', { count: String(serverCount) }));
+      }
+    }
+
+    // --- Health hints (saropa-owned only) ---
+    if (assessment.level === HealthLevel.Warning) {
+      lines.push(l10n('systemHealth.tooltip.warningHint'));
+    } else if (assessment.level === HealthLevel.Critical) {
+      lines.push(l10n('systemHealth.tooltip.criticalHint'));
+    }
+    return lines;
+  }
+
   const updateMemoryStatusBar = () => {
     const memPressureSuffix = memoryPressureSuffix(memoryPressureState);
     let text: string | undefined;
@@ -1161,43 +1249,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (line) tooltipLines.push(line);
     } else if (systemHealthSnapshot) {
       // Delegate the wording to the health module so the text always names
-      // whatever actually tripped the level. An orphan-driven Critical used
-      // to render an RSS figure, which read as "this memory number is the
-      // crisis" even at a healthy 47 MB; the saropa-only RSS breakdown now
-      // lives in the tooltip lines below instead.
+      // whatever actually tripped the level.
       text = systemHealthStatusBarText(systemHealthSnapshot, systemHealthAssessment);
     }
 
+    // Per-process breakdown in the tooltip (separate from the status text).
     if (systemHealthSnapshot) {
-      const sSize = formatBytes(systemHealthSnapshot.totalRssBytes);
-      const sCount = String(systemHealthSnapshot.processCount);
-      const sTotal = String(systemHealthSnapshot.legitimateDaemonCount + systemHealthSnapshot.orphanedDaemonPids.length);
-      const sOrphaned = String(systemHealthSnapshot.orphanedDaemonPids.length);
-      tooltipLines.push(
-        l10n('systemHealth.tooltip.processCount', { count: sCount, size: sSize }),
-      );
-      if (systemHealthSnapshot.saropaProcessCount > 0) {
-        tooltipLines.push(
-          l10n('systemHealth.tooltip.saropaProcessCount', {
-            count: String(systemHealthSnapshot.saropaProcessCount),
-            size: formatBytes(systemHealthSnapshot.saropaRssBytes),
-          }),
-        );
-      }
-      tooltipLines.push(
-        l10n('systemHealth.tooltip.daemonCount', { total: sTotal, orphaned: sOrphaned }),
-      );
-      const scanOrphans = systemHealthSnapshot.orphanedScanDaemonPids.length;
-      if (scanOrphans > 0) {
-        tooltipLines.push(
-          l10n('systemHealth.tooltip.scanDaemonOrphans', { count: String(scanOrphans) }),
-        );
-      }
-      if (systemHealthAssessment.level === HealthLevel.Warning) {
-        tooltipLines.push(l10n('systemHealth.tooltip.warningHint'));
-      } else if (systemHealthAssessment.level === HealthLevel.Critical) {
-        tooltipLines.push(l10n('systemHealth.tooltip.criticalHint'));
-      }
+      tooltipLines.push(...buildProcessTooltipLines(systemHealthSnapshot, systemHealthAssessment, saropaTrend));
     }
 
     if (!text) {
@@ -1351,6 +1409,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     systemHealthSnapshot = snapshot;
     // Keep the trigger, not just the level — the status bar text depends on it.
     systemHealthAssessment = assessment;
+    // Update trend after the monitor records the new RSS sample.
+    saropaTrend = processMonitor.getSaropaTrend();
     updateAllStatusBars();
   });
   processMonitor.start();

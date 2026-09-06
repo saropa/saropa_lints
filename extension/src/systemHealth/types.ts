@@ -21,6 +21,8 @@ export interface DartProcessSnapshot {
   saropaProcessCount: number;
   /** Orphaned scan daemon PIDs (parent process no longer alive). */
   orphanedScanDaemonPids: number[];
+  /** All enumerated processes, kept for per-process tooltip breakdown. */
+  processes: DartProcessInfo[];
   timestamp: number;
 }
 

@@ -121,6 +121,12 @@ export function isDaemonProcess(p: DartProcessInfo): boolean {
   return /\bdaemon\b/.test(cmd);
 }
 
+/** True when the process is a Dart analysis server (language-server or snapshot). */
+export function isAnalysisServerProcess(p: DartProcessInfo): boolean {
+  const cmd = p.commandLine ?? '';
+  return cmd.includes('language-server') || cmd.includes('analysis_server');
+}
+
 /** True when the process is a saropa_lints scan daemon or CLI scan. */
 export function isSaropaProcess(p: DartProcessInfo): boolean {
   const cmd = p.commandLine ?? '';
@@ -130,6 +136,37 @@ export function isSaropaProcess(p: DartProcessInfo): boolean {
 /** True when the process is specifically the long-lived scan daemon. */
 export function isScanDaemonProcess(p: DartProcessInfo): boolean {
   return (p.commandLine ?? '').includes('saropa_lints:scan_daemon');
+}
+
+/**
+ * Derive a short human-readable label from a dart process command line.
+ * Used in the tooltip per-process breakdown so users can identify what
+ * each process is without reading raw command strings.
+ */
+export function processLabel(p: DartProcessInfo): string {
+  const cmd = p.commandLine ?? '';
+  // Saropa-owned processes — most specific matches first.
+  if (cmd.includes('saropa_lints:scan_daemon')) return 'scan daemon';
+  if (cmd.includes('saropa_lints:scan')) return 'scan CLI';
+  if (cmd.includes('saropa_lints')) return 'saropa_lints';
+  // Dart analysis server — delegate detection to the shared predicate.
+  if (isAnalysisServerProcess(p)) {
+    // Flag uncapped heap — an uncapped server can grow without bound and
+    // is the single most common cause of high system-wide Dart RSS.
+    const capped = cmd.includes('--old_gen_heap_size');
+    return capped ? 'analysis server' : 'analysis server (no heap cap)';
+  }
+  // Flutter daemon (long-lived tooling process).
+  if (cmd.includes('flutter_tools.snapshot') && /\bdaemon\b/.test(cmd)) {
+    return 'Flutter daemon';
+  }
+  // Build-related processes.
+  if (cmd.includes('frontend_server') || cmd.includes('frontend_compiler')) {
+    return 'frontend compiler';
+  }
+  if (cmd.includes('build_runner')) return 'build runner';
+  // Fallback — generic dart process.
+  return 'dart process';
 }
 
 export function killProcess(pid: number): Promise<boolean> {
@@ -200,6 +237,8 @@ export async function buildSnapshot(
     saropaRssBytes: saropaRss,
     saropaProcessCount: saropaCount,
     orphanedScanDaemonPids: orphanScanDaemonPids,
+    // Keep the full list for per-process tooltip breakdown.
+    processes,
     timestamp: Date.now(),
   };
 }

@@ -15,6 +15,8 @@ import '../vibrancy/register-vscode-mock';
 import * as assert from 'node:assert';
 import {
   assessHealth,
+  computeRssTrend,
+  RssTrend,
   systemHealthStatusBarText,
   type SystemHealthConfig,
 } from '../../systemHealth/processMonitor';
@@ -50,6 +52,7 @@ function snapshot(overrides: Partial<DartProcessSnapshot>): DartProcessSnapshot 
     saropaRssBytes: 47 * MB,
     saropaProcessCount: 1,
     orphanedScanDaemonPids: [],
+    processes: [],
     timestamp: 0,
     ...overrides,
   };
@@ -113,7 +116,8 @@ describe('Bug A — status bar text names what tripped the level', () => {
   });
 
   it('still shows the RSS figure when memory is what actually tripped', () => {
-    const snap = snapshot({ totalRssBytes: 7 * GB });
+    // Thresholds now compare saropaRssBytes, not totalRssBytes.
+    const snap = snapshot({ saropaRssBytes: 7 * GB });
     const assessment = assessHealth(snap, CONFIG);
     assert.strictEqual(assessment.trigger, HealthTrigger.Memory);
     const text = systemHealthStatusBarText(snap, assessment);
@@ -123,10 +127,19 @@ describe('Bug A — status bar text names what tripped the level', () => {
   it('prefers the memory trigger when memory and orphans both trip', () => {
     // Memory wins because the numeric figure the badge shows describes it.
     const assessment = assessHealth(
-      snapshot({ totalRssBytes: 7 * GB, orphanedDaemonPids: [1, 2, 3, 4] }),
+      snapshot({ saropaRssBytes: 7 * GB, orphanedDaemonPids: [1, 2, 3, 4] }),
       CONFIG,
     );
     assert.strictEqual(assessment.trigger, HealthTrigger.Memory);
+  });
+
+  it('does NOT trip memory threshold on high totalRssBytes when saropaRssBytes is low', () => {
+    // Core false-attribution fix: 12 GB system-wide with 29 MB saropa-owned
+    // must NOT trigger a warning or critical level.
+    const snap = snapshot({ totalRssBytes: 12 * GB, saropaRssBytes: 29 * MB });
+    const assessment = assessHealth(snap, CONFIG);
+    assert.strictEqual(assessment.level, HealthLevel.Healthy);
+    assert.strictEqual(assessment.trigger, HealthTrigger.None);
   });
 
   it('produces no text at all when healthy, so the item stays hidden', () => {
@@ -184,5 +197,35 @@ describe('Bug B — only severe pressure bands get the error background', () => 
   it('reports no severity and no background when there is no pressure state', () => {
     assert.strictEqual(memoryPressureSeverity(null), undefined);
     assert.strictEqual(pressureBackgroundColorId(null), undefined);
+  });
+});
+
+describe('RSS trend detection', () => {
+  it('returns Unknown when fewer than 5 samples exist', () => {
+    assert.strictEqual(computeRssTrend([100, 200, 300, 400]), RssTrend.Unknown);
+  });
+
+  it('returns Stable when values are flat', () => {
+    assert.strictEqual(computeRssTrend([100, 100, 100, 100, 100]), RssTrend.Stable);
+  });
+
+  it('returns Rising when newer samples are >10% higher than older', () => {
+    // Older half avg = 100, newer half avg = 200 — 100% increase.
+    assert.strictEqual(computeRssTrend([100, 100, 200, 200, 200]), RssTrend.Rising);
+  });
+
+  it('returns Falling when newer samples are >10% lower than older', () => {
+    // Older half avg = 200, newer half avg = 100 — 50% decrease.
+    assert.strictEqual(computeRssTrend([200, 200, 100, 100, 100]), RssTrend.Falling);
+  });
+
+  it('returns Stable for fluctuations within the 10% threshold', () => {
+    // Older avg = 100, newer avg = 105 — 5% change, below threshold.
+    assert.strictEqual(computeRssTrend([100, 100, 105, 105, 105]), RssTrend.Stable);
+  });
+
+  it('returns Stable when all values are zero', () => {
+    // Guard against division by zero — zero RSS is stable by definition.
+    assert.strictEqual(computeRssTrend([0, 0, 0, 0, 0]), RssTrend.Stable);
   });
 });

@@ -34,8 +34,7 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 - VS Code warning notification when the analyzer hits memory pressure but rule shedding is not enabled — "Enable" writes `shed_rules: true` directly into `analysis_options_custom.yaml`, "Learn More" opens the docs. Shows once per workspace root per session, with a persistent status-bar indicator so pressure stays visible after dismissing the toast.
 - `memory_mode: aggressive` option in `analysis_options_custom.yaml` — applies balanced-mode unchanged-file skipping to the scan daemon and CLI too, reducing daemon RSS on incremental scans at the cost of potentially missing violations in unchanged files whose dependencies changed.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Publish script: preflight version verification** — a visible "PREFLIGHT: VERSION VERIFICATION" step now runs early in the publish pipeline (before badge validation, CI gate, and extension packaging), checking that `pubspec.yaml` and `extension/package.json` carry the correct version. Two additional safety-net gates run later (after staging and before tagging) as a last resort. No action required.
 - Severity registration at plugin startup maps each rule to a 0-based shed index for the graduated shedding mechanism.
@@ -255,8 +254,7 @@ Rule execution is roughly twice as fast, and the analysis server now reports the
 - (Extension) On-save scans now skip the rules the in-process plugin already reports when a project runs `lane: light`, so a finding is not listed twice in the Problems panel; the skip applies only while the plugin is verifiably reporting, so nothing is hidden if it is off or silent. No action required.
 - (Extension) New "Saropa Lints: Set Analysis Lane" command (command palette, or the sidebar's Lane row) switches between `light` and `full` in-process analysis without hand-editing `analysis_options.yaml`. Picking a lane restarts the Dart analysis server so the change takes effect immediately.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Widened the `rule_count` CLI's extension-side timeout from 10s to 25s — a cold `dart run` invocation measured at 8.4s, leaving too little margin under the old cap on a slower first run.
 - Fixed the pre-commit hook's dart-fix and recommended.yaml gates: `subprocess.run(['dart', ...])` silently failed to find `dart` on Windows (Flutter ships `dart.bat`, which Python's subprocess can't resolve without `shell=True`), so both gates had been no-op'ing on every commit. Now resolved via `shutil.which('dart')`.
@@ -448,8 +446,7 @@ Version 15.0.0 adds new quick fixes for error logging and variable placement whi
 - A save-triggered scan of a single file no longer prints a misleading progress bar estimating its position against the whole project (e.g. "Files: 1/4477, ETA: 2h"). That estimate now only appears during the long-lived in-editor plugin session it was designed for; one-shot scans (save-triggered daemon, `scan` CLI) show a plain file count instead.
 - `analysis_options.yaml` is now the single source of truth for a project's lint tier. Save-triggered scans, the whole-project baseline scan, and the tier picker's "current tier" display now read the tier straight from `analysis_options.yaml` instead of trusting the (possibly stale) `saropaLints.tier` setting, so a hand-edited or regenerated config file can no longer silently disagree with what the extension shows or scans with. `SAROPA_TIER` remains available as a dev-only override but now logs a warning when it disagrees with the project's own config; `saropa_tier:` in `analysis_options_custom.yaml` is deprecated in favor of `analysis_options.yaml`.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Investigated a `no_magic_string` false-positive report (string literal inside a `//`-commented-out `debugPrint` call) and confirmed by code inspection it cannot occur — the rule and all its gating helpers are AST-callback-only, with no raw-text scanning. Added a resolved-analyzer regression test pinning this behavior. ([bugs/no_magic_string_false_positive_commented_out_code.md](bugs/no_magic_string_false_positive_commented_out_code.md))
 - Manually corrected seven German and Swahili extension strings that had shipped corrupted machine-translation output — a mangled literal `--resolve` CLI flag, two entries collapsed into a repetition loop (one leaking a fragment resembling a stray prompt artifact), and grammatically broken fallback text — and added each as a curated `dictionaries.py` override so a future translation run can never regenerate the same corruption from cache.
@@ -489,8 +486,7 @@ Fixed the extension running lint analysis in the background while "Lint integrat
 
 Dependency maintenance release — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.5.7/CHANGELOG.md)
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Bumped `js-yaml` (extension dev dependency, via `mocha`) from 4.3.0 to 4.3.1, resolving GHSA-5p4m-2wfm-xmqj.
 
@@ -554,8 +550,7 @@ This release fixes a test-suite timeout in the health-history archival path and 
 
 - `loadHealthHistory` test timeout — complexity parsing every Dart file across archived tags exceeded the 2-minute test budget. The function now accepts an optional `withComplexity` parameter (defaults `true`; test passes `false`).
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - `loadHealthHistory` now caches each tag's computed `HistoryPoint` on disk (`.dart_tool/saropa_lints/health_history_cache.json`), keyed by the tag's resolved commit SHA. Repeat calls against unchanged tags skip re-archiving and re-scanning entirely.
 - Fill `fil`/`nl` extension i18n coverage gaps for `Default`, `Pattern`, `Medium`, and `Open analysis_options.yaml`. `Pattern` is kept as the English loanword already used in the sibling `{count} file pattern(s)` string; `Open analysis_options.yaml` uses verb-final Dutch order to match the existing `pubspec.yaml openen` sibling.
@@ -583,8 +578,7 @@ This release introduces a new balanced memory mode to drastically reduce RAM con
 - **Full Opportunities Report** — a new export (sidebar, or `Saropa Lints: Export Full Opportunities Report`) that consolidates every dependency and every changelog feature into one HTML, Markdown, and JSON report under `reports/`. Unlike the Upgrade Opportunities panel, it keeps fully-adopted packages and every changelog category, and counts each feature's usage from zero upward with the exact project file and line of every reference. Built to hand to an AI for a dependency-usage review.
 - **Balanced memory mode** — new `memory_mode: balanced` setting (default) that skips type-heavy rules on unchanged files during incremental analysis, reducing CPU work on re-analysis passes. When a dependency changes, all transitive importers are automatically re-analyzed via import-graph invalidation. Set `memory_mode: full` in `analysis_options_custom.yaml` or `SAROPA_MEMORY_MODE=full` to restore previous behavior. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Moved `.vsix` output from `extension/` to the project root for easier access after packaging.
 - Translation skip logic now recognizes placeholder-only templates (`{category} ({count})`) as untranslatable, eliminating 48 false-positive missing-translation reports.
@@ -612,8 +606,7 @@ This release introduces comprehensive system health monitoring to track memory u
 - Release per-file tracking maps after the analysis summary is reported — previously retained indefinitely, wasting memory for the rest of the session. No action required.
 - Fix VS Code integrated terminal color detection on Windows — ANSI escape sequences now render correctly when `TERM_PROGRAM` is set. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Add infrastructure bug report for orphaned `flutter daemon` processes accumulating on Windows and exhausting system RAM. Includes hardened cleanup scripts with PID-reuse detection, a scheduled task to break the OOM feedback loop, and a Win32 Job Object permanent fix concept.
 - Add `PID`, `RSS`, `Daemon` to MT do-not-translate list and expand skip logic for emoji+placeholder patterns (`⚠ {size}`, `🔴 {size}`), resolving 71 false-positive missing-translation entries across 24 locales. No action required.
@@ -628,8 +621,7 @@ Resolves a runtime error in the lint diagnostic reporter that could prevent igno
 
 - Fix undefined `ruleContext` reference in `SaropaLintRule.registerNodeProcessors` — the diagnostic reporter was receiving an unresolved identifier instead of the method's `RuleContext` parameter, which could cause ignore-comment and dedup checks to fail at runtime. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Resolve `unnecessary_string_interpolations`, `unnecessary_string_escapes`, and `prefer_adjacent_string_concatenation` lint issues across lib/ to future-proof against pana baseline upgrades to `package:lints/recommended.yaml`. No action required.
 - Resolve 209 dart analyzer lint issues across lib/ and test/: nullable final variables, string interpolation style, dangling library doc comments, unnecessary `this`/`late`, missing `@override`, `prefer_contains`, `use_super_parameters`, `prefer_collection_literals`, and parameter naming alignment with base class signatures.
@@ -685,8 +677,7 @@ Fix false positive in `avoid_bluetooth_scan_without_timeout` — the rule no lon
 
 Re-release of v14.3.10 with a build fix — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.3.12/CHANGELOG.md)
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Fix test compilation error that blocked the v14.3.10 publish pipeline. No action required.
 - Extract shared `parseMethodBody` test helper and add CI guard against `childEntities` usage on class-like declarations. No action required.
@@ -708,8 +699,7 @@ Resolves false positives across matrix scaling operations and resource disposal 
 - **Fix: `no_equal_arguments` false positive on Matrix4 uniform scaling** — `scaleByDouble(s, s, 1, 1)`, `scale(s, s, 1)`, and `diagonal3Values(s, s, 1)` no longer flag the repeated factor as a copy-paste error. The `scale` exemption is receiver-type-guarded to Matrix4 only, so `myWidget.scale(x, x)` still fires.
 - **Fix: disposal rules false positive on cascade syntax** — all disposal/cleanup rules (`require_text_editing_controller_dispose`, `require_page_controller_dispose`, stream/timer cancel rules, etc.) now recognize `_field..dispose()` and `_field..close()` cascade expressions as valid cleanup. Previously only `_field.dispose()` and `_field?.dispose()` were matched.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Fix cascade cleanup test helper to use `ClassDeclaration.body.members` instead of `childEntities`, which stopped exposing `MethodDeclaration` in analyzer 12.1.0.
 
@@ -833,8 +823,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - **`pass_correct_accepted_type` now fires, and `prefer_correct_identifier_length` now checks parameter names.** Both registered for a parameter callback the engine ignores: `pass_correct_accepted_type` never fired at all, and `prefer_correct_identifier_length` only checked variable names, silently skipping parameters. Both now register correctly. No action required.
 - **Fourteen more whole-file rules that never fired now work.** Each aggregated information across the whole file and then reported through an end-of-file callback the analysis engine silently ignores, so none produced a diagnostic for anyone. The revived rules are `require_menu_bar_for_desktop`, `require_window_close_confirmation`, `require_error_state`, `avoid_circular_provider_deps`, `prefer_notifier_over_state`, `require_apple_sign_in`, `require_error_case_tests`, `avoid_test_coupling`, `require_test_cleanup`, `prefer_test_variant`, `require_route_transition_consistency`, `prefer_shell_route_for_persistent_ui`, `require_intl_locale_initialization`, and `prefer_implicit_animations`. All now scan the file in a single pass and report correctly; `require_intl_locale_initialization` also stops missing usages that a duplicate registration had been discarding, and `require_apple_sign_in` now recognizes the standard `GoogleSignIn().signIn()` call shape (a constructor-call receiver) that its detection had been skipping. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Fixed the rule-liveness report (`accuracy_report`) so it exercises stylistic rules. No tier — not even pedantic — contains the stylistic rules, so the previous tier-scoped scan never enabled them and falsely reported stylistic rules with fixtures as silent; correcting it flipped 80 previously-false-silent rules to firing (the silent worklist dropped from 744 to 664). The report now defaults to all defined rules (`--tier <name>` narrows it), via a new optional explicit rule-set on the scan runner.
 - Repaired the collection and async rule fixtures so the liveness instrument exercises the rules that were correct but sitting on inadequate fixtures. Collection reached full coverage (all 27 rules fire). Async went from 13 silent to 4: eight fixtures made realistic (typed streams/futures, class-method context, matching heuristic identifiers, a real `WebSocketChannel`). The four remaining are two rules whose fixtures resolve to zero diagnostics under the full-corpus scan (cause not yet isolated with per-file tooling) and two `expect_lint` markers naming rules that were never implemented.
@@ -869,8 +858,7 @@ Adds a rule pack for device_calendar_plus, a maintained replacement for the aban
 - **(Extension) Opportunities detection no longer treats document files as adoptable APIs.** A changelog bullet mentioning `README.md`, `CHANGELOG.md`, or `pubspec.yaml` was being extracted as if it were a dotted API reference (like `ReelText.rich`), so the Package Dashboard's Opportunities column and count could include filenames instead of real code. Extraction now excludes filename-shaped tokens. No action required — rescanning drops the false entries.
 - **(Extension) Sidebar views now show an icon.** The Banner, Editor Dashboards, Status, Settings, and Help views in the activity bar panel were missing an icon, so they rendered as unlabeled entries when moved to another panel. No action required — icons appear automatically.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Added false-positive-guard fixtures and additional UTC-shape cases for the device_calendar_plus all-day-event rule, closing a regression-coverage gap where the resolved-receiver-type check shipped in 14.3.3 had no fixture or test exercising it.
 - Fixed an inconsistent `target`/`realTarget` accessor in the device_calendar_plus UTC-taint helper's `DateTime.parse` branch (no behavior change — not a realistic cascade shape).
@@ -1411,8 +1399,7 @@ Adds crash, performance, and contract rules for seventeen more packages, each ac
 
 - **Removed the "show other analyzer findings" and "show analyzer TODOs" Findings Dashboard toggles** (both settings and their commands). Now that the dashboard is holistic those diagnostics appear directly in the main findings list, so the separate opt-in pills were redundant. If you had either setting enabled you can delete it from your settings.json; otherwise no action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - The extension i18n audit and NLLB-fallback reports now write to datetime-stamped, day-bucketed paths (`extension/reports/<YYYYMMDD>/<YYYYMMDD_HHMMSS>_i18n_translation_audit.md`) instead of a single fixed file, so successive audit runs no longer overwrite each other and each run stays a durable record. Build tooling only (excluded from the `.vsix`); no behavior change for users.
 - Rewrote the archived finish reports under `plans/` into third-person engineering-record voice, removing session-narration artifacts (chat-quoting openers, first-person/session deixis) from 58 internal documents while preserving every technical fact. Documentation housekeeping only; not shipped to pub.dev.
@@ -1494,8 +1481,7 @@ Adds one-click quick fixes for eight more lint rules, so common simplifications 
 - **`prefer_correct_handler_name` no longer flags boolean state getters and predicates that end in a handler suffix.** The rule asks event handlers to start with `on`/`handle`, but it matched any method whose name ended in a past-tense suffix (`Closed`, `Changed`, `Loaded`, …) — so a state query like `bool get isClosed` was wrongly told to become `onClosed`. It now skips getters entirely (a getter returns state, never handles an event) and skips boolean-predicate names prefixed with `is`/`has`/`can`/`should`/`will`/`did`, where the suffix is an adjective, not an event. Genuine handlers (`void itemDeleted()`) still lint. Remove any `// ignore:` you added for these.
 - **`prefer_reusing_assigned_local` no longer flags a receiver-less call reused into a later local.** A bare `this`-call like a recursive-descent parser's `_term()` advances a cursor and returns a different value each call, so the second call must run — but the rule treated camelCase calls as pure reads and told you to reuse the first result, which would skip the parse. It now treats any receiver-less or explicit-`this` call as impure; receiver-qualified resolver and static-helper calls (`Theme.surface.from(ctx)`, `JsonUtils.parse(x)`) still lint as before. Remove any `// ignore:` you added for these.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - The extension translation pipeline now splits an over-long source string on clause boundaries (newlines, then `;:—–,`, never mid-URL) when sentence-splitting alone leaves it past NLLB's per-call token gate, so long config descriptions and markdown link blocks stay on the higher-quality NLLB engine instead of silently dropping to Google. Every string NLLB still cannot translate (Google-served, left English, or unsplittable) is now named in a new `reports/i18n_nllb_fallbacks.md` report instead of a once-only console log, making fallbacks visible and actionable. Build tooling only (excluded from the `.vsix`); no behavior change for users.
 - The extension translation pipeline also splits a terminator-less source string on its semicolons and colons before the first NLLB call, even when the string sits under the per-call token gate — a colon-introduced list sent whole was degenerating into repetition and burning the full 10s deadline before bouncing to Google, and now each clause translates quickly on NLLB instead. The locale-generation run shows a live per-locale progress bar with words-per-minute and an ETA during the otherwise-silent machine-translation phase (a plain checkpoint line on non-TTY logs). Build tooling only (excluded from the `.vsix`); no behavior change for users.
@@ -1548,8 +1534,7 @@ Clears a wide round of false positives across the string, exception-handling, as
 
 - **Brand, tool, and code-identifier names are no longer machine-translated or transliterated in the localized UI.** Product and tool names ("Saropa Lints", "VS Code", "pub.dev", "OWASP", "SPDX", "Dart", "Flutter") and literal identifiers such as file names and config keys (`violations.json`, `analysis_options`, `pubspec.yaml`, `dev_dependencies`, `saropa_lints`) were being rendered as native words or local-script transliterations (e.g. "Saropa Fusseln", "VS Kodu", "पब.डेव", "الانتهاكات.json") across translated command titles, settings descriptions, and dashboards; every locale now shows one worldwide spelling, and the translation pipeline shields these terms so future regenerations keep them intact. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - The publish script now gates the release on a CHANGELOG Overview check: the version section must open with an intro paragraph ending in a `[log](.../vX.Y.Z/CHANGELOG.md)` link pinned to the proposed version. A missing intro or a stale/wrong-version link prompts retry (default) / ignore / abort instead of shipping silently. Build tooling only; no behavior change for users.
 - The extension translation script gained operator controls for long NLLB runs: a graceful Ctrl-C (first press finishes the in-flight string, flushes the cache, and exits cleanly; second force-quits), a `--mode` selector — gaps-only / gaps + upgrade low-quality Google→NLLB / force re-translate — with an interactive menu, persistent per-string engine provenance, and `--show` / `--set` / `--unset` commands to inspect, override, or remove cached translations. Build tooling only (excluded from the `.vsix`); no behavior change for users.
@@ -1588,8 +1573,7 @@ Adds a family of compound performance rules that flag GPU-expensive widgets only
 - **`avoid_mixed_environments` no longer flags environment keywords that appear only as substrings of unrelated identifiers.** The rule matched `prod`/`release`/`test`/`dev`/`live`/`local` as raw substrings, so a config class with `release_notes` and `latest` (or `developer`, `delivery`, `locale`) was wrongly reported as mixing production and development configuration. It now tokenizes identifiers into whole words — splitting on non-letters and camelCase — and matches keywords by exact word, so `release_notes`/`latest` are ignored while genuine mixes (`apiUrlProd` alongside `debugFlag`) still flag. No action required.
 - **`avoid_parameter_mutation` no longer flags index assignment into a List, typed-data, or Map parameter.** Filling a caller-allocated buffer by index (`p[i] = value` on a `List`/`Uint8List`/`Map` passed in to be populated) is the out-parameter/output pattern — the same intent already exempted for `.add`/`.addAll` — yet it was flagged unconditionally, producing hundreds of false positives on generated fill-buffer tables. Index assignment into a collection parameter is now exempt; field and cascade-field assignment on a DTO parameter (the real caller-corruption case) still flags. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Reworked the unreleased `prefer_dispose_before_new_instance` deferred-dispose helper to walk the AST instead of substring-matching `block.toSource()`, removing a `source.contains()` anti-pattern that the CI guard rejects and matching the disposed receiver exactly across plain, null-aware, and cascade forms. No behavior change.
 - Added regression fixtures for `avoid_equal_expressions` covering compound arithmetic with identical operands (`dx * dx + dy * dy`, `(a * a + b * b) / 2`). The rule already excludes arithmetic operators (fixed in 13.12.2); these cases guard against a future regression. No behavior change.
@@ -1784,8 +1768,7 @@ Identical content — re-released as `13.11.9` to repackage the VS Code extensio
 - **`avoid_small_touch_targets` no longer false-fires on wide-band overlays.** A `SizedBox` or `Container` whose single small axis (e.g. `height: 38`) wrapped a `GestureDetector`, `InkWell`, or `InkResponse` — typically a dismiss-on-tap pill, list row, or `Positioned.fill` overlay — was incorrectly flagged as a small touch target even though the tap region spans the full parent width. The rule now distinguishes icon-sized targets (`IconButton`, `Checkbox`, `Radio`, `Switch`, `TextButton`, `ElevatedButton`, `OutlinedButton`) — where either axis under 44 px is a real concern — from region recognizers, which require both axes explicitly under 44 px to fire. Remove any project-local `// ignore: avoid_small_touch_targets` comments added to silence the false positive.
 - **`prefer_layout_builder_for_constraints` no longer fires inside `static` utility methods that take a `BuildContext`.** Static helpers like `MenuUtils.popupMenuConstraints(BuildContext)` compute absolute viewport-fraction dimensions for non-widget return types (`BoxConstraints`, `Size`, `EdgeInsets`); `LayoutBuilder` is structurally inapplicable to them because there is no parent constraint to consult and the return is data, not a widget. Instance methods that take `BuildContext` (the 2026-04-28 case) still fire. Remove any project-local `// ignore: prefer_layout_builder_for_constraints` comments added to silence the false positive on static utilities.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Python publish-tooling tests now find the repo root.** The unittest suite was relocated to `scripts/modules/tests/` in May without updating its `parents[2]` repo-root index, leaving CI's test job red against every release commit since (including `Release v13.11.2`). No user impact.
 - **Removed post-publish auto-bump of `pubspec.yaml`.** Releases no longer auto-commit `chore: bump version to n.n.n+1`. The next publish prompt now defaults to a patch bump only when `CHANGELOG.md` has an `[Unreleased]` section, so minor or major releases no longer have to undo a pre-committed patch decision and main no longer carries phantom version-bump commits for releases that never shipped. No user impact.
@@ -2654,8 +2637,7 @@ Package Vibrancy and cross-file analysis get proper extension UI and several new
 - Diagnostic statistics now support per-rule threshold gates and baseline-diff reporting in both the analysis report and `violations.json`, so CI can fail on targeted rule regressions and track newly introduced violations without custom parsers. To adopt this workflow, generate a baseline with `dart run saropa_lints:diagnostic_baseline` and reference it under `diagnostic_statistics.baseline.file` in `analysis_options_custom.yaml`.
 - Project Vibrancy scoring no longer crashes when LCOV coverage is missing or unreadable, when the on-disk vibrancy cache file is corrupt, or when individual `git log` / `git blame` / `git hash-object` calls fail for a single file. The scan reports a short diagnostic and degrades gracefully (zero coverage, empty cache, missing timestamps) instead of aborting the whole run. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Discussion #59 (custom suppression prefixes) is now explicitly deferred as policy-blocked in its discussion document, so contributors do not accidentally implement plugin-side custom ignore parsing under current project policy. No action required for package users.
 - Added a dedicated `diagnostic-baseline-strict` GitHub Actions workflow for maintainers to fail fast when `violations.json` is missing before baseline refresh, so strict baseline regeneration can be run independently without changing default CI behavior. No action required for package users.
@@ -2721,8 +2703,7 @@ This release focuses on reducing high-noise false positives in common Flutter pa
 - `require_clipboard_paste_validation` no longer fires on reusable paste helpers that hand the pasted string to a callback parameter (`callback.call(text)`, `onPaste?.call(text)`, `(callback)(text)`) — those helpers have no semantic context to validate against, so the security boundary lives at the caller, not the paste site. Genuine cases (clipboard text written directly into a field with no validation regex nearby and no callback dispatch) still warn. No action required.
 - `use_setstate_synchronously` no longer fires on a `setState` that lexically precedes the first `await`, even when both calls live inside a single compound statement (`try`, `if`, `for`, `switch`). Previously the rule treated any nested `await` as if it preceded every `setState` in the enclosing block — which broke every codebase that wraps method bodies in mandatory `try { … } on Object catch (e, st) { … }` blocks. The rule now tracks the await position and `if (!mounted) return;` guard scope in source order across nested blocks. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Archived the resolved `avoid_opacity_animation` constant-opacity false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
 
@@ -2742,8 +2723,7 @@ This release is a quality pass aimed at precision: fewer accidental matches, few
 - `avoid_platform_specific_imports` and sibling rules that consult `ProjectContext.hasWebSupport` now run that check while visiting each library, so Flutter projects without a root `web/` directory are correctly treated as non-web and `dart:io` imports stop false-alarming there; pure Dart packages still get web-portability warnings by default. No action required.
 - `prefer_layout_builder_for_constraints` no longer double-reports on `MediaQuery.of(context).size.width` / `.height`, skips intentional screen fractions and numeric breakpoint comparisons, documents when `MediaQuery` sizing is appropriate, and treats `MediaQuery.sizeOf(context).width` / `.height` like the `.of().size.*` pattern. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Archived the closed `require_notification_for_long_tasks` foreground false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
 - Archived the resolved `avoid_excessive_rebuilds_animation` false-positive report under `plans/history/2026.04/2026.04.26/` and removed it from `bugs/`. No action required for package users.
@@ -2763,8 +2743,7 @@ This release cleans up disposal and accessibility false positives that were nois
 - `avoid_color_only_meaning` now treats `Checkbox`/`Switch`/`Radio` (including `*ListTile` variants) as companion state indicators, so selection rows with conditional background color are not incorrectly reported as color-only meaning. No action required.
 - `avoid_color_only_meaning` now recognizes common design-system widget names built as a short prefix plus a known companion type (for example thin `Icon`/`Text` wrappers), so conditional surface color next to an icon swap or label in those widgets is not treated as color-only meaning when the remainder matches a real companion. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Archived the closed `avoid_color_only_meaning` design-system wrapper companion false-positive report under `plans/history/2026.04/2026.04.25/` and removed it from `bugs/`. No action required for package users.
 - The publish script’s combined coverage report now treats `repo_integrity` rules as using the shared `config` example fixtures, matching where those files already live. Additional validated example fixtures cover stylistic null-and-collection rules, stylistic whitespace and constructor preferences, and `prefer_semantics_sort`, with matching mock types for analysis. No action required for package users.
@@ -2794,8 +2773,7 @@ New rules help you catch missing Android permissions, missing iOS privacy string
 - Added `require_env_file_gitignore` to report `.env` / `.env.*` files at the project root that are not covered by `.gitignore` patterns.
 - Extended `dart run saropa_lints:cross_file` with **missing mirror test** detection: each `lib/**/*.dart` (except `main.dart`, generated-style names, and `lib/generated/`) is checked for a matching `test/**/*_test.dart`; results appear in text/JSON output, HTML report, baselines (format version 2), and non-zero exit when present.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Archived closed `avoid_builder_index_out_of_bounds` false-positive investigation under `plans/history/2026.04/2026.04.25/` (removed duplicate from `bugs/`). No action required for package users.
 - Closed false-positive report for `require_image_picker_permission_ios` (existing `NSCameraUsageDescription`) under `plans/history/2026.04/2026.04.25/`. No action required for package users.
@@ -2810,8 +2788,7 @@ New rules help you catch missing Android permissions, missing iOS privacy string
 
 - `require_animation_controller_dispose` now treats `disposeSafe(…)` like `dispose(…)` in your `State.dispose()` so custom safe-dispose extensions are not reported, and the rule message was refreshed so on-screen wording stays aligned with that behavior. No action required; remove suppression comments you added only for this false positive.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Deferred SDK plan notes consolidated under `plans/deferred/`; publish audit spelling prompt now retry/ignore; publish menu shows logo first; Windows temp-dir teardown hardened in one integration test. No action required for package users.
 - Rounded rule-count messaging is aligned to **2100+** / **~2100** everywhere (pub.dev description, extension listings, walkthrough, tier headers, and guides) so numbers match the current rule set. No action required.
@@ -2881,8 +2858,7 @@ Three animation-focused rules catch inert `Animation.value` reads in `build`, mi
 - Analyzer-plugin reports populate the configuration block instead of showing “not captured,” so reports stay self-describing. No action required.
 - Extension Run Analysis warning popups show the real issue count from `violations.json` instead of a slice of progress stderr. No action required; see [bugs/infra_run_analysis_popup_dumps_progress_stderr.md](bugs/infra_run_analysis_popup_dumps_progress_stderr.md).
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Internal tweak to `prefer_animation_controller_forward_from_zero` detection so publish CI anti-pattern gates stay satisfied; rule behavior unchanged. No action required for consumers.
 
@@ -2914,8 +2890,7 @@ Path-safety rules ignore clearly safe literal-only helpers and common Dart SDK p
 
 `saropa_lints` itself passes `dart analyze --fatal-infos` again thanks to dogfood-only disables and small plugin fixes; publish script gains a publish-existing-.vsix mode. [log](https://github.com/saropa/saropa_lints/blob/v12.3.2/CHANGELOG.md)
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Publish script adds mode 7 to publish the newest packaged `.vsix` without repackaging after `pubspec`/`package.json` post-publish bumps, avoiding version skew when finishing a partial extension release. No action required for package users.
 - `dart analyze --fatal-infos` is clean on saropa_lints itself via targeted code fixes plus dogfood-only disables in this repo’s `analysis_options.yaml`, so maintainers can ship without thousands of self-applied rule hits while published consumer behavior is unchanged. No action required for package users.
@@ -2963,8 +2938,7 @@ New graph command for import visualization, a searchable command catalog in the 
 - **cross_file HTML reporter**: Fixed string interpolation bug in index page — file counts were rendered as list objects instead of numbers. No action required.
 - **cross_file --exclude**: The `--exclude` glob flag is now applied to filter results. Previously it was parsed but silently ignored. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Unified pubspec.yaml listener**: Pubspec validation and SDK constraint diagnostics now share a single `registerPubspecDocListeners` helper with one debounce timer (300ms), eliminating duplicate event subscriptions. Includes error boundary — a pubspec validation failure does not block SDK diagnostics.
 - **Internal**: `parseDependencySections()` now accepts a pre-split lines array, eliminating a duplicate `content.split('\n')` call per validation run.
@@ -3112,8 +3086,7 @@ Replacement complexity metric — analyzes local pub cache to estimate feasibili
 
 Fixed VS Code Marketplace publishing blocked by TypeScript 5.9 bug; modularized publish script into focused modules. — [log](https://github.com/saropa/saropa_lints/blob/v10.4.1/CHANGELOG.md)
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Fixed VS Code Marketplace publishing blocked since v10.2.2 by TypeScript 5.9 bug — `tsc --noEmit` fails with "Unknown compiler option" because TS 5.9's `createOptionNameMap()` reads `option.lowerCaseName` (a property that doesn't exist on any option declaration), building an empty lookup map; pinned TypeScript to `~5.8. No action required.
 - Modularized `scripts/publish.py` (1,246 → 202 lines) into three focused modules: `_publish_workflow.py` (pipeline orchestration), version prompting/sync into `_version_changelog.py`, and store verification into `_extension_publish.py`.
@@ -3142,8 +3115,7 @@ Vibrancy Report overhaul — auto-hiding blank columns, clickable summary cards 
 - **(Extension)** Description info icon column with tooltip on hover
 - **(Extension)** Override count shown in summary cards
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - `createdDate` field added to pub.dev metadata model.
 - `installedVersionDate` field added to vibrancy results model.
@@ -3159,8 +3131,7 @@ Analyzer 12 migration — rewrites ~500 call sites across 70+ rule files to the 
 - **Vibrancy scan cancel button** — the progress notification now shows a Cancel button so users can abort a long-running scan. No action required.
 - **Scan supersede** — starting a new vibrancy scan automatically cancels any in-progress scan instead of silently dropping the request. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Analyzer upgraded from ^9.0.0 to ^12.0.0** — migrated ~500 call sites across 70+ rule files to the new AST API (`ClassDeclaration.body.members`, `ClassNamePart.typeName`, `PrimaryConstructorDeclaration`, `DottedName`, etc.)
 - **Removed analyzer-9 compatibility extensions** — `DiagnosticCodeLowerCase` and `LintCodeLowerCase` shims removed; `lowerCaseName` is now native in analyzer 12.
@@ -3209,8 +3180,7 @@ Stream subscription detection improvements — fixes false negatives on rxdart a
 - **(Extension)** Violations sidebar no longer opens a "file not found" error when source files have been moved or renamed since the last analysis; affected items show a warning icon with "(file moved or deleted)" label. No action required.
 - **(Extension)** "Fix all in this file" command now shows a user-friendly warning instead of silently failing on moved/deleted files. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Test fixture for `avoid_stream_subscription_in_field` now uses properly-typed `Stream<int>` variables instead of undefined `dynamic` references that bypassed the type check.
 
@@ -3246,8 +3216,7 @@ This release focuses on Flutter SDK alignment (new migration lints and a shared 
 - **Package Vibrancy (VS Code extension)** — Introduces : **`TRUSTED_PUBLISHERS`** (`dart.dev`, `google.dev`, `flutter.dev`, `firebase.google.com`) and **`isTrustedPublisher()`**. No action required.
 
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Analyzer identifier → element** — Shared `elementFromAstIdentifier` in `lib/src/element_identifier_utils.dart` tries `.element` then `.staticElement` with optional `logFailures`. Used by `image_filter_quality_detection` and deprecated-API checks in `code_quality_avoid_rules.dart`. Tests: `test/element_identifier_utils_test.dart`.
 
@@ -3262,8 +3231,7 @@ This patch wires ten compile-time mirror rules into the public rule list and tie
 - **Plan additional rules 31–40** — The ten compile-time / doc / style mirror rules (`abstract_field_initializer`, `abi_specific_integer_invalid`, `annotate_redeclares`, `deprecated_new_in_comment_reference`, `document_ignores`, `non_constant_map_element`, `return_in_generator`, `subtype_of_disallowed_type`, `undefined_enum_constructor`,. No action required.
 - **`require_data_encryption`** — The `pin` keyword is matched only when not immediately preceded by an ASCII letter, so identifiers such as `OwaspMapping` (where `Mapping` embeds `…p-i-n…`) no longer false-positive on ordinary `write`/`writeAsString` calls. Regression coverage: ; fixture: `example_async/lib/security/require_data_encryption_fixture.dart`. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Analyzer 9 (migration / fixes)** — `prefer_dropdown_menu_item_button_opacity_animation` uses `declaredFragment?.element` on class and field declarations, `DartType.nullabilitySuffix` for nullable `CurvedAnimation?`, `SimpleIdentifier.element` for `!` operands, and `reporter.atToken` for field names. `image_filter_quality_detection` uses `SimpleIdentifier.element` only (removed `staticElement`).
 - **`rootUriToPath`** — `file://` roots use `Uri.tryParse` so invalid URIs return null instead of throwing. Tests: `test/project_info_root_uri_test.dart`.
@@ -3327,8 +3295,7 @@ In this milestone update work centers on the composite analyzer plugin hook (`re
 - **prefer_super_key**: flags `Key? key` with `super(key: key)` on `StatelessWidget` / `StatefulWidget` / `*Widget` subclasses; prefer `super.key` ([Flutter PR #147621](https://github.com/flutter/flutter/pull/147621)). Quick fix rewrites the constructor. No action required.
 - **avoid_chip_delete_inkwell_circle_border**: flags chip `deleteIcon` subtrees that use `InkWell` with `customBorder: CircleBorder()`, which mismatches the square chip delete region fixed in Flutter 3.22 ([PR #144319](https://github.com/flutter/flutter/pull/144319)). No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Publish / tier integrity** — `scripts/modules/_tier_integrity.py` `get_registered_rule_names` now resolves rule classes when the `extends` clause starts on the line after the class name (valid Dart; previously produced a false **phantom** for `avoid_removed_nosuchmethoderror_default_constructor`). Python regression coverage added.
 - **Code cleanup** — Batched `context.subscriptions.push` calls in `extension.ts`; refactored vibrancy "Copy as JSON" serialization into small matchers with documented dispatch order (`treeSerializers.ts`). Added unit tests for `serializeVibrancyNode`.
@@ -3439,8 +3406,7 @@ Import graph tracking, scan API, TODOs & Hacks view, and new lint rules. — [lo
 
 • **Extension** — **Create Saropa Lints Instructions**: Command (Overview title bar and Command Palette) writes a project-instructions file into the workspace from a bundled template, so contributors get project guidelines (essential files, workflow, prohibitions, principles). Uses async file I/O and a short progress notification.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Scripts** — `publish.py` main workflow refactored into smaller helpers (`_PublishContext`, `_run_audit_step`, `_run_pre_publish_pipeline`, `_run_badge_validation_docs_dryrun`, etc.) to reduce cognitive complexity; behavior unchanged. Extension install/publish prompts centralized in `_prompt_extension_install_and_publish`. Main docstring documents flow for reviewers. `SystemExit` from `exit_with_error()` is caught so `finally` (timer summary) runs and the intended exit code is returned.
 
@@ -3497,8 +3463,7 @@ _Headless config writer, cross-file analysis CLI, and a polished Issues view._ �
 
 • **Extension** — Polished Issues view violation context menu with icons for Apply fix / Copy message, a separator between action and hide groups, and clearer suppression behavior (rule vs rule-in-file); extension README documents how to clear and manage suppressions from the toolbar.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Central cache stats** — `CacheStatsAggregator.getStats()` returns a single map aggregating statistics from all project caches (import graph, throttle, speculative, rule batch, baseline, semantic, etc.) for debugging and monitoring.
 
@@ -3574,8 +3539,7 @@ _Streamlining the Package Vibrancy toolbar._ — [log](https://github.com/saropa
 
 • **Package Vibrancy** — removed the cryptic problem-severity summary row (colored dots with bare numbers) from the top of the tree; the Action Items group already communicates problem counts and details
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Examples** — removed stale `custom_lint` dev dependency from all 6 example projects; `custom_lint ^0.8.0` requires `analyzer ^8.0.0` which conflicts with the v5 native plugin's `analyzer ^9.0.0`
 • **ROADMAP** — removed `prefer_semver_version` and `prefer_correct_package_name` from the "Deferred: Pubspec Rules" section; both are already implemented and registered
@@ -3717,8 +3681,7 @@ About screen, Getting Started walkthrough, and consolidated status bar. — [log
 
 • "Learn More" button renamed to "Learn more online" to clarify it opens a website
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **CRITICAL** Fixed extension never reaching VS Code Marketplace after v9.0.2 — `run_extension_package()` used `next(glob("*.vsix"))` which returned the stale 9.0.2 `.vsix` (alphabetically before 9.1.0/9.2.0) instead of the newly created one; now deletes old `.vsix` files before packaging and looks for the expected filename first
 
@@ -3754,8 +3717,7 @@ Extension reliability and subdirectory project support. — [log](https://github
 
 • Line-based YAML insertion preserves original CRLF/LF line endings
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • Centralized project root discovery (`projectRoot.ts`) with per-session caching
 • Workspace folder change listener invalidates cached project root
@@ -3787,8 +3749,7 @@ Sidebar icon refinement. — [log](https://github.com/saropa/saropa_lints/blob/v
 
 • **Sidebar icon:** Changed activity bar icon from solid fill to wireframe (stroked outline) for consistency with VS Code's icon style.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Open VSX publish:** The publish script now prompts for an OVSX_PAT when the environment variable is missing, with platform-specific setup instructions, instead of silently skipping.
 
@@ -3870,8 +3831,7 @@ The VS Code extension is now the primary way to use saropa_lints. One-click setu
 
 • Tree view fixes: root folder path prefix, severity/impact suppression timing, tier status bar immediate update.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • Unified publish script (`scripts/publish.py`) for package and extension; extension version synced with package version.
 
@@ -3897,8 +3857,7 @@ Init `--target` flag, standalone scan command, and init modularization. — [log
 
 • **Standalone scan command:** `dart run saropa_lints scan [path]` runs lint rules directly against any Dart project without requiring saropa_lints as a dependency. Reads the project's `analysis_options.yaml` (generated by `init`) to determine which rules to run. Results are written to a report file with a compact summary on terminal.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Init tool modularization:** Extracted `bin/init.dart` (4,819 lines) into 21 focused modules under `lib/src/init/`, reducing the entry point to 15 lines. No behavior changes.
 
@@ -4035,8 +3994,7 @@ Fix `prefer_readable_line_length` crash and publish script changelog parsing.
 
 • **`prefer_readable_line_length` crash:** Fixed off-by-one error in `PreferReadableLineLengthRule` that caused `Invalid line number` exception when analyzing files. The loop used 1-based indexing but `LineInfo.getOffsetOfLine()` requires 0-based, crashing on the last line of every file.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Publish script changelog logic:** Fixed regexes in `_version_changelog.py` that expected `---\n##` but the actual format uses `---\n\n##` (blank line after separator). This caused `add_version_section` to silently append entries at the end of the file and `add_unreleased_section` to fail entirely. Recovered 8 orphaned changelog entries.
 
@@ -4050,8 +4008,7 @@ Remove Flutter SDK constraint that broke CI and fix 56 unresolved dartdoc refere
 
 • **Removed Flutter SDK constraint from pubspec.yaml** that caused CI publish workflow to fail (`dart pub get` requires only the Dart SDK; this is a pure Dart package).
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Fixed 56 unresolved dartdoc reference warnings** across rule files.
 
@@ -4061,8 +4018,7 @@ Remove Flutter SDK constraint that broke CI and fix 56 unresolved dartdoc refere
 
 Publish workflow improvements with retry logic and SDK configuration.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Updated publish workflow** with improved retry logic and SDK configuration.
 
@@ -4072,8 +4028,7 @@ Publish workflow improvements with retry logic and SDK configuration.
 
 Publish script auto-bumps version on tag conflict; GitHub Actions workflow uses stable Dart SDK.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Publish script and workflow:** GitHub Actions publish workflow now uses the Dart stable SDK (no exact-version lookup), adds a Verify Dart SDK step, and retries `dart pub get` once on failure. When the release tag already exists on the remote, the script auto-bumps the pubspec version and adds a "Release version" CHANGELOG section instead of failing. The script automatically commits and pushes `.github/workflows/publish.yml` when it has uncommitted changes, so no manual git steps are required.
 
@@ -4169,8 +4124,7 @@ In this release we’re preparing bug fixes and small rule refinements.
 
 • **require_content_type_validation** — No longer reports when a dominating content-type guard returns or throws (not only return) before `jsonDecode`, and when the guard is nested inside an outer if block. Resolves bug_require_api_response_validation_require_content_type_in_validator_impl.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **prefer_webview_sandbox** — Internal: removed null assertion in controller root helper; handle nullable `PropertyAccess.target` to satisfy avoid_null_assertion.
 
@@ -4270,8 +4224,7 @@ In this release we fix a few rules (use_existing_variable, require_debouncer_can
 
 • `prefer_const_constructor_declarations` — Prefer declaring constructors as `const` when the class has only final fields (plain classes; @immutable and Widget subclasses remain covered by `prefer_const_constructors_in_immutables`). INFO, comprehensive tier.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 • **Publish script (Step 6 & 7):** Step 6 (analysis) now runs `dart test --chain-stack-traces` after `dart analyze`, piping output to `reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log` and checking for failure lines so test failures surface early. Step 7 on failure runs the same command (no retry prompt) and reports the log path and error lines. Shared `_dart_test_env()` for test temp dir; spinner shown during the test run.
 • **Quick-fix presence tests:** Dedicated file `test/rule_quick_fix_presence_test.dart` with 100 unit tests asserting each listed rule has at least one quick fix (`fixGenerators` non-empty), plus one inverse test that a rule without fixes ([AvoidNonFinalExceptionClassFieldsRule]) has empty `fixGenerators`. Replaces duplicate rule entries with distinct rules (e.g. `AvoidEmptyBuildWhenRule`, `AvoidUnnecessaryFuturesRule`, `AvoidUnnecessaryNullableReturnTypeRule`, `AvoidThrowInCatchBlockRule`, `PreferPublicExceptionClassesRule`). Additional fix-presence assertions remain in code_quality_rules_test, complexity_rules_test, and structure_rules_test where relevant.
@@ -4405,8 +4358,7 @@ We focus on eating our own dog food: new rules for API validation, accessibility
 
 - **Duplicate rules (positional boolean parameters):** `avoid_positional_boolean_parameters` and `prefer_named_bool_params` reported the same issue and produced two diagnostics per positional bool. Removed `prefer_named_bool_params` from the default tier so only `avoid_positional_boolean_parameters` runs by default. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Rules layout:** Reorganized `lib/src/rules/` into subfolders to reduce root file count. Category rule files now live under `architecture/`, `code_quality/`, `codegen/`, `commerce/`, `config/`, `core/`, `data/`, `flow/`, `hardware/`, `media/`, `network/`, `resources/`, `security/`, `stylistic/`, `testing/`, `ui/`, and `widget/`. `packages/` and `platforms/` unchanged. Barrel export in `all_rules.dart` and `CODEBASE_INDEX.md` updated. No rule logic or tier changes.
 
@@ -4439,8 +4391,7 @@ In this release we remove 18 quick fixes that only inserted a TODO (project poli
 
 - **handle_throwing_invocations plugin crash:** On analyzer versions where `Element.metadata` is a wrapper (e.g. `MetadataImpl`) rather than an `Iterable`, the rule no longer crashes with "MetadataImpl is not a subtype of Iterable". `_hasThrowsAnnotation` now uses `readElementAnnotationsFromMetadata` from . Regression test: . No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **History integration (false_positives 11–20):** Rule DartDoc **Exempt** blocks and CHANGELOG_ARCHIVE intent notes for: `avoid_ignoring_return_values` (property setter), `avoid_ios_hardcoded_device_model` (word boundary), `avoid_manual_date_formatting` (map/cache keys), `avoid_medium_length_files` (code-only count, abstract final exempt), `avoid_missing_enum_constant_in_map` (complete maps), `avoid_money_arithmetic_on_double` (word boundary), `avoid_nested_assignments` (for-loop update, arrow body), `avoid_non_ascii_symbols` (invisible/confusable only). False-positive test groups and fixture coverage (e.g. `avoid_nested_assignments` arrow body) added. Checklist since removed.
 - **No stub fixtures:** Policy and docs now prohibit stub test fixtures (files with `// expect_lint` and placeholder BAD/GOOD code when the rule does not run or report on that code). Fixtures may only be added when the rule is implemented and the fixture is validated. Updated: `bugs/UNIT_TEST_COVERAGE.md` (policy + §6.3) and `CONTRIBUTING.md` (§8 and Testing checklist).
@@ -4456,8 +4407,7 @@ In this release we reach full fixture coverage: 54 new fixture files so every ru
 
 - **avoid_deprecated_usage plugin crash:** On analyzer versions where `Element.metadata` is a wrapper (e.g. `MetadataImpl`) rather than an `Iterable`, the rule no longer crashes with "MetadataImpl is not a subtype of Iterable". Deprecation detection now uses so metadata is read safely across analyzer API shapes. Regression test: . No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Fixture coverage 100%:** Added 54 missing fixture files so the publish script Test Coverage report reaches 1963/1963 (100%) fixture coverage. No action required.
 - **no_empty_block metrics:** `NoEmptyBlockRule` now uses a string literal for its `LintCode` first argument so can parse the rule name and count the existing fixture. Unnecessary_code category reports 14/14 fixtures. No action required.
@@ -4527,8 +4477,7 @@ In this release we add many new stylistic and professional rules (cascade, fold 
 
 - **Report duplicate paths:** The analysis report log counted the same violation twice when the same issue was reported with both relative and absolute file paths (e.g. and `D:\proj\lib\foo.dart`). No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Publish script (audit failure):** When the pre-publish audit fails, the script now auto-fixes only the missing `[rule_name]` prefix in problem messages when applicable, then re-runs the audit. For other blocking issues (tier integrity, duplicates, spelling, . No action required.
 - **Rule file split (refactor):** Five large rule files were split into smaller, thematically grouped files for maintainability. No behavior or rule counts changed. **code_quality_rules.dart** (106 rules) → `code_quality_avoid_rules.dart`, `code_quality_control_flow_rules.dart`, `code_quality_prefer_rules. No action required.
@@ -4576,8 +4525,7 @@ In this release we focus on cutting false positives: substring checks are replac
 - **require_app_startup_error_handling:** Documented that the rule only runs when the project has a crash-reporting dependency (e.g. firebase_crashlytics, sentry_flutter). No action required.
 - **Tier reclassification (no orphans):** Rule logic, unit tests, and false-positive suppressors unchanged; only tier set membership in updated. Moved **to Essential:** `check_mounted_after_async`, `avoid_drift_raw_sql_interpolation`. No action required.
 - **Severity reclassification:** `LintCode` severity only; when the rule fires is unchanged. CI using `--fatal-infos` may now fail where it did not. **WARNING → ERROR:** `require_unknown_route_handler`, `avoid_circular_redirects`, `check_mounted_after_async`, `require_https_only`, `require_route_guards`. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Publish script (test coverage):** Rule-instantiation status is now derived from the codebase. The Test Coverage report shows a "Rule inst." line (categories with a Rule Instantiation group / categories with a test file) and lists categories missing that group. No action required.
 - **Tests (behavioral):** Added a second test in that runs custom_lint on example_async and asserts specific rule codes (avoid_catch_all, avoid_dialog_context_after_async, require_stream_controller_close, require_feature_flag_default, prefer_specifying_future_value_type) appear in parsed violations when custom_lint runs. No action required.
@@ -4679,8 +4627,7 @@ In this release we add 55 new lint rules (deprecation, security, structure, Fire
   - `require_ssl_pinning_sensitive` (Professional, WARNING) — HTTP POST/PUT/PATCH to sensitive paths (/auth, /login, /token) without certificate pinning; OWASP M5, M3. Suppressed when project uses http_certificate_pinning or ssl_pinning_plugin, and for localhost.
   - `require_text_scale_factor_awareness` — Container/SizedBox with literal height containing Text may overflow at large text scale; recommend flexible layout (widget files only).
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Style:** Satisfy `curly_braces_in_flow_control_structures` in rule implementation files (api_network, control_flow, lifecycle, naming_style, notification, sqflite, performance, web, security, structure, ui_ux, widget_patterns). Single-statement `if` bodies are now wrapped in blocks; no behavior change. No action required.
 - **no_empty_block:** Confirmed existing implementation in `unnecessary_code_rules.dart`; roadmap task archived. No action required.
@@ -4761,8 +4708,7 @@ In this release we fix the Drift test rule (avoid_drift_close_streams_in_tests) 
 ### Fixed
 
 - `avoid_drift_close_streams_in_tests` — rule never fired because `testRelevance` was not overridden; the framework skipped test files before the rule could run. Now correctly set to `TestRelevance.testOnly`. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - `avoid_drift_update_without_where` — removed unreachable dead code branch. No action required.
 
@@ -4776,8 +4722,7 @@ In this release we widen the analysis_server_plugin and analyzer_plugin version 
 
 - Widened `analysis_server_plugin` and `analyzer_plugin` dependency constraints from pinned to `^` range to reduce version conflicts for consumers. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - CI publish workflow: dry run step failed on exit code 65 (warnings) due to `set -e` killing the shell before the exit code could be evaluated; warnings are now reported via GitHub Actions annotations without blocking the publish. No action required.
 
@@ -4917,8 +4862,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - YAML config examples updated from v4 `custom_lint:` format to v5 native `plugins: saropa_lints:` format across lib/, docs, and scripts. No action required.
 - VSCode extension updated to run `dart analyze` instead of `dart run custom_lint`. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Trailing-comment fixer functions from (`_fixTrailingIgnoreComments`, `_splitIgnoreParts`, etc.) — existed only to support the removed rule. No action required.
 - — obsolete v4 script. No action required.
@@ -4950,8 +4894,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 - `avoid_high_cyclomatic_complexity`: raise threshold from 10 to 15 to align with industry standards (SonarQube, ESLint). No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Publish report: test coverage "Overall" percentage now caps per-category fixture counts at rule counts, preventing excess fixtures from masking gaps. No action required.
 
@@ -5049,8 +4992,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - Init: stylistic walkthrough shows per-rule progress counter (`4/120 — 3%`) and `[quick fix]` indicator for rules with IDE auto-fixes
 - Init: stylistic walkthrough rule descriptions rendered in default terminal color instead of dim gray for readability
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Publish audit: consolidated quality checks into a single pass/warn/fail list instead of separate subsections per check
 - Publish audit: US English spelling check displayed as a simple bullet instead of a standalone subsection
@@ -5102,8 +5044,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - `avoid_string_concatenation_l10n`: skip numeric-only interpolated strings (e.g. `'$a / $b'`) that contain no translatable word content. No action required.
 - `avoid_unmarked_public_class`: skip classes where all constructors are private (extension already prevented). No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Publish audit: added 3 new blocking checks — `flutterStylisticRules` subset validation, `packageRuleSets` tier consistency, `exampleBad`/`exampleGood` pairing
 - Publish audit: doc comment auto-fix (angle brackets, references) now runs during audit step instead of only during analysis step
@@ -5119,8 +5060,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 - CLI defaults to `init` command when run without arguments (`dart run saropa_lints` now equivalent to `dart run saropa_lints init`). No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Publish script: `dart format` now targets specific top-level paths, excluding `example*/` directories upfront instead of tolerating exit-code 65 after the fact. No action required.
 - Publish script: roadmap summary now includes color-coded bug report breakdown (unsolved/categorized/resolved) from sibling `saropa_dart_utils/bugs/` directory. No action required.
@@ -5151,8 +5091,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - Stream drain and exit code now awaited together via `Future.wait` to prevent interleaved output. No action required.
 - Persistent cache files (`rule_version_cache.json`, export directories) moved from `reports/` root to `reports/_cache/` subfolder. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Publish script: restored post-publish version bump (pubspec + `[Unreleased]` section) — accidentally removed in v4.9.17 refactor. No action required.
 - Publish script: optional `_offer_custom_lint` prompt no longer blocks success status or timing summary on interrupt. No action required.
@@ -5215,8 +5154,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Fixed
 
 - `.pubignore` pattern `test/` was excluding from published package — anchored to `/test/` so only the root test directory is excluded; this caused `dart run saropa_lints:init` to fail with a missing import error for `replace_expect_with_expect_later_fix.dart`. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Publish script `dart format` step failed on fixture files using future language features (extension types, digit separators, non-ASCII identifiers) — now tolerates exit code 65 when all unparseable files are in example fixture directories. No action required.
 
@@ -5229,8 +5167,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Added
 
 - Quick fix for `require_subscription_status_check` — inserts TODO reminder to verify subscription status in build methods. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - `getLineIndent()` utility on `SaropaFixProducer` base class for consistent indentation in fix output. No action required.
 - Moved generated export folders (`dart_code_exports/`, `dart_sdk_exports/`, `flutter_sdk_exports/`) and report caches from `scripts/` to `reports/` — scripts now write output to the gitignored `reports/` directory, keeping `scripts/` clean. No action required.
@@ -5260,8 +5197,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 - V4 migration no longer imports all rule settings as overrides — only settings that differ from the selected v5 tier defaults are preserved, preventing mass rule disablement. No action required.
 - Init script scans and auto-fixes broken ignore comments — detects trailing explanations (`// ignore: rule // reason` or `// ignore: rule - reason`) that silently break suppression, and moves the text to the line above. No action required.
 - Quick fix support for 108 rules via native `SaropaFixProducer` system — enables IDE lightbulb fixes and `dart fix --apply`. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - 3 reusable fix base classes: `InsertTextFix`, `ReplaceNodeFix`, `DeleteNodeFix` in. No action required.
 - 108 individual fix implementation files in , all with real implementations (zero TODO placeholders). No action required.
@@ -5279,8 +5215,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 **We fix publish dry-run and CI checks.**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Untrack a stray gitignored editor-config file — was tracked despite the gitignore rule, causing `dart pub publish --dry-run` to exit 65 (warning). No action required.
 - Publish workflow dry-run step now tolerates warnings (exit 65) but still fails on errors (exit 66). No action required.
@@ -5295,8 +5230,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 ### Fixed
 
 - Add `analyzer` as explicit dependency — `dart pub publish` rejected transitive-only imports, causing silent publish failure. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Remove `|| [ $? -eq 65 ]` from publish workflow — was silently swallowing publish failures. No action required.
 
@@ -5306,8 +5240,7 @@ In this release we upgrade to analyzer 9 and Dart SDK 3.10+, and add 21 Drift (S
 
 **We update the publish script for the v5 LintCode format and pre-release versions.**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Publish script regex patterns updated for v5 positional `LintCode` constructor — tier integrity, audit checks, OWASP coverage, prefix validation, and correction message stats now match both v5 positional and v4 named parameter formats. No action required.
 - Publish script version utilities now support pre-release versions (`5.0.0-beta.1` → `5.0.0-beta.2`) — version parsing, comparison, pubspec read/write, changelog extraction, and input validation all handle `-suffix.N` format. No action required.
@@ -5459,8 +5392,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ### Fixed
 
 - **`require_websocket_reconnection` false positive** (v4): Rule no longer fires on `WebSocket` and `WebSocketChannel` class definitions themselves; only classes that use WebSocket connections are checked. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Cross-rule noise in fixture files**: Added `ignore_for_file` directives to 8 example fixtures to suppress unrelated rule violations (e.g. `avoid_print_in_release` in `avoid_variable_shadowing_fixture.dart`). No action required.
 - **`super_formal_parameter_without_associated_positional`**: Disabled pending further investigation.
@@ -5473,8 +5405,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We add a US English spelling check in publish, split the example into sub-packages, and fix fixtures and false positives.**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **US English spelling check** in publish pipeline: New `_us_spelling.py` module with ~90+ UK-to-US spelling pairs scans all source files for British English and blocks publish until fixed. Integrated as a blocking pre-publish audit step. No action required.
 - **Split example project into 6 sub-packages**: Resolves Out of Memory crash during custom_lint analysis of 1,542 fixture files. Fixtures are now split across `example_core/`, `example_async/`, `example_widgets/`, `example_style/`, `example_packages/`, and `example_platforms/`, each independently analyzable within memory limits. No action required.
@@ -5504,8 +5435,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We add unit test coverage for 10 rule categories, JSON violation export, and a new Firebase index rule.**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Roadmap summary bars inverted**: Bars now show completion (0 remaining = full green bar) instead of remaining count, making progress more intuitive. No action required.
 - **DX Message Quality label padding**: Widened impact label column from 10 to 12 chars so "Opinionated" aligns correctly. No action required.
@@ -5555,8 +5485,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
   - `require_feature_flag_type_safety`: `isEnabled()` moved to target-filtered set; `notification.isEnabled()` no longer triggers
 - **Double-fire note**: `avoid_synchronous_file_io` (Professional) is now also covered by `avoid_blocking_main_thread` (Essential) which adds isolate detection. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Rule versioning**: Added `{vN}` version suffixes and `Since: vX.Y.Z` DartDoc provenance to all rules. No action required.
 - **Publish script enhancements**: Auto-sync README/ROADMAP rule counts, roadmap header sync, GitHub issue tracking. No action required.
@@ -5589,8 +5518,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Report: multi-isolate batch consolidation**: Reports now merge data from all isolate restarts within a session instead of losing earlier analysis data. Each isolate writes a batch file; the final report consolidates all batches into one combined report. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Publish gate: `[rule_name]` prefix required in all problemMessage strings**: The publish script now blocks release if any rule's `problemMessage` does not start with `[rule_name]`. All 15 previously non-compliant rules have been updated. No action required.
 - **CI guard: `.contains()` anti-pattern detection test**: New test scans all rule files for 9 dangerous `String.contains()` patterns (e.g. `methodName.contains(`, `toSource().contains(`) and fails CI if new violations are introduced. Per-file baseline counts track the 1,100+ existing instances; baselines tighten as violations are removed. No action required.
@@ -5645,8 +5573,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Analysis report captures all violations**: The debounce timer's write-once guard caused reports to contain only the first batch of violations when analysis gaps exceeded 3 seconds. Reports now overwrite on each debounce cycle so the final output reflects the complete analysis. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Regression tests for violation parser**: Added 16 tests covering `parseViolations()` and the `Violation` model to guard against future `custom_lint` output format changes (see PR #84 / PR #90). No action required.
 - **Updated PR #84 review document**: Corrected merge status (PR #84 was closed in favor of PR #90), added timeline, risk table, and regression test reference. No action required.
@@ -5687,8 +5614,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We centralize violation-parsing logic (PR #84).**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Centralized the duplicated violation-parsing logic from the `baseline` and `impact_report` tools. This resolves a structural issue highlighted by the regex fix in PR #84 and makes future updates more robust. (Thanks [@icealive](https://github.com/icealive!)). No action required.
 
@@ -5716,8 +5642,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ### Added
 
 - **New rule `verify_documented_parameters_exist`** (Professional, WARNING): Detects when dartdoc `[paramName]` references parameters that do not exist in the function signature. Complements the existing `require_parameter_documentation` rule which checks the inverse direction. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Added Documentation Rules section to ROADMAP** (section 1.63): Lists all 9 documentation rules including the new `verify_documented_parameters_exist`. No action required.
 
@@ -5759,8 +5684,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **`prefer_expanded_at_call_site` quick fix now unwraps**: Replaced the `// HACK` comment insertion with a proper code transformation that extracts the `child` argument and returns it directly. Not offered for `Spacer` (no child to extract). No action required.
 - **`avoid_expanded_outside_flex` improved diagnostic messages**: Expanded `problemMessage` to explain the FlexParentData/RenderFlex mechanism and the indirect `build()` return case. Expanded `correctionMessage` with actionable guidance for reusable widgets. Added "Why This Crashes" dartdoc section explaining the ParentDataWidget error. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Publish script defers version prompt until after analysis**: The `publish_to_pubdev.py` script no longer asks for the publish version upfront. Audits, prerequisites, tests, formatting, and static analysis all run first; the version prompt now appears at Step 8 only after all analysis passes. No action required.
 
@@ -5821,8 +5745,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **README: Added platform and package configuration documentation**: Expanded the platform configuration section with a table showing rule counts and examples for all 6 platforms (iOS, Android, macOS, Web, Windows, Linux), shared platform groups (Apple, Desktop), and how shared rules are handled. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Publish script: version prompt with timeout**: Script now prompts for the publish version (pre-filled with pubspec value, 30s timeout) allowing major/minor bumps without manual pubspec edits
 - **Publish script: [Unreleased] renamed to version before publishing**: The `[Unreleased]` section in CHANGELOG.md is automatically renamed to the publish version at the start of the workflow
@@ -5869,8 +5792,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **3 duplicate rules removed**: `require_prefs_key_constants` (duplicate of `require_shared_prefs_key_constants`), `require_equatable_immutable` (duplicate of `avoid_mutable_field_in_equatable`), `avoid_equatable_mutable_collections` (duplicate of `prefer_unmodifiable_collections`). Removed from rule files, `_allRuleFactories`, tiers, and analysis options. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Extracted package rules into dedicated files**: Bloc rules (52) to `bloc_rules.dart`, Provider rules (26) to `provider_rules.dart`, Dio rules (14) to `dio_rules.dart`, SharedPreferences rules (10) to `shared_preferences_rules.dart`, GetIt rules (3) to `get_it_rules.dart`. Also Riverpod rules (37) expanded in `riverpod_rules. No action required.
 - **Audit report now includes DX Message Quality section**: The full audit markdown report (`reports/*_full_audit.md`) now exports the complete DX quality analysis — summary tables by impact level and tier, issues grouped by type, and a searchable per-rule failing table with tier, impact, score, and specific issues. No action required.
@@ -5945,8 +5867,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Aligned DiagnosticSeverity with actual risk across ~28 rules**: Audited all 1,681 rules for severity-vs-impact mismatches. Upgraded 9 crash-path rules from INFO to ERROR (permission failures, missing error boundaries, unhandled navigation results). No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **DX audit now enforces message length on opinionated rules**: The `_audit_dx.py` scoring previously skipped all length checks for `LintImpact.opinionated` rules (stylistic tier), allowing 30-50 character messages to score 100%. Added 100-character minimum threshold (-10 penalty). No action required.
 
@@ -5983,8 +5904,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - Renamed report files from `_saropa_full.log` / `_saropa_summary.md` to `_saropa_lint_report_full.log` / `_saropa_lint_report_summary.log` for clearer identification and consistent `.log` extension. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Audit report filenames include project name**: Exported audit reports now include the project name from `pubspec.yaml` in the filename (e.g. `20260202_090730_saropa_lints_full_audit.md` instead of `20260202_090730_full_audit.md`). Applies to both full audit and DX audit reports. No action required.
 - **DX audit per-tier breakdown**: The DX Message Quality report now includes a "By tier" section showing passing/total counts and percentages for each tier (Essential, Recommended, Professional, Comprehensive, Insanity, Stylistic), color-coded to match the tier distribution display. No action required.
@@ -6044,8 +5964,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **DX message quality for control_flow_rules**: Expanded `problemMessage` and `correctionMessage` text for all 28 rules with DX issues in `control_flow_rules.dart`. Removes "Avoid" prefixes, explains consequences of control flow anti-patterns, and meets minimum message length thresholds.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Shared `WrapInTryCatchFix` utility**: Extracted common try-catch wrapping fix to `ignore_fixes.dart` for reuse across rules that require error handling (PDF, SQLite, geolocation, etc.). No action required.
 
@@ -6178,8 +6097,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 ### Changed
 
 - **DX message quality improvements for 25 medium/low priority rules**: Improved lint message clarity by replacing vague language with specific, actionable problem descriptions. Changes include: (1) Replaced "better performance" with quantified impacts (e.g. No action required.
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Audit report organization improved**: Refactored audit scripts to reduce repetition and improve report readability. No action required.
 
@@ -6197,8 +6115,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **DX message quality improvements for 24 critical/high impact rules**: Achieved 100% pass rate (293/293 high, 61/61 critical) for developer experience message quality audit. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Widget rules refactored into 3 focused files**: Split the 18,953-line `flutter_widget_rules.dart` into three thematic categories for improved maintainability and discoverability: `widget_lifecycle_rules.dart` (34 rules for State management, dispose, setState patterns), `widget_layout_rules. No action required.
 - **README badges upgraded**: Replaced static badges with dynamic, auto-updating badges organized into logical groups (CI/CD, pub.dev metrics, GitHub activity, technical info). Added popularity, likes, stars, forks, last commit, issues count, Dart SDK version, and Flutter platform badges with appropriate logos. No action required.
@@ -6278,8 +6195,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Improved DX messages for 58 high-impact rules**: Expanded `problemMessage` and `correctionMessage` text across `navigation_rules`, `notification_rules`, `package_specific_rules`, `performance_rules`, `platform_rules`, `qr_scanner_rules`, `resource_management_rules`, `riverpod_rules`, `scroll_rules`, `security_rules`, and. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Test coverage top offenders report**: The publish workflow's test coverage summary now lists the 10 worst categories ranked by untested rule count, color-coded by severity. No action required.
 - **File health top offenders**: The "Files needing quick fixes" audit section now lists the top 5 worst files sorted by fix coverage, showing fixes/rules and percentage. No action required.
@@ -6315,8 +6231,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **Improved DX message quality for 25 critical/high-impact lint rules**: Expanded problem messages to clearly explain the detected issue, its real-world consequence, and the user impact. Expanded correction messages with specific, actionable fix guidance. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Pre-publish audit script bugs fixed**: `_code\s*=` regex now matches variant field names (`_codeField`, `_codeMethod`), eliminating phantom rule false positives. Opinionated prefer\_\* detection uses class-scoped search instead of backward search, preventing cross-class name resolution errors. No action required.
 - **Critical DX pass rate**: 98.3% → 100% (60/60 rules passing). No action required.
@@ -6363,8 +6278,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **`require_immutable_bloc_state` false positives on non-BLoC classes**: Skip indirect Flutter State subclasses (`PopupMenuItemState`, `FormFieldState`, `AnimatedWidgetBaseState`, `ScrollableState`, `RefreshIndicatorState`) and `StatefulWidget`/`StatelessWidget` subclasses using "State" as a domain term. No action required.
 - **`require_cache_key_determinism` false positive on metadata parameters**: Common metadata parameter names (`createdAt`, `updatedAt`, `timestamp`, `expiresAt`, `ttl`, etc.) are now excluded from determinism checks. Diagnostics now report at the specific offending argument instead of the entire variable declaration. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **`require_deep_link_fallback` test fixture**: Added coverage for lazy-loading getters that use utility class methods (e.g., `_uri ??= UrlUtils.getSecureUri(url)`) to prevent false positives. No action required.
 - **Tier assignment: single source of truth**: `tiers.dart` is now the sole authority for rule tier assignments. Removed the `RuleTier get tier` getter from `SaropaLintRule` and the legacy two-phase fallback in . The init script now reads tier assignments exclusively from `tiers.dart` sets. No action required.
@@ -6671,8 +6585,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **require_deep_link_fallback quick fix**: Wraps handler body with try/catch for fallback handling. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Updated README.md version badge to 4.5.7
 - Updated example/analysis_options_template.yaml tier counts to match actual rule counts
@@ -6720,8 +6633,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 - **require_camera_permission_check**: False positive fixed for `.initialize()` calls on non-camera controllers (e.g., IsarStreamController). The rule now checks the static type to ensure only `CameraController` is flagged. Thanks to user report and test case. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **PERFORMANCE.md**: Updated to reflect current best practices for configuration and performance:
   - The summary table now states that tier set caching and rule filtering cache are "Built-in" (not just v3.0.0).
@@ -6808,8 +6720,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 
 **We add CLI --no-pager and better YAML handling, rename file length rules, and align custom_lint versions.**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Ensure custom_lint and custom_lint_builder use the same version in pubspec.yaml to avoid compatibility issues. If you downgrade, set both to the same version (e.g., ^0.8.0).
 - Upgraded dev dependencies: test to v1.29.0 and json2yaml to v3.0.1.
@@ -7662,8 +7573,7 @@ The following 6 rules, previously implemented but not assigned to any tier, are 
 
 This ensures all implemented rules are available through tiered configuration and improves coverage for test and state management best practices.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Ran `scripts/audit_rules.py` to identify all implemented rules not assigned to any tier.
 - Assigned the following rules to the most appropriate tier sets in `lib/src/tiers.dart`:
@@ -7779,8 +7689,7 @@ Improved problem messages for 7 critical-impact rules to provide specific conseq
 
 **Result**: Critical impact rules now at 100% DX compliance (40/40 passing).
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **PROFESSIONAL_SERVICES.md**: Rewrote professional services documentation with clearer service offerings and contact information
 
@@ -7984,8 +7893,7 @@ Added comprehensive performance infrastructure to support 1400+ lint rules effic
 
 **Quick fix policy: HACK-comment fixes discouraged; ROADMAP quick-fix plan; audit_rules.py enhancements.**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 **Quick Fix Policy Update**
 
@@ -8021,8 +7929,7 @@ Safety checklist: no deleting code, no behavior changes, works in edge cases.
 
 **Audit script v2.0: OWASP stats, tier distribution, orphan detection, DX audit.**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 **Audit Script v2.0**
 
@@ -8295,8 +8202,7 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 - **Rule pass tracking**: Records which rules passed on unchanged files to skip redundant analysis.
 - **Impact**: Files that haven't changed between saves can skip re-running passing rules.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Updated ROADMAP.md**: Added "Future Optimizations" section with Batch AST Visitors and Lazy Rule Instantiation as planned major refactors.
 
@@ -8356,8 +8262,7 @@ This release focuses on **significant performance improvements** for large codeb
 - **One-time parsing**: Pubspec.yaml is parsed once per project, not per file.
 - **Impact**: Eliminates redundant file I/O across 1400+ rules.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **Added performance tips to README**: Guidance on using lower tiers during development for faster iteration.
 - **Tier speed comparison**: Documented the performance impact of each tier level.
@@ -9188,8 +9093,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 **Fixes and refinements.**
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - **CI/CD**: Reverted example project to pure Dart (no Flutter SDK dependency) to fix CI failures caused by `dart pub get` requiring Flutter SDK. No action required.
 - **ROADMAP cleanup**: Removed 72 entries from ROADMAP.md that were already implemented (14 as aliases, 58 as rules). No action required.

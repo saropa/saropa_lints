@@ -66,6 +66,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.7] — Unreleased
+
+### Added
+
+- Process Health tooltip now shows an RSS trend arrow (↑ rising / → stable / ↓ falling) next to the saropa section header. A rising trend is an early memory-leak warning before the red threshold trips. Based on a 5-sample split-mean with a 10% change threshold. No action required.
+
+### Fixed
+
+- Fixed Process Health status bar falsely attributing system-wide Dart memory to saropa_lints. The red/yellow thresholds now evaluate saropa-owned process RSS only (scan daemon, CLI scans), not the aggregate of all Dart processes. A 12GB analysis server from another VS Code window no longer makes the saropa_lints indicator go red.
+- Process Health tooltip now shows a per-process breakdown: saropa-owned processes first (with health check), Flutter daemons, then other Dart processes as informational. Top 3 processes per category listed by RSS. Hints when multiple analysis servers are detected.
+- Fixed "Enable all recommended packs" button showing "no applicable rule packs detected" while the dashboard table correctly showed 87 detected packs. The button was using `computeConfigSuggestions` (which has early-return guards for missing dependency/config), while the table used `isPackDetected` directly. The button now uses the same detection path as the table.
+
+---
+
 ## [16.0.0-beta.6]
 
 Fixes a false-positive in the extension's l10n diagnostic provider and hardens the publish pipeline so CI-only test failures are caught locally before tagging. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.6/CHANGELOG.md)
@@ -84,8 +98,6 @@ Fixes a false-positive in the extension's l10n diagnostic provider and hardens t
 - Publish script: `create_git_tag` now prompts before moving a stale remote tag to HEAD on retry instead of hard-failing.
 - Publish script: `_find_workflow_run` skips already-failed runs so retry doesn't re-attach to old workflows.
 - Publish script: delta test pass now includes integrity and config test suites when rule/config files change, catching cross-cutting failures locally instead of deferring to CI.
-
-</details>
 
 ---
 
@@ -375,8 +387,7 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
   - `specify_unknown_enum_value` requires `unknownEnumValue` on `@JsonSerializable` enum fields (Comprehensive).
   - `use_compare_without_case` flags `toLowerCase() ==` patterns that should use `compareTo` (Pedantic).
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Extended the extension's Playwright visual-regression harness (`test/ux/generate-pages.ts`) to render the Home hub, two Rules & Tiers tabs, and both Project Map states, which previously had no rendered-HTML coverage at all. Added a `vscode.extensions.getExtension` stub to the shared test mock so the Rules & Tiers dashboard's manifest-driven settings tab can render outside a real VS Code host.
 - **Style-system migration: Full Audit report.** `audit/audit-report-styles.ts` now builds on `getDashboardChromeStyles()` (`.dash-hero`, `.chip-strip`/`.chip`, `.toolbar-band`/`.field`, `.btn`, `.dash-table`, `.empty-cta`) instead of a fully bespoke stylesheet — one of the three remaining parallel CSS systems the redesign plan re-deferred at Phases 5 and 7 (`plans/PLAN_extension_ui_redesign.md` §1.5). Only severity-tinted pills, baseline badges, and the deferred-load banner remain bespoke. Added the first-ever `audit-report` fixture to the Playwright UX harness. No markup IDs or client-script selectors changed, so `audit-report-script.ts` needed no edits.
@@ -401,8 +412,7 @@ Hardens the LSP server against normal editor traffic and adds a `doctor` command
 - **New `doctor` command** scans consumer project configuration for misplaced keys, missing custom file, and other issues that produce SDK warnings. Run `dart run saropa_lints doctor [directory]`.
 - **`--trace` flag for LSP server** enables verbose logging from startup without waiting for the editor to send `$/setTrace`. Useful for standalone debugging: `dart run saropa_lints:lsp_server --trace`.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Pre-commit hook now auto-regenerates category map and migration pack codes when rule files, tier definitions, or migration guides change — eliminates the recurring CI failures from stale generated indexes.
 - Closed `unsupported_option` bug for `rule_packs` and `log_level` — investigation confirmed the fix was already implemented; consumer projects just need to run `dart run saropa_lints migrate-config`.
@@ -425,8 +435,7 @@ Removed Phase 0 fake LSP test diagnostics that shipped in 15.2.10. The standalon
 
 - **`saropaLints.lspServer.enabled` now defaults to `false`.** Previously defaulted to `true`, which activated the fake LSP server for all users. No action required.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Regenerated category map and migration pack codes for 18 new rules added in 15.2.10 that were missing from the generated indexes.
 
@@ -467,8 +476,7 @@ Seventeen new lint rules across testing, equality, control flow, constructor sty
 - New quick fix for `always_put_doc_comments_before_annotations` — auto-moves misplaced `///` doc comments above all annotations with correct indentation. Supports bulk "Fix All" application across files.
 - New rule `prefer_doc_comment_after_annotations` (Stylistic) — inverse of `always_put_doc_comments_before_annotations`, for teams that prefer `///` doc comments adjacent to the declaration keyword rather than above annotations. Registered as a conflicting pair. Includes quick fix with bulk "Fix All" support.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Added doc-link validation to `.githooks/pre-commit` — broken or excluded-path links in shipped docs are now caught before commit, not just in CI.
 - Publish script now detects orphaned version bumps from aborted publishes at startup and offers to reset versions, preventing cascading state corruption.
@@ -518,8 +526,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Fixed 5 migration guides (`dcm`, `dart_code_linter`, `pyramid_lint`, `mad_lint`, `solid_lints`) that mapped a source rule to a saropa Dart *class* name (`NewlineBeforeReturnRule`) or a rule that never existed (`avoid_magic_numbers`) instead of the real rule codes (`prefer_blank_line_before_return`, `no_magic_number`). Every affected migration pack was silently missing that rule's coverage — the phantom code matched nothing.
 - Fixed `many_lints` migration pack referencing the removed rule `prefer_returning_shorthands` instead of its replacement `prefer_arrow_functions` — the pack was silently missing coverage for that rule.
 
-<details>
-<summary>Maintenance</summary>
+### Internal
 
 - Compiled alternative landscape gap analysis (`plans/GAP_ANALYSIS.md`) — rule-by-rule audit of 48 Dart/Flutter lint packages against saropa_lints' catalog, with gap themes and per-package detail sections for planning future rule additions.
 - Hardened dead-package language in migration guides for `accessibility_lint` (archived), `design_system_lints` (defunct since 2022), and `flutter_refactor_plugin` (source repo 404) — migration is mandatory, not optional.

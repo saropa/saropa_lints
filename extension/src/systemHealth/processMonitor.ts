@@ -32,25 +32,27 @@ export function readSystemHealthConfig(): SystemHealthConfig {
 /**
  * Classify a snapshot AND record why it was classified that way.
  *
+ * Thresholds are compared against saropa-owned RSS only (scan daemon, CLI
+ * scans) — NOT the system-wide Dart total. A 12 GB analysis server is not
+ * saropa_lints' fault and must not make the saropa_lints indicator red.
+ * The system-wide total is still shown in the tooltip as informational.
+ *
  * Memory is evaluated before orphans at each level so that when both trip,
  * the trigger reported is the one the numeric status-bar figure describes.
- * The trigger matters because orphan-driven Critical carries no meaningful
- * RSS number to show (see BUG: status bar shows CRITICAL RED for healthy
- * memory) — the caller needs to know which sentence to render.
  */
 export function assessHealth(
   snapshot: DartProcessSnapshot,
   config: SystemHealthConfig,
 ): HealthAssessment {
-  const rssGB = snapshot.totalRssBytes / BYTES_PER_GB;
+  // Only saropa-owned RSS drives the color — the fix for false attribution
+  // where external analysis servers made saropa_lints' status bar go red.
+  const rssGB = snapshot.saropaRssBytes / BYTES_PER_GB;
   // Both Flutter daemon and scan daemon orphans count toward the threshold.
   const orphans = snapshot.orphanedDaemonPids.length + snapshot.orphanedScanDaemonPids.length;
 
   if (rssGB >= config.criticalThresholdGB) {
     return { level: HealthLevel.Critical, trigger: HealthTrigger.Memory, orphanCount: orphans };
   }
-  // Critical orphan count with healthy RSS — this is the case that used to
-  // render a red badge around a tiny memory figure.
   if (orphans >= config.criticalOrphanCount) {
     return { level: HealthLevel.Critical, trigger: HealthTrigger.Orphans, orphanCount: orphans };
   }
@@ -78,17 +80,9 @@ export function classifyHealth(
  * Build the memory/system-health status-bar text for an assessment, or
  * undefined when there is nothing to report.
  *
- * The text must name the trigger. Always rendering an RSS figure meant an
- * orphan-driven Critical showed a healthy number in an alarming color, so
- * users investigated the memory reading instead of the orphaned daemons
- * that actually tripped the level. Orphan triggers therefore get their own
- * strings and never show bytes.
- *
- * For memory triggers the figure shown is the machine-wide Dart total,
- * because that is the number compared against the configured thresholds —
- * showing the smaller saropa-only RSS here would again put a number in
- * front of the user that does not explain the color. The saropa-only
- * breakdown stays in the tooltip.
+ * The text must name the trigger. Orphan triggers get their own strings
+ * and never show bytes. Memory triggers show the saropa-owned RSS — the
+ * number that actually tripped the threshold — not the system-wide total.
  */
 export function systemHealthStatusBarText(
   snapshot: DartProcessSnapshot,
@@ -104,7 +98,8 @@ export function systemHealthStatusBarText(
       : l10n('systemHealth.statusBar.warningOrphans', { count });
   }
 
-  const size = formatBytes(snapshot.totalRssBytes);
+  // Show saropa-owned RSS — this is what the thresholds compare against.
+  const size = formatBytes(snapshot.saropaRssBytes);
   return critical
     ? l10n('systemHealth.statusBar.critical', { size })
     : l10n('systemHealth.statusBar.warning', { size });
@@ -120,12 +115,51 @@ export type SnapshotListener = (
   assessment: HealthAssessment,
 ) => void;
 
+/** Trend direction for saropa-owned RSS over recent polls. */
+export const enum RssTrend {
+  /** Too few samples to determine a trend. */
+  Unknown = 'unknown',
+  /** RSS is growing across recent polls — possible leak. */
+  Rising = 'rising',
+  /** RSS is roughly stable. */
+  Stable = 'stable',
+  /** RSS is shrinking (e.g., cache eviction, process exit). */
+  Falling = 'falling',
+}
+
+/** Number of recent saropa RSS samples kept for trend detection. */
+const TREND_WINDOW = 5;
+
+/**
+ * A 10% relative change threshold — smaller fluctuations are noise from
+ * GC cycles and working-set jitter, not a meaningful trend.
+ */
+const TREND_THRESHOLD = 0.10;
+
+/**
+ * Pure trend computation: split the samples into an older and newer half,
+ * compare their averages, and classify the direction. Exported for testing.
+ */
+export function computeRssTrend(samples: readonly number[]): RssTrend {
+  if (samples.length < TREND_WINDOW) return RssTrend.Unknown;
+  const mid = Math.floor(samples.length / 2);
+  const oldAvg = samples.slice(0, mid).reduce((a, b) => a + b, 0) / mid;
+  const newAvg = samples.slice(mid).reduce((a, b) => a + b, 0) / (samples.length - mid);
+  if (oldAvg === 0) return RssTrend.Stable;
+  const delta = (newAvg - oldAvg) / oldAvg;
+  if (delta > TREND_THRESHOLD) return RssTrend.Rising;
+  if (delta < -TREND_THRESHOLD) return RssTrend.Falling;
+  return RssTrend.Stable;
+}
+
 export class ProcessMonitor implements vscode.Disposable {
   private timer: ReturnType<typeof setInterval> | undefined;
   private lastNotificationTime = 0;
   private disposed = false;
   private readonly listeners: SnapshotListener[] = [];
   private lastSnapshot: DartProcessSnapshot | undefined;
+  /** Ring buffer of recent saropa RSS values for trend detection. */
+  private readonly saropaRssHistory: number[] = [];
 
   start(): void {
     if (this.disposed) return;
@@ -153,12 +187,22 @@ export class ProcessMonitor implements vscode.Disposable {
     return this.lastSnapshot;
   }
 
+  /** Delegates to the pure computeRssTrend with the internal ring buffer. */
+  getSaropaTrend(): RssTrend {
+    return computeRssTrend(this.saropaRssHistory);
+  }
+
   private async poll(): Promise<void> {
     if (this.disposed) return;
     try {
       const processes = await queryDartProcesses();
       const snapshot = await buildSnapshot(processes);
       this.lastSnapshot = snapshot;
+      // Record saropa RSS for trend detection (ring buffer).
+      this.saropaRssHistory.push(snapshot.saropaRssBytes);
+      if (this.saropaRssHistory.length > TREND_WINDOW) {
+        this.saropaRssHistory.shift();
+      }
       const config = readSystemHealthConfig();
       const assessment = assessHealth(snapshot, config);
 
@@ -177,7 +221,8 @@ export class ProcessMonitor implements vscode.Disposable {
     if (now - this.lastNotificationTime < 5 * 60 * 1000) return;
     this.lastNotificationTime = now;
 
-    const size = formatBytes(snapshot.totalRssBytes);
+    // Show saropa-owned RSS in the notification — consistent with status bar.
+    const size = formatBytes(snapshot.saropaRssBytes);
     // Include both Flutter daemon and scan daemon orphans in the count.
     const totalOrphans = snapshot.orphanedDaemonPids.length + snapshot.orphanedScanDaemonPids.length;
     const orphaned = String(totalOrphans);

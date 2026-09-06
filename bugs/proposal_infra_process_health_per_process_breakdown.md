@@ -1,6 +1,6 @@
 # PROPOSAL: Process Health — fix false attribution and non-actionable red alarm
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-06
 Type: Tooling / Infrastructure
@@ -117,20 +117,35 @@ When Process Health detects Dart processes whose parent VS Code window no longer
 
 ## Decision
 
-<!-- Fill in when the proposal is accepted or declined -->
+Accepted and implemented 2026-09-06. Core scope only — stretch goals (RSS sparkline, kill-orphans action) deferred to separate proposals.
 
 ---
 
 ## Implementation Notes
 
-<!-- Fill in when work begins -->
+### What changed
 
-### Assumptions to verify before implementing
+1. **`assessHealth()` thresholds on `saropaRssBytes` only** (`processMonitor.ts:41-64`). The 4GB/6GB warning/critical thresholds now compare saropa-owned process RSS (scan daemon, CLI scans), not the system-wide Dart total. A 12GB analysis server no longer makes the saropa_lints status bar go red.
 
-- **Tooltip rendering constraints**: VS Code hover tooltips have a max width and may truncate long content. Confirm whether a multi-line per-process breakdown fits, or whether a click-to-expand panel is needed for the detail view.
-- **Process enumeration API**: Confirm whether the extension already enumerates Dart processes internally (for the current aggregate count) and whether command-line parsing is available, or whether new `child_process.exec` / `tasklist` / `ps` calls are needed.
-- **Red threshold for owned processes**: The scan daemon at 2.9GB may be normal for large projects. Before setting a threshold, profile scan daemon RSS across a range of project sizes (500, 2000, 4000+ files) to distinguish "expected" from "leak."
-- **Platform differences**: Process enumeration and command-line retrieval differ across Windows (`wmic`/`tasklist`), macOS (`ps`), and Linux (`/proc`). The current aggregate likely already handles this — confirm before extending.
+2. **Status bar text shows saropa RSS** (`processMonitor.ts:93-111`). Memory-triggered warnings/criticals display the saropa-owned figure — the number that actually tripped the threshold.
+
+3. **Per-process tooltip breakdown** (`extension.ts:1171-1245`). The tooltip now shows three sections:
+   - **Saropa Lints** — owned process count and RSS, with top 3 by RSS listed individually. Shows a ✓ when healthy.
+   - **Flutter daemons** — count and orphan status (unchanged).
+   - **Other Dart processes** — informational only (never red). Top 3 listed individually. Hints when 2+ analysis servers detected ("close unused VS Code windows").
+
+4. **Process labeling** (`processQuery.ts:140-168`). New `processLabel()` function parses command lines into human-readable labels: "scan daemon", "analysis server", "analysis server (no heap cap)", "Flutter daemon", "frontend compiler", "build runner", "dart process".
+
+5. **`DartProcessSnapshot.processes` field** (`types.ts`). The full process list is now carried in the snapshot so the tooltip can render per-process detail without re-querying.
+
+6. **New test** (`statusBarSeverity.test.ts`). Pins the false-attribution fix: 12GB `totalRssBytes` with 29MB `saropaRssBytes` must remain Healthy.
+
+### Assumptions verified
+
+- **Process enumeration**: already existed via `queryDartProcesses()` with full command-line parsing. No new shell calls needed.
+- **Tooltip rendering**: VS Code hover tooltips support multi-line plain text. The per-process lines are indented and truncated to short labels, fitting within standard tooltip width.
+- **Platform**: process enumeration is Windows-only (`process.platform !== 'win32'` returns empty). No cross-platform changes needed — the tooltip gracefully shows nothing when no processes are enumerated.
+- **Red threshold for owned processes**: existing 4GB/6GB defaults kept. Profiling scan daemon RSS across project sizes remains an open question (see Open Questions §1) — the threshold can be tuned via `saropaLints.systemHealth.warningThresholdGB` / `criticalThresholdGB` settings.
 
 ---
 

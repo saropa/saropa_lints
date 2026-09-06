@@ -682,12 +682,16 @@
       "openHint": "Click to open Process Health"
     },
     "tooltip": {
-      "processCount": "Dart processes: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} process(es) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} process(es) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} process(es) ({size} RSS) ✓",
+      "otherSection": "Other Dart processes: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} analysis server(s) detected — close unused VS Code windows",
       "daemonCount": "Flutter daemons: {total} ({orphaned} orphaned)",
       "scanDaemonOrphans": "Orphaned scan daemons: {count} — use Clean Up to kill",
-      "warningHint": "Memory usage is high — click for details",
-      "criticalHint": "Memory usage is critical — clean up recommended"
+      "warningHint": "Saropa memory is high — click for details",
+      "criticalHint": "Saropa memory is critical — clean up recommended"
     },
     "notification": {
       "critical": "Dart processes are using {size} with {orphaned} orphaned daemons. Clean up?",
