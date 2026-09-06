@@ -282,7 +282,9 @@ export class ProcessMonitor implements vscode.Disposable {
 
     void vscode.window.showInformationMessage(msg, openPanel, dismiss).then((choice) => {
       if (choice === openPanel) {
-        void vscode.commands.executeCommand('saropaLints.showHealthPanel');
+        // Must match the registered command in extension.ts — saropaLints.showHealthPanel
+        // was never registered, causing the button to silently no-op.
+        void vscode.commands.executeCommand('saropaLints.showProcessHealth');
       }
     });
   }

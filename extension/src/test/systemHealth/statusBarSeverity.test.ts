@@ -23,6 +23,8 @@ import {
 import {
   detectMonotonicGrowth,
   isAnalysisServerProcess,
+  isDaemonProcess,
+  isSaropaProcess,
   processLabel,
   renderSparkline,
   truncateLabel,
@@ -432,5 +434,58 @@ describe('detectMonotonicGrowth — memory leak detection', () => {
     // First 5 are falling, but the last 10 are rising.
     const samples = [500, 400, 300, 200, 100, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     assert.strictEqual(detectMonotonicGrowth(samples), true);
+  });
+});
+
+// ── Partition exhaustiveness ──
+// The tooltip groups processes into saropa / daemon / other. These filters
+// must be mutually exclusive (no double-counting) and collectively exhaustive
+// (no process slips through). If a new entry point is added to saropa_lints
+// or the Dart SDK renames a binary, these tests catch the classification gap.
+
+describe('process category partition — mutual exclusivity', () => {
+  /** Helper: build a minimal DartProcessInfo with the given command line. */
+  function proc(commandLine: string): DartProcessInfo {
+    return { processId: 1, parentProcessId: 0, workingSetSize: 100, creationDate: '', commandLine };
+  }
+
+  it('saropa scan daemon is saropa but NOT a Flutter daemon', () => {
+    // The scan daemon's command line should never match isDaemonProcess
+    // because it lacks flutter_tools.snapshot.
+    const p = proc('dart run saropa_lints:scan_daemon --port=1234');
+    assert.strictEqual(isSaropaProcess(p), true);
+    assert.strictEqual(isDaemonProcess(p), false);
+  });
+
+  it('saropa CLI scan is saropa but NOT a Flutter daemon', () => {
+    const p = proc('dart run saropa_lints:scan . --tier comprehensive');
+    assert.strictEqual(isSaropaProcess(p), true);
+    assert.strictEqual(isDaemonProcess(p), false);
+  });
+
+  it('Flutter daemon is a daemon but NOT saropa', () => {
+    const p = proc('dart flutter_tools.snapshot daemon --port=1234');
+    assert.strictEqual(isDaemonProcess(p), true);
+    assert.strictEqual(isSaropaProcess(p), false);
+  });
+
+  it('analysis server is neither saropa nor daemon', () => {
+    const p = proc('dart language-server --protocol=lsp');
+    assert.strictEqual(isSaropaProcess(p), false);
+    assert.strictEqual(isDaemonProcess(p), false);
+    assert.strictEqual(isAnalysisServerProcess(p), true);
+  });
+
+  it('unrelated dart process is neither saropa nor daemon', () => {
+    const p = proc('dart run build_runner build');
+    assert.strictEqual(isSaropaProcess(p), false);
+    assert.strictEqual(isDaemonProcess(p), false);
+  });
+
+  it('empty command line matches no category', () => {
+    const p = proc('');
+    assert.strictEqual(isSaropaProcess(p), false);
+    assert.strictEqual(isDaemonProcess(p), false);
+    assert.strictEqual(isAnalysisServerProcess(p), false);
   });
 });

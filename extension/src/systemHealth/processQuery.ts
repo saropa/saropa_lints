@@ -4,6 +4,28 @@ import type { DartProcessInfo, DartProcessSnapshot } from './types';
 const BYTES_PER_GB = 1_073_741_824;
 const MAX_BUFFER = 4 * 1024 * 1024;
 
+// ── Process classification markers ──
+// Centralised so that isDaemonProcess, isSaropaProcess, processLabel, and the
+// tooltip partition filter all match on the same strings. If the Dart SDK or
+// saropa_lints renames a binary, update these constants — not every callsite.
+
+/** Substring present in every Flutter daemon command line. */
+const FLUTTER_TOOLS_MARKER = 'flutter_tools.snapshot';
+/** Saropa scan daemon entry point — the long-lived background worker. */
+const SAROPA_SCAN_DAEMON_MARKER = 'saropa_lints:scan_daemon';
+/** Saropa CLI scan entry point (one-shot scan, not the daemon). */
+const SAROPA_SCAN_MARKER = 'saropa_lints:scan';
+/** Generic saropa_lints marker — matches daemon, scan, and any future entry point. */
+const SAROPA_PACKAGE_MARKER = 'saropa_lints';
+/** Current Dart LSP binary name. */
+const ANALYSIS_SERVER_LSP_BINARY = 'language-server';
+/** Legacy/snapshot-based analysis server invocation. */
+const ANALYSIS_SERVER_SNAPSHOT = 'analysis_server';
+/** Protocol flag that identifies an analysis server regardless of binary name. */
+const ANALYSIS_SERVER_PROTOCOL_FLAG = '--protocol=lsp';
+/** Flag that caps the analysis server's old-gen heap. */
+const HEAP_CAP_FLAG = '--old_gen_heap_size';
+
 export function formatBytes(bytes: number): string {
   if (bytes >= BYTES_PER_GB) {
     return `${(bytes / BYTES_PER_GB).toFixed(1)}G`;
@@ -115,7 +137,7 @@ function isParentAlive(
 
 export function isDaemonProcess(p: DartProcessInfo): boolean {
   const cmd = p.commandLine ?? '';
-  if (!cmd.includes('flutter_tools.snapshot')) return false;
+  if (!cmd.includes(FLUTTER_TOOLS_MARKER)) return false;
   // Match "daemon" as a standalone argument, not as a substring of
   // unrelated tokens like "dart_tooling_daemon".
   return /\bdaemon\b/.test(cmd);
@@ -130,20 +152,21 @@ export function isDaemonProcess(p: DartProcessInfo): boolean {
  */
 export function isAnalysisServerProcess(p: DartProcessInfo): boolean {
   const cmd = p.commandLine ?? '';
-  return cmd.includes('language-server')
-    || cmd.includes('analysis_server')
-    || cmd.includes('--protocol=lsp');
+  return cmd.includes(ANALYSIS_SERVER_LSP_BINARY)
+    || cmd.includes(ANALYSIS_SERVER_SNAPSHOT)
+    || cmd.includes(ANALYSIS_SERVER_PROTOCOL_FLAG);
 }
 
 /** True when the process is a saropa_lints scan daemon or CLI scan. */
 export function isSaropaProcess(p: DartProcessInfo): boolean {
   const cmd = p.commandLine ?? '';
-  return cmd.includes('saropa_lints:scan_daemon') || cmd.includes('saropa_lints:scan');
+  // Daemon check first — its marker is a superset of the scan marker.
+  return cmd.includes(SAROPA_SCAN_DAEMON_MARKER) || cmd.includes(SAROPA_SCAN_MARKER);
 }
 
 /** True when the process is specifically the long-lived scan daemon. */
 export function isScanDaemonProcess(p: DartProcessInfo): boolean {
-  return (p.commandLine ?? '').includes('saropa_lints:scan_daemon');
+  return (p.commandLine ?? '').includes(SAROPA_SCAN_DAEMON_MARKER);
 }
 
 /**
@@ -165,18 +188,18 @@ const MAX_LABEL_LENGTH = 30;
 export function processLabel(p: DartProcessInfo): string {
   const cmd = p.commandLine ?? '';
   // Saropa-owned processes — most specific matches first.
-  if (cmd.includes('saropa_lints:scan_daemon')) return 'scan daemon';
-  if (cmd.includes('saropa_lints:scan')) return 'scan CLI';
-  if (cmd.includes('saropa_lints')) return 'saropa_lints';
+  if (cmd.includes(SAROPA_SCAN_DAEMON_MARKER)) return 'scan daemon';
+  if (cmd.includes(SAROPA_SCAN_MARKER)) return 'scan CLI';
+  if (cmd.includes(SAROPA_PACKAGE_MARKER)) return 'saropa_lints';
   // Dart analysis server — delegate detection to the shared predicate.
   if (isAnalysisServerProcess(p)) {
     // Flag uncapped heap — an uncapped server can grow without bound and
     // is the single most common cause of high system-wide Dart RSS.
-    const capped = cmd.includes('--old_gen_heap_size');
+    const capped = cmd.includes(HEAP_CAP_FLAG);
     return capped ? 'analysis server' : 'analysis server (no heap cap)';
   }
   // Flutter daemon (long-lived tooling process).
-  if (cmd.includes('flutter_tools.snapshot') && /\bdaemon\b/.test(cmd)) {
+  if (cmd.includes(FLUTTER_TOOLS_MARKER) && /\bdaemon\b/.test(cmd)) {
     return 'Flutter daemon';
   }
   // Build-related processes.

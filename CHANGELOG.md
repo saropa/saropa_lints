@@ -86,11 +86,14 @@ Process Health status bar and tooltip now isolate saropa-owned memory from syste
 
 ### Internal
 
+- Hardened `add_resolution_workspace` quick fix: re-verifies `resolution: workspace` absence before inserting (guards against stale diagnostics and batch "fix all" duplicates), added trailing-newline guard when inserting after the environment block, and tolerates blank lines inside the environment block. The detection regex now also accepts quoted forms (`"workspace"` / `'workspace'`). Added 22 behavioral tests covering the resolution regex, workspace member parsing (block/flow style, comments, early termination), and workspace root detection (membership, ancestor walk, example/ false-positive guard, Windows case-insensitive paths).
 - Hardened Process Health tooltip: process labels truncated at 30 chars for width safety, analysis server detection broadened with `--protocol=lsp` for future binary rename resilience, ✓/↑ conflict resolved (rising trend suppresses the healthy checkmark to avoid mixed signals), and partition assertion added to catch filter coupling drift.
 - Expanded RSS history ring buffer from 5 to 30 samples for sparkline rendering while preserving trend computation on the most recent 5.
 - Added monotonic growth detector as a pure function with 8/10 threshold — fires a one-time informational toast directing the user to the health panel.
 - Hardened sparkline renderer to use reduce loops instead of spread for stack safety, and ProcessMonitor returns a defensive copy of the RSS history buffer.
-- Added 33 tests: `processLabel` (9), `isAnalysisServerProcess` (4), `truncateLabel` (5), RSS trend boundary (2), `renderSparkline` (6), `detectMonotonicGrowth` (7). Total systemHealth suite: 78 tests.
+- Added 39 tests: `processLabel` (9), `isAnalysisServerProcess` (4), `truncateLabel` (5), RSS trend boundary (2), `renderSparkline` (6), `detectMonotonicGrowth` (7), process category partition (6). Total systemHealth suite: 84 tests.
+- Fixed leak detection "Open Health Panel" button silently no-oping because it called unregistered command `showHealthPanel` instead of the registered `showProcessHealth`.
+- Extracted process classification markers (Flutter daemon, saropa scan, analysis server) to named constants so all predicates and `processLabel` match on a single source of truth.
 - Extracted `getDetectedPackIds` in `rulePackDefinitions.ts` as the single source of truth for pack applicability. The dashboard table and "Enable all" button both call it instead of inlining `isPackDetected` filters independently.
 - Replaced the collapsed HTML Maintenance expander changelog convention with a `### Internal` heading, enforced by a pre-commit hook and a publish-time gate. No action required.
 
