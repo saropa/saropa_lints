@@ -8,23 +8,93 @@ const MAX_BUFFER = 4 * 1024 * 1024;
 // Centralised so that isDaemonProcess, isSaropaProcess, processLabel, and the
 // tooltip partition filter all match on the same strings. If the Dart SDK or
 // saropa_lints renames a binary, update these constants — not every callsite.
+// Exported so tests can verify substring containment invariants directly.
 
 /** Substring present in every Flutter daemon command line. */
-const FLUTTER_TOOLS_MARKER = 'flutter_tools.snapshot';
+export const FLUTTER_TOOLS_MARKER = 'flutter_tools.snapshot';
 /** Saropa scan daemon entry point — the long-lived background worker. */
-const SAROPA_SCAN_DAEMON_MARKER = 'saropa_lints:scan_daemon';
+export const SAROPA_SCAN_DAEMON_MARKER = 'saropa_lints:scan_daemon';
 /** Saropa CLI scan entry point (one-shot scan, not the daemon). */
-const SAROPA_SCAN_MARKER = 'saropa_lints:scan';
+export const SAROPA_SCAN_MARKER = 'saropa_lints:scan';
 /** Generic saropa_lints marker — matches daemon, scan, and any future entry point. */
-const SAROPA_PACKAGE_MARKER = 'saropa_lints';
+export const SAROPA_PACKAGE_MARKER = 'saropa_lints';
 /** Current Dart LSP binary name. */
-const ANALYSIS_SERVER_LSP_BINARY = 'language-server';
+export const ANALYSIS_SERVER_LSP_BINARY = 'language-server';
 /** Legacy/snapshot-based analysis server invocation. */
-const ANALYSIS_SERVER_SNAPSHOT = 'analysis_server';
+export const ANALYSIS_SERVER_SNAPSHOT = 'analysis_server';
 /** Protocol flag that identifies an analysis server regardless of binary name. */
-const ANALYSIS_SERVER_PROTOCOL_FLAG = '--protocol=lsp';
+export const ANALYSIS_SERVER_PROTOCOL_FLAG = '--protocol=lsp';
 /** Flag that caps the analysis server's old-gen heap. */
-const HEAP_CAP_FLAG = '--old_gen_heap_size';
+export const HEAP_CAP_FLAG = '--old_gen_heap_size';
+
+/**
+ * Tooltip partition categories. Every dart process falls into exactly one.
+ * The enum drives classifyProcess(), and the boolean predicates
+ * (isSaropaProcess, isDaemonProcess) delegate to it — so the ordering
+ * logic lives in one place rather than being duplicated and driftable.
+ */
+export const enum ProcessCategory {
+  /** saropa_lints scan daemon or CLI scan. */
+  Saropa = 'saropa',
+  /** Flutter daemon (flutter_tools.snapshot + \bdaemon\b). */
+  Daemon = 'daemon',
+  /** Dart analysis server (LSP binary, snapshot, or protocol flag). */
+  AnalysisServer = 'analysisServer',
+  /** Any other dart process (build runner, frontend compiler, etc.). */
+  Other = 'other',
+}
+
+/** Result of classifyProcess — the category plus a human-readable label. */
+export interface ProcessClassification {
+  /** Which tooltip section this process belongs to. */
+  readonly category: ProcessCategory;
+  /** Short human-readable label for tooltip display. */
+  readonly label: string;
+}
+
+/**
+ * Single source of truth for process classification. Every predicate and
+ * processLabel delegates here, so the match ordering (most-specific first)
+ * is enforced in one place. The ordering invariant:
+ *   SAROPA_SCAN_DAEMON_MARKER before SAROPA_SCAN_MARKER (daemon is a
+ *   superset: "saropa_lints:scan_daemon" contains "saropa_lints:scan").
+ */
+export function classifyProcess(p: DartProcessInfo): ProcessClassification {
+  const cmd = p.commandLine ?? '';
+  // Saropa-owned — most specific marker first because scan_daemon
+  // contains the scan marker as a prefix.
+  if (cmd.includes(SAROPA_SCAN_DAEMON_MARKER)) {
+    return { category: ProcessCategory.Saropa, label: 'scan daemon' };
+  }
+  if (cmd.includes(SAROPA_SCAN_MARKER)) {
+    return { category: ProcessCategory.Saropa, label: 'scan CLI' };
+  }
+  if (cmd.includes(SAROPA_PACKAGE_MARKER)) {
+    return { category: ProcessCategory.Saropa, label: 'saropa_lints' };
+  }
+  // Analysis server — multiple patterns to survive binary renames.
+  if (cmd.includes(ANALYSIS_SERVER_LSP_BINARY)
+    || cmd.includes(ANALYSIS_SERVER_SNAPSHOT)
+    || cmd.includes(ANALYSIS_SERVER_PROTOCOL_FLAG)) {
+    const capped = cmd.includes(HEAP_CAP_FLAG);
+    return {
+      category: ProcessCategory.AnalysisServer,
+      label: capped ? 'analysis server' : 'analysis server (no heap cap)',
+    };
+  }
+  // Flutter daemon — requires flutter_tools.snapshot AND word-boundary "daemon".
+  if (cmd.includes(FLUTTER_TOOLS_MARKER) && /\bdaemon\b/.test(cmd)) {
+    return { category: ProcessCategory.Daemon, label: 'Flutter daemon' };
+  }
+  // Build-related processes fall through to Other with specific labels.
+  if (cmd.includes('frontend_server') || cmd.includes('frontend_compiler')) {
+    return { category: ProcessCategory.Other, label: 'frontend compiler' };
+  }
+  if (cmd.includes('build_runner')) {
+    return { category: ProcessCategory.Other, label: 'build runner' };
+  }
+  return { category: ProcessCategory.Other, label: 'dart process' };
+}
 
 export function formatBytes(bytes: number): string {
   if (bytes >= BYTES_PER_GB) {
@@ -135,33 +205,19 @@ function isParentAlive(
   return parentTs < daemonTs;
 }
 
+/** Delegates to classifyProcess — true for flutter_tools.snapshot + daemon. */
 export function isDaemonProcess(p: DartProcessInfo): boolean {
-  const cmd = p.commandLine ?? '';
-  if (!cmd.includes(FLUTTER_TOOLS_MARKER)) return false;
-  // Match "daemon" as a standalone argument, not as a substring of
-  // unrelated tokens like "dart_tooling_daemon".
-  return /\bdaemon\b/.test(cmd);
+  return classifyProcess(p).category === ProcessCategory.Daemon;
 }
 
-/**
- * True when the process is a Dart analysis server. Matches multiple
- * patterns to survive Dart SDK binary renames:
- * - `language-server` (current LSP binary name)
- * - `analysis_server` (snapshot-based invocation)
- * - `--protocol=lsp` (protocol flag present regardless of binary name)
- */
+/** Delegates to classifyProcess — true for any analysis server variant. */
 export function isAnalysisServerProcess(p: DartProcessInfo): boolean {
-  const cmd = p.commandLine ?? '';
-  return cmd.includes(ANALYSIS_SERVER_LSP_BINARY)
-    || cmd.includes(ANALYSIS_SERVER_SNAPSHOT)
-    || cmd.includes(ANALYSIS_SERVER_PROTOCOL_FLAG);
+  return classifyProcess(p).category === ProcessCategory.AnalysisServer;
 }
 
-/** True when the process is a saropa_lints scan daemon or CLI scan. */
+/** Delegates to classifyProcess — true for any saropa_lints entry point. */
 export function isSaropaProcess(p: DartProcessInfo): boolean {
-  const cmd = p.commandLine ?? '';
-  // Daemon check first — its marker is a superset of the scan marker.
-  return cmd.includes(SAROPA_SCAN_DAEMON_MARKER) || cmd.includes(SAROPA_SCAN_MARKER);
+  return classifyProcess(p).category === ProcessCategory.Saropa;
 }
 
 /** True when the process is specifically the long-lived scan daemon. */
@@ -178,37 +234,10 @@ const MAX_LABEL_LENGTH = 30;
 
 /**
  * Derive a short human-readable label from a dart process command line.
- * Used in the tooltip per-process breakdown so users can identify what
- * each process is without reading raw command strings.
- *
- * Known labels are all static strings well under MAX_LABEL_LENGTH.
- * The guard exists for the fallback path where an unrecognized process
- * might produce a longer label in a future extension of this function.
+ * Delegates to classifyProcess so the match ordering is never duplicated.
  */
 export function processLabel(p: DartProcessInfo): string {
-  const cmd = p.commandLine ?? '';
-  // Saropa-owned processes — most specific matches first.
-  if (cmd.includes(SAROPA_SCAN_DAEMON_MARKER)) return 'scan daemon';
-  if (cmd.includes(SAROPA_SCAN_MARKER)) return 'scan CLI';
-  if (cmd.includes(SAROPA_PACKAGE_MARKER)) return 'saropa_lints';
-  // Dart analysis server — delegate detection to the shared predicate.
-  if (isAnalysisServerProcess(p)) {
-    // Flag uncapped heap — an uncapped server can grow without bound and
-    // is the single most common cause of high system-wide Dart RSS.
-    const capped = cmd.includes(HEAP_CAP_FLAG);
-    return capped ? 'analysis server' : 'analysis server (no heap cap)';
-  }
-  // Flutter daemon (long-lived tooling process).
-  if (cmd.includes(FLUTTER_TOOLS_MARKER) && /\bdaemon\b/.test(cmd)) {
-    return 'Flutter daemon';
-  }
-  // Build-related processes.
-  if (cmd.includes('frontend_server') || cmd.includes('frontend_compiler')) {
-    return 'frontend compiler';
-  }
-  if (cmd.includes('build_runner')) return 'build runner';
-  // Fallback — generic label, truncated for tooltip width safety.
-  return 'dart process';
+  return classifyProcess(p).label;
 }
 
 /** Truncate a process label if it exceeds tooltip width constraints. */

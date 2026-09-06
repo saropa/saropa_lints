@@ -49,23 +49,35 @@ Health Panel" button called `saropaLints.showHealthPanel`, a command that was
 never registered. The registered command is `saropaLints.showProcessHealth`.
 Fixed the command ID — clicking the button now opens the correct panel.
 
-**Process classification constants (`processQuery.ts`):** Hardcoded process
-marker strings (`flutter_tools.snapshot`, `saropa_lints:scan_daemon`,
-`language-server`, etc.) were duplicated across `isDaemonProcess`,
-`isSaropaProcess`, `isScanDaemonProcess`, `isAnalysisServerProcess`, and
-`processLabel`. Extracted to 8 named constants so all callsites match on a
-single source of truth. If the Dart SDK or saropa_lints renames a binary,
-one constant update propagates everywhere.
+**`classifyProcess()` discriminated union (`processQuery.ts`):** Introduced
+`ProcessCategory` enum (`Saropa`, `Daemon`, `AnalysisServer`, `Other`) and
+`classifyProcess()` returning `{ category, label }`. This replaces the
+duplicated predicate chains — `isSaropaProcess`, `isDaemonProcess`,
+`isAnalysisServerProcess`, and `processLabel` now all delegate to it. The
+match ordering (most-specific marker first) lives in one place rather than
+being duplicated across 4 functions where it could drift. Marker constants
+exported so tests can verify the substring containment invariant directly.
 
-**Partition exhaustiveness tests (`statusBarSeverity.test.ts`):** Added 6 tests
-verifying that the three tooltip process categories (saropa, daemon, other) are
-mutually exclusive. Covers: scan daemon is saropa but not daemon, CLI scan is
-saropa but not daemon, Flutter daemon is daemon but not saropa, analysis server
-is neither, unrelated dart process is neither, empty command line matches
-nothing. Suite total: 84 tests.
+**Single-pass tooltip partition (`extension.ts`):** `buildProcessTooltipLines`
+now classifies each process once via `classifyProcess()` and routes it to the
+correct bucket, replacing 3 independent `filter()` passes plus a runtime
+`console.warn` partition assertion. The partition is now structurally correct
+— the enum is exhaustive, so no process can fall through.
+
+**Marker substring containment test:** Added a test asserting that
+`SAROPA_SCAN_DAEMON_MARKER` starts with `SAROPA_SCAN_MARKER`. This invariant
+is load-bearing: `classifyProcess` tests daemon marker first because it
+contains the scan marker as a prefix. If someone renames one without the
+other, this test breaks before the misclassification ships.
+
+**Test suite expansion (`statusBarSeverity.test.ts`):** 90 tests total:
+8 `classifyProcess` discriminated union tests (category + label for each
+process type), 3 mutual exclusivity tests (boolean predicates agree with
+`classifyProcess`), 1 marker substring containment invariant, plus the
+existing 78.
 
 ### Verification
 
-Both typechecks clean. 84/84 mocha tests passing. Code review (low) found zero
-issues in the changed files. The pre-commit hook staging contamination was
-diagnosed as a multi-session overlap issue requiring no hook modification.
+Both typechecks clean. 90/90 mocha tests passing. Code review (low) found zero
+issues in the changed extension files. The pre-commit hook staging contamination
+was diagnosed as a multi-session overlap issue requiring no hook modification.

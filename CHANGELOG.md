@@ -92,9 +92,9 @@ Process Health status bar and tooltip now isolate saropa-owned memory from syste
 - Expanded RSS history ring buffer from 5 to 30 samples for sparkline rendering while preserving trend computation on the most recent 5.
 - Added monotonic growth detector as a pure function with 8/10 threshold — fires a one-time informational toast directing the user to the health panel.
 - Hardened sparkline renderer to use reduce loops instead of spread for stack safety, and ProcessMonitor returns a defensive copy of the RSS history buffer.
-- Added 39 tests: `processLabel` (9), `isAnalysisServerProcess` (4), `truncateLabel` (5), RSS trend boundary (2), `renderSparkline` (6), `detectMonotonicGrowth` (7), process category partition (6). Total systemHealth suite: 84 tests.
+- Added `classifyProcess()` as a discriminated union (`ProcessCategory` + label) replacing the duplicated predicate chains across tooltip, snapshot, and label functions. Boolean predicates (`isSaropaProcess`, `isDaemonProcess`, `isAnalysisServerProcess`) now delegate to it, and the tooltip builder uses a single-pass partition instead of three independent filter passes with a runtime assertion.
 - Fixed leak detection "Open Health Panel" button silently no-oping because it called unregistered command `showHealthPanel` instead of the registered `showProcessHealth`.
-- Extracted process classification markers (Flutter daemon, saropa scan, analysis server) to named constants so all predicates and `processLabel` match on a single source of truth.
+- Added 45 tests total in the systemHealth suite (90 passing): `classifyProcess` discriminated union (8), process partition mutual exclusivity (3), marker substring containment invariant (1), plus the existing `processLabel` (9), `isAnalysisServerProcess` (4), `truncateLabel` (5), RSS trend boundary (2), `renderSparkline` (6), `detectMonotonicGrowth` (7).
 - Extracted `getDetectedPackIds` in `rulePackDefinitions.ts` as the single source of truth for pack applicability. The dashboard table and "Enable all" button both call it instead of inlining `isPackDetected` filters independently.
 - Replaced the collapsed HTML Maintenance expander changelog convention with a `### Internal` heading, enforced by a pre-commit hook and a publish-time gate. No action required.
 

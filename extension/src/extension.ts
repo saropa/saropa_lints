@@ -155,12 +155,12 @@ import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMAN
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor, RssTrend, systemHealthStatusBarText } from './systemHealth/processMonitor';
-import { formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, processLabel, renderSparkline, truncateLabel } from './systemHealth/processQuery';
+import { classifyProcess, formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, ProcessCategory, processLabel, renderSparkline, truncateLabel } from './systemHealth/processQuery';
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
 import { registerOrphanPreflight } from './systemHealth/orphanPreflight';
 import { HealthPanel } from './systemHealth/healthPanel';
 import { HealthLevel } from './systemHealth/types';
-import type { DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
+import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
@@ -1158,10 +1158,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
    * saropa-owned (health-colored), Flutter daemons, and other Dart
    * processes (informational only). Top 3 by RSS shown per section.
    *
-   * COUPLING: the "other" filter excludes processes matched by
-   * isSaropaProcess and isDaemonProcess. If a new process category
-   * gets its own section, add it to the "other" exclusion filter
-   * here to avoid double-counting.
+   * Uses classifyProcess for a single-pass partition — the enum is
+   * exhaustive, so adding a new ProcessCategory without handling it
+   * here is a compile-time error (if the switch is kept exhaustive).
    */
   function buildProcessTooltipLines(
     snap: DartProcessSnapshot,
@@ -1171,11 +1170,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   ): string[] {
     const lines: string[] = [];
 
+    // Single-pass partition — each process is classified once and lands
+    // in exactly one bucket. No runtime assertion needed because the
+    // classifyProcess enum is exhaustive.
+    const saropaProcs: DartProcessInfo[] = [];
+    const daemonProcs: DartProcessInfo[] = [];
+    const otherProcs: DartProcessInfo[] = [];
+    for (const p of snap.processes) {
+      const cat = classifyProcess(p).category;
+      if (cat === ProcessCategory.Saropa) saropaProcs.push(p);
+      else if (cat === ProcessCategory.Daemon) daemonProcs.push(p);
+      // AnalysisServer and Other both go in the "other" tooltip section.
+      else otherProcs.push(p);
+    }
+
     // --- Saropa-owned section (colored by health level) ---
-    // Derive count from the filtered array (single source of truth) rather
-    // than the snapshot scalar, which could diverge if isSaropaProcess and
-    // buildSnapshot's classification ever drift apart.
-    const saropaProcs = snap.processes.filter(isSaropaProcess);
     const saropaRss = saropaProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
     const isHealthy = assessment.level === HealthLevel.Healthy;
     // When trend is rising, suppress the ✓ — a rising arrow next to a check
@@ -1218,20 +1227,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }
 
     // --- Other Dart processes (informational, never red) ---
-    // Uses isDaemonProcess (the same predicate the daemon section uses) so
-    // no process falls through the cracks between the two filters.
-    const daemonProcs = snap.processes.filter(isDaemonProcess);
-    const otherProcs = snap.processes.filter((p) => !isSaropaProcess(p) && !isDaemonProcess(p));
-    // Partition assertion: every process must land in exactly one section.
-    // A mismatch means a new category was added without updating the
-    // "other" exclusion filter — catch it during development, not in prod.
-    const partitionTotal = saropaProcs.length + daemonProcs.length + otherProcs.length;
-    if (partitionTotal !== snap.processes.length) {
-      console.warn(
-        `[saropa] tooltip partition mismatch: ${partitionTotal} ≠ ${snap.processes.length} — ` +
-        'a process matched multiple category filters or fell through all of them',
-      );
-    }
     if (otherProcs.length > 0) {
       const otherRss = otherProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
       lines.push(l10n('systemHealth.tooltip.otherSection', {

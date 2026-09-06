@@ -21,12 +21,16 @@ import {
   type SystemHealthConfig,
 } from '../../systemHealth/processMonitor';
 import {
+  classifyProcess,
   detectMonotonicGrowth,
   isAnalysisServerProcess,
   isDaemonProcess,
   isSaropaProcess,
+  ProcessCategory,
   processLabel,
   renderSparkline,
+  SAROPA_SCAN_DAEMON_MARKER,
+  SAROPA_SCAN_MARKER,
   truncateLabel,
 } from '../../systemHealth/processQuery';
 import type { DartProcessInfo } from '../../systemHealth/types';
@@ -437,55 +441,103 @@ describe('detectMonotonicGrowth — memory leak detection', () => {
   });
 });
 
-// ── Partition exhaustiveness ──
-// The tooltip groups processes into saropa / daemon / other. These filters
-// must be mutually exclusive (no double-counting) and collectively exhaustive
-// (no process slips through). If a new entry point is added to saropa_lints
-// or the Dart SDK renames a binary, these tests catch the classification gap.
+// ── classifyProcess — single source of truth for process categorization ──
+// The tooltip uses classifyProcess for a single-pass partition. These tests
+// verify the discriminated union output and enforce the substring containment
+// invariant that makes marker ordering load-bearing.
 
-describe('process category partition — mutual exclusivity', () => {
+describe('classifyProcess — discriminated union', () => {
   /** Helper: build a minimal DartProcessInfo with the given command line. */
   function proc(commandLine: string): DartProcessInfo {
     return { processId: 1, parentProcessId: 0, workingSetSize: 100, creationDate: '', commandLine };
   }
 
-  it('saropa scan daemon is saropa but NOT a Flutter daemon', () => {
-    // The scan daemon's command line should never match isDaemonProcess
-    // because it lacks flutter_tools.snapshot.
+  it('classifies saropa scan daemon as Saropa with correct label', () => {
+    const result = classifyProcess(proc('dart run saropa_lints:scan_daemon --port=1234'));
+    assert.strictEqual(result.category, ProcessCategory.Saropa);
+    assert.strictEqual(result.label, 'scan daemon');
+  });
+
+  it('classifies saropa CLI scan as Saropa with correct label', () => {
+    const result = classifyProcess(proc('dart run saropa_lints:scan . --tier comprehensive'));
+    assert.strictEqual(result.category, ProcessCategory.Saropa);
+    assert.strictEqual(result.label, 'scan CLI');
+  });
+
+  it('classifies Flutter daemon as Daemon', () => {
+    const result = classifyProcess(proc('dart flutter_tools.snapshot daemon --port=1234'));
+    assert.strictEqual(result.category, ProcessCategory.Daemon);
+    assert.strictEqual(result.label, 'Flutter daemon');
+  });
+
+  it('classifies analysis server as AnalysisServer', () => {
+    const result = classifyProcess(proc('dart language-server --protocol=lsp'));
+    assert.strictEqual(result.category, ProcessCategory.AnalysisServer);
+    assert.strictEqual(result.label, 'analysis server (no heap cap)');
+  });
+
+  it('classifies capped analysis server with correct label', () => {
+    const result = classifyProcess(proc('dart analysis_server --old_gen_heap_size=4096'));
+    assert.strictEqual(result.category, ProcessCategory.AnalysisServer);
+    assert.strictEqual(result.label, 'analysis server');
+  });
+
+  it('classifies build runner as Other', () => {
+    const result = classifyProcess(proc('dart run build_runner build'));
+    assert.strictEqual(result.category, ProcessCategory.Other);
+    assert.strictEqual(result.label, 'build runner');
+  });
+
+  it('classifies frontend compiler as Other', () => {
+    const result = classifyProcess(proc('dart frontend_server --incremental'));
+    assert.strictEqual(result.category, ProcessCategory.Other);
+    assert.strictEqual(result.label, 'frontend compiler');
+  });
+
+  it('classifies empty command line as Other', () => {
+    const result = classifyProcess(proc(''));
+    assert.strictEqual(result.category, ProcessCategory.Other);
+    assert.strictEqual(result.label, 'dart process');
+  });
+});
+
+describe('process category partition — mutual exclusivity via classifyProcess', () => {
+  function proc(commandLine: string): DartProcessInfo {
+    return { processId: 1, parentProcessId: 0, workingSetSize: 100, creationDate: '', commandLine };
+  }
+
+  // Boolean predicates must agree with classifyProcess since they delegate to it.
+  it('saropa scan daemon: isSaropaProcess=true, isDaemonProcess=false', () => {
     const p = proc('dart run saropa_lints:scan_daemon --port=1234');
     assert.strictEqual(isSaropaProcess(p), true);
     assert.strictEqual(isDaemonProcess(p), false);
   });
 
-  it('saropa CLI scan is saropa but NOT a Flutter daemon', () => {
-    const p = proc('dart run saropa_lints:scan . --tier comprehensive');
-    assert.strictEqual(isSaropaProcess(p), true);
-    assert.strictEqual(isDaemonProcess(p), false);
-  });
-
-  it('Flutter daemon is a daemon but NOT saropa', () => {
+  it('Flutter daemon: isDaemonProcess=true, isSaropaProcess=false', () => {
     const p = proc('dart flutter_tools.snapshot daemon --port=1234');
     assert.strictEqual(isDaemonProcess(p), true);
     assert.strictEqual(isSaropaProcess(p), false);
   });
 
-  it('analysis server is neither saropa nor daemon', () => {
+  it('analysis server: isAnalysisServerProcess=true, not saropa or daemon', () => {
     const p = proc('dart language-server --protocol=lsp');
-    assert.strictEqual(isSaropaProcess(p), false);
-    assert.strictEqual(isDaemonProcess(p), false);
     assert.strictEqual(isAnalysisServerProcess(p), true);
-  });
-
-  it('unrelated dart process is neither saropa nor daemon', () => {
-    const p = proc('dart run build_runner build');
     assert.strictEqual(isSaropaProcess(p), false);
     assert.strictEqual(isDaemonProcess(p), false);
   });
+});
 
-  it('empty command line matches no category', () => {
-    const p = proc('');
-    assert.strictEqual(isSaropaProcess(p), false);
-    assert.strictEqual(isDaemonProcess(p), false);
-    assert.strictEqual(isAnalysisServerProcess(p), false);
+describe('marker substring containment invariant', () => {
+  // SAROPA_SCAN_DAEMON_MARKER must contain SAROPA_SCAN_MARKER as a prefix.
+  // classifyProcess tests daemon marker first because of this. If this
+  // invariant breaks (e.g. someone renames scan_daemon without updating
+  // the scan marker), the ordering in classifyProcess becomes wrong and
+  // scan daemon processes get misclassified as "scan CLI".
+  it('scan daemon marker contains the scan marker as a prefix', () => {
+    assert.ok(
+      SAROPA_SCAN_DAEMON_MARKER.startsWith(SAROPA_SCAN_MARKER),
+      `"${SAROPA_SCAN_DAEMON_MARKER}" must start with "${SAROPA_SCAN_MARKER}" — ` +
+      'classifyProcess relies on testing daemon marker before scan marker',
+    );
   });
 });
