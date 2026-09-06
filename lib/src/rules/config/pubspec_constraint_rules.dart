@@ -924,3 +924,235 @@ class WorkspaceMemberOrderRule extends SaropaLintRule {
     return true;
   }
 }
+
+// =============================================================================
+// prefer_publish_to_none
+// =============================================================================
+
+/// Flags a pubspec.yaml that looks like an application but does not set
+/// `publish_to: none`.
+///
+/// Since: v16.0.0-beta.7 | Rule version: v1
+///
+/// A pubspec with no `publish_to:` key and no `homepage`/`repository`
+/// metadata almost certainly describes an application, not a package meant
+/// for pub.dev. Without `publish_to: none`, an accidental `dart pub publish`
+/// (fat-fingered command, a CI job misconfigured to run in the wrong
+/// directory) publishes the app's source — potentially with internal names,
+/// API shapes, or comments never meant to be public — to the world, and
+/// pub.dev publishes are permanent. Setting `publish_to: none` makes that
+/// class of mistake impossible: `pub` refuses to publish at all.
+///
+/// The "is this an app" heuristic is delegated to
+/// [shouldFlagMissingPublishToNone] (kept in the parser file so it is pure
+/// and unit-testable): a pubspec with an explicit `publish_to:` (any value)
+/// is trusted as a deliberate choice, and a pubspec with BOTH `homepage` and
+/// `repository` is assumed to be a library intentionally prepared for
+/// publishing. Everything else — missing publish_to and missing/incomplete
+/// publish metadata — is flagged.
+///
+/// **BAD:**
+/// ```yaml
+/// name: my_app
+/// environment:
+///   sdk: ^3.6.0
+/// # no publish_to, no homepage, no repository
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// name: my_app
+/// environment:
+///   sdk: ^3.6.0
+/// publish_to: none
+/// ```
+class PreferPublishToNoneRule extends SaropaLintRule {
+  PreferPublishToNoneRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  /// Dedup set: report at most once per project root.
+  static final Set<String> _reportedRoots = {};
+
+  static const LintCode _code = LintCode(
+    'prefer_publish_to_none',
+    '[prefer_publish_to_none] This pubspec.yaml has no publish_to field and '
+        'appears to be an application (missing homepage/repository metadata). '
+        'Add publish_to: none to prevent accidental publishing to pub.dev. '
+        '{v1}',
+    correctionMessage: 'Add publish_to: none to your pubspec.yaml.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    _reportPubspecOnce(reporter, context, _reportedRoots, (parsed) {
+      return shouldFlagMissingPublishToNone(parsed);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_pinned_version_syntax
+// =============================================================================
+
+/// Warns when an application dependency uses caret-range version syntax.
+///
+/// Since: v16.0.0-beta.7 | Rule version: v1
+///
+/// This is the deliberate stylistic opposite of [PreferCaretConstraintInAppRule]:
+/// that rule pushes apps toward caret ranges, this one pushes them toward
+/// exact pins. Both are stylistic (info) and both are gated to
+/// `publish_to: none` — only one should be enabled at a time via
+/// `analysis_options_custom.yaml`, since enabling both would fight over every
+/// dependency line. Applies only to applications: a caret range in an app lets
+/// `pub get` silently resolve to any newer non-breaking version, which can
+/// differ between a developer's machine and CI and makes "it works on my
+/// machine" bugs harder to pin down. Published packages are exempt — they
+/// need caret ranges for consumer compatibility, which is why
+/// [hasCaretDependenciesInApp] checks [ParsedPubspec.isApp] before flagging
+/// anything.
+///
+/// **BAD (app):**
+/// ```yaml
+/// dependencies:
+///   http: ^1.2.3
+/// ```
+///
+/// **GOOD (app):**
+/// ```yaml
+/// dependencies:
+///   http: 1.2.3
+/// ```
+class PreferPinnedVersionSyntaxRule extends SaropaLintRule {
+  PreferPinnedVersionSyntaxRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec', 'style'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  /// Dedup set: report at most once per project root.
+  static final Set<String> _reportedRoots = {};
+
+  static const LintCode _code = LintCode(
+    'prefer_pinned_version_syntax',
+    '[prefer_pinned_version_syntax] pubspec.yaml uses caret version '
+        'constraints (^X.Y.Z) — for an application with publish_to: none, '
+        'consider pinning to exact versions (X.Y.Z) for reproducible builds. '
+        'Caret ranges let pub resolve to any non-breaking version, which can '
+        'vary between developers and CI runs. {v1}',
+    correctionMessage:
+        'Replace caret constraints (^X.Y.Z) with exact versions (X.Y.Z) in '
+        'dependencies.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Delegate the isApp gate and caret detection to the pure, unit-tested
+    // function — the reporting plumbing here only handles file I/O and dedup.
+    _reportPubspecOnce(
+      reporter,
+      context,
+      _reportedRoots,
+      (parsed) => hasCaretDependenciesInApp(parsed),
+    );
+  }
+}
+
+// =============================================================================
+// avoid_dependency_overrides
+// =============================================================================
+
+/// Warns when a `pubspec.yaml` has a non-empty `dependency_overrides:` section.
+///
+/// Since: v16.0.0-beta.7 | Rule version: v1
+///
+/// `dependency_overrides` forces pub to resolve a package to a specific
+/// version or source regardless of the normal dependency graph. It exists for
+/// temporary local debugging — pointing a dependency at a local path or an
+/// unreleased git commit while chasing a bug — not for shipping committed to
+/// a repo. Left in place, it silently diverges the resolved graph from the
+/// constraints declared elsewhere in the file and masks real version
+/// conflicts that pub's solver would otherwise surface.
+///
+/// An empty section (`dependency_overrides:` with no children, or
+/// `dependency_overrides: {}`) does not fire — nothing is actually being
+/// overridden.
+///
+/// **BAD:**
+/// ```yaml
+/// dependency_overrides:
+///   http:
+///     path: ../http
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// # no dependency_overrides section
+/// ```
+class AvoidDependencyOverridesRule extends SaropaLintRule {
+  AvoidDependencyOverridesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  /// Dedup set: report at most once per project root.
+  static final Set<String> _reportedRoots = {};
+
+  static const LintCode _code = LintCode(
+    'avoid_dependency_overrides',
+    '[avoid_dependency_overrides] pubspec.yaml contains dependency_overrides, '
+        'which forces pub to resolve packages outside the normal dependency '
+        'graph. This is meant for temporary local debugging — left committed, '
+        'it silently diverges the resolved graph from declared constraints '
+        'and masks real conflicts. {v1}',
+    correctionMessage:
+        'Remove the dependency_overrides section or suppress this rule '
+        'per-line with a justification comment.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    _reportPubspecOnce(reporter, context, _reportedRoots, (parsed) {
+      return parsed.hasDependencyOverrides;
+    });
+  }
+}

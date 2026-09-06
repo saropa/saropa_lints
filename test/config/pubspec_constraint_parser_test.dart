@@ -108,6 +108,33 @@ void main() {
         );
       },
     );
+    test(
+      'AvoidDependencyOverridesRule reports correct name and messages',
+      () {
+        expectMetadata(
+          AvoidDependencyOverridesRule(),
+          'avoid_dependency_overrides',
+        );
+      },
+    );
+    test(
+      'PreferPinnedVersionSyntaxRule reports correct name and messages',
+      () {
+        expectMetadata(
+          PreferPinnedVersionSyntaxRule(),
+          'prefer_pinned_version_syntax',
+        );
+      },
+    );
+    test(
+      'PreferPublishToNoneRule reports correct name and messages',
+      () {
+        expectMetadata(
+          PreferPublishToNoneRule(),
+          'prefer_publish_to_none',
+        );
+      },
+    );
   });
 
   group('parseConstraint', () {
@@ -749,6 +776,235 @@ name: foo
         ProjectContext.canonicalRelativePath('packages/foo'),
         'packages/foo',
       );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // hasDependencyOverridesEntries — the pure decision logic behind
+  // avoid_dependency_overrides. An empty section (no children, or `{}`) must
+  // NOT flag: nothing is actually being overridden in that case, so flagging
+  // it would be a false positive on a pubspec that merely has a leftover
+  // empty header.
+  // ---------------------------------------------------------------------------
+  group('hasDependencyOverridesEntries', () {
+    test('non-empty dependency_overrides section is flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+dependency_overrides:
+  http: ^1.0.0
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isTrue);
+    });
+
+    test('no dependency_overrides section at all is not flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isFalse);
+    });
+
+    test('dependency_overrides header with no children is not flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+dependency_overrides:
+dev_dependencies:
+  test: ^1.24.0
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isFalse);
+    });
+
+    test('empty flow-map dependency_overrides: {} is not flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+dependency_overrides: {}
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isFalse);
+    });
+
+    test('path override entry is flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+dependency_overrides:
+  http:
+    path: ../http
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isTrue);
+    });
+
+    test('git override entry is flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+dependency_overrides:
+  http:
+    git:
+      url: https://github.com/dart-lang/http.git
+      ref: main
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isTrue);
+    });
+  });
+
+  // Behavioral coverage for `prefer_pinned_version_syntax` (the deliberate
+  // stylistic opposite of `prefer_caret_constraint_in_app`): fires only for
+  // apps (publish_to: none) that have at least one caret-syntax dependency.
+  group('hasCaretDependenciesInApp', () {
+    test('app with a caret dependency is flagged', () {
+      const pubspec = '''
+name: my_app
+publish_to: none
+dependencies:
+  http: ^1.2.3
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isTrue);
+    });
+
+    test('app with only an exact-pinned dependency is not flagged', () {
+      const pubspec = '''
+name: my_app
+publish_to: none
+dependencies:
+  http: 1.2.3
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isFalse);
+    });
+
+    test('non-app (published package) with caret deps is not flagged', () {
+      // No `publish_to: none` — this is a publishable package, which needs
+      // caret ranges for consumer compatibility, so the rule stays silent.
+      const pubspec = '''
+name: my_package
+dependencies:
+  http: ^1.2.3
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isFalse);
+    });
+
+    test('app with mixed caret and exact deps is flagged', () {
+      const pubspec = '''
+name: my_app
+publish_to: none
+dependencies:
+  http: ^1.2.3
+  path: 1.9.0
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isTrue);
+    });
+
+    test('app with no dependencies is not flagged', () {
+      const pubspec = '''
+name: my_app
+publish_to: none
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isFalse);
+    });
+
+    test('app with an unbounded "any" dependency is not flagged', () {
+      // `any` has no caret syntax to pin — this is avoid_unbounded_dependency's
+      // concern, not prefer_pinned_version_syntax's.
+      const pubspec = '''
+name: my_app
+publish_to: none
+dependencies:
+  http: any
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isFalse);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // shouldFlagMissingPublishToNone — prefer_publish_to_none's decision logic.
+  // ---------------------------------------------------------------------------
+  group('shouldFlagMissingPublishToNone', () {
+    test(
+      'flags a pubspec with no publish_to and no homepage/repository',
+      () {
+        const pubspec = '''
+name: my_app
+environment:
+  sdk: ^3.6.0
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+      },
+    );
+
+    test('does not flag a pubspec with publish_to: none', () {
+      const pubspec = '''
+name: my_app
+publish_to: none
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+    });
+
+    test(
+      'does not flag a pubspec with publish_to set to a custom server',
+      () {
+        const pubspec = '''
+name: my_package
+publish_to: https://custom.server
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+      },
+    );
+
+    test(
+      'does not flag a pubspec with no publish_to but full publish metadata '
+      '(likely a library)',
+      () {
+        const pubspec = '''
+name: my_package
+homepage: https://example.com/my_package
+repository: https://github.com/example/my_package
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+      },
+    );
+
+    test(
+      'flags a pubspec with homepage but no repository (incomplete metadata)',
+      () {
+        const pubspec = '''
+name: my_package
+homepage: https://example.com/my_package
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+      },
+    );
+
+    test('flags a bare pubspec with only a name field', () {
+      const pubspec = '''
+name: my_app
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(shouldFlagMissingPublishToNone(parsed), isTrue);
     });
   });
 }

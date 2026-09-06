@@ -189,6 +189,12 @@ const Set<String> stylisticRules = <String>{
   'prefer_public_members_first',
   'prefer_private_members_first',
 
+  // === Pubspec version-pinning style (conflicting pair - opt-in only) ===
+  // Opposite of 'prefer_caret_constraint_in_app' (professionalOnlyRules):
+  // that rule pushes apps toward caret ranges, this one pushes them toward
+  // exact pins. Only one should be enabled at a time.
+  'prefer_pinned_version_syntax',
+
   // === Opinionated prefer_* rules (conflicting/stylistic - opt-in only) ===
   'prefer_addall_over_spread',
   'prefer_await_over_then',
@@ -1750,6 +1756,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'flag_missing_workspace_member', // INFO - workspace root has unlisted subdirectory packages
   'workspace_dependency_version_sync', // INFO - workspace members have divergent dependency constraints
   'workspace_member_order', // INFO - workspace: list entries not alphabetically sorted
+  'avoid_dependency_overrides', // WARNING - dependency_overrides section committed to repo
+  'prefer_publish_to_none', // INFO - app pubspec missing publish_to: none
   // Tier 1 quick wins — batch 1
   'avoid_exit_outside_entrypoint', // WARNING - exit() hidden outside main()
   // Tier 1 quick wins — batch 2

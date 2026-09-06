@@ -1,6 +1,6 @@
 # PROPOSAL: Prefer Pinned Version Syntax
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 

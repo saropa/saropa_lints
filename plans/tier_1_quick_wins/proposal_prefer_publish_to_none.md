@@ -1,6 +1,6 @@
 # PROPOSAL: Flag a Package `pubspec.yaml` Missing `publish_to: none` for a Private/App Package
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

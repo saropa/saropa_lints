@@ -222,6 +222,10 @@ class ParsedPubspec {
     required this.isApp,
     required this.sdkConstraint,
     required this.dependencies,
+    required this.hasDependencyOverrides,
+    required this.hasPublishTo,
+    required this.hasHomepage,
+    required this.hasRepository,
   });
 
   /// True when the package is an application (`publish_to: none`), false when
@@ -236,11 +240,43 @@ class ParsedPubspec {
   /// entries (git/path/sdk) and the bare `flutter:`/`sdk: flutter` markers are
   /// excluded — they have no comparable version range.
   final List<PubspecDependency> dependencies;
+
+  /// True when the pubspec has a non-empty `dependency_overrides:` section —
+  /// i.e. the header is present AND at least one 2-space-indented child entry
+  /// follows it. An empty section (`dependency_overrides:` with no children,
+  /// or `dependency_overrides: {}`) is not a violation: nothing is actually
+  /// being overridden.
+  final bool hasDependencyOverrides;
+
+  /// True when a `publish_to:` key exists at all, regardless of its value
+  /// (`none` or a custom hosted-package server URL). Distinct from [isApp],
+  /// which only matches the `none` value — `prefer_publish_to_none` needs to
+  /// know "was this key considered at all" so a package that intentionally
+  /// publishes to a private server is not flagged for missing `none`.
+  final bool hasPublishTo;
+
+  /// True when a non-empty `homepage:` field is present. Used, together with
+  /// [hasRepository], as a heuristic signal that this pubspec describes a
+  /// publishable library rather than an application — pub.dev expects both
+  /// fields on a published package, so their presence suggests intent to
+  /// publish even without an explicit `publish_to:`.
+  final bool hasHomepage;
+
+  /// True when a non-empty `repository:` field is present. See [hasHomepage].
+  final bool hasRepository;
 }
 
 /// Section headers whose 2-space-indented children are version dependencies.
 final RegExp _depSectionHeader = RegExp(
   r'^(dependencies|dev_dependencies):\s*$',
+);
+
+/// The `dependency_overrides:` block header. Matched only when nothing
+/// follows the colon on the same line — `dependency_overrides: {}` (an
+/// explicit empty flow-map) intentionally does NOT match, so it is treated
+/// the same as "no overrides" rather than needing a separate empty-map check.
+final RegExp _dependencyOverridesHeader = RegExp(
+  r'^dependency_overrides:\s*$',
 );
 
 /// A 2-space-indented `name: value` entry. `value` may be empty (block follows).
@@ -252,23 +288,71 @@ final RegExp _publishToNone = RegExp(
   multiLine: true,
 );
 
+/// Any `publish_to:` key at column 0, whatever its value — `none` or a
+/// custom hosted-package server URL. Broader than [_publishToNone] because
+/// `prefer_publish_to_none` must not flag a pubspec that already made a
+/// deliberate publish-target decision of either kind.
+final RegExp _publishToAny = RegExp(
+  r'''^publish_to:\s*\S''',
+  multiLine: true,
+);
+
+/// A non-empty `homepage:` field at column 0. Requires at least one non-space
+/// character after the colon so `homepage:` with nothing following (or only
+/// trailing whitespace) does not count as "present".
+final RegExp _homepageField = RegExp(
+  r'''^homepage:\s*\S''',
+  multiLine: true,
+);
+
+/// A non-empty `repository:` field at column 0. Same non-empty rule as
+/// [_homepageField].
+final RegExp _repositoryField = RegExp(
+  r'''^repository:\s*\S''',
+  multiLine: true,
+);
+
 /// Parses a `pubspec.yaml` body into the [ParsedPubspec] the rules consume.
 ParsedPubspec parsePubspecConstraints(String content) {
   final lines = content.split(RegExp(r'\r\n?|\n'));
   final isApp = _publishToNone.hasMatch(content);
+  // Publish-metadata signals for prefer_publish_to_none: whether the pubspec
+  // already made an explicit publish_to decision, and whether it carries the
+  // homepage/repository fields pub.dev expects on a publishable package.
+  final hasPublishTo = _publishToAny.hasMatch(content);
+  final hasHomepage = _homepageField.hasMatch(content);
+  final hasRepository = _repositoryField.hasMatch(content);
   ParsedConstraint? sdkConstraint;
   final dependencies = <PubspecDependency>[];
+  // True once a `dependency_overrides:` header AND at least one indented
+  // child entry under it have both been seen.
+  var hasDependencyOverrides = false;
 
   // Track which top-level block we are inside. Only `environment` and the two
   // dependency sections matter; anything else (flutter:, dev tooling) is skipped.
   bool inDepSection = false;
   bool inEnvironment = false;
+  // Tracked separately from inDepSection: override entries must NOT be added
+  // to `dependencies` (they are not the package's own declared constraints,
+  // and folding them in would make the range-hygiene rules reason about
+  // versions the pubspec doesn't actually declare).
+  bool inDependencyOverrides = false;
 
   for (final line in lines) {
     // A non-indented, non-blank line starts a new top-level block.
     if (line.isNotEmpty && !line.startsWith(' ') && !line.startsWith('\t')) {
       inDepSection = _depSectionHeader.hasMatch(line);
       inEnvironment = line.trimRight() == 'environment:';
+      inDependencyOverrides = _dependencyOverridesHeader.hasMatch(line);
+      continue;
+    }
+
+    if (inDependencyOverrides) {
+      // Any 2-space-indented child line under the header means the section
+      // is non-empty — a real override is being forced.
+      if (_depEntry.hasMatch(line)) {
+        hasDependencyOverrides = true;
+      }
       continue;
     }
 
@@ -300,7 +384,55 @@ ParsedPubspec parsePubspecConstraints(String content) {
     isApp: isApp,
     sdkConstraint: sdkConstraint,
     dependencies: dependencies,
+    hasDependencyOverrides: hasDependencyOverrides,
+    hasPublishTo: hasPublishTo,
+    hasHomepage: hasHomepage,
+    hasRepository: hasRepository,
   );
+}
+
+/// Returns true when the pubspec has a non-empty dependency_overrides
+/// section. Exists as a thin, named wrapper around [ParsedPubspec] so the
+/// unit tests can assert on the same public surface the rule reads from,
+/// without depending on field access syntax staying stable.
+bool hasDependencyOverridesEntries(ParsedPubspec parsed) {
+  return parsed.hasDependencyOverrides;
+}
+
+/// Returns true when [parsed] looks like an application pubspec that is
+/// missing `publish_to: none`.
+///
+/// Extracted as a pure function (rather than inlined in the rule) so it can
+/// be unit-tested directly on parser output, the same way every other
+/// decision in this file is tested. The heuristic is intentionally simple
+/// for v1: a package that already made a publish_to decision, or that
+/// carries both of the fields pub.dev requires for a published package
+/// (`homepage` and `repository`), is assumed to be a library and is not
+/// flagged — everything else is treated as an app missing the guard.
+bool shouldFlagMissingPublishToNone(ParsedPubspec parsed) {
+  // Already has publish_to: (whether "none" or a custom server URL) — the
+  // author already made a deliberate choice, so there is nothing to flag.
+  if (parsed.hasPublishTo) return false;
+  // Has both homepage and repository — looks like a publishable package
+  // deliberately prepared for pub.dev, not an app that forgot the guard.
+  if (parsed.hasHomepage && parsed.hasRepository) return false;
+  // No publish_to AND missing (or incomplete) publish metadata — flag it as
+  // an app that should set publish_to: none to prevent accidental publishing.
+  return true;
+}
+
+/// Returns true when an app pubspec (`publish_to: none`) has any caret-syntax
+/// dependencies that could be pinned to exact versions for reproducible
+/// builds. Published packages are exempt: they need caret ranges so
+/// consumers can resolve compatible versions, which is the opposite goal of
+/// `PreferCaretConstraintInAppRule` — the two rules form a deliberate
+/// conflicting stylistic pair, gated apart by [ParsedPubspec.isApp].
+bool hasCaretDependenciesInApp(ParsedPubspec parsed) {
+  // Only fire for apps — a publishable package should keep caret ranges.
+  if (!parsed.isApp) return false;
+  // A single caret dependency is enough to report: the rule flags the
+  // pubspec once, not once per offending line.
+  return parsed.dependencies.any((dep) => dep.constraint.isCaret);
 }
 
 /// Finds dependencies that carry more than one distinct constraint string
