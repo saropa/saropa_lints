@@ -451,13 +451,10 @@ class AddResolutionWorkspaceRule extends SaropaLintRule {
   /// Dedup set: report at most once per project root.
   static final Set<String> _reportedRoots = {};
 
-  /// Regex to detect a top-level `resolution: workspace` line in a pubspec.
-  /// Anchored to column 0 so indented YAML values (inside environment: etc.)
-  /// cannot match. Allows trailing whitespace and YAML comments (# ...).
-  static final RegExp _resolutionWorkspaceRe = RegExp(
-    r'^resolution:\s+workspace\s*(?:#.*)?$',
-    multiLine: true,
-  );
+  /// Delegates to the shared [resolutionWorkspaceRe] regex (defined in
+  /// `add_resolution_workspace_fix.dart`) — accepts bare `workspace` and
+  /// quoted forms, anchored to column 0.
+  static final RegExp _resolutionWorkspaceRe = resolutionWorkspaceRe;
 
   static const LintCode _code = LintCode(
     'add_resolution_workspace',
@@ -694,5 +691,131 @@ class FlagMissingWorkspaceMemberRule extends SaropaLintRule {
         depth + 1,
       );
     }
+  }
+}
+
+// =============================================================================
+// workspace_dependency_version_sync
+// =============================================================================
+
+/// Flags a workspace whose member packages declare different version
+/// constraints for the same dependency.
+///
+/// Since: v16.0.0-beta.7 | Rule version: v1
+///
+/// In a pub workspace all members share one lockfile, so `pub get` resolves
+/// each dependency to one version. When two members ask for incompatible
+/// ranges (e.g. `http: ^1.2.0` vs `http: ^0.13.0`) the resolver picks a
+/// winner and the loser's pubspec constraint becomes a lie. At best this
+/// causes confusing behavior at runtime; at worst `pub get` simply fails.
+/// Aligning constraints at edit time catches the drift before it breaks the
+/// build.
+///
+/// Fires once per workspace root, listing every dependency that appears with
+/// more than one distinct raw constraint string across member packages. Does
+/// NOT fire when only one member uses a dependency (nothing to diverge from).
+///
+/// **BAD:**
+/// ```yaml
+/// # packages/foo/pubspec.yaml
+/// dependencies:
+///   http: ^1.2.0
+///
+/// # packages/bar/pubspec.yaml
+/// dependencies:
+///   http: ^0.13.0   # different constraint for the same dependency
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// # packages/foo/pubspec.yaml
+/// dependencies:
+///   http: ^1.2.0
+///
+/// # packages/bar/pubspec.yaml
+/// dependencies:
+///   http: ^1.2.0   # same constraint across all members
+/// ```
+class WorkspaceDependencyVersionSyncRule extends SaropaLintRule {
+  WorkspaceDependencyVersionSyncRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec', 'workspace'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  /// Dedup set: report at most once per workspace root.
+  static final Set<String> _reportedRoots = {};
+
+  static const LintCode _code = LintCode(
+    'workspace_dependency_version_sync',
+    '[workspace_dependency_version_sync] Members of this pub workspace '
+        'declare different version constraints for the same dependency. '
+        'Because all members share one lockfile, `pub get` resolves each '
+        'dependency to a single version — when two members specify different '
+        'ranges, one constraint becomes a lie that masks incompatibilities '
+        'until runtime. Align constraints across members so the pubspec '
+        'matches the actually-resolved version. {v1}',
+    correctionMessage:
+        'Align all workspace members to the same constraint string for '
+        'each shared dependency.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Find this file's project root.
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+    if (_reportedRoots.contains(root)) return;
+
+    // Only fire on lib/ files (same dedup pattern as sibling rules).
+    final path = context.filePath.replaceAll('\\', '/');
+    if (!path.contains('/lib/')) return;
+
+    // Only fire on workspace roots (packages that declare workspace: key).
+    final members = ProjectContext.getWorkspaceMembers(root);
+    if (members.isEmpty) return;
+
+    // Collect dependency constraints from every member's pubspec.
+    // Key = dependency name, Value = set of distinct constraint strings.
+    final depVersions = <String, Set<String>>{};
+    for (final memberPath in members) {
+      final fullPath = '$root/$memberPath/pubspec.yaml';
+      final pubspecFile = File(fullPath);
+      if (!pubspecFile.existsSync()) continue;
+
+      final parsed = parsePubspecConstraints(pubspecFile.readAsStringSync());
+      for (final dep in parsed.dependencies) {
+        // Skip block deps (git/path/sdk) — no comparable version string.
+        if (dep.constraint.isBlock) continue;
+        depVersions.putIfAbsent(dep.name, () => {}).add(dep.constraint.raw);
+      }
+    }
+
+    // Find dependencies with more than one distinct constraint string.
+    final divergent = depVersions.entries
+        .where((e) => e.value.length > 1)
+        .toList();
+
+    if (divergent.isEmpty) return;
+
+    // At least one dependency has conflicting constraints across members.
+    _reportedRoots.add(root);
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
+    });
   }
 }

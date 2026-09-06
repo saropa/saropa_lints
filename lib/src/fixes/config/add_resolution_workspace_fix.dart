@@ -5,12 +5,25 @@ import 'dart:io' show File;
 import '../../native/saropa_fix.dart';
 import '../../project_context.dart';
 
+/// Regex to detect a top-level `resolution: workspace` line in a pubspec.
+/// Anchored to column 0 so indented YAML values (inside environment: etc.)
+/// cannot match. Accepts bare `workspace` and quoted forms (`"workspace"`,
+/// `'workspace'`) — the alternation requires matching pairs so `"workspace'`
+/// does not slip through. Allows trailing whitespace and YAML comments.
+/// Shared between [AddResolutionWorkspaceRule] and [AddResolutionWorkspaceFix].
+final RegExp resolutionWorkspaceRe = RegExp(
+  r'''^resolution:\s+(?:workspace|"workspace"|'workspace')\s*(?:#.*)?$''',
+  multiLine: true,
+);
+
 /// Regex to find the end of the `environment:` block in a pubspec.yaml.
 /// Matches the `environment:` header line plus all subsequent indented lines
-/// (the `sdk:` and optional `flutter:` sub-keys). Group 0 spans the entire
+/// (the `sdk:` and optional `flutter:` sub-keys). Tolerates blank or
+/// whitespace-only continuation lines inside the block — a legal YAML style
+/// choice that should not end the match early. Group 0 spans the entire
 /// block so its end offset is the insertion point for `resolution: workspace`.
 final RegExp _environmentBlockRe = RegExp(
-  r'^environment\s*:[ \t]*\n(?:[ \t]+\S[^\n]*\n?)*',
+  r'^environment\s*:[ \t]*\n(?:(?:[ \t]+\S[^\n]*|[ \t]*)\n)*',
   multiLine: true,
 );
 
@@ -49,6 +62,11 @@ class AddResolutionWorkspaceFix extends SaropaFixProducer {
 
     final content = pubspecFile.readAsStringSync();
 
+    // Re-verify: if the pubspec already has `resolution: workspace`, bail out.
+    // Guards against stale diagnostics (user edited pubspec since last analysis)
+    // and "fix all" batch applies that would otherwise insert a duplicate key.
+    if (resolutionWorkspaceRe.hasMatch(content)) return;
+
     // Determine where to insert: after the environment: block if it exists,
     // otherwise at end of file with a leading newline.
     final envMatch = _environmentBlockRe.firstMatch(content);
@@ -56,9 +74,15 @@ class AddResolutionWorkspaceFix extends SaropaFixProducer {
     final String insertText;
 
     if (envMatch != null) {
-      // Insert immediately after the environment: block.
+      // Insert immediately after the environment: block. If the matched block
+      // does not end with a newline (e.g. environment: is the last content in
+      // a file that lacks a trailing newline), prepend one to avoid corrupting
+      // the previous line.
       insertOffset = envMatch.end;
-      insertText = 'resolution: workspace\n';
+      final matchedText = content.substring(envMatch.start, envMatch.end);
+      final needsNewline = !matchedText.endsWith('\n');
+      insertText =
+          '${needsNewline ? '\n' : ''}resolution: workspace\n';
     } else {
       // No environment: block found — append at end of file.
       insertOffset = content.length;

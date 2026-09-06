@@ -2786,6 +2786,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Workspace resolution (pubspec_constraint_rules.dart),
   AddResolutionWorkspaceRule.new,
   FlagMissingWorkspaceMemberRule.new,
+  WorkspaceDependencyVersionSyncRule.new,
   // SDK syntax vs constraint cross-check (sdk_syntax_match_rule.dart),
   RequireSdkSyntaxMatchRule.new,
   // Removed: `DependOnReferencedPackagesRule` — the Dart SDK already ships,

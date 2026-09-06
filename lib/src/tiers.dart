@@ -1748,6 +1748,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_unbounded_dependency', // WARNING - dependency pinned to `any`
   'add_resolution_workspace', // WARNING - workspace member missing resolution: workspace
   'flag_missing_workspace_member', // INFO - workspace root has unlisted subdirectory packages
+  'workspace_dependency_version_sync', // INFO - workspace members have divergent dependency constraints
   // Tier 1 quick wins — batch 1
   'avoid_exit_outside_entrypoint', // WARNING - exit() hidden outside main()
   // Tier 1 quick wins — batch 2

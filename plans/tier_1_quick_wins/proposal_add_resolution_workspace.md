@@ -21,6 +21,30 @@ New lint rule `add_resolution_workspace` (recommended tier, WARNING) implemented
 
 **Limitations:** Rule inherits the `/lib/`-gating pattern from sibling pubspec rules — bin-only packages with no `lib/` directory are never flagged. `_reportedRoots` static Set follows the pre-existing pattern of not being wired to `clearCache()`. No fixture file because the rule targets `.yaml` content read from disk, not `.dart` AST nodes.
 
+## Finish Report (2026-09-06) — Hardening Pass
+
+Code review of the initial implementation identified four defensive gaps in the quick fix and detection regex, plus zero behavioral test coverage beyond metadata pinning.
+
+**Fixes applied:**
+1. `AddResolutionWorkspaceFix.compute()` now re-checks `resolutionWorkspaceRe` against the live pubspec content before inserting. Guards against stale diagnostics (pubspec edited since last analysis) and batch "fix all" applies that would otherwise insert a duplicate `resolution:` key.
+2. The `envMatch != null` branch now checks whether the matched block ends with a newline and prepends one if absent — prevents `sdk: ^3.6.0resolution: workspace` corruption when the environment block sits at EOF without a trailing newline.
+3. `_environmentBlockRe` continuation pattern now tolerates blank or whitespace-only lines inside the environment block (`(?:(?:[ \t]+\S[^\n]*|[ \t]*)\n)*`) — a legal YAML style that previously ended the match early, causing the insertion point to land mid-block.
+4. `resolutionWorkspaceRe` now accepts quoted scalars (`resolution: "workspace"`, `resolution: 'workspace'`) via `['"]?workspace['"]?` — valid YAML that previously caused a false positive.
+
+**Shared regex:** Extracted `resolutionWorkspaceRe` as a top-level export in `add_resolution_workspace_fix.dart` so both the rule and the fix reference the same pattern without circular imports. The rule delegates via `static final _resolutionWorkspaceRe = resolutionWorkspaceRe`.
+
+**Test coverage added (22 tests):**
+- `resolutionWorkspaceRe` group (9 tests): bare match, trailing whitespace, YAML comment, double-quoted, single-quoted, indented no-match, wrong value, multi-line pubspec match, absent key.
+- `getWorkspaceMembers` group (7 tests): block-style, flow-style, column-0 comments, no workspace key, empty list, block terminated by next top-level key, nonexistent directory.
+- `getWorkspaceRoot` group (6 tests): listed member found, unlisted member null, no workspace key stops walk, example/ false-positive guard, Windows case-insensitive match, null/empty input.
+
+**Additional hardening (same pass):**
+- Tightened `resolutionWorkspaceRe` to require matching quote pairs via alternation (`workspace|"workspace"|'workspace'`) rather than independent optional quotes.
+- Confirmed `_environmentBlockRe` already uses `[ \t]+` for continuation lines, covering tab indentation.
+- Added mismatched-quote negative test.
+
+**Companion rule added:** `workspace_dependency_version_sync` (recommended tier, INFO) — flags a workspace whose member packages declare different constraint strings for the same dependency. Fires once per workspace root, parsing all members' pubspec.yaml files via the existing `parsePubspecConstraints` infrastructure. No quick fix (which member's version should win is a human decision). Registered in all 3 places (`_allRuleFactories`, `recommendedOnlyRules`, metadata test).
+
 Created: 2026-09-02
 
 ## Summary
