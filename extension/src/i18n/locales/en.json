@@ -74,7 +74,11 @@
       "ready": "Saropa: ready",
       "disabled": "Saropa: disabled",
       "noProject": "Saropa: no Dart project",
-      "doneTooltip": "{total} finding(s), {shown} shown after filter"
+      "doneTooltip": "{total} finding(s), {shown} shown after filter",
+      "dropped": "Saropa: scan skipped ({count} files)",
+      "droppedTooltip": "Saropa Lints skipped {count} files that were opened by another tool rather than by you. Save a file to scan it.",
+      "droppedSuffix": " (+{count} skipped)",
+      "droppedSuffixTooltip": "Also skipped {count} files that were opened by another tool rather than by you. Save a file to scan it."
     },
     "baseline": {
       "progressTitle": "Saropa Lints: scanning whole project",
@@ -673,6 +677,8 @@
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
+      "warningOrphans": "⚠ {count} orphaned daemon(s)",
+      "criticalOrphans": "🔴 {count} orphaned daemon(s)",
       "openHint": "Click to open Process Health"
     },
     "tooltip": {
@@ -700,6 +706,20 @@
     },
     "command": {
       "killOrphans": "Kill Orphaned Flutter Daemons"
+    },
+    "orphanPreflight": {
+      "found": "{count} orphaned model host process(es) from an earlier session are holding {size} of committed memory.",
+      "reclaimAction": "Reclaim Memory",
+      "detailsAction": "Show Details",
+      "none": "No orphaned model host processes found.",
+      "confirmTitle": "End {count} orphaned process(es) holding {size}?",
+      "confirmDetail": "These processes will be ended immediately and cannot be recovered:",
+      "confirmKill": "End Processes",
+      "listEntry": "{name} (PID {pid}) — {size}",
+      "reclaimed": "Ended {count} orphaned process(es), reclaiming about {size}.",
+      "reclaimFailed": "Could not end {count} process(es). They may need elevated permissions.",
+      "bannerTitle": "{count} orphaned model host process(es) holding {size}",
+      "bannerReclaim": "Reclaim"
     },
     "panel": {
       "title": "Process Health",

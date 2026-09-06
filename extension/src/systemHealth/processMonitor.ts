@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
-import type { DartProcessSnapshot } from './types';
-import { HealthLevel } from './types';
+import type { DartProcessSnapshot, HealthAssessment } from './types';
+import { HealthLevel, HealthTrigger } from './types';
 import { buildSnapshot, formatBytes, queryDartProcesses } from './processQuery';
 
 const BYTES_PER_GB = 1_073_741_824;
@@ -29,25 +29,95 @@ export function readSystemHealthConfig(): SystemHealthConfig {
   };
 }
 
+/**
+ * Classify a snapshot AND record why it was classified that way.
+ *
+ * Memory is evaluated before orphans at each level so that when both trip,
+ * the trigger reported is the one the numeric status-bar figure describes.
+ * The trigger matters because orphan-driven Critical carries no meaningful
+ * RSS number to show (see BUG: status bar shows CRITICAL RED for healthy
+ * memory) — the caller needs to know which sentence to render.
+ */
+export function assessHealth(
+  snapshot: DartProcessSnapshot,
+  config: SystemHealthConfig,
+): HealthAssessment {
+  const rssGB = snapshot.totalRssBytes / BYTES_PER_GB;
+  // Both Flutter daemon and scan daemon orphans count toward the threshold.
+  const orphans = snapshot.orphanedDaemonPids.length + snapshot.orphanedScanDaemonPids.length;
+
+  if (rssGB >= config.criticalThresholdGB) {
+    return { level: HealthLevel.Critical, trigger: HealthTrigger.Memory, orphanCount: orphans };
+  }
+  // Critical orphan count with healthy RSS — this is the case that used to
+  // render a red badge around a tiny memory figure.
+  if (orphans >= config.criticalOrphanCount) {
+    return { level: HealthLevel.Critical, trigger: HealthTrigger.Orphans, orphanCount: orphans };
+  }
+  if (rssGB >= config.warningThresholdGB) {
+    return { level: HealthLevel.Warning, trigger: HealthTrigger.Memory, orphanCount: orphans };
+  }
+  if (orphans >= config.warningOrphanCount) {
+    return { level: HealthLevel.Warning, trigger: HealthTrigger.Orphans, orphanCount: orphans };
+  }
+  return { level: HealthLevel.Healthy, trigger: HealthTrigger.None, orphanCount: orphans };
+}
+
+/**
+ * Level-only view of {@link assessHealth}, kept for callers that genuinely
+ * do not care why the level was reached (notifications, panel badges).
+ */
 export function classifyHealth(
   snapshot: DartProcessSnapshot,
   config: SystemHealthConfig,
 ): HealthLevel {
-  const rssGB = snapshot.totalRssBytes / BYTES_PER_GB;
-  // Both Flutter daemon and scan daemon orphans count toward the threshold.
-  const orphans = snapshot.orphanedDaemonPids.length + snapshot.orphanedScanDaemonPids.length;
-  if (rssGB >= config.criticalThresholdGB || orphans >= config.criticalOrphanCount) {
-    return HealthLevel.Critical;
-  }
-  if (rssGB >= config.warningThresholdGB || orphans >= config.warningOrphanCount) {
-    return HealthLevel.Warning;
-  }
-  return HealthLevel.Healthy;
+  return assessHealth(snapshot, config).level;
 }
 
+/**
+ * Build the memory/system-health status-bar text for an assessment, or
+ * undefined when there is nothing to report.
+ *
+ * The text must name the trigger. Always rendering an RSS figure meant an
+ * orphan-driven Critical showed a healthy number in an alarming color, so
+ * users investigated the memory reading instead of the orphaned daemons
+ * that actually tripped the level. Orphan triggers therefore get their own
+ * strings and never show bytes.
+ *
+ * For memory triggers the figure shown is the machine-wide Dart total,
+ * because that is the number compared against the configured thresholds —
+ * showing the smaller saropa-only RSS here would again put a number in
+ * front of the user that does not explain the color. The saropa-only
+ * breakdown stays in the tooltip.
+ */
+export function systemHealthStatusBarText(
+  snapshot: DartProcessSnapshot,
+  assessment: HealthAssessment,
+): string | undefined {
+  if (assessment.level === HealthLevel.Healthy) return undefined;
+
+  const critical = assessment.level === HealthLevel.Critical;
+  if (assessment.trigger === HealthTrigger.Orphans) {
+    const count = String(assessment.orphanCount);
+    return critical
+      ? l10n('systemHealth.statusBar.criticalOrphans', { count })
+      : l10n('systemHealth.statusBar.warningOrphans', { count });
+  }
+
+  const size = formatBytes(snapshot.totalRssBytes);
+  return critical
+    ? l10n('systemHealth.statusBar.critical', { size })
+    : l10n('systemHealth.statusBar.warning', { size });
+}
+
+/**
+ * Snapshot subscribers receive the full assessment rather than a bare level:
+ * re-deriving "was this memory or orphans?" at every call site would let the
+ * status bar and the monitor drift apart on the next threshold change.
+ */
 export type SnapshotListener = (
   snapshot: DartProcessSnapshot,
-  level: HealthLevel,
+  assessment: HealthAssessment,
 ) => void;
 
 export class ProcessMonitor implements vscode.Disposable {
@@ -90,11 +160,11 @@ export class ProcessMonitor implements vscode.Disposable {
       const snapshot = await buildSnapshot(processes);
       this.lastSnapshot = snapshot;
       const config = readSystemHealthConfig();
-      const level = classifyHealth(snapshot, config);
+      const assessment = assessHealth(snapshot, config);
 
-      for (const fn of this.listeners) fn(snapshot, level);
+      for (const fn of this.listeners) fn(snapshot, assessment);
 
-      if (level === HealthLevel.Critical && config.showNotifications) {
+      if (assessment.level === HealthLevel.Critical && config.showNotifications) {
         this.showCriticalNotification(snapshot);
       }
     } catch {

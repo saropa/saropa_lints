@@ -47,26 +47,112 @@ export function resolveCliCwd(projectRoot: string): string {
 }
 
 /**
- * Kills the spawned scan process AND its descendants. On Windows the scans run
- * through the shell (shell:true, for dart.bat resolution), so `child` is the
- * `cmd.exe` wrapper — `child.kill()` reaps the shell but orphans the real
- * `dart.exe` grandchild, which keeps pegging the machine (the "cancel does
- * nothing / locked up" bug). `taskkill /T` kills the whole tree.
+ * Flags for the Windows tree kill, built as a pure function so the exact
+ * command shape is unit-testable without spawning anything.
+ *
+ * `/T` is the load-bearing flag and must never be dropped: it is what makes
+ * taskkill walk the process TREE. Every scan is spawned with `shell: true` on
+ * Windows (for `dart.bat` resolution), so `child.pid` is the `cmd.exe`
+ * wrapper and the real `dart.exe` is a GRANDCHILD. Without `/T` only the
+ * shell dies and the orphaned `dart.exe` keeps its multi-GB resolved-analysis
+ * heap until reboot. `/F` forces the kill, because a `dart` process that is
+ * busy resolving does not respond to a polite terminate request.
  */
-export function killProcessTree(child: cp.ChildProcess): void {
-  const procId = child.pid;
-  if (procId === undefined) return;
-  if (process.platform === 'win32') {
-    try {
-      cp.spawn('taskkill', ['/F', '/T', '/PID', String(procId)], { windowsHide: true });
-      return;
-    } catch {
-      // Fall through to child.kill() if taskkill is unavailable.
-    }
-  }
+export function buildTaskkillArgs(procId: number): string[] {
+  return ['/F', '/T', '/PID', String(procId)];
+}
+
+/**
+ * Last-resort single-process kill. Wrapped because the child may already have
+ * exited between the caller's decision and this call, and a throw here would
+ * escape into an event handler or a `finally` block where nothing would
+ * report it.
+ */
+function fallbackKill(child: cp.ChildProcess): void {
   try {
     child.kill();
   } catch {
-    // Best-effort: child may have already exited.
+    // Already exited — nothing to reap.
   }
+}
+
+/**
+ * Windows tree kill via `taskkill /F /T /PID`.
+ *
+ * The `error` listener is not optional. `cp.spawn` reports a failed launch
+ * (taskkill missing from PATH, denied by policy) ASYNCHRONOUSLY through an
+ * `error` event, which the caller's try/catch cannot see. Two bugs followed
+ * from leaving it unhandled: an unhandled `error` on a ChildProcess is an
+ * uncaught exception that takes down the extension host, and the fallback
+ * below never ran, so the `dart` child survived while cancellation reported
+ * success.
+ */
+function killWindowsProcessTree(
+  child: cp.ChildProcess,
+  procId: number,
+  spawnFn: typeof cp.spawn,
+): void {
+  try {
+    const killer = spawnFn('taskkill', buildTaskkillArgs(procId), { windowsHide: true });
+    killer.on('error', () => fallbackKill(child));
+  } catch {
+    // Synchronous spawn rejection (invalid args) — still try the plain kill.
+    fallbackKill(child);
+  }
+}
+
+/**
+ * POSIX tree kill via a process-GROUP signal.
+ *
+ * A negative pid means "every process in the group whose id is [procId]".
+ * A child spawned with `detached: true` is the leader of its own new group, so
+ * this reaches the `dart` grandchild that `shell: true` put underneath it —
+ * a plain `child.kill()` signals only the shell and silently orphans `dart`,
+ * which is the same leak the Windows `/T` flag exists to prevent.
+ *
+ * It is safe for NON-detached children too, and that is why no caller has to
+ * declare which kind it spawned: a non-detached child shares this Node
+ * process's group, whose id is the host's pid and therefore never equal to the
+ * child's own pid, so `-procId` names a group that does not exist, `kill`
+ * throws ESRCH, and we fall through. There is no path on which this signals
+ * the extension host itself.
+ */
+function killPosixProcessTree(child: cp.ChildProcess, procId: number): void {
+  try {
+    process.kill(-procId, 'SIGKILL');
+  } catch {
+    // No such group (non-detached child) or already gone — single-process kill.
+    fallbackKill(child);
+  }
+}
+
+/**
+ * Kills the spawned scan process AND its descendants, on both platforms.
+ *
+ * Best-effort by contract: callers must never assume a `close` event follows
+ * (see `createScanLifecycle` in scanOnSaveRunner.ts, whose watchdog exists
+ * precisely because this can fail to take effect).
+ *
+ * [spawnFn] exists only as a test seam and every production caller omits it:
+ * Node exposes `child_process.spawn` as a non-configurable property, so a test
+ * cannot replace it on the module, and without an injection point the Windows
+ * branch — the one that actually matters, since it is the platform where the
+ * `dart.exe` grandchild hides behind a shell — would be unverifiable.
+ */
+export function killProcessTree(
+  child: cp.ChildProcess,
+  spawnFn: typeof cp.spawn = cp.spawn,
+): void {
+  const procId = child.pid;
+  // No pid means the spawn itself failed (ENOENT, EPERM) and there is nothing
+  // to reap. Returning early is correct rather than merely defensive: passing
+  // `undefined` into either branch below would target the wrong process — a
+  // `taskkill /PID undefined` or a `process.kill(NaN)` — and callers that
+  // believed a kill had been issued would be told nothing went wrong.
+  if (procId === undefined) return;
+  if (process.platform === 'win32') {
+    killWindowsProcessTree(child, procId, spawnFn);
+    return;
+  }
+  killPosixProcessTree(child, procId);
 }

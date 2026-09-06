@@ -137,12 +137,26 @@ interface PressureBandKeys {
   tooltip: string;
 }
 
+/**
+ * How loudly a pressure band should be presented.
+ *
+ * Every band used to paint the status bar error-red simply because it
+ * produced a suffix, so an informational level-1 shed (a handful of
+ * expensive rules stood down, analysis fully functional) looked identical
+ * to "all rules paused". Red is reserved for bands the user must act on:
+ * anything less alarming gets warning yellow or the default background, so
+ * a red memory badge keeps meaning something.
+ */
+export type PressureSeverity = 'error' | 'warning' | 'info';
+
 /** Ordered priority: hardTripped > shedLevel 3 > 2 > 1 > softNoShed. */
 const PRESSURE_BANDS: readonly {
   match: (s: MemoryPressureState) => boolean;
   keys: PressureBandKeys;
   /** l10n interpolation tokens for this band. */
   params: (s: MemoryPressureState) => Record<string, string>;
+  /** Presentation weight for this band — drives the status-bar background. */
+  severity: PressureSeverity;
 }[] = [
   {
     match: (s) => s.hardLimitTripped,
@@ -151,6 +165,7 @@ const PRESSURE_BANDS: readonly {
       tooltip: 'memoryPressure.tooltip.hardTripped',
     },
     params: (s) => ({ rssMb: String(s.rssMb) }),
+    severity: 'error',
   },
   {
     match: (s) => s.shedLevel >= 3,
@@ -159,6 +174,7 @@ const PRESSURE_BANDS: readonly {
       tooltip: 'memoryPressure.tooltip.shedLevel3',
     },
     params: (s) => ({ count: String(s.shedRuleCount) }),
+    severity: 'error',
   },
   {
     match: (s) => s.shedLevel >= 2,
@@ -167,6 +183,7 @@ const PRESSURE_BANDS: readonly {
       tooltip: 'memoryPressure.tooltip.shedLevel2',
     },
     params: (s) => ({ count: String(s.shedRuleCount) }),
+    severity: 'warning',
   },
   {
     match: (s) => s.shedLevel >= 1,
@@ -175,6 +192,7 @@ const PRESSURE_BANDS: readonly {
       tooltip: 'memoryPressure.tooltip.shedLevel1',
     },
     params: (s) => ({ count: String(s.shedRuleCount) }),
+    severity: 'info',
   },
   {
     match: (s) => s.softLimitTripped && !s.shedEnabled,
@@ -183,6 +201,7 @@ const PRESSURE_BANDS: readonly {
       tooltip: 'memoryPressure.tooltip.pressureNoShed',
     },
     params: (s) => ({ rssMb: String(s.rssMb) }),
+    severity: 'warning',
   },
 ];
 
@@ -190,9 +209,23 @@ const PRESSURE_BANDS: readonly {
 function matchPressureBand(state: MemoryPressureState | null) {
   if (!state) return undefined;
   for (const band of PRESSURE_BANDS) {
-    if (band.match(state)) return { keys: band.keys, params: band.params(state) };
+    if (band.match(state)) {
+      return { keys: band.keys, params: band.params(state), severity: band.severity };
+    }
   }
   return undefined;
+}
+
+/**
+ * Severity of the winning pressure band, or undefined when no band matches
+ * (no pressure suffix is shown at all). Read by the status bar to choose a
+ * background color; sharing the band table with the suffix and tooltip keeps
+ * the color and the words from disagreeing about how bad things are.
+ */
+export function memoryPressureSeverity(
+  state: MemoryPressureState | null,
+): PressureSeverity | undefined {
+  return matchPressureBand(state)?.severity;
 }
 
 export function memoryPressureSuffix(
@@ -200,6 +233,31 @@ export function memoryPressureSuffix(
 ): string | undefined {
   const band = matchPressureBand(state);
   return band ? l10n(band.keys.statusBar, band.params) : undefined;
+}
+
+/**
+ * Theme color id for the status-bar background of the current pressure
+ * state, or undefined for "no colored background".
+ *
+ * Kept next to the band table (and pure, so it is testable without a VS Code
+ * host) because the words and the color must come from the same decision:
+ * the previous code painted error red whenever any suffix existed, which
+ * made an informational shed indistinguishable from a hard memory stop.
+ * Only bands the user must act on get error red. These are theme color ids,
+ * never raw hex, so both light and dark themes render correctly.
+ */
+export function pressureBackgroundColorId(
+  state: MemoryPressureState | null,
+): string | undefined {
+  switch (memoryPressureSeverity(state)) {
+    case 'error':
+      return 'statusBarItem.errorBackground';
+    case 'warning':
+      return 'statusBarItem.warningBackground';
+    default:
+      // Informational band (or no band at all) — default background.
+      return undefined;
+  }
 }
 
 /**

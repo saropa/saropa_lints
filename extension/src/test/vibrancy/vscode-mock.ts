@@ -196,6 +196,12 @@ export const workspace: Record<string, any> = {
     onDidChangeConfiguration: (_listener: (e: any) => void) => ({
         dispose: () => { /* no-op */ },
     }),
+    // The Drift mapper arms this when there is no folder to run a file watcher over, so a
+    // folder appearing later can still invalidate its caches. Never fired by the mock — the
+    // tests drive invalidation directly via resetTableLocationCache.
+    onDidChangeWorkspaceFolders: (_listener: (e: any) => void) => ({
+        dispose: () => { /* no-op */ },
+    }),
     onDidSaveTextDocument: (_listener: (doc: any) => void) => ({
         dispose: () => { /* no-op */ },
     }),

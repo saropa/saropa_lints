@@ -26,6 +26,10 @@ document.addEventListener('click', function(e) {
     if (card) {
       vscode.postMessage({ type: 'toggle', engine: card.dataset.engine, enabled: action === 'toggleOn' });
     }
+  } else if (action === 'reclaimOrphans') {
+    // Fires the same command as the palette entry; the extension host owns
+    // the confirmation modal, so the webview never terminates anything.
+    vscode.postMessage({ type: 'reclaimOrphans' });
   } else if (action === 'killAll') {
     vscode.postMessage({ type: 'killAll' });
   } else if (action === 'restartAll') {

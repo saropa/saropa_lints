@@ -3,6 +3,8 @@ import { l10n } from '../i18n/runtime';
 import { queryDartProcesses, buildSnapshot, killProcess } from './processQuery';
 import { buildHealthPanelHtml } from './healthPanel-html';
 import type { HealthPanelData } from './healthPanel-html';
+import { scanOrphanedHosts, type OrphanHostScan } from './orphanHosts';
+import { CHECK_ORPHANS_COMMAND } from './orphanPreflight';
 import type { EngineStatus, EngineStatusDeps } from './engineCardsHtml';
 
 /** Maximum number of engine-log entries retained in the scrollback buffer. */
@@ -18,7 +20,8 @@ type HealthPanelMessage =
   | { type: 'killProcess'; pid: number }
   | { type: 'toggle'; engine: 'analyzer' | 'scanDaemon' | 'lspServer'; enabled: boolean }
   | { type: 'killAll' }
-  | { type: 'restartAll' };
+  | { type: 'restartAll' }
+  | { type: 'reclaimOrphans' };
 
 // Singleton webview panel: only one System Health view makes sense at a
 // time, so re-invoking the command reveals + refreshes the existing panel
@@ -148,9 +151,31 @@ export class HealthPanel implements vscode.Disposable {
   }
 
   private async refresh(): Promise<void> {
-    const data = await this.queryData();
+    // The orphan scan is queried alongside the Dart process table rather than
+    // cached from the activation preflight: the panel is where a user goes to
+    // confirm a reclaim worked, and a stale banner would still show the
+    // processes they just terminated.
+    const [data, orphanHosts] = await Promise.all([
+      this.queryData(),
+      HealthPanel.queryOrphanHosts(),
+    ]);
     if (this.disposed) return;
-    this.panel.webview.html = buildHealthPanelHtml(data, this.collectEngines(), HealthPanel.logEntries);
+    this.panel.webview.html = buildHealthPanelHtml({
+      data,
+      engines: this.collectEngines(),
+      logEntries: HealthPanel.logEntries,
+      orphanHosts,
+    });
+  }
+
+  /** Orphan scan for the banner; failures degrade to no banner, never to a broken panel. */
+  private static async queryOrphanHosts(): Promise<OrphanHostScan | undefined> {
+    if (process.platform !== 'win32') return undefined;
+    try {
+      return await scanOrphanedHosts();
+    } catch {
+      return undefined;
+    }
   }
 
   private async queryData(): Promise<HealthPanelData | null> {
@@ -193,6 +218,12 @@ export class HealthPanel implements vscode.Disposable {
         break;
       case 'restartAll':
         HealthPanel._onRestartAll.fire();
+        break;
+      case 'reclaimOrphans':
+        // Delegated to the command so the confirmation modal and the kill
+        // path have exactly one implementation, shared with the palette
+        // entry and the preflight notification.
+        void vscode.commands.executeCommand(CHECK_ORPHANS_COMMAND);
         break;
     }
   }

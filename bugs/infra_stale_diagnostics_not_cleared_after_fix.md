@@ -5,7 +5,7 @@
 Created: 2026-09-05
 Rule: ALL rules (infrastructure-level)
 File: `lib/src/rules/saropa_lint_rule.dart` (line ~3223, `deferForRapidEdit`)
-      `lib/src/rules/saropa_context.dart` (line ~322, `_wrapCallback`)
+      `lib/src/native/saropa_context.dart` (line ~322, `_wrapCallback`)
 Severity: Critical — blocks the entire fix-verify loop; developers must reload
 VS Code to see whether a fix worked
 Rule version: N/A (infrastructure)
@@ -31,7 +31,7 @@ Infrastructure bug — not rule-specific. The mechanism lives in:
 
 ```
 lib/src/rules/saropa_lint_rule.dart — deferForRapidEdit (line ~3223)
-lib/src/rules/saropa_context.dart — _wrapCallback (line ~322)
+lib/src/native/saropa_context.dart — _wrapCallback (line ~322)
 ```
 
 The deferral happens inside `_wrapCallback` at `saropa_context.dart:322` — the

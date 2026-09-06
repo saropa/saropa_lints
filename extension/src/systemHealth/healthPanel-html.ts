@@ -5,6 +5,7 @@ import { getHealthPanelScript } from './healthPanel-script';
 import { formatBytes, isDaemonProcess, isSaropaProcess } from './processQuery';
 import { buildEnginesSection, buildActionsBar, buildLogSection, type EngineStatus } from './engineCardsHtml';
 import type { DartProcessInfo } from './types';
+import type { OrphanHostScan } from './orphanHosts';
 
 export interface HealthPanelData {
   processes: DartProcessInfo[];
@@ -20,11 +21,21 @@ export interface HealthPanelData {
 // `engines` and `logEntries` render the "Diagnostic Engines" section that
 // moved in from the former standalone Debug Panel sidebar webview — omitted
 // entirely when the caller has no engine deps configured yet.
-export function buildHealthPanelHtml(
-  data: HealthPanelData | null,
-  engines?: EngineStatus[],
-  logEntries?: string[],
-): string {
+export interface HealthPanelRender {
+  data: HealthPanelData | null;
+  engines?: EngineStatus[];
+  logEntries?: string[];
+  /**
+   * Model-host processes orphaned by earlier sessions. Rendered as a banner
+   * above everything else because it is the only section that can be
+   * actionable while the rest of the panel is empty — a machine with no Dart
+   * process running can still be carrying tens of GB of stranded model hosts.
+   */
+  orphanHosts?: OrphanHostScan;
+}
+
+export function buildHealthPanelHtml(render: HealthPanelRender): string {
+  const { data, engines, logEntries } = render;
   const nonce = createWebviewCspNonce();
   const styles = getHealthPanelStyles();
   const script = getHealthPanelScript();
@@ -49,6 +60,7 @@ export function buildHealthPanelHtml(
   <style nonce="${nonce}">${styles}</style>
 </head>
 <body>
+  ${buildOrphanHostBanner(render.orphanHosts)}
   ${enginesHtml}
   ${data ? buildSummaryBar(data) : ''}
   ${body}
@@ -67,6 +79,27 @@ function buildSummaryBar(data: HealthPanelData): string {
   <span class="summary-stat"><strong>${rss}</strong> ${escapeHtml(l10n('systemHealth.panel.totalRss'))}</span>
   <span class="summary-stat"><strong>${orphans}</strong> ${escapeHtml(l10n('systemHealth.panel.orphaned'))}</span>
   <button class="btn-refresh" data-action="refresh">${escapeHtml(l10n('systemHealth.panel.refresh'))}</button>
+</div>`;
+}
+
+/**
+ * Warning banner for orphaned model hosts, with the explicit reclaim action.
+ *
+ * The committed-memory total is the headline figure rather than the process
+ * count: the 2026-09-05 incident was three processes, which reads as harmless
+ * until you see the 37 GB next to it. Renders nothing when there is nothing to
+ * report so a healthy machine gets no permanent scold bar.
+ */
+export function buildOrphanHostBanner(scan: OrphanHostScan | undefined): string {
+  if (!scan || scan.orphans.length === 0) return '';
+  const title = l10n('systemHealth.orphanPreflight.bannerTitle', {
+    count: String(scan.orphans.length),
+    size: formatBytes(scan.totalCommittedBytes),
+  });
+  const action = escapeHtml(l10n('systemHealth.orphanPreflight.bannerReclaim'));
+  return `<div class="orphan-banner">
+  <span class="orphan-banner-text">${escapeHtml(title)}</span>
+  <button class="btn-kill" data-action="reclaimOrphans">${action}</button>
 </div>`;
 }
 

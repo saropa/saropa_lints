@@ -407,6 +407,15 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'pulse',
   },
   {
+    // Startup preflight for model-host processes (llama-server/ollama) that
+    // outlived the session that spawned them — see orphanPreflight.ts.
+    command: 'saropaLints.checkOrphanedProcesses',
+    title: 'Check for Orphaned Processes',
+    description: 'Find model host processes left behind by earlier sessions and offer to reclaim their memory.',
+    category: 'Analysis',
+    icon: 'circuit-board',
+  },
+  {
     // Kill orphaned Flutter/Dart and scan daemon processes.
     command: 'saropaLints.killOrphanedDaemons',
     title: 'Kill Orphaned Flutter Daemons',

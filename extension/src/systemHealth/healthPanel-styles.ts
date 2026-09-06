@@ -65,6 +65,25 @@ ${getEngineCardsStyles()}
   background: var(--vscode-editorInfo-foreground, #3794ff);
   color: #fff;
 }
+/* Orphaned-host banner. Uses the editorWarning token rather than a literal
+   amber so it stays legible in light, dark and high-contrast themes; the
+   text color is the editor foreground so the banner never becomes a block
+   of unreadable low-contrast text when a theme redefines the warning hue. */
+.orphan-banner {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--vscode-widget-border, #e5e7eb);
+  border-left: 4px solid var(--vscode-editorWarning-foreground, #cca700);
+  background: var(--vscode-inputValidation-warningBackground, var(--vscode-editorWidget-background));
+}
+.orphan-banner-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
 .summary-bar {
   display: flex;
   gap: 16px;

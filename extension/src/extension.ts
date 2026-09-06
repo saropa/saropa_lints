@@ -72,7 +72,7 @@ import { registerProjectMapCommand } from './views/projectMapView';
 import { registerHealthCodeLens } from './views/healthCodeLens';
 import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
-import { mapIssuesToLocations } from './driftAdvisor/mapper';
+import { mapIssuesToLocations, disposeTableLocationWatcher } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { maybeRecommendDriftAdvisor } from './driftAdvisor/driftAdvisorRecommendNudge';
 import { registerSuiteCommands } from './suite/commands';
@@ -152,14 +152,16 @@ import {
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
 import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
 import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
-import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
+import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
-import { ProcessMonitor } from './systemHealth/processMonitor';
+import { ProcessMonitor, systemHealthStatusBarText } from './systemHealth/processMonitor';
 import { formatBytes } from './systemHealth/processQuery';
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
+import { registerOrphanPreflight } from './systemHealth/orphanPreflight';
 import { HealthPanel } from './systemHealth/healthPanel';
 import { HealthLevel } from './systemHealth/types';
-import type { DartProcessSnapshot } from './systemHealth/types';
+import type { DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
+import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
@@ -1098,10 +1100,48 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   // System health snapshot pushed from the process monitor.
   let systemHealthSnapshot: DartProcessSnapshot | null = null;
-  let systemHealthLevel: HealthLevel = HealthLevel.Healthy;
+  // Full assessment (level plus what tripped it), not just the level: the
+  // status bar has to name the trigger, and re-deriving it here would let
+  // this file and the monitor disagree the next time thresholds change.
+  let systemHealthAssessment: HealthAssessment = {
+    level: HealthLevel.Healthy,
+    trigger: HealthTrigger.None,
+    orphanCount: 0,
+  };
   // Plugin-level memory pressure state — fed by the MemoryPressureWatcher
   // watching memory_state.json. Takes priority over process-level health.
   let memoryPressureState: MemoryPressureState | null = null;
+
+  /**
+   * Pick the background for the memory status bar item.
+   *
+   * Red is deliberately rationed. Previously any non-empty pressure suffix
+   * forced `statusBarItem.errorBackground`, so an informational level-1 shed
+   * (a few expensive rules stood down, analysis otherwise intact) looked
+   * exactly as alarming as "all rules paused" — and a red badge that fires
+   * for non-problems stops meaning anything. Error red is now reserved for
+   * bands the user must act on; softer bands get warning yellow, and purely
+   * informational ones get the default background (undefined) so they read
+   * as a note rather than an alarm. Theme colors only, never raw hex, so the
+   * item follows the user's light/dark theme.
+   *
+   * @param pressureActive whether a plugin memory-pressure band is showing;
+   *   when false the process-level health level decides the color.
+   */
+  const memoryStatusBarBackground = (
+    pressureActive: boolean,
+  ): vscode.ThemeColor | undefined => {
+    if (pressureActive) {
+      // The id (or "no background") is decided by the band table itself so
+      // the color can be unit-tested without a VS Code host.
+      const colorId = pressureBackgroundColorId(memoryPressureState);
+      return colorId ? new vscode.ThemeColor(colorId) : undefined;
+    }
+    // Process-level health: only Critical earns red; Warning stays yellow.
+    return systemHealthAssessment.level === HealthLevel.Critical
+      ? new vscode.ThemeColor('statusBarItem.errorBackground')
+      : new vscode.ThemeColor('statusBarItem.warningBackground');
+  };
 
   /**
    * Drive the dedicated memory/system-health status bar item. Hidden when
@@ -1119,15 +1159,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       text = memPressureSuffix;
       const line = memoryPressureTooltipLine(memoryPressureState);
       if (line) tooltipLines.push(line);
-    } else if (systemHealthSnapshot && systemHealthLevel !== HealthLevel.Healthy) {
-      // Show saropa-specific RSS when available — the system-wide total
-      // wrongly blames saropa_lints for every dart.exe on the machine.
-      const size = systemHealthSnapshot.saropaProcessCount > 0
-        ? formatBytes(systemHealthSnapshot.saropaRssBytes)
-        : formatBytes(systemHealthSnapshot.totalRssBytes);
-      text = systemHealthLevel === HealthLevel.Critical
-        ? l10n('systemHealth.statusBar.critical', { size })
-        : l10n('systemHealth.statusBar.warning', { size });
+    } else if (systemHealthSnapshot) {
+      // Delegate the wording to the health module so the text always names
+      // whatever actually tripped the level. An orphan-driven Critical used
+      // to render an RSS figure, which read as "this memory number is the
+      // crisis" even at a healthy 47 MB; the saropa-only RSS breakdown now
+      // lives in the tooltip lines below instead.
+      text = systemHealthStatusBarText(systemHealthSnapshot, systemHealthAssessment);
     }
 
     if (systemHealthSnapshot) {
@@ -1155,9 +1193,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           l10n('systemHealth.tooltip.scanDaemonOrphans', { count: String(scanOrphans) }),
         );
       }
-      if (systemHealthLevel === HealthLevel.Warning) {
+      if (systemHealthAssessment.level === HealthLevel.Warning) {
         tooltipLines.push(l10n('systemHealth.tooltip.warningHint'));
-      } else if (systemHealthLevel === HealthLevel.Critical) {
+      } else if (systemHealthAssessment.level === HealthLevel.Critical) {
         tooltipLines.push(l10n('systemHealth.tooltip.criticalHint'));
       }
     }
@@ -1172,9 +1210,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       ...tooltipLines,
       l10n('systemHealth.statusBar.openHint'),
     ].join('\n');
-    memoryStatusBarItem.backgroundColor = memPressureSuffix || systemHealthLevel === HealthLevel.Critical
-      ? new vscode.ThemeColor('statusBarItem.errorBackground')
-      : new vscode.ThemeColor('statusBarItem.warningBackground');
+    memoryStatusBarItem.backgroundColor = memoryStatusBarBackground(memPressureSuffix !== undefined);
     memoryStatusBarItem.show();
   };
 
@@ -1311,9 +1347,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // System health monitor: polls Dart/Flutter process memory and orphan count.
   const processMonitor = new ProcessMonitor();
   context.subscriptions.push(processMonitor);
-  processMonitor.onSnapshot((snapshot, level) => {
+  processMonitor.onSnapshot((snapshot, assessment) => {
     systemHealthSnapshot = snapshot;
-    systemHealthLevel = level;
+    // Keep the trigger, not just the level — the status bar text depends on it.
+    systemHealthAssessment = assessment;
     updateAllStatusBars();
   });
   processMonitor.start();
@@ -1343,6 +1380,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   }
 
   registerCleanupCommand(context);
+  // One-shot orphaned model-host preflight (llama-server/ollama left behind by
+  // an earlier session). Registers its command immediately but defers the
+  // process-table scan well past activation — see orphanPreflight.ts.
+  registerOrphanPreflight(context);
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.showProcessHealth', () => {
       HealthPanel.createOrShow(context);
@@ -2874,6 +2915,15 @@ export function deactivate(): void {
     stopFreshnessWatcher();
   } catch (err) {
     console.error('[Saropa Lints] Package Vibrancy deactivation failed:', err);
+  }
+  // The Drift table-location cache creates its `**/*.dart` file watcher lazily, on the first
+  // poll that has to resolve a table, so it is owned by that module rather than by this file's
+  // subscriptions list. Dispose it explicitly here — nothing else will. Separate try/catch so a
+  // failure above cannot skip it, and vice versa.
+  try {
+    disposeTableLocationWatcher();
+  } catch (err) {
+    console.error('[Saropa Lints] Drift table cache teardown failed:', err);
   }
 }
 

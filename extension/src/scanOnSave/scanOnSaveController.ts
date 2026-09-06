@@ -36,6 +36,201 @@ function resolveEffectiveTier(root: string): string {
 
 const DEBOUNCE_MS = 1500;
 
+/**
+ * Hard ceiling on how many OPEN-derived files one debounced batch may scan.
+ *
+ * It deliberately does NOT apply to saved files: a refactor across 30 files
+ * followed by Save All is a legitimate user action, and dropping it would
+ * leave the user with no diagnostics and nothing but an output-channel line
+ * to explain why. Saves are always real user intent, so a save-derived batch
+ * of any size scans.
+ *
+ * Open events are different: `onDidOpenTextDocument` can be driven by other
+ * extensions on a timer. Above this count, an open-derived batch that somehow
+ * survived {@link isDocumentUserOpen} is a bug signal. That is exactly what
+ * happened in
+ * `plans/history/2026.09/2026.09.05/infra_drift_poll_opens_every_dart_file_triggers_full_project_scan.md`:
+ * the Drift Advisor poll called `workspace.openTextDocument()` on all 4,598
+ * Dart files every 30 s, each open fired `onDidOpenTextDocument`, and the
+ * controller launched a full-project *resolved* scan 33 times in 50 minutes.
+ * Two `dart.exe` processes reached 22 GB and 13 GB of commit memory and
+ * VS Code was killed by the low-memory condition.
+ *
+ * The visible-editor gate in {@link isDocumentUserOpen} is the real fix; this
+ * cap is only the backstop behind it, so that no *future* regression in the
+ * open-event path can ever again turn an event storm into a whole-project
+ * scan. Whole-project scanning has a deliberate, user-triggered home: the
+ * Lane 3 baseline scan command (`runBaselineScanCommand`), which chunks the
+ * work and shows progress.
+ *
+ * Why 200 and not a tighter number: because Gate O runs FIRST, everything
+ * that reaches this cap is a file the user genuinely has open in a tab or an
+ * editor. Restoring a workspace with 30 or 50 Dart tabs is an ordinary
+ * working session, and a cap of 20 would deny startup diagnostics to exactly
+ * the users who keep the most files open. This is not a performance budget —
+ * it is a backstop against an event storm, and the storm it was written for
+ * was 4,598 files. Two hundred still catches that by more than an order of
+ * magnitude while leaving every realistic human tab count alone. A 200-file
+ * scan is one bounded `dart` invocation with an explicit file list, not a
+ * whole-project resolve.
+ *
+ * A drop is still reported in the status bar, not only the log, so that on
+ * the rare occasion the backstop does fire the user can see it happened.
+ */
+export const MAX_QUEUED_SCAN_FILES = 200;
+
+/**
+ * True when a queued batch is too large to be a real user action and must be
+ * dropped rather than scanned. Exported so the backstop is unit-testable
+ * without a live workspace.
+ */
+export function queuedBatchExceedsCap(fileCount: number): boolean {
+  return fileCount > MAX_QUEUED_SCAN_FILES;
+}
+
+/**
+ * Why a path is sitting in the pending queue.
+ *
+ * Provenance has to be carried through the debounce because the two origins
+ * get different treatment at scan time: a `save` is proof of user intent and
+ * is scanned unconditionally, while an `open` is not (see Gate O on
+ * {@link isDocumentUserOpen}) and must be re-checked against the window's
+ * editor/tab state once the debounce has elapsed.
+ */
+export type ScanQueueOrigin = 'save' | 'open';
+
+/** How many file paths a scan log line prints before summarizing the rest. */
+const LOG_FILE_SAMPLE_SIZE = 5;
+
+/**
+ * Renders a file batch for the output channel as a count plus a short sample.
+ *
+ * The previous implementation logged `files.join(', ')`. During the incident
+ * above that produced a single 354 KB log line per scan and drove the
+ * extension output logs to 10-20 MB, which is itself a memory and disk
+ * problem and makes the log unreadable for the bug reporter. Sampling keeps
+ * the line diagnostic (you can still see *which* files) and bounded.
+ *
+ * Developer diagnostic text only — deliberately NOT routed through `l10n()`
+ * per `.claude/rules/i18n.md` (log strings are exempt).
+ */
+export function formatScanFileListForLog(files: readonly string[]): string {
+  const sample = files.slice(0, LOG_FILE_SAMPLE_SIZE).join(', ');
+  const remaining = files.length - LOG_FILE_SAMPLE_SIZE;
+  // Only append the suffix when something was actually elided, so the common
+  // one-file save reads as a plain path with no noise after it.
+  return remaining > 0 ? `${sample} and ${remaining} more` : sample;
+}
+
+/**
+ * True when [fsPath] is a document the USER has open, as opposed to one some
+ * extension opened programmatically via `workspace.openTextDocument()`.
+ *
+ * `onDidOpenTextDocument` fires for BOTH cases and cannot tell them apart —
+ * that conflation is the root of the crash documented on
+ * {@link MAX_QUEUED_SCAN_FILES}. A programmatically opened document has no
+ * editor and no tab, so intersecting against the window's own state is what
+ * separates them.
+ *
+ * Both inputs matter and neither alone is sufficient:
+ * - [openTabPaths] (from `window.tabGroups`) is the load-bearing one: it
+ *   includes background tabs, so a file the user has open but is not
+ *   currently looking at still gets scanned, as it did before this fix.
+ * - [visibleEditorPaths] (from `window.visibleTextEditors`) covers editors
+ *   that exist without a normal tab entry, so nothing the user can actually
+ *   see is dropped.
+ *
+ * Pure and exported so the gate is unit-testable without a live workspace.
+ */
+export function isDocumentUserOpen(
+  fsPath: string,
+  visibleEditorPaths: readonly string[],
+  openTabPaths: readonly string[],
+): boolean {
+  return visibleEditorPaths.includes(fsPath) || openTabPaths.includes(fsPath);
+}
+
+/**
+ * fsPaths of every text editor the window is currently showing.
+ *
+ * Defensive `?? []`: the API is always present in a real host, but a test
+ * double (or a future proposed-API shuffle) may not define it, and a missing
+ * property must degrade to "nothing is visible" rather than throw inside an
+ * event handler where the exception would be swallowed.
+ */
+function currentVisibleEditorPaths(): string[] {
+  return (vscode.window.visibleTextEditors ?? []).map((e) => e.document.uri.fsPath);
+}
+
+/**
+ * Every property name on a `Tab.input` union member that carries a `Uri`.
+ *
+ * `tab.input` is a union and only ONE of its members (`TabInputText`,
+ * `TabInputNotebook`, `TabInputCustom`) exposes a plain `uri`. The comparison
+ * shapes hide their URIs behind other names:
+ *  - `TabInputTextDiff` / `TabInputNotebookDiff`: `original` + `modified`
+ *  - `TabInputTextMerge`: `base` + `input1` + `input2` + `result`
+ * Reading only `uri` therefore reported a Dart file that is open as the
+ * modified side of a diff as "not open", so Gate O dropped it and the user
+ * silently lost that file's diagnostics.
+ */
+const TAB_INPUT_URI_KEYS = [
+  'uri',
+  'original',
+  'modified',
+  'base',
+  'input1',
+  'input2',
+  'result',
+] as const;
+
+/**
+ * Collects every fsPath a single tab input exposes.
+ *
+ * Duck-typed on purpose rather than `instanceof`-checked against the
+ * `TabInput*` classes: this runs inside an event handler where a throw would
+ * be swallowed, and VS Code adds union members over time. Anything that is not
+ * an object, or whose named property is not a `Uri`-shaped value with a string
+ * `fsPath`, contributes nothing instead of failing — so a future member the
+ * table does not know about degrades to "this tab holds no files", which is
+ * the same conservative answer the old code gave for every non-`uri` shape.
+ *
+ * Pure and exported so the diff and merge shapes are unit-testable without a
+ * live window.
+ */
+export function tabInputUriPaths(input: unknown): string[] {
+  if (input === null || typeof input !== 'object') return [];
+  const record = input as Record<string, unknown>;
+  const paths: string[] = [];
+  for (const key of TAB_INPUT_URI_KEYS) {
+    // Optional chaining covers a property that is absent, null, or a
+    // primitive; the typeof check covers one that exists but is not a Uri.
+    const fsPath = (record[key] as { fsPath?: unknown } | undefined)?.fsPath;
+    if (typeof fsPath === 'string' && fsPath.length > 0) paths.push(fsPath);
+  }
+  return paths;
+}
+
+/**
+ * fsPaths of every tab open in every tab group, including background tabs the
+ * user is not currently looking at — those must still be scanned.
+ *
+ * Flattens {@link tabInputUriPaths} over every tab, so a file counts as open
+ * whether it is a normal editor tab or one side of a diff or merge view. The
+ * `?? []` on `tabGroups` keeps a test double (or a proposed-API shuffle) that
+ * lacks the API from throwing inside the save handler.
+ */
+function currentOpenTabPaths(): string[] {
+  const groups = vscode.window.tabGroups?.all ?? [];
+  const paths: string[] = [];
+  for (const group of groups) {
+    for (const tab of group.tabs) {
+      paths.push(...tabInputUriPaths(tab.input));
+    }
+  }
+  return paths;
+}
+
 const SEVERITY_MAP: Record<string, vscode.DiagnosticSeverity> = {
   ERROR: vscode.DiagnosticSeverity.Error,
   WARNING: vscode.DiagnosticSeverity.Warning,
@@ -112,10 +307,22 @@ const DAEMON_SUSPEND_SHED_LEVEL = 2;
 export class ScanOnSaveController implements vscode.Disposable {
   private readonly _disposables: vscode.Disposable[] = [];
   private readonly _statusBarItem: vscode.StatusBarItem;
-  /** Absolute file paths saved since the last scan started, keyed by uniqueness. */
-  private _pendingFiles = new Set<string>();
+  /**
+   * Absolute file paths queued since the last scan started, mapped to why they
+   * were queued. A Map rather than a Set because the visibility filter is
+   * applied at scan time, not queue time, and by then the origin is the only
+   * way to tell a user's Save All from another extension's open storm.
+   */
+  private _pendingFiles = new Map<string, ScanQueueOrigin>();
   private _debounceTimer: NodeJS.Timeout | undefined;
   private _scanInFlight = false;
+  /** Files the in-flight scan is covering — used to decide whether a newly
+   *  queued batch makes that scan redundant (see _supersedeStaleScan). */
+  private _inFlightFiles: readonly string[] = [];
+  /** Cancels the in-flight scan's child process. One source per scan; cancelled
+   *  when the scan is superseded by a newer batch, and on dispose so a shutdown
+   *  never leaves an orphaned `dart` process holding resolved-analysis memory. */
+  private _scanCancelSource: vscode.CancellationTokenSource | undefined;
   /** Set when saves arrive while a scan is already running — triggers one more pass after it finishes. */
   private _rescanQueued = false;
   private readonly _daemonManager = new ScanDaemonManager();
@@ -126,6 +333,15 @@ export class ScanOnSaveController implements vscode.Disposable {
   private _lastDiagnosticsByFile = new Map<string, ScanOnSaveDiagnostic[]>();
   /** True when the daemon has been suspended due to heavy memory pressure. */
   private _daemonSuspended = false;
+  /**
+   * Files dropped by the over-cap backstop that the user has not been told about yet.
+   *
+   * Needed because `_dropOversizedOpenBatch` and `_beginScan` write to the same status bar item:
+   * when one queued batch contained both an over-cap open storm and a saved file, the "scan
+   * skipped" text was overwritten by "scanning ..." microseconds later and the drop became
+   * invisible. Carrying the count forward lets the post-scan status line report it instead.
+   */
+  private _droppedFileCount = 0;
 
   /** Public read access for the debug panel to display daemon suspension state. */
   get isDaemonSuspended(): boolean {
@@ -322,9 +538,28 @@ export class ScanOnSaveController implements vscode.Disposable {
   }
 
   /**
-   * Queues a Dart file for scanning if it passes the same gates as _onSave.
-   * Shared by onDidOpenTextDocument and the activation-time open-editors scan
-   * so files get diagnostics without requiring a save.
+   * Queues a Dart file that was opened, so diagnostics appear without needing
+   * a save. Wired to `onDidOpenTextDocument`.
+   *
+   * Queuing here is deliberately OPTIMISTIC — only the language and
+   * project-root gates apply. The "is this really the user's file?" question
+   * (Gate O) is answered later, in {@link _runQueuedScan}, for two reasons:
+   *
+   * 1. `onDidOpenTextDocument` fires when the document loads, which for a
+   *    user-initiated open can be BEFORE the tab is registered in
+   *    `window.tabGroups`. Checking here would race that registration and
+   *    could silently deny diagnostics to a file the user really did open.
+   *    Deferring past the debounce makes the ordering irrelevant.
+   * 2. The check is only meaningful at the moment the scan is about to spawn
+   *    a process; a document opened and closed inside the debounce window
+   *    should not be scanned at all, and the deferred check gets that right
+   *    for free.
+   *
+   * The gate itself is not optional: `onDidOpenTextDocument` also fires for
+   * every `workspace.openTextDocument()` call made by ANY extension. The Drift
+   * Advisor integration opened all 4,598 workspace Dart files on a 30-second
+   * timer, which became 33 full-project resolved scans and crashed VS Code —
+   * see `plans/history/2026.09/2026.09.05/infra_drift_poll_opens_every_dart_file_triggers_full_project_scan.md`.
    */
   private _queueIfDart(doc: vscode.TextDocument): void {
     if (doc.languageId !== 'dart') return;
@@ -334,9 +569,20 @@ export class ScanOnSaveController implements vscode.Disposable {
     const relative = path.relative(root, doc.uri.fsPath);
     if (relative.startsWith('..') || path.isAbsolute(relative)) return;
 
-    this._pendingFiles.add(doc.uri.fsPath);
+    this._enqueue(doc.uri.fsPath, 'open');
     if (this._debounceTimer) clearTimeout(this._debounceTimer);
     this._debounceTimer = setTimeout(() => this._runQueuedScan(root), DEBOUNCE_MS);
+  }
+
+  /**
+   * Adds a path to the pending queue, keeping the STRONGER provenance when the
+   * same file arrives twice. A save must never be downgraded to an open: a
+   * file saved and then re-opened by some background tool would otherwise lose
+   * its guaranteed scan and be subjected to the visibility filter.
+   */
+  private _enqueue(fsPath: string, origin: ScanQueueOrigin): void {
+    if (origin === 'open' && this._pendingFiles.get(fsPath) === 'save') return;
+    this._pendingFiles.set(fsPath, origin);
   }
 
   /**
@@ -348,12 +594,19 @@ export class ScanOnSaveController implements vscode.Disposable {
     if (!this._isEnabled()) return;
     const root = this._getProjectRoot();
     if (!root) return;
+    // `workspace.textDocuments` is NOT "the files the user has open" — it is
+    // every document any extension currently holds open, including the ones
+    // opened programmatically that caused the full-project-scan crash. These
+    // are therefore queued with 'open' provenance and filtered through Gate O
+    // in _runQueuedScan, after the debounce has let the window's tab state
+    // settle. The document list is still the iteration source because it is
+    // the only place `languageId` is available; tabs carry a URI, no language.
     let queued = 0;
     for (const doc of vscode.workspace.textDocuments) {
       if (doc.languageId !== 'dart') continue;
       const relative = path.relative(root, doc.uri.fsPath);
       if (relative.startsWith('..') || path.isAbsolute(relative)) continue;
-      this._pendingFiles.add(doc.uri.fsPath);
+      this._enqueue(doc.uri.fsPath, 'open');
       queued++;
     }
     if (queued > 0) {
@@ -396,7 +649,9 @@ export class ScanOnSaveController implements vscode.Disposable {
       return;
     }
 
-    this._pendingFiles.add(doc.uri.fsPath);
+    // 'save' provenance — a save is unconditional proof of user intent, so
+    // this path bypasses both the visibility filter and the batch cap.
+    this._enqueue(doc.uri.fsPath, 'save');
     if (this._debounceTimer) clearTimeout(this._debounceTimer);
     this._debounceTimer = setTimeout(() => this._runQueuedScan(root), DEBOUNCE_MS);
   }
@@ -408,20 +663,210 @@ export class ScanOnSaveController implements vscode.Disposable {
       // Don't spawn a second concurrent scan (contends on dart's build lock
       // and hangs) — flag one more pass for when the current scan finishes.
       this._rescanQueued = true;
+      this._supersedeStaleScan();
       return;
     }
-    const files = [...this._pendingFiles];
+    const queued = [...this._pendingFiles.entries()];
     this._pendingFiles.clear();
-    if (files.length === 0) return;
+    if (queued.length === 0) return;
+    const files = this._selectFilesToScan(queued);
+    if (files.length === 0) {
+      // Nothing follows to overwrite the status bar, so the drop notice written by
+      // `_dropOversizedOpenBatch` is already standing on its own. Clear the carry-forward count
+      // so a later, unrelated scan does not re-announce a drop the user has already seen.
+      this._droppedFileCount = 0;
+      return;
+    }
     void this._scan(root, files);
   }
 
-  private async _scan(root: string, files: string[]): Promise<void> {
-    this._scanInFlight = true;
-    this._log(`scanning ${files.length} file(s): ${files.join(', ')}`);
-    this._statusBarItem.text = l10n('scanOnSave.statusBar.scanning', { count: String(files.length) });
-    this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.scanning', { count: String(files.length) });
+  /**
+   * Decides which of the debounced queue entries actually get scanned.
+   *
+   * Saves pass through untouched — a Save All across 30 files is a real user
+   * action and must produce diagnostics for all 30. Open-derived paths run the
+   * Gate O gauntlet HERE rather than at queue time, because the tab state is
+   * only reliably settled after the debounce (see _queueIfDart), and then the
+   * survivors face the {@link MAX_QUEUED_SCAN_FILES} backstop.
+   */
+  private _selectFilesToScan(queued: readonly [string, ScanQueueOrigin][]): string[] {
+    const saved = queued.filter(([, origin]) => origin === 'save').map(([f]) => f);
+    const opened = queued.filter(([, origin]) => origin === 'open').map(([f]) => f);
+    // Snapshot the window state once: the gate must judge every file in this
+    // batch against the same instant, and a second pass would re-read state
+    // that can change mid-loop.
+    const visible = currentVisibleEditorPaths();
+    const tabs = currentOpenTabPaths();
+    const userOpened: string[] = [];
+    const programmatic: string[] = [];
+    for (const file of opened) {
+      (isDocumentUserOpen(file, visible, tabs) ? userOpened : programmatic).push(file);
+    }
+    if (programmatic.length > 0) {
+      // One sampled line for the whole batch, never one line per file: the
+      // old per-file logging is what produced multi-megabyte output logs.
+      this._log(
+        `skipped ${programmatic.length} file(s) opened programmatically (no editor, no tab): ` +
+          formatScanFileListForLog(programmatic),
+      );
+    }
+    // Cap applies to the open-derived survivors only. Saves are exempt by
+    // design — see the doc comment on MAX_QUEUED_SCAN_FILES.
+    const accepted = queuedBatchExceedsCap(userOpened.length)
+      ? this._dropOversizedOpenBatch(userOpened)
+      : userOpened;
+    // Dedupe: a file can appear in both lists only if provenance was upgraded,
+    // which _enqueue prevents, but the Set keeps the contract explicit.
+    return [...new Set([...saved, ...accepted])];
+  }
+
+  /**
+   * Drops an over-cap open-derived batch and makes the drop VISIBLE.
+   *
+   * Dropping rather than truncating is deliberate: a batch this large was
+   * filled by something other than a person, so no subset of it is worth
+   * spawning a `dart` process for. The status bar update is not optional —
+   * an action that silently produces nothing violates the project rule that
+   * every outcome must be visible, and the output channel alone is not a
+   * surface any user watches.
+   */
+  private _dropOversizedOpenBatch(files: readonly string[]): string[] {
+    this._log(
+      `ABORTED batch of ${files.length} opened file(s) — over the ${MAX_QUEUED_SCAN_FILES}-file cap, ` +
+        `so this is an event storm, not a user action. Dropped without scanning. ` +
+        `Sample: ${formatScanFileListForLog(files)}`,
+    );
+    const count = String(files.length);
+    // Written unconditionally so the drop is visible when NO scan follows. When one does, this
+    // text is immediately overwritten by `_beginScan`; the carry-forward count below is what
+    // makes the drop survive that, via `_appendDropNotice` on the post-scan line.
+    this._droppedFileCount += files.length;
+    this._statusBarItem.text = l10n('scanOnSave.statusBar.dropped', { count });
+    this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.droppedTooltip', { count });
     this._statusBarItem.show();
+    return [];
+  }
+
+  /**
+   * Folds a pending drop notice into whatever the finished scan just reported.
+   *
+   * Chosen over a timed toast or a delayed status flip because it rides the existing status bar
+   * lifecycle exactly: the status bar already ends every scan with a single terminal line, so
+   * appending there needs no new timer, cannot be clobbered by the next `_beginScan`, and keeps
+   * the "every asynchronous action emits a visible outcome" rule satisfied for both outcomes of
+   * one queued batch. Cleared after appending so the drop is announced once and only once.
+   */
+  private _appendDropNotice(): void {
+    if (this._droppedFileCount === 0) return;
+    const count = String(this._droppedFileCount);
+    this._droppedFileCount = 0;
+    this._statusBarItem.text += l10n('scanOnSave.statusBar.droppedSuffix', { count });
+    const tooltip = this._statusBarItem.tooltip;
+    // Only a plain-string tooltip can be extended safely; every writer in this class sets one.
+    const base = typeof tooltip === 'string' ? `${tooltip}\n` : '';
+    this._statusBarItem.tooltip = base + l10n('scanOnSave.statusBar.droppedSuffixTooltip', { count });
+  }
+
+  /**
+   * Cancels the in-flight scan when a newly queued batch already covers every
+   * file it is scanning.
+   *
+   * In that case the running scan can only produce results the follow-up pass
+   * is about to overwrite — and it produces them from the file contents as
+   * they were BEFORE the newest save, so waiting for it delays correct
+   * diagnostics behind stale ones. Cancelling frees the `dart` child
+   * immediately; the in-flight scan's own `finally` then starts the queued
+   * rescan, so no run is lost. A batch that only partially overlaps is left
+   * alone — those extra files would otherwise never get their diagnostics.
+   */
+  private _supersedeStaleScan(): void {
+    if (this._inFlightFiles.length === 0) return;
+    const pending = this._pendingFiles;
+    if (!this._inFlightFiles.every((f) => pending.has(f))) return;
+    this._log(`superseding in-flight scan of ${this._inFlightFiles.length} file(s): newer batch covers them all`);
+    this._scanCancelSource?.cancel();
+  }
+
+  /**
+   * Marks a scan as started and hands back the token that kills its child
+   * process. Split out of `_scan` to keep that method inside the 50-line
+   * limit; it owns every piece of per-scan state that `_endScan` must undo.
+   */
+  private _beginScan(files: string[]): vscode.CancellationToken {
+    this._scanInFlight = true;
+    this._inFlightFiles = files;
+    // Fresh source per scan — a cancelled token stays cancelled forever, so
+    // reusing one would make every later scan abort instantly.
+    this._scanCancelSource?.dispose();
+    this._scanCancelSource = new vscode.CancellationTokenSource();
+    // Count first, then a bounded sample. Joining the whole list produced a
+    // 354 KB single log line during the event-storm incident and pushed the
+    // extension output logs to 10-20 MB.
+    this._log(`scanning ${files.length} file(s): ${formatScanFileListForLog(files)}`);
+    const scanning = l10n('scanOnSave.statusBar.scanning', { count: String(files.length) });
+    this._statusBarItem.text = scanning;
+    this._statusBarItem.tooltip = scanning;
+    this._statusBarItem.show();
+    return this._scanCancelSource.token;
+  }
+
+  /**
+   * Clears every piece of per-scan state. MUST run on all exit paths — a
+   * leaked `_scanInFlight` silently kills scan-on-save for the rest of the
+   * session, and a leaked token source leaves a `dart` child unkillable.
+   */
+  private _endScan(): void {
+    this._scanInFlight = false;
+    this._inFlightFiles = [];
+    this._scanCancelSource?.dispose();
+    this._scanCancelSource = undefined;
+  }
+
+  /** Surfaces a failed run in the log, the status bar, and a toast. */
+  private _reportScanFailure(result: ScanOnSaveResult): void {
+    // Log the full error so it's visible in the output channel even
+    // after the transient warning toast auto-dismisses.
+    this._log(`scan FAILED (exit ${result.exitCode}): ${result.errorMessage}`);
+    this._statusBarItem.text = l10n('scanOnSave.statusBar.failed');
+    this._statusBarItem.tooltip = result.errorMessage;
+    // A failed scan is still the end of the batch, so a drop queued alongside it must be
+    // reported here too — otherwise the failure text would bury it exactly as `_beginScan` did.
+    this._appendDropNotice();
+    void vscode.window.showWarningMessage(
+      l10n('notify.commands.scanOnSaveFailedDetails', { details: result.errorMessage ?? '' }),
+    );
+  }
+
+  /**
+   * Publishes a completed scan's findings and reports it in the log and the
+   * status bar. The `scan complete` log line is the counterpart every
+   * `scanning ...` line must eventually get — its absence is how the hung-scan
+   * bug was spotted (57 starts, 1 completion), so it stays a single line
+   * emitted from exactly one place.
+   */
+  private _reportScanSuccess(
+    files: string[],
+    diagnostics: readonly ScanOnSaveDiagnostic[],
+    startMs: number,
+  ): void {
+    const publishedCount = this._applyDiagnostics(files, diagnostics);
+    const elapsedS = ((Date.now() - startMs) / 1000).toFixed(1);
+    this._log(`scan complete: ${diagnostics.length} raw finding(s), ${publishedCount} published after severity filter, ${elapsedS}s`);
+    this._statusBarItem.text = l10n('scanOnSave.statusBar.done', {
+      count: String(publishedCount),
+      elapsed: elapsedS,
+    });
+    this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.doneTooltip', {
+      total: String(diagnostics.length),
+      shown: String(publishedCount),
+    });
+    // The same queued batch may have dropped an over-cap open storm before this scan ran; that
+    // notice was overwritten by `_beginScan`, so re-surface it on this terminal line.
+    this._appendDropNotice();
+  }
+
+  private async _scan(root: string, files: string[]): Promise<void> {
+    const cancelToken = this._beginScan(files);
     const start = Date.now();
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const tier = resolveEffectiveTier(root);
@@ -438,32 +883,26 @@ export class ScanOnSaveController implements vscode.Disposable {
       this._log(`tier=${tier}, resolveTypes=${resolveTypes}, useDaemon=${useDaemon}, daemonSuspended=${this._daemonSuspended}`);
       const result = useDaemon
         ? await this._scanViaDaemon(root, files, tier)
-        : await runScanOnSave(root, files, tier, false);
+        // The token reaches the spawn path only: the daemon path multiplexes
+        // one long-lived process and has its own request timeout, so killing
+        // it on cancellation would tear down the warm state every other
+        // queued file still needs.
+        : await runScanOnSave(root, files, tier, false, cancelToken);
       if (result.errorMessage) {
-        // Log the full error so it's visible in the output channel even
-        // after the transient warning toast auto-dismisses.
-        this._log(`scan FAILED (exit ${result.exitCode}): ${result.errorMessage}`);
-        this._statusBarItem.text = l10n('scanOnSave.statusBar.failed');
-        this._statusBarItem.tooltip = result.errorMessage;
-        void vscode.window.showWarningMessage(
-          l10n('notify.commands.scanOnSaveFailedDetails', { details: result.errorMessage }),
-        );
+        // Early return — the `finally` below still runs, so the in-flight
+        // state is released on this path too (a failure that leaked it would
+        // be the same permanent-death bug as a hung child).
+        this._reportScanFailure(result);
         return;
       }
-      const diagnostics = result.payload?.diagnostics ?? [];
-      const publishedCount = this._applyDiagnostics(files, diagnostics);
-      const elapsedS = ((Date.now() - start) / 1000).toFixed(1);
-      this._log(`scan complete: ${diagnostics.length} raw finding(s), ${publishedCount} published after severity filter, ${elapsedS}s`);
-      this._statusBarItem.text = l10n('scanOnSave.statusBar.done', {
-        count: String(publishedCount),
-        elapsed: elapsedS,
-      });
-      this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.doneTooltip', {
-        total: String(diagnostics.length),
-        shown: String(publishedCount),
-      });
+      this._reportScanSuccess(files, result.payload?.diagnostics ?? [], start);
     } finally {
-      this._scanInFlight = false;
+      // Reached on every exit path, including the early `return` in the
+      // errorMessage branch above and any thrown exception — `_scanInFlight`
+      // must never be left true, or the feature is silently dead for the rest
+      // of the session and every later save is swallowed by the guard in
+      // _runQueuedScan.
+      this._endScan();
       if (this._rescanQueued) {
         this._rescanQueued = false;
         // Files saved mid-scan are already in `_pendingFiles` (added by
@@ -610,6 +1049,12 @@ export class ScanOnSaveController implements vscode.Disposable {
 
   dispose(): void {
     if (this._debounceTimer) clearTimeout(this._debounceTimer);
+    // Kill any scan child still running at shutdown — an orphaned `dart`
+    // process outliving the extension host keeps its resolved-analysis memory
+    // (multiple GB on a large project) until the machine is rebooted.
+    this._scanCancelSource?.cancel();
+    this._scanCancelSource?.dispose();
+    this._scanCancelSource = undefined;
     this._daemonManager.dispose();
     for (const d of this._disposables) d.dispose();
   }
