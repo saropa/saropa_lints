@@ -124,3 +124,46 @@ cannot fulfill.
 3. **Remove the 60% adaptive cap.** It fires in normal operation on any large
    project and delivers no benefit.
 4. **Fix the extension** to not display stale state when the plugin is off.
+
+---
+
+## Outcome (2026-09-05)
+
+This document is an analysis, not a defect, so it carries no status field. Its
+substance is resolved and it is archived for the reasoning, which remains the
+best explanation of why the valve is shaped as it is.
+
+Both bugs it filed are fixed and archived:
+
+- Bug 1, the extension rendering stale state, is fixed. State is published only
+  when the plugin is enrolled in `analysis_options.yaml` and the reading came
+  from the current session. Either check failing renders nothing.
+  See `infra_extension_shows_stale_memory_state_when_plugin_disabled.md`.
+- Bug 2, the valve measuring the wrong thing, is fixed. Attribution gates the
+  pause, with an unconditional panic threshold above it.
+  See `infra_hard_rss_valve_penalizes_plugin_for_server_memory.md`.
+
+Three further defects were found by review of that attribution fix before it
+shipped, and are also fixed: the bystander state re-walked every cache on every
+sample, a legitimate trip could never release because clearing the plugin's
+caches made it a bystander while release tested process RSS alone, and the
+physical-memory probe re-spawned a subprocess on every call after a failed
+detection. See
+`infra_rss_valve_attribution_leaves_rules_paused_and_rescans_caches.md`.
+
+### Recommendation 3 was not implemented, and is now moot
+
+The document recommended removing the 60% adaptive cap outright, on the grounds
+that it fires during normal operation on any large project and delivers no
+benefit. The cap still exists, at 60% of physical RAM clamped to 2048-8192 MB
+(`project_context_throttle_memory.dart:2105-2130`).
+
+Removing it became unnecessary rather than being rejected. The complaint was
+never the threshold itself but what crossing it caused: an unconditional pause
+of every rule. With attribution in place, crossing the cap pauses rules only
+when the plugin is actually responsible for the memory, so the cap now selects
+when to *ask* the attribution question rather than deciding the outcome. Left
+in place it is a cheap trigger; removed, the attribution check would need some
+other trigger of its own.
+
+Recommendations 1, 2 and 4 all landed as written.
