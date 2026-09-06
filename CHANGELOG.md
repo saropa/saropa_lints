@@ -68,6 +68,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0-beta.7] — Unreleased
 
+Process Health status bar and tooltip now isolate saropa-owned memory from system-wide Dart processes, preventing false alerts when analysis servers from other VS Code windows consume significant memory. The tooltip adds a trend indicator to catch memory leaks early, plus a per-process breakdown for diagnostic detail. Fixed the dashboard's "Enable all recommended packs" button using stale pack detection while the table showed the current state. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.7/CHANGELOG.md)
+
 ### Added
 
 - Process Health tooltip now shows an RSS trend arrow (↑ rising / → stable / ↓ falling) next to the saropa section header. A rising trend is an early memory-leak warning before the red threshold trips. Based on a 5-sample split-mean with a 10% change threshold. No action required.
@@ -76,7 +78,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - Fixed Process Health status bar falsely attributing system-wide Dart memory to saropa_lints. The red/yellow thresholds now evaluate saropa-owned process RSS only (scan daemon, CLI scans), not the aggregate of all Dart processes. A 12GB analysis server from another VS Code window no longer makes the saropa_lints indicator go red.
 - Process Health tooltip now shows a per-process breakdown: saropa-owned processes first (with health check), Flutter daemons, then other Dart processes as informational. Top 3 processes per category listed by RSS. Hints when multiple analysis servers are detected.
-- Fixed "Enable all recommended packs" button showing "no applicable rule packs detected" while the dashboard table correctly showed 87 detected packs. The button was using `computeConfigSuggestions` (which has early-return guards for missing dependency/config), while the table used `isPackDetected` directly. The button now uses the same detection path as the table.
+- Fixed "Enable all recommended packs" button showing "no applicable rule packs detected" while the dashboard table correctly showed 87 detected packs. The button now uses `getDetectedPackIds`, a shared helper that both the table and the button call, so the two surfaces can never diverge. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Hardened Process Health tooltip: process labels truncated at 30 chars for width safety, analysis server detection broadened with `--protocol=lsp` for future binary rename resilience, and ✓/↑ conflict resolved (rising trend suppresses the healthy checkmark to avoid mixed signals).
+- Added 16 tests: `processLabel` classification (9), `isAnalysisServerProcess` detection (4), `truncateLabel` boundary (3). Total systemHealth suite: 61 tests.
+- Extracted `getDetectedPackIds` in `rulePackDefinitions.ts` as the single source of truth for pack applicability. The dashboard table and "Enable all" button both call it instead of inlining `isPackDetected` filters independently.
+
+</details>
 
 ---
 

@@ -4904,3 +4904,15 @@ export function isPackDetected(def: RulePackDefinition, pubspecContent: string):
   }
   return def.matchPubNames.some((n) => new RegExp('^\\s+' + n + '\\s*:', 'm').test(pubspecContent));
 }
+
+/**
+ * Single source of truth for "which packs apply to this project."
+ * Returns the ids of every pack whose pubspec markers or SDK gate match.
+ * Used by the dashboard table (pack rows) and the "Enable all recommended"
+ * button so both surfaces always agree on the applicable set.
+ */
+export function getDetectedPackIds(pubspecContent: string): readonly string[] {
+  return RULE_PACK_DEFINITIONS
+    .filter((def) => isPackDetected(def, pubspecContent))
+    .map((def) => def.id);
+}

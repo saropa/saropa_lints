@@ -32,7 +32,7 @@ import {
 import { readPubspec, FLUTTER_EMBEDDER_PLATFORMS } from '../pubspecReader';
 import { readViolations, filterDisabledFromData } from '../violationsReader';
 import { buildSuppressionsExportSnapshotStripHtml } from '../views/configDashboardSuppressionsStrip';
-import { RULE_PACK_DEFINITIONS, isPackDetected } from './rulePackDefinitions';
+import { RULE_PACK_DEFINITIONS, isPackDetected, getDetectedPackIds } from './rulePackDefinitions';
 import { enforceSingleVersion, versionGroupIndex } from './versionGroups';
 import { STYLISTIC_PACK_DEFINITIONS } from './stylisticPackDefinitions';
 import { packDomainForId, PACK_DOMAIN_ORDER } from './packDomains';
@@ -51,7 +51,6 @@ import {
 } from '../views/keyboard-shortcuts';
 import type { MemoryPressureState } from '../systemHealth/memoryPressureWatcher';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePackYaml';
-import { computeConfigSuggestions } from '../config/configSuggestions';
 import { fetchRuleCounts, type RuleCountSummary } from '../views/ruleCountCliRunner';
 import type { AnalysisOptimizerWebviewProvider } from '../analysisOptimizer/analysisOptimizerWebviewProvider';
 import {
@@ -810,15 +809,18 @@ export class RulePacksWebviewProvider {
     const currentTier =
       vscode.workspace.getConfiguration('saropaLints').get<string>('tier', 'recommended') ??
       'recommended';
+    // Build the detected-pack set once via the shared helper so the table,
+    // the "Enable all" button, and SDK-pack filtering all use the same source.
+    const detectedIds = new Set(getDetectedPackIds(pubspecContent));
     const packRows: PackChartRow[] = RULE_PACK_DEFINITIONS.map((def) => ({
       id: def.id,
       label: def.label,
-      detected: isPackDetected(def, pubspecContent),
+      detected: detectedIds.has(def.id),
       enabled: enabledIds.has(def.id),
       rules: def.ruleCodes.length,
     }));
     const detectedSdkPacks = RULE_PACK_DEFINITIONS.filter(
-      (def) => isSdkPackId(def.id) && isPackDetected(def, pubspecContent),
+      (def) => isSdkPackId(def.id) && detectedIds.has(def.id),
     );
     const stats = computePackDashboardStats(packRows);
     const violationsRaw = readViolations(root);
@@ -2642,11 +2644,14 @@ ${detailRow}`;
   }
 
   /**
-   * Enable every pack that is "recommended" for this project in one click:
-   * package packs whose marker is in pubspec, SDK packs whose environment gate
-   * passes, and lockfile-resolved upgrade packs. {@link computeConfigSuggestions}
-   * is the single source of "what applies", so this button and the proactive
-   * detection agree on the set instead of drifting apart.
+   * Enable every pack that is "recommended" for this project in one click.
+   * Uses {@link getDetectedPackIds} — the single source of truth for pack
+   * detection, shared with the dashboard table — so the button and the table
+   * always agree on which packs are applicable.
+   * The old path via `computeConfigSuggestions` had extra guards
+   * (hasSaropaLintsDep, hasSaropaLintsConfigured) that returned empty before
+   * pack detection ran, causing a false "no applicable packs" toast while the
+   * table showed 87 detected packs.
    */
   private async _enableAllApplicablePacks(): Promise<void> {
     const root = getProjectRoot();
@@ -2656,9 +2661,17 @@ ${detailRow}`;
       );
       return;
     }
-    const applicableIds = computeConfigSuggestions(root)
-      .filter((s) => s.kind === 'pack-available' && s.packId)
-      .map((s) => s.packId!);
+    // Read the pubspec and detect applicable packs via the shared helper —
+    // same detection the dashboard table uses, so the two never diverge.
+    const pubspecPath = path.join(root, 'pubspec.yaml');
+    let pubspecContent = '';
+    try {
+      pubspecContent = fs.readFileSync(pubspecPath, 'utf-8');
+    } catch {
+      void vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotReadPubspec'));
+      return;
+    }
+    const applicableIds = getDetectedPackIds(pubspecContent);
     if (applicableIds.length === 0) {
       void vscode.window.showInformationMessage(
         l10n('notify.vibrancy.noApplicablePacksDetected'),
