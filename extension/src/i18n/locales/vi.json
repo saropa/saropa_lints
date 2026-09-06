@@ -682,19 +682,27 @@
       "openHint": "Nhấp để mở Tình trạng quy trình"
     },
     "tooltip": {
-      "processCount": "Dart quy trình: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} quy trình(es) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} quy trình(es) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} quy trình(s) ({size} RSS) ✓",
+      "sparkline": "RSS xu hướng: {chart}",
+      "otherSection": "Các quy trình khác Dart: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} server phân tích được phát hiện — đóng các cửa sổ VS Code không sử dụng",
       "daemonCount": "Flutter daemon: {total} ({orphaned} bị bỏ rơi)",
       "scanDaemonOrphans": "Daemon quét bị bỏ rơi: {count} — dùng Clean Up để giết",
-      "warningHint": "Sử dụng bộ nhớ cao — click để xem chi tiết",
-      "criticalHint": "Sử dụng bộ nhớ là rất quan trọng — dọn dẹp được khuyến nghị"
+      "warningHint": "Saropa bộ nhớ cao — click để xem chi tiết",
+      "criticalHint": "Saropa memory là quan trọng — được khuyến nghị dọn dẹp"
     },
     "notification": {
       "critical": "Các quy trình Dart đang sử dụng {size} với các daemon bị bỏ rơi {orphaned}. Dọn dẹp?",
+      "possibleLeak": "Saropa RSS đang tăng dần ổn định ({size} và đang tăng). Có thể có rò rỉ bộ nhớ — kiểm tra bảng trạng thái sức khỏe.",
       "result": "Đã giết {count} tiến trình daemon bị bỏ rơi, giải phóng ~{size}"
     },
     "action": {
       "cleanUp": "Làm Sạch",
+      "openPanel": "Mở bảng điều khiển Sức khỏe",
+      "dismiss": "Thả bỏ việc làm",
       "optimizeAnalysis": "Tối ưu Hóa Phân Tích",
       "dontShowAgain": "Không Hiển Thị Lại"
     },

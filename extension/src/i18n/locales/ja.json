@@ -682,19 +682,27 @@
       "openHint": "クリックしてプロセスヘルスを開く"
     },
     "tooltip": {
-      "processCount": "Dart プロセス: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} プロセス(es) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} プロセス(es) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} プロセス(es) ({size} RSS) ✓",
+      "sparkline": "RSS テンド: {chart}",
+      "otherSection": "他の Dart プロセス: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count}分析サーバー（ス）が検出されました — 使っていないVS Codeウィンドウを閉じる",
       "daemonCount": "Flutter デーモン: {total} ({orphaned} 遺棄)",
       "scanDaemonOrphans": "孤立したスキャンデーモン: {count} — クリーンアップを使用して終了",
-      "warningHint": "メモリ使用量は高い — クリックして詳細を表示",
-      "criticalHint": "メモリ使用量は重要です — 推奨されるクリーンアップを行ってください"
+      "warningHint": "Saropa メモリが多い — 詳細についてはクリックしてください",
+      "criticalHint": "メモリSaropaは重要 — 推奨されるクリーンアップ"
     },
     "notification": {
       "critical": "Dartプロセスは{size}を使用して{orphaned}の孤児デーモンを使用しています。クリーンアップ？",
+      "possibleLeak": "Saropa RSS は順調に上昇しています（{size} と上昇中）。メモリリークの可能性 — ヘルスパネルを確認してください。",
       "result": "{count}の孤児デーモンを終了し、~{size}を解放しました"
     },
     "action": {
       "cleanUp": "クリーンアップ",
+      "openPanel": "ヘルスパネルを開く",
+      "dismiss": "解雇処分について",
       "optimizeAnalysis": "分析を最適化",
       "dontShowAgain": "もう一度表示しない"
     },

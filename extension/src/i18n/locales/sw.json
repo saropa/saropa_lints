@@ -682,19 +682,27 @@
       "openHint": "Bofya ili kufungua Mchakato wa Afya"
     },
     "tooltip": {
-      "processCount": "Mipangilio ya Dart: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} prosesu ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} prosesu ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} proses(s) ({size} RSS) ✓",
+      "sparkline": "Mwenendo wa RSS: {chart}",
+      "otherSection": "Picha ya Dart: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} server ya analizi (analysis server) zilizotajwa — tuma kipengele ya VS Code kozalishwa",
       "daemonCount": "Daemons Flutter: {total} ({orphaned} yatima)",
       "scanDaemonOrphans": "Daemons ya scan ya kifupishwa: {count} — kuzalishia kwa kutumia Clean Up",
-      "warningHint": "Unganisha wa matokeo ni kubwa — klikika kwa detali",
-      "criticalHint": "Unganisho wa memory ni kifaa — tume kuchapisha kutoa"
+      "warningHint": "Saropa memory ni kubwa — click kwa detali",
+      "criticalHint": "Saropa memory ni kifaa kubadilishwa — kusalama kwa makosa kwa kutoa"
     },
     "notification": {
       "critical": "Mipaka ya Dart ina kuzungumza na {size} kulingana na mipaka ya daemons ya {orphaned}. Kupata kushindua?",
+      "possibleLeak": "Saropa RSS inakwenda kwa muda muda ({size} na kubeba). Moyo ya kuzalishia matokeo — tafuta paneli ya health.",
       "result": "Killed {count} daemons ya mwalimu, freed ~{size}"
     },
     "action": {
       "cleanUp": "Tuzalisha",
+      "openPanel": "Unganisha Panel ya Uzalishaji",
+      "dismiss": "Fungua kazi.",
       "optimizeAnalysis": "Tambua Analizi",
       "dontShowAgain": "Hakikisha Upeleka Tumia Kwa Muda Mmoja"
     },

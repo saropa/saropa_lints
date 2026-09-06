@@ -682,19 +682,27 @@
       "openHint": "Klik untuk membuka Process Health"
     },
     "tooltip": {
-      "processCount": "Dart proses: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} proses(es) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} proses(es) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} proses(es) ({size} RSS) ✓",
+      "sparkline": "RSS tren: {chart}",
+      "otherSection": "Proses Dart lainnya: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} analisis server(s) terdeteksi — tutup VS Code jendela yang tidak digunakan",
       "daemonCount": "Flutter daemon: {total} ({orphaned} terlantar)",
       "scanDaemonOrphans": "Daemon pemindaian yang terlantar: {count} — gunakan Clean Up untuk membunuh",
-      "warningHint": "Penggunaan memori tinggi — klik untuk detail",
-      "criticalHint": "Penggunaan memori kritis — bersihkan rekomendasi"
+      "warningHint": "Saropa memory adalah tinggi — klik untuk detail",
+      "criticalHint": "Saropa memory adalah kritis — bersihkan disarankan"
     },
     "notification": {
       "critical": "Proses Dart menggunakan {size} dengan daemons {orphaned} yang terlantar. Bersihkan?",
+      "possibleLeak": "Saropa RSS sedang naik secara konsisten ({size} dan meningkat). Kemungkinan kebocoran memori — periksa panel kesehatan.",
       "result": "Killed {count} daemon yang terlantar, freed ~{size}"
     },
     "action": {
       "cleanUp": "Pembersihan",
+      "openPanel": "Buka Panel Kesehatan",
+      "dismiss": "Mengusir dari pekerjaan.",
       "optimizeAnalysis": "Optimalkan Analisis",
       "dontShowAgain": "Jangan Tampilkan Lagi"
     },

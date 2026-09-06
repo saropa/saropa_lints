@@ -682,19 +682,27 @@
       "openHint": "عمل صحت کو کھولنے کے لیے کلک کریں۔"
     },
     "tooltip": {
-      "processCount": "Dart پرکریس: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} عمل ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} عمل ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} عمل ({size} RSS) ✓",
+      "sparkline": "RSS رجحان: {chart}",
+      "otherSection": "دیگر Dart پروسسز: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} تحلیل سرور(س) پایا گیا — غیر استعمالی VS Code ونڈوز بند کریں",
       "daemonCount": "Flutter ڈیمینس: {total} ({orphaned} چھوڑے گئے)",
       "scanDaemonOrphans": "کھوکھلے اسکن ڈیمُن: {count} — استعمال کریں کلین اپ کریں تاکہ",
-      "warningHint": "یاد کرنے کی استعمال زیادہ ہے — کلک کریں تفصیلات کے لئے",
-      "criticalHint": "ذہبی استعمال اہم ہے — سفارش کی گئی صفائی کریں"
+      "warningHint": "Saropa یاد کریں ہے — کلک کریں تفصیلات کے لئے",
+      "criticalHint": "Saropa یاد کریں اہم ہے — تیزی سے صاف کریں"
     },
     "notification": {
       "critical": "Dart پروسسز {size} کے ساتھ {orphaned} کے اورفان ڈیمنز کا استعمال کر رہے ہیں۔ سیل کریں؟",
+      "possibleLeak": "Saropa RSS میں مستقل طور پر اضافہ ہو رہا ہے ({size} اور اٹھ رہا ہے)۔ ممکنہ یاد کی لیک — ہیلتھ پنل کو چیک کریں۔",
       "result": "کیلڈ {count} بے والد ڈیمنز کو مار دیا، ~{size} آزاد کر دیا"
     },
     "action": {
       "cleanUp": "کلین اپ",
+      "openPanel": "ہیلتھ پینل کھولیں",
+      "dismiss": "برطرفی۔",
       "optimizeAnalysis": "تحلیل کو اپ ٹوڈیٹ کریں",
       "dontShowAgain": "دوبارہ نہ دکھائیں"
     },

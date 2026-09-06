@@ -682,19 +682,27 @@
       "openHint": "Süreç Sağlığı'nı açmak için tıklayın"
     },
     "tooltip": {
-      "processCount": "Dart işleme: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} işlem(ler) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} işlem(ler) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} işlem(ler) ({size} RSS) ✓",
+      "sparkline": "RSS trendi: {chart}",
+      "otherSection": "Diğer Dart süreçleri: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} analiz sunucusu(t) tespit edildi — kullanılmayan VS Code pencereleri kapat",
       "daemonCount": "Flutter daemonları: {total} ({orphaned} izole)",
       "scanDaemonOrphans": "Artık tarama programları: {count} — öldürmek için Temizleme'yi kullanın",
-      "warningHint": "Hafıza kullanımı yüksek — detaylar için tıklayınız",
-      "criticalHint": "Hafıza kullanımı kritik — temizleme önerilir"
+      "warningHint": "Saropa belleği yüksek — detaylar için tıklayınız",
+      "criticalHint": "Saropa belleği kritik — temizleme önerilir"
     },
     "notification": {
       "critical": "Dart süreçleri {size} ile {orphaned} izole edilmiş daemon'ları kullanıyor. Temizle?",
+      "possibleLeak": "Saropa RSS artmaya devam ediyor ({size} ve artıyor). Olası bellek sızıntısı — sağlık panelini kontrol edin.",
       "result": "{count} ölü daemon öldürdüm, ~{size} serbest bırakıldı"
     },
     "action": {
       "cleanUp": "Temizle",
+      "openPanel": "Sağlık Paneli",
+      "dismiss": "İşten çıkarma, işten atmak.",
       "optimizeAnalysis": "Analiz Optimizasyonu",
       "dontShowAgain": "Yine Gösterme"
     },

@@ -682,19 +682,27 @@
       "openHint": "ক্লিক করুন প্রক্রিয়া স্বাস্থ্য খুলতে"
     },
     "tooltip": {
-      "processCount": "Dart প্রক্রিয়া: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} প্রক্রিয়া(গুলি) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} প্রক্রিয়া(গুলি) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} প্রক্রিয়া(গুলি) ({size} RSS) ✓",
+      "sparkline": "RSS প্রবণতা: {chart}",
+      "otherSection": "অন্যান্য Dart প্রক্রিয়া: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} এনালাইসিস সার্ভার(গুলো) পাওয়া গেল — ব্যবহার করা হয়নি VS Code ওপেন করুন",
       "daemonCount": "Flutter ডেমন: {total} ({orphaned} অপসারিত)",
       "scanDaemonOrphans": "অপরিচ্ছন্ন স্ক্যান ডেমন: {count} — ক্লিন আপ ব্যবহার করুন যাতে মারা যায়",
-      "warningHint": "মেমরি ব্যবহার উচ্চ — ক্লিক করুন বিস্তারিত জন্য",
-      "criticalHint": "মেমরি ব্যবহার গুরুত্বপূর্ণ — পরামর্শ দেওয়া হয়েছে পরিষ্কার করুন"
+      "warningHint": "Saropa মেমোরি উচ্চ — বিস্তারিত দেখুন",
+      "criticalHint": "Saropa মেমোরি গুরুত্বপূর্ণ — পরিষ্কার করার পরামর্শ দেওয়া হয়েছে"
     },
     "notification": {
       "critical": "Dart প্রক্রিয়াগুলো ব্যবহার করছে {size} এবং {orphaned} অরফান ডেমন। পরিষ্কার করুন?",
+      "possibleLeak": "Saropa RSS স্থিরভাবে বৃদ্ধি পাচ্ছে ({size} এবং উঠছে)। সম্ভাব্য মেমরি লিক — হেলথ প্যানেল দেখুন।",
       "result": "{count} অর্থাত মৃত ডেমন কিল করা হয়েছে, ~{size} ফ্রিড করা হয়েছে"
     },
     "action": {
       "cleanUp": "পরিষ্কার করুন",
+      "openPanel": "স্বাস্থ্য প্যানেল খুলুন",
+      "dismiss": "বরখাস্ত করা হয়।",
       "optimizeAnalysis": "অ্যানালিসিস অপ্টিমাইজ করুন",
       "dontShowAgain": "আবার দেখাও না"
     },

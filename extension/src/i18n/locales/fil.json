@@ -682,19 +682,27 @@
       "openHint": "Click para magbukas ng Process Health"
     },
     "tooltip": {
-      "processCount": "Dart proseso: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} proseso(s) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} proseso(s) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} proseso(s) ({size} RSS) ✓",
+      "sparkline": "RSS trend: {chart}",
+      "otherSection": "Mga iba pang proseso Dart: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "Nakita ang (mga) server ng pagsusuri ng {count} — isara ang hindi nagamit na mga window ng VS Code",
       "daemonCount": "Flutter daemon: {total} ({orphaned} na walang magulang)",
       "scanDaemonOrphans": "Nakalabas na mga daemon ng scan: {count} — gamitin ang Clean Up para i-kill",
-      "warningHint": "Mataas ang paggamit ng memorya — click para sa detalye",
-      "criticalHint": "Ang paggamit ng memorya ay kritikal — i-clear ang mga inirerekomendang bagay"
+      "warningHint": "Ang Saropa memory ay mataas — i-click para sa mga detalye",
+      "criticalHint": "Saropa memory ay kritikal — puntaan ang pagtanggal"
     },
     "notification": {
       "critical": "Ang mga proseso Dart ay gumagamit ng {size} kasama ang mga orphaned daemon na {orphaned}. I-clear up?",
+      "possibleLeak": "Saropa RSS ay umuunlad nang maayos ({size} at tumataas). Posibleng memory leak — tingnan ang health panel.",
       "result": "Nagpatay sa {count} mga daemon na walang ama, naglibos ng ~{size}"
     },
     "action": {
       "cleanUp": "Maglinis",
+      "openPanel": "I-Open Health Panel",
+      "dismiss": "Mag-dismiss na ako.",
       "optimizeAnalysis": "I-optimize ang Pagsusuri",
       "dontShowAgain": "Hindi Mo Iwanan Nang Magkakaroon Nang Paliwanag"
     },

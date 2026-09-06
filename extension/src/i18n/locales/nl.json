@@ -682,19 +682,27 @@
       "openHint": "Klik om Process Health te openen"
     },
     "tooltip": {
-      "processCount": "Dart processen: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} proces(sen) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} proces(sen) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} proces(sen) ({size} RSS) ✓",
+      "sparkline": "RSS-trend: {chart}",
+      "otherSection": "Andere Dart processen: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} analyseer server(s) gedetecteerd — sluit ongebruikte VS Code vensters",
       "daemonCount": "Flutter daemonen: {total} ({orphaned} orphane)",
       "scanDaemonOrphans": "Geïsoleerde scan-daemonen: {count} — gebruik Clean Up om te killen",
-      "warningHint": "Geheugengebruik is hoog — klik voor details",
-      "criticalHint": "Geheugengebruik is kritisch — maak het schoon zoals aangeraden"
+      "warningHint": "Saropa geheugen is hoog — klik voor details",
+      "criticalHint": "Saropa geheugen is kritisch — schoonmaken wordt aanbevolen"
     },
     "notification": {
       "critical": "Dart processen gebruiken {size} met {orphaned} orphanged daemonen. Verwijderen?",
+      "possibleLeak": "Saropa RSS stijgt steeds verder ({size} en stijgt). Mogelijke geheugenlek — controleer de health panel.",
       "result": "Killed {count} orphelen daemonen, vrijgemaakt ~{size}"
     },
     "action": {
       "cleanUp": "Reinigen",
+      "openPanel": "Open het Gezondheidspaneel",
+      "dismiss": "Ontslag ontslagen.",
       "optimizeAnalysis": "Analyse optimaliseren",
       "dontShowAgain": "Niet Opnieuw Toon"
     },

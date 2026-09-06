@@ -682,19 +682,27 @@
       "openHint": "Klicken Sie, um Process Health zu öffnen"
     },
     "tooltip": {
-      "processCount": "Dart Prozesse: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} Prozess(e) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} Prozess(e) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} Prozess(e) ({size} RSS) ✓",
+      "sparkline": "RSS-Trend: {chart}",
+      "otherSection": "Andere Dart-Prozesse: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} Analyse-Server(e) erkannt — schließen Sie nicht genutzte VS Code Fenster",
       "daemonCount": "Flutter-Daemone: {total} ({orphaned} odergeblieben)",
       "scanDaemonOrphans": "Verwaiste Scan-Deamon: {count} — verwenden Sie Clean Up, um zu beenden",
-      "warningHint": "Speicherbereitschaft ist hoch — klicken Sie für Details",
-      "criticalHint": "Die Speichernutzung ist kritisch — bereinigen Sie empfohlen"
+      "warningHint": "Saropa Speicher ist hoch — klicken Sie für Details",
+      "criticalHint": "Saropa Speicher ist kritisch — Reinigung wird empfohlen"
     },
     "notification": {
       "critical": "Dart Prozesse verwenden {size} mit {orphaned} oderfremden Daemonen. Reinigen?",
+      "possibleLeak": "Saropa RSS steigt kontinuierlich ({size} und steigt). Möglicher Speicherleck – prüfen Sie den Health-Panel.",
       "result": "{count} Orphandämonen beendet, ~{size} freigegeben"
     },
     "action": {
       "cleanUp": "Aufräumen",
+      "openPanel": "Gesundheitspanel öffnen",
+      "dismiss": "Entlassen Sie.",
       "optimizeAnalysis": "Analyse optimieren",
       "dontShowAgain": "Nicht wieder zeigen"
     },

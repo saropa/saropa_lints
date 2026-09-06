@@ -682,19 +682,27 @@
       "openHint": "프로세스 헬스를 열려면 클릭하세요"
     },
     "tooltip": {
-      "processCount": "Dart 처리 중: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} 프로세스( {size} RSS )",
+      "saropaSection": "Saropa Lints: {count} 프로세스( {size} RSS )",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} 프로세스( {size} RSS) ✓",
+      "sparkline": "RSS 트렌드: {chart}",
+      "otherSection": "기타 Dart 프로세스: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} 분석 서버가 감지되었습니다 — 사용하지 않는 VS Code 창 닫기",
       "daemonCount": "Flutter 데몬: {total} ({orphaned} 버려짐)",
       "scanDaemonOrphans": "삭제된 스캔 데몬: {count} — 정리 기능을 사용하여 종료",
-      "warningHint": "메모리 사용량이 높습니다 — 자세한 정보를 클릭하세요",
-      "criticalHint": "메모리 사용량은 중요합니다 — 정리 권장"
+      "warningHint": "Saropa 메모리가 높습니다 — 자세한 정보를 클릭하여 확인하세요",
+      "criticalHint": "Saropa 메모리는 중요합니다 — 정리 권장됩니다"
     },
     "notification": {
       "critical": "Dart 프로세스는 {size}를 사용하여 {orphaned} 오라phan 데몬을 실행 중입니다. 정리하시겠습니까?",
+      "possibleLeak": "Saropa RSS는 꾸준히 상승하고 있습니다 ({size} 및 상승 중). 가능한 메모리 누수 — 건강 패널을 확인하세요.",
       "result": "{count}를 종료하고, {size}개의 오레孤儿 데몬을 해제했습니다."
     },
     "action": {
       "cleanUp": "정리하기",
+      "openPanel": "오픈 헬스 패널",
+      "dismiss": "해고 처분",
       "optimizeAnalysis": "분석 최적화",
       "dontShowAgain": "다시 보지 않기"
     },

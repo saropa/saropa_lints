@@ -682,19 +682,27 @@
       "openHint": "Kliknij, aby otworzyć Zdrowie Procesu"
     },
     "tooltip": {
-      "processCount": "Dart procesy: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} proces(y) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} proces(y) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} proces(y) ({size} RSS) ✓",
+      "sparkline": "RSS trend: {chart}",
+      "otherSection": "Inne procesy Dart: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "Serwer analizy {count} wykryty — zamknij niepotrzebne okna VS Code",
       "daemonCount": "Flutter daemony: {total} ({orphaned} orfany)",
       "scanDaemonOrphans": "Daemony skanowania niezwiązane: {count} — użyj Clean Up, aby zakończyć",
-      "warningHint": "Użycie pamięci jest wysokie — kliknij aby zobaczyć szczegóły",
-      "criticalHint": "Użycie pamięci jest krytyczne — oczyszczenie zalecane"
+      "warningHint": "Pamięć Saropa jest wysoka — kliknij aby zobaczyć szczegóły",
+      "criticalHint": "Pamięć Saropa jest krytyczna — zaleca się czyszczenie"
     },
     "notification": {
       "critical": "Procesy Dart używają {size} z orfankami {orphaned}. Czy czyszczyć?",
+      "possibleLeak": "Założenia ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zamiennikowe: tokeny zamiennikowe. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w poprawnej gramatycznie pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Saropa RSS rośnie stabilnie ({size} i rośnie). Możliwy wyciek pamięci — sprawdź panel zdrowia.",
       "result": "Zabito {count} daemonów orfankich, zwolniono ~{size}"
     },
     "action": {
       "cleanUp": "Czysta Przestrzeń",
+      "openPanel": "Otwórz Panel Zdrowia",
+      "dismiss": "Zwolnienie z pracy.",
       "optimizeAnalysis": "Optymalizuj Analizę",
       "dontShowAgain": "Nie Pokazuj Ponownie"
     },

@@ -682,19 +682,27 @@
       "openHint": "לחץ כדי לפתוח מצב בריאות תהליך"
     },
     "tooltip": {
-      "processCount": "תהליכי Dart: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} תהליך(ים) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} תהליך(ים) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} תהליך(ים) ({size} RSS) ✓",
+      "sparkline": "RSS ת趋: {chart}",
+      "otherSection": "אחרי Dart תהליכים: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "שרת ניתוח {count} détected — סגור חלונות VS Code לא בשימוש",
       "daemonCount": "Flutter דמונים: {total} ({orphaned} אובד)",
       "scanDaemonOrphans": "דמוניס קסן אובירנים: {count} — השתמש בנקה כדי לסיים",
-      "warningHint": "שימוש ב pamięć הוא גבוה — לחץ כדי לראות פרטים",
-      "criticalHint": "שימוש ב pamięć הוא קריטי — ניקוי מומלץ"
+      "warningHint": "זיכרון Saropa גבוה — לחץ כדי לראות פרטים",
+      "criticalHint": "הזיכרון Saropa קריטי — מומלץ לנקות"
     },
     "notification": {
       "critical": "תהליכי Dart משתמשים ב-{size} עם דמונים מוזרים {orphaned}. לנקות?",
+      "possibleLeak": "Saropa RSS עולה בצורה מתמדת ({size} ועולה). סיבת זרימה של זיכרון — בדוק את painel של הבריאות.",
       "result": "הרגתי {count} דמונים אבויים, שחררתי ~{size}"
     },
     "action": {
       "cleanUp": "נקה",
+      "openPanel": "פתוח painel של בריאות",
+      "dismiss": "פיטורים.",
       "optimizeAnalysis": "שפר ניתוח",
       "dontShowAgain": "אל תציג שוב"
     },

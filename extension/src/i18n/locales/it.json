@@ -682,19 +682,27 @@
       "openHint": "Fai clic per aprire Process Health"
     },
     "tooltip": {
-      "processCount": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Dart processi: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} processo(i) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} processo(i) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} processo(i) ({size} RSS) ✓",
+      "sparkline": "Andamento RSS: {chart}",
+      "otherSection": "Altri processi Dart: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "Server di analisi {count} rilevati — chiudi finestre VS Code non utilizzate",
       "daemonCount": "Flutter daemon: {total} ({orphaned} orfani)",
       "scanDaemonOrphans": "Scan daemons orfani: {count} — utilizza Clean Up per terminare",
-      "warningHint": "Utilizzo della memoria è elevato — clicca per i dettagli",
-      "criticalHint": "L'uso della memoria è critico — pulisci consigliato"
+      "warningHint": "Memoria Saropa è alta — clicca per i dettagli",
+      "criticalHint": "Memoria Saropa è critica — pulizia consigliata"
     },
     "notification": {
       "critical": "I processi Dart stanno utilizzando {size} con {orphaned} daemon orfani. Pulire?",
+      "possibleLeak": "Saropa RSS sta aumentando in modo costante ({size} e in aumento). Possibile perdita di memoria — verifica il pannello salute.",
       "result": "Processi {count} terminati, ~{size} liberati"
     },
     "action": {
       "cleanUp": "Pulisci",
+      "openPanel": "Pannello Salute Aperto",
+      "dismiss": "Scusate il licenziamento.",
       "optimizeAnalysis": "Ottimizza Analisi",
       "dontShowAgain": "Non Mostra di Nuovo"
     },

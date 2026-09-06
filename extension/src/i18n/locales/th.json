@@ -682,19 +682,27 @@
       "openHint": "คลิกเพื่อเปิดความสมบูรณ์ของกระบวนการ"
     },
     "tooltip": {
-      "processCount": "กระบวนการ Dart: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} กระบวนการ(ๆ) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} กระบวนการ(ๆ) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} กระบวนการ(ๆ) ({size} RSS) ✓",
+      "sparkline": "RSS แนวโน้ม: {chart}",
+      "otherSection": "กระบวนการอื่น ๆ Dart: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "เซิร์ฟเวอร์การวิเคราะห์ {count} ตรวจพบ — ปิดหน้าต่าง VS Code ที่ไม่ได้ใช้",
       "daemonCount": "Flutter ผู้ดูแลระบบ: {total} ({orphaned} ทิ้งไว้)",
       "scanDaemonOrphans": "Daemon ที่ถูกทอดทิ้งในการสแกน: {count} — ใช้ Clean Up เพื่อปิด",
-      "warningHint": "การใช้งานหน่วยความจำสูง — คลิกเพื่อดูรายละเอียด",
-      "criticalHint": "การใช้งานหน่วยความจำเป็นสิ่งสำคัญ — ทำความสะอาดตามที่แนะนำ"
+      "warningHint": "หน่วยความจำ Saropa สูง — คลิกเพื่อดูรายละเอียด",
+      "criticalHint": "Saropa memory คือสิ่งสำคัญ — แนะนำให้ทำความสะอาด"
     },
     "notification": {
       "critical": "กระบวนการ Dart กำลังใช้ {size} กับ daemon ที่ถูกทอดทิ้ง {orphaned} ทำความสะอาดหรือ?",
+      "possibleLeak": "Saropa RSS กำลังเพิ่มขึ้นอย่างมั่นคง ({size} และเพิ่มขึ้น) อาจมีการรั่วของข้อมูลในหน่วยความจำ — ตรวจสอบแผงสุขภาพ",
       "result": "กำจัด {count} กระบวนการที่ไม่มีผู้ปกครอง ปลดปล่อย ~{size}"
     },
     "action": {
       "cleanUp": "ทำความสะอาด",
+      "openPanel": "เปิดแผงสุขภาพ",
+      "dismiss": "ขอยกเลิกการทํางาน",
       "optimizeAnalysis": "ปรับปรุงการวิเคราะห์",
       "dontShowAgain": "อย่าแสดงอีกต่อไป"
     },

@@ -682,19 +682,27 @@
       "openHint": "کلیک کنید تا پرچه سلامت را باز کنید"
     },
     "tooltip": {
-      "processCount": "Dart فرآیند ها: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} فرآیند(ها) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} فرآیند(ها) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} فرآیند(ها) ({size} RSS) ✓",
+      "sparkline": "RSS روند: {chart}",
+      "otherSection": "دیگر فرآیندهای Dart: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "تحلیل سرور {count} تشخیص داده شد — بستن پنجره های VS Code نا مورد استفاده",
       "daemonCount": "Flutter نیمکت‌ها: {total} ({orphaned} بدون والد)",
       "scanDaemonOrphans": "اسکن های پیگیری فرزندناشده: {count} — از تمیز کردن برای خاتمه دادن استفاده کنید",
-      "warningHint": "استفاده از حافظه بالا است — کلیک کنید تا جزئیات را ببینید",
-      "criticalHint": "استفاده از حافظه مهم است — تمیز کردن پیشنهاد می‌شود"
+      "warningHint": "ذخیره سازی Saropa بالا است — کلیک کنید تا جزئیات را ببینید",
+      "criticalHint": "ذخیره سازی Saropa اهمیت ویژه ای دارد — تمیز کردن پیشنهاد می‌شود"
     },
     "notification": {
       "critical": "Dart فرآیندها در حال استفاده از {size} با {orphaned} دمین نابود هستند. تمیز کنید؟",
+      "possibleLeak": "Saropa RSS به طور مداوم افزایش یافته است ({size} و افزایش پیدا کرده). احتمالاً یک چکانی در حافظه وجود دارد — به پنل سلامت مراجعه کنید.",
       "result": "کیلدد {count} دمئون های تکلیف شده را از بین برده، ~{size} را آزاد کرد"
     },
     "action": {
       "cleanUp": "کلی نمایی",
+      "openPanel": "پنل سلامت را باز کنید",
+      "dismiss": "اخراج از کار",
       "optimizeAnalysis": "بهینه سازی تحلیل",
       "dontShowAgain": "باز نشان نده"
     },

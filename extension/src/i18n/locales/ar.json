@@ -682,19 +682,27 @@
       "openHint": "اضغط لفتح صحة العملية"
     },
     "tooltip": {
-      "processCount": "الإجراءات Dart: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} عملية(ات) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} عملية(ات) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} عملية(ات) ({size} RSS) ✓",
+      "sparkline": "RSS الاتجاه: {chart}",
+      "otherSection": "الإجراءات الأخرى Dart: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "خادم تحليل {count} تم اكتشافه — إغلاق النوافذ VS Code غير المستخدمة",
       "daemonCount": "Flutter مُساعدين: {total} ({orphaned} مهجور)",
       "scanDaemonOrphans": "الـديـمـونـات الـمُرَدَّدَة: {count} — استخدم تنظيف لـإنهاء",
-      "warningHint": "استخدام الذاكرة مرتفع — انقر للحصول على التفاصيل",
-      "criticalHint": "استخدام الذاكرة هو أمر حيوي — تنظيف موصى به"
+      "warningHint": "ذاكرة Saropa مرتفعة — انقر للحصول على التفاصيل",
+      "criticalHint": "ذاكرة Saropa حيوية — يُنصح بالتنظيف"
     },
     "notification": {
       "critical": "تُعالج Dart العمليات {size} مع {orphaned} أوامر مهجورة. تنظيف؟",
+      "possibleLeak": "Saropa RSS يرتفع بشكل مستقر ({size} ويزداد). ممكن تسرب الذاكرة — تحقق من لوحة الصحة.",
       "result": "تم قتل {count} من الدايمونز المهجورة، وتم تحرير ~{size}"
     },
     "action": {
       "cleanUp": "تنظيف",
+      "openPanel": "فتح لوحة الصحة",
+      "dismiss": "فصله من العمل",
       "optimizeAnalysis": "تحسين التحليل",
       "dontShowAgain": "لا تظهر مرة أخرى"
     },

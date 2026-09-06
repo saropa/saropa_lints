@@ -682,19 +682,27 @@
       "openHint": "Натисніть, щоб відкрити Process Health"
     },
     "tooltip": {
-      "processCount": "Dart процеси: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints: {count} процес(ів) ({size} RSS)",
+      "saropaSection": "Saropa Lints: {count} процес(ів) ({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} процес(ів) ({size} RSS) ✓",
+      "sparkline": "RSS тенденція: {chart}",
+      "otherSection": "Інші Dart процеси: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count} аналіз сервер(ів) виявлено — закрийте непотрібні VS Code вікна",
       "daemonCount": "Flutter демони: {total} ({orphaned} відокремлений)",
       "scanDaemonOrphans": "Орфанізовані сканери: {count} — використовуйте Clean Up для видалення",
-      "warningHint": "Використання пам'яті високе — натисніть для деталей",
-      "criticalHint": "Використання пам'яті критичне — очистити рекомендується"
+      "warningHint": "Saropa пам'ять висока — клікніть для деталей",
+      "criticalHint": "Saropa пам'ять критична — рекомендується очистити"
     },
     "notification": {
       "critical": "Dart процеси використовують {size} з {orphaned} орфанізованими демонами. Очищати?",
+      "possibleLeak": "Saropa RSS постійно зростає ({size} і зростає). Можлива утечка пам'яті — перевірте панель стану.",
       "result": "Вбито {count} орфанів демонів, звільнено ~{size}"
     },
     "action": {
       "cleanUp": "Очистити",
+      "openPanel": "Відкрити панель здоров'я",
+      "dismiss": "Відпустка від роботи.",
       "optimizeAnalysis": "Оптимізувати аналіз",
       "dontShowAgain": "Не Показувати Опять"
     },

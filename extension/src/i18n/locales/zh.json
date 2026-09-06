@@ -682,19 +682,27 @@
       "openHint": "单击打开进程运行状况"
     },
     "tooltip": {
-      "processCount": "Dart进程: {count} ({size} RSS)",
-      "saropaProcessCount": "Saropa Lints：{count}个进程({size} RSS)",
+      "saropaSection": "Saropa Lints：{count}个进程({size} RSS)",
+      "saropaProcessEntry": "  {label}  {size}",
+      "saropaHealthy": "Saropa Lints: {count} 个进程({size} RSS) ✓",
+      "sparkline": "RSS 趋势: {chart}",
+      "otherSection": "其他 Dart 进程: {count} ({size} RSS)",
+      "otherProcessEntry": "  {label}  {size}",
+      "otherHint": "{count}分析服务器检测到 — 关闭未使用的VS Code窗口",
       "daemonCount": "Flutter 守护进程：{total}（{orphaned} 孤儿）",
       "scanDaemonOrphans": "孤立的扫描守护进程：{count} — 使用清理功能终止",
-      "warningHint": "内存使用率高 — 点击查看详情",
-      "criticalHint": "内存使用是关键 —— 建议清理"
+      "warningHint": "Saropa 内存使用率高 — 点击查看详情",
+      "criticalHint": "Saropa内存是关键 —— 推荐清理"
     },
     "notification": {
       "critical": "Dart进程正在使用{size}带有{orphaned}孤儿守护进程。清理一下？",
+      "possibleLeak": "Saropa RSS 正在稳步上升（{size} 并且持续增长）。可能存在内存泄漏 — 检查健康面板。",
       "result": "已终止 {count} 个孤儿守护进程，释放了 ~{size} 空间"
     },
     "action": {
       "cleanUp": "清理",
+      "openPanel": "打开健康面板",
+      "dismiss": "解雇了,这是一个很好的方法.",
       "optimizeAnalysis": "优化分析",
       "dontShowAgain": "不再显示"
     },
