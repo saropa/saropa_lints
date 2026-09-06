@@ -68,6 +68,9 @@ lib/src/rules/visitor_import_patch.txt
 # Generated reports (large audit files)
 reports/
 
+# Self-check lock file (checked in but gitignored — causes pub publish warning)
+self_check/pubspec.lock
+
 # Bug tracking / internal issue docs
 bugs/
 

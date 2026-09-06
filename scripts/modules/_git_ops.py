@@ -895,6 +895,45 @@ def _report_workflow_failure(
             pass
 
 
+def _offer_local_publish(project_dir: Path) -> bool:
+    """Offer to publish from the local machine when CI publish fails.
+
+    Falls back to `dart pub publish --force` using the developer's
+    local pub.dev credentials (from `dart pub login`). This bypasses
+    GitHub Actions OIDC entirely.
+    """
+    from scripts.modules._utils import safe_input
+
+    print()
+    print_warning("CI publish failed. You can publish locally instead.")
+    print_info(
+        "  This uses your local pub.dev credentials "
+        "(from `dart pub login`)."
+    )
+    choice = safe_input(
+        "  Publish locally with `dart pub publish --force`? [Y/n]: ",
+        "y",
+    ).strip().lower()
+    if choice == "n":
+        return False
+
+    print_info("Publishing locally...")
+    result = subprocess.run(
+        ["dart", "pub", "publish", "--force"],
+        cwd=project_dir,
+        shell=get_shell_mode(),
+    )
+    if result.returncode == 0:
+        print_success("Published to pub.dev locally!")
+        return True
+
+    print_error(
+        f"Local publish failed (exit {result.returncode}). "
+        f"Run `dart pub publish --force` manually to see errors."
+    )
+    return False
+
+
 def publish_to_pubdev_step(
     project_dir: Path, version: str,
 ) -> bool:
@@ -924,58 +963,45 @@ def publish_to_pubdev_step(
     print()
 
     run_id = _find_workflow_run(project_dir, tag_name)
+    ci_ok = False
     if not run_id:
         print_warning(
             f"No publish workflow found for tag {tag_name} "
-            f"after 10m. Check GitHub Actions manually."
+            f"after 10m."
         )
-        return False
+    else:
+        print_info(f"Watching workflow run {run_id}...")
+        try:
+            watch_result = subprocess.run(
+                ["gh", "run", "watch", run_id, "--exit-status"],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                shell=use_shell,
+                timeout=600,
+            )
+        except subprocess.TimeoutExpired:
+            print_warning(
+                f"Publish workflow {run_id} still running after the watch "
+                f"window. Monitor: https://github.com/{repo_path}/actions"
+            )
+        except KeyboardInterrupt:
+            print()
+            print_warning(
+                f"Stopped watching workflow {run_id} — it keeps running on "
+                f"GitHub Actions. "
+                f"Monitor: https://github.com/{repo_path}/actions/runs/{run_id}"
+            )
+        else:
+            if watch_result.returncode == 0:
+                print_success(
+                    "GitHub Actions publish workflow succeeded!"
+                )
+                return True
+            _report_workflow_failure(project_dir, run_id, repo_path)
 
-    print_info(f"Watching workflow run {run_id}...")
-    try:
-        watch_result = subprocess.run(
-            ["gh", "run", "watch", run_id, "--exit-status"],
-            cwd=project_dir,
-            capture_output=True,
-            text=True,
-            shell=use_shell,
-            # Aligned with the 10m run-discovery poll above. A publish workflow
-            # legitimately runs longer than 5m; the previous 300s with no
-            # handler raised TimeoutExpired and crashed the publish AFTER the
-            # tag had already been pushed, leaving a burned tag and a traceback.
-            timeout=600,
-        )
-    except subprocess.TimeoutExpired:
-        # The tag is already pushed, so a slow-but-not-failed workflow must not
-        # crash the publish. Surface the monitor URL and let the user confirm.
-        print_warning(
-            f"Publish workflow {run_id} still running after the watch window. "
-            f"Monitor: https://github.com/{repo_path}/actions"
-        )
-        return False
-    except KeyboardInterrupt:
-        # The tag push already triggered the workflow, so it keeps running on
-        # GitHub Actions regardless of whether this terminal is watching it —
-        # Ctrl-C here only detaches the local `gh run watch` display. Must not
-        # propagate as an unhandled KeyboardInterrupt: that crashes publish.py
-        # with a raw traceback after the tag is already live, which reads as
-        # "publish failed" when nothing about the actual publish failed.
-        print()
-        print_warning(
-            f"Stopped watching workflow {run_id} — it keeps running on "
-            f"GitHub Actions independent of this terminal. "
-            f"Monitor: https://github.com/{repo_path}/actions/runs/{run_id}"
-        )
-        return False
-
-    if watch_result.returncode == 0:
-        print_success(
-            "GitHub Actions publish workflow succeeded!"
-        )
-        return True
-
-    _report_workflow_failure(project_dir, run_id, repo_path)
-    return False
+    # CI publish failed or was not found — offer local publish fallback.
+    return _offer_local_publish(project_dir)
 
 
 def create_github_release(
