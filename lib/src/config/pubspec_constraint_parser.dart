@@ -303,6 +303,53 @@ ParsedPubspec parsePubspecConstraints(String content) {
   );
 }
 
+/// Finds dependencies that carry more than one distinct constraint string
+/// across a set of workspace member pubspecs.
+///
+/// Extracted from `WorkspaceDependencyVersionSyncRule` (in
+/// `lib/src/rules/config/pubspec_constraint_rules.dart`) so the actual
+/// decision logic — "do any two members disagree on a dependency's version
+/// range" — is a pure function over strings and can be unit-tested directly,
+/// the same way every other constraint rule in this file is tested. The rule
+/// itself only adds file I/O (reading each member's pubspec.yaml) and the
+/// diagnostic report; it delegates the comparison to this function.
+///
+/// [memberPubspecContents] is the raw text of each workspace member's
+/// pubspec.yaml. Order does not matter — every distinct raw constraint string
+/// seen for a dependency name is collected regardless of which member wrote
+/// it.
+///
+/// Returns a map of dependency name to the set of distinct constraint strings
+/// found for it, containing ONLY dependencies with 2+ distinct strings (a
+/// dependency used by just one member, or used identically by all members
+/// that declare it, has nothing to diverge from and is omitted).
+///
+/// Block dependencies (`git:`, `path:`, `sdk:`) are never included: they have
+/// no comparable version string, and `parsePubspecConstraints` already
+/// excludes them from `dependencies` before this function ever sees them —
+/// there is no separate block check needed here.
+Map<String, Set<String>> findDivergentDependencyConstraints(
+  Iterable<String> memberPubspecContents,
+) {
+  // Key = dependency name, Value = every distinct raw constraint string seen
+  // for it across all members.
+  final constraintsByDependency = <String, Set<String>>{};
+  for (final content in memberPubspecContents) {
+    final parsed = parsePubspecConstraints(content);
+    for (final dep in parsed.dependencies) {
+      constraintsByDependency
+          .putIfAbsent(dep.name, () => {})
+          .add(dep.constraint.raw);
+    }
+  }
+
+  // A dependency only "diverges" once two members disagree on its constraint
+  // string — a single distinct value (whether from one member or from many
+  // members that all agree) is not a finding.
+  constraintsByDependency.removeWhere((_, versions) => versions.length <= 1);
+  return constraintsByDependency;
+}
+
 /// Drops a trailing `# comment` that is not inside quotes. Constraint values
 /// never contain `#`, so a plain split on the first `#` is safe here.
 String _stripComment(String value) {

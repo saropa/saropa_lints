@@ -14,7 +14,7 @@
 /// YAML, including edge cases that have caused false positives in practice.
 library;
 
-import 'dart:io' show Directory, File, Platform;
+import 'dart:io' show Directory, File;
 
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:saropa_lints/src/config/pubspec_constraint_parser.dart';
@@ -96,6 +96,15 @@ void main() {
         expectMetadata(
           WorkspaceDependencyVersionSyncRule(),
           'workspace_dependency_version_sync',
+        );
+      },
+    );
+    test(
+      'WorkspaceMemberOrderRule reports correct name and messages',
+      () {
+        expectMetadata(
+          WorkspaceMemberOrderRule(),
+          'workspace_member_order',
         );
       },
     );
@@ -266,6 +275,119 @@ dependencies:
         parsed.dependencies.every((d) => (d.constraint.majorSpan ?? 0) < 2),
         isTrue,
       );
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // findDivergentDependencyConstraints — the pure comparison logic behind
+  // workspace_dependency_version_sync. The rule itself only adds file I/O
+  // (reading each member's pubspec.yaml) around this function, so exercising
+  // it directly is the real behavioral coverage for that rule (it can only be
+  // fired end-to-end through the scan CLI, since it targets a workspace root's
+  // .dart file, not .yaml content).
+  // ---------------------------------------------------------------------------
+  group('findDivergentDependencyConstraints', () {
+    test('flags a dependency with different constraints across members', () {
+      const memberA = '''
+name: foo
+dependencies:
+  http: ^1.2.0
+''';
+      const memberB = '''
+name: bar
+dependencies:
+  http: ^0.13.0
+''';
+      final divergent = findDivergentDependencyConstraints([memberA, memberB]);
+      expect(divergent, containsPair('http', {'^1.2.0', '^0.13.0'}));
+    });
+
+    test('does not flag a dependency declared identically everywhere', () {
+      const memberA = '''
+name: foo
+dependencies:
+  http: ^1.2.0
+''';
+      const memberB = '''
+name: bar
+dependencies:
+  http: ^1.2.0
+''';
+      final divergent = findDivergentDependencyConstraints([memberA, memberB]);
+      expect(divergent, isEmpty);
+    });
+
+    test('does not flag a dependency used by only one member', () {
+      // Nothing to diverge from when only one member declares it at all.
+      const memberA = '''
+name: foo
+dependencies:
+  http: ^1.2.0
+''';
+      const memberB = '''
+name: bar
+dependencies:
+  collection: ^1.19.0
+''';
+      final divergent = findDivergentDependencyConstraints([memberA, memberB]);
+      expect(divergent, isEmpty);
+    });
+
+    test('skips block dependencies (git/path/sdk) entirely', () {
+      // Two members point the same package name at different git refs —
+      // block entries carry no comparable version string, so this must not
+      // be treated as a divergent constraint.
+      const memberA = '''
+name: foo
+dependencies:
+  shared_pkg:
+    git:
+      url: https://example.com/shared_pkg.git
+      ref: main
+''';
+      const memberB = '''
+name: bar
+dependencies:
+  shared_pkg:
+    path: ../shared_pkg
+''';
+      final divergent = findDivergentDependencyConstraints([memberA, memberB]);
+      expect(divergent, isEmpty);
+    });
+
+    test('returns empty for no members (empty workspace)', () {
+      expect(findDivergentDependencyConstraints(const <String>[]), isEmpty);
+    });
+
+    test('reports only the offending dependency among several shared ones', () {
+      // args agrees across members; http diverges. Only http should surface.
+      const memberA = '''
+name: foo
+dependencies:
+  args: ^2.0.0
+  http: ^1.2.0
+''';
+      const memberB = '''
+name: bar
+dependencies:
+  args: ^2.0.0
+  http: ^1.5.0
+''';
+      final divergent = findDivergentDependencyConstraints([memberA, memberB]);
+      expect(divergent.keys, ['http']);
+      expect(divergent['http'], {'^1.2.0', '^1.5.0'});
+    });
+
+    test('collects three distinct constraints across three members', () {
+      const memberA = 'name: a\ndependencies:\n  http: ^1.0.0\n';
+      const memberB = 'name: b\ndependencies:\n  http: ^1.1.0\n';
+      const memberC = 'name: c\ndependencies:\n  http: ^1.2.0\n';
+      final divergent = findDivergentDependencyConstraints([
+        memberA,
+        memberB,
+        memberC,
+      ]);
+      expect(divergent['http'], {'^1.0.0', '^1.1.0', '^1.2.0'});
     });
   });
 
@@ -570,11 +692,11 @@ name: foo
 ''');
 
       final root = ProjectContext.getWorkspaceRoot(memberDir.path);
-      if (Platform.isWindows) {
-        // Case-insensitive match on Windows.
+      if (ProjectContext.isCaseInsensitiveFs) {
+        // Case-insensitive match on Windows and macOS (default APFS).
         expect(root, isNotNull);
       } else {
-        // Case-sensitive on Unix — Packages/Foo != packages/foo.
+        // Case-sensitive on Linux — Packages/Foo != packages/foo.
         expect(root, isNull);
       }
     });
@@ -582,6 +704,51 @@ name: foo
     test('returns null for null or empty input', () {
       expect(ProjectContext.getWorkspaceRoot(null), isNull);
       expect(ProjectContext.getWorkspaceRoot(''), isNull);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // canonicalRelativePath — public path normalization helper used by workspace
+  // rules to ensure consistent member-path comparison.
+  // ---------------------------------------------------------------------------
+  group('canonicalRelativePath', () {
+    test('normalizes backslashes to forward slashes', () {
+      expect(
+        ProjectContext.canonicalRelativePath(r'packages\foo\bar'),
+        'packages/foo/bar',
+      );
+    });
+
+    test('strips leading ./ prefix', () {
+      expect(
+        ProjectContext.canonicalRelativePath('./packages/foo'),
+        'packages/foo',
+      );
+    });
+
+    test('strips trailing /', () {
+      expect(
+        ProjectContext.canonicalRelativePath('packages/foo/'),
+        'packages/foo',
+      );
+    });
+
+    test('handles all normalizations together', () {
+      expect(
+        ProjectContext.canonicalRelativePath(r'.\packages\foo\'),
+        'packages/foo',
+      );
+    });
+
+    test('returns empty string for empty input', () {
+      expect(ProjectContext.canonicalRelativePath(''), isEmpty);
+    });
+
+    test('preserves simple paths unchanged', () {
+      expect(
+        ProjectContext.canonicalRelativePath('packages/foo'),
+        'packages/foo',
+      );
     });
   });
 }

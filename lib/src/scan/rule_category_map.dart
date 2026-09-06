@@ -2381,6 +2381,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'use_truncating_division_strict': 'stylistic',
   'verify_documented_parameters_exist': 'core',
   'workspace_dependency_version_sync': 'config',
+  'workspace_member_order': 'config',
   'wrong_number_of_parameters_for_setter': 'architecture',
   'yield_in_non_generator': 'flow',
   'youtube_player_auto_fullscreen_without_portrait_guard': 'packages',

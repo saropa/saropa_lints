@@ -373,13 +373,26 @@ class ProjectContext {
   /// trailing `/` so all spellings of the same relative path match.
   /// Returns empty string for null/empty input (safe for comparison — will
   /// never match a real path).
-  static String _canonicalRelativePath(String raw) {
+  ///
+  /// Public so [FlagMissingWorkspaceMemberRule] and other workspace rules can
+  /// call it instead of reimplementing the same normalization inline.
+  static String canonicalRelativePath(String raw) {
     var clean = normalizePath(raw);
     if (clean.isEmpty) return '';
     if (clean.startsWith('./')) clean = clean.substring(2);
     if (clean.endsWith('/')) clean = clean.substring(0, clean.length - 1);
     return clean;
   }
+
+  /// Whether the current platform uses case-insensitive filesystem paths.
+  /// True on Windows (NTFS) and macOS (default APFS), false on Linux.
+  /// Note: macOS CAN have case-sensitive volumes (created via `diskutil`),
+  /// but the default developer setup is case-insensitive-but-preserving.
+  /// Treating macOS as case-insensitive is the safer default — a false
+  /// match on a rare case-sensitive volume is a benign no-op, while a
+  /// false mismatch on the common case-insensitive volume is a real FP.
+  static bool get isCaseInsensitiveFs =>
+      Platform.isWindows || Platform.isMacOS;
 
   /// Extract the raw `workspace:` list entries from a pubspec's content.
   ///
@@ -446,16 +459,15 @@ class ProjectContext {
     if (members.isEmpty) return null;
 
     // Normalize both paths for comparison via the shared helper.
-    final ancestorClean = _canonicalRelativePath(ancestorDir);
-    final packageClean = _canonicalRelativePath(packageDir);
+    final ancestorClean = canonicalRelativePath(ancestorDir);
+    final packageClean = canonicalRelativePath(packageDir);
 
-    // Case-insensitive comparison on Windows where filesystem paths are
-    // case-insensitive. Dart's Platform.isWindows is checked once; on other
-    // platforms the lowercase conversion is a no-op cost-wise.
-    final lowerAncestor = Platform.isWindows
+    // Case-insensitive comparison on Windows and macOS (default APFS) where
+    // filesystem paths are case-insensitive-but-preserving.
+    final lowerAncestor = isCaseInsensitiveFs
         ? ancestorClean.toLowerCase()
         : ancestorClean;
-    final lowerPackage = Platform.isWindows
+    final lowerPackage = isCaseInsensitiveFs
         ? packageClean.toLowerCase()
         : packageClean;
 
@@ -467,8 +479,8 @@ class ProjectContext {
 
     // Check if any workspace entry matches (after canonicalizing the entry).
     for (final entry in members) {
-      final entryClean = _canonicalRelativePath(entry);
-      final lowerEntry = Platform.isWindows
+      final entryClean = canonicalRelativePath(entry);
+      final lowerEntry = isCaseInsensitiveFs
           ? entryClean.toLowerCase()
           : entryClean;
       if (lowerEntry == relativePath) {
@@ -484,7 +496,7 @@ class ProjectContext {
   /// [projectRoot], or an empty list if the pubspec has no `workspace:` key.
   ///
   /// Paths are returned as-is from the pubspec (relative, forward-slash).
-  /// Callers should use [_canonicalRelativePath] before comparing with
+  /// Callers should use [canonicalRelativePath] before comparing with
   /// filesystem paths.
   static List<String> getWorkspaceMembers(String? projectRoot) {
     if (projectRoot == null) return const [];

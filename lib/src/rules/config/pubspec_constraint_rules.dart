@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'dart:io'
-    show Directory, File, FileSystemEntity, FileSystemException, Platform;
+    show Directory, File, FileSystemEntity, FileSystemException;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
@@ -597,12 +597,12 @@ class FlagMissingWorkspaceMemberRule extends SaropaLintRule {
     if (members.isEmpty) return;
 
     // Build a normalized set of listed members for O(1) lookup.
+    // Uses the shared canonicalRelativePath helper so normalization stays in
+    // sync with _findWorkspaceMembership's path comparisons.
     final normalizedMembers = <String>{};
     for (final entry in members) {
-      var clean = entry.replaceAll('\\', '/');
-      if (clean.startsWith('./')) clean = clean.substring(2);
-      if (clean.endsWith('/')) clean = clean.substring(0, clean.length - 1);
-      if (Platform.isWindows) clean = clean.toLowerCase();
+      var clean = ProjectContext.canonicalRelativePath(entry);
+      if (ProjectContext.isCaseInsensitiveFs) clean = clean.toLowerCase();
       normalizedMembers.add(clean);
     }
 
@@ -650,21 +650,26 @@ class FlagMissingWorkspaceMemberRule extends SaropaLintRule {
       return;
     }
 
+    // Hoist the workspace root normalization outside the loop — it's
+    // invariant across all children and recursive calls.
+    final rootClean = ProjectContext.canonicalRelativePath(workspaceRoot);
+
     for (final child in children) {
       if (child is! Directory) continue;
 
       // Skip hidden directories (., .dart_tool, .git) and build output.
+      // Case-insensitive `build` check matches the Windows/macOS awareness
+      // applied to workspace member paths.
       final name = child.path.replaceAll('\\', '/').split('/').last;
-      if (name.startsWith('.') || name == 'build') continue;
+      if (name.startsWith('.') || name.toLowerCase() == 'build') continue;
 
-      // Compute relative path from workspace root to this directory.
-      var relative = child.path
-          .replaceAll('\\', '/')
-          .substring(workspaceRoot.replaceAll('\\', '/').length + 1);
-      if (relative.endsWith('/')) {
-        relative = relative.substring(0, relative.length - 1);
-      }
-      final comparePath = Platform.isWindows
+      // Compute relative path from workspace root using the shared helper
+      // so normalization stays in sync with _findWorkspaceMembership.
+      final childClean = ProjectContext.canonicalRelativePath(child.path);
+      // Guard: child must be under root for substring to make sense.
+      if (!childClean.startsWith('$rootClean/')) continue;
+      final relative = childClean.substring(rootClean.length + 1);
+      final comparePath = ProjectContext.isCaseInsensitiveFs
           ? relative.toLowerCase()
           : relative;
 
@@ -787,27 +792,23 @@ class WorkspaceDependencyVersionSyncRule extends SaropaLintRule {
     final members = ProjectContext.getWorkspaceMembers(root);
     if (members.isEmpty) return;
 
-    // Collect dependency constraints from every member's pubspec.
-    // Key = dependency name, Value = set of distinct constraint strings.
-    final depVersions = <String, Set<String>>{};
+    // Read every member's pubspec text. Missing files are skipped rather than
+    // failing the whole rule — a member listed in `workspace:` but not yet
+    // created on disk is a separate problem (flag_missing_workspace_member's
+    // inverse case), not this rule's concern.
+    final memberPubspecContents = <String>[];
     for (final memberPath in members) {
-      final fullPath = '$root/$memberPath/pubspec.yaml';
-      final pubspecFile = File(fullPath);
+      final pubspecFile = File('$root/$memberPath/pubspec.yaml');
       if (!pubspecFile.existsSync()) continue;
-
-      final parsed = parsePubspecConstraints(pubspecFile.readAsStringSync());
-      for (final dep in parsed.dependencies) {
-        // Skip block deps (git/path/sdk) — no comparable version string.
-        if (dep.constraint.isBlock) continue;
-        depVersions.putIfAbsent(dep.name, () => {}).add(dep.constraint.raw);
-      }
+      memberPubspecContents.add(pubspecFile.readAsStringSync());
     }
 
-    // Find dependencies with more than one distinct constraint string.
-    final divergent = depVersions.entries
-        .where((e) => e.value.length > 1)
-        .toList();
-
+    // Delegate the actual comparison to the pure, unit-tested function —
+    // I/O stays here, decision logic stays testable without a fake analyzer
+    // context (see findDivergentDependencyConstraints doc for why).
+    final divergent = findDivergentDependencyConstraints(
+      memberPubspecContents,
+    );
     if (divergent.isEmpty) return;
 
     // At least one dependency has conflicting constraints across members.
@@ -817,5 +818,109 @@ class WorkspaceDependencyVersionSyncRule extends SaropaLintRule {
       if (token.isEof) return;
       reporter.atOffset(offset: token.offset, length: token.length);
     });
+  }
+}
+
+// =============================================================================
+// workspace_member_order
+// =============================================================================
+
+/// Flags a workspace root whose `workspace:` list entries are not in
+/// alphabetical order.
+///
+/// Since: v16.0.0-beta.7 | Rule version: v1
+///
+/// Alphabetically sorted workspace entries produce predictable diffs, reduce
+/// merge conflicts when two branches add different members, and make it easy
+/// to scan for a specific package in a large monorepo. The check compares
+/// only block-style lists (`- path`) — flow-style (`workspace: [a, b]`) is
+/// ignored since short inline lists rarely benefit from sorting.
+///
+/// **BAD:**
+/// ```yaml
+/// workspace:
+///   - packages/zeta
+///   - packages/alpha
+///   - packages/mango
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// workspace:
+///   - packages/alpha
+///   - packages/mango
+///   - packages/zeta
+/// ```
+class WorkspaceMemberOrderRule extends SaropaLintRule {
+  WorkspaceMemberOrderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec', 'workspace'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  /// Dedup set: report at most once per workspace root.
+  static final Set<String> _reportedRoots = {};
+
+  static const LintCode _code = LintCode(
+    'workspace_member_order',
+    '[workspace_member_order] The workspace: list entries are not in '
+        'alphabetical order. Sorted entries produce predictable diffs, reduce '
+        'merge conflicts when two branches add different members, and make it '
+        'easy to scan for a specific package in a large monorepo. Reorder the '
+        'workspace: entries alphabetically. {v1}',
+    correctionMessage:
+        'Sort the workspace: list entries alphabetically.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Find this file's project root.
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+    if (_reportedRoots.contains(root)) return;
+
+    // Only fire on lib/ files (same dedup pattern as sibling rules).
+    final path = context.filePath.replaceAll('\\', '/');
+    if (!path.contains('/lib/')) return;
+
+    // Only fire on workspace roots.
+    final members = ProjectContext.getWorkspaceMembers(root);
+    // Need at least 2 entries to have an ordering concern.
+    if (members.length < 2) return;
+
+    // Check if the members are already sorted (case-insensitive to match
+    // how filesystem paths are compared).
+    final lowered = members.map((e) => e.toLowerCase()).toList();
+    final sorted = List<String>.from(lowered)..sort();
+    if (_listEquals(lowered, sorted)) return;
+
+    // Entries are out of order — report.
+    _reportedRoots.add(root);
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
+    });
+  }
+
+  /// Compares two string lists for element-wise equality.
+  static bool _listEquals(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 }

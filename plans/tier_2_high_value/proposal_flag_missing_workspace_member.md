@@ -132,3 +132,17 @@ New lint rule `flag_missing_workspace_member` (recommended tier, INFO) implement
 **Infrastructure changes:** Refactored `_findWorkspaceMembership` in `project_context_project_file.dart` to extract `_parseWorkspaceEntries` as a reusable static method. Added public `getWorkspaceMembers(projectRoot)` for the new rule to call. Added case-insensitive path comparison on Windows via `Platform.isWindows` to both the membership check and the scan.
 
 **Limitations:** Same `/lib/`-gating limitation as all pubspec rules — workspace roots without a `lib/` directory never trigger. Scan depth capped at 3 levels — deeply nested packages beyond that are missed. No quick fix (the insertion position and alphabetical ordering logic is more complex than the companion rule's simple append).
+
+## Finish Report (2026-09-06) — Hardening Pass
+
+Code review of the initial implementation identified three consolidation and correctness issues plus missing behavioral tests.
+
+**Fixes applied:**
+1. Deduplicated path-normalization logic: made `_canonicalRelativePath` public as `canonicalRelativePath` on `ProjectContext` and replaced the two inline reimplementations in `FlagMissingWorkspaceMemberRule` with calls to the shared helper. A single normalization source prevents future drift when adding new path-cleaning steps.
+2. Extended case-insensitive path comparison from Windows-only (`Platform.isWindows`) to Windows + macOS via a new `ProjectContext.isCaseInsensitiveFs` property. Default macOS volumes (APFS) are case-insensitive-but-preserving, matching Windows/NTFS behavior — the previous code would false-positive on macOS when workspace entry casing didn't match the directory name.
+3. Made the `build/` directory skip case-insensitive (`name.toLowerCase() == 'build'`), consistent with the case-aware philosophy applied to workspace member paths.
+
+**Test coverage added (6 tests):**
+- `canonicalRelativePath` group: backslash normalization, `./` stripping, trailing `/` stripping, combined normalization, empty input, passthrough.
+
+**Stale ROADMAP.md finding dismissed:** ROADMAP.md is a stub redirecting to `plans/` — the CLAUDE.md checklist item is stale relative to current project structure.
