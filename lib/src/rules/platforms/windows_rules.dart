@@ -393,6 +393,10 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Uses staticType to confirm both operands are String before flagging.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>

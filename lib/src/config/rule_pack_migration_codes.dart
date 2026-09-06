@@ -452,7 +452,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'use_setstate_synchronously',
   },
 
-  // flutter_skill_lints — 229 codes carried forward (no per-rule guide table; see plans/GAP_ANALYSIS.md).
+  // flutter_skill_lints — 233 codes carried forward (no per-rule guide table; see plans/GAP_ANALYSIS.md).
   'migrate_flutter_skill_lints': {
     'always_remove_listener',
     'avoid_accessing_collections_by_constant_index',
@@ -520,6 +520,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_inherited_widget_in_initstate',
     'avoid_inverted_boolean_checks',
     'avoid_keywords_in_wildcard_pattern',
+    'avoid_labeled_statements',
     'avoid_late_context',
     'avoid_late_final_reassignment',
     'avoid_late_keyword',
@@ -567,6 +568,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_ref_read_inside_build',
     'avoid_ref_watch_outside_build',
     'avoid_referencing_discarded_variables',
+    'avoid_returning_null_for_future_strict',
     'avoid_returning_void',
     'avoid_returning_widgets',
     'avoid_self_assignment',
@@ -592,6 +594,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_unnecessary_consumer_widgets',
     'avoid_unnecessary_continue',
     'avoid_unnecessary_digit_separators',
+    'avoid_unnecessary_else_after_control_flow',
     'avoid_unnecessary_enum_arguments',
     'avoid_unnecessary_futures',
     'avoid_unnecessary_gesture_detector',
@@ -600,6 +603,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_unnecessary_nullable_return_type',
     'avoid_unnecessary_overrides',
     'avoid_unnecessary_overrides_in_state',
+    'avoid_unnecessary_parentheses',
     'avoid_unnecessary_return',
     'avoid_unnecessary_setstate',
     'avoid_unnecessary_stateful_widgets',

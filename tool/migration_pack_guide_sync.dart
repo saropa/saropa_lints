@@ -44,8 +44,8 @@ const Set<String> kMigrationPacksWithoutGuideTable = {
   'migrate_flutter_skill_lints',
 };
 
-/// Known dedup count for flutter_skill_lints (2 source rules share targets).
-const int kFlutterSkillLintsDedupDelta = 2;
+/// Known dedup count for flutter_skill_lints (3 source rules share targets).
+const int kFlutterSkillLintsDedupDelta = 3;
 
 final _codePattern = RegExp(r'`([a-zA-Z0-9_]+)`');
 
