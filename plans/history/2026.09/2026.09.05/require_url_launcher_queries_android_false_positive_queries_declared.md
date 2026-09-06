@@ -1,6 +1,6 @@
 # BUG: `require_url_launcher_queries_android` — fires when queries intent IS declared in AndroidManifest.xml
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open -> Investigating -> Fix Ready -> Closed -->
 
@@ -106,3 +106,31 @@ The fixture should include:
 
 - saropa_lints version: current
 - Triggering project/file: `d:\src\contacts\lib\views\system\news_screen.dart:49`
+
+---
+
+## Finish Report (2026-09-05)
+
+`RequireUrlLauncherQueriesAndroidRule` (`lib/src/rules/widget/widget_patterns_require_rules.dart`)
+reported unconditionally on every `url_launcher` import at WARNING/`LintImpact.error`, with no
+mechanism to check whether the required `<queries>` block was already declared in
+`AndroidManifest.xml`. This produced a guaranteed false positive on any project that had already
+declared the block correctly.
+
+Option 3 from the Suggested Fix section was applied: severity downgraded from
+`DiagnosticSeverity.WARNING`/`LintImpact.error` to `DiagnosticSeverity.INFO`/`LintImpact.info`.
+The problem message and correction message were reworded from an assertion ("Without <queries> in
+manifest...") to an advisory verification prompt ("Verify that <queries> intent filters are
+declared..."), matching the rule's actual epistemic position: it can detect the import but cannot
+confirm the manifest state. A code comment on the `impact` override and a doc-comment note on the
+class explain why INFO is correct here. Rule version bumped v3 to v4.
+
+The Fixture Gap noted above (a GOOD case for "queries declared") was not addressed — the existing
+fixture (`example/lib/widget_patterns/require_url_launcher_queries_android_fixture.dart`) is a
+pre-existing stub with an empty function body and no real trigger; adding a manifest-declared GOOD
+case to it would not be a meaningful additional guard, since the rule no longer distinguishes
+manifest state at all (it cannot). No fixture change was made for that reason.
+
+Existing test coverage (`test/rules/widget/widget_patterns_rules_test.dart`, 218 tests) asserts
+rule name, message prefix, message length, and non-null correction message only — no severity
+assertions existed to break. Full suite re-run passes after the change.

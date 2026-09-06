@@ -90,6 +90,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Fixed the memory safety valve never resuming rules after it paused them. Clearing the plugin's own caches made it a minor memory contributor, but release was tested against total process memory, which the analysis server keeps high, so rules stayed paused indefinitely. No action required.
 - Fixed the memory valve repeatedly re-measuring every cache while the analysis server sat above the memory cap, which made the common case the most expensive one. No action required.
 - Fixed the translation tooling abandoning multi-gigabyte model host processes on every run, by terminating whole process trees rather than a parent alone, sweeping for survivors, and refusing to start when abandoned processes are already present. No action required.
+- Fixed `require_copy_with_null_handling` firing on `copyWith` methods where all fields using `??` are non-nullable types. The sentinel/wrapper pattern adds no value when a field cannot be null, so `??` is the correct pattern. The rule now checks class field nullability before emitting. No action required.
+- Fixed `require_permission_manifest_android` asserting a missing manifest entry when it cannot read AndroidManifest.xml. Downgraded to INFO severity since the rule is advisory only. No action required.
+- Fixed `require_url_launcher_queries_android` asserting missing `<queries>` blocks when it cannot read AndroidManifest.xml. Downgraded to INFO severity since the rule is advisory only. No action required.
+- Fixed `require_workmanager_for_background` firing on `Timer.periodic` inside `State` subclasses with proper `cancel()` in `dispose()`. UI-lifecycle timers are not background tasks. No action required.
+- Fixed `avoid_ios_battery_drain_patterns` firing on `Timer.periodic` inside `State` subclasses with proper `cancel()` in `dispose()`. Widget-bound timers cannot drain battery in the background. No action required.
 
 ### Internal
 

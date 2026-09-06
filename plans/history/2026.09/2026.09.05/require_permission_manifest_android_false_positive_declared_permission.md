@@ -1,6 +1,6 @@
 # BUG: `require_permission_manifest_android` — fires when permission IS declared in AndroidManifest.xml
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open -> Investigating -> Fix Ready -> Closed -->
 
@@ -100,3 +100,33 @@ The fixture should include:
 
 - saropa_lints version: current
 - Triggering project/file: `d:\src\contacts\lib\views\email\email_center_screen.dart:14`
+
+---
+
+## Finish Report (2026-09-05)
+
+Option 3 from Suggested Fix was applied: the rule's structural inability to read `AndroidManifest.xml`
+at analysis time (options 1 and 2 both require reading project files the rule has no access to) means
+it can never assert a permission is missing with confidence, so its severity was downgraded from
+WARNING/`LintImpact.error` to INFO/`LintImpact.info`, and its message was reworded from an assertion
+("Runtime permission request without manifest entry always fails") to an instruction to verify
+("Verify that the required Android permission is declared in AndroidManifest.xml").
+
+Changes:
+- `lib/src/rules/widget/widget_patterns_require_rules.dart` — `RequirePermissionManifestAndroidRule`:
+  `_code.severity` changed from `DiagnosticSeverity.WARNING` to `DiagnosticSeverity.INFO`; `impact`
+  changed from `LintImpact.error` to `LintImpact.info`; problem/correction message text reworded to
+  advisory phrasing; comments added explaining the rule cannot read the manifest and why INFO is
+  therefore the correct ceiling for its confidence.
+- `test/rules/widget/widget_patterns_rules_test.dart` — added a regression test asserting the rule's
+  `code.severity.name == 'INFO'` and `impact == LintImpact.info`, so a future edit cannot silently
+  re-promote the rule to WARNING/error without a test failure.
+- `CHANGELOG.md` — added a `## [16.0.0-beta.5] — Unreleased` section (none existed after the
+  beta.4 release) with a Fixed entry describing the behavior change.
+
+No manifest-parsing logic was added (options 1/2 from Suggested Fix remain open future work); the
+rule still cannot detect whether a permission is truly missing, it now says so honestly instead of
+asserting a fact it cannot verify.
+
+Verification: `dart test test/rules/widget/widget_patterns_rules_test.dart` — 219/219 passed
+(218 existing + 1 new regression test).

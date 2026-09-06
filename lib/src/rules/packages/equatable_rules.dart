@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../analyzer_compat.dart';
 import '../../saropa_lint_rule.dart';
 import '../../type_annotation_utils.dart';
 
@@ -973,14 +974,78 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
 
       // Check if body uses ?? with nullable params (word-boundary to avoid FPs)
       final String bodySource = body.toSource();
+      final Set<String> flaggedParams = <String>{};
       for (final String paramName in nullableParams) {
         final pattern = RegExp(r'\b' + RegExp.escape(paramName) + r'\s*\?\?');
         if (pattern.hasMatch(bodySource)) {
-          reporter.atNode(node);
-          return;
+          flaggedParams.add(paramName);
         }
       }
+      if (flaggedParams.isEmpty) return;
+
+      // The rule only matters when the underlying class FIELD is nullable --
+      // that's the only case where `??` actually loses the ability to set
+      // null. A non-nullable field (e.g. `bool showDetails`) can never be set
+      // to null in the first place, so `paramName ?? this.paramName` is the
+      // correct, complete pattern and the sentinel/wrapper suggestion is a
+      // false positive. See
+      // plans/history/2026.09/2026.09.05/require_copy_with_null_handling_false_positive_non_nullable_fields.md.
+      final Set<String> nullableFieldNames = _collectNullableFieldNames(node);
+      final bool anyFlaggedFieldIsNullable = flaggedParams.any(
+        nullableFieldNames.contains,
+      );
+      if (!anyFlaggedFieldIsNullable) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Walks up from the `copyWith` method to its enclosing class and collects
+  /// the names of instance fields declared with a nullable type.
+  ///
+  /// Used to distinguish "?? loses the ability to null out a nullable field"
+  /// (a real bug) from "?? on a non-nullable field" (correct and harmless --
+  /// the field could never be null anyway, so there's nothing to lose).
+  ///
+  /// Known limitations of matching by NAME rather than by resolved element
+  /// (accepted trade-off -- correct for the common case, not worth the
+  /// complexity of full type resolution for a heuristic rule):
+  /// - Inherited fields (declared on a superclass, not this class) are
+  ///   invisible here, so a `??` on an inherited nullable field is missed.
+  /// - A `copyWith` parameter renamed relative to its field (e.g.
+  ///   `copyWith({String? newName})` backing a `name` field) won't match.
+  /// - `static` fields are skipped by the `FieldDeclaration` check already
+  ///   (copyWith never legitimately assigns from a static field via `this.`),
+  ///   but a same-named static and instance field could theoretically
+  ///   collide in the name set.
+  /// - A field typed via a `typedef` that expands to a nullable type is not
+  ///   detected, since `isOuterTypeNullable` only reads the AST's `?` token.
+  Set<String> _collectNullableFieldNames(MethodDeclaration node) {
+    // copyWith is always a member of a class body; walk up to find it.
+    final ClassDeclaration? enclosingClass = node
+        .thisOrAncestorOfType<ClassDeclaration>();
+    if (enclosingClass == null) return const <String>{};
+
+    final Set<String> nullableFieldNames = <String>{};
+    // Use the `bodyMembers` compat shim (analyzer_compat.dart) instead of
+    // `.body.members` directly -- the raw member-access path has moved
+    // between analyzer versions (v9 exposes `.members` on the declaration
+    // itself, v12 moved it onto `.body`), and this rule must keep working
+    // across the pinned analyzer range without another version-fragility
+    // bug like the one that broke this code the first time it was written.
+    for (final ClassMember member in enclosingClass.bodyMembers) {
+      if (member is! FieldDeclaration) continue;
+      final TypeAnnotation? fieldType = member.fields.type;
+      // A field with no explicit type annotation (inferred, e.g. `var x = 1`)
+      // can't be proven nullable from the AST alone -- skip it rather than
+      // risk a false positive from assuming it's nullable.
+      if (fieldType == null || !isOuterTypeNullable(fieldType)) continue;
+
+      for (final VariableDeclaration variable in member.fields.variables) {
+        nullableFieldNames.add(variable.name.lexeme);
+      }
+    }
+    return nullableFieldNames;
   }
 }
 

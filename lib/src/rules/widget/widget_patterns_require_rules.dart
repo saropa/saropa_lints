@@ -2511,8 +2511,15 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
 class RequirePermissionManifestAndroidRule extends SaropaLintRule {
   RequirePermissionManifestAndroidRule() : super(code: _code);
 
+  // INFO, not error: unlike the sibling camera-permission rule above (which
+  // uses AndroidManifestChecker to actually read AndroidManifest.xml), this
+  // rule only sees the Dart AST and has no way to open the manifest file
+  // during analysis. It cannot confirm the permission is truly missing, so
+  // reporting at error/warning severity was a guaranteed false positive on
+  // every permission_handler import whose manifest entry already existed
+  // (plans/history/2026.09/2026.09.05/require_permission_manifest_android_false_positive_declared_permission.md).
   @override
-  LintImpact get impact => LintImpact.error;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2528,11 +2535,13 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_permission_manifest_android',
-    '[require_permission_manifest_android] Runtime permission request without '
-        'manifest entry always fails. Feature silently stops working. {v3}',
+    '[require_permission_manifest_android] Verify that the required Android '
+        'permission is declared in AndroidManifest.xml. {v3}',
     correctionMessage:
-        'Add <uses-permission android:name="android.permission.XXX"/> to manifest.',
-    severity: DiagnosticSeverity.WARNING,
+        'Confirm <uses-permission android:name="android.permission.XXX"/> exists in manifest.',
+    // INFO: this rule cannot read the manifest, so it can only remind the
+    // developer to check it -- it must never assert the entry is missing.
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override
@@ -2613,7 +2622,7 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
 
 /// Reminder to add queries element for url_launcher on Android 11+.
 ///
-/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.3.3 | Updated: v16.0.1 | Rule version: v4
 ///
 /// Alias: android_queries_element, url_launcher_manifest
 ///
@@ -2628,11 +2637,23 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
 ///   </intent>
 /// </queries>
 /// ```
+///
+/// NOTE: this rule fires on every `url_launcher` import regardless of
+/// whether the manifest already declares the required `<queries>` block,
+/// because it operates purely on the Dart AST and cannot parse
+/// AndroidManifest.xml. Severity is INFO (advisory) rather than
+/// WARNING/error for exactly that reason -- see
+/// plans/history/2026.09/2026.09.05/require_url_launcher_queries_android_false_positive_queries_declared.md.
 class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
   RequireUrlLauncherQueriesAndroidRule() : super(code: _code);
 
+  // INFO, not error/warning: the rule cannot read AndroidManifest.xml, so
+  // it cannot verify its own premise (that <queries> is missing). Reporting
+  // at a higher severity produced a guaranteed false positive on every
+  // project that had already declared the block correctly. INFO keeps this
+  // as a one-time "go check the manifest" nudge instead of an assertion.
   @override
-  LintImpact get impact => LintImpact.error;
+  LintImpact get impact => LintImpact.info;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2648,11 +2669,16 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_url_launcher_queries_android',
-    '[require_url_launcher_queries_android] Without <queries> in manifest, '
-        'canLaunchUrl returns false on Android 11+ even for installed apps. {v3}',
+    '[require_url_launcher_queries_android] Verify that <queries> intent '
+        'filters are declared in AndroidManifest.xml for url_launcher on '
+        'Android 11+ -- canLaunchUrl silently returns false without them, '
+        'even for installed apps. This rule cannot parse the manifest, so '
+        'it cannot confirm whether the block is already present; treat '
+        'this as a reminder to check by hand, not a confirmed defect. {v4}',
     correctionMessage:
-        'Add <queries> element with intent filters to AndroidManifest.xml.',
-    severity: DiagnosticSeverity.WARNING,
+        'Confirm a <queries> element with the relevant intent filters '
+        'exists in AndroidManifest.xml; add it if missing.',
+    severity: DiagnosticSeverity.INFO,
   );
 
   @override

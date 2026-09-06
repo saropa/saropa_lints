@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../target_matcher_utils.dart';
 
 // =============================================================================
 // WORKMANAGER RULES
@@ -193,7 +194,7 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 
 /// Warns when workmanager is needed for reliable background tasks.
 ///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.4.0 | Updated: v16.0.0-beta.5 | Rule version: v3
 ///
 /// Dart isolates die when the app goes to background. For reliable
 /// background execution on iOS and Android, use the workmanager package.
@@ -222,6 +223,27 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 /// );
 /// ```
 ///
+/// A `Timer.periodic` created inside a `State<T>` and canceled in that
+/// `dispose()` is exempt -- it is a UI-lifecycle ticker (clock tick,
+/// typewriter animation) bound to the widget, not a background task:
+/// ```dart
+/// class _ClockState extends State<Clock> {
+///   Timer? _tick;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _tick = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+///   }
+///
+///   @override
+///   void dispose() {
+///     _tick?.cancel(); // exempts the timer above
+///     super.dispose();
+///   }
+/// }
+/// ```
+///
 /// @see [workmanager package](https://pub.dev/packages/workmanager)
 class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
   /// Creates a new instance of [RequireWorkmanagerForBackgroundRule].
@@ -242,7 +264,7 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_workmanager_for_background',
     '[require_workmanager_for_background] Periodic task detected without workmanager. Dart isolates die when '
-        'app backgrounds. Use workmanager for reliable background tasks. {v2}',
+        'app backgrounds. Use workmanager for reliable background tasks. {v3}',
     correctionMessage:
         'Replace Timer.periodic with Workmanager().registerPeriodicTask() '
         'for reliable background execution.',
@@ -268,10 +290,47 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
       // Detect Timer.periodic
       if (methodName == 'periodic') {
         if (target != null && target.toSource() == 'Timer') {
+          // A Timer.periodic that lives entirely inside a widget's State and
+          // is torn down in dispose() is a UI-lifecycle ticker (clock tick,
+          // typewriter animation, poll-while-visible), not a background task
+          // candidate -- it cannot outlive the widget, so workmanager adds
+          // nothing here. See plans/history/2026.09/2026.09.05/require_workmanager_for_background_false_positive_ui_timer.md.
+          if (_isTimerInDisposableState(node)) return;
           reporter.atNode(node);
         }
       }
     });
+  }
+
+  /// Returns true when [node] (a `Timer.periodic(...)` call) sits inside a
+  /// `State<T>` subclass whose `dispose()` cancels the field the timer is
+  /// assigned to. Such timers are bound to widget lifecycle and die with the
+  /// widget, so they are not the "isolate dies on backgrounding" hazard this
+  /// rule warns about.
+  ///
+  /// Conservative by design: any of "no enclosing class", "class does not
+  /// extend State", "no dispose()", or "dispose() doesn't cancel the field"
+  /// falls through to the original unconditional warning.
+  bool _isTimerInDisposableState(MethodInvocation node) {
+    // Walk up the AST to find the class the Timer.periodic call lives in.
+    final ClassDeclaration? enclosingClass = node
+        .thisOrAncestorOfType<ClassDeclaration>();
+    if (enclosingClass == null) return false;
+
+    // Only State subclasses get the lifecycle exemption -- a plain service
+    // or top-level class has no framework-guaranteed teardown point.
+    final ExtendsClause? extendsClause = enclosingClass.extendsClause;
+    if (extendsClause == null) return false;
+    // 'State'.endsWith('State') is trivially true, so this single check
+    // covers both the bare `State<T>` case and subclasses like ConsumerState.
+    final String superName = extendsClause.superclass.name.lexeme;
+    if (!superName.endsWith('State')) return false;
+
+    // Reuse the shared "field is canceled/closed inside dispose()" check
+    // already relied on by lifecycle_rules.dart / disposal_rules.dart, so
+    // this exemption stays consistent with how those rules treat the same
+    // Timer.periodic + State + dispose() shape.
+    return isBackgroundWorkCanceledInDispose(node, enclosingClass);
   }
 }
 

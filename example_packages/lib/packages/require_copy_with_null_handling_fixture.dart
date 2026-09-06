@@ -102,23 +102,82 @@
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: require_copy_with_null_handling
 // Source: lib\src\rules\packages\equatable_rules.dart
+//
+// NOTE: the rule only visits real `MethodDeclaration` nodes (class members),
+// never local functions nested inside a top-level function -- so every case
+// below is a genuine instance method on a class, matching the rule's actual
+// trigger. The previous version of this fixture wrapped its BAD case in a
+// local function, which the rule's `addMethodDeclaration` visitor can never
+// see; it was silently never firing.
 
-import 'package:saropa_lints_example/flutter_mocks.dart';
+// BAD: `nickname` is a NULLABLE field. `?? this.nickname` means callers can
+// never explicitly set nickname back to null via copyWith -- exactly the bug
+// this rule detects.
+class UserProfile {
+  final String? nickname;
+  const UserProfile({this.nickname});
 
-final name = 'example';
-dynamic value;
-
-// BAD: Should trigger require_copy_with_null_handling
-// expect_lint: require_copy_with_null_handling
-void _bad604() {
-  User copyWith({String? name}) {
-    return User(name: name ?? this.name); // Can't set name to null!
+  // expect_lint: require_copy_with_null_handling
+  UserProfile copyWith({String? nickname}) {
+    return UserProfile(nickname: nickname ?? this.nickname);
   }
 }
 
-// GOOD: Should NOT trigger require_copy_with_null_handling
-void _good604() {
-  User copyWith({Optional<String>? name}) {
+// GOOD: every field is NON-nullable, so `??` cannot lose the ability to set
+// a field to null -- none of these fields could ever be null in the first
+// place. The sentinel/wrapper pattern the rule suggests adds no value here.
+// Regression fixture for: plans/history/2026.09/2026.09.05/require_copy_with_null_handling_false_positive_non_nullable_fields.md
+class MentalModelViewOptions {
+  final bool showDetails;
+  final bool showExamples;
+  final bool isExpanded;
+
+  const MentalModelViewOptions({
+    this.showDetails = false,
+    this.showExamples = false,
+    this.isExpanded = false,
+  });
+
+  MentalModelViewOptions copyWith({
+    bool? showDetails,
+    bool? showExamples,
+    bool? isExpanded,
+  }) {
+    return MentalModelViewOptions(
+      showDetails: showDetails ?? this.showDetails,
+      showExamples: showExamples ?? this.showExamples,
+      isExpanded: isExpanded ?? this.isExpanded,
+    );
+  }
+}
+
+// BAD (mixed): `theme` is nullable and uses `??`, so this must still fire
+// even though `enabled` is a non-nullable field using the same `??` pattern.
+class Settings {
+  final String? theme;
+  final bool enabled;
+
+  const Settings({this.theme, this.enabled = true});
+
+  // expect_lint: require_copy_with_null_handling
+  Settings copyWith({String? theme, bool? enabled}) {
+    return Settings(theme: theme ?? this.theme, enabled: enabled ?? this.enabled);
+  }
+}
+
+/// Minimal wrapper distinguishing "not provided" from "explicitly null".
+class Optional<T> {
+  const Optional(this.value);
+  final T value;
+}
+
+// GOOD: Optional<T> wrapper pattern correctly distinguishes "not provided"
+// from "explicitly null" for a nullable field.
+class User {
+  final String? name;
+  const User({this.name});
+
+  User copyWith({Optional<String?>? name}) {
     return User(name: name != null ? name.value : this.name);
   }
   // Or using freezed with @Default

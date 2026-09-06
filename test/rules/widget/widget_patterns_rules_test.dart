@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/widget/widget_patterns_avoid_prefer_rules.dart';
+import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_ux_rules.dart';
 import '../../helpers/fixture_discovery.dart';
@@ -612,6 +613,20 @@ void main() {
       'RequirePermissionManifestAndroidRule',
       'require_permission_manifest_android',
       () => RequirePermissionManifestAndroidRule(),
+    );
+
+    // Regression guard: the rule cannot read AndroidManifest.xml at analysis
+    // time, so it must stay INFO severity, not WARNING/error -- otherwise it
+    // asserts a missing permission it has no way to verify (false positive
+    // on every permission_handler import whose manifest entry already
+    // existed; see bugs archive for the original report).
+    test(
+      'RequirePermissionManifestAndroidRule reports INFO severity, not WARNING',
+      () {
+        final rule = RequirePermissionManifestAndroidRule();
+        expect(rule.code.severity.name, 'INFO');
+        expect(rule.impact, LintImpact.info);
+      },
     );
 
     testRule(
