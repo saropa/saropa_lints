@@ -87,6 +87,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Fixed a Dart file open only as one side of a diff or merge view never receiving scan on save diagnostics, because only ordinary tabs were recognized. No action required.
 - Fixed a canceled scan leaving an orphaned Dart process on macOS and Linux, and a failure to launch the process cleanup command being able to crash the extension host. No action required.
 
+### Internal
+
+- Triage script (`scripts/triage_scan.py`): added diagnostic-key validation (warns when `filePath`/`severity`/`ruleName` are missing), and a 29-test unit-test suite covering path classification, bucket assignment, and output formatting. No action required.
+- Changelog guard hook (`scripts/hooks/changelog_guard.py`): removed the `package.json` version-drift check that false-alarmed every beta cycle because VS Code uses a different version scheme. Guard 1 (multiple unreleased sections) still triggers on `package.json` edits. No action required.
+
 ---
 
 ## [16.0.0-beta.4]

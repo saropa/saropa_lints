@@ -421,7 +421,34 @@ def _load_scan_json(input_path: str | None) -> dict:
             file=sys.stderr,
         )
 
+    # Validate that the diagnostics array contains objects with required keys.
+    # Missing keys produce silent misclassification (everything lands in P3
+    # as severity '' / rule '<unknown>'), so warn loudly.
+    _validate_diagnostics(data.get('diagnostics', []))
+
     return data
+
+
+# Required keys in each diagnostic object — without these the triage
+# logic silently misclassifies (empty filePath = always 'app', missing
+# severity = never 'ERROR', missing ruleName = never grouped for bulk).
+_REQUIRED_DIAG_KEYS = {'filePath', 'severity', 'ruleName'}
+
+
+def _validate_diagnostics(diagnostics: list) -> None:
+    """Warn on diagnostics missing required keys."""
+    if not diagnostics:
+        return
+    # Sample the first diagnostic for missing keys.
+    first = diagnostics[0] if isinstance(diagnostics[0], dict) else {}
+    missing = _REQUIRED_DIAG_KEYS - first.keys()
+    if missing:
+        print(
+            f'Warning: diagnostics are missing required keys: '
+            f'{", ".join(sorted(missing))}. '
+            'Triage results may be incorrect.',
+            file=sys.stderr,
+        )
 
 
 def main(argv: list[str] | None = None) -> None:
