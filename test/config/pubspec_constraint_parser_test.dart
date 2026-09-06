@@ -20,6 +20,8 @@ import 'package:saropa_lints/saropa_lints.dart';
 import 'package:saropa_lints/src/config/pubspec_constraint_parser.dart';
 import 'package:saropa_lints/src/fixes/config/add_resolution_workspace_fix.dart'
     show resolutionWorkspaceRe;
+import 'package:saropa_lints/src/fixes/config/prefer_publish_to_none_fix.dart'
+    show computePublishToNoneInsertion, publishToAnyRe;
 import 'package:test/test.dart';
 
 void main() {
@@ -860,6 +862,78 @@ dependency_overrides:
       final parsed = parsePubspecConstraints(pubspec);
       expect(hasDependencyOverridesEntries(parsed), isTrue);
     });
+
+    // A commented-out entry is not a real override — the 2-space `_depEntry`
+    // regex requires the first non-space char to be alphanumeric/underscore,
+    // so a `#`-prefixed line under the header never matches and the section
+    // is correctly treated as empty.
+    test('dependency_overrides with only comment lines is not flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+dependency_overrides:
+  # http:
+  #   path: ../http
+dev_dependencies:
+  test: ^1.24.0
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isFalse);
+    });
+
+    // `# dependency_overrides:` is a top-level comment line, not the header —
+    // the header regex requires the line to start with the literal keyword,
+    // so a commented-out header must not be treated as opening the section.
+    test('commented-out dependency_overrides header is not flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+# dependency_overrides:
+#   http: ^1.0.0
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isFalse);
+    });
+
+    // More than one override entry must still flag — and each entry line
+    // independently satisfies the "non-empty section" check.
+    test('multiple override entries are flagged', () {
+      const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+dependency_overrides:
+  http: ^1.0.0
+  path: ^1.8.0
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isTrue);
+    });
+
+    // Regression guard for the `inDependencyOverrides` / `inDepSection`
+    // split: an override entry must be flagged as an override AND must NOT
+    // leak into `dependencies` — folding it in would make the range-hygiene
+    // rules reason about a version the pubspec doesn't actually declare.
+    test(
+      'dependencies and dependency_overrides are parsed independently',
+      () {
+        const pubspec = '''
+name: my_pkg
+dependencies:
+  http: ^1.2.0
+dependency_overrides:
+  http: ^1.0.0
+  meta: ^1.9.0
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(hasDependencyOverridesEntries(parsed), isTrue);
+        expect(parsed.dependencies, hasLength(1));
+        expect(parsed.dependencies.single.name, 'http');
+        expect(parsed.dependencies.single.constraint.raw, '^1.2.0');
+      },
+    );
   });
 
   // Behavioral coverage for `prefer_pinned_version_syntax` (the deliberate
@@ -933,6 +1007,86 @@ dependencies:
       final parsed = parsePubspecConstraints(pubspec);
       expect(hasCaretDependenciesInApp(parsed), isFalse);
     });
+
+    test(
+      'app with a range constraint (not caret syntax) is not flagged',
+      () {
+        // `>=1.0.0 <2.0.0` is an explicit range, not caret syntax — even
+        // though it is functionally equivalent to `^1.0.0`, this rule only
+        // targets the literal `^` spelling; the equivalent-range case is
+        // `PreferCaretConstraintInAppRule`'s concern (the opposite rule),
+        // never both.
+        const pubspec = '''
+name: my_app
+publish_to: none
+dependencies:
+  http: ">=1.0.0 <2.0.0"
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(hasCaretDependenciesInApp(parsed), isFalse);
+      },
+    );
+
+    test('app with a caret dev_dependency is flagged', () {
+      // The shared parser folds dev_dependencies into `dependencies` (see
+      // `_depSectionHeader` matching both headers), so a caret constraint
+      // under dev_dependencies is just as reproducibility-relevant as one
+      // under dependencies (e.g. a caret-pinned build_runner) and must fire.
+      const pubspec = '''
+name: my_app
+publish_to: none
+dev_dependencies:
+  build_runner: ^2.4.0
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isTrue);
+    });
+
+    test('non-app (published package) with only exact deps is not flagged', () {
+      // Double-checks the isApp gate independently of caret usage: a
+      // publishable package with exact pins has nothing to do with this
+      // rule either way, since the gate excludes it before caret is checked.
+      const pubspec = '''
+name: my_package
+dependencies:
+  http: 1.2.3
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isFalse);
+    });
+
+    test(
+      'a single dependency cannot trigger both conflicting-pair rules',
+      () {
+        // Cross-rule interaction check: hasCaretDependenciesInApp (this
+        // rule) requires isCaret; PreferCaretConstraintInAppRule requires
+        // isCaretEquivalentRange, which explicitly excludes isCaret
+        // constraints (see ParsedConstraint.isCaretEquivalentRange, first
+        // line: `if (isCaret ...) return false`). So for any one dependency
+        // exactly one of the two predicates can ever be true, never both.
+        const caretPubspec = '''
+name: my_app
+publish_to: none
+dependencies:
+  http: ^1.2.3
+''';
+        final caretParsed = parsePubspecConstraints(caretPubspec);
+        final caretDep = caretParsed.dependencies.single;
+        expect(hasCaretDependenciesInApp(caretParsed), isTrue);
+        expect(caretDep.constraint.isCaretEquivalentRange, isFalse);
+
+        const rangePubspec = '''
+name: my_app
+publish_to: none
+dependencies:
+  http: ">=1.2.3 <2.0.0"
+''';
+        final rangeParsed = parsePubspecConstraints(rangePubspec);
+        final rangeDep = rangeParsed.dependencies.single;
+        expect(hasCaretDependenciesInApp(rangeParsed), isFalse);
+        expect(rangeDep.constraint.isCaretEquivalentRange, isTrue);
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
@@ -1005,6 +1159,263 @@ name: my_app
 ''';
       final parsed = parsePubspecConstraints(pubspec);
       expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+    });
+
+    test('does not flag publish_to: none written with quotes', () {
+      // Regression: `_publishToNone` allows optional surrounding quotes, so
+      // `publish_to: 'none'` must be recognized as isApp AND as a deliberate
+      // publish_to decision, same as the unquoted form.
+      const pubspec = '''
+name: my_app
+publish_to: 'none'
+''';
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(parsed.isApp, isTrue);
+      expect(parsed.hasPublishTo, isTrue);
+      expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+    });
+
+    test(
+      'still flags when publish_to: is present but has no value (comment '
+      'only)',
+      () {
+        // Regression: the first non-whitespace character after `publish_to:`
+        // must not be `#` — a comment-only line is not a deliberate decision
+        // and must not silently suppress the lint.
+        const pubspec = '''
+name: my_app
+publish_to: # decide later
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(parsed.hasPublishTo, isFalse);
+        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+      },
+    );
+
+    test(
+      'treats an empty homepage field as absent and still flags',
+      () {
+        // `homepage:` with nothing (or only trailing whitespace) after the
+        // colon must not count as "has homepage".
+        const pubspec = '''
+name: my_package
+homepage:
+repository: https://github.com/example/my_package
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(parsed.hasHomepage, isFalse);
+        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+      },
+    );
+
+    test(
+      'treats a comment-only homepage field as absent and still flags',
+      () {
+        // `homepage: # TODO add homepage` has no real value, only a comment
+        // — must not count as "has homepage".
+        const pubspec = '''
+name: my_package
+homepage: # TODO add homepage
+repository: https://github.com/example/my_package
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(parsed.hasHomepage, isFalse);
+        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+      },
+    );
+
+    test(
+      'treats an empty repository field as absent and still flags',
+      () {
+        const pubspec = '''
+name: my_package
+homepage: https://example.com/my_package
+repository:
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(parsed.hasRepository, isFalse);
+        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+      },
+    );
+
+    test(
+      'a trailing comment after a real homepage/repository value still '
+      'counts as present',
+      () {
+        // A comment after a genuine URL value is normal YAML style and must
+        // not affect detection — only a comment with NO preceding value
+        // should be treated as absent.
+        const pubspec = '''
+name: my_package
+homepage: https://example.com/my_package # main site
+repository: https://github.com/example/my_package # source
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(parsed.hasHomepage, isTrue);
+        expect(parsed.hasRepository, isTrue);
+        expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+      },
+    );
+
+    test(
+      'a homepage/repository URL containing a # fragment still counts as '
+      'present',
+      () {
+        // `[^\s#]` only constrains the FIRST non-whitespace character after
+        // the colon — it must not be `#` (which would mean "no value, only
+        // a comment"). A URL's first character is always its scheme (`h` in
+        // `https://...`), so a `#fragment` or `#readme` anchor later in the
+        // same URL is unaffected: the regex has already matched by the time
+        // it reaches the `#`. Only a value that LITERALLY STARTS with `#`
+        // (i.e. no value at all, just a YAML comment) fails to match.
+        const pubspec = '''
+name: my_package
+homepage: https://example.com/my_package#readme
+repository: https://github.com/example/my_package#readme
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(parsed.hasHomepage, isTrue);
+        expect(parsed.hasRepository, isTrue);
+        expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+      },
+    );
+
+    test(
+      'a workspace root pubspec with no publish_to/homepage/repository is '
+      'still flagged (pub workspace roots also need publish_to: none)',
+      () {
+        const pubspec = '''
+name: my_workspace
+environment:
+  sdk: ^3.6.0
+workspace:
+  - packages/a
+  - packages/b
+''';
+        final parsed = parsePubspecConstraints(pubspec);
+        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+      },
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // PreferPublishToNoneFix — computePublishToNoneInsertion is the pure
+  // computation factored out of the fix's compute() so it can be unit-tested
+  // without a real analyzer ChangeBuilder/CorrectionProducerContext (same
+  // seam pattern as resolutionWorkspaceRe above).
+  // ---------------------------------------------------------------------------
+  group('computePublishToNoneInsertion', () {
+    test('inserts after the name: line when there is no description', () {
+      const pubspec = '''
+name: my_app
+environment:
+  sdk: ^3.6.0
+''';
+      final insertion = computePublishToNoneInsertion(pubspec);
+      expect(insertion, isNotNull);
+      // The offset must land immediately after the name: line, not anywhere
+      // inside environment: — verify by reconstructing the resulting file.
+      final result = pubspec.replaceRange(
+        insertion!.offset,
+        insertion.offset,
+        insertion.text,
+      );
+      expect(result, '''
+name: my_app
+publish_to: none
+environment:
+  sdk: ^3.6.0
+''');
+    });
+
+    test('inserts after the description: block when present', () {
+      const pubspec = '''
+name: my_app
+description: A little app that does a thing.
+environment:
+  sdk: ^3.6.0
+''';
+      final insertion = computePublishToNoneInsertion(pubspec);
+      expect(insertion, isNotNull);
+      final result = pubspec.replaceRange(
+        insertion!.offset,
+        insertion.offset,
+        insertion.text,
+      );
+      expect(result, '''
+name: my_app
+description: A little app that does a thing.
+publish_to: none
+environment:
+  sdk: ^3.6.0
+''');
+    });
+
+    test(
+      'inserts after the whole description: block scalar, not mid-block',
+      () {
+        // A multi-line block-scalar description (description: | ...) has
+        // indented continuation lines — the fix must anchor past ALL of
+        // them, never split the block by inserting in the middle.
+        const pubspec = '''
+name: my_app
+description: |
+  A little app.
+  It does a thing.
+environment:
+  sdk: ^3.6.0
+''';
+        final insertion = computePublishToNoneInsertion(pubspec);
+        expect(insertion, isNotNull);
+        final result = pubspec.replaceRange(
+          insertion!.offset,
+          insertion.offset,
+          insertion.text,
+        );
+        expect(result, '''
+name: my_app
+description: |
+  A little app.
+  It does a thing.
+publish_to: none
+environment:
+  sdk: ^3.6.0
+''');
+      },
+    );
+
+    test(
+      'is idempotent: returns null when publish_to: already exists '
+      '(guards against stale diagnostics / double-apply)',
+      () {
+        const pubspec = '''
+name: my_app
+description: A little app.
+publish_to: none
+environment:
+  sdk: ^3.6.0
+''';
+        expect(computePublishToNoneInsertion(pubspec), isNull);
+      },
+    );
+
+    test('returns null (no double-insert) for a non-none publish_to value', () {
+      const pubspec = '''
+name: my_app
+publish_to: https://my-private-server.example.com
+''';
+      expect(computePublishToNoneInsertion(pubspec), isNull);
+    });
+
+    test('publishToAnyRe matches publish_to regardless of value', () {
+      expect(publishToAnyRe.hasMatch('publish_to: none'), isTrue);
+      expect(
+        publishToAnyRe.hasMatch('publish_to: https://example.com'),
+        isTrue,
+      );
+      // A bare publish_to: with only a trailing comment has no real value —
+      // must not be mistaken for a deliberate decision.
+      expect(publishToAnyRe.hasMatch('publish_to: # decide later'), isFalse);
     });
   });
 }

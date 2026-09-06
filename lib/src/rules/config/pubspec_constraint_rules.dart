@@ -7,6 +7,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../config/pubspec_constraint_parser.dart';
 import '../../fixes/config/add_resolution_workspace_fix.dart';
+import '../../fixes/config/prefer_publish_to_none_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -38,6 +39,16 @@ void _reportPubspecOnce(
   if (reportedRoots.contains(root)) return;
 
   // Only attach to source files; avoids reporting from test/ or example/ trees.
+  //
+  // Side effect (intentional, not a bug): a pub workspace ROOT pubspec.yaml
+  // typically has no lib/ directory at all (only its member packages do), so
+  // `prefer_publish_to_none` and friends never fire directly on the root —
+  // there is simply no lib/ Dart file to attach the diagnostic to. This is
+  // accepted for v1: the diagnostic still needs *some* file to report at, and
+  // a workspace root without lib/ has none. A dedicated workspace-root check
+  // would need a different reporting mechanism (e.g. attaching to the root
+  // pubspec.yaml's own analysis-options-driven error, or a member's lib/ file
+  // representing the root) — out of scope here.
   final path = context.filePath.replaceAll('\\', '/');
   if (!path.contains('/lib/')) return;
 
@@ -966,6 +977,10 @@ class WorkspaceMemberOrderRule extends SaropaLintRule {
 ///   sdk: ^3.6.0
 /// publish_to: none
 /// ```
+///
+/// **Quick fix available:** Inserts `publish_to: none` after the
+/// `description:` block in pubspec.yaml (or after `name:` if there is no
+/// description).
 class PreferPublishToNoneRule extends SaropaLintRule {
   PreferPublishToNoneRule() : super(code: _code);
 
@@ -993,6 +1008,14 @@ class PreferPublishToNoneRule extends SaropaLintRule {
     correctionMessage: 'Add publish_to: none to your pubspec.yaml.',
     severity: DiagnosticSeverity.INFO,
   );
+
+  // Edits the YAML file via addGenericFileEdit (same pattern as
+  // AddResolutionWorkspaceFix) since the diagnostic attaches to a .dart token.
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferPublishToNoneFix(context: context),
+  ];
 
   @override
   void runWithReporter(

@@ -140,6 +140,31 @@ ClipRRect(
 
 ---
 
+## Pubspec Version Constraints
+
+Preferences for how application (`publish_to: none`) dependency versions are written in `pubspec.yaml`. Published packages are exempt from both — they need caret ranges for consumer compatibility.
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_pinned_version_syntax` | Pin app dependencies to exact versions (`1.2.3`) for reproducible builds | `prefer_caret_constraint_in_app` |
+| `prefer_caret_constraint_in_app` | Use caret ranges (`^1.2.3`) instead of an equivalent explicit range in app dependencies | `prefer_pinned_version_syntax` |
+
+### Example: Pinned vs Caret
+
+```yaml
+# prefer_pinned_version_syntax
+dependencies:
+  http: 1.2.3
+
+# prefer_caret_constraint_in_app
+dependencies:
+  http: ^1.2.3
+```
+
+> **Note:** Only one of this pair should be enabled — both firing on the same project gives contradictory guidance on every dependency line.
+
+---
+
 ## Null & Collection Handling
 
 Preferences for null-aware operators and collection manipulation patterns.
@@ -334,6 +359,7 @@ Many stylistic rules have valid opposites. This table helps you choose which rul
 | EdgeInsets.symmetric | `prefer_edgeinsets_symmetric` | | `prefer_edgeinsets_only` | EdgeInsets.only |
 | Expanded | `prefer_expanded_over_flexible` | | `prefer_flexible_over_expanded` | Flexible |
 | Theme colors | `prefer_material_theme_colors` | | `prefer_explicit_colors` | Explicit colors |
+| Pinned version | `prefer_pinned_version_syntax` | | `prefer_caret_constraint_in_app` | Caret constraint |
 | Spread operator | `prefer_spread_over_addall` | | `prefer_addall_over_spread` | addAll |
 | Switch expressions | `prefer_switch_expression` | | `prefer_switch_statement` | Switch statements |
 | Blank before return | `prefer_blank_line_before_return` | | `prefer_no_blank_line_before_return` | No blank |

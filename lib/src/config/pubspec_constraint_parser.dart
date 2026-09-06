@@ -282,33 +282,49 @@ final RegExp _dependencyOverridesHeader = RegExp(
 /// A 2-space-indented `name: value` entry. `value` may be empty (block follows).
 final RegExp _depEntry = RegExp(r'^  ([a-zA-Z0-9_][a-zA-Z0-9_-]*):(.*)$');
 
-/// `publish_to: none` at column 0 marks an application, not a published package.
+/// `publish_to: none` at column 0 marks an application, not a published
+/// package. Uses `[ \t]*` (not `\s*`) around the value: `\s` matches `\n`,
+/// so `\s*` here would let the match skip past an empty rest-of-line and
+/// bleed onto the START OF THE NEXT LINE looking for `none` — a bug found in
+/// review (confirmed by a failing test with `publish_to:` on its own line
+/// followed by an unrelated `none`-shaped value further down).
 final RegExp _publishToNone = RegExp(
-  r'''^publish_to:\s*['"]?none['"]?\s*(#.*)?$''',
+  r'''^publish_to:[ \t]*['"]?none['"]?[ \t]*(#.*)?$''',
   multiLine: true,
 );
 
 /// Any `publish_to:` key at column 0, whatever its value — `none` or a
 /// custom hosted-package server URL. Broader than [_publishToNone] because
 /// `prefer_publish_to_none` must not flag a pubspec that already made a
-/// deliberate publish-target decision of either kind.
+/// deliberate publish-target decision of either kind. The first
+/// non-whitespace character must not be `#`: `publish_to: # decide later` has
+/// no actual value, only a comment, so it must NOT count as a deliberate
+/// decision — bug found in review, previously `\S` matched the `#` itself and
+/// silently suppressed the lint on a pubspec that still needs publish_to set.
+/// Uses `[ \t]*` rather than `\s*` for the same line-bleed reason as
+/// [_publishToNone]: `\s` matches `\n`, so a bare `publish_to:` with nothing
+/// on its line would otherwise match the first non-whitespace character of
+/// the FOLLOWING line and be misread as a value.
 final RegExp _publishToAny = RegExp(
-  r'''^publish_to:\s*\S''',
+  r'''^publish_to:[ \t]*[^\s#]''',
   multiLine: true,
 );
 
-/// A non-empty `homepage:` field at column 0. Requires at least one non-space
-/// character after the colon so `homepage:` with nothing following (or only
-/// trailing whitespace) does not count as "present".
+/// A non-empty `homepage:` field at column 0. Requires at least one non-space,
+/// non-`#` character after the colon so `homepage:` with nothing following
+/// (or only trailing whitespace, or only a trailing comment like
+/// `homepage: # TODO`) does not count as "present" — same reasoning as
+/// [_publishToAny]. `[ \t]*` (not `\s*`) keeps the match on one line — see
+/// [_publishToAny] for why `\s*` is unsafe here.
 final RegExp _homepageField = RegExp(
-  r'''^homepage:\s*\S''',
+  r'''^homepage:[ \t]*[^\s#]''',
   multiLine: true,
 );
 
-/// A non-empty `repository:` field at column 0. Same non-empty rule as
-/// [_homepageField].
+/// A non-empty `repository:` field at column 0. Same non-empty, non-comment,
+/// single-line rule as [_homepageField].
 final RegExp _repositoryField = RegExp(
-  r'''^repository:\s*\S''',
+  r'''^repository:[ \t]*[^\s#]''',
   multiLine: true,
 );
 
@@ -430,6 +446,13 @@ bool shouldFlagMissingPublishToNone(ParsedPubspec parsed) {
 bool hasCaretDependenciesInApp(ParsedPubspec parsed) {
   // Only fire for apps — a publishable package should keep caret ranges.
   if (!parsed.isApp) return false;
+  // `parsed.dependencies` intentionally includes BOTH `dependencies:` and
+  // `dev_dependencies:` (see `_depSectionHeader`, which matches both
+  // headers into the same list). Reproducible builds care about dev
+  // tooling too — a caret-pinned build_runner/test package can drift a CI
+  // build the same way a caret-pinned runtime dependency can — so dev deps
+  // are not excluded here.
+  //
   // A single caret dependency is enough to report: the rule flags the
   // pubspec once, not once per offending line.
   return parsed.dependencies.any((dep) => dep.constraint.isCaret);

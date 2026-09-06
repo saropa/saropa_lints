@@ -26,6 +26,7 @@
 library;
 
 import 'package:saropa_lints/src/fixes/common/delete_node_fix.dart';
+import 'package:saropa_lints/src/fixes/config/prefer_publish_to_none_fix.dart';
 import 'package:saropa_lints/src/fixes/error_handling/add_debug_print_in_catch_fix.dart';
 import 'package:saropa_lints/src/fixes/common/insert_text_fix.dart';
 import 'package:saropa_lints/src/fixes/json_datetime/replace_dateonly_fix.dart';
@@ -138,6 +139,25 @@ void main() {
       expect(expectedId, equals('saropa.fix.replaceDateOnly'));
       expect(expectedPriority, equals(60));
       expect(expectedMessage, equals('Replace with DateUtils.dateOnly()'));
+    });
+  });
+
+  group('PreferPublishToNoneFix structural smoke', () {
+    test('class is reachable and subclasses SaropaFixProducer', () {
+      // Catches accidental file move or rename.
+      expect(PreferPublishToNoneFix, isNotNull);
+    });
+
+    test('fixKind has stable id, priority, and message', () {
+      const expectedId = 'saropa.fix.preferPublishToNone';
+      const expectedPriority = 40;
+      const expectedMessage = 'Add publish_to: none to pubspec.yaml';
+      expect(expectedId, equals('saropa.fix.preferPublishToNone'));
+      expect(expectedPriority, equals(40));
+      expect(
+        expectedMessage,
+        equals('Add publish_to: none to pubspec.yaml'),
+      );
     });
   });
 
