@@ -86,6 +86,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Fixed every level of memory pressure painting the status bar error red, including informational ones such as a light rule shed. Only genuinely severe states are red now, with moderate states amber and informational states left uncolored. No action required.
 - Fixed a Dart file open only as one side of a diff or merge view never receiving scan on save diagnostics, because only ordinary tabs were recognized. No action required.
 - Fixed a canceled scan leaving an orphaned Dart process on macOS and Linux, and a failure to launch the process cleanup command being able to crash the extension host. No action required.
+- Fixed the memory status bar showing plugin state that was no longer live, so a project with the analyzer plugin switched off could still display paused rules and a large memory figure from an earlier session. Nothing is shown now unless the plugin is enrolled and the reading is from the current session. No action required.
+- Fixed the memory safety valve never resuming rules after it paused them. Clearing the plugin's own caches made it a minor memory contributor, but release was tested against total process memory, which the analysis server keeps high, so rules stayed paused indefinitely. No action required.
+- Fixed the memory valve repeatedly re-measuring every cache while the analysis server sat above the memory cap, which made the common case the most expensive one. No action required.
+- Fixed the translation tooling abandoning multi-gigabyte model host processes on every run, by terminating whole process trees rather than a parent alone, sweeping for survivors, and refusing to start when abandoned processes are already present. No action required.
 
 ### Internal
 

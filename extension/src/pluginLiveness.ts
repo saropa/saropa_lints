@@ -145,8 +145,16 @@ const SAROPA_INCLUDE_PATTERN = /^\s*include:\s*package:saropa_lints\//m;
 const PLUGINS_HEADER_PATTERN = /^plugins:\s*$/m;
 const PLUGINS_SAROPA_NESTED_PATTERN = /^\s+saropa_lints:\s*$/m;
 
-/** Whether [content] enrols the saropa_lints analyzer plugin. */
-function analysisOptionsEnrolsSaropa(content: string): boolean {
+/**
+ * Whether [content] enrols the saropa_lints analyzer plugin.
+ *
+ * Exported because the memory-pressure watcher needs the same answer: it must
+ * not render plugin-written state when the plugin is not enrolled at all.
+ * Sharing one predicate keeps the two surfaces from disagreeing about what
+ * counts as "the plugin is configured to run" — a second, slightly different
+ * regex in the watcher would drift the moment either enrolment shape changes.
+ */
+export function analysisOptionsEnrolsSaropa(content: string): boolean {
   if (SAROPA_INCLUDE_PATTERN.test(content)) return true;
   // Require BOTH a top-level `plugins:` and a nested `saropa_lints:` so a
   // stray top-level `saropa_lints:` (the issue #208 reporter's case)

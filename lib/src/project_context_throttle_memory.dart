@@ -1180,6 +1180,43 @@ class MemoryPressureHandler {
   /// flooding the log when RSS hovers at the cap with a low plugin footprint.
   static bool _loggedAttributionSkip = false;
 
+  /// True once attribution has concluded the plugin is a bystander for the
+  /// current RSS excursion above the cap: process RSS is over the cap but the
+  /// plugin's own footprint is too small for pausing rules to help.
+  ///
+  /// This latches for the same reason a trip latches. Without it the guard
+  /// `!_hardLimitTripped && rss >= _hardLimitMb` stays true forever while the
+  /// analysis server sits above the cap, so [_estimateMemoryUsageMb] — which
+  /// walks the whole string-intern pool and every cache map — would re-run on
+  /// every sample (once per 200 rule callbacks) for the entire session. That
+  /// is exactly the condition the attribution check exists to make cheap, so
+  /// leaving it unlatched turns the intended free path into the most expensive
+  /// one. Cleared when RSS drops back below the cap or the decision flips.
+  static bool _attributionBystander = false;
+
+  /// Wall-clock time of the last attribution estimate, used to re-check the
+  /// bystander latch (and the attribution-based release) on a coarse timer
+  /// instead of on every sample. Null means "never checked — check now",
+  /// which is the conservative default on both paths: a fresh evaluation can
+  /// only ever move toward resuming rules or toward a justified pause.
+  static DateTime? _lastAttributionCheckAt;
+
+  /// How long a latched attribution decision is trusted before it is
+  /// re-evaluated. Matched to [_memoryLogInterval] so the bystander path costs
+  /// no more estimate walks than the periodic trend log already performs.
+  static const Duration _attributionRecheckInterval = _memoryLogInterval;
+
+  /// Number of times [_estimateMemoryUsageMb] has walked the caches. Test-only
+  /// observability: the bystander latch is a performance fix, and the only way
+  /// to pin a performance fix is to count the work it is supposed to skip.
+  static int _estimateCallCount = 0;
+
+  /// Test-only read of the cache-walk counter. See [_estimateCallCount].
+  static int get estimateCallCountForTesting => _estimateCallCount;
+
+  /// Test-only reset of the cache-walk counter. See [_estimateCallCount].
+  static void resetEstimateCallCountForTesting() => _estimateCallCount = 0;
+
   /// The configured hard RSS cap in MB, or 0 if disabled. Used by
   /// FileBudgetTracker to compute its file-skipping threshold.
   static int get hardRssLimitMb => _hardLimitMb;
@@ -1198,6 +1235,11 @@ class MemoryPressureHandler {
     // Arm the valve with a non-zero cap so isOverHardLimit doesn't short-
     // circuit on the _hardLimitMb <= 0 check.
     if (value && _hardLimitMb <= 0) _hardLimitMb = 1;
+    // Clear the attribution timer so the simulated state behaves like a state
+    // freshly entered: the next refresh re-evaluates attribution immediately
+    // rather than inheriting a stale timestamp from an earlier test.
+    _lastAttributionCheckAt = null;
+    _attributionBystander = false;
   }
 
   /// Runs the real RSS refresh (including the periodic memory-log write) on
@@ -1206,9 +1248,42 @@ class MemoryPressureHandler {
   /// have to drive 200+ times just to exercise the log line.
   static void refreshForTesting() => _refreshHardLimit();
 
+  /// Test-only bridge to the memoized physical-RAM probe. The probe and its
+  /// cache are library-private top-level members, which a test outside this
+  /// library cannot name; this static on a public class is the only handle.
+  static int totalPhysicalMemoryMbForTesting() => _totalPhysicalMemoryMb();
+
+  /// Test-only bridge to the adaptive-cap computation, so the caching fix can
+  /// be pinned at the real call site rather than only at the probe.
+  static int adaptiveRssCapForTesting(int fallbackMb, int ramMb) =>
+      _computeAdaptiveRssCap(fallbackMb, ramMb: ramMb);
+
+  /// How many times the physical-RAM probe has actually been attempted.
+  static int get physicalMemoryProbeCountForTesting =>
+      _totalPhysicalMemoryProbeCount;
+
+  /// Clear the memoized RAM value and probe counter. [forceFailure] makes the
+  /// probe report "unavailable" without touching the platform, so the cached-
+  /// failure path is testable on a machine where detection would succeed.
+  /// Tests MUST reset this in tearDown — a leaked `true` would make every
+  /// later cap computation fall back to the fixed default.
+  static void resetPhysicalMemoryProbeForTesting({bool forceFailure = false}) {
+    _cachedTotalPhysicalMemoryMb = null;
+    _totalPhysicalMemoryProbeCount = 0;
+    _forcePhysicalMemoryProbeFailure = forceFailure;
+  }
+
   /// Resets the periodic memory-log cooldown so the next [refreshForTesting]
   /// or [isOverHardLimit] refresh is guaranteed to log. Test-only.
   static void resetMemoryLogCooldownForTesting() => _lastMemoryLogAt = null;
+
+  /// Test-only override of the OOM panic threshold (MB); 0 disables it.
+  /// Production derives this from system RAM in [initializeCacheManagement].
+  /// Tests cannot control real process RSS, so this is the only way to pin
+  /// that panic still bypasses attribution on both the trip and release paths.
+  static void setPanicRssLimitMbForTest(int mb) {
+    _panicRssLimitMb = mb;
+  }
 
   /// Force the soft-limit-tripped flag for testing. Allows tests to simulate
   /// memory pressure without controlling real process RSS.
@@ -1237,6 +1312,11 @@ class MemoryPressureHandler {
     _loggedAttributionSkip = false;
     _baselineRssMb = 0;
     _panicRssLimitMb = 0;
+    // Attribution latch state must reset too, otherwise a bystander decision
+    // latched by one test would suppress the estimate walk in the next.
+    _attributionBystander = false;
+    _lastAttributionCheckAt = null;
+    _estimateCallCount = 0;
   }
 
   /// Whether the process RSS is currently over the hard cap, meaning rule
@@ -1270,85 +1350,199 @@ class MemoryPressureHandler {
       return;
     }
 
-    // Periodic trend line for post-crash diagnosis: this call site already
-    // runs on every RSS refresh (throttled via _rssCheckInterval above), so
-    // piggybacking here avoids a second polling loop. Gated on wall-clock
-    // interval, not refresh count, since refresh frequency depends on how
-    // busy the analysis server is.
+    // One clock reading is shared by the trend log and both attribution
+    // re-check timers below, so a single sample cannot straddle two instants.
     final now = DateTime.now();
-    if (_lastMemoryLogAt == null ||
-        now.difference(_lastMemoryLogAt!) >= _memoryLogInterval) {
-      _lastMemoryLogAt = now;
-      // Include shed level and plugin estimate in the periodic log so
-      // post-crash diagnosis shows attribution and shedding state.
-      final shedInfo = _shedLevel > 0 ? ' shed=$_shedLevel' : '';
-      final pluginEst = _estimateMemoryUsageMb();
-      PluginLogger.log(
-        '[memory] RSS ${rss}MB (cap ${_hardLimitMb}MB, '
-        'soft ${_softLimitMb}MB, plugin ~${pluginEst}MB$shedInfo)',
-      );
-
-      // Per-cache breakdown for diagnosing which caches are growing.
-      // Enabled via SAROPA_LINTS_DEBUG_MEMORY=1.
-      if (_debugMemory) {
-        _logCacheBreakdown();
-      }
-    }
+    _maybeLogMemoryTrend(rss, now);
 
     // ── Soft limit: graduated rule shedding ──
     _refreshSoftLimit(rss);
 
     // ── Hard limit: full rule-execution pause ──
-    // Attribution check: only pause rules when the plugin is a meaningful
-    // contributor to RSS. The analysis server's own AST caches, resolved
-    // element model, and type graph are typically 70-90% of process RSS on
-    // large projects — pausing a 50 MB plugin won't reclaim 8 GB of server
-    // memory. The panic threshold (90% of system RAM) bypasses attribution
-    // because at that point any shedding is better than an OOM kill.
+    // Split into trip and release evaluation so both paths can consult
+    // attribution. Testing only RSS on the release path is self-defeating: a
+    // trip clears the plugin's caches, which by the valve's own definition
+    // turns the plugin into a bystander, while the RSS that remains belongs to
+    // the analysis server and therefore never falls. Rules would stay paused
+    // for the rest of the session.
     if (!_hardLimitTripped && rss >= _hardLimitMb) {
-      final pluginMb = _estimateMemoryUsageMb();
-      final isPluginSignificant = pluginMb >= _minPluginContributionMb ||
-          (rss > 0 && pluginMb * 100 ~/ rss >= _minPluginContributionPct);
-      final isPanic = _panicRssLimitMb > 0 && rss >= _panicRssLimitMb;
-
-      if (isPluginSignificant || isPanic) {
-        // Plugin is a real contributor, or we're near OOM — pause.
-        _hardLimitTripped = true;
-        relieve(clearAll: true);
-        final reason = isPanic && !isPluginSignificant
-            ? 'OOM panic threshold (${_panicRssLimitMb}MB)'
-            : 'plugin footprint ${pluginMb}MB';
-        stderr.writeln(
-          '[saropa_lints] Memory guard tripped: RSS ${rss}MB >= '
-          '${_hardLimitMb}MB cap ($reason). Pausing rule execution. '
-          'Set SAROPA_LINTS_MAX_RSS_MB to adjust (0 disables).',
-        );
-      } else {
-        // Plugin is a bystander — the analysis server is the dominant
-        // consumer. Log once per crossing, don't pause rules.
-        if (!_loggedAttributionSkip) {
-          _loggedAttributionSkip = true;
-          PluginLogger.log(
-            '[memory] RSS ${rss}MB >= cap ${_hardLimitMb}MB but plugin '
-            'footprint is only ${pluginMb}MB '
-            '(< ${_minPluginContributionMb}MB / ${_minPluginContributionPct}% '
-            'of RSS) — analysis server is the dominant consumer. '
-            'Not pausing rules.',
-          );
-        }
-      }
-    } else if (_hardLimitTripped && rss < _hardLimitMb - _rssRecoveryMarginMb) {
-      _hardLimitTripped = false;
+      _evaluateHardTrip(rss, now);
+    } else if (_hardLimitTripped) {
+      _evaluateHardRelease(rss, now);
+    } else {
+      // RSS is below the cap and the valve is open — reset the per-excursion
+      // log guard and the bystander latch so the next crossing is evaluated
+      // and logged from scratch.
       _loggedAttributionSkip = false;
-      stderr.writeln(
-        '[saropa_lints] Memory guard released: RSS ${rss}MB. '
-        'Resuming rule execution.',
-      );
-    } else if (!_hardLimitTripped && rss < _hardLimitMb) {
-      // RSS dropped back below cap — reset the attribution skip log so the
-      // next crossing logs again.
-      _loggedAttributionSkip = false;
+      _attributionBystander = false;
+      _lastAttributionCheckAt = null;
     }
+  }
+
+  /// Write the periodic RSS trend line for post-crash diagnosis.
+  ///
+  /// Piggybacks on the RSS refresh (already throttled by [_rssCheckInterval])
+  /// so there is no second polling loop. Gated on wall clock rather than
+  /// refresh count, because refresh frequency depends on how busy the analysis
+  /// server is — a busy pass would otherwise flood the log.
+  static void _maybeLogMemoryTrend(int rss, DateTime now) {
+    final lastLog = _lastMemoryLogAt;
+    if (lastLog != null && now.difference(lastLog) < _memoryLogInterval) {
+      return;
+    }
+    _lastMemoryLogAt = now;
+
+    // Include shed level and plugin estimate so post-crash diagnosis shows
+    // attribution and shedding state, not just a bare RSS number.
+    final shedInfo = _shedLevel > 0 ? ' shed=$_shedLevel' : '';
+    final pluginEst = _estimateMemoryUsageMb();
+    PluginLogger.log(
+      '[memory] RSS ${rss}MB (cap ${_hardLimitMb}MB, '
+      'soft ${_softLimitMb}MB, plugin ~${pluginEst}MB$shedInfo)',
+    );
+
+    // Per-cache breakdown for diagnosing which caches are growing.
+    // Enabled via SAROPA_LINTS_DEBUG_MEMORY=1.
+    if (_debugMemory) {
+      _logCacheBreakdown();
+    }
+  }
+
+  /// Whether the plugin's own footprint is large enough that pausing rules
+  /// would meaningfully reduce memory pressure.
+  ///
+  /// The analysis server's AST caches, resolved element model, and type graph
+  /// are typically 70-90% of process RSS on large projects, so pausing a 50 MB
+  /// plugin cannot reclaim an 8 GB server heap. Either an absolute floor or a
+  /// share-of-RSS test qualifies, so the check stays meaningful on both small
+  /// and very large processes.
+  static bool _isPluginSignificant(int rss, int pluginMb) {
+    if (pluginMb >= _minPluginContributionMb) return true;
+    return rss > 0 && pluginMb * 100 ~/ rss >= _minPluginContributionPct;
+  }
+
+  /// Decide whether an over-cap RSS reading should pause rule execution.
+  ///
+  /// Called only while the valve is open and RSS is at or above the cap.
+  /// [now] is the sample's wall clock, threaded in so the coarse re-check
+  /// timer shares one clock reading with the trend log above.
+  static void _evaluateHardTrip(int rss, DateTime now) {
+    // Panic is an RSS-only test and must never sit behind the attribution
+    // latch: at 90% of system RAM the OS is about to kill the process, so any
+    // shedding beats an OOM. Evaluated before the latch short-circuit.
+    if (_panicRssLimitMb > 0 && rss >= _panicRssLimitMb) {
+      // -1 marks "no estimate was taken" — the panic path deliberately skips
+      // the cache walk, because the decision does not depend on it.
+      _tripHardLimit(rss, -1, true);
+      return;
+    }
+
+    // Bystander latch: skip the expensive cache walk while a recent decision
+    // still stands. Without this the walk repeats on every sample for as long
+    // as the server sits above the cap (see [_attributionBystander]).
+    final lastCheck = _lastAttributionCheckAt;
+    if (_attributionBystander &&
+        lastCheck != null &&
+        now.difference(lastCheck) < _attributionRecheckInterval) {
+      return;
+    }
+
+    final pluginMb = _estimateMemoryUsageMb();
+    _lastAttributionCheckAt = now;
+
+    if (_isPluginSignificant(rss, pluginMb)) {
+      _attributionBystander = false;
+      _tripHardLimit(rss, pluginMb, false);
+      return;
+    }
+
+    // Plugin is a bystander — the analysis server is the dominant consumer.
+    // Latch the decision and log once per crossing; do not pause rules.
+    _attributionBystander = true;
+    if (!_loggedAttributionSkip) {
+      _loggedAttributionSkip = true;
+      PluginLogger.log(
+        '[memory] RSS ${rss}MB >= cap ${_hardLimitMb}MB but plugin '
+        'footprint is only ${pluginMb}MB '
+        '(< ${_minPluginContributionMb}MB / ${_minPluginContributionPct}% '
+        'of RSS) — analysis server is the dominant consumer. '
+        'Not pausing rules.',
+      );
+    }
+  }
+
+  /// Pause rule execution and clear every cache. [pluginMb] is the estimate
+  /// that justified the trip (-1 when the panic threshold fired without one);
+  /// [isPanic] selects the reported reason.
+  static void _tripHardLimit(int rss, int pluginMb, bool isPanic) {
+    _hardLimitTripped = true;
+    relieve(clearAll: true);
+    // Start the release-path re-check timer here so the attribution release
+    // below cannot fire on the very next sample. Tripping just emptied the
+    // caches, so an immediate re-estimate would always read "bystander" and
+    // resume, producing a clear/resume thrash every 200 rule callbacks. One
+    // re-check interval of dwell lets the caches regrow enough for the release
+    // decision to be based on the plugin's real steady-state footprint.
+    _lastAttributionCheckAt = DateTime.now();
+    final reason = isPanic
+        ? 'OOM panic threshold (${_panicRssLimitMb}MB)'
+        : 'plugin footprint ${pluginMb}MB';
+    stderr.writeln(
+      '[saropa_lints] Memory guard tripped: RSS ${rss}MB >= '
+      '${_hardLimitMb}MB cap ($reason). Pausing rule execution. '
+      'Set SAROPA_LINTS_MAX_RSS_MB to adjust (0 disables).',
+    );
+  }
+
+  /// Decide whether a tripped valve should re-open. Called only while the
+  /// valve is closed. [now] is the sample's wall clock.
+  static void _evaluateHardRelease(int rss, DateTime now) {
+    // Panic overrides every release route: while RSS is at 90% of system RAM
+    // the process stays paused no matter who allocated the memory.
+    if (_panicRssLimitMb > 0 && rss >= _panicRssLimitMb) return;
+
+    // Normal release: process RSS fell below the cap minus the hysteresis
+    // band, so the pressure that justified the trip is genuinely gone.
+    if (rss < _hardLimitMb - _rssRecoveryMarginMb) {
+      _releaseHardLimit('RSS ${rss}MB');
+      return;
+    }
+
+    // Attribution release: RSS is still high, but if it is not the plugin's
+    // memory then keeping rules paused buys nothing and costs the user every
+    // diagnostic. A paused plugin is silent, so when the evidence no longer
+    // implicates the plugin we resume. Re-checked on the same coarse timer the
+    // bystander latch uses so this path does not walk the caches per sample.
+    final lastCheck = _lastAttributionCheckAt;
+    if (lastCheck != null &&
+        now.difference(lastCheck) < _attributionRecheckInterval) {
+      return;
+    }
+    final pluginMb = _estimateMemoryUsageMb();
+    _lastAttributionCheckAt = now;
+    if (_isPluginSignificant(rss, pluginMb)) return;
+
+    _releaseHardLimit(
+      'RSS ${rss}MB still above cap but plugin footprint is only '
+      '${pluginMb}MB',
+    );
+    // RSS is still over the cap, so the next sample re-enters the trip path.
+    // Pre-latch the bystander decision we just made so that sample reuses it
+    // instead of paying for another cache walk.
+    _attributionBystander = true;
+    _lastAttributionCheckAt = now;
+  }
+
+  /// Re-open the valve and reset the per-excursion attribution state.
+  static void _releaseHardLimit(String reason) {
+    _hardLimitTripped = false;
+    _loggedAttributionSkip = false;
+    _attributionBystander = false;
+    _lastAttributionCheckAt = null;
+    stderr.writeln(
+      '[saropa_lints] Memory guard released: $reason. '
+      'Resuming rule execution.',
+    );
   }
 
   /// Evaluate the soft RSS threshold and adjust [_shedLevel] accordingly.
@@ -1763,6 +1957,9 @@ class MemoryPressureHandler {
   /// — an omission would let the attribution check undercount the plugin's
   /// footprint and skip a trip that should fire.
   static int _estimateMemoryUsageMb() {
+    // Count every walk so the bystander latch's whole purpose — not walking
+    // the caches on every sample — is testable rather than asserted.
+    _estimateCallCount++;
     var estimatedBytes = 0;
 
     // FileContentCache: hash map + _passedRules (LRU-capped Set<String> per
@@ -1917,8 +2114,12 @@ class _CacheRegistration {
 /// from claiming too much on high-RAM servers where other processes
 /// also need memory.
 int _computeAdaptiveRssCap(int fallbackMb, {int ramMb = -1}) {
-  // Accept pre-detected RAM to avoid redundant subprocess spawns. Falls
-  // back to a fresh detection if the caller didn't pass one.
+  // Accept pre-detected RAM from the caller. When the caller has none (or its
+  // own detection failed) fall through to [_totalPhysicalMemoryMb], which is
+  // itself memoized — including the failure result — so this branch can no
+  // longer respawn a PowerShell/wmic probe per call. That failure case is the
+  // expensive one, so leaving it uncached defeated the stated purpose of the
+  // pre-detection parameter entirely.
   final ram = ramMb > 0 ? ramMb : _totalPhysicalMemoryMb();
   if (ram < 4096) return fallbackMb;
 
@@ -1935,13 +2136,48 @@ int _computeAdaptiveRssCap(int fallbackMb, {int ramMb = -1}) {
   return adaptive.clamp(2048, 8192);
 }
 
-/// Detect total physical memory in MB, or -1 if unavailable.
+/// Memoized result of [_probeTotalPhysicalMemoryMb]. Null means "not probed
+/// yet"; -1 is a cached *failure*, which is deliberately as terminal as a
+/// cached success. Physical RAM does not change while the process runs, and a
+/// probe that failed once (missing binary, blocked subprocess, unsupported
+/// platform) fails identically every time — so retrying only pays the cost of
+/// spawning a process to learn the same answer.
+int? _cachedTotalPhysicalMemoryMb;
+
+/// Number of times the underlying probe actually ran. Test-only observability:
+/// the memoization fix is about *not* spawning subprocesses, and the only way
+/// to pin that is to count the spawns.
+int _totalPhysicalMemoryProbeCount = 0;
+
+/// Test-only switch that makes the probe report failure without touching the
+/// platform, so the cached-failure path can be exercised on a machine where
+/// detection would otherwise succeed.
+bool _forcePhysicalMemoryProbeFailure = false;
+
+/// Detect total physical memory in MB, or -1 if unavailable. Memoized.
+///
+/// The probe shells out to PowerShell/wmic on Windows and to `sysctl` on
+/// macOS, so it must run at most once per process. See
+/// [_cachedTotalPhysicalMemoryMb] for why the failure result is cached too.
+int _totalPhysicalMemoryMb() {
+  final cached = _cachedTotalPhysicalMemoryMb;
+  if (cached != null) return cached;
+  final detected = _probeTotalPhysicalMemoryMb();
+  _cachedTotalPhysicalMemoryMb = detected;
+  return detected;
+}
+
+/// The uncached platform probe behind [_totalPhysicalMemoryMb].
 ///
 /// Platform-specific: Windows tries PowerShell CIM first (wmic is deprecated
 /// since Win10 21H1), then falls back to wmic. Linux reads `/proc/meminfo`,
 /// macOS uses `sysctl`. All wrapped in try/catch so a failure on an
 /// unknown platform returns -1 (the caller falls back to the fixed default).
-int _totalPhysicalMemoryMb() {
+int _probeTotalPhysicalMemoryMb() {
+  // Counted before the early returns so a suppressed probe is still recorded
+  // as an attempt — the test asserts the number of attempts, not of spawns.
+  _totalPhysicalMemoryProbeCount++;
+  if (_forcePhysicalMemoryProbeFailure) return -1;
   try {
     if (Platform.isWindows) {
       // Try PowerShell CIM first — wmic is deprecated since Windows 10 21H1

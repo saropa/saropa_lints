@@ -16,20 +16,44 @@ Environment variables:
   SAROPA_QWEN_MODEL       Pin a specific Ollama model tag (default: auto by VRAM).
   SAROPA_QWEN_TIMEOUT     Per-call timeout in seconds (default 90, clamped [15,600]).
   SAROPA_SKIP_QWEN=1      Disable Qwen entirely (pipeline uses Google only).
+  SAROPA_QWEN_KEEP_ALIVE  How long Ollama keeps the model resident between calls
+                          (default "5m"). The run unloads explicitly when it
+                          finishes, so this only covers gaps mid-run.
+
+Process-hygiene opt-ins (all default OFF — see "Process hygiene" below):
+  SAROPA_QWEN_ALLOW_GLOBAL_KILL=1  Permit killing every ``ollama`` process on the
+                          machine by image name. DESTRUCTIVE: this terminates
+                          daemons other people/tools are serving from. Only set
+                          it when you know this machine runs Ollama for nothing
+                          but this pipeline.
+  SAROPA_QWEN_REAP_ORPHANS=1  Let the preflight terminate orphaned model-host
+                          processes it finds instead of refusing to start.
+
+Process hygiene (see bugs/infra_translation_engine_orphans_llama_server_processes.md):
+  Ollama's daemon (``ollama``) is not the process that holds the model. It spawns
+  a separate model host (``llama-server``) that commits 9-16 GB. Killing only the
+  daemon strands that child forever: on Windows ``taskkill /F`` without ``/T``
+  does not walk the tree, and on POSIX a plain ``kill`` reaches one PID. Three
+  such orphans were once found holding 37 GB and crashing the editor. Every kill
+  path in this module therefore terminates the whole tree, and a sweep reaps any
+  model host whose parent is gone as a backstop.
 """
 
 from __future__ import annotations
 
+import atexit
 import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import threading
 import time
 import urllib.request
 from collections import deque
+from typing import NamedTuple
 
 # ---------------------------------------------------------------------------
 # Ollama endpoint
@@ -255,7 +279,29 @@ def reset_run_state() -> None:
 # ---------------------------------------------------------------------------
 # Daemon management
 # ---------------------------------------------------------------------------
+# PID of the daemon THIS run started, or None when we are talking to a daemon
+# somebody else started. Ownership is the safety boundary for every teardown
+# decision below: we only ever stop a daemon we spawned.
 _daemon_pid: int | None = None
+
+# Set once the atexit teardown is registered, so restarts do not stack handlers.
+_atexit_registered: bool = False
+
+
+def _adopt_daemon(pid: int) -> None:
+    """Record that this run owns the daemon at ``pid`` and must clean it up.
+
+    Registering teardown at adoption time (rather than at import) means a run
+    that never starts a daemon never installs a handler that could touch someone
+    else's process. The daemon is spawned fully detached (DETACHED_PROCESS /
+    start_new_session), so nothing else ties its lifetime to this script —
+    this handler is the only thing that will ever reap it.
+    """
+    global _daemon_pid, _atexit_registered  # noqa: PLW0603
+    _daemon_pid = pid
+    if not _atexit_registered:
+        atexit.register(shutdown_engine)
+        _atexit_registered = True
 
 
 def _daemon_popen_kwargs(ollama_bin: str) -> dict[str, object]:
@@ -298,17 +344,368 @@ def _has_model(timeout_s: float = 5.0) -> bool:
     return any(str(m.get("name", "")) == _model_tag() for m in models)
 
 
-def _kill_all_ollama() -> None:
+# ---------------------------------------------------------------------------
+# Process hygiene — tree termination, orphan detection, orphan reaping
+#
+# WHY this whole section exists: the Ollama daemon is a thin supervisor. The
+# memory lives in a separate ``llama-server`` child. Terminating the daemon
+# alone leaves that child running with the model committed and no parent left
+# to ever reap it, so the leak is permanent for the machine's uptime and
+# compounds one orphan per affected run.
+# ---------------------------------------------------------------------------
+
+# Image names Ollama has used for its model host across versions. Compared
+# case-folded and with any ``.exe`` suffix stripped, so one set covers both
+# platforms.
+_MODEL_HOST_NAMES = frozenset({
+    "llama-server", "ollama_llama_server", "ollama-llama-server",
+})
+
+# How long a graceful shutdown gets before escalating to a force kill. A force
+# kill is what strands the child in the first place, so it is the last resort,
+# not the first move.
+_GRACEFUL_WAIT_S: float = 6.0
+
+
+class _ProcInfo(NamedTuple):
+    """One row of a process-table snapshot.
+
+    ``commit_bytes`` is committed/pagefile-backed memory on Windows and RSS on
+    POSIX. It is only ever used to *report* how much an orphan is holding, never
+    to decide whether to kill it — memory size is not evidence of ownership.
+    """
+
+    pid: int
+    ppid: int
+    name: str
+    commit_bytes: int
+
+
+def _env_flag(name: str) -> bool:
+    """True only for an explicit opt-in value.
+
+    Deliberately strict: every flag routed through here gates something that
+    terminates processes, so an ambiguous value must read as "no".
+    """
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _normalize_image(name: str) -> str:
+    """Reduce an OS process name to a comparable key.
+
+    Windows reports ``llama-server.exe``; POSIX ``ps -o comm=`` may report a
+    full path. Strip both so one name set matches on either platform.
+    """
+    base = os.path.basename((name or "").strip()).lower()
+    return base[:-4] if base.endswith(".exe") else base
+
+
+def _is_model_host(name: str) -> bool:
+    """True when this process name is one of Ollama's model hosts."""
+    return _normalize_image(name) in _MODEL_HOST_NAMES
+
+
+def _snapshot_processes() -> list[_ProcInfo] | None:
+    """Enumerate live processes with parent PID and memory, or None on failure.
+
+    Returning None rather than an empty list on failure is load-bearing: callers
+    must be able to tell "there are no orphans" apart from "I could not look".
+    Every kill decision in this module is skipped when we could not look, so an
+    enumeration failure can never be mistaken for evidence to terminate.
+    """
+    try:
+        if sys.platform == "win32":
+            return _snapshot_processes_windows()
+        return _snapshot_processes_posix()
+    except Exception:  # noqa: BLE001 — enumeration is best-effort, never fatal
+        return None
+
+
+def _snapshot_processes_windows() -> list[_ProcInfo] | None:
+    """Snapshot via CIM. ``wmic`` is removed from current Windows, so use CIM."""
+    shell = shutil.which("powershell") or shutil.which("pwsh")
+    if not shell:
+        return None
+    out = subprocess.run(  # noqa: S603
+        [
+            shell, "-NoProfile", "-NonInteractive", "-Command",
+            "Get-CimInstance Win32_Process | Select-Object "
+            "ProcessId,ParentProcessId,Name,PageFileUsage | ConvertTo-Json -Compress",
+        ],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        timeout=60, check=False,
+    )
+    if out.returncode != 0 or not (out.stdout or "").strip():
+        return None
+    rows = json.loads(out.stdout)
+    # ConvertTo-Json emits a bare object, not an array, when exactly one row
+    # matches. Normalizing here keeps the parse below single-shaped.
+    if isinstance(rows, dict):
+        rows = [rows]
+    procs: list[_ProcInfo] = []
+    for row in rows:
+        try:
+            procs.append(_ProcInfo(
+                pid=int(row["ProcessId"]),
+                ppid=int(row.get("ParentProcessId") or 0),
+                name=str(row.get("Name") or ""),
+                # PageFileUsage is KiB of commit — the figure that actually
+                # exhausted the machine in the reported incident.
+                commit_bytes=int(row.get("PageFileUsage") or 0) * 1024,
+            ))
+        except (TypeError, ValueError, KeyError):
+            continue  # A malformed row is not worth failing the whole snapshot.
+    return procs
+
+
+def _snapshot_processes_posix() -> list[_ProcInfo] | None:
+    """Snapshot via ``ps``. RSS stands in for commit; it is display-only."""
+    out = subprocess.run(  # noqa: S603
+        ["ps", "-eo", "pid=,ppid=,rss=,comm="],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        timeout=30, check=False,
+    )
+    if out.returncode != 0:
+        return None
+    procs: list[_ProcInfo] = []
+    for line in (out.stdout or "").splitlines():
+        # comm can contain spaces, so split only the three leading numeric
+        # columns and keep the remainder as the name.
+        parts = line.split(None, 3)
+        if len(parts) < 4:
+            continue
+        try:
+            procs.append(_ProcInfo(
+                pid=int(parts[0]), ppid=int(parts[1]),
+                name=parts[3].strip(), commit_bytes=int(parts[2]) * 1024,
+            ))
+        except ValueError:
+            continue
+    return procs
+
+
+def find_orphan_model_hosts() -> list[_ProcInfo] | None:
+    """Model-host processes whose parent no longer exists. None if unknowable.
+
+    SAFETY — this is the single decision point for "may this process be killed":
+
+    * A host whose parent is still alive is EXCLUDED. That parent is a running
+      daemon which may be serving a live client (possibly not us at all), and
+      killing its model host is exactly the failure this module exists to
+      prevent.
+    * PID reuse can only make a dead parent look alive, never the reverse — the
+      OS will not hand a recycled PID to nothing. So this test errs toward
+      leaving processes alone, which is the safe direction.
+    * A failed snapshot yields None, not an empty list, so no caller can read
+      "could not look" as "nothing to kill" or as permission to kill.
+    """
+    procs = _snapshot_processes()
+    if procs is None:
+        return None
+    live_pids = {p.pid for p in procs}
+    return [
+        p for p in procs
+        if _is_model_host(p.name) and p.ppid not in live_pids
+    ]
+
+
+def _describe_orphans(orphans: list[_ProcInfo]) -> str:
+    """One-line human summary used by both the preflight and the sweep."""
+    total_gb = sum(p.commit_bytes for p in orphans) / (1024 ** 3)
+    detail = ", ".join(
+        f"PID {p.pid} ({p.commit_bytes / (1024 ** 3):.1f} GB)" for p in orphans
+    )
+    return f"{len(orphans)} orphaned model host(s) holding {total_gb:.1f} GB — {detail}"
+
+
+def _pid_alive(pid: int) -> bool:
+    """Cheap single-PID liveness probe used to time the graceful/force escalation."""
     if sys.platform == "win32":
-        subprocess.run(
-            ["taskkill", "/IM", "ollama.exe", "/F"],
-            capture_output=True, timeout=10, check=False,
+        out = subprocess.run(  # noqa: S603
+            ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            timeout=10, check=False,
+        )
+        # tasklist prints an "INFO: No tasks..." banner (no PID) when nothing
+        # matches, so testing for the PID text is enough and avoids parsing.
+        return str(pid) in (out.stdout or "")
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        # Exists but belongs to another user — alive as far as we are concerned.
+        return True
+    return True
+
+
+def _wait_pid_gone(pid: int, timeout_s: float) -> bool:
+    """Poll until the PID disappears. True if it went away within the budget."""
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        if not _pid_alive(pid):
+            return True
+        time.sleep(0.25)
+    return not _pid_alive(pid)
+
+
+def _terminate_tree(pid: int, *, log=None) -> bool:
+    """Terminate a process AND its children, graceful first, force second.
+
+    The tree part is the actual bug fix: ``taskkill /PID n /F`` (no ``/T``)
+    terminates one process, so Ollama's ``llama-server`` child outlived every
+    kill this module issued. ``/T`` walks the tree; on POSIX the equivalent is
+    signalling the process group, which the daemon leads because it is spawned
+    with ``start_new_session=True``.
+
+    Graceful first matters for the same reason: a forced kill gives the daemon
+    no chance to shut its own child down, so the force path is only reached
+    after the polite one has demonstrably failed.
+    """
+    say = log or (lambda _m: None)
+    if sys.platform == "win32":
+        # No /F: ask the tree to close. /T is what reaches llama-server.
+        subprocess.run(  # noqa: S603
+            ["taskkill", "/PID", str(pid), "/T"],
+            capture_output=True, timeout=15, check=False,
+        )
+        if _wait_pid_gone(pid, _GRACEFUL_WAIT_S):
+            return True
+        say(f"    [ollama] PID {pid} ignored graceful close — forcing tree kill")
+        subprocess.run(  # noqa: S603
+            ["taskkill", "/PID", str(pid), "/T", "/F"],
+            capture_output=True, timeout=15, check=False,
+        )
+        return _wait_pid_gone(pid, 3.0)
+
+    # POSIX: signal the whole group (negative PID) so the model host dies with
+    # the daemon. Fall back to the bare PID if the process is not a group leader
+    # (it should be, via start_new_session, but a caller may pass any PID).
+    for sig, label in ((signal.SIGTERM, "TERM"), (signal.SIGKILL, "KILL")):
+        try:
+            os.killpg(pid, sig)
+        except (ProcessLookupError, PermissionError, OSError):
+            try:
+                os.kill(pid, sig)
+            except (ProcessLookupError, PermissionError):
+                return True
+        grace = _GRACEFUL_WAIT_S if sig == signal.SIGTERM else 3.0
+        if _wait_pid_gone(pid, grace):
+            return True
+        say(f"    [ollama] PID {pid} survived SIG{label}")
+    return not _pid_alive(pid)
+
+
+def sweep_orphan_model_hosts(*, log=None, require_daemon_down: bool = True) -> int:
+    """Reap model hosts whose parent is gone. Returns how many were terminated.
+
+    This is the only reliable backstop. A daemon that dies any other way — crash,
+    Task Manager, an OS shutdown of the wrong process — strands its model host
+    identically, and no amount of care on our own kill paths covers that.
+
+    SAFETY: by default this refuses to run while the Ollama endpoint answers,
+    because a responding daemon means a live client could be mid-request. Only
+    parentless hosts are ever touched (see ``find_orphan_model_hosts``), and a
+    snapshot failure aborts the sweep rather than guessing.
+    """
+    say = log or (lambda _m: None)
+    if require_daemon_down and _endpoint_up(timeout_s=1.0):
+        # A serving daemon is exactly what must not be disturbed — killing one
+        # is what caused the incident this function was written for.
+        say("    [ollama] sweep skipped — a daemon is still serving on the port")
+        return 0
+    orphans = find_orphan_model_hosts()
+    if not orphans:
+        # None (could not enumerate) and [] (nothing to do) both mean "do not kill".
+        return 0
+    say(f"    [ollama] reaping {_describe_orphans(orphans)}")
+    reaped = 0
+    for proc in orphans:
+        if _terminate_tree(proc.pid, log=say):
+            reaped += 1
+        else:
+            say(f"    [ollama] could not terminate orphan PID {proc.pid}")
+    return reaped
+
+
+def preflight_orphan_check(*, log=None) -> tuple[bool, str]:
+    """Refuse to start when orphaned model hosts are already holding memory.
+
+    Starting another run on top of existing orphans is how three of them reached
+    37 GB: each run adds one and nothing ever reports the accumulation. Surfacing
+    it here converts a silent leak into a visible, actionable stop.
+
+    Terminating pre-existing orphans is opt-in (``SAROPA_QWEN_REAP_ORPHANS=1``)
+    because they were not created by this run — the operator must say so.
+    """
+    say = log or (lambda _m: None)
+    orphans = find_orphan_model_hosts()
+    if orphans is None:
+        # Could not enumerate. Not a reason to block a translation run; the
+        # end-of-run sweep will try again.
+        return True, "process table unavailable — orphan preflight skipped"
+    if not orphans:
+        return True, "no orphaned model hosts"
+
+    summary = _describe_orphans(orphans)
+    if _env_flag("SAROPA_QWEN_REAP_ORPHANS"):
+        say(f"[Ollama/Qwen] preflight: {summary} — reaping (SAROPA_QWEN_REAP_ORPHANS=1)")
+        # These are parentless by definition, so no daemon owns them and the
+        # endpoint check would only block a legitimate cleanup here.
+        reaped = sweep_orphan_model_hosts(log=say, require_daemon_down=False)
+        remaining = find_orphan_model_hosts() or []
+        if remaining:
+            return False, (
+                f"reaped {reaped}, but {_describe_orphans(remaining)} remain — "
+                "terminate them manually before re-running"
+            )
+        return True, f"reaped {reaped} orphaned model host(s) before starting"
+
+    return False, (
+        f"{summary}. These are leaked from an earlier run and will keep that "
+        "memory committed until they are terminated. Kill them (Windows: "
+        "Stop-Process -Name llama-server -Force; POSIX: pkill -f llama-server) "
+        "or re-run with SAROPA_QWEN_REAP_ORPHANS=1 to have this script do it."
+    )
+
+
+def _kill_all_ollama(*, log=None) -> bool:
+    """Kill every Ollama process on the machine, by image name. OPT-IN ONLY.
+
+    SAFETY: this is machine-wide and cannot tell our daemon from one another
+    tool, another user, or an interactive session is actively serving from.
+    Killing a serving daemon is precisely what produced the original incident,
+    so it is gated behind ``SAROPA_QWEN_ALLOW_GLOBAL_KILL=1`` and is never a
+    side effect of a normal run. Returns True only when the kill actually ran.
+
+    When it does run it uses ``/T`` (Windows) and the ``-f`` pattern that also
+    matches the model host (POSIX), so it no longer strands children.
+    """
+    say = log or (lambda _m: None)
+    if not _env_flag("SAROPA_QWEN_ALLOW_GLOBAL_KILL"):
+        say(
+            "    [ollama] refusing machine-wide kill — the daemon on this port "
+            "was not started by this run and may be serving another client. "
+            "Set SAROPA_QWEN_ALLOW_GLOBAL_KILL=1 if this machine runs Ollama "
+            "only for this pipeline."
+        )
+        return False
+    if sys.platform == "win32":
+        # /T is the fix: without it llama-server.exe survives its parent.
+        subprocess.run(  # noqa: S603
+            ["taskkill", "/IM", "ollama.exe", "/T", "/F"],
+            capture_output=True, timeout=15, check=False,
         )
     else:
-        subprocess.run(
+        # SIGTERM first so daemons can stop their own model hosts; the sweep
+        # below catches anything that did not.
+        subprocess.run(  # noqa: S603
             ["pkill", "-f", "ollama serve"],
-            capture_output=True, timeout=10, check=False,
+            capture_output=True, timeout=15, check=False,
         )
+    # Whatever the kill missed is now parentless, so the sweep can reach it.
+    sweep_orphan_model_hosts(log=say)
+    return True
 
 
 def _wait_for_port_down(timeout_s: float = 8.0) -> bool:
@@ -321,7 +718,8 @@ def _wait_for_port_down(timeout_s: float = 8.0) -> bool:
 
 
 def restart_ollama(*, log=print) -> bool:
-    global _restarts_this_run, _daemon_pid  # noqa: PLW0603
+    # _daemon_pid is only read here now; ownership is recorded by _adopt_daemon.
+    global _restarts_this_run  # noqa: PLW0603
     ollama = shutil.which("ollama")
     if not ollama:
         log("    [stall] cannot restart — ollama not on PATH")
@@ -330,8 +728,11 @@ def restart_ollama(*, log=print) -> bool:
         log("    [stall] restart cap reached — skipping")
         return False
 
+    # Graceful step one: ask Ollama to unload the model. This is what actually
+    # releases the multi-GB commit, and it lets the daemon retire its own model
+    # host instead of us having to terminate it.
     try:
-        subprocess.run(
+        subprocess.run(  # noqa: S603
             [ollama, "stop", _model_tag()],
             capture_output=True, timeout=10, check=False,
         )
@@ -340,19 +741,20 @@ def restart_ollama(*, log=print) -> bool:
     time.sleep(0.5)
 
     if _daemon_pid is not None:
-        if sys.platform == "win32":
-            subprocess.run(
-                ["taskkill", "/PID", str(_daemon_pid), "/F"],
-                capture_output=True, timeout=10, check=False,
-            )
-        else:
-            subprocess.run(
-                ["kill", "-9", str(_daemon_pid)],
-                capture_output=True, timeout=10, check=False,
-            )
+        # We started this daemon, so we may stop it — as a TREE. The previous
+        # single-PID force kill left llama-server running with the model still
+        # committed and no parent to ever reap it.
+        _terminate_tree(_daemon_pid, log=log)
     else:
-        _kill_all_ollama()
+        # We did NOT start the daemon holding this port. Terminating it would
+        # kill whatever client it is serving, which is the original incident.
+        # _kill_all_ollama is opt-in and no-ops unless the operator allowed it.
+        _kill_all_ollama(log=log)
     time.sleep(1.0)
+
+    # Backstop: whatever the teardown above missed is now parentless, so reap it
+    # before starting a replacement daemon that would add a second model host.
+    sweep_orphan_model_hosts(log=log)
 
     for attempt in range(2):
         try:
@@ -376,7 +778,7 @@ def restart_ollama(*, log=print) -> bool:
         time.sleep(1.5)
 
         if proc.poll() is None:
-            _daemon_pid = proc.pid
+            _adopt_daemon(proc.pid)
             _reset_circuit()
             _restarts_this_run += 1
             log(
@@ -386,9 +788,13 @@ def restart_ollama(*, log=print) -> bool:
             return True
 
         if attempt == 0:
-            log("    [stall] our daemon exited (port conflict) — killing rival and retrying")
-            _kill_all_ollama()
-            _wait_for_port_down(timeout_s=8.0)
+            # Another daemon owns the port. Displacing it is machine-wide and
+            # opt-in; when it is not allowed, _kill_all_ollama logs why and this
+            # retry simply fails, which is the safe outcome.
+            log("    [stall] our daemon exited (port conflict) — attempting rival teardown")
+            if _kill_all_ollama(log=log):
+                _wait_for_port_down(timeout_s=8.0)
+                sweep_orphan_model_hosts(log=log)
 
     log("    [stall] could not start daemon — port repeatedly claimed by another instance")
     _restarts_this_run += 1
@@ -396,7 +802,6 @@ def restart_ollama(*, log=print) -> bool:
 
 
 def _ensure_ready() -> tuple[bool, str]:
-    global _daemon_pid  # noqa: PLW0603
     ollama = shutil.which("ollama")
     if not ollama:
         return False, (
@@ -407,6 +812,15 @@ def _ensure_ready() -> tuple[bool, str]:
     sys.stderr.write(
         f"[Ollama/Qwen] model selection: {_model_selection_note()}\n"
     )
+
+    # Preflight: refuse to add another model host on top of leaked ones. Each
+    # run used to silently contribute one more multi-GB orphan; three of them
+    # once held 37 GB and crashed the editor. Surfacing it beats compounding it.
+    clear, detail = preflight_orphan_check(
+        log=lambda m: sys.stderr.write(m + "\n")
+    )
+    if not clear:
+        return False, f"orphaned Ollama model hosts detected — {detail}"
 
     if not _endpoint_up():
         sys.stderr.write("[Ollama/Qwen] daemon not running — starting...\n")
@@ -434,7 +848,8 @@ def _ensure_ready() -> tuple[bool, str]:
             if not restart_ollama(log=lambda m: sys.stderr.write(m + "\n")):
                 return False, "Could not start Ollama — another instance keeps reclaiming port"
         else:
-            _daemon_pid = proc.pid
+            # Ours: record ownership so the end-of-run teardown may stop it.
+            _adopt_daemon(proc.pid)
 
     if not _endpoint_up():
         return False, "Ollama daemon not responding after startup sequence"
@@ -506,6 +921,11 @@ def _build_prompt(text: str, target_bcp47: str) -> str:
     )
 
 
+def _keep_alive() -> str:
+    """Model residency window between calls. Short by design — see _call_ollama."""
+    return os.environ.get("SAROPA_QWEN_KEEP_ALIVE", "").strip() or "5m"
+
+
 def _call_ollama(prompt: str, timeout_s: float) -> str | None:
     global _qwen_cooldown_remaining  # noqa: PLW0603
     with _qwen_state_lock:
@@ -522,7 +942,12 @@ def _call_ollama(prompt: str, timeout_s: float) -> str | None:
             "temperature": 0.1,
             "num_ctx": 2048,
         },
-        "keep_alive": "30m",
+        # WHY not "30m": this is a batch job that knows when it is finished.
+        # A half-hour residency meant the model stayed committed long after the
+        # last string was translated, for no benefit. A short window still spans
+        # the gaps between locales, and shutdown_engine() unloads explicitly at
+        # the end rather than waiting for any timer at all.
+        "keep_alive": _keep_alive(),
     }
     req = urllib.request.Request(
         f"{_OLLAMA_BASE}/api/chat",
@@ -624,6 +1049,67 @@ def qwen_translate(text: str, locale: str) -> str | None:
     return translated
 
 
+def unload_model(*, log=None) -> bool:
+    """Ask Ollama to evict the model now instead of after the keep-alive timer.
+
+    ``keep_alive: 0`` is Ollama's own supported eviction path, so this frees the
+    9-16 GB the model host holds without terminating anything. It is the cheap,
+    non-destructive half of teardown and is safe even when other clients are
+    connected — the worst case is that they reload the model on their next call.
+    """
+    say = log or (lambda _m: None)
+    if not _endpoint_up(timeout_s=2.0):
+        return False
+    payload = {"model": _model_tag(), "prompt": "", "keep_alive": 0}
+    req = urllib.request.Request(
+        f"{_OLLAMA_BASE}/api/generate",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            resp.read()
+    except Exception as exc:  # noqa: BLE001 — teardown is best-effort
+        say(f"    [ollama] unload request failed: {exc}")
+        return False
+    say(f"    [ollama] unloaded {_model_tag()}")
+    return True
+
+
+def shutdown_engine(*, log=None) -> None:
+    """End-of-run teardown. Registered with atexit the moment we adopt a daemon.
+
+    SAFETY — ownership decides everything here:
+
+    * Daemon we started: unload the model, then terminate the whole tree so the
+      model host cannot outlive it, then sweep for anything left parentless.
+    * Daemon we did NOT start: touch nothing at all. It may be serving a live
+      client, and evicting its model or killing it is the exact failure that
+      motivated this code. We only report that we left it alone.
+
+    Best-effort by construction: this runs at interpreter exit, where raising
+    would obscure the real exit path, so every step swallows its own errors.
+    """
+    global _daemon_pid  # noqa: PLW0603
+    say = log or (lambda m: sys.stderr.write(m + "\n"))
+    pid = _daemon_pid
+    if pid is None:
+        # Nothing adopted: either we never started a daemon, or teardown already
+        # ran. Either way there is no process here we are entitled to stop.
+        return
+    _daemon_pid = None  # Idempotent: a second atexit pass must be a no-op.
+    try:
+        unload_model(log=say)
+        _terminate_tree(pid, log=say)
+        # The daemon is down, so any surviving model host is parentless and the
+        # sweep may reap it. This is the backstop for a daemon that died in a
+        # way our own kill paths never saw.
+        sweep_orphan_model_hosts(log=say)
+    except Exception:  # noqa: BLE001 — never raise out of atexit
+        pass
+
+
 def long_inputs() -> list[tuple[str, int, str]]:
     """Compatibility stub — Qwen has no input-length gate like NLLB."""
     return []
@@ -646,3 +1132,13 @@ if __name__ == "__main__":
     print(f"Endpoint up:    {_endpoint_up()}")
     if _endpoint_up():
         print(f"Model pulled:   {_has_model()}")
+    # Read-only orphan report: the operational check from the bug report, built
+    # in, so "is this machine leaking?" never needs a remembered PowerShell line.
+    _orphans = find_orphan_model_hosts()
+    if _orphans is None:
+        print("Orphan hosts:   unknown (could not enumerate processes)")
+    elif _orphans:
+        print(f"Orphan hosts:   {_describe_orphans(_orphans)}")
+        print("                re-run the pipeline with SAROPA_QWEN_REAP_ORPHANS=1 to clear them")
+    else:
+        print("Orphan hosts:   none")

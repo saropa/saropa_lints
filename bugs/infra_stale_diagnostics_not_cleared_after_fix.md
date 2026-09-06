@@ -1,11 +1,9 @@
 # BUG: Infrastructure — Diagnostics go stale after code fix or `// ignore:` addition
 
-**Status: Open — needs investigation**
+**Status: Open — root cause unidentified**
 
 Created: 2026-09-05
 Rule: ALL rules (infrastructure-level)
-File: `lib/src/rules/saropa_lint_rule.dart` (line ~3223, `deferForRapidEdit`)
-      `lib/src/native/saropa_context.dart` (line ~322, `_wrapCallback`)
 Severity: Critical — blocks the entire fix-verify loop; developers must reload
 VS Code to see whether a fix worked
 Rule version: N/A (infrastructure)
@@ -18,31 +16,6 @@ After adding an `// ignore:` directive or fixing flagged code, saropa_lints
 diagnostics do NOT clear from VS Code's Problems panel. "Dart: Restart Analysis
 Server" does not help. Only "Developer: Reload Window" (full VS Code reload)
 clears stale diagnostics. This breaks the edit-verify loop for every rule.
-
-The `deferForRapidEdit` mechanism is the primary suspect but the exact failure
-path has NOT been verified. The pivotal question is what the analysis server
-does when per-node callbacks emit nothing during a deferred pass.
-
----
-
-## Attribution Evidence
-
-Infrastructure bug — not rule-specific. The mechanism lives in:
-
-```
-lib/src/rules/saropa_lint_rule.dart — deferForRapidEdit (line ~3223)
-lib/src/native/saropa_context.dart — _wrapCallback (line ~322)
-```
-
-The deferral happens inside `_wrapCallback` at `saropa_context.dart:322` — the
-per-node callback returns early without calling the reporter. The rule's
-`registerNodeProcessors` already ran at startup; it is the per-node visitor
-that short-circuits.
-
-The docstring at `saropa_lint_rule.dart:3218–3222` acknowledges the tradeoff:
-"saropa_lints diagnostics are deferred and briefly disappear, returning on the
-next settled pass… The plugin cannot force a settle-pass; it relies on the
-server's normal idle re-analysis."
 
 ---
 
@@ -57,105 +30,124 @@ server's normal idle re-analysis."
 
 Same behavior when FIXING the underlying code instead of suppressing.
 
-**Frequency:** Reported as consistent, but not yet verified with logging. The
-docstring says diagnostics should restore on the next idle re-analysis — if they
-truly never restore, the problem may not be `deferForRapidEdit` at all.
+**Frequency:** Reported as consistent, not yet verified with logging.
 
 ---
 
-## Hypothesis (UNVERIFIED)
+## Investigation Results
 
-The `deferForRapidEdit` mechanism is the primary suspect, but two critical
-questions are open:
+### `deferForRapidEdit` is NOT the root cause
 
-### Question 1: What does the server do when callbacks emit nothing?
+The initial hypothesis blamed `deferForRapidEdit` (3+ passes in 2s → all rule
+callbacks become no-ops). Code tracing through the `analysis_server_plugin`
+framework (v0.3.14) disproves this:
 
-The defer happens inside `_wrapCallback` — the per-node callback returns early
-without calling the reporter. The `analysis_server_plugin` framework still ran
-the pass; the callbacks just didn't emit anything.
+**Finding 1: Empty pass = clears diagnostics.**
+The framework pre-populates every file in a library with an empty diagnostic
+list (`plugin_server.dart:549-551`) and sends `AnalysisErrorsParams(path, [])`
+for every file (`plugin_server.dart:394-399`). A fresh
+`RecordingDiagnosticListener` is created per pass (`plugin_server.dart:418-421`)
+with no carryover. An empty pass therefore CLEARS previous diagnostics — it does
+not retain them.
 
-**If the framework treats "callbacks emitted nothing" as "zero diagnostics":**
-the server clears previous diagnostics. When the rapid-edit window expires and
-no further file change occurs, the server never triggers a new pass, so the
-panel stays stale. This matches the observed behavior.
+**Finding 2: No idle re-analysis exists.**
+The plugin framework is purely request-driven. Analysis fires only when the
+analysis server sends `analysis.updateContent` (editor buffer changes,
+`plugin_server.dart:805`) or `analysis.handleWatchEvents` (disk changes,
+`plugin_server.dart:863`). There is no timer, no debounce, no idle-triggered
+re-analysis. The docstring claim that "the server's normal idle re-analysis"
+would restore diagnostics is incorrect — no such mechanism exists in the plugin
+framework.
 
-**If the framework treats "callbacks emitted nothing" as "no result" and retains
-previous diagnostics:** then `deferForRapidEdit` is NOT the cause, and the
-staleness comes from somewhere else — possibly the server not scheduling idle
-re-analysis after rapid edits, or the plugin not receiving file-change
-notifications.
+**Finding 3: Plugin cannot force re-analysis.**
+The `Plugin` API (`plugin.dart`) exposes only `register()`, `start()`, and
+`shutDown()`. There is no API to request re-analysis of a file.
 
-This is the **pivotal question**. The fix depends entirely on the answer.
+**The contradiction:** If `deferForRapidEdit` fires, diagnostics should
+*disappear* (empty pass clears them). The reported symptom is diagnostics
+*persisting*. These are opposite behaviors. `deferForRapidEdit` cannot cause
+diagnostics to persist — it can only cause them to transiently disappear.
 
-### Question 2: Does idle re-analysis actually fire?
+**On restart:** `_fileEditHistory` is a static in-memory map. On "Restart
+Analysis Server", the plugin process restarts with an empty map — the
+rapid-edit gate cannot trip on the first pass. If diagnostics are stale after
+restart, the cause is definitively not `deferForRapidEdit`.
 
-The docstring says the plugin relies on the server's "normal idle re-analysis"
-to restore diagnostics after edits settle. If the server reliably fires idle
-re-analysis, diagnostics should self-heal within seconds. If they don't
-self-heal, either (a) idle re-analysis never fires, (b) the deferred pass
-consumed the last analysis trigger, or (c) the problem is unrelated to
-`deferForRapidEdit`.
+### What `deferForRapidEdit` DOES cause (separate issue)
 
----
-
-## Investigation Steps (REQUIRED before implementing any fix)
-
-1. **Add logging inside `deferForRapidEdit` and `_wrapCallback`:** log when
-   deferral triggers, the file path, the pass count, and whether the deferral
-   window has expired. Log when a non-deferred (real) pass runs.
-
-2. **Reproduce the stale diagnostic:** save a fix, observe the Problems panel,
-   and check the log. Confirm: (a) whether deferral actually triggers on a
-   single save + auto-format, (b) how many passes fire and at what intervals,
-   (c) whether a "real" (non-deferred) pass ever fires afterward.
-
-3. **Verify server behavior with empty results:** create a test where a rule
-   deliberately emits nothing on one pass and emits diagnostics on the next.
-   Observe whether the server clears or retains between passes.
-
-4. **Check `_fileEditHistory` lifecycle:** on "Restart Analysis Server",
-   `_fileEditHistory` is a static in-memory map. On a cold restart it is EMPTY,
-   so the rapid-edit gate CANNOT trip on the first pass after restart. If
-   diagnostics are still stale after restart, the cause is NOT
-   `deferForRapidEdit` — investigate the server's file-change notification
-   mechanism instead.
+During genuine rapid editing (3+ passes in 2s), all diagnostics vanish until
+editing stops. Since there is no idle re-analysis mechanism, they only return
+when the next file-change event (save, type, external edit) triggers a new
+pass. This is a minor UX annoyance but NOT the reported bug — the reported bug
+is diagnostics persisting when they should clear.
 
 ---
 
-## Suggested Fixes (contingent on investigation)
+## Actual Root Cause: Unknown
 
-### If Question 1 = "empty clears the panel":
+The investigation eliminates `deferForRapidEdit`. Possible causes to
+investigate:
 
-**Option A: Cache and replay**
+### Hypothesis A: Analysis server not forwarding file-change events to plugin
 
-When deferring, replay the last valid diagnostic set for that file instead of
-emitting nothing. Requires tracking diagnostics per-file per-pass — the current
-architecture reports diagnostics inline (not collected), so this needs a
-collection layer.
+The analysis server may debounce, coalesce, or drop `analysis.updateContent` /
+`analysis.handleWatchEvents` requests to the plugin under load. In a 3957-file
+workspace, the server may decide the plugin's re-analysis is lower priority
+than its own type resolution. If the plugin never receives the change event, it
+never re-analyzes, and the old diagnostics persist.
 
-**Option D: Raise the deferral threshold (band-aid)**
+**How to test:** Add logging at the top of `_handleAnalysisUpdateContent` and
+`_handleAnalysisWatchEvents` in a local fork of `analysis_server_plugin` to
+confirm whether the plugin receives events after saves.
 
-Raise the gate from 3 passes / 2 seconds to a higher threshold (e.g., 5
-passes / 1 second) so a single save + auto-format doesn't trigger deferral.
-Reduces frequency but doesn't eliminate the bug.
+### Hypothesis B: Content overlay vs disk divergence
 
-### If Question 1 = "nothing = retain previous":
+The analysis server uses "content overlays" for unsaved editor buffers. When
+the user saves, the overlay should be replaced by the disk content. If the
+overlay is not removed after save, the plugin may re-analyze the stale
+(pre-save) content and re-report the same diagnostics.
 
-The bug is NOT `deferForRapidEdit`. Investigate:
-- Whether the server schedules idle re-analysis after rapid edits.
-- Whether the plugin receives file-change notifications correctly.
-- Whether the analysis_server_plugin framework has a known bug with stale
-  diagnostics.
+**How to test:** Log the file content hash at the start of `_analyzeLibrary` to
+confirm the plugin sees the post-save content.
 
-### Non-viable options (corrected from initial report):
+### Hypothesis C: Analysis context not invalidating the file
 
-**~~Option B: Skip registration during deferral~~** — registration happens once
-at startup (`registerNodeProcessors`), not per pass. The per-node visitor
-short-circuits, not the registration. This misunderstands the lifecycle.
+`analysisContext.changeFile(path)` at `plugin_server.dart:902` notifies the
+analysis driver that a file changed. `applyPendingFileChanges()` then returns
+the set of affected files. If the driver does not consider the file "affected"
+(e.g., because the overlay still holds the old content), the file is not
+re-analyzed.
 
-**~~Option C: Force re-analysis after deferral~~** — the docstring already notes
-"The plugin cannot force a settle-pass." No API exists for this. Would need
-investigation to confirm.
+**How to test:** Log the return value of `applyPendingFileChanges()` to see
+whether the edited file appears in the affected set.
+
+### Hypothesis D: Stale resolved unit served to plugin
+
+The `AnalysisDriver` caches resolved units. If it serves a cached (pre-edit)
+resolved unit to the plugin, the rules see old code and re-report the same
+diagnostics. The file appears "analyzed" but with stale AST.
+
+**How to test:** Log a hash of the `CompilationUnit.toSource()` to confirm the
+AST matches the current file content.
+
+---
+
+## Next Steps
+
+1. Add diagnostic logging to `_wrapCallback` to confirm whether
+   `deferForRapidEdit` even fires during a normal save (it likely does NOT —
+   a single save + auto-format is only 2 passes, below the threshold of 3).
+
+2. Fork `analysis_server_plugin` locally and add logging to
+   `_handleAnalysisUpdateContent`, `_handleAnalysisWatchEvents`,
+   `_handleContentChanged`, and `_analyzeLibrary` to trace whether the plugin
+   receives file-change events and re-analyzes after a save.
+
+3. If the plugin IS re-analyzing but reporting the same diagnostics: log the
+   resolved unit's content hash to verify it sees the updated file.
+
+4. If the plugin is NOT receiving events: the bug is in the analysis server's
+   plugin communication, not in saropa_lints — file upstream.
 
 ---
 

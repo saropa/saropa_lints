@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
+import { analysisOptionsEnrolsSaropa } from '../pluginLiveness';
 import { saropaLintsDataPath } from '../reportsPaths';
 
 /**
@@ -41,11 +42,105 @@ export interface MemoryPressureState {
 }
 
 /**
+ * When this extension host PROCESS started, in epoch milliseconds.
+ *
+ * Deliberately derived from `process.uptime()` rather than from the clock at
+ * module load. Module load happens at *activation* (`onLanguage:dart`), which
+ * is triggered by the user opening a Dart file — potentially seconds or
+ * minutes after the analyzer plugin has already written a pressure
+ * transition. Anchoring on activation time would classify that genuinely live
+ * state as stale and hide it. The host process, by contrast, is spawned as
+ * part of window startup, before the Dart extension launches the analysis
+ * server that hosts the plugin, so nothing a live plugin can write in this
+ * window predates it. That makes it the correct — and conservative in the
+ * right direction — session boundary.
+ */
+const HOST_START_MS = Date.now() - process.uptime() * 1000;
+
+/** Inputs to the staleness/liveness decision. Grouped so the check stays pure. */
+export interface MemoryStateLivenessInput {
+  /** `mtimeMs` of `memory_state.json`, or null when it could not be stat'd. */
+  writtenAtMs: number | null;
+  /** Epoch ms marking the start of the current extension host session. */
+  sessionStartMs: number;
+  /** Whether `analysis_options.yaml` currently enrols the analyzer plugin. */
+  pluginEnrolled: boolean;
+}
+
+/**
+ * Whether `memory_state.json` can be trusted to describe a plugin that is
+ * actually running right now.
+ *
+ * Both conditions must hold, and each catches a failure the other misses:
+ *
+ *  - **Enrolment.** The reported incident: the user commented the `plugins:`
+ *    block out of `analysis_options.yaml`, so no plugin was loaded at all,
+ *    yet the status bar kept showing "Rules paused (8425 MB)" from a file
+ *    written days earlier. mtime alone would not catch a variant where
+ *    something else touches the file; enrolment answers "could a plugin even
+ *    be running?" directly from the configuration that decides it.
+ *  - **Freshness against the session.** Enrolment alone is not enough either:
+ *    a plugin can be enrolled and still be dead (crashed isolate, analysis
+ *    server never started, stale cache). The state file outlives the process
+ *    that wrote it, so an orphaned file from a previous run would still
+ *    render.
+ *
+ * Why the session boundary and not a fixed age window (say "younger than five
+ * minutes"): the plugin writes this file only on shed-level *transitions*, so
+ * a genuinely paused plugin may legitimately not rewrite it for hours. Any
+ * fixed max-age would eventually hide state that is still true. The session
+ * boundary is the honest one — a plugin lives inside the analysis server,
+ * which restarts with the window, so state written before this session was by
+ * definition written by a process that no longer exists.
+ *
+ * Why not a plugin-written heartbeat file (option B in the bug report): it is
+ * the strongest signal, but it requires a Dart-side change to write and
+ * delete it, and a heartbeat that is never deleted on a hard crash degrades
+ * back to exactly the staleness problem being fixed here. This gate needs no
+ * plugin cooperation and cannot be defeated by an unclean shutdown.
+ *
+ * Errs toward hiding: if a live plugin's state is wrongly suppressed the user
+ * sees a silent status bar, which is merely uninformative. The failure this
+ * replaces sent a user investigating a memory problem that did not exist.
+ */
+export function isMemoryStateLive(input: MemoryStateLivenessInput): boolean {
+  // No plugin enrolled means nothing can be writing this file — whatever it
+  // contains describes a configuration the user has since turned off.
+  if (!input.pluginEnrolled) return false;
+  // Could not stat the file: treat as unknown, and unknown is not live.
+  if (input.writtenAtMs === null) return false;
+  return input.writtenAtMs >= input.sessionStartMs;
+}
+
+/**
+ * Whether the project at [root] currently enrols the analyzer plugin.
+ *
+ * Read fresh on every state-file event rather than cached at startup, so a
+ * user who re-enables the plugin mid-session gets their status bar back
+ * without reloading the window. The read is cheap and only happens on a
+ * debounced file-change event, never on a timer.
+ */
+function pluginEnrolledInAnalysisOptions(root: string): boolean {
+  try {
+    const optionsPath = path.join(root, 'analysis_options.yaml');
+    return analysisOptionsEnrolsSaropa(fs.readFileSync(optionsPath, 'utf8'));
+  } catch {
+    // Missing or unreadable analysis_options.yaml — the plugin cannot be
+    // enrolled through a file that is not there.
+    return false;
+  }
+}
+
+/**
  * Watches `reports/.saropa_lints/memory_state.json` for shed-level transitions
  * written by the analyzer plugin and notifies listeners on significant changes.
  *
  * Uses `fs.watch` on the reports directory — no polling. Only fires when
  * shedLevel or hardLimitTripped changes to avoid noisy re-renders.
+ *
+ * The file is only ever surfaced when {@link isMemoryStateLive} confirms it
+ * describes a plugin that is running now; a stale or orphaned file publishes
+ * `null`, which renders as a silent status bar.
  */
 export class MemoryPressureWatcher implements vscode.Disposable {
   private _watcher: fs.FSWatcher | null = null;
@@ -53,6 +148,19 @@ export class MemoryPressureWatcher implements vscode.Disposable {
   private _onStateChange:
     | ((state: MemoryPressureState | null) => void)
     | null = null;
+  /** Workspace root being watched — needed to locate analysis_options.yaml. */
+  private _root: string | null = null;
+  /** Session boundary every read is measured against. */
+  private readonly _sessionStartMs: number;
+
+  /**
+   * @param sessionStartMs overrides the session boundary; only tests pass it,
+   *   so they can exercise both sides of the staleness gate without waiting
+   *   on wall-clock time.
+   */
+  constructor(sessionStartMs: number = HOST_START_MS) {
+    this._sessionStartMs = sessionStartMs;
+  }
 
   /** Register the callback invoked on significant state changes. */
   onStateChange(cb: (state: MemoryPressureState | null) => void): void {
@@ -62,6 +170,9 @@ export class MemoryPressureWatcher implements vscode.Disposable {
   /** Begin watching the reports directory under [root]. */
   start(root: string): void {
     this.dispose();
+    // Retained for the per-read enrolment check, which has to re-read
+    // analysis_options.yaml from this same root.
+    this._root = root;
 
     // Shared helper keeps this in sync with the other reports/.saropa_lints consumers.
     const reportsDir = saropaLintsDataPath(root);
@@ -90,28 +201,77 @@ export class MemoryPressureWatcher implements vscode.Disposable {
     }
   }
 
-  /** Parse the state file and notify only on significant transitions. */
+  /**
+   * Read the state file and publish it — but only when it can be confirmed
+   * live. This is the fix for the stale-state defect: the file used to be
+   * parsed and published unconditionally, so a `memory_state.json` written
+   * days earlier by a plugin that had since been commented out of
+   * `analysis_options.yaml` still drove the status bar.
+   *
+   * A file that fails the gate publishes `null` rather than being ignored,
+   * because ignoring it would leave any previously published state on screen.
+   */
   private _tryRead(filePath: string): void {
-    try {
-      const raw = fs.readFileSync(filePath, 'utf8');
-      const parsed = JSON.parse(raw) as MemoryPressureState;
-
-      // Notify on shed level, hard-limit, or soft-limit trip state changes.
-      // softLimitTripped is needed so the "enable shedding" prompt fires
-      // when shedding is off (shedLevel stays 0 in that path).
-      const changed =
-        this._state === null ||
-        this._state.shedLevel !== parsed.shedLevel ||
-        this._state.hardLimitTripped !== parsed.hardLimitTripped ||
-        this._state.softLimitTripped !== parsed.softLimitTripped;
-
-      this._state = parsed;
-      if (changed) {
-        this._onStateChange?.(parsed);
-      }
-    } catch {
-      // Swallow parse errors from partial writes or missing file.
+    if (!this._isLive(filePath)) {
+      // Deliberately does NOT delete the stale file. It is the only record of
+      // what the plugin last did and is useful when diagnosing the run that
+      // wrote it; suppressing it from the UI is enough to stop it misleading.
+      this._publish(null);
+      return;
     }
+    let parsed: MemoryPressureState;
+    try {
+      parsed = JSON.parse(fs.readFileSync(filePath, 'utf8')) as MemoryPressureState;
+    } catch {
+      // Partial write or a read race. Keep whatever was last published rather
+      // than blanking the badge — the debounced watcher will re-read shortly.
+      return;
+    }
+    this._publish(parsed);
+  }
+
+  /** Whether the file at [filePath] reflects a plugin running in this session. */
+  private _isLive(filePath: string): boolean {
+    const root = this._root;
+    if (root === null) return false;
+    let writtenAtMs: number | null = null;
+    try {
+      writtenAtMs = fs.statSync(filePath).mtimeMs;
+    } catch {
+      // File absent (plugin has never written one) — nothing to trust.
+      writtenAtMs = null;
+    }
+    return isMemoryStateLive({
+      writtenAtMs,
+      sessionStartMs: this._sessionStartMs,
+      pluginEnrolled: pluginEnrolledInAnalysisOptions(root),
+    });
+  }
+
+  /**
+   * Store [next] and notify listeners only on a significant transition.
+   *
+   * Now has to handle null on both sides, because the liveness gate can move
+   * state to and from "nothing to report". A null-to-null read must stay
+   * quiet or every unrelated write into the reports directory would re-render
+   * the status bar.
+   */
+  private _publish(next: MemoryPressureState | null): void {
+    const previous = this._state;
+    this._state = next;
+    if (previous === null || next === null) {
+      // Appearing or disappearing is always significant; both-null is not.
+      if (previous !== next) this._onStateChange?.(next);
+      return;
+    }
+    // Notify on shed level, hard-limit, or soft-limit trip state changes.
+    // softLimitTripped is needed so the "enable shedding" prompt fires
+    // when shedding is off (shedLevel stays 0 in that path).
+    const changed =
+      previous.shedLevel !== next.shedLevel ||
+      previous.hardLimitTripped !== next.hardLimitTripped ||
+      previous.softLimitTripped !== next.softLimitTripped;
+    if (changed) this._onStateChange?.(next);
   }
 
   dispose(): void {

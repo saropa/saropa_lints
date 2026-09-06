@@ -1,6 +1,6 @@
 # BUG: RSS valve attribution check leaves rules paused forever and re-walks caches on every bystander sample
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-09-05
 Rule: N/A (infrastructure — `MemoryPressureHandler` hard RSS valve)
@@ -92,3 +92,34 @@ rather than an observed failure.
   — the extension side renders this state without checking it is live.
 - `bugs/analysis_rss_valve_is_measuring_the_wrong_thing.md` — the design
   analysis behind the attribution work.
+
+---
+
+## Resolution (2026-09-05)
+
+All three defects fixed in `lib/src/project_context_throttle_memory.dart`.
+
+Defect 1: the bystander decision now latches behind a flag and a timestamp,
+re-checked on the same 30 second interval the trend log already uses. The
+expensive cache walk no longer runs on every sample while the analysis server
+sits above the cap. Measured in test: ten samples after latching perform zero
+walks, where the previous code performed ten.
+
+Defect 2: the release path consults attribution. Order is panic first, which
+stays RSS-only and unconditional, then the original release below the cap minus
+hysteresis, then an attribution release that resumes rules when the plugin is
+no longer a meaningful contributor even with process RSS still high. A trip
+seeds the attribution timestamp so the first attribution release cannot fire on
+the next sample. Without that dwell, tripping clears the caches, the immediate
+re-estimate reads as bystander, and the valve would thrash between paused and
+resumed every 200 callbacks.
+
+Defect 3: the physical memory probe is memoized, caching its failure sentinel
+as terminal. The report described that sentinel as 0; it is actually -1, and
+the probe had no cache at all rather than a partial one.
+
+Verified by `test/report/memory_pressure_attribution_test.dart`, nine tests,
+alongside the three pre-existing memory suites, 41 passing. Behavior under real
+memory pressure in a live analysis server is unverified; tests drive the state
+machine directly because a test cannot control process RSS. The 30 second
+re-check interval and the post-trip dwell are reasoned rather than measured.

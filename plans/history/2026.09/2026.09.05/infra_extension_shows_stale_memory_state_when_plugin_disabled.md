@@ -1,6 +1,6 @@
 # BUG: VS Code extension shows stale "Rules paused" when plugin is disabled
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-09-05
 Rule: N/A (infrastructure — VS Code extension status bar)
@@ -91,3 +91,28 @@ and only shows memory state when the plugin is configured as active.
 - Platform: Windows 11, 16 GB RAM
 - Triggering project: d:\src\contacts
 - `plugins:` block status: both instances commented out
+
+---
+
+## Resolution
+
+Fixed in `extension/src/systemHealth/memoryPressureWatcher.ts`. The read path
+now gates on `isMemoryStateLive()`, which requires BOTH:
+
+1. **Enrolment** — `analysis_options.yaml` currently enrols the plugin
+   (shared predicate `analysisOptionsEnrolsSaropa`, exported from
+   `pluginLiveness.ts` so the two surfaces cannot disagree). This is
+   suggested-fix Option C and kills the reported incident directly.
+2. **Freshness against the session** — `memory_state.json` mtime is at or
+   after the extension host process start (suggested-fix Option A). This
+   catches the enrolled-but-dead case that Option C alone misses.
+
+Option B (a plugin-written heartbeat) was rejected: it needs a Dart-side
+change, and a heartbeat that is not deleted on a hard crash degrades back to
+the same staleness problem.
+
+State that fails the gate publishes `null`, so the status bar renders nothing
+rather than something wrong. The stale file is deliberately NOT deleted — it
+remains useful diagnostic evidence of the run that wrote it.
+
+Pinned by `extension/src/test/systemHealth/memoryStateLiveness.test.ts`.
