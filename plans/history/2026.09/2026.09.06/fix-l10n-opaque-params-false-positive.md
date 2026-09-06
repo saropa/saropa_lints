@@ -41,10 +41,26 @@ a full TypeScript AST, which is out of scope for this regex-based diagnostic pro
 - `extension/src/test/l10nParsers.test.ts` — seven new test cases: variable reference, property
   access, function call, ternary, `undefined`, `null`, spread-into-object.
 
+## Hardening (2026-09-06)
+
+- Introduced a branded `OpaqueParams` type using a unique-symbol brand. The type prevents
+  accidental creation of sentinel values from plain strings (requires explicit cast) and makes
+  the three-state return type of `extractParamsBlock` self-documenting:
+  `string | OpaqueParams | undefined`.
+- Extracted `extractBalancedBrace` as a shared export with 8 dedicated unit tests, eliminating
+  the duplicated brace-depth loop that previously existed inside `extractParamsBlock`.
+- Fixed `extractParamsBlock` accepting `undefined` and `null` keywords as opaque params —
+  they now correctly return `undefined` so the "expects params but none passed" diagnostic fires.
+- Variable-resolution approach (tracing `const name = {...}` declarations backward) was
+  prototyped, code-reviewed by 8 parallel review angles, and rejected: naive backward text
+  search without scope awareness can match the wrong declaration (same-named variable in a
+  different function), producing worse outcomes than skipping. Scope-aware resolution would
+  require a full TypeScript AST.
+
 ## Finish Report (2026-09-06)
 
-Verified: 41/41 parser tests pass. TypeScript compiles cleanly under both `tsconfig.json` and
-`tsconfig.test.json`. The false positive on `orphanPreflight.ts:64` and
-`memoryPressureWatcher.ts:491` (both pass params via variables) is eliminated.
+Verified: 49/49 parser tests pass (15 new since the original fix). TypeScript compiles cleanly
+under both `tsconfig.json` and `tsconfig.test.json`. The false positive on `orphanPreflight.ts:64`
+and `memoryPressureWatcher.ts:491` (both pass params via variables) is eliminated.
 `l10n('key', undefined)` correctly triggers the "expects params but none passed" diagnostic.
 No user-facing strings changed.

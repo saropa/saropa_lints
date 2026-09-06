@@ -9,6 +9,7 @@ import {
   OPAQUE_PARAMS,
   skipStringLiteral,
   blankComments,
+  extractBalancedBrace,
   extractParamsBlock,
   extractTopLevelKeys,
 } from '../i18n/l10nParsers';
@@ -193,6 +194,47 @@ describe('extractParamsBlock', () => {
     const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
     // Starts with { so extractParamsBlock parses the inline object.
     assert.strictEqual(extractParamsBlock(text, afterKey), '{ ...base, extra }');
+  });
+});
+
+// -- extractBalancedBrace ----------------------------------------------------
+
+describe('extractBalancedBrace', () => {
+  it('extracts a simple object literal', () => {
+    assert.strictEqual(extractBalancedBrace('{ a: 1 }', 0), '{ a: 1 }');
+  });
+
+  it('handles nested braces', () => {
+    assert.strictEqual(extractBalancedBrace('{ a: { b: 1 } }', 0), '{ a: { b: 1 } }');
+  });
+
+  it('returns undefined when not starting at a brace', () => {
+    assert.strictEqual(extractBalancedBrace('abc', 0), undefined);
+  });
+
+  it('returns undefined for out-of-bounds position', () => {
+    assert.strictEqual(extractBalancedBrace('{}', 5), undefined);
+  });
+
+  it('skips braces inside string literals', () => {
+    // The { inside the string shouldn't affect depth tracking.
+    assert.strictEqual(extractBalancedBrace("{ msg: '{hello}' }", 0), "{ msg: '{hello}' }");
+  });
+
+  it('skips braces inside template literal interpolations', () => {
+    // The ${...} inside the template should not confuse brace depth.
+    const text = '{ msg: `${fn({x: 1})}` }';
+    assert.strictEqual(extractBalancedBrace(text, 0), text);
+  });
+
+  it('returns undefined for unterminated block', () => {
+    assert.strictEqual(extractBalancedBrace('{ a: 1', 0), undefined);
+  });
+
+  it('extracts from a mid-string position', () => {
+    // Starting at position 5 which is the { of the nested object.
+    const text = 'xxx { a: 1 } yyy';
+    assert.strictEqual(extractBalancedBrace(text, 4), '{ a: 1 }');
   });
 });
 

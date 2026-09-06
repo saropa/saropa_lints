@@ -3,6 +3,9 @@
  *
  * Extracted from l10nDiagnostics.ts so they can be unit-tested
  * without VS Code API dependencies.
+ *
+ * Exports: skipStringLiteral, blankComments, extractParamsBlock,
+ * extractBalancedBrace, extractTopLevelKeys, OPAQUE_PARAMS, OpaqueParams.
  */
 
 /**
@@ -121,11 +124,21 @@ export function blankComments(text: string): string {
 }
 
 /**
+ * Branded sentinel type — prevents code from accidentally passing the
+ * sentinel into extractTopLevelKeys or other string-consuming functions.
+ * The unique symbol brand makes this a distinct type from plain `string`
+ * in TypeScript's structural type system, so a `string | OpaqueParams`
+ * union doesn't collapse and type-narrowing works after an equality check.
+ */
+declare const _opaqueParamsBrand: unique symbol;
+export type OpaqueParams = string & { readonly [_opaqueParamsBrand]: true };
+
+/**
  * Sentinel returned when the second l10n() argument is a variable or
  * expression rather than an inline object literal. The diagnostic
  * code can't statically extract keys from it, so it skips the check.
  */
-export const OPAQUE_PARAMS = '__opaque__';
+export const OPAQUE_PARAMS = '__opaque__' as OpaqueParams;
 
 /**
  * Extract a balanced { ... } block starting at position `start`,
@@ -135,7 +148,7 @@ export const OPAQUE_PARAMS = '__opaque__';
  * when a non-literal expression is passed (variable, property access,
  * function call), or undefined when no second argument exists.
  */
-export function extractParamsBlock(text: string, start: number): string | undefined {
+export function extractParamsBlock(text: string, start: number): string | OpaqueParams | undefined {
   let i = start;
   const n = text.length;
   // Skip whitespace, expect comma then opening brace.

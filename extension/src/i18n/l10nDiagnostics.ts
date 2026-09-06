@@ -15,6 +15,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
   OPAQUE_PARAMS,
+  type OpaqueParams,
   blankComments,
   extractParamsBlock,
   extractTopLevelKeys,

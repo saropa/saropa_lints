@@ -73,9 +73,12 @@ Fixes a false-positive in the extension's l10n diagnostic provider and hardens t
 ### Fixed
 
 - Fixed the l10n diagnostic provider (`saropa-l10n`) reporting false-positive "expects params but none passed" warnings when `l10n()` receives its params via a variable or expression instead of an inline object literal. The parser now recognizes non-literal second arguments and skips static key extraction for them. No action required.
+- Fixed the l10n diagnostic silently accepting `l10n('key', undefined)` and `l10n('key', null)` without warning when the template expects params. These keyword arguments are now correctly treated as "no params passed." No action required.
 
 <details><summary>Maintenance</summary>
 
+- Introduced a branded `OpaqueParams` type for the l10n parser sentinel, preventing accidental use of the sentinel string in key-extraction functions at compile time.
+- Extracted `extractBalancedBrace` as a shared export from `l10nParsers.ts`, deduplicating the brace-matching loop previously inlined in `extractParamsBlock`.
 - Added missing `usesTypeResolution` override to `AvoidCaseSensitivePathComparisonRule` (uses `staticType`).
 - Added 4 missing codes to the `flutter_skill_lints` migration pack that moved from TODO/PARTIAL to HAVE.
 - Publish script: `create_git_tag` now prompts before moving a stale remote tag to HEAD on retry instead of hard-failing.
