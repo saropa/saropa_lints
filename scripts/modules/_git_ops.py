@@ -688,7 +688,7 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
         if result.returncode != 0:
             return False
 
-    # Check if tag exists on remote — blocker if already published
+    # Check if tag exists on remote — may need moving on retry
     result = subprocess.run(
         ["git", "ls-remote", "--tags", "origin", tag_name],
         cwd=project_dir,
@@ -697,90 +697,88 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
         shell=use_shell,
     )
     if result.stdout.strip():
-        print_error(
-            f"Tag {tag_name} already exists on remote. "
-            f"This version has already been published."
+        # Tag exists remotely. Check if it already points to HEAD.
+        remote_sha = result.stdout.strip().split()[0]
+        head_result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=project_dir,
+            capture_output=True, text=True, shell=use_shell,
         )
-        return False
-    else:
-        try:
-            result = run_command(
-                ["git", "push", "origin", tag_name],
-                project_dir,
-                f"Pushing tag {tag_name}",
+        head_sha = head_result.stdout.strip()
+
+        if remote_sha == head_sha:
+            # Tag already points to the right commit — nothing to do.
+            print_info(
+                f"Tag {tag_name} already on remote at HEAD."
             )
-        except KeyboardInterrupt:
-            # Same failure class fixed for `gh run watch` and the branch
-            # push above: the tag may have already landed on the remote
-            # before the interrupt, so this must not crash with a raw
-            # traceback — a landed tag would already have triggered the
-            # publish workflow regardless of this process's state.
-            print()
-            print_warning(
-                f"Tag push interrupted — {tag_name} may have already "
-                f"landed on the remote. Check `git ls-remote --tags "
-                f"origin {tag_name}` before retrying."
+            return True
+
+        # Tag points to a stale commit (e.g. failed CI after a fix).
+        # Destructive: ask the user before moving.
+        print_warning(
+            f"Tag {tag_name} exists on remote but points to "
+            f"{remote_sha[:10]}, not HEAD ({head_sha[:10]})."
+        )
+        from scripts.modules._utils import safe_input
+        choice = safe_input(
+            f"  Move tag {tag_name} to HEAD? [y/N]: ", "n",
+        ).strip().lower()
+        if choice != "y":
+            print_error("Tag not moved. Aborting.")
+            return False
+
+        # Delete remote tag, then fall through to re-push below.
+        del_result = subprocess.run(
+            ["git", "push", "origin", f":refs/tags/{tag_name}"],
+            cwd=project_dir,
+            capture_output=True, text=True, shell=use_shell,
+        )
+        if del_result.returncode != 0:
+            print_error(
+                f"Failed to delete remote tag: "
+                f"{del_result.stderr.strip()}"
             )
             return False
-        if result.returncode != 0:
+        # Delete and re-create local tag at HEAD
+        subprocess.run(
+            ["git", "tag", "-d", tag_name],
+            cwd=project_dir,
+            capture_output=True, text=True, shell=use_shell,
+        )
+        result2 = subprocess.run(
+            ["git", "tag", "-a", tag_name,
+             "-m", f"Release {tag_name}"],
+            cwd=project_dir,
+            capture_output=True, text=True, shell=use_shell,
+        )
+        if result2.returncode != 0:
+            print_error(
+                f"Failed to re-create tag: "
+                f"{result2.stderr.strip()}"
+            )
             return False
+        print_success(f"Tag {tag_name} moved to HEAD.")
 
-    return True
-
-
-def _retag_and_push(
-    project_dir: Path, tag_name: str,
-) -> bool:
-    """Delete tag locally+remotely, re-create at HEAD, and force-push.
-
-    Used on publish retry when the previous workflow failed on an older
-    commit. The tag must point to the current HEAD (which contains fixes)
-    so the new workflow run checks out the right code.
-    """
-    use_shell = get_shell_mode()
-
-    # Delete local tag (may not exist if already cleaned up)
-    subprocess.run(
-        ["git", "tag", "-d", tag_name],
-        cwd=project_dir,
-        capture_output=True, text=True, shell=use_shell,
-    )
-    # Delete remote tag
-    result = subprocess.run(
-        ["git", "push", "origin", f":refs/tags/{tag_name}"],
-        cwd=project_dir,
-        capture_output=True, text=True, shell=use_shell,
-    )
-    if result.returncode != 0:
-        print_error(
-            f"Failed to delete remote tag {tag_name}: "
-            f"{result.stderr.strip()}"
+    # Push tag to remote (new or re-created after move)
+    try:
+        result = run_command(
+            ["git", "push", "origin", tag_name],
+            project_dir,
+            f"Pushing tag {tag_name}",
+        )
+    except KeyboardInterrupt:
+        # The tag may have already landed on the remote before the
+        # interrupt — must not crash with a raw traceback.
+        print()
+        print_warning(
+            f"Tag push interrupted — {tag_name} may have already "
+            f"landed on the remote. Check `git ls-remote --tags "
+            f"origin {tag_name}` before retrying."
         )
         return False
-
-    # Re-create at HEAD
-    result = subprocess.run(
-        ["git", "tag", "-a", tag_name, "-m", f"Release {tag_name}"],
-        cwd=project_dir,
-        capture_output=True, text=True, shell=use_shell,
-    )
-    if result.returncode != 0:
-        print_error(
-            f"Failed to create tag {tag_name}: "
-            f"{result.stderr.strip()}"
-        )
-        return False
-
-    # Push new tag
-    result = run_command(
-        ["git", "push", "origin", tag_name],
-        project_dir,
-        f"Re-pushing tag {tag_name}",
-    )
     if result.returncode != 0:
         return False
 
-    print_success(f"Tag {tag_name} moved to HEAD and pushed.")
     return True
 
 
@@ -927,26 +925,11 @@ def publish_to_pubdev_step(
 
     run_id = _find_workflow_run(project_dir, tag_name)
     if not run_id:
-        # No pending/successful run found — the previous run for this tag
-        # may have failed on an older commit. Move the tag to HEAD and
-        # re-push to trigger a fresh workflow against the current code.
         print_warning(
-            f"No active workflow found for tag {tag_name}. "
-            f"Moving tag to HEAD and re-pushing..."
+            f"No publish workflow found for tag {tag_name} "
+            f"after 10m. Check GitHub Actions manually."
         )
-        if not _retag_and_push(project_dir, tag_name):
-            print_warning(
-                f"Could not re-push tag {tag_name}. "
-                f"Check GitHub Actions manually."
-            )
-            return False
-        run_id = _find_workflow_run(project_dir, tag_name)
-        if not run_id:
-            print_warning(
-                f"No publish workflow found for tag {tag_name} "
-                f"after re-push. Check GitHub Actions manually."
-            )
-            return False
+        return False
 
     print_info(f"Watching workflow run {run_id}...")
     try:
