@@ -1,9 +1,11 @@
 /// Detects stale `// ignore:` comments that suppress diagnostics which no
 /// longer fire on the target line.
 ///
-/// The scan CLI does not honor `// ignore:` directives — rules report
-/// diagnostics regardless — so we can compare the set of ignore comments
-/// against the actual diagnostics to identify stale suppressions.
+/// The scan CLI does not honor `// ignore:` directives during rule execution
+/// — rules always report diagnostics regardless. This is deliberate: it lets
+/// stale-ignore detection compare the full diagnostic set against ignore
+/// comments. The [filterIgnoredDiagnostics] function applies suppression
+/// AFTER scanning, so the default output path respects user-placed ignores.
 ///
 /// Two Dart conventions are handled:
 /// - Standalone `// ignore:` on its own line: suppresses the NEXT line.
@@ -412,6 +414,101 @@ int _pruneStaleRules(
   lines[lineIdx] = '$prefix// ignore: $newRuleList';
 
   return staleRules.length;
+}
+
+/// Matches `// ignore_for_file:` directives. Captures the rule list after
+/// the colon for extraction via [_extractRuleNames].
+final RegExp _ignoreForFilePattern =
+    RegExp(r'//\s*ignore_for_file\s*:\s*(.+)');
+
+/// Removes diagnostics that are suppressed by `// ignore:` or
+/// `// ignore_for_file:` directives in the source files.
+///
+/// The scan CLI deliberately does not honor ignore directives during rule
+/// execution (so stale-ignore detection can compare ignores against actual
+/// diagnostics). This function applies the suppression AFTER scanning, so
+/// callers that need the full unfiltered set (stale-ignore detection) can
+/// still get it, while the default output path (Problems panel, JSON) only
+/// shows diagnostics the user has not explicitly suppressed.
+///
+/// Both directive forms are supported:
+/// - `// ignore: rule_name` on its own line: suppresses the NEXT line.
+/// - `// ignore: rule_name` inline at end of code: suppresses THAT line.
+/// - `// ignore_for_file: rule_name` anywhere in the file: suppresses the
+///   rule for the entire file.
+///
+/// [files] is the list of file paths that were scanned — used to read source
+/// content and parse ignore directives. Files not in [files] are not
+/// filtered (their diagnostics pass through unchanged).
+List<ScanDiagnostic> filterIgnoredDiagnostics({
+  required List<ScanDiagnostic> diagnostics,
+  required List<String> files,
+}) {
+  if (diagnostics.isEmpty || files.isEmpty) return diagnostics;
+
+  // Build per-file ignore maps: (line → rule names) for line-level ignores,
+  // and a set of file-wide ignored rule names for ignore_for_file.
+  // Keyed by normalized path so Windows path casing doesn't cause misses.
+  final lineIgnores = <String, Map<int, Set<String>>>{};
+  final fileIgnores = <String, Set<String>>{};
+
+  for (final filePath in files) {
+    final file = File(filePath);
+    if (!file.existsSync()) continue;
+
+    final content = file.readAsStringSync();
+    final normalizedPath = _normalizePath(filePath);
+
+    // Parse line-level // ignore: directives (reuses existing parser).
+    final entries = _parseIgnoreComments(content, filePath);
+    if (entries.isNotEmpty) {
+      final map = <int, Set<String>>{};
+      for (final e in entries) {
+        map.putIfAbsent(e.targetLine, () => <String>{}).add(e.ruleName);
+      }
+      lineIgnores[normalizedPath] = map;
+    }
+
+    // Parse file-level // ignore_for_file: directives.
+    final lines = content.split('\n');
+    for (final line in lines) {
+      final match = _ignoreForFilePattern.firstMatch(line);
+      if (match == null) continue;
+      // Skip doc comments (///), same guard as _parseIgnoreComments.
+      if (line.trimLeft().startsWith('///')) continue;
+      final ruleNames = _extractRuleNames(match.group(1)!);
+      for (final name in ruleNames) {
+        if (allSaropaRuleNames.contains(name)) {
+          fileIgnores
+              .putIfAbsent(normalizedPath, () => <String>{})
+              .add(name);
+        }
+      }
+    }
+  }
+
+  // No ignore directives found — return the full list unchanged.
+  if (lineIgnores.isEmpty && fileIgnores.isEmpty) return diagnostics;
+
+  // Filter: remove diagnostics whose rule is suppressed at that location.
+  return diagnostics.where((d) {
+    final normalizedPath = _normalizePath(d.filePath);
+
+    // Check file-level suppression first (cheaper — one set lookup).
+    final fileRules = fileIgnores[normalizedPath];
+    if (fileRules != null && fileRules.contains(d.ruleName)) return false;
+
+    // Check line-level suppression.
+    final lineMap = lineIgnores[normalizedPath];
+    if (lineMap != null) {
+      final rulesOnLine = lineMap[d.line];
+      if (rulesOnLine != null && rulesOnLine.contains(d.ruleName)) {
+        return false;
+      }
+    }
+
+    return true;
+  }).toList();
 }
 
 /// Strips trailing rationale text (` -- reason`) from a rule name segment
