@@ -194,7 +194,7 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 
 /// Warns when workmanager is needed for reliable background tasks.
 ///
-/// Since: v2.4.0 | Updated: v16.0.0-beta.5 | Rule version: v3
+/// Since: v2.4.0 | Updated: v16.0.0-beta.5 | Rule version: v4
 ///
 /// Dart isolates die when the app goes to background. For reliable
 /// background execution on iOS and Android, use the workmanager package.
@@ -211,6 +211,9 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 /// ```dart
 /// // Timer in isolate - won't work in background
 /// Timer.periodic(Duration(hours: 1), (_) => syncData());
+///
+/// // Stream-based polling - same problem, different API
+/// Stream.periodic(Duration(minutes: 5), (_) => fetchUpdates());
 /// ```
 ///
 /// **GOOD:**
@@ -264,10 +267,10 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_workmanager_for_background',
     '[require_workmanager_for_background] Periodic task detected without workmanager. Dart isolates die when '
-        'app backgrounds. Use workmanager for reliable background tasks. {v3}',
+        'app backgrounds. Use workmanager for reliable background tasks. {v4}',
     correctionMessage:
-        'Replace Timer.periodic with Workmanager().registerPeriodicTask() '
-        'for reliable background execution.',
+        'Replace Timer.periodic / Stream.periodic with '
+        'Workmanager().registerPeriodicTask() for reliable background execution.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -287,16 +290,19 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
 
-      // Detect Timer.periodic
+      // Detect Timer.periodic and Stream.periodic — both create repeating
+      // background work that dies when the app backgrounds. Timer.periodic
+      // is the common case; Stream.periodic is the same anti-pattern using
+      // the stream API instead.
       if (methodName == 'periodic') {
-        if (target != null && target.toSource() == 'Timer') {
-          // A Timer.periodic that lives entirely inside a widget's State and
+        final String targetSource = target?.toSource() ?? '';
+        if (targetSource == 'Timer' || targetSource == 'Stream') {
+          // A periodic call that lives entirely inside a widget's State and
           // is torn down in dispose() is a UI-lifecycle ticker (clock tick,
           // typewriter animation, poll-while-visible), not a background task
-          // candidate -- it cannot outlive the widget, so workmanager adds
-          // nothing here. See plans/history/2026.09/2026.09.05/require_workmanager_for_background_false_positive_ui_timer.md.
-          // Shared helper from target_matcher_utils.dart — checks State
-          // ancestry and cancel-in-dispose for widget-lifecycle timers.
+          // candidate — it cannot outlive the widget, so workmanager adds
+          // nothing here. Covers both Timer.cancel() and Stream close/cancel
+          // via the shared helper in target_matcher_utils.dart.
           if (isTimerLifecycleBoundToDisposableState(node)) return;
           reporter.atNode(node);
         }

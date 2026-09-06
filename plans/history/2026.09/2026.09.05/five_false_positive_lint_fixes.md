@@ -20,7 +20,9 @@ Five lint rules from the contacts project sweep were producing false positives o
 
 The two `_isTimerInDisposableState` implementations initially diverged: workmanager's used `endsWith('State')` (catching `ConsumerState`, `TickerProviderState`), while iOS battery drain's used exact `== 'State'`. Aligned both to use `endsWith('State')` and `thisOrAncestorOfType<ClassDeclaration>()` for consistency.
 
-**Reflection-gate hardening:** extracted the duplicated private `_isTimerInDisposableState` helpers from both rules into a single shared `isTimerLifecycleBoundToDisposableState()` in `target_matcher_utils.dart`. Both `require_workmanager_for_background` and `avoid_ios_battery_drain_patterns` now call the shared helper. Added a ConsumerState test case to the iOS battery drain test suite (4 cases total).
+**Reflection-gate hardening:** extracted the duplicated private `_isTimerInDisposableState` helpers from both rules into a single shared `isTimerLifecycleBoundToDisposableState()` in `target_matcher_utils.dart`. Both `require_workmanager_for_background` and `avoid_ios_battery_drain_patterns` now call the shared helper. Added a ConsumerState test case to the iOS battery drain test suite (4 cases total). Documented that `TickerProviderStateMixin` is covered because it always requires `extends State<T>`, and that `FooState` non-Flutter classes are an accepted false-negative consistent with `isWidgetOrStateClass`.
+
+**Stream.periodic coverage:** extended `require_workmanager_for_background` to detect `Stream.periodic` alongside `Timer.periodic` — the same repeating-background-work anti-pattern using the stream API. The same lifecycle guard applies: a `Stream.periodic` inside a State subclass with `cancel()`/`close()` in `dispose()` is exempt. Rule version v3 → v4.
 
 ### Known Limitations
 
@@ -34,4 +36,5 @@ The two `_isTimerInDisposableState` implementations initially diverged: workmana
 - `test/rules/widget/widget_patterns_rules_test.dart` — severity assertion for permission manifest rule
 - `example_packages/lib/packages/require_copy_with_null_handling_fixture.dart` — 4 fixture cases
 - `example_packages/lib/workmanager/require_workmanager_for_background_fixture.dart` — 4 fixture cases
+- `test/rules/packages/require_workmanager_for_background_lifecycle_test.dart` — 7 cases (State+cancel, ConsumerState+cancel, State-no-cancel, non-State service, Stream.periodic service, Stream.periodic State+cancel, Workmanager-present skip)
 - `test/support/syntactic_rule_harness.dart` — new harness for syntactic-only rule testing

@@ -94,6 +94,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Fixed `require_permission_manifest_android` asserting a missing manifest entry when it cannot read AndroidManifest.xml. Downgraded to INFO severity since the rule is advisory only. No action required.
 - Fixed `require_url_launcher_queries_android` asserting missing `<queries>` blocks when it cannot read AndroidManifest.xml. Downgraded to INFO severity since the rule is advisory only. No action required.
 - Fixed `require_workmanager_for_background` firing on `Timer.periodic` inside `State` subclasses with proper `cancel()` in `dispose()`. UI-lifecycle timers are not background tasks. No action required.
+- Extended `require_workmanager_for_background` to also detect `Stream.periodic` — the same background-polling anti-pattern using the stream API. No action required.
 - Fixed `avoid_ios_battery_drain_patterns` firing on `Timer.periodic` inside `State` subclasses with proper `cancel()` in `dispose()`. Widget-bound timers cannot drain battery in the background. No action required.
 
 ### Internal

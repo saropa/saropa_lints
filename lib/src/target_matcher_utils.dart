@@ -78,20 +78,32 @@ bool isBackgroundWorkCanceledInDispose(
       isFieldCleanedUp(fieldName, 'close', disposeBody);
 }
 
-/// Returns true when [node] (a `Timer.periodic(...)` call) sits inside a
-/// Flutter `State<T>` subclass (or a subtype like `ConsumerState`,
-/// `TickerProviderStateMixin`) whose `dispose()` method cancels the field
-/// the timer is assigned to.
+/// Returns true when [node] (a `Timer.periodic(...)` or `Stream.periodic(...)`
+/// call) sits inside a Flutter `State<T>` subclass (or a subtype like
+/// `ConsumerState`) whose `dispose()` method cancels/closes the field the
+/// timer or stream subscription is assigned to.
 ///
-/// Such timers are bound to the widget's lifecycle and cannot outlive it —
-/// they stop existing when the widget is removed from the tree, well before
-/// or exactly when the app backgrounds. Used by both
+/// Such timers/streams are bound to the widget's lifecycle and cannot outlive
+/// it — they stop existing when the widget is removed from the tree, well
+/// before or exactly when the app backgrounds. Used by both
 /// `require_workmanager_for_background` and `avoid_ios_battery_drain_patterns`
-/// to skip false positives on UI-only timers (clock ticks, typewriter
+/// to skip false positives on UI-only periodic work (clock ticks, typewriter
 /// animations, poll-while-visible patterns).
 ///
+/// The `endsWith('State')` check on the `extends` clause covers `State<T>`,
+/// `ConsumerState<T>`, and any other State subclass. Mixin-based patterns
+/// like `TickerProviderStateMixin` are also covered because they always
+/// require `extends State<T>` (or a State subclass) — the mixin appears in
+/// the `with` clause, not the `extends` clause, so the extends check still
+/// matches.
+///
+/// Known limitation: a user class literally named `FooState` that is NOT a
+/// Flutter State subclass would get the exemption. This is consistent with
+/// `isWidgetOrStateClass` elsewhere in the codebase and accepted as a
+/// trade-off against requiring full type resolution.
+///
 /// Conservative: returns false for any shape it can't confirm (no enclosing
-/// class, not a State subclass, no dispose(), no cancel on the field).
+/// class, not a State subclass, no dispose(), no cancel/close on the field).
 bool isTimerLifecycleBoundToDisposableState(MethodInvocation node) {
   // Walk up to the enclosing class — a top-level function or non-widget
   // helper has no State lifecycle to lean on.
@@ -100,15 +112,18 @@ bool isTimerLifecycleBoundToDisposableState(MethodInvocation node) {
   if (enclosingClass == null) return false;
 
   // Only State subclasses get the lifecycle exemption. Uses endsWith('State')
-  // to cover ConsumerState, TickerProviderStateMixin, etc. — same convention
-  // used by isWidgetOrStateClass elsewhere in the codebase.
+  // to cover ConsumerState, etc. — same convention as isWidgetOrStateClass.
+  // Mixin-based patterns (TickerProviderStateMixin, SingleTickerProvider...)
+  // are covered because they always sit alongside `extends State<T>`.
   final ExtendsClause? extendsClause = enclosingClass.extendsClause;
   if (extendsClause == null) return false;
   final String superName = extendsClause.superclass.name.lexeme;
   if (!superName.endsWith('State')) return false;
 
-  // Delegate the "is this field canceled in dispose()?" check to the shared
-  // utility directly above, so all rules agree on what counts as cleaned up.
+  // Delegate the "is this field canceled/closed in dispose()?" check to the
+  // shared utility directly above, so all rules agree on what counts as
+  // cleaned up. Covers both .cancel() (Timer) and .close() (StreamController,
+  // StreamSubscription) via isBackgroundWorkCanceledInDispose.
   return isBackgroundWorkCanceledInDispose(node, enclosingClass);
 }
 
