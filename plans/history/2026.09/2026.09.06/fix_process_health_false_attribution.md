@@ -62,4 +62,4 @@ The trend arrow is appended to the saropa tooltip header line. Six tests pin the
 
 ### Verification status
 
-TypeScript compiles clean. All 45 systemHealth tests pass. **Unverified** in the Extension Development Host — tooltip rendering in both themes needs F5 confirmation.
+TypeScript compiles clean. All 61 systemHealth tests pass (45 original + 16 hardening: 9 processLabel, 4 isAnalysisServerProcess, 3 truncateLabel). **Unverified** in the Extension Development Host — tooltip rendering in both themes needs F5 confirmation.

@@ -121,10 +121,18 @@ export function isDaemonProcess(p: DartProcessInfo): boolean {
   return /\bdaemon\b/.test(cmd);
 }
 
-/** True when the process is a Dart analysis server (language-server or snapshot). */
+/**
+ * True when the process is a Dart analysis server. Matches multiple
+ * patterns to survive Dart SDK binary renames:
+ * - `language-server` (current LSP binary name)
+ * - `analysis_server` (snapshot-based invocation)
+ * - `--protocol=lsp` (protocol flag present regardless of binary name)
+ */
 export function isAnalysisServerProcess(p: DartProcessInfo): boolean {
   const cmd = p.commandLine ?? '';
-  return cmd.includes('language-server') || cmd.includes('analysis_server');
+  return cmd.includes('language-server')
+    || cmd.includes('analysis_server')
+    || cmd.includes('--protocol=lsp');
 }
 
 /** True when the process is a saropa_lints scan daemon or CLI scan. */
@@ -139,9 +147,20 @@ export function isScanDaemonProcess(p: DartProcessInfo): boolean {
 }
 
 /**
+ * Max label length for tooltip display — long labels break VS Code
+ * tooltip layout. Known labels are all well under this; the guard
+ * catches unexpected command lines that reach the fallback path.
+ */
+const MAX_LABEL_LENGTH = 30;
+
+/**
  * Derive a short human-readable label from a dart process command line.
  * Used in the tooltip per-process breakdown so users can identify what
  * each process is without reading raw command strings.
+ *
+ * Known labels are all static strings well under MAX_LABEL_LENGTH.
+ * The guard exists for the fallback path where an unrecognized process
+ * might produce a longer label in a future extension of this function.
  */
 export function processLabel(p: DartProcessInfo): string {
   const cmd = p.commandLine ?? '';
@@ -165,8 +184,14 @@ export function processLabel(p: DartProcessInfo): string {
     return 'frontend compiler';
   }
   if (cmd.includes('build_runner')) return 'build runner';
-  // Fallback — generic dart process.
+  // Fallback — generic label, truncated for tooltip width safety.
   return 'dart process';
+}
+
+/** Truncate a process label if it exceeds tooltip width constraints. */
+export function truncateLabel(label: string): string {
+  if (label.length <= MAX_LABEL_LENGTH) return label;
+  return label.slice(0, MAX_LABEL_LENGTH - 1) + '…';
 }
 
 export function killProcess(pid: number): Promise<boolean> {

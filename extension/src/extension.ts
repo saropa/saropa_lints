@@ -155,7 +155,7 @@ import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMAN
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor, RssTrend, systemHealthStatusBarText } from './systemHealth/processMonitor';
-import { formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, processLabel } from './systemHealth/processQuery';
+import { formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, processLabel, truncateLabel } from './systemHealth/processQuery';
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
 import { registerOrphanPreflight } from './systemHealth/orphanPreflight';
 import { HealthPanel } from './systemHealth/healthPanel';
@@ -1176,8 +1176,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const saropaProcs = snap.processes.filter(isSaropaProcess);
     const saropaRss = saropaProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
     const isHealthy = assessment.level === HealthLevel.Healthy;
-    // Show the healthy check mark only when saropa-owned RSS is clean.
-    const saropaHeader = isHealthy ? 'systemHealth.tooltip.saropaHealthy' : 'systemHealth.tooltip.saropaSection';
+    // When trend is rising, suppress the ✓ — a rising arrow next to a check
+    // mark sends mixed signals. The arrow IS the warning; ✓ contradicts it.
+    const showCheck = isHealthy && trend !== RssTrend.Rising;
+    const saropaHeader = showCheck ? 'systemHealth.tooltip.saropaHealthy' : 'systemHealth.tooltip.saropaSection';
     // Trend arrow after the header — rising RSS is an early leak warning
     // even when the absolute value is below the red threshold.
     const trendSuffix = trend === RssTrend.Rising ? ' ↑'
@@ -1191,7 +1193,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const topSaropa = [...saropaProcs].sort((a, b) => b.workingSetSize - a.workingSetSize).slice(0, 3);
     for (const p of topSaropa) {
       lines.push(l10n('systemHealth.tooltip.saropaProcessEntry', {
-        label: processLabel(p), size: formatBytes(p.workingSetSize),
+        label: truncateLabel(processLabel(p)), size: formatBytes(p.workingSetSize),
       }));
     }
 
@@ -1219,7 +1221,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const topOther = [...otherProcs].sort((a, b) => b.workingSetSize - a.workingSetSize).slice(0, 3);
       for (const p of topOther) {
         lines.push(l10n('systemHealth.tooltip.otherProcessEntry', {
-          label: processLabel(p), size: formatBytes(p.workingSetSize),
+          label: truncateLabel(processLabel(p)), size: formatBytes(p.workingSetSize),
         }));
       }
       // Hint when multiple analysis servers are detected.

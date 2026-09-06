@@ -21,6 +21,12 @@ import {
   type SystemHealthConfig,
 } from '../../systemHealth/processMonitor';
 import {
+  isAnalysisServerProcess,
+  processLabel,
+  truncateLabel,
+} from '../../systemHealth/processQuery';
+import type { DartProcessInfo } from '../../systemHealth/types';
+import {
   memoryPressureSeverity,
   pressureBackgroundColorId,
   type MemoryPressureState,
@@ -227,5 +233,94 @@ describe('RSS trend detection', () => {
   it('returns Stable when all values are zero', () => {
     // Guard against division by zero — zero RSS is stable by definition.
     assert.strictEqual(computeRssTrend([0, 0, 0, 0, 0]), RssTrend.Stable);
+  });
+});
+
+/** Helper to build a minimal DartProcessInfo with just a command line. */
+function proc(commandLine: string): DartProcessInfo {
+  return { processId: 1, parentProcessId: 0, workingSetSize: 0, creationDate: '', commandLine };
+}
+
+describe('processLabel — command-line classification', () => {
+  it('labels saropa scan daemon', () => {
+    assert.strictEqual(processLabel(proc('dart.exe saropa_lints:scan_daemon --port 9100')), 'scan daemon');
+  });
+
+  it('labels saropa scan CLI', () => {
+    assert.strictEqual(processLabel(proc('dart.exe saropa_lints:scan . --tier comprehensive')), 'scan CLI');
+  });
+
+  it('labels capped analysis server', () => {
+    assert.strictEqual(
+      processLabel(proc('dart.exe language-server --protocol=lsp --old_gen_heap_size=6144')),
+      'analysis server',
+    );
+  });
+
+  it('labels uncapped analysis server', () => {
+    assert.strictEqual(
+      processLabel(proc('dart.exe language-server --protocol=lsp')),
+      'analysis server (no heap cap)',
+    );
+  });
+
+  it('labels Flutter daemon', () => {
+    assert.strictEqual(
+      processLabel(proc('dart.exe flutter_tools.snapshot daemon')),
+      'Flutter daemon',
+    );
+  });
+
+  it('labels frontend compiler', () => {
+    assert.strictEqual(processLabel(proc('dart.exe frontend_server --sdk-root')), 'frontend compiler');
+  });
+
+  it('labels build runner', () => {
+    assert.strictEqual(processLabel(proc('dart.exe build_runner serve')), 'build runner');
+  });
+
+  it('falls back to "dart process" for unknown command lines', () => {
+    assert.strictEqual(processLabel(proc('dart.exe some_custom_tool --flag')), 'dart process');
+  });
+
+  it('handles empty command line gracefully', () => {
+    assert.strictEqual(processLabel(proc('')), 'dart process');
+  });
+});
+
+describe('isAnalysisServerProcess — resilient detection', () => {
+  it('matches language-server binary', () => {
+    assert.ok(isAnalysisServerProcess(proc('dart.exe language-server --protocol=lsp')));
+  });
+
+  it('matches analysis_server snapshot', () => {
+    assert.ok(isAnalysisServerProcess(proc('dart.exe analysis_server.dart.snapshot')));
+  });
+
+  it('matches --protocol=lsp flag even with renamed binary', () => {
+    // Future-proofing: if the binary is renamed, the protocol flag survives.
+    assert.ok(isAnalysisServerProcess(proc('dart.exe dart_lsp_server --protocol=lsp')));
+  });
+
+  it('rejects unrelated processes', () => {
+    assert.ok(!isAnalysisServerProcess(proc('dart.exe build_runner serve')));
+  });
+});
+
+describe('truncateLabel — tooltip width guard', () => {
+  it('passes through short labels unchanged', () => {
+    assert.strictEqual(truncateLabel('scan daemon'), 'scan daemon');
+  });
+
+  it('truncates labels exceeding 30 characters', () => {
+    const long = 'a'.repeat(40);
+    const result = truncateLabel(long);
+    assert.strictEqual(result.length, 30);
+    assert.ok(result.endsWith('…'));
+  });
+
+  it('handles exactly 30 characters without truncation', () => {
+    const exact = 'a'.repeat(30);
+    assert.strictEqual(truncateLabel(exact), exact);
   });
 });
