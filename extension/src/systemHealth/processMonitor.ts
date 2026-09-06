@@ -127,8 +127,14 @@ export const enum RssTrend {
   Falling = 'falling',
 }
 
-/** Number of recent saropa RSS samples kept for trend detection. */
+/** Number of recent saropa RSS samples used for trend direction. */
 const TREND_WINDOW = 5;
+
+/**
+ * Number of recent saropa RSS samples kept for the tooltip sparkline.
+ * 30 samples ≈ 30 minutes at the default 60-second poll interval.
+ */
+const SPARKLINE_WINDOW = 30;
 
 /**
  * A 10% relative change threshold — smaller fluctuations are noise from
@@ -187,9 +193,16 @@ export class ProcessMonitor implements vscode.Disposable {
     return this.lastSnapshot;
   }
 
-  /** Delegates to the pure computeRssTrend with the internal ring buffer. */
+  /** Delegates to the pure computeRssTrend with the most recent samples. */
   getSaropaTrend(): RssTrend {
-    return computeRssTrend(this.saropaRssHistory);
+    // Only the last TREND_WINDOW samples drive the trend arrow — the full
+    // buffer is longer (SPARKLINE_WINDOW) to feed the tooltip sparkline.
+    return computeRssTrend(this.saropaRssHistory.slice(-TREND_WINDOW));
+  }
+
+  /** Returns the full RSS history for sparkline rendering. */
+  getRssHistory(): readonly number[] {
+    return this.saropaRssHistory;
   }
 
   private async poll(): Promise<void> {
@@ -198,9 +211,9 @@ export class ProcessMonitor implements vscode.Disposable {
       const processes = await queryDartProcesses();
       const snapshot = await buildSnapshot(processes);
       this.lastSnapshot = snapshot;
-      // Record saropa RSS for trend detection (ring buffer).
+      // Record saropa RSS for trend detection and sparkline (ring buffer).
       this.saropaRssHistory.push(snapshot.saropaRssBytes);
-      if (this.saropaRssHistory.length > TREND_WINDOW) {
+      if (this.saropaRssHistory.length > SPARKLINE_WINDOW) {
         this.saropaRssHistory.shift();
       }
       const config = readSystemHealthConfig();

@@ -155,7 +155,7 @@ import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMAN
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor, RssTrend, systemHealthStatusBarText } from './systemHealth/processMonitor';
-import { formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, processLabel, truncateLabel } from './systemHealth/processQuery';
+import { formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, processLabel, renderSparkline, truncateLabel } from './systemHealth/processQuery';
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
 import { registerOrphanPreflight } from './systemHealth/orphanPreflight';
 import { HealthPanel } from './systemHealth/healthPanel';
@@ -1100,8 +1100,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   // System health snapshot pushed from the process monitor.
   let systemHealthSnapshot: DartProcessSnapshot | null = null;
-  // Saropa RSS trend from the process monitor's ring buffer.
+  // Saropa RSS trend and history from the process monitor's ring buffer.
   let saropaTrend: RssTrend = RssTrend.Unknown;
+  let saropaRssHistory: readonly number[] = [];
   // Full assessment (level plus what tripped it), not just the level: the
   // status bar has to name the trigger, and re-deriving it here would let
   // this file and the monitor disagree the next time thresholds change.
@@ -1166,6 +1167,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     snap: DartProcessSnapshot,
     assessment: HealthAssessment,
     trend: RssTrend,
+    rssHistory: readonly number[] = [],
   ): string[] {
     const lines: string[] = [];
 
@@ -1197,6 +1199,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       }));
     }
 
+    // RSS sparkline — visual trend over the last ~30 minutes.
+    // Only shown when enough data points exist for a meaningful shape.
+    const sparkline = renderSparkline(rssHistory);
+    if (sparkline) {
+      lines.push(l10n('systemHealth.tooltip.sparkline', { chart: sparkline }));
+    }
+
     // --- Flutter daemons ---
     const sTotal = String(snap.legitimateDaemonCount + snap.orphanedDaemonPids.length);
     lines.push(l10n('systemHealth.tooltip.daemonCount', {
@@ -1211,7 +1220,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // --- Other Dart processes (informational, never red) ---
     // Uses isDaemonProcess (the same predicate the daemon section uses) so
     // no process falls through the cracks between the two filters.
+    const daemonProcs = snap.processes.filter(isDaemonProcess);
     const otherProcs = snap.processes.filter((p) => !isSaropaProcess(p) && !isDaemonProcess(p));
+    // Partition assertion: every process must land in exactly one section.
+    // A mismatch means a new category was added without updating the
+    // "other" exclusion filter — catch it during development, not in prod.
+    const partitionTotal = saropaProcs.length + daemonProcs.length + otherProcs.length;
+    if (partitionTotal !== snap.processes.length) {
+      console.warn(
+        `[saropa] tooltip partition mismatch: ${partitionTotal} ≠ ${snap.processes.length} — ` +
+        'a process matched multiple category filters or fell through all of them',
+      );
+    }
     if (otherProcs.length > 0) {
       const otherRss = otherProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
       lines.push(l10n('systemHealth.tooltip.otherSection', {
@@ -1257,7 +1277,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
     // Per-process breakdown in the tooltip (separate from the status text).
     if (systemHealthSnapshot) {
-      tooltipLines.push(...buildProcessTooltipLines(systemHealthSnapshot, systemHealthAssessment, saropaTrend));
+      tooltipLines.push(...buildProcessTooltipLines(systemHealthSnapshot, systemHealthAssessment, saropaTrend, saropaRssHistory));
     }
 
     if (!text) {
@@ -1411,8 +1431,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     systemHealthSnapshot = snapshot;
     // Keep the trigger, not just the level — the status bar text depends on it.
     systemHealthAssessment = assessment;
-    // Update trend after the monitor records the new RSS sample.
+    // Update trend and history after the monitor records the new RSS sample.
     saropaTrend = processMonitor.getSaropaTrend();
+    saropaRssHistory = processMonitor.getRssHistory();
     updateAllStatusBars();
   });
   processMonitor.start();

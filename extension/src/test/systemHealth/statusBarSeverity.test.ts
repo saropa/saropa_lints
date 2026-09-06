@@ -23,6 +23,7 @@ import {
 import {
   isAnalysisServerProcess,
   processLabel,
+  renderSparkline,
   truncateLabel,
 } from '../../systemHealth/processQuery';
 import type { DartProcessInfo } from '../../systemHealth/types';
@@ -234,6 +235,19 @@ describe('RSS trend detection', () => {
     // Guard against division by zero — zero RSS is stable by definition.
     assert.strictEqual(computeRssTrend([0, 0, 0, 0, 0]), RssTrend.Stable);
   });
+
+  it('classifies correctly at exactly the TREND_WINDOW boundary (5 samples)', () => {
+    // Boundary: exactly 5 samples should work — older half [100,100], newer half [200,200,200].
+    assert.strictEqual(computeRssTrend([100, 100, 200, 200, 200]), RssTrend.Rising);
+    // At 4 samples, still Unknown.
+    assert.strictEqual(computeRssTrend([100, 100, 200, 200]), RssTrend.Unknown);
+  });
+
+  it('handles more than TREND_WINDOW samples correctly', () => {
+    // 7 samples: older half [50,50,50], newer half [200,200,200,200].
+    // Older avg = 50, newer avg = 200 — 300% increase → Rising.
+    assert.strictEqual(computeRssTrend([50, 50, 50, 200, 200, 200, 200]), RssTrend.Rising);
+  });
 });
 
 /** Helper to build a minimal DartProcessInfo with just a command line. */
@@ -322,5 +336,62 @@ describe('truncateLabel — tooltip width guard', () => {
   it('handles exactly 30 characters without truncation', () => {
     const exact = 'a'.repeat(30);
     assert.strictEqual(truncateLabel(exact), exact);
+  });
+
+  it('truncates at exactly 31 characters (one over the limit)', () => {
+    const oneOver = 'b'.repeat(31);
+    const result = truncateLabel(oneOver);
+    assert.strictEqual(result.length, 30);
+    assert.ok(result.endsWith('…'), 'expected ellipsis at the end');
+    // First 29 chars preserved, then ellipsis.
+    assert.strictEqual(result, 'b'.repeat(29) + '…');
+  });
+
+  it('handles empty string without error', () => {
+    assert.strictEqual(truncateLabel(''), '');
+  });
+});
+
+describe('renderSparkline — Unicode RSS visualization', () => {
+  it('returns empty string for fewer than 2 samples', () => {
+    assert.strictEqual(renderSparkline([]), '');
+    assert.strictEqual(renderSparkline([100]), '');
+  });
+
+  it('renders flat values as uniform mid-height bars', () => {
+    const result = renderSparkline([50, 50, 50, 50]);
+    // All identical → all the same character, repeated 4 times.
+    assert.strictEqual(result.length, 4);
+    assert.ok(new Set([...result]).size === 1, 'expected all bars identical for flat data');
+  });
+
+  it('renders rising values with ascending bar heights', () => {
+    const result = renderSparkline([0, 25, 50, 75, 100]);
+    assert.strictEqual(result.length, 5);
+    // First bar should be the lowest, last bar should be the tallest.
+    assert.strictEqual(result[0], '▁');
+    assert.strictEqual(result[4], '█');
+  });
+
+  it('renders falling values with descending bar heights', () => {
+    const result = renderSparkline([100, 75, 50, 25, 0]);
+    assert.strictEqual(result.length, 5);
+    // First bar tallest, last bar lowest.
+    assert.strictEqual(result[0], '█');
+    assert.strictEqual(result[4], '▁');
+  });
+
+  it('handles two samples correctly (minimum for rendering)', () => {
+    const result = renderSparkline([0, 100]);
+    assert.strictEqual(result.length, 2);
+    // Min mapped to lowest bar, max mapped to highest.
+    assert.strictEqual(result[0], '▁');
+    assert.strictEqual(result[1], '█');
+  });
+
+  it('handles all-zero values as flat line', () => {
+    const result = renderSparkline([0, 0, 0]);
+    assert.strictEqual(result.length, 3);
+    assert.ok(new Set([...result]).size === 1, 'expected uniform bars for all zeros');
   });
 });

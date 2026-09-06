@@ -685,6 +685,7 @@
       "saropaSection": "Saropa Lints: {count} process(es) ({size} RSS)",
       "saropaProcessEntry": "  {label}  {size}",
       "saropaHealthy": "Saropa Lints: {count} process(es) ({size} RSS) ✓",
+      "sparkline": "RSS trend: {chart}",
       "otherSection": "Other Dart processes: {count} ({size} RSS)",
       "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} analysis server(s) detected — close unused VS Code windows",

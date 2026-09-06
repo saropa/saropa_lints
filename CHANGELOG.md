@@ -68,11 +68,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0-beta.7] — Unreleased
 
-Process Health status bar and tooltip now isolate saropa-owned memory from system-wide Dart processes, preventing false alerts when analysis servers from other VS Code windows consume significant memory. The tooltip adds a trend indicator to catch memory leaks early, plus a per-process breakdown for diagnostic detail. Fixed the dashboard's "Enable all recommended packs" button using stale pack detection while the table showed the current state. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.7/CHANGELOG.md)
+Process Health status bar and tooltip now isolate saropa-owned memory from system-wide Dart processes, preventing false alerts when analysis servers from other VS Code windows consume significant memory. The tooltip adds a trend indicator and a Unicode sparkline chart to catch memory leaks early, plus a per-process breakdown for diagnostic detail. Fixed the dashboard's "Enable all recommended packs" button using stale pack detection while the table showed the current state. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.7/CHANGELOG.md)
 
 ### Added
 
 - Process Health tooltip now shows an RSS trend arrow (↑ rising / → stable / ↓ falling) next to the saropa section header. A rising trend is an early memory-leak warning before the red threshold trips. Based on a 5-sample split-mean with a 10% change threshold. No action required.
+- Process Health tooltip includes a Unicode sparkline chart (▁▂▃▄▅▆▇█) showing saropa RSS over the last ~30 minutes. Gives a visual memory profile at a glance without opening a panel. No action required.
 
 ### Fixed
 
@@ -82,8 +83,9 @@ Process Health status bar and tooltip now isolate saropa-owned memory from syste
 
 ### Internal
 
-- Hardened Process Health tooltip: process labels truncated at 30 chars for width safety, analysis server detection broadened with `--protocol=lsp` for future binary rename resilience, and ✓/↑ conflict resolved (rising trend suppresses the healthy checkmark to avoid mixed signals).
-- Added 16 tests: `processLabel` classification (9), `isAnalysisServerProcess` detection (4), `truncateLabel` boundary (3). Total systemHealth suite: 61 tests.
+- Hardened Process Health tooltip: process labels truncated at 30 chars for width safety, analysis server detection broadened with `--protocol=lsp` for future binary rename resilience, ✓/↑ conflict resolved (rising trend suppresses the healthy checkmark to avoid mixed signals), and partition assertion added to catch filter coupling drift.
+- Expanded RSS history ring buffer from 5 to 30 samples for sparkline rendering while preserving trend computation on the most recent 5.
+- Added 26 tests: `processLabel` classification (9), `isAnalysisServerProcess` detection (4), `truncateLabel` boundary (5), RSS trend boundary (2), `renderSparkline` (6). Total systemHealth suite: 71 tests.
 - Extracted `getDetectedPackIds` in `rulePackDefinitions.ts` as the single source of truth for pack applicability. The dashboard table and "Enable all" button both call it instead of inlining `isPackDetected` filters independently.
 
 ---

@@ -53,13 +53,24 @@ New regression test pins the false-attribution fix: 12GB `totalRssBytes` with 29
 
 The trend arrow is appended to the saropa tooltip header line. Six tests pin the trend computation (unknown, stable, rising, falling, within-threshold, zero-division guard).
 
+### Sparkline (reflection gate — unrequested feature)
+
+The tooltip now includes a Unicode sparkline (▁▂▃▄▅▆▇█) visualizing saropa RSS over the last ~30 minutes. The ring buffer was expanded from 5 to 30 samples (`SPARKLINE_WINDOW`); trend computation is sliced to the last 5 (`TREND_WINDOW`) to preserve existing behavior. `renderSparkline()` in `processQuery.ts` is a pure function — maps samples to 8-level block characters, returns empty string below 2 data points, handles flat/zero data. Sparkline line uses the `systemHealth.tooltip.sparkline` l10n key.
+
+### Additional hardening (reflection gate)
+
+- Partition assertion in `buildProcessTooltipLines`: filters processes into saropa/daemon/other arrays, warns to console if the sum doesn't equal the total. Catches filter coupling drift without runtime cost in the happy path.
+- Ring buffer boundary test at exactly 5 samples (TREND_WINDOW boundary).
+- `truncateLabel` tests for 31-char input (one over limit) and empty string.
+- 6 `renderSparkline` tests: empty/single input, flat data, rising, falling, minimum 2-sample input, all-zero.
+
 ### Not addressed (out of scope)
 
-- Stretch goals from the proposal (RSS sparkline chart, kill-orphans action) — deferred to separate proposals.
+- Kill-orphans action from tooltip — deferred to separate proposal.
 - Dead translated locale keys (`processCount`, `saropaProcessCount`) — harmless; cleaned at next translation regen.
 - `processLabel` returns English strings — these are technical identifiers consistent across locales.
 - Test fixture `processCount:1` with `processes:[]` — scalar disagrees with array but no current test subject iterates the array.
 
 ### Verification status
 
-TypeScript compiles clean. All 61 systemHealth tests pass (45 original + 16 hardening: 9 processLabel, 4 isAnalysisServerProcess, 3 truncateLabel). **Unverified** in the Extension Development Host — tooltip rendering in both themes needs F5 confirmation.
+TypeScript compiles clean. All 71 systemHealth tests pass (45 original + 16 initial hardening + 10 additional: 2 trend boundary, 2 truncateLabel edge, 6 renderSparkline). **Unverified** in the Extension Development Host — tooltip rendering (including sparkline) in both themes needs F5 confirmation.

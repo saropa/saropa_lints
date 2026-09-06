@@ -194,6 +194,34 @@ export function truncateLabel(label: string): string {
   return label.slice(0, MAX_LABEL_LENGTH - 1) + '…';
 }
 
+/**
+ * Unicode block characters for sparkline rendering, from lowest to tallest.
+ * Eight levels give enough visual resolution for a 30-sample tooltip line
+ * without needing a full chart library.
+ */
+const SPARK_CHARS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+
+/**
+ * Render a series of numeric samples as a single-line Unicode sparkline.
+ * Returns an empty string when there are fewer than 2 data points (a
+ * single dot has no shape to show). Exported for testing.
+ */
+export function renderSparkline(samples: readonly number[]): string {
+  if (samples.length < 2) return '';
+  const min = Math.min(...samples);
+  const max = Math.max(...samples);
+  // Flat line — all values identical, render mid-height bars.
+  if (max === min) return SPARK_CHARS[3].repeat(samples.length);
+  const range = max - min;
+  return samples
+    .map((v) => {
+      // Map each value to a bar index (0–7). Clamp to handle rounding.
+      const idx = Math.min(Math.floor(((v - min) / range) * SPARK_CHARS.length), SPARK_CHARS.length - 1);
+      return SPARK_CHARS[idx];
+    })
+    .join('');
+}
+
 export function killProcess(pid: number): Promise<boolean> {
   return new Promise((resolve) => {
     execFile(
