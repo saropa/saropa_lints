@@ -315,7 +315,7 @@ Coverage: 487 rules — 431 HAVE (89%), 16 PARTIAL, 40 TODO (8%)
 | `avoid-unnecessary-enum-arguments` | HAVE | `avoid_unnecessary_enum_arguments` |
 | `avoid-unnecessary-enum-prefix` | HAVE | `avoid_unnecessary_enum_prefix` |
 | `avoid-unnecessary-extends` | HAVE | `avoid_unnecessary_extends` |
-| `avoid-unnecessary-factory` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_factory_constructor.md) |
+| `avoid-unnecessary-factory` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_avoid_unnecessary_factory_constructor.md) |
 | `avoid-unnecessary-futures` | HAVE | `avoid_unnecessary_futures` |
 | `avoid-unnecessary-getter` | HAVE | `avoid_unnecessary_getter` |
 | `avoid-unnecessary-if` | HAVE | `avoid_unnecessary_if` |
@@ -537,7 +537,7 @@ Coverage: 487 rules — 431 HAVE (89%), 16 PARTIAL, 40 TODO (8%)
 | `check-for-equals-in-render-object-setters` | HAVE | `check_for_equals_in_render_object_setters` |
 | `consistent-update-render-object` | HAVE | `consistent_update_render_object` |
 | `dispose-fields` | HAVE | `dispose_widget_fields` / `dispose_class_fields` |
-| `keep-state-below-its-widget` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_state_class_below_widget.md) |
+| `keep-state-below-its-widget` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_prefer_state_class_below_widget.md) |
 | `pass-existing-future-to-future-builder` | HAVE | `pass_existing_future_to_future_builder` |
 | `pass-existing-stream-to-stream-builder` | HAVE | `pass_existing_stream_to_stream_builder` |
 | `prefer-action-button-tooltip` | HAVE | `prefer_action_button_tooltip` |
@@ -649,7 +649,7 @@ Coverage: 487 rules — 431 HAVE (89%), 16 PARTIAL, 40 TODO (8%)
 | `add-equatable-props` | HAVE | `list_all_equatable_fields` |
 | `avoid-equatable-call-on-equality-base-class` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_equatable_call_on_equality_base_class.md) |
 | `prefer-equatable-key-name` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_equatable_key_name.md) |
-| `sort-equatable-props` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_sorted_equatable_props.md) |
+| `sort-equatable-props` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_prefer_sorted_equatable_props.md) |
 
 ## What You Gain
 

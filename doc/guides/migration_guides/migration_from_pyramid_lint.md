@@ -88,7 +88,7 @@ Coverage: 37 rules — 29 HAVE (78%), 3 PARTIAL, 5 TODO (14%)
 |---|---|---|
 | `avoid_public_members_in_states` | HAVE | `avoid_public_members_in_states` |
 | `avoid_single_child_in_flex` | HAVE | `avoid_single_child_column_row` |
-| `dispose_controllers` | PARTIAL | `require_form_field_controller` — pyramid's is type-checker-based (any disposable-typed field); saropa's is a fixed enumeration of known controller types, so a novel custom controller type would be missed by saropa but caught by pyramid. TODO — see [proposal](../../../plans/tier_2_high_value/proposal_dispose_controllers.md) |
+| `dispose_controllers` | PARTIAL | `require_form_field_controller` — pyramid's is type-checker-based (any disposable-typed field); saropa's is a fixed enumeration of known controller types, so a novel custom controller type would be missed by saropa but caught by pyramid. TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_dispose_controllers.md) |
 | `prefer_async_callback` | HAVE | `prefer_async_callback` |
 | `prefer_border_from_border_side` | HAVE | `avoid_border_all` |
 | `prefer_border_radius_all` | PARTIAL | `prefer_borderradius_circular` — same subject, contradictory prescribed style (saropa recommends `.circular()` over `.all()`, pyramid recommends the opposite). TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_prefer_border_radius_all.md) |

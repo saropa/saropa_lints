@@ -65,6 +65,12 @@ void main() {
     test('RequireSdkSyntaxMatchRule reports correct name and messages', () {
       expectMetadata(RequireSdkSyntaxMatchRule(), 'require_sdk_syntax_match');
     });
+    test('AddResolutionWorkspaceRule reports correct name and messages', () {
+      expectMetadata(
+        AddResolutionWorkspaceRule(),
+        'add_resolution_workspace',
+      );
+    });
   });
 
   group('parseConstraint', () {

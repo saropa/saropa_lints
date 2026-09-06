@@ -371,9 +371,11 @@ class ProjectContext {
   ///
   /// Normalizes backslashes to forward slashes, strips leading `./` and
   /// trailing `/` so all spellings of the same relative path match.
+  /// Returns empty string for null/empty input (safe for comparison — will
+  /// never match a real path).
   static String _canonicalRelativePath(String raw) {
-    // normalizePath always returns non-null for a non-null input.
     var clean = normalizePath(raw);
+    if (clean.isEmpty) return '';
     if (clean.startsWith('./')) clean = clean.substring(2);
     if (clean.endsWith('/')) clean = clean.substring(0, clean.length - 1);
     return clean;

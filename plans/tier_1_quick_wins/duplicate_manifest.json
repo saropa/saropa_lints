@@ -45,9 +45,9 @@
     {
       "file": "proposal_avoid_any_version.md",
       "rule_name": "avoid_any_version",
-      "status": "new",
-      "existing_rule": null,
-      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+      "status": "duplicate",
+      "existing_rule": "AvoidUnboundedDependencyRule (avoid_unbounded_dependency)",
+      "notes": "Manual /finish review found this rule-name-based scan missed the match: avoid_unbounded_dependency in pubspec_constraint_rules.dart already flags 'any'/empty dependency constraints (shipped v14.1.0, plans/history/2026.06/2026.06.18/PLAN_PUBSPEC_REVIEWER.md). Proposal moved to plans/declined/."
     },
     {
       "file": "proposal_avoid_connectivity_ui_decisions.md",

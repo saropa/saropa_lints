@@ -59,7 +59,7 @@ Coverage: 24 rules — 7 HAVE (29%), 4 PARTIAL, 13 TODO (54%)
 | `avoid_test_timeouts` | HAVE | `require_integration_test_timeout` |
 | `document_enum` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.04/proposal_document_enum.md) |
 | `document_fake_parameters` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_document_fake_parameters.md) |
-| `document_interface` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_document_interface.md) |
+| `document_interface` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_document_interface.md) |
 | `forbid_datetime_now` | PARTIAL | `avoid_datetime_now_in_tests` — only covers test files, not "always inject a Clock in production code" |
 | `forbid_forced_unwrapping` | HAVE | `avoid_non_null_assertion` |
 | `forbid_helper_util_naming` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_forbid_helper_util_naming.md) |
@@ -67,10 +67,10 @@ Coverage: 24 rules — 7 HAVE (29%), 4 PARTIAL, 13 TODO (54%)
 | `forbid_modular_get_outside_module` | PARTIAL | `avoid_service_locator_in_widgets` — narrower, widgets only |
 | `forbid_raw_icon_and_image_usage` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_forbid_raw_icon_and_image_usage.md) |
 | `no_direct_instantiation` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_no_direct_instantiation.md) |
-| `no_internal_method_docs` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_no_internal_method_docs.md) |
+| `no_internal_method_docs` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_no_internal_method_docs.md) |
 | `no_optional_operators_in_tests` | HAVE | `no_optional_operators_in_tests` |
 | `prefer_fake_over_mock` | PARTIAL | `prefer_fake_over_mock` exists but its doc describes "excessive mocking" generally, not specifically the `extends Mock` → `extends Fake` pattern — needs verification |
-| `prevent_feature_module_dependencies` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_prevent_feature_module_dependencies.md) |
+| `prevent_feature_module_dependencies` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_prevent_feature_module_dependencies.md) |
 | `prevent_library_module_dependencies` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_prevent_library_module_dependencies.md) |
 | `private_subject` | TODO | TODO — see [proposal](../../../plans/tier_5_niche/proposal_private_subject.md) |
 | `restrict_core_icon_data` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_restrict_core_icon_data.md) |

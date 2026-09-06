@@ -164,7 +164,7 @@ Coverage: 266 rules — 204 HAVE (77%), 7 PARTIAL, 51 TODO (19%)
 | `avoid_inverted_boolean_checks` | HAVE | `avoid_inverted_boolean_checks` |
 | `avoid_late_context` | HAVE | `avoid_late_context` |
 | `avoid_late_final_reassignment` | HAVE | `avoid_late_final_reassignment` |
-| `avoid_long_files` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_long_files.md) (configurable line-count budget, see Gap Theme 9) |
+| `avoid_long_files` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_avoid_long_files.md) (configurable line-count budget, see Gap Theme 9) |
 | `avoid_long_functions` | HAVE | `avoid_long_functions` |
 | `avoid_long_parameter_list` | HAVE | `avoid_long_parameter_list` |
 | `avoid_map_keys_contains` | HAVE | `avoid_map_keys_contains` |
@@ -204,7 +204,7 @@ Coverage: 266 rules — 204 HAVE (77%), 7 PARTIAL, 51 TODO (19%)
 | `avoid_throw_in_catch_block` | HAVE | `avoid_throw_in_catch_block` |
 | `avoid_throw_in_fp_callback` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_avoid_throw_in_fp_callback.md) (fpdart family, see Gap Theme 1) |
 | `avoid_todo_comments` | PARTIAL | `prefer_todo_format` / `prefer_fixme_format` / `prefer_hack_format` — check marker format only, not issue/URL reference presence |
-| `avoid_too_many_methods` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_too_many_methods.md) (budget rule, see Gap Theme 9) |
+| `avoid_too_many_methods` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_avoid_too_many_methods.md) (budget rule, see Gap Theme 9) |
 | `avoid_too_many_widgets_per_build` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_too_many_widgets_per_build.md) (budget rule, see Gap Theme 9) |
 | `avoid_unassigned_stream_subscriptions` | HAVE | `avoid_unassigned_stream_subscriptions` |
 | `avoid_unmodified_loop_condition` | PARTIAL | `avoid_complex_loop_conditions` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_complex_loop_conditions_dcm_parity.md) |
@@ -243,7 +243,7 @@ Coverage: 266 rules — 204 HAVE (77%), 7 PARTIAL, 51 TODO (19%)
 | `function_always_returns_null` | HAVE | `function_always_returns_null` |
 | `function_always_returns_same_value` | HAVE | `function_always_returns_same_value` |
 | `handle_bloc_event_subclasses` | PARTIAL | `require_bloc_event_sealed` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_require_bloc_event_sealed_dcm_parity.md) |
-| `initializers_ordering` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_sorted_initializers.md) |
+| `initializers_ordering` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_prefer_sorted_initializers.md) |
 | `list_all_equatable_fields` | HAVE | `list_all_equatable_fields` |
 | `map_keys_ordering` | HAVE | `map_keys_ordering` |
 | `match_class_name_pattern` | HAVE | `match_class_name_pattern` |
@@ -253,7 +253,7 @@ Coverage: 266 rules — 204 HAVE (77%), 7 PARTIAL, 51 TODO (19%)
 | `max_imports` | HAVE | `limit_max_imports` |
 | `max_statements` | PARTIAL | `avoid_long_functions` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_long_functions_dcm_parity.md) |
 | `member_ordering` | HAVE | `prefer_member_ordering` |
-| `missing_provider_scope` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_missing_provider_scope.md) |
+| `missing_provider_scope` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_missing_provider_scope.md) |
 | `never_discard_build_context` | TODO | TODO — Planned |
 | `no_equal_conditions` | HAVE | `no_equal_conditions` |
 | `no_equal_switch_case` | HAVE | `no_equal_switch_case` |

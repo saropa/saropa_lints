@@ -5,6 +5,7 @@ import 'dart:io' show File;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../config/pubspec_constraint_parser.dart';
+import '../../fixes/config/add_resolution_workspace_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -383,6 +384,130 @@ class AvoidOverlyWideAppConstraintRule extends SaropaLintRule {
         final span = dep.constraint.majorSpan;
         return span != null && span >= 2;
       });
+    });
+  }
+}
+
+// =============================================================================
+// add_resolution_workspace
+// =============================================================================
+
+/// Flags a package in a Dart pub workspace that is missing
+/// `resolution: workspace` in its pubspec.yaml.
+///
+/// Since: v16.0.0-beta.7 | Rule version: v1
+///
+/// Dart 3.6 introduced pub workspaces so a monorepo can share a single
+/// lockfile. A member package that omits `resolution: workspace` falls back
+/// to independent resolution — its own lockfile, its own dependency graph —
+/// silently defeating the workspace and reintroducing version drift. The
+/// detection walks to the nearest ancestor pubspec.yaml (never past it) and
+/// checks its `workspace:` list for membership.
+///
+/// **BAD:**
+/// ```yaml
+/// # packages/foo/pubspec.yaml (listed in root workspace:)
+/// name: foo
+/// environment:
+///   sdk: ^3.6.0
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// # packages/foo/pubspec.yaml
+/// name: foo
+/// environment:
+///   sdk: ^3.6.0
+/// resolution: workspace
+/// ```
+///
+/// **Quick fix available:** Inserts `resolution: workspace` after the
+/// `environment:` block in pubspec.yaml (or at end of file if absent).
+class AddResolutionWorkspaceRule extends SaropaLintRule {
+  AddResolutionWorkspaceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'config', 'pubspec', 'workspace'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  // Offers to insert `resolution: workspace` into the package's pubspec.yaml.
+  // Edits the YAML file via addGenericFileEdit (same pattern as
+  // RaiseSdkLowerBoundFix) since the diagnostic attaches to a .dart token.
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddResolutionWorkspaceFix(context: context),
+  ];
+
+  /// Dedup set: report at most once per project root.
+  static final Set<String> _reportedRoots = {};
+
+  /// Regex to detect a top-level `resolution: workspace` line in a pubspec.
+  /// Anchored to column 0 so indented YAML values (inside environment: etc.)
+  /// cannot match. Allows trailing whitespace and YAML comments (# ...).
+  static final RegExp _resolutionWorkspaceRe = RegExp(
+    r'^resolution:\s+workspace\s*(?:#.*)?$',
+    multiLine: true,
+  );
+
+  static const LintCode _code = LintCode(
+    'add_resolution_workspace',
+    '[add_resolution_workspace] This package is listed in a pub workspace '
+        'but does not declare `resolution: workspace` in its pubspec.yaml. '
+        'Without it the package resolves dependencies independently — its own '
+        'lockfile, its own version graph — silently defeating the shared '
+        'workspace resolution and reintroducing version drift between packages '
+        'that are supposed to be locked together. Add `resolution: workspace` '
+        'as a top-level key. {v1}',
+    correctionMessage:
+        'Add `resolution: workspace` as a top-level key in pubspec.yaml.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Find this file's project root (nearest pubspec.yaml).
+    final root = ProjectContext.findProjectRoot(context.filePath);
+    if (root == null) return;
+    if (_reportedRoots.contains(root)) return;
+
+    // Only attach to lib/ files to dedup (same pattern as _reportPubspecOnce).
+    // Known limitation: bin-only or tool-only workspace members with no lib/
+    // directory will never trigger this rule. Fixing requires a different
+    // reporting anchor, which is a separate design change for all pubspec rules.
+    final path = context.filePath.replaceAll('\\', '/');
+    if (!path.contains('/lib/')) return;
+
+    // Check if this package is a listed workspace member.
+    final workspaceRoot = ProjectContext.getWorkspaceRoot(root);
+    if (workspaceRoot == null) return;
+
+    // Read this package's own pubspec to check for resolution: workspace.
+    final pubspecFile = File('$root/pubspec.yaml');
+    if (!pubspecFile.existsSync()) return;
+
+    final content = pubspecFile.readAsStringSync();
+
+    // If the pubspec already has `resolution: workspace`, nothing to report.
+    if (_resolutionWorkspaceRe.hasMatch(content)) return;
+
+    // Package is a workspace member but missing the resolution declaration.
+    _reportedRoots.add(root);
+    context.addCompilationUnit((CompilationUnit unit) {
+      final token = unit.beginToken;
+      if (token.isEof) return;
+      reporter.atOffset(offset: token.offset, length: token.length);
     });
   }
 }

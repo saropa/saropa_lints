@@ -1746,6 +1746,7 @@ const Set<String> recommendedOnlyRules = <String>{
   // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
   'require_sdk_upper_bound', // WARNING - SDK constraint missing upper bound
   'avoid_unbounded_dependency', // WARNING - dependency pinned to `any`
+  'add_resolution_workspace', // WARNING - workspace member missing resolution: workspace
   // Tier 1 quick wins — batch 1
   'avoid_exit_outside_entrypoint', // WARNING - exit() hidden outside main()
   // Tier 1 quick wins — batch 2

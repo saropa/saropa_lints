@@ -72,7 +72,7 @@ Process Health status bar and tooltip now isolate saropa-owned memory from syste
 
 ### Added
 
-- New rule `add_resolution_workspace` (recommended tier, WARNING): flags a package listed in a Dart pub workspace that is missing `resolution: workspace` in its pubspec.yaml, catching version drift before `pub get` fails. No action required.
+- New rule `add_resolution_workspace` (recommended tier, WARNING): flags a package listed in a Dart pub workspace that is missing `resolution: workspace` in its pubspec.yaml, catching version drift before `pub get` fails. Quick fix inserts the key after the `environment:` block. No action required.
 - Process Health tooltip now shows an RSS trend arrow (↑ rising / → stable / ↓ falling) next to the saropa section header. A rising trend is an early memory-leak warning before the red threshold trips. Based on a 5-sample split-mean with a 10% change threshold. No action required.
 - Process Health tooltip includes a Unicode sparkline chart (▁▂▃▄▅▆▇█) showing saropa RSS over the last ~30 minutes. Gives a visual memory profile at a glance without opening a panel. No action required.
 - Process Health now detects monotonically rising RSS and shows a one-time "possible memory leak" notification before the red threshold trips. Based on 8/10 consecutive non-decreasing comparisons, tolerating brief GC dips. No action required.

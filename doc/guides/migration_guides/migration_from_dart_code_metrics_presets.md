@@ -187,7 +187,7 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid-missing-tr` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_missing_tr.md). |
+| `avoid-missing-tr` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_avoid_missing_tr.md). |
 | `avoid-missing-tr-on-strings` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_missing_tr_on_strings.md). |
 
 ### get_it.yaml (1 rule — 1 TODO)

@@ -59,7 +59,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 
 | flutter_skill_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid_any_version` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_any_version.md) |
+| `avoid_any_version` | Done | `avoid_unbounded_dependency` — see [declined duplicate proposal](../../../plans/declined/proposal_avoid_any_version.md) |
 | `avoid_banned_exports` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_exports.md) |
 | `avoid_banned_file_names` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_file_names.md) |
 | `avoid_banned_imports` | TODO | TODO — see [proposal](../../../plans/tier_3_infrastructure/proposal_avoid_banned_imports.md) |
@@ -77,7 +77,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `avoid_nullable_async_or_collection_return_type` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_nullable_async_or_collection_return_type.md) |
 | `avoid_parameter_aliases` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_parameter_aliases.md) |
 | `avoid_positional_record_fields` | HAVE | `avoid_positional_record_field_access` |
-| `avoid_public_late_final_without_initializer` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_public_late_final_without_initializer.md) |
+| `avoid_public_late_final_without_initializer` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_avoid_public_late_final_without_initializer.md) |
 | `avoid_public_notifier_properties` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_avoid_public_notifier_properties.md) |
 | `avoid_repeated_property_aliases` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_repeated_property_aliases.md) |
 | `avoid_then_return_with_future` | HAVE | `avoid_returning_null_for_future_strict` |
@@ -86,7 +86,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `avoid_unnecessary_parentheses` | HAVE | `avoid_unnecessary_parentheses` |
 | `avoid_unnecessary_safe_area` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_avoid_unnecessary_safe_area.md) |
 | `avoid_unused_local_variable` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_avoid_unused_local_variable_na.md) |
-| `keep_state_below_its_widget` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_state_class_below_widget.md) |
+| `keep_state_below_its_widget` | TODO | TODO — see [proposal](../../../plans/history/2026.09/2026.09.06/proposal_prefer_state_class_below_widget.md) |
 | `pass_mock_object` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_pass_mock_object.md) |
 | `prefer_container` | TODO | TODO — see [proposal](../../../plans/declined/proposal_prefer_container.md) |
 | `prefer_correct_any_matcher` | TODO | TODO — see [proposal](../../../plans/tier_2_high_value/proposal_prefer_correct_any_matcher.md) |
