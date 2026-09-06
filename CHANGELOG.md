@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.6] — Unreleased
+## [16.0.0-beta.6]
 
 Fixes a false-positive in the extension's l10n diagnostic provider and hardens the publish pipeline so CI-only test failures are caught locally before tagging. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.6/CHANGELOG.md)
 
