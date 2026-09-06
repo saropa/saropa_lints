@@ -20,7 +20,7 @@ jobs:
     # and announce-release). PRs and ordinary main pushes are unaffected.
     if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # PR: checkout head branch; push: checkout exact commit that triggered the run
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
@@ -95,7 +95,7 @@ jobs:
       - name: Refresh diagnostic baseline snapshot (if available)
         # Safe no-op when this job does not produce reports/.saropa_lints/violations.json
         run: test -f reports/.saropa_lints/violations.json && dart run saropa_lints:diagnostic_baseline || true
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Check for removed analyzer API usage
@@ -144,7 +144,7 @@ jobs:
     # Skip the redundant main-push run on release commits; see the analyze job.
     if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # Same ref/token as analyze job so both jobs see identical code
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
@@ -164,7 +164,7 @@ jobs:
           cd packages/saropa_lints_api
           dart pub get
           dart test
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Python script tests (tier integrity)
@@ -175,12 +175,12 @@ jobs:
     # Skip the redundant main-push run on release commits; see the analyze job.
     if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "22"
       - name: Verify extension manifest NLS keys
         run: node extension/scripts/verify-manifest-nls-keys.mjs

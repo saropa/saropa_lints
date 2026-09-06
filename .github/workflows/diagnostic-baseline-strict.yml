@@ -10,7 +10,7 @@ jobs:
   strict-diagnostic-baseline:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: '3.10.8'
@@ -24,7 +24,7 @@ jobs:
       - name: Refresh diagnostic baseline snapshot
         run: dart run saropa_lints:diagnostic_baseline
       - name: Upload diagnostic baseline artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: diagnostic-baseline
           path: reports/.saropa_lints/diagnostic_baseline.json

@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Extract changelog for this version
         id: changelog
@@ -36,7 +36,7 @@ jobs:
           echo 'EOF' >> $GITHUB_OUTPUT
 
       - name: Post announcement to GitHub Discussions
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

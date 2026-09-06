@@ -11,7 +11,7 @@ jobs:
     permissions:
       id-token: write  # Required for OIDC authentication with pub.dev
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Use stable channel so the SDK is always available (no exact-version lookup failures).
       # Pubspec allows sdk: ">=3.6.0 <4.0.0", so any current stable is valid.
