@@ -1475,6 +1475,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Tier: {tier} · Lane: {lane}": "Tier: {tier} · Lane: {lane}",
         # Manual: quality-gate status with grade/score prefix — "Hindi pumasa ang gate" = gate not passed.
         "{grade} · {score}/100 · Gate failing": "{grade} · {score}/100 · Hindi pumasa ang gate",
+        # Manual: MT returned English unchanged; "Takbo" = trend/run, "ng RSS" = of RSS.
+        "RSS trend: {chart}": "Takbo ng RSS: {chart}",
     },
     "he": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1663,6 +1665,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{grade} · {score}/100 · Gate failing": "{grade} · {score}/100 · Brama nie działa",
         # Curated passthrough: "Status:" is spelled identically in Polish; no translation needed.
         "Status:": "Status:",
+        # Manual: "Trend" is a Polish loanword; "RSS" stays as the technical abbreviation.
+        "RSS trend: {chart}": "Trend RSS: {chart}",
     },
     "sw": {
         # Manual: cached MT output for these five degenerated (repetition-loop garbage, one

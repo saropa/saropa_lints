@@ -275,9 +275,7 @@ final RegExp _depSectionHeader = RegExp(
 /// follows the colon on the same line — `dependency_overrides: {}` (an
 /// explicit empty flow-map) intentionally does NOT match, so it is treated
 /// the same as "no overrides" rather than needing a separate empty-map check.
-final RegExp _dependencyOverridesHeader = RegExp(
-  r'^dependency_overrides:\s*$',
-);
+final RegExp _dependencyOverridesHeader = RegExp(r'^dependency_overrides:\s*$');
 
 /// A 2-space-indented `name: value` entry. `value` may be empty (block follows).
 final RegExp _depEntry = RegExp(r'^  ([a-zA-Z0-9_][a-zA-Z0-9_-]*):(.*)$');

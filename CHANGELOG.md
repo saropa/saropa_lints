@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.7] — Unreleased
+## [16.0.0-beta.7]
 
 Process Health status bar and tooltip now isolate saropa-owned memory from system-wide Dart processes, preventing false alerts when analysis servers from other VS Code windows consume significant memory. The tooltip adds a trend indicator, Unicode sparkline chart, and automatic leak detection to catch memory issues early, plus a per-process breakdown for diagnostic detail. Fixed the dashboard's "Enable all recommended packs" button using stale pack detection while the table showed the current state. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.7/CHANGELOG.md)
 

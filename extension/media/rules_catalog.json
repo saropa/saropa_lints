@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2376,
+  "ruleCount": 2383,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -39,6 +39,28 @@
         "description": "Bug rule default target: zero false positives."
       },
       "correction": "Use an abstract field without an initializer, or a concrete field with an initializer.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "add_resolution_workspace": {
+      "ruleType": "bug",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec",
+        "workspace"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Bug rule default target: zero false positives."
+      },
+      "correction": "Add `resolution: workspace` as a top-level key in pubspec.yaml.",
       "owasp": {
         "mobile": [],
         "web": []
@@ -3081,6 +3103,27 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Override toString() to return a string representation of the object's key fields and current state. Format as \"ClassName(field1: value1, field2: value2)\" for easy inspection during debugging.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "avoid_dependency_overrides": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Remove the dependency_overrides section or suppress this rule per-line with a justification comment.",
       "owasp": {
         "mobile": [],
         "web": []
@@ -18209,6 +18252,28 @@
         "web": []
       }
     },
+    "flag_missing_workspace_member": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec",
+        "workspace"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Add the missing package directory to the workspace: list in pubspec.yaml.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
     "flutter_animate_auto_play_false_no_driver": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -30531,6 +30596,28 @@
         "web": []
       }
     },
+    "prefer_pinned_version_syntax": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec",
+        "style"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Replace caret constraints (^X.Y.Z) with exact versions (X.Y.Z) in dependencies.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
     "prefer_platform_io_conditional": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -30932,6 +31019,27 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Move public declarations above private declarations so the external API is visible at the top of the class.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "prefer_publish_to_none": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Add publish_to: none to your pubspec.yaml.",
       "owasp": {
         "mobile": [],
         "web": []
@@ -48529,6 +48637,50 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Remove the stale parameter reference or update it to match an actual parameter name.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "workspace_dependency_version_sync": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec",
+        "workspace"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Align all workspace members to the same constraint string for each shared dependency.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "workspace_member_order": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec",
+        "workspace"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Sort the workspace: list entries alphabetically.",
       "owasp": {
         "mobile": [],
         "web": []

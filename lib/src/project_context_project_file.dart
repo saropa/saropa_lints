@@ -391,8 +391,7 @@ class ProjectContext {
   /// Treating macOS as case-insensitive is the safer default — a false
   /// match on a rare case-sensitive volume is a benign no-op, while a
   /// false mismatch on the common case-insensitive volume is a real FP.
-  static bool get isCaseInsensitiveFs =>
-      Platform.isWindows || Platform.isMacOS;
+  static bool get isCaseInsensitiveFs => Platform.isWindows || Platform.isMacOS;
 
   /// Extract the raw `workspace:` list entries from a pubspec's content.
   ///

@@ -78,10 +78,7 @@ void main() {
       expectMetadata(RequireSdkSyntaxMatchRule(), 'require_sdk_syntax_match');
     });
     test('AddResolutionWorkspaceRule reports correct name and messages', () {
-      expectMetadata(
-        AddResolutionWorkspaceRule(),
-        'add_resolution_workspace',
-      );
+      expectMetadata(AddResolutionWorkspaceRule(), 'add_resolution_workspace');
     });
     test(
       'FlagMissingWorkspaceMemberRule reports correct name and messages',
@@ -101,42 +98,24 @@ void main() {
         );
       },
     );
-    test(
-      'WorkspaceMemberOrderRule reports correct name and messages',
-      () {
-        expectMetadata(
-          WorkspaceMemberOrderRule(),
-          'workspace_member_order',
-        );
-      },
-    );
-    test(
-      'AvoidDependencyOverridesRule reports correct name and messages',
-      () {
-        expectMetadata(
-          AvoidDependencyOverridesRule(),
-          'avoid_dependency_overrides',
-        );
-      },
-    );
-    test(
-      'PreferPinnedVersionSyntaxRule reports correct name and messages',
-      () {
-        expectMetadata(
-          PreferPinnedVersionSyntaxRule(),
-          'prefer_pinned_version_syntax',
-        );
-      },
-    );
-    test(
-      'PreferPublishToNoneRule reports correct name and messages',
-      () {
-        expectMetadata(
-          PreferPublishToNoneRule(),
-          'prefer_publish_to_none',
-        );
-      },
-    );
+    test('WorkspaceMemberOrderRule reports correct name and messages', () {
+      expectMetadata(WorkspaceMemberOrderRule(), 'workspace_member_order');
+    });
+    test('AvoidDependencyOverridesRule reports correct name and messages', () {
+      expectMetadata(
+        AvoidDependencyOverridesRule(),
+        'avoid_dependency_overrides',
+      );
+    });
+    test('PreferPinnedVersionSyntaxRule reports correct name and messages', () {
+      expectMetadata(
+        PreferPinnedVersionSyntaxRule(),
+        'prefer_pinned_version_syntax',
+      );
+    });
+    test('PreferPublishToNoneRule reports correct name and messages', () {
+      expectMetadata(PreferPublishToNoneRule(), 'prefer_publish_to_none');
+    });
   });
 
   group('parseConstraint', () {
@@ -444,17 +423,11 @@ dependencies:
     });
 
     test('matches double-quoted workspace', () {
-      expect(
-        resolutionWorkspaceRe.hasMatch('resolution: "workspace"'),
-        isTrue,
-      );
+      expect(resolutionWorkspaceRe.hasMatch('resolution: "workspace"'), isTrue);
     });
 
     test('matches single-quoted workspace', () {
-      expect(
-        resolutionWorkspaceRe.hasMatch("resolution: 'workspace'"),
-        isTrue,
-      );
+      expect(resolutionWorkspaceRe.hasMatch("resolution: 'workspace'"), isTrue);
     });
 
     test('does not match indented line (not top-level)', () {
@@ -467,10 +440,7 @@ dependencies:
     });
 
     test('does not match a different resolution value', () {
-      expect(
-        resolutionWorkspaceRe.hasMatch('resolution: local'),
-        isFalse,
-      );
+      expect(resolutionWorkspaceRe.hasMatch('resolution: local'), isFalse);
     });
 
     test('does not match mismatched quotes', () {
@@ -530,8 +500,7 @@ environment:
     /// Helper: write a pubspec.yaml at the given root path with the specified
     /// content, then call getWorkspaceMembers.
     List<String> membersFrom(String pubspecContent) {
-      File('${tmpDir.path}/pubspec.yaml')
-          .writeAsStringSync(pubspecContent);
+      File('${tmpDir.path}/pubspec.yaml').writeAsStringSync(pubspecContent);
       return ProjectContext.getWorkspaceMembers(tmpDir.path);
     }
 
@@ -916,10 +885,8 @@ dependency_overrides:
     // split: an override entry must be flagged as an override AND must NOT
     // leak into `dependencies` — folding it in would make the range-hygiene
     // rules reason about a version the pubspec doesn't actually declare.
-    test(
-      'dependencies and dependency_overrides are parsed independently',
-      () {
-        const pubspec = '''
+    test('dependencies and dependency_overrides are parsed independently', () {
+      const pubspec = '''
 name: my_pkg
 dependencies:
   http: ^1.2.0
@@ -927,13 +894,12 @@ dependency_overrides:
   http: ^1.0.0
   meta: ^1.9.0
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(hasDependencyOverridesEntries(parsed), isTrue);
-        expect(parsed.dependencies, hasLength(1));
-        expect(parsed.dependencies.single.name, 'http');
-        expect(parsed.dependencies.single.constraint.raw, '^1.2.0');
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasDependencyOverridesEntries(parsed), isTrue);
+      expect(parsed.dependencies, hasLength(1));
+      expect(parsed.dependencies.single.name, 'http');
+      expect(parsed.dependencies.single.constraint.raw, '^1.2.0');
+    });
   });
 
   // Behavioral coverage for `prefer_pinned_version_syntax` (the deliberate
@@ -1008,24 +974,21 @@ dependencies:
       expect(hasCaretDependenciesInApp(parsed), isFalse);
     });
 
-    test(
-      'app with a range constraint (not caret syntax) is not flagged',
-      () {
-        // `>=1.0.0 <2.0.0` is an explicit range, not caret syntax — even
-        // though it is functionally equivalent to `^1.0.0`, this rule only
-        // targets the literal `^` spelling; the equivalent-range case is
-        // `PreferCaretConstraintInAppRule`'s concern (the opposite rule),
-        // never both.
-        const pubspec = '''
+    test('app with a range constraint (not caret syntax) is not flagged', () {
+      // `>=1.0.0 <2.0.0` is an explicit range, not caret syntax — even
+      // though it is functionally equivalent to `^1.0.0`, this rule only
+      // targets the literal `^` spelling; the equivalent-range case is
+      // `PreferCaretConstraintInAppRule`'s concern (the opposite rule),
+      // never both.
+      const pubspec = '''
 name: my_app
 publish_to: none
 dependencies:
   http: ">=1.0.0 <2.0.0"
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(hasCaretDependenciesInApp(parsed), isFalse);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(hasCaretDependenciesInApp(parsed), isFalse);
+    });
 
     test('app with a caret dev_dependency is flagged', () {
       // The shared parser folds dev_dependencies into `dependencies` (see
@@ -1055,56 +1018,50 @@ dependencies:
       expect(hasCaretDependenciesInApp(parsed), isFalse);
     });
 
-    test(
-      'a single dependency cannot trigger both conflicting-pair rules',
-      () {
-        // Cross-rule interaction check: hasCaretDependenciesInApp (this
-        // rule) requires isCaret; PreferCaretConstraintInAppRule requires
-        // isCaretEquivalentRange, which explicitly excludes isCaret
-        // constraints (see ParsedConstraint.isCaretEquivalentRange, first
-        // line: `if (isCaret ...) return false`). So for any one dependency
-        // exactly one of the two predicates can ever be true, never both.
-        const caretPubspec = '''
+    test('a single dependency cannot trigger both conflicting-pair rules', () {
+      // Cross-rule interaction check: hasCaretDependenciesInApp (this
+      // rule) requires isCaret; PreferCaretConstraintInAppRule requires
+      // isCaretEquivalentRange, which explicitly excludes isCaret
+      // constraints (see ParsedConstraint.isCaretEquivalentRange, first
+      // line: `if (isCaret ...) return false`). So for any one dependency
+      // exactly one of the two predicates can ever be true, never both.
+      const caretPubspec = '''
 name: my_app
 publish_to: none
 dependencies:
   http: ^1.2.3
 ''';
-        final caretParsed = parsePubspecConstraints(caretPubspec);
-        final caretDep = caretParsed.dependencies.single;
-        expect(hasCaretDependenciesInApp(caretParsed), isTrue);
-        expect(caretDep.constraint.isCaretEquivalentRange, isFalse);
+      final caretParsed = parsePubspecConstraints(caretPubspec);
+      final caretDep = caretParsed.dependencies.single;
+      expect(hasCaretDependenciesInApp(caretParsed), isTrue);
+      expect(caretDep.constraint.isCaretEquivalentRange, isFalse);
 
-        const rangePubspec = '''
+      const rangePubspec = '''
 name: my_app
 publish_to: none
 dependencies:
   http: ">=1.2.3 <2.0.0"
 ''';
-        final rangeParsed = parsePubspecConstraints(rangePubspec);
-        final rangeDep = rangeParsed.dependencies.single;
-        expect(hasCaretDependenciesInApp(rangeParsed), isFalse);
-        expect(rangeDep.constraint.isCaretEquivalentRange, isTrue);
-      },
-    );
+      final rangeParsed = parsePubspecConstraints(rangePubspec);
+      final rangeDep = rangeParsed.dependencies.single;
+      expect(hasCaretDependenciesInApp(rangeParsed), isFalse);
+      expect(rangeDep.constraint.isCaretEquivalentRange, isTrue);
+    });
   });
 
   // ---------------------------------------------------------------------------
   // shouldFlagMissingPublishToNone — prefer_publish_to_none's decision logic.
   // ---------------------------------------------------------------------------
   group('shouldFlagMissingPublishToNone', () {
-    test(
-      'flags a pubspec with no publish_to and no homepage/repository',
-      () {
-        const pubspec = '''
+    test('flags a pubspec with no publish_to and no homepage/repository', () {
+      const pubspec = '''
 name: my_app
 environment:
   sdk: ^3.6.0
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+    });
 
     test('does not flag a pubspec with publish_to: none', () {
       const pubspec = '''
@@ -1115,31 +1072,25 @@ publish_to: none
       expect(shouldFlagMissingPublishToNone(parsed), isFalse);
     });
 
-    test(
-      'does not flag a pubspec with publish_to set to a custom server',
-      () {
-        const pubspec = '''
+    test('does not flag a pubspec with publish_to set to a custom server', () {
+      const pubspec = '''
 name: my_package
 publish_to: https://custom.server
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(shouldFlagMissingPublishToNone(parsed), isFalse);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+    });
 
-    test(
-      'does not flag a pubspec with no publish_to but full publish metadata '
-      '(likely a library)',
-      () {
-        const pubspec = '''
+    test('does not flag a pubspec with no publish_to but full publish metadata '
+        '(likely a library)', () {
+      const pubspec = '''
 name: my_package
 homepage: https://example.com/my_package
 repository: https://github.com/example/my_package
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(shouldFlagMissingPublishToNone(parsed), isFalse);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+    });
 
     test(
       'flags a pubspec with homepage but no repository (incomplete metadata)',
@@ -1175,116 +1126,96 @@ publish_to: 'none'
       expect(shouldFlagMissingPublishToNone(parsed), isFalse);
     });
 
-    test(
-      'still flags when publish_to: is present but has no value (comment '
-      'only)',
-      () {
-        // Regression: the first non-whitespace character after `publish_to:`
-        // must not be `#` — a comment-only line is not a deliberate decision
-        // and must not silently suppress the lint.
-        const pubspec = '''
+    test('still flags when publish_to: is present but has no value (comment '
+        'only)', () {
+      // Regression: the first non-whitespace character after `publish_to:`
+      // must not be `#` — a comment-only line is not a deliberate decision
+      // and must not silently suppress the lint.
+      const pubspec = '''
 name: my_app
 publish_to: # decide later
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(parsed.hasPublishTo, isFalse);
-        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(parsed.hasPublishTo, isFalse);
+      expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+    });
 
-    test(
-      'treats an empty homepage field as absent and still flags',
-      () {
-        // `homepage:` with nothing (or only trailing whitespace) after the
-        // colon must not count as "has homepage".
-        const pubspec = '''
+    test('treats an empty homepage field as absent and still flags', () {
+      // `homepage:` with nothing (or only trailing whitespace) after the
+      // colon must not count as "has homepage".
+      const pubspec = '''
 name: my_package
 homepage:
 repository: https://github.com/example/my_package
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(parsed.hasHomepage, isFalse);
-        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(parsed.hasHomepage, isFalse);
+      expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+    });
 
-    test(
-      'treats a comment-only homepage field as absent and still flags',
-      () {
-        // `homepage: # TODO add homepage` has no real value, only a comment
-        // — must not count as "has homepage".
-        const pubspec = '''
+    test('treats a comment-only homepage field as absent and still flags', () {
+      // `homepage: # TODO add homepage` has no real value, only a comment
+      // — must not count as "has homepage".
+      const pubspec = '''
 name: my_package
 homepage: # TODO add homepage
 repository: https://github.com/example/my_package
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(parsed.hasHomepage, isFalse);
-        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(parsed.hasHomepage, isFalse);
+      expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+    });
 
-    test(
-      'treats an empty repository field as absent and still flags',
-      () {
-        const pubspec = '''
+    test('treats an empty repository field as absent and still flags', () {
+      const pubspec = '''
 name: my_package
 homepage: https://example.com/my_package
 repository:
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(parsed.hasRepository, isFalse);
-        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(parsed.hasRepository, isFalse);
+      expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+    });
 
-    test(
-      'a trailing comment after a real homepage/repository value still '
-      'counts as present',
-      () {
-        // A comment after a genuine URL value is normal YAML style and must
-        // not affect detection — only a comment with NO preceding value
-        // should be treated as absent.
-        const pubspec = '''
+    test('a trailing comment after a real homepage/repository value still '
+        'counts as present', () {
+      // A comment after a genuine URL value is normal YAML style and must
+      // not affect detection — only a comment with NO preceding value
+      // should be treated as absent.
+      const pubspec = '''
 name: my_package
 homepage: https://example.com/my_package # main site
 repository: https://github.com/example/my_package # source
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(parsed.hasHomepage, isTrue);
-        expect(parsed.hasRepository, isTrue);
-        expect(shouldFlagMissingPublishToNone(parsed), isFalse);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(parsed.hasHomepage, isTrue);
+      expect(parsed.hasRepository, isTrue);
+      expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+    });
 
-    test(
-      'a homepage/repository URL containing a # fragment still counts as '
-      'present',
-      () {
-        // `[^\s#]` only constrains the FIRST non-whitespace character after
-        // the colon — it must not be `#` (which would mean "no value, only
-        // a comment"). A URL's first character is always its scheme (`h` in
-        // `https://...`), so a `#fragment` or `#readme` anchor later in the
-        // same URL is unaffected: the regex has already matched by the time
-        // it reaches the `#`. Only a value that LITERALLY STARTS with `#`
-        // (i.e. no value at all, just a YAML comment) fails to match.
-        const pubspec = '''
+    test('a homepage/repository URL containing a # fragment still counts as '
+        'present', () {
+      // `[^\s#]` only constrains the FIRST non-whitespace character after
+      // the colon — it must not be `#` (which would mean "no value, only
+      // a comment"). A URL's first character is always its scheme (`h` in
+      // `https://...`), so a `#fragment` or `#readme` anchor later in the
+      // same URL is unaffected: the regex has already matched by the time
+      // it reaches the `#`. Only a value that LITERALLY STARTS with `#`
+      // (i.e. no value at all, just a YAML comment) fails to match.
+      const pubspec = '''
 name: my_package
 homepage: https://example.com/my_package#readme
 repository: https://github.com/example/my_package#readme
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(parsed.hasHomepage, isTrue);
-        expect(parsed.hasRepository, isTrue);
-        expect(shouldFlagMissingPublishToNone(parsed), isFalse);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(parsed.hasHomepage, isTrue);
+      expect(parsed.hasRepository, isTrue);
+      expect(shouldFlagMissingPublishToNone(parsed), isFalse);
+    });
 
-    test(
-      'a workspace root pubspec with no publish_to/homepage/repository is '
-      'still flagged (pub workspace roots also need publish_to: none)',
-      () {
-        const pubspec = '''
+    test('a workspace root pubspec with no publish_to/homepage/repository is '
+        'still flagged (pub workspace roots also need publish_to: none)', () {
+      const pubspec = '''
 name: my_workspace
 environment:
   sdk: ^3.6.0
@@ -1292,10 +1223,9 @@ workspace:
   - packages/a
   - packages/b
 ''';
-        final parsed = parsePubspecConstraints(pubspec);
-        expect(shouldFlagMissingPublishToNone(parsed), isTrue);
-      },
-    );
+      final parsed = parsePubspecConstraints(pubspec);
+      expect(shouldFlagMissingPublishToNone(parsed), isTrue);
+    });
   });
 
   // ---------------------------------------------------------------------------
@@ -1384,20 +1314,17 @@ environment:
       },
     );
 
-    test(
-      'is idempotent: returns null when publish_to: already exists '
-      '(guards against stale diagnostics / double-apply)',
-      () {
-        const pubspec = '''
+    test('is idempotent: returns null when publish_to: already exists '
+        '(guards against stale diagnostics / double-apply)', () {
+      const pubspec = '''
 name: my_app
 description: A little app.
 publish_to: none
 environment:
   sdk: ^3.6.0
 ''';
-        expect(computePublishToNoneInsertion(pubspec), isNull);
-      },
-    );
+      expect(computePublishToNoneInsertion(pubspec), isNull);
+    });
 
     test('returns null (no double-insert) for a non-none publish_to value', () {
       const pubspec = '''

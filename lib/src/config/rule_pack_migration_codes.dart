@@ -452,7 +452,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'use_setstate_synchronously',
   },
 
-  // flutter_skill_lints — 233 codes carried forward (no per-rule guide table; see plans/GAP_ANALYSIS.md).
+  // flutter_skill_lints — 234 codes carried forward (no per-rule guide table; see plans/GAP_ANALYSIS.md).
   'migrate_flutter_skill_lints': {
     'always_remove_listener',
     'avoid_accessing_collections_by_constant_index',
@@ -587,6 +587,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'avoid_unassigned_fields',
     'avoid_unassigned_late_fields',
     'avoid_unassigned_stream_subscriptions',
+    'avoid_unbounded_dependency',
     'avoid_uncaught_future_errors',
     'avoid_unconditional_break',
     'avoid_undisposed_instances',

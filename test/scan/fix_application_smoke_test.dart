@@ -154,10 +154,7 @@ void main() {
       const expectedMessage = 'Add publish_to: none to pubspec.yaml';
       expect(expectedId, equals('saropa.fix.preferPublishToNone'));
       expect(expectedPriority, equals(40));
-      expect(
-        expectedMessage,
-        equals('Add publish_to: none to pubspec.yaml'),
-      );
+      expect(expectedMessage, equals('Add publish_to: none to pubspec.yaml'));
     });
   });
 

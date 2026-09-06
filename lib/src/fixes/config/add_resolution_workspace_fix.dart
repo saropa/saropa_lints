@@ -81,15 +81,13 @@ class AddResolutionWorkspaceFix extends SaropaFixProducer {
       insertOffset = envMatch.end;
       final matchedText = content.substring(envMatch.start, envMatch.end);
       final needsNewline = !matchedText.endsWith('\n');
-      insertText =
-          '${needsNewline ? '\n' : ''}resolution: workspace\n';
+      insertText = '${needsNewline ? '\n' : ''}resolution: workspace\n';
     } else {
       // No environment: block found — append at end of file.
       insertOffset = content.length;
       // Ensure a blank line separator before the new key.
       final needsNewline = content.isNotEmpty && !content.endsWith('\n');
-      insertText =
-          '${needsNewline ? '\n' : ''}resolution: workspace\n';
+      insertText = '${needsNewline ? '\n' : ''}resolution: workspace\n';
     }
 
     // Insert the resolution: workspace line into pubspec.yaml.

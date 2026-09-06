@@ -1,7 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
-import 'dart:io'
-    show Directory, File, FileSystemEntity, FileSystemException;
+import 'dart:io' show Directory, File, FileSystemEntity, FileSystemException;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
@@ -620,13 +619,7 @@ class FlagMissingWorkspaceMemberRule extends SaropaLintRule {
     // Scan subdirectories (bounded depth) for pubspec.yaml files not listed.
     final rootDir = Directory(root);
     final missing = <String>[];
-    _scanForUnlistedPackages(
-      rootDir,
-      root,
-      normalizedMembers,
-      missing,
-      0,
-    );
+    _scanForUnlistedPackages(rootDir, root, normalizedMembers, missing, 0);
 
     if (missing.isEmpty) return;
 
@@ -817,9 +810,7 @@ class WorkspaceDependencyVersionSyncRule extends SaropaLintRule {
     // Delegate the actual comparison to the pure, unit-tested function —
     // I/O stays here, decision logic stays testable without a fake analyzer
     // context (see findDivergentDependencyConstraints doc for why).
-    final divergent = findDivergentDependencyConstraints(
-      memberPubspecContents,
-    );
+    final divergent = findDivergentDependencyConstraints(memberPubspecContents);
     if (divergent.isEmpty) return;
 
     // At least one dependency has conflicting constraints across members.
@@ -887,8 +878,7 @@ class WorkspaceMemberOrderRule extends SaropaLintRule {
         'merge conflicts when two branches add different members, and make it '
         'easy to scan for a specific package in a large monorepo. Reorder the '
         'workspace: entries alphabetically. {v1}',
-    correctionMessage:
-        'Sort the workspace: list entries alphabetically.',
+    correctionMessage: 'Sort the workspace: list entries alphabetically.',
     severity: DiagnosticSeverity.INFO,
   );
 
