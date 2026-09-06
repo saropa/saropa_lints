@@ -6,6 +6,7 @@
  */
 import * as assert from 'node:assert';
 import {
+  OPAQUE_PARAMS,
   skipStringLiteral,
   blankComments,
   extractParamsBlock,
@@ -141,6 +142,57 @@ describe('extractParamsBlock', () => {
     const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
     const result = extractParamsBlock(text, afterKey);
     assert.strictEqual(result, "{ msg: '{hello}' }");
+  });
+
+  it('returns OPAQUE_PARAMS for a variable reference', () => {
+    // l10n('key', params) — second arg is an identifier, not an object literal.
+    const text = "l10n('key', params)";
+    const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
+    assert.strictEqual(extractParamsBlock(text, afterKey), OPAQUE_PARAMS);
+  });
+
+  it('returns OPAQUE_PARAMS for a property access', () => {
+    // l10n('key', band.params) — second arg is a dotted expression.
+    const text = "l10n('key', band.params)";
+    const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
+    assert.strictEqual(extractParamsBlock(text, afterKey), OPAQUE_PARAMS);
+  });
+
+  it('returns OPAQUE_PARAMS for a function call', () => {
+    // l10n('key', getParams()) — second arg is a call expression.
+    const text = "l10n('key', getParams())";
+    const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
+    assert.strictEqual(extractParamsBlock(text, afterKey), OPAQUE_PARAMS);
+  });
+
+  it('returns OPAQUE_PARAMS for a ternary expression', () => {
+    // l10n('key', cond ? a : b) — second arg is a conditional expression.
+    const text = "l10n('key', cond ? paramsA : paramsB)";
+    const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
+    assert.strictEqual(extractParamsBlock(text, afterKey), OPAQUE_PARAMS);
+  });
+
+  it('returns undefined for undefined as second arg', () => {
+    // l10n('key', undefined) — functionally no params, not opaque.
+    const text = "l10n('key', undefined)";
+    const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
+    assert.strictEqual(extractParamsBlock(text, afterKey), undefined);
+  });
+
+  it('returns undefined for null as second arg', () => {
+    // l10n('key', null) — functionally no params, not opaque.
+    const text = "l10n('key', null)";
+    const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
+    assert.strictEqual(extractParamsBlock(text, afterKey), undefined);
+  });
+
+  it('returns OPAQUE_PARAMS for a spread-into-object expression', () => {
+    // l10n('key', { ...base, extra }) uses { so it should parse normally —
+    // but a bare spread variable like `...params` is still an inline object.
+    const text = "l10n('key', { ...base, extra })";
+    const afterKey = text.indexOf("'", text.indexOf("'") + 1) + 1;
+    // Starts with { so extractParamsBlock parses the inline object.
+    assert.strictEqual(extractParamsBlock(text, afterKey), '{ ...base, extra }');
   });
 });
 

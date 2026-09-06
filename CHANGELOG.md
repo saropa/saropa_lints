@@ -66,6 +66,26 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.6] — Unreleased
+
+Fixes a false-positive in the extension's l10n diagnostic provider and hardens the publish pipeline so CI-only test failures are caught locally before tagging. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.6/CHANGELOG.md)
+
+### Fixed
+
+- Fixed the l10n diagnostic provider (`saropa-l10n`) reporting false-positive "expects params but none passed" warnings when `l10n()` receives its params via a variable or expression instead of an inline object literal. The parser now recognizes non-literal second arguments and skips static key extraction for them. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Added missing `usesTypeResolution` override to `AvoidCaseSensitivePathComparisonRule` (uses `staticType`).
+- Added 4 missing codes to the `flutter_skill_lints` migration pack that moved from TODO/PARTIAL to HAVE.
+- Publish script: `create_git_tag` now prompts before moving a stale remote tag to HEAD on retry instead of hard-failing.
+- Publish script: `_find_workflow_run` skips already-failed runs so retry doesn't re-attach to old workflows.
+- Publish script: delta test pass now includes integrity and config test suites when rule/config files change, catching cross-cutting failures locally instead of deferring to CI.
+
+</details>
+
+---
+
 ## [16.0.0-beta.5]
 
 Hardens memory safety, scan lifecycle, and process hygiene across the extension and CLI. Memory pressure detection now attributes usage to the plugin rather than the entire analysis server, preventing false pauses on large projects. Scan on save gains a configurable timeout, diff-view support, and correct cancellation so stalled scans no longer disable the feature for the session. Fixes false positives in timer-lifecycle and manifest rules, and adds orphaned-process detection at startup. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.5/CHANGELOG.md)

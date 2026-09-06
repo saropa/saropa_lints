@@ -14,6 +14,7 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
+  OPAQUE_PARAMS,
   blankComments,
   extractParamsBlock,
   extractTopLevelKeys,
@@ -156,7 +157,10 @@ function validateDocument(doc: vscode.TextDocument): void {
       continue;
     }
 
-    if (!paramsBlock) continue;
+    // Non-literal expression passed (variable, property access, call) —
+    // can't statically extract keys without scope-aware resolution, so
+    // skip the param check to avoid false positives.
+    if (!paramsBlock || paramsBlock === OPAQUE_PARAMS) continue;
 
     const supplied = extractTopLevelKeys(paramsBlock);
     const missingParams = [...expectedParams].filter(p => !supplied.has(p));

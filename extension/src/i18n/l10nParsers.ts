@@ -121,8 +121,19 @@ export function blankComments(text: string): string {
 }
 
 /**
+ * Sentinel returned when the second l10n() argument is a variable or
+ * expression rather than an inline object literal. The diagnostic
+ * code can't statically extract keys from it, so it skips the check.
+ */
+export const OPAQUE_PARAMS = '__opaque__';
+
+/**
  * Extract a balanced { ... } block starting at position `start`,
  * handling nested braces and string literals.
+ *
+ * Returns the literal block text for inline objects, OPAQUE_PARAMS
+ * when a non-literal expression is passed (variable, property access,
+ * function call), or undefined when no second argument exists.
  */
 export function extractParamsBlock(text: string, start: number): string | undefined {
   let i = start;
@@ -132,15 +143,36 @@ export function extractParamsBlock(text: string, start: number): string | undefi
   if (i >= n || text[i] !== ',') return undefined;
   i++;
   while (i < n && /\s/.test(text[i])) i++;
+  // `undefined` or `null` as the second arg is functionally "no params."
+  if (i < n && /[a-zA-Z_$]/.test(text[i])) {
+    const wordStart = i;
+    while (i < n && /[\w$]/.test(text[i])) i++;
+    const word = text.slice(wordStart, i);
+    if (word === 'undefined' || word === 'null') return undefined;
+    // Any other identifier/expression — params ARE being passed but
+    // we can't statically extract keys without scope-aware resolution.
+    return OPAQUE_PARAMS;
+  }
   if (i >= n || text[i] !== '{') return undefined;
 
+  return extractBalancedBrace(text, i);
+}
+
+/**
+ * Extract a balanced { ... } block starting at position `pos` (which
+ * must point at `{`). Handles nested braces and string literals.
+ * Returns the slice from `{` through closing `}`, or undefined.
+ */
+export function extractBalancedBrace(text: string, pos: number): string | undefined {
+  if (pos >= text.length || text[pos] !== '{') return undefined;
   let depth = 0;
-  const objStart = i;
+  let i = pos;
+  const n = text.length;
   while (i < n) {
     const c = text[i];
     if (c === "'" || c === '"' || c === '`') { i = skipStringLiteral(text, i); continue; }
-    if (c === '{') { depth++; }
-    else if (c === '}') { depth--; if (depth === 0) return text.slice(objStart, i + 1); }
+    if (c === '{') depth++;
+    else if (c === '}') { depth--; if (depth === 0) return text.slice(pos, i + 1); }
     i++;
   }
   return undefined;
