@@ -246,20 +246,17 @@ void f(String pathologyReport, String empathyNote) {
     // False-positive guards: "uri" embedded in unrelated words must NOT
     // trigger the import-URI suppression and then bypass the path check.
 
-    test(
-      'does NOT fire when "uri" is embedded in an unrelated word',
-      () async {
-        // "security" and "mercurial" both contain "uri" as a substring
-        // but not at a camelCase word boundary — rule should ignore them,
-        // and since neither looks like a path variable either, no diagnostic.
-        await assertFixtureMarkers(rule, '''
+    test('does NOT fire when "uri" is embedded in an unrelated word', () async {
+      // "security" and "mercurial" both contain "uri" as a substring
+      // but not at a camelCase word boundary — rule should ignore them,
+      // and since neither looks like a path variable either, no diagnostic.
+      await assertFixtureMarkers(rule, '''
 void f(String securityLevel, String mercurialBuild) {
   // LINT_NOT: avoid_case_sensitive_path_comparison
   if (securityLevel == mercurialBuild) {}
 }
 ''');
-      },
-    );
+    });
 
     test(
       'does NOT suppress a path comparison when "uri" is embedded in operand',
@@ -290,18 +287,15 @@ void f(String file_path, String other) {
 ''');
     });
 
-    test(
-      'does NOT fire on snake_case URI variables (named_uri)',
-      () async {
-        // "named_uri" has "uri" after an underscore — detected as a URI
-        // variable, so the import-URI suppression should apply.
-        await assertFixtureMarkers(rule, '''
+    test('does NOT fire on snake_case URI variables (named_uri)', () async {
+      // "named_uri" has "uri" after an underscore — detected as a URI
+      // variable, so the import-URI suppression should apply.
+      await assertFixtureMarkers(rule, '''
 void f(String named_uri, String other_uri) {
   // LINT_NOT: avoid_case_sensitive_path_comparison
   if (named_uri == other_uri) {}
 }
 ''');
-      },
-    );
+    });
   });
 }

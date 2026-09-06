@@ -45,5 +45,6 @@ export 'src/scan/stale_ignore_detector.dart'
         StaleIgnore,
         StaleIgnoreFixResult,
         detectStaleIgnores,
+        filterIgnoredDiagnostics,
         fixStaleIgnores,
         staleIgnoresToJsonString;

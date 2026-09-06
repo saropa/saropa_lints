@@ -6,6 +6,23 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [15.2.8]
+
+Rule shedding under memory pressure is now cost-aware — expensive rules that drive the most memory consumption are shed first, keeping cheap syntactic rules running longer. The Config Dashboard surfaces which rules are currently shed and why, and the status bar tooltip shows shed category breakdowns. [log](https://github.com/saropa/saropa_lints/blob/v15.2.8/CHANGELOG.md)
+
+### Added
+
+- Config Dashboard now shows a "Shed rules" section when memory pressure is active — lists every temporarily disabled rule grouped by shed category (type-resolving, high-cost, INFO, WARNING) with clickable links to each rule's explanation.
+- Shed rules are marked with a "shed" badge inside expanded pack rows so you can see at a glance which rules in a pack are temporarily inactive.
+- "Restart analyzer" button in the shed section clears memory pressure by restarting the analysis server — shed rules restore automatically when RSS resets. No action required.
+
+### Changed
+
+- Cost-aware rule shedding: memory pressure now sheds type-resolving and high-cost rules first (level 1), then INFO-severity (level 2), then WARNING-severity (level 3). No action required.
+- Status bar tooltip shows shed rule breakdown by category (type-resolving, high-cost, INFO, WARNING) when shedding is active. No action required.
+
+---
+
 ## [15.2.7]
 
 Adds graduated rule shedding under memory pressure — the analyzer plugin now progressively disables low-severity rules when RSS approaches its cap, keeping essential rules running. The VS Code extension surfaces shedding state in the status bar and tooltip. Also includes publish script hardening. [log](https://github.com/saropa/saropa_lints/blob/v15.2.7/CHANGELOG.md)

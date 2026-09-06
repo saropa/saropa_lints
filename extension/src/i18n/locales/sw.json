@@ -708,7 +708,7 @@
       "killOrphans": "Kifungu Ya Flutter Ya Daemons Ya Kifungu"
     },
     "orphanPreflight": {
-      "found": "{count} orphaned model host process(es) from an earlier session are holding {size} of committed memory.",
+      "found": "Mchakato (michakato) {count} ya mwenyeji wa modeli yatima kutoka kipindi kilichopita yanashikilia {size} ya kumbukumbu iliyotengwa.",
       "reclaimAction": "Kupungua Moyo",
       "detailsAction": "Tazama Detalile",
       "none": "Hakuna kipengele ya host ya model ya kihubu.",

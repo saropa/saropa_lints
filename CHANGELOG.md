@@ -66,7 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.5] — Unreleased
+## [16.0.0-beta.5]
+
+Hardens memory safety, scan lifecycle, and process hygiene across the extension and CLI. Memory pressure detection now attributes usage to the plugin rather than the entire analysis server, preventing false pauses on large projects. Scan on save gains a configurable timeout, diff-view support, and correct cancellation so stalled scans no longer disable the feature for the session. Fixes false positives in timer-lifecycle and manifest rules, and adds orphaned-process detection at startup. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.5/CHANGELOG.md)
 
 ### Added
 

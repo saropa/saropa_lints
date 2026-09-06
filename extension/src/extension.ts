@@ -2520,6 +2520,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.scanOnSave.diagnose', () => {
       scanOnSaveController.diagnose();
     }),
+    // Clear stale scan-on-save diagnostics and rescan open editors. Called
+    // internally after operations that restart the analysis server, so
+    // the scan-on-save channel (independent of the server) stays in sync.
+    vscode.commands.registerCommand('saropaLints.scanOnSave.clearAndRescan', () => {
+      scanOnSaveController.clearAndRescan();
+    }),
     vscode.commands.registerCommand('saropaLints.showRelatedRuleTelemetry', () => {
       showRelatedRuleTelemetryPanel(relatedRuleTelemetry);
     }),

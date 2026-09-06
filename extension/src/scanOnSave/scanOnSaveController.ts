@@ -408,6 +408,19 @@ export class ScanOnSaveController implements vscode.Disposable {
     ch.show(true);
   }
 
+  /**
+   * Clears all scan-on-save diagnostics and rescans open editors.
+   * Call after "Restart Analysis Server" or any event that invalidates
+   * the in-process plugin's diagnostics, so the scan-on-save channel
+   * (which is independent of the analysis server) stays in sync.
+   */
+  clearAndRescan(): void {
+    this._collection.clear();
+    this._lastDiagnosticsByFile.clear();
+    this._log('clearAndRescan: diagnostics cleared, rescanning open editors');
+    this._scanOpenEditors();
+  }
+
   constructor(
     private readonly _collection: vscode.DiagnosticCollection,
     private readonly _getProjectRoot: () => string | undefined,

@@ -1712,6 +1712,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} folder(s)": "folda {count}",
         "{count} function": "chaguo la kukokotoa {count}",
         "{count} functions": "chaguo za kukokotoa {count}",
+        # Manual: MT left this English — orphan-preflight banner string.
+        "{count} orphaned model host process(es) from an earlier session are holding {size} of committed memory.": "Mchakato (michakato) {count} ya mwenyeji wa modeli yatima kutoka kipindi kilichopita yanashikilia {size} ya kumbukumbu iliyotengwa.",
         "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.": "lango {count} linaloshindwa — kagua viwango, au nakili JSON ili kukagua gates.violations.",
         "{count} gates failing — review thresholds, or copy the JSON to inspect gates.violations.": "malango {count} yanayoshindwa — kagua viwango, au nakili JSON ili kukagua gates.violations.",
         "{count} impact hide(s)": "athari {count} zilizofichwa",

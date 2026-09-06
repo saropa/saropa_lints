@@ -243,13 +243,19 @@ Future<void> _handleScanRequest(
       );
       return;
     }
+    // Honor // ignore: and // ignore_for_file: directives so the Problems
+    // panel does not show diagnostics the user explicitly suppressed.
+    final effective = filterIgnoredDiagnostics(
+      diagnostics: diagnostics,
+      files: files,
+    );
     stderr.writeln(
       '[scan_daemon] Scanned ${files.length} file(s) in '
       '${(sw.elapsedMilliseconds / 1000).toStringAsFixed(2)}s '
-      '(${diagnostics.length} diagnostic(s), '
+      '(${effective.length} diagnostic(s), '
       'RSS ${_currentRssMb() ?? '?'} MB).',
     );
-    final payload = scanDiagnosticsToJson(diagnostics);
+    final payload = scanDiagnosticsToJson(effective);
     stdout.writeln(jsonEncode({'id': id, 'ok': true, ...payload}));
   } on Object catch (e, st) {
     stderr.writeln('[scan_daemon] Scan failed: $e\n$st');

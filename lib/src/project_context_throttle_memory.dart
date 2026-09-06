@@ -1204,7 +1204,63 @@ class MemoryPressureHandler {
   /// How long a latched attribution decision is trusted before it is
   /// re-evaluated. Matched to [_memoryLogInterval] so the bystander path costs
   /// no more estimate walks than the periodic trend log already performs.
+  /// This is the BASE cadence — see [_currentRecheckInterval] for the widened
+  /// value actually used once the valve starts oscillating (Fix 1).
   static const Duration _attributionRecheckInterval = _memoryLogInterval;
+
+  /// Ceiling for the exponential backoff below. Without a cap, a valve stuck
+  /// oscillating for hours would grow its recheck interval without bound —
+  /// 5 minutes is slow enough to stop the clear/resume thrash while still
+  /// re-evaluating often enough to notice a genuine recovery.
+  static const Duration _maxAttributionRecheckInterval = Duration(minutes: 5);
+
+  /// Consecutive hard-limit trips that were NOT followed by a genuine RSS
+  /// drop (i.e. every release since the last genuine one was the attribution
+  /// "plugin is a bystander" kind). Drives the exponential widening of
+  /// [_currentRecheckInterval]. Reset by [_resetTripBackoff].
+  static int _consecutiveTrips = 0;
+
+  /// Recheck/dwell interval actually used by the trip and release attribution
+  /// checks. Starts at [_attributionRecheckInterval] (30s) and doubles on
+  /// each consecutive forced-clear trip via [_widenTripBackoff], up to
+  /// [_maxAttributionRecheckInterval].
+  ///
+  /// Fix 1 (30s trip/release oscillation): without this, a plugin correctly
+  /// judged a bystander at 30s still gets its caches nuked by the NEXT trip
+  /// 30s later, because relieving on the trip path forces the caches back to
+  /// empty, letting them "regrow" just enough over one interval to look
+  /// significant again — trip, relieve, release, repeat, forever. Widening
+  /// the interval after each unresolved cycle spaces out the forced clears
+  /// until either memory genuinely recovers (reset to 30s) or the interval
+  /// caps out at 5 minutes, which is a tolerable steady-state cost.
+  static Duration _currentRecheckInterval = _attributionRecheckInterval;
+
+  /// Double the recheck interval after a trip that was not preceded by a
+  /// genuine release, up to the cap. Called from [_tripHardLimit].
+  static void _widenTripBackoff() {
+    _consecutiveTrips++;
+    final doubled = _currentRecheckInterval * 2;
+    _currentRecheckInterval = doubled > _maxAttributionRecheckInterval
+        ? _maxAttributionRecheckInterval
+        : doubled;
+  }
+
+  /// Reset the backoff to its base cadence. Called when memory genuinely
+  /// drops below the hard cap on its own (not merely because a forced clear
+  /// briefly emptied the plugin's own caches) and when a fresh excursion
+  /// above the cap begins from a clean, never-tripped state.
+  static void _resetTripBackoff() {
+    _consecutiveTrips = 0;
+    _currentRecheckInterval = _attributionRecheckInterval;
+  }
+
+  /// Test-only read of the consecutive-trip counter. See [_consecutiveTrips].
+  static int get consecutiveTripsForTesting => _consecutiveTrips;
+
+  /// Test-only read of the current backoff-widened recheck interval. See
+  /// [_currentRecheckInterval].
+  static Duration get currentRecheckIntervalForTesting =>
+      _currentRecheckInterval;
 
   /// Number of times [_estimateMemoryUsageMb] has walked the caches. Test-only
   /// observability: the bystander latch is a performance fix, and the only way
@@ -1271,6 +1327,10 @@ class MemoryPressureHandler {
     _cachedTotalPhysicalMemoryMb = null;
     _totalPhysicalMemoryProbeCount = 0;
     _forcePhysicalMemoryProbeFailure = forceFailure;
+    // D5 fix: also reset the fallback-cap log-once guard so a test that
+    // exercises the fallback path doesn't leave it permanently silenced for
+    // every later test in the same process.
+    _loggedAdaptiveCapFallback = false;
   }
 
   /// Resets the periodic memory-log cooldown so the next [refreshForTesting]
@@ -1317,6 +1377,10 @@ class MemoryPressureHandler {
     _attributionBystander = false;
     _lastAttributionCheckAt = null;
     _estimateCallCount = 0;
+    // Fix 1 backoff state must reset too, otherwise a widened interval
+    // latched by one test's simulated oscillation would suppress the next
+    // test's attribution checks for up to 5 minutes of simulated time.
+    _resetTripBackoff();
   }
 
   /// Whether the process RSS is currently over the hard cap, meaning rule
@@ -1353,7 +1417,17 @@ class MemoryPressureHandler {
     // One clock reading is shared by the trend log and both attribution
     // re-check timers below, so a single sample cannot straddle two instants.
     final now = DateTime.now();
-    _maybeLogMemoryTrend(rss, now);
+
+    // D2 fix: the trend log and the attribution decision below each used to
+    // call _estimateMemoryUsageMb() independently, so a sample where both
+    // timers land together walked every cache twice. Memoize the walk for
+    // the lifetime of this single refresh call and hand out the cached
+    // value via this closure — at most one walk per call, regardless of how
+    // many of the call sites below actually need the number.
+    int? sharedEstimateMb;
+    int estimateMb() => sharedEstimateMb ??= _estimateMemoryUsageMb();
+
+    _maybeLogMemoryTrend(rss, now, estimateMb);
 
     // ── Soft limit: graduated rule shedding ──
     _refreshSoftLimit(rss);
@@ -1366,9 +1440,9 @@ class MemoryPressureHandler {
     // the analysis server and therefore never falls. Rules would stay paused
     // for the rest of the session.
     if (!_hardLimitTripped && rss >= _hardLimitMb) {
-      _evaluateHardTrip(rss, now);
+      _evaluateHardTrip(rss, now, estimateMb);
     } else if (_hardLimitTripped) {
-      _evaluateHardRelease(rss, now);
+      _evaluateHardRelease(rss, now, estimateMb);
     } else {
       // RSS is below the cap and the valve is open — reset the per-excursion
       // log guard and the bystander latch so the next crossing is evaluated
@@ -1376,6 +1450,11 @@ class MemoryPressureHandler {
       _loggedAttributionSkip = false;
       _attributionBystander = false;
       _lastAttributionCheckAt = null;
+      // Fix 1: a clean excursion (valve currently open, RSS below cap) means
+      // any prior oscillation has genuinely ended — start the next crossing
+      // at the base 30s cadence rather than inheriting a widened interval
+      // from a completely unrelated earlier excursion.
+      _resetTripBackoff();
     }
   }
 
@@ -1385,7 +1464,15 @@ class MemoryPressureHandler {
   /// so there is no second polling loop. Gated on wall clock rather than
   /// refresh count, because refresh frequency depends on how busy the analysis
   /// server is — a busy pass would otherwise flood the log.
-  static void _maybeLogMemoryTrend(int rss, DateTime now) {
+  ///
+  /// [estimateMb] is the memoized per-refresh-call estimator from
+  /// [_refreshHardLimit] (D2 fix) — calling it here does not force a second
+  /// cache walk when the attribution check below also needs the number.
+  static void _maybeLogMemoryTrend(
+    int rss,
+    DateTime now,
+    int Function() estimateMb,
+  ) {
     final lastLog = _lastMemoryLogAt;
     if (lastLog != null && now.difference(lastLog) < _memoryLogInterval) {
       return;
@@ -1395,7 +1482,7 @@ class MemoryPressureHandler {
     // Include shed level and plugin estimate so post-crash diagnosis shows
     // attribution and shedding state, not just a bare RSS number.
     final shedInfo = _shedLevel > 0 ? ' shed=$_shedLevel' : '';
-    final pluginEst = _estimateMemoryUsageMb();
+    final pluginEst = estimateMb();
     PluginLogger.log(
       '[memory] RSS ${rss}MB (cap ${_hardLimitMb}MB, '
       'soft ${_softLimitMb}MB, plugin ~${pluginEst}MB$shedInfo)',
@@ -1425,34 +1512,42 @@ class MemoryPressureHandler {
   ///
   /// Called only while the valve is open and RSS is at or above the cap.
   /// [now] is the sample's wall clock, threaded in so the coarse re-check
-  /// timer shares one clock reading with the trend log above.
-  static void _evaluateHardTrip(int rss, DateTime now) {
+  /// timer shares one clock reading with the trend log above. [estimateMb]
+  /// is the memoized per-refresh estimator (D2 fix) shared with the trend log.
+  static void _evaluateHardTrip(
+    int rss,
+    DateTime now,
+    int Function() estimateMb,
+  ) {
     // Panic is an RSS-only test and must never sit behind the attribution
     // latch: at 90% of system RAM the OS is about to kill the process, so any
     // shedding beats an OOM. Evaluated before the latch short-circuit.
     if (_panicRssLimitMb > 0 && rss >= _panicRssLimitMb) {
       // -1 marks "no estimate was taken" — the panic path deliberately skips
       // the cache walk, because the decision does not depend on it.
-      _tripHardLimit(rss, -1, true);
+      _tripHardLimit(rss, -1, now);
       return;
     }
 
     // Bystander latch: skip the expensive cache walk while a recent decision
     // still stands. Without this the walk repeats on every sample for as long
-    // as the server sits above the cap (see [_attributionBystander]).
+    // as the server sits above the cap (see [_attributionBystander]). Uses
+    // the backoff-widened interval (Fix 1) rather than the fixed base, so a
+    // persistent oscillation spaces its cache walks and forced clears out
+    // instead of repeating every 30s forever.
     final lastCheck = _lastAttributionCheckAt;
     if (_attributionBystander &&
         lastCheck != null &&
-        now.difference(lastCheck) < _attributionRecheckInterval) {
+        now.difference(lastCheck) < _currentRecheckInterval) {
       return;
     }
 
-    final pluginMb = _estimateMemoryUsageMb();
+    final pluginMb = estimateMb();
     _lastAttributionCheckAt = now;
 
     if (_isPluginSignificant(rss, pluginMb)) {
       _attributionBystander = false;
-      _tripHardLimit(rss, pluginMb, false);
+      _tripHardLimit(rss, pluginMb, now);
       return;
     }
 
@@ -1472,9 +1567,15 @@ class MemoryPressureHandler {
   }
 
   /// Pause rule execution and clear every cache. [pluginMb] is the estimate
-  /// that justified the trip (-1 when the panic threshold fired without one);
-  /// [isPanic] selects the reported reason.
-  static void _tripHardLimit(int rss, int pluginMb, bool isPanic) {
+  /// that justified the trip (-1 when the panic threshold fired without one,
+  /// which also identifies the panic reason below — no separate bool needed
+  /// to stay within the 3-parameter limit). [now] is the sample's wall clock,
+  /// threaded through from [_evaluateHardTrip] (D4 fix) rather than read
+  /// again here — a fresh `DateTime.now()` call would violate the
+  /// one-clock-reading-per-sample invariant the rest of this valve relies on
+  /// (see the comment in [_refreshHardLimit]).
+  static void _tripHardLimit(int rss, int pluginMb, DateTime now) {
+    final isPanic = pluginMb < 0;
     _hardLimitTripped = true;
     relieve(clearAll: true);
     // Start the release-path re-check timer here so the attribution release
@@ -1483,7 +1584,12 @@ class MemoryPressureHandler {
     // resume, producing a clear/resume thrash every 200 rule callbacks. One
     // re-check interval of dwell lets the caches regrow enough for the release
     // decision to be based on the plugin's real steady-state footprint.
-    _lastAttributionCheckAt = DateTime.now();
+    _lastAttributionCheckAt = now;
+    // Fix 1: every forced-clear trip counts toward the backoff unless it was
+    // preceded by a genuine release (which already reset the counter in
+    // _evaluateHardRelease/_refreshHardLimit) — widening here is what turns a
+    // repeating 30s trip/relieve/release cycle into a spaced-out one.
+    _widenTripBackoff();
     final reason = isPanic
         ? 'OOM panic threshold (${_panicRssLimitMb}MB)'
         : 'plugin footprint ${pluginMb}MB';
@@ -1495,8 +1601,13 @@ class MemoryPressureHandler {
   }
 
   /// Decide whether a tripped valve should re-open. Called only while the
-  /// valve is closed. [now] is the sample's wall clock.
-  static void _evaluateHardRelease(int rss, DateTime now) {
+  /// valve is closed. [now] is the sample's wall clock. [estimateMb] is the
+  /// memoized per-refresh estimator (D2 fix) shared with the trend log.
+  static void _evaluateHardRelease(
+    int rss,
+    DateTime now,
+    int Function() estimateMb,
+  ) {
     // Panic overrides every release route: while RSS is at 90% of system RAM
     // the process stays paused no matter who allocated the memory.
     if (_panicRssLimitMb > 0 && rss >= _panicRssLimitMb) return;
@@ -1505,20 +1616,26 @@ class MemoryPressureHandler {
     // band, so the pressure that justified the trip is genuinely gone.
     if (rss < _hardLimitMb - _rssRecoveryMarginMb) {
       _releaseHardLimit('RSS ${rss}MB');
+      // Fix 1: this is a GENUINE release — memory actually dropped on its
+      // own, not merely because a forced clear made the plugin look like a
+      // bystander. Reset the backoff so the next excursion (if any) starts
+      // fresh at the 30s base cadence instead of inheriting a widened one.
+      _resetTripBackoff();
       return;
     }
 
     // Attribution release: RSS is still high, but if it is not the plugin's
     // memory then keeping rules paused buys nothing and costs the user every
     // diagnostic. A paused plugin is silent, so when the evidence no longer
-    // implicates the plugin we resume. Re-checked on the same coarse timer the
-    // bystander latch uses so this path does not walk the caches per sample.
+    // implicates the plugin we resume. Re-checked on the backoff-widened
+    // timer (Fix 1) rather than the fixed base, so this path does not walk
+    // the caches — or force another clear via the next trip — every 30s.
     final lastCheck = _lastAttributionCheckAt;
     if (lastCheck != null &&
-        now.difference(lastCheck) < _attributionRecheckInterval) {
+        now.difference(lastCheck) < _currentRecheckInterval) {
       return;
     }
-    final pluginMb = _estimateMemoryUsageMb();
+    final pluginMb = estimateMb();
     _lastAttributionCheckAt = now;
     if (_isPluginSignificant(rss, pluginMb)) return;
 
@@ -1528,7 +1645,9 @@ class MemoryPressureHandler {
     );
     // RSS is still over the cap, so the next sample re-enters the trip path.
     // Pre-latch the bystander decision we just made so that sample reuses it
-    // instead of paying for another cache walk.
+    // instead of paying for another cache walk. Deliberately does NOT reset
+    // the backoff — this is an attribution release, not a genuine one, so the
+    // oscillation this fix targets is still in play.
     _attributionBystander = true;
     _lastAttributionCheckAt = now;
   }
@@ -2019,8 +2138,7 @@ class MemoryPressureHandler {
       if (bytes > 0) lines.add('  $name: ${bytes ~/ 1024}KB');
     }
 
-    add('FileContentCache.hashes',
-        FileContentCache._contentHashes.length * 64);
+    add('FileContentCache.hashes', FileContentCache._contentHashes.length * 64);
     var passedBytes = 0;
     for (final ruleSet in FileContentCache._passedRules.values) {
       passedBytes += ruleSet.length * 48;
@@ -2045,8 +2163,10 @@ class MemoryPressureHandler {
       diffBytes += content.length * 2;
     }
     add('DiffBasedAnalysis', diffBytes);
-    add('IncrementalAnalysisTracker',
-        IncrementalAnalysisTracker._state.length * 256);
+    add(
+      'IncrementalAnalysisTracker',
+      IncrementalAnalysisTracker._state.length * 256,
+    );
     add('ParallelAnalyzer', ParallelAnalyzer._resultCache.length * 512);
     var profilerBytes = 0;
     for (final durations in HotPathProfiler._measurements.values) {
@@ -2121,7 +2241,22 @@ int _computeAdaptiveRssCap(int fallbackMb, {int ramMb = -1}) {
   // expensive one, so leaving it uncached defeated the stated purpose of the
   // pre-detection parameter entirely.
   final ram = ramMb > 0 ? ramMb : _totalPhysicalMemoryMb();
-  if (ram < 4096) return fallbackMb;
+  if (ram < 4096) {
+    // D5 fix: the fallback used to activate silently. A cached probe failure
+    // (see [_cachedTotalPhysicalMemoryMb]) makes this branch permanent for
+    // the rest of the process, so a reader diagnosing "why is the cap always
+    // ${fallbackMb}MB regardless of machine size" needs one line saying the
+    // fallback is in force, logged once rather than on every call.
+    if (!_loggedAdaptiveCapFallback) {
+      _loggedAdaptiveCapFallback = true;
+      PluginLogger.log(
+        '[memory] Physical RAM undetectable or implausibly small '
+        '(probed ${ram}MB) — using fixed fallback RSS cap of '
+        '${fallbackMb}MB instead of an adaptive cap.',
+      );
+    }
+    return fallbackMb;
+  }
 
   // 60% of physical RAM: the analysis server shares memory with the IDE,
   // OS, browser, and other dev tools. 60% is aggressive enough to protect
@@ -2136,6 +2271,13 @@ int _computeAdaptiveRssCap(int fallbackMb, {int ramMb = -1}) {
   return adaptive.clamp(2048, 8192);
 }
 
+/// True once the "using fallback RSS cap" message (D5 fix) has been logged.
+/// The failure that triggers the fallback is cached permanently (see
+/// [_cachedTotalPhysicalMemoryMb]), so without this flag every later call to
+/// [_computeAdaptiveRssCap] during the process lifetime would repeat the
+/// same line.
+bool _loggedAdaptiveCapFallback = false;
+
 /// Memoized result of [_probeTotalPhysicalMemoryMb]. Null means "not probed
 /// yet"; -1 is a cached *failure*, which is deliberately as terminal as a
 /// cached success. Physical RAM does not change while the process runs, and a
@@ -2149,9 +2291,35 @@ int? _cachedTotalPhysicalMemoryMb;
 /// to pin that is to count the spawns.
 int _totalPhysicalMemoryProbeCount = 0;
 
-/// Test-only switch that makes the probe report failure without touching the
-/// platform, so the cached-failure path can be exercised on a machine where
-/// detection would otherwise succeed.
+/// Detects whether Dart assertions are enabled (i.e. a debug/test run, never
+/// a release build), via the classic assert-side-effect trick: the
+/// assignment inside `assert()` only executes when `--enable-asserts` is
+/// active. Called once to compute [_assertionsEnabledForProbeTest] below.
+bool _computeAssertionsEnabled() {
+  var enabled = false;
+  assert(() {
+    enabled = true;
+    return true;
+  }());
+  return enabled;
+}
+
+/// True only when Dart assertions are enabled. Guards
+/// [_forcePhysicalMemoryProbeFailure] so that flag stays inert in every
+/// release binary — `dart test` runs with assertions on, a shipped release
+/// build never does.
+final bool _assertionsEnabledForProbeTest = _computeAssertionsEnabled();
+
+/// D3 fix: test-only switch that makes the probe report failure without
+/// touching the platform, so the cached-failure path can be exercised on a
+/// machine where detection would otherwise succeed. This is mutable
+/// (tests need to flip it) and top-level (tests outside this library need to
+/// reach it via [resetPhysicalMemoryProbeForTesting]), which made it a stray
+/// production knob — a bug or malicious change could set it `true` outside a
+/// test and silently force every physical-RAM probe to fail. Guarded by
+/// [_assertionsEnabledForProbeTest] in [_probeTotalPhysicalMemoryMb] below so
+/// the flag is inert unless assertions are on, which is true for `dart test`
+/// but never for a shipped release build.
 bool _forcePhysicalMemoryProbeFailure = false;
 
 /// Detect total physical memory in MB, or -1 if unavailable. Memoized.
@@ -2177,7 +2345,11 @@ int _probeTotalPhysicalMemoryMb() {
   // Counted before the early returns so a suppressed probe is still recorded
   // as an attempt — the test asserts the number of attempts, not of spawns.
   _totalPhysicalMemoryProbeCount++;
-  if (_forcePhysicalMemoryProbeFailure) return -1;
+  // D3 fix: only honor the forced-failure test switch when assertions are
+  // enabled, so a stray `true` value can never affect a release build.
+  if (_forcePhysicalMemoryProbeFailure && _assertionsEnabledForProbeTest) {
+    return -1;
+  }
   try {
     if (Platform.isWindows) {
       // Try PowerShell CIM first — wmic is deprecated since Windows 10 21H1

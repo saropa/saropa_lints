@@ -1063,6 +1063,15 @@ async function restartDartAnalysisServer(): Promise<void> {
   } catch {
     // Dart extension not installed/active — nothing to restart.
   }
+  // The scan-on-save diagnostic channel is independent of the Dart analysis
+  // server — its DiagnosticCollection survives a server restart, leaving
+  // stale squiggles in the Problems panel. Clear it and rescan so the two
+  // channels stay in sync after any restart.
+  try {
+    await vscode.commands.executeCommand('saropaLints.scanOnSave.clearAndRescan');
+  } catch {
+    // Command not yet registered (extension still activating) — harmless.
+  }
 }
 
 export async function runDisable(context: vscode.ExtensionContext): Promise<void> {

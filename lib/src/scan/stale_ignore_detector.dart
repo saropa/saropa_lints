@@ -418,8 +418,7 @@ int _pruneStaleRules(
 
 /// Matches `// ignore_for_file:` directives. Captures the rule list after
 /// the colon for extraction via [_extractRuleNames].
-final RegExp _ignoreForFilePattern =
-    RegExp(r'//\s*ignore_for_file\s*:\s*(.+)');
+final RegExp _ignoreForFilePattern = RegExp(r'//\s*ignore_for_file\s*:\s*(.+)');
 
 /// Removes diagnostics that are suppressed by `// ignore:` or
 /// `// ignore_for_file:` directives in the source files.
@@ -479,9 +478,7 @@ List<ScanDiagnostic> filterIgnoredDiagnostics({
       final ruleNames = _extractRuleNames(match.group(1)!);
       for (final name in ruleNames) {
         if (allSaropaRuleNames.contains(name)) {
-          fileIgnores
-              .putIfAbsent(normalizedPath, () => <String>{})
-              .add(name);
+          fileIgnores.putIfAbsent(normalizedPath, () => <String>{}).add(name);
         }
       }
     }

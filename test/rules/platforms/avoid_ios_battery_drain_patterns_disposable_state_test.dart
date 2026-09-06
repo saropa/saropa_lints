@@ -82,13 +82,14 @@ class _S extends State<W> {
       expect(codes, contains('avoid_ios_battery_drain_patterns'));
     });
 
-    test('Timer.periodic in ConsumerState, canceled in dispose() -- no lint',
-        () {
-      // ConsumerState (Riverpod) ends with 'State' and should get the same
-      // lifecycle exemption as plain State<T>.
-      final codes = reportedRuleCodesSyntactic(
-        AvoidIosBatteryDrainPatternsRule(),
-        '''
+    test(
+      'Timer.periodic in ConsumerState, canceled in dispose() -- no lint',
+      () {
+        // ConsumerState (Riverpod) ends with 'State' and should get the same
+        // lifecycle exemption as plain State<T>.
+        final codes = reportedRuleCodesSyntactic(
+          AvoidIosBatteryDrainPatternsRule(),
+          '''
 class _S extends ConsumerState<W> {
   Timer? _tick;
 
@@ -105,11 +106,12 @@ class _S extends ConsumerState<W> {
   }
 }
 ''',
-      );
+        );
 
-      // ConsumerState is a State subtype — lifecycle-bound timer must pass.
-      expect(codes, isNot(contains('avoid_ios_battery_drain_patterns')));
-    });
+        // ConsumerState is a State subtype — lifecycle-bound timer must pass.
+        expect(codes, isNot(contains('avoid_ios_battery_drain_patterns')));
+      },
+    );
 
     test('Timer.periodic in a non-State service class -- lints', () {
       final codes = reportedRuleCodesSyntactic(

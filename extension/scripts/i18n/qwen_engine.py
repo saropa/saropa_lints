@@ -499,7 +499,7 @@ def _snapshot_processes_posix() -> list[_ProcInfo] | None:
     return procs
 
 
-def find_orphan_model_hosts() -> list[_ProcInfo] | None:
+def find_orphan_model_hosts(*, log=None) -> list[_ProcInfo] | None:
     """Model-host processes whose parent no longer exists. None if unknowable.
 
     SAFETY — this is the single decision point for "may this process be killed":
@@ -518,9 +518,32 @@ def find_orphan_model_hosts() -> list[_ProcInfo] | None:
       explicitly. Without that second step a dropped or unparsable snapshot row
       would silently promote a live daemon's child to an orphan.
 
+    WINDOWS ONLY. This test is "parent PID is not in the live set". On Windows
+    a dead parent's PID simply disappears, so that test works. On POSIX a
+    child whose parent dies is immediately reparented by the kernel to PID 1
+    (or a subreaper), which is always alive — so ``ppid not in live_pids`` is
+    never true and this function can never nominate a candidate. Implementing
+    a correct POSIX test (detect reparenting to 1/a subreaper AND confirm the
+    process is genuinely a stray model host, not something else's legitimate
+    child of init) is real work with real false-positive risk in a module
+    whose whole job is to not kill the wrong process, so until that lands this
+    returns [] on POSIX rather than pretending to have looked.
+
     The probe runs once per candidate, and on a healthy machine there are no
     candidates, so the common case costs nothing beyond the snapshot.
     """
+    say = log or (lambda _m: None)
+    if sys.platform != "win32":
+        # Honest limitation, not a silent no-op: every caller (preflight,
+        # sweep, CLI report) treats an empty list as "nothing to reap", which
+        # is accurate here — we are not merely failing to look, we know this
+        # test structurally cannot fire on POSIX (see docstring).
+        say(
+            "    [ollama] orphan detection is Windows-only — POSIX child "
+            "processes are reparented to PID 1, which defeats the "
+            "'parent PID gone' test used here"
+        )
+        return []
     procs = _snapshot_processes()
     if procs is None:
         return None
@@ -630,7 +653,7 @@ def _wait_pid_gone(pid: int, timeout_s: float) -> bool:
     return not _pid_alive(pid)
 
 
-def _terminate_tree(pid: int, *, log=None) -> bool:
+def _terminate_tree(pid: int, *, is_daemon: bool = False, log=None) -> bool:
     """Terminate a process AND its children, graceful first, force second.
 
     The tree part is the actual bug fix: ``taskkill /PID n /F`` (no ``/T``)
@@ -638,6 +661,17 @@ def _terminate_tree(pid: int, *, log=None) -> bool:
     kill this module issued. ``/T`` walks the tree; on POSIX the equivalent is
     signalling the process group, which the daemon leads because it is spawned
     with ``start_new_session=True``.
+
+    ``is_daemon`` gates ``os.killpg`` on POSIX: ``killpg(pid, sig)`` signals
+    whichever process GROUP has PGID == pid, not the process whose PID is
+    pid. That is correct for our own daemon, which IS its group's leader
+    (``start_new_session=True`` made PGID == PID at spawn time). It is NOT
+    correct for a PID pulled from the process table by the orphan sweep — a
+    reaped ``llama-server`` is a child, not a leader, and after PGID reuse
+    elsewhere on the box, blindly calling killpg on its bare PID can signal a
+    complete stranger's process group. So only the daemon path may use
+    killpg; every other caller (orphans) gets a bare ``os.kill`` on the exact
+    PID it was given.
 
     Graceful first matters for the same reason: a forced kill gives the daemon
     no chance to shut its own child down, so the force path is only reached
@@ -659,17 +693,36 @@ def _terminate_tree(pid: int, *, log=None) -> bool:
         )
         return _wait_pid_gone(pid, 3.0)
 
-    # POSIX: signal the whole group (negative PID) so the model host dies with
-    # the daemon. Fall back to the bare PID if the process is not a group leader
-    # (it should be, via start_new_session, but a caller may pass any PID).
+    # POSIX: for our own daemon, signal the whole group (negative PID) so the
+    # model host dies with it. For anything else (orphan PIDs from the sweep)
+    # signal only the exact PID — see the killpg safety note above.
     for sig, label in ((signal.SIGTERM, "TERM"), (signal.SIGKILL, "KILL")):
         try:
-            os.killpg(pid, sig)
-        except (ProcessLookupError, PermissionError, OSError):
+            if is_daemon:
+                os.killpg(pid, sig)
+            else:
+                os.kill(pid, sig)
+        except ProcessLookupError:
+            # Already gone — the wait below will confirm and this counts as
+            # success rather than falling through to a second kill attempt.
+            return True
+        except PermissionError:
+            # Exists but we are not allowed to signal it. That is "untouchable",
+            # not "reaped" — do not report success for a process we never
+            # actually affected (see A3: this was previously conflated).
+            say(f"    [ollama] PID {pid} — permission denied sending SIG{label}")
+            return False
+        except OSError:
+            # Anything else (e.g. killpg on a PID that is not a valid PGID) —
+            # fall back to a bare kill of the exact PID before giving up on
+            # this signal.
             try:
                 os.kill(pid, sig)
-            except (ProcessLookupError, PermissionError):
+            except ProcessLookupError:
                 return True
+            except PermissionError:
+                say(f"    [ollama] PID {pid} — permission denied sending SIG{label}")
+                return False
         grace = _GRACEFUL_WAIT_S if sig == signal.SIGTERM else 3.0
         if _wait_pid_gone(pid, grace):
             return True
@@ -695,13 +748,16 @@ def sweep_orphan_model_hosts(*, log=None, require_daemon_down: bool = True) -> i
         # is what caused the incident this function was written for.
         say("    [ollama] sweep skipped — a daemon is still serving on the port")
         return 0
-    orphans = find_orphan_model_hosts()
+    orphans = find_orphan_model_hosts(log=say)
     if not orphans:
         # None (could not enumerate) and [] (nothing to do) both mean "do not kill".
         return 0
     say(f"    [ollama] reaping {_describe_orphans(orphans)}")
     reaped = 0
     for proc in orphans:
+        # is_daemon defaults False here on purpose: these PIDs come from the
+        # process table, not from our own spawn, so they are never eligible
+        # for the killpg(group) path — see _terminate_tree's docstring.
         if _terminate_tree(proc.pid, log=say):
             reaped += 1
         else:
@@ -720,7 +776,7 @@ def preflight_orphan_check(*, log=None) -> tuple[bool, str]:
     because they were not created by this run — the operator must say so.
     """
     say = log or (lambda _m: None)
-    orphans = find_orphan_model_hosts()
+    orphans = find_orphan_model_hosts(log=say)
     if orphans is None:
         # Could not enumerate. Not a reason to block a translation run; the
         # end-of-run sweep will try again.
@@ -731,9 +787,13 @@ def preflight_orphan_check(*, log=None) -> tuple[bool, str]:
     summary = _describe_orphans(orphans)
     if _env_flag("SAROPA_QWEN_REAP_ORPHANS"):
         say(f"[Ollama/Qwen] preflight: {summary} — reaping (SAROPA_QWEN_REAP_ORPHANS=1)")
-        # These are parentless by definition, so no daemon owns them and the
-        # endpoint check would only block a legitimate cleanup here.
-        reaped = sweep_orphan_model_hosts(log=say, require_daemon_down=False)
+        # A5 fix: do NOT bypass the serving-daemon guard here. These PIDs are
+        # confirmed parentless, but "parentless" is a property of the PID we
+        # are about to kill, not of the machine as a whole — a second daemon
+        # could have started on the port since the last check and be serving
+        # a live client right now. Use the same require_daemon_down=True guard
+        # every other reap path uses rather than special-casing this one.
+        reaped = sweep_orphan_model_hosts(log=say)
         remaining = find_orphan_model_hosts() or []
         if remaining:
             return False, (
@@ -759,8 +819,12 @@ def _kill_all_ollama(*, log=None) -> bool:
     so it is gated behind ``SAROPA_QWEN_ALLOW_GLOBAL_KILL=1`` and is never a
     side effect of a normal run. Returns True only when the kill actually ran.
 
-    When it does run it uses ``/T`` (Windows) and the ``-f`` pattern that also
-    matches the model host (POSIX), so it no longer strands children.
+    When it does run it uses ``/T`` (Windows), which walks the whole tree and
+    reaches the model host directly. On POSIX ``pkill -f "ollama serve"``
+    matches only the daemon's own command line, NOT ``llama-server`` — the
+    model host is left parentless, not killed outright, so this waits for the
+    port to actually drop before handing off to the sweep below, which is what
+    actually reaps it.
     """
     say = log or (lambda _m: None)
     if not _env_flag("SAROPA_QWEN_ALLOW_GLOBAL_KILL"):
@@ -784,6 +848,13 @@ def _kill_all_ollama(*, log=None) -> bool:
             ["pkill", "-f", "ollama serve"],
             capture_output=True, timeout=15, check=False,
         )
+        # A4 fix: pkill only matched the daemon's own command line, so its
+        # model host is now parentless but may still be mid-shutdown. Wait for
+        # the port to actually drop before sweeping — otherwise
+        # sweep_orphan_model_hosts's require_daemon_down guard sees the still
+        # (briefly) responding endpoint and skips the reap this call exists to
+        # perform.
+        _wait_for_port_down(timeout_s=8.0)
     # Whatever the kill missed is now parentless, so the sweep can reach it.
     sweep_orphan_model_hosts(log=say)
     return True
@@ -808,6 +879,15 @@ def restart_ollama(*, log=print) -> bool:
     if _restarts_this_run >= _MAX_RESTARTS_PER_LOCALE:
         log("    [stall] restart cap reached — skipping")
         return False
+    # A8 fix: count exactly once per call to restart_ollama, here, before any
+    # attempt is made. The three scattered increments this replaced (one on
+    # the "did not come up in time" return, one on success, one on "port
+    # repeatedly claimed") missed the Popen-raised-an-exception return path
+    # entirely, so a genuinely failed attempt could silently not count against
+    # the cap while an equally-failed timeout did. A single site immediately
+    # after the guard check makes every return path below count as the one
+    # restart attempt it actually is, regardless of how it fails or succeeds.
+    _restarts_this_run += 1
 
     # Graceful step one: ask Ollama to unload the model. This is what actually
     # releases the multi-GB commit, and it lets the daemon retire its own model
@@ -824,8 +904,10 @@ def restart_ollama(*, log=print) -> bool:
     if _daemon_pid is not None:
         # We started this daemon, so we may stop it — as a TREE. The previous
         # single-PID force kill left llama-server running with the model still
-        # committed and no parent to ever reap it.
-        _terminate_tree(_daemon_pid, log=log)
+        # committed and no parent to ever reap it. is_daemon=True because this
+        # PID IS a process-group leader (start_new_session=True at spawn), so
+        # killpg is safe and reaches the model host in one signal.
+        _terminate_tree(_daemon_pid, is_daemon=True, log=log)
     else:
         # We did NOT start the daemon holding this port. Terminating it would
         # kill whatever client it is serving, which is the original incident.
@@ -853,7 +935,6 @@ def restart_ollama(*, log=print) -> bool:
             time.sleep(0.5)
         else:
             log("    [stall] Ollama did not come up within 30s after restart")
-            _restarts_this_run += 1
             return False
 
         time.sleep(1.5)
@@ -861,7 +942,8 @@ def restart_ollama(*, log=print) -> bool:
         if proc.poll() is None:
             _adopt_daemon(proc.pid)
             _reset_circuit()
-            _restarts_this_run += 1
+            # Count already incremented at the top of this call (A8) — this
+            # log line just reports where that single count landed.
             log(
                 f"    [stall] Ollama restarted "
                 f"({_restarts_this_run}/{_MAX_RESTARTS_PER_LOCALE})"
@@ -878,7 +960,6 @@ def restart_ollama(*, log=print) -> bool:
                 sweep_orphan_model_hosts(log=log)
 
     log("    [stall] could not start daemon — port repeatedly claimed by another instance")
-    _restarts_this_run += 1
     return False
 
 
@@ -1201,7 +1282,9 @@ def shutdown_engine(*, log=None) -> None:
     _daemon_pid = None  # Idempotent: a second atexit pass must be a no-op.
     try:
         unload_model(log=say)
-        _terminate_tree(pid, log=say)
+        # pid came from _daemon_pid — our own spawn, hence a group leader — so
+        # killpg is safe here too.
+        _terminate_tree(pid, is_daemon=True, log=say)
         # The daemon is down, so any surviving model host is parentless and the
         # sweep may reap it. This is the backstop for a daemon that died in a
         # way our own kill paths never saw.
@@ -1234,11 +1317,18 @@ if __name__ == "__main__":
         print(f"Model pulled:   {_has_model()}")
     # Read-only orphan report: the operational check from the bug report, built
     # in, so "is this machine leaking?" never needs a remembered PowerShell line.
-    _orphans = find_orphan_model_hosts()
-    if _orphans is None:
-        print("Orphan hosts:   unknown (could not enumerate processes)")
-    elif _orphans:
-        print(f"Orphan hosts:   {_describe_orphans(_orphans)}")
-        print("                re-run the pipeline with SAROPA_QWEN_REAP_ORPHANS=1 to clear them")
+    if sys.platform != "win32":
+        # See find_orphan_model_hosts: the "parent PID gone" test cannot fire
+        # on POSIX because a dead parent's child is reparented to PID 1, so
+        # say so plainly instead of printing "none" and implying a real check
+        # ran. Use "pkill -f llama-server" to check/clear manually.
+        print("Orphan hosts:   detection is Windows-only on this platform")
     else:
-        print("Orphan hosts:   none")
+        _orphans = find_orphan_model_hosts()
+        if _orphans is None:
+            print("Orphan hosts:   unknown (could not enumerate processes)")
+        elif _orphans:
+            print(f"Orphan hosts:   {_describe_orphans(_orphans)}")
+            print("                re-run the pipeline with SAROPA_QWEN_REAP_ORPHANS=1 to clear them")
+        else:
+            print("Orphan hosts:   none")

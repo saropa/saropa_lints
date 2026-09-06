@@ -40,13 +40,14 @@ class _ClockState extends State<Clock> {
       expect(codes, isNot(contains('require_workmanager_for_background')));
     });
 
-    test('Timer.periodic in ConsumerState, canceled in dispose() — no lint',
-        () {
-      // ConsumerState (Riverpod) endsWith('State') and should get the
-      // same lifecycle exemption as plain State<T>.
-      final codes = reportedRuleCodesSyntactic(
-        RequireWorkmanagerForBackgroundRule(),
-        '''
+    test(
+      'Timer.periodic in ConsumerState, canceled in dispose() — no lint',
+      () {
+        // ConsumerState (Riverpod) endsWith('State') and should get the
+        // same lifecycle exemption as plain State<T>.
+        final codes = reportedRuleCodesSyntactic(
+          RequireWorkmanagerForBackgroundRule(),
+          '''
 class _DashState extends ConsumerState<Dashboard> {
   Timer? _refreshTimer;
 
@@ -63,11 +64,12 @@ class _DashState extends ConsumerState<Dashboard> {
   }
 }
 ''',
-      );
+        );
 
-      // ConsumerState is a State subtype — lifecycle-bound timer must pass.
-      expect(codes, isNot(contains('require_workmanager_for_background')));
-    });
+        // ConsumerState is a State subtype — lifecycle-bound timer must pass.
+        expect(codes, isNot(contains('require_workmanager_for_background')));
+      },
+    );
 
     test('Timer.periodic in State, NOT canceled — lints', () {
       final codes = reportedRuleCodesSyntactic(

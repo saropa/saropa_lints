@@ -44332,7 +44332,7 @@
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
       },
-      "correction": "Add <uses-permission android:name=\"android.permission.XXX\"/> to manifest.",
+      "correction": "Confirm <uses-permission android:name=\"android.permission.XXX\"/> exists in manifest.",
       "owasp": {
         "mobile": [],
         "web": []
@@ -47162,7 +47162,7 @@
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
       },
-      "correction": "Add <queries> element with intent filters to AndroidManifest.xml.",
+      "correction": "Confirm a <queries> element with the relevant intent filters exists in AndroidManifest.xml; add it if missing.",
       "owasp": {
         "mobile": [],
         "web": []
@@ -47673,7 +47673,7 @@
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
       },
-      "correction": "Replace Timer.periodic with Workmanager().registerPeriodicTask() for reliable background execution.",
+      "correction": "Replace Timer.periodic / Stream.periodic with Workmanager().registerPeriodicTask() for reliable background execution.",
       "owasp": {
         "mobile": [],
         "web": []

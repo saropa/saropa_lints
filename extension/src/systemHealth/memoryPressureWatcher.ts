@@ -54,8 +54,24 @@ export interface MemoryPressureState {
  * server that hosts the plugin, so nothing a live plugin can write in this
  * window predates it. That makes it the correct — and conservative in the
  * right direction — session boundary.
+ *
+ * Computed by a function rather than a one-time module-level constant
+ * (T4 fix): a `const` here is evaluated exactly once, the first time this
+ * module is `import`ed into the extension host process. That is correct
+ * when the process itself is fresh, but "Developer: Restart Extension
+ * Host" and a plain disable/enable toggle can both re-run `activate()`
+ * inside the SAME already-running process (Node's module cache means the
+ * file is not re-evaluated), so a cached constant would keep reporting
+ * the ORIGINAL process's start time — often hours stale — and the
+ * liveness gate would then reject genuinely live state written after the
+ * restart, until the next shed-level transition finally moves the
+ * session boundary forward. Recomputing on every call sidesteps the
+ * caching question entirely: fresh process or reused process, this always
+ * reflects the current `process.uptime()`.
  */
-const HOST_START_MS = Date.now() - process.uptime() * 1000;
+function computeHostStartMs(): number {
+  return Date.now() - process.uptime() * 1000;
+}
 
 /** Inputs to the staleness/liveness decision. Grouped so the check stays pure. */
 export interface MemoryStateLivenessInput {
@@ -113,22 +129,66 @@ export function isMemoryStateLive(input: MemoryStateLivenessInput): boolean {
 }
 
 /**
- * Whether the project at [root] currently enrols the analyzer plugin.
- *
- * Read fresh on every state-file event rather than cached at startup, so a
- * user who re-enables the plugin mid-session gets their status bar back
- * without reloading the window. The read is cheap and only happens on a
- * debounced file-change event, never on a timer.
+ * Directory names skipped while scanning for a nested package's
+ * `analysis_options.yaml` (monorepo case). None of these ever contain a
+ * Dart/Flutter package of interest, and skipping them keeps the scan cheap
+ * — it runs on every debounced state-file event, not just at startup.
  */
-function pluginEnrolledInAnalysisOptions(root: string): boolean {
+const MONOREPO_SCAN_EXCLUDES = new Set([
+  '.git',
+  '.dart_tool',
+  '.idea',
+  '.vscode',
+  'build',
+  'node_modules',
+  'ios',
+  'android',
+]);
+
+/** Whether [dir]'s own `analysis_options.yaml` enrols the plugin. */
+function pluginEnrolledAt(dir: string): boolean {
   try {
-    const optionsPath = path.join(root, 'analysis_options.yaml');
+    const optionsPath = path.join(dir, 'analysis_options.yaml');
     return analysisOptionsEnrolsSaropa(fs.readFileSync(optionsPath, 'utf8'));
   } catch {
     // Missing or unreadable analysis_options.yaml — the plugin cannot be
     // enrolled through a file that is not there.
     return false;
   }
+}
+
+/**
+ * Whether the project at [root] currently enrols the analyzer plugin.
+ *
+ * Read fresh on every state-file event rather than cached at startup, so a
+ * user who re-enables the plugin mid-session gets their status bar back
+ * without reloading the window. The read is cheap and only happens on a
+ * debounced file-change event, never on a timer.
+ *
+ * Also checks first-level subdirectories (monorepo fix). A pub workspace
+ * commonly enrols the plugin in a nested package's `analysis_options.yaml`
+ * rather than at the workspace root — the root itself may have no
+ * `analysis_options.yaml` at all. Without this fallback, such a project
+ * reads as "not enrolled" forever, and the status bar goes silently dead
+ * with no diagnostic pointing at why. Only one level deep is walked: going
+ * deeper without a real pubspec `workspace:` list resolver risks scanning
+ * arbitrary unrelated directories on every event.
+ */
+function pluginEnrolledInAnalysisOptions(root: string): boolean {
+  if (pluginEnrolledAt(root)) return true;
+
+  let entries: fs.Dirent[];
+  try {
+    entries = fs.readdirSync(root, { withFileTypes: true });
+  } catch {
+    // Root itself unreadable — nothing more to check.
+    return false;
+  }
+  for (const entry of entries) {
+    if (!entry.isDirectory() || MONOREPO_SCAN_EXCLUDES.has(entry.name)) continue;
+    if (pluginEnrolledAt(path.join(root, entry.name))) return true;
+  }
+  return false;
 }
 
 /**
@@ -152,13 +212,25 @@ export class MemoryPressureWatcher implements vscode.Disposable {
   private _root: string | null = null;
   /** Session boundary every read is measured against. */
   private readonly _sessionStartMs: number;
+  /**
+   * Pending debounce timer from the `fs.watch` callback in `start()` (fix
+   * for the debounce-timer leak on dispose). This used to be a `let` local
+   * to `start()`'s closure, so `dispose()` had no handle on it and could
+   * only close the `fs.FSWatcher`. A timer already in flight when
+   * `dispose()` ran would still fire ~80ms later and call `_tryRead` against
+   * the OLD root's state file — while `_isLive` reads `_root`/`_sessionStartMs`
+   * which `start()` may have already reassigned to a NEW root by then,
+   * producing a read that mixes state from two different projects. Storing
+   * the id as an instance field lets `dispose()` cancel it before it fires.
+   */
+  private _debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * @param sessionStartMs overrides the session boundary; only tests pass it,
    *   so they can exercise both sides of the staleness gate without waiting
    *   on wall-clock time.
    */
-  constructor(sessionStartMs: number = HOST_START_MS) {
+  constructor(sessionStartMs: number = computeHostStartMs()) {
     this._sessionStartMs = sessionStartMs;
   }
 
@@ -185,12 +257,16 @@ export class MemoryPressureWatcher implements vscode.Disposable {
     // fs.watch `filename` can be null on macOS FSEvents and some Linux
     // configurations — fall back to reading on any event when null.
     try {
-      let debounceTimer: ReturnType<typeof setTimeout> | null = null;
       this._watcher = fs.watch(reportsDir, (_eventType, filename) => {
         if (filename !== null && filename !== 'memory_state.json') return;
-        // Debounce — Windows commonly fires 2-3 events per write.
-        if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => this._tryRead(stateFile), 80);
+        // Debounce — Windows commonly fires 2-3 events per write. Stored on
+        // `this` (not a closure local) so `dispose()` can cancel a pending
+        // fire — see the field doc comment for why that matters.
+        if (this._debounceTimer) clearTimeout(this._debounceTimer);
+        this._debounceTimer = setTimeout(() => {
+          this._debounceTimer = null;
+          this._tryRead(stateFile);
+        }, 80);
       });
       // Swallow watcher errors (directory may vanish mid-session).
       this._watcher.on('error', () => {});
@@ -277,6 +353,26 @@ export class MemoryPressureWatcher implements vscode.Disposable {
   dispose(): void {
     this._watcher?.close();
     this._watcher = null;
+    // Cancel any in-flight debounce timer (fix for the debounce-timer
+    // leak): without this, a timer scheduled just before dispose() still
+    // fires ~80ms later and reads whatever `stateFile`/`_root` are current
+    // at that point — which, if `start()` has since been called again for
+    // a different folder, is the NEW root, read using the OLD closure's
+    // `stateFile` path. Clearing here guarantees a disposed watcher never
+    // produces a read.
+    if (this._debounceTimer) {
+      clearTimeout(this._debounceTimer);
+      this._debounceTimer = null;
+    }
+    // Reset root/state so a subsequent start() on a different workspace
+    // folder never carries the previous project's state forward. Before
+    // this fix, restarting on a new root left `_state` holding the old
+    // root's last-published pressure snapshot, so `_publish`'s
+    // change-detection could compare the new root's first read against
+    // stale data and suppress a legitimate first notification; `_root`
+    // stayed pointed at a folder the watcher module no longer serves.
+    this._state = null;
+    this._root = null;
   }
 }
 

@@ -170,10 +170,28 @@ Future<void> main(List<String> args) async {
     // _runFixStaleIgnores calls exit() internally.
   }
 
+  // Honor // ignore: and // ignore_for_file: directives by filtering
+  // diagnostics that the user has explicitly suppressed. The scan itself
+  // deliberately ignores these (so stale-ignore detection can compare
+  // against the full set), but output shown to the user must respect them.
+  // Resolve the scanned file list the same way stale-ignore does.
+  final scannedFiles = dartFiles.isNotEmpty
+      ? dartFiles
+          .map(
+            (f) => p.isAbsolute(f) ? p.normalize(f) : p.normalize(p.join(p.absolute(path), f)),
+          )
+          .where((f) => f.endsWith('.dart'))
+          .toList()
+      : ScanRunner.discoverDartFiles(p.absolute(path));
+  final effectiveDiagnostics = filterIgnoredDiagnostics(
+    diagnostics: diagnostics,
+    files: scannedFiles,
+  );
+
   // Warn about unrecognized severity values so a future analyzer change
   // doesn't silently drop diagnostics through the rank-0 fallback.
   if (parsed.minSeverity != null) {
-    final unknown = diagnostics
+    final unknown = effectiveDiagnostics
         .map((d) => d.severity.toUpperCase())
         .where((s) => !_knownSeverities.contains(s))
         .toSet();
@@ -188,7 +206,7 @@ Future<void> main(List<String> args) async {
       parsed.maxSeverity != null ||
       parsed.minImpact != null;
   final filtered = hasFilter
-      ? diagnostics.where((d) {
+      ? effectiveDiagnostics.where((d) {
           final rank = _severityRank(d.severity);
           if (parsed.minSeverity != null &&
               rank < _severityRank(parsed.minSeverity!)) {
@@ -211,11 +229,12 @@ Future<void> main(List<String> args) async {
           }
           return true;
         }).toList()
-      : diagnostics;
+      : effectiveDiagnostics;
 
   // --fail-on / --fail-on-impact decouple exit code from display filtering:
-  // the exit code is determined by whether any diagnostic in the FULL set meets
-  // the threshold, not by what survived the display filter.
+  // the exit code is determined by whether any diagnostic in the ignore-
+  // filtered set meets the threshold, not by what survived the severity
+  // display filter. Ignored diagnostics (// ignore:) are excluded from both.
   // Build the tier rule set once if --fail-on-tier is active, so the exit-code
   // check doesn't recompute it per diagnostic.
   final failOnTierRules = parsed.failOnTier != null
@@ -224,7 +243,7 @@ Future<void> main(List<String> args) async {
 
   final exitCode = _computeExitCode(
     filtered: filtered,
-    allDiagnostics: diagnostics,
+    allDiagnostics: effectiveDiagnostics,
     failOn: parsed.failOn,
     failOnImpact: parsed.failOnImpact,
     failOnTierRules: failOnTierRules,
@@ -262,10 +281,10 @@ Future<void> main(List<String> args) async {
     if (!formatJson) {
       // Distinguish "genuinely clean" from "all outside window" so callers
       // (AI agents, CI) know diagnostics were suppressed, not absent.
-      if (hasFilter && diagnostics.isNotEmpty) {
+      if (hasFilter && effectiveDiagnostics.isNotEmpty) {
         print(
           '\nNo issues in the requested filter window '
-          '(${diagnostics.length} outside threshold).',
+          '(${effectiveDiagnostics.length} outside threshold).',
         );
       } else {
         print('\nNo issues found.');
