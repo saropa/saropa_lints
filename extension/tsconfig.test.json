@@ -263,7 +263,9 @@
     "src/audit/audit-report-script.ts",
     "src/test/audit/killAuditProcessTree.test.ts",
     "src/test/audit/deferredPayload.test.ts",
-    "src/workspaceFolderPicker.ts"
+    "src/workspaceFolderPicker.ts",
+    "src/commandGuards.ts",
+    "src/test/commandGuards.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

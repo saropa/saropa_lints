@@ -531,8 +531,8 @@ function buildActionItems(): LeafItem[] {
     // configTree.ts, `getSettingAndActionNodes` removed).
     return [
         new LeafItem(
-            'Run analysis',
-            'Re-run analyzer',
+            l10n('sidebar.actions.runAnalysisLabel'),
+            l10n('sidebar.actions.runAnalysisDescription'),
             'saropaLints.runAnalysis',
             'play',
             new vscode.ThemeColor('debugIcon.startForeground'),
@@ -560,8 +560,8 @@ function buildActionItems(): LeafItem[] {
             new vscode.ThemeColor('charts.red'),
         ),
         new LeafItem(
-            'Initialize / Update config',
-            undefined,
+            l10n('sidebar.actions.updateConfigLabel'),
+            l10n('sidebar.actions.updateConfigDescription'),
             'saropaLints.initializeConfig',
             'gear',
         ),

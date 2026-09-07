@@ -66,9 +66,32 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.8] — Unreleased
+
+Fixed a sidebar action that could crash on a project's first scan or run twice on rapid clicks, and shortened several sidebar labels. Internal reliability fixes round out the translation engine and memory monitoring. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.8/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- Fixed "Fix stale ignores" sidebar action crashing with ENOENT when the `reports/.saropa_lints/` directory does not yet exist (e.g. first run on a project). The directory is now created before the scan CLI writes its JSON output. No action required.
+- Fixed all stale-ignore commands allowing concurrent execution when double-clicked or triggered in rapid succession, which could launch duplicate CLI processes. A busy guard now shows a brief status-bar message and drops the duplicate click. No action required.
+
+### Changed (Extension)
+
+- Shortened sidebar action labels: "Fix stale ignores" → "Prune ignores", "Initialize / Update config" → "Update config". Descriptions now carry the detail the labels shed. No action required.
+
+### Internal
+
+- Extracted `createBusyGuard` to `commandGuards.ts` as a reusable concurrency guard with visible status-bar feedback, replacing four identical inline busy-flag patterns in the stale-ignore commands. No action required.
+- Routed the three sidebar Actions labels ("Run analysis", "Prune ignores", "Update config") through `l10n()` with new `sidebar.actions.*` keys in `en.json`, closing an i18n gap where two of the three labels were hardcoded English. No action required.
+- Translation engine: restricted `os.killpg` to daemon PIDs only, preventing a swept orphan PID from killing an unrelated process group after PGID reuse. Orphan detection now returns early on POSIX with an explanation instead of silently never matching. `PermissionError` during tree kill is no longer counted as a successful reap. Restart accounting consolidated to a single increment site. No action required.
+- Memory safety valve: added exponential backoff on consecutive forced-clear trips (30 s doubling to 5 min cap), eliminating the 30-second cache-clear oscillation. Recheck and trend-log cache walks are now shared per sample. The test-only probe-failure flag is inert in release builds. A log line now fires when the RAM-probe fallback cap activates. No action required.
+- Memory pressure watcher: debounce timer is now an instance field cleared on dispose, preventing a post-dispose fire from reading stale state. Restarting on a different folder gets a clean slate. Plugin enrolment now checks first-level subdirectories for monorepo layouts. Host start time recomputes on each activation so "Restart Extension Host" no longer hides live state. No action required.
+
+---
+
 ## [16.0.0-beta.7]
 
-Process Health status bar and tooltip now isolate saropa-owned memory from system-wide Dart processes, preventing false alerts when analysis servers from other VS Code windows consume significant memory. The tooltip adds a trend indicator, Unicode sparkline chart, and automatic leak detection to catch memory issues early, plus a per-process breakdown for diagnostic detail. Fixed the dashboard's "Enable all recommended packs" button using stale pack detection while the table showed the current state. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.7/CHANGELOG.md)
+Process Health now tracks only saropa-owned memory, so other VS Code windows no longer trigger false alerts. The tooltip adds a trend arrow, sparkline chart, and early leak detection. Also fixes the dashboard's "Enable all recommended packs" button showing stale results. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.7/CHANGELOG.md)
 
 ### Added
 
@@ -108,7 +131,7 @@ Process Health status bar and tooltip now isolate saropa-owned memory from syste
 
 ## [16.0.0-beta.6]
 
-Fixes a false-positive in the extension's l10n diagnostic provider and hardens the publish pipeline so CI-only test failures are caught locally before tagging. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.6/CHANGELOG.md)
+Fixes a false positive in the l10n diagnostic provider and catches more CI-only test failures locally before publishing. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.6/CHANGELOG.md)
 
 ### Fixed
 
@@ -129,7 +152,7 @@ Fixes a false-positive in the extension's l10n diagnostic provider and hardens t
 
 ## [16.0.0-beta.5]
 
-Hardens memory safety, scan lifecycle, and process hygiene across the extension and CLI. Memory pressure detection now attributes usage to the plugin rather than the entire analysis server, preventing false pauses on large projects. Scan on save gains a configurable timeout, diff-view support, and correct cancellation so stalled scans no longer disable the feature for the session. Fixes false positives in timer-lifecycle and manifest rules, and adds orphaned-process detection at startup. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.5/CHANGELOG.md)
+Hardens memory safety and scan reliability across the extension and CLI. Memory pressure detection now attributes usage correctly, preventing false pauses on large projects, and a stalled scan on save can no longer disable the feature for the session. Also fixes false positives in timer-lifecycle and manifest rules, and adds orphaned-process detection at startup. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.5/CHANGELOG.md)
 
 ### Added
 
@@ -165,15 +188,12 @@ Hardens memory safety, scan lifecycle, and process hygiene across the extension 
 - Triage script (`scripts/triage_scan.py`): added diagnostic-key validation (warns when `filePath`/`severity`/`ruleName` are missing), and a 29-test unit-test suite covering path classification, bucket assignment, and output formatting. No action required.
 - Changelog guard hook (`scripts/hooks/changelog_guard.py`): removed the `package.json` version-drift check that false-alarmed every beta cycle because VS Code uses a different version scheme. Guard 1 (multiple unreleased sections) still triggers on `package.json` edits. No action required.
 - Extracted shared `isTimerLifecycleBoundToDisposableState()` helper to eliminate duplicate private implementations across timer lifecycle rules. No action required.
-- Translation engine (`qwen_engine.py`): restricted `os.killpg` to daemon PIDs only, preventing a swept orphan PID from killing an unrelated process group after PGID reuse. Orphan detection now returns early on POSIX with an explanation instead of silently never matching. `PermissionError` during tree kill is no longer counted as a successful reap. Restart accounting consolidated to a single increment site. No action required.
-- Memory safety valve (`project_context_throttle_memory.dart`): added exponential backoff on consecutive forced-clear trips (30 s doubling to 5 min cap), eliminating the 30-second cache-clear oscillation. Recheck and trend-log cache walks are now shared per sample. The test-only probe-failure flag is inert in release builds. `_tripHardLimit` uses the threaded clock instead of `DateTime.now()`. A log line now fires when the RAM-probe fallback cap activates. No action required.
-- Memory pressure watcher (`memoryPressureWatcher.ts`): debounce timer is now an instance field cleared on dispose, preventing a post-dispose fire from reading stale state. `dispose()` resets `_state` and `_root` so a restart on a different folder gets a clean slate. Plugin enrolment now checks first-level subdirectories for monorepo layouts. `HOST_START_MS` recomputes on each activation so "Restart Extension Host" no longer hides live state. No action required.
 
 ---
 
 ## [16.0.0-beta.4]
 
-Adds five new lint rules covering unsafe late-final fields, unnecessary factory constructors, internal method docs, widget/state ordering, and Equatable props sorting. Extends the extension dashboards with inline rule guidance on the Findings screen, embedded tabs on the Package Dashboard, live sidebar data, and scan progress on Health Panel and Project Map. Fixes 16 false-positive and over-suppression bugs across rules including substring, nullable interpolation, unsafe cast, catch logging, URL validation, global state, and cache expiration. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.4/CHANGELOG.md)
+Adds five new lint rules covering unsafe late-final fields, constructor and widget ordering, and Equatable prop sorting. Extends the dashboards with inline rule guidance, embedded Package Dashboard tabs, live sidebar data, and scan progress in Health Panel and Project Map. Also fixes several false-positive and over-suppression bugs in existing rules. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.4/CHANGELOG.md)
 
 ### Added
 
@@ -277,7 +297,7 @@ Adds five new lint rules covering unsafe late-final fields, unnecessary factory 
 
 ## [16.0.0-beta.3]
 
-Streamlines the extension sidebar, cutting it roughly in half by removing rows that duplicated richer controls already available on the dashboards, and moves that information onto the Findings dashboard's status line and a new Lane switch and live baseline diff on the Rules & Tiers config tab. Fixes path traversal vulnerabilities in the cross-file HTML reporter and project package detection, a false positive in the case-sensitive path comparison rule, and false positives across six iOS rules on collection-literal data tables. Also fixes a startup crash on large workspaces and makes the in-editor workspace scan progressive and cancelable. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.3/CHANGELOG.md)
+Streamlines the extension sidebar by moving rows that duplicated dashboard controls onto the Findings and Rules & Tiers dashboards instead. Fixes path traversal vulnerabilities in the HTML reporter and package detection, plus false positives in the path-comparison rule and several iOS rules. Also fixes a startup crash on large workspaces and makes the in-editor scan progressive and cancelable. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.3/CHANGELOG.md)
 
 ### Changed
 
@@ -354,7 +374,7 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
 
 *--- IMPORTANT NOTE ---*
 
-**Major release — LSP server (BETA).** The new standalone LSP server replaces the in-process analyzer plugin as the default diagnostic engine. It runs in its own process, consuming a fraction of the RAM the plugin needed, and delivers diagnostics, quick fixes (lightbulb menu), and per-rule config overrides without loading the full analyzer into the IDE's analysis server. The LSP server is now **ON by default** — review its status in the Health Panel (Command Palette → "Saropa Lints: Process Health"). This is a BETA feature: if you encounter issues, toggle "LSP Server" OFF in the Health Panel and re-enable the Analyzer Plugin. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.1/CHANGELOG.md)
+**Major release — LSP server (BETA).** A new standalone LSP server replaces the in-process analyzer plugin as the default diagnostic engine, using far less memory while still providing diagnostics, quick fixes, and per-rule overrides. It's **ON by default** — check its status in the Health Panel. If you hit issues, toggle it off there to fall back to the Analyzer Plugin. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.1/CHANGELOG.md)
 
 ### Fixed
 
@@ -451,7 +471,7 @@ Hardens the LSP server against normal editor traffic and adds a `doctor` command
 
 ## [15.2.11]
 
-Removed Phase 0 fake LSP test diagnostics that shipped in 15.2.10. The standalone LSP server infrastructure remains (off by default) but no longer emits test squiggles. [log](https://github.com/saropa/saropa_lints/blob/v15.2.11/CHANGELOG.md)
+Removes fake LSP test diagnostics that shipped in 15.2.10. The standalone LSP server remains available, off by default, and no longer emits test squiggles. [log](https://github.com/saropa/saropa_lints/blob/v15.2.11/CHANGELOG.md)
 
 ### Fixed
 
@@ -471,7 +491,7 @@ Removed Phase 0 fake LSP test diagnostics that shipped in 15.2.10. The standalon
 
 > **Known issue:** This release shipped `saropaLints.lspServer.enabled` defaulting to `true`, causing fake test diagnostics to appear in every open `.dart` file. Update to 15.2.11 immediately.
 
-Seventeen new lint rules across testing, equality, control flow, constructor style, widget lifecycle, formatting, code quality, documentation, and architecture. Cross-platform SARIF output fix, dead-link hardening for published docs, and orphan-publish recovery for the publish script. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
+New lint rules covering testing, equality, control flow, constructor style, and widget lifecycle. Also fixes cross-platform SARIF output, dead links in published docs, and orphan-publish recovery in the publish script. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
 
 ### Fixed
 

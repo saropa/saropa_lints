@@ -6,7 +6,7 @@
  * chevrons, no nested expansion.
  *
  * Actions (renamed from "Settings"/"Quick Actions", package.json
- * `saropaLints.actions`) is exactly 3 rows: Run analysis, Fix stale ignores,
+ * `saropaLints.actions`) is exactly 3 rows: Run analysis, Prune ignores,
  * Initialize/Update config. Command Catalog moved OUT to Dashboards (it
  * opens a picker, it doesn't run anything — the wrong section per §2's
  * table). Migrate config keys moved OUT of the sidebar entirely — it is now
@@ -32,8 +32,8 @@
  *   - No STATUS or DASHBOARDS row targets a run/toggle command — the
  *     executable form of §2's rule that those sections "never change
  *     anything."
- *   - Actions carries exactly Run analysis / Fix stale ignores /
- *     Initialize-Update config — no Command Catalog, no Migrate row, no
+ *   - Actions carries exactly Run analysis / Prune ignores /
+ *     Update config — no Command Catalog, no Migrate row, no
  *     severity toggles, no setting-value rows, no triage rows.
  *   - Tier and Lane are folded into the Dashboards "Lints Config" row
  *     description; no row anywhere still targets `saropaLints.setLane`.
@@ -323,7 +323,7 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     }
   });
 
-  it('Actions section is exactly Run analysis / Fix stale ignores / Initialize-Update config', () => {
+  it('Actions section is exactly Run analysis / Prune ignores / Update config', () => {
     const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
     const items = actions.getChildren().map((n) => actions.getTreeItem(n as never));
     const commands = items.map((i) => i.command?.command);

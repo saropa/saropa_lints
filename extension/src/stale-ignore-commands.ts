@@ -10,6 +10,7 @@
  * Dart fixer) instead of being re-implemented in TypeScript.
  */
 import * as crypto from 'node:crypto';
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { runInWorkspaceAsync, getSharedOutputChannel } from './setup';
@@ -18,6 +19,8 @@ import { hasSaropaLintsDep } from './pubspecReader';
 import { l10n } from './i18n/runtime';
 // Shared path-segment helper — keeps 'reports'/'.saropa_lints' in one place.
 import { saropaLintsDataPath } from './reportsPaths';
+// Reusable concurrency guard — prevents concurrent CLI invocations.
+import { createBusyGuard } from './commandGuards';
 
 // ── Types matching the scan CLI's `--find-stale-ignores --format json` output ─
 
@@ -43,6 +46,16 @@ interface StaleIgnoreResult {
 
 /** Diagnostic source string — also the CodeActionProvider's filter key. */
 const DIAGNOSTIC_SOURCE = 'Saropa Lints';
+
+/**
+ * Concurrency guard — all four stale-ignore commands share one guard so
+ * two CLI processes never run against the same project root simultaneously.
+ * The lazy l10n call ensures the message is resolved at display time (after
+ * the extension's locale has loaded), not at import time.
+ */
+const withBusyGuard = createBusyGuard(
+  () => l10n('staleIgnores.info.alreadyRunning'),
+);
 
 // Shared diagnostic collection so results persist until the next run or
 // the extension deactivates. One collection for both find and fix — a fix
@@ -126,30 +139,32 @@ export function registerStaleIgnoreCommands(
  * (potentially long) scan.
  */
 async function runFindStaleIgnores(): Promise<void> {
-  const root = getWorkspaceRootOrError();
-  if (!root) return;
-  if (!ensureSaropaDependency(root)) return;
+  await withBusyGuard(async () => {
+    const root = getWorkspaceRootOrError();
+    if (!root) return;
+    if (!ensureSaropaDependency(root)) return;
 
-  const jsonPath = path.join(saropaLintsDataPath(root), 'stale_ignores.json');
-  const scan = await runFindScan(root, jsonPath, l10n('staleIgnores.progress.finding'));
-  if (scan === null) return; // Cancelled or a genuine error already reported.
+    const jsonPath = path.join(saropaLintsDataPath(root), 'stale_ignores.json');
+    const scan = await runFindScan(root, jsonPath, l10n('staleIgnores.progress.finding'));
+    if (scan === null) return; // Cancelled or a genuine error already reported.
 
-  publishDiagnostics(scan.staleIgnores);
+    publishDiagnostics(scan.staleIgnores);
 
-  const count = scan.summary.totalCount;
-  const fileCount = Object.keys(scan.summary.byFile).length;
-  if (count === 0) {
-    void vscode.window.showInformationMessage(
-      l10n('staleIgnores.info.noneFound'),
-    );
-  } else {
-    void vscode.window.showWarningMessage(
-      l10n('staleIgnores.info.found', {
-        count: String(count),
-        fileCount: String(fileCount),
-      }),
-    );
-  }
+    const count = scan.summary.totalCount;
+    const fileCount = Object.keys(scan.summary.byFile).length;
+    if (count === 0) {
+      void vscode.window.showInformationMessage(
+        l10n('staleIgnores.info.noneFound'),
+      );
+    } else {
+      void vscode.window.showWarningMessage(
+        l10n('staleIgnores.info.found', {
+          count: String(count),
+          fileCount: String(fileCount),
+        }),
+      );
+    }
+  });
 }
 
 /**
@@ -168,6 +183,11 @@ async function runFindScan(
   progressTitle: string,
   filePath?: string,
 ): Promise<StaleIgnoreResult | null> {
+  // Ensure the JSON output directory exists — projects that have never run
+  // a scan won't have reports/.saropa_lints/ yet, and the CLI's JSON write
+  // would ENOENT. Centralized here so every caller is covered.
+  fs.mkdirSync(path.dirname(jsonPath), { recursive: true });
+
   const result = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -216,7 +236,6 @@ async function runFindScan(
   // (corrupted write, permissions, disk full) — NOT "clean, no findings" —
   // so it surfaces as an error rather than silently reporting success.
   try {
-    const fs = await import('node:fs');
     const raw = fs.readFileSync(jsonPath, 'utf-8');
     return JSON.parse(raw) as StaleIgnoreResult;
   } catch (err) {
@@ -237,39 +256,41 @@ async function runFindScan(
  * modifying files, then clears the diagnostic collection on success.
  */
 async function runFixStaleIgnores(): Promise<void> {
-  const root = getWorkspaceRootOrError();
-  if (!root) return;
-  if (!ensureSaropaDependency(root)) return;
+  await withBusyGuard(async () => {
+    const root = getWorkspaceRootOrError();
+    if (!root) return;
+    if (!ensureSaropaDependency(root)) return;
 
-  // Confirm before modifying source files — the fix is destructive (removes
-  // comments from disk). The user can always undo via git, but still.
-  const confirmLabel = l10n('staleIgnores.confirm.fixAction');
-  const choice = await vscode.window.showWarningMessage(
-    l10n('staleIgnores.confirm.fixMessage'),
-    { modal: true },
-    confirmLabel,
-  );
-  if (choice !== confirmLabel) return;
+    // Confirm before modifying source files — the fix is destructive (removes
+    // comments from disk). The user can always undo via git, but still.
+    const confirmLabel = l10n('staleIgnores.confirm.fixAction');
+    const choice = await vscode.window.showWarningMessage(
+      l10n('staleIgnores.confirm.fixMessage'),
+      { modal: true },
+      confirmLabel,
+    );
+    if (choice !== confirmLabel) return;
 
-  const result = await runFixScan(root, l10n('staleIgnores.progress.fixing'));
-  if (result === null) return; // Cancelled.
+    const result = await runFixScan(root, l10n('staleIgnores.progress.fixing'));
+    if (result === null) return; // Cancelled.
 
-  if (!result.ok) {
-    void showFixFailure(result);
-    return;
-  }
+    if (!result.ok) {
+      void showFixFailure(result);
+      return;
+    }
 
-  // Fix succeeded — clear diagnostics since the stale ignores are gone.
-  getDiagnosticCollection().clear();
+    // Fix succeeded — clear diagnostics since the stale ignores are gone.
+    getDiagnosticCollection().clear();
 
-  // Matches the cross-file command convention (cross-file-commands.ts): the
-  // Output channel is only force-revealed on error. A successful run gets a
-  // lighter-weight info message instead of yanking focus away from the
-  // editor — the channel already has the full CLI output from the run
-  // (logToOutput: true) for anyone who wants to check it.
-  void vscode.window.showInformationMessage(
-    l10n('staleIgnores.info.fixed'),
-  );
+    // Matches the cross-file command convention (cross-file-commands.ts): the
+    // Output channel is only force-revealed on error. A successful run gets a
+    // lighter-weight info message instead of yanking focus away from the
+    // editor — the channel already has the full CLI output from the run
+    // (logToOutput: true) for anyone who wants to check it.
+    void vscode.window.showInformationMessage(
+      l10n('staleIgnores.info.fixed'),
+    );
+  });
 }
 
 /**
@@ -283,39 +304,41 @@ async function runFixStaleIgnores(): Promise<void> {
  * clicking.
  */
 async function runFindAndFixStaleIgnores(): Promise<void> {
-  const root = getWorkspaceRootOrError();
-  if (!root) return;
-  if (!ensureSaropaDependency(root)) return;
+  await withBusyGuard(async () => {
+    const root = getWorkspaceRootOrError();
+    if (!root) return;
+    if (!ensureSaropaDependency(root)) return;
 
-  const jsonPath = path.join(saropaLintsDataPath(root), 'stale_ignores.json');
-  const scan = await runFindScan(root, jsonPath, l10n('staleIgnores.progress.finding'));
-  if (scan === null) return; // Cancelled or a genuine error already reported.
+    const jsonPath = path.join(saropaLintsDataPath(root), 'stale_ignores.json');
+    const scan = await runFindScan(root, jsonPath, l10n('staleIgnores.progress.finding'));
+    if (scan === null) return; // Cancelled or a genuine error already reported.
 
-  publishDiagnostics(scan.staleIgnores);
+    publishDiagnostics(scan.staleIgnores);
 
-  if (scan.summary.totalCount === 0) {
-    void vscode.window.showInformationMessage(l10n('staleIgnores.info.noneFound'));
-    return;
-  }
+    if (scan.summary.totalCount === 0) {
+      void vscode.window.showInformationMessage(l10n('staleIgnores.info.noneFound'));
+      return;
+    }
 
-  const confirmLabel = l10n('staleIgnores.confirm.fixAction');
-  const choice = await vscode.window.showWarningMessage(
-    l10n('staleIgnores.confirm.fixMessageWithCount', { count: String(scan.summary.totalCount) }),
-    { modal: true },
-    confirmLabel,
-  );
-  if (choice !== confirmLabel) return;
+    const confirmLabel = l10n('staleIgnores.confirm.fixAction');
+    const choice = await vscode.window.showWarningMessage(
+      l10n('staleIgnores.confirm.fixMessageWithCount', { count: String(scan.summary.totalCount) }),
+      { modal: true },
+      confirmLabel,
+    );
+    if (choice !== confirmLabel) return;
 
-  const result = await runFixScan(root, l10n('staleIgnores.progress.fixing'));
-  if (result === null) return; // Cancelled.
+    const result = await runFixScan(root, l10n('staleIgnores.progress.fixing'));
+    if (result === null) return; // Cancelled.
 
-  if (!result.ok) {
-    void showFixFailure(result);
-    return;
-  }
+    if (!result.ok) {
+      void showFixFailure(result);
+      return;
+    }
 
-  getDiagnosticCollection().clear();
-  void vscode.window.showInformationMessage(l10n('staleIgnores.info.fixed'));
+    getDiagnosticCollection().clear();
+    void vscode.window.showInformationMessage(l10n('staleIgnores.info.fixed'));
+  });
 }
 
 // ── Fix stale ignores (single file, from a quick fix) ───────────────────────
@@ -328,39 +351,41 @@ async function runFindAndFixStaleIgnores(): Promise<void> {
  * than the bulk sidebar/palette action.
  */
 async function runFixStaleIgnoresInFile(uri: vscode.Uri): Promise<void> {
-  const root = getWorkspaceRootOrError();
-  if (!root) return;
-  if (!ensureSaropaDependency(root)) return;
+  await withBusyGuard(async () => {
+    const root = getWorkspaceRootOrError();
+    if (!root) return;
+    if (!ensureSaropaDependency(root)) return;
 
-  const filePath = uri.fsPath;
-  const result = await runFixScan(
-    root,
-    l10n('staleIgnores.progress.fixing'),
-    filePath,
-  );
-  if (result === null) return; // Cancelled.
+    const filePath = uri.fsPath;
+    const result = await runFixScan(
+      root,
+      l10n('staleIgnores.progress.fixing'),
+      filePath,
+    );
+    if (result === null) return; // Cancelled.
 
-  if (!result.ok) {
-    void showFixFailure(result);
-    return;
-  }
+    if (!result.ok) {
+      void showFixFailure(result);
+      return;
+    }
 
-  // Re-scan just this file to refresh its diagnostics. The JSON output path
-  // is hashed from the file path (not a fixed shared filename) so two
-  // per-file fixes on DIFFERENT files triggered close together — e.g. two
-  // quick fixes clicked in quick succession — can't have one run's write
-  // land between the other run's write and read and cross-contaminate each
-  // other's diagnostics via updateDiagnosticsForUri.
-  const jsonPath = perFileJsonPath(root, filePath);
-  const scan = await runFindScan(root, jsonPath, l10n('staleIgnores.progress.finding'), filePath);
-  if (scan !== null) {
-    updateDiagnosticsForUri(uri, scan.staleIgnores);
-  }
+    // Re-scan just this file to refresh its diagnostics. The JSON output path
+    // is hashed from the file path (not a fixed shared filename) so two
+    // per-file fixes on DIFFERENT files triggered close together — e.g. two
+    // quick fixes clicked in quick succession — can't have one run's write
+    // land between the other run's write and read and cross-contaminate each
+    // other's diagnostics via updateDiagnosticsForUri.
+    const jsonPath = perFileJsonPath(root, filePath);
+    const scan = await runFindScan(root, jsonPath, l10n('staleIgnores.progress.finding'), filePath);
+    if (scan !== null) {
+      updateDiagnosticsForUri(uri, scan.staleIgnores);
+    }
 
-  vscode.window.setStatusBarMessage(
-    l10n('staleIgnores.info.fixedInFile'),
-    5000,
-  );
+    vscode.window.setStatusBarMessage(
+      l10n('staleIgnores.info.fixedInFile'),
+      5000,
+    );
+  });
 }
 
 /**

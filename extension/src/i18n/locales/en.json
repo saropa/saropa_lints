@@ -2542,7 +2542,8 @@
       "noneFound": "No stale ignore comments found.",
       "found": "{count} stale ignore(s) in {fileCount} file(s). See the Problems panel for details.",
       "fixed": "Stale ignore comments removed. See the Output panel for details.",
-      "fixedInFile": "Saropa Lints: stale ignores fixed in this file"
+      "fixedInFile": "Saropa Lints: stale ignores fixed in this file",
+      "alreadyRunning": "A stale-ignore scan is already running."
     },
     "confirm": {
       "fixMessage": "This will remove stale ignore comments from your source files. The changes can be undone with git. Continue?",
@@ -2553,14 +2554,20 @@
       "message": "Stale ignore: rule '{ruleName}' no longer fires on this line."
     },
     "sidebar": {
-      "fixLabel": "Fix stale ignores",
-      "fixDescription": "Detect and auto-remove dead // ignore: comments"
+      "fixLabel": "Prune ignores",
+      "fixDescription": "Find and auto-remove dead // ignore: comments"
     },
     "quickFix": {
       "title": "Fix stale ignores in this file"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Run analysis",
+      "runAnalysisDescription": "Re-run analyzer",
+      "updateConfigLabel": "Update config",
+      "updateConfigDescription": "Initialize or refresh analysis options"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% reviewed",
       "hotspotsDescription": "{open} open",
