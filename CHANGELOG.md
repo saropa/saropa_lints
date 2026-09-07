@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.1] — Unreleased
+## [16.0.1]
 
 Adds a "What's New" panel that surfaces on activation, flagging the v16 diagnostic engine change (LSP server replacing the Analyzer Plugin), the new machine health monitoring, and the sidebar redesign — with a one-click revert to the previous engine. [log](https://github.com/saropa/saropa_lints/blob/v16.0.1/CHANGELOG.md)
 

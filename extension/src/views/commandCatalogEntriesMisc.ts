@@ -90,6 +90,13 @@ export const miscCatalogEntries: readonly CatalogEntry[] = [
     icon: 'info',
   },
   {
+    command: 'saropaLints.showWelcome',
+    title: 'What\'s New',
+    description: 'Open the upgrade summary covering the diagnostic engine change, machine health monitoring, and the sidebar redesign.',
+    category: 'Views & Navigation',
+    icon: 'sparkle',
+  },
+  {
     command: 'saropaLints.openHelpHub',
     title: 'Help',
     description:

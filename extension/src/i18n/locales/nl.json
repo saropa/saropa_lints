@@ -35,7 +35,7 @@
         "body": "De zijbalk is gereduceerd tot 13 rijen over 4 panelen. Zwaarheidschakelaars, enginebeheer en instellingen zijn verplaatst naar hun dashboards. De Debug Panel is samengevoegd met de Health Panel, en de Home hub is verwijderd in ruil voor de statusbalk en het Findings Dashboard.",
         "why": "Als iets dat je vroeger klikte in de zijbalk verdwenen is, is het verplaatst naar een dashboard — het is niet verwijderd.",
         "actionCatalog": "Blader door alle commando's.",
-        "actionWalkthrough": "Open Walkthrough"
+        "actionWalkthrough": "Rondleiding openen"
       }
     },
     "discover": {

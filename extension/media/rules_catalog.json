@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2383,
+  "ruleCount": 2384,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -123,6 +123,27 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Call removeListener() in the dispose() method for every addListener() call to release references and prevent memory leaks.",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "always_specify_parameter_names": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "readability",
+        "safety"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Consider declaring these parameters as named to prevent accidental reordering (e.g. {required String firstName, required String lastName}).",
       "owasp": {
         "mobile": [],
         "web": []

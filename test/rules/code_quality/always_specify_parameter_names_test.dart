@@ -151,8 +151,14 @@ void main() {
     // class name alone would silently exempt a user-defined class that
     // happens to share a name with an allowlisted one.
     test('user-defined class sharing a name is NOT allowlisted', () {
-      expect(findAllowlistedMaxArgs('Size', 'package:my_app/models.dart'), isNull);
-      expect(findAllowlistedMaxArgs('Offset', 'package:my_app/models.dart'), isNull);
+      expect(
+        findAllowlistedMaxArgs('Size', 'package:my_app/models.dart'),
+        isNull,
+      );
+      expect(
+        findAllowlistedMaxArgs('Offset', 'package:my_app/models.dart'),
+        isNull,
+      );
     });
 
     test('dart:ui Offset is allowlisted with max 2 args', () {
@@ -176,7 +182,10 @@ void main() {
     });
 
     test('dart:math MutableRectangle is allowlisted with max 4 args', () {
-      expect(findAllowlistedMaxArgs('MutableRectangle', 'dart:math'), equals(4));
+      expect(
+        findAllowlistedMaxArgs('MutableRectangle', 'dart:math'),
+        equals(4),
+      );
     });
 
     // Right class name, wrong library — must not match (e.g. a hypothetical

@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "16.1.921",
+  "version": "16.0.1",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
@@ -556,6 +556,11 @@
         "icon": "$(info)"
       },
       {
+        "command": "saropaLints.showWelcome",
+        "title": "%command.showWelcome.title%",
+        "icon": "$(sparkle)"
+      },
+      {
         "command": "saropaLints.openHelpHub",
         "title": "%command.openHelpHub.title%",
         "icon": "$(question)"
@@ -1008,6 +1013,11 @@
           "command": "saropaLints.createSaropaInstructions",
           "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject",
           "group": "9_help@4"
+        },
+        {
+          "command": "saropaLints.showWelcome",
+          "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject",
+          "group": "9_help@5"
         }
       ],
       "view/item/context": [

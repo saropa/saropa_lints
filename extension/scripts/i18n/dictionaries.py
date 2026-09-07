@@ -62,6 +62,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Curated command title: "Saropa Lints" is the brand prefix (never translated); Dutch VS Code
         # convention puts the verb in infinitive form at the end of a command title.
         "Saropa Lints: Fix Stale Ignore Comments": "Saropa Lints: Verouderde ignore-opmerkingen corrigeren",
+        # Walkthrough link label — "rondleiding" is the standard Dutch term for a guided tour/walkthrough.
+        "Open Walkthrough": "Rondleiding openen",
         "Search": "Zoeken",
         "Search packages": "Zoeken",
         "Search packages…": "Zoeken",

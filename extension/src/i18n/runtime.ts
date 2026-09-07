@@ -75,6 +75,16 @@ const catalogs: Readonly<Record<string, NestedRecord>> = {
 let activeLocale = DEFAULT_LOCALE;
 
 /**
+ * Count of bundled locale catalogs (including English). Reads `catalogs`
+ * directly so a marketing figure (e.g. welcomePanel's stats strip) can never
+ * drift from the actual shipped translations the way a hand-typed number
+ * would — adding or removing a locale file changes this automatically.
+ */
+export function getSupportedLocaleCount(): number {
+    return Object.keys(catalogs).length;
+}
+
+/**
  * Maps free-form locale input to a catalog key present in `catalogs`.
  * Lowercases, prefers exact keys, then primary language subtag before `en`.
  * Aliases cover legacy OS tags (`iw`→Hebrew, `tl`→Filipino).

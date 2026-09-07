@@ -21,23 +21,27 @@ typedef AllowlistedConstructor = ({
 
 /// Well-known constructors where positional pairs are idiomatic Dart/Flutter
 /// convention and the swap risk is understood/accepted by the ecosystem.
-const List<AllowlistedConstructor> allowlistedConstructors =
-    <AllowlistedConstructor>[
-      (className: 'Offset', libraryUri: 'dart:ui', maxArgs: 2), // Offset(dx, dy)
-      (className: 'Size', libraryUri: 'dart:ui', maxArgs: 2), // Size(width, height)
-      (className: 'Rect', libraryUri: 'dart:ui', maxArgs: 4), // Rect.fromLTRB(l, t, r, b)
-      (className: 'Point', libraryUri: 'dart:math', maxArgs: 2), // Point(x, y)
-      (
-        className: 'Rectangle',
-        libraryUri: 'dart:math',
-        maxArgs: 4,
-      ), // Rectangle(x, y, w, h)
-      (
-        className: 'MutableRectangle',
-        libraryUri: 'dart:math',
-        maxArgs: 4,
-      ), // MutableRectangle(x, y, w, h)
-    ];
+const List<AllowlistedConstructor>
+allowlistedConstructors = <AllowlistedConstructor>[
+  (className: 'Offset', libraryUri: 'dart:ui', maxArgs: 2), // Offset(dx, dy)
+  (className: 'Size', libraryUri: 'dart:ui', maxArgs: 2), // Size(width, height)
+  (
+    className: 'Rect',
+    libraryUri: 'dart:ui',
+    maxArgs: 4,
+  ), // Rect.fromLTRB(l, t, r, b)
+  (className: 'Point', libraryUri: 'dart:math', maxArgs: 2), // Point(x, y)
+  (
+    className: 'Rectangle',
+    libraryUri: 'dart:math',
+    maxArgs: 4,
+  ), // Rectangle(x, y, w, h)
+  (
+    className: 'MutableRectangle',
+    libraryUri: 'dart:math',
+    maxArgs: 4,
+  ), // MutableRectangle(x, y, w, h)
+];
 
 /// Returns the max positional arg count for an allowlisted constructor
 /// matching both [className] and [libraryUri], or null if not allowlisted.

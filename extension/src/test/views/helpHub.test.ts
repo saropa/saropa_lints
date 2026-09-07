@@ -15,9 +15,9 @@ describe('helpHub', () => {
         resetMocks();
     });
 
-    it('HELP_HUB_COMMAND_IDS lists four unique Saropa commands (before/after: hub surface)', () => {
-        assert.strictEqual(HELP_HUB_COMMAND_IDS.length, 4);
-        assert.strictEqual(new Set(HELP_HUB_COMMAND_IDS).size, 4);
+    it('HELP_HUB_COMMAND_IDS lists five unique Saropa commands (before/after: hub surface)', () => {
+        assert.strictEqual(HELP_HUB_COMMAND_IDS.length, 5);
+        assert.strictEqual(new Set(HELP_HUB_COMMAND_IDS).size, 5);
         for (const id of HELP_HUB_COMMAND_IDS) {
             assert.ok(id.startsWith('saropaLints.'), id);
         }

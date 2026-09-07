@@ -23,6 +23,11 @@ const HELP_HUB_SPECS = [
         description: 'Version and documentation',
     },
     {
+        commandId: 'saropaLints.showWelcome',
+        label: '$(sparkle) What\'s New',
+        description: 'Upgrade summary and what changed',
+    },
+    {
         commandId: 'saropaLints.showCommandCatalog',
         label: '$(list-flat) Browse All Commands',
         description: 'Searchable command catalog',

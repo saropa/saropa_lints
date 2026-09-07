@@ -1057,15 +1057,9 @@ dependency_overrides:
         (d) => d.name == 'saropa_core',
       );
       expect(httpDep.constraint.isAny, isTrue);
-      expect(
-        parsed.pathOverriddenPackages.contains('http'),
-        isFalse,
-      );
+      expect(parsed.pathOverriddenPackages.contains('http'), isFalse);
       expect(coreDep.constraint.isAny, isTrue);
-      expect(
-        parsed.pathOverriddenPackages.contains('saropa_core'),
-        isTrue,
-      );
+      expect(parsed.pathOverriddenPackages.contains('saropa_core'), isTrue);
     });
 
     // Edge case 9: `path:` value missing/malformed — bare `path:` with no

@@ -95,16 +95,16 @@ class AlwaysSpecifyParameterNamesRule extends SaropaLintRule {
     });
 
     // Function expression invocations: callback(a, b)
-    context.addFunctionExpressionInvocation(
-      (FunctionExpressionInvocation node) {
-        final element = node.element;
-        _checkInvocation(
-          reporter: reporter,
-          arguments: node.argumentList,
-          element: element,
-        );
-      },
-    );
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
+      final element = node.element;
+      _checkInvocation(
+        reporter: reporter,
+        arguments: node.argumentList,
+        element: element,
+      );
+    });
   }
 }
 
