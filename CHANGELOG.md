@@ -66,9 +66,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.9] — Unreleased
+## [16.0.0-beta.9]
 
-Activation is now resilient — commands register and the sidebar warns on failure instead of going blank. The Findings Dashboard absorbs the full-project audit as a scope selector and gains severity coloring, clickable file paths and rule names, a filter-aware page limit, and JSON export. Sidebar rows show live counts, and per-file analysis no longer blocks the extension host. Publish-pipeline fixes stop the i18n audit from launching Ollama and the local pub.dev fallback from flooding the terminal.
+Activation is now resilient — commands register and the sidebar warns on failure instead of going blank. The Findings Dashboard absorbs the full-project audit as a scope selector and gains severity coloring, clickable file paths and rule names, a filter-aware page limit, and JSON export. Sidebar rows show live counts, and per-file analysis no longer blocks the extension host. Publish-pipeline fixes stop the i18n audit from launching Ollama and the local pub.dev fallback from flooding the terminal. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.9/CHANGELOG.md)
+
 
 ### Fixed (Extension)
 
