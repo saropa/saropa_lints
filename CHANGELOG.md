@@ -66,6 +66,24 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.9] — Unreleased
+
+Publish-pipeline hardening: the i18n audit no longer launches Ollama, and the local pub.dev fallback no longer floods the terminal with a file-tree listing. Closes five translation gaps across four locales.
+
+### Fixed (Extension)
+
+- Fixed "Prune ignores" crashing the Flutter daemon on Windows by spawning `dart` directly instead of via a `cmd.exe` wrapper, eliminating process-tree complexity that competed for SDK resources. No action required.
+- Fixed per-file analysis (`runAnalysisForFiles`) blocking the extension host with a synchronous `spawnSync` call for the entire `dart analyze` duration. Converted to the async `runInWorkspaceAsync` variant that the full-workspace analysis already uses, keeping the event loop responsive and adding a Cancel button to the progress notification. No action required.
+- Sidebar dashboard rows now show live counts instead of static labels — Findings Dashboard shows violation count and health score, Package Dashboard shows how many packages have features to adopt, and the activity bar badge now reflects only lint violations. No action required.
+
+### Internal
+
+- Fixed i18n audit (`--mode audit`) probing Ollama engine availability via `low_quality_entries()`, which self-provisioned the daemon and pulled the model — an expensive, risky side effect during a read-only coverage check. Audit now uses `audit_only=True` to scan cache provenance tags without any subprocess calls. No action required.
+- Fixed `dart pub publish --force` (local fallback) printing its full file-tree listing to stdout, flooding the terminal and pushing prior publish-step output out of the scrollback buffer. Output is now captured; only the pub.dev confirmation line is surfaced. No action required.
+- Added manual translations to `dictionaries.py` for 5 gaps across 4 locales (ar, de, fil, pt) that MT engines did not translate: RSS warning description, "Dev Tool Budget", "Set Cap", "Translation Engine (Ollama)". No action required.
+
+---
+
 ## [16.0.0-beta.8]
 
 🌍 **Milestone: 25 languages, 2,319 translated fields** — extension ships in 25 locales (Arabic, Bengali, Chinese, Dutch, English, Farsi, Filipino, French, German, Hebrew, Hindi, Indonesian, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Swahili, Thai, Turkish, Ukrainian, Urdu, Vietnamese).

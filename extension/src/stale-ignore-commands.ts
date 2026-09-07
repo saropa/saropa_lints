@@ -207,9 +207,15 @@ async function runFindScan(
         jsonPath,
         '-q', // Suppress text output; JSON goes to the file.
       ];
+      // shell: false — spawns dart.exe directly instead of via cmd.exe, so the
+      // child process tree is flat and cannot interfere with the Flutter daemon
+      // (see plans/history/2026.09/2026.09.07/bug_prune_ignores_crashes_flutter_daemon.md). Suppress
+      // analytics to further reduce SDK side-effects during the scan.
       return runInWorkspaceAsync(root, 'dart', args, {
         logToOutput: true,
         token,
+        shell: false,
+        env: { DART_SUPPRESS_ANALYTICS: 'true' },
       });
     },
   );
@@ -411,9 +417,13 @@ async function runFixScan(
         ...(filePath ? ['--files', filePath] : []),
         '--fix-stale-ignores',
       ];
+      // shell: false — same rationale as runFindScan: avoid cmd.exe wrapper to
+      // prevent Flutter daemon interference on Windows.
       return runInWorkspaceAsync(root, 'dart', args, {
         logToOutput: true,
         token,
+        shell: false,
+        env: { DART_SUPPRESS_ANALYTICS: 'true' },
       });
     },
   );

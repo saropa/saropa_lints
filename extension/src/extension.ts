@@ -109,7 +109,7 @@ import {
   setSupersedesRulesMetadata,
 } from './ruleMetadata';
 import { hasSaropaLintsDep } from './pubspecReader';
-import { createPubspecValidation, registerFallbackPubspecListeners } from './pubspec-validation';
+import { createPubspecValidation, PubspecValidation, registerFallbackPubspecListeners } from './pubspec-validation';
 import { PubspecCodeActionProvider } from './pubspec-code-actions';
 import {
   appendSnapshot,
@@ -580,10 +580,40 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Match disk-backed violation report so `saropaLints.hasViolations` is correct on first tick.
   updateContext(enabled, root ? hasViolations(root) : false);
 
-  const todosAndHacksProvider = new TodosAndHacksTreeProvider();
+  // ── Hoisted setup variables ───────────────────────────────────────────
+  // Declared above the try/catch guard so the command registration block
+  // at the end of activate() always executes — even if an error aborts
+  // setup partway. When setup fails, providers stay undefined and the
+  // specific command that touches them throws a meaningful runtime error
+  // instead of the opaque "command not found" from a skipped registration.
+  let todosAndHacksProvider!: TodosAndHacksTreeProvider;
+  let driftAdvisorProvider!: DriftAdvisorTreeProvider;
+  let scanOnSaveController!: ScanOnSaveController;
+  let issuesProvider!: IssuesTreeProvider;
+  let hotspotReviewState!: SecurityHotspotReviewStateService;
+  let summaryProvider!: SummaryTreeProvider;
+  let suppressionsProvider!: SuppressionsTreeProvider;
+  let configProvider!: ConfigTreeProvider;
+  let securityProvider!: SecurityPostureTreeProvider;
+  let fileRiskProvider!: FileRiskTreeProvider;
+  let rulePacksWebviewProvider!: RulePacksWebviewProvider;
+  let analysisOptimizerProvider!: AnalysisOptimizerWebviewProvider;
+  let pubspecValidator!: PubspecValidation;
+  // Functions get no-op defaults so commands degrade silently when setup fails.
+  let refreshAllSections = (): void => {};
+  let reloadOpenDashboardsForLocale = (): void => {};
+  let updateIssuesViewMessage = (): void => {};
+  let refreshAll = (): void => {};
+  let updateAllStatusBars = (_preloadedData?: ViolationsData): void => {};
+  let extVersion = '0.0.0';
+  let driftAdvisorRefreshInProgress = false;
+
+  try {
+
+  todosAndHacksProvider = new TodosAndHacksTreeProvider();
   const driftAdvisorDiagCollection = vscode.languages.createDiagnosticCollection('Saropa Drift Advisor');
   context.subscriptions.push(driftAdvisorDiagCollection);
-  const driftAdvisorProvider = new DriftAdvisorTreeProvider(driftAdvisorDiagCollection);
+  driftAdvisorProvider = new DriftAdvisorTreeProvider(driftAdvisorDiagCollection);
 
   // Scan-on-save (plans/PLAN_scan_only_diagnostics.md, Lane 2): the default
   // delivery path for `saropaLints.enabled` — no separate toggle. Findings
@@ -591,14 +621,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // analyzer plugin (which Lane 2 makes opt-in).
   const scanOnSaveDiagCollection = vscode.languages.createDiagnosticCollection('saropa_lints');
   context.subscriptions.push(scanOnSaveDiagCollection);
-  const scanOnSaveController = new ScanOnSaveController(scanOnSaveDiagCollection, getProjectRoot, getSharedOutputChannel());
+  scanOnSaveController = new ScanOnSaveController(scanOnSaveDiagCollection, getProjectRoot, getSharedOutputChannel());
   context.subscriptions.push(scanOnSaveController);
 
   // Pubspec validation: inline diagnostics for dependency ordering,
   // version syntax, and constraint issues on pubspec.yaml.
   // Listeners are registered centrally in extension-activation.ts to
   // share a single pubspec.yaml watcher with SDK diagnostics.
-  const pubspecValidator = createPubspecValidation(context);
+  pubspecValidator = createPubspecValidation(context);
 
   // Quick-fix code actions for pubspec validation diagnostics
   // (caret/pin syntax, publish_to, blank lines, resolution workspace)
@@ -618,13 +648,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // export commands. Do not "fix" this by registering them or deleting them
   // as dead code — product decision, flagged in the (now archived)
   // plans/history sidebar_view_inventory audit.
-  const issuesProvider = new IssuesTreeProvider(context.workspaceState);
+  issuesProvider = new IssuesTreeProvider(context.workspaceState);
   // Wire up dispose so the severity config watcher is cleaned up on deactivation.
   context.subscriptions.push(issuesProvider);
-  const hotspotReviewState = new SecurityHotspotReviewStateService(context.workspaceState);
-  const summaryProvider = new SummaryTreeProvider(context.workspaceState);
-  const suppressionsProvider = new SuppressionsTreeProvider();
-  const configProvider = new ConfigTreeProvider();
+  hotspotReviewState = new SecurityHotspotReviewStateService(context.workspaceState);
+  summaryProvider = new SummaryTreeProvider(context.workspaceState);
+  suppressionsProvider = new SuppressionsTreeProvider();
+  configProvider = new ConfigTreeProvider();
   // Sectioned sidebar: each VS Code view (Banner / Editor dashboards / Actions /
   // Status / Settings / Triage / Help) is its own collapsible panel. Items
   // inside each panel are flat leaves only — the panel title bar is the
@@ -642,7 +672,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Keyed by viewId so refreshAllSections can look up the right handle for
   // each provider without threading extra state through FlatSectionProvider.
   const sectionTreeViews = new Map<string, vscode.TreeView<SectionNode>>();
-  const refreshAllSections = (): void => {
+  refreshAllSections = (): void => {
     for (const p of sectionProviders) {
       p.refresh();
       const treeView = sectionTreeViews.get(p.viewId);
@@ -672,8 +702,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   }
   updateSidebarSectionContext(context.workspaceState);
 
-  const securityProvider = new SecurityPostureTreeProvider();
-  const fileRiskProvider = new FileRiskTreeProvider(context.workspaceState);
+  securityProvider = new SecurityPostureTreeProvider();
+  fileRiskProvider = new FileRiskTreeProvider(context.workspaceState);
 
   // The dedicated "Suggestions" sidebar view was removed: its long
   // "Enable the X rule pack" list was noise. Proactive pack discovery now flows
@@ -705,14 +735,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
   );
 
-  const rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
+  rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
   registerAnalyzerExcludeDiffProvider(context);
-  const analysisOptimizerProvider = new AnalysisOptimizerWebviewProvider(context.extensionUri);
+  analysisOptimizerProvider = new AnalysisOptimizerWebviewProvider(context.extensionUri);
   // Phase 4 (PLAN_extension_ui_redesign.md): the Rules & Tiers dashboard's Config file tab embeds
   // the optimizer's live body and forwards its button clicks — wire the reference once both
   // providers exist rather than at either constructor (avoids an activation ordering dependency).
   rulePacksWebviewProvider.setAnalysisOptimizerProvider(analysisOptimizerProvider);
-  const reloadOpenDashboardsForLocale = (): void => {
+  reloadOpenDashboardsForLocale = (): void => {
     refreshFindingsDashboardIfOpen(context);
     rulePacksWebviewProvider.refresh();
     analysisOptimizerProvider.refresh();
@@ -733,7 +763,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   registerL10nDeadKeys(context);
   registerProjectMapCommand(context);
   registerHealthCodeLens(context);
-  let driftAdvisorRefreshInProgress = false;
 
   let todosAndHacksSaveDebounce: ReturnType<typeof setTimeout> | undefined;
   context.subscriptions.push(
@@ -768,13 +797,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
   );
 
-  function updateIssuesViewMessage(): void {
+  // Sync Issues view context keys for menu enablement (filter, suppression, focus badges).
+  updateIssuesViewMessage = (): void => {
     const state = issuesProvider.getFilterState();
     const focused = issuesProvider.getFocusedFile();
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasIssuesFilter', state.hasActiveFilters);
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasSuppressions', state.hasSuppressions);
     void vscode.commands.executeCommand('setContext', 'saropaLints.hasFocusedFile', focused !== undefined);
-  }
+  };
   updateIssuesViewMessage();
 
   context.subscriptions.push(
@@ -794,7 +824,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     },
   });
 
-  const refreshAll = () => {
+  refreshAll = () => {
     const root = getProjectRoot();
     syncRuleMetadataFromViolations(root ? readViolations(root) : null);
     issuesProvider.refresh();
@@ -1083,7 +1113,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   syncRuleMetadataFromViolations(root ? readViolations(root) : null);
 
-  const extVersion = (context.extension.packageJSON as { version: string }).version;
+  extVersion = (context.extension.packageJSON as { version: string }).version;
 
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   context.subscriptions.push(statusBarItem);
@@ -1347,7 +1377,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Single unified status bar item showing lint score, tier, and vibrancy.
   // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
   // when the caller already has it (e.g. debouncedRefresh).
-  const updateAllStatusBars = (preloadedData?: ViolationsData) => {
+  updateAllStatusBars = (preloadedData?: ViolationsData) => {
     if (!isDartProject) {
       // Surface the version even outside a Dart workspace so users can verify
       // that a fresh build has loaded — previously the bar was hidden here and
@@ -1853,6 +1883,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     crashMirrorWatcher.onDidChange(nudgeCrashCoverage);
     crashMirrorWatcher.onDidCreate(nudgeCrashCoverage);
     context.subscriptions.push(crashMirrorWatcher);
+  }
+
+  } catch (setupErr) {
+    // Log and continue — commands below register with degraded providers.
+    // A specific command invocation will throw a meaningful error (e.g.
+    // "cannot read property of undefined") rather than the opaque
+    // "command not found" that a skipped registration causes.
+    console.error('[Saropa Lints] Activation setup failed — commands will register with degraded functionality:', setupErr);
   }
 
   context.subscriptions.push(
@@ -2932,8 +2970,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     runAnalysis(): Promise<boolean> {
       return runAnalysisCommand(context);
     },
-    runAnalysisForFiles(files: string[]): Promise<boolean> {
-      return runAnalysisForFilesCommand(context, files, { showProgress: false });
+    async runAnalysisForFiles(files: string[]): Promise<boolean> {
+      // Public API preserves the boolean contract — internal callers use the
+      // richer { ok, cancelled } result directly.
+      const result = await runAnalysisForFilesCommand(context, files, { showProgress: false });
+      return result.ok;
     },
     getVersion(): string {
       return extVersion || '0.0.0';

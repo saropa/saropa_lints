@@ -48,7 +48,9 @@ describe('runAnalysis / runAnalysisForFiles enabled gate', () => {
 
   it('runAnalysisForFiles no-ops when integration is off', async () => {
     setTestConfig('saropaLints', 'enabled', false);
-    const ok = await runAnalysisForFiles({} as any, ['lib/main.dart']);
-    assert.strictEqual(ok, false);
+    const result = await runAnalysisForFiles({} as any, ['lib/main.dart']);
+    // Disabled integration returns ok:false without spawning dart analyze.
+    assert.strictEqual(result.ok, false);
+    assert.strictEqual(result.cancelled, false);
   });
 });

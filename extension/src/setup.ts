@@ -293,9 +293,20 @@ export async function runInWorkspaceAsync(
   workspaceRoot: string,
   command: string,
   args: string[],
-  options: { logToOutput?: boolean; token?: vscode.CancellationToken } = {},
+  options: {
+    logToOutput?: boolean;
+    token?: vscode.CancellationToken;
+    // When false, spawns the command directly (no cmd.exe intermediary on
+    // Windows). This avoids process-tree complexity that can interfere with
+    // other long-lived SDK processes (e.g. the Flutter daemon). Default: true
+    // for backward compatibility; prefer false for new call sites.
+    shell?: boolean;
+    // Extra environment variables merged onto `process.env` for this spawn.
+    // Use to isolate the child from analytics, devtools, or pub side-effects.
+    env?: Record<string, string>;
+  } = {},
 ): Promise<{ ok: boolean; stderr: string; stdout: string; cancelled: boolean }> {
-  const { logToOutput = true, token } = options;
+  const { logToOutput = true, token, shell = true, env } = options;
   const ch = logToOutput ? getOutputChannel() : undefined;
   ch?.appendLine(`$ ${command} ${args.join(' ')}`);
 
@@ -306,59 +317,78 @@ export async function runInWorkspaceAsync(
   // the numbers already in it.
   const startedMs = Date.now();
 
-  return new Promise((resolve) => {
-    const child = spawn(command, args, {
-      cwd: workspaceRoot,
-      shell: true,
-    });
+  // Merge caller-supplied env vars onto the current process environment.
+  // Only allocate the merged object when extra vars were provided.
+  const spawnEnv = env ? { ...process.env, ...env } : undefined;
 
-    let stdout = '';
-    let stderr = '';
-    let cancelled = false;
+  // Wrapper that wires up stdout/stderr streaming, cancellation, and
+  // exit-code resolution for a single spawn attempt.
+  const doSpawn = (useShell: boolean): Promise<{ ok: boolean; stderr: string; stdout: string; cancelled: boolean }> =>
+    new Promise((resolve) => {
+      const child = spawn(command, args, {
+        cwd: workspaceRoot,
+        shell: useShell,
+        ...(spawnEnv ? { env: spawnEnv } : {}),
+      });
 
-    // Stream output so the user sees progress in the Output channel during long
-    // commands instead of one delayed dump at the end. `append` (not `appendLine`)
-    // preserves the child's own line breaks.
-    child.stdout?.on('data', (chunk: Buffer) => {
-      const text = chunk.toString('utf-8');
-      stdout += text;
-      ch?.append(text);
-    });
-    child.stderr?.on('data', (chunk: Buffer) => {
-      const text = chunk.toString('utf-8');
-      stderr += text;
-      ch?.append(text);
-    });
+      let stdout = '';
+      let stderr = '';
+      let cancelled = false;
 
-    const cancelSub = token?.onCancellationRequested(() => {
-      cancelled = true;
-      ch?.appendLine('\n[cancelled by user]');
-      killProcessTree(child);
-    });
+      // Stream output so the user sees progress in the Output channel during
+      // long commands instead of one delayed dump at the end.
+      child.stdout?.on('data', (chunk: Buffer) => {
+        const text = chunk.toString('utf-8');
+        stdout += text;
+        ch?.append(text);
+      });
+      child.stderr?.on('data', (chunk: Buffer) => {
+        const text = chunk.toString('utf-8');
+        stderr += text;
+        ch?.append(text);
+      });
 
-    // ENOENT or other spawn-time failure (e.g. `dart` not on PATH).
-    child.on('error', (err) => {
-      cancelSub?.dispose();
-      resolve({
-        ok: false,
-        stderr: stderr + err.message,
-        stdout,
-        cancelled,
+      const cancelSub = token?.onCancellationRequested(() => {
+        cancelled = true;
+        ch?.appendLine('\n[cancelled by user]');
+        killProcessTree(child);
+      });
+
+      // ENOENT or other spawn-time failure (e.g. `dart` not on PATH).
+      child.on('error', (err) => {
+        cancelSub?.dispose();
+        resolve({
+          ok: false,
+          stderr: stderr + err.message,
+          stdout,
+          cancelled,
+        });
+      });
+
+      // Resolve on `close` (not `exit`) so stdout/stderr pipes are fully flushed.
+      child.on('close', (code) => {
+        cancelSub?.dispose();
+        logCommandTiming(command, args, startedMs, cancelled ? 'cancelled' : `exit ${code}`);
+        resolve({
+          ok: !cancelled && code === 0,
+          stderr: cancelled && !stderr ? 'Cancelled by user.' : stderr,
+          stdout,
+          cancelled,
+        });
       });
     });
 
-    // Resolve on `close` (not `exit`) so stdout/stderr pipes are fully flushed.
-    child.on('close', (code) => {
-      cancelSub?.dispose();
-      logCommandTiming(command, args, startedMs, cancelled ? 'cancelled' : `exit ${code}`);
-      resolve({
-        ok: !cancelled && code === 0,
-        stderr: cancelled && !stderr ? 'Cancelled by user.' : stderr,
-        stdout,
-        cancelled,
-      });
-    });
-  });
+  // ENOENT fallback: when shell: false fails because the command isn't found
+  // (e.g. `dart` resolves to `dart.bat` on a legacy Windows SDK install, and
+  // CreateProcessW can't execute .bat files without a shell), retry once with
+  // shell: true so the cmd.exe wrapper handles .bat resolution. This keeps
+  // shell: false as the preferred path while degrading gracefully.
+  const result = await doSpawn(shell);
+  if (!shell && !result.ok && result.stderr.includes('ENOENT')) {
+    ch?.appendLine('[shell: false failed with ENOENT — retrying with shell: true]');
+    return doSpawn(true);
+  }
+  return result;
 }
 
 /**
@@ -1217,7 +1247,10 @@ async function runAnalysisAfterConfigChangeScoped(
   if (openEditorsOnly) {
     const files = getOpenDartFilePaths(workspaceRoot);
     if (files.length > 0) {
-      await runAnalysisForFiles(context, files, { showProgress: false });
+      // Propagate cancellation so the caller (e.g. runEnable) doesn't treat
+      // a cancelled per-file analyze as a successful completion.
+      const filesResult = await runAnalysisForFiles(context, files, { showProgress: false, token: options?.token });
+      return { cancelled: filesResult.cancelled };
     } else {
       logReport('- Skipped analysis (no open Dart files)');
     }
@@ -1559,7 +1592,10 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
           ok = false;
           return;
         }
-        ok = await runAnalysisForFiles(context, files, { showProgress: false });
+        const filesResult = await runAnalysisForFiles(context, files, { showProgress: false, token: supersedeCts.token });
+        ok = filesResult.ok;
+        // Skip the post-analysis popup when cancelled — the data is stale/incomplete.
+        if (filesResult.cancelled) return;
         if (!ok) {
           // See bugs/infra_run_analysis_popup_dumps_progress_stderr.md — scope
           // label tells the user why the count may differ from a full run.
@@ -1635,12 +1671,12 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
 export async function runAnalysisForFiles(
   context: vscode.ExtensionContext,
   files: string[],
-  options?: { showProgress?: boolean },
-): Promise<boolean> {
+  options?: { showProgress?: boolean; token?: vscode.CancellationToken },
+): Promise<{ ok: boolean; cancelled: boolean }> {
   const workspaceRoot = getProjectRoot();
-  if (!workspaceRoot || !files.length) return false;
+  if (!workspaceRoot || !files.length) return { ok: false, cancelled: false };
   const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
-  if (!enabled) return false;
+  if (!enabled) return { ok: false, cancelled: false };
 
   const normalized = new Set<string>();
   for (const f of files) {
@@ -1665,9 +1701,17 @@ export async function runAnalysisForFiles(
   const cmd = 'dart';
   const args = ['analyze', ...toRun];
 
-  const doRun = (): boolean => {
+  // Async runner — replaces the old synchronous `runInWorkspace`/`spawnSync`
+  // call that blocked the extension host for the entire analyze duration.
+  // See bug_analysis_runs_dart_analyze_not_lsp.md for the original report.
+  const doRun = async (token?: vscode.CancellationToken): Promise<{ ok: boolean; cancelled: boolean }> => {
     logSection('Analysis (files)');
-    const result = runInWorkspace(workspaceRoot, cmd, args, true);
+    const result = await runInWorkspaceAsync(workspaceRoot, cmd, args, { token });
+    if (result.cancelled) {
+      logReport('- Analysis (files) cancelled');
+      flushReport(workspaceRoot);
+      return { ok: false, cancelled: true };
+    }
     if (result.ok) {
       logReport('- Analysis completed');
     } else {
@@ -1683,22 +1727,26 @@ export async function runAnalysisForFiles(
       saropaLintsVersion: installed?.version,
       saropaLintsSource: installed?.source,
     });
-    return result.ok;
+    return { ok: result.ok, cancelled: false };
   };
 
   if (options?.showProgress) {
-    let ok = false;
+    let runResult: { ok: boolean; cancelled: boolean } = { ok: false, cancelled: false };
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
         title: 'Running analysis (selected files)',
-        cancellable: false,
+        // Cancellable so a long per-file analyze can be killed — matches the
+        // full-workspace runAnalysis pattern.
+        cancellable: true,
       },
-      async () => { ok = doRun(); },
+      async (_progress, token) => { runResult = await doRun(token); },
     );
-    return ok;
+    return runResult;
   }
-  return doRun();
+  // Pass the caller's token so a parent progress (e.g. runAnalysis's
+  // supersede CTS) can cancel the per-file analyze child.
+  return doRun(options?.token);
 }
 
 export async function runInitializeConfig(context: vscode.ExtensionContext, title?: string): Promise<boolean> {
