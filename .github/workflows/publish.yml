@@ -100,5 +100,19 @@ jobs:
             exit 1
           fi
 
+      # setup-dart mints the pub.dev OIDC credential once, immediately after
+      # installing the SDK (the first setup-dart step above). Analyze + the
+      # full test suite run for ~9-10 minutes after that, long enough for the
+      # short-lived GitHub OIDC token to expire before the publish step uses
+      # it — pub.dev then rejects it with "Invalid JWT token: invalid
+      # timestamps", which looks like a pub.dev outage but is actually a
+      # stale-token bug in our step ordering. Re-running setup-dart here
+      # mints a fresh token right before it's needed; the SDK download itself
+      # is a no-op since it's already installed on this runner.
+      - name: Refresh pub.dev OIDC token
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
       - name: Publish to pub.dev
         run: dart pub publish --force
