@@ -106,7 +106,7 @@ Activation is now resilient — commands register and the sidebar warns on failu
 - Fixed per-file analysis (`runAnalysisForFiles`) blocking the extension host with a synchronous `spawnSync` call for the entire `dart analyze` duration. Converted to the async `runInWorkspaceAsync` variant that the full-workspace analysis already uses, keeping the event loop responsive and adding a Cancel button to the progress notification. No action required.
 - "Run Analysis" now reads live VS Code diagnostics instantly instead of spawning a `dart analyze` subprocess. Completes in milliseconds instead of tens of seconds. The zero-violations case now shows a confirmation message instead of silent completion. Config-change rescans use an event-driven freshness gate instead of a fixed delay. No action required.
 - Sidebar dashboard rows now show live counts instead of static labels — Findings Dashboard shows violation count and health score, Package Dashboard shows how many packages have features to adopt, and the activity bar badge now reflects only lint violations. No action required.
-- Findings Dashboard sidebar row now shows "updated Ns ago" once live diagnostics have changed at least once this session, so a stale-looking count can be told apart from a genuinely fresh one at a glance. No action required.
+- Findings Dashboard sidebar row now shows "updated Ns ago" once live diagnostics have changed at least once this session, so a stale-looking count can be told apart from a genuinely fresh one at a glance. The freshness timestamp now only updates for `.dart` file diagnostics, not unrelated file types, and the row's icon switches from a warning triangle to a clock once the timestamp is over an hour old, so an aging count no longer reads as an up-to-date warning. No action required.
 
 ### Improved (Extension)
 
@@ -516,30 +516,6 @@ Fixes the VS Code pre-release install button and removes a publish-time blocker 
 - **New `scripts/check_rule_name.py`.** Checks a proposed rule name against the core Dart/Flutter analyzer lint namespace in one second, before any implementation work begins. The same collision gate (`_tier_integrity.py` Check 8) caught 3 rules that needed renaming at publish time three days running (2026-09-02, 2026-09-03, 2026-09-04) — each time meaning a rename across `lib/`, `test/`, and `example/` after the fact. Wired into the rule-authoring checklist (`.claude/skills/lint-rules/SKILL.md`, `CLAUDE.md`) as step 0.
 - Extended `scripts/fix_ignores.py`'s rename map with the 3 rules renamed 2026-09-04 (`avoid_dynamic_calls`, `avoid_equals_and_hash_code_on_mutable_classes`, `avoid_implementing_value_types`, all now `_extended`), and fixed the corresponding stale "N/A (stock analyzer rule)" rows in `doc/guides/migration_guides/migration_from_vga.md` to `ENHANCED`.
 - `scripts/publish.py` now routes a prerelease version (e.g. `16.0.0-beta.1`, the version this release ships as) to each store's prerelease channel automatically — `vsce package`/`publish`, `ovsx publish`, and `gh release create` all get their prerelease flag derived from the version string, no separate flag or prompt needed. `extension/package.json`'s `version` field, which the Marketplace requires to be a plain `MAJOR.MINOR.PATCH` (no hyphen, even with `--pre-release`), is instead derived via `extension_version_for()`: the stripped core PATCH offset by a channel- and iteration-specific band, so successive beta/rc builds of the same base version get distinct extension versions instead of colliding at the Marketplace/Open VSX level. The `.vsix` filename and store-verification poll stay consistent with whichever version was actually published.
-
----
-
-## [15.2.12]
-
-Hardens the LSP server against normal editor traffic and adds a `doctor` command to catch misconfigured project settings before they cause confusing warnings. [log](https://github.com/saropa/saropa_lints/blob/v15.2.12/CHANGELOG.md)
-
-### Fixed
-
-- **LSP server handles all standard notifications without crashing.** Added explicit no-op cases for `textDocument/didChange`, `$/cancelRequest`, `$/setTrace`, and `workspace/didChangeConfiguration` so the inert server stays alive under normal VS Code traffic. Two-level logging surfaces server activity in the Output channel: lifecycle events always log, high-frequency messages (didChange, codeAction) are suppressed unless `$/setTrace` is set to `verbose`. No action required.
-
-### Added
-
-- **New `doctor` command** scans consumer project configuration for misplaced keys, missing custom file, and other issues that produce SDK warnings. Run `dart run saropa_lints doctor [directory]`.
-- **`--trace` flag for LSP server** enables verbose logging from startup without waiting for the editor to send `$/setTrace`. Useful for standalone debugging: `dart run saropa_lints:lsp_server --trace`.
-
-### Internal
-
-- Pre-commit hook now auto-regenerates category map and migration pack codes when rule files, tier definitions, or migration guides change — eliminates the recurring CI failures from stale generated indexes.
-- Closed `unsupported_option` bug for `rule_packs` and `log_level` — investigation confirmed the fix was already implemented; consumer projects just need to run `dart run saropa_lints migrate-config`.
-- `migrate-config` now removes orphan `rule_packs:` keys that have no `enabled:` child, and handles trailing comments on the key line.
-- Config parser (`_leadingSpaces`) now counts tabs as indentation, matching the scalar parser — fixes silent parse failures on tab-indented YAML.
-- `doctor` command now scopes key detection to the `saropa_lints:` plugin block — no longer false-positives on identically named top-level keys.
-- Publish script supports `--log-file`, `--log-append`, `--mode`, `--auto-retry`, and `--output-level` flags for non-interactive/CI execution. Auto-detects non-TTY stdin. Mode definitions are unified in a single table driving both CLI and interactive menu.
 
 ---
 

@@ -6,6 +6,30 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [15.2.12]
+
+Hardens the LSP server against normal editor traffic and adds a `doctor` command to catch misconfigured project settings before they cause confusing warnings. [log](https://github.com/saropa/saropa_lints/blob/v15.2.12/CHANGELOG.md)
+
+### Fixed
+
+- **LSP server handles all standard notifications without crashing.** Added explicit no-op cases for `textDocument/didChange`, `$/cancelRequest`, `$/setTrace`, and `workspace/didChangeConfiguration` so the inert server stays alive under normal VS Code traffic. Two-level logging surfaces server activity in the Output channel: lifecycle events always log, high-frequency messages (didChange, codeAction) are suppressed unless `$/setTrace` is set to `verbose`. No action required.
+
+### Added
+
+- **New `doctor` command** scans consumer project configuration for misplaced keys, missing custom file, and other issues that produce SDK warnings. Run `dart run saropa_lints doctor [directory]`.
+- **`--trace` flag for LSP server** enables verbose logging from startup without waiting for the editor to send `$/setTrace`. Useful for standalone debugging: `dart run saropa_lints:lsp_server --trace`.
+
+### Internal
+
+- Pre-commit hook now auto-regenerates category map and migration pack codes when rule files, tier definitions, or migration guides change — eliminates the recurring CI failures from stale generated indexes.
+- Closed `unsupported_option` bug for `rule_packs` and `log_level` — investigation confirmed the fix was already implemented; consumer projects just need to run `dart run saropa_lints migrate-config`.
+- `migrate-config` now removes orphan `rule_packs:` keys that have no `enabled:` child, and handles trailing comments on the key line.
+- Config parser (`_leadingSpaces`) now counts tabs as indentation, matching the scalar parser — fixes silent parse failures on tab-indented YAML.
+- `doctor` command now scopes key detection to the `saropa_lints:` plugin block — no longer false-positives on identically named top-level keys.
+- Publish script supports `--log-file`, `--log-append`, `--mode`, `--auto-retry`, and `--output-level` flags for non-interactive/CI execution. Auto-detects non-TTY stdin. Mode definitions are unified in a single table driving both CLI and interactive menu.
+
+---
+
 ## [15.2.11]
 
 Removes fake LSP test diagnostics that shipped in 15.2.10. The standalone LSP server remains available, off by default, and no longer emits test squiggles. [log](https://github.com/saropa/saropa_lints/blob/v15.2.11/CHANGELOG.md)

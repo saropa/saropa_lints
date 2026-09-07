@@ -1822,11 +1822,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // pass into a single refresh (same 400ms the consolidated dashboard uses).
   let diagnosticsRefreshTimer: NodeJS.Timeout | undefined;
   context.subscriptions.push(
-    vscode.languages.onDidChangeDiagnostics(() => {
-      // Recorded on every raw event (not the debounced tail) so the freshness
-      // timestamp reflects the actual moment the server produced new data,
-      // not when the UI finished coalescing the refresh burst.
-      recordDiagnosticsChange();
+    vscode.languages.onDidChangeDiagnostics((e) => {
+      // Only stamp freshness when at least one changed URI is a .dart file —
+      // otherwise unrelated diagnostics (JSON schema, YAML, etc.) would claim
+      // Dart-analysis freshness the sidebar displays as "updated Ns ago".
+      if (e.uris.some((u) => u.fsPath.endsWith('.dart'))) {
+        recordDiagnosticsChange();
+      }
       if (diagnosticsRefreshTimer) clearTimeout(diagnosticsRefreshTimer);
       diagnosticsRefreshTimer = setTimeout(() => {
         diagnosticsRefreshTimer = undefined;

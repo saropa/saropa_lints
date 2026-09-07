@@ -192,3 +192,21 @@ export function recordDiagnosticsChange(): void {
 export function getLastDiagnosticsChangeIso(): string | undefined {
   return _lastDiagnosticsChangeIso;
 }
+
+/**
+ * Age past which a diagnostics timestamp is treated as "possibly stale"
+ * rather than reassuringly fresh. One hour: long enough that ordinary
+ * edit-triggered diagnostic churn never false-positives, short enough to
+ * flag a count left over from an abandoned or long-idle session.
+ */
+export const DIAGNOSTICS_STALE_THRESHOLD_MS = 60 * 60 * 1000;
+
+/**
+ * True when the given diagnostics-change ISO timestamp is older than
+ * {@link DIAGNOSTICS_STALE_THRESHOLD_MS}. Surfaces that show an "updated Ns
+ * ago" suffix use this to swap to a visually distinct (stale) treatment
+ * instead of implying the count is as current as a fresh one.
+ */
+export function isDiagnosticsStale(iso: string): boolean {
+  return Date.now() - new Date(iso).getTime() > DIAGNOSTICS_STALE_THRESHOLD_MS;
+}

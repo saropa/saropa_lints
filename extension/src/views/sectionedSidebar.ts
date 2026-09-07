@@ -63,7 +63,7 @@ import * as vscode from 'vscode';
 import * as nodeFs from 'node:fs';
 import * as nodePath from 'node:path';
 import type { ViolationsData } from '../violationsReader';
-import { readVisibleLiveViolations, computeLiveHealthScore, getLastDiagnosticsChangeIso } from '../liveViolationsData';
+import { readVisibleLiveViolations, computeLiveHealthScore, getLastDiagnosticsChangeIso, isDiagnosticsStale } from '../liveViolationsData';
 // `getTrendSummary` / `getScoreTrendSummary` / `detectScoreRegression` were
 // dropped from this import (WP5, sidebar row collapse): the Trends /
 // Score-dropped / Fewer-issues rows they backed all moved to the Findings
@@ -517,6 +517,18 @@ function buildFindingsDescription(snapshot: SidebarDataSnapshot): string {
 }
 
 /**
+ * True when the Findings Dashboard row's "updated Ns ago" suffix is old
+ * enough to read as "possibly stale" rather than reassuringly current (see
+ * `isDiagnosticsStale`). False both when no diagnostics event has fired yet
+ * this session (no claim of freshness is being made at all) and when the
+ * last event is recent — only an aging claim needs the visual downgrade.
+ */
+function isFindingsRowStale(): boolean {
+    const lastChangeIso = getLastDiagnosticsChangeIso();
+    return lastChangeIso !== undefined && isDiagnosticsStale(lastChangeIso);
+}
+
+/**
  * Package Dashboard row description: live adoption needle count, so users
  * see at a glance how many dependencies have features they haven't tried.
  * Falls back to a "run scan" prompt before the first vibrancy scan.
@@ -558,13 +570,17 @@ function buildPackageDescription(): string {
  * live count where one exists — not a format label or static blurb.
  */
 function buildEditorDashboardItems(snapshot: SidebarDataSnapshot): LeafItem[] {
+    // Stale claims get a distinct icon (clock, not warning) and a muted
+    // theme color, so an old "updated Ns ago" count reads as "go re-run
+    // analysis" rather than a currently-accurate warning.
+    const findingsStale = isFindingsRowStale();
     return [
         new LeafItem(
             'Findings Dashboard',
             buildFindingsDescription(snapshot),
             'saropaLints.openViolationsWideReport',
-            'warning',
-            new vscode.ThemeColor('editorWarning.foreground'),
+            findingsStale ? 'history' : 'warning',
+            new vscode.ThemeColor(findingsStale ? 'descriptionForeground' : 'editorWarning.foreground'),
         ),
         new LeafItem(
             'Lints Config',

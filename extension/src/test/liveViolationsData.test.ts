@@ -21,6 +21,8 @@ import {
   hasLiveViolations,
   recordDiagnosticsChange,
   getLastDiagnosticsChangeIso,
+  isDiagnosticsStale,
+  DIAGNOSTICS_STALE_THRESHOLD_MS,
 } from '../liveViolationsData';
 
 const ROOT = '/proj';
@@ -128,6 +130,15 @@ describe('liveViolationsData', () => {
       assert.ok(iso, 'expected a timestamp to be recorded');
       const ms = Date.now() - new Date(iso!).getTime();
       assert.ok(ms >= 0 && ms < 5000, `timestamp should be within 5s of now, was ${ms}ms`);
+    });
+
+    it('isDiagnosticsStale is false for a recent timestamp', () => {
+      assert.strictEqual(isDiagnosticsStale(new Date().toISOString()), false);
+    });
+
+    it('isDiagnosticsStale is true once the threshold has elapsed', () => {
+      const old = new Date(Date.now() - DIAGNOSTICS_STALE_THRESHOLD_MS - 1000).toISOString();
+      assert.strictEqual(isDiagnosticsStale(old), true);
     });
   });
 });
