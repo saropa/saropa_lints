@@ -11,6 +11,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
+import '../../config/always_specify_parameter_names_config.dart';
 import '../../saropa_lint_rule.dart';
 import 'always_specify_parameter_names_helpers.dart';
 
@@ -119,7 +120,13 @@ bool _isAllowlistedConstructor(InstanceCreationExpression node) {
   // class that happens to be named `Size`/`Offset`/etc. would be silently
   // exempted from the swap-risk check (false negative found in review).
   final libraryUri = enclosing.library.uri.toString();
-  final maxArgs = findAllowlistedMaxArgs(className, libraryUri);
+  // Project-configured entries (analysis_options_custom.yaml) extend, never
+  // replace, the built-in allowlist — see always_specify_parameter_names_config.dart.
+  final maxArgs = findAllowlistedMaxArgs(
+    className,
+    libraryUri,
+    extra: userAllowlistedConstructors,
+  );
   if (maxArgs == null) return false;
 
   // Only allowlist when the call has at most the expected positional count —

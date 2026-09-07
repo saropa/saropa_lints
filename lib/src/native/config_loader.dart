@@ -21,6 +21,7 @@ import 'dart:io' show Directory, File, Platform;
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 
 import '../banned_usage_config.dart';
+import '../config/always_specify_parameter_names_config.dart';
 import '../config/max_declarations_config.dart';
 import '../baseline/baseline_config.dart';
 import '../baseline/baseline_manager.dart';
@@ -163,6 +164,7 @@ void _loadFromRoot(String? projectRoot) {
     }
     _loadBaselineConfig(content);
     loadBannedUsageConfig(content);
+    loadAlwaysSpecifyParameterNamesConfig(content);
     loadMaxDeclarationsConfig(content);
     _loadOutputConfig(content);
     // log_level, lane, and memory_mode live in the custom file (top-level

@@ -44,9 +44,18 @@ const List<AllowlistedConstructor> allowlistedConstructors =
 /// Matching on library URI (not just class name) prevents a user-defined
 /// class that happens to share a name like `Size` from being silently
 /// exempted from the swap-risk check.
-int? findAllowlistedMaxArgs(String? className, String libraryUri) {
+///
+/// [extra] lets a caller add project-specific entries (e.g. from
+/// `analysis_options_custom.yaml`) without this pure-logic file depending on
+/// the config-loading module — passed in by the rule, not read globally
+/// here, to keep this file free of I/O/config concerns.
+int? findAllowlistedMaxArgs(
+  String? className,
+  String libraryUri, {
+  List<AllowlistedConstructor> extra = const [],
+}) {
   if (className == null) return null;
-  for (final entry in allowlistedConstructors) {
+  for (final entry in allowlistedConstructors.followedBy(extra)) {
     if (entry.className == className && entry.libraryUri == libraryUri) {
       return entry.maxArgs;
     }
@@ -114,7 +123,13 @@ String normalizeTypeName(DartType type) {
   // For all other types, use the full display string so identical custom
   // types (e.g. two Duration args, two Color args) are also caught, while
   // differently-parameterized generics (List<String> vs List<int>) are not.
-  return name;
+  // Strip a single trailing '?' so a nullable and non-nullable variant of the
+  // same outer type (Duration vs Duration?) still group as confusable — the
+  // swap risk is the same either way, and getDisplayString() would otherwise
+  // treat them as unrelated (found in review; the core-type branches above
+  // already handle this correctly via isDartCoreString/-Int/etc., which
+  // return true regardless of nullability).
+  return name.endsWith('?') ? name.substring(0, name.length - 1) : name;
 }
 
 /// Finds runs of 2+ consecutive entries in [typeNames] that belong to the

@@ -76,7 +76,7 @@ Adds a "What's New" panel that surfaces on activation, flagging the v16 diagnost
 
 ### Added (Lint Rules)
 
-- New `always_specify_parameter_names` rule (Professional tier) flags call sites passing 2+ consecutive positional arguments of the same or confusable type (e.g. two Strings, int+double), where named arguments could prevent silent swap bugs. Allowlists idiomatic Dart/Flutter constructors like `Offset(dx, dy)`.
+- New `always_specify_parameter_names` rule (Professional tier) flags call sites passing 2+ consecutive positional arguments of the same or confusable type (e.g. two Strings, int+double), where named arguments could prevent silent swap bugs. Allowlists idiomatic Dart/Flutter constructors like `Offset(dx, dy)` (matched by declaring library, so a project's own same-named class is never silently exempted); add project-specific allowlist entries under `always_specify_parameter_names: allowlist:` in `analysis_options_custom.yaml`.
 
 ### Fixed (Lint Rules)
 
