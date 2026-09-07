@@ -19,6 +19,8 @@ import {
   readLiveViolationsForFiles,
   readVisibleLiveViolations,
   hasLiveViolations,
+  recordDiagnosticsChange,
+  getLastDiagnosticsChangeIso,
 } from '../liveViolationsData';
 
 const ROOT = '/proj';
@@ -117,5 +119,15 @@ describe('liveViolationsData', () => {
       fakeGet(entries),
     );
     assert.strictEqual(data.violations.length, 0);
+  });
+
+  describe('diagnostics freshness tracking', () => {
+    it('recordDiagnosticsChange stamps a parseable ISO timestamp close to now', () => {
+      recordDiagnosticsChange();
+      const iso = getLastDiagnosticsChangeIso();
+      assert.ok(iso, 'expected a timestamp to be recorded');
+      const ms = Date.now() - new Date(iso!).getTime();
+      assert.ok(ms >= 0 && ms < 5000, `timestamp should be within 5s of now, was ${ms}ms`);
+    });
   });
 });

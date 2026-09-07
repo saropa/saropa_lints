@@ -63,7 +63,7 @@ import * as vscode from 'vscode';
 import * as nodeFs from 'node:fs';
 import * as nodePath from 'node:path';
 import type { ViolationsData } from '../violationsReader';
-import { readVisibleLiveViolations, computeLiveHealthScore } from '../liveViolationsData';
+import { readVisibleLiveViolations, computeLiveHealthScore, getLastDiagnosticsChangeIso } from '../liveViolationsData';
 // `getTrendSummary` / `getScoreTrendSummary` / `detectScoreRegression` were
 // dropped from this import (WP5, sidebar row collapse): the Trends /
 // Score-dropped / Fewer-issues rows they backed all moved to the Findings
@@ -494,13 +494,26 @@ function buildFindingsDescription(snapshot: SidebarDataSnapshot): string {
     if (!snapshot.filtered) return l10n('sidebar.dashboards.findingsNoProject');
     // No health score means analysis has never run (violations.json missing).
     if (snapshot.healthScore === null) return l10n('sidebar.dashboards.findingsNeverScanned');
+    // Undefined until the first `onDidChangeDiagnostics` event this session
+    // (see liveViolationsData.ts) — omit the "updated Ns ago" suffix rather
+    // than claim a freshness we haven't actually observed yet.
+    const lastChangeIso = getLastDiagnosticsChangeIso();
+    const ago = lastChangeIso ? formatTimeAgo(lastChangeIso) : undefined;
     if (snapshot.totalViolations === 0) {
-        return l10n('sidebar.dashboards.findingsClean', { score: String(snapshot.healthScore) });
+        return ago
+            ? l10n('sidebar.dashboards.findingsCleanFresh', { score: String(snapshot.healthScore), ago })
+            : l10n('sidebar.dashboards.findingsClean', { score: String(snapshot.healthScore) });
     }
-    return l10n('sidebar.dashboards.findingsWithViolations', {
-        count: String(snapshot.totalViolations),
-        score: String(snapshot.healthScore),
-    });
+    return ago
+        ? l10n('sidebar.dashboards.findingsWithViolationsFresh', {
+              count: String(snapshot.totalViolations),
+              score: String(snapshot.healthScore),
+              ago,
+          })
+        : l10n('sidebar.dashboards.findingsWithViolations', {
+              count: String(snapshot.totalViolations),
+              score: String(snapshot.healthScore),
+          });
 }
 
 /**

@@ -116,10 +116,29 @@ path matching, and empty-result behavior. All 93 scoped tests pass.
 - Added `showInformationMessage` for the zero-violations "Run Analysis" result so the user
   gets visible confirmation the command fired and found nothing.
 - Added l10n key `loading.analysisClean` for the clean-analysis message.
+- `awaitDiagnosticsChange` now logs to the report when it hits the timeout instead of
+  resolving on an actual diagnostics event, so a "config change didn't apply" investigation
+  can distinguish a real server hang from the expected no-diff case.
+- Fixed the two pre-existing `recommended.yaml` lint warnings the commit hook surfaced in
+  unrelated dirty files (`unnecessary_non_null_assertion` in
+  `pubspec_constraint_parser.dart`, `dead_code`/`dead_null_aware_expression` in
+  `always_specify_parameter_names_helpers.dart`) so the commit hook could pass.
+
+### Unrequested feature: diagnostics freshness indicator
+
+Added a shared "last diagnostics change" timestamp (`recordDiagnosticsChange` /
+`getLastDiagnosticsChangeIso` in `liveViolationsData.ts`), stamped from the single
+`onDidChangeDiagnostics` listener already registered in `extension.ts`. The Findings
+Dashboard sidebar row now appends "· updated Ns ago" (via new l10n keys
+`sidebar.dashboards.findingsCleanFresh` / `findingsWithViolationsFresh`) once at least one
+diagnostics event has fired this session, so a user can tell a genuinely fresh count from
+one that predates the session's first analyzer pass. Two new unit tests pin
+`recordDiagnosticsChange`/`getLastDiagnosticsChangeIso`.
 
 ### Verification status
 
-TypeScript compiles clean (both `tsc --noEmit -p .` and `tsc -p tsconfig.test.json`). 93
-scoped tests pass. The change is **unverified in the Extension Development Host** — the
-live-diagnostics path, notification popup, dashboard refresh via file watcher, and the
-event-driven config-change gate all need F5 verification.
+TypeScript compiles clean (both `tsc --noEmit -p .` and `tsc -p tsconfig.test.json`). 95
+scoped tests pass (93 + 2 new freshness-tracking tests). The change is **unverified in the
+Extension Development Host** — the live-diagnostics path, notification popup, dashboard
+refresh via file watcher, event-driven config-change gate, and the new "updated Ns ago"
+sidebar suffix all need F5 verification in both themes.

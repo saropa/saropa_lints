@@ -106,6 +106,7 @@ Activation is now resilient — commands register and the sidebar warns on failu
 - Fixed per-file analysis (`runAnalysisForFiles`) blocking the extension host with a synchronous `spawnSync` call for the entire `dart analyze` duration. Converted to the async `runInWorkspaceAsync` variant that the full-workspace analysis already uses, keeping the event loop responsive and adding a Cancel button to the progress notification. No action required.
 - "Run Analysis" now reads live VS Code diagnostics instantly instead of spawning a `dart analyze` subprocess. Completes in milliseconds instead of tens of seconds. The zero-violations case now shows a confirmation message instead of silent completion. Config-change rescans use an event-driven freshness gate instead of a fixed delay. No action required.
 - Sidebar dashboard rows now show live counts instead of static labels — Findings Dashboard shows violation count and health score, Package Dashboard shows how many packages have features to adopt, and the activity bar badge now reflects only lint violations. No action required.
+- Findings Dashboard sidebar row now shows "updated Ns ago" once live diagnostics have changed at least once this session, so a stale-looking count can be told apart from a genuinely fresh one at a glance. No action required.
 
 ### Improved (Extension)
 

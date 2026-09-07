@@ -61,6 +61,7 @@ import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
+import { WelcomePanel, SHOW_ON_ACTIVATION_KEY } from './views/welcomePanel';
 import { registerIssuesViewCommands } from './commands/issuesViewCommands';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
@@ -99,7 +100,7 @@ import {
 } from './violationsReader';
 // Status-bar score reads LIVE diagnostics (same source as the Findings wide
 // report and the Issues tree) so the grade never lags the Problems panel.
-import { readLiveViolations, readVisibleLiveViolations } from './liveViolationsData';
+import { readLiveViolations, readVisibleLiveViolations, recordDiagnosticsChange } from './liveViolationsData';
 import { initRuleCatalog } from './ruleCatalog';
 import {
   SecurityHotspotReviewStateService,
@@ -1822,6 +1823,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   let diagnosticsRefreshTimer: NodeJS.Timeout | undefined;
   context.subscriptions.push(
     vscode.languages.onDidChangeDiagnostics(() => {
+      // Recorded on every raw event (not the debounced tail) so the freshness
+      // timestamp reflects the actual moment the server produced new data,
+      // not when the UI finished coalescing the refresh burst.
+      recordDiagnosticsChange();
       if (diagnosticsRefreshTimer) clearTimeout(diagnosticsRefreshTimer);
       diagnosticsRefreshTimer = setTimeout(() => {
         diagnosticsRefreshTimer = undefined;
@@ -2299,6 +2304,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.showAbout', () => {
       void showAboutPanel(context.extensionUri, extVersion);
+    }),
+    vscode.commands.registerCommand('saropaLints.showWelcome', () => {
+      WelcomePanel.createOrShow(context);
     }),
     vscode.commands.registerCommand('saropaLints.showCommandCatalog', () => {
       showCommandCatalogPanel(context);
@@ -3003,6 +3011,17 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         void vscode.commands.executeCommand('saropaLints.enable');
       }
     });
+  }
+
+  // Show the "What's New" welcome panel on every activation until the user explicitly
+  // opts out (the panel only lets them do that after scrolling through it once — see
+  // welcomePanel.ts). This is deliberately stickier than a one-time "seen it" flag:
+  // v16 changed the default diagnostic engine, and a single dismissible toast is not
+  // enough weight for a change to what actually produces the user's diagnostics.
+  if (context.globalState.get<boolean>(SHOW_ON_ACTIVATION_KEY, true)) {
+    // Delayed so the sidebar and status bar finish their first render before
+    // an editor tab steals focus.
+    setTimeout(() => WelcomePanel.createOrShow(context), 3000);
   }
 
   // Public API for other extensions (e.g. Saropa Log Capture). See api.ts and extension README.

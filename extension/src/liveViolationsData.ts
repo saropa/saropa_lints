@@ -166,3 +166,29 @@ export function computeLiveHealthScore(
     },
   });
 }
+
+// Last time `vscode.languages.onDidChangeDiagnostics` fired, as an ISO string.
+// Undefined until the first event this session — every live-diagnostics
+// surface (status bar, sidebar, Issues tree) reads the SAME diagnostics
+// snapshot, so one shared timestamp is enough to answer "how stale is what
+// I'm looking at" for all of them without each surface tracking its own.
+let _lastDiagnosticsChangeIso: string | undefined;
+
+/**
+ * Records "now" as the last time live diagnostics changed. Call this from the
+ * single `onDidChangeDiagnostics` listener registered in `extension.ts` —
+ * do NOT add a second listener elsewhere, or the timestamp becomes ambiguous
+ * about which registration fired last.
+ */
+export function recordDiagnosticsChange(): void {
+  _lastDiagnosticsChangeIso = new Date().toISOString();
+}
+
+/**
+ * ISO timestamp of the last diagnostics change, or undefined when no
+ * `onDidChangeDiagnostics` event has fired yet this session (e.g. immediately
+ * after activation, before the analysis server has produced anything).
+ */
+export function getLastDiagnosticsChangeIso(): string | undefined {
+  return _lastDiagnosticsChangeIso;
+}

@@ -1300,7 +1300,15 @@ async function runAnalysisAfterConfigChangeScoped(
   // guaranteed freshness by running a cold analysis from scratch; this event-
   // driven wait resolves as soon as the server emits fresh diagnostics (typically
   // <500ms), with a timeout fallback for edge cases where no diagnostic changes.
-  await awaitDiagnosticsChange();
+  const gotFreshDiagnostics = await awaitDiagnosticsChange();
+  // Logged so a "config change didn't apply" report can distinguish a real
+  // server hang from the expected no-diff case (e.g. a rule that fires on
+  // zero files) — both hit the timeout, but only one is worth investigating.
+  if (!gotFreshDiagnostics) {
+    logReport(
+      `- Config-change settle timed out after ${CONFIG_CHANGE_SETTLE_TIMEOUT_MS}ms with no diagnostic change; reading current diagnostics as-is`,
+    );
+  }
 
   // Read live VS Code diagnostics — reflects the new config after the settle.
   const data = readLiveViolations(workspaceRoot);
