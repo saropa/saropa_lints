@@ -66,6 +66,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.0.0-beta.10] — Unreleased
+
+### Internal
+
+- Fixed the publish workflow authenticating to pub.dev with a stale OIDC token. `setup-dart` mints the credential once, right after SDK install; Analyze plus the full test suite then run for 9-10 minutes before the publish step, long enough for the short-lived token to expire and be rejected as `Invalid JWT token: invalid timestamps`. This had been misdiagnosed twice (beta.6, beta.9) as a transient pub.dev outage. `setup-dart` now re-runs immediately before `dart pub publish` so the token is minted at the point of use.
+- Bumped GitHub Actions across all workflows to Node.js 24-compatible major versions (`actions/checkout` v4→v5, `actions/setup-python` v5→v6, `actions/setup-node` v4→v5 with runtime bumped to Node 22, `actions/upload-artifact` v4→v5, `actions/github-script` v7→v8), resolving the Node.js 20 deprecation warning on GitHub-hosted runners.
+
+---
+
 ## [16.0.0-beta.9]
 
 Activation is now resilient — commands register and the sidebar warns on failure instead of going blank. The Findings Dashboard absorbs the full-project audit as a scope selector and gains severity coloring, clickable file paths and rule names, a filter-aware page limit, and JSON export. Sidebar rows show live counts, and per-file analysis no longer blocks the extension host. Publish-pipeline fixes stop the i18n audit from launching Ollama and the local pub.dev fallback from flooding the terminal. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.9/CHANGELOG.md)
