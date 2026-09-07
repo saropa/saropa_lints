@@ -42,3 +42,28 @@ When setup fails:
 ## Files
 
 - `extension/src/extension.ts` — hoisted declarations, try/catch guard
+
+## Finish Report (2026-09-07)
+
+A prior session hoisted 20 of 21 setup variables and wrapped the setup
+phase in try/catch. The `vibrancyData` variable was missed — it remained
+inside the try block, making it invisible to the vibrancy callback at
+line 2905 (outside the try), producing a compile error (`TS2304: Cannot
+find name 'vibrancyData'`).
+
+This session completed the fix with four changes:
+
+1. Hoisted `vibrancyData` to the declarations block above the try (same
+   type `VibrancyStatusData | null`, same initial value `null`).
+2. Replaced silent no-op function defaults with stub functions that log a
+   console warning when called after a failed setup, making degraded
+   operation visible in Extension Host output.
+3. Wrapped `registerCopyAsJsonCommands` in try/catch — it accesses
+   hoisted providers inline (not inside a callback), so it would throw
+   immediately if setup failed.
+4. Added a deferred command registration self-test (3s after activation)
+   that compares declared commands in `package.json` against actually
+   registered commands and logs any mismatches.
+
+TypeScript compiles clean (`npx tsc --noEmit`). Pre-existing errors in
+`audit-report-html.ts` are unrelated.

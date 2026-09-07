@@ -599,14 +599,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   let rulePacksWebviewProvider!: RulePacksWebviewProvider;
   let analysisOptimizerProvider!: AnalysisOptimizerWebviewProvider;
   let pubspecValidator!: PubspecValidation;
-  // Functions get no-op defaults so commands degrade silently when setup fails.
-  let refreshAllSections = (): void => {};
-  let reloadOpenDashboardsForLocale = (): void => {};
-  let updateIssuesViewMessage = (): void => {};
-  let refreshAll = (): void => {};
-  let updateAllStatusBars = (_preloadedData?: ViolationsData): void => {};
+  // Functions get stub defaults so commands degrade with a log warning when setup fails.
+  const _setupStub = (name: string) => () => {
+    console.warn(`[Saropa Lints] ${name}() called but activation setup did not complete.`);
+  };
+  let refreshAllSections = _setupStub('refreshAllSections');
+  let reloadOpenDashboardsForLocale = _setupStub('reloadOpenDashboardsForLocale');
+  let updateIssuesViewMessage = _setupStub('updateIssuesViewMessage');
+  let refreshAll = _setupStub('refreshAll');
+  let updateAllStatusBars: (preloadedData?: ViolationsData) => void = _setupStub('updateAllStatusBars');
   let extVersion = '0.0.0';
   let driftAdvisorRefreshInProgress = false;
+  let vibrancyData: VibrancyStatusData | null = null;
 
   try {
 
@@ -1127,9 +1131,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const memoryStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
   memoryStatusBarItem.command = 'saropaLints.showProcessHealth';
   context.subscriptions.push(memoryStatusBarItem);
-
-  // Vibrancy data pushed from the vibrancy subsystem via callback.
-  let vibrancyData: VibrancyStatusData | null = null;
 
   // System health snapshot pushed from the process monitor.
   let systemHealthSnapshot: DartProcessSnapshot | null = null;
@@ -2890,12 +2891,17 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   // ── Copy as JSON commands ───────────────────────────────────────────────
   // Each view gets its own command so context menus target the right view.
-  registerCopyAsJsonCommands(context, {
-    issuesProvider,
-    summaryProvider,
-    securityProvider,
-    fileRiskProvider,
-  });
+  // Guarded: providers may be undefined if activation setup failed above.
+  try {
+    registerCopyAsJsonCommands(context, {
+      issuesProvider,
+      summaryProvider,
+      securityProvider,
+      fileRiskProvider,
+    });
+  } catch (err) {
+    console.error('[Saropa Lints] Copy-as-JSON command registration failed:', err);
+  }
 
   // Package Vibrancy subsystem — registers its own views, commands, and providers
   // under the shared saropaLints sidebar container.
@@ -2912,6 +2918,33 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // so pubspec validation still works without vibrancy/SDK diagnostics.
     registerFallbackPubspecListeners(context, pubspecValidator);
   }
+
+  // ── Command registration self-test ──────────────────────────────────
+  // Deferred so it never delays activation. Compares registered commands
+  // against package.json declarations; logs mismatches to Extension Host
+  // output so a broken registration is visible without user interaction.
+  setTimeout(() => {
+    try {
+      const manifest = context.extension.packageJSON as {
+        contributes?: { commands?: Array<{ command: string }> };
+      };
+      const declared = (manifest.contributes?.commands ?? []).map((c) => c.command);
+      if (declared.length === 0) return;
+      // getCommands(true) includes internal commands; filter to our prefix.
+      void vscode.commands.getCommands(true).then((registered) => {
+        const registeredSet = new Set(registered);
+        const missing = declared.filter((id) => !registeredSet.has(id));
+        if (missing.length > 0) {
+          console.warn(
+            `[Saropa Lints] ${missing.length} declared command(s) not registered:`,
+            missing.join(', '),
+          );
+        }
+      });
+    } catch {
+      // Self-test is best-effort — never surface this to the user.
+    }
+  }, 3_000);
 
   // Background upgrade check — runs asynchronously, fails silently.
   // Only checks when saropa_lints is already in the project and extension is enabled.
