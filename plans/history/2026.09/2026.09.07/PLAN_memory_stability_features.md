@@ -1,7 +1,42 @@
 # Plan: Memory & Stability Features for the Extension
 
 **Created:** 2026-09-06
-**Status:** Draft — awaiting review
+**Status:** Phases 1-3 shipped; Phases 4-5 and consolidation split to [`PLAN_memory_stability_remaining.md`](../PLAN_memory_stability_remaining.md)
+
+## Finish Report (2026-09-07)
+
+Phases 1-3 of this plan — Machine Health Dashboard, Actionable Controls, and
+Proactive Warnings — were implemented across 8 new files and 7 modified files
+under `extension/src/systemHealth/`. The implementation adds machine-wide
+visibility into system RAM, all Dart/Flutter processes, and Ollama model hosts
+with contextual recommendations and one-click actions.
+
+A code review caught and fixed four correctness/efficiency bugs before commit:
+1. `buildRecommendations` used a hardcoded 0.15 free-RAM threshold instead of
+   the user-configurable `systemMemoryWarningPercent`, causing the dashboard and
+   the proactive notification to disagree on when memory was "low." Fixed by
+   threading the config value through `RecommendationInput`.
+2. `unloadOllamaModelCommand` accepted no argument validation — invoking it from
+   the command palette (no args) passed `undefined` to `execFile`, throwing
+   `ERR_INVALID_ARG_TYPE`. Fixed with a type/falsy guard and a user-facing warning.
+3. `checkSystemMemory` throttled only the notification, not the PowerShell query
+   itself — healthy machines spawned `powershell.exe` every 60s poll cycle
+   indefinitely for no benefit. Fixed by recording the check time on both the
+   healthy and unhealthy paths.
+4. The session-start low-memory check applied `Math.max(warningPercent, 20)`,
+   silently overriding any user config below 20%. Fixed by honoring the
+   configured value directly.
+
+Deferred to [`PLAN_memory_stability_remaining.md`](../PLAN_memory_stability_remaining.md):
+- Consolidation of Machine Health into the existing Process Health panel (user
+  direction: separate dashboard over-complicates; use collapsible sections).
+- Phase 4 (Job Object containment) and Phase 5 (historical logging).
+- Function-length violations (`buildRecommendations` 101 lines, `queryData` 64
+  lines) and PowerShell/constant duplication — best addressed during consolidation.
+
+Verification: both typechecks clean (`tsc --noEmit -p .`, `tsc -p tsconfig.test.json`),
+`npm run compile` clean, 75 systemHealth tests passing (10 new + 65 existing).
+F5 visual verification not yet done — listed as unverified below.
 **Source:** [`plans/ANALYSIS_dev_machine_stability.md`](ANALYSIS_dev_machine_stability.md)
 **Related:** [`plans/history/2026.09/2026.09.02/PLAN_analyzer_memory_monitor.md`](history/2026.09/2026.09.02/PLAN_analyzer_memory_monitor.md) (Phases 0-4 shipped), [`plans/history/2026.08/2026.08.07/PLAN_system_health_monitor.md`](history/2026.08/2026.08.07/PLAN_system_health_monitor.md)
 

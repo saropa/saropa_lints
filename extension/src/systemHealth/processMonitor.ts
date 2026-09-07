@@ -2,7 +2,14 @@ import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
 import type { DartProcessSnapshot, HealthAssessment } from './types';
 import { HealthLevel, HealthTrigger } from './types';
-import { buildSnapshot, detectMonotonicGrowth, formatBytes, queryDartProcesses } from './processQuery';
+import {
+  buildSnapshot,
+  detectMonotonicGrowth,
+  formatBytes,
+  isAnalysisServerProcess,
+  queryDartProcesses,
+} from './processQuery';
+import { querySystemMemory, type SystemMemorySnapshot } from './systemQuery';
 
 const BYTES_PER_GB = 1_073_741_824;
 
@@ -14,6 +21,10 @@ export interface SystemHealthConfig {
   warningOrphanCount: number;
   criticalOrphanCount: number;
   showNotifications: boolean;
+  /** GB threshold for a single Dart analysis-server process, independent of saropa's own thresholds above. */
+  analysisServerWarningGB: number;
+  /** Percent of free system-wide RAM below which the whole-machine warning fires. */
+  systemMemoryWarningPercent: number;
 }
 
 export function readSystemHealthConfig(): SystemHealthConfig {
@@ -26,6 +37,8 @@ export function readSystemHealthConfig(): SystemHealthConfig {
     warningOrphanCount: cfg.get<number>('warningOrphanCount', 1),
     criticalOrphanCount: cfg.get<number>('criticalOrphanCount', 4),
     showNotifications: cfg.get<boolean>('showNotifications', true),
+    analysisServerWarningGB: cfg.get<number>('analysisServerWarningGB', 4),
+    systemMemoryWarningPercent: cfg.get<number>('systemMemoryWarningPercent', 15),
   };
 }
 
@@ -168,6 +181,19 @@ export class ProcessMonitor implements vscode.Disposable {
   private readonly saropaRssHistory: number[] = [];
   /** Whether a leak-detection notification has already been shown this session. */
   private leakNotificationShown = false;
+  // Separate throttle timestamps from lastNotificationTime (the saropa-RSS
+  // critical notification) — these two checks are about the *machine* and
+  // *any* analysis server, not saropa's own memory, and firing all three
+  // notifications off one shared timestamp would let an unrelated saropa
+  // alert suppress a genuinely new system-wide warning for 5 minutes.
+  // Two-tier throttle: query at 2 min (catch rapid degradation without
+  // shelling out every 60s poll), notify at 10 min (don't nag).
+  private lastSystemMemoryQueryTime = 0;
+  private lastSystemMemoryNotificationTime = 0;
+  private lastAnalysisServerNotificationTime = 0;
+  /** Last known system memory state, exposed for status bar integration.
+   *  Updated on every checkSystemMemory query (every ~2 min). */
+  private lastSystemMemory: SystemMemorySnapshot | undefined;
 
   start(): void {
     if (this.disposed) return;
@@ -193,6 +219,11 @@ export class ProcessMonitor implements vscode.Disposable {
 
   getLastSnapshot(): DartProcessSnapshot | undefined {
     return this.lastSnapshot;
+  }
+
+  /** Last known system-wide memory state, for status bar / tooltip use. */
+  getLastSystemMemory(): SystemMemorySnapshot | undefined {
+    return this.lastSystemMemory;
   }
 
   /** Delegates to the pure computeRssTrend with the most recent samples. */
@@ -237,9 +268,84 @@ export class ProcessMonitor implements vscode.Disposable {
           this.showLeakNotification(snapshot);
         }
       }
+
+      // Two checks below are deliberately independent of `assessment` above:
+      // that assessment only ever looks at saropa-owned RSS (by design — see
+      // its own doc comment), so a machine-wide low-memory condition or an
+      // oversized *external* analysis server would otherwise never surface
+      // anywhere, even though both are exactly the conditions that preceded
+      // the 2026-09-05 incident this whole subsystem exists to catch early.
+      if (config.showNotifications) {
+        await this.checkSystemMemory(config);
+        this.checkAnalysisServerSize(snapshot, config);
+      }
     } catch {
       // Next poll will retry.
     }
+  }
+
+  /**
+   * Warn when free physical RAM across the whole machine drops below the
+   * configured percentage — independent of which process is responsible.
+   * Piggybacks on this class's existing poll timer rather than running its
+   * own interval, since the two checks share the same "don't spam" needs and
+   * a second timer would double the PowerShell shell-out cadence for no benefit.
+   */
+  private async checkSystemMemory(config: SystemHealthConfig): Promise<void> {
+    const now = Date.now();
+    // 2-minute query throttle — avoids shelling out every 60s poll on a
+    // healthy machine, but still catches a machine going from healthy to
+    // critical within a few minutes (10 min would miss rapid degradation).
+    if (now - this.lastSystemMemoryQueryTime < 2 * 60 * 1000) return;
+    this.lastSystemMemoryQueryTime = now;
+    const system = await querySystemMemory();
+    // Store for status bar / tooltip consumers regardless of threshold.
+    this.lastSystemMemory = system;
+    if (!system) return;
+    const freePercent = system.freeFraction * 100;
+    if (freePercent >= config.systemMemoryWarningPercent) return;
+    // 10-minute notification throttle — don't nag; the user needs time to
+    // act (close tabs, kill a process) before a repeat nudge is useful.
+    if (now - this.lastSystemMemoryNotificationTime < 10 * 60 * 1000) return;
+    this.lastSystemMemoryNotificationTime = now;
+
+    const msg = l10n('systemHealth.notification.systemLowMemory', {
+      free: formatBytes(system.freeBytes),
+      total: formatBytes(system.totalBytes),
+    });
+    const openDashboard = l10n('systemHealth.action.openMachineDashboard');
+    void vscode.window.showWarningMessage(msg, openDashboard).then((choice) => {
+      if (choice === openDashboard) {
+        void vscode.commands.executeCommand('saropaLints.showMachineDashboard');
+      }
+    });
+  }
+
+  /**
+   * Warn when ANY Dart analysis-server process (not just saropa's own,
+   * which `assessHealth` already covers) exceeds the configured GB. A 12 GB
+   * analysis server from another window is deliberately excluded from the
+   * saropa-colored status bar (see `assessHealth`'s doc comment) — this
+   * notification is the place that condition is still surfaced at all.
+   */
+  private checkAnalysisServerSize(snapshot: DartProcessSnapshot, config: SystemHealthConfig): void {
+    const now = Date.now();
+    if (now - this.lastAnalysisServerNotificationTime < 10 * 60 * 1000) return;
+    const warningBytes = config.analysisServerWarningGB * BYTES_PER_GB;
+    const oversized = snapshot.processes.filter(
+      (p) => isAnalysisServerProcess(p) && p.workingSetSize >= warningBytes,
+    );
+    if (oversized.length === 0) return;
+    this.lastAnalysisServerNotificationTime = now;
+
+    const largest = Math.max(...oversized.map((p) => p.workingSetSize));
+    const msg = l10n('systemHealth.notification.analysisServerLarge', { size: formatBytes(largest) });
+    const restart = l10n('systemHealth.action.restartAnalysisServer');
+    void vscode.window.showWarningMessage(msg, restart).then((choice) => {
+      if (choice === restart) {
+        void vscode.commands.executeCommand('dart.restartAnalysisServer');
+      }
+    });
   }
 
   private showCriticalNotification(snapshot: DartProcessSnapshot): void {

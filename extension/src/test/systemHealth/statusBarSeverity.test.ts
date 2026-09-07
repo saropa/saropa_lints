@@ -51,6 +51,8 @@ const CONFIG: SystemHealthConfig = {
   warningOrphanCount: 1,
   criticalOrphanCount: 4,
   showNotifications: true,
+  analysisServerWarningGB: 4,
+  systemMemoryWarningPercent: 15,
 };
 
 const MB = 1024 * 1024;

@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} orphaned daemon(s)",
       "criticalOrphans": "🔴 {count} orphaned daemon(s)",
-      "openHint": "Click to open Process Health"
+      "openHint": "Click to open Process Health",
+      "systemRam": "System: {free} of {total} free",
+      "systemLow": "⚠ System: {free} of {total} free"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} process(es) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart processes are using {size} with {orphaned} orphaned daemons. Clean up?",
       "possibleLeak": "Saropa RSS has been rising steadily ({size} and climbing). Possible memory leak — check the health panel.",
-      "result": "Killed {count} orphaned daemons, freed ~{size}"
+      "result": "Killed {count} orphaned daemons, freed ~{size}",
+      "systemLowMemory": "Your machine has only {free} of {total} RAM free. Consider closing unused windows or applications.",
+      "analysisServerLarge": "A Dart analysis server is using {size}. Restart it to free memory?",
+      "sessionStartLow": "Your machine has {free} of {total} RAM free. Consider closing unused VS Code windows or Ollama models before starting work."
     },
     "action": {
       "cleanUp": "Clean Up",
       "openPanel": "Open Health Panel",
       "dismiss": "Dismiss",
       "optimizeAnalysis": "Optimize Analysis",
-      "dontShowAgain": "Don’t Show Again"
+      "dontShowAgain": "Don’t Show Again",
+      "openMachineDashboard": "Open Machine Health",
+      "restartAnalysisServer": "Restart"
     },
     "cleanup": {
       "noOrphans": "No orphaned daemons found.",
@@ -749,6 +756,50 @@
       "kill": "Kill",
       "killed": "Killed",
       "killFailed": "Failed"
+    }
+  },
+  "machineDashboard": {
+    "title": "Machine Health",
+    "refresh": "Refresh",
+    "systemUnknown": "System memory could not be read on this platform.",
+    "platformUnsupported": "Machine Health requires Windows — process queries are not available on this platform.",
+    "freeOf": "free of",
+    "used": "used",
+    "recommendationsTitle": "Recommendations",
+    "recommendationsNone": "No issues detected.",
+    "noProcesses": "No Dart, Flutter, or model-host processes running.",
+    "orphanCount": "{count} orphaned",
+    "kill": "Kill",
+    "group": {
+      "analysisServer": "Dart Analysis Servers",
+      "flutterDaemon": "Flutter Daemons",
+      "saropa": "Saropa Lints",
+      "otherDart": "Other Dart Processes",
+      "modelHost": "Translation Engine (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Only {free} of {total} RAM is free machine-wide. Close unused applications or VS Code windows.",
+      "orphansFound": "{count} orphaned process(es) are holding {size} of memory from an earlier session.",
+      "analysisServerLarge": "{count} Dart analysis server process(es) are using up to {size}. A restart releases the memory.",
+      "multipleAnalysisServers": "{count} Dart analysis servers are running — likely one per open VS Code window on overlapping projects.",
+      "noHeapCap": "The Dart analysis server has no memory ceiling configured. Setting one caps worst-case growth.",
+      "modelLoaded": "Model \"{model}\" is loaded in the translation engine, using {size}."
+    },
+    "action": {
+      "reclaim": "Reclaim",
+      "restartAnalysisServer": "Restart",
+      "setHeapCap": "Set Cap",
+      "unloadModel": "Unload"
+    },
+    "heapCap": {
+      "prompt": "Analysis server heap cap in MB (e.g. 4096)",
+      "invalid": "Enter a whole number of megabytes greater than 0.",
+      "applied": "Set analysis server heap cap to {mb} MB. Restart the analysis server for it to take effect.",
+      "restartNow": "Restart Now"
+    },
+    "unload": {
+      "succeeded": "Unloaded model \"{model}\".",
+      "failed": "Could not unload model \"{model}\" — the Ollama CLI may not be on PATH."
     }
   },
   "memoryPressure": {
@@ -2571,7 +2622,9 @@
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% reviewed",
       "hotspotsDescription": "{open} open",
-      "lastRunLabel": "Last run · {ago}"
+      "lastRunLabel": "Last run · {ago}",
+      "machineHealthLabel": "Machine Health",
+      "machineHealthDescription": "RAM, orphans & translation engine across the whole machine"
     },
     "dashboards": {
       "commandCatalogLabel": "All commands…",

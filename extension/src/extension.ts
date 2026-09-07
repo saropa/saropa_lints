@@ -159,6 +159,9 @@ import { classifyProcess, formatBytes, isAnalysisServerProcess, isDaemonProcess,
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
 import { registerOrphanPreflight } from './systemHealth/orphanPreflight';
 import { HealthPanel } from './systemHealth/healthPanel';
+import { MachineDashboard } from './systemHealth/machineDashboard';
+import { registerMachineDashboardCommands } from './systemHealth/machineDashboardCommands';
+import { querySystemMemory } from './systemHealth/systemQuery';
 import { HealthLevel } from './systemHealth/types';
 import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
 import { HealthTrigger } from './systemHealth/types';
@@ -1275,6 +1278,28 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       tooltipLines.push(...buildProcessTooltipLines(systemHealthSnapshot, systemHealthAssessment, saropaTrend, saropaRssHistory));
     }
 
+    // Machine-wide RAM: show in tooltip always (when available), and promote
+    // to the status bar text when free RAM is below the configured threshold
+    // and no saropa-specific or memory-pressure issue is already displayed.
+    const systemMem = processMonitor.getLastSystemMemory();
+    if (systemMem) {
+      const config = vscode.workspace.getConfiguration('saropaLints.systemHealth');
+      const threshold = config.get<number>('systemMemoryWarningPercent', 15);
+      const freePercent = systemMem.freeFraction * 100;
+      // Always show machine RAM in the tooltip for at-a-glance context.
+      tooltipLines.push(l10n('systemHealth.statusBar.systemRam', {
+        free: formatBytes(systemMem.freeBytes),
+        total: formatBytes(systemMem.totalBytes),
+      }));
+      // When system RAM is low and no other health text is showing, surface it.
+      if (!text && freePercent < threshold) {
+        text = l10n('systemHealth.statusBar.systemLow', {
+          free: formatBytes(systemMem.freeBytes),
+          total: formatBytes(systemMem.totalBytes),
+        });
+      }
+    }
+
     if (!text) {
       memoryStatusBarItem.hide();
       return;
@@ -1433,6 +1458,33 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   });
   processMonitor.start();
 
+  // One-shot session-start memory check, deferred 5s past activation (not
+  // run inline here) so it never delays activation itself — activation-time
+  // latency is user-visible as "VS Code feels slow to open", whereas a
+  // notification arriving 5s later is unnoticed. Separate from
+  // ProcessMonitor's own recurring low-memory check (10-minute throttle,
+  // starts from whatever the machine looked like when the first poll ran)
+  // because this one specifically answers "should I have started work at
+  // all?" before any work has happened yet.
+  setTimeout(() => {
+    void (async () => {
+      const config = vscode.workspace.getConfiguration('saropaLints.systemHealth');
+      if (!config.get<boolean>('showNotifications', true)) return;
+      const system = await querySystemMemory();
+      if (!system) return;
+      // Honor the user's configured threshold — a user who lowered it to 10%
+      // did so to silence exactly this kind of nag on machines that idle near 15%.
+      const warningPercent = config.get<number>('systemMemoryWarningPercent', 15);
+      if (system.freeFraction * 100 >= warningPercent) return;
+      void vscode.window.showInformationMessage(
+        l10n('systemHealth.notification.sessionStartLow', {
+          free: formatBytes(system.freeBytes),
+          total: formatBytes(system.totalBytes),
+        }),
+      );
+    })();
+  }, 5_000);
+
   // Memory pressure watcher: reads memory_state.json written by the analyzer
   // plugin on shed-level transitions. Surfaces graduated rule shedding in the
   // status bar without polling — uses fs.watch on the reports directory.
@@ -1462,9 +1514,17 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // an earlier session). Registers its command immediately but defers the
   // process-table scan well past activation — see orphanPreflight.ts.
   registerOrphanPreflight(context);
+  // Heap-cap and Ollama-unload actions the Machine Health dashboard's
+  // Recommendations panel dispatches by command name (see machineDashboard.ts's
+  // handleMessage) — registered independently of the panel so they also work
+  // from the command palette without ever opening the dashboard.
+  registerMachineDashboardCommands(context);
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.showProcessHealth', () => {
       HealthPanel.createOrShow(context);
+    }),
+    vscode.commands.registerCommand('saropaLints.showMachineDashboard', () => {
+      MachineDashboard.createOrShow(context);
     }),
   );
 

@@ -68,7 +68,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0-beta.8] — Unreleased
 
-Fixed a sidebar action that could crash on a project's first scan or run twice on rapid clicks, and shortened several sidebar labels. Internal reliability fixes round out the translation engine and memory monitoring. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.8/CHANGELOG.md)
+Fixed a sidebar action that could crash on a project's first scan or run twice on rapid clicks, and shortened several sidebar labels. System Health now monitors the whole machine — not just saropa_lints' own processes — with proactive warnings and one-click fixes. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.8/CHANGELOG.md)
+
+### Added (Extension)
+
+- Machine-wide health monitoring: system RAM, every Dart analysis server, Flutter daemon, and Ollama/llama-server process grouped by category with contextual recommendations and one-click actions (restart server, set heap cap, reclaim orphans, unload model). Accessible from the sidebar and command palette. No action required.
+- Proactive warnings when free RAM drops below a configurable threshold (`saropaLints.systemHealth.systemMemoryWarningPercent`, default 15%) or any single analysis server exceeds a configurable size (`saropaLints.systemHealth.analysisServerWarningGB`, default 4 GB), plus a one-time session-start check. No action required.
 
 ### Fixed (Extension)
 
@@ -83,9 +88,6 @@ Fixed a sidebar action that could crash on a project's first scan or run twice o
 
 - Extracted `createBusyGuard` to `commandGuards.ts` as a reusable concurrency guard with visible status-bar feedback, replacing four identical inline busy-flag patterns in the stale-ignore commands. No action required.
 - Routed the three sidebar Actions labels ("Run analysis", "Prune ignores", "Update config") through `l10n()` with new `sidebar.actions.*` keys in `en.json`, closing an i18n gap where two of the three labels were hardcoded English. No action required.
-- Translation engine: restricted `os.killpg` to daemon PIDs only, preventing a swept orphan PID from killing an unrelated process group after PGID reuse. Orphan detection now returns early on POSIX with an explanation instead of silently never matching. `PermissionError` during tree kill is no longer counted as a successful reap. Restart accounting consolidated to a single increment site. No action required.
-- Memory safety valve: added exponential backoff on consecutive forced-clear trips (30 s doubling to 5 min cap), eliminating the 30-second cache-clear oscillation. Recheck and trend-log cache walks are now shared per sample. The test-only probe-failure flag is inert in release builds. A log line now fires when the RAM-probe fallback cap activates. No action required.
-- Memory pressure watcher: debounce timer is now an instance field cleared on dispose, preventing a post-dispose fire from reading stale state. Restarting on a different folder gets a clean slate. Plugin enrolment now checks first-level subdirectories for monorepo layouts. Host start time recomputes on each activation so "Restart Extension Host" no longer hides live state. No action required.
 
 ---
 

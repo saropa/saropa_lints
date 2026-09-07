@@ -938,6 +938,21 @@
         "icon": "$(pulse)"
       },
       {
+        "command": "saropaLints.showMachineDashboard",
+        "title": "%command.showMachineDashboard.title%",
+        "icon": "$(dashboard)"
+      },
+      {
+        "command": "saropaLints.setAnalysisServerHeapCap",
+        "title": "%command.setAnalysisServerHeapCap.title%",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "saropaLints.unloadOllamaModel",
+        "title": "%command.unloadOllamaModel.title%",
+        "icon": "$(circle-slash)"
+      },
+      {
         "command": "saropaLints.checkOrphanedProcesses",
         "title": "%command.checkOrphanedProcesses.title%",
         "icon": "$(circuit-board)"
@@ -2142,6 +2157,20 @@
             "type": "boolean",
             "default": true,
             "description": "%config.property.systemHealth.showNotifications.description%"
+          },
+          "saropaLints.systemHealth.analysisServerWarningGB": {
+            "type": "number",
+            "default": 4,
+            "minimum": 1,
+            "maximum": 64,
+            "description": "%config.property.systemHealth.analysisServerWarningGB.description%"
+          },
+          "saropaLints.systemHealth.systemMemoryWarningPercent": {
+            "type": "number",
+            "default": 15,
+            "minimum": 5,
+            "maximum": 50,
+            "description": "%config.property.systemHealth.systemMemoryWarningPercent.description%"
           }
         }
       },

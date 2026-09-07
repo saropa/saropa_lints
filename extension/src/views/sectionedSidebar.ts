@@ -754,6 +754,26 @@ function appendEnginesRow(items: LeafItem[]): void {
     ));
 }
 
+/**
+ * Static launcher row for the Machine Health dashboard (PLAN_memory_stability_features.md
+ * Phase 1). Unlike appendEnginesRow above, this row carries no live summary —
+ * the dashboard's data (system RAM, Ollama models, every Dart process on the
+ * box) is expensive enough to gather that re-querying it just to render one
+ * sidebar description line would duplicate the panel's own refresh cost on
+ * every sidebar repaint. Windows-only, matching the subsystem it opens
+ * (processQuery.ts, orphanHosts.ts, systemQuery.ts all shell out to
+ * PowerShell CIM queries with no cross-platform equivalent yet).
+ */
+function appendMachineHealthRow(items: LeafItem[]): void {
+    if (process.platform !== 'win32') return;
+    items.push(new LeafItem(
+        l10n('sidebar.status.machineHealthLabel'),
+        l10n('sidebar.status.machineHealthDescription'),
+        'saropaLints.showMachineDashboard',
+        'dashboard',
+    ));
+}
+
 // `appendLintIntegrationRow` ("Lint integration: On/Off") was REMOVED here
 // (PLAN_ext_ui_sidebar_reset.md P3, §3.1 row "Lint integration: On/Off
 // (Settings)"). Two reasons:
@@ -822,6 +842,7 @@ function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
 
     appendHealthRow(items, history, data, total, critical, root);
     appendEnginesRow(items);
+    appendMachineHealthRow(items);
     appendHotspotsRow(items, data, workspaceState);
     appendLastRunRow(items, history);
 
