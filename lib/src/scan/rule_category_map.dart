@@ -8,7 +8,6 @@
 /// A unit test validates that every registered rule appears in this map.
 // ignore_for_file: prefer_single_quotes
 library;
-
 const Map<String, String> ruleCategoryMap = <String, String>{
   'abi_specific_integer_invalid': 'data',
   'abstract_field_initializer': 'architecture',
@@ -16,6 +15,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'always_put_doc_comments_before_annotations': 'stylistic',
   'always_remove_getx_listener': 'packages',
   'always_remove_listener': 'widget',
+  'always_specify_parameter_names': 'code_quality',
   'annotate_inherited_member_redeclaration': 'stylistic',
   'app_links_avoid_get_initial_link_string': 'packages',
   'app_links_listen_in_build': 'packages',
@@ -861,8 +861,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'conflicting_constructor_and_static_member': 'architecture',
   'connectivity_satellite_missing': 'packages',
   'consistent_update_render_object': 'widget',
-  'constructor_parameters_and_fields_should_have_the_same_order':
-      'architecture',
+  'constructor_parameters_and_fields_should_have_the_same_order': 'architecture',
   'deprecated_new_in_comment_reference': 'core',
   'device_calendar_event_missing_calendar_id': 'packages',
   'device_calendar_event_utc_timezone': 'packages',

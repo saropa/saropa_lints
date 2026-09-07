@@ -17,6 +17,7 @@ export 'architecture/compile_time_syntax_rules.dart';
 export 'commerce/iap_rules.dart';
 
 // Code quality
+export 'code_quality/always_specify_parameter_names_rule.dart';
 export 'code_quality/code_quality_avoid_rules.dart';
 export 'code_quality/code_quality_control_flow_rules.dart';
 export 'code_quality/code_quality_prefer_rules.dart';

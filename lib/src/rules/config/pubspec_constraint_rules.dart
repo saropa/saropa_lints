@@ -153,6 +153,20 @@ class RequireSdkUpperBoundRule extends SaropaLintRule {
 /// dependencies:
 ///   http: ^1.2.0
 /// ```
+///
+/// **GOOD (workspace-internal package resolved locally):**
+/// ```yaml
+/// dependencies:
+///   saropa_core: any
+/// dependency_overrides:
+///   saropa_core:
+///     path: ../saropa_core
+/// ```
+/// In a pub workspace or Melos monorepo, an `any` constraint paired with a
+/// `path:` override in `dependency_overrides:` is inert — pub resolves via
+/// the local path, not the loose constraint, so there is no reproducibility
+/// risk. Only `path:` overrides suppress this rule; `git:` and `hosted:`
+/// overrides still resolve through pub's normal version negotiation.
 class AvoidUnboundedDependencyRule extends SaropaLintRule {
   AvoidUnboundedDependencyRule() : super(code: _code);
 
@@ -191,7 +205,16 @@ class AvoidUnboundedDependencyRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     _reportPubspecOnce(reporter, context, _reportedRoots, (parsed) {
-      return parsed.dependencies.any((dep) => dep.constraint.isAny);
+      // Exclude dependencies whose `any` constraint is neutralized by a local
+      // `path:` override in `dependency_overrides:` — pub resolves via the
+      // path, not the loose constraint, so the unboundedness is inert. This
+      // is the standard Melos/pub-workspace pattern for workspace-internal
+      // packages.
+      return parsed.dependencies.any(
+        (dep) =>
+            dep.constraint.isAny &&
+            !parsed.pathOverriddenPackages.contains(dep.name),
+      );
     });
   }
 }

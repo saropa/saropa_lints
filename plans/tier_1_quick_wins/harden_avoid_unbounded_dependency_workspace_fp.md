@@ -1,6 +1,6 @@
 # HARDENING SPEC: `avoid_unbounded_dependency` — Melos/Workspace False Positive
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-06
 Type: Hardening (false-positive guard) on a shipped rule

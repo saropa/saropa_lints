@@ -231,6 +231,7 @@ final List<SaropaLintRule Function()>
 _allRuleFactories = <SaropaLintRule Function()>[
   // Core rules,
   AlwaysFailRule.new,
+  AlwaysSpecifyParameterNamesRule.new,
   AvoidNullAssertionRule.new,
   PreferConditionalLoggingRule.new,
   PreferLogLevelsRule.new,

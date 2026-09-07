@@ -223,6 +223,7 @@ class ParsedPubspec {
     required this.sdkConstraint,
     required this.dependencies,
     required this.hasDependencyOverrides,
+    required this.pathOverriddenPackages,
     required this.hasPublishTo,
     required this.hasHomepage,
     required this.hasRepository,
@@ -247,6 +248,17 @@ class ParsedPubspec {
   /// or `dependency_overrides: {}`) is not a violation: nothing is actually
   /// being overridden.
   final bool hasDependencyOverrides;
+
+  /// Package names that have a `path:` entry inside `dependency_overrides:`.
+  ///
+  /// Exists specifically to suppress the workspace `any` false positive in
+  /// `avoid_unbounded_dependency`: when a dependency's `any` constraint is
+  /// paired with a local `path:` override, pub resolves via the path — not the
+  /// loose version range — so the constraint's unboundedness carries no real
+  /// reproducibility risk. Only `path:` overrides qualify; `git:` and `hosted:`
+  /// overrides still resolve through pub's normal version negotiation, so they
+  /// do NOT neutralize an `any` constraint.
+  final Set<String> pathOverriddenPackages;
 
   /// True when a `publish_to:` key exists at all, regardless of its value
   /// (`none` or a custom hosted-package server URL). Distinct from [isApp],
@@ -279,6 +291,18 @@ final RegExp _dependencyOverridesHeader = RegExp(r'^dependency_overrides:\s*$');
 
 /// A 2-space-indented `name: value` entry. `value` may be empty (block follows).
 final RegExp _depEntry = RegExp(r'^  ([a-zA-Z0-9_][a-zA-Z0-9_-]*):(.*)$');
+
+/// A 4-space-indented `path:` child line inside a `dependency_overrides:`
+/// entry. The 4-space indent makes it a child of the 2-space package entry
+/// (YAML block mapping nesting). Only `path:` overrides neutralize an `any`
+/// constraint — `git:` and `hosted:` still resolve through pub's normal
+/// version negotiation and do not suppress the unbounded-dependency lint.
+/// Requires at least one non-whitespace character after `path:` so a bare
+/// `path:` with no value does not falsely suppress the lint. Uses `\s*\S`
+/// (zero-or-more whitespace then a non-whitespace) so `path:../foo` (no space
+/// after the colon) also matches — technically not valid YAML block mapping
+/// syntax, but tolerating it is cheaper than debugging a silent miss.
+final RegExp _pathOverrideChild = RegExp(r'^    path:\s*\S');
 
 /// `publish_to: none` at column 0 marks an application, not a published
 /// package. Uses `[ \t]*` (not `\s*`) around the value: `\s` matches `\n`,
@@ -326,6 +350,46 @@ final RegExp _repositoryField = RegExp(
   multiLine: true,
 );
 
+/// Collects package names from `dependency_overrides:` that have a `path:`
+/// child key. Pure function — a separate pass over the lines keeps the main
+/// parser under the 50-line-of-logic soft limit and isolates the workspace
+/// false-positive guard from the constraint-parsing logic.
+///
+/// Returns a tuple: the set of path-overridden package names, and whether
+/// the `dependency_overrides:` section is non-empty (has at least one entry).
+(Set<String>, bool) _collectPathOverrides(List<String> lines) {
+  final pathOverriddenPackages = <String>{};
+  var hasDependencyOverrides = false;
+  var inOverrides = false;
+  String? currentPackage;
+
+  for (final line in lines) {
+    // A non-indented, non-blank line starts a new top-level block.
+    if (line.isNotEmpty && !line.startsWith(' ') && !line.startsWith('\t')) {
+      inOverrides = _dependencyOverridesHeader.hasMatch(line);
+      if (!inOverrides) currentPackage = null;
+      continue;
+    }
+
+    if (!inOverrides) continue;
+
+    final depMatch = _depEntry.firstMatch(line);
+    if (depMatch != null) {
+      // Any 2-space-indented child line means the section is non-empty.
+      hasDependencyOverrides = true;
+      // Remember this package name so a subsequent `path:` child line
+      // (4-space indent) can be associated with it.
+      currentPackage = depMatch.group(1);
+    } else if (currentPackage != null && _pathOverrideChild.hasMatch(line)) {
+      // A 4-space-indented `path:` line means pub resolves this package
+      // from a local directory, not from the version constraint.
+      pathOverriddenPackages.add(currentPackage);
+    }
+  }
+
+  return (pathOverriddenPackages, hasDependencyOverrides);
+}
+
 /// Parses a `pubspec.yaml` body into the [ParsedPubspec] the rules consume.
 ParsedPubspec parsePubspecConstraints(String content) {
   final lines = content.split(RegExp(r'\r\n?|\n'));
@@ -336,37 +400,23 @@ ParsedPubspec parsePubspecConstraints(String content) {
   final hasPublishTo = _publishToAny.hasMatch(content);
   final hasHomepage = _homepageField.hasMatch(content);
   final hasRepository = _repositoryField.hasMatch(content);
+  // Separate pass collects path-overridden packages and the override-present
+  // flag — keeps the main loop focused on constraints only.
+  final (pathOverriddenPackages, hasDependencyOverrides) =
+      _collectPathOverrides(lines);
   ParsedConstraint? sdkConstraint;
   final dependencies = <PubspecDependency>[];
-  // True once a `dependency_overrides:` header AND at least one indented
-  // child entry under it have both been seen.
-  var hasDependencyOverrides = false;
 
   // Track which top-level block we are inside. Only `environment` and the two
   // dependency sections matter; anything else (flutter:, dev tooling) is skipped.
   bool inDepSection = false;
   bool inEnvironment = false;
-  // Tracked separately from inDepSection: override entries must NOT be added
-  // to `dependencies` (they are not the package's own declared constraints,
-  // and folding them in would make the range-hygiene rules reason about
-  // versions the pubspec doesn't actually declare).
-  bool inDependencyOverrides = false;
 
   for (final line in lines) {
     // A non-indented, non-blank line starts a new top-level block.
     if (line.isNotEmpty && !line.startsWith(' ') && !line.startsWith('\t')) {
       inDepSection = _depSectionHeader.hasMatch(line);
       inEnvironment = line.trimRight() == 'environment:';
-      inDependencyOverrides = _dependencyOverridesHeader.hasMatch(line);
-      continue;
-    }
-
-    if (inDependencyOverrides) {
-      // Any 2-space-indented child line under the header means the section
-      // is non-empty — a real override is being forced.
-      if (_depEntry.hasMatch(line)) {
-        hasDependencyOverrides = true;
-      }
       continue;
     }
 
@@ -399,6 +449,7 @@ ParsedPubspec parsePubspecConstraints(String content) {
     sdkConstraint: sdkConstraint,
     dependencies: dependencies,
     hasDependencyOverrides: hasDependencyOverrides,
+    pathOverriddenPackages: pathOverriddenPackages,
     hasPublishTo: hasPublishTo,
     hasHomepage: hasHomepage,
     hasRepository: hasRepository,
@@ -411,6 +462,13 @@ ParsedPubspec parsePubspecConstraints(String content) {
 /// without depending on field access syntax staying stable.
 bool hasDependencyOverridesEntries(ParsedPubspec parsed) {
   return parsed.hasDependencyOverrides;
+}
+
+/// Returns the set of package names that have a `path:` entry inside
+/// `dependency_overrides:`. Same thin-wrapper rationale as
+/// [hasDependencyOverridesEntries]: keeps the test surface stable and named.
+Set<String> getPathOverriddenPackages(ParsedPubspec parsed) {
+  return parsed.pathOverriddenPackages;
 }
 
 /// Returns true when [parsed] looks like an application pubspec that is

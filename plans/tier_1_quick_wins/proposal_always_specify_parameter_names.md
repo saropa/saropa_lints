@@ -1,6 +1,6 @@
 # PROPOSAL: Require Named Arguments at Call Sites With Ambiguous Positional Parameters
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

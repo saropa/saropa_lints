@@ -1780,6 +1780,8 @@ const Set<String> recommendedOnlyRules = <String>{
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
 /// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
+  // Call-site safety: flags 2+ consecutive positional args of confusable type
+  'always_specify_parameter_names',
   'mutable_tearoff',
   'no_direct_iterable_access',
   // Android 14 partial photo/video access (android_rules.dart). Advisory (INFO),

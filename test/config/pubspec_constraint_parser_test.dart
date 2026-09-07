@@ -902,6 +902,224 @@ dependency_overrides:
     });
   });
 
+  // ---------------------------------------------------------------------------
+  // pathOverriddenPackages / avoid_unbounded_dependency workspace suppression —
+  // exercises the path-override tracking added to parsePubspecConstraints and
+  // the per-package exclusion in avoid_unbounded_dependency. An `any` constraint
+  // paired with a `path:` override in dependency_overrides is inert (pub
+  // resolves via the local path), so it must not flag. Only `path:` overrides
+  // suppress; `git:` and `hosted:` do not.
+  // ---------------------------------------------------------------------------
+  group('pathOverriddenPackages (workspace FP suppression)', () {
+    // Helper: thin named wrapper matching hasDependencyOverridesEntries pattern.
+    // Keeps the test surface stable regardless of ParsedPubspec field syntax.
+    Set<String> pathOverridden(String pubspec) {
+      return getPathOverriddenPackages(parsePubspecConstraints(pubspec));
+    }
+
+    /// Helper: returns true when at least one dependency in [pubspec] would
+    /// trigger avoid_unbounded_dependency — i.e. has `isAny` AND is not
+    /// suppressed by a path override. Mirrors the rule's actual predicate.
+    bool hasUnsuppressedUnbounded(String pubspec) {
+      final parsed = parsePubspecConstraints(pubspec);
+      return parsed.dependencies.any(
+        (dep) =>
+            dep.constraint.isAny &&
+            !parsed.pathOverriddenPackages.contains(dep.name),
+      );
+    }
+
+    // Edge case 1: plain unbounded with no overrides at all — baseline
+    // regression guard; the common case this rule exists for.
+    test('plain unbounded dependency with no overrides still flags', () {
+      const pubspec = '''
+name: my_app
+dependencies:
+  http: any
+''';
+      expect(pathOverridden(pubspec), isEmpty);
+      expect(hasUnsuppressedUnbounded(pubspec), isTrue);
+    });
+
+    // Edge case 2: `any` + `path:` override for the SAME package — the target
+    // fix. Pub resolves via the local path, so the `any` is inert.
+    test('any + path override for same package does NOT flag', () {
+      const pubspec = '''
+name: my_workspace
+dependencies:
+  saropa_core: any
+dependency_overrides:
+  saropa_core:
+    path: ../saropa_core
+''';
+      expect(pathOverridden(pubspec), {'saropa_core'});
+      expect(hasUnsuppressedUnbounded(pubspec), isFalse);
+    });
+
+    // Edge case 3: `any` + `git:` override — MUST still flag. A git override
+    // still resolves through pub's version negotiation (just from a different
+    // source), so the loose constraint remains a reproducibility risk.
+    test('any + git override still flags', () {
+      const pubspec = '''
+name: my_app
+dependencies:
+  http: any
+dependency_overrides:
+  http:
+    git:
+      url: https://github.com/dart-lang/http.git
+      ref: main
+''';
+      expect(pathOverridden(pubspec), isEmpty);
+      expect(hasUnsuppressedUnbounded(pubspec), isTrue);
+    });
+
+    // Edge case 4: `any` + `hosted:` override — MUST still flag, same
+    // reasoning as git.
+    test('any + hosted override still flags', () {
+      const pubspec = '''
+name: my_app
+dependencies:
+  http: any
+dependency_overrides:
+  http:
+    hosted:
+      name: http
+      url: https://my-private-server.example.com
+''';
+      expect(pathOverridden(pubspec), isEmpty);
+      expect(hasUnsuppressedUnbounded(pubspec), isTrue);
+    });
+
+    // Edge case 5: override present but for a DIFFERENT package — the
+    // unbounded one must still flag because the override does not apply to it.
+    test('path override for different package does not suppress unbounded', () {
+      const pubspec = '''
+name: my_app
+dependencies:
+  http: any
+dependency_overrides:
+  collection:
+    path: ../collection
+''';
+      expect(pathOverridden(pubspec), {'collection'});
+      expect(hasUnsuppressedUnbounded(pubspec), isTrue);
+    });
+
+    // Edge case 6: empty flow-map `dependency_overrides: {}` — no overrides
+    // are actually present, so the unbounded dep must still flag.
+    test('empty dependency_overrides: {} still flags unbounded', () {
+      const pubspec = '''
+name: my_app
+dependencies:
+  http: any
+dependency_overrides: {}
+''';
+      expect(pathOverridden(pubspec), isEmpty);
+      expect(hasUnsuppressedUnbounded(pubspec), isTrue);
+    });
+
+    // Edge case 7: `dependency_overrides:` appears BEFORE `dependencies:` in
+    // file order. The single-pass parser must collect path overrides regardless
+    // of section order — the set is fully built before the rule predicate runs.
+    test('dependency_overrides before dependencies still suppresses', () {
+      const pubspec = '''
+name: my_workspace
+dependency_overrides:
+  saropa_core:
+    path: ../saropa_core
+dependencies:
+  saropa_core: any
+''';
+      expect(pathOverridden(pubspec), {'saropa_core'});
+      expect(hasUnsuppressedUnbounded(pubspec), isFalse);
+    });
+
+    // Edge case 8: multiple unbounded deps, only ONE has a path override —
+    // verifies the exclusion is per-package, not all-or-nothing.
+    test('only the non-overridden unbounded dep flags', () {
+      const pubspec = '''
+name: my_workspace
+dependencies:
+  saropa_core: any
+  http: any
+dependency_overrides:
+  saropa_core:
+    path: ../saropa_core
+''';
+      expect(pathOverridden(pubspec), {'saropa_core'});
+      // http is still unbounded and not path-overridden — must flag.
+      expect(hasUnsuppressedUnbounded(pubspec), isTrue);
+      // Verify saropa_core alone would NOT flag.
+      final parsed = parsePubspecConstraints(pubspec);
+      final httpDep = parsed.dependencies.firstWhere((d) => d.name == 'http');
+      final coreDep = parsed.dependencies.firstWhere(
+        (d) => d.name == 'saropa_core',
+      );
+      expect(httpDep.constraint.isAny, isTrue);
+      expect(
+        parsed.pathOverriddenPackages.contains('http'),
+        isFalse,
+      );
+      expect(coreDep.constraint.isAny, isTrue);
+      expect(
+        parsed.pathOverriddenPackages.contains('saropa_core'),
+        isTrue,
+      );
+    });
+
+    // Edge case 9: `path:` value missing/malformed — bare `path:` with no
+    // actual value must NOT suppress the lint. The regex requires at least
+    // one non-whitespace character after `path:`.
+    test('bare path: with no value does NOT suppress', () {
+      const pubspec = '''
+name: my_app
+dependencies:
+  http: any
+dependency_overrides:
+  http:
+    path:
+''';
+      // No non-whitespace after `path:`, so http is NOT path-overridden.
+      expect(pathOverridden(pubspec), isEmpty);
+      expect(hasUnsuppressedUnbounded(pubspec), isTrue);
+    });
+
+    // Edge case 10: unrelated overrides + unrelated unbounded dep — the
+    // guard is scoped strictly by package name equality, not "any override
+    // present anywhere in the file."
+    test('unrelated path override does not suppress unrelated unbounded', () {
+      const pubspec = '''
+name: my_app
+dependencies:
+  http: any
+  collection: ^1.19.0
+dependency_overrides:
+  args:
+    path: ../args
+''';
+      expect(pathOverridden(pubspec), {'args'});
+      expect(hasUnsuppressedUnbounded(pubspec), isTrue);
+    });
+
+    // Sanity check: multiple packages with path overrides are all collected.
+    test('multiple path overrides are all collected', () {
+      const pubspec = '''
+name: my_workspace
+dependencies:
+  saropa_core: any
+  saropa_utils: any
+dependency_overrides:
+  saropa_core:
+    path: ../saropa_core
+  saropa_utils:
+    path: ../saropa_utils
+''';
+      expect(pathOverridden(pubspec), {'saropa_core', 'saropa_utils'});
+      expect(hasUnsuppressedUnbounded(pubspec), isFalse);
+    });
+  });
+
   // Behavioral coverage for `prefer_pinned_version_syntax` (the deliberate
   // stylistic opposite of `prefer_caret_constraint_in_app`): fires only for
   // apps (publish_to: none) that have at least one caret-syntax dependency.
