@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "{total} maelezo ya kusandika kwa sasa inapakia katika versi hii (mazungumzaji {essential} · mazungumzaji ya kuchangia {recommended} · mazungumzaji ya kifalme {professional} · mazungumzaji ya kifalme {comprehensive} · mazungumzaji ya kifalme {pedantic} · {stylistic} mazungumzaji ya kuchangia)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Sikilizaji ya v16"
+    },
+    "hero": {
+      "subtitle": "Unganisha hali ya kipindi kwa kuzungumza kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kipindi kwa kip."
+    },
+    "checkbox": {
+      "label": "Tazama hiki kwa muda mwingi",
+      "hint": "Kuzingia kwenye kati ya kati kuzalisha kipengele hiki. Kama haukufaniki, kipengele hiki kuzalisha kipengele kwa kipengele.",
+      "hintEnabled": "Ondoa hili kufuta kuzalishia matokeo ya kuzalishia."
+    },
+    "card": {
+      "engine": {
+        "header": "MAHUSU: Mengine ya Diagnostiki ya Kati ya Kati iliyongezeka",
+        "body": "Injini inayozalisha uchunguzi wako sio tena Programu-jalizi ya Kichanganuzi inayochakachuliwa - sasa ni seva ya LSP inayojitegemea, iliyowashwa kwa chaguomsingi kwa kila mradi. Hii ni programu ya beta, na tabia yake bado inabadilika kati ya matoleo. Ikiwa sheria unayotegemea itaacha kurusha, moto tofauti, au kurekebisha haraka kutoweka, hii ndiyo sababu inayowezekana zaidi. Programu-jalizi ya Analyzer bado ipo na inaweza kurejeshwa kwa mbofyo mmoja.",
+        "why": "Hii ni changi kwa nini ina kufanya analysis yako, hau ni update ya UI ya kipasifika. Ona kushirikisha diagnostics yako ina kufanya tofauti kwa kipasifika kila siku kama unaweza kushirikisha wakati.",
+        "actionHealth": "Unganisha Panel ya Uzalishaji",
+        "actionRevert": "Kubadilisha kwa Plugin ya Analyzer",
+        "revertConfirm": "Ungewekani kwa Plugin ya Analyzer. Server ya LSP inaonekani imetumika kwa workspace hili."
+      },
+      "monitoring": {
+        "header": "Moto: Uchunguzi wa Uzalishaji wa Mchakato",
+        "body": "Extension ina kufungua RAM ya system, kila server ya analysis ya Dart, daemon ya Flutter na proses ya background — hakuna kwa kuchagua yake. Indikator ya Budget ya Dev Tool ina kushinda kama dev tools yakupata kutoa kati ya RAM ya kutoa, na proses ya kuzalishwa kutokana na sesion ya kuzalishwa kuzalishwa kuzalishwa kwa kuanza.",
+        "why": "Proyeksi mbalimbali kuzalishia kwa muda mrefu kwa server ya analizi. Unaweza kushuhudia kwa kipato kila siku kila siku kwa muda mrefu kwa makini yako.",
+        "actionDashboard": "Fungua Afya ya Mashine",
+        "actionThresholds": "Tumia Mshabiki"
+      },
+      "sidebar": {
+        "header": "Unganisha: Sidebar Ilimisaidia",
+        "body": "Sidebar inatimika kwa 13 kisila kati ya 4 kipaneli. Togglers ya severity, kontrolizi ya engine, na matokeo yamekushuka kwenye dashboard yao. Panel ya Debug yamekushuka kwenye Panel ya Health, na hub ya Home yamekushuka kwa sababu ya status bar na Dashboard ya Findings.",
+        "why": "Kama kifungu kizungumzwa kwenye barini ya kati ilikuwa mlangoni, ilikuwa ilipanda kwenye dashboard — ilikuwa haukupanda.",
+        "actionCatalog": "Browse All Commands Tafuta amri zote",
+        "actionWalkthrough": "Fungua Njia"
+      }
+    },
+    "discover": {
+      "header": "Tazama dashboard ya kwanza",
+      "findings": {
+        "label": "Matokeo ya Dashibodi ya Deshibodi.",
+        "description": "Kila diagnostic ya kati ya project yako, inapangwa kwa kati na kundi."
+      },
+      "packages": {
+        "label": "Dashibodi ya Package Dashboard.",
+        "description": "Unganishaji wa kipengele, matokeo ya kuzalishia, na kuzalisha matokeo ya kifungu."
+      },
+      "rules": {
+        "label": "Moto ya Kifundisho na Mwaka wa Kifundisho",
+        "description": "Tambua kwa nani ya 2,300+ kati ya nizawa ya kuzalisha na kwa kati ya kifedha."
+      },
+      "catalog": {
+        "label": "Katalogi ya amri ya amri Catalog.",
+        "description": "Kila komandi Saropa Lints katika jumla ya matokeo ya kucheza."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Kuhesabi ya kujaribu ina kufanya - kushusha kwa kufinisha.",
     "noProject": "Hakuna project Dart. Openda folder ambalo ina pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Cancel cancel kufuta",
     "runningAnalysis": "Kuendesha uchambuzi ... uchambuzaji.",
     "analysisComplete": "Uchambuzi kamilifu ukamilifu.",
+    "analysisClean": "Hakuna maswala yoyote.",
     "refreshingDashboard": "Dashibodi ya kuburudisha na matokeo ya hivi karibuni.",
     "analysisStartedDetail": "Uchambuzi ulianza. Kukusanya diagnostics ...",
     "analysisFailedDetail": "Uchambuzi umeshindwa. Angalia pato kwa maelezo."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Openda projecti Dart kujaribu",
       "findingsNeverScanned": "Tuma kujaribu",
       "findingsClean": "Hakikisha wakati · matokeo {score}",
+      "findingsCleanFresh": "Hakikisha kushindwa · matokeo {score} · imetokea {ago}",
       "findingsWithViolations": "Vizioni ya {count} · matokeo ya {score}",
+      "findingsWithViolationsFresh": "Vizioni ya {count} · matokeo ya {score} · ilifanikisha na {ago}",
       "packagesNeverScanned": "Tuma kujaribu kujifunza dependencies",
       "packagesAllAdopted": "Watafitishia wote ya kifedha",
       "packagesNeedlesCount": "{count} paketi kuzalisha",

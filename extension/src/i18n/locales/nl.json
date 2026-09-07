@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "{total} lint regels zijn momenteel beschikbaar in deze versie (essentieel {essential} · aanbevolen {recommended} · professioneel {professional} · comprehensief {comprehensive} · pedant {pedantic} · {stylistic} opt-in stylistisch)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Wat is er nieuw in v16"
+    },
+    "hero": {
+      "subtitle": "Deze release wijzigt het standaard diagnostische engine. Lees dit voor je verder werkt — het beïnvloedt wat je zult zien in het Problems-venster."
+    },
+    "checkbox": {
+      "label": "Toon dit de volgende keer",
+      "hint": "Scroll naar beneden om dit te ontgrendelen. Tot dan blijft deze mededeling herhalen.",
+      "hintEnabled": "De notitie moet niet opnieuw verschijnen, deselecteer dit."
+    },
+    "card": {
+      "engine": {
+        "header": "CRITICAL: Standaard Diagnostiek Motor Veranderd",
+        "body": "De engine die je diagnostics produceert is niet langer de in-process Analyzer Plugin — het is nu een standalone LSP server, standaard ingeschakeld voor elke project. Dit is beta software, en het gedrag verandert nog steeds tussen releases. Als een regel waarop je vertrouwt ophoudt met het firen, anders firet of een quick fix verdwijnt, is dit de meest waarschijnlijke oorzaak. De Analyzer Plugin bestaat nog steeds en kan in één klik hersteld worden.",
+        "why": "Dit is een verandering aan wat uw analyse uitvoert, niet een cosmetische UI-update. Bevestig dat uw diagnostiek nog steeds correct uitziest voordat u ze vertrouwt.",
+        "actionHealth": "Open het Gezondheidspaneel",
+        "actionRevert": "Terugkeren naar Analyzer Plugin",
+        "revertConfirm": "Teruggegaan naar de Analyzer Plugin. De LSP Server is nu uitgeschakeld voor dit werkruimte."
+      },
+      "monitoring": {
+        "header": "Nieuw: Machine Health Monitoring",
+        "body": "De extensie monitorert nu systeem RAM, elke Dart analyse server, Flutter daemon en achtergrond proces — niet alleen het eigen. Een Dev Tool Budget indicator waarschuwt wanneer dev tools een instelbare deel van de RAM overschrijden, en gescheiden processen van gecrashte sessies worden gedetecteerd bij opstarten.",
+        "why": "Grote projecten lekken regelmatig analyse servers. Je zult het nu zien voordat je machine langzamer wordt.",
+        "actionDashboard": "Open Machinestatus",
+        "actionThresholds": "Thresholden instellen"
+      },
+      "sidebar": {
+        "header": "Aangepast: Sidebar Vereenvoudigd",
+        "body": "De zijbalk is gereduceerd tot 13 rijen over 4 panelen. Zwaarheidschakelaars, enginebeheer en instellingen zijn verplaatst naar hun dashboards. De Debug Panel is samengevoegd met de Health Panel, en de Home hub is verwijderd in ruil voor de statusbalk en het Findings Dashboard.",
+        "why": "Als iets dat je vroeger klikte in de zijbalk verdwenen is, is het verplaatst naar een dashboard — het is niet verwijderd.",
+        "actionCatalog": "Blader door alle commando's.",
+        "actionWalkthrough": "Open Walkthrough"
+      }
+    },
+    "discover": {
+      "header": "Verken de dashboards",
+      "findings": {
+        "label": "Het bevindingen dashboard.",
+        "description": "Elke diagnose in uw project, filterbaar op ernst en regel."
+      },
+      "packages": {
+        "label": "Package Dashboard van het pakket",
+        "description": "Afhankelijkheidsgesondheid, upgrade-gelegenheden en functie-adoptie."
+      },
+      "rules": {
+        "label": "Regels & Tiers",
+        "description": "Configureer welke van de 2.300+ regels actief zijn en op welke ernst."
+      },
+      "catalog": {
+        "label": "Bevelslijst Katalogus Commando Catalogus",
+        "description": "Elke Saropa Lints commando in één zoekbare lijst."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Een audit loopt al — wacht tot het klaar is.",
     "noProject": "Geen Dart project gevonden. Open een map die een pubspec.yaml bevat.",
@@ -605,6 +661,7 @@
     "cancel": "Annuleren",
     "runningAnalysis": "Het uitvoeren van analyses...",
     "analysisComplete": "Analyse compleet analyse afgerond.",
+    "analysisClean": "Geen problemen gevonden.",
     "refreshingDashboard": "Verfrissend dashboard met de nieuwste bevindingen.",
     "analysisStartedDetail": "De analyse is gestart. Diagnostiek verzamelen...",
     "analysisFailedDetail": "Analyse mislukt. Controleer de uitgang voor details."
@@ -946,7 +1003,7 @@
     },
     "audit": {
       "scopeFieldTitle": "Kies waar de onderzoeken hieronder vandaan komen",
-      "scopeLabel": "Bron",
+      "scopeLabel": "Source",
       "scopeLive": "Live diagnostiek",
       "scopeFull": "Volledige project audit",
       "scopeChangedMain": "Geen wijzigingen vs hoofd",
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Open een Dart project om te scannen",
       "findingsNeverScanned": "Analyse uitvoeren om te scannen",
       "findingsClean": "Geen overtredingen · score {score}",
+      "findingsCleanFresh": "Geen overtredingen · score {score} · bijgewerkt {ago}",
       "findingsWithViolations": "{count} overtredingen · score {score}",
+      "findingsWithViolationsFresh": "{count} overtredingen · score {score} · bijgewerkt {ago}",
       "packagesNeverScanned": "Scan uitvoeren om afhankelijkheden te controleren",
       "packagesAllAdopted": "Alle functies aangenomen",
       "packagesNeedlesCount": "{count} pakketten om te adopteren",

@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "กลุ่มโดย ... โดย...",
   "command.openWalkthrough.title": "Saropa Lints: เริ่มต้นการเริ่มต้น",
   "command.showAbout.title": "เกี่ยวกับ Saropa Lints",
+  "command.showWelcome.title": "Saropa Lints: ข่าวสารใหม่",
   "command.openHelpHub.title": "Saropa Lints: ช่วยเหลือ ความช่วยเหลือ",
   "command.openPubDevSaropaLints.title": "Saropa Lints: เปิดแพ็คเกจบน pub.dev",
   "command.createSaropaInstructions.title": "สร้าง Saropa Lints คําสั่งสําหรับเอเยนต์ AI",

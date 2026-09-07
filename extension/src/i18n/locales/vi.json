@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "Quy tắc lint {total} hiện đang được cung cấp trong phiên bản này (cơ bản {essential} · khuyến nghị {recommended} · chuyên nghiệp {professional} · toàn diện {comprehensive} · cầu kỳ {pedantic} · {stylistic} tùy chọn phong cách)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Có gì mới trong v16"
+    },
+    "hero": {
+      "subtitle": "Phiên bản này thay đổi động cơ chẩn đoán mặc định. Đọc trước khi tiếp tục làm việc — điều này ảnh hưởng đến những gì bạn sẽ thấy trong bảng Problems."
+    },
+    "checkbox": {
+      "label": "Hiển thị lần sau",
+      "hint": "Cuộn xuống dưới để mở khóa điều này. Cho đến khi nào đó, thông báo này sẽ tiếp tục xuất hiện.",
+      "hintEnabled": "Bỏ chọn này để dừng thông báo không còn xuất hiện lại."
+    },
+    "card": {
+      "engine": {
+        "header": "THÔNG CẤP: Đã Thay Đổi Máy Chẩn Đoán Mặc Định",
+        "body": "Engine tạo ra các thông báo chẩn đoán của bạn không còn là Analyzer Plugin trong quá trình thực thi — hiện tại nó là một máy chủ LSP độc lập, mặc định được bật cho mọi dự án. Đây là phần mềm beta, và hành vi của nó vẫn thay đổi giữa các phiên bản. Nếu một quy tắc mà bạn dựa vào ngừng hoạt động, hoạt động khác đi, hoặc một gợi ý nhanh biến mất, nguyên nhân khả dĩ nhất là do điều này. Analyzer Plugin vẫn tồn tại và có thể được khôi phục chỉ với một cú nhấp chuột.",
+        "why": "Đây là thay đổi đối với thứ chạy phân tích của bạn, không phải là cập nhật giao diện người dùng kiểu dáng. Hãy xác nhận các thông báo lỗi vẫn hiển thị đúng trước khi bạn tin tưởng vào chúng.",
+        "actionHealth": "Mở bảng điều khiển Sức khỏe",
+        "actionRevert": "Quay lại Plugin Phân tích",
+        "revertConfirm": "Quay lại plugin Analyzer. Máy chủ LSP hiện được vô hiệu hóa cho không gian làm việc này."
+      },
+      "monitoring": {
+        "header": "Mới: Giám sát Sức khỏe Máy móc",
+        "body": "Phần mở rộng hiện đang giám sát bộ nhớ RAM hệ thống, mọi máy chủ phân tích Dart, Flutter daemon và quy trình nền — không chỉ riêng phần mở rộng. Chỉ số ngân sách công cụ phát triển cảnh báo khi các công cụ phát triển vượt quá một tỷ lệ bộ nhớ RAM có thể cấu hình, và các quy trình bị bỏ rơi từ các phiên bị lỗi sẽ được phát hiện khi khởi động.",
+        "why": "Các dự án lớn thường xuyên làm rò rỉ các máy chủ phân tích. Bây giờ bạn sẽ thấy điều này trước khi máy tính của bạn bị chậm lại.",
+        "actionDashboard": "Mở Trạng thái Máy",
+        "actionThresholds": "Cấu hình Ngưỡng"
+      },
+      "sidebar": {
+        "header": "Đã thay đổi: Thanh bên đơn giản hóa",
+        "body": "Thanh bên phải đã giảm xuống còn 13 hàng trên 4 bảng điều khiển. Các công tắc mức độ nghiêm trọng, điều khiển động cơ và cài đặt đã được di chuyển vào bảng điều khiển của chúng. Bảng điều khiển Debug đã được hợp nhất vào Bảng điều khiển Health, và bảng điều khiển Home đã bị loại bỏ trong favor của thanh trạng thái và Bảng điều khiển Tìm kiếm.",
+        "why": "Nếu điều gì đó bạn từng nhấp vào trong thanh bên là bị mất, nó đã được chuyển đến bảng điều khiển — nó không bị xóa.",
+        "actionCatalog": "Browse All Commands (Tạm dịch: Tìm tất cả các lệnh)",
+        "actionWalkthrough": "Mở Hướng dẫn từng bước"
+      }
+    },
+    "discover": {
+      "header": "Khám phá bảng điều khiển",
+      "findings": {
+        "label": "Kết quả của bảng điều khiển kết luận",
+        "description": "Mỗi chẩn đoán trong toàn bộ dự án của bạn, có thể lọc theo mức độ nghiêm trọng và quy tắc."
+      },
+      "packages": {
+        "label": "Package Dashboard là bảng điều khiển của gói.",
+        "description": "Sức khỏe phụ thuộc, cơ hội cập nhật và việc áp dụng tính năng."
+      },
+      "rules": {
+        "label": "Quy tắc & Cấp độ",
+        "description": "Cấu hình quy tắc nào trong hơn 2.300 quy tắc chạy và mức độ nghiêm trọng như thế nào."
+      },
+      "catalog": {
+        "label": "Command Catalogue - Danh mục chỉ huy",
+        "description": "Mỗi lệnh Saropa Lints trong một danh sách có thể tìm kiếm được."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Một cuộc kiểm tra đang chạy — vui lòng chờ đến khi nó kết thúc.",
     "noProject": "Không tìm thấy dự án Dart. Mở một thư mục chứa pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Hủy bỏ hủy bỏ",
     "runningAnalysis": "Chạy phân tích...",
     "analysisComplete": "Phân tích hoàn thành, phân tích hoàn tất.",
+    "analysisClean": "Không có vấn đề nào được phát hiện.",
     "refreshingDashboard": "Bảng điều khiển làm mới với những phát hiện mới nhất.",
     "analysisStartedDetail": "Phân tích bắt đầu. Thu thập chẩn đoán...",
     "analysisFailedDetail": "Phân tích không thành công. Kiểm tra đầu ra để biết chi tiết."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Mở một dự án Dart để quét",
       "findingsNeverScanned": "Chạy phân tích để quét",
       "findingsClean": "Không có vi phạm · điểm số {score}",
+      "findingsCleanFresh": "Không có vi phạm · điểm số {score} · đã cập nhật {ago}",
       "findingsWithViolations": "Vi phạm {count} · điểm số {score}",
+      "findingsWithViolationsFresh": "Vi phạm {count} · điểm số {score} · cập nhật {ago}",
       "packagesNeverScanned": "Chạy quét để kiểm tra các phụ thuộc",
       "packagesAllAdopted": "Tất cả tính năng được áp dụng",
       "packagesNeedlesCount": "{count} packages để tiếp nhận",

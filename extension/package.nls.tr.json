@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "Gruplar... gruplar...",
   "command.openWalkthrough.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Başlamak için başlama.",
   "command.showAbout.title": "Yaklaşık olarak Saropa Lints hakkında.",
+  "command.showWelcome.title": "Saropa Lints: Yeni Neler Var",
   "command.openHelpHub.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Yardım yardım yardımcı yardımcı",
   "command.openPubDevSaropaLints.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Paketi açın pub.dev üzerinde.",
   "command.createSaropaInstructions.title": "Yapay zeka ajanları için Saropa Lints Talimatlar oluşturun.",

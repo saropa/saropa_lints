@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "Règles {total} de lint sont actuellement incluses dans cette version (essentiel {essential} · recommandé {recommended} · professionnel {professional} · complet {comprehensive} · pédant {pedantic} · {stylistic} opt-in stylistique)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Qu'est-ce qui est nouveau dans v16"
+    },
+    "hero": {
+      "subtitle": "Cette version modifie le moteur de diagnostic par défaut. Lisez ceci avant de continuer votre travail — cela affecte ce que vous verrez dans le panneau Problèmes."
+    },
+    "checkbox": {
+      "label": "Affichez cela la prochaine fois",
+      "hint": "Faites défiler vers le bas pour déverrouiller cela. En attendant, cet avertissement continuera de s'afficher.",
+      "hintEnabled": "Désélectionnez cette option pour arrêter l'avis de se reproduire."
+    },
+    "card": {
+      "engine": {
+        "header": "CRITICAL : moteur de diagnostic par défaut modifié",
+        "body": "La machine qui produit vos diagnostics n'est plus le plugin d'analyse en processus — elle est désormais un serveur LSP autonome, activé par défaut pour chaque projet. Il s'agit de logiciel en phase bêta, et son comportement peut encore changer entre les versions. Si une règle sur laquelle vous comptez cesse de s'appliquer, s'applique différemment, ou si une suggestion rapide disparaît, cela est le plus probablement la cause. Le plugin d'analyse existe toujours et peut être restauré en un clic.",
+        "why": "C’est un changement sur ce qui exécute votre analyse, pas une mise à jour de l’interface utilisateur cosmétique. Vérifiez que vos diagnostics sont encore corrects avant de leur faire confiance.",
+        "actionHealth": "Ouvrir le panneau de santé",
+        "actionRevert": "Revenir au plugin Analyseur",
+        "revertConfirm": "Retourné au plugin Analyseur. Le serveur LSP est maintenant désactivé pour ce workspace."
+      },
+      "monitoring": {
+        "header": "Nouveau : Surveillance de la santé des machines",
+        "body": "L'extension surveille maintenant la mémoire RAM du système, chaque serveur d'analyse Dart, daemon Flutter et processus en arrière-plan — pas seulement le sien. Un indicateur du budget outils de développement alerte lorsqu'un outil de développement dépasse une part configurable de la mémoire RAM, et les processus orphelins provenant de sessions effondrées sont détectés au démarrage.",
+        "why": "Règles strictes :  \n1. Retournez UNIQUEMENT la sortie traduite.  \n2. NE PAS inclure d'explications, d'introduction, de notation markdown ou de guillemets entourant.  \n3. Le texte peut contenir des tokens de placeholder : tokens de placeholder. Copiez chaque un d'eux dans la traduction EXACTEMENT tel que rédigé, dans la position grammaticalement correcte. NE PAS traduire, supprimer ou reformater un token.  \n4. La sortie DOIT utiliser le système d'écriture correct pour la langue cible ; ne pas passer à une autre langue au milieu d'une phrase.",
+        "actionDashboard": "Ouvrir la santé de l'ordinateur",
+        "actionThresholds": "Configurer les seuils"
+      },
+      "sidebar": {
+        "header": "Modifié : Barre latérale simplifiée",
+        "body": "La barre latérale est réduite à 13 lignes sur 4 panneaux. Les bascules de gravité, les contrôles d' moteur et les paramètres ont été déplacés vers leurs tableaux de bord. Le panneau Debug a été fusionné avec le panneau Health, et le hub Home a été supprimé au profit de la barre d'état et du tableau de bord Findings.",
+        "why": "Si quelque chose que vous cliquiez dans la barre latérale a disparu, il a été déplacé vers un tableau de bord — il n'a pas été supprimé.",
+        "actionCatalog": "Parcourir toutes les commandes de commande.",
+        "actionWalkthrough": "Ouvrir la démonstration étape par étape"
+      }
+    },
+    "discover": {
+      "header": "Explorer les tableaux de bord",
+      "findings": {
+        "label": "Le tableau de bord des résultats.",
+        "description": "Tous les diagnostics de votre projet, filtrables par gravité et règle."
+      },
+      "packages": {
+        "label": "Le tableau de bord des paquets est le Dashboard.",
+        "description": "Santé des dépendances, opportunités de mise à jour et adoption des fonctionnalités."
+      },
+      "rules": {
+        "label": "Règles & Niveaux",
+        "description": "Configurer quelles des 2 300+ règles s'exécutent et à quel niveau de gravité."
+      },
+      "catalog": {
+        "label": "Catalogue de commande du catalogue de commandes.",
+        "description": "Toutes les commandes Saropa Lints dans une seule liste recherchable."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Un audit est déjà en cours — attendez qu'il se termine.",
     "noProject": "Aucun projet Dart trouvé. Ouvrez un dossier contenant un pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Annuler",
     "runningAnalysis": "Je suis en train de faire une analyse...",
     "analysisComplete": "L'analyse est complète, l'analyse terminée.",
+    "analysisClean": "Aucun problème trouvé.",
     "refreshingDashboard": "Tableau de bord rafraîchissant avec les dernières découvertes.",
     "analysisStartedDetail": "L'analyse a commencé. La collecte des diagnostics... est une affaire de famille.",
     "analysisFailedDetail": "L'analyse a échoué. Vérifiez la sortie pour plus de détails."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Ouvrez un projet Dart pour analyser",
       "findingsNeverScanned": "Analyser pour scanner",
       "findingsClean": "Aucune violation · score {score}",
+      "findingsCleanFresh": "Aucune violation · score {score} · mis à jour {ago}",
       "findingsWithViolations": "Violations {count} · score {score}",
+      "findingsWithViolationsFresh": "Violations {count} · score {score} · mis à jour {ago}",
       "packagesNeverScanned": "Exécuter un scan pour vérifier les dépendances",
       "packagesAllAdopted": "Toutes les fonctionnalités adoptées",
       "packagesNeedlesCount": "{count} packages à adopter",

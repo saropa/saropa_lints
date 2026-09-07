@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "Mag-group sa pamamagitan ng...",
   "command.openWalkthrough.title": "Saropa Lints: Simulan ang Pagsimula",
   "command.showAbout.title": "Tungkol sa _Saropa Lints.",
+  "command.showWelcome.title": "Saropa Lints: Ano ang Bagong Nangyari",
   "command.openHelpHub.title": "Saropa Lints: Tulong sa tulong",
   "command.openPubDevSaropaLints.title": "Saropa Lints: Buksan ang pakete sa pub.dev.",
   "command.createSaropaInstructions.title": "Lumikha ng Saropa Lints Mga Sugo para sa AI Agents",

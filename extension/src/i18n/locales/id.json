@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "Aturan lint {total} saat ini tersedia dalam versi ini (esensial {essential} · direkomendasikan {recommended} · profesional {professional} · komprehensif {comprehensive} · pedantik {pedantic} · {stylistic} opt-in stilistis)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Apa yang Baru di v16"
+    },
+    "hero": {
+      "subtitle": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks ini mungkin mengandung token placeholder: token placeholder. Salin setiap satu ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat."
+    },
+    "checkbox": {
+      "label": "Tampilkan ini lagi nanti",
+      "hint": "Scroll ke bawah untuk mengaktifkan ini. Sampai saat itu, pemberitahuan ini akan terus muncul kembali.",
+      "hintEnabled": "Batalkan ini untuk menghentikan pemberitahuan dari muncul kembali."
+    },
+    "card": {
+      "engine": {
+        "header": "KRITIS: Mesin Diagnostik Default Berubah",
+        "body": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitarnya.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Mesin yang menghasilkan diagnosis Anda tidak lagi merupakan Plugin Analyzer dalam proses—sekarang merupakan server LSP yang independen, yang secara default diaktifkan untuk setiap proyek. Ini adalah perangkat lunak beta, dan perilakunya masih berubah antar versi. Jika aturan yang Anda andalkan berhenti memicu, memicu secara berbeda, atau solusi cepat menghilang, ini adalah penyebab paling mungkin. Plugin Analyzer masih ada dan dapat dipulihkan dengan satu klik.",
+        "why": "Ini adalah perubahan terhadap apa yang menjalankan analisis Anda, bukan pembaruan UI kosmetik. Konfirmasi bahwa diagnostik Anda masih terlihat benar sebelum Anda mempercayainya.",
+        "actionHealth": "Buka Panel Kesehatan",
+        "actionRevert": "Kembali ke Plugin Analyzer",
+        "revertConfirm": "Dikembalikan ke Plugin Analyzer. Server LSP sekarang dinonaktifkan untuk workspace ini."
+      },
+      "monitoring": {
+        "header": "Baru: Pemantauan Kesehatan Mesin",
+        "body": "Ekstensi sekarang memantau RAM sistem, setiap server analisis Dart, Flutter daemon, dan proses latar belakang — bukan hanya yang miliknya sendiri. Indikator Anggaran Alat Pengembangan memberi peringatan ketika alat pengembangan melebihi bagian RAM yang dapat dikonfigurasi, dan proses yang terlantar dari sesi yang crash terdeteksi saat startup.",
+        "why": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.",
+        "actionDashboard": "Buka Kesehatan Mesin",
+        "actionThresholds": "Konfigurasikan Ambang Batas"
+      },
+      "sidebar": {
+        "header": "Diubah: Sidebar Disederhanakan",
+        "body": "Sidebar turun menjadi 13 baris di 4 panel. Toggle keparahan, kontrol engine, dan pengaturan dipindahkan ke dashboard masing-masing. Panel Debug digabungkan ke Panel Health, dan hub Home dihapus dalam favorit status bar dan Dashboard Findings.",
+        "why": "Jika sesuatu yang kamu biasa klik di sidebar tidak ada lagi, itu pindah ke dashboard — tidak dihapus.",
+        "actionCatalog": "Browse Semua Komando",
+        "actionWalkthrough": "Buka Walkthrough"
+      }
+    },
+    "discover": {
+      "header": "Eksplorasi dashboard",
+      "findings": {
+        "label": "Hasil Penemuan Dashboard Dasbor",
+        "description": "Setiap diagnosa di seluruh proyek Anda, dapat disaring berdasarkan tingkat keparahan dan aturan."
+      },
+      "packages": {
+        "label": "Dashboard Paket adalah sebuah dashboard paket.",
+        "description": "Kesehatan dependensi, kesempatan upgrade, dan adopsi fitur."
+      },
+      "rules": {
+        "label": "Aturan & Tingkatan",
+        "description": "Konfigurasikan aturan dari 2.300+ yang berjalan dan pada tingkat keparahan apa."
+      },
+      "catalog": {
+        "label": "Katalog Komando Katalog Perintah",
+        "description": "Setiap perintah Saropa Lints dalam satu daftar yang dapat dicari"
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Audit sedang berjalan — tunggu hingga selesai.",
     "noProject": "Tidak ditemukan proyek Dart. Buka folder yang mengandung pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Batalkan Batal.",
     "runningAnalysis": "Menjalankan analisis... analisa.",
     "analysisComplete": "Analisis lengkap, analisis selesai.",
+    "analysisClean": "Tidak ada masalah yang ditemukan.",
     "refreshingDashboard": "Dasbor yang menyegarkan dengan temuan terbaru.",
     "analysisStartedDetail": "Analisis dimulai. Mengumpulkan diagnostik...",
     "analysisFailedDetail": "Analisis gagal. Periksa output untuk detail."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Buka proyek Dart untuk melakukan pemindaian",
       "findingsNeverScanned": "Jalankan analisis untuk memindai",
       "findingsClean": "Tidak ada pelanggaran · skor {score}",
+      "findingsCleanFresh": "Tidak ada pelanggaran · skor {score} · diperbarui {ago}",
       "findingsWithViolations": "Pelanggaran {count} · skor {score}",
+      "findingsWithViolationsFresh": "Pelanggaran {count} · skor {score} · diperbarui {ago}",
       "packagesNeverScanned": "Jalankan pemindaian untuk memeriksa dependensi",
       "packagesAllAdopted": "Semua fitur yang diadopsi",
       "packagesNeedlesCount": "{count} packages untuk diadopsi",

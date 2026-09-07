@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "按...分组进行.",
   "command.openWalkthrough.title": "Saropa Lints: 没有一个人. 开始的过程",
   "command.showAbout.title": "关于Saropa Lints",
+  "command.showWelcome.title": "Saropa Lints：新增内容",
   "command.openHelpHub.title": "Saropa Lints: 没有一个人. 帮助帮助帮助帮忙",
   "command.openPubDevSaropaLints.title": "Saropa Lints: 没有一个人. 在 pub.dev 上打开包装.",
   "command.createSaropaInstructions.title": "创建 Saropa Lints 对人工智能代理的指令.",

@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "קבוצה לפי... קבוצה אחרי...",
   "command.openWalkthrough.title": "Saropa Lints: זה היה חרא. התחלנו בהתחלה",
   "command.showAbout.title": "על Saropa Lints",
+  "command.showWelcome.title": "Saropa Lints: מה חדש",
   "command.openHelpHub.title": "Saropa Lints: עזרה עזרו",
   "command.openPubDevSaropaLints.title": "Saropa Lints: פתח את החבילה על pub.dev.",
   "command.createSaropaInstructions.title": "ליצור Saropa Lints הוראות עבור סוכני AI.",

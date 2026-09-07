@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "{total} 条 lint 规则目前包含在此版本中（基础 {essential} · 推荐 {recommended} · 专业 {professional} · 全面 {comprehensive} · 严谨 {pedantic} · {stylistic} 风格化选项）"
   },
+  "welcome": {
+    "panel": {
+      "title": "v16 新增内容"
+    },
+    "hero": {
+      "subtitle": "此版本更改了默认的诊断引擎。在继续工作前请阅读此内容——它会影响你在问题面板中看到的内容。"
+    },
+    "checkbox": {
+      "label": "下次显示此内容",
+      "hint": "滚动到底部以解锁此内容。在此之前，此提示将不断重新出现。",
+      "hintEnabled": "取消勾选以停止通知再次出现。"
+    },
+    "card": {
+      "engine": {
+        "header": "关键：默认诊断引擎已更改",
+        "body": "生成您诊断信息的引擎不再是在进程内的分析器插件——现在它是一个独立的 LSP 服务器，默认情况下每个项目都会启用。这是 Beta 软件，其行为在每次发布之间仍可能发生变化。如果您依赖的某个规则停止触发、触发方式不同，或某个快速修复方案消失，这最可能是原因。分析器插件仍然存在，并且可以通过单击恢复。",
+        "why": "这是对运行分析内容的更改，而不是一个外观界面的更新。在信任这些诊断之前，请确认它们仍然显示正确。",
+        "actionHealth": "打开健康面板",
+        "actionRevert": "恢复使用分析器插件",
+        "revertConfirm": "已回退到分析器插件。LSP 服务器在此工作区中现在已禁用。"
+      },
+      "monitoring": {
+        "header": "新功能：机器健康监控",
+        "body": "该扩展现在监控系统内存，每个 Dart 分析服务器，Flutter 守护进程以及后台进程 —— 而不仅仅是它自己的。一个 Dev 工具预算指示器会在开发工具占用的内存超过可配置的份额时发出警告，并在启动时检测崩溃会话产生的孤儿进程。",
+        "why": "大型项目经常导致分析服务器泄漏。现在您的机器变慢之前您将看到此问题。",
+        "actionDashboard": "打开机器健康",
+        "actionThresholds": "配置阈值"
+      },
+      "sidebar": {
+        "header": "已更改：侧边栏 简体中文",
+        "body": "侧边栏已缩减至跨4个面板的13行。严重性切换、引擎控制和设置已移至其仪表盘。调试面板已合并至健康面板，主页中心已被状态栏和发现仪表盘取代。",
+        "why": "如果你曾经在侧边栏中点击过的某个内容不见了，它可能移动到了仪表盘——它并没有被删除。",
+        "actionCatalog": "浏览所有命令,查看所有的指令.",
+        "actionWalkthrough": "打开演练"
+      }
+    },
+    "discover": {
+      "header": "探索仪表盘",
+      "findings": {
+        "label": "发现仪表板的结果",
+        "description": "项目中每个诊断信息，可根据严重程度和规则进行筛选。"
+      },
+      "packages": {
+        "label": "包装仪表板 这些是",
+        "description": "依赖健康度，升级机会和功能采用情况。"
+      },
+      "rules": {
+        "label": "规则与层级",
+        "description": "配置运行的 2300 多条规则以及其严重程度。"
+      },
+      "catalog": {
+        "label": "命令目录指令目录",
+        "description": "每个Saropa Lints命令都在一个可搜索的列表中。"
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "已有一个审计正在运行 —— 请等待其完成。",
     "noProject": "未找到 Dart 项目。打开包含 pubspec.yaml 的文件夹。",
@@ -605,6 +661,7 @@
     "cancel": "取消 取缔 在此之前,请注销.",
     "runningAnalysis": "运行分析...进行分析.",
     "analysisComplete": "分析完成,完整的分析.",
+    "analysisClean": "未发现任何问题。",
     "refreshingDashboard": "清新的仪表板,展示了最新的发现.",
     "analysisStartedDetail": "分析开始了. 收集诊断数据... 在一个小时内,",
     "analysisFailedDetail": "分析失败了. 这是一个错误的结果. 检查输出以获取详细信息."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "打开一个 Dart 项目以扫描",
       "findingsNeverScanned": "运行分析以扫描",
       "findingsClean": "无违规 · 分数 {score}",
+      "findingsCleanFresh": "无违规 · 分数 {score} · 更新时间 {ago}",
       "findingsWithViolations": "{count} 违规 · 分数 {score}",
+      "findingsWithViolationsFresh": "{count} 违规 · 分数 {score} · 更新时间 {ago}",
       "packagesNeverScanned": "运行扫描以检查依赖项",
       "packagesAllAdopted": "所有功能采用",
       "packagesNeedlesCount": "{count} 个包需要采用",

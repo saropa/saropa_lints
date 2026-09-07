@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "Groeperen naar... groepen.",
   "command.openWalkthrough.title": "Saropa Lints: Aan de slag gaan",
   "command.showAbout.title": "Over Saropa Lints gaat het.",
+  "command.showWelcome.title": "Saropa Lints: Wat is er nieuw",
   "command.openHelpHub.title": "Saropa Lints: Help",
   "command.openPubDevSaropaLints.title": "Saropa Lints: Open de verpakking op pub.dev.",
   "command.createSaropaInstructions.title": "Creëer Saropa Lints Instructies voor AI-agenten.",

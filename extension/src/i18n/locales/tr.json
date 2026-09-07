@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "Kurulumdaki şu anda mevcut {total} lint kuralları (temel {essential} · önerilen {recommended} · profesyonel {professional} · kapsamlı {comprehensive} · pedantik {pedantic} · {stylistic} seçeneğiyle stil)"
   },
+  "welcome": {
+    "panel": {
+      "title": "v16'da Ne Yeni?"
+    },
+    "hero": {
+      "subtitle": "Bu sürüm, varsayılan tanımlama makinelerini değiştirir. Devam etmeden önce okuyun — bu, Problems bölmesinde ne göreceğinize etki eder."
+    },
+    "checkbox": {
+      "label": "Bunu bir sonraki sefere göster",
+      "hint": "Altaca kaydırarak bu özelliğe erişin. Bunun gerçekleşmesine kadar bu bildirim sürekli tekrar edecektir.",
+      "hintEnabled": "Bu seçeneği iptal etmek, bildirimin tekrar görünmesini durdurur."
+    },
+    "card": {
+      "engine": {
+        "header": "CRITICAL: Varsayılan Tanılama Motoru Değiştirildi",
+        "body": "Tanımlayıcılarınızın üretildiği motor artık işlem içi Analyzer Plugin değil — artık her proje için varsayılan olarak çalışacak şekilde bir LSP sunucusu. Bu beta yazılımıdır ve yayınlar arasında davranışları hâlâ değişiyor. Bağımlı olduğunuz bir kuralın artık ateşlenmediği, farklı şekilde ateşlendiği veya hızlı düzelme önerisi kaybolduysa, bu en olası nedenidir. Analyzer Plugin hâlâ mevcuttur ve tek bir tıklamayla geri yüklenmesi mümkündür.",
+        "why": "Bu, analizinizi çalıştıran şeyde bir değişiklik, sadece bir görünüm güncellemesi değildir. Tanımlarınızın hâlâ doğru görünmesini onaylamadan onlara güvenmeyin.",
+        "actionHealth": "Sağlık Paneli",
+        "actionRevert": "Analyzer Plugin'e Geri Dön",
+        "revertConfirm": "Analizör Eklentisine Geri Dönüldü. Bu çalışma alanı için LSP Sunucusu artık devre dışı bırakıldı."
+      },
+      "monitoring": {
+        "header": "Yeni: Makine Sağlık İzleme",
+        "body": "Uzama şimdi sistem RAM'ini izliyor, her Dart analiz sunucusunu, Flutter arka planda çalışan programı ve arka plan sürecini — kendi kendine değil. Bir geliştirme araçları bütçesi göstergesi, geliştirme araçlarının yapılandırılabilir RAM payını aşması durumunda uyarı verir ve çöken oturumların izole edilmiş süreçlerini başlatma sırasında tespit eder.",
+        "why": "Büyük projeler analiz sunucularını düzenli olarak sızdırır. Makineniz yavaşlamadan önce bunu göreceksiniz.",
+        "actionDashboard": "Makine Sağlığı Açık",
+        "actionThresholds": "Eşik Değerlerini Yapılandır"
+      },
+      "sidebar": {
+        "header": "Değiştirildi: Sidebar Basitleştirildi",
+        "body": "Sidebar 4 panelde toplam 13 satıra indirildi. Ciddiyet açılır-kapanır butonları, motor kontrolleri ve ayarlar kendi dashboard'larına taşındı. Debug Panel Health Panel içine birleştirildi ve Home hub statüs çubuğu ve Findings Dashboard yerine kaldırıldı.",
+        "why": "Eğer sidebar'da eskiden tıklayacağınız bir şey kaybolduysa, bir dashboard'a taşındı — kaldırılmadı.",
+        "actionCatalog": "Tüm Komutları Tarayın",
+        "actionWalkthrough": "Açık Walkthrough"
+      }
+    },
+    "discover": {
+      "header": "Panelleri keşfedin",
+      "findings": {
+        "label": "Bulgular Tablosu (Dashboard)",
+        "description": "Projenizdeki her teşhis, ciddiyet ve kurala göre filtrelenebilir."
+      },
+      "packages": {
+        "label": "Paket Tablosu (Dashboard)",
+        "description": "Bağımlılık sağlık durumu, yükseltme fırsatları ve özellik kabulü."
+      },
+      "rules": {
+        "label": "Kurallar & Seviyeler",
+        "description": "2.300'den fazla kuralın hangilerinin çalıştığını ve hangi ciddiyet seviyesinde çalıştığını yapılandırın."
+      },
+      "catalog": {
+        "label": "Komut Kataloğu Komuta Katalogu",
+        "description": "Her Saropa Lints komutunu tek bir arama yapılabilir listede."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Bir denetim zaten çalışmaktadır — tamamlamasını bekleyin.",
     "noProject": "Dart projesi bulunamadı. Bir pubspec.yaml içeren bir klasör açın.",
@@ -605,6 +661,7 @@
     "cancel": "İptal Et iptal et",
     "runningAnalysis": "Analiz yapıyorum... analiz yapıyorum.",
     "analysisComplete": "Analiz tamamlandı, analizler tamamlandı.",
+    "analysisClean": "Sorun bulunamadı.",
     "refreshingDashboard": "En son bulgularla yenilenmiş bir pano.",
     "analysisStartedDetail": "Analiz başladı. Teşhis kayıtlarını toplamak...",
     "analysisFailedDetail": "Analiz başarısız oldu. Detaylar için çıkışı kontrol edin."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Dart projesini açarak tarama yapın",
       "findingsNeverScanned": "Analiz çalıştırarak taranır",
       "findingsClean": "Hiçbir ihlal · puan {score}",
+      "findingsCleanFresh": "Hiçbir ihlal · puan {score} · güncellendi {ago}",
       "findingsWithViolations": "{count} ihlalleri · puan {score}",
+      "findingsWithViolationsFresh": "{count} ihlaller · puan {score} · güncellendi {ago}",
       "packagesNeverScanned": "Bağımlılıkları kontrol etmek için tarama yap",
       "packagesAllAdopted": "Tüm özellikleri benimsedi",
       "packagesNeedlesCount": "{count} paketleri benimsenmeli",

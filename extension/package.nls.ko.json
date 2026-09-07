@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "그룹별로...그룹별로..",
   "command.openWalkthrough.title": "Saropa Lints: 시작을 하기 위해서.",
   "command.showAbout.title": "Saropa Lints에 대해",
+  "command.showWelcome.title": "Saropa Lints: 변경 사항",
   "command.openHelpHub.title": "Saropa Lints: 도움말",
   "command.openPubDevSaropaLints.title": "Saropa Lints: pub.dev에 패키지를 열고",
   "command.createSaropaInstructions.title": "AI 에이전트에 대한 Saropa Lints 지침 생성",

@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "Mga tala ng {total} na mga tala ng lint ay kasama na sa bersyon na ito (essensial {essential} · inirerekomenda {recommended} · profesional {professional} · komprehensibo {comprehensive} · pedantiko {pedantic} · {stylistic} opt-in stylistic)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Ano ang Bagong Nangyari sa v16"
+    },
+    "hero": {
+      "subtitle": "Ang release na ito ay nagbabago sa default na diagnostic engine. Basahin ito bago magpatuloy sa trabaho — ito ay nakaapekto sa ano ang makikita mo sa panel ng Problems."
+    },
+    "checkbox": {
+      "label": "Ipakita ito sa susunod na pagkakataon",
+      "hint": "Ilipat ang iyong paningin sa ibaba upang buksain ang bagay na ito. Hanggang sa gawin ito, ang pahayag na ito ay magpapalabas muli.",
+      "hintEnabled": "I-uncheck ito upang itigil ang pahayag mula magulat muli."
+    },
+    "card": {
+      "engine": {
+        "header": "CRITICAL: Nangangasiwa na Default Diagnostic Engine",
+        "body": "Ang engine na nagtatag ng mga diagnostics mo ay wala nang gumagamit ng in-process Analyzer Plugin — ito ay karon ay isang standalone LSP server, na nagsisimula sa default para sa bawat proyekto. Ito ay beta software, at ang kanyang mga epekto ay pa rin nagbabago sa bawat release. Kung ang isang rule na nagsisimula mo ay nawala, nagbabago ang paraan, o ang quick fix ay nawala, ito ay ang pinakamalapit na sanhi. Ang Analyzer Plugin ay pa rin nandyan at maaaring i-restore sa isang click.",
+        "why": "Ito ay isang pagbabago sa ano ang nag-uugnay sa iyong pag-aaral, hindi isang kosmetiko UI update. Patuloy na i-verify ang iyong diagnostics bago maniwala sa kanila.",
+        "actionHealth": "I-Open Health Panel",
+        "actionRevert": "Ibalik sa Plugin ng Analyzer",
+        "revertConfirm": "Nababalik sa Analyzer Plugin. Ang LSP Server ay ngayon ay di-naka-enable para sa workspace na ito."
+      },
+      "monitoring": {
+        "header": "Bagong: Pagmamonitor ng Kalusugan ng Makina",
+        "body": "Ang extension ay nagmamonitor ng sistema RAM, bawat Dart analysis server, Flutter daemon, at background process — hindi lamang ang sarili nito. Ang Dev Tool Budget indicator ay nagbibigay ng abiso kapag ang dev tools ay umabot sa isang nakakakontrol na bahagi ng RAM, at ang mga orphaned processes mula sa mga nangungunat na sesyon ay nakikita sa pagbubukas ng sistema.",
+        "why": "Malaking proyekto ay karaniwang naglalabas ng mga serbisyong analisis. Ito ay makikita mo na bago ang iyong makina mag-ugat.",
+        "actionDashboard": "I-Open Machine Health",
+        "actionThresholds": "Iugnay ang Mga Threshold"
+      },
+      "sidebar": {
+        "header": "Napagbago: Sidebar na Sinimplify",
+        "body": "Ang sidebar ay nagsimula sa 13 rows sa 4 panels. Ang severity toggles, engine controls, at mga setting ay inilipat sa kanilang dashboards. Ang Debug Panel ay nagmula sa Health Panel, at ang Home hub ay naging wala sa pagkakaroon ng status bar at Findings Dashboard.",
+        "why": "Kung ang ano man ang ginamit mo na click sa sidebar ay nawala, ito ay nasa dashboard na — hindi ito tinanggal.",
+        "actionCatalog": "Mag-browse sa Lahat ng mga Commands.",
+        "actionWalkthrough": "I-Open Walkthrough"
+      }
+    },
+    "discover": {
+      "header": "Iyakan ang mga dashboard",
+      "findings": {
+        "label": "Mga Natuklasan Dashboard ng mga natuklasan.",
+        "description": "Ang bawat diagnostic sa iyong proyekto, mai-filter ayon sa kahimikang at panuntok."
+      },
+      "packages": {
+        "label": "Package Dashboard ng Pakete Ang pakete ay isang dashboard na may mga tampok.",
+        "description": "Kalusugan ng dependensya, mga oportunidad para i-upgrade, at paggamit ng mga feature."
+      },
+      "rules": {
+        "label": "Mga Tala at Mga Antas",
+        "description": "I-configure kung alin sa 2,300+ na mga rule ang mag-run at sa anong antas ng kahalagahan."
+      },
+      "catalog": {
+        "label": "Command Catalogue Katalogo ng Pag-uutos",
+        "description": "Bawat Saropa Lints command sa isang makapagpapalabas na listahan."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Ang isang audit ay nagsisimula na — wait for it to finish.",
     "noProject": "Walang proyekto Dart. Bumuksa sa isang folder na mayroon ang pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Kanselahin I-cancel ang pagkansela",
     "runningAnalysis": "Nagpapatakbo ng pagsusuri ... pag-aaral...",
     "analysisComplete": "Pagsusuri kumpleto kumpletong pagsusuri.",
+    "analysisClean": "Walang mga isyu.",
     "refreshingDashboard": "Refreshing dashboard na may pinakabagong mga natuklasan.",
     "analysisStartedDetail": "Nagsimula ang pagsusuri. Pagkolekta ng mga diagnostic...",
     "analysisFailedDetail": "Ang pagsusuri ay nabigo. Suriin ang output para sa mga detalye."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "I-Open ang isang Dart project upang i-scan",
       "findingsNeverScanned": "I-run ang analysis upang i-scan",
       "findingsClean": "Walang mga pagkakasala · score {score}",
+      "findingsCleanFresh": "Walang mga pagkakasala · score {score} · na-update ang {ago}",
       "findingsWithViolations": "{count} na pagkakasala · puntos {score}",
+      "findingsWithViolationsFresh": "{count} na pagkakasala · puntos {score} · na-update ang {ago}",
       "packagesNeverScanned": "Paghahatid ng scan upang tukuyin ang mga dependensya",
       "packagesAllAdopted": "Lahat ng mga tampok na inilapat",
       "packagesNeedlesCount": "{count} packages na magpapalit",

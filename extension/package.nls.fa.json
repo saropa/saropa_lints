@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "گروه بندی به ...",
   "command.openWalkthrough.title": "Saropa Lints: شروع کردن کار",
   "command.showAbout.title": "درباره Saropa Lints",
+  "command.showWelcome.title": "Saropa Lints: چه جدیدی",
   "command.openHelpHub.title": "Saropa Lints: کمک به کمک",
   "command.openPubDevSaropaLints.title": "Saropa Lints: بسته را در pub.dev باز کنید.",
   "command.createSaropaInstructions.title": "ایجاد Saropa Lints دستورالعمل برای عوامل هوش مصنوعی",

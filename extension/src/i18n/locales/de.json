@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "{total} Lint-Regeln sind in dieser Version enthalten (essentiell {essential} · empfohlen {recommended} · professionell {professional} · umfassend {comprehensive} · pedantisch {pedantic} · {stylistic} opt-in stylistisch)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Was ist neu in v16"
+    },
+    "hero": {
+      "subtitle": "Diese Version ändert die Standard-Diagnose-Engine. Lesen Sie dies, bevor Sie weiterarbeiten – es beeinflusst, was Sie im Problems-Panel sehen werden."
+    },
+    "checkbox": {
+      "label": "Zeige dies das nächste Mal",
+      "hint": "Scrollen Sie nach unten, um dies zu entsperren. Bis dahin wird diese Nachricht ständig erneut erscheinen.",
+      "hintEnabled": "Dies zu deaktivieren, um die Benachrichtigung nicht erneut auftauchen zu lassen."
+    },
+    "card": {
+      "engine": {
+        "header": "KRITISCH: Standard-Diagnose-Engine geändert",
+        "body": "Die Engine, die Ihre Diagnose erzeugt, ist nicht mehr der in-Prozess Analyzer Plugin – es handelt sich jetzt um einen eigenständigen LSP-Server, der standardmäßig für jedes Projekt aktiviert ist. Es handelt sich um Beta-Software, und ihr Verhalten ändert sich weiterhin zwischen den Releases. Wenn eine von Ihnen abhängige Regel nicht mehr auslöst, anders auslöst oder eine schnelle Lösung verschwindet, ist dies der wahrscheinlichste Grund. Das Analyzer Plugin existiert weiterhin und kann mit einem Klick wiederhergestellt werden.",
+        "why": "Dies ist eine Änderung an dem, was Ihre Analyse ausführt, nicht ein kosmetischer UI-Update. Bestätigen Sie, dass Ihre Diagnoseangaben noch korrekt aussehen, bevor Sie sie vertrauen.",
+        "actionHealth": "Gesundheitspanel öffnen",
+        "actionRevert": "Zurücksetzen auf Analyzer Plugin",
+        "revertConfirm": "Zurückgekehrt zum Analyzer Plugin. Der LSP Server ist für dieses Workspace jetzt deaktiviert."
+      },
+      "monitoring": {
+        "header": "Neu: Maschinen-Gesundheitsüberwachung",
+        "body": "Die Erweiterung überwacht nun den System-RAM, jeden Dart Analyse-Server, Flutter Daemon und Hintergrundprozess – nicht nur die eigenen. Ein Dev Tool Budget-Indikator warnt, wenn Dev-Tools eine konfigurierbare RAM-Anteil überschreiten, und verwaiste Prozesse aus abgebrochenen Sitzungen werden beim Start aufgedeckt.",
+        "why": "Große Projekte lecken regelmäßig Analyseserver. Sie werden jetzt bemerkt, bevor Ihre Maschine langsamer wird.",
+        "actionDashboard": "Maschinen-Gesundheitsstatus öffnen",
+        "actionThresholds": "Schwellwerte konfigurieren"
+      },
+      "sidebar": {
+        "header": "Geändert: Sidebar vereinfacht",
+        "body": "Die Seitenleiste ist auf 13 Zeilen über 4 Panels reduziert. Schweregrad-Schalter, Engine-Steuerungen und Einstellungen wurden in ihre Dashboards verschoben. Der Debug-Panel wurde in das Health-Panel eingegliedert, und das Home-Panel wurde durch die Statusleiste und das Findings-Dashboard ersetzt.",
+        "why": "Wenn etwas, das du früher in der Seitenleiste klickst, verschwunden ist, wurde es in eine Dashboard-Bereich verschoben – es wurde nicht entfernt.",
+        "actionCatalog": "Durchsuchen Sie alle Befehle.",
+        "actionWalkthrough": "Öffnen Sie die exemplarische Vorgehensweise"
+      }
+    },
+    "discover": {
+      "header": "Dashboard untersuchen",
+      "findings": {
+        "label": "Das Findings Dashboard ist eine sehr gute Lösung.",
+        "description": "Jeder Diagnose in Ihrem Projekt, filterbar nach Schweregrad und Regel."
+      },
+      "packages": {
+        "label": "Das Package Dashboard ist ein Paket-Dashboard.",
+        "description": "Abhängigkeitsgesundheit, Upgrade-Chancen und Feature-Adoption."
+      },
+      "rules": {
+        "label": "Regeln & Ebenen",
+        "description": "Konfigurieren Sie, welche der über 2.300 Regeln laufen und mit welcher Schweregrad."
+      },
+      "catalog": {
+        "label": "Befehlskatalog, der Katalog für die Kommandoführung.",
+        "description": "Jeder Saropa Lints-Befehl in einer suchbaren Liste."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Eine Audite wird bereits ausgeführt — warten Sie, bis es fertig ist.",
     "noProject": "Kein Dart Projekt gefunden. Öffnen Sie ein Verzeichnis, das ein pubspec.yaml enthält.",
@@ -605,6 +661,7 @@
     "cancel": "Stornieren Sie stornieren",
     "runningAnalysis": "Ich führe Analysen durch...",
     "analysisComplete": "Analyse abgeschlossen, vollständig analysiert.",
+    "analysisClean": "Keine Probleme gefunden.",
     "refreshingDashboard": "Erfrischendes Dashboard mit den neuesten Erkenntnissen.",
     "analysisStartedDetail": "Die Analyse wurde gestartet. Das Sammeln von Diagnosen...",
     "analysisFailedDetail": "Die Analyse ist fehlgeschlagen. Überprüfen Sie die Ausgabe für Details."
@@ -946,7 +1003,7 @@
     },
     "audit": {
       "scopeFieldTitle": "Wählen Sie, was die unten stehenden Ergebnisse beziehen",
-      "scopeLabel": "Quelle",
+      "scopeLabel": "Source",
       "scopeLive": "Live-Diagnose",
       "scopeFull": "Volle Projektprüfung",
       "scopeChangedMain": "Geändert vs Haupt",
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Dart-Projekt öffnen, um zu scannen",
       "findingsNeverScanned": "Analyse ausführen, um zu scannen",
       "findingsClean": "Keine Verstöße · Punktestand {score}",
+      "findingsCleanFresh": "Keine Verstöße · Punktestand {score} · aktualisiert {ago}",
       "findingsWithViolations": "{count}-Violationen · Punkte {score}",
+      "findingsWithViolationsFresh": "{count}-Violationen · Punkte {score} · aktualisiert {ago}",
       "packagesNeverScanned": "Scan ausführen, um Abhängigkeiten zu prüfen",
       "packagesAllAdopted": "Alle Funktionen übernommen",
       "packagesNeedlesCount": "{count} Pakete zur Adoption",

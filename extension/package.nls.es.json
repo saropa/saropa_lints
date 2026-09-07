@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "Grupo por... grupo.",
   "command.openWalkthrough.title": "Saropa Lints: Cómo empezar",
   "command.showAbout.title": "Acerca de Saropa Lints",
+  "command.showWelcome.title": "Saropa Lints: ¿Qué hay de nuevo",
   "command.openHelpHub.title": "Saropa Lints: Ayuda ayuda.",
   "command.openPubDevSaropaLints.title": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin Abre el paquete en pub.dev.",
   "command.createSaropaInstructions.title": "Crear Saropa Lints Instrucciones para los agentes de IA.",

@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "Regole {total} di lint attualmente presenti in questa versione (essenziali {essential} · consigliate {recommended} · professionali {professional} · complete {comprehensive} · pedanti {pedantic} · {stylistic} stili opt-in)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Cosa c'è di Nuovo in v16"
+    },
+    "hero": {
+      "subtitle": "Questo rilascio modifica il motore diagnostico predefinito. Leggi questo prima di proseguire con il lavoro — influisce su ciò che vedrai nel pannello Problemi."
+    },
+    "checkbox": {
+      "label": "Mostra questo la prossima volta",
+      "hint": "Scorri in basso per sbloccare questo. Finché non lo farai, questo avviso continuerà a ripresentarsi.",
+      "hintEnabled": "Deseleziona questa opzione per interrompere l'annuncio da ricomparire."
+    },
+    "card": {
+      "engine": {
+        "header": "CRITICO: Motore Diagnostico Predefinito Cambiato",
+        "body": "La macchina che produce le tue diagnosi non è più il plugin Analyzer in-process — ora è un server LSP autonomo, abilitato di default per ogni progetto. Questo è software in beta, e il suo comportamento sta ancora cambiando tra le release. Se una regola su cui dipendi smette di attivarsi, attiva in modo diverso o una correzione rapida scompare, questa è la causa più probabile. Il plugin Analyzer esiste ancora e può essere ripristinato in un clic.",
+        "why": "Questo è un cambiamento su ciò che esegue l'analisi, non un aggiornamento UI cosmetico. Conferma che i tuoi diagnostic siano ancora corretti prima di fidarti di loro.",
+        "actionHealth": "Pannello Salute Aperto",
+        "actionRevert": "Reverti al Plugin Analizzatore",
+        "revertConfirm": "Ritornato al Plugin dell'Analizzatore. Il Server LSP è ora disabilitato per questo workspace."
+      },
+      "monitoring": {
+        "header": "Nuovo: Monitoraggio Salute Macchina",
+        "body": "L'estensione monitora ora la RAM del sistema, ogni server di analisi Dart, daemon Flutter e processo di background — non solo il proprio. Un indicatore del Budget degli Strumenti di Sviluppo avvisa quando gli strumenti di sviluppo superano una quota configurabile di RAM, e i processi orfani da sessioni crashate vengono rilevati all'avvio.",
+        "why": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.",
+        "actionDashboard": "Apri Salute Macchina",
+        "actionThresholds": "Configura Soglie"
+      },
+      "sidebar": {
+        "header": "Modificato: Sidebar Semplificata",
+        "body": "La barra laterale è ridotta a 13 righe su 4 pannelli. I commutatori di gravità, i controlli dell'engine e le impostazioni sono stati spostati nei loro dashboard. Il pannello Debug è stato unito al pannello Health, e il hub Home è stato rimosso a favore della barra di stato e del Dashboard Findings.",
+        "why": "Se qualcosa che usavi cliccare nel lato sinistro è scomparso, è stato spostato in una dashboard — non è stato rimosso.",
+        "actionCatalog": "Navigare tutti i comandi di navigazione.",
+        "actionWalkthrough": "Apri Guida passo passo"
+      }
+    },
+    "discover": {
+      "header": "Esplora i dashboard",
+      "findings": {
+        "label": "Conclusioni Dashboard delle scoperte.",
+        "description": "Ogni diagnostica nel tuo progetto, filtrabile per gravità e regola."
+      },
+      "packages": {
+        "label": "Dashboard dei pacchetti.",
+        "description": "Salute delle dipendenze, opportunità di aggiornamento e adozione di funzionalità."
+      },
+      "rules": {
+        "label": "Regole e Livelli",
+        "description": "Configura quali delle 2.300+ regole vengano eseguite e a quale gravità."
+      },
+      "catalog": {
+        "label": "Catalogo di comando del catalogo dei comandi.",
+        "description": "Ogni comando Saropa Lints in un elenco ricercabile."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Un'audit è già in corso — attendi che termini.",
     "noProject": "Nessun progetto Dart trovato. Apri una cartella che contenga un pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Annulla annulla cancella",
     "runningAnalysis": "Eseguiamo analisi...",
     "analysisComplete": "Analisi completa, analisi completa.",
+    "analysisClean": "Nessun problema trovato.",
     "refreshingDashboard": "Refrescante dashboard con le ultime scoperte.",
     "analysisStartedDetail": "Iniziata l'analisi. Raccogliere i dati diagnostici...",
     "analysisFailedDetail": "Analisi fallita. Controlla l'output per i dettagli."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Apri un progetto Dart per scansionare",
       "findingsNeverScanned": "Esegui l'analisi per scansionare",
       "findingsClean": "Nessun violazione · punteggio {score}",
+      "findingsCleanFresh": "Nessun violazione · punteggio {score} · aggiornato {ago}",
       "findingsWithViolations": "Violazioni {count} · punteggio {score}",
+      "findingsWithViolationsFresh": "Violazioni {count} · punteggio {score} · aggiornato {ago}",
       "packagesNeverScanned": "Esegui scansione per verificare le dipendenze",
       "packagesAllAdopted": "Tutte le funzionalità adottate",
       "packagesNeedlesCount": "{count} package da adottare",

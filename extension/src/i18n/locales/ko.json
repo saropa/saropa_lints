@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "{total} lint 규칙은 현재 버전에 포함되어 있습니다 (필수 {essential} · 권장 {recommended} · 전문 {professional} · 포괄적 {comprehensive} · 철저 {pedantic} · {stylistic} 스타일적 옵인)"
   },
+  "welcome": {
+    "panel": {
+      "title": "v16에 새로 추가된 기능"
+    },
+    "hero": {
+      "subtitle": "이 릴리스는 기본 진단 엔진을 변경했습니다. 계속 작업하기 전에 이 내용을 읽어주세요 — 이는 Problems 패널에서 보게 되는 내용에 영향을 줍니다."
+    },
+    "checkbox": {
+      "label": "다음에는 이걸 보여줘",
+      "hint": "스크롤을 아래로 이동하여 이 기능을 해제하세요. 그렇지 않으면 이 알림이 계속 나타납니다.",
+      "hintEnabled": "이 체크박스를 해제하여 알림이 다시 나타나지 않도록 합니다."
+    },
+    "card": {
+      "engine": {
+        "header": "CRITICAL: 기본 진단 엔진 변경",
+        "body": "진단을 생성하는 엔진은 더 이상 인-프로세스 분석기 플러그인이 아닙니다 — 이제 모든 프로젝트에 대해 기본적으로 실행되는 독립적인 LSP 서버입니다. 이는 베타 소프트웨어이며, 각 выпус크에서 동작 방식이 여전히 변경되고 있습니다. 의존하는 규칙이 더 이상 작동하지 않거나, 다른 방식으로 작동하거나, 빠른 수정이 사라진다면, 이는 가장 가능성 있는 원인입니다. 분석기 플러그인은 여전히 존재하며, 한 번의 클릭으로 복원할 수 있습니다.",
+        "why": "이것은 분석을 실행하는 내용에 대한 변경사항이며, 단순한 UI 수정이 아닙니다. 분석 결과가 여전히 올바르게 보이도록 확인한 후에 신뢰해야 합니다.",
+        "actionHealth": "오픈 헬스 패널",
+        "actionRevert": "분석기 플러그인으로 되돌리기",
+        "revertConfirm": "분석기 플러그인으로 되돌렸습니다. LSP 서버는 이제 이 작업 공간에서 비활성화되었습니다."
+      },
+      "monitoring": {
+        "header": "새로운 기능: 기계 건강 모니터링",
+        "body": "확장자는 이제 시스템 RAM을 모니터링하며, 모든 Dart 분석 서버, Flutter 데몬, 및 백그라운드 프로세스를 감시합니다 — 단지 자신의 것만이 아니라요. 개발 도구 예산 지표는 개발 도구가 설정 가능한 RAM 비율을 초과할 때 경고를 제공하고, 충돌한 세션에서 발생한 버려진 프로세스는 시작 시에 탐지됩니다.",
+        "why": "대규모 프로젝트는 일반적으로 분석 서버를 누출하게 됩니다. 기계가 느려지기 전에 이를 이제 볼 수 있습니다.",
+        "actionDashboard": "기계 건강 열기",
+        "actionThresholds": "임계값 설정"
+      },
+      "sidebar": {
+        "header": "변경됨: 사이드바 단순화",
+        "body": "사이드바는 4개 패널을 통해 13행으로 줄였습니다. 중증도 전환, 엔진 제어, 설정은 각각 대시보드로 이동했습니다. 디버그 패널은 헬스 패널에 통합되었고, 홈 허브는 상태 표시줄과 발견 대시보드로 대체되었습니다.",
+        "why": "이전에 사이드바에서 클릭하던 것이 사라졌다면, 대시보드로 이동했습니다 — 제거된 것이 아닙니다.",
+        "actionCatalog": "모든 명령어를 탐색하십시오.",
+        "actionWalkthrough": "오픈 워크투어"
+      }
+    },
+    "discover": {
+      "header": "대시보드 탐색",
+      "findings": {
+        "label": "결과 대시보드 (Dashboard)",
+        "description": "프로젝트 전체의 모든 진단 정보를 중증도와 규칙별로 필터링하여 확인할 수 있습니다."
+      },
+      "packages": {
+        "label": "패키지 대시보드 (Package Dashboard)",
+        "description": "의존성 건강, 업그레이드 기회, 및 기능 채택."
+      },
+      "rules": {
+        "label": "규칙 및 등급",
+        "description": "2,300개 이상의 규칙 중 어떤 규칙이 실행되며, 어떤 중대도에서 실행되는지 설정합니다."
+      },
+      "catalog": {
+        "label": "명령 카탈로그",
+        "description": "모든 Saropa Lints 명령어는 하나의 검색 가능한 목록에 있습니다."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "점검이 이미 실행 중입니다 — 완료를 기다려 주세요.",
     "noProject": "Dart 프로젝트를 찾을 수 없습니다. pubspec.yaml가 포함된 폴더를 열어주세요.",
@@ -605,6 +661,7 @@
     "cancel": "취소 취소합니다.",
     "runningAnalysis": "분석을 실행하고 있습니다...",
     "analysisComplete": "분석 완료, 분석을 완료",
+    "analysisClean": "문제가 없습니다.",
     "refreshingDashboard": "최신 연구결과와 함께 신선한 대시보드.",
     "analysisStartedDetail": "분석이 시작되었습니다. 진단 자료를 수집하고...",
     "analysisFailedDetail": "분석 실패. 자세한 내용은 출력을 확인하십시오."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Dart 프로젝트를 열어 스캔",
       "findingsNeverScanned": "분석 실행하여 스캔",
       "findingsClean": "위반 없음 · 점수 {score}",
+      "findingsCleanFresh": "위반 없음 · 점수 {score} · 업데이트 {ago}",
       "findingsWithViolations": "{count} 위반 · 점수 {score}",
+      "findingsWithViolationsFresh": "{count} 위반 · 점수 {score} · 수정됨 {ago}",
       "packagesNeverScanned": "의존성 검사 실행",
       "packagesAllAdopted": "모든 기능 채택",
       "packagesNeedlesCount": "{count} 패키지 채택",

@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "Gruppo per... gruppo.",
   "command.openWalkthrough.title": "Saropa Lints: Iniziamo a lavorare.",
   "command.showAbout.title": "Circa _Saropa Lints.",
+  "command.showWelcome.title": "Saropa Lints: Cosa Nuovo",
   "command.openHelpHub.title": "Saropa Lints: Aiutare aiuta.",
   "command.openPubDevSaropaLints.title": "Saropa Lints: Aprire il pacchetto su pub.dev.",
   "command.createSaropaInstructions.title": "Creare Saropa Lints Istruzioni per gli agenti di IA.",

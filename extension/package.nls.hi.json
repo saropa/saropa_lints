@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "समूह द्वारा ... के अनुसार।",
   "command.openWalkthrough.title": "Saropa Lints: आरंभ करना शुरू कर दिया",
   "command.showAbout.title": "Saropa Lints के बारे में",
+  "command.showWelcome.title": "Saropa Lints: नई चीजें",
   "command.openHelpHub.title": "Saropa Lints: मदद कीजिये।",
   "command.openPubDevSaropaLints.title": "Saropa Lints: _PH0_: pub.dev पर पैकेज खोलें।",
   "command.createSaropaInstructions.title": "Saropa Lints निर्देश बनाएँ AI एजेंटों के लिए।",

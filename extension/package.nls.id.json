@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "Kelompokkan oleh... kelompok.",
   "command.openWalkthrough.title": "Saropa Lints: Memulai Mulai",
   "command.showAbout.title": "Tentang _Saropa Lints.",
+  "command.showWelcome.title": "Saropa Lints: Apa yang Baru",
   "command.openHelpHub.title": "Saropa Lints: Bantuan Membantu",
   "command.openPubDevSaropaLints.title": "Saropa Lints: adalah suatu bentuk dari _PH0_. Buka paket pada pub.dev.",
   "command.createSaropaInstructions.title": "Buat Saropa Lints Instruksi untuk Agen AI",

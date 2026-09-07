@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "Zasady {total} lint w tej wersji (podstawowe {essential} · zalecane {recommended} · profesjonalne {professional} · kompleksowe {comprehensive} · pedantyczne {pedantic} · {stylistic} opcjonalne stylowe)"
   },
+  "welcome": {
+    "panel": {
+      "title": "Co nowego w wersji v16"
+    },
+    "hero": {
+      "subtitle": "Ta wersja zmienia domyślny silnik diagnostyczny. Przeczytaj to przed kontynuowaniem pracy — wpływa to na to, co zobaczysz w panelu Problemy."
+    },
+    "checkbox": {
+      "label": "Pokaż to w kolejnym razie",
+      "hint": "Przewiń na dół, aby odblokować to. Dopóki to nie zrobisz, ten komunikat będzie się powtarzał.",
+      "hintEnabled": "Odkliknij to, aby zatrzymać powiadamianie o ponownym pojawieniu się."
+    },
+    "card": {
+      "engine": {
+        "header": "KRITYCZNE: Domyślny silnik diagnostyczny zmieniony",
+        "body": "Silne zasady:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE TAK, jak napisany, w gramatycznie poprawnej pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie zmieniaj języka pośrodku zdania.\n\nTekst: Silnik, który generuje Twoje diagnozy, nie jest już wewnętrzny wtyczki Analyzer Plugin — teraz to samodzielny serwer LSP, domyślnie włączony dla każdego projektu. To oprogramowanie beta, a jego zachowanie nadal zmienia się między wersjami. Jeśli reguła, na której polegasz, przestanie wykonywać się, zmieni się w działaniu, lub szybki poprawka zniknie, to najbardziej prawdopodobny powód. Wtyczka Analyzer Plugin nadal istnieje i może zostać przywrócona w jednym kliku.",
+        "why": "To zmiana w tym, co uruchamia analizę, a nie kosmetyczna aktualizacja interfejsu użytkownika. Potwierdź, że diagnozy nadal wyglądają poprawnie, zanim zaufasz im.",
+        "actionHealth": "Otwórz Panel Zdrowia",
+        "actionRevert": "Cofnij do analizatora Plugin",
+        "revertConfirm": "Powrocono do wtyczki Analizatora. Serwer LSP jest teraz wyłączony dla tego przestrzeni roboczej."
+      },
+      "monitoring": {
+        "header": "Nowe: Monitorowanie stanu maszyny",
+        "body": "Rozszerzenie teraz monitoruje pamięć RAM systemu, każdy serwer analizy Dart, daemon Flutter oraz proces w tle — nie tylko własne. Wskazówka wskaźnika Budżetu Narzędzi Rozwojowych ostrzega, gdy narzędzia do rozwoju przekraczają ustawioną przez użytkownika część pamięci RAM, a procesy niezwiązane z sesjami zakończonymi niepowodzeniem są wykrywane przy starcie.",
+        "why": "Zaawansowane reguły:  \n1. Zwróć TYLKO przetłumaczony tekst.  \n2. NIE dodawaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów.  \n3. Tekst może zawierać tokeny zastępcze: tokeny zastępcze. Skopiuj każdy z nich do tłumaczenia IDEWOWO jak napisany, w poprawnej gramatycznej pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.  \n4. Wyjście MUSI używać poprawnej systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.",
+        "actionDashboard": "Otwórz Stan Maszyny",
+        "actionThresholds": "Konfiguruj próg"
+      },
+      "sidebar": {
+        "header": "Zmienione: Sidebar uproszczony",
+        "body": "Panel boczny zmniejszono do 13 wierszy na 4 panelach. Przełączniki ważności, kontrolki silnika oraz ustawienia przeniesiono do ich paneli sterowania. Panel Debug został scalony z panelu Health, a hub Home został usunięty w zamian za pasek statusu i Dashboard Findings.",
+        "why": "Jeśli coś, co kiedyś kliknąłeś w pasku bocznym, znikło, przenieśli się do dashboardu — nie zostało usunięte.",
+        "actionCatalog": "Przeglądaj wszystkie polecenia",
+        "actionWalkthrough": "Otwórz przewodnik"
+      }
+    },
+    "discover": {
+      "header": "Odkryj dashboards",
+      "findings": {
+        "label": "Wyniki z tablicy narzędzi.",
+        "description": "Wszystkie diagnozy w całym projekcie, filtrowalne według poważności i reguły."
+      },
+      "packages": {
+        "label": "Panel paneli pakietów (Package Dashboard)",
+        "description": "Zdrowie zależności, możliwości aktualizacji oraz przyjęcie funkcji."
+      },
+      "rules": {
+        "label": "Reguły & Poziomy",
+        "description": "Konfiguruj, które z 2 300+ reguł są uruchamiane oraz na jakim poziomie poważności."
+      },
+      "catalog": {
+        "label": "Katalog dowodzenia katalogu poleceń.",
+        "description": "Każda komenda Saropa Lints w jednej wyszukiwalnej liście."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Audyt już się uruchomił — czekaj, aż zakończy.",
     "noProject": "Brak projektu Dart. Otwórz folder zawierający pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Odwołaj Anulować",
     "runningAnalysis": "Prowadzę analizę...",
     "analysisComplete": "Analiza zakończona, analiza ukończona.",
+    "analysisClean": "Brak problemów.",
     "refreshingDashboard": "Odświeżająca pulpeta z najnowszymi odkryciami.",
     "analysisStartedDetail": "Rozpoczęła się analiza. Zbieranie danych diagnostycznych...",
     "analysisFailedDetail": "Analiza nie powiodła się. Sprawdź wyjście dla szczegółów."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Otwórz projekt Dart, aby przeprowadzić skanowanie",
       "findingsNeverScanned": "Uruchom analizę, aby skanować",
       "findingsClean": "Brak naruszeń · wynik {score}",
+      "findingsCleanFresh": "Brak naruszeń · wynik {score} · zaktualizowano {ago}",
       "findingsWithViolations": "Widoczne są {count} naruszenia · wynik {score}",
+      "findingsWithViolationsFresh": "Założeń {count} · wynik {score} · zaktualizowano {ago}",
       "packagesNeverScanned": "Uruchom skanowanie aby sprawdzić zależności",
       "packagesAllAdopted": "Wszystkie funkcje zaakceptowane",
       "packagesNeedlesCount": "{count} pakietów do przyjęcia",

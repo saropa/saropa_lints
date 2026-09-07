@@ -109,6 +109,7 @@
   "command.setGroupBy.title": "গ্রুপ দ্বারা ... দ্বারা... গ্রুপ।",
   "command.openWalkthrough.title": "Saropa Lints: শুরু করা হচ্ছে",
   "command.showAbout.title": "Saropa Lints সম্পর্কে",
+  "command.showWelcome.title": "Saropa Lints: নতুন কি",
   "command.openHelpHub.title": "Saropa Lints: সাহায্য করুন",
   "command.openPubDevSaropaLints.title": "Saropa Lints: PH0__::: -PH0_: =PH0 pub.dev এ প্যাকেজটি খুলুন।",
   "command.createSaropaInstructions.title": "এআই এজেন্টদের জন্য Saropa Lints নির্দেশাবলী তৈরি করুন",

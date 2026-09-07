@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "Reglas de lint {total} actualmente incluidas en esta versión (esenciales {essential} · recomendadas {recommended} · profesionales {professional} · completas {comprehensive} · pedantes {pedantic} · {stylistic} de estilo opt-in)"
   },
+  "welcome": {
+    "panel": {
+      "title": "¿Qué hay de nuevo en v16"
+    },
+    "hero": {
+      "subtitle": "Esta versión cambia el motor de diagnóstico por defecto. Lee esto antes de seguir trabajando — afecta lo que verás en el panel de Problemas."
+    },
+    "checkbox": {
+      "label": "Muestra esto la próxima vez",
+      "hint": "Desplázate hacia abajo para desbloquear esto. Hasta entonces, este aviso seguirá apareciendo.",
+      "hintEnabled": "Deshabilitar esta opción para detener que la notificación aparezca nuevamente."
+    },
+    "card": {
+      "engine": {
+        "header": "CRITICAL: Motor de Diagnóstico Predeterminado Cambiado",
+        "body": "El motor que produce sus diagnósticos ya no es el Analizador Plugin en proceso — ahora es un servidor LSP independiente, activado de forma predeterminada para cada proyecto. Este es un software en beta, y su comportamiento sigue cambiando entre versiones. Si una regla en la que depende deja de dispararse, se comporta de forma diferente o una corrección rápida desaparece, esta es la causa más probable. El Analizador Plugin aún existe y puede restaurarse con un solo clic.",
+        "why": "Este es un cambio en lo que ejecuta su análisis, no una actualización de interfaz de usuario cosmética. Confirme que sus diagnósticos aún se ven correctamente antes de confiar en ellos.",
+        "actionHealth": "Panel de Salud Abrir",
+        "actionRevert": "Volver al plugin de Analizador",
+        "revertConfirm": "Se ha vuelto al Plugin del Analizador. El Servidor LSP ahora está desactivado para este workspace."
+      },
+      "monitoring": {
+        "header": "Nuevo: Monitoreo de Salud de la Máquina",
+        "body": "La extensión ahora monitorea la RAM del sistema, cada servidor de análisis Dart, daemon Flutter y proceso en segundo plano — no solo el propio. Un indicador de presupuesto de herramientas de desarrollo advierte cuando las herramientas de desarrollo exceden una proporción configurable de RAM, y los procesos huérfanos de sesiones que se crashearon son detectados al iniciar.",
+        "why": "Reglas estrictas:\n1. Devuelve ÚNICAMENTE la salida de la cadena traducida.\n2. NO incluyas explicaciones, introducción, notación markdown o comillas alrededor.\n3. El texto puede contener tokens de marcador: tokens de marcador. Copia cada uno en la traducción EXACTAMENTE como se escribe, en la posición gramaticalmente correcta. Nunca lo traduzcas, elimines o reformates un token.\n4. La salida DEBE usar la escritura correcta para el idioma de destino; no cambies a otro idioma en medio de una oración.",
+        "actionDashboard": "Abrir Salud de la Máquina",
+        "actionThresholds": "Configurar umbrales"
+      },
+      "sidebar": {
+        "header": "Modificado: Barra lateral simplificada",
+        "body": "El panel lateral se redujo a 13 filas en 4 paneles. Los toggles de severidad, controles del motor y ajustes se movieron a sus dashboards. El panel de Depuración se fusionó con el panel de Salud, y el hub de Inicio fue eliminado en favor de la barra de estado y el Dashboard de Encuentros.",
+        "why": "Si algo que solías hacer clic en el panel lateral desapareció, se movió a un tablero — no fue eliminado.",
+        "actionCatalog": "Navegue por todos los comandos.",
+        "actionWalkthrough": "Abrir Recorrido"
+      }
+    },
+    "discover": {
+      "header": "Explora los dashboards",
+      "findings": {
+        "label": "El panel de resultados del tablero.",
+        "description": "Todo diagnóstico en todo tu proyecto, filtrable por gravedad y regla."
+      },
+      "packages": {
+        "label": "Panel de control del paquete.",
+        "description": "Salud de dependencias, oportunidades de actualización y adopción de características."
+      },
+      "rules": {
+        "label": "Reglas y Niveles",
+        "description": "Configura cuáles de las 2.300+ reglas se ejecutan y en qué nivel de gravedad."
+      },
+      "catalog": {
+        "label": "Catálogo de comandos del catálogo.",
+        "description": "Cada comando Saropa Lints en una lista buscable."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "Una auditoría ya está en ejecución — espere a que termine.",
     "noProject": "No se encontró un proyecto Dart. Abra una carpeta que contenga un pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Cancelar cancelar el pago de la cuenta.",
     "runningAnalysis": "Ejecutar análisis ... de ejecución.",
     "analysisComplete": "Análisis completo y completo.",
+    "analysisClean": "No se encontraron problemas.",
     "refreshingDashboard": "Tablero de instrumentos refrescante con los últimos hallazgos.",
     "analysisStartedDetail": "Se inició el análisis. Recogiendo los diagnósticos ...",
     "analysisFailedDetail": "El análisis falló. Compruebe la salida para obtener detalles."
@@ -2645,7 +2702,9 @@
       "findingsNoProject": "Abra un proyecto Dart para escanear",
       "findingsNeverScanned": "Ejecutar análisis para escanear",
       "findingsClean": "Sin violaciones · puntuación {score}",
+      "findingsCleanFresh": "Sin violaciones · puntuación {score} · actualizado {ago}",
       "findingsWithViolations": "Violaciones {count} · puntuación {score}",
+      "findingsWithViolationsFresh": "Violaciones {count} · puntuación {score} · actualizado {ago}",
       "packagesNeverScanned": "Ejecutar escaneo para verificar dependencias",
       "packagesAllAdopted": "Todas las características adoptadas",
       "packagesNeedlesCount": "{count} paquetes para adoptar",
