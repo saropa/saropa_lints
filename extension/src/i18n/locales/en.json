@@ -2,6 +2,62 @@
   "about": {
     "ruleCountStrip": "{total} lint rules currently ship in this version (essential {essential} · recommended {recommended} · professional {professional} · comprehensive {comprehensive} · pedantic {pedantic} · {stylistic} opt-in stylistic)"
   },
+  "welcome": {
+    "panel": {
+      "title": "What's New in v16"
+    },
+    "hero": {
+      "subtitle": "This release changes the default diagnostic engine. Read this before you keep working — it affects what you'll see in the Problems panel."
+    },
+    "checkbox": {
+      "label": "Show this next time",
+      "hint": "Scroll to the bottom to unlock this. Until then, this notice will keep reappearing.",
+      "hintEnabled": "Uncheck this to stop the notice from reappearing."
+    },
+    "card": {
+      "engine": {
+        "header": "CRITICAL: Default Diagnostic Engine Changed",
+        "body": "The engine that produces your diagnostics is no longer the in-process Analyzer Plugin — it is now a standalone LSP server, on by default for every project. This is beta software, and its behavior is still changing between releases. If a rule you rely on stops firing, fires differently, or a quick fix disappears, this is the most likely cause. The Analyzer Plugin still exists and can be restored in one click.",
+        "why": "This is a change to what runs your analysis, not a cosmetic UI update. Confirm your diagnostics still look right before you trust them.",
+        "actionHealth": "Open Health Panel",
+        "actionRevert": "Revert to Analyzer Plugin",
+        "revertConfirm": "Reverted to the Analyzer Plugin. The LSP Server is now disabled for this workspace."
+      },
+      "monitoring": {
+        "header": "New: Machine Health Monitoring",
+        "body": "The extension now monitors system RAM, every Dart analysis server, Flutter daemon, and background process — not just its own. A Dev Tool Budget indicator warns when dev tools exceed a configurable share of RAM, and orphaned processes from crashed sessions are detected at startup.",
+        "why": "Large projects routinely leak analysis servers. You'll now see it before your machine slows down.",
+        "actionDashboard": "Open Machine Health",
+        "actionThresholds": "Configure Thresholds"
+      },
+      "sidebar": {
+        "header": "Changed: Sidebar Simplified",
+        "body": "The sidebar is down to 13 rows across 4 panels. Severity toggles, engine controls, and settings moved into their dashboards. The Debug Panel merged into Health Panel, and the Home hub was removed in favor of the status bar and Findings Dashboard.",
+        "why": "If something you used to click in the sidebar is gone, it moved to a dashboard — it wasn't removed.",
+        "actionCatalog": "Browse All Commands",
+        "actionWalkthrough": "Open Walkthrough"
+      }
+    },
+    "discover": {
+      "header": "Explore the dashboards",
+      "findings": {
+        "label": "Findings Dashboard",
+        "description": "Every diagnostic across your project, filterable by severity and rule."
+      },
+      "packages": {
+        "label": "Package Dashboard",
+        "description": "Dependency health, upgrade opportunities, and feature adoption."
+      },
+      "rules": {
+        "label": "Rules & Tiers",
+        "description": "Configure which of the 2,300+ rules run and at what severity."
+      },
+      "catalog": {
+        "label": "Command Catalog",
+        "description": "Every Saropa Lints command in one searchable list."
+      }
+    }
+  },
   "audit": {
     "alreadyRunning": "An audit is already running — wait for it to finish.",
     "noProject": "No Dart project found. Open a folder that contains a pubspec.yaml.",
@@ -605,6 +661,7 @@
     "cancel": "Cancel",
     "runningAnalysis": "Running analysis…",
     "analysisComplete": "Analysis complete",
+    "analysisClean": "No issues found.",
     "refreshingDashboard": "Refreshing dashboard with the latest findings.",
     "analysisStartedDetail": "Analysis started. Collecting diagnostics…",
     "analysisFailedDetail": "Analysis failed. Check output for details."

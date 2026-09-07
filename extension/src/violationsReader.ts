@@ -486,3 +486,26 @@ function computeByRuleStatus(
   }
   return result;
 }
+
+/**
+ * Write a ViolationsData snapshot to the standard violations.json path.
+ *
+ * Uses atomic temp-then-rename to match the Dart plugin's write pattern
+ * (`ViolationExporter._writeAtomicFile`), so file-watchers never see a
+ * partial write. Creates the parent directory if it doesn't exist yet
+ * (first-run on a fresh project).
+ */
+export async function writeViolationsData(
+  workspaceRoot: string,
+  data: ViolationsData,
+): Promise<void> {
+  const p = getViolationsPath(workspaceRoot);
+  const dir = path.dirname(p);
+  // Ensure the reports/.saropa_lints directory exists on first write.
+  // recursive:true is a no-op when the directory already exists.
+  fs.mkdirSync(dir, { recursive: true });
+  const tmp = p + '.tmp';
+  await fs.promises.writeFile(tmp, JSON.stringify(data, null, 2), 'utf-8');
+  // Atomic rename so concurrent readers never see a half-written file.
+  await fs.promises.rename(tmp, p);
+}

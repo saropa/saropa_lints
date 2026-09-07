@@ -9,7 +9,8 @@ import * as path from 'node:path';
 import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { logReport, logSection, flushReport, findLatestAnalysisReport } from './reportWriter';
 import { getProjectRoot } from './projectRoot';
-import { readViolations } from './violationsReader';
+import { readViolations, writeViolationsData, type ViolationsData } from './violationsReader';
+import { readLiveViolations, readLiveViolationsForFiles } from './liveViolationsData';
 import { readInstalledVersion } from './upgrade-checker';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
 import { readTierFromAnalysisOptionsYaml } from './config/tierConfig';
@@ -20,7 +21,7 @@ import {
 } from './config/laneConfig';
 import { l10n } from './i18n/runtime';
 // Shared path-segment constants/helpers — keeps 'reports'/'.saropa_lints' in one place.
-import { REPORTS_DIR, saropaLintsDataPath } from './reportsPaths';
+import { REPORTS_DIR } from './reportsPaths';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
 const DEFAULT_VERSION = '^9.1.0';
@@ -34,13 +35,40 @@ const OUTPUT_CHANNEL_NAME = 'Saropa Lints';
 // Lazily-initialized singleton to avoid creating multiple channel objects.
 let _outputChannel: vscode.OutputChannel | undefined;
 
-// Cancellation source for the one in-flight full `runAnalysis`. A newer request
-// (e.g. toggling several rule packs in quick succession) cancels the previous run
-// instead of spawning a second concurrent `dart analyze` + progress notification.
-// Without this, rapid pack toggles stacked N "Running analysis" notifications and N
-// overlapping analyzer processes (reported 2026-06-23). Newest-wins is always
-// correct: two concurrent full analyses race to write the same violations.json.
-let _supersedingAnalysisCts: vscode.CancellationTokenSource | undefined;
+// Max time (ms) to wait for the analysis server to settle after a config change.
+// The Dart Analysis Server re-analyzes asynchronously after an
+// analysis_options.yaml write; awaitDiagnosticsChange resolves as soon as ANY
+// diagnostic changes (typically <500ms), falling back to this timeout on slow
+// machines or when the config change triggers no diagnostic difference.
+const CONFIG_CHANGE_SETTLE_TIMEOUT_MS = 3000;
+
+/**
+ * Wait for the analysis server to produce fresh diagnostics after a config
+ * change, or fall back to a timeout. Resolves true when diagnostics actually
+ * changed; false on timeout (the read will proceed with whatever is current).
+ *
+ * Why event-driven: a fixed sleep is either too short (stale data on slow
+ * machines) or too long (unnecessary delay on fast ones). Listening for
+ * `onDidChangeDiagnostics` resolves at the actual moment the server catches
+ * up — typically under 500ms — while the timeout cap prevents an indefinite
+ * wait when the config change produces no diagnostic difference (e.g. adding
+ * a rule that fires on zero files).
+ */
+async function awaitDiagnosticsChange(
+  timeoutMs: number = CONFIG_CHANGE_SETTLE_TIMEOUT_MS,
+): Promise<boolean> {
+  return new Promise<boolean>((resolve) => {
+    const timeout = setTimeout(() => {
+      disposable.dispose();
+      resolve(false);
+    }, timeoutMs);
+    const disposable = vscode.languages.onDidChangeDiagnostics(() => {
+      clearTimeout(timeout);
+      disposable.dispose();
+      resolve(true);
+    });
+  });
+}
 function getOutputChannel(): vscode.OutputChannel {
   _outputChannel ??= vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
   return _outputChannel;
@@ -1264,22 +1292,22 @@ async function runAnalysisAfterConfigChangeScoped(
     return { cancelled: false };
   }
 
-  // Always `dart`, never `flutter`, even on Flutter projects: both run the same
-  // analyzer, but the flutter wrapper boots the flutter_tool first (SDK version
-  // check, artifact validation, its own resolution) — measured at ~114 s of pure
-  // overhead on a large project. See runPubGet for the measurement.
-  const analyzeCmd = 'dart';
-  // Async spawn: `dart analyze` on a large project can run for tens of seconds,
-  // and the synchronous spawnSync variant used to block the whole extension
-  // host for that entire duration — the root cause of the "Enabling Saropa
-  // Lints" progress notification appearing permanently stalled.
-  // shell: false — dart.exe is a native executable; no cmd.exe needed.
-  const analysisResult = await runInWorkspaceAsync(workspaceRoot, analyzeCmd, ['analyze'], { token: options?.token, shell: false });
-  if (analysisResult.cancelled) {
-    logReport('- Analysis cancelled by user');
-    return { cancelled: true };
-  }
-  logReport(analysisResult.ok ? fullOkMessage : fullFailMessage);
+  // Wait for the analysis server to settle after the config write. The Dart
+  // Analysis Server watches analysis_options.yaml and re-analyzes automatically,
+  // but the re-analysis is asynchronous. Without waiting, readLiveViolations
+  // would capture the stale pre-change diagnostic state, writing a snapshot that
+  // disagrees with the new config. The old `dart analyze` subprocess implicitly
+  // guaranteed freshness by running a cold analysis from scratch; this event-
+  // driven wait resolves as soon as the server emits fresh diagnostics (typically
+  // <500ms), with a timeout fallback for edge cases where no diagnostic changes.
+  await awaitDiagnosticsChange();
+
+  // Read live VS Code diagnostics — reflects the new config after the settle.
+  const data = readLiveViolations(workspaceRoot);
+  await writeViolationsData(workspaceRoot, data);
+  const ok = data.violations.length === 0;
+  logReport(ok ? fullOkMessage : fullFailMessage);
+  // Live reads are instant — nothing to cancel. Always report not-cancelled.
   return { cancelled: false };
 }
 
@@ -1394,61 +1422,6 @@ export function analysisIssuesActions(
 }
 
 /**
- * Max time to wait for the plugin to write a fresh `violations.json` after an
- * analysis run before falling back to whatever is on disk. The analyzer writes
- * on a 3s idle debounce (`AnalysisReporter._debounce`); 6s leaves margin for a
- * multi-isolate consolidation without pinning the progress toast for an
- * unreasonable time.
- */
-const FRESH_VIOLATIONS_TIMEOUT_MS = 6000;
-
-/** Poll interval while waiting for the fresh `violations.json` write. */
-const FRESH_VIOLATIONS_POLL_MS = 250;
-
-/**
- * Wait until `reports/.saropa_lints/violations.json` has been written newer
- * than [sinceMs], or [timeoutMs] elapses. Returns true when a fresh write
- * landed.
- *
- * Why this exists: the post-analysis popup must reflect the plugin's ACTUAL
- * output, not the bare `dart analyze` exit code. The plugin (the live analysis
- * server) writes `violations.json` and the `*_saropa_lint_report.log` together
- * on a debounce, decoupled from the one-shot `dart analyze` the extension
- * spawns. Firing the popup immediately off the exit code produced the "claims
- * violations, empty dashboard, dead Copy/Open Report buttons" bug: the exit
- * code can be non-zero (a core analyzer error, a compile failure) while the
- * plugin's fresh write hasn't landed — or never lands for this run. Gating on
- * a fresh write makes the popup honest: when it fires off fresh data, the
- * dashboard is populated and the report exists, so every button has a target.
- *
- * Robust to both runtime realities — whether the spawned `dart analyze`
- * triggers the write or the live server does — because it keys off the real
- * artifact's mtime, not the subprocess. When no fresh write lands within the
- * timeout, the caller still shows the gated notification, which then reflects
- * whatever is on disk (typically the honest "see Output" no-findings message).
- */
-async function awaitFreshViolations(
-  workspaceRoot: string,
-  sinceMs: number,
-  timeoutMs: number = FRESH_VIOLATIONS_TIMEOUT_MS,
-): Promise<boolean> {
-  const p = path.join(saropaLintsDataPath(workspaceRoot), 'violations.json');
-  const deadline = Date.now() + timeoutMs;
-  for (;;) {
-    try {
-      // mtimeMs strictly greater than the run start means the plugin rewrote
-      // the file for THIS run, not a leftover from a prior session.
-      if (fs.existsSync(p) && fs.statSync(p).mtimeMs > sinceMs) return true;
-    } catch {
-      // stat race: the exporter writes temp-then-rename (ViolationExporter
-      // ._writeAtomicFile), so a stat can briefly hit a mid-rename gap. Retry.
-    }
-    if (Date.now() >= deadline) return false;
-    await new Promise((resolve) => setTimeout(resolve, FRESH_VIOLATIONS_POLL_MS));
-  }
-}
-
-/**
  * Warn the user that `dart analyze` reported issues, with the real count and
  * clickable buttons for the next step.
  *
@@ -1457,8 +1430,11 @@ async function awaitFreshViolations(
  * dismisses the popup — a bad UX. The popup is modeless; the button handlers
  * dispatch their own commands asynchronously.
  */
-function showAnalysisIssuesNotification(workspaceRoot: string, scope?: string): void {
-  const data = readViolations(workspaceRoot);
+function showAnalysisIssuesNotification(workspaceRoot: string, scope?: string, liveData?: ViolationsData): void {
+  // Accept pre-built ViolationsData from the live-diagnostics path (instant,
+  // no file I/O) — fall back to the on-disk export for callers that don't
+  // have data in hand (e.g. legacy code paths).
+  const data = liveData ?? readViolations(workspaceRoot);
   // Count what the Findings dashboard will actually render — the
   // `violations[]` array — NOT `summary.totalViolations`. The summary is a
   // plugin-written aggregate that can diverge from (or outlive) the array
@@ -1548,7 +1524,6 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
     vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
     return false;
   }
-  let ok = false;
   const cfg = vscode.workspace.getConfiguration('saropaLints');
   // "Lint integration: Off" must stop every analyze run this function can be
   // reached from — manual command, dependency-change watcher, config-change
@@ -1558,124 +1533,73 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
   if (!(cfg.get<boolean>('enabled', true) ?? true)) return false;
   const openEditorsOnly = cfg.get<boolean>('runAnalysisOpenEditorsOnly', false) ?? false;
 
-  // Supersede any previous in-flight full analysis before starting this one, so a
-  // burst of config changes (pack toggles) collapses to a single live run rather
-  // than stacking notifications and analyzer processes. The previous run's child
-  // is killed via its token; its progress notification then resolves and closes.
-  _supersedingAnalysisCts?.cancel();
-  _supersedingAnalysisCts?.dispose();
-  const supersedeCts = new vscode.CancellationTokenSource();
-  _supersedingAnalysisCts = supersedeCts;
+  // Read live VS Code diagnostics — zero cost. The Dart Analysis Server
+  // already produced these for the Problems panel; this reads the result
+  // rather than spawning a cold `dart analyze` subprocess.
+  // See plans/history/2026.09/2026.09.07/bug_analysis_runs_dart_analyze_not_lsp.md for the migration rationale.
+  let data: ViolationsData;
+  if (openEditorsOnly) {
+    const relFiles = getOpenDartFilePaths(workspaceRoot);
+    if (relFiles.length === 0) {
+      vscode.window.showInformationMessage(
+        l10n('notify.setup.noOpenDartFiles'),
+      );
+      return false;
+    }
+    // getOpenDartFilePaths returns workspace-relative paths; resolve to
+    // absolute so readLiveViolationsForFiles can match against the
+    // diagnostics API's absolute uri.fsPath values.
+    const absFiles = relFiles.map((f) => path.join(workspaceRoot, f));
+    data = readLiveViolationsForFiles(workspaceRoot, absFiles);
+  } else {
+    data = readLiveViolations(workspaceRoot);
+  }
 
-  await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: openEditorsOnly ? 'Running analysis (open editors)' : 'Running analysis',
-      // Cancellable so a wedged `dart analyze` can be killed. Critical when this
-      // flow is nested inside another progress (e.g. the upgrade checker awaits
-      // initializeConfig -> runAnalysis): the old synchronous `runInWorkspace`
-      // here blocked the extension-host event loop for the FULL analyze duration,
-      // which froze the outer "Upgrading…" notification with a dead Cancel
-      // button and made it look like it never closed. The async variant below
-      // keeps the loop responsive and forwards this token to kill the child tree.
-      cancellable: true,
-    },
-    async (_progress, token) => {
-      // Funnel the UI Cancel button into the supersede token so the analyzer child
-      // sees a single cancellation source whether the user clicked Cancel or a newer
-      // run superseded this one. Disposed in finally so the listener never leaks.
-      const cancelBridge = token.onCancellationRequested(() => supersedeCts.cancel());
-      try {
-      // Stamp the run start so the post-analysis popup can wait for the
-      // plugin's fresh violations.json write (newer than this) before firing,
-      // instead of racing the bare `dart analyze` exit code. See
-      // awaitFreshViolations for the decoupling rationale.
-      const runStartMs = Date.now();
-      if (openEditorsOnly) {
-        const files = getOpenDartFilePaths(workspaceRoot);
-        if (files.length === 0) {
-          vscode.window.showInformationMessage(
-            l10n('notify.setup.noOpenDartFiles'),
-          );
-          ok = false;
-          return;
-        }
-        const filesResult = await runAnalysisForFiles(context, files, { showProgress: false, token: supersedeCts.token });
-        ok = filesResult.ok;
-        // Skip the post-analysis popup when cancelled — the data is stale/incomplete.
-        if (filesResult.cancelled) return;
-        if (!ok) {
-          // See bugs/infra_run_analysis_popup_dumps_progress_stderr.md — scope
-          // label tells the user why the count may differ from a full run.
-          // Wait for the plugin's fresh write so the popup reflects real data
-          // (and the report log exists) rather than a stale/empty snapshot.
-          await awaitFreshViolations(workspaceRoot, runStartMs);
-          showAnalysisIssuesNotification(workspaceRoot, 'open editors only');
-        }
-        return;
-      }
+  // Write the snapshot to violations.json so file-watching consumers
+  // (dashboard refresh watcher, health score, report buttons) continue
+  // working with a fresh export. Atomic temp-then-rename matches the
+  // Dart plugin's pattern so watchers never see a partial write.
+  await writeViolationsData(workspaceRoot, data);
 
-      // `dart`, not `flutter` — same analyzer, none of the flutter_tool boot
-      // cost (see the comment on analyzeCmd above).
-      const cmd = 'dart';
-      logSection('Analysis');
-      // Async + cancellable: never block the extension-host event loop (see the
-      // cancellable rationale on this progress above). The token wires the
-      // Cancel button to a process-tree kill.
-      // shell: false — dart.exe is a native executable; no cmd.exe needed.
-      const result = await runInWorkspaceAsync(workspaceRoot, cmd, ['analyze'], { token: supersedeCts.token, shell: false });
-      if (result.cancelled) {
-        // Cancelled either by the user's Cancel button or because a newer run
-        // superseded this one (rapid pack toggles). Either way: stop quietly.
-        logReport('- Analysis cancelled (user or superseded by a newer run)');
-        flushReport(workspaceRoot);
-        ok = false;
-        return;
-      }
-      ok = result.ok;
-      if (ok) {
-        logReport('- Analysis completed clean');
-      } else {
-        logReport(`- Analysis reported issues (${cmd} analyze)`);
-        // See bugs/infra_run_analysis_popup_dumps_progress_stderr.md — the old
-        // code sliced result.stderr into the popup, but dart analyze writes a
-        // progress bar to stderr, so the popup was always garbled chrome.
-        // Read the authoritative count from violations.json instead — but only
-        // after waiting for the plugin's fresh write so the popup, the report
-        // buttons, and the dashboard all agree on the same data.
-        await awaitFreshViolations(workspaceRoot, runStartMs);
-        showAnalysisIssuesNotification(workspaceRoot);
-      }
-      logSuppressionSummary(workspaceRoot);
-      // Tag the extension report with the extension version and the resolved
-      // saropa_lints version from pubspec.lock — so every
-      // `<ts>_saropa_extension.md` file is self-identifying. When a user
-      // asks "is the rule still firing 14k times?" the first useful fact is
-      // which plugin build produced the numbers.
-      const installed = resolveSaropaLintsVersion(workspaceRoot);
-      flushReport(workspaceRoot, {
-        extensionVersion: resolveExtensionVersion(),
-        saropaLintsVersion: installed?.version,
-        saropaLintsSource: installed?.source,
-      });
-      } finally {
-        cancelBridge.dispose();
-      }
-    },
-  );
-  // Only clear the shared slot if this run still owns it — a newer run may have
-  // already replaced (and disposed) it. dispose() is idempotent, so the extra
-  // call when superseded is harmless.
-  if (_supersedingAnalysisCts === supersedeCts) _supersedingAnalysisCts = undefined;
-  supersedeCts.dispose();
+  const violationCount = data.violations.length;
+  const ok = violationCount === 0;
+
+  logSection('Analysis');
+  if (ok) {
+    logReport('- Analysis completed clean (live diagnostics)');
+    // Give the user visible confirmation the command fired and found nothing.
+    vscode.window.showInformationMessage(
+      `${l10n('loading.analysisComplete')} — ${l10n('loading.analysisClean')}`,
+    );
+  } else {
+    const scope = openEditorsOnly ? 'open editors only' : undefined;
+    logReport(`- Analysis reported ${violationCount} issues (live diagnostics)`);
+    // Pass the data directly — no need to re-read from the file we just wrote.
+    showAnalysisIssuesNotification(workspaceRoot, scope, data);
+  }
+  logSuppressionSummary(workspaceRoot);
+  // Tag the extension report with the extension + plugin versions so every
+  // `<ts>_saropa_extension.md` file is self-identifying.
+  const installed = resolveSaropaLintsVersion(workspaceRoot);
+  flushReport(workspaceRoot, {
+    extensionVersion: resolveExtensionVersion(),
+    saropaLintsVersion: installed?.version,
+    saropaLintsSource: installed?.source,
+  });
   return ok;
 }
 
 /**
  * Run analysis only for the given files (e.g. stack-trace files for Log Capture).
- * Same as runAnalysis but passes file paths to dart/flutter analyze.
- * Paths are normalized (relative → absolute under workspace), deduplicated, and capped at 50.
- * When invoked via API, no progress UI is shown unless showProgress is true.
+ *
+ * Reads live VS Code diagnostics filtered to the requested files — instant,
+ * no subprocess. Paths are normalized (relative → absolute under workspace),
+ * deduplicated, and capped at {@link RUN_ANALYSIS_FOR_FILES_CAP}.
+ *
+ * `cancelled` is always false in the live-diagnostics path (nothing to cancel);
+ * kept in the return type for call-site compat. `showProgress` and `token`
+ * are accepted for signature compat but have no effect — the live read is
+ * instantaneous (no subprocess to show progress for or cancel).
  */
 export async function runAnalysisForFiles(
   context: vscode.ExtensionContext,
@@ -1687,6 +1611,8 @@ export async function runAnalysisForFiles(
   const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
   if (!enabled) return { ok: false, cancelled: false };
 
+  // Normalize paths to absolute — same dedup/cap logic as before so callers
+  // passing relative paths or duplicates still get the expected behavior.
   const normalized = new Set<string>();
   for (const f of files) {
     const trimmed = f.trim();
@@ -1705,58 +1631,31 @@ export async function runAnalysisForFiles(
     );
   }
 
-  // `dart`, not `flutter` — same analyzer, none of the flutter_tool boot cost
-  // (see the comment on analyzeCmd above).
-  const cmd = 'dart';
-  const args = ['analyze', ...toRun];
+  // Read live diagnostics filtered to the requested files — zero cost, the
+  // Dart Analysis Server already produced these for the Problems panel.
+  const data = readLiveViolationsForFiles(workspaceRoot, toRun);
 
-  // Async runner — replaces the old synchronous `runInWorkspace`/`spawnSync`
-  // call that blocked the extension host for the entire analyze duration.
-  // See bug_analysis_runs_dart_analyze_not_lsp.md for the original report.
-  const doRun = async (token?: vscode.CancellationToken): Promise<{ ok: boolean; cancelled: boolean }> => {
-    logSection('Analysis (files)');
-    // shell: false — dart.exe is a native executable; no cmd.exe needed.
-    const result = await runInWorkspaceAsync(workspaceRoot, cmd, args, { token, shell: false });
-    if (result.cancelled) {
-      logReport('- Analysis (files) cancelled');
-      flushReport(workspaceRoot);
-      return { ok: false, cancelled: true };
-    }
-    if (result.ok) {
-      logReport('- Analysis completed');
-    } else {
-      logReport(`- Analysis reported issues (${cmd} analyze ${toRun.length} files)`);
-    }
-    logSuppressionSummary(workspaceRoot);
-    // Same reasoning as the full-workspace runAnalysis flow — stamp the
-    // extension report with the versions that produced the run, so the
-    // file is self-identifying.
-    const installed = resolveSaropaLintsVersion(workspaceRoot);
-    flushReport(workspaceRoot, {
-      extensionVersion: resolveExtensionVersion(),
-      saropaLintsVersion: installed?.version,
-      saropaLintsSource: installed?.source,
-    });
-    return { ok: result.ok, cancelled: false };
-  };
+  // Write to violations.json so file-watching consumers stay in sync.
+  await writeViolationsData(workspaceRoot, data);
 
-  if (options?.showProgress) {
-    let runResult: { ok: boolean; cancelled: boolean } = { ok: false, cancelled: false };
-    await vscode.window.withProgress(
-      {
-        location: vscode.ProgressLocation.Notification,
-        title: 'Running analysis (selected files)',
-        // Cancellable so a long per-file analyze can be killed — matches the
-        // full-workspace runAnalysis pattern.
-        cancellable: true,
-      },
-      async (_progress, token) => { runResult = await doRun(token); },
-    );
-    return runResult;
+  const violationCount = data.violations.length;
+  const ok = violationCount === 0;
+
+  logSection('Analysis (files)');
+  if (ok) {
+    logReport('- Analysis completed (live diagnostics)');
+  } else {
+    logReport(`- Analysis reported ${violationCount} issues (live diagnostics, ${toRun.length} files)`);
   }
-  // Pass the caller's token so a parent progress (e.g. runAnalysis's
-  // supersede CTS) can cancel the per-file analyze child.
-  return doRun(options?.token);
+  logSuppressionSummary(workspaceRoot);
+  // Stamp the extension report with versions so the file is self-identifying.
+  const installed = resolveSaropaLintsVersion(workspaceRoot);
+  flushReport(workspaceRoot, {
+    extensionVersion: resolveExtensionVersion(),
+    saropaLintsVersion: installed?.version,
+    saropaLintsSource: installed?.source,
+  });
+  return { ok, cancelled: false };
 }
 
 export async function runInitializeConfig(context: vscode.ExtensionContext, title?: string): Promise<boolean> {

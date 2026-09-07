@@ -66,7 +66,25 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.10] — Unreleased
+## [16.0.1] — Unreleased
+
+Adds a "What's New" panel that surfaces on activation, flagging the v16 diagnostic engine change (LSP server replacing the Analyzer Plugin), the new machine health monitoring, and the sidebar redesign — with a one-click revert to the previous engine. [log](https://github.com/saropa/saropa_lints/blob/v16.0.1/CHANGELOG.md)
+
+### Added (Extension)
+
+- New "What's New" panel opens on activation, summarizing the v16 diagnostic engine change (Analyzer Plugin → LSP server, on by default), the new machine health monitoring, and the sidebar redesign — with one-click actions including reverting to the Analyzer Plugin, plus a live rule-count stat strip and a discovery grid linking straight into the Findings, Package, and Rules & Tiers dashboards. The panel keeps reappearing on every activation until you scroll through it and uncheck "Show this next time"; reopen it anytime from the Command Palette or Help Hub ("Saropa Lints: What's New"). No action required unless your diagnostics look different after this upgrade, in which case the panel's revert button restores the previous engine.
+
+### Added (Lint Rules)
+
+- New `always_specify_parameter_names` rule (Professional tier) flags call sites passing 2+ consecutive positional arguments of the same or confusable type (e.g. two Strings, int+double), where named arguments could prevent silent swap bugs. Allowlists idiomatic Dart/Flutter constructors like `Offset(dx, dy)`.
+
+### Fixed (Lint Rules)
+
+- Fixed `avoid_unbounded_dependency` false positive in Melos/pub-workspace monorepos where a dependency with `any` constraint is paired with a `path:` entry in `dependency_overrides:`. The `any` is inert in that case because pub resolves via the local path, not the loose constraint. Only `path:` overrides suppress the lint; `git:` and `hosted:` overrides do not.
+
+### Improved (Extension)
+
+- "Run analysis" now reads live VS Code diagnostics instead of spawning a cold `dart analyze` subprocess, completing in milliseconds instead of tens of seconds on large projects. The three analysis paths (full workspace, per-file, and post-config-change) all use the live diagnostic stream. The data written to `violations.json` is structurally identical to what the Problems panel shows, eliminating stale-data divergence between runs.
 
 ### Internal
 
@@ -86,6 +104,7 @@ Activation is now resilient — commands register and the sidebar warns on failu
 - When activation setup fails, the sidebar now shows a warning banner ("Activation Error — Check Extension Host log for details") instead of empty panels. No action required.
 - Fixed "Prune ignores" crashing the Flutter daemon on Windows by spawning `dart` directly instead of via a `cmd.exe` wrapper, eliminating process-tree complexity that competed for SDK resources. All `dart` CLI invocations now use direct spawn; `flutter` (a `.bat` wrapper) retains the shell path, and an ENOENT fallback retries with a shell for legacy SDK installs. No action required.
 - Fixed per-file analysis (`runAnalysisForFiles`) blocking the extension host with a synchronous `spawnSync` call for the entire `dart analyze` duration. Converted to the async `runInWorkspaceAsync` variant that the full-workspace analysis already uses, keeping the event loop responsive and adding a Cancel button to the progress notification. No action required.
+- "Run Analysis" now reads live VS Code diagnostics instantly instead of spawning a `dart analyze` subprocess. Completes in milliseconds instead of tens of seconds. The zero-violations case now shows a confirmation message instead of silent completion. Config-change rescans use an event-driven freshness gate instead of a fixed delay. No action required.
 - Sidebar dashboard rows now show live counts instead of static labels — Findings Dashboard shows violation count and health score, Package Dashboard shows how many packages have features to adopt, and the activity bar badge now reflects only lint violations. No action required.
 
 ### Improved (Extension)

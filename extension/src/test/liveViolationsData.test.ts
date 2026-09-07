@@ -16,6 +16,7 @@ import * as assert from 'node:assert';
 import * as vscode from 'vscode';
 import {
   readLiveViolations,
+  readLiveViolationsForFiles,
   readVisibleLiveViolations,
   hasLiveViolations,
 } from '../liveViolationsData';
@@ -77,5 +78,44 @@ describe('liveViolationsData', () => {
     assert.strictEqual(hasLiveViolations(ROOT, fakeGet(entries)), true);
     // Empty diagnostic stream -> clean project -> false (no stale file to read).
     assert.strictEqual(hasLiveViolations(ROOT, fakeGet([])), false);
+  });
+
+  it('readLiveViolationsForFiles filters diagnostics to the requested absolute paths', () => {
+    // Two files in the diagnostic stream; request only one.
+    const twoFileEntries = [
+      [uri('/proj/lib/a.dart'), [diag('rule_a')]],
+      [uri('/proj/lib/b.dart'), [diag('rule_b')]],
+    ] as const;
+    // Only request b.dart — a.dart's diagnostic must be excluded.
+    const data = readLiveViolationsForFiles(
+      ROOT,
+      ['/proj/lib/b.dart'],
+      fakeGet(twoFileEntries),
+    );
+    assert.strictEqual(data.violations.length, 1);
+    assert.strictEqual(data.violations[0].rule, 'rule_b');
+  });
+
+  it('readLiveViolationsForFiles is case-insensitive on Windows-style paths', () => {
+    // Simulate Windows casing mismatch: URI has mixed case, caller has uppercase.
+    const mixedCaseEntries = [
+      [uri('C:/Users/Dev/proj/lib/Main.dart'), [diag('mixed_case')]],
+    ] as const;
+    const data = readLiveViolationsForFiles(
+      'C:/Users/Dev/proj',
+      ['C:/USERS/DEV/PROJ/LIB/MAIN.DART'],
+      fakeGet(mixedCaseEntries),
+    );
+    // Case-insensitive match should find the diagnostic.
+    assert.strictEqual(data.violations.length, 1);
+  });
+
+  it('readLiveViolationsForFiles returns empty when no files match', () => {
+    const data = readLiveViolationsForFiles(
+      ROOT,
+      ['/proj/lib/nonexistent.dart'],
+      fakeGet(entries),
+    );
+    assert.strictEqual(data.violations.length, 0);
   });
 });

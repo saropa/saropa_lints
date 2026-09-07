@@ -24,7 +24,7 @@ The VS Code extension's activity bar badge showed "79" with no explanation anywh
 
 ### Bug reports filed
 
-- `bugs/bug_analysis_runs_dart_analyze_not_lsp.md` — Run Analysis spawns `dart analyze` instead of using the existing LSP client or live diagnostics model.
+- `plans/history/2026.09/2026.09.07/bug_analysis_runs_dart_analyze_not_lsp.md` — Run Analysis spawns `dart analyze` instead of using the existing LSP client or live diagnostics model. **Fixed.**
 - `plans/history/2026.09/2026.09.07/bug_commands_not_found_on_activation.md` — commands fail when activation setup throws before the registration block. **Fixed.**
 - `bugs/bug_prune_ignores_crashes_flutter_daemon.md` — `dart run` competes for `.dart_tool/` locks with the Flutter daemon.
 

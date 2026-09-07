@@ -24,6 +24,7 @@
  * `vscode` config API nor the filesystem is touched.
  */
 
+import * as path from 'path';
 import * as vscode from 'vscode';
 import {
   applyRuleCatalog,
@@ -83,6 +84,39 @@ export function readVisibleLiveViolations(
   disabled: Set<string> = readDisabledRules(root),
 ): ViolationsData {
   return filterDisabledFromData(readLiveViolations(root, getDiagnostics, tier), disabled);
+}
+
+/**
+ * Live findings scoped to a specific set of files. Filters the live diagnostic
+ * stream to only URIs matching the given absolute paths, then enriches with the
+ * rule catalog — same shape as `readLiveViolations` but restricted to the
+ * caller's file set. Used by `runAnalysisForFiles` after the migration from
+ * `dart analyze` to live diagnostics.
+ */
+export function readLiveViolationsForFiles(
+  root: string,
+  absolutePaths: string[],
+  getDiagnostics?: GetDiagnosticsFn,
+  tier: string | undefined = resolveTier(),
+  catalog: Record<string, RuleMetadataData> = getRuleCatalog(),
+): ViolationsData {
+  // Normalize to forward-slashed lowercase for case-insensitive matching on
+  // Windows — the URI.fsPath casing can differ from the caller's paths.
+  const allowed = new Set(
+    absolutePaths.map((f) => path.normalize(f).replaceAll('\\', '/').toLowerCase()),
+  );
+  // Wrap the diagnostics source to only yield entries for the requested files.
+  const filterFn: GetDiagnosticsFn = () => {
+    const all = (getDiagnostics ?? (() => vscode.languages.getDiagnostics()))();
+    return all.filter(([uri]) => {
+      const norm = path.normalize(uri.fsPath).replaceAll('\\', '/').toLowerCase();
+      return allowed.has(norm);
+    });
+  };
+  return applyRuleCatalog(
+    buildViolationsDataFromDiagnostics(root, filterFn, tier),
+    catalog,
+  );
 }
 
 /**
