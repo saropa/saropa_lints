@@ -7,7 +7,7 @@ import { l10n } from '../i18n/runtime';
 import { buildFullWidthToggle } from './dashboardHero';
 import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
 import { buildKeyboardShortcutsButton } from './keyboard-shortcuts';
-import { SEVERITY_ORDER, escapeHtml, formatRelative, type ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
+import { DEFAULT_AUDIT_SCOPE, SEVERITY_ORDER, escapeHtml, formatRelative, type ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
 import { pluralize } from './webview-format';
 
 
@@ -448,10 +448,59 @@ export function renderKpiCard(c: KpiSpec): string {
  * Toolbar — sticky band with density tiers (§4.3, §8.10).
  * ========================================================================= */
 
+/**
+ * Findings-source scope selector — folds the former sidebar "Full Audit"
+ * command (a VS Code quick-pick: full project / changed-vs-main /
+ * changed-vs-branch, opening a SEPARATE report webview) directly into this
+ * toolbar. Selecting a non-live scope and clicking Run triggers
+ * `dart run saropa_lints audit` and replaces the findings table's source with
+ * its output, so there is exactly one place to see findings from, not two
+ * disconnected panels.
+ *
+ * The branch text field is always present in the DOM (client-side JS shows
+ * it only for the "Changed vs branch…" option) rather than injected on
+ * selection change, so no extra host round-trip is needed to reveal it.
+ */
+export function buildAuditScopeControl(input: ViolationsDashboardHtmlInput): string {
+  const scope = input.auditScope ?? DEFAULT_AUDIT_SCOPE;
+  const branchValue = scope.mode === 'sinceRef' ? escapeHtml(scope.ref ?? '') : '';
+  const isCustomBranch = scope.mode === 'sinceRef' && scope.ref !== 'main';
+  const opts: Array<[string, string]> = [
+    ['live', l10n('findingsDash.audit.scopeLive')],
+    ['full', l10n('findingsDash.audit.scopeFull')],
+    ['sinceRef:main', l10n('findingsDash.audit.scopeChangedMain')],
+    ['sinceRefCustom', l10n('findingsDash.audit.scopeChangedBranch')],
+  ];
+  const selectedValue = scope.mode === 'live'
+    ? 'live'
+    : scope.mode === 'full'
+      ? 'full'
+      : isCustomBranch ? 'sinceRefCustom' : 'sinceRef:main';
+  const options = opts
+    .map(([value, label]) => `<option value="${escapeHtml(value)}"${value === selectedValue ? ' selected' : ''}>${escapeHtml(label)}</option>`)
+    .join('');
+  const runDisabled = scope.mode === 'live' || scope.running;
+  return `<span class="field audit-scope-field" title="${escapeHtml(l10n('findingsDash.audit.scopeFieldTitle'))}">
+    <span class="glyph">🛡</span>
+    <label for="auditScope">${escapeHtml(l10n('findingsDash.audit.scopeLabel'))}</label>
+    <select id="auditScope" aria-label="${escapeHtml(l10n('findingsDash.audit.scopeLabel'))}">${options}</select>
+    <input type="text" id="auditScopeBranch" value="${branchValue}"
+      placeholder="${escapeHtml(l10n('findingsDash.audit.branchPlaceholder'))}"
+      aria-label="${escapeHtml(l10n('findingsDash.audit.branchAria'))}"
+      ${selectedValue === 'sinceRefCustom' ? '' : 'hidden'} />
+  </span>
+  <button type="button" class="btn" id="btn-run-audit" data-run-audit
+    title="${escapeHtml(l10n('findingsDash.audit.runButtonTitle'))}"
+    ${scope.mode === 'live' ? 'hidden' : ''} ${runDisabled ? 'disabled' : ''}>
+    <span class="glyph">🛡</span>${escapeHtml(l10n('findingsDash.audit.runButton'))}
+  </button>`;
+}
+
 export function buildToolbar(input: ViolationsDashboardHtmlInput): string {
   const tf = escapeHtml(input.textFilter);
   const exportCount = input.exportViolations.length;
   const gbLabel = l10n('findingsDash.toolbar.groupByLabel');
+  const isLive = (input.auditScope ?? DEFAULT_AUDIT_SCOPE).mode === 'live';
   return `<section class="toolbar-band" aria-label="${escapeHtml(l10n('findingsDash.toolbar.ariaFiltersActions'))}">
     <div class="toolbar-row">
       <span class="field" title="${escapeHtml(l10n('findingsDash.toolbar.groupByFieldTitle'))}">
@@ -477,7 +526,10 @@ export function buildToolbar(input: ViolationsDashboardHtmlInput): string {
             role="listbox" aria-label="${escapeHtml(l10n('findingsDash.toolbar.recentFiltersListAria'))}"></ul>
         </div>
       </span>
-      <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="${escapeHtml(l10n('findingsDash.toolbar.runAnalysisTitle'))}">
+      <!-- "Run analysis" only affects live diagnostics — hidden while a
+           non-live audit scope is selected so it can't be mistaken for a way
+           to refresh the audit result (that's the Run audit button below). -->
+      <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="${escapeHtml(l10n('findingsDash.toolbar.runAnalysisTitle'))}" ${isLive ? '' : 'hidden'}>
         <span class="glyph">▶</span>${escapeHtml(l10n('toolbar.runAnalysis'))}
       </button>
       ${buildMoreActionsMenu(exportCount)}
@@ -490,6 +542,7 @@ export function buildToolbar(input: ViolationsDashboardHtmlInput): string {
       <button type="button" id="btn-refresh" hidden aria-hidden="true" tabindex="-1"></button>
     </div>
     <div class="toolbar-row">
+      ${buildAuditScopeControl(input)}
       <!-- The Impact filter pill row was removed: since the LintImpact 5→3
            collapse on 2026-05-03 (plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md),
            every Impact bucket mirrors the same-named Severity bucket. Two
@@ -517,6 +570,46 @@ export function buildAnalysisProgress(): string {
       <div class="analysis-progress-bar"></div>
     </div>
   </div>`;
+}
+
+/**
+ * Audit-CLI progress strip — same visual pattern as `buildAnalysisProgress`
+ * (reuses its CSS classes) but for the toolbar's own scope-selector-triggered
+ * audit run, with a Cancel button (the audit CLI can take a while on a large
+ * project; the old quick-pick's notification progress had a cancel action
+ * too, so this preserves that capability rather than dropping it).
+ */
+export function buildAuditProgress(input: ViolationsDashboardHtmlInput): string {
+  const scope = input.auditScope ?? DEFAULT_AUDIT_SCOPE;
+  const running = scope.running;
+  const rel = formatRelative(input.reportTimestamp) ?? '';
+  let statusLine = '';
+  if (!running) {
+    if (scope.error) {
+      statusLine = scope.error;
+    } else if (scope.mode === 'full' && scope.hasResult) {
+      statusLine = l10n('findingsDash.audit.statusFull', { time: rel });
+    } else if (scope.mode === 'sinceRef' && scope.hasResult) {
+      statusLine = l10n('findingsDash.audit.statusChangedRef', { ref: scope.ref ?? 'main', time: rel });
+    } else if (scope.mode !== 'live') {
+      statusLine = l10n('findingsDash.audit.notRunYet');
+    }
+  }
+  // The progress strip's own hidden state is `running` (shown only while the
+  // CLI is in flight); the whole block is additionally absent for the live
+  // scope, where there is no audit to report progress on.
+  if (scope.mode === 'live') return '';
+  return `<div id="audit-progress" class="analysis-progress" role="status" aria-live="polite" ${running ? '' : 'hidden'}>
+    <div class="analysis-progress-head">
+      <strong id="audit-progress-label">${escapeHtml(l10n('findingsDash.audit.runningLabel'))}</strong>
+      <span id="audit-progress-meta">${escapeHtml(l10n('findingsDash.audit.runningMeta'))}</span>
+      <button type="button" id="btn-cancel-audit" class="btn tier-3" data-cancel-audit>${escapeHtml(l10n('findingsDash.audit.cancelButton'))}</button>
+    </div>
+    <div class="analysis-progress-track" aria-hidden="true">
+      <div class="analysis-progress-bar" id="audit-progress-bar"></div>
+    </div>
+  </div>
+  <p id="audit-status-line" class="audit-status-line" ${running ? 'hidden' : ''}>${escapeHtml(statusLine)}</p>`;
 }
 
 

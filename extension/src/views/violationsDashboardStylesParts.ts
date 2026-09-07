@@ -549,6 +549,14 @@ export function vdsFindingsAndTopRulesTables(): string {
       50% { transform: translateX(40%); }
       100% { transform: translateX(260%); }
     }
+    /* Findings-source audit status line — shown under the (hidden while
+       running) audit-progress strip once a non-live audit has completed,
+       failed, or has not been run yet. */
+    .audit-status-line {
+      margin: -6px 0 14px;
+      font-size: 0.9em;
+      color: var(--muted);
+    }
 `;
 }
 

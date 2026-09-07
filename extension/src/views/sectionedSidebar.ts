@@ -155,19 +155,46 @@ class LeafItem extends vscode.TreeItem {
 // `refreshAllSections` behavior either way. The `toggleSeverity*` commands
 // stay registered for the command palette; only the sidebar row is gone.
 
-// ── Filtered violation cache (shared across status view) ───────────────────
+// ── Shared sidebar data snapshot ────────────────────────────────────────────
+//
+// Computed once per refresh cycle, consumed by BOTH the Dashboards and Status
+// section builders. Eliminates the duplicate live-diagnostics read +
+// computeLiveHealthScore parse that buildFindingsDescription and appendHealthRow
+// previously performed independently, and guarantees all rows show identical
+// numbers from a single computation.
 
-let _cachedFiltered: { data: ViolationsData; root: string } | null | undefined;
+/** All sidebar-relevant data, computed once per invalidateSharedCache(). */
+interface SidebarDataSnapshot {
+    /** Filtered violations data (suppressions applied). Null if no project root. */
+    filtered: { data: ViolationsData; root: string } | null;
+    /** Health score from live diagnostics + cached violations.json. Null if
+     *  analysis has never run (no violations.json) or no project root. */
+    healthScore: number | null;
+    /** Total filtered violation count (post-suppression). */
+    totalViolations: number;
+    /** Critical (error-severity) violation count (post-suppression). */
+    criticalViolations: number;
+}
 
-function loadFilteredViolations(
-    workspaceState: vscode.Memento,
-): { data: ViolationsData; root: string } | null {
-    if (_cachedFiltered !== undefined) return _cachedFiltered;
+let _cachedSnapshot: SidebarDataSnapshot | undefined;
+
+/**
+ * Build or return the cached sidebar data snapshot. Called by both the
+ * Dashboards and Status section builders on the same refresh cycle — the
+ * first call computes, the rest hit the cache.
+ */
+function getSnapshot(workspaceState: vscode.Memento): SidebarDataSnapshot {
+    if (_cachedSnapshot !== undefined) return _cachedSnapshot;
 
     const root = getProjectRoot();
     if (!root) {
-        _cachedFiltered = null;
-        return null;
+        _cachedSnapshot = {
+            filtered: null,
+            healthScore: null,
+            totalViolations: 0,
+            criticalViolations: 0,
+        };
+        return _cachedSnapshot;
     }
 
     // Live diagnostics (vscode.languages.getDiagnostics()), not the cached
@@ -199,8 +226,32 @@ function loadFilteredViolations(
         summary: rebuildSummary(afterDisabled, filtered),
     };
 
-    _cachedFiltered = { data, root };
-    return _cachedFiltered;
+    const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
+    // Was data.summary.byImpact.critical (5-bucket taxonomy retired 2026-05-03).
+    const critical = data.summary?.byImpact?.error ?? 0;
+
+    // Health score — computeLiveHealthScore reads violations.json from disk
+    // (the one expensive call). Done once here, shared by Findings row and
+    // Health row so they always show the same number.
+    const health = computeLiveHealthScore(root, data);
+
+    _cachedSnapshot = {
+        filtered: { data, root },
+        healthScore: health?.score ?? null,
+        totalViolations: total,
+        criticalViolations: critical,
+    };
+    return _cachedSnapshot;
+}
+
+/**
+ * Legacy accessor for callers that only need the filtered violations data.
+ * Delegates to getSnapshot so the computation is shared.
+ */
+function loadFilteredViolations(
+    workspaceState: vscode.Memento,
+): { data: ViolationsData; root: string } | null {
+    return getSnapshot(workspaceState).filtered;
 }
 
 function rebuildSummary(
@@ -235,9 +286,9 @@ function rebuildSummary(
     };
 }
 
-/** Clear the filtered-violations cache — call from each provider's `refresh()`. */
+/** Clear the shared snapshot — call from each provider's `refresh()`. */
 function invalidateSharedCache(): void {
-    _cachedFiltered = undefined;
+    _cachedSnapshot = undefined;
 }
 
 // ── Per-view item builders ────────────────────────────────────────────────
@@ -427,10 +478,47 @@ function buildProjectMapDescription(): string {
 }
 
 /**
- * The seven DASHBOARDS rows (PLAN_ext_ui_sidebar_reset.md §3): Findings
+ * Findings Dashboard row description: live violation count + health score,
+ * so the sidebar itself tells users whether there's something to click on.
+ * Reads from the shared SidebarDataSnapshot so the count matches the
+ * Status/Health row exactly — both read one computation, not two.
+ */
+function buildFindingsDescription(snapshot: SidebarDataSnapshot): string {
+    if (!snapshot.filtered) return l10n('sidebar.dashboards.findingsNoProject');
+    // No health score means analysis has never run (violations.json missing).
+    if (snapshot.healthScore === null) return l10n('sidebar.dashboards.findingsNeverScanned');
+    if (snapshot.totalViolations === 0) {
+        return l10n('sidebar.dashboards.findingsClean', { score: String(snapshot.healthScore) });
+    }
+    return l10n('sidebar.dashboards.findingsWithViolations', {
+        count: String(snapshot.totalViolations),
+        score: String(snapshot.healthScore),
+    });
+}
+
+/**
+ * Package Dashboard row description: live adoption needle count, so users
+ * see at a glance how many dependencies have features they haven't tried.
+ * Falls back to a "run scan" prompt before the first vibrancy scan.
+ */
+function buildPackageDescription(): string {
+    const needles = countAdoptionNeedles();
+    const results = getLatestResults();
+    // No scan results at all — vibrancy hasn't run yet.
+    if (results.length === 0) return l10n('sidebar.dashboards.packagesNeverScanned');
+    if (needles === 0) return l10n('sidebar.dashboards.packagesAllAdopted');
+    return l10n('sidebar.dashboards.packagesNeedlesCount', { count: String(needles) });
+}
+
+/**
+ * The six DASHBOARDS rows (PLAN_ext_ui_sidebar_reset.md §3): Findings
  * first (it's the row most users click first — health score + issue count),
- * then Lints Config, Packages, Code Health, Project Map, Full Audit, and
- * "All commands…" last as the escape hatch. Analysis Optimizer, Upgrade
+ * then Lints Config, Packages, Code Health, Project Map, and "All commands…"
+ * last as the escape hatch. Full Audit is no longer a separate row — its
+ * workspace-wide scope picker (full project / changed vs main / changed vs
+ * branch) is now the Findings row's own toolbar scope selector, so running
+ * it and viewing its results happen in the same dashboard rather than a
+ * second panel opened from a VS Code quick-pick. Analysis Optimizer, Upgrade
  * Opportunities, and the Feature Inventory export are deliberately NOT
  * separate rows here — they render as tabs inside Rules & Tiers (Analysis
  * Optimizer, embedded per rulePacksWebviewProvider.ts's getEmbeddedBodyHtml)
@@ -445,19 +533,15 @@ function buildProjectMapDescription(): string {
  * opens a page/picker like every other row in this section, it never runs
  * anything itself, so ACTIONS (whose section semantics are "runs something
  * now") was the wrong home for it.
+ *
+ * Every description answers "what will I find when I click this?" with a
+ * live count where one exists — not a format label or static blurb.
  */
-function buildEditorDashboardItems(): LeafItem[] {
-    // Append a needle count to the Package Dashboard row when the last scan
-    // found unadopted features, so under-used dependencies are visible at a
-    // glance. Falls back to the plain description before any scan has run.
-    const needles = countAdoptionNeedles();
-    const packageDesc = needles > 0
-        ? `Dependency vibrancy report · ${needles} to adopt`
-        : 'Dependency vibrancy report';
+function buildEditorDashboardItems(snapshot: SidebarDataSnapshot): LeafItem[] {
     return [
         new LeafItem(
             'Findings Dashboard',
-            'Editor tab · filters · JSON',
+            buildFindingsDescription(snapshot),
             'saropaLints.openViolationsWideReport',
             'warning',
             new vscode.ThemeColor('editorWarning.foreground'),
@@ -471,7 +555,7 @@ function buildEditorDashboardItems(): LeafItem[] {
         ),
         new LeafItem(
             'Package Dashboard',
-            packageDesc,
+            buildPackageDescription(),
             'saropaLints.packageVibrancy.showReport',
             'package',
             new vscode.ThemeColor('charts.green'),
@@ -499,14 +583,10 @@ function buildEditorDashboardItems(): LeafItem[] {
             'flame',
             new vscode.ThemeColor('charts.orange'),
         ),
-        // Full project audit with scope picker and filterable report webview.
-        new LeafItem(
-            l10n('fullAudit.sidebar.label'),
-            l10n('fullAudit.sidebar.description'),
-            'saropaLints.fullAudit',
-            'shield',
-            new vscode.ThemeColor('charts.red'),
-        ),
+        // Full-project audit is now a scope option inside the Findings
+        // Dashboard's own toolbar (Live / Full project / Changed vs main /
+        // Changed vs branch) rather than a separate sidebar entry that opened
+        // a VS Code quick-pick menu and a second report panel.
         new LeafItem(
             l10n('sidebar.dashboards.commandCatalogLabel'),
             l10n('sidebar.dashboards.commandCatalogDescription'),
@@ -604,16 +684,14 @@ function healthScoreDescription(delta: string, total: number, critical: number):
 function appendHealthRow(
     items: LeafItem[],
     history: ReturnType<typeof loadHistory>,
-    data: ViolationsData,
     total: number,
     critical: number,
-    root: string,
+    healthScore: number | null,
 ): void {
-    // Live severity counts, cached-report file-count denominator — see
-    // computeLiveHealthScore's doc comment for why the score can't be purely
-    // live-sourced.
-    const health = computeLiveHealthScore(root, data);
-    if (!health) {
+    // Health score comes from the shared SidebarDataSnapshot — computed once
+    // per refresh, shared with the Findings Dashboard row so both always
+    // show the same number.
+    if (healthScore === null) {
         // computeLiveHealthScore returns null when reports/.saropa_lints/
         // violations.json has never been written (no `filesAnalyzed`) — i.e.
         // analysis has never run for this project (empty-state audit, case
@@ -637,9 +715,9 @@ function appendHealthRow(
         return;
     }
     const prevScore = findPreviousScore(history);
-    const delta = prevScore !== undefined ? formatScoreDelta(health.score, prevScore) : '';
+    const delta = prevScore !== undefined ? formatScoreDelta(healthScore, prevScore) : '';
     const item = new LeafItem(
-        `Health: ${health.score}`,
+        `Health: ${healthScore}`,
         healthScoreDescription(delta, total, critical),
         'saropaLints.focusIssues',
         'pulse',
@@ -830,17 +908,16 @@ function appendMachineHealthRow(items: LeafItem[]): void {
  * still needs the Engines row visible to explain why it's clean.
  */
 function buildStatusItems(workspaceState: vscode.Memento): SectionNode[] {
-    const loaded = loadFilteredViolations(workspaceState);
-    if (!loaded) return [];
-    const { data, root } = loaded;
+    // Read from the shared snapshot so Dashboards and Status sections always
+    // agree on violation count, health score, and critical count.
+    const snapshot = getSnapshot(workspaceState);
+    if (!snapshot.filtered) return [];
+    const { data } = snapshot.filtered;
 
     const items: LeafItem[] = [];
     const history = loadHistory(workspaceState);
-    const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
-    // Was data.summary.byImpact.critical (5-bucket taxonomy retired 2026-05-03).
-    const critical = data.summary?.byImpact?.error ?? 0;
 
-    appendHealthRow(items, history, data, total, critical, root);
+    appendHealthRow(items, history, snapshot.totalViolations, snapshot.criticalViolations, snapshot.healthScore);
     appendEnginesRow(items);
     appendMachineHealthRow(items);
     appendHotspotsRow(items, data, workspaceState);
@@ -970,10 +1047,17 @@ export function createSidebarSectionProviders(
 ): FlatSectionProvider[] {
     return [
         new FlatSectionProvider(SECTION_VIEW_IDS.banner, () => buildBannerItems()),
+        // No badge builder — adoption needles are informational, not problems.
+        // The count is already shown in the Package Dashboard row description.
+        // Putting it on the view badge inflated the activity bar number and
+        // misled users into thinking 79 packages had lint errors.
+        //
+        // Both Dashboards and Status read from the shared SidebarDataSnapshot
+        // (getSnapshot) so violations.json is parsed once, not twice, and
+        // the Findings row's count always matches the Health row's count.
         new FlatSectionProvider(
             SECTION_VIEW_IDS.editorDashboards,
-            () => buildEditorDashboardItems(),
-            () => computeDashboardsBadge(),
+            () => buildEditorDashboardItems(getSnapshot(workspaceState)),
         ),
         new FlatSectionProvider(SECTION_VIEW_IDS.actions, () => buildActionsItems()),
         new FlatSectionProvider(
@@ -984,20 +1068,6 @@ export function createSidebarSectionProviders(
     ];
 }
 
-/**
- * Dashboards view badge: count of packages with unadopted changelog features
- * (same "needles" the Package Dashboard row's description already surfaces —
- * see `countAdoptionNeedles`). Undefined (no badge) when there is nothing to
- * adopt, rather than a distracting "0" pill.
- */
-function computeDashboardsBadge(): vscode.ViewBadge | undefined {
-    const needles = countAdoptionNeedles();
-    if (needles <= 0) return undefined;
-    return {
-        value: needles,
-        tooltip: l10n('dashboards.badge.needlesTooltip', { count: String(needles) }),
-    };
-}
 
 /**
  * Status view badge: critical (error-severity) violation count when any
@@ -1007,20 +1077,23 @@ function computeDashboardsBadge(): vscode.ViewBadge | undefined {
  * Health row's description is built from, so the two can never disagree.
  */
 function computeStatusBadge(workspaceState: vscode.Memento): vscode.ViewBadge | undefined {
-    const loaded = loadFilteredViolations(workspaceState);
-    if (!loaded) return undefined;
-    const { data } = loaded;
-    const total = data.summary?.totalViolations ?? data.violations?.length ?? 0;
-    if (total <= 0) return undefined;
-    // Was data.summary.byImpact.critical (5-bucket taxonomy retired 2026-05-03).
-    const critical = data.summary?.byImpact?.error ?? 0;
-    if (critical > 0) {
+    // Read from the shared snapshot — same single computation that feeds
+    // Findings Dashboard and Health row.
+    const snapshot = getSnapshot(workspaceState);
+    if (snapshot.totalViolations <= 0) return undefined;
+    if (snapshot.criticalViolations > 0) {
         return {
-            value: critical,
-            tooltip: l10n('status.badge.criticalTooltip', { critical: String(critical), total: String(total) }),
+            value: snapshot.criticalViolations,
+            tooltip: l10n('status.badge.criticalTooltip', {
+                critical: String(snapshot.criticalViolations),
+                total: String(snapshot.totalViolations),
+            }),
         };
     }
-    return { value: total, tooltip: l10n('status.badge.totalTooltip', { total: String(total) }) };
+    return {
+        value: snapshot.totalViolations,
+        tooltip: l10n('status.badge.totalTooltip', { total: String(snapshot.totalViolations) }),
+    };
 }
 
 /**

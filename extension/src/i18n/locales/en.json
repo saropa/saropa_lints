@@ -6,19 +6,6 @@
     "alreadyRunning": "An audit is already running — wait for it to finish.",
     "noProject": "No Dart project found. Open a folder that contains a pubspec.yaml.",
     "missingDep": "This project does not depend on saropa_lints. Add it to dev_dependencies first.",
-    "pickWorkspaceFolder": "Which workspace folder should the audit run against?",
-    "scope": {
-      "placeholder": "Which files should the audit cover?",
-      "full": "Full project",
-      "fullDescription": "Audit every Dart file — the most thorough option",
-      "changedVsMain": "Changed vs main",
-      "changedVsMainDescription": "Only files that differ from the main branch",
-      "changedPickBranch": "Changed vs branch…",
-      "changedPickBranchDescription": "Only files that differ from a branch you choose",
-      "compareBaseline": "Compare to baseline",
-      "compareBaselineDescription": "Show what changed since the last saved baseline snapshot",
-      "branchPrompt": "Branch to compare against"
-    },
     "progress": {
       "title": "Running Saropa Lints audit…",
       "message": "{pct}% · {scanned}/{total} files · {issues} issues · {file}"
@@ -57,6 +44,12 @@
       "loadMore": "Show more",
       "keyboardHint": "Arrow keys to navigate · Enter to open file · Esc to clear search",
       "copiedJson": "Audit JSON copied to clipboard.",
+      "exportJson": "Export JSON",
+      "exportJsonTitle": "Export audit results as JSON",
+      "exportJsonSaved": "Audit JSON exported.",
+      "exportJsonFailed": "Could not export the audit JSON: {message}",
+      "clearRuleFilter": "Clear",
+      "paginationNote": "Page limit applies to filtered results.",
       "baselineSaved": "Baseline saved. Future audits can compare against this snapshot.",
       "baselineSaveFailed": "Could not save the baseline: {message}",
       "deferredLoading": "Loading the full result set (this audit is large)…",
@@ -380,9 +373,6 @@
       "laneFull": "Full — every enabled rule in-editor",
       "migrateLegacyKeys": "Migrate {count} legacy config key(s)",
       "migrateLegacyKeysDesc": "Move legacy plugin-block keys to analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "{count} package(s) have unadopted features"
     }
   },
   "configSuggestions": {
@@ -951,6 +941,27 @@
       "copyJsonTitle": "Copy filtered violations as JSON ({count})",
       "saveReportTitle": "Save filtered violations as JSON to reports/YYYYMMDD/"
     },
+    "audit": {
+      "scopeFieldTitle": "Choose what the findings below are sourced from",
+      "scopeLabel": "Source",
+      "scopeLive": "Live diagnostics",
+      "scopeFull": "Full project audit",
+      "scopeChangedMain": "Changed vs main",
+      "scopeChangedBranch": "Changed vs branch…",
+      "branchPlaceholder": "branch name",
+      "branchAria": "Branch to compare against",
+      "runButton": "Run audit",
+      "runButtonTitle": "Run the full-project audit CLI and load its results here",
+      "cancelButton": "Cancel",
+      "runningLabel": "Auditing…",
+      "runningMeta": "Starting the audit CLI…",
+      "completedLabel": "Audit complete",
+      "failedLabel": "Audit failed",
+      "canceledLabel": "Audit canceled",
+      "statusFull": "Showing the full-project audit from {time}",
+      "statusChangedRef": "Showing files changed vs {ref}, audited {time}",
+      "notRunYet": "Choose a scope above, then Run audit"
+    },
     "chip": {
       "contains": "contains \"{q}\"",
       "severityOff": "severity ≠ {v}",
@@ -1177,12 +1188,6 @@
     "hintBuildFailed": "Could not build triage from this export. Run a fresh analysis.",
     "summaryVolume": "Rule triage (volume / must-fix / stylistic)",
     "hintSameAsTree": "Same grouping as the Triage activity-bar tree: filter Issues, or disable/enable rules in `analysis_options_custom.yaml`. Large groups may ask for confirmation."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Full Audit",
-      "description": "All rules · scope picker · filterable report"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Show keyboard shortcuts (?)",
@@ -2634,6 +2639,13 @@
     "dashboards": {
       "commandCatalogLabel": "All commands…",
       "commandCatalogDescription": "Search all commands",
+      "findingsNoProject": "Open a Dart project to scan",
+      "findingsNeverScanned": "Run analysis to scan",
+      "findingsClean": "No violations · score {score}",
+      "findingsWithViolations": "{count} violations · score {score}",
+      "packagesNeverScanned": "Run scan to check dependencies",
+      "packagesAllAdopted": "All features adopted",
+      "packagesNeedlesCount": "{count} packages to adopt",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate failing",
       "codeHealthNeverScanned": "Run Code Health to see your score",

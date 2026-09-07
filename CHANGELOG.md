@@ -77,6 +77,19 @@ Publish-pipeline hardening: the i18n audit no longer launches Ollama, and the lo
 - Fixed per-file analysis (`runAnalysisForFiles`) blocking the extension host with a synchronous `spawnSync` call for the entire `dart analyze` duration. Converted to the async `runInWorkspaceAsync` variant that the full-workspace analysis already uses, keeping the event loop responsive and adding a Cancel button to the progress notification. No action required.
 - Sidebar dashboard rows now show live counts instead of static labels — Findings Dashboard shows violation count and health score, Package Dashboard shows how many packages have features to adopt, and the activity bar badge now reflects only lint violations. No action required.
 
+### Improved (Extension)
+
+- Full Audit is now a "Source" scope selector inside the Findings Dashboard toolbar (Live diagnostics / Full project / Changed vs main / Changed vs branch) instead of a separate sidebar entry that opened a VS Code quick-pick menu and a second report panel. Progress and results render in the same dashboard you already have open.
+- Audit report: severity is now color-coded — error rows get a red left border, warning rows amber, and severity pills/chips use tinted text for quick scanning.
+- Audit report: all counts use thousands separators (e.g. 151,919 instead of 151919) for readability.
+- Audit report: filter chip counts use a consistent badge style instead of bare parenthesized numbers.
+- Audit report: removed the duplicate read-only KPI chip strip — the interactive filter chips already show the same counts.
+- Audit report: the 500-row page limit now applies after filtering, not before. The pagination note clarifies this.
+- Audit report: added "Export JSON" button that saves the full diagnostics to a user-chosen file.
+- Audit report: file paths are visually clickable (link color + underline on hover) and now jump to the diagnostic line instead of just opening the file.
+- Audit report: rule names are clickable — clicking one filters the table to show only findings for that rule, with a dismissible banner.
+- Audit report: when errors or warnings exist, INFO findings are hidden by default so actionable findings are immediately visible. Click the INFO chip to show them.
+
 ### Internal
 
 - Fixed i18n audit (`--mode audit`) probing Ollama engine availability via `low_quality_entries()`, which self-provisioned the daemon and pulled the model — an expensive, risky side effect during a read-only coverage check. Audit now uses `audit_only=True` to scan cache provenance tags without any subprocess calls. No action required.

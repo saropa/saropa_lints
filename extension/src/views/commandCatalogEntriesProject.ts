@@ -359,14 +359,6 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'file-text',
   },
   {
-    // Full-project audit, optionally scoped by git ref or baseline.
-    command: 'saropaLints.fullAudit',
-    title: 'Full Audit (All Rules)',
-    description: 'Run a full-project audit using configured rules, optionally scoped by git ref or baseline.',
-    category: 'Analysis',
-    icon: 'shield',
-  },
-  {
     // Folder-scoped audit from the explorer context menu.
     command: 'saropaLints.auditFolder',
     title: 'Audit Folder',

@@ -184,7 +184,35 @@ export interface ViolationsDashboardHtmlInput {
    * violations-dashboard-top.ts).
    */
   qualityGate?: { pass: boolean; violationCount: number };
+  /**
+   * Findings source selector state (folds the former sidebar "Full Audit"
+   * quick-pick workflow into the dashboard toolbar). `mode: 'live'` sources
+   * `exportViolations` from live diagnostics as before; the other modes
+   * source from a `dart run saropa_lints audit` CLI run the toolbar itself
+   * triggers — see `runAuditForDashboard` in violationsWideReportView.ts.
+   * Optional (defaults to live, matching every caller before this field
+   * existed) so existing test fixtures that build this input directly don't
+   * all need updating just to keep compiling.
+   */
+  auditScope?: {
+    mode: 'live' | 'full' | 'sinceRef';
+    /** Git ref for `mode: 'sinceRef'` (e.g. "main" or a user-typed branch). */
+    ref?: string;
+    /** True while the audit CLI child process is running. */
+    running: boolean;
+    /** Localized failure message from the last audit run, if it failed. */
+    error?: string;
+    /** True once at least one non-live audit has completed successfully. */
+    hasResult: boolean;
+  };
 }
+
+/** Default when `input.auditScope` is omitted (e.g. older test fixtures). */
+export const DEFAULT_AUDIT_SCOPE: NonNullable<ViolationsDashboardHtmlInput['auditScope']> = {
+  mode: 'live',
+  running: false,
+  hasResult: false,
+};
 
 export const SEVERITY_ORDER: readonly string[] = ['error', 'warning', 'info'];
 

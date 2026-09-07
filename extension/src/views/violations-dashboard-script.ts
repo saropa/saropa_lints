@@ -31,6 +31,7 @@ function findingsDashScriptStrings(): Record<string, string> {
         announceStarted: l10n('findingsDash.script.announceStarted'),
         announceComplete: l10n('findingsDash.script.announceComplete'),
         announceFailed: l10n('findingsDash.script.announceFailed'),
+        auditRunningMeta: l10n('findingsDash.audit.runningMeta'),
         removeRecentTitle: l10n('findingsDash.script.removeRecentTitle'),
         removeRecentAriaPrefix: l10n('findingsDash.script.removeRecentAria'),
         bulkSelectedTpl: l10n('findingsDash.script.bulkSelectedTpl'), // l10n:passthrough — {n} substituted client-side
@@ -285,6 +286,59 @@ export function buildScript(): string {
       pushState(true);
     });
   });
+
+  /* Findings-source scope selector (folds the former sidebar "Full Audit"
+     quick-pick into this toolbar — see buildAuditScopeControl). Changing the
+     dropdown only updates local visibility (branch field, Run button); the
+     host is not told until Run audit is clicked (or 'Live diagnostics' is
+     picked, which reverts immediately since there is nothing to run). */
+  var auditScopeSel = document.getElementById('auditScope');
+  var auditBranchInput = document.getElementById('auditScopeBranch');
+  var runAuditBtn = document.getElementById('btn-run-audit');
+  var isAuditing = false;
+
+  function auditScopeSelection() {
+    var v = auditScopeSel ? auditScopeSel.value : 'live';
+    if (v === 'live') return { mode: 'live' };
+    if (v === 'full') return { mode: 'full' };
+    if (v === 'sinceRefCustom') return { mode: 'sinceRef', ref: (auditBranchInput && auditBranchInput.value.trim()) || 'main' };
+    return { mode: 'sinceRef', ref: 'main' }; // 'sinceRef:main'
+  }
+  function syncAuditScopeUi() {
+    var v = auditScopeSel ? auditScopeSel.value : 'live';
+    if (auditBranchInput) auditBranchInput.hidden = v !== 'sinceRefCustom';
+    if (runAuditBtn) runAuditBtn.hidden = v === 'live';
+    var runBtn = document.getElementById('btn-run');
+    if (runBtn) runBtn.hidden = v !== 'live';
+  }
+  if (auditScopeSel) {
+    auditScopeSel.addEventListener('change', function () {
+      syncAuditScopeUi();
+      if (auditScopeSel.value === 'live') {
+        vscode.postMessage({ type: 'setAuditScope', mode: 'live' });
+      }
+    });
+  }
+  bindClick('btn-run-audit', function () {
+    if (isAuditing) return;
+    var sel = auditScopeSelection();
+    vscode.postMessage(Object.assign({ type: 'setAuditScope' }, sel));
+  });
+  bindClick('btn-cancel-audit', function () {
+    vscode.postMessage({ type: 'cancelAudit' });
+  });
+
+  function setAuditProgress(running, metaText) {
+    isAuditing = running;
+    var box = document.getElementById('audit-progress');
+    var meta = document.getElementById('audit-progress-meta');
+    var statusLine = document.getElementById('audit-status-line');
+    if (box) box.hidden = !running;
+    if (statusLine) statusLine.hidden = running;
+    if (meta) meta.textContent = metaText || FD.auditRunningMeta;
+    if (runAuditBtn) runAuditBtn.disabled = running;
+    if (auditScopeSel) auditScopeSel.disabled = running;
+  }
 
   /* Toolbar primary actions */
   bindClick('btn-run', triggerRunAnalysis);
@@ -926,6 +980,18 @@ export function buildScript(): string {
     // settled grade. Keeps the gauge honest even for runs the dashboard did
     // not initiate (e.g. analyze-on-save).
     if (msg.type === 'gaugePending') { setGaugePending(!!msg.pending); return; }
+    if (msg.type === 'auditProgress') {
+      if (msg.status === 'started' || msg.status === 'running') {
+        setAuditProgress(true, msg.message || FD.auditRunningMeta);
+      } else {
+        // 'completed' | 'failed' | 'canceled' — the host ships a full
+        // rebuild right behind this message, which repaints the status line
+        // and Run-audit button state from fresh server data; this just drops
+        // the running spinner immediately rather than waiting on that reload.
+        setAuditProgress(false);
+      }
+      return;
+    }
     if (msg.type !== 'analysisProgress') return;
     if (msg.status === 'started') {
       setAnalysisProgress(true, FD.metaStartedDetail);

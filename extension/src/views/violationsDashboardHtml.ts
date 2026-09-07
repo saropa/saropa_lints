@@ -21,7 +21,7 @@ import { buildChartsBlock, buildDriftBlock, buildSuppressionsBlock, buildTodoHac
 import { buildScript } from './violations-dashboard-script';
 import { escapeHtml, type ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
 import { buildFindingsBlock, buildTopRulesTable } from './violations-dashboard-tables';
-import { buildAnalysisProgress, buildHero, buildKpiCards, buildToolbar } from './violations-dashboard-top';
+import { buildAnalysisProgress, buildAuditProgress, buildHero, buildKpiCards, buildToolbar } from './violations-dashboard-top';
 import { getFindingsEmptyStateStyles, getViolationsDashboardStyles } from './violationsDashboardStyles';
 // Re-exported so violationsWideReportView and tests keep importing these types
 // from the dashboard composer rather than the internal shared module.
@@ -53,6 +53,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   ${buildKpiCards(input)}
   ${buildToolbar(input)}
   ${buildAnalysisProgress()}
+  ${buildAuditProgress(input)}
   <main id="findings-table" tabindex="-1">
     ${buildTopRulesTable(input)}
     ${buildFindingsBlock(input)}

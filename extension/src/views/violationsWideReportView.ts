@@ -72,6 +72,7 @@ import {
   TOP_RULES_LIMIT,
 } from './violationsWideReportStats';
 import { l10n } from '../i18n/runtime';
+import { spawnAuditCli, auditPayloadToViolationsData } from '../audit/auditCliRunner';
 
 const PANEL_VIEW_TYPE = 'saropaViolationsWideReport';
 const MAX_SOURCE_VIOLATIONS = 4000;
@@ -129,6 +130,28 @@ interface DriftAdvisorSnapshot {
 let dashboardState: DashboardState | undefined;
 let lastExportViolations: Violation[] = [];
 let driftAdvisorSnapshot: DriftAdvisorSnapshot | undefined;
+
+/**
+ * Findings-source scope state — folds the former sidebar "Full Audit" command
+ * (a VS Code quick-pick that opened a SEPARATE report webview) into this
+ * dashboard's own toolbar. `mode: 'live'` is the pre-existing behavior
+ * (source from `vscode.languages.getDiagnostics()`); the other two modes
+ * source from a `dart run saropa_lints audit` CLI run triggered by the
+ * toolbar's Run audit button — see `runAuditForDashboard`.
+ */
+type AuditScopeMode = 'live' | 'full' | 'sinceRef';
+interface AuditScopeState {
+  mode: AuditScopeMode;
+  ref?: string;
+  running: boolean;
+  error?: string;
+  hasResult: boolean;
+}
+let auditScopeState: AuditScopeState = { mode: 'live', running: false, hasResult: false };
+/** Result of the last completed non-live audit run; undefined until one succeeds. */
+let auditResult: ViolationsData | undefined;
+/** Lets the toolbar's Cancel button stop an in-flight audit CLI run. */
+let auditCts: vscode.CancellationTokenSource | undefined;
 
 const VIEW_SUP_SAMPLE = 14;
 
@@ -290,15 +313,21 @@ async function rebuildDashboardHtml(
   const cfg = vscode.workspace.getConfiguration('saropaLints');
 
   // Source findings from LIVE diagnostics — the same array the Problems panel
-  // shows — not the batch violations.json export. This keeps the dashboard
-  // structurally in sync with Problems (no stale "0 findings / grade A" while
-  // Problems shows dozens) and triggers zero analysis (the analyzer already
-  // produced these for the Problems panel; we only read the result). An empty
-  // result is a genuine clean state that renders the zeroed dashboard, not a
-  // "no report yet" wall — so there is no early-return empty-state branch here
-  // any more. Phase #1a: findings only, no per-rule enrichment (see
-  // liveDiagnosticsModel).
-  const raw = buildViolationsDataFromDiagnostics(root, undefined, cfg.get<string>('tier'));
+  // shows — not the batch violations.json export, UNLESS the toolbar's audit
+  // scope selector has picked a non-live scope (full project / changed vs a
+  // ref), in which case the last `dart run saropa_lints audit` run's output
+  // (converted to the same ViolationsData shape by auditCliRunner) is the
+  // source instead. This keeps the dashboard structurally in sync with
+  // Problems in the default 'live' mode (no stale "0 findings / grade A"
+  // while Problems shows dozens) while triggering zero analysis (the
+  // analyzer already produced these for the Problems panel; we only read the
+  // result). An empty result is a genuine clean state that renders the
+  // zeroed dashboard, not a "no report yet" wall — so there is no
+  // early-return empty-state branch here any more. Phase #1a: findings only,
+  // no per-rule enrichment (see liveDiagnosticsModel).
+  const raw: ViolationsData = auditScopeState.mode === 'live'
+    ? buildViolationsDataFromDiagnostics(root, undefined, cfg.get<string>('tier'))
+    : (auditResult ?? { violations: [] });
 
   const state = getDashboardState(cfg);
   const disabled = readDisabledRules(root);
@@ -399,6 +428,7 @@ async function rebuildDashboardHtml(
       if (gates?.pass === undefined) return undefined;
       return { pass: gates.pass, violationCount: gates.violations?.length ?? 0 };
     })(),
+    auditScope: { ...auditScopeState },
   };
 
   // No-op guard: when nothing the user sees has changed, skip the html
@@ -551,6 +581,14 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
     // blank) and replays the entrance animation on that first paint.
     lastFindingsRenderSignature = undefined;
     hasPaintedOnce = false;
+    // Reopening the dashboard should start from live diagnostics again, not
+    // resume a stale (possibly minutes-old) audit result from before it was
+    // closed. Also cancels any audit still in flight — nothing left to post
+    // the completion message to.
+    auditCts?.cancel();
+    auditCts = undefined;
+    auditScopeState = { mode: 'live', running: false, hasResult: false };
+    auditResult = undefined;
   });
 
   // Live refresh. The Problems panel updates as analysis runs; this listener
@@ -596,6 +634,33 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       todosAndHacksSnapshot = undefined;
       driftAdvisorSnapshot = undefined;
       await rebuildDashboardHtml(context, currentPanel!);
+      return;
+    }
+    if (data.type === 'setAuditScope') {
+      const req = data as { mode?: unknown; ref?: unknown };
+      const mode: AuditScopeMode = req.mode === 'full' || req.mode === 'sinceRef' ? req.mode : 'live';
+      if (mode === 'live') {
+        // Reverting to live needs no CLI run — just drop the cached audit
+        // result and re-source from diagnostics on the next rebuild.
+        auditScopeState = { mode: 'live', running: false, hasResult: false };
+        auditResult = undefined;
+        if (currentPanel) {
+          await rebuildDashboardHtml(context, currentPanel);
+        }
+        return;
+      }
+      const ref = mode === 'sinceRef'
+        ? (typeof req.ref === 'string' && req.ref.trim().length > 0 ? req.ref.trim() : 'main')
+        : undefined;
+      auditScopeState = { mode, ref, running: false, hasResult: auditScopeState.hasResult };
+      const root = getProjectRoot();
+      if (root) {
+        await runAuditForDashboard(context, root);
+      }
+      return;
+    }
+    if (data.type === 'cancelAudit') {
+      auditCts?.cancel();
       return;
     }
     if (data.type === 'runAnalysis') {
@@ -874,6 +939,69 @@ async function openFileAtLine(relativePath: string, line: number): Promise<void>
     editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
   } catch {
     void vscode.window.showErrorMessage(l10n('wideReport.couldNotOpenFile', { path: relativePath }));
+  }
+}
+
+/**
+ * Runs `dart run saropa_lints audit` for the toolbar's currently-selected
+ * non-live scope and swaps its output in as the dashboard's findings source.
+ *
+ * This is the whole of what used to be the sidebar "Full Audit" command's
+ * `doAudit`/`spawnAuditCli` flow — minus the VS Code notification progress
+ * and separate report webview, since progress and results now render
+ * directly in this panel's own toolbar and findings table.
+ */
+async function runAuditForDashboard(context: vscode.ExtensionContext, root: string): Promise<void> {
+  if (auditScopeState.running) return;
+  auditScopeState = { ...auditScopeState, running: true, error: undefined };
+  currentPanel?.webview.postMessage({ type: 'auditProgress', status: 'started' });
+  if (currentPanel) {
+    await rebuildDashboardHtml(context, currentPanel);
+  }
+
+  const sinceRef = auditScopeState.mode === 'sinceRef' ? (auditScopeState.ref ?? 'main') : null;
+  const cts = new vscode.CancellationTokenSource();
+  auditCts = cts;
+  let failMessage: string | undefined;
+  let wasCanceled = false;
+  const payload = await spawnAuditCli(
+    root,
+    sinceRef,
+    false,
+    cts.token,
+    (update) => {
+      currentPanel?.webview.postMessage({ type: 'auditProgress', status: 'running', message: update.message });
+    },
+    (message, canceled) => {
+      failMessage = message;
+      wasCanceled = canceled;
+    },
+  );
+  // Dispose the token source once the run has settled — VS Code does not
+  // dispose these for the caller the way it does for the ones it hands out
+  // itself via withProgress (the old quick-pick's path), so leaving this out
+  // would leak one CancellationTokenSource (and its event emitter) per audit
+  // run triggered from this toolbar.
+  cts.dispose();
+  auditCts = undefined;
+
+  if (payload) {
+    auditResult = auditPayloadToViolationsData(payload);
+    auditScopeState = { ...auditScopeState, running: false, error: undefined, hasResult: true };
+  } else {
+    // A cancellation still carries a message (l10n('audit.error.canceled'))
+    // from spawnAuditCli's onFailure callback — surface it the same as any
+    // other failure rather than discarding it, so the toolbar status line
+    // reads "Audit canceled" instead of falling through to "Not run yet",
+    // which would read as if the Cancel click never registered.
+    auditScopeState = { ...auditScopeState, running: false, error: failMessage };
+  }
+  currentPanel?.webview.postMessage({
+    type: 'auditProgress',
+    status: wasCanceled ? 'canceled' : payload ? 'completed' : 'failed',
+  });
+  if (currentPanel) {
+    await rebuildDashboardHtml(context, currentPanel);
   }
 }
 

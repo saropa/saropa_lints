@@ -12,7 +12,7 @@ import '../vibrancy/register-vscode-mock';
 import * as assert from 'node:assert';
 import * as sinon from 'sinon';
 
-import { killAuditProcessTree } from '../../audit/audit-command';
+import { killAuditProcessTree } from '../../audit/auditCliRunner';
 import * as devCliRoot from '../../views/devCliRoot';
 
 describe('killAuditProcessTree', () => {

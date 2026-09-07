@@ -195,11 +195,6 @@
         "icon": "$(graph)"
       },
       {
-        "command": "saropaLints.fullAudit",
-        "title": "Saropa Lints: Full Audit (All Rules)",
-        "icon": "$(shield)"
-      },
-      {
         "command": "saropaLints.auditFolder",
         "title": "%command.auditFolder.title%",
         "icon": "$(shield)"
@@ -984,11 +979,6 @@
         }
       ],
       "view/title": [
-        {
-          "command": "saropaLints.fullAudit",
-          "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject",
-          "group": "navigation"
-        },
         {
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.editorDashboards",
