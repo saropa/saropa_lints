@@ -51,7 +51,17 @@ existed).
 - `mt_fallback.py` `_accept()` was not changed. Cognates in `TRANSLATIONS` are
   already skipped by `_iter_pending_texts` (line 883: `text in dict_table`),
   so MT is never consulted for them.
-- The `--check-cognates` flag is opt-in (not wired into the publish pipeline by
-  default) because the import-time `ValueError` already catches the most
-  dangerous error (invalid locale codes), and the drift check runs
-  unconditionally.
+- `--check-cognates` is wired into the publish pipeline
+  (`_extension_publish.py:audit_extension_locales`) so cognate conflicts are
+  caught before release. Import-time `ValueError` catches locale typos even
+  earlier (at any script invocation).
+
+### Hardening (follow-up)
+
+- Added empty-locale-list and duplicate-locale-code guards to the merge loop in
+  `dictionaries.py` (both raise `ValueError` at import time).
+- Documented the post-merge timing of `_validate_cognates()` — the `setdefault`
+  semantics preserve pre-existing curated entries, so the conflict check correctly
+  detects locales where a real (different) translation already exists.
+- Wired `--check-cognates` into `audit_extension_locales()` in
+  `_extension_publish.py` so cognate validation runs as part of every publish.

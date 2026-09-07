@@ -2033,7 +2033,19 @@ for _locale_dict in TRANSLATIONS.values():
 # translation takes priority over the passthrough.
 _valid_locales = frozenset(TRANSLATIONS.keys())
 for _cognate_src, _cognate_locales in COGNATES.items():
+    if not _cognate_locales:
+        raise ValueError(
+            f"COGNATES[{_cognate_src!r}] has an empty locale list — "
+            f"remove the entry or add at least one locale code"
+        )
+    _seen_locales: set[str] = set()
     for _cognate_locale in _cognate_locales:
+        if _cognate_locale in _seen_locales:
+            raise ValueError(
+                f"COGNATES[{_cognate_src!r}] lists locale "
+                f"{_cognate_locale!r} more than once"
+            )
+        _seen_locales.add(_cognate_locale)
         if _cognate_locale not in _valid_locales:
             raise ValueError(
                 f"COGNATES[{_cognate_src!r}] references unknown locale "

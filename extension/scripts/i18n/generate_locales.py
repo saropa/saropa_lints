@@ -266,11 +266,18 @@ def _check_cognate_drift(english_strings: set[str]) -> list[str]:
 def _validate_cognates() -> list[str]:
     """Deep-validate COGNATES entries: conflict and redundancy checks.
 
-    Returns a list of warning lines (empty = clean). Checks:
+    Returns a list of warning/error lines (empty = clean). Checks:
     1. A locale already has a *different* curated translation for the string —
-       the cognate claim contradicts a hand-written translation.
+       the cognate claim contradicts a hand-written translation. This is an
+       error because the cognate is wrong for that locale.
     2. The string is also in DO_NOT_TRANSLATE — the cognate entry is redundant
        because DO_NOT_TRANSLATE already covers every locale.
+
+    Runs AFTER the COGNATES merge into TRANSLATIONS (import-time). The conflict
+    check still works because ``setdefault`` preserves pre-existing curated
+    entries: if ``de`` already had ``"Source": "Quelle"``, the merge was a no-op
+    and ``TRANSLATIONS["de"]["Source"]`` still returns ``"Quelle"`` (≠ en_key),
+    which this check catches.
     """
     issues: list[str] = []
     dnt_set = set(DO_NOT_TRANSLATE)
@@ -283,11 +290,9 @@ def _validate_cognates() -> list[str]:
             )
             continue
         for locale in locales:
-            # The merge used setdefault, so a pre-existing entry wins.
-            # Check the TRANSLATIONS dict BEFORE the COGNATES merge would
-            # have run — we can detect a conflict by checking whether the
-            # value differs from the passthrough.
             existing = TRANSLATIONS.get(locale, {}).get(en_key)
+            # Conflict: a curated translation that differs from the passthrough
+            # means the cognate claim is wrong for this locale.
             if existing is not None and existing != en_key:
                 issues.append(
                     f"  COGNATES[{en_key!r}] claims {locale} is a cognate, "
