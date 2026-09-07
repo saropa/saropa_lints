@@ -153,6 +153,31 @@ let auditResult: ViolationsData | undefined;
 /** Lets the toolbar's Cancel button stop an in-flight audit CLI run. */
 let auditCts: vscode.CancellationTokenSource | undefined;
 
+/**
+ * Persists just the SELECTION (mode + ref), never the CLI result — a stale
+ * audit result from a prior session is exactly what re-running the CLI on
+ * hydrate (see `openViolationsWideReport`) replaces with a fresh one, so
+ * there is nothing worth caching beyond "what the user last had picked".
+ */
+const AUDIT_SCOPE_STORAGE_KEY = 'saropa.findingsDashboard.auditScope';
+
+interface PersistedAuditScope {
+  mode: AuditScopeMode;
+  ref?: string;
+}
+
+function loadPersistedAuditScope(context: vscode.ExtensionContext): PersistedAuditScope | undefined {
+  const stored = context.workspaceState.get<PersistedAuditScope>(AUDIT_SCOPE_STORAGE_KEY);
+  if (!stored || (stored.mode !== 'full' && stored.mode !== 'sinceRef' && stored.mode !== 'live')) {
+    return undefined;
+  }
+  return stored;
+}
+
+function persistAuditScope(context: vscode.ExtensionContext, state: AuditScopeState): void {
+  void context.workspaceState.update(AUDIT_SCOPE_STORAGE_KEY, { mode: state.mode, ref: state.ref });
+}
+
 const VIEW_SUP_SAMPLE = 14;
 
 function buildAnalyzerSuppressionsSlice(data: ViolationsData): AnalyzerSuppressionsSlice {
@@ -296,8 +321,30 @@ export async function openViolationsWideReport(context: vscode.ExtensionContext)
     return;
   }
 
+  // Hydrate the audit scope selection from workspace state on a genuinely
+  // fresh panel only (currentPanel undefined) — `getOrCreatePanel` below
+  // resets auditScopeState to 'live' in its onDidDispose handler, so by the
+  // time this function is called again for an ALREADY-open panel,
+  // auditScopeState already reflects the user's in-session choice and must
+  // not be clobbered by whatever was persisted from a previous session.
+  const isFreshPanel = currentPanel === undefined;
+  if (isFreshPanel) {
+    const persisted = loadPersistedAuditScope(context);
+    if (persisted && persisted.mode !== 'live') {
+      auditScopeState = { mode: persisted.mode, ref: persisted.ref, running: false, hasResult: false };
+    }
+  }
+
   const panel = getOrCreatePanel(context);
-  await rebuildDashboardHtml(context, panel);
+  if (isFreshPanel && auditScopeState.mode !== 'live') {
+    // Re-run the CLI rather than trying to resurrect a result from a prior
+    // session — see the doc comment on AUDIT_SCOPE_STORAGE_KEY. This also
+    // paints the "running" state on first reveal instead of a misleading
+    // empty "0 findings" table for however long the run takes.
+    await runAuditForDashboard(context, root);
+  } else {
+    await rebuildDashboardHtml(context, panel);
+  }
   panel.reveal(vscode.ViewColumn.One);
 }
 
@@ -640,10 +687,18 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       const req = data as { mode?: unknown; ref?: unknown };
       const mode: AuditScopeMode = req.mode === 'full' || req.mode === 'sinceRef' ? req.mode : 'live';
       if (mode === 'live') {
+        // Switching back to live while a run is still in flight must cancel
+        // it — otherwise the orphaned CLI process keeps running with no UI
+        // left to cancel it, and its eventual completion silently overwrites
+        // whatever state the user has moved on to (same leak the panel's
+        // onDidDispose handler already guards against on close).
+        auditCts?.cancel();
+        auditCts = undefined;
         // Reverting to live needs no CLI run — just drop the cached audit
         // result and re-source from diagnostics on the next rebuild.
         auditScopeState = { mode: 'live', running: false, hasResult: false };
         auditResult = undefined;
+        persistAuditScope(context, auditScopeState);
         if (currentPanel) {
           await rebuildDashboardHtml(context, currentPanel);
         }
@@ -653,6 +708,7 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
         ? (typeof req.ref === 'string' && req.ref.trim().length > 0 ? req.ref.trim() : 'main')
         : undefined;
       auditScopeState = { mode, ref, running: false, hasResult: auditScopeState.hasResult };
+      persistAuditScope(context, auditScopeState);
       const root = getProjectRoot();
       if (root) {
         await runAuditForDashboard(context, root);

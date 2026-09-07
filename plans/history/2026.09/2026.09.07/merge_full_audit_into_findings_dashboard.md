@@ -52,6 +52,40 @@ workflow that belonged in one place.
   the one it hands out via `withProgress` itself; this path owns its own).
   `runAuditForDashboard` now calls `cts.dispose()` once the run settles.
 
+## Follow-up hardening (same day)
+
+After the initial merge, a second review pass (prompted by the finish
+checklist's reflection gate) applied three more fixes:
+
+- **Legacy impact normalization.** `spawnAuditCli` runs the SCANNED
+  PROJECT's own pinned `saropa_lints`, not necessarily the version bundled
+  with this extension — a project still pinned below 13.4.x can emit the
+  legacy 5-bucket `impact` vocabulary (critical/high/medium/low/opinionated).
+  `auditPayloadToViolationsData()` did not normalize this the way
+  `readViolations()` already does for the batch `violations.json` export
+  (see `normalizeLegacyImpact`'s doc comment, issue #208's "401 findings / 0
+  shown" regression) — an old project's audit run would have silently shown
+  zero rows under the dashboard's default `{error, warning, info}` filter.
+  Fixed by routing `impact` through the same `normalizeLegacyImpact()`.
+- **Persisted audit scope.** The toolbar's Source selection (mode + ref) now
+  persists to `context.workspaceState` under
+  `saropa.findingsDashboard.auditScope` and rehydrates on the next fresh
+  panel open — only the selection is persisted, never the CLI result; a
+  non-live hydrate re-runs the audit CLI immediately rather than trying to
+  resurrect a stale result. `openViolationsWideReport()` only hydrates when
+  `currentPanel` is `undefined` (a genuinely fresh panel), so an
+  already-open panel's in-session choice is never clobbered by a stale
+  workspace-state read.
+- **Cancel-on-live-switch.** A second `/code-review low` pass on this
+  follow-up diff caught a real bug it introduced surface: switching the
+  Source dropdown back to "Live diagnostics" while a non-live audit CLI run
+  was still in flight did not cancel it — the orphaned `dart` process kept
+  running with no UI left to cancel it, and its eventual completion would
+  have silently overwritten whatever the user had moved on to. Fixed by
+  calling `auditCts?.cancel()` in the `setAuditScope` handler's
+  `mode === 'live'` branch, mirroring what the panel's `onDidDispose` already
+  did on close.
+
 ## Known gap — not addressed
 
 Baseline-compare mode (`--baseline`, "Save as baseline") is not part of the

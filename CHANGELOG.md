@@ -79,7 +79,7 @@ Publish-pipeline hardening: the i18n audit no longer launches Ollama, and the lo
 
 ### Improved (Extension)
 
-- Full Audit is now a "Source" scope selector inside the Findings Dashboard toolbar (Live diagnostics / Full project / Changed vs main / Changed vs branch) instead of a separate sidebar entry that opened a VS Code quick-pick menu and a second report panel. Progress and results render in the same dashboard you already have open.
+- Full Audit is now a "Source" scope selector inside the Findings Dashboard toolbar (Live diagnostics / Full project / Changed vs main / Changed vs branch) instead of a separate sidebar entry that opened a VS Code quick-pick menu and a second report panel. Progress and results render in the same dashboard you already have open, the chosen scope is remembered across sessions, and a legacy `saropa_lints` version's audit output normalizes to the current severity vocabulary the same way the batch report already did.
 - Audit report: severity is now color-coded — error rows get a red left border, warning rows amber, and severity pills/chips use tinted text for quick scanning.
 - Audit report: all counts use thousands separators (e.g. 151,919 instead of 151919) for readability.
 - Audit report: filter chip counts use a consistent badge style instead of bare parenthesized numbers.
@@ -89,6 +89,8 @@ Publish-pipeline hardening: the i18n audit no longer launches Ollama, and the lo
 - Audit report: file paths are visually clickable (link color + underline on hover) and now jump to the diagnostic line instead of just opening the file.
 - Audit report: rule names are clickable — clicking one filters the table to show only findings for that rule, with a dismissible banner.
 - Audit report: when errors or warnings exist, INFO findings are hidden by default so actionable findings are immediately visible. Click the INFO chip to show them.
+- Audit report: a severity summary bar below the header shows the error/warning/info ratio as colored segments with tooltips. No action required.
+- Audit report: clicking a file path now jumps to the exact column, not just the line. No action required.
 
 ### Internal
 

@@ -12,7 +12,7 @@ import * as cp from 'node:child_process';
 import * as vscode from 'vscode';
 import { killProcessTree, resolveCliCwd } from '../views/devCliRoot';
 import { l10n } from '../i18n/runtime';
-import type { Violation, ViolationsData } from '../violationsReader';
+import { normalizeLegacyImpact, type Violation, type ViolationsData } from '../violationsReader';
 
 /** Cross-platform tree-kill for the spawned audit CLI process — see doc comment in the original audit-command.ts. */
 export function killAuditProcessTree(child: cp.ChildProcess): void {
@@ -198,6 +198,12 @@ export function spawnAuditCli(
  * computes its own aggregate straight from the `violations` array rather than
  * trusting a precomputed summary — see `buildViolationsDataFromDiagnostics`,
  * which follows the same minimal-payload convention for live diagnostics.
+ *
+ * `impact` IS legacy-normalized (unlike `buildViolationsDataFromDiagnostics`,
+ * which has no legacy path since it reads the in-process analyzer plugin
+ * bundled with THIS extension) — the audit CLI runs the scanned project's own
+ * pinned `saropa_lints`, which can be an older version still emitting the
+ * pre-collapse 5-bucket impact vocabulary. See the inline comment below.
  */
 export function auditPayloadToViolationsData(payload: Record<string, unknown>): ViolationsData {
   const diagnostics = Array.isArray(payload['diagnostics'])
@@ -205,16 +211,25 @@ export function auditPayloadToViolationsData(payload: Record<string, unknown>): 
     : [];
   const violations: Violation[] = diagnostics.map((d) => {
     const severity = (d.severity ?? 'info').toLowerCase();
+    // `spawnAuditCli` runs the SCANNED PROJECT's own pinned `saropa_lints`
+    // (via resolveCliCwd), not necessarily the version bundled with this
+    // extension — a project pinned to <13.4.x can still emit the legacy
+    // 5-bucket `impact` vocabulary (critical/high/medium/low/opinionated)
+    // even though the extension's own dashboard code has moved on to the
+    // 3-bucket error/warning/info model. `readViolations()` normalizes this
+    // exact case for the batch violations.json export (see
+    // normalizeLegacyImpact's doc comment, issue #208's "401 findings / 0
+    // shown" regression); apply the same normalization here so an old
+    // project's audit run doesn't silently show 0 rows under the default
+    // {error, warning, info} severity filter.
+    const impact = normalizeLegacyImpact(d.impact) ?? severity;
     return {
       file: d.filePath,
       line: d.line,
       rule: d.ruleName,
       message: d.problemMessage ?? '',
       severity,
-      // The audit CLI's impact/severity are already the post-collapse 3-bucket
-      // vocabulary (same as liveDiagnosticsModel), so no legacy normalization
-      // is needed here the way readViolations() does for old violations.json.
-      impact: (d.impact ?? severity).toLowerCase(),
+      impact,
       correction: d.correctionMessage ?? undefined,
     };
   });
