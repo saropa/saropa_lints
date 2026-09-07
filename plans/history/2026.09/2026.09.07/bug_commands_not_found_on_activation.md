@@ -65,5 +65,16 @@ This session completed the fix with four changes:
    that compares declared commands in `package.json` against actually
    registered commands and logs any mismatches.
 
+A follow-up hardening pass added three more changes:
+
+5. Guarded the vibrancy fallback's `registerFallbackPubspecListeners` call
+   with a null check on `pubspecValidator` — if setup failed before its
+   assignment, the catch block would otherwise throw unguarded.
+6. Registered a degraded-mode sidebar banner in the catch block: when
+   setup fails, the banner view shows "Activation Error — Check Extension
+   Host log for details" with a warning icon, instead of an empty panel.
+7. Added l10n keys (`sidebar.degraded.bannerLabel`, `sidebar.degraded.bannerDescription`)
+   for the degraded-mode banner text.
+
 TypeScript compiles clean (`npx tsc --noEmit`). Pre-existing errors in
 `audit-report-html.ts` are unrelated.

@@ -44,6 +44,7 @@ import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvid
 import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type IssueTreeNode } from './views/issuesTree';
 import {
   createSidebarSectionProviders,
+  FlatSectionProvider,
   SECTION_VIEW_IDS,
   updateSidebarSectionContext,
   type SectionNode,
@@ -1892,6 +1893,31 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // "cannot read property of undefined") rather than the opaque
     // "command not found" that a skipped registration causes.
     console.error('[Saropa Lints] Activation setup failed — commands will register with degraded functionality:', setupErr);
+
+    // Register minimal sidebar providers so the user sees a warning banner
+    // instead of empty panels. The banner view is the most visible; the
+    // others show nothing (no data providers) which VS Code renders as
+    // "No children found" — acceptable in a degraded state.
+    const warningItem = new vscode.TreeItem(
+      l10n('sidebar.degraded.bannerLabel'),
+      vscode.TreeItemCollapsibleState.None,
+    );
+    warningItem.description = l10n('sidebar.degraded.bannerDescription');
+    warningItem.iconPath = new vscode.ThemeIcon('warning', new vscode.ThemeColor('list.warningForeground'));
+    // Open the Extension Host log when the user clicks the warning row.
+    warningItem.command = {
+      command: 'workbench.action.toggleDevTools',
+      title: l10n('sidebar.degraded.bannerLabel'),
+    };
+    const degradedBanner = new FlatSectionProvider(
+      SECTION_VIEW_IDS.banner,
+      () => [warningItem],
+    );
+    context.subscriptions.push(
+      vscode.window.createTreeView(SECTION_VIEW_IDS.banner, {
+        treeDataProvider: degradedBanner,
+      }),
+    );
   }
 
   context.subscriptions.push(
@@ -2916,7 +2942,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     console.error('[Saropa Lints] Package Vibrancy activation failed:', err);
     // Fallback: if vibrancy fails, register standalone pubspec listeners
     // so pubspec validation still works without vibrancy/SDK diagnostics.
-    registerFallbackPubspecListeners(context, pubspecValidator);
+    // Guard: pubspecValidator may be undefined if the main setup try/catch
+    // failed before its assignment.
+    if (pubspecValidator) {
+      registerFallbackPubspecListeners(context, pubspecValidator);
+    }
   }
 
   // ── Command registration self-test ──────────────────────────────────

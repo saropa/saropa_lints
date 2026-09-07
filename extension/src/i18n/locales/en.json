@@ -2654,6 +2654,10 @@
       "codeHealthNeverScanned": "Run Code Health to see your score",
       "projectMapDescription": "Scanned {ago}",
       "projectMapNeverScanned": "Run Project Map to see size & hot spots"
+    },
+    "degraded": {
+      "bannerLabel": "Activation Error",
+      "bannerDescription": "Check Extension Host log for details"
     }
   }
 }
