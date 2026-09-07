@@ -50,6 +50,8 @@ export function buildAuditScript(
   const PAGE_SIZE = 500;
   let shownCount = Math.min(PAGE_SIZE, ALL_DIAGNOSTICS.length);
   let groupByFile = false;
+  // Rule-name filter: when set, only rows matching this rule are shown.
+  let ruleFilter = null;
 
   // Active filters: dimension -> Set of active values.
   const filters = {
@@ -59,11 +61,14 @@ export function buildAuditScript(
     baselineStatus: new Set(),
   };
 
-  // Initialize filters: all values active.
+  // Initialize filter sets from the chip active state rendered by the server.
+  // Chips rendered without audit-chip-active start excluded from the filter.
   document.querySelectorAll('.audit-chip').forEach(chip => {
     const dim = chip.dataset.dim;
     const val = chip.dataset.val;
-    if (dim && val) filters[dim].add(val);
+    if (dim && val && chip.classList.contains('audit-chip-active')) {
+      filters[dim].add(val);
+    }
   });
 
   // Filter chip toggle.
@@ -91,9 +96,14 @@ export function buildAuditScript(
     searchTimeout = setTimeout(rerender, 200);
   });
 
-  // Copy JSON button.
+  // Copy JSON button — copies to clipboard.
   document.getElementById('audit-copy-json').addEventListener('click', () => {
     vscode.postMessage({ type: 'copyJson', json: JSON.stringify(ALL_DIAGNOSTICS, null, 2) });
+  });
+
+  // Export JSON button — saves to a file via the host.
+  document.getElementById('audit-export-json').addEventListener('click', () => {
+    vscode.postMessage({ type: 'exportJson', json: JSON.stringify(ALL_DIAGNOSTICS, null, 2) });
   });
 
   // Save as baseline button — sends the full audit JSON back to the host.
@@ -117,12 +127,38 @@ export function buildAuditScript(
     rerender();
   });
 
-  // File click: open in editor.
+  // File click: open in editor at the diagnostic line.
   document.getElementById('audit-tbody').addEventListener('click', (e) => {
+    // Handle rule-name clicks — filter to show only that rule.
+    const ruleLink = e.target.closest('.audit-rule-link');
+    if (ruleLink) {
+      setRuleFilter(ruleLink.dataset.rule);
+      return;
+    }
+    // Handle file-path clicks — open the file at the diagnostic line.
     const cell = e.target.closest('.audit-clickable');
     if (!cell) return;
-    vscode.postMessage({ type: 'openFile', path: cell.dataset.path });
+    vscode.postMessage({ type: 'openFile', path: cell.dataset.path, line: parseInt(cell.dataset.line, 10) || 1, column: parseInt(cell.dataset.col, 10) || 1 });
   });
+
+  // Rule filter banner: clear button resets the rule filter.
+  const ruleFilterBanner = document.getElementById('audit-rule-filter-banner');
+  const ruleFilterLabel = document.getElementById('audit-rule-filter-label');
+  const ruleFilterClear = document.getElementById('audit-rule-filter-clear');
+  ruleFilterClear.addEventListener('click', () => { setRuleFilter(null); });
+
+  // Sets or clears the active rule filter and re-renders.
+  function setRuleFilter(rule) {
+    ruleFilter = rule;
+    if (rule) {
+      ruleFilterLabel.textContent = rule;
+      ruleFilterBanner.hidden = false;
+    } else {
+      ruleFilterBanner.hidden = true;
+    }
+    shownCount = PAGE_SIZE;
+    rerender();
+  }
 
   // Sort by clicking column headers.
   let sortCol = null;
@@ -158,10 +194,10 @@ export function buildAuditScript(
       searchInput.value = '';
       rerender();
     } else if (e.key === 'Enter' && activeRowIdx >= 0 && activeRowIdx < rows.length) {
-      // Open the file at the active row.
+      // Open the file at the active row's diagnostic line.
       const cell = rows[activeRowIdx].querySelector('.audit-clickable');
       if (cell) {
-        vscode.postMessage({ type: 'openFile', path: cell.dataset.path });
+        vscode.postMessage({ type: 'openFile', path: cell.dataset.path, line: parseInt(cell.dataset.line, 10) || 1, column: parseInt(cell.dataset.col, 10) || 1 });
       }
     }
   });
@@ -188,6 +224,8 @@ export function buildAuditScript(
       if (!filters.severity.has(d.severity)) return false;
       if (!filters.impact.has(d.impact || 'unknown')) return false;
       if (hasBaselineData && d.baselineStatus && !filters.baselineStatus.has(d.baselineStatus)) return false;
+      // Rule-name filter: when active, only show diagnostics for that rule.
+      if (ruleFilter && d.ruleName !== ruleFilter) return false;
       if (query) {
         const haystack = (d.filePath + ' ' + d.ruleName + ' ' + (d.problemMessage || '')).toLowerCase();
         if (!haystack.includes(query)) return false;
@@ -235,12 +273,12 @@ export function buildAuditScript(
       filteredEmpty.hidden = true;
     }
 
-    // Pagination controls.
+    // Pagination controls — limit applies to the filtered set, not the raw total.
     const pagination = document.getElementById('audit-pagination');
     const countSpan = document.getElementById('audit-shown-count');
     if (filtered.length > shownCount) {
       pagination.hidden = false;
-      countSpan.textContent = shownCount + ' / ' + filtered.length;
+      countSpan.textContent = fmtN(shownCount) + ' / ' + fmtN(filtered.length);
     } else {
       pagination.hidden = true;
     }
@@ -279,9 +317,9 @@ export function buildAuditScript(
         ? ' <span class="audit-status-badge audit-status-unchanged">—</span>'
         : '';
     return '<tr class="audit-row ' + sevClass + baselineClass + '" data-baseline-status="' + escA(d.baselineStatus || '') + '">'
-      + '<td class="audit-col-file audit-clickable" data-path="' + escA(d.filePath) + '" data-line="' + d.line + '">' + esc(rel) + '</td>'
+      + '<td class="audit-col-file audit-clickable" data-path="' + escA(d.filePath) + '" data-line="' + d.line + '" data-col="' + d.column + '">' + esc(rel) + '</td>'
       + '<td class="audit-col-line">' + d.line + ':' + d.column + '</td>'
-      + '<td class="audit-col-rule"><code>' + esc(d.ruleName) + '</code>' + statusBadge + '</td>'
+      + '<td class="audit-col-rule"><code class="audit-rule-link" data-rule="' + escA(d.ruleName) + '">' + esc(d.ruleName) + '</code>' + statusBadge + '</td>'
       + '<td class="audit-col-severity"><span class="audit-sev-pill ' + sevClass + '">' + esc(d.severity) + '</span></td>'
       + '<td class="audit-col-tier">' + esc(d.tier || '') + '</td>'
       + '<td class="audit-col-message">' + esc(d.problemMessage || '') + '</td>'
@@ -291,6 +329,8 @@ export function buildAuditScript(
   function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function escA(s) { return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
   function sevRank(s) { return s === 'error' ? 3 : s === 'warning' ? 2 : s === 'info' ? 1 : 0; }
+  // Format a number with thousands separators — matches the server's en-US convention.
+  function fmtN(n) { return n.toLocaleString('en-US'); }
 
   // Lazily load the full diagnostics payload when it was too large to
   // inline (>10MB — see MAX_INLINE_BYTES in audit-report-panel.ts). The

@@ -2,11 +2,12 @@
  * HTML generator for the audit report webview.
  *
  * Builds a self-contained HTML document with:
- * - Summary header (total count, per-tier breakdown, per-severity breakdown)
- * - Filter chip bars for tier, severity, and impact
+ * - Summary header (total count, timestamp)
+ * - Filter chip bars for tier, severity, and impact (with counts as badges)
  * - Text search box with debounced filtering
- * - Sortable diagnostic table grouped by file or flat
- * - "Copy JSON" export button
+ * - Rule-name filter with a dismissible banner
+ * - Sortable diagnostic table with severity-colored rows, clickable files/rules
+ * - "Copy JSON", "Export JSON", and "Save as baseline" actions
  *
  * All strings are externalized via l10n() under the `audit.report` namespace.
  * Styles and client-side script live in the sibling audit-report-styles.ts /
@@ -20,6 +21,7 @@ import { createWebviewCspNonce, escapeHtml, escapeJsonStringForScriptBlock, json
 // KPI chip strip, toolbar/field/button, and table primitives; buildAuditStyles()
 // now holds only the audit-specific remainder (severity pills, baseline badges).
 import { getDashboardChromeStyles } from '../views/dashboardChromeStyles';
+import { formatNumber } from '../views/webview-format';
 import { buildAuditStyles } from './audit-report-styles';
 import { buildAuditScript } from './audit-report-script';
 
@@ -109,12 +111,20 @@ export function buildAuditReportHtml(
   // header show accurate totals immediately instead of "0" until the fetch
   // resolves.
   const tierCounts = countBy(diagnostics, (d) => d.tier ?? 'unknown');
-  const severityCounts = countBy(diagnostics, (d) => d.severity);
+  // Normalize severity to lowercase — the CLI should already do this, but
+  // defensive normalization prevents a silent feature regression if the CLI
+  // ever changes its casing convention.
+  const severityCounts = countBy(diagnostics, (d) => (d.severity ?? '').toLowerCase());
   const impactCounts = countBy(diagnostics, (d) => d.impact ?? 'unknown');
+
+  // Whether to hide INFO by default — only when errors or warnings exist.
+  // Severity values are lowercase (normalized by auditCliRunner.ts).
+  const hasErrorsOrWarnings = (severityCounts.get('error') ?? 0) > 0
+    || (severityCounts.get('warning') ?? 0) > 0;
 
   // Collect unique values for filter chips.
   const tiers = uniqueSorted(diagnostics, (d) => d.tier ?? 'unknown');
-  const severities = uniqueSorted(diagnostics, (d) => d.severity);
+  const severities = uniqueSorted(diagnostics, (d) => (d.severity ?? '').toLowerCase());
   const impacts = uniqueSorted(diagnostics, (d) => d.impact ?? 'unknown');
 
   // CSP nonce — required for the inline <style>/<script> below. See the
@@ -127,7 +137,12 @@ export function buildAuditReportHtml(
   // webview's own resource origin (cspSource), not arbitrary network access.
   const csp = `default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; connect-src ${ctx.webview.cspSource};`;
 
-  const initialPage = diagnostics.slice(0, PAGE_SIZE);
+  // When hiding INFO by default, filter the initial page server-side so the
+  // client doesn't flash INFO rows before the script's rerender hides them.
+  const initialSource = hasErrorsOrWarnings
+    ? diagnostics.filter((d) => (d.severity ?? '').toLowerCase() !== 'info')
+    : diagnostics;
+  const initialPage = initialSource.slice(0, PAGE_SIZE);
   // Full array embed is skipped when deferring — the client fetches it.
   // When a pre-serialized string is available (from the upfront serialize
   // in openAuditReport), apply only the HTML-safe escaping step instead of
@@ -153,17 +168,21 @@ export function buildAuditReportHtml(
     <div class="hero-text">
       <h1>${escapeHtml(l10n('audit.report.heading'))}</h1>
       <p class="status-line">
-        ${escapeHtml(l10n('audit.report.subtitle', { count: String(totalCount), timestamp }))}
+        ${escapeHtml(l10n('audit.report.subtitle', { count: formatNumber(totalCount), timestamp }))}
         ${hasBaseline ? `<span class="dot">·</span><span class="audit-baseline-tag">${escapeHtml(l10n('audit.report.baselineSubtitle', { date: String(baseline?.['comparedTo'] ?? '') }))}</span>` : ''}
       </p>
     </div>
   </header>
-  <div class="chip-strip">
-    ${buildKpiStrip(tierCounts, severityCounts)}
-  </div>
+  ${totalCount > 0 ? buildSeverityBar(severityCounts, totalCount) : ''}
 
   <!-- Shown only while a deferred (>10MB) payload is still loading. -->
   ${ctx.deferredUri ? `<div class="audit-loading-banner" id="audit-loading-banner" data-fail-message="${escapeHtml(l10n('audit.report.deferredLoadFailed', { pageSize: String(PAGE_SIZE) }))}">${escapeHtml(l10n('audit.report.deferredLoading'))}</div>` : ''}
+
+  <!-- Rule-name filter banner — hidden by default, shown when user clicks a rule. -->
+  <div class="audit-rule-filter-banner" id="audit-rule-filter-banner" hidden>
+    <span id="audit-rule-filter-label"></span>
+    <button id="audit-rule-filter-clear">${escapeHtml(l10n('audit.report.clearRuleFilter'))}</button>
+  </div>
 
   <!-- Controls: search + filters + actions — canonical .toolbar-band/.field/.btn. -->
   <div class="toolbar-band">
@@ -183,7 +202,8 @@ export function buildAuditReportHtml(
       </div>
       <div class="audit-filter-group">
         <span class="audit-filter-label">${escapeHtml(l10n('audit.report.filterSeverity'))}</span>
-        ${buildFilterChips('severity', severities, severityCounts)}
+        ${buildFilterChips('severity', severities, severityCounts,
+          hasErrorsOrWarnings ? new Set(['info']) : undefined)}
       </div>
       <div class="audit-filter-group">
         <span class="audit-filter-label">${escapeHtml(l10n('audit.report.filterImpact'))}</span>
@@ -191,13 +211,14 @@ export function buildAuditReportHtml(
       </div>
       ${hasBaseline ? `<div class="audit-filter-group">
         <span class="audit-filter-label">${escapeHtml(l10n('audit.report.filterBaselineStatus'))}</span>
-        <button class="chip audit-chip audit-chip-active audit-baseline-new" data-dim="baselineStatus" data-val="new">${escapeHtml(l10n('audit.report.baselineNew'))} <span class="audit-chip-count">(${baseline?.['new'] ?? 0})</span></button>
-        <button class="chip audit-chip audit-chip-active" data-dim="baselineStatus" data-val="unchanged">${escapeHtml(l10n('audit.report.baselineUnchanged'))} <span class="audit-chip-count">(${baseline?.['unchanged'] ?? 0})</span></button>
+        <button class="chip audit-chip audit-chip-active audit-baseline-new" data-dim="baselineStatus" data-val="new">${escapeHtml(l10n('audit.report.baselineNew'))} <span class="audit-chip-count">${formatNumber(baseline?.['new'] as number ?? 0)}</span></button>
+        <button class="chip audit-chip audit-chip-active" data-dim="baselineStatus" data-val="unchanged">${escapeHtml(l10n('audit.report.baselineUnchanged'))} <span class="audit-chip-count">${formatNumber(baseline?.['unchanged'] as number ?? 0)}</span></button>
       </div>` : ''}
     </div>
     <div class="toolbar-row">
       <button id="audit-save-baseline" class="btn tier-3">${escapeHtml(l10n('audit.report.saveBaseline'))}</button>
       <button id="audit-copy-json" class="btn tier-3">${escapeHtml(l10n('audit.report.copyJson'))}</button>
+      <button id="audit-export-json" class="btn tier-3">${escapeHtml(l10n('audit.report.exportJson'))}</button>
       <button id="audit-toggle-group" class="btn tier-3">${escapeHtml(l10n('audit.report.toggleGroup'))}</button>
     </div>
   </div>
@@ -227,10 +248,11 @@ export function buildAuditReportHtml(
     </div>
   </div>
 
-  <!-- Pagination controls for large result sets -->
+  <!-- Pagination controls for large result sets (limit applies after filtering). -->
   <div class="audit-pagination" id="audit-pagination" hidden>
     <button id="audit-load-more" class="btn tier-3">${escapeHtml(l10n('audit.report.loadMore'))}</button>
     <span id="audit-shown-count"></span>
+    <span class="audit-pagination-note">${escapeHtml(l10n('audit.report.paginationNote'))}</span>
   </div>
 
   <!-- Keyboard navigation hint -->
@@ -281,36 +303,66 @@ export function buildAuditErrorHtml(
 
 // ── HTML builders ────────────────────────────────────────────────────
 
-/** KPI strip: total + per-tier + per-severity counts. */
-function buildKpiStrip(
-  tierCounts: Map<string, number>,
+/**
+ * Builds a thin horizontal bar showing error/warning/info proportions as
+ * colored segments. Gives an instant visual read on project health.
+ */
+function buildSeverityBar(
   severityCounts: Map<string, number>,
+  totalCount: number,
 ): string {
-  const pills: string[] = [];
-  for (const [severity, count] of severityCounts) {
-    pills.push(
-      `<span class="chip audit-kpi-${escapeHtml(severity)}">${escapeHtml(severity)}: ${count}</span>`,
+  const errorCount = severityCounts.get('error') ?? 0;
+  const warnCount = severityCounts.get('warning') ?? 0;
+  const infoCount = severityCounts.get('info') ?? 0;
+
+  // Compute percentages — clamp to at least 1% when non-zero so thin
+  // slices remain visible (the full bar is purely illustrative, not a
+  // precise measurement).
+  const pct = (n: number): number =>
+    n === 0 ? 0 : Math.max(1, Math.round((n / totalCount) * 100));
+  const errorPct = pct(errorCount);
+  const warnPct = pct(warnCount);
+  const infoPct = pct(infoCount);
+
+  // Build segment HTML — only non-zero segments render, each with a
+  // tooltip showing count and percentage.
+  const segments: string[] = [];
+  if (errorPct > 0) {
+    segments.push(
+      `<div class="audit-sev-bar-seg audit-sev-bar-error" style="width:${errorPct}%" title="${escapeHtml(l10n('audit.report.sevBarError', { count: formatNumber(errorCount), pct: String(errorPct) }))}"></div>`,
     );
   }
-  for (const [tier, count] of tierCounts) {
-    pills.push(
-      `<span class="chip audit-kpi-tier">${escapeHtml(tier)}: ${count}</span>`,
+  if (warnPct > 0) {
+    segments.push(
+      `<div class="audit-sev-bar-seg audit-sev-bar-warning" style="width:${warnPct}%" title="${escapeHtml(l10n('audit.report.sevBarWarning', { count: formatNumber(warnCount), pct: String(warnPct) }))}"></div>`,
     );
   }
-  return pills.join('');
+  if (infoPct > 0) {
+    segments.push(
+      `<div class="audit-sev-bar-seg audit-sev-bar-info" style="width:${infoPct}%" title="${escapeHtml(l10n('audit.report.sevBarInfo', { count: formatNumber(infoCount), pct: String(infoPct) }))}"></div>`,
+    );
+  }
+
+  return `<div class="audit-sev-bar">${segments.join('')}</div>`;
 }
 
-/** Builds a set of toggle-able filter chips for a dimension. */
+/**
+ * Builds toggle-able filter chips for a dimension. Values in `inactiveValues`
+ * render with the chip inactive by default (e.g. INFO when errors/warnings
+ * exist), letting the user opt in rather than opt out.
+ */
 function buildFilterChips(
   dimension: string,
   values: string[],
   counts: Map<string, number>,
+  inactiveValues?: Set<string>,
 ): string {
   return values
-    .map(
-      (v) =>
-        `<button class="chip audit-chip audit-chip-active" data-dim="${escapeHtml(dimension)}" data-val="${escapeHtml(v)}">${escapeHtml(v)} <span class="audit-chip-count">(${counts.get(v) ?? 0})</span></button>`,
-    )
+    .map((v) => {
+      const active = !inactiveValues?.has(v);
+      const activeClass = active ? ' audit-chip-active' : '';
+      return `<button class="chip audit-chip${activeClass}" data-dim="${escapeHtml(dimension)}" data-val="${escapeHtml(v)}">${escapeHtml(v)} <span class="audit-chip-count">${formatNumber(counts.get(v) ?? 0)}</span></button>`;
+    })
     .join('');
 }
 
@@ -332,9 +384,9 @@ function diagnosticRow(d: AuditDiagnostic, root: string): string {
   const severityClass = `audit-sev-${(d.severity ?? '').toLowerCase()}`;
   const baselineClass = d.baselineStatus === 'new' ? ' audit-baseline-new-row' : '';
   return `<tr class="audit-row ${severityClass}${baselineClass}" data-file="${escapeHtml(d.filePath)}" data-severity="${escapeHtml(d.severity)}" data-tier="${escapeHtml(d.tier ?? 'unknown')}" data-impact="${escapeHtml(d.impact ?? 'unknown')}" data-rule="${escapeHtml(d.ruleName)}" data-baseline-status="${escapeHtml(d.baselineStatus ?? '')}">
-  <td class="audit-col-file audit-clickable" data-path="${escapeHtml(d.filePath)}" data-line="${d.line}">${escapeHtml(relPath)}</td>
+  <td class="audit-col-file audit-clickable" data-path="${escapeHtml(d.filePath)}" data-line="${d.line}" data-col="${d.column}">${escapeHtml(relPath)}</td>
   <td class="audit-col-line">${d.line}:${d.column}</td>
-  <td class="audit-col-rule"><code>${escapeHtml(d.ruleName)}</code></td>
+  <td class="audit-col-rule"><code class="audit-rule-link" data-rule="${escapeHtml(d.ruleName)}">${escapeHtml(d.ruleName)}</code></td>
   <td class="audit-col-severity"><span class="audit-sev-pill ${severityClass}">${escapeHtml(d.severity)}</span></td>
   <td class="audit-col-tier">${escapeHtml(d.tier ?? '')}</td>
   <td class="audit-col-message">${escapeHtml(d.problemMessage ?? '')}</td>
@@ -357,3 +409,4 @@ function countBy<T>(items: T[], fn: (item: T) => string): Map<string, number> {
 function uniqueSorted<T>(items: T[], fn: (item: T) => string): string[] {
   return [...new Set(items.map(fn))].sort();
 }
+

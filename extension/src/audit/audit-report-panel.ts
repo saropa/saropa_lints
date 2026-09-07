@@ -122,17 +122,26 @@ function ensurePanel(
   // Registered once per panel instance regardless of which entry point
   // created it.
   panel.webview.onDidReceiveMessage(
-    (msg: { type: string; path?: string; json?: string }) => {
+    (msg: { type: string; path?: string; line?: number; column?: number; json?: string }) => {
       if (msg.type === 'openFile' && msg.path) {
-        // Open the file at the diagnostic location.
+        // Open the file at the diagnostic position (1-indexed from the audit).
         const uri = vscode.Uri.file(msg.path);
-        void vscode.window.showTextDocument(uri);
+        const line = Math.max(0, (msg.line ?? 1) - 1);
+        const col = Math.max(0, (msg.column ?? 1) - 1);
+        const position = new vscode.Position(line, col);
+        void vscode.window.showTextDocument(uri, {
+          selection: new vscode.Range(position, position),
+        });
       }
       if (msg.type === 'copyJson' && msg.json) {
         void vscode.env.clipboard.writeText(msg.json);
         void vscode.window.showInformationMessage(
           l10n('audit.report.copiedJson'),
         );
+      }
+      if (msg.type === 'exportJson' && msg.json) {
+        // Save the audit JSON to a user-chosen file.
+        void exportAuditJson(msg.json);
       }
       if (msg.type === 'saveBaseline' && msg.json) {
         // Save the audit JSON as the project baseline via the CLI.
@@ -240,6 +249,36 @@ export function cleanupDeferredPayloads(storageDir: vscode.Uri): void {
       // Ignore: e.g. still open by the webview from a prior render, or
       // already removed by another process.
     }
+  }
+}
+
+/**
+ * Prompts the user to pick a location and saves the audit JSON to a file.
+ * Uses writeFileSync for simplicity — the payload rarely exceeds a few MB
+ * (the deferred-payload path handles >10MB), and the sync write keeps the
+ * success/error feedback immediate after the save dialog.
+ */
+async function exportAuditJson(jsonString: string): Promise<void> {
+  // Fall back to the first workspace folder if currentRoot is somehow empty.
+  const root = currentRoot || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || '';
+  const uri = await vscode.window.showSaveDialog({
+    defaultUri: vscode.Uri.file(
+      path.join(root, `audit-${new Date().toISOString().slice(0, 10)}.json`),
+    ),
+    filters: { JSON: ['json'] },
+    title: l10n('audit.report.exportJsonTitle'),
+  });
+  if (!uri) return;
+  try {
+    fs.writeFileSync(uri.fsPath, jsonString, 'utf-8');
+    void vscode.window.showInformationMessage(
+      l10n('audit.report.exportJsonSaved'),
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    void vscode.window.showErrorMessage(
+      l10n('audit.report.exportJsonFailed', { message }),
+    );
   }
 }
 
