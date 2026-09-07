@@ -95,6 +95,7 @@ Publish-pipeline hardening: the i18n audit no longer launches Ollama, and the lo
 
 ### Internal
 
+- Sidebar data is now computed once per refresh cycle (`prepareRefreshCycle`) instead of being cleared and rebuilt by each provider independently. Eliminates redundant `readVisibleLiveViolations` + `computeLiveHealthScore` calls when multiple sidebar sections refresh together.
 - Fixed i18n audit (`--mode audit`) probing Ollama engine availability via `low_quality_entries()`, which self-provisioned the daemon and pulled the model — an expensive, risky side effect during a read-only coverage check. Audit now uses `audit_only=True` to scan cache provenance tags without any subprocess calls. No action required.
 - Fixed `dart pub publish --force` (local fallback) printing its full file-tree listing to stdout, flooding the terminal and pushing prior publish-step output out of the scrollback buffer. Output is now captured; only the pub.dev confirmation line is surfaced. No action required.
 - Added manual translations to `dictionaries.py` for 5 gaps across 4 locales (ar, de, fil, pt) that MT engines did not translate: RSS warning description, "Dev Tool Budget", "Set Cap", "Translation Engine (Ollama)". No action required.

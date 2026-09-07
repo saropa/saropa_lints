@@ -45,6 +45,7 @@ import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type
 import {
   createSidebarSectionProviders,
   FlatSectionProvider,
+  prepareRefreshCycle,
   SECTION_VIEW_IDS,
   updateSidebarSectionContext,
   type SectionNode,
@@ -678,6 +679,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // each provider without threading extra state through FlatSectionProvider.
   const sectionTreeViews = new Map<string, vscode.TreeView<SectionNode>>();
   refreshAllSections = (): void => {
+    // Compute the sidebar data snapshot ONCE for this cycle. Every provider's
+    // getChildren / getBadge then reads a cache hit — no per-provider
+    // invalidate-and-rebuild churn.
+    prepareRefreshCycle(context.workspaceState);
     for (const p of sectionProviders) {
       p.refresh();
       const treeView = sectionTreeViews.get(p.viewId);

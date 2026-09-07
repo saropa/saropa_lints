@@ -286,9 +286,16 @@ function rebuildSummary(
     };
 }
 
-/** Clear the shared snapshot — call from each provider's `refresh()`. */
-function invalidateSharedCache(): void {
+/**
+ * Pre-compute the shared sidebar snapshot for a refresh cycle. Call once at
+ * the TOP of refreshAllSections — every provider's getChildren / getBadge
+ * then hits the cache instead of recomputing. Replaces the old per-provider
+ * invalidateSharedCache pattern that cleared and rebuilt the cache N times.
+ */
+export function prepareRefreshCycle(workspaceState: vscode.Memento): void {
     _cachedSnapshot = undefined;
+    // Eagerly build so the loop only reads cache hits.
+    getSnapshot(workspaceState);
 }
 
 // ── Per-view item builders ────────────────────────────────────────────────
@@ -989,8 +996,9 @@ export class FlatSectionProvider implements vscode.TreeDataProvider<SectionNode>
         return this.buildBadge?.();
     }
 
+    /** Fire the tree-data-changed event. Snapshot is pre-computed by
+     *  prepareRefreshCycle — no per-provider cache invalidation needed. */
     refresh(): void {
-        invalidateSharedCache();
         this._onDidChangeTreeData.fire();
     }
 
@@ -1114,5 +1122,6 @@ export function updateSidebarSectionContext(workspaceState: vscode.Memento): voi
     const enabled = cfg.get<boolean>('enabled', true) ?? true;
     const needsBanner = !hasSaropaLintsDep(root) || !enabled;
     void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', needsBanner);
-    invalidateSharedCache();
+    // Cache invalidation moved to prepareRefreshCycle — called once at the
+    // top of refreshAllSections instead of per-provider and per-context-update.
 }
