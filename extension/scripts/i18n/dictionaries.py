@@ -25,6 +25,23 @@ DO_NOT_TRANSLATE: list[str] = [
     "{grade} · {score}/100",
 ]
 
+# Words that are spelled identically in specific locales (cognates, loanwords,
+# shared technical terms). Unlike DO_NOT_TRANSLATE, these apply only to the
+# listed locales — the same word might need a real translation elsewhere.
+# Format: English source string → list of locale codes where it is correct as-is.
+# The merge loop below injects "X" → "X" into each listed locale's TRANSLATIONS
+# dict at import time, so compute_stats() counts them as translated and MT is
+# never consulted for them.
+COGNATES: dict[str, list[str]] = {
+    # "Source" is a French/Dutch/German cognate (same spelling, same meaning).
+    "Source": ["de", "fr", "nl"],
+    # "Status:" — identical spelling in many Latin/Germanic-script locales.
+    "Status:": ["de", "id", "nl", "pl", "pt"],
+    # "{detail} in {sections}" — "in" is a preposition in German/Italian too;
+    # no translatable words remain after placeholders.
+    "{detail} in {sections}": ["de", "it"],
+}
+
 # cspell:disable
 #
 # UNVERIFIED TRANSLATIONS (2026-09-05): 15 per-locale entries across
@@ -2010,3 +2027,16 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
 for _locale_dict in TRANSLATIONS.values():
     for _keyword in DO_NOT_TRANSLATE:
         _locale_dict.setdefault(_keyword, _keyword)
+
+# Merge COGNATES passthroughs into only the locales where the word is a valid
+# cognate/loanword. Same setdefault semantics: a curated entry with a real
+# translation takes priority over the passthrough.
+_valid_locales = frozenset(TRANSLATIONS.keys())
+for _cognate_src, _cognate_locales in COGNATES.items():
+    for _cognate_locale in _cognate_locales:
+        if _cognate_locale not in _valid_locales:
+            raise ValueError(
+                f"COGNATES[{_cognate_src!r}] references unknown locale "
+                f"{_cognate_locale!r}. Valid: {sorted(_valid_locales)}"
+            )
+        TRANSLATIONS[_cognate_locale].setdefault(_cognate_src, _cognate_src)

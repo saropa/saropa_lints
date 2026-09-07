@@ -24,7 +24,7 @@ if sys.stdout.encoding != "utf-8":
 if sys.stderr.encoding != "utf-8":
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 
-from dictionaries import DO_NOT_TRANSLATE, TRANSLATIONS
+from dictionaries import COGNATES, DO_NOT_TRANSLATE, TRANSLATIONS
 from json_io import read_json, write_json
 from mt_fallback import (
     active_engine_name,
@@ -234,6 +234,75 @@ def _check_dnt_collisions(english_strings: set[str]) -> list[str]:
     return collisions
 
 
+def _check_cognate_drift(english_strings: set[str]) -> list[str]:
+    """Warn when a COGNATES key does not match any English source string.
+
+    Same purpose as ``_check_dictionary_drift``: if the English wording changes,
+    the cognate passthrough silently stops matching and MT takes over for those
+    locales — the audit then flags them as missing again.
+    """
+    orphans: list[str] = []
+    for en_key, locales in COGNATES.items():
+        if en_key not in english_strings:
+            orphans.append(
+                f"  COGNATES[{en_key!r}] ({', '.join(locales)}) — "
+                f"no matching English source string"
+            )
+    if orphans:
+        print(
+            c("yellow", f"  ⚠ {len(orphans)} COGNATES key(s) no longer match "
+                        "any English source string (stale or renamed):"),
+        )
+        for line in orphans:
+            print(c("yellow", line))
+        print(
+            c("gray", "    Fix: update or remove the key in dictionaries.py "
+                      "COGNATES to match the current en.json wording."),
+        )
+        print()
+    return orphans
+
+
+def _validate_cognates() -> list[str]:
+    """Deep-validate COGNATES entries: conflict and redundancy checks.
+
+    Returns a list of warning lines (empty = clean). Checks:
+    1. A locale already has a *different* curated translation for the string —
+       the cognate claim contradicts a hand-written translation.
+    2. The string is also in DO_NOT_TRANSLATE — the cognate entry is redundant
+       because DO_NOT_TRANSLATE already covers every locale.
+    """
+    issues: list[str] = []
+    dnt_set = set(DO_NOT_TRANSLATE)
+    for en_key, locales in COGNATES.items():
+        # Redundancy: already in DO_NOT_TRANSLATE (covers all locales).
+        if en_key in dnt_set:
+            issues.append(
+                f"  COGNATES[{en_key!r}] is already in DO_NOT_TRANSLATE "
+                f"(covers all locales) — remove from COGNATES"
+            )
+            continue
+        for locale in locales:
+            # The merge used setdefault, so a pre-existing entry wins.
+            # Check the TRANSLATIONS dict BEFORE the COGNATES merge would
+            # have run — we can detect a conflict by checking whether the
+            # value differs from the passthrough.
+            existing = TRANSLATIONS.get(locale, {}).get(en_key)
+            if existing is not None and existing != en_key:
+                issues.append(
+                    f"  COGNATES[{en_key!r}] claims {locale} is a cognate, "
+                    f"but {locale} already has translation: {existing!r}"
+                )
+    if issues:
+        print(
+            c("yellow", f"  ⚠ {len(issues)} COGNATES issue(s):"),
+        )
+        for line in issues:
+            print(c("yellow", line))
+        print()
+    return issues
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate extension locale JSON files.")
     parser.add_argument(
@@ -264,6 +333,16 @@ def parse_args() -> argparse.Namespace:
             "no longer matches an English source string. Catches stale keys "
             "that silently stop working after en.json renames. Pair with "
             "--fail-on-missing in the publish pipeline."
+        ),
+    )
+    parser.add_argument(
+        "--check-cognates",
+        action="store_true",
+        help=(
+            "Validate COGNATES entries in dictionaries.py: warn when a cognate "
+            "locale already has a different (non-passthrough) translation for "
+            "the string, or when the entry overlaps with DO_NOT_TRANSLATE "
+            "(redundant). Exits non-zero if any conflict is found."
         ),
     )
     parser.add_argument(
@@ -797,8 +876,10 @@ def _run_audit(
         stats, missing = compute_stats(mapping, dict_table)
         stats_by_locale[locale] = stats
         missing_by_locale[locale] = missing
+        # audit_only=True prevents the engine-availability probe that would
+        # otherwise self-provision Ollama — audit must be read-only.
         low_quality_by_locale[locale] = low_quality_entries(
-            mt_cache, locale, sorted_unique, dict_table
+            mt_cache, locale, sorted_unique, dict_table, audit_only=True
         )
         lq = len(low_quality_by_locale[locale])
         miss_tag = (
@@ -990,6 +1071,18 @@ def main() -> int:
         )
         return 1
 
+    # Warn when COGNATES keys no longer match any English source string — same
+    # drift hazard as curated dictionary entries.
+    cognate_orphans = _check_cognate_drift(unique_en)
+    if args.fail_on_drift and cognate_orphans:
+        print(
+            c("red", f"  COGNATES drift gate FAILED: {len(cognate_orphans)} orphaned "
+                     "key(s). Update COGNATES in dictionaries.py to match the current "
+                     "en.json wording, then re-run."),
+            file=sys.stderr,
+        )
+        return 1
+
     # Warn (or error with --strict-dnt) if a DO_NOT_TRANSLATE keyword appears
     # embedded in a longer source string — the passthrough is exact-match only,
     # but the collision suggests the keyword may need real translation.
@@ -1002,6 +1095,19 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+
+    # Deep COGNATES validation: conflict and redundancy checks.
+    if args.check_cognates:
+        cognate_issues = _validate_cognates()
+        if cognate_issues:
+            print(
+                c("red", f"  --check-cognates: {len(cognate_issues)} issue(s) found. "
+                          "Fix COGNATES in dictionaries.py before publishing."),
+                file=sys.stderr,
+            )
+            return 1
+        if not cognate_orphans:
+            print(c("green", "  ✓ COGNATES: all entries valid, no conflicts."))
 
     # Interactive launches preview the current gap/low-quality state with a
     # read-only audit BEFORE the menu, so the mode choice is informed by what is
@@ -1188,8 +1294,9 @@ def main() -> int:
         print()
         print(
             c("red", f"  Coverage gate FAILED: {total_missing} missing translation(s) "
-                     "across locales. Add curated entries to dictionaries.py (or a "
-                     '"X": "X" passthrough for words identical in the target language) '
+                     "across locales. Add curated entries to dictionaries.py — use "
+                     "COGNATES for words identical in specific target languages, "
+                     "DO_NOT_TRANSLATE for technical keywords identical everywhere — "
                      "and rerun, then commit the regenerated locale JSON."),
             file=sys.stderr,
         )

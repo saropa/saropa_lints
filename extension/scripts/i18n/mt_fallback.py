@@ -291,19 +291,31 @@ def prune_low_quality(
 
 def low_quality_entries(
     cache: dict[str, str], locale: str, texts: list[str], dict_table: dict[str, str],
+    *, audit_only: bool = False,
 ) -> list[str]:
     """Audit counterpart to prune_low_quality: return source strings whose cached
-    translation ranks below Qwen. Empty unless Qwen is the primary engine.
+    translation ranks below Qwen.
+
+    When *audit_only* is True the check skips the engine-availability probe
+    (which self-provisions Ollama) and scans all engine keyspaces instead.
+    This keeps ``--mode audit`` a pure read-only operation with zero
+    subprocess calls.
     """
-    if _primary_engine(locale) != "qwen":
-        return []
+    if not audit_only:
+        # Live mode: only report low-quality when Qwen is the active engine.
+        if _primary_engine(locale) != "qwen":
+            return []
     found: list[str] = []
+    # Audit mode checks all engine keyspaces; live mode checks Qwen only.
+    engines = ("qwen", "nllb", "google") if audit_only else ("qwen",)
     for text in texts:
         if not text or text in dict_table:
             continue
-        key = _cache_key(locale, text, "qwen")
-        if key in cache and _provenance.get(key, "") in _LOW_QUALITY_PROVENANCE:
-            found.append(text)
+        for engine in engines:
+            key = _cache_key(locale, text, engine)
+            if key in cache and _provenance.get(key, "") in _LOW_QUALITY_PROVENANCE:
+                found.append(text)
+                break
     return found
 
 

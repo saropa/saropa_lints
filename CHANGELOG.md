@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.0.0-beta.9] — Unreleased
 
-Publish-pipeline hardening: the i18n audit no longer launches Ollama, and the local pub.dev fallback no longer floods the terminal with a file-tree listing. Closes five translation gaps across four locales.
+Activation is now resilient — commands register and the sidebar warns on failure instead of going blank. The Findings Dashboard absorbs the full-project audit as a scope selector and gains severity coloring, clickable file paths and rule names, a filter-aware page limit, and JSON export. Sidebar rows show live counts, and per-file analysis no longer blocks the extension host. Publish-pipeline fixes stop the i18n audit from launching Ollama and the local pub.dev fallback from flooding the terminal.
 
 ### Fixed (Extension)
 
@@ -99,6 +99,7 @@ Publish-pipeline hardening: the i18n audit no longer launches Ollama, and the lo
 - Fixed i18n audit (`--mode audit`) probing Ollama engine availability via `low_quality_entries()`, which self-provisioned the daemon and pulled the model — an expensive, risky side effect during a read-only coverage check. Audit now uses `audit_only=True` to scan cache provenance tags without any subprocess calls. No action required.
 - Fixed `dart pub publish --force` (local fallback) printing its full file-tree listing to stdout, flooding the terminal and pushing prior publish-step output out of the scrollback buffer. Output is now captured; only the pub.dev confirmation line is surfaced. No action required.
 - Added manual translations to `dictionaries.py` for 5 gaps across 4 locales (ar, de, fil, pt) that MT engines did not translate: RSS warning description, "Dev Tool Budget", "Set Cap", "Translation Engine (Ollama)". No action required.
+- Added `COGNATES` approval list to `dictionaries.py` for words that are spelled identically in specific target languages (e.g. "Source" in French). Previously each cognate needed a per-locale `"X": "X"` passthrough scattered across the file; the centralized list merges them at import time, with locale-code validation at import (typos raise `ValueError`), drift detection (stale keys warn or fail with `--fail-on-drift`), and a `--check-cognates` flag that catches conflicts (a locale already has a different translation) and redundancies (overlap with `DO_NOT_TRANSLATE`). No action required.
 
 ---
 
@@ -509,73 +510,6 @@ Hardens the LSP server against normal editor traffic and adds a `doctor` command
 - Config parser (`_leadingSpaces`) now counts tabs as indentation, matching the scalar parser — fixes silent parse failures on tab-indented YAML.
 - `doctor` command now scopes key detection to the `saropa_lints:` plugin block — no longer false-positives on identically named top-level keys.
 - Publish script supports `--log-file`, `--log-append`, `--mode`, `--auto-retry`, and `--output-level` flags for non-interactive/CI execution. Auto-detects non-TTY stdin. Mode definitions are unified in a single table driving both CLI and interactive menu.
-
----
-
-## [15.2.11]
-
-Removes fake LSP test diagnostics that shipped in 15.2.10. The standalone LSP server remains available, off by default, and no longer emits test squiggles. [log](https://github.com/saropa/saropa_lints/blob/v15.2.11/CHANGELOG.md)
-
-### Fixed
-
-- **LSP server no longer emits fake test diagnostics.** Phase 0 proof-of-concept diagnostics were being published to every open `.dart` file when the LSP server was enabled. No action required — the setting now defaults to off.
-
-### Changed
-
-- **`saropaLints.lspServer.enabled` now defaults to `false`.** Previously defaulted to `true`, which activated the fake LSP server for all users. No action required.
-
-### Internal
-
-- Regenerated category map and migration pack codes for 18 new rules added in 15.2.10 that were missing from the generated indexes.
-
----
-
-## [15.2.10]
-
-> **Known issue:** This release shipped `saropaLints.lspServer.enabled` defaulting to `true`, causing fake test diagnostics to appear in every open `.dart` file. Update to 15.2.11 immediately.
-
-New lint rules covering testing, equality, control flow, constructor style, and widget lifecycle. Also fixes cross-platform SARIF output, dead links in published docs, and orphan-publish recovery in the publish script. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
-
-### Fixed
-
-- Fixed SARIF writer emitting `../C:/project/...` URIs on Linux CI — switched from `p.relative()` to prefix stripping after forward-slash normalization so Windows-style paths resolve correctly cross-platform.
-- Fixed broken links in `README.md` and `doc/README.md` to removed guide files (`upgrading_to_v7.md`, `migration_v4_to_v5.md`).
-- Fixed wrong relative path in `using_with_flutter_lints.md` link to VGA migration guide.
-- Fixed `always_put_doc_comments_before_annotations` false-negative — the old token-walking detection assumed `documentationComment == null` for misplaced comments, but the analyzer populates it regardless of position. Replaced with offset comparison against the first annotation.
-
-### Added
-
-- New rule `avoid_focused_tests` (Essential) — flags `test()`/`group()` calls with `solo: true` left in committed code, which silently skips the rest of the suite in CI.
-- New rule `avoid_exit_outside_entrypoint` (Recommended) — flags `exit()` calls outside the top-level `main()` function, which kill the process bypassing cleanup and `finally` blocks.
-- New rule `avoid_labeled_statements` (Comprehensive) — flags labeled statements (`label: for/while/switch`) that force readers to track names across nested blocks instead of reasoning locally.
-- New rule `avoid_null_checks_in_equality_operators_extended` (Recommended) — flags dead `other == null` checks inside `operator ==` overrides under sound null safety. Named with `_extended` suffix to avoid collision with the core Dart lint.
-- New rule `avoid_unnecessary_else_after_control_flow` (Recommended) — flags `else` blocks after `if` bodies that end with `return`, `throw`, `break`, or `continue`.
-- New rule `prefer_initializing_formals_extended` (Comprehensive) — flags constructor body assignments that could be `this.param` initializing formals. Named with `_extended` suffix to avoid collision with the core Dart lint.
-- New rule `avoid_skipped_tests` (Recommended) — flags `test()`/`group()` calls with `skip: true` or a skip message left in committed code.
-- New rule `no_optional_operators_in_tests` (Comprehensive) — flags `?.` and `??` operators in test files that silently swallow failures.
-- New rule `avoid_public_members_in_states` (Recommended) — flags public fields and methods in `State` subclasses that leak internal state as public API.
-- New rule `prefer_blank_line_before_break` (Stylistic) — requires a blank line before `break` in multi-statement blocks for visual separation.
-- New rule `prefer_blank_line_before_continue` (Stylistic) — requires a blank line before `continue` in multi-statement blocks.
-- New rule `prefer_blank_line_before_throw` (Stylistic) — requires a blank line before `throw` statements in multi-statement blocks.
-- New rule `avoid_unnecessary_parentheses` (Comprehensive) — flags redundant parentheses that don't change evaluation order or precedence.
-- New rule `always_put_doc_comments_before_annotations` (Recommended) — flags `///` doc comments placed after annotations instead of before, which breaks dartdoc association.
-- New rule `start_comments_with_space` (Pedantic) — flags `//comment` missing a space after the slashes.
-- New rule `constructor_parameters_and_fields_should_have_the_same_order` (Comprehensive) — flags constructors where parameter order doesn't match field declaration order.
-- New rule `todo_with_story_links` (Professional) — flags TODO/FIXME comments lacking an issue tracker reference.
-- New quick fix for `always_put_doc_comments_before_annotations` — auto-moves misplaced `///` doc comments above all annotations with correct indentation. Supports bulk "Fix All" application across files.
-- New rule `prefer_doc_comment_after_annotations` (Stylistic) — inverse of `always_put_doc_comments_before_annotations`, for teams that prefer `///` doc comments adjacent to the declaration keyword rather than above annotations. Registered as a conflicting pair. Includes quick fix with bulk "Fix All" support.
-
-### Internal
-
-- Added doc-link validation to `.githooks/pre-commit` — broken or excluded-path links in shipped docs are now caught before commit, not just in CI.
-- Publish script now detects orphaned version bumps from aborted publishes at startup and offers to reset versions, preventing cascading state corruption.
-- New publish mode **9) Pub.dev only** — runs the full publish pipeline (audit, format, analyze, tests, version, commit, tag, pub.dev publish, GitHub release) but skips all extension packaging and Marketplace/Open VSX publishing. Use when the VSIX was already published separately or when only the Dart package needs a release.
-- Fixed `--fail-on error` scan test failing when error-level diagnostics exist in the fixture — test now uses `--fail-on-count 9999` to decouple exit-code assertion from project error count.
-- Fixed CI failure: `.pubignore` now excludes `doc/guides/migration_guides/` so shipped docs no longer contain dead links to `.pubignore`-excluded `plans/` proposals.
-- Fixed `check_doc_links_excluded_paths.py` not filtering out source docs that are themselves `.pubignore`-excluded — the script now skips docs under excluded prefixes instead of scanning them for link targets.
-- New `scripts/fix_ignores.py` migration tool rewrites stale `// ignore:` comments and `analysis_options.yaml` rule names from pre-rename saropa_lints rule names to their current `_extended`/`_strict`/`_with_fix` equivalents. Run `python scripts/fix_ignores.py <dir>` (dry run) or `--apply` to rewrite.
-- Publish audit now checks `CORE_DART_LINT_NAMES` freshness against the live Dart SDK linter — warns (non-blocking) if the reference set is stale.
-- New `test/integrity/core_lint_collision_test.dart` catches rule name collisions with core Dart lints during `dart test`, not only at publish time.
 
 ---
 

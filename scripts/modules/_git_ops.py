@@ -918,15 +918,36 @@ def _offer_local_publish(project_dir: Path) -> bool:
         return False
 
     print_info("Publishing locally...")
+    # Capture output so the file-tree listing dart emits does not flood the
+    # terminal and push prior history out of the scrollback buffer.
     result = subprocess.run(
         ["dart", "pub", "publish", "--force"],
         cwd=project_dir,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
         shell=get_shell_mode(),
     )
     if result.returncode == 0:
+        # Surface only the pub.dev confirmation line, not the full tree.
+        for line in (result.stdout or "").splitlines():
+            stripped = line.strip()
+            if stripped and ("Successfully uploaded" in stripped
+                            or "Published" in stripped.lower()
+                            or "pub.dev" in stripped):
+                print_info(f"  {stripped}")
         print_success("Published to pub.dev locally!")
         return True
 
+    # On failure, show the actual errors (not the tree).
+    output = (result.stdout or "") + (result.stderr or "")
+    error_lines = [
+        ln.strip() for ln in output.splitlines()
+        if ln.strip() and not ln.strip().startswith("|") and not ln.strip().startswith("'--")
+    ]
+    for line in error_lines[-20:]:
+        print_error(line)
     print_error(
         f"Local publish failed (exit {result.returncode}). "
         f"Run `dart pub publish --force` manually to see errors."
