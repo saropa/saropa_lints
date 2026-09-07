@@ -9,18 +9,50 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+/// One allowlisted constructor: the class name, the declaring library's URI
+/// (so a user-defined class that happens to share a name like `Size` is NOT
+/// silently exempted — a false negative found in review), and the maximum
+/// positional arg count the idiomatic form uses.
+typedef AllowlistedConstructor = ({
+  String className,
+  String libraryUri,
+  int maxArgs,
+});
+
 /// Well-known constructors where positional pairs are idiomatic Dart/Flutter
 /// convention and the swap risk is understood/accepted by the ecosystem.
-/// Keyed by class name; values are the minimum positional arg count that
-/// triggers the allowlist bypass (typically 2).
-const Map<String, int> allowlistedConstructors = <String, int>{
-  'Offset': 2, // Offset(dx, dy)
-  'Point': 2, // Point(x, y)
-  'Size': 2, // Size(width, height)
-  'Rect': 4, // Rect.fromLTRB(l, t, r, b)
-  'MutableRectangle': 4, // MutableRectangle(x, y, w, h)
-  'Rectangle': 4, // Rectangle(x, y, w, h)
-};
+const List<AllowlistedConstructor> allowlistedConstructors =
+    <AllowlistedConstructor>[
+      (className: 'Offset', libraryUri: 'dart:ui', maxArgs: 2), // Offset(dx, dy)
+      (className: 'Size', libraryUri: 'dart:ui', maxArgs: 2), // Size(width, height)
+      (className: 'Rect', libraryUri: 'dart:ui', maxArgs: 4), // Rect.fromLTRB(l, t, r, b)
+      (className: 'Point', libraryUri: 'dart:math', maxArgs: 2), // Point(x, y)
+      (
+        className: 'Rectangle',
+        libraryUri: 'dart:math',
+        maxArgs: 4,
+      ), // Rectangle(x, y, w, h)
+      (
+        className: 'MutableRectangle',
+        libraryUri: 'dart:math',
+        maxArgs: 4,
+      ), // MutableRectangle(x, y, w, h)
+    ];
+
+/// Returns the max positional arg count for an allowlisted constructor
+/// matching both [className] and [libraryUri], or null if not allowlisted.
+/// Matching on library URI (not just class name) prevents a user-defined
+/// class that happens to share a name like `Size` from being silently
+/// exempted from the swap-risk check.
+int? findAllowlistedMaxArgs(String? className, String libraryUri) {
+  if (className == null) return null;
+  for (final entry in allowlistedConstructors) {
+    if (entry.className == className && entry.libraryUri == libraryUri) {
+      return entry.maxArgs;
+    }
+  }
+  return null;
+}
 
 /// Extracts the positional (non-named) arguments from an [ArgumentList],
 /// preserving call-site order.
@@ -59,8 +91,11 @@ String normalizeTypeName(DartType type) {
   if (type is DynamicType) return '__dynamic';
   if (type is VoidType) return '__void';
 
-  final element = type.element;
-  final name = element?.name ?? type.getDisplayString();
+  // getDisplayString() includes type arguments (List<String> vs List<int>),
+  // unlike element?.name (bare 'List' for both) — using the bare name would
+  // silently merge two generic-collection args of incompatible element types
+  // into one confusable group, a false positive found in review.
+  final name = type.getDisplayString();
 
   // Numeric group: int, double, num are all interchangeable in many contexts
   if (type.isDartCoreInt || type.isDartCoreDouble || type.isDartCoreNum) {
@@ -76,9 +111,9 @@ String normalizeTypeName(DartType type) {
   // Object? is too broad — skip
   if (type.isDartCoreObject) return '__object';
 
-  // For all other types, use the element name so identical custom types
-  // (e.g. two Duration args, two Color args) are also caught
-  // getDisplayString() is non-nullable, so name is always a String.
+  // For all other types, use the full display string so identical custom
+  // types (e.g. two Duration args, two Color args) are also caught, while
+  // differently-parameterized generics (List<String> vs List<int>) are not.
   return name;
 }
 
@@ -94,9 +129,11 @@ List<(int, int)> findConfusableRuns(List<String> typeNames) {
   int runStart = 0;
 
   for (int i = 1; i < typeNames.length; i++) {
-    // Delegate to areTypesConfusable so the confusability definition is in
-    // one place (also exercised independently by unit tests)
-    if (areTypesConfusable(typeNames[i], typeNames[runStart])) {
+    // Compare against the immediately preceding entry (not runStart) — reads
+    // as plain adjacent-pair comparison. Delegates to areTypesConfusable so
+    // the confusability definition is in one place (also exercised
+    // independently by unit tests).
+    if (areTypesConfusable(typeNames[i], typeNames[i - 1])) {
       // Extend the current run — same confusable group
       continue;
     }

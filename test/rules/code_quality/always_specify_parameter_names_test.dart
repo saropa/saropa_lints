@@ -146,6 +146,54 @@ void main() {
     });
   });
 
+  group('findAllowlistedMaxArgs', () {
+    // Regression test for a false-negative found in review: matching on
+    // class name alone would silently exempt a user-defined class that
+    // happens to share a name with an allowlisted one.
+    test('user-defined class sharing a name is NOT allowlisted', () {
+      expect(findAllowlistedMaxArgs('Size', 'package:my_app/models.dart'), isNull);
+      expect(findAllowlistedMaxArgs('Offset', 'package:my_app/models.dart'), isNull);
+    });
+
+    test('dart:ui Offset is allowlisted with max 2 args', () {
+      expect(findAllowlistedMaxArgs('Offset', 'dart:ui'), equals(2));
+    });
+
+    test('dart:ui Size is allowlisted with max 2 args', () {
+      expect(findAllowlistedMaxArgs('Size', 'dart:ui'), equals(2));
+    });
+
+    test('dart:ui Rect is allowlisted with max 4 args', () {
+      expect(findAllowlistedMaxArgs('Rect', 'dart:ui'), equals(4));
+    });
+
+    test('dart:math Point is allowlisted with max 2 args', () {
+      expect(findAllowlistedMaxArgs('Point', 'dart:math'), equals(2));
+    });
+
+    test('dart:math Rectangle is allowlisted with max 4 args', () {
+      expect(findAllowlistedMaxArgs('Rectangle', 'dart:math'), equals(4));
+    });
+
+    test('dart:math MutableRectangle is allowlisted with max 4 args', () {
+      expect(findAllowlistedMaxArgs('MutableRectangle', 'dart:math'), equals(4));
+    });
+
+    // Right class name, wrong library — must not match (e.g. a hypothetical
+    // Point from a different package than dart:math).
+    test('right class name but wrong library is NOT allowlisted', () {
+      expect(findAllowlistedMaxArgs('Point', 'dart:ui'), isNull);
+    });
+
+    test('unknown class name is NOT allowlisted', () {
+      expect(findAllowlistedMaxArgs('Duration', 'dart:core'), isNull);
+    });
+
+    test('null class name is NOT allowlisted', () {
+      expect(findAllowlistedMaxArgs(null, 'dart:ui'), isNull);
+    });
+  });
+
   group('rule instantiation pin', () {
     // Verifies the rule can be constructed without throwing — catches
     // missing imports, wrong constructor signatures, broken LintCode, etc.

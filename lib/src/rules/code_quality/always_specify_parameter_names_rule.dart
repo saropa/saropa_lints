@@ -113,18 +113,21 @@ bool _isAllowlistedConstructor(InstanceCreationExpression node) {
   final constructorElement = node.constructorName.element;
   if (constructorElement == null) return false;
 
-  // enclosingElement.name is nullable for Element but non-null for classes;
-  // null key safely returns null from the map, so the allowlist falls through
-  final className = constructorElement.enclosingElement.name;
-  final minArgs = allowlistedConstructors[className];
-  if (minArgs == null) return false;
+  final enclosing = constructorElement.enclosingElement;
+  final className = enclosing.name;
+  // Match on library URI as well as class name — otherwise a user-defined
+  // class that happens to be named `Size`/`Offset`/etc. would be silently
+  // exempted from the swap-risk check (false negative found in review).
+  final libraryUri = enclosing.library.uri.toString();
+  final maxArgs = findAllowlistedMaxArgs(className, libraryUri);
+  if (maxArgs == null) return false;
 
   // Only allowlist when the call has at most the expected positional count —
   // unusual overloads should still be checked.
   final positionalCount = node.argumentList.arguments
       .where((arg) => arg is! NamedExpression)
       .length;
-  return positionalCount <= minArgs;
+  return positionalCount <= maxArgs;
 }
 
 /// Core detection: examines an argument list against its callee's declared

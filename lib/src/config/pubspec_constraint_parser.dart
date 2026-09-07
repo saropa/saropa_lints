@@ -279,6 +279,14 @@ class ParsedPubspec {
 }
 
 /// Section headers whose 2-space-indented children are version dependencies.
+///
+/// IMPORTANT COUPLING: this must never match `dependency_overrides:` — the
+/// main parser loop relies on that to keep override entries out of
+/// [ParsedPubspec.dependencies] (they are not the package's own declared
+/// constraints). There is no separate guard for this in the loop; widening
+/// this regex to a prefix match or adding `dependency_overrides` support
+/// here would silently leak overridden packages' loose/any constraints into
+/// `dependencies` and break every constraint-hygiene rule that reads it.
 final RegExp _depSectionHeader = RegExp(
   r'^(dependencies|dev_dependencies):\s*$',
 );
