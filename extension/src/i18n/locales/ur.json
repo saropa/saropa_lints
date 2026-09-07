@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} وارث کے بے گھر ڈیمین",
       "criticalOrphans": "🔴 {count} ورثہ دار ڈیمون(s)",
-      "openHint": "عمل صحت کو کھولنے کے لیے کلک کریں۔"
+      "openHint": "عمل صحت کو کھولنے کے لیے کلک کریں۔",
+      "systemRam": "سسٹم: {free} آزاد {total} سے",
+      "systemLow": "⚠ نظام: {free} / {total} آزاد"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} عمل ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart پروسسز {size} کے ساتھ {orphaned} کے اورفان ڈیمنز کا استعمال کر رہے ہیں۔ سیل کریں؟",
       "possibleLeak": "Saropa RSS میں مستقل طور پر اضافہ ہو رہا ہے ({size} اور اٹھ رہا ہے)۔ ممکنہ یاد کی لیک — ہیلتھ پنل کو چیک کریں۔",
-      "result": "کیلڈ {count} بے والد ڈیمنز کو مار دیا، ~{size} آزاد کر دیا"
+      "result": "کیلڈ {count} بے والد ڈیمنز کو مار دیا، ~{size} آزاد کر دیا",
+      "systemLowMemory": "آپ کی ماشین پر صرف {free} ہی {total} RAM فری ہے۔ غیر استعمال ہونے والے ونڈوز یا ایپلیکیشنز بند کرنے کا سوچیں۔",
+      "analysisServerLarge": "Dart تجزیہ سرور {size} استعمال کر رہا ہے۔ اسے مفت میموری پر دوبارہ شروع کریں؟",
+      "sessionStartLow": "آپ کی ماشین پر {free} ہر ہر {total} RAM خالی ہے۔ کام شروع کرنے سے پہلے استعمال نہ کیے گئے VS Code ونڈوز یا Ollama میڈلز بند کریں۔"
     },
     "action": {
       "cleanUp": "کلین اپ",
       "openPanel": "ہیلتھ پینل کھولیں",
       "dismiss": "برطرفی۔",
       "optimizeAnalysis": "تحلیل کو اپ ٹوڈیٹ کریں",
-      "dontShowAgain": "دوبارہ نہ دکھائیں"
+      "dontShowAgain": "دوبارہ نہ دکھائیں",
+      "openMachineDashboard": "میشین ہیلتھ کھولیں",
+      "restartAnalysisServer": "دوبارہ شروع کریں اور پھر سے شروع کریں۔"
     },
     "cleanup": {
       "noOrphans": "کوئی چھوڑے گئے ڈیمُن نہیں ملا۔",
@@ -749,6 +756,55 @@
       "kill": "کلیک /نومتھنک",
       "killed": "مروی",
       "killFailed": "ناکام"
+    }
+  },
+  "machineDashboard": {
+    "title": "ماشین ہیلتھ",
+    "refresh": "ريفريش",
+    "systemUnknown": "سسٹم یادگیری کو اس پلیٹ فارم پر پڑھنا ناممکن ہے",
+    "platformUnsupported": "ماشین ہیلتھ ونڈوز کی ضرورت ہے — پروسس کوئریز اس پلیٹ فارم پر دستیاب نہیں ہیں۔",
+    "freeOf": "آزاد",
+    "used": "استعمال کیا گیا",
+    "recommendationsTitle": "اپنی سفارشات",
+    "recommendationsNone": "مسئلہ نہیں ملا",
+    "noProcesses": "کوئی Dart، Flutter یا میڈل-ہوست پروسس چلا رہے ہیں۔",
+    "orphanCount": "{count} چھوڑ دیا گیا",
+    "kill": "کلیک /نومتھنک",
+    "group": {
+      "analysisServer": "Dart تحلیل سرورس",
+      "flutterDaemon": "Flutter ڈیمونز",
+      "saropa": "Saropa Lints",
+      "otherDart": "دیگر Dart پروسسز",
+      "modelHost": "ترجمہ ہند (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "صرف {free} ہے {total} RAM میں فری ماشین وسیع ہے۔ غیر استعمال کی ہوئی ایپلیکیشنز یا VS Code ونڈوز بند کریں۔",
+      "orphansFound": "{count} اکثریت کے بے گھر پروسس(س) پہلے سیشن سے {size} یادگیری کے ذریعے ہیں۔",
+      "analysisServerLarge": "{count} Dart تجزیہ سرور عمل (es) {size} تک استعمال کر رہے ہیں۔ دوبارہ اسٹارٹ میموری کو جاری کرتا ہے۔",
+      "multipleAnalysisServers": "{count} Dart سرور تحليل کر رہے ہیں — اکثر ہر اپنے VS Code پنجرے پر ہوتے ہیں جو ایک دوسرے پر چھوٹے پروجیکٹس کے ساتھ ہیں۔",
+      "noHeapCap": "Dart تحلیل سرور کے ذخیرہ اِنکار کی حد تعریف نہیں کی گئی ہے۔ ایک تعریف کرنا سب سے خراب صورت حال کی نمو کو محدود کرے گا۔",
+      "modelLoaded": "مڈل \"{model}\" ترجمہ انجن میں لوڈ ہوچکا ہے، {size} کا استعمال کرتے ہوئے۔",
+      "budgetOverspend": "ڈیو ٹولز نے سسٹم RAM کا {used}% استعمال کر لیا ہے ({size})، جو {budget}% بجٹ سے زیادہ ہے۔ ناکارہ VS Code ونڈوز بند کریں یا ترجمہ میڈل کو ڈیٹا ہٹا دیں۔"
+    },
+    "action": {
+      "reclaim": "برآورد کریں",
+      "restartAnalysisServer": "دوبارہ شروع کریں اور پھر سے شروع کریں۔",
+      "setHeapCap": "سیٹ کاپ",
+      "unloadModel": "نکال کرے"
+    },
+    "heapCap": {
+      "prompt": "تحلیل سرور ہیپ کی کپ کی سیم (مثلاً 4096)",
+      "invalid": "0 سے بڑا ایک ہیلیو بائٹ کی ہول نمبر دیں",
+      "applied": "ایکسیلیزیشن سرور کی ہیپ کی کپ کو {mb} MB تک رکھیں۔ اس کا عمل ہونے کے لیے ایکسیلیزیشن سرور کو دوبارہ شروع کریں۔",
+      "restartNow": "نیو سٹارٹ"
+    },
+    "unload": {
+      "succeeded": "نام نامی میڈل \"{model}\" نکال دیا گیا۔",
+      "failed": "مڈل \"{model}\" کو اتارنا ناممکن ہے — اولاما CLI پیٹھ پر نہیں ہو سکتا۔"
+    },
+    "budget": {
+      "title": "ڈیو ٹول بجٹ",
+      "value": "{used}% از {budget}% ہدف ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "کسی بھی چھوڑے ہوئے نظرانداز کمیٹس کا ذکر نہیں ملا۔",
       "found": "{count} غلطیاں چھوڑ دی گئی ہیں {fileCount} فائل(یں) میں۔ تفصیلات کے لیے مسائل پنل دیکھیں۔",
       "fixed": "غیر فعال نظریہ چھوڑ دیے گئے ہیں۔ تفصیلات کے لیے اخراجات پنل دیکھیں۔",
-      "fixedInFile": "Saropa Lints: اس فائل میں یہ نظریہ تبدیل کر دیا گیا ہے"
+      "fixedInFile": "Saropa Lints: اس فائل میں یہ نظریہ تبدیل کر دیا گیا ہے",
+      "alreadyRunning": "ایک گھٹی ہوئی چیک کر رہے ہیں۔"
     },
     "confirm": {
       "fixMessage": "یہ تھوڑا سا تبدیلی کرے گا جو آپ کے ذریعہ ذخیرہ کیے گئے ہیں۔ تبدیلیاں گٹ کے ذریعہ واپس کی جا سکتی ہیں۔ جاری رکھیں؟",
@@ -2553,18 +2610,26 @@
       "message": "غیر فعال چھوڑ دیا گیا: قاعدہ '{ruleName}' اس خط پر اب نہیں چل رہا۔"
     },
     "sidebar": {
-      "fixLabel": "ستال ایگنرنس ترمیم کریں",
-      "fixDescription": "مردہ کا پتہ لگائیں اور خودکار طور پر ہٹا دیں // نظر انداز کریں: تبصرے۔"
+      "fixLabel": "کٹھا نظر انداز کر دیتا ہے",
+      "fixDescription": "ڈیڈ // چھوڑ دیں: کامنٹس /نومور ڈیٹا کو تلاش کریں اور اتار دیں"
     },
     "quickFix": {
       "title": "اس فائل میں گھبرائی ہوئی نظریات ترمیم کریں"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "تجزيي هلائو",
+      "runAnalysisDescription": "ڈیٹا اینالائیزr دوبارہ کریں",
+      "updateConfigLabel": "کانفیگ اپڈیٹ کریں",
+      "updateConfigDescription": "تحلیل اختیاریں معاوضہ یا تازہ کریں"
+    },
     "status": {
       "hotspotsLabel": "ہوٹ ہوٹس · {percent}% ریویو کیا گیا",
       "hotspotsDescription": "{open} کھولیں",
-      "lastRunLabel": "آخری اجرا · {ago}"
+      "lastRunLabel": "آخری اجرا · {ago}",
+      "machineHealthLabel": "ماشین ہیلتھ",
+      "machineHealthDescription": "RAM، وارثانہ اور ترجمہ ڈیٹا ہر چیز کے لیے میکھیں پر موجود ہے"
     },
     "dashboards": {
       "commandCatalogLabel": "ہر کمینڈ...",

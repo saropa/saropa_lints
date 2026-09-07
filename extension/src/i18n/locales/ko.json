@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} 버려진 데몬(s)",
       "criticalOrphans": "🔴 {count} 버려진 데몬(s)",
-      "openHint": "프로세스 헬스를 열려면 클릭하세요"
+      "openHint": "프로세스 헬스를 열려면 클릭하세요",
+      "systemRam": "시스템: {free}의 {total} 무료",
+      "systemLow": "⚠ 시스템: {free} 중 {total} 무료"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} 프로세스( {size} RSS )",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart 프로세스는 {size}를 사용하여 {orphaned} 오라phan 데몬을 실행 중입니다. 정리하시겠습니까?",
       "possibleLeak": "Saropa RSS는 꾸준히 상승하고 있습니다 ({size} 및 상승 중). 가능한 메모리 누수 — 건강 패널을 확인하세요.",
-      "result": "{count}를 종료하고, {size}개의 오레孤儿 데몬을 해제했습니다."
+      "result": "{count}를 종료하고, {size}개의 오레孤儿 데몬을 해제했습니다.",
+      "systemLowMemory": "당신의 기계는 {free} 중 {total} RAM이 무료로 남아 있습니다. 사용하지 않는 창이나 애플리케이션을 닫아 보세요.",
+      "analysisServerLarge": "Dart 분석 서버는 {size}를 사용하고 있습니다. 메모리 해제를 위해 다시 시작하시겠습니까?",
+      "sessionStartLow": "당신의 기계는 {free}의 {total} RAM이 자유로워 있습니다. 작업을 시작하기 전에 사용하지 않는 VS Code 창이나 Ollama 모델을 닫는 것을 고려해 주세요."
     },
     "action": {
       "cleanUp": "정리하기",
       "openPanel": "오픈 헬스 패널",
       "dismiss": "해고 처분",
       "optimizeAnalysis": "분석 최적화",
-      "dontShowAgain": "다시 보지 않기"
+      "dontShowAgain": "다시 보지 않기",
+      "openMachineDashboard": "기계 건강 열기",
+      "restartAnalysisServer": "다시 시작해서 재시작을 해보세요."
     },
     "cleanup": {
       "noOrphans": "삭제된 데몬 없음.",
@@ -749,6 +756,55 @@
       "kill": "죽이다",
       "killed": "죽음",
       "killFailed": "실패"
+    }
+  },
+  "machineDashboard": {
+    "title": "기계 건강",
+    "refresh": "신선하고 상쾌한 느낌을 줍니다.",
+    "systemUnknown": "이 플랫폼에서 시스템 메모리가 읽혀지지 않았습니다.",
+    "platformUnsupported": "머신 헬스는 윈도우가 필요합니다 — 이 플랫폼에서는 프로세스 쿼리가 사용할 수 없습니다.",
+    "freeOf": "무료한",
+    "used": "사용됨",
+    "recommendationsTitle": "추천사항",
+    "recommendationsNone": "문제가 발견되지 않았습니다.",
+    "noProcesses": "Dart, Flutter, 또는 model-host 프로세스가 실행 중이지 않습니다.",
+    "orphanCount": "{count} 버려짐",
+    "kill": "죽이다",
+    "group": {
+      "analysisServer": "Dart 분석 서버",
+      "flutterDaemon": "Flutter 데몬",
+      "saropa": "Saropa Lints",
+      "otherDart": "기타 Dart 프로세스",
+      "modelHost": "번역 엔진 (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "{free} 중 {total} RAM이 전체적으로 사용 가능합니다. 사용하지 않는 애플리케이션을 닫거나 VS Code 창을 닫아주세요.",
+      "orphansFound": "{count} 버려진 프로세스(들)가 이전 세션에서 {size}의 메모리를 차지하고 있습니다.",
+      "analysisServerLarge": "{count} Dart 분석 서버 프로세스(들)는 {size}까지 사용 중입니다. 재시작은 메모리를 해제합니다.",
+      "multipleAnalysisServers": "{count} Dart 분석 서버가 실행 중입니다 — 중복된 프로젝트에서 열린 VS Code 창당해 각각 하나씩 실행 중일 가능성이 큽니다.",
+      "noHeapCap": "Dart 분석 서버는 메모리 제한이 설정되지 않았습니다. 설정하면 최악의 성장이 제한됩니다.",
+      "modelLoaded": "모델 \"{model}\"는 번역 엔진에서 {size}를 사용하여 로드되었습니다.",
+      "budgetOverspend": "디바이스 도구는 시스템 RAM의 {used}% ({size})를 사용 중으로, {budget}% 예산을 초과했습니다. 사용하지 않는 VS Code 창을 닫거나 번역 모델을 언로드하세요."
+    },
+    "action": {
+      "reclaim": "복구",
+      "restartAnalysisServer": "다시 시작해서 재시작을 해보세요.",
+      "setHeapCap": "설정 제한",
+      "unloadModel": "언로드"
+    },
+    "heapCap": {
+      "prompt": "분석 서버 힙 제한 (MB, 예: 4096)",
+      "invalid": "0보다 큰 정수 메가바이트를 입력하세요.",
+      "applied": "분석 서버 힙 크기 제한을 {mb} MB로 설정합니다. 분석 서버를 다시 시작해야 적용됩니다.",
+      "restartNow": "지금 재시작"
+    },
+    "unload": {
+      "succeeded": "비로소 모델 \"{model}\"이 언로드되었습니다.",
+      "failed": "모델 \"{model}\"을 언로드할 수 없습니다 — Ollama CLI가 PATH에 있지 않을 수 있습니다."
+    },
+    "budget": {
+      "title": "디브 도구 예산",
+      "value": "{used}%의 {budget}% 목표({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "스테일 무시 주석이 발견되지 않았습니다.",
       "found": "{count} 파일에서 {fileCount} 개의 stale ignore가 있습니다. 자세한 내용은 Problems 패널을 참조하세요.",
       "fixed": "사용하지 않는 무시 주석이 제거되었습니다. 자세한 내용은 출력 패널을 확인하세요.",
-      "fixedInFile": "Saropa Lints: 이 파일에서 무시된 항목이 해결되었습니다"
+      "fixedInFile": "Saropa Lints: 이 파일에서 무시된 항목이 해결되었습니다",
+      "alreadyRunning": "스테일-아이gnore 스캔이 이미 실행 중입니다."
     },
     "confirm": {
       "fixMessage": "이 작업은 소스 파일에서 오래된 무시 주석을 제거합니다. 변경 내용은 git을 통해 되돌릴 수 있습니다. 계속하시겠습니까?",
@@ -2553,18 +2610,26 @@
       "message": "무효한 무시: 규칙 '{ruleName}'은 이 줄에서 더 이상 작동하지 않습니다."
     },
     "sidebar": {
-      "fixLabel": "무시된 항목 정리",
-      "fixDescription": "사용자 정의 // 무시: 주석을 감지하고 자동으로 제거합니다"
+      "fixLabel": "무시하는",
+      "fixDescription": "사용 중인 // ignore: 주석을 자동으로 찾고 제거해 주세요"
     },
     "quickFix": {
       "title": "이 파일의 오래된 무시 목록 수정"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "분석을 실행하여 분석을 수행합니다.",
+      "runAnalysisDescription": "분석기 다시 실행",
+      "updateConfigLabel": "설정 업데이트",
+      "updateConfigDescription": "분석 옵션 초기화 또는 새로고침"
+    },
     "status": {
       "hotspotsLabel": "핫스팟 · {percent}% 검토",
       "hotspotsDescription": "{open} 열기",
-      "lastRunLabel": "마지막 실행 · {ago}"
+      "lastRunLabel": "마지막 실행 · {ago}",
+      "machineHealthLabel": "기계 건강",
+      "machineHealthDescription": "전체 기계에 걸친 RAM, 고아 및 번역 엔진"
     },
     "dashboards": {
       "commandCatalogLabel": "모든 명령어…",

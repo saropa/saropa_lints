@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} 已弃用的守护进程(进程)",
       "criticalOrphans": "🔴 {count} 孤儿守护进程(进程)",
-      "openHint": "单击打开进程运行状况"
+      "openHint": "单击打开进程运行状况",
+      "systemRam": "系统：{free} / {total} 免费",
+      "systemLow": "⚠ 系统：{free} / {total} 个免费"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints：{count}个进程({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart进程正在使用{size}带有{orphaned}孤儿守护进程。清理一下？",
       "possibleLeak": "Saropa RSS 正在稳步上升（{size} 并且持续增长）。可能存在内存泄漏 — 检查健康面板。",
-      "result": "已终止 {count} 个孤儿守护进程，释放了 ~{size} 空间"
+      "result": "已终止 {count} 个孤儿守护进程，释放了 ~{size} 空间",
+      "systemLowMemory": "您的机器仅有 {free} 的 {total} 内存可用。请考虑关闭未使用的窗口或程序。",
+      "analysisServerLarge": "一个 Dart 分析服务器正在使用 {size}。重启它以释放内存？",
+      "sessionStartLow": "您的机器有 {free} 的 {total} 内存可用。在开始工作前，请考虑关闭未使用的 VS Code 窗口或 Ollama 模型。"
     },
     "action": {
       "cleanUp": "清理",
       "openPanel": "打开健康面板",
       "dismiss": "解雇了,这是一个很好的方法.",
       "optimizeAnalysis": "优化分析",
-      "dontShowAgain": "不再显示"
+      "dontShowAgain": "不再显示",
+      "openMachineDashboard": "打开机器健康",
+      "restartAnalysisServer": "重启重新开始"
     },
     "cleanup": {
       "noOrphans": "未发现孤立的守护进程。",
@@ -749,6 +756,55 @@
       "kill": "杀死",
       "killed": "已终止",
       "killFailed": "失败"
+    }
+  },
+  "machineDashboard": {
+    "title": "机器健康",
+    "refresh": "让人感到清爽,使自己得到新鲜感.",
+    "systemUnknown": "此平台无法读取系统内存。",
+    "platformUnsupported": "机器健康需要 Windows —— 此平台不支持进程查询。",
+    "freeOf": "免费的",
+    "used": "使用",
+    "recommendationsTitle": "推荐建议",
+    "recommendationsNone": "未发现任何问题。",
+    "noProcesses": "没有Dart、Flutter或model-host进程在运行。",
+    "orphanCount": "{count} 孤儿",
+    "kill": "杀死",
+    "group": {
+      "analysisServer": "Dart 分析服务器",
+      "flutterDaemon": "Flutter 守护进程",
+      "saropa": "Saropa Lints",
+      "otherDart": "其他 Dart 进程",
+      "modelHost": "翻译引擎（Ollama）"
+    },
+    "recommendation": {
+      "systemLowMemory": "仅 {free} / {total} 内存可用。关闭未使用的应用程序或 VS Code 窗口。",
+      "orphansFound": "{count} 未被回收的进程(们)正在占用 {size} 内存，这些内存来自之前的会话。",
+      "analysisServerLarge": "{count} Dart 分析服务器进程（process）正在使用最多 {size}。重启可以释放内存。",
+      "multipleAnalysisServers": "{count} Dart分析服务器正在运行 —— 可能每个打开的VS Code窗口对应一个，在重叠的项目上。",
+      "noHeapCap": "Dart分析服务器没有配置内存上限。设置一个可限制最坏情况下的增长。",
+      "modelLoaded": "模型\"{model}\"已加载到翻译引擎中，使用{size}。",
+      "budgetOverspend": "开发工具正在使用 {used}% 的系统内存 ({size})，超过了 {budget}% 的预算。关闭未使用的 VS Code 窗口或卸载翻译模型。"
+    },
+    "action": {
+      "reclaim": "收回",
+      "restartAnalysisServer": "重启重新开始",
+      "setHeapCap": "设置上限",
+      "unloadModel": "卸载"
+    },
+    "heapCap": {
+      "prompt": "分析服务器堆内存上限（以MB为单位）（例如：4096）",
+      "invalid": "输入一个大于0的整数兆字节",
+      "applied": "设置分析服务器堆内存上限为 {mb} MB。重启分析服务器以使更改生效。",
+      "restartNow": "立即重启"
+    },
+    "unload": {
+      "succeeded": "已卸载模型 \"{model}\"",
+      "failed": "无法卸载模型 \"{model}\" —— Ollama CLI 可能未在 PATH 中。"
+    },
+    "budget": {
+      "title": "Dev Tool 预算",
+      "value": "{used}% 的 {budget}% 目标 ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "未找到过期的忽略注释。",
       "found": "{count} 个已忽略的 stale 项在 {fileCount} 个文件中。详情请查看 Problems 面板。",
       "fixed": "已移除过期的忽略注释。详情请查看输出面板。",
-      "fixedInFile": "Saropa Lints: 本文件中已修复过期的忽略项"
+      "fixedInFile": "Saropa Lints: 本文件中已修复过期的忽略项",
+      "alreadyRunning": "一个 stale-ignore 扫描已经在运行。"
     },
     "confirm": {
       "fixMessage": "这将从您的源文件中删除过期的忽略注释。更改可以通过 git 撤销。继续吗？",
@@ -2553,18 +2610,26 @@
       "message": "过时的忽略：规则 '{ruleName}' 此行不再触发。"
     },
     "sidebar": {
-      "fixLabel": "修复过时的忽略项",
-      "fixDescription": "检测并自动删除死掉的 // ignore: 注释"
+      "fixLabel": "修剪忽略",
+      "fixDescription": "查找并自动删除死掉的 // ignore: 注释"
     },
     "quickFix": {
       "title": "修复此文件中过时的忽略项"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "运行分析,进行分析.",
+      "runAnalysisDescription": "重新运行分析器",
+      "updateConfigLabel": "更新配置",
+      "updateConfigDescription": "初始化或刷新分析选项"
+    },
     "status": {
       "hotspotsLabel": "热点 · {percent}% 评审",
       "hotspotsDescription": "{open} 打开",
-      "lastRunLabel": "上次运行 · {ago}"
+      "lastRunLabel": "上次运行 · {ago}",
+      "machineHealthLabel": "机器健康",
+      "machineHealthDescription": "RAM，孤儿进程及翻译引擎在整个机器上"
     },
     "dashboards": {
       "commandCatalogLabel": "所有命令…",

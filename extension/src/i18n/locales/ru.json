@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} орфанованные демон(ы)",
       "criticalOrphans": "🔴 {count} орфанных демонов",
-      "openHint": "Нажмите, чтобы открыть Процесс Здоровье"
+      "openHint": "Нажмите, чтобы открыть Процесс Здоровье",
+      "systemRam": "Система: {free} из {total} свободных",
+      "systemLow": "⚠ Система: {free} из {total} свободных"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} процесс(ов) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart процессы используют {size} с {orphaned} орфанными демонами. Очистить?",
       "possibleLeak": "Saropa RSS стабильно растёт ({size} и растёт). Возможная утечка памяти — проверьте панель состояния.",
-      "result": "Убиты {count} орфанные демоны, освобождено ~{size}"
+      "result": "Убиты {count} орфанные демоны, освобождено ~{size}",
+      "systemLowMemory": "Ваш компьютер имеет только {free} из {total} оперативной памяти. Рассмотрите возможность закрытия ненужных окон или приложений.",
+      "analysisServerLarge": "Анализатор Dart использует {size}. Перезапустите его, чтобы освободить память?",
+      "sessionStartLow": "Ваш компьютер имеет {free} из {total} свободной оперативной памяти. Рассмотрите возможность закрытия ненужных окон VS Code или моделей Ollama перед началом работы."
     },
     "action": {
       "cleanUp": "Очистить",
       "openPanel": "Открыть панель здоровья",
       "dismiss": "Отпустить с работы.",
       "optimizeAnalysis": "Оптимизировать Анализ",
-      "dontShowAgain": "Не показывать снова"
+      "dontShowAgain": "Не показывать снова",
+      "openMachineDashboard": "Открыть состояние машины",
+      "restartAnalysisServer": "Перезагрузить, перезапустив."
     },
     "cleanup": {
       "noOrphans": "Нет найденных орфанов дэмонов.",
@@ -749,6 +756,55 @@
       "kill": "Убить",
       "killed": "Убит",
       "killFailed": "Ошибка"
+    }
+  },
+  "machineDashboard": {
+    "title": "Машинный здоровье",
+    "refresh": "Освежите и освежайте.",
+    "systemUnknown": "На этой платформе не удалось прочитать системную память.",
+    "platformUnsupported": "Машина Health требует Windows — запросы процесса недоступны на этой платформе.",
+    "freeOf": "бесплатный",
+    "used": "использовано",
+    "recommendationsTitle": "Рекомендации",
+    "recommendationsNone": "Нет обнаруженных проблем.",
+    "noProcesses": "Нет запущенных процессов Dart, Flutter или model-host.",
+    "orphanCount": "{count} орфанед",
+    "kill": "Убить",
+    "group": {
+      "analysisServer": "Анализаторы Dart",
+      "flutterDaemon": "Flutter Демоны",
+      "saropa": "Saropa Lints",
+      "otherDart": "Другие Dart процессы",
+      "modelHost": "Система перевода (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Только {free} из {total} RAM свободно в системе. Закройте ненужные приложения или VS Code окна.",
+      "orphansFound": "{count} процессы, оставленные без родителей, держат {size} памяти из более ранней сессии.",
+      "analysisServerLarge": "Процесс(ы) сервера анализа {count} Dart используют до {size}. Перезапуск освобождает память.",
+      "multipleAnalysisServers": "{count} Dart анализаторы запущены — вероятно, один на каждый открытый VS Code окно на перекрывающихся проектах.",
+      "noHeapCap": "Анализатор Dart не имеет настроенной памяти. Установка ограничения на память ограничит максимальный рост.",
+      "modelLoaded": "Модель \"{model}\" загружена в движок перевода, используя {size}.",
+      "budgetOverspend": "Dev tools используют {used}% от системной памяти RAM ({size}), превышая бюджет {budget}%. Закройте ненужные окна VS Code или сбросьте модели перевода."
+    },
+    "action": {
+      "reclaim": "Восстановить",
+      "restartAnalysisServer": "Перезагрузить, перезапустив.",
+      "setHeapCap": "Установить лимит",
+      "unloadModel": "Снять"
+    },
+    "heapCap": {
+      "prompt": "Анализ сервера кучи в МБ (например, 4096)",
+      "invalid": "Введите целое число мегабайт, большее 0.",
+      "applied": "Установите лимит кучи анализатора в {mb} МБ. Перезапустите анализатор, чтобы изменения вступили в силу.",
+      "restartNow": "Перезапустить сейчас"
+    },
+    "unload": {
+      "succeeded": "Несанкционированная модель \"{model}\"",
+      "failed": "Не удалось снять модель \"{model}\" — Ollama CLI, возможно, не в PATH."
+    },
+    "budget": {
+      "title": "Бюджет инструментов разработки",
+      "value": "{used}% из {budget}% целей ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "Нет найденных устаревших комментариев ignore.",
       "found": "{count} устаревшие игноры в {fileCount} файл(ах). См. панель Problems для деталей.",
       "fixed": "Устаревшие комментарии ignore удалены. См. панель вывода для деталей.",
-      "fixedInFile": "Saropa Lints: устаревшие игноры исправлены в этом файле"
+      "fixedInFile": "Saropa Lints: устаревшие игноры исправлены в этом файле",
+      "alreadyRunning": "Сканирование stale-ignore уже запущено."
     },
     "confirm": {
       "fixMessage": "Это удалит устаревшие комментарии ignore из ваших исходных файлов. Изменения можно отменить с помощью git. Продолжить?",
@@ -2553,18 +2610,26 @@
       "message": "Сталые игнор: правило '{ruleName}' больше не срабатывает на этой строке."
     },
     "sidebar": {
-      "fixLabel": "Исправить устаревшие игноры",
-      "fixDescription": "Обнаруживать и автоматически удалять мертвые // ignore: комментарии"
+      "fixLabel": "Удалить игнорирует",
+      "fixDescription": "Найдите и автоматически удалите мертвые // ignore: комментарии"
     },
     "quickFix": {
       "title": "Исправить устаревшие игноры в этом файле"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Запустите анализ, выполните анализы.",
+      "runAnalysisDescription": "Повторно запустить анализатор",
+      "updateConfigLabel": "Обновить конфиг",
+      "updateConfigDescription": "Инициализировать или обновить параметры анализа"
+    },
     "status": {
       "hotspotsLabel": "Горячие точки · {percent}% проверено",
       "hotspotsDescription": "{open} открыть",
-      "lastRunLabel": "Последнее выполнение · {ago}"
+      "lastRunLabel": "Последнее выполнение · {ago}",
+      "machineHealthLabel": "Машинный здоровье",
+      "machineHealthDescription": "RAM, илиphans & переводной движок по всей машине"
     },
     "dashboards": {
       "commandCatalogLabel": "Все команды…",

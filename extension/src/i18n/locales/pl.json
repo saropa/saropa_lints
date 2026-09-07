@@ -679,13 +679,15 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} daemon(s) wypalone",
       "criticalOrphans": "🔴 {count} daemon(s) wyrzucony /nie_zadziala",
-      "openHint": "Kliknij, aby otworzyć Zdrowie Procesu"
+      "openHint": "Kliknij, aby otworzyć Zdrowie Procesu",
+      "systemRam": "System: {free} z {total} darmowych",
+      "systemLow": "⚠ System: {free} z {total} wolnych"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proces(y) ({size} RSS)",
       "saropaProcessEntry": "  {label}  {size}",
       "saropaHealthy": "Saropa Lints: {count} proces(y) ({size} RSS) ✓",
-      "sparkline": "RSS trend: {chart}",
+      "sparkline": "Trend RSS: {chart}",
       "otherSection": "Inne procesy Dart: {count} ({size} RSS)",
       "otherProcessEntry": "  {label}  {size}",
       "otherHint": "Serwer analizy {count} wykryty — zamknij niepotrzebne okna VS Code",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Procesy Dart używają {size} z orfankami {orphaned}. Czy czyszczyć?",
       "possibleLeak": "Założenia ścisłe:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown ani cudzysłowów otaczających.\n3. Tekst może zawierać tokeny zamiennikowe: tokeny zamiennikowe. Skopiuj każdy z nich do tłumaczenia WŁAŚNIE tak, jak został napisany, w poprawnej gramatycznie pozycji. Nigdy nie tłumaczą, usuwaj ani zmieniaj token.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Saropa RSS rośnie stabilnie ({size} i rośnie). Możliwy wyciek pamięci — sprawdź panel zdrowia.",
-      "result": "Zabito {count} daemonów orfankich, zwolniono ~{size}"
+      "result": "Zabito {count} daemonów orfankich, zwolniono ~{size}",
+      "systemLowMemory": "Twoj komputer ma tylko {free} z {total} RAM w wolnym stanie. Rozważ zamknięcie niepotrzebnych okien lub aplikacji.",
+      "analysisServerLarge": "Serwer analizy Dart używa {size}. Restartuj go, aby zwolnić pamięć?",
+      "sessionStartLow": "Twoj komputer ma {free} z dostępnej pamięci RAM {total}. Rozważ zamknięcie niepotrzebnych okien VS Code lub modeli Ollama przed rozpoczęciem pracy."
     },
     "action": {
       "cleanUp": "Czysta Przestrzeń",
       "openPanel": "Otwórz Panel Zdrowia",
       "dismiss": "Zwolnienie z pracy.",
       "optimizeAnalysis": "Optymalizuj Analizę",
-      "dontShowAgain": "Nie Pokazuj Ponownie"
+      "dontShowAgain": "Nie Pokazuj Ponownie",
+      "openMachineDashboard": "Otwórz Stan Maszyny",
+      "restartAnalysisServer": "Następnie ponownie uruchom."
     },
     "cleanup": {
       "noOrphans": "Brak niezarejestrowanych daemonów.",
@@ -749,6 +756,55 @@
       "kill": "Zabij",
       "killed": "Zabity",
       "killFailed": "Niepowodzenie"
+    }
+  },
+  "machineDashboard": {
+    "title": "Zdrowie Maszyny",
+    "refresh": "Odświeżaj i oddychaj.",
+    "systemUnknown": "System pamięci operacyjnej nie można odczytać w tym systemie operacyjnym.",
+    "platformUnsupported": "Zdrowie maszyny wymaga systemu Windows — zapytania o procesy nie są dostępne na tej platformie.",
+    "freeOf": "bez",
+    "used": "użyty",
+    "recommendationsTitle": "Rekomendacje",
+    "recommendationsNone": "Brak problemów.",
+    "noProcesses": "Brak procesów Dart, Flutter lub model-host.",
+    "orphanCount": "{count} niezwiązany",
+    "kill": "Zabij",
+    "group": {
+      "analysisServer": "Serwery analizy Dart",
+      "flutterDaemon": "Flutter Daemony",
+      "saropa": "Saropa Lints",
+      "otherDart": "Inne procesy Dart",
+      "modelHost": "Silne Reguły:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown lub cudzysłowów otaczających.\n3. Tekst może zawierać tokeny placeholder: tokeny placeholder. Skopiuj każdy z nich do tłumaczenia IDEALNIE jak napisany, w poprawnej gramatycznej pozycji. Nigdy nie tłumacza, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Silnik Tłumaczenia (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Tylko {free} z {total} RAM jest wolne w całym systemie. Zamknij niepotrzebne aplikacje lub VS Code okna.",
+      "orphansFound": "{count} procesy (procesów) niezwiązane są trzymanie {size} pamięci z wcześniejszej sesji.",
+      "analysisServerLarge": "Proces(y) serwera analizy {count} Dart zużywa(a) do {size}. Uruchomienie ponowne zwolni pamięć.",
+      "multipleAnalysisServers": "Serwery analizy {count} Dart są uruchomione — prawdopodobnie jeden na otwarty VS Code okno na projektach nakładających się.",
+      "noHeapCap": "Serwer analizy Dart nie ma skonfigurowanej górnej granicy pamięci. Ustawienie jej ogranicza maksymalny wzrost w najgorszym przypadku.",
+      "modelLoaded": "Model \"{model}\" jest wczytywany w silniku tłumaczenia, używając {size}.",
+      "budgetOverspend": "Narzędzia deweloperskie używają {used}% pamięci RAM ({size}), co przekracza budżet {budget}%. Zamknij niepotrzebne okna VS Code lub odładować modele tłumaczenia."
+    },
+    "action": {
+      "reclaim": "Zwolnij",
+      "restartAnalysisServer": "Następnie ponownie uruchom.",
+      "setHeapCap": "Ustaw limit",
+      "unloadModel": "Odczekiwanie"
+    },
+    "heapCap": {
+      "prompt": "Limit stogu pamięci serwera analizy w MB (np. 4096)",
+      "invalid": "Wprowadź całkowitą liczbę megabajtów większą niż 0.",
+      "applied": "Ustaw limit stosu serwera analizy na {mb} MB. Uruchom ponownie serwer analizy, aby zmiana weszła w życie.",
+      "restartNow": "Uruchom ponownie teraz"
+    },
+    "unload": {
+      "succeeded": "Model \"{model}\" został odładowany.",
+      "failed": "Nie można odzładować modelu \"{model}\" — Ollama CLI może nie być w PATH."
+    },
+    "budget": {
+      "title": "Dev Tool Budżet",
+      "value": "{used}% z {budget}% celu ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "Brak znaleziono zaneglowanych komentarzy ignorowania.",
       "found": "{count} nieuwzględnione ignorowane w {fileCount} plikach. Zobacz panel Problemy dla szczegółów.",
       "fixed": "Usunięto stare komentarze ignorujące. Zobacz panel Wyjścia dla szczegółów.",
-      "fixedInFile": "Saropa Lints: zignorowane stale naprawione w tym pliku"
+      "fixedInFile": "Saropa Lints: zignorowane stale naprawione w tym pliku",
+      "alreadyRunning": "Skanowanie stale-ignore już się uruchomiono."
     },
     "confirm": {
       "fixMessage": "Usunie to stare komentarze ignorujące z plików źródłowych. Zmiany można cofnąć za pomocą git. Czy kontynuować?",
@@ -2553,18 +2610,26 @@
       "message": "Ignorujesz regułę: reguła '{ruleName}' nie wykrywa już tego wiersza."
     },
     "sidebar": {
-      "fixLabel": "Popraw nieaktualne ignorowane",
-      "fixDescription": "Wykryj i automatycznie usuń martwe // ignore: komentarze"
+      "fixLabel": "Prune ignoruje",
+      "fixDescription": "Znajdź i automatycznie usuń martwe // ignore: komentarze"
     },
     "quickFix": {
       "title": "Popraw nieaktualne ignorowane w tym pliku"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Przeprowadź analizę, przeprowadzić analizę.",
+      "runAnalysisDescription": "Przeanalizuj ponownie analizator",
+      "updateConfigLabel": "Aktualizuj konfigurację",
+      "updateConfigDescription": "Inicjalizuj lub odśwież opcje analizy"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% przeglądnął",
       "hotspotsDescription": "{open} otwórz",
-      "lastRunLabel": "Poprzednie uruchomienie · {ago}"
+      "lastRunLabel": "Poprzednie uruchomienie · {ago}",
+      "machineHealthLabel": "Zdrowie Maszyny",
+      "machineHealthDescription": "RAM, orfany & silnik tłumaczenia po całym komputerze"
     },
     "dashboards": {
       "commandCatalogLabel": "Wszystkie polecenia…",

@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} daemon(s) ที่ถูกทอดทิ้ง",
       "criticalOrphans": "🔴 {count} daemon(s) ที่ถูกทอดทิ้ง",
-      "openHint": "คลิกเพื่อเปิดความสมบูรณ์ของกระบวนการ"
+      "openHint": "คลิกเพื่อเปิดความสมบูรณ์ของกระบวนการ",
+      "systemRam": "ระบบ: {free} จาก {total} ฟรี",
+      "systemLow": "⚠ ระบบ: {free} จาก {total} ฟรี"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} กระบวนการ(ๆ) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "กระบวนการ Dart กำลังใช้ {size} กับ daemon ที่ถูกทอดทิ้ง {orphaned} ทำความสะอาดหรือ?",
       "possibleLeak": "Saropa RSS กำลังเพิ่มขึ้นอย่างมั่นคง ({size} และเพิ่มขึ้น) อาจมีการรั่วของข้อมูลในหน่วยความจำ — ตรวจสอบแผงสุขภาพ",
-      "result": "กำจัด {count} กระบวนการที่ไม่มีผู้ปกครอง ปลดปล่อย ~{size}"
+      "result": "กำจัด {count} กระบวนการที่ไม่มีผู้ปกครอง ปลดปล่อย ~{size}",
+      "systemLowMemory": "เครื่องของคุณมี RAM ที่ว่างอยู่เพียง {free} จาก {total} เท่านั้น โปรดพิจารณาปิดหน้าต่างหรือแอปที่ไม่ได้ใช้งาน",
+      "analysisServerLarge": "เซิร์ฟเวอร์การวิเคราะห์ Dart กำลังใช้ {size} อยู่ ต้องการรีสตาร์ทเพื่อปลดปล่อยหน่วยความจำ?",
+      "sessionStartLow": "เครื่องของคุณมี {free} ของ {total} RAM ว่าง โปรดพิจารณาปิดหน้าต่าง VS Code ที่ไม่ได้ใช้หรือโมเดล Ollama ก่อนเริ่มทำงาน"
     },
     "action": {
       "cleanUp": "ทำความสะอาด",
       "openPanel": "เปิดแผงสุขภาพ",
       "dismiss": "ขอยกเลิกการทํางาน",
       "optimizeAnalysis": "ปรับปรุงการวิเคราะห์",
-      "dontShowAgain": "อย่าแสดงอีกต่อไป"
+      "dontShowAgain": "อย่าแสดงอีกต่อไป",
+      "openMachineDashboard": "เปิดเครื่องมือตรวจสอบสุขภาพ",
+      "restartAnalysisServer": "Restart การเริ่มต้นใหม่"
     },
     "cleanup": {
       "noOrphans": "ไม่พบ daemon ที่ถูกทอดทิ้ง",
@@ -749,6 +756,55 @@
       "kill": "ลบ",
       "killed": "ถูกสังหาร",
       "killFailed": "ล้มเหลว"
+    }
+  },
+  "machineDashboard": {
+    "title": "สุขภาพเครื่องมือ",
+    "refresh": "สะดวกสบาย Refresh",
+    "systemUnknown": "ระบบความจำไม่สามารถอ่านได้บนแพลตฟอร์มนี้",
+    "platformUnsupported": "เครื่องมือตรวจสอบสุขภาพต้องการ Windows — ไม่มีการสอบถามข้อมูลกระบวนการในแพลตฟอร์มนี้",
+    "freeOf": "ฟรีของ",
+    "used": "ใช้",
+    "recommendationsTitle": "คำแนะนำ",
+    "recommendationsNone": "ไม่มีปัญหาใดๆ พบ",
+    "noProcesses": "ไม่มีกระบวนการ Dart, Flutter หรือ model-host ที่ทำงานอยู่",
+    "orphanCount": "{count} ทิ้งไว้ข้างหลัง",
+    "kill": "ลบ",
+    "group": {
+      "analysisServer": "เซิร์ฟเวอร์การวิเคราะห์ Dart",
+      "flutterDaemon": "Flutter Daemon",
+      "saropa": "Saropa Lints",
+      "otherDart": "กระบวนการอื่น ๆ Dart",
+      "modelHost": "เครื่องมือแปลภาษา (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "มี RAM จำนวน {free} จากทั้งหมด {total} ที่ว่างอยู่ทั่วเครื่อง ปิดแอปที่ไม่ได้ใช้งานหรือ VS Code หน้าต่าง",
+      "orphansFound": "กระบวนการที่ถูกทอดทิ้ง ({count}) กำลังยึดครองหน่วยความจำ {size} จากการประชุมก่อนหน้านี้",
+      "analysisServerLarge": "กระบวนการวิเคราะห์เซิร์ฟเวอร์ {count} Dart กำลังใช้หน่วยความจำสูงสุดถึง {size}  การรีสตาร์ทจะปล่อยหน่วยความจำ",
+      "multipleAnalysisServers": "เซิร์ฟเวอร์การวิเคราะห์ {count} Dart กำลังทำงาน — น่าจะมีหนึ่งต่อหน้าต่าง VS Code ที่เปิดอยู่ในโครงการที่ทับซ้อนกัน",
+      "noHeapCap": "เซิร์ฟเวอร์การวิเคราะห์ Dart ไม่มีการกำหนดค่าขีดจำกัดความจำ กำหนดค่าขีดจำกัดจะช่วยควบคุมการเติบโตในกรณีแย่สุด",
+      "modelLoaded": "โมเดล \"{model}\" ถูกโหลดในเครื่องมือแปล ใช้ {size}",
+      "budgetOverspend": "เครื่องมือพัฒนาใช้หน่วยความจำ RAM ของระบบอยู่ที่ {used}% ({size}) ซึ่งเกินวงเงินที่กำหนดไว้ที่ {budget}% ปิดหน้าต่าง VS Code ที่ไม่ได้ใช้หรือปลดโมเดลการแปลออก"
+    },
+    "action": {
+      "reclaim": "คืนค่า",
+      "restartAnalysisServer": "Restart การเริ่มต้นใหม่",
+      "setHeapCap": "ตั้งค่าขีดจำกัด",
+      "unloadModel": "ยกเลิกการโหลด"
+    },
+    "heapCap": {
+      "prompt": "การจำกัดขนาดหน่วยความจำของเซิร์ฟเวอร์การวิเคราะห์ใน MB (เช่น 4096)",
+      "invalid": "กรอกจำนวนเมกะไบต์ที่เป็นจำนวนเต็มและมากกว่า 0",
+      "applied": "ตั้งค่าขนาดหน่วยความจำของเซิร์ฟเวอร์การวิเคราะห์เป็น {mb} MB ปิดและเปิดใหม่เซิร์ฟเวอร์การวิเคราะห์เพื่อให้การเปลี่ยนแปลงมีผล",
+      "restartNow": "เริ่มต้นใหม่ตอนนี้"
+    },
+    "unload": {
+      "succeeded": "โมเดล \"{model}\" ถูกยกเลิกการโหลดแล้ว",
+      "failed": "ไม่สามารถปลดโหลดโมเดล \"{model}\" ได้ — อาจเป็นไปได้ว่า Ollama CLI ไม่ได้อยู่ใน PATH"
+    },
+    "budget": {
+      "title": "เครื่องมือพัฒนาเครื่องมือประมาณการงบ",
+      "value": "{used}% ของ {budget}% ที่ตั้งเป้าหมาย ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "ไม่พบข้อความการละเลยการระบุไว้แล้ว",
       "found": "{count} ไฟล์ที่มีการละเลย (ignore) อยู่ {fileCount} ไฟล์ See Problems panel สำหรับรายละเอียด",
       "fixed": "คำสั่งการละเว้นที่ไม่ได้ใช้ถูกลบไปแล้ว ดูรายละเอียดในแผงผลลัพธ์",
-      "fixedInFile": "Saropa Lints: กฎการละเว้นที่ไม่ได้รับการอัปเดตถูกแก้ไขในไฟล์นี้"
+      "fixedInFile": "Saropa Lints: กฎการละเว้นที่ไม่ได้รับการอัปเดตถูกแก้ไขในไฟล์นี้",
+      "alreadyRunning": "การสแกน stale-ignore อยู่ในระหว่างการดำเนินการแล้ว"
     },
     "confirm": {
       "fixMessage": "ข้อความนี้จะลบความคิดเห็นการละเว้นที่ไม่จำเป็นออกจากไฟล์แหล่งข้อมูลของคุณ การเปลี่ยนแปลงสามารถยกเลิกได้ด้วย git ต้องการดำเนินการต่อหรือไม่",
@@ -2553,18 +2610,26 @@
       "message": "กฎการละเว้นที่ไม่ได้ใช้: กฎ '{ruleName}' ไม่ได้ทำงานบนบรรทัดนี้อีกต่อไป"
     },
     "sidebar": {
-      "fixLabel": "แก้ไขการละเลยที่ไม่ได้ใช้แล้ว",
-      "fixDescription": "ตรวจจับและลบอัตโนมัติ // ละเว้น: ความคิดเห็น"
+      "fixLabel": "ตัดแต่งข้าม",
+      "fixDescription": "ค้นหาและลบอัตโนมัติคอมเมนต์ // ignore: ที่ไม่จำเป็น"
     },
     "quickFix": {
       "title": "แก้ไขการละเลยที่ไม่สมควรในไฟล์นี้"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "วิ่งวิเคราะห์ Run Analysis การวัด",
+      "runAnalysisDescription": "วิเคราะห์ซ้ำ",
+      "updateConfigLabel": "อัปเดตคอนฟิก",
+      "updateConfigDescription": "กำหนดค่าหรืออัปเดตตัวเลือกการวิเคราะห์"
+    },
     "status": {
       "hotspotsLabel": "จุดร้อน · {percent}% รีวิวแล้ว",
       "hotspotsDescription": "{open} เปิด",
-      "lastRunLabel": "ครั้งที่แล้ว · {ago}"
+      "lastRunLabel": "ครั้งที่แล้ว · {ago}",
+      "machineHealthLabel": "สุขภาพเครื่องมือ",
+      "machineHealthDescription": "RAM, ผู้ไม่มีผู้ปกครอง และเครื่องมือแปลภาษาทั่วทั้งเครื่อง"
     },
     "dashboards": {
       "commandCatalogLabel": "ทุกคำสั่ง…",

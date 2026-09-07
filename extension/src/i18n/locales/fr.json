@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} daemon(s) orphelin(s)",
       "criticalOrphans": "🔴 {count} daemon(s) orphelin(s)",
-      "openHint": "Cliquez pour ouvrir Process Health"
+      "openHint": "Cliquez pour ouvrir Process Health",
+      "systemRam": "Système : {free} sur {total} gratuit",
+      "systemLow": "⚠ Système : {free} sur {total} gratuit"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints : {count} processus ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart processes sont utilisés avec {size} et {orphaned} daemons orphelins. Nettoyer ?",
       "possibleLeak": "Saropa RSS monte de façon constante ({size} et monte). Possible fuite de mémoire — vérifiez le panneau de santé.",
-      "result": "Daemons orphelins {count} tués, ~{size} libérés"
+      "result": "Daemons orphelins {count} tués, ~{size} libérés",
+      "systemLowMemory": "Votre machine dispose seulement de {free} d’octets sur {total} de RAM libre. Considérez la fermeture des fenêtres ou applications inutilisées.",
+      "analysisServerLarge": "Un serveur d'analyse Dart utilise {size}. Redémarrer pour libérer de la mémoire ?",
+      "sessionStartLow": "Votre machine dispose de {free} d’octets de mémoire RAM libres sur {total}. Considérez la fermeture des fenêtres VS Code inutilisées ou des modèles Ollama avant de commencer votre travail."
     },
     "action": {
       "cleanUp": "Nettoyer",
       "openPanel": "Ouvrir le panneau de santé",
       "dismiss": "Le licenciement est annulé.",
       "optimizeAnalysis": "Optimiser l'analyse",
-      "dontShowAgain": "Ne plus afficher à nouveau"
+      "dontShowAgain": "Ne plus afficher à nouveau",
+      "openMachineDashboard": "Ouvrir la santé de l'ordinateur",
+      "restartAnalysisServer": "Le redémarrage est à refaire."
     },
     "cleanup": {
       "noOrphans": "Aucun daemon orphelin trouvé.",
@@ -749,6 +756,55 @@
       "kill": "Tuer",
       "killed": "Tué",
       "killFailed": "Échec"
+    }
+  },
+  "machineDashboard": {
+    "title": "Santé du système",
+    "refresh": "Actualiser",
+    "systemUnknown": "Le mémoire système ne peut pas être lue sur cette plateforme.",
+    "platformUnsupported": "Santé du système requiert Windows — les requêtes de processus ne sont pas disponibles sur cette plateforme.",
+    "freeOf": "libre de",
+    "used": "utilisé",
+    "recommendationsTitle": "Recommandations",
+    "recommendationsNone": "Aucun problème détecté.",
+    "noProcesses": "Aucun processus Dart, Flutter ou model-host en cours d'exécution.",
+    "orphanCount": "{count} orphelin",
+    "kill": "Tuer",
+    "group": {
+      "analysisServer": "Serveurs d'analyse Dart",
+      "flutterDaemon": "Démons Flutter",
+      "saropa": "Saropa Lints",
+      "otherDart": "Autres processus Dart",
+      "modelHost": "Traducteur (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Seule {free} de {total} RAM est libre à l'échelle du système. Fermez les applications inutilisées ou VS Code fenêtres.",
+      "orphansFound": "{count} processus orphelin(s) retiennent {size} d'espace mémoire d'une session précédente.",
+      "analysisServerLarge": "Processus de serveur d'analyse {count} Dart utilise jusqu'à {size}. Un redémarrage libère la mémoire.",
+      "multipleAnalysisServers": "Serveurs d'analyse {count} Dart en cours d'exécution — probablement un par fenêtre VS Code ouverte sur des projets superposés.",
+      "noHeapCap": "Le serveur d'analyse Dart n'a pas de plafond de mémoire configuré. Définir un plafond limite la croissance dans le pire des cas.",
+      "modelLoaded": "Le modèle \"{model}\" est chargé dans l' moteur de traduction, en utilisant {size}.",
+      "budgetOverspend": "Les outils de développement utilisent {used}% de la mémoire RAM du système ({size}), ce qui dépasse le budget de {budget}%. Fermez les fenêtres VS Code inutilisées ou désactivez les modèles de traduction."
+    },
+    "action": {
+      "reclaim": "Recouvrer",
+      "restartAnalysisServer": "Le redémarrage est à refaire.",
+      "setHeapCap": "Fixer la limite",
+      "unloadModel": "Désinstaller"
+    },
+    "heapCap": {
+      "prompt": "Limite de la mémoire (heap) du serveur d'analyse en Mo (par exemple 4096)",
+      "invalid": "Entrez un nombre entier de mégaoctets supérieur à 0.",
+      "applied": "Fixer la capacité de la mémoire tampon du serveur d'analyse à {mb} Mo. Redémarrer le serveur d'analyse pour que les modifications soient prises en compte.",
+      "restartNow": "Redémarrer maintenant"
+    },
+    "unload": {
+      "succeeded": "Modèle \"{model}\" désactivé.",
+      "failed": "Impossible de décharger le modèle \"{model}\" — la CLI Ollama peut ne pas être dans le PATH."
+    },
+    "budget": {
+      "title": "Budget des outils de développement",
+      "value": "{used}% de {budget}% cible ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "Aucun commentaire d'ignoration périmé trouvé.",
       "found": "{count} ignors périmés dans {fileCount} fichier(s). Voir le panneau Problèmes pour plus de détails.",
       "fixed": "Commentaires d'ignoration périmés supprimés. Voir le panneau de sortie pour plus de détails.",
-      "fixedInFile": "Saropa Lints : les ignorés périmés ont été corrigés dans ce fichier"
+      "fixedInFile": "Saropa Lints : les ignorés périmés ont été corrigés dans ce fichier",
+      "alreadyRunning": "Un scan stale-ignore est déjà en cours."
     },
     "confirm": {
       "fixMessage": "Cela supprimera les commentaires d'ignorance périmés de vos fichiers sources. Les modifications peuvent être annulées avec git. Continuer ?",
@@ -2553,18 +2610,26 @@
       "message": "Règle '{ruleName}' ignorée : cette règle ne s'applique plus sur cette ligne."
     },
     "sidebar": {
-      "fixLabel": "Corriger les ignorés périmés",
-      "fixDescription": "Détecter et supprimer automatiquement les commentaires // ignore: morts"
+      "fixLabel": "Prune ignore",
+      "fixDescription": "Trouver et supprimer automatiquement les commentaires // ignore: morts"
     },
     "quickFix": {
       "title": "Corriger les ignorés périmés dans ce fichier"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Executer l'analyse",
+      "runAnalysisDescription": "Re-lancer l'analyseur",
+      "updateConfigLabel": "Mettre à jour la configuration",
+      "updateConfigDescription": "Initialiser ou actualiser les options d'analyse"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% revu",
       "hotspotsDescription": "{open} ouvrir",
-      "lastRunLabel": "Dernière exécution · {ago}"
+      "lastRunLabel": "Dernière exécution · {ago}",
+      "machineHealthLabel": "Santé du système",
+      "machineHealthDescription": "RAM, orphelins & moteur de traduction sur l'ensemble de la machine"
     },
     "dashboards": {
       "commandCatalogLabel": "Toutes les commandes…",

@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} daemon(s) ya kifalaki",
       "criticalOrphans": "🔴 {count} daemon(s) ya kifalaki",
-      "openHint": "Bofya ili kufungua Mchakato wa Afya"
+      "openHint": "Bofya ili kufungua Mchakato wa Afya",
+      "systemRam": "System: {free} ya {total} kwa kuanza",
+      "systemLow": "⚠ Sistema: {free} ya {total} kati"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} prosesu ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Mipaka ya Dart ina kuzungumza na {size} kulingana na mipaka ya daemons ya {orphaned}. Kupata kushindua?",
       "possibleLeak": "Saropa RSS inakwenda kwa muda muda ({size} na kubeba). Moyo ya kuzalishia matokeo — tafuta paneli ya health.",
-      "result": "Killed {count} daemons ya mwalimu, freed ~{size}"
+      "result": "Killed {count} daemons ya mwalimu, freed ~{size}",
+      "systemLowMemory": "Machingi yako ina mabadiliko ya {free} ya {total} RAM. Tafakari kuzalisha windows au applications ya kufaniki.",
+      "analysisServerLarge": "A server ya analysis ya Dart ina kuzalishia {size}. Tafakari kuzalishia ili kuzalishia memory?",
+      "sessionStartLow": "Machingi yako ina {free} ya {total} RAM inayotolea. Tafakari kuzalisha kipengele ya VS Code ya kufikia au Ollama models kabla ya kuanza kazi."
     },
     "action": {
       "cleanUp": "Tuzalisha",
       "openPanel": "Unganisha Panel ya Uzalishaji",
       "dismiss": "Fungua kazi.",
       "optimizeAnalysis": "Tambua Analizi",
-      "dontShowAgain": "Hakikisha Upeleka Tumia Kwa Muda Mmoja"
+      "dontShowAgain": "Hakikisha Upeleka Tumia Kwa Muda Mmoja",
+      "openMachineDashboard": "Fungua Afya ya Mashine",
+      "restartAnalysisServer": "Anzisha upya tena kwa kuanza upya."
     },
     "cleanup": {
       "noOrphans": "Hakuna daemons ya kihofu.",
@@ -749,6 +756,55 @@
       "kill": "Kifungua",
       "killed": "Kuuawa",
       "killFailed": "Mwisho"
+    }
+  },
+  "machineDashboard": {
+    "title": "Unganishaji wa Machinga",
+    "refresh": "Kufanya kazi kwa njia ya burudani.",
+    "systemUnknown": "Hakikisha matokeo ya kipanda kwa kipanda hiki.",
+    "platformUnsupported": "Unganishaji wa Machinga inahitajika Windows — matokeo ya matokeo ya mafunzo huzungumzika katika platform hii.",
+    "freeOf": "safii ya",
+    "used": "iliseli",
+    "recommendationsTitle": "Maelezo ya kujaribu",
+    "recommendationsNone": "Hakuna miongoni mengine.",
+    "noProcesses": "Hakuna Dart, Flutter, au michezo ya host kozalishwa.",
+    "orphanCount": "{count} ya kifalme",
+    "kill": "Kifungua",
+    "group": {
+      "analysisServer": "Unganishaji wa Server ya Dart",
+      "flutterDaemon": "Mashetani ya Flutter",
+      "saropa": "Saropa Lints",
+      "otherDart": "Mipaka Mengine ya Dart Others",
+      "modelHost": "Mwongozo wa Kifungu (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Kati ya {free} ya {total} RAM ina kufika kwa mlangoni. Tumia kuzalisha programu ambayo inaweza kushuka au VS Code windows.",
+      "orphansFound": "{count} mchakato mwingi (m) wanaongeza {size} ya memory kutoka kwa muda mwa session ya kiliopita.",
+      "analysisServerLarge": "Mipaka ya server ya analysis ya {count} Dart inapakia kwa kutoa kwa {size}. Kukurusha kusababisha kutoa kwa memory.",
+      "multipleAnalysisServers": "Ungizaji wa {count} Dart wa analysis wanaofungua — sio kwa kutoa kwa kila VS Code window ya kuzalishia kwa project kama wakati.",
+      "noHeapCap": "Server ya analizi ya Dart haikuwa na miongoni mwa mali. Kusetisha miongoni mwa mali kusababisha kuzalishia kuzalishia kwa kipindi kikubwa.",
+      "modelLoaded": "Modeli \"{model}\" inapakia katika engine ya kutoa, kwa kutumia {size}.",
+      "budgetOverspend": "Mwongozo ya kifedha ina kuzalishia {used}% ya RAM ya sistem ({size}), inapungua kwa kipato ya {budget}%. Tumia kuzalisha kipato ya VS Code ya kifedha ya kwanza au kuzalisha model ya kifedha."
+    },
+    "action": {
+      "reclaim": "Kupungua",
+      "restartAnalysisServer": "Anzisha upya tena kwa kuanza upya.",
+      "setHeapCap": "Weka Cap",
+      "unloadModel": "Ondoa"
+    },
+    "heapCap": {
+      "prompt": "Kapu ya heap ya server ya analysis (mbadala ya 4096)",
+      "invalid": "Tuma namba ya kipindani ya megabytes ya kati ya 0.",
+      "applied": "Tuma kipengele cha heap ya server ya analysis kwenye {mb} MB. Tumia server ya analysis yenye kipengele kwa kufanya kutoa.",
+      "restartNow": "Tumia Kali ya Siku"
+    },
+    "unload": {
+      "succeeded": "Modeli iliyofunguka \"{model}\".",
+      "failed": "Hakikisha modeli \"{model}\" hakutumika — Ollama CLI bado hakutumika katikati ya PATH."
+    },
+    "budget": {
+      "title": "Tool ya Ushauri ya Dev",
+      "value": "%{used} ya %{budget} ya matokeo ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "Hakuna matokeo ya komenti ya ignore ya kufungua.",
       "found": "{count} matokeo ya kusimamia kwa kuzalisha (s) katika {fileCount} faili (s). Tafuta paneli ya Problems kwa detali.",
       "fixed": "Komenti ya ignore ya kipengele kifukuzwa. Tafuta matokeo kwenye paneli ya Output.",
-      "fixedInFile": "Saropa Lints: matokeo ya kushughulisha ya kuzalishwa katika faili hii"
+      "fixedInFile": "Saropa Lints: matokeo ya kushughulisha ya kuzalishwa katika faili hii",
+      "alreadyRunning": "Kuzingia kwa scan ya stale-ignore uliokokotana."
     },
     "confirm": {
       "fixMessage": "Hii inaondosha komento ya ignore ya kipasifika kutoka kwenye faili zako ya michezo. Mabadiliko haya inaweza kubadilishwa na git. Je, unaweza kubegani?",
@@ -2553,18 +2610,26 @@
       "message": "Stale ignore: rule '{ruleName}' hakuna kufanya kwenye linia hii."
     },
     "sidebar": {
-      "fixLabel": "Tuzaliwa kwa kuzalisha ignores ya kipengele",
-      "fixDescription": "Tazama na ongeza kusilisisha komento // ignore:"
+      "fixLabel": "Prune hupuuza",
+      "fixDescription": "Tazama na auto-ondoa komento // ignore: kozalishwa"
     },
     "quickFix": {
       "title": "Tumeua kifungu kwenye faili hili"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Run uchambuzi kukimbia.",
+      "runAnalysisDescription": "Rudia kichanganuzi",
+      "updateConfigLabel": "Tuma config",
+      "updateConfigDescription": "Inisiatia au refresh analysis options"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% zimepitiwa",
       "hotspotsDescription": "{open} kifungu",
-      "lastRunLabel": "Jina la kwanza · {ago}"
+      "lastRunLabel": "Jina la kwanza · {ago}",
+      "machineHealthLabel": "Unganishaji wa Machinga",
+      "machineHealthDescription": "RAM, watoto yatima na injini ya tafsiri kwenye mashine nzima"
     },
     "dashboards": {
       "commandCatalogLabel": "Wote matokeo…",

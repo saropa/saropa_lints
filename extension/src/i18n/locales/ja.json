@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} 廃棄されたデーモン(s)",
       "criticalOrphans": "🔴 {count} 廃棄されたデーモン(s)",
-      "openHint": "クリックしてプロセスヘルスを開く"
+      "openHint": "クリックしてプロセスヘルスを開く",
+      "systemRam": "システム: {free} / {total} が無料",
+      "systemLow": "⚠ システム: {free} / {total} が空いています"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} プロセス(es) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dartプロセスは{size}を使用して{orphaned}の孤児デーモンを使用しています。クリーンアップ？",
       "possibleLeak": "Saropa RSS は順調に上昇しています（{size} と上昇中）。メモリリークの可能性 — ヘルスパネルを確認してください。",
-      "result": "{count}の孤児デーモンを終了し、~{size}を解放しました"
+      "result": "{count}の孤児デーモンを終了し、~{size}を解放しました",
+      "systemLowMemory": "あなたのマシンには {free} だけの {total} RAM が空いています。不要なウィンドウまたはアプリケーションを閉じることを検討してください。",
+      "analysisServerLarge": "Dart分析サーバーは{size}を使用しています。メモリを解放するために再起動しますか？",
+      "sessionStartLow": "あなたのマシンには {free} が {total} の RAM が空いています。作業を開始する前に、使用していない VS Code ウィンドウや Ollama モデルを閉じることを検討してください。"
     },
     "action": {
       "cleanUp": "クリーンアップ",
       "openPanel": "ヘルスパネルを開く",
       "dismiss": "解雇処分について",
       "optimizeAnalysis": "分析を最適化",
-      "dontShowAgain": "もう一度表示しない"
+      "dontShowAgain": "もう一度表示しない",
+      "openMachineDashboard": "オープン マシン ヘルス",
+      "restartAnalysisServer": "再起動してリスタートします."
     },
     "cleanup": {
       "noOrphans": "孤児のデーモンは見つかりません。",
@@ -749,6 +756,55 @@
       "kill": "キル",
       "killed": "殺された",
       "killFailed": "失敗"
+    }
+  },
+  "machineDashboard": {
+    "title": "機械の健康",
+    "refresh": "爽やかにリフレッシュする.",
+    "systemUnknown": "このプラットフォームではシステムメモリが読み取れません。",
+    "platformUnsupported": "マシンヘルスはWindowsが必要です — このプラットフォームではプロセスクエリが利用できません。",
+    "freeOf": "フリーの",
+    "used": "使用済み",
+    "recommendationsTitle": "推奨事項",
+    "recommendationsNone": "問題は見つかりません。",
+    "noProcesses": "Dart、Flutter、またはmodel-hostプロセスが実行されていません。",
+    "orphanCount": "{count} 遺棄された",
+    "kill": "キル",
+    "group": {
+      "analysisServer": "Dart分析サーバー",
+      "flutterDaemon": "Flutter デーモン",
+      "saropa": "Saropa Lints",
+      "otherDart": "その他 Dart プロセス",
+      "modelHost": "翻訳エンジン（Ollama）"
+    },
+    "recommendation": {
+      "systemLowMemory": "のみ {free} の {total} RAM が機械全体で空いています。不要なアプリケーションを閉じたり、 VS Code ウィンドウを閉じたりしてください。",
+      "orphansFound": "{count}の孤立プロセスが、以前のセッションから{size}のメモリを保持しています。",
+      "analysisServerLarge": "{count} Dart アナリシスサーバー プロセス(たち)は {size} まで使用しています。再起動によりメモリが解放されます。",
+      "multipleAnalysisServers": "分析サーバー {count} Dart が実行中 — 重なったプロジェクトごとにオープンしている VS Code ウィンドウごとにおそらく1つずつ。",
+      "noHeapCap": "Dart分析サーバーにはメモリの上限が設定されていません。設定することで最悪の成長を制限できます。",
+      "modelLoaded": "モデル「{model}」は翻訳エンジンで{size}を使用してロードされています。",
+      "budgetOverspend": "開発ツールはシステムRAMの{used}%（{size}）を使用しており、{budget}%の予算を超過しています。不要なVS Codeウィンドウを閉じたり、翻訳モデルをアンロードしてください。"
+    },
+    "action": {
+      "reclaim": "リカイン",
+      "restartAnalysisServer": "再起動してリスタートします.",
+      "setHeapCap": "設定上限",
+      "unloadModel": "アンロード"
+    },
+    "heapCap": {
+      "prompt": "分析サーバーのヒープ容量（MB）（例: 4096）",
+      "invalid": "0より大きい整数のメガバイトを入力してください。",
+      "applied": "分析サーバーのヒープ容量を{mb}MBに設定してください。分析サーバーを再起動して有効にしてください。",
+      "restartNow": "即時再開"
+    },
+    "unload": {
+      "succeeded": "非負荷モデル「{model}」",
+      "failed": "モデル「{model}」をアンロードできませんでした — Ollama CLIがPATHにない可能性があります。"
+    },
+    "budget": {
+      "title": "開発ツール予算",
+      "value": "{used}% の {budget}% 目標 ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "古い無視コメントが見つかりません。",
       "found": "{count} で ignore しているものが {fileCount} にあります。詳細は Problems パネルをご覧ください。",
       "fixed": "非活性化された無視コメントが削除されました。詳細は出力パネルをご確認ください。",
-      "fixedInFile": "Saropa Lints: このファイルで無視リストが更新されました"
+      "fixedInFile": "Saropa Lints: このファイルで無視リストが更新されました",
+      "alreadyRunning": "既にstale-ignoreスキャンが実行中です。"
     },
     "confirm": {
       "fixMessage": "これは、ソースファイルから古くなった無視コメントを削除します。変更はgitで元に戻せます。続行しますか？",
@@ -2553,18 +2610,26 @@
       "message": "無効な無視: ルール '{ruleName}' はこの行ではもう発火しません。"
     },
     "sidebar": {
-      "fixLabel": "不適な無視を修正",
-      "fixDescription": "死んだ // ignore: コメントを検出して自動的に削除する"
+      "fixLabel": "不要な を切り捨てる",
+      "fixDescription": "非表示の// ignore:コメントを自動で検出・削除する"
     },
     "quickFix": {
       "title": "このファイルの古くなった無視設定を修正してください"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "分析を実行する.",
+      "runAnalysisDescription": "再実行分析",
+      "updateConfigLabel": "設定を更新",
+      "updateConfigDescription": "分析オプションを初期化または再構成する"
+    },
     "status": {
       "hotspotsLabel": "ホットスポット・{percent}%がレビューしました",
       "hotspotsDescription": "{open} 開く",
-      "lastRunLabel": "先ほどの実行 · {ago}"
+      "lastRunLabel": "先ほどの実行 · {ago}",
+      "machineHealthLabel": "機械の健康",
+      "machineHealthDescription": "RAM、孤児と翻訳エンジン全体のマシン"
     },
     "dashboards": {
       "commandCatalogLabel": "すべてのコマンド…",

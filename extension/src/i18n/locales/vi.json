@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} tiến trình daemon bị bỏ rơi",
       "criticalOrphans": "🔴 {count} daemon(s) bị bỏ rơi",
-      "openHint": "Nhấp để mở Tình trạng quy trình"
+      "openHint": "Nhấp để mở Tình trạng quy trình",
+      "systemRam": "Hệ thống: {free} của {total} miễn phí",
+      "systemLow": "⚠ Hệ thống: {free} của {total} miễn phí"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} quy trình(es) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Các quy trình Dart đang sử dụng {size} với các daemon bị bỏ rơi {orphaned}. Dọn dẹp?",
       "possibleLeak": "Saropa RSS đang tăng dần ổn định ({size} và đang tăng). Có thể có rò rỉ bộ nhớ — kiểm tra bảng trạng thái sức khỏe.",
-      "result": "Đã giết {count} tiến trình daemon bị bỏ rơi, giải phóng ~{size}"
+      "result": "Đã giết {count} tiến trình daemon bị bỏ rơi, giải phóng ~{size}",
+      "systemLowMemory": "Máy tính của bạn chỉ còn {free} trong số {total} RAM trống. Hãy cân nhắc đóng các cửa sổ hoặc ứng dụng không sử dụng.",
+      "analysisServerLarge": "Một máy chủ phân tích Dart đang sử dụng {size}. Khởi động lại để giải phóng bộ nhớ?",
+      "sessionStartLow": "Máy tính của bạn có {free} RAM trống của {total}. Xem xét việc đóng các cửa sổ VS Code không sử dụng hoặc các mô hình Ollama trước khi bắt đầu làm việc."
     },
     "action": {
       "cleanUp": "Làm Sạch",
       "openPanel": "Mở bảng điều khiển Sức khỏe",
       "dismiss": "Thả bỏ việc làm",
       "optimizeAnalysis": "Tối ưu Hóa Phân Tích",
-      "dontShowAgain": "Không Hiển Thị Lại"
+      "dontShowAgain": "Không Hiển Thị Lại",
+      "openMachineDashboard": "Mở Trạng thái Máy",
+      "restartAnalysisServer": "Khởi động lại khởi động lại."
     },
     "cleanup": {
       "noOrphans": "Không tìm thấy daemon nào bị bỏ rơi.",
@@ -749,6 +756,55 @@
       "kill": "Giết",
       "killed": "bị giết",
       "killFailed": "Thất bại"
+    }
+  },
+  "machineDashboard": {
+    "title": "Tình trạng máy",
+    "refresh": "Thức mới và làm mới",
+    "systemUnknown": "Không thể đọc bộ nhớ hệ thống trên nền tảng này.",
+    "platformUnsupported": "Trạng thái máy tính yêu cầu Windows — truy vấn tiến trình không khả dụng trên nền tảng này.",
+    "freeOf": "miễn phí",
+    "used": "đã sử dụng",
+    "recommendationsTitle": "Khuyến nghị",
+    "recommendationsNone": "Không có lỗi nào được phát hiện.",
+    "noProcesses": "Không có quy trình Dart, Flutter hoặc model-host nào đang chạy.",
+    "orphanCount": "{count} mồ côi",
+    "kill": "Giết",
+    "group": {
+      "analysisServer": "Máy chủ phân tích Dart",
+      "flutterDaemon": "Daemon Flutter",
+      "saropa": "Saropa Lints",
+      "otherDart": "Các quy trình khác Dart",
+      "modelHost": "Engine Dịch (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Chỉ có {free} trong số {total} RAM là miễn phí toàn bộ hệ thống. Đóng các ứng dụng không sử dụng hoặc VS Code cửa sổ.",
+      "orphansFound": "{count} quá trình bị bỏ rơi đang chiếm dụng {size} bộ nhớ từ một phiên trước đó.",
+      "analysisServerLarge": "{count} quá trình xử lý máy chủ phân tích Dart đang sử dụng lên đến {size}. Một lần khởi động lại sẽ giải phóng bộ nhớ.",
+      "multipleAnalysisServers": "Các máy chủ phân tích {count} Dart đang chạy — có thể một cái cho mỗi cửa sổ VS Code mở trên các dự án chồng chéo.",
+      "noHeapCap": "Phân tích máy chủ Dart không có giới hạn bộ nhớ được cấu hình. Thiết lập một giới hạn sẽ làm giảm sự phát triển tối đa.",
+      "modelLoaded": "Mô hình \"{model}\" được tải vào bộ máy dịch, sử dụng {size}.",
+      "budgetOverspend": "Công cụ dev đang sử dụng {used}% bộ nhớ RAM hệ thống ({size}), vượt quá ngân sách {budget}%. Đóng các cửa sổ VS Code không cần thiết hoặc hủy tải các mô hình dịch."
+    },
+    "action": {
+      "reclaim": "Khôi phục",
+      "restartAnalysisServer": "Khởi động lại khởi động lại.",
+      "setHeapCap": "Đặt Cap",
+      "unloadModel": "Gỡ cài đặt"
+    },
+    "heapCap": {
+      "prompt": "Giới hạn bộ nhớ heap của máy chủ phân tích (MB) (ví dụ: 4096)",
+      "invalid": "Nhập một số nguyên dương lớn hơn 0 theo megabytes.",
+      "applied": "Đặt giới hạn bộ nhớ heap của máy chủ phân tích thành {mb} MB. Khởi động lại máy chủ phân tích để thay đổi có hiệu lực.",
+      "restartNow": "Khởi động lại ngay"
+    },
+    "unload": {
+      "succeeded": "Mô hình \"{model}\" đã được gỡ khỏi bộ nhớ.",
+      "failed": "Không thể gỡ bỏ mô hình \"{model}\" — Ollama CLI có thể không nằm trong PATH."
+    },
+    "budget": {
+      "title": "Ngân sách dành cho công cụ phát triển",
+      "value": "{used}% của {budget}% mục tiêu ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "Không tìm thấy bất kỳ bình luận bỏ qua nào.",
       "found": "{count} lỗi bỏ qua (stale ignore) trong {fileCount} tệp (file). Xem bảng điều khiển Problems để biết chi tiết.",
       "fixed": "Nhận xét bỏ qua lỗi đã bị xóa. Xem bảng điều khiển Đầu ra để xem chi tiết.",
-      "fixedInFile": "Saropa Lints: các ignores lỗi đã được sửa trong tệp này"
+      "fixedInFile": "Saropa Lints: các ignores lỗi đã được sửa trong tệp này",
+      "alreadyRunning": "Một lần quét stale-ignore đang chạy."
     },
     "confirm": {
       "fixMessage": "Điều này sẽ xóa các chú thích bỏ qua lỗi cũ từ các tệp nguồn của bạn. Những thay đổi này có thể được hủy bỏ bằng git. Tiếp tục?",
@@ -2553,18 +2610,26 @@
       "message": "Quy tắc bỏ qua lỗi: quy tắc '{ruleName}' không còn kích hoạt trên dòng này nữa."
     },
     "sidebar": {
-      "fixLabel": "Sửa bỏ các ignore lỗi",
-      "fixDescription": "Phát hiện và tự động loại bỏ người chết // bỏ qua: ý kiến"
+      "fixLabel": "Prune bỏ qua",
+      "fixDescription": "Tìm và tự động loại bỏ các chú thích // ignore: chết"
     },
     "quickFix": {
       "title": "Sửa các ignore lỗi thời trong tệp này"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Chạy phân tích chạy.",
+      "runAnalysisDescription": "Chạy lại phân tích",
+      "updateConfigLabel": "Cập nhật cấu hình",
+      "updateConfigDescription": "Khởi tạo hoặc cập nhật lại tùy chọn phân tích"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% đã xem xét",
       "hotspotsDescription": "{open} mở",
-      "lastRunLabel": "Lần chạy cuối · {ago}"
+      "lastRunLabel": "Lần chạy cuối · {ago}",
+      "machineHealthLabel": "Tình trạng máy",
+      "machineHealthDescription": "RAM, mồ côi & công cụ dịch thuật trên toàn bộ máy"
     },
     "dashboards": {
       "commandCatalogLabel": "Tất cả các lệnh…",

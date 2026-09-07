@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} پردازش‌کننده (ها) ترک شده",
       "criticalOrphans": "🔴 {count} پرورش دهنده(ها) ترک شده",
-      "openHint": "کلیک کنید تا پرچه سلامت را باز کنید"
+      "openHint": "کلیک کنید تا پرچه سلامت را باز کنید",
+      "systemRam": "سیستم: {free} از {total} رایگان",
+      "systemLow": "⚠ سیستم: {free} از {total} رایگان"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} فرآیند(ها) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart فرآیندها در حال استفاده از {size} با {orphaned} دمین نابود هستند. تمیز کنید؟",
       "possibleLeak": "Saropa RSS به طور مداوم افزایش یافته است ({size} و افزایش پیدا کرده). احتمالاً یک چکانی در حافظه وجود دارد — به پنل سلامت مراجعه کنید.",
-      "result": "کیلدد {count} دمئون های تکلیف شده را از بین برده، ~{size} را آزاد کرد"
+      "result": "کیلدد {count} دمئون های تکلیف شده را از بین برده، ~{size} را آزاد کرد",
+      "systemLowMemory": "ماشین شما فقط {free} از {total} حافظه RAM آزاد دارد. لطفا پنجره ها یا برنامه های نا مورد نیاز را ببندید.",
+      "analysisServerLarge": "سرویس تحلیل Dart در حال استفاده از {size} است. دوباره راه اندازی کنید تا حافظه را آزاد کنید؟",
+      "sessionStartLow": "ماشین شما دارای {free} از {total} رم آزاد است. لطفا پنجره های نااستفاده VS Code یا مدل های Ollama را قبل از شروع کار ببندید."
     },
     "action": {
       "cleanUp": "کلی نمایی",
       "openPanel": "پنل سلامت را باز کنید",
       "dismiss": "اخراج از کار",
       "optimizeAnalysis": "بهینه سازی تحلیل",
-      "dontShowAgain": "باز نشان نده"
+      "dontShowAgain": "باز نشان نده",
+      "openMachineDashboard": "مکانیزم سلامت ماشین",
+      "restartAnalysisServer": "راه اندازی مجدد دوباره Restart کردن"
     },
     "cleanup": {
       "noOrphans": "هیچ دمین نیافته شد.",
@@ -749,6 +756,55 @@
       "kill": "کیل کردن",
       "killed": "کیلدد",
       "killFailed": "ناموفق"
+    }
+  },
+  "machineDashboard": {
+    "title": "سلامت ماشین",
+    "refresh": "به راحتی و با آرامش استراحت کنید.",
+    "systemUnknown": "ذخیره‌سازی حافظه سیستم در این پلتفرم قابل خواندن نیست.",
+    "platformUnsupported": "سلامت دستگاه نیاز به ویندوز دارد — درخواست های پروسه در این پلتفرم در دسترس نیست.",
+    "freeOf": "رایگان است / بدون تفکر",
+    "used": "استفاده شده",
+    "recommendationsTitle": "پیشنهادات",
+    "recommendationsNone": "هیچ مشکلی کشف نشد.",
+    "noProcesses": "هیچ Dart، Flutter یا فرآیند های model-host در حال اجرا نیست.",
+    "orphanCount": "{count} ترک شده",
+    "kill": "کیل کردن",
+    "group": {
+      "analysisServer": "سرورهای تحلیل Dart",
+      "flutterDaemon": "Flutter دیمونز",
+      "saropa": "Saropa Lints",
+      "otherDart": "دیگر فرآیندهای Dart",
+      "modelHost": "ماشین翻译 (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "فقط {free} از {total} رم آزاد است. برنامه های نا مورد نیاز را ببندید یا VS Code پنجره ها را ببندید.",
+      "orphansFound": "فرايند(ها) گم شده {count} به چندان از حافظه {size} از جلسه قبل اشاره دارند.",
+      "analysisServerLarge": "{count} Dart فرآیند(ها) سرور تحلیل اسکریپت در حال استفاده از تا {size} هستند. با باز کردن مجدد حافظه آزاد می شود.",
+      "multipleAnalysisServers": "{count} Dart سرورهای تحلیل در حال اجرا هستند — احتمالاً یکی برای هر پنجره VS Code باز شده در پروژه‌های همپوشان.",
+      "noHeapCap": "سرور تحلیل Dart هیچ محدوده‌ای برای حافظه تنظیم نکرده است. تنظیم یکی بهترین رشد بدترین مورد را محدود می‌کند.",
+      "modelLoaded": "مدل \"{model}\" در موتور ترجمه بارگذاری شده است، با استفاده از {size}.",
+      "budgetOverspend": "اترکس ابزارها از {used}% از حافظه RAM سیستم ({size}) استفاده می کنند که بیشتر از {budget}% بودجه است. پنجره های نا مورد استفاده VS Code را ببندید یا مدل های ترجمه را بکشید."
+    },
+    "action": {
+      "reclaim": "بازگرداندن",
+      "restartAnalysisServer": "راه اندازی مجدد دوباره Restart کردن",
+      "setHeapCap": "تنظیم حداکثری",
+      "unloadModel": "بی‌باریک کردن"
+    },
+    "heapCap": {
+      "prompt": "محدوده حافظه سرور تحلیل در مگابایت (مثلاً 4096)",
+      "invalid": "عددی کامل مگابایت وارد کنید که بیشتر از 0 باشد",
+      "applied": "مقدار حافظه پشته سرور تحلیل را به {mb} مگابایت تنظیم کنید. سرور تحلیل را مجدد راه‌اندازی کنید تا تغییرات اعمال شود.",
+      "restartNow": "تکرار اکنون"
+    },
+    "unload": {
+      "succeeded": "مدل \"{model}\" آواعیش شد",
+      "failed": "نمی تواند مدل \"{model}\" را آزاد کند — ممکن است CLI Ollama در PATH وجود نداشته باشد."
+    },
+    "budget": {
+      "title": "اتریکس ابزار توسعه /نیاز به ابزار نیست",
+      "value": "{used}% از {budget}% هدف ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "هیچ نظراتی برای نادیده گرفتن یافت نشد.",
       "found": "{count} مورد(ها) ناگهانی در {fileCount} فایل(ها) است. جزئیات را در پنل مشکلات ببینید.",
       "fixed": "یاداشت های نادیده گرفته شده حذف شدند. جزئیات را در پنل خروجی مشاهده کنید.",
-      "fixedInFile": "Saropa Lints: تکرارهای مهمل ثابت شدند"
+      "fixedInFile": "Saropa Lints: تکرارهای مهمل ثابت شدند",
+      "alreadyRunning": "یک اسکن stale-ignore قبلاً در حال اجرا است."
     },
     "confirm": {
       "fixMessage": "این عملیات باعث حذف نظرات نادیده گرفته شده از فایل های منبع شما می شود. تغییرات می تواند با git بازگردانی شود. ادامه؟",
@@ -2553,18 +2610,26 @@
       "message": "نگهداری ناگهانی: قاعده '{ruleName}' دیگر روی این خط اجرا نمی‌شود."
     },
     "sidebar": {
-      "fixLabel": "تصحیح نادیده گرفته شده ها",
-      "fixDescription": "کشف و خودکار حذف نظرات // نادیده گرفتن:"
+      "fixLabel": "کم کردن نادیده گرفته می‌شود",
+      "fixDescription": "یافته و خودکار حذف کامنت های // ignore: مرده"
     },
     "quickFix": {
       "title": "این فایل ایگنورهای قدیمی را رفع کنید"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "تحلیل را اجرا کنید.",
+      "runAnalysisDescription": "تحلیل کننده را مجدد اجرا کنید",
+      "updateConfigLabel": "کنfig را به‌روزرسانی کنید",
+      "updateConfigDescription": "انتخاب یا به‌روزرسانی گزینه‌های تحلیل"
+    },
     "status": {
       "hotspotsLabel": "گرمایشگر · {percent}% بررسی شده",
       "hotspotsDescription": "{open} باز کنید",
-      "lastRunLabel": "آخرین اجرا · {ago}"
+      "lastRunLabel": "آخرین اجرا · {ago}",
+      "machineHealthLabel": "سلامت ماشین",
+      "machineHealthDescription": "RAM، افراد بدون والد و موتور ترجمه در سراسر ماشین"
     },
     "dashboards": {
       "commandCatalogLabel": "همه دستورات…",

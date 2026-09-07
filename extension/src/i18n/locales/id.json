@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} daemon(s) yang terlantar",
       "criticalOrphans": "🔴 {count} daemon(s) yang terlantar",
-      "openHint": "Klik untuk membuka Process Health"
+      "openHint": "Klik untuk membuka Process Health",
+      "systemRam": "Sistem: {free} dari {total} gratis",
+      "systemLow": "⚠ Sistem: {free} dari {total} gratis"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proses(es) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Proses Dart menggunakan {size} dengan daemons {orphaned} yang terlantar. Bersihkan?",
       "possibleLeak": "Saropa RSS sedang naik secara konsisten ({size} dan meningkat). Kemungkinan kebocoran memori — periksa panel kesehatan.",
-      "result": "Killed {count} daemon yang terlantar, freed ~{size}"
+      "result": "Killed {count} daemon yang terlantar, freed ~{size}",
+      "systemLowMemory": "Mesin Anda hanya memiliki {free} dari {total} RAM yang bebas. Pertimbangkan untuk menutup jendela atau aplikasi yang tidak digunakan.",
+      "analysisServerLarge": "Sebuah server analisis Dart sedang menggunakan {size}. Restart untuk melepaskan memori?",
+      "sessionStartLow": "Mesin Anda memiliki {free} dari {total} RAM yang bebas. Pertimbangkan untuk menutup jendela VS Code yang tidak digunakan atau model Ollama sebelum memulai pekerjaan."
     },
     "action": {
       "cleanUp": "Pembersihan",
       "openPanel": "Buka Panel Kesehatan",
       "dismiss": "Mengusir dari pekerjaan.",
       "optimizeAnalysis": "Optimalkan Analisis",
-      "dontShowAgain": "Jangan Tampilkan Lagi"
+      "dontShowAgain": "Jangan Tampilkan Lagi",
+      "openMachineDashboard": "Buka Kesehatan Mesin",
+      "restartAnalysisServer": "Restart ulang mulai dari awal."
     },
     "cleanup": {
       "noOrphans": "Tidak ditemukan daemon yang terlantar.",
@@ -749,6 +756,55 @@
       "kill": "Matikan",
       "killed": "Dibunuh",
       "killFailed": "Gagal"
+    }
+  },
+  "machineDashboard": {
+    "title": "Kesehatan Mesin",
+    "refresh": "Refreshing dan menyegarkan.",
+    "systemUnknown": "Memori sistem tidak dapat dibaca pada platform ini.",
+    "platformUnsupported": "Kesehatan Mesin memerlukan Windows — query proses tidak tersedia pada platform ini.",
+    "freeOf": "tanpa biaya",
+    "used": "digunakan",
+    "recommendationsTitle": "Rekomendasi",
+    "recommendationsNone": "Tidak ada masalah yang terdeteksi.",
+    "noProcesses": "Tidak ada proses Dart, Flutter, atau model-host yang berjalan.",
+    "orphanCount": "{count} terlantar",
+    "kill": "Matikan",
+    "group": {
+      "analysisServer": "Server Analisis Dart",
+      "flutterDaemon": "Flutter Daemon",
+      "saropa": "Saropa Lints",
+      "otherDart": "Lainnya Dart Proses",
+      "modelHost": "Mesin Terjemah (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Hanya {free} dari {total} RAM yang bebas secara global. Tutup aplikasi yang tidak digunakan atau VS Code jendela.",
+      "orphansFound": "Proses {count} yang terlantar sedang menggunakan {size} dari memori dari sesi sebelumnya.",
+      "analysisServerLarge": "Proses analisis server {count} Dart menggunakan hingga {size}. Restart melepaskan memori.",
+      "multipleAnalysisServers": "Server analisis {count} Dart sedang berjalan — kemungkinan satu per jendela VS Code yang terbuka pada proyek yang tumpang tindih.",
+      "noHeapCap": "Server analisis Dart tidak memiliki batas memori yang dikonfigurasi. Menetapkan satu batas akan membatasi pertumbuhan terburuk kasus.",
+      "modelLoaded": "Model \"{model}\" dimuat dalam mesin penerjemah, menggunakan {size}.",
+      "budgetOverspend": "Dev tools menggunakan {used}% dari RAM sistem ({size}), melebihi anggaran {budget}%. Tutup jendela VS Code yang tidak digunakan atau bebaskan model terjemahan."
+    },
+    "action": {
+      "reclaim": "Memperoleh kembali",
+      "restartAnalysisServer": "Restart ulang mulai dari awal.",
+      "setHeapCap": "Tetapkan Batas",
+      "unloadModel": "Uninstall"
+    },
+    "heapCap": {
+      "prompt": "Kapasitas heap server analisis dalam MB (misalnya 4096)",
+      "invalid": "Masukkan bilangan bulat dalam megabyte yang lebih besar dari 0.",
+      "applied": "Atur batas memori heap server analisis ke {mb} MB. Restart server analisis untuk membuatnya berlaku.",
+      "restartNow": "Restart Sekarang"
+    },
+    "unload": {
+      "succeeded": "Model \"{model}\" tidak terpasang",
+      "failed": "Tidak dapat membebaskan model \"{model}\" — Ollama CLI mungkin tidak ada di PATH."
+    },
+    "budget": {
+      "title": "Anggaran Alat Pengembang",
+      "value": "{used}% dari {budget}% target ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "Tidak ditemukan komentar ignore yang sudah usang.",
       "found": "{count} ignore yang tidak valid dalam {fileCount} file. Lihat panel Problems untuk detailnya.",
       "fixed": "Komentar ignore yang usang dihapus. Lihat panel Output untuk detailnya.",
-      "fixedInFile": "Saropa Lints: ignore yang kedaluwarsa telah diperbaiki dalam berkas ini"
+      "fixedInFile": "Saropa Lints: ignore yang kedaluwarsa telah diperbaiki dalam berkas ini",
+      "alreadyRunning": "Pindaian stale-ignore sudah berjalan."
     },
     "confirm": {
       "fixMessage": "Ini akan menghapus komentar ignore yang tidak aktif dari file sumber Anda. Perubahan ini dapat dibatalkan dengan git. Lanjutkan?",
@@ -2553,18 +2610,26 @@
       "message": "Ignore usang: aturan '{ruleName}' tidak lagi berlaku pada baris ini."
     },
     "sidebar": {
-      "fixLabel": "Perbaiki ignores yang usang",
-      "fixDescription": "Deteksi dan otomatis hapus komentar // ignore:"
+      "fixLabel": "Prune mengabaikan",
+      "fixDescription": "Cari dan otomatis hapus komentar // ignore: yang mati"
     },
     "quickFix": {
       "title": "Perbaiki ignores yang usang dalam berkas ini"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Jalankan analisis analisa.",
+      "runAnalysisDescription": "Jalankan ulang analisator",
+      "updateConfigLabel": "Perbarui konfigurasi",
+      "updateConfigDescription": "Inisialisasi atau perbarui opsi analisis"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% diulas",
       "hotspotsDescription": "{open} buka",
-      "lastRunLabel": "Lalu run · {ago}"
+      "lastRunLabel": "Lalu run · {ago}",
+      "machineHealthLabel": "Kesehatan Mesin",
+      "machineHealthDescription": "RAM, orphan & mesin terjemahan di seluruh mesin"
     },
     "dashboards": {
       "commandCatalogLabel": "Semua perintah…",

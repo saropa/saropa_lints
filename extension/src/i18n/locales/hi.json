@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} अकेले डेमोन (s)",
       "criticalOrphans": "🔴 {count} अकेले डेमोन(s)",
-      "openHint": "क्लिक करें ताकि प्रोसेस हेल्थ खोलें"
+      "openHint": "क्लिक करें ताकि प्रोसेस हेल्थ खोलें",
+      "systemRam": "सिस्टम: {free} में {total} खाली",
+      "systemLow": "⚠ सिस्टम: {free} में {total} मुक्त"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} प्रक्रिया(एं) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart प्रक्रियाएं {size} का उपयोग करती हैं जिनमें {orphaned} अकेले डेमॉन हैं। साफ करें?",
       "possibleLeak": "Saropa RSS निरंतर बढ़ रहा है ({size} और बढ़ रहा है)। संभावित मेमोरी लीक — स्वास्थ्य पैनल के साथ जांच करें।",
-      "result": "मार दिया गया है {count} अकेले डेमोन, ~{size} मुक्त किया गया"
+      "result": "मार दिया गया है {count} अकेले डेमोन, ~{size} मुक्त किया गया",
+      "systemLowMemory": "आपके मशीन में केवल {free} ऑफ {total} एआरएम खाली है। अप्रयोग के लिए बने रहे विंडोज या एप्लिकेशन बंद करें।",
+      "analysisServerLarge": "एक Dart विश्लेषण सर्वर द्वारा {size} का उपयोग किया जा रहा है। स्मृति मुक्त करने के लिए इसे पुनः शुरू करें?",
+      "sessionStartLow": "आपके मशीन में {free} {total} RAM मुक्त है। काम शुरू करने से पहले अप्रयोग के लिए बर्बाद वाले VS Code विंडोज़ या Ollama मॉडल बंद करें।"
     },
     "action": {
       "cleanUp": "साफ करें",
       "openPanel": "स्वास्थ्य पैनल खोलें",
       "dismiss": "बर्खास्तगी को खारिज करें।",
       "optimizeAnalysis": "अनुकूलित विश्लेषण",
-      "dontShowAgain": "फिर से नहीं दिखाएँ"
+      "dontShowAgain": "फिर से नहीं दिखाएँ",
+      "openMachineDashboard": "मशीन स्वास्थ्य खोलें",
+      "restartAnalysisServer": "रिस्टार्ट करें और फिर से शुरू करें।"
     },
     "cleanup": {
       "noOrphans": "कोई अकेला डेमोन नहीं मिला।",
@@ -749,6 +756,55 @@
       "kill": "किल्ल",
       "killed": "मार दिया",
       "killFailed": "असफल"
+    }
+  },
+  "machineDashboard": {
+    "title": "मशीन हेल्थ",
+    "refresh": "ताज़ा करें रिफ्रेश करें",
+    "systemUnknown": "सिस्टम मेमोरी को इस प्लेटफॉर्म पर पढ़ा नहीं सका गया।",
+    "platformUnsupported": "मशीन हेल्थ विंडोज के लिए आवश्यक है — प्रोसेस एक्ज़ेक्यूशन निवेदन इस प्लेटफॉर्म पर उपलब्ध नहीं है।",
+    "freeOf": "फ्री ऑफ /नो_थिंक",
+    "used": "उपयोग किया गया",
+    "recommendationsTitle": "सुझाव",
+    "recommendationsNone": "कोई समस्या नहीं पाई गई।",
+    "noProcesses": "कोई Dart, Flutter या मॉडल-होस्ट प्रक्रिया चल रही नहीं है।",
+    "orphanCount": "{count} अकेला",
+    "kill": "किल्ल",
+    "group": {
+      "analysisServer": "Dart विश्लेषण सर्वर",
+      "flutterDaemon": "Flutter डेमोन्स",
+      "saropa": "Saropa Lints",
+      "otherDart": "अन्य Dart प्रक्रियाएँ",
+      "modelHost": "अनुवाद इंजन (ओल्लामा)"
+    },
+    "recommendation": {
+      "systemLowMemory": "केवल {free} ऑफ़ {total} RAM मशीन-व्यापक रूप से खाली है। अप्रयोग के अनुप्रयोग बंद करें या VS Code विंडोज़ बंद करें।",
+      "orphansFound": "{count} अकेले प्रक्रिया(एं) पहले सत्र से {size} स्मृति को धारण कर रहे हैं।",
+      "analysisServerLarge": "{count} Dart विश्लेषण सर्वर प्रक्रिया(एं) आप तक {size} तक उपयोग कर रहे हैं। एक पुनरारम्भ स्मृति छोड़ देता है।",
+      "multipleAnalysisServers": "{count} Dart विश्लेषण सर्वर चल रहे हैं — संभवतः प्रत्येक खुले VS Code विंडो पर ओवरलैपिंग प्रोजेक्ट के लिए एक।",
+      "noHeapCap": "Dart विश्लेषण सर्वर में कोई स्मृति छत निर्धारित नहीं किया गया है। एक केंद्र निर्धारित करता है सबसे खराब मामले में विकास।",
+      "modelLoaded": "मॉडल \"{model}\" अनुवाद इंजन में लोड किया गया है, जिसमें {size} का उपयोग किया गया है।",
+      "budgetOverspend": "डेव टूल्स सिस्टम एआरएम में {used}% उपयोग कर रहे हैं ({size}), जो {budget}% बजट के बाहर है। अप्रयोग के लिए VS Code विंडोज़ बंद करें या अनुवाद मॉडल अपलोड करें।"
+    },
+    "action": {
+      "reclaim": "पुनः प्राप्त करें",
+      "restartAnalysisServer": "रिस्टार्ट करें और फिर से शुरू करें।",
+      "setHeapCap": "सेट कैप",
+      "unloadModel": "अनलोड"
+    },
+    "heapCap": {
+      "prompt": "एनालिसिस सर्वर हीप कैप एमबी में (उदाहरण के लिए 4096)",
+      "invalid": "0 से बड़ा एक पूर्ण संख्या मेगाबाइट दर्ज करें।",
+      "applied": "अनालिसिस सर्वर के हीप कैप को {mb} मेबी सेट करें। इसका लागू होना चाहिए तो अनालिसिस सर्वर को फिर से शुरू करें।",
+      "restartNow": "अब रीस्टार्ट करें"
+    },
+    "unload": {
+      "succeeded": "अनलोडेड मॉडल \"{model}\"",
+      "failed": "मॉडल \"{model}\" को अनलोड नहीं किया जा सकता — ओलमा CLI के PATH पर होना आवश्यक है।"
+    },
+    "budget": {
+      "title": "डेव टूल बजट",
+      "value": "{used}% के {budget}% लक्ष्य ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "कोई भी निष्प्रभाव अनदेखा टिप्पणी नहीं पाए गए।",
       "found": "{count} अक्षय अनदेखा(ए) हैं {fileCount} फ़ाइल(ए) में। विवरण के लिए समस्या पैनल देखें।",
       "fixed": "अतिक्रमित अनदेखा टिप्पणियाँ हटा दी गई हैं। विवरण के लिए आउटपुट पैनल देखें।",
-      "fixedInFile": "Saropa Lints: इस फ़ाइल में स्टेल इगनोर्स ठीक कर लिए गए"
+      "fixedInFile": "Saropa Lints: इस फ़ाइल में स्टेल इगनोर्स ठीक कर लिए गए",
+      "alreadyRunning": "एक स्टेल-आईग्नोर स्कैन पहले से ही चल रहा है।"
     },
     "confirm": {
       "fixMessage": "यह आपके स्रोत फ़ाइलों से पुराने अग्नोर कमेंट हटा देगा। बदलाव git के माध्यम से वापस किया जा सकता है। जारी रखें?",
@@ -2553,18 +2610,26 @@
       "message": "अति निर्जीव अनदेखा: नियम '{ruleName}' इस पंक्ति पर अब नहीं चलता।"
     },
     "sidebar": {
-      "fixLabel": "स्टेल इगनोर्स फिक्स करें",
-      "fixDescription": "मृत // अग्नि: कमेंट डिटेक्ट एवं स्वतः हटाएं"
+      "fixLabel": "प्रून अपेक्षित अग्रेषित करता है",
+      "fixDescription": "मृत // अग्नि: कमेंट खोजें और स्वतः हटा दें"
     },
     "quickFix": {
       "title": "इस फ़ाइल में विस्तारित अनदेखा करें"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "विश्लेषण चलाएं।",
+      "runAnalysisDescription": "पुनः एनालाइजर चलाएँ",
+      "updateConfigLabel": "अपडेट कॉन्फिग",
+      "updateConfigDescription": "अनालिसिस विकल्पों को शुरू करें या ताज़ा करें"
+    },
     "status": {
       "hotspotsLabel": "हॉटस्पॉट्स · {percent}% रीव्यू किया",
       "hotspotsDescription": "{open} खोलें",
-      "lastRunLabel": "पिछला चलान · {ago}"
+      "lastRunLabel": "पिछला चलान · {ago}",
+      "machineHealthLabel": "मशीन हेल्थ",
+      "machineHealthDescription": "RAM, अविवाहित बच्चे & अनुवाद इंजन समग्र मशीन पर"
     },
     "dashboards": {
       "commandCatalogLabel": "सभी कमांड...",

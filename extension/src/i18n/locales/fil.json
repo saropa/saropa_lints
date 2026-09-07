@@ -679,13 +679,15 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} na walang magulang na daemon(s)",
       "criticalOrphans": "🔴 {count} na walang magulang na daemon(s)",
-      "openHint": "Click para magbukas ng Process Health"
+      "openHint": "Click para magbukas ng Process Health",
+      "systemRam": "Sistema: {free} ng {total} libre",
+      "systemLow": "⚠ Sistema: {free} ng {total} libre"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proseso(s) ({size} RSS)",
       "saropaProcessEntry": "  {label}  {size}",
       "saropaHealthy": "Saropa Lints: {count} proseso(s) ({size} RSS) ✓",
-      "sparkline": "RSS trend: {chart}",
+      "sparkline": "Takbo ng RSS: {chart}",
       "otherSection": "Mga iba pang proseso Dart: {count} ({size} RSS)",
       "otherProcessEntry": "  {label}  {size}",
       "otherHint": "Nakita ang (mga) server ng pagsusuri ng {count} — isara ang hindi nagamit na mga window ng VS Code",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Ang mga proseso Dart ay gumagamit ng {size} kasama ang mga orphaned daemon na {orphaned}. I-clear up?",
       "possibleLeak": "Saropa RSS ay umuunlad nang maayos ({size} at tumataas). Posibleng memory leak — tingnan ang health panel.",
-      "result": "Nagpatay sa {count} mga daemon na walang ama, naglibos ng ~{size}"
+      "result": "Nagpatay sa {count} mga daemon na walang ama, naglibos ng ~{size}",
+      "systemLowMemory": "Mayroon ka lamang {free} ng {total} ng libreng RAM. Gamitin ang pagbubukas ng mga hindi ginagamit na window o application.",
+      "analysisServerLarge": "Ang isang analysis server ng Dart ay nag-uusap sa {size}. I-restart ito upang mapalagyan ang memorya?",
+      "sessionStartLow": "Mayroon kang {free} ng {total} ng libreng RAM. Gamitin ang mga VS Code na window o modelo ng Ollama bago magtrabaho."
     },
     "action": {
       "cleanUp": "Maglinis",
       "openPanel": "I-Open Health Panel",
       "dismiss": "Mag-dismiss na ako.",
       "optimizeAnalysis": "I-optimize ang Pagsusuri",
-      "dontShowAgain": "Hindi Mo Iwanan Nang Magkakaroon Nang Paliwanag"
+      "dontShowAgain": "Hindi Mo Iwanan Nang Magkakaroon Nang Paliwanag",
+      "openMachineDashboard": "I-Open Machine Health",
+      "restartAnalysisServer": "I-restart ang iyong computer at i-reset ito."
     },
     "cleanup": {
       "noOrphans": "Walang nakakalat na daemon.",
@@ -749,6 +756,55 @@
       "kill": "Iwan",
       "killed": "Pinatay",
       "killFailed": "Nagkabigo"
+    }
+  },
+  "machineDashboard": {
+    "title": "Mga Kondisyon ng Sistemang Makina",
+    "refresh": "Magpahinga at mag-refresh.",
+    "systemUnknown": "Hindi mabasa ang sistema memory sa platform na ito.",
+    "platformUnsupported": "Kabug-osang Kalusugan ng Machine ay nangangailangan ng Windows — ang mga pagtanong sa proseso ay hindi magagamit sa platform na ito.",
+    "freeOf": "walang",
+    "used": "gamit",
+    "recommendationsTitle": "Rekomendasyon",
+    "recommendationsNone": "Walang mga isyu na nakita.",
+    "noProcesses": "Walang Dart, Flutter, o proseso ng model-host na nagsisimula.",
+    "orphanCount": "{count} na walang magulang",
+    "kill": "Iwan",
+    "group": {
+      "analysisServer": "Mga Server ng Pagsusuri ng Dart",
+      "flutterDaemon": "Flutter Mga Daemon",
+      "saropa": "Saropa Lints",
+      "otherDart": "Mga Proseso na Dart Pang iba pang",
+      "modelHost": "Translation Engine (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Nagbibigay lamang ng {free} ng {total} RAM ang libreng machine-wide. I-close ang mga aplikasyon na hindi ginagamit o VS Code windows.",
+      "orphansFound": "{count} proseso na walang inaasahang mga anak ay umuunlad {size} ng memorya mula sa isang mas mabibigat na sesyon.",
+      "analysisServerLarge": "{count} Dart analysis server process(es) ay gumagamit ng hanggang {size}. Ang pag-restart ay nagrerelease ng memorya.",
+      "multipleAnalysisServers": "{count} Dart analysis servers ay nagtatrabaho — maaaring isa bawat bukas na VS Code window sa overlapping projects.",
+      "noHeapCap": "Ang analysis server ng Dart ay walang nakakatagung ang memory ceiling. Pagtatakda nito ay naglalimita sa pinakamalawak na paglaki.",
+      "modelLoaded": "Model \"{model}\" ay nakalaan sa translation engine, gamit ang {size}.",
+      "budgetOverspend": "Ang mga tool ng development ay gumagamit ng {used}% ng RAM ng sistema ({size}), naglalabas sa budget na {budget}%. I-close ang mga window ng VS Code na hindi ginagamit o i-unload ang mga modelo ng pagsasalin."
+    },
+    "action": {
+      "reclaim": "Ibalik",
+      "restartAnalysisServer": "I-restart ang iyong computer at i-reset ito.",
+      "setHeapCap": "Itakda ang Cap",
+      "unloadModel": "Magdiskarga"
+    },
+    "heapCap": {
+      "prompt": "Sukat ng heap ng server ng analisis sa MB (hal. 4096)",
+      "invalid": "I-input ang isang buong bilang ng megabytes na mas malaki kaysa 0.",
+      "applied": "Set ang heap cap ng analysis server sa {mb} MB. I-restart ang analysis server para makatulong ito.",
+      "restartNow": "Ibalik ang Pag-Start Ngayon"
+    },
+    "unload": {
+      "succeeded": "Nag-unload ng modelo \"{model}\".",
+      "failed": "Hindi maaaring i-unload ang modelo \"{model}\" — ang Ollama CLI ay maaaring hindi nasa PATH."
+    },
+    "budget": {
+      "title": "Budget ng Tool ng Developer",
+      "value": "{used}% ng {budget}% target ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "Walang mga komento sa pag-ignor ng mga panukat na nangungunat.",
       "found": "{count} mga ignore na stale sa {fileCount} file(s). Tingnan ang panel ng Problems para sa detalye.",
       "fixed": "Nakaraan na ang mga komento sa ignore. Tingnan ang panel ng Output para sa detalye.",
-      "fixedInFile": "Saropa Lints: naka-ayos na ang mga ignore na nakakalimot dito"
+      "fixedInFile": "Saropa Lints: naka-ayos na ang mga ignore na nakakalimot dito",
+      "alreadyRunning": "Ang isang scan ng stale-ignore ay nagsisimula na."
     },
     "confirm": {
       "fixMessage": "Ito ay magpapalit ng mga hindi na kinakailangang komento sa iyong mga source files. Ang mga pagbabago ay maaaring i-undo gamit ang git. Susunod?",
@@ -2553,18 +2610,26 @@
       "message": "Nag-iignore na: ang rule '{ruleName}' ay wala nang magtatag ng alerta sa linya na ito."
     },
     "sidebar": {
-      "fixLabel": "Ibahin ang mga hindi kinakailangang ignore",
-      "fixDescription": "Magdetect at auto-removе ang mga // ignore: komento"
+      "fixLabel": "Hindi pinapansin ni Prune",
+      "fixDescription": "Hanapin at auto-removе ang mga // ignore: komento"
     },
     "quickFix": {
       "title": "Iayos ang mga hindi kinakailangang ignores dito"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Magpatakbo ng pagsusuri sa run analysis.",
+      "runAnalysisDescription": "Ibalik ang analisys",
+      "updateConfigLabel": "Ibahin ang config",
+      "updateConfigDescription": "Iinitialize o refresh analysis options"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% na inreview",
       "hotspotsDescription": "{open} buksan",
-      "lastRunLabel": "Nangunguna · {ago}"
+      "lastRunLabel": "Nangunguna · {ago}",
+      "machineHealthLabel": "Mga Kondisyon ng Sistemang Makina",
+      "machineHealthDescription": "RAM, orphans & translation engine sa buong sistema"
     },
     "dashboards": {
       "commandCatalogLabel": "Lahat ng mga command…",

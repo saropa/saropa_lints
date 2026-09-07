@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} عملية(s) خلفية مهجورة",
       "criticalOrphans": "🔴 {count} daemon(s) مهجور",
-      "openHint": "اضغط لفتح صحة العملية"
+      "openHint": "اضغط لفتح صحة العملية",
+      "systemRam": "نظام: {free} من {total} مجاني",
+      "systemLow": "⚠ النظام: {free} من {total} مجاني"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} عملية(ات) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "تُعالج Dart العمليات {size} مع {orphaned} أوامر مهجورة. تنظيف؟",
       "possibleLeak": "Saropa RSS يرتفع بشكل مستقر ({size} ويزداد). ممكن تسرب الذاكرة — تحقق من لوحة الصحة.",
-      "result": "تم قتل {count} من الدايمونز المهجورة، وتم تحرير ~{size}"
+      "result": "تم قتل {count} من الدايمونز المهجورة، وتم تحرير ~{size}",
+      "systemLowMemory": "جهازك يحتوي فقط على {free} من {total} من الذاكرة العشوائية (RAM) متوفرة. اعتبر إغلاق النوافذ أو التطبيقات غير المستخدمة.",
+      "analysisServerLarge": "خادم تحليل Dart يستخدم {size}. هل تعيد تشغيله لتحرير الذاكرة؟",
+      "sessionStartLow": "جهازك يحتوي على {free} من {total} من الذاكرة العشوائية (RAM) متوفرة. اعتبر إغلاق النوافذ غير المستخدمة VS Code أو نماذج Ollama قبل البدء بالعمل."
     },
     "action": {
       "cleanUp": "تنظيف",
       "openPanel": "فتح لوحة الصحة",
       "dismiss": "فصله من العمل",
       "optimizeAnalysis": "تحسين التحليل",
-      "dontShowAgain": "لا تظهر مرة أخرى"
+      "dontShowAgain": "لا تظهر مرة أخرى",
+      "openMachineDashboard": "فتح حالة الجهاز",
+      "restartAnalysisServer": "إعادة تشغيل: إعادة التشغيل."
     },
     "cleanup": {
       "noOrphans": "لم يتم العثور على أي دايموندات مهجورة.",
@@ -749,6 +756,55 @@
       "kill": "القتل",
       "killed": "تم القتل",
       "killFailed": "فشل"
+    }
+  },
+  "machineDashboard": {
+    "title": "صحة الجهاز",
+    "refresh": "استرخاء وترفعه.",
+    "systemUnknown": "لا يمكن قراءة ذاكرة النظام على هذه المنصة.",
+    "platformUnsupported": "تطلب صحة الجهاز نظام ويندوز — لا تتوفر استعلامات العمليات على هذه المنصة.",
+    "freeOf": "خالٍ من",
+    "used": "مستخدم",
+    "recommendationsTitle": "التوصيات",
+    "recommendationsNone": "لا توجد مشاكل تم اكتشافها.",
+    "noProcesses": "لا يوجد عمليات Dart، Flutter، أو مضيف النماذج تعمل.",
+    "orphanCount": "{count} مهجور",
+    "kill": "القتل",
+    "group": {
+      "analysisServer": "خوادم تحليل Dart",
+      "flutterDaemon": "Flutter الدايمونز",
+      "saropa": "Saropa Lints",
+      "otherDart": "其他 Dart 进程",
+      "modelHost": "محرك الترجمة (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "توجد فقط {free} من {total} من الذاكرة العشوائية (RAM) متوفرة على مستوى النظام. أغلق التطبيقات غير المستخدمة أو VS Code النوافذ.",
+      "orphansFound": "عملية(ات) مهجورة {count} تستخدم {size} من الذاكرة من جلسة سابقة.",
+      "analysisServerLarge": "عملية(ات) خدمة تحليل {count} Dart تستخدم حتى {size}. إعادة التشغيل تطلق الذاكرة.",
+      "multipleAnalysisServers": "خوادم تحليل {count} Dart تعمل — من المرجح أن تكون واحدة لكل نافذة مفتوحة VS Code على مشاريع متشابكة.",
+      "noHeapCap": "الخادم تحليلي Dart لا يحتوي على حد أقصى للذاكرة المُحدَّد. تحديد واحد يحد من النمو الأسوأ للحالات.",
+      "modelLoaded": "نموذج \"{model}\" مُحمّل في محرك الترجمة باستخدام {size}.",
+      "budgetOverspend": "أدوات التطوير تستخدم {used}% من ذاكرة النظام ({size})، وتتجاوز الحد المسموح {budget}%. أغلق النوافذ VS Code غير المستخدمة أو أزل نماذج الترجمة."
+    },
+    "action": {
+      "reclaim": "استعادة",
+      "restartAnalysisServer": "إعادة تشغيل: إعادة التشغيل.",
+      "setHeapCap": "ضبط الحد الأقصى",
+      "unloadModel": "إلغاء التحميل"
+    },
+    "heapCap": {
+      "prompt": "الحد الأقصى لحجم الذاكرة (Heap Cap) لخادم التحليل بالميغا بايت (م.ب) (مثلاً: 4096)",
+      "invalid": "أدخل عددًا صحيحًا من ميغابايت أكبر من 0.",
+      "applied": "ضبط سعة الذاكرة (heap) للخادم الخاص بالتحليل إلى {mb} ميغا بايت. قم بإعادة تشغيل خادم التحليل ليصبح التغيير سارياً.",
+      "restartNow": "إعادة التشغيل الآن"
+    },
+    "unload": {
+      "succeeded": "نموذج غير مُحمَّل \"{model}\"",
+      "failed": "لم يتم إزالة النموذج \"{model}\" — قد لا يكون Ollama CLI في مسار PATH."
+    },
+    "budget": {
+      "title": "أداة تطوير الميزانية",
+      "value": "%{used} من %{budget} الهدف ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "لم يتم العثور على تعليقات إهمال قديمة.",
       "found": "{count} ملف(ات) غير نشط(ة) في {fileCount} ملف(ات). راجع لوحة المشاكل للحصول على التفاصيل.",
       "fixed": "تعليقات إهمال قديمة تم إزالتها. راجع لوحة المخرجات للحصول على التفاصيل.",
-      "fixedInFile": "Saropa Lints: تم إصلاح إهمالات مهجورة في هذا الملف"
+      "fixedInFile": "Saropa Lints: تم إصلاح إهمالات مهجورة في هذا الملف",
+      "alreadyRunning": "مسح stale-ignore بالفعل في التشغيل."
     },
     "confirm": {
       "fixMessage": "هذا سيقوم بإزالة التعليقات المهمة من ملفات مصدرك. يمكن إلغاء التغييرات باستخدام git. هل ترغب في المتابعة؟",
@@ -2553,18 +2610,26 @@
       "message": "التجاهل القديم: قاعدة '{ruleName}' لا تعمل الآن على هذه السطر."
     },
     "sidebar": {
-      "fixLabel": "إصلاح الإهمالات القديمة",
-      "fixDescription": "اكتشاف وحذف تلقائي التعليقات // تجاهل:"
+      "fixLabel": "تقطيع تجاهل",
+      "fixDescription": "ابحث واحذف تلقائيًا التعليقات // تجاهل: الميتة"
     },
     "quickFix": {
       "title": "إصلاح الإهمالات القديمة في هذا الملف"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "تشغيل تحليل التحليل.",
+      "runAnalysisDescription": "إعادة تشغيل المدقق",
+      "updateConfigLabel": "تحديث التكوين",
+      "updateConfigDescription": "-initialize أو refresh خيارات التحليل"
+    },
     "status": {
       "hotspotsLabel": "المناطق الساخنة · {percent}% تقييم",
       "hotspotsDescription": "{open} فتح",
-      "lastRunLabel": "التشغيل الأخير · {ago}"
+      "lastRunLabel": "التشغيل الأخير · {ago}",
+      "machineHealthLabel": "صحة الجهاز",
+      "machineHealthDescription": "RAM، الأيتام & محرك الترجمة عبر جميع الجهاز"
     },
     "dashboards": {
       "commandCatalogLabel": "جميع الأوامر…",

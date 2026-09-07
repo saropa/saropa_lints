@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count}daemon(s) מבודדים",
       "criticalOrphans": "🔴 {count}daemon(s) מוסתרים",
-      "openHint": "לחץ כדי לפתוח מצב בריאות תהליך"
+      "openHint": "לחץ כדי לפתוח מצב בריאות תהליך",
+      "systemRam": "מערכת: {free} מתוך {total} חפשי",
+      "systemLow": "⚠ מערכת: {free} מתוך {total} חופשיים"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} תהליך(ים) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "תהליכי Dart משתמשים ב-{size} עם דמונים מוזרים {orphaned}. לנקות?",
       "possibleLeak": "Saropa RSS עולה בצורה מתמדת ({size} ועולה). סיבת זרימה של זיכרון — בדוק את painel של הבריאות.",
-      "result": "הרגתי {count} דמונים אבויים, שחררתי ~{size}"
+      "result": "הרגתי {count} דמונים אבויים, שחררתי ~{size}",
+      "systemLowMemory": "המחשב שלך יש לו רק {free} של {total} זיכרון ריק. חשב על סגירת חלונות או אפליקציות לא בשימוש.",
+      "analysisServerLarge": "שרת ניתוח Dart נמצא בשימוש ב-{size}. יש להפסיק את הפעולה כדי לחרוג זיכרון?",
+      "sessionStartLow": "המחשב שלך יש לו {free} של {total} זיכרון פנימי פנוי. יש ל Ferm ל Ferm חלונות VS Code לא בשימוש או מודלים Ollama לפני הبدء לעבודה."
     },
     "action": {
       "cleanUp": "נקה",
       "openPanel": "פתוח painel של בריאות",
       "dismiss": "פיטורים.",
       "optimizeAnalysis": "שפר ניתוח",
-      "dontShowAgain": "אל תציג שוב"
+      "dontShowAgain": "אל תציג שוב",
+      "openMachineDashboard": "פתיחה של מצב המכונה",
+      "restartAnalysisServer": "התחל מחדש - Restart"
     },
     "cleanup": {
       "noOrphans": "לא נמצאו דמונים מוזרים.",
@@ -749,6 +756,55 @@
       "kill": "הכבה",
       "killed": "מתווך",
       "killFailed": "נכשל"
+    }
+  },
+  "machineDashboard": {
+    "title": "בריאות המחשב",
+    "refresh": "מרענן ומקפיא",
+    "systemUnknown": "הメモリ של النظام לא ניתן לקרוא בפלטפורמה זו.",
+    "platformUnsupported": "בריאות המחשב דורשת וינדוס — שאילתות תהליך אינן זמינות בפלטפורמה זו.",
+    "freeOf": "ללא תשלום",
+    "used": "נעשה",
+    "recommendationsTitle": "המלצות",
+    "recommendationsNone": "אין בעיות נמצאו.",
+    "noProcesses": "אין תהליכי Dart, Flutter או מודל-הост פעילים.",
+    "orphanCount": "{count} חסר אב/אם",
+    "kill": "הכבה",
+    "group": {
+      "analysisServer": "שרתים לניתוח Dart",
+      "flutterDaemon": "Flutter דמונים",
+      "saropa": "Saropa Lints",
+      "otherDart": "אחרי Dart תהליכים",
+      "modelHost": "מנוע תרגום (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "רק {free} מתוך {total} של RAM פנויים למשותף. סגורו יישומים לא בשימוש או VS Code חלונות.",
+      "orphansFound": "תהליך(ים) מבודד(ים) {count} מחזיק(ים) {size} של זיכרון מ세션 קודם.",
+      "analysisServerLarge": "השרת (ים) של ניתוח {count} Dart משתמשים עד {size}. עצירה מחדש פורחת את הזיכרון.",
+      "multipleAnalysisServers": "מתקנים {count} Dart ניתוח שרתים בפעולה — ככל הנראה אחד לכל חלון פתוח VS Code על פרויקטים חופפים.",
+      "noHeapCap": "השרת לניתוח Dart לא מוגדר לו גבול זיכרון. הגדרת גבול זיכרון מונעת את הצטברות המרחב בحالות רעות ביותר.",
+      "modelLoaded": "מודל \"{model}\" נטען במנוע ההתרגם, תוך שימוש ב-{size}.",
+      "budgetOverspend": "أدوات التطوير משתמשות ב-{used}% מהرام של النظام ({size}), והן מتجاوزות الحد المسموح {budget}%. أغلق النوافذ VS Code غير المستخدمة أو أزيل النماذج الترجمية."
+    },
+    "action": {
+      "reclaim": "שחזר",
+      "restartAnalysisServer": "התחל מחדש - Restart",
+      "setHeapCap": "הגדר גבול",
+      "unloadModel": "הסר"
+    },
+    "heapCap": {
+      "prompt": "מגבלה למאגר האנליזה של שרת ניתוח ב-MB (למשל 4096)",
+      "invalid": "הכנס מספר שלם של מגה bait גדול מ-0.",
+      "applied": "הגדר גודל הערימה של שרת ניתוח ל {mb} MB. עצור את שרת הניתוח כדי שהשינוי ייכנס לתוקף.",
+      "restartNow": "הפעל מחדש עכשיו"
+    },
+    "unload": {
+      "succeeded": "מודל לא מועadow \"{model}\"",
+      "failed": "לא ניתן להוריד את המודל \"{model}\" — ייתכן שהollama CLI אינו נמצא בPATH."
+    },
+    "budget": {
+      "title": "כלי разработка התקציב",
+      "value": "{used}% מ {budget}% מטרה ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "לא נמצאוتعليقات זכירות להתעלמות.",
       "found": "{count} זיהויים ישנים של איסור ({fileCount} קבצים). ראה את painel הבעיות לפרטים.",
       "fixed": "הערות זכירות שנמחקו. ראה את painel הפלט לפרטים.",
-      "fixedInFile": "Saropa Lints: איזורים ישנים שונו在这个文件中"
+      "fixedInFile": "Saropa Lints: איזורים ישנים שונו在这个文件中",
+      "alreadyRunning": "סריקה של stale-ignore כבר בפעולה."
     },
     "confirm": {
       "fixMessage": "הפעולה תמחקتعليים ישנים מהתיעודים בקבצי המקור שלך. השינויים יכולים להיות מוחקים באמצעות git. המשך?",
@@ -2553,18 +2610,26 @@
       "message": "התעלמות ישנה: כלל '{ruleName}' כבר לא פועל בשורה זו."
     },
     "sidebar": {
-      "fixLabel": "תקן איסורים ישנים",
-      "fixDescription": "הגדר ומחק אוטומטיתتعليות // игнор: מיותרים"
+      "fixLabel": "הסרת עץ עצי עץ",
+      "fixDescription": "מצא ותגלה אוטומטיתتعليות // игнор: שמתו"
     },
     "quickFix": {
       "title": "תקן איסורים ישנים在这个文件中"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "רץ ניתוח ריצה",
+      "runAnalysisDescription": "הפעלה מחדש של המפענח",
+      "updateConfigLabel": "עדכון קובץ Yapılandırma",
+      "updateConfigDescription": "הפעלה או עדכון אפשרויות ניתוח"
+    },
     "status": {
       "hotspotsLabel": "הסיבובים · {percent}% בדיקו",
       "hotspotsDescription": "{open} פתוח",
-      "lastRunLabel": "הרצה האחרונה · {ago}"
+      "lastRunLabel": "הרצה האחרונה · {ago}",
+      "machineHealthLabel": "בריאות המחשב",
+      "machineHealthDescription": "זיכרון RAM, יתומים ומנוע תרגום בכל המכונה"
     },
     "dashboards": {
       "commandCatalogLabel": "כל הפקודות…",

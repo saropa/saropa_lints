@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} daemon(es) huérfano(s)",
       "criticalOrphans": "🔴 {count} daemon(es) huérfano(s)",
-      "openHint": "Haga clic para abrir Salud del Proceso"
+      "openHint": "Haga clic para abrir Salud del Proceso",
+      "systemRam": "Sistema: {free} de {total} gratis",
+      "systemLow": "⚠ Sistema: {free} de {total} libre"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proceso(s) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Procesos Dart están utilizando {size} con daemons {orphaned} orfanos. Limpiar?",
       "possibleLeak": "Saropa RSS ha estado subiendo consistentemente ({size} y subiendo). Posible fuga de memoria — revise el panel de salud.",
-      "result": "Demonios huérfanos {count} asesinados, liberados ~{size}"
+      "result": "Demonios huérfanos {count} asesinados, liberados ~{size}",
+      "systemLowMemory": "Tu máquina tiene solo {free} de {total} de RAM libre. Considera cerrar ventanas o aplicaciones no utilizadas.",
+      "analysisServerLarge": "Un servidor de análisis Dart está utilizando {size}. Reiniciar para liberar memoria?",
+      "sessionStartLow": "Tu máquina tiene {free} de {total} de RAM libre. Considera cerrar ventanas VS Code no utilizadas o modelos Ollama antes de comenzar a trabajar."
     },
     "action": {
       "cleanUp": "Limpiar",
       "openPanel": "Panel de Salud Abrir",
       "dismiss": "Despido de trabajo.",
       "optimizeAnalysis": "Optimizar Análisis",
-      "dontShowAgain": "No mostrar de nuevo"
+      "dontShowAgain": "No mostrar de nuevo",
+      "openMachineDashboard": "Abrir Salud de la Máquina",
+      "restartAnalysisServer": "Reiniciar el sistema de nuevo."
     },
     "cleanup": {
       "noOrphans": "No se encontraron daemons huérfanos.",
@@ -749,6 +756,55 @@
       "kill": "Matar",
       "killed": "Delicado",
       "killFailed": "Fallido"
+    }
+  },
+  "machineDashboard": {
+    "title": "Salud de la Máquina",
+    "refresh": "Refrescarse y refrescar.",
+    "systemUnknown": "No se pudo leer la memoria del sistema en esta plataforma.",
+    "platformUnsupported": "Salud de la máquina requiere Windows — las consultas de proceso no están disponibles en esta plataforma.",
+    "freeOf": "libre de",
+    "used": "usado",
+    "recommendationsTitle": "Recomendaciones",
+    "recommendationsNone": "No se encontraron problemas.",
+    "noProcesses": "No Dart, Flutter, o procesos de model-host en ejecución.",
+    "orphanCount": "{count} orfánico",
+    "kill": "Matar",
+    "group": {
+      "analysisServer": "Servidores de análisis Dart",
+      "flutterDaemon": "Flutter Daemon",
+      "saropa": "Saropa Lints",
+      "otherDart": "Otros procesos Dart",
+      "modelHost": "Motor de Traducción (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Solo {free} de {total} de RAM está libre a nivel de sistema. Cierre aplicaciones no utilizadas o VS Code ventanas.",
+      "orphansFound": "Proceso(s) {count} abandonado(s) están utilizando {size} de memoria de una sesión anterior.",
+      "analysisServerLarge": "Proceso(s) del servidor de análisis {count} Dart están utilizando hasta {size}. Un reinicio libera la memoria.",
+      "multipleAnalysisServers": "Servidores de análisis {count} Dart están en ejecución — probablemente uno por cada ventana VS Code abierta en proyectos superpuestos.",
+      "noHeapCap": "El servidor de análisis Dart no tiene un límite de memoria configurado. Establecer uno limita el crecimiento en el peor de los casos.",
+      "modelLoaded": "Modelo \"{model}\" se carga en el motor de traducción, usando {size}.",
+      "budgetOverspend": "Las herramientas de desarrollo están utilizando {used}% del RAM del sistema ({size}), superando el presupuesto de {budget}%. Cierre ventanas VS Code no utilizadas o descargue modelos de traducción."
+    },
+    "action": {
+      "reclaim": "Recuperar",
+      "restartAnalysisServer": "Reiniciar el sistema de nuevo.",
+      "setHeapCap": "Establecer Límite",
+      "unloadModel": "Descargar"
+    },
+    "heapCap": {
+      "prompt": "Límite de memoria heap del servidor de análisis en MB (p. ej. 4096)",
+      "invalid": "Ingrese un número entero de megabytes mayor que 0.",
+      "applied": "Establecer el límite de memoria del servidor de análisis en {mb} MB. Reinicie el servidor de análisis para que surta efecto.",
+      "restartNow": "Reiniciar ahora"
+    },
+    "unload": {
+      "succeeded": "Modelo \"{model}\" descargado",
+      "failed": "No se pudo desinstalar el modelo \"{model}\" — el CLI de Ollama puede no estar en PATH."
+    },
+    "budget": {
+      "title": "Herramienta de desarrollo Presupuesto",
+      "value": "{used}% de {budget}% objetivo ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "No se encontraron comentarios de ignorar obsoletos.",
       "found": "{count} ignorados caducados en {fileCount} archivo(s). Vea el panel de Problemas para más detalles.",
       "fixed": "Comentarios de ignorar obsoletos eliminados. Vea el panel de salida para más detalles.",
-      "fixedInFile": "Saropa Lints: ignorados caducados corregidos en este archivo"
+      "fixedInFile": "Saropa Lints: ignorados caducados corregidos en este archivo",
+      "alreadyRunning": "Un escaneo de stale-ignore ya está en ejecución."
     },
     "confirm": {
       "fixMessage": "Esto eliminará comentarios de ignorar obsoletos de sus archivos de origen. Los cambios pueden deshacerse con git. ¿Continuar?",
@@ -2553,18 +2610,26 @@
       "message": "Regla '{ruleName}' no se aplica más en esta línea."
     },
     "sidebar": {
-      "fixLabel": "Corrige ignores obsoletos",
-      "fixDescription": "Detectar y eliminar automáticamente los comentarios // ignore: muertos"
+      "fixLabel": "Cortar ignora",
+      "fixDescription": "Encuentre y elimine automáticamente los comentarios // ignore: muertos"
     },
     "quickFix": {
       "title": "Corrige ignores obsoletos en este archivo"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Ejecutar el análisis de ejecución.",
+      "runAnalysisDescription": "Volver a ejecutar el analizador",
+      "updateConfigLabel": "Actualizar configuración",
+      "updateConfigDescription": "Inicializar o refrescar opciones de análisis"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% revisado",
       "hotspotsDescription": "{open} abrir",
-      "lastRunLabel": "Última ejecución · {ago}"
+      "lastRunLabel": "Última ejecución · {ago}",
+      "machineHealthLabel": "Salud de la Máquina",
+      "machineHealthDescription": "RAM, orfanos & motor de traducción en toda la máquina"
     },
     "dashboards": {
       "commandCatalogLabel": "Todos los comandos…",

@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} orphello daemon(s)",
       "criticalOrphans": "🔴 {count} orphane daemon(s)",
-      "openHint": "Klik om Process Health te openen"
+      "openHint": "Klik om Process Health te openen",
+      "systemRam": "Systeem: {free} van {total} vrij",
+      "systemLow": "⚠ Systeem: {free} van {total} vrij"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proces(sen) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart processen gebruiken {size} met {orphaned} orphanged daemonen. Verwijderen?",
       "possibleLeak": "Saropa RSS stijgt steeds verder ({size} en stijgt). Mogelijke geheugenlek — controleer de health panel.",
-      "result": "Killed {count} orphelen daemonen, vrijgemaakt ~{size}"
+      "result": "Killed {count} orphelen daemonen, vrijgemaakt ~{size}",
+      "systemLowMemory": "Je machine heeft slechts {free} van {total} RAM vrij. Overweeg het sluiten van ongebruikte vensters of toepassingen.",
+      "analysisServerLarge": "Een Dart analyse-server gebruikt {size}. Herstart het om geheugen vrij te maken?",
+      "sessionStartLow": "Je machine heeft {free} van {total} RAM vrij. Overweeg het sluiten van ongebruikte VS Code vensters of Ollama modellen voordat je begint met werken."
     },
     "action": {
       "cleanUp": "Reinigen",
       "openPanel": "Open het Gezondheidspaneel",
       "dismiss": "Ontslag ontslagen.",
       "optimizeAnalysis": "Analyse optimaliseren",
-      "dontShowAgain": "Niet Opnieuw Toon"
+      "dontShowAgain": "Niet Opnieuw Toon",
+      "openMachineDashboard": "Open Machinestatus",
+      "restartAnalysisServer": "Herstart opnieuw opstarten."
     },
     "cleanup": {
       "noOrphans": "Geen orphane daemonprocessen gevonden.",
@@ -749,6 +756,55 @@
       "kill": "Kil",
       "killed": "Gedood",
       "killFailed": "Mislukt"
+    }
+  },
+  "machineDashboard": {
+    "title": "Machinegezondheid",
+    "refresh": "Vernieuwen",
+    "systemUnknown": "Systeemgeheugen kon niet worden gelezen op deze platform.",
+    "platformUnsupported": "Machine Health vereist Windows — process queries zijn niet beschikbaar op deze platform.",
+    "freeOf": "vrij van",
+    "used": "gebruikt",
+    "recommendationsTitle": "Aanbevelingen",
+    "recommendationsNone": "Geen problemen gedetecteerd.",
+    "noProcesses": "Geen Dart, Flutter of model-host processen actief.",
+    "orphanCount": "{count} orphelijn",
+    "kill": "Kil",
+    "group": {
+      "analysisServer": "Dart Analyseerververs",
+      "flutterDaemon": "Flutter Daemonen",
+      "saropa": "Saropa Lints",
+      "otherDart": "Andere Dart processen",
+      "modelHost": "Vertaalingsmotor (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Alleen {free} van {total} RAM is vrij machine-wide. Sluit ongebruikte applicaties of VS Code vensters.",
+      "orphansFound": "{count} orphaneerd proces(en) houden {size} van geheugen in beschikking van een vroeger sessie.",
+      "analysisServerLarge": "{count} Dart analyseer server proces(en) gebruiken totaal van {size}. Een herstart bevrijdt de geheugen.",
+      "multipleAnalysisServers": "{count} Dart analyseerservers lopen — waarschijnlijk één per geopende VS Code venster op overlappende projecten.",
+      "noHeapCap": "De analyse-server Dart heeft geen geheugenlimiet ingesteld. Het instellen van een limiet beperkt de slechtste gevalgroei.",
+      "modelLoaded": "Model \"{model}\" is geladen in de vertalingengine, met behulp van {size}.",
+      "budgetOverspend": "Dev tools gebruiken {used}% van het systeem RAM ({size}), wat het {budget}% budget overtreft. Sluit ongebruikte VS Code vensters of laad vertaling modellen af."
+    },
+    "action": {
+      "reclaim": "Herstel",
+      "restartAnalysisServer": "Herstart opnieuw opstarten.",
+      "setHeapCap": "Kap instellen",
+      "unloadModel": "Uitladen"
+    },
+    "heapCap": {
+      "prompt": "Analyseer server heap cap in MB (bijv. 4096)",
+      "invalid": "Geef een geheel getal in megabytes dat groter is dan 0.",
+      "applied": "Analyseer server heap cap instellen op {mb} MB. Herstart de analyseer server voor het te werken.",
+      "restartNow": "Nu opnieuw starten"
+    },
+    "unload": {
+      "succeeded": "Model \"{model}\" is geladen.",
+      "failed": "Kon model \"{model}\" niet ontladen — de Ollama CLI kan niet op PATH zijn."
+    },
+    "budget": {
+      "title": "Budget voor ontwikkelaarstools",
+      "value": "{used}% van {budget}% doel ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "Geen verouderde ignore opmerkingen gevonden.",
       "found": "{count} verouderde negeren(s) in {fileCount} bestand(s). Zie het Problems-paneel voor meer informatie.",
       "fixed": "Verouwde ignore opmerkingen verwijderd. Zie de Output-venster voor details.",
-      "fixedInFile": "Saropa Lints: verouwde ignoreren is aangepast in deze bestand"
+      "fixedInFile": "Saropa Lints: verouwde ignoreren is aangepast in deze bestand",
+      "alreadyRunning": "Een stale-ignore scan loopt al."
     },
     "confirm": {
       "fixMessage": "Dit zal oude ignore comments verwijderen uit je bronbestanden. De wijzigingen kunnen met git ongedaan worden gemaakt. Verder?",
@@ -2553,18 +2610,26 @@
       "message": "Stale ignore: regel '{ruleName}' activeert zich niet meer op deze regel."
     },
     "sidebar": {
-      "fixLabel": "Vermijd verouderde ignores",
-      "fixDescription": "Detecteer en auto-verwijder dead // ignore: comments"
+      "fixLabel": "Prune ignoreert",
+      "fixDescription": "Zoek en automatisch verwijderen van dode // ignore: opmerkingen"
     },
     "quickFix": {
       "title": "Vermijd verouderde ignores in deze bestand"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Analyse uitvoeren",
+      "runAnalysisDescription": "Analyseer opnieuw",
+      "updateConfigLabel": "Config bijwerken",
+      "updateConfigDescription": "Initialiseer of vernieuw analyseopties"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% beoordeeld",
       "hotspotsDescription": "{open} geopend",
-      "lastRunLabel": "Laatste run · {ago}"
+      "lastRunLabel": "Laatste run · {ago}",
+      "machineHealthLabel": "Machinegezondheid",
+      "machineHealthDescription": "RAM, orphelen & vertalingssysteem over de hele machine"
     },
     "dashboards": {
       "commandCatalogLabel": "Alle commando's…",

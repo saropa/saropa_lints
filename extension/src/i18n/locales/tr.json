@@ -679,7 +679,9 @@
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} izole edilmiş daemon(s)",
       "criticalOrphans": "🔴 {count} izole edilmiş daemon(s)",
-      "openHint": "Süreç Sağlığı'nı açmak için tıklayın"
+      "openHint": "Süreç Sağlığı'nı açmak için tıklayın",
+      "systemRam": "Sistem: {free} / {total} ücretsiz",
+      "systemLow": "⚠ Sistem: {free} / {total} ücretsiz"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} işlem(ler) ({size} RSS)",
@@ -697,14 +699,19 @@
     "notification": {
       "critical": "Dart süreçleri {size} ile {orphaned} izole edilmiş daemon'ları kullanıyor. Temizle?",
       "possibleLeak": "Saropa RSS artmaya devam ediyor ({size} ve artıyor). Olası bellek sızıntısı — sağlık panelini kontrol edin.",
-      "result": "{count} ölü daemon öldürdüm, ~{size} serbest bırakıldı"
+      "result": "{count} ölü daemon öldürdüm, ~{size} serbest bırakıldı",
+      "systemLowMemory": "Makinanızda sadece {free} kadar {total} RAM boş. Kullanılmayan pencereleri veya uygulamaları kapatmayı düşünün.",
+      "analysisServerLarge": "Dart analiz sunucusu {size} kullanıyor. Belleği boşaltmak için yeniden başlatın?",
+      "sessionStartLow": "Makinanızda {free} kadar {total} RAM serbest. Çalışmaya başlamadan önce kullanılmayan VS Code pencerelerini veya Ollama modellerini kapatmayı düşünün."
     },
     "action": {
       "cleanUp": "Temizle",
       "openPanel": "Sağlık Paneli",
       "dismiss": "İşten çıkarma, işten atmak.",
       "optimizeAnalysis": "Analiz Optimizasyonu",
-      "dontShowAgain": "Yine Gösterme"
+      "dontShowAgain": "Yine Gösterme",
+      "openMachineDashboard": "Makine Sağlığı Açık",
+      "restartAnalysisServer": "Yeniden başlatma, yeniden başlatmak."
     },
     "cleanup": {
       "noOrphans": "Hiçbir ölü daemon bulunamadı.",
@@ -749,6 +756,55 @@
       "kill": "Öldür",
       "killed": "Öldürüldü",
       "killFailed": "Başarısız"
+    }
+  },
+  "machineDashboard": {
+    "title": "Makine Sağlığı",
+    "refresh": "Rahatlatıcı ve rahatlatıcı olsun.",
+    "systemUnknown": "Bu platformda sistem belleği okunamadı.",
+    "platformUnsupported": "Makine Sağlığı Windows gerektirir — bu platformda işlem sorguları mevcut değildir.",
+    "freeOf": "ücretsiz",
+    "used": "kullanıldı",
+    "recommendationsTitle": "Tavsiyeler",
+    "recommendationsNone": "Sorun tespit edilmedi.",
+    "noProcesses": "Hiçbir Dart, Flutter veya model-host süreçleri çalışmadı.",
+    "orphanCount": "{count} izole",
+    "kill": "Öldür",
+    "group": {
+      "analysisServer": "Dart Analiz Sunucuları",
+      "flutterDaemon": "Flutter İstemci Programları",
+      "saropa": "Saropa Lints",
+      "otherDart": "Diğer Dart İşlemleri",
+      "modelHost": "Çeviri Motoru (Ollama)"
+    },
+    "recommendation": {
+      "systemLowMemory": "Sadece {free}/{total} RAM özgür makine çapında. Kullanılmayan uygulamaları kapatın veya VS Code pencerelerini kapatın.",
+      "orphansFound": "{count} izole süreç(ler) daha önceki bir oturumdan {size} bellek tutuyor.",
+      "analysisServerLarge": "{count} Dart analiz sunucu işlem(ler)i en fazla {size} kullanıyor. Yeniden başlatma belleği serbest bırakır.",
+      "multipleAnalysisServers": "{count} Dart analiz sunucuları çalışıyor — muhtemelen açık VS Code pencerede çakışan projeler için her biri için bir tane.",
+      "noHeapCap": "Dart analiz sunucusu için bellek üst sınırı ayarlanmamıştır. Ayarlamak en kötü durumda büyümenin sınırlarını belirler.",
+      "modelLoaded": "Model \"{model}\" çeviri motorunda {size} kullanılarak yüklendi.",
+      "budgetOverspend": "Dev araçları sistemin RAM'ini {used}% kullanıyor ({size}), {budget}% bütçeyi aşmış. Kullanılmayan VS Code pencerelerini kapatın veya çeviri modellerini yükün."
+    },
+    "action": {
+      "reclaim": "Geri Kazanım",
+      "restartAnalysisServer": "Yeniden başlatma, yeniden başlatmak.",
+      "setHeapCap": "Kapağı Ayarla",
+      "unloadModel": "Çıkart"
+    },
+    "heapCap": {
+      "prompt": "Analiz sunucusu yığın kapasitesi MB cinsinden (örn. 4096)",
+      "invalid": "0'dan büyük bir tam sayı megabayt girin.",
+      "applied": "Analiz sunucusu yığın kapasitesini {mb} MB'ye ayarlayın. Analiz sunucusunu yeniden başlatın ve etkili olması için.",
+      "restartNow": "Şimdi Yeniden Başlat"
+    },
+    "unload": {
+      "succeeded": "Yüklenmemiş model \"{model}\"",
+      "failed": "Model \"{model}\" yüklenemedi — Ollama CLI'nin PATH'te olmayabileceği."
+    },
+    "budget": {
+      "title": "Dev Tool Bütçesi",
+      "value": "{used}% of {budget}% hedef ({size})"
     }
   },
   "memoryPressure": {
@@ -2542,7 +2598,8 @@
       "noneFound": "İgnore yorumları bulunamadı.",
       "found": "{count} eski ignore(s) {fileCount} dosya(s) içinde. Detaylar için Sorunlar paneline bakın.",
       "fixed": "İgnore yorumları kaldırıldı. Detaylar için Çıktı panosunu inceleyin.",
-      "fixedInFile": "Saropa Lints: bu dosyada eski görmezlikler düzeltilmiş"
+      "fixedInFile": "Saropa Lints: bu dosyada eski görmezlikler düzeltilmiş",
+      "alreadyRunning": "Bir stale-ignore taraması zaten çalışmaktadır."
     },
     "confirm": {
       "fixMessage": "Bu, kaynak dosyanızdaki eski ignore yorumlarını kaldırır. Değişiklikler git ile geri alınamaz. Devam edilsin mi?",
@@ -2553,18 +2610,26 @@
       "message": "İgnore edilmiş: kural '{ruleName}' bu satırda artık tetiklenmiyor."
     },
     "sidebar": {
-      "fixLabel": "Yeniden değerlendirilen ignore'ları düzelt",
-      "fixDescription": "Ölüleri algıla ve otomatik olarak kaldır // yoksay: yorumlar"
+      "fixLabel": "İgnore edilen kesilir",
+      "fixDescription": "Ölü // ignore: yorumlarını bulun ve otomatik olarak kaldırın"
     },
     "quickFix": {
       "title": "Bu dosyadaki eski atlananları düzelt"
     }
   },
   "sidebar": {
+    "actions": {
+      "runAnalysisLabel": "Analiz çalıştırın.",
+      "runAnalysisDescription": "Analizciyi yeniden çalıştır",
+      "updateConfigLabel": "Yükleme config",
+      "updateConfigDescription": "Analiz seçeneklerini başlat veya yenile"
+    },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% inceledi",
       "hotspotsDescription": "{open} aç",
-      "lastRunLabel": "Son çalıştırma · {ago}"
+      "lastRunLabel": "Son çalıştırma · {ago}",
+      "machineHealthLabel": "Makine Sağlığı",
+      "machineHealthDescription": "RAM, orfanlar & çevirici motoru tüm makine boyunca"
     },
     "dashboards": {
       "commandCatalogLabel": "Tüm komutlar…",
