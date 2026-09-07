@@ -380,9 +380,6 @@
       "laneFull": "完全 — エディタ内でのすべての有効なルール",
       "migrateLegacyKeys": "{count} 既存の設定キーを移行",
       "migrateLegacyKeysDesc": "古いプラグインブロックのキーをanalysis_options_custom.yamlに移動"
-    },
-    "badge": {
-      "needlesTooltip": "{count} パッケージ（s）に未採用の機能があります"
     }
   },
   "configSuggestions": {

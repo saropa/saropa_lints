@@ -380,9 +380,6 @@
       "laneFull": "Completo — ogni regola abilitata analizzata in-editor",
       "migrateLegacyKeys": "Migrare la chiave {count} legacy configurazione",
       "migrateLegacyKeysDesc": "Sposta le chiavi del plugin-block legacy in analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "{count} package(s) hanno caratteristiche non adottate"
     }
   },
   "configSuggestions": {

@@ -380,9 +380,6 @@
       "laneFull": "ครบ — กฎทุกกฎที่เปิดใช้งานในตัวแก้ไข",
       "migrateLegacyKeys": "ย้ายคีย์การกำหนดค่าดั้งเดิมของ {count}",
       "migrateLegacyKeysDesc": "ย้ายคีย์บล็อกปลั๊กอินแบบเดิมไปที่ analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "แพ็คเกจ {count} มีคุณสมบัติที่ยังไม่ได้นำมาใช้"
     }
   },
   "configSuggestions": {

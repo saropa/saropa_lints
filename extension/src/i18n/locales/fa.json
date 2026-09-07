@@ -380,9 +380,6 @@
       "laneFull": "کامل — هر قاعده‌ای که فعال است در داخل ویرایشگر",
       "migrateLegacyKeys": "میگرایید {count} کلید(ها) پیکربندی قدیمی",
       "migrateLegacyKeysDesc": "کلیدهای قدیمی پلاگین-بلوک را به analysis_options_custom.yaml منتقل کنید"
-    },
-    "badge": {
-      "needlesTooltip": "بسته(های) {count} دارای ویژگی های ناپذیرفته است"
     }
   },
   "configSuggestions": {

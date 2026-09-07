@@ -380,9 +380,6 @@
       "laneFull": "完整 — 编辑器中所有启用的规则",
       "migrateLegacyKeys": "迁移 {count} 旧配置密钥",
       "migrateLegacyKeysDesc": "将旧插件块密钥移至 analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "{count} 软件包具有未采用的功能"
     }
   },
   "configSuggestions": {

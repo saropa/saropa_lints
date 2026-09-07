@@ -380,9 +380,6 @@
       "laneFull": "पूर्ण — सभी सक्रिय नियम एडिटर में",
       "migrateLegacyKeys": "{count} वितरण अपडेट करें",
       "migrateLegacyKeysDesc": "पुराने प्लगइन-ब्लॉक कुंजी को analysis_options_custom.yaml में ले जाएं"
-    },
-    "badge": {
-      "needlesTooltip": "{count} पैकेज (s) में अपस्वीकृत सुविधाएँ"
     }
   },
   "configSuggestions": {

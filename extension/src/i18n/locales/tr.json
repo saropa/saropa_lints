@@ -380,9 +380,6 @@
       "laneFull": "Tam — editörde etkinleştirilmiş her kural",
       "migrateLegacyKeys": "{count} eski yapılandırma anahtarlarını taşıyın",
       "migrateLegacyKeysDesc": "Eski eklenti bloğu anahtarlarını analysis_options_custom.yaml'a taşıyın"
-    },
-    "badge": {
-      "needlesTooltip": "{count} paket(ler)inde benimsenmemiş özellikler var"
     }
   },
   "configSuggestions": {

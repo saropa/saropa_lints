@@ -380,9 +380,6 @@
       "laneFull": "Pełny — każda włączona reguła w edytorze",
       "migrateLegacyKeys": "Przenieś klucze konfiguracji {count} legacy",
       "migrateLegacyKeysDesc": "Przenieś stare klucze plugin-block do analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "Pakiety {count} mają nieadoptowane funkcje"
     }
   },
   "configSuggestions": {

@@ -380,9 +380,6 @@
       "laneFull": "Vollständig — jede aktivierte Regel im Editor",
       "migrateLegacyKeys": "{count} legacy Konfigurations Schlüssel(e) migrieren",
       "migrateLegacyKeysDesc": "Legacy-Plugin-Block-Schlüssel in analysis_options_custom.yaml verschieben"
-    },
-    "badge": {
-      "needlesTooltip": "{count} Paket(e) haben nicht übernommene Features"
     }
   },
   "configSuggestions": {

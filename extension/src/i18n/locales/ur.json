@@ -380,9 +380,6 @@
       "laneFull": "کامل — ہر ایک ایک سے چالو ہوئے قاعدہ داخلہ میں",
       "migrateLegacyKeys": "{count} میراثی تشکیل کلید کو منتقل کریں",
       "migrateLegacyKeysDesc": "لیگیسی پلگ ان بلاک کیز کو analysis_options_custom.yaml پر منتقل کریں۔"
-    },
-    "badge": {
-      "needlesTooltip": "{count} پیکیج (پیکیجوں) میں غیر اختیار شدہ خصوصیات ہیں۔"
     }
   },
   "configSuggestions": {

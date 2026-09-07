@@ -380,9 +380,6 @@
       "laneFull": "Full — lahat ng nakarehistro na rule sa loob ng editor",
       "migrateLegacyKeys": "I-migrate ang (mga) legacy na config key ng {count}",
       "migrateLegacyKeysDesc": "Ibahin ang mga key ng legacy plugin-block patungo sa analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "{count} package(s) ay may mga hindi inilalagay na mga tampok"
     }
   },
   "configSuggestions": {

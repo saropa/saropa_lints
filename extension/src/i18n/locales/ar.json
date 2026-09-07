@@ -380,9 +380,6 @@
       "laneFull": "كامل — كل القواعد المفعلة داخل المحرر",
       "migrateLegacyKeys": "التحوّل من مفتاح {count} القديم (مفاتيح)",
       "migrateLegacyKeysDesc": "الانتقال إلى مفاتيح قديم plugin-block إلى analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "حزمة {count} تحتوي على ميزات غير مُعتمدة"
     }
   },
   "configSuggestions": {

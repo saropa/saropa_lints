@@ -380,9 +380,6 @@
       "laneFull": "Lengkap — setiap aturan yang diaktifkan dalam editor",
       "migrateLegacyKeys": "Migrasi {count} legacy config key(s)",
       "migrateLegacyKeysDesc": "Pindahkan kunci plugin-block lama ke analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "{count} paket(s) memiliki fitur yang belum diadopsi"
     }
   },
   "configSuggestions": {

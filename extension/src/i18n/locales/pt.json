@@ -380,9 +380,6 @@
       "laneFull": "Completo — todas as regras ativadas em editor",
       "migrateLegacyKeys": "Migrar {count} chave(s) de configuração legada",
       "migrateLegacyKeysDesc": "Mova as chaves do plugin-block legado para analysis_options_custom.yaml"
-    },
-    "badge": {
-      "needlesTooltip": "{count} pacote(s) têm recursos não adotados"
     }
   },
   "configSuggestions": {

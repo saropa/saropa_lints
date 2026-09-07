@@ -380,9 +380,6 @@
       "laneFull": "পূর্ণ — সমস্ত সক্রিয় নিয়ম ইন-এডিটরে ব্যবহার করুন",
       "migrateLegacyKeys": "{count} পুরানো কনফিগ কী(গুলি) স্থানান্তরিত করুন",
       "migrateLegacyKeysDesc": "পুরাতন প্লাগইন-ব্লক কী গুলো স্থানান্তর করুন analysis_options_custom.yaml-তে"
-    },
-    "badge": {
-      "needlesTooltip": "{count} প্যাকেজ(গুলো) অনুসরণ করা হয়নি বৈশিষ্ট্যগুলো"
     }
   },
   "configSuggestions": {
