@@ -385,6 +385,9 @@ export async function runInWorkspaceAsync(
   // shell: false as the preferred path while degrading gracefully.
   const result = await doSpawn(shell);
   if (!shell && !result.ok && result.stderr.includes('ENOENT')) {
+    // Don't retry if the user already cancelled — avoids a pointless
+    // spawn-then-immediate-kill cycle between the ENOENT and the retry.
+    if (token?.isCancellationRequested) return result;
     ch?.appendLine('[shell: false failed with ENOENT — retrying with shell: true]');
     return doSpawn(true);
   }
@@ -446,7 +449,8 @@ export async function resolveDependencies(
       : work;
 
   const dartResult = await withTick(
-    runInWorkspaceAsync(workspaceRoot, 'dart', ['pub', 'get'], { token }),
+    // shell: false — dart.exe is a native executable; no cmd.exe needed.
+    runInWorkspaceAsync(workspaceRoot, 'dart', ['pub', 'get'], { token, shell: false }),
   );
   if (dartResult.ok || dartResult.cancelled) return { ...dartResult, command: 'dart' };
 
@@ -463,7 +467,8 @@ export async function resolveDependencies(
 
   logReport('- dart pub get failed to resolve the Flutter SDK; retrying with flutter pub get');
   const flutterResult = await withTick(
-    runInWorkspaceAsync(workspaceRoot, 'flutter', ['pub', 'get'], { token }),
+    // shell: true — `flutter` is a .bat on Windows; needs cmd.exe to execute.
+    runInWorkspaceAsync(workspaceRoot, 'flutter', ['pub', 'get'], { token, shell: true }),
   );
   return { ...flutterResult, command: 'flutter' };
 }
@@ -612,7 +617,8 @@ async function runEnableExclusive(context: vscode.ExtensionContext): Promise<boo
       const initResult = await withTickingProgress(
         progress,
         (elapsed) => l10n('notify.setup.progressConfigWrite', { elapsed: String(elapsed) }),
-        runInWorkspaceAsync(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier), { token }),
+        // shell: false — dart.exe is a native executable; no cmd.exe needed.
+        runInWorkspaceAsync(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier), { token, shell: false }),
       );
       if (initResult.cancelled) {
         logReport('- Enable cancelled by user (write_config)');
@@ -707,11 +713,12 @@ async function runCreateBaselineExclusive(): Promise<boolean> {
       const result = await withTickingProgress(
         progress,
         (elapsed) => l10n('notify.setup.progressBaseline', { elapsed: String(elapsed) }),
+        // shell: false — dart.exe is a native executable; no cmd.exe needed.
         runInWorkspaceAsync(
           workspaceRoot,
           'dart',
           ['run', 'saropa_lints:baseline'],
-          { token },
+          { token, shell: false },
         ),
       );
       // User-initiated cancel is not an error: leave the report quiet and skip
@@ -1266,7 +1273,8 @@ async function runAnalysisAfterConfigChangeScoped(
   // and the synchronous spawnSync variant used to block the whole extension
   // host for that entire duration — the root cause of the "Enabling Saropa
   // Lints" progress notification appearing permanently stalled.
-  const analysisResult = await runInWorkspaceAsync(workspaceRoot, analyzeCmd, ['analyze'], { token: options?.token });
+  // shell: false — dart.exe is a native executable; no cmd.exe needed.
+  const analysisResult = await runInWorkspaceAsync(workspaceRoot, analyzeCmd, ['analyze'], { token: options?.token, shell: false });
   if (analysisResult.cancelled) {
     logReport('- Analysis cancelled by user');
     return { cancelled: true };
@@ -1614,7 +1622,8 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
       // Async + cancellable: never block the extension-host event loop (see the
       // cancellable rationale on this progress above). The token wires the
       // Cancel button to a process-tree kill.
-      const result = await runInWorkspaceAsync(workspaceRoot, cmd, ['analyze'], { token: supersedeCts.token });
+      // shell: false — dart.exe is a native executable; no cmd.exe needed.
+      const result = await runInWorkspaceAsync(workspaceRoot, cmd, ['analyze'], { token: supersedeCts.token, shell: false });
       if (result.cancelled) {
         // Cancelled either by the user's Cancel button or because a newer run
         // superseded this one (rapid pack toggles). Either way: stop quietly.
@@ -1706,7 +1715,8 @@ export async function runAnalysisForFiles(
   // See bug_analysis_runs_dart_analyze_not_lsp.md for the original report.
   const doRun = async (token?: vscode.CancellationToken): Promise<{ ok: boolean; cancelled: boolean }> => {
     logSection('Analysis (files)');
-    const result = await runInWorkspaceAsync(workspaceRoot, cmd, args, { token });
+    // shell: false — dart.exe is a native executable; no cmd.exe needed.
+    const result = await runInWorkspaceAsync(workspaceRoot, cmd, args, { token, shell: false });
     if (result.cancelled) {
       logReport('- Analysis (files) cancelled');
       flushReport(workspaceRoot);
@@ -1768,11 +1778,12 @@ export async function runInitializeConfig(context: vscode.ExtensionContext, titl
     },
     async (_progress, token) => {
       logSection('Initialize Config');
+      // shell: false — dart.exe is a native executable; no cmd.exe needed.
       const result = await runInWorkspaceAsync(
         workspaceRoot,
         'dart',
         buildWriteConfigArgs(workspaceRoot, tier),
-        { token },
+        { token, shell: false },
       );
       ok = result.ok;
       if (result.cancelled) {
@@ -1988,7 +1999,8 @@ async function applyTierChange(
   const writeResult = await withTickingProgress(
     ui.progress,
     (elapsed) => l10n('notify.setup.progressConfigWrite', { elapsed: String(elapsed) }),
-    runInWorkspaceAsync(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tiers.next), { token: ui.token }),
+    // shell: false — dart.exe is a native executable; no cmd.exe needed.
+    runInWorkspaceAsync(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tiers.next), { token: ui.token, shell: false }),
   );
   if (writeResult.cancelled) {
     // Cancelling mid-write leaves analysis_options.yaml in whatever state the

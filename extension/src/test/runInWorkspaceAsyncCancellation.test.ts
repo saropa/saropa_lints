@@ -60,16 +60,17 @@ describe('runInWorkspaceAsync cancellation', () => {
     fs.rmSync(scriptDir, { recursive: true, force: true });
   });
 
-  it('flags cancelled: true and kills the child when the token fires mid-run', async () => {
+  // --- shell: true (legacy path, still used by `flutter` which is a .bat) ---
+
+  it('flags cancelled: true and kills the child when the token fires mid-run (shell: true)', async () => {
     const source = new FakeCancellationTokenSource();
-    // `runInWorkspaceAsync` spawns with `shell: true`, which does NOT auto-quote
-    // args containing spaces (e.g. `C:\Program Files\nodejs\node.exe`) — quote
-    // manually, same as a real caller would need to for a spaced install path.
+    // shell: true does NOT auto-quote args containing spaces — quote manually,
+    // same as the `flutter pub get` caller does for a spaced install path.
     const resultPromise = runInWorkspaceAsync(
       os.tmpdir(),
       `"${process.execPath}"`,
       [`"${sleepScript}"`],
-      { logToOutput: false, token: source.token },
+      { logToOutput: false, token: source.token, shell: true },
     );
 
     // Cancel shortly after spawn so the child is definitely running, not already exited.
@@ -80,13 +81,45 @@ describe('runInWorkspaceAsync cancellation', () => {
     assert.strictEqual(result.ok, false);
   });
 
-  it('flags cancelled: false when the command completes before any cancellation', async () => {
+  it('flags cancelled: false when the command completes before any cancellation (shell: true)', async () => {
     const source = new FakeCancellationTokenSource();
     const result = await runInWorkspaceAsync(
       os.tmpdir(),
       `"${process.execPath}"`,
       [`"${exitScript}"`],
-      { logToOutput: false, token: source.token },
+      { logToOutput: false, token: source.token, shell: true },
+    );
+
+    assert.strictEqual(result.cancelled, false);
+    assert.strictEqual(result.ok, true);
+  });
+
+  // --- shell: false (preferred path for `dart` — no cmd.exe intermediary) ---
+
+  it('flags cancelled: true and kills the child when the token fires mid-run (shell: false)', async () => {
+    const source = new FakeCancellationTokenSource();
+    // shell: false — args are passed directly to the child, no quoting needed.
+    const resultPromise = runInWorkspaceAsync(
+      os.tmpdir(),
+      process.execPath,
+      [sleepScript],
+      { logToOutput: false, token: source.token, shell: false },
+    );
+
+    setTimeout(() => source.cancel(), 100);
+
+    const result = await resultPromise;
+    assert.strictEqual(result.cancelled, true);
+    assert.strictEqual(result.ok, false);
+  });
+
+  it('flags cancelled: false when the command completes before any cancellation (shell: false)', async () => {
+    const source = new FakeCancellationTokenSource();
+    const result = await runInWorkspaceAsync(
+      os.tmpdir(),
+      process.execPath,
+      [exitScript],
+      { logToOutput: false, token: source.token, shell: false },
     );
 
     assert.strictEqual(result.cancelled, false);
