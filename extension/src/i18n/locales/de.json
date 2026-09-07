@@ -789,7 +789,7 @@
     "action": {
       "reclaim": "Wiedererobern",
       "restartAnalysisServer": "Wiederherstellen Sie den Restart.",
-      "setHeapCap": "Set Cap",
+      "setHeapCap": "Limit festlegen",
       "unloadModel": "Entladen"
     },
     "heapCap": {
@@ -803,7 +803,7 @@
       "failed": "Model \"{model}\" konnte nicht geladen werden — der Ollama CLI könnte nicht im PATH sein."
     },
     "budget": {
-      "title": "Dev Tool Budget",
+      "title": "Dev-Tool-Budget",
       "value": "{used}% von {budget}% Ziel ({size})"
     }
   },

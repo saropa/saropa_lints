@@ -775,7 +775,7 @@
       "flutterDaemon": "Flutter Mga Daemon",
       "saropa": "Saropa Lints",
       "otherDart": "Mga Proseso na Dart Pang iba pang",
-      "modelHost": "Translation Engine (Ollama)"
+      "modelHost": "Makina ng Pagsasalin (Ollama)"
     },
     "recommendation": {
       "systemLowMemory": "Nagbibigay lamang ng {free} ng {total} RAM ang libreng machine-wide. I-close ang mga aplikasyon na hindi ginagamit o VS Code windows.",

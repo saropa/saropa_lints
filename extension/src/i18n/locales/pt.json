@@ -803,7 +803,7 @@
       "failed": "Não foi possível desanexar o modelo \"{model}\" — o Ollama CLI pode não estar no PATH."
     },
     "budget": {
-      "title": "Dev Tool Budget",
+      "title": "Orçamento de Dev Tools",
       "value": "{used}% do {budget}% alvo ({size})"
     }
   },

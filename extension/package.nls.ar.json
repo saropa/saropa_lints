@@ -343,7 +343,7 @@
   "config.property.systemHealth.warningOrphanCount.description": "أظهر تحذير عندما يصل عدد الزومان Flutter المهجور إلى هذه القيمة.",
   "config.property.systemHealth.criticalOrphanCount.description": "أظهر تنبيهًا حرجًا عندما يصل عدد دايموند Flutter المهجور إلى هذه القيمة.",
   "config.property.systemHealth.showNotifications.description": "أظهر إشعارًا عندما تصل صحة النظام إلى مستوى حرجة.",
-  "config.property.systemHealth.analysisServerWarningGB.description": "Warn when any single Dart analysis server process (not just saropa_lints) exceeds this RSS, in GB.",
+  "config.property.systemHealth.analysisServerWarningGB.description": "تحذير عندما تتجاوز أي عملية خادم تحليل Dart (ليس فقط saropa_lints) حجم RSS هذا، بالجيجابايت.",
   "config.property.systemHealth.systemMemoryWarningPercent.description": "تحذير عند تقليل نسبة الذاكرة الفيزيائية الحرة في جميع الجهاز تحت هذه النسبة المئوية.",
   "config.property.systemHealth.devToolBudgetPercent.description": "نسبة الهدف من الذاكرة العشوائية الخاصة بالنظام الكلية لجميع أدوات التطوير (Dart, Flutter, Ollama). يحذر لوحة التحكم عندما تتجاوز أدوات التطوير هذه الحصة.",
   "command.toggleDebugPanel.title": "Saropa Lints: عرض لوحة الصحة (محركات + العمليات)",

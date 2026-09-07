@@ -589,6 +589,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Gate passing": "Gate bestanden",
         # Manual: MT did not translate this log-panel placeholder for German.
         "No output yet — this log only fills if the scan prints a diagnostic message.": "Noch keine Ausgabe — dieses Protokoll wird nur gefüllt, wenn der Scan eine Diagnosemeldung ausgibt.",
+        # Manual: machine health dashboard section title — MT returned English unchanged.
+        "Dev Tool Budget": "Dev-Tool-Budget",
+        # Manual: heap-cap button label — MT returned English unchanged.
+        "Set Cap": "Limit festlegen",
     },
     "es": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -800,6 +804,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Code Health quality gate passing — click to open Code Health": "Gate de qualidade do Code Health aprovado — clique para abrir o Code Health",
         # Manual: scan timestamp — {ago} is a relative-time placeholder like "5m ago".
         "Scanned {ago}": "Escaneado {ago}",
+        # Manual: machine health dashboard section title — MT returned English unchanged.
+        "Dev Tool Budget": "Orçamento de Dev Tools",
     },
     "ru": {
         # Manual: brand "Saropa Lints" stays untranslated; {error} placeholder preserved.
@@ -1096,6 +1102,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{visible} من {total} صفوف مرئية",
         "{wk}w ago": "منذ {wk} أسبوع",
         "▾": "▾",
+        # Manual: RSS memory warning description for settings — MT returned English unchanged.
+        "Warn when any single Dart analysis server process (not just saropa_lints) exceeds this RSS, in GB.": "تحذير عندما تتجاوز أي عملية خادم تحليل Dart (ليس فقط saropa_lints) حجم RSS هذا، بالجيجابايت.",
     },
     "hi": {
         # Manual: MT returned this identical to English; pinned so a regen cannot revert it.
@@ -1477,6 +1485,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{grade} · {score}/100 · Gate failing": "{grade} · {score}/100 · Hindi pumasa ang gate",
         # Manual: MT returned English unchanged; "Takbo" = trend/run, "ng RSS" = of RSS.
         "RSS trend: {chart}": "Takbo ng RSS: {chart}",
+        # Manual: machine health section label — MT returned English unchanged.
+        "Translation Engine (Ollama)": "Makina ng Pagsasalin (Ollama)",
     },
     "he": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.

@@ -66,7 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.0.0-beta.8] — Unreleased
+## [16.0.0-beta.8]
+
+🌍 **Milestone: 25 languages, 2,319 translated fields** — extension ships in 25 locales (Arabic, Bengali, Chinese, Dutch, English, Farsi, Filipino, French, German, Hebrew, Hindi, Indonesian, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Swahili, Thai, Turkish, Ukrainian, Urdu, Vietnamese).
 
 Fixed a sidebar action that could crash on a project's first scan or run twice on rapid clicks, and shortened several sidebar labels. System Health now monitors the whole machine — not just saropa_lints' own processes — with proactive warnings and one-click fixes. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.8/CHANGELOG.md)
 
