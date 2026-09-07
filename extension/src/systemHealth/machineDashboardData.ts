@@ -5,6 +5,15 @@
  * and recommendation rules — the part someone will actually want to change
  * ("why didn't it warn me about X?") — are unit-testable without a webview
  * or a live process table.
+ *
+ * **Key invariant:** process categorization delegates to `classifyProcess()`
+ * (the single source of truth shared with the status bar and Process Health
+ * panel). Any new process category MUST be added there first — this module
+ * translates its enum into dashboard group keys, so a category rename
+ * upstream fails to compile here rather than silently mis-bucketing.
+ *
+ * **Platform assumption:** all data sources are Windows-only (CIM queries,
+ * Ollama CLI). Non-Windows callers receive empty results, never errors.
  */
 import { l10n } from '../i18n/runtime';
 import {
@@ -48,6 +57,45 @@ const BYTES_PER_GB = 1_073_741_824;
 
 /** Default free-RAM percentage below which a recommendation fires (matches package.json default). */
 const DEFAULT_SYSTEM_MEMORY_WARNING_PERCENT = 15;
+
+/** Default dev-tool memory budget as a percentage of total system RAM. */
+const DEFAULT_DEV_TOOL_BUDGET_PERCENT = 60;
+
+/** Budget computation result — how much of the machine's RAM dev tools are using vs the target. */
+export interface DevToolBudget {
+  /** Sum of all tracked process groups' RSS, in bytes. */
+  devToolBytes: number;
+  /** devToolBytes as a percentage of total system RAM. */
+  usedPercent: number;
+  /** The user's configured budget target. */
+  budgetPercent: number;
+  /** Whether the dev tools exceed the budget. */
+  overBudget: boolean;
+}
+
+/**
+ * Compute how much of the machine's total RAM is consumed by tracked dev
+ * tools (every process group in the dashboard). Returns undefined when
+ * system RAM is unknown (non-Windows or query failure).
+ */
+export function computeDevToolBudget(
+  system: SystemMemorySnapshot | undefined,
+  groups: readonly ProcessGroup[],
+  budgetPercent: number,
+): DevToolBudget | undefined {
+  if (!system) return undefined;
+  // Sum every tracked group's RSS — this is deliberately broader than
+  // saropa-owned RSS (which only counts this extension's own processes)
+  // because the budget answers "how much RAM are my dev tools using total?"
+  const devToolBytes = groups.reduce((sum, g) => sum + g.totalRssBytes, 0);
+  const usedPercent = (devToolBytes / system.totalBytes) * 100;
+  return {
+    devToolBytes,
+    usedPercent: Math.round(usedPercent * 10) / 10,
+    budgetPercent,
+    overBudget: usedPercent > budgetPercent,
+  };
+}
 
 /** One actionable or informational line in the dashboard's Recommendations panel. */
 export interface Recommendation {
@@ -162,6 +210,8 @@ export interface RecommendationInput {
    *  Must match the same setting processMonitor reads, so the dashboard and
    *  the proactive notification agree on when memory is "low". */
   systemMemoryWarningPercent: number;
+  /** Target percentage of total RAM for dev tools — the budget threshold. */
+  devToolBudgetPercent: number;
   /** Raw `dart.analyzerVmAdditionalArgs` setting value, to detect a missing heap cap. */
   analyzerVmArgs: readonly string[];
 }
@@ -273,7 +323,27 @@ export function buildRecommendations(input: RecommendationInput): Recommendation
     }
   }
 
+  // Budget overspend: when dev tools collectively exceed the user's configured
+  // share of total RAM. Lower severity than systemLowMemory (which fires
+  // when the machine is actually in trouble) — this is a proactive nudge.
+  const budget = computeDevToolBudget(
+    input.system,
+    input.groups,
+    input.devToolBudgetPercent ?? DEFAULT_DEV_TOOL_BUDGET_PERCENT,
+  );
+  if (budget?.overBudget) {
+    recs.push({
+      id: 'budgetOverspend',
+      severity: 'warning',
+      text: l10n('machineDashboard.recommendation.budgetOverspend', {
+        used: String(budget.usedPercent),
+        budget: String(budget.budgetPercent),
+        size: formatBytes(budget.devToolBytes),
+      }),
+    });
+  }
+
   return recs;
 }
 
-export { DEFAULT_ANALYSIS_SERVER_WARNING_GB, DEFAULT_SYSTEM_MEMORY_WARNING_PERCENT };
+export { DEFAULT_ANALYSIS_SERVER_WARNING_GB, DEFAULT_SYSTEM_MEMORY_WARNING_PERCENT, DEFAULT_DEV_TOOL_BUDGET_PERCENT };

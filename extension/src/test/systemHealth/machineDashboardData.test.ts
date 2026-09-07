@@ -10,6 +10,7 @@ import '../vibrancy/register-vscode-mock';
 import * as assert from 'node:assert';
 import {
   buildRecommendations,
+  computeDevToolBudget,
   groupDartProcesses,
   groupModelHosts,
   type RecommendationInput,
@@ -53,6 +54,7 @@ function baseRecommendationInput(overrides: Partial<RecommendationInput> = {}): 
     orphanTotalBytes: 0,
     analysisServerWarningGB: 4,
     systemMemoryWarningPercent: 15,
+    devToolBudgetPercent: 60,
     analyzerVmArgs: [],
     ...overrides,
   };
@@ -185,5 +187,53 @@ describe('buildRecommendations', () => {
     assert.ok(qwen);
     assert.deepStrictEqual(qwen!.actionArgs, ['qwen2.5:7b']);
     assert.strictEqual(recs.filter((r) => r.id.startsWith('modelLoaded:')).length, 2);
+  });
+
+  it('fires budgetOverspend when dev tools exceed the configured budget', () => {
+    // 32 GB total, 20 GB of dev tools = 62.5% — over the 60% default budget.
+    const groups = groupDartProcesses(
+      [dartProcess({ processId: 1, workingSetSize: 20 * GB, commandLine: 'dart language-server --protocol=lsp' })],
+      new Set(),
+    );
+    const recs = buildRecommendations(baseRecommendationInput({
+      system: { totalBytes: 32 * GB, freeBytes: 12 * GB, freeFraction: 12 / 32 },
+      groups,
+      devToolBudgetPercent: 60,
+    }));
+    assert.ok(recs.some((r) => r.id === 'budgetOverspend'));
+  });
+
+  it('does not fire budgetOverspend when under budget', () => {
+    // 32 GB total, 10 GB of dev tools = 31.25% — well under 60%.
+    const groups = groupDartProcesses(
+      [dartProcess({ processId: 1, workingSetSize: 10 * GB, commandLine: 'dart language-server --protocol=lsp' })],
+      new Set(),
+    );
+    const recs = buildRecommendations(baseRecommendationInput({
+      system: { totalBytes: 32 * GB, freeBytes: 22 * GB, freeFraction: 22 / 32 },
+      groups,
+      devToolBudgetPercent: 60,
+    }));
+    assert.strictEqual(recs.some((r) => r.id === 'budgetOverspend'), false);
+  });
+});
+
+describe('computeDevToolBudget', () => {
+  it('returns undefined when system memory is unknown', () => {
+    assert.strictEqual(computeDevToolBudget(undefined, [], 60), undefined);
+  });
+
+  it('computes correct percentage and over-budget flag', () => {
+    const system = { totalBytes: 32 * GB, freeBytes: 12 * GB, freeFraction: 12 / 32 };
+    const groups = groupDartProcesses(
+      [dartProcess({ processId: 1, workingSetSize: 20 * GB, commandLine: 'dart language-server --protocol=lsp' })],
+      new Set(),
+    );
+    const budget = computeDevToolBudget(system, groups, 60);
+    assert.ok(budget);
+    assert.strictEqual(budget!.overBudget, true);
+    assert.strictEqual(budget!.devToolBytes, 20 * GB);
+    // 20/32 = 62.5%
+    assert.strictEqual(budget!.usedPercent, 62.5);
   });
 });

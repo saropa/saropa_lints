@@ -783,7 +783,8 @@
       "analysisServerLarge": "{count} Dart analysis server process(es) are using up to {size}. A restart releases the memory.",
       "multipleAnalysisServers": "{count} Dart analysis servers are running — likely one per open VS Code window on overlapping projects.",
       "noHeapCap": "The Dart analysis server has no memory ceiling configured. Setting one caps worst-case growth.",
-      "modelLoaded": "Model \"{model}\" is loaded in the translation engine, using {size}."
+      "modelLoaded": "Model \"{model}\" is loaded in the translation engine, using {size}.",
+      "budgetOverspend": "Dev tools are using {used}% of system RAM ({size}), exceeding the {budget}% budget. Close unused VS Code windows or unload translation models."
     },
     "action": {
       "reclaim": "Reclaim",
@@ -800,6 +801,10 @@
     "unload": {
       "succeeded": "Unloaded model \"{model}\".",
       "failed": "Could not unload model \"{model}\" — the Ollama CLI may not be on PATH."
+    },
+    "budget": {
+      "title": "Dev Tool Budget",
+      "value": "{used}% of {budget}% target ({size})"
     }
   },
   "memoryPressure": {

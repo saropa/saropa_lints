@@ -7,6 +7,7 @@ import { querySystemMemory } from './systemQuery';
 import { buildMachineDashboardHtml, type MachineDashboardData } from './machineDashboard-html';
 import {
   buildRecommendations,
+  computeDevToolBudget,
   DEFAULT_ANALYSIS_SERVER_WARNING_GB,
   groupDartProcesses,
   groupModelHosts,
@@ -92,7 +93,7 @@ export class MachineDashboard implements vscode.Disposable {
     // Returning the empty shape (not throwing) lets the HTML layer render
     // its normal empty state rather than needing a separate error path.
     if (process.platform !== 'win32') {
-      return { system: undefined, groups: [], recommendations: [] };
+      return { system: undefined, groups: [], recommendations: [], budget: undefined };
     }
     // Five independent queries fired concurrently rather than sequentially —
     // none depends on another's result, and this panel already reads as
@@ -134,6 +135,12 @@ export class MachineDashboard implements vscode.Disposable {
       'systemMemoryWarningPercent',
       15,
     );
+    // Dev-tool memory budget — the percentage of total RAM the user considers
+    // acceptable for Dart/Flutter/Ollama combined.
+    const devToolBudgetPercent = config.get<number>(
+      'devToolBudgetPercent',
+      60,
+    );
     // Read directly from Dart-Code's own setting (not a saropa_lints
     // mirror) so "no heap cap" reflects what the analysis server will
     // actually launch with, not a copy that could drift out of sync.
@@ -156,10 +163,15 @@ export class MachineDashboard implements vscode.Disposable {
         }, 0) + orphanHostScan.totalCommittedBytes,
       analysisServerWarningGB,
       systemMemoryWarningPercent,
+      devToolBudgetPercent,
       analyzerVmArgs,
     });
 
-    return { system, groups, recommendations };
+    // Compute budget after groups are finalized — the budget is derived from
+    // the same group RSS totals the dashboard already displays, so they
+    // always agree without a separate data path.
+    const budget = computeDevToolBudget(system, groups, devToolBudgetPercent);
+    return { system, groups, recommendations, budget };
   }
 
   private handleMessage(msg: DashboardMessage): void {

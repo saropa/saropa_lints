@@ -73,7 +73,8 @@ Fixed a sidebar action that could crash on a project's first scan or run twice o
 ### Added (Extension)
 
 - Machine-wide health monitoring: system RAM, every Dart analysis server, Flutter daemon, and Ollama/llama-server process grouped by category with contextual recommendations and one-click actions (restart server, set heap cap, reclaim orphans, unload model). Accessible from the sidebar and command palette. No action required.
-- Proactive warnings when free RAM drops below a configurable threshold (`saropaLints.systemHealth.systemMemoryWarningPercent`, default 15%) or any single analysis server exceeds a configurable size (`saropaLints.systemHealth.analysisServerWarningGB`, default 4 GB), plus a one-time session-start check. No action required.
+- Dev Tool Budget indicator: a single percentage showing how much of the machine's RAM dev tools consume versus a configurable target (`saropaLints.systemHealth.devToolBudgetPercent`, default 60%). Warns when dev tools exceed the budget. No action required.
+- Proactive warnings when free RAM drops below a configurable threshold (`saropaLints.systemHealth.systemMemoryWarningPercent`, default 15%) or any single analysis server exceeds a configurable size (`saropaLints.systemHealth.analysisServerWarningGB`, default 4 GB), plus a one-time session-start check. System-wide free RAM now appears in the status bar tooltip. No action required.
 
 ### Fixed (Extension)
 
@@ -88,6 +89,8 @@ Fixed a sidebar action that could crash on a project's first scan or run twice o
 
 - Extracted `createBusyGuard` to `commandGuards.ts` as a reusable concurrency guard with visible status-bar feedback, replacing four identical inline busy-flag patterns in the stale-ignore commands. No action required.
 - Routed the three sidebar Actions labels ("Run analysis", "Prune ignores", "Update config") through `l10n()` with new `sidebar.actions.*` keys in `en.json`, closing an i18n gap where two of the three labels were hardcoded English. No action required.
+- Hardened Machine Health dashboard: Windows-only platform guard with localized message, narrow viewport wrapping/scrolling, two-tier query/notification throttle (2 min / 10 min) to reduce unnecessary PowerShell shell-outs, undefined-arg guard on Unload Ollama Model command. No action required.
+- System memory warning now honors the user's configured threshold directly instead of silently clamping to a 20% minimum at session start. No action required.
 
 ---
 

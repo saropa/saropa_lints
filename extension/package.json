@@ -2171,6 +2171,13 @@
             "minimum": 5,
             "maximum": 50,
             "description": "%config.property.systemHealth.systemMemoryWarningPercent.description%"
+          },
+          "saropaLints.systemHealth.devToolBudgetPercent": {
+            "type": "number",
+            "default": 60,
+            "minimum": 10,
+            "maximum": 95,
+            "description": "%config.property.systemHealth.devToolBudgetPercent.description%"
           }
         }
       },

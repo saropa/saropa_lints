@@ -345,6 +345,7 @@
   "config.property.systemHealth.showNotifications.description": "Show a notification when system health reaches critical level.",
   "config.property.systemHealth.analysisServerWarningGB.description": "Warn when any single Dart analysis server process (not just saropa_lints) exceeds this RSS, in GB.",
   "config.property.systemHealth.systemMemoryWarningPercent.description": "Warn when free physical RAM across the whole machine falls below this percentage.",
+  "config.property.systemHealth.devToolBudgetPercent.description": "Target percentage of total system RAM for all dev tools (Dart, Flutter, Ollama). The dashboard warns when dev tools exceed this budget.",
   "command.toggleDebugPanel.title": "Saropa Lints: Show Health Panel (Engines + Processes)",
   "command.lspServer.start.title": "Saropa Lints: Start LSP Server",
   "command.lspServer.stop.title": "Saropa Lints: Stop LSP Server",

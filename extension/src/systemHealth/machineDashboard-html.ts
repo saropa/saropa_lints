@@ -3,7 +3,7 @@ import { l10n } from '../i18n/runtime';
 import { getMachineDashboardStyles } from './machineDashboard-styles';
 import { getMachineDashboardScript } from './machineDashboard-script';
 import { formatBytes } from './processQuery';
-import type { ProcessGroup, Recommendation } from './machineDashboardData';
+import type { DevToolBudget, ProcessGroup, Recommendation } from './machineDashboardData';
 import type { SystemMemorySnapshot } from './systemQuery';
 
 /** Full data set the webview renders on every refresh. */
@@ -11,6 +11,7 @@ export interface MachineDashboardData {
   system: SystemMemorySnapshot | undefined;
   groups: ProcessGroup[];
   recommendations: Recommendation[];
+  budget: DevToolBudget | undefined;
 }
 
 // machineDashboardData.ts's ProcessGroup only carries a machine-readable
@@ -44,6 +45,7 @@ export function buildMachineDashboardHtml(data: MachineDashboardData): string {
 </head>
 <body>
   ${buildSystemSummary(data.system)}
+  ${buildBudgetBar(data.budget)}
   ${buildRecommendationsSection(data.recommendations)}
   ${buildGroupsSection(data.groups)}
   <script nonce="${nonce}">${script}</script>
@@ -72,6 +74,31 @@ function buildSystemSummary(system: SystemMemorySnapshot | undefined): string {
   <span class="summary-stat"><strong>${escapeHtml(formatBytes(system.freeBytes))}</strong> ${escapeHtml(l10n('machineDashboard.freeOf'))} <strong>${escapeHtml(formatBytes(system.totalBytes))}</strong></span>
   <span class="summary-stat">${Math.round(usedFraction * 100)}% ${escapeHtml(l10n('machineDashboard.used'))}</span>
   ${refreshBtn}
+</div>`;
+}
+
+/** Renders the dev-tool memory budget bar — a single percentage showing how
+ *  much of the machine's RAM dev tools consume vs the configured target. */
+function buildBudgetBar(budget: DevToolBudget | undefined): string {
+  if (!budget) return '';
+  const severity = budget.overBudget ? 'over' : 'under';
+  // Clamp the visual bar width to 100% even if usage exceeds the total
+  // (theoretically impossible but defensive against rounding).
+  const barWidth = Math.min(budget.usedPercent, 100);
+  const budgetMarker = Math.min(budget.budgetPercent, 100);
+  return `<div class="budget-bar">
+  <div class="budget-label">
+    <span>${escapeHtml(l10n('machineDashboard.budget.title'))}</span>
+    <span class="budget-value budget-${severity}">${escapeHtml(l10n('machineDashboard.budget.value', {
+      used: String(budget.usedPercent),
+      budget: String(budget.budgetPercent),
+      size: formatBytes(budget.devToolBytes),
+    }))}</span>
+  </div>
+  <div class="budget-track">
+    <div class="budget-fill budget-${severity}" style="width:${barWidth}%"></div>
+    <div class="budget-target" style="left:${budgetMarker}%"></div>
+  </div>
 </div>`;
 }
 
@@ -146,8 +173,10 @@ function buildGroupCard(group: ProcessGroup): string {
     <span class="group-rss">${rss}</span>
     ${orphanBadge}
   </summary>
-  <table class="group-table">
-    <tbody>${rows}</tbody>
-  </table>
+  <div class="group-table-wrap">
+    <table class="group-table">
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
 </details>`;
 }

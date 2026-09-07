@@ -51,6 +51,8 @@ export function getMachineDashboardStyles(): string {
   border-left: 4px solid var(--vscode-editorInfo-foreground, #3794ff);
   background: var(--vscode-editorWidget-background);
   font-size: 13px;
+  /* Wrap action button below text at narrow viewports instead of overflowing. */
+  flex-wrap: wrap;
 }
 .rec-card.rec-warning { border-left-color: var(--vscode-editorWarning-foreground, #cca700); }
 .rec-card.rec-critical { border-left-color: var(--vscode-editorError-foreground, #f14c4c); }
@@ -82,6 +84,8 @@ export function getMachineDashboardStyles(): string {
   cursor: pointer;
   background: var(--vscode-editorWidget-background);
   list-style: none;
+  /* Allow label+count+rss+badge to wrap at narrow widths. */
+  flex-wrap: wrap;
 }
 .group-card summary::-webkit-details-marker { display: none; }
 .group-label { font-weight: 600; font-size: 13px; color: var(--vscode-foreground); }
@@ -95,6 +99,9 @@ export function getMachineDashboardStyles(): string {
   font-weight: 600;
 }
 .pill-orphan { background: var(--vscode-editorError-foreground, #f14c4c); color: #fff; }
+/* Scroll the table horizontally at narrow widths rather than breaking the
+   page layout — the process command-line column can be very wide. */
+.group-table-wrap { overflow-x: auto; }
 .group-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .group-table td {
   padding: 4px 12px;
@@ -120,6 +127,43 @@ export function getMachineDashboardStyles(): string {
 }
 .btn-kill:hover { opacity: 0.85; }
 .btn-kill:disabled { opacity: 0.4; cursor: default; }
+/* Budget bar — a single-number summary of dev-tool memory usage vs target. */
+.budget-bar { padding: 8px 16px 4px; }
+.budget-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+  margin-bottom: 4px;
+}
+.budget-value { font-weight: 600; }
+.budget-value.budget-over { color: var(--vscode-editorWarning-foreground, #cca700); }
+.budget-value.budget-under { color: var(--vscode-foreground); }
+.budget-track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--vscode-progressBar-background, rgba(90,93,110,.15));
+  overflow: visible;
+}
+.budget-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+/* Green when under budget, amber when over. */
+.budget-fill.budget-under { background: var(--vscode-terminal-ansiGreen, #89d185); }
+.budget-fill.budget-over { background: var(--vscode-editorWarning-foreground, #cca700); }
+/* Vertical tick marking the budget target on the track. */
+.budget-target {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 10px;
+  background: var(--vscode-foreground);
+  opacity: 0.5;
+  border-radius: 1px;
+}
 .empty-state {
   text-align: center;
   padding: 48px 16px;
