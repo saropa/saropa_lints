@@ -6,19 +6,6 @@
     "alreadyRunning": "アジャイルはすでに実行中です — 完了するのを待ってください。",
     "noProject": "Dartプロジェクトが見つかりません。pubspec.yamlを含むフォルダを開いてください。",
     "missingDep": "このプロジェクトはsaropa_lintsに依存していません。まずdev_dependenciesに追加してください。",
-    "pickWorkspaceFolder": "どのワークスペースフォルダをaudit対象としますか？",
-    "scope": {
-      "placeholder": "どのファイルを検査に含めるべきですか？",
-      "full": "フルプロジェクト",
-      "fullDescription": "Dartファイルをすべて検証 — 最も丁寧なオプション",
-      "changedVsMain": "変更 vs メイン",
-      "changedVsMainDescription": "メインブランチと異なるファイルのみ",
-      "changedPickBranch": "変更 vs ブランチ…",
-      "changedPickBranchDescription": "選んだブランチと異なるファイルのみ",
-      "compareBaseline": "ベースラインと比較",
-      "compareBaselineDescription": "最後に保存されたベースラインスナップショット以来変更された内容を表示",
-      "branchPrompt": "比較対象のブランチ"
-    },
     "progress": {
       "title": "Saropa Lints アウド中…",
       "message": "{pct}% · {scanned}/{total} ファイル · {issues} イssue · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "もっと表示",
       "keyboardHint": "矢印キーで移動 · Enterでファイルを開く · Escで検索をクリア",
       "copiedJson": "クリップボードにコピーされたJSONの審査",
+      "exportJson": "JSONをエクスポート",
+      "exportJsonTitle": "アジャイル結果をJSONとしてエクスポート",
+      "exportJsonSaved": "JSONをauditしました",
+      "exportJsonFailed": "audit JSON のエクスポートに失敗しました: {message}",
+      "clearRuleFilter": "清々しい,はっきりとした.",
+      "paginationNote": "フィルタリングされた結果にはページ制限が適用されます。",
+      "sevBarError": "{count}エラー({pct}%)",
+      "sevBarWarning": "{count} わarnings ({pct}%)",
+      "sevBarInfo": "{count}情報({pct}%)",
       "baselineSaved": "ベースラインが保存されました。今後のアプライアンスはこのスナップショットと比較できます。",
       "baselineSaveFailed": "ベースラインの保存に失敗しました: {message}",
       "deferredLoading": "フルな結果セットを読み込み中（このアプライアンスは大きい）…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "フィルターされた違反をJSON ({count}) としてコピーします.",
       "saveReportTitle": "フィルターされた違反をJSONとしてレポート/YYY YMMDD/に保存します."
     },
+    "audit": {
+      "scopeFieldTitle": "下記の結果はどこから取得されているかを選択してください",
+      "scopeLabel": "ソース",
+      "scopeLive": "リアルタイム診断",
+      "scopeFull": "フルプロジェクトアジャイル",
+      "scopeChangedMain": "変更 vs メイン",
+      "scopeChangedBranch": "変更 vs ブランチ…",
+      "branchPlaceholder": "ブランチ名",
+      "branchAria": "比較対象のブランチ",
+      "runButton": "アジャイルチェックを実行",
+      "runButtonTitle": "全体プロジェクトのアプライアンスCLIを実行し、その結果をここにロードしてください",
+      "cancelButton": "キャンセル キャンセル",
+      "runningLabel": "検証中…",
+      "runningMeta": "audit CLIを開始します…",
+      "completedLabel": "検証完了",
+      "failedLabel": "監査に失敗しました",
+      "canceledLabel": "監査がキャンセルされました",
+      "statusFull": "{time} 全プロジェクトのアジャイルを表示しています",
+      "statusChangedRef": "変更されたファイルを表示しています vs {ref}、{time} が検証されました",
+      "notRunYet": "上記のスコープを選択し、次にコードレビューを実行してください"
+    },
     "chip": {
       "contains": "\"{q}\"を含む",
       "severityOff": "症状の重度 ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "この輸出からトリアージを構築することができなかった. 新しい分析を実行します.",
     "summaryVolume": "ルールトリアージ (ボリューム/マストフィックス/スタイル)",
     "hintSameAsTree": "問題切り分けアクティビティ バー ツリーと同じグループ化: フィルター問題、または `analysis_options_custom.yaml` のルールの無効化/有効化。大人数の場合は確認をお願いする場合がございます。"
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "フル アウディット",
-      "description": "すべてのルール · スコープ選択 · フィルタ可能なレポート"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "キーボードショートカット (?) を表示する",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "すべてのコマンド…",
       "commandCatalogDescription": "すべてのコマンドを検索",
+      "findingsNoProject": "Dartプロジェクトを開くしてスキャンする",
+      "findingsNeverScanned": "分析を実行してスキャンする",
+      "findingsClean": "違反なし · スコア {score}",
+      "findingsWithViolations": "{count}違反 · スコア {score}",
+      "packagesNeverScanned": "依存関係を確認するためスキャンを実行",
+      "packagesAllAdopted": "すべての機能が採用されました",
+      "packagesNeedlesCount": "{count} パッケージの導入",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · ゲート障害",
       "codeHealthNeverScanned": "Code Health を実行してスコアを確認する",
       "projectMapDescription": "スキャン済み {ago}",
       "projectMapNeverScanned": "プロジェクト マップを実行してサイズとホット スポットを確認する"
+    },
+    "degraded": {
+      "bannerLabel": "アクティベーション エラー",
+      "bannerDescription": "拡張機能ホストのログを確認してください"
     }
   }
 }

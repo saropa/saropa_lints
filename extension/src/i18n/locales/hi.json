@@ -6,19 +6,6 @@
     "alreadyRunning": "एक अनुमान चल रहा है - इसे खत्म होने तक इंतजार करें।",
     "noProject": "कोई Dart प्रोजेक्ट नहीं मिला। एक pubspec.yaml वाले फोल्डर को खोलें।",
     "missingDep": "इस प्रोजेक्ट में saropa_lints पर निर्भरता नहीं है। इसे पहले dev_dependencies में जोड़ें।",
-    "pickWorkspaceFolder": "कौन सा कार्यस्थल फ़ोल्डर आवरण के खिलाफ चलाया जाए?",
-    "scope": {
-      "placeholder": "कौन से फ़ाइलों के अधीन आवरण होना चाहिए?",
-      "full": "पूरा प्रोजेक्ट",
-      "fullDescription": "प्रत्येक Dart फ़ाइल की जांच करें — सबसे गहरी विकल्प",
-      "changedVsMain": "परिवर्तित vs मुख्य",
-      "changedVsMainDescription": "केवल फ़ाइलें जो मुख्य श技 से अलग हैं",
-      "changedPickBranch": "ब्रांच में बदलाव…",
-      "changedPickBranchDescription": "केवल ऐसे फ़ाइल जो आप चुने वाले श",
-      "compareBaseline": "कम्पेर करें बेसलाइन के साथ",
-      "compareBaselineDescription": "पिछले सेव किए गए बेसलाइन स्नैपशॉट से क्या बदल गया है",
-      "branchPrompt": "ब्रांच को तुलना के लिए"
-    },
     "progress": {
       "title": "Saropa Lints आईडी जांच में...",
       "message": "{pct}% · {scanned}/{total} फ़ाइलें · {issues} समस्याएं · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "अधिक दिखाएं",
       "keyboardHint": "सीधे कुंजी के लिए नाविगेट · एंटर फ़ाइल खोलने के लिए · एस्क खोज साफ करने के लिए",
       "copiedJson": "ऑडिट JSON को क्लिपबोर्ड पर कॉपी किया गया।",
+      "exportJson": "ज़ॉन एक्सपोर्ट",
+      "exportJsonTitle": "अकाउंट आउटपुट को JSON के रूप में निर्यात करें",
+      "exportJsonSaved": "जॉन एक्सपोर्ट किया गया है.",
+      "exportJsonFailed": "{message} के लिए आवर्तन JSON निर्यात नहीं किया जा सकता:",
+      "clearRuleFilter": "Clear साफ करना Clear",
+      "paginationNote": "फ़िल्टर किए गए परिणाम के लिए पृष्ठ सीमा लागू होती है।",
+      "sevBarError": "{count} त्रुटियाँ ({pct}%)",
+      "sevBarWarning": "{count} चेतावनियाँ ({pct}%)",
+      "sevBarInfo": "{count} जानकारी ({pct}%)",
       "baselineSaved": "मूल आधार बचाया गया। भविष्य के अभियोजन इस स्नैपशॉट के खिलाफ तुलना कर सकते हैं।",
       "baselineSaveFailed": "के आधार बनाने में असमर्थ: {message}",
       "deferredLoading": "पूरा रिजल्ट सेट लोड कर रहे हैं (इस ऑडिट बहुत बड़ा है)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "JSON ({count}) के रूप में फ़िल्टर किए गए उल्लंघन की प्रतिलिपि बनाएँ।",
       "saveReportTitle": "फ़िल्टर किए गए उल्लंघन को JSON के रूप में रिपोर्ट/YYY YMMDD/ पर सहेजें।"
     },
+    "audit": {
+      "scopeFieldTitle": "खोज के निम्नलिखित परिणाम कहां से लिए गए हैं",
+      "scopeLabel": "स्रोत",
+      "scopeLive": "जीवित निदान",
+      "scopeFull": "पूरा परियोजना अभियोजन",
+      "scopeChangedMain": "परिवर्तित vs मुख्य",
+      "scopeChangedBranch": "ब्रांच में बदलाव…",
+      "branchPlaceholder": "ब्रांच नाम",
+      "branchAria": "ब्रांच को तुलना के लिए",
+      "runButton": "अपडेट चेक करें",
+      "runButtonTitle": "पूरे प्रोजेक्ट के अभिमान CLI को चलाएं और इसके परिणाम यहाँ लोड करें",
+      "cancelButton": "रद्द करें रद्द करें",
+      "runningLabel": "अनुमान लगाना...",
+      "runningMeta": "अपीयु के अभियान को शुरू कर रहे हैं...",
+      "completedLabel": "अप्रमाणित अंतिम",
+      "failedLabel": "ऑडिट विफल रहा",
+      "canceledLabel": "ऑडिट रद्द कर दिया गया",
+      "statusFull": "पूरे प्रोजेक्ट की ऑडिट दिखाए जा रहे हैं जो {time} से है",
+      "statusChangedRef": "अपडेट किए गए फ़ाइलों को दिखाए जा रहे हैं vs {ref}, जांच किए गए {time}",
+      "notRunYet": "ऊपर एक रेंज चुनें, फिर आवेदन चलाएं"
+    },
     "chip": {
       "contains": "\"{q}\" युक्त है।",
       "severityOff": "गंभीरता ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "इस निर्यात से ट्रीआइज नहीं बना सका। एक नया विश्लेषण चलाएं।",
     "summaryVolume": "नियम ट्रायएज (वॉल्यूम / मस्ट-फिक्सिंग / स्टाइलिस्टिक)",
     "hintSameAsTree": "Triage गतिविधि-बार पेड़ के समान समूहीकरणः फ़िल्टर मुद्दे, या `analysis_options_custom.yaml̅ में नियमों को अक्षम / सक्षम करें। बड़े समूह पुष्टि के लिए पूछ सकते हैं।"
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "पूर्ण अपूर्णता",
-      "description": "सभी नियम · स्कोप पिकर · फ़िल्टर करने योग्य रिपोर्ट"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "कीबोर्ड शॉर्टकट दिखाएँ (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "सभी कमांड...",
       "commandCatalogDescription": "सभी कमांड खोजें",
+      "findingsNoProject": "Dart प्रोजेक्ट खोलें ताकि स्कैन किया जा सके",
+      "findingsNeverScanned": "एनालिसिस चलाएं ताकि स्कैन कर सकें",
+      "findingsClean": "कोई भी उल्लंघन नहीं · अंक {score}",
+      "findingsWithViolations": "{count} उल्लंघन · अंक {score}",
+      "packagesNeverScanned": "डिपेंडेंसी चेक करने के लिए स्कैन चलाएँ",
+      "packagesAllAdopted": "सभी फीचर्स अपनाए गए",
+      "packagesNeedlesCount": "{count} पैकेज अDOPT करें",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · गेट फेल होना",
       "codeHealthNeverScanned": "अपना स्कोर देखने के लिए कोड हेल्थ चलाएँ",
       "projectMapDescription": "स्कैन किया गया {ago}",
       "projectMapNeverScanned": "आकार और हॉट स्पॉट देखने के लिए प्रोजेक्ट मैप चलाएँ"
+    },
+    "degraded": {
+      "bannerLabel": "सक्रियण त्रुटि",
+      "bannerDescription": "अवयव आयोजक लॉग देखें विवरण के लिए"
     }
   }
 }

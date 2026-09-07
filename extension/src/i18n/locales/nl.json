@@ -6,19 +6,6 @@
     "alreadyRunning": "Een audit loopt al — wacht tot het klaar is.",
     "noProject": "Geen Dart project gevonden. Open een map die een pubspec.yaml bevat.",
     "missingDep": "Dit project heeft geen afhankelijkheid van saropa_lints. Voeg het eerst toe aan dev_dependencies.",
-    "pickWorkspaceFolder": "Welke werkmap moet de audit onderzoeken?",
-    "scope": {
-      "placeholder": "Welke bestanden moet de audit omvatten?",
-      "full": "Volledig project",
-      "fullDescription": "Audit elk Dart bestand — de meest grondige optie",
-      "changedVsMain": "Geen wijzigingen vs hoofd",
-      "changedVsMainDescription": "Alleen bestanden die verschillen van de hoofdverzameling",
-      "changedPickBranch": "Geen vs tak…",
-      "changedPickBranchDescription": "Alleen bestanden die verschillen van een tak die je kiest",
-      "compareBaseline": "Vergelijk met baseline",
-      "compareBaselineDescription": "Toon wat veranderd is sinds de laatste opgeslagen basislijn snapshot",
-      "branchPrompt": "Branch om te vergelijken"
-    },
     "progress": {
       "title": "Audit Saropa Lints uitvoeren…",
       "message": "{pct}% · {scanned}/{total} bestanden · {issues} problemen · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Meer tonen",
       "keyboardHint": "Pijltoetsen om te navigeren · Enter om bestand te openen · Esc om zoekopdracht te wissen",
       "copiedJson": "Audit JSON naar het klembord gekopieerd.",
+      "exportJson": "Exporteer JSON",
+      "exportJsonTitle": "Auditresultaten exporteren als JSON",
+      "exportJsonSaved": "Audit JSON geëxporteerd",
+      "exportJsonFailed": "Kon de audit JSON niet exporteren: {message}",
+      "clearRuleFilter": "De helderheid is duidelijk.",
+      "paginationNote": "Paginelimite geldt voor gefilterde resultaten.",
+      "sevBarError": "{count} fouten ({pct}%)",
+      "sevBarWarning": "{count} waarschuwingen ({pct}%)",
+      "sevBarInfo": "{count}-informatie ({pct}%)",
       "baselineSaved": "Baseline opgeslagen. Toekomstige audits kunnen dit snapshot vergelijken.",
       "baselineSaveFailed": "Kon de baseline niet opslaan: {message}",
       "deferredLoading": "Volledig resultaat laden (deze audit is groot)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Kopieer gefilterde schendingen als JSON ({count})",
       "saveReportTitle": "Bewaar gefilterde schendingen als JSON in rapporten/JJJMMDD."
     },
+    "audit": {
+      "scopeFieldTitle": "Kies waar de onderzoeken hieronder vandaan komen",
+      "scopeLabel": "Bron",
+      "scopeLive": "Live diagnostiek",
+      "scopeFull": "Volledige project audit",
+      "scopeChangedMain": "Geen wijzigingen vs hoofd",
+      "scopeChangedBranch": "Geen vs tak…",
+      "branchPlaceholder": "tak naam",
+      "branchAria": "Branch om te vergelijken",
+      "runButton": "Audit uitvoeren",
+      "runButtonTitle": "Volledige-project audit CLI uitvoeren en resultaten hier laden",
+      "cancelButton": "Annuleren",
+      "runningLabel": "Auditeren…",
+      "runningMeta": "Audit CLI starten…",
+      "completedLabel": "Audit volledig",
+      "failedLabel": "Controle mislukt",
+      "canceledLabel": "Controle geannuleerd",
+      "statusFull": "Volledige project-audit tonen van {time}",
+      "statusChangedRef": "Bestanden weergeven die gewijzigd zijn vs {ref}, beoordeeld {time}",
+      "notRunYet": "Kies een scope hierboven, dan Run audit"
+    },
     "chip": {
       "contains": "bevat \"{q}\"",
       "severityOff": "de ernst ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Kon geen triage bouwen op basis van deze export. Voer een nieuwe analyse uit.",
     "summaryVolume": "Regel triage (volume / moet-fix / stilistisch)",
     "hintSameAsTree": "Dezelfde groepering als de Triage activiteit-balk boom: filter issues, of uitschakelen/activeren regels in `analysis_options_custom.yaml゙. Grote groepen kunnen om bevestiging vragen."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Volledige Audit",
-      "description": "Alle regels · bereikkiezer · filterbare rapport"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Toon toetsenbordsnelkoppelingen (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Alle commando's…",
       "commandCatalogDescription": "Alle opdrachten zoeken",
+      "findingsNoProject": "Open een Dart project om te scannen",
+      "findingsNeverScanned": "Analyse uitvoeren om te scannen",
+      "findingsClean": "Geen overtredingen · score {score}",
+      "findingsWithViolations": "{count} overtredingen · score {score}",
+      "packagesNeverScanned": "Scan uitvoeren om afhankelijkheden te controleren",
+      "packagesAllAdopted": "Alle functies aangenomen",
+      "packagesNeedlesCount": "{count} pakketten om te adopteren",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Poort defect",
       "codeHealthNeverScanned": "Voer Code Health uit om je score te zien",
       "projectMapDescription": "{ago} gescand",
       "projectMapNeverScanned": "Voer Project Map uit om de grootte en hotspots te zien"
+    },
+    "degraded": {
+      "bannerLabel": "Activeringsfout",
+      "bannerDescription": "Controleer de log van de Extension Host voor meer informatie"
     }
   }
 }

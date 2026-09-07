@@ -6,19 +6,6 @@
     "alreadyRunning": "ایک جانچ جاری ہے — اس کو ختم ہونے تک انتظار کریں۔",
     "noProject": "Dart پروجیکٹ نہیں ملا۔ ایک pubspec.yaml کے ساتھ فولڈر کھولیں۔",
     "missingDep": "یہ پروجیکٹ saropa_lints پر منحصر نہیں ہے۔ اسے پہلے dev_dependencies میں شامل کریں۔",
-    "pickWorkspaceFolder": "کون سا ورک سپیس فولڈر ا审计 کے خلاف چلے گا؟",
-    "scope": {
-      "placeholder": "کون سے فائلز کا ا审计 شامل کرے؟",
-      "full": "پورا پروجیکٹ",
-      "fullDescription": "ہر Dart فائل کا جائزہ لیں — سب سے مکمل اختیار",
-      "changedVsMain": "تبدیل کردہ vs میں اصل",
-      "changedVsMainDescription": "فقط ایسی فائلیں جو مین برانچ سے مختلف ہوں",
-      "changedPickBranch": "تبدیل کردہ vs شاخہ…",
-      "changedPickBranchDescription": "فقط اُن فائلیں جو آپ کے انتخاب کردہ شاخ سے مختلف ہوں",
-      "compareBaseline": "ٹیسٹ کریں",
-      "compareBaselineDescription": "آخری ذخیرہ کیا گیا بنیادی چھوٹی تصویر سے کیا تبدیلی ہوئی ہے دکھائیں",
-      "branchPrompt": "شاخہ جس کے خلاف تقابل کیا جائے"
-    },
     "progress": {
       "title": "ٹریکنگ Saropa Lints ا审计...",
       "message": "{pct}% · {scanned}/{total} فائلز · {issues} مسائل · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "زیادہ دکھائی دے",
       "keyboardHint": "چھوٹے کی کیاﺅں سے ناﺅٹیگ کریں · اینٹر کریں تاکہ فائل کھولی جائے · اسکی کریں تاکہ تلاش ہٹا دی جائے",
       "copiedJson": "ٹیسٹ جی ایسون جی کاپی کریٹھ کر دیا گیا ہے۔",
+      "exportJson": "JSON اکسپورٹ",
+      "exportJsonTitle": "Audit نتائج کو JSON کے طور پر اکسپورٹ کریں",
+      "exportJsonSaved": "JSON اکسپورٹ کی جانچ کی گئی۔",
+      "exportJsonFailed": "ٹسٹ کی ڈیٹا جیسٹن کو اکسپورٹ نہیں کیا جا سکتا: {message}",
+      "clearRuleFilter": "Clear صاف کریں Clear",
+      "paginationNote": "فائل کی محدودیت فیلٹر کی گئی نتائج پر لاگو ہوتی ہے",
+      "sevBarError": "{count} خطاں ({pct}%)",
+      "sevBarWarning": "{count} تحذيرات ({pct}%)",
+      "sevBarInfo": "{count} معلومات ({pct}%)",
       "baselineSaved": "اس کی بنیاد درج کر لی گئی ہے۔ مستقبل میں آڈٹس اس چھوٹے نمونے سے موازنہ کر سکتے ہیں۔",
       "baselineSaveFailed": "نیچے کی بنیاد کو بچانے میں ناکام رہ گیا: {message}",
       "deferredLoading": "کامل نتائج لوڈ کر رہے ہیں (یہ آڈٹ بہت بڑا ہے)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "JSON ({count}) کے طور پر فلٹر شدہ خلاف ورزیوں کی کاپی کریں",
       "saveReportTitle": "فلٹر شدہ خلاف ورزیوں کو JSON کے طور پر رپورٹس / YYYYMMDD/ میں محفوظ کریں۔"
     },
+    "audit": {
+      "scopeFieldTitle": "نیچے دیا گیا تحلیل کس سے حاصل ہے کہاں سے چنیں",
+      "scopeLabel": "منبع",
+      "scopeLive": "زندگی ڈیاگنوسٹکس",
+      "scopeFull": "پورا پروجیکٹ آڈٹ",
+      "scopeChangedMain": "تبدیل کردہ vs میں اصل",
+      "scopeChangedBranch": "تبدیل کردہ vs شاخہ…",
+      "branchPlaceholder": "برنچ نام",
+      "branchAria": "شاخہ جس کے خلاف تقابل کیا جائے",
+      "runButton": "آڈیٹ چلاؤ",
+      "runButtonTitle": "پورے پروجیکٹ کی آڈٹ CLI کو چلا کر اس کے نتائج کو یہاں لوڈ کریں",
+      "cancelButton": "منسوخ",
+      "runningLabel": "تحقيق کر رہے ہیں...",
+      "runningMeta": "ٹیسٹ کیا جارہا ہے CLI...",
+      "completedLabel": "نگرخانی مکمل",
+      "failedLabel": "آڈٹ ناکام ہو گیا۔",
+      "canceledLabel": "آڈٹ منسوخ کر دیا گیا۔",
+      "statusFull": "پورے پروجیکٹ کا آڈٹ دکھانا {time}",
+      "statusChangedRef": "فائلیں دکھانا جو تبدیل ہوئی ہیں vs {ref}، جانچا گیا {time}",
+      "notRunYet": "اپنی اسکوپ کو اس سے اوپر منتخب کریں، پھر آڈٹ چلائیں"
+    },
     "chip": {
       "contains": "\"{q}\" پر مشتمل ہے۔",
       "severityOff": "شدت ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "اس برآمد سے ٹرائےج نہیں بناسکا۔ ایک تازہ تجزیہ چلائیں۔",
     "summaryVolume": "قاعدہ ٹریج (حجم / لازمی فکسڈ / اسٹائلسٹک)",
     "hintSameAsTree": "ٹراجیج سرگرمی بار درخت کی طرح ہی گروپ بندی: فلٹر کے مسائل ، یا `analysis_options_custom.yaml̅ میں قواعد کو غیر فعال / قابل بنائیں۔ بڑے گروپوں کی تصدیق کے لئے پوچھ سکتے ہیں."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "کامل جائزہ",
-      "description": "ہر قاعدہ · انتخاب کنندہ · فلٹر کرنا ممکن ہے ڈاکومنٹ"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "کی بورڈ شارٹ کٹس (?) دکھائیں",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "ہر کمینڈ...",
       "commandCatalogDescription": "ڈیٹا کو ڈھونڈو",
+      "findingsNoProject": "Dart پروجیکٹ کھولیں تاکہ اسکن کیا جائے",
+      "findingsNeverScanned": "تحلیل کریں تاکہ اسکن کر سکیں",
+      "findingsClean": "کوئی خلاف ورزی نہیں · نمبر {score}",
+      "findingsWithViolations": "{count} خلاف ورزی · نمبر {score}",
+      "packagesNeverScanned": "ڈپندنس چیک کرنے کے لیے اسکن چلاوݨ",
+      "packagesAllAdopted": "ہر خاصیت قبول کر لی گئیں",
+      "packagesNeedlesCount": "{count} پیکیجس کو تسلیم کریں",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · گیٹ ناکام ہو رہا ہے۔",
       "codeHealthNeverScanned": "اپنا سکور دیکھنے کے لیے کوڈ ہیلتھ چلائیں۔",
       "projectMapDescription": "اسکین شدہ {ago}",
       "projectMapNeverScanned": "سائز اور گرم مقامات دیکھنے کے لیے پروجیکٹ میپ چلائیں۔"
+    },
+    "degraded": {
+      "bannerLabel": "فعالیت خطا",
+      "bannerDescription": "لوگ ایکسٹنسن ہوست کی لاگ کے لیے تفصیلات دیکھیں"
     }
   }
 }

@@ -6,19 +6,6 @@
     "alreadyRunning": "Аудит вже виконується — зачекайте, поки він не завершиться.",
     "noProject": "Не знайдено проекту Dart. Відкрийте папку, яка містить pubspec.yaml.",
     "missingDep": "Цей проект не залежить від saropa_lints. Додайте його до dev_dependencies спочатку.",
-    "pickWorkspaceFolder": "Який теку ви хочете перевірити?",
-    "scope": {
-      "placeholder": "Які файли мають бути включеними в аудит?",
-      "full": "Повний проект",
-      "fullDescription": "Перевіряти кожен файл Dart — найповнішій варіант",
-      "changedVsMain": "Змінено по відношенню до головної",
-      "changedVsMainDescription": "Тільки файли, які відрізняються від основної гілки",
-      "changedPickBranch": "Змінено vs гілка…",
-      "changedPickBranchDescription": "Тільки файли, які відрізняються від гілки, яку ви виберете",
-      "compareBaseline": "Порівняти з базовою версією",
-      "compareBaselineDescription": "Показати, що змінилося з моменту останнього збереженого базового зображення",
-      "branchPrompt": "Гілка для порівняння"
-    },
     "progress": {
       "title": "Виконання аудиту Saropa Lints…",
       "message": "{pct}% · {scanned}/{total} файли · {issues} питання · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Показати більше",
       "keyboardHint": "Стрілки для навігації · Enter для відкриття файлу · Esc для очищення пошуку",
       "copiedJson": "Аудит JSON скопійовано в буфер обміну.",
+      "exportJson": "Експорт JSON",
+      "exportJsonTitle": "Експорт результатів аудиту як JSON",
+      "exportJsonSaved": "Аудит JSON виported.",
+      "exportJsonFailed": "Не вдалося експортувати аудит JSON: {message}",
+      "clearRuleFilter": "Чистий чистий Чистия Чисті",
+      "paginationNote": "Ліміт сторінок застосовується до фільтрованих результатів.",
+      "sevBarError": "{count} помилки ({pct}%)",
+      "sevBarWarning": "{count} попередження ({pct}%)",
+      "sevBarInfo": "{count} інфо ({pct}%)",
       "baselineSaved": "Збережено базову версію. Майбутні аудити можуть порівнювати цей знімок.",
       "baselineSaveFailed": "Не вдалося зберегти базову лінію: {message}",
       "deferredLoading": "Завантаження повного набору результатів (цей аудит досить великий)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Копіюйте фільтрувані порушення як JSON ({count})",
       "saveReportTitle": "Заховувати фільтрувані порушення як JSON до звітів / YYYYMMDD/."
     },
+    "audit": {
+      "scopeFieldTitle": "Виберіть, від чого походять знайдені результати",
+      "scopeLabel": "Джерело",
+      "scopeLive": "Живі діагностики",
+      "scopeFull": "Повний аудит проекту",
+      "scopeChangedMain": "Змінено по відношенню до головної",
+      "scopeChangedBranch": "Змінено vs гілка…",
+      "branchPlaceholder": "назва гілки",
+      "branchAria": "Гілка для порівняння",
+      "runButton": "Запустити аудит",
+      "runButtonTitle": "Виконайте повний аудит проекту CLI та завантажте його результати тут",
+      "cancelButton": "Відкласти скасувати",
+      "runningLabel": "Аудитування…",
+      "runningMeta": "Початок аудиту CLI…",
+      "completedLabel": "Аудит завершено",
+      "failedLabel": "Аудит не вдалося",
+      "canceledLabel": "Аудит скасовано",
+      "statusFull": "Показувати повний аудит проекту з {time}",
+      "statusChangedRef": "Показується файли, які змінені порівняно з {ref}, перевірено {time}",
+      "notRunYet": "Виберіть діапазон вище, потім Запустити аудит"
+    },
     "chip": {
       "contains": "містить \"{q}\"",
       "severityOff": "тяжкість ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Не вдалося побудувати триаж з цього експорту. Запустити новий аналіз.",
     "summaryVolume": "Тріаж правил (об'єм / обов'язкова фіксація / стилістика)",
     "hintSameAsTree": "Те ж саме групування, що і дерево Triage activity-bar tree: питання фільтра, або відключити/включити правила в `analysis_options_custom.yaml゙. Великі групи можуть попросити підтвердження."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Повний аудит",
-      "description": "Всі правила · вибірковий елемент · фільтрування звіту"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Показати короткі клавіші (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Всі команди…",
       "commandCatalogDescription": "Шукати всі команди",
+      "findingsNoProject": "Відкрийте проект Dart для сканування",
+      "findingsNeverScanned": "Виконати аналіз для сканування",
+      "findingsClean": "Немає порушень · бал {score}",
+      "findingsWithViolations": "Нарушення {count} · бал {score}",
+      "packagesNeverScanned": "Запустити сканування для перевірки залежностей",
+      "packagesAllAdopted": "Усі функції прийняті",
+      "packagesNeedlesCount": "{count} пакети для прийняття",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Помилка воріт",
       "codeHealthNeverScanned": "Запустіть Code Health, щоб побачити свій бал",
       "projectMapDescription": "Відсканований {ago}",
       "projectMapNeverScanned": "Запустіть карту проекту, щоб побачити розмір і гарячі точки"
+    },
+    "degraded": {
+      "bannerLabel": "Помилка активації",
+      "bannerDescription": "Перевірте журнал логів хоста розширення для деталей"
     }
   }
 }

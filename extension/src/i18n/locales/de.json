@@ -6,19 +6,6 @@
     "alreadyRunning": "Eine Audite wird bereits ausgeführt — warten Sie, bis es fertig ist.",
     "noProject": "Kein Dart Projekt gefunden. Öffnen Sie ein Verzeichnis, das ein pubspec.yaml enthält.",
     "missingDep": "Dieses Projekt hängt nicht von saropa_lints ab. Fügen Sie es zunächst in dev_dependencies hinzu.",
-    "pickWorkspaceFolder": "Welcher Arbeitsordner soll die Audite durchlaufen?",
-    "scope": {
-      "placeholder": "Welche Dateien sollte die Auditeinschätzung umfassen?",
-      "full": "Vollständiger Projektstatus",
-      "fullDescription": "Auditieren Sie jede Dart-Datei — die umfassendste Option",
-      "changedVsMain": "Geändert vs Haupt",
-      "changedVsMainDescription": "Nur Dateien, die sich von der Hauptverzweigung unterscheiden",
-      "changedPickBranch": "Geändert vs. Branch…",
-      "changedPickBranchDescription": "Nur Dateien, die sich von einer von Ihnen ausgewählten Branch unterscheiden",
-      "compareBaseline": "Vergleichen mit der Baseline",
-      "compareBaselineDescription": "Zeige, was seit der letzten gespeicherten Baselinesnapshot geändert wurde",
-      "branchPrompt": "Verzweigung zum Vergleich"
-    },
     "progress": {
       "title": "Saropa Lints Audit ausführen…",
       "message": "{pct}% · {scanned}/{total} Dateien · {issues} Probleme · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Mehr anzeigen",
       "keyboardHint": "Pfeiltasten zum Navigieren · Enter, um Datei zu öffnen · Esc, um Suche zu löschen",
       "copiedJson": "Audit JSON in die Zwischenablage kopiert.",
+      "exportJson": "JSON export",
+      "exportJsonTitle": "Audit-Ergebnisse als JSON exportieren",
+      "exportJsonSaved": "Audit JSON exportiert.",
+      "exportJsonFailed": "Kann den Audit-JSON nicht exportieren: {message}",
+      "clearRuleFilter": "Klar klar klar klar, das ist ein Witz.",
+      "paginationNote": "Seitenbegrenzung gilt für gefilterte Ergebnisse.",
+      "sevBarError": "{count} Fehler ({pct}%)",
+      "sevBarWarning": "{count} Warnungen ({pct}%)",
+      "sevBarInfo": "{count}-Info ({pct}%)",
       "baselineSaved": "Baseline gespeichert. Zukünftige Audits können dieses Snapshot vergleichen.",
       "baselineSaveFailed": "Konnte die Baseline nicht speichern: {message}",
       "deferredLoading": "Vollständige Ergebnismenge laden (dieser Audit ist groß)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Kopieren Sie gefilterte Verstöße als JSON ({count})",
       "saveReportTitle": "Speichern Sie gefilterte Verstöße als JSON in Berichten/JJJMMDD/"
     },
+    "audit": {
+      "scopeFieldTitle": "Wählen Sie, was die unten stehenden Ergebnisse beziehen",
+      "scopeLabel": "Quelle",
+      "scopeLive": "Live-Diagnose",
+      "scopeFull": "Volle Projektprüfung",
+      "scopeChangedMain": "Geändert vs Haupt",
+      "scopeChangedBranch": "Geändert vs. Branch…",
+      "branchPlaceholder": "Branch-Name",
+      "branchAria": "Verzweigung zum Vergleich",
+      "runButton": "Audit ausführen",
+      "runButtonTitle": "Den vollständigen Projekt-Audit-CLI ausführen und seine Ergebnisse hier laden",
+      "cancelButton": "Stornieren Sie stornieren",
+      "runningLabel": "Wirtschaftsprüfung…",
+      "runningMeta": "Audit CLI starten…",
+      "completedLabel": "Audit abgeschlossen",
+      "failedLabel": "Prüfung fehlgeschlagen",
+      "canceledLabel": "Audit abgebrochen",
+      "statusFull": "Vollständige Projekt-Prüfung anzuzeigen von {time}",
+      "statusChangedRef": "Dateien geändert vs {ref}, geprüft {time}",
+      "notRunYet": "Wählen Sie einen Bereich oben aus, dann Ausführung prüfen"
+    },
     "chip": {
       "contains": "enthält \"{q}\"",
       "severityOff": "Schwere ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "konnte keine Triage aus dieser Export-Datenbank erstellen. Führen Sie eine neue Analyse durch.",
     "summaryVolume": "Regeln Triage (Volumen / müssen fixieren / stilistisch)",
     "hintSameAsTree": "Dieselbe Gruppierung wie der Triage-Aktivitätsbalkenbaum: Filterprobleme oder Regeln deaktivieren/aktivieren in `analysis_options_custom.yaml゙. Große Gruppen können um Bestätigung bitten."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Vollständige Prüfung",
-      "description": "Alle Regeln · Bereichsauswahl · filterbarer Bericht"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Zeigen Sie Tastatur-Verknüpfungen (?) an.",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Alle Befehle…",
       "commandCatalogDescription": "Alle Befehle suchen",
+      "findingsNoProject": "Dart-Projekt öffnen, um zu scannen",
+      "findingsNeverScanned": "Analyse ausführen, um zu scannen",
+      "findingsClean": "Keine Verstöße · Punktestand {score}",
+      "findingsWithViolations": "{count}-Violationen · Punkte {score}",
+      "packagesNeverScanned": "Scan ausführen, um Abhängigkeiten zu prüfen",
+      "packagesAllAdopted": "Alle Funktionen übernommen",
+      "packagesNeedlesCount": "{count} Pakete zur Adoption",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate fehlt",
       "codeHealthNeverScanned": "Code Health ausführen, um Ihren Score zu sehen",
       "projectMapDescription": "Gescannt {ago}",
       "projectMapNeverScanned": "Projektmappe ausführen, um Größe & Hotspots anzuzeigen"
+    },
+    "degraded": {
+      "bannerLabel": "Aktivierungsfehler",
+      "bannerDescription": "Prüfen Sie den Extension Host-Log für Details"
     }
   }
 }

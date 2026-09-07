@@ -6,19 +6,6 @@
     "alreadyRunning": "Un audit est déjà en cours — attendez qu'il se termine.",
     "noProject": "Aucun projet Dart trouvé. Ouvrez un dossier contenant un pubspec.yaml.",
     "missingDep": "Ce projet ne dépend pas de saropa_lints. Ajoutez-le d'abord à dev_dependencies.",
-    "pickWorkspaceFolder": "Quel dossier de travail doit être analysé par l'audit ?",
-    "scope": {
-      "placeholder": "Quels fichiers l'audit doit-il couvrir ?",
-      "full": "Projet complet",
-      "fullDescription": "Auditer chaque fichier Dart — l'option la plus approfondie",
-      "changedVsMain": "Modifié par rapport à la version principale",
-      "changedVsMainDescription": "Seulement les fichiers qui diffèrent de la branche principale",
-      "changedPickBranch": "Modifié vs branche…",
-      "changedPickBranchDescription": "Seulement les fichiers qui diffèrent d'une branche que vous choisissez",
-      "compareBaseline": "Comparer avec la référence",
-      "compareBaselineDescription": "Afficher ce qui a changé depuis le dernier instantané de base de sauvegarde",
-      "branchPrompt": "Branche à comparer"
-    },
     "progress": {
       "title": "Audit Saropa Lints en cours…",
       "message": "{pct}% · {scanned}/{total} fichiers · {issues} problèmes · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Afficher plus",
       "keyboardHint": "Flèches directionnelles pour naviguer · Entrée pour ouvrir le fichier · Échap pour effacer la recherche",
       "copiedJson": "Audit JSON copié dans le presse-papier.",
+      "exportJson": "Exporter JSON",
+      "exportJsonTitle": "Exporter les résultats d'audit au format JSON",
+      "exportJsonSaved": "Audit JSON exporté.",
+      "exportJsonFailed": "Impossible d'exporter le JSON d'audit : {message}",
+      "clearRuleFilter": "Le clair de lune est un signe.",
+      "paginationNote": "La limite de pages s'applique aux résultats filtrés.",
+      "sevBarError": "Erreurs {count} ({pct}%)",
+      "sevBarWarning": "Avertissements {count} ({pct}%)",
+      "sevBarInfo": "Informations {count} ({pct}%)",
       "baselineSaved": "Snapshot enregistré. Les futures audits peuvent comparer contre ce point de référence.",
       "baselineSaveFailed": "Impossible de sauvegarder la base de comparaison : {message}",
       "deferredLoading": "Chargement de l'ensemble complet des résultats (cet audit est volumineux)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Copiez les violations filtrées sous forme de JSON ({count})",
       "saveReportTitle": "Enregistrer les violations filtrées sous forme de JSON dans des rapports / YYYYMMDD/."
     },
+    "audit": {
+      "scopeFieldTitle": "Choisir d'où proviennent les résultats ci-dessous",
+      "scopeLabel": "Source",
+      "scopeLive": "Diagnostic en temps réel",
+      "scopeFull": "Audit complet du projet",
+      "scopeChangedMain": "Modifié par rapport à la version principale",
+      "scopeChangedBranch": "Modifié vs branche…",
+      "branchPlaceholder": "nom de branche",
+      "branchAria": "Branche à comparer",
+      "runButton": "Exécuter l'audit",
+      "runButtonTitle": "Exécutez l'audit CLI du projet complet et chargez ses résultats ici",
+      "cancelButton": "Annuler",
+      "runningLabel": "Audit en cours…",
+      "runningMeta": "Démarrage de l'audit CLI…",
+      "completedLabel": "Audit terminé",
+      "failedLabel": "L'audit a échoué",
+      "canceledLabel": "Vérification annulée",
+      "statusFull": "Affichage de l'audit de l'ensemble du projet depuis {time}",
+      "statusChangedRef": "Affichage des fichiers modifiés vs {ref}, audité {time}",
+      "notRunYet": "Choisissez une portée ci-dessus, puis Exécutez l'audit"
+    },
     "chip": {
       "contains": "contient le mot \"{q}\"",
       "severityOff": "La sévérité est ≠ {v}.",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Ne pouvait pas construire un triage à partir de cette exportation. Faites une nouvelle analyse.",
     "summaryVolume": "Le tri des règles (volume / doit-être fixé / stylistique)",
     "hintSameAsTree": "Même groupement que l'arbre de barre d'activité Triage: filtrez les problèmes, ou désactivez/activez des règles dans `analysis_options_custom.yaml゙. Les grands groupes peuvent demander une confirmation."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Audit complet",
-      "description": "Toutes les règles · sélection de portée · rapport filtrable"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Afficher les raccourcis clavier (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Toutes les commandes…",
       "commandCatalogDescription": "Rechercher toutes les commandes",
+      "findingsNoProject": "Ouvrez un projet Dart pour analyser",
+      "findingsNeverScanned": "Analyser pour scanner",
+      "findingsClean": "Aucune violation · score {score}",
+      "findingsWithViolations": "Violations {count} · score {score}",
+      "packagesNeverScanned": "Exécuter un scan pour vérifier les dépendances",
+      "packagesAllAdopted": "Toutes les fonctionnalités adoptées",
+      "packagesNeedlesCount": "{count} packages à adopter",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Porte en panne",
       "codeHealthNeverScanned": "Exécutez Code Health pour voir votre score",
       "projectMapDescription": "Scanné {ago}",
       "projectMapNeverScanned": "Exécuter Project Map pour voir la taille et les zones chaudes"
+    },
+    "degraded": {
+      "bannerLabel": "Erreur d'activation",
+      "bannerDescription": "Vérifier les logs du hôte de l'extension pour plus de détails"
     }
   }
 }

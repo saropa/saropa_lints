@@ -6,19 +6,6 @@
     "alreadyRunning": "Ang isang audit ay nagsisimula na — wait for it to finish.",
     "noProject": "Walang proyekto Dart. Bumuksa sa isang folder na mayroon ang pubspec.yaml.",
     "missingDep": "Ang proyekto ay hindi naglalaman ng dependensya sa saropa_lints. Idagdag ito sa dev_dependencies muna.",
-    "pickWorkspaceFolder": "Saan ang workspace folder na dapat i-target ang audit?",
-    "scope": {
-      "placeholder": "Anong mga file ang dapat talaan ng audit?",
-      "full": "Buo ang proyekto",
-      "fullDescription": "I-check lahat ng Dart file — ang pinakamalayog na opsyon",
-      "changedVsMain": "Nagbago mula sa main",
-      "changedVsMainDescription": "Mga file na nangangailangan ng pagbabago mula sa pangunahing branch",
-      "changedPickBranch": "Nagbago ang vs branch…",
-      "changedPickBranchDescription": "Mga file na nangangailangan ng pagbabago mula sa isang branch na iyong piliin",
-      "compareBaseline": "Compare sa baseline",
-      "compareBaselineDescription": "Ipakita ang mga bagay na nangyari mula sa huling sinagot na baseline snapshot",
-      "branchPrompt": "Branch para i-compare"
-    },
     "progress": {
       "title": "Pangangalap ng Saropa Lints audit…",
       "message": "{pct}% · {scanned}/{total} mga file · {issues} mga isyu · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Ipakita ang mas marami",
       "keyboardHint": "Arrow keys para mag-navigate · Enter para buksan ang file · Esc para alisin ang search",
       "copiedJson": "Nakakopya ang audit JSON sa clipboard.",
+      "exportJson": "I-export JSON",
+      "exportJsonTitle": "I-export ang mga resulta ng audit bilang JSON",
+      "exportJsonSaved": "Audit JSON na exportado.",
+      "exportJsonFailed": "Hindi maaaring i-export ang audit JSON: {message}",
+      "clearRuleFilter": "Ang mga ito ay malinaw na may isang mahusay na pag-andar.",
+      "paginationNote": "Ang limitasyon sa pahina ay nagsisimula sa mga resulta na in-filter.",
+      "sevBarError": "{count} mga error ({pct}%)",
+      "sevBarWarning": "{count} mga warning ({pct}%)",
+      "sevBarInfo": "{count} impormasyon ({pct}%)",
       "baselineSaved": "Nakasave ang baseline. Maaari itong i-compare ng mga susunod na audit sa snapshot na ito.",
       "baselineSaveFailed": "Hindi maaaring i-save ang baseline: {message}",
       "deferredLoading": "Naglalagay ng buong result set (ang audit na ito ay malaki)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Kopyahin ang mga na-filter na paglabag bilang JSON ({count})",
       "saveReportTitle": "I-save ang mga na-filter na paglabag bilang JSON sa mga ulat / YYYYMMDD /."
     },
+    "audit": {
+      "scopeFieldTitle": "Piliin kung ano ang pinagmulan ng mga resulta sa ibaba",
+      "scopeLabel": "Sulat",
+      "scopeLive": "Mga live na diagnostic",
+      "scopeFull": "Buong pag-audit ng proyekto",
+      "scopeChangedMain": "Nagbago mula sa main",
+      "scopeChangedBranch": "Nagbago ang vs branch…",
+      "branchPlaceholder": "pangalan ng sangay",
+      "branchAria": "Branch para i-compare",
+      "runButton": "Pagsusulit audit",
+      "runButtonTitle": "Punan ang resulta ng CLI ng full-project audit dito",
+      "cancelButton": "Kanselahin I-cancel ang pagkansela",
+      "runningLabel": "Pag-aaral…",
+      "runningMeta": "Pagsimula ng audit CLI...",
+      "completedLabel": "Tapos na ang pag-audit",
+      "failedLabel": "Nabigo ang pag-audit",
+      "canceledLabel": "Kinansela ang pag-audit",
+      "statusFull": "Pangkabug-osang pag-aaral ng proyekto mula sa {time}",
+      "statusChangedRef": "Nakapagpapakita ng mga file na binago kumpara sa {ref}, inaudited {time}",
+      "notRunYet": "Pumili ng isang scope sa itaas, pagkatapos Pumunta sa audit"
+    },
     "chip": {
       "contains": "naglalaman ng \"{q}\"",
       "severityOff": "kalubhaan ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Hindi maaaring bumuo ng triage mula sa pag-export na ito. Magpatakbo ng isang bagong pagsusuri.",
     "summaryVolume": "Pag-iisa ng mga patakaran (bolyum / dapat na i-fix / istilo)",
     "hintSameAsTree": "Katulad na pag-uuri bilang ang Triage activity bar tree: filter Issues, o i-disable/enable rules sa `analysis_options_custom.yaml゙. Ang malalaking grupo ay maaaring humiling ng kumpirmasyon."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Buong Audit",
-      "description": "Lahat ng mga rule · pagpili ng scope · report na maaaring i-filter"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Ipakita ang mga shortcut ng keyboard (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Lahat ng mga command…",
       "commandCatalogDescription": "Suriin lahat ng mga command",
+      "findingsNoProject": "I-Open ang isang Dart project upang i-scan",
+      "findingsNeverScanned": "I-run ang analysis upang i-scan",
+      "findingsClean": "Walang mga pagkakasala · score {score}",
+      "findingsWithViolations": "{count} na pagkakasala · puntos {score}",
+      "packagesNeverScanned": "Paghahatid ng scan upang tukuyin ang mga dependensya",
+      "packagesAllAdopted": "Lahat ng mga tampok na inilapat",
+      "packagesNeedlesCount": "{count} packages na magpapalit",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Hindi pumasa ang gate",
       "codeHealthNeverScanned": "Punan ang Code Health upang makita ang iyong score",
       "projectMapDescription": "Nascan {ago}",
       "projectMapNeverScanned": "Pangalawang Mapa ng Proyekto upang makita ang laki at mga hot spot"
+    },
+    "degraded": {
+      "bannerLabel": "Mga Error sa Pag-activate",
+      "bannerDescription": "Tingnan ang log ng Extension Host para sa detalye"
     }
   }
 }

@@ -6,19 +6,6 @@
     "alreadyRunning": "Audyt już się uruchomił — czekaj, aż zakończy.",
     "noProject": "Brak projektu Dart. Otwórz folder zawierający pubspec.yaml.",
     "missingDep": "Ten projekt nie zależy od saropa_lints. Dodaj go najpierw do dev_dependencies.",
-    "pickWorkspaceFolder": "Który katalog roboczy powinien być użyty do wykonania audytu?",
-    "scope": {
-      "placeholder": "Które pliki powinny być obejmowane audytem?",
-      "full": "Cały projekt",
-      "fullDescription": "Audytuj każdy plik Dart — najbardziej szczegółowa opcja",
-      "changedVsMain": "Zmieniono vs main",
-      "changedVsMainDescription": "Tylko pliki, które różnią się od gałęzi głównej",
-      "changedPickBranch": "Zmieniono vs gałąź…",
-      "changedPickBranchDescription": "Tylko pliki, które różnią się od gałęzi, którą wybierasz",
-      "compareBaseline": "Porównaj z bazą danych",
-      "compareBaselineDescription": "Pokaż, co się zmieniło od ostatniego zapisanego punktu odniesienia",
-      "branchPrompt": "Gałąź do porównania"
-    },
     "progress": {
       "title": "Uruchamianie audytu Saropa Lints…",
       "message": "{pct}% · {scanned}/{total} pliki · {issues} problemy · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Pokaż więcej",
       "keyboardHint": "Strzałki do nawigacji · Enter aby otworzyć plik · Esc aby wyczyścić wyszukiwanie",
       "copiedJson": "Audyt JSON skopiowany do schowka.",
+      "exportJson": "Eksportuj JSON",
+      "exportJsonTitle": "Eksportuj wyniki audytu jako JSON",
+      "exportJsonSaved": "Audyt JSON wyeksportowany.",
+      "exportJsonFailed": "Nie można wyeksportować audytu JSON: {message}",
+      "clearRuleFilter": "Wystarczy, że będziecie się wypełniać.",
+      "paginationNote": "Ograniczenie liczby stron dotyczy wyników po filtrowaniu.",
+      "sevBarError": "Błędy {count} ({pct}%)",
+      "sevBarWarning": "Ostrzeżenia {count} ({pct}%)",
+      "sevBarInfo": "{count} informacja ({pct}%)",
       "baselineSaved": "Zapisano podstawową wersję. Przyszłe audyty mogą porównać ją z tym zrzutem.",
       "baselineSaveFailed": "Nie można zapisać podstawy: {message}",
       "deferredLoading": "Ładowanie pełnego zestawu wyników (ten audyt jest duży)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Kopiowanie zfiltrowanych naruszeń jako JSON ({count})",
       "saveReportTitle": "Zapisz przefiltrowane naruszenia jako JSON do raportów/RRRMMDD."
     },
+    "audit": {
+      "scopeFieldTitle": "Wybierz, z czego są źródła poniższe wyniki",
+      "scopeLabel": "Źródło",
+      "scopeLive": "Diagnostyka w czasie rzeczywistym",
+      "scopeFull": "Pełna audyt projektu",
+      "scopeChangedMain": "Zmieniono vs main",
+      "scopeChangedBranch": "Zmieniono vs gałąź…",
+      "branchPlaceholder": "nazwa gałęzi",
+      "branchAria": "Gałąź do porównania",
+      "runButton": "Uruchom audyt",
+      "runButtonTitle": "Uruchom pełnoprawny audyt projektu CLI i załaduj jego wyniki tutaj",
+      "cancelButton": "Odwołaj Anulować",
+      "runningLabel": "Audytowanie…",
+      "runningMeta": "Uruchamianie audytu CLI…",
+      "completedLabel": "Audyt zakończony",
+      "failedLabel": "Audyt nie powiódł się",
+      "canceledLabel": "Audyt odwołany",
+      "statusFull": "Pokaż wynik pełnego audytu projektu z {time}",
+      "statusChangedRef": "Pokaż pliki zmienione w porównaniu do {ref}, audyt {time}",
+      "notRunYet": "Wybierz zakres powyżej, a następnie Uruchom audyt"
+    },
     "chip": {
       "contains": "zawiera \"{q}\"",
       "severityOff": "nasilenie ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Nie można było zbudować triażu z tego eksportu. Przeprowadź nową analizę.",
     "summaryVolume": "Triaż reguł (wolumen / musi być poprawiony / stylistyczny)",
     "hintSameAsTree": "Ta sama grupa jak drzewo Triage activity-bar: filtrować zagadnienia, lub wyłączać/włączania reguł w `analysis_options_custom.yaml゙. Duże grupy mogą poprosić o potwierdzenie."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Pełna audyt",
-      "description": "Wszystkie reguły · wybór zakresu · raport filtrowalny"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Pokaż skróty klawiatury (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Wszystkie polecenia…",
       "commandCatalogDescription": "Wyszukaj wszystkie polecenia",
+      "findingsNoProject": "Otwórz projekt Dart, aby przeprowadzić skanowanie",
+      "findingsNeverScanned": "Uruchom analizę, aby skanować",
+      "findingsClean": "Brak naruszeń · wynik {score}",
+      "findingsWithViolations": "Widoczne są {count} naruszenia · wynik {score}",
+      "packagesNeverScanned": "Uruchom skanowanie aby sprawdzić zależności",
+      "packagesAllAdopted": "Wszystkie funkcje zaakceptowane",
+      "packagesNeedlesCount": "{count} pakietów do przyjęcia",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Brama nie działa",
       "codeHealthNeverScanned": "Uruchom Code Health, aby zobaczyć swój wynik",
       "projectMapDescription": "Zeskanowano {ago}",
       "projectMapNeverScanned": "Uruchom Mapę projektu, aby zobaczyć rozmiar i gorące punkty"
+    },
+    "degraded": {
+      "bannerLabel": "Błąd aktywacji",
+      "bannerDescription": "Sprawdź logi hosta rozszerzenia dla szczegółów"
     }
   }
 }

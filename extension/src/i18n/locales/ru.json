@@ -6,19 +6,6 @@
     "alreadyRunning": "Аудит уже запущен — подождите, пока он завершится.",
     "noProject": "Нет проекта Dart. Откройте папку, содержащую pubspec.yaml.",
     "missingDep": "Этот проект не зависит от saropa_lints. Добавьте его сначала в dev_dependencies.",
-    "pickWorkspaceFolder": "Какой каталог рабочей области должен проверяться аудитом?",
-    "scope": {
-      "placeholder": "Какие файлы должен охватывать аудит?",
-      "full": "Полный проект",
-      "fullDescription": "Проверяйте каждый файл Dart — наиболее тщательный вариант",
-      "changedVsMain": "Изменено по сравнению с основной",
-      "changedVsMainDescription": "Только файлы, которые отличаются от основной ветки",
-      "changedPickBranch": "Изменен vs ветка…",
-      "changedPickBranchDescription": "Только файлы, которые отличаются от ветки, которую вы выберете",
-      "compareBaseline": "Сравнить с базовой версией",
-      "compareBaselineDescription": "Показать, что изменилось с момента последней сохраненной базовой снимка",
-      "branchPrompt": "Ветка для сравнения"
-    },
     "progress": {
       "title": "Запуск аудита Saropa Lints…",
       "message": "{pct}% · {scanned}/{total} файлы · {issues} ошибки · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Показать больше",
       "keyboardHint": "Стрелки вверх и вниз для навигации · Enter для открытия файла · Esc для очистки поиска",
       "copiedJson": "Аудит JSON скопирован в буфер обмена.",
+      "exportJson": "Экспорт JSON",
+      "exportJsonTitle": "Экспортировать результаты аудита в формате JSON",
+      "exportJsonSaved": "Аудит JSON экспортирован.",
+      "exportJsonFailed": "Не удалось экспортировать аудит JSON: {message}",
+      "clearRuleFilter": "Чистый чистый Чистые Чистыми",
+      "paginationNote": "Ограничение по страницам применяется к отфильтрованным результатам.",
+      "sevBarError": "{count} ошибок ({pct}%)",
+      "sevBarWarning": "{count} предупреждений ({pct}%)",
+      "sevBarInfo": "{count} информация ({pct}%)",
       "baselineSaved": "Базовая точка сохранена. Будущие аудиты могут сравнивать её с этим снимком.",
       "baselineSaveFailed": "Не удалось сохранить базовую версию: {message}",
       "deferredLoading": "Загрузка полного набора результатов (этот аудит большой)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Копируйте отфильтрованные нарушения в виде JSON ({count})",
       "saveReportTitle": "Сохранить отфильтрованные нарушения в виде JSON для отчетов/YYY YMMDD/."
     },
+    "audit": {
+      "scopeFieldTitle": "Выберите, откуда получены следующие результаты",
+      "scopeLabel": "Источник",
+      "scopeLive": "Живая диагностика",
+      "scopeFull": "Полный аудит проекта",
+      "scopeChangedMain": "Изменено по сравнению с основной",
+      "scopeChangedBranch": "Изменен vs ветка…",
+      "branchPlaceholder": "название ветки",
+      "branchAria": "Ветка для сравнения",
+      "runButton": "Запустить аудит",
+      "runButtonTitle": "Запустите полный аудит проекта CLI и загрузите его результаты здесь",
+      "cancelButton": "Отменить отменить.",
+      "runningLabel": "Аудит...",
+      "runningMeta": "Запуск аудита CLI…",
+      "completedLabel": "Аудит завершен",
+      "failedLabel": "Аудит не пройден",
+      "canceledLabel": "Аудит отменен",
+      "statusFull": "Показывает полный аудит проекта из {time}",
+      "statusChangedRef": "Показываются измененные файлы по сравнению с {ref}, проверено {time}",
+      "notRunYet": "Выберите область выше, затем Запустить аудит"
+    },
     "chip": {
       "contains": "содержит \"{q}\"",
       "severityOff": "тяжесть ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Не удалось создать триаж из этого экспорта. Проведите новый анализ.",
     "summaryVolume": "Правило сортировки (объем / необходимость фиксации / стилистический)",
     "hintSameAsTree": "Та же группировка, что и в дереве activity-bar Triage: фильтруйте вопросы или отключите/включите правила в `analysis_options_custom.yaml゙. Большие группы могут попросить подтверждение."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Полный аудит",
-      "description": "Все правила · выборка области · отчет с фильтром"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Показывать сокращения клавиатуры (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Все команды…",
       "commandCatalogDescription": "Поиск всех команд",
+      "findingsNoProject": "Открыть проект Dart для сканирования",
+      "findingsNeverScanned": "Анализ выполнить для сканирования",
+      "findingsClean": "Нарушений нет · результат {score}",
+      "findingsWithViolations": "Нарушения {count} · оценка {score}",
+      "packagesNeverScanned": "Запустить сканирование для проверки зависимостей",
+      "packagesAllAdopted": "Все функции приняты",
+      "packagesNeedlesCount": "{count} пакеты для принятия",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Ошибка ворот",
       "codeHealthNeverScanned": "Запустите Code Health, чтобы увидеть свой результат",
       "projectMapDescription": "Отсканировано {ago}",
       "projectMapNeverScanned": "Запустите карту проекта, чтобы увидеть размер и горячие точки."
+    },
+    "degraded": {
+      "bannerLabel": "Ошибка активации",
+      "bannerDescription": "Проверьте журнал Extension Host для деталей"
     }
   }
 }

@@ -6,19 +6,6 @@
     "alreadyRunning": "یک ا审计 در حال اجرا است — منتظر پایان آن باشید.",
     "noProject": "هیچ پروژه Dart یافت نشد. یک پوشه که حاوی pubspec.yaml باشد را باز کنید.",
     "missingDep": "این پروژه به saropa_lints وابسته نمی باشد. ابتدا به dev_dependencies اضافه کنید.",
-    "pickWorkspaceFolder": "کدام پوشه کارگاه اجرا را باید علیه آن انجام دهیم؟",
-    "scope": {
-      "placeholder": "کدام فایل‌ها باید در بازرسی مورد بررسی قرار گیرند؟",
-      "full": "پروژه کامل",
-      "fullDescription": "همه Dart فایل را بررسی کنید — گزینه کامل ترین",
-      "changedVsMain": "تغییر یافته نسبت به اصلی",
-      "changedVsMainDescription": "فایل‌هایی که از شاخه اصلی متفاوت هستند",
-      "changedPickBranch": "تغییر یافته vs شاخه...",
-      "changedPickBranchDescription": "فایل‌هایی که از شاخه‌ای که انتخاب می‌کنید متفاوت هستند",
-      "compareBaseline": "مقایسه با پایه استاندارد",
-      "compareBaselineDescription": "تغییراتی که از آخرین نسخه پایه ذخیره شده تغییر کرده است نمایش دهید",
-      "branchPrompt": "فرعی که مقایسه می‌شود"
-    },
     "progress": {
       "title": "اجرای آudit Saropa Lints...",
       "message": "{pct}% · {scanned}/{total} فایل · {issues} مشکل · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "نمایش بیشتر",
       "keyboardHint": "کلیدهای سیمایی برای پیمایش · Enter برای باز کردن فایل · Esc برای پاک کردن جستجو",
       "copiedJson": "بررسی JSON به پیش‌نویس کپی شد.",
+      "exportJson": "خروج JSON",
+      "exportJsonTitle": "نتیجه گزارش ارزیابی را به صورت JSON صادر کنید",
+      "exportJsonSaved": "审计 JSON 导出.",
+      "exportJsonFailed": "نمی توانید فایل JSON گزارش امنیتی را صادر کنید: {message}",
+      "clearRuleFilter": "صاف شفاف روشن",
+      "paginationNote": "محدودیت صفحه بر روی نتایج فیلتر شده اعمال می‌شود.",
+      "sevBarError": "خطا های {count} ({pct}%)",
+      "sevBarWarning": "تحذيرات {count} ({pct}%)",
+      "sevBarInfo": "{count} اطلاعات ({pct}%)",
       "baselineSaved": "نمونه‌ی پایه ذخیره شد. تحلیل‌های آتی می‌توانند این نسخه را به عنوان یک مقایسه استفاده کنند.",
       "baselineSaveFailed": "نمی توان پایه ی اصلی را ذخیره کرد: {message}",
       "deferredLoading": "بارگذاری مجموعه نتایج کامل (این آ审计 بزرگ است)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "کپی کردن نقض های فیلتر شده به عنوان JSON ({count})",
       "saveReportTitle": "ذخیره نقض فیلتر شده به عنوان JSON در گزارش ها / YYYYMMDD/"
     },
+    "audit": {
+      "scopeFieldTitle": "یافته‌های زیر از کجا گرفته شده‌اند",
+      "scopeLabel": "منبع",
+      "scopeLive": "دیاگنوستیک زنده",
+      "scopeFull": "تحقيق كامل پروژه",
+      "scopeChangedMain": "تغییر یافته نسبت به اصلی",
+      "scopeChangedBranch": "تغییر یافته vs شاخه...",
+      "branchPlaceholder": "نام شاخه",
+      "branchAria": "فرعی که مقایسه می‌شود",
+      "runButton": "اجرای آ审计",
+      "runButtonTitle": "تمام پروژه را با CLI ا审计 اجرا کنید و نتایج آن را اینجا بارگذاری کنید",
+      "cancelButton": "لغو کن لغو کنید",
+      "runningLabel": "بررسی...",
+      "runningMeta": "برنامه ا审计 CLI را شروع می کنیم...",
+      "completedLabel": "تحقيق كامل",
+      "failedLabel": "حسابرسی ناموفق بود",
+      "canceledLabel": "حسابرسی لغو شد",
+      "statusFull": "نمایش بررسی پروژه کامل از {time}",
+      "statusChangedRef": "فایل های تغییر یافته نسبت به {ref} نمایش داده می شود، {time} بررسی شده است",
+      "notRunYet": "یک محدوده بالا را انتخاب کنید، سپس اجرا کنید"
+    },
     "chip": {
       "contains": "حاوی \"{q}\" است.",
       "severityOff": "شدت ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "نمی توان از این صادرات، یک سریال ساخت. یک تحلیل تازه را اجرا کنید.",
     "summaryVolume": "ردیابی قوانین (حجم / باید ثابت شود / سبک)",
     "hintSameAsTree": "همان گروه بندی که در درخت فعالیت-بار Triage وجود دارد: مسائل فیلتر، یا قوانین غیرفعال / فعال کردن در `analysis_options_custom.yaml゙. گروه های بزرگ ممکن است برای تایید درخواست کنند."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Audit کامل",
-      "description": "همه قوانین · انتخاب کننده گسترده · گزارش قابل فیلتر"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "میانبر های صفحه کلید را نشان دهید (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "همه دستورات…",
       "commandCatalogDescription": "جستجوی تمام دستورات",
+      "findingsNoProject": "پروژه ای با نام Dart را باز کنید تا اسکن شود",
+      "findingsNeverScanned": "تحلیل را اجرا کنید تا اسکن شود",
+      "findingsClean": "بدون خطا · نمره {score}",
+      "findingsWithViolations": "اعتنیات {count} · امتیاز {score}",
+      "packagesNeverScanned": "اسکن را اجرا کنید تا وابستگی ها را بررسی کنید",
+      "packagesAllAdopted": "همه ویژگی های پذیرفته شده",
+      "packagesNeedlesCount": "{count} پکیج به ادغام درآوردن",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · گیت شکست خورده",
       "codeHealthNeverScanned": "نمره خود را با اجرا کردن کد سلامت ببینید",
       "projectMapDescription": "سکن شده {ago}",
       "projectMapNeverScanned": "پروژه مپ را اجرا کنید تا اندازه و نقاط گرم را ببینید"
+    },
+    "degraded": {
+      "bannerLabel": "خطا در فعال‌سازی",
+      "bannerDescription": "لگ های هاست اکستنشن را برای جزئیات بررسی کنید"
     }
   }
 }

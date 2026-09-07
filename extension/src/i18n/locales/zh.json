@@ -6,19 +6,6 @@
     "alreadyRunning": "已有一个审计正在运行 —— 请等待其完成。",
     "noProject": "未找到 Dart 项目。打开包含 pubspec.yaml 的文件夹。",
     "missingDep": "此项目不依赖saropa_lints。请先将其添加到dev_dependencies中。",
-    "pickWorkspaceFolder": "应该对哪个工作区文件夹运行审计？",
-    "scope": {
-      "placeholder": "应审计哪些文件？",
-      "full": "完整项目",
-      "fullDescription": "审计每一个 Dart 文件 —— 最彻底的选项",
-      "changedVsMain": "已更改 vs 主分支",
-      "changedVsMainDescription": "仅与主分支不同的文件",
-      "changedPickBranch": "已更改 vs 分支…",
-      "changedPickBranchDescription": "只有与您选择的分支不同的文件",
-      "compareBaseline": "与基线对比",
-      "compareBaselineDescription": "显示自上次保存基线快照以来发生了哪些变化",
-      "branchPrompt": "要比较的分支"
-    },
     "progress": {
       "title": "正在运行 Saropa Lints 审计…",
       "message": "{pct}% · {scanned}/{total} 个文件 · {issues} 个问题 · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "显示更多",
       "keyboardHint": "方向键导航 · 回车打开文件 · Esc 清除搜索",
       "copiedJson": "剪贴板已复制审计 JSON",
+      "exportJson": "导出 JSON",
+      "exportJsonTitle": "导出审计结果为 JSON",
+      "exportJsonSaved": "审计导出的 JSON",
+      "exportJsonFailed": "无法导出审计 JSON：{message}",
+      "clearRuleFilter": "清晰的清晰明确的",
+      "paginationNote": "分页限制适用于筛选后的结果。",
+      "sevBarError": "{count}错误({pct}%)",
+      "sevBarWarning": "{count}警告({pct}%)",
+      "sevBarInfo": "{count}信息({pct}%)",
       "baselineSaved": "基线已保存。未来的审计可以以此快照作为对比。",
       "baselineSaveFailed": "无法保存基线：{message}",
       "deferredLoading": "加载完整的结果集（此审计内容较多）…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "将过 ⁇ 的违规行为复制为JSON ({count})",
       "saveReportTitle": "保存过 ⁇ 的违规行为作为JSON到报告/YYY YMMDD/."
     },
+    "audit": {
+      "scopeFieldTitle": "选择以下发现的来源",
+      "scopeLabel": "源码",
+      "scopeLive": "实时诊断",
+      "scopeFull": "全项目审计",
+      "scopeChangedMain": "已更改 vs 主分支",
+      "scopeChangedBranch": "已更改 vs 分支…",
+      "branchPlaceholder": "分支名称",
+      "branchAria": "要比较的分支",
+      "runButton": "运行审计",
+      "runButtonTitle": "在此运行完整的项目审计CLI并加载其结果",
+      "cancelButton": "取消 取缔 在此之前,请注销.",
+      "runningLabel": "审计中…",
+      "runningMeta": "开始审计 CLI…",
+      "completedLabel": "审计完成",
+      "failedLabel": "审核失败",
+      "canceledLabel": "审计被取消",
+      "statusFull": "显示{time}的整个项目审计结果",
+      "statusChangedRef": "显示已更改的文件 vs {ref}，已审计 {time}",
+      "notRunYet": "选择一个范围，然后运行审计"
+    },
     "chip": {
       "contains": "包含\"{q}\"的内容",
       "severityOff": "严重程度≠{v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "从这个出口中不能构建分类. 运行一个新的分析.",
     "summaryVolume": "规则分类 (体积/必须修复/风格)",
     "hintSameAsTree": "与分类活动栏树相同的分组：过滤问题，或禁用/启用“analysis_options_custom.yaml”中的规则。大型团体可能会要求确认。"
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "全面审计",
-      "description": "所有规则 · 作用域选择器 · 可过滤报告"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "显示键盘快捷方式 (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "所有命令…",
       "commandCatalogDescription": "搜索所有命令",
+      "findingsNoProject": "打开一个 Dart 项目以扫描",
+      "findingsNeverScanned": "运行分析以扫描",
+      "findingsClean": "无违规 · 分数 {score}",
+      "findingsWithViolations": "{count} 违规 · 分数 {score}",
+      "packagesNeverScanned": "运行扫描以检查依赖项",
+      "packagesAllAdopted": "所有功能采用",
+      "packagesNeedlesCount": "{count} 个包需要采用",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · 门故障",
       "codeHealthNeverScanned": "运行 Code Health 查看您的分数",
       "projectMapDescription": "已扫描 {ago}",
       "projectMapNeverScanned": "运行项目地图以查看规模和热点"
+    },
+    "degraded": {
+      "bannerLabel": "激活错误",
+      "bannerDescription": "检查扩展主机日志以获取详细信息"
     }
   }
 }

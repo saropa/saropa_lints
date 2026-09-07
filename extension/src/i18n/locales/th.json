@@ -6,19 +6,6 @@
     "alreadyRunning": "การตรวจสอบอยู่ในระหว่างการดำเนินการแล้ว — รอให้เสร็จสิ้นก่อน",
     "noProject": "ไม่พบโปรเจกต์ Dart โปรดเปิดโฟลเดอร์ที่มี pubspec.yaml",
     "missingDep": "โปรเจกต์นี้ไม่ได้ขึ้นกับ saropa_lints โปรดเพิ่มเข้าไปที่ dev_dependencies ก่อน",
-    "pickWorkspaceFolder": "โฟลเดอร์เวิร์สเปซใดที่ควรตรวจสอบ?",
-    "scope": {
-      "placeholder": "ไฟล์ใดที่ควรให้การตรวจสอบครอบคลุม?",
-      "full": "โครงการทั้งหมด",
-      "fullDescription": "ตรวจสอบไฟล์ Dart ทุกไฟล์ — ตัวเลือกที่ละเอียดที่สุด",
-      "changedVsMain": "เปลี่ยนจาก vs main",
-      "changedVsMainDescription": "เฉพาะไฟล์ที่ต่างจากสาขาหลัก",
-      "changedPickBranch": "เปลี่ยน vs สาขา…",
-      "changedPickBranchDescription": "เฉพาะไฟล์ที่ต่างจากสาขาที่คุณเลือก",
-      "compareBaseline": "เปรียบเทียบกับฐานข้อมูลมาตรฐาน",
-      "compareBaselineDescription": "แสดงสิ่งที่เปลี่ยนไปตั้งแต่การบันทึกฐานข้อมูลครั้งสุดท้าย",
-      "branchPrompt": "สาขาที่จะเปรียบเทียบ"
-    },
     "progress": {
       "title": "กำลังตรวจสอบ Saropa Lints...",
       "message": "{pct}% · {scanned}/{total} ไฟล์ · {issues} ปัญหา · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "แสดงเพิ่ม",
       "keyboardHint": "คีย์ลูกศรเพื่อการนำทาง · ปุ่ม Enter เพื่อเปิดไฟล์ · ปุ่ม Esc เพื่อเคลียร์การค้นหา",
       "copiedJson": "ตรวจสอบ JSON ที่คัดลอกไปยังคลิปบอร์ด",
+      "exportJson": "ส่งออก JSON",
+      "exportJsonTitle": "ส่งผลลัพธ์การตรวจสอบออกเป็น JSON",
+      "exportJsonSaved": "ตรวจสอบ JSON ที่ส่งออก",
+      "exportJsonFailed": "ไม่สามารถส่งออกไฟล์ JSON ผลการตรวจสอบได้: {message}",
+      "clearRuleFilter": "Clear สะอาด",
+      "paginationNote": "ข้อจำกัดจำนวนหน้ามีผลกับผลลัพธ์ที่กรองแล้ว",
+      "sevBarError": "ข้อผิดพลาด {count} ({pct}%)",
+      "sevBarWarning": "ข้อเตือนภัย {count} ({pct}%)",
+      "sevBarInfo": "ข้อมูล {count} ({pct}%)",
       "baselineSaved": "เกณฑ์พื้นฐานถูกบันทึกไว้แล้ว ตรวจสอบในอนาคตสามารถเปรียบเทียบกับภาพถ่ายหน้าจอช่วงนี้ได้",
       "baselineSaveFailed": "ไม่สามารถบันทึกฐานข้อมูลได้: {message}",
       "deferredLoading": "กำลังโหลดเซตผลลัพธ์ทั้งหมด (การตรวจสอบนี้มีขนาดใหญ่)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "สําเนาความผิดที่กรองไว้เป็น JSON ({count})",
       "saveReportTitle": "เก็บการละเมิดที่กรองไว้เป็น JSON ไปยังรายงาน / YYYYMMDD /"
     },
+    "audit": {
+      "scopeFieldTitle": "เลือกแหล่งที่มาของผลการค้นหาด้านล่าง",
+      "scopeLabel": "แหล่งที่มา",
+      "scopeLive": "การวินิจฉัยแบบเรียลไทม์",
+      "scopeFull": "การตรวจสอบโครงการแบบเต็มรูปแบบ",
+      "scopeChangedMain": "เปลี่ยนจาก vs main",
+      "scopeChangedBranch": "เปลี่ยน vs สาขา…",
+      "branchPlaceholder": "ชื่อสาขา",
+      "branchAria": "สาขาที่จะเปรียบเทียบ",
+      "runButton": "รันออดิท",
+      "runButtonTitle": "รันการตรวจสอบโครงการทั้งหมดผ่าน CLI และโหลดผลลัพธ์ของมันตรงนี้",
+      "cancelButton": "ยกเลิก Cancel เลิก",
+      "runningLabel": "ตรวจสอบ...",
+      "runningMeta": "เริ่มการตรวจสอบ CLI...",
+      "completedLabel": "ตรวจสอบเสร็จสิ้น",
+      "failedLabel": "การตรวจสอบล้มเหลว",
+      "canceledLabel": "ยกเลิกการตรวจสอบแล้ว",
+      "statusFull": "แสดงผลการตรวจสอบโครงการเต็มรูปแบบจาก {time}",
+      "statusChangedRef": "แสดงไฟล์ที่เปลี่ยนแปลงเทียบกับ {ref}, ตรวจสอบ {time}",
+      "notRunYet": "เลือกขอบเขตข้างต้น แล้วดำเนินการตรวจสอบ"
+    },
     "chip": {
       "contains": "มี \"{q}\" ในตัว",
       "severityOff": "ความรุนแรง ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "ไม่สามารถสร้างการคัดเลือกจากสินค้าส่งออกนี้ได้ ทําการวิเคราะห์ใหม่ๆ",
     "summaryVolume": "การจัดลําดับกติกา (ปริมาณ / ต้องแก้ไข / สไตลิสติก)",
     "hintSameAsTree": "การจัดกลุ่มเดียวกันกับต้นไม้การทํางานของ Triage: ปกรอง Issues หรือปิด /เปิดกฎใน `analysis_options_custom.yaml゙. กลุ่มใหญ่อาจขอรับรอง"
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "การตรวจสอบแบบเต็มรูปแบบ",
-      "description": "กฎทั้งหมด · ตัวเลือกขอบเขต · รายงานที่สามารถกรองได้"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "แสดงทางลัดคีย์บอร์ด (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "ทุกคำสั่ง…",
       "commandCatalogDescription": "ค้นหาคำสั่งทั้งหมด",
+      "findingsNoProject": "เปิดโปรเจกต์ Dart เพื่อสแกน",
+      "findingsNeverScanned": "วิเคราะห์เพื่อสแกน",
+      "findingsClean": "ไม่มีข้อผิดพลาด · คะแนน {score}",
+      "findingsWithViolations": "ข้อผิดพลาด {count} · คะแนน {score}",
+      "packagesNeverScanned": "วิเคราะห์ข้อมูลเพื่อตรวจสอบขึ้นทะเบียนการพึ่งพา",
+      "packagesAllAdopted": "คุณสมบัติทั้งหมดที่นำไปใช้",
+      "packagesNeedlesCount": "{count} แพ็กเกจที่ต้องการให้ปรับใช้",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · ประตูขัดข้อง",
       "codeHealthNeverScanned": "เรียกใช้ Code Health เพื่อดูคะแนนของคุณ",
       "projectMapDescription": "สแกน {ago} แล้ว",
       "projectMapNeverScanned": "เรียกใช้ Project Map เพื่อดูขนาดและฮอตสปอต"
+    },
+    "degraded": {
+      "bannerLabel": "ข้อผิดพลาดในการเปิดใช้งาน",
+      "bannerDescription": "ตรวจสอบบันทึกการดำเนินการของ Extension Host เพื่อดูรายละเอียด"
     }
   }
 }

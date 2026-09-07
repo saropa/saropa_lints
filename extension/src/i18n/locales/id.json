@@ -6,19 +6,6 @@
     "alreadyRunning": "Audit sedang berjalan — tunggu hingga selesai.",
     "noProject": "Tidak ditemukan proyek Dart. Buka folder yang mengandung pubspec.yaml.",
     "missingDep": "Proyek ini tidak bergantung pada saropa_lints. Tambahkan terlebih dahulu ke dev_dependencies.",
-    "pickWorkspaceFolder": "Folder workspace mana yang seharusnya diuji?",
-    "scope": {
-      "placeholder": "File mana yang harus ditinjau oleh audit?",
-      "full": "Proyek lengkap",
-      "fullDescription": "Audit setiap file Dart — opsi yang paling mendetail",
-      "changedVsMain": "Diubah dari vs utama",
-      "changedVsMainDescription": "Hanya file yang berbeda dari cabang utama",
-      "changedPickBranch": "Diubah vs cabang…",
-      "changedPickBranchDescription": "Hanya file yang berbeda dari cabang yang Anda pilih",
-      "compareBaseline": "Bandingkan dengan baseline",
-      "compareBaselineDescription": "Tampilkan apa yang berubah sejak snapshot basis terakhir disimpan",
-      "branchPrompt": "Cabang untuk dibandingkan"
-    },
     "progress": {
       "title": "Melakukan audit Saropa Lints...",
       "message": "{pct}% · {scanned}/{total} file · {issues} issues · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Tampilkan lebih banyak",
       "keyboardHint": "Panah atas dan bawah untuk navigasi · Enter untuk membuka file · Esc untuk menghapus pencarian",
       "copiedJson": "Audit JSON telah disalin ke clipboard.",
+      "exportJson": "Ekspor JSON",
+      "exportJsonTitle": "Ekspor hasil audit sebagai JSON",
+      "exportJsonSaved": "Audit JSON diekspor.",
+      "exportJsonFailed": "Tidak dapat mengekspor audit JSON: {message}",
+      "clearRuleFilter": "Clear (bahasa Inggris)",
+      "paginationNote": "Batas halaman berlaku untuk hasil yang telah disaring.",
+      "sevBarError": "{count} kesalahan ({pct}%)",
+      "sevBarWarning": "Peringatan {count} ({pct}%)",
+      "sevBarInfo": "{count} informasi ({pct}%)",
       "baselineSaved": "Baseline disimpan. Audit masa depan dapat membandingkan dengan snapshot ini.",
       "baselineSaveFailed": "Tidak dapat menyimpan baseline: {message}",
       "deferredLoading": "Memuat hasil himpunan lengkap (audit ini besar)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Salin pelanggaran yang disaring sebagai JSON ({count})",
       "saveReportTitle": "Simpan pelanggaran yang disaring sebagai JSON ke laporan / YYYYMMDD/"
     },
+    "audit": {
+      "scopeFieldTitle": "Pilih sumber dari mana temuan di bawah ini berasal",
+      "scopeLabel": "Sumber",
+      "scopeLive": "Diagnosis Langsung",
+      "scopeFull": "Audit proyek lengkap",
+      "scopeChangedMain": "Diubah dari vs utama",
+      "scopeChangedBranch": "Diubah vs cabang…",
+      "branchPlaceholder": "nama cabang",
+      "branchAria": "Cabang untuk dibandingkan",
+      "runButton": "Jalankan audit",
+      "runButtonTitle": "Jalankan CLI audit full-project dan muat hasilnya di sini",
+      "cancelButton": "Batalkan Batal.",
+      "runningLabel": "Mengaudit…",
+      "runningMeta": "Memulai audit CLI…",
+      "completedLabel": "Audit selesai",
+      "failedLabel": "Audit gagal",
+      "canceledLabel": "Audit dibatalkan",
+      "statusFull": "Menampilkan audit seluruh proyek dari {time}",
+      "statusChangedRef": "Menampilkan file yang berubah vs {ref}, audited {time}",
+      "notRunYet": "Pilih lingkup di atas, lalu Jalankan audit"
+    },
     "chip": {
       "contains": "berisi \"{q}\"",
       "severityOff": "tingkat keparahan ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Tidak dapat membangun triage dari ekspor ini. Lakukan analisis baru.",
     "summaryVolume": "Triage aturan (volume / harus-perbaiki / stylistic)",
     "hintSameAsTree": "Pengelompokan yang sama seperti pohon bar aktivitas Triage: isu filter, atau menonaktifkan / mengaktifkan aturan di `analysis_options_custom.yaml゙. Kelompok besar dapat meminta konfirmasi."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Audit Lengkap",
-      "description": "Semua aturan · pemilih jangkauan · laporan yang dapat disaring"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Tampilkan pintasan keyboard (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Semua perintah…",
       "commandCatalogDescription": "Cari semua perintah",
+      "findingsNoProject": "Buka proyek Dart untuk melakukan pemindaian",
+      "findingsNeverScanned": "Jalankan analisis untuk memindai",
+      "findingsClean": "Tidak ada pelanggaran · skor {score}",
+      "findingsWithViolations": "Pelanggaran {count} · skor {score}",
+      "packagesNeverScanned": "Jalankan pemindaian untuk memeriksa dependensi",
+      "packagesAllAdopted": "Semua fitur yang diadopsi",
+      "packagesNeedlesCount": "{count} packages untuk diadopsi",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gerbang gagal",
       "codeHealthNeverScanned": "Jalankan Code Health untuk melihat skor Anda",
       "projectMapDescription": "{ago} yang dipindai",
       "projectMapNeverScanned": "Jalankan Project Map untuk melihat ukuran & hot spot"
+    },
+    "degraded": {
+      "bannerLabel": "Error Aktivasi",
+      "bannerDescription": "Periksa log Extension Host untuk detailnya"
     }
   }
 }

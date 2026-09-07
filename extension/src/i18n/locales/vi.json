@@ -6,19 +6,6 @@
     "alreadyRunning": "Một cuộc kiểm tra đang chạy — vui lòng chờ đến khi nó kết thúc.",
     "noProject": "Không tìm thấy dự án Dart. Mở một thư mục chứa pubspec.yaml.",
     "missingDep": "Dự án này không phụ thuộc vào saropa_lints. Hãy thêm nó vào dev_dependencies trước.",
-    "pickWorkspaceFolder": "Thư mục làm việc nào nên được kiểm tra?",
-    "scope": {
-      "placeholder": "Các tệp nào nên được kiểm tra?",
-      "full": "Toàn bộ dự án",
-      "fullDescription": "Kiểm tra từng tệp Dart — tùy chọn kỹ lưỡng nhất",
-      "changedVsMain": "Đã thay đổi so với main",
-      "changedVsMainDescription": "Chỉ các file khác với nhánh chính",
-      "changedPickBranch": "Đã thay đổi so với nhánh…",
-      "changedPickBranchDescription": "Chỉ các file khác với nhánh bạn chọn",
-      "compareBaseline": "So sánh với cơ sở so sánh",
-      "compareBaselineDescription": "Hiển thị những gì đã thay đổi kể từ bản sao lưu cơ sở cuối cùng",
-      "branchPrompt": "Chi nhánh để so sánh"
-    },
     "progress": {
       "title": "Đang chạy kiểm tra Saropa Lints...",
       "message": "{pct}% · {scanned}/{total} tập tin · {issues} vấn đề · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Hiển thị thêm",
       "keyboardHint": "Phím mũi tên để di chuyển · Nhấn Enter để mở file · Nhấn Esc để xóa tìm kiếm",
       "copiedJson": "Kiểm tra JSON đã được sao chép vào clipboard.",
+      "exportJson": "Xuất JSON",
+      "exportJsonTitle": "Xuất kết quả kiểm toán thành JSON",
+      "exportJsonSaved": "Kiểm tra JSON đã xuất khẩu.",
+      "exportJsonFailed": "Không thể xuất file JSON kiểm tra: {message}",
+      "clearRuleFilter": "Clear (văn) - Rõ ràng, rõ ràng",
+      "paginationNote": "Giới hạn trang áp dụng cho kết quả đã lọc.",
+      "sevBarError": "Lỗi {count} ({pct}%)",
+      "sevBarWarning": "{count} cảnh báo ({pct}%)",
+      "sevBarInfo": "{count} thông tin ({pct}%)",
       "baselineSaved": "Đã lưu baseline. Các cuộc kiểm tra sau có thể so sánh với bản chụp màn hình này.",
       "baselineSaveFailed": "Không thể lưu trữ baseline: {message}",
       "deferredLoading": "Đang tải toàn bộ tập kết quả (đ这次 audit khá lớn)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Sao chép các vi phạm được lọc dưới dạng JSON ({count})",
       "saveReportTitle": "Lưu các vi phạm được lọc dưới dạng JSON vào báo cáo/YYY YMMDD/"
     },
+    "audit": {
+      "scopeFieldTitle": "Chọn nguồn nào các phát hiện dưới đây được lấy từ",
+      "scopeLabel": "Nguồn",
+      "scopeLive": "Chẩn đoán trực tiếp",
+      "scopeFull": "Kiểm tra toàn bộ dự án",
+      "scopeChangedMain": "Đã thay đổi so với main",
+      "scopeChangedBranch": "Đã thay đổi so với nhánh…",
+      "branchPlaceholder": "tên nhánh",
+      "branchAria": "Chi nhánh để so sánh",
+      "runButton": "Chạy kiểm tra",
+      "runButtonTitle": "Chạy CLI kiểm tra toàn bộ dự án và tải kết quả của nó ở đây",
+      "cancelButton": "Hủy bỏ hủy bỏ",
+      "runningLabel": "Kiểm tra...",
+      "runningMeta": "Bắt đầu kiểm tra CLI...",
+      "completedLabel": "Kiểm tra hoàn tất",
+      "failedLabel": "Kiểm toán không thành công",
+      "canceledLabel": "Đã hủy kiểm tra",
+      "statusFull": "Hiển thị toàn bộ kiểm tra dự án từ {time}",
+      "statusChangedRef": "Hiển thị các tệp đã thay đổi so với {ref}, đã kiểm tra {time}",
+      "notRunYet": "Chọn một phạm vi ở trên, sau đó Chạy kiểm tra"
+    },
     "chip": {
       "contains": "chứa \"{q}\"",
       "severityOff": "mức độ nghiêm trọng ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Không thể xây dựng phân loại từ xuất khẩu này. Chạy một phân tích mới.",
     "summaryVolume": "Quy tắc phân loại (khối lượng / phải sửa chữa / phong cách)",
     "hintSameAsTree": "Cùng nhóm như cây thanh hoạt động Triage: filter Issues, hoặc disable/enable rules trong `analysis_options_custom.yaml゙n. Các nhóm lớn có thể yêu cầu xác nhận."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Kiểm tra Toàn diện",
-      "description": "Tất cả quy tắc · chọn phạm vi · báo cáo có thể lọc"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Hiển thị phím tắt (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Tất cả các lệnh…",
       "commandCatalogDescription": "Tìm kiếm tất cả lệnh",
+      "findingsNoProject": "Mở một dự án Dart để quét",
+      "findingsNeverScanned": "Chạy phân tích để quét",
+      "findingsClean": "Không có vi phạm · điểm số {score}",
+      "findingsWithViolations": "Vi phạm {count} · điểm số {score}",
+      "packagesNeverScanned": "Chạy quét để kiểm tra các phụ thuộc",
+      "packagesAllAdopted": "Tất cả tính năng được áp dụng",
+      "packagesNeedlesCount": "{count} packages để tiếp nhận",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Cổng bị lỗi",
       "codeHealthNeverScanned": "Chạy Code Health để xem điểm của bạn",
       "projectMapDescription": "Đã quét {ago}",
       "projectMapNeverScanned": "Chạy Project Map để xem quy mô và các điểm nóng"
+    },
+    "degraded": {
+      "bannerLabel": "Lỗi Kích hoạt",
+      "bannerDescription": "Kiểm tra log của Extension Host để biết chi tiết"
     }
   }
 }

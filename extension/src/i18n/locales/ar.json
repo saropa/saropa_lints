@@ -6,19 +6,6 @@
     "alreadyRunning": "مراجعة تُجرى بالفعل — انتظر حتى تنتهي.",
     "noProject": "لم يتم العثور على مشروع Dart. افتح مجلدًا يحتوي على pubspec.yaml.",
     "missingDep": "هذا المشروع لا يعتمد على saropa_lints. أضفه إلى dev_dependencies أولاً.",
-    "pickWorkspaceFolder": "أي مجلد مساحة العمل يجب أن يُجرى عليه التحقق؟",
-    "scope": {
-      "placeholder": "أي ملفات يجب أن تشملها الفحص؟",
-      "full": "مشروع كامل",
-      "fullDescription": "مراجعة كل ملف Dart — الخيار الأكثر دقة",
-      "changedVsMain": "تم التغيير مقارنة بالرئيسي",
-      "changedVsMainDescription": "الملفات فقط التي تختلف عن الفرع الرئيسي",
-      "changedPickBranch": "تم تغيير vs فرع…",
-      "changedPickBranchDescription": "الملفات فقط التي تختلف عن一支 فرعك الذي تختاره",
-      "compareBaseline": "مقارنة مع الأساسيات",
-      "compareBaselineDescription": "покажи ما تغير منذ آخر لقطة استنادية محفوظة",
-      "branchPrompt": "فرع لمقارنة عليه"
-    },
     "progress": {
       "title": "التحقق من Saropa Lints...",
       "message": "{pct}% · {scanned}/{total} ملفات · {issues} مسائل · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "покажи больше",
       "keyboardHint": "مفاتيح السهم للتنقل · إدخال لفتح الملف · إس كيو تي لمسح البحث",
       "copiedJson": "مراجعة JSON تم نسخها إلى الحافظة.",
+      "exportJson": "تصدير JSON",
+      "exportJsonTitle": "تصدير نتائج المراجعة كJSON",
+      "exportJsonSaved": "مراجعة JSON المصدر.",
+      "exportJsonFailed": "لم يتم استيراد ملف JSON التقرير: {message}",
+      "clearRuleFilter": "واضحة واضحة صافية",
+      "paginationNote": "الحد الأقصى للصفحات ينطبق على النتائج المرشَّحة.",
+      "sevBarError": "أخطاء {count} ({pct}%)",
+      "sevBarWarning": "تحذيرات {count} ({pct}%)",
+      "sevBarInfo": "معلومات {count} ({pct}%)",
       "baselineSaved": "تم حفظ المعايير الأساسية. يمكن للمراجعة المستقبلية مقارنة هذا المقطع معه.",
       "baselineSaveFailed": "لم يتم حفظ القاعدة الأساسية: {message}",
       "deferredLoading": "تحميل مجموعة النتائج الكاملة (هذا التقرير كبير)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "نسخ الانتهاكات التي تمت تصفيتها كـ JSON ({count})",
       "saveReportTitle": "حفظ الانتهاكات التي تمت تصفيتها كـ JSON إلى التقارير / YYYYMMDD/."
     },
+    "audit": {
+      "scopeFieldTitle": "اختر ما هو مصدر العثورات أدناه",
+      "scopeLabel": "المصدر",
+      "scopeLive": "التحاليل الحية",
+      "scopeFull": "مراجعة كاملة للمشروع",
+      "scopeChangedMain": "تم التغيير مقارنة بالرئيسي",
+      "scopeChangedBranch": "تم تغيير vs فرع…",
+      "branchPlaceholder": "اسم الفرع",
+      "branchAria": "فرع لمقارنة عليه",
+      "runButton": "تشغيل مراجعة",
+      "runButtonTitle": "أعد تنفيذ تحليل المشروع الكامل CLI وحمّل نتائجها هنا",
+      "cancelButton": "إلغاء الإلغاء",
+      "runningLabel": "مراجعة...",
+      "runningMeta": "بدء مراجعة CLI...",
+      "completedLabel": "مراجعة مكتملة",
+      "failedLabel": "التحقق من الصحة فاشل",
+      "canceledLabel": "التحقق من الصحة تم إلغاؤه",
+      "statusFull": "عرض تحليل المشروع الكامل من {time}",
+      "statusChangedRef": "عرض الملفات المُغيّرة مقابل {ref}، تم التحقق من {time}",
+      "notRunYet": "اختر نطاقًا أعلاه ثم قم بتشغيل التحقق"
+    },
     "chip": {
       "contains": "تحتوي على \"{q}\"",
       "severityOff": "شدة الحالة ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "لم يتمكن من بناء التفرز من هذا الصادرة. قم بإجراء تحليل جديد.",
     "summaryVolume": "قاعدة التدقيق (حجم / يجب إصلاحه / أسلوبي)",
     "hintSameAsTree": "نفس التجميع مثل شجرة شريط النشاط Triage: إعدادات الفلتر أو تعطيل / تمكين القواعد في `analysis_options_custom.yaml゙. قد تطلب المجموعات الكبيرة التأكيد."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "مراجعة شاملة",
-      "description": "جميع القواعد · اختيار نطاق · تقرير قابل للتنقيح"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "عرض اختصارات لوحة المفاتيح (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "جميع الأوامر…",
       "commandCatalogDescription": "ابحث عن جميع الأوامر",
+      "findingsNoProject": "افتح مشروع Dart لمسح",
+      "findingsNeverScanned": "تشغيل التحليل لمسح",
+      "findingsClean": "لا توجد مخالفات · الدرجة {score}",
+      "findingsWithViolations": "مخالفات {count} · الدرجة {score}",
+      "packagesNeverScanned": "تشغيل المسح لفحص الاعتماديات",
+      "packagesAllAdopted": "كل الميزات المتبعة",
+      "packagesNeedlesCount": "{count} حزم لتبني",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate فاشل",
       "codeHealthNeverScanned": "تشغيل صحة الكود لرؤية درجتك",
       "projectMapDescription": "تم التحقق من {ago}",
       "projectMapNeverScanned": "تشغيل خريطة المشروع لرؤية الحجم ونقاط الحرارة"
+    },
+    "degraded": {
+      "bannerLabel": "خطأ التفعيل",
+      "bannerDescription": "تحقق من سجل مضيف التمديد للحصول على التفاصيل"
     }
   }
 }

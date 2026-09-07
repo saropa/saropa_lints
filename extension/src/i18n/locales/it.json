@@ -6,19 +6,6 @@
     "alreadyRunning": "Un'audit è già in corso — attendi che termini.",
     "noProject": "Nessun progetto Dart trovato. Apri una cartella che contenga un pubspec.yaml.",
     "missingDep": "Questo progetto non dipende da saropa_lints. Aggiungilo prima a dev_dependencies.",
-    "pickWorkspaceFolder": "Quale cartella del workspace dovrebbe essere analizzata?",
-    "scope": {
-      "placeholder": "Quale file dovrebbe coprire l'audit?",
-      "full": "Progetto completo",
-      "fullDescription": "Audit ogni file Dart — l'opzione più completa",
-      "changedVsMain": "Modificato vs main",
-      "changedVsMainDescription": "Solo i file che differiscono dalla branch principale",
-      "changedPickBranch": "Modificato vs ramo…",
-      "changedPickBranchDescription": "Solo file che differiscono da una ramo che scegli.",
-      "compareBaseline": "Confronta con la baseline",
-      "compareBaselineDescription": "Mostra cosa è cambiato da ultima snapshot di baseline salvata",
-      "branchPrompt": "Ramificazione da confrontare"
-    },
     "progress": {
       "title": "Esecuzione audit Saropa Lints...",
       "message": "{pct}% · {scanned}/{total} file · {issues} problemi · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Mostra di più",
       "keyboardHint": "Freccia su e giù per navigare · Invio per aprire il file · Esc per cancellare la ricerca",
       "copiedJson": "Audit JSON copiato negli appunti.",
+      "exportJson": "Esporta JSON",
+      "exportJsonTitle": "Esporta risultati dell'audit come JSON",
+      "exportJsonSaved": "Audit JSON esportato.",
+      "exportJsonFailed": "Non è stato possibile esportare il file JSON dell'audit: {message}",
+      "clearRuleFilter": "Chiaro chiaro chiara.",
+      "paginationNote": "Il limite di pagine si applica ai risultati filtrati.",
+      "sevBarError": "Errori {count} ({pct}%)",
+      "sevBarWarning": "Avvisi {count} ({pct}%)",
+      "sevBarInfo": "{count} informazioni ({pct}%)",
       "baselineSaved": "Baseline salvato. Future audit possono confrontarsi con questa snapshot.",
       "baselineSaveFailed": "Non è stato possibile salvare la baseline: {message}",
       "deferredLoading": "Caricamento dell'intero set di risultati (questo audit è grande)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Copia le violazioni filtrate come JSON ({count})",
       "saveReportTitle": "Salva le violazioni filtrate come JSON nei report/YYY YMMDD."
     },
+    "audit": {
+      "scopeFieldTitle": "Scegli da dove provengono le trovate sottostanti",
+      "scopeLabel": "Sorgente",
+      "scopeLive": "Diagnostics in tempo reale",
+      "scopeFull": "Audit completo del progetto",
+      "scopeChangedMain": "Modificato vs main",
+      "scopeChangedBranch": "Modificato vs ramo…",
+      "branchPlaceholder": "nome della branch",
+      "branchAria": "Ramificazione da confrontare",
+      "runButton": "Esegui audit",
+      "runButtonTitle": "Esegui l'audit CLI completo del progetto e carica i suoi risultati qui",
+      "cancelButton": "Annulla annulla cancella",
+      "runningLabel": "Audit…",
+      "runningMeta": "Avvio dell'audit CLI...",
+      "completedLabel": "Audit completo",
+      "failedLabel": "Il controllo non è riuscito",
+      "canceledLabel": "Verifica annullata",
+      "statusFull": "Mostra l'audit dell'intero progetto da {time}",
+      "statusChangedRef": "Mostra file modificati vs {ref}, audit {time}",
+      "notRunYet": "Scegli un ambito sopra, quindi Esegui audit"
+    },
     "chip": {
       "contains": "contiene \"{q}\"",
       "severityOff": "gravità ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Non è stato possibile creare un triage da questa esportazione. Eseguire una nuova analisi.",
     "summaryVolume": "Regola di triage (volume / must-fix / stilistica)",
     "hintSameAsTree": "Stessa raggruppamento come l'albero di attività-bar Triage: filtrare problemi, o disabilitare / abilitare le regole in `analysis_options_custom.yaml゙. I gruppi più grandi possono chiedere la conferma."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Audit Completo",
-      "description": "Tutte le regole · selezione ambito · rapporto filtrabile"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Mostra scorciatoie da tastiera (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Tutti i comandi…",
       "commandCatalogDescription": "Cerca tutti i comandi",
+      "findingsNoProject": "Apri un progetto Dart per scansionare",
+      "findingsNeverScanned": "Esegui l'analisi per scansionare",
+      "findingsClean": "Nessun violazione · punteggio {score}",
+      "findingsWithViolations": "Violazioni {count} · punteggio {score}",
+      "packagesNeverScanned": "Esegui scansione per verificare le dipendenze",
+      "packagesAllAdopted": "Tutte le funzionalità adottate",
+      "packagesNeedlesCount": "{count} package da adottare",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate non superato",
       "codeHealthNeverScanned": "Esegui Code Health per vedere il tuo punteggio",
       "projectMapDescription": "{ago} scansionato",
       "projectMapNeverScanned": "Esegui Project Map per visualizzare le dimensioni e i punti caldi"
+    },
+    "degraded": {
+      "bannerLabel": "Errore di attivazione",
+      "bannerDescription": "Verifica il log dell'host dell'estensione per i dettagli"
     }
   }
 }

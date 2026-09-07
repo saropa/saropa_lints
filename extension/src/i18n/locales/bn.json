@@ -6,19 +6,6 @@
     "alreadyRunning": "একটি অ্যাউডিট বর্তমানে চালানো হচ্ছে — এটি শেষ হওয়া অপেক্ষা করুন।",
     "noProject": "কোনও Dart প্রকল্প খুঁজে পাওয়া যায়নি। একটি pubspec.yaml কোনও ফোল্ডার খুলুন।",
     "missingDep": "এই প্রকল্পটি saropa_lints এর উপর নির্ভর করে না। প্রথমে dev_dependencies এ যোগ করুন।",
-    "pickWorkspaceFolder": "কোন ওয়ার্কস্পেস ফোল্ডারে অডিট চালানো হবে?",
-    "scope": {
-      "placeholder": "কোন ফাইলগুলি পরিদর্শনের জন্য বিবেচনা করা উচিত?",
-      "full": "পুরো প্রকল্প",
-      "fullDescription": "প্রতিটি Dart ফাইল পরীক্ষা করুন — সবচেয়ে গভীর বিকল্প",
-      "changedVsMain": "পরিবর্তিত vs মেইন",
-      "changedVsMainDescription": "মূল শ",
-      "changedPickBranch": "পরিবর্তন করা হয়েছে vs শ",
-      "changedPickBranchDescription": "কেবলমাত্র আপনি যে শাখা বাছাই করেন তার সাথে ভিন্ন ফাইলগুলি",
-      "compareBaseline": "বেসলাইন সাথে তুলনা করুন",
-      "compareBaselineDescription": "শেষ সংরক্ষিত বেসলাইন স্ন্যাপশট থেকে কী পরিবর্তন হয়েছে দেখুন",
-      "branchPrompt": "ট্রান্সফার করুন যেটি তুলনার জন্য"
-    },
     "progress": {
       "title": "Saropa Lints ক্রমবর্ধনশীল পরিদর্শন চালানো হচ্ছে...",
       "message": "{pct}% · {scanned}/{total} ফাইল · {issues} প্রবলেম · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "বেশি দেখুন",
       "keyboardHint": "সাজানো কী বাটন · এন্টার করে ফাইল খুলুন · এস্ক করে খোঁজা পরিষ্কার করুন",
       "copiedJson": "ক্লিপবোর্ডে অডিট জেসন কপি করা হয়েছে।",
+      "exportJson": "JSON এক্সপোর্ট",
+      "exportJsonTitle": "অ্যাউডিট ফলাফল জেসন হিসাবে এক্সপোর্ট করুন",
+      "exportJsonSaved": "জেসন এক্সপোর্ট করা হয়েছে অ্যাউডিট করুন",
+      "exportJsonFailed": "অডিট জেএসন এক্সপোর্ট করতে পারিনি: {message}",
+      "clearRuleFilter": "Clear পরিষ্কার পরিষ্কার পরিষ্কার",
+      "paginationNote": "ফিল্টার করা ফলাফলগুলির জন্য পেজ সীমা প্রয়োগ করা হয়।",
+      "sevBarError": "{count} ত্রুটি ({pct}%)",
+      "sevBarWarning": "{count} বার্ণিং ({pct}%)",
+      "sevBarInfo": "{count} তথ্য ({pct}%)",
       "baselineSaved": "বেস লাইন সংরক্ষিত। ভবিষ্যৎ অডিটগুলি এই স্ন্যাপশটটির বিরুদ্ধে তুলনা করতে পারে।",
       "baselineSaveFailed": "বেসলাইন সংরক্ষণ করা যায়নি: {message}",
       "deferredLoading": "পূর্ণ ফলাফল প্রস্তুত করছি (এই অডিটটি বড়)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "JSON ({count}) হিসাবে ফিল্টার করা লঙ্ঘনগুলি অনুলিপি করুন।",
       "saveReportTitle": "ফিল্টার করা লঙ্ঘনগুলি JSON হিসাবে রিপোর্ট / YYYYMMDD/ এ সংরক্ষণ করুন।"
     },
+    "audit": {
+      "scopeFieldTitle": "নিচের খো",
+      "scopeLabel": "সূত্র",
+      "scopeLive": "জীবন ডায়নামিকস",
+      "scopeFull": "পুরো প্রকল্প পরিদর্শন",
+      "scopeChangedMain": "পরিবর্তিত vs মেইন",
+      "scopeChangedBranch": "পরিবর্তন করা হয়েছে vs শ",
+      "branchPlaceholder": "ব্রাংচ নাম",
+      "branchAria": "ট্রান্সফার করুন যেটি তুলনার জন্য",
+      "runButton": "অডিট চালান ✅",
+      "runButtonTitle": "পুরো প্রকল্প অডিট CLI চালান এবং এর ফলাফল এখানে প্রস্তুত করুন",
+      "cancelButton": "বাতিল করুন Cancel",
+      "runningLabel": "অডিটিং…",
+      "runningMeta": "অডিট CLI শুরু করছি...",
+      "completedLabel": "অ্যাউডিট সম্পন্ন",
+      "failedLabel": "অডিট ব্যর্থ হয়েছে",
+      "canceledLabel": "অডিট বাতিল হয়েছে",
+      "statusFull": "{time} এর পূর্ণ প্রকল্প অডিট দেখাচ্ছে",
+      "statusChangedRef": "ফাইল পরিবর্তন দেখাচ্ছে vs {ref}, যাচ্ছে {time}",
+      "notRunYet": "নিচে একটি স্কোপ নির্বাচন করুন, তারপর অডিট চালানো হোক"
+    },
     "chip": {
       "contains": "\"{q}\" ধারণ করে।",
       "severityOff": "তীব্রতা ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "এই রফতানি থেকে ট্রায়াল তৈরি করতে পারেনি। একটি নতুন বিশ্লেষণ চালান।",
     "summaryVolume": "নিয়ম ট্রায়াগ (ভলিউম / অবশ্যই-ফিক্স / শৈলীর)",
     "hintSameAsTree": "Triage activity-bar tree এর মতো একই গ্রুপিংঃ ফিল্টার ইস্যু, অথবা `analysis_options_custom.yaml゙.in এ নিয়ম নিষ্ক্রিয়/সক্ষম করুন। বড় দলগুলি নিশ্চিতকরণের জন্য জিজ্ঞাসা করতে পারে।"
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "সম্পূর্ণ অডিট",
-      "description": "সমস্ত নিয়ম · সুযোগ চয়নকারী · ফিল্টারযোগ্য প্রতিবেদন"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "কীবোর্ড শর্টকাটগুলি (?) দেখান",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "সব কমান্ড...",
       "commandCatalogDescription": "সকল কমান্ড খুঁজুন",
+      "findingsNoProject": "Dart প্রকল্পটি খুলুন স্ক্যান করুন",
+      "findingsNeverScanned": "এনালাইসিস চালান যাতে স্ক্যান করা যায়",
+      "findingsClean": "কোন ভঙ্গিমা নেই · স্কোর {score}",
+      "findingsWithViolations": "{count} বিধি ভঙ্গ · স্কোর {score}",
+      "packagesNeverScanned": "প্রতিশ্রুতি পরীক্ষা করতে স্ক্যান চালানো যেতে পারে",
+      "packagesAllAdopted": "সব ফিচার গ্রহণ করা হয়েছে",
+      "packagesNeedlesCount": "{count} প্যাকেজ গ্রহণ করুন",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · গেট ব্যর্থ হচ্ছে",
       "codeHealthNeverScanned": "কোড হেলথ চালান আপনার স্কোর দেখুন",
       "projectMapDescription": "স্ক্যান করা হয়েছে {ago}",
       "projectMapNeverScanned": "প্রজেক্ট ম্যাপ চালান সাইজ এবং হট স্পট দেখুন"
+    },
+    "degraded": {
+      "bannerLabel": "সক্রিয়করণ ত্রুটি",
+      "bannerDescription": "প্রস্তাবিত এক্সটেনশন হোস্ট লগ দেখুন বিস্তারিত জন্য"
     }
   }
 }

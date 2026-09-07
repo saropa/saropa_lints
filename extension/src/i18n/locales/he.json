@@ -6,19 +6,6 @@
     "alreadyRunning": "בדיקה כבר בדיקה — חכו לסיומה.",
     "noProject": "לא נמצאו פרויקטים Dart. פתח תיקייה שמכילה pubspec.yaml.",
     "missingDep": "הפרויקט הזה לא תלוי בsaropa_lints. הוסף אותו לdev_dependencies תחילה.",
-    "pickWorkspaceFolder": "איזה תיקייה של וורקספேס צריכה ל chạy את האודיט?",
-    "scope": {
-      "placeholder": "אילו קבצים צריך לשקול בבדיקה?",
-      "full": "פרויקט מלא",
-      "fullDescription": "הערכה של כל קובץ Dart — האופציה היקרה ביותר",
-      "changedVsMain": "שונה מ-main",
-      "changedVsMainDescription": "רק קבצים שמתאימים ל分歧 מהענף הראשי",
-      "changedPickBranch": "שינה את ה-vs ל一支…",
-      "changedPickBranchDescription": "רק קבצים שמתאימים ל一支 you choose",
-      "compareBaseline": "השוואה לנקודת ההתחלה",
-      "compareBaselineDescription": "הצגת מה השתנה מאז ה-snapsot של הבסיס האחרון שנמרח韬",
-      "branchPrompt": "שעלה להשוואה"
-    },
     "progress": {
       "title": "מבצע בדיקה Saropa Lints...",
       "message": "{pct}% · {scanned}/{total} קבצים · {issues} בעיות · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "הצג יותר",
       "keyboardHint": "מקשי החץ כדי לנוע · לחיצה על Enter כדי לפתוח קובץ · לחיצה על Esc כדי לנקות חיפוש",
       "copiedJson": "האודיט JSON הועתק ללוח ה메모יריה.",
+      "exportJson": "יצוא JSON",
+      "exportJsonTitle": "יצוא תוצאות ביקורת כJSON",
+      "exportJsonSaved": "مراجعة JSON שנ출ופת.",
+      "exportJsonFailed": "לא ניתן לייצא את JSON האudit: {message}",
+      "clearRuleFilter": "ברור, ברור, נכון.",
+      "paginationNote": "הגבלה על עמודים תקיפה על תוצאות מסוננות.",
+      "sevBarError": "שגיאות {count} ({pct}%)",
+      "sevBarWarning": "התראות {count} ({pct}%)",
+      "sevBarInfo": "{count} מידע ({pct}%)",
       "baselineSaved": "השכלה נשמרה. בדיקות עתידיות יכולות להשוות לשקף זה.",
       "baselineSaveFailed": "לא ניתן לשמור את הבסיס: {message}",
       "deferredLoading": "טוען את קבוצת התוצאות המלאה (האודיט גדול)…",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "העתק הפרות מסוננות כ-JSON ({count})",
       "saveReportTitle": "שמור הפרות מסוננות כ-JSON לדוחות/YYY YMMDD/"
     },
+    "audit": {
+      "scopeFieldTitle": "اختر מהแหล่งที่ผลลัพธ์ด้านล่างมาจาก",
+      "scopeLabel": "מקור",
+      "scopeLive": "דיאגנוסטיקה לוחית",
+      "scopeFull": "مراجعة מלאה של הפרויקט",
+      "scopeChangedMain": "שונה מ-main",
+      "scopeChangedBranch": "שינה את ה-vs ל一支…",
+      "branchPlaceholder": "שם ענף",
+      "branchAria": "שעלה להשוואה",
+      "runButton": "הריץ אודיט",
+      "runButtonTitle": "הפעלה של CLI לניתוח פרויקט מלא והעלאה של תוצאותיו כאן",
+      "cancelButton": "ביטול לבטל",
+      "runningLabel": "مراجعة...",
+      "runningMeta": "התחלת בדיקה CLI...",
+      "completedLabel": "مراجعة מושלמת",
+      "failedLabel": "הביקורת נכשלה",
+      "canceledLabel": "הביקורת בוטלה",
+      "statusFull": "הצגת ניתוח פרויקט מלא מ {time}",
+      "statusChangedRef": "מציג קבצים שונו ביחס ל-{ref}, נבדק {time}",
+      "notRunYet": "اختر טווח מעלה, ואז הפעל ביקורת"
+    },
     "chip": {
       "contains": "מכיל \"{q}\"",
       "severityOff": "חומרת ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "לא יכול לבנות סיווג מהייצוא הזה. תריץ ניתוח חדש.",
     "summaryVolume": "מיון כללים (קולי / חייב-תקן / סגנוני)",
     "hintSameAsTree": "אותה קבוצה כמו עץ ה-bar של פעילות Triage: מסנן בעיות, או מכבה / מאפשר כללים ב `analysis_options_custom.yaml゙. קבוצות גדולות יכולות לבקש אישור."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "مراجعة מלאה",
-      "description": "כל הכללים · בחירת טווח · דוחقابل למסננת"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "להראות קיצורי מקלדת (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "כל הפקודות…",
       "commandCatalogDescription": "ה cerca של כל הפקודות",
+      "findingsNoProject": "פתח פרויקט Dart כדי לסרוק",
+      "findingsNeverScanned": "הפעלה ניתוח כדי לסרוק",
+      "findingsClean": "אין סכרים · ציון {score}",
+      "findingsWithViolations": "הפרות {count} · ציון {score}",
+      "packagesNeverScanned": "הרץ ס캔 כדי לבדוק תלותות",
+      "packagesAllAdopted": "כל הפקודות שהושגו",
+      "packagesNeedlesCount": "{count} חבילות לאמץ",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · שער נכשל",
       "codeHealthNeverScanned": "הרץ את Code Health כדי לראות את הציון שלך",
       "projectMapDescription": "הסריקה {ago}",
       "projectMapNeverScanned": "הרץ תרשים פרויקט כדי לראות גודל ונקודות חום"
+    },
+    "degraded": {
+      "bannerLabel": "שגיאה בהפעלה",
+      "bannerDescription": "בדוק את לוג ה-extension host כדי לראות פרטים"
     }
   }
 }

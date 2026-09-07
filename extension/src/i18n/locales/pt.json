@@ -6,19 +6,6 @@
     "alreadyRunning": "Uma auditoria já está em execução — aguarde até que ela termine.",
     "noProject": "Nenhum projeto Dart encontrado. Abra uma pasta que contenha um pubspec.yaml.",
     "missingDep": "Esse projeto não depende de saropa_lints. Adicione-o a dev_dependencies primeiro.",
-    "pickWorkspaceFolder": "Qual pasta de trabalho deve ser auditada?",
-    "scope": {
-      "placeholder": "Quais arquivos a auditoria deve cobrir?",
-      "full": "Projeto completo",
-      "fullDescription": "Audite todos os arquivos Dart — a opção mais completa",
-      "changedVsMain": "Alterado vs main",
-      "changedVsMainDescription": "Apenas arquivos que diferem da branch principal",
-      "changedPickBranch": "Alterado vs branch…",
-      "changedPickBranchDescription": "Apenas arquivos que diferem de uma branch que você escolher",
-      "compareBaseline": "Comparar com a linha de base",
-      "compareBaselineDescription": "Mostrar o que mudou desde a última captura de base de salvamento",
-      "branchPrompt": "Ramal para comparar"
-    },
     "progress": {
       "title": "Executando análise Saropa Lints...",
       "message": "{pct}% · {scanned}/{total} arquivos · {issues} problemas · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Mostrar mais",
       "keyboardHint": "Setas para navegar · Enter para abrir arquivo · Esc para limpar busca",
       "copiedJson": "Auditoria JSON copiado para a área de transferência.",
+      "exportJson": "Exportar JSON",
+      "exportJsonTitle": "Exportar resultados de auditoria como JSON",
+      "exportJsonSaved": "Auditoria JSON exportada.",
+      "exportJsonFailed": "Não foi possível exportar o JSON de auditoria: {message}",
+      "clearRuleFilter": "Claro, claro, claro é o que se passa.",
+      "paginationNote": "Limite de página aplica-se aos resultados filtrados.",
+      "sevBarError": "{count} erros ({pct}%)",
+      "sevBarWarning": "{count} avisos ({pct}%)",
+      "sevBarInfo": "{count} informação ({pct}%)",
       "baselineSaved": "Baseline salvo. Auditorias futuras podem comparar contra esse snapshot.",
       "baselineSaveFailed": "Não foi possível salvar a linha de base: {message}",
       "deferredLoading": "Carregando o conjunto completo de resultados (este auditoria é grande)...",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Copie as violações filtradas como JSON ({count})",
       "saveReportTitle": "Salvar violações filtradas como JSON para relatórios/AAAAMMDD/."
     },
+    "audit": {
+      "scopeFieldTitle": "Escolha de onde as descobertas abaixo são originárias",
+      "scopeLabel": "Fonte",
+      "scopeLive": "Diagnósticos em tempo real",
+      "scopeFull": "Auditoria do projeto completo",
+      "scopeChangedMain": "Alterado vs main",
+      "scopeChangedBranch": "Alterado vs branch…",
+      "branchPlaceholder": "nome da filial",
+      "branchAria": "Ramal para comparar",
+      "runButton": "Executar auditoria",
+      "runButtonTitle": "Execute o CLI de auditoria do projeto completo e carregue seus resultados aqui",
+      "cancelButton": "Cancelar cancelar Cancelá-lo",
+      "runningLabel": "Auditoria...",
+      "runningMeta": "Iniciando o CLI de auditoria...",
+      "completedLabel": "Auditoria completa",
+      "failedLabel": "Falha na auditoria",
+      "canceledLabel": "Auditoria cancelada",
+      "statusFull": "Mostrando a auditoria do projeto completo de {time}",
+      "statusChangedRef": "Mostrando arquivos alterados vs {ref}, auditado {time}",
+      "notRunYet": "Escolha um escopo acima, em seguida, Execute auditoria"
+    },
     "chip": {
       "contains": "contém \"{q}\"",
       "severityOff": "gravidade ≠ {v}.",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Não foi possível construir triagem a partir desta exportação. Faça uma nova análise.",
     "summaryVolume": "Regra triagem (volume / deve-fixar / estilística)",
     "hintSameAsTree": "O mesmo agrupamento que a árvore de barra de atividades do triagem: questões filtradas ou regras desativadas/ativadas em `analysis_options_custom.yaml゙. Grandes grupos podem pedir confirmação."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Auditoria Completa",
-      "description": "Todas as regras · seleção de escopo · relatório filtrável"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Mostrar atalhos de teclado (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Todos os comandos…",
       "commandCatalogDescription": "Procurar todas as comandos",
+      "findingsNoProject": "Abra um projeto Dart para varredura",
+      "findingsNeverScanned": "Execute análise para varrer",
+      "findingsClean": "Nenhum violação · pontuação {score}",
+      "findingsWithViolations": "Violações {count} · pontuação {score}",
+      "packagesNeverScanned": "Executar varredura para verificar dependências",
+      "packagesAllAdopted": "Todas as funcionalidades adotadas",
+      "packagesNeedlesCount": "{count} pacotes para adotar",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Gate reprovado",
       "codeHealthNeverScanned": "Execute Code Health para ver sua pontuação",
       "projectMapDescription": "Escaneado {ago}",
       "projectMapNeverScanned": "Execute o Mapa do Projeto para ver o tamanho e os pontos críticos"
+    },
+    "degraded": {
+      "bannerLabel": "Erro de Ativação",
+      "bannerDescription": "Verifique o log do Extension Host para detalhes"
     }
   }
 }

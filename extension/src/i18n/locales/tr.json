@@ -6,19 +6,6 @@
     "alreadyRunning": "Bir denetim zaten çalışmaktadır — tamamlamasını bekleyin.",
     "noProject": "Dart projesi bulunamadı. Bir pubspec.yaml içeren bir klasör açın.",
     "missingDep": "Bu proje saropa_lints'e bağımlılık göstermiyor. Öncelikle dev_dependencies'a ekleyin.",
-    "pickWorkspaceFolder": "Hangi çalışma alanı klasörünü denetim için kullanmalı?",
-    "scope": {
-      "placeholder": "Audit hangi dosyaları kapsaması gerekir?",
-      "full": "Tam proje",
-      "fullDescription": "Her Dart dosyasını denetleyin — en kapsamlı seçenek",
-      "changedVsMain": "Değiştirildi vs ana",
-      "changedVsMainDescription": "Sadece ana dal ile farklı olan dosyalar",
-      "changedPickBranch": "Değiştirildi vs dal…",
-      "changedPickBranchDescription": "Sadece seçtiğiniz bir dal ile farklı olan dosyalar",
-      "compareBaseline": "Temel ile karşılaştır",
-      "compareBaselineDescription": "Son kaydedilen temel noktası karşılaştırmalı olarak neyin değiştiğini göster",
-      "branchPrompt": "Karşılaştırılacak dal"
-    },
     "progress": {
       "title": "Saropa Lints audit çalıştırılıyor...",
       "message": "{pct}% · {scanned}/{total} dosyalar · {issues} sorun · {file}"
@@ -57,6 +44,15 @@
       "loadMore": "Daha fazla göster",
       "keyboardHint": "Ok yön tuşları ile gezin · Enter ile dosya aç · Esc ile arama temizle",
       "copiedJson": "Audit JSON panoya kopyalandı.",
+      "exportJson": "JSON Dışa Aktar",
+      "exportJsonTitle": "Audit sonuçlarını JSON olarak dışa aktar",
+      "exportJsonSaved": "JSON çıktısı denetlendi.",
+      "exportJsonFailed": "Audit JSON'ı dışa aktarılamadı: {message}",
+      "clearRuleFilter": "Clear açık açık açık",
+      "paginationNote": "Filtrelenmiş sonuçlara sınırlama uygulanır.",
+      "sevBarError": "{count} hataları ({pct}%)",
+      "sevBarWarning": "{count} uyarıları ({pct}%)",
+      "sevBarInfo": "{count} bilgisi ({pct}%)",
       "baselineSaved": "Temel kaydedildi. Gelecekteki denetimler bu anlık görüntüsü ile karşılaştırabilir.",
       "baselineSaveFailed": "Temel hattı kaydedemiyor: {message}",
       "deferredLoading": "Tam sonuç kümesini yükleniyor (bu denetim büyük)...",
@@ -948,6 +944,27 @@
       "copyJsonTitle": "Filtreli ihlalleri JSON ({count}) olarak kopyalayın.",
       "saveReportTitle": "Filtre edilmiş ihlalleri JSON olarak raporlara/YYY YMMDD/ kaydet."
     },
+    "audit": {
+      "scopeFieldTitle": "Bulguların kaynaklarını seçin",
+      "scopeLabel": "Kaynak",
+      "scopeLive": "Canlı tanılama",
+      "scopeFull": "Tam proje denetimi",
+      "scopeChangedMain": "Değiştirildi vs ana",
+      "scopeChangedBranch": "Değiştirildi vs dal…",
+      "branchPlaceholder": "şube adı",
+      "branchAria": "Karşılaştırılacak dal",
+      "runButton": "Audit çalıştır",
+      "runButtonTitle": "Tam proje denetimi CLI'sini çalıştırın ve sonuçlarını buraya yükleyin",
+      "cancelButton": "İptal Et iptal et",
+      "runningLabel": "Denetleniyor…",
+      "runningMeta": "Audit CLI'sini başlatıyor...",
+      "completedLabel": "Audit tamamlandı",
+      "failedLabel": "Denetim başarısız oldu",
+      "canceledLabel": "Denetim iptal edildi",
+      "statusFull": "Tam proje denetimini {time}'tan gösteriyor",
+      "statusChangedRef": "Dosyaları {ref} ile karşılaştırarak değişiklik gösteriliyor, audited {time}",
+      "notRunYet": "Yukarıdaki bir kapsam seçin, ardından Audit çalıştırın"
+    },
     "chip": {
       "contains": "\"{q}\" içermektedir.",
       "severityOff": "şiddet ≠ {v}",
@@ -1174,12 +1191,6 @@
     "hintBuildFailed": "Bu ihracattan bir triaj oluşturamadı. Yeni bir analiz yapın.",
     "summaryVolume": "Kural triaj (hacim / sabitleme zorunluluğu / stilistik)",
     "hintSameAsTree": "Triage etkinlik-bar ağacı ile aynı gruplandırma: Filtre Sorunları veya `analysis_options_custom.yaml゙. içinde kuralları devre dışı bırak/etkinleştirin. Büyük gruplar onay isteyebilir."
-  },
-  "fullAudit": {
-    "sidebar": {
-      "label": "Tam Muayene",
-      "description": "Tüm kurallar · kapsam seçici · süzülebilir rapor"
-    }
   },
   "kbdOverlay": {
     "toggleTitle": "Klavye kısayollarını göster (?)",
@@ -2631,11 +2642,22 @@
     "dashboards": {
       "commandCatalogLabel": "Tüm komutlar…",
       "commandCatalogDescription": "Tüm komutları arayın",
+      "findingsNoProject": "Dart projesini açarak tarama yapın",
+      "findingsNeverScanned": "Analiz çalıştırarak taranır",
+      "findingsClean": "Hiçbir ihlal · puan {score}",
+      "findingsWithViolations": "{count} ihlalleri · puan {score}",
+      "packagesNeverScanned": "Bağımlılıkları kontrol etmek için tarama yap",
+      "packagesAllAdopted": "Tüm özellikleri benimsedi",
+      "packagesNeedlesCount": "{count} paketleri benimsenmeli",
       "codeHealthDescription": "{grade} · {score}/100",
       "codeHealthDescriptionGateFailing": "{grade} · {score}/100 · Geçit arızalı",
       "codeHealthNeverScanned": "Puanınızı görmek için Code Health'i çalıştırın",
       "projectMapDescription": "{ago} önce tarandı",
       "projectMapNeverScanned": "Boyutu ve sıcak noktaları görmek için Proje Haritasını çalıştırın"
+    },
+    "degraded": {
+      "bannerLabel": "Aktivasyon Hatası",
+      "bannerDescription": "Extensiyon Host log'una detaylar için bakın"
     }
   }
 }
