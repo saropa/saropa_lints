@@ -190,7 +190,44 @@ control), and the observer callbacks are silent.
 
 ## Commits
 
-<!-- Filled in by the commit that lands this fix. -->
+`e51044e2` — fix: avoid_public_members_in_states no longer flags WidgetsBindingObserver/RouteAware overrides
+
+---
+
+## Finish Report (2026-09-08)
+
+`avoid_public_members_in_states` reported a false positive on public methods that
+override a Flutter framework mixin's callback contract (e.g.
+`WidgetsBindingObserver.didChangeAppLifecycleState`) on a `State` subclass. The
+rule only recognized a closed list of `State`-mandated lifecycle method names,
+so it treated a mixin-mandated public override the same as an author-chosen
+public API and suggested a private rename that would have silently broken the
+mixin's dispatch.
+
+The fix added a second, narrower exemption path in
+`lib/src/rules/widget/widget_lifecycle_rules.dart`:
+`_mixinRequiredMethodsByType` maps a framework mixin's source name
+(`WidgetsBindingObserver`, `RouteAware`) to its known callback method names.
+`runWithReporter` inspects the class's `with` clause syntactically — consistent
+with the file's other non-type-resolved checks — and only exempts a method
+name when the class actually mixes in the matching interface, so an unrelated
+public method on the same class is still flagged.
+
+Verified two ways: `dart run saropa_lints scan example/lib/widget_lifecycle
+--files avoid_public_members_in_states_fixture.dart --format json` reports
+exactly the 3 expected violations (the two pre-existing BAD cases plus the new
+negative-control case), with the observer-callback overrides silent; and `dart
+test test/rules/widget/widget_lifecycle_rules_test.dart` passes all 76 cases
+(instantiation-pin test only — no assertion needed updating). A `/code-review
+low` pass against commit `e51044e2` found no correctness issues.
+
+Scope of this fix is narrow by design: it recognizes two named framework
+mixins (`WidgetsBindingObserver`, `RouteAware`), not an arbitrary
+resolved-element "does this override a non-`State` supertype member" check —
+the more general fix the bug report's Root Cause section flagged as the more
+robust option. Any other Flutter framework mixin with public-by-contract
+callback methods (e.g. a future SDK addition) will reproduce this same false
+positive until it is added to `_mixinRequiredMethodsByType`.
 
 ---
 
