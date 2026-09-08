@@ -1,6 +1,6 @@
 # BUG: Infrastructure — VS Code Hard Crash from Memory Exhaustion; Status Bar Missing After Restart
 
-**Status: Investigating**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -153,71 +153,35 @@ New entries (last 5) prevent future accumulation of unwatched large files.
 
 ## Part 3: Open Issues
 
-### OPEN-1: Saropa Lints status bar not visible after restart
+### OPEN-1: Saropa Lints status bar not visible after restart — FIXED
 
 **Symptom:** After VS Code restarted post-crash, the Saropa Lints status bar item
 (normally showing health score, tier, and violation count) is not visible.
 
-**Possible causes:**
+**Root cause confirmed:** `updateAllStatusBars` had no top-level exception
+handling. A throw anywhere in its body (e.g. `loadHistory(context.workspaceState)`
+against a workspaceState corrupted by the hard crash) aborted the function before
+reaching `statusBarItem.show()`, leaving the bar silently absent.
 
-1. **Extension activation failed silently.** If the extension host crashed or
-   timed out during activation, `createStatusBarItem` at line 1129 may never have
-   executed, or `updateAllStatusBars()` at line 1483 may not have completed. The
-   extension would appear "installed" but not "active" in the Extensions panel.
+**Fix:** Commit `4ce4859f` ("harden: memory monitoring infrastructure +
+crash-safe status bar") already applied the exact recommendation below — the
+body was extracted into `updateAllStatusBarsInner()` and `updateAllStatusBars`
+now wraps it in try/catch (extension.ts:1551), rendering a visible
+`$(error) ...` status bar item and logging to the "Saropa Lints" output channel
+on any throw, so `statusBarItem.show()` always executes. No further action
+needed here.
 
-2. **`updateAllStatusBars()` exited early.** The function has an early return at
-   line 1401 when no project root is found — this shows a version-only bar. If
-   the workspace failed to resolve (e.g., corrupted workspace state after crash),
-   this path runs but the item may be too narrow or positioned behind other items.
+### OPEN-2: Dart analyzer heap size (6 GB) is aggressive — MOVED
 
-3. **Memory pressure watcher hid the item.** `memoryStatusBarItem.hide()` is
-   called at lines 1342, 1400, and 1479 under various conditions. If the system
-   health assessment triggered before the main status bar rendered, the memory
-   item is hidden but the main item should still show.
+This concerns `d:\src\contacts` workspace settings (`.vscode/settings.json`
+`dart.analyzerVmAdditionalArgs`), not the saropa_lints extension. Per project
+scope rules, filed instead in the contacts project's own `bugs/` — not tracked
+here.
 
-4. **VS Code workspace state corruption.** A hard crash can corrupt
-   `workspaceState` (used at line 1431 for score history). If
-   `loadHistory(context.workspaceState)` throws, the entire `updateAllStatusBars`
-   function may abort before reaching `statusBarItem.show()` at line 1481.
+### OPEN-3: `custom_lint.log` and `hs_err_*.log` not in `.gitignore` — MOVED
 
-**Diagnostic steps:**
-- Check VS Code Output panel → "Saropa Lints" channel for activation errors
-- Run `Developer: Show Running Extensions` — verify `saropaLints` appears and
-  shows a non-zero activation time
-- If absent, try `Developer: Restart Extension Host`
-- Check `Developer: Toggle Developer Tools` → Console for uncaught exceptions
-  during activation
-
-**Recommendation:** Add a `try/catch` around the `updateAllStatusBars` body (or
-at minimum around `loadHistory` and `computeHealthScore`) so a single throw
-cannot prevent `statusBarItem.show()` from executing. The status bar should
-always show *something* — even a fallback "Saropa Lints: Error" label — rather
-than silently disappear.
-
-### OPEN-2: Dart analyzer heap size (6 GB) is aggressive
-
-The `--old_gen_heap_size=6144` setting reserves 6 GB for the Dart analysis server.
-This was set to prevent analyzer OOM on this large workspace (31,800 files,
-474 KB analysis_options.yaml), but it leaves insufficient headroom for the rest
-of the toolchain on machines with 16 GB RAM.
-
-**Recommendation:** Reduce to `--old_gen_heap_size=4096` (4 GB). If the analyzer
-still OOMs, the fix is to exclude more directories from analysis (the
-`dependency_overrides/` tree is already excluded; `assets/` and `scripts/` could
-be added), not to reserve more heap.
-
-### OPEN-3: `custom_lint.log` and `hs_err_*.log` not in `.gitignore`
-
-These file types are not in the project's `.gitignore`. While `*.hprof` is
-already covered, `custom_lint.log` and `hs_err_pid*.log` are not, meaning they
-can accumulate silently and re-create the same memory pressure.
-
-**Recommendation:** Add to `.gitignore`:
-```
-custom_lint.log
-hs_err_pid*.log
-flutter_*.log
-```
+This concerns the `d:\src\contacts` project's own `.gitignore`, not
+saropa_lints. Filed in the contacts project's own `bugs/` — not tracked here.
 
 ### OPEN-4: `analysis_options.yaml` is 474 KB (2,000+ lines)
 
@@ -229,25 +193,10 @@ parse latency. Most projects have analysis_options under 5 KB.
 flattened rule configurations rather than using `include:` directives. A
 structural refactor could reduce it significantly, but this is not urgent.
 
-### OPEN-5: 31,800 files in workspace with limited exclusions
+### OPEN-5: 31,800 files in workspace with limited exclusions — MOVED
 
-Even after the watcher exclusion fixes, VS Code's file explorer and search
-still index the full workspace. The `reports/` directory alone has 6,389 files
-(4.7 GB) and `build/` has 13,294 files (3.6 GB). While excluded from the file
-*watcher*, they still appear in the explorer tree and file search unless also
-added to `files.exclude` or `search.exclude`.
-
-**Recommendation:** Add to `.vscode/settings.json`:
-```json
-"search.exclude": {
-    "**/reports/**": true,
-    "**/build/**": true,
-    "**/blobs/**": true,
-    "**/.dart_tool/**": true,
-    "**/dependency_overrides/**/build/**": true,
-    "**/dependency_overrides/**/.dart_tool/**": true
-}
-```
+This concerns `d:\src\contacts` workspace settings (`search.exclude`), not
+saropa_lints. Filed in the contacts project's own `bugs/` — not tracked here.
 
 ---
 
@@ -259,8 +208,8 @@ added to `files.exclude` or `search.exclude`.
 | 86 MB `custom_lint.log` files deleted | **FIXED** |
 | 6 JVM crash logs deleted | **FIXED** |
 | Watcher exclusions for l10n, `.hprof`, `.log`, `.vs` | **FIXED** |
-| Status bar not visible after restart | **OPEN-1** — needs diagnostic |
-| 6 GB analyzer heap too aggressive | **OPEN-2** — recommend 4 GB |
-| Missing `.gitignore` entries | **OPEN-3** — needs update |
+| Status bar not visible after restart | **FIXED** — try/catch hardening already in `4ce4859f` |
+| 6 GB analyzer heap too aggressive | **MOVED** — contacts project scope |
+| Missing `.gitignore` entries | **MOVED** — contacts project scope |
 | 474 KB `analysis_options.yaml` | **OPEN-4** — noted, low priority |
-| 31,800 files with limited search exclusions | **OPEN-5** — recommend `search.exclude` |
+| 31,800 files with limited search exclusions | **MOVED** — contacts project scope |
