@@ -429,6 +429,9 @@ export function buildConfigSnippetYaml(tier: string, enabledPackIds: readonly st
   ].join('\n');
 }
 
+/** Per-workspace storage key for `<details>` open/closed state — see `_sectionOpenState`. */
+const SECTION_STATE_STORAGE_KEY = 'saropa.configDashboard.sectionState';
+
 export class RulePacksWebviewProvider {
   private _panel?: vscode.WebviewPanel;
   // Cached across refresh() calls (fired on every toggle/edit) so the tier
@@ -453,8 +456,34 @@ export class RulePacksWebviewProvider {
   // (see `SCRIPT_TABS` in configDashboardScript.ts), this only decides which tab's data-heavy
   // subsections (e.g. re-reading the baseline file) get rebuilt into the fresh HTML string.
   private _activeTab: TabId = DEFAULT_TAB;
+  // Bug fix: background refreshes (diagnostics ticks every ~400ms, file-save watchers,
+  // memory-pressure updates) used to call `refresh()` unconditionally, which does a full
+  // `webview.html =` reassignment — destroying the live DOM including whatever the user was
+  // typing into a search box or text field, and resetting scroll position/focus. The panel posts
+  // `uiFocus`/`uiBlur` whenever an editable control gains/loses focus (see configDashboardScript.ts);
+  // while focused, `refresh()` defers instead of rebuilding, and catches up once the user leaves
+  // the field so no update is permanently lost — just delayed until it is safe to redraw.
+  private _userInteracting = false;
+  private _refreshPending = false;
+  // Bug fix: `<details>` sections (packs accordions, disabled/shed/stylistic sections) reset to
+  // their hardcoded default open/closed state on every rebuild because nothing read the user's
+  // choice back before regenerating the HTML string. Persisted per-workspace using the same
+  // pattern as the Findings Dashboard's `SECTION_STATE_STORAGE_KEY` (violationsWideReportView.ts)
+  // so a user's expand/collapse choice survives both refreshes and panel close/reopen.
+  private _sectionOpenState: Record<string, boolean>;
 
-  constructor(private readonly _extensionUri: vscode.Uri) {}
+  constructor(
+    private readonly _extensionUri: vscode.Uri,
+    private readonly _workspaceState: vscode.Memento,
+  ) {
+    this._sectionOpenState = this._workspaceState.get<Record<string, boolean>>(SECTION_STATE_STORAGE_KEY, {});
+  }
+
+  /** Whether `id`'s `<details>` section should render `open`, honoring the persisted choice over `defaultOpen`. */
+  private _isSectionOpen(id: string, defaultOpen: boolean): boolean {
+    const stored = this._sectionOpenState[id];
+    return stored === undefined ? defaultOpen : stored;
+  }
 
   /** Receive a memory pressure update from the watcher; refreshes the panel if open. */
   setMemoryPressureState(state: MemoryPressureState | null): void {
@@ -521,7 +550,35 @@ export class RulePacksWebviewProvider {
         warn?: number | null;
         fail?: number | null;
         optimizer?: { type: string; pattern?: string; patterns?: string[] };
+        // Bug-fix additions: focus tracking (defers background refreshes while the user is
+        // typing) and `<details>` open/closed persistence — see the fields' doc comments above.
+        sectionId?: string;
+        open?: boolean;
       }) => {
+        // The user entered/left an editable control (search box, text field). While focused,
+        // `refresh()` queues instead of rebuilding; on blur, replay any queued refresh so
+        // nothing requested while they were typing is silently dropped.
+        if (msg.type === 'uiFocus') {
+          this._userInteracting = true;
+          return;
+        }
+        if (msg.type === 'uiBlur') {
+          this._userInteracting = false;
+          if (this._refreshPending) {
+            this._refreshPending = false;
+            this.refresh();
+          }
+          return;
+        }
+        // A `<details>` section was expanded/collapsed client-side — persist the choice so the
+        // next rebuild (or the next time the panel opens) honors it. Deliberately does NOT call
+        // refresh(): the native `<details>` element already reflects the new state, so rebuilding
+        // here would only cost the user their scroll position for no visible benefit.
+        if (msg.type === 'sectionToggled' && typeof msg.sectionId === 'string' && typeof msg.open === 'boolean') {
+          this._sectionOpenState = { ...this._sectionOpenState, [msg.sectionId]: msg.open };
+          void this._workspaceState.update(SECTION_STATE_STORAGE_KEY, this._sectionOpenState);
+          return;
+        }
         if (msg.type === 'toggle' && msg.packId !== undefined && msg.enabled !== undefined) {
           void this._handleToggle(msg.packId, msg.enabled);
         }
@@ -609,12 +666,36 @@ export class RulePacksWebviewProvider {
       },
     );
 
+    panel.onDidChangeViewState((e) => {
+      if (e.webviewPanel.visible) {
+        // Coming back into view: apply whatever was queued while hidden or mid-edit so the
+        // user sees fresh content immediately rather than a stale panel that only catches up
+        // on the next background tick.
+        if (this._refreshPending) {
+          this._refreshPending = false;
+          this.refresh();
+        }
+        return;
+      }
+      // Hardening: hiding the panel (switching editor tabs) should not leave `_userInteracting`
+      // stuck `true` forever if the DOM's blur event does not reach us for any reason — there is
+      // no user-visible field to keep "focused" while the tab is not shown.
+      this._userInteracting = false;
+    });
+
     panel.onDidDispose(() => {
       this._panel = undefined;
       // Re-fetch on next open rather than serving a session-stale count —
       // rules can change between opens (e.g. the user updates the package).
       this._ruleCounts = null;
       this._ruleCountsRequested = false;
+      // Bug fix: closing the panel while a search/text field still has focus (e.g. clicking the
+      // tab's close button instead of blurring first) would otherwise leave `_userInteracting`
+      // stuck `true` forever — the fresh webview on next open has no focused element to fire the
+      // `uiBlur` that would normally clear it, so every future `refresh()` silently no-ops and the
+      // dashboard stays blank. Reset both flags on dispose so a reopen always starts clean.
+      this._userInteracting = false;
+      this._refreshPending = false;
     });
 
     this._loadRuleCounts();
@@ -643,6 +724,23 @@ export class RulePacksWebviewProvider {
   refresh(): void {
     const webview = this._panel?.webview;
     if (!webview) {
+      return;
+    }
+    // Hardening: a background redraw while the panel is hidden (another editor tab focused)
+    // is both wasted work and, per `retainContextWhenHidden`, invisible until the user comes
+    // back anyway — queue it and let `onDidChangeViewState` below flush it the moment the
+    // panel becomes visible again, matching the Findings Dashboard's visible-only convention.
+    if (this._panel && !this._panel.visible) {
+      this._refreshPending = true;
+      return;
+    }
+    // Bug fix: never blow away the DOM while the user has focus in a search box or text
+    // field — queue the redraw and let it fire on the next `uiBlur` instead (see the field
+    // doc comment above and the `uiFocus`/`uiBlur` message handlers below). Tell the client so
+    // it can show the "Update pending" hint rather than the panel just going quiet.
+    if (this._userInteracting) {
+      this._refreshPending = true;
+      void webview.postMessage({ type: 'refreshPending' });
       return;
     }
     webview.html = this._buildHtml();
@@ -919,7 +1017,7 @@ export class RulePacksWebviewProvider {
     return `<header class="dash-hero">
   <div class="hero-text">
     <h1>Saropa Lints Config <button type="button" class="help-icon" title="${escapeHtml(helpTitle)}" aria-label="About this dashboard">?</button></h1>
-    <p class="status-line">${statusLine}${buildKeyboardShortcutsButton()}</p>
+    <p class="status-line">${statusLine}<span class="refresh-pending-indicator" id="refresh-pending-indicator" hidden title="${escapeHtml(l10n('dashboards.refreshPending.title'))}">${escapeHtml(l10n('dashboards.refreshPending.label'))}</span>${buildKeyboardShortcutsButton()}</p>
   </div>
   ${this._buildCoverageGauge(ctx)}
 </header>`;
@@ -1167,7 +1265,7 @@ export class RulePacksWebviewProvider {
     const detectedEmpty = `<tr class="packs-none"><td colspan="6" class="hint">${escapeHtml(l10n('packs.noneDetected'))}</td></tr>`;
     const detectedCount = packsAndRulesLabel(detected.length, sumPackRules(detected));
     const restCount = packsAndRulesLabel(rest.length, sumPackRules(rest));
-    return `<details class="section expander" aria-label="${escapeHtml(l10n('packs.forYourProject'))}" open>
+    return `<details id="packs-for-project" class="section expander" aria-label="${escapeHtml(l10n('packs.forYourProject'))}"${this._isSectionOpen('packs-for-project', true) ? ' open' : ''}>
   <summary><span class="expander-title">${escapeHtml(l10n('packs.forYourProject'))}</span> <span class="muted">(${detectedCount})</span></summary>
   <p class="hint">${escapeHtml(l10n('packs.forYourProjectHint'))}</p>
   <div class="dash-table-wrap">
@@ -1177,7 +1275,7 @@ export class RulePacksWebviewProvider {
     </table>
   </div>
 </details>
-<details class="section expander" aria-label="${escapeHtml(l10n('packs.allPackages'))}">
+<details id="packs-all" class="section expander" aria-label="${escapeHtml(l10n('packs.allPackages'))}"${this._isSectionOpen('packs-all', false) ? ' open' : ''}>
   <summary><span class="expander-title">${escapeHtml(l10n('packs.allPackages'))}</span> <span class="muted">(${restCount})</span></summary>
   <p class="hint">${escapeHtml(l10n('packs.allPackagesHint'))}</p>
   ${this._buildPackDomainGroups(rest, ctx.shedRuleNames)}
@@ -1224,7 +1322,8 @@ export class RulePacksWebviewProvider {
     const body = rows.map((row) => this._buildPackRow(row, false, shedRuleNames)).join('\n');
     const rawDesc = l10n('packs.domainDesc.' + slug, undefined, { fallback: '' });
     const descHtml = rawDesc ? `<p class="hint domain-desc">${escapeHtml(rawDesc)}</p>` : '';
-    return `<details class="domain-group">
+    const sectionId = `domain-group-${slug}`;
+    return `<details id="${sectionId}" class="domain-group"${this._isSectionOpen(sectionId, false) ? ' open' : ''}>
   <summary><span class="domain-title">${escapeHtml(domain)}</span> <span class="muted">(${packsAndRulesLabel(rows.length, sumPackRules(rows))})</span></summary>
   ${descHtml}
   <div class="dash-table-wrap">
@@ -1446,7 +1545,7 @@ ${detailRow}`;
     if (count === 0) {
       // Collapsed by default even when empty: empty state rarely needs immediate attention,
       // and keeping the same `<details>` shell avoids a visual jump if a rule is later disabled.
-      return `<details class="section expander disabled-rules" aria-label="Disabled rules">
+      return `<details id="disabled-rules" class="section expander disabled-rules" aria-label="Disabled rules"${this._isSectionOpen('disabled-rules', false) ? ' open' : ''}>
   ${summary}
   <p class="hint">No rules are currently disabled by override. When you disable a rule (right-click in Issues, or the Triage panel), it appears here with a one-click re-enable.</p>
 </details>`;
@@ -1494,7 +1593,7 @@ ${detailRow}`;
   <ul class="disabled-rules-list">${rows}</ul>
 </div>`;
     }).join('\n');
-    return `<details class="section expander disabled-rules" aria-label="Disabled rules">
+    return `<details id="disabled-rules" class="section expander disabled-rules" aria-label="Disabled rules"${this._isSectionOpen('disabled-rules', false) ? ' open' : ''}>
   ${summary}
   <p class="hint">These rules are turned off via overrides in <code>analysis_options_custom.yaml</code>. Re-enable a rule below; the file is managed by the extension — no manual editing required.</p>
   <div class="disabled-rules-toolbar">
@@ -1551,7 +1650,7 @@ ${detailRow}`;
     // RSS resets on restart, so shedding de-escalates to level 0 if the project
     // fits in memory on a fresh start. Uses the existing 'command' message type.
     const restartBtn = `<button type="button" class="btn tier-2" data-command="restartAnalyzer" title="${escapeHtml(l10n('memoryPressure.dashboard.restartTooltip'))}">${escapeHtml(l10n('memoryPressure.dashboard.restartButton'))}</button>`;
-    return `<details class="section expander shed-rules" aria-label="${escapeHtml(l10n('memoryPressure.dashboard.shedSectionTitle'))}" open>
+    return `<details id="shed-rules" class="section expander shed-rules" aria-label="${escapeHtml(l10n('memoryPressure.dashboard.shedSectionTitle'))}"${this._isSectionOpen('shed-rules', true) ? ' open' : ''}>
   ${summary}
   <p class="hint">${escapeHtml(l10n('memoryPressure.dashboard.shedHint'))} ${restartBtn}</p>
   ${groupHtml}
@@ -1579,7 +1678,7 @@ ${detailRow}`;
     const groups = STYLISTIC_PACK_DEFINITIONS.map((pack) =>
       this._buildStylisticGroup(pack, ctx.enabledStylistic),
     ).join('\n');
-    return `<details class="section expander stylistic" aria-label="${escapeHtml(l10n('stylistic.title'))}">
+    return `<details id="stylistic" class="section expander stylistic" aria-label="${escapeHtml(l10n('stylistic.title'))}"${this._isSectionOpen('stylistic', false) ? ' open' : ''}>
   ${summary}
   <p class="hint">${escapeHtml(l10n('stylistic.intro'))}</p>
   <div class="stylistic-toolbar">

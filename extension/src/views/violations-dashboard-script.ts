@@ -11,7 +11,7 @@
  */
 
 import { l10n } from '../i18n/runtime';
-import { getAnnouncerScript, getFullWidthToggleScript } from './dashboardHero';
+import { getAnnouncerScript, getFullWidthToggleScript, getFocusTrackingScript } from './dashboardHero';
 import { getKeyboardShortcutsScript } from './keyboard-shortcuts';
 
 /** Client-script strings (embedded webview JS); resolved at host HTML build time. */
@@ -1053,6 +1053,13 @@ export function buildScript(): string {
     // settled grade. Keeps the gauge honest even for runs the dashboard did
     // not initiate (e.g. analyze-on-save).
     if (msg.type === 'gaugePending') { setGaugePending(!!msg.pending); return; }
+    // Deferred while a field is focused (see the interaction guard below) — no explicit
+    // hide is needed since applying the deferred update reloads the whole document.
+    if (msg.type === 'refreshPending') {
+      var pendingEl = document.getElementById('refresh-pending-indicator');
+      if (pendingEl) pendingEl.hidden = false;
+      return;
+    }
     if (msg.type === 'auditProgress') {
       if (msg.status === 'started' || msg.status === 'running') {
         setAuditProgress(true, msg.message || FD.auditRunningMeta);
@@ -1105,5 +1112,11 @@ export function buildScript(): string {
     }
   });
   ${getKeyboardShortcutsScript()}
+
+  /* Bug fix: background-triggered rebuilds (diagnostics ticks, tree-data refresh)
+     used to reassign webview.html unconditionally, wiping out an in-progress edit
+     in the text filter or any other field and dropping focus. Shared with the Config
+     Dashboard, which hit the same bug independently — see dashboardHero.ts. */
+  ${getFocusTrackingScript()}
 })();`;
 }

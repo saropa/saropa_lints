@@ -101,6 +101,17 @@ const LIVE_REFRESH_DEBOUNCE_MS = 500;
 let lastFindingsRenderSignature: string | undefined;
 let hasPaintedOnce = false;
 
+// Bug fix: the signature guard above only helps when diagnostics are republished
+// UNCHANGED. While the user is actively editing a Dart file with this dashboard open,
+// diagnostics genuinely change on every analysis pass, so the live listener keeps
+// reassigning `webview.html` — destroying the user's in-progress typing in the text
+// filter box and dropping focus. Track focus on the panel's editable controls (via
+// `uiFocus`/`uiBlur`, posted from violations-dashboard-script.ts) and defer the
+// diagnostics-driven rebuild while focused, replaying it once the field is left so no
+// update is silently lost — just delayed until it is safe to redraw.
+let findingsDashboardUserInteracting = false;
+let findingsDashboardRefreshPending = false;
+
 interface DashboardState {
   groupBy: GroupByMode;
   textFilter: string;
@@ -718,6 +729,8 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
     // blank) and replays the entrance animation on that first paint.
     lastFindingsRenderSignature = undefined;
     hasPaintedOnce = false;
+    findingsDashboardUserInteracting = false;
+    findingsDashboardRefreshPending = false;
     // Reopening the dashboard should start from live diagnostics again, not
     // resume a stale (possibly minutes-old) audit result from before it was
     // closed. Also cancels any audit still in flight — nothing left to post
@@ -728,12 +741,32 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
     auditResult = undefined;
   });
 
+  currentPanel.onDidChangeViewState((e) => {
+    if (e.webviewPanel.visible) {
+      // Hardening: a background rebuild skipped while hidden (see the `!visible` early
+      // returns below and in `refreshFindingsDashboardIfOpen`) would otherwise only catch up
+      // on the NEXT diagnostics/tree event, which may not arrive right away — flush it now so
+      // the user sees fresh content the moment they switch back to this tab.
+      if (findingsDashboardRefreshPending && currentPanel) {
+        findingsDashboardRefreshPending = false;
+        void rebuildDashboardHtml(context, currentPanel);
+      }
+      return;
+    }
+    // Hidden: there is no visible field to keep "focused" — do not leave the interaction
+    // guard stuck true if a blur event does not reach us for any reason.
+    findingsDashboardUserInteracting = false;
+  });
+
   // Live refresh. The Problems panel updates as analysis runs; this listener
   // rebuilds the dashboard from the same diagnostics so the two stay in sync
   // without the user clicking refresh. Debounced because a single analysis run
   // typically emits dozens of per-URI diagnostic events.
   liveDiagnosticsListener = vscode.languages.onDidChangeDiagnostics(() => {
-    if (!currentPanel?.visible) return;
+    if (!currentPanel?.visible) {
+      findingsDashboardRefreshPending = true;
+      return;
+    }
     // Diagnostics are actively changing → analysis is streaming results in, so
     // the on-disk health score is mid-flight. Dim the gauge to "computing" now
     // (avoids the A→E whiplash); the debounced rebuild below ships a fresh
@@ -742,9 +775,19 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
     if (liveRefreshTimer) clearTimeout(liveRefreshTimer);
     liveRefreshTimer = setTimeout(() => {
       liveRefreshTimer = undefined;
-      if (currentPanel?.visible) {
-        void rebuildDashboardHtml(context, currentPanel);
+      if (!currentPanel?.visible) {
+        findingsDashboardRefreshPending = true;
+        return;
       }
+      if (findingsDashboardUserInteracting) {
+        // Defer: rebuilding now would tear out whatever the user is typing into.
+        // `uiBlur` replays this once they leave the field. Tell the client so it can show
+        // the "Update pending" hint rather than the panel just going quiet.
+        findingsDashboardRefreshPending = true;
+        void currentPanel.webview.postMessage({ type: 'refreshPending' });
+        return;
+      }
+      void rebuildDashboardHtml(context, currentPanel);
     }, LIVE_REFRESH_DEBOUNCE_MS);
   });
 
@@ -761,6 +804,18 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
     };
     const cfg = vscode.workspace.getConfiguration('saropaLints');
 
+    if (data.type === 'uiFocus') {
+      findingsDashboardUserInteracting = true;
+      return;
+    }
+    if (data.type === 'uiBlur') {
+      findingsDashboardUserInteracting = false;
+      if (findingsDashboardRefreshPending && currentPanel) {
+        findingsDashboardRefreshPending = false;
+        await rebuildDashboardHtml(context, currentPanel);
+      }
+      return;
+    }
     if (data.type === 'dashboardUpdate') {
       mergeDashboardUpdate(cfg, data);
       if (currentPanel) {
@@ -1226,9 +1281,16 @@ async function runAuditForDashboard(context: vscode.ExtensionContext, root: stri
 
 /** Rebuild Findings when `IssuesTreeProvider` fires (filters/suppressions) while the panel is open. */
 export function refreshFindingsDashboardIfOpen(context: vscode.ExtensionContext): void {
-  if (currentPanel) {
-    void rebuildDashboardHtml(context, currentPanel);
+  if (!currentPanel) return;
+  // Bug fix: this fires from background events (diagnostics-driven tree refresh, locale
+  // reload, todos/hacks rescans) — never tear out an in-progress edit. See the doc comment
+  // on `findingsDashboardUserInteracting` above.
+  if (findingsDashboardUserInteracting) {
+    findingsDashboardRefreshPending = true;
+    void currentPanel.webview.postMessage({ type: 'refreshPending' });
+    return;
   }
+  void rebuildDashboardHtml(context, currentPanel);
 }
 
 /**

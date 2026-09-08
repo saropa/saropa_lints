@@ -49,6 +49,14 @@ export function chromeHeroAndGauge(): string {
   align-items: center;
 }
 .status-line .dot { opacity: 0.55; }
+/* Shown while a background refresh (diagnostics/save/tree-data driven) is deferred because
+ * the user has focus in a field — see refresh() in rulePacksWebviewProvider.ts and the
+ * liveDiagnosticsListener in violationsWideReportView.ts. Deliberately unscoped like .pill.pill
+ * above so both dashboards' headers pick it up without redeclaring it. */
+.refresh-pending-indicator {
+  color: color-mix(in srgb, var(--accent-warning) 65%, var(--vscode-foreground));
+  font-size: 0.9em;
+}
 /* THE pill primitive (Task B — every counter treatment on the dashboard converges
  * here: status-line pills, section-heading counters, and the big KPI stat-card
  * numbers). Deliberately UNSCOPED (was .status-line .pill) so it works anywhere

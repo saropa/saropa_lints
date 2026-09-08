@@ -432,6 +432,10 @@
       "laneFull": "Full — every enabled rule in-editor",
       "migrateLegacyKeys": "Migrate {count} legacy config key(s)",
       "migrateLegacyKeysDesc": "Move legacy plugin-block keys to analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Update pending",
+      "title": "An update is waiting — it will apply once you leave the field you're editing."
     }
   },
   "configSuggestions": {

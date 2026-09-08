@@ -18,6 +18,8 @@
  * (.btn, .chip-strip, .chip, .seg, .seg-btn, .menu .menu-item, .bar-row, .donut .seg) so
  * the dashboard behaves the same as Findings and Code Health where the same selectors apply.
  */
+import { getFocusTrackingScript } from '../views/dashboardHero';
+
 export function getConfigDashboardScript(): string {
   return [
     SCRIPT_PREAMBLE,
@@ -35,6 +37,16 @@ export function getConfigDashboardScript(): string {
     SCRIPT_SETTINGS_GRID,
     SCRIPT_CONFIG_FILE_TAB,
     SCRIPT_OPTIMIZER_EMBED,
+    // Bug fix: background host refreshes (diagnostics ticks, config-file-save watchers,
+    // memory-pressure updates) used to call `refresh()` unconditionally on the host, which
+    // fully reassigns `webview.html` — destroying whatever the user was typing into the pack
+    // search box, disabled-rules search, stylistic search, or a banned-usage/config-file text
+    // field. `getFocusTrackingScript()` (shared with the Findings Dashboard, which hits the
+    // same bug — see dashboardHero.ts) tells the host via `uiFocus`/`uiBlur` so it can defer
+    // the rebuild until the field is left (see `refresh()` in rulePacksWebviewProvider.ts).
+    getFocusTrackingScript(),
+    SCRIPT_SECTION_STATE,
+    SCRIPT_REFRESH_PENDING_INDICATOR,
     SCRIPT_INIT,
   ].join('\n');
 }
@@ -1121,6 +1133,37 @@ const SCRIPT_OPTIMIZER_EMBED = `
     // this correct without depending on that assumption holding forever).
     updateApplySelected();
   })();
+`;
+
+/**
+ * Bug fix: every `<details>` section (packs accordions, disabled/shed/stylistic sections)
+ * reset to its hardcoded default open/closed state on every host rebuild — nothing told the
+ * host which sections the user had expanded. Every persistable section now carries a stable
+ * `id` (see rulePacksWebviewProvider.ts's `_isSectionOpen`); this reports each toggle so the
+ * NEXT rebuild honors it. No rebuild is triggered here — the native `<details>` element
+ * already shows the new state.
+ */
+const SCRIPT_SECTION_STATE = `
+  document.querySelectorAll('details[id]').forEach(function(d) {
+    d.addEventListener('toggle', function() {
+      vscode.postMessage({ type: 'sectionToggled', sectionId: d.id, open: d.open });
+    });
+  });
+`;
+
+/**
+ * Shows the header's "Update pending" hint while a background refresh is deferred (see
+ * `refresh()` in rulePacksWebviewProvider.ts). No explicit hide is needed: applying the
+ * deferred update reassigns the whole document, and the freshly rendered header always starts
+ * with the indicator hidden.
+ */
+const SCRIPT_REFRESH_PENDING_INDICATOR = `
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'refreshPending') {
+      var el = document.getElementById('refresh-pending-indicator');
+      if (el) el.hidden = false;
+    }
+  });
 `;
 
 const SCRIPT_INIT = `

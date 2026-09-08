@@ -314,7 +314,8 @@ export function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   // (see .status-line .full-width-toggle in dashboardChromeStyles.ts / violationsDashboardStyles.ts).
   // The keyboard-shortcut overlay trigger sits left of the toggle so the toggle
   // remains the rightmost action across all dashboards (sticky muscle memory).
-  const trailing = `${buildKeyboardShortcutsButton()}${buildFullWidthToggle()}`;
+  const refreshPendingIndicator = `<span class="refresh-pending-indicator" id="refresh-pending-indicator" hidden title="${escapeHtml(l10n('dashboards.refreshPending.title'))}">${escapeHtml(l10n('dashboards.refreshPending.label'))}</span>`;
+  const trailing = `${refreshPendingIndicator}${buildKeyboardShortcutsButton()}${buildFullWidthToggle()}`;
   return `<p class="status-line">${parts.join('<span class="dot">·</span>')}${trailing}</p>`;
 }
 

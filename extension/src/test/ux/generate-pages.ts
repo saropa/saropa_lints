@@ -219,7 +219,14 @@ function violationsEmptyFixture() {
 function buildRulesAndTiersTabHtml(tab: 'tier' | 'configFile'): string {
   const repoRoot = path.resolve(__dirname, '../../../..');
   mockWorkspaceFolders.value = [{ uri: { fsPath: repoRoot } }];
-  const provider = new RulePacksWebviewProvider({ fsPath: repoRoot } as unknown as vscode.Uri);
+  // Fixture-only stand-in for `vscode.Memento` — this generator never round-trips section
+  // open/closed state, it just needs a store that satisfies the constructor's shape.
+  const fakeMemento = {
+    get: <T>(_key: string, defaultValue?: T) => defaultValue as T,
+    update: async () => {},
+    keys: () => [],
+  } as unknown as vscode.Memento;
+  const provider = new RulePacksWebviewProvider({ fsPath: repoRoot } as unknown as vscode.Uri, fakeMemento);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see doc comment above.
   (provider as any)._activeTab = tab;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see doc comment above.

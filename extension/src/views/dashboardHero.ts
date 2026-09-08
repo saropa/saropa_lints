@@ -161,6 +161,35 @@ export function getFullWidthToggleScript(): string {
   })();`;
 }
 
+/**
+ * Inline script that reports focus in/out on editable controls (`uiFocus`/`uiBlur`
+ * postMessage) so the host can defer a background-triggered `webview.html` reassignment
+ * (diagnostics ticks, file-save watchers, tree-data refreshes) while the user is mid-edit
+ * instead of tearing the DOM out from under an in-progress keystroke. Shared by the Config
+ * Dashboard (rulePacksWebviewProvider.ts) and the Findings Dashboard
+ * (violationsWideReportView.ts), which both hit the same class of bug independently.
+ */
+export function getFocusTrackingScript(): string {
+  return `(function() {
+    function isEditableTarget(el) {
+      if (!el) return false;
+      var tag = el.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable === true;
+    }
+    document.addEventListener('focusin', function(e) {
+      if (isEditableTarget(e.target)) vscode.postMessage({ type: 'uiFocus' });
+    });
+    document.addEventListener('focusout', function(e) {
+      if (!isEditableTarget(e.target)) return;
+      // Deferred: a focusout immediately followed by a focusin onto another editable
+      // control (e.g. Tab between two search boxes) should read as "still interacting".
+      setTimeout(function() {
+        if (!isEditableTarget(document.activeElement)) vscode.postMessage({ type: 'uiBlur' });
+      }, 0);
+    });
+  })();`;
+}
+
 /** Format a UTC ISO 8601 timestamp as a relative duration ("just now", "2m ago", "3d ago"). */
 export function formatRelativeTimestamp(iso: string | undefined): string | undefined {
   if (!iso) return undefined;

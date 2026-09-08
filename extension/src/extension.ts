@@ -753,7 +753,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
   );
 
-  rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
+  rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri, context.workspaceState);
   registerAnalyzerExcludeDiffProvider(context);
   analysisOptimizerProvider = new AnalysisOptimizerWebviewProvider(context.extensionUri);
   // Phase 4 (PLAN_extension_ui_redesign.md): the Rules & Tiers dashboard's Config file tab embeds
