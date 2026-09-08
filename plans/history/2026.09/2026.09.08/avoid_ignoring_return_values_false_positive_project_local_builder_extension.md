@@ -210,6 +210,44 @@ without weakening the rule's real bug-catching case.
 
 ---
 
+## Finish Report (2026-09-08)
+
+`avoid_ignoring_return_values` reported a false positive on any project-local
+`extension` method following the `List.add` mutate-and-return-bool
+convention, because its exemption list was a closed set of ~30 hardcoded
+stdlib method names with no path to recognize an equivalent project-defined
+pattern.
+
+The fix adds a structural exemption alongside the existing name-based
+allowlist: a bare-statement invocation is also skipped when it is a
+`MethodInvocation` with a `bool` return type, a mutate-verb name (`add*`,
+`append*`, `insert*`, `remove*`, `update*`, `set*`, matched with a
+camelCase-boundary check so `setup`/`additional` don't false-match), and the
+invoked method is declared inside an `extension` block defined in the
+current project's own package. The package-scoping check reuses the same
+`package:` URI comparison as `AvoidDeprecatedUsageRule._isSamePackage`
+elsewhere in the same file.
+
+A same-package restriction was added after an independent code-review pass
+on the initial implementation: an extension-name/bool-return check alone
+would also have exempted third-party package extensions whose ignored
+`bool` is a genuine result the rule is designed to catch, not a
+mutate-and-forget convenience flag.
+
+Verified via `dart run saropa_lints scan example --tier comprehensive
+--resolve --files lib/code_quality/avoid_ignoring_return_values_fixture.dart
+--format json`: the rule fires exactly once, on the pre-existing real
+violation (`list.map(...)` discarded), and does not fire on the new
+extension-mutator fixture case. `dart test
+test/integrity/anti_pattern_detection_test.dart
+test/integrity/saropa_lints_test.dart
+test/rules/code_quality/code_quality_rules_test.dart` — 250/250 passed.
+
+Rule version bumped `{v1}` → `{v2}`; doc comment `Updated` stamp set to
+`v16.2.1` (the in-progress unreleased version per `CHANGELOG.md`).
+
+---
+
 ## Commits
 
 <!-- Add commit hash when committed. -->

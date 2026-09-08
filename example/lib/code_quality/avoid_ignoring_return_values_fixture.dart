@@ -19,3 +19,23 @@ void _goodMapMutation(Map<String, int> counts, Map<String, List<int>> grouped) {
   counts.putIfAbsent('other', () => 0);
   grouped.update('key', (v) => [...v, 1], ifAbsent: () => <int>[1]);
 }
+
+class _NameSpans {
+  final List<String> spans = <String>[];
+}
+
+// GOOD: Project-local extension mutator matching the List.add convention —
+// mutate-verb name, bool return, declared on an extension.
+extension _NameTextSpanExtensions on _NameSpans {
+  bool appendNamePart(String? part) {
+    if (part == null || part.isEmpty) return false;
+    spans.add(part);
+    return true;
+  }
+}
+
+void _goodExtensionMutator(_NameSpans target, String? givenName) {
+  if (givenName != null && givenName.isNotEmpty) {
+    target.appendNamePart(givenName); // Exempt — extension bool-mutator
+  }
+}

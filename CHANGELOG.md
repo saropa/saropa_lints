@@ -80,6 +80,8 @@ Patch release fixing false positives in two lint rules and resolving unwanted re
 
 `avoid_ignoring_return_values` no longer flags a project-local `extension` method whose name follows a mutate-verb convention (`add*`, `append*`, `insert*`, `remove*`, `update*`, `set*`) and returns `bool` — the same structural shape as allowlisted stdlib mutators like `List.add`, where the bool is a "did it happen" convenience the caller is not required to consult. No action required.
 
+`require_ios_accessibility_large_text` no longer flags `TextStyle(fontSize:)` when the value comes from a getter, method call, or property access — only bare numeric literals are flagged. Previously the rule pattern-matched source text for `textScaleFactor`/`textScaler`/`MediaQuery` substrings and missed any design-system token that applies Dynamic Type scaling through a helper. No action required.
+
 ### Fixed (Extension)
 
 - The Config Dashboard and Findings Dashboard no longer constantly reload while you type into a search box or text field — a background refresh (triggered by the analyzer's live diagnostics, config-file saves, or workspace tree updates) was rebuilding the whole panel on every tick regardless of whether you were mid-edit, which also made the Config Dashboard's "Matching rules" → "in `<package>`" links appear dead since the panel they lived in kept getting torn down. Both dashboards now wait until you leave the field before redrawing.

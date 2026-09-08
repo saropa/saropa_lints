@@ -4143,7 +4143,7 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
 
 /// Warns when a function's return value is ignored.
 ///
-/// Since: v4.15.0 | Rule version: v1
+/// Since: v4.15.0 | Updated: v16.2.1 | Rule version: v2
 ///
 /// Ignoring a return value often means the result of a computation or an
 /// error check is silently discarded. This can hide bugs where an important
@@ -4160,13 +4160,17 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
 ///
 /// **Exempt:** Map mutation methods (`update`, `putIfAbsent`, `updateAll`) and
 /// property setter assignments (e.g. `obj.value = x`) are not flagged when
-/// used for their in-place side effect.
+/// used for their in-place side effect. Project-local `extension` methods
+/// following the same convention — a mutate-verb name (`add*`, `append*`,
+/// `insert*`, `remove*`, `update*`, `set*`) returning `bool` — are exempt
+/// too, since they are structurally identical to `List.add`.
 ///
 /// **GOOD:**
 /// ```dart
 /// void example() {
 ///   final doubled = list.map((e) => e * 2).toList();
 ///   final value = int.parse('42');
+///   target.appendNamePart(givenName); // extension bool-mutator, exempt
 /// }
 /// ```
 class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
@@ -4193,7 +4197,7 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
         'ignored. Discarding return values can hide bugs where an important '
         'result (a Future, a boolean success flag, or a parsed value) is '
         'silently lost. Assign the result to a variable or remove the call '
-        'if it is truly unnecessary. {v1}',
+        'if it is truly unnecessary. {v2}',
     correctionMessage:
         'Assign the return value to a variable, or use it in an expression.',
     severity: DiagnosticSeverity.INFO,
@@ -4241,6 +4245,54 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
     'writeCharCode',
   };
 
+  /// Verb prefixes conventionally used by mutate-in-place builder methods
+  /// (stdlib and project-local alike) whose `bool` return is a "did it
+  /// happen" convenience flag, not the primary result of the call.
+  static const List<String> _mutateVerbPrefixes = <String>[
+    'add',
+    'append',
+    'insert',
+    'remove',
+    'update',
+    'set',
+  ];
+
+  /// True if [methodName] starts with one of [_mutateVerbPrefixes], using a
+  /// camelCase-aware boundary (next char is absent or uppercase) so names
+  /// like `setup` or `additional` don't false-match on `set`/`add`.
+  static bool _isMutateVerbName(String methodName) {
+    for (final String prefix in _mutateVerbPrefixes) {
+      if (!methodName.startsWith(prefix)) continue;
+      if (methodName.length == prefix.length) return true;
+      final String nextChar = methodName[prefix.length];
+      if (nextChar == nextChar.toUpperCase() &&
+          nextChar != nextChar.toLowerCase()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// True if [element] is a method declared inside an `extension` block
+  /// AND that extension is defined in the current project's own package
+  /// (not a third-party dependency). Both conditions matter: a third-party
+  /// extension's `bool` return (e.g. a real validation result) is exactly
+  /// the kind of ignored-value bug this rule exists to catch — the
+  /// exemption only applies to the project's own builder-pattern mutators,
+  /// mirroring `AvoidDeprecatedUsageRule._isSamePackage` above.
+  static bool _isDeclaredOnLocalExtension(Element? element, String filePath) {
+    if (element?.enclosingElement is! ExtensionElement) return false;
+    final String uri = element?.library?.uri.toString() ?? '';
+    if (!uri.startsWith('package:')) return true;
+    final String rest = uri.substring(8);
+    final int slash = rest.indexOf('/');
+    final String elementPackage = slash >= 0 ? rest.substring(0, slash) : rest;
+    final String? root = ProjectContext.findProjectRoot(filePath);
+    if (root == null) return true;
+    final String? currentPackage = ProjectContext.getPackageName(root);
+    return elementPackage == currentPackage;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -4275,6 +4327,24 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
 
       // Skip cascade targets (they return the cascade target)
       if (expression is MethodInvocation && expression.isCascaded) return;
+
+      // Skip project-local extension methods that follow the same
+      // mutate-in-place-and-return-a-convenience-bool convention as the
+      // stdlib names above (e.g. `list.add`). The fixed name allowlist can
+      // never cover project-defined builder-pattern mutators, so fall back
+      // to a structural check: declared on an `extension`, named with a
+      // known mutate verb, and returning `bool`.
+      if (expression is MethodInvocation &&
+          methodName != null &&
+          returnType != null &&
+          returnType.isDartCoreBool &&
+          _isMutateVerbName(methodName) &&
+          _isDeclaredOnLocalExtension(
+            expression.methodName.element,
+            context.filePath,
+          )) {
+        return;
+      }
 
       // Skip void, dynamic, and Null return types
       if (returnType == null || returnType is VoidType) return;
