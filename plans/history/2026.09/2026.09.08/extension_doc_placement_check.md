@@ -84,3 +84,67 @@ The new `docPlacement.diagnostic.message` and `config.property.docPlacement.*`
 strings exist only in English; other locale catalogs were not regenerated
 (`extension/scripts/generate_translations.py` requires explicit in-the-moment
 authorization per global instructions and was not run this session).
+
+## Second pass: hardening + move-to-bugs quick fix (commit `6dc1d830`)
+
+At the `/finish` reflection gate, the user selected both "harden reflection
+items" and "implement the unrequested feature." Both were done in one
+follow-up pass, committed separately from the first draft above (the first
+draft had already been swept into `350b3c52` by a concurrent process before
+this pass could commit it).
+
+Hardening:
+
+- Extracted `extension/src/extensionChecks/docConventions.ts` (new) —
+  `ARCHIVE_DIR = 'plans/history'` and `OPEN_ISSUES_DIR = 'bugs'` as the
+  single source of truth. Both `docPlacementCheck.ts` and the pre-existing
+  `bugArchivalCheck.ts` now derive their directory-matching logic from it,
+  so the two mirror checks can no longer drift apart on directory names.
+- Fixed a second latent regex gap the first pass missed: the default
+  `Status:`/`Severity:` signals absorbed bold wrapping a field's *label*
+  (`**Status:**`) but not bold wrapping only its *value*
+  (`Severity: **Critical**`). Added a second `\*{0,2}` before the value in
+  both signal defaults, in code, `package.json`, and test fixtures.
+- Applied the identical bold-label regex fix to `bugArchivalCheck.ts`'s
+  pre-existing `STATUS_LINE_PATTERN` — same bug, same fix, a file this task
+  did not originally author but which shared the defect.
+- `compilePatterns()` now `console.warn`s (with the offending source string)
+  when a user-supplied regex setting fails to compile, instead of failing
+  silently.
+- The config-change rescan handler now filters to
+  `doc.languageId === 'markdown'` before rescanning open documents, instead
+  of relying on `validateDocument`'s own early return for every open
+  document on every settings change.
+
+Move-to-bugs quick fix (the unrequested feature):
+
+- `computeDocPlacementDiagnostic` now sets `diag.code = 'docPlacement'` so a
+  `CodeActionProvider` can scope to only this check's diagnostics.
+  Deliberately not `diag.source` (`'Saropa Lints'`), which is shared by
+  every check in the extension and is not a safe filter key on its own —
+  the pre-existing `StaleIgnoreCodeActionProvider` filters by `source`
+  alone, a latent cross-provider collision risk this pass did not copy.
+- New `DocPlacementCodeActionProvider` offers one quick fix
+  ("Move to bugs/") wired to a new `saropaLints.docPlacement.
+  moveToOpenIssues` command.
+- New `moveToOpenIssuesCommand(uri, openIssuesDir)`: resolves the workspace
+  folder, computes the target path under `openIssuesDir`, refuses to
+  proceed if a file already exists there, tries `git mv` first (so the move
+  is tracked as a rename in git history) falling back to a plain
+  `vscode.workspace.fs.rename` if `git mv` fails (not a git repo, untracked
+  file, git not on PATH), then opens the moved file at its new path.
+- Three new `docPlacement.*` l10n keys for the quick-fix title and two error
+  messages (no workspace folder, target already exists).
+
+Testing: 7 more unit tests added (bold-value severity, glob edge cases,
+invalid-regex warning, the `diag.code` field, and
+`DocPlacementCodeActionProvider` filtering with/without a matching
+diagnostic) — 29/29 passing in `extensionChecks/**/*.test.js`. Both
+typechecks (`tsc --noEmit -p .`, `tsc -p tsconfig.test.json`) clean.
+
+Still not yet verified: F5 in the Extension Development Host (settings UI
+rendering, live diagnostic + quick-fix behavior, enable/disable toggle) —
+requires a human look per `.claude/rules/extension-verification.md`. Locale
+catalogs for the three new l10n keys added in this pass have also not been
+checked against the unrelated `350b3c52` locale regen for stale English
+placeholders.
