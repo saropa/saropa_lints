@@ -277,7 +277,48 @@ Ran the full existing suite (`test/rules/code_quality/code_quality_rules_test.da
 
 ## Commits
 
-<!-- Fill in at commit time. -->
+- `3b0050d1` — fix: prefer_late_final no longer flags fields reassigned via method tear-offs
+
+---
+
+## Finish Report (2026-09-08)
+
+`AvoidLateFinalReassignmentRule`'s `prefer_late_final` heuristic undercounted
+runtime reassignments of a `late` field when the field's assigning method
+was invoked at one site as a direct call and at another as a bare tear-off
+(e.g. `setState(_initFutures)`). The tear-off call site was invisible to
+`_LateFinalMethodCallCounterVisitor`, which only recognized
+`MethodInvocation` nodes, so the rule treated a genuinely-reassigned field
+as a single-assignment `late final` candidate and its own quick fix
+(`AddLateFinalFix`) would introduce a real `LateInitializationError` crash
+if applied.
+
+`_LateFinalMethodCallCounterVisitor` gained a `visitSimpleIdentifier`
+override that recognizes a tracked method name referenced outside its own
+`MethodInvocation.methodName` position, resolved to a `MethodElement`, as a
+tear-off. `_adjustForMethodCallSites` now bumps the assignment count for any
+field assigned by a torn-off method above the `count == 1` trigger, rather
+than folding an unbounded runtime call count into the existing
+`callCount - 1` arithmetic.
+
+Verified with the resolved-AST scan CLI
+(`dart run saropa_lints scan --resolve`): before the fix, `prefer_late_final`
+fired on both the genuine single-assignment case and the new tear-off
+fixture case (2 diagnostics); after, only the genuine case fires (1
+diagnostic). The existing 221-test `code_quality_rules_test.dart` suite and
+the 16-test `false_positive_fixes_test.dart` fixture-coverage suite both
+pass unchanged. Code review (`/code-review medium`) found no issues in the
+changed file; two findings surfaced were in unrelated concurrent work
+(`code_quality_avoid_rules.dart`, `ios_capabilities_permissions_rules.dart`)
+and are out of scope for this fix.
+
+Deliberately out of scope: the bug report's Hypothesis A case 3 (a tear-off
+passed to a provably-single-call callback, e.g. one-shot `Future.then`) is
+not special-cased — the fix suppresses on any tear-off reference
+unconditionally, since proving a callback runs at most once would require
+call-graph reasoning this rule does not implement, and a missed genuine
+`late final` candidate is the safer failure mode than the crash-risk false
+positive this bug reports.
 
 ---
 
