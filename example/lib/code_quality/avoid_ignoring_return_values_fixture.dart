@@ -39,3 +39,24 @@ void _goodExtensionMutator(_NameSpans target, String? givenName) {
     target.appendNamePart(givenName); // Exempt — extension bool-mutator
   }
 }
+
+// BAD: Same mutate-verb name + bool return as appendNamePart above, but
+// declared as a plain instance method (not on an extension). Proves the
+// extension-only gate is load-bearing: the verb+bool shape alone is not a
+// sufficient signal (a class method's bool return may be a real result the
+// caller should check), so this must still lint even though it matches
+// every other condition of the exemption.
+class _NameBuilder {
+  final List<String> parts = <String>[];
+
+  bool appendPart(String? part) {
+    if (part == null || part.isEmpty) return false;
+    parts.add(part);
+    return true;
+  }
+}
+
+void _badNonExtensionMutator(_NameBuilder builder, String? part) {
+  // expect_lint: avoid_ignoring_return_values
+  builder.appendPart(part);
+}
