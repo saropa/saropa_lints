@@ -60,3 +60,14 @@ void _badNonExtensionMutator(_NameBuilder builder, String? part) {
   // expect_lint: avoid_ignoring_return_values
   builder.appendPart(part);
 }
+
+// GOOD: `computeHash` is not in the built-in allowlist or heuristic pattern,
+// but the project allowlisted it via analysis_options_custom.yaml
+// (`avoid_ignoring_return_values: safe_to_ignore: - computeHash`).
+class _Hasher {
+  int computeHash(String input) => input.hashCode;
+}
+
+void _goodConfigAllowlisted(_Hasher hasher) {
+  hasher.computeHash('hello'); // Exempt — project-level config allowlist
+}

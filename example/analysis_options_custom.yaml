@@ -2,3 +2,9 @@ rule_packs:
   enabled:
     - dart_sdk_3_2
     - dart_sdk_3_4
+
+# Per-rule config: additional safe-to-ignore methods for
+# avoid_ignoring_return_values (project-specific allowlist).
+avoid_ignoring_return_values:
+  safe_to_ignore:
+    - computeHash

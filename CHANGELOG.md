@@ -68,7 +68,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.2.1] — Unreleased
 
-Patch release fixing false positives in two lint rules and resolving unwanted reload behavior in the Config and Findings Dashboards when editing text fields. [log](https://github.com/saropa/saropa_lints/blob/v16.2.1/CHANGELOG.md)
+Patch release fixing false positives in two lint rules, adding a project-level allowlist for `avoid_ignoring_return_values`, and resolving unwanted reload behavior in the Config and Findings Dashboards when editing text fields. [log](https://github.com/saropa/saropa_lints/blob/v16.2.1/CHANGELOG.md)
+
+### Added
+
+`avoid_ignoring_return_values` now supports a project-level allowlist via `analysis_options_custom.yaml` — add method names under `avoid_ignoring_return_values: safe_to_ignore:` to exempt project-specific methods whose return values are safely ignored. No action required unless you have project-specific methods you want to allowlist.
 
 ### Fixed
 

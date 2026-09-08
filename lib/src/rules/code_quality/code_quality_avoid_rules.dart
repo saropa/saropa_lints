@@ -21,6 +21,8 @@ import 'package:meta/meta.dart';
 import '../../analyzer_metadata_compat_utils.dart';
 import '../../literal_context_utils.dart';
 import '../../banned_usage_config.dart' as banned_usage_config;
+import '../../config/avoid_ignoring_return_values_config.dart'
+    as airv_config;
 import '../../element_identifier_utils.dart';
 import '../../fixes/code_quality/avoid_substring_todo_fix.dart';
 import '../../fixes/code_quality/combine_adjacent_strings_fix.dart';
@@ -4165,6 +4167,14 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
 /// `insert*`, `remove*`, `update*`, `set*`) returning `bool` — are exempt
 /// too, since they are structurally identical to `List.add`.
 ///
+/// **Project config:** Add method names to the built-in allowlist via
+/// `analysis_options_custom.yaml`:
+/// ```yaml
+/// avoid_ignoring_return_values:
+///   safe_to_ignore:
+///     - myCustomMethod
+/// ```
+///
 /// **GOOD:**
 /// ```dart
 /// void example() {
@@ -4322,8 +4332,16 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
         returnType = expression.staticType;
       }
 
-      // Skip methods that are safe to ignore
+      // Skip methods that are safe to ignore (built-in allowlist).
       if (methodName != null && _safeToIgnore.contains(methodName)) return;
+
+      // Skip methods the project explicitly allowlisted via config
+      // (`avoid_ignoring_return_values: safe_to_ignore:` in
+      // analysis_options_custom.yaml).
+      if (methodName != null &&
+          airv_config.userSafeToIgnoreMethods.contains(methodName)) {
+        return;
+      }
 
       // Skip cascade targets (they return the cascade target)
       if (expression is MethodInvocation && expression.isCascaded) return;
