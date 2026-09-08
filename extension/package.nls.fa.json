@@ -356,7 +356,7 @@
   "config.property.systemHealth.systemMemoryWarningPercent.description": "هنگامی که درصد حافظه RAM آزاد در سراسر ماشین پایین تر از این درصد شود، ا cảnhا کن.",
   "config.property.systemHealth.devToolBudgetPercent.description": "درصد هدفی از حافظه RAM کل سیستم برای تمام ابزارهای توسعه (Dart، Flutter، Ollama). پانل کنترل هشدار می‌دهد اگر ابزارهای توسعه از این بودجه پشتیبانی کنند.",
   "config.property.systemHealth.workspaceHazardScan.description": "فایل های بسیار بزرگ (dump های حافظه، لاگ های بسیار بزرگ) را در زمان فعال سازی در کارگاه اسکن کنید که از نظارت فایل استثناء داده نشده اند. فایل های پوشش داده نشده می توانند حافظه را به کنار ببرند و VS Code را خاموش کنند.",
-  "config.property.systemHealth.extensionHostWarningGB.description": "Warn when the VS Code extension host process RSS exceeds this value (GB). The extension host running saropa_lints was invisible to the Dart process monitor and can exhaust memory independently.",
+  "config.property.systemHealth.extensionHostWarningGB.description": "هنگامی که RSS فرآیند میزبان افزونهٔ VS Code از این مقدار (گیگابایت) فراتر رود هشدار بده. فرآیند میزبان افزونه‌ای که saropa_lints را اجرا می‌کند برای نظارت‌گر فرآیندهای Dart نامرئی بود و می‌تواند به‌طور مستقل حافظه را تمام کند.",
   "command.toggleDebugPanel.title": "Saropa Lints: پنل سلامت را نمایش دهید (موتورها + فرآیندها)",
   "command.lspServer.start.title": "Saropa Lints: سرویس سر버 LSP را شروع کنید",
   "command.lspServer.stop.title": "Saropa Lints: متوقف کردن سرور LSP",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2384,
+  "ruleCount": 2385,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -15213,6 +15213,27 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Replace \"any\" with a bounded constraint, e.g. ^1.2.3 or \">=1.2.3 <2.0.0\".",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "avoid_unbounded_image_in_full_bleed_container": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "media",
+        "performance"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Pass width/height (matching the ancestor's actual render box, e.g. via MediaQuery) or cacheWidth/cacheHeight to bound the decode.",
       "owasp": {
         "mobile": [],
         "web": []

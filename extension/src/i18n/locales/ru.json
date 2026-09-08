@@ -965,7 +965,7 @@
       "driftAuthRequiredTitle": "Найден сервер Drift Advisor, но требуется токен аутентификации — установите saropaLints.driftAdvisor.authToken",
       "driftAuthRequiredPill": "Drift требует токен",
       "driftAuthFailedTitle": "Drift Advisor отклонил настроенный токен аутентификации — нажмите, чтобы обновить его",
-      "driftAuthFailedPill": "Drift auth failed",
+      "driftAuthFailedPill": "Ошибка авторизации Drift",
       "enabledRulesTitle": "Правила, включенные в текущий уровень.",
       "rulesCount": "{count} правил",
       "regressionTitle": "Оценка здоровья снизилась с {previousScore} до {currentScore}",

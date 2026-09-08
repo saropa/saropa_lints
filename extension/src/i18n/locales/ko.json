@@ -1226,7 +1226,7 @@
       "columnFile": "파일파일 파일이",
       "columnLine": "라인 라인",
       "columnRule": "규칙 규정 규칙",
-      "columnKind": "Kind",
+      "columnKind": "종류",
       "columnAction": "작동"
     },
     "suppressions": {

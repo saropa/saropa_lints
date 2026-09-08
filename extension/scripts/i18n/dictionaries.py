@@ -23,6 +23,8 @@ DO_NOT_TRANSLATE: list[str] = [
     "saropa_quality_gate.yaml thresholds",
     "saropa_tier",
     "{grade} · {score}/100",
+    # Dart analyzer comment directive — literal code syntax, never translated.
+    "// ignore_for_file:",
 ]
 
 # Words that are spelled identically in specific locales (cognates, loanwords,
@@ -40,6 +42,10 @@ COGNATES: dict[str, list[str]] = {
     # "{detail} in {sections}" — "in" is a preposition in German/Italian too;
     # no translatable words remain after placeholders.
     "{detail} in {sections}": ["de", "it"],
+    # "baseline" is a common English loanword in Italian/Dutch software and
+    # security jargon (e.g. "baseline di sicurezza"); both locale files
+    # already keep "Drift"/"auth" untranslated in the same UI area.
+    "baseline": ["it", "nl"],
 }
 
 # cspell:disable
@@ -64,6 +70,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Saropa Lints: Fix Stale Ignore Comments": "Saropa Lints: Verouderde ignore-opmerkingen corrigeren",
         # Walkthrough link label — "rondleiding" is the standard Dutch term for a guided tour/walkthrough.
         "Open Walkthrough": "Rondleiding openen",
+        # "Drift" and "auth" stay untranslated here — see driftAuthRequiredPill
+        # ("Drift vereist token") and baselineSaveFailed ("baseline") already
+        # in nl.json for the established convention in this UI area.
+        "Drift auth failed": "Drift auth mislukt",
+        "Workspace Readiness Issues": "Problemen met werkruimtegereedheid",
         "Search": "Zoeken",
         "Search packages": "Zoeken",
         "Search packages…": "Zoeken",
@@ -617,6 +628,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
+        # Curated passthrough: "Error" is spelled identically in Spanish; ru.json
+        # already renders the sibling key as "Saropa Lints: Ошибка" (brand kept, only the noun translated).
+        "Saropa Lints: Error": "Saropa Lints: Error",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         "Search": "Buscar",
@@ -688,6 +702,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{label}: {size}": "{label}: {size}",
         # Curated passthrough: two placeholders joined by the preposition "in", which is spelled identically in Italian; no translatable words remain.
         "{detail} in {sections}": "{detail} in {sections}",
+        # Setting description for the extension-host RSS warning threshold.
+        "Warn when the VS Code extension host process RSS exceeds this value (GB). The extension host running saropa_lints was invisible to the Dart process monitor and can exhaust memory independently.": "Avvisa quando la RSS del processo host dell'estensione di VS Code supera questo valore (GB). Il processo host che esegue saropa_lints era invisibile al monitor dei processi Dart e può esaurire la memoria in modo indipendente.",
         "Search": "Cerca",
         "Saropa Lints UI language": "Lingua interfaccia Saropa Lints",
         "Choose language for sidebar and dashboards": "Scegli la lingua per barra laterale e dashboard",
@@ -832,6 +848,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
+        # "Drift" stays untranslated per driftAuthRequiredPill ("Drift требует токен") already in ru.json.
+        "Drift auth failed": "Ошибка авторизации Drift",
         "Search": "Поиск",
         "Saropa Lints UI language": "Язык интерфейса Saropa Lints",
         "Choose language for sidebar and dashboards": "Выберите язык боковой панели и панелей",
@@ -950,6 +968,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{label}: {size}": "{label}: {size}",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
+        # Table column header (suppressions table: ignore-comment vs. baseline).
+        "Kind": "종류",
         "Search": "검색",
         "Saropa Lints UI language": "Saropa Lints UI 언어",
         "Choose language for sidebar and dashboards": "사이드바와 대시보드 언어 선택",
@@ -1260,6 +1280,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{label}: {size}": "{label}: {size}",
         # Curated passthrough: Saropa brand (never translated) + colon + {message} placeholder; nothing translatable remains.
         "Saropa Lints: {message}": "Saropa Lints: {message}",
+        # Setting description for the extension-host RSS warning threshold.
+        "Warn when the VS Code extension host process RSS exceeds this value (GB). The extension host running saropa_lints was invisible to the Dart process monitor and can exhaust memory independently.": "هنگامی که RSS فرآیند میزبان افزونهٔ VS Code از این مقدار (گیگابایت) فراتر رود هشدار بده. فرآیند میزبان افزونه‌ای که saropa_lints را اجرا می‌کند برای نظارت‌گر فرآیندهای Dart نامرئی بود و می‌تواند به‌طور مستقل حافظه را تمام کند.",
         "#": "#",
         # Curated passthrough: bullet glyph + bare {dep} placeholder has no translatable content; the sibling tooltipDepShared carries the only translatable word "(shared)".
         "• {dep}": "• {dep}",
@@ -1350,8 +1372,16 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Manual: MT returned English unchanged — "Batayan" is the standard Filipino for a reference point
         # or starting measure, used in technical/project contexts.
         "Baseline": "Batayan",
+        # Lowercase form of the "Baseline" table-value above (suppressions column: "// ignore:", "// ignore_for_file:", "baseline").
+        "baseline": "batayan",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
+        # Curated passthroughs: "Extension host" and "RSS"/"heap" are kept in English elsewhere in fil.json
+        # (e.g. hostMemory: "Extension host na ginagamit {size}"); no translatable prose remains in either string.
+        "Extension host: {rss} RSS ({heap} / {heapTotal} heap)": "Extension host: {rss} RSS ({heap} / {heapTotal} heap)",
+        "⚠ Extension host: {size}": "⚠ Extension host: {size}",
+        # Curated passthrough: "Error" is a common loanword in Filipino tech UI; brand "Saropa Lints" never translated.
+        "Saropa Lints: Error": "Saropa Lints: Error",
         # Curated passthrough: format-only string (two placeholders + colon) has no translatable words.
         "{label}: {size}": "{label}: {size}",
         # Manual: MT hallucinated trailing clauses ("ang iyong katawan", doubled "deps deps") on these short technical tooltips.

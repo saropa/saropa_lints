@@ -66,7 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.2.0] — Unreleased
+## [16.2.0]
+
+The audit command now gives you complete visibility into suppressed warnings across your codebase, revealing exactly what is being silenced in your project. A new diagnostic flags unbounded images that waste memory, while the extension introduces robust workspace hazard scans and a fully collapsible Findings Dashboard. [log](https://github.com/saropa/saropa_lints/blob/v16.2.0/CHANGELOG.md)
 
 ### Added
 

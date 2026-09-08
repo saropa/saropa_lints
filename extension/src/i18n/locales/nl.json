@@ -828,7 +828,7 @@
   },
   "workspaceReadiness": {
     "allClear": "Workspace klaarheid: alles in orde — geen problemen gevonden.",
-    "quickPickTitle": "Workspace Readiness Issues",
+    "quickPickTitle": "Problemen met werkruimtegereedheid",
     "quickPickPlaceholder": "Selecteer een probleem voor meer informatie of om het te verhelpen",
     "statusBar": {
       "red": "🔴 {count} werkruimte probleem(en)",
@@ -965,7 +965,7 @@
       "driftAuthRequiredTitle": "Drift Advisor server gevonden maar vereist een auth token — stel saropaLints.driftAdvisor.authToken",
       "driftAuthRequiredPill": "Drift vereist token",
       "driftAuthFailedTitle": "Drift Advisor heeft de geconfigureerde auth token geweigerd — klik om het te bijwerken",
-      "driftAuthFailedPill": "Drift auth failed",
+      "driftAuthFailedPill": "Drift auth mislukt",
       "enabledRulesTitle": "Ingestelde regels in de huidige tier.",
       "rulesCount": "{count} regels",
       "regressionTitle": "Gezondheidscore is gedaald van {previousScore} naar {currentScore}",

@@ -356,7 +356,7 @@
   "config.property.systemHealth.systemMemoryWarningPercent.description": "Avvisa quando la RAM fisica libera su tutta la macchina scende al di sotto di questa percentuale.",
   "config.property.systemHealth.devToolBudgetPercent.description": "Percentuale target di RAM totale del sistema per tutti gli strumenti di sviluppo (Dart, Flutter, Ollama). Il dashboard avvisa quando gli strumenti di sviluppo superano questo budget.",
   "config.property.systemHealth.workspaceHazardScan.description": "Analizza lo workspace all'attivazione per file pericolosamente grandi (dump heap, log sovrabbondanti) non esclusi dal watcher dei file. I file non coperti possono esaurire la memoria e causare il crash di VS Code.",
-  "config.property.systemHealth.extensionHostWarningGB.description": "Warn when the VS Code extension host process RSS exceeds this value (GB). The extension host running saropa_lints was invisible to the Dart process monitor and can exhaust memory independently.",
+  "config.property.systemHealth.extensionHostWarningGB.description": "Avvisa quando la RSS del processo host dell'estensione di VS Code supera questo valore (GB). Il processo host che esegue saropa_lints era invisibile al monitor dei processi Dart e può esaurire la memoria in modo indipendente.",
   "command.toggleDebugPanel.title": "Saropa Lints: Mostra pannello Salute (Motori + Processi)",
   "command.lspServer.start.title": "Saropa Lints: Avvia Server LSP",
   "command.lspServer.stop.title": "Saropa Lints: Fermata Server LSP",
