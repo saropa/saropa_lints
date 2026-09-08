@@ -178,3 +178,45 @@ class _GoodTestHookState extends State<MyWidget> {
   @override
   Widget build(BuildContext context) => Text('hooked');
 }
+
+// GOOD: WidgetsBindingObserver's callback methods are mandated by the
+// mixin's public contract, exactly like State's own lifecycle methods —
+// the framework calls them by exact public name, so a private rename
+// would silently stop the callback from firing with no compile error.
+class _GoodObserverState extends State<MyWidget> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {}
+
+  @override
+  void didChangeLocales(List<Locale>? locales) {}
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+// BAD: a public method that merely happens to share a mixin-related class
+// but is not part of the mixed-in interface's contract must still be
+// flagged — the exemption is scoped to the mixin's own callback names,
+// not to every method on a class that mixes in a framework interface.
+class _BadObserverExtraMethodState extends State<MyWidget> with WidgetsBindingObserver {
+  // expect_lint: avoid_public_members_in_states
+  void refreshFromObserver() {}
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {}
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}

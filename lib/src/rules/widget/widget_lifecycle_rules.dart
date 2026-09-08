@@ -5113,6 +5113,34 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
     'setState',
   };
 
+  /// Callback method names mandated by common Flutter framework mixins,
+  /// keyed by the mixin's source name as it appears in a `with` clause.
+  /// The framework looks these up by their exact public spelling (e.g.
+  /// `WidgetsBinding` calls `didChangeAppLifecycleState` on every
+  /// registered `WidgetsBindingObserver`), so — like `_frameworkRequiredMethods`
+  /// above — their visibility is not a choice the author made and a private
+  /// rename would silently break dispatch with no compile error. Only
+  /// exempted when the class actually mixes in the matching type, so an
+  /// unrelated public method that happens to share a name is still flagged.
+  static const Map<String, Set<String>> _mixinRequiredMethodsByType = <String, Set<String>>{
+    'WidgetsBindingObserver': <String>{
+      'didChangeAppLifecycleState',
+      'didChangePlatformBrightness',
+      'didChangeMetrics',
+      'didChangeTextScaleFactor',
+      'didChangeLocales',
+      'didChangeAccessibilityFeatures',
+      'didHaveMemoryPressure',
+      'didRequestAppExit',
+    },
+    'RouteAware': <String>{
+      'didPush',
+      'didPop',
+      'didPushNext',
+      'didPopNext',
+    },
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -5123,14 +5151,34 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       // other class is a normal, supported part of that class's API.
       if (!_isStateSubclass(node)) return;
 
+      final Set<String> mixinExemptMethods = _mixinExemptMethods(node);
+
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           _checkField(reporter, member);
         } else if (member is MethodDeclaration) {
-          _checkMethod(reporter, member);
+          _checkMethod(reporter, member, mixinExemptMethods);
         }
       }
     });
+  }
+
+  /// Collects the set of method names exempt from this rule because the
+  /// class mixes in a framework interface (`with WidgetsBindingObserver`,
+  /// `with RouteAware`, ...) whose callback methods are named in
+  /// [_mixinRequiredMethodsByType]. Checked syntactically against the
+  /// `with` clause's type names, consistent with this file's other
+  /// non-type-resolved checks.
+  Set<String> _mixinExemptMethods(ClassDeclaration node) {
+    final WithClause? withClause = node.withClause;
+    if (withClause == null) return const <String>{};
+
+    final Set<String> exempt = <String>{};
+    for (final NamedType mixinType in withClause.mixinTypes) {
+      final Set<String>? methods = _mixinRequiredMethodsByType[mixinType.name.lexeme];
+      if (methods != null) exempt.addAll(methods);
+    }
+    return exempt;
   }
 
   /// Flags each public (non-underscore) variable in a field declaration.
@@ -5151,10 +5199,15 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   /// Flags a public (non-underscore) method unless it is one of the
   /// framework-mandated lifecycle overrides, or explicitly marked as an
   /// intentional public surface via `@visibleForTesting` / `@protected`.
-  void _checkMethod(SaropaDiagnosticReporter reporter, MethodDeclaration node) {
+  void _checkMethod(
+    SaropaDiagnosticReporter reporter,
+    MethodDeclaration node,
+    Set<String> mixinExemptMethods,
+  ) {
     final String name = node.name.lexeme;
     if (name.startsWith('_')) return;
     if (_frameworkRequiredMethods.contains(name)) return;
+    if (mixinExemptMethods.contains(name)) return;
 
     // Operators (==, [], etc.) have a mandatory public spelling defined by
     // the language, not the author — excluding them avoids flagging a
