@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
-import type { DartProcessSnapshot, HealthAssessment } from './types';
+import type { DartProcessSnapshot, ExtensionHostMemory, HealthAssessment } from './types';
 import { HealthLevel, HealthTrigger } from './types';
 import {
   buildSnapshot,
@@ -25,6 +25,8 @@ export interface SystemHealthConfig {
   analysisServerWarningGB: number;
   /** Percent of free system-wide RAM below which the whole-machine warning fires. */
   systemMemoryWarningPercent: number;
+  /** GB threshold for extension host RSS — fires a status bar warning when exceeded. */
+  extensionHostWarningGB: number;
 }
 
 export function readSystemHealthConfig(): SystemHealthConfig {
@@ -39,6 +41,7 @@ export function readSystemHealthConfig(): SystemHealthConfig {
     showNotifications: cfg.get<boolean>('showNotifications', true),
     analysisServerWarningGB: cfg.get<number>('analysisServerWarningGB', 4),
     systemMemoryWarningPercent: cfg.get<number>('systemMemoryWarningPercent', 15),
+    extensionHostWarningGB: cfg.get<number>('extensionHostWarningGB', 1),
   };
 }
 
@@ -179,6 +182,10 @@ export class ProcessMonitor implements vscode.Disposable {
   private lastSnapshot: DartProcessSnapshot | undefined;
   /** Ring buffer of recent saropa RSS values for trend detection. */
   private readonly saropaRssHistory: number[] = [];
+  /** Ring buffer of extension host RSS for trend detection (parallels saropaRssHistory). */
+  private readonly hostRssHistory: number[] = [];
+  /** Last sampled extension host memory, exposed for status bar / tooltip. */
+  private lastHostMemory: ExtensionHostMemory | undefined;
   /** Whether a leak-detection notification has already been shown this session. */
   private leakNotificationShown = false;
   // Separate throttle timestamps from lastNotificationTime (the saropa-RSS
@@ -226,6 +233,21 @@ export class ProcessMonitor implements vscode.Disposable {
     return this.lastSystemMemory;
   }
 
+  /** Last sampled extension host process memory, for status bar / tooltip use. */
+  getLastHostMemory(): ExtensionHostMemory | undefined {
+    return this.lastHostMemory;
+  }
+
+  /** Returns a snapshot of the extension host RSS history for trend detection. */
+  getHostRssHistory(): readonly number[] {
+    return [...this.hostRssHistory];
+  }
+
+  /** Trend direction for extension host RSS over recent polls. */
+  getHostTrend(): RssTrend {
+    return computeRssTrend(this.hostRssHistory.slice(-TREND_WINDOW));
+  }
+
   /** Delegates to the pure computeRssTrend with the most recent samples. */
   getSaropaTrend(): RssTrend {
     // Only the last TREND_WINDOW samples drive the trend arrow — the full
@@ -250,6 +272,10 @@ export class ProcessMonitor implements vscode.Disposable {
       if (this.saropaRssHistory.length > SPARKLINE_WINDOW) {
         this.saropaRssHistory.shift();
       }
+      // Sample the extension host's own memory — this is the Node.js process
+      // running this extension, which was invisible to the WMI-based Dart
+      // monitor during the 2026-09-05 crash.
+      this.sampleHostMemory();
       const config = readSystemHealthConfig();
       const assessment = assessHealth(snapshot, config);
 
@@ -281,6 +307,28 @@ export class ProcessMonitor implements vscode.Disposable {
       }
     } catch {
       // Next poll will retry.
+    }
+  }
+
+  /**
+   * Sample the Node.js extension host process memory via `process.memoryUsage()`.
+   * Cheap (no shell-out, no WMI) and always available — unlike the Dart process
+   * query, this never fails on non-Windows platforms.
+   */
+  private sampleHostMemory(): void {
+    const mem = process.memoryUsage();
+    this.lastHostMemory = {
+      rssBytes: mem.rss,
+      heapUsedBytes: mem.heapUsed,
+      heapTotalBytes: mem.heapTotal,
+      externalBytes: mem.external,
+      arrayBuffersBytes: mem.arrayBuffers,
+      timestamp: Date.now(),
+    };
+    // Track RSS in a ring buffer parallel to the saropa one.
+    this.hostRssHistory.push(mem.rss);
+    if (this.hostRssHistory.length > SPARKLINE_WINDOW) {
+      this.hostRssHistory.shift();
     }
   }
 

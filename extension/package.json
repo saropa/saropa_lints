@@ -943,6 +943,11 @@
         "icon": "$(dashboard)"
       },
       {
+        "command": "saropaLints.showWorkspaceReadiness",
+        "title": "%command.showWorkspaceReadiness.title%",
+        "icon": "$(checklist)"
+      },
+      {
         "command": "saropaLints.setAnalysisServerHeapCap",
         "title": "%command.setAnalysisServerHeapCap.title%",
         "icon": "$(gear)"
@@ -2178,6 +2183,18 @@
             "minimum": 10,
             "maximum": 95,
             "description": "%config.property.systemHealth.devToolBudgetPercent.description%"
+          },
+          "saropaLints.systemHealth.extensionHostWarningGB": {
+            "type": "number",
+            "default": 1,
+            "minimum": 0.25,
+            "maximum": 8,
+            "description": "%config.property.systemHealth.extensionHostWarningGB.description%"
+          },
+          "saropaLints.systemHealth.workspaceHazardScan": {
+            "type": "boolean",
+            "default": true,
+            "description": "%config.property.systemHealth.workspaceHazardScan.description%"
           }
         }
       },

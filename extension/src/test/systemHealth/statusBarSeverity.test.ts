@@ -53,6 +53,8 @@ const CONFIG: SystemHealthConfig = {
   showNotifications: true,
   analysisServerWarningGB: 4,
   systemMemoryWarningPercent: 15,
+  // Extension host RSS threshold — matches the default shipped in package.json.
+  extensionHostWarningGB: 1,
 };
 
 const MB = 1024 * 1024;

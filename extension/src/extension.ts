@@ -165,7 +165,11 @@ import { HealthPanel } from './systemHealth/healthPanel';
 import { MachineDashboard } from './systemHealth/machineDashboard';
 import { registerMachineDashboardCommands } from './systemHealth/machineDashboardCommands';
 import { querySystemMemory } from './systemHealth/systemQuery';
+import { auditWatcherExcludes } from './systemHealth/watcherExcludeAudit';
+import { scanWorkspaceForHazards } from './systemHealth/workspaceHazardScan';
+import { gatherReadiness, readinessStatusBarText, showWorkspaceReadiness, ReadinessLevel } from './systemHealth/workspaceReadiness';
 import { HealthLevel } from './systemHealth/types';
+import type { ExtensionHostMemory } from './systemHealth/types';
 import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
@@ -1144,6 +1148,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Saropa RSS trend and history from the process monitor's ring buffer.
   let saropaTrend: RssTrend = RssTrend.Unknown;
   let saropaRssHistory: readonly number[] = [];
+  // Extension host memory and trend — the Node.js process running this extension.
+  let hostMemory: ExtensionHostMemory | undefined;
+  let hostTrend: RssTrend = RssTrend.Unknown;
   // Full assessment (level plus what tripped it), not just the level: the
   // status bar has to name the trigger, and re-deriving it here would let
   // this file and the monitor disagree the next time thresholds change.
@@ -1155,6 +1162,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Plugin-level memory pressure state — fed by the MemoryPressureWatcher
   // watching memory_state.json. Takes priority over process-level health.
   let memoryPressureState: MemoryPressureState | null = null;
+  // Cached workspace readiness — refreshed once at activation and whenever
+  // the readiness command is invoked. Avoids running the filesystem-heavy
+  // hazard scan on every status bar poll tick.
+  let cachedReadinessText: string | undefined;
 
   /**
    * Pick the background for the memory status bar item.
@@ -1208,6 +1219,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     assessment: HealthAssessment,
     trend: RssTrend,
     rssHistory: readonly number[] = [],
+    extHost?: ExtensionHostMemory,
+    extHostTrend: RssTrend = RssTrend.Unknown,
   ): string[] {
     const lines: string[] = [];
 
@@ -1287,6 +1300,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       }
     }
 
+    // --- Extension host (the Node.js process running this extension) ---
+    if (extHost) {
+      const hostTrendSuffix = extHostTrend === RssTrend.Rising ? ' ↑'
+        : extHostTrend === RssTrend.Falling ? ' ↓'
+        : extHostTrend === RssTrend.Stable ? ' →' : '';
+      lines.push(l10n('systemHealth.tooltip.extensionHostSection', {
+        rss: formatBytes(extHost.rssBytes),
+        heap: formatBytes(extHost.heapUsedBytes),
+        heapTotal: formatBytes(extHost.heapTotalBytes),
+      }) + hostTrendSuffix);
+    }
+
     // --- Health hints (saropa-owned only) ---
     if (assessment.level === HealthLevel.Warning) {
       lines.push(l10n('systemHealth.tooltip.warningHint'));
@@ -1313,7 +1338,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
     // Per-process breakdown in the tooltip (separate from the status text).
     if (systemHealthSnapshot) {
-      tooltipLines.push(...buildProcessTooltipLines(systemHealthSnapshot, systemHealthAssessment, saropaTrend, saropaRssHistory));
+      tooltipLines.push(...buildProcessTooltipLines(systemHealthSnapshot, systemHealthAssessment, saropaTrend, saropaRssHistory, hostMemory, hostTrend));
     }
 
     // Machine-wide RAM: show in tooltip always (when available), and promote
@@ -1336,6 +1361,27 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           total: formatBytes(systemMem.totalBytes),
         });
       }
+    }
+
+    // Extension host RSS warning — surface when no higher-priority issue is
+    // showing and the host process itself is consuming too much memory.
+    // This was the blind spot in the 2026-09-05 crash: Dart processes
+    // were fine, but the Electron/Node host exhausted memory.
+    if (!text && hostMemory) {
+      const hostConfig = vscode.workspace.getConfiguration('saropaLints.systemHealth');
+      const hostWarningGB = hostConfig.get<number>('extensionHostWarningGB', 1);
+      const hostRssGB = hostMemory.rssBytes / 1_073_741_824;
+      if (hostRssGB >= hostWarningGB) {
+        text = l10n('systemHealth.statusBar.extensionHostWarning', {
+          size: formatBytes(hostMemory.rssBytes),
+        });
+      }
+    }
+
+    // Workspace readiness — lowest priority, shown only when no process-level
+    // or system-level health issue is already displayed.
+    if (!text && cachedReadinessText) {
+      text = cachedReadinessText;
     }
 
     if (!text) {
@@ -1382,10 +1428,74 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     return base;
   }
 
-  // Single unified status bar item showing lint score, tier, and vibrancy.
-  // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
-  // when the caller already has it (e.g. debouncedRefresh).
-  updateAllStatusBars = (preloadedData?: ViolationsData) => {
+  // Renders the status bar content when analysis is enabled — extracted from
+  // the main status bar update to keep each function under the 50-line limit.
+  function updateEnabledStatusBar(
+    preloadedData: ViolationsData | undefined,
+    root: string | undefined,
+    tier: string,
+    showVibrancy: boolean,
+    vibrancyLabel: string | null,
+  ): void {
+    // Live + disabled-filtered: the score matches the Problems panel and never
+    // counts a muted rule. (Was the raw, file-based readViolations.)
+    const data = preloadedData ?? (root ? readVisibleViolations(root) : null);
+    const health = data ? computeHealthScore(data) : null;
+    // Finding count folded into this single item (was a separate ⚠ entry).
+    const badge = findingsBadge(data);
+    const badgeSuffix = badge?.suffix ?? '';
+
+    // Memory/system-health state now renders in its own status bar item
+    // (updateMemoryStatusBar) rather than as a text suffix here.
+    updateMemoryStatusBar();
+
+    if (health) {
+      const history = loadHistory(context.workspaceState);
+      const prevScore = findPreviousScore(history);
+      const delta = prevScore === undefined ? '' : ` ${formatScoreDelta(health.score, prevScore)}`;
+      const detailLabel = buildStatusBarLabel({
+        hasHealth: true,
+        healthScore: health.score,
+        delta,
+        tier,
+        showVibrancy,
+        vibrancyLabel,
+      });
+      statusBarItem.text = `$(checklist) Saropa: ${detailLabel}${badgeSuffix}`;
+      statusBarItem.backgroundColor = undefined;
+    } else {
+      statusBarItem.text = `$(checklist) ${buildStatusBarLabel({
+        hasHealth: false,
+        tier,
+        showVibrancy,
+        vibrancyLabel,
+      })}${badgeSuffix}`;
+      statusBarItem.backgroundColor = undefined;
+    }
+    // "Score pending": we have a report but it covers too little of the
+    // project to score (partial IDE sweep) — surface a hint, not a blank.
+    const scorePending = health === null && data !== null && isReportTooPartial(data);
+    const tooltipLines = buildStatusBarTooltipLines(
+      tier,
+      health,
+      showVibrancy,
+      vibrancyLabel,
+      scorePending,
+    );
+    if (badge) tooltipLines.push(badge.tooltip);
+    // Memory/system-health detail moved to its own status bar item
+    // (updateMemoryStatusBar) — no longer duplicated in this tooltip.
+    // Rich tooltip: clickable action menu (toggle + report/panel shortcuts)
+    // instead of plain read-only text — mirrors saropa-log-capture's
+    // status bar menu tooltip pattern.
+    statusBarItem.tooltip = buildStatusBarTooltipMarkdown(tooltipLines, true);
+    statusBarItem.command = 'saropaLints.openViolationsWideReport';
+  }
+
+  // Inner implementation of updateAllStatusBars, extracted so the outer
+  // function can wrap it in a single try/catch without exceeding the
+  // 50-line function limit.
+  function updateAllStatusBarsInner(preloadedData?: ViolationsData): void {
     if (!isDartProject) {
       // Surface the version even outside a Dart workspace so users can verify
       // that a fresh build has loaded — previously the bar was hidden here and
@@ -1414,60 +1524,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const vibrancyLabel = showVibrancy ? `${Math.round(vibrancyData!.averageScore / 10)}/10` : null;
 
     if (en) {
-      const root = statusBarRoot;
-      // Live + disabled-filtered: the score matches the Problems panel and never
-      // counts a muted rule. (Was the raw, file-based readViolations.)
-      const data = preloadedData ?? (root ? readVisibleViolations(root) : null);
-      const health = data ? computeHealthScore(data) : null;
-      // Finding count folded into this single item (was a separate ⚠ entry).
-      const badge = findingsBadge(data);
-      const badgeSuffix = badge?.suffix ?? '';
-
-      // Memory/system-health state now renders in its own status bar item
-      // (updateMemoryStatusBar) rather than as a text suffix here.
-      updateMemoryStatusBar();
-
-      if (health) {
-        const history = loadHistory(context.workspaceState);
-        const prevScore = findPreviousScore(history);
-        const delta = prevScore === undefined ? '' : ` ${formatScoreDelta(health.score, prevScore)}`;
-        const detailLabel = buildStatusBarLabel({
-          hasHealth: true,
-          healthScore: health.score,
-          delta,
-          tier,
-          showVibrancy,
-          vibrancyLabel,
-        });
-        statusBarItem.text = `$(checklist) Saropa: ${detailLabel}${badgeSuffix}`;
-        statusBarItem.backgroundColor = undefined;
-      } else {
-        statusBarItem.text = `$(checklist) ${buildStatusBarLabel({
-          hasHealth: false,
-          tier,
-          showVibrancy,
-          vibrancyLabel,
-        })}${badgeSuffix}`;
-        statusBarItem.backgroundColor = undefined;
-      }
-      // "Score pending": we have a report but it covers too little of the
-      // project to score (partial IDE sweep) — surface a hint, not a blank.
-      const scorePending = health === null && data !== null && isReportTooPartial(data);
-      const tooltipLines = buildStatusBarTooltipLines(
-        tier,
-        health,
-        showVibrancy,
-        vibrancyLabel,
-        scorePending,
-      );
-      if (badge) tooltipLines.push(badge.tooltip);
-      // Memory/system-health detail moved to its own status bar item
-      // (updateMemoryStatusBar) — no longer duplicated in this tooltip.
-      // Rich tooltip: clickable action menu (toggle + report/panel shortcuts)
-      // instead of plain read-only text — mirrors saropa-log-capture's
-      // status bar menu tooltip pattern.
-      statusBarItem.tooltip = buildStatusBarTooltipMarkdown(tooltipLines, en);
-      statusBarItem.command = 'saropaLints.openViolationsWideReport';
+      updateEnabledStatusBar(preloadedData, statusBarRoot, tier, showVibrancy, vibrancyLabel);
     } else {
       statusBarItem.text = '$(checklist) Saropa Lints: Off';
       statusBarItem.tooltip = buildStatusBarTooltipMarkdown(
@@ -1479,6 +1536,47 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       memoryStatusBarItem.hide();
     }
     statusBarItem.show();
+  }
+
+  // Single unified status bar item showing lint score, tier, and vibrancy.
+  // Accepts optional pre-loaded data to avoid re-reading violations.json from disk
+  // when the caller already has it (e.g. debouncedRefresh).
+  //
+  // Top-level try/catch: if anything throws (corrupted workspaceState after
+  // a VS Code hard crash, a malformed violations.json, an unexpected null)
+  // the status bar MUST still render. Without this, statusBarItem.show()
+  // never executes and the bar silently disappears — the user sees nothing
+  // and has no idea the extension is broken. The catch block shows a visible
+  // error state so the user can at least click through to About/diagnostics.
+  updateAllStatusBars = (preloadedData?: ViolationsData) => {
+    try {
+      updateAllStatusBarsInner(preloadedData);
+    } catch (err) {
+      // Log to the shared output channel so the error is discoverable in
+      // "Saropa Lints" output panel — console.error alone is invisible
+      // to most users.
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('[Saropa Lints] updateAllStatusBars failed:', err);
+      getSharedOutputChannel().appendLine(
+        `[ERROR] Status bar update failed: ${message}`,
+      );
+
+      // Render a visible error state — the bar must ALWAYS show so the user
+      // knows the extension is loaded but degraded.
+      statusBarItem.text = `$(error) ${l10n('statusBar.error.label')}`;
+      statusBarItem.tooltip = l10n('statusBar.error.tooltip');
+      statusBarItem.backgroundColor = new vscode.ThemeColor(
+        'statusBarItem.errorBackground',
+      );
+      // Safe fallback command — About panel works without any project state.
+      statusBarItem.command = 'saropaLints.showAbout';
+      statusBarItem.show();
+
+      // Hide the memory bar — its data may also be stale/corrupt, and
+      // showing a healthy-looking memory readout next to an error is
+      // misleading.
+      memoryStatusBarItem.hide();
+    }
   };
   updateAllStatusBars();
 
@@ -1492,6 +1590,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // Update trend and history after the monitor records the new RSS sample.
     saropaTrend = processMonitor.getSaropaTrend();
     saropaRssHistory = processMonitor.getRssHistory();
+    // Extension host memory — sampled on each poll alongside Dart processes.
+    hostMemory = processMonitor.getLastHostMemory();
+    hostTrend = processMonitor.getHostTrend();
     updateAllStatusBars();
   });
   processMonitor.start();
@@ -1552,6 +1653,24 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // an earlier session). Registers its command immediately but defers the
   // process-table scan well past activation — see orphanPreflight.ts.
   registerOrphanPreflight(context);
+  // One-shot audit of files.watcherExclude — recommends patterns that keep
+  // VS Code's file watcher from tracking multi-GB heap dumps, build output,
+  // and tooling caches that can exhaust memory and crash the host. Fires
+  // first (10 s) so its patterns are in place before the hazard scan runs.
+  setTimeout(() => void auditWatcherExcludes(context), 10_000);
+  // One-shot scan for dangerously large files (heap dumps, oversized logs)
+  // that the file watcher would try to track. Runs after the audit (15 s)
+  // so files the user just auto-excluded don't trigger a redundant warning.
+  setTimeout(() => void scanWorkspaceForHazards(), 15_000);
+  // Compute initial workspace readiness after the hazard scan has had time
+  // to run (20 s). The cached result feeds the status bar without re-running
+  // the filesystem walk on every poll tick.
+  setTimeout(() => {
+    void gatherReadiness(processMonitor.getLastHostMemory()).then((r) => {
+      cachedReadinessText = readinessStatusBarText(r);
+      updateMemoryStatusBar();
+    });
+  }, 20_000);
   // Heap-cap and Ollama-unload actions the Machine Health dashboard's
   // Recommendations panel dispatches by command name (see machineDashboard.ts's
   // handleMessage) — registered independently of the panel so they also work
@@ -1563,6 +1682,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.showMachineDashboard', () => {
       MachineDashboard.createOrShow(context);
+    }),
+    // Workspace readiness — combines hazard scan, watcher audit, and host
+    // memory into a single actionable quick-pick.
+    vscode.commands.registerCommand('saropaLints.showWorkspaceReadiness', () => {
+      void showWorkspaceReadiness(processMonitor.getLastHostMemory());
     }),
   );
 

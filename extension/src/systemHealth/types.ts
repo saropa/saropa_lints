@@ -57,3 +57,24 @@ export interface HealthAssessment {
   /** Combined Flutter-daemon + scan-daemon orphan count behind the trigger. */
   orphanCount: number;
 }
+
+/**
+ * Point-in-time snapshot of the VS Code extension host Node.js process
+ * memory, from `process.memoryUsage()`. Tracked separately from Dart
+ * processes because the host's own heap exhaustion was the root cause
+ * of the 2026-09-05 crash — the existing WMI monitor was blind to it.
+ */
+export interface ExtensionHostMemory {
+  /** Resident set size — total memory allocated to the Node.js process. */
+  rssBytes: number;
+  /** V8 heap actually in use. */
+  heapUsedBytes: number;
+  /** V8 heap allocated (including free regions waiting for GC). */
+  heapTotalBytes: number;
+  /** Memory used by C++ objects bound to JS (Buffers, etc.). */
+  externalBytes: number;
+  /** SharedArrayBuffer + ArrayBuffer memory. */
+  arrayBuffersBytes: number;
+  /** Millisecond timestamp when the sample was taken. */
+  timestamp: number;
+}

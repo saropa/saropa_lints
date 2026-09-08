@@ -66,6 +66,34 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.2.0] — Unreleased
+
+### Added
+
+- `dart run saropa_lints audit` now supports `--include-suppressed`, which adds findings normally dropped by `// ignore:`, `// ignore_for_file:`, or a baseline entry back into the report, each tagged with a `suppressedBy` field (`ignore`, `ignore_for_file`, or `baseline`). Useful for a true "everything" audit that shows what's being silenced, not just what's currently surfaced. No action required — default `audit` output is unchanged.
+
+### Added (Extension)
+
+- New file-watcher exclusion audit checks the workspace's `files.watcherExclude` setting on activation and recommends missing patterns for heap dumps, build output, and tooling caches that can crash VS Code when tracked. "Add All" writes them into workspace settings in one click; "Dismiss" suppresses the prompt permanently for that workspace.
+- Extension host process memory monitoring: the ProcessMonitor now samples the Node.js extension host RSS and heap on each poll, with trend tracking and a configurable warning threshold (`extensionHostWarningGB`, default 1 GB) that surfaces in the status bar — the blind spot behind the 2026-09-05 crash.
+- Workspace hazard scan: on activation, scans for dangerously large files (heap dumps, oversized logs, any file >100 MB) not excluded from the file watcher. Warns with a one-click action to add `files.watcherExclude` patterns. Disable via `saropaLints.systemHealth.workspaceHazardScan`.
+- Workspace readiness indicator: combines hazard scan, watcher exclude audit, and extension host memory into a single status bar signal with a `saropaLints.showWorkspaceReadiness` command that opens an actionable quick-pick listing each issue.
+- Every top-level section of the Findings Dashboard (Overview KPIs, Charts, TODO/HACK, Drift Advisor, Suppressions, Top Rules, Findings) is now individually collapsible via a native disclosure triangle. Each section remembers its open/closed state per workspace, and a collapsed section still shows its counter so you know how many items are inside without expanding it.
+- Unified every counter on the Findings Dashboard (chart totals, section headers, TODO/HACK counts, and the big KPI stat-card numbers) onto the same pill component already used by the status-line pills, for one consistent counter look across the page. Severity colors are unchanged.
+
+### Fixed (Extension)
+
+- Fixed silent status bar disappearance when `updateAllStatusBars` throws (e.g. corrupted `workspaceState` after a VS Code hard crash). The bar now catches errors, shows a visible `$(error) Saropa Lints: Error` state with an error-themed background, and logs to the output channel so the failure is discoverable.
+
+### Internal
+
+- Converted the workspace hazard scan's recursive directory walk from synchronous `fs.readdirSync`/`fs.statSync` to async `fs.promises.readdir`/`fs.promises.stat`, preventing the extension host thread from blocking on large workspaces. Subdirectory walks and file stat calls now fan out concurrently via `Promise.all`.
+- Extracted duplicate watcher-exclude merge logic (read config, spread, set keys, write at workspace level) from both `workspaceHazardScan.ts` and `watcherExcludeAudit.ts` into a shared `mergeWatcherExcludes` helper in `watcherExcludeHelpers.ts`.
+- Added a guard around the watcher-exclude audit's `workspaceState.get` call so a corrupted workspace state after a VS Code crash does not prevent the audit from running.
+- Fixed extension version scheme so stable releases supersede their betas on Marketplace and Open VSX. Stable versions now bump minor to the next even above the prerelease odd minor (e.g. `16.2.x` > `16.1.x`).
+
+---
+
 ## [16.0.1]
 
 Adds a "What's New" panel that surfaces on activation, flagging the v16 diagnostic engine change (LSP server replacing the Analyzer Plugin), the new machine health monitoring, and the sidebar redesign — with a one-click revert to the previous engine. [log](https://github.com/saropa/saropa_lints/blob/v16.0.1/CHANGELOG.md)

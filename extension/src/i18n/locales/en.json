@@ -713,6 +713,10 @@
     "reloadLater": "Later"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Error",
+      "tooltip": "Status bar update failed — click for details. The extension may still work; try running a command from the Command Palette."
+    },
     "menu": {
       "enableOn": "Analysis enabled (click to disable)",
       "enableOff": "Analysis disabled (click to enable)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} orphaned daemon(s)",
       "openHint": "Click to open Process Health",
       "systemRam": "System: {free} of {total} free",
-      "systemLow": "⚠ System: {free} of {total} free"
+      "systemLow": "⚠ System: {free} of {total} free",
+      "extensionHostWarning": "⚠ Extension host: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} process(es) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} analysis server(s) detected — close unused VS Code windows",
       "daemonCount": "Flutter daemons: {total} ({orphaned} orphaned)",
       "scanDaemonOrphans": "Orphaned scan daemons: {count} — use Clean Up to kill",
+      "extensionHostSection": "Extension host: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa memory is high — click for details",
       "criticalHint": "Saropa memory is critical — clean up recommended"
     },
@@ -806,6 +812,35 @@
       "kill": "Kill",
       "killed": "Killed",
       "killFailed": "Failed"
+    },
+    "watcherExclude": {
+      "prompt": "{count} recommended file-watcher exclusion(s) are missing from this workspace: {patterns}. Adding them prevents VS Code from tracking large build artifacts and heap dumps that waste memory.",
+      "addAll": "Add All",
+      "dismiss": "Dismiss",
+      "added": "Added {count} file-watcher exclusion(s) to workspace settings."
+    },
+    "hazardScan": {
+      "warning": "Found {count} large file(s) not excluded from the file watcher: {files}. These can exhaust memory and crash VS Code.",
+      "addExclusions": "Exclude from Watcher",
+      "dismiss": "Dismiss",
+      "added": "Added {count} watcher exclusion pattern(s) to workspace settings."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Workspace readiness: all clear — no issues found.",
+    "quickPickTitle": "Workspace Readiness Issues",
+    "quickPickPlaceholder": "Select an issue for details or to fix it",
+    "statusBar": {
+      "red": "🔴 {count} workspace issue(s)",
+      "yellow": "⚠ {count} workspace issue(s)"
+    },
+    "issue": {
+      "hazardFiles": "$(warning) {count} large unexcluded file(s)",
+      "hazardFilesDetail": "Large files tracked by the file watcher can exhaust memory and crash VS Code. Run the hazard scan to exclude them.",
+      "missingExcludes": "$(info) {count} missing watcher exclusion(s)",
+      "missingExcludesDetail": "Recommended file-watcher exclusion patterns are not configured. Adding them prevents unnecessary memory usage.",
+      "hostMemory": "$(alert) Extension host using {size}",
+      "hostMemoryDetail": "The extension host process RSS exceeds the warning threshold. Open Process Health for details."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "no files affected",
       "filesTitle": "Distinct files contributing at least one finding",
       "topRuleLabel": "Top rule",
-      "topRuleTitle": "Filter findings to rule {name}"
+      "topRuleTitle": "Filter findings to rule {name}",
+      "sectionHeading": "Overview",
+      "sectionAria": "Overview statistics"
     },
     "toolbar": {
       "ariaFiltersActions": "Filters and actions",
@@ -1010,6 +1047,8 @@
       "scopeChangedBranch": "Changed vs branch…",
       "branchPlaceholder": "branch name",
       "branchAria": "Branch to compare against",
+      "includeSuppressedLabel": "Include suppressed",
+      "includeSuppressedTitle": "Also include findings normally hidden by // ignore:, // ignore_for_file:, or a baseline entry — each marked with how it was suppressed. Your project's config is not changed.",
       "runButton": "Run audit",
       "runButtonTitle": "Run the full-project audit CLI and load its results here",
       "cancelButton": "Cancel",
@@ -1088,6 +1127,7 @@
     },
     "findings": {
       "sectionAria": "Findings",
+      "heading": "Findings",
       "expandAll": "Expand all",
       "collapseAll": "Collapse all",
       "bulkSelected": "{count} selected",
@@ -1101,6 +1141,8 @@
       "colActionsAria": "Row actions",
       "selectRowAria": "Select this finding row",
       "copyRowTitle": "Copy this finding as JSON",
+      "suppressedBadge": "Suppressed",
+      "suppressedByTitle": "Hidden from your normal view by {kind} — only visible here because \"Include suppressed\" is on",
       "metaShown": "{filtered} shown",
       "metaAfterDisable": "{total} after disabled-rule filter",
       "metaSourceCap": "source capped at {max} for performance",
