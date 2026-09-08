@@ -476,6 +476,10 @@ class GoogleSignInAuthTokenFromAuthenticateRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses staticType to exclude GoogleSignInClientAuthorization receivers.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'google_sign_in_auth_token_from_authenticate',
     '[google_sign_in_auth_token_from_authenticate] A .accessToken property '

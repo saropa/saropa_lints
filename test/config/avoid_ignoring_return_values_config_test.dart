@@ -50,10 +50,11 @@ void main() {
       '    - fireEvent\n'
       '    - _privateHelper\n',
     );
-    expect(
-      userSafeToIgnoreMethods,
-      {'computeHash', 'fireEvent', '_privateHelper'},
-    );
+    expect(userSafeToIgnoreMethods, {
+      'computeHash',
+      'fireEvent',
+      '_privateHelper',
+    });
   });
 
   test('quoted method names are accepted', () {

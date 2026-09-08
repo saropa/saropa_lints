@@ -2762,8 +2762,7 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
 
     // Negated expression: `-14`, `-(14.0)`, `-(14 * 2)`. Recurse into
     // the operand so nested parenthesized/arithmetic negations are caught.
-    if (expr is PrefixExpression &&
-        expr.operator.type == TokenType.MINUS) {
+    if (expr is PrefixExpression && expr.operator.type == TokenType.MINUS) {
       return _isHardcodedNumeric(expr.operand, depth + 1);
     }
 

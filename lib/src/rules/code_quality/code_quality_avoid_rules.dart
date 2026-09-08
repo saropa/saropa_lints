@@ -21,8 +21,7 @@ import 'package:meta/meta.dart';
 import '../../analyzer_metadata_compat_utils.dart';
 import '../../literal_context_utils.dart';
 import '../../banned_usage_config.dart' as banned_usage_config;
-import '../../config/avoid_ignoring_return_values_config.dart'
-    as airv_config;
+import '../../config/avoid_ignoring_return_values_config.dart' as airv_config;
 import '../../element_identifier_utils.dart';
 import '../../fixes/code_quality/avoid_substring_todo_fix.dart';
 import '../../fixes/code_quality/combine_adjacent_strings_fix.dart';

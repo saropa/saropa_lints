@@ -5123,7 +5123,8 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   /// rename would silently break dispatch with no compile error. Only
   /// exempted when the class actually mixes in the matching type, so an
   /// unrelated public method that happens to share a name is still flagged.
-  static const Map<String, Set<String>> _mixinRequiredMethodsByType = <String, Set<String>>{
+  static const Map<String, Set<String>>
+  _mixinRequiredMethodsByType = <String, Set<String>>{
     // Full member list per api.flutter.dev/flutter/widgets/WidgetsBindingObserver-class.html
     // (verified 2026-09-08) — a name-list approach must be kept in sync
     // manually as the SDK adds new callbacks (didChangeViewFocus and the
@@ -5148,19 +5149,12 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       'handleUpdateBackGestureProgress',
     },
     // Per api.flutter.dev/flutter/widgets/RouteAware-class.html.
-    'RouteAware': <String>{
-      'didPush',
-      'didPop',
-      'didPushNext',
-      'didPopNext',
-    },
+    'RouteAware': <String>{'didPush', 'didPop', 'didPushNext', 'didPopNext'},
     // wantKeepAlive is a getter (still a MethodDeclaration in the AST), not
     // a method, but AutomaticKeepAliveClientMixin mandates the same public
     // spelling: the framework reads it directly, not via an override
     // dispatch table, so it is equally non-optional for the author.
-    'AutomaticKeepAliveClientMixin': <String>{
-      'wantKeepAlive',
-    },
+    'AutomaticKeepAliveClientMixin': <String>{'wantKeepAlive'},
   };
 
   @override
@@ -5179,15 +5173,19 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       // allSupertypes is the expensive part of the resolved fallback, and
       // every public @override method on this class shares the same
       // answer for "which names does a Flutter SDK supertype declare".
-      final _FlutterSdkContractMembers flutterSdkContractMembers = _flutterSdkContractMembers(
-        classElement,
-      );
+      final _FlutterSdkContractMembers flutterSdkContractMembers =
+          _flutterSdkContractMembers(classElement);
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           _checkField(reporter, member);
         } else if (member is MethodDeclaration) {
-          _checkMethod(reporter, member, mixinExemptMethods, flutterSdkContractMembers);
+          _checkMethod(
+            reporter,
+            member,
+            mixinExemptMethods,
+            flutterSdkContractMembers,
+          );
         }
       }
     });
@@ -5209,7 +5207,8 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
     final WithClause? withClause = node.withClause;
     if (withClause != null) {
       for (final NamedType mixinType in withClause.mixinTypes) {
-        final Set<String>? methods = _mixinRequiredMethodsByType[mixinType.name.lexeme];
+        final Set<String>? methods =
+            _mixinRequiredMethodsByType[mixinType.name.lexeme];
         if (methods != null) exempt.addAll(methods);
       }
     }
@@ -5217,7 +5216,8 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
     final ImplementsClause? implementsClause = node.implementsClause;
     if (implementsClause != null) {
       for (final NamedType interfaceType in implementsClause.interfaces) {
-        final Set<String>? methods = _mixinRequiredMethodsByType[interfaceType.name.lexeme];
+        final Set<String>? methods =
+            _mixinRequiredMethodsByType[interfaceType.name.lexeme];
         if (methods != null) exempt.addAll(methods);
       }
     }
@@ -5298,7 +5298,9 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   /// whenever [classElement] is unavailable, e.g. because the analysis
   /// context has no Flutter SDK resolved — the syntactic
   /// [_mixinExemptMethods] table remains the primary path for that case.
-  _FlutterSdkContractMembers _flutterSdkContractMembers(InterfaceElement? classElement) {
+  _FlutterSdkContractMembers _flutterSdkContractMembers(
+    InterfaceElement? classElement,
+  ) {
     if (classElement == null) {
       return const _FlutterSdkContractMembers(<String>{}, <String>{});
     }
