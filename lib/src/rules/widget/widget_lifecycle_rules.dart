@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:meta/meta.dart';
 
 import '../../async_context_utils.dart';
@@ -5123,21 +5124,42 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   /// exempted when the class actually mixes in the matching type, so an
   /// unrelated public method that happens to share a name is still flagged.
   static const Map<String, Set<String>> _mixinRequiredMethodsByType = <String, Set<String>>{
+    // Full member list per api.flutter.dev/flutter/widgets/WidgetsBindingObserver-class.html
+    // (verified 2026-09-08) — a name-list approach must be kept in sync
+    // manually as the SDK adds new callbacks (didChangeViewFocus and the
+    // predictive-back handlers are recent additions).
     'WidgetsBindingObserver': <String>{
-      'didChangeAppLifecycleState',
-      'didChangePlatformBrightness',
-      'didChangeMetrics',
-      'didChangeTextScaleFactor',
-      'didChangeLocales',
       'didChangeAccessibilityFeatures',
+      'didChangeAppLifecycleState',
+      'didChangeLocales',
+      'didChangeMetrics',
+      'didChangePlatformBrightness',
+      'didChangeTextScaleFactor',
+      'didChangeViewFocus',
       'didHaveMemoryPressure',
+      'didPopRoute',
+      'didPushRoute',
+      'didPushRouteInformation',
       'didRequestAppExit',
+      'handleCancelBackGesture',
+      'handleCommitBackGesture',
+      'handleStartBackGesture',
+      'handleStatusBarTap',
+      'handleUpdateBackGestureProgress',
     },
+    // Per api.flutter.dev/flutter/widgets/RouteAware-class.html.
     'RouteAware': <String>{
       'didPush',
       'didPop',
       'didPushNext',
       'didPopNext',
+    },
+    // wantKeepAlive is a getter (still a MethodDeclaration in the AST), not
+    // a method, but AutomaticKeepAliveClientMixin mandates the same public
+    // spelling: the framework reads it directly, not via an override
+    // dispatch table, so it is equally non-optional for the author.
+    'AutomaticKeepAliveClientMixin': <String>{
+      'wantKeepAlive',
     },
   };
 
@@ -5152,12 +5174,20 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       if (!_isStateSubclass(node)) return;
 
       final Set<String> mixinExemptMethods = _mixinExemptMethods(node);
+      final InterfaceElement? classElement = node.declaredFragment?.element;
+      // Computed once per class rather than per member: walking
+      // allSupertypes is the expensive part of the resolved fallback, and
+      // every public @override method on this class shares the same
+      // answer for "which names does a Flutter SDK supertype declare".
+      final _FlutterSdkContractMembers flutterSdkContractMembers = _flutterSdkContractMembers(
+        classElement,
+      );
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           _checkField(reporter, member);
         } else if (member is MethodDeclaration) {
-          _checkMethod(reporter, member, mixinExemptMethods);
+          _checkMethod(reporter, member, mixinExemptMethods, flutterSdkContractMembers);
         }
       }
     });
@@ -5197,12 +5227,16 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   }
 
   /// Flags a public (non-underscore) method unless it is one of the
-  /// framework-mandated lifecycle overrides, or explicitly marked as an
-  /// intentional public surface via `@visibleForTesting` / `@protected`.
+  /// framework-mandated lifecycle overrides, a named framework-mixin
+  /// callback (`mixinExemptMethods`), a resolved Flutter SDK contract
+  /// override (`flutterSdkContractMembers`, see [_flutterSdkContractMembers]),
+  /// or explicitly marked as an intentional public surface via
+  /// `@visibleForTesting` / `@protected`.
   void _checkMethod(
     SaropaDiagnosticReporter reporter,
     MethodDeclaration node,
     Set<String> mixinExemptMethods,
+    _FlutterSdkContractMembers flutterSdkContractMembers,
   ) {
     final String name = node.name.lexeme;
     if (name.startsWith('_')) return;
@@ -5222,7 +5256,67 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       return;
     }
 
+    // Resolved fallback for framework contracts not in the hand-maintained
+    // _mixinRequiredMethodsByType table: an @override method whose exact
+    // name is declared on some non-State, non-Object supertype that lives
+    // in the Flutter SDK itself means the SDK — not this class's author —
+    // mandates the public spelling, so it is out of scope for this rule the
+    // same way build()/initState() are. Only trusted for package:flutter /
+    // dart:ui supertypes: a same-named member declared in the app's own
+    // code is exactly the encapsulation leak this rule exists to catch, so
+    // it must still be flagged even though it is also an @override.
+    if (_hasAnnotation(node.metadata, 'override')) {
+      final bool isSdkContract = node.isGetter
+          ? flutterSdkContractMembers.getters.contains(name)
+          : flutterSdkContractMembers.methods.contains(name);
+      if (isSdkContract) return;
+    }
+
     reporter.atToken(node.name);
+  }
+
+  /// Names of methods and getters that some Flutter-SDK-owned supertype of
+  /// [classElement] (excluding `State`/`Object` themselves) declares
+  /// directly — i.e. the set of public spellings the SDK, not this class's
+  /// author, mandates. Computed once per class (walking `allSupertypes` is
+  /// the expensive part) rather than once per candidate member, since every
+  /// public `@override` member on the class shares the same answer. Empty
+  /// whenever [classElement] is unavailable, e.g. because the analysis
+  /// context has no Flutter SDK resolved — the syntactic
+  /// [_mixinExemptMethods] table remains the primary path for that case.
+  _FlutterSdkContractMembers _flutterSdkContractMembers(InterfaceElement? classElement) {
+    if (classElement == null) {
+      return const _FlutterSdkContractMembers(<String>{}, <String>{});
+    }
+
+    final Set<String> methodNames = <String>{};
+    final Set<String> getterNames = <String>{};
+    for (final InterfaceType supertype in classElement.allSupertypes) {
+      final String? supertypeName = supertype.element.name;
+      if (supertypeName == null ||
+          supertypeName == 'State' ||
+          supertypeName == 'Object') {
+        continue;
+      }
+
+      final Uri libraryUri = supertype.element.library.uri;
+      final bool isFlutterSdk =
+          (libraryUri.scheme == 'package' &&
+              libraryUri.pathSegments.isNotEmpty &&
+              libraryUri.pathSegments.first == 'flutter') ||
+          (libraryUri.scheme == 'dart' && libraryUri.path == 'ui');
+      if (!isFlutterSdk) continue;
+
+      for (final MethodElement method in supertype.methods) {
+        final String? methodName = method.name;
+        if (methodName != null) methodNames.add(methodName);
+      }
+      for (final GetterElement getter in supertype.getters) {
+        final String? getterName = getter.name;
+        if (getterName != null) getterNames.add(getterName);
+      }
+    }
+    return _FlutterSdkContractMembers(methodNames, getterNames);
   }
 
   /// True when [metadata] carries an annotation literally named [name]
@@ -5233,4 +5327,16 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   bool _hasAnnotation(NodeList<Annotation> metadata, String name) {
     return metadata.any((Annotation a) => a.name.name == name);
   }
+}
+
+/// Method and getter names declared directly on a Flutter-SDK-owned
+/// supertype of a `State` class, split by member kind so a getter name
+/// cannot be mistaken for a method name (or vice versa) from an unrelated
+/// SDK interface. Produced once per class by
+/// [AvoidPublicMembersInStatesRule._flutterSdkContractMembers].
+class _FlutterSdkContractMembers {
+  const _FlutterSdkContractMembers(this.methods, this.getters);
+
+  final Set<String> methods;
+  final Set<String> getters;
 }

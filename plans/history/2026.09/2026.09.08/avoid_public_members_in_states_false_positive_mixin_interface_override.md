@@ -221,13 +221,116 @@ test test/rules/widget/widget_lifecycle_rules_test.dart` passes all 76 cases
 (instantiation-pin test only — no assertion needed updating). A `/code-review
 low` pass against commit `e51044e2` found no correctness issues.
 
-Scope of this fix is narrow by design: it recognizes two named framework
-mixins (`WidgetsBindingObserver`, `RouteAware`), not an arbitrary
-resolved-element "does this override a non-`State` supertype member" check —
-the more general fix the bug report's Root Cause section flagged as the more
-robust option. Any other Flutter framework mixin with public-by-contract
-callback methods (e.g. a future SDK addition) will reproduce this same false
-positive until it is added to `_mixinRequiredMethodsByType`.
+Scope of this fix is narrow by design: it recognizes named framework mixins
+(`WidgetsBindingObserver`, `RouteAware`, `AutomaticKeepAliveClientMixin`), not
+an arbitrary resolved-element "does this override a non-`State` supertype
+member" check — the more general fix the bug report's Root Cause section
+flagged as the more robust option. Any other Flutter framework mixin with
+public-by-contract callback methods will reproduce this same false positive
+until it is added to `_mixinRequiredMethodsByType`.
+
+### Hardening pass (2026-09-08, same day)
+
+The initial `WidgetsBindingObserver` list was written from memory and was
+incomplete: cross-checked against
+`api.flutter.dev/flutter/widgets/WidgetsBindingObserver-class.html`, it was
+missing `didChangeViewFocus`, `didPopRoute`, `didPushRoute`,
+`didPushRouteInformation`, and the four predictive-back-gesture handlers
+(`handleCancelBackGesture`, `handleCommitBackGesture`,
+`handleStartBackGesture`, `handleStatusBarTap`,
+`handleUpdateBackGestureProgress`). All were added. `RouteAware`'s four
+methods were confirmed correct against
+`api.flutter.dev/flutter/widgets/RouteAware-class.html`.
+
+A second common mixin with the same false-positive class was identified and
+added: `AutomaticKeepAliveClientMixin.wantKeepAlive` is a getter (still a
+`MethodDeclaration` in the AST, so `_checkMethod`'s existing string-name
+check covers it with no code change beyond the table entry) whose public
+spelling the framework reads directly.
+
+### Resolved-element fallback (2026-09-08, same day)
+
+The general fix flagged above as a follow-up was built in this same pass
+instead of deferred: `_isFlutterSdkContractOverride` walks
+`classElement.allSupertypes` (via `node.declaredFragment?.element`) and, for
+an `@override` method or getter, checks whether the same name is declared
+(not merely inherited) on a non-`State`, non-`Object` supertype whose owning
+library is `package:flutter/...` or `dart:ui`. When it is, the override is
+exempted the same way a `_mixinRequiredMethodsByType` hit is — the SDK, not
+the class's author, mandates that public spelling.
+
+This is deliberately narrower than "any `@override` resolving to a
+non-`State` supertype member": restricting it to Flutter-SDK-owned
+supertypes avoids exempting a same-named override of an app-authored mixin,
+which is exactly the encapsulation leak this rule exists to catch (an author
+could otherwise define `mixin PublicAccessor { void exposedMethod(); }`,
+mix it into `State`, and dodge the lint). `_mixinRequiredMethodsByType`
+remains the primary/fast path (works without a Flutter SDK in the analysis
+context, matching this rule's existing non-type-resolved design); the
+resolved check is an additional fallback for Flutter SDK mixins not yet
+added to that table, so future SDK additions to `WidgetsBindingObserver` (or
+an as-yet-unlisted mixin like `TickerProvider`) no longer require a code
+change to stay correct — only mixins from packages other than
+`package:flutter`/`dart:ui` still need a manual table entry.
+
+Not covered by the fixture suite: `example/lib/flutter_mocks.dart` is a
+local mock package, not `package:flutter` itself, so the fixture's
+`WidgetsBindingObserver`/`RouteAware`/`AutomaticKeepAliveClientMixin` cases
+are verified only via the syntactic table path, not this resolved fallback.
+The resolved path was validated indirectly (compiles, `dart run
+saropa_lints scan` runs clean on the fixture, `dart test` on the rule file's
+76 cases passes) but has no fixture exercising an actual `package:flutter`
+resolution context.
+
+**Efficiency follow-up (same day):** a multi-agent review pass flagged that
+the first version of this fallback re-walked `classElement.allSupertypes`
+once per uncovered public `@override` member instead of once per class.
+Restructured into `_flutterSdkContractMembers`, computed once per
+`ClassDeclaration` into a `_FlutterSdkContractMembers` holder (separate
+method-name and getter-name sets, so a getter can't be mistaken for a
+method of the same name from an unrelated SDK interface); `_checkMethod`
+now does an O(1) set-membership check per candidate member instead of
+re-walking supertypes. Re-verified with the same scan/test commands above
+after the refactor — identical results.
+
+The same review pass also noted the hand-maintained
+`_mixinRequiredMethodsByType` table now substantially overlaps what the
+resolved fallback would already catch for its three current entries
+(`WidgetsBindingObserver`, `RouteAware`, `AutomaticKeepAliveClientMixin` are
+themselves declared in `package:flutter`). This overlap is intentional, not
+dead weight: the table is the only path that works when the analysis
+context has no Flutter SDK resolved (this rule file's existing
+non-type-resolved design), so it stays as the fast/no-SDK-required primary
+path, with the resolved check as an SDK-aware fallback for names not yet
+added to the table.
+
+**Reviewed and not changed — two correctness questions raised by the same
+pass:**
+
+1. *"The check exempts by name-anywhere-in-the-Flutter-supertype-chain, not
+   by confirming this specific `@override` satisfies that specific
+   supertype's contract."* True as described, but not a false negative in
+   practice: Dart has one method table slot per name per class — a class
+   cannot have two differently-typed members named `update`, so if
+   `classElement.allSupertypes` genuinely contains a Flutter interface
+   requiring public `update()` (which it only does if the class actually
+   extends/implements/mixes that interface, per `allSupertypes`'
+   definition), then *any* method literally named `update` on that class is,
+   by construction, the same override satisfying that interface's contract
+   — an app-authored contract requiring the same name would have to share
+   the same public spelling regardless. No fixture demonstrates this
+   corner case; flagged here for whoever revisits this code next rather
+   than building a full override-resolution check for a scenario Dart's own
+   type system already forecloses.
+2. *"`getMethod`/`getGetter` might resolve inherited members, not just
+   declared-on-this-type ones, defeating the `State`/`Object` exclusion."*
+   Not applicable to the shipped code: `_flutterSdkContractMembers` uses
+   `InterfaceType.methods` / `.getters`, both documented as "declared in
+   this type" (not inherited) — confirmed by reading
+   `analyzer-12.1.0/lib/dart/element/type.dart` directly. The earlier
+   per-method draft did call `getMethod`/`getGetter` (also declared-only
+   per the same source), but that draft was already replaced by the
+   per-class cache before this review landed.
 
 ---
 

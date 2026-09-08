@@ -203,7 +203,25 @@ class _GoodObserverState extends State<MyWidget> with WidgetsBindingObserver {
   void didChangeLocales(List<Locale>? locales) {}
 
   @override
+  void didChangeMetrics() {}
+
+  @override
   Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+// GOOD: AutomaticKeepAliveClientMixin.wantKeepAlive is a getter, not a
+// method, but its public spelling is equally mandated by the mixin's
+// contract — the framework reads it directly, so this must not be flagged
+// even though `_checkMethod` sees a getter as a MethodDeclaration.
+class _GoodKeepAliveState extends State<MyWidget> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return const SizedBox.shrink();
+  }
 }
 
 // BAD: a public method that merely happens to share a mixin-related class

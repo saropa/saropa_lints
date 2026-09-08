@@ -72,7 +72,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 `google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on already-migrated `GoogleSignInClientAuthorization` results or unrelated model classes with a same-named field. No action required.
 
-`avoid_public_members_in_states` no longer flags `WidgetsBindingObserver`/`RouteAware` callback methods (e.g. `didChangeAppLifecycleState`, `didPushNext`) on a `State` class that mixes in the interface — their public spelling is mandated by the framework, so the rule's own suggested private-rename fix would have silently broken dispatch. No action required.
+`avoid_public_members_in_states` no longer flags `WidgetsBindingObserver`/`RouteAware`/`AutomaticKeepAliveClientMixin` callback methods (e.g. `didChangeAppLifecycleState`, `didPushNext`, `wantKeepAlive`) on a `State` class that mixes in the interface — their public spelling is mandated by the framework, so the rule's own suggested private-rename fix would have silently broken dispatch. No action required.
+
+### Fixed (Extension)
+
+- The Config Dashboard and Findings Dashboard no longer constantly reload while you type into a search box or text field — a background refresh (triggered by the analyzer's live diagnostics, config-file saves, or workspace tree updates) was rebuilding the whole panel on every tick regardless of whether you were mid-edit, which also made the Config Dashboard's "Matching rules" → "in `<package>`" links appear dead since the panel they lived in kept getting torn down. Both dashboards now wait until you leave the field before redrawing.
+- The Config Dashboard's collapsible sections (packs, disabled rules, shed rules, style & opinions) now remember whether you left them open or closed, the same way the Findings Dashboard's sections already did.
 
 ---
 

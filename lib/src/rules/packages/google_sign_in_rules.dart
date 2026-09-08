@@ -509,7 +509,8 @@ class GoogleSignInAuthTokenFromAuthenticateRule extends SaropaLintRule {
       // not an arbitrary object that has an accessToken field. target is
       // nullable (cascade form); a null receiver cannot be an account.
       final Expression? target = node.target;
-      if (target == null || !_looksLikeGsiAccount(target)) return;
+      if (target == null || _isGsiClientAuthorization(target)) return;
+      if (!_looksLikeGsiAccount(target)) return;
       reporter.atNode(node);
     });
 
@@ -523,10 +524,22 @@ class GoogleSignInAuthTokenFromAuthenticateRule extends SaropaLintRule {
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (!_importsGsi(node)) return;
       if (node.identifier.name != 'accessToken') return;
+      if (_isGsiClientAuthorization(node.prefix)) return;
       if (!_looksLikeGsiAccount(node.prefix)) return;
       reporter.atNode(node);
     });
   }
+
+  /// Excludes receivers whose resolved static type is
+  /// `GoogleSignInClientAuthorization` — the correct v7 migration target this
+  /// rule's own "GOOD" example recommends — even when the variable name still
+  /// matches the account-shaped [_looksLikeGsiAccount] heuristic (e.g. a
+  /// variable named `accountAuthorization` holding the authorization result).
+  /// Falls through to the name heuristic when the type is unresolved
+  /// (`staticType` is null in unresolved/syntactic scan contexts), so this is
+  /// purely an additional exclusion, never a replacement for the heuristic.
+  bool _isGsiClientAuthorization(Expression expr) =>
+      expr.staticType?.getDisplayString() == 'GoogleSignInClientAuthorization';
 
   /// Heuristic: the receiver `expr` is likely a `GoogleSignInAccount` when its
   /// source text contains common account-variable patterns from the GSI API.
