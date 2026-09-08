@@ -432,6 +432,10 @@
       "laneFull": "کامل — ہر ایک ایک سے چالو ہوئے قاعدہ داخلہ میں",
       "migrateLegacyKeys": "{count} میراثی تشکیل کلید کو منتقل کریں",
       "migrateLegacyKeysDesc": "لیگیسی پلگ ان بلاک کیز کو analysis_options_custom.yaml پر منتقل کریں۔"
+    },
+    "refreshPending": {
+      "label": "● اپڈیٹ تیار",
+      "title": "ایک اپڈیٹ تیار ہے — یہ ایک بار آپ وہ فیلڈ چھوڑ جائیں گے جس کو آپ تبدیل کر رہے ہیں جب اپلائی ہوگا۔"
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "سیکشن جہاں غیر معمولی نتائج تھے",
       "byKind": "{count} دی {kind} تیاری",
       "kindIgnore": "// چھوڑ دیجیے:",
-      "kindIgnoreForFile": "// تجاهل_کریں_کی_فائل: /نہ_سوچوں",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "بیس لائنے",
       "unsuppressButton": "نامناسب کریں",
       "unsuppressTitle": "سیچنگ کو ہٹا دیجیے تاکہ یہ ایک معمولی اسکن میں نظر آئے",

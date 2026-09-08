@@ -432,6 +432,10 @@
       "laneFull": "Completo — ogni regola abilitata analizzata in-editor",
       "migrateLegacyKeys": "Migrare la chiave {count} legacy configurazione",
       "migrateLegacyKeysDesc": "Sposta le chiavi del plugin-block legacy in analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Aggiornamento in sospeso",
+      "title": "Un aggiornamento è in attesa — verrà applicato non appena lascerai il campo che stai modificando."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Sezione delle trovate soppressa",
       "byKind": "{count} da {kind}",
       "kindIgnore": "// ignora:",
-      "kindIgnoreForFile": "// ignora_per_file:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "baseline",
       "unsuppressButton": "Non sopprimere",
       "unsuppressTitle": "Rimuovi la suppression in modo che questa finding appaia in scans normali",

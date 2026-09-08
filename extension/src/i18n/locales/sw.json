@@ -432,6 +432,10 @@
       "laneFull": "Panda — kila neno ya kipengele kizalishwa katika kipengele ya editor",
       "migrateLegacyKeys": "Hamisha vitufe vya usanidi vya {count}",
       "migrateLegacyKeysDesc": "Hamisha funguo za uzuiaji wa programu-jalizi hadi analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Uwanja wa kuzalisha",
+      "title": "Kutambua kwa muda mlima — itakuwa kuzalishwa kama uzisikia kujua kwa kutoa kipengele kimesikia."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Sektion ya matokeo ya kuzalishia",
       "byKind": "{count} na {kind}",
       "kindIgnore": "// kupuuza:",
-      "kindIgnoreForFile": "// kupuuza_kwa_faili:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "msingi",
       "unsuppressButton": "Acha kukandamiza",
       "unsuppressTitle": "Ondoa kuzalishia kwa kusafisha matokeo hapa kwenye skani mafanikio ya kipindi",

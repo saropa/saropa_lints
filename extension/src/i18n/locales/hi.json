@@ -432,6 +432,10 @@
       "laneFull": "पूर्ण — सभी सक्रिय नियम एडिटर में",
       "migrateLegacyKeys": "{count} वितरण अपडेट करें",
       "migrateLegacyKeysDesc": "पुराने प्लगइन-ब्लॉक कुंजी को analysis_options_custom.yaml में ले जाएं"
+    },
+    "refreshPending": {
+      "label": "● अपडेट पेंडिंग",
+      "title": "एक अपडेट लग रहा है — यह आप अपने संपादित क्षेत्र छोड़ देंगे तब लागू होगा।"
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "अवरोधित खोज अनुभाग",
       "byKind": "{count} द्वारा {kind}",
       "kindIgnore": "// अग्नो:",
-      "kindIgnoreForFile": "// अनदेखन_कर_फ़ाइल:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "बेसलाइन",
       "unsuppressButton": "अनप्रतिबंधित",
       "unsuppressTitle": "सामान्य स्कैन में इस खोज को दिखाने के लिए विरोधाभास को हटा दें",

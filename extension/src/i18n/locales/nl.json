@@ -432,6 +432,10 @@
       "laneFull": "Volledig — elke ingeschakelde regel in de editor",
       "migrateLegacyKeys": "Migrateer {count} legacy config key(s)",
       "migrateLegacyKeysDesc": "Legacy plugin-block sleutels verplaatsen naar analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Update uitstel",
+      "title": "Een update is in behandeling — het wordt toegepast zodra je het veld verlaat dat je aan het bewerken bent."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Afdeling onderdrukte gevonden items",
       "byKind": "{count} door {kind}",
       "kindIgnore": "// negeren:",
-      "kindIgnoreForFile": "// negeer_voor_bestand:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "baseline",
       "unsuppressButton": "Unsuppresseer",
       "unsuppressTitle": "Verwijder de onderdrukingsindicatie zodat deze bevinding verschijnt in normale scans",

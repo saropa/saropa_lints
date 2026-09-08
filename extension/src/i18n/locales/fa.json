@@ -432,6 +432,10 @@
       "laneFull": "کامل — هر قاعده‌ای که فعال است در داخل ویرایشگر",
       "migrateLegacyKeys": "میگرایید {count} کلید(ها) پیکربندی قدیمی",
       "migrateLegacyKeysDesc": "کلیدهای قدیمی پلاگین-بلوک را به analysis_options_custom.yaml منتقل کنید"
+    },
+    "refreshPending": {
+      "label": "● به‌روزرسانی در انتظار",
+      "title": "به‌روزرسانی در انتظار است — به‌صورت خودکار اعمال خواهد شد هنگامی که از فیلدی که در حال ویرایش هستید بازگردید."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "بخش یافته‌های غیرفعال شده",
       "byKind": "{count} توسط {kind}",
       "kindIgnore": "// نادیده گرفتن:",
-      "kindIgnoreForFile": "// اهمیت_نکردن_فایل: /نیاز_به_فکر_کردن",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "بیس لاین#line",
       "unsuppressButton": "غیر فعال سازی",
       "unsuppressTitle": "محدودیت را حذف کنید تا این یافته در اسکن‌های معمولی ظاهر شود",

@@ -432,6 +432,10 @@
       "laneFull": "Lengkap — setiap aturan yang diaktifkan dalam editor",
       "migrateLegacyKeys": "Migrasi {count} legacy config key(s)",
       "migrateLegacyKeysDesc": "Pindahkan kunci plugin-block lama ke analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Pembaruan tertunda",
+      "title": "Sebuah pembaruan sedang menunggu — akan diterapkan saat Anda keluar dari bidang yang sedang diedit."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Bagian temuan yang dinonaktifkan",
       "byKind": "{count} oleh {kind}",
       "kindIgnore": "// abaikan:",
-      "kindIgnoreForFile": "// abaikan_untuk_file:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "garis dasar",
       "unsuppressButton": "Tidak supresi",
       "unsuppressTitle": "Hapus pengabaian sehingga temuan ini muncul dalam pemindaian normal",

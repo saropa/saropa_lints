@@ -432,6 +432,10 @@
       "laneFull": "Completo — cada regla habilitada en el editor",
       "migrateLegacyKeys": "Migrar {count} clave(s) de configuración legada",
       "migrateLegacyKeysDesc": "Mover las claves del plugin-block legado a analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Actualización pendiente",
+      "title": "Una actualización está esperando — se aplicará una vez que dejes el campo que estás editando."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Sección de hallazgos suprimidos",
       "byKind": "{count} por {kind}",
       "kindIgnore": "// ignorar:",
-      "kindIgnoreForFile": "// ignorar_para_archivo:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "base",
       "unsuppressButton": "Unsuprimir",
       "unsuppressTitle": "Elimine la supresión para que este hallazgo aparezca en escaneos normales",

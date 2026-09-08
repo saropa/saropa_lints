@@ -432,6 +432,10 @@
       "laneFull": "完全 — エディタ内でのすべての有効なルール",
       "migrateLegacyKeys": "{count} 既存の設定キーを移行",
       "migrateLegacyKeysDesc": "古いプラグインブロックのキーをanalysis_options_custom.yamlに移動"
+    },
+    "refreshPending": {
+      "label": "● 更新待機",
+      "title": "更新が待機中 — 編集中のフィールドを離れたときに適用されます。"
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "抑制された結果のセクション",
       "byKind": "{count} によって {kind}",
       "kindIgnore": "// 無視:",
-      "kindIgnoreForFile": "// 無視するファイル:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "ベースライン",
       "unsuppressButton": "アンスプレス",
       "unsuppressTitle": "この見つかりを通常のスキャンに表示するため、抑制を解除してください",

@@ -432,6 +432,10 @@
       "laneFull": "完整 — 编辑器中所有启用的规则",
       "migrateLegacyKeys": "迁移 {count} 旧配置密钥",
       "migrateLegacyKeysDesc": "将旧插件块密钥移至 analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● 更新待处理",
+      "title": "有一个更新正在等待 — 它将在你离开正在编辑的字段时应用。"
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "抑制结果部分",
       "byKind": "{count} 由 {kind} 提供",
       "kindIgnore": "// 忽略:",
-      "kindIgnoreForFile": "// 忽略文件：",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "基线",
       "unsuppressButton": "取消抑制",
       "unsuppressTitle": "移除抑制以便此发现出现在常规扫描中",

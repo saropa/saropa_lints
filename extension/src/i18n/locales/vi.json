@@ -432,6 +432,10 @@
       "laneFull": "Hoàn chỉnh — mọi quy tắc đã kích hoạt trong trình soạn thảo",
       "migrateLegacyKeys": "Di chuyển (các) khóa cấu hình cũ {count}",
       "migrateLegacyKeysDesc": "Chuyển các khóa plugin-block lỗi thời sang analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Cập nhật đang chờ",
+      "title": "Một bản cập nhật đang chờ — nó sẽ được áp dụng khi bạn rời khỏi trường đang chỉnh sửa."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Phần kết quả bị ẩn",
       "byKind": "{count} bởi {kind}",
       "kindIgnore": "// bỏ qua:",
-      "kindIgnoreForFile": "// bỏ qua_for_file:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "đường cơ sở",
       "unsuppressButton": "Không tắt cảnh báo",
       "unsuppressTitle": "Loại bỏ việc bỏ qua để kết quả này xuất hiện trong các quét bình thường",

@@ -432,6 +432,10 @@
       "laneFull": "كامل — كل القواعد المفعلة داخل المحرر",
       "migrateLegacyKeys": "التحوّل من مفتاح {count} القديم (مفاتيح)",
       "migrateLegacyKeysDesc": "الانتقال إلى مفاتيح قديم plugin-block إلى analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● تحديث معلق",
+      "title": "تحديث متوفر — سيتم تطبيقه بمجرد أن تغادر المجال الذي تحريره."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "قسم العثورات المكبوتة",
       "byKind": "{count} بواسطة {kind}",
       "kindIgnore": "// تجاهل:",
-      "kindIgnoreForFile": "// تجاهل_للملف: /لا_تُفكّر_في_الملف",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "قاعدة أساسية",
       "unsuppressButton": "إلغاء تفعيل",
       "unsuppressTitle": "أزل التخفيض بحيث يظهر هذا العثور في المسح العادي",

@@ -432,6 +432,10 @@
       "laneFull": "Tam — editörde etkinleştirilmiş her kural",
       "migrateLegacyKeys": "{count} eski yapılandırma anahtarlarını taşıyın",
       "migrateLegacyKeysDesc": "Eski eklenti bloğu anahtarlarını analysis_options_custom.yaml'a taşıyın"
+    },
+    "refreshPending": {
+      "label": "● Güncellemeler bekliyor",
+      "title": "Bir güncelleme bekleniyor — düzenleme yaptığınız alanın dışına çıktığınızda uygulanacaktır."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "İncelemeyi bastırmış bulunuyor section",
       "byKind": "{count} tarafından {kind}",
       "kindIgnore": "// görmezden gelmek:",
-      "kindIgnoreForFile": "// dosya için görmezden gelin:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "temel",
       "unsuppressButton": "Kapat",
       "unsuppressTitle": "Kontrolü kaldırın böylece bu bulgu normal taramalarda görünür",

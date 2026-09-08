@@ -432,6 +432,10 @@
       "laneFull": "Completo — todas as regras ativadas em editor",
       "migrateLegacyKeys": "Migrar {count} chave(s) de configuração legada",
       "migrateLegacyKeysDesc": "Mova as chaves do plugin-block legado para analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Atualização pendente",
+      "title": "Uma atualização está aguardando — ela será aplicada assim que você sair do campo que está editando."
     }
   },
   "configSuggestions": {

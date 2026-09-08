@@ -432,6 +432,10 @@
       "laneFull": "מלא — כל כלל מופעל בתוך המודעה",
       "migrateLegacyKeys": "המרידת של מפתחות תצורה ישנות {count}",
       "migrateLegacyKeysDesc": "העתקключи-plugin-block ישנות ל-analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● עדכון במתנה",
+      "title": "עדכון ממתין — הוא יתבצע לאחר שיצאת מהשדה שאתה עורך."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "תבנית תוצאות מוסרות",
       "byKind": "{count} על ידי {kind}",
       "kindIgnore": "// התייחסות:",
-      "kindIgnoreForFile": "// התייחסות_ל_קובץ:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "קו בסיס",
       "unsuppressButton": "לא להצמצם",
       "unsuppressTitle": "הסר את ההיעדרות כדי שהמצאה זו תופיע בסריקות רגילות",

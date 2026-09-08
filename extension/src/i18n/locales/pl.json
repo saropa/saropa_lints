@@ -432,6 +432,10 @@
       "laneFull": "Pełny — każda włączona reguła w edytorze",
       "migrateLegacyKeys": "Przenieś klucze konfiguracji {count} legacy",
       "migrateLegacyKeysDesc": "Przenieś stare klucze plugin-block do analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Aktualizacja w trakcie",
+      "title": "Aktualizacja jest dostępna — zostanie zastosowana, gdy opustisz pole, które aktualnie edytujesz."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Część wykrytych problemów",
       "byKind": "{count} przez {kind}",
       "kindIgnore": "// ignoruj:",
-      "kindIgnoreForFile": "// ignoruj_dla_pliku:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "podstawa",
       "unsuppressButton": "Unsuppresja",
       "unsuppressTitle": "Usuń zasłonę, aby ten wynik pojawił się w normalnych skanach",

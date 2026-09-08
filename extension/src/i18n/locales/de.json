@@ -432,6 +432,10 @@
       "laneFull": "Vollständig — jede aktivierte Regel im Editor",
       "migrateLegacyKeys": "{count} legacy Konfigurations Schlüssel(e) migrieren",
       "migrateLegacyKeysDesc": "Legacy-Plugin-Block-Schlüssel in analysis_options_custom.yaml verschieben"
+    },
+    "refreshPending": {
+      "label": "● Aktualisierung ausstehend",
+      "title": "Eine Aktualisierung wartet — sie wird angewendet, sobald Sie das Feld verlassen, das Sie bearbeiten."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Abschnitte der unterdrückten Ergebnisse",
       "byKind": "{count} von {kind}",
       "kindIgnore": "// ignorieren:",
-      "kindIgnoreForFile": "//ignore_for_file:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "Grundlinie",
       "unsuppressButton": "Unsuppresse",
       "unsuppressTitle": "Die Unterdrückung entfernen, damit dieses Ergebnis in normalen Scans angezeigt wird",

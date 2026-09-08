@@ -432,6 +432,10 @@
       "laneFull": "완전 — 에디터 내에서 활성화된 모든 규칙",
       "migrateLegacyKeys": "{count} 유산 구성 요소 키(s) 마이그레이션",
       "migrateLegacyKeysDesc": "구식 플러그인 블록 키를 analysis_options_custom.yaml로 이동"
+    },
+    "refreshPending": {
+      "label": "● 업데이트 대기",
+      "title": "업데이트가 기다리고 있습니다 — 수정 중인 필드를 벗어나면 자동으로 적용됩니다."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "잠재적 문제 항목",
       "byKind": "{count} 의 {kind}",
       "kindIgnore": "// 무시:",
-      "kindIgnoreForFile": "// 무시_for_file:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "기준값",
       "unsuppressButton": "비활성화 해제",
       "unsuppressTitle": "해당 결과가 정상 스캔에 나타나도록 감지 제거를 해제하세요",

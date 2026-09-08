@@ -432,6 +432,10 @@
       "laneFull": "Full — lahat ng nakarehistro na rule sa loob ng editor",
       "migrateLegacyKeys": "I-migrate ang (mga) legacy na config key ng {count}",
       "migrateLegacyKeysDesc": "Ibahin ang mga key ng legacy plugin-block patungo sa analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Nakabinbin ang pag-update",
+      "title": "Mayroon nang update — itto ay magapply nang umaabot ka sa kahon na iyong nagmumungkahi."
     }
   },
   "configSuggestions": {
@@ -1219,7 +1223,7 @@
       "byKind": "{count} ng {kind}",
       "kindIgnore": "// huwag pansinin:",
       "kindIgnoreForFile": "// ignore_for_file:",
-      "kindBaseline": "baseline",
+      "kindBaseline": "batayan",
       "unsuppressButton": "I-unsuppress",
       "unsuppressTitle": "Tanggalin ang pag-iwas para makuha ang resulta na ito sa normal na mga pag-scan",
       "unsuppressHint": "Para i-unsuppress ang {rule} sa {file}:{line}: alisin ang // ignore: komento sa itaas ng linya.",

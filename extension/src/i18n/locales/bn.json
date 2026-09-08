@@ -432,6 +432,10 @@
       "laneFull": "পূর্ণ — সমস্ত সক্রিয় নিয়ম ইন-এডিটরে ব্যবহার করুন",
       "migrateLegacyKeys": "{count} পুরানো কনফিগ কী(গুলি) স্থানান্তরিত করুন",
       "migrateLegacyKeysDesc": "পুরাতন প্লাগইন-ব্লক কী গুলো স্থানান্তর করুন analysis_options_custom.yaml-তে"
+    },
+    "refreshPending": {
+      "label": "● আপডেট অপেক্ষার মধ্যে",
+      "title": "একটি আপডেট অপেক্ষাকৃত আছে — আপনি যে ক্ষেত্রটি সম্পাদনা করছেন তার বাইরে চলে গেলে এটি প্রয়োগ হবে।"
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "সাপ্রেসড ফাইন্ডিংস বিভাগ",
       "byKind": "{count} দ্বারা {kind}",
       "kindIgnore": "// অবহেলা:",
-      "kindIgnoreForFile": "// অবহেলনা_কর_ফাইল: /নো_থিংক",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "বেসলাইন /নো_থিং",
       "unsuppressButton": "অপ্রতিহত করুন",
       "unsuppressTitle": "সাধারণ স্ক্যানে এই খুঁজতে সাপ্রেসন অপসারণ করুন",

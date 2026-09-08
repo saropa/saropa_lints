@@ -432,6 +432,10 @@
       "laneFull": "Полный — все включенные правила в редакторе",
       "migrateLegacyKeys": "Переносить ключи {count} устаревшей конфигурации",
       "migrateLegacyKeysDesc": "Переместить устаревшие ключи плагина блоков в analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Обновление ожидается",
+      "title": "Обновление ожидается — оно применится, как только вы покинете поле, которое сейчас редактируете."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Раздел подавленных нарушений",
       "byKind": "{count} по {kind}",
       "kindIgnore": "// игнорировать:",
-      "kindIgnoreForFile": "// игнорировать_для_файла:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "базовый уровень",
       "unsuppressButton": "Отключить",
       "unsuppressTitle": "Удалить подавление, чтобы это открытие отображалось в обычных сканированиях",

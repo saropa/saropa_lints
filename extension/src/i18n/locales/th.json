@@ -432,6 +432,10 @@
       "laneFull": "ครบ — กฎทุกกฎที่เปิดใช้งานในตัวแก้ไข",
       "migrateLegacyKeys": "ย้ายคีย์การกำหนดค่าดั้งเดิมของ {count}",
       "migrateLegacyKeysDesc": "ย้ายคีย์บล็อกปลั๊กอินแบบเดิมไปที่ analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● รออัปเดต",
+      "title": "มีการอัปเดตที่รออยู่ — จะนำไปใช้เมื่อคุณออกจากช่องที่คุณกำลังแก้ไข"
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "ส่วนผลการค้นหาที่ถูกปิดกั้น",
       "byKind": "{count} โดย {kind}",
       "kindIgnore": "// ละเว้น:",
-      "kindIgnoreForFile": "// ละเว้นการตรวจสอบไฟล์:",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "ฐานข้อมูลมาตรฐาน",
       "unsuppressButton": "ไม่ต้องยืนยัน",
       "unsuppressTitle": "ลบการปิดกันเพื่อให้ผลการค้นหาปรากฏในสแกนปกติ",

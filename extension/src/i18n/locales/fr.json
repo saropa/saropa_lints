@@ -432,6 +432,10 @@
       "laneFull": "Complet — toutes les règles activées analysées en ligne",
       "migrateLegacyKeys": "Migrer la clé (s) de configuration héritée {count}",
       "migrateLegacyKeysDesc": "Déplacer les clés du plugin-block legacy vers analysis_options_custom.yaml"
+    },
+    "refreshPending": {
+      "label": "● Mise à jour en attente",
+      "title": "Une mise à jour est en attente — elle s'appliquera une fois que vous quitterez le champ que vous éditez."
     }
   },
   "configSuggestions": {
@@ -1218,7 +1222,7 @@
       "headingAria": "Section des résultats supprimés",
       "byKind": "{count} par {kind}",
       "kindIgnore": "// ignorer :",
-      "kindIgnoreForFile": "// ignore_for_file :",
+      "kindIgnoreForFile": "// ignore_for_file:",
       "kindBaseline": "ligne de base",
       "unsuppressButton": "Unsupprime",
       "unsuppressTitle": "Supprimez la suppression afin que ce résultat apparaisse dans les scans normaux",
