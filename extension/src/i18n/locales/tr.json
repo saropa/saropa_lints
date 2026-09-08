@@ -713,6 +713,10 @@
     "reloadLater": "Daha sonra Sonra Daha sonra Sonradan"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Hata",
+      "tooltip": "Durum çubuğu güncellenemedi — detaylar için tıklayın. Eklenti hâlâ çalışabilir; Komut Paleti'nden bir komut çalıştırmayı deneyin."
+    },
     "menu": {
       "enableOn": "Analiz etkin (devre dışı bırakmak için tıklayın)",
       "enableOff": "Analiz devre dışı (etkinleştirmek için tıklayın)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} izole edilmiş daemon(s)",
       "openHint": "Süreç Sağlığı'nı açmak için tıklayın",
       "systemRam": "Sistem: {free} / {total} ücretsiz",
-      "systemLow": "⚠ Sistem: {free} / {total} ücretsiz"
+      "systemLow": "⚠ Sistem: {free} / {total} ücretsiz",
+      "extensionHostWarning": "⚠ Eklenti ana bilgisayarı: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} işlem(ler) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} analiz sunucusu(t) tespit edildi — kullanılmayan VS Code pencereleri kapat",
       "daemonCount": "Flutter daemonları: {total} ({orphaned} izole)",
       "scanDaemonOrphans": "Artık tarama programları: {count} — öldürmek için Temizleme'yi kullanın",
+      "extensionHostSection": "Eklenti ana bilgisayarı: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa belleği yüksek — detaylar için tıklayınız",
       "criticalHint": "Saropa belleği kritik — temizleme önerilir"
     },
@@ -806,6 +812,35 @@
       "kill": "Öldür",
       "killed": "Öldürüldü",
       "killFailed": "Başarısız"
+    },
+    "watcherExclude": {
+      "prompt": "{count} önerilen dosya izleme hariç tutmaları bu çalışma alanından eksik: {patterns}. Bunları eklemek, VS Code tarafından belleği boşa harcayan büyük derleme artefaktlarını ve heap dump'ları izlenmesini engeller.",
+      "addAll": "Tümünü Ekle",
+      "dismiss": "İşten çıkarma, işten atmak.",
+      "added": "{count} dosya izlemeçi hariç tutmaları işlevselliğe eklendi."
+    },
+    "hazardScan": {
+      "warning": "{count} boyutunda büyük dosya(s) dosya izleyicisinden dışlanmamış: {files}. Bu dosyalar belleği tüketebilir ve VS Code'yi kapatabilir.",
+      "addExclusions": "Watcher'dan Dışarıya Al",
+      "dismiss": "İşten çıkarma, işten atmak.",
+      "added": "{count} izlemeçi hariç tutma deseni(e) işlevsel ayarlara eklendi."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Çalışma alanı hazırlanması: tamam — sorun bulunmadı.",
+    "quickPickTitle": "Çalışma Alanı Hazırlık Sorunları",
+    "quickPickPlaceholder": "Bir sorunu detaylar için veya onu çözmek için seçin",
+    "statusBar": {
+      "red": "🔴 {count} çalışma alanı sorunu(lar)",
+      "yellow": "⚠ {count} çalışma alanı sorunları"
+    },
+    "issue": {
+      "hazardFiles": "$(uyarı) {count} büyük dışlanmamış dosya(lar)",
+      "hazardFilesDetail": "Büyük dosyalar file watcher tarafından izlenirse bellek tükenebilir ve VS Code çökebilir. Tehlike taramasını çalıştırarak bunları dışlayabilirsiniz.",
+      "missingExcludes": "$(info) {count} izleme dışlama(sı) eksik",
+      "missingExcludesDetail": "Tavsiye edilen dosya izleme hariç tutma desenleri yapılandırılmamış. Bunları eklemek gereksiz bellek kullanımını önler.",
+      "hostMemory": "$(alert) Zamanlayıcı kullanılarak {size}",
+      "hostMemoryDetail": "Eklenti ana bilgisayar süreci RSS uyarı eşiğini aştı. Detaylar için İşlem Sağlığı'na açın."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "hiçbir dosya etkilenmedi.",
       "filesTitle": "En az bir bulguya katkıda bulunan farklı dosyalar.",
       "topRuleLabel": "En üst düzey kural, en yüksek kuraldır.",
-      "topRuleTitle": "{name} kuralına filtre bulguları."
+      "topRuleTitle": "{name} kuralına filtre bulguları.",
+      "sectionHeading": "Genel Bakış",
+      "sectionAria": "Genel istatistikler"
     },
     "toolbar": {
       "ariaFiltersActions": "Filtreler ve eylemler.",
@@ -999,7 +1036,17 @@
       "moreSummary": "Daha Fazla Daha Çok Daha Fazlası",
       "moreChevron": "▾",
       "copyJsonTitle": "Filtreli ihlalleri JSON ({count}) olarak kopyalayın.",
-      "saveReportTitle": "Filtre edilmiş ihlalleri JSON olarak raporlara/YYY YMMDD/ kaydet."
+      "saveReportTitle": "Filtre edilmiş ihlalleri JSON olarak raporlara/YYY YMMDD/ kaydet.",
+      "copyEverythingJson": "Tümünü JSON olarak kopyala",
+      "copyEverythingJsonTitle": "Tüm denetim bulgularını JSON olarak kopyala — süzgeçlenmemiş, baskılamış içeriyor",
+      "saveEverythingReport": "Tümünü kaydet report",
+      "saveEverythingReportTitle": "Tüm denetim bulgularını JSON olarak reports/ klasörüne kaydet — süzgeçlenmemiş, bastırılmış dahil",
+      "suppressAll": "Tüm görünür engelle",
+      "suppressAllTitle": "Her görünen bulguya yukarıda // ignore: yorumları ekle",
+      "suppressAllConfirm": "Bu, kaynak dosyanızda {count} // ignore: yorumlarını ekleyecektir. Bu işlem dashboard'tan geri alınamaz — düzenleyicinizin geri al veya sürüm kontrolünü kullanarak geri almanız gerekir. Devam edilsin mi?",
+      "suppressAllProceed": "Tümünü bastır",
+      "suppressAllDone": "Eklendi {count} // ignore: yorumlar.",
+      "suppressAllFailed": "Bulk suppress uygulanamadı — bazı dosyalar okunur-yazılır olabilir."
     },
     "audit": {
       "scopeFieldTitle": "Bulguların kaynaklarını seçin",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "Değiştirildi vs dal…",
       "branchPlaceholder": "şube adı",
       "branchAria": "Karşılaştırılacak dal",
+      "includeSuppressedLabel": "İptal edilenleri dahil et",
+      "includeSuppressedTitle": "Ayrıca // ignore:, // ignore_for_file: veya bir temel girişle gizlenen bulguları da ekleyin — her biri nasıl bastırıldığını belirtir. Projenizin yapılandırması değiştirilmez.",
       "runButton": "Audit çalıştır",
       "runButtonTitle": "Tam proje denetimi CLI'sini çalıştırın ve sonuçlarını buraya yükleyin",
       "cancelButton": "İptal Et iptal et",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-enable disabled rules: Etkinleştirilmiş kuralları yeniden etkinleştir.",
       "reEnableQuickPickPlaceholder": "Yeniden etkinleştirmek için bir veya daha fazla kural seçin.",
       "menuGroupExport": "İhracat Export Dışarıya ihracat",
+      "menuGroupBulk": "Toplu eylemler",
       "menuGroupFilter": "Filtre & odaklama",
       "menuGroupOpen": "Açmak için gösterge panelini açın.",
       "menuGroupSystem": "Sistem sistemi sistem sistemi."
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "Bulgular Bulguları",
+      "heading": "Bulgular Bulguları",
       "expandAll": "Tümünü genişlet.",
       "collapseAll": "Hepsi çöküyor, hepsi yıkılıyor.",
       "bulkSelected": "{count} seçildi",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "Sıra eylemleri Sıralı eylemler",
       "selectRowAria": "Bu bulma satırını seçin.",
       "copyRowTitle": "Bu bulguyu JSON olarak kopyalayın.",
+      "suppressedBadge": "İptal edildi",
+      "suppressedByTitle": "Gizli görünümünüzden {kind} tarafından gizlenmiştir — sadece burada görünür çünkü \"İndirgenmişleri içer\" açıktır",
       "metaShown": "{filtered} gösteriliyor",
       "metaAfterDisable": "devre dışı bırakılan kural filtresinden sonra {total}",
       "metaSourceCap": "Performans için {max}'de sınırlandırılmış bir kaynak.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "Tarayıcıda açılır.",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor'ı devre dışı bırak"
+    },
+    "suppressedFindings": {
+      "heading": "İncelemeye Alınmış Bulgular",
+      "headingAria": "İncelemeyi bastırmış bulunuyor section",
+      "byKind": "{count} tarafından {kind}",
+      "kindIgnore": "// ignore:",
+      "kindIgnoreForFile": "// ignore_for_file:",
+      "kindBaseline": "temel",
+      "unsuppressButton": "Kapat",
+      "unsuppressTitle": "Kontrolü kaldırın böylece bu bulgu normal taramalarda görünür",
+      "unsuppressHint": "{rule}'ı {file}:{line}'de tekrar bastırmak için, satırın üstündeki // ignore: yorumunu kaldırın.",
+      "columnFile": "Dosya dosyası dosya dosya.",
+      "columnLine": "Hattı çizgi çizgi.",
+      "columnRule": "Kural Kanun kural",
+      "columnKind": "Türkçe",
+      "columnAction": "Eylem"
     },
     "suppressions": {
       "sectionAria": "Baskıların bastırılması.",
@@ -1261,6 +1330,7 @@
     "noReportYet": "Henüz ihlal raporu yok. Önce Saropa Lints analizini çalıştırın.",
     "clipboardCopyFailed": "Klipbord'a kopyalanamadı.",
     "copiedViolationsJson": "Kopyalandı {count} ihlal (((s) JSON olarak.",
+    "copiedEverythingJson": "Kopyalandı {count} süzülmüş bulgular panoya kopyalandı.",
     "copiedOneViolationJson": "1 ihlal JSON olarak kopyalanmıştır.",
     "driftNotConnected": "Drift Advisor sunucusu bağlanmamıştır.",
     "copiedBulkFindings": "Kopyalandı {count} seçilen bulgular (((s) JSON olarak.",

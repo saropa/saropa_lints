@@ -713,6 +713,10 @@
     "reloadLater": "بعد میں بعد میں اس کے بعد"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: گری ہے",
+      "tooltip": "اسٹیٹس بار اپ ڈیٹ ناکام ہو گیا — تفصیلات کے لیے کلک کریں۔ توسیع اب بھی کام کر سکتی ہے؛ کمانڈ پیلیٹ سے کمانڈ چلانے کی کوشش کریں۔"
+    },
     "menu": {
       "enableOn": "تجزیہ فعال (غیر فعال کرنے کے لیے کلک کریں)",
       "enableOff": "تجزیہ غیر فعال (فعال کرنے کے لیے کلک کریں)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} ورثہ دار ڈیمون(s)",
       "openHint": "عمل صحت کو کھولنے کے لیے کلک کریں۔",
       "systemRam": "سسٹم: {free} آزاد {total} سے",
-      "systemLow": "⚠ نظام: {free} / {total} آزاد"
+      "systemLow": "⚠ نظام: {free} / {total} آزاد",
+      "extensionHostWarning": "⚠ امتداد ہوست: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} عمل ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} تحلیل سرور(س) پایا گیا — غیر استعمالی VS Code ونڈوز بند کریں",
       "daemonCount": "Flutter ڈیمینس: {total} ({orphaned} چھوڑے گئے)",
       "scanDaemonOrphans": "کھوکھلے اسکن ڈیمُن: {count} — استعمال کریں کلین اپ کریں تاکہ",
+      "extensionHostSection": "اکسنسن ہوست: {rss} RSS ({heap} / {heapTotal} ہیپ)",
       "warningHint": "Saropa یاد کریں ہے — کلک کریں تفصیلات کے لئے",
       "criticalHint": "Saropa یاد کریں اہم ہے — تیزی سے صاف کریں"
     },
@@ -806,6 +812,35 @@
       "kill": "کلیک /نومتھنک",
       "killed": "مروی",
       "killFailed": "ناکام"
+    },
+    "watcherExclude": {
+      "prompt": "{count} اس ورک سپیس میں فائل وچار کے اِکسکلوژن(ز) کم ہیں: {patterns}۔ ان کو شامل کرنا VS Code کو بڑی بیلڈ آرٹفیکٹس اور ہیپ ڈمپس سے گھٹنے سے گھر کرنے میں مدد کرتا ہے جو یاد ہے۔",
+      "addAll": "تمام اضاف کریں",
+      "dismiss": "برطرفی۔",
+      "added": "کارکردگی کے تنظیمی اعداد و شمار میں {count} فائل وچار کے استثناء(ات) شامل کردیا گیا۔"
+    },
+    "hazardScan": {
+      "warning": "{count} بڑے فائل(ز) نہیں ہیں فائل وچر کے سے اخراج کیے گئے ہیں: {files}۔ یہ یادگیری کی گنجائش کو ختم کر سکتے ہیں اور VS Code کو گری ہو سکتے ہیں۔",
+      "addExclusions": "نگاہ کے اُتارے جانے والے تخلیق کردہ کردار",
+      "dismiss": "برطرفی۔",
+      "added": "کارکردگی کے تنظیمی اعداد و شمار میں {count} وچر اکثریت کے استثناء کی الگ ترتیب شامل کر دی گئی۔"
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "کارکردگی کار کے کام میں: تمام صاف — کوئی مسئلہ نہیں ملا",
+    "quickPickTitle": "کارکردگی کار کے مسائل",
+    "quickPickPlaceholder": "مسئلہ کا انتخاب کریں تفصیل یا اس کو ترمیم کرنے کے لئے",
+    "statusBar": {
+      "red": "🔴 {count} ورکسپیس مسئلہ(ات)",
+      "yellow": "⚠ {count} میکسچر مسئلہ(ات)"
+    },
+    "issue": {
+      "hazardFiles": "$(تحذير) {count} بڑے نامناسب فائل(یں)",
+      "hazardFilesDetail": "بڑے فائل جو فائل وچر کے ذریعہ ٹریک کیے گئے ہیں، یادگیری اور VS Code کو ٹھیک کرنے میں مدد کر سکتے ہیں۔ خطرہ چیک کریں تاکہ انہیں چھوڑ دیا جا سکے۔",
+      "missingExcludes": "$(info) {count} میں گریڈر تخلیق کی گئی ہے",
+      "missingExcludesDetail": "اگرچہ اسٹرکچر کیا گیا ہے کہ فائل وچر کے اکثر استعمال ہونے والے نمونے نہیں تیار کیے گئے ہیں۔ ان کے شامل کرنا غیر ضروری یادگیری استعمال کو روکتا ہے۔",
+      "hostMemory": "$(alert) ایکسٹنسن ہوست استعمال کر رہا ہے {size}",
+      "hostMemoryDetail": "اکسنسن ہوست پروسس RSS چेतاوں کی حد سے تجاوز کر گیا ہے۔ تفصیلات کے لیے پروسس ہیلتھ کھولیں۔"
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "کوئی فائل متاثر نہیں ہوئی۔",
       "filesTitle": "الگ الگ فائلیں جو کم از کم ایک تلاش میں حصہ ڈالتی ہیں",
       "topRuleLabel": "سب سے اوپر حکمرانی کا اصول.",
-      "topRuleTitle": "{name} قاعدہ کے لئے فلٹر نتائج کو فلٹر کریں."
+      "topRuleTitle": "{name} قاعدہ کے لئے فلٹر نتائج کو فلٹر کریں.",
+      "sectionHeading": "جائزہ",
+      "sectionAria": "مختصر تجزیہ"
     },
     "toolbar": {
       "ariaFiltersActions": "فلٹرز اور ایکشن",
@@ -999,7 +1036,17 @@
       "moreSummary": "مزید More More زیادہ سے زیادہ",
       "moreChevron": "▾",
       "copyJsonTitle": "JSON ({count}) کے طور پر فلٹر شدہ خلاف ورزیوں کی کاپی کریں",
-      "saveReportTitle": "فلٹر شدہ خلاف ورزیوں کو JSON کے طور پر رپورٹس / YYYYMMDD/ میں محفوظ کریں۔"
+      "saveReportTitle": "فلٹر شدہ خلاف ورزیوں کو JSON کے طور پر رپورٹس / YYYYMMDD/ میں محفوظ کریں۔",
+      "copyEverythingJson": "کچھ بھی کاپی کریں جیسے جی این جی ایسون",
+      "copyEverythingJsonTitle": "تمام آڈیٹ نتائج کو جی ایس این کے طور پر کاپی کریں — فلٹر کیے بغیر، سuppresse شامل کریں",
+      "saveEverythingReport": "رپورٹ چیزیں بچائیں",
+      "saveEverythingReportTitle": "تمام آڈٹ نتائج کو JSON کے طور پر reports/ میں بچائیں — فلٹر کیے بغیر، سuppresse شامل کریں",
+      "suppressAll": "سیم کریں تمام دکھائی دینے والے",
+      "suppressAllTitle": "// تخلیق: تبصرہ ہر نظر آنے والے نتیجے کے اوپر کریں",
+      "suppressAllConfirm": "یہ {count} // نظر انداز کریں: تبصرے آپ کے ذریعہ ذریعہ فائلوں پر ڈالے گا۔ یہ ڈاش بورڈ سے تبدیل نہیں کیا جا سکتا — اپنے ایڈیٹر کے انسیڈ یا ورژن کنٹرول کا استعمال کریں تاکہ واپسی کی جا سکے۔ جاری رکھیں؟",
+      "suppressAllProceed": "تمام چھوڑ دیجیے",
+      "suppressAllDone": "درج کیا گیا {count} // نظر انداز: تبصرہ۔",
+      "suppressAllFailed": ".bulk suppress کو نافذ نہیں کیا جا سکتا — کچھ فائل پڑھ - لکھ کریکٹ ہو سکتی ہیں."
     },
     "audit": {
       "scopeFieldTitle": "نیچے دیا گیا تحلیل کس سے حاصل ہے کہاں سے چنیں",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "تبدیل کردہ vs شاخہ…",
       "branchPlaceholder": "برنچ نام",
       "branchAria": "شاخہ جس کے خلاف تقابل کیا جائے",
+      "includeSuppressedLabel": "سکریم کیے ہوئے شامل کریں",
+      "includeSuppressedTitle": "بھی ایسی تلاشیں شامل کریں جو عام طور پر // ignore:، // ignore_for_file: یا ایک بنیادی واقعہ کی ورک کے ذریعے چھپائی گئی ہیں — ہر ایک کو اس طرح مارک کیا گیا ہے جس طرح اسے روک دیا گیا تھا۔ آپ کے پروجیکٹ کی کانفیگ نہیں تبدیل کی گئی۔",
       "runButton": "آڈیٹ چلاؤ",
       "runButtonTitle": "پورے پروجیکٹ کی آڈٹ CLI کو چلا کر اس کے نتائج کو یہاں لوڈ کریں",
       "cancelButton": "منسوخ",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "غیر فعال قواعد کو دوبارہ قابل بنائیں۔",
       "reEnableQuickPickPlaceholder": "ایک یا زیادہ قواعد کو دوبارہ فعال کرنے کے لئے منتخب کریں۔",
       "menuGroupExport": "برآمدات کی درآمدات کا تبادلہ کریں.",
+      "menuGroupBulk": "批量操作",
       "menuGroupFilter": "فلٹر اور فوکس کریں",
       "menuGroupOpen": "ڈیش بورڈ کھولیں۔",
       "menuGroupSystem": "سسٹم سسٹمز سسٹمس نظام"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "نتائج کے نتائج",
+      "heading": "نتائج کے نتائج",
       "expandAll": "تمام توسیع کریں",
       "collapseAll": "سبھی گر جائیں ، سبھی ٹوٹ جائیں",
       "bulkSelected": "{count} منتخب کردہ",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "صفوں کی کارروائیاں۔",
       "selectRowAria": "اس تلاش کی قطار کو منتخب کریں.",
       "copyRowTitle": "اس تلاش کو JSON کے طور پر کاپی کریں.",
+      "suppressedBadge": "پرکار نہ کیا گیا",
+      "suppressedByTitle": "مخفی ہے آپ کے عام دیکھنے سے {kind} — صرف یہاں دکھائی دے رہا ہے کیونکہ \"Include suppressed\" کھول دیا گیا ہے",
       "metaShown": "{filtered} دکھائے گئے",
       "metaAfterDisable": "غیر فعال اصولوں کے فلٹر کے بعد {total}",
       "metaSourceCap": "کارکردگی کے لئے {max} پر حد بندی کردہ ماخذ۔",
@@ -1155,6 +1208,22 @@
       "openBrowser": "براؤزر میں کھولیں",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor کو غیر فعال کریں۔"
+    },
+    "suppressedFindings": {
+      "heading": "پرکار نہیں کیے گئے نتائج",
+      "headingAria": "سیکشن جہاں غیر معمولی نتائج تھے",
+      "byKind": "{count} دی {kind} تیاری",
+      "kindIgnore": "// چھوڑ دیجیے:",
+      "kindIgnoreForFile": "// تجاهل_کریں_کی_فائل: /نہ_سوچوں",
+      "kindBaseline": "بیس لائنے",
+      "unsuppressButton": "نامناسب کریں",
+      "unsuppressTitle": "سیچنگ کو ہٹا دیجیے تاکہ یہ ایک معمولی اسکن میں نظر آئے",
+      "unsuppressHint": "{rule} کو {file}:{line} پر دوبارہ تحریک دینے کے لئے، اس لائن کے اوپر // ignore: کامنت ہٹا دیجئے۔",
+      "columnFile": "فائلوں کی فہرست بنائیں۔",
+      "columnLine": "لائن لائن لائن لکیری",
+      "columnRule": "آرٹیکل آرٹیک رول",
+      "columnKind": "کنڈھہ",
+      "columnAction": "کارروائی"
     },
     "suppressions": {
       "sectionAria": "دباؤ کو ختم کرنا۔",
@@ -1261,6 +1330,7 @@
     "noReportYet": "ابھی تک کوئی خلاف ورزی کی اطلاع نہیں ہے۔ پہلے Saropa Lints تجزیہ چلائیں۔",
     "clipboardCopyFailed": "کلپ بورڈ میں کاپی نہیں کر سکا۔",
     "copiedViolationsJson": "کاپی کیا گیا {count} خلاف ورزیوں کو JSON.as کے طور پر",
+    "copiedEverythingJson": "clipboard میں {count} فلٹر کیے گئے نتائج کا کپی کر لیا گیا۔",
     "copiedOneViolationJson": "1 خلاف ورزی کو JSON کے طور پر کاپی کیا گیا۔",
     "driftNotConnected": "Drift Advisor سرور سے رابطہ نہیں ہے۔",
     "copiedBulkFindings": "کاپی کیا گیا {count} منتخب شدہ تلاش (((s) JSON کے طور پر.",

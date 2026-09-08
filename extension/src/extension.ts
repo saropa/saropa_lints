@@ -179,6 +179,7 @@ import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
 import { registerBugArchivalCheck } from './extensionChecks/bugArchivalCheck';
+import { registerDocPlacementCheck } from './extensionChecks/docPlacementCheck';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, postDashboardAnalysisProgress, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
@@ -781,6 +782,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Extension-native check (non-Dart): flags a closed bugs/*.md report still
   // sitting in bugs/ instead of plans/history/ — see ISSUE_REPORT_GUIDE.md.
   registerBugArchivalCheck(context);
+  // Mirror image of the above: flags a still-open report filed under the
+  // configured archive/history glob instead of the open-issues directory.
+  registerDocPlacementCheck(context);
   registerProjectMapCommand(context);
   registerHealthCodeLens(context);
 

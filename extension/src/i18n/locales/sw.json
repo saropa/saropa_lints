@@ -713,6 +713,10 @@
     "reloadLater": "Baadaye baadaye baadaye baadaye"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Macho",
+      "tooltip": "Unganisha matokeo ya bar ya maelekezo — bonye kwa matokeo. Extension ina kushuka kushuka; tafakari kuzinga kwa njia ya Command Palette."
+    },
     "menu": {
       "enableOn": "Analisisi inaonyeshwa (klikua kufuta)",
       "enableOff": "Analisi zilizofanikwa (klikua kujakokotia)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} daemon(s) ya kifalaki",
       "openHint": "Bofya ili kufungua Mchakato wa Afya",
       "systemRam": "System: {free} ya {total} kwa kuanza",
-      "systemLow": "⚠ Sistema: {free} ya {total} kati"
+      "systemLow": "⚠ Sistema: {free} ya {total} kati",
+      "extensionHostWarning": "⚠ Extension host: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} prosesu ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} server ya analizi (analysis server) zilizotajwa — tuma kipengele ya VS Code kozalishwa",
       "daemonCount": "Daemons Flutter: {total} ({orphaned} yatima)",
       "scanDaemonOrphans": "Daemons ya scan ya kifupishwa: {count} — kuzalishia kwa kutumia Clean Up",
+      "extensionHostSection": "Mshirika wa extension: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa memory ni kubwa — click kwa detali",
       "criticalHint": "Saropa memory ni kifaa kubadilishwa — kusalama kwa makosa kwa kutoa"
     },
@@ -806,6 +812,35 @@
       "kill": "Kifungua",
       "killed": "Kuuawa",
       "killFailed": "Mwisho"
+    },
+    "watcherExclude": {
+      "prompt": "Vipengezeko vya kuzalishia kipengele ya faili ({count}) vilianzishwa kwenye kipengele hiki: {patterns}. Kuzalishia wao wakifanyike kushughulisha VS Code kutenganisha kipengele mbalimbali ya uharibifu na kipengele ya kipengele kizungumzwa kote kwenye kipengele.",
+      "addAll": "Ona Wanda全部",
+      "dismiss": "Fungua kazi.",
+      "added": "Zilizongezwa {count} file-watcher exclusions kwenye mstika ya workspace."
+    },
+    "hazardScan": {
+      "warning": "Imeongezwa faili ya {count} ya kipindi kubwa sikuwa sio kikomotia kwenye kifichi ya faili: {files}. Hizi inaweza kuzalisha mifano ya memory na kuzalisha VS Code.",
+      "addExclusions": "Ondoa kutokana na Watcher",
+      "dismiss": "Fungua kazi.",
+      "added": "Zilizongezwa kipengele ya kufuta kipengele ya {count} kwenye mstari ya kazi."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Unganisha msaumia: wote wakati — haukosa kosa.",
+    "quickPickTitle": "Sauti ya Kuanzisha Kazi",
+    "quickPickPlaceholder": "Chagua msaada kwa maelezo au kujaribu kujaribu",
+    "statusBar": {
+      "red": "🔴 {count} miongoni mwa kazi",
+      "yellow": "⚠ {count} miongoni mwa kazi"
+    },
+    "issue": {
+      "hazardFiles": "$(warning) {count} faili (faili) ya kubwa ya kwanza kuzalishwa",
+      "hazardFilesDetail": "Faili mbalimbali ambayo inapangwa na mchakato wa faili inaweza kubadilisha mifano na kuzalisha VS Code. Tafuta kwa kuzalisha mifano kuzingatia wakati wao.",
+      "missingExcludes": "$(info) {count} kifungu kwa watcher kizungumzwa (s)",
+      "missingExcludesDetail": "Recommended file-watcher exclusion patterns are not configured. Adding them prevents unnecessary memory usage.",
+      "hostMemory": "$(alert) Mshirika wa extension ina kuzunguka {size}",
+      "hostMemoryDetail": "Programu ya host ya extension RSS inaanza kuzalishia matokeo ya mchoro. Opend Process Health kwa matokeo."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "hakuna faili zilizoathiriwa.",
       "filesTitle": "Faili tofauti zinazosaidia angalau utafutaji mmoja.",
       "topRuleLabel": "Sheria ya juu zaidi ni sheria ya juu.",
-      "topRuleTitle": "Chuja matokeo ya uchunguzi kwa utawala {name}."
+      "topRuleTitle": "Chuja matokeo ya uchunguzi kwa utawala {name}.",
+      "sectionHeading": "Muhtasari",
+      "sectionAria": "Matokeo ya kuhusiana"
     },
     "toolbar": {
       "ariaFiltersActions": "Vichungi na vitendo vya hatua.",
@@ -999,7 +1036,17 @@
       "moreSummary": "Zaidi zaidi More More",
       "moreChevron": "▾",
       "copyJsonTitle": "Nakili ukiukaji uliochujwa kama JSON ({count})",
-      "saveReportTitle": "Hifadhi ukiukaji uliochujwa kama JSON kwa ripoti/YYY YMMDD/"
+      "saveReportTitle": "Hifadhi ukiukaji uliochujwa kama JSON kwa ripoti/YYY YMMDD/",
+      "copyEverythingJson": "Tupa kila vitu kama JSON",
+      "copyEverythingJsonTitle": "Tuma KAA audit ya kifedha kama JSON — kwa kutoa, kuzingatia yoyote kama suppressed",
+      "saveEverythingReport": "Tuma wote raporti",
+      "saveEverythingReportTitle": "Tuma WAA audit ya kutoa kama JSON kwa reports/ — unfiltered, inakaribisha suppressed",
+      "suppressAll": "Kubadilisha kila matokeo ya kwanza",
+      "suppressAllTitle": "Tuma // ignore: kifungu kati ya kila matokeo mwingi ya kwanza",
+      "suppressAllConfirm": "Hii inaongeza {count} // ignore: comments kwenye faili zozobrazwa yako. Hii hauwezi kufungua kwa kuzingatia dashboard — tafuta undo ya editor yako au version control kuzingatia. Jipatikana?",
+      "suppressAllProceed": "Kubadilisha kila",
+      "suppressAllDone": "Ilingiza {count} // ignore: comments.",
+      "suppressAllFailed": "Hakikisha kubadilisha kwa kuzalishwa kwa kila faili — kuna faili mbalimbali ambayo ina kuhusika kwa kuzalishwa."
     },
     "audit": {
       "scopeFieldTitle": "Chagua nini kwa ajili ya matokeo ya kati ya chini kufungua kutokana na",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "Ungepata vs branch…",
       "branchPlaceholder": "jina la branch",
       "branchAria": "Branch ya kuzalisha",
+      "includeSuppressedLabel": "Inkisa kifupi",
+      "includeSuppressedTitle": "Tambaa pia matokeo ambayo inakubaliwa kwa muda mmoja kwa // ignore:, // ignore_for_file:, au eneo ya baseline — kila matokeo inaonyesha kama nini inapungua. Mipango ya project yako hau inapungua.",
       "runButton": "Tuma audit",
       "runButtonTitle": "Tumia CLI ya audit ya project kwa kufaniki na kuchagua matokeo yake hapa",
       "cancelButton": "Cancel cancel kufuta",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-Enable Disabled Rules - Kuwezesha tena sheria zilizozimwa.",
       "reEnableQuickPickPlaceholder": "Chagua moja au zaidi ya sheria ili kuwezesha tena.",
       "menuGroupExport": "Export export Uuzaji wa nje.",
+      "menuGroupBulk": "Mwongozo ya kujifunza kwa kibooti",
       "menuGroupFilter": "Filter & Focus ya",
       "menuGroupOpen": "Fungua dashibodi ya wazi.",
       "menuGroupSystem": "System System System Mfumo wa mfumo."
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "Matokeo ya Uchunguzi.",
+      "heading": "Matokeo ya Uchunguzi.",
       "expandAll": "Kuongeza wote kupanua yote.",
       "collapseAll": "Kuanguka wote kuporomoka.",
       "bulkSelected": "{count} zimechaguliwa",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "Hatua za safu Matendo ya safu.",
       "selectRowAria": "Chagua safu hii ya kutafuta chaguo.",
       "copyRowTitle": "Nakili matokeo haya kama JSON.",
+      "suppressedBadge": "Mwongozo ya kuzalishia",
+      "suppressedByTitle": "Hidaya kati ya matokeo yako ya kwanza na {kind} — kati ya matokeo haya kwa sababu \"Include suppressed\" inaunda",
       "metaShown": "{filtered} zimeonyeshwa",
       "metaAfterDisable": "{total} baada ya kichujio cha sheria iliyozimwa",
       "metaSourceCap": "chanzo kilichowekwa kikomo cha {max} kwa utendaji wa utendaji.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "Fungua katika kivinjari cha browser.",
       "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor Mshauri wa Uhamaji."
+    },
+    "suppressedFindings": {
+      "heading": "Matokeo ya Kufunga Kwa Kando",
+      "headingAria": "Sektion ya matokeo ya kuzalishia",
+      "byKind": "{count} na {kind}",
+      "kindIgnore": "// kupuuza:",
+      "kindIgnoreForFile": "// kupuuza_kwa_faili:",
+      "kindBaseline": "baseline",
+      "unsuppressButton": "Unsuppress",
+      "unsuppressTitle": "Ondoa kuzalishia kwa kusafisha matokeo hapa kwenye skani mafanikio ya kipindi",
+      "unsuppressHint": "Kuondoa {rule} kwenye {file}:{line}: ongeza komento // ignore: kwenye linia ya kichwa.",
+      "columnFile": "File ya faili file.",
+      "columnLine": "Mstari Line Line Line line.",
+      "columnRule": "Kanuni ya Sheria Kanuni za sheria.",
+      "columnKind": "Aina",
+      "columnAction": "Moto ya Ujumla"
     },
     "suppressions": {
       "sectionAria": "Ukandamizaji wa mawazo.",
@@ -1261,6 +1330,7 @@
     "noReportYet": "Hakuna ripoti ya ukiukaji bado. Fanya uchambuzi wa Saropa Lints kwanza.",
     "clipboardCopyFailed": "Haikuweza kunakili kwenye clipboard.",
     "copiedViolationsJson": "Nakala {count} ukiukaji (((s) kama JSON.",
+    "copiedEverythingJson": "Mlango wa {count} ya kifungu kwa kutoa kwa kipanda.",
     "copiedOneViolationJson": "Nilinakili ukiukaji 1 kama JSON.",
     "driftNotConnected": "Drift Advisor server haihusiani.",
     "copiedBulkFindings": "Nakala {count} matokeo yaliyochaguliwa (((s) kama JSON.",

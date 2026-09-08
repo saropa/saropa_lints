@@ -713,6 +713,10 @@
     "reloadLater": "Sau này sau đó sau này sau này"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Lỗi",
+      "tooltip": "Cập nhật thanh trạng thái thất bại — nhấp để xem chi tiết. Mở rộng có thể vẫn hoạt động; hãy thử chạy một lệnh từ Palet Lệnh."
+    },
     "menu": {
       "enableOn": "Đã bật phân tích (bấm để tắt)",
       "enableOff": "Phân tích bị vô hiệu hóa (nhấp để bật)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} daemon(s) bị bỏ rơi",
       "openHint": "Nhấp để mở Tình trạng quy trình",
       "systemRam": "Hệ thống: {free} của {total} miễn phí",
-      "systemLow": "⚠ Hệ thống: {free} của {total} miễn phí"
+      "systemLow": "⚠ Hệ thống: {free} của {total} miễn phí",
+      "extensionHostWarning": "⚠ Host mở rộng: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} quy trình(es) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} server phân tích được phát hiện — đóng các cửa sổ VS Code không sử dụng",
       "daemonCount": "Flutter daemon: {total} ({orphaned} bị bỏ rơi)",
       "scanDaemonOrphans": "Daemon quét bị bỏ rơi: {count} — dùng Clean Up để giết",
+      "extensionHostSection": "Máy chủ mở rộng: {rss} RSS (đống {heap} / {heapTotal})",
       "warningHint": "Saropa bộ nhớ cao — click để xem chi tiết",
       "criticalHint": "Saropa memory là quan trọng — được khuyến nghị dọn dẹp"
     },
@@ -806,6 +812,35 @@
       "kill": "Giết",
       "killed": "bị giết",
       "killFailed": "Thất bại"
+    },
+    "watcherExclude": {
+      "prompt": "{count} quy tắc loại trừ file-watcher được đề xuất đang thiếu trong không gian làm việc này: {patterns}. Việc thêm chúng sẽ ngăn VS Code theo dõi các sản phẩm xây dựng lớn và file dump heap tốn kém bộ nhớ.",
+      "addAll": "Thêm Tất Cả",
+      "dismiss": "Thả bỏ việc làm",
+      "added": "Đã thêm {count} file-watcher ngoại lệ(s) vào cài đặt không gian làm việc."
+    },
+    "hazardScan": {
+      "warning": "Đã tìm thấy {count} tập tin (tập tin) lớn không được loại trừ khỏi trình theo dõi tập tin: {files}. Những tập tin này có thể làm tràn bộ nhớ và gây ra sự cố VS Code.",
+      "addExclusions": "Loại trừ khỏi Watcher",
+      "dismiss": "Thả bỏ việc làm",
+      "added": "Đã thêm mẫu trừ (pattern) theo dõi {count} vào cài đặt không gian làm việc."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Sẵn sàng làm việc: tất cả đã ổn — không có vấn đề nào được phát hiện.",
+    "quickPickTitle": "Vấn đề Chuẩn bị Không gian Làm việc",
+    "quickPickPlaceholder": "Chọn một vấn đề để xem chi tiết hoặc để sửa nó",
+    "statusBar": {
+      "red": "🔴 {count} vấn đề không gian làm việc",
+      "yellow": "⚠ {count} vấn đề không gian làm việc"
+    },
+    "issue": {
+      "hazardFiles": "$(warning) {count} file(s) lớn không được loại trừ",
+      "hazardFilesDetail": "Các tệp lớn được theo dõi bởi trình giám sát tệp có thể làm tràn bộ nhớ và gây treo VS Code. Chạy quét nguy hiểm để loại trừ chúng.",
+      "missingExcludes": "$(info) {count} thiếu các file được bỏ qua bởi watcher",
+      "missingExcludesDetail": "Các mẫu loại trừ người quan sát tệp được khuyến nghị không được cấu hình. Việc thêm chúng ngăn không cho sử dụng bộ nhớ không cần thiết.",
+      "hostMemory": "$(alert) Host mở rộng đang sử dụng {size}",
+      "hostMemoryDetail": "Quy trình chủ mở rộng RSS vượt quá ngưỡng cảnh báo. Mở Process Health để xem chi tiết."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "Không có tệp nào bị ảnh hưởng.",
       "filesTitle": "Các tập tin riêng biệt đóng góp ít nhất một phát hiện.",
       "topRuleLabel": "Quy tắc hàng đầu là luật lệ.",
-      "topRuleTitle": "Chọn lọc kết quả để quy tắc {name}."
+      "topRuleTitle": "Chọn lọc kết quả để quy tắc {name}.",
+      "sectionHeading": "Tổng quan",
+      "sectionAria": "Tổng quan thống kê"
     },
     "toolbar": {
       "ariaFiltersActions": "Bộ lọc và hành động.",
@@ -999,7 +1036,17 @@
       "moreSummary": "More More More Nhiều hơn",
       "moreChevron": "▾",
       "copyJsonTitle": "Sao chép các vi phạm được lọc dưới dạng JSON ({count})",
-      "saveReportTitle": "Lưu các vi phạm được lọc dưới dạng JSON vào báo cáo/YYY YMMDD/"
+      "saveReportTitle": "Lưu các vi phạm được lọc dưới dạng JSON vào báo cáo/YYY YMMDD/",
+      "copyEverythingJson": "Sao chép mọi thứ dưới dạng JSON",
+      "copyEverythingJsonTitle": "Sao chép TẤT CẢ kết quả kiểm tra như JSON — chưa lọc, bao gồm cả những kết quả bị ẩn",
+      "saveEverythingReport": "Lưu tất cả báo cáo",
+      "saveEverythingReportTitle": "Lưu TẤT CẢ kết quả kiểm tra vào JSON để reports/ — chưa lọc, bao gồm cả những kết quả bị ức chế",
+      "suppressAll": "Tắt tất cả các cảnh báo có thể nhìn thấy",
+      "suppressAllTitle": "Chèn // ignore: bình luận phía trên mỗi kết quả hiển thị",
+      "suppressAllConfirm": "Điều này sẽ chèn {count} // ignore: comments vào các tệp nguồn của bạn. Điều này không thể hủy bỏ từ bảng điều khiển — hãy sử dụng chức năng khôi phục của trình soạn thảo hoặc kiểm soát phiên bản. Tiếp tục?",
+      "suppressAllProceed": "Tắt tất cả",
+      "suppressAllDone": "Đã chèn {count} // ignore: comments.",
+      "suppressAllFailed": "Không thể áp dụng việc bỏ qua hàng loạt — một số tệp có thể là chỉ đọc."
     },
     "audit": {
       "scopeFieldTitle": "Chọn nguồn nào các phát hiện dưới đây được lấy từ",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "Đã thay đổi so với nhánh…",
       "branchPlaceholder": "tên nhánh",
       "branchAria": "Chi nhánh để so sánh",
+      "includeSuppressedLabel": "Bao gồm các quy tắc bị bỏ qua",
+      "includeSuppressedTitle": "Cũng bao gồm các phát hiện thường bị ẩn bởi // ignore:, // ignore_for_file:, hoặc một mục nhập cơ sở — mỗi mục được đánh dấu cách nó đã bị vô hiệu hóa. Cấu hình dự án của bạn không bị thay đổi.",
       "runButton": "Chạy kiểm tra",
       "runButtonTitle": "Chạy CLI kiểm tra toàn bộ dự án và tải kết quả của nó ở đây",
       "cancelButton": "Hủy bỏ hủy bỏ",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-enable disabled rules: Khởi động lại các quy tắc bị vô hiệu hóa.",
       "reEnableQuickPickPlaceholder": "Chọn một hoặc nhiều quy tắc để kích hoạt lại.",
       "menuGroupExport": "Xuất khẩu xuất khẩu",
+      "menuGroupBulk": "Tác động hàng loạt",
       "menuGroupFilter": "Filter & focus (chuyển hình và tập trung)",
       "menuGroupOpen": "Mở bảng điều khiển mở.",
       "menuGroupSystem": "Hệ thống hệ thống System System"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "Những phát hiện của các nhà nghiên cứu",
+      "heading": "Những phát hiện của các nhà nghiên cứu",
       "expandAll": "Expand all mở rộng tất cả",
       "collapseAll": "Tất cả đều sụp đổ.",
       "bulkSelected": "đã chọn {count}",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "Các hành động hàng Row actions",
       "selectRowAria": "Chọn hàng tìm kiếm này.",
       "copyRowTitle": "Sao chép kết quả này dưới dạng JSON.",
+      "suppressedBadge": "Bị ức chế",
+      "suppressedByTitle": "Ẩn khỏi tầm nhìn bình thường của bạn bởi {kind} — chỉ hiển thị ở đây vì \"Include suppressed\" đã được bật",
       "metaShown": "hiển thị {filtered}",
       "metaAfterDisable": "{total} sau khi lọc quy tắc bị vô hiệu hóa",
       "metaSourceCap": "nguồn giới hạn ở {max} cho hiệu suất hoạt động.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "Mở trong trình duyệt.",
       "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor - Ngăn chặn tư vấn trôi dạt"
+    },
+    "suppressedFindings": {
+      "heading": "Kết quả Bị Bỏ Qua",
+      "headingAria": "Phần kết quả bị ẩn",
+      "byKind": "{count} bởi {kind}",
+      "kindIgnore": "// bỏ qua:",
+      "kindIgnoreForFile": "// bỏ qua_for_file:",
+      "kindBaseline": "đường cơ sở",
+      "unsuppressButton": "Không tắt cảnh báo",
+      "unsuppressTitle": "Loại bỏ việc bỏ qua để kết quả này xuất hiện trong các quét bình thường",
+      "unsuppressHint": "Để hủy bỏ cảnh báo {rule} tại {file}:{line}, hãy xóa chú thích // ignore: phía trên dòng đó.",
+      "columnFile": "File file file file File File",
+      "columnLine": "Dòng Đường Đường",
+      "columnRule": "Quy tắc của quy định",
+      "columnKind": "Loại",
+      "columnAction": "Hành động"
     },
     "suppressions": {
       "sectionAria": "Sự đàn áp sự ám ảnh",
@@ -1261,6 +1330,7 @@
     "noReportYet": "Chưa có báo cáo vi phạm nào. Đầu tiên chạy phân tích Saropa Lints.",
     "clipboardCopyFailed": "Không thể sao chép vào clipboard.",
     "copiedViolationsJson": "Sao chép {count} vi phạm (s) như JSON.",
+    "copiedEverythingJson": "Đã sao chép {count} các kết quả chưa lọc sang clipboard.",
     "copiedOneViolationJson": "Sao chép 1 vi phạm dưới dạng JSON.",
     "driftNotConnected": "Máy chủ Drift Advisor không được kết nối.",
     "copiedBulkFindings": "Sao chép {count} tìm kiếm được chọn (s) dưới dạng JSON.",

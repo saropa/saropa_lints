@@ -713,6 +713,10 @@
     "reloadLater": "后来 后来的 之后的"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: 错误",
+      "tooltip": "状态栏更新失败 — 点击查看详情。扩展仍可能正常工作；尝试从命令面板运行命令。"
+    },
     "menu": {
       "enableOn": "已启用分析（单击以禁用）",
       "enableOff": "分析已禁用（单击以启用）",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} 孤儿守护进程(进程)",
       "openHint": "单击打开进程运行状况",
       "systemRam": "系统：{free} / {total} 免费",
-      "systemLow": "⚠ 系统：{free} / {total} 个免费"
+      "systemLow": "⚠ 系统：{free} / {total} 个免费",
+      "extensionHostWarning": "⚠ 扩展主机: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints：{count}个进程({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count}分析服务器检测到 — 关闭未使用的VS Code窗口",
       "daemonCount": "Flutter 守护进程：{total}（{orphaned} 孤儿）",
       "scanDaemonOrphans": "孤立的扫描守护进程：{count} — 使用清理功能终止",
+      "extensionHostSection": "扩展主机：{rss} RSS（{heap} / {heapTotal} 堆）",
       "warningHint": "Saropa 内存使用率高 — 点击查看详情",
       "criticalHint": "Saropa内存是关键 —— 推荐清理"
     },
@@ -806,6 +812,35 @@
       "kill": "杀死",
       "killed": "已终止",
       "killFailed": "失败"
+    },
+    "watcherExclude": {
+      "prompt": "在此工作区中缺少{count}推荐的文件监视器排除项：{patterns}。添加它们可防止VS Code跟踪占用内存的大型构建工件和堆转储。",
+      "addAll": "全部添加",
+      "dismiss": "解雇了,这是一个很好的方法.",
+      "added": "已将 {count} 文件监视器排除项添加到工作区设置中。"
+    },
+    "hazardScan": {
+      "warning": "发现{count}个未被文件监视器排除的大文件: {files}。这些文件可能耗尽内存并导致VS Code崩溃。",
+      "addExclusions": "排除于监视器之外",
+      "dismiss": "解雇了,这是一个很好的方法.",
+      "added": "已将{count}监视器排除模式添加到工作区设置中。"
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "工作区准备就绪：一切正常 — 未发现任何问题。",
+    "quickPickTitle": "工作区准备问题",
+    "quickPickPlaceholder": "选择一个问题以获取详细信息或进行修复",
+    "statusBar": {
+      "red": "🔴 {count} 工作区问题",
+      "yellow": "⚠ {count} 工作区问题"
+    },
+    "issue": {
+      "hazardFiles": "$(warning) {count} 个未排除的大文件(s)",
+      "hazardFilesDetail": "被文件监视器跟踪的大文件可能会耗尽内存并导致VS Code崩溃。运行危险扫描以排除这些文件。",
+      "missingExcludes": "$(info) {count} 缺失的 watcher 排除项",
+      "missingExcludesDetail": "推荐的文件监视器排除模式未配置。添加它们可以防止不必要的内存使用。",
+      "hostMemory": "$(alert) 扩展主机使用 {size}",
+      "hostMemoryDetail": "扩展主机进程 RSS 超出警告阈值。打开进程健康状态以获取详细信息。"
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "没有任何文件受到影响.",
       "filesTitle": "独立的文件至少有助于一个发现.",
       "topRuleLabel": "最重要的规则是最高的规则.",
-      "topRuleTitle": "过 ⁇ 结果以规则为 {name} ."
+      "topRuleTitle": "过 ⁇ 结果以规则为 {name} .",
+      "sectionHeading": "概述",
+      "sectionAria": "概览统计"
     },
     "toolbar": {
       "ariaFiltersActions": "过 ⁇ 器和行动.",
@@ -999,7 +1036,17 @@
       "moreSummary": "更多的,更多的.",
       "moreChevron": "▾",
       "copyJsonTitle": "将过 ⁇ 的违规行为复制为JSON ({count})",
-      "saveReportTitle": "保存过 ⁇ 的违规行为作为JSON到报告/YYY YMMDD/."
+      "saveReportTitle": "保存过 ⁇ 的违规行为作为JSON到报告/YYY YMMDD/.",
+      "copyEverythingJson": "复制全部内容为JSON",
+      "copyEverythingJsonTitle": "复制所有审计结果作为 JSON — 未过滤，包括被抑制的",
+      "saveEverythingReport": "保存所有内容报告",
+      "saveEverythingReportTitle": "将所有审计结果保存为 JSON 到 reports/ 目录中 — 未过滤，包括被抑制的",
+      "suppressAll": "抑制所有可见",
+      "suppressAllTitle": "插入 // ignore: 注释在每个可见问题上方",
+      "suppressAllConfirm": "这将在您的源文件中插入 {count} // ignore: 注释。此操作无法从仪表板中撤销 — 请使用编辑器的撤销功能或版本控制来还原。继续吗？",
+      "suppressAllProceed": "全部抑制",
+      "suppressAllDone": "插入 {count} // ignore: 注释。",
+      "suppressAllFailed": "无法应用批量抑制 —— 一些文件可能为只读。"
     },
     "audit": {
       "scopeFieldTitle": "选择以下发现的来源",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "已更改 vs 分支…",
       "branchPlaceholder": "分支名称",
       "branchAria": "要比较的分支",
+      "includeSuppressedLabel": "包含已抑制的",
+      "includeSuppressedTitle": "也包括通常被// ignore:// ignore_for_file:或基线条目隐藏的发现——每个都标记了它是如何被抑制的。您的项目配置不会被更改。",
       "runButton": "运行审计",
       "runButtonTitle": "在此运行完整的项目审计CLI并加载其结果",
       "cancelButton": "取消 取缔 在此之前,请注销.",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "重新启用禁用的规则",
       "reEnableQuickPickPlaceholder": "选择一个或多个规则重新启用.",
       "menuGroupExport": "输出 出口 在外面",
+      "menuGroupBulk": "批量操作",
       "menuGroupFilter": "过 ⁇ 器和焦点",
       "menuGroupOpen": "打开仪表板,打开一个仪表盘.",
       "menuGroupSystem": "系统的系统是什么"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "发现结果的研究.",
+      "heading": "发现结果的研究.",
       "expandAll": "扩展所有",
       "collapseAll": "所有的崩 ⁇ 都会发生.",
       "bulkSelected": "已选择 {count} 个",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "排行行动 行列动作",
       "selectRowAria": "选择这个查找行,然后在此行中找到.",
       "copyRowTitle": "将这个发现复制为JSON.",
+      "suppressedBadge": "已抑制",
+      "suppressedByTitle": "被{kind}隐藏，仅在此处可见因为“包含被抑制的”已开启",
       "metaShown": "显示 {filtered} 个",
       "metaAfterDisable": "过滤禁用规则后共 {total} 个",
       "metaSourceCap": "性能源的上限为 {max} 的性能.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "在浏览器中打开.",
       "headingIssues": "Drift Advisor",
       "disable": "禁用 Drift Advisor 的功能"
+    },
+    "suppressedFindings": {
+      "heading": "抑制的发现",
+      "headingAria": "抑制结果部分",
+      "byKind": "{count} 由 {kind} 提供",
+      "kindIgnore": "// 忽略:",
+      "kindIgnoreForFile": "// 忽略文件：",
+      "kindBaseline": "基线",
+      "unsuppressButton": "取消抑制",
+      "unsuppressTitle": "移除抑制以便此发现出现在常规扫描中",
+      "unsuppressHint": "要取消抑制 {rule} 在 {file}:{line} 的警告，请删除该行上方的 // ignore: 注释。",
+      "columnFile": "文件的档案,是我们所拥有的.",
+      "columnLine": "线条 线路 线上",
+      "columnRule": "规则 规章制度 在",
+      "columnKind": "种类",
+      "columnAction": "操作"
     },
     "suppressions": {
       "sectionAria": "压抑的压制",
@@ -1261,6 +1330,7 @@
     "noReportYet": "没有违规报告. 首先运行Saropa Lints分析.",
     "clipboardCopyFailed": "无法复制到剪贴板.",
     "copiedViolationsJson": "复制了 {count} 的违规内容 (s) 以 JSON.",
+    "copiedEverythingJson": "已将{count}未过滤的发现复制到剪贴板。",
     "copiedOneViolationJson": "复制了1个违规行为作为JSON.",
     "driftNotConnected": "Drift Advisor 服务器没有连接.",
     "copiedBulkFindings": "复制了 {count} 的选择结果 (s) 以 JSON.",

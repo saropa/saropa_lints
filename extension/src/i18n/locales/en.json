@@ -2761,6 +2761,11 @@
       "message": "This report is marked \"{status}\" but is still in bugs/ — archive it to plans/history/ before closing (see ISSUE_REPORT_GUIDE.md)."
     }
   },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "This document still reads as open work but is filed in the archive/history location — move it to {openIssuesDir} instead."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Run analysis",

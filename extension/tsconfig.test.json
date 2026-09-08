@@ -267,7 +267,9 @@
     "src/commandGuards.ts",
     "src/test/commandGuards.test.ts",
     "src/extensionChecks/bugArchivalCheck.ts",
-    "src/test/extensionChecks/bugArchivalCheck.test.ts"
+    "src/test/extensionChecks/bugArchivalCheck.test.ts",
+    "src/extensionChecks/docPlacementCheck.ts",
+    "src/test/extensionChecks/docPlacementCheck.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

@@ -1636,6 +1636,49 @@
         }
       },
       {
+        "title": "%config.section.Doc.Placement.title%",
+        "properties": {
+          "saropaLints.docPlacement.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "%config.property.docPlacement.enabled.description%"
+          },
+          "saropaLints.docPlacement.archiveGlob": {
+            "type": "string",
+            "default": "**/plans/history/**/*.md",
+            "description": "%config.property.docPlacement.archiveGlob.description%"
+          },
+          "saropaLints.docPlacement.openIssuesDir": {
+            "type": "string",
+            "default": "bugs/",
+            "description": "%config.property.docPlacement.openIssuesDir.description%"
+          },
+          "saropaLints.docPlacement.openSignals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "^\\*{0,2}Status:\\*{0,2}\\s*Open\\*{0,2}\\s*$",
+              "^\\*{0,2}Severity:\\*{0,2}\\s*(Critical|High|Major)\\*{0,2}\\s*$",
+              "\\|\\s*(Critical|High|Major)\\s*\\|",
+              "^#{1,6}\\s*(Recommended [Nn]ext [Ss]teps|Work [Ss]till to [Dd]o|TODO|Open [Ii]tems)\\s*$"
+            ],
+            "description": "%config.property.docPlacement.openSignals.description%"
+          },
+          "saropaLints.docPlacement.closedSignals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [
+              "^\\*{0,2}Status:\\*{0,2}\\s*(Fixed|Closed|Done)\\*{0,2}\\s*$"
+            ],
+            "description": "%config.property.docPlacement.closedSignals.description%"
+          }
+        }
+      },
+      {
         "title": "%config.section.Drift.Advisor.title%",
         "properties": {
           "saropaLints.driftAdvisor.integration": {

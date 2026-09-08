@@ -713,6 +713,10 @@
     "reloadLater": "ภายหลัง ต่อไป ล่าสุด"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: ข้อผิดพลาด",
+      "tooltip": "การอัปเดตแถบสถานะล้มเหลว — คลิกเพื่อดูรายละเอียด การขยายอาจยังทำงานได้; ลองรันคำสั่งจาก Command Palette"
+    },
     "menu": {
       "enableOn": "เปิดใช้งานการวิเคราะห์แล้ว (คลิกเพื่อปิดใช้งาน)",
       "enableOff": "การวิเคราะห์ถูกปิดใช้งาน (คลิกเพื่อเปิดใช้งาน)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} daemon(s) ที่ถูกทอดทิ้ง",
       "openHint": "คลิกเพื่อเปิดความสมบูรณ์ของกระบวนการ",
       "systemRam": "ระบบ: {free} จาก {total} ฟรี",
-      "systemLow": "⚠ ระบบ: {free} จาก {total} ฟรี"
+      "systemLow": "⚠ ระบบ: {free} จาก {total} ฟรี",
+      "extensionHostWarning": "⚠ ตัวดำเนินการขยาย: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} กระบวนการ(ๆ) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "เซิร์ฟเวอร์การวิเคราะห์ {count} ตรวจพบ — ปิดหน้าต่าง VS Code ที่ไม่ได้ใช้",
       "daemonCount": "Flutter ผู้ดูแลระบบ: {total} ({orphaned} ทิ้งไว้)",
       "scanDaemonOrphans": "Daemon ที่ถูกทอดทิ้งในการสแกน: {count} — ใช้ Clean Up เพื่อปิด",
+      "extensionHostSection": "ตัวขยาย: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "หน่วยความจำ Saropa สูง — คลิกเพื่อดูรายละเอียด",
       "criticalHint": "Saropa memory คือสิ่งสำคัญ — แนะนำให้ทำความสะอาด"
     },
@@ -806,6 +812,35 @@
       "kill": "ลบ",
       "killed": "ถูกสังหาร",
       "killFailed": "ล้มเหลว"
+    },
+    "watcherExclude": {
+      "prompt": "{count} ไฟล์ที่ควรจะตั้งค่าการติดตาม (file-watcher exclusion) ไม่ได้ถูกเพิ่มในพื้นที่ทำงานนี้: {patterns} การเพิ่มพวกมันจะป้องกัน VS Code ไม่ติดตามวัตถุการสร้างขนาดใหญ่และไฟล์การดัมพ์หน่วยความจำที่กินทรัพยากรความจำ",
+      "addAll": "เพิ่มทั้งหมด",
+      "dismiss": "ขอยกเลิกการทํางาน",
+      "added": "เพิ่มการยกเว้น {count} ของไฟล์ watcher ไปยังการตั้งค่าของงาน (workspace)"
+    },
+    "hazardScan": {
+      "warning": "พบไฟล์ขนาดใหญ่ {count} ที่ไม่ได้ถูกตัดออกจากตัวติดตามไฟล์: {files} ไฟล์เหล่านี้อาจใช้หน่วยความจำจนหมดและทำให้ VS Code ล่ม",
+      "addExclusions": "แยกออกจากรายการติดตาม",
+      "dismiss": "ขอยกเลิกการทํางาน",
+      "added": "เพิ่มรูปแบบการยกเว้น {count} watcher ไปยังตั้งค่าการทำงานร่วมกันของงาน"
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "ความพร้อมของพื้นที่ทำงาน: ทุกอย่างเป็นไปตามปกติ — ไม่พบปัญหาใดๆ",
+    "quickPickTitle": "ปัญหาความพร้อมของพื้นที่ทำงาน",
+    "quickPickPlaceholder": "เลือกปัญหาเพื่อดูรายละเอียดหรือแก้ไข",
+    "statusBar": {
+      "red": "🔴 {count} ปัญหาใน workspace",
+      "yellow": "⚠ ปัญหา {count} workspace"
+    },
+    "issue": {
+      "hazardFiles": "$(warning) {count} ไฟล์ที่มีขนาดใหญ่และไม่ได้รับการยกเว้น",
+      "hazardFilesDetail": "ไฟล์ขนาดใหญ่ที่ถูกติดตามโดย File Watcher อาจทำให้ระบบใช้หน่วยความจำหมดและเกิดการล่มของ VS Code ให้รันการสแกนความเสี่ยงเพื่อแยกพวกมันออก",
+      "missingExcludes": "$(info) {count} ขาดการยกเว้น watcher(s)",
+      "missingExcludesDetail": "รูปแบบการยกเว้นการติดตามไฟล์ที่แนะนำไม่ได้กำหนดไว้ การเพิ่มขึ้นจะป้องกันการใช้งานหน่วยความจำที่ไม่จำเป็น",
+      "hostMemory": "$(alert) ตัวดำเนินการขยายการใช้งาน {size}",
+      "hostMemoryDetail": "กระบวนการโฮสต์ของต่อขยาย RSS เกินขีดจำกัดเตือน คลิกที่ Process Health เพื่อดูรายละเอียด"
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "ไม่มีไฟล์ใด ๆ ที่ได้รับผลกระทบ",
       "filesTitle": "ไฟล์ที่แตกต่างกัน ที่มีส่วนร่วมอย่างน้อย 1 การค้นพบ",
       "topRuleLabel": "กฎสูงสุดของกฎ",
-      "topRuleTitle": "การกรองผลการค้นพบเพื่อใช้กฎ {name}"
+      "topRuleTitle": "การกรองผลการค้นพบเพื่อใช้กฎ {name}",
+      "sectionHeading": "ภาพรวม",
+      "sectionAria": "สถิติภาพรวม"
     },
     "toolbar": {
       "ariaFiltersActions": "ฟิลเตอร์และการกระทํา",
@@ -999,7 +1036,17 @@
       "moreSummary": "More More มากยิ่งขึ้น",
       "moreChevron": "▾",
       "copyJsonTitle": "สําเนาความผิดที่กรองไว้เป็น JSON ({count})",
-      "saveReportTitle": "เก็บการละเมิดที่กรองไว้เป็น JSON ไปยังรายงาน / YYYYMMDD /"
+      "saveReportTitle": "เก็บการละเมิดที่กรองไว้เป็น JSON ไปยังรายงาน / YYYYMMDD /",
+      "copyEverythingJson": "คัดลอกทุกอย่างเป็น JSON",
+      "copyEverythingJsonTitle": "คัดลอกข้อมูลการตรวจสอบทั้งหมดในรูปแบบ JSON — ไม่กรอง รวมถึงข้อผิดพลาดที่ถูกปิดกั้น",
+      "saveEverythingReport": "รายงานการบันทึกทุกอย่าง",
+      "saveEverythingReportTitle": "บันทึกผลการตรวจสอบทั้งหมดเป็น JSON ไปยัง reports/ — ไม่กรอง รวมถึงที่ถูกปิด/ไม่แสดง",
+      "suppressAll": "ปิดการแจ้งเตือนทั้งหมดที่มองเห็นได้",
+      "suppressAllTitle": "แทรก // ละเว้น: ความคิดเห็นข้างบนทุกการค้นพบที่เห็นได้",
+      "suppressAllConfirm": "สิ่งนี้จะแทรก {count} // ignore: ความเห็นข้ามไฟล์แหล่งข้อมูลของคุณ ไม่สามารถยกเลิกได้จากแดชบอร์ด — ใช้การยกเลิกของตัวแก้ไขหรือระบบควบคุมเวอร์ชันเพื่อกลับไปยังสถานะเดิม ต้องดำเนินการต่อหรือไม่?",
+      "suppressAllProceed": "ปิดการแจ้งเตือนทั้งหมด",
+      "suppressAllDone": "แทรก {count} // ละเว้น: ความเห็น.",
+      "suppressAllFailed": "ไม่สามารถใช้การปิดกันแบบกลุ่มได้ — บางไฟล์อาจเป็นไฟล์อ่าน-only"
     },
     "audit": {
       "scopeFieldTitle": "เลือกแหล่งที่มาของผลการค้นหาด้านล่าง",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "เปลี่ยน vs สาขา…",
       "branchPlaceholder": "ชื่อสาขา",
       "branchAria": "สาขาที่จะเปรียบเทียบ",
+      "includeSuppressedLabel": "รวมถึงการยับยั้ง",
+      "includeSuppressedTitle": "ยังรวมถึงผลการค้นหาที่ปกปิดโดยปกติโดย // ignore:, // ignore_for_file: หรือรายการฐานข้อมูล — แต่ละข้อถูกทำเครื่องหมายว่าถูกปิดกั้นอย่างไร ไฟล์กำหนดค่าของโปรเจกต์ของคุณไม่ถูกเปลี่ยนแปลง",
       "runButton": "รันออดิท",
       "runButtonTitle": "รันการตรวจสอบโครงการทั้งหมดผ่าน CLI และโหลดผลลัพธ์ของมันตรงนี้",
       "cancelButton": "ยกเลิก Cancel เลิก",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-enable disabled rules กฎกติกาที่ถูกปิดการใช้งาน",
       "reEnableQuickPickPlaceholder": "เลือกกฎหนึ่งหรือมากกว่ากฏที่จะเปิดใช้งานใหม่",
       "menuGroupExport": "การส่งออก Export ส่งออก",
+      "menuGroupBulk": "การดำเนินการแบบกลุ่ม",
       "menuGroupFilter": "การกรอง & โฟกัส",
       "menuGroupOpen": "เปิด Dashboard แล้วเปิด",
       "menuGroupSystem": "ระบบ System System ระบบ"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "ผลการค้นพบ รายงาน",
+      "heading": "ผลการค้นพบ รายงาน",
       "expandAll": "ขยายทั้งหมด Expand all",
       "collapseAll": "พังหมดไปหมด",
       "bulkSelected": "เลือกแล้ว {count} รายการ",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "การกระทํา Row actions กิจกรรมแถว",
       "selectRowAria": "เลือกแถวการค้นหานี้",
       "copyRowTitle": "สําเนาการค้นพบนี้เป็น JSON",
+      "suppressedBadge": "ยับยั้ง",
+      "suppressedByTitle": "ซ่อนจากมุมมองปกติของคุณโดย {kind} — มองเห็นได้เฉพาะที่นี่เพราะ \"Include suppressed\" ถูกเปิดใช้งาน",
       "metaShown": "แสดง {filtered} รายการ",
       "metaAfterDisable": "{total} หลังตัวกรองกฎที่ปิดใช้งาน",
       "metaSourceCap": "แหล่งที่กําหนดขั้นต่ําอยู่ที่ {max} สําหรับการทํางาน",
@@ -1155,6 +1208,22 @@
       "openBrowser": "เปิดใน browser ใน Browser",
       "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor แนะนําการเคลื่อนไหว"
+    },
+    "suppressedFindings": {
+      "heading": "ผลการตรวจสอบที่ถูกปิดกั้น",
+      "headingAria": "ส่วนผลการค้นหาที่ถูกปิดกั้น",
+      "byKind": "{count} โดย {kind}",
+      "kindIgnore": "// ละเว้น:",
+      "kindIgnoreForFile": "// ละเว้นการตรวจสอบไฟล์:",
+      "kindBaseline": "ฐานข้อมูลมาตรฐาน",
+      "unsuppressButton": "ไม่ต้องยืนยัน",
+      "unsuppressTitle": "ลบการปิดกันเพื่อให้ผลการค้นหาปรากฏในสแกนปกติ",
+      "unsuppressHint": "เพื่อเปิดการแจ้งเตือน {rule} ที่ {file}:{line} ให้ลบความคิดเห็น // ignore: ที่อยู่เหนือบรรทัดนั้น",
+      "columnFile": "File รายการ",
+      "columnLine": "สาย เส้น เส้น",
+      "columnRule": "กฎหมาย สังกัด",
+      "columnKind": "กฎที่เข้มงวด",
+      "columnAction": "การกระทำ"
     },
     "suppressions": {
       "sectionAria": "การกดความอ่อนแอ ความรู้สึก",
@@ -1261,6 +1330,7 @@
     "noReportYet": "ยังไม่มีรายงานการละเมิดใด ๆ วิ่ง Saropa Lints การวิเคราะห์แรก.",
     "clipboardCopyFailed": "ไม่สามารถสําเนาไปยัง clipboard.",
     "copiedViolationsJson": "สําเนา {count} การละเมิด (((s) เป็น JSON.",
+    "copiedEverythingJson": "คัดลอก {count} ผลการตรวจสอบที่ไม่ได้กรองไปยังคัดลอกข้อมูล",
     "copiedOneViolationJson": "สําเนา 1 การละเมิดเป็น JSON.",
     "driftNotConnected": "Drift Advisor เซอร์เวอร์ไม่เชื่อมต่อ",
     "copiedBulkFindings": "สําเนา {count} การค้นหาที่เลือก (((s) เป็น JSON.",

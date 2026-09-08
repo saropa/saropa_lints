@@ -713,6 +713,10 @@
     "reloadLater": "Пізніше пізніше пізніше"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Помилка",
+      "tooltip": "Статусна лінія не оновлена — натисніть для деталів. Розширення може все одно працювати; спробуйте виконати команду з палітри команд."
+    },
     "menu": {
       "enableOn": "Аналіз увімкнено (клацніть, щоб вимкнути)",
       "enableOff": "Аналіз вимкнено (клацніть, щоб увімкнути)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} відкинуті daemon(s)",
       "openHint": "Натисніть, щоб відкрити Process Health",
       "systemRam": "Система: {free} з {total} безкоштовних",
-      "systemLow": "⚠ Система: {free} з {total} безкоштовних"
+      "systemLow": "⚠ Система: {free} з {total} безкоштовних",
+      "extensionHostWarning": "⚠ Додаток host: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} процес(ів) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} аналіз сервер(ів) виявлено — закрийте непотрібні VS Code вікна",
       "daemonCount": "Flutter демони: {total} ({orphaned} відокремлений)",
       "scanDaemonOrphans": "Орфанізовані сканери: {count} — використовуйте Clean Up для видалення",
+      "extensionHostSection": "Розширення-хост: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa пам'ять висока — клікніть для деталей",
       "criticalHint": "Saropa пам'ять критична — рекомендується очистити"
     },
@@ -806,6 +812,35 @@
       "kill": "Видалити",
       "killed": "Забито",
       "killFailed": "Помилка"
+    },
+    "watcherExclude": {
+      "prompt": "{count} порекомендовані виключення для файлового спостерігача відсутні в цьому робочому просторі: {patterns}. Додавання їх запобігає VS Code від слідкування великими побудовними артефактами та дампами стеку, які витрачають пам'ять.",
+      "addAll": "Додати всі",
+      "dismiss": "Відпустка від роботи.",
+      "added": "Додано {count} виключення(я) файлового оглядач до налаштувань робочого простору"
+    },
+    "hazardScan": {
+      "warning": "Знайдено {count} великих файл(ів), які не виключені з нагляду за файлами: {files}. Ці файли можуть вичерпати пам'ять та призвести до збою VS Code.",
+      "addExclusions": "Виключити з Watcher",
+      "dismiss": "Відпустка від роботи.",
+      "added": "Додано шаблон(и) виключення {count} нагляду до налаштувань робочого простору."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Готовність робочого простору: усі чітко — проблем не знайдено.",
+    "quickPickTitle": "Проблеми з підготовкою робочого простору",
+    "quickPickPlaceholder": "Виберіть проблему для деталів або щоб виправити її",
+    "statusBar": {
+      "red": "🔴 {count} проблема(и) у робочому просторі",
+      "yellow": "⚠ {count} проблема(и) у робочому просторі"
+    },
+    "issue": {
+      "hazardFiles": "$(warning) {count} великий(і) не виключений(і) файл(и)",
+      "hazardFilesDetail": "Великі файли, відстежені файловим відстежувачем, можуть вичерпати пам'ять та призвести до збою VS Code. Запустіть сканування небезпек, щоб виключити їх.",
+      "missingExcludes": "$(info) {count} відсутні виключення для спостерігача",
+      "missingExcludesDetail": "Рекомендовані шаблони виключення для файлового спостерігача не налаштовані. Додавання їх запобігає зайвому використанню пам'яті.",
+      "hostMemory": "$(alert) Хост розширення використовує {size}",
+      "hostMemoryDetail": "Розширення процесу хосту RSS перевищує поріг попередження. Відкрийте Процес Здоров'я для деталей."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "Ніяких файлів не зачіпали.",
       "filesTitle": "Відрізні файли, що сприяють принаймні одному знахідці.",
       "topRuleLabel": "Головне правило - верховне правило.",
-      "topRuleTitle": "Фільтруйте результати дослідження за правилом {name}."
+      "topRuleTitle": "Фільтруйте результати дослідження за правилом {name}.",
+      "sectionHeading": "Огляд",
+      "sectionAria": "Огляд статистики"
     },
     "toolbar": {
       "ariaFiltersActions": "Фільтри та дії.",
@@ -999,7 +1036,17 @@
       "moreSummary": "Більше, більше, більше",
       "moreChevron": "▾",
       "copyJsonTitle": "Копіюйте фільтрувані порушення як JSON ({count})",
-      "saveReportTitle": "Заховувати фільтрувані порушення як JSON до звітів / YYYYMMDD/."
+      "saveReportTitle": "Заховувати фільтрувані порушення як JSON до звітів / YYYYMMDD/.",
+      "copyEverythingJson": "Копіювати все як JSON",
+      "copyEverythingJsonTitle": "Копіювати ВСІ результати аудиту у форматі JSON — без фільтру, включаючи приховані",
+      "saveEverythingReport": "Зберігати все звіт",
+      "saveEverythingReportTitle": "Зберігати ВСІ результати аудиту як JSON у reports/ — без фільтрації, включаючи приховані",
+      "suppressAll": "Прихильники всіх видимих",
+      "suppressAllTitle": "Вставляти // ignore: коментарі над кожним видимим знайденням",
+      "suppressAllConfirm": "Це вставить {count} // ignore: коментарі по всіх джерельних файлах. Це не можна скасувати з панелі — використовуйте зворотній крок редактора або контроль версій для скасування. Продовжити?",
+      "suppressAllProceed": "Прихильники всіх",
+      "suppressAllDone": "Вставлений {count} // ignore: коментарі.",
+      "suppressAllFailed": "Не вдалося застосувати масове придушення — деякі файли можуть бути тільки для читання."
     },
     "audit": {
       "scopeFieldTitle": "Виберіть, від чого походять знайдені результати",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "Змінено vs гілка…",
       "branchPlaceholder": "назва гілки",
       "branchAria": "Гілка для порівняння",
+      "includeSuppressedLabel": "Включити приховані",
+      "includeSuppressedTitle": "Також включіть знайдені порушення, які зазвичай приховані за допомогою // ignore:, // ignore_for_file: або запису базової точки — кожен з них позначений способом, яким він був приховано. Конфігурація вашого проекту не змінюється.",
       "runButton": "Запустити аудит",
       "runButtonTitle": "Виконайте повний аудит проекту CLI та завантажте його результати тут",
       "cancelButton": "Відкласти скасувати",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Повторна активність відключених правил.",
       "reEnableQuickPickPlaceholder": "Виберіть одну або кілька правил, щоб знову включити.",
       "menuGroupExport": "Експортна експортування експорт.",
+      "menuGroupBulk": "Операції масового виконання",
       "menuGroupFilter": "Фільтр і фокус.",
       "menuGroupOpen": "Відкрийте приладову панель.",
       "menuGroupSystem": "Система системи System"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "Висновки висновків.",
+      "heading": "Висновки висновків.",
       "expandAll": "Розширюйте все.",
       "collapseAll": "Колапс усіх, колапс всіх.",
       "bulkSelected": "{count} вибрано",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "Діяльність по ряду Роль ролі",
       "selectRowAria": "Виберіть цей ряд пошуку.",
       "copyRowTitle": "Копіюйте цей висновок в JSON.",
+      "suppressedBadge": "Відмінений",
+      "suppressedByTitle": "Приховано від вашого звичайного перегляду за допомогою {kind} — видно лише тут, бо увімкнено \"Включити приховане\"",
       "metaShown": "показано {filtered}",
       "metaAfterDisable": "{total} після фільтра вимкнених правил",
       "metaSourceCap": "джерело, обмежене {max} для продуктивності.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "Відкрити в браузері.",
       "headingIssues": "Drift Advisor",
       "disable": "Виключити Drift Advisor"
+    },
+    "suppressedFindings": {
+      "heading": "Виявлені порушення",
+      "headingAria": "Розділ прихованої інформації",
+      "byKind": "{count} за {kind}",
+      "kindIgnore": "// ігнор:",
+      "kindIgnoreForFile": "// ignore_for_file:",
+      "kindBaseline": "базова лінія",
+      "unsuppressButton": "Відмінити",
+      "unsuppressTitle": "Видаліть приховання, щоб це знайдення з'являлося в звичайних скануваннях",
+      "unsuppressHint": "Щоб відновити {rule} у {file}:{line}: видаліть коментар // ignore: над цією строкою.",
+      "columnFile": "Файл файлу файла",
+      "columnLine": "Лінія лінія лінії лінія",
+      "columnRule": "Статут Регуляція",
+      "columnKind": "Кінд",
+      "columnAction": "Дія"
     },
     "suppressions": {
       "sectionAria": "Піддушення пригнічення.",
@@ -1261,6 +1330,7 @@
     "noReportYet": "Повідомлень про порушення поки немає. Спочатку запустіть аналіз Saropa Lints.",
     "clipboardCopyFailed": "Не вдалося скопіювати в обкладинку.",
     "copiedViolationsJson": "Копіюється {count} порушення (і) як JSON.",
+    "copiedEverythingJson": "Скопійовано {count} неперероблені результати в буфер обміну.",
     "copiedOneViolationJson": "Копіював 1 порушення як JSON.",
     "driftNotConnected": "Сервер Drift Advisor не підключений.",
     "copiedBulkFindings": "Копіюється {count} вибрані знахідки (і) як JSON.",
