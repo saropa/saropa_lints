@@ -7,7 +7,15 @@ import { l10n } from '../i18n/runtime';
 import { buildFullWidthToggle } from './dashboardHero';
 import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
 import { buildKeyboardShortcutsButton } from './keyboard-shortcuts';
-import { DEFAULT_AUDIT_SCOPE, SEVERITY_ORDER, escapeHtml, formatRelative, type ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
+import {
+  DEFAULT_AUDIT_SCOPE,
+  SEVERITY_ORDER,
+  buildCollapsibleSection,
+  escapeHtml,
+  formatRelative,
+  resolveSectionOpen,
+  type ViolationsDashboardHtmlInput,
+} from './violations-dashboard-shared';
 import { pluralize } from './webview-format';
 
 
@@ -339,7 +347,23 @@ export interface KpiSpec {
 
 export function buildKpiCards(input: ViolationsDashboardHtmlInput): string {
   const cards = collectKpiCards(input);
-  return `<div class="kpi-row">${cards.map(renderKpiCard).join('')}</div>`;
+  // Task A: the KPI/stat-card row is one of the required collapsible
+  // sections. It had no visible heading before this — add one so the
+  // disclosure has something to summarize; the "Visible" KPI's own count
+  // doubles as the section's counter (matches every other section, whose
+  // pill shows the same number its content is built from).
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.kpi.sectionHeading'))} <span class="pill">${input.filteredCount}</span></h2>`;
+  const body = `<div class="kpi-row">${cards.map(renderKpiCard).join('')}</div>`;
+  // The KPI cards always render (they are not conditional on data being
+  // present — a zero-findings project still shows "0 errors" etc.), so this
+  // is always "has content" and defaults open.
+  return buildCollapsibleSection({
+    id: 'kpi',
+    ariaLabel: l10n('findingsDash.kpi.sectionAria'),
+    headingHtml: heading,
+    bodyHtml: body,
+    open: resolveSectionOpen('kpi', true, input.sectionOpenState),
+  });
 }
 
 
@@ -436,9 +460,14 @@ export function renderKpiCard(c: KpiSpec): string {
       }`
     : '';
   const title = c.title ? ` title="${escapeHtml(c.title)}"` : '';
+  // Task B: the big stat-card number is now a "kpi-v pill" — same rounded/
+  // tinted pill primitive the status-line and section headings use, just
+  // sized up (see .kpi-v.pill in dashboardChromeStylesComponents.ts) so it
+  // keeps the hero-number glance test (§4.2) while reading as the same
+  // component family everywhere else on the page.
   return `<div class="kpi-card ${escapeHtml(c.classes)}${interactive}"${role} data-kpi="${escapeHtml(c.key)}"${filterAttrs}${title}>
     <div class="kpi-k">${escapeHtml(c.label)}</div>
-    <div class="kpi-v">${escapeHtml(c.value)}</div>
+    <div class="kpi-v pill">${escapeHtml(c.value)}</div>
     <div class="kpi-sub">${escapeHtml(c.sub)}</div>
   </div>`;
 }
@@ -480,6 +509,18 @@ export function buildAuditScopeControl(input: ViolationsDashboardHtmlInput): str
     .map(([value, label]) => `<option value="${escapeHtml(value)}"${value === selectedValue ? ' selected' : ''}>${escapeHtml(label)}</option>`)
     .join('');
   const runDisabled = scope.mode === 'live' || scope.running;
+  // "Include suppressed" — passes --include-suppressed to the audit CLI so
+  // findings normally dropped by `// ignore:`, `// ignore_for_file:`, or a
+  // baseline entry are added back (tagged `suppressedBy`) instead of being
+  // silently hidden. Meaningless for `mode: 'live'`, which has no
+  // suppression-bypass mechanism of its own — hidden there via the same
+  // always-in-DOM-but-`hidden` pattern as auditScopeBranch above, so the
+  // client script (syncAuditScopeUi) can toggle it instantly on dropdown
+  // change without waiting for a host round-trip/rebuild.
+  const includeSuppressedField = `<span class="field audit-suppressed-field" title="${escapeHtml(l10n('findingsDash.audit.includeSuppressedTitle'))}" ${scope.mode === 'live' ? 'hidden' : ''}>
+    <input type="checkbox" id="auditIncludeSuppressed" ${scope.includeSuppressed ? 'checked' : ''} ${scope.running ? 'disabled' : ''} />
+    <label for="auditIncludeSuppressed">${escapeHtml(l10n('findingsDash.audit.includeSuppressedLabel'))}</label>
+  </span>`;
   return `<span class="field audit-scope-field" title="${escapeHtml(l10n('findingsDash.audit.scopeFieldTitle'))}">
     <span class="glyph">🛡</span>
     <label for="auditScope">${escapeHtml(l10n('findingsDash.audit.scopeLabel'))}</label>
@@ -489,6 +530,7 @@ export function buildAuditScopeControl(input: ViolationsDashboardHtmlInput): str
       aria-label="${escapeHtml(l10n('findingsDash.audit.branchAria'))}"
       ${selectedValue === 'sinceRefCustom' ? '' : 'hidden'} />
   </span>
+  ${includeSuppressedField}
   <button type="button" class="btn" id="btn-run-audit" data-run-audit
     title="${escapeHtml(l10n('findingsDash.audit.runButtonTitle'))}"
     ${scope.mode === 'live' ? 'hidden' : ''} ${runDisabled ? 'disabled' : ''}>
@@ -532,7 +574,7 @@ export function buildToolbar(input: ViolationsDashboardHtmlInput): string {
       <button type="button" class="btn tier-1" id="btn-run" data-run-analysis title="${escapeHtml(l10n('findingsDash.toolbar.runAnalysisTitle'))}" ${isLive ? '' : 'hidden'}>
         <span class="glyph">▶</span>${escapeHtml(l10n('toolbar.runAnalysis'))}
       </button>
-      ${buildMoreActionsMenu(exportCount)}
+      ${buildMoreActionsMenu(exportCount, (input.auditScope ?? DEFAULT_AUDIT_SCOPE).mode !== 'live')}
       <!-- Refresh moved into the More menu as "Reload from disk".
            The visible toolbar button was indistinguishable from Run analysis
            and never re-ran the analyzer — it only re-rendered from the
@@ -648,13 +690,30 @@ export type MenuItem = {
  *
  * Hidden id="btn-refresh-extension" preserves the existing test contract
  * and keyboard binding (Cmd/Ctrl-R) without polluting the visible menu.
+ *
+ * `isAuditMode` gates the "Copy everything" / "Save everything" items: they
+ * export the raw, un-post-filtered audit result (including suppressed
+ * findings), which only exists for a completed audit run — live diagnostics
+ * has no equivalent unfiltered snapshot to export, so the items would be
+ * misleading (or simply duplicate btn-copy/btn-save) in live mode.
  */
-export function buildMoreActionsMenu(exportCount: number): string {
-  const exportItems: readonly MenuItem[] = [
+export function buildMoreActionsMenu(exportCount: number, isAuditMode: boolean): string {
+  const exportItems: MenuItem[] = [
     { localId: 'btn-copy', glyph: '⎘', label: l10n('toolbar.copyJson'), title: l10n('findingsDash.toolbar.copyJsonTitle', { count: String(exportCount) }) },
     { localId: 'btn-save', glyph: '⤓', label: l10n('toolbar.saveReport'), title: l10n('findingsDash.toolbar.saveReportTitle') },
-    { cmd: 'saropaLints.issues.copyAsJson', glyph: '❏', label: l10n('findingsDash.menuPalette.copyTreeJson') },
   ];
+  // "Everything" export bypasses every dashboard filter (severity toggles,
+  // text search, hidden files/rules) and includes suppressed findings — only
+  // meaningful against a completed audit result, so hidden in live mode.
+  if (isAuditMode) {
+    exportItems.push(
+      { localId: 'btn-copy-all', glyph: '⎘', label: l10n('findingsDash.toolbar.copyEverythingJson'), title: l10n('findingsDash.toolbar.copyEverythingJsonTitle') },
+      { localId: 'btn-save-all', glyph: '⤓', label: l10n('findingsDash.toolbar.saveEverythingReport'), title: l10n('findingsDash.toolbar.saveEverythingReportTitle') },
+    );
+  }
+  exportItems.push(
+    { cmd: 'saropaLints.issues.copyAsJson', glyph: '❏', label: l10n('findingsDash.menuPalette.copyTreeJson') },
+  );
   const filterItems: readonly MenuItem[] = [
     { cmd: 'saropaLints.setGroupBy', glyph: '▦', label: l10n('findingsDash.menuPalette.groupBy') },
     { cmd: 'saropaLints.setIssuesFilter', glyph: '⌕', label: l10n('findingsDash.menuPalette.textFilter') },

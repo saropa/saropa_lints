@@ -3,7 +3,16 @@
  */
 
 import { l10n } from '../i18n/runtime';
-import { SEVERITY_ORDER, escapeHtml, type AnalyzerSuppressionsSlice, type ViewSuppressionsSlice, type ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
+import type { Violation } from '../violationsReader';
+import {
+  SEVERITY_ORDER,
+  buildCollapsibleSection,
+  escapeHtml,
+  resolveSectionOpen,
+  type AnalyzerSuppressionsSlice,
+  type ViewSuppressionsSlice,
+  type ViolationsDashboardHtmlInput,
+} from './violations-dashboard-shared';
 
 
 /* ============================================================================
@@ -17,12 +26,21 @@ export function buildChartsBlock(input: ViolationsDashboardHtmlInput): string {
   // The Impact mix donut was removed: post-collapse it rendered an identical
   // chart to Severity mix on the same row. impactCounts is still populated
   // on input for stored snapshot back-compat but no longer displayed.
-  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.charts.sectionAria'))}">
-    <h2>${escapeHtml(l10n('findingsDash.charts.heading'))} <span class="meta">${escapeHtml(l10n('findingsDash.charts.metaClickSlice'))}</span></h2>
-    <div class="charts-grid">
+  // Task B: the section's own finding count is now a pill (matches the
+  // status-line pill look) instead of a bare <span class="count">.
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.charts.heading'))} <span class="pill">${sevTotal}</span> <span class="meta">${escapeHtml(l10n('findingsDash.charts.metaClickSlice'))}</span></h2>`;
+  const body = `<div class="charts-grid">
       ${buildMixCard(l10n('findingsDash.charts.severityMix'), SEVERITY_ORDER, input.severityCounts, 'sev')}
-    </div>
-  </section>`;
+    </div>`;
+  // Task A: collapsible. Reached this point only when sevTotal > 0, so the
+  // section always has content — content-based default is always "open".
+  return buildCollapsibleSection({
+    id: 'charts',
+    ariaLabel: l10n('findingsDash.charts.sectionAria'),
+    headingHtml: heading,
+    bodyHtml: body,
+    open: resolveSectionOpen('charts', true, input.sectionOpenState),
+  });
 }
 
 
@@ -36,8 +54,10 @@ export function buildMixCard(
   const max = Math.max(1, ...order.map((k) => counts[k] ?? 0));
   const bars = order.map((k) => buildBarRow(axis, k, counts[k] ?? 0, max)).join('');
   const donut = buildDonut(order, counts, axis, total);
+  // Task B: <span class="count"> unified onto the pill primitive (the first
+  // of the three inconsistent counter treatments the task calls out).
   return `<div class="chart-card">
-    <h3>${escapeHtml(title)}<span class="count">${total}</span></h3>
+    <h3>${escapeHtml(title)}<span class="pill">${total}</span></h3>
     <div class="body">
       <div class="bars">${bars}</div>
       ${donut}
@@ -97,11 +117,19 @@ export function buildDonut(
 export function buildTodoHackBlock(input: ViolationsDashboardHtmlInput): string {
   const snap = input.todoHackSnapshot;
   if (!snap.enabled) {
-    return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.todoHack.sectionAria'))}">
-      <h2>${escapeHtml(l10n('findingsDash.todoHack.headingDisabled'))} <span class="meta">${escapeHtml(l10n('findingsDash.todoHack.metaDisabled'))}</span></h2>
-      <p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.scanOff'))}
-        <button type="button" class="link" id="btn-enable-todos-scan">${escapeHtml(l10n('findingsDash.todoHack.enableScan'))}</button></p>
-    </section>`;
+    // Scanner disabled — nothing but a promo footer-line, so the
+    // content-based default is collapsed (empty/zero-count sections
+    // default collapsed per the Task A brief).
+    const heading = `<h2>${escapeHtml(l10n('findingsDash.todoHack.headingDisabled'))} <span class="meta">${escapeHtml(l10n('findingsDash.todoHack.metaDisabled'))}</span></h2>`;
+    const body = `<p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.scanOff'))}
+        <button type="button" class="link" id="btn-enable-todos-scan">${escapeHtml(l10n('findingsDash.todoHack.enableScan'))}</button></p>`;
+    return buildCollapsibleSection({
+      id: 'todoHack',
+      ariaLabel: l10n('findingsDash.todoHack.sectionAria'),
+      headingHtml: heading,
+      bodyHtml: body,
+      open: resolveSectionOpen('todoHack', false, input.sectionOpenState),
+    });
   }
   const todoBody = renderTodoSubsection(l10n('findingsDash.todoHack.todosLabel'), snap.todos);
   const hackBody = renderTodoSubsection(l10n('findingsDash.todoHack.hacksLabel'), snap.hacks);
@@ -110,12 +138,20 @@ export function buildTodoHackBlock(input: ViolationsDashboardHtmlInput): string 
   // that opens the relevant setting — naming the setting key in prose alone left
   // the user with no way to act on it (user-reported dead-end).
   const capNote = snap.capped ? buildScanCapNote() : '';
-  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.todoHack.sectionAria'))}">
-    <h2>${escapeHtml(l10n('findingsDash.todoHack.heading'))} <span class="count">${snap.todos.length + snap.hacks.length}</span></h2>
-    ${todoBody}
+  const totalCount = snap.todos.length + snap.hacks.length;
+  // Task B: pill instead of <span class="count">.
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.todoHack.heading'))} <span class="pill">${totalCount}</span></h2>`;
+  const body = `${todoBody}
     ${hackBody}
-    ${capNote}
-  </section>`;
+    ${capNote}`;
+  return buildCollapsibleSection({
+    id: 'todoHack',
+    ariaLabel: l10n('findingsDash.todoHack.sectionAria'),
+    headingHtml: heading,
+    bodyHtml: body,
+    // Task A: zero TODOs/HACKs is a genuinely empty section — default collapsed.
+    open: resolveSectionOpen('todoHack', totalCount > 0, input.sectionOpenState),
+  });
 }
 
 
@@ -135,8 +171,10 @@ export function renderTodoSubsection(
     return `<p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.subsectionNone', { title }))}</p>`;
   }
   const rows = items.map(renderCompactRow).join('');
+  // Task B: this was a <span class="meta"> used AS a count (the exact
+  // inconsistency the task calls out) — unified onto the pill primitive.
   return `<div style="margin-bottom:8px">
-    <h3 style="margin:6px 0;font-size:.95em;font-weight:600">${escapeHtml(title)} <span class="meta">${items.length}</span></h3>
+    <h3 style="margin:6px 0;font-size:.95em;font-weight:600">${escapeHtml(title)} <span class="pill">${items.length}</span></h3>
     <div class="compact-list">${rows}</div>
   </div>`;
 }
@@ -160,30 +198,47 @@ export function renderCompactRow(item: { file: string; line: number; snippet: st
  * Drift Advisor (§14.7) — single section, footer-line when offline.
  * ========================================================================= */
 
-export function buildDriftBlock(input: ViolationsDashboardHtmlInput['driftAdvisorSnapshot']): string {
+export function buildDriftBlock(
+  input: ViolationsDashboardHtmlInput['driftAdvisorSnapshot'],
+  // Task A: section-open persistence is keyed by workspace via
+  // `sectionOpenState`, which lives on the top-level dashboard input, not
+  // this narrower `driftAdvisorSnapshot` slice — driftAdvisorSnapshot has no
+  // room for it without leaking dashboard-composer concerns into the
+  // snapshot type, so it is threaded through as its own parameter instead.
+  persisted?: ViolationsDashboardHtmlInput['sectionOpenState'],
+): string {
   if (!input.integrationEnabled) {
-    return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.drift.sectionAria'))}">
-      <h2>${escapeHtml(l10n('findingsDash.drift.headingOff'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaOff'))}</span></h2>
-      <p class="footer-line">${escapeHtml(l10n('findingsDash.drift.enableBlurb'))}
-        <button type="button" class="link" id="btn-drift-enable">${escapeHtml(l10n('findingsDash.drift.enable'))}</button></p>
-    </section>`;
+    const heading = `<h2>${escapeHtml(l10n('findingsDash.drift.headingOff'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaOff'))}</span></h2>`;
+    const body = `<p class="footer-line">${escapeHtml(l10n('findingsDash.drift.enableBlurb'))}
+        <button type="button" class="link" id="btn-drift-enable">${escapeHtml(l10n('findingsDash.drift.enable'))}</button></p>`;
+    // Integration off — nothing actionable to show; default collapsed.
+    return buildCollapsibleSection({
+      id: 'drift', ariaLabel: l10n('findingsDash.drift.sectionAria'), headingHtml: heading, bodyHtml: body,
+      open: resolveSectionOpen('drift', false, persisted),
+    });
   }
   if (!input.connected) {
-    return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.drift.sectionAria'))}">
-      <h2>${escapeHtml(l10n('findingsDash.drift.headingNoServer'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaNoServer'))}</span></h2>
-      <p class="footer-line">${escapeHtml(l10n('findingsDash.drift.noServerBlurb'))}
+    const heading = `<h2>${escapeHtml(l10n('findingsDash.drift.headingNoServer'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaNoServer'))}</span></h2>`;
+    const body = `<p class="footer-line">${escapeHtml(l10n('findingsDash.drift.noServerBlurb'))}
         <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(l10n('findingsDash.drift.retry'))}</button>
-      </p>
-    </section>`;
+      </p>`;
+    // No server reachable — nothing to show yet; default collapsed.
+    return buildCollapsibleSection({
+      id: 'drift', ariaLabel: l10n('findingsDash.drift.sectionAria'), headingHtml: heading, bodyHtml: body,
+      open: resolveSectionOpen('drift', false, persisted),
+    });
   }
   if (input.issues.length === 0) {
-    return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.drift.sectionAria'))}">
-      <h2>${escapeHtml(l10n('findingsDash.drift.headingConnected'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaConnected'))}</span></h2>
-      <p class="footer-line">${escapeHtml(l10n('findingsDash.drift.noIssues', { label: input.serverLabel ?? '' }))}
+    const heading = `<h2>${escapeHtml(l10n('findingsDash.drift.headingConnected'))} <span class="meta">${escapeHtml(l10n('findingsDash.drift.metaConnected'))}</span></h2>`;
+    const body = `<p class="footer-line">${escapeHtml(l10n('findingsDash.drift.noIssues', { label: input.serverLabel ?? '' }))}
         <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(l10n('findingsDash.drift.refresh'))}</button>
         <button type="button" class="link" id="btn-drift-browser">${escapeHtml(l10n('findingsDash.drift.openBrowser'))}</button>
-      </p>
-    </section>`;
+      </p>`;
+    // Connected but zero issues — a genuinely empty section; default collapsed.
+    return buildCollapsibleSection({
+      id: 'drift', ariaLabel: l10n('findingsDash.drift.sectionAria'), headingHtml: heading, bodyHtml: body,
+      open: resolveSectionOpen('drift', false, persisted),
+    });
   }
   const rows = input.issues.map((issue) => {
     const file = issue.file ? escapeHtml(issue.file) : escapeHtml(issue.source);
@@ -205,15 +260,110 @@ export function buildDriftBlock(input: ViolationsDashboardHtmlInput['driftAdviso
       <span class="fline">—</span>
     </div>`;
   }).join('');
-  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.drift.sectionAria'))}">
-    <h2>${escapeHtml(l10n('findingsDash.drift.headingIssues'))} <span class="count">${input.issues.length}</span> <span class="meta">${escapeHtml(input.serverLabel ?? '')}</span></h2>
-    <div class="compact-list">${rows}</div>
+  // Task B: pill instead of <span class="count">.
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.drift.headingIssues'))} <span class="pill">${input.issues.length}</span> <span class="meta">${escapeHtml(input.serverLabel ?? '')}</span></h2>`;
+  const body = `<div class="compact-list">${rows}</div>
     <p class="footer-line">
       <button type="button" class="link" id="btn-drift-refresh">${escapeHtml(l10n('findingsDash.drift.refresh'))}</button>
       <button type="button" class="link" id="btn-drift-browser">${escapeHtml(l10n('findingsDash.drift.openBrowser'))}</button>
       <button type="button" class="link" id="btn-drift-disable">${escapeHtml(l10n('findingsDash.drift.disable'))}</button>
-    </p>
-  </section>`;
+    </p>`;
+  // Live issues to review — content-based default is open.
+  return buildCollapsibleSection({
+    id: 'drift', ariaLabel: l10n('findingsDash.drift.sectionAria'), headingHtml: heading, bodyHtml: body,
+    open: resolveSectionOpen('drift', true, persisted),
+  });
+}
+
+
+/* ============================================================================
+ * Suppressed Findings — dedicated audit-mode subsection (distinct from the
+ * "Suppressions (export)" band below, which only carries counts). Renders
+ * only when the toolbar's audit run opted into `--include-suppressed` AND
+ * came back with at least one suppressed violation — see
+ * `buildSuppressedFindingsSlice` in violationsWideReportView.ts for how the
+ * slice is computed and gated.
+ * ========================================================================= */
+
+/** Maps a raw `suppressedBy` token to its localized display label. */
+function suppressedFindingsKindLabel(kind: string): string {
+  if (kind === 'ignore') return l10n('findingsDash.suppressedFindings.kindIgnore');
+  if (kind === 'ignore_for_file') return l10n('findingsDash.suppressedFindings.kindIgnoreForFile');
+  if (kind === 'baseline') return l10n('findingsDash.suppressedFindings.kindBaseline');
+  // Unknown/future kind — fall back to the prettified raw token rather than
+  // silently dropping it (matches prettifyAnalyzerKindToken's philosophy).
+  return prettifyAnalyzerKindToken(kind);
+}
+
+/** "3 by // ignore:, 1 by baseline" breakdown row for the subsection heading. */
+function buildSuppressedFindingsByKindRow(byKind: ReadonlyArray<[string, number]>): string {
+  if (byKind.length === 0) return '';
+  const parts = byKind.map(([kind, count]) =>
+    l10n('findingsDash.suppressedFindings.byKind', { count: String(count), kind: suppressedFindingsKindLabel(kind) }),
+  );
+  return `<p class="footer-line">${escapeHtml(parts.join(', '))}</p>`;
+}
+
+/** One row of the mini suppressed-findings table, with its Unsuppress button. */
+function buildSuppressedFindingRow(v: Violation): string {
+  const kind = v.suppressedBy ?? 'unknown';
+  const fileAttr = encodeURIComponent(v.file);
+  const line = Math.max(1, v.line);
+  return `<tr class="frow" data-file="${fileAttr}" data-line="${line}">
+    <td class="col-msg" title="${escapeHtml(v.file)}">${escapeHtml(v.file)}</td>
+    <td class="col-line">${line}</td>
+    <td class="col-rule"><span class="rule-tag">${escapeHtml(v.rule)}</span></td>
+    <td>${escapeHtml(suppressedFindingsKindLabel(kind))}</td>
+    <td class="col-actions">
+      <button type="button" class="row-action" data-unsuppress
+              data-file="${escapeHtml(v.file)}" data-line="${line}" data-rule="${escapeHtml(v.rule)}" data-kind="${escapeHtml(kind)}"
+              title="${escapeHtml(l10n('findingsDash.suppressedFindings.unsuppressTitle'))}">
+        ${escapeHtml(l10n('findingsDash.suppressedFindings.unsuppressButton'))}
+      </button>
+    </td>
+  </tr>`;
+}
+
+/** Mini findings table (file / line / rule / kind / action) for the suppressed set. */
+function buildSuppressedFindingsTable(violations: readonly Violation[]): string {
+  const rows = violations.map(buildSuppressedFindingRow).join('');
+  return `<div class="findings-wrap">
+    <table class="findings-table" role="grid">
+      <thead>
+        <tr>
+          <th scope="col">${escapeHtml(l10n('findingsDash.suppressedFindings.columnFile'))}</th>
+          <th scope="col">${escapeHtml(l10n('findingsDash.suppressedFindings.columnLine'))}</th>
+          <th scope="col">${escapeHtml(l10n('findingsDash.suppressedFindings.columnRule'))}</th>
+          <th scope="col">${escapeHtml(l10n('findingsDash.suppressedFindings.columnKind'))}</th>
+          <th scope="col">${escapeHtml(l10n('findingsDash.suppressedFindings.columnAction'))}</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+/**
+ * The "Suppressed Findings" collapsible subsection. Empty string when the
+ * caller never populated (or zeroed out) `input.suppressedFindings` — this
+ * is the single gate that keeps the section invisible in live mode and in
+ * an audit run with `--include-suppressed` but nothing actually suppressed.
+ */
+export function buildSuppressedFindingsBlock(input: ViolationsDashboardHtmlInput): string {
+  const slice = input.suppressedFindings;
+  if (!slice || slice.total <= 0) return '';
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.suppressedFindings.heading'))} <span class="pill">${slice.total}</span></h2>`;
+  const body = `${buildSuppressedFindingsByKindRow(slice.byKind)}
+    ${buildSuppressedFindingsTable(slice.violations)}`;
+  // Reached only when total > 0 (the early-return guard above), so this
+  // section always has content when rendered — default open, per the task brief.
+  return buildCollapsibleSection({
+    id: 'suppressed-findings',
+    ariaLabel: l10n('findingsDash.suppressedFindings.headingAria'),
+    headingHtml: heading,
+    bodyHtml: body,
+    open: resolveSectionOpen('suppressed-findings', true, input.sectionOpenState),
+  });
 }
 
 
@@ -229,13 +379,24 @@ export function buildSuppressionsBlock(input: ViolationsDashboardHtmlInput): str
   /* "(export)" qualifier is part of the section title — it tells the user this
      section reflects what is in violations.json, not the live workspace state.
      The kind breakdown sits in the meta span when populated; otherwise the meta
-     span stays empty so the header doesn't render an awkward trailing dot. */
-  return `<section class="section" id="suppressions-block" aria-label="${escapeHtml(l10n('findingsDash.suppressions.sectionAria'))}">
-    <h2>${escapeHtml(l10n('findingsDash.suppressions.headingExport'))} <span class="count">${a.total}</span>${kindBreakdown ? ` <span class="meta">${kindBreakdown}</span>` : ''}</h2>
-    <div class="sup-band">${buildAnalyzerBody(a)}</div>
+     span stays empty so the header doesn't render an awkward trailing dot.
+     Task B: the total is now a pill instead of <span class="count">. */
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.suppressions.headingExport'))} <span class="pill">${a.total}</span>${kindBreakdown ? ` <span class="meta">${kindBreakdown}</span>` : ''}</h2>`;
+  const body = `<div class="sup-band">${buildAnalyzerBody(a)}</div>
     <h3 style="margin:14px 0 6px;font-size:.98em;font-weight:600">${escapeHtml(l10n('findingsDash.suppressions.viewHidesHeading'))} <span class="meta" style="margin-inline-start:8px;color:var(--vscode-descriptionForeground)">${v.active ? escapeHtml(l10n('findingsDash.suppressions.viewHidesMetaActive')) : escapeHtml(l10n('findingsDash.suppressions.viewHidesMetaNone'))}</span></h3>
-    <div class="sup-band">${buildViewBody(v)}</div>
-  </section>`;
+    <div class="sup-band">${buildViewBody(v)}</div>`;
+  // The client script now finds this section via `data-section-id`
+  // (see violations-dashboard-script.ts), same as every other collapsible
+  // section — no separate `htmlId` hook is needed any more.
+  return buildCollapsibleSection({
+    id: 'suppressions',
+    ariaLabel: l10n('findingsDash.suppressions.sectionAria'),
+    headingHtml: heading,
+    bodyHtml: body,
+    // Zero suppressions AND no active view-hides is a genuinely empty
+    // section; otherwise there is something worth seeing by default.
+    open: resolveSectionOpen('suppressions', a.total > 0 || v.active, input.sectionOpenState),
+  });
 }
 
 

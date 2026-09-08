@@ -49,7 +49,19 @@ export function chromeHeroAndGauge(): string {
   align-items: center;
 }
 .status-line .dot { opacity: 0.55; }
-.status-line .pill {
+/* THE pill primitive (Task B — every counter treatment on the dashboard converges
+ * here: status-line pills, section-heading counters, and the big KPI stat-card
+ * numbers). Deliberately UNSCOPED (was .status-line .pill) so it works anywhere
+ * a counter needs the same rounded/tinted chip look, not only inside the status
+ * line — .section > summary > h2 .pill and .kpi-v.pill both rely on this base
+ * rule; only the status-line-specific affordances below (.pill-action, .toggle,
+ * .freshness) stay scoped, since those interactions only exist there today.
+ * systemHealth webviews (healthPanel, machineDashboard) also define local .pill
+ * — equal specificity, later-in-source wins, so their overrides hold ONLY
+ * because getDashboardChromeStyles() is injected before their local styles.
+ * Do not reorder injection or raise this rule's specificity without checking
+ * those two files. */
+.pill {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 1px 8px;
   border-radius: 999px;
@@ -57,12 +69,12 @@ export function chromeHeroAndGauge(): string {
   color: var(--vscode-foreground);
   font-size: 0.92em;
 }
-/* Small status-pill text mixes the semantic hue toward foreground for WCAG AA
+/* Small pill text mixes the semantic hue toward foreground for WCAG AA
  * on the tinted pill background. The --status/--accent tokens stay vivid for the
  * large KPI hero numbers (which meet the 3:1 large-text threshold as-is). */
-.status-line .pill.good { color: color-mix(in srgb, var(--status-good) 58%, var(--vscode-foreground)); }
-.status-line .pill.bad  { color: color-mix(in srgb, var(--status-bad) 44%, var(--vscode-foreground)); }
-.status-line .pill.warn { color: color-mix(in srgb, var(--accent-warning) 55%, var(--vscode-foreground)); }
+.pill.good { color: color-mix(in srgb, var(--status-good) 58%, var(--vscode-foreground)); }
+.pill.bad  { color: color-mix(in srgb, var(--status-bad) 44%, var(--vscode-foreground)); }
+.pill.warn { color: color-mix(in srgb, var(--accent-warning) 55%, var(--vscode-foreground)); }
 /* Interactive pill (e.g. "Scanned X ago" -> rescan). Reset the button chrome so
  * it reads as a pill, but keep the affordances a button needs: pointer cursor,
  * a hover lift, and a visible focus ring for keyboard users. */
@@ -191,6 +203,18 @@ export function chromeKpiCards(): string {
   line-height: 1.05;
   font-variant-numeric: tabular-nums;
 }
+/* Task B — the KPI hero number is now ALSO a .pill (see .pill's base rule in
+ * chromeHeroAndGauge): rounded chip + tinted background, same primitive every
+ * other counter on the dashboard uses. Widen the base pill's small-text padding
+ * back out and pin width to content only (fit-content) so the chip hugs the big
+ * number instead of stretching to the card's full width — .kpi-v's own
+ * font-size/font-weight above already win the cascade (later in source order,
+ * same specificity) so the hero-number glance test (§4.2) is unaffected. */
+.kpi-v.pill {
+  width: fit-content;
+  padding: 2px 14px;
+  gap: 0;
+}
 .kpi-sub {
   margin-top: 4px;
   font-size: 0.82em;
@@ -207,10 +231,17 @@ export function chromeKpiCards(): string {
   display: block; height: 100%;
   background: var(--vscode-progressBar-background);
 }
-.kpi-card.errors    .kpi-v { color: var(--accent-error); }
-.kpi-card.warnings  .kpi-v { color: var(--accent-warning); }
-.kpi-card.crit      .kpi-v { color: var(--accent-critical); }
-.kpi-card.todos     .kpi-v { color: var(--accent-info); }
+/* Severity-tinted pill background + solid text color, mirroring the .sev-pill
+ * treatment (18% tint) used everywhere else in the findings table — keeps the
+ * "severity colors preserved" requirement (Task B) while adopting the pill look.
+ * .kpi-card.info was previously undefined (a latent gap: the Info KPI card
+ * rendered with the neutral pill color) — added here alongside the others now
+ * that the same rule set is being touched. */
+.kpi-card.errors    .kpi-v.pill { background: color-mix(in srgb, var(--accent-error) 18%, transparent); color: var(--accent-error); }
+.kpi-card.warnings  .kpi-v.pill { background: color-mix(in srgb, var(--accent-warning) 18%, transparent); color: var(--accent-warning); }
+.kpi-card.info      .kpi-v.pill { background: color-mix(in srgb, var(--accent-info) 18%, transparent); color: var(--accent-info); }
+.kpi-card.crit      .kpi-v.pill { background: color-mix(in srgb, var(--accent-critical) 18%, transparent); color: var(--accent-critical); }
+.kpi-card.todos     .kpi-v.pill { background: color-mix(in srgb, var(--accent-info) 18%, transparent); color: var(--accent-info); }
 @media (prefers-reduced-motion: reduce) {
   .kpi-card { transition: none; }
 }
@@ -533,7 +564,10 @@ export function chromeChartAndDonut(): string {
   font-weight: 600;
   display: flex; align-items: baseline; gap: 8px;
 }
-.chart-card h3 .count {
+/* .count kept for back-compat with any other .chart-card h3 consumer still on the
+ * old span; .pill is the current one (Task B — see buildMixCard). Both get the
+ * same muted, small-text treatment so a straggler .count reads identically. */
+.chart-card h3 .count, .chart-card h3 .pill {
   font-size: 0.82em;
   color: var(--muted);
   font-weight: 500;

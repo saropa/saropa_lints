@@ -80,8 +80,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Workspace readiness indicator: combines hazard scan, watcher exclude audit, and extension host memory into a single status bar signal with a `saropaLints.showWorkspaceReadiness` command that opens an actionable quick-pick listing each issue.
 - Every top-level section of the Findings Dashboard (Overview KPIs, Charts, TODO/HACK, Drift Advisor, Suppressions, Top Rules, Findings) is now individually collapsible via a native disclosure triangle. Each section remembers its open/closed state per workspace, and a collapsed section still shows its counter so you know how many items are inside without expanding it.
 - Unified every counter on the Findings Dashboard (chart totals, section headers, TODO/HACK counts, and the big KPI stat-card numbers) onto the same pill component already used by the status-line pills, for one consistent counter look across the page. Severity colors are unchanged.
+- "Include suppressed" checkbox in the Findings Dashboard toolbar (visible only in audit mode) passes the new `--include-suppressed` CLI flag through the UI — check it, run audit, and suppressed violations appear in the findings table with an orange "Suppressed" pill badge. No config files are touched.
+- New "Copy everything as JSON" and "Save everything report" items in the More-actions menu (audit mode only) export the raw, unfiltered audit result — bypassing all dashboard filters and including suppressed findings — so you can get a true everything-export without manually clearing filters first.
+- New "Suppressed Findings" collapsible section appears in the dashboard when audit mode has `--include-suppressed` active and there are suppressed violations. Groups findings by suppression kind (ignore, ignore_for_file, baseline) with a mini table and per-row "Unsuppress" button (currently shows a hint — full comment-removal is planned).
 
 ### Fixed (Extension)
+
+- Fixed Code Health dashboard KPI tiles silently losing their semantic color coding (red/amber/info) after the pill-unification refactor — `kpiCard()` was missing the `.pill` class that the updated CSS selectors require.
 
 - Fixed silent status bar disappearance when `updateAllStatusBars` throws (e.g. corrupted `workspaceState` after a VS Code hard crash). The bar now catches errors, shows a visible `$(error) Saropa Lints: Error` state with an error-themed background, and logs to the output channel so the failure is discoverable.
 

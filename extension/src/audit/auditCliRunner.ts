@@ -41,6 +41,13 @@ export interface AuditDiagnostic {
   correctionMessage: string | null;
   /** Present only when --baseline was used: 'new', 'unchanged', or 'resolved'. */
   baselineStatus: string | null;
+  /**
+   * Present only when --include-suppressed was used, and only on the
+   * entries it added back in: 'ignore' | 'ignore_for_file' | 'baseline'.
+   * Absent (not null) on every ordinary finding — see bin/audit.dart's
+   * `suppressedByLabel` for the contract this mirrors.
+   */
+  suppressedBy?: string;
 }
 
 /** Absolute progress percentage + a human-readable status line. */
@@ -70,6 +77,11 @@ interface AuditProgressLine {
  * @param onFailure Invoked with the localized failure/cancel message right
  *   before resolving null, so the caller can surface the same text wherever
  *   it renders results (a webview panel, a toast, or both).
+ * @param includeSuppressed Passes `--include-suppressed` to the CLI, which
+ *   adds findings normally dropped by `// ignore:`, `// ignore_for_file:`,
+ *   or a baseline entry back into `diagnostics`, each tagged `suppressedBy`.
+ *   Defaults to false so the explorer "Audit Folder..." caller (which has
+ *   no UI for this yet) is unaffected.
  */
 export function spawnAuditCli(
   root: string,
@@ -78,6 +90,7 @@ export function spawnAuditCli(
   token: vscode.CancellationToken,
   onProgress: (update: AuditCliProgressUpdate) => void,
   onFailure: (message: string, canceled: boolean) => void,
+  includeSuppressed = false,
 ): Promise<Record<string, unknown> | null> {
   return new Promise((resolve) => {
     const args = ['run', 'saropa_lints', 'audit', root, '--quiet'];
@@ -86,6 +99,9 @@ export function spawnAuditCli(
     }
     if (useBaseline) {
       args.push('--baseline');
+    }
+    if (includeSuppressed) {
+      args.push('--include-suppressed');
     }
 
     const child = cp.spawn('dart', args, {
@@ -231,6 +247,11 @@ export function auditPayloadToViolationsData(payload: Record<string, unknown>): 
       severity,
       impact,
       correction: d.correctionMessage ?? undefined,
+      // Only present on entries `--include-suppressed` added back in — see
+      // AuditDiagnostic.suppressedBy. Left undefined (not read) for a normal
+      // audit run, so an old audit result cached before this field existed
+      // still renders identically.
+      suppressedBy: d.suppressedBy,
     };
   });
   return {

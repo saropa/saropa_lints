@@ -43,6 +43,9 @@ ${getEngineCardsStyles()}
   white-space: normal;
   word-break: break-all;
 }
+/* Local .pill overrides the chrome .pill (same specificity, later source
+   order wins). This depends on getDashboardChromeStyles() being injected
+   BEFORE this stylesheet — see dashboardChromeStylesComponents.ts. */
 .pill {
   display: inline-block;
   padding: 1px 7px;

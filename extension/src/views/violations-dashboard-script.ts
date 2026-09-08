@@ -294,15 +294,20 @@ export function buildScript(): string {
      picked, which reverts immediately since there is nothing to run). */
   var auditScopeSel = document.getElementById('auditScope');
   var auditBranchInput = document.getElementById('auditScopeBranch');
+  var auditIncludeSuppressedCb = document.getElementById('auditIncludeSuppressed');
   var runAuditBtn = document.getElementById('btn-run-audit');
   var isAuditing = false;
 
   function auditScopeSelection() {
     var v = auditScopeSel ? auditScopeSel.value : 'live';
+    // The checkbox is not rendered at all for 'live' (see buildAuditScopeControl),
+    // so reading it unconditionally here would throw on a null element — guard
+    // with the same optional-check pattern the branch input already uses above.
+    var includeSuppressed = !!(auditIncludeSuppressedCb && auditIncludeSuppressedCb.checked);
     if (v === 'live') return { mode: 'live' };
-    if (v === 'full') return { mode: 'full' };
-    if (v === 'sinceRefCustom') return { mode: 'sinceRef', ref: (auditBranchInput && auditBranchInput.value.trim()) || 'main' };
-    return { mode: 'sinceRef', ref: 'main' }; // 'sinceRef:main'
+    if (v === 'full') return { mode: 'full', includeSuppressed: includeSuppressed };
+    if (v === 'sinceRefCustom') return { mode: 'sinceRef', ref: (auditBranchInput && auditBranchInput.value.trim()) || 'main', includeSuppressed: includeSuppressed };
+    return { mode: 'sinceRef', ref: 'main', includeSuppressed: includeSuppressed }; // 'sinceRef:main'
   }
   function syncAuditScopeUi() {
     var v = auditScopeSel ? auditScopeSel.value : 'live';
@@ -310,6 +315,11 @@ export function buildScript(): string {
     if (runAuditBtn) runAuditBtn.hidden = v === 'live';
     var runBtn = document.getElementById('btn-run');
     if (runBtn) runBtn.hidden = v !== 'live';
+    // Same "hide the whole field when the mode makes it inapplicable" pattern
+    // as the branch input above — the checkbox itself is meaningless for
+    // 'live' mode, which has no suppression-bypass mechanism of its own.
+    var suppressedField = auditIncludeSuppressedCb ? auditIncludeSuppressedCb.closest('.audit-suppressed-field') : null;
+    if (suppressedField) suppressedField.hidden = v === 'live';
   }
   if (auditScopeSel) {
     auditScopeSel.addEventListener('change', function () {
@@ -364,6 +374,19 @@ export function buildScript(): string {
   });
   bindClick('btn-save', function () {
     vscode.postMessage({ type: 'saveFilteredJson' });
+    var det = document.querySelector('details.more');
+    if (det) det.removeAttribute('open');
+  });
+  // "Everything" export variants bypass every dashboard filter and include
+  // suppressed findings — only rendered (see buildMoreActionsMenu) while an
+  // audit result is the active source, so no live-mode guard is needed here.
+  bindClick('btn-copy-all', function () {
+    vscode.postMessage({ type: 'copyEverythingJson' });
+    var det = document.querySelector('details.more');
+    if (det) det.removeAttribute('open');
+  });
+  bindClick('btn-save-all', function () {
+    vscode.postMessage({ type: 'saveEverythingJson' });
     var det = document.querySelector('details.more');
     if (det) det.removeAttribute('open');
   });
@@ -878,8 +901,25 @@ export function buildScript(): string {
   bindClick('btn-drift-disable', function () { vscode.postMessage({ type: 'driftDisable' }); });
   bindClick('btn-drift-browser', function () { vscode.postMessage({ type: 'driftOpenBrowser' }); });
 
+  /* Task A — per-section collapse persistence. Native <details> already does
+     every bit of the toggle interaction itself (click, keyboard, focus order);
+     this listener's only job is telling the host WHICH section changed so
+     violationsWideReportView.ts can remember the choice in workspaceState
+     across panel reloads (same persistence pattern as saveFindingsRecent
+     below). No local rebuild here — the <details> element's own open/closed
+     DOM state is already correct; only the persisted copy needs updating. */
+  document.querySelectorAll('details.section[data-section-id]').forEach(function (el) {
+    el.addEventListener('toggle', function () {
+      var id = el.getAttribute('data-section-id');
+      if (!id) return;
+      vscode.postMessage({ type: 'saveSectionState', id: id, open: el.open });
+    });
+  });
+
   /* Suppressions block bindings */
-  var supRoot = document.getElementById('suppressions-block');
+  // Suppressions block uses data-section-id like every other collapsible
+  // section — the legacy getElementById hook was the last holdout.
+  var supRoot = document.querySelector('[data-section-id="suppressions"]');
   if (supRoot) {
     supRoot.querySelectorAll('.sup-row.sup-act').forEach(function (row) {
       function fire() {
@@ -904,6 +944,27 @@ export function buildScript(): string {
     });
     bindClick('btn-clear-view-sup', function () {
       vscode.postMessage({ type: 'clearWorkspaceSuppressions' });
+    });
+  }
+
+  /* Unsuppress buttons inside the suppressed-findings section — posts
+     the violation identity so the host can remove the // ignore: comment
+     (currently a stub that surfaces an info message; see
+     violationsWideReportView.ts's 'unsuppress' handler). Event delegation
+     on the section root rather than one listener per row, matching the
+     pattern used for the findings-table bulk actions below. */
+  var supFindingsRoot = document.querySelector('[data-section-id="suppressed-findings"]');
+  if (supFindingsRoot) {
+    supFindingsRoot.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-unsuppress]');
+      if (!btn) return;
+      vscode.postMessage({
+        type: 'unsuppress',
+        file: btn.dataset.file,
+        line: Number(btn.dataset.line),
+        rule: btn.dataset.rule,
+        kind: btn.dataset.kind
+      });
     });
   }
 

@@ -91,6 +91,9 @@ export function getMachineDashboardStyles(): string {
 .group-label { font-weight: 600; font-size: 13px; color: var(--vscode-foreground); }
 .group-count { font-size: 12px; color: var(--vscode-descriptionForeground, #94a3b8); }
 .group-rss { font-size: 12px; font-weight: 700; color: var(--vscode-foreground); margin-left: auto; }
+/* Local .pill overrides the chrome .pill (same specificity, later source
+   order wins). This depends on getDashboardChromeStyles() being injected
+   BEFORE this stylesheet — see dashboardChromeStylesComponents.ts. */
 .pill {
   display: inline-block;
   padding: 1px 7px;

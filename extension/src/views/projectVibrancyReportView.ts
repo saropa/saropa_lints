@@ -677,7 +677,7 @@ function kpiCard(input: KpiInput): string {
   return `<button type="button" class="kpi-card ${input.classes} ${interactiveClass}"${filterAttr}${tabAttr}
     title="${escapeHtml(tooltip)}"${interactive ? '' : ' disabled'}>
     <span class="kpi-k">${escapeHtml(input.label)}</span>
-    <span class="kpi-v">${input.value}</span>
+    <span class="kpi-v pill">${input.value}</span>
     <span class="kpi-sub">${escapeHtml(input.sub)}</span>
   </button>`;
 }

@@ -6,7 +6,12 @@ import { l10n } from '../i18n/runtime';
 import { type Violation } from '../violationsReader';
 import { type DashboardSection } from './issuesTreeModel';
 import { buildRuleDetailExtras, ruleDetailExtrasAvailable } from './violations-dashboard-rule-detail';
-import { escapeHtml, type ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
+import {
+  buildCollapsibleSection,
+  escapeHtml,
+  resolveSectionOpen,
+  type ViolationsDashboardHtmlInput,
+} from './violations-dashboard-shared';
 import { pluralize } from './webview-format';
 
 
@@ -41,12 +46,19 @@ export function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string 
   // it is intentionally NOT sortable, so it keeps reading as "the Nth noisiest
   // rule" even after the user re-sorts by name or severity.
   const body = rows.map((r, i) => buildTopRuleRow(r, i)).join('');
+  // `{count}` in these two catalog values is substituted by `pluralize`
+  // itself (see webview-format.ts), not by `l10n()`, so the l10n diagnostic's
+  // "expects params {count} but none passed" check is a false positive here —
+  // hence the passthrough directives, matching every other pluralize+l10n
+  // call site in the extension.
   const topPhrase = pluralize(rows.length, {
-    one: l10n('findingsDash.topRules.topRulesOne'),
-    other: l10n('findingsDash.topRules.topRulesOther'),
+    one: l10n('findingsDash.topRules.topRulesOne'), // l10n:passthrough
+    other: l10n('findingsDash.topRules.topRulesOther'), // l10n:passthrough
   });
-  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.topRules.sectionAria'))}">
-    <div class="findings-wrap">
+  // Task B: rank pill up in the heading gives the section a counter that
+  // stays visible while collapsed (its meta-line detail below does not).
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.topRules.sectionAria'))} <span class="pill">${rows.length}</span></h2>`;
+  const tableBody = `<div class="findings-wrap">
       <div class="findings-toolbar">
         <span class="meta-line" style="margin:0">
           ${topPhrase} · ${totalShown} of ${input.filteredCount} findings (${share}%) ·
@@ -66,8 +78,16 @@ export function buildTopRulesTable(input: ViolationsDashboardHtmlInput): string 
         </thead>
         <tbody>${body}</tbody>
       </table>
-    </div>
-  </section>`;
+    </div>`;
+  // Reached this point only when rows.length > 0 (the early-return guard
+  // above), so this section always has content — default open.
+  return buildCollapsibleSection({
+    id: 'topRules',
+    ariaLabel: l10n('findingsDash.topRules.sectionAria'),
+    headingHtml: heading,
+    bodyHtml: tableBody,
+    open: resolveSectionOpen('topRules', true, input.sectionOpenState),
+  });
 }
 
 
@@ -157,8 +177,9 @@ export function buildFindingsBlock(input: ViolationsDashboardHtmlInput): string 
   if (input.filteredCount === 0) {
     return buildFindingsEmpty(input);
   }
-  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.findings.sectionAria'))}">
-    <div class="findings-wrap">
+  // Task B: pill counter in the heading (kept visible while collapsed).
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.findings.heading'))} <span class="pill">${input.filteredCount}</span></h2>`;
+  const body = `<div class="findings-wrap">
       <div class="findings-toolbar">
         <span class="meta-line" style="margin:0">${escapeHtml(buildFindingsMeta(input))}</span>
         <div class="actions">
@@ -184,8 +205,18 @@ export function buildFindingsBlock(input: ViolationsDashboardHtmlInput): string 
         <tbody>${buildTableBody(input.sections, input.pageSize)}</tbody>
       </table>
       ${buildOverflowNote(input)}
-    </div>
-  </section>`;
+    </div>`;
+  // Findings is the dashboard's primary, density-first content (§14.7) — unlike
+  // the secondary aside panels (Charts/TODO/Drift/Suppressions), it always
+  // defaults open even when a filter has temporarily zeroed it out, so a
+  // first-time viewer never mistakes a collapsed main table for "no data".
+  return buildCollapsibleSection({
+    id: 'findings',
+    ariaLabel: l10n('findingsDash.findings.sectionAria'),
+    headingHtml: heading,
+    bodyHtml: body,
+    open: resolveSectionOpen('findings', true, input.sectionOpenState),
+  });
 }
 
 
@@ -241,10 +272,17 @@ export function renderFindingRow(v: Violation, filePath: string): string {
   const rule = escapeHtml(v.rule);
   const msg = escapeHtml(v.message ?? '');
   const fileLabel = escapeHtml(filePath);
+  // Only set on a row an "Include suppressed" audit run added back in — see
+  // Violation.suppressedBy. Rendered as its own pill (not folded into the
+  // severity pill) so it reads as an orthogonal fact: this finding is real,
+  // AND it is currently silenced in your normal (non-audit) view.
+  const suppressedPill = v.suppressedBy
+    ? `<span class="pill warn" title="${escapeHtml(l10n('findingsDash.findings.suppressedByTitle', { kind: v.suppressedBy }))}">${escapeHtml(l10n('findingsDash.findings.suppressedBadge'))}</span>`
+    : '';
   return `<tr class="frow" data-sev="${escapeHtml(sev)}" data-rule="${escapeHtml(v.rule)}" data-line="${line}" data-file="${fileAttr}" tabindex="0">
     <td class="col-sel-bulk"><input type="checkbox" class="bulk-row-cb" data-file="${fileAttr}" data-line="${line}" data-rule="${escapeHtml(v.rule)}" aria-label="${escapeHtml(l10n('findingsDash.findings.selectRowAria'))}"></td>
     <td class="col-sev"><span class="sev-pill sev-${escapeHtml(sev)}">${escapeHtml(sev)}</span></td>
-    <td class="col-rule"><span class="rule-tag">${rule}</span></td>
+    <td class="col-rule"><span class="rule-tag">${rule}</span> ${suppressedPill}</td>
     <td class="col-msg"><div class="vmsg">${msg}</div><div class="kpi-sub" title="${fileLabel}">${fileLabel}</div></td>
     <td class="col-line">${escapeHtml(l10n('findingsDash.findings.linePrefix', { line: String(line) }))}</td>
     <td class="col-actions"><button type="button" class="row-action" data-row-action="copy" title="${escapeHtml(l10n('findingsDash.findings.copyRowTitle'))}">⎘</button></td>
@@ -265,8 +303,10 @@ export function buildFindingsEmpty(input: ViolationsDashboardHtmlInput): string 
     ? ''
     : `<button type="button" class="btn tier-1" id="btn-reset-empty"><span class="glyph">⊘</span>${escapeHtml(l10n('findingsDash.findings.resetFilters'))}</button>
        <button type="button" class="btn" id="btn-run-empty2" data-run-analysis><span class="glyph">▶</span>${escapeHtml(l10n('findingsDash.findings.reRunAnalysis'))}</button>`;
-  return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.findings.sectionAria'))}">
-    <div class="findings-wrap">
+  // Task B: pill counter (0) so the collapsed-state contract ("still says how
+  // many things are inside") holds even for the empty state.
+  const heading = `<h2>${escapeHtml(l10n('findingsDash.findings.heading'))} <span class="pill">0</span></h2>`;
+  const body = `<div class="findings-wrap">
       <div class="empty-cta">
         <h2>${escapeHtml(reason)}</h2>
         <p>${input.totalRawAfterDisable === 0
@@ -274,8 +314,15 @@ export function buildFindingsEmpty(input: ViolationsDashboardHtmlInput): string 
           : escapeHtml(l10n('findingsDash.findings.emptyHintFilters'))}</p>
         ${cta ? `<div class="btns">${cta}</div>` : ''}
       </div>
-    </div>
-  </section>`;
+    </div>`;
+  // Same primary-content override as buildFindingsBlock above — always open.
+  return buildCollapsibleSection({
+    id: 'findings',
+    ariaLabel: l10n('findingsDash.findings.sectionAria'),
+    headingHtml: heading,
+    bodyHtml: body,
+    open: resolveSectionOpen('findings', true, input.sectionOpenState),
+  });
 }
 
 

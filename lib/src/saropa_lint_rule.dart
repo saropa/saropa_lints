@@ -2086,18 +2086,56 @@ enum SuppressionKind {
 ///
 /// Equality is based on [file], [line], and [rule] so that duplicate
 /// suppressions (from re-analysis) are collapsed in a [Set].
+///
+/// The [column]/[endLine]/[endColumn]/[severity]/[problemMessage]/
+/// [correctionMessage]/[impact] fields are the same diagnostic-shaped data
+/// a real (non-suppressed) finding would carry. They are only populated
+/// when [SuppressionTracker.captureDetails] is true — see that flag's doc
+/// for why this is opt-in — so a normal scan's [SuppressionRecord]s stay
+/// as cheap as before (just enough for counts and grouping).
 class SuppressionRecord {
   const SuppressionRecord({
     required this.rule,
     required this.file,
     required this.line,
     required this.kind,
+    this.column,
+    this.endLine,
+    this.endColumn,
+    this.severity,
+    this.problemMessage,
+    this.correctionMessage,
+    this.impact,
   });
 
   final String rule;
   final String file;
   final int line;
   final SuppressionKind kind;
+
+  /// 1-based start column. Only set when [SuppressionTracker.captureDetails]
+  /// was enabled at record time.
+  final int? column;
+
+  /// 1-based end line (inclusive). Only set when captured (see [column]).
+  final int? endLine;
+
+  /// 1-based end column (exclusive). Only set when captured (see [column]).
+  final int? endColumn;
+
+  /// The rule's declared analyzer severity (e.g. `'ERROR'`), matching the
+  /// casing used for real diagnostics. Only set when captured.
+  final String? severity;
+
+  /// The rule's `LintCode.problemMessage`. Only set when captured.
+  final String? problemMessage;
+
+  /// The rule's `LintCode.correctionMessage`. Only set when captured.
+  final String? correctionMessage;
+
+  /// The rule's declared [LintImpact] name (e.g. `'warning'`). Only set
+  /// when captured.
+  final String? impact;
 
   @override
   bool operator ==(Object other) =>
@@ -2132,18 +2170,54 @@ class SuppressionTracker {
   static int _ignoreForFileCount = 0;
   static int _baselineCount = 0;
 
+  /// When true, [record] retains the full diagnostic-shaped detail passed
+  /// in (column/span/severity/messages/impact) on each [SuppressionRecord]
+  /// instead of discarding it. Off by default: a normal scan or in-editor
+  /// analysis only ever reads the counts and `byRule`/`byFile` groupings
+  /// below, so retaining full detail (several strings per record) for
+  /// every suppressed diagnostic in a large codebase would be pure memory
+  /// pressure with no reader. `dart run saropa_lints audit
+  /// --include-suppressed` is the one consumer that needs the full detail
+  /// (to re-emit suppressed findings as diagnostic-shaped JSON), and it
+  /// opts in explicitly before running the scan.
+  static bool captureDetails = false;
+
   /// Record one suppression with full location data.
   ///
   /// Duplicate records (same file + line + rule) are silently ignored
   /// thanks to [SuppressionRecord]'s equality contract. The per-kind
   /// counters only increment when a genuinely new record is added.
+  ///
+  /// The optional detail parameters (column/span/severity/messages/impact)
+  /// are only retained on the stored record when [captureDetails] is true
+  /// — otherwise they are dropped here so callers can pass them
+  /// unconditionally without needing to know the current mode.
   static void record({
     required String rule,
     required String file,
     required int line,
     required SuppressionKind kind,
+    int? column,
+    int? endLine,
+    int? endColumn,
+    String? severity,
+    String? problemMessage,
+    String? correctionMessage,
+    String? impact,
   }) {
-    final r = SuppressionRecord(rule: rule, file: file, line: line, kind: kind);
+    final r = SuppressionRecord(
+      rule: rule,
+      file: file,
+      line: line,
+      kind: kind,
+      column: captureDetails ? column : null,
+      endLine: captureDetails ? endLine : null,
+      endColumn: captureDetails ? endColumn : null,
+      severity: captureDetails ? severity : null,
+      problemMessage: captureDetails ? problemMessage : null,
+      correctionMessage: captureDetails ? correctionMessage : null,
+      impact: captureDetails ? impact : null,
+    );
     // Only increment the counter if this is a genuinely new record
     // (not a duplicate that the LinkedHashSet rejects).
     if (_records.add(r)) {
@@ -2221,11 +2295,15 @@ class SuppressionTracker {
   static int get estimatedBytes => _records.length * 120;
 
   /// Clear all records and counters (called between analysis sessions).
+  /// Also resets [captureDetails] so a long-lived process (LSP server,
+  /// analyzer plugin) does not keep paying the extra binary-search cost
+  /// after a one-shot audit that armed it.
   static void reset() {
     _records.clear();
     _ignoreCount = 0;
     _ignoreForFileCount = 0;
     _baselineCount = 0;
+    captureDetails = false;
   }
 }
 
@@ -3328,11 +3406,21 @@ class SaropaDiagnosticReporter {
   void atToken(Token token, [LintCode? code]) {
     if (_isDuplicateAttempt(token.offset)) return;
     if (_isBaselined(token.offset)) {
-      _trackSuppression(token.offset, SuppressionKind.baseline);
+      // Pass the token's own length so a captured suppression record's
+      // end-of-span matches what `reportAtToken` would have highlighted.
+      _trackSuppression(
+        token.offset,
+        SuppressionKind.baseline,
+        length: token.length,
+      );
       return;
     }
     if (_isIgnoredForFile()) {
-      _trackSuppression(token.offset, SuppressionKind.ignoreForFile);
+      _trackSuppression(
+        token.offset,
+        SuppressionKind.ignoreForFile,
+        length: token.length,
+      );
       return;
     }
     // A leading `// ignore:` above a declaration attaches to the declaration's
@@ -3350,7 +3438,11 @@ class SaropaDiagnosticReporter {
           lineInfo,
         ) ||
         IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) {
-      _trackSuppression(token.offset, SuppressionKind.ignore);
+      _trackSuppression(
+        token.offset,
+        SuppressionKind.ignore,
+        length: token.length,
+      );
       return;
     }
     if (!_isCappedFromProblemsTab()) _rule.reportAtToken(token);
@@ -3361,12 +3453,16 @@ class SaropaDiagnosticReporter {
   void atOffset({required int offset, required int length}) {
     if (_isDuplicateAttempt(offset)) return;
     if (_isBaselined(offset)) {
-      _trackSuppression(offset, SuppressionKind.baseline);
+      _trackSuppression(offset, SuppressionKind.baseline, length: length);
       return;
     }
     // File-level only — no AST node available for node-level ignore check.
     if (_isIgnoredForFile()) {
-      _trackSuppression(offset, SuppressionKind.ignoreForFile);
+      _trackSuppression(
+        offset,
+        SuppressionKind.ignoreForFile,
+        length: length,
+      );
       return;
     }
     if (!_isCappedFromProblemsTab()) _rule.reportAtOffset(offset, length);
@@ -3429,11 +3525,43 @@ class SaropaDiagnosticReporter {
   /// only consulted when no node is available (token / raw-offset
   /// reporting paths) or as a fallback for unresolved scan ASTs whose
   /// `declaredFragment` is null.
-  ({String path, int line})? _resolveLocation(int offset, AstNode? node) {
+  ///
+  /// [length] (when known — e.g. from [atToken]'s token length or
+  /// [atOffset]'s explicit length) sizes the returned [endLine]/[endColumn]
+  /// span. When omitted and [node] is available, the node's own extent
+  /// (`node.end`) is used instead, matching the span [atNode] actually
+  /// reports. When neither is available the span collapses to a single
+  /// point at [offset]. These end-of-span fields exist only to give
+  /// [SuppressionTracker] (when [SuppressionTracker.captureDetails] is on)
+  /// a diagnostic-shaped record to re-emit — ordinary violation tracking
+  /// only ever reads `.path`/`.line`.
+  ///
+  /// [wantSpan] gates the SECOND `getLocation` call needed to resolve the
+  /// end of that span. `getLocation` is a binary search over the unit's
+  /// line starts, and this method sits in the in-editor analyzer hot path:
+  /// two of its three callers (the violation trackers) only ever read
+  /// `.path`/`.line`, and even `_trackSuppression` discards the span
+  /// unless `--include-suppressed` armed [SuppressionTracker.captureDetails].
+  /// A single `// ignore_for_file:` on a noisy rule produces one
+  /// suppression record per occurrence, so paying an extra binary search
+  /// each time for a value that is immediately thrown away is exactly the
+  /// kind of avoidable hot-path cost this package has fought before. When
+  /// [wantSpan] is false the end fields collapse onto the start location,
+  /// which costs nothing — [loc] is already resolved.
+  ({String path, int line, int column, int endLine, int endColumn})?
+  _resolveLocation(
+    int offset,
+    AstNode? node, {
+    int? length,
+    bool wantSpan = false,
+  }) {
     if (node != null) {
       final root = node.root;
       if (root is CompilationUnit) {
-        final line = root.lineInfo.getLocation(offset).lineNumber;
+        final lineInfo = root.lineInfo;
+        final loc = lineInfo.getLocation(offset);
+        final endOffset = offset + (length ?? (node.end - offset));
+        final endLoc = wantSpan ? lineInfo.getLocation(endOffset) : loc;
         // declaredFragment is null for unresolved ASTs (the standalone
         // scan command parses with parseString); fall back to the
         // currentUnit-supplied path in that narrow case so suppression
@@ -3441,14 +3569,31 @@ class SaropaDiagnosticReporter {
         final path =
             root.declaredFragment?.source.fullName ??
             _ruleContext.currentUnit?.file.path;
-        if (path != null) return (path: path, line: line);
+        if (path != null) {
+          return (
+            path: path,
+            line: loc.lineNumber,
+            column: loc.columnNumber,
+            endLine: endLoc.lineNumber,
+            endColumn: endLoc.columnNumber,
+          );
+        }
       }
     }
     final unit = _ruleContext.currentUnit;
     if (unit == null) return null;
+    final lineInfo = unit.unit.lineInfo;
+    final loc = lineInfo.getLocation(offset);
+    final endOffset = offset + (length ?? 0);
+    // Same hot-path guard as the node branch above — skip the second
+    // binary search when no caller will read the resulting span.
+    final endLoc = wantSpan ? lineInfo.getLocation(endOffset) : loc;
     return (
       path: unit.file.path,
-      line: unit.unit.lineInfo.getLocation(offset).lineNumber,
+      line: loc.lineNumber,
+      column: loc.columnNumber,
+      endLine: endLoc.lineNumber,
+      endColumn: endLoc.columnNumber,
     );
   }
 
@@ -3539,12 +3684,39 @@ class SaropaDiagnosticReporter {
   /// [node] threads through so suppression records are computed against
   /// the same CompilationUnit as the violation would have been (keeps
   /// suppression line numbers comparable to violation line numbers).
-  void _trackSuppression(int offset, SuppressionKind kind, {AstNode? node}) {
+  ///
+  /// [length] gives the reported span's width when the caller has one
+  /// (token length for [atToken], the explicit length for [atOffset]);
+  /// when omitted, [_resolveLocation] falls back to [node]'s own extent.
+  /// The extra diagnostic fields (severity/messages/impact) are passed
+  /// through unconditionally — [SuppressionTracker.record] itself decides
+  /// whether to keep them (see [SuppressionTracker.captureDetails]), so
+  /// there is no need to branch on that flag for those. They are plain
+  /// field reads and cost nothing meaningful.
+  ///
+  /// The end-of-span resolution is the one exception: it costs a line-info
+  /// binary search, so it IS branched on [SuppressionTracker.captureDetails]
+  /// below rather than computed and thrown away.
+  void _trackSuppression(
+    int offset,
+    SuppressionKind kind, {
+    AstNode? node,
+    int? length,
+  }) {
     // Skip accumulation when the hard RSS valve has tripped — suppression
     // records are diagnostic, not worth re-filling under OOM pressure.
     if (MemoryPressureHandler.isOverHardLimit) return;
 
-    final loc = _resolveLocation(offset, node);
+    // Only ask for the end-of-span (a second line-info binary search) when
+    // something will actually read it. `record` nulls every detail field
+    // out when captureDetails is false, so resolving the span in that mode
+    // is pure waste on a path that runs inside in-editor analysis.
+    final loc = _resolveLocation(
+      offset,
+      node,
+      length: length,
+      wantSpan: SuppressionTracker.captureDetails,
+    );
     if (loc == null) return;
 
     SuppressionTracker.record(
@@ -3552,6 +3724,16 @@ class SaropaDiagnosticReporter {
       file: loc.path,
       line: loc.line,
       kind: kind,
+      column: loc.column,
+      endLine: loc.endLine,
+      endColumn: loc.endColumn,
+      // Same LintCode fields a real (non-suppressed) diagnostic would
+      // carry, so audit --include-suppressed can re-emit a suppressed
+      // finding as a diagnostic-shaped JSON entry.
+      severity: lintCode.severity.name,
+      problemMessage: lintCode.problemMessage,
+      correctionMessage: lintCode.correctionMessage,
+      impact: impact.name,
     );
   }
 }

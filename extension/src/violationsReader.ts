@@ -52,6 +52,13 @@ export interface Violation {
   owasp?: OwaspData;
   /** Rule metadata snapshot at export time. */
   metadata?: RuleMetadataData;
+  /**
+   * Set only for a finding an "Include suppressed" audit run added back in —
+   * 'ignore' | 'ignore_for_file' | 'baseline'. Absent for every ordinary
+   * (non-suppressed) finding from any source, live or audit. See
+   * AuditDiagnostic.suppressedBy in auditCliRunner.ts for the origin.
+   */
+  suppressedBy?: string;
 }
 
 export interface BySeverity {

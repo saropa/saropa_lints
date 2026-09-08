@@ -39,6 +39,21 @@ export interface ViewSuppressionsSlice {
   sampleRuleInFileLines: readonly string[];
 }
 
+/**
+ * Suppressed findings grouped by suppression kind for the dedicated
+ * "Suppressed Findings" subsection. Populated only in audit mode with
+ * `--include-suppressed` on and at least one suppressed finding present —
+ * see `buildSuppressedFindingsSlice` in violationsWideReportView.ts.
+ */
+export interface SuppressedFindingsSlice {
+  /** Total count of suppressed violations in the audit result. */
+  total: number;
+  /** Breakdown by suppression kind (ignore, ignore_for_file, baseline). */
+  byKind: Array<[string, number]>;
+  /** The actual suppressed violations, for rendering a mini findings table. */
+  violations: Violation[];
+}
+
 export interface ViolationsDashboardHtmlInput {
   /** Violations matching current filters (deduped), for JSON copy. */
   exportViolations: Violation[];
@@ -204,7 +219,35 @@ export interface ViolationsDashboardHtmlInput {
     error?: string;
     /** True once at least one non-live audit has completed successfully. */
     hasResult: boolean;
+    /**
+     * Passes `--include-suppressed` to the audit CLI: findings normally
+     * dropped by `// ignore:`, `// ignore_for_file:`, or a baseline entry
+     * come back tagged with `suppressedBy` instead of being silently
+     * dropped. Meaningless (and hidden in the UI) for `mode: 'live'`, which
+     * has no suppression-bypass mechanism of its own.
+     */
+    includeSuppressed: boolean;
   };
+  /**
+   * Per-workspace open/closed state for every top-level collapsible section
+   * (Task A). Keyed by the section's `data-section-id` (see
+   * `buildCollapsibleSection` below). Loaded by `violationsWideReportView.ts`
+   * from `context.workspaceState` — same persistence pattern as
+   * `auditScope` above — and threaded through so a user's explicit
+   * expand/collapse choice survives a panel reload. `undefined` (or a
+   * missing key within it) falls back to the section's own content-based
+   * default (see `resolveSectionOpen`).
+   */
+  sectionOpenState?: SectionOpenState;
+  /**
+   * Suppressed-findings breakdown for the dedicated subsection (see
+   * `SuppressedFindingsSlice`). Undefined unless the toolbar's audit run
+   * used `--include-suppressed` AND at least one suppressed finding came
+   * back — a live-mode dashboard or an audit with zero suppressions never
+   * populates this, which is exactly the "hide the section" condition
+   * `buildSuppressedFindingsBlock` checks for.
+   */
+  suppressedFindings?: SuppressedFindingsSlice;
 }
 
 /** Default when `input.auditScope` is omitted (e.g. older test fixtures). */
@@ -212,6 +255,7 @@ export const DEFAULT_AUDIT_SCOPE: NonNullable<ViolationsDashboardHtmlInput['audi
   mode: 'live',
   running: false,
   hasResult: false,
+  includeSuppressed: false,
 };
 
 export const SEVERITY_ORDER: readonly string[] = ['error', 'warning', 'info'];
@@ -222,6 +266,63 @@ export function escapeHtml(s: string): string {
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;');
+}
+
+/* ============================================================================
+ * Collapsible sections (Task A — every top-level dashboard section can be
+ * expanded/collapsed via native <details>/<summary>). One helper lives here,
+ * shared by every section-builder module (panels/tables/top), so the markup
+ * shape and the open/closed resolution rule stay in exactly one place.
+ * ========================================================================= */
+
+/** Per-section open/closed flags, keyed by `data-section-id`. */
+export type SectionOpenState = Readonly<Record<string, boolean>>;
+
+/**
+ * Resolve whether one section should render open. A persisted user choice
+ * (if present for this id) always wins over the content-based default —
+ * once a user has explicitly collapsed a section, a later render must not
+ * silently flip it back open just because its content changed (e.g. a new
+ * TODO appeared). `contentDefaultOpen` is the caller's own "has content /
+ * is empty" judgment (sections with content default open; empty or
+ * zero-count sections default collapsed, per the Task A brief).
+ */
+export function resolveSectionOpen(
+  sectionId: string,
+  contentDefaultOpen: boolean,
+  persisted: SectionOpenState | undefined,
+): boolean {
+  const stored = persisted?.[sectionId];
+  return typeof stored === 'boolean' ? stored : contentDefaultOpen;
+}
+
+/**
+ * Wrap one dashboard section's heading + body in a native `<details>`/
+ * `<summary>` disclosure. Using the native element (rather than a JS click
+ * handler toggling a class) means the browser supplies keyboard activation
+ * (Space/Enter) and focus order for free — see
+ * `.claude/rules/extension-verification.md`'s warning against breaking
+ * either with custom click handling. `headingHtml` renders INSIDE
+ * `<summary>` so the heading text and its counter pill stay visible while
+ * the section is collapsed — a collapsed section must still say how many
+ * things are inside it. The client script (`violations-dashboard-script.ts`)
+ * listens for this element's native `toggle` event to persist the choice;
+ * no other JS is needed to make the disclosure itself work.
+ */
+export function buildCollapsibleSection(opts: {
+  id: string;
+  ariaLabel: string;
+  headingHtml: string;
+  bodyHtml: string;
+  open: boolean;
+  /** Extra class(es) appended after the required `section` class (e.g. a section-specific id-selector hook). */
+  extraClass?: string;
+}): string {
+  const cls = opts.extraClass ? `section ${opts.extraClass}` : 'section';
+  return `<details class="${cls}" data-section-id="${escapeHtml(opts.id)}" aria-label="${escapeHtml(opts.ariaLabel)}"${opts.open ? ' open' : ''}>
+    <summary class="section-summary">${opts.headingHtml}</summary>
+    <div class="section-body">${opts.bodyHtml}</div>
+  </details>`;
 }
 
 /** Relative time (e.g. "2m ago"). Resilient to clock drift / future stamps. */

@@ -60,8 +60,11 @@ function minimalInput(overrides: Partial<Parameters<typeof renderViolationsDashb
 
 describe('violationsDashboardHtml', () => {
   it('includes suppressions block and export zero copy', () => {
+    // The suppressions section is located via `data-section-id` like every
+    // other collapsible section now — the legacy `id="suppressions-block"`
+    // getElementById hook was removed (see buildCollapsibleSection).
     const html = renderViolationsDashboardHtml(minimalInput({}));
-    assert.ok(html.includes('id="suppressions-block"'));
+    assert.ok(html.includes('data-section-id="suppressions"'));
     assert.ok(html.includes('Suppressions (export)'));
     assert.ok(html.includes('Issues view hides'));
   });
@@ -637,5 +640,21 @@ describe('violationsDashboardHtml', () => {
     const html = renderViolationsDashboardHtml(minimalInput({}));
     assert.ok(!html.includes('Gate passing'));
     assert.ok(!html.includes('Gate failing'));
+  });
+
+  it('shows "everything" export items only in audit mode', () => {
+    // Live mode (default) should not render the "everything" export buttons
+    // since there is no raw audit result to export.
+    const liveHtml = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!liveHtml.includes('id="btn-copy-all"'));
+    assert.ok(!liveHtml.includes('id="btn-save-all"'));
+
+    // Audit mode renders the "everything" buttons in the More menu so the
+    // user can export the full, unfiltered audit result.
+    const auditHtml = renderViolationsDashboardHtml(minimalInput({
+      auditScope: { mode: 'full', running: false, hasResult: true, includeSuppressed: false },
+    }));
+    assert.ok(auditHtml.includes('id="btn-copy-all"'));
+    assert.ok(auditHtml.includes('id="btn-save-all"'));
   });
 });

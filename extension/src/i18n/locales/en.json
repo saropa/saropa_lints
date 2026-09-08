@@ -1036,7 +1036,11 @@
       "moreSummary": "More",
       "moreChevron": "▾",
       "copyJsonTitle": "Copy filtered violations as JSON ({count})",
-      "saveReportTitle": "Save filtered violations as JSON to reports/YYYYMMDD/"
+      "saveReportTitle": "Save filtered violations as JSON to reports/YYYYMMDD/",
+      "copyEverythingJson": "Copy everything as JSON",
+      "copyEverythingJsonTitle": "Copy ALL audit findings as JSON — unfiltered, including suppressed",
+      "saveEverythingReport": "Save everything report",
+      "saveEverythingReportTitle": "Save ALL audit findings as JSON to reports/ — unfiltered, including suppressed"
     },
     "audit": {
       "scopeFieldTitle": "Choose what the findings below are sourced from",
@@ -1198,6 +1202,22 @@
       "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor"
     },
+    "suppressedFindings": {
+      "heading": "Suppressed Findings",
+      "headingAria": "Suppressed findings section",
+      "byKind": "{count} by {kind}",
+      "kindIgnore": "// ignore:",
+      "kindIgnoreForFile": "// ignore_for_file:",
+      "kindBaseline": "baseline",
+      "unsuppressButton": "Unsuppress",
+      "unsuppressTitle": "Remove the suppression so this finding appears in normal scans",
+      "unsuppressHint": "To unsuppress {rule} at {file}:{line}, remove the // ignore: comment above that line.",
+      "columnFile": "File",
+      "columnLine": "Line",
+      "columnRule": "Rule",
+      "columnKind": "Kind",
+      "columnAction": "Action"
+    },
     "suppressions": {
       "sectionAria": "Suppressions",
       "headingExport": "Suppressions (export)",
@@ -1303,6 +1323,7 @@
     "noReportYet": "No violations report yet. Run Saropa Lints analysis first.",
     "clipboardCopyFailed": "Could not copy to clipboard.",
     "copiedViolationsJson": "Copied {count} violation(s) as JSON.",
+    "copiedEverythingJson": "Copied {count} unfiltered findings to clipboard.",
     "copiedOneViolationJson": "Copied 1 violation as JSON.",
     "driftNotConnected": "Drift Advisor server is not connected.",
     "copiedBulkFindings": "Copied {count} selected finding(s) as JSON.",

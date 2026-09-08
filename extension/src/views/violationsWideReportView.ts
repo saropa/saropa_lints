@@ -61,7 +61,7 @@ import {
   type AnalyzerSuppressionsSlice,
   type ViewSuppressionsSlice,
 } from './violationsDashboardHtml';
-import type { ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
+import type { SectionOpenState, SuppressedFindingsSlice, ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
 import {
   buildScannerSlice,
   countBySeverity,
@@ -146,24 +146,34 @@ interface AuditScopeState {
   running: boolean;
   error?: string;
   hasResult: boolean;
+  /** See the doc comment on `auditScope.includeSuppressed` in violations-dashboard-shared.ts. */
+  includeSuppressed: boolean;
 }
-let auditScopeState: AuditScopeState = { mode: 'live', running: false, hasResult: false };
+let auditScopeState: AuditScopeState = {
+  mode: 'live',
+  running: false,
+  hasResult: false,
+  includeSuppressed: false,
+};
 /** Result of the last completed non-live audit run; undefined until one succeeds. */
 let auditResult: ViolationsData | undefined;
 /** Lets the toolbar's Cancel button stop an in-flight audit CLI run. */
 let auditCts: vscode.CancellationTokenSource | undefined;
 
 /**
- * Persists just the SELECTION (mode + ref), never the CLI result — a stale
- * audit result from a prior session is exactly what re-running the CLI on
- * hydrate (see `openViolationsWideReport`) replaces with a fresh one, so
- * there is nothing worth caching beyond "what the user last had picked".
+ * Persists just the SELECTION (mode + ref + includeSuppressed), never the
+ * CLI result — a stale audit result from a prior session is exactly what
+ * re-running the CLI on hydrate (see `openViolationsWideReport`) replaces
+ * with a fresh one, so there is nothing worth caching beyond "what the user
+ * last had picked".
  */
 const AUDIT_SCOPE_STORAGE_KEY = 'saropa.findingsDashboard.auditScope';
 
 interface PersistedAuditScope {
   mode: AuditScopeMode;
   ref?: string;
+  /** Optional so an older stored value (written before this field existed) still parses. */
+  includeSuppressed?: boolean;
 }
 
 function loadPersistedAuditScope(context: vscode.ExtensionContext): PersistedAuditScope | undefined {
@@ -175,7 +185,31 @@ function loadPersistedAuditScope(context: vscode.ExtensionContext): PersistedAud
 }
 
 function persistAuditScope(context: vscode.ExtensionContext, state: AuditScopeState): void {
-  void context.workspaceState.update(AUDIT_SCOPE_STORAGE_KEY, { mode: state.mode, ref: state.ref });
+  void context.workspaceState.update(AUDIT_SCOPE_STORAGE_KEY, {
+    mode: state.mode,
+    ref: state.ref,
+    includeSuppressed: state.includeSuppressed,
+  });
+}
+
+/**
+ * Task A — per-workspace open/closed state for every top-level collapsible
+ * dashboard section, keyed by `data-section-id` (see `buildCollapsibleSection`
+ * in violations-dashboard-shared.ts). Same workspaceState persistence pattern
+ * as `AUDIT_SCOPE_STORAGE_KEY` above: a user's explicit expand/collapse choice
+ * must survive closing and reopening the panel. Native `<details>` already
+ * handles the in-session toggle itself; this only carries the choice across a
+ * fresh `rebuildDashboardHtml` render (see the `saveSectionState` message
+ * handler below, which writes into this key without forcing a rebuild).
+ */
+const SECTION_STATE_STORAGE_KEY = 'saropa.findingsDashboard.sectionState';
+
+function loadPersistedSectionState(context: vscode.ExtensionContext): SectionOpenState | undefined {
+  const stored = context.workspaceState.get<Record<string, boolean>>(SECTION_STATE_STORAGE_KEY);
+  if (!stored || typeof stored !== 'object') {
+    return undefined;
+  }
+  return stored;
 }
 
 const VIEW_SUP_SAMPLE = 14;
@@ -191,6 +225,33 @@ function buildAnalyzerSuppressionsSlice(data: ViolationsData): AnalyzerSuppressi
     byKind: sortedNumericCountEntries(sup.byKind),
     byRule: sortedNumericCountEntries(sup.byRule),
     byFile: sortedNumericCountEntries(sup.byFile),
+  };
+}
+
+/**
+ * Group audit-result violations carrying `suppressedBy` into the dedicated
+ * "Suppressed Findings" subsection slice. Only called when the audit run used
+ * `--include-suppressed` (see the `auditScopeState.includeSuppressed` gate at
+ * the call site) — a live-mode dashboard has no `suppressedBy` violations to
+ * find at all. Returns `undefined` when the count is zero so the caller can
+ * omit the section entirely rather than rendering an empty shell.
+ */
+function buildSuppressedFindingsSlice(violations: readonly Violation[]): SuppressedFindingsSlice | undefined {
+  const suppressed = violations.filter((v) => Boolean(v.suppressedBy));
+  if (suppressed.length === 0) return undefined;
+  // Tally per suppression kind ('ignore' | 'ignore_for_file' | 'baseline') for
+  // the subsection's breakdown row, in first-seen order (matches the pattern
+  // `sortedNumericCountEntries` produces elsewhere, without needing that
+  // helper's Record-based input shape for a small three-value domain).
+  const byKindMap = new Map<string, number>();
+  for (const v of suppressed) {
+    const kind = v.suppressedBy ?? 'unknown';
+    byKindMap.set(kind, (byKindMap.get(kind) ?? 0) + 1);
+  }
+  return {
+    total: suppressed.length,
+    byKind: [...byKindMap.entries()],
+    violations: suppressed,
   };
 }
 
@@ -331,7 +392,13 @@ export async function openViolationsWideReport(context: vscode.ExtensionContext)
   if (isFreshPanel) {
     const persisted = loadPersistedAuditScope(context);
     if (persisted && persisted.mode !== 'live') {
-      auditScopeState = { mode: persisted.mode, ref: persisted.ref, running: false, hasResult: false };
+      auditScopeState = {
+        mode: persisted.mode,
+        ref: persisted.ref,
+        running: false,
+        hasResult: false,
+        includeSuppressed: persisted.includeSuppressed ?? false,
+      };
     }
   }
 
@@ -476,6 +543,19 @@ async function rebuildDashboardHtml(
       return { pass: gates.pass, violationCount: gates.violations?.length ?? 0 };
     })(),
     auditScope: { ...auditScopeState },
+    // Task A: per-section open/closed state, read fresh each rebuild so a
+    // toggle persisted via the `saveSectionState` message (below) is honored
+    // on the next repaint (e.g. after a live diagnostics change) without
+    // requiring the panel to be closed and reopened first.
+    sectionOpenState: loadPersistedSectionState(context),
+    // Suppressed-findings subsection: only meaningful for a completed
+    // audit run that opted into `--include-suppressed` — a live-mode
+    // dashboard never carries `suppressedBy` violations, so gating on
+    // `includeSuppressed` avoids a wasted filter pass over `lastExportViolations`
+    // on every rebuild in the common (live) case.
+    suppressedFindings: auditScopeState.includeSuppressed && auditResult
+      ? buildSuppressedFindingsSlice(lastExportViolations)
+      : undefined,
   };
 
   // No-op guard: when nothing the user sees has changed, skip the html
@@ -634,7 +714,7 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
     // the completion message to.
     auditCts?.cancel();
     auditCts = undefined;
-    auditScopeState = { mode: 'live', running: false, hasResult: false };
+    auditScopeState = { mode: 'live', running: false, hasResult: false, includeSuppressed: false };
     auditResult = undefined;
   });
 
@@ -667,6 +747,7 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       textFilter?: string;
       severities?: string[];
       impacts?: string[];
+      includeSuppressed?: boolean;
     };
     const cfg = vscode.workspace.getConfiguration('saropaLints');
 
@@ -696,7 +777,7 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
         auditCts = undefined;
         // Reverting to live needs no CLI run — just drop the cached audit
         // result and re-source from diagnostics on the next rebuild.
-        auditScopeState = { mode: 'live', running: false, hasResult: false };
+        auditScopeState = { mode: 'live', running: false, hasResult: false, includeSuppressed: false };
         auditResult = undefined;
         persistAuditScope(context, auditScopeState);
         if (currentPanel) {
@@ -707,7 +788,8 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       const ref = mode === 'sinceRef'
         ? (typeof req.ref === 'string' && req.ref.trim().length > 0 ? req.ref.trim() : 'main')
         : undefined;
-      auditScopeState = { mode, ref, running: false, hasResult: auditScopeState.hasResult };
+      const includeSuppressed = typeof data.includeSuppressed === 'boolean' ? data.includeSuppressed : false;
+      auditScopeState = { mode, ref, running: false, hasResult: auditScopeState.hasResult, includeSuppressed };
       persistAuditScope(context, auditScopeState);
       const root = getProjectRoot();
       if (root) {
@@ -752,6 +834,30 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       await saveReportJson(lastExportViolations);
       return;
     }
+    // "Everything" variants export the raw audit result (`auditResult`), NOT
+    // `lastExportViolations` — the latter has already had severity/text/hidden
+    // filters and suppressions applied. `auditResult` is only populated for a
+    // completed non-live audit run (see the `data.type === 'live'` guard on
+    // buildMoreActionsMenu's `isAuditMode`), so falling back to `[]` here is
+    // defensive, not an expected path in the UI. Shared helper avoids
+    // duplicating the spread+sort between copy and save.
+    if (data.type === 'copyEverythingJson' || data.type === 'saveEverythingJson') {
+      const everything = prepareEverythingExport();
+      if (data.type === 'copyEverythingJson') {
+        try {
+          await vscode.env.clipboard.writeText(JSON.stringify(everything, null, 2));
+          void vscode.window.setStatusBarMessage(
+            l10n('wideReport.copiedEverythingJson', { count: String(everything.length) }),
+            4000,
+          );
+        } catch {
+          void vscode.window.showErrorMessage(l10n('wideReport.clipboardCopyFailed'));
+        }
+      } else {
+        await saveReportJson(everything);
+      }
+      return;
+    }
     if (data.type === 'copySingleFinding') {
       const d = data as { file?: string; line?: number; rule?: string };
       const match = lastExportViolations.find((v) =>
@@ -765,6 +871,20 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
           void vscode.window.showErrorMessage(l10n('wideReport.clipboardCopyFailed'));
         }
       }
+      return;
+    }
+    if (data.type === 'unsuppress') {
+      // Stub: actual // ignore: comment removal is complex (multi-line,
+      // ignore_for_file at file top, baseline entries in a separate file).
+      // For now, surface the intent so the user can act manually.
+      const d = data as { file?: string; line?: number; rule?: string; kind?: string };
+      void vscode.window.showInformationMessage(
+        l10n('findingsDash.suppressedFindings.unsuppressHint', {
+          rule: d.rule ?? '',
+          file: d.file ?? '',
+          line: String(d.line ?? 0),
+        }),
+      );
       return;
     }
     if (data.type === 'resetFilters') {
@@ -950,6 +1070,24 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       }
       return;
     }
+    if (data.type === 'saveSectionState') {
+      // Task A — persist one section's open/closed choice. Merged into the
+      // existing stored map (not replaced wholesale) so toggling one section
+      // never clobbers another's remembered state, and deliberately does NOT
+      // call rebuildDashboardHtml: the client's own <details> element is
+      // already showing the correct open/closed state (native browser
+      // behavior), so a host-triggered HTML reassignment here would only
+      // reload the document and cost the user their scroll position for no
+      // visible benefit — the persisted value simply needs to be right by
+      // the *next* rebuild (see the comment on `sectionOpenState` above).
+      const id = (data as { id?: unknown }).id;
+      const open = (data as { open?: unknown }).open;
+      if (typeof id === 'string' && id.trim().length > 0 && typeof open === 'boolean') {
+        const current = loadPersistedSectionState(context) ?? {};
+        await context.workspaceState.update(SECTION_STATE_STORAGE_KEY, { ...current, [id]: open });
+      }
+      return;
+    }
     if (data.type === 'saveFindingsRecent') {
       const q = (data as { queries?: unknown }).queries;
       if (Array.isArray(q) && q.every((x) => typeof x === 'string')) {
@@ -1032,6 +1170,7 @@ async function runAuditForDashboard(context: vscode.ExtensionContext, root: stri
       failMessage = message;
       wasCanceled = canceled;
     },
+    auditScopeState.includeSuppressed,
   );
   // Dispose the token source once the run has settled — VS Code does not
   // dispose these for the caller the way it does for the ones it hands out
@@ -1082,6 +1221,15 @@ export function postDashboardAnalysisProgress(status: 'started' | 'completed' | 
 /**
  * Save the current filtered finding set to `reports/YYYYMMDD/HHMMSS_findings.json`.
  *
+ * Returns the full, unfiltered audit result sorted for export — shared by
+ * both "Copy everything" and "Save everything" handlers so the spread+sort
+ * is not duplicated across two message branches.
+ */
+function prepareEverythingExport(): Violation[] {
+  return [...(auditResult?.violations ?? [])].sort(sortViolationsByReportPriority);
+}
+
+/**
  * Mirrors the package-vibrancy save pattern so all dashboards drop their
  * exports under the same project-rooted folder structure. Filename embeds
  * a timestamp so successive saves never clobber each other.

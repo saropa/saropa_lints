@@ -28,7 +28,8 @@ import 'package:saropa_lints/src/config/rule_lane.dart' show RuleLane;
 import 'package:saropa_lints/src/native/saropa_context.dart'
     show SaropaContext;
 import 'package:saropa_lints/src/report/timing_emitter.dart';
-import 'package:saropa_lints/src/saropa_lint_rule.dart' show RuleTimingTracker;
+import 'package:saropa_lints/src/saropa_lint_rule.dart'
+    show RuleTimingTracker, SuppressionKind, SuppressionTracker;
 import 'package:saropa_lints/src/scan/audit_baseline.dart';
 import 'package:saropa_lints/src/scan/git_changed_files.dart';
 import 'package:saropa_lints/src/scan/rule_tier_index.dart';
@@ -82,6 +83,14 @@ Future<void> main(List<String> args) async {
   if (parsed.profile) {
     RuleTimingTracker.reset();
     SaropaContext.runtimeProfilingEnabled = true;
+  }
+
+  // Arm full-detail suppression capture before any rule callback runs, same
+  // as the --profile arm above. Off by default (SuppressionTracker only
+  // keeps counts) — --include-suppressed opts in so suppressed findings can
+  // be reconstructed as diagnostic-shaped JSON after the scan completes.
+  if (parsed.includeSuppressed) {
+    SuppressionTracker.captureDetails = true;
   }
 
   // Progress sink: when --quiet, emit machine-readable JSON progress lines
@@ -156,6 +165,21 @@ Future<void> main(List<String> args) async {
   // Build the enriched JSON output.
   final json = scanDiagnosticsToJson(filtered);
 
+  // --include-suppressed: append findings that were dropped by // ignore:,
+  // // ignore_for_file:, or the baseline back into the same diagnostics
+  // array, each tagged with `suppressedBy`. Inserted before the tier/
+  // category enrichment loop below so that loop enriches these entries too,
+  // exactly like a normal finding. `filtered` (used for the exit code and
+  // summary counts) is untouched, so default behavior and exit codes are
+  // unaffected by this flag.
+  if (parsed.includeSuppressed) {
+    final suppressedDiagnostics = suppressedDiagnosticMaps(
+      minSeverity: parsed.minSeverity,
+      minImpact: parsed.minImpact,
+    );
+    (json['diagnostics'] as List<Object?>).addAll(suppressedDiagnostics);
+  }
+
   // Enrich each diagnostic with its tier and category.
   final diagList = json['diagnostics'];
   if (diagList is List) {
@@ -175,6 +199,9 @@ Future<void> main(List<String> args) async {
 
   // Add audit-specific top-level fields.
   json['tierCapBypassed'] = true;
+  // Only present when the flag was passed — its absence must match today's
+  // output exactly for the default (no-flag) path.
+  if (parsed.includeSuppressed) json['includeSuppressed'] = true;
   json['timestamp'] = DateTime.now().toUtc().toIso8601String();
 
   // Baseline diffing: compare current diagnostics against the saved baseline
@@ -292,6 +319,7 @@ class _AuditArgs {
     this.useBaseline = false,
     this.baselinePath,
     this.format = 'native',
+    this.includeSuppressed = false,
   });
 
   final String path;
@@ -318,6 +346,12 @@ class _AuditArgs {
 
   /// Override path for the baseline file (default: .saropa/audit_baseline.json).
   final String? baselinePath;
+
+  /// When true, findings that would normally be dropped by `// ignore:`,
+  /// `// ignore_for_file:`, or a baseline entry are ALSO included in the
+  /// `diagnostics` output, each tagged with a `suppressedBy` field. Purely
+  /// additive and opt-in — default (false) output is unchanged.
+  final bool includeSuppressed;
 }
 
 /// Parses CLI args into [_AuditArgs], or prints an error and returns null.
@@ -333,6 +367,7 @@ _AuditArgs? _parseArgs(List<String> args) {
   var useBaseline = false;
   String? baselinePathOverride;
   var format = 'native';
+  var includeSuppressed = false;
   final excludeGlobs = <String>[];
   final includeGlobs = <String>[];
 
@@ -402,6 +437,8 @@ _AuditArgs? _parseArgs(List<String> args) {
         baselinePathOverride = args[++i];
       case '--profile':
         profile = true;
+      case '--include-suppressed':
+        includeSuppressed = true;
       case '--quiet' || '-q':
         quiet = true;
       default:
@@ -435,6 +472,7 @@ _AuditArgs? _parseArgs(List<String> args) {
     useBaseline: useBaseline,
     baselinePath: baselinePathOverride,
     format: format,
+    includeSuppressed: includeSuppressed,
   );
 }
 
@@ -467,6 +505,82 @@ int _impactRank(String impact) => switch (impact.toLowerCase()) {
   _ => 0,
 };
 
+// ── --include-suppressed ─────────────────────────────────────────────
+
+/// Maps a [SuppressionKind] to the string used in the `suppressedBy` field.
+///
+/// `ignoreForFile` -> `'ignore_for_file'` matches the `// ignore_for_file:`
+/// comment syntax it represents, rather than the Dart-identifier-style enum
+/// name — the JSON is a public output contract, not an internal enum dump.
+// Not underscore-prefixed (unlike this file's other private helpers) so
+// `test/cli/audit_include_suppressed_test.dart` can import and exercise it
+// directly — the same pattern `bin/doctor.dart` uses for `diagnose`.
+String suppressedByLabel(SuppressionKind kind) => switch (kind) {
+  SuppressionKind.ignore => 'ignore',
+  SuppressionKind.ignoreForFile => 'ignore_for_file',
+  SuppressionKind.baseline => 'baseline',
+};
+
+/// Converts every record [SuppressionTracker] captured during the scan into
+/// a diagnostic-shaped JSON map, ready to append to the `diagnostics` array.
+///
+/// Only called when `--include-suppressed` is set (the caller must also
+/// have armed [SuppressionTracker.captureDetails] before the scan ran, or
+/// every record here will carry null detail fields). [minSeverity] /
+/// [minImpact] mirror the post-filters already applied to normal findings
+/// (see the call site in `main`) so a suppressed finding below the
+/// requested threshold does not reappear via this back door.
+// Not underscore-prefixed for the same test-import reason as
+// [suppressedByLabel] above.
+List<Map<String, Object?>> suppressedDiagnosticMaps({
+  required String? minSeverity,
+  required String? minImpact,
+}) {
+  final severityThreshold = minSeverity != null
+      ? _severityRank(minSeverity)
+      : null;
+  final impactThreshold = minImpact != null ? _impactRank(minImpact) : null;
+
+  final result = <Map<String, Object?>>[];
+  for (final r in SuppressionTracker.records) {
+    // Records captured without captureDetails (or from a code path that
+    // never resolved a location) carry no severity/message — skip them
+    // rather than emit a diagnostic-shaped entry with nothing useful in it.
+    if (r.severity == null) continue;
+
+    if (severityThreshold != null &&
+        _severityRank(r.severity!) < severityThreshold) {
+      continue;
+    }
+    if (impactThreshold != null &&
+        _impactRank(r.impact ?? '') < impactThreshold) {
+      continue;
+    }
+
+    // SCHEMA SYNC: these fields mirror the diagnostic shape produced by
+    // scanDiagnosticsToJson() in lib/src/scan/scan_json.dart. Changes to
+    // the diagnostic JSON schema must be applied in both places until a
+    // shared serializer is extracted.
+    result.add(<String, Object?>{
+      'filePath': r.file,
+      'line': r.line,
+      'column': r.column ?? 1,
+      'endLine': r.endLine ?? r.line,
+      'endColumn': r.endColumn ?? (r.column ?? 1),
+      'ruleName': r.rule,
+      'severity': r.severity,
+      'impact': r.impact,
+      'problemMessage': r.problemMessage,
+      'correctionMessage': r.correctionMessage,
+      // The one field a normal diagnostic never has — how this finding
+      // was suppressed. Its absence on every other entry is the contract
+      // consumers branch on (see bin/audit.dart --help).
+      'suppressedBy': suppressedByLabel(r.kind),
+    });
+  }
+  return result;
+}
+
 // ── Usage ────────────────────────────────────────────────────────────
 
 void _printUsage() {
@@ -492,6 +606,11 @@ void _printUsage() {
   print('  --save-baseline       Save this audit as the project baseline');
   print('  --baseline            Compare against the saved baseline');
   print('  --baseline-path <p>   Override baseline file path');
+  print('  --include-suppressed  Also include findings normally dropped by');
+  print('                        // ignore:, // ignore_for_file:, or the');
+  print('                        baseline — each tagged with a');
+  print('                        "suppressedBy" field. Additive/opt-in;');
+  print('                        default output is unchanged.');
   print('  --profile             Emit per-rule timing report');
   print('  --quiet, -q           Suppress non-fatal stderr messages');
   print('  -h, --help            Show this help');
@@ -508,4 +627,5 @@ void _printUsage() {
   print('  dart run saropa_lints audit . --min-severity warning --quiet');
   print('  dart run saropa_lints audit . --since main --format sarif '
       '--output results.sarif');
+  print('  dart run saropa_lints audit . --include-suppressed');
 }

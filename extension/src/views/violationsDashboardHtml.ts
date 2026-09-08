@@ -17,7 +17,7 @@ import { l10n } from '../i18n/runtime';
 import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import { buildAnnouncer, buildSkipLink } from './dashboardHero';
 import { buildKeyboardShortcutsOverlay, getKeyboardShortcutsStyles } from './keyboard-shortcuts';
-import { buildChartsBlock, buildDriftBlock, buildSuppressionsBlock, buildTodoHackBlock } from './violations-dashboard-panels';
+import { buildChartsBlock, buildDriftBlock, buildSuppressedFindingsBlock, buildSuppressionsBlock, buildTodoHackBlock } from './violations-dashboard-panels';
 import { buildScript } from './violations-dashboard-script';
 import { escapeHtml, type ViolationsDashboardHtmlInput } from './violations-dashboard-shared';
 import { buildFindingsBlock, buildTopRulesTable } from './violations-dashboard-tables';
@@ -57,10 +57,11 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
   <main id="findings-table" tabindex="-1">
     ${buildTopRulesTable(input)}
     ${buildFindingsBlock(input)}
+    ${buildSuppressedFindingsBlock(input)}
   </main>
   <aside aria-label="${escapeHtml(l10n('findingsDash.secondaryAsideLabel'))}">
     ${buildTodoHackBlock(input)}
-    ${buildDriftBlock(input.driftAdvisorSnapshot)}
+    ${buildDriftBlock(input.driftAdvisorSnapshot, input.sectionOpenState)}
     ${buildChartsBlock(input)}
     ${buildSuppressionsBlock(input)}
   </aside>

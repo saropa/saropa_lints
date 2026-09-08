@@ -49,23 +49,68 @@ export function chromeMonospace(): string {
 `;
 }
 
-/** `.section` heading band (count/meta annotations) — its own concern. */
+/**
+ * `.section` heading band (count/meta annotations) — its own concern.
+ *
+ * Task A (Findings dashboard only): `buildCollapsibleSection` in
+ * violations-dashboard-shared.ts now renders `.section` as a native
+ * `<details>` with its heading wrapped in `<summary>`. Several OTHER
+ * consumers of this shared chrome (rulePacksWebviewProvider's Lints Config
+ * tab, relatedRuleTelemetryView, projectVibrancyReportView's Code Health
+ * table) still render `.section` as a plain `<section>` with `<h2>` as a
+ * DIRECT child and are NOT part of this task — so the original `> h2`
+ * selector stays, unmodified, and the new `> summary > h2` selector is
+ * ADDED alongside it rather than replacing it. Removing the original would
+ * silently unstyle every heading in those other dashboards. The rest of
+ * this function hides the native disclosure triangle and replaces it with a
+ * rotating chevron, matching the existing `.sup-disclosure` / `details.more`
+ * pattern elsewhere in this stylesheet rather than inventing a third
+ * disclosure look.
+ */
 export function chromeSectionHeadings(): string {
   // NOTE: no leading newline -- see chromeMonospace's comment.
   return `.section { margin-bottom: 14px; }
-.section > h2 {
+.section > h2, .section > summary > h2 {
   margin: 0 0 8px;
   font-size: 1.05em;
   font-weight: 600;
   letter-spacing: 0.2px;
   display: flex; align-items: baseline; gap: 8px;
 }
-.section > h2 .count, .section > h2 .meta {
+.section > h2 .count, .section > h2 .meta,
+.section > summary > h2 .count, .section > summary > h2 .pill, .section > summary > h2 .meta {
   font-size: 0.82em;
   color: var(--muted);
   font-weight: 500;
 }
-.section > h2 .meta { margin-inline-start: auto; font-weight: 400; }
+.section > h2 .meta, .section > summary > h2 .meta { margin-inline-start: auto; font-weight: 400; }
+/* Native-<details> variant only (Findings dashboard) — hide the default
+   disclosure triangle and draw a rotating chevron instead, matching the
+   existing .sup-disclosure / details.more pattern rather than inventing a
+   third disclosure look. */
+.section > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.section > summary::-webkit-details-marker { display: none; }
+.section > summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-inline-end: 6px;
+  color: var(--muted);
+  transition: transform 0.12s linear;
+}
+.section[open] > summary::before { transform: rotate(90deg); }
+.section > summary:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
+/* > h2 above sets display:flex (a block-level box) which is right for the
+   original direct-child-of-section usage but would force the heading onto
+   its own line under the chevron inside <summary> (an inline-context
+   parent) — override back to inline-flex for the <summary> variant only. */
+.section > summary > h2 { display: inline-flex; margin-bottom: 0; }
+.section > .section-body { margin-top: 8px; }
 `;
 }
 
