@@ -66,13 +66,19 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.3.0] — Unreleased
+## [16.2.1] — Unreleased
+
+Patch release fixing false positives in two lint rules and resolving unwanted reload behavior in the Config and Findings Dashboards when editing text fields. [log](https://github.com/saropa/saropa_lints/blob/v16.2.1/CHANGELOG.md)
 
 ### Fixed
 
 `google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on already-migrated `GoogleSignInClientAuthorization` results or unrelated model classes with a same-named field. No action required.
 
 `avoid_public_members_in_states` no longer flags `WidgetsBindingObserver`/`RouteAware`/`AutomaticKeepAliveClientMixin` callback methods (e.g. `didChangeAppLifecycleState`, `didPushNext`, `wantKeepAlive`) on a `State` class that carries the interface via `with` or `implements` — their public spelling is mandated by the framework, so the rule's own suggested private-rename fix would have silently broken dispatch. No action required.
+
+`prefer_late_final` no longer flags a `late` field whose assigning method is passed elsewhere as a bare tear-off (e.g. `setState(_initFutures)`) — the tear-off's runtime call count can't be bounded from the declaration site, so the field may genuinely be reassigned even though only one direct call site is visible in the AST. No action required.
+
+`avoid_ignoring_return_values` no longer flags a project-local `extension` method whose name follows a mutate-verb convention (`add*`, `append*`, `insert*`, `remove*`, `update*`, `set*`) and returns `bool` — the same structural shape as allowlisted stdlib mutators like `List.add`, where the bool is a "did it happen" convenience the caller is not required to consult. No action required.
 
 ### Fixed (Extension)
 

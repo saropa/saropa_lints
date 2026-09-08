@@ -3439,6 +3439,17 @@ class PreferLateFinalRule extends SaropaLintRule {
 
     for (final MapEntry<String, Set<String>> entry
         in methodFieldAssignments.entries) {
+      // A method torn off as a value (e.g. `setState(_initFutures)`) may be
+      // invoked any number of times through that callback, so its true call
+      // count is not statically knowable from the declaration site. Bail out
+      // of the arithmetic adjustment entirely for fields it assigns rather
+      // than folding an unbounded count into `callCount - 1`.
+      if (callVisitor.tornOffMethods.contains(entry.key)) {
+        for (final String fieldName in entry.value) {
+          assignmentCounts[fieldName] = (assignmentCounts[fieldName] ?? 0) + 1;
+        }
+        continue;
+      }
       final int callCount = methodCallCounts[entry.key] ?? 0;
       if (callCount > 1) {
         for (final String fieldName in entry.value) {
@@ -3508,6 +3519,13 @@ class _LateFinalMethodCallCounterVisitor extends RecursiveAstVisitor<void> {
 
   final Map<String, int> counts;
 
+  /// Tracked method names seen used as a bare tear-off (e.g. passed as a
+  /// callback: `setState(_initFutures)`) rather than invoked directly.
+  /// A tear-off's runtime call count can't be bounded from the declaration
+  /// site, so callers must treat these as "called more than once" rather
+  /// than relying on [counts] for these methods.
+  final Set<String> tornOffMethods = <String>{};
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final String methodName = node.methodName.name;
@@ -3520,6 +3538,22 @@ class _LateFinalMethodCallCounterVisitor extends RecursiveAstVisitor<void> {
     }
 
     super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    // Skip the identifier when it IS the invocation's method name - that
+    // case is already handled by visitMethodInvocation above and is not a
+    // tear-off reference.
+    final AstNode? parent = node.parent;
+    if (parent is MethodInvocation && parent.methodName == node) {
+      super.visitSimpleIdentifier(node);
+      return;
+    }
+    if (counts.containsKey(node.name) && node.element is MethodElement) {
+      tornOffMethods.add(node.name);
+    }
+    super.visitSimpleIdentifier(node);
   }
 }
 
