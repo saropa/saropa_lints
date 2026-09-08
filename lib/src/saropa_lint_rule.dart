@@ -3458,11 +3458,7 @@ class SaropaDiagnosticReporter {
     }
     // File-level only — no AST node available for node-level ignore check.
     if (_isIgnoredForFile()) {
-      _trackSuppression(
-        offset,
-        SuppressionKind.ignoreForFile,
-        length: length,
-      );
+      _trackSuppression(offset, SuppressionKind.ignoreForFile, length: length);
       return;
     }
     if (!_isCappedFromProblemsTab()) _rule.reportAtOffset(offset, length);

@@ -70,7 +70,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Added
 
-- `dart run saropa_lints audit` now supports `--include-suppressed`, which adds findings normally dropped by `// ignore:`, `// ignore_for_file:`, or a baseline entry back into the report, each tagged with a `suppressedBy` field (`ignore`, `ignore_for_file`, or `baseline`). Useful for a true "everything" audit that shows what's being silenced, not just what's currently surfaced. No action required — default `audit` output is unchanged.
+The audit command now gives you complete visibility into suppressed warnings across your codebase. You can optionally expose findings previously hidden by ignore directives or baseline files to understand exactly what is being silenced in your project. [log](https://github.com/saropa/saropa_lints/blob/v16.2.0/CHANGELOG.md)
+
+New rule `avoid_unbounded_image_in_full_bleed_container`: flags an `Image`/`Image.asset`/`Image.network`/`Image.memory`/`Image.file` with no `width`/`height`/`cacheWidth`/`cacheHeight` sitting inside a full-bleed ancestor (`Positioned.fill`, `SizedBox.expand`, or a `Stack` with `fit: StackFit.expand`) — the image decodes at native resolution and is then stretched to fill an arbitrarily large parent, wasting decode memory. Skips false positives where a nearer `SizedBox`/`Container`/`ConstrainedBox`/`AspectRatio` already constrains the image's own size.
 
 ### Added (Extension)
 

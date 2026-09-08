@@ -750,6 +750,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'avoid_unbounded_cache_growth': 'resources',
   'avoid_unbounded_constraints': 'widget',
   'avoid_unbounded_dependency': 'config',
+  'avoid_unbounded_image_in_full_bleed_container': 'media',
   'avoid_unbounded_listview_in_column': 'widget',
   'avoid_uncaught_future_errors': 'flow',
   'avoid_unconditional_break': 'flow',

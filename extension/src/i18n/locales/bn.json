@@ -962,6 +962,10 @@
       "driftOnPill": "ড্রিফট অন · {count}",
       "driftOfflineTitle": "Drift Advisor সক্ষম করা হয়েছে কিন্তু কোন সার্ভার পাওয়া যায়নি।",
       "driftOfflinePill": "ড্রাইভ অফলাইন ড্রিফট করুন",
+      "driftAuthRequiredTitle": "Drift Advisor সার্ভার পাওয়া গেল কিন্তু এটি একটি অথেন্টিকেশন টোকেন প্রয়োজন — সেট করুন saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "ড্রিফট টোকেন প্রয়োজন",
+      "driftAuthFailedTitle": "Drift Advisor সেট করা অথেন্টিকেশন টোকেন অস্বীকৃত করেছে — আপডেট করতে ক্লিক করুন",
+      "driftAuthFailedPill": "ড্রিফট অ্যাথ ফেলড",
       "enabledRulesTitle": "বর্তমান স্তরের সক্ষম নিয়মগুলিকে সক্রিয় করা হয়েছে",
       "rulesCount": "{count} রুল",
       "regressionTitle": "স্বাস্থ্য স্কোর {previousScore} থেকে {currentScore} এ কমে গেলো",
@@ -2752,6 +2756,23 @@
       "title": "এই ফাইলে বাক্স করা নগন্বিত করুন"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "এই রিপোর্টটি \"{status}\" ট্যাগ দিয়ে মার্ক করা হয়েছে কিন্তু এটি এখনও বাগ কম করতে হবে — বন্ধ করার আগে এটিকে প্ল্যানস/হিস্টোরি/ ফোল্ডারে আর্কাইভ করুন (দেখুন ISSUE_REPORT_GUIDE.md)।"
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "এই দক্ষিণ এখনও খোলা কাজ হিসাবে পড়ে আসছে কিন্তু এটি আর্কাইভ / ইতিহাস অবস্থানে ফাইল করা হয়েছে — এটিকে {openIssuesDir} এ স্থানান্তর করুন।"
+    },
+    "quickFix": {
+      "title": "{openIssuesDir} এ চলে যান"
+    },
+    "error": {
+      "noWorkspaceFolder": "এই ফাইলটি সরানো যাবে না — এটি খোলা ওয়ার্কস্পেস ফোল্ডারের ভিতরে নয়।",
+      "targetExists": "কোনও ফাইল বর্তমানে {targetPath} এ অবস্থিত তাই সরানো যাবে না।"
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Run analysis চালান বিশ্লেষণ",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "সক্রিয়করণ ত্রুটি",
       "bannerDescription": "প্রস্তাবিত এক্সটেনশন হোস্ট লগ দেখুন বিস্তারিত জন্য"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "সার্ভার প্রমাণীকরণ প্রয়োজন। সেটিংস → Saropa Lints → Drift Advisor → অথেন্টিকেশন টোকেন একটি টোকেন সেট করুন, তারপর রিফ্রেশ ক্লিক করুন।",
+    "authFailed": "প্রমাণনা ব্যর্থ — সার্ভার সেটার কনফিগার করা টোকেন অস্বীকার করেছে। সেটিংসে আপডেট করতে ক্লিক করুন।",
+    "discovering": "সার্ভার খুঁজছে এবং সমস্যা তুলে আসছে...",
+    "noServerFound": "কোন Drift Advisor সার্ভার পাওয়া যায়নি। সার্ভার চালু রেখে আপনার অ্যাপ শুরু করুন, তারপর রিফ্রেশ ক্লিক করুন।",
+    "integrationOff": "Drift Advisor ইন্টিগ্রেশন অফ অবস্থায়। সেটিংস (saropaLints.driftAdvisor.integration) এ এনেবল করুন, তারপর রিফ্রেশ ক্লিক করুন।"
   }
 }

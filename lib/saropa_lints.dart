@@ -1886,6 +1886,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireGetitDisposeRegistrationRule.new,
   RequirePerformanceTestRule.new,
   RequireImageMemoryCacheLimitRule.new,
+  AvoidUnboundedImageInFullBleedContainerRule.new,
   // Dependency injection rules,
   RequireGetItRegistrationOrderRule.new,
   RequireDefaultConfigRule.new,

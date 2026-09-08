@@ -962,6 +962,10 @@
       "driftOnPill": "التنجرف على · {count}",
       "driftOfflineTitle": "تم تفعيل مستشار Drift Advisor ولكن لم يتم العثور على خادم.",
       "driftOfflinePill": "الانجراف في وضع عدم الاتصال بالإنترنت.",
+      "driftAuthRequiredTitle": "الخادم Drift Advisor تم العثور عليه لكنه يتطلب توكن أمان — قم بتعيين saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "د rift يحتاج إلى توكين",
+      "driftAuthFailedTitle": "تم رفض Drift Advisor التوكن المُحدد للتحقق من الهوية — انقر للتحديث",
+      "driftAuthFailedPill": "فشل د rift أUTH",
       "enabledRulesTitle": "قواعد تمكين في المستوى الحالي.",
       "rulesCount": "{count} قواعد",
       "regressionTitle": "نسبة الصحة انخفضت من {previousScore} إلى {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "إصلاح الإهمالات القديمة في هذا الملف"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "هذا التقرير مُarked \"{status}\" لكنه ما زال في bugs/ — أرشيفه إلى plans/history/ قبل إغلاقه (انظر ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "هذا المستند لا يزال يقرأ كعمل مفتوح ولكن تم تخزينه في الموقع الملفات/السجل — انتقل إليه {openIssuesDir} بدلًا من ذلك."
+    },
+    "quickFix": {
+      "title": "الانتقال إلى {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "لا يمكن نقل هذا الملف — إنه ليس داخل مجلد مفتوح لمساحة العمل.",
+      "targetExists": "لا يمكن التحرك — هناك ملف موجود بالفعل في {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "تشغيل تحليل التحليل.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "خطأ التفعيل",
       "bannerDescription": "تحقق من سجل مضيف التمديد للحصول على التفاصيل"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "الخادم يتطلب التحقق من الهوية. ضع توكن في الإعدادات → Saropa Lints → Drift Advisor → توكن التحقق من الهوية، ثم اضغط تحديث.",
+    "authFailed": "التحقق من الهوية فشل — رفض الخادم التوكن المُحدد. انقر لتحديثه في الإعدادات.",
+    "discovering": "اكتشاف الخادم وتنزيل المشكلات...",
+    "noServerFound": "لم يتم العثور على خادم Drift Advisor. ابدأ تطبيقك مع تشغيل الخادم، ثم اضغط على تحديث.",
+    "integrationOff": "التكامل Drift Advisor غير مفعل. قم بتفعيله في الإعدادات (saropaLints.driftAdvisor.integration)، ثم اضغط تحديث."
   }
 }

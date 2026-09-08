@@ -962,6 +962,10 @@
       "driftOnPill": "A la deriva en el · {count}",
       "driftOfflineTitle": "Drift Advisor habilitado pero no se encontró ningún servidor.",
       "driftOfflinePill": "Drift fuera de línea.",
+      "driftAuthRequiredTitle": "Drift Advisor servidor encontrado pero requiere un token de autenticación — establecer saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift necesita token",
+      "driftAuthFailedTitle": "Drift Advisor rechazó el token de autenticación configurado — haga clic para actualizarlo",
+      "driftAuthFailedPill": "Autenticación Drift fallida",
       "enabledRulesTitle": "Reglas habilitadas en el nivel actual.",
       "rulesCount": "{count} reglas",
       "regressionTitle": "Puntuación de salud disminuyó de {previousScore} a {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Corrige ignores obsoletos en este archivo"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Este informe está marcado como \"{status}\" pero aún está en bugs/ — archivélo en plans/history/ antes de cerrarlo (ver ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Este documento aún se lee como trabajo abierto, pero está archivado en la ubicación de historial — mueve el archivo a {openIssuesDir} en su lugar."
+    },
+    "quickFix": {
+      "title": "Moverse a {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "No se puede mover este archivo — no está dentro de una carpeta de espacio de trabajo abierto.",
+      "targetExists": "No se puede mover — ya existe un archivo en {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Ejecutar el análisis de ejecución.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Error de activación",
       "bannerDescription": "Compruebe el registro del host de la extensión para más detalles"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "El servidor requiere autenticación. Establezca un token en Configuración → Saropa Lints → Drift Advisor → Token de autenticación, luego haga clic en Actualizar.",
+    "authFailed": "Autenticación fallida — el servidor rechazó el token configurado. Haga clic para actualizarlo en Configuración.",
+    "discovering": "Descubriendo servidor y obteniendo problemas…",
+    "noServerFound": "No se encontró ningún servidor Drift Advisor. Inicie su aplicación con el servidor en ejecución, luego haga clic en Actualizar.",
+    "integrationOff": "La integración Drift Advisor está desactivada. Actívala en la configuración (saropaLints.driftAdvisor.integration), luego haz clic en Refrescar."
   }
 }

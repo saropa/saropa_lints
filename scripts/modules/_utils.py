@@ -82,49 +82,55 @@ _PRERELEASE_ITERATION_RE = _re.compile(r"(\d+)\s*$")
 def extension_version_for(version: str) -> str:
     """Return the extension/package.json version to publish for *version*.
 
-    A stable *version* passes through strip_prerelease_suffix() unchanged.
-    A prerelease *version* (e.g. "16.0.0-beta.1") gets PATCH offset by
-    _PRERELEASE_PATCH_OFFSET, plus a channel-derived band from the text
-    before the trailing number ("beta" in "beta.1"), plus the trailing
-    iteration number itself — producing e.g. "16.1.913" for "beta.1" and
-    a different value for "rc.1" of the same base version.
+    VS Code uses an odd/even minor convention: odd minor = pre-release,
+    even minor = stable. Both stable and prerelease versions get their
+    MINOR adjusted so stable always supersedes its betas numerically.
 
-    The MINOR is forced to odd for prerelease versions. VS Code uses an
-    odd/even minor convention to distinguish pre-release from stable: even
-    minor = stable, odd minor = pre-release. Without an odd minor, the
-    "Switch to Pre-Release Version" button in VS Code fails with
-    ``net::ERR_FAILED`` because it can't find a version on the pre-release
-    channel.
+    Prerelease (e.g. "16.0.0-beta.1") → odd minor, offset patch:
+    ``16.1.913``.  The PATCH is offset by _PRERELEASE_PATCH_OFFSET plus
+    a channel-derived band plus the iteration number, so successive beta
+    iterations produce distinct versions.
 
-    Without the PATCH offset, every prerelease iteration of the same pub.dev
-    base version strips down to the identical extension version ("16.0.0"),
-    and the second publish collides with the first at the Marketplace/Open
-    VSX level — pub.dev's hyphenated prerelease identifier has no equivalent
-    in the extension version field, so a distinct signal has to be
-    manufactured from the numbers that ARE available.
+    Stable (e.g. "16.0.1") → even minor one above the prerelease band:
+    ``16.2.1``.  This guarantees stable > prerelease in semver, so
+    marketplace users on a beta auto-update to the stable release.
+    The even minor is ``(original_minor | 1) + 1`` — the next even
+    integer at or above the prerelease odd minor.
 
     **Idempotency guarantee:** calling this function twice on the same input
     returns the same result. A converted prerelease version (e.g. "16.1.913")
     contains no ``-``, so ``is_prerelease_version`` returns False and the
-    function returns the input unchanged via ``strip_prerelease_suffix``.
+    stable path returns it unchanged (odd minor stays odd because
+    ``(1 | 1) + 1 = 2`` would break idempotency — so the stable path
+    only bumps when the minor is even, i.e. not already converted).
     ``set_extension_version`` relies on this property.
     """
     base = strip_prerelease_suffix(version)
-    if not is_prerelease_version(version):
-        return base
-    suffix = version.split("-", 1)[1]
-    match = _PRERELEASE_ITERATION_RE.search(suffix)
-    iteration = int(match.group(1)) if match else 1
-    channel = suffix[: match.start()].rstrip(".") if match else suffix
-    channel_band = sum(ord(c) for c in channel) % _PRERELEASE_CHANNEL_BAND
     major, minor, patch = base.split(".")
-    # VS Code requires an odd minor version for pre-release extensions;
-    # even minor = stable. Force odd so "Switch to Pre-Release" works.
-    prerelease_minor = int(minor) | 1
-    new_patch = (
-        int(patch) + _PRERELEASE_PATCH_OFFSET + channel_band + iteration
-    )
-    return f"{major}.{prerelease_minor}.{new_patch}"
+    minor_int = int(minor)
+
+    if is_prerelease_version(version):
+        # Odd minor for prerelease so VS Code's "Switch to Pre-Release" works.
+        prerelease_minor = minor_int | 1
+        suffix = version.split("-", 1)[1]
+        match = _PRERELEASE_ITERATION_RE.search(suffix)
+        iteration = int(match.group(1)) if match else 1
+        channel = suffix[: match.start()].rstrip(".") if match else suffix
+        channel_band = sum(ord(c) for c in channel) % _PRERELEASE_CHANNEL_BAND
+        new_patch = (
+            int(patch) + _PRERELEASE_PATCH_OFFSET + channel_band + iteration
+        )
+        return f"{major}.{prerelease_minor}.{new_patch}"
+
+    # Stable: bump minor to the next even above the prerelease odd minor,
+    # so stable always supersedes its betas (e.g. 16.2.x > 16.1.x).
+    # Skip the bump when minor is already odd — that means this value was
+    # already converted from a prerelease (idempotency guard).
+    if minor_int % 2 == 0:
+        stable_minor = (minor_int | 1) + 1
+    else:
+        stable_minor = minor_int
+    return f"{major}.{stable_minor}.{patch}"
 
 
 # =============================================================================

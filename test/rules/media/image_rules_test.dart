@@ -4,7 +4,7 @@ import 'package:saropa_lints/src/rules/media/image_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
 
-/// Tests for 21 Image lint rules.
+/// Tests for 22 Image lint rules.
 ///
 /// Test fixtures: example/lib/image/*
 void main() {
@@ -128,6 +128,11 @@ void main() {
       'AvoidCachedImageWebRule',
       'avoid_cached_image_web',
       () => AvoidCachedImageWebRule(),
+    );
+    testRule(
+      'AvoidUnboundedImageInFullBleedContainerRule',
+      'avoid_unbounded_image_in_full_bleed_container',
+      () => AvoidUnboundedImageInFullBleedContainerRule(),
     );
   });
   group('Image Rules - Fixture Verification', () {

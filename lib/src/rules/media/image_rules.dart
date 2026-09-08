@@ -2100,3 +2100,183 @@ class RequireImageMemoryCacheLimitRule extends SaropaLintRule {
     SaropaContext context,
   ) {}
 }
+
+// =============================================================================
+// avoid_unbounded_image_in_full_bleed_container
+// =============================================================================
+
+/// Warns when an `Image` constructor has no size or decode bound while
+/// sitting inside a full-bleed layout ancestor.
+///
+/// Since: v16.2.0 | Rule version: v1
+///
+/// A raw `Image`/`Image.asset`/`Image.network`/`Image.memory`/`Image.file`
+/// with none of `width`, `height`, `cacheWidth`, `cacheHeight` set has no way
+/// to bound its decode-time resolution. Most of the time Flutter lays such a
+/// widget out at its intrinsic size and the gap is harmless -- but inside a
+/// full-bleed ancestor (`Positioned.fill`, `SizedBox.expand`, or a `Stack`
+/// forced to expand via `fit: StackFit.expand`), the image is stretched to
+/// fill an arbitrarily large parent while still decoding at its native
+/// resolution, wasting decode memory and risking visible upscale blur.
+///
+/// **BAD:**
+/// ```dart
+/// Stack(
+///   fit: StackFit.expand,
+///   children: [
+///     Image.asset('assets/hero.png'), // no width/height/cache bound
+///     Text('Overlay'),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stack(
+///   fit: StackFit.expand,
+///   children: [
+///     Image.asset(
+///       'assets/hero.png',
+///       width: double.infinity,
+///       height: double.infinity,
+///       cacheWidth: 800,
+///     ),
+///     Text('Overlay'),
+///   ],
+/// )
+/// ```
+class AvoidUnboundedImageInFullBleedContainerRule extends SaropaLintRule {
+  AvoidUnboundedImageInFullBleedContainerRule() : super(code: _code);
+
+  /// Performance issue -- unbounded decode inside a stretched container.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'media', 'performance'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_unbounded_image_in_full_bleed_container',
+    '[avoid_unbounded_image_in_full_bleed_container] Image widget has neither a size (width/height) nor a decode bound (cacheWidth/cacheHeight) while sitting inside a full-bleed ancestor (Positioned.fill, SizedBox.expand, or Stack forced to expand). The image decodes at its native resolution and is then stretched to fill an arbitrarily large parent, wasting decode memory and risking visible upscale blur on high-resolution source assets. {v1}',
+    correctionMessage:
+        "Pass width/height (matching the ancestor's actual render box, e.g. via MediaQuery) or cacheWidth/cacheHeight to bound the decode.",
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  // Named constructors of Image that decode a bitmap ('' is the default
+  // Image() constructor, which also decodes via an ImageProvider).
+  static const Set<String> _imageConstructors = <String>{
+    '',
+    'asset',
+    'network',
+    'memory',
+    'file',
+  };
+
+  // Ancestor widgets that constrain their child's size directly -- if one
+  // of these sits between the Image and a full-bleed ancestor, the Image is
+  // NOT the thing being stretched, so the pattern doesn't apply.
+  static const Set<String> _sizeConstrainingWidgets = <String>{
+    'SizedBox',
+    'Container',
+    'ConstrainedBox',
+    'AspectRatio',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Image') return;
+
+      final String constructorName = node.constructorName.name?.name ?? '';
+      if (!_imageConstructors.contains(constructorName)) return;
+
+      if (_hasSizeOrCacheBound(node)) return;
+      if (!_hasFullBleedAncestor(node)) return;
+
+      reporter.atNode(node.constructorName);
+    });
+  }
+
+  bool _hasSizeOrCacheBound(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+      final String name = arg.name.label.name;
+      if (name == 'width' ||
+          name == 'height' ||
+          name == 'cacheWidth' ||
+          name == 'cacheHeight') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool _hasNamedArg(InstanceCreationExpression node, String argName) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == argName) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Walks up from the Image to find a full-bleed ancestor. Stops early
+  // (returns false) if a nearer ancestor already constrains the Image's own
+  // size -- that nearer constraint wins, so the full-bleed ancestor further
+  // up is irrelevant to this Image's decode size.
+  bool _hasFullBleedAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String ancestorType = current.constructorName.type.name.lexeme;
+        final String? ancestorCtor = current.constructorName.name?.name;
+
+        if (ancestorType == 'Positioned' && ancestorCtor == 'fill') {
+          return true;
+        }
+
+        if (ancestorType == 'SizedBox' && ancestorCtor == 'expand') {
+          return true;
+        }
+
+        if (ancestorType == 'Stack' && _hasExpandFit(current)) {
+          return true;
+        }
+
+        if (_sizeConstrainingWidgets.contains(ancestorType) &&
+            (_hasNamedArg(current, 'width') ||
+                _hasNamedArg(current, 'height') ||
+                _hasNamedArg(current, 'constraints') ||
+                _hasNamedArg(current, 'aspectRatio'))) {
+          return false;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _hasExpandFit(InstanceCreationExpression stackNode) {
+    for (final Expression arg in stackNode.argumentList.arguments) {
+      if (arg is! NamedExpression || arg.name.label.name != 'fit') continue;
+      final Expression fitValue = arg.expression;
+      if (fitValue is PrefixedIdentifier &&
+          fitValue.prefix.name == 'StackFit' &&
+          fitValue.identifier.name == 'expand') {
+        return true;
+      }
+    }
+    return false;
+  }
+}

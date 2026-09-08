@@ -1902,6 +1902,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_getit_dispose_registration',
   'require_performance_test',
   'require_image_memory_cache_limit',
+  'avoid_unbounded_image_in_full_bleed_container',
   'require_interface_for_dependency',
   'require_json_date_format_consistency',
   'require_keychain_access',

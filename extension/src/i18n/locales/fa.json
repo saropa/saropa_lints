@@ -962,6 +962,10 @@
       "driftOnPill": "در حال حرکت بر روی · {count}",
       "driftOfflineTitle": "Drift Advisor فعال شده اما هیچ سرور پیدا نشده است.",
       "driftOfflinePill": "درایف کردن به صورت آفلاین",
+      "driftAuthRequiredTitle": "سرویس Drift Advisor پیدا شد اما نیاز به یک توکن احراز هویت دارد — سرور saropaLints.driftAdvisor.authToken را تنظیم کنید",
+      "driftAuthRequiredPill": "د rift نیاز به تکنیک دارد",
+      "driftAuthFailedTitle": "Drift Advisor مجوز ورود پیکربندی شده را رد کرد — کلیک کنید تا آن را به‌روزرسانی کنید",
+      "driftAuthFailedPill": "د rift اتھ چک نشد",
       "enabledRulesTitle": "قوانین فعال شده در سطح فعلی",
       "rulesCount": "{count} قانون",
       "regressionTitle": "امتیاز سلامت از {previousScore} به {currentScore} کاهش یافت",
@@ -2752,6 +2756,23 @@
       "title": "این فایل ایگنورهای قدیمی را رفع کنید"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "این گزارش به \"{status}\" نمادین شده اما هنوز در bugs/ است — آن را قبل از بستن به plans/history/ ارکیو کنید (برای مشاهده ISSUE_REPORT_GUIDE.md ببینید)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "این مستند هنوز به عنوان کار در حال انجام خوانده می‌شود اما در مکان پرچم/تاریخچه قرار دارد — آن را به {openIssuesDir} منتقل کنید."
+    },
+    "quickFix": {
+      "title": "به {openIssuesDir} منتقل شوید"
+    },
+    "error": {
+      "noWorkspaceFolder": "فایلی نمی توان انتقال داد — در یک پوشه کارگاه باز قرار ندارد.",
+      "targetExists": "نمی‌توان جابه‌جا کرد — یک فایل در {targetPath} وجود دارد."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "تحلیل را اجرا کنید.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "خطا در فعال‌سازی",
       "bannerDescription": "لگ های هاست اکستنشن را برای جزئیات بررسی کنید"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "سرویس می‌خواهد ورودی احراز شود. یک توکن را در تنظیمات → Saropa Lints → Drift Advisor → توکن ورودی قرار دهید، سپس روی به‌روزرسانی کلیک کنید.",
+    "authFailed": "ورود ناموفق — سرور مجوز وارد شده را رد کرد. کلیک کنید تا آن را در تنظیمات به‌روزرسانی کنید.",
+    "discovering": "دریافت سرور و گرفتن مشکلات...",
+    "noServerFound": "هیچ سرور Drift Advisor یافت نشد. برنامه خود را با اجرای سرور شروع کنید، سپس روی به‌روزرسانی کلیک کنید.",
+    "integrationOff": "نتیجه ی انتگراسيون Drift Advisor غیر فعال است. آن را در تنظیمات (saropaLints.driftAdvisor.integration) فعال کنید، سپس روی به‌روزرسانی کلیک کنید."
   }
 }

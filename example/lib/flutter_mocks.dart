@@ -155,6 +155,14 @@ class Positioned extends Widget {
     double? bottom,
     required Widget child,
   });
+  const Positioned.fill({
+    super.key,
+    double left = 0.0,
+    double top = 0.0,
+    double right = 0.0,
+    double bottom = 0.0,
+    required Widget child,
+  });
 }
 
 class AnimatedPositioned extends Widget {

@@ -74,8 +74,15 @@ class TestExtensionVersionFor(unittest.TestCase):
 
         self.fn = extension_version_for
 
-    def test_stable_version_passes_through(self) -> None:
-        self.assertEqual(self.fn("15.2.7"), "15.2.7")
+    def test_stable_version_gets_even_minor_bump(self) -> None:
+        # Stable versions bump minor to the next even above the prerelease
+        # odd minor, so stable always supersedes its betas in semver.
+        # 15.2.7 → minor (2|1)+1 = 4 → "15.4.7"
+        self.assertEqual(self.fn("15.2.7"), "15.4.7")
+
+    def test_stable_version_even_zero_minor(self) -> None:
+        # 16.0.1 → minor (0|1)+1 = 2 → "16.2.1"
+        self.assertEqual(self.fn("16.0.1"), "16.2.1")
 
     def test_first_beta_gets_offset_patch(self) -> None:
         # Minor is forced to odd (0 → 1) for pre-release so the VS Code
@@ -123,11 +130,14 @@ class TestExtensionVersionFor(unittest.TestCase):
                 "— set_extension_version relies on this",
         )
 
-    def test_stable_double_conversion_is_idempotent(self) -> None:
-        # Stable versions pass through unchanged on every call.
+    def test_stable_double_conversion_not_idempotent(self) -> None:
+        # Stable double-conversion is NOT idempotent — the even-minor bump
+        # re-triggers on the converted value. This is acceptable because
+        # callers (set_extension_version, publish pipeline) always pass the
+        # raw pub.dev version, never a previously-converted extension version.
         once = self.fn("15.2.12")
         twice = self.fn(once)
-        self.assertEqual(once, twice)
+        self.assertNotEqual(once, twice)
 
 
 class TestPackageExtensionWritesSafeVersion(unittest.TestCase):
@@ -159,10 +169,12 @@ class TestPackageExtensionWritesSafeVersion(unittest.TestCase):
              mock.patch.object(self._mod, "run_extension_package", return_value=None):
             self._mod.package_extension(self.root, version)
 
-    def test_stable_version_written_as_is(self) -> None:
+    def test_stable_version_gets_even_minor_bump(self) -> None:
+        # Stable versions bump minor to even above prerelease odd minor.
+        # 15.2.7 → "15.4.7"
         self._package_with_mocks("15.2.7")
         pkg = json.loads((self.root / "extension" / "package.json").read_text(encoding="utf-8"))
-        self.assertEqual(pkg["version"], "15.2.7")
+        self.assertEqual(pkg["version"], "15.4.7")
 
     def test_prerelease_version_offset_before_writing(self) -> None:
         # Minor forced odd (2 → 3) for pre-release channel detection.
@@ -212,12 +224,12 @@ class TestSetExtensionVersionDryRun(unittest.TestCase):
         )
         self.assertEqual(pkg["version"], "0.0.0")
 
-    def test_dry_run_stable_returns_passthrough(self) -> None:
-        # Stable versions pass through unchanged.
+    def test_dry_run_stable_returns_bumped_minor(self) -> None:
+        # Stable versions get even-minor bump: 15.2.7 → "15.4.7".
         result = self._mod.set_extension_version(
             self.root, "15.2.7", dry_run=True,
         )
-        self.assertEqual(result, "15.2.7")
+        self.assertEqual(result, "15.4.7")
 
     def test_dry_run_missing_package_json_returns_empty(self) -> None:
         # When extension dir has no package.json, dry-run returns "".
