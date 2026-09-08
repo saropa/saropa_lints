@@ -320,6 +320,34 @@ call-graph reasoning this rule does not implement, and a missed genuine
 `late final` candidate is the safer failure mode than the crash-risk false
 positive this bug reports.
 
+### Hardening follow-up (2026-09-08)
+
+Two additional fixture cases exercise edges the original fix wasn't tested
+against: a tear-off reference registered inside a constructor body rather
+than a method (`_GoodPreferLateFinalTearOffInConstructor`, confirming
+`_LateFinalMethodCallCounterVisitor`'s `ConstructorDeclaration` traversal
+path also feeds `visitSimpleIdentifier`), and a field whose assigning
+method already has 2 direct call sites (triggering the pre-existing
+`callCount - 1` arithmetic) that is *also* torn off elsewhere
+(`_GoodPreferLateFinalMultiCallAndTearOff`, confirming the tear-off `+1`
+bump doesn't misbehave when stacked on the older adjustment path). Both
+verified suppressed via `--resolve` scan; `prefer_late_final` still fires
+exactly once across all fixture classes (the one genuine case).
+
+`PreferLateFinalRule`'s class-level DartDoc — previously a `duplicate
+string literal` doc misattributed to this class, an unrelated pre-existing
+documentation bug with no bearing on rule behavior — was replaced with an
+accurate description of the rule plus a BAD/GOOD example demonstrating the
+tear-off exemption directly in the rule source, rather than leaving that
+behavior documented only in this bug archive.
+
+Not addressed (documented as open risk, not fixed): whether `MethodElement`
+is stable across future analyzer versions, tear-offs stored in an
+intermediate variable before being passed to a callback
+(`final cb = _method; setState(cb);`), and named-constructor / getter /
+`Function.apply` tear-off shapes. These remain the same blind spots noted
+in the original handoff reflection.
+
 ---
 
 ## Environment

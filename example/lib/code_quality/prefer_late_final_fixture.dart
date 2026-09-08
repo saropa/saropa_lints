@@ -39,3 +39,42 @@ class _GoodPreferLateFinalTearOffCallSite {
 
   void scheduleCallback(void Function() callback) => callback();
 }
+
+// GOOD: the tear-off reference lives inside a constructor body rather than a
+// method — _LateFinalMethodCallCounterVisitor walks ConstructorDeclaration
+// bodies too, so this must be suppressed the same way as the method case.
+class _GoodPreferLateFinalTearOffInConstructor {
+  late int value; // Reassigned via _refresh()'s tear-off, registered in ctor
+  _GoodPreferLateFinalTearOffInConstructor() {
+    scheduleCallback(_refresh);
+  }
+
+  void _refresh() {
+    value = 42;
+  }
+
+  void scheduleCallback(void Function() callback) => callback();
+}
+
+// GOOD: the assigning method already has 2 direct call sites (so the
+// existing callCount-1 arithmetic alone would already suppress this), AND
+// is separately torn off. Confirms the tear-off bump doesn't double-count
+// or otherwise misbehave when stacked on top of the pre-existing multi-call
+// adjustment path.
+class _GoodPreferLateFinalMultiCallAndTearOff {
+  late int value;
+  void init() {
+    _refresh();
+    _refresh();
+  }
+
+  void _refresh() {
+    value = 42;
+  }
+
+  void onTap() {
+    scheduleCallback(_refresh);
+  }
+
+  void scheduleCallback(void Function() callback) => callback();
+}

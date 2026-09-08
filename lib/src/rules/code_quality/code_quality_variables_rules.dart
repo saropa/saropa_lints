@@ -3252,39 +3252,51 @@ class UseExistingVariableRule extends SaropaLintRule {
   }
 }
 
-/// Warns when the same string literal appears 3 or more times in a file.
+/// Warns when a `late` field is assigned exactly once, suggesting `late final`.
 ///
-/// Since: v4.13.0 | Rule version: v1
+/// Since: v2.3.7 | Rule version: v3
 ///
-/// Duplicate string literals are candidates for extraction to constants,
-/// which improves maintainability and reduces the risk of typos.
+/// A `late` field that is only ever assigned once is a candidate for
+/// `late final`, which catches accidental reassignment at compile time
+/// instead of leaving the field open to silent mutation.
 ///
-/// This rule triggers at 3+ occurrences (Professional tier).
-/// See also: `avoid_duplicate_string_literals_pair` for 2+ occurrences.
-///
-/// **Excluded strings:**
-/// - Strings shorter than 4 characters
-/// - Package/dart import prefixes
-/// - URLs (http://, https://)
-/// - Interpolation-only strings
+/// A method that assigns the field is treated as an additional call site
+/// (not just its own literal `field = ...` statement) when called from more
+/// than one place, or when referenced anywhere as a bare tear-off (e.g.
+/// `setState(_initFutures)`) — a tear-off's true runtime call count can't be
+/// bounded statically, so the field is exempted rather than risking a
+/// `late final` suggestion that would crash with `LateInitializationError`
+/// the next time the callback runs.
 ///
 /// **BAD:**
 /// ```dart
-/// void process() {
-///   print('Loading...');
-///   showMessage('Loading...');
-///   log('Loading...');
+/// class _ExampleState extends State<Example> {
+///   late Future<int> dataFuture; // Assigned exactly once — flag it
+///   void initState() {
+///     super.initState();
+///     dataFuture = Future<int>.value(1);
+///   }
 /// }
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// const kLoadingMessage = 'Loading...';
+/// class _ExampleState extends State<Example> {
+///   // Reassigned every time _refresh() runs, including via the tear-off
+///   // passed to setState() below, so late final would crash on refresh.
+///   late Future<int> dataFuture;
+///   void initState() {
+///     super.initState();
+///     _refresh();
+///   }
 ///
-/// void process() {
-///   print(kLoadingMessage);
-///   showMessage(kLoadingMessage);
-///   log(kLoadingMessage);
+///   void _refresh() {
+///     dataFuture = Future<int>.value(1);
+///   }
+///
+///   void onRefreshPressed() {
+///     setState(_refresh); // Tear-off — exempts dataFuture from the rule
+///   }
 /// }
 /// ```
 class PreferLateFinalRule extends SaropaLintRule {
