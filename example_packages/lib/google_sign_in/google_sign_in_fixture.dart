@@ -169,11 +169,25 @@ Future<void> authTokenGood() async {
   // OK: idToken is still valid in v7 for identity purposes.
   final idToken = account.idToken;
 
-  // OK: uses the authorization client for access tokens.
+  // OK: uses the authorization client for access tokens. `authorization` is
+  // a GoogleSignInClientAuthorization, not a GoogleSignInAccount — this is
+  // the simple (non-chained) PrefixedIdentifier form of the same read.
   final authorization = await account.authorizationClient.authorizeScopes([
     'https://www.googleapis.com/auth/calendar',
   ]);
   final accessToken = authorization.accessToken;
+}
+
+class _UnrelatedAuthModel {
+  _UnrelatedAuthModel(this.accessToken);
+  final String accessToken;
+}
+
+void authTokenGoodUnrelatedType() {
+  final storedAuth = _UnrelatedAuthModel('stored-token');
+  // OK: storedAuth is not a GoogleSignInAccount — an unrelated model that
+  // happens to share the field name.
+  final t = storedAuth.accessToken;
 }
 
 // =============================================================================

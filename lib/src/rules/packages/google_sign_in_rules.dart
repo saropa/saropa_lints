@@ -514,10 +514,16 @@ class GoogleSignInAuthTokenFromAuthenticateRule extends SaropaLintRule {
     });
 
     // PrefixedIdentifier covers `account.accessToken` in simple (non-chained)
-    // property reads — e.g. `final t = acct.accessToken;`.
+    // property reads — e.g. `final t = acct.accessToken;`. Same receiver
+    // guard as the PropertyAccess branch above: without it this fires on any
+    // `.accessToken` read in a file that imports google_sign_in, including
+    // the already-migrated `authorization.accessToken` (the rule's own GOOD
+    // example) and unrelated model classes that happen to share the field
+    // name.
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (!_importsGsi(node)) return;
       if (node.identifier.name != 'accessToken') return;
+      if (!_looksLikeGsiAccount(node.prefix)) return;
       reporter.atNode(node);
     });
   }
