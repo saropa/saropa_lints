@@ -708,4 +708,57 @@ describe('violationsDashboardHtml', () => {
     const html = renderViolationsDashboardHtml(minimalInput({}));
     assert.ok(!html.includes('aria-label="Suppressed findings section"'));
   });
+
+  it('renders no Drift Advisor pill when integration is disabled', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!html.includes('Drift on'));
+    assert.ok(!html.includes('Drift offline'));
+    assert.ok(!html.includes('Drift needs token'));
+    assert.ok(!html.includes('Drift auth failed'));
+  });
+
+  it('renders the offline pill when integration is on but no server is found', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({
+      driftAdvisorSnapshot: { integrationEnabled: true, connected: false, issues: [] },
+    }));
+    assert.ok(html.includes('Drift offline'));
+  });
+
+  it('renders the connected pill with issue count when a server is reachable', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({
+      driftAdvisorSnapshot: {
+        integrationEnabled: true,
+        connected: true,
+        serverLabel: '127.0.0.1:8642',
+        issues: [{ source: 'anomaly', severity: 'warning', message: 'x' }],
+      },
+    }));
+    assert.ok(html.includes('Drift on'));
+  });
+
+  it('renders the auth-required pill instead of the offline pill when server needs a token', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({
+      driftAdvisorSnapshot: {
+        integrationEnabled: true,
+        connected: true,
+        issues: [],
+        authRequired: true,
+      },
+    }));
+    assert.ok(html.includes('Drift needs token'));
+    assert.ok(!html.includes('Drift offline'));
+  });
+
+  it('renders the auth-failed pill instead of the connected pill when the token was rejected', () => {
+    const html = renderViolationsDashboardHtml(minimalInput({
+      driftAdvisorSnapshot: {
+        integrationEnabled: true,
+        connected: true,
+        issues: [],
+        authFailed: true,
+      },
+    }));
+    assert.ok(html.includes('Drift auth failed'));
+    assert.ok(!html.includes('Drift on'));
+  });
 });

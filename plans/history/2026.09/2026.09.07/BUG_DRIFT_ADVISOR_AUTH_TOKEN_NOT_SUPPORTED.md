@@ -72,17 +72,24 @@ Added a `DriftAuthError` class in `client.ts`, thrown when any data endpoint (`/
 
 `extension.ts` now catches `DriftAuthError` specifically and calls a new `DriftAdvisorTreeProvider.setAuthFailed(server)` method, which keeps the server node visible (it IS reachable) while showing a `l10n('driftAdvisor.authFailed')` placeholder with a click-through command to `workbench.action.openSettings` scoped to `saropaLints.driftAdvisor.authToken`. The pre-existing "auth required, no token configured" placeholder was given the same click-through command.
 
-Scoped to the tree view only — the violations wide report dashboard's auth-required/auth-failed surfacing is deferred (see Known Gaps) since it requires webview HTML/CSS changes that need visual verification via the Extension Development Host, which was not launched this session.
+### Dashboard parity (second hardening pass)
+
+Extended the same auth-failure surfacing to the Findings Dashboard, closing the gap noted in the first pass: `DriftAdvisorSnapshot` (both the `violationsWideReportView.ts` definition and the shared `violations-dashboard-shared.ts` input type) gained `authRequired?: boolean` and `authFailed?: boolean`. `loadDriftAdvisorSnapshot()` now checks `server.authRequired` before fetching (mirroring the tree view's gate) and catches `DriftAuthError` separately from other fetch failures. `violations-dashboard-top.ts`'s status-line pill builder gained two new states — "Drift needs token" and "Drift auth failed" (both `pill warn`, reusing the existing pill styling) — checked ahead of the existing connected/offline branches. Four new `findingsDash.status.*` l10n keys back the new pill text and tooltips.
+
+The dashboard pill is informational only (not clickable) — reaching Settings from the dashboard still requires the tree view or Command Palette, consistent with how the existing offline/connected pills behave.
 
 ### Tests Added
 
 - `discovery.test.ts`: 3 tests — `authRequired` propagation, `authRequired` absence, `host` field storage.
 - `client.test.ts`: 4 tests — Authorization header sent/omitted correctly, `DriftAuthError` thrown on 401 from `/api/issues`, `DriftAuthError` thrown on 403 from legacy endpoints.
+- `violationsDashboardHtml.test.ts`: 5 tests — no pill when integration disabled, offline pill, connected pill, auth-required pill (and that it suppresses the offline pill), auth-failed pill (and that it suppresses the connected pill).
 
-All 19 drift advisor tests pass. Both `tsconfig.json` and `tsconfig.test.json` compile clean.
+All 65 tests in the affected suites pass (discovery, client, violationsDashboardHtml). Both `tsconfig.json` and `tsconfig.test.json` compile clean.
 
 ### Known Gaps (out of scope)
 
-1. **Dashboard auth state**: The violations wide report's `DriftAdvisorSnapshot` does not propagate `authRequired` or catch `DriftAuthError` separately — it still shows "connected, 0 issues" for both cases. Requires extending the snapshot interface and webview rendering; deferred pending a session that can launch the Extension Development Host for visual verification.
+1. **HTTP-only Bearer token**: The `baseUrl` is always `http://`, and the token is sent in cleartext. Off-box (LAN) deployments are vulnerable to credential sniffing. An HTTPS option or warning for non-loopback hosts would mitigate this.
 
-2. **HTTP-only Bearer token**: The `baseUrl` is always `http://`, and the token is sent in cleartext. Off-box (LAN) deployments are vulnerable to credential sniffing. An HTTPS option or warning for non-loopback hosts would mitigate this.
+2. **Dashboard pill is not clickable**: Unlike the tree view's placeholders, the dashboard's auth-required/auth-failed pills do not open Settings on click — matches the existing (non-interactive) pill convention for offline/connected states, but is a smaller affordance than the tree view offers for the same problem.
+
+3. **No live verification**: All work in this bug was verified by `tsc`/`mocha` only — no Extension Development Host session was launched. Visual layout, both themes, and narrow-width rendering of the new tree placeholders and dashboard pills remain unverified.

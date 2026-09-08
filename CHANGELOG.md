@@ -87,7 +87,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed (Extension)
 
-- Drift Advisor integration now supports authenticated servers via a new `saropaLints.driftAdvisor.authToken` setting, with tree-view guidance nodes (each linking to Settings) when a token is missing or was rejected by the server.
+- Drift Advisor integration now supports authenticated servers via a new `saropaLints.driftAdvisor.authToken` setting, with matching guidance states in both the tree view (linking to Settings) and the Findings Dashboard status pill when a token is missing or was rejected by the server.
 
 - Fixed Code Health dashboard KPI tiles silently losing their semantic color coding (red/amber/info) after the pill-unification refactor — `kpiCard()` was missing the `.pill` class that the updated CSS selectors require.
 
@@ -99,7 +99,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Extracted duplicate watcher-exclude merge logic (read config, spread, set keys, write at workspace level) from both `workspaceHazardScan.ts` and `watcherExcludeAudit.ts` into a shared `mergeWatcherExcludes` helper in `watcherExcludeHelpers.ts`.
 - Added a guard around the watcher-exclude audit's `workspaceState.get` call so a corrupted workspace state after a VS Code crash does not prevent the audit from running.
 - Fixed extension version scheme so stable releases supersede their betas on Marketplace and Open VSX. Stable versions now bump minor to the next even above the prerelease odd minor (e.g. `16.2.x` > `16.1.x`).
-- Documented the split between Dart AST rules (`lib/src/rules/`, scoped to resolved `.dart` files) and extension-native rules (`extension/src/`, full workspace file access) in `bugs/ISSUE_REPORT_GUIDE.md`, so non-Dart-file issues (file placement, markdown conventions) are routed to the right engine instead of being misfiled as out of scope. No action required.
+- Documented the split between Dart AST rules (`lib/src/rules/`, scoped to resolved `.dart` files) and ad hoc extension-native checks (`extension/src/`, full workspace file access, own `DiagnosticCollection` each, not yet surfaced in the web report) in `bugs/ISSUE_REPORT_GUIDE.md`, so non-Dart-file issues are routed correctly instead of being misfiled as out of scope. No action required.
 
 ---
 

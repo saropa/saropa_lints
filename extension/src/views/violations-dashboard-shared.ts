@@ -78,6 +78,10 @@ export interface ViolationsDashboardHtmlInput {
     connected: boolean;
     serverLabel?: string;
     issues: Array<{ source: string; severity: string; message: string; file?: string; line?: number }>;
+    /** Server reachable but requires a token that isn't configured yet. */
+    authRequired?: boolean;
+    /** Server reachable but rejected the configured token (401/403). */
+    authFailed?: boolean;
   };
   severityCounts: Record<string, number>;
   impactCounts: Record<string, number>;

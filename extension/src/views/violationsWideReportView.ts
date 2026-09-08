@@ -43,7 +43,7 @@ import {
   DEFAULT_TODOS_AND_HACKS_TAGS,
 } from './todosAndHacksDefaults';
 import { discoverServer } from '../driftAdvisor/discovery';
-import { fetchIssues } from '../driftAdvisor/client';
+import { fetchIssues, DriftAuthError } from '../driftAdvisor/client';
 import { getDriftAuthToken } from '../driftAdvisor/auth';
 import { mapIssuesToLocations } from '../driftAdvisor/mapper';
 import {
@@ -126,6 +126,10 @@ interface DriftAdvisorSnapshot {
   connected: boolean;
   serverLabel?: string;
   issues: Array<{ source: string; severity: string; message: string; file?: string; line?: number }>;
+  /** Server reachable but requires a token that isn't configured yet. */
+  authRequired?: boolean;
+  /** Server reachable but rejected the configured token (401/403). */
+  authFailed?: boolean;
 }
 
 let dashboardState: DashboardState | undefined;
@@ -656,14 +660,20 @@ async function loadDriftAdvisorSnapshot(): Promise<DriftAdvisorSnapshot> {
   if (!server) {
     return { integrationEnabled: true, connected: false, issues: [] };
   }
+  const serverLabel = `${server.host}:${server.port}${server.version ? ` (v${server.version})` : ''}`;
+  const authToken = getDriftAuthToken();
+  // Mirrors the tree view's gating: a server that reports authRequired with no
+  // token configured never gets fetched — surface that instead of "0 issues".
+  if (server.authRequired && !authToken) {
+    return { integrationEnabled: true, connected: true, serverLabel, issues: [], authRequired: true };
+  }
   try {
-    // Read auth token for authenticated Drift Advisor servers.
-    const raw = await fetchIssues(server, getDriftAuthToken());
+    const raw = await fetchIssues(server, authToken);
     const mapped = await mapIssuesToLocations(raw);
     return {
       integrationEnabled: true,
       connected: true,
-      serverLabel: `${server.host}:${server.port}${server.version ? ` (v${server.version})` : ''}`,
+      serverLabel,
       issues: mapped.map((issue) => ({
         source: issue.source,
         severity: issue.severity,
@@ -672,13 +682,11 @@ async function loadDriftAdvisorSnapshot(): Promise<DriftAdvisorSnapshot> {
         line: issue.line != null ? issue.line + 1 : undefined,
       })),
     };
-  } catch {
-    return {
-      integrationEnabled: true,
-      connected: true,
-      serverLabel: `${server.host}:${server.port}${server.version ? ` (v${server.version})` : ''}`,
-      issues: [],
-    };
+  } catch (err) {
+    if (err instanceof DriftAuthError) {
+      return { integrationEnabled: true, connected: true, serverLabel, issues: [], authFailed: true };
+    }
+    return { integrationEnabled: true, connected: true, serverLabel, issues: [] };
   }
 }
 

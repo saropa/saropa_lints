@@ -297,7 +297,11 @@ export function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   parts.push(...buildScannerPromoPill(input));
   const drift = input.driftAdvisorSnapshot;
   if (drift.integrationEnabled) {
-    if (drift.connected) {
+    if (drift.authFailed) {
+      parts.push(`<span class="pill warn" title="${escapeHtml(l10n('findingsDash.status.driftAuthFailedTitle'))}">${escapeHtml(l10n('findingsDash.status.driftAuthFailedPill'))}</span>`);
+    } else if (drift.authRequired) {
+      parts.push(`<span class="pill warn" title="${escapeHtml(l10n('findingsDash.status.driftAuthRequiredTitle'))}">${escapeHtml(l10n('findingsDash.status.driftAuthRequiredPill'))}</span>`);
+    } else if (drift.connected) {
       parts.push(`<span class="pill good" title="${escapeHtml(l10n('findingsDash.status.driftOnTitle', { label: drift.serverLabel ?? '' }))}">${l10n('findingsDash.status.driftOnPill', { count: String(drift.issues.length) })}</span>`);
     } else {
       parts.push(`<span class="pill warn" title="${escapeHtml(l10n('findingsDash.status.driftOfflineTitle'))}">${escapeHtml(l10n('findingsDash.status.driftOfflinePill'))}</span>`);
