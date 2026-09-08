@@ -224,6 +224,27 @@ class _GoodKeepAliveState extends State<MyWidget> with AutomaticKeepAliveClientM
   }
 }
 
+// GOOD: RouteAware and WidgetsBindingObserver are abstract classes with no
+// state, so `implements` is just as valid as `with` for them — Flutter's
+// own samples use both spellings interchangeably. The exemption must not
+// depend on which clause the author chose.
+class _GoodImplementsObserverState extends State<MyWidget> implements RouteAware {
+  @override
+  void didPush() {}
+
+  @override
+  void didPop() {}
+
+  @override
+  void didPushNext() {}
+
+  @override
+  void didPopNext() {}
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
 // BAD: a public method that merely happens to share a mixin-related class
 // but is not part of the mixed-in interface's contract must still be
 // flagged — the exemption is scoped to the mixin's own callback names,

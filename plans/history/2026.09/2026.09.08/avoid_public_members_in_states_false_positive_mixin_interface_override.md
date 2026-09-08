@@ -332,6 +332,39 @@ pass:**
    per the same source), but that draft was already replaced by the
    per-class cache before this review landed.
 
+### Second hardening + feature pass (2026-09-08, same day)
+
+**Harden:** the biggest unverified item from the first pass's handoff
+reflection — "no fixture exercises the resolved fallback against a real
+`package:flutter` resolution context" — turns out to be infeasible, not
+merely undone: `pubspec.yaml`'s own dependency comments confirm this
+package deliberately carries no `flutter` SDK dependency (analyzer/meta
+version conflicts make it unresolvable for Flutter consumers otherwise),
+which is exactly why `example/lib/flutter_mocks.dart` exists as a
+hand-rolled stand-in. There is no way to add a real-SDK-resolved test
+without breaking that constraint. Documented here as a permanent limitation
+of this rule file's design rather than a follow-up task.
+
+**Feature:** the resolved fallback (`_flutterSdkContractMembers`) already
+generalizes correctly across `with`/`implements`/`extends`, because it
+walks `classElement.allSupertypes`, which includes interfaces regardless of
+clause. The syntactic table path (`_mixinExemptMethods`, the primary/fast
+path used whenever a Flutter SDK isn't resolved) did not have that
+generality — it only scanned `node.withClause`. Since `RouteAware` and
+`WidgetsBindingObserver` are abstract classes with no state, Dart accepts
+either `with RouteAware` or `implements RouteAware` for them, and both
+appear in real Flutter code. `_mixinExemptMethods` now also scans
+`node.implementsClause?.interfaces`, so the syntactic path no longer
+depends on which clause spelling the author picked.
+
+Added `_GoodImplementsObserverState` (`implements RouteAware`, overriding
+all four `RouteAware` methods) to the fixture. Re-verified with `dart run
+saropa_lints scan example/lib/widget_lifecycle --files
+avoid_public_members_in_states_fixture.dart --format json` (still exactly
+the 3 expected BAD violations, new case silent) and `dart test
+test/rules/widget/widget_lifecycle_rules_test.dart` (all 76 cases pass).
+`/code-review low` on the diff reported no findings.
+
 ---
 
 ## Environment

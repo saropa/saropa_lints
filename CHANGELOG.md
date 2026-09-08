@@ -72,7 +72,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 `google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on already-migrated `GoogleSignInClientAuthorization` results or unrelated model classes with a same-named field. No action required.
 
-`avoid_public_members_in_states` no longer flags `WidgetsBindingObserver`/`RouteAware`/`AutomaticKeepAliveClientMixin` callback methods (e.g. `didChangeAppLifecycleState`, `didPushNext`, `wantKeepAlive`) on a `State` class that mixes in the interface — their public spelling is mandated by the framework, so the rule's own suggested private-rename fix would have silently broken dispatch. No action required.
+`avoid_public_members_in_states` no longer flags `WidgetsBindingObserver`/`RouteAware`/`AutomaticKeepAliveClientMixin` callback methods (e.g. `didChangeAppLifecycleState`, `didPushNext`, `wantKeepAlive`) on a `State` class that carries the interface via `with` or `implements` — their public spelling is mandated by the framework, so the rule's own suggested private-rename fix would have silently broken dispatch. No action required.
 
 ### Fixed (Extension)
 

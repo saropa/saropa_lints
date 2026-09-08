@@ -5194,20 +5194,34 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   }
 
   /// Collects the set of method names exempt from this rule because the
-  /// class mixes in a framework interface (`with WidgetsBindingObserver`,
-  /// `with RouteAware`, ...) whose callback methods are named in
-  /// [_mixinRequiredMethodsByType]. Checked syntactically against the
-  /// `with` clause's type names, consistent with this file's other
-  /// non-type-resolved checks.
+  /// class carries a framework interface named in
+  /// [_mixinRequiredMethodsByType], via either `with WidgetsBindingObserver`
+  /// or `implements WidgetsBindingObserver` — `RouteAware` and
+  /// `WidgetsBindingObserver` are abstract classes with no state, so Dart
+  /// accepts either clause and Flutter's own cookbook samples use both
+  /// interchangeably; the exemption must not depend on which spelling the
+  /// author picked. Checked syntactically against the `with`/`implements`
+  /// clauses' type names, consistent with this file's other non-type-
+  /// resolved checks.
   Set<String> _mixinExemptMethods(ClassDeclaration node) {
-    final WithClause? withClause = node.withClause;
-    if (withClause == null) return const <String>{};
-
     final Set<String> exempt = <String>{};
-    for (final NamedType mixinType in withClause.mixinTypes) {
-      final Set<String>? methods = _mixinRequiredMethodsByType[mixinType.name.lexeme];
-      if (methods != null) exempt.addAll(methods);
+
+    final WithClause? withClause = node.withClause;
+    if (withClause != null) {
+      for (final NamedType mixinType in withClause.mixinTypes) {
+        final Set<String>? methods = _mixinRequiredMethodsByType[mixinType.name.lexeme];
+        if (methods != null) exempt.addAll(methods);
+      }
     }
+
+    final ImplementsClause? implementsClause = node.implementsClause;
+    if (implementsClause != null) {
+      for (final NamedType interfaceType in implementsClause.interfaces) {
+        final Set<String>? methods = _mixinRequiredMethodsByType[interfaceType.name.lexeme];
+        if (methods != null) exempt.addAll(methods);
+      }
+    }
+
     return exempt;
   }
 
