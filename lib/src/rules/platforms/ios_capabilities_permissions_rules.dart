@@ -6,7 +6,11 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/element/element.dart';
 
+import '../../config/require_ios_accessibility_large_text_config.dart'
+    as large_text_config;
 import '../../info_plist_utils.dart';
 import '../../literal_context_utils.dart';
 import '../../target_matcher_utils.dart';
@@ -2653,12 +2657,23 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
   }
 }
 
-/// Warns when iOS app may send misleading push notifications.
+/// Flags `TextStyle(fontSize:)` when the value is a hardcoded numeric
+/// literal or const identifier — it won't respect iOS Dynamic Type.
 ///
 /// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v2
 ///
-/// Apple rejects apps that send push notifications unrelated to
-/// the user's interests or that spam users.
+/// Non-const getters, method calls, and property accesses are exempt
+/// because they may apply Dynamic Type scaling internally (e.g. a
+/// project design-system token that reads `MediaQuery.textScalerOf`).
+///
+/// **Project config:** Declare additional scaling-aware getter/method
+/// names in `analysis_options_custom.yaml`:
+/// ```yaml
+/// require_ios_accessibility_large_text:
+///   scaling_aware:
+///     - size
+///     - scaledFontSize
+/// ```
 class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -2709,30 +2724,141 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
         return;
       }
 
-      // Check if fontSize is hardcoded
+      // Check if fontSize is a hardcoded numeric value — only flag
+      // bare literals like `14`, const identifiers like `kFontSize`,
+      // or arithmetic on those. Non-const getters/methods (e.g.
+      // `ThemeCommonFontSize.medium.size`) may apply Dynamic Type
+      // scaling internally and must not be flagged.
       final Expression? fontSize = node.getNamedParameterValue('fontSize');
-      if (fontSize != null) {
-        // Allow if using textScaleFactor
-        final String fontSizeSource = fontSize.toSource();
-        if (fontSizeSource.contains('textScaleFactor') ||
-            fontSizeSource.contains('textScaler') ||
-            fontSizeSource.contains('MediaQuery')) {
+      if (fontSize == null) return;
+
+      // Allow if the expression's terminal name is in the project's
+      // `scaling_aware:` allowlist (analysis_options_custom.yaml).
+      // This lets projects declare getters/methods that apply Dynamic
+      // Type scaling internally without a per-call-site `// ignore:`.
+      final String? terminalName = _terminalName(fontSize);
+      if (terminalName != null &&
+          large_text_config.userScalingAwareMethods.contains(terminalName)) {
+        return;
+      }
+
+      if (!_isHardcodedNumeric(fontSize)) {
+        return;
+      }
+
+      // Allow if this TextStyle lives inside a theme definition — the
+      // theme itself is the scaling layer.
+      AstNode? current = node.parent;
+      while (current != null) {
+        final String currentSource = current.toSource();
+        if (_themeSourceRegex.any((re) => re.hasMatch(currentSource))) {
           return;
         }
-
-        // Check parent to see if this is from a theme
-        AstNode? current = node.parent;
-        while (current != null) {
-          final String currentSource = current.toSource();
-          if (_themeSourceRegex.any((re) => re.hasMatch(currentSource))) {
-            return; // Part of theme definition
-          }
-          current = current.parent;
-        }
-
-        reporter.atNode(node);
+        current = current.parent;
       }
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Max recursion depth for [_isHardcodedNumeric] — prevents stack
+  /// overflow on pathologically nested arithmetic expressions.
+  static const int _maxNumericDepth = 8;
+
+  /// Whether [expr] is a hardcoded numeric value: a bare literal, a
+  /// const identifier/field, or arithmetic/negation/parenthesization of
+  /// those. Non-const getters and method calls are excluded — they may
+  /// apply Dynamic Type scaling internally.
+  ///
+  /// Catches: `14`, `14.0`, `-14`, `-(14)`, `14 * 2`, `kFontSize`,
+  /// `AppFonts.small` (when const).
+  /// Skips: `someGetter`, `SomeClass.size` (non-const), `fn()`.
+  static bool _isHardcodedNumeric(Expression expr, [int depth = 0]) {
+    // Depth guard — bail out conservatively (don't flag) if the
+    // expression tree is unreasonably deep.
+    if (depth > _maxNumericDepth) return false;
+
+    // Bare numeric literal: `14` or `14.0`.
+    if (expr is IntegerLiteral || expr is DoubleLiteral) {
+      return true;
+    }
+
+    // Negated expression: `-14`, `-(14.0)`, `-(14 * 2)`. Recurse into
+    // the operand so nested parenthesized/arithmetic negations are caught.
+    if (expr is PrefixExpression &&
+        expr.operator.type == TokenType.MINUS) {
+      return _isHardcodedNumeric(expr.operand, depth + 1);
+    }
+
+    // Arithmetic on two hardcoded operands: `14 * 2`, `kGap + 4.0`.
+    if (expr is BinaryExpression) {
+      return _isHardcodedNumeric(expr.leftOperand, depth + 1) &&
+          _isHardcodedNumeric(expr.rightOperand, depth + 1);
+    }
+
+    // Parenthesized expression: `(14.0)`.
+    if (expr is ParenthesizedExpression) {
+      return _isHardcodedNumeric(expr.expression, depth + 1);
+    }
+
+    // Named constant: `kFontSize` or `AppFonts.small`. A const value
+    // is by definition fixed at compile time — no runtime scaling.
+    // Non-const getters/methods are excluded because they may apply
+    // Dynamic Type scaling internally (the FP this rule originally
+    // had with ThemeCommonFontSize.medium.size).
+    if (_isConstIdentifier(expr)) {
+      return true;
+    }
+
+    // Anything else (non-const PropertyAccess, MethodInvocation, etc.)
+    // routes through an abstraction that may scale — don't flag.
+    return false;
+  }
+
+  /// Whether [expr] resolves to a compile-time constant variable or
+  /// field (e.g. `kFontSize`, `AppFonts.small` where `small` is const).
+  static bool _isConstIdentifier(Expression expr) {
+    Element? el;
+
+    // Simple identifier: `kFontSize`.
+    if (expr is SimpleIdentifier) {
+      el = expr.element;
+    }
+
+    // Prefixed identifier: `AppFonts.small` (import prefix or static).
+    if (expr is PrefixedIdentifier) {
+      el = expr.identifier.element;
+    }
+
+    // Property access: `AppFonts.small` when parsed as PropertyAccess.
+    if (expr is PropertyAccess) {
+      el = expr.propertyName.element;
+    }
+
+    if (el == null) return false;
+
+    // Direct const variable (top-level or local).
+    if (el is VariableElement && el.isConst) return true;
+
+    // Const field accessed via its synthetic getter.
+    if (el is PropertyAccessorElement && el.variable.isConst) return true;
+
+    return false;
+  }
+
+  /// Extract the leaf identifier name from [expr] — the name that
+  /// would match a `scaling_aware:` allowlist entry.
+  ///
+  /// Returns the rightmost name segment: `size` for
+  /// `ThemeCommonFontSize.medium.size`, `kFontSize` for a bare
+  /// identifier, `scaledSize` for `scaledSize(14)`, or null for
+  /// literals and other non-named expressions.
+  static String? _terminalName(Expression expr) {
+    if (expr is SimpleIdentifier) return expr.name;
+    if (expr is PrefixedIdentifier) return expr.identifier.name;
+    if (expr is PropertyAccess) return expr.propertyName.name;
+    if (expr is MethodInvocation) return expr.methodName.name;
+    return null;
   }
 }
 

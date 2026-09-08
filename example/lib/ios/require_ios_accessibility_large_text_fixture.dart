@@ -101,7 +101,7 @@
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: require_ios_accessibility_large_text
-// Source: lib\src\rules\platforms\ios_rules.dart
+// Source: lib\src\rules\platforms\ios_capabilities_permissions_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
@@ -121,4 +121,32 @@ void _good910() {
     // Or explicitly scale:
     // style: TextStyle(fontSize: 14 * MediaQuery.textScaleFactorOf(context)),
   );
+}
+
+// GOOD: fontSize routed through a getter/property — the getter may
+// apply Dynamic Type scaling internally, so the rule must not flag it.
+// Regression test for substring-match indirection FP.
+enum ThemeCommonFontSize {
+  medium;
+
+  // In the real project this reads MediaQuery/textScaler internally.
+  double get size => 14.0;
+}
+
+void _goodGetterIndirection() {
+  Text(
+    'Hello',
+    style: TextStyle(fontSize: ThemeCommonFontSize.medium.size),
+  );
+}
+
+// GOOD: non-const method call — may apply scaling internally.
+double scaledFontSize(double base) => base;
+void _goodMethodCall() {
+  Text('Hello', style: TextStyle(fontSize: scaledFontSize(14)));
+}
+
+// GOOD: non-const final variable — may hold a scaled value.
+void _goodFinalVariable(double fontSize) {
+  Text('Hello', style: TextStyle(fontSize: fontSize));
 }

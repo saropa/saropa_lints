@@ -74,6 +74,8 @@ Patch release fixing false positives in two lint rules, adding a project-level a
 
 `avoid_ignoring_return_values` now supports a project-level allowlist via `analysis_options_custom.yaml` — add method names under `avoid_ignoring_return_values: safe_to_ignore:` to exempt project-specific methods whose return values are safely ignored. No action required unless you have project-specific methods you want to allowlist.
 
+`require_ios_accessibility_large_text` now supports a `scaling_aware:` allowlist in `analysis_options_custom.yaml` — declare getter/method names that apply Dynamic Type scaling internally so the rule won't flag calls to them even though they resolve to non-const elements. No action required unless you have project-specific scaling helpers.
+
 ### Fixed
 
 `google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on already-migrated `GoogleSignInClientAuthorization` results or unrelated model classes with a same-named field. No action required.
@@ -84,7 +86,7 @@ Patch release fixing false positives in two lint rules, adding a project-level a
 
 `avoid_ignoring_return_values` no longer flags a project-local `extension` method whose name follows a mutate-verb convention (`add*`, `append*`, `insert*`, `remove*`, `update*`, `set*`) and returns `bool` — the same structural shape as allowlisted stdlib mutators like `List.add`, where the bool is a "did it happen" convenience the caller is not required to consult. No action required.
 
-`require_ios_accessibility_large_text` no longer flags `TextStyle(fontSize:)` when the value comes from a getter, method call, or property access — only bare numeric literals are flagged. Previously the rule pattern-matched source text for `textScaleFactor`/`textScaler`/`MediaQuery` substrings and missed any design-system token that applies Dynamic Type scaling through a helper. No action required.
+`require_ios_accessibility_large_text` no longer flags `TextStyle(fontSize:)` when the value comes from a non-const getter, method call, or property access — only bare numeric literals and const identifiers are flagged. Previously the rule pattern-matched source text for `textScaleFactor`/`textScaler`/`MediaQuery` substrings and missed any design-system token that applies Dynamic Type scaling through a helper. No action required.
 
 ### Fixed (Extension)
 

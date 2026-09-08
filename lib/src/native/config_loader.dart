@@ -24,6 +24,7 @@ import '../banned_usage_config.dart';
 import '../config/always_specify_parameter_names_config.dart';
 import '../config/avoid_ignoring_return_values_config.dart';
 import '../config/max_declarations_config.dart';
+import '../config/require_ios_accessibility_large_text_config.dart';
 import '../baseline/baseline_config.dart';
 import '../baseline/baseline_manager.dart';
 import '../config/analysis_options_rule_packs.dart';
@@ -168,6 +169,7 @@ void _loadFromRoot(String? projectRoot) {
     loadAlwaysSpecifyParameterNamesConfig(content);
     loadMaxDeclarationsConfig(content);
     loadAvoidIgnoringReturnValuesConfig(content);
+    loadRequireIosAccessibilityLargeTextConfig(content);
     _loadOutputConfig(content);
     // log_level, lane, and memory_mode live in the custom file (top-level
     // keys) to avoid unsupported_option warnings from the SDK's plugin-block
