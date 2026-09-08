@@ -178,6 +178,7 @@ import type { EngineStatus } from './systemHealth/engineCardsHtml';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
+import { registerBugArchivalCheck } from './extensionChecks/bugArchivalCheck';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, postDashboardAnalysisProgress, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
@@ -777,6 +778,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   registerL10nDiagnostics(context);
   // Dead-key detection — hints on en.json keys never referenced in source.
   registerL10nDeadKeys(context);
+  // Extension-native check (non-Dart): flags a closed bugs/*.md report still
+  // sitting in bugs/ instead of plans/history/ — see ISSUE_REPORT_GUIDE.md.
+  registerBugArchivalCheck(context);
   registerProjectMapCommand(context);
   registerHealthCodeLens(context);
 

@@ -265,7 +265,9 @@
     "src/test/audit/deferredPayload.test.ts",
     "src/workspaceFolderPicker.ts",
     "src/commandGuards.ts",
-    "src/test/commandGuards.test.ts"
+    "src/test/commandGuards.test.ts",
+    "src/extensionChecks/bugArchivalCheck.ts",
+    "src/test/extensionChecks/bugArchivalCheck.test.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

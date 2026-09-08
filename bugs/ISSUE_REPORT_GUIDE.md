@@ -8,6 +8,40 @@ How to file, investigate, and close bugs and feature requests in `saropa_lints`.
 
 ---
 
+## Rule Sources: Dart AST vs Extension-Native
+
+`saropa_lints` findings reach the user through **two different rule engines**. Knowing which one is responsible for a given diagnostic determines where the fix lives and what a bug report needs to prove.
+
+### 1. Dart AST rules (`lib/src/rules/*.dart`)
+
+- Run inside `custom_lint` / the Dart Analysis Server (LSP), via `dart run custom_lint` or the `saropa_lints scan` CLI.
+- Scoped strictly to **resolved `.dart` files** — the rule visits `CompilationUnit`/AST nodes that the Dart analyzer produces.
+- **Cannot see**: markdown content, JSON/YAML files, file paths or directory placement, cross-file conventions (e.g. "closed bug reports must move to `plans/history/`"), non-Dart source of any kind.
+- This is the engine the rest of this guide (attribution grep against `lib/src/rules/`, AST Context section, etc.) is written for.
+
+### 2. Extension-native checks (`extension/src/...`)
+
+- Run inside the VS Code extension host as plain TypeScript — no Dart analyzer involved.
+- Have full VS Code workspace API access: **any file type**, file paths and directory structure, git state, `package.json`/manifest content, markdown text, multi-file relationships.
+- This is the correct engine for anything the Dart AST rules structurally cannot do — file-placement conventions, doc-organization checks, non-Dart config/manifest validation, cross-file consistency.
+- **Packaging:** ships inside the extension bundle exactly like the Dart-sourced rules. The end user does not install or configure anything separately — having the extension active is sufficient.
+- **This is not one unified engine today — it is several ad hoc checks, each with its own `DiagnosticCollection`.** Existing precedent: `i18n/l10nDiagnostics.ts` (own `'saropa-l10n'` collection), `pubspec-validation.ts`, `vibrancy/extension-activation.ts` (`diagCollection`/`sdkDiagCollection` for dependency-health findings), and `extension.ts`'s `driftAdvisorDiagCollection`/`scanOnSaveDiagCollection`. There is no shared `Rule`/`Check` interface or registry — a new non-Dart check is a new standalone module following this same pattern, not a plug-in to an existing extensibility point.
+- **Problems panel: yes, today.** Each of the checks above already pushes `vscode.Diagnostic`s to its own collection, so they appear in the VS Code Problems panel now, without new work.
+- **Web report: no, not today.** `liveDiagnosticsModel.ts`'s `buildViolationsDataFromDiagnostics` — which feeds `views/violationsWideReportView.ts`, the status bar, and the Issues tree — hardcodes `if (!uri.fsPath.endsWith('.dart')) continue;`. Extension-native diagnostics are filtered out before they ever reach the web report data model. Surfacing a new extension-native check there requires deliberately loosening that filter — do not assume it "just shows up."
+
+### Filing against the right engine
+
+When a diagnostic or proposal is about a **non-Dart file, file placement, or a cross-file/workspace convention**, it is almost certainly an extension-native issue, not a Dart AST rule issue. Do not close it as "out of scope for saropa_lints" — check whether it belongs under `extension/src/` instead of `lib/src/rules/` before deciding scope. If the request also expects the finding to appear in the web report (not just the Problems panel), say so explicitly — that is currently blocked by the `.dart`-only filter above and needs its own scoped change.
+
+| Rule engine | Grep root for attribution | Can inspect |
+|---|---|---|
+| Dart AST rule | `lib/src/rules/` | `.dart` files only, via resolved AST |
+| Extension-native check | `extension/src/` | Any file type, paths, workspace structure (Problems panel only — not the web report) |
+
+Use the naming patterns below; extension-native issues use the same `proposal_infra_description.md` / `infra_description.md` patterns as other tooling work, since they are still saropa_lints infrastructure — just running in a different process than the Dart analyzer.
+
+---
+
 ## File Naming
 
 | Type | Pattern | Example |

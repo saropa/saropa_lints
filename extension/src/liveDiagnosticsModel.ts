@@ -110,6 +110,10 @@ export function buildViolationsDataFromDiagnostics(
     // Dashboard scope is Dart source — the lint rules target Dart and the JSON
     // export was Dart-only. Skip diagnostics on non-Dart files (pubspec,
     // markdown, the extension's own TS) so the holistic view stays on topic.
+    // Extension-native checks (l10n, pubspec-validation, vibrancy, drift advisor)
+    // reach the Problems panel via their own DiagnosticCollection but are filtered
+    // out here — see "Rule Sources" in bugs/ISSUE_REPORT_GUIDE.md before assuming
+    // a new non-Dart check will show up in the web report without touching this line.
     if (!uri.fsPath.endsWith('.dart')) continue;
 
     // Root-relative, forward-slashed: matches the format

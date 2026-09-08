@@ -2756,6 +2756,11 @@
       "title": "Fix stale ignores in this file"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "This report is marked \"{status}\" but is still in bugs/ — archive it to plans/history/ before closing (see ISSUE_REPORT_GUIDE.md)."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Run analysis",
