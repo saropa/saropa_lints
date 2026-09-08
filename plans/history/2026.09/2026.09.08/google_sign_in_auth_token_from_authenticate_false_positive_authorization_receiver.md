@@ -229,7 +229,40 @@ file.
 
 ## Commits
 
-<!-- Add commit hash once committed. -->
+730bf055 — fix: guard PrefixedIdentifier receiver in google_sign_in_auth_token_from_authenticate
+
+---
+
+## Finish Report (2026-09-08)
+
+The `google_sign_in_auth_token_from_authenticate` rule's `PrefixedIdentifier`
+visitor (simple, non-chained `.accessToken` reads) lacked the receiver guard
+present on its `PropertyAccess` sibling, so it flagged every `.accessToken`
+read in a file importing `google_sign_in` regardless of receiver type,
+including the rule's own recommended `authorization.accessToken` migration
+pattern and unrelated model classes with a same-named field.
+
+The fix reuses the existing `_looksLikeGsiAccount` name-heuristic guard on
+`node.prefix` in the `PrefixedIdentifier` branch, matching the
+`PropertyAccess` branch. A separate `staticType`-based exclusion for
+`GoogleSignInClientAuthorization`, proposed in the original report, was
+determined unnecessary: the name heuristic alone already excludes
+`authorization` (it contains neither `account` nor `Account`).
+
+Verification: `dart run saropa_lints scan example_packages/lib/google_sign_in
+--tier comprehensive --files google_sign_in_fixture.dart --format json`
+reports exactly one `google_sign_in_auth_token_from_authenticate` finding —
+the true positive — down from firing on every `.accessToken` read in the
+file. `test/rules/packages/google_sign_in_rules_test.dart` (15 tests, all
+instantiation/metadata/fixture-existence pins — no scan-based `expect_lint`
+coverage for this rule) passes unchanged.
+
+A `/code-review low` pass over the change found no issues in the reviewed
+hunks. It also surfaced two findings in concurrent, unrelated in-progress
+work present in the same working tree at review time (a focus-tracking
+regression in `extension/src/rulePacks/rulePacksWebviewProvider.ts` and a
+premature release-tag link in a CHANGELOG entry not authored by this fix) —
+both out of scope for this bug and left untouched.
 
 ---
 
