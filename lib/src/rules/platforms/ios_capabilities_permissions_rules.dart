@@ -9,8 +9,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 
-import '../../config/require_ios_accessibility_large_text_config.dart'
-    as large_text_config;
 import '../../info_plist_utils.dart';
 import '../../literal_context_utils.dart';
 import '../../target_matcher_utils.dart';
@@ -2665,15 +2663,6 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
 /// Non-const getters, method calls, and property accesses are exempt
 /// because they may apply Dynamic Type scaling internally (e.g. a
 /// project design-system token that reads `MediaQuery.textScalerOf`).
-///
-/// **Project config:** Declare additional scaling-aware getter/method
-/// names in `analysis_options_custom.yaml`:
-/// ```yaml
-/// require_ios_accessibility_large_text:
-///   scaling_aware:
-///     - size
-///     - scaledFontSize
-/// ```
 class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -2730,19 +2719,7 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
       // `ThemeCommonFontSize.medium.size`) may apply Dynamic Type
       // scaling internally and must not be flagged.
       final Expression? fontSize = node.getNamedParameterValue('fontSize');
-      if (fontSize == null) return;
-
-      // Allow if the expression's terminal name is in the project's
-      // `scaling_aware:` allowlist (analysis_options_custom.yaml).
-      // This lets projects declare getters/methods that apply Dynamic
-      // Type scaling internally without a per-call-site `// ignore:`.
-      final String? terminalName = _terminalName(fontSize);
-      if (terminalName != null &&
-          large_text_config.userScalingAwareMethods.contains(terminalName)) {
-        return;
-      }
-
-      if (!_isHardcodedNumeric(fontSize)) {
+      if (fontSize == null || !_isHardcodedNumeric(fontSize)) {
         return;
       }
 
@@ -2844,21 +2821,6 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
     if (el is PropertyAccessorElement && el.variable.isConst) return true;
 
     return false;
-  }
-
-  /// Extract the leaf identifier name from [expr] — the name that
-  /// would match a `scaling_aware:` allowlist entry.
-  ///
-  /// Returns the rightmost name segment: `size` for
-  /// `ThemeCommonFontSize.medium.size`, `kFontSize` for a bare
-  /// identifier, `scaledSize` for `scaledSize(14)`, or null for
-  /// literals and other non-named expressions.
-  static String? _terminalName(Expression expr) {
-    if (expr is SimpleIdentifier) return expr.name;
-    if (expr is PrefixedIdentifier) return expr.identifier.name;
-    if (expr is PropertyAccess) return expr.propertyName.name;
-    if (expr is MethodInvocation) return expr.methodName.name;
-    return null;
   }
 }
 

@@ -74,8 +74,6 @@ Patch release fixing false positives in two lint rules, adding a project-level a
 
 `avoid_ignoring_return_values` now supports a project-level allowlist via `analysis_options_custom.yaml` — add method names under `avoid_ignoring_return_values: safe_to_ignore:` to exempt project-specific methods whose return values are safely ignored. No action required unless you have project-specific methods you want to allowlist.
 
-`require_ios_accessibility_large_text` now supports a `scaling_aware:` allowlist in `analysis_options_custom.yaml` — declare getter/method names that apply Dynamic Type scaling internally so the rule won't flag calls to them even though they resolve to non-const elements. No action required unless you have project-specific scaling helpers.
-
 ### Fixed
 
 `google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on already-migrated `GoogleSignInClientAuthorization` results or unrelated model classes with a same-named field. No action required.
