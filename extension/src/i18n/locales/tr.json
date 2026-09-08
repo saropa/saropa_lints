@@ -962,6 +962,10 @@
       "driftOnPill": "Sürüklenmek · {count}",
       "driftOfflineTitle": "Drift Advisor etkinleştirildi ancak hiçbir sunucu bulunamadı.",
       "driftOfflinePill": "Drift çevrimdışı sürüklenme.",
+      "driftAuthRequiredTitle": "Drift Advisor sunucusu bulundu ancak bir auth token gerektirir — saropaLints.driftAdvisor.authToken ayarlayın",
+      "driftAuthRequiredPill": "Drift token gerekli",
+      "driftAuthFailedTitle": "Drift Advisor yapılandırılmış auth token'u reddetti — güncellemek için tıklayın",
+      "driftAuthFailedPill": "Drift auth başarısız",
       "enabledRulesTitle": "Mevcut seviyede etkinleştirilmiş kurallar mevcut seviye.",
       "rulesCount": "{count} kural",
       "regressionTitle": "Sağlık puanı {previousScore}'den {currentScore}'ye düştü",
@@ -1213,8 +1217,8 @@
       "heading": "İncelemeye Alınmış Bulgular",
       "headingAria": "İncelemeyi bastırmış bulunuyor section",
       "byKind": "{count} tarafından {kind}",
-      "kindIgnore": "// ignore:",
-      "kindIgnoreForFile": "// ignore_for_file:",
+      "kindIgnore": "// görmezden gelmek:",
+      "kindIgnoreForFile": "// dosya için görmezden gelin:",
       "kindBaseline": "temel",
       "unsuppressButton": "Kapat",
       "unsuppressTitle": "Kontrolü kaldırın böylece bu bulgu normal taramalarda görünür",
@@ -2752,6 +2756,23 @@
       "title": "Bu dosyadaki eski atlananları düzelt"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Bu rapor \"{status}\" olarak işaretlenmiştir ancak hâlâ bugs/ içinde — kapattan önce plans/history/ klasörüne arşivleyin (ISSUE_REPORT_GUIDE.md'ye bakın)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Bu belge hâlâ açık çalışma olarak okunuyor ancak arşiv/tekrar eden konumda — {openIssuesDir}'ye taşıyın."
+    },
+    "quickFix": {
+      "title": "{openIssuesDir}'a geç"
+    },
+    "error": {
+      "noWorkspaceFolder": "Bu dosyayı taşınamaz — açık bir çalışma alanı klasöründe değildir.",
+      "targetExists": "Hareket edilemez — {targetPath} konumunda bir dosya zaten mevcut."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Analiz çalıştırın.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Aktivasyon Hatası",
       "bannerDescription": "Extensiyon Host log'una detaylar için bakın"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Sunucu kimlik doğrulaması gerektirir. Ayarlar → Saropa Lints → Drift Advisor → Auth Token alanına bir token ayarlayın, ardından Yenile'ye tıklayın.",
+    "authFailed": "Yetkilendirme başarısız — sunucu yapılandırılmış token'u reddetti. Ayarlar'da güncellemek için tıklayın.",
+    "discovering": "Sunucuyu keşfediliyor ve sorunlar alınıyor…",
+    "noServerFound": "Drift Advisor sunucusu bulunamadı. Uygulamanızı sunucunun çalıştığı sürece başlatın ve sonra Yenile'ye tıklayın.",
+    "integrationOff": "Drift Advisor entegrasyonu devre dışı. Ayarlar (saropaLints.driftAdvisor.integration) içinde etkinleştirin, ardından Yenile'ye tıklayın."
   }
 }

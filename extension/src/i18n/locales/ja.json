@@ -962,6 +962,10 @@
       "driftOnPill": "漂流する · {count}",
       "driftOfflineTitle": "Drift Advisor が有効になっているが,サーバーが見つかりませんでした.",
       "driftOfflinePill": "漂流はオフラインでドリフトする.",
+      "driftAuthRequiredTitle": "Drift Advisor サーバーが見つかったが認証トークンが必要です — saropaLints.driftAdvisor.authToken を設定してください",
+      "driftAuthRequiredPill": "Drift にはトークンが必要です",
+      "driftAuthFailedTitle": "Drift Advisor 設定された認証トークンを拒否しました — 更新するにはクリックしてください",
+      "driftAuthFailedPill": "Drift認証失敗",
       "enabledRulesTitle": "既存のレベルでの有効なルール",
       "rulesCount": "{count} つのルール",
       "regressionTitle": "健康スコアが{previousScore}から{currentScore}に下がりました",
@@ -1214,7 +1218,7 @@
       "headingAria": "抑制された結果のセクション",
       "byKind": "{count} によって {kind}",
       "kindIgnore": "// 無視:",
-      "kindIgnoreForFile": "// ignore_for_file:",
+      "kindIgnoreForFile": "// 無視するファイル:",
       "kindBaseline": "ベースライン",
       "unsuppressButton": "アンスプレス",
       "unsuppressTitle": "この見つかりを通常のスキャンに表示するため、抑制を解除してください",
@@ -2752,6 +2756,23 @@
       "title": "このファイルの古くなった無視設定を修正してください"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "このレポートは「{status}」とマークされていますが、まだbugs/にあります — 閉じる前にplans/history/にアーカイブしてください（ISSUE_REPORT_GUIDE.mdを参照）。"
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "このドキュメントはまだオープンワークとして読めますが、アーカイブ/履歴の場所に保存されています — {openIssuesDir}に移動してください。"
+    },
+    "quickFix": {
+      "title": "{openIssuesDir}へ移動"
+    },
+    "error": {
+      "noWorkspaceFolder": "このファイルは移動できません — 開いているワークスペースフォルダ内にありません。",
+      "targetExists": "動けません — {targetPath} にファイルが既に存在しています。"
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "分析を実行する.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "アクティベーション エラー",
       "bannerDescription": "拡張機能ホストのログを確認してください"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "サーバーは認証が必要です。設定 → Saropa Lints → Drift Advisor → 認証トークンにトークンを設定し、その後リフレッシュをクリックしてください。",
+    "authFailed": "認証失敗 — サーバーが設定されたトークンを拒否しました。設定で更新するにはクリックしてください。",
+    "discovering": "サーバーの検出と問題の取得中…",
+    "noServerFound": "Drift Advisorサーバーが見つかりません。アプリを起動する際はサーバーを事前に起動し、その後リフレッシュをクリックしてください。",
+    "integrationOff": "Drift Advisor インテグレーションはオフです。設定（saropaLints.driftAdvisor.integration）で有効にして、その後リフレッシュをクリックしてください。"
   }
 }

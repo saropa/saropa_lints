@@ -962,6 +962,10 @@
       "driftOnPill": "Drift on · {count} Đánh trôi trên",
       "driftOfflineTitle": "Drift Advisor được kích hoạt nhưng không tìm thấy máy chủ nào.",
       "driftOfflinePill": "Drift offline không trực tuyến",
+      "driftAuthRequiredTitle": "Đã tìm thấy máy chủ Drift Advisor nhưng yêu cầu mã thông báo xác thực - đặt saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift cần token",
+      "driftAuthFailedTitle": "Drift Advisor đã từ chối token xác thực được cấu hình — nhấp để cập nhật nó",
+      "driftAuthFailedPill": "Xác thực trôi dạt không thành công",
       "enabledRulesTitle": "Các quy tắc được kích hoạt trong cấp hiện tại.",
       "rulesCount": "{count} quy tắc",
       "regressionTitle": "Điểm máu giảm từ {previousScore} xuống {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Sửa các ignore lỗi thời trong tệp này"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Báo cáo này được đánh dấu \"{status}\" nhưng vẫn còn lỗi — lưu vào plans/history/ trước khi đóng (xem ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Tài liệu này vẫn được xem là công việc mở nhưng đã được lưu trữ tại vị trí hồ sơ/lịch sử — di chuyển nó đến {openIssuesDir} thay vì vậy."
+    },
+    "quickFix": {
+      "title": "Chuyển đến {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Không thể di chuyển tệp này — nó không nằm trong một thư mục làm việc mở.",
+      "targetExists": "Không thể di chuyển — một tệp tin đã tồn tại tại {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Chạy phân tích chạy.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Lỗi Kích hoạt",
       "bannerDescription": "Kiểm tra log của Extension Host để biết chi tiết"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Server yêu cầu xác thực. Đặt một token trong Settings → Saropa Lints → Drift Advisor → Auth Token, sau đó nhấn Refresh.",
+    "authFailed": "Đăng nhập thất bại — máy chủ đã từ chối token được cấu hình. Nhấp để cập nhật trong Cài đặt.",
+    "discovering": "Đang phát hiện máy chủ và lấy lỗi...",
+    "noServerFound": "Không tìm thấy máy chủ Drift Advisor. Hãy bắt đầu ứng dụng của bạn với máy chủ đang chạy, sau đó nhấn Làm mới.",
+    "integrationOff": "Tích hợp Drift Advisor đã bị tắt. Bật nó trong cài đặt (saropaLints.driftAdvisor.integration), sau đó nhấn Làm mới."
   }
 }

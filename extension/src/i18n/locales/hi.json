@@ -962,6 +962,10 @@
       "driftOnPill": "पर बहती है · {count}",
       "driftOfflineTitle": "Drift Advisor सक्षम है लेकिन कोई सर्वर नहीं मिला।",
       "driftOfflinePill": "ऑफलाइन ऑफ़लाइन बहाव।",
+      "driftAuthRequiredTitle": "Drift Advisor सर्वर ज्ञात किया गया लेकिन एक एथेंट टोकन की आवश्यकता है — सेट करें saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "ड्रिफ्ट टोकन आवश्यक है",
+      "driftAuthFailedTitle": "Drift Advisor निर्धारित अथॉरिजेशन टोकन को अस्वीकृत कर दिया गया है — अपडेट करने के लिए क्लिक करें",
+      "driftAuthFailedPill": "ड्रिफ्ट अथ फेल हो गया",
       "enabledRulesTitle": "वर्तमान स्तर में सक्षम नियम।",
       "rulesCount": "{count} नियम",
       "regressionTitle": "स्वास्थ्य स्कोर {previousScore} से {currentScore} तक गिर गया",
@@ -2752,6 +2756,23 @@
       "title": "इस फ़ाइल में विस्तारित अनदेखा करें"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "इस रिपोर्ट को \"{status}\" के रूप में चिह्नित किया गया है लेकिन अभी भी bugs/ में है — बंद करने से पहले इसे plans/history/ में आर्काइव करें (देखें ISSUE_REPORT_GUIDE.md)।"
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "इस दस्तावेज़ अभी भी खुले काम के रूप में पढ़ता है लेकिन अभिलेख/इतिहास स्थान में रखा गया है — इसे {openIssuesDir} में ले जाएं।"
+    },
+    "quickFix": {
+      "title": "{openIssuesDir} में जाएं"
+    },
+    "error": {
+      "noWorkspaceFolder": "इस फ़ाइल को नहीं बरकरार रख सकते — यह खुले वर्कस्पेस फ़ोल्डर के अंदर नहीं है।",
+      "targetExists": "मूव नहीं कर सकते — एक फ़ाइल पहले से ही {targetPath} पर मौजूद है।"
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "विश्लेषण चलाएं।",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "सक्रियण त्रुटि",
       "bannerDescription": "अवयव आयोजक लॉग देखें विवरण के लिए"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "सर्वर पर विशेषज्ञता की आवश्यकता है। सेटिंग्स → Saropa Lints → Drift Advisor → एथर टोकन में एक टोकन सेट करें, फिर रीफ्रेश क्लिक करें।",
+    "authFailed": "प्रमाणन विफल — सर्वर ने निर्धारित टोकन को अस्वीकृत कर दिया। सेटिंग्स में इसे अपडेट करने के लिए क्लिक करें।",
+    "discovering": "सर्वर की खोज और समस्याओं के लेखन के लिए लेखन कर रहे हैं…",
+    "noServerFound": "कोई Drift Advisor सर्वर नहीं मिला। अपने एप्लिकेशन को सर्वर के साथ शुरू करें, फिर रीफ्रेश करें।",
+    "integrationOff": "Drift Advisor एक्सपोर्ट बंद है। सेटिंग्स में इसे सक्षम करें (saropaLints.driftAdvisor.integration), फिर रीफ्रेश करें।"
   }
 }

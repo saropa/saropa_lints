@@ -962,6 +962,10 @@
       "driftOnPill": "Berlayar di atas · {count}",
       "driftOfflineTitle": "Drift Advisor diaktifkan tetapi tidak ada server yang ditemukan.",
       "driftOfflinePill": "Drift offline, bergeser ke arah yang tidak diinginkan.",
+      "driftAuthRequiredTitle": "Drift Advisor server ditemukan tetapi memerlukan token auth — set saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift membutuhkan token",
+      "driftAuthFailedTitle": "Drift Advisor menolak token autentikasi yang dikonfigurasikan — klik untuk memperbaruiinya",
+      "driftAuthFailedPill": "Drift auth gagal",
       "enabledRulesTitle": "Aturan yang diaktifkan dalam tingkat saat ini.",
       "rulesCount": "{count} aturan",
       "regressionTitle": "Skor kesehatan turun dari {previousScore} ke {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Perbaiki ignores yang usang dalam berkas ini"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Laporan ini ditandai \"{status}\" tetapi masih ada bugs/ — arsipkan ke plans/history/ sebelum ditutup (lihat ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Dokumen ini masih terlihat sebagai pekerjaan terbuka tetapi disimpan di lokasi arsip/sejarah — pindahkan ke {openIssuesDir} saja."
+    },
+    "quickFix": {
+      "title": "Pindah ke {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Tidak dapat memindahkan berkas ini — berkas ini tidak berada di dalam folder workspace yang terbuka.",
+      "targetExists": "Tidak dapat memindahkan — ada file yang sudah ada di {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Jalankan analisis analisa.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Error Aktivasi",
       "bannerDescription": "Periksa log Extension Host untuk detailnya"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Server memerlukan autentikasi. Tetapkan sebuah token di Settings → Saropa Lints → Drift Advisor → Auth Token, lalu klik Refresh.",
+    "authFailed": "Autentikasi gagal — server menolak token yang dikonfigurasikan. Klik untuk memperbarui di Pengaturan.",
+    "discovering": "Mencari server dan mengambil masalah…",
+    "noServerFound": "Tidak ditemukan server Drift Advisor. Mulai aplikasi Anda dengan server yang berjalan, lalu klik Refresh.",
+    "integrationOff": "Drift Advisor integrasi dimatikan. Aktifkan di pengaturan (saropaLints.driftAdvisor.integration), lalu klik Segarkan."
   }
 }

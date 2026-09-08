@@ -962,6 +962,10 @@
       "driftOnPill": "Дрейфуя по · {count}",
       "driftOfflineTitle": "Drift Advisor включен, но сервер не найден.",
       "driftOfflinePill": "Дрейф в автономном режиме.",
+      "driftAuthRequiredTitle": "Найден сервер Drift Advisor, но требуется токен аутентификации — установите saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift требует токен",
+      "driftAuthFailedTitle": "Drift Advisor отклонил настроенный токен аутентификации — нажмите, чтобы обновить его",
+      "driftAuthFailedPill": "Drift auth failed",
       "enabledRulesTitle": "Правила, включенные в текущий уровень.",
       "rulesCount": "{count} правил",
       "regressionTitle": "Оценка здоровья снизилась с {previousScore} до {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Исправить устаревшие игноры в этом файле"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Этот отчет помечен как \"{status}\", но все еще в bugs/ — архивируйте его в plans/history/ перед закрытием (см. ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Этот документ всё ещё читается как открытая работа, но он находится в папке архива/истории — переместите его в {openIssuesDir} вместо."
+    },
+    "quickFix": {
+      "title": "Перейти в {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Нельзя переместить этот файл — он не находится внутри открытой папки рабочего пространства.",
+      "targetExists": "Нельзя переместить — файл уже существует по адресу {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Запустите анализ, выполните анализы.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Ошибка активации",
       "bannerDescription": "Проверьте журнал Extension Host для деталей"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Сервер требует аутентификации. Установите токен в Настройки → Saropa Lints → Drift Advisor → Auth Token, затем нажмите Обновить.",
+    "authFailed": "Аутентификация не удалась — сервер отклонил настроенный токен. Нажмите, чтобы обновить его в Настройках.",
+    "discovering": "Обнаружение сервера и получение проблем…",
+    "noServerFound": "Нет найдено сервера Drift Advisor. Запустите ваше приложение с работающим сервером, затем нажмите Обновить.",
+    "integrationOff": "Интеграция Drift Advisor отключена. Включите её в настройках (saropaLints.driftAdvisor.integration), затем нажмите Обновить."
   }
 }

@@ -962,6 +962,10 @@
       "driftOnPill": "Drift on · {count} - dryfowanie w czasie",
       "driftOfflineTitle": "Drift Advisor włączony, ale nie znaleziono żadnego serwera.",
       "driftOfflinePill": "Drift offline - dryfowanie w trybie offline.",
+      "driftAuthRequiredTitle": "Znaleziono serwer Drift Advisor, ale wymaga tokena autoryzacyjnego — ustaw saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift potrzebuje tokena",
+      "driftAuthFailedTitle": "Drift Advisor odrzucił skonfigurowany token autoryzacyjny — kliknij, aby go zaktualizować",
+      "driftAuthFailedPill": "Drift auth nie powiodło się",
       "enabledRulesTitle": "Zasady włączone do bieżącego poziomu.",
       "rulesCount": "{count} reguł",
       "regressionTitle": "Wynik zdrowia spadł z {previousScore} do {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Popraw nieaktualne ignorowane w tym pliku"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Ten raport oznaczony jest jako \"{status}\", ale nadal znajduje się w bugs/ — zarchiwuj go do plans/history/ przed zamknięciem (patrz ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Ten dokument nadal czyta się jak pracę otwartą, ale został umieszczony w lokalizacji archiwum/historii — przenieś go do {openIssuesDir} zamiast tego."
+    },
+    "quickFix": {
+      "title": "Przejdź do {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Nie można przenieść tego pliku — nie znajduje się on w otwartym folderze projektu.",
+      "targetExists": "Nie można przenieść — plik już istnieje w {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Przeprowadź analizę, przeprowadzić analizę.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Błąd aktywacji",
       "bannerDescription": "Sprawdź logi hosta rozszerzenia dla szczegółów"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Serwer wymaga uwierzytelnienia. Ustaw token w Ustawieniach → Saropa Lints → Drift Advisor → Token Auth, a następnie kliknij Odśwież.",
+    "authFailed": "Autoryzacja nie powiodła się — serwer odrzucił skonfigurowany token. Kliknij, aby zaktualizować go w Ustawieniach.",
+    "discovering": "Odkrywanie serwera i pobieranie problemów…",
+    "noServerFound": "Nie znaleziono serwera Drift Advisor. Uruchom aplikację z serwerem w tle, a następnie kliknij Odśwież.",
+    "integrationOff": "Integracja Drift Advisor jest wyłączona. Włącz ją w ustawieniach (saropaLints.driftAdvisor.integration), a następnie kliknij Odśwież."
   }
 }

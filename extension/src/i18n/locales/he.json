@@ -962,6 +962,10 @@
       "driftOnPill": "\"הדריף על · {count}\"",
       "driftOfflineTitle": "Drift Advisor מופעל אך לא נמצא שרת.",
       "driftOfflinePill": "דריפט לא מקוון",
+      "driftAuthRequiredTitle": "שרת Drift Advisor נמצא אך דורש טוקן אימות — установите saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "דריפט צריך טוקן",
+      "driftAuthFailedTitle": "Drift Advisor דוחה את הטוקן האוטוריזציה שהוגדר — לחץ כדי לעדכן אותו",
+      "driftAuthFailedPill": "Drift אוט' אינ' פאילד",
       "enabledRulesTitle": "כללים מופעלים ברמה הנוכחית.",
       "rulesCount": "{count} כללים",
       "regressionTitle": "ציון הבריאות ירד מ{previousScore} ל{currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "תקן איסורים ישנים在这个文件中"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "הדוח הזה סומן \"{status}\" אך עדיין ב-bugs/ — ארכי אותו ל-plans/history/ לפני סגירתו (ראו ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "המסמך עדיין קרוא כעבודה פתוחה אך שמור בכתובת הארכיון/היסטוריה — תעבירו אותו ל{openIssuesDir} במקום."
+    },
+    "quickFix": {
+      "title": "העתק ל {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "לא ניתן למקם קובץ זה — הוא לא נמצא בתוך תיקייה פתוחה של 작업.",
+      "targetExists": "לא ניתן להזיז — קובץ קיים כבר ב {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "רץ ניתוח ריצה",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "שגיאה בהפעלה",
       "bannerDescription": "בדוק את לוג ה-extension host כדי לראות פרטים"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "השרת דורש אימות. установите токен в Настройки → Saropa Lints → Drift Advisor → Auth Token, затем нажмите Обновить.",
+    "authFailed": "האימות נכשל — שרת הרשם את הכרטיסייה שנוגשת. לחץ כדי לעדכן אותה בהגדרות.",
+    "discovering": "גילוי שרת וקבלת בעיות...",
+    "noServerFound": "לא נמצאו שרת Drift Advisor. התחילו את האפליקציה עם השרת פעיל, ואז לחצו על עדכון.",
+    "integrationOff": "האינטגרציה Drift Advisor מוטה. הפעל אותה ב설比利ות (saropaLints.driftAdvisor.integration), ואז לחץ על עדכון."
   }
 }

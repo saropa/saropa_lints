@@ -962,6 +962,10 @@
       "driftOnPill": "在漂浮上 · {count}",
       "driftOfflineTitle": "启用了Drift Advisor,但没有找到服务器.",
       "driftOfflinePill": "漂流在线下载 在线不开机",
+      "driftAuthRequiredTitle": "发现Drift Advisor服务器但需要一个认证令牌 —— 设置 saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift 需要 token",
+      "driftAuthFailedTitle": "Drift Advisor 拒绝了配置的认证令牌 —— 点击以更新它",
+      "driftAuthFailedPill": "漂移验证失败",
       "enabledRulesTitle": "在当前级别中启用规则.",
       "rulesCount": "{count} 个规则",
       "regressionTitle": "健康分数从 {previousScore} 下降到 {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "修复此文件中过时的忽略项"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "此报告标记为\"{status}\"但仍有bug/ — 在关闭前请归档到plans/history/（参见ISSUE_REPORT_GUIDE.md）。"
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "此文档仍显示为开放工作，但已归档到历史位置——请将其移动到{openIssuesDir}。"
+    },
+    "quickFix": {
+      "title": "移动到 {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "无法移动此文件 — 它不在一个打开的工作区文件夹内。",
+      "targetExists": "不能移动 — 在 {targetPath} 已经存在一个文件。"
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "运行分析,进行分析.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "激活错误",
       "bannerDescription": "检查扩展主机日志以获取详细信息"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "服务器需要认证。在设置中设置一个令牌 → Saropa Lints → Drift Advisor → 认证令牌，然后点击刷新。",
+    "authFailed": "认证失败 — 服务器拒绝了配置的令牌。点击在设置中更新它。",
+    "discovering": "发现服务器并获取问题…",
+    "noServerFound": "未找到 Drift Advisor 服务器。请先启动应用并运行服务器，然后点击刷新。",
+    "integrationOff": "Drift Advisor 集成已关闭。在设置中启用它（saropaLints.driftAdvisor.integration），然后点击刷新。"
   }
 }

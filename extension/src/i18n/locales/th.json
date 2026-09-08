@@ -962,6 +962,10 @@
       "driftOnPill": "ล่องลอยไปตาม · {count}",
       "driftOfflineTitle": "Drift Advisor ได้รับการเปิดใช้งาน แต่ไม่พบเซอร์เวอร์",
       "driftOfflinePill": "Drift ออฟไลน์ ไม่ติดต่อ",
+      "driftAuthRequiredTitle": "เซิร์ฟเวอร์ Drift Advisor พบแต่ต้องการโทเคนการตรวจสอบความถูกต้อง — ตั้งค่า saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "ดริฟต์ต้องการโทเคน",
+      "driftAuthFailedTitle": "Drift Advisor ปฏิเสธโทเคนการตรวจสอบความถูกต้องที่ตั้งค่าไว้ — คลิกเพื่ออัปเดตมัน",
+      "driftAuthFailedPill": "ข้อผิดพลาดการตรวจสอบ Drift auth",
       "enabledRulesTitle": "กฎที่เปิดใช้ในระดับปัจจุบัน",
       "rulesCount": "{count} กฎ",
       "regressionTitle": "คะแนนสุขภาพลดลงจาก {previousScore} เป็น {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "แก้ไขการละเลยที่ไม่สมควรในไฟล์นี้"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "รายงานนี้มีเครื่องหมายว่า \"{status}\" แต่ยังอยู่ใน bugs/ — ให้เก็บเข้าไปใน plans/history/ ก่อนปิด (ดู ISSUE_REPORT_GUIDE.md)"
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "เอกสารนี้ยังคงอ่านได้เหมือนงานที่ยังไม่เสร็จแต่ถูกเก็บไว้ในตำแหน่งโฟลเดอร์ประวัติ — ย้ายไปที่ {openIssuesDir} แทน"
+    },
+    "quickFix": {
+      "title": "ย้ายไป {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "ไม่สามารถย้ายไฟล์นี้ได้ — ไฟล์นี้อยู่ภายนอกโฟลเดอร์ที่เปิดไว้ในงาน",
+      "targetExists": "ไม่สามารถย้ายได้ — มีไฟล์อยู่แล้วที่ {targetPath}"
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "วิ่งวิเคราะห์ Run Analysis การวัด",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "ข้อผิดพลาดในการเปิดใช้งาน",
       "bannerDescription": "ตรวจสอบบันทึกการดำเนินการของ Extension Host เพื่อดูรายละเอียด"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "เซิร์ฟเวอร์ต้องการการตรวจสอบความถูกต้อง ตั้งค่าโทเคนในตั้งค่า → Saropa Lints → Drift Advisor → Auth Token แล้วคลิก Refresh",
+    "authFailed": "การตรวจสอบความถูกต้องล้มเหลว — เซิร์ฟเวอร์ปฏิเสธโทเคนที่กำหนดไว้ คลิกเพื่ออัปเดตในตั้งค่า",
+    "discovering": "กำลังค้นหาเซิร์ฟเวอร์และดึงข้อมูลปัญหา...",
+    "noServerFound": "ไม่พบเซิร์ฟเวอร์ Drift Advisor ใดๆ อยู่ กรุณาเริ่มแอปของคุณพร้อมที่เซิร์ฟเวอร์กำลังทำงาน แล้วคลิก Refresh",
+    "integrationOff": "การผสาน Drift Advisor ถูกปิด ให้เปิดใช้งานในตั้งค่า (saropaLints.driftAdvisor.integration) จากนั้นคลิก Refresh"
   }
 }

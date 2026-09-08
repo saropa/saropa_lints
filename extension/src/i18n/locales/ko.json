@@ -962,6 +962,10 @@
       "driftOnPill": "· {count}에 떠돌아다니는 것",
       "driftOfflineTitle": "Drift Advisor가 활성화되었지만 서버는 발견되지 않았습니다.",
       "driftOfflinePill": "오프라인에서 도래하는 데 몰입하십시오.",
+      "driftAuthRequiredTitle": "Drift Advisor 서버가 발견되었지만 인증 토큰이 필요합니다 — saropaLints.driftAdvisor.authToken 설정",
+      "driftAuthRequiredPill": "드라이프는 토큰이 필요합니다",
+      "driftAuthFailedTitle": "Drift Advisor 설정된 인증 토큰을 거부했습니다 — 클릭하여 업데이트합니다",
+      "driftAuthFailedPill": "드리프트 인증 실패",
       "enabledRulesTitle": "현재 계층에서 허용된 규칙",
       "rulesCount": "{count}개 규칙",
       "regressionTitle": "건강 점수는 {previousScore}에서 {currentScore}로 떨어졌습니다",
@@ -2752,6 +2756,23 @@
       "title": "이 파일의 오래된 무시 목록 수정"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "이 보고서는 \"{status}\"로 표시되어 있지만 여전히 bugs/에 있습니다 — 닫기 전에 plans/history/에 보관하세요 (ISSUE_REPORT_GUIDE.md 참조)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "이 문서는 여전히 오픈 작업으로 읽히지만 아카이브/히스토리 위치에 저장되어 있습니다 — {openIssuesDir}로 이동하십시오."
+    },
+    "quickFix": {
+      "title": "{openIssuesDir}로 이동"
+    },
+    "error": {
+      "noWorkspaceFolder": "이 파일을 이동할 수 없습니다 — 이 파일은 열린 워크스페이스 폴더 내에 있지 않습니다.",
+      "targetExists": "이동할 수 없습니다 — {targetPath} 위치에 이미 파일이 존재합니다."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "분석을 실행하여 분석을 수행합니다.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "활성화 오류",
       "bannerDescription": "확장 프로그램 호스트 로그를 확인하여 세부 정보를 확인하세요"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "서버는 인증이 필요합니다. 설정 → Saropa Lints → Drift Advisor → Auth Token에 토큰을 설정한 후, 새로고침을 클릭하세요.",
+    "authFailed": "인증 실패 — 서버가 설정된 토큰을 거부했습니다. 설정에서 업데이트하려면 클릭하세요.",
+    "discovering": "서버 발견 및 문제 가져오기 중…",
+    "noServerFound": "Drift Advisor 서버를 찾을 수 없습니다. 앱을 실행할 때 서버를 먼저 실행한 후 새로고침을 클릭하세요.",
+    "integrationOff": "Drift Advisor 통합은 꺼져 있습니다. 설정에서 활성화하세요 (saropaLints.driftAdvisor.integration), 그런 다음 새로고침을 클릭하세요."
   }
 }

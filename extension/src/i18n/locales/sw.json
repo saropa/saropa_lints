@@ -736,7 +736,7 @@
       "openHint": "Bofya ili kufungua Mchakato wa Afya",
       "systemRam": "System: {free} ya {total} kwa kuanza",
       "systemLow": "⚠ Sistema: {free} ya {total} kati",
-      "extensionHostWarning": "⚠ Extension host: {size}"
+      "extensionHostWarning": "⚠ Mwenyeji wa kiendelezi: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} prosesu ({size} RSS)",
@@ -838,7 +838,7 @@
       "hazardFiles": "$(warning) {count} faili (faili) ya kubwa ya kwanza kuzalishwa",
       "hazardFilesDetail": "Faili mbalimbali ambayo inapangwa na mchakato wa faili inaweza kubadilisha mifano na kuzalisha VS Code. Tafuta kwa kuzalisha mifano kuzingatia wakati wao.",
       "missingExcludes": "$(info) {count} kifungu kwa watcher kizungumzwa (s)",
-      "missingExcludesDetail": "Recommended file-watcher exclusion patterns are not configured. Adding them prevents unnecessary memory usage.",
+      "missingExcludesDetail": "Mifumo ya kutengwa ya kitazamaji faili inayopendekezwa haijasanidiwa. Kuziongeza huzuia utumiaji wa kumbukumbu usio wa lazima.",
       "hostMemory": "$(alert) Mshirika wa extension ina kuzunguka {size}",
       "hostMemoryDetail": "Programu ya host ya extension RSS inaanza kuzalishia matokeo ya mchoro. Opend Process Health kwa matokeo."
     }
@@ -962,6 +962,10 @@
       "driftOnPill": "Drift on · {count} Kuendelea na safari.",
       "driftOfflineTitle": "Drift Advisor imewezeshwa lakini hakuna seva iliyopatikana.",
       "driftOfflinePill": "Drift nje ya mtandao.",
+      "driftAuthRequiredTitle": "Drift Advisor server inatoa lakini ina kuhusu token ya auth — ongeza saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift inakwenda token",
+      "driftAuthFailedTitle": "Drift Advisor amesahani token ya auth ya kuchapishwa — klikka kujaribu kushiriki",
+      "driftAuthFailedPill": "Uthibitishaji wa Drift umeshindwa",
       "enabledRulesTitle": "Sheria zilizowezeshwa katika kiwango cha sasa cha ngazi.",
       "rulesCount": "sheria {count}",
       "regressionTitle": "Unganisho wa health uchukua kutokana na {previousScore} hadi {currentScore}",
@@ -1215,8 +1219,8 @@
       "byKind": "{count} na {kind}",
       "kindIgnore": "// kupuuza:",
       "kindIgnoreForFile": "// kupuuza_kwa_faili:",
-      "kindBaseline": "baseline",
-      "unsuppressButton": "Unsuppress",
+      "kindBaseline": "msingi",
+      "unsuppressButton": "Acha kukandamiza",
       "unsuppressTitle": "Ondoa kuzalishia kwa kusafisha matokeo hapa kwenye skani mafanikio ya kipindi",
       "unsuppressHint": "Kuondoa {rule} kwenye {file}:{line}: ongeza komento // ignore: kwenye linia ya kichwa.",
       "columnFile": "File ya faili file.",
@@ -2752,6 +2756,23 @@
       "title": "Tumeua kifungu kwenye faili hili"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Raporti huu imetambulika kama \"{status}\" lakini anapata kwenye bugs/ — kushinda kwenye plans/history/ kabla ya kufungua (tazama ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Kipengele hiki inakwenda kama kazi ya kuzalishwa bado lakini inaonekana kwenye jumla ya kisiasa/majaribio — ongeza kwenye {openIssuesDir} bado."
+    },
+    "quickFix": {
+      "title": "Unganisha kwa {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Hakikisha kujifunza faili hii — hakuna kwenye kipengele cha workspace ya kuzalishwa.",
+      "targetExists": "Hakuna kujaribu — faili inaonekani kwenye {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Run uchambuzi kukimbia.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Error ya Uactivation",
       "bannerDescription": "Tafuta log ya Extension Host kwa detali"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Server ina kutafuta mshirika. Oneshika token katikati ya Settings → Saropa Lints → Drift Advisor → Auth Token, kisha bonye kwenye Refresh.",
+    "authFailed": "Unganisha matokeo — server alikwenda token iliyochaguliwa. Bonyeza kuzingatia kwenye Settings.",
+    "discovering": "Kuzingia server na kifungua kifungua...",
+    "noServerFound": "Hakuna server Drift Advisor. Hatua aplikasi wako na server inayotumika, kisha chagua Refresh.",
+    "integrationOff": "Unganisha Drift Advisor ni of. Ondoa kwenye mipango (saropaLints.driftAdvisor.integration), sasa bonye na Refresh."
   }
 }

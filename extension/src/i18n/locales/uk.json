@@ -962,6 +962,10 @@
       "driftOnPill": "Дрейфуючи на · {count}",
       "driftOfflineTitle": "Drift Advisor включений, але сервер не знайдено.",
       "driftOfflinePill": "Дрейф в офлайновому режимі",
+      "driftAuthRequiredTitle": "Знайдено сервер Drift Advisor, але вимагається токен автентифікації — встановіть saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift потребує токен",
+      "driftAuthFailedTitle": "Drift Advisor відхилений налаштований токен автентифікації — натисніть, щоб оновити його",
+      "driftAuthFailedPill": "Помилка авторизації дрейфу",
       "enabledRulesTitle": "Встановлені правила в поточному рівні.",
       "rulesCount": "{count} правил",
       "regressionTitle": "Показник здоров’я знизився з {previousScore} до {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Виправайте засмічені ігнори в цьому файлі"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Цей звіт позначений \"{status}\", але все ще в bugs/ — архівуйте його в plans/history/ перед закриттям (дивіться ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Цей документ ще читається як відкритий проект, але збережений у папці архіву/історії — перемістіть його у {openIssuesDir} замість цього."
+    },
+    "quickFix": {
+      "title": "Переміститися в {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Не можна перемістити цей файл — він не знаходиться у відкритій папці робочого простору.",
+      "targetExists": "Не можна перемістити — файл вже існує в {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Запустити аналіз, провести аналіз.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Помилка активації",
       "bannerDescription": "Перевірте журнал логів хоста розширення для деталей"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Сервер вимагає автентифікації. Встановіть токен у налаштуваннях → Saropa Lints → Drift Advisor → Auth Token, потім натисніть Оновити.",
+    "authFailed": "Автентифікація не вдалася — сервер відхилив налаштований токен. Натисніть, щоб оновити його в налаштуваннях.",
+    "discovering": "Виявлення сервера та отримання проблем…",
+    "noServerFound": "Не знайдено сервера Drift Advisor. Запустіть ваш додаток з запущеним сервером, потім натисніть Оновити.",
+    "integrationOff": "Інтеграція Drift Advisor вимкнена. Увімкніть її в налаштуваннях (saropaLints.driftAdvisor.integration), потім натисніть Оновити."
   }
 }

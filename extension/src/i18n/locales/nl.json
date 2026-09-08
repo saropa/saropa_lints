@@ -962,6 +962,10 @@
       "driftOnPill": "Drift verder · {count}",
       "driftOfflineTitle": "Drift Advisor is ingeschakeld, maar er werd geen server gevonden.",
       "driftOfflinePill": "Drift offline afdrijven.",
+      "driftAuthRequiredTitle": "Drift Advisor server gevonden maar vereist een auth token — stel saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift vereist token",
+      "driftAuthFailedTitle": "Drift Advisor heeft de geconfigureerde auth token geweigerd — klik om het te bijwerken",
+      "driftAuthFailedPill": "Drift auth failed",
       "enabledRulesTitle": "Ingestelde regels in de huidige tier.",
       "rulesCount": "{count} regels",
       "regressionTitle": "Gezondheidscore is gedaald van {previousScore} naar {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Vermijd verouderde ignores in deze bestand"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Deze rapport is gemarkeerd \"{status}\" maar is nog steeds in bugs/ — archiveer het naar plans/history/ voordat u het sluit (zie ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Deze documenten lezen nog steeds als open werk, maar zijn opgeslagen in de archief/geschiedenis locatie – verplaats ze naar {openIssuesDir} in plaats daarvan."
+    },
+    "quickFix": {
+      "title": "Ga naar {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Bestand kan niet worden verplaatst — het bevindt zich niet in een geopend werkruimte map.",
+      "targetExists": "Niet verplaatsen — er bestaat al een bestand op {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Analyse uitvoeren",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Activeringsfout",
       "bannerDescription": "Controleer de log van de Extension Host voor meer informatie"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Server vereist authenticatie. Stel een token in Instellingen → Saropa Lints → Drift Advisor → Auth Token, daarna klik je op Vernieuwen.",
+    "authFailed": "Authenticatie mislukt — de server heeft de geconfigureerde token geweigerd. Klik om het in Instellingen te bijwerken.",
+    "discovering": "Server ontdekken en issues ophalen…",
+    "noServerFound": "Geen Drift Advisor server gevonden. Start je app met de server draaiend, daarna klik je op Vernieuwen.",
+    "integrationOff": "Drift Advisor integratie is uitgeschakeld. Schakel het in de instellingen in (saropaLints.driftAdvisor.integration), daarna klik je op Vernieuwen."
   }
 }

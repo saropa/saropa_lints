@@ -962,6 +962,10 @@
       "driftOnPill": "ڈریو پر · {count}",
       "driftOfflineTitle": "Drift Advisor فعال ہے لیکن کوئی سرور نہیں ملا.",
       "driftOfflinePill": "آف لائن ڈرائیو کو آف لائن کریں",
+      "driftAuthRequiredTitle": "Drift Advisor سرور ملا لیکن اuth ٹوکن کی ضرورت ہے — ساروپا لینٹس. ڈریفٹ اڈوائزر. اثنتکن ست کریں",
+      "driftAuthRequiredPill": "ڈرائیفٹ کی ضرورت ہے تکنیکی کیوٹن /نہ کریں",
+      "driftAuthFailedTitle": "Drift Advisor تصدیق شدہ اثربنی کو مسترد کر دیا گیا ہے — اسے اپ ڈیٹ کرنے کے لیے کلک کریں",
+      "driftAuthFailedPill": "ڈرائیفٹ اثنتی فیلڈ",
       "enabledRulesTitle": "موجودہ ٹائیر میں فعال قواعد کو چالو کیا گیا ہے۔",
       "rulesCount": "{count} اصول",
       "regressionTitle": "صحت کا اسکور {previousScore} سے {currentScore} تک گر گیا۔",
@@ -2752,6 +2756,23 @@
       "title": "اس فائل میں گھبرائی ہوئی نظریات ترمیم کریں"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "یہ رپورٹ \"{status}\" کے نشان دار ہے لیکن ابھی بھی bugs/ میں ہے — بند کرنے سے پہلے اسے plans/history/ میں ارکیو کریں (دیکھیے ISSUE_REPORT_GUIDE.md)"
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "یہ دستاویز ابھی تک کھلے کام کے طور پر پڑھا جاتا ہے لیکن ارچیو/تاریخ کی جگہ میں رکھا گیا ہے — اسے {openIssuesDir} میں منتقل کریں۔"
+    },
+    "quickFix": {
+      "title": "{openIssuesDir} میں منتقل ہوں"
+    },
+    "error": {
+      "noWorkspaceFolder": "یہ فائل ہمیشہ ایک کھولے گھر کے اندر ہوتی ہے۔",
+      "targetExists": "نہیں ہو سکتا — ایک فائل پہلے سے {targetPath} پر موجود ہے۔"
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "تجزيي هلائو",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "فعالیت خطا",
       "bannerDescription": "لوگ ایکسٹنسن ہوست کی لاگ کے لیے تفصیلات دیکھیں"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "سرور کی اuthenticatie ضروری ہے۔ سیٹنگس → Saropa Lints → Drift Advisor → Auth Token میں ایک ٹوکن سیٹ کریں، پھر ریفرش کلک کریں۔",
+    "authFailed": "鉴权失败 — 服务器拒绝了配置的令牌。点击以在设置中更新它。",
+    "discovering": "سروسر کی تلاش اور مسائل کی حاصل کرنا...",
+    "noServerFound": "Drift Advisor سرور نہیں ملا۔ اپنی ایپ کو سرور کے ساتھ شروع کریں، پھر رفریش کریں۔",
+    "integrationOff": "Drift Advisor انتیگریشن آف ہے۔ اسے سیٹنگس (saropaLints.driftAdvisor.integration) میں ایکسٹیبل کریں، پھر ریفرش کلک کریں۔"
   }
 }

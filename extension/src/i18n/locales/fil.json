@@ -962,6 +962,10 @@
       "driftOnPill": "Drift on · {count}",
       "driftOfflineTitle": "Drift Advisor na naka-enable ngunit walang server natagpuan.",
       "driftOfflinePill": "Drift offline",
+      "driftAuthRequiredTitle": "Drift Advisor server na naitala ngunit nangangailangan ng isang auth token — ilagay saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Ang drift ay nangangailangan ng token",
+      "driftAuthFailedTitle": "Drift Advisor nareject ang nakonfigure na auth token — klik para i-update ito",
+      "driftAuthFailedPill": "Drift auth nagsilbi",
       "enabledRulesTitle": "Pinapayagan na mga patakaran sa kasalukuyang tier.",
       "rulesCount": "{count} na rule",
       "regressionTitle": "Nabawasan ang health score mula {previousScore} hanggang {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Iayos ang mga hindi kinakailangang ignores dito"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Ito ang report na may marka \"{status}\" ngunit pa rin nasa bugs/ — i-archieve ito sa plans/history/ bago i-close (tanungin ang ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Ang dokumento pa rin ay naisulat bilang open work ngunit ay naka-arkibo sa lokasyon ng arkeyo/panahon — ilipat ito sa {openIssuesDir} instead."
+    },
+    "quickFix": {
+      "title": "Pumunta sa {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Hindi makakalipat ng file — wala itong nasa loob ng isang bukas na workspace folder.",
+      "targetExists": "Hindi makapagmove — mayroon na isang file sa {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Magpatakbo ng pagsusuri sa run analysis.",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Mga Error sa Pag-activate",
       "bannerDescription": "Tingnan ang log ng Extension Host para sa detalye"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Ang server ay nangangailangan ng pahintulot. I-set ang isang token sa Settings → Saropa Lints → Drift Advisor → Auth Token, pagkatapos ay i-click ang Refresh.",
+    "authFailed": "Authentication failed — ang server ay nareject ang nakonfigure na token. Click para i-update ito sa Settings.",
+    "discovering": "Nagtatagpo ng server at pagkuha ng mga isyu...",
+    "noServerFound": "Walang inilabas na server ng Drift Advisor. Simulan ang iyong app kasama ang server na nagsisimula, pagkatapos ay i-click ang Refresh.",
+    "integrationOff": "Ang integrasyon ng Drift Advisor ay naka-off. I-enable ito sa mga setting (saropaLints.driftAdvisor.integration), pagkatapos ay i-click ang Refresh."
   }
 }

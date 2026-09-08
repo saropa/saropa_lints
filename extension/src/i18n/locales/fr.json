@@ -962,6 +962,10 @@
       "driftOnPill": "À la dérive sur le · {count}.",
       "driftOfflineTitle": "Drift Advisor activé mais aucun serveur n'a été trouvé.",
       "driftOfflinePill": "Drift hors ligne à la dérive.",
+      "driftAuthRequiredTitle": "Serveur Drift Advisor trouvé mais nécessite un token d'authentification — définir saropaLints.driftAdvisor.authToken",
+      "driftAuthRequiredPill": "Drift a besoin de token",
+      "driftAuthFailedTitle": "Drift Advisor a rejeté le jeton d'authentification configuré — cliquez pour le mettre à jour",
+      "driftAuthFailedPill": "Auth Drift échouée",
       "enabledRulesTitle": "Règles activées dans le niveau actuel.",
       "rulesCount": "{count} règles",
       "regressionTitle": "Score de santé passé de {previousScore} à {currentScore}",
@@ -2752,6 +2756,23 @@
       "title": "Corriger les ignorés périmés dans ce fichier"
     }
   },
+  "bugArchival": {
+    "diagnostic": {
+      "message": "Ce rapport est marqué « {status} » mais est toujours dans bugs/ — archivez-le dans plans/history/ avant de le fermer (voir ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "docPlacement": {
+    "diagnostic": {
+      "message": "Ce document reste encore lu comme un travail ouvert mais est archivé dans le dossier archive/historique — déplacez-le vers {openIssuesDir} au lieu."
+    },
+    "quickFix": {
+      "title": "Déplacez-vous vers {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Impossible de déplacer ce fichier — il ne se trouve pas dans un dossier de travail ouvert.",
+      "targetExists": "Impossible de déplacer — un fichier existe déjà à {targetPath}."
+    }
+  },
   "sidebar": {
     "actions": {
       "runAnalysisLabel": "Executer l'analyse",
@@ -2788,5 +2809,12 @@
       "bannerLabel": "Erreur d'activation",
       "bannerDescription": "Vérifier les logs du hôte de l'extension pour plus de détails"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Le serveur nécessite une authentification. Définissez un jeton dans Paramètres → Saropa Lints → Drift Advisor → Jeton d'authentification, puis cliquez sur Rafraîchir.",
+    "authFailed": "Authentification échouée — le serveur a rejeté le jeton configuré. Cliquez pour le mettre à jour dans les Paramètres.",
+    "discovering": "Découverte du serveur et récupération des problèmes…",
+    "noServerFound": "Aucun serveur Drift Advisor trouvé. Démarragez votre application avec le serveur en cours d'exécution, puis cliquez sur Rafraîchir.",
+    "integrationOff": "L'intégration Drift Advisor est désactivée. Activez-la dans les paramètres (saropaLints.driftAdvisor.integration), puis cliquez sur Rafraîchir."
   }
 }
