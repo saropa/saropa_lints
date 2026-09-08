@@ -393,6 +393,18 @@ export function buildScript(): string {
   bindClick('btn-refresh-extension', function () {
     vscode.postMessage({ type: 'paletteCommand', commandId: 'saropaLints.refresh' });
   });
+  // "Suppress all visible" (More menu, Bulk section) — modifies source files,
+  // so confirmation happens host-side (a modal there can block until the
+  // user answers; a webview cannot). The button itself is disabled when
+  // there are 0 findings (see buildMoreActionsMenu), so no findings-count
+  // guard is needed here. Note: this whole file is one big TS template
+  // literal (see buildScript below) — backticks in comments here would
+  // prematurely close it, so avoid them.
+  bindClick('btn-suppress-all', function () {
+    vscode.postMessage({ type: 'suppressAllVisible' });
+    var det = document.querySelector('details.more');
+    if (det) det.removeAttribute('open');
+  });
   // btn-run-empty / btn-refresh-empty were removed from the no-data empty panel
   // (deduped against the toolbar Run analysis). Only the filtered-empty state's
   // buttons remain.

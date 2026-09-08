@@ -667,6 +667,8 @@ export type MenuItem = {
   readonly label: string;
   readonly kbd?: string;
   readonly title?: string;
+  /** Renders the `disabled` attribute — used for bulk actions with 0 targets. */
+  readonly disabled?: boolean;
 };
 
 
@@ -714,6 +716,21 @@ export function buildMoreActionsMenu(exportCount: number, isAuditMode: boolean):
   exportItems.push(
     { cmd: 'saropaLints.issues.copyAsJson', glyph: '❏', label: l10n('findingsDash.menuPalette.copyTreeJson') },
   );
+  // "Suppress all visible" is a bulk write to source files (inserts `// ignore:`
+  // above every finding currently in `lastExportViolations`, i.e. the same
+  // post-filter set Copy JSON / Save report export), so it lives alongside
+  // those two rather than under Filter (which only touches dashboard state).
+  // Disabled at 0 findings — nothing to suppress, and it avoids a no-op
+  // confirmation dialog.
+  const bulkItems: readonly MenuItem[] = [
+    {
+      localId: 'btn-suppress-all',
+      glyph: '⊘',
+      label: l10n('findingsDash.toolbar.suppressAll'),
+      title: l10n('findingsDash.toolbar.suppressAllTitle'),
+      disabled: exportCount === 0,
+    },
+  ];
   const filterItems: readonly MenuItem[] = [
     { cmd: 'saropaLints.setGroupBy', glyph: '▦', label: l10n('findingsDash.menuPalette.groupBy') },
     { cmd: 'saropaLints.setIssuesFilter', glyph: '⌕', label: l10n('findingsDash.menuPalette.textFilter') },
@@ -739,6 +756,7 @@ export function buildMoreActionsMenu(exportCount: number, isAuditMode: boolean):
 
   const sections: ReadonlyArray<{ key: string; title: string; items: readonly MenuItem[] }> = [
     { key: 'export', title: l10n('findingsDash.menuPalette.menuGroupExport'), items: exportItems },
+    { key: 'bulk', title: l10n('findingsDash.menuPalette.menuGroupBulk'), items: bulkItems },
     { key: 'filter', title: l10n('findingsDash.menuPalette.menuGroupFilter'), items: filterItems },
     { key: 'open', title: l10n('findingsDash.menuPalette.menuGroupOpen'), items: openItems },
     { key: 'system', title: l10n('findingsDash.menuPalette.menuGroupSystem'), items: systemItems },
@@ -748,7 +766,11 @@ export function buildMoreActionsMenu(exportCount: number, isAuditMode: boolean):
     const idAttr = item.localId ? ` id="${escapeHtml(item.localId)}"` : '';
     const cmdAttr = item.cmd ? ` data-palette-cmd="${escapeHtml(item.cmd)}"` : '';
     const titleAttr = item.title ? ` title="${escapeHtml(item.title)}"` : '';
-    return `<button type="button" class="menu-item"${idAttr}${cmdAttr}${titleAttr}>
+    // Disabled bulk actions (e.g. Suppress all visible at 0 findings) render
+    // as a non-interactive menu item rather than being omitted, so the
+    // control's position in the menu stays predictable.
+    const disabledAttr = item.disabled ? ' disabled' : '';
+    return `<button type="button" class="menu-item"${idAttr}${cmdAttr}${titleAttr}${disabledAttr}>
       <span class="menu-item-label"><span class="glyph">${escapeHtml(item.glyph)}</span>${escapeHtml(item.label)}</span>
       <span class="kbd">${escapeHtml(item.kbd ?? '')}</span>
     </button>`;

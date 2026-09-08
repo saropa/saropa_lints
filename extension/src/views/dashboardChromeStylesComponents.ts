@@ -56,12 +56,13 @@ export function chromeHeroAndGauge(): string {
  * line — .section > summary > h2 .pill and .kpi-v.pill both rely on this base
  * rule; only the status-line-specific affordances below (.pill-action, .toggle,
  * .freshness) stay scoped, since those interactions only exist there today.
- * systemHealth webviews (healthPanel, machineDashboard) also define local .pill
- * — equal specificity, later-in-source wins, so their overrides hold ONLY
- * because getDashboardChromeStyles() is injected before their local styles.
- * Do not reorder injection or raise this rule's specificity without checking
- * those two files. */
-.pill {
+ * Doubled selector (.pill.pill) raises specificity above a single-class .pill
+ * override, ensuring the chrome base wins unless a local stylesheet
+ * intentionally doubles its own selector. This eliminates the source-order
+ * dependency with healthPanel-styles.ts and machineDashboard-styles.ts, which
+ * both define a single-class .pill that now correctly overrides only the
+ * properties they re-declare (their .pill specificity is lower). */
+.pill.pill {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 1px 8px;
   border-radius: 999px;

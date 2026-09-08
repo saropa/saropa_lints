@@ -9,6 +9,9 @@ import {
   type ViewSuppressionsSlice,
 } from '../../views/violationsDashboardHtml';
 import type { DashboardSection } from '../../views/issuesTreeModel'; // type-only: no vscode at runtime
+// Violation is the shared export/violation shape used by the suppressed-
+// findings slice below (type-only: no runtime import needed).
+import type { Violation } from '../../violationsReader';
 
 const emptyTodoHack = { enabled: false, capped: false, todos: [], hacks: [] };
 const emptyDrift = { integrationEnabled: false, connected: false, issues: [] as [] };
@@ -656,5 +659,53 @@ describe('violationsDashboardHtml', () => {
     }));
     assert.ok(auditHtml.includes('id="btn-copy-all"'));
     assert.ok(auditHtml.includes('id="btn-save-all"'));
+  });
+
+  /* ──────────────────────────────────────────────────────────────────────
+   * "Suppressed Findings" subsection (distinct from the "Suppressions
+   * (export)" counts-only band). Gated entirely on `input.suppressedFindings`
+   * being populated with total > 0 — see buildSuppressedFindingsBlock in
+   * violations-dashboard-panels.ts. These two tests pin both sides of that
+   * gate so a caller that forgets to wire the slice (or wires an empty one)
+   * fails loudly instead of silently losing the section.
+   * ────────────────────────────────────────────────────────────────────── */
+  it('renders suppressed findings section when suppressedFindings slice is provided', () => {
+    // The suppressed-findings section only appears when the audit ran with
+    // --include-suppressed and there are actually suppressed violations.
+    const suppressedViolation: Violation = {
+      file: 'lib/example.dart',
+      line: 42,
+      rule: 'prefer_const_declarations',
+      message: 'Prefer const with constant value',
+      severity: 'info',
+      impact: 'info',
+      suppressedBy: 'ignore',
+    };
+    const html = renderViolationsDashboardHtml(minimalInput({
+      suppressedFindings: {
+        total: 1,
+        byKind: [['ignore', 1]],
+        violations: [suppressedViolation],
+      },
+    }));
+    // Section wrapper uses the data-section-id convention shared by every
+    // other collapsible section on this dashboard.
+    assert.ok(html.includes('data-section-id="suppressed-findings"'));
+    // The unsuppress button carries the violation identity for the host handler.
+    assert.ok(html.includes('data-unsuppress'));
+    // Per-kind breakdown renders the localized "// ignore:" label from en.json.
+    assert.ok(html.includes('// ignore:'));
+  });
+
+  it('omits suppressed findings section when no suppressedFindings slice is provided', () => {
+    // Default (live mode, no audit) — the section must not render since
+    // buildSuppressedFindingsBlock early-returns on an undefined slice.
+    // NOTE: `data-section-id="suppressed-findings"` also appears verbatim
+    // inside the inline script's querySelector call (which always ships),
+    // so a plain string.includes on that selector always matches. Use the
+    // section's aria-label instead — it is emitted only by the actual
+    // section wrapper markup, never by the script or <style> blocks.
+    const html = renderViolationsDashboardHtml(minimalInput({}));
+    assert.ok(!html.includes('aria-label="Suppressed findings section"'));
   });
 });

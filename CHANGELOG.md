@@ -83,6 +83,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - "Include suppressed" checkbox in the Findings Dashboard toolbar (visible only in audit mode) passes the new `--include-suppressed` CLI flag through the UI — check it, run audit, and suppressed violations appear in the findings table with an orange "Suppressed" pill badge. No config files are touched.
 - New "Copy everything as JSON" and "Save everything report" items in the More-actions menu (audit mode only) export the raw, unfiltered audit result — bypassing all dashboard filters and including suppressed findings — so you can get a true everything-export without manually clearing filters first.
 - New "Suppressed Findings" collapsible section appears in the dashboard when audit mode has `--include-suppressed` active and there are suppressed violations. Groups findings by suppression kind (ignore, ignore_for_file, baseline) with a mini table and per-row "Unsuppress" button (currently shows a hint — full comment-removal is planned).
+- New "Suppress all visible" bulk action in the Findings Dashboard's More-actions menu inserts `// ignore: <rule>` above every finding currently shown in the table, in one confirmed, all-or-nothing edit across every affected file. Disabled when there are no findings to suppress.
 
 ### Fixed (Extension)
 

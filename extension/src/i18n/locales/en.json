@@ -1040,7 +1040,13 @@
       "copyEverythingJson": "Copy everything as JSON",
       "copyEverythingJsonTitle": "Copy ALL audit findings as JSON — unfiltered, including suppressed",
       "saveEverythingReport": "Save everything report",
-      "saveEverythingReportTitle": "Save ALL audit findings as JSON to reports/ — unfiltered, including suppressed"
+      "saveEverythingReportTitle": "Save ALL audit findings as JSON to reports/ — unfiltered, including suppressed",
+      "suppressAll": "Suppress all visible",
+      "suppressAllTitle": "Insert // ignore: comments above every visible finding",
+      "suppressAllConfirm": "This will insert {count} // ignore: comments across your source files. This cannot be undone from the dashboard — use your editor's undo or version control to revert. Continue?",
+      "suppressAllProceed": "Suppress all",
+      "suppressAllDone": "Inserted {count} // ignore: comments.",
+      "suppressAllFailed": "Could not apply bulk suppress — some files may be read-only."
     },
     "audit": {
       "scopeFieldTitle": "Choose what the findings below are sourced from",
@@ -1097,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-enable disabled rules",
       "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
       "menuGroupExport": "Export",
+      "menuGroupBulk": "Bulk actions",
       "menuGroupFilter": "Filter & focus",
       "menuGroupOpen": "Open dashboard",
       "menuGroupSystem": "System"

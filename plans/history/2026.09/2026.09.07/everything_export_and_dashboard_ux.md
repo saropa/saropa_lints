@@ -56,10 +56,23 @@ The Findings Dashboard lacked a way to export the full, unfiltered audit result 
 - `violations-dashboard-script.ts`: event-delegation click handler for `[data-unsuppress]` buttons.
 - `en.json`: 14 new keys under `findingsDash.suppressedFindings.*`.
 
+**Hardening (second reflection gate)**
+- `.pill.pill` doubled CSS selector: raises specificity above single-class `.pill` overrides structurally, replacing source-order dependence between chrome, healthPanel, and machineDashboard styles.
+- Two new tests for suppressed findings section HTML: presence test (with slice) and absence test (without slice, using `aria-label` instead of `data-section-id` to avoid false positive from inline script querySelector string).
+- `SuppressionTracker.reset()` now also resets `captureDetails = false`, preventing cost leak in long-lived processes.
+- Deduplicated everything-export prep into `prepareEverythingExport()` helper.
+
+**"Suppress all visible" bulk action**
+- `violations-dashboard-top.ts`: new "Suppress all visible" menu item under "Bulk actions" group, disabled at 0 findings.
+- `violations-dashboard-script.ts`: click handler posts `suppressAllVisible` message.
+- `violationsWideReportView.ts`: `suppressAllVisible()` reads each affected file once, inserts `// ignore: <rule>` in descending line order (so earlier inserts don't shift later targets), with indentation preservation and modal confirmation dialog. All strings l10n'd.
+- `en.json`: 6 new keys under `findingsDash.toolbar.suppressAll*`, 1 under `findingsDash.menuPalette.menuGroupBulk`.
+
 ### Test results
 - `dart test test/cli/audit_include_suppressed_test.dart` — 5/5 pass
-- `npx mocha violationsDashboardHtml.test.js` — 39/39 pass (includes new audit-mode export test)
+- Extension mocha — 413/413 pass
 - `npx tsc --noEmit -p .` — exit 0
+- `npx tsc -p tsconfig.test.json` — exit 0
 
 ### Known limitations
 - All UI changes are unverified visually (no F5 + screenshot) per `.claude/rules/extension-verification.md`.

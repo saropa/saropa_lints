@@ -873,6 +873,20 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       }
       return;
     }
+    if (data.type === 'suppressAllVisible') {
+      // Bulk action operates on the same post-filter set Copy JSON / Save
+      // report already export — "visible" means "currently in the table",
+      // not the unfiltered audit result.
+      await suppressAllVisible(lastExportViolations);
+      // The edit does not remove entries from `lastExportViolations` itself
+      // (that only happens on the next analysis run / disk reload), but the
+      // rebuild re-evaluates the "Suppress all" button's disabled state and
+      // any other UI derived from current config, so it is not a no-op.
+      if (currentPanel) {
+        await rebuildDashboardHtml(context, currentPanel);
+      }
+      return;
+    }
     if (data.type === 'unsuppress') {
       // Stub: actual // ignore: comment removal is complex (multi-line,
       // ignore_for_file at file top, baseline entries in a separate file).
@@ -1263,6 +1277,94 @@ async function saveReportJson(violations: readonly Violation[]): Promise<void> {
 
 function pad2(n: number): string {
   return String(n).padStart(2, '0');
+}
+
+/**
+ * "Suppress all visible" bulk action — inserts `// ignore: <rule>` immediately
+ * above every violation in `violations` (the Findings table's current
+ * post-filter set), preserving each target line's existing indentation.
+ *
+ * Applied as a single `WorkspaceEdit` so the write is all-or-nothing across
+ * every touched file: `vscode.workspace.applyEdit` either lands every insert
+ * or none, so a bulk-suppress across dozens of files never leaves the
+ * project half-annotated. Files are read with `vscode.workspace.fs.readFile`
+ * (not `openTextDocument`) and grouped by path so each file is read exactly
+ * once no matter how many violations it has, and violations within a file
+ * are processed in descending line order so an earlier insert never shifts
+ * the line number a later insert targets.
+ */
+async function suppressAllVisible(violations: readonly Violation[]): Promise<void> {
+  // Nothing to do — also guards against showing a confirmation dialog for a
+  // no-op (the toolbar button is disabled at 0 findings, but the message
+  // handler is defensive against a stale/racing webview).
+  if (violations.length === 0) {
+    return;
+  }
+
+  // This writes to source files with no in-dashboard undo, so require an
+  // explicit confirmation; `{ modal: true }` blocks until answered, which a
+  // webview-side confirm() cannot do for a host-side file edit.
+  const proceedLabel = l10n('findingsDash.toolbar.suppressAllProceed');
+  const confirmed = await vscode.window.showWarningMessage(
+    l10n('findingsDash.toolbar.suppressAllConfirm', { count: String(violations.length) }),
+    { modal: true },
+    proceedLabel,
+  );
+  if (confirmed !== proceedLabel) {
+    return;
+  }
+
+  const root = getProjectRoot();
+  if (!root) {
+    void vscode.window.showErrorMessage(l10n('findingsDash.toolbar.suppressAllFailed'));
+    return;
+  }
+
+  // Group by file path first so each file is read from disk exactly once.
+  const byFile = new Map<string, Violation[]>();
+  for (const v of violations) {
+    const list = byFile.get(v.file) ?? [];
+    list.push(v);
+    byFile.set(v.file, list);
+  }
+
+  const edit = new vscode.WorkspaceEdit();
+  let insertCount = 0;
+  for (const [file, fileViolations] of byFile) {
+    const uri = resolveWorkspaceFileUri(root, file);
+    let lines: string[];
+    try {
+      const bytes = await vscode.workspace.fs.readFile(uri);
+      lines = new TextDecoder('utf-8').decode(bytes).split('\n');
+    } catch {
+      // Stale violations.json can reference a file that moved/was deleted
+      // since the last scan — skip it rather than aborting the whole batch.
+      continue;
+    }
+    // Descending line order: each `edit.insert` adds a whole line above the
+    // violation's original line, which would shift every subsequent
+    // violation in this file down by one if processed ascending.
+    const sorted = [...fileViolations].sort((a, b) => b.line - a.line);
+    for (const v of sorted) {
+      const lineIndex = Math.max(0, v.line - 1);
+      const targetLine = lines[lineIndex] ?? '';
+      // Match the violation line's leading whitespace so the inserted
+      // comment sits at the same indentation as the code it suppresses.
+      const indentMatch = /^[ \t]*/.exec(targetLine);
+      const indent = indentMatch ? indentMatch[0] : '';
+      edit.insert(uri, new vscode.Position(lineIndex, 0), `${indent}// ignore: ${v.rule}\n`);
+      insertCount++;
+    }
+  }
+
+  const applied = await vscode.workspace.applyEdit(edit);
+  if (applied) {
+    void vscode.window.showInformationMessage(
+      l10n('findingsDash.toolbar.suppressAllDone', { count: String(insertCount) }),
+    );
+  } else {
+    void vscode.window.showErrorMessage(l10n('findingsDash.toolbar.suppressAllFailed'));
+  }
 }
 
 function resolveWorkspaceFileUri(root: string, filePathFromReport: string): vscode.Uri {

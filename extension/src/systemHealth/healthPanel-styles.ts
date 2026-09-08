@@ -43,9 +43,10 @@ ${getEngineCardsStyles()}
   white-space: normal;
   word-break: break-all;
 }
-/* Local .pill overrides the chrome .pill (same specificity, later source
-   order wins). This depends on getDashboardChromeStyles() being injected
-   BEFORE this stylesheet — see dashboardChromeStylesComponents.ts. */
+/* Local .pill: the chrome base rule is doubled (.pill.pill in
+   dashboardChromeStylesComponents.ts) to raise its specificity above this
+   single-class selector, so this override applies regardless of injection
+   order relative to getDashboardChromeStyles(). */
 .pill {
   display: inline-block;
   padding: 1px 7px;
