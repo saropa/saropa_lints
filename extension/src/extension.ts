@@ -74,7 +74,8 @@ import { saropaLintsDataPath } from './reportsPaths';
 import { registerProjectMapCommand } from './views/projectMapView';
 import { registerHealthCodeLens } from './views/healthCodeLens';
 import { discoverServer } from './driftAdvisor/discovery';
-import { fetchIssues } from './driftAdvisor/client';
+import { fetchIssues, DriftAuthError } from './driftAdvisor/client';
+import { getDriftAuthToken } from './driftAdvisor/auth';
 import { mapIssuesToLocations, disposeTableLocationWatcher } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { maybeRecommendDriftAdvisor } from './driftAdvisor/driftAdvisorRecommendNudge';
@@ -2606,8 +2607,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const hosts = (Array.isArray(hostsCfg) ? hostsCfg : [])
         .map((h) => (h ?? '').trim())
         .filter(Boolean);
+      // Hoisted so the catch block can report an auth failure against the same
+      // server without re-running discovery.
+      let server: Awaited<ReturnType<typeof discoverServer>> = null;
       try {
-        const server = await discoverServer(
+        server = await discoverServer(
           portMin,
           portMax,
           undefined,
@@ -2620,7 +2624,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           void vscode.window.setStatusBarMessage('Saropa Drift Advisor: no server found', 5000);
           return;
         }
-        const issues = await fetchIssues(server);
+        // Read the auth token from settings so authenticated servers can be queried.
+        const authToken = getDriftAuthToken();
+        const issues = await fetchIssues(server, authToken);
         const mapped = await mapIssuesToLocations(issues);
         driftAdvisorProvider.setState(server, mapped);
         setDriftAdvisorServerConnected(true);
@@ -2630,11 +2636,19 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         // Drift Advisor extension (which owns the richer Problems-panel experience)
         // is not installed, surface a once-per-workspace recommendation to install it.
         void maybeRecommendDriftAdvisor(context, true);
-      } catch {
-        driftAdvisorProvider.setState(null, []);
-        await onDriftAdvisorDisconnected(context.workspaceState);
-        void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
-        void vscode.window.setStatusBarMessage('Saropa Drift Advisor: error fetching issues', 5000);
+      } catch (err) {
+        if (err instanceof DriftAuthError) {
+          // Server is reachable but rejected the token — distinct from "no server"
+          // so the tree can show an actionable auth error instead of going dark.
+          if (server) driftAdvisorProvider.setAuthFailed(server);
+          void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
+          void vscode.window.setStatusBarMessage('Saropa Drift Advisor: authentication failed', 5000);
+        } else {
+          driftAdvisorProvider.setState(null, []);
+          await onDriftAdvisorDisconnected(context.workspaceState);
+          void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', false);
+          void vscode.window.setStatusBarMessage('Saropa Drift Advisor: error fetching issues', 5000);
+        }
       } finally {
         driftAdvisorRefreshInProgress = false;
         refreshAllSections();

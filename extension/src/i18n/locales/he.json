@@ -713,6 +713,10 @@
     "reloadLater": "מאוחר יותר אחר כך"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: שגיאה",
+      "tooltip": "تحديثแถת الحالة נכשל — לחץ כדי לראות פרטים. הרחבת התוכנה עדיין יכולה לעבוד; נסה להריץ פקודה מהסרגל של הפקודות."
+    },
     "menu": {
       "enableOn": "ניתוח מופעל (לחץ כדי לנטרל)",
       "enableOff": "ניתוח מושתק (לחץ כדי לאפשר)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count}daemon(s) מוסתרים",
       "openHint": "לחץ כדי לפתוח מצב בריאות תהליך",
       "systemRam": "מערכת: {free} מתוך {total} חפשי",
-      "systemLow": "⚠ מערכת: {free} מתוך {total} חופשיים"
+      "systemLow": "⚠ מערכת: {free} מתוך {total} חופשיים",
+      "extensionHostWarning": "⚠ מארח הרחבת אקס텐שן: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} תהליך(ים) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "שרת ניתוח {count} détected — סגור חלונות VS Code לא בשימוש",
       "daemonCount": "Flutter דמונים: {total} ({orphaned} אובד)",
       "scanDaemonOrphans": "דמוניס קסן אובירנים: {count} — השתמש בנקה כדי לסיים",
+      "extensionHostSection": "מארח הרחבת אפליקציה: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "זיכרון Saropa גבוה — לחץ כדי לראות פרטים",
       "criticalHint": "הזיכרון Saropa קריטי — מומלץ לנקות"
     },
@@ -806,6 +812,35 @@
       "kill": "הכבה",
       "killed": "מתווך",
       "killFailed": "נכשל"
+    },
+    "watcherExclude": {
+      "prompt": "{count} recommended file-watcher exclusion(s) are missing from this workspace: {patterns}. Adding them prevents VS Code from tracking large build artifacts and heap dumps that waste memory.",
+      "addAll": "הוסף כל",
+      "dismiss": "פיטורים.",
+      "added": "הוספו סנאי שגיאה {count} למסגרת העבודה."
+    },
+    "hazardScan": {
+      "warning": "מצאתי קבצים גדולים {count} שלא נמחקו מהצופה לקבצים: {files}. אלו יכולים לאיים את הזיכרון ולצמצם את VS Code.",
+      "addExclusions": "הסר מהמר察ור",
+      "dismiss": "פיטורים.",
+      "added": "הוספו {count} mẫu תצפית חסימה ל설וגות העבודה."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "מוכנות לתחום עבודה: כל סגור — אין בעיות מוצגות",
+    "quickPickTitle": "בעיות התאמה למרחב העבודה",
+    "quickPickPlaceholder": "בחר בעיה כדי לראות פרטים או לתקן אותה",
+    "statusBar": {
+      "red": "🔴 {count} בעיה(ות) במרחב העבודה",
+      "yellow": "⚠ {count} בעיה(ות) במרחב העבודה"
+    },
+    "issue": {
+      "hazardFiles": "$(אזהרה) {count} קבצים גדולים לא מ-excluded",
+      "hazardFilesDetail": "הערכים הגדולים שנראים על ידי מונה הערכים יכולים לאיים את הזיכרון ול戛ר VS Code. רץ על סקר סיכון כדי לשלוח אותם.",
+      "missingExcludes": "$(info) {count} חסר/ים מוניטור שיקול היעדרים",
+      "missingExcludesDetail": "השכלות הניתוק של קבצים לא מותאמות. הוספתן מונעת שימוש לא הדרוש ב메モרי.",
+      "hostMemory": "$(alert) מארח הרחבת ה-${size}",
+      "hostMemoryDetail": "תהליך מארח ההרחבה RSS חורג מסף האזהרה. פתח את Process Health לפרטים."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "לא היו קבצים שנפגעו.",
       "filesTitle": "קבצים נפרדים התורמים לפחות לממצא אחד.",
       "topRuleLabel": "חוק עליון, כלל עליון.",
-      "topRuleTitle": "מסנן את הממצאים כדי לשלוט {name}."
+      "topRuleTitle": "מסנן את הממצאים כדי לשלוט {name}.",
+      "sectionHeading": "סקירת תיאור",
+      "sectionAria": "סטטיסטיקות כללית"
     },
     "toolbar": {
       "ariaFiltersActions": "מסננים ופעולות.",
@@ -999,7 +1036,17 @@
       "moreSummary": "יותר, יותר, עוד",
       "moreChevron": "▾",
       "copyJsonTitle": "העתק הפרות מסוננות כ-JSON ({count})",
-      "saveReportTitle": "שמור הפרות מסוננות כ-JSON לדוחות/YYY YMMDD/"
+      "saveReportTitle": "שמור הפרות מסוננות כ-JSON לדוחות/YYY YMMDD/",
+      "copyEverythingJson": "העתק הכל כJSON",
+      "copyEverythingJsonTitle": "העתק את כל תוצאות האudit כJSON — ללא מסננים, כולל מונעים",
+      "saveEverythingReport": "сохранить всё отчет",
+      "saveEverythingReportTitle": "שמור על כל תוצאות האudit כJSON ל-raports/ – ללא מסננים, כולל מונעים",
+      "suppressAll": "השתלט על כל מה שמוצג",
+      "suppressAllTitle": "הכנס // זניחה:تعليقات מעל כל מציאת נראות",
+      "suppressAllConfirm": "הנהל זה יתאים {count} // זנתר:تعليقات על קבצי המקור שלך. זה לא ניתן לשחזור מהלוח — השתמש ב.undo של המחבר או בניהול גרסאות כדי לשחזר. המשך?",
+      "suppressAllProceed": "השתלט על כל",
+      "suppressAllDone": "הוספה {count} // זנתר:تعليقات.",
+      "suppressAllFailed": "לא ניתן להפעלת בדיקה מונעת בדרכים רבות — חלק מהקבצים עשויים להיות קרואים בלבד."
     },
     "audit": {
       "scopeFieldTitle": "اختر מהแหล่งที่ผลลัพธ์ด้านล่างมาจาก",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "שינה את ה-vs ל一支…",
       "branchPlaceholder": "שם ענף",
       "branchAria": "שעלה להשוואה",
+      "includeSuppressedLabel": "הכנס שגשוגים",
+      "includeSuppressedTitle": "הוסף גם תוצאות שמסתתרות בדרך כלל באמצעות // ignore:, // ignore_for_file:, או רשומה בסיסית — כל אחת מותאמת כיצד היא נסמכה. תצורת הפרויקט שלך אינה משתנה.",
       "runButton": "הריץ אודיט",
       "runButtonTitle": "הפעלה של CLI לניתוח פרויקט מלא והעלאה של תוצאותיו כאן",
       "cancelButton": "ביטול לבטל",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "אפשרות להפעיל מחדש כללים מופרעים.",
       "reEnableQuickPickPlaceholder": "בחרו אחד או יותר כללים כדי לאפשר מחדש את הפעילות.",
       "menuGroupExport": "ייצוא יצוא היציאה",
+      "menuGroupBulk": "פעולות מונחות",
       "menuGroupFilter": "מסנן & התמקדות",
       "menuGroupOpen": "פתח את לוח המחוונים.",
       "menuGroupSystem": "מערכת מערכות מערכת"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "ממצאים הממצאים",
+      "heading": "ממצאים הממצאים",
       "expandAll": "הרחיב את כל הכל",
       "collapseAll": "כולם מתמוטטים.",
       "bulkSelected": "{count} נבחרו",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "פעולות שורה (Row actions)",
       "selectRowAria": "בחר את שורת המציאה הזו.",
       "copyRowTitle": "העתיק את הממצא הזה כ-JSON.",
+      "suppressedBadge": "הסמכה",
+      "suppressedByTitle": "מוסתרה מהמבט הרגיל שלך על ידי {kind} — מוצגת רק כאן בגלל ש\"הצגת מונעים\" מופעל",
       "metaShown": "{filtered} מוצגים",
       "metaAfterDisable": "{total} לאחר מסנן כללים מושבתים",
       "metaSourceCap": "מקור מוגבל ל- {max} עבור ביצועים.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "פתח בדפדפן, פתחי אותו בבראוזר.",
       "headingIssues": "Drift Advisor",
       "disable": "נטרל את Drift Advisor"
+    },
+    "suppressedFindings": {
+      "heading": "ממצאים מוסכמים",
+      "headingAria": "תבנית תוצאות מוסרות",
+      "byKind": "{count} על ידי {kind}",
+      "kindIgnore": "// התייחסות:",
+      "kindIgnoreForFile": "// התייחסות_ל_קובץ:",
+      "kindBaseline": "קו בסיס",
+      "unsuppressButton": "לא להצמצם",
+      "unsuppressTitle": "הסר את ההיעדרות כדי שהמצאה זו תופיע בסריקות רגילות",
+      "unsuppressHint": "כדי לא להצמצם {rule} ב-{file}:{line}, הסר את הערה // ignore: מעל 줄 זו.",
+      "columnFile": "קובץ קבצים File File",
+      "columnLine": "קו קו שורה שורה",
+      "columnRule": "חוקי בית סעיף",
+      "columnKind": "סוג",
+      "columnAction": "פעולה"
     },
     "suppressions": {
       "sectionAria": "דחיפות הדחייה",
@@ -1261,6 +1330,7 @@
     "noReportYet": "אין עדיין דיווח על הפרות. הפעל תחילה ניתוח Saropa Lints.",
     "clipboardCopyFailed": "לא ניתן היה להעתיק לצינור.",
     "copiedViolationsJson": "העתק {count} הפרה (((s) כJSON.",
+    "copiedEverythingJson": "העתקה {count} תוצאות ללא מסננים ללוחות העתקה.",
     "copiedOneViolationJson": "העתקנו 1 הפרה כ- JSON.",
     "driftNotConnected": "שרת Drift Advisor אינו מחובר.",
     "copiedBulkFindings": "העתק {count} מוצא נבחר (((s) כJSON.",

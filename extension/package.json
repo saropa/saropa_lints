@@ -1674,6 +1674,11 @@
             "type": "boolean",
             "default": true,
             "description": "%config.property.driftAdvisor.showInProblems.description%"
+          },
+          "saropaLints.driftAdvisor.authToken": {
+            "type": "string",
+            "default": "",
+            "description": "%config.property.driftAdvisor.authToken.description%"
           }
         }
       },

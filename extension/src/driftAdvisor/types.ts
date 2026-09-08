@@ -33,6 +33,8 @@ export interface DriftHealthResponse {
   ok?: boolean;
   version?: string;
   capabilities?: string[];
+  /** Server indicates it requires a Bearer token for data endpoints. */
+  authRequired?: boolean;
 }
 
 export interface DriftIssuesResponse {
@@ -42,7 +44,11 @@ export interface DriftIssuesResponse {
 /** Result of discovering a Drift Advisor server. */
 export interface DriftServerInfo {
   baseUrl: string;
+  /** Hostname extracted from baseUrl at discovery time (avoids re-parsing). */
+  host: string;
   port: number;
   version?: string;
   capabilities: string[];
+  /** True when health reports authRequired and no token is configured yet. */
+  authRequired?: boolean;
 }

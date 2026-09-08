@@ -713,6 +713,10 @@
     "reloadLater": "बाद में बाद में फिर बाद में"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: त्रुटि",
+      "tooltip": "स्टेटस बार अपडेट विफल रहा — क्लिक करें डिटेल के लिए। एक्सटेंशन अभी भी काम कर सकता है; कमांड पैलेट से कमांड चलाने की कोशिश करें।"
+    },
     "menu": {
       "enableOn": "विश्लेषण सक्रिय (अक्षय करने के लिए क्लिक करें)",
       "enableOff": "विश्लेषण अक्षम (सक्षम करने के लिए क्लिक करें)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} अकेले डेमोन(s)",
       "openHint": "क्लिक करें ताकि प्रोसेस हेल्थ खोलें",
       "systemRam": "सिस्टम: {free} में {total} खाली",
-      "systemLow": "⚠ सिस्टम: {free} में {total} मुक्त"
+      "systemLow": "⚠ सिस्टम: {free} में {total} मुक्त",
+      "extensionHostWarning": "⚠ एक्सटेंशन होस्ट: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} प्रक्रिया(एं) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} विश्लेषण सर्वर (सर्वर) डिटेक्टेड — अनुपयोगी VS Code विंडोज़ बंद करें",
       "daemonCount": "Flutter डेमोन्स: {total} ({orphaned} अकेला)",
       "scanDaemonOrphans": "अकेले स्कैन डेमोन: {count} — स्वच्छ करें के उपयोग करके मारें",
+      "extensionHostSection": "प्रस्तावक: {rss} RSS ({heap} / {heapTotal} खाली स्थान)",
       "warningHint": "Saropa स्मृति उच्च है — विवरण के लिए क्लिक करें",
       "criticalHint": "Saropa मेमोरी काफी महत्वपूर्ण है — सफाई करना अनुशोधन किया जाता है"
     },
@@ -806,6 +812,35 @@
       "kill": "किल्ल",
       "killed": "मार दिया",
       "killFailed": "असफल"
+    },
+    "watcherExclude": {
+      "prompt": "{count} नामक फ़ाइल-वॉचर बाहरी वस्तुएं इस वर्कस्पेस में अनुपस्थित हैं: {patterns}। इनको जोड़ने से VS Code बड़े बिल्ड आर्टिफ़ैक्ट और हीप डंप के ट्रैक करने से रोका जा सकता है जो मेमोरी के अतिक्रमण का कारण बनते हैं।",
+      "addAll": "सभी जोड़ें",
+      "dismiss": "बर्खास्तगी को खारिज करें।",
+      "added": "{count} फ़ाइल-वॉचर बाहरी वस्तुओं को कार्यस्थल सेटिंग में जोड़ दिया गया।"
+    },
+    "hazardScan": {
+      "warning": "{count} बड़े फ़ाइल (एस) का पता लगाया गया है जो फ़ाइल वॉचर से बाहर नहीं किया गया है: {files}। ये मेमोरी के अतिक्रमण कर सकते हैं और VS Code को बंद कर सकते हैं।",
+      "addExclusions": "अवलोकन से बाहर करें",
+      "dismiss": "बर्खास्तगी को खारिज करें।",
+      "added": "अतिरिक्त {count} वॉचर बाहरी पैटर्न(स) को कार्यस्थल सेटिंग में जोड़ दिया गया।"
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "कार्यस्थल तैयारी: सभी स्पष्ट - कोई समस्या नहीं पाई गई।",
+    "quickPickTitle": "कार्यस्थल तैयारी समस्याएँ",
+    "quickPickPlaceholder": "किसी भी समस्या का चयन करें जिसके बारे में विस्तार से जानकारी लें या इसे ठीक करें",
+    "statusBar": {
+      "red": "🔴 {count} वर्कस्पेस समस्या(एं)",
+      "yellow": "⚠ {count} वर्कस्पेस समस्या(एं)"
+    },
+    "issue": {
+      "hazardFiles": "$(सावधानी) {count} बड़े अनलग फ़ाइल (एस)",
+      "hazardFilesDetail": "महान फ़ाइलें जो फ़ाइल वॉचर द्वारा ट्रैक की जा रही हैं, मेमोरी को खाली कर सकती हैं और VS Code को बंद कर सकती हैं। खतरनाक स्कैन चलाएं ताकि उन्हें बाहर कर दें।",
+      "missingExcludes": "$(info) {count} वॉचर एक्स्क्लुजन अपेक्षित",
+      "missingExcludesDetail": "अनुशोधन आवश्यक फ़ाइल-वॉचर बाहरी पैटर्न निर्दिष्ट नहीं किए गए हैं। उनके जोड़ने से अतिरिक्त स्मृति उपयोग को रोका जा सकता है।",
+      "hostMemory": "$(alert) एक्सटेंसन होस्ट इस्तेमाल कर रहा है {size}",
+      "hostMemoryDetail": "प्रक्रिया आवरण प्रक्रिया RSS सावधानी सीमा के बाहर है। विवरण के लिए प्रक्रिया स्वास्थ्य खोलें।"
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "कोई फ़ाइल प्रभावित नहीं हुई।",
       "filesTitle": "अलग-अलग फाइलें जो कम से कम एक खोज में योगदान करती हैं।",
       "topRuleLabel": "शीर्ष नियम, शीर्ष नियम।",
-      "topRuleTitle": "{name} नियम के लिए फ़िल्टर निष्कर्षों को फ़िल्ट करें।"
+      "topRuleTitle": "{name} नियम के लिए फ़िल्टर निष्कर्षों को फ़िल्ट करें।",
+      "sectionHeading": "ओवरव्यू",
+      "sectionAria": "सारांश सांख्यिकी"
     },
     "toolbar": {
       "ariaFiltersActions": "फ़िल्टर और क्रियाएँ।",
@@ -999,7 +1036,17 @@
       "moreSummary": "अधिक More और अधिक",
       "moreChevron": "▾",
       "copyJsonTitle": "JSON ({count}) के रूप में फ़िल्टर किए गए उल्लंघन की प्रतिलिपि बनाएँ।",
-      "saveReportTitle": "फ़िल्टर किए गए उल्लंघन को JSON के रूप में रिपोर्ट/YYY YMMDD/ पर सहेजें।"
+      "saveReportTitle": "फ़िल्टर किए गए उल्लंघन को JSON के रूप में रिपोर्ट/YYY YMMDD/ पर सहेजें।",
+      "copyEverythingJson": "सभ कुछ कॉपी करें जैसा JSON में",
+      "copyEverythingJsonTitle": "सभी अनुसंधान निर्णयों की प्रतिलिपि ले लो JSON में — अनुच्छिन्न, समावेशित",
+      "saveEverythingReport": "सब कुछ बचाएं रिपोर्ट",
+      "saveEverythingReportTitle": "सभी अनुसंधान निर्णयों को JSON के रूप में reports/ में बचाएं — अनुसंधान नहीं किए गए, समावेशित विरक्त",
+      "suppressAll": "सभी दिखाई देने वाले अक्षम करें",
+      "suppressAllTitle": "// अग्नो: कमेंट हर दृश्य खोज में ऊपर डालें",
+      "suppressAllConfirm": "यह आपके स्रोत फ़ाइलों में {count} // ignore: comments डालेगा। इसे डैशबोर्ड से वापस नहीं किया जा सकता - आप अपने एडिटर के undo या संस्करण नियंत्रण का उपयोग करके वापस ले सकते हैं। जारी रखें?",
+      "suppressAllProceed": "सभी अक्षम करें",
+      "suppressAllDone": "आगे बढ़ाया गया {count} // अग्नोर: टिप्पणियाँ।",
+      "suppressAllFailed": "बूल्क सुपरेस्स के लागू करने में असमर्थ — कुछ फ़ाइलें पढ़-लिख संभवतः नहीं हो सकती।"
     },
     "audit": {
       "scopeFieldTitle": "खोज के निम्नलिखित परिणाम कहां से लिए गए हैं",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "ब्रांच में बदलाव…",
       "branchPlaceholder": "ब्रांच नाम",
       "branchAria": "ब्रांच को तुलना के लिए",
+      "includeSuppressedLabel": "अनुमति दी गई",
+      "includeSuppressedTitle": "भी अनुमान शामिल करें जो // अग्नि:, // अग्नि_के_लिए_फ़ाइल:, या एक आधार एंट्री द्वारा छिपाए गए हैं — प्रत्येक को इसके द्वारा कैसे अक्षम किया गया था उसके साथ चिह्नित किया गया है। आपके प्रोजेक्ट कॉन्फ़िगरेशन बदला नहीं गया।",
       "runButton": "अपडेट चेक करें",
       "runButtonTitle": "पूरे प्रोजेक्ट के अभिमान CLI को चलाएं और इसके परिणाम यहाँ लोड करें",
       "cancelButton": "रद्द करें रद्द करें",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "अक्षम नियमों को फिर से सक्षम करें।",
       "reEnableQuickPickPlaceholder": "पुनः सक्षम करने के लिए एक या अधिक नियमों का चयन करें।",
       "menuGroupExport": "निर्यात निर्यात करें।",
+      "menuGroupBulk": "बूल्क कार्य操作",
       "menuGroupFilter": "फ़िल्टर और फोकस करें।",
       "menuGroupOpen": "डैशबोर्ड खोलें।",
       "menuGroupSystem": "सिस्टम सिस्टम सिस्टम।"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "निष्कर्षों की खोज करें।",
+      "heading": "निष्कर्षों की खोज करें।",
       "expandAll": "सभी का विस्तार करें।",
       "collapseAll": "सभी को ढहने दें।",
       "bulkSelected": "{count} चयनित",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "पंक्ति क्रियाएँ Row actions",
       "selectRowAria": "इस खोज पंक्ति का चयन करें।",
       "copyRowTitle": "इस खोज को JSON के रूप में कॉपी करें।",
+      "suppressedBadge": "प्रतिबंधित",
+      "suppressedByTitle": "छिपा है आपके सामान्य दृश्य से द्वारा {kind} - केवल यहां दिखाई दे रहा है क्योंकि \"Include suppressed\" चालू है",
       "metaShown": "{filtered} दिखाए गए",
       "metaAfterDisable": "अक्षम-नियम फ़िल्टर के बाद {total}",
       "metaSourceCap": "प्रदर्शन के लिए {max} पर कैप्ड स्रोत।",
@@ -1155,6 +1208,22 @@
       "openBrowser": "ब्राउज़र में खोलें।",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor को अक्षम करें।"
+    },
+    "suppressedFindings": {
+      "heading": "प्रतिबंधित खोज़",
+      "headingAria": "अवरोधित खोज अनुभाग",
+      "byKind": "{count} द्वारा {kind}",
+      "kindIgnore": "// अग्नो:",
+      "kindIgnoreForFile": "// अनदेखन_कर_फ़ाइल:",
+      "kindBaseline": "बेसलाइन",
+      "unsuppressButton": "अनप्रतिबंधित",
+      "unsuppressTitle": "सामान्य स्कैन में इस खोज को दिखाने के लिए विरोधाभास को हटा दें",
+      "unsuppressHint": "{rule} को {file}:{line} पर अन-अवरोधित करने के लिए, उस लाइन के ऊपर // ignore: कमेंट हटा दें।",
+      "columnFile": "File फ़ाइल फाइल",
+      "columnLine": "लाइन लाइन लाइन रेखा",
+      "columnRule": "नियम और विनियम।",
+      "columnKind": "किंड",
+      "columnAction": "कार्यविधि"
     },
     "suppressions": {
       "sectionAria": "दमन के लिए दबाव",
@@ -1261,6 +1330,7 @@
     "noReportYet": "अभी तक कोई उल्लंघन रिपोर्ट नहीं। पहले Saropa Lints विश्लेषण चलाएं।",
     "clipboardCopyFailed": "क्लिपबोर्ड में कॉपी नहीं कर सका।",
     "copiedViolationsJson": "JSON. के रूप में {count} उल्लंघन की प्रतिलिपि बनाई गई है।",
+    "copiedEverythingJson": "अनुकूलित नहीं किए गए {count} अनुसंधान छेड़छाड़ के लिए क्लिपबोर्ड में कॉपी किए गए।",
     "copiedOneViolationJson": "JSON के रूप में 1 उल्लंघन की प्रतिलिपि बनाई गई।",
     "driftNotConnected": "Drift Advisor सर्वर कनेक्ट नहीं है।",
     "copiedBulkFindings": "कॉपी किया गया {count} चयनित खोज (ओं) JSON के रूप में।",

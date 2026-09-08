@@ -14,6 +14,29 @@ const ISSUES_ENDPOINT = '/api/issues';
 const INDEX_SUGGESTIONS_ENDPOINT = '/api/index-suggestions';
 const ANOMALIES_ENDPOINT = '/api/analytics/anomalies';
 
+/**
+ * Thrown when a data endpoint returns 401/403. Distinguishes "wrong or missing
+ * token" from "server genuinely has zero issues" — both would otherwise look
+ * identical (an empty array) to callers.
+ */
+export class DriftAuthError extends Error {
+  constructor() {
+    super('Drift Advisor server rejected the request: invalid or missing auth token');
+    this.name = 'DriftAuthError';
+  }
+}
+
+/** Build Authorization header from the given token, if present. */
+function authHeaders(authToken?: string): Record<string, string> | undefined {
+  if (!authToken) return undefined;
+  return { Authorization: `Bearer ${authToken}` };
+}
+
+/** Throw DriftAuthError on 401/403; other non-OK statuses are handled by the caller. */
+function assertNotAuthFailure(res: Response): void {
+  if (res.status === 401 || res.status === 403) throw new DriftAuthError();
+}
+
 /** Normalize severity string from server. */
 function toSeverity(s: unknown): 'error' | 'warning' | 'info' {
   if (s === 'error' || s === 'warning' || s === 'info') return s;
@@ -60,8 +83,10 @@ function anomaliesToIssues(raw: Record<string, unknown>): DriftIssueRaw[] {
 }
 
 /** Fetch GET /api/issues (unified endpoint). */
-async function fetchIssuesEndpoint(baseUrl: string): Promise<DriftIssueRaw[]> {
-  const res = await fetch(`${baseUrl}${ISSUES_ENDPOINT}`);
+async function fetchIssuesEndpoint(baseUrl: string, authToken?: string): Promise<DriftIssueRaw[]> {
+  const headers = authHeaders(authToken);
+  const res = await fetch(`${baseUrl}${ISSUES_ENDPOINT}`, headers ? { headers } : undefined);
+  assertNotAuthFailure(res);
   if (!res.ok) return [];
   const data = (await res.json()) as { issues?: DriftIssueRaw[] };
   const arr = Array.isArray(data?.issues) ? data.issues : [];
@@ -69,11 +94,15 @@ async function fetchIssuesEndpoint(baseUrl: string): Promise<DriftIssueRaw[]> {
 }
 
 /** Fetch index-suggestions and anomalies and merge into stable shape. */
-async function fetchLegacyEndpoints(baseUrl: string): Promise<DriftIssueRaw[]> {
+async function fetchLegacyEndpoints(baseUrl: string, authToken?: string): Promise<DriftIssueRaw[]> {
+  const headers = authHeaders(authToken);
+  const opts = headers ? { headers } : undefined;
   const [indexRes, anomaliesRes] = await Promise.all([
-    fetch(`${baseUrl}${INDEX_SUGGESTIONS_ENDPOINT}`),
-    fetch(`${baseUrl}${ANOMALIES_ENDPOINT}`),
+    fetch(`${baseUrl}${INDEX_SUGGESTIONS_ENDPOINT}`, opts),
+    fetch(`${baseUrl}${ANOMALIES_ENDPOINT}`, opts),
   ]);
+  assertNotAuthFailure(indexRes);
+  assertNotAuthFailure(anomaliesRes);
   const out: DriftIssueRaw[] = [];
   if (indexRes.ok) {
     const data = (await indexRes.json()) as unknown;
@@ -96,11 +125,15 @@ async function fetchLegacyEndpoints(baseUrl: string): Promise<DriftIssueRaw[]> {
 
 /**
  * Fetch all issues from the server. Uses GET /api/issues if capabilities include "issues",
- * otherwise uses index-suggestions and analytics/anomalies.
+ * otherwise uses index-suggestions and analytics/anomalies. When authToken is provided,
+ * sends it as a Bearer token on every request (required for non-loopback servers).
+ *
+ * Callers should read the token via `getDriftAuthToken()` from `./auth.ts` —
+ * the single source of truth for the saropaLints.driftAdvisor.authToken setting.
  */
-export async function fetchIssues(server: DriftServerInfo): Promise<DriftIssueRaw[]> {
+export async function fetchIssues(server: DriftServerInfo, authToken?: string): Promise<DriftIssueRaw[]> {
   if (server.capabilities.includes('issues')) {
-    return fetchIssuesEndpoint(server.baseUrl);
+    return fetchIssuesEndpoint(server.baseUrl, authToken);
   }
-  return fetchLegacyEndpoints(server.baseUrl);
+  return fetchLegacyEndpoints(server.baseUrl, authToken);
 }

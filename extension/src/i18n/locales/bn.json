@@ -713,6 +713,10 @@
     "reloadLater": "পরে পরবর্তীতে পরে পরে"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: ত্রুটি",
+      "tooltip": "স্ট্যাটাস বার আপডেট করা ব্যর্থ হয়েছে — বিস্তারিত দেখতে ক্লিক করুন। এক্সটেনশনটি আরও কাজ করতে পারে; কমান্ড প্যালেট থেকে একটি কমান্ড চালানো চেষ্টা করুন।"
+    },
     "menu": {
       "enableOn": "বিশ্লেষণ সক্রিয় (বন্ধ করতে ক্লিক করুন)",
       "enableOff": "বিশ্লেষণ অক্ষম (সক্ষম করতে ক্লিক করুন)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} অপরিচিত ডেমন(s)",
       "openHint": "ক্লিক করুন প্রক্রিয়া স্বাস্থ্য খুলতে",
       "systemRam": "সিস্টেম: {free} টি ফ্রি এর মধ্যে {total} টি",
-      "systemLow": "⚠ সিস্টেম: {free} টি {total} টি ফ্রি"
+      "systemLow": "⚠ সিস্টেম: {free} টি {total} টি ফ্রি",
+      "extensionHostWarning": "⚠ একসেনশন হোস্ট: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} প্রক্রিয়া(গুলি) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} এনালাইসিস সার্ভার(গুলো) পাওয়া গেল — ব্যবহার করা হয়নি VS Code ওপেন করুন",
       "daemonCount": "Flutter ডেমন: {total} ({orphaned} অপসারিত)",
       "scanDaemonOrphans": "অপরিচ্ছন্ন স্ক্যান ডেমন: {count} — ক্লিন আপ ব্যবহার করুন যাতে মারা যায়",
+      "extensionHostSection": "একসাথে ব্যবহারকারী: {rss} RSS ({heap} / {heapTotal} মেমরি)",
       "warningHint": "Saropa মেমোরি উচ্চ — বিস্তারিত দেখুন",
       "criticalHint": "Saropa মেমোরি গুরুত্বপূর্ণ — পরিষ্কার করার পরামর্শ দেওয়া হয়েছে"
     },
@@ -806,6 +812,35 @@
       "kill": "ঘুলাইয়ে দাও",
       "killed": "মারা গেছে",
       "killFailed": "ব্যর্থ"
+    },
+    "watcherExclude": {
+      "prompt": "{count} পরামর্শ দেওয়া ফাইল ওয়াচার বাদ দেওয়া অপসারণ অনুপস্থিত {patterns} এই ওয়ার্কস্পেস থেকে: এগুলো যোগ করা হলে VS Code বড় বিল্ড আর্টিফ্যাক্ট এবং হিপ ডাম্প ট্র্যাক করতে থাকবে না যা মেমরি ব্যবহার করে।",
+      "addAll": "সবগুলো যোগ করুন",
+      "dismiss": "বরখাস্ত করা হয়।",
+      "added": "যুক্ত করা হয়েছে {count} ফাইল ওয়াচার বাদ দেওয়া (একাধিক) কাজের সেটিংস কাজের স্থানে।"
+    },
+    "hazardScan": {
+      "warning": "{count} নাম্বার ফাইল(গুলো) ফাইল ওবজারভার থেকে বাদ দেওয়া হয়নি: {files}। এগুলো মেমোরি খাওয়া এবং VS Code ক্র্যাশ করতে পারে।",
+      "addExclusions": "ওবার্স থেকে বাদ দিন",
+      "dismiss": "বরখাস্ত করা হয়।",
+      "added": "যুক্ত করা হয়েছে {count} ওবজারভার বাদ দেওয়া ধরনের প্যাটার্ন(গুলি) কাজের সেটিংসে।"
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "কাজ স্থানের প্রস্তুততা: সব স্পষ্ট — কোনও সমস্যা খুঁজে পাওয়া যায়নি।",
+    "quickPickTitle": "কাজ করার স্থানে প্রস্তুতি সমস্যা",
+    "quickPickPlaceholder": "একটি সমস্যা বাছাই করুন বিস্তারিত বা সংশোধন করার জন্য",
+    "statusBar": {
+      "red": "🔴 {count} ওয়ার্কস্পেস সমস্যা(গুলি)",
+      "yellow": "⚠ {count} ওয়ার্কস্পেস সমস্যা(গুলি)"
+    },
+    "issue": {
+      "hazardFiles": "$(ত্রুটি) {count} বড় অন্তর্ভুক্ত করা হয়নি ফাইল (গুলি)",
+      "hazardFilesDetail": "বড় ফাইলগুলো ফাইল ওবজার্ভার দ্বারা ট্র্যাক করা হলে মেমরি খালাস হতে পারে এবং VS Code বন্ধ হতে পারে। হাজার স্ক্যান চালানো হোক এবং তাদের বাদ দিন।",
+      "missingExcludes": "$(info) {count} ওয়াচার এক্সক্লুসন অনুপস্থিত",
+      "missingExcludesDetail": "পরামর্শ দেওয়া ফাইল ওবজারভার বাদ দেওয়া প্যাটার্ন অ্যাক্টিভ করা হয়নি। এগুলো যোগ করা অপ্রয়োজন মেমরি ব্যবহার বন্ধ করে।",
+      "hostMemory": "$(alert) একসাথে ব্যবহারকারী হোস্ট ব্যবহার করছেন {size}",
+      "hostMemoryDetail": "প্রসেস হোস্ট প্রসেস RSS আপত্তি সীমা অতিক্রম করেছে। বিস্তারিত জন্য প্রসেস স্বাস্থ্য খুলুন।"
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "কোন ফাইল প্রভাবিত হয় নি",
       "filesTitle": "স্বতন্ত্র ফাইলগুলি কমপক্ষে একটি সন্ধান অবদান রাখে",
       "topRuleLabel": "শীর্ষ নিয়ম, সর্বোচ্চ নিয়ম।",
-      "topRuleTitle": "{name} নিয়মের জন্য ফিল্টার ফলাফলগুলি ফিল্টর করুন।"
+      "topRuleTitle": "{name} নিয়মের জন্য ফিল্টার ফলাফলগুলি ফিল্টর করুন।",
+      "sectionHeading": "অ্যাওভারভিশ বা সারাংশ",
+      "sectionAria": "সারাংশ স্ট্যাটিস্টিকস"
     },
     "toolbar": {
       "ariaFiltersActions": "ফিল্টার এবং ক্রিয়াগুলি।",
@@ -999,7 +1036,17 @@
       "moreSummary": "More More আরো More আরও",
       "moreChevron": "▾",
       "copyJsonTitle": "JSON ({count}) হিসাবে ফিল্টার করা লঙ্ঘনগুলি অনুলিপি করুন।",
-      "saveReportTitle": "ফিল্টার করা লঙ্ঘনগুলি JSON হিসাবে রিপোর্ট / YYYYMMDD/ এ সংরক্ষণ করুন।"
+      "saveReportTitle": "ফিল্টার করা লঙ্ঘনগুলি JSON হিসাবে রিপোর্ট / YYYYMMDD/ এ সংরক্ষণ করুন।",
+      "copyEverythingJson": "সবকিছু জেনারেল করুন",
+      "copyEverythingJsonTitle": "সব অ্যাউডিট ফাইন্ডিং কপি করুন জেসন হিসাবে — ফিল্টার করা হয়নি, অন্তর্ভুক্ত করুন",
+      "saveEverythingReport": "সব জিনিস সংরক্ষণ করুন রিপোর্ট",
+      "saveEverythingReportTitle": "সব অ্যাউডিট ফাইন্ডিং জেসন হিসাবে সংরক্ষণ করুন reports/ এ — ফিল্টার করা হয়নি, যাচ্ছে বাদ দেওয়া",
+      "suppressAll": "সব দৃশ্যমান বাদ দিন",
+      "suppressAllTitle": "সব দৃশ্যমান খুঁজতে // অবহেলা: কমেন্ট দিন উপরে",
+      "suppressAllConfirm": "এটি আপনার সোর্স ফাইলগুলিতে {count} // ignore: কমেন্ট স্থাপন করবে। এটি ড্যাশবোর্ড থেকে বাতিল করা যাবে না — আপনার এডিটরের undo বা ভেরসন কন্ট্রোল ব্যবহার করে পুনরায় তৈরি করুন। চালু করতে চাচ্ছেন?",
+      "suppressAllProceed": "সব বন্ধ করুন",
+      "suppressAllDone": "ছাড়া করুন {count} // অবহেলা: কমেন্ট।",
+      "suppressAllFailed": "বৃহত্তর বাধা দমন প্রয়োগ করা যায়নি — কিছু ফাইল পড়া যায় না।"
     },
     "audit": {
       "scopeFieldTitle": "নিচের খো",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "পরিবর্তন করা হয়েছে vs শ",
       "branchPlaceholder": "ব্রাংচ নাম",
       "branchAria": "ট্রান্সফার করুন যেটি তুলনার জন্য",
+      "includeSuppressedLabel": "বাদ দেওয়া হয়েছে",
+      "includeSuppressedTitle": "সাধারণত // ignore:, // ignore_for_file: বা বেসলাইন এন্ট্রি দ্বারা আবৃত থাকা ফাইন্ডিংস অন্যান্য সহ অন্তর্ভুক্ত করুন — প্রতিটি কিভাবে আবৃত হয়েছিল তা চিহ্নিত করা হয়েছে। আপনার প্রকল্পের কনফিগ পরিবর্তন হয়নি।",
       "runButton": "অডিট চালান ✅",
       "runButtonTitle": "পুরো প্রকল্প অডিট CLI চালান এবং এর ফলাফল এখানে প্রস্তুত করুন",
       "cancelButton": "বাতিল করুন Cancel",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "পুনরায় সক্ষম করুন অক্ষম নিয়মগুলিকে আবার সক্ষম করুন",
       "reEnableQuickPickPlaceholder": "পুনরায় সক্ষম করতে এক বা একাধিক নিয়ম নির্বাচন করুন।",
       "menuGroupExport": "রপ্তানি এক্সপোর্ট",
+      "menuGroupBulk": "বৃহত্তম ক্রিয়া",
       "menuGroupFilter": "ফিল্টার এবং ফোকাস করুন",
       "menuGroupOpen": "ড্যাশবোর্ড খুলুন।",
       "menuGroupSystem": "সিস্টেম সিস্টেম System"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "ফলাফলঃ অনুসন্ধানগুলি পাওয়া গেছে।",
+      "heading": "ফলাফলঃ অনুসন্ধানগুলি পাওয়া গেছে।",
       "expandAll": "সমস্ত প্রসারিত করুন",
       "collapseAll": "সব ভেঙে পড়ুক,",
       "bulkSelected": "{count} নির্বাচিত",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "সারি ক্রিয়াকলাপগুলি রোল ক্রিয়া",
       "selectRowAria": "এই সন্ধান সারিটি নির্বাচন করুন।",
       "copyRowTitle": "এই ফলাফলটি JSON হিসাবে অনুলিপি করুন।",
+      "suppressedBadge": "সাপ্রেসড",
+      "suppressedByTitle": "{kind} দ্বারা আপনার সাধারণ দৃশ্য থেকে ছুপিছুপি করা হয়েছে — এটি কেবলমাত্র \"Include suppressed\" চালু করে এখানে দেখা যাচ্ছে",
       "metaShown": "{filtered} দেখানো হয়েছে",
       "metaAfterDisable": "অক্ষম-রুল ফিল্টারের পরে {total}",
       "metaSourceCap": "কর্মক্ষমতা জন্য {max} এ সীমিত উৎস।",
@@ -1155,6 +1208,22 @@
       "openBrowser": "ব্রাউজারে খুলুন",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor নিষ্ক্রিয় করুন"
+    },
+    "suppressedFindings": {
+      "heading": "বাতিল করা ফাইন্ডিংস",
+      "headingAria": "সাপ্রেসড ফাইন্ডিংস বিভাগ",
+      "byKind": "{count} দ্বারা {kind}",
+      "kindIgnore": "// অবহেলা:",
+      "kindIgnoreForFile": "// অবহেলনা_কর_ফাইল: /নো_থিংক",
+      "kindBaseline": "বেসলাইন /নো_থিং",
+      "unsuppressButton": "অপ্রতিহত করুন",
+      "unsuppressTitle": "সাধারণ স্ক্যানে এই খুঁজতে সাপ্রেসন অপসারণ করুন",
+      "unsuppressHint": "{rule} এর জন্য অনুমতি বাতিল করুন যেখানে {file}:{line} রয়েছে: সেই লাইনের উপরে থাকা // ignore: কমেন্টটি অপসারণ করুন।",
+      "columnFile": "ফাইলের নাম File file",
+      "columnLine": "লাইন, লাইন, লাইনের মধ্যে",
+      "columnRule": "নিয়মকানুন Rule Rule",
+      "columnKind": "কাইন্ড",
+      "columnAction": "অ্যাকশন"
     },
     "suppressions": {
       "sectionAria": "দমন-নিরোধের কাজ।",
@@ -1261,6 +1330,7 @@
     "noReportYet": "এখনও পর্যন্ত কোনও লঙ্ঘনের রিপোর্ট নেই। প্রথমে Saropa Lints বিশ্লেষণ চালান।",
     "clipboardCopyFailed": "ক্লিপবোর্ডে অনুলিপি করা যায়নি।",
     "copiedViolationsJson": "JSON. হিসাবে {count} লঙ্ঘন কপি করা হয়েছে (s) ।",
+    "copiedEverythingJson": "{count} ফিল্টার করা না থাকা ফাইন্ডিং ক্লিপবোর্ডে কপি করা হয়েছে।",
     "copiedOneViolationJson": "JSON. হিসাবে 1 টি লঙ্ঘন অনুলিপি করা হয়েছে।",
     "driftNotConnected": "Drift Advisor সার্ভার সংযুক্ত নয়।",
     "copiedBulkFindings": "JSON. হিসাবে {count} নির্বাচিত সন্ধানগুলি (s) অনুলিপি করা হয়েছে।",

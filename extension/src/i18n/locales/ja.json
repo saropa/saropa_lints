@@ -713,6 +713,10 @@
     "reloadLater": "後 遅い 後になって"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: エラー",
+      "tooltip": "ステータスバーの更新に失敗しました — 詳細をクリックしてください。拡張機能はまだ動作する可能性があります; コマンドパレットからコマンドを実行してみてください。"
+    },
     "menu": {
       "enableOn": "解析を有効にしています（無効にするにはクリック）",
       "enableOff": "解析無効（クリックして有効にする）",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} 廃棄されたデーモン(s)",
       "openHint": "クリックしてプロセスヘルスを開く",
       "systemRam": "システム: {free} / {total} が無料",
-      "systemLow": "⚠ システム: {free} / {total} が空いています"
+      "systemLow": "⚠ システム: {free} / {total} が空いています",
+      "extensionHostWarning": "⚠ エクステンションホスト: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} プロセス(es) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count}分析サーバー（ス）が検出されました — 使っていないVS Codeウィンドウを閉じる",
       "daemonCount": "Flutter デーモン: {total} ({orphaned} 遺棄)",
       "scanDaemonOrphans": "孤立したスキャンデーモン: {count} — クリーンアップを使用して終了",
+      "extensionHostSection": "拡張機能ホスト: {rss} RSS ({heap} / {heapTotal} ヘップ)",
       "warningHint": "Saropa メモリが多い — 詳細についてはクリックしてください",
       "criticalHint": "メモリSaropaは重要 — 推奨されるクリーンアップ"
     },
@@ -806,6 +812,35 @@
       "kill": "キル",
       "killed": "殺された",
       "killFailed": "失敗"
+    },
+    "watcherExclude": {
+      "prompt": "このワークスペースから{count}推奨のファイルウォッチャー除外項目{patterns}が欠落しています。これらを追加することで、VS Codeがメモリを浪費する大規模なビルドアーティファクトやヒープダンプを追跡しなくなります。",
+      "addAll": "すべて追加",
+      "dismiss": "解雇処分について",
+      "added": "ワークスペース設定に{count}ファイルウォッチャーの除外を追加しました。"
+    },
+    "hazardScan": {
+      "warning": "{count} が指定された大容量ファイルがファイルウォッチャーから除外されていません: {files}。これらはメモリを枯渇させ VS Code をクラッシュする可能性があります。",
+      "addExclusions": "ウォッチャーから除外",
+      "dismiss": "解雇処分について",
+      "added": "ワークスペース設定に{count}ウォッチャー除外パターンを追加しました。"
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "ワークスペースの準備状態: 全く問題ありません — 何らかの問題は見つかりませんでした。",
+    "quickPickTitle": "ワークスペース準備に関する問題",
+    "quickPickPlaceholder": "特定の問題を選択して詳細情報を表示するか、それを修正します",
+    "statusBar": {
+      "red": "🔴 {count} ワークスペースの問題",
+      "yellow": "⚠ {count} ワークスペースの問題"
+    },
+    "issue": {
+      "hazardFiles": "$(ワーニング) {count} 大きな除外されていないファイル(s)",
+      "hazardFilesDetail": "ファイルウォッチャーによって追跡される大容量ファイルはメモリを枯渇させ VS Code をクラッシュさせる可能性があります。危険スキャンを実行してそれらを除外してください。",
+      "missingExcludes": "$(info) {count} ワッチャー除外が不足しています",
+      "missingExcludesDetail": "推奨されるファイルウォッチャーの除外パターンが設定されていません。これらを追加することで不要なメモリ使用量を防ぐことができます。",
+      "hostMemory": "$(alert) エクステンションホストを使用中 {size}",
+      "hostMemoryDetail": "拡張機能ホストプロセス RSS は警告閾値を超えています。詳細はプロセスヘルスを開いてください。"
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "影響を受けたファイルは見つかりませんでした.",
       "filesTitle": "異なるファイルで,少なくとも1つの発見に貢献します.",
       "topRuleLabel": "ルールトップルールは,",
-      "topRuleTitle": "{name}のルールで,結果をフィルターします."
+      "topRuleTitle": "{name}のルールで,結果をフィルターします.",
+      "sectionHeading": "概要",
+      "sectionAria": "概要統計"
     },
     "toolbar": {
       "ariaFiltersActions": "フィルターとアクション",
@@ -999,7 +1036,17 @@
       "moreSummary": "もっともっともっともっと",
       "moreChevron": "▾",
       "copyJsonTitle": "フィルターされた違反をJSON ({count}) としてコピーします.",
-      "saveReportTitle": "フィルターされた違反をJSONとしてレポート/YYY YMMDD/に保存します."
+      "saveReportTitle": "フィルターされた違反をJSONとしてレポート/YYY YMMDD/に保存します.",
+      "copyEverythingJson": "コピー everything として JSON",
+      "copyEverythingJsonTitle": "すべてのアジャーディング結果をJSONとしてコピー — フィルタリングなし、抑制されたものを含む",
+      "saveEverythingReport": "すべて保存するレポート",
+      "saveEverythingReportTitle": "すべてのアジャイル結果をJSON形式でreports/に保存 — フィルタリングせずに、抑制された/no_thinkを含めて",
+      "suppressAll": "すべての可視のルールを無視する",
+      "suppressAllTitle": "// 無視: コメントをすべての可視な見つかった箇所の上に挿入",
+      "suppressAllConfirm": "これは {count} // ignore: コメントをソースファイル全体に挿入します。これはダッシュボードから取り消せません — エディタのアンドゥまたはバージョン管理を使用して元に戻してください。続行しますか？",
+      "suppressAllProceed": "すべてを抑制する",
+      "suppressAllDone": "挿入 {count} // ignore: コメント。",
+      "suppressAllFailed": "一括無視を適用できませんでした — 一部のファイルが読み取り専用の場合があります。"
     },
     "audit": {
       "scopeFieldTitle": "下記の結果はどこから取得されているかを選択してください",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "変更 vs ブランチ…",
       "branchPlaceholder": "ブランチ名",
       "branchAria": "比較対象のブランチ",
+      "includeSuppressedLabel": "抑制されたを含める",
+      "includeSuppressedTitle": "// ignore: または // ignore_for_file: 、またはベースラインエントリによって通常隠されている検出結果も含みます — 各結果はどのように抑制されたかを示してあります。プロジェクトの設定は変更されません。",
       "runButton": "アジャイルチェックを実行",
       "runButtonTitle": "全体プロジェクトのアプライアンスCLIを実行し、その結果をここにロードしてください",
       "cancelButton": "キャンセル キャンセル",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "禁用されたルールを再有効にします.",
       "reEnableQuickPickPlaceholder": "ルール1つまたは複数のルールを選択して,再有効にします.",
       "menuGroupExport": "輸出 エクスポート",
+      "menuGroupBulk": "一括操作",
       "menuGroupFilter": "フィルター&フォーカスを設定する",
       "menuGroupOpen": "ダッシュボードを開けてダッシュボードをクリックします.",
       "menuGroupSystem": "システム・システム・システムの"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "発見結果は,",
+      "heading": "発見結果は,",
       "expandAll": "Expand all を拡張する",
       "collapseAll": "すべてが崩壊する.",
       "bulkSelected": "{count} 件選択中",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "ローアクション (Row actions) は,行列のアクションをすること.",
       "selectRowAria": "この検索行を選択してください.",
       "copyRowTitle": "この発見をJSONとしてコピーします.",
+      "suppressedBadge": "抑制された",
+      "suppressedByTitle": "通常のビューから{kind}によって隠されており、ここに表示されているのは「抑制を含める」がオンになっているため",
       "metaShown": "{filtered} 件表示",
       "metaAfterDisable": "無効化ルールフィルター適用後 {total} 件",
       "metaSourceCap": "性能の {max} に制限されたソース.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "ブラウザで開きます.",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor を無効にする"
+    },
+    "suppressedFindings": {
+      "heading": "抑制された結果",
+      "headingAria": "抑制された結果のセクション",
+      "byKind": "{count} によって {kind}",
+      "kindIgnore": "// 無視:",
+      "kindIgnoreForFile": "// ignore_for_file:",
+      "kindBaseline": "ベースライン",
+      "unsuppressButton": "アンスプレス",
+      "unsuppressTitle": "この見つかりを通常のスキャンに表示するため、抑制を解除してください",
+      "unsuppressHint": "{rule}を{file}:{line}で無視解除するには、その行の上にある// ignore:コメントを削除してください。",
+      "columnFile": "ファイルは,ファイルの形式で",
+      "columnLine": "ライン・ライン・線・ライン",
+      "columnRule": "ルール ルールはルールの規則",
+      "columnKind": "キンド",
+      "columnAction": "アクション"
     },
     "suppressions": {
       "sectionAria": "抑圧の抑制は,",
@@ -1261,6 +1330,7 @@
     "noReportYet": "まだ違反報告はありません。最初に Saropa Lints 分析を実行します。",
     "clipboardCopyFailed": "クリップボードにコピーできませんでした.",
     "copiedViolationsJson": "コピーされた {count} 違反 (は) JSON.として",
+    "copiedEverythingJson": "クリップボードに {count} 無フィルタの結果をコピーしました。",
     "copiedOneViolationJson": "1件の違反をJSONとしてコピーしました.",
     "driftNotConnected": "Drift Advisor サーバに接続されていません.",
     "copiedBulkFindings": "コピー {count} 選択された発見 (s) JSON.として",

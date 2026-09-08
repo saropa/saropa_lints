@@ -713,6 +713,10 @@
     "reloadLater": "Sa huli sa susunod na mga araw, mas maaga."
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Error",
+      "tooltip": "Nagkabangya ang pag-update sa status bar — i-click para sa detalye. Ang extension ay maaaring pa rin magtrabaho; subukang i-run ang isang command mula sa Command Palette."
+    },
     "menu": {
       "enableOn": "Analisis na nakalaan (klik para i-disable)",
       "enableOff": "Analisis di-nag-disable (klik para i-enable)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} na walang magulang na daemon(s)",
       "openHint": "Click para magbukas ng Process Health",
       "systemRam": "Sistema: {free} ng {total} libre",
-      "systemLow": "⚠ Sistema: {free} ng {total} libre"
+      "systemLow": "⚠ Sistema: {free} ng {total} libre",
+      "extensionHostWarning": "⚠ Extension host: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proseso(s) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "Nakita ang (mga) server ng pagsusuri ng {count} — isara ang hindi nagamit na mga window ng VS Code",
       "daemonCount": "Flutter daemon: {total} ({orphaned} na walang magulang)",
       "scanDaemonOrphans": "Nakalabas na mga daemon ng scan: {count} — gamitin ang Clean Up para i-kill",
+      "extensionHostSection": "Extension host: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Ang Saropa memory ay mataas — i-click para sa mga detalye",
       "criticalHint": "Saropa memory ay kritikal — puntaan ang pagtanggal"
     },
@@ -806,6 +812,35 @@
       "kill": "Iwan",
       "killed": "Pinatay",
       "killFailed": "Nagkabigo"
+    },
+    "watcherExclude": {
+      "prompt": "Naglalagay ang {count} ng mga exclusion sa file-watcher na nawala sa workspace na ito: {patterns}. Ang pagdaragdag nito ay nagpapahinto sa VS Code mula mag-keep ng malalaking build artifacts at heap dumps na nagpapalagay ng memory.",
+      "addAll": "Isumulat Lahat",
+      "dismiss": "Mag-dismiss na ako.",
+      "added": "Nagdagdag ng mga {count} file-watcher exclusion sa mga setting ng workspace."
+    },
+    "hazardScan": {
+      "warning": "Nakita ang {count} malaking file(s) na hindi inilagay sa pagmamana ng file: {files}. Ito ay maaaring mag-imbak ng memorya at mag-iba sa VS Code.",
+      "addExclusions": "I-exclude sa Watcher",
+      "dismiss": "Mag-dismiss na ako.",
+      "added": "Nagdagdag ng pattern ng {count} watcher para sa pag-exclude sa mga setting ng workspace."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Kabug-osang pagkabukas ng workspace: lahat ay malayong-ayos — walang mga isyu na nakita.",
+    "quickPickTitle": "Mga Problema sa Pagpapareto ng Workspace",
+    "quickPickPlaceholder": "Piliin ang isang isyu para sa detalye o para i-apply ang solusyon",
+    "statusBar": {
+      "red": "🔴 {count} problema sa workspace",
+      "yellow": "⚠ {count} problema sa workspace"
+    },
+    "issue": {
+      "hazardFiles": "$(warning) {count} malaking file(s) na walang pag-iisip",
+      "hazardFilesDetail": "Mga malalaking file na in-monitor ng file watcher ay maaaring mag-imbak ng memorya at mag-iba ang VS Code. I-run ang hazard scan upang i-exclude ang mga ito.",
+      "missingExcludes": "$(info) {count} nawawalang watcher exclusion(s)",
+      "missingExcludesDetail": "Hindi nakakonekta ang mga pattern ng pag-ibig sa file na inirerekumenda. Ang pagdaragdag nito ay nagpapahintulot sa hindi kinakailangang paggamit ng memorya.",
+      "hostMemory": "$(alert) Extension host na ginagamit {size}",
+      "hostMemoryDetail": "Ang proseso ng host ng extension RSS ay umabot sa threshold ng palagay. Bumuksan ang Health ng Proseso para sa detalye."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "walang mga file na apektado.",
       "filesTitle": "Mga natatanging file na nag-aambag ng hindi bababa sa isang paghahanap.",
       "topRuleLabel": "Ang pinakamataas na panuntunan ay ang pag-uutos ng nangungunang patak",
-      "topRuleTitle": "I-filter ang mga natuklasan sa panuntunan {name}."
+      "topRuleTitle": "I-filter ang mga natuklasan sa panuntunan {name}.",
+      "sectionHeading": "Pangkalahatang-ideya",
+      "sectionAria": "Oversight statistics"
     },
     "toolbar": {
       "ariaFiltersActions": "Mga filter at mga pagkilos.",
@@ -999,7 +1036,17 @@
       "moreSummary": "Mas marami pa More More",
       "moreChevron": "▾",
       "copyJsonTitle": "Kopyahin ang mga na-filter na paglabag bilang JSON ({count})",
-      "saveReportTitle": "I-save ang mga na-filter na paglabag bilang JSON sa mga ulat / YYYYMMDD /."
+      "saveReportTitle": "I-save ang mga na-filter na paglabag bilang JSON sa mga ulat / YYYYMMDD /.",
+      "copyEverythingJson": "Kopyahin ang lahat bilang JSON",
+      "copyEverythingJsonTitle": "Kopyahin LAHAT ng mga resulta ng audit bilang JSON — walang filter, kasama ang mga naisulat",
+      "saveEverythingReport": "I-save ang lahat ng ulat",
+      "saveEverythingReportTitle": "I-save lahat ng mga resulta ng audit bilang JSON sa reports/ — walang pag-filter, kasama ang mga naka-ignored",
+      "suppressAll": "I-block lahat ng nakikita",
+      "suppressAllTitle": "Ilagay // ignore: komento sa itaas ng bawat nakakakita na resulta",
+      "suppressAllConfirm": "Ito ay magpapalagay ng {count} // ignore: komento sa iyong mga source files. Ito ay hindi maaaring i-undo mula sa dashboard — gamitin ang undo ng iyong editor o version control upang i-revert. Magpatuloy?",
+      "suppressAllProceed": "I-block lahat ng",
+      "suppressAllDone": "Nakalagay {count} // ignore: komento.",
+      "suppressAllFailed": "Hindi maaaring ipalagay ang bulk suppress — ang ilang mga file ay maaaring read-only."
     },
     "audit": {
       "scopeFieldTitle": "Piliin kung ano ang pinagmulan ng mga resulta sa ibaba",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "Nagbago ang vs branch…",
       "branchPlaceholder": "pangalan ng sangay",
       "branchAria": "Branch para i-compare",
+      "includeSuppressedLabel": "Mag-include ng pinagbabawal",
+      "includeSuppressedTitle": "Magbigay din ng mga resulta na karaniwang naka-ignored ng // ignore:, // ignore_for_file:, o entry sa baseline — bawat isang nangangahulugan kung paano ito tinanggal. Ang iyong proyekto config ay hindi binago.",
       "runButton": "Pagsusulit audit",
       "runButtonTitle": "Punan ang resulta ng CLI ng full-project audit dito",
       "cancelButton": "Kanselahin I-cancel ang pagkansela",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-enable disabled rules muling paganahin ang mga ito.",
       "reEnableQuickPickPlaceholder": "Piliin ang isa o higit pang mga patakaran upang muling paganahin.",
       "menuGroupExport": "Export export na ang mga ito.",
+      "menuGroupBulk": "Maramihang pagkilos",
       "menuGroupFilter": "Filter & focus ang mga ito.",
       "menuGroupOpen": "Buksan ang dashboard ng mga sasakyan.",
       "menuGroupSystem": "Ang sistema ng pag-aayos ay isang system na may mga tampok."
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "Mga Natuklasan sa Paghahanap",
+      "heading": "Mga Natuklasan sa Paghahanap",
       "expandAll": "Palawakin ang lahat ng mga ito.",
       "collapseAll": "Bumagsak lahat ng mga ito.",
       "bulkSelected": "{count} ang pinili",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "Mga aksyon sa hilera ng mga aksyong hilera.",
       "selectRowAria": "Piliin ang hilera ng paghahanap na ito.",
       "copyRowTitle": "Kopyahin ang paghahanap na ito bilang JSON.",
+      "suppressedBadge": "Nag-iiwan",
+      "suppressedByTitle": "Nakatago mula sa iyong karaniwang pananaw sa {kind} — nakikita lang dito dahil ang \"Include suppressed\" ay naka-on",
       "metaShown": "{filtered} ang ipinakita",
       "metaAfterDisable": "{total} pagkatapos ng disabled-rule filter",
       "metaSourceCap": "source na may cap sa {max} para sa pagganap ng performance.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "Buksan sa browser ng browser.",
       "headingIssues": "Drift Advisor",
       "disable": "I-disable ang Drift Advisor ng Drift"
+    },
+    "suppressedFindings": {
+      "heading": "Nagawa na mga Resulta",
+      "headingAria": "Seksiyon ng mga naisip na resulta",
+      "byKind": "{count} ng {kind}",
+      "kindIgnore": "// huwag pansinin:",
+      "kindIgnoreForFile": "// ignore_for_file:",
+      "kindBaseline": "baseline",
+      "unsuppressButton": "I-unsuppress",
+      "unsuppressTitle": "Tanggalin ang pag-iwas para makuha ang resulta na ito sa normal na mga pag-scan",
+      "unsuppressHint": "Para i-unsuppress ang {rule} sa {file}:{line}: alisin ang // ignore: komento sa itaas ng linya.",
+      "columnFile": "Ang file ay isang file ng file.",
+      "columnLine": "Ang linya ng linya ay ang mga linya na ito.",
+      "columnRule": "Panuntunan ng Pamamahala sa Pamahalaan",
+      "columnKind": "Uri",
+      "columnAction": "Aksyon"
     },
     "suppressions": {
       "sectionAria": "Mga suppression ng mga pang-aapi.",
@@ -1261,6 +1330,7 @@
     "noReportYet": "Walang ulat ng mga paglabag pa. Magpatakbo ng Saropa Lints analysis muna.",
     "clipboardCopyFailed": "Hindi maaaring kopyahin sa clipboard.",
     "copiedViolationsJson": "Nakopya ang {count} paglabag (s) bilang JSON.",
+    "copiedEverythingJson": "Nakopya ang {count} na mga resulta na walang pag-filter sa clipboard.",
     "copiedOneViolationJson": "Nakopya 1 paglabag bilang JSON.",
     "driftNotConnected": "Hindi konektado ang server ng Drift Advisor.",
     "copiedBulkFindings": "Nakopya {count} na pinili ang mga natuklasan (((s) bilang JSON.",

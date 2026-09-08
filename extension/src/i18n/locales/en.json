@@ -2788,5 +2788,12 @@
       "bannerLabel": "Activation Error",
       "bannerDescription": "Check Extension Host log for details"
     }
+  },
+  "driftAdvisor": {
+    "authRequired": "Server requires authentication. Set a token in Settings → Saropa Lints → Drift Advisor → Auth Token, then click Refresh.",
+    "authFailed": "Authentication failed — the server rejected the configured token. Click to update it in Settings.",
+    "discovering": "Discovering server and fetching issues…",
+    "noServerFound": "No Drift Advisor server found. Start your app with the server running, then click Refresh.",
+    "integrationOff": "Drift Advisor integration is off. Enable it in settings (saropaLints.driftAdvisor.integration), then click Refresh."
   }
 }

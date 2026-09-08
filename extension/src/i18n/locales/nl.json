@@ -713,6 +713,10 @@
     "reloadLater": "Later"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Fout",
+      "tooltip": "Statusbalk update mislukt — klik voor details. De extensie kan nog steeds werken; probeer een commando uit te voeren uit de Command Palette."
+    },
     "menu": {
       "enableOn": "Analyse ingeschakeld (klik om te deactiveren)",
       "enableOff": "Analyse uitgeschakeld (klik om in te schakelen)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} orphane daemon(s)",
       "openHint": "Klik om Process Health te openen",
       "systemRam": "Systeem: {free} van {total} vrij",
-      "systemLow": "⚠ Systeem: {free} van {total} vrij"
+      "systemLow": "⚠ Systeem: {free} van {total} vrij",
+      "extensionHostWarning": "⚠ Extensiehost: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proces(sen) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} analyseer server(s) gedetecteerd — sluit ongebruikte VS Code vensters",
       "daemonCount": "Flutter daemonen: {total} ({orphaned} orphane)",
       "scanDaemonOrphans": "Geïsoleerde scan-daemonen: {count} — gebruik Clean Up om te killen",
+      "extensionHostSection": "Extensiehost: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa geheugen is hoog — klik voor details",
       "criticalHint": "Saropa geheugen is kritisch — schoonmaken wordt aanbevolen"
     },
@@ -806,6 +812,35 @@
       "kill": "Kil",
       "killed": "Gedood",
       "killFailed": "Mislukt"
+    },
+    "watcherExclude": {
+      "prompt": "De aangeraden bestand-watcher uitsluitingen van {count} ontbreken in dit werkruimte: {patterns}. Het toevoegen ervan voorkomt dat VS Code het volgen van grote build-artefacten en heap-dumps die geheugen verspillen.",
+      "addAll": "Alles toevoegen",
+      "dismiss": "Ontslag ontslagen.",
+      "added": "Gebruikte {count} bestand-watcher uitsluitingen toegevoegd aan werkruimte instellingen."
+    },
+    "hazardScan": {
+      "warning": "Grote bestand(en) {count} gevonden die niet uit de bestandswatcher zijn gesloten: {files}. Deze kunnen de geheugenruimte opzij zetten en VS Code kunnen crashen.",
+      "addExclusions": "Uitsluiten van Watcher",
+      "dismiss": "Ontslag ontslagen.",
+      "added": "Gebruik van de watcher uitsluitingspatronen {count} is toegevoegd aan de werkruimte instellingen."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Workspace klaarheid: alles in orde — geen problemen gevonden.",
+    "quickPickTitle": "Workspace Readiness Issues",
+    "quickPickPlaceholder": "Selecteer een probleem voor meer informatie of om het te verhelpen",
+    "statusBar": {
+      "red": "🔴 {count} werkruimte probleem(en)",
+      "yellow": "⚠ {count} werkruimte probleem(en)"
+    },
+    "issue": {
+      "hazardFiles": "$(waarschuwing) {count} grote niet-uitgesloten bestand(en)",
+      "hazardFilesDetail": "Grote bestanden die door de bestandswatcher worden gevolgd, kunnen de geheugenverbruimening oplopen en VS Code crashen. Voer de gevaarlijke scan uit om ze uit te sluiten.",
+      "missingExcludes": "$(info) {count} ontbrekende watcher uitsluitingen",
+      "missingExcludesDetail": "Aanbevolen bestand-watcher uitsluitingspatronen zijn niet geconfigureerd. Het toevoegen ervan voorkomt onnodig geheugenverbruik.",
+      "hostMemory": "$(alert) Extension host gebruikt {size}",
+      "hostMemoryDetail": "De host-process van de extensie RSS overschrijdt de waarsingsdrempel. Open Process Health voor meer informatie."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "geen bestanden beïnvloed.",
       "filesTitle": "Onderscheidende bestanden die ten minste één bevinding bijdragen.",
       "topRuleLabel": "Topregel: de hoogste regel.",
-      "topRuleTitle": "Filter bevindingen naar regel {name}."
+      "topRuleTitle": "Filter bevindingen naar regel {name}.",
+      "sectionHeading": "Overzicht",
+      "sectionAria": "Overzicht statistieken"
     },
     "toolbar": {
       "ariaFiltersActions": "Filters en acties.",
@@ -999,7 +1036,17 @@
       "moreSummary": "Meer meer meer meer",
       "moreChevron": "▾",
       "copyJsonTitle": "Kopieer gefilterde schendingen als JSON ({count})",
-      "saveReportTitle": "Bewaar gefilterde schendingen als JSON in rapporten/JJJMMDD."
+      "saveReportTitle": "Bewaar gefilterde schendingen als JSON in rapporten/JJJMMDD.",
+      "copyEverythingJson": "Alles kopiëren als JSON",
+      "copyEverythingJsonTitle": "Alle auditresultaten kopiëren als JSON — ongefilterd, inclusief onderdrukte",
+      "saveEverythingReport": "Alles opslaan rapport",
+      "saveEverythingReportTitle": "Alle auditresultaten opslaan als JSON naar reports/ — ongefilterd, inclusief onderdrukte",
+      "suppressAll": "Alle zichtbare onderdrukken",
+      "suppressAllTitle": "Plaats // ignore: opmerkingen boven elke zichtbare fout",
+      "suppressAllConfirm": "Dit zal {count} // ignore: commenten toevoegen over uw bronbestanden. Dit kan niet ongedaan gemaakt worden vanaf de dashboard — gebruik de undo-functie van uw editor of versiebeheer om te herstellen. Doorgaan?",
+      "suppressAllProceed": "Alle onderdrukken",
+      "suppressAllDone": "Ingewerkt {count} // ignore: opmerkingen.",
+      "suppressAllFailed": "Bulk-uitschakelen niet toepassen — sommige bestanden kunnen alleen-lezen zijn."
     },
     "audit": {
       "scopeFieldTitle": "Kies waar de onderzoeken hieronder vandaan komen",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "Geen vs tak…",
       "branchPlaceholder": "tak naam",
       "branchAria": "Branch om te vergelijken",
+      "includeSuppressedLabel": "Geef onderdrukte",
+      "includeSuppressedTitle": "Voeg ook gevonden items toe die normaal gesproken verborgen zijn door // ignore:, // ignore_for_file: of een baseline-entree — elk gemarkeerd met hoe het werd onderdrukt. Je projectconfiguratie blijft onveranderd.",
       "runButton": "Audit uitvoeren",
       "runButtonTitle": "Volledige-project audit CLI uitvoeren en resultaten hier laden",
       "cancelButton": "Annuleren",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-enable deactiveren uitgeschakelde regels.",
       "reEnableQuickPickPlaceholder": "Selecteer een of meer regels om deze opnieuw in te schakelen.",
       "menuGroupExport": "Export Uitvoer",
+      "menuGroupBulk": "Bulk acties",
       "menuGroupFilter": "Filter & focus op de foto's.",
       "menuGroupOpen": "Open het dashboard.",
       "menuGroupSystem": "Het systeem van het systeem."
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "Bevindingen bevindingen.",
+      "heading": "Bevindingen bevindingen.",
       "expandAll": "Uitbreiden van alles.",
       "collapseAll": "Alles instort, alles stort in.",
       "bulkSelected": "{count} geselecteerd",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "Rij-acties Rijaakties",
       "selectRowAria": "Selecteer deze zoekrij.",
       "copyRowTitle": "Kopieer deze bevinding als JSON.",
+      "suppressedBadge": "Verzwakt",
+      "suppressedByTitle": "Verborgen vanuit je normale beeld door {kind} — alleen zichtbaar hier omdat \"Include suppressed\" is ingeschakeld",
       "metaShown": "{filtered} weergegeven",
       "metaAfterDisable": "{total} na filter voor uitgeschakelde regels",
       "metaSourceCap": "bron beperkt tot {max} voor prestaties.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "Open in de browser.",
       "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor - De driftradgeur uitschakelen"
+    },
+    "suppressedFindings": {
+      "heading": "Verwerkte Resultaten",
+      "headingAria": "Afdeling onderdrukte gevonden items",
+      "byKind": "{count} door {kind}",
+      "kindIgnore": "// negeren:",
+      "kindIgnoreForFile": "// negeer_voor_bestand:",
+      "kindBaseline": "baseline",
+      "unsuppressButton": "Unsuppresseer",
+      "unsuppressTitle": "Verwijder de onderdrukingsindicatie zodat deze bevinding verschijnt in normale scans",
+      "unsuppressHint": "Om {rule} te ontsuppressen bij {file}:{line}: verwijder de // ignore: opmerking bovenaan die regel.",
+      "columnFile": "File File File is een bestand.",
+      "columnLine": "Lijn Lijnlijn Lijn",
+      "columnRule": "Reglement van het reglement",
+      "columnKind": "Soort",
+      "columnAction": "Actie"
     },
     "suppressions": {
       "sectionAria": "Onderdrukking Verdrukkingen",
@@ -1261,6 +1330,7 @@
     "noReportYet": "Er zijn nog geen meldingen van overtredingen. Voer eerst Saropa Lints analyse uit.",
     "clipboardCopyFailed": "Kon niet kopiëren naar het klembord.",
     "copiedViolationsJson": "Gekopieerd {count} overtreding (en) als JSON.",
+    "copiedEverythingJson": "Gecopieerd {count} ongefilterde resultaten naar het klembord.",
     "copiedOneViolationJson": "1 overtreding gekopieerd als JSON.",
     "driftNotConnected": "De Drift Advisor-server is niet aangesloten.",
     "copiedBulkFindings": "Gekopieerd {count} geselecteerde bevindingen (s) als JSON.",

@@ -98,9 +98,12 @@ export async function tryHealth(
     if (data?.ok === false) return null;
     return {
       baseUrl,
+      host,
       port,
       version: data.version,
       capabilities: Array.isArray(data.capabilities) ? data.capabilities : [],
+      // Propagate the server's auth requirement so callers can prompt for a token.
+      authRequired: data.authRequired === true ? true : undefined,
     };
   } catch {
     return null;

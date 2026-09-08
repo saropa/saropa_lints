@@ -713,6 +713,10 @@
     "reloadLater": "Kemudian, kemudian, selanjutnya."
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Kesalahan",
+      "tooltip": "Status bar update gagal — klik untuk detail. Ekstensi mungkin masih berfungsi; coba jalankan perintah dari Command Palette."
+    },
     "menu": {
       "enableOn": "Analisis diaktifkan (klik untuk menonaktifkan)",
       "enableOff": "Analisis dinonaktifkan (klik untuk mengaktifkan)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} daemon(s) yang terlantar",
       "openHint": "Klik untuk membuka Process Health",
       "systemRam": "Sistem: {free} dari {total} gratis",
-      "systemLow": "⚠ Sistem: {free} dari {total} gratis"
+      "systemLow": "⚠ Sistem: {free} dari {total} gratis",
+      "extensionHostWarning": "⚠ Host ekstensi: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proses(es) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "{count} analisis server(s) terdeteksi — tutup VS Code jendela yang tidak digunakan",
       "daemonCount": "Flutter daemon: {total} ({orphaned} terlantar)",
       "scanDaemonOrphans": "Daemon pemindaian yang terlantar: {count} — gunakan Clean Up untuk membunuh",
+      "extensionHostSection": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, dalam posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Keluaran HARUS menggunakan sistem penulisan yang benar untuk bahasa tujuan; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Extension host: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa memory adalah tinggi — klik untuk detail",
       "criticalHint": "Saropa memory adalah kritis — bersihkan disarankan"
     },
@@ -806,6 +812,35 @@
       "kill": "Matikan",
       "killed": "Dibunuh",
       "killFailed": "Gagal"
+    },
+    "watcherExclude": {
+      "prompt": "{count} recommended file-watcher exclusion(s) are missing from this workspace: {patterns}. Adding them prevents VS Code from tracking large build artifacts and heap dumps that waste memory.",
+      "addAll": "Tambahkan Semua",
+      "dismiss": "Mengusir dari pekerjaan.",
+      "added": "{count} file-watcher eksepsi ditambahkan ke pengaturan workspace."
+    },
+    "hazardScan": {
+      "warning": "Ditemukan {count} file besar yang tidak dikecualikan dari file watcher: {files}. Ini dapat menghabiskan memori dan menyebabkan crash pada VS Code.",
+      "addExclusions": "Keluar dari Watcher",
+      "dismiss": "Mengusir dari pekerjaan.",
+      "added": "Pola pengecualian pengawas {count} ditambahkan ke pengaturan workspace."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Kesiapan workspace: semua lancar — tidak ditemukan masalah.",
+    "quickPickTitle": "Masalah Kesiapan Workspace",
+    "quickPickPlaceholder": "Pilih masalah untuk detail atau memperbaikinya",
+    "statusBar": {
+      "red": "🔴 {count} masalah workspace",
+      "yellow": "⚠ {count} masalah workspace"
+    },
+    "issue": {
+      "hazardFiles": "$(peringatan) {count} file(s) besar yang tidak termasuk dalam pengecualian",
+      "hazardFilesDetail": "File besar yang diawasi oleh file watcher dapat menghabiskan memori dan menyebabkan crash VS Code. Jalankan pemindaian bahaya untuk mengecualikan mereka.",
+      "missingExcludes": "$(info) {count} kurang pengeluaran pengawas",
+      "missingExcludesDetail": "Pola-pola pengecualian pengawas file yang direkomendasikan tidak dikonfigurasikan. Menambahkannya mencegah penggunaan memori yang tidak perlu.",
+      "hostMemory": "$(alert) Ekstensi host menggunakan {size}",
+      "hostMemoryDetail": "Proses host ekstensi RSS melebihi ambang peringatan. Buka Process Health untuk detailnya."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "Tidak ada file yang terpengaruh.",
       "filesTitle": "Berbagai file yang berbeda berkontribusi setidaknya satu temuan.",
       "topRuleLabel": "Aturan teratas adalah aturan atas.",
-      "topRuleTitle": "Filter temuan untuk aturan {name}."
+      "topRuleTitle": "Filter temuan untuk aturan {name}.",
+      "sectionHeading": "Ringkasan",
+      "sectionAria": "Statistik ringkasan"
     },
     "toolbar": {
       "ariaFiltersActions": "Filter dan tindakan.",
@@ -999,7 +1036,17 @@
       "moreSummary": "Lebih banyak lagi lebih banyak lagi.",
       "moreChevron": "▾",
       "copyJsonTitle": "Salin pelanggaran yang disaring sebagai JSON ({count})",
-      "saveReportTitle": "Simpan pelanggaran yang disaring sebagai JSON ke laporan / YYYYMMDD/"
+      "saveReportTitle": "Simpan pelanggaran yang disaring sebagai JSON ke laporan / YYYYMMDD/",
+      "copyEverythingJson": "Salin semuanya sebagai JSON",
+      "copyEverythingJsonTitle": "Salin SEMUA temuan audit sebagai JSON — tidak disaring, termasuk yang dikendalikan",
+      "saveEverythingReport": "Simpan laporan semua hal",
+      "saveEverythingReportTitle": "Simpan SEMUA temuan audit sebagai JSON ke reports/ — tidak disaring, termasuk yang dikendalikan",
+      "suppressAll": "Tutup semua yang terlihat",
+      "suppressAllTitle": "Insert // ignore: komentar di atas setiap temuan yang terlihat",
+      "suppressAllConfirm": "Ini akan menyisipkan {count} // ignore: komentar di seluruh berkas sumber Anda. Ini tidak dapat dibatalkan dari dashboard — gunakan undo editor atau kontrol versi untuk membatalkan. Lanjutkan?",
+      "suppressAllProceed": "Tutup semua",
+      "suppressAllDone": "Diinsert {count} // ignore: komentar.",
+      "suppressAllFailed": "Tidak dapat menerapkan pengurangan penggunaan — beberapa file mungkin hanya untuk dibaca."
     },
     "audit": {
       "scopeFieldTitle": "Pilih sumber dari mana temuan di bawah ini berasal",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "Diubah vs cabang…",
       "branchPlaceholder": "nama cabang",
       "branchAria": "Cabang untuk dibandingkan",
+      "includeSuppressedLabel": "Termasuk yang ditutup",
+      "includeSuppressedTitle": "Juga termasuk temuan yang biasanya tersembunyi oleh // ignore:, // ignore_for_file:, atau entri baseline — masing-masing ditandai dengan cara pengabaian yang digunakan. Konfigurasi proyek Anda tidak berubah.",
       "runButton": "Jalankan audit",
       "runButtonTitle": "Jalankan CLI audit full-project dan muat hasilnya di sini",
       "cancelButton": "Batalkan Batal.",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-enable disabled rules: mengaktifkan kembali aturan yang telah dinonaktifkan.",
       "reEnableQuickPickPlaceholder": "Pilih satu atau lebih aturan untuk mengaktifkan kembali.",
       "menuGroupExport": "Ekspor ekspor.",
+      "menuGroupBulk": "Tindakan berkelompok",
       "menuGroupFilter": "Filter & fokuskan",
       "menuGroupOpen": "Buka dashboard dan buka panel kontrol.",
       "menuGroupSystem": "Sistem yang digunakan adalah sistem"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "Temuan-temuan yang ditemukan.",
+      "heading": "Temuan-temuan yang ditemukan.",
       "expandAll": "Expand all memperluas semua.",
       "collapseAll": "Semua runtuh semua.",
       "bulkSelected": "{count} dipilih",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "Tindakan baris Row actions.",
       "selectRowAria": "Pilih baris pencarian ini.",
       "copyRowTitle": "Salin temuan ini sebagai JSON.",
+      "suppressedBadge": "Ditindaklanjuti",
+      "suppressedByTitle": "Tersembunyi dari tampilan normal Anda oleh {kind} — hanya terlihat di sini karena \"Include suppressed\" diaktifkan",
       "metaShown": "{filtered} ditampilkan",
       "metaAfterDisable": "{total} setelah filter aturan dinonaktifkan",
       "metaSourceCap": "sumber yang dibatasi pada {max} untuk kinerja",
@@ -1155,6 +1208,22 @@
       "openBrowser": "Buka di browser yang terbuka.",
       "headingIssues": "Drift Advisor",
       "disable": "Menonaktifkan Drift Advisor"
+    },
+    "suppressedFindings": {
+      "heading": "Temuan yang Dinyahaktifkan",
+      "headingAria": "Bagian temuan yang dinonaktifkan",
+      "byKind": "{count} oleh {kind}",
+      "kindIgnore": "// abaikan:",
+      "kindIgnoreForFile": "// abaikan_untuk_file:",
+      "kindBaseline": "garis dasar",
+      "unsuppressButton": "Tidak supresi",
+      "unsuppressTitle": "Hapus pengabaian sehingga temuan ini muncul dalam pemindaian normal",
+      "unsuppressHint": "Untuk menghilangkan pemberitahuan {rule} di {file}:{line}, hapus komentar // ignore: di atas baris tersebut.",
+      "columnFile": "File yang berupa file.",
+      "columnLine": "Garis garis garis garis",
+      "columnRule": "Peraturan Pemerintah Peraturan Negara",
+      "columnKind": "Jenis",
+      "columnAction": "Aksi"
     },
     "suppressions": {
       "sectionAria": "Penekanan (suppression) adalah penindasan terhadap",
@@ -1261,6 +1330,7 @@
     "noReportYet": "Belum ada laporan pelanggaran. Jalankan analisis Saropa Lints terlebih dahulu.",
     "clipboardCopyFailed": "Tidak dapat menyalin ke clipboard.",
     "copiedViolationsJson": "Dicopy {count} violation(s) sebagai JSON.",
+    "copiedEverythingJson": "Salinan {count} temuan tanpa penyaringan telah dicopy ke clipboard.",
     "copiedOneViolationJson": "Dicopy 1 pelanggaran sebagai JSON.",
     "driftNotConnected": "Server Drift Advisor tidak terhubung.",
     "copiedBulkFindings": "Disalin {count} temuan yang dipilih (s) sebagai JSON.",

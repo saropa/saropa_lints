@@ -15,9 +15,11 @@ import type { DriftServerInfo } from './types';
 import type { DriftIssueMapped } from './types';
 import { ADVISOR_EXTENSION_ID } from '../suite/siblingDeepLinkTargets';
 import { shouldPublishDriftProblems } from './driftProblemsGate';
+import { getDriftAuthToken } from './auth';
+import { l10n } from '../i18n/runtime';
 
 type DriftTreeNode =
-  | { kind: 'placeholder'; message: string }
+  | { kind: 'placeholder'; message: string; command?: vscode.Command }
   | { kind: 'server'; server: DriftServerInfo }
   | { kind: 'issue'; issue: DriftIssueMapped };
 
@@ -40,6 +42,9 @@ export class DriftAdvisorTreeProvider implements vscode.TreeDataProvider<DriftTr
   private server: DriftServerInfo | null = null;
   private issues: DriftIssueMapped[] = [];
   private loading = false;
+  // Set when the server rejected the last fetch with 401/403 — distinct from
+  // "connected, zero issues" so a bad token doesn't masquerade as a clean project.
+  private authFailed = false;
 
   constructor(private readonly diagnosticCollection: vscode.DiagnosticCollection) {}
 
@@ -47,12 +52,27 @@ export class DriftAdvisorTreeProvider implements vscode.TreeDataProvider<DriftTr
     this.server = server;
     this.issues = issues;
     this.loading = false;
+    this.authFailed = false;
     this.updateDiagnostics();
     this._onDidChangeTreeData.fire();
   }
 
   setLoading(loading: boolean): void {
     this.loading = loading;
+    this._onDidChangeTreeData.fire();
+  }
+
+  /**
+   * Record that the server was reached but rejected the request due to a bad
+   * or missing auth token. Keeps the server node visible (it IS reachable)
+   * while replacing the issue list with an actionable auth-error placeholder.
+   */
+  setAuthFailed(server: DriftServerInfo): void {
+    this.server = server;
+    this.issues = [];
+    this.loading = false;
+    this.authFailed = true;
+    this.updateDiagnostics();
     this._onDidChangeTreeData.fire();
   }
 
@@ -126,11 +146,13 @@ export class DriftAdvisorTreeProvider implements vscode.TreeDataProvider<DriftTr
     if (element.kind === 'placeholder') {
       const item = new vscode.TreeItem(element.message, vscode.TreeItemCollapsibleState.None);
       item.contextValue = 'driftAdvisorPlaceholder';
+      item.command = element.command;
       return item;
     }
     if (element.kind === 'server') {
       const s = element.server;
-      const label = `Server: 127.0.0.1:${s.port}`;
+      // Host is stored at discovery time on DriftServerInfo — no re-parsing needed.
+      const label = `Server: ${s.host}:${s.port}`;
       const item = new vscode.TreeItem(label, vscode.TreeItemCollapsibleState.None);
       item.description = s.version ? `v${s.version}` : undefined;
       item.contextValue = 'driftAdvisorServer';
@@ -169,7 +191,7 @@ export class DriftAdvisorTreeProvider implements vscode.TreeDataProvider<DriftTr
       return [];
     }
     if (this.loading) {
-      return [{ kind: 'placeholder', message: 'Discovering server and fetching issues…' }];
+      return [{ kind: 'placeholder', message: l10n('driftAdvisor.discovering') }];
     }
     if (!this.server) {
       const cfg = vscode.workspace.getConfiguration('saropaLints.driftAdvisor');
@@ -177,9 +199,33 @@ export class DriftAdvisorTreeProvider implements vscode.TreeDataProvider<DriftTr
       return [{
         kind: 'placeholder',
         message: integration
-          ? 'No Drift Advisor server found. Start your app with the server running, then click Refresh.'
-          : 'Drift Advisor integration is off. Enable it in settings (saropaLints.driftAdvisor.integration), then click Refresh.',
+          ? l10n('driftAdvisor.noServerFound')
+          : l10n('driftAdvisor.integrationOff'),
       }];
+    }
+    // Server rejected the last fetch (401/403) — a bad or expired token, not zero issues.
+    if (this.authFailed) {
+      return [
+        { kind: 'server', server: this.server },
+        {
+          kind: 'placeholder',
+          message: l10n('driftAdvisor.authFailed'),
+          command: { command: 'workbench.action.openSettings', title: 'Open Settings', arguments: ['saropaLints.driftAdvisor.authToken'] },
+        },
+      ];
+    }
+    // Server detected but requires auth and no token is configured — guide the user.
+    if (this.server.authRequired) {
+      if (!getDriftAuthToken()) {
+        return [
+          { kind: 'server', server: this.server },
+          {
+            kind: 'placeholder',
+            message: l10n('driftAdvisor.authRequired'),
+            command: { command: 'workbench.action.openSettings', title: 'Open Settings', arguments: ['saropaLints.driftAdvisor.authToken'] },
+          },
+        ];
+      }
     }
     const nodes: DriftTreeNode[] = [
       { kind: 'server', server: this.server },

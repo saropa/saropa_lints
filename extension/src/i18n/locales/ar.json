@@ -713,6 +713,10 @@
     "reloadLater": "في وقت لاحق لاحقاً"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: خطأ",
+      "tooltip": "تحديث شريط الحالة فشل — اضغط للحصول على التفاصيل. قد تعمل الملحقية ما زالت تعمل؛ جرّب تنفيذ أمر من لوحة الأوامر."
+    },
     "menu": {
       "enableOn": "تحليل مفعل (اضغط للإيقاف)",
       "enableOff": "تحليل معطل (اضغط للتفعيل)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} daemon(s) مهجور",
       "openHint": "اضغط لفتح صحة العملية",
       "systemRam": "نظام: {free} من {total} مجاني",
-      "systemLow": "⚠ النظام: {free} من {total} مجاني"
+      "systemLow": "⚠ النظام: {free} من {total} مجاني",
+      "extensionHostWarning": "⚠ مضيف التمديد: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} عملية(ات) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "خادم تحليل {count} تم اكتشافه — إغلاق النوافذ VS Code غير المستخدمة",
       "daemonCount": "Flutter مُساعدين: {total} ({orphaned} مهجور)",
       "scanDaemonOrphans": "الـديـمـونـات الـمُرَدَّدَة: {count} — استخدم تنظيف لـإنهاء",
+      "extensionHostSection": "مُضيف التمديد: {rss} RSS ({heap} / {heapTotal} ذاكرة)",
       "warningHint": "ذاكرة Saropa مرتفعة — انقر للحصول على التفاصيل",
       "criticalHint": "ذاكرة Saropa حيوية — يُنصح بالتنظيف"
     },
@@ -806,6 +812,35 @@
       "kill": "القتل",
       "killed": "تم القتل",
       "killFailed": "فشل"
+    },
+    "watcherExclude": {
+      "prompt": "{count} تطبيق إستثناءات المراقبة الموصى بها مفقودة من هذا المشروع: {patterns}. إضافة هذه الإستثناءات تمنع VS Code من تتبع مصنفات البناء الكبيرة وملفات التصحيح التي تستهلك الذاكرة.",
+      "addAll": "أضف جميعًا",
+      "dismiss": "فصله من العمل",
+      "added": "أضيفت إعدادات استثناءات مراقبة الملفات {count} إلى إعدادات المشروع."
+    },
+    "hazardScan": {
+      "warning": "تم العثور على ملف(ات) كبير(ة) {count} غير مستبعد(ة) من مراقبة الملفات: {files}. ويمكن أن يؤدي ذلك إلى استهلاك الذاكرة وانهيار VS Code.",
+      "addExclusions": "استبعد من المراقب",
+      "dismiss": "فصله من العمل",
+      "added": "تم إضافة نمط(ات) استثناء {count} لمراقبة المُراقب إلى إعدادات الفضاء العمل."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "الإعداد الجاهز: كل شيء واضح — لم يتم العثور على أي مشاكل.",
+    "quickPickTitle": "مشكلات استعداد المساحة العاملة",
+    "quickPickPlaceholder": "اختر مشكلة للحصول على التفاصيل أو لتصحيحها",
+    "statusBar": {
+      "red": "🔴 {count} مشكلة(ات) في مساحة العمل",
+      "yellow": "⚠ {count} مشكلة(ات) في مساحة العمل"
+    },
+    "issue": {
+      "hazardFiles": "$(تحذير) {count} ملف(s) كبير(s) وغير مستثنى",
+      "hazardFilesDetail": "الملفات الكبيرة المراقبة بواسطة مراقب الملفات يمكن أن تستهلك الذاكرة وتحسّن VS Code. قم بتشغيل مسح الخطر لاستبعادها.",
+      "missingExcludes": "$(info) {count} تطبيق المراقبة مفقود(ة)",
+      "missingExcludesDetail": "الأنماط الموصى بها لاستبعاد المراقبة الملفات غير مُكوَّنة. إضافة هذه الأنماط تمنع استخدام الذاكرة غير الضرورية.",
+      "hostMemory": "التنبيه) استضافExtension باستخدام {size}",
+      "hostMemoryDetail": "العملية الرئيسية للتوسيع RSS تتجاوز حد التنبيه. افتح صحة العملية للحصول على التفاصيل."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "لا توجد ملفات متأثرة.",
       "filesTitle": "ملفات متميزة تساهم في اكتشاف واحد على الأقل.",
       "topRuleLabel": "القاعدة العليا هي قواعد الأعلى.",
-      "topRuleTitle": "تصفية النتائج إلى قاعدة {name}."
+      "topRuleTitle": "تصفية النتائج إلى قاعدة {name}.",
+      "sectionHeading": "نظرة عامة",
+      "sectionAria": "إحصائيات موجزة"
     },
     "toolbar": {
       "ariaFiltersActions": "المرشحات والإجراءات.",
@@ -999,7 +1036,17 @@
       "moreSummary": "أكثر من ذلك ، المزيد والمزيد.",
       "moreChevron": "▾",
       "copyJsonTitle": "نسخ الانتهاكات التي تمت تصفيتها كـ JSON ({count})",
-      "saveReportTitle": "حفظ الانتهاكات التي تمت تصفيتها كـ JSON إلى التقارير / YYYYMMDD/."
+      "saveReportTitle": "حفظ الانتهاكات التي تمت تصفيتها كـ JSON إلى التقارير / YYYYMMDD/.",
+      "copyEverythingJson": "نسخ كل شيء كJSON",
+      "copyEverythingJsonTitle": "نسخ جميع نتائج المراجعة كـ JSON — غير مرشَّح، بما في ذلك المكبوت",
+      "saveEverythingReport": "احفظ كل شيء تقرير",
+      "saveEverythingReportTitle": "احفظ جميع نتائج المراجعة كـ JSON إلى تقارير/ - غير مرشح، بما في ذلك المكبوت",
+      "suppressAll": "إخفاء جميع ما هو مرئي",
+      "suppressAllTitle": "أدخل // تجاهل: تعليقات فوق كل نتيجة مرئية",
+      "suppressAllConfirm": "هذا سيقوم بإدراج {count} // تجاهل: التعليقات عبر ملفات مصدرك. هذا لا يمكن إلغاؤه من لوحة التحكم — استخدم إلغاء التحرير الخاص بمحررك أو إعدادات التحكم في الإصدارات لاستعادة التغييرات. هل ترغب في المتابعة؟",
+      "suppressAllProceed": "إخفاء جميع",
+      "suppressAllDone": "تم الإدراج {count} // تجاهل: التعليقات.",
+      "suppressAllFailed": "لم يتم تطبيق تثبيت كتلة — قد تكون بعض الملفات فقط قابلة للقراءة."
     },
     "audit": {
       "scopeFieldTitle": "اختر ما هو مصدر العثورات أدناه",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "تم تغيير vs فرع…",
       "branchPlaceholder": "اسم الفرع",
       "branchAria": "فرع لمقارنة عليه",
+      "includeSuppressedLabel": "أضف المكتملة",
+      "includeSuppressedTitle": "أيضاً أضف العثور التي تُخفي عادةً بواسطة // ignore:، // ignore_for_file:، أو مُدخل الأساس — كل منها مُarked بأسلوبه الذي تم تجاهله. لم تُغيّر إعدادات مشروعك.",
       "runButton": "تشغيل مراجعة",
       "runButtonTitle": "أعد تنفيذ تحليل المشروع الكامل CLI وحمّل نتائجها هنا",
       "cancelButton": "إلغاء الإلغاء",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "إعادة تمكين قواعد المعطلة معطلًا.",
       "reEnableQuickPickPlaceholder": "حدد قاعدة واحدة أو أكثر لإعادة تمكينها.",
       "menuGroupExport": "التصدير الصادرة.",
+      "menuGroupBulk": "إجراءات كتلة",
       "menuGroupFilter": "فلتر & التركيز.",
       "menuGroupOpen": "افتح لوحة القيادة.",
       "menuGroupSystem": "نظام النظام System"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "النتائج التي توصلنا إليها",
+      "heading": "النتائج التي توصلنا إليها",
       "expandAll": "توسيع جميع التوسع.",
       "collapseAll": "إنهيار كل شيء.",
       "bulkSelected": "{count} محدد",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "إجراءات الصف صف.",
       "selectRowAria": "حدد هذا الصف العثور.",
       "copyRowTitle": "قم بنسخ هذه النتيجة كـ JSON.",
+      "suppressedBadge": "تم تعطيل",
+      "suppressedByTitle": "مخفى عن رؤيتك العادية بواسطة {kind} — فقط مرئي هنا لأن \"تضمين المكبوت\" مفعل",
       "metaShown": "تم عرض {filtered}",
       "metaAfterDisable": "{total} بعد تصفية القواعد المعطلة",
       "metaSourceCap": "مصدر محدد عند {max} للأداء.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "افتح في متصفح المتصفح.",
       "headingIssues": "Drift Advisor",
       "disable": "تعطيل مستشار الانجراف Drift Advisor"
+    },
+    "suppressedFindings": {
+      "heading": "النتائج المكبوتة",
+      "headingAria": "قسم العثورات المكبوتة",
+      "byKind": "{count} بواسطة {kind}",
+      "kindIgnore": "// تجاهل:",
+      "kindIgnoreForFile": "// تجاهل_للملف: /لا_تُفكّر_في_الملف",
+      "kindBaseline": "قاعدة أساسية",
+      "unsuppressButton": "إلغاء تفعيل",
+      "unsuppressTitle": "أزل التخفيض بحيث يظهر هذا العثور في المسح العادي",
+      "unsuppressHint": "لإلغاء تثبيت {rule} في {file}:{line}: قم بإزالة التعليق // ignore: فوق تلك السطر.",
+      "columnFile": "ملفات الملفات File file",
+      "columnLine": "خط خط خط",
+      "columnRule": "قاعدة قانونية القواعد",
+      "columnKind": "نوع",
+      "columnAction": "الإجراء"
     },
     "suppressions": {
       "sectionAria": "القمع الضغوطات.",
@@ -1261,6 +1330,7 @@
     "noReportYet": "لم يتم الإبلاغ عن أي انتهاكات حتى الآن. قم بتشغيل تحليل Saropa Lints أولاً.",
     "clipboardCopyFailed": "لم يتمكن من نسخ إلى الحافظة.",
     "copiedViolationsJson": "نسخ {count} انتهاك (((s) كـ JSON.",
+    "copiedEverythingJson": "نسخ {count} النتائج غير المفلترة إلى الحافظة.",
     "copiedOneViolationJson": "نسخ 1 انتهاك كـ JSON.",
     "driftNotConnected": "خادم Drift Advisor غير متصل.",
     "copiedBulkFindings": "نسخ {count} المكتشفات المحددة (((s) كـ JSON.",

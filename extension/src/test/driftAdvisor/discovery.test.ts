@@ -120,6 +120,44 @@ describe('Drift Advisor discovery', () => {
     }
   });
 
+  it('propagates authRequired from health response', async () => {
+    const { server, port } = await createHealthServer({
+      ok: true,
+      version: '1.0.0',
+      capabilities: [],
+      authRequired: true,
+    });
+    try {
+      const info = await tryHealth(port, 3000);
+      assert.ok(info);
+      assert.strictEqual(info!.authRequired, true);
+    } finally {
+      server.close();
+    }
+  });
+
+  it('omits authRequired when health does not include it', async () => {
+    const { server, port } = await createHealthServer({ ok: true, version: '1' });
+    try {
+      const info = await tryHealth(port, 3000);
+      assert.ok(info);
+      assert.strictEqual(info!.authRequired, undefined);
+    } finally {
+      server.close();
+    }
+  });
+
+  it('stores host on DriftServerInfo from the probed endpoint', async () => {
+    const { server, port } = await createHealthServer({ ok: true });
+    try {
+      const info = await tryHealth(port, 3000, '127.0.0.1');
+      assert.ok(info);
+      assert.strictEqual(info!.host, '127.0.0.1');
+    } finally {
+      server.close();
+    }
+  });
+
   it('discoverServer returns first server in range', async () => {
     const { server, port } = await createHealthServer({
       ok: true,

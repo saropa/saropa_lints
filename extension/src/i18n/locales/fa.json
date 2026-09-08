@@ -713,6 +713,10 @@
     "reloadLater": "بعد بعداً بعدها"
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: خطا",
+      "tooltip": "وضعیت پانل وضعیت به‌روزرسانی شد — کلیک کنید تا جزئیات را ببینید. افزونه ممکن است هنوز کار کند؛ دستوری را از پانل دستور اجرا کنید."
+    },
     "menu": {
       "enableOn": "تحلیل فعال است (برای غیر فعال کردن کلیک کنید)",
       "enableOff": "تحلیل غیر فعال (کلیک کنید تا فعال شود)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} پرورش دهنده(ها) ترک شده",
       "openHint": "کلیک کنید تا پرچه سلامت را باز کنید",
       "systemRam": "سیستم: {free} از {total} رایگان",
-      "systemLow": "⚠ سیستم: {free} از {total} رایگان"
+      "systemLow": "⚠ سیستم: {free} از {total} رایگان",
+      "extensionHostWarning": "⚠ افزونه هاست: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} فرآیند(ها) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "تحلیل سرور {count} تشخیص داده شد — بستن پنجره های VS Code نا مورد استفاده",
       "daemonCount": "Flutter نیمکت‌ها: {total} ({orphaned} بدون والد)",
       "scanDaemonOrphans": "اسکن های پیگیری فرزندناشده: {count} — از تمیز کردن برای خاتمه دادن استفاده کنید",
+      "extensionHostSection": "تکنولوژی افزونه: {rss} RSS ({heap} / {heapTotal} پشته)",
       "warningHint": "ذخیره سازی Saropa بالا است — کلیک کنید تا جزئیات را ببینید",
       "criticalHint": "ذخیره سازی Saropa اهمیت ویژه ای دارد — تمیز کردن پیشنهاد می‌شود"
     },
@@ -806,6 +812,35 @@
       "kill": "کیل کردن",
       "killed": "کیلدد",
       "killFailed": "ناموفق"
+    },
+    "watcherExclude": {
+      "prompt": "{count} تعدادی از فایل‌های نظارتی که پیشنهاد می‌شود از نظارت خارج شوند، در این فضای کار وجود ندارند: {patterns} . افزودن آنها از VS Code جلوگیری می‌کند تا اشیاء بزرگ ساخت و ذخیره‌سازی‌های حافظه را رد کند که حافظه را هدر ببرند.",
+      "addAll": "افزودن همه",
+      "dismiss": "اخراج از کار",
+      "added": "فایل‌های نظارت‌کننده {count} به تنظیمات فضای کاری افزوده شدند."
+    },
+    "hazardScan": {
+      "warning": "فایل(های) بزرگ {count} پیدا شد که از نظارت فایل استثناء نشده اند: {files}. این فایل(های) می توانند حافظه را خالی کنند و VS Code را خاموش کنند.",
+      "addExclusions": "از نظارت خارج کن",
+      "dismiss": "اخراج از کار",
+      "added": "الگوی (های) حذف {count} نظارتی به تنظیمات فضای کاری افزوده شد."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "آمادگی فضای کار: همه چیز درست است — هیچ مشکلی پیدا نشد.",
+    "quickPickTitle": "مشکلات آمادگی فضای کار",
+    "quickPickPlaceholder": "یک مشکل را انتخاب کنید تا جزئیات آن را ببینید یا آن را تصحیح کنید",
+    "statusBar": {
+      "red": "🔴 {count} مشکل(های) فضای کاری",
+      "yellow": "⚠ {count} مشکل(های) فضای کاری"
+    },
+    "issue": {
+      "hazardFiles": "(هشدار) {count} فایل(های) بزرگ غیرمحدود شده",
+      "hazardFilesDetail": "فایل‌های بزرگی که توسط ناظر فایل ردیابی می‌شوند می‌توانند حافظه را به خوبی استفاده کنند و VS Code را خاموش کنند. اجرای اسکن خطر را انجام دهید تا آنها را از بین ببرید.",
+      "missingExcludes": "$(info) {count} عدم وجود نظارت (exclusion) در نظارت",
+      "missingExcludesDetail": "الگو های حذف فایل ناظر پیشنهادی تنظیم نشده اند. افزودن آنها جلوگیری از استفاده از حافظه غیر ضروری می کند.",
+      "hostMemory": "(هشدار) میزبان افزونه از طریق {size}",
+      "hostMemoryDetail": "فرایند میزبان افزونه RSS محدوده ا cảnhح به ویژه را از بین می‌برد. جزئیات را در مورد سلامت فرایند باز کنید."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "هیچ فایل ای تحت تاثیر قرار نگرفته است.",
       "filesTitle": "فایل های متمایز که حداقل یک یافته را به دست می آورند.",
       "topRuleLabel": "قانون برتر، قاعده ی بالاست.",
-      "topRuleTitle": "یافته های فیلتر را به {name} قانون بفرستید."
+      "topRuleTitle": "یافته های فیلتر را به {name} قانون بفرستید.",
+      "sectionHeading": "مقدمه",
+      "sectionAria": "مقدمه آماری"
     },
     "toolbar": {
       "ariaFiltersActions": "فیلترها و اقدامات انجام شده",
@@ -999,7 +1036,17 @@
       "moreSummary": "بیشتر بیشتر بیشتر More",
       "moreChevron": "▾",
       "copyJsonTitle": "کپی کردن نقض های فیلتر شده به عنوان JSON ({count})",
-      "saveReportTitle": "ذخیره نقض فیلتر شده به عنوان JSON در گزارش ها / YYYYMMDD/"
+      "saveReportTitle": "ذخیره نقض فیلتر شده به عنوان JSON در گزارش ها / YYYYMMDD/",
+      "copyEverythingJson": "همه چیز را به عنوان JSON کپی کنید",
+      "copyEverythingJsonTitle": "همه ی یافته های ا审计 را به صورت JSON کپی کنید — بدون فیلتر، شامل مهار شده",
+      "saveEverythingReport": "گزارش چیز همه را ذخیره کنید",
+      "saveEverythingReportTitle": "تمام یافته‌های آudit را به JSON ذخیره کنید به reports/ — بدون فیلتر، شامل مهار شده",
+      "suppressAll": "همهٔ قابل مشاهده را غیر فعال کن",
+      "suppressAllTitle": "کد // نادیده گرفتن: در بالای هر یافته دیده شدنی قرار دهید",
+      "suppressAllConfirm": "این اینترس خواهد کرد {count} // ignore: کامنت هایی را در تمام فایل های منبع خود وارد می کند. این کار از پانل کنترل قابل برگشت نیست — از ویژیون یا کنترل نسخه ای را برگشت دهید. ادامه؟",
+      "suppressAllProceed": "همه را غیر فعال کن",
+      "suppressAllDone": "درج شده {count} // نادیده گرفته شود: نظرات.",
+      "suppressAllFailed": "نمی تواند اعمال محدودیت جمعی را انجام دهد — چندین فایل ممکن است فقط خواندنی باشند."
     },
     "audit": {
       "scopeFieldTitle": "یافته‌های زیر از کجا گرفته شده‌اند",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "تغییر یافته vs شاخه...",
       "branchPlaceholder": "نام شاخه",
       "branchAria": "فرعی که مقایسه می‌شود",
+      "includeSuppressedLabel": "دستورالعمل های صریح:",
+      "includeSuppressedTitle": "همچنین پیدا کردن یافته‌هایی که معمولاً توسط // ignore:، // ignore_for_file: یا ورودی پایه مخفی می‌شوند — هر کدام با نحوهٔ غیرفعال‌سازی آن‌ها مشخص شده‌اند. تنظیمات پروژه شما تغییر نمی‌کند.",
       "runButton": "اجرای آ审计",
       "runButtonTitle": "تمام پروژه را با CLI ا审计 اجرا کنید و نتایج آن را اینجا بارگذاری کنید",
       "cancelButton": "لغو کن لغو کنید",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "قوانین غیرفعال شده را دوباره فعال کنید",
       "reEnableQuickPickPlaceholder": "یک یا چند قانون را برای فعال کردن مجدد انتخاب کنید.",
       "menuGroupExport": "صادرات و فروش:",
+      "menuGroupBulk": "عملیات جمعی",
       "menuGroupFilter": "فیلتر و فوکوس کنید",
       "menuGroupOpen": "داشبورد را باز کنید.",
       "menuGroupSystem": "سیستم سیستم System"
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "یافته ها: نتایج حاصل از بررسی",
+      "heading": "یافته ها: نتایج حاصل از بررسی",
       "expandAll": "همه را گسترش دهید",
       "collapseAll": "همه چیز فرو می ریزد.",
       "bulkSelected": "{count} انتخاب شده",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "اقدامات صف (Row actions) اعمال ردیف",
       "selectRowAria": "این ردیف یافتن را انتخاب کنید.",
       "copyRowTitle": "این یافته را به عنوان JSON کپی کنید.",
+      "suppressedBadge": "ممنوع شده",
+      "suppressedByTitle": "مخفی از نظر نمایش معمولی شما توسط {kind} — فقط در اینجا قابل مشاهده است زیرا \"Include suppressed\" فعال است",
       "metaShown": "{filtered} مورد نمایش داده شد",
       "metaAfterDisable": "{total} مورد پس از فیلتر قوانین غیرفعال",
       "metaSourceCap": "منبع با حد {max} برای عملکرد _ PH0__ محدود شده است.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "در مرورگر باز شود.",
       "headingIssues": "Drift Advisor",
       "disable": "غیرفعال کردن Drift Advisor"
+    },
+    "suppressedFindings": {
+      "heading": "یافته‌های غیرفعال شده",
+      "headingAria": "بخش یافته‌های غیرفعال شده",
+      "byKind": "{count} توسط {kind}",
+      "kindIgnore": "// نادیده گرفتن:",
+      "kindIgnoreForFile": "// اهمیت_نکردن_فایل: /نیاز_به_فکر_کردن",
+      "kindBaseline": "بیس لاین#line",
+      "unsuppressButton": "غیر فعال سازی",
+      "unsuppressTitle": "محدودیت را حذف کنید تا این یافته در اسکن‌های معمولی ظاهر شود",
+      "unsuppressHint": "برای غیر فعال کردن {rule} در {file}:{line}: نظریه // ignore: را بالای خط حذف کنید.",
+      "columnFile": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "columnLine": "خط خط خط",
+      "columnRule": "قاعده قانون اساسی",
+      "columnKind": "کیند",
+      "columnAction": "عملیات"
     },
     "suppressions": {
       "sectionAria": "سرکوب های سرکوب",
@@ -1261,6 +1330,7 @@
     "noReportYet": "هنوز هیچ گزارشی از تخلفات گزارش نشده است. ابتدا تجزیه و تحلیل Saropa Lints را اجرا کنید.",
     "clipboardCopyFailed": "نتوانست به کلیپ بورد کپی کند.",
     "copiedViolationsJson": "کپی شده {count} نقض (((s) به عنوان JSON.",
+    "copiedEverythingJson": "کپی شد {count} یافته های ناfiltered به پیستیون کپی بُرده شد.",
     "copiedOneViolationJson": "کپی شده 1 نقض به عنوان JSON.",
     "driftNotConnected": "سرور Drift Advisor به اینترنت متصل نشده است.",
     "copiedBulkFindings": "کپی {count} یافته های انتخاب شده (((s) به عنوان JSON.",

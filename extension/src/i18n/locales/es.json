@@ -713,6 +713,10 @@
     "reloadLater": "Más tarde más adelante después."
   },
   "statusBar": {
+    "error": {
+      "label": "Saropa Lints: Error",
+      "tooltip": "Actualización de la barra de estado falló — haga clic para ver detalles. La extensión aún puede funcionar; intente ejecutar un comando desde la Paleta de Comandos."
+    },
     "menu": {
       "enableOn": "Análisis habilitado (haga clic para deshabilitar)",
       "enableOff": "Análisis desactivado (haga clic para activar)",
@@ -731,7 +735,8 @@
       "criticalOrphans": "🔴 {count} daemon(es) huérfano(s)",
       "openHint": "Haga clic para abrir Salud del Proceso",
       "systemRam": "Sistema: {free} de {total} gratis",
-      "systemLow": "⚠ Sistema: {free} de {total} libre"
+      "systemLow": "⚠ Sistema: {free} de {total} libre",
+      "extensionHostWarning": "⚠ Anfitrión de extensión: {size}"
     },
     "tooltip": {
       "saropaSection": "Saropa Lints: {count} proceso(s) ({size} RSS)",
@@ -743,6 +748,7 @@
       "otherHint": "Servidor(s) de análisis {count} detectado(s) — cerrar ventanas VS Code no utilizadas",
       "daemonCount": "Flutter daemons: {total} ({orphaned} orfanizados)",
       "scanDaemonOrphans": "Daemons de escaneo orfánicos: {count} — use Clean Up para matar",
+      "extensionHostSection": "Host de extensión: {rss} RSS (montón {heap} / {heapTotal})",
       "warningHint": "Saropa memoria es alta — haga clic para ver detalles",
       "criticalHint": "Saropa memory es crítico — limpieza recomendada"
     },
@@ -806,6 +812,35 @@
       "kill": "Matar",
       "killed": "Delicado",
       "killFailed": "Fallido"
+    },
+    "watcherExclude": {
+      "prompt": "Las exclusiones recomendadas por {count} del observador de archivos están faltando en este workspace: {patterns}. Agregarlas evita que VS Code siga rastreando grandes artefactos de compilación y dumps de heap que consumen memoria.",
+      "addAll": "Añadir Todo",
+      "dismiss": "Despido de trabajo.",
+      "added": "Se agregaron la(s) exclusión(es) {count} del archivo-watcher a la configuración del espacio de trabajo."
+    },
+    "hazardScan": {
+      "warning": "Se encontraron {count} archivo(s) grande(s) no excluido(s) del observador de archivos: {files}. Estos pueden agotar la memoria y hacer colapsar a VS Code.",
+      "addExclusions": "Excluir de Watcher",
+      "dismiss": "Despido de trabajo.",
+      "added": "Se agregó el patrón(s) de exclusión del observador {count} a la configuración del espacio de trabajo."
+    }
+  },
+  "workspaceReadiness": {
+    "allClear": "Preparación del espacio de trabajo: todo en orden — no se encontraron problemas.",
+    "quickPickTitle": "Problemas de preparación del espacio de trabajo",
+    "quickPickPlaceholder": "Selecciona un problema para ver detalles o para corregirlo",
+    "statusBar": {
+      "red": "🔴 {count} problema(s) de espacio de trabajo",
+      "yellow": "⚠ {count} problema(s) de espacio de trabajo"
+    },
+    "issue": {
+      "hazardFiles": "$(advertencia) {count} archivo(s) grande(s) no excluido(s)",
+      "hazardFilesDetail": "Archivos grandes seguidos por el observador de archivos pueden agotar la memoria y hacer que VS Code se bloquee. Ejecute el escaneo de riesgos para excluirlos.",
+      "missingExcludes": "$(info) {count} falta(s) de exclusión(s) del observador",
+      "missingExcludesDetail": "Los patrones de exclusión del observador de archivos recomendados no están configurados. Agregarlos previene el uso innecesario de memoria.",
+      "hostMemory": "$(alert) Host de la extensión usando {size}",
+      "hostMemoryDetail": "El proceso de host de la extensión RSS excede el umbral de advertencia. Abrir Salud del Proceso para más detalles."
     }
   },
   "machineDashboard": {
@@ -975,7 +1010,9 @@
       "filesSubNone": "No hay archivos afectados.",
       "filesTitle": "Archivos distintos que contribuyen con al menos un hallazgo.",
       "topRuleLabel": "La regla más importante es la de reglas.",
-      "topRuleTitle": "Filtrar los resultados para la regla {name}."
+      "topRuleTitle": "Filtrar los resultados para la regla {name}.",
+      "sectionHeading": "Visión general",
+      "sectionAria": "Estadísticas generales"
     },
     "toolbar": {
       "ariaFiltersActions": "Filtros y acciones.",
@@ -999,7 +1036,17 @@
       "moreSummary": "Más más más más.",
       "moreChevron": "▾",
       "copyJsonTitle": "Copia las violaciones filtradas como JSON ({count})",
-      "saveReportTitle": "Guardar las violaciones filtradas como JSON en los informes / YYYYMMDD/."
+      "saveReportTitle": "Guardar las violaciones filtradas como JSON en los informes / YYYYMMDD/.",
+      "copyEverythingJson": "Copiar todo como JSON",
+      "copyEverythingJsonTitle": "Copiar TODO los hallazgos de auditoría como JSON — sin filtrar, incluyendo los suprimidos",
+      "saveEverythingReport": "Guardar todo el informe",
+      "saveEverythingReportTitle": "Guarda TODOS los hallazgos de auditoría como JSON en reports/ — no filtrados, incluyendo los suprimidos",
+      "suppressAll": "Suprime todos los visibles",
+      "suppressAllTitle": "Insertar // ignore: comentarios encima de cada hallazgo visible",
+      "suppressAllConfirm": "Esto insertará {count} // ignore: comentarios en todos sus archivos de origen. Esto no se puede deshacer desde el panel de control — use el deshacer de su editor o el control de versiones para revertir. ¿Continuar?",
+      "suppressAllProceed": "Suprime todo",
+      "suppressAllDone": "Insertado {count} // ignore: comentarios.",
+      "suppressAllFailed": "No se pudo aplicar la supresión en masa — algunos archivos pueden estar en modo solo lectura."
     },
     "audit": {
       "scopeFieldTitle": "Elige de dónde provienen los hallazgos que se muestran a continuación",
@@ -1010,6 +1057,8 @@
       "scopeChangedBranch": "Cambiar vs rama…",
       "branchPlaceholder": "nombre de la rama",
       "branchAria": "rama a comparar",
+      "includeSuppressedLabel": "Incluir suprimidos",
+      "includeSuppressedTitle": "También incluya hallazgos normalmente ocultos por // ignore:, // ignore_for_file: o una entrada de baseline — cada uno marcado con cómo fue suprimido. La configuración de su proyecto no cambia.",
       "runButton": "Ejecutar auditoría",
       "runButtonTitle": "Ejecute el CLI de auditoría del proyecto completo y cargue sus resultados aquí",
       "cancelButton": "Cancelar cancelar el pago de la cuenta.",
@@ -1054,6 +1103,7 @@
       "reEnableQuickPickTitle": "Re-activar las reglas deshabilitadas.",
       "reEnableQuickPickPlaceholder": "Seleccione una o más reglas para volver a habilitar.",
       "menuGroupExport": "Exportación de exportaciones.",
+      "menuGroupBulk": "Acciones en masa",
       "menuGroupFilter": "Filtrar y enfocar.",
       "menuGroupOpen": "Abra el tablero de instrumentos y abra.",
       "menuGroupSystem": "El sistema de sistemas es un sistema."
@@ -1088,6 +1138,7 @@
     },
     "findings": {
       "sectionAria": "Los hallazgos de los resultados.",
+      "heading": "Los hallazgos de los resultados.",
       "expandAll": "Expanda todo y extienda todos.",
       "collapseAll": "Todo se derrumba.",
       "bulkSelected": "{count} seleccionado(s)",
@@ -1101,6 +1152,8 @@
       "colActionsAria": "Acciones de fila Las acciones en fila.",
       "selectRowAria": "Seleccione esta fila de búsqueda para encontrar.",
       "copyRowTitle": "Copie este hallazgo como JSON.",
+      "suppressedBadge": "Suprimido",
+      "suppressedByTitle": "Oculto de tu vista normal por {kind} — solo visible aquí porque \"Incluir suprimidos\" está activado",
       "metaShown": "{filtered} mostrado(s)",
       "metaAfterDisable": "{total} tras filtro de reglas deshabilitadas",
       "metaSourceCap": "fuente limitada a {max} para el rendimiento.",
@@ -1155,6 +1208,22 @@
       "openBrowser": "Abrir en el navegador.",
       "headingIssues": "Drift Advisor",
       "disable": "Desactiva el Drift Advisor."
+    },
+    "suppressedFindings": {
+      "heading": "Hallazgos Suprimidos",
+      "headingAria": "Sección de hallazgos suprimidos",
+      "byKind": "{count} por {kind}",
+      "kindIgnore": "// ignorar:",
+      "kindIgnoreForFile": "// ignorar_para_archivo:",
+      "kindBaseline": "base",
+      "unsuppressButton": "Unsuprimir",
+      "unsuppressTitle": "Elimine la supresión para que este hallazgo aparezca en escaneos normales",
+      "unsuppressHint": "Para desactivar {rule} en {file}:{line}: elimina el comentario // ignore: encima de esa línea.",
+      "columnFile": "El archivo de archivos es un archivo.",
+      "columnLine": "Línea Linea La línea",
+      "columnRule": "El artículo de la ley, el reglamento.",
+      "columnKind": "Tipo",
+      "columnAction": "Acción"
     },
     "suppressions": {
       "sectionAria": "Las supresiones de las suposiciones.",
@@ -1261,6 +1330,7 @@
     "noReportYet": "Todavía no se han reportado violaciones. Ejecuta primero el análisis de Saropa Lints.",
     "clipboardCopyFailed": "No se pudo copiar a la portapapeles.",
     "copiedViolationsJson": "Copiado violación {count} (s) como JSON.",
+    "copiedEverythingJson": "Copiado {count} hallazgos sin filtrar al portapapeles.",
     "copiedOneViolationJson": "Copiado 1 violación como JSON.",
     "driftNotConnected": "El servidor de Drift Advisor no está conectado.",
     "copiedBulkFindings": "Copiado {count} hallazgo seleccionado (s) como JSON.",

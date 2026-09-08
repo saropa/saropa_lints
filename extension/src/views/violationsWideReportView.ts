@@ -44,6 +44,7 @@ import {
 } from './todosAndHacksDefaults';
 import { discoverServer } from '../driftAdvisor/discovery';
 import { fetchIssues } from '../driftAdvisor/client';
+import { getDriftAuthToken } from '../driftAdvisor/auth';
 import { mapIssuesToLocations } from '../driftAdvisor/mapper';
 import {
   sortViolationsByReportPriority,
@@ -656,12 +657,13 @@ async function loadDriftAdvisorSnapshot(): Promise<DriftAdvisorSnapshot> {
     return { integrationEnabled: true, connected: false, issues: [] };
   }
   try {
-    const raw = await fetchIssues(server);
+    // Read auth token for authenticated Drift Advisor servers.
+    const raw = await fetchIssues(server, getDriftAuthToken());
     const mapped = await mapIssuesToLocations(raw);
     return {
       integrationEnabled: true,
       connected: true,
-      serverLabel: `127.0.0.1:${server.port}${server.version ? ` (v${server.version})` : ''}`,
+      serverLabel: `${server.host}:${server.port}${server.version ? ` (v${server.version})` : ''}`,
       issues: mapped.map((issue) => ({
         source: issue.source,
         severity: issue.severity,
@@ -674,7 +676,7 @@ async function loadDriftAdvisorSnapshot(): Promise<DriftAdvisorSnapshot> {
     return {
       integrationEnabled: true,
       connected: true,
-      serverLabel: `127.0.0.1:${server.port}${server.version ? ` (v${server.version})` : ''}`,
+      serverLabel: `${server.host}:${server.port}${server.version ? ` (v${server.version})` : ''}`,
       issues: [],
     };
   }

@@ -229,6 +229,7 @@
   "config.property.driftAdvisor.portRange.description": "Port range [min, max] to scan for Drift Advisor server (inclusive).",
   "config.property.driftAdvisor.pollIntervalMs.description": "How often to poll the Drift Advisor server for issues (milliseconds). Set to 0 to disable automatic polling (refresh manually).",
   "config.property.driftAdvisor.showInProblems.description": "Publish Drift Advisor issues as diagnostics in the Problems view (source: Saropa Drift Advisor).",
+  "config.property.driftAdvisor.authToken.description": "Bearer token for authenticating with the Drift Advisor server. Required when the server binds to a non-loopback address (the documented default). Leave empty for unauthenticated localhost servers.",
   "config.section.Package.Vibrancy.title": "Package Vibrancy",
   "config.property.packageVibrancy.githubToken.description": "GitHub Personal Access Token for increased API rate limits (60/hr without, 5000/hr with)",
   "config.property.packageVibrancy.scanOnOpen.description": "Automatically scan when a Flutter project is opened",
