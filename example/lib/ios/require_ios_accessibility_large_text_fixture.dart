@@ -150,3 +150,43 @@ void _goodMethodCall() {
 void _goodFinalVariable(double fontSize) {
   Text('Hello', style: TextStyle(fontSize: fontSize));
 }
+
+// BAD: bare double literal — still a hardcoded value.
+// expect_lint: require_ios_accessibility_large_text
+void _badDoubleLiteral() {
+  Text('Hello', style: TextStyle(fontSize: 14.0));
+}
+
+// BAD: negated literal — still hardcoded, must recurse through the
+// PrefixExpression to find the literal underneath.
+// expect_lint: require_ios_accessibility_large_text
+void _badNegatedLiteral() {
+  Text('Hello', style: TextStyle(fontSize: -(14.0)));
+}
+
+// BAD: arithmetic on two literals — both operands are hardcoded, so
+// the whole expression is a hardcoded font size.
+// expect_lint: require_ios_accessibility_large_text
+void _badArithmeticOnLiterals() {
+  Text('Hello', style: TextStyle(fontSize: 14 * 2));
+}
+
+// BAD: top-level const identifier — a const is fixed at compile time,
+// so it is exactly as hardcoded as a literal.
+const double kBadFontSize = 14.0;
+// expect_lint: require_ios_accessibility_large_text
+void _badConstIdentifier() {
+  Text('Hello', style: TextStyle(fontSize: kBadFontSize));
+}
+
+// BAD: static const field accessed via a prefixed/property expression —
+// exercises the PrefixedIdentifier/PropertyAccess branch of
+// _isConstIdentifier, not just the bare SimpleIdentifier branch above.
+class _AppFontSizes {
+  static const double small = 12.0;
+}
+
+// expect_lint: require_ios_accessibility_large_text
+void _badConstStaticField() {
+  Text('Hello', style: TextStyle(fontSize: _AppFontSizes.small));
+}
