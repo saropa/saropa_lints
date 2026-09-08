@@ -2764,6 +2764,13 @@
   "docPlacement": {
     "diagnostic": {
       "message": "This document still reads as open work but is filed in the archive/history location — move it to {openIssuesDir} instead."
+    },
+    "quickFix": {
+      "title": "Move to {openIssuesDir}"
+    },
+    "error": {
+      "noWorkspaceFolder": "Cannot move this file — it is not inside an open workspace folder.",
+      "targetExists": "Cannot move — a file already exists at {targetPath}."
     }
   },
   "sidebar": {

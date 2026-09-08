@@ -55,6 +55,11 @@ describe('bugArchivalCheck', () => {
       assert.strictEqual(diag?.source, 'Saropa Lints');
     });
 
+    it('flags a Fixed report using the "**Status:** Fixed" bold-label style', () => {
+      const diag = computeBugArchivalDiagnostic('**Status:** Fixed\n', positionAtForSingleLine());
+      assert.ok(diag, 'expected a diagnostic regardless of which bold style wraps the field');
+    });
+
     it('flags a Closed report for archival', () => {
       const diag = computeBugArchivalDiagnostic('Status: Closed\n', positionAtForSingleLine());
       assert.ok(diag, 'expected a diagnostic for a Closed report');

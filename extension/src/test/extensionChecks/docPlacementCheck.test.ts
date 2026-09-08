@@ -12,16 +12,17 @@ import {
   globToRegExp,
   matchesArchiveGlob,
   computeDocPlacementDiagnostic,
+  DocPlacementCodeActionProvider,
 } from '../../extensionChecks/docPlacementCheck';
 
 const ARCHIVE_GLOB = '**/plans/history/**/*.md';
 const OPEN_SIGNALS = [
-  String.raw`^\*{0,2}Status:\*{0,2}\s*Open\*{0,2}\s*$`,
-  String.raw`^\*{0,2}Severity:\*{0,2}\s*(Critical|High|Major)\*{0,2}\s*$`,
+  String.raw`^\*{0,2}Status:\*{0,2}\s*\*{0,2}Open\*{0,2}\s*$`,
+  String.raw`^\*{0,2}Severity:\*{0,2}\s*\*{0,2}(Critical|High|Major)\*{0,2}\s*$`,
   String.raw`\|\s*(Critical|High|Major)\s*\|`,
   String.raw`^#{1,6}\s*(Recommended [Nn]ext [Ss]teps|Work [Ss]till to [Dd]o|TODO|Open [Ii]tems)\s*$`,
 ];
-const CLOSED_SIGNALS = [String.raw`^\*{0,2}Status:\*{0,2}\s*(Fixed|Closed|Done)\*{0,2}\s*$`];
+const CLOSED_SIGNALS = [String.raw`^\*{0,2}Status:\*{0,2}\s*\*{0,2}(Fixed|Closed|Done)\*{0,2}\s*$`];
 
 describe('docPlacementCheck', () => {
   describe('globToRegExp / matchesArchiveGlob', () => {
@@ -50,6 +51,20 @@ describe('docPlacementCheck', () => {
     it('treats "**" as matching zero segments too', () => {
       // '**/plans/history/**/*.md' with nothing between 'history/' and the filename.
       assert.strictEqual(matchesArchiveGlob('/repo/plans/history/report.md', ARCHIVE_GLOB), true);
+    });
+
+    it('matches a bare "*.md" glob only against a path with no "/" at all', () => {
+      // No leading '**', so '*' cannot cross a '/' — this only matches a
+      // path VS Code would report as just "report.md" with no directory,
+      // never a real absolute/workspace-relative path (see the JSDoc note
+      // on globToRegExp about there being no implicit '**' prefix).
+      assert.strictEqual(matchesArchiveGlob('report.md', '*.md'), true);
+      assert.strictEqual(matchesArchiveGlob('/repo/report.md', '*.md'), false);
+    });
+
+    it('matches a glob with no wildcards only as an exact full-path literal', () => {
+      assert.strictEqual(matchesArchiveGlob('notes.md', 'notes.md'), true);
+      assert.strictEqual(matchesArchiveGlob('/repo/notes.md', 'notes.md'), false);
     });
   });
 
@@ -85,6 +100,12 @@ describe('docPlacementCheck', () => {
       assert.strictEqual(diag, null);
     });
 
+    it('flags a bold-value severity field ("Severity: **Critical**")', () => {
+      const text = '# Report Title\n\nSeverity: **Critical**\n\n## Open items\n1. Fix it.\n';
+      const diag = computeDocPlacementDiagnostic(text, OPEN_SIGNALS, CLOSED_SIGNALS, 'bugs/');
+      assert.ok(diag, 'expected a diagnostic for a bold-value Severity field');
+    });
+
     it('flags a severity table cell', () => {
       const text = '# Report\n\n| Finding | Severity |\n| --- | --- |\n| X | Critical |\n';
       const diag = computeDocPlacementDiagnostic(text, OPEN_SIGNALS, CLOSED_SIGNALS, 'bugs/');
@@ -95,6 +116,34 @@ describe('docPlacementCheck', () => {
       const text = '# Report\n\nStatus: Open\n';
       const diag = computeDocPlacementDiagnostic(text, ['(unterminated', ...OPEN_SIGNALS], CLOSED_SIGNALS, 'bugs/');
       assert.ok(diag, 'expected the valid patterns to still be evaluated');
+    });
+
+    it('sets a diagnostic code so the quick fix can scope to this check only', () => {
+      const text = 'Status: Open\n';
+      const diag = computeDocPlacementDiagnostic(text, OPEN_SIGNALS, CLOSED_SIGNALS, 'bugs/');
+      assert.strictEqual(diag?.code, 'docPlacement');
+    });
+  });
+
+  describe('DocPlacementCodeActionProvider', () => {
+    const provider = new DocPlacementCodeActionProvider();
+    const fakeDocument = { uri: { fsPath: '/repo/plans/history/report.md' } } as any;
+    const fakeRange = {} as any;
+
+    it('offers no action when no diagnostic in context has this check\'s code', () => {
+      const context = { diagnostics: [{ code: 'someOtherCheck' }] } as any;
+      const actions = provider.provideCodeActions(fakeDocument, fakeRange, context);
+      assert.strictEqual(actions.length, 0);
+    });
+
+    it('offers a "move" quick fix scoped to this check\'s diagnostics only', () => {
+      const ownDiag = { code: 'docPlacement' };
+      const otherDiag = { code: 'someOtherCheck' };
+      const context = { diagnostics: [ownDiag, otherDiag] } as any;
+      const actions = provider.provideCodeActions(fakeDocument, fakeRange, context);
+      assert.strictEqual(actions.length, 1);
+      assert.deepStrictEqual(actions[0].diagnostics, [ownDiag]);
+      assert.strictEqual(actions[0].command?.command, 'saropaLints.docPlacement.moveToOpenIssues');
     });
   });
 });

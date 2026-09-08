@@ -1659,8 +1659,8 @@
               "type": "string"
             },
             "default": [
-              "^\\*{0,2}Status:\\*{0,2}\\s*Open\\*{0,2}\\s*$",
-              "^\\*{0,2}Severity:\\*{0,2}\\s*(Critical|High|Major)\\*{0,2}\\s*$",
+              "^\\*{0,2}Status:\\*{0,2}\\s*\\*{0,2}Open\\*{0,2}\\s*$",
+              "^\\*{0,2}Severity:\\*{0,2}\\s*\\*{0,2}(Critical|High|Major)\\*{0,2}\\s*$",
               "\\|\\s*(Critical|High|Major)\\s*\\|",
               "^#{1,6}\\s*(Recommended [Nn]ext [Ss]teps|Work [Ss]till to [Dd]o|TODO|Open [Ii]tems)\\s*$"
             ],
@@ -1672,7 +1672,7 @@
               "type": "string"
             },
             "default": [
-              "^\\*{0,2}Status:\\*{0,2}\\s*(Fixed|Closed|Done)\\*{0,2}\\s*$"
+              "^\\*{0,2}Status:\\*{0,2}\\s*\\*{0,2}(Fixed|Closed|Done)\\*{0,2}\\s*$"
             ],
             "description": "%config.property.docPlacement.closedSignals.description%"
           }

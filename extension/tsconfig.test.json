@@ -266,6 +266,7 @@
     "src/workspaceFolderPicker.ts",
     "src/commandGuards.ts",
     "src/test/commandGuards.test.ts",
+    "src/extensionChecks/docConventions.ts",
     "src/extensionChecks/bugArchivalCheck.ts",
     "src/test/extensionChecks/bugArchivalCheck.test.ts",
     "src/extensionChecks/docPlacementCheck.ts",

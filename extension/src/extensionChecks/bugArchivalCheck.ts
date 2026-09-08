@@ -15,12 +15,19 @@
  */
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
+import { OPEN_ISSUES_DIR } from './docConventions';
 
 /** Status values that mean "this report is done and should be archived." */
 const DONE_STATUSES = ['Fixed', 'Closed', 'Declined'];
 
-/** Matches `**Status: Fixed**` / `Status: Closed` etc. on its own line. */
-const STATUS_LINE_PATTERN = /^\*{0,2}Status:\s*([A-Za-z ]+?)\*{0,2}\s*$/m;
+/**
+ * Matches a `Status:` field line in either bold style this repo's own
+ * reports use — `**Status: Fixed**` (bold wraps the whole field) and
+ * `**Status:** Fixed` (bold wraps only the label) — via the `\*{0,2}` right
+ * after the colon. See `docPlacementCheck.ts`'s equivalent signal, which
+ * hit the same gap for the second style.
+ */
+const STATUS_LINE_PATTERN = /^\*{0,2}Status:\*{0,2}\s*([A-Za-z ]+?)\*{0,2}\s*$/m;
 
 let _collection: vscode.DiagnosticCollection | undefined;
 
@@ -28,8 +35,8 @@ let _collection: vscode.DiagnosticCollection | undefined;
 export function isBugReportFile(fsPath: string): boolean {
   const normalized = fsPath.replaceAll('\\', '/');
   return (
-    /\/bugs\/[^/]+\.md$/.test(normalized) &&
-    !normalized.endsWith('/bugs/ISSUE_REPORT_GUIDE.md')
+    new RegExp(`/${OPEN_ISSUES_DIR}/[^/]+\\.md$`).test(normalized) &&
+    !normalized.endsWith(`/${OPEN_ISSUES_DIR}/ISSUE_REPORT_GUIDE.md`)
   );
 }
 
