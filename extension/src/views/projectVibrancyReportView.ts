@@ -8,7 +8,7 @@
 import * as vscode from 'vscode';
 import * as nodePath from 'node:path';
 import * as nodeFs from 'node:fs';
-import { createWebviewCspNonce, escapeHtml, jsonForScriptBlock } from '../vibrancy/views/html-utils';
+import { createWebviewCspNonce, escapeHtml, jsonForScriptBlock, buildWebviewCsp } from '../vibrancy/views/html-utils';
 import { getProjectRoot } from '../projectRoot';
 import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 import type {
@@ -462,11 +462,10 @@ function buildHtml(
 <head>
   <meta charset="UTF-8" />
   <title>${escapeHtml(l10n('codeHealth.documentTitle'))}</title>
-  <!-- 'unsafe-inline' on style-src: score pills set their colour via inline
-       style="--score-color:hsl(...)" attributes (one per row, ~thousands per
-       report). CSP nonces only authorize <style> blocks, not style attributes —
-       without 'unsafe-inline' every pill would lose its colour. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';">
+  <!-- Score pills set their colour via inline style="--score-color:hsl(...)" attributes
+       (one per row, ~thousands per report) — see buildWebviewCsp's doc comment for why this
+       needs the split style-src-elem/style-src-attr form rather than a combined directive. -->
+  <meta http-equiv="Content-Security-Policy" content="${buildWebviewCsp(nonce)}">
   <style nonce="${nonce}">${getProjectVibrancyReportStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>

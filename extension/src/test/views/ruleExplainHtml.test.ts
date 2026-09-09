@@ -47,6 +47,24 @@ describe('Rule Explain panel HTML', () => {
     assert.ok(!html.includes('No message'));
   });
 
+  it('falls back to tier + pack info for a real, catalog-known rule with no message', () => {
+    const html = buildRuleExplainHtml(
+      input({ ruleName: 'avoid_cached_isar_stream', message: undefined }),
+    );
+    assert.ok(html.includes('Not yet triggered'));
+    assert.ok(html.includes('Included from tier: professional'));
+    assert.ok(html.includes('Rule pack: Isar'));
+  });
+
+  it('omits tier/pack lines (but still shows the fallback heading) for an unknown rule name', () => {
+    const html = buildRuleExplainHtml(
+      input({ ruleName: 'not_a_real_rule_xyz', message: undefined }),
+    );
+    assert.ok(html.includes('Not yet triggered'));
+    assert.ok(!html.includes('Included from tier:'));
+    assert.ok(!html.includes('Rule pack:'));
+  });
+
   it('renders OWASP entries as a <dl> definition list (§7.2)', () => {
     const html = buildRuleExplainHtml(input({
       owasp: { mobile: ['M1'], web: ['A03'] },

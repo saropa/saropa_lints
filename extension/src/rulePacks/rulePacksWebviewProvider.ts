@@ -35,9 +35,9 @@ import { buildSuppressionsExportSnapshotStripHtml } from '../views/configDashboa
 import { RULE_PACK_DEFINITIONS, isPackDetected, getDetectedPackIds } from './rulePackDefinitions';
 import { enforceSingleVersion, versionGroupIndex } from './versionGroups';
 import { STYLISTIC_PACK_DEFINITIONS } from './stylisticPackDefinitions';
-import { packDomainForId, PACK_DOMAIN_ORDER } from './packDomains';
+import { packDomainForId, PACK_DOMAIN_ORDER, isStylisticRule } from './packDomains';
 import { l10n } from '../i18n/runtime';
-import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
+import { createWebviewCspNonce, buildWebviewCsp } from '../vibrancy/views/html-utils';
 import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
 // Phase 7 leftover (deferred): Rules & Tiers already ships working digit shortcuts (1-7, see
@@ -554,6 +554,11 @@ export class RulePacksWebviewProvider {
         // typing) and `<details>` open/closed persistence — see the fields' doc comments above.
         sectionId?: string;
         open?: boolean;
+        // Rule-finder disable/enable toggle (Bug 3) — distinct from `toggleRule`'s `enabled`
+        // because `toggleRule`/_handleToggleRule's write convention (true=write, false=remove)
+        // is specific to opt-in stylistic rules; see `_handleDisableRule`'s doc comment for why
+        // an arbitrary matched rule code needs its own message type and semantics.
+        disable?: boolean;
       }) => {
         // The user entered/left an editable control (search box, text field). While focused,
         // `refresh()` queues instead of rebuilding; on blur, replay any queued refresh so
@@ -586,6 +591,11 @@ export class RulePacksWebviewProvider {
         // writes `rule: true`; disabling removes the override (back to off default).
         if (msg.type === 'toggleRule' && typeof msg.rule === 'string' && msg.enabled !== undefined) {
           void this._handleToggleRule(msg.rule, msg.enabled);
+        }
+        // Rule-finder search results' disable/enable affordance (Bug 3). Deliberately a
+        // separate message type from `toggleRule` — see `_handleDisableRule`'s doc comment.
+        if (msg.type === 'disableRule' && typeof msg.rule === 'string' && typeof msg.disable === 'boolean') {
+          void this._handleDisableRule(msg.rule, msg.disable);
         }
         // A pick-one stylistic group choice. `packId` is the group id; `rule` is
         // the chosen rule code, or '' to clear the whole group.
@@ -849,10 +859,16 @@ export class RulePacksWebviewProvider {
    * stays about "which packs are on", not "which migrations are pending".
    */
   private _buildPacksTab(ctx: DashboardContext): string {
+    // Bug fix (rule-finder disable/enable toggle): the rule-finder panel is rendered entirely
+    // client-side from `tr[data-pack]`'s data-rules-text attribute — it has no way to know which
+    // of the matched rule codes are currently disabled. Stash the set here as a space-separated
+    // data attribute (same convention as data-rules-text) so configDashboardScript.ts's
+    // renderRuleFinder() can render a correctly-labeled Disable/Enable control per row without a
+    // round trip. Space-separated is safe: rule ids are snake_case, never containing spaces.
     const content = [
       this._buildToolbar(ctx),
       '<div class="chip-strip" id="filter-strip" hidden></div>',
-      '<div class="rule-finder" id="rule-finder" hidden></div>',
+      `<div class="rule-finder" id="rule-finder" data-disabled-rules="${escapeHtml(ctx.disabledRules.join(' '))}" hidden></div>`,
       this._buildPackTable(ctx),
       this._buildChartSection(ctx),
     ].join('\n');
@@ -1043,13 +1059,15 @@ export class RulePacksWebviewProvider {
     const tooltip = `Pack coverage ${score}%. ${tooltipBase}`;
     // The fill's stroke-dasharray is driven by `--gauge-target` / `--gauge-arc`.
     // Those vars are set by the client script (`setProperty`) from the data-*
-    // attributes below, NOT from this inline style — a webview CSP that pairs a
-    // style-src nonce with 'unsafe-inline' makes the browser ignore 'unsafe-inline'
-    // for inline style ATTRIBUTES (they cannot carry a nonce), so `--gauge-target`
-    // set here was dropped and the arc rendered empty while the numeric label still
-    // showed the score. Seeding `--gauge-target:0` inline gives a definite empty
-    // start state; the script raises it to the real score and the scoped transition
-    // in configDashboardStyles animates the fill in.
+    // attributes below, NOT from this inline style. Bug fix: `_wrapHtml()` used to pair a
+    // style-src nonce with 'unsafe-inline' in one directive, which per the CSP3 spec makes
+    // the browser ignore 'unsafe-inline' for the WHOLE directive (inline style attributes
+    // included, since they cannot carry a nonce) — so `--gauge-target` set here was dropped
+    // and the arc rendered empty while the numeric label still showed the score. `_wrapHtml()`
+    // now splits style-src-elem (nonce) from style-src-attr ('unsafe-inline' alone), which
+    // restores this inline attribute write. Seeding `--gauge-target:0` inline still gives a
+    // definite empty start state; the script raises it to the real score and the scoped
+    // transition in configDashboardStyles animates the fill in.
     return `<div class="hero-gauge" role="img"
     aria-label="${escapeHtml(`Pack coverage ${score} percent`)}"
     title="${escapeHtml(tooltip)}"
@@ -2250,18 +2268,12 @@ ${detailRow}`;
 
   private _wrapHtml(body: string, scripts: boolean): string {
     const nonce = createWebviewCspNonce();
-    // 'unsafe-inline' on style-src: hero coverage gauge sets dynamic CSS vars
-    // (--gauge-target, --gauge-arc, --gauge-color) via inline style="..." attributes.
-    // CSP nonces only authorize <style> blocks, not style attributes — without
-    // 'unsafe-inline' the vars are dropped, the dasharray falls back to 0, and the
-    // gauge renders as a tiny dot.
-    const csp = [
-      "default-src 'none'",
-      `style-src 'nonce-${nonce}' 'unsafe-inline'`,
-      scripts ? `script-src 'nonce-${nonce}'` : '',
-    ]
-      .filter(Boolean)
-      .join('; ');
+    // Bug fix: the hero coverage gauge sets dynamic CSS vars (--gauge-target, --gauge-arc,
+    // --gauge-color) via inline style="..." attributes, and configDashboardScript.ts does
+    // several `.style.x = ` / CSSOM writes (e.g. focusPack()'s `detail.style.display = ''`,
+    // applyFilters()'s `row.style.display = ...`) — see buildWebviewCsp's doc comment for why
+    // this needs the split style-src-elem/style-src-attr form rather than a combined directive.
+    const csp = buildWebviewCsp(nonce, { scripts });
     // Append the overlay's own script so the '?' button/keydown wiring runs alongside the rest
     // of the dashboard's client script under the SAME nonce (a second <script> tag would need its
     // own nonce authorization and CSP only lists one).
@@ -2333,6 +2345,37 @@ ${detailRow}`;
     if (!root || !this._isValidRuleName(rule)) return;
     if (enabled) {
       writeRuleOverrides(root, [{ rule, enabled: true }]);
+    } else {
+      removeRuleOverrides(root, [rule]);
+    }
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /**
+   * Disable/enable an ARBITRARY rule code matched by the rule-finder search (Bug 3) — unlike
+   * `_handleToggleRule` above, this can target any rule in the catalog, not only stylistic
+   * ones, so it cannot use that method's write convention unconditionally. Stylistic rules are
+   * off BY DEFAULT (no override = off; an explicit `true` override is what turns one on), the
+   * opposite of an ordinary tier/pack rule, which is on by default (no override = on; an
+   * explicit `false` override is what turns one off). Using `_handleToggleRule`'s
+   * write-true/remove-to-disable convention here would silently no-op "disable" for the common
+   * case (an on-by-default rule with no existing override), so this branches on which
+   * convention applies to the specific rule being toggled — matching how
+   * `saropaLints.disableRules`/`enableRules` (Issues tree / Triage panel) already handle the
+   * on-by-default case, and `_handleToggleRule` already handles the stylistic case.
+   */
+  private async _handleDisableRule(rule: string, disable: boolean): Promise<void> {
+    const root = getProjectRoot();
+    if (!root || !this._isValidRuleName(rule)) return;
+    if (isStylisticRule(rule)) {
+      if (disable) {
+        removeRuleOverrides(root, [rule]);
+      } else {
+        writeRuleOverrides(root, [{ rule, enabled: true }]);
+      }
+    } else if (disable) {
+      writeRuleOverrides(root, [{ rule, enabled: false }]);
     } else {
       removeRuleOverrides(root, [rule]);
     }

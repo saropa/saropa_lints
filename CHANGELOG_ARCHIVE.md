@@ -6,6 +6,81 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [16.0.0-beta.1]
+
+*--- IMPORTANT NOTE ---*
+
+**Major release — LSP server (BETA).** A new standalone LSP server replaces the in-process analyzer plugin as the default diagnostic engine, using far less memory while still providing diagnostics, quick fixes, and per-rule overrides. It's **ON by default** — check its status in the Health Panel. If you hit issues, toggle it off there to fall back to the Analyzer Plugin. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.1/CHANGELOG.md)
+
+### Fixed
+
+- **Auto-migrate legacy plugin-block config keys.** Projects with `log_level`, `lane`, `memory_mode`, or `rule_packs` under `plugins > saropa_lints:` in `analysis_options.yaml` triggered `unsupported_option` warnings that were fatal under `--fatal-warnings`, breaking CI. The plugin now auto-migrates these keys to `analysis_options_custom.yaml` at load time — no manual action required.
+- **LSP server: fix 0 diagnostics on opened files.** The CLI scanner's built-in path exclusions (which drop `example/`, `bin/`, generated files) were silently filtering out files the user opened in the editor, producing 0 diagnostics. The LSP server now bypasses scan exclusions since the user explicitly requested analysis by opening the file, and falls back to the `recommended` tier when the project has no `saropa_lints: tier:` shorthand.
+- **LSP server: fix didOpen flood.** VS Code sends `textDocument/didOpen` for every Dart file in the workspace on activation (~200+ for real projects), each triggering a full rule scan. The server now debounces didOpen — only the last file opened within a 1.5-second window gets analyzed. The extension also filters didOpen to only forward files in visible editors. Save still triggers immediate analysis.
+- **LSP server: message queue resilience.** A malformed or unexpected JSON-RPC message could crash the async queue processor, silently dropping all subsequent messages. Each message is now handled in its own try-catch so one bad message doesn't stall the server.
+- **LSP server: Windows CRLF config parsing.** The tier config reader failed to match `tier:` when `analysis_options.yaml` had Windows `\r\n` line endings with lines between `saropa_lints:` and `tier:`. Line endings are now normalized before parsing.
+- **Debug panel: analyzer toggle restores extension setting.** Toggling the Analyzer Plugin OFF correctly set `saropaLints.enabled = false`, but toggling it back ON never restored the setting — the extension stayed disabled until manually re-enabled in VS Code settings. No action required.
+- **`avoid_platform_channel_on_web`: false positive with early-return guards.** The rule fired on `MethodChannel(...)` even when preceded by `if (kIsWeb) return;` or `if (kIsWeb) throw ...;`, because it only recognized platform checks that *wrapped* the node as an ancestor, not preceding sibling guard statements. No action required.
+- **`no_direct_iterable_access`: fixed off-by-one false negative and hardened guard detection.** `index <= list.length` was wrongly accepted as a sufficient bounds guard even though `index == list.length` still throws; only `<` is now accepted. The rule also now recognizes the early-return guard-clause idiom (`if (index >= list.length) return;`), `else`-branch guards, reversed comparisons (`list.length > index`), `RangeError.checkValidIndex(index, list)`, collection-`for` elements, and typed-data lists (`Uint8List` and friends), closing several false-positive/false-negative gaps in the initial implementation. No action required.
+- **Dashboard contrast and a11y fixes.** A new visual-regression pass (rendering Home, Rules & Tiers, and Project Map through the extension's Playwright a11y harness for the first time) found and fixed real WCAG AA contrast failures: the red "Cancel" button, table column headers, the Rules & Tiers tier picker, and the Home hub's "needs attention" KPI tiles all read below the 4.5:1 contrast floor in at least one theme. Also fixed a missing accessible name on the Config file tab's severity-level dropdown, a missing document language attribute on the Rules & Tiers dashboard, and a narrow-window layout bug where the tier picker's pill buttons could push the whole dashboard into horizontal scroll. No action required.
+- **Full Audit report contrast fixes.** Migrating the Full Audit report onto the shared dashboard chrome (below) gave it its first-ever visual-regression pass, which caught severity badges and KPI chips rendering colored text/fills as low as 2.93:1 contrast — now fixed to clear the 4.5:1 AA floor in every theme. No action required.
+- **Sidebar Status and Home hub KPIs could show "All clear" while the Problems panel had real findings.** The sidebar's Status section and Home hub's issue count/health tiles read `reports/.saropa_lints/violations.json`, a file only written by an explicit scan — so a project with the LSP server running (default since this release) and real diagnostics visible in the Problems panel could still show "No violations" if no scan had ever been run. Both now read the same live diagnostics the status bar and Issues tree already use, so they can no longer disagree with the Problems panel. The health score keeps using the last scan's file-count denominator (there's no equivalent from live diagnostics alone) so its coverage caveat is unchanged — only the violation counts and the score's numerator are now always current.
+- **Sidebar Settings rows had no icons.** Every row in the Settings panel (Lint integration, Analyzer plugin, Tier, Lane, Run-analysis toggles, UI language, Detected, config actions, dashboard shortcuts) rendered with no icon at all, unlike every other panel — a wall of unlabeled text. Every row now has a distinct icon. Also adds an "Engines (LSP / Analyzer)" row so the Analyzer Plugin/LSP Server/Scan Daemon toggles (Health Panel) are reachable from the sidebar instead of Command Palette only.
+
+### Changed
+
+- **LSP server is now ON by default (BETA).** New installations start with `saropaLints.lspServer.enabled: true`. The analyzer plugin is automatically disabled when the LSP server is on — it's no longer needed and its ~10GB RAM footprint is eliminated. Turning the LSP server off re-enables the analyzer plugin. To revert: toggle "LSP Server" OFF in the Health Panel, or set the setting to `false` in VS Code workspace settings.
+- **Sidebar: severity toggles are single-click; Diagnostics and Help panels folded away.** The Show errors/warnings/infos/hints rows previously required an undiscoverable double-click; they now toggle on a single click. The standalone Diagnostics panel (severity toggles, Lint integration, Analyzer plugin, Tier) merged into the Settings panel, and the standalone Help panel (Getting Started, About, pub.dev, AI agent instructions) moved into the Dashboards panel's "..." menu. Clicking the status bar while lint integration is off now opens the Dashboards view instead of doing nothing.
+- **Debug Panel merged into the Health Panel.** The sidebar's standalone Debug Panel (engine toggles, PID/RSS, Kill All / Restart All, log) is gone — that content now lives inside "Saropa Lints: Show Process Health" alongside the Dart process table, so engine controls and process diagnostics are in one place instead of two. The engine log is now a collapsed-by-default expander. The sidebar container is down to 4 panels total (from 7).
+- **"Saropa Dashboards" home hub removed.** It duplicated the sidebar and each dashboard's own settings without adding anything a dashboard couldn't already show — the status bar and every former "Saropa Dashboards" link now open Findings instead.
+- **Package dashboard command palette decluttered.** 38 of the 63 `Saropa Lints: Package...` commands (row-argument actions like "go to package", "suppress package", bulk major/minor/patch updaters, and niche registry-auth setup) no longer show in the Command Palette — they still work exactly as before from the dashboard's buttons, CodeLens, and context menus, which is how they were actually used. The palette now shows 25 general-purpose package commands instead of 56.
+
+### Added
+
+- **Sidebar Status section: Engines row.** Shows "Engines: N running" with a one-line summary of the Analyzer Plugin, Scan Daemon, and LSP Server's live status, right below Health — click to open the Health Panel. Turns amber when zero engines are running, so a fully-off diagnostics setup is visible without opening the panel. Previously this state was only visible by opening the panel itself. No action required.
+- **Package dashboard: tabs and an in-dashboard Settings form.** The Package Dashboard now has a tab bar (Overview · Upgrades · Full report · Known issues · Compare · Settings). Upgrades, Full report, Known issues, and Compare open their existing panel with one click from inside the dashboard instead of only being reachable as separate sidebar rows. The new Settings tab renders every `packageVibrancy.*` setting as a grouped form (Access, Scan, Display, Score Weights, Upgrade, Watch, Budget, Vulnerabilities) that writes straight to your workspace settings — the 7 dependency-budget limits are one "Budget" card instead of 7 separate settings.
+- **LSP server: quick fixes (lightbulb menu).** `textDocument/codeAction` now returns real quick fixes for rules that have fix generators. The server resolves the file, instantiates the rule's `SaropaFixProducer`, and returns workspace edits — same fixes the native plugin offers, without the in-process memory cost. No action required.
+- **LSP server: per-rule config overrides.** The server now reads per-rule enable/disable from both `analysis_options.yaml` (`diagnostics:` section) and `analysis_options_custom.yaml` (`severities:` section), layered on top of the tier. Rules the user disabled stay off; rules they enabled run even if the tier wouldn't include them.
+- **Health Panel: every engine and action now has a description.** The Analyzer Plugin, Scan Daemon, and LSP Server cards each show a one-line "what this does" subtitle. Kill All and Restart All show what they actually affect — both currently control the LSP Server only; the Analyzer Plugin and Scan Daemon each have their own ON/OFF toggle.
+- **Debug panel: all three engine toggles now work.** The "Analyzer Plugin" card's ON/OFF buttons previously did nothing — only the LSP Server card was wired up. Toggling the analyzer card now runs the same enable/disable mechanism as the "Lint integration" sidebar toggle, and the card reflects the real on-disk state instead of always showing "active". The Scan Daemon toggle now suspends/resumes the daemon process. The LSP Server toggle persists to `saropaLints.lspServer.enabled` in settings. All toggles log their action to the debug panel's LOG section for immediate user feedback.
+- **LSP server: live config reload.** `workspace/didChangeConfiguration` now re-reads the tier from `analysis_options.yaml` and re-analyzes every file with published diagnostics, so editing per-rule overrides or the tier takes effect immediately instead of requiring a server restart.
+- **LSP server: full workspace scan on startup with incremental re-scan.** After the analyzer warms up, the server scans all Dart files project-wide so diagnostics appear in the Problems panel without opening every file. Subsequent re-scans (e.g. after a config change) are incremental — only files modified since the last scan are re-analyzed. Which directories are scanned and whether the scan runs at all are configurable via `saropaLints.lspServer.scanDirectories` and `saropaLints.lspServer.workspaceScan` in VS Code settings.
+- **Project Map dashboard: live scan + a Reports tab for 7 CLI tools.** The Project Map panel now opens immediately with a live activity log and a working Cancel/Restart, instead of freezing until the whole scan finishes. A new Reports tab adds a Run button for every `saropa_lints` report CLI that previously had no UI at all — Severity Report, Impact Report, Quality Gate (with an inline editor for `saropa_quality_gate.yaml`), Stub Test Report, Accuracy Report, Memory Report, and Doctor — each streaming its output live and saving a copy under `reports/.saropa_lints/reports-tab/`.
+- **Rules & Tiers dashboard is now the full config surface, with 7 tabs.** The dashboard (formerly "Lints Config") is now organized as Tier · Rule packs · Overrides · SDK rollout · Config file · Automation · Extension. The new **Config file** tab adds a control for every `analysis_options_custom.yaml` key that previously had no UI — `max_issues`, `output`, `platforms`, `severities`, `banned_usage`, `saropa_tier`, `runtime_tier`, and `diagnostic_statistics` thresholds — plus a Baseline card (create/refresh, with the current baseline rendered as a table) and the Analysis Optimizer embedded as a live tab (its standalone command still opens it in its own editor tab). The new **Automation** and **Extension** tabs render every remaining `saropaLints.*` setting (outside the Package/Code Health/TODO/Drift groups, which keep their own settings surfaces) as a live control, read directly from the extension's manifest so a setting added later appears automatically. The Disabled rules section moved from the old dashboard into this one's Overrides tab. Editing `analysis_options_custom.yaml` in another editor now refreshes this dashboard automatically if it is open.
+- **Packages and Project Map dashboards: number-key tab shortcuts.** Pressing `1`-`6` on the Package Dashboard, or `1`/`2` on Project Map, jumps straight to that tab — matching the shortcut Rules & Tiers already had. Ignored while typing in a search box or form field.
+- **19 new tier-1 quick-win lint rules.** No action required.
+  - `avoid_disposing_late_fields` flags `.dispose()` on conditionally-initialized `late` fields (Recommended).
+  - `avoid_dynamic_calls_extended` catches method/property/index access through resolved `dynamic` (Recommended). Named `_extended` — `avoid_dynamic_calls` is a core Dart analyzer lint name.
+  - `avoid_equals_and_hash_code_on_mutable_classes_extended` prevents `==`/`hashCode` overrides on classes with non-final fields (Essential). Named `_extended` — the base name is a core Dart analyzer lint name.
+  - `avoid_futureor_return_type` flags `FutureOr<T>` as a declared return type (Recommended).
+  - `avoid_implementing_value_types_extended` catches classes that `implements` a known value-equality type (Comprehensive). Named `_extended` — the base name is a core Dart analyzer lint name.
+  - `avoid_mounted_check_in_finally` flags `mounted` guards inside `finally` blocks (Recommended).
+  - `document_enum` requires doc comments on public enums and enum values (Pedantic).
+  - `duplicate_value` detects repeated sub-expressions in boolean chains (Recommended).
+  - `getters_in_member_list` flags getters declared after behavior members (Pedantic).
+  - `initializers_ordering` enforces field-declaration order in constructor initializer lists (Pedantic).
+  - `is_future` catches runtime `x is Future` type checks (Recommended).
+  - `mutable_tearoff` flags method tear-offs from non-final fields (Professional).
+  - `named_parameters_ordering` enforces declaration-order named arguments at call sites (Pedantic).
+  - `never_discard_build_context` catches unused `BuildContext` params in builder callbacks (Recommended).
+  - `new_instance_cascade` suggests cascades for consecutive statements on a freshly-created instance (Pedantic).
+  - `no_direct_iterable_access` flags `list[i]` index access without a bounds guard (Professional).
+  - `prefer_typed_exceptions` catches `throw` of raw String/non-Exception values (Comprehensive).
+  - `specify_unknown_enum_value` requires `unknownEnumValue` on `@JsonSerializable` enum fields (Comprehensive).
+  - `use_compare_without_case` flags `toLowerCase() ==` patterns that should use `compareTo` (Pedantic).
+
+### Internal
+
+- Extended the extension's Playwright visual-regression harness (`test/ux/generate-pages.ts`) to render the Home hub, two Rules & Tiers tabs, and both Project Map states, which previously had no rendered-HTML coverage at all. Added a `vscode.extensions.getExtension` stub to the shared test mock so the Rules & Tiers dashboard's manifest-driven settings tab can render outside a real VS Code host.
+- **Style-system migration: Full Audit report.** `audit/audit-report-styles.ts` now builds on `getDashboardChromeStyles()` (`.dash-hero`, `.chip-strip`/`.chip`, `.toolbar-band`/`.field`, `.btn`, `.dash-table`, `.empty-cta`) instead of a fully bespoke stylesheet — one of the three remaining parallel CSS systems the redesign plan re-deferred at Phases 5 and 7 (`plans/PLAN_extension_ui_redesign.md` §1.5). Only severity-tinted pills, baseline badges, and the deferred-load banner remain bespoke. Added the first-ever `audit-report` fixture to the Playwright UX harness. No markup IDs or client-script selectors changed, so `audit-report-script.ts` needed no edits.
+- **Style-system migration: Findings dashboard.** `violationsDashboardStylesParts.ts` now builds on `getDashboardChromeStyles()` instead of a fully bespoke stylesheet — the second of the three parallel CSS systems the redesign plan re-deferred (`plans/PLAN_extension_ui_redesign.md` §1.5). The file shrank from 1337 to a much smaller "extras" sheet carrying only what the shared chrome doesn't cover (severity-tinted pills, the hero gauge's `animation: none !important` override so the chrome's shared entrance keyframe doesn't play on this dashboard's rebuilds). One remaining parallel system (`vibrancy/views/report-styles-parts.ts`, the Package Dashboard) is still deferred.
+- Added a `vscode.languages.getDiagnostics` stub to the shared test mock (`test/vibrancy/vscode-mock.ts`) — the sidebar's live-diagnostics fix (above) calls it by default, and the mock's absence was silently breaking sidebar unit tests that don't care about diagnostic content.
+- **New `scripts/check_rule_name.py`.** Checks a proposed rule name against the core Dart/Flutter analyzer lint namespace in one second, before any implementation work begins. The same collision gate (`_tier_integrity.py` Check 8) caught 3 rules that needed renaming at publish time three days running (2026-09-02, 2026-09-03, 2026-09-04) — each time meaning a rename across `lib/`, `test/`, and `example/` after the fact. Wired into the rule-authoring checklist (`.claude/skills/lint-rules/SKILL.md`, `CLAUDE.md`) as step 0.
+- Extended `scripts/fix_ignores.py`'s rename map with the 3 rules renamed 2026-09-04 (`avoid_dynamic_calls`, `avoid_equals_and_hash_code_on_mutable_classes`, `avoid_implementing_value_types`, all now `_extended`), and fixed the corresponding stale "N/A (stock analyzer rule)" rows in `doc/guides/migration_guides/migration_from_vga.md` to `ENHANCED`.
+- `scripts/publish.py` now routes a prerelease version (e.g. `16.0.0-beta.1`, the version this release ships as) to each store's prerelease channel automatically — `vsce package`/`publish`, `ovsx publish`, and `gh release create` all get their prerelease flag derived from the version string, no separate flag or prompt needed. `extension/package.json`'s `version` field, which the Marketplace requires to be a plain `MAJOR.MINOR.PATCH` (no hyphen, even with `--pre-release`), is instead derived via `extension_version_for()`: the stripped core PATCH offset by a channel- and iteration-specific band, so successive beta/rc builds of the same base version get distinct extension versions instead of colliding at the Marketplace/Open VSX level. The `.vsix` filename and store-verification poll stay consistent with whichever version was actually published.
+
+---
+
 ## [15.2.12]
 
 Hardens the LSP server against normal editor traffic and adds a `doctor` command to catch misconfigured project settings before they cause confusing warnings. [log](https://github.com/saropa/saropa_lints/blob/v15.2.12/CHANGELOG.md)
@@ -491,6 +566,7 @@ Five new quick fixes for stylistic rules: convert regular comments to doc commen
 - Removed unused `tiers.dart` import from formatting rules.
 - MT cache serialization (`mt_fallback.py`) now streams entries to disk one-by-one instead of building the full JSON string in memory, fixing a `MemoryError` crash on large caches.
 
+---
 
 ### Added (Extension)
 
@@ -2218,6 +2294,7 @@ The Findings Dashboard now lets you reconcile its count with the Problems panel 
 - **`avoid_string_substring` no longer fires on indexOf-guarded, loop-bounded, or early-exit-guarded substring calls** — the rule now recognizes `while`/`for` loop conditions, preceding `if (idx == -1) return` guards, and if-conditions that reference substring arguments as evidence of bounds safety. No action required.
 - **Analyzer v9 `useDeclaringConstructorsAst` crashes resolved** — all `.namePart.typeName` accesses (132 sites) and `.namePart.typeParameters` accesses (4 sites) now use safe `nameToken` / `nameTypeParameters` extensions that fall back to the pre-gate `.name` / `.typeParameters` API; additionally, `_wrapCallback` now catches `UnsupportedError` globally so any remaining gated property on any analyzer version skips the rule gracefully instead of crashing the plugin. Closes the remaining failures reported in [#224](https://github.com/saropa/saropa_lints/issues/224). No action required.
 
+---
 
 ### Fixed (Extension)
 
@@ -3376,6 +3453,7 @@ This release focuses on Flutter SDK alignment (new migration lints and a shared 
 
 - **Package Vibrancy (VS Code extension)** — Introduces : **`TRUSTED_PUBLISHERS`** (`dart.dev`, `google.dev`, `flutter.dev`, `firebase.google.com`) and **`isTrustedPublisher()`**. No action required.
 
+---
 
 ### Internal
 
@@ -4044,6 +4122,7 @@ Init `--target` flag, standalone scan command, and init modularization. — [log
 - `validation.dart` — post-write config validation. No action required.
 - `whats_new.dart` — release notes display (moved from `bin/`). No action required.
 
+---
 
 ### Fixed
 
@@ -4643,6 +4722,7 @@ In this release we add many new stylistic and professional rules (cascade, fold 
 - **Publish script (audit failure):** When the pre-publish audit fails, the script now auto-fixes only the missing `[rule_name]` prefix in problem messages when applicable, then re-runs the audit. For other blocking issues (tier integrity, duplicates, spelling, . No action required.
 - **Rule file split (refactor):** Five large rule files were split into smaller, thematically grouped files for maintainability. No behavior or rule counts changed. **code_quality_rules.dart** (106 rules) → `code_quality_avoid_rules.dart`, `code_quality_control_flow_rules.dart`, `code_quality_prefer_rules. No action required.
 
+---
 
 ### Archive
 
@@ -5581,6 +5661,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **TODO audit path separator**: Fixed hardcoded backslash in TODO log grouping to use `os.sep` for cross-platform compatibility. No action required.
 - **Unfulfilled `expect_lint` errors**: Enabled `avoid_nested_assignments`, `avoid_variable_shadowing`, and `verify_documented_parameters_exist` in example `analysis_options.yaml` so fixture `expect_lint` annotations are satisfied. No action required.
 
+---
 
 ### Fixed
 
@@ -5605,6 +5686,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **Unit test coverage metric** in publish workflow: New `display_unit_test_coverage` report shows per-category test file status alongside the existing fixture coverage metric. No action required.
 - **`toRelativePath` shared utility**: Extracted from duplicated path normalization logic in the report pipeline. No action required.
 
+---
 
 ### Added
 
@@ -5958,6 +6040,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - **Extracted package rules into dedicated files**: Bloc rules (52) to `bloc_rules.dart`, Provider rules (26) to `provider_rules.dart`, Dio rules (14) to `dio_rules.dart`, SharedPreferences rules (10) to `shared_preferences_rules.dart`, GetIt rules (3) to `get_it_rules.dart`. Also Riverpod rules (37) expanded in `riverpod_rules. No action required.
 - **Audit report now includes DX Message Quality section**: The full audit markdown report (`reports/*_full_audit.md`) now exports the complete DX quality analysis — summary tables by impact level and tier, issues grouped by type, and a searchable per-rule failing table with tier, impact, score, and specific issues. No action required.
 
+---
 
 ### Archive
 
@@ -6887,6 +6970,7 @@ Migrated from `custom_lint_builder` to the native `analysis_server_plugin` syste
 - Upgraded dev dependencies: test to v1.29.0 and json2yaml to v3.0.1.
 - Migrated rules 4.2.0 and below to CHANGELOG_ARCHIVE.md. No action required.
 
+---
 
 ### Changed
 
@@ -8429,6 +8513,7 @@ This release focuses on **significant performance improvements** for large codeb
 - **Tier speed comparison**: Documented the performance impact of each tier level.
 - **Updated CONTRIBUTING.md**: Added rule author guidance for `cost` and `applicableFileTypes` getters.
 
+---
 
 ### New Rules
 
@@ -9272,6 +9357,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Returns exit code 1 if duplicates found for CI integration
 - Updated 12 fixture files to import `flutter_mocks.dart` instead of Flutter/external packages. No action required.
 
+---
 
 ### Changed
 

@@ -1,3 +1,37 @@
+/**
+ * Content-Security-Policy `content` string for a webview.
+ *
+ * Splits `style-src-elem`/`style-src-attr` rather than a single combined
+ * `style-src 'nonce-X' 'unsafe-inline'` directive: per the CSP3 spec, once a directive
+ * contains a nonce-source, `'unsafe-inline'` is ignored for the WHOLE directive — `<style>`
+ * blocks AND inline `style="..."` attributes AND CSSOM `.style.x = ` writes alike (attributes
+ * and CSSOM writes cannot carry a nonce, so they'd otherwise be silently dropped, e.g. a
+ * gauge or bar-fill rendering at zero width/empty). `style-src-elem` carries the nonce (for
+ * `<style>` blocks); `style-src-attr` carries `'unsafe-inline'` alone (no nonce) so
+ * attribute/CSSOM writes are actually honored. Pass `scripts: false` for a webview with no
+ * `<script>` tag to omit `script-src` entirely.
+ *
+ * Also emits a legacy `style-src 'nonce-X' 'unsafe-inline'` fallback (Chrome < 111 /
+ * pre-2023 Electron): a browser that does not recognize the `style-src-elem`/`style-src-attr`
+ * directive names drops them as unknown tokens and, with no `style-src` present at all, would
+ * fall back to `default-src 'none'` for ALL style checks — blocking even `<style>` blocks, a
+ * worse regression than the bug this split fixes. Once `style-src-elem`/`style-src-attr` ARE
+ * recognized (the vast majority of VS Code installs, since the app auto-updates), CSP's
+ * directive-precedence rules mean the browser consults only the more specific pair and ignores
+ * this fallback entirely — so it costs nothing on modern Electron and only helps on old ones.
+ */
+export function buildWebviewCsp(nonce: string, options: { scripts?: boolean } = {}): string {
+    return [
+        "default-src 'none'",
+        `style-src 'nonce-${nonce}' 'unsafe-inline'`,
+        `style-src-elem 'nonce-${nonce}'`,
+        "style-src-attr 'unsafe-inline'",
+        options.scripts === false ? '' : `script-src 'nonce-${nonce}'`,
+    ]
+        .filter(Boolean)
+        .join('; ');
+}
+
 /** Random nonce for Content-Security-Policy `script-src` / `style-src` on webview `<script>` / `<style>`. */
 export function createWebviewCspNonce(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

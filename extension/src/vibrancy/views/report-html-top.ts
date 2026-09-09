@@ -9,7 +9,7 @@
 import { VibrancyResult, activeFileUsages, hasActiveReExport } from '../types';
 import { countByCategory, scoreToGrade } from '../scoring/status-classifier';
 import { formatSizeMB } from '../scoring/bloat-calculator';
-import { createWebviewCspNonce, escapeHtml } from './html-utils';
+import { createWebviewCspNonce, escapeHtml, buildWebviewCsp } from './html-utils';
 import { StatusPill } from '../../views/dashboardHero';
 import { l10n } from '../../i18n/runtime';
 import { ReportOptions } from './report-html-shared';
@@ -83,13 +83,17 @@ function formatScanRelative(ts: number): string {
  */
 export function buildScanInProgressHtml(options: ReportOptions): string {
     const cspNonce = createWebviewCspNonce();
+    // This scan-in-progress page has no inline style="..." attributes today and no
+    // <script>, but keeps the same split CSP as every other webview (see buildWebviewCsp's
+    // doc comment) so it stays correct if an inline-styled element (a gauge, a sparkline)
+    // is ever added here.
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>${escapeHtml(l10n('packageDashboard.documentTitle'))}</title>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'none'; style-src 'nonce-${cspNonce}' 'unsafe-inline';">
+        content="${buildWebviewCsp(cspNonce, { scripts: false })}">
     <style nonce="${cspNonce}">
         body {
             font-family: var(--vscode-font-family);

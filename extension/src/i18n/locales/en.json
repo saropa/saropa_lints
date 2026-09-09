@@ -273,6 +273,12 @@
     "tabBar": {
       "ariaLabel": "Rules & Tiers dashboard tabs"
     },
+    "ruleFinder": {
+      "disableButton": "Disable",
+      "disableTitle": "Disable this rule for the whole project — writes analysis_options_custom.yaml and re-runs analysis",
+      "enableButton": "Enabled",
+      "enableTitle": "Re-enable this rule — removes the override in analysis_options_custom.yaml and re-runs analysis"
+    },
     "tab": {
       "tier": "Tier",
       "packs": "Rule packs",
@@ -1304,6 +1310,20 @@
       "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
       "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
       "tooltipPromoClickToOn": "Click to enable"
+    }
+  },
+  "ruleExplain": {
+    "toggle": {
+      "disableButton": "Disable this rule",
+      "disableTitle": "Disable this rule for the whole project — writes analysis_options_custom.yaml. Run analysis again to see the change take effect.",
+      "enableButton": "Re-enable this rule",
+      "enableTitle": "Re-enable this rule — removes the override in analysis_options_custom.yaml. Run analysis again to see the change take effect."
+    },
+    "noData": {
+      "heading": "Not yet triggered",
+      "body": "This rule hasn't fired anywhere in your workspace yet, so there's no specific problem or fix to show. Run analysis to see it in context, or check its rule pack below for what it looks for.",
+      "tierLine": "Included from tier: {tier}",
+      "packsLine": "Rule pack: {packs}"
     }
   },
   "triageDash": {

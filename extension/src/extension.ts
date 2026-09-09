@@ -2823,7 +2823,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     ),
     vscode.commands.registerCommand('saropaLints.explainRule', (arg: unknown) => {
       if (typeof arg === 'string' && arg.trim().length > 0) {
-        openRuleExplainPanel({ ruleName: arg.trim() });
+        // Bug fix: this branch used to open the panel with only the bare rule name, leaving
+        // message/correction/severity/impact/OWASP all undefined even when the rule HAS fired
+        // in this workspace and violations.json already has that detail — e.g. when the config
+        // dashboard's rule-finder search posts an 'explainRule' message for a matched code. Look
+        // up a matching violation first (same enrichment the no-arg/quickpick fallback path
+        // below already does) so the panel shows full detail whenever it's available; only fall
+        // back to the bare name when no workspace/violations data exists or nothing matches.
+        const ruleName = arg.trim();
+        const root = getProjectRoot();
+        const violation = root ? readViolations(root)?.violations.find((v) => v.rule === ruleName) : undefined;
+        if (violation) {
+          openRuleExplainPanelForViolation(violation);
+        } else {
+          openRuleExplainPanel({ ruleName });
+        }
         return;
       }
       // Accept the documented `{ ruleId }` object form a sibling envelope's

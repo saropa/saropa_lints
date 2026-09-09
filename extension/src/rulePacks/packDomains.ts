@@ -14,6 +14,39 @@
  * file it under the right domain.
  */
 
+import { STYLISTIC_PACK_DEFINITIONS } from './stylisticPackDefinitions';
+import { RULE_PACK_DEFINITIONS } from './rulePackDefinitions';
+
+/**
+ * True when `rule` belongs to any stylistic (opt-in, off-by-default) pack.
+ * Shared by `RulePacksWebviewProvider` and `ruleExplainView.ts` so the two
+ * disable/enable surfaces (Overrides tab + rule-finder, standalone rule-explain
+ * panel) always agree on which override-write convention a given rule needs —
+ * see `RulePacksWebviewProvider._handleDisableRule`'s doc comment for why
+ * stylistic and on-by-default rules write opposite override shapes.
+ */
+export function isStylisticRule(rule: string): boolean {
+  return STYLISTIC_PACK_DEFINITIONS.some((pack) => pack.ruleCodes.includes(rule));
+}
+
+/**
+ * Display labels of every pack (ecosystem or stylistic) that owns `rule`, sorted A-Z.
+ * Used by the rule-explain panel to give a rule that has never fired in the current
+ * workspace something concrete to show besides its bare name — the extension ships
+ * no per-rule description catalog, but pack membership and tier ({@link isStylisticRule}'s
+ * sibling `RULE_TIER_BY_CODE`) are already generated data with full 2300+-rule coverage.
+ */
+export function packsForRule(rule: string): string[] {
+  const labels: string[] = [];
+  for (const pack of RULE_PACK_DEFINITIONS) {
+    if (pack.ruleCodes.includes(rule)) labels.push(pack.label);
+  }
+  for (const pack of STYLISTIC_PACK_DEFINITIONS) {
+    if (pack.ruleCodes.includes(rule)) labels.push(pack.label);
+  }
+  return labels.sort((a, b) => a.localeCompare(b));
+}
+
 /** Domain shown for SDK version-migration packs. */
 export const SDK_DOMAIN = 'SDK migrations';
 /** Domain for alternative-package migration packs (migrate_*). */

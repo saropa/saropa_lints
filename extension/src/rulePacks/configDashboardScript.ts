@@ -19,6 +19,7 @@
  * the dashboard behaves the same as Findings and Code Health where the same selectors apply.
  */
 import { getFocusTrackingScript } from '../views/dashboardHero';
+import { l10n } from '../i18n/runtime';
 
 export function getConfigDashboardScript(): string {
   return [
@@ -30,7 +31,7 @@ export function getConfigDashboardScript(): string {
     SCRIPT_FILTER_APPLY,
     SCRIPT_SORT,
     SCRIPT_KPI_AND_CHART,
-    SCRIPT_FIND,
+    getRuleFinderScript(),
     SCRIPT_GAUGE,
     SCRIPT_DISABLED_RULES_SEARCH,
     SCRIPT_STYLISTIC,
@@ -67,6 +68,15 @@ const SCRIPT_PREAMBLE = `
     /** When set, KPI preset filter is active ('enabled' or 'applicable-sdk'). */
     kpi: null,
   };
+  // Bug fix: 'state' is a fresh JS object every time this script re-executes, which happens on
+  // EVERY host-triggered 'webview.html =' rebuild (config file watcher, memory-pressure tick, or
+  // the queued-refresh replay that fires on 'uiBlur' — see refresh() in rulePacksWebviewProvider.ts).
+  // Clicking a rule-finder result link blurs the search <input> to move focus to the link, and if a
+  // refresh was queued while the user was typing, that blur immediately replays it and wipes the
+  // search box. Persisting the filter fields via vscode.setState() (the same mechanism SCRIPT_TABS
+  // already uses for activeTab) lets a rebuilt script restore what the user had typed/selected.
+  const savedFilters = (vscode.getState() || {}).filters;
+  if (savedFilters) Object.assign(state, savedFilters);
 `;
 
 /** Tier radio control + toggle switches + rules link wiring. */
@@ -190,6 +200,31 @@ const SCRIPT_FILTER_STATE = `
       applyFilters();
     });
   });
+
+  // Reflects restored/persisted filter state (see SCRIPT_PREAMBLE) back onto the actual form
+  // controls. Needed because the host always renders these controls at their server-side
+  // defaults (empty search, 'all' type, unpressed toggles) — only the client-side 'state' object
+  // carries what the user actually had set before a host-triggered rebuild.
+  function restoreFilterControls() {
+    if (searchInput) searchInput.value = state.search || '';
+    if (typeSelect) typeSelect.value = state.type || 'all';
+    document.querySelectorAll('.seg-btn[data-toggle-filter]').forEach(function(btn) {
+      const key = btn.getAttribute('data-toggle-filter');
+      const active = (key === 'detected' && state.detectedOnly) || (key === 'enabled' && state.enabledOnly);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+    if (state.kpi) {
+      const card = document.querySelector('.kpi-card[data-kpi-filter="' + cssEscape(state.kpi) + '"]');
+      if (card) card.classList.add('active');
+    }
+    if (state.barPack) {
+      document.querySelectorAll('[data-bar-pack="' + cssEscape(state.barPack) + '"]').forEach(function(el) {
+        el.classList.add('active');
+      });
+      const donut = document.querySelector('.donut');
+      if (donut) donut.setAttribute('data-has-active', '1');
+    }
+  }
 `;
 
 /** Apply current filter state to rows + render the active-filter chip strip. */
@@ -291,6 +326,25 @@ const SCRIPT_FILTER_APPLY = `
     renderMatchCount(grandVisible, grandRuleMatches);
     highlightRuleLinks();
     renderRuleFinder();
+    persistFilterState();
+  }
+
+  // Persists the current filter fields via vscode.setState() so a host-triggered full-HTML
+  // rebuild (see the SCRIPT_PREAMBLE comment on savedFilters) can restore them. Called at the
+  // end of every applyFilters() run, which already fires after every state mutation in this
+  // file (search input, type select, segmented toggles, KPI/chart clicks, resetFilters,
+  // removeChip) — so persisting here covers all of them from one place.
+  function persistFilterState() {
+    const s = vscode.getState() || {};
+    s.filters = {
+      search: state.search,
+      type: state.type,
+      detectedOnly: state.detectedOnly,
+      enabledOnly: state.enabledOnly,
+      barPack: state.barPack,
+      kpi: state.kpi,
+    };
+    vscode.setState(s);
   }
 
   // Per-table empty state: each pack table shows its own "no matches" row so a
@@ -514,8 +568,22 @@ const SCRIPT_KPI_AND_CHART = `
  *    (idea 4). Clicking a code opens its explanation; clicking a pack reveals it.
  *  - focusPack: open every ancestor accordion + the pack's own rule list and scroll
  *    the row into view.
+ *
+ * `getRuleFinderScript()` is a function (not a module-level const like the other SCRIPT_*
+ * pieces) because it needs to call `l10n()` for the disable/enable toggle's button label and
+ * title text (Bug 3: search results had no way to disable a rule) — the resolved strings are
+ * baked into the returned script as a small JSON object, the same pattern `buildScript()` in
+ * violations-dashboard-script.ts already uses for its own l10n string table.
  */
-const SCRIPT_FIND = `
+function getRuleFinderScript(): string {
+  const RF = {
+    disableLabel: l10n('rulesTiers.ruleFinder.disableButton'),
+    enableLabel: l10n('rulesTiers.ruleFinder.enableButton'),
+    disableTitle: l10n('rulesTiers.ruleFinder.disableTitle'),
+    enableTitle: l10n('rulesTiers.ruleFinder.enableTitle'),
+  };
+  return `
+  var RULE_FINDER_STRINGS = ${JSON.stringify(RF)};
   // Wrap each case-insensitive occurrence of q within text in <mark>. text is a lint
   // id ([a-z0-9_]) so escaping is defensive; q is a user substring of it.
   function highlightMatch(text, q) {
@@ -579,6 +647,11 @@ const SCRIPT_FIND = `
     if (!panel) return;
     const q = state.search;
     if (!q) { panel.hidden = true; panel.innerHTML = ''; return; }
+    // Bug fix: search results had no way to disable/enable a matched rule — read the
+    // disabled-rule set the host stashed on this same element (see _buildPacksTab() in
+    // rulePacksWebviewProvider.ts) so each row's toggle can show the correct current state.
+    const disabledAttr = panel.getAttribute('data-disabled-rules') || '';
+    const disabledRules = new Set(disabledAttr.split(' ').filter(Boolean));
     // Group matching rule codes -> the pack(s) that own them. A rule can sit in
     // several overlapping packs, so collect all of them.
     const byCode = new Map();
@@ -602,8 +675,14 @@ const SCRIPT_FIND = `
       const packLinks = byCode.get(code).map(function(p) {
         return '<a href="#" class="rf-pack" data-pack="' + escapeHtml(p.id) + '">' + escapeHtml(p.label) + '</a>';
       }).join(', ');
+      const isDisabled = disabledRules.has(code);
+      const toggleLabel = isDisabled ? RULE_FINDER_STRINGS.enableLabel : RULE_FINDER_STRINGS.disableLabel;
+      const toggleTitle = isDisabled ? RULE_FINDER_STRINGS.enableTitle : RULE_FINDER_STRINGS.disableTitle;
+      const toggleBtn = '<button type="button" class="rf-toggle btn tier-3" data-rule="' + escapeHtml(code) +
+        '" data-disabled="' + (isDisabled ? '1' : '0') + '" title="' + escapeHtml(toggleTitle) + '">' +
+        escapeHtml(toggleLabel) + '</button>';
       html.push('<li><a href="#" class="rf-rule" data-rule="' + escapeHtml(code) + '">' + highlightMatch(code, q) +
-        '</a> <span class="rf-in">in</span> ' + packLinks + '</li>');
+        '</a> <span class="rf-in">in</span> ' + packLinks + ' ' + toggleBtn + '</li>');
     });
     html.push('</ul>');
     if (codes.length > RULE_FINDER_CAP) {
@@ -623,8 +702,22 @@ const SCRIPT_FIND = `
         focusPack(a.getAttribute('data-pack'));
       });
     });
+    // Bug fix: wires the disable/enable toggle added next to each matched rule code. Posts
+    // 'disableRule' (NOT the Overrides tab's 'toggleRule') because a rule matched by a free-text
+    // search can be an ordinary on-by-default tier/pack rule OR an opt-in stylistic rule, and
+    // those two need opposite override-write conventions — see _handleDisableRule's doc comment
+    // in rulePacksWebviewProvider.ts, which picks the right convention per rule.
+    panel.querySelectorAll('.rf-toggle').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const rule = btn.getAttribute('data-rule');
+        const currentlyDisabled = btn.getAttribute('data-disabled') === '1';
+        vscode.postMessage({ type: 'disableRule', rule: rule, disable: !currentlyDisabled });
+      });
+    });
   }
 `;
+}
 
 /** Initial render. */
 /**
@@ -728,13 +821,17 @@ const SCRIPT_STYLISTIC = `
 /**
  * Animate the hero coverage gauge. The arc fill is driven by the `--gauge-target`
  * / `--gauge-arc` custom properties read by the shared `.gauge-fill` stroke-dasharray
- * rule. Those vars are set HERE (not from the element's inline style attribute):
- * the webview CSP pairs a style-src nonce with 'unsafe-inline', which makes the
- * browser ignore 'unsafe-inline' for inline style ATTRIBUTES, so a `--gauge-target`
- * written into the HTML style="" was dropped and the arc rendered empty. Setting it
- * via setProperty from a nonce'd script always applies. The element starts at
- * --gauge-target:0; raising it on the next frame lets the scoped transition in
- * configDashboardStyles animate the fill in (0 -> score).
+ * rule. Those vars are raised HERE via `setProperty` (a CSSOM write) rather than being
+ * baked into the server-rendered HTML at their final value, purely for the fill-in
+ * animation: the element starts at --gauge-target:0 and this raises it on the next
+ * frame so the scoped transition in configDashboardStyles animates 0 -> score.
+ * Bug fix: this CSSOM write, like the element's inline style="" attribute, is itself
+ * governed by CSP's style-src-attr (per spec a nonce-source in style-src makes
+ * 'unsafe-inline' ignored for the WHOLE directive — <style> blocks, style attributes,
+ * AND .style.setProperty()/.style.x= writes alike). `_wrapHtml()` in
+ * rulePacksWebviewProvider.ts now emits a separate `style-src-attr 'unsafe-inline'`
+ * (no nonce) directive so this write and the element's inline style="" both apply;
+ * previously both were silently dropped and the gauge rendered as a tiny dot.
  */
 const SCRIPT_GAUGE = `
   (function initCoverageGauge() {
@@ -1167,6 +1264,7 @@ const SCRIPT_REFRESH_PENDING_INDICATOR = `
 `;
 
 const SCRIPT_INIT = `
+  restoreFilterControls();
   applySort();
   applyFilters();
 })();

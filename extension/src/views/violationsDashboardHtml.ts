@@ -14,7 +14,7 @@
  */
 
 import { l10n } from '../i18n/runtime';
-import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
+import { createWebviewCspNonce, buildWebviewCsp } from '../vibrancy/views/html-utils';
 import { buildAnnouncer, buildSkipLink } from './dashboardHero';
 import { buildKeyboardShortcutsOverlay, getKeyboardShortcutsStyles } from './keyboard-shortcuts';
 import { buildChartsBlock, buildDriftBlock, buildSuppressedFindingsBlock, buildSuppressionsBlock, buildTodoHackBlock } from './violations-dashboard-panels';
@@ -39,12 +39,11 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
 <html lang="en"><head>
   <meta charset="UTF-8" />
   <title>${escapeHtml(l10n('findingsDash.documentTitle'))}</title>
-  <!-- 'unsafe-inline' on style-src: the severity-mix chart bars set their width
-       via an inline style="--bar-width:N%" attribute. CSP nonces authorize
-       <style> blocks, not style attributes — without 'unsafe-inline' the var is
-       dropped and every bar renders at zero width. (The hero gauge no longer
-       needs this: its fill is now a static SVG stroke-dasharray attribute.) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';" />
+  <!-- The severity-mix chart bars set their width via an inline style="--bar-width:N%"
+       attribute — see buildWebviewCsp's doc comment for why this needs the split
+       style-src-elem/style-src-attr form rather than a combined directive. (The hero gauge
+       no longer needs this: its fill is now a static SVG stroke-dasharray attribute.) -->
+  <meta http-equiv="Content-Security-Policy" content="${buildWebviewCsp(nonce)}" />
   <style nonce="${nonce}">${getViolationsDashboardStyles()}${getKeyboardShortcutsStyles()}</style>
 </head><body${input.firstPaint === false ? ' data-no-hero-anim' : ''}>
   ${buildSkipLink('findings-table', l10n('findingsDash.skipToFindings'))}
@@ -84,10 +83,9 @@ export function buildFindingsEmptyStateHtml(message: string): string {
   return `<!DOCTYPE html>
 <html lang="en"><head>
   <meta charset="UTF-8"/>
-  <!-- 'unsafe-inline' on style-src: kept consistent with the populated dashboard CSP
-       so future inline-style additions (e.g. gauges, sparklines) work without a CSP
-       regression that re-creates the gauge-renders-as-a-dot bug. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';"/>
+  <!-- Kept consistent with the populated dashboard's CSP (see buildWebviewCsp's doc comment)
+       so future inline-style additions (e.g. gauges, sparklines) work here too. -->
+  <meta http-equiv="Content-Security-Policy" content="${buildWebviewCsp(nonce)}"/>
   <style nonce="${nonce}">${getFindingsEmptyStateStyles()}</style>
 </head><body>
   <div class="empty-hero">

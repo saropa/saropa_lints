@@ -34,6 +34,15 @@ import {
   getKeyboardShortcutsScript,
   getKeyboardShortcutsStyles,
 } from './keyboard-shortcuts';
+// Bug fix (Bug 3): this standalone webview panel had no path to disable/enable a rule — the
+// plumbing (readDisabledRules/writeRuleOverrides/removeRuleOverrides) already exists and is
+// used today by RulePacksWebviewProvider._handleToggleRule for the Overrides tab; wiring it
+// here reuses the same config-write functions rather than duplicating the write logic.
+import { readDisabledRules, writeRuleOverrides, removeRuleOverrides } from '../configWriter';
+import { getProjectRoot } from '../projectRoot';
+import { l10n } from '../i18n/runtime';
+import { isStylisticRule, packsForRule } from '../rulePacks/packDomains';
+import { RULE_TIER_BY_CODE } from '../rulePacks/ruleTierDefinitions';
 
 const VIEW_TYPE = 'saropaLints.ruleExplain';
 // Tab label includes the rule name so the user can scan tabs by rule. The hero `<h1>`
@@ -62,6 +71,22 @@ export interface RuleExplainInput {
   /** Optional location for context (e.g. "lib/main.dart:42") */
   location?: string;
   relatedRules?: string[];
+  /**
+   * Whether `ruleName` is currently disabled (via analysis_options.yaml diagnostics or an
+   * analysis_options_custom.yaml override). Bug fix: drives the "Disable this rule" / "Enable
+   * this rule" toggle button's label. Left undefined by callers that don't compute it — those
+   * fall through to `isRuleDisabled()` in `buildHtml()`/`openRuleExplainPanel()`, which reads
+   * the live workspace state via the same `readDisabledRules()` the Overrides tab uses.
+   */
+  disabled?: boolean;
+}
+
+/** Look up whether `ruleName` is currently disabled in the active workspace. No workspace
+ * (or no root) reads as "not disabled" — same fallback the rest of the dashboard uses when
+ * there is nothing to read. */
+function isRuleDisabled(ruleName: string): boolean {
+  const root = getProjectRoot();
+  return root ? readDisabledRules(root).has(ruleName) : false;
 }
 
 function fromViolation(v: Violation): RuleExplainInput {
@@ -141,6 +166,29 @@ function buildHtml(input: RuleExplainInput): string {
         .join('')}</dl></section>`
     : '';
 
+  // Minimal fallback for a rule that has never fired in this workspace: violations.json has
+  // no message/correction/severity for it (getRuleDescription() in ruleMetadata.ts is a
+  // permanent stub — the extension ships no per-rule prose catalog), but pack membership and
+  // introducing tier are already-generated data covering every rule, so use them instead of
+  // rendering nothing but the rule name.
+  let noDataHtml = '';
+  if (!message) {
+    const tier = RULE_TIER_BY_CODE[input.ruleName];
+    const packs = packsForRule(input.ruleName);
+    const tierLine = tier
+      ? escapeHtml(l10n('ruleExplain.noData.tierLine', { tier }))
+      : '';
+    const packsLine = packs.length
+      ? escapeHtml(l10n('ruleExplain.noData.packsLine', { packs: packs.join(', ') }))
+      : '';
+    noDataHtml = `<section class="block">
+    <h4>${escapeHtml(l10n('ruleExplain.noData.heading'))}</h4>
+    <p>${escapeHtml(l10n('ruleExplain.noData.body'))}</p>
+    ${tierLine ? `<p>${tierLine}</p>` : ''}
+    ${packsLine ? `<p>${packsLine}</p>` : ''}
+  </section>`;
+  }
+
   const cspNonce = createWebviewCspNonce();
   // Status line carries the rule's identity facts: where it was triggered, severity, impact.
   // These are the highest-signal facts the panel knows; the existing `.meta` row was
@@ -152,10 +200,19 @@ function buildHtml(input: RuleExplainInput): string {
     { label: input.ruleName, title: 'Rule identifier' },
   ];
   const statusLineHtml = buildStatusLine(statusPills);
+  // Bug fix (Bug 3): disable/enable toggle, placed in the hero's trailing-actions slot ahead of
+  // the keyboard-shortcuts button — the same slot/ordering convention buildDashboardHero already
+  // documents (extra actions before the full-width toggle). `disabled` defaults to a live lookup
+  // when the caller didn't already resolve it (e.g. openRuleExplainPanel recomputes it after a
+  // toggle write so the freshly rendered panel reflects the state that was just written).
+  const disabled = input.disabled ?? isRuleDisabled(input.ruleName);
+  const toggleLabel = disabled ? l10n('ruleExplain.toggle.enableButton') : l10n('ruleExplain.toggle.disableButton');
+  const toggleTitle = disabled ? l10n('ruleExplain.toggle.enableTitle') : l10n('ruleExplain.toggle.disableTitle');
+  const toggleButtonHtml = `<button type="button" id="rule-toggle-btn" class="btn" data-disabled="${disabled ? '1' : '0'}" title="${escapeHtml(toggleTitle)}">${escapeHtml(toggleLabel)}</button>`;
   const heroHtml = buildDashboardHero({
     title: `Rule: ${input.ruleName}`,
     statusLineHtml,
-    extraToggleHtml: buildKeyboardShortcutsButton(),
+    extraToggleHtml: `${toggleButtonHtml}${buildKeyboardShortcutsButton()}`,
   });
   return `<!DOCTYPE html>
 <html lang="en">
@@ -178,7 +235,7 @@ function buildHtml(input: RuleExplainInput): string {
     message ? `<section class="block">
     <h4>Problem</h4>
     <p>${message}</p>
-  </section>` : ''}
+  </section>` : noDataHtml}
 
   ${correction ? `<section class="block"><h4>How to fix</h4><p>${correction}</p></section>` : ''}
 
@@ -213,6 +270,21 @@ function buildHtml(input: RuleExplainInput): string {
           });
         });
       });
+      // Bug fix (Bug 3): disable/enable toggle button. Posts the SAME 'toggleRule' shape the
+      // Config Dashboard's Overrides tab and rule-finder already use, even though this
+      // standalone panel writes it via its own onDidReceiveMessage handler in ruleExplainView.ts
+      // (not RulePacksWebviewProvider) — keeping the message shape identical means both host
+      // handlers could share validation/write logic if that's ever consolidated later.
+      const toggleBtn = document.getElementById('rule-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+          vscode.postMessage({
+            type: 'toggleRule',
+            ruleName: sourceRuleName,
+            enabled: toggleBtn.getAttribute('data-disabled') === '1',
+          });
+        });
+      }
       ${getFullWidthToggleScript()}
       ${getKeyboardShortcutsScript()}
     })();
@@ -240,6 +312,13 @@ function impactTone(impact: string | undefined): 'good' | 'warn' | 'bad' | 'neut
 }
 
 let activePanel: vscode.WebviewPanel | undefined;
+// Bug fix: the panel is reused across "open a related rule" navigations (the
+// `activePanel` branch below only reassigns `webview.html`, it never re-registers
+// onDidReceiveMessage), so a handler that closed over its constructor's `input`
+// parameter kept acting on whichever rule was showing when the panel was FIRST
+// created. `currentInput` tracks whatever is actually rendered right now so the
+// toggle handler always re-renders the rule the user is currently looking at.
+let currentInput: RuleExplainInput | undefined;
 
 /**
  * Opens the rule explain panel to the side of the active editor with the given
@@ -248,6 +327,7 @@ let activePanel: vscode.WebviewPanel | undefined;
 export function openRuleExplainPanel(input: RuleExplainInput): void {
   ruleExplainTelemetry?.('open', { ruleName: input.ruleName });
   const title = PANEL_TITLE + input.ruleName;
+  currentInput = input;
 
   if (activePanel) {
     activePanel.reveal(vscode.ViewColumn.Beside);
@@ -271,20 +351,57 @@ export function openRuleExplainPanel(input: RuleExplainInput): void {
       ruleName?: string;
       sourceRule?: string;
       section?: string;
+      enabled?: boolean;
     }) => {
       if (msg.type === 'openRule' && typeof msg.ruleName === 'string') {
         ruleExplainTelemetry?.('relatedClick', {
-          sourceRule: msg.sourceRule ?? input.ruleName,
+          sourceRule: msg.sourceRule ?? currentInput?.ruleName ?? input.ruleName,
           targetRule: msg.ruleName,
           section: msg.section ?? 'unknown',
         });
         openRuleExplainPanel({ ruleName: msg.ruleName });
+        return;
+      }
+      // Bug fix (Bug 3): this standalone panel has no async infra like
+      // RulePacksWebviewProvider's message handler does (no re-run-analysis-then-refresh
+      // pipeline) — configWriter's write functions are synchronous file edits, so writing the
+      // override then immediately re-rendering with the just-written state is correct without
+      // an intervening await. Deliberately does NOT re-run analysis here (unlike the Overrides
+      // tab): this is a read-detail panel, not the dashboard, and re-running analysis from a
+      // side panel would be a surprising side effect for a "read about this rule" surface.
+      if (msg.type === 'toggleRule' && typeof msg.ruleName === 'string' && typeof msg.enabled === 'boolean') {
+        if (!/^[a-z][a-z0-9_]*$/.test(msg.ruleName)) return; // same untrusted-postMessage guard as RulePacksWebviewProvider
+        const root = getProjectRoot();
+        if (!root) return;
+        // msg.enabled here means "make the rule disabled" is false / "make it enabled" is true —
+        // i.e. it already carries the TARGET enabled-state, not a disable flag. Stylistic
+        // (opt-in, off-by-default) rules and ordinary tier/pack (on-by-default) rules need
+        // opposite override-write conventions to reach that target state — see
+        // RulePacksWebviewProvider._handleDisableRule's doc comment in rulePacksWebviewProvider.ts
+        // for the full rationale; this mirrors that same branch.
+        const isStylistic = isStylisticRule(msg.ruleName);
+        if (isStylistic) {
+          if (msg.enabled) {
+            writeRuleOverrides(root, [{ rule: msg.ruleName, enabled: true }]);
+          } else {
+            removeRuleOverrides(root, [msg.ruleName]);
+          }
+        } else if (msg.enabled) {
+          removeRuleOverrides(root, [msg.ruleName]);
+        } else {
+          writeRuleOverrides(root, [{ rule: msg.ruleName, enabled: false }]);
+        }
+        if (activePanel && currentInput) {
+          currentInput = { ...currentInput, disabled: !msg.enabled };
+          activePanel.webview.html = buildHtml(currentInput);
+        }
       }
     }
   );
 
   activePanel.onDidDispose(() => {
     activePanel = undefined;
+    currentInput = undefined;
   });
 }
 

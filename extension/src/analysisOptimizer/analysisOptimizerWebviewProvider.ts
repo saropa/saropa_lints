@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { getProjectRoot } from '../projectRoot';
-import { createWebviewCspNonce, escapeHtml } from '../vibrancy/views/html-utils';
+import { createWebviewCspNonce, escapeHtml, buildWebviewCsp } from '../vibrancy/views/html-utils';
 import { getDashboardChromeStyles } from '../views/dashboardChromeStyles';
 import { l10n } from '../i18n/runtime';
 import { scanWorkspace } from './scanner';
@@ -581,11 +581,10 @@ ${this._buildHints()}
 
   private _wrapHtml(body: string): string {
     const nonce = createWebviewCspNonce();
-    const csp = [
-      "default-src 'none'",
-      `style-src 'nonce-${nonce}' 'unsafe-inline'`,
-      `script-src 'nonce-${nonce}'`,
-    ].join('; ');
+    // This panel's toolbar bands and bar-fill widths use inline style="..." attributes —
+    // see buildWebviewCsp's doc comment for why that needs the split style-src-elem/
+    // style-src-attr form rather than a combined `style-src 'nonce-X' 'unsafe-inline'`.
+    const csp = buildWebviewCsp(nonce);
     return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
 <title>${escapeHtml(l10n('analysisOptimizer.tabTitle'))}</title>
