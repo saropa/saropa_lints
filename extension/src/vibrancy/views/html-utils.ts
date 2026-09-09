@@ -11,14 +11,12 @@
  * attribute/CSSOM writes are actually honored. Pass `scripts: false` for a webview with no
  * `<script>` tag to omit `script-src` entirely.
  *
- * Also emits a legacy `style-src 'nonce-X' 'unsafe-inline'` fallback (Chrome < 111 /
- * pre-2023 Electron): a browser that does not recognize the `style-src-elem`/`style-src-attr`
- * directive names drops them as unknown tokens and, with no `style-src` present at all, would
- * fall back to `default-src 'none'` for ALL style checks — blocking even `<style>` blocks, a
- * worse regression than the bug this split fixes. Once `style-src-elem`/`style-src-attr` ARE
- * recognized (the vast majority of VS Code installs, since the app auto-updates), CSP's
- * directive-precedence rules mean the browser consults only the more specific pair and ignores
- * this fallback entirely — so it costs nothing on modern Electron and only helps on old ones.
+ * Also emits a legacy `style-src 'nonce-X' 'unsafe-inline'` fallback (Chrome < 75 /
+ * pre-2019 Electron): defense-in-depth only — `style-src-elem`/`style-src-attr` shipped in
+ * Chrome 75, and our minimum VS Code `^1.74.0` bundles Electron 19 (Chrome 102), so the
+ * split directives work on every supported install. The fallback exists for hypothetical
+ * downlevel embedders; on any actual VS Code version, CSP directive-precedence rules mean
+ * the browser consults only the more specific pair and ignores this line entirely.
  */
 export function buildWebviewCsp(nonce: string, options: { scripts?: boolean } = {}): string {
     return [

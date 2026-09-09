@@ -178,12 +178,22 @@ function buildHtml(input: RuleExplainInput): string {
     const tierLine = tier
       ? escapeHtml(l10n('ruleExplain.noData.tierLine', { tier }))
       : '';
+    // Cap at 3 labels to avoid a 265-char runaway for rules in 10+ packs
+    // (migration packs dominate the overlap — see packsForRule doc comment).
     const packsLine = packs.length
-      ? escapeHtml(l10n('ruleExplain.noData.packsLine', { packs: packs.join(', ') }))
+      ? escapeHtml(packs.length <= 3
+          ? l10n('ruleExplain.noData.packsLine', { packs: packs.join(', ') })
+          : l10n('ruleExplain.noData.packsOverflow', {
+              packs: packs.slice(0, 3).join(', '),
+              count: String(packs.length - 3),
+            }))
       : '';
+    // A disabled rule can't fire — telling the user to "run analysis" would be misleading.
+    const isDisabled = input.disabled ?? isRuleDisabled(input.ruleName);
+    const bodyKey = isDisabled ? 'ruleExplain.noData.bodyDisabled' : 'ruleExplain.noData.body';
     noDataHtml = `<section class="block">
     <h4>${escapeHtml(l10n('ruleExplain.noData.heading'))}</h4>
-    <p>${escapeHtml(l10n('ruleExplain.noData.body'))}</p>
+    <p>${escapeHtml(l10n(bodyKey))}</p>
     ${tierLine ? `<p>${tierLine}</p>` : ''}
     ${packsLine ? `<p>${packsLine}</p>` : ''}
   </section>`;

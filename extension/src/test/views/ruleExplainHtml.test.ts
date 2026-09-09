@@ -56,6 +56,32 @@ describe('Rule Explain panel HTML', () => {
     assert.ok(html.includes('Rule pack: Isar'));
   });
 
+  it('shows disabled-specific body copy when a rule is both disabled and never-fired', () => {
+    const html = buildRuleExplainHtml(
+      input({ ruleName: 'avoid_cached_isar_stream', message: undefined, disabled: true }),
+    );
+    // The disabled body explains the rule won't fire because it's off, not "run analysis".
+    assert.ok(html.includes('currently disabled'));
+    assert.ok(!html.includes('Run analysis to see it in context'));
+    // Tier and pack info still renders — they're independent of enabled state.
+    assert.ok(html.includes('Included from tier:'));
+    assert.ok(html.includes('Rule pack:'));
+    // Toggle button reflects disabled state.
+    assert.ok(html.includes('Re-enable this rule'));
+  });
+
+  it('caps packs list at 3 with overflow count for rules in many packs', () => {
+    // avoid_non_null_assertion belongs to 10+ packs (mostly migration packs).
+    const html = buildRuleExplainHtml(
+      input({ ruleName: 'avoid_non_null_assertion', message: undefined }),
+    );
+    assert.ok(html.includes('Not yet triggered'));
+    // Should show capped list with "(+N more)" rather than all 10 labels.
+    assert.ok(html.includes('more)'), 'expected overflow indicator');
+    assert.ok(!html.includes('Migrate from mad_lint') || html.includes('more)'),
+      'long tail of migration packs should be truncated');
+  });
+
   it('omits tier/pack lines (but still shows the fallback heading) for an unknown rule name', () => {
     const html = buildRuleExplainHtml(
       input({ ruleName: 'not_a_real_rule_xyz', message: undefined }),

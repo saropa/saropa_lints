@@ -343,6 +343,12 @@ export class ScanOnSaveController implements vscode.Disposable {
    */
   private _droppedFileCount = 0;
 
+  /**
+   * True once the legacy-key warning toast has been shown this session — a
+   * config reload (e.g. tier change) must not re-show it every time.
+   */
+  private _legacyScanOnSaveKeyWarned = false;
+
   /** Public read access for the debug panel to display daemon suspension state. */
   get isDaemonSuspended(): boolean {
     return this._daemonSuspended;
@@ -439,6 +445,13 @@ export class ScanOnSaveController implements vscode.Disposable {
     // Show initial state immediately so the user never stares at silence.
     // A missing project root or disabled state is visible from the first tick.
     this._showInitialState();
+    // The old `scanOnSave.enabled` toggle was removed from package.json when
+    // gating merged into the single `saropaLints.enabled` switch, but VS Code
+    // still accepts the key with no schema entry to flag it as unknown — a
+    // consumer project with it committed to settings.json (see
+    // bugs/infra_dead_setting_scanonsave_enabled_key.md) gets no signal that
+    // toggling it does nothing.
+    this._warnIfLegacyScanOnSaveKeySet();
 
     this._disposables.push(
       vscode.workspace.onDidSaveTextDocument((doc) => this._onSave(doc)),
@@ -486,6 +499,12 @@ export class ScanOnSaveController implements vscode.Disposable {
         if (affectsSeveritySettings(e) && this._isEnabled()) {
           this._refilterDiagnostics();
         }
+        // A user who tries toggling the dead key off/on (the exact repro in
+        // the linked bug report) should see the warning fire on that toggle,
+        // not just at activation.
+        if (e.affectsConfiguration('saropaLints.scanOnSave.enabled')) {
+          this._warnIfLegacyScanOnSaveKeySet();
+        }
       }),
     );
   }
@@ -519,6 +538,34 @@ export class ScanOnSaveController implements vscode.Disposable {
   /** Logs to the Saropa Lints output channel so silent failures are diagnosable. */
   private _log(message: string): void {
     this._outputChannel?.appendLine(`[scan-on-save] ${message}`);
+  }
+
+  /**
+   * Detects the removed `saropaLints.scanOnSave.enabled` key and warns instead
+   * of leaving it silently inert. `inspect` (not `get`) is required here:
+   * `get` would return the schema default and can't distinguish "never set"
+   * from "explicitly set to the default value", which is exactly the state a
+   * user toggling the dead key back to `true` would be in.
+   */
+  private _warnIfLegacyScanOnSaveKeySet(): void {
+    const legacy = vscode.workspace
+      .getConfiguration('saropaLints.scanOnSave')
+      .inspect<boolean>('enabled');
+    const isSet =
+      legacy?.globalValue !== undefined ||
+      legacy?.workspaceValue !== undefined ||
+      legacy?.workspaceFolderValue !== undefined;
+    if (!isSet) return;
+    this._log(
+      'saropaLints.scanOnSave.enabled is set but has no effect — scan-on-save is ' +
+        'gated entirely by saropaLints.enabled. Remove this key.',
+    );
+    // Toast once per session — a config reload triggered by an unrelated
+    // setting (e.g. tier) must not re-show it on every change.
+    if (!this._legacyScanOnSaveKeyWarned) {
+      this._legacyScanOnSaveKeyWarned = true;
+      void vscode.window.showWarningMessage(l10n('scanOnSave.legacyKeyWarning'));
+    }
   }
 
   /**

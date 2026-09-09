@@ -80,6 +80,14 @@ This release focuses on streamlining the rule management experience by introduci
 - Fixed a webview CSP directive that combined a nonce with `unsafe-inline` for `style-src`, which per spec silently dropped inline `style="..."` writes across several dashboards (the Rules & Tiers coverage gauge, chart bars, and score pills now render correctly again). No action required.
 - Fixed the Rules & Tiers rule-search box losing its typed text when a background refresh landed right after clicking a search result. No action required.
 - Fixed the "Explain rule" panel showing only the bare rule name for a rule that has already fired in the workspace; it now shows full detail (message, correction, severity) as expected. No action required.
+- The `saropaLints.scanOnSave.enabled` setting was removed from the extension's schema when scan-on-save gating merged into the single `saropaLints.enabled` switch, but the key still worked in `settings.json` with no effect and no warning. The extension now detects it and warns (Problems output channel + a one-time notification) that it does nothing and should be removed.
+- Fixed the "Explain rule" panel showing misleading "Run analysis to see it in context" text for a disabled rule that has never fired — the body now explains the rule is disabled and suggests re-enabling it. No action required.
+- Fixed the "Explain rule" fallback panel showing an unbounded pack-label list (up to 265 characters for rules in 10+ migration packs) — the list now caps at 3 labels with a "(+N more)" overflow indicator. No action required.
+
+### Internal
+
+- Audited all extension webviews for the CSP nonce + `unsafe-inline` anti-pattern; confirmed the two remaining nonce-less files (`detail-view-html.ts`, `projectMapShell.ts`) are intentionally nonce-free and unaffected.
+- Documented the version-floor guarantee in the CSP builder: `style-src-elem`/`style-src-attr` shipped in Chrome 75, and the extension's minimum VS Code `^1.74.0` bundles Chrome 102, so the legacy fallback is defense-in-depth only.
 
 ---
 

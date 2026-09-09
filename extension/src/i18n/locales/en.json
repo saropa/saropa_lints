@@ -135,7 +135,8 @@
     "baseline": {
       "progressTitle": "Saropa Lints: scanning whole project",
       "progressMessage": "{scanned}/{total} files scanned, {issues} issue(s) found"
-    }
+    },
+    "legacyKeyWarning": "saropaLints.scanOnSave.enabled has no effect — scan-on-save is controlled entirely by saropaLints.enabled. Remove the unused key from your settings."
   },
   "featureInventory": {
     "export": {
@@ -1322,8 +1323,10 @@
     "noData": {
       "heading": "Not yet triggered",
       "body": "This rule hasn't fired anywhere in your workspace yet, so there's no specific problem or fix to show. Run analysis to see it in context, or check its rule pack below for what it looks for.",
+      "bodyDisabled": "This rule is currently disabled, so it won't appear in analysis results. Re-enable it above and run analysis to see what it catches.",
       "tierLine": "Included from tier: {tier}",
-      "packsLine": "Rule pack: {packs}"
+      "packsLine": "Rule pack: {packs}",
+      "packsOverflow": "Rule pack: {packs} (+{count} more)"
     }
   },
   "triageDash": {

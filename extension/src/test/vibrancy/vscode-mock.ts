@@ -176,6 +176,15 @@ export const workspace: Record<string, any> = {
             const fullKey = section ? `${section}.${key}` : key;
             return fullKey in testConfigValues ? testConfigValues[fullKey] : defaultValue;
         },
+        // setTestConfig doesn't track scope, so a set value is reported as
+        // workspaceValue — enough for callers that only check "is it set at all"
+        // (e.g. the scanOnSave legacy-key detector), which is the only inspect() use so far.
+        inspect: <T>(key: string) => {
+            const fullKey = section ? `${section}.${key}` : key;
+            return fullKey in testConfigValues
+                ? { key: fullKey, workspaceValue: testConfigValues[fullKey] as T }
+                : { key: fullKey };
+        },
         update: async (_key: string, _value: any, _target?: any): Promise<void> => {},
     }),
     findFiles: async (_include: any, _exclude?: any): Promise<any[]> => [],

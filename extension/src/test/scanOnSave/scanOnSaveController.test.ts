@@ -14,6 +14,7 @@ import {
 } from '../../scanOnSave/scanOnSaveController';
 import type { ScanOnSaveDiagnostic } from '../../scanOnSave/scanOnSaveRunner';
 import * as vscode from 'vscode';
+import { setTestConfig, clearTestConfig, messageMock } from '../vibrancy/vscode-mock';
 
 function diag(overrides: Partial<ScanOnSaveDiagnostic> = {}): ScanOnSaveDiagnostic {
   return {
@@ -101,6 +102,34 @@ describe('scanOnSaveIsEnabled', () => {
 
   it('stays off when the master toggle is off', () => {
     assert.strictEqual(scanOnSaveIsEnabled(false), false);
+  });
+});
+
+describe('legacy scanOnSave.enabled key warning', () => {
+  afterEach(() => {
+    clearTestConfig();
+    messageMock.reset();
+  });
+
+  it('warns when the removed scanOnSave.enabled key is set', () => {
+    // Regression test for bugs/infra_dead_setting_scanonsave_enabled_key.md:
+    // this key stopped being read when gating merged into saropaLints.enabled,
+    // but was left settable with no signal that it does nothing.
+    setTestConfig('saropaLints.scanOnSave', 'enabled', true);
+    const log: string[] = [];
+    makeController(log);
+    assert.ok(
+      log.some((line) => line.includes('scanOnSave.enabled is set but has no effect')),
+      `expected a legacy-key warning in the log, got: ${JSON.stringify(log)}`,
+    );
+    assert.strictEqual(messageMock.warnings.length, 1);
+  });
+
+  it('stays silent when the key was never set', () => {
+    const log: string[] = [];
+    makeController(log);
+    assert.ok(!log.some((line) => line.includes('scanOnSave.enabled is set but has no effect')));
+    assert.strictEqual(messageMock.warnings.length, 0);
   });
 });
 
