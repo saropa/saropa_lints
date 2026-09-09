@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.2.2] - Unreleased
 
-[log](https://github.com/saropa/saropa_lints/blob/v16.2.2/CHANGELOG.md)
+This release focuses on streamlining the rule management experience by introducing direct enable/disable toggles within the search and explanation panels. It restores rich metadata visibility for all workspace rules and resolves a styling policy bug that degraded dashboard visualizations. A minor background refresh glitch in the search box has also been fixed. [log](https://github.com/saropa/saropa_lints/blob/v16.2.2/CHANGELOG.md)
 
 ### Added
 
@@ -501,34 +501,6 @@ Streamlines the extension sidebar by moving rows that duplicated dashboard contr
 - Extracted shared `sanitizePath()` utility to `path_guard.dart` — centralizes the normalize-and-reject-traversal pattern so future CLI entry points get path safety automatically. No action required.
 - README rewritten for readability — cut from 1,598 lines to ~430. Extension detail moved to `doc/guides/extension.md`, configuration reference to `doc/guides/configuration.md`, troubleshooting merged into `doc/troubleshooting.md`, FAQ to `doc/faq.md`. Added alternative package coverage table (46 packages audited, ~75% rule coverage). Deleted redundant `plans/GAP_ANALYSIS.md` — per-package data lives in migration guides.
 - Suppressed own-dogfood false positives in `analyzer_compat.dart` (dynamic dispatch, bare catches, swallowed exceptions are intentional version-probing shims) and `scan_runner.dart` (safe-by-construction cast). Fixed nullable interpolation in `DiagnosticCodeLowerCaseCompat.lowerCaseName`.
-
----
-
-## [16.0.0-beta.2]
-
-Fixes the VS Code pre-release install button and removes a publish-time blocker that stalled builds. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.2/CHANGELOG.md)
-
-### Changed
-
-- Sidebar: "Lint integration" is now one row in the Status section that toggles on a single click, instead of two separate copies of the same state in different panels. No action required.
-- Sidebar: "Find stale ignores" and "Fix stale ignores" merged into one row that detects, shows the count, then asks to confirm before removing anything. No action required.
-- Sidebar: Analysis Optimizer, Upgrade Opportunities, and the Feature Inventory export are no longer separate Dashboards rows — each is reachable as a tab inside Rules & Tiers or the Package Dashboard. Command Catalog moved next to Run analysis and Fix stale ignores. No action required.
-- Sidebar: "Engines (LSP / Analyzer)" and "Process health" rows — announced in beta.1 — removed from the Settings panel. Engine toggles remain accessible from the Status section's Engines row (visible when debug mode is on), Health Panel, and Command Catalog. No action required.
-
-### Fixed
-
-- Fixed VS Code "Switch to Pre-Release Version" button failing with `net::ERR_FAILED` — pre-release extension versions now use an odd minor number as VS Code requires.
-- Fixed status-bar click behavior: beta.1 stated clicking while lint integration is off opens the Dashboards view — it actually opens Findings in every state (`extension.ts:1310`). The click target is intentionally Findings regardless of integration state. No action required.
-- Fixed CI watch blocking publish by defaulting to skip (press `y` to opt in).
-- Fixed the status bar cramming memory/system-health warnings into the same text as the lint score, with no way to click through to the details — split into a second status bar item that only appears when there's something to report and opens the Process Health panel on click. No action required.
-- Fixed the status bar's hover tooltip being read-only text with no way to act on it — it's now a clickable menu (toggle analysis on/off, jump to the Violations Report, Package Dashboard, Process Health, Command Catalog, or About). No action required.
-
-### Internal
-
-- Fixed publish script writing raw pub.dev version to `package.json` instead of the converted extension version — caused preflight version check to fail on every pre-release publish.
-- Hardened publish version verification: `_is_head_pushed()` now handles detached HEAD and unreachable remote, `_verify_versions_in_commit` docstring documents that it runs after HEAD is pushed (step 13 after step 12), and `extension_version_for()` idempotency contract is explicit.
-- Added `--dry-run` mode to `set_extension_version()` — returns the converted extension version without touching the file, useful for preflight checks that need the expected version without side effects.
-- Extracted the status bar tooltip's action-menu rows (`buildStatusBarMenuItems`) and its command allow-list (`STATUS_BAR_TRUSTED_COMMANDS`) into `statusBarLabel.ts`, with a unit test asserting every row's command id is covered by the allow-list — a renamed or added command that falls out of sync would previously break the tooltip link with no test failure.
 
 ---
 
