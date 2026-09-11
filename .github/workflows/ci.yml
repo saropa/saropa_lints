@@ -170,6 +170,64 @@ jobs:
       - name: Python script tests (tier integrity)
         run: python -m unittest discover -s scripts/modules/tests -t . -v
 
+  # The "Strip self-plugin reference" step in the analyze job deletes the
+  # `include: package:saropa_lints` line and the `plugins:` section from
+  # analysis_options.yaml before running `dart analyze`, so this repo's own
+  # 2332 rules never actually run against its own pull requests — only stock
+  # `dart analyze` does. That step stays (bootstrapping: a broken saropa_lints
+  # build must never lock its own CI red), so this job closes the gap
+  # separately: it runs the *unmodified* checkout (analysis_options.yaml
+  # intact) through the repo's own composite action, dogfooding the exact
+  # code under review.
+  #
+  # Scoping choices, since auditing every rule against the whole repo on
+  # every PR could be slow:
+  # `mode: gate` resolves to the `scan` command, which is what makes this
+  # dogfooding rather than theatre:
+  #   - scan honors this repo's own analysis_options.yaml, so the job runs
+  #     the rule set the project actually configures — the thing the analyze
+  #     job strips away.
+  #   - scan writes a human-readable report to stdout, so findings are
+  #     visible in the job log.
+  # `mode: annotate` would be wrong here despite the name: it writes SARIF to
+  # a file and passes --quiet, so with upload-sarif off the findings would go
+  # nowhere at all and this job would prove only that the action does not
+  # crash — which action-selftest already proves.
+  #
+  # `since` is deliberately absent: it is an audit-only flag (scan has no
+  # --since), and passing it here would be rejected by the action's input
+  # validation. scan's default fast syntactic parse makes a whole-repo run
+  # affordable without it.
+  #
+  # Non-blocking by `continue-on-error: true` alone, since gate mode DOES
+  # fail on findings by design. That is intentional: the job reports, the
+  # job never blocks.
+  #
+  # To turn these findings into inline PR annotations instead of log output,
+  # set mode: annotate with upload-sarif: true and add
+  # `permissions: security-events: write` to this job. That posts results to
+  # the repo's code-scanning dashboard, which is a deliberate choice about
+  # this repository's Security tab rather than a default worth assuming.
+  self-lint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    # Skip the redundant main-push run on release commits; see the analyze job.
+    if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Same ref/token as the other jobs so this audits identical code.
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10.8'
+      - name: Run saropa_lints on itself
+        uses: ./
+        with:
+          mode: gate
+          min-severity: warning
+
   extension-manifest-nls:
     runs-on: ubuntu-latest
     # Skip the redundant main-push run on release commits; see the analyze job.
