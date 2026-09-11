@@ -56,6 +56,14 @@ The `analyze` job strips `include: package:saropa_lints` and the `plugins:` sect
 
 It uses `mode: gate`, which resolves to the `scan` command. That matters twice over: `scan` honors this repo's own `analysis_options.yaml`, so the job runs the rule set the project actually configures; and `scan` writes a human-readable report to stdout, so findings are visible in the log. Non-blocking via `continue-on-error`, since gate mode fails on findings by design. The job reports; it never blocks.
 
+**Correction to the WP4 premise.** The commit message and the original job comment said the `analyze` job's "Strip self-plugin reference" step is why this repo's rules never run on itself. That is wrong: the committed `analysis_options.yaml` carries no `include:` of a tier and no `plugins:` section at all, so that step deletes lines which are not there. The dogfooding gap is real; the reason given for it was not. The job comment now states it accurately.
+
+**What the first run taught.** The job failed on its first CI run with exit 2, `No saropa_lints configuration found`. `scan` reads per-rule configuration from `analysis_options.yaml` and refuses to run without it — precisely the situation above. Passing `tier` fixes it, because `scan_runner.dart:431` returns the tier's rule set before ever consulting the config. `recommended` was chosen because it is the tier the README points consumers at, which makes self-linting the honest comparison.
+
+That failure is also the action's exit-2 handling working as designed: it failed loudly rather than reporting a green job for an analysis that never ran. A version that treated exit 2 as "no findings" would have shown this repo as clean while nothing had been examined.
+
+`fail-on: error` was added at the same time. Gate mode fails on any finding by design, and this job is meant to report; a check that is red on every pull request trains people to ignore CI. Errors fail it, warnings are displayed and do not.
+
 ### WP0 — Package Vibrancy CI generator (`extension/src/vibrancy/services/ci-generator.ts`)
 
 Two silent defects, both fixed:

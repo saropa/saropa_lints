@@ -170,15 +170,24 @@ jobs:
       - name: Python script tests (tier integrity)
         run: python -m unittest discover -s scripts/modules/tests -t . -v
 
-  # The "Strip self-plugin reference" step in the analyze job deletes the
-  # `include: package:saropa_lints` line and the `plugins:` section from
-  # analysis_options.yaml before running `dart analyze`, so this repo's own
-  # 2332 rules never actually run against its own pull requests — only stock
-  # `dart analyze` does. That step stays (bootstrapping: a broken saropa_lints
-  # build must never lock its own CI red), so this job closes the gap
-  # separately: it runs the *unmodified* checkout (analysis_options.yaml
-  # intact) through the repo's own composite action, dogfooding the exact
-  # code under review.
+  # This repo's own 2332 rules have never run against its own pull requests.
+  # The committed analysis_options.yaml carries no `include:` of a tier and no
+  # `plugins:` section at all (the analyze job's "Strip self-plugin reference"
+  # step is a no-op against the current file — it deletes lines that are not
+  # there), so `dart analyze` here only ever applies stock Dart rules. This
+  # job closes that gap, running the checkout through the repo's own composite
+  # action and dogfooding the exact code under review.
+  #
+  # `tier` is REQUIRED, not cosmetic: scan reads the project's per-rule config
+  # from analysis_options.yaml and exits 2 when it finds none, which is exactly
+  # what happens here. Passing a tier makes scan use that rule set directly
+  # (scan_runner.dart:431 returns the tier rules before ever reading config).
+  # `recommended` is the tier the README points consumers at, so self-linting
+  # at the same level is the honest comparison.
+  #
+  # `fail-on: error` keeps this a report rather than a permanent red X. gate
+  # mode fails on any finding by design, and a job that is red on every PR
+  # trains people to ignore CI. Errors fail it; warnings are shown and do not.
   #
   # Scoping choices, since auditing every rule against the whole repo on
   # every PR could be slow:
@@ -226,7 +235,9 @@ jobs:
         uses: ./
         with:
           mode: gate
+          tier: recommended
           min-severity: warning
+          fail-on: error
 
   extension-manifest-nls:
     runs-on: ubuntu-latest
