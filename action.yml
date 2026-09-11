@@ -230,6 +230,9 @@ runs:
     # This step deliberately never fails the job. It records the exit code and
     # lets the final step decide, so a SARIF upload still happens when findings
     # exist — the annotations are the entire point of annotate mode.
+    #
+    # Note the explicit `set +e` around the audit call below: GitHub's default
+    # bash shell already runs with -e, which a `set -uo pipefail` does not undo.
     - name: Run saropa_lints audit
       id: audit
       shell: bash
@@ -285,8 +288,16 @@ runs:
         fi
 
         echo "Running: dart run saropa_lints ${args[*]}"
+
+        # GitHub invokes this shell as `bash --noprofile --norc -e -o pipefail`,
+        # so -e is already active and `set -uo pipefail` above does not clear
+        # it. Without this `set +e`, an audit exiting 1 (findings) aborts the
+        # step before the exit code is captured, leaving the SARIF upload
+        # skipped and the evaluate step with nothing to read.
+        set +e
         dart run saropa_lints "${args[@]}"
         code=$?
+        set -e
         echo "audit exited with $code"
         echo "exit-code=$code" >> "$GITHUB_OUTPUT"
 

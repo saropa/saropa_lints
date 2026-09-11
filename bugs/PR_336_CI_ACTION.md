@@ -64,6 +64,18 @@ The last two matter most. A green result there would mean the action reports suc
 
 The workflow is `paths`-filtered to `action.yml` and itself, so it does not run on unrelated changes, and it needs no `security-events` permission because the self-test sets `upload-sarif: false`.
 
+### What the self-test caught on its first run
+
+It failed immediately, on the bug it was written to catch.
+
+GitHub invokes step shells as `bash --noprofile --norc -e -o pipefail`. `-e` is therefore already active, and the audit step's `set -uo pipefail` does not clear it — it sets `u` and `pipefail` and leaves `e` alone. So when the audit exited 1 because findings existed, the step aborted before `code=$?` ran. The `exit-code` output was never written, the SARIF upload was skipped, and `Evaluate result` correctly reported that the audit step had not run to completion.
+
+The capture-then-evaluate design was right; the shell's `-e` defeated it. The fix is an explicit `set +e` around the audit call, restored to `set -e` afterward.
+
+This is worth spelling out because it is invisible in local testing: a script run as `bash script.sh` has no `-e`, so the logic passes locally and fails on a runner. It was reproduced here by invoking the extracted logic with the runner's exact shell flags, confirming the failure, then confirming the fix under the same flags.
+
+The rest of the action was swept for the same hazard. Every other command whose non-zero exit is expected sits inside an `if` condition or is guarded with `||`, both of which `-e` exempts. The bare `[ -n "$X" ] && args+=(...)` lines are also exempt, because the failing command is not the one following the final `&&` — verified rather than assumed.
+
 ---
 
 ## Considered and rejected
@@ -118,6 +130,7 @@ This does not block merging. It blocks the action being pleasant to consume.
 
 - Every flag the action can emit (`--format`, `--output`, `--quiet`, `--since`, `--min-severity`, `--min-impact`, `--exclude-globs`, `--include-globs`, `--baseline`, `--baseline-path`) checked programmatically against the argument parser in `bin/audit.dart`. All ten are accepted; `audit` has no `--tier`.
 - Argument assembly extracted and exercised for all three modes, with and without optional inputs. Produces the expected command lines.
+- The `-e` failure above, reproduced under the runner's exact shell invocation (`bash --noprofile --norc -e -o pipefail`): before the fix the exit code is never captured and the step exits 1; after it, the code is captured and the step exits 0.
 - The tightened dependency check, both branches: the `jq` package-graph branch accepts a real `saropa_lints` entry and rejects a package merely named `saropa_lints_self_check`; the fallback regex accepts `self_check`'s dev dependency and rejects both a comment-only mention and a package named `saropa_lints_example`. The original grep accepted all three false cases.
 - The pass/fail decision matrix exercised across all nine mode-by-exit-code combinations. Exit 2 fails in all three modes; exit 1 fails only in `gate` and `both`; exit 0 always passes. An empty exit code (audit step did not complete) fails.
 - `action.yml` parses as YAML; structure inspected for expected step and `uses:` shape.
