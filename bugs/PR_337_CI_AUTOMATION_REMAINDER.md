@@ -95,6 +95,14 @@ When the version cannot be determined, neither emits `@vunknown`: a broken refer
 
 The extension's lockfile parsing is deliberately local rather than imported from `upgrade-checker.ts`. That module pulls in `vscode`, and `ciWorkflow.ts` is otherwise pure `fs`/`path`. Keeping it dependency-free is what makes its enable/disable round trip testable outside an extension host, which is the only way its file surgery gets verified at all. Importing was tried first and reverted for exactly that reason.
 
+### The test that the fix broke
+
+Making the pin version-derived broke one of its own tests, and the failure is worth recording because the mistake is easy to repeat.
+
+To prove the pin was no longer hardcoded, the test asserted the output does **not** contain `saropa_lints@v16.2.1`. That passes anywhere except the one repository it runs in: saropa_lints' own version *is* 16.2.1, so the correctly-derived pin produces exactly the string being forbidden. 10310 tests passed, 1 failed.
+
+The assertion conflated "must not be hardcoded" with "must not be this value". It now asserts the contract — the pin equals `v$saropaLintsVersion`, or `main` when that cannot be resolved — which holds in this repository and in any consumer.
+
 ## Considered and rejected
 
 **Adding this to PR 336.** Rejected: 336 is open and awaiting review at a reviewable size. Stacking keeps each PR legible. The cost is that 337 must merge after 336, which is the correct dependency anyway since WP2 and WP3 generate workflows calling that action.

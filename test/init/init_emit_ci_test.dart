@@ -8,6 +8,7 @@ library;
 
 import 'dart:io';
 
+import 'package:saropa_lints/saropa_lints.dart' show saropaLintsVersion;
 import 'package:saropa_lints/src/init/cli_args.dart';
 import 'package:saropa_lints/src/init/emit_ci_workflow.dart';
 import 'package:test/test.dart';
@@ -37,11 +38,18 @@ void main() {
           '# managed-by: saropa_lints\n',
         ),
       );
-      // The pin tracks the running package version rather than a literal, so
-      // assert the shape and that it is not the old hardcoded tag — that tag
-      // predates action.yml and never resolved.
-      expect(contents, contains('uses: saropa/saropa_lints@'));
-      expect(contents, isNot(contains('saropa_lints@v16.2.1')));
+      // The pin must equal the version actually resolved at run time. An
+      // earlier version of this test forbade the literal 'v16.2.1' to prove
+      // the pin was no longer hardcoded — which fails in this repository,
+      // whose own version IS 16.2.1, so the correctly-derived pin matches the
+      // string being forbidden. Assert the contract instead of a string the
+      // contract happens not to produce elsewhere.
+      final String expectedRef = saropaLintsVersion == 'unknown'
+          ? 'main'
+          : 'v$saropaLintsVersion';
+      expect(contents, contains('uses: saropa/saropa_lints@$expectedRef'));
+      // Interpolation must actually have happened, and an unresolvable
+      // version must never be dressed up as a real tag.
       expect(contents, isNot(contains(r'saropa_lints@$ref')));
       expect(contents, isNot(contains('saropa_lints@vunknown')));
       // Never the moving major-version tag: the release process only ever
