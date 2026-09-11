@@ -1,0 +1,187 @@
+# CI automation for consumer projects — action, generator, and engine card
+
+**Created:** 2026-09-11 · **Status:** proposed, nothing built yet
+**Question answered:** How do consumer projects get saropa_lints running on their GitHub PRs
+automatically, and can that be toggled from the extension's existing Diagnostic Engines screen?
+
+---
+
+## Status at a glance
+
+- **Layer 1 (analyzer plugin) already works and needs nothing.** A project that adopts
+  `include: package:saropa_lints/tiers/<tier>.yaml` gets all rules enforced by any existing
+  `dart analyze` step in its CI. No workflow changes, no new files. This covers the majority case
+  and is not part of the work below.
+- **Layer 2 (PR annotations) works but is copy-paste.** `audit --format sarif` +
+  `github/codeql-action/upload-sarif` is documented at `doc/guides/cli.md:318` and functional.
+  Every consumer hand-maintains ~25 lines of YAML that never updates when flags change.
+- **Layer 3 (gate/baseline) works but is copy-paste.** `quality_gate` and `baseline` have real
+  exit-code contracts. Same distribution problem.
+- **Nothing is packaged.** No `action.yml` at repo root, so there is no `uses: saropa/saropa_lints@v16`.
+- **The extension has a CI generator precedent, and it is stubbed.** See WP0.
+
+The work below is about **distribution**, not capability. The CLI can already do all of this.
+
+---
+
+## Existing code this builds on (verified 2026-09-11)
+
+| Path | What it gives us |
+|---|---|
+| `doc/guides/cli.md:318` | Working SARIF-on-PR workflow, the template to package |
+| `doc/cross_file_ci_example.md` | Same for `cross_file`; exit-code contract documented |
+| `bin/init.dart` | `--emit-composite-plugin-scaffold` — the precedent for emitting a file into a consumer project |
+| `extension/src/vibrancy/services/ci-generator.ts` | 3-platform workflow generator + `getDefaultOutputPath` |
+| `extension/src/vibrancy/extension-activation.ts:2209` | `generateCiConfig()` — quick-pick → generate → overwrite-confirm → `fs.writeFile` → open in editor |
+| `extension/src/systemHealth/engineCardsHtml.ts` | `EngineStatus`, `buildEngineCard`, ON/OFF buttons, status pill |
+| `extension/src/systemHealth/healthPanel.ts:21,:40` | `toggle` message variant + `_onToggle` emitter |
+| `extension/src/extension.ts:1897` | `HealthPanel.onToggle` — per-engine ON/OFF branches |
+
+---
+
+## WP0 — Fix the stubbed vibrancy CI generator (prerequisite)
+
+`extension/src/vibrancy/services/ci-generator.ts` generates a workflow that **does not enforce
+anything**. Two defects:
+
+1. The embedded Dart parses `pub outdated` output, prints the thresholds, and exits 0. The
+   thresholds are interpolated into `print()` calls only — no comparison, no non-zero exit. The
+   trailing comment says as much: *"For full vibrancy checks, use saropa_vibrancy_cli when available"*.
+2. `dart run <<'DART_SCRIPT'` is not a valid invocation — `dart run` does not read a program from
+   stdin. The heredoc pattern appears in all three generated platforms.
+
+A team that generates this file believes their PRs are gated and they are not. This must be fixed
+or the generator withdrawn before a second generator ships next to it, or we ship the same
+silent-pass failure twice.
+
+**Decision needed:** fix in place (write a real threshold check, invoke via a temp `.dart` file) or
+withdraw the command until `saropa_vibrancy_cli` exists. Not blocking WP1, but blocking WP3, which
+would otherwise sit next to a broken sibling in the same UI.
+
+---
+
+## WP1 — Composite action at repo root
+
+`action.yml` wrapping setup-dart + `pub get` + `audit` + SARIF upload.
+
+```yaml
+- uses: saropa/saropa_lints@v16
+  with:
+    tier: recommended        # default: read project analysis_options.yaml
+    since: ${{ github.base_ref }}   # empty = full scan
+    mode: annotate           # annotate | gate | both
+    min-severity: warning
+```
+
+Why first: it collapses the generated workflow from ~25 lines to ~10, moves flag logic into a
+place with tests, and means a flag change ships to consumers via a tag bump instead of a
+documentation edit they never read.
+
+**Open decision — `audit` vs `scan` as the wrapped command.** `audit` runs in-project and requires
+the dependency; `scan` works against projects that never adopted the package. Wrapping `scan`
+enables an org-wide reusable workflow across repos with no saropa_lints dependency, which is a
+materially larger addressable surface. Needs a call before implementation starts.
+
+Caveat to document: SARIF upload requires `security-events: write`, and code scanning is free on
+public repos but needs GitHub Advanced Security on private ones. The gate mode (exit code, no
+upload) is the fallback and should be the documented default for private repos.
+
+---
+
+## WP2 — `init --emit-ci`
+
+Writes `.github/workflows/saropa-lints.yml` calling the WP1 action. Mirrors the existing
+`--emit-composite-plugin-scaffold` flag in `bin/init.dart`.
+
+Emitted file carries a provenance header:
+
+```yaml
+# Generated by saropa_lints init --emit-ci
+# managed-by: saropa_lints
+```
+
+The marker is what lets WP3 distinguish "we generated this and it is untouched" from "the user
+has edited this", which is the difference between a safe regeneration and clobbering someone's work.
+
+---
+
+## WP3 — Engine card in the System Health panel
+
+A fourth card in the Diagnostic Engines section. Contained, typed change:
+
+- add `'ci'` to the `EngineStatus.key` union — `engineCardsHtml.ts:12`, `healthPanel.ts:21`, `healthPanel.ts:40`
+- add `getCiStatus()` to `EngineStatusDeps`
+- add an `else if (engine === 'ci')` branch beside the existing `lspServer` / `analyzer` branches at `extension.ts:1897`
+- add `debug.engine.description.ci` + status values across the 24 `package.nls.*` files
+
+No card layout changes. Field mapping:
+
+| Field | CI meaning |
+|---|---|
+| `status` | last workflow run conclusion — success / failure / running / unknown |
+| `ruleCount` | rule count for the tier the workflow runs |
+| `scanProgress` | in-flight run progress |
+| `pid` | n/a, omitted — card already handles absent PID |
+| `rssBytes` | n/a, use `rssNote` — precedent set by the analyzer card |
+
+`statusColorClass()` gives a green/red pill on last CI result for free. Surfacing "analyzer green
+locally, CI red" next to the local engines is the card's actual value; no other screen shows it.
+
+### The one genuine design issue: branch state vs effective state
+
+The card reads the workflow file in the **current branch's working tree**. Effective CI state is
+what is on the **default branch**. These diverge routinely:
+
+- Developer on a feature branch toggles OFF → card says OFF → every PR is still gated by main's copy.
+- Teammate turns it ON in main → your older branch has no file → card says OFF while CI is live.
+
+The card is confidently wrong in both directions. This is a display-accuracy bug, not a governance
+one — the toggle writes to the working tree, so the change is visible in the SCM view, reviewed in
+the PR, and attributable via `git blame` like any other committed change.
+
+**Fix:** label the card with the branch it reflects ("this branch"), and if live run status is
+wired (below), show default-branch state as the authoritative value.
+
+### OFF should write `if: false`, not delete
+
+Not for safety — for edit preservation. A team that customised the generated workflow loses that
+work on a delete/regenerate cycle. `if: false` is a one-line reversible diff that keeps their edits
+intact. Deletion stays available as an explicit "Remove" action, distinct from the toggle.
+
+### Live run status — needs a decision
+
+Requires the GitHub API, which requires auth. `extension/src/vibrancy/providers/tree-item-builders.ts:237`
+has GitHub-facing code (`result.github`); **not yet traced** whether it is authenticated or anonymous.
+
+- If auth is reusable → live status pill, card is genuinely useful.
+- If not → read local file for ON/OFF, show `status: unknown`, offer sign-in. Do not fake a green
+  pill from file presence.
+
+---
+
+## WP4 — Dogfood in this repo
+
+`.github/workflows/ci.yml:73` strips the `include:` and `plugins:` lines before analyzing, so this
+repo's own PRs are checked by stock `dart analyze` only — not by its own 2332 rules. Presumably
+deliberate (bootstrapping), but it means the audit + SARIF path gets no exercise on any PR.
+
+Add a non-blocking `audit --format sarif` job using the WP1 action. This is also the only realistic
+integration test for the action itself.
+
+---
+
+## Sequencing
+
+```
+WP1 (action) ──► WP2 (--emit-ci) ──► WP3 (engine card)
+     └──────────► WP4 (dogfood / integration test)
+WP0 (fix vibrancy generator) ──► WP3
+```
+
+WP3 before WP1/WP2 means a switch wired to nothing, and template logic written twice.
+
+## Decisions needed before starting
+
+1. WP1: wrap `audit` (in-project) or `scan` (works without the dependency)?
+2. WP0: fix the vibrancy generator in place, or withdraw the command?
+3. WP3: is the vibrancy GitHub auth path reusable for live run status?
