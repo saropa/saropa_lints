@@ -37,7 +37,13 @@ void main() {
           '# managed-by: saropa_lints\n',
         ),
       );
-      expect(contents, contains('uses: saropa/saropa_lints@v16.2.1'));
+      // The pin tracks the running package version rather than a literal, so
+      // assert the shape and that it is not the old hardcoded tag — that tag
+      // predates action.yml and never resolved.
+      expect(contents, contains('uses: saropa/saropa_lints@'));
+      expect(contents, isNot(contains('saropa_lints@v16.2.1')));
+      expect(contents, isNot(contains(r'saropa_lints@$ref')));
+      expect(contents, isNot(contains('saropa_lints@vunknown')));
       // Never the moving major-version tag: the release process only ever
       // creates exact tags, so `@v16` would not resolve.
       expect(contents, isNot(contains('saropa_lints@v16\n')));
@@ -48,6 +54,18 @@ void main() {
     } finally {
       safeDeleteDir(dir);
     }
+  });
+
+  test('buildCiWorkflow pins the running version, never a broken ref', () {
+    final withVersion = buildCiWorkflow(version: '16.3.0');
+    expect(withVersion, contains('uses: saropa/saropa_lints@v16.3.0'));
+
+    // A version that cannot be resolved must not become `@vunknown`, which
+    // would look like a real tag and fail at run time.
+    final unknown = buildCiWorkflow(version: 'unknown');
+    expect(unknown, contains('uses: saropa/saropa_lints@main'));
+    expect(unknown, isNot(contains('vunknown')));
+    expect(unknown, contains('could not be determined'));
   });
 
   test('emitCiWorkflow --dry-run writes nothing', () {

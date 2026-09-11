@@ -85,6 +85,16 @@ The Dart is now written to a real file and run, compares `outdatedCount` against
 
 ---
 
+## The hardcoded pin, and why it was wrong
+
+Both generators originally wrote `saropa/saropa_lints@v16.2.1`. That tag predates `action.yml` entirely, so **every workflow they produced referenced an action that could not resolve** — from `--emit-ci` and from the engine card alike. The file looked correct and failed at run time.
+
+Both now derive the pin from the saropa_lints version actually in use: the Dart side from `saropaLintsVersion` (resolved at runtime from the consumer's `package_config.json`), the extension from the locked version in `pubspec.lock`. This is self-consistent by construction — a release old enough to lack `action.yml` at its tag is also too old to ship `--emit-ci` or the card, so any version that can reach the code has an action to point at. It also cannot go stale the way a literal does.
+
+When the version cannot be determined, neither emits `@vunknown`: a broken reference that looks real is worse than an obvious one. They fall back to the default branch and say so in a comment in the generated file.
+
+The extension's lockfile parsing is deliberately local rather than imported from `upgrade-checker.ts`. That module pulls in `vscode`, and `ciWorkflow.ts` is otherwise pure `fs`/`path`. Keeping it dependency-free is what makes its enable/disable round trip testable outside an extension host, which is the only way its file surgery gets verified at all. Importing was tried first and reverted for exactly that reason.
+
 ## Considered and rejected
 
 **Adding this to PR 336.** Rejected: 336 is open and awaiting review at a reviewable size. Stacking keeps each PR legible. The cost is that 337 must merge after 336, which is the correct dependency anyway since WP2 and WP3 generate workflows calling that action.
@@ -140,6 +150,7 @@ Worth considering separately whether `ci.yml` should trigger on all pull request
 **Ran, passed:**
 
 - **The WP3 workflow toggle, compiled and executed against real files.** ON→OFF→ON returns the file byte-identical; both directions are idempotent; every intermediate state parses as valid YAML; a heavily customized workflow keeps its added `cron`, `timeout-minutes`, changed `mode` and added `tier` across the round trip; a file with no recognizable `jobs:` map is left untouched and the call returns false rather than guessing at a structural edit. This is the part the building agent explicitly flagged as untested, and it is the part most able to destroy someone's work.
+- **The version-derived pin, both branches**, by compiling `ciWorkflow.ts` and running it: a lockfile at 16.3.0 yields `@v16.3.0`; no lockfile yields `@main` with an explanatory comment and never `@vunknown`; the ON/OFF/ON round trip is still byte-identical afterward. The Dart builder's two branches were verified by simulating the interpolation and parsing the result as YAML, since no Dart SDK is available here.
 - `tsc --noEmit -p tsconfig.json` for the extension — passes.
 - WP0's new tests run against both the old and the new generator: 12/12 fail before the fix, 12/12 pass after. A test that passes against broken code would have been worthless here.
 - The generated workflows in both WP2 and WP3 reference only inputs that exist in `action.yml`, checked programmatically against its `inputs:` block.

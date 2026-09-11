@@ -21,15 +21,69 @@ import * as path from 'path';
  * says this explicitly — nothing here should be read as "CI is green".
  */
 
-/** Relative path (from the project root) of the generated workflow file. */
+/** Path of the generated workflow, relative to the workspace root. */
 export const CI_WORKFLOW_RELATIVE_PATH = '.github/workflows/saropa-lints.yml';
 
 /**
- * Pinned action version used when generating the workflow from scratch.
- * Always an exact tag — never a moving major like `@v16` — so a freshly
- * generated workflow doesn't silently pick up a future breaking release.
+ * Fallback action ref used when the installed saropa_lints version cannot be
+ * read from pubspec.lock.
+ *
+ * Deliberately the default branch, not a version literal. A hardcoded tag was
+ * the original bug here: it read `v16.2.1`, a tag created before `action.yml`
+ * existed, so every workflow this wrote referenced an action that could not
+ * resolve. `@vunknown` would be the same mistake wearing a different hat —
+ * a broken ref that looks real. `main` at least resolves, and the generated
+ * file says plainly that it needs pinning.
  */
-const ACTION_VERSION = 'v16.2.1';
+const FALLBACK_ACTION_REF = 'main';
+
+/**
+ * Resolves the action ref to pin, from the workspace's pubspec.lock.
+ *
+ * Pinning to the version the project actually depends on is self-consistent:
+ * a release old enough to lack `action.yml` at its tag is also too old to
+ * ship this card, so any version that can reach this code has an action to
+ * point at.
+ */
+function resolveActionRef(root: string): { ref: string; pinned: boolean } {
+  try {
+    const lock = path.join(root, 'pubspec.lock');
+    if (!fs.existsSync(lock)) return { ref: FALLBACK_ACTION_REF, pinned: false };
+    const version = readLockedVersion(fs.readFileSync(lock, 'utf-8'));
+    if (!version) return { ref: FALLBACK_ACTION_REF, pinned: false };
+    return { ref: `v${version}`, pinned: true };
+  } catch {
+    // A malformed or unreadable lockfile is not worth failing the toggle over;
+    // fall back and let the generated file explain itself.
+    return { ref: FALLBACK_ACTION_REF, pinned: false };
+  }
+}
+
+/**
+ * Reads the locked saropa_lints version out of pubspec.lock.
+ *
+ * Deliberately parsed here rather than imported from upgrade-checker.ts: that
+ * module pulls in `vscode`, and this one is otherwise pure fs/path. Keeping it
+ * dependency-free is what makes the enable/disable round trip testable outside
+ * an extension host, which is the only way its file surgery gets verified.
+ *
+ * pubspec.lock is two-space-indented YAML; the package block is
+ * `  saropa_lints:` followed by more deeply indented fields, one of which is
+ * `version: "x.y.z"`. Stop at the next top-of-block key so a `version:` from a
+ * neighbouring package can never be misread as this one's.
+ */
+function readLockedVersion(lockContent: string): string | null {
+  const lines = lockContent.split('\n');
+  const start = lines.findIndex((l) => /^ {2}saropa_lints:\s*$/.test(l));
+  if (start === -1) return null;
+
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^ {0,2}\S/.test(lines[i])) break; // next package, or a top-level key
+    const m = /^\s+version:\s*"?([^"\s]+)"?\s*$/.exec(lines[i]);
+    if (m) return m[1];
+  }
+  return null;
+}
 
 /**
  * Marker comment appended to the job's `if:` line when the CI toggle is
@@ -48,7 +102,18 @@ const DISABLE_MARKER = '# disabled via Saropa Lints System Health panel';
  * sync by hand since the two live in different files for different
  * audiences (a guide a human reads vs. a template a toggle writes).
  */
-const TEMPLATE = `# .github/workflows/saropa-lints.yml
+function buildTemplate(root: string): string {
+  const { ref, pinned } = resolveActionRef(root);
+  const note = pinned
+    ? ''
+    : '#\n' +
+      '# NOTE: the saropa_lints version could not be read from pubspec.lock,\n' +
+      '# so this references the default branch rather than a release tag.\n' +
+      '# Pin it to the version you depend on before relying on this in CI.\n';
+
+  return `# .github/workflows/saropa-lints.yml
+# managed-by: saropa_lints
+${note}
 name: saropa_lints
 
 on:
@@ -64,11 +129,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: saropa/saropa_lints@${ACTION_VERSION}
+      - uses: saropa/saropa_lints@${ref}
         with:
           since: origin/\${{ github.base_ref }}   # changed files only
           mode: annotate                        # annotate | gate | both
 `;
+}
 
 /** On-disk state of the generated CI workflow for a given project root. */
 export type CiWorkflowState = 'active' | 'stopped' | 'absent';
@@ -100,7 +166,7 @@ export function enableCiWorkflow(root: string): void {
   const file = getCiWorkflowPath(root);
   if (!fs.existsSync(file)) {
     fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(file, TEMPLATE, 'utf-8');
+    fs.writeFileSync(file, buildTemplate(root), 'utf-8');
     return;
   }
 
