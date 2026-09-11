@@ -74,6 +74,8 @@ The capture-then-evaluate design was right; the shell's `-e` defeated it. The fi
 
 This is worth spelling out because it is invisible in local testing: a script run as `bash script.sh` has no `-e`, so the logic passes locally and fails on a runner. It was reproduced here by invoking the extracted logic with the runner's exact shell flags, confirming the failure, then confirming the fix under the same flags.
 
+The run also surfaced a smaller reporting flaw. On a validation failure the log carried two errors: the accurate one (`mode must be annotate, gate or both (got 'not-a-real-mode')`) followed by `The audit step did not run to completion`, emitted by `Evaluate result` because it runs under `if: always()` and cannot distinguish a rejected input from a crashed audit. The second line reads as a crash and would send someone hunting for one after a simple typo. It now says `saropa_lints did not run. See the error above for the cause.`, which is true in both cases and asserts nothing it cannot know.
+
 The rest of the action was swept for the same hazard. Every other command whose non-zero exit is expected sits inside an `if` condition or is guarded with `||`, both of which `-e` exempts. The bare `[ -n "$X" ] && args+=(...)` lines are also exempt, because the failing command is not the one following the final `&&` — verified rather than assumed.
 
 ---

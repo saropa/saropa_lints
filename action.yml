@@ -340,8 +340,13 @@ runs:
       run: |
         set -euo pipefail
 
+        # An empty exit code means the audit never reported one: either an
+        # earlier step rejected the configuration, or the audit itself died.
+        # Both leave a precise error above this one, so don't assert a cause
+        # here — "did not run to completion" reads as a crash and sends
+        # someone hunting for one after a simple bad input.
         if [ -z "$CODE" ]; then
-          echo "::error::The audit step did not run to completion."
+          echo "::error::saropa_lints did not run. See the error above for the cause."
           exit 1
         fi
 
