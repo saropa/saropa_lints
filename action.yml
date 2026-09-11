@@ -1,0 +1,353 @@
+# Composite action: run saropa_lints against a Dart/Flutter project in CI.
+#
+# Wraps `dart run saropa_lints audit` so consumers write a few lines instead of
+# hand-maintaining the full workflow from doc/guides/cli.md. Flag changes ship
+# via a tag bump rather than a docs edit nobody re-reads.
+#
+# Requires saropa_lints as a dev_dependency of the target project — `audit`
+# runs in-project. A Dart or Flutter SDK must already be on PATH unless
+# install-sdk is enabled.
+name: saropa_lints
+description: Run saropa_lints static analysis, with SARIF annotations on pull requests.
+author: Saropa
+
+branding:
+  icon: check-circle
+  color: blue
+
+inputs:
+  working-directory:
+    description: Directory of the Dart/Flutter project to audit.
+    required: false
+    default: '.'
+
+  mode:
+    description: >-
+      annotate — upload SARIF, never fail the job on findings (review signal only).
+      gate — fail the job when findings exist, no upload.
+      both — upload SARIF and fail on findings.
+    required: false
+    default: annotate
+
+  since:
+    description: >-
+      Only audit files changed since this git ref (e.g. origin/main). Empty
+      audits the whole project. The action fetches the ref when it is missing
+      locally, so a shallow default checkout still works.
+    required: false
+    default: ''
+
+  min-severity:
+    description: 'Hide findings below this severity: error, warning, info.'
+    required: false
+    default: ''
+
+  min-impact:
+    description: 'Hide findings below this impact: critical, high, medium, low, minimal.'
+    required: false
+    default: ''
+
+  exclude-globs:
+    description: Comma-separated glob patterns to skip.
+    required: false
+    default: ''
+
+  include-globs:
+    description: Comma-separated glob patterns to force-include.
+    required: false
+    default: ''
+
+  baseline:
+    description: >-
+      Path to a saved audit baseline. When set, findings already in the
+      baseline are tagged so only new ones are treated as failures.
+    required: false
+    default: ''
+
+  sarif-file:
+    description: Where to write the SARIF report (annotate/both modes).
+    required: false
+    default: saropa-lints.sarif
+
+  upload-sarif:
+    description: >-
+      Upload the SARIF file to GitHub code scanning. Requires
+      `security-events: write`, and Advanced Security on private repos. Set
+      false to produce the file without uploading (e.g. to archive it).
+    required: false
+    default: 'true'
+
+  install-sdk:
+    description: >-
+      auto — install the Dart SDK only when no dart is already on PATH.
+      true — always install. false — never install (caller provides it).
+      Flutter projects should set up flutter-action themselves and leave this
+      on auto, which then correctly skips the install.
+    required: false
+    default: auto
+
+  sdk-version:
+    description: Dart SDK version used when install-sdk applies.
+    required: false
+    default: stable
+
+  pub-get:
+    description: Run `dart pub get` before auditing.
+    required: false
+    default: 'true'
+
+outputs:
+  exit-code:
+    description: 'Raw audit exit code: 0 clean, 1 findings, 2 error.'
+    value: ${{ steps.audit.outputs.exit-code }}
+  findings:
+    description: Number of findings reported (empty when it could not be determined).
+    value: ${{ steps.audit.outputs.findings }}
+  sarif-file:
+    description: Path to the written SARIF file, when one was produced.
+    value: ${{ steps.audit.outputs.sarif-file }}
+
+runs:
+  using: composite
+  steps:
+    # Validate inputs before doing any work, so a typo fails in two seconds
+    # with a useful message rather than after an SDK install and a full audit.
+    - name: Validate inputs
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+        INSTALL_SDK: ${{ inputs.install-sdk }}
+        MIN_SEVERITY: ${{ inputs.min-severity }}
+        MIN_IMPACT: ${{ inputs.min-impact }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        fail() { echo "::error::$1"; exit 1; }
+
+        case "$MODE" in
+          annotate|gate|both) ;;
+          *) fail "mode must be annotate, gate or both (got '$MODE')." ;;
+        esac
+
+        case "$INSTALL_SDK" in
+          auto|true|false) ;;
+          *) fail "install-sdk must be auto, true or false (got '$INSTALL_SDK')." ;;
+        esac
+
+        if [ -n "$MIN_SEVERITY" ]; then
+          case "$MIN_SEVERITY" in
+            error|warning|info) ;;
+            *) fail "min-severity must be error, warning or info (got '$MIN_SEVERITY')." ;;
+          esac
+        fi
+
+        if [ -n "$MIN_IMPACT" ]; then
+          case "$MIN_IMPACT" in
+            critical|high|medium|low|minimal) ;;
+            *) fail "min-impact must be critical, high, medium, low or minimal (got '$MIN_IMPACT')." ;;
+          esac
+        fi
+
+        [ -d "$WORKING_DIRECTORY" ] || fail "working-directory '$WORKING_DIRECTORY' does not exist."
+        [ -f "$WORKING_DIRECTORY/pubspec.yaml" ] || \
+          fail "'$WORKING_DIRECTORY' is not a Dart project (no pubspec.yaml)."
+
+    # `auto` exists because Flutter projects get dart via flutter-action; a
+    # second unconditional setup-dart would shadow it with a bare Dart SDK.
+    - name: Decide whether to install the Dart SDK
+      id: sdk
+      shell: bash
+      env:
+        INSTALL_SDK: ${{ inputs.install-sdk }}
+      run: |
+        set -euo pipefail
+        needed=false
+        case "$INSTALL_SDK" in
+          true) needed=true ;;
+          false) needed=false ;;
+          auto)
+            if command -v dart >/dev/null 2>&1; then
+              echo "dart already on PATH ($(dart --version 2>&1)); skipping install."
+            else
+              needed=true
+            fi
+            ;;
+        esac
+        echo "needed=$needed" >> "$GITHUB_OUTPUT"
+
+    - name: Set up Dart
+      if: steps.sdk.outputs.needed == 'true'
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ inputs.sdk-version }}
+
+    # A shallow checkout (the Actions default) has no base branch, so --since
+    # would diff against a ref that does not exist. Fetch just that ref.
+    - name: Fetch base ref for --since
+      if: inputs.since != ''
+      shell: bash
+      env:
+        SINCE: ${{ inputs.since }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        cd "$WORKING_DIRECTORY"
+
+        if git rev-parse --verify --quiet "$SINCE" >/dev/null; then
+          echo "Ref '$SINCE' already present."
+          exit 0
+        fi
+
+        # Strip a leading remote name so 'origin/main' fetches 'main'.
+        branch="${SINCE#origin/}"
+        echo "Ref '$SINCE' missing; fetching '$branch' from origin."
+        # Explicit refspec: actions/checkout configures a single-branch fetch
+        # refspec, under which a bare `git fetch origin <branch>` updates
+        # FETCH_HEAD without creating refs/remotes/origin/<branch> — leaving
+        # `--since origin/<branch>` still unresolvable.
+        if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" --depth=1; then
+          echo "::warning::Could not fetch '$branch'. The audit will fall back to a full scan."
+        fi
+
+        if ! git rev-parse --verify --quiet "$SINCE" >/dev/null; then
+          echo "::warning::'$SINCE' still does not resolve after fetching; expect a full scan."
+        fi
+
+    - name: Install dependencies
+      if: inputs.pub-get == 'true'
+      shell: bash
+      env:
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        cd "$WORKING_DIRECTORY"
+        if grep -qE '^\s*sdk:\s*flutter' pubspec.yaml && command -v flutter >/dev/null 2>&1; then
+          flutter pub get
+        else
+          dart pub get
+        fi
+
+    # This step deliberately never fails the job. It records the exit code and
+    # lets the final step decide, so a SARIF upload still happens when findings
+    # exist — the annotations are the entire point of annotate mode.
+    - name: Run saropa_lints audit
+      id: audit
+      shell: bash
+      env:
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        MODE: ${{ inputs.mode }}
+        SINCE: ${{ inputs.since }}
+        MIN_SEVERITY: ${{ inputs.min-severity }}
+        MIN_IMPACT: ${{ inputs.min-impact }}
+        EXCLUDE_GLOBS: ${{ inputs.exclude-globs }}
+        INCLUDE_GLOBS: ${{ inputs.include-globs }}
+        BASELINE: ${{ inputs.baseline }}
+        SARIF_FILE: ${{ inputs.sarif-file }}
+      run: |
+        set -uo pipefail
+        cd "$WORKING_DIRECTORY"
+
+        if ! grep -q 'saropa_lints' pubspec.yaml; then
+          echo "::error::saropa_lints is not a dependency of '$WORKING_DIRECTORY'."
+          echo "::error::Add it with: dart pub add --dev saropa_lints"
+          exit 1
+        fi
+
+        args=(audit .)
+        want_sarif=false
+        case "$MODE" in
+          annotate|both) want_sarif=true ;;
+        esac
+
+        if [ "$want_sarif" = true ]; then
+          # --quiet only here: in gate mode the native report goes to stdout and
+          # is the only record of what failed, so keep it human-readable.
+          args+=(--format sarif --output "$SARIF_FILE" --quiet)
+        fi
+        [ -n "$SINCE" ] && args+=(--since "$SINCE")
+        [ -n "$MIN_SEVERITY" ] && args+=(--min-severity "$MIN_SEVERITY")
+        [ -n "$MIN_IMPACT" ] && args+=(--min-impact "$MIN_IMPACT")
+        [ -n "$EXCLUDE_GLOBS" ] && args+=(--exclude-globs "$EXCLUDE_GLOBS")
+        [ -n "$INCLUDE_GLOBS" ] && args+=(--include-globs "$INCLUDE_GLOBS")
+        if [ -n "$BASELINE" ]; then
+          args+=(--baseline --baseline-path "$BASELINE")
+        fi
+
+        echo "Running: dart run saropa_lints ${args[*]}"
+        dart run saropa_lints "${args[@]}"
+        code=$?
+        echo "audit exited with $code"
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+
+        # Count findings from the SARIF results array when we produced one.
+        findings=''
+        if [ "$want_sarif" = true ] && [ -f "$SARIF_FILE" ]; then
+          echo "sarif-file=$WORKING_DIRECTORY/$SARIF_FILE" >> "$GITHUB_OUTPUT"
+          if command -v jq >/dev/null 2>&1; then
+            findings=$(jq '[.runs[].results[]] | length' "$SARIF_FILE" 2>/dev/null || echo '')
+          fi
+        fi
+        echo "findings=$findings" >> "$GITHUB_OUTPUT"
+
+    # always() so findings (audit exit 1) still get annotated. Without it this
+    # step is skipped whenever there is something to report.
+    - name: Upload SARIF to GitHub code scanning
+      if: >-
+        always()
+        && inputs.upload-sarif == 'true'
+        && (inputs.mode == 'annotate' || inputs.mode == 'both')
+        && steps.audit.outputs.sarif-file != ''
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ steps.audit.outputs.sarif-file }}
+        category: saropa_lints
+
+    # Single place where the job's pass/fail is decided.
+    #
+    # Exit 2 always fails: it means bad arguments, a missing pub get, or not a
+    # Dart project — the audit never ran, so a green job would be a lie.
+    # Exit 1 (findings) fails only in gate/both. Treating "the tool ran" as
+    # "the code passed" is the failure mode this step exists to prevent.
+    - name: Evaluate result
+      if: always()
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+        CODE: ${{ steps.audit.outputs.exit-code }}
+        FINDINGS: ${{ steps.audit.outputs.findings }}
+      run: |
+        set -euo pipefail
+
+        if [ -z "$CODE" ]; then
+          echo "::error::The audit step did not run to completion."
+          exit 1
+        fi
+
+        # Only describe a count when we actually have one; "found  finding(s)"
+        # and "found 3 finding(s) - no findings" are both worse than silence.
+        if [ -n "$FINDINGS" ]; then
+          found="saropa_lints found $FINDINGS finding(s)"
+        else
+          found="saropa_lints found issues"
+        fi
+
+        case "$CODE" in
+          0)
+            echo "saropa_lints found no issues."
+            ;;
+          1)
+            if [ "$MODE" = "gate" ] || [ "$MODE" = "both" ]; then
+              echo "::error::$found — failing the job (mode: $MODE)."
+              exit 1
+            fi
+            echo "::notice::$found — reported as annotations (mode: annotate)."
+            ;;
+          2)
+            echo "::error::saropa_lints audit could not run (exit 2). See the log above."
+            exit 1
+            ;;
+          *)
+            echo "::error::saropa_lints audit exited with unexpected code $CODE."
+            exit 1
+            ;;
+        esac

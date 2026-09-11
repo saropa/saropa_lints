@@ -87,6 +87,23 @@ Caveat to document: SARIF upload requires `security-events: write`, and code sca
 public repos but needs GitHub Advanced Security on private ones. The gate mode (exit code, no
 upload) is the fallback and should be the documented default for private repos.
 
+### Blocker before consumers can use it: no moving major tag
+
+The release process creates only exact tags (`v{version}` — `_git_ops.py:660`); there is no moving
+`v16` that tracks the latest 16.x. GitHub Actions consumers expect `uses: saropa/saropa_lints@v16`,
+which currently does not resolve.
+
+Two options:
+
+1. **Add a major-tag move to the release process** (`scripts/modules/_git_ops.py`, step 13): after
+   pushing `v16.2.2`, force-move `v16` to the same commit. This is the standard convention for
+   published actions and is what the documentation should be able to promise.
+2. **Document exact tags only** (`@v16.2.1`). Honest and zero release-process change, but every
+   consumer has to bump manually on each release — which removes the main reason for packaging the
+   action at all.
+
+Option 1 is the point of WP1; until it lands, `doc/guides/cli.md` pins an exact tag.
+
 ---
 
 ## WP2 — `init --emit-ci`

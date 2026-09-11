@@ -317,7 +317,50 @@ dart run saropa_lints audit . --since main --format sarif --output results.sarif
 
 ### GitHub Actions CI with SARIF
 
-Use `--format sarif` with `github/codeql-action/upload-sarif` to get inline PR annotations from saropa_lints findings. This workflow audits only the files changed in a PR and uploads the results to GitHub's code-scanning dashboard.
+The quickest route is the bundled composite action, which wraps SDK setup, `pub get`, the audit, and the SARIF upload:
+
+```yaml
+# .github/workflows/saropa-lints.yml
+name: saropa_lints
+
+on:
+  pull_request:
+    paths: ['**.dart']
+
+permissions:
+  security-events: write   # required for the SARIF upload
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: saropa/saropa_lints@v16.2.1   # or a moving @v16 tag, once published
+        with:
+          since: origin/${{ github.base_ref }}   # changed files only
+          mode: annotate                        # annotate | gate | both
+```
+
+`mode` decides what a finding does:
+
+| Mode | SARIF upload | Job fails on findings |
+|------|--------------|-----------------------|
+| `annotate` (default) | yes | no |
+| `gate` | no | yes |
+| `both` | yes | yes |
+
+An audit that *could not run* (exit 2 — bad arguments, missing `pub get`, not a Dart project) fails the job in every mode, including `annotate`. A green job always means the audit actually ran.
+
+Use `mode: gate` on private repositories without GitHub Advanced Security, where code-scanning upload is unavailable — it enforces via exit code and uploads nothing.
+
+Other inputs: `working-directory`, `min-severity`, `min-impact`, `exclude-globs`, `include-globs`, `baseline`, `sarif-file`, `upload-sarif`, `install-sdk`, `sdk-version`, `pub-get`. Outputs: `exit-code`, `findings`, `sarif-file`.
+
+For Flutter projects, set up `subosito/flutter-action@v2` before this step and leave `install-sdk` at its default `auto` — it detects the SDK already on PATH and skips installing a second one.
+
+#### Doing it by hand
+
+Use `--format sarif` with `github/codeql-action/upload-sarif` directly if you would rather own the YAML. This workflow audits only the files changed in a PR and uploads the results to GitHub's code-scanning dashboard.
 
 ```yaml
 # .github/workflows/saropa-audit.yml
