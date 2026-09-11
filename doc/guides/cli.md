@@ -40,6 +40,7 @@ dart run saropa_lints:init --tier recommended --target /path/to/project
 | `--list-packs` | Print applicable rule packs and exit (no YAML write). |
 | `--enable-pack <id>` | Enable a rule pack (repeatable). IDs must match packs applicable to the project's pubspec. |
 | `--emit-composite-plugin-scaffold [dir]` | Generate a composite analyzer plugin scaffold for projects that run saropa_lints alongside other plugins. |
+| `--emit-ci [path]` | Write a GitHub Actions workflow that runs saropa_lints on pull requests. Default: `.github/workflows/saropa-lints.yml`. Carries a `# managed-by: saropa_lints` provenance marker, and refuses to overwrite an existing file so hand edits are never lost. |
 
 ---
 
