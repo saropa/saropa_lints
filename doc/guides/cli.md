@@ -354,7 +354,32 @@ An audit that *could not run* (exit 2 — bad arguments, missing `pub get`, not 
 
 Use `mode: gate` on private repositories without GitHub Advanced Security, where code-scanning upload is unavailable — it enforces via exit code and uploads nothing.
 
-Other inputs: `working-directory`, `min-severity`, `min-impact`, `exclude-globs`, `include-globs`, `baseline`, `sarif-file`, `upload-sarif`, `install-sdk`, `sdk-version`, `pub-get`. Outputs: `exit-code`, `findings`, `sarif-file`.
+#### Controlling which rules run
+
+`mode` decides what happens to a finding; `command` decides which rules produce one.
+
+| `command` | Rules run | SARIF |
+|-----------|-----------|-------|
+| `audit` | **Every rule**, regardless of the project's configured tier | yes |
+| `scan` | Only what `analysis_options.yaml` (or `tier`) enables | no |
+| `auto` (default) | `gate` → `scan`; `annotate`/`both` → `audit` | follows the above |
+
+This matters: `audit` deliberately bypasses the tier cap, so a project on `essential` still sees pedantic-tier findings. `min-severity` and `min-impact` filter what is *reported*, not what runs. To have CI honor your configured rule set, use `command: scan` — which means `mode: gate`, since only `audit` can emit SARIF.
+
+`scan` adds graduated failure, the usual need during incremental adoption:
+
+```yaml
+- uses: saropa/saropa_lints@v16.2.1
+  with:
+    mode: gate
+    tier: professional      # run professional-tier rules
+    fail-on-tier: essential # but only fail on essential-tier findings
+    fail-on-count: '5'      # and tolerate a known baseline of 5
+```
+
+Scan-only inputs: `tier`, `resolve`, `max-severity`, `fail-on`, `fail-on-impact`, `fail-on-count`, `fail-on-impact-count`, `fail-on-tier`. Audit-only: `since`, `baseline`. Passing one to the wrong command is an error, not a silent no-op — a `tier` quietly ignored would leave you believing CI honors it while every rule runs.
+
+Other inputs: `working-directory`, `min-severity`, `min-impact`, `exclude-globs`, `include-globs`, `sarif-file`, `upload-sarif`, `install-sdk`, `sdk-version`, `pub-get`. Outputs: `exit-code`, `findings`, `sarif-file`.
 
 For Flutter projects, set up `subosito/flutter-action@v2` before this step and leave `install-sdk` at its default `auto` — it detects the SDK already on PATH and skips installing a second one.
 

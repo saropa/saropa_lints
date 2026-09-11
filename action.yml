@@ -29,9 +29,74 @@ inputs:
     required: false
     default: annotate
 
+  command:
+    description: >-
+      Which CLI to run.
+      auto (default) — gate mode uses `scan`, annotate/both use `audit`.
+      audit — every rule, regardless of the project's configured tier; the
+      only command that can emit SARIF.
+      scan — only the rules the project's analysis_options.yaml (or `tier`)
+      enables, plus the fail-on-* thresholds. Cannot emit SARIF.
+    required: false
+    default: auto
+
+  tier:
+    description: >-
+      scan only. Override the project's configured tier for this run:
+      essential, recommended, professional, comprehensive, pedantic.
+    required: false
+    default: ''
+
+  resolve:
+    description: >-
+      scan only. Fully resolve each file (type/element resolution) instead of
+      the default fast syntactic parse. Required for type-based rules and for
+      rules that fire on constructor calls; slower.
+    required: false
+    default: 'false'
+
+  max-severity:
+    description: 'scan only. Hide findings above this severity: error, warning, info.'
+    required: false
+    default: ''
+
+  fail-on:
+    description: >-
+      scan only. Exit non-zero only when a finding at or above this severity
+      exists, independent of what is displayed: error, warning, info.
+    required: false
+    default: ''
+
+  fail-on-impact:
+    description: >-
+      scan only. Like fail-on, but against the rule author's declared impact:
+      critical, high, medium, low, minimal.
+    required: false
+    default: ''
+
+  fail-on-count:
+    description: >-
+      scan only. Used with fail-on: tolerate up to this many matching findings
+      before failing. Lets CI accept a known baseline.
+    required: false
+    default: ''
+
+  fail-on-impact-count:
+    description: 'scan only. Like fail-on-count, for fail-on-impact.'
+    required: false
+    default: ''
+
+  fail-on-tier:
+    description: >-
+      scan only. Fail only when a finding comes from a rule in this tier or
+      below, while still reporting everything. The usual lever for incremental
+      adoption: essential, recommended, professional, comprehensive, pedantic.
+    required: false
+    default: ''
+
   since:
     description: >-
-      Only audit files changed since this git ref (e.g. origin/main). Empty
+      audit only. Only audit files changed since this git ref (e.g. origin/main). Empty
       audits the whole project. The action fetches the ref when it is missing
       locally, so a shallow default checkout still works.
     required: false
@@ -59,7 +124,7 @@ inputs:
 
   baseline:
     description: >-
-      Path to a saved audit baseline. When set, findings already in the
+      audit only. Path to a saved audit baseline. When set, findings already in the
       baseline are tagged so only new ones are treated as failures.
     required: false
     default: ''
@@ -116,9 +181,20 @@ runs:
       shell: bash
       env:
         MODE: ${{ inputs.mode }}
+        COMMAND: ${{ inputs.command }}
         INSTALL_SDK: ${{ inputs.install-sdk }}
         MIN_SEVERITY: ${{ inputs.min-severity }}
         MIN_IMPACT: ${{ inputs.min-impact }}
+        MAX_SEVERITY: ${{ inputs.max-severity }}
+        TIER: ${{ inputs.tier }}
+        RESOLVE: ${{ inputs.resolve }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        FAIL_ON_IMPACT: ${{ inputs.fail-on-impact }}
+        FAIL_ON_COUNT: ${{ inputs.fail-on-count }}
+        FAIL_ON_IMPACT_COUNT: ${{ inputs.fail-on-impact-count }}
+        FAIL_ON_TIER: ${{ inputs.fail-on-tier }}
+        SINCE: ${{ inputs.since }}
+        BASELINE: ${{ inputs.baseline }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
       run: |
         set -euo pipefail
@@ -133,6 +209,90 @@ runs:
           auto|true|false) ;;
           *) fail "install-sdk must be auto, true or false (got '$INSTALL_SDK')." ;;
         esac
+
+        case "$COMMAND" in
+          auto|audit|scan) ;;
+          *) fail "command must be auto, audit or scan (got '$COMMAND')." ;;
+        esac
+
+        # Resolve `auto` here so the checks below reason about the command
+        # that will actually run, not the literal input.
+        resolved="$COMMAND"
+        if [ "$resolved" = auto ]; then
+          case "$MODE" in
+            gate) resolved=scan ;;
+            *) resolved=audit ;;
+          esac
+        fi
+
+        # Only audit can emit SARIF (the writer is wired into bin/audit.dart
+        # alone), so scan cannot satisfy a mode that uploads annotations.
+        # Failing here beats running scan and producing no annotations while
+        # the job reports success.
+        if [ "$resolved" = scan ] && { [ "$MODE" = annotate ] || [ "$MODE" = both ]; }; then
+          fail "command 'scan' cannot produce SARIF, which mode '$MODE' requires. Use mode: gate, or command: audit."
+        fi
+
+        # A flag that cannot apply is an error, not a silent no-op: quietly
+        # ignoring `tier` would leave someone believing CI honors their tier
+        # when it is running every rule.
+        scan_only=""
+        [ -n "$TIER" ] && scan_only="$scan_only tier"
+        [ "$RESOLVE" = "true" ] && scan_only="$scan_only resolve"
+        [ -n "$MAX_SEVERITY" ] && scan_only="$scan_only max-severity"
+        [ -n "$FAIL_ON" ] && scan_only="$scan_only fail-on"
+        [ -n "$FAIL_ON_IMPACT" ] && scan_only="$scan_only fail-on-impact"
+        [ -n "$FAIL_ON_COUNT" ] && scan_only="$scan_only fail-on-count"
+        [ -n "$FAIL_ON_IMPACT_COUNT" ] && scan_only="$scan_only fail-on-impact-count"
+        [ -n "$FAIL_ON_TIER" ] && scan_only="$scan_only fail-on-tier"
+        if [ "$resolved" = audit ] && [ -n "$scan_only" ]; then
+          fail "these inputs only apply to command 'scan':$scan_only (resolved command: audit)."
+        fi
+
+        audit_only=""
+        [ -n "$SINCE" ] && audit_only="$audit_only since"
+        [ -n "$BASELINE" ] && audit_only="$audit_only baseline"
+        if [ "$resolved" = scan ] && [ -n "$audit_only" ]; then
+          fail "these inputs only apply to command 'audit':$audit_only (resolved command: scan)."
+        fi
+
+        if [ -n "$TIER" ]; then
+          case "$TIER" in
+            essential|recommended|professional|comprehensive|pedantic) ;;
+            *) fail "tier must be essential, recommended, professional, comprehensive or pedantic (got '$TIER')." ;;
+          esac
+        fi
+
+        if [ -n "$FAIL_ON_TIER" ]; then
+          case "$FAIL_ON_TIER" in
+            essential|recommended|professional|comprehensive|pedantic) ;;
+            *) fail "fail-on-tier must be essential, recommended, professional, comprehensive or pedantic (got '$FAIL_ON_TIER')." ;;
+          esac
+        fi
+
+        for pair in "max-severity:$MAX_SEVERITY" "fail-on:$FAIL_ON"; do
+          name="${pair%%:*}"; value="${pair#*:}"
+          [ -z "$value" ] && continue
+          case "$value" in
+            error|warning|info) ;;
+            *) fail "$name must be error, warning or info (got '$value')." ;;
+          esac
+        done
+
+        if [ -n "$FAIL_ON_IMPACT" ]; then
+          case "$FAIL_ON_IMPACT" in
+            critical|high|medium|low|minimal) ;;
+            *) fail "fail-on-impact must be critical, high, medium, low or minimal (got '$FAIL_ON_IMPACT')." ;;
+          esac
+        fi
+
+        for pair in "fail-on-count:$FAIL_ON_COUNT" "fail-on-impact-count:$FAIL_ON_IMPACT_COUNT"; do
+          name="${pair%%:*}"; value="${pair#*:}"
+          [ -z "$value" ] && continue
+          case "$value" in
+            ''|*[!0-9]*) fail "$name must be a non-negative integer (got '$value')." ;;
+          esac
+        done
 
         if [ -n "$MIN_SEVERITY" ]; then
           case "$MIN_SEVERITY" in
@@ -239,9 +399,18 @@ runs:
       env:
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
         MODE: ${{ inputs.mode }}
+        COMMAND: ${{ inputs.command }}
         SINCE: ${{ inputs.since }}
         MIN_SEVERITY: ${{ inputs.min-severity }}
         MIN_IMPACT: ${{ inputs.min-impact }}
+        MAX_SEVERITY: ${{ inputs.max-severity }}
+        TIER: ${{ inputs.tier }}
+        RESOLVE: ${{ inputs.resolve }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        FAIL_ON_IMPACT: ${{ inputs.fail-on-impact }}
+        FAIL_ON_COUNT: ${{ inputs.fail-on-count }}
+        FAIL_ON_IMPACT_COUNT: ${{ inputs.fail-on-impact-count }}
+        FAIL_ON_TIER: ${{ inputs.fail-on-tier }}
         EXCLUDE_GLOBS: ${{ inputs.exclude-globs }}
         INCLUDE_GLOBS: ${{ inputs.include-globs }}
         BASELINE: ${{ inputs.baseline }}
@@ -267,24 +436,76 @@ runs:
           exit 1
         fi
 
-        args=(audit .)
+        # Resolve `auto` the same way the validate step did.
+        cmd="$COMMAND"
+        if [ "$cmd" = auto ]; then
+          case "$MODE" in
+            gate) cmd=scan ;;
+            *) cmd=audit ;;
+          esac
+        fi
+        echo "command: $cmd (input: $COMMAND, mode: $MODE)"
+
+        args=("$cmd" .)
         want_sarif=false
-        case "$MODE" in
-          annotate|both) want_sarif=true ;;
-        esac
+        if [ "$cmd" = audit ]; then
+          case "$MODE" in
+            annotate|both) want_sarif=true ;;
+          esac
+        fi
 
         if [ "$want_sarif" = true ]; then
           # --quiet only here: in gate mode the native report goes to stdout and
           # is the only record of what failed, so keep it human-readable.
           args+=(--format sarif --output "$SARIF_FILE" --quiet)
         fi
-        [ -n "$SINCE" ] && args+=(--since "$SINCE")
+
+        # Accepted by both commands.
         [ -n "$MIN_SEVERITY" ] && args+=(--min-severity "$MIN_SEVERITY")
         [ -n "$MIN_IMPACT" ] && args+=(--min-impact "$MIN_IMPACT")
-        [ -n "$EXCLUDE_GLOBS" ] && args+=(--exclude-globs "$EXCLUDE_GLOBS")
-        [ -n "$INCLUDE_GLOBS" ] && args+=(--include-globs "$INCLUDE_GLOBS")
-        if [ -n "$BASELINE" ]; then
-          args+=(--baseline --baseline-path "$BASELINE")
+
+        # The two commands disagree on glob grammar: audit takes ONE
+        # comma-separated value (bin/audit.dart splits on ','), while scan
+        # consumes every following non-flag argument as its own pattern
+        # (lib/src/scan/scan_cli_args.dart). Handing scan a comma-joined
+        # string makes it one literal glob containing commas, which matches
+        # nothing and reports no error — so translate rather than pass through.
+        append_globs() {
+          local flag="$1" value="$2"
+          [ -z "$value" ] && return 0
+          if [ "$cmd" = audit ]; then
+            args+=("$flag" "$value")
+          else
+            args+=("$flag")
+            # `read -ra`, not unquoted word splitting: an unquoted $value
+            # undergoes pathname expansion as well as splitting, so a pattern
+            # like 'vendor/*' would be replaced by whatever files happen to
+            # match in the working directory before scan ever sees it.
+            local -a patterns
+            IFS=',' read -ra patterns <<< "$value"
+            local pattern
+            for pattern in "${patterns[@]}"; do
+              [ -n "$pattern" ] && args+=("$pattern")
+            done
+          fi
+        }
+        append_globs --exclude-globs "$EXCLUDE_GLOBS"
+        append_globs --include-globs "$INCLUDE_GLOBS"
+
+        if [ "$cmd" = audit ]; then
+          [ -n "$SINCE" ] && args+=(--since "$SINCE")
+          if [ -n "$BASELINE" ]; then
+            args+=(--baseline --baseline-path "$BASELINE")
+          fi
+        else
+          [ -n "$TIER" ] && args+=(--tier "$TIER")
+          [ "$RESOLVE" = "true" ] && args+=(--resolve)
+          [ -n "$MAX_SEVERITY" ] && args+=(--max-severity "$MAX_SEVERITY")
+          [ -n "$FAIL_ON" ] && args+=(--fail-on "$FAIL_ON")
+          [ -n "$FAIL_ON_IMPACT" ] && args+=(--fail-on-impact "$FAIL_ON_IMPACT")
+          [ -n "$FAIL_ON_COUNT" ] && args+=(--fail-on-count "$FAIL_ON_COUNT")
+          [ -n "$FAIL_ON_IMPACT_COUNT" ] && args+=(--fail-on-impact-count "$FAIL_ON_IMPACT_COUNT")
+          [ -n "$FAIL_ON_TIER" ] && args+=(--fail-on-tier "$FAIL_ON_TIER")
         fi
 
         echo "Running: dart run saropa_lints ${args[*]}"

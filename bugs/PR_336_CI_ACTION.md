@@ -82,9 +82,26 @@ The rest of the action was swept for the same hazard. Every other command whose 
 
 ## Considered and rejected
 
-**Wrapping `scan` instead of `audit`.** `scan` can lint a project that does not declare saropa_lints as a dependency, which would allow one reusable workflow to sweep many repositories across an organization. Rejected as the default because anyone setting this up on their own project already has the dependency, and `audit` is what the existing documentation and SARIF path are built around. Organization-wide scanning of unadopted repositories is a genuinely different use case and can be added later as a `command:` input without disturbing this design.
+**Wrapping only `audit`.** ~~Rejected `scan` because anyone setting this up already has the dependency.~~ **Reversed.** That reasoning weighed the wrong axis. The question is not which command can reach the project, it is which one lets a team control the 2332 rules and decide what fails the build — and `scan` wins both decisively:
 
-**Exposing a `tier` input.** This was in the original sketch and turned out not to exist: `audit` deliberately runs every rule regardless of the project's configured tier. Volume control is `--min-severity` and `--min-impact`, which is what the action exposes instead. Worth knowing when reviewing, because a project on the `essential` tier will see comprehensive-tier findings from this action.
+| Need | `audit` | `scan` |
+|---|---|---|
+| Per-rule on/off via `analysis_options.yaml` | no | yes |
+| `--tier` override | no | yes |
+| `--fail-on <severity>` — report all, fail on some | no | yes |
+| `--fail-on-tier` — fail only on essential during adoption | no | yes |
+| `--fail-on-count <n>` — tolerate a known baseline | no | yes |
+| SARIF for PR annotations | yes | no |
+
+`audit` bypasses the tier cap by design (`bin/audit.dart:5`), so under audit a project configured for `essential` still gets pedantic-tier findings, and `min-severity`/`min-impact` only filter the report after everything has already run. There was no way to express "run my configured rule set."
+
+Neither command covers both jobs, because SARIF is wired into `audit` alone. So the action now takes a `command` input (`auto`/`audit`/`scan`) with `auto` resolving `gate` to `scan` and the SARIF modes to `audit`, and exposes scan's tier and fail-on-* flags.
+
+**Silently ignoring inapplicable inputs.** Rejected: a `tier` accepted and quietly dropped under `audit` would leave a team believing CI honors their configured rule set while every rule runs. Mismatched inputs are a hard error naming the offenders.
+
+**Passing glob inputs straight through to either command.** Rejected because the two disagree on grammar: `audit` takes one comma-separated value, `scan` consumes each following non-flag argument as its own pattern. A comma-joined string reaches `scan` as a single literal glob containing commas, matching nothing and reporting no error. The action translates per command.
+
+**Exposing `tier` as an audit input.** Still rejected, and it is not possible: `audit` has no `--tier` flag. `tier` is a scan-only input, and passing it with `command: audit` is rejected rather than ignored.
 
 **Always installing the Dart SDK.** Simpler to reason about and makes the minimal example shorter, but breaks Flutter consumers by shadowing the Flutter-provided Dart. The `auto` default costs one small step and one input, and removes an entire class of confusing failure.
 
@@ -132,6 +149,8 @@ This does not block merging. It blocks the action being pleasant to consume.
 
 - Every flag the action can emit (`--format`, `--output`, `--quiet`, `--since`, `--min-severity`, `--min-impact`, `--exclude-globs`, `--include-globs`, `--baseline`, `--baseline-path`) checked programmatically against the argument parser in `bin/audit.dart`. All ten are accepted; `audit` has no `--tier`.
 - Argument assembly extracted and exercised for all three modes, with and without optional inputs. Produces the expected command lines.
+- The glob-expansion bug in the scan translation, demonstrated against a real directory: with unquoted word splitting, `vendor/*` was replaced by `vendor/a.dart vendor/b.dart` before the CLI saw it; with `read -ra` the pattern survives intact.
+- Command resolution and argument assembly for `auto`/`audit`/`scan` across all three modes, including that `audit` receives one comma-joined glob argument while `scan` receives each pattern separately.
 - The `-e` failure above, reproduced under the runner's exact shell invocation (`bash --noprofile --norc -e -o pipefail`): before the fix the exit code is never captured and the step exits 1; after it, the code is captured and the step exits 0.
 - The tightened dependency check, both branches: the `jq` package-graph branch accepts a real `saropa_lints` entry and rejects a package merely named `saropa_lints_self_check`; the fallback regex accepts `self_check`'s dev dependency and rejects both a comment-only mention and a package named `saropa_lints_example`. The original grep accepted all three false cases.
 - The pass/fail decision matrix exercised across all nine mode-by-exit-code combinations. Exit 2 fails in all three modes; exit 1 fails only in `gate` and `both`; exit 0 always passes. An empty exit code (audit step did not complete) fails.
@@ -141,6 +160,7 @@ This does not block merging. It blocks the action being pleasant to consume.
 
 **Did not run:**
 
+- **The `scan` path against a real project, locally.** `action-selftest` gained four assertions covering it — that `scan` runs and honors its exit contract under `mode: gate` with `tier` and `fail-on-tier`, and that both incompatible combinations (`scan` with a SARIF mode, a scan-only input passed to `audit`) are rejected. Those assertions have not yet reported at the time of writing.
 - **The action itself, locally.** There is no Dart SDK in the authoring environment, so nothing about the action was executed here. Its shell logic was tested by extracting it into standalone scripts. `action-selftest` is what actually exercises it, and its first run is on this PR — so at the time of writing, the action's real behavior is asserted by CI but those assertions have not yet reported.
 - The SARIF **upload**, and therefore whether annotations render on a PR diff. The self-test deliberately sets `upload-sarif: false` so it needs no `security-events` permission and does not post to code scanning, which means the upload path remains unproven.
 - The `--since` fetch against a real shallow checkout. The refspec reasoning is sound but unproven; the self-test does not pass `since`.

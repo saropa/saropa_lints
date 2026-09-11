@@ -110,6 +110,85 @@ jobs:
       # Both of these must fail. A green job here would mean the action
       # reports success without auditing anything, which is the exact failure
       # this design is meant to rule out.
+      # --- scan command -----------------------------------------------
+      # gate mode resolves to scan by default, so this also covers the `auto`
+      # resolution. fail-on-tier is the incremental-adoption lever: report
+      # everything, fail only on essential-tier findings.
+      - name: Run action via scan with tier and gating flags
+        id: scan
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: gate
+          tier: essential
+          fail-on-tier: essential
+          exclude-globs: '**/generated/**,**/vendor/**'
+
+      - name: Assert scan ran and honored its exit contract
+        env:
+          CODE: ${{ steps.scan.outputs.exit-code }}
+          OUTCOME: ${{ steps.scan.outcome }}
+        run: |
+          set -euo pipefail
+          echo "scan exit-code='$CODE' outcome='$OUTCOME'"
+
+          # An empty exit code means the action died before the CLI reported,
+          # which is what a bad flag or the glob-grammar mismatch would look
+          # like. Distinguishing that from an honest findings exit is the
+          # point of this assertion.
+          [ -n "$CODE" ] || { echo "::error::scan produced no exit code; the CLI likely rejected its arguments."; exit 1; }
+
+          case "$CODE" in
+            0|1) ;;
+            *) echo "::error::scan exited $CODE (2 means it could not run)."; exit 1 ;;
+          esac
+
+          if [ "$CODE" = "1" ]; then
+            [ "$OUTCOME" = "failure" ] || { echo "::error::scan reported findings but gate mode passed."; exit 1; }
+          else
+            [ "$OUTCOME" = "success" ] || { echo "::error::scan reported no findings but the step failed."; exit 1; }
+          fi
+          echo "scan honored the exit contract."
+
+      # --- Incompatible combinations ------------------------------------
+      # scan cannot emit SARIF, and a tier passed to audit would be silently
+      # meaningless. Both must be rejected rather than quietly misbehave.
+      - name: Reject scan with a mode that needs SARIF
+        id: scansarif
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: annotate
+          command: scan
+
+      - name: Reject a scan-only input passed to audit
+        id: tieronaudit
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: annotate
+          command: audit
+          tier: essential
+
+      - name: Assert incompatible combinations were rejected
+        env:
+          SCANSARIF: ${{ steps.scansarif.outcome }}
+          TIERONAUDIT: ${{ steps.tieronaudit.outcome }}
+        run: |
+          set -euo pipefail
+          rc=0
+          [ "$SCANSARIF" = "failure" ] \
+            || { echo "::error::scan was accepted for a SARIF mode (outcome: $SCANSARIF)."; rc=1; }
+          [ "$TIERONAUDIT" = "failure" ] \
+            || { echo "::error::a scan-only input was silently accepted by audit (outcome: $TIERONAUDIT)."; rc=1; }
+          if [ $rc -eq 0 ]; then
+            echo "Both incompatible combinations were rejected, as intended."
+          fi
+          exit $rc
+
       - name: Reject an invalid mode
         id: badmode
         continue-on-error: true
