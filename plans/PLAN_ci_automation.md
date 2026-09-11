@@ -1,6 +1,6 @@
 # CI automation for consumer projects — action, generator, and engine card
 
-**Created:** 2026-09-11 · **Status:** proposed, nothing built yet
+**Created:** 2026-09-11 · **Status:** decisions resolved, ready to start at WP1
 **Question answered:** How do consumer projects get saropa_lints running on their GitHub PRs
 automatically, and can that be toggled from the extension's existing Diagnostic Engines screen?
 
@@ -39,7 +39,7 @@ The work below is about **distribution**, not capability. The CLI can already do
 
 ---
 
-## WP0 — Fix the stubbed vibrancy CI generator (prerequisite)
+## WP0 — Stubbed vibrancy CI generator (separate bug, not a prerequisite)
 
 `extension/src/vibrancy/services/ci-generator.ts` generates a workflow that **does not enforce
 anything**. Two defects:
@@ -54,9 +54,10 @@ A team that generates this file believes their PRs are gated and they are not. T
 or the generator withdrawn before a second generator ships next to it, or we ship the same
 silent-pass failure twice.
 
-**Decision needed:** fix in place (write a real threshold check, invoke via a temp `.dart` file) or
-withdraw the command until `saropa_vibrancy_cli` exists. Not blocking WP1, but blocking WP3, which
-would otherwise sit next to a broken sibling in the same UI.
+**Resolved (2026-09-11): track separately, do not block.** This is a pre-existing bug in a shipped
+feature and is independent of the CI work below. It should be fixed (write a real threshold
+comparison, invoke via a temp `.dart` file rather than a heredoc) or the command withdrawn until
+`saropa_vibrancy_cli` exists — but on its own schedule, not as a gate on WP1-WP4.
 
 ---
 
@@ -77,10 +78,10 @@ Why first: it collapses the generated workflow from ~25 lines to ~10, moves flag
 place with tests, and means a flag change ships to consumers via a tag bump instead of a
 documentation edit they never read.
 
-**Open decision — `audit` vs `scan` as the wrapped command.** `audit` runs in-project and requires
-the dependency; `scan` works against projects that never adopted the package. Wrapping `scan`
-enables an org-wide reusable workflow across repos with no saropa_lints dependency, which is a
-materially larger addressable surface. Needs a call before implementation starts.
+**Resolved (2026-09-11): wrap `audit`.** Any project setting this up already has saropa_lints as a
+dev dependency, which is what `audit` requires. `scan` (which lints projects that never adopted the
+package) addresses org-wide scanning of unadopted repos — a different use case that can be added
+later as a `command: scan` input rather than driving the initial design.
 
 Caveat to document: SARIF upload requires `security-events: write`, and code scanning is free on
 public repos but needs GitHub Advanced Security on private ones. The gate mode (exit code, no
@@ -148,14 +149,21 @@ Not for safety — for edit preservation. A team that customised the generated w
 work on a delete/regenerate cycle. `if: false` is a one-line reversible diff that keeps their edits
 intact. Deletion stays available as an explicit "Remove" action, distinct from the toggle.
 
-### Live run status — needs a decision
+### Live run status — resolved: not available by default
 
-Requires the GitHub API, which requires auth. `extension/src/vibrancy/providers/tree-item-builders.ts:237`
-has GitHub-facing code (`result.github`); **not yet traced** whether it is authenticated or anonymous.
+Traced 2026-09-11. The vibrancy GitHub path authenticates with an optional user-pasted PAT
+(`saropaLints.packageVibrancy.githubToken`, `extension/package.json:1731`, read at
+`config-service.ts:20`), defaulting to empty. It is a plain settings string, not a
+`vscode.authentication` session, so there is no ambient sign-in to inherit and most users will have
+no token set.
 
-- If auth is reusable → live status pill, card is genuinely useful.
-- If not → read local file for ON/OFF, show `status: unknown`, offer sign-in. Do not fake a green
-  pill from file presence.
+**Consequence for the card:** ON/OFF comes from the workflow file, which always works. The status
+pill shows a real run conclusion only when a token happens to be configured, and otherwise reads
+`unknown`. Do not derive a green pill from file presence — "a workflow file exists" is not "CI
+passed", and conflating them is the same class of error as WP0's always-passing workflow.
+
+A proper `vscode.authentication.getSession('github', ...)` flow would make live status reliable for
+everyone, but that is its own piece of work and is not assumed here.
 
 ---
 
@@ -175,13 +183,19 @@ integration test for the action itself.
 ```
 WP1 (action) ──► WP2 (--emit-ci) ──► WP3 (engine card)
      └──────────► WP4 (dogfood / integration test)
-WP0 (fix vibrancy generator) ──► WP3
+
+WP0 (vibrancy generator bug) — tracked separately, blocks nothing
 ```
 
 WP3 before WP1/WP2 means a switch wired to nothing, and template logic written twice.
 
-## Decisions needed before starting
+## Decisions — all resolved 2026-09-11
 
-1. WP1: wrap `audit` (in-project) or `scan` (works without the dependency)?
-2. WP0: fix the vibrancy generator in place, or withdraw the command?
-3. WP3: is the vibrancy GitHub auth path reusable for live run status?
+1. **WP1 wraps `audit`.** Consumers setting this up already have the dependency; `scan` becomes an
+   optional input later if org-wide scanning of unadopted repos is wanted.
+2. **WP0 does not block.** The vibrancy generator bug is pre-existing and tracked on its own
+   schedule; it no longer gates WP3.
+3. **No live CI status by default.** Auth is an optional pasted PAT, so the card shows ON/OFF from
+   the file and `unknown` status unless a token is configured.
+
+Ready to start at WP1.
