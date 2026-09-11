@@ -91,6 +91,12 @@ The Dart is now written to a real file and run, compares `outdatedCount` against
 
 **A test file that has never run.** `ci-generator.test.ts` was absent from the mocha file list in `extension/package.json`. Nineteen sibling `vibrancy/services/` tests are listed individually; this one was omitted, and no glob catches it. That is how assertions referencing `maxLegacy` — a field `CiThresholds` has never had — survived indefinitely: nothing executed them, so nothing failed. Registered in this PR, which is also what makes WP0's new tests more than decoration.
 
+**A pull request that targets anything but `main` gets no CI at all.** `ci.yml` triggers on `pull_request: branches: [main]`, and `action-selftest.yml` is path-filtered to `action.yml`. This PR was originally opened against `claude/inspiring-pascal-tjfi2j` to stack it on PR 336, and the result was zero check runs — not pending, none. A stacked pull request in this repository is unreviewable by construction, and the Dart changes here would have merged having never been compiled by anything.
+
+Retargeting this PR to `main` fixes it for this case: the branch already contains 336's commits, so `uses: ./` in the self-lint job resolves and CI is complete and correct. The cost is that this PR's diff now includes 336's, making it larger to review. That trade is worth taking over merging code nothing has run.
+
+Worth considering separately whether `ci.yml` should trigger on all pull requests rather than only those targeting `main`. Stacked branches are a normal workflow and silently skipping CI for them is a trap that will catch someone else.
+
 **No CI job runs the extension's TypeScript tests.** `ci.yml` runs the Dart tests, the `saropa_lints_api` package tests, and the Python tier tests. Nothing invokes `npm test`. The entire extension suite is local-only, which is the deeper reason a dead test file went unnoticed. Not fixed here: it is its own change, and switching it on may surface other stale tests that deserve their own attention rather than being swept into this PR.
 
 ---
