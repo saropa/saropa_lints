@@ -2202,18 +2202,22 @@
         "stopped": "停止",
         "suspended": "暂停",
         "starting": "开始",
-        "scanning": "扫描"
+        "scanning": "扫描",
+        "notConfigured": "未配置"
       },
       "rssNote": {
         "inProcess": "进程内，不可单独测量",
-        "notRunning": "未运行"
+        "notRunning": "未运行",
+        "remote": "在 GitHub 托管的运行器上运行 — 无法从此处测量"
       },
       "description": {
         "analyzerPlugin": "在 Dart 分析服务器内运行 - 当您键入时，编辑器中会实时显示波形曲线，无需扫描。切换会重写 analysis_options.yaml 中的plugins: 块。",
         "scanDaemon": "后台进程在保存时重新扫描整个项目并写入报告/.saropa_lints/violations.json。关闭会暂停它；下一次保存将恢复它。",
-        "lspServer": "单独的语言服务器 - 将诊断信息发布到“问题”面板以打开和工作区文件。切换写入 saropaLints.lspServer.enabled 设置。"
+        "lspServer": "单独的语言服务器 - 将诊断信息发布到“问题”面板以打开和工作区文件。切换写入 saropaLints.lspServer.enabled 设置。",
+        "ci": "读取并写入工作树中的 .github/workflows/saropa-lints.yml，以启用或禁用内置的 GitHub Actions 工作流。这反映的是当前分支上的文件——真正决定拉取请求结果的是默认分支上的副本，两者可能不一致。切换操作从不运行或删除该工作流；更改仍需您自行审查并提交。"
       },
-      "scanProgress": "扫描：{done}/{total} 文件"
+      "scanProgress": "扫描：{done}/{total} 文件",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "在",
@@ -2236,7 +2240,9 @@
       "analyzerToggleOn": "分析器插件：启用中…",
       "analyzerToggleOff": "分析器插件：禁用…",
       "daemonToggleOn": "扫描 Daemon：继续…",
-      "daemonToggleOff": "扫描 Daemon: 暂停中…"
+      "daemonToggleOff": "扫描 Daemon: 暂停中…",
+      "ciToggleOn": "CI：正在启用…",
+      "ciToggleOff": "CI：正在禁用…"
     },
     "sidebar": {
       "enginesLabel": "发动机：{count} 运行"

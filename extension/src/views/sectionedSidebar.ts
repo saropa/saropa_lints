@@ -822,10 +822,11 @@ function appendHotspotsRow(
 
 // Maps the machine-readable EngineStatus.key to the debug.engine.* l10n
 // namespace, which uses 'analyzerPlugin' rather than 'analyzer'.
-const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer', string> = {
+const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer' | 'ci', string> = {
     analyzer: 'analyzerPlugin',
     scanDaemon: 'scanDaemon',
     lspServer: 'lspServer',
+    ci: 'ci',
 };
 
 /**

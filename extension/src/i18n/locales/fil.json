@@ -2202,18 +2202,22 @@
         "stopped": "nag-stop",
         "suspended": "nagsususpende",
         "starting": "nagsimula",
-        "scanning": "naglalaro"
+        "scanning": "naglalaro",
+        "notConfigured": "hindi naka-configure"
       },
       "rssNote": {
         "inProcess": "sa proseso, hindi nakakakita ng mas maliit na pagtatangka",
-        "notRunning": "walang pagsusulong"
+        "notRunning": "walang pagsusulong",
+        "remote": "tumatakbo sa mga hosted runner ng GitHub — hindi masusukat mula rito"
       },
       "description": {
         "analyzerPlugin": "Pumoproseso sa loob ng serbisyong analisis Dart — mga live squiggles sa editor habang nagsusulat ka, walang kinakailangang pag-scan. Ang pagboto ay nagrere-rewrite ng mga plugin: block sa analysis_options.yaml.",
         "scanDaemon": "Proseso ng background na nagsuscan muli ang buong proyekto sa pag-save at sumusulat ng mga ulat/.saropa_lints/violations.json. Ang pag-off ng opsyon ay sususpende ito; ang susunod na save ay magpapalabas ito muli.",
-        "lspServer": "Makakatagpo ang serbisyong wika — nagpapublish ng mga diagnostic sa panel ng Mga Problema para sa mga nabuksan at mga file ng workspace. Ang pagbubukas ng toggle ay nagpapalit ng setting na saropaLints.lspServer.enabled."
+        "lspServer": "Makakatagpo ang serbisyong wika — nagpapublish ng mga diagnostic sa panel ng Mga Problema para sa mga nabuksan at mga file ng workspace. Ang pagbubukas ng toggle ay nagpapalit ng setting na saropaLints.lspServer.enabled.",
+        "ci": "Binabasa at isinusulat ang .github/workflows/saropa-lints.yml sa iyong working tree para paganahin o huwag paganahin ang kasamang GitHub Actions workflow. Ito ay sumasalamin sa file sa iyong kasalukuyang branch — ang kopya sa default branch ang aktwal na gumagabay sa mga pull request, at maaaring magkaiba ang dalawa. Ang pag-toggle ay hindi kailanman nagpapatakbo o nagtatanggal ng workflow; ikaw pa rin ang susuri at magko-commit ng pagbabago."
       },
-      "scanProgress": "I-scan: {done}/{total} mga file"
+      "scanProgress": "I-scan: {done}/{total} mga file",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "NAKA-ON",
@@ -2236,7 +2240,9 @@
       "analyzerToggleOn": "Analyzer Plugin: nagpapalagay...",
       "analyzerToggleOff": "Analyzer Plugin: nagtatanggal...",
       "daemonToggleOn": "I-scan Daemon: nagsisimula...",
-      "daemonToggleOff": "I-scan Daemon: suspending…"
+      "daemonToggleOff": "I-scan Daemon: suspending…",
+      "ciToggleOn": "CI: pinapagana…",
+      "ciToggleOff": "CI: dinidisable…"
     },
     "sidebar": {
       "enginesLabel": "Mga Engine: {count} na nagtatrabaho"

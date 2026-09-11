@@ -2202,18 +2202,22 @@
         "stopped": "detenido",
         "suspended": "suspendido",
         "starting": "iniciando",
-        "scanning": "escaneando"
+        "scanning": "escaneando",
+        "notConfigured": "no configurado"
       },
       "rssNote": {
         "inProcess": "en proceso, no medible por separado",
-        "notRunning": "no se está ejecutando"
+        "notRunning": "no se está ejecutando",
+        "remote": "se ejecuta en los ejecutores alojados de GitHub — no medible desde aquí"
       },
       "description": {
         "analyzerPlugin": "Ejecuta dentro del servidor de análisis Dart — resaltados en tiempo real en el editor al escribir, sin necesidad de escaneo. Alternar reescribe los plugins: bloque en analysis_options.yaml.",
         "scanDaemon": "Proceso en segundo plano que rescanea todo el proyecto al guardar y escribe informes/.saropa_lints/violations.json. Desactivarlo suspende el proceso; el siguiente guardado lo reanuda.",
-        "lspServer": "Regla estricta: Separar servidor de lenguaje — publica diagnósticos en el panel de Problemas para archivos abiertos y del espacio de trabajo. Alternar escribe la configuración saropaLints.lspServer.enabled."
+        "lspServer": "Regla estricta: Separar servidor de lenguaje — publica diagnósticos en el panel de Problemas para archivos abiertos y del espacio de trabajo. Alternar escribe la configuración saropaLints.lspServer.enabled.",
+        "ci": "Lee y escribe .github/workflows/saropa-lints.yml en tu árbol de trabajo para activar o desactivar el flujo de trabajo de GitHub Actions incluido. Esto refleja el archivo de tu rama actual — la copia de la rama predeterminada es la que realmente controla las solicitudes de extracción, y ambas pueden divergir. Alternar nunca ejecuta ni elimina el flujo de trabajo; sigues revisando y confirmando el cambio tú mismo."
       },
-      "scanProgress": "Escaneo: {done}/{total} archivos"
+      "scanProgress": "Escaneo: {done}/{total} archivos",
+      "ci": "CI de GitHub Actions"
     },
     "toggle": {
       "on": "EN",
@@ -2236,7 +2240,9 @@
       "analyzerToggleOn": "Analizador de plugin: activando…",
       "analyzerToggleOff": "Analizador de plugin: desactivando…",
       "daemonToggleOn": "Escaneo Daemon: reanudando…",
-      "daemonToggleOff": "Escaneo Daemon: suspendiendo…"
+      "daemonToggleOff": "Escaneo Daemon: suspendiendo…",
+      "ciToggleOn": "CI: activando…",
+      "ciToggleOff": "CI: desactivando…"
     },
     "sidebar": {
       "enginesLabel": "Motor: {count} en ejecución"

@@ -175,6 +175,7 @@ import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './s
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
+import { getCiWorkflowState, enableCiWorkflow, disableCiWorkflow } from './systemHealth/ciWorkflow';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
@@ -1865,6 +1866,23 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           : undefined,
       };
     },
+    // CI status — derived entirely from `.github/workflows/saropa-lints.yml`
+    // on disk, never from a live GitHub Actions run (the token in
+    // saropaLints.packageVibrancy.githubToken is optional and usually
+    // empty, so there is no reliable run result to show). "enabled" tracks
+    // whether the file is present and not suspended — never a stand-in for
+    // "the last CI run passed".
+    getCiStatus: (): EngineStatus => {
+      const ciRoot = getProjectRoot();
+      const state = ciRoot ? getCiWorkflowState(ciRoot) : 'absent';
+      return {
+        key: 'ci',
+        name: l10n('debug.engine.ci'),
+        enabled: state === 'active',
+        status: state === 'absent' ? 'notConfigured' : state,
+        rssNote: l10n('debug.engine.rssNote.remote'),
+      };
+    },
   });
   // The sidebar Status section's Engines row (sectionedSidebar.ts) reads
   // HealthPanel.getEngineStatuses(), but the section providers were created
@@ -1936,6 +1954,28 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       } else {
         scanOnSaveController.suspendDaemon();
       }
+    } else if (engine === 'ci') {
+      // Edits .github/workflows/saropa-lints.yml in the workspace's working
+      // tree only — never runs git. ON writes the workflow if it's missing,
+      // or re-enables it if it was suspended; OFF sets `if: false` on the
+      // job rather than deleting the file, so the change is a one-line,
+      // reversible diff and any customisation the team made survives. The
+      // user still reviews and commits this themselves, same as any other
+      // edit to a file that governs the whole team's PRs.
+      HealthPanel.addLogEntry(
+        enabled ? l10n('debug.log.ciToggleOn') : l10n('debug.log.ciToggleOff'),
+      );
+      const ciRoot = getProjectRoot();
+      if (!ciRoot) {
+        vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+        return;
+      }
+      if (enabled) {
+        enableCiWorkflow(ciRoot);
+      } else {
+        disableCiWorkflow(ciRoot);
+      }
+      HealthPanel.refreshIfOpen();
     }
   });
 

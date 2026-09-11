@@ -2202,18 +2202,22 @@
         "stopped": "중단됨",
         "suspended": "중단됨",
         "starting": "시작",
-        "scanning": "스캔"
+        "scanning": "스캔",
+        "notConfigured": "구성되지 않음"
       },
       "rssNote": {
         "inProcess": "인 프로세스, 별도로 측정 불가능",
-        "notRunning": "작동하지 않음"
+        "notRunning": "작동하지 않음",
+        "remote": "GitHub의 호스팅 러너에서 실행되어 여기서는 측정할 수 없음"
       },
       "description": {
         "analyzerPlugin": "Dart 분석 서버 내에서 실행 — 입력 시 에디터에 실시간 오류 표시, 스캔 필요 없음. 전환은 analysis_options.yaml 파일의 플러그인을 재작성합니다.",
         "scanDaemon": "백그라운드 프로세스는 저장 시 전체 프로젝트를 다시 스캔하고 보고서를 작성합니다. /saropa_lints/violations.json. 끄는 것은 해당 프로세스를 일시 중단하고, 다음 저장 시 다시 시작합니다.",
-        "lspServer": "언어 서버 분리 — 열린 파일 및 작업 공간 파일에 대한 진단을 문제 패널에 게시합니다. 전환은 saropaLints.lspServer.enabled 설정을 작성합니다."
+        "lspServer": "언어 서버 분리 — 열린 파일 및 작업 공간 파일에 대한 진단을 문제 패널에 게시합니다. 전환은 saropaLints.lspServer.enabled 설정을 작성합니다.",
+        "ci": "번들된 GitHub Actions 워크플로를 활성화하거나 비활성화하기 위해 작업 트리의 .github/workflows/saropa-lints.yml 파일을 읽고 씁니다. 이는 현재 브랜치의 파일을 반영합니다 — 실제로 풀 리퀘스트를 제어하는 것은 기본 브랜치의 사본이며, 둘은 서로 달라질 수 있습니다. 전환은 워크플로를 실행하거나 삭제하지 않으며, 변경 사항은 직접 검토하고 커밋해야 합니다."
       },
-      "scanProgress": "스캔: {done}/{total} 파일"
+      "scanProgress": "스캔: {done}/{total} 파일",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "에",
@@ -2236,7 +2240,9 @@
       "analyzerToggleOn": "분석기 플러그인: 활성화 중…",
       "analyzerToggleOff": "분석기 플러그인: 비활성화 중…",
       "daemonToggleOn": "스캔 Daemon: 재개…",
-      "daemonToggleOff": "스캔 Daemon: 중단 중…"
+      "daemonToggleOff": "스캔 Daemon: 중단 중…",
+      "ciToggleOn": "CI: 활성화 중…",
+      "ciToggleOff": "CI: 비활성화 중…"
     },
     "sidebar": {
       "enginesLabel": "엔진: {count} 실행"

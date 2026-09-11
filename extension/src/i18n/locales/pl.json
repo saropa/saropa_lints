@@ -2202,18 +2202,22 @@
         "stopped": "zatrzymany",
         "suspended": "wstrzymany",
         "starting": "rozpoczęcie",
-        "scanning": "skanowanie"
+        "scanning": "skanowanie",
+        "notConfigured": "nieskonfigurowane"
       },
       "rssNote": {
         "inProcess": "w procesie, nie oddzielnie mierzalny",
-        "notRunning": "nie uruchamiany"
+        "notRunning": "nie uruchamiany",
+        "remote": "działa na hostowanych przez GitHub agentach — nie do zmierzenia stąd"
       },
       "description": {
         "analyzerPlugin": "Uruchamia się wewnętrznie w serwerze analizy Dart — kreski w edytorze podczas wpisywania, bez potrzeby skanowania. Przełączanie zmienia wtyczki: blok w analysis_options.yaml.",
         "scanDaemon": "Proces w tle, który ponownie skanuje cały projekt przy zapisie i zapisuje raporty/.saropa_lints/violations.json. Wyłączenie procesu zawiesza go; kolejny zapis wznowi jego działanie.",
-        "lspServer": "Zdalny serwer językowy — publikuje diagnozy w panelu Problems dla otwartych i plików z przestrzeni roboczej. Włączanie/wyłączanie zapisuje ustawienie saropaLints.lspServer.enabled."
+        "lspServer": "Zdalny serwer językowy — publikuje diagnozy w panelu Problems dla otwartych i plików z przestrzeni roboczej. Włączanie/wyłączanie zapisuje ustawienie saropaLints.lspServer.enabled.",
+        "ci": "Odczytuje i zapisuje plik .github/workflows/saropa-lints.yml w drzewie roboczym, aby włączyć lub wyłączyć dołączony przepływ pracy GitHub Actions. Odzwierciedla to plik z bieżącej gałęzi — to kopia z gałęzi domyślnej faktycznie kontroluje pull requesty, a te dwie mogą się różnić. Przełączanie nigdy nie uruchamia ani nie usuwa przepływu pracy; zmianę nadal musisz sam przejrzeć i zatwierdzić."
       },
-      "scanProgress": "Skanuj: {done}/{total} pliki"
+      "scanProgress": "Skanuj: {done}/{total} pliki",
+      "ci": "CI GitHub Actions"
     },
     "toggle": {
       "on": "WŁĄCZONY",
@@ -2236,7 +2240,9 @@
       "analyzerToggleOn": "Analizator wtyczki: włączanie…",
       "analyzerToggleOff": "Analizator wtyczki: wyłączanie…",
       "daemonToggleOn": "Skanowanie Daemon: wznowienie…",
-      "daemonToggleOff": "Skanuj Daemon: wstrzymanie…"
+      "daemonToggleOff": "Skanuj Daemon: wstrzymanie…",
+      "ciToggleOn": "CI: włączanie…",
+      "ciToggleOff": "CI: wyłączanie…"
     },
     "sidebar": {
       "enginesLabel": "Silniki: {count} uruchomione"

@@ -2202,18 +2202,22 @@
         "stopped": "durdu",
         "suspended": "askıya alınmış",
         "starting": "başlatma",
-        "scanning": "tarama"
+        "scanning": "tarama",
+        "notConfigured": "yapılandırılmadı"
       },
       "rssNote": {
         "inProcess": "içerisinde, ayrı olarak ölçülmez",
-        "notRunning": "çalışmıyor"
+        "notRunning": "çalışmıyor",
+        "remote": "GitHub'ın barındırılan çalıştırıcılarında çalışır — buradan ölçülemez"
       },
       "description": {
         "analyzerPlugin": "Dart analiz sunucusunun içinde çalışır; siz yazdıkça düzenleyicide canlı dalgalı çizgiler oluşur, taramaya gerek yoktur. Geçiş, eklentileri yeniden yazar: analysis_options.yaml'deki blok.",
         "scanDaemon": "Arka plan süreci, kaydedilirken tüm projeyi tekrar taramak ve raporlar/.saropa_lints/violations.json yazmak için kullanılır. Aç/kapat butonu ile devre dışı bırakılır; bir sonraki kaydetme işlemiyle devam eder.",
-        "lspServer": "Kısa Kural:  \n1. Sadece çevrilmiş metni döndürün.  \n2. Açıklamalar, giriş, markdown notasyonu veya çevreleyici tırnak işaretlerini içerme.  \n3. Metin içinde yer tutucu tokenlar olabilir: yer tutucu tokenlar. Her birini tam olarak yazılan şekilde, grammatik olarak doğru pozisyonda çeviriyi içine kopyalayın. Hiçbir tokeni çevirme, kaldırma veya biçimlendirme.  \n4. Çıktı, hedef dili için doğru yazım sistemi kullanmalıdır; cümle ortasında başka bir dillere geçme.  \n\nDil sunucusu — açık ve çalışma alanı dosyaları için Sorunlar paneline tanımlamalar yayınlar. Açma-kapatma saropaLints.lspServer.enabled ayarı yazar."
+        "lspServer": "Kısa Kural:  \n1. Sadece çevrilmiş metni döndürün.  \n2. Açıklamalar, giriş, markdown notasyonu veya çevreleyici tırnak işaretlerini içerme.  \n3. Metin içinde yer tutucu tokenlar olabilir: yer tutucu tokenlar. Her birini tam olarak yazılan şekilde, grammatik olarak doğru pozisyonda çeviriyi içine kopyalayın. Hiçbir tokeni çevirme, kaldırma veya biçimlendirme.  \n4. Çıktı, hedef dili için doğru yazım sistemi kullanmalıdır; cümle ortasında başka bir dillere geçme.  \n\nDil sunucusu — açık ve çalışma alanı dosyaları için Sorunlar paneline tanımlamalar yayınlar. Açma-kapatma saropaLints.lspServer.enabled ayarı yazar.",
+        "ci": "Paket haline getirilmiş GitHub Actions iş akışını etkinleştirmek veya devre dışı bırakmak için çalışma ağacınızdaki .github/workflows/saropa-lints.yml dosyasını okur ve yazar. Bu, geçerli dalınızdaki dosyayı yansıtır — pull request'leri asıl kontrol eden varsayılan daldaki kopyadır ve ikisi birbirinden farklılaşabilir. Geçiş yapmak iş akışını asla çalıştırmaz veya silmez; değişikliği yine de kendiniz incelemeli ve commit'lemelisiniz."
       },
-      "scanProgress": "Tarama: {done}/{total} dosyaları"
+      "scanProgress": "Tarama: {done}/{total} dosyaları",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "AÇIK",
@@ -2236,7 +2240,9 @@
       "analyzerToggleOn": "Analiz Eklentisi: etkinleştiriliyor...",
       "analyzerToggleOff": "Analiz Eklentisi: devre dışı bırakılıyor...",
       "daemonToggleOn": "Tarama Daemon: devam ediyor...",
-      "daemonToggleOff": "Tarama Daemon: durduruluyor…"
+      "daemonToggleOff": "Tarama Daemon: durduruluyor…",
+      "ciToggleOn": "CI: etkinleştiriliyor…",
+      "ciToggleOff": "CI: devre dışı bırakılıyor…"
     },
     "sidebar": {
       "enginesLabel": "Motorlar: {count} çalışıyor"

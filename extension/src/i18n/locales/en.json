@@ -2202,18 +2202,22 @@
         "stopped": "stopped",
         "suspended": "suspended",
         "starting": "starting",
-        "scanning": "scanning"
+        "scanning": "scanning",
+        "notConfigured": "not configured"
       },
       "rssNote": {
         "inProcess": "in-process, not separately measurable",
-        "notRunning": "not running"
+        "notRunning": "not running",
+        "remote": "runs on GitHub's hosted runners — not measurable from here"
       },
       "description": {
         "analyzerPlugin": "Runs inside the Dart analysis server — live squiggles in the editor as you type, no scan needed. Toggling rewrites the plugins: block in analysis_options.yaml.",
         "scanDaemon": "Background process that rescans the whole project on save and writes reports/.saropa_lints/violations.json. Toggling off suspends it; the next save resumes it.",
-        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting."
+        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting.",
+        "ci": "Reads and writes .github/workflows/saropa-lints.yml in your working tree to enable or disable the bundled GitHub Actions workflow. This reflects the file on your current branch — the default branch's copy is what actually gates pull requests, and the two can drift apart. Toggling never runs or deletes the workflow; you still review and commit the change yourself."
       },
-      "scanProgress": "Scan: {done}/{total} files"
+      "scanProgress": "Scan: {done}/{total} files",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "ON",
@@ -2236,7 +2240,9 @@
       "analyzerToggleOn": "Analyzer Plugin: enabling…",
       "analyzerToggleOff": "Analyzer Plugin: disabling…",
       "daemonToggleOn": "Scan Daemon: resuming…",
-      "daemonToggleOff": "Scan Daemon: suspending…"
+      "daemonToggleOff": "Scan Daemon: suspending…",
+      "ciToggleOn": "CI: enabling…",
+      "ciToggleOff": "CI: disabling…"
     },
     "sidebar": {
       "enginesLabel": "Engines: {count} running"

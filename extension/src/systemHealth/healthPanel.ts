@@ -18,7 +18,7 @@ const MAX_LOG_ENTRIES = 100;
 type HealthPanelMessage =
   | { type: 'refresh' }
   | { type: 'killProcess'; pid: number }
-  | { type: 'toggle'; engine: 'analyzer' | 'scanDaemon' | 'lspServer'; enabled: boolean }
+  | { type: 'toggle'; engine: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci'; enabled: boolean }
   | { type: 'killAll' }
   | { type: 'restartAll' }
   | { type: 'reclaimOrphans' };
@@ -37,7 +37,7 @@ export class HealthPanel implements vscode.Disposable {
   private static engineDeps: EngineStatusDeps | undefined;
   private static readonly logEntries: string[] = [];
   private static readonly _onToggle = new vscode.EventEmitter<{
-    engine: 'analyzer' | 'scanDaemon' | 'lspServer';
+    engine: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci';
     enabled: boolean;
   }>();
   private static readonly _onKillAll = new vscode.EventEmitter<void>();
@@ -147,6 +147,7 @@ export class HealthPanel implements vscode.Disposable {
       deps.getAnalyzerPluginStatus(),
       deps.getScanDaemonStatus(),
       deps.getLspServerStatus(),
+      deps.getCiStatus(),
     ];
   }
 
