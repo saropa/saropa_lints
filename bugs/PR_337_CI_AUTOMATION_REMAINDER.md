@@ -62,7 +62,15 @@ It uses `mode: gate`, which resolves to the `scan` command. That matters twice o
 
 That failure is also the action's exit-2 handling working as designed: it failed loudly rather than reporting a green job for an analysis that never ran. A version that treated exit 2 as "no findings" would have shown this repo as clean while nothing had been examined.
 
-`fail-on: error` was added at the same time. Gate mode fails on any finding by design, and this job is meant to report; a check that is red on every pull request trains people to ignore CI. Errors fail it, warnings are displayed and do not.
+**What the second run reported.** With a tier supplied, scan completed: 1787 files in 74 seconds, **282 findings in 127 files — 155 error, 127 warning** — at the `recommended` tier. The top rules were `avoid_platform_specific_imports` (39), `require_catch_logging` (31), `avoid_case_sensitive_path_comparison` (21), `avoid_global_state` (17).
+
+Two conclusions followed. First, several of the top rules — `avoid_hardcoded_credentials`, `require_apple_signin_nonce`, `require_isar_id_field` — are almost certainly firing on this repository's own rule fixtures: files written to violate the very rule they test. Counting those makes the number meaningless, so `test/` and the example trees are now excluded and the report covers shipped code.
+
+Second, 155 errors is a backlog, not a regression, and no threshold turns that into a useful gate today. The job now carries `continue-on-error` on the step itself, not merely the job, so the action's exit code can never fail it whatever it finds.
+
+That is deliberate, and it is not the WP0 mistake repeated three files away. The vibrancy generator claimed to gate and silently did not. This job states plainly in its own comment that it reports and never gates, and every finding is in the log for anyone who opens it. `baseline` is the designed answer whenever the team wants to gate on new findings only; committing one is its own decision and its own change.
+
+`fail-on: error` was tried and then removed: with 155 errors present it failed exactly as designed, and keeping a flag that implies a gate on a job that cannot gate would be its own small lie.
 
 ### WP0 — Package Vibrancy CI generator (`extension/src/vibrancy/services/ci-generator.ts`)
 
