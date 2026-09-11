@@ -247,7 +247,18 @@ runs:
         set -uo pipefail
         cd "$WORKING_DIRECTORY"
 
-        if ! grep -q 'saropa_lints' pubspec.yaml; then
+        # Check the resolved package graph, not the pubspec text: a grep for
+        # "saropa_lints" in pubspec.yaml also matches the package's own name
+        # (saropa_lints_self_check) or a passing mention in a comment, which
+        # would turn a precise error into a misleading one.
+        resolved=.dart_tool/package_config.json
+        if [ -f "$resolved" ] && command -v jq >/dev/null 2>&1; then
+          if ! jq -e '.packages[] | select(.name == "saropa_lints")' "$resolved" >/dev/null; then
+            echo "::error::saropa_lints is not a resolved dependency of '$WORKING_DIRECTORY'."
+            echo "::error::Add it with: dart pub add --dev saropa_lints"
+            exit 1
+          fi
+        elif ! grep -qE '^\s*saropa_lints\s*:' pubspec.yaml; then
           echo "::error::saropa_lints is not a dependency of '$WORKING_DIRECTORY'."
           echo "::error::Add it with: dart pub add --dev saropa_lints"
           exit 1

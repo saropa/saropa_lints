@@ -31,6 +31,8 @@ Four design decisions carry most of the weight:
 
 **The `--since` fetch uses an explicit refspec.** `actions/checkout` configures a single-branch fetch refspec. Under it, `git fetch origin main` updates `FETCH_HEAD` without creating `refs/remotes/origin/main`, so `--since origin/main` would still fail to resolve on a default shallow checkout. The step fetches `+refs/heads/<branch>:refs/remotes/origin/<branch>` and warns if the ref still does not resolve afterward, rather than silently auditing the whole project when the consumer asked for changed files only.
 
+The dependency check reads the resolved package graph (`.dart_tool/package_config.json`) rather than grepping `pubspec.yaml`. The original grep matched the substring `saropa_lints` anywhere in the file, so it also accepted a package merely *named* `saropa_lints_self_check` or `saropa_lints_example`, and a passing mention in a comment — turning a precise error message into a misleading one. A tightened regex is retained as a fallback for when the package graph is unavailable.
+
 Inputs are validated in the first step — before any SDK install or audit — so a typo in `mode` or `min-severity` fails quickly with a message naming the offending value.
 
 ### `doc/guides/cli.md`
@@ -44,6 +46,23 @@ Added `action.yml`. It is CI infrastructure for consumers of the repository, not
 ### `plans/PLAN_ci_automation.md`
 
 Recorded a blocker found while writing the docs, described under "Known blocker" below.
+
+### `.github/workflows/action-selftest.yml` (new)
+
+Executes the action on a real runner using `uses: ./`, which references the action straight from the checkout. That works before any tag exists and always tests the version in the pull request rather than a release, so it also sidesteps the major-tag blocker for verification purposes.
+
+It targets `self_check/`, a real package that already depends on saropa_lints by path and contains one Dart file, so the audit is quick.
+
+Four assertions, chosen so that each one fails loudly rather than silently passing:
+
+- **Annotate mode produces a usable result.** Exit code is 0 or 1, a `sarif-file` output is set, the file exists, and `jq` confirms it is a SARIF document rather than an empty or native-format file. Reaching the assertion at all is itself part of the test, since annotate mode must not fail the job on findings.
+- **Gate mode honors the exit code.** Asserts the relationship between the two runs rather than a fixed outcome: if the annotate run reported findings, the gate run must have failed; if it reported none, the gate run must have passed. This stays deterministic whether or not `self_check` currently has violations.
+- **An invalid mode is rejected.**
+- **A directory that is not a Dart project is rejected.**
+
+The last two matter most. A green result there would mean the action reports success without auditing anything, which is the specific failure this design exists to rule out.
+
+The workflow is `paths`-filtered to `action.yml` and itself, so it does not run on unrelated changes, and it needs no `security-events` permission because the self-test sets `upload-sarif: false`.
 
 ---
 
@@ -75,15 +94,15 @@ This does not block merging. It blocks the action being pleasant to consume.
 
 ## What to test
 
-Everything below is a human check. None of it has been performed.
+`action-selftest` now covers items 1 through 4 automatically on every run, so the list below is what a human should confirm *beyond* what CI proves. Watch the `action-selftest` check on this PR first: if it is green, the action demonstrably runs, annotates, gates, and rejects bad configuration on a real runner.
 
-**1. The action runs at all.** This is the main thing. Point a workflow at the branch — `uses: saropa/saropa_lints@claude/inspiring-pascal-tjfi2j` — in any Dart project that has saropa_lints as a dev dependency, and confirm the job completes rather than erroring on YAML or on an expression that does not evaluate. First execution of a composite action is where context and quoting problems surface.
+**1. The action runs at all.** *(now covered by `action-selftest`)* First execution of a composite action is where context and quoting problems surface. If that check is green, this is proven.
 
-**2. Findings appear as annotations.** With `mode: annotate` on a pull request touching Dart files, findings should show up inline on the diff in the Files Changed view, and the job should still be green. Green with annotations is the intended outcome, not a contradiction.
+**2. Findings appear as annotations.** *(partially covered)* The self-test proves a valid SARIF file is produced but deliberately does not upload it. A human still needs to confirm that findings render inline on a PR diff in the Files Changed view, with the job staying green. Green with annotations is the intended outcome, not a contradiction.
 
-**3. Gate mode actually fails.** With `mode: gate` against code you know violates a rule, the job must go red. If it passes, the whole feature is worthless — this is the specific failure the existing vibrancy generator has.
+**3. Gate mode actually fails.** *(now covered by `action-selftest`)* The self-test asserts that gate mode fails exactly when findings exist. This is the specific failure the existing vibrancy generator has, so it is worth confirming the assertion really ran by reading the check's log rather than trusting the green tick.
 
-**4. A broken setup fails loudly.** Run it against a directory with no `pubspec.yaml`, or with `mode: nonsense`. Both should fail with a message naming the problem. Neither should report success.
+**4. A broken setup fails loudly.** *(now covered by `action-selftest`)* Both an invalid mode and a non-Dart directory are asserted to fail.
 
 **5. Changed-files-only works on a normal checkout.** With `since: origin/${{ github.base_ref }}` and a plain `actions/checkout@v5` (no `fetch-depth: 0`), confirm the log shows the base ref being fetched and the audit covering only the PR's files. If it silently audits everything, the refspec handling is wrong.
 
@@ -99,6 +118,7 @@ Everything below is a human check. None of it has been performed.
 
 - Every flag the action can emit (`--format`, `--output`, `--quiet`, `--since`, `--min-severity`, `--min-impact`, `--exclude-globs`, `--include-globs`, `--baseline`, `--baseline-path`) checked programmatically against the argument parser in `bin/audit.dart`. All ten are accepted; `audit` has no `--tier`.
 - Argument assembly extracted and exercised for all three modes, with and without optional inputs. Produces the expected command lines.
+- The tightened dependency check, both branches: the `jq` package-graph branch accepts a real `saropa_lints` entry and rejects a package merely named `saropa_lints_self_check`; the fallback regex accepts `self_check`'s dev dependency and rejects both a comment-only mention and a package named `saropa_lints_example`. The original grep accepted all three false cases.
 - The pass/fail decision matrix exercised across all nine mode-by-exit-code combinations. Exit 2 fails in all three modes; exit 1 fails only in `gate` and `both`; exit 0 always passes. An empty exit code (audit step did not complete) fails.
 - `action.yml` parses as YAML; structure inspected for expected step and `uses:` shape.
 - `scripts/check_doc_links_excluded_paths.py` — passes.
@@ -106,10 +126,10 @@ Everything below is a human check. None of it has been performed.
 
 **Did not run:**
 
-- **The action itself, on a runner.** Nothing here proves the composite action executes in GitHub Actions. Logic was tested in isolation by extracting the shell into standalone scripts. Expression evaluation, the `inputs` context in step-level `if:` conditions, output passing between steps, and the nested `uses:` steps are all unexercised.
-- The SARIF upload, and therefore whether annotations render on a PR diff.
-- The `--since` fetch against a real shallow checkout. The refspec reasoning is sound but unproven.
-- `install-sdk: auto` against a real Flutter runner.
+- **The action itself, locally.** There is no Dart SDK in the authoring environment, so nothing about the action was executed here. Its shell logic was tested by extracting it into standalone scripts. `action-selftest` is what actually exercises it, and its first run is on this PR — so at the time of writing, the action's real behavior is asserted by CI but those assertions have not yet reported.
+- The SARIF **upload**, and therefore whether annotations render on a PR diff. The self-test deliberately sets `upload-sarif: false` so it needs no `security-events` permission and does not post to code scanning, which means the upload path remains unproven.
+- The `--since` fetch against a real shallow checkout. The refspec reasoning is sound but unproven; the self-test does not pass `since`.
+- `install-sdk: auto` against a real Flutter runner. The self-test exercises the *skip* branch (dart already on PATH via setup-dart) but not a Flutter toolchain.
 - `dart analyze`, `dart test`, and `dart pub publish --dry-run`. No Dart or Python source changed in this PR, so these were judged not to apply; CI will run them regardless.
 
 **One process note:** the first pass of the decision-matrix test was written incorrectly — `if bash script | tr` captures the exit status of `tr`, not of the script, so every case reported as passing. The harness was corrected and re-run, and the results above are from the corrected run. Flagging it because a test that cannot fail is worse than no test, and the same mistake is easy to repeat when reviewing this.
