@@ -51,7 +51,7 @@ const FALLBACK_ACTION_REF = 'main';
  *
  * Erring high is safe: a version above the floor that lacks the action is
  * impossible, and a version below it falls back to the default branch, which
- * always has one. Update this when the release containing `action.yml` ships.
+ * always has one.
  */
 const MIN_ACTION_VERSION = '16.3.0';
 

@@ -66,6 +66,28 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.3.0]
+
+Minor release adding a GitHub Actions integration: a composite action, a CLI flag that writes the workflow for you, and a switch in the extension that turns it on and off. [log](https://github.com/saropa/saropa_lints/blob/v16.3.0/CHANGELOG.md)
+
+### Added
+
+A composite GitHub Action at the repository root runs saropa_lints against a project's pull requests. Reference it as `saropa/saropa_lints@v16`, which now tracks the latest 16.x. `mode` decides what a finding does — `annotate` posts SARIF to the pull request diff, `gate` fails the build, `both` does each. `command` decides which rules produce one — `scan` honors the project's own `analysis_options.yaml`, `audit` runs every rule regardless of configured tier, and `auto` picks per mode. An analysis that could not run fails the job in every mode, so a green check always means it actually ran.
+
+`dart run saropa_lints:init --emit-ci` writes `.github/workflows/saropa-lints.yml` into a project, pinned to the saropa_lints version doing the generating. It refuses to overwrite an existing file, so a re-run cannot discard workflow edits a team has made.
+
+### Added (Extension)
+
+- A **GitHub Actions CI** card in the System Health panel turns CI on and off for the project. ON adds the dependency if missing and writes the workflow; OFF adds one `if: false` line per job rather than deleting the file, so the change is reversible and any customization survives. Neither direction runs git — the file governs every contributor's pull requests, so it goes through normal review.
+- The generated workflow runs the `scan` command, which honors the project's configured tier and per-rule choices rather than reporting all 2332 rules, and carries `continue-on-error` so it reports without failing pull requests. Removing that line makes it enforce.
+
+### Fixed (Extension)
+
+- The Diagnostic Engines section of the System Health panel is no longer hidden when `saropaLints.debug.enabled` is off. These controls decide whether analysis runs at all, and one of them turns off a project's CI.
+- Package Vibrancy's "Generate CI Pipeline" produced workflows that always passed: thresholds were printed but never compared, and the generated checker was invoked in a way that never executed it. The generated workflow now compares against `maxOutdated` and fails the job when it is breached. Thresholds that `pub outdated` carries no data for are now stated as unenforceable rather than silently ignored.
+
+---
+
 ## [16.2.1]
 
 Patch release fixing false positives in two lint rules, adding a project-level allowlist for `avoid_ignoring_return_values`, and resolving unwanted reload behavior in the Config and Findings Dashboards when editing text fields. [log](https://github.com/saropa/saropa_lints/blob/v16.2.1/CHANGELOG.md)

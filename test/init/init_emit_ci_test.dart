@@ -40,10 +40,10 @@ void main() {
       );
       // The pin must equal the version actually resolved at run time. An
       // earlier version of this test forbade the literal 'v16.2.1' to prove
-      // the pin was no longer hardcoded — which fails in this repository,
-      // whose own version IS 16.2.1, so the correctly-derived pin matches the
-      // string being forbidden. Assert the contract instead of a string the
-      // contract happens not to produce elsewhere.
+      // the pin was no longer hardcoded — which failed in this repository,
+      // whose own version WAS 16.2.1 at the time, so the correctly-derived
+      // pin produced exactly the string being forbidden. Assert the contract
+      // instead of a string the contract happens not to produce elsewhere.
       final String expectedRef = saropaLintsVersion == 'unknown'
           ? 'main'
           : 'v$saropaLintsVersion';
