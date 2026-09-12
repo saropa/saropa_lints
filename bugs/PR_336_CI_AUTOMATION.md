@@ -90,7 +90,7 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 
 **Deriving a green CI status from file presence.** Rejected outright. It is the same class of error as the vibrancy bug being fixed three files away.
 
-**A hardcoded action pin.** Both generators originally wrote `@v16.2.1`, a tag that predates `action.yml` entirely, so every workflow they produced referenced an action that could not resolve. Both now derive the pin from the saropa_lints version in use. The card additionally carries a `MIN_ACTION_VERSION` floor, because the extension and the package version independently and the extension can be several releases ahead of the package a project depends on.
+**A hardcoded action pin.** Both generators originally wrote `@v16.2.1`, a tag that predates `action.yml` entirely, so every workflow they produced referenced an action that could not resolve. Both now derive the pin from the saropa_lints version in use. The card additionally carries a `MIN_ACTION_VERSION` floor, because the extension and the package version independently and the extension can be several releases ahead of the package a project depends on. That floor is `16.3.0`, the version this work ships as and therefore the first tag that will contain `action.yml` — an exact value, not an estimate.
 
 **Fabricating a vulnerability check for `failOnVulnerability`.** Rejected for the reason the whole vibrancy fix exists.
 
@@ -139,11 +139,10 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 - **`--since` against a real shallow checkout.** The refspec reasoning is sound but unproven; the self-test does not pass `since`.
 - **`install-sdk: auto` against a Flutter toolchain.** The self-test exercises the skip branch only.
 - **The generated workflows executing on a runner** — for `--emit-ci`, for the card, or for the vibrancy generator's three platforms. Their content is verified; their behavior in GitHub Actions and GitLab CI is not.
-- **The major tag move.** The code path runs only during a release, and no release has been cut.
+- **The major tag move.** The code path runs only during a release, and the 16.3.0 release has not been cut yet.
 
 **Known follow-ups, not addressed here:**
 
-- `MIN_ACTION_VERSION` in `ciWorkflow.ts` is set to `16.3.0` as a conservative guess and needs updating to whichever release actually ships `action.yml`.
 - No CI job runs the extension's TypeScript tests. Nothing invokes `npm test`; the suite is local-only, which is the deeper reason `ci-generator.test.ts` sat unregistered in the mocha file list long enough for assertions on a nonexistent `maxLegacy` field to survive.
 - `ci.yml` triggers only on `pull_request: branches: [main]`, so a pull request targeting any other branch gets no CI at all. This PR hit it, and it will catch someone else.
 - The `analyze` job commits formatting changes using `GITHUB_TOKEN`; the resulting run comes back `action_required` and never executes, so the final head can carry no `ci` result while an identical tree passed one commit back.
