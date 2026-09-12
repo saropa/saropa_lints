@@ -19,9 +19,10 @@ import '../../support/resolved_rule_harness.dart';
 
 void main() {
   group('prefer_late_final tear-off bail-out', () {
-    test('stays silent for a tear-off captured in a field initializer',
-        () async {
-      final codes = await reportedRuleCodes(PreferLateFinalRule(), '''
+    test(
+      'stays silent for a tear-off captured in a field initializer',
+      () async {
+        final codes = await reportedRuleCodes(PreferLateFinalRule(), '''
 typedef VoidCallback = void Function();
 
 class Loader {
@@ -36,8 +37,9 @@ class Loader {
   }
 }
 ''');
-      expect(codes, isNot(contains('prefer_late_final')));
-    });
+        expect(codes, isNot(contains('prefer_late_final')));
+      },
+    );
 
     test('stays silent for a tear-off captured in a method body', () async {
       final codes = await reportedRuleCodes(PreferLateFinalRule(), '''
