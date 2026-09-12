@@ -201,7 +201,6 @@ on:
     paths: ['**.dart']
 
 permissions:
-  security-events: write   # required for the SARIF upload
   contents: read
 
 jobs:
@@ -210,14 +209,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: saropa/saropa_lints@${ref}
+        # Reports; does not block. Remove this line to make a finding fail the
+        # pull request once the project is clean enough to enforce.
+        continue-on-error: true
         with:
-          since: origin/\${{ github.base_ref }}   # changed files only
-          # annotate = findings appear on the diff, build stays green.
-          # If this job fails with a code-scanning permission error, this is a
-          # private repository without GitHub Advanced Security: change the
-          # line below to 'gate', which fails the build on findings instead
-          # and needs no special permissions.
-          mode: ${opts.mode ?? 'annotate'}${tierLine}
+          # gate runs the \`scan\` command, which honors THIS project's
+          # analysis_options.yaml — the tier and per-rule choices already made
+          # here. The alternative, annotate, runs every rule regardless of
+          # configured tier and posts them to the pull request, which on a
+          # 2332-rule set means findings from rules the project never enabled.
+          mode: gate${tierLine}
 `;
 }
 
@@ -289,18 +290,23 @@ export function disableCiWorkflow(root: string): boolean {
   const jobsIndex = lines.findIndex((l) => l.trim() === 'jobs:');
   if (jobsIndex === -1) return false;
 
-  // First "  <jobName>:" line after `jobs:` — a 2-space-indented map key,
-  // not one of its (more deeply indented) properties.
-  const jobKeyIndex = lines.findIndex(
-    (l, i) => i > jobsIndex && /^ {2}[A-Za-z0-9_.-]+:\s*$/.test(l),
-  );
-  if (jobKeyIndex === -1) return false;
+  // EVERY job under `jobs:`, not just the first. This is the off switch: if a
+  // team added a second job to the generated workflow, suspending only the
+  // first would leave CI running while the card reported it stopped — an off
+  // switch that lies is worse than none.
+  const out: string[] = [];
+  let suspended = 0;
+  for (let i = 0; i < lines.length; i++) {
+    out.push(lines[i]);
+    // A 2-space-indented map key after `jobs:` is a job name; its own
+    // properties are indented further and are not matched.
+    if (i > jobsIndex && /^ {2}[A-Za-z0-9_.-]+:\s*$/.test(lines[i])) {
+      out.push(`    if: false  ${DISABLE_MARKER}`);
+      suspended++;
+    }
+  }
+  if (suspended === 0) return false;
 
-  const next = [
-    ...lines.slice(0, jobKeyIndex + 1),
-    `    if: false  ${DISABLE_MARKER}`,
-    ...lines.slice(jobKeyIndex + 1),
-  ].join('\n');
-  fs.writeFileSync(file, next, 'utf-8');
+  fs.writeFileSync(file, out.join('\n'), 'utf-8');
   return true;
 }

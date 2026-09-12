@@ -95,6 +95,18 @@ When the version cannot be determined, neither emits `@vunknown`: a broken refer
 
 The extension's lockfile parsing is deliberately local rather than imported from `upgrade-checker.ts`. That module pulls in `vscode`, and `ciWorkflow.ts` is otherwise pure `fs`/`path`. Keeping it dependency-free is what makes its enable/disable round trip testable outside an extension host, which is the only way its file surgery gets verified at all. Importing was tried first and reverted for exactly that reason.
 
+### The off switch, and what CI actually runs
+
+Three things were wrong once the card was treated as a control rather than a demo.
+
+**The panel was behind a flag.** `HealthPanel.getEngineStatuses()` returned undefined unless `saropaLints.debug.enabled` was on, which hid the sidebar's Engines row and with it the only route to the panel. These are not debug internals — they decide whether analysis runs at all, and one of them is the off switch for the project's CI. A kill switch behind a setting you have to know to enable is not a kill switch. The gate is gone; the only remaining reason to return undefined is that engine deps are not wired yet, which is timing, not preference.
+
+**OFF suspended one job and reported success regardless.** `disableCiWorkflow` marked the first job under `jobs:` and returned false without the caller noticing when it could not. So a team that added a second job to the generated workflow would turn CI "off" and leave it running, with the card reporting stopped. It now suspends every job, and a refusal — a missing file, or a shape not safe to edit blind — surfaces as an error saying CI is still running, with a button that opens the file.
+
+**CI ran every rule, ignoring the project's configuration.** The generated workflow used `mode: annotate`, which resolves to `audit`, which bypasses the tier cap by design. A project on `essential` would have had its pull requests papered with findings from rules it never enabled. It now uses `mode: gate`, which resolves to `scan` and honors the project's own analysis_options.yaml. A tier is written only when the project has no configuration at all — the one case where scan cannot run.
+
+The generated step carries `continue-on-error: true`, so it reports without failing the pull request, and says in a comment that deleting that line makes it enforce. Enforcement is a decision a project makes once it is clean enough, not a default imposed the first time CI runs. The workflow no longer requests `security-events: write`, because scan produces no SARIF to upload.
+
 ### What the card resolves for the user
 
 Writing the workflow was only one of five things a project needed, and the other four were left to be discovered from a red pull request. The card now handles three of them:

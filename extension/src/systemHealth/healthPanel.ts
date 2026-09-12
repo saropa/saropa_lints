@@ -137,12 +137,16 @@ export class HealthPanel implements vscode.Disposable {
    * the two surfaces can never disagree.
    */
   static getEngineStatuses(): EngineStatus[] | undefined {
-    // saropaLints.debug.enabled now gates the Engines section within this
-    // panel (it used to gate the standalone Debug Panel sidebar webview's
-    // existence entirely).
-    const showEngines = vscode.workspace.getConfiguration('saropaLints.debug').get<boolean>('enabled', true);
+    // No longer gated on saropaLints.debug.enabled. These are not debug
+    // internals: they are the controls for whether analysis runs at all, and
+    // one of them is the off switch for the project's CI. A kill switch behind
+    // a setting the user has to know to enable is not a kill switch.
+    //
+    // The only remaining reason to return undefined is that the engine deps
+    // have not been wired yet (early in activate), which is a timing fact
+    // rather than a preference.
     const deps = HealthPanel.engineDeps;
-    if (!showEngines || !deps) return undefined;
+    if (!deps) return undefined;
     return [
       deps.getAnalyzerPluginStatus(),
       deps.getScanDaemonStatus(),

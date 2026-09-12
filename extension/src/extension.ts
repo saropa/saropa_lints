@@ -1986,34 +1986,53 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const added = ensureSaropaLintsInPubspec(ciRoot);
         if (!added.ok) return; // ensureSaropaLintsInPubspec already explained why
 
-        // No prompt. `annotate` is the documented default for `--emit-ci` and
-        // for the hand-written example, so all three routes produce the same
-        // workflow — a card that quietly differed from the CLI would be its
-        // own bug. It is also the right default: findings show on the diff
-        // and the build stays green.
+        // `gate` runs the scan command, which honors THIS project's own
+        // analysis_options.yaml. That is the whole point: annotate runs
+        // audit, which bypasses the configured tier and reports every one of
+        // 2332 rules, so a project on `essential` would get its pull requests
+        // papered with findings from rules it never enabled.
         //
-        // Its one failure mode is a private repository without Advanced
-        // Security, where the SARIF upload is unavailable. That is not
-        // detectable from here without GitHub auth, and asking the user to
-        // arbitrate it at toggle time is a question about SARIF semantics
-        // dressed up as a setup step — most would not know the answer, and
-        // the ones who do would rather read it in the file. The generated
-        // workflow names the fallback in a comment beside the input it
-        // applies to, which is where someone hitting the error will look.
+        // The generated step carries continue-on-error, so it reports without
+        // failing the pull request. Enforcing is a decision a project makes
+        // once it is clean enough, by deleting that line — not a default
+        // imposed on it the first time CI runs.
         //
-        // A tier is written only when the project has no rule config of its
-        // own; it costs nothing under annotate and makes a later switch to
-        // gate work without a second edit.
+        // A tier is written only when the project has no rule config at all,
+        // which is the one case where scan cannot run. When the project IS
+        // configured, no tier is written and its own choices apply untouched.
+        //
+        // No prompt, and `--emit-ci` generates the identical file: a card that
+        // quietly differed from the CLI would be its own bug.
         const tier = needsExplicitTier(ciRoot) ? 'recommended' : undefined;
-        enableCiWorkflow(ciRoot, { mode: 'annotate', tier });
+        enableCiWorkflow(ciRoot, { mode: 'gate', tier });
 
         // The one step deliberately left to the user, so say so plainly
         // instead of letting them wonder why nothing happens on their next PR.
         void vscode.window.showInformationMessage(
           l10n('debug.ci.enabled', { path: CI_WORKFLOW_RELATIVE_PATH }),
         );
-      } else {
-        disableCiWorkflow(ciRoot);
+      } else if (!disableCiWorkflow(ciRoot)) {
+        // The off switch failed: the file is missing, or its shape is one we
+        // will not edit blind. Never let that look like success — CI is still
+        // running and the user believes they stopped it. Say so, and open the
+        // file so they can stop it by hand right now.
+        const openLabel = l10n('debug.ci.openWorkflow');
+        const choice = await vscode.window.showErrorMessage(
+          l10n('debug.ci.disableFailed', { path: CI_WORKFLOW_RELATIVE_PATH }),
+          openLabel,
+        );
+        if (choice === openLabel) {
+          const uri = vscode.Uri.file(
+            path.join(ciRoot, ...CI_WORKFLOW_RELATIVE_PATH.split('/')),
+          );
+          try {
+            await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(uri));
+          } catch {
+            void vscode.window.showErrorMessage(
+              l10n('debug.ci.openWorkflowFailed', { path: CI_WORKFLOW_RELATIVE_PATH }),
+            );
+          }
+        }
       }
       HealthPanel.refreshIfOpen();
     }

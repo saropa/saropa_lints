@@ -70,7 +70,6 @@ on:
     paths: ['**.dart']
 
 permissions:
-  security-events: write   # required for the SARIF upload
   contents: read
 
 jobs:
@@ -79,9 +78,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: saropa/saropa_lints@$ref
+        # Reports; does not block. Remove this line to make a finding fail the
+        # pull request once the project is clean enough to enforce.
+        continue-on-error: true
         with:
-          since: origin/\${{ github.base_ref }}   # changed files only
-          mode: annotate                        # annotate | gate | both
+          # gate runs the `scan` command, which honors THIS project's
+          # analysis_options.yaml — the tier and per-rule choices already made
+          # here. The alternative, annotate, runs every rule regardless of
+          # configured tier, which on a 2332-rule set means findings from rules
+          # the project never enabled.
+          mode: gate
 ''';
 }
 
