@@ -2248,12 +2248,6 @@
       "enginesLabel": "Motorlar: {count} çalışıyor"
     },
     "ci": {
-      "modeTitle": "Enable saropa_lints in CI",
-      "modePlaceholder": "Choose what a lint finding should do on a pull request",
-      "modeAnnotate": "Annotate the pull request",
-      "modeAnnotateDetail": "Findings appear inline on the diff and the build stays green. Needs code scanning — free on public repositories, requires GitHub Advanced Security on private ones.",
-      "modeGate": "Fail the build",
-      "modeGateDetail": "A finding fails the check. Works on any repository, no extra permissions needed.",
       "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you."
     }
   },

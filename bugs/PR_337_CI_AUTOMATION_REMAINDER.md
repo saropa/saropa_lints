@@ -101,7 +101,9 @@ Writing the workflow was only one of five things a project needed, and the other
 
 - **The dependency.** A workflow calling saropa_lints against a project that does not depend on it fails immediately. ON now runs `ensureSaropaLintsInPubspec` first.
 - **The rule configuration.** `gate` resolves to `scan`, which reads per-rule config from analysis_options.yaml and exits 2 when it finds none — the exact failure this repository's own self-lint job hit. `needsExplicitTier` detects it and writes `tier: recommended` into the workflow. When the project IS configured, no tier is written, so the generated CI honors the team's rule set rather than overriding it.
-- **What a finding should do.** `annotate` needs `security-events: write` and, on a private repository, Advanced Security. Neither is detectable without GitHub auth, so ON asks rather than guessing and writing something that breaks on first run. The two choices are stated in terms of consequence, not flag names.
+- **What a finding should do — decided, not asked.** A first attempt put a quick pick on ON offering "annotate the pull request" or "fail the build". That was wrong twice over: it is a question about SARIF semantics dressed as a setup step, which most users cannot answer and would dismiss, and it let the card produce a workflow that differs from `--emit-ci` for the same project. The card now writes `mode: annotate` unconditionally, matching the CLI and the documented example, so all three routes agree.
+
+  Its one failure mode — a private repository without Advanced Security, where the SARIF upload is unavailable — is not detectable without GitHub auth. Rather than guess or interrogate, the generated workflow names the fallback in a comment beside the `mode:` input: if the job fails with a code-scanning permission error, change it to `gate`. That is where someone hitting the error will actually look.
 
 The fourth, committing the file, stays manual and is now stated in the confirmation message rather than left implicit.
 

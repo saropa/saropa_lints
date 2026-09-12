@@ -1986,26 +1986,26 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const added = ensureSaropaLintsInPubspec(ciRoot);
         if (!added.ok) return; // ensureSaropaLintsInPubspec already explained why
 
-        // annotate needs `security-events: write` and, on a private repo,
-        // Advanced Security. Neither is detectable from here without GitHub
-        // auth, so ask rather than guess and write something that breaks.
-        const annotateLabel = l10n('debug.ci.modeAnnotate');
-        const gateLabel = l10n('debug.ci.modeGate');
-        const picked = await vscode.window.showQuickPick(
-          [
-            { label: annotateLabel, detail: l10n('debug.ci.modeAnnotateDetail') },
-            { label: gateLabel, detail: l10n('debug.ci.modeGateDetail') },
-          ],
-          { title: l10n('debug.ci.modeTitle'), placeHolder: l10n('debug.ci.modePlaceholder') },
-        );
-        if (!picked) return; // dismissed: leave the project untouched
-
-        const mode = picked.label === gateLabel ? 'gate' : 'annotate';
-        // gate resolves to `scan`, which is the command that needs rule config.
-        const tier =
-          mode === 'gate' && needsExplicitTier(ciRoot) ? 'recommended' : undefined;
-
-        enableCiWorkflow(ciRoot, { mode, tier });
+        // No prompt. `annotate` is the documented default for `--emit-ci` and
+        // for the hand-written example, so all three routes produce the same
+        // workflow — a card that quietly differed from the CLI would be its
+        // own bug. It is also the right default: findings show on the diff
+        // and the build stays green.
+        //
+        // Its one failure mode is a private repository without Advanced
+        // Security, where the SARIF upload is unavailable. That is not
+        // detectable from here without GitHub auth, and asking the user to
+        // arbitrate it at toggle time is a question about SARIF semantics
+        // dressed up as a setup step — most would not know the answer, and
+        // the ones who do would rather read it in the file. The generated
+        // workflow names the fallback in a comment beside the input it
+        // applies to, which is where someone hitting the error will look.
+        //
+        // A tier is written only when the project has no rule config of its
+        // own; it costs nothing under annotate and makes a later switch to
+        // gate work without a second edit.
+        const tier = needsExplicitTier(ciRoot) ? 'recommended' : undefined;
+        enableCiWorkflow(ciRoot, { mode: 'annotate', tier });
 
         // The one step deliberately left to the user, so say so plainly
         // instead of letting them wonder why nothing happens on their next PR.

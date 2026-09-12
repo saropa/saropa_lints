@@ -212,6 +212,11 @@ jobs:
       - uses: saropa/saropa_lints@${ref}
         with:
           since: origin/\${{ github.base_ref }}   # changed files only
+          # annotate = findings appear on the diff, build stays green.
+          # If this job fails with a code-scanning permission error, this is a
+          # private repository without GitHub Advanced Security: change the
+          # line below to 'gate', which fails the build on findings instead
+          # and needs no special permissions.
           mode: ${opts.mode ?? 'annotate'}${tierLine}
 `;
 }
