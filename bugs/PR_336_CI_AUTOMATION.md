@@ -50,6 +50,18 @@ Clicking ON does the setup, not just the file: it adds `saropa_lints` to the pub
 
 OFF never deletes. It inserts one marked `if: false` line under **every** job, so the change is a one-line reversible diff and any customization survives.
 
+### A deliberate publish step (`ciPublish.ts`, `ciPublishGithub.ts`, `ciPublishHtml.ts`)
+
+Writing the file changes nothing that anyone else can see. CI only starts, or stops, once the change reaches the default branch, so both directions of the toggle now raise a panel section that offers to take it there — new branch, the one file committed, pushed, pull request opened.
+
+Nothing in that happens on its own. The section is a prompt: the branch is not cut and nothing is pushed until the button in it is pressed. A panel that pushed a branch as a side effect of a toggle would be making a decision for the user that they may not have noticed making, on a file that governs every contributor's pull requests.
+
+The exact commands are rendered in a copyable text control beside a copy button, and they are the literal strings the runner executes — `CiPublishPlan.commands` feeds both, so the two cannot drift into the display being a lie. Someone whose push needs a hardware key, whose team signs commits, or who simply does not want an editor touching their git history copies them and is done. That path is first-class, not a consolation prize.
+
+Three properties are load-bearing, and each has a test that would fail if it broke. Only `.github/workflows/saropa-lints.yml` is ever staged, so pressing the toggle mid-task cannot sweep up the rest of a dirty working tree. The branch is always new and the push is never forced, so no path here can overwrite existing history. And a failure stops at the step that failed and names it, so a push rejected by a protection rule leaves a local commit and a set of commands that still work by hand.
+
+Opening the pull request is the one step git cannot do, so it goes through VS Code's built-in GitHub sign-in — one "Allow" the first time, no personal access token to mint or store. Every failure on that path is non-fatal by construction: the branch is already pushed, so no session, no GitHub remote, or an API refusal all land on the same offer of the compare page.
+
 ### A report-only self-lint job (`.github/workflows/ci.yml`)
 
 This repository's own rules had never run against its own pull requests. The committed `analysis_options.yaml` carries no tier `include:` and no `plugins:` section, so `dart analyze` here only ever applied stock Dart rules — the `analyze` job's "Strip self-plugin reference" step deletes lines that are not there.
@@ -106,21 +118,31 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 
 **4. The generated workflow honors your configuration.** On a project with a configured tier, confirm the generated file has no `tier:` input. On a project with no saropa_lints configuration at all, confirm it has `tier: recommended` — without it, `scan` exits 2.
 
-**5. It does not fail the build.** Push the generated workflow on a project with known findings and confirm the check reports them without turning the pull request red.
+**5. The publish step, in both directions.** After clicking ON, the panel must show the publish section with four git commands. Press the copy button and confirm the clipboard holds them with real quote marks, not `&quot;`. Then press the create button and confirm a branch is pushed and a pull request opens containing only the workflow file. Repeat for OFF.
 
-**6. `--emit-ci` produces the same file.** Run `dart run saropa_lints:init --emit-ci` on a scratch project and diff it against what the card writes. They should be identical. Run it twice and confirm the second run refuses rather than overwriting.
+**6. The publish step with a dirty tree.** Edit an unrelated file, leave it uncommitted, then publish. The resulting commit must contain the workflow file and nothing else, and the unrelated edit must still be sitting uncommitted afterwards.
 
-**7. The engines panel with `saropaLints.debug.enabled` off.** The Engines row must still appear in the sidebar and the panel must still open.
+**7. The publish step refusing.** Publish to a branch-protected remote, or with the network down. The error must name the push command specifically, the panel section must stay on screen with its commands intact, and the local commit must still be there.
 
-**8. The vibrancy generator actually gates.** Run "Generate CI Pipeline" with `maxOutdated` set to 0 on a project with outdated packages, push the result, and confirm the job fails. Before this it always passed.
+**8. Declining the GitHub sign-in.** Press the create button and dismiss the sign-in prompt. The branch must still be pushed, and the fallback must offer the compare page rather than reporting a failure.
 
-**9. The major tag, at release.** After the next release, confirm `v16` exists and points at it, and that `uses: saropa/saropa_lints@v16` resolves in a real workflow.
+**9. It does not fail the build.** Push the generated workflow on a project with known findings and confirm the check reports them without turning the pull request red.
+
+**10. `--emit-ci` produces the same file.** Run `dart run saropa_lints:init --emit-ci` on a scratch project and diff it against what the card writes. They should be identical. Run it twice and confirm the second run refuses rather than overwriting.
+
+**11. The engines panel with `saropaLints.debug.enabled` off.** The Engines row must still appear in the sidebar and the panel must still open.
+
+**12. The vibrancy generator actually gates.** Run "Generate CI Pipeline" with `maxOutdated` set to 0 on a project with outdated packages, push the result, and confirm the job fails. Before this it always passed.
+
+**13. The major tag, at release.** After the next release, confirm `v16` exists and points at it, and that `uses: saropa/saropa_lints@v16` resolves in a real workflow.
 
 ---
 
 ## Verification status
 
 **Ran, passed:**
+
+- **The publish step's git behavior, against real repositories.** 25 tests in `extension/src/test/systemHealth/ciPublish.test.ts`, each against a real working repo with a real bare remote rather than a mocked git — the whole value of the module is what git does with the arguments it is handed, and a mock would only assert my assumptions back at me. Covered: every origin URL shape including the lookalike hosts that must *not* match; a default branch that is neither `main` nor `master`; branch names that never collide with an existing local or remote branch; `buildCiPublishPlan` performing nothing; the commit containing the workflow file and nothing else with an unrelated edit and an untracked file both surviving untouched; the failure path naming the exact step for a missing file and for an unreachable remote, with the local commit intact after a failed push; and two publishes producing two branches. Plus the panel section: nothing rendered with no pending change, every command present, the copy attribute escaped so a quote mark cannot truncate it, and the pull request button hidden — but the commands and the dismiss kept — when the remote is not GitHub.
 
 - **The workflow toggle, compiled and executed against real files.** ON→OFF→ON returns the file byte-identical; both directions are idempotent; every intermediate state parses as valid YAML; a heavily customized workflow keeps its added `cron`, `timeout-minutes`, changed `mode` and added `tier` across the round trip; a two-job workflow has **both** jobs suspended by OFF and both restored by ON with the added job intact; a file with no recognizable `jobs:` map is left untouched and the call returns false.
 - **The generated workflow's content**, across configured and unconfigured projects: a configured project gets `mode: gate` with no tier override, an unconfigured one gets the `recommended` fallback, both carry `continue-on-error` and request only `contents: read`.
@@ -140,9 +162,11 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 - **`install-sdk: auto` against a Flutter toolchain.** The self-test exercises the skip branch only.
 - **The generated workflows executing on a runner** — for `--emit-ci`, for the card, or for the vibrancy generator's three platforms. Their content is verified; their behavior in GitHub Actions and GitLab CI is not.
 - **The major tag move.** The code path runs only during a release, and the 16.3.0 release has not been cut yet.
+- **The publish step end to end in a live extension host.** The git layer beneath it is covered against real repositories, but the button that triggers it, the progress notification, the clipboard write, and the GitHub sign-in have only been typechecked. Items 5 through 8 of the test list exist to close that.
+- **Pull request creation against the GitHub API.** No call has been made. The request shape follows the documented endpoint, and every failure mode falls back to the compare page, but neither the success path nor the fallback has been observed.
 
 **Known follow-ups, not addressed here:**
 
-- No CI job runs the extension's TypeScript tests. Nothing invokes `npm test`; the suite is local-only, which is the deeper reason `ci-generator.test.ts` sat unregistered in the mocha file list long enough for assertions on a nonexistent `maxLegacy` field to survive.
+- No CI job runs the extension's TypeScript tests, and `npm test` currently has 32 failures on `main` that predate this branch — the new tests here were checked against that exact baseline (2188 passing before, 2213 after, the same 32 failing). Those two facts are the same fact: a suite nothing runs is a suite that rots. Nothing invokes `npm test`; the suite is local-only, which is the deeper reason `ci-generator.test.ts` sat unregistered in the mocha file list long enough for assertions on a nonexistent `maxLegacy` field to survive.
 - `ci.yml` triggers only on `pull_request: branches: [main]`, so a pull request targeting any other branch gets no CI at all. This PR hit it, and it will catch someone else.
 - The `analyze` job commits formatting changes using `GITHUB_TOKEN`; the resulting run comes back `action_required` and never executes, so the final head can carry no `ci` result while an identical tree passed one commit back.

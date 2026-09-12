@@ -2251,7 +2251,25 @@
       "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
       "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
       "openWorkflow": "Open workflow",
-      "openWorkflowFailed": "Could not open {path}."
+      "openWorkflowFailed": "Could not open {path}.",
+      "publish": {
+        "heading": "Publish this change",
+        "introEnable": "{path} has been written in your working tree. Nothing runs in CI until it is on {base}. These commands put it on a new branch called {branch} and open a pull request for review — run them yourself, or press the button and Saropa Lints will run exactly these.",
+        "introDisable": "{path} has been edited in your working tree to suspend every job. CI keeps running until that reaches {base}. These commands put the change on a new branch called {branch} and open a pull request — run them yourself, or press the button and Saropa Lints will run exactly these. To stop CI immediately instead, disable the workflow from the repository's Actions tab.",
+        "commandsLabel": "Commands",
+        "copy": "Copy",
+        "copied": "Commands copied to the clipboard.",
+        "createPr": "Create branch, commit, push and open pull request",
+        "notNow": "Not now",
+        "noGitHubRemote": "This repository's origin remote is not GitHub, so the pull request cannot be opened for you. Run the commands above and open it however your host does.",
+        "running": "Creating the branch and pushing…",
+        "failed": "{command} failed, so nothing was pushed. {details}",
+        "pushedNoPr": "Pushed {branch}. The pull request could not be opened automatically — open it from the compare page.",
+        "openCompare": "Open compare page",
+        "created": "Pull request opened for {branch}.",
+        "openPr": "Open pull request",
+        "notARepository": "{path} was written, but this folder is not a git repository, so there is nothing to publish to."
+      }
     }
   },
   "detailView": {

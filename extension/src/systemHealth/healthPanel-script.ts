@@ -34,6 +34,21 @@ document.addEventListener('click', function(e) {
     vscode.postMessage({ type: 'killAll' });
   } else if (action === 'restartAll') {
     vscode.postMessage({ type: 'restartAll' });
+  } else if (action === 'ciCopyCommands') {
+    // Handed to the extension host rather than written with the webview's own
+    // navigator.clipboard: clipboard access from a webview depends on document
+    // focus and is blocked outright in some hosts, whereas vscode.env.clipboard
+    // always works. The host also owns the confirmation message.
+    vscode.postMessage({ type: 'ciCopyCommands', commands: btn.dataset.commands || '' });
+  } else if (action === 'ciPublish') {
+    // Disabled immediately: cutting a branch and pushing is not idempotent, and
+    // a double click would otherwise start a second run against a repository the
+    // first run has already moved.
+    btn.disabled = true;
+    btn.textContent = btn.dataset.labelRunning || btn.textContent;
+    vscode.postMessage({ type: 'ciPublish' });
+  } else if (action === 'ciPublishDismiss') {
+    vscode.postMessage({ type: 'ciPublishDismiss' });
   }
 });
 

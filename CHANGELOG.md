@@ -78,8 +78,9 @@ A composite GitHub Action at the repository root runs saropa_lints against a pro
 
 ### Added (Extension)
 
-- A **GitHub Actions CI** card in the System Health panel turns CI on and off for the project. ON adds the dependency if missing and writes the workflow; OFF adds one `if: false` line per job rather than deleting the file, so the change is reversible and any customization survives. Neither direction runs git — the file governs every contributor's pull requests, so it goes through normal review.
+- A **GitHub Actions CI** card in the System Health panel turns CI on and off for the project. ON adds the dependency if missing and writes the workflow; OFF adds one `if: false` line per job rather than deleting the file, so the change is reversible and any customization survives. Neither direction commits anything on its own — the file governs every contributor's pull requests, so it goes through normal review.
 - The generated workflow runs the `scan` command, which honors the project's configured tier and per-rule choices rather than reporting all 2332 rules, and carries `continue-on-error` so it reports without failing pull requests. Removing that line makes it enforce.
+- Both directions of that switch offer to open a pull request for the change, since nothing reaches CI until it is on the default branch. It is a deliberate step, never automatic: the panel shows the exact git commands it would run, beside a copy button, and cuts no branch until the button is pressed. Only the workflow file is ever staged, the branch is always new and the push is never forced, and a failure names the step that failed and leaves the commands valid to finish by hand.
 
 ### Fixed (Extension)
 

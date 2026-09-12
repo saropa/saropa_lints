@@ -183,6 +183,15 @@ import {
   getCiWorkflowState,
   needsExplicitTier,
 } from './systemHealth/ciWorkflow';
+import {
+  buildCiPublishPlan,
+  compareUrl,
+  isGitRepository,
+  runCiPublish,
+  type CiPublishDirection,
+  type CiPublishPlan,
+} from './systemHealth/ciPublish';
+import { createPullRequest } from './systemHealth/ciPublishGithub';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
@@ -2006,11 +2015,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const tier = needsExplicitTier(ciRoot) ? 'recommended' : undefined;
         enableCiWorkflow(ciRoot, { mode: 'gate', tier });
 
-        // The one step deliberately left to the user, so say so plainly
-        // instead of letting them wonder why nothing happens on their next PR.
-        void vscode.window.showInformationMessage(
-          l10n('debug.ci.enabled', { path: CI_WORKFLOW_RELATIVE_PATH }),
-        );
+        presentCiPublishStep(ciRoot, 'enable');
       } else if (!disableCiWorkflow(ciRoot)) {
         // The off switch failed: the file is missing, or its shape is one we
         // will not edit blind. Never let that look like success — CI is still
@@ -2033,10 +2038,99 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
             );
           }
         }
+      } else {
+        presentCiPublishStep(ciRoot, 'disable');
       }
       HealthPanel.refreshIfOpen();
     }
   });
+
+  // Turning the card on or off only edits the working tree. Publishing that
+  // edit is a separate, explicit act — see ciPublishHtml.ts for why it is a
+  // button in the panel rather than something the toggle does on its own.
+  context.subscriptions.push(HealthPanel.onCiPublish((plan) => void publishCiChange(plan)));
+
+  /**
+   * Shows the publish step for a change just written to the working tree.
+   *
+   * A folder that is not a git repository has nothing to publish to, so it
+   * gets the plain "the file is written, it is yours now" message instead of
+   * a panel section offering commands that could not run.
+   */
+  function presentCiPublishStep(root: string, direction: CiPublishDirection): void {
+    if (!isGitRepository(root)) {
+      void vscode.window.showInformationMessage(
+        l10n('debug.ci.publish.notARepository', { path: CI_WORKFLOW_RELATIVE_PATH }),
+      );
+      return;
+    }
+    // Opening the panel is the point: the step is only meaningful if the user
+    // can see it, and the toggle may have come from the sidebar row.
+    HealthPanel.createOrShow(context);
+    HealthPanel.setPendingCiPublish(buildCiPublishPlan(root, direction));
+  }
+
+  /**
+   * Runs an accepted publish plan: branch, commit, push, then open the pull
+   * request.
+   *
+   * Failure is reported at the step that failed and nothing is retried. A push
+   * rejected by a protection rule, a commit blocked by a hook, a branch name
+   * that raced with another clone — each is something only the user can
+   * resolve, and each leaves the commands in the panel still valid for them to
+   * finish by hand.
+   */
+  async function publishCiChange(plan: CiPublishPlan): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+
+    const result = await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: l10n('debug.ci.publish.running') },
+      async () => runCiPublish(root, plan),
+    );
+
+    if (!result.ok) {
+      // The pending plan is deliberately left on screen: its commands are how
+      // the user finishes the job themselves, so clearing it would take away
+      // the remedy at the moment they need it.
+      void vscode.window.showErrorMessage(
+        l10n('debug.ci.publish.failed', {
+          command: result.failedCommand ?? '',
+          details: result.stderr ?? '',
+        }),
+      );
+      HealthPanel.refreshIfOpen();
+      return;
+    }
+
+    // Pushed. From here the change exists on the remote whatever happens next,
+    // so the panel section has done its job and comes down.
+    HealthPanel.setPendingCiPublish(undefined);
+
+    const prUrl = await createPullRequest(plan);
+    if (prUrl) {
+      const open = l10n('debug.ci.publish.openPr');
+      const choice = await vscode.window.showInformationMessage(
+        l10n('debug.ci.publish.created', { branch: plan.branch }),
+        open,
+      );
+      if (choice === open) void vscode.env.openExternal(vscode.Uri.parse(prUrl));
+      return;
+    }
+
+    // No pull request — not signed in, not a GitHub remote, or the API refused.
+    // The branch is pushed either way, so hand over the compare page rather
+    // than treating this as an error.
+    const compare = compareUrl(plan);
+    const openCompare = l10n('debug.ci.publish.openCompare');
+    const choice = await vscode.window.showInformationMessage(
+      l10n('debug.ci.publish.pushedNoPr', { branch: plan.branch }),
+      ...(compare ? [openCompare] : []),
+    );
+    if (choice === openCompare && compare) {
+      void vscode.env.openExternal(vscode.Uri.parse(compare));
+    }
+  }
 
   // Kept as a command-palette/history-compatible alias now that the
   // formerly separate Debug Panel sidebar webview merged into the Health
