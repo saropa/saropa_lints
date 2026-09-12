@@ -38,6 +38,42 @@ export const CI_WORKFLOW_RELATIVE_PATH = '.github/workflows/saropa-lints.yml';
 const FALLBACK_ACTION_REF = 'main';
 
 /**
+ * First saropa_lints release whose git tag contains `action.yml`.
+ *
+ * This floor exists because the extension and the package version
+ * independently — the extension can be several releases ahead of the
+ * saropa_lints a project actually depends on. Pinning blindly to the locked
+ * version would therefore generate `@v16.2.1` for a project on 16.2.1, and
+ * that tag predates `action.yml` entirely: a reference that cannot resolve.
+ *
+ * `--emit-ci` has no such problem, since it ships inside the package and the
+ * running version always carries the action. The card does, so it checks.
+ *
+ * Erring high is safe: a version above the floor that lacks the action is
+ * impossible, and a version below it falls back to the default branch, which
+ * always has one. Update this when the release containing `action.yml` ships.
+ */
+const MIN_ACTION_VERSION = '16.3.0';
+
+/**
+ * Compares dotted numeric versions. Returns true when `version` is at least
+ * `floor`. Pre-release suffixes are ignored: `16.3.0-dev` counts as 16.3.0,
+ * which is the conservative reading for a floor check.
+ */
+function meetsMinimum(version: string, floor: string): boolean {
+  const parse = (v: string): number[] =>
+    v.split('-')[0].split('.').map((n) => Number.parseInt(n, 10) || 0);
+  const a = parse(version);
+  const b = parse(floor);
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const x = a[i] ?? 0;
+    const y = b[i] ?? 0;
+    if (x !== y) return x > y;
+  }
+  return true;
+}
+
+/**
  * Resolves the action ref to pin, from the workspace's pubspec.lock.
  *
  * Pinning to the version the project actually depends on is self-consistent:
@@ -51,6 +87,11 @@ function resolveActionRef(root: string): { ref: string; pinned: boolean } {
     if (!fs.existsSync(lock)) return { ref: FALLBACK_ACTION_REF, pinned: false };
     const version = readLockedVersion(fs.readFileSync(lock, 'utf-8'));
     if (!version) return { ref: FALLBACK_ACTION_REF, pinned: false };
+    // Below the floor the tag has no action.yml, so a pin would be a
+    // reference that looks right and fails at run time.
+    if (!meetsMinimum(version, MIN_ACTION_VERSION)) {
+      return { ref: FALLBACK_ACTION_REF, pinned: false };
+    }
     return { ref: `v${version}`, pinned: true };
   } catch {
     // A malformed or unreadable lockfile is not worth failing the toggle over;

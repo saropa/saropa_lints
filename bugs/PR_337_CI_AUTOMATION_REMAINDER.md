@@ -95,6 +95,12 @@ When the version cannot be determined, neither emits `@vunknown`: a broken refer
 
 The extension's lockfile parsing is deliberately local rather than imported from `upgrade-checker.ts`. That module pulls in `vscode`, and `ciWorkflow.ts` is otherwise pure `fs`/`path`. Keeping it dependency-free is what makes its enable/disable round trip testable outside an extension host, which is the only way its file surgery gets verified at all. Importing was tried first and reverted for exactly that reason.
 
+### The claim that was wrong for the card
+
+"Self-consistent by construction" was asserted for both generators. It holds for `--emit-ci`, which ships inside the package: the running version always carries `action.yml` once released. It does **not** hold for the engine card, because the extension and the package version independently and have already diverged — the extension is at 16.4.1 while the package is at 16.2.1.
+
+So a user with a current extension and an older `saropa_lints` in their lockfile would have got a pin to a tag with no action in it. The card now carries a `MIN_ACTION_VERSION` floor and falls back to the default branch below it. Erring high is safe: a version above the floor that lacks the action is impossible, and one below it gets `main`, which always has one. The constant needs updating to whichever release actually ships `action.yml`.
+
 ### The test that the fix broke
 
 Making the pin version-derived broke one of its own tests, and the failure is worth recording because the mistake is easy to repeat.
