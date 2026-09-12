@@ -56,8 +56,15 @@ void main() {
       // creates exact tags, so `@v16` would not resolve.
       expect(contents, isNot(contains('saropa_lints@v16\n')));
       expect(contents, contains("since: origin/\${{ github.base_ref }}"));
-      expect(contents, contains('mode: annotate'));
-      expect(contents, contains('security-events: write'));
+      // gate, not annotate: gate runs `scan`, which honors the project's own
+      // analysis_options.yaml. annotate runs `audit`, which bypasses the
+      // configured tier and reports all 2332 rules.
+      expect(contents, contains('mode: gate'));
+      // Reports without blocking. A project decides to enforce by removing
+      // this line, once it is clean enough to.
+      expect(contents, contains('continue-on-error: true'));
+      // scan produces no SARIF, so the upload permission is not requested.
+      expect(contents, isNot(contains('security-events')));
       expect(contents, contains('contents: read'));
     } finally {
       safeDeleteDir(dir);
