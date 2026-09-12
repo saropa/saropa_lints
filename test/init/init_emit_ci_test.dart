@@ -55,7 +55,11 @@ void main() {
       // Never the moving major-version tag: the release process only ever
       // creates exact tags, so `@v16` would not resolve.
       expect(contents, isNot(contains('saropa_lints@v16\n')));
-      expect(contents, contains("since: origin/\${{ github.base_ref }}"));
+      // `since` must NOT appear. It is an audit-only flag, and the action's
+      // input validation rejects it under `scan` — which is what mode: gate
+      // resolves to — so emitting it would produce a workflow that fails on
+      // its first run. This assertion exists to stop it coming back.
+      expect(contents, isNot(contains('since:')));
       // gate, not annotate: gate runs `scan`, which honors the project's own
       // analysis_options.yaml. annotate runs `audit`, which bypasses the
       // configured tier and reports all 2332 rules.
