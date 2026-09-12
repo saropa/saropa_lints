@@ -96,5 +96,49 @@ always_specify_parameter_names:
 ''');
       expect(userAllowlistedConstructors, isEmpty);
     });
+
+    test('an allowlist under a later top-level section is not adopted', () {
+      loadAlwaysSpecifyParameterNamesConfig('''
+always_specify_parameter_names:
+  enabled: true
+some_other_rule:
+  allowlist:
+    - class_name: 'Leaked'
+      library_uri: 'package:other/other.dart'
+      max_args: 2
+''');
+      expect(userAllowlistedConstructors, isEmpty);
+    });
+
+    test('entries from a later top-level section are not appended', () {
+      loadAlwaysSpecifyParameterNamesConfig('''
+always_specify_parameter_names:
+  allowlist:
+    - class_name: 'Mine'
+      library_uri: 'package:app/models.dart'
+      max_args: 2
+some_other_rule:
+  allowlist:
+    - class_name: 'Leaked'
+      library_uri: 'package:other/other.dart'
+      max_args: 3
+''');
+      expect(userAllowlistedConstructors, hasLength(1));
+      expect(userAllowlistedConstructors.first.className, 'Mine');
+    });
+
+    test('blank lines and comments inside the section do not end it', () {
+      loadAlwaysSpecifyParameterNamesConfig('''
+always_specify_parameter_names:
+  allowlist:
+    # project-specific positional-pair constructors
+
+    - class_name: 'Coordinate'
+      library_uri: 'package:my_app/models.dart'
+      max_args: 2
+''');
+      expect(userAllowlistedConstructors, hasLength(1));
+      expect(userAllowlistedConstructors.first.className, 'Coordinate');
+    });
   });
 }
