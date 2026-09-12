@@ -57,6 +57,16 @@ void main() {
       );
     });
 
+    test('a body passed without a leading line break keeps its first line', () {
+      // The loaders hand over `content.substring(match.end)`, which always
+      // starts at a line end; a caller that trims the header itself must not
+      // silently lose the sub-key on the first line.
+      expect(
+        yamlSectionBlock('  entries:\n    - a\nother_rule:\n'),
+        '\n  entries:\n    - a',
+      );
+    });
+
     test('a list item starting in column 0 ends the block', () {
       // A `- item` at column 0 is a sibling of the section header, not part
       // of its indented body.

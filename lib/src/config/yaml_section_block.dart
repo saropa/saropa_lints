@@ -21,9 +21,10 @@ library;
 ///
 /// The result is prefixed with a newline so the first kept line still has a
 /// line start for a caller's `^\s+sub_key:` pattern to anchor against. The
-/// first element of the split is always empty — the header regex ends its
-/// match at a line end, so nothing of the header line survives into the
-/// substring — and is skipped rather than kept.
+/// first element of the split is empty for that call shape — the header regex
+/// ends its match at a line end, so nothing of the header line survives into
+/// the substring — and is skipped rather than kept. A body passed in directly,
+/// without a leading line break, keeps its first line.
 ///
 /// Line endings are normalised first, matching the sibling config readers
 /// (`runtime_tier_cap.dart`, `analysis_options_rule_packs.dart`,
@@ -37,8 +38,15 @@ String yamlSectionBlock(String afterSectionHeader) {
       .replaceAll('\r', '\n')
       .split('\n');
   final kept = <String>[];
-  for (var i = 1; i < lines.length; i++) {
+  for (var i = 0; i < lines.length; i++) {
     final line = lines[i];
+    // Element 0 is the remainder of the header line itself, and is empty: the
+    // caller's header regex ends its match at a line end, so nothing of that
+    // line survives into the substring. Drop it rather than treat it as a body
+    // line — but only when it is in fact empty, so a body handed over directly
+    // (no leading line break) is bounded instead of losing its first line,
+    // which would usually be the sub-key the caller is about to search for.
+    if (i == 0 && line.isEmpty) continue;
     if (line.isEmpty) {
       kept.add(line);
       continue;
