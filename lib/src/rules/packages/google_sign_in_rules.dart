@@ -18,6 +18,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -542,8 +543,17 @@ class GoogleSignInAuthTokenFromAuthenticateRule extends SaropaLintRule {
   /// Falls through to the name heuristic when the type is unresolved
   /// (`staticType` is null in unresolved/syntactic scan contexts), so this is
   /// purely an additional exclusion, never a replacement for the heuristic.
-  bool _isGsiClientAuthorization(Expression expr) =>
-      expr.staticType?.getDisplayString() == 'GoogleSignInClientAuthorization';
+  ///
+  /// Matches on the interface *element* name rather than
+  /// `getDisplayString()`: v7's `authorizationForScopes` returns a nullable
+  /// `GoogleSignInClientAuthorization?`, whose display string carries the `?`
+  /// suffix and so would miss the exclusion, leaving correctly-migrated code
+  /// flagged.
+  bool _isGsiClientAuthorization(Expression expr) {
+    final DartType? type = expr.staticType;
+    return type is InterfaceType &&
+        type.element.name == 'GoogleSignInClientAuthorization';
+  }
 
   /// Heuristic: the receiver `expr` is likely a `GoogleSignInAccount` when its
   /// source text contains common account-variable patterns from the GSI API.

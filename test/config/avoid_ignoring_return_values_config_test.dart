@@ -130,4 +130,65 @@ void main() {
     expect(userSafeToIgnoreMethods, {'newMethod'});
     expect(userSafeToIgnoreMethods, isNot(contains('oldMethod')));
   });
+
+  test('another section\'s safe_to_ignore is not adopted', () {
+    // Regression: the sub-key search used to run to end-of-file, so a
+    // `safe_to_ignore:` belonging to an unrelated top-level section became
+    // this rule's allowlist even though this section declares none.
+    loadAvoidIgnoringReturnValuesConfig(
+      'avoid_ignoring_return_values:\n'
+      '  enabled: true\n'
+      'some_other_rule:\n'
+      '  safe_to_ignore:\n'
+      '    - shouldNotLeak\n',
+    );
+    expect(userSafeToIgnoreMethods, isEmpty);
+  });
+
+  test('this section wins over a later section with the same sub-key', () {
+    loadAvoidIgnoringReturnValuesConfig(
+      'avoid_ignoring_return_values:\n'
+      '  safe_to_ignore:\n'
+      '    - computeHash\n'
+      'some_other_rule:\n'
+      '  safe_to_ignore:\n'
+      '    - shouldNotLeak\n',
+    );
+    expect(userSafeToIgnoreMethods, {'computeHash'});
+  });
+
+  test('a blank line inside the section does not end it', () {
+    loadAvoidIgnoringReturnValuesConfig(
+      'avoid_ignoring_return_values:\n'
+      '\n'
+      '  safe_to_ignore:\n'
+      '    - computeHash\n',
+    );
+    expect(userSafeToIgnoreMethods, {'computeHash'});
+  });
+
+  test('a CRLF blank line inside the section does not drop the rest', () {
+    loadAvoidIgnoringReturnValuesConfig(
+      'avoid_ignoring_return_values:\n'
+              '  safe_to_ignore:\n'
+              '    - computeHash\n'
+              '\n'
+              '    - formatLabel\n'
+          .replaceAll('\n', '\r\n'),
+    );
+    expect(userSafeToIgnoreMethods, {'computeHash', 'formatLabel'});
+  });
+
+  test('a CRLF section still stops at the next top-level section', () {
+    loadAvoidIgnoringReturnValuesConfig(
+      'avoid_ignoring_return_values:\n'
+              '  safe_to_ignore:\n'
+              '    - computeHash\n'
+              'some_other_rule:\n'
+              '  safe_to_ignore:\n'
+              '    - shouldNotLeak\n'
+          .replaceAll('\n', '\r\n'),
+    );
+    expect(userSafeToIgnoreMethods, {'computeHash'});
+  });
 }

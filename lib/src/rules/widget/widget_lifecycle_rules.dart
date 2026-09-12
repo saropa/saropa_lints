@@ -5168,13 +5168,17 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       if (!_isStateSubclass(node)) return;
 
       final Set<String> mixinExemptMethods = _mixinExemptMethods(node);
-      final InterfaceElement? classElement = node.declaredFragment?.element;
-      // Computed once per class rather than per member: walking
-      // allSupertypes is the expensive part of the resolved fallback, and
-      // every public @override method on this class shares the same
-      // answer for "which names does a Flutter SDK supertype declare".
-      final _FlutterSdkContractMembers flutterSdkContractMembers =
-          _flutterSdkContractMembers(classElement);
+      // Memoised per class, and deliberately *lazy*: resolving the class
+      // element and walking `allSupertypes` is the expensive part of this
+      // rule, but it is only ever consulted for a public `@override` member.
+      // Most `State` classes have none, so computing it eagerly forced
+      // element resolution on every single one for an answer nobody read.
+      // Every public `@override` member on the class shares the same answer,
+      // so the first one that asks pays for all of them.
+      final _LazyFlutterSdkContractMembers flutterSdkContractMembers =
+          _LazyFlutterSdkContractMembers(
+            () => _flutterSdkContractMembers(node.declaredFragment?.element),
+          );
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
@@ -5250,7 +5254,7 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     MethodDeclaration node,
     Set<String> mixinExemptMethods,
-    _FlutterSdkContractMembers flutterSdkContractMembers,
+    _LazyFlutterSdkContractMembers flutterSdkContractMembers,
   ) {
     final String name = node.name.lexeme;
     if (name.startsWith('_')) return;
@@ -5280,9 +5284,13 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
     // code is exactly the encapsulation leak this rule exists to catch, so
     // it must still be flagged even though it is also an @override.
     if (_hasAnnotation(node.metadata, 'override')) {
+      // First read of `.value` is what triggers the supertype walk — see the
+      // laziness note at the construction site.
+      final _FlutterSdkContractMembers contract =
+          flutterSdkContractMembers.value;
       final bool isSdkContract = node.isGetter
-          ? flutterSdkContractMembers.getters.contains(name)
-          : flutterSdkContractMembers.methods.contains(name);
+          ? contract.getters.contains(name)
+          : contract.methods.contains(name);
       if (isSdkContract) return;
     }
 
@@ -5355,4 +5363,17 @@ class _FlutterSdkContractMembers {
 
   final Set<String> methods;
   final Set<String> getters;
+}
+
+/// Defers [AvoidPublicMembersInStatesRule._flutterSdkContractMembers] — and
+/// the element resolution it needs — until a member actually asks for it,
+/// then caches the answer for the rest of the class. A `State` class with no
+/// public `@override` member never triggers the supertype walk at all.
+class _LazyFlutterSdkContractMembers {
+  _LazyFlutterSdkContractMembers(this._compute);
+
+  final _FlutterSdkContractMembers Function() _compute;
+  _FlutterSdkContractMembers? _cached;
+
+  _FlutterSdkContractMembers get value => _cached ??= _compute();
 }
