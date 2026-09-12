@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.2.2] — Unreleased
 
-Patch release correcting follow-on defects in the rule and dashboard changes that shipped in 16.2.1. Two lint rules stopped short of the cases they were meant to cover, the `avoid_ignoring_return_values` allowlist could read the wrong part of your config file, and the Config Dashboard could sit on a stale view after you flipped a toggle. [log](https://github.com/saropa/saropa_lints/blob/v16.2.2/CHANGELOG.md)
+Patch release correcting follow-on defects in the rule and dashboard changes that shipped in 16.2.1, and fixing how several rules read their project configuration from `analysis_options_custom.yaml`. Two lint rules stopped short of the cases they were meant to cover, three rules could silently pick up settings written under an unrelated section of your config file, and the Config Dashboard could sit on a stale view after you flipped a toggle. [log](https://github.com/saropa/saropa_lints/blob/v16.2.2/CHANGELOG.md)
 
 ### Fixed
 
@@ -78,12 +78,17 @@ Patch release correcting follow-on defects in the rule and dashboard changes tha
 
 `avoid_ignoring_return_values` now reads `safe_to_ignore:` only from its own section of `analysis_options_custom.yaml` instead of silently adopting a same-named list from an unrelated section further down the file. No action required unless a stray allowlist was being picked up, in which case move those names into the rule's own section.
 
+`banned_usage` now reads its banned-identifier list only from its own section of `analysis_options_custom.yaml`, instead of adopting a same-named list from an unrelated section further down the file or appending that section's items to its own. No action required unless stray bans were being picked up, in which case move those identifiers into the rule's own section.
+
+`always_specify_parameter_names` now reads its allowlist only from its own section of `analysis_options_custom.yaml`, with the same fix for adopted and appended entries. No action required unless a stray allowlist was being picked up, in which case move those entries into the rule's own section.
+
 ### Fixed (Extension)
 
 - The Config Dashboard now redraws as soon as you toggle a rule pack, enable a rule, or pick a dropdown value, instead of showing "Update pending" until you click somewhere else — only in-progress text entry defers a refresh now.
 
 ### Internal
 
+- Section bounding for the line-based config readers is now a single directly tested helper, adopted by all three readers.
 - The Flutter SDK contract lookup behind `avoid_public_members_in_states` is computed on demand, so a `State` class with no public overridden members no longer pays for element resolution and a supertype walk.
 
 ---

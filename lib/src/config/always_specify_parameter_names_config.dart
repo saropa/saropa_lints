@@ -19,6 +19,7 @@ library;
 
 import '../rules/code_quality/always_specify_parameter_names_helpers.dart'
     show AllowlistedConstructor;
+import 'yaml_section_block.dart';
 
 /// User-configured allowlist additions. Set by
 /// [loadAlwaysSpecifyParameterNamesConfig]. Empty by default (no-op) so a
@@ -47,7 +48,11 @@ void loadAlwaysSpecifyParameterNamesConfig(String? content) {
   ).firstMatch(content);
   if (sectionMatch == null) return;
 
-  final afterSection = content.substring(sectionMatch.end);
+  // Bound both the sub-key search and the item loop below to this section's
+  // own indented block. Unbounded, an `allowlist:` belonging to a *later*
+  // top-level section would be adopted as this rule's config, and entries
+  // from later sections would be appended to a legitimately parsed list.
+  final afterSection = yamlSectionBlock(content.substring(sectionMatch.end));
   final allowlistMatch = RegExp(
     r'^\s+allowlist:\s*$',
     multiLine: true,

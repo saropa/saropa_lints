@@ -13,6 +13,8 @@
 /// each entry must be a simple `- methodName` list item.
 library;
 
+import 'yaml_section_block.dart';
+
 /// User-configured safe-to-ignore method names. Set by
 /// [loadAvoidIgnoringReturnValuesConfig]. Empty by default (no-op) so a
 /// project that never adds this section sees no behavior change.
@@ -50,7 +52,7 @@ void loadAvoidIgnoringReturnValuesConfig(String? content) {
   // would be silently adopted as this rule's allowlist. A top-level key is
   // any line starting in column 0 with something other than whitespace or a
   // `#` comment, so the block ends at the first such line.
-  final afterSection = _sectionBlock(content.substring(sectionMatch.end));
+  final afterSection = yamlSectionBlock(content.substring(sectionMatch.end));
 
   // Find the `safe_to_ignore:` sub-key.
   final listMatch = RegExp(
@@ -81,32 +83,4 @@ void loadAvoidIgnoringReturnValuesConfig(String? content) {
     if (name != null) result.add(name);
   }
   userSafeToIgnoreMethods = result;
-}
-
-/// The indented body of a top-level YAML section, given everything that
-/// follows the section's own header line. Stops at the first line that begins
-/// a new top-level key — i.e. starts in column 0 with a non-whitespace,
-/// non-`#` character — so a sibling section's sub-keys are never mistaken for
-/// this section's.
-String _sectionBlock(String afterSectionHeader) {
-  final lines = afterSectionHeader.split('\n');
-  final kept = <String>[];
-  // Skip index 0: it is the remainder of the header line itself (empty,
-  // since the header regex anchors to end-of-line), not a body line.
-  for (var i = 1; i < lines.length; i++) {
-    final line = lines[i];
-    if (line.isEmpty) {
-      kept.add(line);
-      continue;
-    }
-    final first = line.codeUnitAt(0);
-    final startsIndented = first == 0x20 || first == 0x09; // space or tab
-    if (!startsIndented && !line.startsWith('#')) break;
-    kept.add(line);
-  }
-  // Lead with a newline so the first kept line still has a line start for
-  // `^\s+safe_to_ignore:` to anchor against. (`lines.first` is always empty:
-  // the header regex ends the match at a line end, so nothing of the header
-  // line survives into the substring.)
-  return '\n${kept.join('\n')}';
 }
