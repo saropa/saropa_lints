@@ -66,6 +66,22 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.2.2] — Unreleased
+
+Patch release correcting how two rules read their project configuration from `analysis_options_custom.yaml`. Both `banned_usage` and `always_specify_parameter_names` could silently pick up settings written under an unrelated section further down the file. [log](https://github.com/saropa/saropa_lints/blob/v16.2.2/CHANGELOG.md)
+
+### Fixed
+
+`banned_usage` now reads its banned-identifier list only from its own section of `analysis_options_custom.yaml`, instead of adopting a same-named list from an unrelated section further down the file or appending that section's items to its own. No action required unless stray bans were being picked up, in which case move those identifiers into the rule's own section.
+
+`always_specify_parameter_names` now reads its allowlist only from its own section of `analysis_options_custom.yaml`, with the same fix for adopted and appended entries. No action required unless a stray allowlist was being picked up, in which case move those entries into the rule's own section.
+
+### Internal
+
+- Section bounding for the line-based config readers is now a single directly tested helper, ready for the remaining reader to adopt.
+
+---
+
 ## [16.2.1]
 
 Patch release fixing false positives in two lint rules, adding a project-level allowlist for `avoid_ignoring_return_values`, and resolving unwanted reload behavior in the Config and Findings Dashboards when editing text fields. [log](https://github.com/saropa/saropa_lints/blob/v16.2.1/CHANGELOG.md)
