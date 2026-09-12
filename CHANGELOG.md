@@ -78,7 +78,7 @@ Patch release correcting how two rules read their project configuration from `an
 
 ### Internal
 
-- The section-bounding logic these config readers share is now one directly tested helper instead of a copy per rule.
+- Section bounding for the line-based config readers is now a single directly tested helper, ready for the remaining reader to adopt.
 
 ---
 

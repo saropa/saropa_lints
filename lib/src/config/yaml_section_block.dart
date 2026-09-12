@@ -24,8 +24,18 @@ library;
 /// first element of the split is always empty — the header regex ends its
 /// match at a line end, so nothing of the header line survives into the
 /// substring — and is skipped rather than kept.
+///
+/// Line endings are normalised first, matching the sibling config readers
+/// (`runtime_tier_cap.dart`, `analysis_options_rule_packs.dart`,
+/// `config_loader.dart`), which all accept a Windows-authored
+/// `analysis_options_custom.yaml`. Without it a CRLF blank line arrives here
+/// as a bare `\r` — neither empty nor indented nor a comment — and would end
+/// the block early, silently discarding the rest of the section.
 String yamlSectionBlock(String afterSectionHeader) {
-  final lines = afterSectionHeader.split('\n');
+  final lines = afterSectionHeader
+      .replaceAll('\r\n', '\n')
+      .replaceAll('\r', '\n')
+      .split('\n');
   final kept = <String>[];
   for (var i = 1; i < lines.length; i++) {
     final line = lines[i];

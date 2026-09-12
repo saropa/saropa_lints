@@ -127,6 +127,19 @@ some_other_rule:
       expect(userAllowlistedConstructors.first.className, 'Mine');
     });
 
+    test('a CRLF file with a blank line still yields its allowlist', () {
+      loadAlwaysSpecifyParameterNamesConfig(
+        "always_specify_parameter_names:\r\n"
+        "  allowlist:\r\n"
+        "\r\n"
+        "    - class_name: 'Coordinate'\r\n"
+        "      library_uri: 'package:my_app/models.dart'\r\n"
+        "      max_args: 2\r\n",
+      );
+      expect(userAllowlistedConstructors, hasLength(1));
+      expect(userAllowlistedConstructors.first.className, 'Coordinate');
+    });
+
     test('blank lines and comments inside the section do not end it', () {
       loadAlwaysSpecifyParameterNamesConfig('''
 always_specify_parameter_names:

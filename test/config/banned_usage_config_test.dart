@@ -93,6 +93,48 @@ banned_usage:
       expect(bannedUsageEntries.first.identifier, 'print');
     });
 
+    test('a CRLF file with a blank line still yields its entries', () {
+      // Regression: a Windows-authored config whose blank line left a bare
+      // `\r` used to truncate the section — the whole ban list was silently
+      // discarded with no error.
+      loadBannedUsageConfig(
+        "banned_usage:\r\n"
+        "  entries:\r\n"
+        "\r\n"
+        "    - identifier: 'print'\r\n"
+        "      reason: 'Use Logger instead'\r\n",
+      );
+      expect(bannedUsageEntries, hasLength(1));
+      expect(bannedUsageEntries.first.identifier, 'print');
+      expect(bannedUsageEntries.first.reason, 'Use Logger instead');
+    });
+
+    test('a CRLF blank line between items does not drop the rest', () {
+      loadBannedUsageConfig(
+        "banned_usage:\r\n"
+        "  entries:\r\n"
+        "    - identifier: 'print'\r\n"
+        "\r\n"
+        "    - identifier: 'debugPrint'\r\n",
+      );
+      expect(bannedUsageEntries, hasLength(2));
+      expect(bannedUsageEntries[1].identifier, 'debugPrint');
+    });
+
+    test('a CRLF file still stops at the next top-level section', () {
+      loadBannedUsageConfig(
+        "banned_usage:\r\n"
+        "  entries:\r\n"
+        "    - identifier: 'mySymbol'\r\n"
+        "      reason: 'Mine'\r\n"
+        "some_other_rule:\r\n"
+        "  entries:\r\n"
+        "    - identifier: 'leakedSymbol'\r\n",
+      );
+      expect(bannedUsageEntries, hasLength(1));
+      expect(bannedUsageEntries.first.identifier, 'mySymbol');
+    });
+
     test('a stale global list is reset when called again with no section', () {
       loadBannedUsageConfig('''
 banned_usage:
