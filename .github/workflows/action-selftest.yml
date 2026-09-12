@@ -80,6 +80,13 @@ jobs:
       # gate must fail exactly when annotate reported findings. Asserting the
       # relationship rather than a fixed outcome keeps this deterministic
       # whether or not self_check currently has violations.
+      #
+      # `command: audit` is required for the comparison to mean anything:
+      # annotate resolved to audit (every rule), and gate's default `auto`
+      # would resolve to scan (only the rules self_check configures, or exit 2
+      # when it configures none). Comparing two different rule sets would make
+      # this assertion fail on a difference that is not a bug. The `auto` →
+      # scan resolution is covered by the scan step below.
       - name: Run action in gate mode
         id: gate
         continue-on-error: true
@@ -87,6 +94,7 @@ jobs:
         with:
           working-directory: self_check
           mode: gate
+          command: audit
 
       - name: Assert gate mode honors the exit code
         env:

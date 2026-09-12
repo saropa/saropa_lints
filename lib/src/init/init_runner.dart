@@ -166,6 +166,10 @@ Future<void> runInit(List<String> args) async {
     final EmitCiResult result = emitCiWorkflow(
       outFile,
       dryRun: cliArgs.isDryRun,
+      // Read for its analysis_options.yaml: a project with no saropa_lints
+      // rule configuration needs an explicit tier, or the generated `scan`
+      // exits 2 the first time CI runs.
+      projectDir: Directory(targetDir),
     );
 
     switch (result) {

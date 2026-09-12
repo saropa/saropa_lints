@@ -366,11 +366,18 @@ runs:
         # FETCH_HEAD without creating refs/remotes/origin/<branch> — leaving
         # `--since origin/<branch>` still unresolvable.
         if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" --depth=1; then
-          echo "::warning::Could not fetch '$branch'. The audit will fall back to a full scan."
+          echo "::warning::Could not fetch '$branch' from origin."
         fi
 
+        # Not a warning: an unresolvable ref is NOT a fallback to a full scan.
+        # `gitChangedDartFiles` (lib/src/scan/git_changed_files.dart) returns
+        # an empty list for an unknown revision, so the audit would report
+        # zero findings over zero files and exit 0 — a green job that audited
+        # nothing, which is the exact failure this action exists to rule out.
         if ! git rev-parse --verify --quiet "$SINCE" >/dev/null; then
-          echo "::warning::'$SINCE' still does not resolve after fetching; expect a full scan."
+          echo "::error::'$SINCE' does not resolve even after fetching, so --since would audit no files at all."
+          echo "::error::Fetch it first (actions/checkout with fetch-depth: 0), or drop the 'since' input to audit the whole project."
+          exit 1
         fi
 
     - name: Install dependencies

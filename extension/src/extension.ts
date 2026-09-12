@@ -2015,7 +2015,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const tier = needsExplicitTier(ciRoot) ? 'recommended' : undefined;
         enableCiWorkflow(ciRoot, { mode: 'gate', tier });
 
-        presentCiPublishStep(ciRoot, 'enable');
+        // When the dependency was just added, that edit has to travel with the
+        // workflow. A pull request carrying the workflow alone would fail its
+        // very first run with "saropa_lints is not a resolved dependency".
+        presentCiPublishStep(ciRoot, 'enable', added.changed ? ['pubspec.yaml'] : []);
       } else if (!disableCiWorkflow(ciRoot)) {
         // The off switch failed: the file is missing, or its shape is one we
         // will not edit blind. Never let that look like success — CI is still
@@ -2057,7 +2060,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
    * gets the plain "the file is written, it is yours now" message instead of
    * a panel section offering commands that could not run.
    */
-  function presentCiPublishStep(root: string, direction: CiPublishDirection): void {
+  function presentCiPublishStep(
+    root: string,
+    direction: CiPublishDirection,
+    extraPaths: readonly string[] = [],
+  ): void {
     if (!isGitRepository(root)) {
       void vscode.window.showInformationMessage(
         l10n('debug.ci.publish.notARepository', { path: CI_WORKFLOW_RELATIVE_PATH }),
@@ -2067,7 +2074,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // Opening the panel is the point: the step is only meaningful if the user
     // can see it, and the toggle may have come from the sidebar row.
     HealthPanel.createOrShow(context);
-    HealthPanel.setPendingCiPublish(buildCiPublishPlan(root, direction));
+    HealthPanel.setPendingCiPublish(buildCiPublishPlan(root, direction, extraPaths));
   }
 
   /**

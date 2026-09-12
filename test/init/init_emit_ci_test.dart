@@ -87,6 +87,70 @@ void main() {
     expect(unknown, contains('could not be determined'));
   });
 
+  test('buildCiWorkflow emits a tier only when asked for one', () {
+    // A project that configures saropa_lints gets no tier: naming one here
+    // would override the rule set the team already chose.
+    expect(buildCiWorkflow(version: '16.3.0'), isNot(contains('tier:')));
+    expect(
+      buildCiWorkflow(version: '16.3.0', tier: 'recommended'),
+      contains('tier: recommended'),
+    );
+  });
+
+  test('ciNeedsExplicitTier keys off saropa_lints rule configuration', () {
+    final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
+    try {
+      // No analysis_options.yaml at all: `scan` has nothing to read.
+      expect(ciNeedsExplicitTier(dir), isTrue);
+
+      final options = File('${dir.path}/analysis_options.yaml');
+      // Present, but says nothing about saropa_lints.
+      options.writeAsStringSync('linter:\n  rules:\n    - avoid_print\n');
+      expect(ciNeedsExplicitTier(dir), isTrue);
+
+      options.writeAsStringSync(
+        'include: package:saropa_lints/tiers/recommended.yaml\n',
+      );
+      expect(ciNeedsExplicitTier(dir), isFalse);
+    } finally {
+      safeDeleteDir(dir);
+    }
+  });
+
+  test('emitCiWorkflow writes a tier for an unconfigured project', () {
+    final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
+    try {
+      // No analysis_options.yaml: without an explicit tier the generated
+      // `scan` exits 2 and the workflow fails on its very first run.
+      final outFile = File('${dir.path}/.github/workflows/saropa-lints.yml');
+      expect(
+        emitCiWorkflow(outFile, dryRun: false, projectDir: dir),
+        EmitCiResult.written,
+      );
+      expect(outFile.readAsStringSync(), contains('tier: recommended'));
+    } finally {
+      safeDeleteDir(dir);
+    }
+  });
+
+  test('emitCiWorkflow writes no tier for a configured project', () {
+    final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
+    try {
+      File('${dir.path}/analysis_options.yaml').writeAsStringSync(
+        'include: package:saropa_lints/tiers/essential.yaml\n',
+      );
+      final outFile = File('${dir.path}/.github/workflows/saropa-lints.yml');
+      expect(
+        emitCiWorkflow(outFile, dryRun: false, projectDir: dir),
+        EmitCiResult.written,
+      );
+      // The project's own essential tier must survive untouched.
+      expect(outFile.readAsStringSync(), isNot(contains('tier:')));
+    } finally {
+      safeDeleteDir(dir);
+    }
+  });
+
   test('emitCiWorkflow --dry-run writes nothing', () {
     final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
     try {

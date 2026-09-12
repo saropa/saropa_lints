@@ -41,7 +41,10 @@ export function buildCiPublishSection(plan: CiPublishPlan | undefined): string {
       plan.direction === 'enable'
         ? 'debug.ci.publish.introEnable'
         : 'debug.ci.publish.introDisable',
-      { path: plan.relativePath, branch: plan.branch, base: plan.baseBranch },
+      // The workflow file is always first, and is the one the prose names.
+      // Any others (pubspec.yaml, when the dependency was just added) are
+      // visible in the commands below rather than crammed into a sentence.
+      { path: plan.paths[0], branch: plan.branch, base: plan.baseBranch },
     ),
   );
 

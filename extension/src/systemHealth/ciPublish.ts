@@ -28,8 +28,18 @@ export interface CiPublishPlan {
   branch: string;
   /** Branch the pull request targets. */
   baseBranch: string;
-  /** Repository path staged and committed. Always exactly one file. */
-  relativePath: string;
+  /**
+   * Repository paths staged and committed — nothing outside this list is ever
+   * touched.
+   *
+   * Usually just the workflow file. It grows when turning CI on also had to
+   * edit something else for the workflow to work: adding `saropa_lints` to
+   * `pubspec.yaml` when the project did not depend on it. Publishing the
+   * workflow without that edit produces a pull request whose very first CI
+   * run fails with "saropa_lints is not a resolved dependency" — the one
+   * outcome this whole step exists to avoid.
+   */
+  paths: string[];
   commitMessage: string;
   prTitle: string;
   prBody: string;
@@ -61,6 +71,11 @@ function git(root: string, args: string[]): string {
     cwd: root,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
+    // stdin is ignored, so a credential or passphrase prompt would have
+    // nowhere to read from and `execFileSync` would block the extension host
+    // forever. Refusing to prompt turns that hang into an ordinary failure
+    // the caller can report.
+    env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
   }).trim();
 }
 
@@ -184,7 +199,16 @@ const DISABLE_BODY = [
  *
  * Safe to call purely to render the panel: it only reads git state.
  */
-export function buildCiPublishPlan(root: string, direction: CiPublishDirection): CiPublishPlan {
+export function buildCiPublishPlan(
+  root: string,
+  direction: CiPublishDirection,
+  /**
+   * Extra repository-relative paths the caller changed and needs published
+   * alongside the workflow — `pubspec.yaml` when the dependency was just
+   * added. Duplicates and the workflow path itself are ignored.
+   */
+  extraPaths: readonly string[] = [],
+): CiPublishPlan {
   const branch = pickBranchName(root, direction);
   const baseBranch = detectBaseBranch(root);
   const remoteUrl = gitOrUndefined(root, ['remote', 'get-url', 'origin']);
@@ -199,19 +223,24 @@ export function buildCiPublishPlan(root: string, direction: CiPublishDirection):
       ? 'Run saropa_lints on pull requests'
       : 'Turn off saropa_lints on pull requests';
 
+  const paths = [
+    CI_WORKFLOW_RELATIVE_PATH,
+    ...extraPaths.filter((x) => x !== CI_WORKFLOW_RELATIVE_PATH),
+  ].filter((x, i, all) => all.indexOf(x) === i);
+
   return {
     direction,
     branch,
     baseBranch,
-    relativePath: CI_WORKFLOW_RELATIVE_PATH,
+    paths,
     commitMessage,
     prTitle,
     prBody: direction === 'enable' ? ENABLE_BODY : DISABLE_BODY,
     slug,
     commands: [
       `git checkout -b ${branch}`,
-      `git add ${CI_WORKFLOW_RELATIVE_PATH}`,
-      `git commit -m "${commitMessage}"`,
+      `git add ${paths.join(' ')}`,
+      `git commit -m "${commitMessage}" -- ${paths.join(' ')}`,
       `git push -u origin ${branch}`,
     ],
   };
@@ -234,8 +263,13 @@ export function runCiPublish(root: string, plan: CiPublishPlan): CiPublishResult
     ['checkout', '-b', plan.branch],
     // Forward slashes deliberately, not path.sep: git's pathspec grammar is
     // POSIX on every platform, including Windows.
-    ['add', '--', plan.relativePath],
-    ['commit', '-m', plan.commitMessage],
+    ['add', '--', ...plan.paths],
+    // The pathspec is load-bearing: a bare `git commit` commits the WHOLE
+    // index, so anything the user had already `git add`ed before pressing
+    // the button would be swept into this commit and pushed. With the
+    // pathspec, git commits HEAD plus this one path and leaves the rest of
+    // their index exactly as they left it.
+    ['commit', '-m', plan.commitMessage, '--', ...plan.paths],
     ['push', '-u', 'origin', plan.branch],
   ];
 

@@ -184,6 +184,10 @@ function buildTemplate(root: string, opts: CiWorkflowOptions = {}): string {
   // Only emitted when the project has no rule config of its own — otherwise
   // naming a tier here would override the team's configured rule set.
   const tierLine = opts.tier ? `\n          tier: ${opts.tier}` : '';
+  // Honor the caller's choice rather than ignoring it: silently writing
+  // `gate` for a caller that asked for `annotate` would be a workflow that
+  // does the opposite of what the code requesting it said.
+  const mode = opts.mode ?? 'gate';
   const note = pinned
     ? ''
     : '#\n' +
@@ -218,7 +222,7 @@ jobs:
           # here. The alternative, annotate, runs every rule regardless of
           # configured tier and posts them to the pull request, which on a
           # 2332-rule set means findings from rules the project never enabled.
-          mode: gate${tierLine}
+          mode: ${mode}${tierLine}
 `;
 }
 

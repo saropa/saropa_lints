@@ -6,6 +6,7 @@ library;
 // approach: a plain string template written verbatim, no templating engine.
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart' show saropaLintsVersion;
 
 /// Outcome of an [emitCiWorkflow] call, so the caller (init_runner.dart) can
@@ -41,10 +42,42 @@ enum EmitCiResult {
 /// as `v16.2.1`, a tag that predates `action.yml` entirely, so every workflow
 /// it generated referenced an action that could not resolve.
 ///
-/// Never a moving major like `@v16` — the release process creates exact tags
-/// only, so that would not resolve either.
-String buildCiWorkflow({String? version}) {
+/// Deliberately the exact version rather than the moving major (`@v16`) that
+/// the release script also maintains: a generated file should pin to the
+/// release it was generated against, so regenerating is the only thing that
+/// can change which action runs.
+/// True when [projectDir] has no saropa_lints rule configuration, so the
+/// generated `scan` would exit 2 unless the workflow names a tier.
+///
+/// Deliberately a substring check rather than a YAML parse: configuration
+/// reaches analysis_options.yaml several ways — a tier `include:`, an
+/// init-generated per-rule block, a `plugins:` section — and every one of them
+/// mentions saropa_lints. Absence is the signal worth acting on.
+///
+/// Mirrors `needsExplicitTier` in the extension's `ciWorkflow.ts`, because the
+/// card and this command must generate the identical file.
+bool ciNeedsExplicitTier(Directory projectDir) {
+  try {
+    final File options = File(p.join(projectDir.path, 'analysis_options.yaml'));
+    if (!options.existsSync()) {
+      return true;
+    }
+    return !options.readAsStringSync().contains('saropa_lints');
+  } on Object {
+    // An unreadable file is indistinguishable from an absent one here, and
+    // guessing "configured" would generate a workflow that exits 2.
+    return true;
+  }
+}
+
+String buildCiWorkflow({String? version, String? tier}) {
   final String resolved = version ?? saropaLintsVersion;
+
+  // Emitted only when the project has no rule configuration of its own.
+  // Naming a tier for a project that IS configured would override the rule
+  // set the team already chose; omitting it for one that is not produces a
+  // `scan` that exits 2 on the workflow's very first run.
+  final String tierLine = tier == null ? '' : '\n          tier: $tier';
 
   // 'unknown' means package_config.json could not be read. Emitting
   // `@vunknown` would be a broken reference dressed up as a real one, so
@@ -87,7 +120,7 @@ jobs:
           # here. The alternative, annotate, runs every rule regardless of
           # configured tier, which on a 2332-rule set means findings from rules
           # the project never enabled.
-          mode: gate
+          mode: gate$tierLine
 ''';
 }
 
@@ -95,7 +128,15 @@ jobs:
 ///
 /// Never overwrites an existing file (see [EmitCiResult.refusedExists]);
 /// under `--dry-run` reports what it would do without touching disk.
-EmitCiResult emitCiWorkflow(File outputFile, {required bool dryRun}) {
+///
+/// [projectDir] is the project the workflow is being written for. It decides
+/// whether a `tier:` input is needed — see [ciNeedsExplicitTier]. When
+/// omitted, the file is generated without one.
+EmitCiResult emitCiWorkflow(
+  File outputFile, {
+  required bool dryRun,
+  Directory? projectDir,
+}) {
   if (outputFile.existsSync()) {
     return EmitCiResult.refusedExists;
   }
@@ -108,7 +149,13 @@ EmitCiResult emitCiWorkflow(File outputFile, {required bool dryRun}) {
   if (!parent.existsSync()) {
     parent.createSync(recursive: true);
   }
-  outputFile.writeAsStringSync(buildCiWorkflow());
+  outputFile.writeAsStringSync(
+    buildCiWorkflow(
+      tier: projectDir != null && ciNeedsExplicitTier(projectDir)
+          ? 'recommended'
+          : null,
+    ),
+  );
 
   return EmitCiResult.written;
 }

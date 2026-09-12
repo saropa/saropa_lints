@@ -181,7 +181,33 @@ describe('ciPublish — the plan', () => {
         'the file is still only in the working tree',
       );
       assert.strictEqual(plan.baseBranch, 'main');
-      assert.strictEqual(plan.relativePath, CI_WORKFLOW_RELATIVE_PATH);
+      assert.strictEqual(plan.paths[0], CI_WORKFLOW_RELATIVE_PATH);
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  it('carries an extra path the caller needs published with the workflow', () => {
+    const repo = makeRepo();
+    try {
+      const plan = buildCiPublishPlan(repo.root, 'enable', ['pubspec.yaml']);
+      assert.deepStrictEqual(plan.paths, [CI_WORKFLOW_RELATIVE_PATH, 'pubspec.yaml']);
+      // The workflow file stays first: the panel's prose names paths[0].
+      assert.strictEqual(plan.paths[0], CI_WORKFLOW_RELATIVE_PATH);
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  it('never lists the workflow path twice, however the caller passes it', () => {
+    const repo = makeRepo();
+    try {
+      const plan = buildCiPublishPlan(repo.root, 'enable', [
+        CI_WORKFLOW_RELATIVE_PATH,
+        'pubspec.yaml',
+        'pubspec.yaml',
+      ]);
+      assert.deepStrictEqual(plan.paths, [CI_WORKFLOW_RELATIVE_PATH, 'pubspec.yaml']);
     } finally {
       repo.cleanup();
     }
@@ -194,7 +220,7 @@ describe('ciPublish — the plan', () => {
       assert.deepStrictEqual(plan.commands, [
         `git checkout -b ${plan.branch}`,
         `git add ${CI_WORKFLOW_RELATIVE_PATH}`,
-        `git commit -m "${plan.commitMessage}"`,
+        `git commit -m "${plan.commitMessage}" -- ${CI_WORKFLOW_RELATIVE_PATH}`,
         `git push -u origin ${plan.branch}`,
       ]);
     } finally {
@@ -276,6 +302,9 @@ describe('ciPublish — running it', () => {
       // makes a toggle safe to press mid-task.
       fs.writeFileSync(path.join(repo.root, 'README.md'), '# edited by the user\n');
       fs.writeFileSync(path.join(repo.root, 'scratch.txt'), 'unsaved work\n');
+      // Already staged, which is the case a bare `git commit` would sweep up.
+      fs.writeFileSync(path.join(repo.root, 'staged.txt'), 'staged work\n');
+      git(repo.root, ['add', 'staged.txt']);
 
       const plan = buildCiPublishPlan(repo.root, 'enable');
       assert.strictEqual(runCiPublish(repo.root, plan).ok, true);
@@ -288,6 +317,7 @@ describe('ciPublish — running it', () => {
       const status = git(repo.root, ['status', '--porcelain', '--untracked-files=all']);
       assert.ok(status.includes('README.md'), 'the user’s edit is still uncommitted');
       assert.ok(status.includes('scratch.txt'), 'the untracked file is still untracked');
+      assert.ok(status.includes('staged.txt'), 'the user\u2019s staged file is still only staged');
     } finally {
       repo.cleanup();
     }
@@ -307,6 +337,51 @@ describe('ciPublish — running it', () => {
       assert.ok((result.stderr ?? '').length > 0, 'the reason is carried, not swallowed');
       // Nothing reached the remote.
       assert.throws(() => git(repo.remote, ['rev-parse', '--verify', plan.branch]));
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  it('commits every path in the plan, not only the workflow', () => {
+    const repo = makeRepo();
+    try {
+      writeWorkflow(repo.root);
+      // Stand-in for ensureSaropaLintsInPubspec having just added the
+      // dependency: without this file in the commit, the pull request's first
+      // CI run fails on an unresolved dependency.
+      fs.writeFileSync(path.join(repo.root, 'pubspec.yaml'), 'name: demo\n');
+      const plan = buildCiPublishPlan(repo.root, 'enable', ['pubspec.yaml']);
+      assert.strictEqual(runCiPublish(repo.root, plan).ok, true);
+
+      const committed = git(repo.root, ['show', '--name-only', '--pretty=format:', 'HEAD'])
+        .split('\n')
+        .filter(Boolean)
+        .sort();
+      assert.deepStrictEqual(committed, [CI_WORKFLOW_RELATIVE_PATH, 'pubspec.yaml'].sort());
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  it('leaves work the user had already staged out of the commit', () => {
+    const repo = makeRepo();
+    try {
+      writeWorkflow(repo.root);
+      // Already in the index, not merely dirty. A bare `git commit -m` would
+      // sweep this into the CI commit and push it — the pathspec is what
+      // stops that, and this is the case that proves it.
+      fs.writeFileSync(path.join(repo.root, 'README.md'), '# staged by the user\n');
+      git(repo.root, ['add', 'README.md']);
+
+      const plan = buildCiPublishPlan(repo.root, 'enable');
+      assert.strictEqual(runCiPublish(repo.root, plan).ok, true);
+
+      const committed = git(repo.root, ['show', '--name-only', '--pretty=format:', 'HEAD'])
+        .split('\n')
+        .filter(Boolean);
+      assert.deepStrictEqual(committed, [CI_WORKFLOW_RELATIVE_PATH]);
+      // Still staged, exactly as the user left it.
+      assert.ok(git(repo.root, ['diff', '--cached', '--name-only']).includes('README.md'));
     } finally {
       repo.cleanup();
     }
@@ -357,7 +432,7 @@ describe('ciPublish — the panel section', () => {
     direction: 'enable' as const,
     branch: 'saropa-lints-ci',
     baseBranch: 'main',
-    relativePath: CI_WORKFLOW_RELATIVE_PATH,
+    paths: [CI_WORKFLOW_RELATIVE_PATH],
     commitMessage: 'ci: run saropa_lints on pull requests',
     prTitle: 'Run saropa_lints on pull requests',
     prBody: 'body',

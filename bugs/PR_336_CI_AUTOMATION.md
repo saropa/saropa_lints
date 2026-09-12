@@ -140,6 +140,15 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 
 ## Verification status
 
+**Found in code review, fixed:**
+
+- **`git commit -m` committed the whole index.** The module guarantees only the workflow file is ever committed, and the test for it covered an *unstaged* dirty tree — which passes either way. Anything the user had already `git add`ed was swept into the CI commit and pushed. Both the runner and the displayed command now carry a `-- <paths>` pathspec, and the test now stages a file first: it fails without the fix.
+- **The pubspec edit was not published.** Turning CI on adds `saropa_lints` to `pubspec.yaml` when the project does not depend on it, but the plan staged the workflow alone, so the generated pull request failed its first run with "saropa_lints is not a resolved dependency" — the one outcome this step exists to prevent. The plan now carries a list of paths and the host passes `pubspec.yaml` when that edit was made.
+- **`--since` that does not resolve audited nothing.** The action warned "expect a full scan" and continued. `gitChangedDartFiles` returns an empty list for an unknown revision, so the audit scanned zero files and exited 0: a green check over nothing, which is the exact failure the action's exit contract exists to rule out. It is now a hard error naming the remedy.
+- **`--emit-ci` never wrote a tier.** The extension card writes `tier: recommended` for a project with no rule configuration, because `scan` exits 2 without one. The CLI did not, so an unconfigured project's first CI run errored — and the two generators were not producing the identical file they are documented to produce. `ciNeedsExplicitTier` now mirrors the extension's check.
+- **`CiWorkflowOptions.mode` was ignored.** Declared, documented, and hardcoded to `gate` in the template. A caller asking for `annotate` silently got the opposite.
+- **The self-test compared two different rule sets.** Its mode contract asserted `annotate` (→ `audit`, every rule) against `gate` (→ `auto` → `scan`, configured rules only), so it could go red on a difference that is not a bug. The gate step now pins `command: audit`; the `auto` → `scan` resolution is still covered by the scan step below it.
+
 **Ran, passed:**
 
 - **The publish step's git behavior, against real repositories.** 25 tests in `extension/src/test/systemHealth/ciPublish.test.ts`, each against a real working repo with a real bare remote rather than a mocked git — the whole value of the module is what git does with the arguments it is handed, and a mock would only assert my assumptions back at me. Covered: every origin URL shape including the lookalike hosts that must *not* match; a default branch that is neither `main` nor `master`; branch names that never collide with an existing local or remote branch; `buildCiPublishPlan` performing nothing; the commit containing the workflow file and nothing else with an unrelated edit and an untracked file both surviving untouched; the failure path naming the exact step for a missing file and for an unreachable remote, with the local commit intact after a failed push; and two publishes producing two branches. Plus the panel section: nothing rendered with no pending change, every command present, the copy attribute escaped so a quote mark cannot truncate it, and the pull request button hidden — but the commands and the dismiss kept — when the remote is not GitHub.
@@ -163,6 +172,7 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 - **The generated workflows executing on a runner** — for `--emit-ci`, for the card, or for the vibrancy generator's three platforms. Their content is verified; their behavior in GitHub Actions and GitLab CI is not.
 - **The major tag move.** The code path runs only during a release, and the 16.3.0 release has not been cut yet.
 - **The publish step end to end in a live extension host.** The git layer beneath it is covered against real repositories, but the button that triggers it, the progress notification, the clipboard write, and the GitHub sign-in have only been typechecked. Items 5 through 8 of the test list exist to close that.
+- **The Dart changes.** No Dart SDK is available in this environment, so `ciNeedsExplicitTier`, the `tier:` emission, and the four tests added for them in `test/init/init_emit_ci_test.dart` have not been executed locally. CI runs them.
 - **Pull request creation against the GitHub API.** No call has been made. The request shape follows the documented endpoint, and every failure mode falls back to the compare page, but neither the success path nor the fallback has been observed.
 
 **Known follow-ups, not addressed here:**
