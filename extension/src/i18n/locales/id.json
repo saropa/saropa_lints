@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "Jalankan analisis analisa.",
       "runAnalysisDescription": "Jalankan ulang analisator",
       "updateConfigLabel": "Perbarui konfigurasi",
-      "updateConfigDescription": "Inisialisasi atau perbarui opsi analisis",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "Inisialisasi atau perbarui opsi analisis"
     },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% diulas",

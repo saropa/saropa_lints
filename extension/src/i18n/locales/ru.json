@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "Запустите анализ, выполните анализы.",
       "runAnalysisDescription": "Повторно запустить анализатор",
       "updateConfigLabel": "Обновить конфиг",
-      "updateConfigDescription": "Инициализировать или обновить параметры анализа",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "Инициализировать или обновить параметры анализа"
     },
     "status": {
       "hotspotsLabel": "Горячие точки · {percent}% проверено",

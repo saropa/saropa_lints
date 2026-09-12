@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "רץ ניתוח ריצה",
       "runAnalysisDescription": "הפעלה מחדש של המפענח",
       "updateConfigLabel": "עדכון קובץ Yapılandırma",
-      "updateConfigDescription": "הפעלה או עדכון אפשרויות ניתוח",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "הפעלה או עדכון אפשרויות ניתוח"
     },
     "status": {
       "hotspotsLabel": "הסיבובים · {percent}% בדיקו",

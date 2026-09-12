@@ -637,18 +637,7 @@ function buildActionItems(): LeafItem[] {
     // "Pick UI language" is intentionally NOT here — it's a select on the
     // Rules & Tiers Extension tab, not a run action.
     //
-    // Four rows (PLAN_ext_ui_sidebar_reset.md §3 ACTIONS target was 3; "Set
-    // up CI" is the addition). It belongs here and not in STATUS: §2's rule
-    // is that a status row never changes anything, which is why the old
-    // "Lint integration: On/Off" row was removed. This row RUNS setup and
-    // leaves a visible outcome — a new workflow file in the diff and a toast
-    // naming it — which is exactly this section's job.
-    //
-    // It is also the only sidebar surface for the feature. The System Health
-    // card carries the same action, but that panel opens from the command
-    // palette, so on its own the feature was reachable only by users who
-    // already knew it existed.
-    //
+    // Exactly 3 rows now (PLAN_ext_ui_sidebar_reset.md §3 ACTIONS target):
     // every row here RUNS something now, with a visible outcome (progress,
     // toast, diff) — the section's one job per §2's table. Two rows that
     // used to live here moved out because they don't run anything:
@@ -691,13 +680,6 @@ function buildActionItems(): LeafItem[] {
             l10n('sidebar.actions.updateConfigDescription'),
             'saropaLints.initializeConfig',
             'gear',
-        ),
-        new LeafItem(
-            l10n('sidebar.actions.setUpCiLabel'),
-            l10n('sidebar.actions.setUpCiDescription'),
-            'saropaLints.setUpCi',
-            'github',
-            new vscode.ThemeColor('charts.blue'),
         ),
         // `Open analysis_options_custom.yaml` was intentionally REMOVED from the
         // sidebar. The generated file carries a "DO NOT EDIT MANUALLY — use the

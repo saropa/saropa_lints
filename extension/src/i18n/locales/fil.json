@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "Magpatakbo ng pagsusuri sa run analysis.",
       "runAnalysisDescription": "Ibalik ang analisys",
       "updateConfigLabel": "Ibahin ang config",
-      "updateConfigDescription": "Iinitialize o refresh analysis options",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "Iinitialize o refresh analysis options"
     },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% na inreview",

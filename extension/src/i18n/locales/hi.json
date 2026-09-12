@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "विश्लेषण चलाएं।",
       "runAnalysisDescription": "पुनः एनालाइजर चलाएँ",
       "updateConfigLabel": "अपडेट कॉन्फिग",
-      "updateConfigDescription": "अनालिसिस विकल्पों को शुरू करें या ताज़ा करें",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "अनालिसिस विकल्पों को शुरू करें या ताज़ा करें"
     },
     "status": {
       "hotspotsLabel": "हॉटस्पॉट्स · {percent}% रीव्यू किया",

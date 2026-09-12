@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "วิ่งวิเคราะห์ Run Analysis การวัด",
       "runAnalysisDescription": "วิเคราะห์ซ้ำ",
       "updateConfigLabel": "อัปเดตคอนฟิก",
-      "updateConfigDescription": "กำหนดค่าหรืออัปเดตตัวเลือกการวิเคราะห์",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "กำหนดค่าหรืออัปเดตตัวเลือกการวิเคราะห์"
     },
     "status": {
       "hotspotsLabel": "จุดร้อน · {percent}% รีวิวแล้ว",

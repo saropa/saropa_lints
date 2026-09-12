@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "تجزيي هلائو",
       "runAnalysisDescription": "ڈیٹا اینالائیزr دوبارہ کریں",
       "updateConfigLabel": "کانفیگ اپڈیٹ کریں",
-      "updateConfigDescription": "تحلیل اختیاریں معاوضہ یا تازہ کریں",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "تحلیل اختیاریں معاوضہ یا تازہ کریں"
     },
     "status": {
       "hotspotsLabel": "ہوٹ ہوٹس · {percent}% ریویو کیا گیا",

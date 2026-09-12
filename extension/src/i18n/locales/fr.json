@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "Executer l'analyse",
       "runAnalysisDescription": "Re-lancer l'analyseur",
       "updateConfigLabel": "Mettre à jour la configuration",
-      "updateConfigDescription": "Initialiser ou actualiser les options d'analyse",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "Initialiser ou actualiser les options d'analyse"
     },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% revu",

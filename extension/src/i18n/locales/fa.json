@@ -2791,9 +2791,7 @@
       "runAnalysisLabel": "تحلیل را اجرا کنید.",
       "runAnalysisDescription": "تحلیل کننده را مجدد اجرا کنید",
       "updateConfigLabel": "کنfig را به‌روزرسانی کنید",
-      "updateConfigDescription": "انتخاب یا به‌روزرسانی گزینه‌های تحلیل",
-      "setUpCiLabel": "Set up CI",
-      "setUpCiDescription": "Run saropa_lints on every pull request"
+      "updateConfigDescription": "انتخاب یا به‌روزرسانی گزینه‌های تحلیل"
     },
     "status": {
       "hotspotsLabel": "گرمایشگر · {percent}% بررسی شده",
