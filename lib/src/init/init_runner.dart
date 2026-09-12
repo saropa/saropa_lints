@@ -14,6 +14,7 @@ import 'package:saropa_lints/src/init/config_reader.dart';
 import 'package:saropa_lints/src/init/config_writer.dart';
 import 'package:saropa_lints/src/init/custom_overrides_core.dart';
 import 'package:saropa_lints/src/init/display.dart';
+import 'package:saropa_lints/src/init/emit_ci_workflow.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/init/init_post_write.dart';
 import 'package:saropa_lints/src/init/migration.dart';
@@ -152,6 +153,44 @@ Future<void> runInit(List<String> args) async {
     print(
       'See doc/guides/composite_analyzer_plugin.md for analysis_options.yaml wiring.',
     );
+
+    return;
+  }
+
+  if (cliArgs.emitCi != null) {
+    final String raw = cliArgs.emitCi!;
+    final String outPath = p.isAbsolute(raw)
+        ? p.normalize(raw)
+        : p.normalize(p.join(targetDir, raw));
+    final File outFile = File(outPath);
+    final EmitCiResult result = emitCiWorkflow(
+      outFile,
+      dryRun: cliArgs.isDryRun,
+      // Read for its analysis_options.yaml: a project with no saropa_lints
+      // rule configuration needs an explicit tier, or the generated `scan`
+      // exits 2 the first time CI runs.
+      projectDir: Directory(targetDir),
+    );
+
+    switch (result) {
+      case EmitCiResult.written:
+        // ignore: avoid_print
+        print('Wrote GitHub Actions workflow to: $outPath');
+        break;
+      case EmitCiResult.wouldWrite:
+        // ignore: avoid_print
+        print('[dry-run] Would write GitHub Actions workflow to: $outPath');
+        break;
+      case EmitCiResult.refusedExists:
+        // Never overwrite: a workflow a human has since hand-edited must not
+        // be silently clobbered just because it started as a generated file.
+        stderr.writeln(
+          'Refusing to overwrite existing file: $outPath\n'
+          'Remove it first, or point --emit-ci at a different path.',
+        );
+        exitCode = 1;
+        break;
+    }
 
     return;
   }

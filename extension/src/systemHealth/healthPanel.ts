@@ -6,6 +6,7 @@ import type { HealthPanelData } from './healthPanel-html';
 import { scanOrphanedHosts, type OrphanHostScan } from './orphanHosts';
 import { CHECK_ORPHANS_COMMAND } from './orphanPreflight';
 import type { EngineStatus, EngineStatusDeps } from './engineCardsHtml';
+import type { CiPublishPlan } from './ciPublish';
 
 /** Maximum number of engine-log entries retained in the scrollback buffer. */
 const MAX_LOG_ENTRIES = 100;
@@ -18,10 +19,13 @@ const MAX_LOG_ENTRIES = 100;
 type HealthPanelMessage =
   | { type: 'refresh' }
   | { type: 'killProcess'; pid: number }
-  | { type: 'toggle'; engine: 'analyzer' | 'scanDaemon' | 'lspServer'; enabled: boolean }
+  | { type: 'toggle'; engine: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci'; enabled: boolean }
   | { type: 'killAll' }
   | { type: 'restartAll' }
-  | { type: 'reclaimOrphans' };
+  | { type: 'reclaimOrphans' }
+  | { type: 'ciCopyCommands'; commands: string }
+  | { type: 'ciPublish' }
+  | { type: 'ciPublishDismiss' };
 
 // Singleton webview panel: only one System Health view makes sense at a
 // time, so re-invoking the command reveals + refreshes the existing panel
@@ -37,10 +41,11 @@ export class HealthPanel implements vscode.Disposable {
   private static engineDeps: EngineStatusDeps | undefined;
   private static readonly logEntries: string[] = [];
   private static readonly _onToggle = new vscode.EventEmitter<{
-    engine: 'analyzer' | 'scanDaemon' | 'lspServer';
+    engine: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci';
     enabled: boolean;
   }>();
   private static readonly _onKillAll = new vscode.EventEmitter<void>();
+  private static readonly _onCiPublish = new vscode.EventEmitter<CiPublishPlan>();
   private static readonly _onRestartAll = new vscode.EventEmitter<void>();
 
   /** Subscribe to engine toggle requests from the panel UI. */
@@ -49,6 +54,34 @@ export class HealthPanel implements vscode.Disposable {
   static readonly onKillAll = HealthPanel._onKillAll.event;
   /** Subscribe to restart-all requests from the panel UI. */
   static readonly onRestartAll = HealthPanel._onRestartAll.event;
+  /**
+   * Subscribe to the user accepting the publish step. Carries the plan that
+   * was on screen when they pressed the button, so the host commits the
+   * change they were actually shown rather than re-deriving one that may have
+   * picked a different branch name in the meantime.
+   */
+  static readonly onCiPublish = HealthPanel._onCiPublish.event;
+
+  /**
+   * The CI change waiting to be published, if any.
+   *
+   * Static, like the engine deps: the toggle can be flipped from the sidebar
+   * while the panel is closed, and the pending change must still be there when
+   * it opens. Cleared by dismissing it, by publishing it, or by toggling in
+   * the opposite direction (which supersedes it).
+   */
+  private static pendingCiPublish: CiPublishPlan | undefined;
+
+  /**
+   * Record (or clear, with undefined) the pending CI change and redraw.
+   *
+   * Never performs git itself — see `ciPublish.ts` for why the separation
+   * matters.
+   */
+  static setPendingCiPublish(plan: CiPublishPlan | undefined): void {
+    HealthPanel.pendingCiPublish = plan;
+    void HealthPanel.instance?.refresh();
+  }
 
   private readonly panel: vscode.WebviewPanel;
   private readonly disposables: vscode.Disposable[] = [];
@@ -137,16 +170,21 @@ export class HealthPanel implements vscode.Disposable {
    * the two surfaces can never disagree.
    */
   static getEngineStatuses(): EngineStatus[] | undefined {
-    // saropaLints.debug.enabled now gates the Engines section within this
-    // panel (it used to gate the standalone Debug Panel sidebar webview's
-    // existence entirely).
-    const showEngines = vscode.workspace.getConfiguration('saropaLints.debug').get<boolean>('enabled', true);
+    // No longer gated on saropaLints.debug.enabled. These are not debug
+    // internals: they are the controls for whether analysis runs at all, and
+    // one of them is the off switch for the project's CI. A kill switch behind
+    // a setting the user has to know to enable is not a kill switch.
+    //
+    // The only remaining reason to return undefined is that the engine deps
+    // have not been wired yet (early in activate), which is a timing fact
+    // rather than a preference.
     const deps = HealthPanel.engineDeps;
-    if (!showEngines || !deps) return undefined;
+    if (!deps) return undefined;
     return [
       deps.getAnalyzerPluginStatus(),
       deps.getScanDaemonStatus(),
       deps.getLspServerStatus(),
+      deps.getCiStatus(),
     ];
   }
 
@@ -165,6 +203,7 @@ export class HealthPanel implements vscode.Disposable {
       engines: this.collectEngines(),
       logEntries: HealthPanel.logEntries,
       orphanHosts,
+      ciPublish: HealthPanel.pendingCiPublish,
     });
   }
 
@@ -218,6 +257,25 @@ export class HealthPanel implements vscode.Disposable {
         break;
       case 'restartAll':
         HealthPanel._onRestartAll.fire();
+        break;
+      case 'ciCopyCommands':
+        void vscode.env.clipboard.writeText(msg.commands).then(() => {
+          void vscode.window.showInformationMessage(l10n('debug.ci.publish.copied'));
+        });
+        break;
+      case 'ciPublish': {
+        // Read before firing: the handler clears the pending plan, and an
+        // event carrying undefined would be a silent no-op the user reads as
+        // a dead button.
+        const plan = HealthPanel.pendingCiPublish;
+        if (plan) HealthPanel._onCiPublish.fire(plan);
+        break;
+      }
+      case 'ciPublishDismiss':
+        // The file on disk is deliberately left as it is. Dismissing means
+        // "I will deal with this myself", not "undo the edit" — reverting
+        // someone's working tree from a Not now button would be its own bug.
+        HealthPanel.setPendingCiPublish(undefined);
         break;
       case 'reclaimOrphans':
         // Delegated to the command so the confirmation modal and the kill

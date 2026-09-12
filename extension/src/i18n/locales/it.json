@@ -2202,18 +2202,22 @@
         "stopped": "fermato",
         "suspended": "sospeso",
         "starting": "iniziando",
-        "scanning": "scansionando"
+        "scanning": "scansionando",
+        "notConfigured": "non configurato"
       },
       "rssNote": {
         "inProcess": "in-process, non misurabile separatamente",
-        "notRunning": "non in esecuzione"
+        "notRunning": "non in esecuzione",
+        "remote": "viene eseguito sui runner ospitati da GitHub — non misurabile da qui"
       },
       "description": {
         "analyzerPlugin": "Esegue all'interno del server di analisi Dart — squigglie in tempo reale nell'editor mentre si digita, senza necessità di scansione. L'attivazione riscrive i plugin: blocco in analysis_options.yaml.",
         "scanDaemon": "Processo di background che riscansiona l'intero progetto su salvataggio e scrive report/.saropa_lints/violations.json. Disattivare sospende il processo; il salvataggio successivo lo riprende.",
-        "lspServer": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Server linguistico separato — pubblica diagnostiche nel pannello Problemi per i file aperti e del workspace. L'attivazione modifica l'impostazione saropaLints.lspServer.enabled."
+        "lspServer": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Server linguistico separato — pubblica diagnostiche nel pannello Problemi per i file aperti e del workspace. L'attivazione modifica l'impostazione saropaLints.lspServer.enabled.",
+        "ci": "Legge e scrive .github/workflows/saropa-lints.yml nel tuo working tree per abilitare o disabilitare il workflow di GitHub Actions incluso. Questo riflette il file sul tuo branch corrente — è la copia sul branch predefinito a controllare realmente le pull request, e le due possono divergere. L'attivazione non esegue né elimina mai il workflow; devi comunque rivedere e committare tu stesso la modifica."
       },
-      "scanProgress": "Scansiona: {done}/{total} file"
+      "scanProgress": "Scansiona: {done}/{total} file",
+      "ci": "CI di GitHub Actions"
     },
     "toggle": {
       "on": "SU",
@@ -2236,10 +2240,18 @@
       "analyzerToggleOn": "Plugin Analizzatore: abilitazione…",
       "analyzerToggleOff": "Plugin Analizzatore: disattivazione…",
       "daemonToggleOn": "Scansiona Daemon: ripresa…",
-      "daemonToggleOff": "Scansiona Daemon: sospeso…"
+      "daemonToggleOff": "Scansiona Daemon: sospeso…",
+      "ciToggleOn": "CI: attivazione…",
+      "ciToggleOff": "CI: disattivazione…"
     },
     "sidebar": {
       "enginesLabel": "Motori: {count} in esecuzione"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}."
     }
   },
   "detailView": {

@@ -40,6 +40,7 @@ dart run saropa_lints:init --tier recommended --target /path/to/project
 | `--list-packs` | Print applicable rule packs and exit (no YAML write). |
 | `--enable-pack <id>` | Enable a rule pack (repeatable). IDs must match packs applicable to the project's pubspec. |
 | `--emit-composite-plugin-scaffold [dir]` | Generate a composite analyzer plugin scaffold for projects that run saropa_lints alongside other plugins. |
+| `--emit-ci [path]` | Write a GitHub Actions workflow that runs saropa_lints on pull requests. Default: `.github/workflows/saropa-lints.yml`. The action is pinned to the exact saropa_lints version doing the generating, so the tag is always one that contains `action.yml`. The moving `@v16` tag also works and tracks the latest 16.x. Carries a `# managed-by: saropa_lints` provenance marker, and refuses to overwrite an existing file so hand edits are never lost. |
 
 ---
 
@@ -317,7 +318,75 @@ dart run saropa_lints audit . --since main --format sarif --output results.sarif
 
 ### GitHub Actions CI with SARIF
 
-Use `--format sarif` with `github/codeql-action/upload-sarif` to get inline PR annotations from saropa_lints findings. This workflow audits only the files changed in a PR and uploads the results to GitHub's code-scanning dashboard.
+The quickest route is the bundled composite action, which wraps SDK setup, `pub get`, the audit, and the SARIF upload:
+
+```yaml
+# .github/workflows/saropa-lints.yml
+name: saropa_lints
+
+on:
+  pull_request:
+    paths: ['**.dart']
+
+permissions:
+  security-events: write   # required for the SARIF upload
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: saropa/saropa_lints@v16   # tracks the latest 16.x
+        with:
+          since: origin/${{ github.base_ref }}   # changed files only
+          mode: annotate                        # annotate | gate | both
+```
+
+`mode` decides what a finding does:
+
+| Mode | SARIF upload | Job fails on findings |
+|------|--------------|-----------------------|
+| `annotate` (default) | yes | no |
+| `gate` | no | yes |
+| `both` | yes | yes |
+
+An audit that *could not run* (exit 2 — bad arguments, missing `pub get`, not a Dart project) fails the job in every mode, including `annotate`. A green job always means the audit actually ran.
+
+Use `mode: gate` on private repositories without GitHub Advanced Security, where code-scanning upload is unavailable — it enforces via exit code and uploads nothing.
+
+#### Controlling which rules run
+
+`mode` decides what happens to a finding; `command` decides which rules produce one.
+
+| `command` | Rules run | SARIF |
+|-----------|-----------|-------|
+| `audit` | **Every rule**, regardless of the project's configured tier | yes |
+| `scan` | Only what `analysis_options.yaml` (or `tier`) enables | no |
+| `auto` (default) | `gate` → `scan`; `annotate`/`both` → `audit` | follows the above |
+
+This matters: `audit` deliberately bypasses the tier cap, so a project on `essential` still sees pedantic-tier findings. `min-severity` and `min-impact` filter what is *reported*, not what runs. To have CI honor your configured rule set, use `command: scan` — which means `mode: gate`, since only `audit` can emit SARIF.
+
+`scan` adds graduated failure, the usual need during incremental adoption:
+
+```yaml
+- uses: saropa/saropa_lints@v16
+  with:
+    mode: gate
+    tier: professional      # run professional-tier rules
+    fail-on-tier: essential # but only fail on essential-tier findings
+    fail-on-count: '5'      # and tolerate a known baseline of 5
+```
+
+Scan-only inputs: `tier`, `resolve`, `max-severity`, `fail-on`, `fail-on-impact`, `fail-on-count`, `fail-on-impact-count`, `fail-on-tier`. Audit-only: `since`, `baseline`. Passing one to the wrong command is an error, not a silent no-op — a `tier` quietly ignored would leave you believing CI honors it while every rule runs.
+
+Other inputs: `working-directory`, `min-severity`, `min-impact`, `exclude-globs`, `include-globs`, `sarif-file`, `upload-sarif`, `install-sdk`, `sdk-version`, `pub-get`. Outputs: `exit-code`, `findings`, `sarif-file`.
+
+For Flutter projects, set up `subosito/flutter-action@v2` before this step and leave `install-sdk` at its default `auto` — it detects the SDK already on PATH and skips installing a second one.
+
+#### Doing it by hand
+
+Use `--format sarif` with `github/codeql-action/upload-sarif` directly if you would rather own the YAML. This workflow audits only the files changed in a PR and uploads the results to GitHub's code-scanning dashboard.
 
 ```yaml
 # .github/workflows/saropa-audit.yml

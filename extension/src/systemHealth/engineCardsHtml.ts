@@ -9,8 +9,8 @@ import { formatBytes } from './processQuery';
  */
 export interface EngineStatus {
   /** Stable machine key for toggle messages and data-attributes.
-   *  Must match the message union: 'analyzer' | 'scanDaemon' | 'lspServer'. */
-  key: 'analyzer' | 'scanDaemon' | 'lspServer';
+   *  Must match the message union: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci'. */
+  key: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci';
   /** Display name shown in the panel header row — must come from l10n(). */
   name: string;
   /** Whether the user has toggled this engine on. */
@@ -39,6 +39,12 @@ export interface EngineStatusDeps {
   getAnalyzerPluginStatus: () => EngineStatus;
   getScanDaemonStatus: () => EngineStatus;
   getLspServerStatus: () => EngineStatus;
+  /**
+   * WP3: the CI card is derived from `.github/workflows/saropa-lints.yml`
+   * on disk, not a live process — see extension.ts's `getCiStatus` and
+   * `src/systemHealth/ciWorkflow.ts` for the on-disk state machine.
+   */
+  getCiStatus: () => EngineStatus;
 }
 
 // ────────────────────────────────────────────────────────────────

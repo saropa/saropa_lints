@@ -2202,18 +2202,22 @@
         "stopped": "arrêté",
         "suspended": "suspendu",
         "starting": "début",
-        "scanning": "scannage"
+        "scanning": "scannage",
+        "notConfigured": "non configuré"
       },
       "rssNote": {
         "inProcess": "en cours de processus, non mesurable séparément",
-        "notRunning": "pas en cours d'exécution"
+        "notRunning": "pas en cours d'exécution",
+        "remote": "s'exécute sur les runners hébergés par GitHub — non mesurable depuis ici"
       },
       "description": {
         "analyzerPlugin": "Exécute à l'intérieur du serveur d'analyse Dart — des squiggles en temps réel dans l'éditeur pendant que vous tapez, pas besoin de scan. L'activation/désactivation reformate les plugins : bloc dans analysis_options.yaml.",
         "scanDaemon": "Processus en arrière-plan qui rescane l'ensemble du projet lors de la sauvegarde et écrit les rapports/.saropa_lints/violations.json. Désactiver le suspend son exécution ; la prochaine sauvegarde le reprend.",
-        "lspServer": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite."
+        "lspServer": "Règles strictes :\n1. Retournez UNIQUEMENT la sortie traduite.",
+        "ci": "Lit et écrit .github/workflows/saropa-lints.yml dans votre arborescence de travail pour activer ou désactiver le workflow GitHub Actions fourni. Cela reflète le fichier de votre branche actuelle — c'est la copie de la branche par défaut qui contrôle réellement les pull requests, et les deux peuvent diverger. Le basculement n'exécute ni ne supprime jamais le workflow ; vous devez toujours vérifier et valider vous-même la modification."
       },
-      "scanProgress": "Analyse : {done}/{total} fichiers"
+      "scanProgress": "Analyse : {done}/{total} fichiers",
+      "ci": "CI GitHub Actions"
     },
     "toggle": {
       "on": "ACTIVÉ",
@@ -2236,10 +2240,18 @@
       "analyzerToggleOn": "Analyseur de plug-in : activation…",
       "analyzerToggleOff": "Analyseur de plug-in : désactivation…",
       "daemonToggleOn": "Analyse Daemon : reprise…",
-      "daemonToggleOff": "Analyse Daemon : en pause…"
+      "daemonToggleOff": "Analyse Daemon : en pause…",
+      "ciToggleOn": "CI : activation…",
+      "ciToggleOff": "CI : désactivation…"
     },
     "sidebar": {
       "enginesLabel": "Engins : {count} en cours d'exécution"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}."
     }
   },
   "detailView": {

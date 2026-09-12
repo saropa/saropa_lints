@@ -100,7 +100,9 @@ interface PubspecEnsureResult {
   changed: boolean;
 }
 
-function ensureSaropaLintsInPubspec(workspaceRoot: string): PubspecEnsureResult {
+export function ensureSaropaLintsInPubspec(
+  workspaceRoot: string,
+): PubspecEnsureResult {
   const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
   if (!fs.existsSync(pubspecPath)) {
     void vscode.window.showErrorMessage(

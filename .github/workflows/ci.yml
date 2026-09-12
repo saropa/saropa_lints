@@ -170,6 +170,91 @@ jobs:
       - name: Python script tests (tier integrity)
         run: python -m unittest discover -s scripts/modules/tests -t . -v
 
+  # This repo's own 2332 rules have never run against its own pull requests.
+  # The committed analysis_options.yaml carries no `include:` of a tier and no
+  # `plugins:` section at all (the analyze job's "Strip self-plugin reference"
+  # step is a no-op against the current file — it deletes lines that are not
+  # there), so `dart analyze` here only ever applies stock Dart rules. This
+  # job closes that gap, running the checkout through the repo's own composite
+  # action and dogfooding the exact code under review.
+  #
+  # `tier` is REQUIRED, not cosmetic: scan reads the project's per-rule config
+  # from analysis_options.yaml and exits 2 when it finds none, which is exactly
+  # what happens here. Passing a tier makes scan use that rule set directly
+  # (scan_runner.dart:431 returns the tier rules before ever reading config).
+  # `recommended` is the tier the README points consumers at, so self-linting
+  # at the same level is the honest comparison.
+  #
+  # This job CANNOT fail, by construction: `continue-on-error` on the step
+  # itself (not just the job) means the action's exit code never fails the
+  # job, whatever it finds. That is deliberate and it is not the vibrancy
+  # generator's mistake repeated — that workflow claimed to gate and silently
+  # did not. This one states plainly that it reports and never gates, and the
+  # full findings are in the log for anyone who opens it.
+  #
+  # Why it cannot gate yet: at `recommended` this repo reports 282 findings
+  # (155 error, 127 warning) against its own code. That is a backlog, not a
+  # regression, and turning it into a required check would mean either a red X
+  # on every pull request or a rushed sweep of 155 errors. `baseline` is the
+  # designed answer when the team wants to gate on new findings only.
+  #
+  # test/ and the example trees are excluded because they are rule FIXTURES:
+  # files that deliberately violate the rules they test. Counting
+  # avoid_hardcoded_credentials against the fixture written to trigger
+  # avoid_hardcoded_credentials makes the number meaningless.
+  #
+  # Scoping choices, since auditing every rule against the whole repo on
+  # every PR could be slow:
+  # `mode: gate` resolves to the `scan` command, which is what makes this
+  # dogfooding rather than theatre:
+  #   - scan honors this repo's own analysis_options.yaml, so the job runs
+  #     the rule set the project actually configures — the thing the analyze
+  #     job strips away.
+  #   - scan writes a human-readable report to stdout, so findings are
+  #     visible in the job log.
+  # `mode: annotate` would be wrong here despite the name: it writes SARIF to
+  # a file and passes --quiet, so with upload-sarif off the findings would go
+  # nowhere at all and this job would prove only that the action does not
+  # crash — which action-selftest already proves.
+  #
+  # `since` is deliberately absent: it is an audit-only flag (scan has no
+  # --since), and passing it here would be rejected by the action's input
+  # validation. scan's default fast syntactic parse makes a whole-repo run
+  # affordable without it.
+  #
+  # Non-blocking by `continue-on-error: true` alone, since gate mode DOES
+  # fail on findings by design. That is intentional: the job reports, the
+  # job never blocks.
+  #
+  # To turn these findings into inline PR annotations instead of log output,
+  # set mode: annotate with upload-sarif: true and add
+  # `permissions: security-events: write` to this job. That posts results to
+  # the repo's code-scanning dashboard, which is a deliberate choice about
+  # this repository's Security tab rather than a default worth assuming.
+  self-lint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    # Skip the redundant main-push run on release commits; see the analyze job.
+    if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Same ref/token as the other jobs so this audits identical code.
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10.8'
+      - name: Run saropa_lints on itself
+        # On the step, so a finding can never fail the job. See above.
+        continue-on-error: true
+        uses: ./
+        with:
+          mode: gate
+          tier: recommended
+          min-severity: warning
+          exclude-globs: '**/test/**,**/example/**,**/example_packages/**'
+
   extension-manifest-nls:
     runs-on: ubuntu-latest
     # Skip the redundant main-push run on release commits; see the analyze job.

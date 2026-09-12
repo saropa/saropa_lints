@@ -76,9 +76,41 @@ describe('ci-generator', () => {
             const result = generateGitHubActions(defaultThresholds);
 
             assert.ok(result.includes('const maxEol = 2'));
-            assert.ok(result.includes('const maxLegacy = 5'));
+            assert.ok(result.includes('const maxOutdated = 5'));
             assert.ok(result.includes('const minAvgVibrancy = 60'));
             assert.ok(result.includes('const failOnVuln = true'));
+        });
+
+        it('should actually execute the Dart checker instead of piping it into a non-reading stdin', () => {
+            const result = generateGitHubActions(defaultThresholds);
+
+            // `dart run` does not read a program from stdin, so a heredoc
+            // piped straight into it is not a valid invocation.
+            assert.ok(!result.includes("dart run <<'DART_SCRIPT'"));
+            assert.ok(!/dart run\s*<</.test(result));
+
+            // The Dart source must be written to a real file and that file
+            // must actually be run.
+            assert.ok(/cat > \S*\.dart <<'DART_SCRIPT'/.test(result));
+            assert.ok(/dart run \S*\.dart/.test(result));
+        });
+
+        it('should compare parsed counts against thresholds and exit non-zero on breach', () => {
+            const result = generateGitHubActions(defaultThresholds);
+
+            // A real comparison against a threshold, not just a print().
+            assert.ok(result.includes('if (outdatedCount > maxOutdated)'));
+            // A non-zero exit path so the CI job actually fails.
+            assert.ok(result.includes('exit(failed ? 1 : 0)'));
+            assert.ok(result.includes('failed = true'));
+        });
+
+        it('should not fabricate a vulnerability data source', () => {
+            const result = generateGitHubActions(defaultThresholds);
+
+            // failOnVulnerability has no data source from `pub outdated`; the
+            // generated script must say so rather than pretending to check it.
+            assert.ok(result.includes('no vulnerability data'));
         });
 
         it('should handle zero thresholds', () => {
@@ -143,9 +175,32 @@ describe('ci-generator', () => {
         it('should include threshold values', () => {
             const result = generateGitLabCi(defaultThresholds);
 
-            assert.ok(result.includes('Max EOL: 2'));
-            assert.ok(result.includes('Max Legacy: 5'));
-            assert.ok(result.includes('Min Avg Vibrancy: 60'));
+            assert.ok(result.includes('const maxEol = 2'));
+            assert.ok(result.includes('const maxOutdated = 5'));
+            assert.ok(result.includes('const minAvgVibrancy = 60'));
+        });
+
+        it('should actually execute the Dart checker instead of piping it into a non-reading stdin', () => {
+            const result = generateGitLabCi(defaultThresholds);
+
+            assert.ok(!result.includes("dart run <<'DART_SCRIPT'"));
+            assert.ok(!/dart run\s*<</.test(result));
+            assert.ok(/cat > \S*\.dart <<'DART_SCRIPT'/.test(result));
+            assert.ok(/dart run \S*\.dart/.test(result));
+        });
+
+        it('should compare parsed counts against thresholds and exit non-zero on breach', () => {
+            const result = generateGitLabCi(defaultThresholds);
+
+            assert.ok(result.includes('if (outdatedCount > maxOutdated)'));
+            assert.ok(result.includes('exit(failed ? 1 : 0)'));
+            assert.ok(result.includes('failed = true'));
+        });
+
+        it('should not fabricate a vulnerability data source', () => {
+            const result = generateGitLabCi(defaultThresholds);
+
+            assert.ok(result.includes('no vulnerability data'));
         });
 
         it('should include artifact configuration', () => {
@@ -168,9 +223,35 @@ describe('ci-generator', () => {
             const result = generateShellScript(defaultThresholds);
 
             assert.ok(result.includes('MAX_EOL=2'));
-            assert.ok(result.includes('MAX_LEGACY=5'));
+            assert.ok(result.includes('MAX_OUTDATED=5'));
             assert.ok(result.includes('MIN_AVG_VIBRANCY=60'));
             assert.ok(result.includes('FAIL_ON_VULN=true'));
+        });
+
+        it('should actually execute the Dart checker instead of piping it into a non-reading stdin', () => {
+            const result = generateShellScript(defaultThresholds);
+
+            assert.ok(!result.includes("dart run <<'DART_SCRIPT'"));
+            assert.ok(!/dart run\s*<</.test(result));
+            assert.ok(/cat > \S*\.dart <<'DART_SCRIPT'/.test(result));
+            assert.ok(/dart run \S*\.dart/.test(result));
+        });
+
+        it('should compare parsed counts against thresholds and exit non-zero on breach', () => {
+            const result = generateShellScript(defaultThresholds);
+
+            assert.ok(result.includes('if (outdatedCount > maxOutdated)'));
+            assert.ok(result.includes('exit(failed ? 1 : 0)'));
+            assert.ok(result.includes('failed = true'));
+            // `set -e` must be present so the script exits with the Dart
+            // checker's non-zero code instead of swallowing it.
+            assert.ok(result.includes('set -e'));
+        });
+
+        it('should not fabricate a vulnerability data source', () => {
+            const result = generateShellScript(defaultThresholds);
+
+            assert.ok(result.includes('no vulnerability data'));
         });
 
         it('should check for Flutter availability', () => {

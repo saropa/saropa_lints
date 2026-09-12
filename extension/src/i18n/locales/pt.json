@@ -2202,18 +2202,22 @@
         "stopped": "parado",
         "suspended": "suspensa",
         "starting": "iniciando",
-        "scanning": "escaneando"
+        "scanning": "escaneando",
+        "notConfigured": "não configurado"
       },
       "rssNote": {
         "inProcess": "em processo, não mensurável separadamente",
-        "notRunning": "não está em execução"
+        "notRunning": "não está em execução",
+        "remote": "é executado nos executores hospedados pelo GitHub — não mensurável a partir daqui"
       },
       "description": {
         "analyzerPlugin": "Executa dentro do servidor de análise Dart — riscos em tempo real no editor enquanto você digita, sem necessidade de varredura. Alternar reescreve os plugins: bloco em analysis_options.yaml.",
         "scanDaemon": "Processo em segundo plano que rescaneia todo o projeto ao salvar e escreve relatórios/.saropa_lints/violations.json. Desativar suspende-o; o próximo salvamento retoma-o.",
-        "lspServer": "Regra estrita: Separar servidor de linguagem — publica diagnósticos para o painel Problems para arquivos abertos e do workspace. Alternar grava a configuração saropaLints.lspServer.enabled."
+        "lspServer": "Regra estrita: Separar servidor de linguagem — publica diagnósticos para o painel Problems para arquivos abertos e do workspace. Alternar grava a configuração saropaLints.lspServer.enabled.",
+        "ci": "Lê e grava .github/workflows/saropa-lints.yml na sua árvore de trabalho para ativar ou desativar o workflow do GitHub Actions incluído. Isso reflete o arquivo do seu branch atual — é a cópia do branch padrão que realmente controla os pull requests, e os dois podem divergir. Alternar nunca executa nem exclui o workflow; você ainda revisa e confirma a alteração você mesmo."
       },
-      "scanProgress": "Varredura: {done}/{total} arquivos"
+      "scanProgress": "Varredura: {done}/{total} arquivos",
+      "ci": "CI do GitHub Actions"
     },
     "toggle": {
       "on": "SOBRE",
@@ -2236,10 +2240,18 @@
       "analyzerToggleOn": "Analizador de Plugin: ativando…",
       "analyzerToggleOff": "Analizador de Plugin: desativando…",
       "daemonToggleOn": "Varredura Daemon: retomando…",
-      "daemonToggleOff": "Varredura Daemon: suspensão..."
+      "daemonToggleOff": "Varredura Daemon: suspensão...",
+      "ciToggleOn": "CI: ativando…",
+      "ciToggleOff": "CI: desativando…"
     },
     "sidebar": {
       "enginesLabel": "Engines: {count} em execução"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}."
     }
   },
   "detailView": {

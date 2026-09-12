@@ -15,24 +15,25 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
-  runEnable,
-  runDisable,
-  runReenablePlugin,
+  TIER_ORDER,
   disablePluginsIntegration,
-  restorePluginsIntegration,
+  ensureSaropaLintsInPubspec,
   getPluginsIntegrationState,
+  getSharedOutputChannel,
+  openConfig,
+  restorePluginsIntegration,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
-  runInitializeConfig,
   runCreateBaseline,
+  runDisable,
   runEmitCompositePluginScaffold,
-  openConfig,
+  runEnable,
+  runInitializeConfig,
+  runReenablePlugin,
   runRepairConfig,
-  runSetTier,
   runSetLane,
+  runSetTier,
   showOutputChannel,
-  getSharedOutputChannel,
-  TIER_ORDER,
 } from './setup';
 import { runMigrateConfig } from './config/migrateConfig';
 import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
@@ -175,6 +176,22 @@ import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './s
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
+import {
+  CI_WORKFLOW_RELATIVE_PATH,
+  disableCiWorkflow,
+  enableCiWorkflow,
+  getCiWorkflowState,
+  needsExplicitTier,
+} from './systemHealth/ciWorkflow';
+import {
+  buildCiPublishPlan,
+  compareUrl,
+  isGitRepository,
+  runCiPublish,
+  type CiPublishDirection,
+  type CiPublishPlan,
+} from './systemHealth/ciPublish';
+import { createPullRequest } from './systemHealth/ciPublishGithub';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
@@ -1865,6 +1882,23 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           : undefined,
       };
     },
+    // CI status — derived entirely from `.github/workflows/saropa-lints.yml`
+    // on disk, never from a live GitHub Actions run (the token in
+    // saropaLints.packageVibrancy.githubToken is optional and usually
+    // empty, so there is no reliable run result to show). "enabled" tracks
+    // whether the file is present and not suspended — never a stand-in for
+    // "the last CI run passed".
+    getCiStatus: (): EngineStatus => {
+      const ciRoot = getProjectRoot();
+      const state = ciRoot ? getCiWorkflowState(ciRoot) : 'absent';
+      return {
+        key: 'ci',
+        name: l10n('debug.engine.ci'),
+        enabled: state === 'active',
+        status: state === 'absent' ? 'notConfigured' : state,
+        rssNote: l10n('debug.engine.rssNote.remote'),
+      };
+    },
   });
   // The sidebar Status section's Engines row (sectionedSidebar.ts) reads
   // HealthPanel.getEngineStatuses(), but the section providers were created
@@ -1936,8 +1970,174 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       } else {
         scanOnSaveController.suspendDaemon();
       }
+    } else if (engine === 'ci') {
+      // Edits .github/workflows/saropa-lints.yml in the workspace's working
+      // tree only — never runs git. ON writes the workflow if it's missing,
+      // or re-enables it if it was suspended; OFF sets `if: false` on the
+      // job rather than deleting the file, so the change is a one-line,
+      // reversible diff and any customisation the team made survives. The
+      // user still reviews and commits this themselves, same as any other
+      // edit to a file that governs the whole team's PRs.
+      HealthPanel.addLogEntry(
+        enabled ? l10n('debug.log.ciToggleOn') : l10n('debug.log.ciToggleOff'),
+      );
+      const ciRoot = getProjectRoot();
+      if (!ciRoot) {
+        vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+        return;
+      }
+      if (enabled) {
+        // Turning CI on is more than writing a file. A workflow that calls
+        // saropa_lints against a project that does not depend on it, or that
+        // runs `scan` where no rule config exists, is a workflow that fails on
+        // its first run. Resolve both here rather than leaving the user to
+        // discover them from a red PR.
+        const added = ensureSaropaLintsInPubspec(ciRoot);
+        if (!added.ok) return; // ensureSaropaLintsInPubspec already explained why
+
+        // `gate` runs the scan command, which honors THIS project's own
+        // analysis_options.yaml. That is the whole point: annotate runs
+        // audit, which bypasses the configured tier and reports every one of
+        // 2332 rules, so a project on `essential` would get its pull requests
+        // papered with findings from rules it never enabled.
+        //
+        // The generated step carries continue-on-error, so it reports without
+        // failing the pull request. Enforcing is a decision a project makes
+        // once it is clean enough, by deleting that line — not a default
+        // imposed on it the first time CI runs.
+        //
+        // A tier is written only when the project has no rule config at all,
+        // which is the one case where scan cannot run. When the project IS
+        // configured, no tier is written and its own choices apply untouched.
+        //
+        // No prompt, and `--emit-ci` generates the identical file: a card that
+        // quietly differed from the CLI would be its own bug.
+        const tier = needsExplicitTier(ciRoot) ? 'recommended' : undefined;
+        enableCiWorkflow(ciRoot, { mode: 'gate', tier });
+
+        // When the dependency was just added, that edit has to travel with the
+        // workflow. A pull request carrying the workflow alone would fail its
+        // very first run with "saropa_lints is not a resolved dependency".
+        presentCiPublishStep(ciRoot, 'enable', added.changed ? ['pubspec.yaml'] : []);
+      } else if (!disableCiWorkflow(ciRoot)) {
+        // The off switch failed: the file is missing, or its shape is one we
+        // will not edit blind. Never let that look like success — CI is still
+        // running and the user believes they stopped it. Say so, and open the
+        // file so they can stop it by hand right now.
+        const openLabel = l10n('debug.ci.openWorkflow');
+        const choice = await vscode.window.showErrorMessage(
+          l10n('debug.ci.disableFailed', { path: CI_WORKFLOW_RELATIVE_PATH }),
+          openLabel,
+        );
+        if (choice === openLabel) {
+          const uri = vscode.Uri.file(
+            path.join(ciRoot, ...CI_WORKFLOW_RELATIVE_PATH.split('/')),
+          );
+          try {
+            await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(uri));
+          } catch {
+            void vscode.window.showErrorMessage(
+              l10n('debug.ci.openWorkflowFailed', { path: CI_WORKFLOW_RELATIVE_PATH }),
+            );
+          }
+        }
+      } else {
+        presentCiPublishStep(ciRoot, 'disable');
+      }
+      HealthPanel.refreshIfOpen();
     }
   });
+
+  // Turning the card on or off only edits the working tree. Publishing that
+  // edit is a separate, explicit act — see ciPublishHtml.ts for why it is a
+  // button in the panel rather than something the toggle does on its own.
+  context.subscriptions.push(HealthPanel.onCiPublish((plan) => void publishCiChange(plan)));
+
+  /**
+   * Shows the publish step for a change just written to the working tree.
+   *
+   * A folder that is not a git repository has nothing to publish to, so it
+   * gets the plain "the file is written, it is yours now" message instead of
+   * a panel section offering commands that could not run.
+   */
+  function presentCiPublishStep(
+    root: string,
+    direction: CiPublishDirection,
+    extraPaths: readonly string[] = [],
+  ): void {
+    if (!isGitRepository(root)) {
+      void vscode.window.showInformationMessage(
+        l10n('debug.ci.publish.notARepository', { path: CI_WORKFLOW_RELATIVE_PATH }),
+      );
+      return;
+    }
+    // Opening the panel is the point: the step is only meaningful if the user
+    // can see it, and the toggle may have come from the sidebar row.
+    HealthPanel.createOrShow(context);
+    HealthPanel.setPendingCiPublish(buildCiPublishPlan(root, direction, extraPaths));
+  }
+
+  /**
+   * Runs an accepted publish plan: branch, commit, push, then open the pull
+   * request.
+   *
+   * Failure is reported at the step that failed and nothing is retried. A push
+   * rejected by a protection rule, a commit blocked by a hook, a branch name
+   * that raced with another clone — each is something only the user can
+   * resolve, and each leaves the commands in the panel still valid for them to
+   * finish by hand.
+   */
+  async function publishCiChange(plan: CiPublishPlan): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+
+    const result = await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: l10n('debug.ci.publish.running') },
+      async () => runCiPublish(root, plan),
+    );
+
+    if (!result.ok) {
+      // The pending plan is deliberately left on screen: its commands are how
+      // the user finishes the job themselves, so clearing it would take away
+      // the remedy at the moment they need it.
+      void vscode.window.showErrorMessage(
+        l10n('debug.ci.publish.failed', {
+          command: result.failedCommand ?? '',
+          details: result.stderr ?? '',
+        }),
+      );
+      HealthPanel.refreshIfOpen();
+      return;
+    }
+
+    // Pushed. From here the change exists on the remote whatever happens next,
+    // so the panel section has done its job and comes down.
+    HealthPanel.setPendingCiPublish(undefined);
+
+    const prUrl = await createPullRequest(plan);
+    if (prUrl) {
+      const open = l10n('debug.ci.publish.openPr');
+      const choice = await vscode.window.showInformationMessage(
+        l10n('debug.ci.publish.created', { branch: plan.branch }),
+        open,
+      );
+      if (choice === open) void vscode.env.openExternal(vscode.Uri.parse(prUrl));
+      return;
+    }
+
+    // No pull request — not signed in, not a GitHub remote, or the API refused.
+    // The branch is pushed either way, so hand over the compare page rather
+    // than treating this as an error.
+    const compare = compareUrl(plan);
+    const openCompare = l10n('debug.ci.publish.openCompare');
+    const choice = await vscode.window.showInformationMessage(
+      l10n('debug.ci.publish.pushedNoPr', { branch: plan.branch }),
+      ...(compare ? [openCompare] : []),
+    );
+    if (choice === openCompare && compare) {
+      void vscode.env.openExternal(vscode.Uri.parse(compare));
+    }
+  }
 
   // Kept as a command-palette/history-compatible alias now that the
   // formerly separate Debug Panel sidebar webview merged into the Health

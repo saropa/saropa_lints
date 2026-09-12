@@ -2202,18 +2202,22 @@
         "stopped": "остودت",
         "suspended": "متوقفة",
         "starting": "بدء",
-        "scanning": "المسح"
+        "scanning": "المسح",
+        "notConfigured": "غير مُهيأ"
       },
       "rssNote": {
         "inProcess": "قواعد صارمة:\n1. العودة فقط إلى النص المترجم.",
-        "notRunning": "غير مُنفَّذ"
+        "notRunning": "غير مُنفَّذ",
+        "remote": "يعمل على عدّائي GitHub المستضافين — لا يمكن قياسه من هنا"
       },
       "description": {
         "analyzerPlugin": "يُنفَّذ داخل خادم تحليل Dart — تُظهر خطوط التصحيح أثناء الكتابة، لا حاجة للمسح. تبديل الخيار يعيد كتابة المُضافات: حظر في analysis_options.yaml",
         "scanDaemon": "عملية خلفية تقوم بإعادة فحص المشروع بأكمله عند الحفظ وكتابة التقارير/.saropa_lints/violations.json. إيقافها يوقف العملية؛ الحفظ التالي يعاودها.",
-        "lspServer": "قواعد صارمة:\n1. عرض فقط النص المترجم."
+        "lspServer": "قواعد صارمة:\n1. عرض فقط النص المترجم.",
+        "ci": "يقرأ ملف .github/workflows/saropa-lints.yml في شجرة العمل الخاصة بك ويكتب إليه لتفعيل أو تعطيل سير عمل GitHub Actions المرفق. يعكس هذا نسخة الفرع الحالي — نسخة الفرع الافتراضي هي التي تتحكم فعليًا في طلبات السحب، وقد تختلف النسختان. التبديل لا يشغّل أو يحذف سير العمل أبدًا؛ يبقى عليك مراجعة التغيير وتثبيته بنفسك."
       },
-      "scanProgress": "مسح: {done}/{total} ملفات"
+      "scanProgress": "مسح: {done}/{total} ملفات",
+      "ci": "واجهة التكامل المستمر (GitHub Actions)"
     },
     "toggle": {
       "on": "على",
@@ -2236,10 +2240,18 @@
       "analyzerToggleOn": "مُحلِّل المُوسِّع: تفعيل...",
       "analyzerToggleOff": "مُحلِّل المُوسِّع: إيقاف...",
       "daemonToggleOn": "مسح Daemon: استمرار...",
-      "daemonToggleOff": "مسح Daemon: تعليق..."
+      "daemonToggleOff": "مسح Daemon: تعليق...",
+      "ciToggleOn": "التكامل المستمر: جارٍ التفعيل…",
+      "ciToggleOff": "التكامل المستمر: جارٍ التعطيل…"
     },
     "sidebar": {
       "enginesLabel": "محركات: {count} تعمل"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}."
     }
   },
   "detailView": {

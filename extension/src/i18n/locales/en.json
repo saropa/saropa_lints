@@ -2202,18 +2202,22 @@
         "stopped": "stopped",
         "suspended": "suspended",
         "starting": "starting",
-        "scanning": "scanning"
+        "scanning": "scanning",
+        "notConfigured": "not configured"
       },
       "rssNote": {
         "inProcess": "in-process, not separately measurable",
-        "notRunning": "not running"
+        "notRunning": "not running",
+        "remote": "runs on GitHub's hosted runners — not measurable from here"
       },
       "description": {
         "analyzerPlugin": "Runs inside the Dart analysis server — live squiggles in the editor as you type, no scan needed. Toggling rewrites the plugins: block in analysis_options.yaml.",
         "scanDaemon": "Background process that rescans the whole project on save and writes reports/.saropa_lints/violations.json. Toggling off suspends it; the next save resumes it.",
-        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting."
+        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting.",
+        "ci": "Reads and writes .github/workflows/saropa-lints.yml in your working tree to enable or disable the bundled GitHub Actions workflow. This reflects the file on your current branch — the default branch's copy is what actually gates pull requests, and the two can drift apart. Toggling never runs or deletes the workflow; you still review and commit the change yourself."
       },
-      "scanProgress": "Scan: {done}/{total} files"
+      "scanProgress": "Scan: {done}/{total} files",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "ON",
@@ -2236,10 +2240,36 @@
       "analyzerToggleOn": "Analyzer Plugin: enabling…",
       "analyzerToggleOff": "Analyzer Plugin: disabling…",
       "daemonToggleOn": "Scan Daemon: resuming…",
-      "daemonToggleOff": "Scan Daemon: suspending…"
+      "daemonToggleOff": "Scan Daemon: suspending…",
+      "ciToggleOn": "CI: enabling…",
+      "ciToggleOff": "CI: disabling…"
     },
     "sidebar": {
       "enginesLabel": "Engines: {count} running"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}.",
+      "publish": {
+        "heading": "Publish this change",
+        "introEnable": "{path} has been written in your working tree. Nothing runs in CI until it is on {base}. These commands put it on a new branch called {branch} and open a pull request for review — run them yourself, or press the button and Saropa Lints will run exactly these.",
+        "introDisable": "{path} has been edited in your working tree to suspend every job. CI keeps running until that reaches {base}. These commands put the change on a new branch called {branch} and open a pull request — run them yourself, or press the button and Saropa Lints will run exactly these. To stop CI immediately instead, disable the workflow from the repository's Actions tab.",
+        "commandsLabel": "Commands",
+        "copy": "Copy",
+        "copied": "Commands copied to the clipboard.",
+        "createPr": "Create branch, commit, push and open pull request",
+        "notNow": "Not now",
+        "noGitHubRemote": "This repository's origin remote is not GitHub, so the pull request cannot be opened for you. Run the commands above and open it however your host does.",
+        "running": "Creating the branch and pushing…",
+        "failed": "{command} failed, so nothing was pushed. {details}",
+        "pushedNoPr": "Pushed {branch}. The pull request could not be opened automatically — open it from the compare page.",
+        "openCompare": "Open compare page",
+        "created": "Pull request opened for {branch}.",
+        "openPr": "Open pull request",
+        "notARepository": "{path} was written, but this folder is not a git repository, so there is nothing to publish to."
+      }
     }
   },
   "detailView": {

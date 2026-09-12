@@ -132,6 +132,93 @@ ${getEngineCardsStyles()}
 .btn-refresh:hover {
   background: var(--vscode-list-hoverBackground, rgba(90,93,110,.1));
 }
+/* ── CI publish step ──────────────────────────────────────────────
+   Bordered rather than plain, because this section is a prompt that is
+   waiting on the user, not status they can read past. */
+.ci-publish-section {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--vscode-focusBorder, #0078d4);
+  border-radius: 6px;
+  background: var(--vscode-editorWidget-background, rgba(90,93,110,.08));
+}
+.publish-intro {
+  margin: 6px 0 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+}
+.publish-commands-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.publish-commands-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+}
+.publish-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1px solid var(--vscode-widget-border, #e5e7eb);
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  background: var(--vscode-button-secondaryBackground, transparent);
+  color: var(--vscode-foreground);
+}
+.publish-copy:hover {
+  background: var(--vscode-list-hoverBackground, rgba(90,93,110,.1));
+}
+.publish-commands {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 12px;
+  line-height: 1.6;
+  background: var(--vscode-textCodeBlock-background, rgba(0,0,0,.18));
+  color: var(--vscode-foreground);
+  /* Selectable so the commands can be taken by hand, not only by the button. */
+  user-select: text;
+}
+.publish-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+}
+.publish-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.publish-btn {
+  padding: 4px 12px;
+  border: 1px solid var(--vscode-widget-border, #e5e7eb);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--vscode-button-secondaryBackground, transparent);
+  color: var(--vscode-foreground);
+}
+.publish-btn.primary {
+  border-color: transparent;
+  background: var(--vscode-button-background, #0078d4);
+  color: var(--vscode-button-foreground, #fff);
+}
+.publish-btn:hover {
+  opacity: .88;
+}
+.publish-btn:disabled {
+  opacity: .5;
+  cursor: default;
+}
 .empty-state {
   text-align: center;
   padding: 48px 16px;

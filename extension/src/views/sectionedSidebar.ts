@@ -822,18 +822,21 @@ function appendHotspotsRow(
 
 // Maps the machine-readable EngineStatus.key to the debug.engine.* l10n
 // namespace, which uses 'analyzerPlugin' rather than 'analyzer'.
-const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer', string> = {
+const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer' | 'ci', string> = {
     analyzer: 'analyzerPlugin',
     scanDaemon: 'scanDaemon',
     lspServer: 'lspServer',
+    ci: 'ci',
 };
 
 /**
  * "Engines: N running" summary row, sourced from the same snapshot the
  * Health Panel shows (HealthPanel.getEngineStatuses() — see its doc comment:
  * built specifically so the sidebar and panel can never disagree). Silently
- * omitted when saropaLints.debug.enabled is off or engines aren't wired up
- * yet, matching the panel's own behavior.
+ * omitted only while the engines aren't wired up yet (early in activate).
+ * No longer gated on saropaLints.debug.enabled: this row is the way into the
+ * panel that holds the CI off switch, and an off switch you cannot find is
+ * not an off switch.
  */
 function appendEnginesRow(items: LeafItem[]): void {
     const engines = HealthPanel.getEngineStatuses();
