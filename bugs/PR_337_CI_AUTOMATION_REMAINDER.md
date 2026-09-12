@@ -95,6 +95,16 @@ When the version cannot be determined, neither emits `@vunknown`: a broken refer
 
 The extension's lockfile parsing is deliberately local rather than imported from `upgrade-checker.ts`. That module pulls in `vscode`, and `ciWorkflow.ts` is otherwise pure `fs`/`path`. Keeping it dependency-free is what makes its enable/disable round trip testable outside an extension host, which is the only way its file surgery gets verified at all. Importing was tried first and reverted for exactly that reason.
 
+### What the card resolves for the user
+
+Writing the workflow was only one of five things a project needed, and the other four were left to be discovered from a red pull request. The card now handles three of them:
+
+- **The dependency.** A workflow calling saropa_lints against a project that does not depend on it fails immediately. ON now runs `ensureSaropaLintsInPubspec` first.
+- **The rule configuration.** `gate` resolves to `scan`, which reads per-rule config from analysis_options.yaml and exits 2 when it finds none — the exact failure this repository's own self-lint job hit. `needsExplicitTier` detects it and writes `tier: recommended` into the workflow. When the project IS configured, no tier is written, so the generated CI honors the team's rule set rather than overriding it.
+- **What a finding should do.** `annotate` needs `security-events: write` and, on a private repository, Advanced Security. Neither is detectable without GitHub auth, so ON asks rather than guessing and writing something that breaks on first run. The two choices are stated in terms of consequence, not flag names.
+
+The fourth, committing the file, stays manual and is now stated in the confirmation message rather than left implicit.
+
 ### The claim that was wrong for the card
 
 "Self-consistent by construction" was asserted for both generators. It holds for `--emit-ci`, which ships inside the package: the running version always carries `action.yml` once released. It does **not** hold for the engine card, because the extension and the package version independently and have already diverged — the extension is at 16.4.1 while the package is at 16.2.1.

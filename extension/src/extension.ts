@@ -15,24 +15,25 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
-  runEnable,
-  runDisable,
-  runReenablePlugin,
+  TIER_ORDER,
   disablePluginsIntegration,
-  restorePluginsIntegration,
+  ensureSaropaLintsInPubspec,
   getPluginsIntegrationState,
+  getSharedOutputChannel,
+  openConfig,
+  restorePluginsIntegration,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
-  runInitializeConfig,
   runCreateBaseline,
+  runDisable,
   runEmitCompositePluginScaffold,
-  openConfig,
+  runEnable,
+  runInitializeConfig,
+  runReenablePlugin,
   runRepairConfig,
-  runSetTier,
   runSetLane,
+  runSetTier,
   showOutputChannel,
-  getSharedOutputChannel,
-  TIER_ORDER,
 } from './setup';
 import { runMigrateConfig } from './config/migrateConfig';
 import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
@@ -175,7 +176,13 @@ import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './s
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
-import { getCiWorkflowState, enableCiWorkflow, disableCiWorkflow } from './systemHealth/ciWorkflow';
+import {
+  CI_WORKFLOW_RELATIVE_PATH,
+  disableCiWorkflow,
+  enableCiWorkflow,
+  getCiWorkflowState,
+  needsExplicitTier,
+} from './systemHealth/ciWorkflow';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
@@ -1971,7 +1978,40 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         return;
       }
       if (enabled) {
-        enableCiWorkflow(ciRoot);
+        // Turning CI on is more than writing a file. A workflow that calls
+        // saropa_lints against a project that does not depend on it, or that
+        // runs `scan` where no rule config exists, is a workflow that fails on
+        // its first run. Resolve both here rather than leaving the user to
+        // discover them from a red PR.
+        const added = ensureSaropaLintsInPubspec(ciRoot);
+        if (!added.ok) return; // ensureSaropaLintsInPubspec already explained why
+
+        // annotate needs `security-events: write` and, on a private repo,
+        // Advanced Security. Neither is detectable from here without GitHub
+        // auth, so ask rather than guess and write something that breaks.
+        const annotateLabel = l10n('debug.ci.modeAnnotate');
+        const gateLabel = l10n('debug.ci.modeGate');
+        const picked = await vscode.window.showQuickPick(
+          [
+            { label: annotateLabel, detail: l10n('debug.ci.modeAnnotateDetail') },
+            { label: gateLabel, detail: l10n('debug.ci.modeGateDetail') },
+          ],
+          { title: l10n('debug.ci.modeTitle'), placeHolder: l10n('debug.ci.modePlaceholder') },
+        );
+        if (!picked) return; // dismissed: leave the project untouched
+
+        const mode = picked.label === gateLabel ? 'gate' : 'annotate';
+        // gate resolves to `scan`, which is the command that needs rule config.
+        const tier =
+          mode === 'gate' && needsExplicitTier(ciRoot) ? 'recommended' : undefined;
+
+        enableCiWorkflow(ciRoot, { mode, tier });
+
+        // The one step deliberately left to the user, so say so plainly
+        // instead of letting them wonder why nothing happens on their next PR.
+        void vscode.window.showInformationMessage(
+          l10n('debug.ci.enabled', { path: CI_WORKFLOW_RELATIVE_PATH }),
+        );
       } else {
         disableCiWorkflow(ciRoot);
       }

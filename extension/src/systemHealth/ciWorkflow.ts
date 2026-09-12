@@ -143,8 +143,47 @@ const DISABLE_MARKER = '# disabled via Saropa Lints System Health panel';
  * sync by hand since the two live in different files for different
  * audiences (a guide a human reads vs. a template a toggle writes).
  */
-function buildTemplate(root: string): string {
+/** Choices the card resolves before writing a workflow. */
+export interface CiWorkflowOptions {
+  /**
+   * Written as an explicit `tier:` input when set.
+   *
+   * Required when the project has no saropa_lints rule configuration: `scan`
+   * reads per-rule config from analysis_options.yaml and exits 2 when it finds
+   * none, which is a workflow that fails on its first run. Left unset when the
+   * project IS configured, so the generated CI honors the rule set the team
+   * chose rather than overriding it.
+   */
+  tier?: string;
+
+  /** `annotate` (SARIF on the PR diff) or `gate` (fail the build). */
+  mode?: string;
+}
+
+/**
+ * True when the project has no saropa_lints rule configuration, so a generated
+ * `scan` would exit 2 unless the workflow names a tier.
+ *
+ * Deliberately a substring check rather than a YAML parse: configuration
+ * reaches analysis_options.yaml several ways (a tier `include:`, an
+ * init-generated per-rule block, a plugins section), and every one of them
+ * mentions saropa_lints. Absence is the signal worth acting on.
+ */
+export function needsExplicitTier(root: string): boolean {
+  try {
+    const options = path.join(root, 'analysis_options.yaml');
+    if (!fs.existsSync(options)) return true;
+    return !fs.readFileSync(options, 'utf-8').includes('saropa_lints');
+  } catch {
+    return true;
+  }
+}
+
+function buildTemplate(root: string, opts: CiWorkflowOptions = {}): string {
   const { ref, pinned } = resolveActionRef(root);
+  // Only emitted when the project has no rule config of its own — otherwise
+  // naming a tier here would override the team's configured rule set.
+  const tierLine = opts.tier ? `\n          tier: ${opts.tier}` : '';
   const note = pinned
     ? ''
     : '#\n' +
@@ -173,7 +212,7 @@ jobs:
       - uses: saropa/saropa_lints@${ref}
         with:
           since: origin/\${{ github.base_ref }}   # changed files only
-          mode: annotate                        # annotate | gate | both
+          mode: ${opts.mode ?? 'annotate'}${tierLine}
 `;
 }
 
@@ -203,11 +242,14 @@ export function getCiWorkflowState(root: string): CiWorkflowState {
  * the disable marker line when one is present and currently suspended.
  * A no-op when the workflow already exists and is already enabled.
  */
-export function enableCiWorkflow(root: string): void {
+export function enableCiWorkflow(
+  root: string,
+  opts: CiWorkflowOptions = {},
+): void {
   const file = getCiWorkflowPath(root);
   if (!fs.existsSync(file)) {
     fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(file, buildTemplate(root), 'utf-8');
+    fs.writeFileSync(file, buildTemplate(root, opts), 'utf-8');
     return;
   }
 
