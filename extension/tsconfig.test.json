@@ -216,6 +216,8 @@
     "src/views/webview-strings.ts",
     "src/views/keyboard-shortcuts.ts",
     "src/test/views/webview-format.test.ts",
+    "src/views/dashboardHero.ts",
+    "src/test/views/focusTrackingScript.test.ts",
     "src/views/dashboardChromeStyles.ts",
     "src/views/dashboardChromeStylesTokens.ts",
     "src/views/dashboardChromeStylesComponents.ts",

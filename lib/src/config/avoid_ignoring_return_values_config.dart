@@ -13,6 +13,8 @@
 /// each entry must be a simple `- methodName` list item.
 library;
 
+import 'yaml_section_block.dart';
+
 /// User-configured safe-to-ignore method names. Set by
 /// [loadAvoidIgnoringReturnValuesConfig]. Empty by default (no-op) so a
 /// project that never adds this section sees no behavior change.
@@ -45,7 +47,12 @@ void loadAvoidIgnoringReturnValuesConfig(String? content) {
     return;
   }
 
-  final afterSection = content.substring(sectionMatch.end);
+  // Bound the sub-key search to this section's own indented block. Without
+  // the bound, a `safe_to_ignore:` belonging to a *later* top-level section
+  // would be silently adopted as this rule's allowlist. A top-level key is
+  // any line starting in column 0 with something other than whitespace or a
+  // `#` comment, so the block ends at the first such line.
+  final afterSection = yamlSectionBlock(content.substring(sectionMatch.end));
 
   // Find the `safe_to_ignore:` sub-key.
   final listMatch = RegExp(
