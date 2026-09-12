@@ -779,6 +779,67 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
     if result.returncode != 0:
         return False
 
+    return _move_major_version_tag(project_dir, version)
+
+
+def _move_major_version_tag(project_dir: Path, version: str) -> bool:
+    """Point the moving major tag (e.g. v16) at this release.
+
+    GitHub Actions consumers write `uses: saropa/saropa_lints@v16` and expect
+    it to track the newest 16.x. That is the ecosystem convention, and it is
+    the form every guide and generated workflow would otherwise have to avoid.
+    Without this the repo only ever has exact tags, so `@v16` does not resolve
+    at all and the action is unusable at the reference people actually write.
+
+    Force-moving a tag is the intended behavior here, unlike the exact release
+    tag: `v16` is defined as "latest 16.x", so it is expected to move on every
+    release and nothing should be pinned to it expecting immutability. Anyone
+    needing an immutable reference uses the exact tag, which this never
+    touches.
+
+    A failure here does not fail the release. The package is already published
+    and the exact tag already pushed by the time this runs; a missing major
+    tag is a papercut for action consumers, not a broken release, and aborting
+    would leave the release half-done for a worse reason than it fixes.
+    """
+    major = version.split(".")[0]
+    if not major.isdigit():
+        print_warning(
+            f"Could not derive a major version from '{version}'; "
+            f"skipping the moving tag."
+        )
+        return True
+
+    major_tag = f"v{major}"
+    use_shell = get_shell_mode()
+    print_info(f"Moving {major_tag} to this release (Actions consumers use it).")
+
+    # -f locally and --force on push: this tag is meant to move.
+    result = subprocess.run(
+        ["git", "tag", "-f", major_tag, "-m", f"Latest {major_tag}.x release"],
+        cwd=project_dir,
+        capture_output=True, text=True, shell=use_shell,
+    )
+    if result.returncode != 0:
+        print_warning(
+            f"Could not create {major_tag} locally: {result.stderr.strip()}"
+        )
+        return True
+
+    result = subprocess.run(
+        ["git", "push", "--force", "origin", major_tag],
+        cwd=project_dir,
+        capture_output=True, text=True, shell=use_shell,
+    )
+    if result.returncode != 0:
+        print_warning(
+            f"Could not push {major_tag}: {result.stderr.strip()}\n"
+            f"  `uses: saropa/saropa_lints@{major_tag}` will not resolve "
+            f"until it is pushed. The release itself is unaffected."
+        )
+        return True
+
+    print_success(f"{major_tag} now points at v{version}.")
     return True
 
 
