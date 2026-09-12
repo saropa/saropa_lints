@@ -66,6 +66,28 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [16.2.2] — Unreleased
+
+Patch release correcting follow-on defects in the rule and dashboard changes that shipped in 16.2.1. Two lint rules stopped short of the cases they were meant to cover, the `avoid_ignoring_return_values` allowlist could read the wrong part of your config file, and the Config Dashboard could sit on a stale view after you flipped a toggle. [log](https://github.com/saropa/saropa_lints/blob/v16.2.2/CHANGELOG.md)
+
+### Fixed
+
+`google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on a nullable authorization result — the exact shape v7's scope-authorization call returns — so correctly migrated code is left alone. No action required.
+
+`prefer_late_final` no longer flags a `late` field whose assigning method is captured as a tear-off in a field initializer; the 16.2.1 fix covered only tear-offs written inside a method or constructor body, so taking the suggestion could still produce a late-initialization error at run time. No action required.
+
+`avoid_ignoring_return_values` now reads `safe_to_ignore:` only from its own section of `analysis_options_custom.yaml` instead of silently adopting a same-named list from an unrelated section further down the file. No action required unless a stray allowlist was being picked up, in which case move those names into the rule's own section.
+
+### Fixed (Extension)
+
+- The Config Dashboard now redraws as soon as you toggle a rule pack, enable a rule, or pick a dropdown value, instead of showing "Update pending" until you click somewhere else — only in-progress text entry defers a refresh now.
+
+### Internal
+
+- The Flutter SDK contract lookup behind `avoid_public_members_in_states` is computed on demand, so a `State` class with no public overridden members no longer pays for element resolution and a supertype walk.
+
+---
+
 ## [16.2.1]
 
 Patch release fixing false positives in two lint rules, adding a project-level allowlist for `avoid_ignoring_return_values`, and resolving unwanted reload behavior in the Config and Findings Dashboards when editing text fields. [log](https://github.com/saropa/saropa_lints/blob/v16.2.1/CHANGELOG.md)
