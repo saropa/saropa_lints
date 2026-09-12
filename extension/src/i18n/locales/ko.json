@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "분석을 실행하여 분석을 수행합니다.",
       "runAnalysisDescription": "분석기 다시 실행",
       "updateConfigLabel": "설정 업데이트",
-      "updateConfigDescription": "분석 옵션 초기화 또는 새로고침"
+      "updateConfigDescription": "분석 옵션 초기화 또는 새로고침",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "핫스팟 · {percent}% 검토",

@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "Run uchambuzi kukimbia.",
       "runAnalysisDescription": "Rudia kichanganuzi",
       "updateConfigLabel": "Tuma config",
-      "updateConfigDescription": "Inisiatia au refresh analysis options"
+      "updateConfigDescription": "Inisiatia au refresh analysis options",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% zimepitiwa",

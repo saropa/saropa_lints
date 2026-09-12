@@ -542,6 +542,50 @@ function buildStatusBarTooltipMarkdown(infoLines: string[], enabled: boolean): v
   return md;
 }
 
+/**
+ * Turn CI on for the current workspace: ensure the dependency, write the
+ * workflow, tell the user what is left to do.
+ *
+ * Shared deliberately by the System Health card's ON switch and the sidebar's
+ * "Set up CI" action. Two entry points that wrote the workflow their own way
+ * would drift, and a card that generated a different file from the sidebar
+ * would be the same class of bug as a card that differed from `--emit-ci`.
+ *
+ * Returns false when nothing was written, so a caller can leave a toggle in
+ * its previous state rather than reporting success it did not achieve.
+ */
+async function enableCiForWorkspace(): Promise<boolean> {
+  const ciRoot = getProjectRoot();
+  if (!ciRoot) {
+    void vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+    return false;
+  }
+
+  // A workflow calling saropa_lints against a project that does not depend on
+  // it fails on its first run; fix that here rather than let the user find out
+  // from a red pull request.
+  const added = ensureSaropaLintsInPubspec(ciRoot);
+  if (!added.ok) return false; // ensureSaropaLintsInPubspec already explained why
+
+  // No prompt. `annotate` is the documented default for `--emit-ci` and for
+  // the hand-written example, so every route produces the same workflow. Its
+  // one failure mode — a private repository without Advanced Security, where
+  // the SARIF upload is unavailable — is not detectable without GitHub auth,
+  // and the generated file names the fallback in a comment beside the input
+  // it applies to, which is where someone hitting that error will look.
+  //
+  // A tier is written only when the project has no rule config of its own.
+  const tier = needsExplicitTier(ciRoot) ? 'recommended' : undefined;
+  enableCiWorkflow(ciRoot, { mode: 'annotate', tier });
+
+  // The one step deliberately left to the user. Say it, rather than let them
+  // wonder why nothing happens on their next pull request.
+  void vscode.window.showInformationMessage(
+    l10n('debug.ci.enabled', { path: CI_WORKFLOW_RELATIVE_PATH }),
+  );
+  return true;
+}
+
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const applyUiLocalePreference = (): string => {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
@@ -1978,40 +2022,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         return;
       }
       if (enabled) {
-        // Turning CI on is more than writing a file. A workflow that calls
-        // saropa_lints against a project that does not depend on it, or that
-        // runs `scan` where no rule config exists, is a workflow that fails on
-        // its first run. Resolve both here rather than leaving the user to
-        // discover them from a red PR.
-        const added = ensureSaropaLintsInPubspec(ciRoot);
-        if (!added.ok) return; // ensureSaropaLintsInPubspec already explained why
-
-        // No prompt. `annotate` is the documented default for `--emit-ci` and
-        // for the hand-written example, so all three routes produce the same
-        // workflow — a card that quietly differed from the CLI would be its
-        // own bug. It is also the right default: findings show on the diff
-        // and the build stays green.
-        //
-        // Its one failure mode is a private repository without Advanced
-        // Security, where the SARIF upload is unavailable. That is not
-        // detectable from here without GitHub auth, and asking the user to
-        // arbitrate it at toggle time is a question about SARIF semantics
-        // dressed up as a setup step — most would not know the answer, and
-        // the ones who do would rather read it in the file. The generated
-        // workflow names the fallback in a comment beside the input it
-        // applies to, which is where someone hitting the error will look.
-        //
-        // A tier is written only when the project has no rule config of its
-        // own; it costs nothing under annotate and makes a later switch to
-        // gate work without a second edit.
-        const tier = needsExplicitTier(ciRoot) ? 'recommended' : undefined;
-        enableCiWorkflow(ciRoot, { mode: 'annotate', tier });
-
-        // The one step deliberately left to the user, so say so plainly
-        // instead of letting them wonder why nothing happens on their next PR.
-        void vscode.window.showInformationMessage(
-          l10n('debug.ci.enabled', { path: CI_WORKFLOW_RELATIVE_PATH }),
-        );
+        await enableCiForWorkspace();
       } else {
         disableCiWorkflow(ciRoot);
       }
@@ -2302,6 +2313,15 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (created) {
         refreshAll();
         updateAllStatusBars();
+      }
+    }),
+    vscode.commands.registerCommand('saropaLints.setUpCi', async () => {
+      // Same path as the System Health card's ON switch. This command exists
+      // so the feature is reachable from the sidebar's Actions section rather
+      // than only from a panel a user has to know to open.
+      if (await enableCiForWorkspace()) {
+        HealthPanel.refreshIfOpen();
+        refreshAllSections();
       }
     }),
     vscode.commands.registerCommand('saropaLints.initializeConfig', async () => {

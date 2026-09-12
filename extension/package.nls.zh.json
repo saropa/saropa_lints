@@ -366,5 +366,6 @@
   "config.property.lspServer.enabled.description": "运行独立的 Saropa Lints LSP 服务器进行诊断。启用后，会生成一个单独的 Dart 进程，该进程通过语言服务器协议提供波形曲线和快速修复。自动禁用分析器插件以节省约 10GB 的 RAM。关闭此功能将重新启用分析器插件。",
   "config.property.lspServer.workspaceScan.description": "启动时扫描整个工作区，以便诊断结果显示在“问题”面板中的整个项目范围内，而不仅仅是您打开的文件。对于初始扫描时间过长的大型项目禁用此功能。",
   "config.property.lspServer.workspaceScanDelay.description": "分析仪准备就绪后开始工作区扫描之前需要等待的秒数。让 VS Code 首先完成其启动突发，这样扫描就不会与初始文件分析竞争。设置为 0 表示无延迟。",
-  "config.property.lspServer.scanDirectories.description": "启动时扫描的目录（相对于项目根目录）。仅在启用工作区扫描时使用。调整它以匹配您的项目结构 - 例如如果测试文件不相关，则添加“src”或删除“test”。"
+  "config.property.lspServer.scanDirectories.description": "启动时扫描的目录（相对于项目根目录）。仅在启用工作区扫描时使用。调整它以匹配您的项目结构 - 例如如果测试文件不相关，则添加“src”或删除“test”。",
+  "command.setUpCi.title": "Saropa Lints: Set Up CI"
 }

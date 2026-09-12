@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "Przeprowadź analizę, przeprowadzić analizę.",
       "runAnalysisDescription": "Przeanalizuj ponownie analizator",
       "updateConfigLabel": "Aktualizuj konfigurację",
-      "updateConfigDescription": "Inicjalizuj lub odśwież opcje analizy"
+      "updateConfigDescription": "Inicjalizuj lub odśwież opcje analizy",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% przeglądnął",

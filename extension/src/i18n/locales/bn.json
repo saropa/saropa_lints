@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "Run analysis চালান বিশ্লেষণ",
       "runAnalysisDescription": "পুনরায় এনালাইজার চালানো",
       "updateConfigLabel": "কনফিগ আপডেট করুন",
-      "updateConfigDescription": "বিশ্লেষণ বিকল্প প্রারম্ভ করুন বা আপডেট করুন"
+      "updateConfigDescription": "বিশ্লেষণ বিকল্প প্রারম্ভ করুন বা আপডেট করুন",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "হটস্পট · {percent}% আইনী পরীক্ষা করেছেন",

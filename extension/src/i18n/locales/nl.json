@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "Analyse uitvoeren",
       "runAnalysisDescription": "Analyseer opnieuw",
       "updateConfigLabel": "Config bijwerken",
-      "updateConfigDescription": "Initialiseer of vernieuw analyseopties"
+      "updateConfigDescription": "Initialiseer of vernieuw analyseopties",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% beoordeeld",

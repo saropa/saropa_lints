@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "Chạy phân tích chạy.",
       "runAnalysisDescription": "Chạy lại phân tích",
       "updateConfigLabel": "Cập nhật cấu hình",
-      "updateConfigDescription": "Khởi tạo hoặc cập nhật lại tùy chọn phân tích"
+      "updateConfigDescription": "Khởi tạo hoặc cập nhật lại tùy chọn phân tích",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% đã xem xét",

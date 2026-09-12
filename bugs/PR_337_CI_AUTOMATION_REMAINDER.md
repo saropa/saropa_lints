@@ -95,6 +95,14 @@ When the version cannot be determined, neither emits `@vunknown`: a broken refer
 
 The extension's lockfile parsing is deliberately local rather than imported from `upgrade-checker.ts`. That module pulls in `vscode`, and `ciWorkflow.ts` is otherwise pure `fs`/`path`. Keeping it dependency-free is what makes its enable/disable round trip testable outside an extension host, which is the only way its file surgery gets verified at all. Importing was tried first and reverted for exactly that reason.
 
+### Where the feature is reachable from
+
+The System Health panel opens from the command palette, so a CI card living only there is reachable only by someone who already knows it exists. The sidebar's **Actions** section now carries a **Set up CI** row — *Run saropa_lints on every pull request* — which is the discoverable surface.
+
+Actions rather than Status, deliberately. `PLAN_ext_ui_sidebar_reset.md` §2 holds that a status row never changes anything, and the old "Lint integration: On/Off" row was removed for breaking exactly that. This row runs setup and leaves a visible outcome — a workflow file in the diff and a toast naming it — which is what the Actions section is for. It takes that section from the plan's stated three rows to four.
+
+Both entry points call one `enableCiForWorkspace`. Two paths writing the workflow their own way would drift, and a sidebar row that generated a different file from the card would be the same class of bug as a card that differed from `--emit-ci`.
+
 ### What the card resolves for the user
 
 Writing the workflow was only one of five things a project needed, and the other four were left to be discovered from a red pull request. The card now handles three of them:

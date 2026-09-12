@@ -107,6 +107,10 @@
         "title": "%command.verifyPlugin.title%"
       },
       {
+        "command": "saropaLints.setUpCi",
+        "title": "%command.setUpCi.title%"
+      },
+      {
         "command": "saropaLints.initializeConfig",
         "title": "%command.initializeConfig.title%"
       },

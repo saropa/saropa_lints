@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "运行分析,进行分析.",
       "runAnalysisDescription": "重新运行分析器",
       "updateConfigLabel": "更新配置",
-      "updateConfigDescription": "初始化或刷新分析选项"
+      "updateConfigDescription": "初始化或刷新分析选项",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "热点 · {percent}% 评审",

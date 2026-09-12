@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "تشغيل تحليل التحليل.",
       "runAnalysisDescription": "إعادة تشغيل المدقق",
       "updateConfigLabel": "تحديث التكوين",
-      "updateConfigDescription": "-initialize أو refresh خيارات التحليل"
+      "updateConfigDescription": "-initialize أو refresh خيارات التحليل",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "المناطق الساخنة · {percent}% تقييم",

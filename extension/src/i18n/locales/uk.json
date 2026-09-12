@@ -2791,7 +2791,9 @@
       "runAnalysisLabel": "Запустити аналіз, провести аналіз.",
       "runAnalysisDescription": "Повторно запустити аналізатор",
       "updateConfigLabel": "Оновити конфігурацію",
-      "updateConfigDescription": "Ініціалізувати або оновити параметри аналізу"
+      "updateConfigDescription": "Ініціалізувати або оновити параметри аналізу",
+      "setUpCiLabel": "Set up CI",
+      "setUpCiDescription": "Run saropa_lints on every pull request"
     },
     "status": {
       "hotspotsLabel": "Hotspots · {percent}% відгукнувся",
