@@ -1,0 +1,608 @@
+# Composite action: run saropa_lints against a Dart/Flutter project in CI.
+#
+# Wraps `dart run saropa_lints audit` so consumers write a few lines instead of
+# hand-maintaining the full workflow from doc/guides/cli.md. Flag changes ship
+# via a tag bump rather than a docs edit nobody re-reads.
+#
+# Requires saropa_lints as a dev_dependency of the target project — `audit`
+# runs in-project. A Dart or Flutter SDK must already be on PATH unless
+# install-sdk is enabled.
+name: saropa_lints
+description: Run saropa_lints static analysis, with SARIF annotations on pull requests.
+author: Saropa
+
+branding:
+  icon: check-circle
+  color: blue
+
+inputs:
+  working-directory:
+    description: Directory of the Dart/Flutter project to audit.
+    required: false
+    default: '.'
+
+  mode:
+    description: >-
+      annotate — upload SARIF, never fail the job on findings (review signal only).
+      gate — fail the job when findings exist, no upload.
+      both — upload SARIF and fail on findings.
+    required: false
+    default: annotate
+
+  command:
+    description: >-
+      Which CLI to run.
+      auto (default) — gate mode uses `scan`, annotate/both use `audit`.
+      audit — every rule, regardless of the project's configured tier; the
+      only command that can emit SARIF.
+      scan — only the rules the project's analysis_options.yaml (or `tier`)
+      enables, plus the fail-on-* thresholds. Cannot emit SARIF.
+    required: false
+    default: auto
+
+  tier:
+    description: >-
+      scan only. Override the project's configured tier for this run:
+      essential, recommended, professional, comprehensive, pedantic.
+    required: false
+    default: ''
+
+  resolve:
+    description: >-
+      scan only. Fully resolve each file (type/element resolution) instead of
+      the default fast syntactic parse. Required for type-based rules and for
+      rules that fire on constructor calls; slower.
+    required: false
+    default: 'false'
+
+  max-severity:
+    description: 'scan only. Hide findings above this severity: error, warning, info.'
+    required: false
+    default: ''
+
+  fail-on:
+    description: >-
+      scan only. Exit non-zero only when a finding at or above this severity
+      exists, independent of what is displayed: error, warning, info.
+    required: false
+    default: ''
+
+  fail-on-impact:
+    description: >-
+      scan only. Like fail-on, but against the rule author's declared impact:
+      critical, high, medium, low, minimal.
+    required: false
+    default: ''
+
+  fail-on-count:
+    description: >-
+      scan only. Used with fail-on: tolerate up to this many matching findings
+      before failing. Lets CI accept a known baseline.
+    required: false
+    default: ''
+
+  fail-on-impact-count:
+    description: 'scan only. Like fail-on-count, for fail-on-impact.'
+    required: false
+    default: ''
+
+  fail-on-tier:
+    description: >-
+      scan only. Fail only when a finding comes from a rule in this tier or
+      below, while still reporting everything. The usual lever for incremental
+      adoption: essential, recommended, professional, comprehensive, pedantic.
+    required: false
+    default: ''
+
+  since:
+    description: >-
+      audit only. Only audit files changed since this git ref (e.g. origin/main). Empty
+      audits the whole project. The action fetches the ref when it is missing
+      locally, so a shallow default checkout still works.
+    required: false
+    default: ''
+
+  min-severity:
+    description: 'Hide findings below this severity: error, warning, info.'
+    required: false
+    default: ''
+
+  min-impact:
+    description: 'Hide findings below this impact: critical, high, medium, low, minimal.'
+    required: false
+    default: ''
+
+  exclude-globs:
+    description: Comma-separated glob patterns to skip.
+    required: false
+    default: ''
+
+  include-globs:
+    description: Comma-separated glob patterns to force-include.
+    required: false
+    default: ''
+
+  baseline:
+    description: >-
+      audit only. Path to a saved audit baseline. When set, findings already in the
+      baseline are tagged so only new ones are treated as failures.
+    required: false
+    default: ''
+
+  sarif-file:
+    description: Where to write the SARIF report (annotate/both modes).
+    required: false
+    default: saropa-lints.sarif
+
+  upload-sarif:
+    description: >-
+      Upload the SARIF file to GitHub code scanning. Requires
+      `security-events: write`, and Advanced Security on private repos. Set
+      false to produce the file without uploading (e.g. to archive it).
+    required: false
+    default: 'true'
+
+  install-sdk:
+    description: >-
+      auto — install the Dart SDK only when no dart is already on PATH.
+      true — always install. false — never install (caller provides it).
+      Flutter projects should set up flutter-action themselves and leave this
+      on auto, which then correctly skips the install.
+    required: false
+    default: auto
+
+  sdk-version:
+    description: Dart SDK version used when install-sdk applies.
+    required: false
+    default: stable
+
+  pub-get:
+    description: Run `dart pub get` before auditing.
+    required: false
+    default: 'true'
+
+outputs:
+  exit-code:
+    description: 'Raw audit exit code: 0 clean, 1 findings, 2 error.'
+    value: ${{ steps.audit.outputs.exit-code }}
+  findings:
+    description: Number of findings reported (empty when it could not be determined).
+    value: ${{ steps.audit.outputs.findings }}
+  sarif-file:
+    description: Path to the written SARIF file, when one was produced.
+    value: ${{ steps.audit.outputs.sarif-file }}
+
+runs:
+  using: composite
+  steps:
+    # Validate inputs before doing any work, so a typo fails in two seconds
+    # with a useful message rather than after an SDK install and a full audit.
+    - name: Validate inputs
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+        COMMAND: ${{ inputs.command }}
+        INSTALL_SDK: ${{ inputs.install-sdk }}
+        MIN_SEVERITY: ${{ inputs.min-severity }}
+        MIN_IMPACT: ${{ inputs.min-impact }}
+        MAX_SEVERITY: ${{ inputs.max-severity }}
+        TIER: ${{ inputs.tier }}
+        RESOLVE: ${{ inputs.resolve }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        FAIL_ON_IMPACT: ${{ inputs.fail-on-impact }}
+        FAIL_ON_COUNT: ${{ inputs.fail-on-count }}
+        FAIL_ON_IMPACT_COUNT: ${{ inputs.fail-on-impact-count }}
+        FAIL_ON_TIER: ${{ inputs.fail-on-tier }}
+        SINCE: ${{ inputs.since }}
+        BASELINE: ${{ inputs.baseline }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        fail() { echo "::error::$1"; exit 1; }
+
+        case "$MODE" in
+          annotate|gate|both) ;;
+          *) fail "mode must be annotate, gate or both (got '$MODE')." ;;
+        esac
+
+        case "$INSTALL_SDK" in
+          auto|true|false) ;;
+          *) fail "install-sdk must be auto, true or false (got '$INSTALL_SDK')." ;;
+        esac
+
+        case "$COMMAND" in
+          auto|audit|scan) ;;
+          *) fail "command must be auto, audit or scan (got '$COMMAND')." ;;
+        esac
+
+        # Resolve `auto` here so the checks below reason about the command
+        # that will actually run, not the literal input.
+        resolved="$COMMAND"
+        if [ "$resolved" = auto ]; then
+          case "$MODE" in
+            gate) resolved=scan ;;
+            *) resolved=audit ;;
+          esac
+        fi
+
+        # Only audit can emit SARIF (the writer is wired into bin/audit.dart
+        # alone), so scan cannot satisfy a mode that uploads annotations.
+        # Failing here beats running scan and producing no annotations while
+        # the job reports success.
+        if [ "$resolved" = scan ] && { [ "$MODE" = annotate ] || [ "$MODE" = both ]; }; then
+          fail "command 'scan' cannot produce SARIF, which mode '$MODE' requires. Use mode: gate, or command: audit."
+        fi
+
+        # A flag that cannot apply is an error, not a silent no-op: quietly
+        # ignoring `tier` would leave someone believing CI honors their tier
+        # when it is running every rule.
+        scan_only=""
+        [ -n "$TIER" ] && scan_only="$scan_only tier"
+        [ "$RESOLVE" = "true" ] && scan_only="$scan_only resolve"
+        [ -n "$MAX_SEVERITY" ] && scan_only="$scan_only max-severity"
+        [ -n "$FAIL_ON" ] && scan_only="$scan_only fail-on"
+        [ -n "$FAIL_ON_IMPACT" ] && scan_only="$scan_only fail-on-impact"
+        [ -n "$FAIL_ON_COUNT" ] && scan_only="$scan_only fail-on-count"
+        [ -n "$FAIL_ON_IMPACT_COUNT" ] && scan_only="$scan_only fail-on-impact-count"
+        [ -n "$FAIL_ON_TIER" ] && scan_only="$scan_only fail-on-tier"
+        if [ "$resolved" = audit ] && [ -n "$scan_only" ]; then
+          fail "these inputs only apply to command 'scan':$scan_only (resolved command: audit)."
+        fi
+
+        audit_only=""
+        [ -n "$SINCE" ] && audit_only="$audit_only since"
+        [ -n "$BASELINE" ] && audit_only="$audit_only baseline"
+        if [ "$resolved" = scan ] && [ -n "$audit_only" ]; then
+          fail "these inputs only apply to command 'audit':$audit_only (resolved command: scan)."
+        fi
+
+        if [ -n "$TIER" ]; then
+          case "$TIER" in
+            essential|recommended|professional|comprehensive|pedantic) ;;
+            *) fail "tier must be essential, recommended, professional, comprehensive or pedantic (got '$TIER')." ;;
+          esac
+        fi
+
+        if [ -n "$FAIL_ON_TIER" ]; then
+          case "$FAIL_ON_TIER" in
+            essential|recommended|professional|comprehensive|pedantic) ;;
+            *) fail "fail-on-tier must be essential, recommended, professional, comprehensive or pedantic (got '$FAIL_ON_TIER')." ;;
+          esac
+        fi
+
+        for pair in "max-severity:$MAX_SEVERITY" "fail-on:$FAIL_ON"; do
+          name="${pair%%:*}"; value="${pair#*:}"
+          [ -z "$value" ] && continue
+          case "$value" in
+            error|warning|info) ;;
+            *) fail "$name must be error, warning or info (got '$value')." ;;
+          esac
+        done
+
+        if [ -n "$FAIL_ON_IMPACT" ]; then
+          case "$FAIL_ON_IMPACT" in
+            critical|high|medium|low|minimal) ;;
+            *) fail "fail-on-impact must be critical, high, medium, low or minimal (got '$FAIL_ON_IMPACT')." ;;
+          esac
+        fi
+
+        for pair in "fail-on-count:$FAIL_ON_COUNT" "fail-on-impact-count:$FAIL_ON_IMPACT_COUNT"; do
+          name="${pair%%:*}"; value="${pair#*:}"
+          [ -z "$value" ] && continue
+          case "$value" in
+            ''|*[!0-9]*) fail "$name must be a non-negative integer (got '$value')." ;;
+          esac
+        done
+
+        if [ -n "$MIN_SEVERITY" ]; then
+          case "$MIN_SEVERITY" in
+            error|warning|info) ;;
+            *) fail "min-severity must be error, warning or info (got '$MIN_SEVERITY')." ;;
+          esac
+        fi
+
+        if [ -n "$MIN_IMPACT" ]; then
+          case "$MIN_IMPACT" in
+            critical|high|medium|low|minimal) ;;
+            *) fail "min-impact must be critical, high, medium, low or minimal (got '$MIN_IMPACT')." ;;
+          esac
+        fi
+
+        [ -d "$WORKING_DIRECTORY" ] || fail "working-directory '$WORKING_DIRECTORY' does not exist."
+        [ -f "$WORKING_DIRECTORY/pubspec.yaml" ] || \
+          fail "'$WORKING_DIRECTORY' is not a Dart project (no pubspec.yaml)."
+
+    # `auto` exists because Flutter projects get dart via flutter-action; a
+    # second unconditional setup-dart would shadow it with a bare Dart SDK.
+    - name: Decide whether to install the Dart SDK
+      id: sdk
+      shell: bash
+      env:
+        INSTALL_SDK: ${{ inputs.install-sdk }}
+      run: |
+        set -euo pipefail
+        needed=false
+        case "$INSTALL_SDK" in
+          true) needed=true ;;
+          false) needed=false ;;
+          auto)
+            if command -v dart >/dev/null 2>&1; then
+              echo "dart already on PATH ($(dart --version 2>&1)); skipping install."
+            else
+              needed=true
+            fi
+            ;;
+        esac
+        echo "needed=$needed" >> "$GITHUB_OUTPUT"
+
+    - name: Set up Dart
+      if: steps.sdk.outputs.needed == 'true'
+      uses: dart-lang/setup-dart@v1
+      with:
+        sdk: ${{ inputs.sdk-version }}
+
+    # A shallow checkout (the Actions default) has no base branch, so --since
+    # would diff against a ref that does not exist. Fetch just that ref.
+    - name: Fetch base ref for --since
+      if: inputs.since != ''
+      shell: bash
+      env:
+        SINCE: ${{ inputs.since }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        cd "$WORKING_DIRECTORY"
+
+        if git rev-parse --verify --quiet "$SINCE" >/dev/null; then
+          echo "Ref '$SINCE' already present."
+          exit 0
+        fi
+
+        # Strip a leading remote name so 'origin/main' fetches 'main'.
+        branch="${SINCE#origin/}"
+        echo "Ref '$SINCE' missing; fetching '$branch' from origin."
+        # Explicit refspec: actions/checkout configures a single-branch fetch
+        # refspec, under which a bare `git fetch origin <branch>` updates
+        # FETCH_HEAD without creating refs/remotes/origin/<branch> — leaving
+        # `--since origin/<branch>` still unresolvable.
+        if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" --depth=1; then
+          echo "::warning::Could not fetch '$branch' from origin."
+        fi
+
+        # Not a warning: an unresolvable ref is NOT a fallback to a full scan.
+        # `gitChangedDartFiles` (lib/src/scan/git_changed_files.dart) returns
+        # an empty list for an unknown revision, so the audit would report
+        # zero findings over zero files and exit 0 — a green job that audited
+        # nothing, which is the exact failure this action exists to rule out.
+        if ! git rev-parse --verify --quiet "$SINCE" >/dev/null; then
+          echo "::error::'$SINCE' does not resolve even after fetching, so --since would audit no files at all."
+          echo "::error::Fetch it first (actions/checkout with fetch-depth: 0), or drop the 'since' input to audit the whole project."
+          exit 1
+        fi
+
+    - name: Install dependencies
+      if: inputs.pub-get == 'true'
+      shell: bash
+      env:
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        cd "$WORKING_DIRECTORY"
+        if grep -qE '^\s*sdk:\s*flutter' pubspec.yaml && command -v flutter >/dev/null 2>&1; then
+          flutter pub get
+        else
+          dart pub get
+        fi
+
+    # This step deliberately never fails the job. It records the exit code and
+    # lets the final step decide, so a SARIF upload still happens when findings
+    # exist — the annotations are the entire point of annotate mode.
+    #
+    # Note the explicit `set +e` around the audit call below: GitHub's default
+    # bash shell already runs with -e, which a `set -uo pipefail` does not undo.
+    - name: Run saropa_lints audit
+      id: audit
+      shell: bash
+      env:
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        MODE: ${{ inputs.mode }}
+        COMMAND: ${{ inputs.command }}
+        SINCE: ${{ inputs.since }}
+        MIN_SEVERITY: ${{ inputs.min-severity }}
+        MIN_IMPACT: ${{ inputs.min-impact }}
+        MAX_SEVERITY: ${{ inputs.max-severity }}
+        TIER: ${{ inputs.tier }}
+        RESOLVE: ${{ inputs.resolve }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        FAIL_ON_IMPACT: ${{ inputs.fail-on-impact }}
+        FAIL_ON_COUNT: ${{ inputs.fail-on-count }}
+        FAIL_ON_IMPACT_COUNT: ${{ inputs.fail-on-impact-count }}
+        FAIL_ON_TIER: ${{ inputs.fail-on-tier }}
+        EXCLUDE_GLOBS: ${{ inputs.exclude-globs }}
+        INCLUDE_GLOBS: ${{ inputs.include-globs }}
+        BASELINE: ${{ inputs.baseline }}
+        SARIF_FILE: ${{ inputs.sarif-file }}
+      run: |
+        set -uo pipefail
+        cd "$WORKING_DIRECTORY"
+
+        # Check the resolved package graph, not the pubspec text: a grep for
+        # "saropa_lints" in pubspec.yaml also matches the package's own name
+        # (saropa_lints_self_check) or a passing mention in a comment, which
+        # would turn a precise error into a misleading one.
+        resolved=.dart_tool/package_config.json
+        if [ -f "$resolved" ] && command -v jq >/dev/null 2>&1; then
+          if ! jq -e '.packages[] | select(.name == "saropa_lints")' "$resolved" >/dev/null; then
+            echo "::error::saropa_lints is not a resolved dependency of '$WORKING_DIRECTORY'."
+            echo "::error::Add it with: dart pub add --dev saropa_lints"
+            exit 1
+          fi
+        elif ! grep -qE '^\s*saropa_lints\s*:' pubspec.yaml; then
+          echo "::error::saropa_lints is not a dependency of '$WORKING_DIRECTORY'."
+          echo "::error::Add it with: dart pub add --dev saropa_lints"
+          exit 1
+        fi
+
+        # Resolve `auto` the same way the validate step did.
+        cmd="$COMMAND"
+        if [ "$cmd" = auto ]; then
+          case "$MODE" in
+            gate) cmd=scan ;;
+            *) cmd=audit ;;
+          esac
+        fi
+        echo "command: $cmd (input: $COMMAND, mode: $MODE)"
+
+        args=("$cmd" .)
+        want_sarif=false
+        if [ "$cmd" = audit ]; then
+          case "$MODE" in
+            annotate|both) want_sarif=true ;;
+          esac
+        fi
+
+        if [ "$want_sarif" = true ]; then
+          # --quiet only here: in gate mode the native report goes to stdout and
+          # is the only record of what failed, so keep it human-readable.
+          args+=(--format sarif --output "$SARIF_FILE" --quiet)
+        fi
+
+        # Accepted by both commands.
+        [ -n "$MIN_SEVERITY" ] && args+=(--min-severity "$MIN_SEVERITY")
+        [ -n "$MIN_IMPACT" ] && args+=(--min-impact "$MIN_IMPACT")
+
+        # The two commands disagree on glob grammar: audit takes ONE
+        # comma-separated value (bin/audit.dart splits on ','), while scan
+        # consumes every following non-flag argument as its own pattern
+        # (lib/src/scan/scan_cli_args.dart). Handing scan a comma-joined
+        # string makes it one literal glob containing commas, which matches
+        # nothing and reports no error — so translate rather than pass through.
+        append_globs() {
+          local flag="$1" value="$2"
+          [ -z "$value" ] && return 0
+          if [ "$cmd" = audit ]; then
+            args+=("$flag" "$value")
+          else
+            args+=("$flag")
+            # `read -ra`, not unquoted word splitting: an unquoted $value
+            # undergoes pathname expansion as well as splitting, so a pattern
+            # like 'vendor/*' would be replaced by whatever files happen to
+            # match in the working directory before scan ever sees it.
+            local -a patterns
+            IFS=',' read -ra patterns <<< "$value"
+            local pattern
+            for pattern in "${patterns[@]}"; do
+              [ -n "$pattern" ] && args+=("$pattern")
+            done
+          fi
+        }
+        append_globs --exclude-globs "$EXCLUDE_GLOBS"
+        append_globs --include-globs "$INCLUDE_GLOBS"
+
+        if [ "$cmd" = audit ]; then
+          [ -n "$SINCE" ] && args+=(--since "$SINCE")
+          if [ -n "$BASELINE" ]; then
+            args+=(--baseline --baseline-path "$BASELINE")
+          fi
+        else
+          [ -n "$TIER" ] && args+=(--tier "$TIER")
+          [ "$RESOLVE" = "true" ] && args+=(--resolve)
+          [ -n "$MAX_SEVERITY" ] && args+=(--max-severity "$MAX_SEVERITY")
+          [ -n "$FAIL_ON" ] && args+=(--fail-on "$FAIL_ON")
+          [ -n "$FAIL_ON_IMPACT" ] && args+=(--fail-on-impact "$FAIL_ON_IMPACT")
+          [ -n "$FAIL_ON_COUNT" ] && args+=(--fail-on-count "$FAIL_ON_COUNT")
+          [ -n "$FAIL_ON_IMPACT_COUNT" ] && args+=(--fail-on-impact-count "$FAIL_ON_IMPACT_COUNT")
+          [ -n "$FAIL_ON_TIER" ] && args+=(--fail-on-tier "$FAIL_ON_TIER")
+        fi
+
+        echo "Running: dart run saropa_lints ${args[*]}"
+
+        # GitHub invokes this shell as `bash --noprofile --norc -e -o pipefail`,
+        # so -e is already active and `set -uo pipefail` above does not clear
+        # it. Without this `set +e`, an audit exiting 1 (findings) aborts the
+        # step before the exit code is captured, leaving the SARIF upload
+        # skipped and the evaluate step with nothing to read.
+        set +e
+        dart run saropa_lints "${args[@]}"
+        code=$?
+        set -e
+        echo "audit exited with $code"
+        echo "exit-code=$code" >> "$GITHUB_OUTPUT"
+
+        # Count findings from the SARIF results array when we produced one.
+        findings=''
+        if [ "$want_sarif" = true ] && [ -f "$SARIF_FILE" ]; then
+          echo "sarif-file=$WORKING_DIRECTORY/$SARIF_FILE" >> "$GITHUB_OUTPUT"
+          if command -v jq >/dev/null 2>&1; then
+            findings=$(jq '[.runs[].results[]] | length' "$SARIF_FILE" 2>/dev/null || echo '')
+          fi
+        fi
+        echo "findings=$findings" >> "$GITHUB_OUTPUT"
+
+    # always() so findings (audit exit 1) still get annotated. Without it this
+    # step is skipped whenever there is something to report.
+    - name: Upload SARIF to GitHub code scanning
+      if: >-
+        always()
+        && inputs.upload-sarif == 'true'
+        && (inputs.mode == 'annotate' || inputs.mode == 'both')
+        && steps.audit.outputs.sarif-file != ''
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ steps.audit.outputs.sarif-file }}
+        category: saropa_lints
+
+    # Single place where the job's pass/fail is decided.
+    #
+    # Exit 2 always fails: it means bad arguments, a missing pub get, or not a
+    # Dart project — the audit never ran, so a green job would be a lie.
+    # Exit 1 (findings) fails only in gate/both. Treating "the tool ran" as
+    # "the code passed" is the failure mode this step exists to prevent.
+    - name: Evaluate result
+      if: always()
+      shell: bash
+      env:
+        MODE: ${{ inputs.mode }}
+        CODE: ${{ steps.audit.outputs.exit-code }}
+        FINDINGS: ${{ steps.audit.outputs.findings }}
+      run: |
+        set -euo pipefail
+
+        # An empty exit code means the audit never reported one: either an
+        # earlier step rejected the configuration, or the audit itself died.
+        # Both leave a precise error above this one, so don't assert a cause
+        # here — "did not run to completion" reads as a crash and sends
+        # someone hunting for one after a simple bad input.
+        if [ -z "$CODE" ]; then
+          echo "::error::saropa_lints did not run. See the error above for the cause."
+          exit 1
+        fi
+
+        # Only describe a count when we actually have one; "found  finding(s)"
+        # and "found 3 finding(s) - no findings" are both worse than silence.
+        if [ -n "$FINDINGS" ]; then
+          found="saropa_lints found $FINDINGS finding(s)"
+        else
+          found="saropa_lints found issues"
+        fi
+
+        case "$CODE" in
+          0)
+            echo "saropa_lints found no issues."
+            ;;
+          1)
+            if [ "$MODE" = "gate" ] || [ "$MODE" = "both" ]; then
+              echo "::error::$found — failing the job (mode: $MODE)."
+              exit 1
+            fi
+            echo "::notice::$found — reported as annotations (mode: annotate)."
+            ;;
+          2)
+            echo "::error::saropa_lints audit could not run (exit 2). See the log above."
+            exit 1
+            ;;
+          *)
+            echo "::error::saropa_lints audit exited with unexpected code $CODE."
+            exit 1
+            ;;
+        esac

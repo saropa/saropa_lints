@@ -2202,18 +2202,22 @@
         "stopped": "रोक दिया गया",
         "suspended": "सस्पेंडेड",
         "starting": "प्रारंभ",
-        "scanning": "स्कैन कर रहे हैं"
+        "scanning": "स्कैन कर रहे हैं",
+        "notConfigured": "कॉन्फ़िगर नहीं किया गया"
       },
       "rssNote": {
         "inProcess": "अनुप्रक्रिया में, अलग-अलग माप्य नहीं",
-        "notRunning": "नॉट रनिंग"
+        "notRunning": "नॉट रनिंग",
+        "remote": "GitHub के होस्ट किए गए रनर्स पर चलता है — यहां से मापने योग्य नहीं"
       },
       "description": {
         "analyzerPlugin": "Dart विश्लेषण सर्वर में चलता है — आप टाइप करते ही सम्पादक में जीवित छोटी रेखाएं, कोई स्कैन की आवश्यकता नहीं है। स्विच करने से प्लगइन लिखे जाते हैं: analysis_options.yaml में ब्लॉक।",
         "scanDaemon": "पृष्ठभूमि प्रक्रिया जो बचाव के समय पूरे प्रोजेक्ट को पुनः स्कैन करती है और रिपोर्ट लिखती है/.saropa_lints/violations.json। अक्षम करने से यह अक्षम हो जाती है; अगले बचाव इसे फिर से सक्रिय करता है।",
-        "lspServer": "अलग भाषा सर्वर — खुले और कार्यस्थल फ़ाइलों के लिए समस्या पैनल में निदान प्रकाशित करता है। स्विच करने पर saropaLints.lspServer.enabled सेटिंग लिखता है।"
+        "lspServer": "अलग भाषा सर्वर — खुले और कार्यस्थल फ़ाइलों के लिए समस्या पैनल में निदान प्रकाशित करता है। स्विच करने पर saropaLints.lspServer.enabled सेटिंग लिखता है।",
+        "ci": "बंडल किए गए GitHub Actions वर्कफ़्लो को सक्षम या अक्षम करने के लिए आपके वर्किंग ट्री में .github/workflows/saropa-lints.yml को पढ़ता और लिखता है। यह आपकी वर्तमान ब्रांच की फ़ाइल को दर्शाता है — डिफ़ॉल्ट ब्रांच की कॉपी ही वास्तव में पुल रिक्वेस्ट को नियंत्रित करती है, और दोनों में अंतर आ सकता है। टॉगल करने से वर्कफ़्लो कभी नहीं चलता या हटता; बदलाव की समीक्षा और कमिट आपको ही करनी होगी।"
       },
-      "scanProgress": "स्कैन: {done}/{total} फ़ाइलें"
+      "scanProgress": "स्कैन: {done}/{total} फ़ाइलें",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "ओएन /नो_थिंक",
@@ -2236,10 +2240,18 @@
       "analyzerToggleOn": "एनालाइजर प्लगइन: सक्रिय करना...",
       "analyzerToggleOff": "एनालाइजर प्लगइन: अक्षम करना...",
       "daemonToggleOn": "स्कैन Daemon: वापस आ रहा है...",
-      "daemonToggleOff": "स्कैन Daemon: अपस्थिति में..."
+      "daemonToggleOff": "स्कैन Daemon: अपस्थिति में...",
+      "ciToggleOn": "CI: सक्षम किया जा रहा है…",
+      "ciToggleOff": "CI: अक्षम किया जा रहा है…"
     },
     "sidebar": {
       "enginesLabel": "मोटर: {count} चल रहे"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}."
     }
   },
   "detailView": {

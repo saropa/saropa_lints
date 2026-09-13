@@ -2202,18 +2202,22 @@
         "stopped": "зупинено",
         "suspended": "призупинено",
         "starting": "початок",
-        "scanning": "сканування"
+        "scanning": "сканування",
+        "notConfigured": "не налаштовано"
       },
       "rssNote": {
         "inProcess": "в процесі, не окремо вимірювані",
-        "notRunning": "не виконується"
+        "notRunning": "не виконується",
+        "remote": "виконується на розміщених GitHub раннерах — виміряти звідси неможливо"
       },
       "description": {
         "analyzerPlugin": "Працює на сервері аналізу Dart — живі завивки в редакторі під час введення, сканування не потрібне. Перемикання переписує плагіни: блок у analysis_options.yaml.",
         "scanDaemon": "Фоновий процес, який повторно сканує весь проект під час збереження та створює звіти/.saropa_lints/violations.json. Вимкнення призупиняє його; наступне збереження відновлює його.",
-        "lspServer": "Окремий мовний сервер — публікує діагностику на панелі проблем для відкритих файлів і файлів робочої області. Перемикання записує параметр saropaLints.lspServer.enabled."
+        "lspServer": "Окремий мовний сервер — публікує діагностику на панелі проблем для відкритих файлів і файлів робочої області. Перемикання записує параметр saropaLints.lspServer.enabled.",
+        "ci": "Зчитує та записує .github/workflows/saropa-lints.yml у вашому робочому дереві, щоб увімкнути або вимкнути вбудований робочий процес GitHub Actions. Це відображає файл у вашій поточній гілці — саме копія в гілці за замовчуванням фактично керує pull request'ами, і вони можуть відрізнятися. Перемикання ніколи не запускає та не видаляє робочий процес; зміну все одно потрібно переглянути й закомітити самостійно."
       },
-      "scanProgress": "Сканування: {done}/{total} файли"
+      "scanProgress": "Сканування: {done}/{total} файли",
+      "ci": "CI GitHub Actions"
     },
     "toggle": {
       "on": "УВІМКНЕНО",
@@ -2236,10 +2240,18 @@
       "analyzerToggleOn": "Аналізатор плагін: увімкнення…",
       "analyzerToggleOff": "Аналізатор плагіну: вимкнення…",
       "daemonToggleOn": "Сканування Daemon: продовжується…",
-      "daemonToggleOff": "Сканування Daemon: призупинення…"
+      "daemonToggleOff": "Сканування Daemon: призупинення…",
+      "ciToggleOn": "CI: увімкнення…",
+      "ciToggleOff": "CI: вимкнення…"
     },
     "sidebar": {
       "enginesLabel": "Двигуни: {count} запущені"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}."
     }
   },
   "detailView": {

@@ -2202,18 +2202,22 @@
         "stopped": "mpona",
         "suspended": "mehusikisa",
         "starting": "kuanza",
-        "scanning": "kushusha"
+        "scanning": "kushusha",
+        "notConfigured": "haijasanidiwa"
       },
       "rssNote": {
         "inProcess": "kati ya programu, sio kati kwa muda mmoja",
-        "notRunning": "sio inapata"
+        "notRunning": "sio inapata",
+        "remote": "inaendeshwa kwenye wakimbiaji wenyeji wa GitHub — haiwezi kupimwa kutoka hapa"
       },
       "description": {
         "analyzerPlugin": "Hufanya kazi ndani ya seva ya uchanganuzi ya Dart - hutiririka moja kwa moja kwenye kihariri unapoandika, hakuna uchanganuzi unaohitajika. Kugeuza huandika upya programu-jalizi: zuia katika analysis_options.yaml.",
         "scanDaemon": "Mchakato wa usuli ambao unachanganua upya mradi mzima kwenye kuhifadhi na kuandika ripoti/.saropa_lints/violations.json. Kuzima kunasimamisha; hifadhi inayofuata inaanza tena.",
-        "lspServer": "Seva ya lugha tofauti - huchapisha uchunguzi kwenye paneli ya Matatizo kwa faili wazi na za nafasi ya kazi. Kugeuza huandika mpangilio wa saropaLints.lspServer.enabled."
+        "lspServer": "Seva ya lugha tofauti - huchapisha uchunguzi kwenye paneli ya Matatizo kwa faili wazi na za nafasi ya kazi. Kugeuza huandika mpangilio wa saropaLints.lspServer.enabled.",
+        "ci": "Husoma na kuandika .github/workflows/saropa-lints.yml katika mti wako wa kazi ili kuwasha au kuzima mtiririko wa kazi wa GitHub Actions uliojumuishwa. Hii inaonyesha faili ya tawi lako la sasa — nakala ya tawi chaguo-msingi ndiyo inayodhibiti pull request kwa uhalisia, na mbili hizo zinaweza kutofautiana. Kugeuza hakuwahi kuendesha au kufuta mtiririko wa kazi; bado unapaswa kukagua na kuweka mabadiliko mwenyewe."
       },
-      "scanProgress": "Scan: {done}/{total} faili"
+      "scanProgress": "Scan: {done}/{total} faili",
+      "ci": "CI ya GitHub Actions"
     },
     "toggle": {
       "on": "MWONGOLO",
@@ -2236,10 +2240,18 @@
       "analyzerToggleOn": "Plugin ya Analizer: inakubali...",
       "analyzerToggleOff": "Analizator Plugin: imetumia...",
       "daemonToggleOn": "Tafuta Daemon: inakubali…",
-      "daemonToggleOff": "Tafuta Daemon: inapakia…"
+      "daemonToggleOff": "Tafuta Daemon: inapakia…",
+      "ciToggleOn": "CI: inawezeshwa…",
+      "ciToggleOff": "CI: inazimwa…"
     },
     "sidebar": {
       "enginesLabel": "Injini: {count} inayoendesha"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}."
     }
   },
   "detailView": {

@@ -1,0 +1,229 @@
+# Executes the composite action in action.yml on a real runner.
+#
+# The action's shell logic can be unit-tested locally, but nothing local
+# exercises the parts that only exist inside GitHub Actions: expression
+# evaluation, the inputs context in step-level `if:`, output passing between
+# steps, and nested `uses:` steps. This workflow is the only thing that does.
+#
+# `uses: ./` runs the action straight from the checkout, so this works before
+# any tag exists and always tests the version in the PR rather than a release.
+name: action-selftest
+
+on:
+  pull_request:
+    paths:
+      - 'action.yml'
+      - '.github/workflows/action-selftest.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'action.yml'
+      - '.github/workflows/action-selftest.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10.8'
+
+      # self_check depends on the root package by path, so the root must be
+      # resolved before the action runs pub get inside self_check.
+      - name: Resolve root package
+        run: dart pub get
+
+      # --- Happy path -----------------------------------------------------
+      # install-sdk is left at its default `auto`, which exercises the
+      # detection branch: setup-dart already put dart on PATH, so the action
+      # must skip installing a second SDK.
+      # upload-sarif is off so the test needs no security-events permission
+      # and does not post results to code scanning.
+      - name: Run action in annotate mode
+        id: annotate
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: annotate
+          upload-sarif: 'false'
+
+      - name: Assert annotate mode produced a usable result
+        env:
+          CODE: ${{ steps.annotate.outputs.exit-code }}
+          SARIF: ${{ steps.annotate.outputs.sarif-file }}
+          FINDINGS: ${{ steps.annotate.outputs.findings }}
+        run: |
+          set -euo pipefail
+          echo "exit-code='$CODE' sarif-file='$SARIF' findings='$FINDINGS'"
+
+          # annotate must never fail the job on findings, so reaching this
+          # step at all is part of the assertion.
+          case "$CODE" in
+            0|1) ;;
+            *) echo "::error::Expected exit-code 0 or 1 in annotate mode, got '$CODE'."; exit 1 ;;
+          esac
+
+          [ -n "$SARIF" ] || { echo "::error::annotate mode set no sarif-file output."; exit 1; }
+          [ -f "$SARIF" ] || { echo "::error::sarif-file '$SARIF' does not exist."; exit 1; }
+
+          # Prove it is really SARIF, not an empty or native-format file.
+          jq -e '.version and .runs' "$SARIF" >/dev/null \
+            || { echo "::error::'$SARIF' is not a SARIF document."; exit 1; }
+          echo "SARIF OK: $(jq '[.runs[].results[]] | length' "$SARIF") result(s)."
+
+      # --- Mode contract --------------------------------------------------
+      # gate must fail exactly when annotate reported findings. Asserting the
+      # relationship rather than a fixed outcome keeps this deterministic
+      # whether or not self_check currently has violations.
+      #
+      # `command: audit` is required for the comparison to mean anything:
+      # annotate resolved to audit (every rule), and gate's default `auto`
+      # would resolve to scan (only the rules self_check configures, or exit 2
+      # when it configures none). Comparing two different rule sets would make
+      # this assertion fail on a difference that is not a bug. The `auto` →
+      # scan resolution is covered by the scan step below.
+      - name: Run action in gate mode
+        id: gate
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: gate
+          command: audit
+
+      - name: Assert gate mode honors the exit code
+        env:
+          ANNOTATE_CODE: ${{ steps.annotate.outputs.exit-code }}
+          GATE_OUTCOME: ${{ steps.gate.outcome }}
+        run: |
+          set -euo pipefail
+          echo "annotate exit-code='$ANNOTATE_CODE', gate outcome='$GATE_OUTCOME'"
+
+          if [ "$ANNOTATE_CODE" = "1" ]; then
+            [ "$GATE_OUTCOME" = "failure" ] \
+              || { echo "::error::Findings exist but gate mode passed. The gate does not gate."; exit 1; }
+            echo "Findings present and gate mode failed the step, as intended."
+          else
+            [ "$GATE_OUTCOME" = "success" ] \
+              || { echo "::error::No findings, but gate mode failed."; exit 1; }
+            echo "No findings and gate mode passed, as intended."
+          fi
+
+      # --- Failure paths --------------------------------------------------
+      # Both of these must fail. A green job here would mean the action
+      # reports success without auditing anything, which is the exact failure
+      # this design is meant to rule out.
+      # --- scan command -----------------------------------------------
+      # gate mode resolves to scan by default, so this also covers the `auto`
+      # resolution. fail-on-tier is the incremental-adoption lever: report
+      # everything, fail only on essential-tier findings.
+      - name: Run action via scan with tier and gating flags
+        id: scan
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: gate
+          tier: essential
+          fail-on-tier: essential
+          exclude-globs: '**/generated/**,**/vendor/**'
+
+      - name: Assert scan ran and honored its exit contract
+        env:
+          CODE: ${{ steps.scan.outputs.exit-code }}
+          OUTCOME: ${{ steps.scan.outcome }}
+        run: |
+          set -euo pipefail
+          echo "scan exit-code='$CODE' outcome='$OUTCOME'"
+
+          # An empty exit code means the action died before the CLI reported,
+          # which is what a bad flag or the glob-grammar mismatch would look
+          # like. Distinguishing that from an honest findings exit is the
+          # point of this assertion.
+          [ -n "$CODE" ] || { echo "::error::scan produced no exit code; the CLI likely rejected its arguments."; exit 1; }
+
+          case "$CODE" in
+            0|1) ;;
+            *) echo "::error::scan exited $CODE (2 means it could not run)."; exit 1 ;;
+          esac
+
+          if [ "$CODE" = "1" ]; then
+            [ "$OUTCOME" = "failure" ] || { echo "::error::scan reported findings but gate mode passed."; exit 1; }
+          else
+            [ "$OUTCOME" = "success" ] || { echo "::error::scan reported no findings but the step failed."; exit 1; }
+          fi
+          echo "scan honored the exit contract."
+
+      # --- Incompatible combinations ------------------------------------
+      # scan cannot emit SARIF, and a tier passed to audit would be silently
+      # meaningless. Both must be rejected rather than quietly misbehave.
+      - name: Reject scan with a mode that needs SARIF
+        id: scansarif
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: annotate
+          command: scan
+
+      - name: Reject a scan-only input passed to audit
+        id: tieronaudit
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: annotate
+          command: audit
+          tier: essential
+
+      - name: Assert incompatible combinations were rejected
+        env:
+          SCANSARIF: ${{ steps.scansarif.outcome }}
+          TIERONAUDIT: ${{ steps.tieronaudit.outcome }}
+        run: |
+          set -euo pipefail
+          rc=0
+          [ "$SCANSARIF" = "failure" ] \
+            || { echo "::error::scan was accepted for a SARIF mode (outcome: $SCANSARIF)."; rc=1; }
+          [ "$TIERONAUDIT" = "failure" ] \
+            || { echo "::error::a scan-only input was silently accepted by audit (outcome: $TIERONAUDIT)."; rc=1; }
+          if [ $rc -eq 0 ]; then
+            echo "Both incompatible combinations were rejected, as intended."
+          fi
+          exit $rc
+
+      - name: Reject an invalid mode
+        id: badmode
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: self_check
+          mode: not-a-real-mode
+
+      - name: Reject a directory that is not a Dart project
+        id: notdart
+        continue-on-error: true
+        uses: ./
+        with:
+          working-directory: doc
+
+      - name: Assert both failure paths failed
+        env:
+          BADMODE: ${{ steps.badmode.outcome }}
+          NOTDART: ${{ steps.notdart.outcome }}
+        run: |
+          set -euo pipefail
+          rc=0
+          [ "$BADMODE" = "failure" ] \
+            || { echo "::error::An invalid mode was accepted (outcome: $BADMODE)."; rc=1; }
+          [ "$NOTDART" = "failure" ] \
+            || { echo "::error::A non-Dart directory was accepted (outcome: $NOTDART)."; rc=1; }
+          if [ $rc -eq 0 ]; then
+            echo "Both invalid configurations were rejected, as intended."
+          fi
+          exit $rc
