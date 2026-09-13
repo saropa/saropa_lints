@@ -3439,14 +3439,13 @@ class PreferLateFinalRule extends SaropaLintRule {
     final _LateFinalMethodCallCounterVisitor callVisitor =
         _LateFinalMethodCallCounterVisitor(methodCallCounts);
 
+    // Every class member, not just method/constructor bodies: a tear-off in a
+    // field initializer (`final VoidCallback _retry = _loadUser;`) or in a
+    // constructor's initializer list is just as unbounded a call site as one
+    // inside a body, and missing it let `prefer_late_final` recommend the
+    // change that throws `LateInitializationError` at run time.
     for (final ClassMember member in node.bodyMembers) {
-      if (member is MethodDeclaration) {
-        member.body.visitChildren(callVisitor);
-      }
-      if (member is ConstructorDeclaration &&
-          member.body is BlockFunctionBody) {
-        member.body.visitChildren(callVisitor);
-      }
+      member.visitChildren(callVisitor);
     }
 
     for (final MapEntry<String, Set<String>> entry

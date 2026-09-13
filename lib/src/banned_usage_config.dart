@@ -12,6 +12,7 @@
 /// optional `reason: '...'` on the next line.
 library;
 
+import 'package:saropa_lints/src/config/yaml_section_block.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// A single banned identifier entry.
@@ -55,7 +56,11 @@ void loadBannedUsageConfig(String? content) {
   ).firstMatch(content);
   if (sectionMatch == null) return;
 
-  final afterSection = content.afterIndex(sectionMatch.end);
+  // Bound both the sub-key search and the item loop below to this section's
+  // own indented block. Unbounded, an `entries:` belonging to a *later*
+  // top-level section would be adopted as this rule's config, and entries
+  // from later sections would be appended to a legitimately parsed list.
+  final afterSection = yamlSectionBlock(content.afterIndex(sectionMatch.end));
   final entriesMatch = RegExp(
     r'^\s+entries:\s*$',
     multiLine: true,
