@@ -2202,18 +2202,22 @@
         "stopped": "停止",
         "suspended": "一時停止",
         "starting": "開始",
-        "scanning": "スキャン"
+        "scanning": "スキャン",
+        "notConfigured": "未構成"
       },
       "rssNote": {
         "inProcess": "インプロセス、別途測定可能ではない",
-        "notRunning": "実行されていない"
+        "notRunning": "実行されていない",
+        "remote": "GitHub のホストランナー上で実行されるため、ここから測定できません"
       },
       "description": {
         "analyzerPlugin": "Dart分析サーバー内で実行されます — タイピング中にエディタ内でリアルタイムで警告が表示されます（スキャン不要）。トグル操作はプラグインの設定を変更します: analysis_options.yamlにブロックを追加します。",
         "scanDaemon": "保存時にプロジェクト全体を再スキャンし、レポート/.saropa_lints/violations.json を書き込むバックグラウンド プロセス。オフに切り替えると一時停止します。次に保存すると再開されます。",
-        "lspServer": "別個の言語サーバー — 開いているファイルおよびワークスペースファイルの診断情報を「問題」パネルに公開します。トグル操作は saropaLints.lspServer.enabled 設定に影響します。"
+        "lspServer": "別個の言語サーバー — 開いているファイルおよびワークスペースファイルの診断情報を「問題」パネルに公開します。トグル操作は saropaLints.lspServer.enabled 設定に影響します。",
+        "ci": "同梱の GitHub Actions ワークフローを有効/無効にするため、作業ツリー内の .github/workflows/saropa-lints.yml を読み書きします。これは現在のブランチのファイルを反映したものです — 実際にプルリクエストを制御するのはデフォルトブランチ側のコピーであり、両者は食い違うことがあります。切り替えによってワークフローが実行されたり削除されたりすることはありません。変更のレビューとコミットはご自身で行ってください。"
       },
-      "scanProgress": "スキャン: {done}/{total} ファイル"
+      "scanProgress": "スキャン: {done}/{total} ファイル",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "の上",
@@ -2236,10 +2240,18 @@
       "analyzerToggleOn": "分析プラグイン: 有効化中…",
       "analyzerToggleOff": "アナライザープラグイン: 無効化中…",
       "daemonToggleOn": "スキャン Daemon: 再開中…",
-      "daemonToggleOff": "スキャン Daemon: 一時停止中…"
+      "daemonToggleOff": "スキャン Daemon: 一時停止中…",
+      "ciToggleOn": "CI: 有効化しています…",
+      "ciToggleOff": "CI: 無効化しています…"
     },
     "sidebar": {
       "enginesLabel": "エンジン: {count} 実行中"
+    },
+    "ci": {
+      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}."
     }
   },
   "detailView": {

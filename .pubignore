@@ -92,3 +92,6 @@ vscode-saropa-lints/
 
 # GitHub workflows
 .github/
+
+# Composite GitHub Action (CI-only; not needed by package consumers)
+action.yml
