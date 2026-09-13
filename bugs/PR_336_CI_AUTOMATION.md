@@ -110,31 +110,7 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 
 ## What to test
 
-**1. Turn CI on from the UI.** Open the Saropa Lints sidebar, click the **Engines** row under Status to open System Health, find the **GitHub Actions CI** card, click **ON**. A workflow file should appear in Source Control. Confirm the card reads active. This is the path that has never run in a live extension host.
-
-**2. Turn it back off.** Click **OFF**. The file must still exist, with one `if: false` line added per job, and the card must read stopped. Click **ON** again and confirm the file returns to exactly what it was.
-
-**3. Break the off switch deliberately.** Hand-edit the generated workflow into a shape with no recognizable `jobs:` map, then click OFF. It must refuse with an error saying CI is still running, and offer to open the file — not silently report success.
-
-**4. The generated workflow honors your configuration.** On a project with a configured tier, confirm the generated file has no `tier:` input. On a project with no saropa_lints configuration at all, confirm it has `tier: recommended` — without it, `scan` exits 2.
-
-**5. The publish step, in both directions.** After clicking ON, the panel must show the publish section with four git commands. Press the copy button and confirm the clipboard holds them with real quote marks, not `&quot;`. Then press the create button and confirm a branch is pushed and a pull request opens containing only the workflow file. Repeat for OFF.
-
-**6. The publish step with a dirty tree.** Edit an unrelated file, leave it uncommitted, then publish. The resulting commit must contain the workflow file and nothing else, and the unrelated edit must still be sitting uncommitted afterwards.
-
-**7. The publish step refusing.** Publish to a branch-protected remote, or with the network down. The error must name the push command specifically, the panel section must stay on screen with its commands intact, and the local commit must still be there.
-
-**8. Declining the GitHub sign-in.** Press the create button and dismiss the sign-in prompt. The branch must still be pushed, and the fallback must offer the compare page rather than reporting a failure.
-
-**9. It does not fail the build.** Push the generated workflow on a project with known findings and confirm the check reports them without turning the pull request red.
-
-**10. `--emit-ci` produces the same file.** Run `dart run saropa_lints:init --emit-ci` on a scratch project and diff it against what the card writes. They should be identical. Run it twice and confirm the second run refuses rather than overwriting.
-
-**11. The engines panel with `saropaLints.debug.enabled` off.** The Engines row must still appear in the sidebar and the panel must still open.
-
-**12. The vibrancy generator actually gates.** Run "Generate CI Pipeline" with `maxOutdated` set to 0 on a project with outdated packages, push the result, and confirm the job fails. Before this it always passed.
-
-**13. The major tag, at release.** After the next release, confirm `v16` exists and points at it, and that `uses: saropa/saropa_lints@v16` resolves in a real workflow.
+Everything machine-verifiable is covered by the suites named under Verification status below. What is left needs a person and a running extension host, and is tracked as a recorded checklist in [`HUMAN_001_CI_AUTOMATION.md`](HUMAN_001_CI_AUTOMATION.md) — results go there, not here.
 
 ---
 
@@ -165,13 +141,13 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 
 **Did not run:**
 
-- **The extension in a live VS Code host.** The card's rendering, the toggle wiring through the webview, and the error path when disable refuses are typecheck-and-reasoning only. Items 1 through 3 and 7 above are the checks that close this, and none of them has been performed.
+- **The extension in a live VS Code host.** The card's rendering, the toggle wiring through the webview, and the error path when disable refuses are typecheck-and-reasoning only. Items 1 through 4 and 11 in [`HUMAN_001_CI_AUTOMATION.md`](HUMAN_001_CI_AUTOMATION.md) are the checks that close this, and none of them has been performed.
 - **The SARIF upload path.** The self-test sets `upload-sarif: false` so it needs no `security-events` permission, and the generated workflow no longer requests one, so nothing here has exercised an upload or seen an annotation render on a diff.
 - **`--since` against a real shallow checkout.** The refspec reasoning is sound but unproven; the self-test does not pass `since`.
 - **`install-sdk: auto` against a Flutter toolchain.** The self-test exercises the skip branch only.
 - **The generated workflows executing on a runner** — for `--emit-ci`, for the card, or for the vibrancy generator's three platforms. Their content is verified; their behavior in GitHub Actions and GitLab CI is not.
 - **The major tag move.** The code path runs only during a release, and the 16.3.0 release has not been cut yet.
-- **The publish step end to end in a live extension host.** The git layer beneath it is covered against real repositories, but the button that triggers it, the progress notification, the clipboard write, and the GitHub sign-in have only been typechecked. Items 5 through 8 of the test list exist to close that.
+- **The publish step end to end in a live extension host.** The git layer beneath it is covered against real repositories, but the button that triggers it, the progress notification, the clipboard write, and the GitHub sign-in have only been typechecked. Items 5 through 8 and 14 in [`HUMAN_001_CI_AUTOMATION.md`](HUMAN_001_CI_AUTOMATION.md) exist to close that.
 - **The Dart changes.** No Dart SDK is available in this environment, so `ciNeedsExplicitTier`, the `tier:` emission, and the four tests added for them in `test/init/init_emit_ci_test.dart` have not been executed locally. CI runs them.
 - **Pull request creation against the GitHub API.** No call has been made. The request shape follows the documented endpoint, and every failure mode falls back to the compare page, but neither the success path nor the fallback has been observed.
 
