@@ -75,11 +75,9 @@ void someMethod() {
       expect(codes.contains(_ruleCode), isTrue);
     });
 
-    test(
-      'flags debugger() in the else branch of a negated guard '
-      '(runs exactly when isTestEnvironment is true)',
-      () async {
-        const code = '''
+    test('flags debugger() in the else branch of a negated guard '
+        '(runs exactly when isTestEnvironment is true)', () async {
+      const code = '''
 import 'dart:developer';
 
 class PlatformUtils {
@@ -94,13 +92,12 @@ void someMethod() {
   }
 }
 ''';
-        final codes = await reportedRuleCodes(
-          GuardDebuggerAgainstTestEnvironmentRule(),
-          code,
-        );
-        expect(codes.contains(_ruleCode), isTrue);
-      },
-    );
+      final codes = await reportedRuleCodes(
+        GuardDebuggerAgainstTestEnvironmentRule(),
+        code,
+      );
+      expect(codes.contains(_ruleCode), isTrue);
+    });
   });
 
   group('GuardDebuggerAgainstTestEnvironmentRule - library-URI check', () {
