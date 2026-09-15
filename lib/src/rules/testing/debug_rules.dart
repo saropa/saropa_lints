@@ -1583,3 +1583,180 @@ class PreferLogTimestampRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when `dart:developer`'s `debugger()` is not lexically guarded
+/// against the test environment.
+///
+/// Since: v16.4.0 | Rule version: v1
+///
+/// `debugger()` pauses the isolate whenever a VM service is attached —
+/// which includes `flutter test`. A `debugger()` reached during a test run
+/// does not fail the test, it HANGS it: no verdict, no stack trace, and it
+/// takes the whole suite down with it (a test runner waiting on a paused
+/// isolate looks identical to one that is merely slow). This already
+/// happened in production: an activity-logging helper called `debugger()`
+/// whenever a required field was missing, with a comment claiming it was
+/// "No-op in release / when no debugger is attached" — that claim was
+/// false, one test exercised the path, and the resulting hang cost a full
+/// investigation before anyone found the frozen isolate was the cause.
+///
+/// **`kDebugMode` does NOT guard against this.** `flutter test` runs in
+/// debug mode, so `if (kDebugMode) debugger();` still pauses every test run
+/// — this is the trap developers reach for first, and it does nothing.
+///
+/// The rule looks for an enclosing `if` (anywhere up the lexical chain, not
+/// just the immediate parent) whose condition negates a recognized
+/// test-environment check, by SHAPE rather than by one consumer's exact
+/// spelling:
+/// - an identifier whose name contains `isTestEnvironment` (any receiver —
+///   `PlatformUtils.isTestEnvironment`, `env.isTestEnvironment`, a bare
+///   local), or
+/// - a condition mentioning `FLUTTER_TEST` (covers the inline
+///   `Platform.environment.containsKey('FLUTTER_TEST')` form).
+///
+/// **BAD:**
+/// ```dart
+/// import 'dart:developer';
+///
+/// void logActivity() {
+///   debugger(); // Hangs `flutter test` the moment this line runs.
+/// }
+/// ```
+///
+/// ```dart
+/// // kDebugMode is NOT a test-environment guard — flutter test is debug mode.
+/// if (kDebugMode) {
+///   debugger();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (!PlatformUtils.isTestEnvironment) {
+///   debugger();
+/// }
+/// ```
+///
+/// ```dart
+/// if (isBreak && !PlatformUtils.isTestEnvironment) {
+///   debugger();
+/// }
+/// ```
+///
+/// No quick fix: the correct guard's exact identifier is consumer-specific
+/// (this package has no single canonical spelling to insert), and the only
+/// universal SDK fallback — `Platform.environment.containsKey('FLUTTER_TEST')`
+/// — needs `dart:io`, which is unavailable on web. Inserting either as an
+/// unverified guess would be worse than no fix at all.
+class GuardDebuggerAgainstTestEnvironmentRule extends SaropaLintRule {
+  GuardDebuggerAgainstTestEnvironmentRule() : super(code: _code);
+
+  /// A hung, unwinnable test run is a correctness-blocking defect, not a
+  /// style nit — but `debugger()` itself is legitimate when a human is
+  /// attached, so the rule forces the guard rather than banning the call.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'guard_debugger_against_test_environment',
+    '[guard_debugger_against_test_environment] debugger() is not guarded '
+        'against the test environment. A VM service attaches during '
+        '`flutter test` too, so this pauses the isolate and HANGS the test '
+        'run with no verdict — kDebugMode does not help, flutter test runs '
+        'in debug mode. {v1}',
+    correctionMessage:
+        'Wrap in if (!YourPlatformCheck.isTestEnvironment) { debugger(); } '
+        'or a condition mentioning FLUTTER_TEST.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static final RegExp _isTestEnvironmentRegex = RegExp(r'\bisTestEnvironment');
+  static final RegExp _flutterTestRegex = RegExp(r'\bFLUTTER_TEST\b');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'debugger') return;
+      if (!_isDebuggerElement(node.methodName.element)) return;
+      if (!_isGuarded(node)) reporter.atNode(node);
+    });
+
+    // Belt-and-suspenders: a bare `debugger()` where the analyzer resolves
+    // it as a function-expression invocation rather than a method
+    // invocation (mirrors AvoidUnguardedDebugRule's handling of
+    // debugPrint()).
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
+      final Expression function = node.function;
+      if (function is! SimpleIdentifier || function.name != 'debugger') {
+        return;
+      }
+      if (!_isDebuggerElement(function.element)) return;
+      if (!_isGuarded(node)) reporter.atNode(node);
+    });
+  }
+
+  /// True when [element] resolves to `dart:developer`'s `debugger`, or is
+  /// unresolved (fail-safe: treat unresolved `debugger()` calls as the SDK
+  /// one rather than silently missing them — a user-defined `debugger()`
+  /// function is vanishingly unlikely).
+  bool _isDebuggerElement(Element? element) {
+    if (element == null) return true;
+    if (element.name != 'debugger') return false;
+    final LibraryElement? lib = element.library;
+    return lib != null && lib.uri.toString() == 'dart:developer';
+  }
+
+  /// True when [node] sits under an enclosing `if` whose condition negates
+  /// a recognized test-environment check, anywhere up the lexical chain.
+  bool _isGuarded(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement &&
+          _isNegatedTestEnvironmentGuard(current.expression)) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// True when [condition] negates a test-environment check somewhere
+  /// within it — covers a bare negation (`!PlatformUtils.isTestEnvironment`)
+  /// and a negated term inside a compound `&&`/`||` condition
+  /// (`isBreak && !PlatformUtils.isTestEnvironment`).
+  bool _isNegatedTestEnvironmentGuard(Expression condition) {
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      return _mentionsTestEnvironmentCheck(condition.operand);
+    }
+    if (condition is BinaryExpression) {
+      return _isNegatedTestEnvironmentGuard(condition.leftOperand) ||
+          _isNegatedTestEnvironmentGuard(condition.rightOperand);
+    }
+    if (condition is ParenthesizedExpression) {
+      return _isNegatedTestEnvironmentGuard(condition.expression);
+    }
+    return false;
+  }
+
+  /// True when [expression]'s source mentions an `isTestEnvironment`-shaped
+  /// identifier (any receiver) or a `FLUTTER_TEST` reference.
+  bool _mentionsTestEnvironmentCheck(Expression expression) {
+    final String source = expression.toSource();
+    return _isTestEnvironmentRegex.hasMatch(source) ||
+        _flutterTestRegex.hasMatch(source);
+  }
+}

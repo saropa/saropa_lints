@@ -237,6 +237,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferLogLevelsRule.new,
   PreferLogTimestampRule.new,
   AvoidUnguardedDebugRule.new,
+  GuardDebuggerAgainstTestEnvironmentRule.new,
   PreferConstStringListRule.new,
   AvoidUnnecessaryContainersRule.new,
   PreferConstLiteralsToCreateImmutablesRule.new,
