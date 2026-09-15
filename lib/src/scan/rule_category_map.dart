@@ -940,6 +940,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'google_sign_in_canceled_not_handled': 'packages',
   'google_sign_in_missing_exception_handler': 'packages',
   'google_sign_in_unchecked_supports_authenticate': 'packages',
+  'guard_debugger_against_test_environment': 'testing',
   'handle_throwing_invocations': 'flow',
   'home_widget_callback_missing_pragma': 'packages',
   'home_widget_callback_not_top_level': 'packages',

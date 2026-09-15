@@ -1583,3 +1583,299 @@ class PreferLogTimestampRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when `dart:developer`'s `debugger()` is not lexically guarded
+/// against the test environment.
+///
+/// Since: v16.4.0 | Rule version: v1
+///
+/// `debugger()` pauses the isolate whenever a VM service is attached —
+/// which includes `flutter test`. A `debugger()` reached during a test run
+/// does not fail the test, it HANGS it: no verdict, no stack trace, and it
+/// takes the whole suite down with it (a test runner waiting on a paused
+/// isolate looks identical to one that is merely slow). This already
+/// happened in production: an activity-logging helper called `debugger()`
+/// whenever a required field was missing, with a comment claiming it was
+/// "No-op in release / when no debugger is attached" — that claim was
+/// false, one test exercised the path, and the resulting hang cost a full
+/// investigation before anyone found the frozen isolate was the cause.
+///
+/// **`kDebugMode` does NOT guard against this.** `flutter test` runs in
+/// debug mode, so `if (kDebugMode) debugger();` still pauses every test run
+/// — this is the trap developers reach for first, and it does nothing.
+///
+/// The rule looks for an enclosing `if` (anywhere up the lexical chain, not
+/// just the immediate parent) whose condition negates a recognized
+/// test-environment check, by SHAPE rather than by one consumer's exact
+/// spelling:
+/// - an identifier whose name contains `isTestEnvironment` (any receiver —
+///   `PlatformUtils.isTestEnvironment`, `env.isTestEnvironment`, a bare
+///   local), or
+/// - a condition mentioning `FLUTTER_TEST` (covers the inline
+///   `Platform.environment.containsKey('FLUTTER_TEST')` form).
+///
+/// **BAD:**
+/// ```dart
+/// import 'dart:developer';
+///
+/// void logActivity() {
+///   debugger(); // Hangs `flutter test` the moment this line runs.
+/// }
+/// ```
+///
+/// ```dart
+/// // kDebugMode is NOT a test-environment guard — flutter test is debug mode.
+/// if (kDebugMode) {
+///   debugger();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (!PlatformUtils.isTestEnvironment) {
+///   debugger();
+/// }
+/// ```
+///
+/// ```dart
+/// if (isBreak && !PlatformUtils.isTestEnvironment) {
+///   debugger();
+/// }
+/// ```
+///
+/// ```dart
+/// // The guard-clause and inverted-branch forms count too.
+/// if (PlatformUtils.isTestEnvironment) return;
+/// debugger();
+/// ```
+///
+/// `&&` and `||` are not interchangeable: one guarded term of an `&&`
+/// guards the whole condition, but `if (isBreak || !isTestEnvironment)`
+/// still runs the branch under test whenever `isBreak` is true, so it is
+/// reported unless EVERY term of the `||` guarantees non-test. Conditions
+/// the rule does not model (`isTestEnvironment == false`, a ternary, an
+/// `is` check) are reported rather than assumed safe — for a rule whose
+/// failure mode is a hung, verdict-less test run, a false positive the
+/// author can rephrase beats a false negative nobody sees. A `debugger`
+/// tear-off (`final f = debugger; f();`) is likewise not tracked; only
+/// invocations are.
+///
+/// No quick fix: the correct guard's exact identifier is consumer-specific
+/// (this package has no single canonical spelling to insert), and the only
+/// universal SDK fallback — `Platform.environment.containsKey('FLUTTER_TEST')`
+/// — needs `dart:io`, which is unavailable on web. Inserting either as an
+/// unverified guess would be worse than no fix at all.
+class GuardDebuggerAgainstTestEnvironmentRule extends SaropaLintRule {
+  GuardDebuggerAgainstTestEnvironmentRule() : super(code: _code);
+
+  /// A hung, unwinnable test run is a correctness-blocking defect, not a
+  /// style nit — but `debugger()` itself is legitimate when a human is
+  /// attached, so the rule forces the guard rather than banning the call.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'guard_debugger_against_test_environment',
+    '[guard_debugger_against_test_environment] debugger() is not guarded '
+        'against the test environment. A VM service attaches during '
+        '`flutter test` too, so this pauses the isolate and HANGS the test '
+        'run with no verdict — kDebugMode does not help, flutter test runs '
+        'in debug mode. {v1}',
+    correctionMessage:
+        'Wrap in if (!YourPlatformCheck.isTestEnvironment) { debugger(); } '
+        'or a condition mentioning FLUTTER_TEST.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static final RegExp _isTestEnvironmentRegex = RegExp(r'\bisTestEnvironment');
+  static final RegExp _flutterTestRegex = RegExp(r'\bFLUTTER_TEST\b');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'debugger') return;
+      if (!_isDebuggerElement(node.methodName.element)) return;
+      if (!_isGuarded(node)) reporter.atNode(node);
+    });
+
+    // Belt-and-suspenders: a bare `debugger()` where the analyzer resolves
+    // it as a function-expression invocation rather than a method
+    // invocation (mirrors AvoidUnguardedDebugRule's handling of
+    // debugPrint()).
+    context.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
+      final Expression function = node.function;
+      if (function is! SimpleIdentifier || function.name != 'debugger') {
+        return;
+      }
+      if (!_isDebuggerElement(function.element)) return;
+      if (!_isGuarded(node)) reporter.atNode(node);
+    });
+  }
+
+  /// True when [element] resolves to `dart:developer`'s `debugger`, or is
+  /// unresolved (fail-safe: treat unresolved `debugger()` calls as the SDK
+  /// one rather than silently missing them — a user-defined `debugger()`
+  /// function is vanishingly unlikely).
+  bool _isDebuggerElement(Element? element) {
+    if (element == null) return true;
+    if (element.name != 'debugger') return false;
+    final LibraryElement? lib = element.library;
+    return lib != null && lib.uri.toString() == 'dart:developer';
+  }
+
+  /// True when [node] is only reachable outside the test environment.
+  ///
+  /// Three lexical shapes count, at any depth up the ancestor chain:
+  /// - the THEN branch of an `if` whose condition guarantees non-test
+  ///   (`if (!isTestEnvironment) { debugger(); }`),
+  /// - the ELSE branch of an `if` whose condition is implied by the test
+  ///   environment (`if (isTestEnvironment) {} else { debugger(); }` — the
+  ///   else branch runs exactly when the check is false), and
+  /// - any statement after an early-return guard clause in the same block
+  ///   (`if (isTestEnvironment) return;` … `debugger();`).
+  ///
+  /// The branch a match arrives through is load-bearing in both directions:
+  /// the else branch of a NEGATED guard runs exactly when
+  /// `isTestEnvironment` IS true, so a `debugger()` sitting there is
+  /// unguarded — the opposite of what the `if` appears to protect.
+  bool _isGuarded(AstNode node) {
+    AstNode child = node;
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        // A `debugger()` inside the CONDITION itself is neither branch, so
+        // it matches nothing here and stays unguarded.
+        if (identical(child, current.thenStatement)) {
+          if (_guaranteesNonTestEnvironment(current.expression)) return true;
+        } else if (identical(child, current.elseStatement)) {
+          if (_impliedByTestEnvironment(current.expression)) return true;
+        }
+      } else if (current is Block &&
+          _hasPrecedingTestEnvironmentExit(current, child)) {
+        return true;
+      }
+      child = current;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// True when a statement of [block] BEFORE [child] bails out of the block
+  /// whenever the test environment is detected — the `if (isTest) return;`
+  /// guard-clause idiom, which makes everything after it in the block
+  /// unreachable under test.
+  bool _hasPrecedingTestEnvironmentExit(Block block, AstNode child) {
+    for (final Statement statement in block.statements) {
+      // Reached the statement containing the call: nothing after it can
+      // guard it.
+      if (identical(statement, child)) return false;
+      if (statement is! IfStatement) continue;
+      // An `else` means the then branch is not a bail-out guard clause.
+      if (statement.elseStatement != null) continue;
+      if (!_impliedByTestEnvironment(statement.expression)) continue;
+      if (_alwaysLeavesBlock(statement.thenStatement)) return true;
+    }
+    return false;
+  }
+
+  /// True when [statement] always transfers control out of its enclosing
+  /// block, so the statements after it cannot run.
+  bool _alwaysLeavesBlock(Statement statement) {
+    if (statement is ReturnStatement ||
+        statement is BreakStatement ||
+        statement is ContinueStatement) {
+      return true;
+    }
+    if (statement is ExpressionStatement) {
+      final Expression expression = statement.expression;
+      return expression is ThrowExpression || expression is RethrowExpression;
+    }
+    if (statement is Block) {
+      final NodeList<Statement> statements = statement.statements;
+      return statements.isNotEmpty && _alwaysLeavesBlock(statements.last);
+    }
+    return false;
+  }
+
+  /// True when [condition] being TRUE proves the code is not running under
+  /// test — i.e. it is a usable guard for the `then` branch.
+  ///
+  /// `&&` and `||` are NOT interchangeable here, and treating them alike is
+  /// exactly how an unguarded `debugger()` slips through: one guarded term
+  /// of an `&&` guards the whole condition, but `isBreak ||
+  /// !isTestEnvironment` still runs the branch under test whenever
+  /// `isBreak` is true, so EVERY term of a `||` must guarantee it.
+  bool _guaranteesNonTestEnvironment(Expression condition) {
+    if (condition is ParenthesizedExpression) {
+      return _guaranteesNonTestEnvironment(condition.expression);
+    }
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      // `!X` proves non-test exactly when being under test forces X true.
+      return _impliedByTestEnvironment(condition.operand);
+    }
+    if (condition is BinaryExpression) {
+      final String operator = condition.operator.lexeme;
+      if (operator == '&&') {
+        return _guaranteesNonTestEnvironment(condition.leftOperand) ||
+            _guaranteesNonTestEnvironment(condition.rightOperand);
+      }
+      if (operator == '||') {
+        return _guaranteesNonTestEnvironment(condition.leftOperand) &&
+            _guaranteesNonTestEnvironment(condition.rightOperand);
+      }
+    }
+    // Any other shape (`==`, `is`, a ternary, a plain call) is not a
+    // recognized guard. Staying silent about it would risk a hung test run,
+    // so it is reported instead.
+    return false;
+  }
+
+  /// True when running under test forces [expression] to be TRUE — i.e. the
+  /// check itself, such as `PlatformUtils.isTestEnvironment` or
+  /// `Platform.environment.containsKey('FLUTTER_TEST')`.
+  ///
+  /// This is the dual of [_guaranteesNonTestEnvironment], so the two recurse
+  /// into each other through `!`, and `&&`/`||` swap roles between them.
+  bool _impliedByTestEnvironment(Expression expression) {
+    if (expression is ParenthesizedExpression) {
+      return _impliedByTestEnvironment(expression.expression);
+    }
+    if (expression is PrefixExpression && expression.operator.lexeme == '!') {
+      return _guaranteesNonTestEnvironment(expression.operand);
+    }
+    if (expression is BinaryExpression) {
+      final String operator = expression.operator.lexeme;
+      if (operator == '&&') {
+        return _impliedByTestEnvironment(expression.leftOperand) &&
+            _impliedByTestEnvironment(expression.rightOperand);
+      }
+      if (operator == '||') {
+        return _impliedByTestEnvironment(expression.leftOperand) ||
+            _impliedByTestEnvironment(expression.rightOperand);
+      }
+    }
+    return _mentionsTestEnvironmentCheck(expression);
+  }
+
+  /// True when [expression]'s source mentions an `isTestEnvironment`-shaped
+  /// identifier (any receiver) or a `FLUTTER_TEST` reference.
+  bool _mentionsTestEnvironmentCheck(Expression expression) {
+    final String source = expression.toSource();
+    return _isTestEnvironmentRegex.hasMatch(source) ||
+        _flutterTestRegex.hasMatch(source);
+  }
+}

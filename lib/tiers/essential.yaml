@@ -93,3 +93,8 @@ plugins:
       avoid_swallowing_exceptions: true
       avoid_losing_stack_trace: true
       no_empty_block: true
+
+      # =========================================================================
+      # CI HANGS - Test runs that never finish
+      # =========================================================================
+      guard_debugger_against_test_environment: true

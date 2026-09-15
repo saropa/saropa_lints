@@ -4,7 +4,7 @@ import 'package:saropa_lints/src/rules/testing/debug_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
 
-/// Tests for 11 Debug lint rules.
+/// Tests for 12 Debug lint rules.
 ///
 /// Test fixtures: example/lib/debug/*
 // Test-only print/debug patterns and fail helpers in example fixtures.
@@ -21,6 +21,20 @@ void main() {
       final rule = AvoidUnguardedDebugRule();
       expect(rule.code.lowerCaseName, 'avoid_unguarded_debug');
       expect(rule.code.problemMessage, contains('[avoid_unguarded_debug]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
+    test('GuardDebuggerAgainstTestEnvironmentRule '
+        '(guard_debugger_against_test_environment)', () {
+      final rule = GuardDebuggerAgainstTestEnvironmentRule();
+      expect(
+        rule.code.lowerCaseName,
+        'guard_debugger_against_test_environment',
+      );
+      expect(
+        rule.code.problemMessage,
+        contains('[guard_debugger_against_test_environment]'),
+      );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
