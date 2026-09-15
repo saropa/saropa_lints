@@ -1643,6 +1643,23 @@ class PreferLogTimestampRule extends SaropaLintRule {
 /// }
 /// ```
 ///
+/// ```dart
+/// // The guard-clause and inverted-branch forms count too.
+/// if (PlatformUtils.isTestEnvironment) return;
+/// debugger();
+/// ```
+///
+/// `&&` and `||` are not interchangeable: one guarded term of an `&&`
+/// guards the whole condition, but `if (isBreak || !isTestEnvironment)`
+/// still runs the branch under test whenever `isBreak` is true, so it is
+/// reported unless EVERY term of the `||` guarantees non-test. Conditions
+/// the rule does not model (`isTestEnvironment == false`, a ternary, an
+/// `is` check) are reported rather than assumed safe — for a rule whose
+/// failure mode is a hung, verdict-less test run, a false positive the
+/// author can rephrase beats a false negative nobody sees. A `debugger`
+/// tear-off (`final f = debugger; f();`) is likewise not tracked; only
+/// invocations are.
+///
 /// No quick fix: the correct guard's exact identifier is consumer-specific
 /// (this package has no single canonical spelling to insert), and the only
 /// universal SDK fallback — `Platform.environment.containsKey('FLUTTER_TEST')`
@@ -1720,21 +1737,35 @@ class GuardDebuggerAgainstTestEnvironmentRule extends SaropaLintRule {
     return lib != null && lib.uri.toString() == 'dart:developer';
   }
 
-  /// True when [node] sits under an enclosing `if` whose condition negates
-  /// a recognized test-environment check, anywhere up the lexical chain.
+  /// True when [node] is only reachable outside the test environment.
   ///
-  /// Only counts when [node] is reached through the `if`'s THEN branch: a
-  /// negated guard's `else` branch runs exactly when the negated condition
-  /// is false (e.g. when `isTestEnvironment` IS true), so a `debugger()`
-  /// call sitting there is unguarded — the opposite of what the `if`
-  /// appears to protect.
+  /// Three lexical shapes count, at any depth up the ancestor chain:
+  /// - the THEN branch of an `if` whose condition guarantees non-test
+  ///   (`if (!isTestEnvironment) { debugger(); }`),
+  /// - the ELSE branch of an `if` whose condition is implied by the test
+  ///   environment (`if (isTestEnvironment) {} else { debugger(); }` — the
+  ///   else branch runs exactly when the check is false), and
+  /// - any statement after an early-return guard clause in the same block
+  ///   (`if (isTestEnvironment) return;` … `debugger();`).
+  ///
+  /// The branch a match arrives through is load-bearing in both directions:
+  /// the else branch of a NEGATED guard runs exactly when
+  /// `isTestEnvironment` IS true, so a `debugger()` sitting there is
+  /// unguarded — the opposite of what the `if` appears to protect.
   bool _isGuarded(AstNode node) {
     AstNode child = node;
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is IfStatement &&
-          !identical(child, current.elseStatement) &&
-          _isNegatedTestEnvironmentGuard(current.expression)) {
+      if (current is IfStatement) {
+        // A `debugger()` inside the CONDITION itself is neither branch, so
+        // it matches nothing here and stays unguarded.
+        if (identical(child, current.thenStatement)) {
+          if (_guaranteesNonTestEnvironment(current.expression)) return true;
+        } else if (identical(child, current.elseStatement)) {
+          if (_impliedByTestEnvironment(current.expression)) return true;
+        }
+      } else if (current is Block &&
+          _hasPrecedingTestEnvironmentExit(current, child)) {
         return true;
       }
       child = current;
@@ -1743,22 +1774,101 @@ class GuardDebuggerAgainstTestEnvironmentRule extends SaropaLintRule {
     return false;
   }
 
-  /// True when [condition] negates a test-environment check somewhere
-  /// within it — covers a bare negation (`!PlatformUtils.isTestEnvironment`)
-  /// and a negated term inside a compound `&&`/`||` condition
-  /// (`isBreak && !PlatformUtils.isTestEnvironment`).
-  bool _isNegatedTestEnvironmentGuard(Expression condition) {
-    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
-      return _mentionsTestEnvironmentCheck(condition.operand);
-    }
-    if (condition is BinaryExpression) {
-      return _isNegatedTestEnvironmentGuard(condition.leftOperand) ||
-          _isNegatedTestEnvironmentGuard(condition.rightOperand);
-    }
-    if (condition is ParenthesizedExpression) {
-      return _isNegatedTestEnvironmentGuard(condition.expression);
+  /// True when a statement of [block] BEFORE [child] bails out of the block
+  /// whenever the test environment is detected — the `if (isTest) return;`
+  /// guard-clause idiom, which makes everything after it in the block
+  /// unreachable under test.
+  bool _hasPrecedingTestEnvironmentExit(Block block, AstNode child) {
+    for (final Statement statement in block.statements) {
+      // Reached the statement containing the call: nothing after it can
+      // guard it.
+      if (identical(statement, child)) return false;
+      if (statement is! IfStatement) continue;
+      // An `else` means the then branch is not a bail-out guard clause.
+      if (statement.elseStatement != null) continue;
+      if (!_impliedByTestEnvironment(statement.expression)) continue;
+      if (_alwaysLeavesBlock(statement.thenStatement)) return true;
     }
     return false;
+  }
+
+  /// True when [statement] always transfers control out of its enclosing
+  /// block, so the statements after it cannot run.
+  bool _alwaysLeavesBlock(Statement statement) {
+    if (statement is ReturnStatement ||
+        statement is BreakStatement ||
+        statement is ContinueStatement) {
+      return true;
+    }
+    if (statement is ExpressionStatement) {
+      final Expression expression = statement.expression;
+      return expression is ThrowExpression || expression is RethrowExpression;
+    }
+    if (statement is Block) {
+      final NodeList<Statement> statements = statement.statements;
+      return statements.isNotEmpty && _alwaysLeavesBlock(statements.last);
+    }
+    return false;
+  }
+
+  /// True when [condition] being TRUE proves the code is not running under
+  /// test — i.e. it is a usable guard for the `then` branch.
+  ///
+  /// `&&` and `||` are NOT interchangeable here, and treating them alike is
+  /// exactly how an unguarded `debugger()` slips through: one guarded term
+  /// of an `&&` guards the whole condition, but `isBreak ||
+  /// !isTestEnvironment` still runs the branch under test whenever
+  /// `isBreak` is true, so EVERY term of a `||` must guarantee it.
+  bool _guaranteesNonTestEnvironment(Expression condition) {
+    if (condition is ParenthesizedExpression) {
+      return _guaranteesNonTestEnvironment(condition.expression);
+    }
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      // `!X` proves non-test exactly when being under test forces X true.
+      return _impliedByTestEnvironment(condition.operand);
+    }
+    if (condition is BinaryExpression) {
+      final String operator = condition.operator.lexeme;
+      if (operator == '&&') {
+        return _guaranteesNonTestEnvironment(condition.leftOperand) ||
+            _guaranteesNonTestEnvironment(condition.rightOperand);
+      }
+      if (operator == '||') {
+        return _guaranteesNonTestEnvironment(condition.leftOperand) &&
+            _guaranteesNonTestEnvironment(condition.rightOperand);
+      }
+    }
+    // Any other shape (`==`, `is`, a ternary, a plain call) is not a
+    // recognized guard. Staying silent about it would risk a hung test run,
+    // so it is reported instead.
+    return false;
+  }
+
+  /// True when running under test forces [expression] to be TRUE — i.e. the
+  /// check itself, such as `PlatformUtils.isTestEnvironment` or
+  /// `Platform.environment.containsKey('FLUTTER_TEST')`.
+  ///
+  /// This is the dual of [_guaranteesNonTestEnvironment], so the two recurse
+  /// into each other through `!`, and `&&`/`||` swap roles between them.
+  bool _impliedByTestEnvironment(Expression expression) {
+    if (expression is ParenthesizedExpression) {
+      return _impliedByTestEnvironment(expression.expression);
+    }
+    if (expression is PrefixExpression && expression.operator.lexeme == '!') {
+      return _guaranteesNonTestEnvironment(expression.operand);
+    }
+    if (expression is BinaryExpression) {
+      final String operator = expression.operator.lexeme;
+      if (operator == '&&') {
+        return _impliedByTestEnvironment(expression.leftOperand) &&
+            _impliedByTestEnvironment(expression.rightOperand);
+      }
+      if (operator == '||') {
+        return _impliedByTestEnvironment(expression.leftOperand) ||
+            _impliedByTestEnvironment(expression.rightOperand);
+      }
+    }
+    return _mentionsTestEnvironmentCheck(expression);
   }
 
   /// True when [expression]'s source mentions an `isTestEnvironment`-shaped

@@ -41,6 +41,32 @@ void _bad_elseBranchOfNegatedGuard() {
   }
 }
 
+// BAD: `||` does not guard — the branch still runs under test whenever
+// isBreak is true. Only `&&` lets one guarded term cover the condition.
+void _bad_orCompoundIsNotAGuard() {
+  if (isBreak || !PlatformUtils.isTestEnvironment) {
+    // expect_lint: guard_debugger_against_test_environment
+    debugger();
+  }
+}
+
+// BAD: !(A && B) is true under test whenever B is false.
+void _bad_negatedAndIsNotAGuard() {
+  if (!(PlatformUtils.isTestEnvironment && isBreak)) {
+    // expect_lint: guard_debugger_against_test_environment
+    debugger();
+  }
+}
+
+// BAD: a guard clause that falls through guards nothing.
+void _bad_guardClauseWithoutBailOut() {
+  if (PlatformUtils.isTestEnvironment) {
+    isBreak = false;
+  }
+  // expect_lint: guard_debugger_against_test_environment
+  debugger();
+}
+
 // GOOD: direct negated guard.
 void _good_directGuard() {
   if (!PlatformUtils.isTestEnvironment) {
@@ -68,5 +94,28 @@ void _good_guardUpTheChain() {
     if (isBreak) {
       debugger();
     }
+  }
+}
+
+// GOOD: early-return guard clause — the call is unreachable under test.
+void _good_earlyReturnGuardClause() {
+  if (PlatformUtils.isTestEnvironment) return;
+  debugger();
+}
+
+// GOOD: else branch of a POSITIVE check runs only outside the test
+// environment (the mirror image of the bad else-branch case above).
+void _good_elseBranchOfPositiveCheck() {
+  if (PlatformUtils.isTestEnvironment) {
+    // skip
+  } else {
+    debugger();
+  }
+}
+
+// GOOD: De Morgan — !(isTestEnvironment || x) implies !isTestEnvironment.
+void _good_negatedOr() {
+  if (!(PlatformUtils.isTestEnvironment || isBreak)) {
+    debugger();
   }
 }
