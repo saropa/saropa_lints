@@ -579,6 +579,7 @@ const Set<String> essentialRules = <String>{
   'require_form_key_in_stateful_widget', // WARNING - form state loss
   'prefer_timeout_on_requests', // WARNING - hang prevention
   'require_connectivity_timeout', // WARNING - hang prevention
+  'guard_debugger_against_test_environment', // WARNING - hangs flutter test
   'avoid_bloc_context_dependency', // WARNING - testability
   'avoid_provider_value_rebuild', // WARNING - memory leak
   'avoid_notification_same_id', // WARNING - overwrites
