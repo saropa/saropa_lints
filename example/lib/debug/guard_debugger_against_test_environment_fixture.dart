@@ -30,6 +30,17 @@ void _bad_kDebugModeDoesNotHelp() {
   }
 }
 
+// BAD: debugger() in the else branch of a negated guard — this runs
+// exactly when isTestEnvironment IS true, the opposite of guarded.
+void _bad_elseBranchOfNegatedGuard() {
+  if (!PlatformUtils.isTestEnvironment) {
+    // safe path
+  } else {
+    // expect_lint: guard_debugger_against_test_environment
+    debugger();
+  }
+}
+
 // GOOD: direct negated guard.
 void _good_directGuard() {
   if (!PlatformUtils.isTestEnvironment) {

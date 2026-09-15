@@ -74,6 +74,33 @@ void someMethod() {
       );
       expect(codes.contains(_ruleCode), isTrue);
     });
+
+    test(
+      'flags debugger() in the else branch of a negated guard '
+      '(runs exactly when isTestEnvironment is true)',
+      () async {
+        const code = '''
+import 'dart:developer';
+
+class PlatformUtils {
+  static bool isTestEnvironment = false;
+}
+
+void someMethod() {
+  if (!PlatformUtils.isTestEnvironment) {
+    // safe path
+  } else {
+    debugger();
+  }
+}
+''';
+        final codes = await reportedRuleCodes(
+          GuardDebuggerAgainstTestEnvironmentRule(),
+          code,
+        );
+        expect(codes.contains(_ruleCode), isTrue);
+      },
+    );
   });
 
   group('GuardDebuggerAgainstTestEnvironmentRule - library-URI check', () {
