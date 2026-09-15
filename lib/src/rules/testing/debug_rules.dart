@@ -1722,13 +1722,22 @@ class GuardDebuggerAgainstTestEnvironmentRule extends SaropaLintRule {
 
   /// True when [node] sits under an enclosing `if` whose condition negates
   /// a recognized test-environment check, anywhere up the lexical chain.
+  ///
+  /// Only counts when [node] is reached through the `if`'s THEN branch: a
+  /// negated guard's `else` branch runs exactly when the negated condition
+  /// is false (e.g. when `isTestEnvironment` IS true), so a `debugger()`
+  /// call sitting there is unguarded — the opposite of what the `if`
+  /// appears to protect.
   bool _isGuarded(AstNode node) {
+    AstNode child = node;
     AstNode? current = node.parent;
     while (current != null) {
       if (current is IfStatement &&
+          !identical(child, current.elseStatement) &&
           _isNegatedTestEnvironmentGuard(current.expression)) {
         return true;
       }
+      child = current;
       current = current.parent;
     }
     return false;
