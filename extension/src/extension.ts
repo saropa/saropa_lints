@@ -177,15 +177,18 @@ import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
 import {
-  CI_WORKFLOW_RELATIVE_PATH,
+  ciWorkflowPathFromProject,
   disableCiWorkflow,
   enableCiWorkflow,
+  getCiWorkflowPath,
   getCiWorkflowState,
   needsExplicitTier,
+  readCiWorkflow,
 } from './systemHealth/ciWorkflow';
 import {
   buildCiPublishPlan,
   compareUrl,
+  hasUncommittedChanges,
   isGitRepository,
   runCiPublish,
   type CiPublishDirection,
@@ -1992,6 +1995,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         // runs `scan` where no rule config exists, is a workflow that fails on
         // its first run. Resolve both here rather than leaving the user to
         // discover them from a red PR.
+        // Asked before the edit below: were there already edits of the
+        // user's in pubspec.yaml? A commit takes whole files, so publishing
+        // the dependency would push those too — the plan is then blocked.
+        const pubspecHadEdits =
+          isGitRepository(ciRoot) && hasUncommittedChanges(ciRoot, 'pubspec.yaml');
+        const before = readCiWorkflow(ciRoot);
         const added = ensureSaropaLintsInPubspec(ciRoot);
         if (!added.ok) return; // ensureSaropaLintsInPubspec already explained why
 
@@ -2018,31 +2027,45 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         // When the dependency was just added, that edit has to travel with the
         // workflow. A pull request carrying the workflow alone would fail its
         // very first run with "saropa_lints is not a resolved dependency".
-        presentCiPublishStep(ciRoot, 'enable', added.changed ? ['pubspec.yaml'] : []);
-      } else if (!disableCiWorkflow(ciRoot)) {
-        // The off switch failed: the file is missing, or its shape is one we
-        // will not edit blind. Never let that look like success — CI is still
-        // running and the user believes they stopped it. Say so, and open the
-        // file so they can stop it by hand right now.
-        const openLabel = l10n('debug.ci.openWorkflow');
-        const choice = await vscode.window.showErrorMessage(
-          l10n('debug.ci.disableFailed', { path: CI_WORKFLOW_RELATIVE_PATH }),
-          openLabel,
-        );
-        if (choice === openLabel) {
-          const uri = vscode.Uri.file(
-            path.join(ciRoot, ...CI_WORKFLOW_RELATIVE_PATH.split('/')),
+        //
+        // Nothing to publish when neither file changed (CI was already on):
+        // a plan then would cut a branch and fail with nothing to commit.
+        if (added.changed || readCiWorkflow(ciRoot) !== before) {
+          presentCiPublishStep(
+            ciRoot,
+            'enable',
+            added.changed ? ['pubspec.yaml'] : [],
+            added.changed && pubspecHadEdits
+              ? l10n('debug.ci.publish.pubspecHasOtherEdits')
+              : undefined,
           );
-          try {
-            await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(uri));
-          } catch {
-            void vscode.window.showErrorMessage(
-              l10n('debug.ci.openWorkflowFailed', { path: CI_WORKFLOW_RELATIVE_PATH }),
-            );
-          }
         }
       } else {
-        presentCiPublishStep(ciRoot, 'disable');
+        const beforeOff = readCiWorkflow(ciRoot);
+        if (!disableCiWorkflow(ciRoot)) {
+          // The off switch failed: the file is missing, or its shape is one we
+          // will not edit blind. Never let that look like success — CI is still
+          // running and the user believes they stopped it. Say so, and open the
+          // file so they can stop it by hand right now.
+          const openLabel = l10n('debug.ci.openWorkflow');
+          const choice = await vscode.window.showErrorMessage(
+            l10n('debug.ci.disableFailed', { path: ciWorkflowPathFromProject(ciRoot) }),
+            openLabel,
+          );
+          if (choice === openLabel) {
+            const uri = vscode.Uri.file(getCiWorkflowPath(ciRoot));
+            try {
+              await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(uri));
+            } catch {
+              void vscode.window.showErrorMessage(
+                l10n('debug.ci.openWorkflowFailed', { path: ciWorkflowPathFromProject(ciRoot) }),
+              );
+            }
+          }
+        } else if (readCiWorkflow(ciRoot) !== beforeOff) {
+          // Only when OFF changed the file: already off means nothing to publish.
+          presentCiPublishStep(ciRoot, 'disable');
+        }
       }
       HealthPanel.refreshIfOpen();
     }
@@ -2064,17 +2087,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     root: string,
     direction: CiPublishDirection,
     extraPaths: readonly string[] = [],
+    blockedReason?: string,
   ): void {
     if (!isGitRepository(root)) {
       void vscode.window.showInformationMessage(
-        l10n('debug.ci.publish.notARepository', { path: CI_WORKFLOW_RELATIVE_PATH }),
+        l10n('debug.ci.publish.notARepository', { path: ciWorkflowPathFromProject(root) }),
       );
       return;
     }
     // Opening the panel is the point: the step is only meaningful if the user
     // can see it, and the toggle may have come from the sidebar row.
     HealthPanel.createOrShow(context);
-    HealthPanel.setPendingCiPublish(buildCiPublishPlan(root, direction, extraPaths));
+    HealthPanel.setPendingCiPublish(buildCiPublishPlan(root, direction, extraPaths, blockedReason));
   }
 
   /**

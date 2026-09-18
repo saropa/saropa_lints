@@ -305,7 +305,7 @@ dart run saropa_lints audit . --since main --format sarif --output results.sarif
 | `--exclude-globs <g>` | Comma-separated glob patterns to skip. |
 | `--include-globs <g>` | Comma-separated glob patterns to force-include. |
 | `--save-baseline` | Save this audit as the project baseline. |
-| `--baseline` | Compare against the saved baseline and tag diagnostics. |
+| `--baseline` | Compare against the saved baseline and tag diagnostics. Only new findings make the exit code 1. |
 | `--baseline-path <p>` | Override baseline file path. |
 | `--profile` | Emit per-rule timing report. |
 | `--quiet`, `-q` | Suppress non-fatal stderr messages; emit structured JSON progress lines for tooling. |
@@ -446,7 +446,7 @@ jobs:
             --quiet
 ```
 
-**Baseline comparison** (flag new-vs-existing findings):
+**Baseline comparison** (flag new-vs-existing findings; exits 1 only when a finding is new):
 
 ```yaml
       - name: Run audit with baseline

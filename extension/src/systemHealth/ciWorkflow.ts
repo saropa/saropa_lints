@@ -192,6 +192,10 @@ function buildTemplate(root: string, opts: CiWorkflowOptions = {}): string {
   // Only emitted when the project has no rule config of its own — otherwise
   // naming a tier here would override the team's configured rule set.
   const tierLine = opts.tier ? `\n          tier: ${opts.tier}` : '';
+  // A project below the repository root: the workflow lives at the root, so
+  // the action has to be told where the pubspec is.
+  const projectPath = projectPathInRepo(root);
+  const workingDirectoryLine = projectPath ? `\n          working-directory: ${projectPath}` : '';
   // Honor the caller's choice rather than ignoring it: silently writing
   // `gate` for a caller that asked for `annotate` would be a workflow that
   // does the opposite of what the code requesting it said.
@@ -233,7 +237,7 @@ jobs:
           # here. The alternative, annotate, runs every rule regardless of
           # configured tier, which on a 2332-rule set means findings from rules
           # the project never enabled.
-          mode: ${mode}${tierLine}
+          mode: ${mode}${tierLine}${workingDirectoryLine}
 `;
 }
 
@@ -242,7 +246,53 @@ export type CiWorkflowState = 'active' | 'stopped' | 'absent';
 
 /** Absolute path to the generated workflow file under `root`. */
 export function getCiWorkflowPath(root: string): string {
-  return path.join(root, ...CI_WORKFLOW_RELATIVE_PATH.split('/'));
+  return path.join(findRepoRoot(root) ?? root, ...CI_WORKFLOW_RELATIVE_PATH.split('/'));
+}
+
+/**
+ * The enclosing git repository's root: the nearest directory, from `start`
+ * upward, holding a `.git` entry (a directory, or a file in a worktree or
+ * submodule). Undefined outside a repository.
+ *
+ * GitHub only runs workflows from the repository root's `.github/workflows`,
+ * so a Dart project in a subdirectory (`repo/app/pubspec.yaml`) must have its
+ * workflow written there, not under the project.
+ */
+export function findRepoRoot(start: string): string | undefined {
+  let dir = path.resolve(start);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, '.git'))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) return undefined;
+    dir = parent;
+  }
+}
+
+/**
+ * The project's path inside its repository, POSIX-style, or '' when the
+ * project is the repository root (or not in one). Becomes the action's
+ * `working-directory` input.
+ */
+export function projectPathInRepo(root: string): string {
+  const repo = findRepoRoot(root);
+  if (!repo) return '';
+  return path.relative(repo, path.resolve(root)).split(path.sep).join('/');
+}
+
+/**
+ * The workflow file's path relative to the project root, POSIX-style — what
+ * a git pathspec run from the project root, and a message shown to the user,
+ * should say. `.github/workflows/saropa-lints.yml` for a project at the
+ * repository root; `../.github/workflows/saropa-lints.yml` one level down.
+ */
+export function ciWorkflowPathFromProject(root: string): string {
+  return path.relative(path.resolve(root), getCiWorkflowPath(root)).split(path.sep).join('/');
+}
+
+/** The workflow's current text, or undefined when there is none. */
+export function readCiWorkflow(root: string): string | undefined {
+  const file = getCiWorkflowPath(root);
+  return fs.existsSync(file) ? fs.readFileSync(file, 'utf-8') : undefined;
 }
 
 /**
@@ -298,7 +348,9 @@ export function enableCiWorkflow(
  * A job with no `if:` gets one inserted. A job that already has one keeps it,
  * inside the marker comment, and ON restores it (see [WAS_SEPARATOR]).
  *
- * A no-op when the file is already suspended. Returns false, leaving the file
+ * Jobs already suspended are left exactly as they are, so a second OFF also
+ * suspends a job added since the first one, instead of reporting "stopped"
+ * while that job runs. Returns false, leaving the file
  * untouched, when the file is missing or when any job's shape isn't
  * recognized: a flow-style job, an empty job, or an `if:` that spans several
  * lines. Suspending some jobs and not others would leave CI running while the
@@ -309,8 +361,6 @@ export function disableCiWorkflow(root: string): boolean {
   if (!fs.existsSync(file)) return false;
 
   const content = fs.readFileSync(file, 'utf-8');
-  if (content.includes(DISABLE_MARKER)) return true; // already disabled
-
   const lines = content.split('\n');
   const jobsIndex = lines.findIndex((l) => /^jobs:\s*(#.*)?$/.test(l));
   if (jobsIndex === -1) return false;
@@ -353,7 +403,9 @@ export function disableCiWorkflow(root: string): boolean {
     const indent = /^ */.exec(first)![0];
 
     const ifAt = body.findIndex((l) => l.startsWith(`${indent}if:`));
-    if (ifAt === -1) {
+    if (ifAt !== -1 && body[ifAt].includes(DISABLE_MARKER)) {
+      out.push(...body); // suspended by an earlier OFF
+    } else if (ifAt === -1) {
       out.push(`${indent}if: false  ${DISABLE_MARKER}`, ...body);
     } else {
       const original = body[ifAt];
@@ -377,6 +429,7 @@ export function disableCiWorkflow(root: string): boolean {
   if (suspended === 0) return false;
   out.push(...lines.slice(end));
 
-  fs.writeFileSync(file, out.join('\n'), 'utf-8');
+  const next = out.join('\n');
+  if (next !== content) fs.writeFileSync(file, next, 'utf-8');
   return true;
 }
