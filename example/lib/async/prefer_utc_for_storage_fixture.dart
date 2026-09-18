@@ -122,10 +122,7 @@ class UserModel {
 
   // GOOD: toJson with UTC
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'createdAt': createdAt.toUtc().toIso8601String(),
-    };
+    return {'name': name, 'createdAt': createdAt.toUtc().toIso8601String()};
   }
 
   // BAD: toMap without UTC
@@ -139,10 +136,7 @@ class UserModel {
 
   // GOOD: toMap with UTC
   Map<String, dynamic> toMap() {
-    return {
-      'name': name,
-      'createdAt': createdAt.toUtc().toIso8601String(),
-    };
+    return {'name': name, 'createdAt': createdAt.toUtc().toIso8601String()};
   }
 }
 
@@ -177,3 +171,30 @@ class JsonEncoder {
 
   String encode(Map<String, dynamic> data) => data.toString();
 }
+
+// =============================================================================
+// BAD: constructor-promoted field, still flagged (field-tracing removed)
+// =============================================================================
+//
+// An earlier version of this rule tried to resolve a field's receiver back
+// to its construction site(s) and suppress when every site supplied a UTC
+// value. That approximation turned out to still miss several construction
+// paths (redirecting factory constructors, subclass constructors forwarding
+// through `super(...)`, mixin-application class aliases, tear-offs, and —
+// for any non-private class — construction sites in other files/parts a
+// single-file scan can never see), so it was removed rather than patched
+// further. A field's `.toIso8601String()` call is flagged even when every
+// construction site visible in this file is UTC, exactly like the shape
+// from the originating bug report.
+class HostStatement {
+  const HostStatement({required this.at});
+
+  final DateTime at;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    // expect_lint: prefer_utc_for_storage
+    'at': at.toIso8601String(),
+  };
+}
+
+HostStatement makeHostStatement() => HostStatement(at: DateTime.now().toUtc());

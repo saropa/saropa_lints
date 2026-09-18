@@ -22,6 +22,9 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/platforms/windows/case_insensitive_path_fix.dart';
@@ -440,7 +443,9 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
       // Root-detection idiom: `dir.path == dir.parent.path` — both
       // sides come from the same Directory API call so casing is
       // always consistent; this is a standard Dart filesystem-root test.
-      if (_isRootDetectionIdiom(leftSource, rightSource)) return;
+      // Resolves through a single intermediate local variable too, e.g.
+      // `final parent = dir.parent; ... parent.path == dir.path`.
+      if (_isRootDetectionIdiom(node.leftOperand, node.rightOperand)) return;
 
       // String literal that doesn't contain a path separator is a CLI
       // flag or label, not a filesystem path. The word "path" in the
@@ -454,6 +459,17 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
       // are not filesystem path comparisons.
       if (_isDartImportUri(node.leftOperand) ||
           _isDartImportUri(node.rightOperand)) {
+        return;
+      }
+
+      // `HttpRequest.uri.path`/a route handler's `Uri` parameter is an HTTP
+      // request-target path, case-sensitive by specification — not a
+      // filesystem path, even though it's routinely stored in a local
+      // variable named `path`. Deliberately narrow: an arbitrary `Uri`
+      // (e.g. `Platform.script`, `File(...).uri`) is still a filesystem
+      // path and must keep linting — see `_isHttpRequestUri`.
+      if (_isUriPathAccess(node.leftOperand) ||
+          _isUriPathAccess(node.rightOperand)) {
         return;
       }
 
@@ -477,40 +493,271 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
   /// `dir.path == dir.parent.path` is OK, but `a.path == b.parent.path`
   /// is NOT — `a` and `b` are different variables so casing consistency
   /// is not guaranteed).
-  bool _isRootDetectionIdiom(String left, String right) {
-    // Try both orderings: `dir.path == dir.parent.path` and the reverse.
-    return _isRootDetectionPair(left, right) ||
-        _isRootDetectionPair(right, left);
+  ///
+  /// Resolves through a single intermediate local variable so the
+  /// two-statement form used by real root-walk loops — where `.parent` is
+  /// captured in a named local because it's also needed for the next
+  /// iteration's reassignment — is recognized too:
+  /// ```dart
+  /// final parent = dir.parent;
+  /// if (parent.path == dir.path) break;
+  /// dir = parent;
+  /// ```
+  bool _isRootDetectionIdiom(Expression left, Expression right) {
+    final ({bool isParent, String base})? leftSide = _rootPathSide(left);
+    final ({bool isParent, String base})? rightSide = _rootPathSide(right);
+    if (leftSide == null || rightSide == null) return false;
+
+    // One side must be `<base>.path`, the other `<base>.parent.path` —
+    // both "simple" or both "parent" is not the idiom.
+    if (leftSide.isParent == rightSide.isParent) return false;
+
+    return leftSide.base == rightSide.base;
   }
 
-  /// Returns true when [simple] is `<base>.path` and [parent] is
-  /// `<base>.parent.path` with the SAME `<base>` prefix.
+  /// Classifies [expr] as `<base>.path` (`isParent: false`) or
+  /// `<base>.parent.path` (`isParent: true`) for the root-detection idiom,
+  /// returning `null` when [expr] isn't a `.path` access at all.
   ///
-  /// Without the base-expression check, `a.path == b.parent.path` would
-  /// be falsely suppressed — `a` and `b` might be different directories
-  /// with different casing (C15).
-  bool _isRootDetectionPair(String simple, String parent) {
-    // The simple side must end with `.path` but NOT `.parent.path`.
-    if (!simple.endsWith('.path')) return false;
-    if (simple.endsWith('.parent.path')) return false;
-
-    // The parent side must end with `.parent.path`.
-    if (!parent.endsWith('.parent.path')) return false;
-
-    // Extract the base expression from each side and compare.
-    // `dir.path`        → base = `dir`
-    // `dir.parent.path` → base = `dir`
-    final String simpleBase = simple.substring(
-      0,
-      simple.length - '.path'.length,
+  /// When the `.parent` hop was factored into a local variable one
+  /// statement earlier (`final parent = dir.parent;`), traces back through
+  /// that single assignment so `parent.path` is still recognized as
+  /// `dir.parent.path` — but only when it's actually safe to: the local
+  /// must be `final`/`const` and unreassigned between its declaration and
+  /// this use (see [_findLocalDeclaration]), AND the `<base>` identifier
+  /// itself (`dir`) must not have been reassigned in that window either —
+  /// otherwise `final parent = dir.parent; dir = other; ... parent.path ==
+  /// dir.path` would wrongly treat a stale `parent` as still matching the
+  /// since-reassigned `dir`.
+  ({bool isParent, String base})? _rootPathSide(Expression expr) {
+    final ({Expression target, String property})? access = _asPropertyAccess(
+      expr,
     );
-    final String parentBase = parent.substring(
-      0,
-      parent.length - '.parent.path'.length,
-    );
+    if (access == null || access.property != 'path') return null;
+    final Expression target = access.target;
 
-    // Both sides must refer to the same variable/expression.
-    return simpleBase == parentBase;
+    // Direct `<base>.parent.path`.
+    final ({Expression target, String property})? targetParent =
+        _asPropertyAccess(target);
+    if (targetParent != null && targetParent.property == 'parent') {
+      return (isParent: true, base: targetParent.target.toSource());
+    }
+
+    // `<var>.path` where `<var>` was declared as `<base>.parent` in the
+    // immediately enclosing scope.
+    if (target is SimpleIdentifier) {
+      final Element? element = target.element;
+      final VariableDeclaration? decl = element == null
+          ? null
+          : _findLocalDeclaration(target, element, target.offset);
+      final Statement? declStatement = decl
+          ?.thisOrAncestorOfType<VariableDeclarationStatement>();
+      final ({Expression target, String property})? declParent =
+          _asPropertyAccess(decl?.initializer);
+      if (declParent != null &&
+          declParent.property == 'parent' &&
+          declStatement != null &&
+          declParent.target is SimpleIdentifier) {
+        final Element? baseElement =
+            (declParent.target as SimpleIdentifier).element;
+        final bool baseIsStable =
+            baseElement != null &&
+            !_reassignedBetween(baseElement, declStatement, target.offset);
+        if (baseIsStable) {
+          return (isParent: true, base: declParent.target.toSource());
+        }
+      }
+    }
+
+    return (isParent: false, base: target.toSource());
+  }
+
+  /// Returns true when [expr]'s value originates from a `.path` property on
+  /// a `Uri` that is traceably an HTTP request-target Uri — see
+  /// [_isHttpRequestUri]. HTTP request-target paths are case-sensitive by
+  /// specification (unlike filesystem paths), so a comparison against one
+  /// is not a Windows path-casing bug even when the local variable happens
+  /// to be named `path`.
+  ///
+  /// Deliberately does NOT exempt every `Uri.path` — `Platform.script.path`
+  /// and `someFile.uri.path` are filesystem paths wearing a `Uri`, and must
+  /// keep linting.
+  ///
+  /// Resolves through a single intermediate local variable so
+  /// `final String path = requestUri.path;` followed by `path == '/api'`
+  /// is still recognized, not just the single-expression form.
+  bool _isUriPathAccess(Expression expr) {
+    final ({Expression target, String property})? access = _asPropertyAccess(
+      expr,
+    );
+    if (access != null &&
+        access.property == 'path' &&
+        _isDartCoreUriType(access.target.staticType) &&
+        _isHttpRequestUri(access.target)) {
+      return true;
+    }
+
+    if (expr is SimpleIdentifier) {
+      final Element? element = expr.element;
+      if (element == null) return false;
+      final Expression? initializer = _findLocalDeclaration(
+        expr,
+        element,
+        expr.offset,
+      )?.initializer;
+      if (initializer != null) return _isUriPathAccess(initializer);
+    }
+
+    return false;
+  }
+
+  /// Returns true when [target] (the receiver of a `.path` access) is
+  /// traceably an HTTP request-target `Uri`, via one of:
+  /// - `<request>.uri` / `<request>.requestedUri` / `<request>.url`, where
+  ///   `<request>`'s static type is dart:io's `HttpRequest` or package:shelf's
+  ///   `Request` — see [_isHttpRequestType]. Identified by declaring
+  ///   **library**, not by name, so a same-named user class (e.g. a
+  ///   hand-rolled `class Request` or `class UploadRequest`) is never
+  ///   mistaken for a real HTTP request object;
+  /// - a `final`/`const`, unreassigned local traced back through exactly
+  ///   one assignment to the above (see [_findLocalDeclaration]).
+  ///
+  /// Deliberately does NOT exempt a bare `Uri`-typed parameter or local on
+  /// its own — nothing distinguishes a `Uri` that came from a real request
+  /// (`HttpRequest.uri`) from one built from a filesystem path
+  /// (`Platform.script`, `File(...).uri`), so the only way to tell them
+  /// apart soundly is to require the chain to still mention the request
+  /// object's type at the point the `.uri`/`.requestedUri`/`.url` hop
+  /// happens.
+  bool _isHttpRequestUri(Expression target) {
+    final ({Expression target, String property})? access = _asPropertyAccess(
+      target,
+    );
+    if (access != null &&
+        (access.property == 'uri' ||
+            access.property == 'requestedUri' ||
+            access.property == 'url') &&
+        _isHttpRequestType(access.target.staticType)) {
+      return true;
+    }
+
+    if (target is SimpleIdentifier) {
+      final Element? element = target.element;
+      final Expression? initializer = element == null
+          ? null
+          : _findLocalDeclaration(target, element, target.offset)?.initializer;
+      if (initializer != null) return _isHttpRequestUri(initializer);
+    }
+
+    return false;
+  }
+
+  /// Returns true when [type] is exactly `dart:core`'s `Uri` — matched by
+  /// class name AND declaring library (by URI, not by the SDK's informal
+  /// library name), so a user-defined class that happens to be named `Uri`
+  /// is never mistaken for it. Ignores nullability (`Uri?` matches too —
+  /// the class identity is unaffected by the nullability suffix).
+  bool _isDartCoreUriType(DartType? type) {
+    final Element? element = type?.element;
+    return element?.name == 'Uri' &&
+        element?.library?.uri.toString() == 'dart:core';
+  }
+
+  /// Returns true when [type] is exactly dart:io's `HttpRequest` or
+  /// package:shelf's `Request` — matched by class name AND declaring
+  /// library URI, not by name alone, so a user-defined class such as
+  /// `class UploadRequest` or a hand-rolled `class Request` is never
+  /// mistaken for a real HTTP request object.
+  ///
+  /// `HttpRequest` is actually *declared* in `dart:_http` and merely
+  /// re-exported through `dart:io` — `library.uri` reports the declaring
+  /// library, not the import path callers use, so both URIs are accepted.
+  bool _isHttpRequestType(DartType? type) {
+    final Element? element = type?.element;
+    final String? name = element?.name;
+    final String? libraryUri = element?.library?.uri.toString();
+    if (name == null || libraryUri == null) return false;
+    if (name == 'HttpRequest' &&
+        (libraryUri == 'dart:io' || libraryUri == 'dart:_http')) {
+      return true;
+    }
+    if (name == 'Request' && libraryUri.startsWith('package:shelf/')) {
+      return true;
+    }
+    return false;
+  }
+
+  /// Returns the `<target>.<property>` this property access resolves to, or
+  /// `null` when [expr] isn't a property access at all.
+  ({Expression target, String property})? _asPropertyAccess(Expression? expr) {
+    if (expr is PropertyAccess && expr.target != null) {
+      return (target: expr.target!, property: expr.propertyName.name);
+    }
+    if (expr is PrefixedIdentifier) {
+      return (target: expr.prefix, property: expr.identifier.name);
+    }
+    return null;
+  }
+
+  /// Finds the local `VariableDeclaration` for [element] — searching
+  /// statements in the block enclosing [context] and, failing that, each
+  /// enclosing block in turn — but only when it's sound to trust the
+  /// initializer as still describing [element]'s value at [useOffset]:
+  /// the declaration must be `final`/`const` (a reassignable `var` can't be
+  /// trusted to still hold its initializer's value), and [element] must
+  /// not be reassigned anywhere between the declaration and [useOffset].
+  /// Returns `null` — refusing to trace through — when either condition
+  /// fails, rather than risk treating a stale or since-overwritten
+  /// initializer as if it still applied at the use site.
+  VariableDeclaration? _findLocalDeclaration(
+    AstNode context,
+    Element element,
+    int useOffset,
+  ) {
+    Block? block = context.thisOrAncestorOfType<Block>();
+    while (block != null) {
+      for (final Statement statement in block.statements) {
+        if (statement is! VariableDeclarationStatement) continue;
+        if (!statement.variables.isFinal && !statement.variables.isConst) {
+          continue;
+        }
+        for (final VariableDeclaration variable
+            in statement.variables.variables) {
+          final Element? declared = variable.declaredFragment?.element;
+          if (declared == null ||
+              !(identical(declared, element) || declared == element)) {
+            continue;
+          }
+          if (_reassignedBetween(element, statement, useOffset)) return null;
+          return variable;
+        }
+      }
+      block = block.parent?.thisOrAncestorOfType<Block>();
+    }
+    return null;
+  }
+
+  /// Returns true when [element] is the left-hand side of an assignment
+  /// whose offset falls strictly between the end of [afterNode] and
+  /// [useOffset] — i.e. [element] was reassigned somewhere in that window.
+  /// Scans the nearest enclosing `FunctionBody` (falling back to the whole
+  /// `CompilationUnit`), the broadest scope a traced-back local or base
+  /// variable could realistically be reassigned within.
+  bool _reassignedBetween(Element element, AstNode afterNode, int useOffset) {
+    final int startOffset = afterNode.end;
+    if (useOffset <= startOffset) return false;
+
+    final AstNode scope =
+        afterNode.thisOrAncestorOfType<FunctionBody>() ??
+        afterNode.thisOrAncestorOfType<CompilationUnit>() ??
+        afterNode;
+    final _ReassignmentBetweenVisitor visitor = _ReassignmentBetweenVisitor(
+      element,
+      startOffset,
+      useOffset,
+    );
+    scope.accept(visitor);
+    return visitor.found;
   }
 
   /// Returns true when [expr] is a string literal that does not contain
@@ -566,6 +813,37 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
 
     final String iterableSource = parts.iterable.toSource().toLowerCase();
     return iterableSource.contains('import') || iterableSource.contains('uri');
+  }
+}
+
+/// Detects an assignment to [target] whose offset falls strictly between
+/// [startOffset] and [endOffset] — used by
+/// [AvoidCaseSensitivePathComparisonRule] to verify a traced-back local
+/// variable (or the base expression it was assigned from) hasn't been
+/// reassigned between its declaration and a specific use site, so tracing
+/// through it stays sound even when the variable is reassigned elsewhere in
+/// the same scope.
+class _ReassignmentBetweenVisitor extends RecursiveAstVisitor<void> {
+  _ReassignmentBetweenVisitor(this.target, this.startOffset, this.endOffset);
+
+  final Element target;
+  final int startOffset;
+  final int endOffset;
+  bool found = false;
+
+  bool _matches(Element? element) =>
+      element != null && (identical(element, target) || element == target);
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    if (!found && node.offset > startOffset && node.offset < endOffset) {
+      final Expression lhs = node.leftHandSide;
+      if (lhs is SimpleIdentifier && _matches(lhs.element)) {
+        found = true;
+        return;
+      }
+    }
+    super.visitAssignmentExpression(node);
   }
 }
 

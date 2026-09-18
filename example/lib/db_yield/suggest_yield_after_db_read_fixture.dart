@@ -110,4 +110,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 //
 // BAD: final items = await collection.findAll();
 // GOOD: final items = await collection.findAll(); await yieldToUI();
+//
+// Suppressed when the enclosing package does not depend on Flutter (no UI
+// thread to protect — see
+// bugs/suggest_yield_after_db_read_false_positive_one_shot_file_io_non_flutter_server.md).
+// This example package is itself non-Flutter (see example/pubspec.yaml),
+// so no code below fires this rule regardless of shape — resolved-harness
+// regression coverage for the Flutter-gate lives in
+// test/rules/resources/db_yield_rules_test.dart, which fabricates a
+// synthetic Flutter-declaring project to prove the true positive above
+// still fires there.
 void _note304() {}

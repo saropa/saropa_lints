@@ -334,6 +334,8 @@ bool _isFollowedBySafe(List<Statement> stmts, int i) {
 /// - The next statement is `return` (no further UI work in this function).
 /// - The write is inside `compute(...)` or `Isolate.run(...)` (separate isolate).
 /// - The file is in a test directory (`_test.dart`, `test/`, `integration_test/`).
+/// - The enclosing package does not depend on Flutter (no UI thread to
+///   protect, and `DelayUtils.yieldToUI()` is not importable there).
 ///
 /// **Heuristic:** Detection uses method and target name matching; identically
 /// named methods in non-DB code may cause false positives. See file header.
@@ -383,6 +385,14 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     if (context.isInTestDirectory) return;
+    // The entire threat model here is "blocking Flutter's UI thread" (see
+    // file header) and the correction message names `DelayUtils.yieldToUI()`
+    // — a Flutter-app symbol. A pure-Dart package (CLI tool, headless
+    // server) has no UI thread to protect and nothing importable to yield
+    // to, so gate on the enclosing package actually depending on Flutter.
+    // See bugs/require_yield_after_db_write_false_positive_one_shot_file_io_non_flutter_server.md.
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
     _registerYieldCheck(context, reporter, _code, _DbOperationType.write);
   }
 }
@@ -402,6 +412,10 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
 /// **Excluded:** `findFirst` — a single-object read is fast and does not
 /// benefit from a yield. Adding one introduces unnecessary latency and
 /// a stale-data window.
+///
+/// **Also excluded:** packages that do not depend on Flutter — there is no
+/// UI thread to protect there, and `DelayUtils.yieldToUI()` is not
+/// importable.
 ///
 /// ```dart
 /// // INFO (suggestion)
@@ -442,6 +456,11 @@ class SuggestYieldAfterDbReadRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Same Flutter-only threat model as RequireYieldAfterDbWriteRule above —
+    // see the comment there and
+    // bugs/suggest_yield_after_db_read_false_positive_one_shot_file_io_non_flutter_server.md.
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
     _registerYieldCheck(context, reporter, _code, _DbOperationType.bulkRead);
   }
 }

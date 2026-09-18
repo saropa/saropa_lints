@@ -74,6 +74,30 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 `guard_debugger_against_test_environment` flags any `debugger()` call not lexically guarded against the test environment. A VM service attaches during `flutter test` too, so an unguarded call pauses the isolate and hangs the run with no verdict — `kDebugMode` does not help, since `flutter test` itself runs in debug mode. Guard it with a condition mentioning an `isTestEnvironment`-shaped check or `FLUTTER_TEST`, anywhere up the enclosing `if` chain. The negated `if` (`if (!isTestEnvironment) { … }`), the inverted branch (`if (isTestEnvironment) { } else { … }`) and the early-return guard clause (`if (isTestEnvironment) return;`) all count. `&&` and `||` are not interchangeable: one guarded term guards an `&&`, but every term of an `||` must guarantee non-test, so `if (isBreak || !isTestEnvironment)` is still reported. No action required unless the rule fires.
 
+### Fixed
+
+- `prefer_utc_for_storage` no longer flags `.toIso8601String()`/epoch calls on a `final` local variable whose initializer is already UTC — directly, through a `.add()`/`.subtract()` call on a UTC value, or when the variable is read inside a nested closure — even though the receiver's own source at the call site has no `.toUtc()`/`.utc` text. `.toUtc().toLocal()` is now correctly still reported, on the receiver itself or through a local variable, since `.toLocal()` undoes the UTC conversion. No action required.
+- `always_specify_parameter_names` no longer flags calls to Dart SDK (`dart:*`) methods such as `String.substring` — their positional-only parameter lists can never be changed by any caller, so the rule's own suggestion was always inapplicable there. No action required.
+- `avoid_case_sensitive_path_comparison` no longer flags:
+  - a path comparison on `.uri`, `.requestedUri`, or `.url` of a `dart:io` `HttpRequest` or package:shelf `Request` — an HTTP route path, not a filesystem path
+  - the root-walk idiom when the `.parent` hop is held in a `final` local before the comparison
+
+  Filesystem URIs, plain `Uri` parameters, and reassigned locals are still reported. No action required.
+- `avoid_duplicate_string_literals` and `avoid_duplicate_string_literals_pair` no longer flag a URI repeated across `import`/`export`/`part` directives — Dart requires a directive URI to be a string literal, so there is no legal way to deduplicate it. No action required.
+- `avoid_misused_set_literals` now flags an empty `{}` only when nothing gives it a type. It is no longer flagged when its position already supplies a `Map`/`Set` type, or when it initializes a declaration with an explicit `Map` annotation. `var x = {}` — genuinely ambiguous — is still reported. No action required.
+- `avoid_stack_trace_in_production`:
+  - It now recognizes a debug guard reached through a `final` local or a zero-argument helper, `!bool.fromEnvironment('dart.vm.product')`, and `kDebugMode == true`-style comparisons.
+  - Behavior change: `&&`/`||`/`!` are now evaluated soundly, so a condition such as `if (verbose || kDebugMode)`, which the old text match silenced, is now reported. No action required unless a condition like this was previously silent for you, in which case it was never soundly guarded.
+- `avoid_throw_in_catch_block` no longer flags `throw Error.throwWithStackTrace(...)`, including a `core.`-prefixed call and in the unresolved CLI scan pass. No action required.
+- `avoid_unused_assignment` no longer flags a closure-captured variable's reset that the closure's own next invocation reads back. No action required.
+- `function_always_returns_null` no longer flags null-only members in the web-side stub of a `dart.library.io`/`.ffi` conditional import — a null-only body there is the documented contract, mirrored by the native sibling file. No action required.
+- `move_variable_closer_to_its_usage` no longer suggests moving an `await`-initialized declaration inside a `try` block that has a `catch`/`finally` — moving it could let an intervening statement's side effects run before the possible throw instead of after. No action required.
+- `prefer_cached_getter` no longer flags repeated `.length`/`.isEmpty`/`.isNotEmpty`/`.first`/`.last` reads on a `List`, `String`, `Set`, or `Map`, or an unoverridden `.hashCode`. A lazy `Iterable` (for example a `.where(...)` result) is still reported, since those accessors are not O(1) there. No action required.
+- `prefer_typed_route_params` no longer flags a parameter passed into a call whose resolved return type is `int`, `double`, or `num` (for example `parseLimit(...)`), regardless of the call's own name. No action required.
+- `require_data_encryption` no longer flags auth-status metadata (`authStatusFields`, `authConfigured`, `authScheme`, `authRequired`/`authRequiredMessage`) as a credential. A real credential in the same call is still reported. No action required.
+- `require_error_logging` no longer flags a catch block that propagates the error via `return Error.throwWithStackTrace(...)` or a bare call to it. No action required.
+- `require_yield_after_db_write` and `suggest_yield_after_db_read` no longer fire in packages that do not depend on Flutter — their premise, protecting a UI thread, does not apply there. No action required.
+
 ### Fixed (Extension)
 
 - Turning CI off in the System Health panel no longer breaks a workflow whose job already has its own `if:` condition. It used to add a second `if:`, which GitHub rejects as an invalid workflow. The existing condition is now swapped for `if: false` and put back exactly when CI is turned on again. A workflow with a job it cannot safely switch off is left untouched, and the panel reports that CI is still running.

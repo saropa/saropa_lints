@@ -1313,6 +1313,13 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 /// not immediately preceded by an ASCII letter; delimiters such as `.`, `_`,
 /// `(`, or start-of-argument still allow real `pin` arguments to match.
 ///
+/// **Not flagged (auth-status metadata):** Identifiers describing auth
+/// *configuration/status* rather than a credential — `authStatusFields`,
+/// `authConfigured`, `authRequired`/`authRequiredMessage`, `authScheme` — skip
+/// the `auth` keyword match even though they contain the substring `auth`.
+/// Only that identifier is stripped from the scanned text, so a credential
+/// elsewhere in the same call still triggers.
+///
 /// **BAD:**
 /// ```dart
 /// await prefs.setString('password', value);
@@ -1463,6 +1470,28 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     RegExp(r'stoptokens?\b'),
     RegExp(r'nlptokens?\b'),
   ];
+
+  /// Auth-**status**/configuration metadata anywhere in the call's args means
+  /// that identifier is a boolean/enum describing whether or how auth is
+  /// configured (or a static rejection message), not a credential — even
+  /// though it contains the `auth` substring matched by [_authKeywordPattern].
+  /// Anchored with `\b` on both ends so prefixed/suffixed identifiers like
+  /// `userAuthScheme` or `isAuthRequired` do NOT match (only the bare
+  /// metadata names do).
+  ///
+  /// Unlike [_argumentSearchIndexContextPatterns] (which skips the whole
+  /// call), a match here only strips that one identifier out of the scanned
+  /// text — see `runWithReporter` — so a metadata field sitting alongside a
+  /// real credential in the same call (e.g. `{'authScheme': 'basic',
+  /// 'password': pwd}`) still triggers on the credential. See
+  /// `bugs/require_data_encryption_false_positive_auth_status_metadata_keyword_match.md`.
+  static final List<RegExp> _argumentAuthStatusContextPatterns = <RegExp>[
+    RegExp(r'\bauthstatusfields?\b'),
+    RegExp(r'\bauthconfigured\b'),
+    RegExp(r'\bauthrequired(?:message)?\b'),
+    RegExp(r'\bauthscheme\b'),
+  ];
+
   static final List<RegExp> _secureStorageTargetPatterns = [
     RegExp(r'\bsecure\b'),
     RegExp(r'\bencrypt\b'),
@@ -1529,20 +1558,32 @@ class RequireDataEncryptionRule extends SaropaLintRule {
         return;
       }
 
-      if (_pinKeywordPattern.hasMatch(argsSource)) {
+      // Strip auth-status/configuration metadata or static rejection-message
+      // identifiers (e.g. `authStatusFields`, `authRequiredMessage`) out of
+      // the scanned text rather than skipping the whole call: a metadata
+      // field can sit alongside a real credential in the same argument list
+      // (e.g. `{'authScheme': 'basic', 'password': pwd}`), which must still
+      // be flagged. See
+      // bugs/require_data_encryption_false_positive_auth_status_metadata_keyword_match.md.
+      String scannedArgsSource = argsSource;
+      for (final RegExp pattern in _argumentAuthStatusContextPatterns) {
+        scannedArgsSource = scannedArgsSource.replaceAll(pattern, ' ');
+      }
+
+      if (_pinKeywordPattern.hasMatch(scannedArgsSource)) {
         reporter.atNode(node);
         return;
       }
-      if (_tokenKeywordPattern.hasMatch(argsSource)) {
+      if (_tokenKeywordPattern.hasMatch(scannedArgsSource)) {
         reporter.atNode(node);
         return;
       }
-      if (_authKeywordPattern.hasMatch(argsSource)) {
+      if (_authKeywordPattern.hasMatch(scannedArgsSource)) {
         reporter.atNode(node);
         return;
       }
       for (final String keyword in _sensitiveKeywords) {
-        if (argsSource.contains(keyword)) {
+        if (scannedArgsSource.contains(keyword)) {
           reporter.atNode(node);
           return;
         }

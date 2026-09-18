@@ -10,6 +10,7 @@ import 'package:saropa_lints/src/rules/flow/exception_rules.dart';
 import 'package:test/test.dart';
 
 import '../../support/resolved_rule_harness.dart';
+import '../../support/syntactic_rule_harness.dart';
 
 void main() {
   group('handle_throwing_invocations — over-broad dart:io catch-all', () {
@@ -109,6 +110,174 @@ void main() {
         code,
       );
       expect(codes.contains('handle_throwing_invocations'), isFalse);
+    });
+  });
+
+  group('avoid_throw_in_catch_block — Error.throwWithStackTrace exemption', () {
+    // BUG: the rule flagged EVERY ThrowExpression inside a catch block,
+    // including `throw Error.throwWithStackTrace(...)` — dart:core's own
+    // documented mechanism for throwing a new error while explicitly
+    // preserving the caught StackTrace, and exactly what this rule's own
+    // correctionMessage recommends.
+    test('does NOT flag throw Error.throwWithStackTrace(...)', () async {
+      const code = '''
+void main() {
+  try {
+    something();
+  } catch (e, stackTrace) {
+    throw Error.throwWithStackTrace(StateError('failed: \$e'), stackTrace);
+  }
+}
+
+void something() {}
+''';
+      final codes = await reportedRuleCodes(AvoidThrowInCatchBlockRule(), code);
+      expect(
+        codes.contains('avoid_throw_in_catch_block'),
+        isFalse,
+        reason:
+            'Error.throwWithStackTrace already preserves the original stack '
+            'trace; it is the rule\'s own suggested fix and must not itself '
+            'be flagged.',
+      );
+    });
+
+    test('does NOT flag rethrow (control)', () async {
+      const code = '''
+void main() {
+  try {
+    something();
+  } catch (e) {
+    rethrow;
+  }
+}
+
+void something() {}
+''';
+      final codes = await reportedRuleCodes(AvoidThrowInCatchBlockRule(), code);
+      expect(codes.contains('avoid_throw_in_catch_block'), isFalse);
+    });
+
+    // The documented bad case must still fire after adding the exemption.
+    test('still flags a plain throw with no stack-trace forwarding', () async {
+      const code = '''
+void main() {
+  try {
+    something();
+  } catch (e) {
+    throw Exception('failed');
+  }
+}
+
+void something() {}
+''';
+      final codes = await reportedRuleCodes(AvoidThrowInCatchBlockRule(), code);
+      expect(codes.contains('avoid_throw_in_catch_block'), isTrue);
+    });
+
+    // A same-named `throwWithStackTrace` on an unrelated class must still be
+    // flagged — the exemption is keyed to dart:core's Error.
+    test(
+      'still flags a look-alike throwWithStackTrace on a custom class',
+      () async {
+        const code = '''
+class Error {
+  static Never throwWithStackTrace(Object error, StackTrace stackTrace) {
+    throw error;
+  }
+}
+
+void main() {
+  try {
+    something();
+  } catch (e, stackTrace) {
+    throw Error.throwWithStackTrace(e!, stackTrace);
+  }
+}
+
+void something() {}
+''';
+        final codes = await reportedRuleCodes(
+          AvoidThrowInCatchBlockRule(),
+          code,
+        );
+        expect(codes.contains('avoid_throw_in_catch_block'), isTrue);
+      },
+    );
+
+    // BUG (follow-up): the resolved-element check alone under-exempted the
+    // scan CLI's default syntactic (unresolved) pass — `saropa_lints scan`
+    // parses without full type resolution, so `methodName.element` is null
+    // there and the false positive persisted for that path.
+    test('syntactic (unresolved) mode does NOT flag '
+        'throw Error.throwWithStackTrace(...)', () {
+      const code = '''
+void main() {
+  try {
+    something();
+  } catch (e, stackTrace) {
+    throw Error.throwWithStackTrace(StateError('failed: \$e'), stackTrace);
+  }
+}
+
+void something() {}
+''';
+      final codes = reportedRuleCodesSyntactic(
+        AvoidThrowInCatchBlockRule(),
+        code,
+      );
+      expect(
+        codes.contains('avoid_throw_in_catch_block'),
+        isFalse,
+        reason:
+            'With no resolved element (the scan CLI\'s default syntactic '
+            'pass), the rule must fall back to the syntactic match on '
+            'Error.throwWithStackTrace rather than reporting.',
+      );
+    });
+
+    // Regression floor for the syntactic path: a plain throw must still be
+    // flagged even with no type resolution available.
+    test('syntactic (unresolved) mode still flags a plain throw', () {
+      const code = '''
+void main() {
+  try {
+    something();
+  } catch (e) {
+    throw Exception('failed');
+  }
+}
+
+void something() {}
+''';
+      final codes = reportedRuleCodesSyntactic(
+        AvoidThrowInCatchBlockRule(),
+        code,
+      );
+      expect(codes.contains('avoid_throw_in_catch_block'), isTrue);
+    });
+
+    // BUG (follow-up): an import-prefixed `core.Error.throwWithStackTrace`
+    // was still flagged because the target-extraction only accepted a bare
+    // SimpleIdentifier (`Error`), rejecting PrefixedIdentifier targets
+    // outright before element resolution ever got a chance to confirm it.
+    test('does NOT flag throw core.Error.throwWithStackTrace(...) '
+        '(prefixed dart:core import)', () async {
+      const code = '''
+import 'dart:core' as core;
+
+void main() {
+  try {
+    something();
+  } catch (e, stackTrace) {
+    throw core.Error.throwWithStackTrace(StateError('failed: \$e'), stackTrace);
+  }
+}
+
+void something() {}
+''';
+      final codes = await reportedRuleCodes(AvoidThrowInCatchBlockRule(), code);
+      expect(codes.contains('avoid_throw_in_catch_block'), isFalse);
     });
   });
 

@@ -222,8 +222,42 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitThrowExpression(ThrowExpression node) {
-    reporter.atNode(node);
+    if (!_throwsViaThrowWithStackTrace(node.expression)) {
+      reporter.atNode(node);
+    }
     super.visitThrowExpression(node);
+  }
+
+  /// Whether [expression] is a call to `Error.throwWithStackTrace(...)`
+  /// (`dart:core`) — the SDK's own documented mechanism for throwing a new
+  /// error while explicitly preserving an existing [StackTrace]. This is
+  /// exactly the pattern this rule's `correctionMessage` recommends, so it
+  /// must not itself be flagged as "losing the original stack trace".
+  bool _throwsViaThrowWithStackTrace(Expression expression) {
+    if (expression is! MethodInvocation) return false;
+    if (expression.methodName.name != 'throwWithStackTrace') return false;
+
+    // Accept both a bare `Error` target and an import-prefixed one (e.g.
+    // `core.Error.throwWithStackTrace(...)` when dart:core is imported with
+    // a prefix) — element resolution below is what actually confirms it's
+    // dart:core's `Error`, this is just extracting the simple name.
+    final target = expression.target;
+    final String? targetName = switch (target) {
+      SimpleIdentifier() => target.name,
+      PrefixedIdentifier() => target.identifier.name,
+      _ => null,
+    };
+    if (targetName != 'Error') return false;
+
+    final element = expression.methodName.element;
+    // No resolved element (e.g. the scan CLI's syntactic/unresolved mode,
+    // where usesTypeResolution can't be honored): fall back to the
+    // syntactic match already performed above rather than under-report.
+    if (element == null) return true;
+
+    if (element is! MethodElement || !element.isStatic) return false;
+
+    return element.library.uri.toString() == 'dart:core';
   }
 }
 

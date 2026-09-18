@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:meta/meta.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../early_exit_guard_utils.dart';
@@ -2104,10 +2105,12 @@ class PreferUtcForStorageRule extends SaropaLintRule {
       final String typeName = type.getDisplayString();
       if (!typeName.startsWith('DateTime')) return;
 
-      // Check if already UTC (regex to avoid FP on substrings)
-      final String targetSource = target.toSource();
-      if (RegExp(r'\.toUtc\s*\(\s*\)').hasMatch(targetSource) ||
-          RegExp(r'\.utc\b').hasMatch(targetSource)) {
+      // Check if already UTC. Structural (not text-based), so
+      // `DateTime.now().toUtc().toLocal()` is correctly NOT treated as
+      // UTC even though the substring `.toUtc()` appears earlier in the
+      // expression — only the OUTERMOST form (a bare `.toUtc()` call, or a
+      // `DateTime.utc(...)` constructor) counts.
+      if (_expressionIsUtc(target)) {
         return;
       }
 
@@ -2125,6 +2128,16 @@ class PreferUtcForStorageRule extends SaropaLintRule {
         final String source = current.toSource();
         for (final pattern in _storagePatterns) {
           if (pattern.hasMatch(source)) {
+            // The receiver's own source never mentions UTC for a bare
+            // identifier (e.g. `utcNow`) even when the value was normalized
+            // upstream, at a local variable's initializer. Resolve one hop
+            // back before reporting. This resolution walks the compilation
+            // unit, so it only runs once a storage-context match makes
+            // reporting otherwise imminent, not on every toIso8601String()
+            // call.
+            if (target is SimpleIdentifier && _isUpstreamUtc(target)) {
+              return;
+            }
             reporter.atNode(node);
             return;
           }
@@ -2135,6 +2148,132 @@ class PreferUtcForStorageRule extends SaropaLintRule {
         current = current.parent;
       }
     });
+  }
+
+  /// Whether [expr]'s OUTERMOST form is itself a UTC conversion — a bare
+  /// `.toUtc()` call, or a `DateTime.utc(...)` constructor invocation —
+  /// or UTC-preserving arithmetic (`.add(...)`/`.subtract(...)`) applied to
+  /// one. Structural (not text-based) so `DateTime.now().toUtc().toLocal()`
+  /// correctly reads as NOT UTC: the outermost call is `.toLocal()`, even
+  /// though the substring `.toUtc()` appears earlier in the expression.
+  static bool _expressionIsUtc(Expression expr) {
+    final Expression unwrapped = expr.unParenthesized;
+    if (unwrapped is MethodInvocation &&
+        unwrapped.methodName.name == 'toUtc' &&
+        unwrapped.argumentList.arguments.isEmpty) {
+      return true;
+    }
+    if (unwrapped is InstanceCreationExpression &&
+        unwrapped.constructorName.name?.name == 'utc') {
+      if (_isDartCoreDateTime(unwrapped.staticType)) {
+        return true;
+      }
+    }
+    // `.add(Duration)`/`.subtract(Duration)` preserve the UTC-ness of the
+    // DateTime they're called on, so recurse into the receiver. Deliberately
+    // narrow to just these two: `copyWith` can flip the offset via an
+    // `isUtc:` argument, so it is NOT UTC-preserving and must NOT be
+    // recursed into (nor any other DateTime method).
+    if (unwrapped is MethodInvocation &&
+        (unwrapped.methodName.name == 'add' ||
+            unwrapped.methodName.name == 'subtract')) {
+      final Expression? target = unwrapped.target;
+      if (target != null && _isDartCoreDateTime(target.staticType)) {
+        return _expressionIsUtc(target);
+      }
+    }
+    return false;
+  }
+
+  /// Whether [type] is (possibly nullable) `dart:core`'s `DateTime` — a real
+  /// element/library check, not a display-string prefix match. A prefix
+  /// match on `getDisplayString()` would also match an unrelated look-alike
+  /// type such as a user-defined `DateTimeBag`.
+  static bool _isDartCoreDateTime(DartType? type) {
+    if (type is! InterfaceType) return false;
+    return type.element.name == 'DateTime' && type.element.library.isDartCore;
+  }
+
+  /// Resolves [identifier] one hop back via its resolved element to see
+  /// whether the value was already normalized to UTC where it was defined,
+  /// even though the receiver expression's own source text doesn't mention
+  /// `.toUtc()`/`.utc`: a local variable declared `final` whose initializer
+  /// is UTC (e.g. `final utcNow = DateTime.now().toUtc();`).
+  ///
+  /// Deliberately does NOT attempt the same trick for instance fields.
+  /// Tracing a field back to "every construction site supplies UTC" turns
+  /// out to require whole-PROGRAM (not just whole-file) analysis: a field
+  /// can be set via a redirecting factory constructor, a subclass
+  /// constructor forwarding through `super(...)`, a mixin-application class
+  /// alias (`class S = Base with M;`) inheriting the constructor, a tear-off
+  /// invoked elsewhere, or — for any non-private class — a construction
+  /// site in another file (or another part file of the same library) that
+  /// a single-file scan can never see. An earlier version of this rule
+  /// attempted a same-file-only, private-class-only approximation of this
+  /// and was found to still miss several of those paths, so it was removed
+  /// rather than patched further. Only suppresses when upstream UTC-ness
+  /// can actually be verified; anything else falls through to reporting so
+  /// real violations are never silently dropped.
+  bool _isUpstreamUtc(SimpleIdentifier identifier) {
+    final Element? element = identifier.element;
+
+    if (element is LocalVariableElement) {
+      return _localInitializerIsUtc(identifier, element);
+    }
+
+    return false;
+  }
+
+  /// Case 1: local variable declared `final` whose own initializer
+  /// expression is already UTC. Not `final` means it could be reassigned to
+  /// a non-UTC value later, so that case is left unhandled. Searches the
+  /// whole compilation unit (not just the nearest enclosing function body)
+  /// so a value captured by a nested closure still resolves back to its
+  /// declaration in the enclosing function.
+  bool _localInitializerIsUtc(SimpleIdentifier identifier, Element element) {
+    final AstNode root = identifier.root;
+    if (root is! CompilationUnit) return false;
+
+    VariableDeclaration? declaration;
+    root.accept(
+      _FindMatchingDeclaration(element, (VariableDeclaration found) {
+        declaration = found;
+      }),
+    );
+    if (declaration == null) return false;
+
+    final VariableDeclarationList? list =
+        declaration!.parent is VariableDeclarationList
+        ? declaration!.parent as VariableDeclarationList
+        : null;
+    if (list == null || !list.isFinal) return false;
+
+    final Expression? initializer = declaration!.initializer;
+    if (initializer == null) return false;
+
+    return _expressionIsUtc(initializer);
+  }
+}
+
+/// Collects the first [VariableDeclaration] whose declared element matches
+/// [_target], reporting it via [_onFound]. Still walks the rest of the
+/// compilation unit after a match (`_found` only guards against reporting
+/// more than once — elements are unique per declaration, so a second match
+/// can't occur in practice, but the traversal itself isn't short-circuited).
+class _FindMatchingDeclaration extends RecursiveAstVisitor<void> {
+  _FindMatchingDeclaration(this._target, this._onFound);
+
+  final Element _target;
+  final void Function(VariableDeclaration) _onFound;
+  bool _found = false;
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    if (!_found && node.declaredFragment?.element == _target) {
+      _found = true;
+      _onFound(node);
+    }
+    super.visitVariableDeclaration(node);
   }
 }
 

@@ -123,3 +123,24 @@ void _good366() {
     throw Exception('Failed: $e'); // Or use Error.throwWithStackTrace
   }
 }
+
+// GOOD: Should NOT trigger avoid_throw_in_catch_block
+// Error.throwWithStackTrace is dart:core's documented mechanism for
+// throwing a new error while explicitly preserving the caught stack trace.
+void _good367() {
+  try {
+    something();
+  } catch (e, stackTrace) {
+    throw Error.throwWithStackTrace(StateError('Failed: $e'), stackTrace);
+  }
+}
+
+// GOOD: Should NOT trigger avoid_throw_in_catch_block
+// rethrow is structurally exempt (RethrowExpression, not ThrowExpression).
+void _good368() {
+  try {
+    something();
+  } catch (e) {
+    rethrow;
+  }
+}

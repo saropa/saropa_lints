@@ -16,6 +16,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../conditional_import_utils.dart';
 import '../../fixes/code_quality/add_late_final_fix.dart';
 import '../../fixes/code_quality/move_declaration_closer_fix.dart';
 import '../../fixes/code_quality/remove_late_keyword_fix.dart';
@@ -951,6 +952,15 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Files that are the web/stub branch of a `dart.library.io`/`.ffi`
+    // conditional import exist only to mirror a sibling native
+    // implementation's same-named members. A stub member that always returns
+    // `null` (e.g. `static int? get port => null;`) is honoring that
+    // contract, not exhibiting a code smell — the rule cannot see the
+    // sibling file to confirm the return type is meaningful there, so it
+    // skips the whole file instead.
+    if (isConditionalImportStubTarget(context.filePath)) return;
+
     context.addFunctionDeclaration((FunctionDeclaration node) {
       // Top-level functions cannot override anything, but the annotation
       // check is harmless and keeps both call sites symmetrical.
@@ -1284,6 +1294,19 @@ class _AssignmentUsageVisitor extends RecursiveAstVisitor<void> {
     }
     usedVariables.add(node.name);
     super.visitSimpleIdentifier(node);
+  }
+
+  // Don't descend into nested closures/local functions: a closure may be
+  // invoked repeatedly (e.g. from a loop at its call site), so an
+  // assignment inside it that resets state for the closure's OWN next
+  // invocation is not dead relative to unrelated assignments elsewhere in
+  // the enclosing block's single top-to-bottom source order. Each nested
+  // function body is a separate `Block` and gets its own independent
+  // `addBlock` pass (see runWithReporter), so genuine same-invocation dead
+  // writes inside the closure are still caught there.
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Skip
   }
 }
 
@@ -2560,6 +2583,20 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
         .thisOrAncestorOfType<VariableDeclarationStatement>();
     if (declStatement == null) return false;
 
+    // A declaration whose own initializer can throw (contains `await`) must
+    // not be relocated past sibling statements it currently precedes when it
+    // sits directly in the `try` block of a `TryStatement` that has a
+    // `catch`/`finally` — moving it later would let those sibling statements'
+    // side effects (e.g. HTTP status/header writes) run *before* the
+    // possible throw instead of after, changing what the `catch`/`finally`
+    // observes. See bugs/move_variable_closer_to_its_usage_false_positive_
+    // throwing_await_before_header_writes.md.
+    if (decl.initializer != null &&
+        _containsAwait(decl.initializer!) &&
+        _isDirectTryBodyWithHandler(declStatement)) {
+      return false;
+    }
+
     final List<Statement> statements = block.statements;
     final int declIndex = statements.indexOf(declStatement);
     final int useIndex = statements.indexOf(useStatement);
@@ -2630,11 +2667,51 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     return false;
   }
 
+  /// Returns true when [expression] itself contains an `await` — not one
+  /// nested inside a closure, which runs on its own schedule and doesn't
+  /// affect the ordering of statements in the enclosing block.
+  bool _containsAwait(Expression expression) {
+    final _AwaitFinder finder = _AwaitFinder();
+    expression.accept(finder);
+    return finder.found;
+  }
+
+  /// Returns true when [declStatement] is a direct child of the `try` block
+  /// of a [TryStatement] that has at least one `catch` clause or a `finally`
+  /// block — i.e. a handler that could observe side effects performed by
+  /// statements between the declaration and wherever it might be moved.
+  bool _isDirectTryBodyWithHandler(Statement declStatement) {
+    final AstNode? parent = declStatement.parent;
+    if (parent is! Block) return false;
+    final AstNode? grandparent = parent.parent;
+    if (grandparent is! TryStatement) return false;
+    if (grandparent.body != parent) return false;
+    return grandparent.catchClauses.isNotEmpty ||
+        grandparent.finallyBlock != null;
+  }
+
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         MoveDeclarationCloserFix(context: context),
   ];
+}
+
+/// Finds a top-level `await` expression, not descending into closures
+/// (`FunctionExpression`) since an `await` inside a closure body runs when
+/// that closure is later invoked, not as part of evaluating the declaration.
+class _AwaitFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    found = true;
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Do not descend: an await inside a nested closure doesn't run inline.
+  }
 }
 
 class _FirstUsageVisitor extends RecursiveAstVisitor<void> {

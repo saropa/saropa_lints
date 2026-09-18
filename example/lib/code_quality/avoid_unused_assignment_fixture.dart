@@ -120,3 +120,45 @@ void _good188() {
   x = 2;
   print(x); // x is read after the reassignment
 }
+
+// GOOD: Should NOT trigger avoid_unused_assignment
+// Closure-captured variable reset by a local closure invoked repeatedly
+// from a loop: the reset is read by the closure's OWN next invocation, not
+// by the unrelated `fieldWasQuoted = true;` write further down in the
+// enclosing block's source order.
+List<List<String>> _good189ParseCsvLines(String csv) {
+  final row = <String>[];
+  var fieldWasQuoted = false;
+
+  void endField() {
+    row.add(fieldWasQuoted ? 'quoted' : 'plain');
+    fieldWasQuoted = false;
+  }
+
+  var i = 0;
+  while (i < csv.length) {
+    if (csv[i] == '"') {
+      fieldWasQuoted = true;
+    } else if (csv[i] == ',') {
+      endField();
+    }
+    i++;
+  }
+  return [row];
+}
+
+// BAD: Should trigger avoid_unused_assignment
+// Contrasting case: a genuinely dead write inside a closure, both the
+// write and the overwrite occurring within the same invocation. The
+// nested-function boundary added for the closure-capture fix above must
+// not suppress this.
+void _bad189() {
+  void inner() {
+    var total = 0;
+    // expect_lint: avoid_unused_assignment
+    total = 1; // never read before being overwritten below
+    total = 2;
+  }
+
+  inner();
+}

@@ -110,9 +110,9 @@ final items = <dynamic>[];
 dynamic map;
 
 // BAD: Should trigger avoid_misused_set_literals
-// expect_lint: avoid_misused_set_literals
 void _bad153() {
-  Map<String, int> map = {}; // This is actually a Set literal!
+  // expect_lint: avoid_misused_set_literals
+  var noDeclaredType = {}; // No declared/inferred type - silently a Map
   var items = {1, 2, 3}; // Set when Map might be expected
 }
 
@@ -120,4 +120,30 @@ void _bad153() {
 void _good153() {
   Map<String, int> map = <String, int>{}; // Explicit Map
   Set<int> items = {1, 2, 3}; // Explicit Set type
+}
+
+// GOOD: explicit declared `Map<K, V>` type on the LHS already resolves
+// `{}` unambiguously - not a misuse. Regression coverage for
+// bugs/avoid_misused_set_literals_false_positive_explicit_map_declared_type.md
+void _good153ExplicitDeclaredMapType() {
+  final Map<String, int> cache = {};
+  print(cache);
+}
+
+// GOOD: explicit declared `Set<T>` type on the LHS also resolves `{}`
+// unambiguously (as a Set, once non-empty; but the empty case here is
+// still explicit and should not be flagged as ambiguous).
+class _GoodSet153 {
+  final Set<String> tags = {};
+}
+
+// GOOD: an assignment target whose field was declared with an explicit
+// type - the context type comes from the field's declared type, not the
+// assignment site.
+class _GoodAssignment153 {
+  Map<String, int> field = <String, int>{};
+
+  _GoodAssignment153() {
+    field = {};
+  }
 }

@@ -9,6 +9,8 @@ library;
 // cspell:ignore encryptedbox changepassword getexternalstoragedirectory
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../../catch_body_logging_utils.dart';
 import '../../platform_path_utils.dart';
@@ -4898,10 +4900,7 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
     AstNode? current = targetNode.parent;
     while (current != null) {
       if (current is IfStatement) {
-        final String condition = current.expression.toSource();
-        if (condition.contains('kDebugMode') ||
-            condition.contains('kProfileMode') ||
-            condition.contains('!kReleaseMode')) {
+        if (_guaranteesDebug(current.expression, depth: 0)) {
           // Only suppress if node is in the then-branch, not the else-branch
           if (_isDescendantOf(targetNode, current.thenStatement)) {
             return true;
@@ -4914,6 +4913,317 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
     return false;
   }
 
+  /// Maximum indirection hops (a local variable to its initializer, or a
+  /// zero-arg local function/method call to its body) the guard detector
+  /// follows before giving up. Keeps the check cheap and bounds recursion
+  /// on self-referential or mutually-recursive helpers. Unwrapping `!`,
+  /// `&&`/`||`, and parentheses does NOT spend depth — only substituting
+  /// an identifier/call for what it resolves to does.
+  static const int _maxGuardIndirectionDepth = 3;
+
+  /// True when [condition] being TRUE proves the code is running in a
+  /// debug/non-production context — i.e. it is a sound guard for the
+  /// `then` branch of the `if` that holds it.
+  ///
+  /// `&&` and `||` are NOT interchangeable here: one guaranteed operand of
+  /// an `&&` guards the whole condition, but `if (verbose || isDebug())`
+  /// still runs the branch outside debug whenever `verbose` is true, so
+  /// EVERY operand of an `||` must guarantee it. `!X` guarantees debug
+  /// exactly when being in PRODUCTION would force `X` true — see
+  /// [_impliedByProduction], this predicate's dual. Only `!`, `&&`, `||`,
+  /// and parentheses are recursed into; any other shape (`==`, `is`, a
+  /// ternary) is not modeled and is conservatively NOT treated as a
+  /// guard, so the rule stays reported rather than risk silencing a real
+  /// leak. Indirection through a local `bool` variable or a zero-arg
+  /// local function/method call is followed (same predicate applied to
+  /// whatever it resolves to) up to [_maxGuardIndirectionDepth] hops.
+  bool _guaranteesDebug(Expression condition, {required int depth}) {
+    if (condition is ParenthesizedExpression) {
+      return _guaranteesDebug(condition.expression, depth: depth);
+    }
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      return _impliedByProduction(condition.operand, depth: depth);
+    }
+    if (condition is BinaryExpression) {
+      final String operator = condition.operator.lexeme;
+      if (operator == '&&') {
+        return _guaranteesDebug(condition.leftOperand, depth: depth) ||
+            _guaranteesDebug(condition.rightOperand, depth: depth);
+      }
+      if (operator == '||') {
+        return _guaranteesDebug(condition.leftOperand, depth: depth) &&
+            _guaranteesDebug(condition.rightOperand, depth: depth);
+      }
+      // `<flag> == true` / `<flag> != false` behave like `<flag>`;
+      // `<flag> == false` / `<flag> != true` behave like `!<flag>`. Any
+      // other `==`/`!=`/other binary operator is not modeled.
+      final (Expression atom, bool positive)? comparison = _flagComparison(
+        condition,
+      );
+      if (comparison == null) return false;
+      return comparison.$2
+          ? _guaranteesDebug(comparison.$1, depth: depth)
+          : _impliedByProduction(comparison.$1, depth: depth);
+    }
+
+    if (_isDebugAtom(condition)) return true;
+    if (depth >= _maxGuardIndirectionDepth) return false;
+    final Expression? resolved = _resolveIndirection(condition);
+    return resolved != null && _guaranteesDebug(resolved, depth: depth + 1);
+  }
+
+  /// True when being in PRODUCTION forces [expression] to be TRUE — the
+  /// dual of [_guaranteesDebug]. The two recurse into each other through
+  /// `!`, and `&&`/`||` swap roles between them, which is what makes the
+  /// `||` and negation cases in [_guaranteesDebug] sound.
+  bool _impliedByProduction(Expression expression, {required int depth}) {
+    if (expression is ParenthesizedExpression) {
+      return _impliedByProduction(expression.expression, depth: depth);
+    }
+    if (expression is PrefixExpression && expression.operator.lexeme == '!') {
+      return _guaranteesDebug(expression.operand, depth: depth);
+    }
+    if (expression is BinaryExpression) {
+      final String operator = expression.operator.lexeme;
+      if (operator == '&&') {
+        return _impliedByProduction(expression.leftOperand, depth: depth) &&
+            _impliedByProduction(expression.rightOperand, depth: depth);
+      }
+      if (operator == '||') {
+        return _impliedByProduction(expression.leftOperand, depth: depth) ||
+            _impliedByProduction(expression.rightOperand, depth: depth);
+      }
+      final (Expression atom, bool positive)? comparison = _flagComparison(
+        expression,
+      );
+      if (comparison == null) return false;
+      return comparison.$2
+          ? _impliedByProduction(comparison.$1, depth: depth)
+          : _guaranteesDebug(comparison.$1, depth: depth);
+    }
+
+    if (_isProductionAtom(expression)) return true;
+    if (depth >= _maxGuardIndirectionDepth) return false;
+    final Expression? resolved = _resolveIndirection(expression);
+    return resolved != null && _impliedByProduction(resolved, depth: depth + 1);
+  }
+
+  /// For `<flag> == true`, `<flag> == false`, `<flag> != true`, or
+  /// `<flag> != false` (the boolean literal on either side), returns the
+  /// non-literal operand plus whether the whole comparison is equivalent
+  /// to that operand UN-negated (`true`) or negated (`false`) — e.g.
+  /// `kReleaseMode == false` returns `(kReleaseMode, false)`, the same
+  /// shape `!kReleaseMode` would produce. Returns null for anything else
+  /// (neither operand a bool literal, or both are).
+  (Expression, bool)? _flagComparison(BinaryExpression expr) {
+    final String operator = expr.operator.lexeme;
+    if (operator != '==' && operator != '!=') return null;
+    bool? asBoolLiteral(Expression e) => e is BooleanLiteral ? e.value : null;
+    final bool? leftValue = asBoolLiteral(expr.leftOperand);
+    final bool? rightValue = asBoolLiteral(expr.rightOperand);
+    final Expression atom;
+    final bool literalValue;
+    if (leftValue != null && rightValue == null) {
+      atom = expr.rightOperand;
+      literalValue = leftValue;
+    } else if (rightValue != null && leftValue == null) {
+      atom = expr.leftOperand;
+      literalValue = rightValue;
+    } else {
+      return null; // neither operand, or both operands, are bool literals.
+    }
+    final bool positive = (operator == '==') == literalValue;
+    return (atom, positive);
+  }
+
+  /// True when TRUE-valued [atom] is, on its own (never as part of a
+  /// larger compound expression — callers only reach here after `!`,
+  /// `&&`, `||`, `==`/`!=` with a bool literal, and parentheses have
+  /// already been unwrapped), a reference to `kDebugMode` or
+  /// `kProfileMode` — never a substring match against unrelated text.
+  bool _isDebugAtom(Expression atom) {
+    return _isBuildModeConstant(atom, 'kDebugMode') ||
+        _isBuildModeConstant(atom, 'kProfileMode');
+  }
+
+  /// True when TRUE-valued [atom] is, on its own, a reference to
+  /// `kReleaseMode`, or exactly `bool.fromEnvironment('dart.vm.product')`
+  /// (the Dart-VM-native equivalent, used unnegated, for non-Flutter
+  /// `dart:` packages that can't depend on
+  /// `package:flutter/foundation.dart`) — a recognized "we are in
+  /// production" signal.
+  bool _isProductionAtom(Expression atom) {
+    return _isBuildModeConstant(atom, 'kReleaseMode') ||
+        _isDartVmProductCheck(atom);
+  }
+
+  /// True when [atom] is exactly a bare `SimpleIdentifier` or
+  /// namespace-qualified `PrefixedIdentifier` (`foundation.kDebugMode`)
+  /// named [name].
+  ///
+  /// When it resolves to a real Flutter symbol, it must be declared under
+  /// `foundation` — either the `package:flutter/foundation.dart` barrel
+  /// itself, or `package:flutter/src/foundation/...`, which is where
+  /// `kDebugMode`/`kProfileMode`/`kReleaseMode` are actually DECLARED
+  /// (`constants.dart`). `element.library.uri` reports the DECLARING
+  /// library, not the importing/re-exporting one — checking only
+  /// `foundation.dart` rejected every real `import
+  /// 'package:flutter/foundation.dart'; if (kDebugMode) ...`, the
+  /// canonical guard in every Flutter app, since `kDebugMode`'s element
+  /// always resolves to `src/foundation/constants.dart`, never to the
+  /// `foundation.dart` barrel that merely re-exports it.
+  ///
+  /// When it resolves to something else entirely (not a `package:flutter`
+  /// symbol at all), only a top-level `const` is accepted — not a mutable
+  /// field of the same name (e.g. `static bool kDebugMode = ...;`), which
+  /// isn't a build-mode guard no matter what it's called. This also
+  /// covers this package's own non-Flutter example fixtures and
+  /// resolved-rule-harness tests, which mock these constants locally as
+  /// top-level `const`s (since that package can't depend on Flutter).
+  ///
+  /// When it doesn't resolve at all, the name alone is enough — the same
+  /// conservative-but-usable stance the rest of this detector already
+  /// takes for unresolved types.
+  bool _isBuildModeConstant(Expression atom, String name) {
+    final SimpleIdentifier? identifier = switch (atom) {
+      SimpleIdentifier() => atom,
+      PrefixedIdentifier() => atom.identifier,
+      _ => null,
+    };
+    if (identifier == null || identifier.name != name) return false;
+    final Element? element = identifier.element;
+    if (element == null) return true;
+
+    final String? libraryUri = element.library?.uri.toString();
+    if (libraryUri != null && libraryUri.startsWith('package:flutter/')) {
+      return libraryUri == 'package:flutter/foundation.dart' ||
+          libraryUri.startsWith('package:flutter/src/foundation/');
+    }
+
+    // Unwraps a synthetic variable-induced accessor to the real
+    // top-level variable it stands for — same pattern used elsewhere in
+    // this package (see mutable_tearoff_rules.dart's _isMutableReceiver)
+    // — so `isConst` reflects the actual declaration.
+    PropertyInducingElement? variable;
+    if (element is TopLevelVariableElement) {
+      variable = element;
+    } else if (element is PropertyAccessorElement && element.isOriginVariable) {
+      variable = element.variable;
+    }
+    return variable != null && variable.isConst;
+  }
+
+  /// True when [atom] is exactly `bool.fromEnvironment('dart.vm.product')`.
+  /// `bool.fromEnvironment` is a `const factory` constructor of SDK
+  /// `bool` (not a static method), so the analyzer parses a call to it as
+  /// an [InstanceCreationExpression] — `bool` the named type,
+  /// `fromEnvironment` the named constructor — not a `MethodInvocation`.
+  /// Matches when the sole positional argument is the string literal
+  /// `'dart.vm.product'`, optionally followed by the SDK constructor's
+  /// own `defaultValue:` named argument. Anything else — a different
+  /// environment key, a non-literal key, extra positional arguments — is
+  /// NOT matched: unlike the old substring check, this requires the exact
+  /// call shape, so wrapping it in an unrelated call (`hide(kDebugMode)`)
+  /// or checking a different key no longer slips through.
+  bool _isDartVmProductCheck(Expression atom) {
+    if (atom is! InstanceCreationExpression) return false;
+    final ConstructorName ctor = atom.constructorName;
+    if (ctor.type.name.lexeme != 'bool') return false;
+    if (ctor.name?.name != 'fromEnvironment') return false;
+    final List<Expression> args = atom.argumentList.arguments;
+    if (args.isEmpty) return false;
+    final Expression first = args.first;
+    if (first is! SimpleStringLiteral || first.value != 'dart.vm.product') {
+      return false;
+    }
+    for (int i = 1; i < args.length; i++) {
+      final Expression extra = args[i];
+      if (extra is! NamedExpression ||
+          extra.name.label.name != 'defaultValue') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Resolves an identifier or zero-arg local call to the single
+  /// expression it stands for — a local `bool` variable's initializer, or
+  /// a zero-arg local function/method's body expression — so the SAME
+  /// predicate ([_guaranteesDebug] or [_impliedByProduction]) can be
+  /// re-applied to it. Returns null for anything it can't resolve.
+  Expression? _resolveIndirection(Expression expression) {
+    if (expression is SimpleIdentifier) {
+      return _resolveIdentifierToInitializer(expression);
+    }
+    if (expression is MethodInvocation && expression.target == null) {
+      return _resolveCallToBodyExpression(expression);
+    }
+    return null;
+  }
+
+  /// Resolves [id] to the initializer of its variable declaration, if
+  /// it's a `final`/`const` local declared in an enclosing block — see
+  /// [_findLocalDeclaration].
+  Expression? _resolveIdentifierToInitializer(SimpleIdentifier id) {
+    final Element? element = id.element;
+    if (element == null) return null;
+    return _findLocalDeclaration(id, element)?.initializer;
+  }
+
+  /// Finds the local `VariableDeclaration` for [element] — searching
+  /// statements in the block enclosing [context] and, failing that, each
+  /// enclosing block in turn — but ONLY a `final`/`const` declaration.
+  /// A plain `var`/typed mutable local is never traced through, even when
+  /// no reassignment is textually visible between the declaration and the
+  /// use: a reassignment can be reached through a loop body that runs
+  /// before the use on a later iteration (`var t = ...; for (...) { if
+  /// (t) print(s); t = x; }`), a callback, or any other control-flow
+  /// shape a purely offset-window text scan can't see. Trusting a mutable
+  /// local's initializer risks exactly the stale-value false negative
+  /// this rule exists to prevent — a real production leak going
+  /// unreported — so it's simplest and soundest to never trust one,
+  /// mirroring `AvoidCaseSensitivePathComparisonRule._findLocalDeclaration`
+  /// (windows_rules.dart), which takes the same final/const-only stance.
+  VariableDeclaration? _findLocalDeclaration(AstNode context, Element element) {
+    Block? block = context.thisOrAncestorOfType<Block>();
+    int hops = 0;
+    while (block != null && hops < 50) {
+      for (final Statement statement in block.statements) {
+        if (statement is! VariableDeclarationStatement) continue;
+        if (!statement.variables.isFinal && !statement.variables.isConst) {
+          continue;
+        }
+        for (final VariableDeclaration variable
+            in statement.variables.variables) {
+          final Element? declared = variable.declaredFragment?.element;
+          if (declared == null || declared != element) continue;
+          return variable;
+        }
+      }
+      block = block.parent?.thisOrAncestorOfType<Block>();
+      hops++;
+    }
+    return null;
+  }
+
+  /// Resolves a zero-argument local function/method call to the single
+  /// expression its body evaluates, covering both `bool f() => expr;` and
+  /// `bool f() { return expr; }` shapes. Returns null for anything more
+  /// complex (multi-statement bodies, calls that take arguments) rather
+  /// than guess.
+  Expression? _resolveCallToBodyExpression(MethodInvocation call) {
+    if (call.argumentList.arguments.isNotEmpty) return null;
+    final Element? element = call.methodName.element;
+    if (element == null) return null;
+    final CompilationUnit? unit = call.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return null;
+    final _DebugGuardFunctionBodyFinder finder = _DebugGuardFunctionBodyFinder(
+      element,
+    );
+    unit.accept(finder);
+    return finder.bodyExpression;
+  }
+
   bool _isDescendantOf(AstNode node, AstNode ancestor) {
     AstNode? current = node.parent;
     while (current != null) {
@@ -4921,6 +5231,72 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
       current = current.parent;
     }
     return false;
+  }
+}
+
+/// Finds the [FunctionDeclaration]/[MethodDeclaration] whose declared
+/// element matches [_target] and extracts the single expression its body
+/// evaluates, so [AvoidStackTraceInProductionRule] can inspect a
+/// zero-arg debug-guard helper's actual condition. Stops descending as
+/// soon as it finds the target — no other rule in this package uses
+/// exceptions for control flow, so this mirrors that convention with a
+/// plain `_found` flag checked at the top of every overridden visit
+/// method instead.
+class _DebugGuardFunctionBodyFinder extends RecursiveAstVisitor<void> {
+  _DebugGuardFunctionBodyFinder(this._target);
+
+  final Element _target;
+  Expression? bodyExpression;
+  bool _found = false;
+
+  @override
+  void visitCompilationUnit(CompilationUnit node) {
+    for (final CompilationUnitMember declaration in node.declarations) {
+      if (_found) return;
+      declaration.accept(this);
+    }
+  }
+
+  @override
+  void visitClassDeclaration(ClassDeclaration node) {
+    if (_found) return;
+    for (final ClassMember member in node.body.members) {
+      if (_found) return;
+      member.accept(this);
+    }
+  }
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    if (_found) return;
+    if (node.declaredFragment?.element == _target) {
+      bodyExpression = _extractExpression(node.functionExpression.body);
+      _found = true;
+      return;
+    }
+    super.visitFunctionDeclaration(node);
+  }
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    if (_found) return;
+    if (node.declaredFragment?.element == _target) {
+      bodyExpression = _extractExpression(node.body);
+      _found = true;
+      return;
+    }
+    super.visitMethodDeclaration(node);
+  }
+
+  static Expression? _extractExpression(FunctionBody body) {
+    if (body is ExpressionFunctionBody) return body.expression;
+    if (body is BlockFunctionBody) {
+      final List<Statement> statements = body.block.statements;
+      if (statements.length == 1 && statements.first is ReturnStatement) {
+        return (statements.first as ReturnStatement).expression;
+      }
+    }
+    return null;
   }
 }
 
