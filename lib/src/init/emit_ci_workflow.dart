@@ -26,26 +26,6 @@ enum EmitCiResult {
   refusedExists,
 }
 
-/// Builds the workflow body written by [emitCiWorkflow].
-///
-/// Kept in sync with the "GitHub Actions CI with SARIF" example in
-/// doc/guides/cli.md — that doc is the hand-authored reference, this is the
-/// generated copy of it.
-///
-/// The action reference is pinned to the exact saropa_lints version doing the
-/// generating, resolved at runtime from the consumer's package_config.json.
-/// That is self-consistent by construction: a release old enough to lack
-/// `action.yml` at its tag is also too old to have `--emit-ci`, so any version
-/// that can reach this code has an action to point at.
-///
-/// A hardcoded pin cannot make that guarantee, and did not: this was written
-/// as `v16.2.1`, a tag that predates `action.yml` entirely, so every workflow
-/// it generated referenced an action that could not resolve.
-///
-/// Deliberately the exact version rather than the moving major (`@v16`) that
-/// the release script also maintains: a generated file should pin to the
-/// release it was generated against, so regenerating is the only thing that
-/// can change which action runs.
 /// True when [projectDir] has no saropa_lints rule configuration, so the
 /// generated `scan` would exit 2 unless the workflow names a tier.
 ///
@@ -70,6 +50,26 @@ bool ciNeedsExplicitTier(Directory projectDir) {
   }
 }
 
+/// Builds the workflow body written by [emitCiWorkflow].
+///
+/// Kept in sync with the "GitHub Actions CI with SARIF" example in
+/// doc/guides/cli.md — that doc is the hand-authored reference, this is the
+/// generated copy of it.
+///
+/// The action reference is pinned to the exact saropa_lints version doing the
+/// generating, resolved at runtime from the consumer's package_config.json.
+/// That is self-consistent by construction: a release old enough to lack
+/// `action.yml` at its tag is also too old to have `--emit-ci`, so any version
+/// that can reach this code has an action to point at.
+///
+/// A hardcoded pin cannot make that guarantee, and did not: this was written
+/// as `v16.2.1`, a tag that predates `action.yml` entirely, so every workflow
+/// it generated referenced an action that could not resolve.
+///
+/// Deliberately the exact version rather than the moving major (`@v16`) that
+/// the release script also maintains: a generated file should pin to the
+/// release it was generated against, so regenerating is the only thing that
+/// can change which action runs.
 String buildCiWorkflow({String? version, String? tier}) {
   final String resolved = version ?? saropaLintsVersion;
 

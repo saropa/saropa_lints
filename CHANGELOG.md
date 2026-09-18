@@ -77,6 +77,8 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 ### Fixed (Extension)
 
 - Turning CI off in the System Health panel no longer breaks a workflow whose job already has its own `if:` condition. It used to add a second `if:`, which GitHub rejects as an invalid workflow. The existing condition is now swapped for `if: false` and put back exactly when CI is turned on again. A workflow with a job it cannot safely switch off is left untouched, and the panel reports that CI is still running.
+- Turning CI off no longer misses a job's own `if:` when a comment sits above it at 0-2 spaces of indent. The body scan stopped at the comment, so the `if:` further down was never found, and a second `if: false` was inserted before it — the same duplicate-key failure the previous fix was meant to prevent.
+- `buildCiWorkflow`'s dartdoc had been merged into `ciNeedsExplicitTier`'s by a missing blank line, so `--emit-ci`'s workflow-generating function carried no documentation. Restored to the function it describes; no behavior change.
 - The CI card and `init --emit-ci` write identical workflow files again. Their header and comments had drifted apart.
 
 ## [16.3.0]
