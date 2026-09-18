@@ -177,6 +177,30 @@ describe('ciWorkflow — OFF/ON toggle', () => {
     }
   });
 
+  // The OFF line encodes the original as `<marker> | was: <line>`, so an `if:`
+  // whose own value contains that separator is the one input that could make
+  // ON slice at the wrong offset and hand back a truncated condition.
+  it('restores an `if:` whose value contains the marker separator', () => {
+    const { root, cleanup } = makeRoot();
+    const original = [
+      'jobs:',
+      '  lint:',
+      "    if: contains(github.event.head_commit.message, ' | was: ')",
+      '    runs-on: ubuntu-latest',
+      '',
+    ].join('\n');
+    try {
+      writeWorkflow(root, original);
+      assert.strictEqual(disableCiWorkflow(root), true);
+      assert.strictEqual(ifKeysAt(readWorkflow(root), 4), 1);
+
+      enableCiWorkflow(root);
+      assert.strictEqual(readWorkflow(root), original);
+    } finally {
+      cleanup();
+    }
+  });
+
   it('leaves top-level maps after `jobs:` alone', () => {
     const { root, cleanup } = makeRoot();
     const original = [
