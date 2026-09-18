@@ -150,6 +150,33 @@ describe('ciWorkflow — OFF/ON toggle', () => {
     }
   });
 
+  it('finds a job\'s own `if:` past a shallow-indented comment, and restores it', () => {
+    const { root, cleanup } = makeRoot();
+    const original = [
+      'jobs:',
+      '  lint:',
+      '    runs-on: ubuntu-latest',
+      '  # a 2-space comment',
+      '    if: github.event.pull_request.draft == false',
+      '    steps:',
+      '      - run: echo hi',
+      '',
+    ].join('\n');
+    try {
+      writeWorkflow(root, original);
+      assert.strictEqual(disableCiWorkflow(root), true);
+      const off = readWorkflow(root);
+      // One `if:` for the single job: the existing one, swapped, not a second.
+      assert.strictEqual(ifKeysAt(off, 4), 1);
+      assert.ok(!off.includes('\n    if: github.event'), 'original if: must not remain as a live key');
+
+      enableCiWorkflow(root);
+      assert.strictEqual(readWorkflow(root), original);
+    } finally {
+      cleanup();
+    }
+  });
+
   it('leaves top-level maps after `jobs:` alone', () => {
     const { root, cleanup } = makeRoot();
     const original = [
