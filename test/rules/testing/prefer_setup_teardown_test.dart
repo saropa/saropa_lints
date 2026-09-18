@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:saropa_lints/src/rules/testing/testing_best_practices_rules.dart';
 import 'package:test/test.dart';
+
+import '../../support/resolved_rule_harness.dart';
 
 /// Tests for prefer_setup_teardown false-positive fixes.
 ///
@@ -117,6 +120,159 @@ void main() {
           isFalse,
           reason:
               'SUT constructed with a per-test varying literal must not flag',
+        );
+      },
+    );
+
+    // Resolved-analyzer regression coverage: a prior "signature truncated to
+    // first two statements" bug report (rejected — see
+    // plans/history/2026.09/2026.09.18/
+    // prefer_setup_teardown_false_positive_signature_truncated_to_two_statements.md)
+    // proposed suppressing whenever tests sharing a 2-statement setup prefix
+    // diverge afterward. That premise was wrong: divergence AFTER a shared
+    // prefix (a different act/argument) is exactly the normal setUp()
+    // extraction shape — only divergence WITHIN the prefix blocks extraction.
+    // These tests pin the correct (reverted) behavior against the resolved
+    // analyzer, not just fixture text.
+    group(
+      'trailing divergence after a shared prefix (still a true positive)',
+      () {
+        test(
+          'DOES flag when 3+ tests share setup and diverge only in the act step',
+          () async {
+            final diags = await runRuleResolved(
+              PreferSetupTeardownRule(),
+              '''
+class _Repo {}
+class _Svc {
+  _Svc(_Repo repo);
+  void a() {}
+  void b() {}
+  void c() {}
+}
+
+void run() {
+  group('svc', () {
+    test('a', () {
+      final repo = _Repo();
+      final sut = _Svc(repo);
+      sut.a();
+    });
+    test('b', () {
+      final repo = _Repo();
+      final sut = _Svc(repo);
+      sut.b();
+    });
+    test('c', () {
+      final repo = _Repo();
+      final sut = _Svc(repo);
+      sut.c();
+    });
+  });
+}
+''',
+              fileStem: 'shared_prefix_diverging_act_test',
+            );
+            final codes = diags.map((d) => d.ruleName).toSet();
+            expect(
+              codes,
+              contains('prefer_setup_teardown'),
+              reason:
+                  'final repo = _Repo(); final sut = _Svc(repo); is a real '
+                  'shared arrange step extractable to setUp() even though '
+                  'each test calls a different method afterward.',
+            );
+          },
+        );
+
+        test('DOES flag the report\'s shape: shared ctx/handler, diverging '
+            'follow-on argument', () async {
+          final diags = await runRuleResolved(
+            PreferSetupTeardownRule(),
+            '''
+class _TestContext {}
+class _SchemaHandler {
+  _SchemaHandler(_TestContext ctx);
+}
+void _mockQueryWithTables({required Map<String, List<String>> tableColumns}) {}
+
+void run() {
+  group('SchemaHandler', () {
+    test('users table', () {
+      final ctx = _TestContext();
+      final handler = _SchemaHandler(ctx);
+      _mockQueryWithTables(tableColumns: {'users': ['id']});
+    });
+    test('orders table', () {
+      final ctx = _TestContext();
+      final handler = _SchemaHandler(ctx);
+      _mockQueryWithTables(tableColumns: {'orders': ['id']});
+    });
+    test('products table', () {
+      final ctx = _TestContext();
+      final handler = _SchemaHandler(ctx);
+      _mockQueryWithTables(tableColumns: {'products': ['id']});
+    });
+  });
+}
+''',
+            fileStem: 'shared_prefix_diverging_argument_test',
+          );
+          final codes = diags.map((d) => d.ruleName).toSet();
+          expect(
+            codes,
+            contains('prefer_setup_teardown'),
+            reason:
+                'final ctx = _TestContext(); final handler = '
+                'SchemaHandler(ctx); can move to setUp() — the differing '
+                '_mockQueryWithTables(...) call simply stays as each '
+                "test's first line. The original bug report's premise "
+                '(that this divergence blocks extraction) was wrong.',
+          );
+        });
+
+        test(
+          'does NOT flag when the tests genuinely do not share a setup prefix',
+          () async {
+            final diags = await runRuleResolved(PreferSetupTeardownRule(), '''
+class _RepoA {}
+class _RepoB {}
+class _RepoC {}
+class _Svc {
+  _Svc(Object repo);
+}
+
+void run() {
+  group('svc', () {
+    test('a', () {
+      final repo = _RepoA();
+      final sut = _Svc(repo);
+      sut.toString();
+    });
+    test('b', () {
+      final repo = _RepoB();
+      final sut = _Svc(repo);
+      sut.toString();
+    });
+    test('c', () {
+      final repo = _RepoC();
+      final sut = _Svc(repo);
+      sut.toString();
+    });
+  });
+}
+''', fileStem: 'no_shared_prefix_test');
+            final codes = diags.map((d) => d.ruleName).toSet();
+            expect(
+              codes,
+              isNot(contains('prefer_setup_teardown')),
+              reason:
+                  'The very first statement differs per test (_RepoA/_RepoB/'
+                  '_RepoC) — there is no common prefix at all to hoist into '
+                  'setUp(), so each test has its own distinct signature and '
+                  'none meets the 3-test duplicate threshold.',
+            );
+          },
         );
       },
     );

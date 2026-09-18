@@ -225,6 +225,141 @@ import 'native_impl.dart';
       }
     });
   });
+
+  // See bugs/function_always_returns_null_false_positive_conditional_import_
+  // web_stub.dart: FunctionAlwaysReturnsNullRule uses
+  // isConditionalImportStubTarget to skip the web/stub half of a
+  // dart.library.io conditional import, since a stub member that always
+  // returns null is honoring its contract, not exhibiting a code smell.
+  group('isConditionalImportStubTarget', () {
+    test('returns false for null or empty path', () {
+      expect(isConditionalImportStubTarget(null), isFalse);
+      expect(isConditionalImportStubTarget(''), isFalse);
+    });
+
+    test(
+      'returns true for the default branch of a dart.library.io conditional import',
+      () {
+        final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+        try {
+          _createTempProject(
+            dir.path,
+            importerContent: '''
+import 'stub.dart' if (dart.library.io) 'native_impl.dart';
+''',
+          );
+          final stubPath = p.join(dir.path, 'lib', 'stub.dart');
+          expect(isConditionalImportStubTarget(stubPath), isTrue);
+        } finally {
+          safeDeleteDir(dir);
+        }
+      },
+    );
+
+    test(
+      'returns true for the default branch of a dart.library.ffi conditional export',
+      () {
+        final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+        try {
+          _createTempProject(
+            dir.path,
+            importerContent: '''
+export 'stub.dart' if (dart.library.ffi) 'native_impl.dart';
+''',
+          );
+          final stubPath = p.join(dir.path, 'lib', 'stub.dart');
+          expect(isConditionalImportStubTarget(stubPath), isTrue);
+        } finally {
+          safeDeleteDir(dir);
+        }
+      },
+    );
+
+    test('returns false for the native branch itself', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        _createTempProject(
+          dir.path,
+          importerContent: '''
+import 'stub.dart' if (dart.library.io) 'native_impl.dart';
+''',
+        );
+        final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
+        expect(isConditionalImportStubTarget(nativePath), isFalse);
+      } finally {
+        safeDeleteDir(dir);
+      }
+    });
+
+    test('returns false for a file with no conditional import wiring', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        _createTempProject(
+          dir.path,
+          importerContent: '''
+import 'stub.dart' if (dart.library.io) 'native_impl.dart';
+''',
+        );
+        final otherPath = p.join(dir.path, 'lib', 'other.dart');
+        File(otherPath).writeAsStringSync('void other() {}');
+        expect(isConditionalImportStubTarget(otherPath), isFalse);
+      } finally {
+        safeDeleteDir(dir);
+      }
+    });
+
+    // Naming-convention fallback (mirrors _collectSiblingStubTarget): a
+    // `*_stub.dart` file with a sibling `*_io.dart` is the web branch of the
+    // standard split even when no directive we parsed wires them together.
+    // This is the exact shape from the bug report's
+    // `drift_debug_server_stub.dart` / `drift_debug_server_io.dart` pair.
+    test('returns true for *_stub.dart with a sibling *_io.dart', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        final libDir = Directory(p.join(dir.path, 'lib'))
+          ..createSync(recursive: true);
+        File(p.join(dir.path, 'pubspec.yaml')).writeAsStringSync('''
+name: test_package
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+''');
+        final stubPath = p.join(libDir.path, 'drift_debug_server_stub.dart');
+        File(stubPath).writeAsStringSync('''
+class DriftDebugServer {
+  static int? get port => null;
+}
+''');
+        File(
+          p.join(libDir.path, 'drift_debug_server_io.dart'),
+        ).writeAsStringSync('''
+class DriftDebugServer {
+  static int? get port => 1234;
+}
+''');
+        expect(isConditionalImportStubTarget(stubPath), isTrue);
+      } finally {
+        safeDeleteDir(dir);
+      }
+    });
+
+    test('returns false for *_stub.dart with no sibling *_io.dart', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        final libDir = Directory(p.join(dir.path, 'lib'))
+          ..createSync(recursive: true);
+        File(p.join(dir.path, 'pubspec.yaml')).writeAsStringSync('''
+name: test_package
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+''');
+        final stubPath = p.join(libDir.path, 'lonely_stub.dart');
+        File(stubPath).writeAsStringSync('void serve() {}');
+        expect(isConditionalImportStubTarget(stubPath), isFalse);
+      } finally {
+        safeDeleteDir(dir);
+      }
+    });
+  });
 }
 
 /// Writes `pubspec.yaml`, stub/native impl files, and [importerContent] under [projectRoot]/lib.

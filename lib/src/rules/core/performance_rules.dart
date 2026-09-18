@@ -740,7 +740,8 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
     // repeating it costs nothing and must NOT be flagged. The new element model
     // distinguishes the two via `isOriginDeclaration` (true for a real `get`)
     // vs `isOriginVariable` (true for a field's implicit getter).
-    if (_isDeclaredGetter(node.identifier.element)) {
+    if (_isDeclaredGetter(node.identifier.element) &&
+        !_isKnownCheapGetter(node.identifier.element, node.prefix)) {
       final String key = node.toSource();
       getterCalls.putIfAbsent(key, () => <AstNode>[]).add(node);
     }
@@ -751,7 +752,8 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
   void visitPropertyAccess(PropertyAccess node) {
     // Same rationale as visitPrefixedIdentifier: skip field reads (synthetic
     // getters), only track repeated reads of an explicitly-declared getter.
-    if (_isDeclaredGetter(node.propertyName.element)) {
+    if (_isDeclaredGetter(node.propertyName.element) &&
+        !_isKnownCheapGetter(node.propertyName.element, node.realTarget)) {
       final String key = node.toSource();
       getterCalls.putIfAbsent(key, () => <AstNode>[]).add(node);
     }
@@ -764,6 +766,56 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
   /// cannot prove the access is an expensive getter must stay silent.
   static bool _isDeclaredGetter(Element? element) {
     return element is GetterElement && element.isOriginDeclaration;
+  }
+
+  /// `dart:core` collection/string getter names that are O(1) *when read on
+  /// a concrete `List`/`String`/`Set`/`Map`*, but are NOT safe to assume
+  /// cheap in general: `length`/`isEmpty`/`isNotEmpty`/`first`/`last` are
+  /// also declared on `Iterable` (inherited by e.g. a lazy `.where(...)`
+  /// result), where they are genuinely O(n) — evaluating the whole lazy
+  /// chain each time. So this name check alone is not enough; see
+  /// [_isKnownCheapGetter], which additionally requires the *receiver's
+  /// static type* to be one of the four concrete SDK types.
+  static const Set<String> _knownCheapCollectionGetterNames = <String>{
+    'length',
+    'isEmpty',
+    'isNotEmpty',
+    'first',
+    'last',
+  };
+
+  /// True when [element]/[receiver] together prove the read is a `dart:core`
+  /// O(1) accessor that is never worth caching:
+  ///
+  /// * [_knownCheapCollectionGetterNames] (`length`, `isEmpty`, ...) ONLY when
+  ///   [receiver]'s static type is exactly `List`/`String`/`Set`/`Map` —
+  ///   checked via the receiver type, not the getter's declaring class,
+  ///   because `List`/`Set` inherit several of these from `Iterable` and a
+  ///   lazy `Iterable` (e.g. a `.where(...)` result) resolves to the exact
+  ///   same declared getter while genuinely being O(n) per read.
+  /// * `hashCode` ONLY when it resolves to `Object`'s own declaration (i.e.
+  ///   not overridden) — an unoverridden `hashCode` is the cheap identity
+  ///   hash; a class that overrides it with an expensive computation
+  ///   resolves to that subclass's element instead, so it is unaffected and
+  ///   still tracked.
+  static bool _isKnownCheapGetter(Element? element, Expression? receiver) {
+    if (element is! GetterElement) return false;
+
+    if (element.name == 'hashCode') {
+      final Element? enclosing = element.enclosingElement;
+      return enclosing is InterfaceElement &&
+          enclosing.thisType.isDartCoreObject;
+    }
+
+    if (!_knownCheapCollectionGetterNames.contains(element.name)) {
+      return false;
+    }
+    final DartType? receiverType = receiver?.staticType;
+    if (receiverType == null) return false;
+    return receiverType.isDartCoreList ||
+        receiverType.isDartCoreString ||
+        receiverType.isDartCoreSet ||
+        receiverType.isDartCoreMap;
   }
 }
 

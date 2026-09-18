@@ -135,3 +135,45 @@ void _good511() {
     },
   );
 }
+
+// GOOD: Should NOT trigger prefer_typed_route_params
+// A query parameter piped through a same-file `parseXxx`-named wrapper
+// (not the bare word `parse`) that already parses/clamps the value.
+abstract final class _ServerUtils {
+  static int parseLimit(String? value) {
+    if (value == null) return 100;
+    final int? n = int.tryParse(value);
+    if (n == null || n < 1) return 100;
+    return n > 1000 ? 1000 : n;
+  }
+}
+
+void _good512(dynamic request) {
+  final int limit = _ServerUtils.parseLimit(
+    request.uri.queryParameters['limit'],
+  );
+  UserPage(userId: '$limit');
+}
+
+// BAD: Should trigger prefer_typed_route_params
+// A wrapper whose NAME merely contains "parse" as a run of letters
+// (sparseView -> "s" + "parse" + "View") does no actual conversion: it takes
+// a String and returns void. Must still be flagged.
+void _sparseView(String? id) {}
+
+// expect_lint: prefer_typed_route_params
+void _bad513(dynamic request) {
+  _sparseView(request.uri.queryParameters['id']);
+}
+
+// BAD: Should trigger prefer_typed_route_params
+// bool-returning sinks are common (Set.add, Set.contains, a user-defined
+// save() returning success/failure) and don't convert the string to
+// anything — a bool return type alone must NOT be treated as proof of
+// parsing (only `bool.parse`/`bool.tryParse` specifically should be).
+bool _save514(String? id) => id != null;
+
+// expect_lint: prefer_typed_route_params
+void _bad514(dynamic request) {
+  _save514(request.uri.queryParameters['id']);
+}

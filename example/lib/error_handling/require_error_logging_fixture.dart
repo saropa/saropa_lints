@@ -43,4 +43,32 @@ void doSomethingUnrelated() {}
 
 class TimeoutException implements Exception {}
 
+Object decodeWithStackTrace(String data) {
+  try {
+    return parseData(data);
+  } on FormatException catch (e, st) {
+    // GOOD — Error.throwWithStackTrace propagates the error with its
+    // original stack trace attached via a `return`; it is not silently
+    // swallowed even though there's no `throw`/`rethrow` keyword.
+    return Error.throwWithStackTrace(
+      FormatException('Invalid: ${e.message}'),
+      st,
+    );
+  }
+}
+
+Object decodeWithStackTraceThrow(String data) {
+  try {
+    return parseData(data);
+  } on FormatException catch (e, st) {
+    // GOOD — same propagation, explicit `throw` keyword.
+    throw Error.throwWithStackTrace(
+      FormatException('Invalid: ${e.message}'),
+      st,
+    );
+  }
+}
+
+Object parseData(String data) => data;
+
 void main() {}

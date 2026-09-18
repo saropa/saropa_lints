@@ -94,7 +94,7 @@ void main() {
     String fixture(String name) =>
         File('test/fixtures/ci_workflow/$name').readAsStringSync();
 
-    test('pinned', () {
+    test('pinned version output matches the pinned.yml fixture', () {
       expect(buildCiWorkflow(version: '16.3.0'), fixture('pinned.yml'));
     });
 
@@ -105,7 +105,7 @@ void main() {
       );
     });
 
-    test('unpinned', () {
+    test('unknown version output matches the unpinned.yml fixture', () {
       expect(buildCiWorkflow(version: 'unknown'), fixture('unpinned.yml'));
     });
   });

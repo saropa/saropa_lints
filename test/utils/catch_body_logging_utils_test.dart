@@ -85,6 +85,43 @@ void main() {
         isTrue,
       );
     });
+
+    test(
+      'detects Error.throwWithStackTrace wrapped in return as propagation',
+      () {
+        // `return Error.throwWithStackTrace(...)` is a MethodInvocation,
+        // not a ThrowExpression/RethrowExpression - it must be recognized
+        // explicitly, not just via the throw/rethrow visitors.
+        expect(
+          hasLoggingCall(
+            'on FormatException catch (e, st) '
+            '{ return Error.throwWithStackTrace(e, st); }',
+          ),
+          isTrue,
+        );
+      },
+    );
+
+    test('detects Error.throwWithStackTrace wrapped in an explicit throw', () {
+      expect(
+        hasLoggingCall(
+          'on FormatException catch (e, st) '
+          '{ throw Error.throwWithStackTrace(e, st); }',
+        ),
+        isTrue,
+      );
+    });
+
+    test('does not false-positive on an unrelated throwWithStackTrace-named '
+        'method with a different receiver', () {
+      expect(
+        hasLoggingCall(
+          'on Object catch (e, s) '
+          '{ myHelper.throwWithStackTrace(e, s); }',
+        ),
+        isFalse,
+      );
+    });
   });
 }
 

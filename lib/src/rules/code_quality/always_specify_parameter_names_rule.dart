@@ -151,6 +151,17 @@ void _checkInvocation({
   final params = element.formalParameters;
   if (params.isEmpty) return;
 
+  // The correctionMessage tells the developer to redeclare the flagged
+  // parameters as named — advice only actionable when the caller owns (can
+  // edit) the callee's declaration. SDK signatures like
+  // `String.substring(int start, [int? end])` and
+  // `Pattern.replaceAll(Pattern from, String replace)` are positional-only
+  // by design and fixed by the language/SDK: no named form exists or can
+  // ever exist, so flagging these calls is unconditionally unactionable
+  // (false positive found in review — see bugs/always_specify_parameter_names_
+  // false_positive_dart_core_positional_only_methods.md).
+  if (element.library.isInSdk) return;
+
   // Collect only the positional (non-named) arguments in call-site order
   final positionalArgs = collectPositionalArgs(arguments);
 

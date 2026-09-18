@@ -88,6 +88,77 @@ class C {
 ''');
       expect(diags.map((d) => d.ruleName), contains('prefer_cached_getter'));
     });
+
+    test(
+      'does NOT flag List.length read twice (dart:core O(1) getter)',
+      () async {
+        final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+class Importer {
+  void importRow(List<String> rowValues, List<String> headers) {
+    if (rowValues.length >= headers.length) {
+      // ...
+    } else {
+      final colCount = rowValues.length;
+      final headerCount = headers.length;
+      print('\$colCount vs \$headerCount');
+    }
+  }
+}
+''');
+        expect(codes, isNot(contains('prefer_cached_getter')));
+      },
+    );
+
+    test('does NOT flag String/Set/Map .length read twice', () async {
+      // Wrapped in a class method (not a top-level function) — the rule
+      // only inspects `MethodDeclaration` bodies, so a top-level function
+      // would trivially never be flagged regardless of this fix.
+      final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+class C {
+  void run(String text, Set<int> ids, Map<String, int> counts) {
+    print(text.length.toString() + text.length.toString());
+    print(ids.length.toString() + ids.length.toString());
+    print(counts.length.toString() + counts.length.toString());
+  }
+}
+''');
+      expect(codes, isNot(contains('prefer_cached_getter')));
+    });
+
+    test('does NOT flag List.isEmpty/first read twice', () async {
+      final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+class C {
+  void run(List<int> values) {
+    if (values.isEmpty || values.isEmpty) {
+      return;
+    }
+    print(values.first.toString() + values.first.toString());
+  }
+}
+''');
+      expect(codes, isNot(contains('prefer_cached_getter')));
+    });
+
+    test(
+      'STILL flags a lazy Iterable .length read twice (genuinely O(n))',
+      () async {
+        // `list.where(...)` returns a lazy `Iterable<int>`, not a `List`.
+        // `.length` on a lazy Iterable walks the whole chain each read, so
+        // this must stay flagged even though `.length` is exempt for a
+        // concrete List/String/Set/Map receiver. The rule only inspects
+        // `MethodDeclaration` bodies, so this is wrapped in a class (as the
+        // other "STILL flags" case above is) rather than a top-level function.
+        final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+class C {
+  void run(List<int> values) {
+    final it = values.where((x) => x > 0);
+    print(it.length.toString() + it.length.toString());
+  }
+}
+''');
+        expect(codes, contains('prefer_cached_getter'));
+      },
+    );
   });
 
   group('avoid_string_concatenation_loop', () {

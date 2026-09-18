@@ -157,17 +157,8 @@ void _goodDriftEncryptedValue1010() {
 
 // GOOD: `insert` with cipher* / aes* value identifiers
 void _goodDriftInsertCipherAndAes1010() {
-  driftDb.insert(
-    _DriftLikeCompanion(
-      token: _DriftValue(cipherText),
-      other: 1,
-    ),
-  );
-  driftDb.insert(
-    _DriftLikeCompanion(
-      token: _DriftValue(aesEncodedToken),
-    ),
-  );
+  driftDb.insert(_DriftLikeCompanion(token: _DriftValue(cipherText), other: 1));
+  driftDb.insert(_DriftLikeCompanion(token: _DriftValue(aesEncodedToken)));
 }
 
 String toFirebaseEncrypted(String? x) => '';
@@ -187,7 +178,12 @@ class _DriftValue {
 }
 
 class _DriftLikeCompanion {
-  _DriftLikeCompanion({this.privateKey, this.publicKey, this.token, this.other});
+  _DriftLikeCompanion({
+    this.privateKey,
+    this.publicKey,
+    this.token,
+    this.other,
+  });
   final dynamic privateKey;
   final dynamic publicKey;
   final dynamic token;
@@ -248,9 +244,7 @@ class _SearchIndexCompanion1010 {
 // an auth token. The field name `searchTokens:` disambiguates intent.
 void _goodSearchIndexTokens1010() {
   final String tokens = 'foo|bar|baz';
-  driftDb.write(
-    _SearchIndexCompanion1010(searchTokens: _DriftValue(tokens)),
-  );
+  driftDb.write(_SearchIndexCompanion1010(searchTokens: _DriftValue(tokens)));
 }
 
 // GOOD: Compiler / NLP / routing token lists. None require encryption.
@@ -301,6 +295,52 @@ void _goodAuthorshipMetadata1010() {
       authoredAt: _DriftValue(DateTime.now()),
       authoringTool: _DriftValue('claude-code'),
     ),
+  );
+}
+
+// Regression: `authStatusFields` / `authRequiredMessage` are auth
+// **status**/configuration metadata (booleans/enum describing whether/how
+// auth is configured) and a static rejection message — not credentials. See
+// bugs/require_data_encryption_false_positive_auth_status_metadata_keyword_match.md.
+class _ServerContext1010 {
+  Map<String, dynamic> get authStatusFields => <String, dynamic>{
+    'authRequired': false,
+    'authScheme': null,
+  };
+}
+
+final _ctx1010 = _ServerContext1010();
+const String authRequiredMessage1010 = 'Authentication required';
+
+// GOOD: auth-status/config metadata map spread into a written payload.
+void _goodAuthStatusFieldsMetadata1010() async {
+  await file.writeAsString(
+    jsonEncode(<String, dynamic>{'ok': true, ..._ctx1010.authStatusFields}),
+  );
+}
+
+// GOOD: static, non-parameterized rejection message, not a credential.
+void _goodAuthRequiredMessageStatic1010() async {
+  await file.writeAsString(
+    jsonEncode(<String, String>{'error': authRequiredMessage1010}),
+  );
+}
+
+// BAD: auth-status metadata AND a real credential in the SAME call. The
+// metadata exclusion must only strip the metadata identifier from the
+// scanned text, not skip the whole call — a real password/token alongside
+// non-sensitive auth-config fields must still be flagged.
+// expect_lint: require_data_encryption
+void _badAuthStatusFieldPlusPasswordStillTriggers1010() async {
+  await file.writeAsString(
+    jsonEncode(<String, dynamic>{'authScheme': 'basic', 'password': value}),
+  );
+}
+
+// expect_lint: require_data_encryption
+void _badAuthRequiredPlusAccessTokenStillTriggers1010() async {
+  await file.writeAsString(
+    jsonEncode(<String, dynamic>{'authRequired': true, 'accessToken': value}),
   );
 }
 

@@ -1396,9 +1396,17 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
     'pathParameters',
     'queryParameters',
   };
+  // Fallback only: used when the wrapping call's types don't resolve (e.g.
+  // an unresolved/InvalidType receiver), so detection degrades to a name
+  // heuristic instead of going silent. Anchored to the start of the
+  // identifier or the start of a camelCase word (with the new word
+  // requiring an uppercase `P`) and requires a non-lowercase char (or end
+  // of string) immediately after, so it matches `parse`/`tryParse`/
+  // `parseLimit` but not names that merely *contain* "parse" as a run of
+  // letters, like `sparseView` or `openParserScreen`.
   static final RegExp _parseMethodPattern = RegExp(
-    r'\bparse\b',
-    caseSensitive: false,
+    r'(^(try)?[Pp]ars(e|ing)(?![a-z]))|'
+    r'((?<=[a-z_])(Try)?Pars(e|ing)(?![a-z]))',
   );
 
   @override
@@ -1415,14 +1423,12 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
       // Check if result is immediately used without parsing
       final AstNode? parent = node.parent;
 
-      // OK if wrapped in parse
+      // OK if wrapped in a call that already converts the raw string.
       if (parent is ArgumentList) {
         final AstNode? grandparent = parent.parent;
-        if (grandparent is MethodInvocation) {
-          final String methodName = grandparent.methodName.name;
-          if (_parseMethodPattern.hasMatch(methodName)) {
-            return;
-          }
+        if (grandparent is MethodInvocation &&
+            _isAlreadyConverted(node, grandparent)) {
+          return;
         }
       }
 
@@ -1438,6 +1444,65 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Whether [call] already converts the raw string [argument] came from,
+  /// so passing it through does not lose type safety.
+  ///
+  /// Prefers resolved element/type checks over the call's method name:
+  /// matching by name alone (the rule's previous approach) both misses
+  /// same-file wrapper methods with arbitrary names (`parseLimit`) and, if
+  /// loosened to a substring match, false-positives on names that merely
+  /// *contain* "parse" (`sparseView`, `openParserScreen`). A name-based
+  /// check is only used as a last resort when types didn't resolve.
+  bool _isAlreadyConverted(IndexExpression argument, MethodInvocation call) {
+    // The call itself converts the value if it resolves to one of the
+    // numeric "parsed" types a route parameter is meant to become — a
+    // genuine transformation happened, regardless of what the method is
+    // named (covers `int.tryParse`, `ServerUtils.parseLimit`, `double.parse`,
+    // etc.). Checking specifically for these types (rather than merely
+    // "not String") avoids treating a pass-through to some other reference
+    // type (e.g. a `void`-returning sink whose parameter happens to be
+    // `Object`) as if it had been parsed.
+    //
+    // `bool` is deliberately excluded from this return-type check: unlike
+    // int/double/num, `bool`-returning methods are commonly *sinks* that
+    // don't convert anything (`Set<String>.add`, `Set<String>.contains`, a
+    // user-defined `bool save(String? id)`, etc.), so treating any
+    // bool-returning wrapper as "already parsed" silently swallows those.
+    // `bool.parse`/`bool.tryParse` are deliberately NOT special-cased: this
+    // method is only reached when the argument's parent is an `ArgumentList`
+    // (see the call site below), but both `bool.parse` and `bool.tryParse`
+    // require a non-nullable `String` parameter while `queryParameters[...]`/
+    // `pathParameters[...]` is always `String?` — so passing one directly to
+    // either never type-checks, and can only be reached via a `!` or `?? ''`
+    // that puts a `PostfixExpression`/`BinaryExpression` between the index
+    // expression and the `ArgumentList`, which this rule already treats as
+    // "not used directly" for unrelated, pre-existing reasons. A dedicated
+    // resolved-receiver check for those two methods would be untestable dead
+    // code, so it isn't included.
+    final DartType? returnType = call.staticType;
+    if (returnType != null && _isParsedNumericType(returnType)) return true;
+
+    // Fall back to a conservative name check only when types didn't
+    // resolve to anything useful — an unresolved/InvalidType receiver, or a
+    // `dynamic` receiver (e.g. a same-file helper called on an untyped
+    // variable), where the static return type can't tell us whether a
+    // conversion happened.
+    if (returnType == null ||
+        returnType is InvalidType ||
+        returnType is DynamicType) {
+      return _parseMethodPattern.hasMatch(call.methodName.name);
+    }
+
+    return false;
+  }
+
+  /// Whether [type] is one of the numeric types a route parameter is meant
+  /// to be converted to, as opposed to String, bool, void, dynamic, or some
+  /// other type that doesn't prove a conversion happened.
+  bool _isParsedNumericType(DartType type) {
+    return type.isDartCoreInt || type.isDartCoreDouble || type.isDartCoreNum;
   }
 }
 

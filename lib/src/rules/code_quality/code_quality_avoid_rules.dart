@@ -438,19 +438,39 @@ class AvoidMissedCallsRule extends SaropaLintRule {
 ///
 /// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
 ///
-/// This catches cases where `{}` is used but interpreted as a Set
-/// when a Map was likely intended.
+/// This catches cases where an empty `{}` has NO written `Map` annotation
+/// and NO other typing context — not a declared type, not an
+/// argument/return/default-value context, not a surrounding map/list value
+/// slot. With no annotation and no context, Dart silently resolves `{}` to
+/// `Map<dynamic, dynamic>`, which can surprise a reader expecting a `Set`.
+///
+/// An empty `{}` is NOT flagged when EITHER of the following holds:
+/// - the enclosing variable has a written `Map` annotation — even a raw
+///   `Map` (no type arguments) or a typedef alias for one — because the
+///   annotation itself already answers "did you mean Set?"; or
+/// - the literal sits in ANY position that supplies a real context type
+///   (a declared `Set`/`Iterable` type, a parameter type, a return type, a
+///   map value slot, ...), because Dart resolves `{}` against that context
+///   directly.
+///
+/// An unhelpful annotation (`dynamic`, `Object`) does not count as a `Map`
+/// annotation, so it still falls through to the "no context" check below
+/// and is flagged.
 ///
 /// Example of **bad** code:
 /// ```dart
-/// Map<String, int> map = {};  // This is actually a Set literal!
-/// var items = {1, 2, 3};  // Set when Map might be expected
+/// var map = {};  // No context anywhere - silently becomes a Map, not a Set!
+/// dynamic map = {};  // dynamic gives no disambiguation either
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// Map<String, int> map = <String, int>{};  // Explicit Map
+/// Map<String, int> map = {};  // Explicit declared type - unambiguous
+/// Map raw = {};  // Written Map annotation (even raw) - unambiguous
+/// var map = <String, int>{};  // Explicit type argument - unambiguous
 /// Set<int> items = {1, 2, 3};  // Explicit Set type
+/// void f(Map<String, int> m) {}
+/// f({});  // Argument context - unambiguous
 /// ```
 class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
   AvoidMisusedSetLiteralsRule() : super(code: _code);
@@ -491,14 +511,45 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
       if (node.elements.isNotEmpty) return;
       if (node.typeArguments != null) return;
 
-      // Check if context expects a specific type
+      // A written `Map` annotation on the enclosing variable already
+      // answers "did you mean Set?" for the reader — even a raw `Map`
+      // (which resolves to `Map<dynamic, dynamic>`, same as no annotation
+      // at all) or a typedef alias for one. Checked via the declared
+      // element's resolved `type` (so a typedef is followed structurally,
+      // not by re-parsing the annotation's source text), and only when
+      // the annotation is explicit (`!hasImplicitType`) — `var`/inferred
+      // declarations fall through to the general check below.
+      final AstNode? parent = node.parent;
+      if (parent is VariableDeclaration && parent.initializer == node) {
+        final Element? element = parent.declaredFragment?.element;
+        if (element is VariableElement && !element.hasImplicitType) {
+          final DartType declaredType = element.type;
+          if (declaredType is InterfaceType && declaredType.isDartCoreMap) {
+            return;
+          }
+        }
+      }
+
+      // `node.staticType` is the analyzer's *resolved* type for this
+      // literal, which already reflects Dart's own context-typing —
+      // whatever position `{}` sits in (declaration, argument, default
+      // value, return, map value, index assignment, `??` operand, ...).
+      // When a real context type is available, Dart resolves `{}` against
+      // it directly: a `Map`-compatible context yields `Map<K, V>`, an
+      // `Iterable`-compatible-but-not-Map context yields `Set<E>`. Only
+      // when there is NO context type at all (and no written `Map`
+      // annotation, excluded above) does Dart fall back to its hardcoded
+      // default of `Map<dynamic, dynamic>` — and that default-with-no-
+      // context is the *only* shape where a reader could plausibly have
+      // meant `Set`. So: flag exactly that structural default (dart:core
+      // `Map` with both type arguments `dynamic`), not a display-string
+      // comparison, so it isn't fooled by an unrelated user-defined `Map`
+      // shadow or formatting differences.
       final DartType? contextType = node.staticType;
       if (contextType == null) return;
-
-      // Warn if the empty literal could be ambiguous
-      final String typeStr = contextType.getDisplayString();
-      if (typeStr.startsWith('Map<') || typeStr.startsWith('Set<')) {
-        // Type is inferred, but empty {} can be confusing
+      if (contextType is InterfaceType &&
+          contextType.isDartCoreMap &&
+          contextType.typeArguments.every((arg) => arg is DynamicType)) {
         reporter.atNode(node);
       }
     });
@@ -3717,6 +3768,11 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
       // Skip short strings
       if (value.length < _minLength) return;
 
+      // Skip directive URIs (import/export/part): Dart requires these to be
+      // string literals, so there is no legal way to extract them to a
+      // constant. See isInImportOrExport doc for details.
+      if (isInImportOrExport(node)) return;
+
       // Skip excluded patterns
       if (_shouldSkipString(value)) return;
 
@@ -3856,6 +3912,11 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
 
       // Skip short strings
       if (value.length < _minLength) return;
+
+      // Skip directive URIs (import/export/part): Dart requires these to be
+      // string literals, so there is no legal way to extract them to a
+      // constant. See isInImportOrExport doc for details.
+      if (isInImportOrExport(node)) return;
 
       // Skip excluded patterns
       if (_shouldSkipString(value)) return;
