@@ -343,8 +343,9 @@ export function disableCiWorkflow(root: string): boolean {
     out.push(line);
 
     // The job's body: every following line indented deeper than the key.
+    // A comment at 0-2 spaces doesn't end the body — only a real key does.
     let j = i + 1;
-    while (j < end && !/^ {0,2}\S/.test(lines[j])) j++;
+    while (j < end && !/^ {0,2}[^\s#]/.test(lines[j])) j++;
     const body = lines.slice(i + 1, j);
 
     const first = body.find((l) => /\S/.test(l) && !/^\s*#/.test(l));
