@@ -1,7 +1,7 @@
 # PR 336 — Run saropa_lints on pull requests
 
 **Branch:** `claude/inspiring-pascal-tjfi2j` → `main` · **Created:** 2026-09-11 · **Updated:** 2026-09-18
-**Status:** Merged to `main` as `097ba425`. Ships in 16.3.0, which has not been released yet (no `v16.3.0` tag). Still open: the manual checklist and the release, both below under [Closing this out](#closing-this-out).
+**Status:** Closed 2026-09-18. Merged as `097ba425` (#336), with fixes in #343 and #344. Every part of the feature was code reviewed and the findings fixed with unit tests; see [Close-out review](#close-out-review-2026-09-18). Manual checks that need a live VS Code host or a real runner are listed there as not performed.
 **Plan:** `plans/history/2026.09/2026.09.18/PLAN_ci_automation.md`, implemented in full.
 **Supersedes:** `bugs/PR_336_CI_ACTION.md`, `bugs/PR_337_CI_AUTOMATION_REMAINDER.md` and `bugs/HUMAN_001_CI_AUTOMATION.md`, all folded in here. PR 337 was a second pull request for the later half of this work; splitting it was a mistake and its commits were fast-forwarded onto this branch.
 
@@ -201,11 +201,49 @@ Each item needs a person, and items 1–10 also need a running VS Code extension
 | 15 | **SARIF upload.** With `mode: annotate` and `upload-sarif` on, in a repository that has code scanning, findings render as annotations on the diff. This has never been exercised, because the self-test sets `upload-sarif: false`. | - | | |
 | 16 | **`--since` on a real shallow checkout**, and **`install-sdk: auto` against a Flutter toolchain.** The self-test covers neither; it only exercises the skip branch. | - | | |
 
-### Done when
+### Close-out review (2026-09-18)
 
-- The F1 and F2 fixes are committed and merged.
-- Items 1–13 pass. These cover everything the release puts in users' hands.
-- 16.3.0 is released and item 14 passes.
-- Items 15 and 16 either pass or are moved to a new tracked issue. They exercise optional inputs the generated workflow doesn't use, so they shouldn't hold this open.
+After #343 the whole feature was reviewed in four parts: the composite action and workflows, the extension (card, toggle, publish step), the Dart `--emit-ci` and the release script, and the Package Vibrancy generator. Each finding was reproduced or confirmed in the code before it was fixed, and each fix has a test that fails without it. Shipped in #344; the user-facing summary is in the 16.4.0 CHANGELOG.
 
-After that, this file can be deleted from `bugs/`. Git history keeps the record.
+**Fixed:**
+
+| Area | Finding | Test |
+|------|---------|------|
+| audit | `--baseline` never changed the exit code, so the action's `baseline` input could not gate on new findings only | `test/cli/audit_baseline_exit_code_test.dart` |
+| audit | `--since` from a subdirectory joined repo-relative paths onto the project path and audited nothing; an unknown ref crashed on "bad revision" | `test/scan/git_changed_files_test.dart` (real git repo) |
+| action | Glob patterns untrimmed, multi-line lists truncated, trailing empty pattern aborted the step | `scripts/modules/tests/test_action_yml.py` |
+| action | `since` as a bare branch, a branch with slashes or a SHA always failed; another remote gave a misleading error | same, against a real shallow clone |
+| action | Stale SARIF reported as new results; missing SARIF directory; absolute `sarif-file` broke the upload path | same |
+| action | `resolve: True` and `fail-on-count` without `fail-on` silently ignored | same |
+| action | No check that emitted flags exist in the CLI parsers | same (`TestFlagsMatchTheParsers`) |
+| ci.yml | self-lint was green even when the analysis never ran (exit 2) | read; CI is disabled |
+| release | The moving `v16` tag push matched `publish.yml`'s `v*` trigger and started a second publish | `scripts/modules/tests/test_major_version_tag.py` |
+| release | Pre-releases moved `v16`; the tag targeted HEAD not the release; a re-run never repaired it | same, against a real bare remote |
+| emit-ci + card | A project in a subdirectory got its workflow under the project, where GitHub never runs it | Dart and TS tests, shared fixture `pinned_subdir.yml` |
+| emit-ci | `--tier` ignored; write failure threw; a directory at the path was written into | `test/init/init_emit_ci_test.dart` |
+| publish | `execFileSync` froze the extension host during `git push` | async runner, `ciPublish.test.ts` |
+| publish | A retry after a failed push failed at `checkout -b` | `ciPublish.test.ts` |
+| publish | `pubspec.yaml` with the user's own edits was pushed whole | blocked plan, `ciPublish.test.ts` |
+| publish | Empty publish cut a branch; an unfetched same-named remote branch could be fast-forwarded | `ciPublish.test.ts` |
+| publish | GitHub API call had no timeout, so the compare-page fallback never came | `ciPublishHttp.test.ts` (local HTTP server) |
+| pubspec | Dev-dependency insert broke YAML on a trailing comment, 4-space indent, existing entry, `{}`; default was the stale `^9.1.0` | `pubspecDevDependency.test.ts` |
+| toggle | A second OFF did not suspend a job added after the first; an unchanged toggle offered an empty PR | `ciWorkflow.test.ts` |
+| vibrancy | Counted transitive packages the project cannot upgrade, against a threshold suggested from a different measure | checker run with `dart`, `ci-generator.test.ts`, `threshold-suggester.test.ts` |
+| vibrancy | `failOnVulnerability` claimed no data and passed; `pub outdated` reports `isCurrentAffectedByAdvisory` | same |
+| vibrancy | PR comment showed no verdict; shell script used fixed `/tmp` paths; stale GitLab image | same |
+| tests | `ci-generator.test.ts` and `threshold-suggester.test.ts` were not in `tsconfig.test.json`, so they never ran | now registered |
+
+**Recorded, not changed:**
+
+- `install-sdk: auto` installs Dart when `dart` is missing, not Flutter. The input's description already says so; Flutter projects set up flutter-action first.
+- The Dart pin comes from the directory `init` runs in, not `--target`. Identical output is guaranteed for the same version, which is the case the fixtures test.
+- `--emit-ci=path` is not recognised, the same as every other `init` flag, and `--emit-ci` is skipped when combined with `--list-packs` or the scaffold flag.
+- 17 publish-step strings (16 existing, 1 new) are English in the 26 other locales; the runtime falls back to English. They get translated on the next run of `extension/scripts/generate_translations.py`.
+
+**Not performed** (needs a person, a live VS Code host, or a real runner, and CI is disabled): the manual checklist above. Every item there is covered by the unit tests in the table as far as it can be without a host; what remains is seeing the webview, the sign-in and a real GitHub run.
+
+### Test runs for the close-out
+
+- Python: `python -m unittest discover -s scripts/modules/tests -t .`, 200 passing, including 37 new action tests and 7 release-tag tests.
+- Dart: `init_emit_ci_test`, `audit_baseline_exit_code_test`, `git_changed_files_test`, `audit_include_suppressed_test`: 30 passing. `dart analyze` could not complete on this machine (the analysis server stalled reading the iCloud-synced Flutter SDK), so instead `bin/init.dart` and `bin/audit.dart` were compiled with `dart compile kernel`, and `init --emit-ci` was run end to end against a repository with the project in a subdirectory.
+- Extension: all `systemHealth` tests plus `ci-generator` and `threshold-suggester`: 241 passing; the Package Vibrancy checker is compiled and run with Dart 3.12.2. `tsc --noEmit` clean apart from the error in `src/debug/saropaLspClient.ts` that is already on `main`.

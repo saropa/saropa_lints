@@ -1,5 +1,5 @@
-import { execFileSync } from 'child_process';
-import { CI_WORKFLOW_RELATIVE_PATH } from './ciWorkflow';
+import { execFile, execFileSync } from 'child_process';
+import { ciWorkflowPathFromProject } from './ciWorkflow';
 
 /**
  * Git plumbing behind the "publish this change" step of the CI engine card.
@@ -10,8 +10,9 @@ import { CI_WORKFLOW_RELATIVE_PATH } from './ciWorkflow';
  * part that genuinely needs VS Code — the GitHub sign-in used to open the
  * pull request — lives in `ciPublishGithub.ts` instead.
  *
- * SCOPE, and why it is drawn this tightly: this module stages exactly one
- * path, `.github/workflows/saropa-lints.yml`. It never runs `git add -A`,
+ * SCOPE, and why it is drawn this tightly: this module stages exactly the
+ * plan's paths (the workflow, plus `pubspec.yaml` when turning CI on had to
+ * add the dependency). It never runs `git add -A`,
  * never touches the user's index beyond that path, and never commits on the
  * branch they happen to be standing on — it always cuts a new one. A toggle
  * in a panel that swept up whatever else was dirty in someone's working tree
@@ -46,6 +47,14 @@ export interface CiPublishPlan {
   /** `owner/repo`, when the origin remote is a GitHub URL we recognize. */
   slug?: { owner: string; repo: string };
   /**
+   * Set when publishing automatically would commit more than this change —
+   * today, when `pubspec.yaml` already had uncommitted edits of the user's
+   * before the dependency was added. A pathspec limits a commit to files,
+   * not to hunks, so their unrelated edits would be pushed with it. The
+   * panel then shows the reason and the commands, but no button.
+   */
+  blockedReason?: string;
+  /**
    * The exact commands, in order, that `runCiPublish` will execute — rendered
    * verbatim in the panel's copyable text control.
    *
@@ -65,7 +74,7 @@ export interface CiPublishResult {
   stderr?: string;
 }
 
-/** Runs a git command in `root`, returning trimmed stdout. Throws on non-zero exit. */
+/** Runs a git command in `root`, returning trimmed stdout. Throws on non-zero exit. For quick local probes. */
 function git(root: string, args: string[]): string {
   return execFileSync('git', args, {
     cwd: root,
@@ -79,6 +88,28 @@ function git(root: string, args: string[]): string {
   }).trim();
 }
 
+/**
+ * Runs a git command without blocking the extension host — `git push` goes
+ * over the network, and a synchronous call would freeze every extension
+ * until it returned. Rejects with an error carrying `stderr`.
+ */
+function gitAsync(root: string, args: string[]): Promise<string> {
+  return new Promise((resolve, reject) => {
+    execFile(
+      'git',
+      args,
+      { cwd: root, encoding: 'utf8', env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } },
+      (err, stdout, stderr) => {
+        if (err) {
+          reject(Object.assign(err, { stderr: String(stderr) }));
+          return;
+        }
+        resolve(String(stdout).trim());
+      },
+    );
+  });
+}
+
 /** Runs a git command, returning undefined instead of throwing. For probes. */
 function gitOrUndefined(root: string, args: string[]): string | undefined {
   try {
@@ -86,6 +117,16 @@ function gitOrUndefined(root: string, args: string[]): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+/**
+ * True when `relPath` (relative to `root`) differs from HEAD in the working
+ * tree or the index. Checked before the toggle edits a file, to tell the
+ * user's own pending edits apart from the one the toggle is about to make.
+ */
+export function hasUncommittedChanges(root: string, relPath: string): boolean {
+  const status = gitOrUndefined(root, ['status', '--porcelain', '--', relPath]);
+  return status !== undefined && status !== '';
 }
 
 /** True when `root` is inside a git work tree. Everything else here assumes it. */
@@ -208,6 +249,7 @@ export function buildCiPublishPlan(
    * added. Duplicates and the workflow path itself are ignored.
    */
   extraPaths: readonly string[] = [],
+  blockedReason?: string,
 ): CiPublishPlan {
   const branch = pickBranchName(root, direction);
   const baseBranch = detectBaseBranch(root);
@@ -223,10 +265,14 @@ export function buildCiPublishPlan(
       ? 'Run saropa_lints on pull requests'
       : 'Turn off saropa_lints on pull requests';
 
-  const paths = [
-    CI_WORKFLOW_RELATIVE_PATH,
-    ...extraPaths.filter((x) => x !== CI_WORKFLOW_RELATIVE_PATH),
-  ].filter((x, i, all) => all.indexOf(x) === i);
+  // Relative to the project root, which is where every command runs. For a
+  // project below its repository root the workflow is `../.github/...`:
+  // git accepts that pathspec, and the commands stay runnable by hand from
+  // the folder the user has open.
+  const workflowPath = ciWorkflowPathFromProject(root);
+  const paths = [workflowPath, ...extraPaths.filter((x) => x !== workflowPath)].filter(
+    (x, i, all) => all.indexOf(x) === i,
+  );
 
   return {
     direction,
@@ -237,9 +283,10 @@ export function buildCiPublishPlan(
     prTitle,
     prBody: direction === 'enable' ? ENABLE_BODY : DISABLE_BODY,
     slug,
+    blockedReason,
     commands: [
       `git checkout -b ${branch}`,
-      `git add ${paths.join(' ')}`,
+      `git add -- ${paths.join(' ')}`,
       `git commit -m "${commitMessage}" -- ${paths.join(' ')}`,
       `git push -u origin ${branch}`,
     ],
@@ -247,7 +294,7 @@ export function buildCiPublishPlan(
 }
 
 /**
- * Performs the plan: new branch, stage the one file, commit, push.
+ * Performs the plan: new branch, stage the plan's paths, commit, push.
  *
  * Stops at the first failure and reports which command it was, rather than
  * continuing and leaving the repository in a state nobody can describe. The
@@ -255,36 +302,83 @@ export function buildCiPublishPlan(
  * by a branch protection rule can see exactly which step to run by hand —
  * which is also why the same strings are what the panel offers to copy.
  *
+ * Safe to run again after a failure. The panel keeps the plan on screen, so
+ * "Create" is the natural retry, and by then the branch may already exist
+ * with the commit on it. A retry that is standing on the plan's branch skips
+ * the checkout, and skips the commit when those paths are already committed,
+ * so it goes straight to what failed — usually the push.
+ *
  * Note the push is NOT force, and the branch is new, so there is no path here
- * that can overwrite existing history.
+ * that can overwrite existing history. Before creating the branch the remote
+ * is asked whether a branch of that name already exists there, because the
+ * name was picked from the remote branches this clone had fetched, and a
+ * non-force push to an unfetched branch could still fast-forward it.
  */
-export function runCiPublish(root: string, plan: CiPublishPlan): CiPublishResult {
-  const steps: string[][] = [
-    ['checkout', '-b', plan.branch],
-    // Forward slashes deliberately, not path.sep: git's pathspec grammar is
-    // POSIX on every platform, including Windows.
-    ['add', '--', ...plan.paths],
-    // The pathspec is load-bearing: a bare `git commit` commits the WHOLE
-    // index, so anything the user had already `git add`ed before pressing
-    // the button would be swept into this commit and pushed. With the
-    // pathspec, git commits HEAD plus this one path and leaves the rest of
-    // their index exactly as they left it.
-    ['commit', '-m', plan.commitMessage, '--', ...plan.paths],
-    ['push', '-u', 'origin', plan.branch],
-  ];
+export async function runCiPublish(root: string, plan: CiPublishPlan): Promise<CiPublishResult> {
+  if (plan.blockedReason) {
+    return { ok: false, stderr: plan.blockedReason };
+  }
 
-  for (let i = 0; i < steps.length; i++) {
+  const current = gitOrUndefined(root, ['rev-parse', '--abbrev-ref', 'HEAD']);
+  const resuming = current === plan.branch;
+
+  const run = async (index: number, args: string[]): Promise<CiPublishResult | undefined> => {
     try {
-      git(root, steps[i]);
+      await gitAsync(root, args);
+      return undefined;
     } catch (err) {
       const stderr =
         typeof (err as { stderr?: unknown }).stderr === 'string'
           ? ((err as { stderr: string }).stderr).trim()
           : String((err as Error)?.message ?? err).trim();
-      return { ok: false, failedCommand: plan.commands[i], stderr };
+      return { ok: false, failedCommand: plan.commands[index], stderr };
     }
+  };
+
+  if (!resuming) {
+    // Nothing to publish (the files already match HEAD) must not cut a
+    // branch, and must not become an empty pull request.
+    const pending = gitOrUndefined(root, ['status', '--porcelain', '--', ...plan.paths]);
+    if (pending === '') {
+      return { ok: false, stderr: 'There is no change to these files to publish.' };
+    }
+    try {
+      const onRemote = await gitAsync(root, ['ls-remote', '--heads', 'origin', `refs/heads/${plan.branch}`]);
+      if (onRemote) {
+        return {
+          ok: false,
+          failedCommand: plan.commands[0],
+          stderr: `A branch named ${plan.branch} already exists on origin. Toggle CI again to pick a new name.`,
+        };
+      }
+    } catch {
+      // Unreachable remote: the push below will fail and say so precisely.
+    }
+    const failed = await run(0, ['checkout', '-b', plan.branch]);
+    if (failed) return failed;
   }
-  return { ok: true };
+
+  // Forward slashes deliberately, not path.sep: git's pathspec grammar is
+  // POSIX on every platform, including Windows.
+  const added = await run(1, ['add', '--', ...plan.paths]);
+  if (added) return added;
+
+  // Nothing staged for these paths on a retry means the earlier attempt
+  // already committed them; go straight to the push.
+  const nothingToCommit =
+    gitOrUndefined(root, ['diff', '--cached', '--quiet', 'HEAD', '--', ...plan.paths]) !== undefined;
+  if (!nothingToCommit) {
+    // The pathspec is load-bearing: a bare `git commit` commits the WHOLE
+    // index, so anything the user had already `git add`ed before pressing
+    // the button would be swept into this commit and pushed. With the
+    // pathspec, git commits HEAD plus these paths and leaves the rest of
+    // their index exactly as they left it.
+    const committed = await run(2, ['commit', '-m', plan.commitMessage, '--', ...plan.paths]);
+    if (committed) return committed;
+  }
+
+  const pushed = await run(3, ['push', '-u', 'origin', plan.branch]);
+  return pushed ?? { ok: true };
 }
 
 /** The pull request URL a user would open by hand, when we cannot open it for them. */

@@ -4,10 +4,14 @@ import * as os from 'os';
 import * as path from 'path';
 
 import {
+  ciWorkflowPathFromProject,
   disableCiWorkflow,
   enableCiWorkflow,
+  findRepoRoot,
   getCiWorkflowPath,
   getCiWorkflowState,
+  needsExplicitTier,
+  projectPathInRepo,
 } from '../../systemHealth/ciWorkflow';
 
 /**
@@ -302,6 +306,147 @@ describe('ciWorkflow — OFF/ON toggle', () => {
     try {
       assert.strictEqual(disableCiWorkflow(root), false);
       assert.strictEqual(getCiWorkflowState(root), 'absent');
+    } finally {
+      cleanup();
+    }
+  });
+});
+
+describe('ciWorkflow — a project below its repository root', () => {
+  it('writes the workflow at the repository root, naming the project directory', () => {
+    const { root: repo, cleanup } = makeRoot();
+    try {
+      fs.mkdirSync(path.join(repo, '.git'));
+      const app = path.join(repo, 'packages', 'app');
+      fs.mkdirSync(app, { recursive: true });
+      fs.writeFileSync(
+        path.join(app, 'pubspec.lock'),
+        'packages:\n  saropa_lints:\n    dependency: "direct main"\n    version: "16.3.0"\n',
+      );
+
+      assert.strictEqual(findRepoRoot(app), repo);
+      assert.strictEqual(projectPathInRepo(app), 'packages/app');
+      assert.strictEqual(getCiWorkflowPath(app), path.join(repo, '.github', 'workflows', 'saropa-lints.yml'));
+      assert.strictEqual(ciWorkflowPathFromProject(app), '../../.github/workflows/saropa-lints.yml');
+
+      enableCiWorkflow(app);
+      // The Dart `--emit-ci` is checked against this same fixture.
+      assert.strictEqual(
+        fs.readFileSync(getCiWorkflowPath(app), 'utf-8'),
+        fixture('pinned_subdir.yml'),
+      );
+      assert.ok(!fs.existsSync(path.join(app, '.github')), 'nothing written under the project');
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('a .git file (worktree, submodule) marks the root too', () => {
+    const { root: repo, cleanup } = makeRoot();
+    try {
+      fs.writeFileSync(path.join(repo, '.git'), 'gitdir: elsewhere\n');
+      const app = path.join(repo, 'app');
+      fs.mkdirSync(app);
+      assert.strictEqual(projectPathInRepo(app), 'app');
+      assert.strictEqual(projectPathInRepo(repo), '');
+    } finally {
+      cleanup();
+    }
+  });
+});
+
+describe('ciWorkflow — more toggle shapes', () => {
+  it('a second OFF suspends a job added after the first', () => {
+    const { root, cleanup } = makeRoot();
+    try {
+      writeWorkflow(root, ['jobs:', '  lint:', '    runs-on: ubuntu-latest', ''].join('\n'));
+      assert.strictEqual(disableCiWorkflow(root), true);
+      // Someone adds a job while CI is off.
+      fs.appendFileSync(getCiWorkflowPath(root), '  extra:\n    runs-on: ubuntu-latest\n');
+      assert.strictEqual(disableCiWorkflow(root), true);
+      assert.strictEqual(ifKeysAt(readWorkflow(root), 4), 2);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('round-trips a CRLF workflow', () => {
+    const { root, cleanup } = makeRoot();
+    const original = ['jobs:', '  lint:', '    if: always()', '    runs-on: ubuntu-latest', ''].join('\r\n');
+    try {
+      writeWorkflow(root, original);
+      assert.strictEqual(disableCiWorkflow(root), true);
+      assert.strictEqual(getCiWorkflowState(root), 'stopped');
+      enableCiWorkflow(root);
+      assert.strictEqual(readWorkflow(root), original);
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('writes the mode it is asked for', () => {
+    const { root, cleanup } = makeRoot('16.3.0');
+    try {
+      enableCiWorkflow(root, { mode: 'annotate' });
+      assert.match(readWorkflow(root), /^ {10}mode: annotate$/m);
+    } finally {
+      cleanup();
+    }
+  });
+});
+
+describe('ciWorkflow — version pin and tier', () => {
+  function lockWith(root: string, body: string): void {
+    fs.writeFileSync(path.join(root, 'pubspec.lock'), body);
+  }
+
+  it('reads a CRLF lockfile', () => {
+    const { root, cleanup } = makeRoot();
+    try {
+      lockWith(root, 'packages:\r\n  saropa_lints:\r\n    dependency: "direct dev"\r\n    version: "16.4.0"\r\n');
+      enableCiWorkflow(root);
+      assert.ok(readWorkflow(root).includes('saropa/saropa_lints@v16.4.0\n'));
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('never takes a neighbouring package\'s version', () => {
+    const { root, cleanup } = makeRoot();
+    try {
+      lockWith(
+        root,
+        'packages:\n  saropa_lints:\n    dependency: "direct dev"\n    source: path\n' +
+          '  saropa_lints_extra:\n    version: "16.9.9"\n',
+      );
+      enableCiWorkflow(root);
+      assert.ok(readWorkflow(root).includes('saropa/saropa_lints@main'));
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('pins a pre-release at or above the floor', () => {
+    const { root, cleanup } = makeRoot('16.3.0-dev.1');
+    try {
+      enableCiWorkflow(root);
+      assert.ok(readWorkflow(root).includes('saropa/saropa_lints@v16.3.0-dev.1\n'));
+    } finally {
+      cleanup();
+    }
+  });
+
+  it('needs an explicit tier only when analysis_options.yaml does not configure saropa_lints', () => {
+    const { root, cleanup } = makeRoot();
+    try {
+      assert.strictEqual(needsExplicitTier(root), true);
+      fs.writeFileSync(path.join(root, 'analysis_options.yaml'), 'linter:\n  rules: []\n');
+      assert.strictEqual(needsExplicitTier(root), true);
+      fs.writeFileSync(
+        path.join(root, 'analysis_options.yaml'),
+        'include: package:saropa_lints/tiers/essential.yaml\n',
+      );
+      assert.strictEqual(needsExplicitTier(root), false);
     } finally {
       cleanup();
     }

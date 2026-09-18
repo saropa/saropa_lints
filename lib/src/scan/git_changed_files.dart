@@ -17,10 +17,15 @@ import 'package:path/path.dart' as p;
 /// Returns an empty list when the ref is invalid or git is not available.
 /// Throws [ProcessException] on unexpected git failures.
 List<String> gitChangedDartFiles(String repoPath, String ref) {
-  // Run git from the repo root so paths are repo-relative.
+  // `--relative`: git prints paths relative to the repository root even when
+  // run from a subdirectory, and they are joined onto [repoPath] below. For a
+  // project that is not at the root (a monorepo package) that doubled the
+  // subdirectory and matched no files, so `--since` audited nothing. It also
+  // limits the diff to files under [repoPath], which is the project scanned.
   final result = Process.runSync('git', [
     'diff',
     '--name-only',
+    '--relative',
     '--diff-filter=ACMR',
     '-M',
     '$ref..HEAD',
@@ -31,7 +36,10 @@ List<String> gitChangedDartFiles(String repoPath, String ref) {
   if (result.exitCode != 0) {
     final stderr = (result.stderr as String).trim();
     // Invalid ref or not a git repo — return empty rather than crashing.
+    // Git words an unknown ref as "unknown revision" or, when a pathspec
+    // follows it (as here), "bad revision".
     if (stderr.contains('unknown revision') ||
+        stderr.contains('bad revision') ||
         stderr.contains('not a git repository')) {
       return [];
     }

@@ -1,6 +1,6 @@
 /** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
 import * as assert from 'assert';
-import { VibrancyResult, VibrancyCategory } from '../../../vibrancy/types';
+import { VibrancyResult, VibrancyCategory, UpdateInfo, UpdateStatus } from '../../../vibrancy/types';
 import { suggestThresholds, formatThresholdsSummary } from '../../../vibrancy/services/threshold-suggester';
 
 /**
@@ -35,7 +35,13 @@ function makeResult(overrides: Partial<VibrancyResult> = {}): VibrancyResult {
         prereleaseTag: null,
         vulnerabilities: [],
         ...overrides,
-    };
+        // Only the fields the suggester reads are meaningful here; the cast
+        // keeps this factory from breaking each time VibrancyResult grows.
+    } as VibrancyResult;
+}
+
+function update(updateStatus: UpdateStatus): UpdateInfo {
+    return { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus, changelog: null };
 }
 
 describe('threshold-suggester', () => {
@@ -74,17 +80,27 @@ describe('threshold-suggester', () => {
             assert.strictEqual(thresholds.maxEndOfLife, 2);
         });
 
-        it('should count outdated packages and add buffer', () => {
+        it('should count direct dependencies with an update available, plus a buffer', () => {
+            // The measure the generated CI check enforces, so a pipeline built
+            // from the suggestion passes on the project it was suggested for.
             const results = [
-                makeResult({ category: 'outdated' }),
-                makeResult({ category: 'outdated' }),
-                makeResult({ category: 'outdated' }),
-                makeResult({ category: 'vibrant' }),
+                makeResult({ updateInfo: update('major') }),
+                makeResult({ updateInfo: update('minor') }),
+                makeResult({ updateInfo: update('patch') }),
+                makeResult({ updateInfo: update('up-to-date') }),
+                makeResult({ updateInfo: null }),
+                // Transitive: not something the project can upgrade itself.
+                makeResult({ updateInfo: update('major'), package: { ...makeResult().package, isDirect: false } }),
             ];
 
             const thresholds = suggestThresholds(results);
 
             assert.strictEqual(thresholds.maxOutdated, 4);
+        });
+
+        it('does not count the outdated vibrancy category, which is a score band', () => {
+            const results = [makeResult({ category: 'outdated', updateInfo: update('up-to-date') })];
+            assert.strictEqual(suggestThresholds(results).maxOutdated, 1);
         });
 
         it('should round down average vibrancy to nearest 5', () => {
@@ -138,7 +154,7 @@ describe('threshold-suggester', () => {
             const thresholds = suggestThresholds(results);
 
             assert.strictEqual(thresholds.maxEndOfLife, 3);
-            assert.strictEqual(thresholds.maxOutdated, 2);
+            assert.strictEqual(thresholds.maxOutdated, 1);
             assert.strictEqual(thresholds.minAverageVibrancy, 25);
         });
 
@@ -161,9 +177,9 @@ describe('threshold-suggester', () => {
 
             const summary = formatThresholdsSummary(thresholds);
 
-            assert.ok(summary.includes('Stale ≤ 1'));
+            assert.ok(summary.includes('Abandoned ≤ 1'));
             assert.ok(summary.includes('EOL ≤ 2'));
-            assert.ok(summary.includes('Legacy ≤ 5'));
+            assert.ok(summary.includes('Outdated ≤ 5'));
             assert.ok(summary.includes('Avg ≥ 60'));
             assert.ok(summary.includes('Fail on vuln'));
         });

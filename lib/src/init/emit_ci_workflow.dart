@@ -24,6 +24,43 @@ enum EmitCiResult {
   /// clobbered, and the `managed-by` marker only means anything if we never
   /// touch a file we didn't just create.
   refusedExists,
+
+  /// Writing failed (read-only directory, permissions). Nothing was written.
+  writeFailed,
+}
+
+/// The enclosing git repository's root: the nearest directory, from [start]
+/// upward, holding a `.git` entry (a directory, or a file in a worktree or
+/// submodule). Null outside a repository.
+///
+/// GitHub only runs workflows from the repository root's `.github/workflows`,
+/// so a Dart project in a subdirectory must have its workflow written there.
+/// Mirrors `findRepoRoot` in the extension's `ciWorkflow.ts`.
+Directory? findRepoRoot(Directory start) {
+  Directory dir = start.absolute;
+  for (;;) {
+    if (FileSystemEntity.typeSync(p.join(dir.path, '.git')) !=
+        FileSystemEntityType.notFound) {
+      return dir;
+    }
+    final Directory parent = dir.parent;
+    if (parent.path == dir.path) return null;
+    dir = parent;
+  }
+}
+
+/// [projectDir]'s path inside its repository, POSIX-style, or null when it
+/// is the repository root (or not in one). Becomes the action's
+/// `working-directory` input. Mirrors `projectPathInRepo` in `ciWorkflow.ts`.
+String? projectPathInRepo(Directory projectDir) {
+  final Directory? repo = findRepoRoot(projectDir);
+  if (repo == null) return null;
+  final String rel = p.relative(
+    p.normalize(projectDir.absolute.path),
+    from: p.normalize(repo.path),
+  );
+  if (rel == '.') return null;
+  return p.posix.joinAll(p.split(rel));
 }
 
 /// True when [projectDir] has no saropa_lints rule configuration, so the
@@ -70,7 +107,11 @@ bool ciNeedsExplicitTier(Directory projectDir) {
 /// the release script also maintains: a generated file should pin to the
 /// release it was generated against, so regenerating is the only thing that
 /// can change which action runs.
-String buildCiWorkflow({String? version, String? tier}) {
+String buildCiWorkflow({
+  String? version,
+  String? tier,
+  String? workingDirectory,
+}) {
   final String resolved = version ?? saropaLintsVersion;
 
   // Emitted only when the project has no rule configuration of its own.
@@ -78,6 +119,11 @@ String buildCiWorkflow({String? version, String? tier}) {
   // set the team already chose; omitting it for one that is not produces a
   // `scan` that exits 2 on the workflow's very first run.
   final String tierLine = tier == null ? '' : '\n          tier: $tier';
+  // A project below the repository root: the workflow lives at the root, so
+  // the action has to be told where the pubspec is.
+  final String workingDirectoryLine = workingDirectory == null
+      ? ''
+      : '\n          working-directory: $workingDirectory';
 
   // 'unknown' means package_config.json could not be read. Emitting
   // `@vunknown` would be a broken reference dressed up as a real one, so
@@ -123,7 +169,7 @@ jobs:
           # here. The alternative, annotate, runs every rule regardless of
           # configured tier, which on a 2332-rule set means findings from rules
           # the project never enabled.
-          mode: gate$tierLine
+          mode: gate$tierLine$workingDirectoryLine
 ''';
 }
 
@@ -133,14 +179,22 @@ jobs:
 /// under `--dry-run` reports what it would do without touching disk.
 ///
 /// [projectDir] is the project the workflow is being written for. It decides
-/// whether a `tier:` input is needed — see [ciNeedsExplicitTier]. When
-/// omitted, the file is generated without one.
+/// whether a `tier:` input is needed — see [ciNeedsExplicitTier] — and, when
+/// it sits below its repository's root, the `working-directory:` input. When
+/// omitted, the file is generated with neither.
+///
+/// [tier] is an explicit choice (`init --tier`), written whatever the
+/// project's configuration says.
 EmitCiResult emitCiWorkflow(
   File outputFile, {
   required bool dryRun,
   Directory? projectDir,
+  String? tier,
 }) {
-  if (outputFile.existsSync()) {
+  // Any existing entry, not just a file: a directory at the path is not
+  // something to write over either.
+  if (FileSystemEntity.typeSync(outputFile.path) !=
+      FileSystemEntityType.notFound) {
     return EmitCiResult.refusedExists;
   }
 
@@ -148,17 +202,23 @@ EmitCiResult emitCiWorkflow(
     return EmitCiResult.wouldWrite;
   }
 
-  final Directory parent = outputFile.parent;
-  if (!parent.existsSync()) {
-    parent.createSync(recursive: true);
-  }
-  outputFile.writeAsStringSync(
-    buildCiWorkflow(
-      tier: projectDir != null && ciNeedsExplicitTier(projectDir)
-          ? 'recommended'
-          : null,
-    ),
+  final String content = buildCiWorkflow(
+    tier:
+        tier ??
+        (projectDir != null && ciNeedsExplicitTier(projectDir)
+            ? 'recommended'
+            : null),
+    workingDirectory: projectDir == null ? null : projectPathInRepo(projectDir),
   );
+  try {
+    final Directory parent = outputFile.parent;
+    if (!parent.existsSync()) {
+      parent.createSync(recursive: true);
+    }
+    outputFile.writeAsStringSync(content);
+  } on FileSystemException {
+    return EmitCiResult.writeFailed;
+  }
 
   return EmitCiResult.written;
 }

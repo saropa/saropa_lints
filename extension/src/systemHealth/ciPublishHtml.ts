@@ -57,13 +57,18 @@ export function buildCiPublishSection(plan: CiPublishPlan | undefined): string {
   // without a round trip — the host is busy running git at that moment, and a
   // button that still reads "Create…" after a click looks like it was missed.
   const runningLabel = escapeHtml(l10n('debug.ci.publish.running'));
-  const primary = canOpenPr
+  // Blocked: running it would commit more than this change. The commands
+  // stay, so the user can publish by hand once they have sorted their edits.
+  const primary = canOpenPr && !plan.blockedReason
     ? `<button class="publish-btn primary" data-action="ciPublish"
       data-label-running="${runningLabel}">${primaryLabel}</button>`
     : '';
   const noRemoteNote = canOpenPr
     ? ''
     : `<p class="publish-note">${escapeHtml(l10n('debug.ci.publish.noGitHubRemote'))}</p>`;
+  const blockedNote = plan.blockedReason
+    ? `<p class="publish-note publish-blocked">${escapeHtml(plan.blockedReason)}</p>`
+    : '';
 
   const dismissLabel = escapeHtml(l10n('debug.ci.publish.notNow'));
   const copyLabel = escapeHtml(l10n('debug.ci.publish.copy'));
@@ -84,6 +89,7 @@ export function buildCiPublishSection(plan: CiPublishPlan | undefined): string {
       data-commands="${escapeHtml(commandsText)}" title="${copyLabel}">${COPY_ICON}<span>${copyLabel}</span></button>
   </div>
   <pre class="publish-commands"><code>${escapeHtml(commandsText)}</code></pre>
+  ${blockedNote}
   ${noRemoteNote}
   <div class="publish-actions">
     ${primary}

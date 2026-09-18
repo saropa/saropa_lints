@@ -30,6 +30,8 @@
     "src/test/vibrancy/services/package-code-analyzer.test.ts",
     "src/test/vibrancy/services/review-state.test.ts",
     "src/test/vibrancy/services/version-comparator.test.ts",
+    "src/test/vibrancy/services/ci-generator.test.ts",
+    "src/test/vibrancy/services/threshold-suggester.test.ts",
     "src/test/vibrancy/services/changelog-opportunities.test.ts",
     "src/test/vibrancy/services/ai-prompt-bundle.test.ts",
     "src/test/vibrancy/services/local-reimplementation-detector.test.ts",

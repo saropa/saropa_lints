@@ -1,7 +1,12 @@
 /** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
 import * as assert from 'assert';
+import { execFileSync, spawnSync } from 'child_process';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import { CiThresholds, CiPlatform } from '../../../vibrancy/types';
 import {
+    buildCheckerScript,
     generateCiWorkflow,
     generateGitHubActions,
     generateGitLabCi,
@@ -99,18 +104,17 @@ describe('ci-generator', () => {
             const result = generateGitHubActions(defaultThresholds);
 
             // A real comparison against a threshold, not just a print().
-            assert.ok(result.includes('if (outdatedCount > maxOutdated)'));
+            assert.ok(result.includes('if (outdated.length > maxOutdated)'));
             // A non-zero exit path so the CI job actually fails.
             assert.ok(result.includes('exit(failed ? 1 : 0)'));
             assert.ok(result.includes('failed = true'));
         });
 
-        it('should not fabricate a vulnerability data source', () => {
+        it('fails on a security advisory, from pub outdated\'s own advisory data', () => {
             const result = generateGitHubActions(defaultThresholds);
 
-            // failOnVulnerability has no data source from `pub outdated`; the
-            // generated script must say so rather than pretending to check it.
-            assert.ok(result.includes('no vulnerability data'));
+            assert.ok(result.includes("pkg['isCurrentAffectedByAdvisory'] == true"));
+            assert.ok(!result.includes('no vulnerability data'));
         });
 
         it('should handle zero thresholds', () => {
@@ -162,7 +166,8 @@ describe('ci-generator', () => {
         it('should use Flutter Docker image', () => {
             const result = generateGitLabCi(defaultThresholds);
 
-            assert.ok(result.includes('cirrusci/flutter:stable'));
+            // The Docker Hub image is no longer updated; Cirrus Labs publish here.
+            assert.ok(result.includes('ghcr.io/cirruslabs/flutter:stable'));
         });
 
         it('should include pubspec file triggers', () => {
@@ -192,15 +197,16 @@ describe('ci-generator', () => {
         it('should compare parsed counts against thresholds and exit non-zero on breach', () => {
             const result = generateGitLabCi(defaultThresholds);
 
-            assert.ok(result.includes('if (outdatedCount > maxOutdated)'));
+            assert.ok(result.includes('if (outdated.length > maxOutdated)'));
             assert.ok(result.includes('exit(failed ? 1 : 0)'));
             assert.ok(result.includes('failed = true'));
         });
 
-        it('should not fabricate a vulnerability data source', () => {
+        it('fails on a security advisory, from pub outdated\'s own advisory data', () => {
             const result = generateGitLabCi(defaultThresholds);
 
-            assert.ok(result.includes('no vulnerability data'));
+            assert.ok(result.includes("pkg['isCurrentAffectedByAdvisory'] == true"));
+            assert.ok(!result.includes('no vulnerability data'));
         });
 
         it('should include artifact configuration', () => {
@@ -222,10 +228,12 @@ describe('ci-generator', () => {
         it('should include threshold variables', () => {
             const result = generateShellScript(defaultThresholds);
 
-            assert.ok(result.includes('MAX_EOL=2'));
-            assert.ok(result.includes('MAX_OUTDATED=5'));
-            assert.ok(result.includes('MIN_AVG_VIBRANCY=60'));
-            assert.ok(result.includes('FAIL_ON_VULN=true'));
+            // In the checker itself: shell variables here were never read by
+            // it, so editing them silently changed nothing.
+            assert.ok(result.includes('const maxEol = 2;'));
+            assert.ok(result.includes('const maxOutdated = 5;'));
+            assert.ok(result.includes('const minAvgVibrancy = 60;'));
+            assert.ok(result.includes('const failOnVuln = true;'));
         });
 
         it('should actually execute the Dart checker instead of piping it into a non-reading stdin', () => {
@@ -233,14 +241,14 @@ describe('ci-generator', () => {
 
             assert.ok(!result.includes("dart run <<'DART_SCRIPT'"));
             assert.ok(!/dart run\s*<</.test(result));
-            assert.ok(/cat > \S*\.dart <<'DART_SCRIPT'/.test(result));
-            assert.ok(/dart run \S*\.dart/.test(result));
+            assert.ok(result.includes(`cat > "$work/vibrancy_check.dart" <<'DART_SCRIPT'`));
+            assert.ok(result.includes('dart run "$work/vibrancy_check.dart" "$work/outdated.json"'));
         });
 
         it('should compare parsed counts against thresholds and exit non-zero on breach', () => {
             const result = generateShellScript(defaultThresholds);
 
-            assert.ok(result.includes('if (outdatedCount > maxOutdated)'));
+            assert.ok(result.includes('if (outdated.length > maxOutdated)'));
             assert.ok(result.includes('exit(failed ? 1 : 0)'));
             assert.ok(result.includes('failed = true'));
             // `set -e` must be present so the script exits with the Dart
@@ -248,10 +256,11 @@ describe('ci-generator', () => {
             assert.ok(result.includes('set -e'));
         });
 
-        it('should not fabricate a vulnerability data source', () => {
+        it('fails on a security advisory, from pub outdated\'s own advisory data', () => {
             const result = generateShellScript(defaultThresholds);
 
-            assert.ok(result.includes('no vulnerability data'));
+            assert.ok(result.includes("pkg['isCurrentAffectedByAdvisory'] == true"));
+            assert.ok(!result.includes('no vulnerability data'));
         });
 
         it('should check for Flutter availability', () => {
@@ -273,10 +282,11 @@ describe('ci-generator', () => {
             assert.ok(result.includes('flutter pub outdated --json'));
         });
 
-        it('should mention CLI alternative', () => {
+        it('works in a private temporary directory, not fixed /tmp paths', () => {
             const result = generateShellScript(defaultThresholds);
 
-            assert.ok(result.includes('saropa_vibrancy_cli'));
+            assert.ok(result.includes('work="$(mktemp -d)"'));
+            assert.ok(!result.includes('/tmp/'));
         });
     });
 
@@ -388,7 +398,122 @@ describe('ci-generator', () => {
             const shell = generateShellScript(thresholds);
 
             assert.ok(github.includes('const maxEol = 0'));
-            assert.ok(shell.includes('FAIL_ON_VULN=false'));
+            assert.ok(shell.includes('const failOnVuln = false;'));
+        });
+    });
+
+    describe('the generated checker, run for real', () => {
+        // `pub outdated --json` shape, with the cases that decide the count.
+        const outdatedJson = {
+            packages: [
+                // Direct, behind, and affected by an advisory.
+                { package: 'http', kind: 'direct', isDiscontinued: false, isCurrentAffectedByAdvisory: true,
+                  current: { version: '0.13.0' }, latest: { version: '1.6.0' } },
+                // Dev, behind.
+                { package: 'lints', kind: 'dev', isDiscontinued: false, isCurrentAffectedByAdvisory: false,
+                  current: { version: '2.0.0' }, latest: { version: '6.1.0' } },
+                // Direct, 0.x minor bump: behind (and breaking).
+                { package: 'zero', kind: 'direct', isDiscontinued: true, isCurrentAffectedByAdvisory: false,
+                  current: { version: '0.3.1' }, latest: { version: '0.4.0' } },
+                // Direct, up to date.
+                { package: 'path', kind: 'direct', isDiscontinued: false, isCurrentAffectedByAdvisory: false,
+                  current: { version: '1.9.0' }, latest: { version: '1.9.0' } },
+                // Direct, on a pre-release AHEAD of the latest stable: not behind.
+                { package: 'ahead', kind: 'direct', isDiscontinued: false, isCurrentAffectedByAdvisory: false,
+                  current: { version: '2.0.0-dev.1' }, latest: { version: '1.9.0' } },
+                // Transitive and behind: pinned by others, not counted.
+                { package: 'meta', kind: 'transitive', isDiscontinued: false, isCurrentAffectedByAdvisory: true,
+                  current: { version: '1.0.0' }, latest: { version: '2.0.0' } },
+                // Not resolved in this project.
+                { package: 'web', kind: 'transitive', current: null, latest: { version: '1.1.1' } },
+            ],
+        };
+        const hasDart = spawnSync('dart', ['--version']).status === 0;
+
+        function runChecker(thresholds: CiThresholds): { status: number | null; summary: Record<string, unknown>; out: string } {
+            const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vibrancy-check-'));
+            try {
+                fs.writeFileSync(path.join(dir, 'outdated.json'), JSON.stringify(outdatedJson));
+                fs.writeFileSync(path.join(dir, 'check.dart'), buildCheckerScript(thresholds));
+                const res = spawnSync('dart', ['run', 'check.dart', 'outdated.json', 'summary.json'], {
+                    cwd: dir,
+                    encoding: 'utf8',
+                    timeout: 120_000,
+                });
+                const summary = JSON.parse(fs.readFileSync(path.join(dir, 'summary.json'), 'utf8'));
+                return { status: res.status, summary, out: res.stdout };
+            } finally {
+                fs.rmSync(dir, { recursive: true, force: true });
+            }
+        }
+
+        it('counts direct and dev dependencies that are behind, and nothing else', function () {
+            if (!hasDart) this.skip();
+            this.timeout(180_000);
+            const { status, summary } = runChecker({ ...defaultThresholds, maxOutdated: 3, failOnVulnerability: false });
+            assert.strictEqual(summary['outdated'], 3); // http, lints, zero
+            assert.deepStrictEqual(summary['vulnerable'], ['http']); // meta is transitive
+            assert.deepStrictEqual(summary['discontinued'], ['zero']);
+            assert.strictEqual(status, 0);
+        });
+
+        it('exits 1 when outdated dependencies exceed the maximum', function () {
+            if (!hasDart) this.skip();
+            this.timeout(180_000);
+            const { status, summary } = runChecker({ ...defaultThresholds, maxOutdated: 2, failOnVulnerability: false });
+            assert.strictEqual(status, 1);
+            assert.strictEqual(summary['failed'], true);
+        });
+
+        it('exits 1 on a security advisory when failOnVulnerability is set', function () {
+            if (!hasDart) this.skip();
+            this.timeout(180_000);
+            const { status, out } = runChecker({ ...defaultThresholds, maxOutdated: 10, failOnVulnerability: true });
+            assert.strictEqual(status, 1);
+            assert.ok(out.includes('security advisory: http'));
+        });
+
+        it('embeds exactly this checker in every platform, as valid YAML', () => {
+            let yaml: { load(text: string): unknown } | undefined;
+            try {
+                // eslint-disable-next-line @typescript-eslint/no-require-imports
+                yaml = require('js-yaml');
+            } catch {
+                yaml = undefined;
+            }
+            // The YAML platforms drop the checker's final newline before the
+            // indented terminator; the program is otherwise byte-identical.
+            const checker = buildCheckerScript(defaultThresholds).trimEnd();
+            const heredoc = (text: string): string => {
+                const m = /<<'DART_SCRIPT'\n([\s\S]*?)^DART_SCRIPT$/m.exec(text);
+                assert.ok(m, 'heredoc found');
+                return m[1].trimEnd();
+            };
+
+            const gh = generateGitHubActions(defaultThresholds);
+            const glab = generateGitLabCi(defaultThresholds);
+            if (yaml) {
+                const ghDoc = yaml.load(gh) as { jobs: Record<string, { steps: { id?: string; run?: string }[] }> };
+                const step = ghDoc.jobs['vibrancy-check'].steps.find((x) => x.id === 'health-check');
+                assert.strictEqual(heredoc(step!.run!), checker);
+                const glDoc = yaml.load(glab) as Record<string, { script: string[] }>;
+                const block = glDoc['vibrancy-check'].script.find((x) => x.includes('DART_SCRIPT'));
+                assert.strictEqual(heredoc(block!), checker);
+            }
+            assert.strictEqual(heredoc(generateShellScript(defaultThresholds)), checker);
+        });
+
+        it('the shell script passes bash syntax checking', function () {
+            const bash = spawnSync('bash', ['--version']);
+            if (bash.status !== 0) this.skip();
+            const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vibrancy-sh-'));
+            try {
+                const file = path.join(dir, 'check.sh');
+                fs.writeFileSync(file, generateShellScript(defaultThresholds));
+                execFileSync('bash', ['-n', file]);
+            } finally {
+                fs.rmSync(dir, { recursive: true, force: true });
+            }
         });
     });
 });

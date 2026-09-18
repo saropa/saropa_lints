@@ -76,14 +76,28 @@ Test-suite repair, dependency security updates, and a linting fix. No change to 
 
 ### Fixed
 
+- `audit --baseline` now exits 1 only when a finding is new. It used to exit 1 for every finding, baselined or not, so the action's `baseline` input could never let a gate accept a known backlog. Same contract as `cross_file --baseline` and `project_health --baseline`. With no baseline file, every finding still counts.
+- `audit --since` works for a project in a subdirectory of its repository (a monorepo package). The changed-file paths were joined onto the project path twice and matched nothing, so the audit covered no files. An unknown ref now also returns an empty list on git versions that report it as a "bad revision", instead of crashing.
+- `init --emit-ci` writes the workflow at the repository root, where GitHub runs workflows from, and adds `working-directory` when the project is in a subdirectory. It honors an explicit `--tier`, and reports a write failure instead of printing a stack trace.
+- The composite action trims glob patterns (`lib/gen/**, test/**` no longer yields a pattern with a leading space that matches nothing), accepts one pattern per line, and no longer aborts on an empty pattern. It fetches `since` given as a bare branch name, a branch with slashes or a commit SHA, and names the problem when it is on a remote other than origin. It removes a stale SARIF file before the run, creates the SARIF directory, handles an absolute `sarif-file`, and rejects `resolve` values other than true/false and a `fail-on-count` without its `fail-on`.
+- Releases no longer start a second publish run for the moving `v16` tag, which matched the publish workflow's `v*` trigger. Pre-releases leave `v16` on the last stable release, the tag points at the release commit rather than whatever is checked out, and re-running the tag step repairs a `v16` push that failed.
 - `extension/scripts/check_l10n_keys.py` key-union regex rewritten to eliminate exponential backtracking (ReDoS vulnerability, code-scanning alert 23). No action required.
 - `avoid_string_substring` now documents that it cannot prove bounds established inside a helper function it would have to inline; suppress with `// ignore:` at the call site when the helper is bounds-safe. No action required.
+
+### Fixed (Extension)
+
+- The CI card writes the workflow at the repository root with `working-directory` for a project in a subdirectory. It was written under the project, where GitHub never runs it.
+- Publishing the CI change no longer freezes VS Code while git pushes, and pressing the button again after a failure resumes on the same branch instead of failing at `git checkout -b`. It refuses to publish when `pubspec.yaml` already had uncommitted edits of yours (a commit takes whole files, so they would have been pushed too), when there is nothing to publish, and when a branch of the same name already exists on the remote. Opening the pull request gives up after 15 seconds on a connection that never answers and offers the compare page.
+- Adding `saropa_lints` to `pubspec.yaml` keeps valid YAML for a `dev_dependencies:` with a trailing comment, four-space indentation, an existing entry at any indentation, and an empty `{}`. It also adds `^16.2.1` instead of the long-stale `^9.1.0`.
+- Turning CI off a second time also suspends a job added since the first time, and toggling to the state the file is already in no longer offers an empty pull request.
+- Package Vibrancy's "Generate CI Pipeline" counts only direct and dev dependencies that have a newer version, the same measure its suggested threshold now uses. Transitive packages the project cannot upgrade no longer fail a fresh pipeline. `failOnVulnerability` is enforced from the security advisories `pub outdated` reports, where it used to claim there was no data and pass. The pull request comment shows pass or fail against the threshold, the shell script uses a private temporary directory, and the GitLab job uses the maintained Flutter image.
 
 ### Internal
 
 - Restored the scripts package markers and the cross-file, structure and example fixture sources that an earlier bulk commit deleted, which had made the CI `test` job fail.
 - Health history no longer labels a point with the wrong tag when two tags (such as `v16` and `v16.6.0`) share a commit.
 
+---
 ## [16.6.0]
 
 Minor release adding a new essential-tier rule that catches an unguarded `dart:developer`

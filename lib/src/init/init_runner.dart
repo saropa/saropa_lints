@@ -159,17 +159,42 @@ Future<void> runInit(List<String> args) async {
 
   if (cliArgs.emitCi != null) {
     final String raw = cliArgs.emitCi!;
+    final Directory projectDir = Directory(targetDir);
+    // The default location is relative to the REPOSITORY root, not the
+    // project: GitHub only runs workflows from the root's .github/workflows,
+    // so a project in a subdirectory written to its own .github would never
+    // run. An explicit relative path keeps its old meaning (from --target).
+    final String base = raw == defaultEmitCiPath
+        ? (findRepoRoot(projectDir)?.path ?? targetDir)
+        : targetDir;
     final String outPath = p.isAbsolute(raw)
         ? p.normalize(raw)
-        : p.normalize(p.join(targetDir, raw));
+        : p.normalize(p.join(base, raw));
     final File outFile = File(outPath);
+
+    // An explicit --tier is honored as asked. Otherwise one is written only
+    // when the project has no rule configuration (see ciNeedsExplicitTier).
+    String? tier;
+    if (cliArgs.tier != null) {
+      tier = resolveTier(cliArgs.tier);
+      if (tier == null) {
+        stderr.writeln(
+          'Unknown --tier "${cliArgs.tier}". '
+          'Use 1-5 or: ${tierIds.keys.join(', ')}.',
+        );
+        exitCode = 2;
+        return;
+      }
+    }
+
     final EmitCiResult result = emitCiWorkflow(
       outFile,
       dryRun: cliArgs.isDryRun,
-      // Read for its analysis_options.yaml: a project with no saropa_lints
+      // Read for its analysis_options.yaml (a project with no saropa_lints
       // rule configuration needs an explicit tier, or the generated `scan`
-      // exits 2 the first time CI runs.
-      projectDir: Directory(targetDir),
+      // exits 2 the first time CI runs) and for its place in the repository.
+      projectDir: projectDir,
+      tier: tier,
     );
 
     switch (result) {
@@ -187,6 +212,12 @@ Future<void> runInit(List<String> args) async {
         stderr.writeln(
           'Refusing to overwrite existing file: $outPath\n'
           'Remove it first, or point --emit-ci at a different path.',
+        );
+        exitCode = 1;
+        break;
+      case EmitCiResult.writeFailed:
+        stderr.writeln(
+          'Could not write $outPath. Check the directory is writable.',
         );
         exitCode = 1;
         break;

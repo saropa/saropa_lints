@@ -20,11 +20,20 @@ import {
   type RuleLaneValue,
 } from './config/laneConfig';
 import { l10n } from './i18n/runtime';
+import { addDevDependency } from './pubspecDevDependency';
 // Shared path-segment constants/helpers — keeps 'reports'/'.saropa_lints' in one place.
 import { REPORTS_DIR } from './reportsPaths';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
-const DEFAULT_VERSION = '^9.1.0';
+/**
+ * Constraint written when a project does not depend on saropa_lints yet.
+ *
+ * The latest release on pub.dev, as a caret so `pub get` takes every later
+ * 16.x. It was `^9.1.0` long after 16.x shipped, which resolved to a 9.x CLI:
+ * too old for this extension, and too old for the CI workflow the System
+ * Health card writes, whose action needs the 16.x `scan` flags.
+ */
+const DEFAULT_VERSION = '^16.2.1';
 
 /** Composite meta-plugin guide (browser); stable for marketplace installs. */
 const COMPOSITE_PLUGIN_SCAFFOLD_GUIDE_URL =
@@ -117,25 +126,12 @@ export function ensureSaropaLintsInPubspec(
   }
   const content = fs.readFileSync(pubspecPath, 'utf-8');
 
-  // Precision check: match as an actual dependency entry, not a substring
-  // in comments or similarly-named packages like saropa_lints_extra.
   // Already declared => nothing written => the caller can skip `pub get`.
-  if (/^\s{2}saropa_lints\s*:/m.test(content)) return { ok: true, changed: false };
-
-  // Line-based insertion avoids regex backtracking bugs that corrupted YAML
-  // by placing the dependency on the same line as dev_dependencies:.
-  // Preserve original line endings (CRLF on Windows) to avoid git noise.
-  const eol = content.includes('\r\n') ? '\r\n' : '\n';
-  const lines = content.split(eol);
-  const devDepsIdx = lines.findIndex(l => /^dev_dependencies:\s*$/.test(l));
-  const entry = `  ${SAROPA_LINTS_DEV_DEP}: ${DEFAULT_VERSION}`;
-
-  if (devDepsIdx === -1) {
-    lines.push('', 'dev_dependencies:', entry);
-  } else {
-    lines.splice(devDepsIdx + 1, 0, entry);
-  }
-  fs.writeFileSync(pubspecPath, lines.join(eol), 'utf-8');
+  // The edit itself (indentation, comments, CRLF) lives in
+  // pubspecDevDependency.ts, where each of those shapes is tested.
+  const next = addDevDependency(content, SAROPA_LINTS_DEV_DEP, DEFAULT_VERSION);
+  if (next === undefined) return { ok: true, changed: false };
+  fs.writeFileSync(pubspecPath, next, 'utf-8');
   return { ok: true, changed: true };
 }
 
