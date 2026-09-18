@@ -105,6 +105,10 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 - `buildCiWorkflow`'s dartdoc had been merged into `ciNeedsExplicitTier`'s by a missing blank line, so `--emit-ci`'s workflow-generating function carried no documentation. Restored to the function it describes; no behavior change.
 - The CI card and `init --emit-ci` write identical workflow files again. Their header and comments had drifted apart.
 
+### Internal
+
+- Test descriptions for the shared CI workflow fixture checks now state the expected behavior, satisfying `require_test_description_convention`.
+
 ## [16.3.0]
 
 Minor release adding a GitHub Actions integration: a composite action, a CLI flag that writes the workflow for you, and a switch in the extension that turns it on and off. [log](https://github.com/saropa/saropa_lints/blob/v16.3.0/CHANGELOG.md)
