@@ -166,4 +166,29 @@ void main() {
     );
     expect(userSafeToIgnoreMethods, {'computeHash'});
   });
+
+  test('a CRLF blank line inside the section does not drop the rest', () {
+    loadAvoidIgnoringReturnValuesConfig(
+      'avoid_ignoring_return_values:\n'
+              '  safe_to_ignore:\n'
+              '    - computeHash\n'
+              '\n'
+              '    - formatLabel\n'
+          .replaceAll('\n', '\r\n'),
+    );
+    expect(userSafeToIgnoreMethods, {'computeHash', 'formatLabel'});
+  });
+
+  test('a CRLF section still stops at the next top-level section', () {
+    loadAvoidIgnoringReturnValuesConfig(
+      'avoid_ignoring_return_values:\n'
+              '  safe_to_ignore:\n'
+              '    - computeHash\n'
+              'some_other_rule:\n'
+              '  safe_to_ignore:\n'
+              '    - shouldNotLeak\n'
+          .replaceAll('\n', '\r\n'),
+    );
+    expect(userSafeToIgnoreMethods, {'computeHash'});
+  });
 }
