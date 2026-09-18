@@ -2,7 +2,7 @@
 
 **Branch:** `claude/inspiring-pascal-tjfi2j` → `main` · **Created:** 2026-09-11 · **Updated:** 2026-09-18
 **Status:** Merged to `main` as `097ba425`. Ships in 16.3.0, which has not been released yet (no `v16.3.0` tag). Still open: the manual checklist and the release, both below under [Closing this out](#closing-this-out).
-**Plan:** `plans/PLAN_ci_automation.md`, implemented in full.
+**Plan:** `plans/history/2026.09/2026.09.18/PLAN_ci_automation.md`, implemented in full.
 **Supersedes:** `bugs/PR_336_CI_ACTION.md`, `bugs/PR_337_CI_AUTOMATION_REMAINDER.md` and `bugs/HUMAN_001_CI_AUTOMATION.md`, all folded in here. PR 337 was a second pull request for the later half of this work; splitting it was a mistake and its commits were fast-forwarded onto this branch.
 
 ---
