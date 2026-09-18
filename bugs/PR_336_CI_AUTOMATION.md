@@ -1,8 +1,9 @@
 # PR 336 — Run saropa_lints on pull requests
 
-**Branch:** `claude/inspiring-pascal-tjfi2j` → `main` · **Created:** 2026-09-11 · **Updated:** 2026-09-12
+**Branch:** `claude/inspiring-pascal-tjfi2j` → `main` · **Created:** 2026-09-11 · **Updated:** 2026-09-18
+**Status:** Merged to `main` as `097ba425`. Ships in 16.3.0, which has not been released yet (no `v16.3.0` tag). Still open: the manual checklist and the release, both below under [Closing this out](#closing-this-out).
 **Plan:** `plans/PLAN_ci_automation.md`, implemented in full.
-**Supersedes:** `bugs/PR_336_CI_ACTION.md` and `bugs/PR_337_CI_AUTOMATION_REMAINDER.md`, both folded in here. PR 337 was a second pull request for the later half of this work; splitting it was a mistake and its commits were fast-forwarded onto this branch.
+**Supersedes:** `bugs/PR_336_CI_ACTION.md`, `bugs/PR_337_CI_AUTOMATION_REMAINDER.md` and `bugs/HUMAN_001_CI_AUTOMATION.md`, all folded in here. PR 337 was a second pull request for the later half of this work; splitting it was a mistake and its commits were fast-forwarded onto this branch.
 
 ---
 
@@ -46,9 +47,9 @@ Writes `.github/workflows/saropa-lints.yml` into a project, mirroring the existi
 
 A fourth card beside Live Analysis, Scan Daemon and LSP Server, with the same ON/OFF control. `ciWorkflow.ts` holds the file logic and depends only on `fs` and `path`, which is what makes its behavior testable outside an extension host.
 
-Clicking ON does the setup, not just the file: it adds `saropa_lints` to the pubspec when missing, detects whether the project has rule configuration, and writes the workflow. No prompt — `--emit-ci` generates the identical file, and a card that quietly differed from the CLI would be its own bug.
+Clicking ON does the setup, not just the file: it adds `saropa_lints` to the pubspec when missing, detects whether the project has rule configuration, and writes the workflow. No prompt — `--emit-ci` is meant to generate the identical file, and a card that quietly differed from the CLI would be its own bug. Both are checked against shared fixtures so they stay identical (finding F2).
 
-OFF never deletes. It inserts one marked `if: false` line under **every** job, so the change is a one-line reversible diff and any customization survives.
+OFF never deletes. It inserts one marked `if: false` line under **every** job, so the change is a one-line reversible diff and any customization survives. A job that already has its own `if:` has it swapped for `if: false`, with the original kept in the marker comment and put back by ON (finding F1).
 
 ### A deliberate publish step (`ciPublish.ts`, `ciPublishGithub.ts`, `ciPublishHtml.ts`)
 
@@ -108,12 +109,6 @@ Actions consumers write `uses: saropa/saropa_lints@v16` and expect it to track t
 
 ---
 
-## What to test
-
-Everything machine-verifiable is covered by the suites named under Verification status below. What is left needs a person and a running extension host, and is tracked as a recorded checklist in [`HUMAN_001_CI_AUTOMATION.md`](HUMAN_001_CI_AUTOMATION.md) — results go there, not here.
-
----
-
 ## Verification status
 
 **Found in code review, fixed:**
@@ -129,7 +124,7 @@ Everything machine-verifiable is covered by the suites named under Verification 
 
 - **The publish step's git behavior, against real repositories.** 25 tests in `extension/src/test/systemHealth/ciPublish.test.ts`, each against a real working repo with a real bare remote rather than a mocked git — the whole value of the module is what git does with the arguments it is handed, and a mock would only assert my assumptions back at me. Covered: every origin URL shape including the lookalike hosts that must *not* match; a default branch that is neither `main` nor `master`; branch names that never collide with an existing local or remote branch; `buildCiPublishPlan` performing nothing; the commit containing the workflow file and nothing else with an unrelated edit and an untracked file both surviving untouched; the failure path naming the exact step for a missing file and for an unreachable remote, with the local commit intact after a failed push; and two publishes producing two branches. Plus the panel section: nothing rendered with no pending change, every command present, the copy attribute escaped so a quote mark cannot truncate it, and the pull request button hidden — but the commands and the dismiss kept — when the remote is not GitHub.
 
-- **The workflow toggle, compiled and executed against real files.** ON→OFF→ON returns the file byte-identical; both directions are idempotent; every intermediate state parses as valid YAML; a heavily customized workflow keeps its added `cron`, `timeout-minutes`, changed `mode` and added `tier` across the round trip; a two-job workflow has **both** jobs suspended by OFF and both restored by ON with the added job intact; a file with no recognizable `jobs:` map is left untouched and the call returns false.
+- **The workflow toggle, compiled and executed against real files.** Now committed as 12 tests in `extension/src/test/systemHealth/ciWorkflow.test.ts`. ON→OFF→ON returns the file byte-identical; both directions are idempotent; every intermediate state parses as valid YAML; a heavily customized workflow keeps its added `cron`, `timeout-minutes`, changed `mode` and added `tier` across the round trip; a two-job workflow has **both** jobs suspended by OFF and both restored by ON with the added job intact; a file with no recognizable `jobs:` map is left untouched and the call returns false.
 - **The generated workflow's content**, across configured and unconfigured projects: a configured project gets `mode: gate` with no tier override, an unconfigured one gets the `recommended` fallback, both carry `continue-on-error` and request only `contents: read`.
 - **The version-derived pin**, both branches: a lockfile at 16.3.0 yields `@v16.3.0`, no lockfile yields `@main` with an explanatory comment and never `@vunknown`. The floor was checked across locked versions — 16.2.1 and 16.2.9 fall back, 16.3.0 and above pin.
 - **The vibrancy fix's tests against both versions of the generator** — 12/12 fail before the fix, 12/12 pass after. A test that passes against broken code would have been worthless here.
@@ -137,18 +132,17 @@ Everything machine-verifiable is covered by the suites named under Verification 
 - **The `-e` failure**, reproduced under the runner's exact shell invocation and then shown fixed under the same flags.
 - Every flag the action can emit, checked programmatically against the parsers in `bin/audit.dart` and `bin/scan.dart`.
 - `tsc --noEmit -p tsconfig.json` for the extension; `scripts/modules` tests (156); `check_doc_links_excluded_paths.py`; `check_dependency_imports.py`; `verify-manifest-nls-keys` (367 keys).
-- On CI: `analyze`, `test`, `self-lint`, `selftest`, `extension-manifest-nls` and five CodeQL analyses.
+- On CI: `analyze`, `test`, `self-lint`, `selftest`, `extension-manifest-nls` and five CodeQL analyses. The `test` job covers the Dart changes (`ciNeedsExplicitTier`, the `tier:` emission, and the four tests in `test/init/init_emit_ci_test.dart`), which were never run locally because no Dart SDK was available.
 
 **Did not run:**
 
-- **The extension in a live VS Code host.** The card's rendering, the toggle wiring through the webview, and the error path when disable refuses are typecheck-and-reasoning only. Items 1 through 4 and 11 in [`HUMAN_001_CI_AUTOMATION.md`](HUMAN_001_CI_AUTOMATION.md) are the checks that close this, and none of them has been performed.
+- **The extension in a live VS Code host.** The card's rendering, the toggle wiring through the webview, and the error path when disable refuses are typecheck-and-reasoning only. Checklist items 1 through 5 are the checks that close this, and none of them has been performed.
 - **The SARIF upload path.** The self-test sets `upload-sarif: false` so it needs no `security-events` permission, and the generated workflow no longer requests one, so nothing here has exercised an upload or seen an annotation render on a diff.
 - **`--since` against a real shallow checkout.** The refspec reasoning is sound but unproven; the self-test does not pass `since`.
 - **`install-sdk: auto` against a Flutter toolchain.** The self-test exercises the skip branch only.
 - **The generated workflows executing on a runner** — for `--emit-ci`, for the card, or for the vibrancy generator's three platforms. Their content is verified; their behavior in GitHub Actions and GitLab CI is not.
 - **The major tag move.** The code path runs only during a release, and the 16.3.0 release has not been cut yet.
-- **The publish step end to end in a live extension host.** The git layer beneath it is covered against real repositories, but the button that triggers it, the progress notification, the clipboard write, and the GitHub sign-in have only been typechecked. Items 5 through 8 and 14 in [`HUMAN_001_CI_AUTOMATION.md`](HUMAN_001_CI_AUTOMATION.md) exist to close that.
-- **The Dart changes.** No Dart SDK is available in this environment, so `ciNeedsExplicitTier`, the `tier:` emission, and the four tests added for them in `test/init/init_emit_ci_test.dart` have not been executed locally. CI runs them.
+- **The publish step end to end in a live extension host.** The git layer beneath it is covered against real repositories, but the button that triggers it, the progress notification, the clipboard write, and the GitHub sign-in have only been typechecked. Checklist items 6 through 10 exist to close that.
 - **Pull request creation against the GitHub API.** No call has been made. The request shape follows the documented endpoint, and every failure mode falls back to the compare page, but neither the success path nor the fallback has been observed.
 
 **Known follow-ups, not addressed here:**
@@ -156,3 +150,62 @@ Everything machine-verifiable is covered by the suites named under Verification 
 - No CI job runs the extension's TypeScript tests, and `npm test` currently has 32 failures on `main` that predate this branch — the new tests here were checked against that exact baseline (2188 passing before, 2213 after, the same 32 failing). Those two facts are the same fact: a suite nothing runs is a suite that rots. Nothing invokes `npm test`; the suite is local-only, which is the deeper reason `ci-generator.test.ts` sat unregistered in the mocha file list long enough for assertions on a nonexistent `maxLegacy` field to survive.
 - `ci.yml` triggers only on `pull_request: branches: [main]`, so a pull request targeting any other branch gets no CI at all. This PR hit it, and it will catch someone else.
 - The `analyze` job commits formatting changes using `GITHUB_TOKEN`; the resulting run comes back `action_required` and never executes, so the final head can carry no `ci` result while an identical tree passed one commit back.
+
+---
+
+## Closing this out
+
+This section replaces `HUMAN_001_CI_AUTOMATION.md`. Record the manual results here.
+
+### Findings
+
+Found in the 2026-09-18 review, after merge. Both fixed on branch `fix/ci-toggle-if-and-template-parity`, logged under 16.4.0 in the CHANGELOG.
+
+| # | Finding | Fix |
+|---|---------|-----|
+| F1 | **OFF could break a customized workflow.** `disableCiWorkflow` inserted `if: false` under every 2-space job key without checking whether the job already had an `if:`, which creates a duplicate key that makes GitHub reject the whole workflow. It also treated any valueless 2-space key after `jobs:` as a job, so a top-level map placed after `jobs:` (such as `defaults:` → `run:`) got an `if:` injected into it. | **Fixed.** The scan stops at the next top-level key. When a job already has an `if:`, OFF replaces it with `if: false` and keeps the original line in the marker comment, and ON puts that line back byte for byte. OFF refuses, and leaves the file untouched, for any job it cannot suspend safely: flow style, an empty body, or an `if:` that spans more than one line. Covered by `extension/src/test/systemHealth/ciWorkflow.test.ts`. |
+| F2 | **The card and `--emit-ci` wrote different files.** Line 1, the `mode` comment and the unpinned-version note all differed between `ciWorkflow.ts` and `emit_ci_workflow.dart`. | **Fixed.** Both now write the same text, and both test suites compare their output against the same fixtures in `test/fixtures/ci_workflow/`. That covers pinned, pinned with a tier, and unpinned, so a wording change made on one side only fails a test. |
+
+### Manual checklist
+
+Each item needs a person, and items 1–10 also need a running VS Code extension host. **Status** is `pass`, `fail`, `blocked`, or `-` for not yet tried. Put the version or commit you tested in **Build**. In **Notes**, write what you actually saw, not what was supposed to happen. A failure gets a new row under Findings.
+
+#### Extension host: the CI card
+
+| # | Test | Status | Build | Notes |
+|---|------|--------|-------|-------|
+| 1 | **Turn CI on from the UI.** Saropa Lints sidebar → **Engines** row under Status → **GitHub Actions CI** card → **ON**. A workflow file appears in Source Control and the card reads active. | - | | |
+| 2 | **Turn it back off.** **OFF** keeps the file and adds one `if: false` line per job; the card reads stopped. **ON** again returns the file to exactly what it was. Repeat with a job that has its own `if:`: OFF swaps it for `if: false`, and ON puts the original back. | - | | |
+| 3 | **Break the off switch on purpose.** Hand-edit the workflow so it has no recognizable `jobs:` map, then click OFF. It must refuse with an error saying CI is still running and offer to open the file. It must never silently report success. | - | | |
+| 4 | **The generated workflow honors your configuration.** A project with a configured tier gets no `tier:` input. A project with no saropa_lints configuration gets `tier: recommended`, because without it `scan` exits 2. | - | | |
+| 5 | **The engines panel with `saropaLints.debug.enabled` off.** The Engines row still appears in the sidebar and the panel still opens. | - | | |
+
+#### Extension host: the publish step
+
+| # | Test | Status | Build | Notes |
+|---|------|--------|-------|-------|
+| 6 | **Both directions.** After ON, the panel shows the publish section with four git commands. The copy button puts them on the clipboard with real quote marks, not `&quot;`. The create button pushes a branch and opens a pull request containing only the workflow file. Repeat for OFF. | - | | |
+| 7 | **With a dirty tree.** Edit an unrelated file and leave it uncommitted, and `git add` a second one. The commit must contain only the plan's paths, and both edits must survive exactly as they were, with the staged one still staged. | - | | |
+| 8 | **When it refuses.** Publish to a branch-protected remote, or with the network down. The error names the push command, the panel section stays on screen with its commands intact, and the local commit is still there. | - | | |
+| 9 | **Declining the GitHub sign-in.** Dismiss the sign-in prompt. The branch is still pushed, and the fallback offers the compare page instead of reporting a failure. | - | | |
+| 10 | **A project that did not depend on saropa_lints.** Turning CI on adds it to `pubspec.yaml`. That edit must be in the same commit and the same pull request, and that pull request's own CI must pass, not fail on an unresolved dependency. | - | | |
+
+#### Outside the extension
+
+| # | Test | Status | Build | Notes |
+|---|------|--------|-------|-------|
+| 11 | **It does not fail the build.** Push the generated workflow to a project with known findings. The check reports them without turning the pull request red. | - | | |
+| 12 | **`--emit-ci` produces the same file.** Run `dart run saropa_lints:init --emit-ci` on a scratch project and diff it against what the card writes. They must be identical. The shared fixtures already enforce this in tests, so this is a final sanity check. Run it twice: the second run refuses instead of overwriting. | - | | |
+| 13 | **The vibrancy generator actually gates.** Run "Generate CI Pipeline" with `maxOutdated` set to 0 on a project with outdated packages, then push. The job must fail. Before this work it always passed. | - | | |
+| 14 | **The major tag, at release.** After the 16.3.0 release, `v16` exists and points at it, and `uses: saropa/saropa_lints@v16` resolves in a real workflow. | - | | |
+| 15 | **SARIF upload.** With `mode: annotate` and `upload-sarif` on, in a repository that has code scanning, findings render as annotations on the diff. This has never been exercised, because the self-test sets `upload-sarif: false`. | - | | |
+| 16 | **`--since` on a real shallow checkout**, and **`install-sdk: auto` against a Flutter toolchain.** The self-test covers neither; it only exercises the skip branch. | - | | |
+
+### Done when
+
+- The F1 and F2 fixes are committed and merged.
+- Items 1–13 pass. These cover everything the release puts in users' hands.
+- 16.3.0 is released and item 14 passes.
+- Items 15 and 16 either pass or are moved to a new tracked issue. They exercise optional inputs the generated workflow doesn't use, so they shouldn't hold this open.
+
+After that, this file can be deleted from `bugs/`. Git history keeps the record.

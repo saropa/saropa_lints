@@ -68,11 +68,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [16.4.0] — Unreleased
 
-Minor release adding a new essential-tier rule that catches an unguarded `dart:developer` `debugger()` call before it can hang a test run.
+Minor release adding a new essential-tier rule that catches an unguarded `dart:developer` `debugger()` call before it can hang a test run. It also fixes the extension's CI switch for workflows whose jobs already carry their own conditions.
 
 ### Added
 
 `guard_debugger_against_test_environment` flags any `debugger()` call not lexically guarded against the test environment. A VM service attaches during `flutter test` too, so an unguarded call pauses the isolate and hangs the run with no verdict — `kDebugMode` does not help, since `flutter test` itself runs in debug mode. Guard it with a condition mentioning an `isTestEnvironment`-shaped check or `FLUTTER_TEST`, anywhere up the enclosing `if` chain. The negated `if` (`if (!isTestEnvironment) { … }`), the inverted branch (`if (isTestEnvironment) { } else { … }`) and the early-return guard clause (`if (isTestEnvironment) return;`) all count. `&&` and `||` are not interchangeable: one guarded term guards an `&&`, but every term of an `||` must guarantee non-test, so `if (isBreak || !isTestEnvironment)` is still reported. No action required unless the rule fires.
+
+### Fixed (Extension)
+
+- Turning CI off in the System Health panel no longer breaks a workflow whose job already has its own `if:` condition. It used to add a second `if:`, which GitHub rejects as an invalid workflow. The existing condition is now swapped for `if: false` and put back exactly when CI is turned on again. A workflow with a job it cannot safely switch off is left untouched, and the panel reports that CI is still running.
+- The CI card and `init --emit-ci` write identical workflow files again. Their header and comments had drifted apart.
 
 ## [16.3.0]
 
