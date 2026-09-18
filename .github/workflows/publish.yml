@@ -3,7 +3,10 @@ name: publish
 on:
   push:
     tags:
-      - 'v*'  # Triggers on version tags like v1.5.3
+      # Exact version tags only (v1.5.3, v1.5.3-beta.1). Not 'v*': the release
+      # script also force-pushes a moving major tag (v16) for Actions
+      # consumers, and 'v*' would start a second publish run for it.
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
   publish:

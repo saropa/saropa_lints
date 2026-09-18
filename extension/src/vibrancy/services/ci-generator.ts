@@ -29,10 +29,142 @@ export function getDefaultOutputPath(platform: CiPlatform): string {
     }
 }
 
+/**
+ * The Dart program every platform runs. One source, so the three generated
+ * pipelines cannot drift apart, and so a test can run it with `dart` against
+ * real `pub outdated --json` output.
+ *
+ * Arguments: the `pub outdated --json` file, then optionally a path to write
+ * a summary JSON to (the GitHub pull request comment reads it).
+ *
+ * What it counts, and why:
+ * - Outdated = a direct or dev dependency whose `latest` is newer than its
+ *   `current`. Transitive packages are left out: they are pinned by the
+ *   packages that use them (under Flutter, often by the SDK), so a project
+ *   cannot upgrade them and would fail on a threshold it cannot meet. This
+ *   is the same measure `suggestThresholds` suggests `maxOutdated` from.
+ * - Vulnerable = `isCurrentAffectedByAdvisory`, which `pub outdated` reports
+ *   from pub.dev's security advisories. `failOnVulnerability` fails on it.
+ * - Abandonment, end-of-life and vibrancy scores come from pub.dev and GitHub
+ *   data that `pub outdated` does not carry, so those thresholds are stated
+ *   as not enforced rather than faked.
+ */
+export function buildCheckerScript(thresholds: CiThresholds): string {
+    return `import 'dart:convert';
+import 'dart:io';
+
+const maxAbandoned = ${thresholds.maxAbandoned};
+const maxEol = ${thresholds.maxEndOfLife};
+const maxOutdated = ${thresholds.maxOutdated};
+const minAvgVibrancy = ${thresholds.minAverageVibrancy};
+const failOnVuln = ${thresholds.failOnVulnerability ? 'true' : 'false'};
+
+/// Numeric major.minor.patch; on a tie a release sorts after its pre-releases.
+int compareVersions(String a, String b) {
+  List<int> core(String v) =>
+      v.split(RegExp(r'[-+]'))[0].split('.').map((p) => int.tryParse(p) ?? 0).toList();
+  final x = core(a);
+  final y = core(b);
+  for (var i = 0; i < 3; i++) {
+    final d = (i < x.length ? x[i] : 0) - (i < y.length ? y[i] : 0);
+    if (d != 0) return d;
+  }
+  final aPre = a.contains('-');
+  final bPre = b.contains('-');
+  if (aPre == bPre) return 0;
+  return aPre ? -1 : 1;
+}
+
+/// A breaking update: a new major, or for 0.x a new minor.
+bool isBreaking(String current, String latest) {
+  int part(String v, int i) {
+    final parts = v.split(RegExp(r'[-+]'))[0].split('.');
+    return i < parts.length ? int.tryParse(parts[i]) ?? 0 : 0;
+  }
+  if (part(latest, 0) != part(current, 0)) return true;
+  return part(current, 0) == 0 && part(latest, 1) != part(current, 1);
+}
+
+String? versionOf(Object? entry) => entry is Map ? entry['version'] as String? : null;
+
+void main(List<String> args) {
+  final json = jsonDecode(File(args.isNotEmpty ? args[0] : 'outdated.json').readAsStringSync());
+  final packages = (json is Map ? json['packages'] as List? : null) ?? const [];
+
+  final outdated = <String>[];
+  var breaking = 0;
+  final vulnerable = <String>[];
+  final discontinued = <String>[];
+  for (final pkg in packages) {
+    if (pkg is! Map) continue;
+    final kind = pkg['kind'];
+    if (kind != 'direct' && kind != 'dev') continue;
+    final name = '\${pkg['package']}';
+    if (pkg['isCurrentAffectedByAdvisory'] == true) vulnerable.add(name);
+    if (pkg['isDiscontinued'] == true) discontinued.add(name);
+    final current = versionOf(pkg['current']);
+    final latest = versionOf(pkg['latest']);
+    if (current != null && latest != null && compareVersions(latest, current) > 0) {
+      outdated.add('\$name: \$current → \$latest');
+      if (isBreaking(current, latest)) breaking++;
+    }
+  }
+
+  print('📊 Dependency Health Summary (direct and dev dependencies)');
+  print('   Outdated: \${outdated.length} (max \$maxOutdated), breaking updates: \$breaking');
+  for (final line in outdated) {
+    print('     - \$line');
+  }
+
+  var failed = false;
+  if (outdated.length > maxOutdated) {
+    print('❌ FAIL: \${outdated.length} outdated dependencies exceed the maximum of \$maxOutdated.');
+    failed = true;
+  } else {
+    print('✅ Outdated dependencies are within the threshold.');
+  }
+
+  if (vulnerable.isNotEmpty) {
+    final names = vulnerable.join(', ');
+    if (failOnVuln) {
+      print('❌ FAIL: affected by a security advisory: \$names');
+      failed = true;
+    } else {
+      print('⚠️  Affected by a security advisory: \$names');
+    }
+  } else {
+    print('✅ No dependency is affected by a known security advisory.');
+  }
+
+  if (discontinued.isNotEmpty) {
+    print('ℹ️  Discontinued on pub.dev: \${discontinued.join(', ')}');
+  }
+
+  print('ℹ️  Max Abandoned (\$maxAbandoned), Max EOL (\$maxEol) and Min Avg Vibrancy (\$minAvgVibrancy) are scored from pub.dev and GitHub data that pub outdated does not carry, so this check does not enforce them.');
+
+  if (args.length > 1) {
+    File(args[1]).writeAsStringSync(jsonEncode({
+      'outdated': outdated.length,
+      'maxOutdated': maxOutdated,
+      'vulnerable': vulnerable,
+      'failOnVulnerability': failOnVuln,
+      'discontinued': discontinued,
+      'failed': failed,
+    }));
+  }
+  exit(failed ? 1 : 0);
+}
+`;
+}
+
+/** `text` with every non-empty line indented by `spaces`. */
+function indent(text: string, spaces: number): string {
+    const pad = ' '.repeat(spaces);
+    return text.split('\n').map((line) => (line ? pad + line : line)).join('\n');
+}
+
 /** Generate a GitHub Actions workflow. */
 export function generateGitHubActions(thresholds: CiThresholds): string {
-    const failOnVuln = thresholds.failOnVulnerability ? 'true' : 'false';
-
     return `# Generated by Package Vibrancy
 # Checks dependency health on PRs that modify pubspec files
 
@@ -60,91 +192,24 @@ jobs:
       - name: Check dependency health
         id: health-check
         run: |
-          echo "Checking dependency health thresholds..."
-
-          # Get outdated packages info
           flutter pub outdated --json > outdated.json
 
           # Write the checker to a real file: \`dart run\` cannot read a
           # program from stdin, so a heredoc piped into it silently no-ops.
           cat > vibrancy_check.dart <<'DART_SCRIPT'
-          import 'dart:convert';
-          import 'dart:io';
-
-          void main() {
-            final json = jsonDecode(File('outdated.json').readAsStringSync());
-            final packages = json['packages'] as List? ?? [];
-
-            var outdatedCount = 0;
-            var majorUpdates = 0;
-
-            for (final pkg in packages) {
-              final current = pkg['current']?['version'];
-              final latest = pkg['latest']?['version'];
-              if (current != null && latest != null && current != latest) {
-                outdatedCount++;
-                final currentMajor = int.tryParse(current.split('.')[0]) ?? 0;
-                final latestMajor = int.tryParse(latest.split('.')[0]) ?? 0;
-                if (latestMajor > currentMajor) majorUpdates++;
-              }
-            }
-
-            print('📊 Dependency Health Summary');
-            print('   Outdated packages: \$outdatedCount');
-            print('   Major updates available: \$majorUpdates');
-
-            // Thresholds from configuration
-            const maxAbandoned = ${thresholds.maxAbandoned};
-            const maxEol = ${thresholds.maxEndOfLife};
-            const maxOutdated = ${thresholds.maxOutdated};
-            const minAvgVibrancy = ${thresholds.minAverageVibrancy};
-            const failOnVuln = ${failOnVuln};
-
-            print('');
-            print('   Thresholds:');
-            print('     Max Abandoned: \$maxAbandoned');
-            print('     Max EOL: \$maxEol');
-            print('     Max Outdated: \$maxOutdated');
-            print('     Min Avg Vibrancy: \$minAvgVibrancy');
-            print('     Fail on Vulnerability: \$failOnVuln');
-
-            var failed = false;
-            if (outdatedCount > maxOutdated) {
-              print('❌ FAIL: outdated packages (\$outdatedCount) exceed max allowed (\$maxOutdated)');
-              failed = true;
-            } else {
-              print('✅ Outdated package count is within threshold.');
-            }
-
-            // maxAbandoned, maxEol, and minAvgVibrancy describe package
-            // abandonment, end-of-life status, and computed vibrancy scores.
-            // \`flutter pub outdated\` does not report any of that, so those
-            // thresholds cannot be honestly evaluated here. Surface the gap
-            // instead of pretending to enforce it.
-            if (maxAbandoned >= 0 || maxEol >= 0 || minAvgVibrancy >= 0) {
-              print('ℹ️  Max Abandoned / Max EOL / Min Avg Vibrancy require full vibrancy scoring data that \`pub outdated\` does not provide, so they are NOT enforced by this basic check. Use saropa_vibrancy_cli for those.');
-            }
-
-            // failOnVulnerability has no data source here either: pub
-            // outdated reports version currency, not known vulnerabilities.
-            // Do not fabricate a vulnerability count — say so plainly.
-            if (failOnVuln) {
-              print('⚠️  Fail on Vulnerability is enabled but \`pub outdated\` reports no vulnerability data, so this check cannot enforce it. Use saropa_vibrancy_cli or a dedicated vulnerability scanner.');
-            }
-
-            // For full vibrancy scoring use saropa_vibrancy_cli when available.
-            exit(failed ? 1 : 0);
-          }
+${indent(buildCheckerScript(thresholds).trimEnd(), 10)}
           DART_SCRIPT
 
-          dart run vibrancy_check.dart
+          dart run vibrancy_check.dart outdated.json vibrancy_summary.json
 
       - name: Upload dependency report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dependency-report
-          path: outdated.json
+          path: |
+            outdated.json
+            vibrancy_summary.json
           retention-days: 7
 
       - name: Comment on PR
@@ -153,29 +218,25 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            
+
             let report = '## 📊 Dependency Health Check\\n\\n';
-            
+
             try {
-              const outdated = JSON.parse(fs.readFileSync('outdated.json', 'utf8'));
-              const packages = outdated.packages || [];
-              const outdatedCount = packages.filter(p => 
-                p.current?.version && p.latest?.version && 
-                p.current.version !== p.latest.version
-              ).length;
-              
-              report += '| Metric | Value | Threshold | Status |\\n';
-              report += '|--------|-------|-----------|--------|\\n';
-              report += \`| Outdated | \${outdatedCount} | — | \${outdatedCount === 0 ? '✅' : 'ℹ️'} |\\n\`;
-              report += \`| Abandoned Limit | — | ≤ ${thresholds.maxAbandoned} | — |\\n\`;
-              report += \`| EOL Limit | — | ≤ ${thresholds.maxEndOfLife} | — |\\n\`;
-              report += \`| Outdated Limit | — | ≤ ${thresholds.maxOutdated} | — |\\n\`;
-              report += \`| Min Avg Vibrancy | — | ≥ ${thresholds.minAverageVibrancy} | — |\\n\`;
-              report += '\\n*Full vibrancy analysis requires saropa_vibrancy_cli*\\n';
+              // Written by the checker, so the comment reports exactly the
+              // verdict the job reached, not a second opinion.
+              const s = JSON.parse(fs.readFileSync('vibrancy_summary.json', 'utf8'));
+              const mark = (ok) => (ok ? '✅' : '❌');
+              report += '| Check | Value | Threshold | Status |\\n';
+              report += '|-------|-------|-----------|--------|\\n';
+              report += \`| Outdated (direct + dev) | \${s.outdated} | ≤ \${s.maxOutdated} | \${mark(s.outdated <= s.maxOutdated)} |\\n\`;
+              report += \`| Security advisories | \${s.vulnerable.length} | \${s.failOnVulnerability ? '0' : 'reported only'} | \${s.failOnVulnerability ? mark(s.vulnerable.length === 0) : 'ℹ️'} |\\n\`;
+              report += '| Abandoned, EOL, Avg Vibrancy | — | not enforced | ℹ️ |\\n';
+              if (s.vulnerable.length) report += \`\\nAffected by an advisory: \${s.vulnerable.join(', ')}\\n\`;
+              report += '\\n*Abandonment, end-of-life and vibrancy scores need full Package Vibrancy data, which pub outdated does not carry.*\\n';
             } catch (e) {
-              report += 'Failed to parse dependency report.\\n';
+              report += 'The dependency check did not produce a summary. See the job log.\\n';
             }
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -187,85 +248,27 @@ jobs:
 
 /** Generate a GitLab CI job configuration. */
 export function generateGitLabCi(thresholds: CiThresholds): string {
-    const failOnVuln = thresholds.failOnVulnerability ? 'true' : 'false';
-
     return `# Generated by Package Vibrancy
 # Add this to your .gitlab-ci.yml or include as a separate file
 
 vibrancy-check:
   stage: test
-  image: cirrusci/flutter:stable
+  image: ghcr.io/cirruslabs/flutter:stable
   rules:
     - changes:
         - pubspec.yaml
         - pubspec.lock
   script:
     - flutter pub get
-    - echo "Checking dependency health thresholds..."
     - flutter pub outdated --json > outdated.json
     - |
       # Write the checker to a real file: \`dart run\` cannot read a program
       # from stdin, so a heredoc piped into it silently no-ops.
       cat > vibrancy_check.dart <<'DART_SCRIPT'
-      import 'dart:convert';
-      import 'dart:io';
-
-      void main() {
-        final json = jsonDecode(File('outdated.json').readAsStringSync());
-        final packages = json['packages'] as List? ?? [];
-
-        var outdatedCount = 0;
-        for (final pkg in packages) {
-          final current = pkg['current']?['version'];
-          final latest = pkg['latest']?['version'];
-          if (current != null && latest != null && current != latest) {
-            outdatedCount++;
-          }
-        }
-
-        print('📊 Dependency Health Summary');
-        print('   Outdated packages: \$outdatedCount');
-
-        // Thresholds
-        const maxAbandoned = ${thresholds.maxAbandoned};
-        const maxEol = ${thresholds.maxEndOfLife};
-        const maxOutdated = ${thresholds.maxOutdated};
-        const minAvgVibrancy = ${thresholds.minAverageVibrancy};
-        const failOnVuln = ${failOnVuln};
-
-        print('   Max Abandoned: \$maxAbandoned');
-        print('   Max EOL: \$maxEol');
-        print('   Max Outdated: \$maxOutdated');
-        print('   Min Avg Vibrancy: \$minAvgVibrancy');
-        print('   Fail on Vulnerability: \$failOnVuln');
-
-        var failed = false;
-        if (outdatedCount > maxOutdated) {
-          print('❌ FAIL: outdated packages (\$outdatedCount) exceed max allowed (\$maxOutdated)');
-          failed = true;
-        } else {
-          print('✅ Outdated package count is within threshold.');
-        }
-
-        // maxAbandoned, maxEol, and minAvgVibrancy need full vibrancy
-        // scoring data (abandonment status, end-of-life dates, computed
-        // scores) that \`pub outdated\` does not provide, so they are NOT
-        // enforced here. Use saropa_vibrancy_cli for those.
-        if (maxAbandoned >= 0 || maxEol >= 0 || minAvgVibrancy >= 0) {
-          print('ℹ️  Max Abandoned / Max EOL / Min Avg Vibrancy are not enforced by this basic check (no data source). Use saropa_vibrancy_cli.');
-        }
-
-        // No vulnerability data is available from \`pub outdated\`; do not
-        // fabricate one. Report the gap instead of silently passing.
-        if (failOnVuln) {
-          print('⚠️  Fail on Vulnerability is enabled but cannot be enforced here (no vulnerability data source). Use saropa_vibrancy_cli or a dedicated scanner.');
-        }
-
-        exit(failed ? 1 : 0);
-      }
+${indent(buildCheckerScript(thresholds).trimEnd(), 6)}
       DART_SCRIPT
 
-      dart run vibrancy_check.dart
+      dart run vibrancy_check.dart outdated.json
   artifacts:
     paths:
       - outdated.json
@@ -276,20 +279,11 @@ vibrancy-check:
 
 /** Generate a portable shell script for manual/custom CI. */
 export function generateShellScript(thresholds: CiThresholds): string {
-    const failOnVuln = thresholds.failOnVulnerability ? 'true' : 'false';
-
     return `#!/bin/bash
 # Generated by Package Vibrancy
 # Portable dependency health check script
 
 set -e
-
-# Configuration thresholds
-MAX_ABANDONED=${thresholds.maxAbandoned}
-MAX_EOL=${thresholds.maxEndOfLife}
-MAX_OUTDATED=${thresholds.maxOutdated}
-MIN_AVG_VIBRANCY=${thresholds.minAverageVibrancy}
-FAIL_ON_VULN=${failOnVuln}
 
 echo "📊 Dependency Health Check"
 echo "=========================="
@@ -301,108 +295,29 @@ if ! command -v flutter &> /dev/null; then
     exit 1
 fi
 
-# Install dependencies
+# A private directory, not fixed /tmp paths: concurrent runs on one machine
+# would overwrite each other's files, and a fixed path in a shared /tmp can
+# be pre-created as a symlink by another user.
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
 echo "Installing dependencies..."
 flutter pub get
 
-# Get outdated packages
 echo "Checking for outdated packages..."
-flutter pub outdated --json > /tmp/outdated.json
+flutter pub outdated --json > "$work/outdated.json"
 
-# Parse results with Dart.
 # \`dart run\` cannot read a program from stdin, so it must be written to a
 # real file first — piping a heredoc into it silently does nothing.
-cat > /tmp/vibrancy_check.dart <<'DART_SCRIPT'
-import 'dart:convert';
-import 'dart:io';
+cat > "$work/vibrancy_check.dart" <<'DART_SCRIPT'
+${buildCheckerScript(thresholds)}DART_SCRIPT
 
-void main() {
-  final json = jsonDecode(File('/tmp/outdated.json').readAsStringSync());
-  final packages = json['packages'] as List? ?? [];
-
-  var outdatedCount = 0;
-  var majorUpdates = 0;
-  final outdatedList = <String>[];
-
-  for (final pkg in packages) {
-    final name = pkg['package'] as String?;
-    final current = pkg['current']?['version'];
-    final latest = pkg['latest']?['version'];
-
-    if (current != null && latest != null && current != latest) {
-      outdatedCount++;
-      outdatedList.add('  - \$name: \$current → \$latest');
-
-      final currentMajor = int.tryParse(current.split('.')[0]) ?? 0;
-      final latestMajor = int.tryParse(latest.split('.')[0]) ?? 0;
-      if (latestMajor > currentMajor) majorUpdates++;
-    }
-  }
-
-  print('Results:');
-  print('  Total packages: \${packages.length}');
-  print('  Outdated: \$outdatedCount');
-  print('  Major updates: \$majorUpdates');
-
-  if (outdatedList.isNotEmpty) {
-    print('');
-    print('Outdated packages:');
-    for (final item in outdatedList) {
-      print(item);
-    }
-  }
-
-  print('');
-  print('Thresholds:');
-  const maxAbandoned = ${thresholds.maxAbandoned};
-  const maxEol = ${thresholds.maxEndOfLife};
-  const maxOutdated = ${thresholds.maxOutdated};
-  const minAvgVibrancy = ${thresholds.minAverageVibrancy};
-  const failOnVuln = ${failOnVuln};
-
-  print('  Max Abandoned: \$maxAbandoned');
-  print('  Max End-of-Life: \$maxEol');
-  print('  Max Outdated: \$maxOutdated');
-  print('  Min Average Vibrancy: \$minAvgVibrancy');
-  print('  Fail on Vulnerability: \$failOnVuln');
-
-  var failed = false;
-  if (outdatedCount > maxOutdated) {
-    print('❌ FAIL: outdated packages (\$outdatedCount) exceed max allowed (\$maxOutdated)');
-    failed = true;
-  } else {
-    print('✅ Outdated package count is within threshold.');
-  }
-
-  // Max Abandoned / Max End-of-Life / Min Average Vibrancy need full
-  // vibrancy scoring data (abandonment status, end-of-life dates, computed
-  // scores) that \`pub outdated\` does not provide, so they are NOT enforced
-  // by this basic check.
-  if (maxAbandoned >= 0 || maxEol >= 0 || minAvgVibrancy >= 0) {
-    print('ℹ️  Max Abandoned / Max End-of-Life / Min Average Vibrancy are not enforced here (no data source in pub outdated). Use saropa_vibrancy_cli.');
-  }
-
-  // \`pub outdated\` reports no vulnerability data. Do not fabricate one —
-  // report the gap honestly instead of pretending to enforce it.
-  if (failOnVuln) {
-    print('⚠️  Fail on Vulnerability is enabled but cannot be enforced here (no vulnerability data source). Use saropa_vibrancy_cli or a dedicated scanner.');
-  }
-
-  // For full vibrancy scoring use saropa_vibrancy_cli when available.
-  exit(failed ? 1 : 0);
-}
-DART_SCRIPT
-
-dart run /tmp/vibrancy_check.dart
-# \`set -e\` above means a non-zero exit from the check above aborts this
-# script immediately with that same exit code, so the caller sees the
-# failure — nothing below runs unless the thresholds passed.
+# \`set -e\` means a failing check exits this script with the same code, so
+# the caller sees the failure — nothing below runs unless the checks passed.
+dart run "$work/vibrancy_check.dart" "$work/outdated.json"
 
 echo ""
 echo "✅ Dependency check complete"
-echo ""
-echo "Note: For full vibrancy scoring, install saropa_vibrancy_cli:"
-echo "  dart pub global activate saropa_vibrancy_cli"
 `;
 }
 

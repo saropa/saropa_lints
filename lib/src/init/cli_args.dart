@@ -172,7 +172,7 @@ CliArgs parseArguments(List<String> args) {
     if (ciIdx + 1 < args.length && !args[ciIdx + 1].startsWith('-')) {
       emitCi = args[ciIdx + 1];
     } else {
-      emitCi = '.github/workflows/saropa-lints.yml';
+      emitCi = defaultEmitCiPath;
     }
   }
 
@@ -192,6 +192,10 @@ CliArgs parseArguments(List<String> args) {
     targetDir: targetDir,
   );
 }
+
+/// Where `--emit-ci` writes when given no path, relative to the repository
+/// root. The one location GitHub runs workflows from.
+const String defaultEmitCiPath = '.github/workflows/saropa-lints.yml';
 
 /// Resolve a tier input (numeric 1-5 or name) to a canonical tier name.
 ///

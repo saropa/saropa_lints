@@ -8,6 +8,7 @@ import {
   buildCiPublishPlan,
   compareUrl,
   detectBaseBranch,
+  hasUncommittedChanges,
   isGitRepository,
   parseGitHubSlug,
   pickBranchName,
@@ -219,7 +220,7 @@ describe('ciPublish — the plan', () => {
       const plan = buildCiPublishPlan(repo.root, 'enable');
       assert.deepStrictEqual(plan.commands, [
         `git checkout -b ${plan.branch}`,
-        `git add ${CI_WORKFLOW_RELATIVE_PATH}`,
+        `git add -- ${CI_WORKFLOW_RELATIVE_PATH}`,
         `git commit -m "${plan.commitMessage}" -- ${CI_WORKFLOW_RELATIVE_PATH}`,
         `git push -u origin ${plan.branch}`,
       ]);
@@ -269,12 +270,12 @@ describe('ciPublish — the plan', () => {
 });
 
 describe('ciPublish — running it', () => {
-  it('branches, commits and pushes the workflow file', () => {
+  it('branches, commits and pushes the workflow file', async () => {
     const repo = makeRepo();
     try {
       writeWorkflow(repo.root);
       const plan = buildCiPublishPlan(repo.root, 'enable');
-      const result = runCiPublish(repo.root, plan);
+      const result = await runCiPublish(repo.root, plan);
 
       assert.strictEqual(result.ok, true, result.stderr ?? '');
       assert.strictEqual(git(repo.root, ['rev-parse', '--abbrev-ref', 'HEAD']), plan.branch);
@@ -294,7 +295,7 @@ describe('ciPublish — running it', () => {
     }
   });
 
-  it('stages only the workflow file, never the rest of a dirty tree', () => {
+  it('stages only the workflow file, never the rest of a dirty tree', async () => {
     const repo = makeRepo();
     try {
       writeWorkflow(repo.root);
@@ -307,7 +308,7 @@ describe('ciPublish — running it', () => {
       git(repo.root, ['add', 'staged.txt']);
 
       const plan = buildCiPublishPlan(repo.root, 'enable');
-      assert.strictEqual(runCiPublish(repo.root, plan).ok, true);
+      assert.strictEqual((await runCiPublish(repo.root, plan)).ok, true);
 
       const committed = git(repo.root, ['show', '--name-only', '--pretty=format:', 'HEAD'])
         .split('\n')
@@ -323,18 +324,17 @@ describe('ciPublish — running it', () => {
     }
   });
 
-  it('stops at the add step when the workflow file is not there', () => {
+  it('refuses before cutting a branch when the workflow file is not there', async () => {
     const repo = makeRepo();
     try {
-      // No workflow file written. `git add` on a pathspec matching nothing is
-      // itself an error, so this fails one step earlier than a bare `commit`
-      // with an empty index would — and says something more useful.
+      // No workflow file written: there is nothing to publish, and finding
+      // that out after `checkout -b` would strand the user on a new branch.
       const plan = buildCiPublishPlan(repo.root, 'enable');
-      const result = runCiPublish(repo.root, plan);
+      const result = await runCiPublish(repo.root, plan);
 
       assert.strictEqual(result.ok, false);
-      assert.strictEqual(result.failedCommand, plan.commands[1]);
       assert.ok((result.stderr ?? '').length > 0, 'the reason is carried, not swallowed');
+      assert.strictEqual(git(repo.root, ['rev-parse', '--abbrev-ref', 'HEAD']), 'main');
       // Nothing reached the remote.
       assert.throws(() => git(repo.remote, ['rev-parse', '--verify', plan.branch]));
     } finally {
@@ -342,7 +342,7 @@ describe('ciPublish — running it', () => {
     }
   });
 
-  it('commits every path in the plan, not only the workflow', () => {
+  it('commits every path in the plan, not only the workflow', async () => {
     const repo = makeRepo();
     try {
       writeWorkflow(repo.root);
@@ -351,7 +351,7 @@ describe('ciPublish — running it', () => {
       // CI run fails on an unresolved dependency.
       fs.writeFileSync(path.join(repo.root, 'pubspec.yaml'), 'name: demo\n');
       const plan = buildCiPublishPlan(repo.root, 'enable', ['pubspec.yaml']);
-      assert.strictEqual(runCiPublish(repo.root, plan).ok, true);
+      assert.strictEqual((await runCiPublish(repo.root, plan)).ok, true);
 
       const committed = git(repo.root, ['show', '--name-only', '--pretty=format:', 'HEAD'])
         .split('\n')
@@ -363,7 +363,7 @@ describe('ciPublish — running it', () => {
     }
   });
 
-  it('leaves work the user had already staged out of the commit', () => {
+  it('leaves work the user had already staged out of the commit', async () => {
     const repo = makeRepo();
     try {
       writeWorkflow(repo.root);
@@ -374,7 +374,7 @@ describe('ciPublish — running it', () => {
       git(repo.root, ['add', 'README.md']);
 
       const plan = buildCiPublishPlan(repo.root, 'enable');
-      assert.strictEqual(runCiPublish(repo.root, plan).ok, true);
+      assert.strictEqual((await runCiPublish(repo.root, plan)).ok, true);
 
       const committed = git(repo.root, ['show', '--name-only', '--pretty=format:', 'HEAD'])
         .split('\n')
@@ -387,7 +387,7 @@ describe('ciPublish — running it', () => {
     }
   });
 
-  it('reports the push when the remote rejects it', () => {
+  it('reports the push when the remote rejects it', async () => {
     const repo = makeRepo();
     try {
       writeWorkflow(repo.root);
@@ -396,7 +396,7 @@ describe('ciPublish — running it', () => {
       // protection rule: both fail at exactly the push step.
       git(repo.root, ['remote', 'set-url', 'origin', path.join(repo.root, 'does-not-exist.git')]);
 
-      const result = runCiPublish(repo.root, plan);
+      const result = await runCiPublish(repo.root, plan);
       assert.strictEqual(result.ok, false);
       assert.strictEqual(result.failedCommand, plan.commands[3]);
       // The commit still exists locally, which is what makes the printed
@@ -407,20 +407,134 @@ describe('ciPublish — running it', () => {
     }
   });
 
-  it('running twice produces two branches rather than a collision', () => {
+  it('running twice produces two branches rather than a collision', async () => {
     const repo = makeRepo();
     try {
       writeWorkflow(repo.root);
       const first = buildCiPublishPlan(repo.root, 'enable');
-      assert.strictEqual(runCiPublish(repo.root, first).ok, true);
+      assert.strictEqual((await runCiPublish(repo.root, first)).ok, true);
 
       writeWorkflow(repo.root, 'name: saropa_lints\n# changed\n');
       const second = buildCiPublishPlan(repo.root, 'enable');
       assert.notStrictEqual(second.branch, first.branch);
-      assert.strictEqual(runCiPublish(repo.root, second).ok, true);
+      assert.strictEqual((await runCiPublish(repo.root, second)).ok, true);
 
       assert.ok(git(repo.remote, ['rev-parse', '--verify', first.branch]));
       assert.ok(git(repo.remote, ['rev-parse', '--verify', second.branch]));
+    } finally {
+      repo.cleanup();
+    }
+  });
+});
+
+describe('ciPublish — retries and refusals', () => {
+  it('a retry after a failed push resumes on the same branch and pushes', async () => {
+    const repo = makeRepo();
+    try {
+      writeWorkflow(repo.root);
+      const plan = buildCiPublishPlan(repo.root, 'enable');
+      git(repo.root, ['remote', 'set-url', 'origin', path.join(repo.root, 'does-not-exist.git')]);
+      const failed = await runCiPublish(repo.root, plan);
+      assert.strictEqual(failed.failedCommand, plan.commands[3]);
+
+      // The user fixes their remote (or credentials) and presses the button
+      // again. The branch exists and the commit is on it; neither may fail.
+      git(repo.root, ['remote', 'set-url', 'origin', repo.remote]);
+      const retried = await runCiPublish(repo.root, plan);
+      assert.strictEqual(retried.ok, true, retried.stderr ?? '');
+      assert.ok(git(repo.remote, ['rev-parse', '--verify', plan.branch]));
+      // One commit, not two.
+      assert.strictEqual(git(repo.root, ['rev-list', '--count', `origin/main..${plan.branch}`]), '1');
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  it('a blocked plan runs nothing', async () => {
+    const repo = makeRepo();
+    try {
+      writeWorkflow(repo.root);
+      const plan = buildCiPublishPlan(repo.root, 'enable', [], 'blocked for a reason');
+      const result = await runCiPublish(repo.root, plan);
+      assert.strictEqual(result.ok, false);
+      assert.strictEqual(result.stderr, 'blocked for a reason');
+      assert.strictEqual(git(repo.root, ['rev-parse', '--abbrev-ref', 'HEAD']), 'main');
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  it('refuses to cut a branch when there is nothing to publish', async () => {
+    const repo = makeRepo();
+    try {
+      writeWorkflow(repo.root);
+      git(repo.root, ['add', '--', CI_WORKFLOW_RELATIVE_PATH]);
+      git(repo.root, ['commit', '-m', 'already there']);
+      const plan = buildCiPublishPlan(repo.root, 'enable');
+      const result = await runCiPublish(repo.root, plan);
+      assert.strictEqual(result.ok, false);
+      assert.strictEqual(git(repo.root, ['rev-parse', '--abbrev-ref', 'HEAD']), 'main');
+      assert.throws(() => git(repo.root, ['rev-parse', '--verify', `refs/heads/${plan.branch}`]));
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  it('will not push onto a same-named branch this clone never fetched', async () => {
+    const repo = makeRepo();
+    try {
+      writeWorkflow(repo.root);
+      const plan = buildCiPublishPlan(repo.root, 'enable');
+      // Someone else's branch of that name, created on the remote after the
+      // plan was built and never fetched here.
+      git(repo.root, ['push', 'origin', `HEAD:refs/heads/${plan.branch}`]);
+      git(repo.root, ['update-ref', '-d', `refs/remotes/origin/${plan.branch}`]);
+
+      const result = await runCiPublish(repo.root, plan);
+      assert.strictEqual(result.ok, false);
+      assert.ok((result.stderr ?? '').includes('already exists on origin'));
+      assert.strictEqual(git(repo.root, ['rev-parse', '--abbrev-ref', 'HEAD']), 'main');
+    } finally {
+      repo.cleanup();
+    }
+  });
+
+  it('reports a file with uncommitted edits, and a clean one', () => {
+    const repo = makeRepo();
+    try {
+      assert.strictEqual(hasUncommittedChanges(repo.root, 'README.md'), false);
+      fs.writeFileSync(path.join(repo.root, 'README.md'), '# edited\n');
+      assert.strictEqual(hasUncommittedChanges(repo.root, 'README.md'), true);
+      fs.writeFileSync(path.join(repo.root, 'new.txt'), 'untracked\n');
+      assert.strictEqual(hasUncommittedChanges(repo.root, 'new.txt'), true);
+    } finally {
+      repo.cleanup();
+    }
+  });
+});
+
+describe('ciPublish — a project below its repository root', () => {
+  it('publishes the workflow at the repository root, from the project folder', async () => {
+    const repo = makeRepo();
+    try {
+      const app = path.join(repo.root, 'app');
+      fs.mkdirSync(app);
+      fs.writeFileSync(path.join(app, 'pubspec.yaml'), 'name: app\n');
+      git(repo.root, ['add', 'app/pubspec.yaml']);
+      git(repo.root, ['commit', '-m', 'app']);
+      git(repo.root, ['push', 'origin', 'main']);
+      writeWorkflow(repo.root);
+
+      const plan = buildCiPublishPlan(app, 'enable');
+      assert.strictEqual(plan.paths[0], `../${CI_WORKFLOW_RELATIVE_PATH}`);
+      assert.ok(plan.commands[1].endsWith(`../${CI_WORKFLOW_RELATIVE_PATH}`));
+
+      const result = await runCiPublish(app, plan);
+      assert.strictEqual(result.ok, true, result.stderr ?? '');
+      const committed = git(repo.root, ['show', '--name-only', '--pretty=format:', 'HEAD'])
+        .split('\n')
+        .filter(Boolean);
+      assert.deepStrictEqual(committed, [CI_WORKFLOW_RELATIVE_PATH]);
     } finally {
       repo.cleanup();
     }
@@ -439,7 +553,7 @@ describe('ciPublish — the panel section', () => {
     slug: { owner: 'saropa', repo: 'saropa_lints' },
     commands: [
       'git checkout -b saropa-lints-ci',
-      `git add ${CI_WORKFLOW_RELATIVE_PATH}`,
+      `git add -- ${CI_WORKFLOW_RELATIVE_PATH}`,
       'git commit -m "ci: run saropa_lints on pull requests"',
       'git push -u origin saropa-lints-ci',
     ],
@@ -473,6 +587,13 @@ describe('ciPublish — the panel section', () => {
     assert.ok(!noRemote.includes('data-action="ciPublish"'));
     // The commands are still there — that path has to carry the whole flow.
     assert.ok(noRemote.includes('data-action="ciCopyCommands"'));
+  });
+
+  it('a blocked plan shows why, keeps the commands, and offers no button', () => {
+    const html = buildCiPublishSection({ ...plan, blockedReason: 'pubspec has <your> edits' });
+    assert.ok(html.includes('pubspec has &lt;your&gt; edits'));
+    assert.ok(!html.includes('data-action="ciPublish"'));
+    assert.ok(html.includes('data-action="ciCopyCommands"'));
   });
 
   it('always offers a way out', () => {

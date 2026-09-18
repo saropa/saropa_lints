@@ -108,7 +108,109 @@ void main() {
     test('unpinned', () {
       expect(buildCiWorkflow(version: 'unknown'), fixture('unpinned.yml'));
     });
+
+    test('project in a subdirectory of its repository', () {
+      expect(
+        buildCiWorkflow(version: '16.3.0', workingDirectory: 'packages/app'),
+        fixture('pinned_subdir.yml'),
+      );
+    });
   });
+
+  group('a project below its repository root', () {
+    late Directory repo;
+    late Directory app;
+
+    setUp(() {
+      repo = Directory.systemTemp.createTempSync('saropa_emit_ci_repo_');
+      Directory('${repo.path}/.git').createSync();
+      app = Directory('${repo.path}/packages/app')..createSync(recursive: true);
+    });
+
+    tearDown(() => safeDeleteDir(repo));
+
+    test('findRepoRoot walks up to the directory holding .git', () {
+      expect(
+        findRepoRoot(app)!.resolveSymbolicLinksSync(),
+        repo.resolveSymbolicLinksSync(),
+      );
+      expect(projectPathInRepo(app), 'packages/app');
+      expect(projectPathInRepo(repo), isNull);
+    });
+
+    test('a .git FILE (worktree, submodule) also marks the root', () {
+      Directory('${repo.path}/.git').deleteSync();
+      File('${repo.path}/.git').writeAsStringSync('gitdir: elsewhere\n');
+      expect(projectPathInRepo(app), 'packages/app');
+    });
+
+    test('the workflow names the project as the working directory', () {
+      File('${app.path}/analysis_options.yaml').writeAsStringSync(
+        'include: package:saropa_lints/tiers/essential.yaml\n',
+      );
+      final outFile = File('${repo.path}/.github/workflows/saropa-lints.yml');
+      expect(
+        emitCiWorkflow(outFile, dryRun: false, projectDir: app),
+        EmitCiResult.written,
+      );
+      expect(
+        outFile.readAsStringSync(),
+        contains('\n          working-directory: packages/app\n'),
+      );
+    });
+  });
+
+  test('an explicit tier is written even for a configured project', () {
+    final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
+    try {
+      File('${dir.path}/analysis_options.yaml').writeAsStringSync(
+        'include: package:saropa_lints/tiers/essential.yaml\n',
+      );
+      final outFile = File('${dir.path}/.github/workflows/saropa-lints.yml');
+      emitCiWorkflow(
+        outFile,
+        dryRun: false,
+        projectDir: dir,
+        tier: 'comprehensive',
+      );
+      expect(outFile.readAsStringSync(), contains('tier: comprehensive'));
+    } finally {
+      safeDeleteDir(dir);
+    }
+  });
+
+  test('a directory at the output path is refused, not written into', () {
+    final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
+    try {
+      final path = '${dir.path}/.github/workflows/saropa-lints.yml';
+      Directory(path).createSync(recursive: true);
+      expect(
+        emitCiWorkflow(File(path), dryRun: false),
+        EmitCiResult.refusedExists,
+      );
+    } finally {
+      safeDeleteDir(dir);
+    }
+  });
+
+  test(
+    'an unwritable location is reported, not thrown',
+    () {
+      final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
+      try {
+        Process.runSync('chmod', ['555', dir.path]);
+        final outFile = File('${dir.path}/.github/workflows/saropa-lints.yml');
+        expect(
+          emitCiWorkflow(outFile, dryRun: false),
+          EmitCiResult.writeFailed,
+        );
+      } finally {
+        Process.runSync('chmod', ['755', dir.path]);
+        safeDeleteDir(dir);
+      }
+    },
+    skip: Platform.isWindows ? 'chmod is POSIX-only' : false,
+  );
 
   test('buildCiWorkflow emits a tier only when asked for one', () {
     // A project that configures saropa_lints gets no tier: naming one here

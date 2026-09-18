@@ -707,11 +707,14 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
         head_sha = head_result.stdout.strip()
 
         if remote_sha == head_sha:
-            # Tag already points to the right commit — nothing to do.
+            # Tag already points to the right commit. Still move the major
+            # tag: this is the re-run path after a release whose first run
+            # died after the exact-tag push, and the major tag's push only
+            # warns on failure, so a re-run is the only way to repair it.
             print_info(
                 f"Tag {tag_name} already on remote at HEAD."
             )
-            return True
+            return _move_major_version_tag(project_dir, version)
 
         # Tag points to a stale commit (e.g. failed CI after a fix).
         # Destructive: ask the user before moving.
@@ -802,6 +805,12 @@ def _move_major_version_tag(project_dir: Path, version: str) -> bool:
     tag is a papercut for action consumers, not a broken release, and aborting
     would leave the release half-done for a worse reason than it fixes.
     """
+    # A pre-release is not "the latest 16.x" that `@v16` promises; moving the
+    # tag to one would put every consumer of `@v16` on a beta.
+    if is_prerelease_version(version):
+        print_info(f"{version} is a pre-release; leaving the major tag alone.")
+        return True
+
     major = version.split(".")[0]
     if not major.isdigit():
         print_warning(
@@ -814,9 +823,12 @@ def _move_major_version_tag(project_dir: Path, version: str) -> bool:
     use_shell = get_shell_mode()
     print_info(f"Moving {major_tag} to this release (Actions consumers use it).")
 
-    # -f locally and --force on push: this tag is meant to move.
+    # -f locally and --force on push: this tag is meant to move. Target the
+    # exact release tag's commit, not HEAD: they differ when the exact tag
+    # already existed locally at another commit (create_git_tag only warns).
     result = subprocess.run(
-        ["git", "tag", "-f", major_tag, "-m", f"Latest {major_tag}.x release"],
+        ["git", "tag", "-f", major_tag, "-m", f"Latest {major_tag}.x release",
+         f"v{version}^{{commit}}"],
         cwd=project_dir,
         capture_output=True, text=True, shell=use_shell,
     )

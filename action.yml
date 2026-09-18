@@ -256,6 +256,20 @@ runs:
           fail "these inputs only apply to command 'audit':$audit_only (resolved command: scan)."
         fi
 
+        case "$RESOLVE" in
+          true|false) ;;
+          *) fail "resolve must be true or false (got '$RESOLVE')." ;;
+        esac
+
+        # A count is a tolerance on a threshold. Without the threshold it has
+        # nothing to count, so it would be silently ignored.
+        if [ -n "$FAIL_ON_COUNT" ] && [ -z "$FAIL_ON" ]; then
+          fail "fail-on-count needs fail-on (the severity whose findings it counts)."
+        fi
+        if [ -n "$FAIL_ON_IMPACT_COUNT" ] && [ -z "$FAIL_ON_IMPACT" ]; then
+          fail "fail-on-impact-count needs fail-on-impact (the impact whose findings it counts)."
+        fi
+
         if [ -n "$TIER" ]; then
           case "$TIER" in
             essential|recommended|professional|comprehensive|pedantic) ;;
@@ -353,20 +367,55 @@ runs:
         set -euo pipefail
         cd "$WORKING_DIRECTORY"
 
-        if git rev-parse --verify --quiet "$SINCE" >/dev/null; then
+        # `^{commit}` so a full SHA counts as present only when the commit is
+        # actually in the object store; a bare 40-hex string always "verifies".
+        if git rev-parse --verify --quiet "$SINCE^{commit}" >/dev/null; then
           echo "Ref '$SINCE' already present."
           exit 0
         fi
 
-        # Strip a leading remote name so 'origin/main' fetches 'main'.
-        branch="${SINCE#origin/}"
-        echo "Ref '$SINCE' missing; fetching '$branch' from origin."
-        # Explicit refspec: actions/checkout configures a single-branch fetch
-        # refspec, under which a bare `git fetch origin <branch>` updates
-        # FETCH_HEAD without creating refs/remotes/origin/<branch> — leaving
-        # `--since origin/<branch>` still unresolvable.
-        if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" --depth=1; then
-          echo "::warning::Could not fetch '$branch' from origin."
+        case "$SINCE" in
+          *[!0-9a-f]*) is_sha=false ;;
+          *) [ "${#SINCE}" -eq 40 ] && is_sha=true || is_sha=false ;;
+        esac
+
+        if [ "$is_sha" = true ]; then
+          # e.g. github.event.pull_request.base.sha. GitHub serves reachable
+          # commits by SHA, so fetch the one commit rather than a branch.
+          echo "Commit '$SINCE' missing; fetching it from origin."
+          if ! git fetch --depth=1 origin "$SINCE"; then
+            echo "::warning::Could not fetch commit '$SINCE' from origin."
+          fi
+        else
+          # 'origin/main' fetches 'main'. A prefix naming another configured
+          # remote is refused: only origin is fetched, and treating
+          # 'upstream/main' as a branch called 'upstream/main' would fail
+          # with a misleading message. Anything else is a branch name, which
+          # may itself contain slashes ('release/1.0').
+          first="${SINCE%%/*}"
+          if [ "$first" = origin ] && [ "$first" != "$SINCE" ]; then
+            branch="${SINCE#origin/}"
+          elif [ "$first" != "$SINCE" ] && git remote | grep -qxF "$first"; then
+            echo "::error::'$SINCE' is on remote '$first'; only origin is fetched. Use origin/<branch> or a commit SHA."
+            exit 1
+          else
+            branch="$SINCE"
+          fi
+          echo "Ref '$SINCE' missing; fetching '$branch' from origin."
+          # Explicit refspec: actions/checkout configures a single-branch fetch
+          # refspec, under which a bare `git fetch origin <branch>` updates
+          # FETCH_HEAD without creating refs/remotes/origin/<branch> — leaving
+          # `--since origin/<branch>` still unresolvable.
+          if ! git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" --depth=1; then
+            echo "::warning::Could not fetch '$branch' from origin."
+          fi
+          # A bare branch name ('main') resolves only as a local branch, which
+          # a CI checkout does not have. Create it from what was just fetched.
+          if [ "$branch" = "$SINCE" ] \
+            && ! git rev-parse --verify --quiet "$SINCE^{commit}" >/dev/null \
+            && git rev-parse --verify --quiet "refs/remotes/origin/$branch" >/dev/null; then
+            git branch "$branch" "refs/remotes/origin/$branch"
+          fi
         fi
 
         # Not a warning: an unresolvable ref is NOT a fallback to a full scan.
@@ -374,7 +423,7 @@ runs:
         # an empty list for an unknown revision, so the audit would report
         # zero findings over zero files and exit 0 — a green job that audited
         # nothing, which is the exact failure this action exists to rule out.
-        if ! git rev-parse --verify --quiet "$SINCE" >/dev/null; then
+        if ! git rev-parse --verify --quiet "$SINCE^{commit}" >/dev/null; then
           echo "::error::'$SINCE' does not resolve even after fetching, so --since would audit no files at all."
           echo "::error::Fetch it first (actions/checkout with fetch-depth: 0), or drop the 'since' input to audit the whole project."
           exit 1
@@ -462,6 +511,11 @@ runs:
         fi
 
         if [ "$want_sarif" = true ]; then
+          # A SARIF left by an earlier run in this job would otherwise be
+          # counted and uploaded as this run's results if the CLI exits
+          # before writing. And the CLI does not create missing directories.
+          rm -f "$SARIF_FILE"
+          mkdir -p "$(dirname "$SARIF_FILE")"
           # --quiet only here: in gate mode the native report goes to stdout and
           # is the only record of what failed, so keep it human-readable.
           args+=(--format sarif --output "$SARIF_FILE" --quiet)
@@ -477,23 +531,38 @@ runs:
         # (lib/src/scan/scan_cli_args.dart). Handing scan a comma-joined
         # string makes it one literal glob containing commas, which matches
         # nothing and reports no error — so translate rather than pass through.
+        #
+        # Each pattern is also trimmed. Neither CLI trims, so the natural
+        # 'lib/gen/**, test/**' would otherwise pass ' test/**', a pattern
+        # with a leading space that matches nothing.
         append_globs() {
           local flag="$1" value="$2"
           [ -z "$value" ] && return 0
-          if [ "$cmd" = audit ]; then
-            args+=("$flag" "$value")
-          else
-            args+=("$flag")
-            # `read -ra`, not unquoted word splitting: an unquoted $value
-            # undergoes pathname expansion as well as splitting, so a pattern
-            # like 'vendor/*' would be replaced by whatever files happen to
-            # match in the working directory before scan ever sees it.
-            local -a patterns
-            IFS=',' read -ra patterns <<< "$value"
-            local pattern
-            for pattern in "${patterns[@]}"; do
-              [ -n "$pattern" ] && args+=("$pattern")
+          # `read -ra`, not unquoted word splitting: an unquoted $value
+          # undergoes pathname expansion as well as splitting, so a pattern
+          # like 'vendor/*' would be replaced by whatever files happen to
+          # match in the working directory before the CLI ever sees it.
+          local -a raw patterns
+          local pattern
+          # A multi-line YAML value (`exclude-globs: |`) separates patterns
+          # with newlines, and `read` would stop at the first one.
+          value="${value//$'\n'/,}"
+          IFS=',' read -ra raw <<< "$value"
+          patterns=()
+          # Length guards, because bash 3.2 (macOS runners) treats an empty
+          # array as unbound under `set -u`.
+          if [ "${#raw[@]}" -gt 0 ]; then
+            for pattern in "${raw[@]}"; do
+              pattern="${pattern#"${pattern%%[![:space:]]*}"}"
+              pattern="${pattern%"${pattern##*[![:space:]]}"}"
+              [ -n "$pattern" ] && patterns+=("$pattern")
             done
+          fi
+          [ "${#patterns[@]}" -eq 0 ] && return 0
+          if [ "$cmd" = audit ]; then
+            args+=("$flag" "$(IFS=','; printf '%s' "${patterns[*]}")")
+          else
+            args+=("$flag" "${patterns[@]}")
           fi
         }
         append_globs --exclude-globs "$EXCLUDE_GLOBS"
@@ -532,7 +601,12 @@ runs:
         # Count findings from the SARIF results array when we produced one.
         findings=''
         if [ "$want_sarif" = true ] && [ -f "$SARIF_FILE" ]; then
-          echo "sarif-file=$WORKING_DIRECTORY/$SARIF_FILE" >> "$GITHUB_OUTPUT"
+          # --output is relative to the working directory, but an absolute
+          # sarif-file must not be prefixed with it.
+          case "$SARIF_FILE" in
+            /*) echo "sarif-file=$SARIF_FILE" >> "$GITHUB_OUTPUT" ;;
+            *) echo "sarif-file=$WORKING_DIRECTORY/$SARIF_FILE" >> "$GITHUB_OUTPUT" ;;
+          esac
           if command -v jq >/dev/null 2>&1; then
             findings=$(jq '[.runs[].results[]] | length' "$SARIF_FILE" 2>/dev/null || echo '')
           fi

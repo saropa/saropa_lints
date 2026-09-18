@@ -2268,7 +2268,8 @@
         "openCompare": "Open compare page",
         "created": "Pull request opened for {branch}.",
         "openPr": "Open pull request",
-        "notARepository": "{path} was written, but this folder is not a git repository, so there is nothing to publish to."
+        "notARepository": "{path} was written, but this folder is not a git repository, so there is nothing to publish to.",
+        "pubspecHasOtherEdits": "pubspec.yaml already had uncommitted edits of yours. A commit takes whole files, so publishing from here would push those edits too. Commit or stash them, then run the commands above yourself."
       }
     }
   },
