@@ -169,6 +169,7 @@ import { registerMachineDashboardCommands } from './systemHealth/machineDashboar
 import { querySystemMemory } from './systemHealth/systemQuery';
 import { auditWatcherExcludes } from './systemHealth/watcherExcludeAudit';
 import { auditNestedPackageRoots } from './systemHealth/nestedRootsAudit';
+import { auditHeapCap } from './systemHealth/heapCapAudit';
 import { scanWorkspaceForHazards } from './systemHealth/workspaceHazardScan';
 import { gatherReadiness, readinessStatusBarText, showWorkspaceReadiness, ReadinessLevel } from './systemHealth/workspaceReadiness';
 import { HealthLevel } from './systemHealth/types';
@@ -1699,6 +1700,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       updateMemoryStatusBar();
     });
   }, 20_000);
+  // One-shot audit of the Dart analysis server's VM heap cap — warns when
+  // there's no ceiling at all, or when a stale/copied cap now exceeds half
+  // this machine's RAM (see heapCapAudit.ts). Dart-only and deferred past
+  // every other startup check (25 s) since it's informational, not urgent.
+  if (isDartProject) {
+    setTimeout(() => void auditHeapCap(context), 25_000);
+  }
   // Heap-cap and Ollama-unload actions the Machine Health dashboard's
   // Recommendations panel dispatches by command name (see machineDashboard.ts's
   // handleMessage) — registered independently of the panel so they also work

@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "May {totalGb} memory ang iyong makina. Walang naka-set na limitasyon sa memorya ang Dart analysis server, kaya maaari itong lumaki hanggang bumagal ang makina o mag-swap. Inirerekomendang limitasyon: {recommendedGb}.",
+      "tooHighMessage": "May {totalGb} memory ang iyong makina. Pinapayagan ang Dart analysis server na gumamit ng hanggang {capGb} (naka-set sa {location}), na nag-iiwan ng humigit-kumulang {freeGb} para sa OS, VS Code, at iba pang Dart tools, kaya maaaring bumagal o mag-swap ang makina. Inirerekomendang limitasyon: {recommendedGb}.",
+      "locationGlobal": "iyong user settings",
+      "locationWorkspace": "settings ng workspace na ito",
+      "locationWorkspaceFolder": "settings ng workspace folder na ito",
+      "apply": "I-apply ang {gb}",
+      "notNow": "Hindi ngayon",
+      "dontAskAgain": "Huwag nang itanong ulit"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Makina ng Pagsasalin (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Ang heap cap ng analysis server ({capMb} MB) ay nag-iiwan ng mas mababa sa kalahati ng RAM ng makinang ito para sa iba pang bagay. Inirerekomendang limitasyon: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Walang naka-configure na limitasyon sa memorya para sa Dart analysis server. Inirerekomendang limitasyon para sa makinang ito: {mb} MB.",
       "systemLowMemory": "Nagbibigay lamang ng {free} ng {total} RAM ang libreng machine-wide. I-close ang mga aplikasyon na hindi ginagamit o VS Code windows.",
       "orphansFound": "{count} proseso na walang inaasahang mga anak ay umuunlad {size} ng memorya mula sa isang mas mabibigat na sesyon.",
       "analysisServerLarge": "{count} Dart analysis server process(es) ay gumagamit ng hanggang {size}. Ang pag-restart ay nagrerelease ng memorya.",
@@ -888,6 +900,7 @@
       "unloadModel": "Magdiskarga"
     },
     "heapCap": {
+      "promptWithRecommendation": "Heap cap ng analysis server sa MB. Inirerekomenda para sa {totalGb} ng makinang ito: {recommendedMb} MB.",
       "prompt": "Sukat ng heap ng server ng analisis sa MB (hal. 4096)",
       "invalid": "I-input ang isang buong bilang ng megabytes na mas malaki kaysa 0.",
       "applied": "Set ang heap cap ng analysis server sa {mb} MB. I-restart ang analysis server para makatulong ito.",

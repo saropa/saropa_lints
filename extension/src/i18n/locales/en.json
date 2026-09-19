@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Your machine has {totalGb} of memory. The Dart analysis server has no memory ceiling, so it can grow until the machine slows down or starts swapping. Recommended cap: {recommendedGb}.",
+      "tooHighMessage": "Your machine has {totalGb} of memory. The Dart analysis server is allowed to use up to {capGb} (set in {location}), which leaves about {freeGb} for the OS, VS Code and other Dart tools, so the machine may slow down or swap. Recommended cap: {recommendedGb}.",
+      "locationGlobal": "your user settings",
+      "locationWorkspace": "this workspace's settings",
+      "locationWorkspaceFolder": "this workspace folder's settings",
+      "apply": "Apply {gb}",
+      "notNow": "Not now",
+      "dontAskAgain": "Don't ask again"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Translation Engine (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "The analysis server's heap cap ({capMb} MB) leaves less than half this machine's RAM for everything else. Recommended cap: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "The Dart analysis server has no memory ceiling configured. Recommended cap for this machine: {mb} MB.",
       "systemLowMemory": "Only {free} of {total} RAM is free machine-wide. Close unused applications or VS Code windows.",
       "orphansFound": "{count} orphaned process(es) are holding {size} of memory from an earlier session.",
       "analysisServerLarge": "{count} Dart analysis server process(es) are using up to {size}. A restart releases the memory.",
@@ -888,6 +900,7 @@
       "unloadModel": "Unload"
     },
     "heapCap": {
+      "promptWithRecommendation": "Analysis server heap cap in MB. Recommended for this machine's {totalGb}: {recommendedMb} MB.",
       "prompt": "Analysis server heap cap in MB (e.g. 4096)",
       "invalid": "Enter a whole number of megabytes greater than 0.",
       "applied": "Set analysis server heap cap to {mb} MB. Restart the analysis server for it to take effect.",

@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Kompyuta yako ina {totalGb} ya kumbukumbu. Seva ya uchambuzi ya Dart haina kikomo cha kumbukumbu kilichowekwa, hivyo inaweza kuendelea kukua hadi kompyuta ipunguze mwendo au ianze kubadilishana (swap). Kikomo kinachopendekezwa: {recommendedGb}.",
+      "tooHighMessage": "Kompyuta yako ina {totalGb} ya kumbukumbu. Seva ya uchambuzi ya Dart inaruhusiwa kutumia hadi {capGb} (imewekwa katika {location}), ikibakisha takriban {freeGb} kwa ajili ya OS, VS Code, na zana nyingine za Dart, hivyo kompyuta inaweza kupunguza mwendo au kubadilishana. Kikomo kinachopendekezwa: {recommendedGb}.",
+      "locationGlobal": "mipangilio yako ya mtumiaji",
+      "locationWorkspace": "mipangilio ya nafasi hii ya kazi",
+      "locationWorkspaceFolder": "mipangilio ya folda hii ya nafasi ya kazi",
+      "apply": "Tumia {gb}",
+      "notNow": "Si sasa",
+      "dontAskAgain": "Usiulize tena"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Mwongozo wa Kifungu (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Kikomo cha heap cha seva ya uchambuzi ({capMb} MB) kinabakisha chini ya nusu ya RAM ya kompyuta hii kwa kila kitu kingine. Kikomo kinachopendekezwa: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Hakuna kikomo cha kumbukumbu kilichowekwa kwa seva ya uchambuzi ya Dart. Kikomo kinachopendekezwa kwa kompyuta hii: {mb} MB.",
       "systemLowMemory": "Kati ya {free} ya {total} RAM ina kufika kwa mlangoni. Tumia kuzalisha programu ambayo inaweza kushuka au VS Code windows.",
       "orphansFound": "{count} mchakato mwingi (m) wanaongeza {size} ya memory kutoka kwa muda mwa session ya kiliopita.",
       "analysisServerLarge": "Mipaka ya server ya analysis ya {count} Dart inapakia kwa kutoa kwa {size}. Kukurusha kusababisha kutoa kwa memory.",
@@ -888,6 +900,7 @@
       "unloadModel": "Ondoa"
     },
     "heapCap": {
+      "promptWithRecommendation": "Kikomo cha heap cha seva ya uchambuzi katika MB. Kinachopendekezwa kwa {totalGb} ya kompyuta hii: {recommendedMb} MB.",
       "prompt": "Kapu ya heap ya server ya analysis (mbadala ya 4096)",
       "invalid": "Tuma namba ya kipindani ya megabytes ya kati ya 0.",
       "applied": "Tuma kipengele cha heap ya server ya analysis kwenye {mb} MB. Tumia server ya analysis yenye kipengele kwa kufanya kutoa.",

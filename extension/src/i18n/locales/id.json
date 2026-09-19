@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Mesin Anda memiliki {totalGb} memori. Server analisis Dart tidak memiliki batas memori yang dikonfigurasi, sehingga dapat terus tumbuh hingga mesin melambat atau mulai melakukan swap. Batas yang disarankan: {recommendedGb}.",
+      "tooHighMessage": "Mesin Anda memiliki {totalGb} memori. Server analisis Dart diizinkan menggunakan hingga {capGb} (diatur di {location}), sehingga hanya menyisakan sekitar {freeGb} untuk OS, VS Code, dan alat Dart lainnya, sehingga mesin dapat melambat atau melakukan swap. Batas yang disarankan: {recommendedGb}.",
+      "locationGlobal": "pengaturan pengguna Anda",
+      "locationWorkspace": "pengaturan ruang kerja ini",
+      "locationWorkspaceFolder": "pengaturan folder ruang kerja ini",
+      "apply": "Terapkan {gb}",
+      "notNow": "Nanti saja",
+      "dontAskAgain": "Jangan tanya lagi"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Mesin Terjemah (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Batas heap server analisis ({capMb} MB) hanya menyisakan kurang dari setengah RAM mesin ini untuk hal lainnya. Batas yang disarankan: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Tidak ada batas memori yang dikonfigurasi untuk server analisis Dart. Batas yang disarankan untuk mesin ini: {mb} MB.",
       "systemLowMemory": "Hanya {free} dari {total} RAM yang bebas secara global. Tutup aplikasi yang tidak digunakan atau VS Code jendela.",
       "orphansFound": "Proses {count} yang terlantar sedang menggunakan {size} dari memori dari sesi sebelumnya.",
       "analysisServerLarge": "Proses analisis server {count} Dart menggunakan hingga {size}. Restart melepaskan memori.",
@@ -888,6 +900,7 @@
       "unloadModel": "Uninstall"
     },
     "heapCap": {
+      "promptWithRecommendation": "Batas heap server analisis dalam MB. Disarankan untuk {totalGb} mesin ini: {recommendedMb} MB.",
       "prompt": "Kapasitas heap server analisis dalam MB (misalnya 4096)",
       "invalid": "Masukkan bilangan bulat dalam megabyte yang lebih besar dari 0.",
       "applied": "Atur batas memori heap server analisis ke {mb} MB. Restart server analisis untuk membuatnya berlaku.",

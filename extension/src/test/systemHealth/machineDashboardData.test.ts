@@ -177,6 +177,55 @@ describe('buildRecommendations', () => {
     assert.strictEqual(withCap.some((r) => r.id === 'noHeapCap'), false);
   });
 
+  it('includes the RAM-based recommended MB in noHeapCap once system memory is known', () => {
+    const groups = groupDartProcesses(
+      [dartProcess({ workingSetSize: 1 * GB, commandLine: 'dart language-server --protocol=lsp' })],
+      new Set(),
+    );
+    const recs = buildRecommendations(
+      baseRecommendationInput({
+        groups,
+        analyzerVmArgs: [],
+        system: { totalBytes: 8 * GB, freeBytes: 4 * GB, freeFraction: 0.5 },
+      }),
+    );
+    const rec = recs.find((r) => r.id === 'noHeapCap');
+    // 40% of 8 GB rounded down to a 512 MB multiple = 3072.
+    assert.ok(rec?.text.includes('3072'));
+  });
+
+  it('flags heapCapTooHigh when the configured cap exceeds half this machine\'s RAM', () => {
+    const groups = groupDartProcesses(
+      [dartProcess({ workingSetSize: 1 * GB, commandLine: 'dart language-server --protocol=lsp' })],
+      new Set(),
+    );
+    // The 2026-09 incident: an 8 GB machine with a 6144 MB (6 GB) cap.
+    const recs = buildRecommendations(
+      baseRecommendationInput({
+        groups,
+        analyzerVmArgs: ['--old_gen_heap_size=6144'],
+        system: { totalBytes: 8 * GB, freeBytes: 1 * GB, freeFraction: 0.125 },
+      }),
+    );
+    assert.strictEqual(recs.some((r) => r.id === 'heapCapTooHigh'), true);
+    assert.strictEqual(recs.some((r) => r.id === 'noHeapCap'), false);
+  });
+
+  it('does not flag heapCapTooHigh when the configured cap leaves at least half the RAM free', () => {
+    const groups = groupDartProcesses(
+      [dartProcess({ workingSetSize: 1 * GB, commandLine: 'dart language-server --protocol=lsp' })],
+      new Set(),
+    );
+    const recs = buildRecommendations(
+      baseRecommendationInput({
+        groups,
+        analyzerVmArgs: ['--old_gen_heap_size=3072'],
+        system: { totalBytes: 8 * GB, freeBytes: 4 * GB, freeFraction: 0.5 },
+      }),
+    );
+    assert.strictEqual(recs.some((r) => r.id === 'heapCapTooHigh'), false);
+  });
+
   it('emits one modelLoaded recommendation per model with its name as actionArgs', () => {
     const recs = buildRecommendations(
       baseRecommendationInput({

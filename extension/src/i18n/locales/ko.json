@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "이 컴퓨터에는 {totalGb}의 메모리가 있습니다. Dart 분석 서버에 메모리 상한이 설정되어 있지 않아 컴퓨터가 느려지거나 스와핑을 시작할 때까지 계속 커질 수 있습니다. 권장 상한: {recommendedGb}.",
+      "tooHighMessage": "이 컴퓨터에는 {totalGb}의 메모리가 있습니다. Dart 분석 서버는 최대 {capGb}까지 사용하도록 허용되어 있으며({location}에서 설정됨), OS, VS Code 및 기타 Dart 도구를 위해 약 {freeGb}만 남게 되어 컴퓨터가 느려지거나 스와핑될 수 있습니다. 권장 상한: {recommendedGb}.",
+      "locationGlobal": "사용자 설정",
+      "locationWorkspace": "이 작업 영역 설정",
+      "locationWorkspaceFolder": "이 작업 영역 폴더 설정",
+      "apply": "{gb} 적용",
+      "notNow": "나중에",
+      "dontAskAgain": "다시 묻지 않기"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "번역 엔진 (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "분석 서버의 힙 상한({capMb} MB)은 이 컴퓨터의 RAM 중 절반도 안 되는 양을 다른 용도로 남깁니다. 권장 상한: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Dart 분석 서버에 메모리 상한이 구성되어 있지 않습니다. 이 컴퓨터의 권장 상한: {mb} MB.",
       "systemLowMemory": "{free} 중 {total} RAM이 전체적으로 사용 가능합니다. 사용하지 않는 애플리케이션을 닫거나 VS Code 창을 닫아주세요.",
       "orphansFound": "{count} 버려진 프로세스(들)가 이전 세션에서 {size}의 메모리를 차지하고 있습니다.",
       "analysisServerLarge": "{count} Dart 분석 서버 프로세스(들)는 {size}까지 사용 중입니다. 재시작은 메모리를 해제합니다.",
@@ -888,6 +900,7 @@
       "unloadModel": "언로드"
     },
     "heapCap": {
+      "promptWithRecommendation": "분석 서버 힙 상한(MB). 이 컴퓨터의 {totalGb}에 대한 권장값: {recommendedMb} MB.",
       "prompt": "분석 서버 힙 제한 (MB, 예: 4096)",
       "invalid": "0보다 큰 정수 메가바이트를 입력하세요.",
       "applied": "분석 서버 힙 크기 제한을 {mb} MB로 설정합니다. 분석 서버를 다시 시작해야 적용됩니다.",

@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Twój komputer ma {totalGb} pamięci. Serwer analizy Dart nie ma skonfigurowanego limitu pamięci, więc może rosnąć, dopóki komputer nie zwolni lub nie zacznie używać swapu. Zalecany limit: {recommendedGb}.",
+      "tooHighMessage": "Twój komputer ma {totalGb} pamięci. Serwer analizy Dart może używać do {capGb} (ustawione w {location}), co pozostawia około {freeGb} dla systemu operacyjnego, VS Code i innych narzędzi Dart, więc komputer może zwolnić lub użyć swapu. Zalecany limit: {recommendedGb}.",
+      "locationGlobal": "Twoich ustawieniach użytkownika",
+      "locationWorkspace": "ustawieniach tego obszaru roboczego",
+      "locationWorkspaceFolder": "ustawieniach tego folderu obszaru roboczego",
+      "apply": "Zastosuj {gb}",
+      "notNow": "Nie teraz",
+      "dontAskAgain": "Nie pytaj ponownie"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Silne Reguły:\n1. Zwróć TYLKO przetłumaczony tekst wyjściowy.\n2. NIE wkluczaj wyjaśnień, wstępu, notacji markdown lub cudzysłowów otaczających.\n3. Tekst może zawierać tokeny placeholder: tokeny placeholder. Skopiuj każdy z nich do tłumaczenia IDEALNIE jak napisany, w poprawnej gramatycznej pozycji. Nigdy nie tłumacza, usuwaj ani zmienia format tokena.\n4. Wyjście MUSI używać poprawnego systemu pisowni dla języka docelowego; nie przełączaj się na inny język w środku zdania.\n\nTekst: Silnik Tłumaczenia (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Limit sterty serwera analizy ({capMb} MB) pozostawia mniej niż połowę pamięci RAM tego komputera na wszystko inne. Zalecany limit: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Nie skonfigurowano limitu pamięci dla serwera analizy Dart. Zalecany limit dla tego komputera: {mb} MB.",
       "systemLowMemory": "Tylko {free} z {total} RAM jest wolne w całym systemie. Zamknij niepotrzebne aplikacje lub VS Code okna.",
       "orphansFound": "{count} procesy (procesów) niezwiązane są trzymanie {size} pamięci z wcześniejszej sesji.",
       "analysisServerLarge": "Proces(y) serwera analizy {count} Dart zużywa(a) do {size}. Uruchomienie ponowne zwolni pamięć.",
@@ -888,6 +900,7 @@
       "unloadModel": "Odczekiwanie"
     },
     "heapCap": {
+      "promptWithRecommendation": "Limit sterty serwera analizy w MB. Zalecany dla {totalGb} pamięci tego komputera: {recommendedMb} MB.",
       "prompt": "Limit stogu pamięci serwera analizy w MB (np. 4096)",
       "invalid": "Wprowadź całkowitą liczbę megabajtów większą niż 0.",
       "applied": "Ustaw limit stosu serwera analizy na {mb} MB. Uruchom ponownie serwer analizy, aby zmiana weszła w życie.",

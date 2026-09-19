@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "O seu computador tem {totalGb} de memória. O servidor de análise Dart não tem um limite de memória configurado, portanto pode crescer até que o computador fique lento ou comece a usar swap. Limite recomendado: {recommendedGb}.",
+      "tooHighMessage": "O seu computador tem {totalGb} de memória. O servidor de análise Dart pode usar até {capGb} (definido em {location}), deixando cerca de {freeGb} para o sistema operativo, o VS Code e outras ferramentas Dart, portanto o computador pode ficar lento ou usar swap. Limite recomendado: {recommendedGb}.",
+      "locationGlobal": "as suas definições de utilizador",
+      "locationWorkspace": "as definições deste espaço de trabalho",
+      "locationWorkspaceFolder": "as definições desta pasta do espaço de trabalho",
+      "apply": "Aplicar {gb}",
+      "notNow": "Agora não",
+      "dontAskAgain": "Não perguntar novamente"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Tradutor de Código (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "O limite de heap do servidor de análise ({capMb} MB) deixa menos de metade da RAM deste computador para tudo o resto. Limite recomendado: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Não há limite de memória configurado para o servidor de análise Dart. Limite recomendado para este computador: {mb} MB.",
       "systemLowMemory": "Apenas {free} de {total} RAM está livre em toda a máquina. Feche aplicações não utilizadas ou VS Code janelas.",
       "orphansFound": "Processos {count} orfãos estão retendo {size} de memória de uma sessão anterior.",
       "analysisServerLarge": "Processos do servidor de análise {count} Dart estão utilizando até {size}. Um reinício libera a memória.",
@@ -888,6 +900,7 @@
       "unloadModel": "Desinstalar"
     },
     "heapCap": {
+      "promptWithRecommendation": "Limite de heap do servidor de análise em MB. Recomendado para os {totalGb} deste computador: {recommendedMb} MB.",
       "prompt": "Limite de memória do servidor de análise em MB (ex.: 4096)",
       "invalid": "Insira um número inteiro de megabytes maior que 0.",
       "applied": "Defina o limite de memória do servidor de análise para {mb} MB. Reinicie o servidor de análise para que as alterações surtam efeito.",

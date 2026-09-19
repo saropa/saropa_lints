@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "آپ کی مشین میں {totalGb} میموری ہے۔ Dart تجزیاتی سرور کے لیے کوئی میموری کی حد مقرر نہیں ہے، اس لیے یہ اس وقت تک بڑھ سکتا ہے جب تک مشین سست نہ ہو جائے یا سویپنگ شروع نہ کر دے۔ تجویز کردہ حد: {recommendedGb}۔",
+      "tooHighMessage": "آپ کی مشین میں {totalGb} میموری ہے۔ Dart تجزیاتی سرور کو {capGb} تک استعمال کرنے کی اجازت ہے ({location} میں مقرر کردہ)، جو OS، VS Code اور دیگر Dart ٹولز کے لیے تقریباً {freeGb} چھوڑتا ہے، اس لیے مشین سست ہو سکتی ہے یا سویپ کر سکتی ہے۔ تجویز کردہ حد: {recommendedGb}۔",
+      "locationGlobal": "آپ کی صارف کی ترتیبات",
+      "locationWorkspace": "اس ورک اسپیس کی ترتیبات",
+      "locationWorkspaceFolder": "اس ورک اسپیس فولڈر کی ترتیبات",
+      "apply": "{gb} لاگو کریں",
+      "notNow": "ابھی نہیں",
+      "dontAskAgain": "دوبارہ نہ پوچھیں"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "ترجمہ ہند (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "تجزیاتی سرور کی heap حد ({capMb} MB) اس مشین کی آدھی سے بھی کم RAM باقی سب کچھ کے لیے چھوڑتی ہے۔ تجویز کردہ حد: {recommendedMb} MB۔",
+      "noHeapCapWithSuggestion": "Dart تجزیاتی سرور کے لیے کوئی میموری حد مقرر نہیں ہے۔ اس مشین کے لیے تجویز کردہ حد: {mb} MB۔",
       "systemLowMemory": "صرف {free} ہے {total} RAM میں فری ماشین وسیع ہے۔ غیر استعمال کی ہوئی ایپلیکیشنز یا VS Code ونڈوز بند کریں۔",
       "orphansFound": "{count} اکثریت کے بے گھر پروسس(س) پہلے سیشن سے {size} یادگیری کے ذریعے ہیں۔",
       "analysisServerLarge": "{count} Dart تجزیہ سرور عمل (es) {size} تک استعمال کر رہے ہیں۔ دوبارہ اسٹارٹ میموری کو جاری کرتا ہے۔",
@@ -888,6 +900,7 @@
       "unloadModel": "نکال کرے"
     },
     "heapCap": {
+      "promptWithRecommendation": "تجزیاتی سرور کی heap حد MB میں۔ اس مشین کے {totalGb} کے لیے تجویز کردہ: {recommendedMb} MB۔",
       "prompt": "تحلیل سرور ہیپ کی کپ کی سیم (مثلاً 4096)",
       "invalid": "0 سے بڑا ایک ہیلیو بائٹ کی ہول نمبر دیں",
       "applied": "ایکسیلیزیشن سرور کی ہیپ کی کپ کو {mb} MB تک رکھیں۔ اس کا عمل ہونے کے لیے ایکسیلیزیشن سرور کو دوبارہ شروع کریں۔",

@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Je computer heeft {totalGb} geheugen. Voor de Dart-analyseserver is geen geheugengrens ingesteld, waardoor deze kan blijven groeien totdat de computer trager wordt of gaat swappen. Aanbevolen limiet: {recommendedGb}.",
+      "tooHighMessage": "Je computer heeft {totalGb} geheugen. De Dart-analyseserver mag tot {capGb} gebruiken (ingesteld in {location}), waardoor er nog ongeveer {freeGb} overblijft voor het besturingssysteem, VS Code en andere Dart-tools, waardoor de computer trager kan worden of kan gaan swappen. Aanbevolen limiet: {recommendedGb}.",
+      "locationGlobal": "je gebruikersinstellingen",
+      "locationWorkspace": "de instellingen van deze werkruimte",
+      "locationWorkspaceFolder": "de instellingen van deze werkruimtemap",
+      "apply": "{gb} toepassen",
+      "notNow": "Niet nu",
+      "dontAskAgain": "Niet meer vragen"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Vertaalingsmotor (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "De heap-limiet van de analyseserver ({capMb} MB) laat minder dan de helft van het RAM van deze computer over voor al het andere. Aanbevolen limiet: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Er is geen geheugengrens geconfigureerd voor de Dart-analyseserver. Aanbevolen limiet voor deze computer: {mb} MB.",
       "systemLowMemory": "Alleen {free} van {total} RAM is vrij machine-wide. Sluit ongebruikte applicaties of VS Code vensters.",
       "orphansFound": "{count} orphaneerd proces(en) houden {size} van geheugen in beschikking van een vroeger sessie.",
       "analysisServerLarge": "{count} Dart analyseer server proces(en) gebruiken totaal van {size}. Een herstart bevrijdt de geheugen.",
@@ -888,6 +900,7 @@
       "unloadModel": "Uitladen"
     },
     "heapCap": {
+      "promptWithRecommendation": "Heap-limiet van de analyseserver in MB. Aanbevolen voor de {totalGb} van deze computer: {recommendedMb} MB.",
       "prompt": "Analyseer server heap cap in MB (bijv. 4096)",
       "invalid": "Geef een geheel getal in megabytes dat groter is dan 0.",
       "applied": "Analyseer server heap cap instellen op {mb} MB. Herstart de analyseer server voor het te werken.",

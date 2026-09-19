@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Votre machine dispose de {totalGb} de mémoire. Le serveur d'analyse Dart n'a aucun plafond de mémoire configuré, il peut donc croître jusqu'à ce que la machine ralentisse ou commence à swapper. Plafond recommandé : {recommendedGb}.",
+      "tooHighMessage": "Votre machine dispose de {totalGb} de mémoire. Le serveur d'analyse Dart est autorisé à utiliser jusqu'à {capGb} (défini dans {location}), ce qui laisse environ {freeGb} pour le système d'exploitation, VS Code et les autres outils Dart, la machine pourrait donc ralentir ou swapper. Plafond recommandé : {recommendedGb}.",
+      "locationGlobal": "vos paramètres utilisateur",
+      "locationWorkspace": "les paramètres de cet espace de travail",
+      "locationWorkspaceFolder": "les paramètres de ce dossier d'espace de travail",
+      "apply": "Appliquer {gb}",
+      "notNow": "Pas maintenant",
+      "dontAskAgain": "Ne plus demander"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Traducteur (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Le plafond de heap du serveur d'analyse ({capMb} Mo) laisse moins de la moitié de la RAM de cette machine pour le reste. Plafond recommandé : {recommendedMb} Mo.",
+      "noHeapCapWithSuggestion": "Aucun plafond de mémoire n'est configuré pour le serveur d'analyse Dart. Plafond recommandé pour cette machine : {mb} Mo.",
       "systemLowMemory": "Seule {free} de {total} RAM est libre à l'échelle du système. Fermez les applications inutilisées ou VS Code fenêtres.",
       "orphansFound": "{count} processus orphelin(s) retiennent {size} d'espace mémoire d'une session précédente.",
       "analysisServerLarge": "Processus de serveur d'analyse {count} Dart utilise jusqu'à {size}. Un redémarrage libère la mémoire.",
@@ -888,6 +900,7 @@
       "unloadModel": "Désinstaller"
     },
     "heapCap": {
+      "promptWithRecommendation": "Plafond de heap du serveur d'analyse en Mo. Recommandé pour les {totalGb} de cette machine : {recommendedMb} Mo.",
       "prompt": "Limite de la mémoire (heap) du serveur d'analyse en Mo (par exemple 4096)",
       "invalid": "Entrez un nombre entier de mégaoctets supérieur à 0.",
       "applied": "Fixer la capacité de la mémoire tampon du serveur d'analyse à {mb} Mo. Redémarrer le serveur d'analyse pour que les modifications soient prises en compte.",

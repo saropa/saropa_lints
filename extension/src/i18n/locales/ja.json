@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "このマシンには{totalGb}のメモリがあります。Dart 解析サーバーにはメモリの上限が設定されていないため、マシンが遅くなるかスワップを始めるまで増加し続ける可能性があります。推奨上限: {recommendedGb}。",
+      "tooHighMessage": "このマシンには{totalGb}のメモリがあります。Dart 解析サーバーは最大{capGb}まで使用することが許可されており（{location}で設定）、OS、VS Code、その他の Dart ツール用に約{freeGb}しか残らないため、マシンが遅くなったりスワップしたりする可能性があります。推奨上限: {recommendedGb}。",
+      "locationGlobal": "ユーザー設定",
+      "locationWorkspace": "このワークスペースの設定",
+      "locationWorkspaceFolder": "このワークスペースフォルダーの設定",
+      "apply": "{gb} を適用",
+      "notNow": "今はしない",
+      "dontAskAgain": "今後表示しない"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "翻訳エンジン（Ollama）"
     },
     "recommendation": {
+      "heapCapTooHigh": "解析サーバーのヒープ上限（{capMb} MB）では、このマシンの RAM の半分未満しか他の用途に残りません。推奨上限: {recommendedMb} MB。",
+      "noHeapCapWithSuggestion": "Dart 解析サーバーにメモリの上限が設定されていません。このマシンの推奨上限: {mb} MB。",
       "systemLowMemory": "のみ {free} の {total} RAM が機械全体で空いています。不要なアプリケーションを閉じたり、 VS Code ウィンドウを閉じたりしてください。",
       "orphansFound": "{count}の孤立プロセスが、以前のセッションから{size}のメモリを保持しています。",
       "analysisServerLarge": "{count} Dart アナリシスサーバー プロセス(たち)は {size} まで使用しています。再起動によりメモリが解放されます。",
@@ -888,6 +900,7 @@
       "unloadModel": "アンロード"
     },
     "heapCap": {
+      "promptWithRecommendation": "解析サーバーのヒープ上限（MB）。このマシンの{totalGb}に対する推奨値: {recommendedMb} MB。",
       "prompt": "分析サーバーのヒープ容量（MB）（例: 4096）",
       "invalid": "0より大きい整数のメガバイトを入力してください。",
       "applied": "分析サーバーのヒープ容量を{mb}MBに設定してください。分析サーバーを再起動して有効にしてください。",

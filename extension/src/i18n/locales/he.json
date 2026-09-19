@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "למחשב שלך יש {totalGb} של זיכרון. לשרת הניתוח של Dart אין תקרת זיכרון מוגדרת, כך שהוא יכול לגדול עד שהמחשב יאט או יתחיל להחליף (swap). תקרה מומלצת: {recommendedGb}.",
+      "tooHighMessage": "למחשב שלך יש {totalGb} של זיכרון. לשרת הניתוח של Dart מותר להשתמש עד {capGb} (הוגדר ב-{location}), מה שמשאיר כ-{freeGb} עבור מערכת ההפעלה, VS Code וכלי Dart אחרים, כך שהמחשב עלול להאט או להחליף. תקרה מומלצת: {recommendedGb}.",
+      "locationGlobal": "הגדרות המשתמש שלך",
+      "locationWorkspace": "הגדרות סביבת העבודה הזו",
+      "locationWorkspaceFolder": "הגדרות תיקיית סביבת העבודה הזו",
+      "apply": "החל {gb}",
+      "notNow": "לא עכשיו",
+      "dontAskAgain": "אל תשאל שוב"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "מנוע תרגום (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "תקרת ה-heap של שרת הניתוח ({capMb} MB) משאירה פחות ממחצית מזיכרון ה-RAM של המחשב לכל השאר. תקרה מומלצת: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "לא הוגדרה תקרת זיכרון לשרת הניתוח של Dart. תקרה מומלצת למחשב זה: {mb} MB.",
       "systemLowMemory": "רק {free} מתוך {total} של RAM פנויים למשותף. סגורו יישומים לא בשימוש או VS Code חלונות.",
       "orphansFound": "תהליך(ים) מבודד(ים) {count} מחזיק(ים) {size} של זיכרון מ세션 קודם.",
       "analysisServerLarge": "השרת (ים) של ניתוח {count} Dart משתמשים עד {size}. עצירה מחדש פורחת את הזיכרון.",
@@ -888,6 +900,7 @@
       "unloadModel": "הסר"
     },
     "heapCap": {
+      "promptWithRecommendation": "תקרת heap של שרת הניתוח ב-MB. מומלץ עבור {totalGb} של מחשב זה: {recommendedMb} MB.",
       "prompt": "מגבלה למאגר האנליזה של שרת ניתוח ב-MB (למשל 4096)",
       "invalid": "הכנס מספר שלם של מגה bait גדול מ-0.",
       "applied": "הגדר גודל הערימה של שרת ניתוח ל {mb} MB. עצור את שרת הניתוח כדי שהשינוי ייכנס לתוקף.",

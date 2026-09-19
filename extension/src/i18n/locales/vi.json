@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Máy của bạn có {totalGb} bộ nhớ. Máy chủ phân tích Dart không có giới hạn bộ nhớ được cấu hình, vì vậy nó có thể tiếp tục tăng cho đến khi máy chậm lại hoặc bắt đầu swap. Giới hạn được đề xuất: {recommendedGb}.",
+      "tooHighMessage": "Máy của bạn có {totalGb} bộ nhớ. Máy chủ phân tích Dart được phép sử dụng tối đa {capGb} (được đặt trong {location}), chỉ để lại khoảng {freeGb} cho hệ điều hành, VS Code và các công cụ Dart khác, vì vậy máy có thể chậm lại hoặc swap. Giới hạn được đề xuất: {recommendedGb}.",
+      "locationGlobal": "cài đặt người dùng của bạn",
+      "locationWorkspace": "cài đặt của không gian làm việc này",
+      "locationWorkspaceFolder": "cài đặt của thư mục không gian làm việc này",
+      "apply": "Áp dụng {gb}",
+      "notNow": "Không phải bây giờ",
+      "dontAskAgain": "Không hỏi lại"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Engine Dịch (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Giới hạn heap của máy chủ phân tích ({capMb} MB) chỉ để lại chưa đến một nửa RAM của máy này cho mọi thứ khác. Giới hạn được đề xuất: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Không có giới hạn bộ nhớ nào được cấu hình cho máy chủ phân tích Dart. Giới hạn được đề xuất cho máy này: {mb} MB.",
       "systemLowMemory": "Chỉ có {free} trong số {total} RAM là miễn phí toàn bộ hệ thống. Đóng các ứng dụng không sử dụng hoặc VS Code cửa sổ.",
       "orphansFound": "{count} quá trình bị bỏ rơi đang chiếm dụng {size} bộ nhớ từ một phiên trước đó.",
       "analysisServerLarge": "{count} quá trình xử lý máy chủ phân tích Dart đang sử dụng lên đến {size}. Một lần khởi động lại sẽ giải phóng bộ nhớ.",
@@ -888,6 +900,7 @@
       "unloadModel": "Gỡ cài đặt"
     },
     "heapCap": {
+      "promptWithRecommendation": "Giới hạn heap của máy chủ phân tích tính bằng MB. Được đề xuất cho {totalGb} của máy này: {recommendedMb} MB.",
       "prompt": "Giới hạn bộ nhớ heap của máy chủ phân tích (MB) (ví dụ: 4096)",
       "invalid": "Nhập một số nguyên dương lớn hơn 0 theo megabytes.",
       "applied": "Đặt giới hạn bộ nhớ heap của máy chủ phân tích thành {mb} MB. Khởi động lại máy chủ phân tích để thay đổi có hiệu lực.",

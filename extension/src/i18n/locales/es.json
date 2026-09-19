@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Tu equipo tiene {totalGb} de memoria. El servidor de análisis de Dart no tiene un límite de memoria configurado, por lo que puede crecer hasta que el equipo se ralentice o empiece a usar swap. Límite recomendado: {recommendedGb}.",
+      "tooHighMessage": "Tu equipo tiene {totalGb} de memoria. Se permite que el servidor de análisis de Dart use hasta {capGb} (establecido en {location}), lo que deja aproximadamente {freeGb} para el sistema operativo, VS Code y otras herramientas de Dart, por lo que el equipo podría ralentizarse o usar swap. Límite recomendado: {recommendedGb}.",
+      "locationGlobal": "tu configuración de usuario",
+      "locationWorkspace": "la configuración de este espacio de trabajo",
+      "locationWorkspaceFolder": "la configuración de esta carpeta del espacio de trabajo",
+      "apply": "Aplicar {gb}",
+      "notNow": "Ahora no",
+      "dontAskAgain": "No volver a preguntar"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Motor de Traducción (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "El límite de heap del servidor de análisis ({capMb} MB) deja menos de la mitad de la RAM de este equipo para todo lo demás. Límite recomendado: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "El servidor de análisis de Dart no tiene configurado un límite de memoria. Límite recomendado para este equipo: {mb} MB.",
       "systemLowMemory": "Solo {free} de {total} de RAM está libre a nivel de sistema. Cierre aplicaciones no utilizadas o VS Code ventanas.",
       "orphansFound": "Proceso(s) {count} abandonado(s) están utilizando {size} de memoria de una sesión anterior.",
       "analysisServerLarge": "Proceso(s) del servidor de análisis {count} Dart están utilizando hasta {size}. Un reinicio libera la memoria.",
@@ -888,6 +900,7 @@
       "unloadModel": "Descargar"
     },
     "heapCap": {
+      "promptWithRecommendation": "Límite de heap del servidor de análisis en MB. Recomendado para los {totalGb} de este equipo: {recommendedMb} MB.",
       "prompt": "Límite de memoria heap del servidor de análisis en MB (p. ej. 4096)",
       "invalid": "Ingrese un número entero de megabytes mayor que 0.",
       "applied": "Establecer el límite de memoria del servidor de análisis en {mb} MB. Reinicie el servidor de análisis para que surta efecto.",

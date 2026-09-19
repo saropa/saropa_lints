@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Makinenizde {totalGb} bellek var. Dart analiz sunucusu için bellek üst sınırı yapılandırılmamış, bu nedenle makine yavaşlayana veya takas (swap) yapmaya başlayana kadar büyüyebilir. Önerilen sınır: {recommendedGb}.",
+      "tooHighMessage": "Makinenizde {totalGb} bellek var. Dart analiz sunucusunun en fazla {capGb} kullanmasına izin veriliyor ({location} içinde ayarlanmış), bu da işletim sistemi, VS Code ve diğer Dart araçları için yaklaşık {freeGb} bırakıyor, bu nedenle makine yavaşlayabilir veya takas yapabilir. Önerilen sınır: {recommendedGb}.",
+      "locationGlobal": "kullanıcı ayarlarınızda",
+      "locationWorkspace": "bu çalışma alanının ayarlarında",
+      "locationWorkspaceFolder": "bu çalışma alanı klasörünün ayarlarında",
+      "apply": "{gb} uygula",
+      "notNow": "Şimdi değil",
+      "dontAskAgain": "Tekrar sorma"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Çeviri Motoru (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Analiz sunucusunun heap sınırı ({capMb} MB), bu makinenin RAM'inin yarısından azını diğer her şey için bırakıyor. Önerilen sınır: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Dart analiz sunucusu için bellek sınırı yapılandırılmamış. Bu makine için önerilen sınır: {mb} MB.",
       "systemLowMemory": "Sadece {free}/{total} RAM özgür makine çapında. Kullanılmayan uygulamaları kapatın veya VS Code pencerelerini kapatın.",
       "orphansFound": "{count} izole süreç(ler) daha önceki bir oturumdan {size} bellek tutuyor.",
       "analysisServerLarge": "{count} Dart analiz sunucu işlem(ler)i en fazla {size} kullanıyor. Yeniden başlatma belleği serbest bırakır.",
@@ -888,6 +900,7 @@
       "unloadModel": "Çıkart"
     },
     "heapCap": {
+      "promptWithRecommendation": "Analiz sunucusu heap sınırı (MB). Bu makinenin {totalGb} belleği için önerilen: {recommendedMb} MB.",
       "prompt": "Analiz sunucusu yığın kapasitesi MB cinsinden (örn. 4096)",
       "invalid": "0'dan büyük bir tam sayı megabayt girin.",
       "applied": "Analiz sunucusu yığın kapasitesini {mb} MB'ye ayarlayın. Analiz sunucusunu yeniden başlatın ve etkili olması için.",

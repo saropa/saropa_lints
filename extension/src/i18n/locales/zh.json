@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "您的电脑有 {totalGb} 内存。Dart 分析服务器未设置内存上限，因此它可能会不断增长，直到电脑变慢或开始交换（swap）。建议上限：{recommendedGb}。",
+      "tooHighMessage": "您的电脑有 {totalGb} 内存。Dart 分析服务器被允许最多使用 {capGb}（在{location}中设置），这只为操作系统、VS Code 和其他 Dart 工具留下约 {freeGb}，因此电脑可能会变慢或开始交换。建议上限：{recommendedGb}。",
+      "locationGlobal": "您的用户设置",
+      "locationWorkspace": "此工作区的设置",
+      "locationWorkspaceFolder": "此工作区文件夹的设置",
+      "apply": "应用 {gb}",
+      "notNow": "暂不",
+      "dontAskAgain": "不再询问"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "翻译引擎（Ollama）"
     },
     "recommendation": {
+      "heapCapTooHigh": "分析服务器的堆上限（{capMb} MB）使此电脑一半以上的内存无法用于其他用途。建议上限：{recommendedMb} MB。",
+      "noHeapCapWithSuggestion": "Dart 分析服务器未配置内存上限。此电脑的建议上限：{mb} MB。",
       "systemLowMemory": "仅 {free} / {total} 内存可用。关闭未使用的应用程序或 VS Code 窗口。",
       "orphansFound": "{count} 未被回收的进程(们)正在占用 {size} 内存，这些内存来自之前的会话。",
       "analysisServerLarge": "{count} Dart 分析服务器进程（process）正在使用最多 {size}。重启可以释放内存。",
@@ -888,6 +900,7 @@
       "unloadModel": "卸载"
     },
     "heapCap": {
+      "promptWithRecommendation": "分析服务器堆上限（MB）。针对此电脑 {totalGb} 内存的建议值：{recommendedMb} MB。",
       "prompt": "分析服务器堆内存上限（以MB为单位）（例如：4096）",
       "invalid": "输入一个大于0的整数兆字节",
       "applied": "设置分析服务器堆内存上限为 {mb} MB。重启分析服务器以使更改生效。",

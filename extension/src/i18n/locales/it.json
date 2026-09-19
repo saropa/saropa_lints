@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Il tuo computer ha {totalGb} di memoria. Il server di analisi Dart non ha un limite di memoria configurato, quindi può crescere finché il computer non rallenta o inizia a fare swap. Limite consigliato: {recommendedGb}.",
+      "tooHighMessage": "Il tuo computer ha {totalGb} di memoria. Al server di analisi Dart è consentito usare fino a {capGb} (impostato in {location}), lasciando circa {freeGb} per il sistema operativo, VS Code e altri strumenti Dart, quindi il computer potrebbe rallentare o fare swap. Limite consigliato: {recommendedGb}.",
+      "locationGlobal": "le tue impostazioni utente",
+      "locationWorkspace": "le impostazioni di questo spazio di lavoro",
+      "locationWorkspaceFolder": "le impostazioni di questa cartella dello spazio di lavoro",
+      "apply": "Applica {gb}",
+      "notNow": "Non ora",
+      "dontAskAgain": "Non chiedere più"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Traduttore (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Il limite heap del server di analisi ({capMb} MB) lascia meno della metà della RAM di questo computer per tutto il resto. Limite consigliato: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Nessun limite di memoria configurato per il server di analisi Dart. Limite consigliato per questo computer: {mb} MB.",
       "systemLowMemory": "Solo {free} di {total} RAM è libera a livello di sistema. Chiudi le applicazioni non utilizzate o VS Code finestre.",
       "orphansFound": "Processi {count} orfani stanno tenendo occupata {size} di memoria da una sessione precedente.",
       "analysisServerLarge": "Processo(i) del server di analisi {count} Dart utilizzano fino a {size}. Un riavvio rilascia la memoria.",
@@ -888,6 +900,7 @@
       "unloadModel": "Disinstalla"
     },
     "heapCap": {
+      "promptWithRecommendation": "Limite heap del server di analisi in MB. Consigliato per i {totalGb} di questo computer: {recommendedMb} MB.",
       "prompt": "Limite della memoria heap del server di analisi in MB (es. 4096)",
       "invalid": "Inserisci un numero intero di megabyte maggiore di 0.",
       "applied": "Imposta il limite della memoria heap del server di analisi a {mb} MB. Riavvia il server di analisi affinché abbia effetto.",

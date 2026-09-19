@@ -732,6 +732,16 @@
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Ihr Rechner hat {totalGb} Arbeitsspeicher. Für den Dart-Analyseserver ist keine Speicherobergrenze festgelegt, sodass er wachsen kann, bis der Rechner langsamer wird oder zu swappen beginnt. Empfohlene Grenze: {recommendedGb}.",
+      "tooHighMessage": "Ihr Rechner hat {totalGb} Arbeitsspeicher. Der Dart-Analyseserver darf bis zu {capGb} verwenden (festgelegt in {location}), wodurch nur noch etwa {freeGb} für das Betriebssystem, VS Code und andere Dart-Tools übrig bleiben, sodass der Rechner langsamer werden oder swappen könnte. Empfohlene Grenze: {recommendedGb}.",
+      "locationGlobal": "Ihren Benutzereinstellungen",
+      "locationWorkspace": "den Einstellungen dieses Arbeitsbereichs",
+      "locationWorkspaceFolder": "den Einstellungen dieses Arbeitsbereichsordners",
+      "apply": "{gb} anwenden",
+      "notNow": "Nicht jetzt",
+      "dontAskAgain": "Nicht mehr fragen"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
@@ -873,6 +883,8 @@
       "modelHost": "Übersetzungssystem (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "Die Heap-Grenze des Analyseservers ({capMb} MB) lässt weniger als die Hälfte des RAM dieses Rechners für alles andere übrig. Empfohlene Grenze: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "Für den Dart-Analyseserver ist keine Speicherobergrenze konfiguriert. Empfohlene Grenze für diesen Rechner: {mb} MB.",
       "systemLowMemory": "Nur {free} von {total} RAM ist frei über das gesamte System. Schließen Sie nicht genutzte Anwendungen oder VS Code Fenster.",
       "orphansFound": "{count} abgebrochene Prozess(e) halten {size} Bytes aus einer früheren Sitzung.",
       "analysisServerLarge": "{count} Dart Analyse-Server-Prozess(e) nutzen bis zu {size}. Ein Neustart freigibt den Speicher.",
@@ -888,6 +900,7 @@
       "unloadModel": "Entladen"
     },
     "heapCap": {
+      "promptWithRecommendation": "Heap-Grenze des Analyseservers in MB. Empfohlen für {totalGb} dieses Rechners: {recommendedMb} MB.",
       "prompt": "Analyse-Server-Heap-Grenze in MB (z. B. 4096)",
       "invalid": "Geben Sie eine ganze Zahl in Megabytes größer als 0 ein.",
       "applied": "Heap-Limit des Analyse-Servers auf {mb} MB gesetzt. Starten Sie den Analyse-Server neu, damit es wirksam wird.",
