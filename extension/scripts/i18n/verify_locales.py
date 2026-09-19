@@ -117,7 +117,7 @@ def key_allowed(key: str, patterns) -> bool:
 
 
 def audit_pair(en: dict, loc: dict, allow: dict, locale: str = "") -> dict:
-    reviewed = allow["reviewed_ok"].get(locale, set())
+    reviewed = allow.get("reviewed_ok", {}).get(locale, set())
     res = {c: [] for c in CLASSES}
     for k in sorted(en):
         if k not in loc:

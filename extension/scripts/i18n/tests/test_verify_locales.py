@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import verify_locales as v  # noqa: E402
 
-ALLOW = {"values": {"ok"}, "words": {"dart"}, "keys": ["brand.*"]}
+ALLOW = {"values": {"ok"}, "words": {"dart"}, "keys": ["brand.*"], "reviewed_ok": {}}
 
 
 class VerifyTests(unittest.TestCase):
@@ -38,7 +38,8 @@ class VerifyTests(unittest.TestCase):
 
     def test_identical_rules(self):
         en = {"a": "Open the file", "b": "OK", "c": "`dart` {x}", "d": "Dart", "brand": {"n": "Some Words"}}
-        r = self.audit(en, dict(v.flatten(en)) and en)
+        # Locale identical to English: only the untranslated, non-allowlisted value is reported.
+        r = self.audit(en, en)
         self.assertEqual([x["key"] for x in r["identical"]], ["a"])
 
     def test_suspicious_dismiss(self):
