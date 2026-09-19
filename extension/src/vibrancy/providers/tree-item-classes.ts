@@ -32,6 +32,7 @@ export function categoryColor(cat: VibrancyCategory): vscode.ThemeColor {
         case 'stable': return new vscode.ThemeColor('editorInfo.foreground');
         case 'outdated': return new vscode.ThemeColor('editorWarning.foreground');
         case 'abandoned': return new vscode.ThemeColor('editorWarning.foreground');
+        case 'upgrade-required': return new vscode.ThemeColor('editorWarning.foreground');
         case 'end-of-life': return new vscode.ThemeColor('editorError.foreground');
     }
 }

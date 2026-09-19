@@ -10,8 +10,15 @@ import type { ReplacementComplexity } from './services/package-code-analyzer';
 import type { PackageUsage } from './services/import-scanner';
 import type { PackageOpportunities } from './services/changelog-opportunities';
 
-/** Status categories for package vibrancy. */
-export type VibrancyCategory = 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'end-of-life';
+/**
+ * Status categories for package vibrancy.
+ *
+ * 'upgrade-required' means the package is alive but the INSTALLED (old major)
+ * version is known-broken; the fix is to upgrade, not to replace the package.
+ * Contrast 'end-of-life' = the package itself is dead.
+ */
+export type VibrancyCategory =
+    'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'upgrade-required' | 'end-of-life';
 
 /** Which pubspec section a dependency belongs to. */
 export type DependencySection = 'dependencies' | 'dev_dependencies' | 'transitive';
@@ -134,6 +141,11 @@ export interface MaintainerQualityFlags {
 /** Known issue entry from bundled JSON. */
 export interface KnownIssue {
     readonly name: string;
+    /**
+     * Hazard status. `upgrade_required` = the installed old major is broken
+     * (version-scoped); `end_of_life` = the package is dead. Legacy data may
+     * still use `end_of_life` with version bounds; see effectiveIssueStatus().
+     */
     readonly status: string;
     readonly reason?: string;
     readonly as_of?: string;

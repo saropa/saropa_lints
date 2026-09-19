@@ -1,4 +1,5 @@
 /** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */
+import { l10n } from '../../i18n/runtime';
 import * as vscode from 'vscode';
 import { VibrancyResult, FamilySplit, OverrideAnalysis, BudgetResult, VulnSeverity, Vulnerability } from '../types';
 import { findPackageRange } from '../services/pubspec-parser';
@@ -63,7 +64,7 @@ export class VibrancyDiagnostics {
             if (inlineMode === 'all') { return true; }
             if (inlineMode === 'none') { return false; }
             if (inlineMode === 'critical') {
-                return category === 'end-of-life';
+                return category === 'end-of-life' || category === 'upgrade-required';
             }
             return false;
         };
@@ -262,6 +263,8 @@ function buildMessage(result: VibrancyResult): string {
         msg = `Deprecated: ${name} — ${displayReplacement}`;
     } else if (result.category === 'end-of-life') {
         msg = `Deprecated: ${name}`;
+    } else if (result.category === 'upgrade-required') {
+        msg = l10n('lifecycle.upgradeRequired.diagnostic', { name });
     } else if (result.category === 'abandoned' || result.category === 'outdated') {
         // Abandoned and outdated both warrant review, not deprecation
         msg = `Review ${name}`;

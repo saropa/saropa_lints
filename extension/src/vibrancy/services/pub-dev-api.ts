@@ -89,7 +89,7 @@ export async function fetchPackageInfoWithPrerelease(
         if (!resp.ok) { return { info: null, prerelease: null, versionDates: {} }; }
 
         const json: any = await resp.json();
-        const latest = json.latest ?? {};
+        const latest = pickNonRetractedLatest(json);
         const pubspec = latest.pubspec ?? {};
 
         // Extract version dates map and created date (first version) before
@@ -100,7 +100,8 @@ export async function fetchPackageInfoWithPrerelease(
         if (Array.isArray(json.versions)) {
             for (const v of json.versions) {
                 if (!v.version) { continue; }
-                versionStrings.push(v.version);
+                // A retracted release is never a valid upgrade/prerelease target.
+                if (v.retracted !== true) { versionStrings.push(v.version); }
                 if (v.published) {
                     versionDates[v.version] = v.published;
                     if (!createdDate) { createdDate = v.published; }
@@ -150,6 +151,25 @@ export async function fetchPackageInfoWithPrerelease(
         logger?.error(`Failed to fetch package info for ${name} from ${registryUrl}`);
         return { info: null, prerelease: null, versionDates: {} };
     }
+}
+
+/**
+ * Pick the `latest` release object, never a retracted one.
+ *
+ * pub.dev normally excludes retracted versions from `latest`, but a registry
+ * mirror may not; if `latest` is flagged retracted, fall back to the newest
+ * non-retracted, non-prerelease entry in `versions` (list order is ascending
+ * by publish, so scan from the end). Returns `{}` when nothing qualifies.
+ */
+export function pickNonRetractedLatest(json: any): any {
+    const latest = json?.latest ?? {};
+    if (latest.retracted !== true) { return latest; }
+    const versions: any[] = Array.isArray(json.versions) ? json.versions : [];
+    for (let i = versions.length - 1; i >= 0; i--) {
+        const v = versions[i];
+        if (v?.version && v.retracted !== true && !String(v.version).includes('-')) { return v; }
+    }
+    return {};
 }
 
 const WASM_TAGS = ['is:wasm-ready', 'sdk:wasm'];

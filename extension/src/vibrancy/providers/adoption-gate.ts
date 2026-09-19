@@ -9,7 +9,7 @@ import * as vscode from 'vscode';
 import { CacheService } from '../services/cache-service';
 import { parsePubspecYaml } from '../services/pubspec-parser';
 import { fetchPackageInfo, fetchPackageMetrics, fetchPublisher } from '../services/pub-dev-api';
-import { findKnownIssue } from '../scoring/known-issues';
+import { findKnownIssue, effectiveIssueStatus } from '../scoring/known-issues';
 import { classifyAdoption, AdoptionTier, AdoptionResult } from '../scoring/adoption-classifier';
 import { getLatestResults } from '../extension-activation';
 import { SDK_PACKAGES } from '../sdk-packages';
@@ -158,13 +158,13 @@ async function fetchAndClassify(
         fetchPackageMetrics(name, cache),
         fetchPublisher(name, cache),
     ]);
-    const knownIssue = findKnownIssue(name);
+    const knownIssue = findKnownIssue(name, info?.latestVersion || undefined);
 
     return classifyAdoption({
         pubPoints: metrics.pubPoints,
         verifiedPublisher: publisher !== null,
         isDiscontinued: info?.isDiscontinued ?? false,
-        knownIssueStatus: knownIssue?.status ?? null,
+        knownIssueStatus: effectiveIssueStatus(knownIssue),
         knownIssueReason: knownIssue?.reason ?? null,
         exists: info !== null,
     });

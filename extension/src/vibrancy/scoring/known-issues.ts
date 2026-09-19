@@ -153,14 +153,31 @@ export function findKnownIssue(
     const entries = issueMap.get(packageName);
     if (!entries || entries.length === 0) { return null; }
     if (!currentVersion) {
-        // No version context — prefer unscoped entry
-        return entries.find(isUnscoped) ?? entries[0];
+        // No version context: only an unscoped entry is safe to apply. A
+        // version-bounded entry describes an old major, and applying it to a
+        // package of unknown version wrongly flags healthy current releases.
+        return entries.find(isUnscoped) ?? null;
     }
     // Prefer a scoped entry that matches the version
     const scoped = entries.find(e => !isUnscoped(e) && matchesVersionRange(e, currentVersion));
     if (scoped) { return scoped; }
     // Fall back to an unscoped entry
     return entries.find(isUnscoped) ?? null;
+}
+
+/**
+ * Status a known-issue entry means at runtime.
+ *
+ * Backward compatibility: `end_of_life` used to mean both "package is dead"
+ * and "this old major is broken". Data still carries the old status on all
+ * version-bounded entries, so a bounded `end_of_life` entry is read as
+ * `upgrade_required`. Unbounded `end_of_life` stays `end_of_life`. Once the
+ * JSON is migrated to `upgrade_required` this shim becomes a no-op.
+ */
+export function effectiveIssueStatus(entry: KnownIssue | null | undefined): string | null {
+    if (!entry) { return null; }
+    if (entry.status === 'end_of_life' && !isUnscoped(entry)) { return 'upgrade_required'; }
+    return entry.status;
 }
 
 /** Return all known issues grouped by package name. */

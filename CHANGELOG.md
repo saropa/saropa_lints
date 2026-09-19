@@ -100,10 +100,14 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Added (Extension)
 
+- Package Vibrancy now shows a separate "Upgrade Required" status for packages that are alive but where your installed old major version is known to be broken, instead of labelling them "End of Life"; "End of Life" now means only that the package itself is dead. No action required.
 - Package Vibrancy now checks what an upgrade would break before recommending it, and replaces the upgrade nudge with the reason when dependents cap the package below the new version or the new version needs a newer dependency than your Flutter SDK pins (for example `analyzer` 13, which needs a newer `meta` than Flutter stable ships) or needs a dependency that another package in your project caps (for example a `drift_dev` release that requires `analyzer` 13 while a dependency caps it below 13), naming the package responsible. Blocked packages are also skipped by "upgrade all", and the newest version you can still take is suggested. No action required.
 
 ### Fixed (Extension)
 
+- Package Vibrancy no longer marks healthy packages such as `flutter_map`, `camera` and `location` as end of life when checking for new adoption or offering quick fixes, because a problem recorded for an old version was being applied to every version. No action required.
+- Package Vibrancy now notes when a package is unlisted, in maintenance mode or under a caution, warns when an end-of-life record may be out of date, and never offers a retracted release as the latest version. No action required.
+- The known-issues data was cleaned up: about a dozen dead entries removed, wrong version limits on `hive`, `flutter_hooks`, `camera` and `responsive_builder` corrected, and long-quiet packages such as `beamer` and `camerawesome` moved to maintenance mode. No action required.
 - Every translated language now has complete, correct translations: missing strings were added, broken placeholders and code snippets repaired, and hundreds of nonsensical machine translations replaced. No action required.
 - The "Dismiss" button in every translated language now reads correctly; several languages previously showed unrelated machine-translated phrases. No action required.
 - Package Vibrancy's known-issues data now marks `cubit`, `shared_preferences_ios`, `url_strategy` and `integration_test` as end of life, no longer flags eight revived packages (such as `alice` and `rubber`), and stops flagging current `flutter_secure_storage` versions for a pre-5.0 problem. No action required.
@@ -124,6 +128,7 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Internal
 
+- Restored the state and problems index modules of Package Vibrancy, which an earlier cleanup deleted and which stopped the extension from compiling.
 - Added `scripts/pubdev_snapshot.py`, which downloads the latest pub.dev data for every tracked package into a reusable snapshot and refreshes the Package Vibrancy known-issues data from it; the analyzer entries now record why analyzer 13 and later is held back. It also flags packages that look revived or stale, and seven long-quiet packages moved to maintenance mode.
 - The localization key checker no longer crashes, ignores its test fixture, and recognizes keys referenced through key-type unions.
 - Test descriptions for the shared CI workflow fixture checks now state the expected behavior, satisfying `require_test_description_convention`.

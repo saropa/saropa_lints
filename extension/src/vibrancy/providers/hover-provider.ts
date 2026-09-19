@@ -22,6 +22,7 @@ import {
 } from '../sdk-vibrancy-table';
 import { resolveRepoUrl } from '../views/html-utils';
 import { l10n } from '../../i18n/runtime';
+import { getLifecycleNotes } from '../scoring/lifecycle-notes';
 
 export class VibrancyHoverProvider implements vscode.HoverProvider {
     private _results = new Map<string, VibrancyResult>();
@@ -400,6 +401,9 @@ function appendHoverAlerts(
     if (r.knownIssue?.reason) {
         // Escape external issue reason text
         alerts.push(`❌ **Known Issue:** ${escapeMarkdown(truncateBody(r.knownIssue.reason))}`);
+    }
+    for (const note of getLifecycleNotes(r)) {
+        alerts.push(`ℹ️ ${escapeMarkdown(note.text)}`);
     }
     if (r.isUnused) {
         alerts.push('⚠️ **Unused** — no imports detected');

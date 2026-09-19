@@ -8,6 +8,7 @@ import { escapeHtml, resolveRepoUrl } from './html-utils';
 import { getDetailStyles } from './detail-view-styles';
 import { getDetailScript } from './detail-view-script';
 import { l10n } from '../../i18n/runtime';
+import { getLifecycleNotes } from '../scoring/lifecycle-notes';
 
 /**
  * Assembles **sidebar package detail** HTML: placeholder when `result` is null, otherwise full panel
@@ -395,6 +396,10 @@ function buildAlertsSection(r: VibrancyResult): string {
         const status = r.knownIssue.status;
         const reason = r.knownIssue.reason ?? '';
         alerts.push(`<div class="alert-item">${getAlertIcon(status)} ${escapeHtml(status)}: ${escapeHtml(reason)}</div>`);
+    }
+
+    for (const note of getLifecycleNotes(r)) {
+        alerts.push(`<div class="alert-item">ℹ️ ${escapeHtml(note.text)}</div>`);
     }
 
     if (r.github?.flaggedIssues?.length) {

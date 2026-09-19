@@ -47,7 +47,8 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
             }
 
             const packageName = document.getText(diag.range);
-            const issue = findKnownIssue(packageName);
+            const issue = findKnownIssue(
+                packageName, this._results.get(packageName)?.package.version);
 
             if (!seen.has(packageName)) {
                 if (issue?.replacement && isReplacementPackageName(issue.replacement)) {

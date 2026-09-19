@@ -79,6 +79,7 @@ h1 {
 .score.stable { background: var(--accent-info); color: #fff; }
 .score.outdated { background: var(--accent-medium); color: #000; }
 .score.abandoned { background: var(--accent-medium); color: #000; }
+.score.upgrade-required { background: var(--accent-medium); color: #000; }
 .score.end-of-life { background: var(--accent-critical); color: #fff; }
 
 section {

@@ -16,9 +16,9 @@ describe('indicator-config', () => {
         it('should return default indicators', () => {
             const config = loadIndicatorConfig();
             assert.strictEqual(config.vibrant, '🟢');
-            assert.strictEqual(config.quiet, '🟡');
-            assert.strictEqual(config.legacyLocked, '🟠');
-            assert.strictEqual(config.stale, '🟠');
+            assert.strictEqual(config.stable, '🟡');
+            assert.strictEqual(config.outdated, '🟠');
+            assert.strictEqual(config.abandoned, '🟠');
             assert.strictEqual(config.endOfLife, '🔴');
         });
 
@@ -79,6 +79,10 @@ describe('indicator-config', () => {
         it('should return emoji for abandoned', () => {
             const indicator = getCategoryIndicator('abandoned');
             assert.strictEqual(indicator, '🟠');
+        });
+
+        it('should return the outdated emoji for upgrade-required', () => {
+            assert.strictEqual(getCategoryIndicator('upgrade-required'), '🟠');
         });
 
         it('should return emoji for end-of-life', () => {

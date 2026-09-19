@@ -1437,7 +1437,8 @@
       "vulnerable": "Vulnerable",
       "overrides": "Overrides",
       "caveatLine1": "*Code sizes shown (lib + declared assets), falling back to the pub.dev archive size when code size is unavailable. Excludes dev_dependencies (build_runner, lints, saropa_lints, etc.) — they never ship to the APK / IPA / web bundle. Actual app size will be smaller after tree shaking.",
-      "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines)."
+      "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines).",
+      "upgradeTitle": "Upgrade Required"
     },
     "breakdown": {
       "title": "Why grade {grade}? — {avgScore}/100 average across {pkgCount} packages",
@@ -2878,6 +2879,19 @@
       "breaksOther": "{pkg} {to} would break {count} dependents: {names}",
       "safe": "{pkg} {from} -> {to} looks safe",
       "newestCompatible": "Newest compatible: {pkg} {version}"
+    }
+  },
+  "lifecycle": {
+    "note": {
+      "statusMayBeOutdated": "Status may be outdated: recorded as end of life, but pub.dev shows it is not discontinued and was published within the last 12 months.",
+      "maintenanceMode": "Maintenance mode: only critical fixes are expected.",
+      "caution": "Caution: review the known issue before relying on this package.",
+      "unlisted": "Unlisted on pub.dev: hidden from search results; existing users can still depend on it."
+    },
+    "upgradeRequired": {
+      "diagnostic": "Upgrade {name} — installed version is known-broken",
+      "problem": "Score {score}/100 — installed version needs upgrading",
+      "insight": "Installed version is known-broken — upgrade required"
     }
   }
 }

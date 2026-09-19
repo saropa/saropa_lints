@@ -6,6 +6,7 @@
  */
 
 import { VibrancyCategory, KnownIssue, PubDevPackageInfo, VibrancyResult } from '../types';
+import { effectiveIssueStatus } from './known-issues';
 import { isTrustedPublisher } from './trusted-publishers';
 
 // Re-export display helpers from the centralized dictionary so existing
@@ -32,17 +33,18 @@ export function isUpdatable(result: VibrancyResult): boolean {
 
 /** Count results by vibrancy category. */
 export function countByCategory(results: readonly VibrancyResult[]) {
-    let vibrant = 0, stable = 0, outdated = 0, abandoned = 0, eol = 0;
+    let vibrant = 0, stable = 0, outdated = 0, abandoned = 0, eol = 0, upgradeRequired = 0;
     for (const r of results) {
         switch (r.category) {
             case 'vibrant': vibrant++; break;
             case 'stable': stable++; break;
             case 'outdated': outdated++; break;
             case 'abandoned': abandoned++; break;
+            case 'upgrade-required': upgradeRequired++; break;
             case 'end-of-life': eol++; break;
         }
     }
-    return { vibrant, stable, outdated, abandoned, eol };
+    return { vibrant, stable, outdated, abandoned, eol, upgradeRequired };
 }
 
 /** Classify a package into a vibrancy category. */
@@ -57,10 +59,25 @@ export function classifyStatus(params: {
     /** Days since last package publish. */
     daysSinceLastPublish?: number;
 }): VibrancyCategory {
-    // Hard overrides: only truly dead packages get 'end-of-life'
-    if (params.knownIssue?.status === 'end_of_life') { return 'end-of-life'; }
+    /* PRECEDENCE (highest first). Hard overrides return immediately:
+         1. known-issue effective status 'end_of_life' (unscoped: package dead)
+         2. pub.dev isDiscontinued
+         3. archived GitHub repo
+         4. known-issue effective status 'upgrade_required' (installed old
+            major is broken; package itself is alive) -> 'upgrade-required'
+       Then the score bands + caps below apply.
+       Live signals only ESCALATE: a live discontinued/archived signal beats a
+       healthy score, but a live healthy signal never demotes a curated
+       end_of_life entry (it would silently hide a real hazard). A stale entry
+       is instead SURFACED via lifecycle-notes ('status may be outdated').
+       Statuses maintenance_mode / caution never change category; they are
+       surfaced as notes (see lifecycle-notes.ts). Bounded legacy
+       end_of_life entries are read as upgrade_required (effectiveIssueStatus). */
+    const issueStatus = effectiveIssueStatus(params.knownIssue);
+    if (issueStatus === 'end_of_life') { return 'end-of-life'; }
     if (params.pubDev?.isDiscontinued) { return 'end-of-life'; }
     if (params.isArchived === true) { return 'end-of-life'; }
+    if (issueStatus === 'upgrade_required') { return 'upgrade-required'; }
 
     let category: VibrancyCategory;
     if (params.score >= 70) { category = 'vibrant'; }

@@ -19,6 +19,7 @@ import { isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../sc
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { createWebviewCspNonce, escapeHtml, resolveRepoUrl } from './html-utils';
 import { l10n } from '../../i18n/runtime';
+import { getLifecycleNotes } from '../scoring/lifecycle-notes';
 import { getPackageDetailStyles } from './package-detail-styles';
 import { getPillButtonStyles } from './pill-button-styles';
 import { getPackageDetailScript } from './package-detail-script';
@@ -682,6 +683,9 @@ function buildAlertsSection(r: VibrancyResult): string {
     }
     if (r.knownIssue?.reason) {
         items.push(alertItem(escapeHtml(l10n('packageDetail.alerts.knownIssue', { reason: r.knownIssue.reason })), 'critical'));
+    }
+    for (const note of getLifecycleNotes(r)) {
+        items.push(alertItem(escapeHtml(note.text), 'info'));
     }
     if (r.isUnused) {
         items.push(alertItem(escapeHtml(l10n('packageDetail.alerts.unused')), 'info'));

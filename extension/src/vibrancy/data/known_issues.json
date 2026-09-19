@@ -295,7 +295,7 @@
       "reason": "Abandoned (last release 2021).",
       "as_of": "2026-09-19",
       "replacement": "flutter_colorpicker",
-      "migrationNotes": "flutter_colorpicker is the actively maintained picker and covers wheel/circle pickers.",
+      "migrationNotes": "flutter_colorpicker is the actively maintained picker and covers wheel/circle pickers. Use flutter_colorpicker >=1.0.0 (older releases are known-broken).",
       "lastUpdated": "2021-04-19"
     },
     {
@@ -1414,26 +1414,13 @@
       "platforms": []
     },
     {
-      "name": "cached_network_image_v1",
-      "status": "end_of_life",
-      "reason": "Legacy version 1.x; fundamentally incompatible with Dart 3 typing.",
-      "as_of": "2026-03-09",
-      "replacement": "cached_network_image",
-      "migrationNotes": "Drop-in mostly, but requires updating error builder syntax.",
-      "archiveSizeBytes": 292939,
-      "archiveSizeMB": 0.28,
-      "license": "MIT",
-      "lastUpdated": "2024-08-13",
-      "pubPoints": 150,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ]
+      "name": "cached_network_image",
+      "status": "upgrade_required",
+      "reason": "1.x releases predate null safety and do not compile under Dart 3.",
+      "as_of": "2026-09-19",
+      "replacement": "Upgrade to >=2.0.0",
+      "migrationNotes": "Upgrade to >=2.0.0 (latest 4.0.0). Update error builder syntax.",
+      "appliesToMaxVersion": "2.0.0"
     },
     {
       "name": "multi_image_picker",
@@ -1485,8 +1472,8 @@
       "status": "end_of_life",
       "reason": "Underlying mobile FFmpeg libraries are discontinued and fail to compile.",
       "as_of": "2026-09-19",
-      "replacement": "ffmpeg_kit_flutter",
-      "migrationNotes": "Massive rewrite. Execution syntax entirely refactored.",
+      "replacement": "ffmpeg_kit_flutter_new",
+      "migrationNotes": "ffmpeg_kit_flutter is itself discontinued; ffmpeg_kit_flutter_new is an actively maintained continuation (GPL-licensed build; check licensing). Execution syntax differs from flutter_ffmpeg.",
       "archiveSizeBytes": 3475146,
       "archiveSizeMB": 3.31,
       "license": "LGPL-3.0",
@@ -1499,64 +1486,14 @@
       ]
     },
     {
-      "name": "flutter_sound_v7",
-      "status": "end_of_life",
-      "reason": "(Legacy versions) Missing background service permissions for Android 15.",
-      "as_of": "2026-03-09",
-      "replacement": "Update to v9+",
-      "replacementObsoleteFromVersion": "9.0.0",
-      "migrationNotes": "Complete rewrite of the playback session builder.",
-      "archiveSizeBytes": 15290933,
-      "archiveSizeMB": 14.58,
-      "license": "MPL-2.0",
-      "lastUpdated": "2025-11-27",
-      "pubPoints": 140,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ]
-    },
-    {
-      "name": "audioplayers_v0",
-      "status": "end_of_life",
-      "reason": "(v0.x versions) Native code fails to build on Apple Silicon (M1/M2/M3) Macs.",
-      "as_of": "2026-03-09",
-      "replacement": null,
-      "migrationNotes": null,
-      "archiveSizeBytes": 21027379,
-      "archiveSizeMB": 20.05,
-      "license": "MIT",
-      "lastUpdated": "2026-03-01",
-      "pubPoints": 150,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ]
-    },
-    {
-      "name": "flutter_vlc_player_orig",
-      "status": "end_of_life",
-      "reason": "Severe texture cache issues lead to green-screen artifacting on video load.",
-      "as_of": "2026-03-09",
-      "replacement": "media_kit",
-      "migrationNotes": "Huge rewrite. Better Wasm/Desktop support.",
-      "archiveSizeBytes": 10240,
-      "archiveSizeMB": 0.01,
-      "license": "BSD-3-Clause",
-      "lastUpdated": "2016-04-20",
-      "pubPoints": 15,
-      "verifiedPublisher": false,
-      "platforms": []
+      "name": "flutter_sound",
+      "status": "upgrade_required",
+      "reason": "7.x/8.x releases lack the background service permissions required by Android 15.",
+      "as_of": "2026-09-19",
+      "replacement": "Upgrade to >=9.0.0",
+      "migrationNotes": "Upgrade to >=9.0.0 (latest 9.30.0). Complete rewrite of the playback session builder.",
+      "appliesToMinVersion": "7.0.0",
+      "appliesToMaxVersion": "9.0.0"
     },
     {
       "name": "video_launcher",
@@ -1575,11 +1512,11 @@
     },
     {
       "name": "flutter_downloader",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Progress synchronization isolates were broken pre-1.5.2, leaving ghost notifications stuck in 'processing' state (fixed in 1.5.2).",
       "as_of": "2026-09-19",
-      "replacement": "background_downloader",
-      "migrationNotes": "Total rewrite of background task initialization.",
+      "replacement": "Upgrade to >=1.5.2",
+      "migrationNotes": "Upgrade to >=1.5.2 (latest 1.12.1). background_downloader is an alternative but needs a total rewrite of background task initialization.",
       "archiveSizeBytes": 826055,
       "archiveSizeMB": 0.79,
       "license": "BSD-3-Clause",
@@ -1591,50 +1528,6 @@
         "ios"
       ],
       "appliesToMaxVersion": "1.5.1"
-    },
-    {
-      "name": "open_file_v3",
-      "status": "end_of_life",
-      "reason": "Fails to map modern MIME types, causing the OS to reject opening PDFs/docs.",
-      "as_of": "2026-03-09",
-      "replacement": "open_filex",
-      "migrationNotes": "Easy migration. Maintained fork with exact API.",
-      "archiveSizeBytes": 15764086,
-      "archiveSizeMB": 15.03,
-      "license": "BSD-3-Clause",
-      "lastUpdated": "2026-01-08",
-      "pubPoints": 150,
-      "verifiedPublisher": false,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ]
-    },
-    {
-      "name": "file_picker_v3",
-      "status": "end_of_life",
-      "reason": "(Legacy versions) Returns relative paths that the app lacks permission to read.",
-      "as_of": "2026-03-09",
-      "replacement": null,
-      "migrationNotes": null,
-      "archiveSizeBytes": 20261718,
-      "archiveSizeMB": 19.32,
-      "license": "MIT",
-      "lastUpdated": "2026-01-28",
-      "pubPoints": 150,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ]
     },
     {
       "name": "path_provider_foundation",
@@ -1658,37 +1551,14 @@
       "platforms": []
     },
     {
-      "name": "flutter_notifications_v8",
-      "status": "end_of_life",
-      "reason": "(Pre-v10) Completely ignores Android 14+ POST_NOTIFICATIONS permission requirements.",
-      "as_of": "2026-03-09",
-      "replacement": null,
-      "migrationNotes": null,
-      "archiveSizeBytes": 10240,
-      "archiveSizeMB": 0.01,
-      "license": "unknown",
-      "lastUpdated": "2019-07-05",
-      "pubPoints": 0,
-      "verifiedPublisher": false,
-      "platforms": []
-    },
-    {
-      "name": "workmanager_v04",
-      "status": "end_of_life",
-      "reason": "Background execution keys fail to register, so tasks never actually fire.",
-      "as_of": "2026-03-09",
-      "replacement": "Update to latest version",
-      "migrationNotes": "Moderate. Callbacks require stricter async handling.",
-      "archiveSizeBytes": 13544,
-      "archiveSizeMB": 0.01,
-      "license": "MIT",
-      "lastUpdated": "2025-08-31",
-      "pubPoints": 140,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios"
-      ]
+      "name": "workmanager",
+      "status": "upgrade_required",
+      "reason": "0.4.x background execution keys fail to register, so tasks never fire.",
+      "as_of": "2026-09-19",
+      "replacement": "Upgrade to >=0.5.0",
+      "migrationNotes": "Upgrade to >=0.5.0 (latest 0.10.10; 0.10.8+ recommended for Android 16). Callbacks require stricter async handling.",
+      "appliesToMinVersion": "0.4.0",
+      "appliesToMaxVersion": "0.5.0"
     },
     {
       "name": "flutter_background_service",
@@ -1743,41 +1613,6 @@
         "ios",
         "macos",
         "web"
-      ]
-    },
-    {
-      "name": "geolocator_apple_v1",
-      "status": "end_of_life",
-      "reason": "Standalone version dead; lacks modern iOS precise location toggles.",
-      "as_of": "2026-03-09",
-      "replacement": "geolocator",
-      "migrationNotes": "Do not use standalone components. Use main package.",
-      "archiveSizeBytes": 241107,
-      "archiveSizeMB": 0.23,
-      "license": "MIT",
-      "lastUpdated": "2025-03-21",
-      "pubPoints": 160,
-      "verifiedPublisher": true,
-      "platforms": [
-        "ios",
-        "macos"
-      ]
-    },
-    {
-      "name": "geolocator_android_v1",
-      "status": "end_of_life",
-      "reason": "Standalone version dead; crashes on Android 14 location permission prompt.",
-      "as_of": "2026-03-09",
-      "replacement": "geolocator",
-      "migrationNotes": "Same as above. Use unified plugin.",
-      "archiveSizeBytes": 136597,
-      "archiveSizeMB": 0.13,
-      "license": "MIT",
-      "lastUpdated": "2025-07-01",
-      "pubPoints": 160,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android"
       ]
     },
     {
@@ -1847,12 +1682,12 @@
     },
     {
       "name": "flutter_secure_storage",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "(Pre-v5.0) Keychain/Keystore logic is old; data can be wiped on OS upgrades.",
       "as_of": "2026-09-19",
-      "replacement": "Update to v9+",
+      "replacement": "Upgrade to >=5.0.0",
       "replacementObsoleteFromVersion": "9.0.0",
-      "migrationNotes": "Critical update. Fixes Android Keystore initialization.",
+      "migrationNotes": "Upgrade to >=5.0.0 (latest 11.2.0; v9+ recommended). Critical update: fixes Android Keystore initialization.",
       "archiveSizeBytes": 385215,
       "archiveSizeMB": 0.37,
       "license": "BSD-3-Clause",
@@ -1970,10 +1805,10 @@
     },
     {
       "name": "flutter_sms_inbox",
-      "status": "end_of_life",
-      "reason": "Google Play Store explicitly bans apps using this broad SMS read permission.",
+      "status": "caution",
+      "reason": "Google Play policy restricts apps that request broad SMS read permission; apps using this package can be rejected unless they qualify for a permitted use case.",
       "as_of": "2026-09-19",
-      "replacement": "None",
+      "replacement": null,
       "migrationNotes": "Redesign app to not scrape user text messages.",
       "archiveSizeBytes": 65395,
       "archiveSizeMB": 0.06,
@@ -2004,11 +1839,11 @@
     },
     {
       "name": "keyboard_actions",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "FocusNode conflicts cause the keyboard to continuously flicker open and closed.",
       "as_of": "2026-09-19",
-      "replacement": "Use Native FocusNodes",
-      "migrationNotes": "Rewrite using `FocusManager.instance.primaryFocus?.unfocus()`.",
+      "replacement": "Upgrade to >=4.2.2",
+      "migrationNotes": "Upgrade to >=4.2.2 (latest 5.0.2). Alternative: drop the package and use FocusManager.instance.primaryFocus?.unfocus() with native FocusNodes.",
       "archiveSizeBytes": 1556054,
       "archiveSizeMB": 1.48,
       "license": "MIT",
@@ -2201,9 +2036,7 @@
         "macos",
         "web",
         "windows"
-      ],
-      "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "3.0.0"
+      ]
     },
     {
       "name": "isar",
@@ -2348,10 +2181,10 @@
     },
     {
       "name": "audioplayers",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Uses the removed `AudioCache` API; a new async player-instance API is required.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Heavy migration. `AudioCache` is gone, completely new async API.",
+      "migrationNotes": "Upgrade to >=1.0.0 (latest 6.8.1). Heavy migration. `AudioCache` is gone, completely new async API.",
       "archiveSizeBytes": 21021805,
       "archiveSizeMB": 20.05,
       "license": "MIT",
@@ -2366,14 +2199,15 @@
         "web",
         "windows"
       ],
-      "appliesToMaxVersion": "1.0.0"
+      "appliesToMaxVersion": "1.0.0",
+      "replacement": "Upgrade to >=1.0.0"
     },
     {
       "name": "file_picker",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Returns unreadable cache paths.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Moderate. Update async fetching and handle new Scoped Storage rules.",
+      "migrationNotes": "Upgrade to >=3.0.0 (latest 13.1.0). Moderate. Update async fetching and handle new Scoped Storage rules.",
       "archiveSizeBytes": 26219,
       "archiveSizeMB": 0.03,
       "license": "MIT",
@@ -2389,14 +2223,15 @@
         "windows"
       ],
       "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "3.0.0"
+      "appliesToMaxVersion": "3.0.0",
+      "replacement": "Upgrade to >=3.0.0"
     },
     {
       "name": "flutter_local_notifications",
-      "status": "end_of_life",
-      "reason": "Ignores Android 14 POST flags.",
+      "status": "upgrade_required",
+      "reason": "8.x predates the Android 12/13 notification requirements (PendingIntent mutability flags, POST_NOTIFICATIONS runtime permission); notifications can crash or be silently dropped on current Android.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Heavy rewrite. Initialization and tap-handling completely overhauled.",
+      "migrationNotes": "Upgrade to >=10.0.0 (latest 22.3.1). Request POST_NOTIFICATIONS and exact-alarm permission explicitly; initialization and tap handling were overhauled.",
       "archiveSizeBytes": 770725,
       "archiveSizeMB": 0.74,
       "license": "BSD-3-Clause",
@@ -2412,53 +2247,15 @@
         "windows"
       ],
       "appliesToMinVersion": "8.0.0",
-      "appliesToMaxVersion": "9.0.0"
-    },
-    {
-      "name": "flutter_rating_bar (Orig)",
-      "status": "end_of_life",
-      "reason": "Broken on 120Hz screens.",
-      "as_of": "2026-03-09",
-      "replacement": "flutter_rating_bar",
-      "migrationNotes": "Check for active forks or rebuild using native Gesturedetector + Row.",
-      "archiveSizeBytes": 6825252,
-      "archiveSizeMB": 6.51,
-      "license": "MIT",
-      "lastUpdated": "2022-05-18",
-      "pubPoints": 150,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ]
-    },
-    {
-      "name": "js (original)",
-      "status": "end_of_life",
-      "reason": "Blocks Wasm compilation.",
-      "as_of": "2026-03-09",
-      "replacement": "`dart:js_interop`",
-      "migrationNotes": "Huge rewrite. Requires migrating to strict Wasm-ready extension types.",
-      "archiveSizeBytes": 9994,
-      "archiveSizeMB": 0.01,
-      "license": "BSD-3-Clause",
-      "lastUpdated": "2025-02-11",
-      "pubPoints": 140,
-      "verifiedPublisher": true,
-      "platforms": [
-        "web"
-      ]
+      "appliesToMaxVersion": "9.0.0",
+      "replacement": "Upgrade to >=10.0.0"
     },
     {
       "name": "flutter_slidable",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Gestures conflict with modern Flutter internal navigators.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Complete rewrite of the ActionPane builders.",
+      "migrationNotes": "Upgrade to >=1.0.0 (latest 4.0.3). Complete rewrite of the ActionPane builders.",
       "archiveSizeBytes": 89485,
       "archiveSizeMB": 0.09,
       "license": "MIT",
@@ -2473,15 +2270,16 @@
         "web",
         "windows"
       ],
-      "appliesToMaxVersion": "1.0.0"
+      "appliesToMaxVersion": "1.0.0",
+      "replacement": "Upgrade to >=1.0.0"
     },
     {
       "name": "flutter_spinkit",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Hardcoded TickerProviders cause exceptions when screens pop.",
       "as_of": "2026-09-19",
-      "replacement": "Update to latest version",
-      "migrationNotes": "Drop-in update.",
+      "replacement": "Upgrade to >=5.0.0",
+      "migrationNotes": "Upgrade to >=5.0.0 (latest 5.2.2). Drop-in update.",
       "archiveSizeBytes": 1828277,
       "archiveSizeMB": 1.74,
       "license": "MIT",
@@ -2513,26 +2311,6 @@
       "pubPoints": 40,
       "verifiedPublisher": false,
       "platforms": []
-    },
-    {
-      "name": "local_auth (Legacy)",
-      "status": "end_of_life",
-      "reason": "Dead standalone package.",
-      "as_of": "2026-03-09",
-      "replacement": "Update to latest official",
-      "migrationNotes": "Drop-in update, improves biometric fallback mechanisms.",
-      "archiveSizeBytes": 247265,
-      "archiveSizeMB": 0.24,
-      "license": "BSD-3-Clause",
-      "lastUpdated": "2026-02-25",
-      "pubPoints": 150,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "macos",
-        "windows"
-      ]
     },
     {
       "name": "moor",
@@ -2747,10 +2525,10 @@
     },
     {
       "name": "simple_animations",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Stateless animation logic is fundamentally incompatible with Dart 3 type safety.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Total syntax rewrite using modern Control constructs.",
+      "migrationNotes": "Upgrade to >=3.0.0 (latest 5.3.0). Total syntax rewrite using modern Control constructs.",
       "archiveSizeBytes": 4648122,
       "archiveSizeMB": 4.43,
       "license": "MIT",
@@ -2767,7 +2545,8 @@
       ],
       "appliesToMinVersion": "2.0.0",
       "appliesToMaxVersion": "3.0.0",
-      "replacementObsoleteFromVersion": "5.0.0"
+      "replacementObsoleteFromVersion": "5.0.0",
+      "replacement": "Upgrade to >=3.0.0"
     },
     {
       "name": "fluro",
@@ -2793,8 +2572,8 @@
     },
     {
       "name": "beamer",
-      "status": "end_of_life",
-      "reason": "Maintainer MIA; unpatched bugs with WebAssembly (Wasm) URL synchronization.",
+      "status": "maintenance_mode",
+      "reason": "No release since 2024-10 (23 months); the maintainer is largely inactive, so open issues (including Wasm URL synchronization) may go unpatched.",
       "as_of": "2026-09-19",
       "replacement": "go_router",
       "migrationNotes": "Total architectural rewrite for navigation.",
@@ -2830,10 +2609,10 @@
     },
     {
       "name": "flutter_modular",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Global singletons block Dart 3 compilation; deeply flawed memory management.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Complete module syntax refactoring.",
+      "migrationNotes": "Upgrade to >=4.0.0 (latest 7.1.0). Complete module syntax refactoring.",
       "archiveSizeBytes": 88688,
       "archiveSizeMB": 0.08,
       "license": "MIT",
@@ -2850,7 +2629,8 @@
       ],
       "appliesToMinVersion": "3.0.0",
       "appliesToMaxVersion": "4.0.0",
-      "replacementObsoleteFromVersion": "7.0.0"
+      "replacementObsoleteFromVersion": "7.0.0",
+      "replacement": "Upgrade to >=4.0.0"
     },
     {
       "name": "dio_http_cache",
@@ -2965,11 +2745,11 @@
     },
     {
       "name": "camerawesome",
-      "status": "end_of_life",
-      "reason": "Lacks Android Scoped Storage flags; videos save to corrupted, unreadable paths.",
+      "status": "maintenance_mode",
+      "reason": "Latest release 2025-06 (15 months ago); slow maintenance. Older releases reported unreadable video paths under Android Scoped Storage, so re-test capture on current Android.",
       "as_of": "2026-09-19",
-      "replacement": "Update to latest version",
-      "migrationNotes": "Significant rewrite of the builder syntax.",
+      "replacement": null,
+      "migrationNotes": "Update to the latest 2.x release and re-test video capture paths on Android 14+.",
       "archiveSizeBytes": 62669454,
       "archiveSizeMB": 59.77,
       "license": "MIT",
@@ -3049,8 +2829,8 @@
       "status": "end_of_life",
       "reason": "Completely incompatible with Material 3 standard theming.",
       "as_of": "2026-09-19",
-      "replacement": "flutter_backdrop",
-      "migrationNotes": "Moderate theme updates required.",
+      "replacement": null,
+      "migrationNotes": "The former suggested replacement flutter_backdrop is discontinued. Build the backdrop with a Stack/BottomSheet using Material 3 theming instead.",
       "archiveSizeBytes": 211952,
       "archiveSizeMB": 0.2,
       "license": "MIT",
@@ -3172,11 +2952,11 @@
     },
     {
       "name": "flutter_colorpicker",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Relies on deprecated HSV math that creates inaccurate hex codes.",
       "as_of": "2026-09-19",
-      "replacement": "flex_color_picker",
-      "migrationNotes": "Moderate rewrite. Update color translation handling.",
+      "replacement": "Upgrade to >=1.0.0",
+      "migrationNotes": "Upgrade to >=1.0.0 (latest 1.1.0). Update color translation handling. flex_color_picker is an alternative but needs a moderate rewrite.",
       "archiveSizeBytes": 103849,
       "archiveSizeMB": 0.1,
       "license": "MIT",
@@ -3291,11 +3071,11 @@
     },
     {
       "name": "flutter_calendar_carousel",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Swiping physics conflicts with Flutter 3 engine updates, causing stutter.",
       "as_of": "2026-09-19",
-      "replacement": "table_calendar",
-      "migrationNotes": "Complete UI swap.",
+      "replacement": "Upgrade to >=3.0.0",
+      "migrationNotes": "Upgrade to >=3.0.0 (latest 3.0.1). Alternative: table_calendar (complete UI swap).",
       "archiveSizeBytes": 271522,
       "archiveSizeMB": 0.26,
       "license": "MIT",
@@ -3314,10 +3094,10 @@
     },
     {
       "name": "syncfusion_flutter_calendar",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Legacy commercial package; completely fails Dart 3 type checks.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Update license keys and fix null-safety breaks.",
+      "migrationNotes": "Upgrade to >=19.0.0 (latest 34.2.8). Update license keys and fix null-safety breaks.",
       "archiveSizeBytes": 4722228,
       "archiveSizeMB": 4.5,
       "license": "unknown",
@@ -3333,15 +3113,16 @@
         "windows"
       ],
       "appliesToMinVersion": "18.0.0",
-      "appliesToMaxVersion": "19.0.0"
+      "appliesToMaxVersion": "19.0.0",
+      "replacement": "Upgrade to >=19.0.0"
     },
     {
       "name": "intro_slider",
-      "status": "end_of_life",
-      "reason": "Layouts render as 1x1 pixel boxes on foldable and dual-screen devices.",
+      "status": "maintenance_mode",
+      "reason": "Latest release 2025-07 (15 months ago); slow maintenance. Layouts were reported to collapse on foldable/dual-screen devices, so verify on those form factors.",
       "as_of": "2026-09-19",
       "replacement": "introduction_screen",
-      "migrationNotes": "UI rewrite. Data models for pages changed.",
+      "migrationNotes": "Optional: introduction_screen is a maintained alternative (UI rewrite; page data models changed).",
       "archiveSizeBytes": 5190525,
       "archiveSizeMB": 4.95,
       "license": "MIT",
@@ -3440,10 +3221,10 @@
     },
     {
       "name": "flutter_typeahead",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Overlay floats behind keyboards on modern Android 14 inset architectures.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Major update to overlay rendering logic.",
+      "migrationNotes": "Upgrade to >=2.0.0 (latest 6.0.0). Major update to overlay rendering logic.",
       "archiveSizeBytes": 30545691,
       "archiveSizeMB": 29.13,
       "license": "BSD-2-Clause",
@@ -3459,7 +3240,8 @@
         "windows"
       ],
       "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "2.0.0"
+      "appliesToMaxVersion": "2.0.0",
+      "replacement": "Upgrade to >=2.0.0"
     },
     {
       "name": "autocomplete_textfield",
@@ -3671,10 +3453,10 @@
     },
     {
       "name": "curved_navigation_bar",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Severe stutter when pushing new routes over the bar.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Fix dependencies and null-safety errors.",
+      "migrationNotes": "Upgrade to >=1.0.0 (latest 1.0.6). Fix dependencies and null-safety errors.",
       "archiveSizeBytes": 374960,
       "archiveSizeMB": 0.36,
       "license": "BSD-2-Clause",
@@ -3689,7 +3471,8 @@
         "web",
         "windows"
       ],
-      "appliesToMaxVersion": "1.0.0"
+      "appliesToMaxVersion": "1.0.0",
+      "replacement": "Upgrade to >=1.0.0"
     },
     {
       "name": "fancy_bottom_navigation",
@@ -3708,10 +3491,10 @@
     },
     {
       "name": "convex_bottom_bar",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Gesture area overlaps system navigation bars on Android 15.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Update handling of system insets.",
+      "migrationNotes": "Upgrade to >=3.0.0 (latest 3.2.0). Update handling of system insets.",
       "archiveSizeBytes": 7319537,
       "archiveSizeMB": 6.98,
       "license": "Apache-2.0",
@@ -3727,7 +3510,8 @@
         "windows"
       ],
       "appliesToMinVersion": "2.0.0",
-      "appliesToMaxVersion": "3.0.0"
+      "appliesToMaxVersion": "3.0.0",
+      "replacement": "Upgrade to >=3.0.0"
     },
     {
       "name": "flutter_snake_navigationbar",
@@ -3775,10 +3559,9 @@
     },
     {
       "name": "responsive_builder",
-      "status": "end_of_life",
-      "reason": "Hardcoded breakpoints are totally obsolete for modern foldables.",
+      "status": "maintenance_mode",
+      "reason": "No release since 2024-07 (26 months); still pre-1.0 (latest 0.7.1). Hardcoded breakpoints may not suit foldables.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Refactor sizing information properties.",
       "archiveSizeBytes": 1175977,
       "archiveSizeMB": 1.12,
       "license": "MIT",
@@ -3792,15 +3575,14 @@
         "macos",
         "web",
         "windows"
-      ],
-      "appliesToMaxVersion": "1.0.0"
+      ]
     },
     {
       "name": "flutter_screenutil",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Init function crashes on initialization in modern Flutter views.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Update init pattern to use standard builders.",
+      "migrationNotes": "Upgrade to >=5.0.0 (latest 5.9.3). Update init pattern to use standard builders.",
       "archiveSizeBytes": 850174,
       "archiveSizeMB": 0.81,
       "license": "Apache-2.0",
@@ -3816,7 +3598,8 @@
         "windows"
       ],
       "appliesToMinVersion": "4.0.0",
-      "appliesToMaxVersion": "5.0.0"
+      "appliesToMaxVersion": "5.0.0",
+      "replacement": "Upgrade to >=5.0.0"
     },
     {
       "name": "size_config",
@@ -3900,26 +3683,11 @@
       ]
     },
     {
-      "name": "flutter_localizations",
-      "status": "end_of_life",
-      "reason": "Pre-null-safety; lacks modern RTL language mappings.",
-      "as_of": "2026-03-10",
-      "replacement": "Update to latest version",
-      "migrationNotes": "Update SDK constraints.",
-      "archiveSizeBytes": null,
-      "archiveSizeMB": null,
-      "license": "Not Found",
-      "lastUpdated": null,
-      "pubPoints": null,
-      "verifiedPublisher": false,
-      "platforms": []
-    },
-    {
       "name": "flutter_mobx",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Generators output invalid Dart 3 code, blocking compilation.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Update build_runner and regenerate all stores.",
+      "migrationNotes": "Upgrade to >=1.0.0 (latest 2.4.0). Update build_runner and regenerate all stores.",
       "archiveSizeBytes": 15218,
       "archiveSizeMB": 0.01,
       "license": "MIT",
@@ -3934,7 +3702,8 @@
         "web",
         "windows"
       ],
-      "appliesToMaxVersion": "1.0.0"
+      "appliesToMaxVersion": "1.0.0",
+      "replacement": "Upgrade to >=1.0.0"
     },
     {
       "name": "fish_redux",
@@ -4018,10 +3787,10 @@
     },
     {
       "name": "stacked",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "ViewModel locators throw exceptions due to old Provider bindings.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Update ViewModel builder syntax.",
+      "migrationNotes": "Upgrade to >=2.0.0 (latest 3.5.0). Update ViewModel builder syntax.",
       "archiveSizeBytes": 611627,
       "archiveSizeMB": 0.58,
       "license": "MIT",
@@ -4037,7 +3806,8 @@
         "windows"
       ],
       "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "2.0.0"
+      "appliesToMaxVersion": "2.0.0",
+      "replacement": "Upgrade to >=2.0.0"
     },
     {
       "name": "momentum",
@@ -4078,10 +3848,8 @@
     },
     {
       "name": "flutter_hooks",
-      "status": "end_of_life",
-      "reason": "Hook states decouple and cause memory leaks on rapid navigation.",
+      "status": "active",
       "as_of": "2026-09-19",
-      "migrationNotes": "Update syntax and hook definitions.",
       "archiveSizeBytes": 83307,
       "archiveSizeMB": 0.08,
       "license": "MIT",
@@ -4095,8 +3863,7 @@
         "macos",
         "web",
         "windows"
-      ],
-      "appliesToMaxVersion": "1.0.0"
+      ]
     },
     {
       "name": "functional_widget",
@@ -4218,10 +3985,10 @@
     },
     {
       "name": "sembast",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Synchronous writes freeze the UI thread on modern devices.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Major update to async database factory logic.",
+      "migrationNotes": "Upgrade to >=2.0.0 (latest 3.8.10). Major update to async database factory logic.",
       "archiveSizeBytes": 182235,
       "archiveSizeMB": 0.17,
       "license": "BSD-3-Clause",
@@ -4238,7 +4005,8 @@
       ],
       "appliesToMinVersion": "1.0.0",
       "appliesToMaxVersion": "2.0.0",
-      "replacementObsoleteFromVersion": "3.0.0"
+      "replacementObsoleteFromVersion": "3.0.0",
+      "replacement": "Upgrade to >=2.0.0"
     },
     {
       "name": "localstorage",
@@ -4279,10 +4047,10 @@
     },
     {
       "name": "chopper",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Code generator fails completely on Dart 3.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Regenerate all network services.",
+      "migrationNotes": "Upgrade to >=4.0.0 (latest 8.7.0). Regenerate all network services.",
       "archiveSizeBytes": 87023,
       "archiveSizeMB": 0.08,
       "license": "MIT",
@@ -4298,11 +4066,12 @@
         "windows"
       ],
       "appliesToMinVersion": "3.0.0",
-      "appliesToMaxVersion": "4.0.0"
+      "appliesToMaxVersion": "4.0.0",
+      "replacement": "Upgrade to >=4.0.0"
     },
     {
       "name": "graphql",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Pre-null-safety versions fail to compile under Dart 3's sound null safety.",
       "as_of": "2026-09-19",
       "replacement": "Upgrade to graphql ^5.2.4",
@@ -4411,10 +4180,10 @@
     },
     {
       "name": "youtube_player_iframe",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "YouTube blocked the old Web API; iframe renders a black screen.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Controller syntax completely changed.",
+      "migrationNotes": "Upgrade to >=3.0.0 (latest 6.0.2). Controller syntax completely changed.",
       "archiveSizeBytes": 622019,
       "archiveSizeMB": 0.59,
       "license": "BSD-3-Clause",
@@ -4428,7 +4197,8 @@
         "web"
       ],
       "appliesToMinVersion": "2.0.0",
-      "appliesToMaxVersion": "3.0.0"
+      "appliesToMaxVersion": "3.0.0",
+      "replacement": "Upgrade to >=3.0.0"
     },
     {
       "name": "audioplayer",
@@ -4484,10 +4254,8 @@
     },
     {
       "name": "camera",
-      "status": "end_of_life",
-      "reason": "Fails Android 14 Scoped Storage and iOS 18 hardware manifest requirements.",
+      "status": "active",
       "as_of": "2026-09-19",
-      "migrationNotes": "Heavy update to async camera initialization.",
       "archiveSizeBytes": 100426,
       "archiveSizeMB": 0.1,
       "license": "BSD-3-Clause",
@@ -4498,8 +4266,7 @@
         "android",
         "ios",
         "web"
-      ],
-      "appliesToMaxVersion": "1.0.0"
+      ]
     },
     {
       "name": "mapbox_gl",
@@ -4522,10 +4289,10 @@
     },
     {
       "name": "flutter_map",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Leaflet core fundamentally broken; maps render as gray squares.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Complete rewrite of map options and layers.",
+      "migrationNotes": "Upgrade to >=1.0.0 (latest 8.3.2). Complete rewrite of map options and layers.",
       "archiveSizeBytes": 938012,
       "archiveSizeMB": 0.89,
       "license": "BSD-3-Clause",
@@ -4540,14 +4307,15 @@
         "web",
         "windows"
       ],
-      "appliesToMaxVersion": "1.0.0"
+      "appliesToMaxVersion": "1.0.0",
+      "replacement": "Upgrade to >=1.0.0"
     },
     {
       "name": "location",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Fails Android 14 exact vs approximate location prompt requirements.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Update permission request flow.",
+      "migrationNotes": "Upgrade to >=4.0.0 (latest 10.0.2). Update permission request flow.",
       "archiveSizeBytes": 2996402,
       "archiveSizeMB": 2.86,
       "license": "MIT",
@@ -4563,7 +4331,8 @@
         "windows"
       ],
       "appliesToMinVersion": "3.0.0",
-      "appliesToMaxVersion": "4.0.0"
+      "appliesToMaxVersion": "4.0.0",
+      "replacement": "Upgrade to >=4.0.0"
     },
     {
       "name": "bitsdojo_window",
@@ -4601,26 +4370,11 @@
       ]
     },
     {
-      "name": "flutter_web_plugins",
-      "status": "end_of_life",
-      "reason": "Built directly into the Flutter SDK now; causes namespace collisions.",
-      "as_of": "2026-03-10",
-      "replacement": "None",
-      "migrationNotes": "Remove explicit dependency.",
-      "archiveSizeBytes": null,
-      "archiveSizeMB": null,
-      "license": "Not Found",
-      "lastUpdated": null,
-      "pubPoints": null,
-      "verifiedPublisher": false,
-      "platforms": []
-    },
-    {
       "name": "timeago",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "Pre-null-safety; blocks Dart 3 compilation.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Update syntax for custom locales.",
+      "migrationNotes": "Upgrade to >=3.0.0 (latest 3.7.1). Update syntax for custom locales.",
       "archiveSizeBytes": 23847,
       "archiveSizeMB": 0.02,
       "license": "MIT",
@@ -4636,7 +4390,8 @@
         "windows"
       ],
       "appliesToMinVersion": "2.0.0",
-      "appliesToMaxVersion": "3.0.0"
+      "appliesToMaxVersion": "3.0.0",
+      "replacement": "Upgrade to >=3.0.0"
     },
     {
       "name": "date_format",
@@ -4662,10 +4417,10 @@
     },
     {
       "name": "supercharged",
-      "status": "end_of_life",
+      "status": "upgrade_required",
       "reason": "String/Number extensions fail Dart 3 strict typing.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Syntax updates required.",
+      "migrationNotes": "Upgrade to >=2.0.0 (latest 2.1.1). Syntax updates required.",
       "archiveSizeBytes": 9771,
       "archiveSizeMB": 0.01,
       "license": "MIT",
@@ -4681,7 +4436,8 @@
         "windows"
       ],
       "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "2.0.0"
+      "appliesToMaxVersion": "2.0.0",
+      "replacement": "Upgrade to >=2.0.0"
     },
     {
       "name": "flutter_absolute_path",
@@ -4766,10 +4522,10 @@
     },
     {
       "name": "flutter_local_notifications",
-      "status": "end_of_life",
-      "reason": "Fails Android 14 POST_NOTIFICATIONS requirements.",
+      "status": "upgrade_required",
+      "reason": "9.x predates the Android 13 POST_NOTIFICATIONS runtime permission API and Android 14 exact-alarm permission changes; notifications are dropped unless permission handling is added manually.",
       "as_of": "2026-09-19",
-      "migrationNotes": "Requires explicitly asking for exact notification permissions.",
+      "migrationNotes": "Upgrade to >=10.0.0 (latest 22.3.1). Request POST_NOTIFICATIONS and exact-alarm permission explicitly; initialization and tap handling were overhauled.",
       "archiveSizeBytes": 770725,
       "archiveSizeMB": 0.74,
       "license": "BSD-3-Clause",
@@ -4785,7 +4541,8 @@
         "windows"
       ],
       "appliesToMinVersion": "9.0.0",
-      "appliesToMaxVersion": "10.0.0"
+      "appliesToMaxVersion": "10.0.0",
+      "replacement": "Upgrade to >=10.0.0"
     },
     {
       "name": "flutter_native_timezone",
@@ -8065,7 +7822,7 @@
     },
     {
       "name": "timeago",
-      "status": "maintenance_mode",
+      "status": "active",
       "as_of": "2026-09-19",
       "archiveSizeBytes": 23847,
       "archiveSizeMB": 0.02,

@@ -245,7 +245,7 @@ export function buildGradeBreakdown(results: readonly VibrancyResult[], avgScore
     const bottom = [...results]
         .sort((a, b) => a.score - b.score || a.package.name.localeCompare(b.package.name))
         .slice(0, 5);
-    const distRow = (key: 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'eol', filter: string, count: number) => {
+    const distRow = (key: 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'upgrade' | 'eol', filter: string, count: number) => {
         const pct = total > 0 ? Math.round((count / total) * 100) : 0;
         return `<li class="breakdown-dist-row">
             <button type="button" class="breakdown-filter-btn" data-filter="${filter}"
@@ -286,6 +286,7 @@ export function buildGradeBreakdown(results: readonly VibrancyResult[], avgScore
                     ${distRow('stable', 'stable', counts.stable)}
                     ${distRow('outdated', 'outdated', counts.outdated)}
                     ${distRow('abandoned', 'abandoned', counts.abandoned)}
+                    ${distRow('upgrade', 'upgrade-required', counts.upgradeRequired)}
                     ${distRow('eol', 'end-of-life', counts.eol)}
                 </ul>
             </section>
@@ -324,11 +325,12 @@ export function buildGradeBreakdown(results: readonly VibrancyResult[], avgScore
  *  buckets used in countByCategory don't carry the letter directly, so this
  *  small lookup keeps the badge styling consistent with the rest of the
  *  dashboard's grade-A/B/C/E/F CSS classes. */
-function gradeBadgeLetter(bucket: 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'eol'): string {
+function gradeBadgeLetter(bucket: 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'upgrade' | 'eol'): string {
     switch (bucket) {
         case 'vibrant': return 'A';
         case 'stable': return 'B';
         case 'outdated': return 'C';
+        case 'upgrade': return 'D';
         case 'abandoned': return 'E';
         case 'eol': return 'F';
     }
@@ -419,6 +421,7 @@ export function buildReportSummary(options: ReportOptions): string {
         <div class="summary-card stable" data-filter="stable" role="button" tabindex="0" title="${escapeHtml(gradeTitle('stableTitle'))}"><div class="count">${counts.stable}</div><div class="label">B</div></div>
         <div class="summary-card outdated" data-filter="outdated" role="button" tabindex="0" title="${escapeHtml(gradeTitle('outdatedTitle'))}"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
         <div class="summary-card abandoned" data-filter="abandoned" role="button" tabindex="0" title="${escapeHtml(gradeTitle('abandonedTitle'))}"><div class="count">${counts.abandoned}</div><div class="label">E</div></div>
+        <div class="summary-card upgrade" data-filter="upgrade-required" role="button" tabindex="0" title="${escapeHtml(gradeTitle('upgradeTitle'))}"><div class="count">${counts.upgradeRequired}</div><div class="label">D</div></div>
         <div class="summary-card eol" data-filter="end-of-life" role="button" tabindex="0" title="${escapeHtml(gradeTitle('eolTitle'))}"><div class="count">${counts.eol}</div><div class="label">F</div></div>
         <div class="summary-card updates" data-filter="updates" role="button" tabindex="0"><div class="count">${updates}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.updates'))}</div></div>
         <div class="summary-card unused" data-filter="unused" role="button" tabindex="0"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.unused'))}</div></div>

@@ -1612,7 +1612,7 @@ async function runScanInner(
             logger.info(
                 `Scan complete — ${logger.elapsedMs}ms — ` +
                 `vibrant:${counts.vibrant} stable:${counts.stable} ` +
-                `outdated:${counts.outdated} abandoned:${counts.abandoned} eol:${counts.eol}`,
+                `outdated:${counts.outdated} abandoned:${counts.abandoned} upgrade:${counts.upgradeRequired} eol:${counts.eol}`,
             );
 
             publishResults(targets, results, parsed, depGraphSummary);

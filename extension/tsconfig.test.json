@@ -8,7 +8,6 @@
   "include": [
     "src/services/todosAndHacksScannerCore.ts",
     "src/views/todosAndHacksDefaults.ts",
-    "src/test/i18n/localeParity.test.ts",
     "src/test/todosAndHacks/**/*.ts",
     "src/driftAdvisor/types.ts",
     "src/driftAdvisor/discovery.ts",
@@ -49,6 +48,7 @@
     "src/test/vibrancy/services/vibrancy-history.test.ts",
     "src/test/vibrancy/services/freshness-watcher.test.ts",
     "src/test/vibrancy/scoring/status-classifier.test.ts",
+    "src/test/vibrancy/scoring/lifecycle-status.test.ts",
     "src/test/vibrancy/state/vibrancy-state.test.ts",
     "src/test/vibrancy/scoring/vibrancy-calculator.test.ts",
     "src/test/vibrancy/scoring/bloat-calculator.test.ts",
@@ -267,6 +267,7 @@
     "src/test/views/sidebarStatusEngines.test.ts",
     "src/i18n/l10nParsers.ts",
     "src/test/l10nParsers.test.ts",
+    "src/test/i18n/localeParity.test.ts",
     "src/audit/audit-command.ts",
     "src/audit/audit-report-panel.ts",
     "src/audit/audit-report-html.ts",

@@ -25,12 +25,13 @@
               "commercial",
               "caution",
               "end_of_life",
+              "upgrade_required",
               "enterprise",
               "freemium",
               "maintenance_mode",
               "paid"
             ],
-            "description": "The category of the hazard."
+            "description": "The category of the hazard. end_of_life = the package itself is dead (unscoped). upgrade_required = the installed old major version is broken but the package lives on; use with appliesToMinVersion/appliesToMaxVersion."
           },
           "reason": {
             "type": "string",

@@ -5,6 +5,7 @@
  * Vibrancy UI experiment: scoring, providers, and webview assets.
  */
 
+import { l10n } from '../../i18n/runtime';
 import {
     VibrancyResult, OverrideAnalysis, FamilySplit, Problem,
     ProblemType, ActionType, PackageInsight,
@@ -98,6 +99,12 @@ export function collectProblems(
             type: 'unhealthy',
             severity: 'high',
             message: 'Package is end-of-life',
+        });
+    } else if (result.category === 'upgrade-required') {
+        problems.push({
+            type: 'unhealthy',
+            severity: 'medium',
+            message: l10n('lifecycle.upgradeRequired.insight'),
         });
     } else if (result.category === 'abandoned') {
         problems.push({
