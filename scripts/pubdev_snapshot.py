@@ -23,10 +23,41 @@ Two subcommands, deliberately separate so the (slow, networked) fetch and the
     FLAGGED report for a human to decide. Key order and formatting are
     preserved so the git diff stays minimal.
 
-    Lifecycle flags use the snapshot's latest release age vs ``--as-of``:
-    ``end_of_life`` with a release <12 months old (revived?; skipped for
-    entries with appliesToMinVersion/MaxVersion), ``active`` 12-24 months
-    old (candidate maintenance_mode) and >24 months (candidate end_of_life).
+    Flags are printed as ``[kind] message`` and summarised per kind:
+
+    * ``revived``: unbounded ``end_of_life`` released <12 months ago.
+    * ``stale``: ``active`` 12-24 months old (maintenance_mode candidate) or
+      >24 (end_of_life candidate) AND >=1 corroborating weak signal
+      (pubPoints <100, SDK upper bound <3.0.0, likes <100). pubPoints >=140
+      is exempt (finished mature library; mirrors status-classifier.ts).
+      The message lists the signals that fired.
+    * ``bounded-includes-latest`` / ``bounded-min-gt-max`` /
+      ``bounded-above-all`` / ``bounded-template-reason`` /
+      ``bounded-recent-release`` (INFO only): re-checks of
+      appliesToMinVersion/MaxVersion entries. ``appliesToMaxVersion`` is
+      EXCLUSIVE (matches the extension), so max > latest means the entry still
+      covers the newest release.
+    * ``replacement-404`` / ``replacement-discontinued`` /
+      ``replacement-chain`` / ``replacement-cycle``: replacement targets that
+      look like package names (same rule as isReplacementPackageName:
+      ``^[a-z0-9_]+$``); freeform replacements never trigger the
+      ``replacedBy-mismatch`` flag.
+    * ``dead-data`` (informational): tracked names that 404, SDK packages
+      (flutter_localizations, flutter_web_plugins) or names with
+      parentheses/suffix aliases, unless listed in SYNTHETIC_NAMES.
+    * ``stale-as-of``: entries NOT refreshed this run whose as_of is >90 days
+      before --as-of. ``--strict`` exits 1 if any exist.
+    * ``retracted-latest`` / ``advisories``: from snapshot format 2.
+
+    as_of is only ever refreshed for entries whose snapshot status is ``ok``
+    (verified). ``--refresh-as-of-only-verified`` is stricter: also leave
+    as_of alone for entries that raised any non-INFO flag this run.
+
+Snapshot ``format`` is 2 (adds ``origin``, ``allVersions``, ``retracted``,
+``advisories``); apply still reads format-1 snapshots (missing fields are
+simply skipped). Replacement targets are snapshotted with origin
+``replacement``. One extra request per package (``/advisories``) is made;
+concurrency is 8 by default.
 
 Tracked packages come from ``TRACKED_SOURCES`` (currently: names in
 known_issues.json). Add a function returning an iterable of names to extend
@@ -65,6 +96,25 @@ REPO = Path(__file__).resolve().parent.parent
 KNOWN_ISSUES = REPO / "extension/src/vibrancy/data/known_issues.json"
 DEFAULT_SNAPSHOT = REPO / "reports/pubdev_snapshot.json"
 VALID_NAME = re.compile(r"^[a-z0-9_]+$")  # excludes synthetic "x (Orig)" names
+SNAPSHOT_FORMAT = 2
+SDK_PACKAGES = {"flutter_localizations", "flutter_web_plugins", "flutter_test", "flutter"}
+# Intentionally virtual tracked names (skipped by the dead-data flag).
+SYNTHETIC_NAMES: set[str] = set()
+STALE_AS_OF_DAYS = 90
+RETRACT_WINDOW = 10
+# Generic reasons that say nothing package-specific; bounded entries using them
+# deserve a human re-check.
+TEMPLATE_REASONS = (
+    "fails android 14",
+    "fundamentally broken",
+    "fundamentally incompatible",
+    "fails dart 3",
+    "fail dart 3",
+    "fails completely",
+    "completely fails",
+    "totally obsolete",
+    "blocks dart 3",
+)
 API = "https://pub.dev/api"
 UA = "saropa_lints-pubdev-snapshot (+https://github.com/saropa/saropa_lints)"
 
@@ -77,17 +127,39 @@ def _known_issue_names() -> Iterable[str]:
     return [e["name"] for e in data["issues"]]
 
 
-TRACKED_SOURCES: list[Callable[[], Iterable[str]]] = [_known_issue_names]
+def is_replacement_package_name(r: str | None) -> bool:
+    """Mirror of isReplacementPackageName in extension/src/vibrancy/scoring/known-issues.ts."""
+    return bool(r) and re.fullmatch(r"[a-z0-9_]+", r.strip()) is not None
+
+
+def _replacement_names() -> Iterable[str]:
+    data = json.loads(KNOWN_ISSUES.read_text(encoding="utf-8"))
+    return [
+        e["replacement"].strip()
+        for e in data["issues"]
+        if is_replacement_package_name(e.get("replacement"))
+    ]
+
+
+TRACKED_SOURCES: list[tuple[str, Callable[[], Iterable[str]]]] = [
+    ("known_issue", _known_issue_names),
+    ("replacement", _replacement_names),
+]
+
+
+def tracked_origins(extra: list[str]) -> dict[str, str]:
+    """name -> origin tag ('known_issue' wins over 'replacement')."""
+    names: dict[str, str] = {}
+    for tag, src in TRACKED_SOURCES:
+        for n in src():
+            names.setdefault(n, tag)
+    for n in extra:
+        names.setdefault(n, "extra")
+    return {n: o for n, o in names.items() if VALID_NAME.match(n)}
 
 
 def tracked_names(extra: list[str]) -> list[str]:
-    names: dict[str, None] = {}
-    for src in TRACKED_SOURCES:
-        for n in src():
-            names[n] = None
-    for n in extra:
-        names[n] = None
-    return [n for n in names if VALID_NAME.match(n)]
+    return list(tracked_origins(extra))
 
 
 # --------------------------------------------------------------------------
@@ -158,6 +230,22 @@ def fetch_package(name: str, timeout: float, retries: int) -> dict:
         "sdk": (latest.get("pubspec", {}).get("environment") or {}).get("sdk"),
         "archiveSizeBytes": None,
     }
+    vers = pkg.get("versions") or []
+    out["allVersions"] = [v.get("version") for v in vers if v.get("version")]
+    recent = vers[-RETRACT_WINDOW:]
+    out["retracted"] = {
+        "window": len(recent),
+        "latestRetracted": bool(latest.get("retracted")),
+        "versions": [v["version"] for v in recent if v.get("retracted")],
+    }
+    st, body, _ = _request(f"{API}/packages/{name}/advisories", "GET", timeout, retries)
+    out["advisories"] = None
+    if st == 200:
+        try:
+            adv = json.loads(body).get("advisories") or []
+            out["advisories"] = [a.get("id") for a in adv]
+        except ValueError:
+            pass
     url = latest.get("archive_url")
     if url:
         st, _, h = _request(url, "HEAD", timeout, retries)
@@ -168,13 +256,12 @@ def fetch_package(name: str, timeout: float, retries: int) -> dict:
 
 
 def cmd_snapshot(a: argparse.Namespace) -> int:
-    names = tracked_names(a.package or [])
+    origins = tracked_origins(a.package or [])
     if a.packages_file:
-        names += [
-            ln.strip()
-            for ln in Path(a.packages_file).read_text().splitlines()
-            if VALID_NAME.match(ln.strip())
-        ]
+        for ln in Path(a.packages_file).read_text().splitlines():
+            if VALID_NAME.match(ln.strip()):
+                origins.setdefault(ln.strip(), "extra")
+    names = list(origins)
     if a.only:
         names = list(dict.fromkeys(a.only))
     out_path = Path(a.output)
@@ -188,12 +275,14 @@ def cmd_snapshot(a: argparse.Namespace) -> int:
 
     with ThreadPoolExecutor(max_workers=a.concurrency) as ex:
         for n, res in ex.map(work, names):
+            res["origin"] = origins.get(n, "extra")
             snap["packages"][n] = res
             done += 1
             if done % 50 == 0:
                 print(f"  {done}/{len(names)}", file=sys.stderr)
     snap["fetched_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     snap["source"] = API
+    snap["format"] = SNAPSHOT_FORMAT
     counts: dict[str, int] = {}
     for n in names:
         s = snap["packages"][n]["status"]
@@ -223,37 +312,125 @@ def _months_between(published: str, as_of: str) -> float | None:
     return (d2 - d1).days / 30.44
 
 
-def lifecycle_flags(e: dict, s: dict, as_of: str) -> list[str]:
-    """Status-review flags from the snapshot's latest release age (never auto-applied).
+Flag = tuple[str, str]  # (kind, message)
 
-    - ``end_of_life`` still published, not discontinued, released within 12
-      months -> "revived?". Entries with appliesToMinVersion/MaxVersion are
-      skipped: they describe one old major, so a recent release of another
-      major does not invalidate them.
-    - ``active`` with latest release 12-24 months old -> candidate
-      ``maintenance_mode``; over 24 months -> candidate ``end_of_life``.
-    """
+
+def _ver(v: str | None) -> tuple[int, ...]:
+    base = re.sub(r"[-+].*$", "", (v or "").strip())
+    out = []
+    for seg in base.split("."):
+        m = re.match(r"\d+", seg)
+        out.append(int(m.group()) if m else 0)
+    return tuple(out) + (0,) * (3 - len(out))
+
+
+def _sdk_upper_is_old(sdk: str | None) -> bool:
+    m = re.search(r"<\s*=?\s*([0-9][0-9.]*)", sdk or "")
+    return bool(m) and _ver(m.group(1)) <= (3, 0, 0)
+
+
+def stale_signals(s: dict) -> list[str]:
+    """Weak corroborating signals for an old release (commit data is not in the snapshot)."""
+    sig = []
+    pp = s.get("pubPoints")
+    if pp is not None and pp < 100:
+        sig.append(f"pubPoints={pp}<100")
+    if _sdk_upper_is_old(s.get("sdk")):
+        sig.append(f"sdk={s.get('sdk')} (old Dart upper bound)")
+    lk = s.get("likes")
+    if lk is not None and lk < 100:
+        sig.append(f"likes={lk}<100")
+    return sig
+
+
+def bounded_flags(e: dict, s: dict, as_of: str, age: float) -> list[Flag]:
+    n, out = e["name"], []
+    lo, hi = e.get("appliesToMinVersion"), e.get("appliesToMaxVersion")
+    latest = s.get("version")
+    allv = s.get("allVersions") or ([latest] if latest else [])
+    if lo and hi and _ver(lo) >= _ver(hi):
+        out.append(("bounded-min-gt-max", f"{n}: appliesToMinVersion {lo} >= appliesToMaxVersion {hi} (empty range)"))
+    if lo and allv and all(_ver(v) < _ver(lo) for v in allv):
+        out.append(("bounded-above-all", f"{n}: appliesToMinVersion {lo} is above every published version (latest {latest})"))
+    if hi and latest and _ver(latest) < _ver(hi):
+        out.append((
+            "bounded-includes-latest",
+            f"{n} [{e['status']}]: appliesToMaxVersion {hi} (exclusive) does not exclude latest {latest}"
+            + (f" and is above every published version" if allv and all(_ver(v) < _ver(hi) for v in allv) else "")
+            + " - entry still describes the newest release",
+        ))
+    low = (e.get("reason") or "").lower()
+    hit = next((t for t in TEMPLATE_REASONS if t in low), None)
+    if hit:
+        out.append(("bounded-template-reason", f"{n}: bounded reason is generic ('{hit}') - verify it against the bounded range"))
+    if age < 12:
+        out.append(("bounded-recent-release", f"INFO {n} [{e['status']}]: latest release {s['published'][:10]} ({age:.0f} months old); bound may still be right"))
+    return out
+
+
+def lifecycle_flags(e: dict, s: dict, as_of: str) -> list[Flag]:
+    """Status-review flags (never auto-applied). Returns (kind, message) pairs."""
     n, st, out = e["name"], e["status"], []
     age = _months_between(s.get("published") or "", as_of)
     if age is None or s.get("isDiscontinued"):
         return out
     bounded = "appliesToMinVersion" in e or "appliesToMaxVersion" in e
-    if st == "end_of_life" and not bounded and age < 12:
-        out.append(
-            f"{n} [end_of_life]: not discontinued, latest release {s['published'][:10]} "
-            f"({age:.0f} months old) - revived?"
-        )
-    elif st == "active" and age >= 24:
-        out.append(
-            f"{n} [active]: latest release {s['published'][:10]} ({age:.0f} months old) "
-            "- stale, candidate end_of_life"
-        )
+    if bounded:
+        if st == "end_of_life":
+            out.extend(bounded_flags(e, s, as_of, age))
+        return out
+    if st == "end_of_life" and age < 12:
+        out.append(("revived", f"{n} [end_of_life]: not discontinued, latest release {s['published'][:10]} "
+                    f"({age:.0f} months old) - revived?"))
     elif st == "active" and age >= 12:
-        out.append(
-            f"{n} [active]: latest release {s['published'][:10]} ({age:.0f} months old) "
-            "- stale, candidate maintenance_mode"
-        )
+        if (s.get("pubPoints") or 0) >= 140:
+            return out  # finished mature library, same exemption as status-classifier.ts
+        sig = stale_signals(s)
+        if sig:
+            cand = "end_of_life" if age >= 24 else "maintenance_mode"
+            out.append(("stale", f"{n} [active]: latest release {s['published'][:10]} ({age:.0f} months old) "
+                        f"- stale, candidate {cand}; signals: {'; '.join(sig)}"))
     return out
+
+
+def replacement_flags(e: dict, pk: dict, by_name: dict[str, list[dict]]) -> list[Flag]:
+    n, r = e["name"], e.get("replacement")
+    if not is_replacement_package_name(r):
+        return []
+    r, out = r.strip(), []
+    rs = pk.get(r)
+    if rs and rs.get("status") == "not_found":
+        out.append(("replacement-404", f"{n}: replacement {r!r} 404s on pub.dev"))
+    elif rs and rs.get("isDiscontinued"):
+        out.append(("replacement-discontinued", f"{n}: replacement {r!r} is discontinued upstream"))
+    if any(x["status"] == "end_of_life" and "appliesToMinVersion" not in x and "appliesToMaxVersion" not in x
+           for x in by_name.get(r, [])):
+        out.append(("replacement-chain", f"{n} -> {r}: replacement is itself end_of_life in known_issues"))
+    # cycle: follow unbounded replacement links from n
+    seen, cur = [n], r
+    while cur and cur not in seen:
+        seen.append(cur)
+        nxt = next((x.get("replacement") for x in by_name.get(cur, [])
+                    if is_replacement_package_name(x.get("replacement"))), None)
+        cur = nxt.strip() if nxt else None
+    if cur == n:
+        out.append(("replacement-cycle", f"{n}: replacement cycle {' -> '.join(seen + [n])}"))
+    return out
+
+
+def dead_data_flag(e: dict, s: dict | None) -> list[Flag]:
+    n = e["name"]
+    if n in SYNTHETIC_NAMES:
+        return []
+    if n in SDK_PACKAGES:
+        why = "SDK package (not on pub.dev as a normal dependency)"
+    elif not VALID_NAME.match(n):
+        why = "name has parentheses/suffix alias (not a real package name)"
+    elif s and s.get("status") == "not_found":
+        why = "404 on pub.dev (removed?)"
+    else:
+        return []
+    return [("dead-data", f"INFO {n} [{e['status']}]: {why}")]
 
 
 def cmd_apply(a: argparse.Namespace) -> int:
@@ -261,25 +438,33 @@ def cmd_apply(a: argparse.Namespace) -> int:
     pk = snap["packages"]
     raw = KNOWN_ISSUES.read_text(encoding="utf-8")
     data = json.loads(raw)
+    by_name: dict[str, list[dict]] = {}
+    for x in data["issues"]:
+        by_name.setdefault(x["name"], []).append(x)
     updated = unchanged = 0
     not_found: list[str] = []
     errors: list[str] = []
     absent: list[str] = []
-    flags: list[str] = []
+    flags: list[Flag] = []
+    unrefreshed: list[tuple[str, str]] = []
     for e in data["issues"]:
         n = e["name"]
         if a.only and n not in a.only:
             continue
         s = pk.get(n)
+        flags.extend(dead_data_flag(e, s))
+        flags.extend(replacement_flags(e, pk, by_name))
         if s is None:
             absent.append(n)
+            unrefreshed.append((n, e.get("as_of") or ""))
             continue
         if s["status"] == "not_found":
             not_found.append(n)
-            flags.append(f"{n} [{e['status']}]: 404 on pub.dev (removed?)")
+            unrefreshed.append((n, e.get("as_of") or ""))
             continue
         if s["status"] != "ok":
             errors.append(n)
+            unrefreshed.append((n, e.get("as_of") or ""))
             continue
         before = json.dumps(e)
         if "lastUpdated" in e and s["published"]:
@@ -298,61 +483,113 @@ def cmd_apply(a: argparse.Namespace) -> int:
                 for p in ("android", "ios", "linux", "macos", "web", "windows")
                 if p in s["platforms"]
             ]
-        e["as_of"] = a.as_of
         # Flags: never auto-rewritten.
+        mine: list[Flag] = []
         st, disc = e["status"], s["isDiscontinued"]
         if disc and st != "end_of_life":
-            flags.append(
-                f"{n} [{st}]: now DISCONTINUED on pub.dev (replacedBy={s['replacedBy']})"
-            )
-        flags.extend(lifecycle_flags(e, s, a.as_of))
+            mine.append(("discontinued", f"{n} [{st}]: now DISCONTINUED on pub.dev (replacedBy={s['replacedBy']})"))
+        mine.extend(lifecycle_flags(e, s, a.as_of))
         rb = s["replacedBy"]
-        if rb and e.get("replacement") != rb:
-            flags.append(
-                f"{n}: pub.dev replacedBy={rb!r} but replacement={e.get('replacement')!r}"
-            )
+        # Freeform replacement text is not comparable to a package name.
+        if rb and is_replacement_package_name(e.get("replacement")) and e.get("replacement", "").strip() != rb:
+            mine.append(("replacedBy-mismatch", f"{n}: pub.dev replacedBy={rb!r} but replacement={e.get('replacement')!r}"))
         lic = e.get("license")
         if lic and s["licenseTags"] and lic.lower() not in s["licenseTags"]:
-            flags.append(f"{n}: license {lic!r} vs pub.dev tags {s['licenseTags']}")
+            mine.append(("license", f"{n}: license {lic!r} vs pub.dev tags {s['licenseTags']}"))
+        rt = s.get("retracted") or {}
+        if rt.get("latestRetracted"):
+            mine.append(("retracted-latest", f"{n}: latest {s.get('version')} is RETRACTED"))
+        if s.get("advisories"):
+            mine.append(("advisories", f"{n}: {len(s['advisories'])} security advisories ({', '.join(map(str, s['advisories'][:3]))})"))
+        flags.extend(mine)
+        real = [f for f in mine if not f[1].startswith("INFO")]
+        if not (a.refresh_as_of_only_verified and real):
+            e["as_of"] = a.as_of
+        else:
+            unrefreshed.append((n, e.get("as_of") or ""))
         if json.dumps(e) != before:
             updated += 1
         else:
             unchanged += 1
+    # Entries left un-refreshed with an old as_of.
+    stale_as_of = []
+    for n, ao in unrefreshed:
+        age = _months_between(ao, a.as_of)
+        if age is None or age * 30.44 > STALE_AS_OF_DAYS:
+            stale_as_of.append(f"{n} (as_of={ao or 'missing'})")
+    if stale_as_of:
+        flags.append(("stale-as-of", f"{len(stale_as_of)} entries not refreshed with as_of >{STALE_AS_OF_DAYS}d old: "
+                      + ", ".join(stale_as_of)))
     text = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
-    print(f"snapshot fetched_at={snap.get('fetched_at')}")
+    print(f"snapshot format={snap.get('format', 1)} fetched_at={snap.get('fetched_at')}")
     print(
         f"updated={updated} unchanged={unchanged} not_in_snapshot={len(absent)} "
         f"404={len(not_found)} fetch_errors={len(errors)}"
     )
     if errors:
         print("fetch errors:", ", ".join(errors))
+    counts: dict[str, int] = {}
+    for k, _ in flags:
+        counts[k] = counts.get(k, 0) + 1
     print(f"FLAGGED ({len(flags)}):")
-    for f in flags:
-        print("  " + f)
+    for k, m in flags:
+        print(f"  [{k}] {m}")
+    print("flag counts:", json.dumps(dict(sorted(counts.items()))))
+    rc = 1 if (a.strict and stale_as_of) else 0
     if a.dry_run:
         print("[dry-run] known_issues.json not written")
-        return 0
+        return rc
     if text != raw:
         KNOWN_ISSUES.write_text(text, encoding="utf-8")
         print(f"Wrote {KNOWN_ISSUES}")
-    return 0
+    return rc
 
 
 def cmd_selftest(_a: argparse.Namespace) -> int:
-    def s(pub, disc=False):
-        return {"published": pub, "isDiscontinued": disc}
+    def s(pub, disc=False, **kw):
+        return {"published": pub, "isDiscontinued": disc, **kw}
+
+    def kinds(fl):
+        return [k for k, _ in fl]
 
     ao = "2026-09-19"
     eol = {"name": "x", "status": "end_of_life"}
-    assert lifecycle_flags(eol, s("2026-05-01T00:00:00Z"), ao), "revived should fire"
+    assert kinds(lifecycle_flags(eol, s("2026-05-01T00:00:00Z"), ao)) == ["revived"]
     assert not lifecycle_flags(eol, s("2025-01-01T00:00:00Z"), ao)
     assert not lifecycle_flags(eol, s("2026-05-01T00:00:00Z", True), ao)
-    assert not lifecycle_flags({**eol, "appliesToMaxVersion": "1.0.0"}, s("2026-05-01"), ao)
+    # T1 bounded
+    b = {**eol, "appliesToMaxVersion": "1.0.0", "reason": "Fails Android 14 stuff"}
+    k = kinds(lifecycle_flags(b, s("2026-05-01", version="0.21.3", allVersions=["0.21.3"]), ao))
+    assert "bounded-includes-latest" in k and "bounded-template-reason" in k and "bounded-recent-release" in k, k
+    k = kinds(lifecycle_flags({**b, "reason": "specific"}, s("2020-01-01", version="3.0.0"), ao))
+    assert k == [], k
+    k = kinds(lifecycle_flags({**eol, "appliesToMinVersion": "3.0.0", "appliesToMaxVersion": "2.0.0"},
+                              s("2020-01-01", version="1.0.0", allVersions=["1.0.0"]), ao))
+    assert "bounded-min-gt-max" in k and "bounded-above-all" in k, k
+    # T2 stale
     act = {"name": "y", "status": "active"}
-    assert not lifecycle_flags(act, s("2026-01-01"), ao)
-    assert "maintenance_mode" in lifecycle_flags(act, s("2025-03-01"), ao)[0]
-    assert "end_of_life" in lifecycle_flags(act, s("2023-03-01"), ao)[0]
+    assert not lifecycle_flags(act, s("2026-01-01", pubPoints=50), ao)
+    assert not lifecycle_flags(act, s("2023-03-01", pubPoints=150, likes=5), ao), "exempt >=140"
+    assert not lifecycle_flags(act, s("2023-03-01", pubPoints=120, likes=500, sdk=">=3.0.0 <4.0.0"), ao), "no signal"
+    f = lifecycle_flags(act, s("2025-03-01", pubPoints=90), ao)
+    assert "maintenance_mode" in f[0][1] and "pubPoints=90" in f[0][1]
+    f = lifecycle_flags(act, s("2023-03-01", pubPoints=120, likes=500, sdk=">=2.12.0 <3.0.0"), ao)
+    assert "end_of_life" in f[0][1] and "sdk=" in f[0][1]
     assert not lifecycle_flags(act, s(""), ao)
+    # T3 replacements
+    assert is_replacement_package_name("get_it") and not is_replacement_package_name("get_it with injectable")
+    bn = {"a": [{"name": "a", "status": "active", "replacement": "b"}],
+          "b": [{"name": "b", "status": "end_of_life", "replacement": "a"}]}
+    assert set(kinds(replacement_flags(bn["a"][0], {}, bn))) == {"replacement-chain", "replacement-cycle"}
+    pk = {"b": {"status": "not_found"}, "c": {"status": "ok", "isDiscontinued": True}}
+    assert kinds(replacement_flags({"name": "a", "status": "active", "replacement": "b"}, pk, {})) == ["replacement-404"]
+    assert kinds(replacement_flags({"name": "a", "status": "active", "replacement": "c"}, pk, {})) == ["replacement-discontinued"]
+    assert not replacement_flags({"name": "a", "status": "active", "replacement": "the `intl` package"}, pk, {})
+    # T6 dead data
+    assert dead_data_flag({"name": "flutter_localizations", "status": "active"}, None)
+    assert dead_data_flag({"name": "js (original)", "status": "active"}, None)
+    assert dead_data_flag({"name": "gone", "status": "active"}, {"status": "not_found"})
+    assert not dead_data_flag({"name": "ok_pkg", "status": "active"}, {"status": "ok"})
     print("selftest ok")
     return 0
 
@@ -376,6 +613,9 @@ def main() -> int:
     ap.add_argument("--snapshot", default=str(DEFAULT_SNAPSHOT))
     ap.add_argument("--only", action="append")
     ap.add_argument("--as-of", default=datetime.now().strftime("%Y-%m-%d"))
+    ap.add_argument("--strict", action="store_true", help="exit 1 when un-refreshed entries have as_of >90 days old")
+    ap.add_argument("--refresh-as-of-only-verified", action="store_true",
+                    help="do not bump as_of for entries that raised a non-INFO flag this run")
     ap.add_argument("--dry-run", action="store_true")
     ap.set_defaults(fn=cmd_apply)
     st = sub.add_parser("selftest", help="run the built-in lifecycle-flag self-test")

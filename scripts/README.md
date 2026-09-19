@@ -112,7 +112,7 @@ Scripts in this directory that can run independently:
 | `bulk_rule_metadata.py` | Bulk metadata operations |
 | `export_saropa_rules_for_gap.py` | Export rules for external tools |
 | `list_rules_without_fixes.py` | Query rules lacking quick fixes |
-| `pubdev_snapshot.py` | `snapshot`: cache pub.dev facts for every tracked package (`reports/pubdev_snapshot.json`, gitignored, has `fetched_at`). `apply`: offline refresh of machine-derivable fields in `extension/src/vibrancy/data/known_issues.json`; status changes are only flagged. `apply` also flags revived end_of_life entries (unbounded ones only) and stale active entries (12-24 months: maintenance_mode candidate; >24: end_of_life candidate). `selftest` runs built-in checks. Flags: `--dry-run`, `--only PKG`, `--concurrency`, `--retries`. Run `python scripts/pubdev_snapshot.py --help` |
+| `pubdev_snapshot.py` | `snapshot`: cache pub.dev facts for every tracked package (`reports/pubdev_snapshot.json`, gitignored, has `fetched_at`). `apply`: offline refresh of machine-derivable fields in `extension/src/vibrancy/data/known_issues.json`; status changes are only flagged. `apply` also prints per-kind flags: revived, stale (age plus a corroborating signal; pubPoints>=140 exempt), bounded-entry rechecks, replacement-target problems (404/discontinued/chain/cycle), dead-data, retracted/advisories (snapshot format 2), and stale-as-of (`--strict` exits 1; `--refresh-as-of-only-verified` withholds as_of on flagged entries). `selftest` runs built-in checks. Flags: `--dry-run`, `--only PKG`, `--concurrency`, `--retries`. Run `python scripts/pubdev_snapshot.py --help` |
 
 Historical scripts in `scripts/historical/` are not part of the build.
 
