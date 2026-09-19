@@ -104,6 +104,7 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Fixed (Extension)
 
+- Package Vibrancy's known-issues data now marks `cubit`, `shared_preferences_ios`, `url_strategy` and `integration_test` as end of life, no longer flags eight revived packages (such as `alice` and `rubber`), and stops flagging current `flutter_secure_storage` versions for a pre-5.0 problem. No action required.
 - The Analysis Optimizer's git-based scan now also covers Dart code inside git submodules and nested repositories. No action required.
 - The nested-package warning is now translated into all supported languages. No action required.
 - The Analysis Optimizer now lists Dart files through git in one pass when the project is a git repository, so scans are faster, ignored files never count, and the 50,000-file cap no longer applies there. Projects without git keep the previous scan. No action required.
