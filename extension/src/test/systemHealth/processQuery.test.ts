@@ -1,6 +1,6 @@
 /**
  * Tests for the POSIX (macOS/Linux) `ps` process-query path added for
- * `bugs/infra_system_health_monitor_windows_only_no_macos_analysis_server_warning.md`.
+ * `plans/history/2026.09/2026.09.19/infra_system_health_monitor_windows_only_no_macos_analysis_server_warning.md`.
  *
  * The System Health monitor was Windows-only because every data source shelled
  * out to `powershell.exe`/`Get-CimInstance`. These tests pin the pure parsers

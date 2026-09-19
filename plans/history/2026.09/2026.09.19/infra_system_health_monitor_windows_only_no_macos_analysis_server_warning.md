@@ -1,6 +1,6 @@
 # BUG: System Health monitor is Windows-only — a 6.7 GB analysis server on an 8 GB Mac raises no warning
 
-**Status: Fix Ready**
+**Status: Closed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -140,7 +140,9 @@ Parsers (`ps`, `vm_stat`, `sysctl` output) should be extracted as pure functions
 
 ## Commits
 
-<!-- Add commit hashes as fixes land. -->
+- `6d97faa3`: POSIX process and memory queries, platform gate (landed with other extension work)
+- `64806f47`: POSIX health tests
+- `b0d0fdd4`: locale-safe `ps` parsing, same-second parent check, locale string, report corrections
 
 ---
 

@@ -1,6 +1,6 @@
 /**
  * Tests for the cross-platform system memory query added by
- * `bugs/infra_system_health_monitor_windows_only_no_macos_analysis_server_warning.md`.
+ * `plans/history/2026.09/2026.09.19/infra_system_health_monitor_windows_only_no_macos_analysis_server_warning.md`.
  *
  * These pin the pure parsers (`parseVmStat`, `parseHwMemsize`,
  * `parseMeminfo`) against captured real-world output shapes, so the

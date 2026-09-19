@@ -171,4 +171,4 @@ Run with the vscode mock preloaded (`node -r out-test/test/vibrancy/register-vsc
 - custom_lint version: n/a (extension-native)
 - Triggering project/file: `saropa_contacts` workspace, macOS 26.6.2 (Apple silicon, 8 GB RAM)
 - Downstream workaround: `saropa_contacts` commit `2213808bb7` (branch `verify/test-slices`) adds `.claude/**` to `analysis_options.yaml`, `.claude` to `dart.analysisExcludedFolders` and `**/.claude/worktrees/**` to `files.watcherExclude`
-- Related: `bugs/infra_system_health_monitor_windows_only_no_macos_analysis_server_warning.md`
+- Related: `plans/history/2026.09/2026.09.19/infra_system_health_monitor_windows_only_no_macos_analysis_server_warning.md`
