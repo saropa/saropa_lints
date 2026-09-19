@@ -27,11 +27,11 @@ On 2026-09-18 the `dart language-server` for the contacts workspace reached 6.7 
 |---|---|---|---|
 | 5 | Lower the heap cap in contacts to `4096` (or remove it), restart the analysis server, and check whether it settles lower and stays usable | User decides; Claude can edit the setting | This is a downstream project setting, so it needs your go-ahead. If the server hits the cap it slows down or restarts; watch for that. |
 | 6 | Measure the project's real peak: `/usr/bin/time -l dart analyze` in contacts, reading "maximum resident set size" | Claude | Run only when the contacts sessions are idle. The run itself needs a few GB, and running it now would push the machine further into swap. |
-| 7 | Find out why `scan_daemon` holds 3.1 GB | Claude (in this repo) | It's saropa_lints' own process, so this is our bug if it's a leak. Check its lifetime, whether it frees memory between scans, and whether `SAROPA_LINTS_MAX_RSS_MB` (default 4096) is applied. File a bug if it grows without bound. |
+| 7 | Decide whether a resident 3–3.6 GB `scan_daemon` is acceptable on an 8 GB machine | Claude + user | Not a leak. The daemon keeps a warm analyzer for the whole project on purpose; `bin/scan_daemon.dart` records about 3650 MB after prewarm on contacts, and it recycles itself above its ceiling. Contacts is locked to saropa_lints 15.2.12 (`^15.2.4`), so none of v16's memory work is active there, but v16 did not change this warm-daemon cost either. Options: upgrade contacts to v16 (same `analyzer ^12.1.0`, so the analyzer block doesn't apply), shut the daemon down when idle, or skip the daemon when physical RAM is low. |
 | 8 | System Health: warn when the heap cap is above about 50% of physical RAM, and suggest a RAM-based value in the heap-cap prompt | Claude (in this repo) | Today the dashboard only warns when there is no cap (`noHeapCap`); a cap of 6144 on 8 GB passes silently. File as `proposal_infra_…` first. |
 
 ## Done when
 
 - Step 6 gives a baseline peak for the project, and step 5 shows whether a lower cap holds under normal editing.
-- Step 7 either finds a daemon leak (bug filed) or explains the 3.1 GB.
+- Step 7 ends in a decision on the warm daemon for low-RAM machines (and whether contacts moves to v16).
 - Step 8 is filed as a proposal.
