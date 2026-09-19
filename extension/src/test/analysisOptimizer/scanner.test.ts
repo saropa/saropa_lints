@@ -164,10 +164,15 @@ describe('scanner git discovery (real repo)', () => {
       git(nest, 'init', '-q');
       fs.writeFileSync(path.join(nest, '.gitignore'), '*.g.dart\n');
       w(nest, 'lib/n.dart'); w(nest, 'lib/n.g.dart'); w(nest, '.hidden/h.dart');
+      // untracked parent dir (collapsed by --directory) hiding a repo two levels down
+      const hidden = path.join(main, 'vendor/deep/clone');
+      fs.mkdirSync(hidden, { recursive: true });
+      git(hidden, 'init', '-q');
+      w(hidden, 'lib/v.dart'); w(main, 'vendor/deep/notes.txt');
       const out = await listDartFilesViaGit(main);
       assert.ok(out !== undefined);
       const got = filterGitFileList(out!, undefined).sort();
-      const want = ['lib/a.dart', 'nested/inner/lib/n.dart'];
+      const want = ['lib/a.dart', 'nested/inner/lib/n.dart', 'vendor/deep/clone/lib/v.dart'];
       if (submoduleOk) want.push('packages/sm/lib/s.dart');
       assert.deepStrictEqual(got, want.sort());
     } finally {

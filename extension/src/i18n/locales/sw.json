@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: _PH1_: - Ni aina ya kiini cha mwili. {count} mapendekezo ya pakiti za sheria (s) yanahusu mradi huu.",
     "review": "Mapitio ya Ukaguzi wa Uhakiki.",
-    "dismiss": "Fungua kazi.",
+    "dismiss": "Ondoa",
     "reviewFailed": "Haikuweza kufungua ukaguzi wa pakiti ya sheria ya Saropa Lints. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "Tuzalisha",
       "openPanel": "Unganisha Panel ya Uzalishaji",
-      "dismiss": "Fungua kazi.",
+      "dismiss": "Ondoa",
       "optimizeAnalysis": "Tambua Analizi",
       "dontShowAgain": "Hakikisha Upeleka Tumia Kwa Muda Mmoja",
       "openMachineDashboard": "Fungua Afya ya Mashine",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "Vipengezeko vya kuzalishia kipengele ya faili ({count}) vilianzishwa kwenye kipengele hiki: {patterns}. Kuzalishia wao wakifanyike kushughulisha VS Code kutenganisha kipengele mbalimbali ya uharibifu na kipengele ya kipengele kizungumzwa kote kwenye kipengele.",
       "addAll": "Ona Wanda全部",
-      "dismiss": "Fungua kazi.",
+      "dismiss": "Ondoa",
       "added": "Zilizongezwa {count} file-watcher exclusions kwenye mstika ya workspace."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "Imeongezwa faili ya {count} ya kipindi kubwa sikuwa sio kikomotia kwenye kifichi ya faili: {files}. Hizi inaweza kuzalisha mifano ya memory na kuzalisha VS Code.",
       "addExclusions": "Ondoa kutokana na Watcher",
-      "dismiss": "Fungua kazi.",
+      "dismiss": "Ondoa",
       "added": "Zilizongezwa kipengele ya kufuta kipengele ya {count} kwenye mstari ya kazi."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "Mradi huu unatumia Drift Advisor. Sakinisha ugani wa Saropa Log Capture ili kulinganisha SQL ya wakati wa kukimbia na matokeo haya ya tuli.",
       "install": "Weka Uhifadhi wa Kumbukumbu ya Kukamata.",
-      "dismiss": "Fungua kazi."
+      "dismiss": "Ondoa"
     },
     "driftRecommend": {
       "message": "Server ya Drift Advisor imeunganishwa. Sakinisha kipengee cha kujitegemea Saropa Drift Advisor kwa uzoefu kamili wa Jopo la Shida.",
       "install": "Weka Mshauri wa Drift Advisor",
-      "dismiss": "Fungua kazi."
+      "dismiss": "Ondoa"
     }
   },
   "notify": {

@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: Il s'agit de la protéine du cerveau. {count} suggestion de paquet de règles s'appliquent à ce projet.",
     "review": "Un examen est une révision.",
-    "dismiss": "Le licenciement est annulé.",
+    "dismiss": "Ignorer",
     "reviewFailed": "Impossible d'ouvrir la révision du pack de règles Saropa Lints. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "Nettoyer",
       "openPanel": "Ouvrir le panneau de santé",
-      "dismiss": "Le licenciement est annulé.",
+      "dismiss": "Ignorer",
       "optimizeAnalysis": "Optimiser l'analyse",
       "dontShowAgain": "Ne plus afficher à nouveau",
       "openMachineDashboard": "Ouvrir la santé de l'ordinateur",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "Les exclusions du surveillant de fichiers recommandées par {count} sont manquantes dans ce workspace : {patterns}. L'ajout de ces exclusions empêche VS Code de suivre les artefacts de construction volumineux et les dumps de mémoire qui gaspillent de la mémoire.",
       "addAll": "Ajouter tout",
-      "dismiss": "Le licenciement est annulé.",
+      "dismiss": "Ignorer",
       "added": "Ajouté(s) {count} exclusion(s) de surveillance de fichier aux paramètres de l'espace de travail."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "Fichier(s) {count} volumineux trouvé(s) non exclu(s) du surveillant de fichiers : {files}. Ces fichiers peuvent épuiser la mémoire et faire planter VS Code.",
       "addExclusions": "Exclure du Watcher",
-      "dismiss": "Le licenciement est annulé.",
+      "dismiss": "Ignorer",
       "added": "Pattern(s) d'exclusion du watcher {count} ajoutés aux paramètres de l'espace de travail."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "Ce projet utilise Drift Advisor. Installez l'extension Saropa Log Capture pour corréler le SQL en cours d'exécution avec ces résultats statiques.",
       "install": "Installez la capture de journaux.",
-      "dismiss": "Le licenciement est annulé."
+      "dismiss": "Ignorer"
     },
     "driftRecommend": {
       "message": "Un serveur Drift Advisor est connecté. Installez l'extension autonome Saropa Drift Advisor pour bénéficier de toute l'accès au panneau des problèmes.",
       "install": "Installez le Drift Advisor dans l'appareil.",
-      "dismiss": "Le licenciement est annulé."
+      "dismiss": "Ignorer"
     }
   },
   "notify": {

@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: 已经是 {count}规则包建议 (s) 适用于本项目.",
     "review": "审查 评审 评论",
-    "dismiss": "解雇了,这是一个很好的方法.",
+    "dismiss": "忽略",
     "reviewFailed": "无法打开 Saropa Lints 规则包审阅。 {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "清理",
       "openPanel": "打开健康面板",
-      "dismiss": "解雇了,这是一个很好的方法.",
+      "dismiss": "忽略",
       "optimizeAnalysis": "优化分析",
       "dontShowAgain": "不再显示",
       "openMachineDashboard": "打开机器健康",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "在此工作区中缺少{count}推荐的文件监视器排除项：{patterns}。添加它们可防止VS Code跟踪占用内存的大型构建工件和堆转储。",
       "addAll": "全部添加",
-      "dismiss": "解雇了,这是一个很好的方法.",
+      "dismiss": "忽略",
       "added": "已将 {count} 文件监视器排除项添加到工作区设置中。"
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "发现{count}个未被文件监视器排除的大文件: {files}。这些文件可能耗尽内存并导致VS Code崩溃。",
       "addExclusions": "排除于监视器之外",
-      "dismiss": "解雇了,这是一个很好的方法.",
+      "dismiss": "忽略",
       "added": "已将{count}监视器排除模式添加到工作区设置中。"
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "这个项目使用了Drift Advisor. 安装 Saropa 记录捕获扩展程序,以将运行时的 SQL 与这些静态结果相关联.",
       "install": "安装日志捕获的安装",
-      "dismiss": "解雇了,这是一个很好的方法."
+      "dismiss": "忽略"
     },
     "driftRecommend": {
       "message": "一个漂移顾问服务器连接. 安装独立的 Saropa Drift Advisor 扩展,以获得完整的问题面板体验.",
       "install": "安装 Drift Advisor 的时间.",
-      "dismiss": "解雇了,这是一个很好的方法."
+      "dismiss": "忽略"
     }
   },
   "notify": {

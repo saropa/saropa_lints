@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: é um tipo de células {count} sugestão de conjunto de regras (s) se aplicam a este projeto.",
     "review": "Revisão de revisão Review Review.",
-    "dismiss": "Despedimento de despedido.",
+    "dismiss": "Dispensar",
     "reviewFailed": "Não consegui abrir a revisão do pacote de regras Saropa Lints. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "Limpar",
       "openPanel": "Painel de Saúde Open",
-      "dismiss": "Despedimento de despedido.",
+      "dismiss": "Dispensar",
       "optimizeAnalysis": "Otimizar Análise",
       "dontShowAgain": "Não Mostrar Novamente",
       "openMachineDashboard": "Abrir Saúde da Máquina",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "As exclusões recomendadas pelo {count} para observador de arquivos estão faltando neste workspace: {patterns}. Adicionar-as impede que o VS Code rastreie grandes artefatos de build e dumps de heap que desperdiçam memória.",
       "addAll": "Adicionar Todos",
-      "dismiss": "Despedimento de despedido.",
+      "dismiss": "Dispensar",
       "added": "{count} adicionado(s) à exclusão do arquivo-watcher nas configurações do workspace."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "Arquivos grandes {count} encontrados não excluídos do observador de arquivos: {files}. Esses podem esgotar a memória e causar o crash de VS Code.",
       "addExclusions": "Excluir do Watcher",
-      "dismiss": "Despedimento de despedido.",
+      "dismiss": "Dispensar",
       "added": "Padrão(s) de exclusão do observador {count} adicionado(s) às configurações do workspace."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "Este projeto usa o Drift Advisor. Instale a extensão Saropa Log Capture para correlacionar o SQL de tempo de execução com esses achados estáticos.",
       "install": "Instalar a captura de logs.",
-      "dismiss": "Despedimento de despedido."
+      "dismiss": "Dispensar"
     },
     "driftRecommend": {
       "message": "Um servidor Drift Advisor está conectado. Instale a extensão Saropa Drift Advisor para obter uma experiência completa no painel de problemas.",
       "install": "Instalar o Drift Advisor.",
-      "dismiss": "Despedimento de despedido."
+      "dismiss": "Dispensar"
     }
   },
   "notify": {

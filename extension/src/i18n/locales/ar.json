@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: هيئة البيانات الحيوية {count} حزمة قواعد اقتراحات (((s) تنطبق على هذا المشروع.",
     "review": "مراجعة المراجعة Review Review",
-    "dismiss": "فصله من العمل",
+    "dismiss": "تجاهل",
     "reviewFailed": "تعذر فتح مراجعة حزمة قواعد Saropa Lints. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "تنظيف",
       "openPanel": "فتح لوحة الصحة",
-      "dismiss": "فصله من العمل",
+      "dismiss": "تجاهل",
       "optimizeAnalysis": "تحسين التحليل",
       "dontShowAgain": "لا تظهر مرة أخرى",
       "openMachineDashboard": "فتح حالة الجهاز",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "{count} تطبيق إستثناءات المراقبة الموصى بها مفقودة من هذا المشروع: {patterns}. إضافة هذه الإستثناءات تمنع VS Code من تتبع مصنفات البناء الكبيرة وملفات التصحيح التي تستهلك الذاكرة.",
       "addAll": "أضف جميعًا",
-      "dismiss": "فصله من العمل",
+      "dismiss": "تجاهل",
       "added": "أضيفت إعدادات استثناءات مراقبة الملفات {count} إلى إعدادات المشروع."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "تم العثور على ملف(ات) كبير(ة) {count} غير مستبعد(ة) من مراقبة الملفات: {files}. ويمكن أن يؤدي ذلك إلى استهلاك الذاكرة وانهيار VS Code.",
       "addExclusions": "استبعد من المراقب",
-      "dismiss": "فصله من العمل",
+      "dismiss": "تجاهل",
       "added": "تم إضافة نمط(ات) استثناء {count} لمراقبة المُراقب إلى إعدادات الفضاء العمل."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "يستخدم هذا المشروع Drift Advisor. قم بتثبيت Saropa ملحق التقاط السجلات لترتيب SQL أثناء تشغيل مع هذه النتائج الثابتة.",
       "install": "قم بتثبيت التقاط السجلات.",
-      "dismiss": "فصله من العمل"
+      "dismiss": "تجاهل"
     },
     "driftRecommend": {
       "message": "يتم توصيل خادم Drift Advisor. قم بتثبيت إضافة Saropa Drift Advisor المستقلة للحصول على تجربة كاملة في لوحة المشاكل.",
       "install": "قم بتثبيت مستشار الانجراف Drift Advisor.",
-      "dismiss": "فصله من العمل"
+      "dismiss": "تجاهل"
     }
   },
   "notify": {

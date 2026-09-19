@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: เป็นการตรวจหา {count} คําแนะนําของกติกาชุด (s) ใช้กับโครงการนี้.",
     "review": "การตรวจสอบ Review Review",
-    "dismiss": "ขอยกเลิกการทํางาน",
+    "dismiss": "ปิด",
     "reviewFailed": "ไม่สามารถเปิดการตรวจสอบชุดกฎ Saropa Lints ได้ {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "ทำความสะอาด",
       "openPanel": "เปิดแผงสุขภาพ",
-      "dismiss": "ขอยกเลิกการทํางาน",
+      "dismiss": "ปิด",
       "optimizeAnalysis": "ปรับปรุงการวิเคราะห์",
       "dontShowAgain": "อย่าแสดงอีกต่อไป",
       "openMachineDashboard": "เปิดเครื่องมือตรวจสอบสุขภาพ",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "{count} ไฟล์ที่ควรจะตั้งค่าการติดตาม (file-watcher exclusion) ไม่ได้ถูกเพิ่มในพื้นที่ทำงานนี้: {patterns} การเพิ่มพวกมันจะป้องกัน VS Code ไม่ติดตามวัตถุการสร้างขนาดใหญ่และไฟล์การดัมพ์หน่วยความจำที่กินทรัพยากรความจำ",
       "addAll": "เพิ่มทั้งหมด",
-      "dismiss": "ขอยกเลิกการทํางาน",
+      "dismiss": "ปิด",
       "added": "เพิ่มการยกเว้น {count} ของไฟล์ watcher ไปยังการตั้งค่าของงาน (workspace)"
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "พบไฟล์ขนาดใหญ่ {count} ที่ไม่ได้ถูกตัดออกจากตัวติดตามไฟล์: {files} ไฟล์เหล่านี้อาจใช้หน่วยความจำจนหมดและทำให้ VS Code ล่ม",
       "addExclusions": "แยกออกจากรายการติดตาม",
-      "dismiss": "ขอยกเลิกการทํางาน",
+      "dismiss": "ปิด",
       "added": "เพิ่มรูปแบบการยกเว้น {count} watcher ไปยังตั้งค่าการทำงานร่วมกันของงาน"
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "โครงการนี้ใช้ Drift Advisor. ติดตั้ง Saropa Log Capture Extension เพื่อให้ SQL ที่ใช้ในช่วงเวลาทํางานสอดคล้องกับผลการค้นหาแบบสถิตเหล่านี้",
       "install": "ติดตั้ง Log Capture การบันทึกข้อมูล",
-      "dismiss": "ขอยกเลิกการทํางาน"
+      "dismiss": "ปิด"
     },
     "driftRecommend": {
       "message": "เซอร์เวอร์ Drift Advisor ถูกเชื่อมต่อ ติดตั้งการเพิ่ม Saropa Drift Advisor ที่เป็นตัวเดียว เพื่อให้ประสบการณ์ที่เต็มรูปแบบของ Problems-panel.",
       "install": "ติดตั้ง Drift Advisor ครับ",
-      "dismiss": "ขอยกเลิกการทํางาน"
+      "dismiss": "ปิด"
     }
   },
   "notify": {

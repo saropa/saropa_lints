@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: ヒトの体内にある {count} ルールパック提案は,このプロジェクトに適用されます.",
     "review": "レビューを重ねて見直す",
-    "dismiss": "解雇処分について",
+    "dismiss": "閉じる",
     "reviewFailed": "Saropa Lints ルール パックのレビューを開けませんでした。 {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "クリーンアップ",
       "openPanel": "ヘルスパネルを開く",
-      "dismiss": "解雇処分について",
+      "dismiss": "閉じる",
       "optimizeAnalysis": "分析を最適化",
       "dontShowAgain": "もう一度表示しない",
       "openMachineDashboard": "オープン マシン ヘルス",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "このワークスペースから{count}推奨のファイルウォッチャー除外項目{patterns}が欠落しています。これらを追加することで、VS Codeがメモリを浪費する大規模なビルドアーティファクトやヒープダンプを追跡しなくなります。",
       "addAll": "すべて追加",
-      "dismiss": "解雇処分について",
+      "dismiss": "閉じる",
       "added": "ワークスペース設定に{count}ファイルウォッチャーの除外を追加しました。"
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "{count} が指定された大容量ファイルがファイルウォッチャーから除外されていません: {files}。これらはメモリを枯渇させ VS Code をクラッシュする可能性があります。",
       "addExclusions": "ウォッチャーから除外",
-      "dismiss": "解雇処分について",
+      "dismiss": "閉じる",
       "added": "ワークスペース設定に{count}ウォッチャー除外パターンを追加しました。"
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "このプロジェクトは,Drift Advisor を使用しています. Saropa Log Capture 拡張子をインストールして,実行時の SQL とこれらの静的結果と相関させてください.",
       "install": "ログキャプチャのインストール",
-      "dismiss": "解雇処分について"
+      "dismiss": "閉じる"
     },
     "driftRecommend": {
       "message": "Drift Advisor サーバが接続されています. 完全な問題パネル体験のために,スタンドアロン Saropa Drift Advisor エクステンションをインストールします.",
       "install": "Drift Advisorをインストールする",
-      "dismiss": "解雇処分について"
+      "dismiss": "閉じる"
     }
   },
   "notify": {

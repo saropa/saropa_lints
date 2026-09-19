@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: adalah suatu senyawa yang {count} saran paket aturan (s) berlaku untuk proyek ini.",
     "review": "Review Review adalah ulasan yang dilakukan.",
-    "dismiss": "Mengusir dari pekerjaan.",
+    "dismiss": "Tutup",
     "reviewFailed": "Tidak dapat membuka tinjauan paket aturan Saropa Lints. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "Pembersihan",
       "openPanel": "Buka Panel Kesehatan",
-      "dismiss": "Mengusir dari pekerjaan.",
+      "dismiss": "Tutup",
       "optimizeAnalysis": "Optimalkan Analisis",
       "dontShowAgain": "Jangan Tampilkan Lagi",
       "openMachineDashboard": "Buka Kesehatan Mesin",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "{count} recommended file-watcher exclusion(s) are missing from this workspace: {patterns}. Adding them prevents VS Code from tracking large build artifacts and heap dumps that waste memory.",
       "addAll": "Tambahkan Semua",
-      "dismiss": "Mengusir dari pekerjaan.",
+      "dismiss": "Tutup",
       "added": "{count} file-watcher eksepsi ditambahkan ke pengaturan workspace."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "Ditemukan {count} file besar yang tidak dikecualikan dari file watcher: {files}. Ini dapat menghabiskan memori dan menyebabkan crash pada VS Code.",
       "addExclusions": "Keluar dari Watcher",
-      "dismiss": "Mengusir dari pekerjaan.",
+      "dismiss": "Tutup",
       "added": "Pola pengecualian pengawas {count} ditambahkan ke pengaturan workspace."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "Proyek ini menggunakan Drift Advisor. Instal ekstensi Saropa Log Capture untuk mengkorelasikan SQL runtime dengan temuan statis ini.",
       "install": "Install Log Capture untuk menginstal.",
-      "dismiss": "Mengusir dari pekerjaan."
+      "dismiss": "Tutup"
     },
     "driftRecommend": {
       "message": "Server Drift Advisor terhubung. Instal ekstensi Saropa Drift Advisor yang berdiri sendiri untuk pengalaman panel Masalah-panel penuh.",
       "install": "Instal Drift Advisor untuk menginstal.",
-      "dismiss": "Mengusir dari pekerjaan."
+      "dismiss": "Tutup"
     }
   },
   "notify": {

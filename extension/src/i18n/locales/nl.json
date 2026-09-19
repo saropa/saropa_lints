@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: Het is een generieke vorm van _ph1__. {count} regelpakket suggestie (s) zijn van toepassing op dit project.",
     "review": "Review Review Review Onderzoek en evaluatie",
-    "dismiss": "Ontslag ontslagen.",
+    "dismiss": "Negeren",
     "reviewFailed": "Kan de recensie van het Saropa Lints-regelpakket niet openen. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "Reinigen",
       "openPanel": "Open het Gezondheidspaneel",
-      "dismiss": "Ontslag ontslagen.",
+      "dismiss": "Negeren",
       "optimizeAnalysis": "Analyse optimaliseren",
       "dontShowAgain": "Niet Opnieuw Toon",
       "openMachineDashboard": "Open Machinestatus",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "De aangeraden bestand-watcher uitsluitingen van {count} ontbreken in dit werkruimte: {patterns}. Het toevoegen ervan voorkomt dat VS Code het volgen van grote build-artefacten en heap-dumps die geheugen verspillen.",
       "addAll": "Alles toevoegen",
-      "dismiss": "Ontslag ontslagen.",
+      "dismiss": "Negeren",
       "added": "Gebruikte {count} bestand-watcher uitsluitingen toegevoegd aan werkruimte instellingen."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "Grote bestand(en) {count} gevonden die niet uit de bestandswatcher zijn gesloten: {files}. Deze kunnen de geheugenruimte opzij zetten en VS Code kunnen crashen.",
       "addExclusions": "Uitsluiten van Watcher",
-      "dismiss": "Ontslag ontslagen.",
+      "dismiss": "Negeren",
       "added": "Gebruik van de watcher uitsluitingspatronen {count} is toegevoegd aan de werkruimte instellingen."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "Dit project maakt gebruik van Drift Advisor. Installeer de Saropa Log Capture extensie om runtime SQL te correleren met deze statische bevindingen.",
       "install": "Installeer Log Capture.",
-      "dismiss": "Ontslag ontslagen."
+      "dismiss": "Negeren"
     },
     "driftRecommend": {
       "message": "Een Drift Advisor-server is aangesloten. Installeer de standalone Saropa Drift Advisor extensie voor een volledige Problems-panel ervaring.",
       "install": "Installeer Drift Advisor.",
-      "dismiss": "Ontslag ontslagen."
+      "dismiss": "Negeren"
     }
   },
   "notify": {

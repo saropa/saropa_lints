@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: - פטריוטיביות {count} הצעת חבילת כללים (s) חל על הפרויקט הזה.",
     "review": "סקירה Review Review - ביקורת על הסקירה",
-    "dismiss": "פיטורים.",
+    "dismiss": "התעלם",
     "reviewFailed": "לא ניתן היה לפתוח את סקירת חבילת החוקים של Saropa Lints. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "נקה",
       "openPanel": "פתוח painel של בריאות",
-      "dismiss": "פיטורים.",
+      "dismiss": "התעלם",
       "optimizeAnalysis": "שפר ניתוח",
       "dontShowAgain": "אל תציג שוב",
       "openMachineDashboard": "פתיחה של מצב המכונה",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "{count} recommended file-watcher exclusion(s) are missing from this workspace: {patterns}. Adding them prevents VS Code from tracking large build artifacts and heap dumps that waste memory.",
       "addAll": "הוסף כל",
-      "dismiss": "פיטורים.",
+      "dismiss": "התעלם",
       "added": "הוספו סנאי שגיאה {count} למסגרת העבודה."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "מצאתי קבצים גדולים {count} שלא נמחקו מהצופה לקבצים: {files}. אלו יכולים לאיים את הזיכרון ולצמצם את VS Code.",
       "addExclusions": "הסר מהמר察ור",
-      "dismiss": "פיטורים.",
+      "dismiss": "התעלם",
       "added": "הוספו {count} mẫu תצפית חסימה ל설וגות העבודה."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "הפרויקט הזה משתמש ב-Drift Advisor. התקנו את Saropa Log Capture כדי לקשר בין SQL בזמן הפעלה עם הממצאים הסטטיים האלה.",
       "install": "התקנה של קלטת יומן",
-      "dismiss": "פיטורים."
+      "dismiss": "התעלם"
     },
     "driftRecommend": {
       "message": "שרת Drift Advisor מחובר. התקנו את התוספת Saropa Drift Advisor הפנויה באופן עצמאי, כדי לקבל חוויה מלאה של פאנל הבעיות.",
       "install": "התקנה של Drift Advisor",
-      "dismiss": "פיטורים."
+      "dismiss": "התעלם"
     }
   },
   "notify": {

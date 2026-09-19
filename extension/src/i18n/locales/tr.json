@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: _PH1_: -HİS'in ilk aşamas {count} kural paketi önerisi (ler) bu projeye uygulanır.",
     "review": "Review Review Review İnceleme Gözden Geçirme",
-    "dismiss": "İşten çıkarma, işten atmak.",
+    "dismiss": "Kapat",
     "reviewFailed": "Saropa Lints kural paketi incelemesini açamadım. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "Temizle",
       "openPanel": "Sağlık Paneli",
-      "dismiss": "İşten çıkarma, işten atmak.",
+      "dismiss": "Kapat",
       "optimizeAnalysis": "Analiz Optimizasyonu",
       "dontShowAgain": "Yine Gösterme",
       "openMachineDashboard": "Makine Sağlığı Açık",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "{count} önerilen dosya izleme hariç tutmaları bu çalışma alanından eksik: {patterns}. Bunları eklemek, VS Code tarafından belleği boşa harcayan büyük derleme artefaktlarını ve heap dump'ları izlenmesini engeller.",
       "addAll": "Tümünü Ekle",
-      "dismiss": "İşten çıkarma, işten atmak.",
+      "dismiss": "Kapat",
       "added": "{count} dosya izlemeçi hariç tutmaları işlevselliğe eklendi."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "{count} boyutunda büyük dosya(s) dosya izleyicisinden dışlanmamış: {files}. Bu dosyalar belleği tüketebilir ve VS Code'yi kapatabilir.",
       "addExclusions": "Watcher'dan Dışarıya Al",
-      "dismiss": "İşten çıkarma, işten atmak.",
+      "dismiss": "Kapat",
       "added": "{count} izlemeçi hariç tutma deseni(e) işlevsel ayarlara eklendi."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "Bu proje Drift Advisor kullanıyor. Bu statik bulgular ile SQL çalışma süresini ilişkilendirmek için Saropa Log Capture uzantısını yükleyin.",
       "install": "Log Capture'ı yükle",
-      "dismiss": "İşten çıkarma, işten atmak."
+      "dismiss": "Kapat"
     },
     "driftRecommend": {
       "message": "Bir Drift Advisor sunucusu bağlanmıştır. Tam Problemler-panel deneyimi için bağımsız Saropa Drift Advisor uzantısını yükleyin.",
       "install": "Drift Advisor'ı yükleyin.",
-      "dismiss": "İşten çıkarma, işten atmak."
+      "dismiss": "Kapat"
     }
   },
   "notify": {

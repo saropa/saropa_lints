@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: è il nome di una cellula che si sviluppa attraverso la crescita {count} suggerimento del pacchetto di regole (s) si applicano a questo progetto.",
     "review": "Revisione Review Review Esaminare la revisione.",
-    "dismiss": "Scusate il licenziamento.",
+    "dismiss": "Ignora",
     "reviewFailed": "Impossibile aprire la revisione del pacchetto di regole Saropa Lints. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "Pulisci",
       "openPanel": "Pannello Salute Aperto",
-      "dismiss": "Scusate il licenziamento.",
+      "dismiss": "Ignora",
       "optimizeAnalysis": "Ottimizza Analisi",
       "dontShowAgain": "Non Mostra di Nuovo",
       "openMachineDashboard": "Apri Salute Macchina",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "Le esclusioni del file-watcher consigliate da {count} sono mancanti in questo workspace: {patterns}. L'aggiunta di queste previene VS Code dal tracciare grandi artifact di build e dump di heap che sprechino la memoria.",
       "addAll": "Aggiungi Tutti",
-      "dismiss": "Scusate il licenziamento.",
+      "dismiss": "Ignora",
       "added": "Aggiunti gli esclusi {count} del file-watcher alle impostazioni dello spazio di lavoro."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "File {count} grandi trovati non esclusi dal watcher dei file: {files}. Questi possono esaurire la memoria e causare il crash di VS Code.",
       "addExclusions": "Escludi dal Watcher",
-      "dismiss": "Scusate il licenziamento.",
+      "dismiss": "Ignora",
       "added": "Patterni di esclusione {count} del watcher aggiunti alle impostazioni dello spazio di lavoro."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "Questo progetto utilizza Drift Advisor. Installare l'estensione Saropa Log Capture per correlare SQL runtime con questi risultati statici.",
       "install": "Installare la cattura del log.",
-      "dismiss": "Scusate il licenziamento."
+      "dismiss": "Ignora"
     },
     "driftRecommend": {
       "message": "Un server Drift Advisor è connesso. Installare l'estensione autonoma Saropa Drift Advisor per la completa esperienza del pannello Problemi.",
       "install": "Installare il Drift Advisor",
-      "dismiss": "Scusate il licenziamento."
+      "dismiss": "Ignora"
     }
   },
   "notify": {

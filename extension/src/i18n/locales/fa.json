@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: _PH1_: به معنی PH1. {count} پیشنهاد بسته قواعد (s) به این پروژه اعمال می شود.",
     "review": "بررسی Review Review بازبینی",
-    "dismiss": "اخراج از کار",
+    "dismiss": "رد کردن",
     "reviewFailed": "بازبینی بسته قانون Saropa Lints باز نشد. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "کلی نمایی",
       "openPanel": "پنل سلامت را باز کنید",
-      "dismiss": "اخراج از کار",
+      "dismiss": "رد کردن",
       "optimizeAnalysis": "بهینه سازی تحلیل",
       "dontShowAgain": "باز نشان نده",
       "openMachineDashboard": "مکانیزم سلامت ماشین",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "{count} تعدادی از فایل‌های نظارتی که پیشنهاد می‌شود از نظارت خارج شوند، در این فضای کار وجود ندارند: {patterns} . افزودن آنها از VS Code جلوگیری می‌کند تا اشیاء بزرگ ساخت و ذخیره‌سازی‌های حافظه را رد کند که حافظه را هدر ببرند.",
       "addAll": "افزودن همه",
-      "dismiss": "اخراج از کار",
+      "dismiss": "رد کردن",
       "added": "فایل‌های نظارت‌کننده {count} به تنظیمات فضای کاری افزوده شدند."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "فایل(های) بزرگ {count} پیدا شد که از نظارت فایل استثناء نشده اند: {files}. این فایل(های) می توانند حافظه را خالی کنند و VS Code را خاموش کنند.",
       "addExclusions": "از نظارت خارج کن",
-      "dismiss": "اخراج از کار",
+      "dismiss": "رد کردن",
       "added": "الگوی (های) حذف {count} نظارتی به تنظیمات فضای کاری افزوده شد."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "این پروژه از Drift Advisor استفاده می کند. Saropa افزونه Log Capture را برای ارتباط SQL زمان اجرا با این یافته های استاتیک نصب کنید.",
       "install": "نصب ضبط لاگ (Log Capture)",
-      "dismiss": "اخراج از کار"
+      "dismiss": "رد کردن"
     },
     "driftRecommend": {
       "message": "یک سرور Drift Advisor متصل شده است. برای تجربه کامل پانل مشکلات، افزونه Saropa Drift Advisor مستقل را نصب کنید.",
       "install": "نصب Drift Advisor را انجام دهید",
-      "dismiss": "اخراج از کار"
+      "dismiss": "رد کردن"
     }
   },
   "notify": {

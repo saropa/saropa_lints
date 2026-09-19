@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: PH1__는 {count} 규칙 패키지 제안은 이 프로젝트에 적용됩니다.",
     "review": "검토 리뷰를 검토하십시오.",
-    "dismiss": "해고 처분",
+    "dismiss": "닫기",
     "reviewFailed": "Saropa Lints 규칙 팩 검토를 열 수 없습니다. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "정리하기",
       "openPanel": "오픈 헬스 패널",
-      "dismiss": "해고 처분",
+      "dismiss": "닫기",
       "optimizeAnalysis": "분석 최적화",
       "dontShowAgain": "다시 보지 않기",
       "openMachineDashboard": "기계 건강 열기",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "이 작업 공간에서 {count} 추천 파일 감시 제외 항목들이 누락되었습니다: {patterns}. 이 항목들을 추가하면 VS Code가 메모리 낭비를 일으키는 큰 빌드 아티팩트 및 힙 덤프를 추적하지 않도록 합니다.",
       "addAll": "모두 추가",
-      "dismiss": "해고 처분",
+      "dismiss": "닫기",
       "added": "{count} 파일 워처 제외 설정을 작업 공간 설정에 추가했습니다."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "{count} 크기의 대형 파일({files})이 파일 감시기에서 제외되지 않았습니다. 이 파일들은 메모리를 모두 소진하여 VS Code를 중단시킬 수 있습니다.",
       "addExclusions": "Watcher에서 제외",
-      "dismiss": "해고 처분",
+      "dismiss": "닫기",
       "added": "{count} watcher 제외 패턴을 워크스페이스 설정에 추가했습니다."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "이 프로젝트는 Drift Advisor를 사용합니다. Saropa Log Capture 확장 프로그램을 설치하여 실행 SQL을 이러한 정적 결과와 상관관계를 설정합니다.",
       "install": "로그 캡처를 설치하십시오.",
-      "dismiss": "해고 처분"
+      "dismiss": "닫기"
     },
     "driftRecommend": {
       "message": "드립 어드바이저 서버가 연결되었습니다. 전체 문제 패널 경험을 위해 독립된 Saropa Drift Advisor 확장 프로그램을 설치하십시오.",
       "install": "Drift Advisor를 설치합니다.",
-      "dismiss": "해고 처분"
+      "dismiss": "닫기"
     }
   },
   "notify": {

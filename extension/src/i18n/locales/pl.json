@@ -445,7 +445,7 @@
   "startupNudge": {
     "message": "Saropa Lints: jest to grupa, która zawiera {count} reguły pakietu sugestii (s) stosują się do tego projektu.",
     "review": "Przegląd Review Review Review.",
-    "dismiss": "Zwolnienie z pracy.",
+    "dismiss": "Odrzuć",
     "reviewFailed": "Nie można otworzyć przeglądu pakietu reguł Saropa Lints. {error}"
   },
   "opportunities": {
@@ -767,7 +767,7 @@
     "action": {
       "cleanUp": "Czysta Przestrzeń",
       "openPanel": "Otwórz Panel Zdrowia",
-      "dismiss": "Zwolnienie z pracy.",
+      "dismiss": "Odrzuć",
       "optimizeAnalysis": "Optymalizuj Analizę",
       "dontShowAgain": "Nie Pokazuj Ponownie",
       "openMachineDashboard": "Otwórz Stan Maszyny",
@@ -820,7 +820,7 @@
     "watcherExclude": {
       "prompt": "Zalecane przez {count} wykluczenia monitora plików są brakujące w tym obszarze pracy: {patterns}. Dodanie ich zapobiega VS Code śledzeniu dużych artefaktów kompilacji i wyciągów sterty, które zużywają pamięć.",
       "addAll": "Dodaj wszystko",
-      "dismiss": "Zwolnienie z pracy.",
+      "dismiss": "Odrzuć",
       "added": "Dodano wykluczenia {count} plików-watcher do ustawień przestrzeni roboczej."
     },
     "nestedRoots": {
@@ -832,7 +832,7 @@
     "hazardScan": {
       "warning": "Znaleziono {count} dużych plików(n), które nie są wykluczone z monitora plików: {files}. Mogą one wyczerpać pamięć i spowodować awarię VS Code.",
       "addExclusions": "Wyklucz z Watchera",
-      "dismiss": "Zwolnienie z pracy.",
+      "dismiss": "Odrzuć",
       "added": "Dodano wzorzec(wzorce) wykluczenia {count} obserwatora do ustawień przestrzeni roboczej."
     }
   },
@@ -2374,12 +2374,12 @@
     "nudge": {
       "message": "Ten projekt wykorzystuje Drift Advisor. Zainstaluj rozszerzenie Saropa Log Capture, aby skorelować runtime SQL z tymi statycznymi wynikami.",
       "install": "Zainstaluj przechwytywanie dziennika instalacji.",
-      "dismiss": "Zwolnienie z pracy."
+      "dismiss": "Odrzuć"
     },
     "driftRecommend": {
       "message": "Serwer doradcy Drift Advisor jest podłączony. Zainstaluj samodzielne rozszerzenie Saropa Drift Advisor, aby uzyskać pełne doświadczenie z panelu Problemów.",
       "install": "Zainstaluj Drift Advisor",
-      "dismiss": "Zwolnienie z pracy."
+      "dismiss": "Odrzuć"
     }
   },
   "notify": {
