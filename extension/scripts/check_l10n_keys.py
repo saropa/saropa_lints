@@ -51,6 +51,36 @@ _OBJ_KEY_RE = re.compile(r"(?:^|[{,])\s*(?!\.\.\.)(\w+)\s*(?=:|[,}])")
 _PASSTHROUGH_MARKER = 'l10n:passthrough'
 
 
+# Files whose l10n('...') calls are parser test fixtures, not real usages.
+# Their placeholder keys (e.g. 'key') must not be reported as missing.
+_FIXTURE_FILES = frozenset({"extension/src/test/l10nParsers.test.ts"})
+
+# Dynamic references: keys passed to l10n() through a variable typed as a
+# string-literal union (e.g. `summaryKey: BlastSummaryKey` in
+# upgrade-blast-radius.ts). A type alias whose name ends in `Key` and whose
+# members are all dotted string literals is treated as a declaration of
+# dynamically-referenced keys; each member counts as used (so the dead-key
+# warning skips it) and is also validated against en.json.
+_KEY_UNION_RE = re.compile(
+    r"type\s+\w*Key\s*=\s*((?:\|?\s*['\"][a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)+['\"]\s*)+);"
+)
+_UNION_MEMBER_RE = re.compile(r"""['"]([a-zA-Z0-9_.]+)['"]""")
+
+
+def _collect_union_keys() -> dict[str, str]:
+    """Return {key: file} for members of `...Key` string-literal unions."""
+    found: dict[str, str] = {}
+    for ts_file in sorted(_SRC.rglob("*.ts")):
+        rel = str(ts_file.relative_to(_REPO)).replace("\\", "/")
+        if rel in _FIXTURE_FILES:
+            continue
+        text = _strip_comments(ts_file.read_text(encoding="utf-8"))
+        for m in _KEY_UNION_RE.finditer(text):
+            for k in _UNION_MEMBER_RE.findall(m.group(1)):
+                found[k] = rel
+    return found
+
+
 def _flatten(obj: dict, prefix: str = "") -> dict[str, str]:
     """Flatten a nested dict into {dotted.key: value} for leaves."""
     result: dict[str, str] = {}
@@ -240,6 +270,8 @@ def _collect_used_keys() -> dict[str, list[tuple[str, str | None, bool]]]:
     used: dict[str, list[tuple[str, str | None, bool]]] = {}
     for ts_file in sorted(_SRC.rglob("*.ts")):
         rel = str(ts_file.relative_to(_REPO))
+        if rel.replace("\\", "/") in _FIXTURE_FILES:
+            continue
         source = ts_file.read_text(encoding="utf-8")
         # Build a set of 1-based line numbers that have the passthrough
         # marker — checked BEFORE comment stripping so the marker (which
@@ -398,8 +430,17 @@ def main() -> int:
     defined = set(catalog)
     used = _collect_used_keys()
     used_keys = set(used)
+    union_keys = _collect_union_keys()
 
     ok = True
+
+    # Union-declared dynamic keys must exist in en.json too.
+    bad_union = sorted(set(union_keys) - defined)
+    if bad_union:
+        ok = False
+        print(f"\n✗ {len(bad_union)} dynamic (type-union) key(s) MISSING from en.json:\n")
+        for key in bad_union:
+            print(f"  {key}  ← {union_keys[key]}")
 
     # Keys referenced in code but missing from en.json.
     missing = sorted(used_keys - defined)
@@ -409,7 +450,7 @@ def main() -> int:
         for key in missing:
             sites = used[key]
             print(f"  {key}")
-            for loc, _ in sites[:3]:
+            for loc, *_ in sites[:3]:
                 print(f"    ← {loc}")
             if len(sites) > 3:
                 print(f"    … and {len(sites) - 3} more")
@@ -424,7 +465,7 @@ def main() -> int:
                 print(issue)
 
     # Keys defined in en.json but never referenced in code.
-    unused = sorted(defined - used_keys)
+    unused = sorted(defined - used_keys - set(union_keys))
     if unused:
         # Warning only — translations cost money, but don't block the build.
         print(f"\n⚠ {len(unused)} key(s) defined in en.json but never referenced in code:\n")

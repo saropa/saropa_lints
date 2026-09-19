@@ -1692,7 +1692,7 @@
     },
     {
       "name": "flutter_background_service",
-      "status": "end_of_life",
+      "status": "maintenance_mode",
       "reason": "Fails to keep isolates alive; killed instantly by modern OS battery managers.",
       "as_of": "2026-09-19",
       "replacement": "Update to latest version",
@@ -1782,7 +1782,7 @@
     },
     {
       "name": "google_api_availability",
-      "status": "end_of_life",
+      "status": "maintenance_mode",
       "reason": "Obsolete detection methods return false negatives on modern devices.",
       "as_of": "2026-09-19",
       "replacement": "Use Native Channels",
@@ -1987,7 +1987,7 @@
     },
     {
       "name": "call_log",
-      "status": "end_of_life",
+      "status": "maintenance_mode",
       "reason": "Dead privacy wrapper; app will be suspended from app stores for using it.",
       "as_of": "2026-09-19",
       "replacement": "None",
@@ -2245,7 +2245,7 @@
     },
     {
       "name": "easy_localization",
-      "status": "end_of_life",
+      "status": "maintenance_mode",
       "reason": "Slow updates, context leaks.",
       "as_of": "2026-09-19",
       "replacement": "slang",
@@ -4242,7 +4242,7 @@
     },
     {
       "name": "localstorage",
-      "status": "end_of_life",
+      "status": "maintenance_mode",
       "reason": "Uses obsolete synchronous file I/O that crashes Wasm applications.",
       "as_of": "2026-09-19",
       "replacement": "shared_preferences",
@@ -4393,8 +4393,8 @@
     },
     {
       "name": "signalr_flutter",
-      "status": "end_of_life",
-      "reason": "Dead repo; connections fail against .NET 8+ backends.",
+      "status": "maintenance_mode",
+      "reason": "Slow-moving repo (last release 2025-08); connections fail against .NET 8+ backends.",
       "as_of": "2026-09-19",
       "replacement": "signalr_netcore",
       "migrationNotes": "Moderate connection string update.",
@@ -8065,7 +8065,7 @@
     },
     {
       "name": "timeago",
-      "status": "active",
+      "status": "maintenance_mode",
       "as_of": "2026-09-19",
       "archiveSizeBytes": 23847,
       "archiveSizeMB": 0.02,

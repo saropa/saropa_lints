@@ -19,9 +19,14 @@ Two subcommands, deliberately separate so the (slow, networked) fetch and the
     and ``platforms``; plus ``as_of`` for every entry re-verified against the
     snapshot. Hand-written prose (``reason``, ``migrationNotes``), ``status``
     and ``replacement`` are NEVER rewritten - status-relevant changes
-    (discontinued, replacedBy, 404, revived, license drift) are printed as a
+    (discontinued, replacedBy, 404, revived, stale, license drift) are printed as a
     FLAGGED report for a human to decide. Key order and formatting are
     preserved so the git diff stays minimal.
+
+    Lifecycle flags use the snapshot's latest release age vs ``--as-of``:
+    ``end_of_life`` with a release <12 months old (revived?; skipped for
+    entries with appliesToMinVersion/MaxVersion), ``active`` 12-24 months
+    old (candidate maintenance_mode) and >24 months (candidate end_of_life).
 
 Tracked packages come from ``TRACKED_SOURCES`` (currently: names in
 known_issues.json). Add a function returning an iterable of names to extend
@@ -36,6 +41,7 @@ Examples (from the repo root)::
     python scripts/pubdev_snapshot.py apply --only analyzer
     python scripts/pubdev_snapshot.py apply --snapshot path/to/old.json
     python scripts/pubdev_snapshot.py apply --as-of 2026-09-19
+    python scripts/pubdev_snapshot.py selftest
 
 ``snapshot --only`` merges into an existing snapshot rather than replacing it.
 Related: ``check_known_issues_freshness.py`` (lifecycle-claim audit).
@@ -207,6 +213,49 @@ def cmd_snapshot(a: argparse.Namespace) -> int:
 # --------------------------------------------------------------------------
 # Applying
 # --------------------------------------------------------------------------
+def _months_between(published: str, as_of: str) -> float | None:
+    """Approximate months from ``published`` to ``as_of`` (YYYY-MM-DD prefixes)."""
+    try:
+        d1 = datetime.strptime(published[:10], "%Y-%m-%d")
+        d2 = datetime.strptime(as_of[:10], "%Y-%m-%d")
+    except (TypeError, ValueError):
+        return None
+    return (d2 - d1).days / 30.44
+
+
+def lifecycle_flags(e: dict, s: dict, as_of: str) -> list[str]:
+    """Status-review flags from the snapshot's latest release age (never auto-applied).
+
+    - ``end_of_life`` still published, not discontinued, released within 12
+      months -> "revived?". Entries with appliesToMinVersion/MaxVersion are
+      skipped: they describe one old major, so a recent release of another
+      major does not invalidate them.
+    - ``active`` with latest release 12-24 months old -> candidate
+      ``maintenance_mode``; over 24 months -> candidate ``end_of_life``.
+    """
+    n, st, out = e["name"], e["status"], []
+    age = _months_between(s.get("published") or "", as_of)
+    if age is None or s.get("isDiscontinued"):
+        return out
+    bounded = "appliesToMinVersion" in e or "appliesToMaxVersion" in e
+    if st == "end_of_life" and not bounded and age < 12:
+        out.append(
+            f"{n} [end_of_life]: not discontinued, latest release {s['published'][:10]} "
+            f"({age:.0f} months old) - revived?"
+        )
+    elif st == "active" and age >= 24:
+        out.append(
+            f"{n} [active]: latest release {s['published'][:10]} ({age:.0f} months old) "
+            "- stale, candidate end_of_life"
+        )
+    elif st == "active" and age >= 12:
+        out.append(
+            f"{n} [active]: latest release {s['published'][:10]} ({age:.0f} months old) "
+            "- stale, candidate maintenance_mode"
+        )
+    return out
+
+
 def cmd_apply(a: argparse.Namespace) -> int:
     snap = json.loads(Path(a.snapshot).read_text(encoding="utf-8"))
     pk = snap["packages"]
@@ -233,7 +282,6 @@ def cmd_apply(a: argparse.Namespace) -> int:
             errors.append(n)
             continue
         before = json.dumps(e)
-        old_last = e.get("lastUpdated") or ""
         if "lastUpdated" in e and s["published"]:
             e["lastUpdated"] = s["published"]
         if "pubPoints" in e and s["pubPoints"] is not None:
@@ -257,11 +305,7 @@ def cmd_apply(a: argparse.Namespace) -> int:
             flags.append(
                 f"{n} [{st}]: now DISCONTINUED on pub.dev (replacedBy={s['replacedBy']})"
             )
-        if st == "end_of_life" and not disc and old_last and (s["published"] or "") > old_last:
-            flags.append(
-                f"{n} [end_of_life]: not discontinued, published {s['published']} "
-                f"(recorded {old_last}) - revived?"
-            )
+        flags.extend(lifecycle_flags(e, s, a.as_of))
         rb = s["replacedBy"]
         if rb and e.get("replacement") != rb:
             flags.append(
@@ -294,6 +338,25 @@ def cmd_apply(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_selftest(_a: argparse.Namespace) -> int:
+    def s(pub, disc=False):
+        return {"published": pub, "isDiscontinued": disc}
+
+    ao = "2026-09-19"
+    eol = {"name": "x", "status": "end_of_life"}
+    assert lifecycle_flags(eol, s("2026-05-01T00:00:00Z"), ao), "revived should fire"
+    assert not lifecycle_flags(eol, s("2025-01-01T00:00:00Z"), ao)
+    assert not lifecycle_flags(eol, s("2026-05-01T00:00:00Z", True), ao)
+    assert not lifecycle_flags({**eol, "appliesToMaxVersion": "1.0.0"}, s("2026-05-01"), ao)
+    act = {"name": "y", "status": "active"}
+    assert not lifecycle_flags(act, s("2026-01-01"), ao)
+    assert "maintenance_mode" in lifecycle_flags(act, s("2025-03-01"), ao)[0]
+    assert "end_of_life" in lifecycle_flags(act, s("2023-03-01"), ao)[0]
+    assert not lifecycle_flags(act, s(""), ao)
+    print("selftest ok")
+    return 0
+
+
 def main() -> int:
     p = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -315,6 +378,8 @@ def main() -> int:
     ap.add_argument("--as-of", default=datetime.now().strftime("%Y-%m-%d"))
     ap.add_argument("--dry-run", action="store_true")
     ap.set_defaults(fn=cmd_apply)
+    st = sub.add_parser("selftest", help="run the built-in lifecycle-flag self-test")
+    st.set_defaults(fn=cmd_selftest)
     a = p.parse_args()
     return a.fn(a)
 
