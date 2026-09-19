@@ -93,7 +93,8 @@ describe('parsePsDartProcesses', () => {
     );
     assert.deepStrictEqual(
       procs.map((p) => p.parentProcessId),
-      [1432, 1432, 1432],
+      // The analysis server's parent is launchd (pid 1); the other two are its children.
+      [1, 1432, 1432],
     );
   });
 

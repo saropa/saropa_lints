@@ -139,7 +139,7 @@ Parsers (`ps`, `vm_stat`, `sysctl` output) should be extracted as pure functions
 
 ## Environment
 
-- saropa_lints version: VS Code extension `saropa.saropa-lints` 16.4.1 (pub package 8.2.2)
+- saropa_lints version: VS Code extension `saropa.saropa-lints` 16.4.1 (saropa_lints repo `pubspec.yaml` 16.3.0 / 16.4.0 unreleased)
 - Dart SDK version: 3.13.3 (Flutter 3.47.4 stable)
 - custom_lint version: n/a (extension-native)
 - Triggering project/file: `saropa_contacts` workspace, macOS 26.6.2 (Apple silicon, 8 GB RAM)

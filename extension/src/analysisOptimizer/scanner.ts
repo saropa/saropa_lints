@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import type { FileAnalysisMetrics } from './types';
+import { gitIgnoredPaths } from './nestedRoots';
 
 const GENERATED_SUFFIXES = [
   '.g.dart',
@@ -35,6 +36,41 @@ export function isInDotFolder(relativePath: string): boolean {
   return segments.some(segment => segment.startsWith('.'));
 }
 
+// Builds the findFiles exclude glob. VS Code applies `files.exclude` only
+// when the exclude argument is undefined, so we always pass an explicit glob
+// and merge in (a) the enabled `files.exclude` keys and (b) fully
+// git-ignored directories, so neither burns the MAX_FILES cap. Exported
+// (vscode-free) for unit testing.
+export function buildScanExcludeGlob(
+  filesExclude: Record<string, unknown> | undefined,
+  ignoredDirs: readonly string[],
+): string {
+  const parts = ['**/build/**', '**/.*/**'];
+  for (const [glob, on] of Object.entries(filesExclude ?? {})) {
+    if (on === true && !glob.includes(',') && !glob.includes('{')) parts.push(glob);
+  }
+  for (const dir of ignoredDirs) {
+    if (!/[,{}]/.test(dir)) parts.push(`${dir.replace(/\/+$/, '')}/**`);
+  }
+  return `{${[...new Set(parts)].join(',')}}`;
+}
+
+// Directories git ignores wholesale (from `.gitignore`, `.git/info/exclude`
+// and the global ignore file), relative to `root` with no trailing slash.
+// Empty when git is unavailable or `root` is not a repository.
+export function queryGitIgnoredDirs(root: string): string[] {
+  try {
+    const out = cp.execFileSync(
+      'git',
+      ['ls-files', '--others', '--ignored', '--exclude-standard', '--directory'],
+      { cwd: root, encoding: 'utf8', timeout: 15_000, maxBuffer: 10 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] },
+    );
+    return out.split('\n').map(l => l.trim()).filter(l => l.endsWith('/')).map(l => l.slice(0, -1));
+  } catch {
+    return [];
+  }
+}
+
 export function computeFileMetrics(
   content: string,
   relativePath: string,
@@ -53,7 +89,7 @@ export function computeFileMetrics(
     if (trimmed.startsWith('import ')) importCount++;
     if (trimmed.startsWith('class ') || trimmed.startsWith('abstract class ') || trimmed.startsWith('mixin ')) classCount++;
     if (/^\s*\w[\w<>,\s]*\s+\w+\s*\(/.test(line) && !trimmed.startsWith('import ') && !trimmed.startsWith('//')) functionCount++;
-    if (!hasWidgets && /\bWidget\b|\bState</.test(line)) hasWidgets = true;
+    if (!hasWidgets && /Widget\b|\bState</.test(line)) hasWidgets = true;
     if (!hasAsyncCode && /\basync\b|\bFuture\b|\bStream\b/.test(line)) hasAsyncCode = true;
   }
 
@@ -112,9 +148,13 @@ export async function scanWorkspace(
 ): Promise<FileAnalysisMetrics[]> {
   const allFiles = await vscode.workspace.findFiles(
     new vscode.RelativePattern(root, '**/*.dart'),
-    // Exclude build output and any dot-folder at the glob level so they
-    // don't consume the findFiles cap in the first place.
-    '{**/build/**,**/.*/**}',
+    // Exclude build output, dot-folders, `files.exclude` entries and
+    // git-ignored directories at the glob level so they don't consume the
+    // findFiles cap in the first place.
+    buildScanExcludeGlob(
+      vscode.workspace.getConfiguration('files').get<Record<string, unknown>>('exclude'),
+      queryGitIgnoredDirs(root),
+    ),
     MAX_FILES,
   );
   if (token.isCancellationRequested) return [];
@@ -127,7 +167,17 @@ export async function scanWorkspace(
 
   // Belt-and-braces: correctness shouldn't depend on findFiles' glob
   // semantics matching analyzer's dot-folder exclusion exactly.
-  const files = allFiles.filter(f => !isInDotFolder(path.relative(root, f.fsPath).replace(/\\/g, '/')));
+  const dotFiltered = allFiles.filter(f => !isInDotFolder(path.relative(root, f.fsPath).replace(/\\/g, '/')));
+
+  // File-level .gitignore patterns (e.g. `*.g.dart`) that the directory-level
+  // glob above cannot express.
+  const ignored = gitIgnoredPaths(
+    root,
+    dotFiltered.map(f => path.relative(root, f.fsPath).replace(/\\/g, '/')),
+  );
+  const files = ignored.size === 0
+    ? dotFiltered
+    : dotFiltered.filter(f => !ignored.has(path.relative(root, f.fsPath).replace(/\\/g, '/')));
 
   const total = files.length;
   progress.report({ message: `Found ${total} Dart files` });

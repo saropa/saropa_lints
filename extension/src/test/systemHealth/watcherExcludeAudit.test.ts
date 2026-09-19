@@ -20,6 +20,7 @@ import * as path from 'node:path';
 import {
   auditWatcherExcludes,
   computeMissingExcludes,
+  findMissingExcludes,
 } from '../../systemHealth/watcherExcludeAudit';
 import {
   clearTestConfig,
@@ -195,5 +196,39 @@ describe('auditWatcherExcludes dismissal', () => {
     assert.strictEqual(messageMock.infos.length, 1);
     assert.ok(messageMock.infos[0].includes('**/*.log'));
     assert.ok(!messageMock.infos[0].includes('**/.claude/worktrees/**'));
+  });
+});
+
+describe('findMissingExcludes', () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-find-missing-'));
+    mockWorkspaceFolders.value = [{ uri: { fsPath: tmpDir } }];
+    clearTestConfig();
+  });
+
+  afterEach(() => {
+    mockWorkspaceFolders.value = undefined;
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('reports the worktree pattern only when .claude/worktrees exists on disk', async () => {
+    setTestConfig('files', 'watcherExclude', fullyConfigured());
+    assert.deepStrictEqual(await findMissingExcludes(), []);
+
+    fs.mkdirSync(path.join(tmpDir, '.claude', 'worktrees'), { recursive: true });
+    assert.deepStrictEqual(await findMissingExcludes(), ['**/.claude/worktrees/**']);
+  });
+
+  it('treats a missing files.watcherExclude setting as empty', async () => {
+    const missing = await findMissingExcludes();
+    assert.deepStrictEqual(missing, UNCONDITIONAL_PATTERNS);
+  });
+
+  it('returns nothing extra when no workspace folder is open', async () => {
+    mockWorkspaceFolders.value = undefined;
+    setTestConfig('files', 'watcherExclude', fullyConfigured());
+    assert.deepStrictEqual(await findMissingExcludes(), []);
   });
 });

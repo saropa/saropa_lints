@@ -2,6 +2,7 @@ import type {
   FileAnalysisMetrics,
   FolderAnalysisCost,
   ExclusionRow,
+  NestedPackageGroup,
 } from './types';
 import { isPatternCovered } from './analyzerExcludeYaml';
 
@@ -127,12 +128,34 @@ export function buildExclusionRows(
   folders: FolderAnalysisCost[],
   files: FileAnalysisMetrics[],
   currentExclusions: string[],
+  nestedGroups: readonly NestedPackageGroup[] = [],
 ): ExclusionRow[] {
   const appliedSet = new Set(currentExclusions);
   const rows: ExclusionRow[] = [];
   const seenPatterns = new Set<string>();
 
+  // Nested package roots first: they are high priority, ranked by context
+  // count, and their `<folder>/**` pattern must win over a same-named
+  // default row (e.g. `.claude/**`).
+  for (const g of nestedGroups) {
+    const pattern = `${g.folder}/**`;
+    if (seenPatterns.has(pattern)) continue;
+    seenPatterns.add(pattern);
+    rows.push({
+      pattern,
+      reason: `${g.contextCount} nested Dart package(s), each analyzed as a separate context`,
+      estimatedFilesExcluded: 0,
+      estimatedCostReduction: 0,
+      hasActiveFiles: false,
+      priority: 'high',
+      isDefault: false,
+      isApplied: isPatternCovered(pattern, currentExclusions),
+      contextCount: g.contextCount,
+    });
+  }
+
   for (const def of DEFAULT_EXCLUSION_PATTERNS) {
+    if (seenPatterns.has(def.pattern)) continue;
     const { filesMatched, costMatched, hasActiveFiles } = matchExclusionPattern(files, def.pattern);
     const isApplied = appliedSet.has(def.pattern);
     if (filesMatched === 0 && !isApplied) continue;
@@ -208,6 +231,8 @@ export function buildExclusionRows(
     if (PRIORITY_RANK[a.priority] !== PRIORITY_RANK[b.priority]) {
       return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
     }
+    const ctx = (b.contextCount ?? 0) - (a.contextCount ?? 0);
+    if (ctx !== 0) return ctx;
     return b.estimatedCostReduction - a.estimatedCostReduction;
   });
 

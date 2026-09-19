@@ -168,6 +168,7 @@ import { MachineDashboard } from './systemHealth/machineDashboard';
 import { registerMachineDashboardCommands } from './systemHealth/machineDashboardCommands';
 import { querySystemMemory } from './systemHealth/systemQuery';
 import { auditWatcherExcludes } from './systemHealth/watcherExcludeAudit';
+import { auditNestedPackageRoots } from './systemHealth/nestedRootsAudit';
 import { scanWorkspaceForHazards } from './systemHealth/workspaceHazardScan';
 import { gatherReadiness, readinessStatusBarText, showWorkspaceReadiness, ReadinessLevel } from './systemHealth/workspaceReadiness';
 import { HealthLevel } from './systemHealth/types';
@@ -1684,6 +1685,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // and tooling caches that can exhaust memory and crash the host. Fires
   // first (10 s) so its patterns are in place before the hazard scan runs.
   setTimeout(() => void auditWatcherExcludes(context), 10_000);
+  setTimeout(() => void auditNestedPackageRoots(context), 12_000);
   // One-shot scan for dangerously large files (heap dumps, oversized logs)
   // that the file watcher would try to track. Runs after the audit (15 s)
   // so files the user just auto-excluded don't trigger a redundant warning.

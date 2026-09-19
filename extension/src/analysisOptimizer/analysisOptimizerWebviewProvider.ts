@@ -3,6 +3,7 @@ import { getProjectRoot } from '../projectRoot';
 import { createWebviewCspNonce, escapeHtml } from '../vibrancy/views/html-utils';
 import { getDashboardChromeStyles } from '../views/dashboardChromeStyles';
 import { l10n } from '../i18n/runtime';
+import { discoverNestedPackageGroups } from './nestedRoots';
 import { scanWorkspace } from './scanner';
 import { computeFileCost, aggregateByFolder, buildExclusionRows } from './scorer';
 import {
@@ -174,7 +175,9 @@ export class AnalysisOptimizerWebviewProvider {
     const root = getProjectRoot();
     if (root) {
       const currentExclusions = readAnalyzerExcludes(root);
-      this._result.exclusions = buildExclusionRows(this._result.folders, this._scannedFiles, currentExclusions);
+      this._result.exclusions = buildExclusionRows(
+        this._result.folders, this._scannedFiles, currentExclusions, discoverNestedPackageGroups(root),
+      );
     }
     this._renderPanel();
   }
@@ -226,7 +229,9 @@ export class AnalysisOptimizerWebviewProvider {
 
     const currentExclusions = readAnalyzerExcludes(root);
     const folders = aggregateByFolder(files);
-    const exclusions = buildExclusionRows(folders, files, currentExclusions);
+    const exclusions = buildExclusionRows(
+      folders, files, currentExclusions, discoverNestedPackageGroups(root),
+    );
 
     this._scannedFiles = files;
     this._result = {

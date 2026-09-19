@@ -35,6 +35,9 @@ export interface ExclusionRow {
   priority: 'high' | 'medium' | 'low';
   isDefault: boolean;
   isApplied: boolean;
+  // Set on nested-package-root rows: number of separate analysis contexts
+  // the folder holds. Ranks these rows ahead of line-count-ranked ones.
+  contextCount?: number;
 }
 
 // Full scan result rendered by the panel: totals plus per-folder costs
@@ -46,4 +49,12 @@ export interface AnalysisOptimizerResult {
   folders: FolderAnalysisCost[];
   exclusions: ExclusionRow[];
   scanTimestamp: string;
+}
+
+// A folder holding one or more nested Dart packages that are not legitimate
+// monorepo members (under a dot-folder or git-ignored), e.g. `.claude`.
+export interface NestedPackageGroup {
+  folder: string;
+  contextCount: number;
+  packages: string[];
 }
