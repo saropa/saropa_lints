@@ -159,7 +159,11 @@ export function setTestConfig(section: string, key: string, value: any): void {
     testConfigValues[`${section}.${key}`] = value;
 }
 
+/** Every `config.update(...)` call made through the mocked workspace config. */
+export const configUpdates: Array<{ section?: string; key: string; value: any; target?: any }> = [];
+
 export function clearTestConfig(): void {
+    configUpdates.length = 0;
     for (const key of Object.keys(testConfigValues)) {
         delete testConfigValues[key];
     }
@@ -176,7 +180,9 @@ export const workspace: Record<string, any> = {
             const fullKey = section ? `${section}.${key}` : key;
             return fullKey in testConfigValues ? testConfigValues[fullKey] : defaultValue;
         },
-        update: async (_key: string, _value: any, _target?: any): Promise<void> => {},
+        update: async (key: string, value: any, target?: any): Promise<void> => {
+            configUpdates.push({ section, key, value, target });
+        },
     }),
     findFiles: async (_include: any, _exclude?: any): Promise<any[]> => [],
     createFileSystemWatcher: (_glob: string) => ({

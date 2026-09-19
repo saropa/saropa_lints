@@ -5,8 +5,8 @@ import * as cp from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { auditNestedPackageRoots } from '../../systemHealth/nestedRootsAudit';
-import { clearTestConfig, mockWorkspaceFolders, setTestConfig, messageMock } from '../vibrancy/vscode-mock';
+import { applyNestedRootFix, auditNestedPackageRoots } from '../../systemHealth/nestedRootsAudit';
+import { clearTestConfig, mockWorkspaceFolders, setTestConfig, messageMock, configUpdates } from '../vibrancy/vscode-mock';
 
 function fakeContext(): { workspaceState: any; store: Map<string, unknown> } {
   const store = new Map<string, unknown>();
@@ -79,5 +79,17 @@ describe('auditNestedPackageRoots', () => {
     ctx.store.set('nestedPackageRoots.dismissedFolders', ['scratch/pkg']);
     await auditNestedPackageRoots(ctx as any);
     assert.strictEqual(messageMock.warnings.length, 0);
+  });
+
+  it('applyNestedRootFix writes yaml exclude, dart excluded folders and watcher excludes', async () => {
+    fs.writeFileSync(path.join(root, 'analysis_options.yaml'), 'include: package:lints/recommended.yaml\n');
+    setTestConfig('dart', 'analysisExcludedFolders', ['existing']);
+    await applyNestedRootFix(root, [{ folder: 'scratch/pkg', contextCount: 1, packages: ['scratch/pkg'] }]);
+    const yaml = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+    assert.ok(yaml.includes('scratch/pkg/**'));
+    const dart = configUpdates.find(u => u.section === 'dart' && u.key === 'analysisExcludedFolders');
+    assert.deepStrictEqual(dart?.value, ['existing', 'scratch/pkg']);
+    const watcher = configUpdates.find(u => u.key === 'watcherExclude');
+    assert.strictEqual(watcher?.value['**/scratch/pkg/**'], true);
   });
 });
