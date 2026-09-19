@@ -2856,6 +2856,19 @@
     "noServerFound": "Drift Advisor sunucusu bulunamadı. Uygulamanızı sunucunun çalıştığı sürece başlatın ve sonra Yenile'ye tıklayın.",
     "integrationOff": "Drift Advisor entegrasyonu devre dışı. Ayarlar (saropaLints.driftAdvisor.integration) içinde etkinleştirin, ardından Yenile'ye tıklayın."
   },
+  "lifecycle": {
+    "note": {
+      "statusMayBeOutdated": "Durum güncel olmayabilir: kullanım ömrü sonu olarak kayıtlı, ancak pub.dev paketin kullanımdan kaldırılmadığını ve son 12 ay içinde yayımlandığını gösteriyor.",
+      "maintenanceMode": "Bakım modu: yalnızca kritik düzeltmeler bekleniyor.",
+      "caution": "Dikkat: bu pakete güvenmeden önce bilinen sorunu inceleyin.",
+      "unlisted": "pub.dev'de listelenmemiş: arama sonuçlarında gizli; mevcut kullanıcılar yine de buna bağımlı olabilir."
+    },
+    "upgradeRequired": {
+      "diagnostic": "{name} paketini yükseltin — yüklü sürüm bilinen bir hataya sahip",
+      "problem": "Puan {score}/100 — yüklü sürümün yükseltilmesi gerekiyor",
+      "insight": "Yüklü sürüm bilinen bir hataya sahip — yükseltme gerekli"
+    }
+  },
   "blastRadius": {
     "label": {
       "upgrade": "Yükselt",
