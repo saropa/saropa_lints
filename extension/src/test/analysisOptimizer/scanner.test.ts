@@ -3,7 +3,7 @@ import * as cp from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { computeFileMetrics, filterGitFileList, isInDotFolder } from '../../analysisOptimizer/scanner';
+import { computeFileMetrics, filterGitFileList, isInDotFolder, listDartFilesViaGit, parseNestedRepoRoots } from '../../analysisOptimizer/scanner';
 
 // computeFileMetrics drives the exclude-pattern cost estimates shown in
 // the Analysis Optimizer panel, so its widget/async/generated heuristics
@@ -133,5 +133,51 @@ describe('scanner git discovery (real repo)', () => {
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
+  });
+
+  (gitOk ? it : it.skip)('includes nested repos and submodules', async function () {
+    this.timeout(30000);
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'scan-nest-'));
+    const git = (cwd: string, ...a: string[]): void => {
+      cp.execFileSync('git', ['-c', 'user.email=t@t', '-c', 'user.name=t',
+        '-c', 'protocol.file.allow=always', ...a], { cwd, stdio: 'ignore' });
+    };
+    const w = (base: string, p: string): void => {
+      fs.mkdirSync(path.dirname(path.join(base, p)), { recursive: true });
+      fs.writeFileSync(path.join(base, p), 'void main() {}\n');
+    };
+    try {
+      const sub = path.join(root, 'subsrc');
+      fs.mkdirSync(sub);
+      git(sub, 'init', '-q'); w(sub, 'lib/s.dart'); git(sub, 'add', '-A'); git(sub, 'commit', '-qm', 'i');
+      const main = path.join(root, 'main');
+      fs.mkdirSync(main);
+      git(main, 'init', '-q');
+      fs.writeFileSync(path.join(main, '.gitignore'), '*.g.dart\n');
+      w(main, 'lib/a.dart');
+      git(main, 'add', '-A'); git(main, 'commit', '-qm', 'i');
+      let submoduleOk = true;
+      try { git(main, 'submodule', 'add', sub, 'packages/sm'); } catch { submoduleOk = false; }
+      // untracked nested repo
+      const nest = path.join(main, 'nested/inner');
+      fs.mkdirSync(nest, { recursive: true });
+      git(nest, 'init', '-q');
+      fs.writeFileSync(path.join(nest, '.gitignore'), '*.g.dart\n');
+      w(nest, 'lib/n.dart'); w(nest, 'lib/n.g.dart'); w(nest, '.hidden/h.dart');
+      const out = await listDartFilesViaGit(main);
+      assert.ok(out !== undefined);
+      const got = filterGitFileList(out!, undefined).sort();
+      const want = ['lib/a.dart', 'nested/inner/lib/n.dart'];
+      if (submoduleOk) want.push('packages/sm/lib/s.dart');
+      assert.deepStrictEqual(got, want.sort());
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('parseNestedRepoRoots reads gitlinks and untracked dirs', () => {
+    const stage = '100644 abc 0\tlib/a.dart\x00160000 def 0\tpackages/sm\0';
+    assert.deepStrictEqual(parseNestedRepoRoots(stage, 'x.dart\0nested/inner/\0').sort(),
+      ['nested/inner', 'packages/sm']);
   });
 });

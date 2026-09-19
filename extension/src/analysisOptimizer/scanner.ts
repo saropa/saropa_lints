@@ -119,17 +119,65 @@ export function filterGitFileList(
   return out;
 }
 
-// One `git ls-files` call: tracked + untracked-not-ignored Dart files.
-// Returns undefined when git is missing or root is not a work tree.
-async function listDartFilesViaGit(root: string): Promise<string | undefined> {
+const MAX_NESTED_DEPTH = 4;
+
+function runGit(cwd: string, args: string[]): Promise<string | undefined> {
   return new Promise(resolve => {
     cp.execFile(
       'git',
-      ['ls-files', '--cached', '--others', '--exclude-standard', '-z', '--', '*.dart'],
-      { cwd: root, encoding: 'utf8', timeout: 60_000, maxBuffer: 256 * 1024 * 1024 },
+      args,
+      { cwd, encoding: 'utf8', timeout: 60_000, maxBuffer: 256 * 1024 * 1024 },
       (err, stdout) => resolve(err ? undefined : stdout),
     );
   });
+}
+
+// Extracts nested repo roots (repo-relative, no trailing slash) from the two
+// git outputs that mention them: `ls-files --stage -z` gitlink entries
+// (mode 160000, submodules) and `ls-files --others -z` entries ending in '/'
+// (untracked directories that contain their own .git). Pure for testing.
+export function parseNestedRepoRoots(stageOut: string, othersOut: string): string[] {
+  const roots = new Set<string>();
+  for (const e of stageOut.split('\0')) {
+    const m = /^160000 [0-9a-f]+ \d\t(.+)$/.exec(e);
+    if (m) roots.add(m[1]);
+  }
+  for (const e of othersOut.split('\0')) {
+    if (e.endsWith('/') && e.length > 1) roots.add(e.slice(0, -1));
+  }
+  return [...roots];
+}
+
+// tracked + untracked-not-ignored Dart files, descending into nested repos and
+// submodules (which the parent's ls-files does not enter). Output is the same
+// NUL-separated, root-relative format as `git ls-files -z`.
+// Returns undefined when git is missing or root is not a work tree.
+export async function listDartFilesViaGit(root: string, depth = 0): Promise<string | undefined> {
+  const own = await runGit(root,
+    ['ls-files', '--cached', '--others', '--exclude-standard', '-z', '--', '*.dart']);
+  if (own === undefined) return undefined;
+  if (depth >= MAX_NESTED_DEPTH) return own;
+  const [stage, others] = await Promise.all([
+    // Gitlinks (submodules) can only exist alongside a .gitmodules file, so skip listing every
+    // tracked file with --stage in the common no-submodule case.
+    fs.existsSync(path.join(root, '.gitmodules'))
+      ? runGit(root, ['ls-files', '--stage', '-z'])
+      : Promise.resolve(''),
+    runGit(root, ['ls-files', '--others', '--exclude-standard', '-z']),
+  ]);
+  const nested = parseNestedRepoRoots(stage ?? '', others ?? '');
+  let merged = own;
+  for (const rel of nested) {
+    const dir = path.join(root, rel);
+    // Uninitialised submodules have no .git entry; nothing to list.
+    if (!fs.existsSync(path.join(dir, '.git'))) continue;
+    const sub = await listDartFilesViaGit(dir, depth + 1);
+    if (!sub) continue;
+    for (const f of sub.split('\0')) {
+      if (f) merged += `${rel}/${f}\0`;
+    }
+  }
+  return merged;
 }
 
 async function existingOnly(root: string, rels: string[]): Promise<string[]> {

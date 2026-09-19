@@ -53,8 +53,8 @@ Swapouts:                                   60020643.
     assert.strictEqual(result?.pageSize, 16384);
     assert.strictEqual(result?.freeBytes, 76800 * 16384);
     assert.ok(
-      Math.abs(result!.freeBytes / GB - 1.2) < 0.01,
-      `expected ~1.2 GB reclaimable, got ${result!.freeBytes / GB} GB`,
+      Math.abs(result!.freeBytes / GB - 1.171875) < 0.001,
+      `expected ~1.17 GB reclaimable, got ${result!.freeBytes / GB} GB`,
     );
 
     // Cross-check against the whole-snapshot math querySystemMemory would do.
