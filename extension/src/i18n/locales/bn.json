@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "{count} {modeLabel} প্যাকটি সক্রিয় করুন (s)?"
     },
     "misc": {
+      "actionDontAskForVersion": "এই সংস্করণের জন্য জিজ্ঞাসা করবেন না",
+      "actionLater": "পরে",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}। এটি একটি মেজর সংস্করণ এবং কনফিগারেশন পরিবর্তনের প্রয়োজন হতে পারে — চেঞ্জলগ দেখুন।",
       "upgradeCheckerMajorUpdate": "মেজর আপডেট",
       "upgradeCheckerMinorUpdate": "মাইনর আপডেট",
       "upgradeCheckerPatchUpdate": "প্যাচ আপডেট",

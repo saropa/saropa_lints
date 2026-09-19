@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "Enable {count} {modeLabel} pack ((s))?"
     },
     "misc": {
+      "actionDontAskForVersion": "Niet meer vragen voor deze versie",
+      "actionLater": "Later",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Dit is een grote (major) versie en vereist mogelijk configuratiewijzigingen — zie de changelog.",
       "upgradeCheckerMajorUpdate": "Grote update",
       "upgradeCheckerMinorUpdate": "Kleine update",
       "upgradeCheckerPatchUpdate": "Patch-update",

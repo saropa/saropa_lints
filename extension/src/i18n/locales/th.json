@@ -2638,6 +2638,9 @@
       "enableModePacksPrompt": "เปิดตัว {count} {modeLabel} แพ็ค ((s) หรือไม่?"
     },
     "misc": {
+      "actionDontAskForVersion": "ไม่ต้องถามอีกสำหรับเวอร์ชันนี้",
+      "actionLater": "ภายหลัง",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to} นี่คือเวอร์ชันหลัก (major) และอาจต้องเปลี่ยนแปลงการตั้งค่า — โปรดดู changelog",
       "upgradeCheckerMajorUpdate": "อัปเดตหลัก",
       "upgradeCheckerMinorUpdate": "อัปเดตย่อย",
       "upgradeCheckerPatchUpdate": "อัปเดตแพตช์",

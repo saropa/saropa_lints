@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "¿Habilitar el paquete {count} y {modeLabel}?"
     },
     "misc": {
+      "actionDontAskForVersion": "No preguntar para esta versión",
+      "actionLater": "Más tarde",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Esta es una versión mayor y puede requerir cambios de configuración — consulta el registro de cambios.",
       "upgradeCheckerMajorUpdate": "Actualización mayor",
       "upgradeCheckerMinorUpdate": "Actualización menor",
       "upgradeCheckerPatchUpdate": "Actualización de parche",

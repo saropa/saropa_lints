@@ -2638,6 +2638,9 @@
       "enableModePacksPrompt": "Включити {count} {modeLabel} пакети ?"
     },
     "misc": {
+      "actionDontAskForVersion": "Більше не питати про цю версію",
+      "actionLater": "Пізніше",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Це major-версія, яка може потребувати змін конфігурації — див. журнал змін.",
       "upgradeCheckerMajorUpdate": "Мажорне оновлення",
       "upgradeCheckerMinorUpdate": "Мінорне оновлення",
       "upgradeCheckerPatchUpdate": "Оновлення-патч",

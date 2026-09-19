@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "Pagbibigay ng kakayahan sa {count} {modeLabel} pack ((s)?"
     },
     "misc": {
+      "actionDontAskForVersion": "Huwag nang magtanong para sa bersyong ito",
+      "actionLater": "Mamaya",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Ito ay isang major na bersyon at maaaring mangailangan ng mga pagbabago sa config — tingnan ang changelog.",
       "upgradeCheckerMajorUpdate": "Malaking update",
       "upgradeCheckerMinorUpdate": "Maliit na update",
       "upgradeCheckerPatchUpdate": "Patch update",

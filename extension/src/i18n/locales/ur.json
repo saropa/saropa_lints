@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "{count} {modeLabel} پیک کو فعال کریں (s) ؟"
     },
     "misc": {
+      "actionDontAskForVersion": "اس ورژن کے لیے دوبارہ نہ پوچھیں",
+      "actionLater": "بعد میں",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}۔ یہ ایک بڑا (major) ورژن ہے اور اسے کنفیگریشن تبدیلیوں کی ضرورت ہو سکتی ہے — چینج لاگ دیکھیں۔",
       "upgradeCheckerMajorUpdate": "بڑی اپ ڈیٹ",
       "upgradeCheckerMinorUpdate": "معمولی اپ ڈیٹ",
       "upgradeCheckerPatchUpdate": "پیچ اپ ڈیٹ",

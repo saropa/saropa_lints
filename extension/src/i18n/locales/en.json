@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "Enable {count} {modeLabel} pack(s)?"
     },
     "misc": {
+      "actionDontAskForVersion": "Don't ask for this version",
+      "actionLater": "Later",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. This is a major version and may need config changes — see the changelog.",
       "upgradeCheckerMajorUpdate": "Major update",
       "upgradeCheckerMinorUpdate": "Minor update",
       "upgradeCheckerPatchUpdate": "Patch update",

@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "启用 {count} {modeLabel} 的包吗?"
     },
     "misc": {
+      "actionDontAskForVersion": "不再询问此版本",
+      "actionLater": "稍后",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}。这是一个主要（major）版本，可能需要配置更改 — 请查看更新日志。",
       "upgradeCheckerMajorUpdate": "主要更新",
       "upgradeCheckerMinorUpdate": "次要更新",
       "upgradeCheckerPatchUpdate": "补丁更新的最新版本",

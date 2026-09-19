@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "Chạy {count} {modeLabel} pack (s)?"
     },
     "misc": {
+      "actionDontAskForVersion": "Không hỏi lại cho phiên bản này",
+      "actionLater": "Để sau",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Đây là phiên bản major và có thể cần thay đổi cấu hình — xem changelog.",
       "upgradeCheckerMajorUpdate": "Bản cập nhật lớn",
       "upgradeCheckerMinorUpdate": "Bản cập nhật nhỏ",
       "upgradeCheckerPatchUpdate": "Bản cập nhật vá lỗi",

@@ -2638,6 +2638,9 @@
       "enableModePacksPrompt": "{count} {modeLabel} paketlerini etkinleştirmek için ((s)?"
     },
     "misc": {
+      "actionDontAskForVersion": "Bu sürüm için tekrar sorma",
+      "actionLater": "Daha sonra",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Bu bir majör sürümdür ve yapılandırma değişiklikleri gerektirebilir — değişiklik günlüğüne bakın.",
       "upgradeCheckerMajorUpdate": "Ana güncelleme",
       "upgradeCheckerMinorUpdate": "Küçük güncelleme Uyarı",
       "upgradeCheckerPatchUpdate": "Yama güncellemesi",

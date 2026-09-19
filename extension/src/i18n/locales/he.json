@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "אפשר {count} {modeLabel} חבילות ?"
     },
     "misc": {
+      "actionDontAskForVersion": "אל תשאל שוב עבור גרסה זו",
+      "actionLater": "מאוחר יותר",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. זוהי גרסה מרכזית (major) שעשויה לדרוש שינויי תצורה — עיין ביומן השינויים.",
       "upgradeCheckerMajorUpdate": "עדכון גדול לעדכונים",
       "upgradeCheckerMinorUpdate": "עדכון משני",
       "upgradeCheckerPatchUpdate": "עדכון פטץ'",

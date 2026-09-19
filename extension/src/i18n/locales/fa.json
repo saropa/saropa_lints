@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "{count} {modeLabel} بسته را فعال کنید؟"
     },
     "misc": {
+      "actionDontAskForVersion": "برای این نسخه دیگر نپرس",
+      "actionLater": "بعداً",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. این یک نسخه اصلی است و ممکن است به تغییرات پیکربندی نیاز داشته باشد — به تغییرات مراجعه کنید.",
       "upgradeCheckerMajorUpdate": "به‌روزرسانی اصلی",
       "upgradeCheckerMinorUpdate": "به‌روزرسانی جزئی",
       "upgradeCheckerPatchUpdate": "به‌روزرسانی وصله",

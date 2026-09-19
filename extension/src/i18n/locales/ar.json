@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "تمكين حزمة {count} {modeLabel} ((s) ؟"
     },
     "misc": {
+      "actionDontAskForVersion": "عدم السؤال عن هذا الإصدار",
+      "actionLater": "لاحقًا",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. هذا إصدار رئيسي وقد يتطلب تغييرات في الإعدادات — راجع سجل التغييرات.",
       "upgradeCheckerMajorUpdate": "تحديث رئيسي",
       "upgradeCheckerMinorUpdate": "تحديثات طفيفة للتحديث",
       "upgradeCheckerPatchUpdate": "تحديث تصحيحي",

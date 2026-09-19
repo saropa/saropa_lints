@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "Kuwezesha {count} {modeLabel} pakiti ((s)?"
     },
     "misc": {
+      "actionDontAskForVersion": "Usiulize tena kuhusu toleo hili",
+      "actionLater": "Baadaye",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Hii ni toleo kuu (major) na huenda likahitaji mabadiliko ya usanidi — angalia changelog.",
       "upgradeCheckerMajorUpdate": "Sasisho kubwa",
       "upgradeCheckerMinorUpdate": "Sasisho dogo",
       "upgradeCheckerPatchUpdate": "Sasisho la kiraka",

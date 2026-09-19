@@ -2640,6 +2640,9 @@
       "enableModePacksPrompt": "{count} {modeLabel} パックを有効にする (s)?"
     },
     "misc": {
+      "actionDontAskForVersion": "このバージョンでは再度確認しない",
+      "actionLater": "後で",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}。これはメジャーバージョンであり、設定の変更が必要になる場合があります — 変更ログを確認してください。",
       "upgradeCheckerMajorUpdate": "メジャーアップデート 更新",
       "upgradeCheckerMinorUpdate": "マイナーアップデート",
       "upgradeCheckerPatchUpdate": "パッチアップデート",
