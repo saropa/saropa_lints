@@ -1,5 +1,9 @@
 import * as assert from 'assert';
-import { computeFileMetrics, isInDotFolder } from '../../analysisOptimizer/scanner';
+import * as cp from 'child_process';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import { computeFileMetrics, filterGitFileList, isInDotFolder } from '../../analysisOptimizer/scanner';
 
 // computeFileMetrics drives the exclude-pattern cost estimates shown in
 // the Analysis Optimizer panel, so its widget/async/generated heuristics
@@ -72,5 +76,40 @@ describe('scanner isInDotFolder', () => {
 
   it('does not flag a file whose name merely contains dots', () => {
     assert.strictEqual(isInDotFolder('lib/foo.bar.dart'), false);
+  });
+});
+
+describe('filterGitFileList', () => {
+  it('filters dot-folders, build, non-dart, duplicates and files.exclude', () => {
+    const out = ['lib/a.dart', 'lib/a.dart', '.claude/w/b.dart', 'build/c.dart', 'pkg/build/d.dart',
+      'lib/readme.md', 'gen/e.dart', 'lib/x.g.dart', ''].join('\0');
+    assert.deepStrictEqual(
+      filterGitFileList(out, { 'gen': true, '**/*.g.dart': false, '**/off': false }),
+      ['lib/a.dart', 'lib/x.g.dart'],
+    );
+    assert.deepStrictEqual(filterGitFileList(out, { '**/*.g.dart': true, gen: true }), ['lib/a.dart']);
+  });
+});
+
+describe('scanner git discovery (real repo)', () => {
+  let gitOk = true;
+  try { cp.execFileSync('git', ['--version'], { stdio: 'ignore' }); } catch { gitOk = false; }
+  (gitOk ? it : it.skip)('respects .gitignore and includes untracked files', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'scan-git-'));
+    try {
+      const w = (p: string): void => {
+        fs.mkdirSync(path.dirname(path.join(root, p)), { recursive: true });
+        fs.writeFileSync(path.join(root, p), 'void main() {}\n');
+      };
+      cp.execFileSync('git', ['init', '-q'], { cwd: root });
+      fs.writeFileSync(path.join(root, '.gitignore'), '*.g.dart\nscratch/\n');
+      w('lib/a.dart'); w('lib/a.g.dart'); w('scratch/s.dart'); w('lib/new.dart'); w('.claude/w/z.dart');
+      const out = cp.execFileSync('git',
+        ['ls-files', '--cached', '--others', '--exclude-standard', '-z', '--', '*.dart'],
+        { cwd: root, encoding: 'utf8' });
+      assert.deepStrictEqual(filterGitFileList(out, undefined).sort(), ['lib/a.dart', 'lib/new.dart']);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
   });
 });

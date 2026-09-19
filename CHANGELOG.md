@@ -104,6 +104,7 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Fixed (Extension)
 
+- The Analysis Optimizer now lists Dart files through git in one pass when the project is a git repository, so scans are faster, ignored files never count, and the 50,000-file cap no longer applies there. Projects without git keep the previous scan. No action required.
 - The System Health panel warns when a Dart project contains git-ignored nested package roots, which the analysis server treats as separate contexts, and offers a one-click exclude or a per-folder dismiss. No action required.
 - The Analysis Optimizer now lists nested Dart package contexts as a high-priority exclusion row, and its scan honors `files.exclude` and `.gitignore`. No action required.
 - The Analysis Optimizer's scan now detects `StatelessWidget` and `StatefulWidget` classes as widgets. No action required.

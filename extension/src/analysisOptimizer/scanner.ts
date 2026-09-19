@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
+import * as fs from 'fs';
 import type { FileAnalysisMetrics } from './types';
 import { gitIgnoredPaths } from './nestedRoots';
 
@@ -69,6 +70,77 @@ export function queryGitIgnoredDirs(root: string): string[] {
   } catch {
     return [];
   }
+}
+
+// Converts a `files.exclude` glob to a RegExp (supports `**`, `*`, `?`).
+function globToRegExp(glob: string): RegExp {
+  let re = '';
+  for (let i = 0; i < glob.length; i++) {
+    const c = glob[i];
+    if (c === '*') {
+      if (glob[i + 1] === '*') {
+        i++;
+        if (glob[i + 1] === '/') { i++; re += '(?:.*/)?'; } else re += '.*';
+      } else re += '[^/]*';
+    } else if (c === '?') re += '[^/]';
+    else re += c.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  }
+  return new RegExp(`^${re}$`);
+}
+
+// Parses NUL-separated `git ls-files -z` output into scan candidates,
+// applying the dot-folder filter, build/** exclusion and enabled
+// `files.exclude` globs (a glob matching a directory prefix excludes
+// everything beneath it). Pure and vscode-free for unit testing.
+export function filterGitFileList(
+  output: string,
+  filesExclude: Record<string, unknown> | undefined,
+): string[] {
+  const excludes = Object.entries(filesExclude ?? {})
+    .filter(([g, on]) => on === true && !g.includes(',') && !g.includes('{'))
+    .map(([g]) => globToRegExp(g.replace(/\/+$/, '')));
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of output.split('\0')) {
+    // git always emits '/' separators (even on Windows); a backslash is a legal POSIX filename char.
+    const rel = raw;
+    if (!rel.endsWith('.dart') || seen.has(rel)) continue;
+    seen.add(rel);
+    if (isInDotFolder(rel)) continue;
+    const segs = rel.split('/');
+    if (segs.slice(0, -1).includes('build')) continue;
+    let excluded = false;
+    for (let i = 1; i <= segs.length && !excluded; i++) {
+      const prefix = segs.slice(0, i).join('/');
+      excluded = excludes.some(r => r.test(prefix));
+    }
+    if (!excluded) out.push(rel);
+  }
+  return out;
+}
+
+// One `git ls-files` call: tracked + untracked-not-ignored Dart files.
+// Returns undefined when git is missing or root is not a work tree.
+async function listDartFilesViaGit(root: string): Promise<string | undefined> {
+  return new Promise(resolve => {
+    cp.execFile(
+      'git',
+      ['ls-files', '--cached', '--others', '--exclude-standard', '-z', '--', '*.dart'],
+      { cwd: root, encoding: 'utf8', timeout: 60_000, maxBuffer: 256 * 1024 * 1024 },
+      (err, stdout) => resolve(err ? undefined : stdout),
+    );
+  });
+}
+
+async function existingOnly(root: string, rels: string[]): Promise<string[]> {
+  const keep: string[] = [];
+  for (let i = 0; i < rels.length; i += 200) {
+    const batch = rels.slice(i, i + 200);
+    const ok = await Promise.all(batch.map(r =>
+      fs.promises.access(path.join(root, r)).then(() => true, () => false)));
+    batch.forEach((r, j) => { if (ok[j]) keep.push(r); });
+  }
+  return keep;
 }
 
 export function computeFileMetrics(
@@ -146,38 +218,33 @@ export async function scanWorkspace(
   progress: vscode.Progress<{ message?: string; increment?: number }>,
   token: vscode.CancellationToken,
 ): Promise<FileAnalysisMetrics[]> {
-  const allFiles = await vscode.workspace.findFiles(
-    new vscode.RelativePattern(root, '**/*.dart'),
-    // Exclude build output, dot-folders, `files.exclude` entries and
-    // git-ignored directories at the glob level so they don't consume the
-    // findFiles cap in the first place.
-    buildScanExcludeGlob(
-      vscode.workspace.getConfiguration('files').get<Record<string, unknown>>('exclude'),
-      queryGitIgnoredDirs(root),
-    ),
-    MAX_FILES,
-  );
-  if (token.isCancellationRequested) return [];
+  const filesExclude = vscode.workspace.getConfiguration('files').get<Record<string, unknown>>('exclude');
+  let files: vscode.Uri[];
+  const gitOut = await listDartFilesViaGit(root);
+  if (gitOut !== undefined) {
+    // Git path: honours .gitignore natively; no cap needed.
+    const rels = await existingOnly(root, filterGitFileList(gitOut, filesExclude));
+    files = rels.map(r => vscode.Uri.file(path.join(root, r)));
+    if (token.isCancellationRequested) return [];
+  } else {
+    const allFiles = await vscode.workspace.findFiles(
+      new vscode.RelativePattern(root, '**/*.dart'),
+      buildScanExcludeGlob(filesExclude, queryGitIgnoredDirs(root)),
+      MAX_FILES,
+    );
+    if (token.isCancellationRequested) return [];
 
-  if (allFiles.length === MAX_FILES) {
-    const message = `Analysis Optimizer scan hit the ${MAX_FILES.toLocaleString()}-file cap; results are partial.`;
-    progress.report({ message });
-    void vscode.window.showWarningMessage(message);
+    if (allFiles.length === MAX_FILES) {
+      const message = `Analysis Optimizer scan hit the ${MAX_FILES.toLocaleString()}-file cap; results are partial.`;
+      progress.report({ message });
+      void vscode.window.showWarningMessage(message);
+    }
+
+    const rel = (f: vscode.Uri): string => path.relative(root, f.fsPath).replace(/\\/g, '/');
+    const dotFiltered = allFiles.filter(f => !isInDotFolder(rel(f)));
+    const ignored = gitIgnoredPaths(root, dotFiltered.map(rel));
+    files = ignored.size === 0 ? dotFiltered : dotFiltered.filter(f => !ignored.has(rel(f)));
   }
-
-  // Belt-and-braces: correctness shouldn't depend on findFiles' glob
-  // semantics matching analyzer's dot-folder exclusion exactly.
-  const dotFiltered = allFiles.filter(f => !isInDotFolder(path.relative(root, f.fsPath).replace(/\\/g, '/')));
-
-  // File-level .gitignore patterns (e.g. `*.g.dart`) that the directory-level
-  // glob above cannot express.
-  const ignored = gitIgnoredPaths(
-    root,
-    dotFiltered.map(f => path.relative(root, f.fsPath).replace(/\\/g, '/')),
-  );
-  const files = ignored.size === 0
-    ? dotFiltered
-    : dotFiltered.filter(f => !ignored.has(path.relative(root, f.fsPath).replace(/\\/g, '/')));
 
   const total = files.length;
   progress.report({ message: `Found ${total} Dart files` });
