@@ -823,6 +823,12 @@
       "dismiss": "Despedimento de despedido.",
       "added": "{count} adicionado(s) à exclusão do arquivo-watcher nas configurações do workspace."
     },
+    "nestedRoots": {
+      "prompt": "{folders} contém {count} raiz(es) de pacote Dart aninhada(s) que o git ignora. Cada uma é analisada como um contexto separado e pode inflar a memória do servidor de análise.",
+      "fix": "Excluir da análise",
+      "dismiss": "Dispensar",
+      "fixed": "{folders} foi excluído da análise e do monitoramento de arquivos."
+    },
     "hazardScan": {
       "warning": "Arquivos grandes {count} encontrados não excluídos do observador de arquivos: {files}. Esses podem esgotar a memória e causar o crash de VS Code.",
       "addExclusions": "Excluir do Watcher",

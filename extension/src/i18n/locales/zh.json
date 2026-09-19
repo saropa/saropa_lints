@@ -823,6 +823,12 @@
       "dismiss": "解雇了,这是一个很好的方法.",
       "added": "已将 {count} 文件监视器排除项添加到工作区设置中。"
     },
+    "nestedRoots": {
+      "prompt": "{folders} 包含 {count} 个被 git 忽略的嵌套 Dart 包根目录。每个都会作为单独的上下文进行分析,可能使分析服务器的内存大幅膨胀。",
+      "fix": "从分析中排除",
+      "dismiss": "忽略",
+      "fixed": "已将 {folders} 从分析和文件监视中排除。"
+    },
     "hazardScan": {
       "warning": "发现{count}个未被文件监视器排除的大文件: {files}。这些文件可能耗尽内存并导致VS Code崩溃。",
       "addExclusions": "排除于监视器之外",

@@ -823,6 +823,12 @@
       "dismiss": "Despido de trabajo.",
       "added": "Se agregaron la(s) exclusión(es) {count} del archivo-watcher a la configuración del espacio de trabajo."
     },
+    "nestedRoots": {
+      "prompt": "{folders} contiene {count} raíz(ces) de paquetes Dart anidados que git ignora. Cada una se analiza como un contexto independiente y puede inflar la memoria del servidor de análisis.",
+      "fix": "Excluir del análisis",
+      "dismiss": "Descartar",
+      "fixed": "Se excluyó {folders} del análisis y de la vigilancia de archivos."
+    },
     "hazardScan": {
       "warning": "Se encontraron {count} archivo(s) grande(s) no excluido(s) del observador de archivos: {files}. Estos pueden agotar la memoria y hacer colapsar a VS Code.",
       "addExclusions": "Excluir de Watcher",

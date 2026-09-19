@@ -823,6 +823,12 @@
       "dismiss": "Thả bỏ việc làm",
       "added": "Đã thêm {count} file-watcher ngoại lệ(s) vào cài đặt không gian làm việc."
     },
+    "nestedRoots": {
+      "prompt": "{folders} chứa {count} gốc gói Dart lồng nhau mà git bỏ qua. Mỗi gốc được phân tích như một ngữ cảnh riêng và có thể làm phình bộ nhớ của máy chủ phân tích.",
+      "fix": "Loại trừ khỏi phân tích",
+      "dismiss": "Bỏ qua",
+      "fixed": "Đã loại trừ {folders} khỏi phân tích và theo dõi tệp."
+    },
     "hazardScan": {
       "warning": "Đã tìm thấy {count} tập tin (tập tin) lớn không được loại trừ khỏi trình theo dõi tập tin: {files}. Những tập tin này có thể làm tràn bộ nhớ và gây ra sự cố VS Code.",
       "addExclusions": "Loại trừ khỏi Watcher",

@@ -823,6 +823,12 @@
       "dismiss": "İşten çıkarma, işten atmak.",
       "added": "{count} dosya izlemeçi hariç tutmaları işlevselliğe eklendi."
     },
+    "nestedRoots": {
+      "prompt": "{folders} içinde git'in yok saydığı {count} iç içe Dart paket kökü var. Her biri ayrı bir bağlam olarak analiz edilir ve analiz sunucusunun belleğini şişirebilir.",
+      "fix": "Analizden Hariç Tut",
+      "dismiss": "Kapat",
+      "fixed": "{folders} analizden ve dosya izlemeden hariç tutuldu."
+    },
     "hazardScan": {
       "warning": "{count} boyutunda büyük dosya(s) dosya izleyicisinden dışlanmamış: {files}. Bu dosyalar belleği tüketebilir ve VS Code'yi kapatabilir.",
       "addExclusions": "Watcher'dan Dışarıya Al",

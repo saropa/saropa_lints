@@ -823,6 +823,12 @@
       "dismiss": "Le licenciement est annulé.",
       "added": "Ajouté(s) {count} exclusion(s) de surveillance de fichier aux paramètres de l'espace de travail."
     },
+    "nestedRoots": {
+      "prompt": "{folders} contient {count} racine(s) de paquet Dart imbriquée(s) ignorée(s) par git. Chacune est analysée comme un contexte distinct et peut faire gonfler la mémoire du serveur d'analyse.",
+      "fix": "Exclure de l'analyse",
+      "dismiss": "Ignorer",
+      "fixed": "{folders} a été exclu de l'analyse et de la surveillance des fichiers."
+    },
     "hazardScan": {
       "warning": "Fichier(s) {count} volumineux trouvé(s) non exclu(s) du surveillant de fichiers : {files}. Ces fichiers peuvent épuiser la mémoire et faire planter VS Code.",
       "addExclusions": "Exclure du Watcher",

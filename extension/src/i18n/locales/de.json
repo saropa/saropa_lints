@@ -823,6 +823,12 @@
       "dismiss": "Entlassen Sie.",
       "added": "{count} Datei-Watcher-Ausnahmen zur Arbeitsbereichseinstellungen hinzugefügt."
     },
+    "nestedRoots": {
+      "prompt": "{folders} enthält {count} verschachtelte Dart-Paketwurzel(n), die git ignoriert. Jede wird als eigener Kontext analysiert und kann den Speicher des Analyseservers stark aufblähen.",
+      "fix": "Von der Analyse ausschließen",
+      "dismiss": "Verwerfen",
+      "fixed": "{folders} wurde von der Analyse und der Dateiüberwachung ausgeschlossen."
+    },
     "hazardScan": {
       "warning": "Große Datei(n) {count} nicht vom Datei-Überwachungssystem ausgeschlossen gefunden: {files}. Diese können den Arbeitsspeicher aufbrauchen und VS Code abstürzen.",
       "addExclusions": "Von Watcher ausschließen",

@@ -823,6 +823,12 @@
       "dismiss": "Zwolnienie z pracy.",
       "added": "Dodano wykluczenia {count} plików-watcher do ustawień przestrzeni roboczej."
     },
+    "nestedRoots": {
+      "prompt": "{folders} zawiera zagnieżdżone korzenie pakietów Dart (liczba: {count}), które git ignoruje. Każdy jest analizowany jako osobny kontekst i może mocno zwiększyć zużycie pamięci serwera analizy.",
+      "fix": "Wyklucz z analizy",
+      "dismiss": "Odrzuć",
+      "fixed": "Wykluczono {folders} z analizy i obserwowania plików."
+    },
     "hazardScan": {
       "warning": "Znaleziono {count} dużych plików(n), które nie są wykluczone z monitora plików: {files}. Mogą one wyczerpać pamięć i spowodować awarię VS Code.",
       "addExclusions": "Wyklucz z Watchera",

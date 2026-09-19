@@ -823,6 +823,12 @@
       "dismiss": "Scusate il licenziamento.",
       "added": "Aggiunti gli esclusi {count} del file-watcher alle impostazioni dello spazio di lavoro."
     },
+    "nestedRoots": {
+      "prompt": "{folders} contiene {count} radice/i di pacchetti Dart annidate che git ignora. Ognuna viene analizzata come contesto separato e può far crescere molto la memoria del server di analisi.",
+      "fix": "Escludi dall'analisi",
+      "dismiss": "Ignora",
+      "fixed": "{folders} escluso dall'analisi e dal monitoraggio dei file."
+    },
     "hazardScan": {
       "warning": "File {count} grandi trovati non esclusi dal watcher dei file: {files}. Questi possono esaurire la memoria e causare il crash di VS Code.",
       "addExclusions": "Escludi dal Watcher",

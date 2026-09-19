@@ -823,6 +823,12 @@
       "dismiss": "Fungua kazi.",
       "added": "Zilizongezwa {count} file-watcher exclusions kwenye mstika ya workspace."
     },
+    "nestedRoots": {
+      "prompt": "{folders} ina mizizi {count} ya vifurushi vya Dart vilivyoundwa ndani ambavyo git huvipuuza. Kila kimoja huchanganuliwa kama muktadha tofauti na kinaweza kuongeza sana kumbukumbu ya seva ya uchanganuzi.",
+      "fix": "Ondoa kwenye Uchanganuzi",
+      "dismiss": "Ondoa",
+      "fixed": "{folders} imeondolewa kwenye uchanganuzi na ufuatiliaji wa faili."
+    },
     "hazardScan": {
       "warning": "Imeongezwa faili ya {count} ya kipindi kubwa sikuwa sio kikomotia kwenye kifichi ya faili: {files}. Hizi inaweza kuzalisha mifano ya memory na kuzalisha VS Code.",
       "addExclusions": "Ondoa kutokana na Watcher",

@@ -823,6 +823,12 @@
       "dismiss": "Mag-dismiss na ako.",
       "added": "Nagdagdag ng mga {count} file-watcher exclusion sa mga setting ng workspace."
     },
+    "nestedRoots": {
+      "prompt": "Ang {folders} ay may {count} nested na Dart package root na hindi pinapansin ng git. Bawat isa ay sinusuri bilang hiwalay na context at maaaring magpalobo sa memory ng analysis server.",
+      "fix": "I-exclude sa Analysis",
+      "dismiss": "I-dismiss",
+      "fixed": "Na-exclude ang {folders} sa analysis at file watching."
+    },
     "hazardScan": {
       "warning": "Nakita ang {count} malaking file(s) na hindi inilagay sa pagmamana ng file: {files}. Ito ay maaaring mag-imbak ng memorya at mag-iba sa VS Code.",
       "addExclusions": "I-exclude sa Watcher",

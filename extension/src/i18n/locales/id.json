@@ -823,6 +823,12 @@
       "dismiss": "Mengusir dari pekerjaan.",
       "added": "{count} file-watcher eksepsi ditambahkan ke pengaturan workspace."
     },
+    "nestedRoots": {
+      "prompt": "{folders} berisi {count} root paket Dart bersarang yang diabaikan git. Masing-masing dianalisis sebagai konteks terpisah dan dapat membengkakkan memori server analisis.",
+      "fix": "Kecualikan dari Analisis",
+      "dismiss": "Tutup",
+      "fixed": "{folders} dikecualikan dari analisis dan pemantauan file."
+    },
     "hazardScan": {
       "warning": "Ditemukan {count} file besar yang tidak dikecualikan dari file watcher: {files}. Ini dapat menghabiskan memori dan menyebabkan crash pada VS Code.",
       "addExclusions": "Keluar dari Watcher",

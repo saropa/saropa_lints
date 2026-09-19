@@ -823,6 +823,12 @@
       "dismiss": "해고 처분",
       "added": "{count} 파일 워처 제외 설정을 작업 공간 설정에 추가했습니다."
     },
+    "nestedRoots": {
+      "prompt": "{folders}에 git이 무시하는 중첩된 Dart 패키지 루트가 {count}개 있습니다. 각각 별도의 컨텍스트로 분석되어 분석 서버의 메모리를 크게 늘릴 수 있습니다.",
+      "fix": "분석에서 제외",
+      "dismiss": "닫기",
+      "fixed": "{folders}을(를) 분석 및 파일 감시에서 제외했습니다."
+    },
     "hazardScan": {
       "warning": "{count} 크기의 대형 파일({files})이 파일 감시기에서 제외되지 않았습니다. 이 파일들은 메모리를 모두 소진하여 VS Code를 중단시킬 수 있습니다.",
       "addExclusions": "Watcher에서 제외",
