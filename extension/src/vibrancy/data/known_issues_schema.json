@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Flutter Package Known Issues Schema",
+  "description": "Machine-derivable fields (lastUpdated, pubPoints, archiveSize*, verifiedPublisher, platforms, as_of) are refreshed from pub.dev with scripts/pubdev_snapshot.py (snapshot, then apply); see scripts/README.md.",
   "type": "object",
   "properties": {
     "$schema": {

@@ -19,6 +19,6 @@ export const HELD_BACK_UPGRADES: readonly HeldBackEntry[] = [
     {
         pkg: 'analyzer',
         range: '>=13.0.0',
-        reason: 'analyzer 13 needs meta ^1.18.3, but Flutter stable pins meta 1.18.0',
+        reason: 'analyzer 13+ (latest 14.4.0) needs meta ^1.18.3, but Flutter stable pins meta 1.18.0; stay on analyzer 12.x (with analysis_server_plugin ^0.3.14)',
     },
 ];

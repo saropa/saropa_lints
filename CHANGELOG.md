@@ -119,6 +119,7 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Internal
 
+- Added `scripts/pubdev_snapshot.py`, which downloads the latest pub.dev data for every tracked package into a reusable snapshot and refreshes the Package Vibrancy known-issues data from it; the analyzer entries now record why analyzer 13 and later is held back.
 - Test descriptions for the shared CI workflow fixture checks now state the expected behavior, satisfying `require_test_description_convention`.
 - `CHANGELOG_ARCHIVE.md` (11k+ lines) split into one file per major.minor line under `changelog/archive/` (e.g. `15.2.x.md`); the old file is now a short index. Every release entry is preserved (plus 10.12.0–12.2.1, recovered from git history where an earlier trim had deleted them without archiving) and stays greppable with `grep -r <term> changelog/archive/`. `scripts/split_changelog_archive.py` regenerates the split and index; `compact_changelog_archive.py` and the rule-version-history scan now read the directory, and `changelog/` is excluded from the pub.dev package.
 

@@ -112,6 +112,7 @@ Scripts in this directory that can run independently:
 | `bulk_rule_metadata.py` | Bulk metadata operations |
 | `export_saropa_rules_for_gap.py` | Export rules for external tools |
 | `list_rules_without_fixes.py` | Query rules lacking quick fixes |
+| `pubdev_snapshot.py` | `snapshot`: cache pub.dev facts for every tracked package (`reports/pubdev_snapshot.json`, gitignored, has `fetched_at`). `apply`: offline refresh of machine-derivable fields in `extension/src/vibrancy/data/known_issues.json`; status changes are only flagged. Flags: `--dry-run`, `--only PKG`, `--concurrency`, `--retries`. Run `python scripts/pubdev_snapshot.py --help` |
 
 Historical scripts in `scripts/historical/` are not part of the build.
 
