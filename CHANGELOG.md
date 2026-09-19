@@ -100,7 +100,7 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Added (Extension)
 
-- Package Vibrancy now checks what an upgrade would break before recommending it, and replaces the upgrade nudge with the reason when dependents cap the package below the new version or the new version needs a newer dependency than your Flutter SDK pins (for example `analyzer` 13, which needs a newer `meta` than Flutter stable ships) or needs a dependency that is itself held back (for example a `drift_dev` release that requires `analyzer` 13). Blocked packages are also skipped by "upgrade all", and the newest version you can still take is suggested. No action required.
+- Package Vibrancy now checks what an upgrade would break before recommending it, and replaces the upgrade nudge with the reason when dependents cap the package below the new version or the new version needs a newer dependency than your Flutter SDK pins (for example `analyzer` 13, which needs a newer `meta` than Flutter stable ships) or needs a dependency that another package in your project caps (for example a `drift_dev` release that requires `analyzer` 13 while a dependency caps it below 13), naming the package responsible. Blocked packages are also skipped by "upgrade all", and the newest version you can still take is suggested. No action required.
 
 ### Fixed (Extension)
 

@@ -2872,6 +2872,7 @@
     "summary": {
       "heldBack": "{pkg} {to} is held back: {reason}",
       "sdkBlocked": "{pkg} {to} is blocked by the SDK: {sdk}",
+      "depCapped": "{pkg} {to} needs {dep} {range}, but {dep} is capped by {cappers}",
       "depHeldBack": "{pkg} {to} needs {dep} {range}, which is held back: {reason}",
       "breaksOne": "{pkg} {to} would break {count} dependent: {names}",
       "breaksOther": "{pkg} {to} would break {count} dependents: {names}",

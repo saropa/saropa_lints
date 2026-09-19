@@ -11,6 +11,14 @@ import * as path from 'path';
 import { execFile } from 'child_process';
 import { SDK_PACKAGES } from '../sdk-packages';
 
+/**
+ * What counts as a pin: ONLY an exact version (`meta: 1.18.0`) in an SDK
+ * package's `dependencies:`. A caret/range entry (`meta: ^1.18.3`, `>=1 <2`)
+ * is a floor/ceiling, not a pin: any version inside it is allowed, so it never
+ * yields a pin here (inventing one caused false "sdk-blocked" verdicts on
+ * newer Flutter). Whether a range excludes a target is decided by the
+ * data-driven checks in upgrade-blast-radius (lock + dependents' ranges).
+ */
 const EXACT = /^\d+\.\d+\.\d+(?:[-+][\w.]+)?$/;
 
 /** Pure: exact-version entries under `dependencies:` of an SDK pubspec. */
@@ -71,14 +79,25 @@ function detectFlutterRoot(): Promise<string | null> {
     });
 }
 
-/** Derived SDK pins for a workspace; empty map when nothing derivable. */
+/** Derived SDK pins; empty map when nothing derivable. */
 export async function deriveSdkPins(
     workspaceRoot: string,
     findFlutterRoot: () => Promise<string | null> = detectFlutterRoot,
 ): Promise<Map<string, string>> {
+    return (await deriveSdkPinsOrNull(workspaceRoot, findFlutterRoot)) ?? new Map();
+}
+
+/**
+ * Like deriveSdkPins but null when the SDK could not be inspected (so callers
+ * may apply curated fallback pins); an empty map means "SDK read, no exact pins".
+ */
+export async function deriveSdkPinsOrNull(
+    workspaceRoot: string,
+    findFlutterRoot: () => Promise<string | null> = detectFlutterRoot,
+): Promise<Map<string, string> | null> {
     try {
         const root = await findFlutterRoot();
-        if (!root) { return new Map(); }
+        if (!root) { return null; }
         const specs: string[] = [];
         for (const pkg of SDK_PACKAGES) {
             try {
@@ -89,8 +108,9 @@ export async function deriveSdkPins(
         let lock: string | null = null;
         try { lock = fs.readFileSync(path.join(workspaceRoot, 'pubspec.lock'), 'utf8'); }
         catch { /* no lock yet */ }
+        if (specs.length === 0) { return null; }
         return mergePins(specs, lock);
     } catch {
-        return new Map();
+        return null;
     }
 }

@@ -42,6 +42,36 @@ describe('parseTargetDeps', () => {
         assert.ok(!m.has('sdk_thing'));
         assert.strictEqual(parseTargetDeps({}), null);
     });
+    it('empty map when pubspec has no dependencies; null when retracted', () => {
+        const m = parseTargetDeps({ pubspec: { name: 'meta' } });
+        assert.ok(m && m.size === 0);
+        assert.strictEqual(parseTargetDeps({ retracted: true, pubspec: { dependencies: { a: '^1.0.0' } } }), null);
+    });
+});
+
+describe('fetchTargetDeps empty/retracted', () => {
+    const realFetch = global.fetch;
+    afterEach(() => { global.fetch = realFetch; });
+    it('caches an empty dependency map; does not cache retracted', async () => {
+        let calls = 0;
+        let body: unknown = { pubspec: { name: 'meta' } };
+        global.fetch = (async () => { calls++; return { ok: true, status: 200, json: async () => body }; }) as any;
+        const store = new Map<string, unknown>();
+        const cache: any = { get: (k: string) => store.get(k), set: async (k: string, v: unknown) => { store.set(k, v); } };
+        assert.strictEqual((await fetchTargetDeps('meta', '1.18.3', cache))!.size, 0);
+        await fetchTargetDeps('meta', '1.18.3', cache);
+        assert.strictEqual(calls, 1);
+        body = { retracted: true, pubspec: { dependencies: {} } };
+        assert.strictEqual(await fetchTargetDeps('bad', '1.0.0', cache), null);
+        assert.ok(!store.has('pub.targetDeps.bad@1.0.0'));
+    });
+});
+
+describe('sdk pins semantics', () => {
+    it('caret/range SDK deps are not pins', () => {
+        const y = 'dependencies:\n  meta: ^1.18.3\n  collection: 1.19.1\n  vm: ">=1.0.0 <2.0.0"\n';
+        assert.deepStrictEqual([...parseExactPins(y)], [['collection', '1.19.1']]);
+    });
 });
 
 describe('fetchTargetDeps', () => {

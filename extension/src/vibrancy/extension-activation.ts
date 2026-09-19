@@ -87,7 +87,7 @@ import {
     runOverrideAnalysis, overrideConstrainerCandidates,
 } from './services/override-runner';
 import { fetchTargetDepsFor, fetchVersionListsFor } from './services/upgrade-target-deps';
-import { deriveSdkPins, parseLockedVersions } from './services/sdk-pins';
+import { deriveSdkPinsOrNull, parseLockedVersions } from './services/sdk-pins';
 import { buildConstraintIndex } from './services/shared-dep-constraints';
 import { attachBlastRadius, blastRadiusCandidates } from './scoring/blast-radius-attacher';
 import { OverrideAnalysis, NewVersionNotification, PackageInsight } from './types';
@@ -1404,7 +1404,8 @@ async function runScanInner(
                 blastRadiusCandidates(results, enrichResult.reverseDeps),
             );
             const targetDeps = await fetchTargetDepsFor(results, targets.cache);
-            const derivedPins = await deriveSdkPins(workspaceRoot.fsPath);
+            // null = SDK not found (curated fallback pins apply); empty map = SDK found, nothing pinned.
+            const derivedPins = await deriveSdkPinsOrNull(workspaceRoot.fsPath);
             // Full lock (incl. transitives) so a satisfied transitive is not blocked.
             const lockText = await vscode.workspace.fs
                 .readFile(vscode.Uri.joinPath(workspaceRoot, 'pubspec.lock'))
@@ -1415,7 +1416,7 @@ async function runScanInner(
                 reverseDeps: enrichResult.reverseDeps,
                 constraints: blastConstraints,
                 targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
-                sdkPins: derivedPins.size > 0 ? derivedPins : undefined,
+                sdkPins: derivedPins ?? undefined,
                 lockedVersions: fullLock,
             }).filter(r => r.blastRadius && r.blastRadius.verdict !== 'safe')
                 .map(r => r.package.name);
@@ -1427,7 +1428,7 @@ async function runScanInner(
                 versionsOf: p => versionLists.get(p) ?? null,
                 targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
                 // Undefined -> attacher falls back to the documented table.
-                sdkPins: derivedPins.size > 0 ? derivedPins : undefined,
+                sdkPins: derivedPins ?? undefined,
             });
             lastReverseDeps = enrichResult.reverseDeps;
             lastFloors = enrichResult.floors;

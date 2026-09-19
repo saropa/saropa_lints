@@ -5,10 +5,21 @@
  * pub.dev's latest is not always adoptable: analyzer 13 needs `meta ^1.18.3`
  * while Flutter stable pins `meta 1.18.0`, and several dependents cap analyzer
  * below 13. Three independent signals are combined, in precedence order
- * held-back > sdk-blocked > dependency-held-back > breaks-dependents > safe:
+ * held-back > sdk-blocked > dependency-capped > dependency-held-back >
+ * breaks-dependents > safe:
  *   - a curated held-back entry matching the target version,
  *   - a target dependency range that excludes a version pinned by the SDK,
+ *   - dependency-capped (data-driven): the target needs dep D at a version the
+ *     lock does not have, and another project package caps D below it,
+ *   - dependency-held-back: same need, but decided only by the curated list,
  *   - dependents whose declared range on the package excludes the target.
+ *
+ * FALLBACK DECISION: the curated held-back list is a fallback for when the
+ * data cannot decide. Self entries apply only when targetDeps is unknown or
+ * there is no lock data; dependency entries apply per dep only when that
+ * dep's locked version is unknown. When lock + ranges are available they
+ * decide (e.g. analyzer needed at >=13, locked 12, nothing caps it: not
+ * blocked, whatever the list says).
  *
  * Pure — no I/O, no VS Code API. All graph and version data is supplied by the
  * caller.
@@ -17,11 +28,12 @@
 import * as semver from 'semver';
 import { DepEdge } from '../types';
 import { ConstraintIndex } from './shared-dep-conflict-detector';
-import { pathToDirectDep } from './constraint-chain';
+import { pathToDirectDep, formatChain } from './constraint-chain';
 import { HeldBackEntry } from './held-back-upgrades';
 
 export type BlastVerdict =
-    'safe' | 'breaks-dependents' | 'dependency-held-back' | 'sdk-blocked' | 'held-back';
+    'safe' | 'breaks-dependents' | 'dependency-held-back' | 'dependency-capped'
+    | 'sdk-blocked' | 'held-back';
 
 export interface BlastBreaker {
     /** Dependent whose range excludes the target. */
@@ -44,6 +56,8 @@ export interface BlastRadius {
     readonly sdkBlock: SdkBlock | null;
     /** Target dependency whose required range needs a held-back version. */
     readonly depHeldBack?: DepHeldBack | null;
+    /** Target dependency the project cannot raise because a dependent caps it. */
+    readonly depCapped?: DepCapped | null;
     /** Curated maintainer explanation (data, not localized). */
     readonly heldBackReason: string | null;
     /** Newest release newer than `from` that is not blocked; set by the attacher. */
@@ -70,7 +84,18 @@ export interface DepHeldBack {
     readonly reason: string;
 }
 
+/** A dependency the target needs, capped below the needed version by others. */
+export interface DepCapped {
+    readonly dep: string;
+    /** Range the target requires of `dep`. */
+    readonly range: string;
+    /** `dep`'s currently locked version. */
+    readonly locked: string;
+    readonly cappers: readonly BlastBreaker[];
+}
+
 export type BlastSummaryKey =
+    | 'blastRadius.summary.depCapped'
     | 'blastRadius.summary.heldBack'
     | 'blastRadius.summary.sdkBlocked'
     | 'blastRadius.summary.depHeldBack'
@@ -158,12 +183,53 @@ function findDepHeldBack(
         if (!range) { continue; }
         const lock = locked?.get(dep);
         const lockV = lock ? toVersion(lock) : null;
-        if (lockV && semver.satisfies(lockV, range, { includePrerelease: true })) { continue; }
+        // A known lock means the data decides (see findDepCapped); the curated
+        // list is consulted only for deps whose locked version is unknown.
+        if (lockV) { continue; }
         let min: semver.SemVer | null = null;
         try { min = semver.minVersion(range); } catch { min = null; }
         if (!min) { continue; }
         const entry = findHeldBack(dep, min.version, heldBack);
         if (entry) { return { dep, range: rawRange.replace(/["']/g, '').trim(), reason: entry.reason }; }
+    }
+    return null;
+}
+
+/**
+ * Data-driven: first target dependency D whose required range the locked D
+ * does not satisfy AND whose required minimum is excluded by the declared
+ * range of some other dependent of D (excluding `pkg` itself, whose own range
+ * is replaced by the upgrade). Those dependents cap D.
+ */
+function findDepCapped(input: BlastRadiusInput): DepCapped | null {
+    const { targetDeps, lockedVersions: locked, reverseDeps, constraints } = input;
+    if (!targetDeps || !locked) { return null; }
+    let roots: Set<string> | null = null;
+    for (const [dep, rawRange] of targetDeps) {
+        const range = parseRange(rawRange);
+        const lock = locked.get(dep);
+        const lockV = lock ? toVersion(lock) : null;
+        if (!range || !lockV || semver.satisfies(lockV, range, { includePrerelease: true })) { continue; }
+        let min: semver.SemVer | null = null;
+        try { min = semver.minVersion(range); } catch { min = null; }
+        if (!min) { continue; }
+        const cappers: BlastBreaker[] = [];
+        const seen = new Set<string>();
+        for (const edge of reverseDeps.get(dep) ?? []) {
+            const name = edge.dependentPackage;
+            if (name === input.pkg || seen.has(name)) { continue; }
+            seen.add(name);
+            const constraint = constraints.get(name)?.get(dep);
+            if (!constraint || !excludes(constraint, min.version)) { continue; }
+            roots ??= graphRoots(reverseDeps);
+            const path = pathToDirectDep(name, reverseDeps, roots);
+            cappers.push({
+                name, constraint, chain: path.length > 1 ? path : null, fixedInLatest: null,
+            });
+        }
+        if (cappers.length > 0) {
+            return { dep, range: rawRange.replace(/["']/g, '').trim(), locked: lock!, cappers };
+        }
     }
     return null;
 }
@@ -221,8 +287,12 @@ export function computeBlastRadius(input: BlastRadiusInput): BlastRadius {
     const { pkg, from, to } = input;
     const base = { pkg, from, to };
 
-    const held = findHeldBack(pkg, to, input.heldBack);
+    // Curated self entry is a fallback: skipped when target deps and lock are
+    // both known, since then the data-driven checks below decide.
+    const dataDecides = !!input.targetDeps && (input.lockedVersions?.size ?? 0) > 0;
+    const held = dataDecides ? null : findHeldBack(pkg, to, input.heldBack);
     const sdkBlock = findSdkBlock(pkg, to, input.targetDeps, input.sdkPins);
+    const depCapped = findDepCapped(input);
     const depHeld = findDepHeldBack(input.targetDeps, input.heldBack, input.lockedVersions);
     const breakers = findBreakers(input);
 
@@ -241,6 +311,20 @@ export function computeBlastRadius(input: BlastRadiusInput): BlastRadius {
             heldBackReason: null,
             summaryKey: 'blastRadius.summary.sdkBlocked',
             summaryParams: { ...pkgTo },
+        };
+    }
+    if (depCapped) {
+        return {
+            ...base, verdict: 'dependency-capped', breakers, sdkBlock: null,
+            depCapped, heldBackReason: null,
+            summaryKey: 'blastRadius.summary.depCapped',
+            summaryParams: {
+                ...pkgTo, dep: depCapped.dep, range: depCapped.range,
+                cappers: depCapped.cappers.map(c => {
+                    const via = formatChain(c.chain ?? []);
+                    return `${c.name} ${c.constraint}${via ? ` via ${via}` : ''}`;
+                }).join(', '),
+            },
         };
     }
     // After sdk-blocked (a hard platform limit) but before dependents: the

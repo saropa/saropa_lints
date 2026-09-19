@@ -250,3 +250,66 @@ describe('dependency-held-back verdict', () => {
         assert.strictEqual(r.verdict, 'held-back');
     });
 });
+
+describe('dependency-capped verdict (data-driven)', () => {
+    const drift = {
+        ...base, pkg: 'drift_dev', from: '2.28.0', to: '2.35.0',
+        targetDeps: new Map([['analyzer', '>=13.0.0']]),
+        reverseDeps: reverse([['drift_dev', 'analyzer'], ['saropa_lints', 'analyzer']]),
+        constraints: constraintsOf([
+            ['drift_dev', 'analyzer', '>=12.0.0 <13.0.0'],
+            ['saropa_lints', 'analyzer', '<13.0.0'],
+        ]),
+        lockedVersions: new Map([['analyzer', '12.1.0']]),
+        heldBack: HELD_BACK_UPGRADES,
+    };
+
+    it('blocks and names the capper', () => {
+        const r = computeBlastRadius(drift);
+        assert.strictEqual(r.verdict, 'dependency-capped');
+        assert.strictEqual(r.summaryKey, 'blastRadius.summary.depCapped');
+        assert.strictEqual(r.depCapped?.dep, 'analyzer');
+        assert.deepStrictEqual(r.depCapped?.cappers.map(c => c.name), ['saropa_lints']);
+        assert.ok(String(r.summaryParams.cappers).includes('saropa_lints <13.0.0'));
+    });
+
+    it('is not blocked by data when nothing caps analyzer (curated fallback ignored)', () => {
+        const r = computeBlastRadius({
+            ...drift,
+            reverseDeps: reverse([['drift_dev', 'analyzer']]),
+            constraints: constraintsOf([['drift_dev', 'analyzer', '>=12.0.0 <13.0.0']]),
+        });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+
+    it('is safe when the lock already satisfies the range', () => {
+        const r = computeBlastRadius({
+            ...drift, lockedVersions: new Map([['analyzer', '13.2.0']]),
+        });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+
+    it('curated list still decides when the lock has no entry for the dep', () => {
+        const r = computeBlastRadius({
+            ...drift, lockedVersions: new Map([['other', '1.0.0']]),
+            reverseDeps: reverse([]), constraints: constraintsOf([]),
+        });
+        assert.strictEqual(r.verdict, 'dependency-held-back');
+    });
+
+    it('sdk-blocked outranks it', () => {
+        const r = computeBlastRadius({
+            ...drift, targetDeps: new Map([['analyzer', '>=13.0.0'], ['meta', '^1.18.3']]),
+            sdkPins: new Map([['meta', '1.18.0']]),
+        });
+        assert.strictEqual(r.verdict, 'sdk-blocked');
+    });
+
+    it('self curated entry is skipped when target deps and lock are known', () => {
+        const r = computeBlastRadius({
+            ...base, targetDeps: new Map([['meta', '^1.18.3']]),
+            lockedVersions: new Map([['meta', '1.18.3']]), heldBack: HELD_BACK_UPGRADES,
+        });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+});

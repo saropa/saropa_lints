@@ -14,12 +14,20 @@ const PUB_DEV_URL = 'https://pub.dev';
 
 export type TargetDeps = ReadonlyMap<string, string>;
 
-/** Pure: pubspec.dependencies of a /versions/<v> response as name -> range. */
+/**
+ * Pure: pubspec.dependencies of a /versions/<v> response as name -> range.
+ * Empty map = pubspec present but no dependencies (a real answer, e.g. meta).
+ * Null = unknown: no pubspec, or the release is retracted (never analysed or
+ * suggested).
+ */
 export function parseTargetDeps(json: unknown): Map<string, string> | null {
-    const deps = (json as { pubspec?: { dependencies?: unknown } } | null)
-        ?.pubspec?.dependencies;
-    if (!deps || typeof deps !== 'object') { return null; }
+    const j = json as { retracted?: unknown; pubspec?: { dependencies?: unknown } } | null;
+    if (j?.retracted === true) { return null; }
+    const pubspec = j?.pubspec;
+    if (!pubspec || typeof pubspec !== 'object') { return null; }
     const out = new Map<string, string>();
+    const deps = pubspec.dependencies;
+    if (!deps || typeof deps !== 'object') { return out; }
     for (const [name, range] of Object.entries(deps as Record<string, unknown>)) {
         // Map-valued entries (sdk/git/path) carry no comparable version range.
         if (typeof range === 'string') { out.set(name, range); }
