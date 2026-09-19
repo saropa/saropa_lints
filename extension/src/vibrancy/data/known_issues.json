@@ -1416,11 +1416,11 @@
     {
       "name": "cached_network_image",
       "status": "upgrade_required",
-      "reason": "1.x releases predate null safety and do not compile under Dart 3.",
+      "reason": "Releases before 3.0.0 predate null safety (3.0.0 changelog: 'Migrate to null safety') and cannot compile under Dart 3.",
       "as_of": "2026-09-19",
-      "replacement": "Upgrade to >=2.0.0",
-      "migrationNotes": "Upgrade to >=2.0.0 (latest 4.0.0). Update error builder syntax.",
-      "appliesToMaxVersion": "2.0.0"
+      "replacement": "Upgrade to >=3.0.0",
+      "migrationNotes": "Upgrade to >=3.0.0 (latest 4.0.0). Update error builder syntax.",
+      "appliesToMaxVersion": "3.0.0"
     },
     {
       "name": "multi_image_picker",
@@ -1488,7 +1488,7 @@
     {
       "name": "flutter_sound",
       "status": "upgrade_required",
-      "reason": "7.x/8.x releases lack the background service permissions required by Android 15.",
+      "reason": "7.x and 8.x are superseded major versions; 9.x is the current line. Specific defects in these versions have not been verified against the changelog.",
       "as_of": "2026-09-19",
       "replacement": "Upgrade to >=9.0.0",
       "migrationNotes": "Upgrade to >=9.0.0 (latest 9.30.0). Complete rewrite of the playback session builder.",
@@ -1513,7 +1513,7 @@
     {
       "name": "flutter_downloader",
       "status": "upgrade_required",
-      "reason": "Progress synchronization isolates were broken pre-1.5.2, leaving ghost notifications stuck in 'processing' state (fixed in 1.5.2).",
+      "reason": "Releases before 1.5.2 could leave Android notifications stuck in 'processing' state (fixed in 1.5.2 per changelog: 'Android: fix bug notification stuck in processing').",
       "as_of": "2026-09-19",
       "replacement": "Upgrade to >=1.5.2",
       "migrationNotes": "Upgrade to >=1.5.2 (latest 1.12.1). background_downloader is an alternative but needs a total rewrite of background task initialization.",
@@ -1527,7 +1527,7 @@
         "android",
         "ios"
       ],
-      "appliesToMaxVersion": "1.5.1"
+      "appliesToMaxVersion": "1.5.2"
     },
     {
       "name": "path_provider_foundation",
@@ -1553,7 +1553,7 @@
     {
       "name": "workmanager",
       "status": "upgrade_required",
-      "reason": "0.4.x background execution keys fail to register, so tasks never fire.",
+      "reason": "0.4.x predates fixes to callback handler key handling (0.5.0-dev.7) and to WorkManager not running under obfuscation or Flutter 3.1+ (0.5.0).",
       "as_of": "2026-09-19",
       "replacement": "Upgrade to >=0.5.0",
       "migrationNotes": "Upgrade to >=0.5.0 (latest 0.10.10; 0.10.8+ recommended for Android 16). Callbacks require stricter async handling.",

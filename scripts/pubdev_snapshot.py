@@ -243,7 +243,8 @@ def fetch_package(name: str, timeout: float, retries: int) -> dict:
     if st == 200:
         try:
             adv = json.loads(body).get("advisories") or []
-            out["advisories"] = [a.get("id") for a in adv]
+            out["advisories"] = [a.get("id") for a in adv if isinstance(a, dict)]
+            out["advisoryDetails"] = [advisory_detail(a, name, out["version"]) for a in adv if isinstance(a, dict)]
         except ValueError:
             pass
     url = latest.get("archive_url")
@@ -253,6 +254,69 @@ def fetch_package(name: str, timeout: float, retries: int) -> dict:
         if st == 200 and size and str(size).isdigit():
             out["archiveSizeBytes"] = int(size)
     return out
+
+
+def advisory_detail(rec: dict, pkg: str, latest: str | None) -> dict:
+    """Reduce an OSV record to the fields needed to judge the latest version.
+
+    ``ranges`` is a list of ``{introduced, fixed, lastAffected}`` groups (one
+    per OSV event sequence); ``latestListed`` says whether the record's
+    explicit ``versions`` list names ``latest``. Malformed input is tolerated.
+    """
+    ranges: list[dict] = []
+    listed = False
+    for aff in rec.get("affected") or []:
+        if not isinstance(aff, dict):
+            continue
+        nm = (aff.get("package") or {}).get("name")
+        if nm and nm != pkg:
+            continue
+        if latest and latest in (aff.get("versions") or []):
+            listed = True
+        for r in aff.get("ranges") or []:
+            if not isinstance(r, dict):
+                continue
+            cur: dict = {}
+            for ev in r.get("events") or []:
+                if not isinstance(ev, dict):
+                    continue
+                if ev.get("introduced") is not None:
+                    if cur:
+                        ranges.append(cur)
+                    cur = {"introduced": str(ev["introduced"])}
+                if ev.get("fixed") is not None:
+                    cur["fixed"] = str(ev["fixed"])
+                if ev.get("last_affected") is not None:
+                    cur["lastAffected"] = str(ev["last_affected"])
+            if cur:
+                ranges.append(cur)
+    return {"id": rec.get("id"), "summary": rec.get("summary"), "ranges": ranges, "latestListed": listed}
+
+
+def advisory_status(detail: dict, latest: str | None) -> str:
+    """'affected' (latest inside an unfixed range), 'fixed' (bounded ranges
+    all end at/below latest) or 'unknown' (no usable range data)."""
+    if not isinstance(detail, dict):
+        return "unknown"
+    if detail.get("latestListed"):
+        return "affected"
+    if not latest:
+        return "unknown"
+    lv = _ver(latest)
+    usable = False
+    for r in detail.get("ranges") or []:
+        if not isinstance(r, dict) or not r.get("introduced"):
+            continue
+        usable = True
+        if lv < _ver(r["introduced"]) and r["introduced"] != "0":
+            continue
+        fixed, last = r.get("fixed"), r.get("lastAffected")
+        if fixed is not None and lv >= _ver(fixed):
+            continue
+        if last is not None and lv > _ver(last):
+            continue
+        return "affected"
+    return "fixed" if usable else "unknown"
 
 
 def cmd_snapshot(a: argparse.Namespace) -> int:
@@ -499,8 +563,17 @@ def cmd_apply(a: argparse.Namespace) -> int:
         rt = s.get("retracted") or {}
         if rt.get("latestRetracted"):
             mine.append(("retracted-latest", f"{n}: latest {s.get('version')} is RETRACTED"))
-        if s.get("advisories"):
-            mine.append(("advisories", f"{n}: {len(s['advisories'])} security advisories ({', '.join(map(str, s['advisories'][:3]))})"))
+        details = s.get("advisoryDetails")
+        if details is not None:
+            live = [d.get("id") for d in details if advisory_status(d, s.get("version")) == "affected"]
+            old_fixed = [d.get("id") for d in details if advisory_status(d, s.get("version")) == "fixed"]
+            if live:
+                mine.append(("advisories", f"{n}: latest {s.get('version')} affected by unfixed advisories ({', '.join(map(str, live[:3]))})"))
+            if old_fixed:
+                mine.append(("advisories-fixed", f"INFO {n}: {len(old_fixed)} advisories affect older versions, fixed in latest ({', '.join(map(str, old_fixed[:3]))})"))
+        elif s.get("advisories"):
+            # format-2 snapshot without range data: cannot judge; stay quiet-but-informative.
+            mine.append(("advisories", f"INFO {n}: {len(s['advisories'])} advisories on record (re-run snapshot for range data)"))
         flags.extend(mine)
         real = [f for f in mine if not f[1].startswith("INFO")]
         if not (a.refresh_as_of_only_verified and real):
@@ -590,6 +663,22 @@ def cmd_selftest(_a: argparse.Namespace) -> int:
     assert dead_data_flag({"name": "js (original)", "status": "active"}, None)
     assert dead_data_flag({"name": "gone", "status": "active"}, {"status": "not_found"})
     assert not dead_data_flag({"name": "ok_pkg", "status": "active"}, {"status": "ok"})
+    # advisories
+    def adv(**r):
+        return {"id": "G", "ranges": [r], "latestListed": False}
+    assert advisory_status(adv(introduced="0", fixed="0.13.3"), "1.2.0") == "fixed"
+    assert advisory_status(adv(introduced="0", fixed="2.0.0"), "1.2.0") == "affected"
+    assert advisory_status(adv(introduced="1.0.0"), "1.2.0") == "affected"  # only introduced
+    assert advisory_status(adv(introduced="3.0.0"), "1.2.0") == "fixed"  # not yet introduced
+    assert advisory_status(adv(introduced="0", lastAffected="1.1.0"), "1.2.0") == "fixed"
+    assert advisory_status({"id": "G", "ranges": [], "latestListed": True}, "1.2.0") == "affected"
+    for bad in (None, {}, {"ranges": "x"}, {"ranges": [None, {}, {"fixed": "1"}]}):
+        assert advisory_status(bad, "1.2.0") == "unknown", bad
+    assert advisory_status(adv(introduced="0", fixed="1.0.0"), None) == "unknown"
+    d = advisory_detail({"id": "X", "affected": [None, {"package": {"name": "p"}, "versions": ["1.2.0"], "ranges": [
+        {"events": [{"introduced": "0", "fixed": None}, {"introduced": None, "fixed": "1.0.0"}, None]}, "junk"]}]}, "p", "1.2.0")
+    assert d["ranges"] == [{"introduced": "0", "fixed": "1.0.0"}] and d["latestListed"], d
+    assert advisory_detail({"affected": "oops"}, "p", "1.0.0")["ranges"] == []
     print("selftest ok")
     return 0
 
