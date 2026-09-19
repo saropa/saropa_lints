@@ -1,13 +1,13 @@
 # BUG: Exclusion audits never flag `.claude/worktrees/`, so nested package copies each become a separate analysis context
 
-**Status: Investigating**
+**Status: Closed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
 Created: 2026-09-18
 Rule: n/a (extension-native checks: Watcher Exclude Audit, Analysis Optimizer)
 File: `extension/src/systemHealth/watcherExcludeAudit.ts` (line ~33); `extension/src/analysisOptimizer/scorer.ts` (lines ~10, ~154-178); `extension/src/analysisOptimizer/scanner.ts` (line ~94)
-Severity: False negative (High): the analysis server grew to 6.7 GB on an 8 GB machine with no exclusion suggested
+Severity: Low (revised). The 6.7 GB analysis-server figure was not caused by the worktrees; see Resolution
 Rule version: n/a | Since: extension 16.x | Updated: 16.4.1
 
 ---
@@ -133,6 +133,22 @@ What *is* real: VS Code's own file watcher tracks ~7 GB of copies (Code Helper m
 3. A non-ignored `packages/foo/pubspec.yaml` (a legitimate monorepo member) → no warning, or an informational row only. Must not nag real workspaces.
 4. `computeMissingExcludes` with every current pattern present plus a `.claude/worktrees` folder on disk → reports `'**/.claude/worktrees/**'` missing. **Fails today.**
 5. `scanWorkspace` with a gitignored folder → its files are not counted toward the 50,000 cap.
+
+---
+
+## Resolution (2026-09-19)
+
+**The premise was disproved; the real side issues are fixed.**
+
+Probe on this machine (Dart SDK 3.13.3, `dart analyze`): a throwaway package with a nested package holding a deliberate type error in `claude/worktrees/w/` (control) and an identical copy in `.claude/worktrees/w/`. Only the `claude/` copy's error was reported. The analyzer skips dot-folders, as Hypothesis E read from source.
+
+What likely explains the memory instead (details and follow-up in `plans/PLAN_analysis_server_memory_diagnostics.md`):
+
+- The contacts workspace sets `dart.analyzerVmAdditionalArgs: ["--old_gen_heap_size=6144"]`, which lets the server grow to about 6 GB of heap on an 8 GB Mac.
+- saropa_lints' own scan daemon was using a further 3.1 GB for the same project.
+- Only one worktree remained under `.claude/worktrees`; the other copies are sibling folders outside the workspace.
+
+Shipped from this report: the watcher-exclude audit's conditional worktree pattern and per-pattern dismissal, and the Optimizer's dot-folder skip and cap warning. Nested-root detection shipped separately (`64806f47`), limited to non-dot folders that the analyzer really treats as context roots.
 
 ---
 

@@ -152,4 +152,4 @@ Parsers (`ps`, `vm_stat`, `sysctl` output) should be extracted as pure functions
 - Dart SDK version: 3.13.3 (Flutter 3.47.4 stable)
 - custom_lint version: n/a (extension-native)
 - Triggering project/file: `saropa_contacts` workspace, macOS 26.6.2 (Apple silicon, 8 GB RAM)
-- Related: `bugs/infra_exclusion_audits_miss_claude_worktrees_nested_package_roots.md`
+- Related: `plans/history/2026.09/2026.09.19/infra_exclusion_audits_miss_claude_worktrees_nested_package_roots.md`
