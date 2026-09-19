@@ -81,7 +81,9 @@ const CLAUDE_WORKTREE_PATTERN = '**/.claude/worktrees/**';
 const CLAUDE_WORKTREE_COVERING_KEYS: readonly string[] = [
   '**/.claude/worktrees/**',
   '**/.claude/**',
+  '**/.claude',
   '.claude/**',
+  '.claude',
   '.claude/worktrees/**',
 ];
 

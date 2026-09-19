@@ -16,7 +16,6 @@ const DEFAULT_EXCLUSION_PATTERNS: { pattern: string; reason: string }[] = [
   { pattern: '**/*.graphql.dart', reason: 'GraphQL-generated types' },
   { pattern: 'build/**', reason: 'Build output directory' },
   { pattern: '.dart_tool/**', reason: 'Dart tooling cache' },
-  { pattern: '.claude/**', reason: 'Agent tool folder (worktrees are full repo copies)' },
 ];
 
 export function computeFileCost(m: FileAnalysisMetrics): number {

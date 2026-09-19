@@ -119,17 +119,6 @@ describe('scorer', () => {
       assert.strictEqual(gDartRow?.isApplied, false);
     });
 
-    it('recommends excluding .claude worktree copies as a high-priority default', () => {
-      const files = [
-        file({ relativePath: '.claude/worktrees/a/lib/x.dart' }),
-      ];
-      const rows = buildExclusionRows(aggregateByFolder(files), files, []);
-      const row = rows.find((r) => r.pattern === '.claude/**');
-      assert.ok(row, 'expected a .claude/** row');
-      assert.strictEqual(row?.priority, 'high');
-      assert.strictEqual(row?.estimatedFilesExcluded, 1);
-    });
-
     it('never recommends excluding lib or lib/src', () => {
       const files = Array.from({ length: 10 }, (_, i) =>
         file({ relativePath: `lib/src/file${i}.dart`, lineCount: 500 }),

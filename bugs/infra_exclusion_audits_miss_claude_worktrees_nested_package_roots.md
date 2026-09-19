@@ -142,19 +142,25 @@ Scoped to the confirmed parts (A, C). Nested-package-root detection (Suggested F
 
 - Watcher Exclude Audit: recommends `**/.claude/worktrees/**` only when that folder exists on disk; a broader `.claude` entry counts as covered. Dismissal now records the dismissed patterns, so a newly added recommendation can prompt once (legacy dismissals cover the original list).
 - Analysis Optimizer: the scan skips dot-folders (matching the analyzer), so they no longer consume the file cap or produce exclusion rows, and a capped scan is reported instead of silently truncated.
-- `.gitignore` is not consulted (`findFiles` cannot); skipping dot-folders covers the reported case.
+- The Optimizer does not add a `.claude/**` default row: the scanner skips dot-folders, so it would always match zero files and recommend excluding something the analyzer already ignores.
+
+Open issue found while testing: `computeFileMetrics` uses `/\bWidget\b/`, which does not match `extends StatelessWidget`, so the widget multiplier is skipped and `scanner.test.ts` "detects widgets and async code" fails. This predates this bug (same code at `bc6cf84b`).
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `extension/src/test/systemHealth/watcherExcludeAudit.test.ts`: conditional worktree pattern, broader `.claude` coverage, legacy and per-pattern dismissal, on-disk detection.
+- `extension/src/test/analysisOptimizer/scanner.test.ts`: `isInDotFolder` cases (`.claude/worktrees`, `ios/.symlinks`, dot-file, dotted filename).
+
+Run with the vscode mock preloaded (`node -r out-test/test/vibrancy/register-vscode-mock.js`): 42 passing, 1 failing (the unrelated widget-regex case above). The mocha CLI currently crashes inside the installed `glob` (`Error: wtf?`) on both Node 22 and 25, which looks like a broken `node_modules`; `npm ci` is likely needed.
 
 ---
 
 ## Commits
 
-<!-- Add commit hashes as fixes land. -->
+- `6d97faa3`: watcher audit conditional pattern and per-pattern dismissal; Optimizer dot-folder skip and cap warning (bundled with unrelated System Health work).
+- Follow-up: drop the `.claude/**` Optimizer default, widen `.claude` coverage keys, correct changelog.
 
 ---
 
