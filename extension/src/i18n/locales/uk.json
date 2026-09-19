@@ -2838,5 +2838,28 @@
     "discovering": "Виявлення сервера та отримання проблем…",
     "noServerFound": "Не знайдено сервера Drift Advisor. Запустіть ваш додаток з запущеним сервером, потім натисніть Оновити.",
     "integrationOff": "Інтеграція Drift Advisor вимкнена. Увімкніть її в налаштуваннях (saropaLints.driftAdvisor.integration), потім натисніть Оновити."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "Оновлення",
+      "breaks": "Ламає",
+      "breaksLower": "ламає",
+      "upgradeNotRecommended": "⚠️ Оновлення не рекомендоване"
+    },
+    "notRecommended": "Оновлення не рекомендоване",
+    "skipReason": "оновлення не рекомендоване: {summary}",
+    "sdkBlock": "{pkg} {to} потребує {dep} {range}; Flutter фіксує {dep} на {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) через {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} утримується: {reason}",
+      "sdkBlocked": "{pkg} {to} заблоковано SDK: {sdk}",
+      "depCapped": "{pkg} {to} потребує {dep} {range}, але {dep} обмежено пакетом: {cappers}",
+      "depHeldBack": "{pkg} {to} потребує {dep} {range}, який утримується: {reason}",
+      "breaksOne": "{pkg} {to} зламає залежні пакети (зачеплено: {count}): {names}",
+      "breaksOther": "{pkg} {to} зламає залежні пакети (зачеплено: {count}): {names}",
+      "safe": "{pkg} {from} -> {to} виглядає безпечним",
+      "newestCompatible": "Найновіша сумісна версія: {pkg} {version}"
+    }
   }
 }

@@ -2838,5 +2838,28 @@
     "discovering": "सर्वर की खोज और समस्याओं के लेखन के लिए लेखन कर रहे हैं…",
     "noServerFound": "कोई Drift Advisor सर्वर नहीं मिला। अपने एप्लिकेशन को सर्वर के साथ शुरू करें, फिर रीफ्रेश करें।",
     "integrationOff": "Drift Advisor एक्सपोर्ट बंद है। सेटिंग्स में इसे सक्षम करें (saropaLints.driftAdvisor.integration), फिर रीफ्रेश करें।"
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "अपग्रेड",
+      "breaks": "ब्रेक करता है",
+      "breaksLower": "ब्रेक करता है",
+      "upgradeNotRecommended": "⚠️ अपग्रेड की सलाह नहीं दी जाती"
+    },
+    "notRecommended": "अपग्रेड की सलाह नहीं दी जाती",
+    "skipReason": "अपग्रेड की सलाह नहीं दी जाती: {summary}",
+    "sdkBlock": "{pkg} {to} को {dep} {range} चाहिए; Flutter ने {dep} को {pinned} पर पिन किया है",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) {chain} के माध्यम से",
+    "summary": {
+      "heldBack": "{pkg} {to} रोका गया है: {reason}",
+      "sdkBlocked": "{pkg} {to} को SDK ने ब्लॉक किया है: {sdk}",
+      "depCapped": "{pkg} {to} को {dep} {range} चाहिए, लेकिन {dep} पर {cappers} की सीमा है",
+      "depHeldBack": "{pkg} {to} को {dep} {range} चाहिए, जो रोका गया है: {reason}",
+      "breaksOne": "{pkg} {to} {count} डिपेंडेंट को तोड़ देगा: {names}",
+      "breaksOther": "{pkg} {to} {count} डिपेंडेंट्स को तोड़ देगा: {names}",
+      "safe": "{pkg} {from} -> {to} सुरक्षित लगता है",
+      "newestCompatible": "नवीनतम संगत: {pkg} {version}"
+    }
   }
 }

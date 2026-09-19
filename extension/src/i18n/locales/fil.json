@@ -2838,5 +2838,28 @@
     "discovering": "Nagtatagpo ng server at pagkuha ng mga isyu...",
     "noServerFound": "Walang inilabas na server ng Drift Advisor. Simulan ang iyong app kasama ang server na nagsisimula, pagkatapos ay i-click ang Refresh.",
     "integrationOff": "Ang integrasyon ng Drift Advisor ay naka-off. I-enable ito sa mga setting (saropaLints.driftAdvisor.integration), pagkatapos ay i-click ang Refresh."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "I-upgrade",
+      "breaks": "Masisira",
+      "breaksLower": "masisira",
+      "upgradeNotRecommended": "⚠️ Hindi inirerekomenda ang pag-upgrade"
+    },
+    "notRecommended": "Hindi inirerekomenda ang pag-upgrade",
+    "skipReason": "hindi inirerekomenda ang pag-upgrade: {summary}",
+    "sdkBlock": "Kailangan ng {pkg} {to} ang {dep} {range}; naka-pin ng Flutter ang {dep} sa {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) sa pamamagitan ng {chain}",
+    "summary": {
+      "heldBack": "Pinipigilan ang {pkg} {to}: {reason}",
+      "sdkBlocked": "Hinaharang ng SDK ang {pkg} {to}: {sdk}",
+      "depCapped": "Kailangan ng {pkg} {to} ang {dep} {range}, pero nililimitahan ng {cappers} ang {dep}",
+      "depHeldBack": "Kailangan ng {pkg} {to} ang {dep} {range}, na pinipigilan: {reason}",
+      "breaksOne": "Masisira ng {pkg} {to} ang {count} dependent: {names}",
+      "breaksOther": "Masisira ng {pkg} {to} ang {count} dependent: {names}",
+      "safe": "Mukhang ligtas ang {pkg} {from} -> {to}",
+      "newestCompatible": "Pinakabagong compatible: {pkg} {version}"
+    }
   }
 }

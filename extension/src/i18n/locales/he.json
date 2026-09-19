@@ -2838,5 +2838,28 @@
     "discovering": "גילוי שרת וקבלת בעיות...",
     "noServerFound": "לא נמצאו שרת Drift Advisor. התחילו את האפליקציה עם השרת פעיל, ואז לחצו על עדכון.",
     "integrationOff": "האינטגרציה Drift Advisor מוטה. הפעל אותה ב설比利ות (saropaLints.driftAdvisor.integration), ואז לחץ על עדכון."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "שדרוג",
+      "breaks": "שובר",
+      "breaksLower": "שובר",
+      "upgradeNotRecommended": "⚠️ לא מומלץ לשדרג"
+    },
+    "notRecommended": "לא מומלץ לשדרג",
+    "skipReason": "לא מומלץ לשדרג: {summary}",
+    "sdkBlock": "{pkg} {to} דורש {dep} {range}; Flutter מצמיד את {dep} ל-{pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) דרך {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} מוחזק לאחור: {reason}",
+      "sdkBlocked": "{pkg} {to} חסום על ידי ה-SDK: {sdk}",
+      "depCapped": "{pkg} {to} דורש {dep} {range}, אבל {dep} מוגבל על ידי {cappers}",
+      "depHeldBack": "{pkg} {to} דורש {dep} {range}, שמוחזק לאחור: {reason}",
+      "breaksOne": "{pkg} {to} ישבור תלות אחת ({count}): {names}",
+      "breaksOther": "{pkg} {to} ישבור {count} תלויות: {names}",
+      "safe": "{pkg} {from} -> {to} נראה בטוח",
+      "newestCompatible": "התואם החדש ביותר: {pkg} {version}"
+    }
   }
 }

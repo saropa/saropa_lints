@@ -2838,5 +2838,28 @@
     "discovering": "サーバーの検出と問題の取得中…",
     "noServerFound": "Drift Advisorサーバーが見つかりません。アプリを起動する際はサーバーを事前に起動し、その後リフレッシュをクリックしてください。",
     "integrationOff": "Drift Advisor インテグレーションはオフです。設定（saropaLints.driftAdvisor.integration）で有効にして、その後リフレッシュをクリックしてください。"
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "アップグレード",
+      "breaks": "破壊",
+      "breaksLower": "破壊する",
+      "upgradeNotRecommended": "⚠️ アップグレードは非推奨"
+    },
+    "notRecommended": "アップグレードは非推奨",
+    "skipReason": "アップグレードは非推奨：{summary}",
+    "sdkBlock": "{pkg} {to} は {dep} {range} を必要としますが、Flutter は {dep} を {pinned} に固定しています",
+    "breaker": "{name}（{constraint}）",
+    "breakerVia": "{name}（{constraint}）（{chain} 経由）",
+    "summary": {
+      "heldBack": "{pkg} {to} は据え置かれています：{reason}",
+      "sdkBlocked": "{pkg} {to} は SDK によってブロックされています：{sdk}",
+      "depCapped": "{pkg} {to} は {dep} {range} を必要としますが、{dep} は {cappers} によって上限が設定されています",
+      "depHeldBack": "{pkg} {to} は {dep} {range} を必要としますが、これは据え置かれています：{reason}",
+      "breaksOne": "{pkg} {to} は {count} 件の依存元を壊します：{names}",
+      "breaksOther": "{pkg} {to} は {count} 件の依存元を壊します：{names}",
+      "safe": "{pkg} {from} -> {to} は安全と思われます",
+      "newestCompatible": "互換性のある最新版：{pkg} {version}"
+    }
   }
 }

@@ -2838,5 +2838,28 @@
     "discovering": "Đang phát hiện máy chủ và lấy lỗi...",
     "noServerFound": "Không tìm thấy máy chủ Drift Advisor. Hãy bắt đầu ứng dụng của bạn với máy chủ đang chạy, sau đó nhấn Làm mới.",
     "integrationOff": "Tích hợp Drift Advisor đã bị tắt. Bật nó trong cài đặt (saropaLints.driftAdvisor.integration), sau đó nhấn Làm mới."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "Nâng cấp",
+      "breaks": "Làm hỏng",
+      "breaksLower": "làm hỏng",
+      "upgradeNotRecommended": "⚠️ Không nên nâng cấp"
+    },
+    "notRecommended": "Không nên nâng cấp",
+    "skipReason": "không nên nâng cấp: {summary}",
+    "sdkBlock": "{pkg} {to} cần {dep} {range}; Flutter ghim {dep} ở {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) qua {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} đang bị giữ lại: {reason}",
+      "sdkBlocked": "{pkg} {to} bị SDK chặn: {sdk}",
+      "depCapped": "{pkg} {to} cần {dep} {range}, nhưng {dep} bị giới hạn bởi {cappers}",
+      "depHeldBack": "{pkg} {to} cần {dep} {range}, phiên bản này đang bị giữ lại: {reason}",
+      "breaksOne": "{pkg} {to} sẽ làm hỏng {count} gói phụ thuộc: {names}",
+      "breaksOther": "{pkg} {to} sẽ làm hỏng {count} gói phụ thuộc: {names}",
+      "safe": "{pkg} {from} -> {to} có vẻ an toàn",
+      "newestCompatible": "Phiên bản tương thích mới nhất: {pkg} {version}"
+    }
   }
 }

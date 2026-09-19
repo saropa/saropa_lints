@@ -2838,5 +2838,28 @@
     "discovering": "سروسر کی تلاش اور مسائل کی حاصل کرنا...",
     "noServerFound": "Drift Advisor سرور نہیں ملا۔ اپنی ایپ کو سرور کے ساتھ شروع کریں، پھر رفریش کریں۔",
     "integrationOff": "Drift Advisor انتیگریشن آف ہے۔ اسے سیٹنگس (saropaLints.driftAdvisor.integration) میں ایکسٹیبل کریں، پھر ریفرش کلک کریں۔"
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "اپ گریڈ",
+      "breaks": "توڑتا ہے",
+      "breaksLower": "توڑتا ہے",
+      "upgradeNotRecommended": "⚠️ اپ گریڈ تجویز نہیں کیا جاتا"
+    },
+    "notRecommended": "اپ گریڈ تجویز نہیں کیا جاتا",
+    "skipReason": "اپ گریڈ تجویز نہیں کیا جاتا: {summary}",
+    "sdkBlock": "{pkg} {to} کو {dep} {range} درکار ہے؛ جبکہ Flutter نے {dep} کو {pinned} پر پن کر رکھا ہے",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) بذریعہ {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} روکا گیا ہے: {reason}",
+      "sdkBlocked": "{pkg} {to} کو SDK نے بلاک کیا ہے: {sdk}",
+      "depCapped": "{pkg} {to} کو {dep} {range} درکار ہے، لیکن {dep} پر {cappers} کی حد لگی ہے",
+      "depHeldBack": "{pkg} {to} کو {dep} {range} درکار ہے، جو روکا گیا ہے: {reason}",
+      "breaksOne": "{pkg} {to} {count} منحصر پیکج کو توڑ دے گا: {names}",
+      "breaksOther": "{pkg} {to} {count} منحصر پیکجز کو توڑ دے گا: {names}",
+      "safe": "{pkg} {from} -> {to} محفوظ لگتا ہے",
+      "newestCompatible": "تازہ ترین مطابقت پذیر: {pkg} {version}"
+    }
   }
 }

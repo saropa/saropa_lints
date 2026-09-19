@@ -2838,5 +2838,28 @@
     "discovering": "সার্ভার খুঁজছে এবং সমস্যা তুলে আসছে...",
     "noServerFound": "কোন Drift Advisor সার্ভার পাওয়া যায়নি। সার্ভার চালু রেখে আপনার অ্যাপ শুরু করুন, তারপর রিফ্রেশ ক্লিক করুন।",
     "integrationOff": "Drift Advisor ইন্টিগ্রেশন অফ অবস্থায়। সেটিংস (saropaLints.driftAdvisor.integration) এ এনেবল করুন, তারপর রিফ্রেশ ক্লিক করুন।"
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "আপগ্রেড",
+      "breaks": "ভেঙে দেয়",
+      "breaksLower": "ভেঙে দেয়",
+      "upgradeNotRecommended": "⚠️ আপগ্রেড করার পরামর্শ দেওয়া হয় না"
+    },
+    "notRecommended": "আপগ্রেড করার পরামর্শ দেওয়া হয় না",
+    "skipReason": "আপগ্রেড করার পরামর্শ নেই: {summary}",
+    "sdkBlock": "{pkg} {to}-এর জন্য {dep} {range} দরকার; কিন্তু Flutter {dep}-কে {pinned}-এ পিন করে রেখেছে",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) {chain} এর মাধ্যমে",
+    "summary": {
+      "heldBack": "{pkg} {to} আটকে রাখা হয়েছে: {reason}",
+      "sdkBlocked": "{pkg} {to} SDK দ্বারা বাধাগ্রস্ত: {sdk}",
+      "depCapped": "{pkg} {to}-এর জন্য {dep} {range} দরকার, কিন্তু {dep} {cappers} দ্বারা সীমিত",
+      "depHeldBack": "{pkg} {to}-এর জন্য {dep} {range} দরকার, যা আটকে রাখা হয়েছে: {reason}",
+      "breaksOne": "{pkg} {to} {count}টি নির্ভরশীল প্যাকেজ ভেঙে দেবে: {names}",
+      "breaksOther": "{pkg} {to} {count}টি নির্ভরশীল প্যাকেজ ভেঙে দেবে: {names}",
+      "safe": "{pkg} {from} -> {to} নিরাপদ মনে হচ্ছে",
+      "newestCompatible": "সর্বশেষ সামঞ্জস্যপূর্ণ সংস্করণ: {pkg} {version}"
+    }
   }
 }

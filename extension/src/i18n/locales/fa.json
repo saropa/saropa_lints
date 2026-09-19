@@ -2838,5 +2838,28 @@
     "discovering": "دریافت سرور و گرفتن مشکلات...",
     "noServerFound": "هیچ سرور Drift Advisor یافت نشد. برنامه خود را با اجرای سرور شروع کنید، سپس روی به‌روزرسانی کلیک کنید.",
     "integrationOff": "نتیجه ی انتگراسيون Drift Advisor غیر فعال است. آن را در تنظیمات (saropaLints.driftAdvisor.integration) فعال کنید، سپس روی به‌روزرسانی کلیک کنید."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "ارتقا",
+      "breaks": "می‌شکند",
+      "breaksLower": "می‌شکند",
+      "upgradeNotRecommended": "⚠️ ارتقا توصیه نمی‌شود"
+    },
+    "notRecommended": "ارتقا توصیه نمی‌شود",
+    "skipReason": "ارتقا توصیه نمی‌شود: {summary}",
+    "sdkBlock": "{pkg} {to} به {dep} {range} نیاز دارد؛ Flutter نسخهٔ {dep} را روی {pinned} ثابت کرده است",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) از طریق {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} نگه داشته شده است: {reason}",
+      "sdkBlocked": "{pkg} {to} توسط SDK مسدود شده است: {sdk}",
+      "depCapped": "{pkg} {to} به {dep} {range} نیاز دارد، اما {dep} توسط {cappers} محدود شده است",
+      "depHeldBack": "{pkg} {to} به {dep} {range} نیاز دارد که نگه داشته شده است: {reason}",
+      "breaksOne": "{pkg} {to} باعث شکستن {count} وابسته می‌شود: {names}",
+      "breaksOther": "{pkg} {to} باعث شکستن {count} وابسته می‌شود: {names}",
+      "safe": "{pkg} {from} -> {to} ایمن به نظر می‌رسد",
+      "newestCompatible": "جدیدترین نسخهٔ سازگار: {pkg} {version}"
+    }
   }
 }

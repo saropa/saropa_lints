@@ -2838,5 +2838,28 @@
     "discovering": "Server finden und Fehler abrufen…",
     "noServerFound": "Kein Drift Advisor Server gefunden. Starten Sie Ihre App mit dem laufenden Server, dann klicken Sie auf Auffrischen.",
     "integrationOff": "Drift Advisor Integration ist deaktiviert. Aktivieren Sie sie in den Einstellungen (saropaLints.driftAdvisor.integration), dann klicken Sie auf Auffrischen."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "Upgrade",
+      "breaks": "Bricht",
+      "breaksLower": "bricht",
+      "upgradeNotRecommended": "⚠️ Upgrade nicht empfohlen"
+    },
+    "notRecommended": "Upgrade nicht empfohlen",
+    "skipReason": "Upgrade nicht empfohlen: {summary}",
+    "sdkBlock": "{pkg} {to} benötigt {dep} {range}; Flutter fixiert {dep} auf {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) über {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} wird zurückgehalten: {reason}",
+      "sdkBlocked": "{pkg} {to} wird vom SDK blockiert: {sdk}",
+      "depCapped": "{pkg} {to} benötigt {dep} {range}, aber {dep} wird durch {cappers} begrenzt",
+      "depHeldBack": "{pkg} {to} benötigt {dep} {range}, das zurückgehalten wird: {reason}",
+      "breaksOne": "{pkg} {to} würde {count} abhängiges Paket beschädigen: {names}",
+      "breaksOther": "{pkg} {to} würde {count} abhängige Pakete beschädigen: {names}",
+      "safe": "{pkg} {from} -> {to} sieht sicher aus",
+      "newestCompatible": "Neueste kompatible Version: {pkg} {version}"
+    }
   }
 }

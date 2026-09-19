@@ -2838,5 +2838,28 @@
     "discovering": "اكتشاف الخادم وتنزيل المشكلات...",
     "noServerFound": "لم يتم العثور على خادم Drift Advisor. ابدأ تطبيقك مع تشغيل الخادم، ثم اضغط على تحديث.",
     "integrationOff": "التكامل Drift Advisor غير مفعل. قم بتفعيله في الإعدادات (saropaLints.driftAdvisor.integration)، ثم اضغط تحديث."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "ترقية",
+      "breaks": "يعطّل",
+      "breaksLower": "يعطّل",
+      "upgradeNotRecommended": "⚠️ الترقية غير موصى بها"
+    },
+    "notRecommended": "الترقية غير موصى بها",
+    "skipReason": "الترقية غير موصى بها: {summary}",
+    "sdkBlock": "يحتاج {pkg} {to} إلى {dep} {range}؛ بينما يثبّت Flutter الحزمة {dep} عند {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) عبر {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} مؤجَّل: {reason}",
+      "sdkBlocked": "{pkg} {to} محظور بسبب SDK: {sdk}",
+      "depCapped": "يحتاج {pkg} {to} إلى {dep} {range}، لكن {dep} مقيَّد بواسطة {cappers}",
+      "depHeldBack": "يحتاج {pkg} {to} إلى {dep} {range}، وهو مؤجَّل: {reason}",
+      "breaksOne": "سيؤدي {pkg} {to} إلى تعطيل {count} حزمة تابعة: {names}",
+      "breaksOther": "سيؤدي {pkg} {to} إلى تعطيل {count} حزم تابعة: {names}",
+      "safe": "{pkg} {from} -> {to} يبدو آمنًا",
+      "newestCompatible": "أحدث إصدار متوافق: {pkg} {version}"
+    }
   }
 }

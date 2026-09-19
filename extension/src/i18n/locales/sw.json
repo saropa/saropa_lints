@@ -2838,5 +2838,28 @@
     "discovering": "Kuzingia server na kifungua kifungua...",
     "noServerFound": "Hakuna server Drift Advisor. Hatua aplikasi wako na server inayotumika, kisha chagua Refresh.",
     "integrationOff": "Unganisha Drift Advisor ni of. Ondoa kwenye mipango (saropaLints.driftAdvisor.integration), sasa bonye na Refresh."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "Sasisha",
+      "breaks": "Huvunja",
+      "breaksLower": "huvunja",
+      "upgradeNotRecommended": "⚠️ Kusasisha hakupendekezwi"
+    },
+    "notRecommended": "Kusasisha hakupendekezwi",
+    "skipReason": "kusasisha hakupendekezwi: {summary}",
+    "sdkBlock": "{pkg} {to} inahitaji {dep} {range}; Flutter inabana {dep} kwenye {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) kupitia {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} imezuiwa: {reason}",
+      "sdkBlocked": "{pkg} {to} imezuiwa na SDK: {sdk}",
+      "depCapped": "{pkg} {to} inahitaji {dep} {range}, lakini {dep} imewekewa kikomo na {cappers}",
+      "depHeldBack": "{pkg} {to} inahitaji {dep} {range}, ambayo imezuiwa: {reason}",
+      "breaksOne": "{pkg} {to} ingevunja kifurushi {count} tegemezi: {names}",
+      "breaksOther": "{pkg} {to} ingevunja vifurushi {count} tegemezi: {names}",
+      "safe": "{pkg} {from} -> {to} inaonekana salama",
+      "newestCompatible": "Toleo jipya zaidi linalooana: {pkg} {version}"
+    }
   }
 }

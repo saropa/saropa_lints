@@ -2838,5 +2838,28 @@
     "discovering": "Mencari server dan mengambil masalah…",
     "noServerFound": "Tidak ditemukan server Drift Advisor. Mulai aplikasi Anda dengan server yang berjalan, lalu klik Refresh.",
     "integrationOff": "Drift Advisor integrasi dimatikan. Aktifkan di pengaturan (saropaLints.driftAdvisor.integration), lalu klik Segarkan."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "Upgrade",
+      "breaks": "Merusak",
+      "breaksLower": "merusak",
+      "upgradeNotRecommended": "⚠️ Upgrade tidak disarankan"
+    },
+    "notRecommended": "Upgrade tidak disarankan",
+    "skipReason": "upgrade tidak disarankan: {summary}",
+    "sdkBlock": "{pkg} {to} membutuhkan {dep} {range}; Flutter mengunci {dep} di {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) melalui {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} ditahan: {reason}",
+      "sdkBlocked": "{pkg} {to} diblokir oleh SDK: {sdk}",
+      "depCapped": "{pkg} {to} membutuhkan {dep} {range}, tetapi {dep} dibatasi oleh {cappers}",
+      "depHeldBack": "{pkg} {to} membutuhkan {dep} {range}, yang ditahan: {reason}",
+      "breaksOne": "{pkg} {to} akan merusak {count} dependen: {names}",
+      "breaksOther": "{pkg} {to} akan merusak {count} dependen: {names}",
+      "safe": "{pkg} {from} -> {to} tampak aman",
+      "newestCompatible": "Kompatibel terbaru: {pkg} {version}"
+    }
   }
 }

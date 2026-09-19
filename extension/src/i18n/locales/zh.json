@@ -2838,5 +2838,28 @@
     "discovering": "发现服务器并获取问题…",
     "noServerFound": "未找到 Drift Advisor 服务器。请先启动应用并运行服务器，然后点击刷新。",
     "integrationOff": "Drift Advisor 集成已关闭。在设置中启用它（saropaLints.driftAdvisor.integration），然后点击刷新。"
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "升级",
+      "breaks": "破坏",
+      "breaksLower": "破坏",
+      "upgradeNotRecommended": "⚠️ 不建议升级"
+    },
+    "notRecommended": "不建议升级",
+    "skipReason": "不建议升级：{summary}",
+    "sdkBlock": "{pkg} {to} 需要 {dep} {range}；Flutter 将 {dep} 固定为 {pinned}",
+    "breaker": "{name}（{constraint}）",
+    "breakerVia": "{name}（{constraint}），经由 {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} 被暂缓：{reason}",
+      "sdkBlocked": "{pkg} {to} 被 SDK 阻止：{sdk}",
+      "depCapped": "{pkg} {to} 需要 {dep} {range}，但 {dep} 被 {cappers} 限制了上限",
+      "depHeldBack": "{pkg} {to} 需要 {dep} {range}，而该版本被暂缓：{reason}",
+      "breaksOne": "{pkg} {to} 会破坏 {count} 个依赖项：{names}",
+      "breaksOther": "{pkg} {to} 会破坏 {count} 个依赖项：{names}",
+      "safe": "{pkg} {from} -> {to} 看起来是安全的",
+      "newestCompatible": "最新兼容版本：{pkg} {version}"
+    }
   }
 }

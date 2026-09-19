@@ -2838,5 +2838,28 @@
     "discovering": "กำลังค้นหาเซิร์ฟเวอร์และดึงข้อมูลปัญหา...",
     "noServerFound": "ไม่พบเซิร์ฟเวอร์ Drift Advisor ใดๆ อยู่ กรุณาเริ่มแอปของคุณพร้อมที่เซิร์ฟเวอร์กำลังทำงาน แล้วคลิก Refresh",
     "integrationOff": "การผสาน Drift Advisor ถูกปิด ให้เปิดใช้งานในตั้งค่า (saropaLints.driftAdvisor.integration) จากนั้นคลิก Refresh"
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "อัปเกรด",
+      "breaks": "ทำให้พัง",
+      "breaksLower": "ทำให้พัง",
+      "upgradeNotRecommended": "⚠️ ไม่แนะนำให้อัปเกรด"
+    },
+    "notRecommended": "ไม่แนะนำให้อัปเกรด",
+    "skipReason": "ไม่แนะนำให้อัปเกรด: {summary}",
+    "sdkBlock": "{pkg} {to} ต้องการ {dep} {range}; Flutter ตรึง {dep} ไว้ที่ {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) ผ่าน {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} ถูกชะลอไว้: {reason}",
+      "sdkBlocked": "{pkg} {to} ถูก SDK บล็อก: {sdk}",
+      "depCapped": "{pkg} {to} ต้องการ {dep} {range} แต่ {dep} ถูกจำกัดเวอร์ชันโดย {cappers}",
+      "depHeldBack": "{pkg} {to} ต้องการ {dep} {range} ซึ่งถูกชะลอไว้: {reason}",
+      "breaksOne": "{pkg} {to} จะทำให้แพ็กเกจที่พึ่งพา {count} รายการพัง: {names}",
+      "breaksOther": "{pkg} {to} จะทำให้แพ็กเกจที่พึ่งพา {count} รายการพัง: {names}",
+      "safe": "{pkg} {from} -> {to} ดูปลอดภัย",
+      "newestCompatible": "เวอร์ชันล่าสุดที่เข้ากันได้: {pkg} {version}"
+    }
   }
 }

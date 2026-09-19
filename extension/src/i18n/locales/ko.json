@@ -2838,5 +2838,28 @@
     "discovering": "서버 발견 및 문제 가져오기 중…",
     "noServerFound": "Drift Advisor 서버를 찾을 수 없습니다. 앱을 실행할 때 서버를 먼저 실행한 후 새로고침을 클릭하세요.",
     "integrationOff": "Drift Advisor 통합은 꺼져 있습니다. 설정에서 활성화하세요 (saropaLints.driftAdvisor.integration), 그런 다음 새로고침을 클릭하세요."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "업그레이드",
+      "breaks": "깨짐",
+      "breaksLower": "깨짐",
+      "upgradeNotRecommended": "⚠️ 업그레이드 권장하지 않음"
+    },
+    "notRecommended": "업그레이드 권장하지 않음",
+    "skipReason": "업그레이드 권장하지 않음: {summary}",
+    "sdkBlock": "{pkg} {to}에는 {dep} {range}이(가) 필요하지만 Flutter는 {dep} {pinned}에 고정되어 있습니다",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) 경유: {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to}은(는) 보류 중입니다: {reason}",
+      "sdkBlocked": "{pkg} {to}은(는) SDK 때문에 차단됩니다: {sdk}",
+      "depCapped": "{pkg} {to}에는 {dep} {range}이(가) 필요하지만 {dep}은(는) {cappers}에 의해 상한이 제한됩니다",
+      "depHeldBack": "{pkg} {to}에는 {dep} {range}이(가) 필요하지만 해당 버전은 보류 중입니다: {reason}",
+      "breaksOne": "{pkg} {to}은(는) 의존 패키지 {count}개를 깨뜨립니다: {names}",
+      "breaksOther": "{pkg} {to}은(는) 의존 패키지 {count}개를 깨뜨립니다: {names}",
+      "safe": "{pkg} {from} -> {to}은(는) 안전해 보입니다",
+      "newestCompatible": "호환되는 최신 버전: {pkg} {version}"
+    }
   }
 }

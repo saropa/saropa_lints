@@ -2838,5 +2838,28 @@
     "discovering": "Sunucuyu keşfediliyor ve sorunlar alınıyor…",
     "noServerFound": "Drift Advisor sunucusu bulunamadı. Uygulamanızı sunucunun çalıştığı sürece başlatın ve sonra Yenile'ye tıklayın.",
     "integrationOff": "Drift Advisor entegrasyonu devre dışı. Ayarlar (saropaLints.driftAdvisor.integration) içinde etkinleştirin, ardından Yenile'ye tıklayın."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "Yükseltme",
+      "breaks": "Bozar",
+      "breaksLower": "bozar",
+      "upgradeNotRecommended": "⚠️ Yükseltme önerilmez"
+    },
+    "notRecommended": "Yükseltme önerilmez",
+    "skipReason": "yükseltme önerilmez: {summary}",
+    "sdkBlock": "{pkg} {to}, {dep} {range} gerektiriyor; Flutter {dep} sürümünü {pinned} olarak sabitliyor",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) üzerinden {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} geri tutuluyor: {reason}",
+      "sdkBlocked": "{pkg} {to}, SDK tarafından engelleniyor: {sdk}",
+      "depCapped": "{pkg} {to}, {dep} {range} gerektiriyor ancak {dep} şu paket(ler) tarafından sınırlandırılıyor: {cappers}",
+      "depHeldBack": "{pkg} {to}, {dep} {range} gerektiriyor ancak bu sürüm geri tutuluyor: {reason}",
+      "breaksOne": "{pkg} {to}, {count} bağımlı paketi bozar: {names}",
+      "breaksOther": "{pkg} {to}, {count} bağımlı paketi bozar: {names}",
+      "safe": "{pkg} {from} -> {to} güvenli görünüyor",
+      "newestCompatible": "En yeni uyumlu sürüm: {pkg} {version}"
+    }
   }
 }
