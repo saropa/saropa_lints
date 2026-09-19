@@ -1183,6 +1183,7 @@
       "findingsDash.toolbar.impactLabel",
       "findingsDash.topRules.owaspMobileLabel",
       "findingsDash.topRules.owaspWebLabel",
+      "notify.misc.actionLater",
       "packageDashboard.columns.deps.label",
       "packageDashboard.columns.downloads.label",
       "packageDashboard.columns.issues.label",

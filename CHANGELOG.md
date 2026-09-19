@@ -100,11 +100,14 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Added (Extension)
 
+- The extension now checks the Dart analysis server's memory cap against this machine's RAM at startup and, when there is no cap or it leaves less than half the RAM for everything else, explains the trade-off and offers a recommended value in one click. Click Apply, or choose Don't ask again to keep your setting.
 - Package Vibrancy now shows a separate "Upgrade Required" status for packages that are alive but where your installed old major version is known to be broken, instead of labelling them "End of Life"; "End of Life" now means only that the package itself is dead. No action required.
 - Package Vibrancy now checks what an upgrade would break before recommending it, and replaces the upgrade nudge with the reason when dependents cap the package below the new version or the new version needs a newer dependency than your Flutter SDK pins (for example `analyzer` 13, which needs a newer `meta` than Flutter stable ships) or needs a dependency that another package in your project caps (for example a `drift_dev` release that requires `analyzer` 13 while a dependency caps it below 13), naming the package responsible. Blocked packages are also skipped by "upgrade all", and the newest version you can still take is suggested. No action required.
 
 ### Fixed (Extension)
 
+- The saropa_lints update prompt now appears at every startup while your project is behind, instead of only once per release even when the notification was missed. Choose Don't ask for this version to silence a release.
+- Setting the analysis server heap cap from System Health now changes the settings file that actually controls it, instead of reporting success while a workspace setting kept the old value. No action required.
 - Package Vibrancy no longer marks healthy packages such as `flutter_map`, `camera` and `location` as end of life when checking for new adoption or offering quick fixes, because a problem recorded for an old version was being applied to every version. No action required.
 - Package Vibrancy now notes when a package is unlisted, in maintenance mode or under a caution, warns when an end-of-life record may be out of date, and never offers a retracted release as the latest version. No action required.
 - The known-issues data was cleaned up: about a dozen dead entries removed, wrong version limits on `hive`, `flutter_hooks`, `camera` and `responsive_builder` corrected, and long-quiet packages such as `beamer` and `camerawesome` moved to maintenance mode. No action required.

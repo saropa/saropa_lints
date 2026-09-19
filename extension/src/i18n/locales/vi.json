@@ -739,7 +739,7 @@
       "locationWorkspace": "cài đặt của không gian làm việc này",
       "locationWorkspaceFolder": "cài đặt của thư mục không gian làm việc này",
       "apply": "Áp dụng {gb}",
-      "notNow": "Không phải bây giờ",
+      "notNow": "Để sau",
       "dontAskAgain": "Không hỏi lại"
     },
     "statusBar": {
