@@ -117,7 +117,9 @@ describe('countSuggestionItems with temp workspace', () => {
       },
     };
     const n = countSuggestionItems(data, dir, 'essential');
-    // baseline + related + pack + run + open
-    assert.strictEqual(n, 5);
+    // baseline + related + 2 packs + run + open. Both candidates belong to
+    // two disabled packs (the bloc pack and the stylistic naming pack), and
+    // each pack with >= 2 matching candidates yields its own suggestion.
+    assert.strictEqual(n, 6);
   });
 });

@@ -11,7 +11,7 @@ import {
     findOverrideRange,
 } from '../../../vibrancy/services/override-parser';
 
-const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
+const fixturesDir = path.join(__dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures');
 
 /** dependency_overrides section parsing and range finding in pubspec YAML. */
 

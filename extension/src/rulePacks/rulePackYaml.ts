@@ -13,7 +13,7 @@ import * as path from 'node:path';
  * eat into the next section's unindented comments or headers.
  */
 const TOP_LEVEL_RULE_PACK_BLOCK =
-  /^rule_packs:\s*\n(?:\s+\S[^\n]*\n)*/m;
+  /^rule_packs:[ \t]*\n(?:[ \t]+\S[^\n]*\n)*/m;
 
 /** Pattern matching an indented `rule_packs:` block inside the plugin block. */
 const PLUGIN_RULE_PACK_BLOCK =

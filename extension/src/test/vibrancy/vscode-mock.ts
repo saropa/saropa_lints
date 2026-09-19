@@ -265,7 +265,8 @@ export const Uri = {
     parse: (v: string) => ({ toString: () => v, scheme: 'http', path: v, fsPath: v }),
     file: (p: string) => ({ toString: () => p, scheme: 'file', path: p, fsPath: p }),
     joinPath: (base: any, ...segments: string[]) => {
-        const joined = [base.fsPath ?? base.path, ...segments].join('/');
+        // Normalise like the real vscode.Uri.joinPath so '..' segments resolve.
+        const joined = require('node:path').posix.join(base.fsPath ?? base.path, ...segments);
         return { toString: () => joined, scheme: 'file', path: joined, fsPath: joined };
     },
 };

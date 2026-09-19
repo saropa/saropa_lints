@@ -9,6 +9,14 @@ describe('ContextState', () => {
     const testKey = 'test.contextState';
     let executedCommands: { id: string; args: any[] }[] = [];
 
+    // Saved so the override below can be undone: leaking it breaks every later
+    // suite that dispatches through vscode.commands.executeCommand.
+    const originalExecuteCommand = vscode.commands.executeCommand;
+
+    afterEach(() => {
+        (vscode.commands as any).executeCommand = originalExecuteCommand;
+    });
+
     beforeEach(() => {
         executedCommands = [];
         (vscode.commands as any).executeCommand = async (id: string, ...args: any[]) => {

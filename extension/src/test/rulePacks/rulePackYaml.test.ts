@@ -88,12 +88,21 @@ plugins:
     assert.deepStrictEqual(parseRulePacksEnabled(yaml), ['riverpod', 'drift']);
   });
 
-  it('writeRulePacksEnabled normalizes legacy migration_packs to rule_packs', () => {
+  // rule_packs now lives in analysis_options_custom.yaml (canonical); the
+  // writer also strips any legacy block from analysis_options.yaml.
+  function withRoot(fn: (root: string, mainPath: string, customPath: string) => void): void {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
     try {
-      const analysisPath = path.join(root, 'analysis_options.yaml');
+      fn(root, path.join(root, 'analysis_options.yaml'), path.join(root, 'analysis_options_custom.yaml'));
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  }
+
+  it('writeRulePacksEnabled writes rule_packs to the custom file and removes legacy migration_packs from the main file', () => {
+    withRoot((root, mainPath, customPath) => {
       fs.writeFileSync(
-        analysisPath,
+        mainPath,
         `
 plugins:
   saropa_lints:
@@ -108,97 +117,67 @@ plugins:
       );
 
       assert.strictEqual(writeRulePacksEnabled(root, ['riverpod']), true);
-      const content = fs.readFileSync(analysisPath, 'utf-8');
-      assert.strictEqual(content.includes('migration_packs:'), false);
-      assert.strictEqual(content.includes('rule_packs:'), true);
-      assert.deepStrictEqual(parseRulePacksEnabled(content), ['riverpod']);
-    } finally {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
+      const custom = fs.readFileSync(customPath, 'utf-8');
+      assert.strictEqual(custom.includes('rule_packs:'), true);
+      assert.deepStrictEqual(parseRulePacksEnabled(custom), ['riverpod']);
+      const main = fs.readFileSync(mainPath, 'utf-8');
+      assert.strictEqual(main.includes('migration_packs:'), false);
+      assert.strictEqual(main.includes('diagnostics:'), true, 'other content preserved');
+    });
   });
 
-  it('writeRulePacksEnabled creates plugins block when no saropa_lints key exists', () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
-    try {
-      const analysisPath = path.join(root, 'analysis_options.yaml');
-      fs.writeFileSync(
-        analysisPath,
-        `analyzer:\n  errors:\n    todo: ignore\nlinter:\n  rules:\n    - curly_braces_in_flow_control_structures\n`,
-        'utf-8',
-      );
+  it('writeRulePacksEnabled creates the custom file and leaves an unrelated main file untouched', () => {
+    withRoot((root, mainPath, customPath) => {
+      const original = `analyzer:\n  errors:\n    todo: ignore\nlinter:\n  rules:\n    - curly_braces_in_flow_control_structures\n`;
+      fs.writeFileSync(mainPath, original, 'utf-8');
 
       assert.strictEqual(writeRulePacksEnabled(root, ['riverpod']), true);
-      const content = fs.readFileSync(analysisPath, 'utf-8');
-      assert.strictEqual(content.includes('plugins:'), true);
-      assert.strictEqual(content.includes('saropa_lints:'), true);
-      assert.strictEqual(content.includes('rule_packs:'), true);
-      assert.deepStrictEqual(parseRulePacksEnabled(content), ['riverpod']);
-      assert.strictEqual(content.includes('analyzer:'), true, 'original content preserved');
-    } finally {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
+      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(customPath, 'utf-8')), ['riverpod']);
+      assert.strictEqual(fs.readFileSync(mainPath, 'utf-8'), original);
+    });
   });
 
-  it('writeRulePacksEnabled inserts under existing plugins key without saropa_lints', () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
-    try {
-      const analysisPath = path.join(root, 'analysis_options.yaml');
-      fs.writeFileSync(
-        analysisPath,
-        `plugins:\n  other_plugin:\n    enabled: true\n`,
-        'utf-8',
-      );
+  it('writeRulePacksEnabled does not touch an existing plugins block without saropa_lints', () => {
+    withRoot((root, mainPath, customPath) => {
+      const original = `plugins:\n  other_plugin:\n    enabled: true\n`;
+      fs.writeFileSync(mainPath, original, 'utf-8');
 
       assert.strictEqual(writeRulePacksEnabled(root, ['drift']), true);
-      const content = fs.readFileSync(analysisPath, 'utf-8');
-      assert.strictEqual(content.includes('saropa_lints:'), true);
-      assert.strictEqual(content.includes('other_plugin:'), true, 'other plugin preserved');
-      assert.deepStrictEqual(parseRulePacksEnabled(content), ['drift']);
-    } finally {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
+      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(customPath, 'utf-8')), ['drift']);
+      assert.strictEqual(fs.readFileSync(mainPath, 'utf-8'), original, 'other plugin preserved');
+    });
   });
 
-  it('round-trip: fallback create → toggle OFF → toggle ON', () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
-    try {
-      const analysisPath = path.join(root, 'analysis_options.yaml');
-      fs.writeFileSync(analysisPath, 'analyzer:\n  errors:\n    todo: ignore\n', 'utf-8');
+  it('round-trip: create -> toggle OFF -> toggle ON via the custom file', () => {
+    withRoot((root, mainPath, customPath) => {
+      fs.writeFileSync(mainPath, 'analyzer:\n  errors:\n    todo: ignore\n', 'utf-8');
+      fs.writeFileSync(customPath, '# custom overrides\nplatforms:\n  ios: true\n', 'utf-8');
+      const read = (): string => fs.readFileSync(customPath, 'utf-8');
 
-      // ON: creates plugins block via final fallback.
       assert.strictEqual(writeRulePacksEnabled(root, ['riverpod']), true);
-      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(analysisPath, 'utf-8')), ['riverpod']);
+      assert.deepStrictEqual(parseRulePacksEnabled(read()), ['riverpod']);
 
-      // OFF: RULE_PACK_BLOCK regex must match the fallback-created block.
       assert.strictEqual(writeRulePacksEnabled(root, []), true);
-      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(analysisPath, 'utf-8')), []);
+      assert.deepStrictEqual(parseRulePacksEnabled(read()), []);
+      assert.strictEqual(read().includes('rule_packs:'), false);
 
-      // ON again: bare saropa_lints: key remains; pluginKey regex re-anchors.
       assert.strictEqual(writeRulePacksEnabled(root, ['drift']), true);
-      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(analysisPath, 'utf-8')), ['drift']);
-
-      const final = fs.readFileSync(analysisPath, 'utf-8');
-      assert.strictEqual(final.includes('analyzer:'), true, 'original content preserved');
-    } finally {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
+      assert.deepStrictEqual(parseRulePacksEnabled(read()), ['drift']);
+      assert.strictEqual(read().includes('platforms:'), true, 'other custom content preserved');
+      assert.strictEqual(fs.readFileSync(mainPath, 'utf-8').includes('analyzer:'), true);
+    });
   });
 
   // Regression: the saropa_lints package's own dev config omits the version
-  // pin (plugin loads from workspace source). The writer must still find an
-  // anchor; previously it returned false and surfaced "could not write
-  // analysis_options.yaml (rule_packs)" on the upgrade nudge.
-  it('writeRulePacksEnabled inserts block when version pin is absent', () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
-    try {
-      const analysisPath = path.join(root, 'analysis_options.yaml');
+  // pin. Writing must succeed without needing any anchor in the main file.
+  it('writeRulePacksEnabled succeeds when the main file has no version pin', () => {
+    withRoot((root, mainPath, customPath) => {
       fs.writeFileSync(
-        analysisPath,
+        mainPath,
         `
 plugins:
   saropa_lints:
     # No version: pin — plugin loads from workspace source.
-    # Regenerate with: dart run saropa_lints:init --tier recommended
     diagnostics:
       foo: true
 `,
@@ -206,12 +185,8 @@ plugins:
       );
 
       assert.strictEqual(writeRulePacksEnabled(root, ['riverpod', 'drift']), true);
-      const content = fs.readFileSync(analysisPath, 'utf-8');
-      assert.strictEqual(content.includes('rule_packs:'), true);
-      assert.strictEqual(content.includes('diagnostics:'), true);
-      assert.deepStrictEqual(parseRulePacksEnabled(content), ['riverpod', 'drift']);
-    } finally {
-      fs.rmSync(root, { recursive: true, force: true });
-    }
+      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(customPath, 'utf-8')), ['riverpod', 'drift']);
+      assert.strictEqual(fs.readFileSync(mainPath, 'utf-8').includes('diagnostics:'), true);
+    });
   });
 });

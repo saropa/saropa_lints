@@ -26,7 +26,7 @@ import * as path from 'path';
 import { parseDepGraphJson, buildReverseDeps, DepGraphPackage } from '../../../vibrancy/services/dep-graph';
 
 const fixturesDir = path.join(
-    __dirname, '..', '..', '..', 'src', 'test', 'fixtures',
+    __dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures',
 );
 const FIXTURE_PATH = path.join(fixturesDir, 'pub-deps.json');
 

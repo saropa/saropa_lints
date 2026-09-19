@@ -106,6 +106,8 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Fixed (Extension)
 
+- Turning a rule pack off in `analysis_options_custom.yaml` no longer deletes the blank line and the next top-level section (such as `platforms:`) after it. No action required.
+- Machine Health, Workspace Readiness, Set Analysis Server Heap Cap and Unload Ollama Model now appear in the command catalog. No action required.
 - The saropa_lints update prompt now appears at every startup while your project is behind, instead of only once per release even when the notification was missed. Choose Don't ask for this version to silence a release.
 - Setting the analysis server heap cap from System Health now changes the settings file that actually controls it, instead of reporting success while a workspace setting kept the old value. No action required.
 - Package Vibrancy no longer marks healthy packages such as `flutter_map`, `camera` and `location` as end of life when checking for new adoption or offering quick fixes, because a problem recorded for an old version was being applied to every version. No action required.

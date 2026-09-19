@@ -399,6 +399,34 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'pulse',
   },
   {
+    command: 'saropaLints.showMachineDashboard',
+    title: 'Machine Health',
+    description: 'Open the machine health dashboard showing RAM, CPU, and heavy background processes.',
+    category: 'Analysis',
+    icon: 'dashboard',
+  },
+  {
+    command: 'saropaLints.showWorkspaceReadiness',
+    title: 'Workspace Readiness',
+    description: 'Check whether this workspace is ready for analysis and list anything that needs attention.',
+    category: 'Analysis',
+    icon: 'checklist',
+  },
+  {
+    command: 'saropaLints.setAnalysisServerHeapCap',
+    title: 'Set Analysis Server Heap Cap',
+    description: 'Set a memory cap for the Dart analysis server, sized to the available RAM.',
+    category: 'Setup & Configuration',
+    icon: 'gear',
+  },
+  {
+    command: 'saropaLints.unloadOllamaModel',
+    title: 'Unload Ollama Model',
+    description: 'Unload the loaded Ollama model to free RAM held by the local model host.',
+    category: 'Analysis',
+    icon: 'circle-slash',
+  },
+  {
     // Startup preflight for model-host processes (llama-server/ollama) that
     // outlived the session that spawned them — see orphanPreflight.ts.
     command: 'saropaLints.checkOrphanedProcesses',
