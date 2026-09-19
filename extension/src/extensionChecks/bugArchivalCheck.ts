@@ -1,7 +1,7 @@
 /**
  * Extension-native check: flags a `bugs/*.md` report whose `Status:` line says
  * it is done (`Fixed`, `Closed`, `Declined`) but the file is still sitting in
- * `bugs/` instead of being archived to `plans/history/YYYY.MM/YYYYMMDD/`.
+ * `bugs/` instead of being archived to `plans/history/YYYY.MM/YYYY.MM.DD/`.
  *
  * This is a worked example of the "extension-native check" pattern documented
  * in `bugs/ISSUE_REPORT_GUIDE.md` — a check that inspects markdown content and

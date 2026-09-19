@@ -590,13 +590,13 @@ When an issue is closed (or a proposal is declined), `git mv` its file into the 
 
 ```
 bugs/rule_name_false_positive_description.md
-  → plans/history/YYYY.MM/YYYYMMDD/rule_name_false_positive_description.md
+  → plans/history/YYYY.MM/YYYY.MM.DD/rule_name_false_positive_description.md
 
 bugs/proposal_rule_name.md
-  → plans/history/YYYY.MM/YYYYMMDD/proposal_rule_name.md
+  → plans/history/YYYY.MM/YYYY.MM.DD/proposal_rule_name.md
 ```
 
-Use the date the issue was closed. Create the `YYYY.MM/YYYYMMDD` folders if they do not exist. Grep and repoint any `bugs/<file>.md` references (CHANGELOG, ROADMAP, other issue files) to the new path in the same commit.
+Use the date the issue was closed, e.g. `plans/history/2026.09/2026.09.19/`. Create the `YYYY.MM/YYYY.MM.DD` folders if they do not exist. (Folders before April 2026 use the older `YYYYMMDD` day format; leave them as they are.) Grep and repoint any `bugs/<file>.md` references (CHANGELOG, ROADMAP, other issue files) to the new path in the same commit.
 
 ---
 
@@ -616,7 +616,7 @@ Use the date the issue was closed. Create the `YYYY.MM/YYYYMMDD` folders if they
 - Reference bugs from commits: `fix: description (rule_name false positive)`
 - Reference proposals from commits: `feat: description (proposal_rule_name)`
 - Reference issues from ROADMAP: `[issue file](bugs/rule_name_false_positive_description.md)` or `[proposal](bugs/proposal_rule_name.md)`
-- Reference related history: `Related: plans/history/YYYY.MM/YYYYMMDD/filename.md`
+- Reference related history: `Related: plans/history/YYYY.MM/YYYY.MM.DD/filename.md`
 
 ---
 
