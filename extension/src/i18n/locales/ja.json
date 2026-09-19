@@ -851,7 +851,7 @@
     "title": "機械の健康",
     "refresh": "爽やかにリフレッシュする.",
     "systemUnknown": "このプラットフォームではシステムメモリが読み取れません。",
-    "platformUnsupported": "マシンヘルスはWindowsが必要です — このプラットフォームではプロセスクエリが利用できません。",
+    "platformUnsupported": "マシンヘルスはこのプラットフォームでは利用できません — プロセスクエリはWindows、macOS、Linuxでサポートされています。",
     "freeOf": "フリーの",
     "used": "使用済み",
     "recommendationsTitle": "推奨事項",

@@ -851,7 +851,7 @@
     "title": "Zdrowie Maszyny",
     "refresh": "Odświeżaj i oddychaj.",
     "systemUnknown": "System pamięci operacyjnej nie można odczytać w tym systemie operacyjnym.",
-    "platformUnsupported": "Zdrowie maszyny wymaga systemu Windows — zapytania o procesy nie są dostępne na tej platformie.",
+    "platformUnsupported": "Zdrowie maszyny nie jest dostępne na tej platformie — zapytania o procesy są obsługiwane w systemach Windows, macOS i Linux.",
     "freeOf": "bez",
     "used": "użyty",
     "recommendationsTitle": "Rekomendacje",

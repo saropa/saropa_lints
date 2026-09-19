@@ -851,7 +851,7 @@
     "title": "Mga Kondisyon ng Sistemang Makina",
     "refresh": "Magpahinga at mag-refresh.",
     "systemUnknown": "Hindi mabasa ang sistema memory sa platform na ito.",
-    "platformUnsupported": "Kabug-osang Kalusugan ng Machine ay nangangailangan ng Windows — ang mga pagtanong sa proseso ay hindi magagamit sa platform na ito.",
+    "platformUnsupported": "Hindi available ang Machine Health sa platform na ito — sinusuportahan ng mga pagtanong sa proseso ang Windows, macOS, at Linux.",
     "freeOf": "walang",
     "used": "gamit",
     "recommendationsTitle": "Rekomendasyon",

@@ -851,7 +851,7 @@
     "title": "Makine Sağlığı",
     "refresh": "Rahatlatıcı ve rahatlatıcı olsun.",
     "systemUnknown": "Bu platformda sistem belleği okunamadı.",
-    "platformUnsupported": "Makine Sağlığı Windows gerektirir — bu platformda işlem sorguları mevcut değildir.",
+    "platformUnsupported": "Makine Sağlığı bu platformda kullanılamıyor — işlem sorguları Windows, macOS ve Linux'ta desteklenir.",
     "freeOf": "ücretsiz",
     "used": "kullanıldı",
     "recommendationsTitle": "Tavsiyeler",

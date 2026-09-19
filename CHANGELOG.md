@@ -105,7 +105,7 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 ### Fixed (Extension)
 
 - The Package Dashboard no longer shows a white page with unreadable dark text under dark themes; the Feature Inventory tab's browser-only colors were overriding the editor theme. No action required.
-- The System Health panel now tracks Dart processes and memory on macOS and Linux instead of only Windows. No action required.
+- The System Health panel now tracks Dart processes and memory on macOS and Linux instead of only Windows, whatever the system language. No action required.
 - The Analysis Optimizer now skips dot-folders such as agent worktree copies, which the Dart analyzer never analyzes, so they no longer inflate costs or crowd out real files, and a scan that hits its file cap now says the results are partial. No action required.
 - The file-watcher exclude audit now suggests excluding agent worktree copies when a workspace has any, and dismissing the audit hides only the patterns shown, so a new suggestion can still appear once. Accept the prompt to add the exclusion.
 - Turning CI off in the System Health panel no longer breaks a workflow whose job already has its own `if:` condition. It used to add a second `if:`, which GitHub rejects as an invalid workflow. The existing condition is now swapped for `if: false` and put back exactly when CI is turned on again. A workflow with a job it cannot safely switch off is left untouched, and the panel reports that CI is still running.

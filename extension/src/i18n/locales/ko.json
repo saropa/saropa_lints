@@ -851,7 +851,7 @@
     "title": "기계 건강",
     "refresh": "신선하고 상쾌한 느낌을 줍니다.",
     "systemUnknown": "이 플랫폼에서 시스템 메모리가 읽혀지지 않았습니다.",
-    "platformUnsupported": "머신 헬스는 윈도우가 필요합니다 — 이 플랫폼에서는 프로세스 쿼리가 사용할 수 없습니다.",
+    "platformUnsupported": "이 플랫폼에서는 머신 헬스를 사용할 수 없습니다 — 프로세스 쿼리는 Windows, macOS, Linux에서 지원됩니다.",
     "freeOf": "무료한",
     "used": "사용됨",
     "recommendationsTitle": "추천사항",

@@ -851,7 +851,7 @@
     "title": "机器健康",
     "refresh": "让人感到清爽,使自己得到新鲜感.",
     "systemUnknown": "此平台无法读取系统内存。",
-    "platformUnsupported": "机器健康需要 Windows —— 此平台不支持进程查询。",
+    "platformUnsupported": "此平台不支持机器健康监测 —— 进程查询支持 Windows、macOS 和 Linux。",
     "freeOf": "免费的",
     "used": "使用",
     "recommendationsTitle": "推荐建议",

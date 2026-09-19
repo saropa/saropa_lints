@@ -851,7 +851,7 @@
     "title": "Saúde da Máquina",
     "refresh": "Refrescar e refrescar.",
     "systemUnknown": "A memória do sistema não pode ser lida nesse ambiente.",
-    "platformUnsupported": "Saúde da Máquina requer Windows — consultas de processo não estão disponíveis nessa plataforma.",
+    "platformUnsupported": "Saúde da Máquina não está disponível nesta plataforma — as consultas de processo são compatíveis com Windows, macOS e Linux.",
     "freeOf": "livre de",
     "used": "usado",
     "recommendationsTitle": "Recomendações",

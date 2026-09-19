@@ -851,7 +851,7 @@
     "title": "Kesehatan Mesin",
     "refresh": "Refreshing dan menyegarkan.",
     "systemUnknown": "Memori sistem tidak dapat dibaca pada platform ini.",
-    "platformUnsupported": "Kesehatan Mesin memerlukan Windows — query proses tidak tersedia pada platform ini.",
+    "platformUnsupported": "Kesehatan Mesin tidak tersedia pada platform ini — kueri proses didukung di Windows, macOS, dan Linux.",
     "freeOf": "tanpa biaya",
     "used": "digunakan",
     "recommendationsTitle": "Rekomendasi",

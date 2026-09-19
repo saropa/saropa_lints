@@ -851,7 +851,7 @@
     "title": "Salute Macchina",
     "refresh": "Rinfrescare e rinfrescare.",
     "systemUnknown": "La memoria del sistema non può essere letta su questa piattaforma.",
-    "platformUnsupported": "Salute del sistema richiede Windows — le query di processo non sono disponibili su questa piattaforma.",
+    "platformUnsupported": "Salute del sistema non è disponibile su questa piattaforma — le query di processo sono supportate su Windows, macOS e Linux.",
     "freeOf": "libero da",
     "used": "usato",
     "recommendationsTitle": "Raccomandazioni",

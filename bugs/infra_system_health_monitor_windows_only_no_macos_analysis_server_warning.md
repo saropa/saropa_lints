@@ -1,6 +1,6 @@
 # BUG: System Health monitor is Windows-only — a 6.7 GB analysis server on an 8 GB Mac raises no warning
 
-**Status: Open**
+**Status: Fix Ready**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -121,13 +121,20 @@ Parsers (`ps`, `vm_stat`, `sysctl` output) should be extracted as pure functions
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+- `processQuery.ts`: POSIX `queryDartProcesses` (`ps -axww -o pid=,ppid=,rss=,lstart=,command=`, filtered by argv[0] basename) and POSIX `queryProcessById` (`ps -o pid=,lstart= -p`), with pure exported parsers. Every `ps` call runs with `LC_ALL=C`, because `lstart` follows the locale (German prints `Sa. 19 Sep. …`) and would otherwise parse to nothing. `isParentAlive` now counts equal start times as alive, because `lstart` has one-second resolution and a same-second child would otherwise be flagged orphaned. POSIX `killProcess` uses `SIGKILL`.
+- `systemQuery.ts`: darwin (`sysctl -n hw.memsize` + `vm_stat`, free = free + inactive + speculative) and linux (`/proc/meminfo` `MemAvailable`, falling back to `MemFree + Buffers + Cached`).
+- `processMonitor.ts`: `isSystemHealthPlatformSupported()` (win32/darwin/linux) replaces the `win32` gates in `start()`, `healthPanel.ts` process enumeration and `machineDashboard.ts`. The orphan-host guards stay Windows-only.
+- Locales: `machineDashboard.platformUnsupported` no longer says Windows is required.
 
 ---
 
 ## Tests Added
 
-<!-- List new or updated fixture/test files and what they verify. -->
+- `extension/src/test/systemHealth/processQuery.test.ts`: darwin `ps` parsing, basename filter, lstart to ISO, single-pid lookup.
+- `extension/src/test/systemHealth/systemQuery.test.ts`: `vm_stat` (16 KB and 4 KB pages), `hw.memsize`, `/proc/meminfo` with and without `MemAvailable`, malformed input.
+- `extension/src/test/systemHealth/posixQueries.test.ts`: ps output through to analysis-server classification; memory parsers end to end.
+- `extension/src/test/systemHealth/processMonitorPosix.test.ts`: `start()` polls on darwin; the analysis-server notification fires once, then throttles.
+- `extension/src/test/systemHealth/processQueryPosixEdges.test.ts`: a same-second parent is alive, a later-started parent is a reused pid, a missing parent is dead.
 
 ---
 

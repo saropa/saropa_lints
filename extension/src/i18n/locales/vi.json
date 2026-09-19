@@ -851,7 +851,7 @@
     "title": "Tình trạng máy",
     "refresh": "Thức mới và làm mới",
     "systemUnknown": "Không thể đọc bộ nhớ hệ thống trên nền tảng này.",
-    "platformUnsupported": "Trạng thái máy tính yêu cầu Windows — truy vấn tiến trình không khả dụng trên nền tảng này.",
+    "platformUnsupported": "Trạng thái máy tính không khả dụng trên nền tảng này — truy vấn tiến trình được hỗ trợ trên Windows, macOS và Linux.",
     "freeOf": "miễn phí",
     "used": "đã sử dụng",
     "recommendationsTitle": "Khuyến nghị",

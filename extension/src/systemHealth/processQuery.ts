@@ -104,7 +104,7 @@ export function formatBytes(bytes: number): string {
   return `${Math.round(mb)}M`;
 }
 
-interface MinimalProcess {
+export interface MinimalProcess {
   processId: number;
   creationDate: string;
 }
@@ -154,6 +154,12 @@ const POSIX_DART_IMAGES = new Set(['dart', 'dartvm', 'dartaotruntime', 'flutter_
 // columns, e.g. "Fri Sep  8 21:38:25 2026"). Matched explicitly rather than
 // via a plain whitespace split, since the trailing `command` column can
 // itself contain runs of spaces.
+// lstart is rendered through the C library's locale (a German locale prints
+// "Sa. 19 Sep. 08:00:50 2026"), so every `ps` call runs with LC_ALL=C to keep
+// the English shape the pattern below expects. Without it, a non-English
+// locale makes every line unparseable and the monitor silently sees nothing.
+const PS_ENV: NodeJS.ProcessEnv = { ...process.env, LC_ALL: 'C' };
+
 const PS_LSTART_GROUP = '\\S{3}\\s+\\S{3}\\s+\\d{1,2}\\s+\\d{2}:\\d{2}:\\d{2}\\s+\\d{4}';
 
 /**
@@ -238,7 +244,7 @@ function queryDartProcessesPosix(): Promise<DartProcessInfo[]> {
     execFile(
       'ps',
       ['-axww', '-o', 'pid=,ppid=,rss=,lstart=,command='],
-      { timeout: 15_000, maxBuffer: MAX_BUFFER },
+      { timeout: 15_000, maxBuffer: MAX_BUFFER, env: PS_ENV },
       (err, stdout) => resolve(err || !stdout.trim() ? [] : parsePsDartProcesses(stdout)),
     );
   });
@@ -275,7 +281,7 @@ function queryProcessById(pid: number): Promise<MinimalProcess | undefined> {
       execFile(
         'ps',
         ['-o', 'pid=,lstart=', '-p', String(pid)],
-        { timeout: 10_000, maxBuffer: MAX_BUFFER },
+        { timeout: 10_000, maxBuffer: MAX_BUFFER, env: PS_ENV },
         (err, stdout) => resolve(err || !stdout.trim() ? undefined : parsePsSingleProcess(stdout)),
       );
     });
@@ -329,7 +335,14 @@ function parseCimDate(raw: string): number {
   return Number.isNaN(ts) ? 0 : ts;
 }
 
-function isParentAlive(
+/**
+ * A parent is alive if its pid exists and it started no later than the
+ * daemon (a later start means the pid was reused by an unrelated process).
+ * Equal timestamps count as alive: `ps lstart` has one-second resolution, so
+ * a daemon spawned in the same second as its parent reads as equal, and a
+ * strict `<` would flag a healthy daemon as orphaned. Exported for testing.
+ */
+export function isParentAlive(
   parent: MinimalProcess | undefined,
   daemonCreation: string,
 ): boolean {
@@ -338,7 +351,7 @@ function isParentAlive(
   const parentTs = parseCimDate(parent.creationDate);
   const daemonTs = parseCimDate(daemonCreation);
   if (parentTs === 0 || daemonTs === 0) return true;
-  return parentTs < daemonTs;
+  return parentTs <= daemonTs;
 }
 
 /** Delegates to classifyProcess — true for flutter_tools.snapshot + daemon. */

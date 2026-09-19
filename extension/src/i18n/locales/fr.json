@@ -851,7 +851,7 @@
     "title": "Santé du système",
     "refresh": "Actualiser",
     "systemUnknown": "Le mémoire système ne peut pas être lue sur cette plateforme.",
-    "platformUnsupported": "Santé du système requiert Windows — les requêtes de processus ne sont pas disponibles sur cette plateforme.",
+    "platformUnsupported": "Santé du système n'est pas disponible sur cette plateforme — les requêtes de processus sont prises en charge sous Windows, macOS et Linux.",
     "freeOf": "libre de",
     "used": "utilisé",
     "recommendationsTitle": "Recommandations",

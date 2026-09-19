@@ -851,7 +851,7 @@
     "title": "Maschinen-Gesundheit",
     "refresh": "Erfrischen Sie und erfrischen.",
     "systemUnknown": "Systemspeicher konnte auf dieser Plattform nicht gelesen werden.",
-    "platformUnsupported": "Maschinen-Gesundheit erfordert Windows — Prozessabfragen sind auf dieser Plattform nicht verfügbar.",
+    "platformUnsupported": "Maschinen-Gesundheit ist auf dieser Plattform nicht verfügbar — Prozessabfragen werden unter Windows, macOS und Linux unterstützt.",
     "freeOf": "kostenlos",
     "used": "angewendet",
     "recommendationsTitle": "Empfehlungen",

@@ -851,7 +851,7 @@
     "title": "Machinegezondheid",
     "refresh": "Vernieuwen",
     "systemUnknown": "Systeemgeheugen kon niet worden gelezen op deze platform.",
-    "platformUnsupported": "Machine Health vereist Windows — process queries zijn niet beschikbaar op deze platform.",
+    "platformUnsupported": "Machine Health is niet beschikbaar op dit platform — procesquery's worden ondersteund op Windows, macOS en Linux.",
     "freeOf": "vrij van",
     "used": "gebruikt",
     "recommendationsTitle": "Aanbevelingen",
