@@ -2877,8 +2877,8 @@
   "blastRadius": {
     "label": {
       "upgrade": "アップグレード",
-      "breaks": "破壊",
-      "breaksLower": "破壊する",
+      "breaks": "壊す",
+      "breaksLower": "壊す",
       "upgradeNotRecommended": "⚠️ アップグレードは非推奨"
     },
     "notRecommended": "アップグレードは非推奨",
@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} は {dep} {range} を必要としますが、Flutter は {dep} を {pinned} に固定しています",
     "breaker": "{name}（{constraint}）",
     "breakerVia": "{name}（{constraint}）（{chain} 経由）",
+    "unverified": "アップグレードの確認が不完全です: {to} の依存関係データを取得できませんでした",
     "summary": {
       "heldBack": "{pkg} {to} は据え置かれています：{reason}",
       "sdkBlocked": "{pkg} {to} は SDK によってブロックされています：{sdk}",

@@ -1,6 +1,6 @@
 /** Tests target-version dependency fetch (fixtures, no network) and SDK pin derivation. */
 import * as assert from 'assert';
-import { parseTargetDeps, fetchTargetDeps, fetchTargetDepsFor } from '../../../vibrancy/services/upgrade-target-deps';
+import { parseTargetDeps, fetchTargetDeps, fetchTargetDepsFor, parseVersionList, fetchVersionListsFor } from '../../../vibrancy/services/upgrade-target-deps';
 import { parseExactPins, parseLockedVersions, mergePins, deriveSdkPins } from '../../../vibrancy/services/sdk-pins';
 import { attachBlastRadius } from '../../../vibrancy/scoring/blast-radius-attacher';
 import { DepEdge, VibrancyResult } from '../../../vibrancy/types';
@@ -144,5 +144,28 @@ describe('analyzer 13 sdk-blocked from data (held-back list emptied)', () => {
             sdkPins: new Map([['meta', '1.18.0']]), targetDepsOf: () => null,
         });
         assert.strictEqual(r.blastRadius?.verdict, 'safe');
+    });
+});
+
+describe('robustness fixes', () => {
+    it('parseLockedVersions accepts unquoted versions', () => {
+        const lock = 'packages:\n  meta:\n    dependency: transitive\n    version: 1.18.0\n';
+        assert.strictEqual(parseLockedVersions(lock).get('meta'), '1.18.0');
+    });
+    it('parseVersionList ignores non-object dependencies', () => {
+        const l = parseVersionList({ versions: [{ version: '1.0.0', pubspec: { dependencies: 'abc' } }] });
+        assert.strictEqual(l?.[0].deps.size, 0);
+    });
+    it('fetchVersionListsFor survives a throwing fetcher', async () => {
+        const m = await fetchVersionListsFor(['a', 'b'], undefined, undefined, async (p: string) => {
+            if (p === 'a') { throw new Error('boom'); }
+            return [];
+        });
+        assert.deepStrictEqual([...m.keys()], ['b']);
+    });
+    it('fetchTargetDeps returns cached empty map', async () => {
+        const cache = { get: () => ({}), set: async () => undefined } as any;
+        const r = await fetchTargetDeps('meta', '1.0.0', cache);
+        assert.strictEqual(r?.size, 0);
     });
 });

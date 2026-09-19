@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to}에는 {dep} {range}이(가) 필요하지만 Flutter는 {dep} {pinned}에 고정되어 있습니다",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) 경유: {chain}",
+    "unverified": "업그레이드 확인이 불완전합니다: {to}의 의존성 데이터를 가져오지 못했습니다",
     "summary": {
       "heldBack": "{pkg} {to}은(는) 보류 중입니다: {reason}",
       "sdkBlocked": "{pkg} {to}은(는) SDK 때문에 차단됩니다: {sdk}",
@@ -2902,7 +2903,7 @@
       "statusMayBeOutdated": "상태가 오래되었을 수 있음: 수명 종료로 기록되어 있지만 pub.dev에서는 중단되지 않았고 최근 12개월 이내에 게시된 것으로 표시됩니다.",
       "maintenanceMode": "유지보수 모드: 중요한 수정만 예상됩니다.",
       "caution": "주의: 이 패키지에 의존하기 전에 알려진 문제를 검토하세요.",
-      "unlisted": "pub.dev에 비공개 등록됨: 검색 결과에서 숨겨져 있으며 기존 사용자는 계속 의존할 수 있습니다."
+      "unlisted": "pub.dev에 목록 미게재: 검색 결과에서 숨겨져 있으며 기존 사용자는 계속 의존할 수 있습니다."
     },
     "upgradeRequired": {
       "diagnostic": "{name} 업그레이드 — 설치된 버전에 알려진 결함이 있습니다",

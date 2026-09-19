@@ -2897,6 +2897,7 @@
     "sdkBlock": "{pkg} {to} ต้องใช้ {dep} {range}; Flutter ตรึง {dep} ไว้ที่ {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) ผ่าน {chain}",
+    "unverified": "การตรวจสอบการอัปเกรดไม่สมบูรณ์: ไม่สามารถดึงข้อมูลการพึ่งพาของ {to} ได้",
     "summary": {
       "heldBack": "{pkg} {to} ถูกระงับไว้: {reason}",
       "sdkBlocked": "{pkg} {to} ถูก SDK บล็อก: {sdk}",

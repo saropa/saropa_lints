@@ -1411,6 +1411,8 @@ async function runScanInner(
                 .readFile(vscode.Uri.joinPath(workspaceRoot, 'pubspec.lock'))
                 .then(b => Buffer.from(b).toString('utf8'), () => null);
             const fullLock = lockText ? parseLockedVersions(lockText) : undefined;
+            // dependency_overrides bypass dependents' caps on the overridden package.
+            const blastOverrides = new Set(parseDependencyOverrides(parsed.yamlContent));
             // Prefetch release lists only for packages whose latest is blocked.
             const blockedPkgs = attachBlastRadius(results, {
                 reverseDeps: enrichResult.reverseDeps,
@@ -1418,6 +1420,7 @@ async function runScanInner(
                 targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
                 sdkPins: derivedPins ?? undefined,
                 lockedVersions: fullLock,
+                overrides: blastOverrides,
             }).filter(r => r.blastRadius && r.blastRadius.verdict !== 'safe')
                 .map(r => r.package.name);
             const versionLists = await fetchVersionListsFor(blockedPkgs, targets.cache);
@@ -1425,6 +1428,7 @@ async function runScanInner(
                 reverseDeps: enrichResult.reverseDeps,
                 constraints: blastConstraints,
                 lockedVersions: fullLock,
+                overrides: blastOverrides,
                 versionsOf: p => versionLists.get(p) ?? null,
                 targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
                 // Undefined -> attacher falls back to the documented table.

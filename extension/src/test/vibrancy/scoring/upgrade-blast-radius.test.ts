@@ -313,3 +313,56 @@ describe('dependency-capped verdict (data-driven)', () => {
         assert.strictEqual(r.verdict, 'safe');
     });
 });
+
+describe('computeBlastRadius: capper edge cases', () => {
+    const capped = {
+        ...base, targetDeps: new Map([['meta', '>=1.18.3']]),
+        lockedVersions: new Map([['meta', '1.18.0']]),
+        reverseDeps: reverse([['a', 'meta'], ['b', 'meta']]),
+        constraints: constraintsOf([['a', 'meta', '^1.18.0'], ['b', 'meta', '<1.18.2']]),
+    };
+    it('names only the capper whose range excludes the need', () => {
+        const r = computeBlastRadius(capped);
+        assert.strictEqual(r.verdict, 'dependency-capped');
+        assert.deepStrictEqual(r.depCapped?.cappers.map(c => c.name), ['b']);
+    });
+    it('dependency_overrides on the dep bypasses the cap', () => {
+        const r = computeBlastRadius({ ...capped, overrides: new Set(['meta']) });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+    it('a lock ABOVE the needed range is not a cap', () => {
+        const r = computeBlastRadius({
+            ...capped, targetDeps: new Map([['meta', '^1.10.0']]),
+            lockedVersions: new Map([['meta', '2.0.0']]),
+            constraints: constraintsOf([['b', 'meta', '^0.9.0']]),
+        });
+        assert.notStrictEqual(r.verdict, 'dependency-capped');
+    });
+    it('treats pub `any` as unconstrained', () => {
+        const r = computeBlastRadius({
+            ...capped, constraints: constraintsOf([['a', 'meta', 'any'], ['b', 'meta', 'any']]),
+        });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+    it('handles a ^x-0 prerelease caret and 0.x caret', () => {
+        const r = computeBlastRadius({
+            ...capped, targetDeps: new Map([['meta', '^13.0.0-0']]),
+            lockedVersions: new Map([['meta', '12.0.0']]),
+            constraints: constraintsOf([['b', 'meta', '^0.3.14']]),
+        });
+        assert.strictEqual(r.verdict, 'dependency-capped');
+    });
+    it('overriding the upgraded package removes its breakers', () => {
+        const r = computeBlastRadius({
+            ...base, reverseDeps: reverse([['lints', 'analyzer']]),
+            constraints: constraintsOf([['lints', 'analyzer', '^12.0.0']]),
+            overrides: new Set(['analyzer']),
+        });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+    it('flags a safe verdict reached without target deps as unverified', () => {
+        assert.strictEqual(computeBlastRadius(base).unverified, true);
+        assert.strictEqual(
+            computeBlastRadius({ ...base, targetDeps: new Map() }).unverified, false);
+    });
+});

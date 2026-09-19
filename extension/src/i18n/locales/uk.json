@@ -2897,13 +2897,14 @@
     "sdkBlock": "{pkg} {to} потребує {dep} {range}; Flutter фіксує {dep} на {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) через {chain}",
+    "unverified": "Перевірка оновлення неповна: не вдалося отримати дані про залежності для {to}",
     "summary": {
       "heldBack": "{pkg} {to} утримується: {reason}",
       "sdkBlocked": "{pkg} {to} заблоковано SDK: {sdk}",
       "depCapped": "{pkg} {to} потребує {dep} {range}, але {dep} обмежено пакетом: {cappers}",
       "depHeldBack": "{pkg} {to} потребує {dep} {range}, який утримується: {reason}",
       "breaksOne": "{pkg} {to} зламає {count} залежний пакет: {names}",
-      "breaksOther": "{pkg} {to} зламає {count} залежних пакетів: {names}",
+      "breaksOther": "{pkg} {to} зламає залежні пакети ({count}): {names}",
       "safe": "{pkg} {from} -> {to} виглядає безпечним",
       "newestCompatible": "Найновіша сумісна: {pkg} {version}"
     }

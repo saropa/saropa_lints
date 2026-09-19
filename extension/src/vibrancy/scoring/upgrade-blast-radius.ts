@@ -58,6 +58,8 @@ export interface BlastRadius {
     readonly depHeldBack?: DepHeldBack | null;
     /** Target dependency the project cannot raise because a dependent caps it. */
     readonly depCapped?: DepCapped | null;
+    /** True on a 'safe' verdict reached without the target's dependency data (not verified). */
+    readonly unverified?: boolean;
     /** Curated maintainer explanation (data, not localized). */
     readonly heldBackReason: string | null;
     /** Newest release newer than `from` that is not blocked; set by the attacher. */
@@ -116,13 +118,21 @@ export interface BlastRadiusInput {
     heldBack: readonly HeldBackEntry[];
     /** Package -> version currently locked (pubspec.lock); optional. */
     lockedVersions?: ReadonlyMap<string, string>;
+    /**
+     * Packages listed under `dependency_overrides`. An override forces the
+     * resolution, so dependents' ranges on it no longer cap it (dependency-
+     * capped skips it) nor break it (no breakers when `pkg` is overridden).
+     */
+    overrides?: ReadonlySet<string>;
     /** Dependents' latest versions. */
     latestOf?: ReadonlyMap<string, string>;
 }
 
 /** Strip quotes and whitespace, then validate; null when unparseable. */
 function parseRange(raw: string): string | null {
-    return semver.validRange(raw.replace(/["']/g, '').trim());
+    const t = raw.replace(/["']/g, '').trim();
+    // pub's `any` means unconstrained; semver's parser rejects the word.
+    return semver.validRange(t === 'any' ? '*' : t);
 }
 
 /** True only when both sides parse and `version` lies outside `rawRange`. */
@@ -210,9 +220,13 @@ function findDepCapped(input: BlastRadiusInput): DepCapped | null {
         const lock = locked.get(dep);
         const lockV = lock ? toVersion(lock) : null;
         if (!range || !lockV || semver.satisfies(lockV, range, { includePrerelease: true })) { continue; }
+        // An overridden dep is forced to whatever the override says.
+        if (input.overrides?.has(dep)) { continue; }
         let min: semver.SemVer | null = null;
         try { min = semver.minVersion(range); } catch { min = null; }
-        if (!min) { continue; }
+        // Only a lock BELOW the needed range is "capped"; a lock above it is a
+        // different conflict that no dependent cap explains.
+        if (!min || !semver.lt(lockV, min)) { continue; }
         const cappers: BlastBreaker[] = [];
         const seen = new Set<string>();
         for (const edge of reverseDeps.get(dep) ?? []) {
@@ -259,6 +273,7 @@ function graphRoots(
 
 /** Dependents whose declared range on `pkg` excludes `to`. */
 function findBreakers(input: BlastRadiusInput): BlastBreaker[] {
+    if (input.overrides?.has(input.pkg)) { return []; }
     let roots: Set<string> | null = null;
     const breakers: BlastBreaker[] = [];
     const seen = new Set<string>();
@@ -351,7 +366,7 @@ export function computeBlastRadius(input: BlastRadiusInput): BlastRadius {
     }
     return {
         ...base, verdict: 'safe', breakers: [], sdkBlock: null,
-        heldBackReason: null,
+        heldBackReason: null, unverified: !input.targetDeps,
         summaryKey: 'blastRadius.summary.safe',
         summaryParams: { pkg, from, to },
     };

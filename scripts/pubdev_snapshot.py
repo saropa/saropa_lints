@@ -180,7 +180,8 @@ def _request(url: str, method: str, timeout: float, retries: int):
             if e.code not in (429, 500, 502, 503, 504) or attempt == retries:
                 return e.code, b"", e.headers
             ra = e.headers.get("Retry-After")
-            time.sleep(float(ra) if ra and ra.isdigit() else delay)
+            # Retry-After may be an HTTP date; only honour delta-seconds, capped.
+            time.sleep(min(float(ra), 60.0) if ra and ra.isdigit() else delay)
         except (urllib.error.URLError, TimeoutError, OSError):
             if attempt == retries:
                 return 0, b"", {}
@@ -195,11 +196,17 @@ def fetch_package(name: str, timeout: float, retries: int) -> dict:
         return {"status": "not_found"}
     if st != 200:
         return {"status": "error", "http": st}
-    pkg = json.loads(body)
+    try:
+        pkg = json.loads(body)
+    except ValueError:
+        return {"status": "error", "http": 200}
     st, body, _ = _request(f"{API}/packages/{name}/score", "GET", timeout, retries)
     if st != 200:
         return {"status": "error", "http": st}
-    score = json.loads(body)
+    try:
+        score = json.loads(body)
+    except ValueError:
+        return {"status": "error", "http": 200}
     tags = score.get("tags") or []
     latest = pkg.get("latest") or {}
     out = {
@@ -327,19 +334,38 @@ def cmd_snapshot(a: argparse.Namespace) -> int:
                 origins.setdefault(ln.strip(), "extra")
     names = list(origins)
     if a.only:
-        names = list(dict.fromkeys(a.only))
+        names = [n for n in dict.fromkeys(a.only) if VALID_NAME.match(n)]
+        skipped = [n for n in dict.fromkeys(a.only) if not VALID_NAME.match(n)]
+        if skipped:
+            print(f"ignoring invalid --only names: {', '.join(skipped)}", file=sys.stderr)
     out_path = Path(a.output)
     snap: dict = {"packages": {}}
     if a.only and out_path.exists():
-        snap = json.loads(out_path.read_text(encoding="utf-8"))
+        try:
+            snap = json.loads(out_path.read_text(encoding="utf-8"))
+            snap.setdefault("packages", {})
+        except ValueError:
+            print(f"existing snapshot {out_path} is unreadable; starting fresh", file=sys.stderr)
+            snap = {"packages": {}}
+    prior = dict(snap["packages"])
     done = 0
 
     def work(n: str):
-        return n, fetch_package(n, a.timeout, a.retries)
+        # One package's failure (bad JSON, unexpected exception) must not
+        # abort the whole run and lose everything fetched so far.
+        try:
+            return n, fetch_package(n, a.timeout, a.retries)
+        except Exception as exc:  # noqa: BLE001
+            return n, {"status": "error", "http": 0, "exception": type(exc).__name__}
 
-    with ThreadPoolExecutor(max_workers=a.concurrency) as ex:
+    with ThreadPoolExecutor(max_workers=max(1, a.concurrency)) as ex:
         for n, res in ex.map(work, names):
-            res["origin"] = origins.get(n, "extra")
+            old = prior.get(n)
+            if res["status"] == "error" and old and old.get("status") == "ok":
+                # Transient failure: keep the last good data rather than clobber it.
+                res = old
+            else:
+                res["origin"] = origins.get(n, "extra")
             snap["packages"][n] = res
             done += 1
             if done % 50 == 0:
@@ -355,12 +381,17 @@ def cmd_snapshot(a: argparse.Namespace) -> int:
         print(f"[dry-run] would write {out_path}: {counts}")
         return 0
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(
+    # Atomic: write a sibling temp file then rename, so an interrupted run can
+    # never leave a truncated snapshot behind.
+    tmp = out_path.with_name(out_path.name + ".tmp")
+    tmp.write_text(
         json.dumps(snap, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
     )
+    tmp.replace(out_path)
     print(f"Wrote {out_path} ({len(names)} packages): {counts}")
-    return 0
+    # Non-zero when any package could not be fetched (snapshot is still written).
+    return 2 if counts.get("error") else 0
 
 
 # --------------------------------------------------------------------------
@@ -428,7 +459,7 @@ def bounded_flags(e: dict, s: dict, as_of: str, age: float) -> list[Flag]:
     if hit:
         out.append(("bounded-template-reason", f"{n}: bounded reason is generic ('{hit}') - verify it against the bounded range"))
     if age < 12:
-        out.append(("bounded-recent-release", f"INFO {n} [{e['status']}]: latest release {s['published'][:10]} ({age:.0f} months old); bound may still be right"))
+        out.append(("bounded-recent-release", f"INFO {n} [{e['status']}]: latest release {(s.get('published') or '')[:10]} ({age:.0f} months old); bound may still be right"))
     return out
 
 
@@ -438,13 +469,13 @@ def lifecycle_flags(e: dict, s: dict, as_of: str) -> list[Flag]:
     age = _months_between(s.get("published") or "", as_of)
     if age is None or s.get("isDiscontinued"):
         return out
-    bounded = "appliesToMinVersion" in e or "appliesToMaxVersion" in e
+    bounded = bool(e.get("appliesToMinVersion") or e.get("appliesToMaxVersion"))
     if bounded:
         if st == "end_of_life":
             out.extend(bounded_flags(e, s, as_of, age))
         return out
     if st == "end_of_life" and age < 12:
-        out.append(("revived", f"{n} [end_of_life]: not discontinued, latest release {s['published'][:10]} "
+        out.append(("revived", f"{n} [end_of_life]: not discontinued, latest release {(s.get('published') or '')[:10]} "
                     f"({age:.0f} months old) - revived?"))
     elif st == "active" and age >= 12:
         if (s.get("pubPoints") or 0) >= 140:
@@ -452,7 +483,7 @@ def lifecycle_flags(e: dict, s: dict, as_of: str) -> list[Flag]:
         sig = stale_signals(s)
         if sig:
             cand = "end_of_life" if age >= 24 else "maintenance_mode"
-            out.append(("stale", f"{n} [active]: latest release {s['published'][:10]} ({age:.0f} months old) "
+            out.append(("stale", f"{n} [active]: latest release {(s.get('published') or '')[:10]} ({age:.0f} months old) "
                         f"- stale, candidate {cand}; signals: {'; '.join(sig)}"))
     return out
 
@@ -467,7 +498,7 @@ def replacement_flags(e: dict, pk: dict, by_name: dict[str, list[dict]]) -> list
         out.append(("replacement-404", f"{n}: replacement {r!r} 404s on pub.dev"))
     elif rs and rs.get("isDiscontinued"):
         out.append(("replacement-discontinued", f"{n}: replacement {r!r} is discontinued upstream"))
-    if any(x["status"] == "end_of_life" and "appliesToMinVersion" not in x and "appliesToMaxVersion" not in x
+    if any(x["status"] == "end_of_life" and not x.get("appliesToMinVersion") and not x.get("appliesToMaxVersion")
            for x in by_name.get(r, [])):
         out.append(("replacement-chain", f"{n} -> {r}: replacement is itself end_of_life in known_issues"))
     # cycle: follow unbounded replacement links from n
@@ -498,6 +529,11 @@ def dead_data_flag(e: dict, s: dict | None) -> list[Flag]:
 
 
 def cmd_apply(a: argparse.Namespace) -> int:
+    try:
+        datetime.strptime(a.as_of, "%Y-%m-%d")
+    except ValueError:
+        print(f"--as-of must be YYYY-MM-DD, got {a.as_of!r}", file=sys.stderr)
+        return 2
     snap = json.loads(Path(a.snapshot).read_text(encoding="utf-8"))
     pk = snap["packages"]
     raw = KNOWN_ISSUES.read_text(encoding="utf-8")
@@ -531,17 +567,18 @@ def cmd_apply(a: argparse.Namespace) -> int:
             unrefreshed.append((n, e.get("as_of") or ""))
             continue
         before = json.dumps(e)
-        if "lastUpdated" in e and s["published"]:
+        # .get() throughout: format-1 snapshots lack several format-2 fields.
+        if "lastUpdated" in e and s.get("published"):
             e["lastUpdated"] = s["published"]
-        if "pubPoints" in e and s["pubPoints"] is not None:
+        if "pubPoints" in e and s.get("pubPoints") is not None:
             e["pubPoints"] = s["pubPoints"]
-        if "archiveSizeBytes" in e and s["archiveSizeBytes"]:
+        if "archiveSizeBytes" in e and s.get("archiveSizeBytes"):
             e["archiveSizeBytes"] = s["archiveSizeBytes"]
             if "archiveSizeMB" in e:
                 e["archiveSizeMB"] = round(s["archiveSizeBytes"] / 1048576, 2)
-        if "verifiedPublisher" in e:
+        if "verifiedPublisher" in e and "publisher" in s:
             e["verifiedPublisher"] = bool(s["publisher"])
-        if "platforms" in e:
+        if "platforms" in e and s.get("platforms") is not None:
             e["platforms"] = [
                 p
                 for p in ("android", "ios", "linux", "macos", "web", "windows")
@@ -549,17 +586,18 @@ def cmd_apply(a: argparse.Namespace) -> int:
             ]
         # Flags: never auto-rewritten.
         mine: list[Flag] = []
-        st, disc = e["status"], s["isDiscontinued"]
+        st, disc = e["status"], bool(s.get("isDiscontinued"))
         if disc and st != "end_of_life":
-            mine.append(("discontinued", f"{n} [{st}]: now DISCONTINUED on pub.dev (replacedBy={s['replacedBy']})"))
+            mine.append(("discontinued", f"{n} [{st}]: now DISCONTINUED on pub.dev (replacedBy={s.get('replacedBy')})"))
         mine.extend(lifecycle_flags(e, s, a.as_of))
-        rb = s["replacedBy"]
+        rb = s.get("replacedBy")
         # Freeform replacement text is not comparable to a package name.
-        if rb and is_replacement_package_name(e.get("replacement")) and e.get("replacement", "").strip() != rb:
+        if rb and is_replacement_package_name(e.get("replacement")) and e["replacement"].strip() != rb:
             mine.append(("replacedBy-mismatch", f"{n}: pub.dev replacedBy={rb!r} but replacement={e.get('replacement')!r}"))
         lic = e.get("license")
-        if lic and s["licenseTags"] and lic.lower() not in s["licenseTags"]:
-            mine.append(("license", f"{n}: license {lic!r} vs pub.dev tags {s['licenseTags']}"))
+        tags = s.get("licenseTags") or []
+        if lic and tags and lic.lower() not in tags:
+            mine.append(("license", f"{n}: license {lic!r} vs pub.dev tags {tags}"))
         rt = s.get("retracted") or {}
         if rt.get("latestRetracted"):
             mine.append(("retracted-latest", f"{n}: latest {s.get('version')} is RETRACTED"))
@@ -613,7 +651,9 @@ def cmd_apply(a: argparse.Namespace) -> int:
         print("[dry-run] known_issues.json not written")
         return rc
     if text != raw:
-        KNOWN_ISSUES.write_text(text, encoding="utf-8")
+        tmp = KNOWN_ISSUES.with_name(KNOWN_ISSUES.name + ".tmp")
+        tmp.write_text(text, encoding="utf-8")
+        tmp.replace(KNOWN_ISSUES)
         print(f"Wrote {KNOWN_ISSUES}")
     return rc
 
@@ -679,6 +719,21 @@ def cmd_selftest(_a: argparse.Namespace) -> int:
         {"events": [{"introduced": "0", "fixed": None}, {"introduced": None, "fixed": "1.0.0"}, None]}, "junk"]}]}, "p", "1.2.0")
     assert d["ranges"] == [{"introduced": "0", "fixed": "1.0.0"}] and d["latestListed"], d
     assert advisory_detail({"affected": "oops"}, "p", "1.0.0")["ranges"] == []
+    # null bounds are not bounds; format-1 style snapshot rows must not crash
+    nb = {**eol, "appliesToMinVersion": None, "appliesToMaxVersion": None}
+    assert kinds(lifecycle_flags(nb, s("2026-05-01"), ao)) == ["revived"]
+    assert not lifecycle_flags(eol, {"isDiscontinued": False}, ao)  # no published date
+    # multiple introduced/fixed pairs: latest between pairs is fixed, inside the second is affected
+    two = {"id": "M", "ranges": [{"introduced": "0", "fixed": "1.0.0"}, {"introduced": "2.0.0", "fixed": "2.5.0"}], "latestListed": False}
+    assert advisory_status(two, "1.5.0") == "fixed" and advisory_status(two, "2.1.0") == "affected"
+    assert advisory_status(two, "2.5.0") == "fixed"
+    d2 = advisory_detail({"id": "M", "affected": [{"package": {"name": "p"}, "ranges": [{"events": [
+        {"introduced": "0"}, {"fixed": "1.0.0"}, {"introduced": "2.0.0"}, {"last_affected": "2.2.0"}]}]}]}, "p", "3.0.0")
+    assert d2["ranges"] == [{"introduced": "0", "fixed": "1.0.0"}, {"introduced": "2.0.0", "lastAffected": "2.2.0"}], d2
+    assert advisory_status(d2, "3.0.0") == "fixed"
+    # replacement rule parity with isReplacementPackageName (/^[a-z0-9_]+$/ on trimmed)
+    assert is_replacement_package_name(" get_it ") and not is_replacement_package_name("")
+    assert not is_replacement_package_name("Get_It") and not is_replacement_package_name("a-b")
     print("selftest ok")
     return 0
 
@@ -701,7 +756,7 @@ def main() -> int:
     ap = sub.add_parser("apply", help="apply a snapshot to known_issues.json (offline)")
     ap.add_argument("--snapshot", default=str(DEFAULT_SNAPSHOT))
     ap.add_argument("--only", action="append")
-    ap.add_argument("--as-of", default=datetime.now().strftime("%Y-%m-%d"))
+    ap.add_argument("--as-of", default=datetime.now(timezone.utc).strftime("%Y-%m-%d"))
     ap.add_argument("--strict", action="store_true", help="exit 1 when un-refreshed entries have as_of >90 days old")
     ap.add_argument("--refresh-as-of-only-verified", action="store_true",
                     help="do not bump as_of for entries that raised a non-INFO flag this run")

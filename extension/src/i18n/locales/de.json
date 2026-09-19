@@ -2877,8 +2877,8 @@
   "blastRadius": {
     "label": {
       "upgrade": "Upgrade",
-      "breaks": "Bricht",
-      "breaksLower": "bricht",
+      "breaks": "Verursacht Fehler",
+      "breaksLower": "verursacht Fehler",
       "upgradeNotRecommended": "⚠️ Upgrade nicht empfohlen"
     },
     "notRecommended": "Upgrade nicht empfohlen",
@@ -2886,13 +2886,14 @@
     "sdkBlock": "{pkg} {to} benötigt {dep} {range}; Flutter fixiert {dep} auf {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) über {chain}",
+    "unverified": "Upgrade-Prüfung unvollständig: Abhängigkeitsdaten für {to} konnten nicht abgerufen werden",
     "summary": {
       "heldBack": "{pkg} {to} wird zurückgehalten: {reason}",
       "sdkBlocked": "{pkg} {to} wird vom SDK blockiert: {sdk}",
       "depCapped": "{pkg} {to} benötigt {dep} {range}, aber {dep} wird durch {cappers} begrenzt",
       "depHeldBack": "{pkg} {to} benötigt {dep} {range}, das zurückgehalten wird: {reason}",
-      "breaksOne": "{pkg} {to} würde {count} abhängiges Paket beschädigen: {names}",
-      "breaksOther": "{pkg} {to} würde {count} abhängige Pakete beschädigen: {names}",
+      "breaksOne": "{pkg} {to} würde {count} abhängiges Paket funktionsunfähig machen: {names}",
+      "breaksOther": "{pkg} {to} würde {count} abhängige Pakete funktionsunfähig machen: {names}",
       "safe": "{pkg} {from} -> {to} sieht sicher aus",
       "newestCompatible": "Neueste kompatible Version: {pkg} {version}"
     }
@@ -2906,7 +2907,7 @@
     },
     "upgradeRequired": {
       "diagnostic": "{name} upgraden — installierte Version ist bekanntermaßen defekt",
-      "problem": "Score {score}/100 — installierte Version muss aktualisiert werden",
+      "problem": "Score {score}/100 — installierte Version benötigt ein Upgrade",
       "insight": "Installierte Version ist bekanntermaßen defekt — Upgrade erforderlich"
     }
   }

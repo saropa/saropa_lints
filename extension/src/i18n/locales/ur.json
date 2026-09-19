@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} کو {dep} {range} درکار ہے؛ جبکہ Flutter نے {dep} کو {pinned} پر پن کر رکھا ہے",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) بذریعہ {chain}",
+    "unverified": "اپ گریڈ کی جانچ نامکمل ہے: {to} کا ڈیپینڈنسی ڈیٹا حاصل نہیں ہو سکا",
     "summary": {
       "heldBack": "{pkg} {to} روکا گیا ہے: {reason}",
       "sdkBlocked": "{pkg} {to} کو SDK نے بلاک کیا ہے: {sdk}",

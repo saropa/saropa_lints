@@ -2896,7 +2896,8 @@
     "skipReason": "yükseltme önerilmez: {summary}",
     "sdkBlock": "{pkg} {to} için {dep} {range} gerekir; Flutter {dep} sürümünü {pinned} olarak sabitler",
     "breaker": "{name} ({constraint})",
-    "breakerVia": "{name} ({constraint}) üzerinden {chain}",
+    "breakerVia": "{name} ({constraint}) — {chain} üzerinden",
+    "unverified": "Yükseltme denetimi eksik: {to} için bağımlılık verileri alınamadı",
     "summary": {
       "heldBack": "{pkg} {to} bekletiliyor: {reason}",
       "sdkBlocked": "{pkg} {to} SDK tarafından engelleniyor: {sdk}",

@@ -1451,7 +1451,7 @@
       "overrides": "Override",
       "caveatLine1": "* Ukuran kode yang ditunjukkan (lib + declared assets), jatuh kembali ke ukuran arsip pub.dev ketika ukuran kode tidak tersedia. Tidak termasuk dev_dependencies (build_runner, lints, saropa_lints, dll.)  ⁇  mereka tidak pernah dikirim ke paket APK / IPA / web. Ukuran aplikasi yang sebenarnya akan lebih kecil setelah tree shaking.",
       "caveatLine2": "Batas aktivitas: 90d = basi, 180d = tidak aktif (komitmen + rilis garis waktu).",
-      "upgradeTitle": "Peningkatan diperlukan"
+      "upgradeTitle": "Upgrade diperlukan"
     },
     "breakdown": {
       "title": "Mengapa nilai {grade}?  ⁇  {avgScore}/100 rata-rata di seluruh paket {pkgCount}.",
@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} membutuhkan {dep} {range}; Flutter mematok {dep} pada {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) melalui {chain}",
+    "unverified": "Pemeriksaan upgrade tidak lengkap: data dependensi untuk {to} tidak dapat diambil",
     "summary": {
       "heldBack": "{pkg} {to} ditahan: {reason}",
       "sdkBlocked": "{pkg} {to} diblokir oleh SDK: {sdk}",

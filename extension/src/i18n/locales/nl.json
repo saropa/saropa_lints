@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} vereist {dep} {range}; Flutter pint {dep} op {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) via {chain}",
+    "unverified": "Upgradecontrole onvolledig: afhankelijkheidsgegevens voor {to} konden niet worden opgehaald",
     "summary": {
       "heldBack": "{pkg} {to} wordt tegengehouden: {reason}",
       "sdkBlocked": "{pkg} {to} wordt geblokkeerd door de SDK: {sdk}",

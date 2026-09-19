@@ -2877,8 +2877,8 @@
   "blastRadius": {
     "label": {
       "upgrade": "अपग्रेड",
-      "breaks": "ब्रेक करता है",
-      "breaksLower": "ब्रेक करता है",
+      "breaks": "तोड़ता है",
+      "breaksLower": "तोड़ता है",
       "upgradeNotRecommended": "⚠️ अपग्रेड की सलाह नहीं दी जाती"
     },
     "notRecommended": "अपग्रेड की सलाह नहीं दी जाती",
@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} को {dep} {range} चाहिए; Flutter ने {dep} को {pinned} पर पिन किया है",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) {chain} के माध्यम से",
+    "unverified": "अपग्रेड जाँच अधूरी: {to} का डिपेंडेंसी डेटा प्राप्त नहीं किया जा सका",
     "summary": {
       "heldBack": "{pkg} {to} रोका गया है: {reason}",
       "sdkBlocked": "{pkg} {to} को SDK ने ब्लॉक किया है: {sdk}",

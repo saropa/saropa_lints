@@ -31,38 +31,73 @@ Here is the updated table combining the timeline, the impact of the release, and
 
 pub.dev's latest version is not always one you can adopt. Before Package Vibrancy nudges you to upgrade a package, it checks what that upgrade would break. Each package gets one verdict; when several apply, the first in this list wins.
 
-| Verdict                | Meaning                                                                                                   |
-| :--------------------- | :-------------------------------------------------------------------------------------------------------- |
-| `held-back`            | The target version is on the curated held-back list (see below).                                          |
-| `sdk-blocked`          | The target version needs a dependency version that the Flutter SDK pins to something else.               |
-| `dependency-held-back` | The target version needs a dependency range that only a held-back version of that dependency can satisfy. |
-| `breaks-dependents`    | One or more packages that depend on it declare a version range that excludes the target.                 |
-| `safe`                 | Nothing found; the upgrade is offered as normal.                                                          |
+| Verdict                | Meaning                                                                                                                                 |
+| :--------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
+| `held-back`            | The target version is on the curated held-back list (fallback; see below).                                                              |
+| `sdk-blocked`          | The target version needs a dependency version that the Flutter SDK pins to something else.                                              |
+| `dependency-capped`    | The target needs a dependency version your lock file does not have, and another package in your project caps that dependency below it. The message names the capper. |
+| `dependency-held-back` | Same need, but decided only by the curated list because lock or range data was unavailable.                                             |
+| `breaks-dependents`    | One or more packages that depend on it declare a version range that excludes the target.                                                |
+| `safe`                 | Nothing found; the upgrade is offered as normal.                                                                                        |
 
-Any verdict other than `safe` replaces the plain "newer version available" nudge with a one-line explanation of what blocks it (for example, "analyzer 13.1.0 needs meta ^1.18.3; Flutter pins meta 1.18.0").
+Any verdict other than `safe` replaces the plain "newer version available" nudge with a one-line explanation of what blocks it (for example, "analyzer 13.1.0 needs meta ^1.18.3; Flutter pins meta 1.18.0"). When the latest version is blocked, the newest version you can still take is suggested as **Newest compatible**. Retracted releases are never offered.
 
 ### How the checks are derived
 
-- **SDK pins.** The extension reads the Flutter SDK's own package pubspecs (for example, `flutter` depends on `meta: 1.18.0`) and cross-checks them against the version locked in `pubspec.lock`. Only if nothing can be derived (no Flutter SDK found, or a non-Flutter project) does it fall back to a built-in table of known pins.
-- **Target-version dependencies.** The dependency ranges of the version you would upgrade to are fetched, then compared with the SDK pins and with the full lock file, so a transitive dependency you already satisfy is not reported as a blocker.
+- **SDK pins.** The extension reads the installed Flutter SDK's own package pubspecs (for example, `flutter` depends on `meta: 1.18.0`). Only exact pins count; a caret range such as `^1.2.0` is a range, not a pin. Only if the SDK cannot be inspected does it fall back to a built-in table of known pins.
+- **Full lock file.** All of `pubspec.lock`, including transitive packages, is read, so a dependency you already satisfy is not reported as a blocker.
+- **Target-version dependencies.** The dependency ranges of the version you would upgrade to come from pub.dev per version and are cached, then compared with the SDK pins and the lock file.
 - **Dependents.** The ranges that your other packages declare on the package are compared with the target version.
 
-### The held-back list
+### The held-back list (fallback only)
 
-Some upgrades are known to break this kind of project even though pub.dev offers them. `extension/src/vibrancy/scoring/held-back-upgrades.ts` lists each package, the range of target versions to avoid, and the reason shown to you. For example, `analyzer >=13.0.0` is held back because it needs `meta ^1.18.3` while Flutter stable pins `meta 1.18.0`.
+`extension/src/vibrancy/scoring/held-back-upgrades.ts` lists packages and target-version ranges known to break this kind of project (for example `analyzer >=13.0.0`, which needs `meta ^1.18.3` while Flutter stable pins `meta 1.18.0`). It is used only when lock and range data cannot decide. When they can, they win: if the needed version is not capped by anything in your project, the upgrade is not blocked whatever the list says.
 
 ### Bulk updates
 
-**Update All** skips every package whose verdict is not `safe`. Skipped packages are listed with the blast-radius explanation as the reason, so nothing is silently left behind. Upgrade them individually once the blocker is resolved.
+**Update All** skips every package whose verdict is not `safe`. Skipped packages are listed with the blocker as the reason, so nothing is silently left behind. Upgrade them individually once the blocker is resolved.
 
-### Refreshing the known issues data
+## Known-Issue Statuses
 
-The built-in known issues library (`extension/src/vibrancy/data/known_issues.json`) can be refreshed from pub.dev with `scripts/pubdev_snapshot.py`:
+Curated entries in the known-issues library drive the status shown for a package.
+
+| Status             | Shown as / meaning                                                                                   |
+| :----------------- | :--------------------------------------------------------------------------------------------------- |
+| `end_of_life`      | The package itself is dead. Replace it.                                                              |
+| `upgrade_required` | The package is alive but your installed old major is known-broken (shown as **Upgrade Required**). The fix is to upgrade. |
+| `maintenance_mode` | Note only: the package receives little more than fixes.                                              |
+| `caution`          | Note only: use with care; see the reason.                                                            |
+
+Notes are also shown for unlisted packages and when a status "may be outdated".
+
+**Version bounds.** An entry with `appliesToMinVersion` / `appliesToMaxVersion` applies only to installed versions in `[min, max)`: min is inclusive, max is exclusive. Outside that window the entry is ignored.
+
+**Vulnerabilities.** With the vulnerability scan enabled, each installed package version is checked against OSV (optionally merged with GitHub advisories) and shown with a severity.
+
+## Maintaining the known-issues data
+
+The data lives in `extension/src/vibrancy/data/known_issues.json`, validated by `known_issues_schema.json` in the same folder. Each entry needs `name`, `status` and `as_of`.
+
+Rule of thumb for `status`: package dead, no fix except replacing it, use `end_of_life`; package alive but an old major is broken, use `upgrade_required` with version bounds; slow but usable, `maintenance_mode`; risky or contested, `caution`.
+
+`scripts/pubdev_snapshot.py` refreshes the machine-derivable facts from pub.dev:
 
 ```
-python scripts/pubdev_snapshot.py snapshot          # fetch pub.dev facts (network)
-python scripts/pubdev_snapshot.py apply --dry-run   # preview the offline update
-python scripts/pubdev_snapshot.py apply
+python3 scripts/pubdev_snapshot.py snapshot            # fetch pub.dev facts (network)
+python3 scripts/pubdev_snapshot.py apply --dry-run     # preview the offline update
+python3 scripts/pubdev_snapshot.py apply
+python3 scripts/pubdev_snapshot.py selftest            # built-in flag self-test
 ```
 
-`apply` only refreshes machine-derivable fields (last updated, pub points, archive size, verified publisher, platforms, and the `as_of` date). Hand-written text, `status` and `replacement` are never rewritten; changes that matter for those (discontinued, replaced, license drift) are printed as a flagged report for you to review. `--only NAME` limits a run to specific packages.
+`apply` only refreshes last updated, pub points, archive size, verified publisher, platforms and `as_of`. Hand-written text, `status` and `replacement` are never rewritten; changes that matter for them are printed as flags for you to review. `--only NAME` limits a run; `--strict` fails when un-refreshed entries have an `as_of` older than 90 days.
+
+| Flag                                                                                                             | Meaning                                                              |
+| :--------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------- |
+| `revived`                                                                                                        | An unbounded `end_of_life` package released within 12 months.        |
+| `stale`                                                                                                          | An `active` package 12+ months old with corroborating weak signals.  |
+| `bounded-includes-latest`, `bounded-min-gt-max`, `bounded-above-all`, `bounded-template-reason`, `bounded-recent-release` | Sanity checks on version-bounded entries.                            |
+| `replacement-404`, `replacement-discontinued`, `replacement-chain`, `replacement-cycle`                          | The named replacement is missing, discontinued or circular.          |
+| `retracted-latest`                                                                                               | The latest release was retracted.                                    |
+| `advisories`                                                                                                     | pub.dev lists security advisories.                                   |
+| `dead-data`                                                                                                      | Informational: a tracked name that 404s or is not a real package.    |
+| `stale-as-of`                                                                                                    | Entry not refreshed and its `as_of` is over 90 days old.             |

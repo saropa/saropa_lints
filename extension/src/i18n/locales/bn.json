@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to}-এর জন্য {dep} {range} দরকার; কিন্তু Flutter {dep}-কে {pinned}-এ পিন করে রেখেছে",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) {chain} এর মাধ্যমে",
+    "unverified": "আপগ্রেড যাচাই অসম্পূর্ণ: {to}-এর ডিপেন্ডেন্সি তথ্য আনা যায়নি",
     "summary": {
       "heldBack": "{pkg} {to} আটকে রাখা হয়েছে: {reason}",
       "sdkBlocked": "{pkg} {to} SDK দ্বারা বাধাগ্রস্ত: {sdk}",

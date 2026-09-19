@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} cần {dep} {range}; Flutter ghim {dep} ở {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) qua {chain}",
+    "unverified": "Kiểm tra nâng cấp chưa đầy đủ: không thể tải dữ liệu phụ thuộc cho {to}",
     "summary": {
       "heldBack": "{pkg} {to} đang bị giữ lại: {reason}",
       "sdkBlocked": "{pkg} {to} bị SDK chặn: {sdk}",

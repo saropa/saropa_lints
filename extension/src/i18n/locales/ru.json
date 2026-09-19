@@ -2886,13 +2886,14 @@
     "sdkBlock": "{pkg} {to} требует {dep} {range}; Flutter закрепляет {dep} {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) через {chain}",
+    "unverified": "Проверка обновления неполная: не удалось получить данные о зависимостях для {to}",
     "summary": {
       "heldBack": "{pkg} {to} удержан: {reason}",
       "sdkBlocked": "{pkg} {to} заблокирован SDK: {sdk}",
       "depCapped": "{pkg} {to} требует {dep} {range}, но {dep} ограничен пакетами: {cappers}",
       "depHeldBack": "{pkg} {to} требует {dep} {range}, который удержан: {reason}",
       "breaksOne": "{pkg} {to} сломает {count} зависимый пакет: {names}",
-      "breaksOther": "{pkg} {to} сломает зависимых пакетов: {count}: {names}",
+      "breaksOther": "{pkg} {to} сломает зависимые пакеты ({count}): {names}",
       "safe": "{pkg} {from} -> {to} выглядит безопасно",
       "newestCompatible": "Новейшая совместимая версия: {pkg} {version}"
     }

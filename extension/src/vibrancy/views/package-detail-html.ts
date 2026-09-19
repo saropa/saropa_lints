@@ -15,7 +15,7 @@ import { formatSizeMB } from '../scoring/bloat-calculator';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
-import { isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
+import { describeUnverified, isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { createWebviewCspNonce, escapeHtml, resolveRepoUrl } from './html-utils';
 import { l10n } from '../../i18n/runtime';
@@ -272,6 +272,10 @@ function buildVersionSection(r: VibrancyResult): string {
     } else if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date') {
         rows.push(row(l10n('packageDetail.version.update'),
             `${escapeHtml(r.updateInfo.currentVersion)} &rarr; ${escapeHtml(r.updateInfo.latestVersion)} (${escapeHtml(r.updateInfo.updateStatus)})`));
+        const unverifiedNote = r.blastRadius ? describeUnverified(r.blastRadius) : null;
+        if (unverifiedNote) {
+            rows.push(row(l10n('blastRadius.label.upgrade'), escapeHtml(unverifiedNote)));
+        }
         if (r.blocker) {
             rows.push(row(l10n('packageDetail.version.blockedBy'), `<strong>${escapeHtml(r.blocker.blockerPackage)}</strong>`));
             // Diamond conflict: name the shared transitive dep and the binding

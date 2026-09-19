@@ -4,6 +4,7 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { VibrancyHoverProvider } from '../../../vibrancy/providers/hover-provider';
 import { VibrancyResult } from '../../../vibrancy/types';
+import type { BlastRadius } from '../../../vibrancy/scoring/upgrade-blast-radius';
 
 /**
  * Tests **VibrancyHoverProvider** markdown hovers: package score breakdown, badges, links, and edge cases
@@ -263,5 +264,24 @@ describe('VibrancyHoverProvider', () => {
         const md = hover!.contents as unknown as vscode.MarkdownString;
         assert.ok(md.value.includes('Changelog'), 'hover should include Changelog link');
         assert.ok(md.value.includes('pub.dev/packages/http/changelog'));
+    });
+
+    it('shows the upgrade-check-incomplete note only for a safe unverified verdict', () => {
+        const br = (unverified: boolean): BlastRadius => ({
+            pkg: 'http', from: '1.0.0', to: '2.0.0', verdict: 'safe', breakers: [], sdkBlock: null,
+            heldBackReason: null, unverified,
+            summaryKey: 'blastRadius.summary.safe', summaryParams: { pkg: 'http', from: '1.0.0', to: '2.0.0' },
+        });
+        const upd = { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus: 'major' as const, changelog: null };
+        const doc = makeMockDocument('  http: ^1.0.0');
+        const render = (unverified: boolean): string => {
+            provider.updateResults([{ ...makeResult('http', 85), updateInfo: upd, blastRadius: br(unverified) }]);
+            const hover = provider.provideHover(doc, new vscode.Position(0, 2));
+            return (hover!.contents as unknown as vscode.MarkdownString).value;
+        };
+        const on = render(true);
+        assert.ok(on.includes('Upgrade check incomplete: dependency data for 2\\.0\\.0 could not be fetched'), 'escaped note');
+        assert.ok(on.includes('1.0.0 → 2.0.0'), 'upgrade nudge must remain');
+        assert.ok(!render(false).includes('Upgrade check incomplete'));
     });
 });

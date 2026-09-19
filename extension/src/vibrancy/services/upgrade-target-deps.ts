@@ -42,7 +42,8 @@ export async function fetchTargetDeps(
 ): Promise<Map<string, string> | null> {
     const key = `pub.targetDeps.${pkg}@${version}`;
     const cached = cache?.get<Record<string, string>>(key);
-    if (cached) { return new Map(Object.entries(cached)); }
+    // `{}` is a real cached answer (no dependencies), so test type, not truthiness.
+    if (cached && typeof cached === 'object') { return new Map(Object.entries(cached)); }
     const url = `${registryUrl}/api/packages/${encodeURIComponent(pkg)}/versions/${encodeURIComponent(version)}`;
     try {
         const resp = await fetchWithRetry(url, undefined, logger);
@@ -66,8 +67,10 @@ export async function fetchTargetDepsFor(
         r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date');
     await Promise.all(todo.map(async r => {
         const v = r.updateInfo!.latestVersion;
-        const deps = await fetcher(r.package.name, v, cache, logger);
-        if (deps) { out.set(`${r.package.name}@${v}`, deps); }
+        try {
+            const deps = await fetcher(r.package.name, v, cache, logger);
+            if (deps) { out.set(`${r.package.name}@${v}`, deps); }
+        } catch { /* one failed package must not reject the whole prefetch */ }
     }));
     return out;
 }
@@ -80,7 +83,10 @@ export function parseVersionList(json: unknown): VersionCandidate[] | null {
     for (const v of list as Record<string, any>[]) {
         if (typeof v?.version !== 'string') { continue; }
         const deps = new Map<string, string>();
-        for (const [n, r] of Object.entries(v.pubspec?.dependencies ?? {})) {
+        const rawDeps = v.pubspec?.dependencies;
+        // Guard: Object.entries on a string would yield per-character junk.
+        const entries = rawDeps && typeof rawDeps === 'object' ? Object.entries(rawDeps) : [];
+        for (const [n, r] of entries) {
             if (typeof r === 'string') { deps.set(n, r); }
         }
         out.push({ version: v.version, deps, retracted: v.retracted === true });
@@ -118,8 +124,10 @@ export async function fetchVersionListsFor(
 ): Promise<Map<string, VersionCandidate[]>> {
     const out = new Map<string, VersionCandidate[]>();
     await Promise.all(pkgs.map(async p => {
-        const l = await fetcher(p, cache, logger);
-        if (l) { out.set(p, l); }
+        try {
+            const l = await fetcher(p, cache, logger);
+            if (l) { out.set(p, l); }
+        } catch { /* one failed package must not reject the whole prefetch */ }
     }));
     return out;
 }

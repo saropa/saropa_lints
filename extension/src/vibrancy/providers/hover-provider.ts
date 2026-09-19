@@ -9,7 +9,7 @@ import * as vscode from 'vscode';
 import { escapeMarkdown } from '../../markdownUtils';
 import { VibrancyResult, FamilySplit, PackageInsight, activeFileUsages } from '../types';
 import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
-import { isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
+import { describeUnverified, isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
@@ -188,6 +188,10 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
             }
         } else {
             rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus})${srcNote ? ` — ${srcNote}` : ''} |`);
+            const unverifiedNote = r.blastRadius ? describeUnverified(r.blastRadius) : null;
+            if (unverifiedNote) {
+                rows.push(`| ${l10n('blastRadius.label.upgrade')} | ${escapeMarkdown(unverifiedNote)} |`);
+            }
         }
         if (r.blocker) {
             const detail = formatSharedDepDetail(r.blocker);

@@ -41,7 +41,7 @@ export function parseLockedVersions(lock: string): Map<string, string> {
     for (const line of lock.split(/\r?\n/)) {
         const n = line.match(/^ {2}([\w-]+):\s*$/);
         if (n) { name = n[1]; continue; }
-        const v = line.match(/^ {4}version:\s*"([^"]+)"/);
+        const v = line.match(/^ {4}version:\s*["']?([^"'\s#]+)["']?/);
         if (v && name) { out.set(name, v[1]); }
     }
     return out;

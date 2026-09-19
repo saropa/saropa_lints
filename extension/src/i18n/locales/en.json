@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} needs {dep} {range}; Flutter pins {dep} {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) via {chain}",
+    "unverified": "Upgrade check incomplete: dependency data for {to} could not be fetched",
     "summary": {
       "heldBack": "{pkg} {to} is held back: {reason}",
       "sdkBlocked": "{pkg} {to} is blocked by the SDK: {sdk}",

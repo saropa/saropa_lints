@@ -2886,6 +2886,7 @@
     "sdkBlock": "يحتاج {pkg} {to} إلى {dep} {range}؛ بينما يثبّت Flutter الحزمة {dep} عند {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) عبر {chain}",
+    "unverified": "فحص الترقية غير مكتمل: تعذر جلب بيانات الاعتماديات للإصدار {to}",
     "summary": {
       "heldBack": "{pkg} {to} مؤجَّل: {reason}",
       "sdkBlocked": "{pkg} {to} محظور بسبب SDK: {sdk}",

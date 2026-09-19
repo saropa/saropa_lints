@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} inahitaji {dep} {range}; Flutter inabana {dep} kwenye {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) kupitia {chain}",
+    "unverified": "Ukaguzi wa uboreshaji haujakamilika: data ya utegemezi kwa {to} haikuweza kupatikana",
     "summary": {
       "heldBack": "{pkg} {to} imezuiwa: {reason}",
       "sdkBlocked": "{pkg} {to} imezuiwa na SDK: {sdk}",

@@ -27,11 +27,13 @@ export interface BlastRadiusContext {
     readonly constraints: ConstraintIndex;
     readonly sdkPins?: ReadonlyMap<string, string>;
     readonly heldBack?: readonly HeldBackEntry[];
-    /** Optional: target version's own dependency ranges, when known. */
+    /** `dependency_overrides` package names (see BlastRadiusInput.overrides). */
+    readonly overrides?: ReadonlySet<string>;
     /** Full pubspec.lock name -> version (includes transitives). */
     readonly lockedVersions?: ReadonlyMap<string, string>;
     /** Published releases of a package (for the newest-compatible search). */
     readonly versionsOf?: (pkg: string) => readonly VersionCandidate[] | null;
+    /** Target version's own dependency ranges, when known. */
     readonly targetDepsOf?: (pkg: string, version: string) => ReadonlyMap<string, string> | null;
 }
 
@@ -72,6 +74,7 @@ export function attachBlastRadius<T extends VibrancyResult>(
             sdkPins: ctx.sdkPins ?? SDK_PINNED_PACKAGES,
             heldBack: ctx.heldBack ?? HELD_BACK_UPGRADES,
             lockedVersions,
+            overrides: ctx.overrides,
         };
         const to = r.updateInfo.latestVersion;
         let blastRadius = computeBlastRadius({
@@ -105,6 +108,13 @@ export function describeBlastSummary(b: BlastRadius): string {
     return b.newestCompatible
         ? `${base} ${l10n('blastRadius.summary.newestCompatible', { pkg: b.pkg, version: b.newestCompatible })}`
         : base;
+}
+
+/** Low-key note for a 'safe' verdict reached without the target's dependency data; null otherwise. */
+export function describeUnverified(b: BlastRadius): string | null {
+    return b.verdict === 'safe' && b.unverified
+        ? l10n('blastRadius.unverified', { to: b.to })
+        : null;
 }
 
 /** Localized breaker lines: "name (^12.0.0) via a -> b". */

@@ -14,6 +14,7 @@ import {
     ProblemItem, SuggestionItem,
 } from '../../../vibrancy/providers/problem-tree-items';
 import { VibrancyResult, GitHubMetrics, PubDevPackageInfo, PackageInsight, OverrideAnalysis } from '../../../vibrancy/types';
+import type { BlastRadius } from '../../../vibrancy/scoring/upgrade-blast-radius';
 
 function makeResult(name: string, score: number): VibrancyResult {
     return {
@@ -593,4 +594,21 @@ describe('buildDependencyGroup unique/shared split', () => {
         assert.ok(sharedDesc.includes('a, b, c'));
         assert.ok(sharedDesc.includes('+2'));
     });
+
+describe('buildUpdateGroup unverified blast radius note', () => {
+    it('adds the note only for a safe unverified verdict', () => {
+        const br = (unverified: boolean): BlastRadius => ({
+            pkg: 'http', from: '1.0.0', to: '2.0.0', verdict: 'safe', breakers: [], sdkBlock: null,
+            heldBackReason: null, unverified,
+            summaryKey: 'blastRadius.summary.safe', summaryParams: { pkg: 'http', from: '1.0.0', to: '2.0.0' },
+        });
+        const upd = { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus: 'major' as const, changelog: null };
+        const find = (u: boolean) => buildGroupItems({ ...makeResult('http', 50), updateInfo: upd, blastRadius: br(u) })
+            .find(g => g.label === '⬆️ Update')!.children;
+        const on = find(true);
+        assert.ok(on.some(c => c.description === 'Upgrade check incomplete: dependency data for 2.0.0 could not be fetched'));
+        assert.ok(on.some(c => String(c.label).includes('1.0.0 → 2.0.0')), 'upgrade nudge must remain');
+        assert.ok(!find(false).some(c => String(c.description).includes('Upgrade check incomplete')));
+    });
+});
 });

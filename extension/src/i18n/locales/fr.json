@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} nécessite {dep} {range} ; Flutter fixe {dep} à {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) via {chain}",
+    "unverified": "Vérification de mise à jour incomplète : impossible de récupérer les données de dépendances pour {to}",
     "summary": {
       "heldBack": "{pkg} {to} est retenu : {reason}",
       "sdkBlocked": "{pkg} {to} est bloqué par le SDK : {sdk}",

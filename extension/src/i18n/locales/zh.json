@@ -2886,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} 需要 {dep} {range}；Flutter 将 {dep} 固定为 {pinned}",
     "breaker": "{name}（{constraint}）",
     "breakerVia": "{name}（{constraint}），经由 {chain}",
+    "unverified": "升级检查不完整：无法获取 {to} 的依赖数据",
     "summary": {
       "heldBack": "{pkg} {to} 被暂缓：{reason}",
       "sdkBlocked": "{pkg} {to} 被 SDK 阻止：{sdk}",
@@ -2899,10 +2900,10 @@
   },
   "lifecycle": {
     "note": {
-      "statusMayBeOutdated": "状态可能已过时:记录为已终止维护,但 pub.dev 显示其并未停用,且在过去 12 个月内有发布。",
-      "maintenanceMode": "维护模式:预计仅提供关键修复。",
-      "caution": "注意:依赖此包之前,请先查看已知问题。",
-      "unlisted": "在 pub.dev 上未列出:不显示在搜索结果中;现有用户仍可依赖它。"
+      "statusMayBeOutdated": "状态可能已过时：记录为已终止维护，但 pub.dev 显示其并未停用，且在过去 12 个月内有发布。",
+      "maintenanceMode": "维护模式：预计仅提供关键修复。",
+      "caution": "注意：依赖此包之前，请先查看已知问题。",
+      "unlisted": "在 pub.dev 上未列出：不显示在搜索结果中；现有用户仍可依赖它。"
     },
     "upgradeRequired": {
       "diagnostic": "请升级 {name} — 已安装的版本存在已知问题",

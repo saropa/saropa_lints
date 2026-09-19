@@ -2886,6 +2886,7 @@
     "sdkBlock": "Kailangan ng {pkg} {to} ang {dep} {range}; naka-pin ng Flutter ang {dep} sa {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) sa pamamagitan ng {chain}",
+    "unverified": "Hindi kumpleto ang upgrade check: hindi makuha ang dependency data para sa {to}",
     "summary": {
       "heldBack": "Pinipigilan ang {pkg} {to}: {reason}",
       "sdkBlocked": "Hinaharang ng SDK ang {pkg} {to}: {sdk}",

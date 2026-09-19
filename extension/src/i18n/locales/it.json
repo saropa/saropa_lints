@@ -2876,29 +2876,6 @@
   },
   "blastRadius": {
     "label": {
-      "upgrade": "Aggiornamento",
-      "breaks": "Si rompe",
-      "breaksLower": "si rompe",
-      "upgradeNotRecommended": "⚠️ Aggiornamento sconsigliato"
-    },
-    "notRecommended": "Aggiornamento sconsigliato",
-    "skipReason": "aggiornamento sconsigliato: {summary}",
-    "sdkBlock": "{pkg} {to} richiede {dep} {range}; Flutter fissa {dep} a {pinned}",
-    "breaker": "{name} ({constraint})",
-    "breakerVia": "{name} ({constraint}) tramite {chain}",
-    "summary": {
-      "heldBack": "{pkg} {to} è trattenuto: {reason}",
-      "sdkBlocked": "{pkg} {to} è bloccato dall'SDK: {sdk}",
-      "depCapped": "{pkg} {to} richiede {dep} {range}, ma {dep} è limitato da {cappers}",
-      "depHeldBack": "{pkg} {to} richiede {dep} {range}, che è trattenuto: {reason}",
-      "breaksOne": "{pkg} {to} romperebbe {count} dipendente: {names}",
-      "breaksOther": "{pkg} {to} romperebbe {count} dipendenti: {names}",
-      "safe": "{pkg} {from} -> {to} sembra sicuro",
-      "newestCompatible": "Ultima versione compatibile: {pkg} {version}"
-    }
-  },
-  "blastRadius": {
-    "label": {
       "upgrade": "Aggiorna",
       "breaks": "Rompe",
       "breaksLower": "rompe",
@@ -2909,6 +2886,7 @@
     "sdkBlock": "{pkg} {to} richiede {dep} {range}; Flutter fissa {dep} a {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) tramite {chain}",
+    "unverified": "Controllo dell'aggiornamento incompleto: impossibile recuperare i dati delle dipendenze per {to}",
     "summary": {
       "heldBack": "{pkg} {to} è trattenuto: {reason}",
       "sdkBlocked": "{pkg} {to} è bloccato dall'SDK: {sdk}",
