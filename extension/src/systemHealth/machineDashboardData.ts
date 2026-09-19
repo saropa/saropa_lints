@@ -12,8 +12,12 @@
  * translates its enum into dashboard group keys, so a category rename
  * upstream fails to compile here rather than silently mis-bucketing.
  *
- * **Platform assumption:** all data sources are Windows-only (CIM queries,
- * Ollama CLI). Non-Windows callers receive empty results, never errors.
+ * **Platform assumption:** process/memory queries (Dart processes, system
+ * RAM) are supported on win32/darwin/linux. `ollamaQuery.ts`'s loaded-model
+ * query is cross-platform (plain HTTP + the `ollama` CLI), but
+ * `orphanHosts.ts`'s model-host process scan is genuinely Windows-only
+ * (CIM/taskkill against `llama-server.exe`). Every source degrades to empty
+ * results, never errors, on a platform it does not support.
  */
 import { l10n } from '../i18n/runtime';
 import {

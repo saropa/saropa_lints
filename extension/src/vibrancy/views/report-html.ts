@@ -160,7 +160,7 @@ export function buildReportHtml(options: ReportOptions): string {
          via SMIL <animate>, so no inline style attributes are needed. -->
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
-    <style nonce="${cspNonce}">${getDashboardTokens()}${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}${getPackagesTabsStyles()}${getSettingsTabStyles()}${getFeatureInventoryStyles()}${getOpportunitiesStyles()}${getKnownIssuesEmbedStyles()}</style>
+    <style nonce="${cspNonce}">${getDashboardTokens()}${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}${getPackagesTabsStyles()}${getSettingsTabStyles()}${getFeatureInventoryStyles(true)}${getOpportunitiesStyles()}${getKnownIssuesEmbedStyles()}</style>
 </head>
 <body>
     ${/* PLAN_ext_ui_report_styles.md Pass 1: markup migrated from the local .report-header

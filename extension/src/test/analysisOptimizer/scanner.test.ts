@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { computeFileMetrics } from '../../analysisOptimizer/scanner';
+import { computeFileMetrics, isInDotFolder } from '../../analysisOptimizer/scanner';
 
 // computeFileMetrics drives the exclude-pattern cost estimates shown in
 // the Analysis Optimizer panel, so its widget/async/generated heuristics
@@ -47,5 +47,30 @@ class Foo {
     assert.strictEqual(computeFileMetrics('', 'lib/model.freezed.dart').isGenerated, true);
     assert.strictEqual(computeFileMetrics('', 'lib/model.mocks.dart').isGenerated, true);
     assert.strictEqual(computeFileMetrics('', 'lib/model.dart').isGenerated, false);
+  });
+});
+
+// isInDotFolder mirrors the Dart analyzer's context-root exclusion so the
+// Optimizer's cost estimates and exclusion suggestions match what the
+// analysis server actually analyzes.
+describe('scanner isInDotFolder', () => {
+  it('flags files under agent-tool worktree dot-folders', () => {
+    assert.strictEqual(isInDotFolder('.claude/worktrees/a/lib/x.dart'), true);
+  });
+
+  it('flags files under nested dot-folders like ios/.symlinks', () => {
+    assert.strictEqual(isInDotFolder('ios/.symlinks/plugins/p/lib/x.dart'), true);
+  });
+
+  it('does not flag ordinary paths', () => {
+    assert.strictEqual(isInDotFolder('lib/src/x.dart'), false);
+  });
+
+  it('flags a dot-prefixed file basename', () => {
+    assert.strictEqual(isInDotFolder('lib/.hidden.dart'), true);
+  });
+
+  it('does not flag a file whose name merely contains dots', () => {
+    assert.strictEqual(isInDotFolder('lib/foo.bar.dart'), false);
   });
 });

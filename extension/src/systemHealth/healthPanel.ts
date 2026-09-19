@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
 import { queryDartProcesses, buildSnapshot, killProcess } from './processQuery';
+import { isSystemHealthPlatformSupported } from './processMonitor';
 import { buildHealthPanelHtml } from './healthPanel-html';
 import type { HealthPanelData } from './healthPanel-html';
 import { scanOrphanedHosts, type OrphanHostScan } from './orphanHosts';
@@ -218,10 +219,11 @@ export class HealthPanel implements vscode.Disposable {
   }
 
   private async queryData(): Promise<HealthPanelData | null> {
-    // Process enumeration (queryDartProcesses) shells out to a Windows-only
-    // tool; on other platforms there is no data source, so show the empty
-    // state rather than attempting a query that would just fail.
-    if (process.platform !== 'win32') return null;
+    // Process enumeration (queryDartProcesses) shells out to a platform tool
+    // that only exists for the supported platforms below; anywhere else there
+    // is no data source, so show the empty state rather than attempting a
+    // query that would just fail.
+    if (!isSystemHealthPlatformSupported()) return null;
     const processes = await queryDartProcesses();
     if (processes.length === 0) return null;
     const snapshot = await buildSnapshot(processes);

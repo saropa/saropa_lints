@@ -174,6 +174,38 @@ export function computeRssTrend(samples: readonly number[]): RssTrend {
   return RssTrend.Stable;
 }
 
+/**
+ * Platforms the process/memory queries in this subsystem support.
+ *
+ * Single source of truth for the "is System/Machine Health available here?"
+ * gate — {@link ProcessMonitor.start}, `healthPanel.ts`'s process
+ * enumeration, and `machineDashboard.ts`'s data sources all defer to this
+ * rather than each hard-coding their own platform check, so adding a fourth
+ * supported platform (or dropping one) only ever needs to change here.
+ *
+ * `orphanHosts.ts` (llama-server.exe/taskkill) is a separate, genuinely
+ * Windows-only concern and deliberately keeps its own `win32` check rather
+ * than using this predicate.
+ */
+const SUPPORTED_SYSTEM_HEALTH_PLATFORMS: ReadonlySet<NodeJS.Platform> = new Set([
+  'win32',
+  'darwin',
+  'linux',
+]);
+
+/**
+ * Whether System/Machine Health's process and memory queries support the
+ * given platform (defaults to the current one). Everything else (freebsd,
+ * aix, sunos, …) has no implementation behind `queryDartProcesses` /
+ * `querySystemMemory` and stays gated off rather than attempting a query
+ * that would just fail.
+ */
+export function isSystemHealthPlatformSupported(
+  platform: NodeJS.Platform = process.platform,
+): boolean {
+  return SUPPORTED_SYSTEM_HEALTH_PLATFORMS.has(platform);
+}
+
 export class ProcessMonitor implements vscode.Disposable {
   private timer: ReturnType<typeof setInterval> | undefined;
   private lastNotificationTime = 0;
@@ -206,7 +238,7 @@ export class ProcessMonitor implements vscode.Disposable {
     if (this.disposed) return;
     this.stop();
     const config = readSystemHealthConfig();
-    if (!config.enabled || process.platform !== 'win32') return;
+    if (!config.enabled || !isSystemHealthPlatformSupported()) return;
 
     const pollMs = Math.max(config.pollIntervalSeconds, 10) * 1000;
     this.poll();
@@ -312,8 +344,9 @@ export class ProcessMonitor implements vscode.Disposable {
 
   /**
    * Sample the Node.js extension host process memory via `process.memoryUsage()`.
-   * Cheap (no shell-out, no WMI) and always available — unlike the Dart process
-   * query, this never fails on non-Windows platforms.
+   * Cheap (no shell-out) and always available on every platform Node runs on —
+   * unlike the Dart process query, which depends on a platform-specific tool
+   * being present and can still come back empty.
    */
   private sampleHostMemory(): void {
     const mem = process.memoryUsage();
@@ -337,7 +370,8 @@ export class ProcessMonitor implements vscode.Disposable {
    * configured percentage — independent of which process is responsible.
    * Piggybacks on this class's existing poll timer rather than running its
    * own interval, since the two checks share the same "don't spam" needs and
-   * a second timer would double the PowerShell shell-out cadence for no benefit.
+   * a second timer would double the platform shell-out cadence (PowerShell on
+   * Windows, `vm_stat`/`free` elsewhere) for no benefit.
    */
   private async checkSystemMemory(config: SystemHealthConfig): Promise<void> {
     const now = Date.now();

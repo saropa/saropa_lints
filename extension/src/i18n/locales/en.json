@@ -851,7 +851,7 @@
     "title": "Machine Health",
     "refresh": "Refresh",
     "systemUnknown": "System memory could not be read on this platform.",
-    "platformUnsupported": "Machine Health requires Windows — process queries are not available on this platform.",
+    "platformUnsupported": "Machine Health is not available on this platform — process queries support Windows, macOS and Linux.",
     "freeOf": "free of",
     "used": "used",
     "recommendationsTitle": "Recommendations",

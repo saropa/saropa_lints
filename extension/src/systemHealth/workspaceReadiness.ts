@@ -81,7 +81,7 @@ export async function gatherReadiness(
   hostMemory: ExtensionHostMemory | undefined,
 ): Promise<WorkspaceReadiness> {
   const hazardCount = (await getUncoveredHazards()).length;
-  const missingCount = findMissingExcludes().length;
+  const missingCount = (await findMissingExcludes()).length;
 
   // Check host memory against the configured threshold.
   let hostWarn = false;

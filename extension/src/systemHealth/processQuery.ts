@@ -111,7 +111,7 @@ interface MinimalProcess {
 
 export function queryDartProcesses(): Promise<DartProcessInfo[]> {
   if (process.platform !== 'win32') {
-    return Promise.resolve([]);
+    return queryDartProcessesPosix();
   }
   return new Promise((resolve) => {
     const script =
@@ -139,11 +139,147 @@ export function queryDartProcesses(): Promise<DartProcessInfo[]> {
   });
 }
 
+/**
+ * Executable basenames treated as "a dart process" on POSIX. Deliberately
+ * wider than the Windows filter (dart.exe / dartvm.exe): on macOS/Linux the
+ * analysis server, `flutter test` runs, and AOT-compiled tooling frequently
+ * execute under `dartaotruntime` or `flutter_tester` rather than the plain
+ * `dart`/`dartvm` binary, and those still need to show up for RSS accounting
+ * and orphan detection.
+ */
+const POSIX_DART_IMAGES = new Set(['dart', 'dartvm', 'dartaotruntime', 'flutter_tester']);
+
+// `ps` lstart is a fixed-format "Www Mmm d(d) hh:mm:ss yyyy" string (e.g.
+// "Thu Sep 18 10:15:02 2026" — a single-digit day is space-padded to two
+// columns, e.g. "Fri Sep  8 21:38:25 2026"). Matched explicitly rather than
+// via a plain whitespace split, since the trailing `command` column can
+// itself contain runs of spaces.
+const PS_LSTART_GROUP = '\\S{3}\\s+\\S{3}\\s+\\d{1,2}\\s+\\d{2}:\\d{2}:\\d{2}\\s+\\d{4}';
+
+/**
+ * Parse one line of `ps -o pid=,ppid=,rss=,lstart=,command=` output. Returns
+ * undefined for a line that doesn't match the expected shape (e.g. a stray
+ * blank line). Exported for testing without shelling out to `ps`.
+ *
+ * The three leading numeric columns are right-justified with variable
+ * width, so this can't be a single whitespace split — it consumes them
+ * greedily, then anchors on the fixed-width lstart pattern, leaving
+ * everything after it (which may contain spaces) as the command.
+ */
+export function parsePsProcessLine(
+  line: string,
+): { pid: number; ppid: number; rssKb: number; lstart: string; command: string } | undefined {
+  const pattern = new RegExp(`^\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(${PS_LSTART_GROUP})\\s+(.*)$`);
+  const m = pattern.exec(line);
+  if (!m) return undefined;
+  return { pid: Number(m[1]), ppid: Number(m[2]), rssKb: Number(m[3]), lstart: m[4], command: m[5] };
+}
+
+/**
+ * Convert a `ps` lstart string ("Thu Sep 18 10:15:02 2026") to ISO-8601 so
+ * it round-trips through the same `Date.parse` fallback that already
+ * handles non-CIM date strings in {@link parseCimDate}. Returns '' when the
+ * input can't be parsed, matching the "unknown creation date" contract a
+ * missing Windows CreationDate already has.
+ */
+export function parsePsLstart(lstart: string): string {
+  // Collapse the double space before a single-digit day ("Sep  8") — V8's
+  // Date.parse tolerates it, but normalizing keeps this function's
+  // contract unambiguous rather than relying on engine leniency.
+  const normalized = lstart.replace(/\s+/g, ' ').trim();
+  const ts = Date.parse(normalized);
+  return Number.isNaN(ts) ? '' : new Date(ts).toISOString();
+}
+
+/**
+ * Best-effort basename of a command line's argv[0] (the executable path).
+ * `ps command=` prints the full argv, space-joined with no quoting, so an
+ * argv[0] containing a literal space is indistinguishable from the start of
+ * argv[1] and would mis-split here. Accepted limitation: real Dart/Flutter
+ * SDK install paths do not contain spaces in practice.
+ */
+function argv0Basename(command: string): string {
+  const argv0 = command.trimStart().split(' ', 1)[0] ?? '';
+  const parts = argv0.split('/');
+  return parts[parts.length - 1] ?? '';
+}
+
+/**
+ * Parse the full stdout of `ps -axww -o pid=,ppid=,rss=,lstart=,command=`
+ * into dart processes, filtered to {@link POSIX_DART_IMAGES} by the argv[0]
+ * basename — not a substring match on the full command line, which would
+ * also match unrelated processes run from e.g. a `~/dart-tools/` checkout.
+ * RSS is reported in KB; converted to bytes to match `workingSetSize`
+ * elsewhere. Pure/exported so tests can feed captured `ps` samples.
+ */
+export function parsePsDartProcesses(stdout: string): DartProcessInfo[] {
+  const out: DartProcessInfo[] = [];
+  for (const line of stdout.split('\n')) {
+    if (!line.trim()) continue;
+    const parsed = parsePsProcessLine(line);
+    if (!parsed) continue;
+    if (!POSIX_DART_IMAGES.has(argv0Basename(parsed.command))) continue;
+    out.push({
+      processId: parsed.pid,
+      parentProcessId: parsed.ppid,
+      workingSetSize: parsed.rssKb * 1024,
+      creationDate: parsePsLstart(parsed.lstart),
+      commandLine: parsed.command,
+    });
+  }
+  return out;
+}
+
+function queryDartProcessesPosix(): Promise<DartProcessInfo[]> {
+  return new Promise((resolve) => {
+    // -a: all users' processes, -x: include processes without a controlling
+    // tty, -ww: never truncate the command column. `command` must be last
+    // since it's the only column that can contain spaces.
+    execFile(
+      'ps',
+      ['-axww', '-o', 'pid=,ppid=,rss=,lstart=,command='],
+      { timeout: 15_000, maxBuffer: MAX_BUFFER },
+      (err, stdout) => resolve(err || !stdout.trim() ? [] : parsePsDartProcesses(stdout)),
+    );
+  });
+}
+
+/**
+ * Parse `ps -o pid=,lstart= -p <pid>` output (a single matched process, no
+ * header row). Returns undefined for empty/unparseable output, matching the
+ * "process not found" contract of the CIM path. Exported for testing.
+ */
+export function parsePsSingleProcess(stdout: string): MinimalProcess | undefined {
+  const line = stdout.split('\n').find((l) => l.trim());
+  if (!line) return undefined;
+  const pattern = new RegExp(`^\\s*(\\d+)\\s+(${PS_LSTART_GROUP})\\s*$`);
+  const m = pattern.exec(line);
+  if (!m) return undefined;
+  return { processId: Number(m[1]), creationDate: parsePsLstart(m[2]) };
+}
+
 // Queries the OS process table for a single PID. Returns undefined if
 // the PID does not exist. Used to check whether a daemon's parent is
 // still running — the parent is typically cmd.exe, Code.exe, or
 // node.exe, NOT a dart process, so the dart-only list cannot be used.
 function queryProcessById(pid: number): Promise<MinimalProcess | undefined> {
+  if (process.platform !== 'win32') {
+    // `ps -p <pid>` exits 1 with empty stdout when the pid doesn't exist —
+    // that's an ordinary "not found" outcome here, not an error. Getting
+    // this branch wrong (e.g. omitting a POSIX implementation entirely, as
+    // this function used to) makes every daemon look orphaned on macOS/
+    // Linux: a failed lookup resolves to undefined -> isParentAlive() ->
+    // false for every daemon, which would prompt the user to kill live,
+    // healthy processes.
+    return new Promise((resolve) => {
+      execFile(
+        'ps',
+        ['-o', 'pid=,lstart=', '-p', String(pid)],
+        { timeout: 10_000, maxBuffer: MAX_BUFFER },
+        (err, stdout) => resolve(err || !stdout.trim() ? undefined : parsePsSingleProcess(stdout)),
+      );
+    });
+  }
   return new Promise((resolve) => {
     const script =
       `Get-CimInstance Win32_Process -Filter "ProcessId = ${pid}" ` +
@@ -315,6 +451,14 @@ export function detectMonotonicGrowth(samples: readonly number[]): boolean {
 }
 
 export function killProcess(pid: number): Promise<boolean> {
+  if (process.platform !== 'win32') {
+    try {
+      process.kill(pid, 'SIGKILL');
+      return Promise.resolve(true);
+    } catch {
+      return Promise.resolve(false);
+    }
+  }
   return new Promise((resolve) => {
     execFile(
       'taskkill',

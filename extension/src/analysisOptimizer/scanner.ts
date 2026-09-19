@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import type { FileAnalysisMetrics } from './types';
@@ -15,6 +16,24 @@ const GENERATED_SUFFIXES = [
 
 const CONCURRENCY = 30;
 const RECENT_DAYS = 30;
+
+// Hard cap passed to vscode.workspace.findFiles. Kept as a named constant so
+// the truncation check below stays in sync with the value actually passed.
+const MAX_FILES = 50_000;
+
+// The Dart analysis server never analyzes anything under a dot-folder:
+// analyzer's ContextLocatorImpl skips directories whose name starts with
+// '.' when building context roots, and ContextRootImpl excludes any file
+// with a '.'-prefixed segment between the root and the file. Folders like
+// `.claude/worktrees/*` (agent-tool git worktrees), `.dart_tool/`,
+// `ios/.symlinks/`, and `.fvm/` therefore cost the analyzer nothing, but
+// findFiles would otherwise walk them, burn scan capacity, and skew the
+// "no recent edits" exclusion suggestions. Exported (vscode-free) so it can
+// be unit tested directly.
+export function isInDotFolder(relativePath: string): boolean {
+  const segments = relativePath.split('/');
+  return segments.some(segment => segment.startsWith('.'));
+}
 
 export function computeFileMetrics(
   content: string,
@@ -91,12 +110,24 @@ export async function scanWorkspace(
   progress: vscode.Progress<{ message?: string; increment?: number }>,
   token: vscode.CancellationToken,
 ): Promise<FileAnalysisMetrics[]> {
-  const files = await vscode.workspace.findFiles(
+  const allFiles = await vscode.workspace.findFiles(
     new vscode.RelativePattern(root, '**/*.dart'),
-    '**/build/**',
-    50_000,
+    // Exclude build output and any dot-folder at the glob level so they
+    // don't consume the findFiles cap in the first place.
+    '{**/build/**,**/.*/**}',
+    MAX_FILES,
   );
   if (token.isCancellationRequested) return [];
+
+  if (allFiles.length === MAX_FILES) {
+    const message = `Analysis Optimizer scan hit the ${MAX_FILES.toLocaleString()}-file cap; results are partial.`;
+    progress.report({ message });
+    void vscode.window.showWarningMessage(message);
+  }
+
+  // Belt-and-braces: correctness shouldn't depend on findFiles' glob
+  // semantics matching analyzer's dot-folder exclusion exactly.
+  const files = allFiles.filter(f => !isInDotFolder(path.relative(root, f.fsPath).replace(/\\/g, '/')));
 
   const total = files.length;
   progress.report({ message: `Found ${total} Dart files` });

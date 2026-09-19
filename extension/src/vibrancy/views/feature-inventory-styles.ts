@@ -9,7 +9,31 @@
  * Split out of the renderer purely to keep both files under the size limit.
  */
 
-/** Palette plus base document rules. */
+/**
+ * Palette for the dashboard-embedded panel: resolves through VS Code theme tokens so the tab
+ * follows the editor theme. Status tints are blended off the theme accents (not fixed hex).
+ */
+function getEmbeddedPaletteStyles(): string {
+    return `
+        :root {
+            --fi-bg: var(--vscode-editor-background); --fi-fg: var(--vscode-foreground);
+            --fi-muted: var(--vscode-descriptionForeground); --fi-border: var(--vscode-widget-border, var(--vscode-panel-border));
+            --fi-panel: var(--vscode-editor-inactiveSelectionBackground); --fi-link: var(--vscode-textLink-foreground);
+            --fi-warn-bg: color-mix(in srgb, var(--vscode-editorWarning-foreground) 16%, transparent);
+            --fi-warn-fg: var(--vscode-foreground); --fi-warn-border: var(--vscode-editorWarning-foreground);
+            --fi-unused-bg: color-mix(in srgb, var(--vscode-editorError-foreground) 16%, transparent);
+            --fi-unused-fg: var(--vscode-foreground);
+            --fi-unknown-bg: var(--vscode-editor-inactiveSelectionBackground);
+            --fi-unknown-fg: var(--vscode-descriptionForeground);
+            --fi-adopted-bg: color-mix(in srgb, var(--vscode-testing-iconPassed, var(--vscode-editorInfo-foreground)) 16%, transparent);
+            --fi-adopted-fg: var(--vscode-foreground);
+            --fi-partial-bg: color-mix(in srgb, var(--vscode-editorWarning-foreground) 12%, transparent);
+            --fi-partial-fg: var(--vscode-foreground);
+        }
+    `;
+}
+
+/** Palette plus base document rules (standalone browser report only). */
 function getBaseStyles(): string {
     return `
         :root {
@@ -114,6 +138,11 @@ function getBodyStyles(): string {
 }
 
 /** Full stylesheet, injected once into the report document. */
-export function getFeatureInventoryStyles(): string {
+export function getFeatureInventoryStyles(embedded = false): string {
+    // Embedded in the Package Dashboard webview: the host page owns body/h1/h2/a/code and the
+    // theme, so emitting getBaseStyles() there would paint a white body over the VS Code theme.
+    if (embedded) {
+        return getEmbeddedPaletteStyles() + getHeaderStyles() + getBodyStyles();
+    }
     return getBaseStyles() + getHeaderStyles() + getBodyStyles();
 }
