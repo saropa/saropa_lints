@@ -53,6 +53,7 @@ nul
 # Project management files
 CLAUDE.md
 CHANGELOG_ARCHIVE.md
+changelog/
 articles/
 cspell.json
 

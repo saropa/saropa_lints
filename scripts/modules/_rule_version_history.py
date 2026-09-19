@@ -30,7 +30,7 @@ from typing import Optional
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 RULES_DIR = PROJECT_ROOT / "lib" / "src" / "rules"
 CHANGELOG_PATH = PROJECT_ROOT / "CHANGELOG.md"
-CHANGELOG_ARCHIVE_PATH = PROJECT_ROOT / "CHANGELOG_ARCHIVE.md"
+CHANGELOG_ARCHIVE_DIR = PROJECT_ROOT / "changelog" / "archive"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 CACHE_DIR = REPORTS_DIR / "_cache"
 CACHE_PATH = CACHE_DIR / "rule_version_cache.json"
@@ -229,7 +229,7 @@ def scan_changelogs() -> dict[str, list[ChangelogMention]]:
     """Parse both changelog files for rule name mentions."""
     mentions: dict[str, list[ChangelogMention]] = {}
 
-    for path in (CHANGELOG_PATH, CHANGELOG_ARCHIVE_PATH):
+    for path in (CHANGELOG_PATH, *sorted(CHANGELOG_ARCHIVE_DIR.glob("*.md"))):
         if path.exists():
             file_mentions = _parse_changelog(path)
             for rule_name, rule_mentions in file_mentions.items():
@@ -441,7 +441,7 @@ def _get_commits_touching_rules() -> list[tuple[str, str]]:
     result = subprocess.run(
         [
             "git", "log", "--oneline", "--all",
-            "--", "lib/src/rules/", "CHANGELOG.md", "CHANGELOG_ARCHIVE.md",
+            "--", "lib/src/rules/", "CHANGELOG.md", "CHANGELOG_ARCHIVE.md", "changelog/archive/",
         ],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         cwd=str(PROJECT_ROOT), timeout=60,
@@ -462,7 +462,7 @@ def _get_commit_diff(commit_hash: str) -> str:
         [
             "git", "diff-tree", "-p", "--no-commit-id",
             commit_hash,
-            "--", "lib/src/rules/", "CHANGELOG.md", "CHANGELOG_ARCHIVE.md",
+            "--", "lib/src/rules/", "CHANGELOG.md", "CHANGELOG_ARCHIVE.md", "changelog/archive/",
         ],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         cwd=str(PROJECT_ROOT), timeout=30,

@@ -131,13 +131,15 @@ def process(text: str) -> str:
 
 
 def main() -> int:
-    if not ARCHIVE.exists():
-        print("missing", ARCHIVE, file=sys.stderr)
+    files = sorted((ROOT / "changelog" / "archive").glob("*.md"))
+    if not files:
+        print("missing changelog/archive/*.md", file=sys.stderr)
         return 1
-    data = ARCHIVE.read_text(encoding="utf-8")
-    new_data = process(data)
-    ARCHIVE.write_text(new_data, encoding="utf-8", newline="\n")
-    print("updated", ARCHIVE, len(data), "->", len(new_data))
+    for path in files:
+        data = path.read_text(encoding="utf-8")
+        new_data = process(data)
+        path.write_text(new_data, encoding="utf-8", newline="\n")
+        print("updated", path.name, len(data), "->", len(new_data))
     return 0
 
 
