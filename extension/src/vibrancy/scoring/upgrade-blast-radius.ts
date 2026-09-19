@@ -5,7 +5,7 @@
  * pub.dev's latest is not always adoptable: analyzer 13 needs `meta ^1.18.3`
  * while Flutter stable pins `meta 1.18.0`, and several dependents cap analyzer
  * below 13. Three independent signals are combined, in precedence order
- * held-back > sdk-blocked > breaks-dependents > safe:
+ * held-back > sdk-blocked > dependency-held-back > breaks-dependents > safe:
  *   - a curated held-back entry matching the target version,
  *   - a target dependency range that excludes a version pinned by the SDK,
  *   - dependents whose declared range on the package excludes the target.
@@ -20,7 +20,8 @@ import { ConstraintIndex } from './shared-dep-conflict-detector';
 import { pathToDirectDep } from './constraint-chain';
 import { HeldBackEntry } from './held-back-upgrades';
 
-export type BlastVerdict = 'safe' | 'breaks-dependents' | 'sdk-blocked' | 'held-back';
+export type BlastVerdict =
+    'safe' | 'breaks-dependents' | 'dependency-held-back' | 'sdk-blocked' | 'held-back';
 
 export interface BlastBreaker {
     /** Dependent whose range excludes the target. */
@@ -41,6 +42,8 @@ export interface BlastRadius {
     readonly breakers: readonly BlastBreaker[];
     /** Structured SDK conflict (formatted at the UI edge, see blast-radius-attacher). */
     readonly sdkBlock: SdkBlock | null;
+    /** Target dependency whose required range needs a held-back version. */
+    readonly depHeldBack?: DepHeldBack | null;
     /** Curated maintainer explanation (data, not localized). */
     readonly heldBackReason: string | null;
     /** l10n key of the one-line summary; format with `describeBlastSummary`. */
@@ -58,9 +61,17 @@ export interface SdkBlock {
     readonly pinned: string;
 }
 
+/** A target dependency range that can only be met by a held-back version. */
+export interface DepHeldBack {
+    readonly dep: string;
+    readonly range: string;
+    readonly reason: string;
+}
+
 export type BlastSummaryKey =
     | 'blastRadius.summary.heldBack'
     | 'blastRadius.summary.sdkBlocked'
+    | 'blastRadius.summary.depHeldBack'
     | 'blastRadius.summary.breaksOne'
     | 'blastRadius.summary.breaksOther'
     | 'blastRadius.summary.safe';
@@ -76,6 +87,8 @@ export interface BlastRadiusInput {
     /** Package -> exact version pinned by the SDK. */
     sdkPins: ReadonlyMap<string, string>;
     heldBack: readonly HeldBackEntry[];
+    /** Package -> version currently locked (pubspec.lock); optional. */
+    lockedVersions?: ReadonlyMap<string, string>;
     /** Dependents' latest versions. */
     latestOf?: ReadonlyMap<string, string>;
 }
@@ -123,6 +136,32 @@ function findSdkBlock(
         const pinned = sdkPins.get(dep);
         if (pinned === undefined || !excludes(range, pinned)) { continue; }
         return { pkg, to, dep, range, pinned };
+    }
+    return null;
+}
+
+/**
+ * First target dependency whose range needs a version inside a held-back range
+ * (its minimum lies in the held range) and that the current lock does not
+ * already satisfy. Held-back deps cannot be upgraded, so the range is unmeetable.
+ */
+function findDepHeldBack(
+    targetDeps: ReadonlyMap<string, string> | null,
+    heldBack: readonly HeldBackEntry[],
+    locked: ReadonlyMap<string, string> | undefined,
+): DepHeldBack | null {
+    if (!targetDeps) { return null; }
+    for (const [dep, rawRange] of targetDeps) {
+        const range = parseRange(rawRange);
+        if (!range) { continue; }
+        const lock = locked?.get(dep);
+        const lockV = lock ? toVersion(lock) : null;
+        if (lockV && semver.satisfies(lockV, range, { includePrerelease: true })) { continue; }
+        let min: semver.SemVer | null = null;
+        try { min = semver.minVersion(range); } catch { min = null; }
+        if (!min) { continue; }
+        const entry = findHeldBack(dep, min.version, heldBack);
+        if (entry) { return { dep, range: rawRange.replace(/["']/g, '').trim(), reason: entry.reason }; }
     }
     return null;
 }
@@ -182,6 +221,7 @@ export function computeBlastRadius(input: BlastRadiusInput): BlastRadius {
 
     const held = findHeldBack(pkg, to, input.heldBack);
     const sdkBlock = findSdkBlock(pkg, to, input.targetDeps, input.sdkPins);
+    const depHeld = findDepHeldBack(input.targetDeps, input.heldBack, input.lockedVersions);
     const breakers = findBreakers(input);
 
     const pkgTo = { pkg, to };
@@ -199,6 +239,16 @@ export function computeBlastRadius(input: BlastRadiusInput): BlastRadius {
             heldBackReason: null,
             summaryKey: 'blastRadius.summary.sdkBlocked',
             summaryParams: { ...pkgTo },
+        };
+    }
+    // After sdk-blocked (a hard platform limit) but before dependents: the
+    // package's own requirements are unmeetable, so no dependent fix helps.
+    if (depHeld) {
+        return {
+            ...base, verdict: 'dependency-held-back', breakers, sdkBlock: null,
+            depHeldBack: depHeld, heldBackReason: depHeld.reason,
+            summaryKey: 'blastRadius.summary.depHeldBack',
+            summaryParams: { ...pkgTo, dep: depHeld.dep, range: depHeld.range, reason: depHeld.reason },
         };
     }
     if (breakers.length > 0) {

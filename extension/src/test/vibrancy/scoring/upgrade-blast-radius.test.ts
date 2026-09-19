@@ -210,3 +210,43 @@ describe('computeBlastRadius', () => {
         }
     });
 });
+
+describe('dependency-held-back verdict', () => {
+    const drift = {
+        ...base, pkg: 'drift_dev', from: '2.28.0', to: '2.30.0',
+        targetDeps: new Map([['analyzer', '^13.0.0']]),
+        heldBack: HELD_BACK_UPGRADES,
+    };
+
+    it('blocks drift_dev needing analyzer ^13 when analyzer is held back', () => {
+        const r = computeBlastRadius(drift);
+        assert.strictEqual(r.verdict, 'dependency-held-back');
+        assert.strictEqual(r.summaryKey, 'blastRadius.summary.depHeldBack');
+        assert.strictEqual(r.summaryParams.dep, 'analyzer');
+        assert.strictEqual(r.summaryParams.range, '^13.0.0');
+    });
+
+    it('is safe when analyzer is not held back', () => {
+        assert.strictEqual(computeBlastRadius({ ...drift, heldBack: [] }).verdict, 'safe');
+    });
+
+    it('is safe when the lock already satisfies the range', () => {
+        const r = computeBlastRadius({
+            ...drift, lockedVersions: new Map([['analyzer', '13.2.0']]),
+        });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+
+    it('is safe when the range needs an older analyzer', () => {
+        const r = computeBlastRadius({ ...drift, targetDeps: new Map([['analyzer', '>=12.0.0 <13.0.0']]) });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+
+    it('self held-back outranks it', () => {
+        const r = computeBlastRadius({
+            ...drift,
+            heldBack: [...HELD_BACK_UPGRADES, { pkg: 'drift_dev', range: '>=2.30.0', reason: 'x' }],
+        });
+        assert.strictEqual(r.verdict, 'held-back');
+    });
+});

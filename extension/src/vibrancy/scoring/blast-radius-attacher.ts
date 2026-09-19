@@ -52,6 +52,7 @@ function hasNewerVersion(r: VibrancyResult): boolean {
 export function attachBlastRadius<T extends VibrancyResult>(
     results: readonly T[], ctx: BlastRadiusContext,
 ): T[] {
+    const lockedVersions = new Map(results.map(r => [r.package.name, r.package.version] as const));
     return results.map(r => {
         if (!hasNewerVersion(r) || !r.updateInfo) { return r; }
         const blastRadius = computeBlastRadius({
@@ -63,6 +64,7 @@ export function attachBlastRadius<T extends VibrancyResult>(
             targetDeps: ctx.targetDepsOf?.(r.package.name, r.updateInfo.latestVersion) ?? null,
             sdkPins: ctx.sdkPins ?? SDK_PINNED_PACKAGES,
             heldBack: ctx.heldBack ?? HELD_BACK_UPGRADES,
+            lockedVersions,
         });
         return { ...r, blastRadius };
     });
