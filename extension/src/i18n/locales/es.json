@@ -395,39 +395,12 @@
       "showOverlay": "Mostrar esta superposición de atajos."
     }
   },
-  "consolidated": {
-    "kicker": "Seguridad · Calidad · Seguridad.",
-    "searchPlaceholder": "Reglas de filtro... las reglas del filtro.",
-    "empty": "Todo claro  ⁇ No hay hallazgos.",
-    "liveTitle": "En vivo  ⁇  en directo. actualizaciones a medida que editas.",
-    "fetching": "Traer... traerá ... para traer.",
-    "noOccurrences": "Sin apariciones",
-    "summaryFindings": "{count} hallazgos",
-    "summaryRules": "{count} reglas",
-    "more": "+{count} más y más.",
-    "wordErrors": "errores",
-    "wordWarnings": "advertencias",
-    "wordInfo": "información",
-    "wordFiles": "archivos",
-    "gradeExcellent": "Excelente",
-    "gradeGood": "Buena",
-    "gradeFair": "Aceptable",
-    "gradeWeak": "Débil",
-    "gradeSevere": "Grave",
-    "evidence": {
-      "advisor": "El asesor confirma en el tiempo de ejecución.",
-      "logCapture": "La captura de registro vio {count}."
-    }
-  },
   "dashboards": {
     "lintsConfig": {
       "description": "Nivel: {tier} · Línea: {lane}",
       "descriptionNoLane": "Tier: Nivel de nivel superior, es decir, el nivel que se encuentra por encima del {tier} El hombre de la ciudad"
     },
     "controls": {
-      "analyzerPlugin": "Análisis en vivo",
-      "analyzerPluginDisabled": "Off — escaneo solo al guardar",
-      "analyzerPluginAbsent": "No configurado",
       "laneLight": "Light — ~200 reglas en editor, el resto al guardar",
       "laneFull": "Completo — cada regla habilitada en el editor",
       "migrateLegacyKeys": "Migrar {count} clave(s) de configuración legada",
@@ -468,7 +441,6 @@
       "writeReport": "Escribir Informe"
     },
     "report": {
-      "noWorkspace": "No hay carpeta de espacio de trabajo abierta — no se puede escribir el informe.",
       "noContent": "No hay paquetes con contenido de prompt de IA para escribir.",
       "written": "Informe escrito — ruta copiada al portapapeles: {path}",
       "failed": "Error al escribir el informe de oportunidades: {error}"
@@ -633,36 +605,12 @@
   },
   "toolbar": {
     "runAnalysis": "Ejecutar análisis",
-    "rescan": "Volver a analizar",
-    "refresh": "Actualizar",
     "copyJson": "Copiar JSON",
     "saveReport": "Guardar informe",
     "moreActions": "Más acciones",
-    "clearAll": "Borrar todo",
-    "resetView": "Restablecer vista"
-  },
-  "empty": {
-    "noFindingsTitle": "Sin hallazgos",
-    "noFindingsMessage": "Ejecuta análisis para escanear el espacio de trabajo.",
-    "noFindingsCta": "Ejecutar análisis",
-    "noMatchTitle": "Sin coincidencias",
-    "noMatchMessage": "No hay filas que coincidan con los filtros actuales.",
-    "noMatchCta": "Restablecer filtros",
-    "noProjectTitle": "No hay espacio de trabajo abierto.",
-    "noProjectMessage": "Abra un proyecto Flutter o Dart para ver los resultados.",
-    "noProjectCta": "Abrir carpeta",
-    "noDataTitle": "Todavía no hay datos.",
-    "noDataMessage": "Ejecuta un escaneo para rellenar este tablero.",
-    "noDataCta": "Ejecutar análisis"
+    "clearAll": "Borrar todo"
   },
   "loading": {
-    "thinking": "Pensando... en lo que estoy pensando.",
-    "preparing": "Me estoy preparando... para la preparación.",
-    "checking": "Estoy comprobando...",
-    "fetching": "Traer... traerá ... para traer.",
-    "working": "Trabajar... trabajar.",
-    "scanning": "Escaneando ... escaneando.",
-    "cancel": "Cancelar",
     "runningAnalysis": "Ejecutar análisis ... de ejecución.",
     "analysisComplete": "Análisis completo y completo.",
     "analysisClean": "No se encontraron problemas.",
@@ -670,40 +618,14 @@
     "analysisStartedDetail": "Se inició el análisis. Recogiendo los diagnósticos ...",
     "analysisFailedDetail": "El análisis falló. Compruebe la salida para obtener detalles."
   },
-  "error": {
-    "genericTitle": "Algo salió mal y algo se fue.",
-    "retry": "Reintentar",
-    "reload": "Recargar",
-    "copyDetails": "Copiar detalles",
-    "unreachable": "No se pudo alcanzar {target}.",
-    "partialSummary": "{loaded} de {total} {item} cargado(s). {failed} fallaron.",
-    "partialRetry": "Reintentar fallidos"
-  },
-  "offline": {
-    "banner": "Offline  ⁇  reconectarse para actualizar.",
-    "cachedFooter": "Mostrando datos en caché de {when}.",
-    "reconnecting": "Reconectando... la conexión de nuevo."
-  },
-  "stale": {
-    "statusPill": "Última ejecución exitosa {when}  ⁇  refrescar no pudo."
-  },
   "filter": {
-    "searchPlaceholder": "Buscar... hacer una búsqueda.",
-    "clearSearch": "Borrar búsqueda",
     "activeLabel": "Filtros activos:",
-    "recentLabel": "Recientes ▾",
     "chipRemove": "Quitar"
   },
   "a11y": {
     "toggleFullWidth": "Toggle diseño de ancho completo.",
-    "sortBy": "Ordenado por {column}",
     "expandRow": "Expandir fila",
-    "copyRow": "Copiar fila",
-    "comparisonDimension": "Métrica",
-    "collapseRow": "Contraer fila",
-    "selectAll": "Seleccione todas las filas.",
-    "keyboardShortcuts": "Atajos de teclado para el teclado.",
-    "announcer": "Las actualizaciones para filtrar y ordenar el estado se anuncian aquí."
+    "comparisonDimension": "Métrica"
   },
   "uiLanguage": {
     "pick": {
@@ -788,9 +710,6 @@
       "confirm": "Se encontraron {count} proceso(s) daemon huérfano(s) usando {size}. ¿Matarlos?",
       "killButton": "Matar Orfandos",
       "cancelButton": "Cancelar"
-    },
-    "command": {
-      "killOrphans": "Matar Daemons Flutter Orfanos"
     },
     "orphanPreflight": {
       "found": "Procesos {count} de host de modelo abandonados de una sesión anterior están utilizando {size} de memoria comprometida.",
@@ -901,7 +820,6 @@
     },
     "heapCap": {
       "promptWithRecommendation": "Límite de heap del servidor de análisis en MB. Recomendado para los {totalGb} de este equipo: {recommendedMb} MB.",
-      "prompt": "Límite de memoria heap del servidor de análisis en MB (p. ej. 4096)",
       "invalid": "Ingrese un número entero de megabytes mayor que 0.",
       "applied": "Establecer el límite de memoria del servidor de análisis en {mb} MB. Reinicie el servidor de análisis para que surta efecto.",
       "restartNow": "Reiniciar ahora"
@@ -924,7 +842,6 @@
       "pressureNoShed": "⚠ Presión de memoria ({rssMb} MB)"
     },
     "tooltip": {
-      "shedLevel0": "Presión de memoria: normal",
       "shedLevel1": "Presión de memoria: {count} reglas costosas eliminan (resolución de tipos + alto costo) para reducir RSS",
       "shedLevel2": "Presión de memoria: {count} reglas generan (costosas + INFO severidad)",
       "shedLevel3": "Presión de memoria: {count} reglas eliminan (todo lo no esencial no-ERROR)",
@@ -952,16 +869,12 @@
       "restartTooltip": "Reinicia el servidor de análisis Dart para liberar la presión de memoria y restaurar las reglas de eliminación."
     }
   },
-  "brand": {
-    "prefix": "Saropa "
-  },
   "findingsDash": {
     "pageTitle": "Saropa Tablero de resultados del panel de control.",
     "documentTitle": "Saropa Tablero de resultados del panel de control.",
     "skipToFindings": "Salta a los hallazgos.",
     "secondaryAsideLabel": "Diagnóstico secundario: Es el diagnóstico de enfermedades.",
     "hero": {
-      "productTitle": "El panel de resultados del tablero.",
       "gaugeTitle": "Puntuación de salud {score} (grado {grade}). Los errores pesan más.",
       "gaugePending": "…"
     },
@@ -972,7 +885,6 @@
       "daysAgo": "hace {day} d"
     },
     "status": {
-      "lastRunPrefix": "Última ejecución",
       "updatedPrefix": "Actualizado",
       "refreshHint": "Haga clic para actualizar desde el analizador.",
       "lastRunUnknown": "Última ejecución desconocida.",
@@ -1012,8 +924,7 @@
       "pack": "Paquete(s)"
     },
     "seg": {
-      "toggleSeverityTitle": "Intercambiar {v} severidad de la gravedad.",
-      "toggleImpactTitle": "Toggle {v} impacto de la colisión en el suelo."
+      "toggleSeverityTitle": "Intercambiar {v} severidad de la gravedad."
     },
     "kpi": {
       "visibleLabel": "Hallazgos visibles",
@@ -1055,11 +966,8 @@
       "clearRecentButton": "Borrar",
       "recentFiltersListAria": "Filtros recientes",
       "runAnalysisTitle": "Ejecuta el análisis Saropa Lints.",
-      "refreshViolationsTitle": "Recargar violations.json desde el disco.",
       "severityGroupAria": "Filtro de gravedad",
       "severityLabel": "Gravedad",
-      "impactGroupAria": "Filtro de impacto",
-      "impactLabel": "Impacto",
       "moreSummary": "Más",
       "moreChevron": "▾",
       "copyJsonTitle": "Copia las violaciones filtradas como JSON ({count})",
@@ -1091,9 +999,6 @@
       "cancelButton": "Cancelar",
       "runningLabel": "Auditoría…",
       "runningMeta": "Iniciando la CLI de auditoría...",
-      "completedLabel": "Auditoría completa",
-      "failedLabel": "La auditoría falló",
-      "canceledLabel": "Auditoría cancelada",
       "statusFull": "Mostrando la auditoría del proyecto completo desde {time}",
       "statusChangedRef": "Mostrando archivos modificados vs {ref}, auditados {time}",
       "notRunYet": "Elige un alcance arriba, luego Ejecutar auditoría"
@@ -1101,9 +1006,7 @@
     "chip": {
       "contains": "contiene \"{q}\"",
       "severityOff": "severidad ≠ {v}",
-      "impactOff": "impacto ≠ {v} y el efecto es",
-      "resetAllTitle": "Reinicie todos los filtros.",
-      "removeFilterAria": "Quitar filtro"
+      "resetAllTitle": "Reinicie todos los filtros."
     },
     "menuPalette": {
       "help": "Ayuda",
@@ -1125,7 +1028,6 @@
       "reloadFromDiskTitle": "Re-rendure el tablero desde la última violations.json sin volver a ejecutar el analizador.",
       "reEnableDisabledRules": "Re-activar las reglas deshabilitadas...",
       "reEnableDisabledRulesTitle": "Abra una selección rápida de las reglas actualmente deshabilitadas en analysis_options_custom.yaml y vuelva a habilitar las elegidas.",
-      "reEnableNoneTitle": "No hay reglas actualmente deshabilitado.",
       "reEnableNoneMessage": "Actualmente no hay reglas deshabilitadas a través de analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Re-activar las reglas deshabilitadas.",
       "reEnableQuickPickPlaceholder": "Seleccione una o más reglas para volver a habilitar.",
@@ -1200,7 +1102,6 @@
       "heading": "Distribución",
       "metaClickSlice": "Haga clic en una rebanada para filtrar.",
       "severityMix": "Distribución por gravedad",
-      "impactMix": "Distribución por impacto",
       "filterBarTitle": "Filtrar a {key} sólo para el",
       "donutTotal": "total"
     },
@@ -1276,25 +1177,14 @@
       "foldersSample": "Carpetas (muestra)",
       "filesSample": "Archivos / globos (muestra)",
       "rulesSample": "Reglas (muestra)",
-      "perFileRulesSample": "Reglas por expediente (muestra)",
-      "unknownKind": "Desconocido"
+      "perFileRulesSample": "Reglas por expediente (muestra)"
     },
     "script": {
-      "analysisRunning": "Ejecutar análisis ... de ejecución.",
-      "analysisComplete": "Análisis completo y completo.",
-      "metaRunning": "Esto puede tomar un momento en grandes proyectos.",
-      "metaDone": "Tablero de instrumentos refrescante con los últimos hallazgos.",
-      "announceSearch": "búsqueda {q}",
-      "announceSeverities": "{n} gravedades",
-      "announceImpacts": "{n} impactos",
       "announceCleared": "Todos los filtros limpiados.",
       "announceFiltersPrefix": "Filtros:",
-      "bulkSelected": "{n} seleccionado(s)",
-      "analysisStartedDetail": "Se inició el análisis. Recogiendo los diagnósticos ...",
       "announceStarted": "Análisis iniciado",
       "announceComplete": "Análisis completo y completo.",
       "announceFailed": "Error en el análisis",
-      "analysisFailedDetail": "El análisis falló. Compruebe la salida para obtener detalles.",
       "removeRecentAria": "Quitar",
       "removeRecentTitle": "Quitar",
       "bulkSelectedTpl": "{n} seleccionado(s)",
@@ -1315,12 +1205,7 @@
     },
     "unknownAnalyzerKind": "Desconocido",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} otros hallazgos del analizador.",
-      "otherAnalyzerPromo": "+? otros hallazgos del analizador  ⁇  muestran",
-      "analyzerTodosOn": "+{count} analizador TODOs es el más grande.",
-      "analyzerTodosPromo": "+? analizador TODOs  ⁇  muestra el espectáculo.",
       "scannerPromo": "Habilitar el escáner TODO/HACK para las pruebas de detección.",
-      "tooltipLive": "En vivo desde el panel de problemas VS Code. Actualizaciones a medida que se completa el análisis. Haga clic para ocultar.",
       "tooltipScanner": "Saropa escáner de sistema de archivos  ⁇  cuenta los marcadores abiertos TODO/HACK en el origen.",
       "tooltipPromoClickToOn": "Haga clic para habilitar y activar."
     }
@@ -1354,7 +1239,6 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "Primero abra una carpeta de espacio de trabajo.",
-    "noReportYet": "Todavía no se han reportado violaciones. Ejecuta primero el análisis de Saropa Lints.",
     "clipboardCopyFailed": "No se pudo copiar a la portapapeles.",
     "copiedViolationsJson": "Copiado violación {count} (s) como JSON.",
     "copiedEverythingJson": "Copiado {count} hallazgos sin filtrar al portapapeles.",
@@ -1662,13 +1546,9 @@
     "references": {
       "noImports": "No se detectaron importaciones de archivos fuente.",
       "reExportLine": "{location} (reexportación) Se refiere a las exportaciones.",
-      "reExportSuffix": "(reexportación)",
       "publicApiSurface": "Superficie de API pública  ⁇  al menos un uso es una reexportación.",
       "reExportedBadge": "Reexportado",
-      "openFileReferences": "Abrir referencias de archivos abiertos.",
-      "searchImports": "Buscar importaciones",
-      "fileReferencesHeading": "Referencias de archivos ({count})",
-      "andMore": "... y más {count}."
+      "openFileReferences": "Abrir referencias de archivos abiertos."
     },
     "deps": {
       "noTransitives": "No hay dependencias transitivas.",
@@ -1677,9 +1557,7 @@
       "tooltipDepShared": "• {dep} (compartido) es el número de",
       "tooltipHeader": "{total} deps transitivos se desvanecen en el tiempo.",
       "tooltipHeaderShared": "{total} depósitos transitivos ({shared} compartidos) y también",
-      "sharedBadgeTitle": "{count} compartido con otros paquetes.",
-      "sharedBadge": "compartida",
-      "transitiveDepsHeading": "Dependencias transitivas ({count})"
+      "sharedBadgeTitle": "{count} compartido con otros paquetes."
     },
     "dormancy": {
       "noActivity6mo": "No hay compromisos y no se liberan en 6+ meses.",
@@ -1708,17 +1586,7 @@
       "resolutionVelocity": "Velocidad de resolución.",
       "engagementLevel": "Nivel de participación",
       "popularity": "Popularidad",
-      "publisherTrust": "Confianza del editor",
-      "fixInVersion": "→ fijar en el {version}.",
-      "vulnerabilitiesHeading": "Vulnerabilidades ({count}) Las vulnerabilidades son las que se encuentran en la parte superior de un sistema."
-    },
-    "links": {
-      "heading": "Enlaces",
-      "pubDev": "pub.dev",
-      "changelog": "registro de cambios",
-      "versions": "versiones",
-      "repository": "repositorio",
-      "issues": "incidencias"
+      "publisherTrust": "Confianza del editor"
     }
   },
   "commandCatalog": {
@@ -1726,9 +1594,6 @@
     "skipLink": "Salta al catálogo de comandos.",
     "heroTitle": "Saropa Catálogo de comandos del catálogo",
     "status": {
-      "commands": "{count} comandos",
-      "categories": "{count} categorías",
-      "recent": "{count} reciente(s)",
       "internalHidden": "{count} solo menú contextual (oculto)",
       "wordCommands": "comandos",
       "wordCategories": "categorías",
@@ -1806,7 +1671,6 @@
     "documentTitle": "Saropa Código de la Tabla de Control de Salud",
     "skipToTable": "Salta a las funciones de la tabla.",
     "openWorkspaceFirst": "Abra primero un espacio de trabajo Dart/Flutter.",
-    "scanningTitle": "Código de salud: funciones de escaneo...",
     "scan": {
       "title": "Proyecto de escaneo salud del proyecto.",
       "subtitle": "Leyendo tu código. El tablero de instrumentos se llena a medida que el escaneo aprende más.",
@@ -1864,10 +1728,6 @@
       "gatesFailing": "umbrales fallidos",
       "gatesPassing": "umbrales superados"
     },
-    "gauge": {
-      "tooltip": "La puntuación media {rounded} de 100 (grado {grade}).",
-      "ariaLabel": "El puntaje promedio es {rounded} de 100 puntos."
-    },
     "gate": {
       "fallback": "Las puertas de calidad fallaron  ⁇  revisar los umbrales en la configuración del Código Salud.",
       "failingOne": "{count} puerta fallando — revisa los umbrales o copia el JSON para inspeccionar gates.violations.",
@@ -1906,8 +1766,6 @@
     "table": {
       "ariaLabel": "Las peores funciones por puntaje.",
       "heading": "Peores funciones",
-      "topCount": "parte superior {shown} de {total}",
-      "colGrade": "Nota",
       "colScore": "Puntuación",
       "colFunction": "Función",
       "colFile": "Archivo",
@@ -1919,7 +1777,6 @@
       "noMatch": "No hay funciones que coincidan con los filtros actuales.",
       "resetFiltersTitle": "Borrar la búsqueda y cualquier filtro de bandera activo.",
       "resetFilters": "Restablecer filtros",
-      "hint": "Mostrando las peores 200 funciones por puntaje. Utilice el campo de búsqueda para restringir aún más.",
       "expanderAriaCollapsed": "Mostrar detalles del problema.",
       "expanderAriaExpanded": "Ocultar los detalles del problema.",
       "detailHeading": "Por qué esta función obtuvo {score}.",
@@ -1978,11 +1835,7 @@
     },
     "script": {
       "activeFiltersLabel": "Filtros activos:",
-      "searchChip": "búsqueda: \"{q}\"",
-      "flagChip": "bandera: {flag} El objetivo es",
-      "removeAria": "Eliminar el {key}",
       "clearAll": "Borrar todo",
-      "rowsVisible": "{visible} de {total} filas visibles",
       "neverRun": "nunca ejecutado"
     },
     "freshness": {
@@ -2199,9 +2052,6 @@
     }
   },
   "debug": {
-    "panel": {
-      "title": "Panel de Depuración"
-    },
     "section": {
       "engines": "Motor de Diagnóstico",
       "log": "Registro"
@@ -2211,7 +2061,6 @@
       "scanDaemon": "Escaneo al guardar",
       "lspServer": "Servidor LSP",
       "pid": "PID:",
-      "status": "Estado:",
       "rules": "Reglas:",
       "rss": "RSS:",
       "statusLabel": "Estado:",
@@ -2268,7 +2117,6 @@
       "enginesLabel": "Motor: {count} en ejecución"
     },
     "ci": {
-      "enabled": "CI de saropa_lints escrita en {path}. Revisa el cambio y haz commit: este archivo rige las pull requests de todos los colaboradores, por eso no se confirma por ti.",
       "disableFailed": "No se pudo desactivar la CI: falta {path} o tiene una estructura que Saropa Lints no editará automáticamente. La CI sigue en ejecución. Abre el archivo y desactiva el flujo de trabajo a mano.",
       "openWorkflow": "Abrir flujo de trabajo",
       "openWorkflowFailed": "No se pudo abrir {path}.",
@@ -2667,7 +2515,6 @@
       "upgradeCheckerUpgraded": "Saropa Lints mejorado a {version}.",
       "actionUpgrade": "Actualizar",
       "actionViewChangelog": "Ver registro de cambios",
-      "actionDismiss": "Descartar",
       "healthCodeLensEnabled": "Saropa Mapa de Proyecto calor CodeLens habilitado.",
       "healthCodeLensDisabled": "Saropa Mapa del proyecto calor CodeLens desactivado.",
       "reportViewCopiedPath": "Caminos del informe copiado: {path} El hombre de la ciudad",
@@ -2770,7 +2617,6 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "Último análisis: {ago}",
       "neverRunLabel": "Salud: —",
       "neverRunDescription": "Ejecuta el análisis para ver tu puntaje de salud"
     },

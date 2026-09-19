@@ -395,39 +395,12 @@
       "showOverlay": "Покажите этот краткий путь наложения."
     }
   },
-  "consolidated": {
-    "kicker": "Безопасность · Качество · Безопасность.",
-    "searchPlaceholder": "Правила фильтрации... правила фильтра.",
-    "empty": "Все чисто  ⁇ никаких выводов нет.",
-    "liveTitle": "В прямом эфире  ⁇ обновления по мере редактирования.",
-    "fetching": "Добывать... добывать.",
-    "noOccurrences": "Нет вхождений",
-    "summaryFindings": "{count} находок",
-    "summaryRules": "{count} правил",
-    "more": "+{count} больше, чем",
-    "wordErrors": "ошибок",
-    "wordWarnings": "предупреждений",
-    "wordInfo": "сообщений",
-    "wordFiles": "файлов",
-    "gradeExcellent": "Отлично",
-    "gradeGood": "Хорошо",
-    "gradeFair": "Удовлетворительно",
-    "gradeWeak": "Слабо",
-    "gradeSevere": "Критично",
-    "evidence": {
-      "advisor": "Советник подтверждает на время выполнения.",
-      "logCapture": "Запись журнала снятия увидела {count}."
-    }
-  },
   "dashboards": {
     "lintsConfig": {
       "description": "Уровень: {tier} · Линия: {lane}",
       "descriptionNoLane": "Tier: уровень, который соответствует уровню. {tier} Это - ПХО."
     },
     "controls": {
-      "analyzerPlugin": "Живой анализ",
-      "analyzerPluginDisabled": "Выключено — сканирование только при сохранении",
-      "analyzerPluginAbsent": "Не настроен",
       "laneLight": "Свет — ~200 правил в редакторе, остальные при сохранении",
       "laneFull": "Полный — все включенные правила в редакторе",
       "migrateLegacyKeys": "Переносить ключи {count} устаревшей конфигурации",
@@ -468,7 +441,6 @@
       "writeReport": "Написать отчет"
     },
     "report": {
-      "noWorkspace": "Нет открытой папки рабочей области — невозможно записать отчет.",
       "noContent": "Нет пакетов с содержимым AI-запросов для написания.",
       "written": "Отчет составлен — путь скопирован в буфер обмена: {path}",
       "failed": "Ошибка записи отчета о возможностях: {error}"
@@ -633,36 +605,12 @@
   },
   "toolbar": {
     "runAnalysis": "Запустить анализ",
-    "rescan": "Пересканировать",
-    "refresh": "Обновить",
     "copyJson": "Копировать JSON",
     "saveReport": "Сохранить отчёт",
     "moreActions": "Другие действия",
-    "clearAll": "Очистить всё",
-    "resetView": "Сбросить вид"
-  },
-  "empty": {
-    "noFindingsTitle": "Нет результатов",
-    "noFindingsMessage": "Запустите анализ для сканирования рабочего пространства.",
-    "noFindingsCta": "Запустить анализ",
-    "noMatchTitle": "Нет совпадений",
-    "noMatchMessage": "Никакие строки не совпадают с текущими фильтрами.",
-    "noMatchCta": "Сбросить фильтры",
-    "noProjectTitle": "Нет рабочей зоны открытой.",
-    "noProjectMessage": "Откройте Flutter или Dart проект, чтобы увидеть результаты.",
-    "noProjectCta": "Открыть папку",
-    "noDataTitle": "Пока нет данных.",
-    "noDataMessage": "Запустите сканирование, чтобы заполнить эту панель.",
-    "noDataCta": "Запустить анализ"
+    "clearAll": "Очистить всё"
   },
   "loading": {
-    "thinking": "Думая... думая.",
-    "preparing": "Готовлюсь... к подготовке.",
-    "checking": "Проверяю... проверяю.",
-    "fetching": "Добывать... добывать.",
-    "working": "Работает... работает.",
-    "scanning": "Сканирование... сканирование.",
-    "cancel": "Отмена",
     "runningAnalysis": "Проводя анализ... анализы.",
     "analysisComplete": "Анализ завершен, анализ выполнен.",
     "analysisClean": "Нет проблем.",
@@ -670,40 +618,14 @@
     "analysisStartedDetail": "Начался анализ. Собираю диагностические данные...",
     "analysisFailedDetail": "Анализ не удался. Проверьте выход для деталей."
   },
-  "error": {
-    "genericTitle": "Что-то пошло не так.",
-    "retry": "Повторить",
-    "reload": "Перезагрузить",
-    "copyDetails": "Копировать сведения",
-    "unreachable": "Не удалось достичь {target}.",
-    "partialSummary": "загружено {loaded} из {total} {item}. {failed} с ошибкой.",
-    "partialRetry": "Повторить неудавшиеся"
-  },
-  "offline": {
-    "banner": "В автономном режиме  ⁇  воссоединяется для обновления.",
-    "cachedFooter": "Показаны кэшированные данные от {when}.",
-    "reconnecting": "Пересоединяюсь... пересоединение."
-  },
-  "stale": {
-    "statusPill": "Последний успешный запуск {when}  ⁇  обновление не удалось."
-  },
   "filter": {
-    "searchPlaceholder": "Поиск... поиск.",
-    "clearSearch": "Очистить поиск",
     "activeLabel": "Активные фильтры:",
-    "recentLabel": "Недавние  ⁇  Последние",
     "chipRemove": "Удалить"
   },
   "a11y": {
     "toggleFullWidth": "Переключатель для полной ширины макета Toggle.",
-    "sortBy": "Сортировка по {column}.",
     "expandRow": "Развернуть строку",
-    "copyRow": "Копировать строку",
-    "comparisonDimension": "Метрика",
-    "collapseRow": "Свернуть строку",
-    "selectAll": "Выберите все строки.",
-    "keyboardShortcuts": "Краткие пути к клавиатуре.",
-    "announcer": "Обновления фильтрации и сортировки объявляются здесь."
+    "comparisonDimension": "Метрика"
   },
   "uiLanguage": {
     "pick": {
@@ -788,9 +710,6 @@
       "confirm": "Найдены {count} орфанные д демон процесс(а) с использованием {size}. Убить их?",
       "killButton": "Убить Орфанов",
       "cancelButton": "Отмена"
-    },
-    "command": {
-      "killOrphans": "Убить Орфанные Flutter Демоны"
     },
     "orphanPreflight": {
       "found": "{count} орфанованные модели хост-процессов (процессов) из более ранней сессии держат {size} выделенной памяти.",
@@ -901,7 +820,6 @@
     },
     "heapCap": {
       "promptWithRecommendation": "Предел кучи сервера анализа в МБ. Рекомендуется для {totalGb} этого компьютера: {recommendedMb} МБ.",
-      "prompt": "Анализ сервера кучи в МБ (например, 4096)",
       "invalid": "Введите целое число мегабайт, большее 0.",
       "applied": "Установите лимит кучи анализатора в {mb} МБ. Перезапустите анализатор, чтобы изменения вступили в силу.",
       "restartNow": "Перезапустить сейчас"
@@ -924,7 +842,6 @@
       "pressureNoShed": "⚠ Напряжение памяти ({rssMb} МБ)"
     },
     "tooltip": {
-      "shedLevel0": "Напряжение памяти: нормальное",
       "shedLevel1": "Напряжение памяти: {count} дорогие правила устраняют (разрешение типов + высокая стоимость) для сокращения RSS",
       "shedLevel2": "Напряжение памяти: {count} правил сброс (дорогостоящие + INFO уровень серьёзности)",
       "shedLevel3": "Напряжение памяти: {count} правил удаляют (все необязательные не-ERROR)",
@@ -952,16 +869,12 @@
       "restartTooltip": "Перезапустите сервер анализа Dart для очистки давления на память и восстановления правил."
     }
   },
-  "brand": {
-    "prefix": "Saropa "
-  },
   "findingsDash": {
     "pageTitle": "Saropa Приборная панель результатов.",
     "documentTitle": "Saropa Приборная панель результатов.",
     "skipToFindings": "Перейдите к выводам.",
     "secondaryAsideLabel": "Вторичная диагностика - это вторичная диагнозная система.",
     "hero": {
-      "productTitle": "Находки панели инструментов.",
       "gaugeTitle": "Показатель здоровья {score} (оценка {grade}). Ошибки имеют наибольший вес.",
       "gaugePending": "…"
     },
@@ -972,7 +885,6 @@
       "daysAgo": "{day} д. назад"
     },
     "status": {
-      "lastRunPrefix": "Последний запуск",
       "updatedPrefix": "Обновлено",
       "refreshHint": "Нажмите, чтобы обновить информацию с анализатора.",
       "lastRunUnknown": "Последний пробег неизвестен.",
@@ -1012,8 +924,7 @@
       "pack": "Пакет (ы)"
     },
     "seg": {
-      "toggleSeverityTitle": "Переключатель {v} степень тяжести.",
-      "toggleImpactTitle": "Переключатель {v} воздействие удара."
+      "toggleSeverityTitle": "Переключатель {v} степень тяжести."
     },
     "kpi": {
       "visibleLabel": "Видимые результаты",
@@ -1055,11 +966,8 @@
       "clearRecentButton": "Очистить",
       "recentFiltersListAria": "Недавние фильтры",
       "runAnalysisTitle": "Запустите Saropa Lints анализ.",
-      "refreshViolationsTitle": "Перезагрузить violations.json с диска.",
       "severityGroupAria": "Фильтр по серьёзности",
       "severityLabel": "Серьёзность",
-      "impactGroupAria": "Фильтр по влиянию",
-      "impactLabel": "Влияние",
       "moreSummary": "Ещё",
       "moreChevron": "▾",
       "copyJsonTitle": "Копируйте отфильтрованные нарушения в виде JSON ({count})",
@@ -1091,9 +999,6 @@
       "cancelButton": "Отмена",
       "runningLabel": "Аудит...",
       "runningMeta": "Запуск аудита CLI…",
-      "completedLabel": "Аудит завершен",
-      "failedLabel": "Аудит не пройден",
-      "canceledLabel": "Аудит отменен",
       "statusFull": "Показывает полный аудит проекта из {time}",
       "statusChangedRef": "Показываются измененные файлы по сравнению с {ref}, проверено {time}",
       "notRunYet": "Выберите область выше, затем Запустить аудит"
@@ -1101,9 +1006,7 @@
     "chip": {
       "contains": "содержит \"{q}\"",
       "severityOff": "тяжесть ≠ {v}",
-      "impactOff": "воздействие ≠ {v}",
-      "resetAllTitle": "Сбросьте все фильтры.",
-      "removeFilterAria": "Удалить фильтр"
+      "resetAllTitle": "Сбросьте все фильтры."
     },
     "menuPalette": {
       "help": "Справка",
@@ -1125,7 +1028,6 @@
       "reloadFromDiskTitle": "Переделайте приборную панель с последнего violations.json, не запуская анализер.",
       "reEnableDisabledRules": "Восстановить действие отключенных правил...",
       "reEnableDisabledRulesTitle": "Откройте быстрый выбор правил, которые в настоящее время отключены в analysis_options_custom.yaml и снова включите избранные правила.",
-      "reEnableNoneTitle": "Никаких правил в настоящее время отключены.",
       "reEnableNoneMessage": "В настоящее время правила не отключены через analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Восстановить действие отключенных правил.",
       "reEnableQuickPickPlaceholder": "Выберите одну или несколько правил, чтобы снова включить их.",
@@ -1200,7 +1102,6 @@
       "heading": "Структура",
       "metaClickSlice": "нажмите на кусочек, чтобы отфильтровать.",
       "severityMix": "Структура по серьёзности",
-      "impactMix": "Структура по влиянию",
       "filterBarTitle": "Фильтр только на {key}.",
       "donutTotal": "всего"
     },
@@ -1276,25 +1177,14 @@
       "foldersSample": "Папки (образец) папок",
       "filesSample": "Файлы / глобусы (образец)",
       "rulesSample": "Правила (образец)",
-      "perFileRulesSample": "Правила для каждого файла (образец)",
-      "unknownKind": "Неизвестно"
+      "perFileRulesSample": "Правила для каждого файла (образец)"
     },
     "script": {
-      "analysisRunning": "Проводя анализ... анализы.",
-      "analysisComplete": "Анализ завершен, анализ выполнен.",
-      "metaRunning": "Это может занять некоторое время на крупных проектах.",
-      "metaDone": "Освежающая панель с последними находками.",
-      "announceSearch": "поиск {q}",
-      "announceSeverities": "{n} серьезностей",
-      "announceImpacts": "{n} влияний",
       "announceCleared": "Все фильтры очищены.",
       "announceFiltersPrefix": "Фильтры:",
-      "bulkSelected": "{n} выбрано",
-      "analysisStartedDetail": "Начался анализ. Собираю диагностические данные...",
       "announceStarted": "Анализ запущен",
       "announceComplete": "Анализ завершен, анализ выполнен.",
       "announceFailed": "Ошибка анализа",
-      "analysisFailedDetail": "Анализ не удался. Проверьте выход для деталей.",
       "removeRecentAria": "Удалить",
       "removeRecentTitle": "Удалить",
       "bulkSelectedTpl": "{n} выбрано",
@@ -1315,12 +1205,7 @@
     },
     "unknownAnalyzerKind": "Неизвестно",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} другие результаты анализатора.",
-      "otherAnalyzerPromo": "+? другие результаты анализатора  ⁇  показывают.",
-      "analyzerTodosOn": "+{count} анализатор TODOs",
-      "analyzerTodosPromo": "+? анализатор TODOs  ⁇  показывают показатели.",
       "scannerPromo": "Включить сканер TODO/HACK.",
-      "tooltipLive": "В прямом эфире с панели проблем VS Code. Обновление по мере завершения анализа. Нажмите, чтобы скрыться.",
       "tooltipScanner": "Saropa сканер файловой системы  ⁇  подсчитывает открытые маркеры TODO/HACK в исходном коде.",
       "tooltipPromoClickToOn": "Нажмите, чтобы включить."
     }
@@ -1354,7 +1239,6 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "Сначала откройте папку рабочей зоны.",
-    "noReportYet": "О нарушениях пока не сообщается. Сначала запустите анализ Saropa Lints.",
     "clipboardCopyFailed": "Не удалось скопировать в буфер.",
     "copiedViolationsJson": "Копировано {count} нарушение (ы) как JSON.",
     "copiedEverythingJson": "Скопировано {count} нефильтрованные результаты в буфер обмена.",
@@ -1662,13 +1546,9 @@
     "references": {
       "noImports": "Никаких источников файлов импорта не обнаружено.",
       "reExportLine": "{location} (реэкспорт) - реэкспортировать.",
-      "reExportSuffix": "(реэкспорт)",
       "publicApiSurface": "Общедоступная поверхность API  ⁇  по крайней мере одно использование является реэкспортом.",
       "reExportedBadge": "Реэкспорт",
-      "openFileReferences": "Открыть ссылки на файлы.",
-      "searchImports": "Искать импорты",
-      "fileReferencesHeading": "Ссылки на файлы ({count})",
-      "andMore": "... и {count} больше."
+      "openFileReferences": "Открыть ссылки на файлы."
     },
     "deps": {
       "noTransitives": "Нет переходных зависимостей.",
@@ -1677,9 +1557,7 @@
       "tooltipDepShared": "• {dep} (общий)",
       "tooltipHeader": "{total} переходные депессы.",
       "tooltipHeaderShared": "Переходные отступы {total} (общие {shared})",
-      "sharedBadgeTitle": "{count}, который используется совместно с другими пакетами.",
-      "sharedBadge": "общая",
-      "transitiveDepsHeading": "Переходные зависимости ({count})"
+      "sharedBadgeTitle": "{count}, который используется совместно с другими пакетами."
     },
     "dormancy": {
       "noActivity6mo": "Никаких коммитов и никаких релизов за 6+ месяцев.",
@@ -1708,17 +1586,7 @@
       "resolutionVelocity": "Скорость разрешения Resolution Velocity (скорость разрешение).",
       "engagementLevel": "Уровень вовлечённости",
       "popularity": "Популярность",
-      "publisherTrust": "Доверие к издателю",
-      "fixInVersion": "→ фиксировать в {version}.",
-      "vulnerabilitiesHeading": "Уязвимости ({count})"
-    },
-    "links": {
-      "heading": "Ссылки",
-      "pubDev": "pub.dev",
-      "changelog": "список изменений",
-      "versions": "версии",
-      "repository": "репозиторий",
-      "issues": "issues"
+      "publisherTrust": "Доверие к издателю"
     }
   },
   "commandCatalog": {
@@ -1726,9 +1594,6 @@
     "skipLink": "Перейти в каталог команд Skip to command catalog.",
     "heroTitle": "Saropa Каталог команд каталога",
     "status": {
-      "commands": "{count} команд",
-      "categories": "{count} категорий",
-      "recent": "{count} недавних",
       "internalHidden": "{count} только контекстное меню (скрыто)",
       "wordCommands": "команд",
       "wordCategories": "категорий",
@@ -1806,7 +1671,6 @@
     "documentTitle": "Saropa Код панели управления здоровьем.",
     "skipToTable": "Перейти к функциям таблицы.",
     "openWorkspaceFirst": "Сначала откройте рабочую зону Dart/Flutter.",
-    "scanningTitle": "Код здоровья: функции сканирования...",
     "scan": {
       "title": "Сканирование проекта здоровья.",
       "subtitle": "Читаю ваш код. Приборная панель заполняется по мере того, как сканирование узнает больше.",
@@ -1864,10 +1728,6 @@
       "gatesFailing": "проверок не пройдено",
       "gatesPassing": "проверок пройдено"
     },
-    "gauge": {
-      "tooltip": "Средний балл {rounded} из 100 (класс {grade}).",
-      "ariaLabel": "Средний балл {rounded} из 100"
-    },
     "gate": {
       "fallback": "Качественные ворота не удались  ⁇  пересмотр пороговых значений в настройках Code Health.",
       "failingOne": "{count} шлюз завершился с ошибкой — проверьте пороги или скопируйте JSON для проверки gates.violations.",
@@ -1906,8 +1766,6 @@
     "table": {
       "ariaLabel": "Худшие функции по баллам.",
       "heading": "Худшие функции",
-      "topCount": "верхний {shown} из {total}.",
-      "colGrade": "Оценка",
       "colScore": "Балл",
       "colFunction": "Функция",
       "colFile": "Файл",
@@ -1919,7 +1777,6 @@
       "noMatch": "Никакие функции не соответствуют текущим фильтрам.",
       "resetFiltersTitle": "Очистить поиск и любой активный флаг фильтр.",
       "resetFilters": "Сбросить фильтры",
-      "hint": "Показано худшие 200 функций по баллам. Используйте поле поиска, чтобы сузить поиск.",
       "expanderAriaCollapsed": "Показывать детали проблемы.",
       "expanderAriaExpanded": "Скрыть детали проблемы.",
       "detailHeading": "Почему эта функция набрала {score}?",
@@ -1978,11 +1835,7 @@
     },
     "script": {
       "activeFiltersLabel": "Активные фильтры:",
-      "searchChip": "поиск: \"{q}\"",
-      "flagChip": "флаг: {flag}",
-      "removeAria": "Удалить {key}.",
       "clearAll": "Очистить всё",
-      "rowsVisible": "отображается {visible} из {total} строк",
       "neverRun": "ни разу не запускалось"
     },
     "freshness": {
@@ -2199,9 +2052,6 @@
     }
   },
   "debug": {
-    "panel": {
-      "title": "Панель отладки"
-    },
     "section": {
       "engines": "Диагностические движки",
       "log": "Лог"
@@ -2211,7 +2061,6 @@
       "scanDaemon": "Сканировать при сохранении",
       "lspServer": "LSP Сервер",
       "pid": "PID:",
-      "status": "Статус:",
       "rules": "Правила:",
       "rss": "RSS:",
       "statusLabel": "Статус:",
@@ -2268,7 +2117,6 @@
       "enginesLabel": "Двигатели: {count} работает"
     },
     "ci": {
-      "enabled": "CI для saropa_lints записан в {path}. Проверьте изменение и сделайте коммит — этот файл управляет pull request всех участников, поэтому коммит не создаётся автоматически.",
       "disableFailed": "Не удалось отключить CI: файл {path} отсутствует или имеет структуру, которую Saropa Lints не изменяет автоматически. CI по-прежнему работает. Откройте файл и отключите workflow вручную.",
       "openWorkflow": "Открыть workflow",
       "openWorkflowFailed": "Не удалось открыть {path}.",
@@ -2667,7 +2515,6 @@
       "upgradeCheckerUpgraded": "Saropa Lints обновлен до {version}.",
       "actionUpgrade": "Обновить",
       "actionViewChangelog": "Открыть список изменений",
-      "actionDismiss": "Закрыть",
       "healthCodeLensEnabled": "Saropa Проектная карта тепло CodeLens включен.",
       "healthCodeLensDisabled": "Saropa Карта проекта heat CodeLens отключен.",
       "reportViewCopiedPath": "Копированный путь доклада: {path} Это - ПХО.",
@@ -2770,7 +2617,6 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "Последний анализ: {ago}",
       "neverRunLabel": "Здоровье: —",
       "neverRunDescription": "Запустите анализ, чтобы увидеть ваш рейтинг здоровья"
     },

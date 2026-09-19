@@ -395,39 +395,12 @@
       "showOverlay": "اس شارٹ کٹ اوورلی کو دکھائیں۔"
     }
   },
-  "consolidated": {
-    "kicker": "سیکیورٹی · معیار · حفاظت",
-    "searchPlaceholder": "فلٹر کے قواعد...",
-    "empty": "سب صاف  ⁇ کوئی نتائج نہیں ملے۔",
-    "liveTitle": "لائیو  ⁇ اپ ڈیٹس آپ ترمیم کے طور پر آپ کو ترمیم کرتے وقت.",
-    "fetching": "آڻي رهيو آهي…",
-    "noOccurrences": "کوئی وقوع نہیں",
-    "summaryFindings": "{count} دریافتیں",
-    "summaryRules": "{count} اصول",
-    "more": "+{count} زیادہ سے زیادہ",
-    "wordErrors": "خرابیاں",
-    "wordWarnings": "انتباہات، تنبیہات۔",
-    "wordInfo": "معلومات",
-    "wordFiles": "فائلیں",
-    "gradeExcellent": "بہت عمدہ، بہترین۔",
-    "gradeGood": "اچھا",
-    "gradeFair": "مناسب",
-    "gradeWeak": "کمزور",
-    "gradeSevere": "شدید",
-    "evidence": {
-      "advisor": "مشیر رن ٹائم پر تصدیق کرتا ہے",
-      "logCapture": "لاگ کیپچر نے دیکھا {count}"
-    }
-  },
   "dashboards": {
     "lintsConfig": {
       "description": "ٹائر: {tier} · لین: {lane}",
       "descriptionNoLane": "ٹائر: {tier}"
     },
     "controls": {
-      "analyzerPlugin": "زندگی کی تحلیل",
-      "analyzerPluginDisabled": "آف — سکن سیو کے ساتھ ہی",
-      "analyzerPluginAbsent": "کنفیگر نہیں ہے",
       "laneLight": "ہلکا — ~200 قاعدے ان ڈیٹور میں، باقی ذخیرہ کرنے پر",
       "laneFull": "کامل — ہر ایک ایک سے چالو ہوئے قاعدہ داخلہ میں",
       "migrateLegacyKeys": "{count} میراثی تشکیل کلید کو منتقل کریں",
@@ -468,7 +441,6 @@
       "writeReport": "رپورٹ لکھیں"
     },
     "report": {
-      "noWorkspace": "کوئی ورک سپیس فولڈر کھولی گئی ہے — ڈاکیمینٹ کی رپورٹ لکھنا ممکن نہیں۔",
       "noContent": "کوئی پیکیج ای 1111111111111111111111111111111",
       "written": "رپورٹ تیار کر دی گئی — پہچان کی جانچ کا راستہ کلیپ بورڈ میں کپی کر دیا گیا: {path}",
       "failed": "کامیابی سے مواقع ڈاکument لکھنا ناممکن ہو گیا: {error}"
@@ -633,36 +605,12 @@
   },
   "toolbar": {
     "runAnalysis": "تجزيي هلائو",
-    "rescan": "ٻيهر اسڪين",
-    "refresh": "ريفريش",
     "copyJson": "JSON ڪاپي ڪريو",
     "saveReport": "رپورٽ محفوظ ڪريو",
     "moreActions": "وڌيڪ ايڪشنز",
-    "clearAll": "سڀ صاف ڪريو",
-    "resetView": "منظر ری سیٹ کریں"
-  },
-  "empty": {
-    "noFindingsTitle": "کوئی نتیجہ نہیں",
-    "noFindingsMessage": "ورڪ اسپيس اسڪين ڪرڻ لاءِ تجزيو هلائو.",
-    "noFindingsCta": "تجزيي هلائو",
-    "noMatchTitle": "کوئی مماثلت نہیں",
-    "noMatchMessage": "ڪو به قطار موجوده فلٽرن سان نه ملي.",
-    "noMatchCta": "فلٹرز ری سیٹ کریں",
-    "noProjectTitle": "ڪو ورڪ اسپيس کليل ناهي",
-    "noProjectMessage": "نتيجا ڏسڻ لاءِ Flutter يا Dart پروجيڪٽ کوليو.",
-    "noProjectCta": "فولڊر کوليو",
-    "noDataTitle": "اڃا ڪو ڊيٽا ناهي",
-    "noDataMessage": "هن ڊيش بورڊ کي ڀرڻ لاءِ اسڪين هلائو.",
-    "noDataCta": "تجزيي هلائو"
+    "clearAll": "سڀ صاف ڪريو"
   },
   "loading": {
-    "thinking": "سوچي رهيو آهي…",
-    "preparing": "تياري ٿي رهي آهي…",
-    "checking": "چيڪ ٿي رهيو آهي…",
-    "fetching": "آڻي رهيو آهي…",
-    "working": "ڪم جاري آهي…",
-    "scanning": "اسڪين ٿي رهيو آهي…",
-    "cancel": "منسوخ",
     "runningAnalysis": "تجزیہ چلانے ...",
     "analysisComplete": "تجزیہ مکمل کریں، مکمل کریں.",
     "analysisClean": "مسئلہ نہیں ملا۔",
@@ -670,40 +618,14 @@
     "analysisStartedDetail": "تجزیہ شروع ہوا۔ تشخیصی معلومات جمع کرنا...",
     "analysisFailedDetail": "تجزیہ ناکام ہوگیا۔ تفصیلات کے لئے آؤٹ پٹ چیک کریں۔"
   },
-  "error": {
-    "genericTitle": "ڪجهه غلط ٿي ويو",
-    "retry": "ٻيهر ڪوشش",
-    "reload": "ٻيهر لوڊ ڪريو",
-    "copyDetails": "تفصيل ڪاپي ڪريو",
-    "unreachable": "{target} تائين پهچي نه سگهيو",
-    "partialSummary": "{total} میں سے {loaded} {item} لوڈ ہو گئے۔ {failed} ناکام۔",
-    "partialRetry": "ناکام کو دوبارہ آزمائیں"
-  },
-  "offline": {
-    "banner": "آف لائن — ريفريش لاءِ ٻيهر ڳنڍيو.",
-    "cachedFooter": "{when} جو ڪيش ٿيل ڊيٽا ڏيکاريو پيو وڃي.",
-    "reconnecting": "ٻيهر ڳنڍجي رهيو آهي…"
-  },
-  "stale": {
-    "statusPill": "آخري ڪامياب رن {when} — ريفريش ناڪام"
-  },
   "filter": {
-    "searchPlaceholder": "ڳوليو…",
-    "clearSearch": "ڳولا صاف ڪريو",
     "activeLabel": "فعال فلٽر:",
-    "recentLabel": "تازو ▾",
     "chipRemove": "هٽايو"
   },
   "a11y": {
     "toggleFullWidth": "پوري ويڪر واري لي آئوٽ ٽوگل ڪريو",
-    "sortBy": "{column} موجب ترتيب ڏيو",
     "expandRow": "قطار وڌايو",
-    "copyRow": "قطار کاپی کریں",
-    "comparisonDimension": "میٹرک میٹریک۔",
-    "collapseRow": "قطار سميٽيو",
-    "selectAll": "سڀ قطارون چونڊيو",
-    "keyboardShortcuts": "ڪي بورڊ شارٽ ڪٽس",
-    "announcer": "فلٽر ۽ ترتيب واري حالت جون تازه ڪاريون هتي ٻڌايون وينديون."
+    "comparisonDimension": "میٹرک میٹریک۔"
   },
   "uiLanguage": {
     "pick": {
@@ -788,9 +710,6 @@
       "confirm": "{count} کے ذریعہ {size} سے اُنکے والد پروسس(س) پایا گیا۔ ان کو ہٹ کر دیں؟",
       "killButton": "کل کریکس",
       "cancelButton": "منسوخ"
-    },
-    "command": {
-      "killOrphans": "کل کریکٹر ہیں Flutter ڈیمنز"
     },
     "orphanPreflight": {
       "found": "{count} غائب میڈل ہوس پروسس(ز) پہلی سیشن سے ہیں جو {size} مitted میموری کے حوالے کر رہے ہیں۔",
@@ -901,7 +820,6 @@
     },
     "heapCap": {
       "promptWithRecommendation": "تجزیاتی سرور کی heap حد MB میں۔ اس مشین کے {totalGb} کے لیے تجویز کردہ: {recommendedMb} MB۔",
-      "prompt": "تحلیل سرور ہیپ کی کپ کی سیم (مثلاً 4096)",
       "invalid": "0 سے بڑا ایک ہیلیو بائٹ کی ہول نمبر دیں",
       "applied": "ایکسیلیزیشن سرور کی ہیپ کی کپ کو {mb} MB تک رکھیں۔ اس کا عمل ہونے کے لیے ایکسیلیزیشن سرور کو دوبارہ شروع کریں۔",
       "restartNow": "نیو سٹارٹ"
@@ -924,7 +842,6 @@
       "pressureNoShed": "⚠ ذہنی دباؤ ({rssMb} MB)"
     },
     "tooltip": {
-      "shedLevel0": "یاد کرنے کی دباؤ: نормل /نہ کریں",
       "shedLevel1": "یاد کرنے کی دباؤ: {count} مہنگی قواعد (ٹائپ حل کرنے + اعلی درجہ کی لاگت) کے لئے ہٹا دیں تاکہ RSS",
       "shedLevel2": "یاد کرنے کی دباؤ: {count} قواعد ہٹا دیں (مہنگا + INFO اہمیت)",
       "shedLevel3": "یاد کریں: {count} قواعد (سب غیر ضروری غیر ERROR) کو ہٹا دیں",
@@ -952,16 +869,12 @@
       "restartTooltip": "Dart تحلیل سرور کو دوبارہ شروع کریں تاکہ یادگیری دباؤ کو دور کیا جائے اور شیڈ قواعد بحال کیے جائیں۔"
     }
   },
-  "brand": {
-    "prefix": "Saropa "
-  },
   "findingsDash": {
     "pageTitle": "Saropa نتائج ڈیش بورڈ",
     "documentTitle": "Saropa نتائج ڈیش بورڈ",
     "skipToFindings": "نتائج پر جائیں",
     "secondaryAsideLabel": "ثانوی تشخیصی نظام۔",
     "hero": {
-      "productTitle": "نتائج ڈیش بورڈ",
       "gaugeTitle": "صحت کا اسکور {score} (گریڈ {grade}) ۔ غلطیوں کا وزن سب سے زیادہ ہوتا ہے۔",
       "gaugePending": "…"
     },
@@ -972,7 +885,6 @@
       "daysAgo": "{day} دن قبل"
     },
     "status": {
-      "lastRunPrefix": "آخری بار چلایا",
       "updatedPrefix": "اپ ڈیٹ ہوا",
       "refreshHint": "تجزیہ کار سے تازہ کاری کرنے کے لئے کلک کریں.",
       "lastRunUnknown": "آخری رن نامعلوم نامعلوم",
@@ -1012,8 +924,7 @@
       "pack": "پیک (پیک)"
     },
     "seg": {
-      "toggleSeverityTitle": "ٹوگل {v} شدت کی حد۔",
-      "toggleImpactTitle": "ٹوگل {v} اثر کے اثرات کو تبدیل کریں."
+      "toggleSeverityTitle": "ٹوگل {v} شدت کی حد۔"
     },
     "kpi": {
       "visibleLabel": "نظر آنے والے نتائج",
@@ -1055,11 +966,8 @@
       "clearRecentButton": "صاف کریں",
       "recentFiltersListAria": "حالیہ فلٹرز",
       "runAnalysisTitle": "Saropa Lints تجزیہ چلائیں",
-      "refreshViolationsTitle": "ڈسک سے violations.json دوبارہ لوڈ کریں۔",
       "severityGroupAria": "شدت فلٹر",
       "severityLabel": "شدت کی حد۔",
-      "impactGroupAria": "اثر فلٹر",
-      "impactLabel": "اثر",
       "moreSummary": "مزید",
       "moreChevron": "▾",
       "copyJsonTitle": "JSON ({count}) کے طور پر فلٹر شدہ خلاف ورزیوں کی کاپی کریں",
@@ -1091,9 +999,6 @@
       "cancelButton": "منسوخ",
       "runningLabel": "تحقيق کر رہے ہیں...",
       "runningMeta": "ٹیسٹ کیا جارہا ہے CLI...",
-      "completedLabel": "نگرخانی مکمل",
-      "failedLabel": "آڈٹ ناکام ہو گیا",
-      "canceledLabel": "آڈٹ منسوخ ہو گیا",
       "statusFull": "پورے پروجیکٹ کا آڈٹ دکھانا {time}",
       "statusChangedRef": "فائلیں دکھانا جو تبدیل ہوئی ہیں vs {ref}، جانچا گیا {time}",
       "notRunYet": "اپنی اسکوپ کو اس سے اوپر منتخب کریں، پھر آڈٹ چلائیں"
@@ -1101,9 +1006,7 @@
     "chip": {
       "contains": "\"{q}\" پر مشتمل ہے۔",
       "severityOff": "شدت ≠ {v}",
-      "impactOff": "اثر ≠ {v}",
-      "resetAllTitle": "تمام فلٹرز کو دوبارہ ترتیب دیں۔",
-      "removeFilterAria": "فلٹر ہٹائیں"
+      "resetAllTitle": "تمام فلٹرز کو دوبارہ ترتیب دیں۔"
     },
     "menuPalette": {
       "help": "مدد",
@@ -1125,7 +1028,6 @@
       "reloadFromDiskTitle": "تجزیہ کار کو دوبارہ چلانے کے بغیر آخری violations.json سے ڈیش بورڈ کو دوبارہ پیش کریں۔",
       "reEnableDisabledRules": "غیر فعال قواعد کو دوبارہ قابل بنائیں...",
       "reEnableDisabledRulesTitle": "analysis_options_custom.yaml میں فی الحال غیر فعال قواعد کا ایک فوری انتخاب کھولیں اور منتخب کردہ کو دوبارہ چالو کریں۔",
-      "reEnableNoneTitle": "کوئی قواعد نہیں فی الحال غیر فعال ہے۔",
       "reEnableNoneMessage": "فی الحال کوئی قواعد analysis_options_custom.yaml کے ذریعے غیر فعال نہیں ہیں۔",
       "reEnableQuickPickTitle": "غیر فعال قواعد کو دوبارہ قابل بنائیں۔",
       "reEnableQuickPickPlaceholder": "ایک یا زیادہ قواعد کو دوبارہ فعال کرنے کے لئے منتخب کریں۔",
@@ -1200,7 +1102,6 @@
       "heading": "امتزاج",
       "metaClickSlice": "فلٹر کرنے کے لئے ایک سلائس پر کلک کریں.",
       "severityMix": "شدت کا امتزاج",
-      "impactMix": "اثر کا امتزاج",
       "filterBarTitle": "صرف {key} پر فلٹر کریں۔",
       "donutTotal": "کل"
     },
@@ -1276,25 +1177,14 @@
       "foldersSample": "فولڈرز (نمونہ)",
       "filesSample": "فائلیں / گلوب (نمونہ)",
       "rulesSample": "قواعد (نمونہ)",
-      "perFileRulesSample": "فی فائل قواعد (نمونہ)",
-      "unknownKind": "نامعلوم"
+      "perFileRulesSample": "فی فائل قواعد (نمونہ)"
     },
     "script": {
-      "analysisRunning": "تجزیہ چلانے ...",
-      "analysisComplete": "تجزیہ مکمل کریں، مکمل کریں.",
-      "metaRunning": "یہ بڑے منصوبوں پر ایک لمحہ لگ سکتا ہے.",
-      "metaDone": "تازہ ترین نتائج کے ساتھ ریفریشنگ ڈیش بورڈ۔",
-      "announceSearch": "تلاش {q}",
-      "announceSeverities": "{n} شدتیں",
-      "announceImpacts": "{n} اثرات",
       "announceCleared": "تمام فلٹرز صاف کر دیا گیا",
       "announceFiltersPrefix": "فلٹر: فلٹرز:",
-      "bulkSelected": "{n} منتخب کردہ",
-      "analysisStartedDetail": "تجزیہ شروع ہوا۔ تشخیصی معلومات جمع کرنا...",
       "announceStarted": "تجزیہ شروع ہوا۔",
       "announceComplete": "تجزیہ مکمل کریں، مکمل کریں.",
       "announceFailed": "تجزیہ ناکام ہوگیا",
-      "analysisFailedDetail": "تجزیہ ناکام ہوگیا۔ تفصیلات کے لئے آؤٹ پٹ چیک کریں۔",
       "removeRecentAria": "هٽايو",
       "removeRecentTitle": "هٽايو",
       "bulkSelectedTpl": "{n} منتخب کردہ",
@@ -1315,12 +1205,7 @@
     },
     "unknownAnalyzerKind": "نامعلوم",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} دیگر تجزیہ کار کے نتائج",
-      "otherAnalyzerPromo": "+? دیگر تجزیہ کار کے نتائج  ⁇ شو کے لئے ایک شو۔",
-      "analyzerTodosOn": "+{count} تجزیہ کار TODOs",
-      "analyzerTodosPromo": "+? تجزیہ کار TODOs  ⁇ شو کے لئے ایک شو۔",
       "scannerPromo": "TODO/HACK اسکینر کو فعال کریں۔",
-      "tooltipLive": "VS Code مسائل پینل سے براہ راست. تجزیہ مکمل ہونے پر اپ ڈیٹس۔ چھپانے کے لئے کلک کریں۔",
       "tooltipScanner": "Saropa فائل سسٹم اسکینر  ⁇ ماخذ میں کھلے TODO/HACK مارکرز کی گنتی کرتا ہے۔",
       "tooltipPromoClickToOn": "فعال کرنے کے لئے کلک کریں کو چالو کرنے کے."
     }
@@ -1354,7 +1239,6 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "پہلے ایک ورک اسپیس فولڈر کھولیں۔",
-    "noReportYet": "ابھی تک کوئی خلاف ورزی کی اطلاع نہیں ہے۔ پہلے Saropa Lints تجزیہ چلائیں۔",
     "clipboardCopyFailed": "کلپ بورڈ میں کاپی نہیں کر سکا۔",
     "copiedViolationsJson": "کاپی کیا گیا {count} خلاف ورزیوں کو JSON.as کے طور پر",
     "copiedEverythingJson": "clipboard میں {count} فلٹر کیے گئے نتائج کا کپی کر لیا گیا۔",
@@ -1662,13 +1546,9 @@
     "references": {
       "noImports": "کوئی سورس فائل درآمدات کا پتہ نہیں چلا۔",
       "reExportLine": "{location} (دوبارہ برآمد)",
-      "reExportSuffix": "(دوبارہ برآمد)",
       "publicApiSurface": "عوامی API کی سطح  ⁇ کم از کم ایک استعمال دوبارہ برآمد ہے۔",
       "reExportedBadge": "دوبارہ برآمد شدہ۔",
-      "openFileReferences": "فائل کے حوالوں کو کھولیں",
-      "searchImports": "تلاش کریں درآمدات",
-      "fileReferencesHeading": "فائل حوالہ جات ({count})",
-      "andMore": "... اور {count} مزید"
+      "openFileReferences": "فائل کے حوالوں کو کھولیں"
     },
     "deps": {
       "noTransitives": "کوئی منتقلی انحصار نہیں ہے.",
@@ -1677,9 +1557,7 @@
       "tooltipDepShared": "• {dep} (مشترکہ)",
       "tooltipHeader": "{total} ٹرانزیٹو ڈیپس",
       "tooltipHeaderShared": "{total} ٹرانزیٹو ڈیپس ({shared} مشترکہ)",
-      "sharedBadgeTitle": "{count} دوسرے پیکجوں کے ساتھ اشتراک کیا جاتا ہے",
-      "sharedBadge": "مشترک",
-      "transitiveDepsHeading": "منتقلی کی انحصار ({count})"
+      "sharedBadgeTitle": "{count} دوسرے پیکجوں کے ساتھ اشتراک کیا جاتا ہے"
     },
     "dormancy": {
       "noActivity6mo": "6+ مہینوں میں کوئی کمٹ اور ریلیز نہیں ہوئی۔",
@@ -1708,17 +1586,7 @@
       "resolutionVelocity": "قرارداد کی رفتار:",
       "engagementLevel": "شمولیت کی سطح",
       "popularity": "مقبولیت",
-      "publisherTrust": "پبلشر ٹرسٹ فاؤنڈیشن",
-      "fixInVersion": "→ {version} میں فکس کریں",
-      "vulnerabilitiesHeading": "کمزوریاں ({count})"
-    },
-    "links": {
-      "heading": "لنکس روابط۔",
-      "pubDev": "pub.dev",
-      "changelog": "تبدیلیوں کا لاگ",
-      "versions": "ورژن کی خصوصیات:",
-      "repository": "ریپوزٹری کا ذخیرہ۔",
-      "issues": "مسائل"
+      "publisherTrust": "پبلشر ٹرسٹ فاؤنڈیشن"
     }
   },
   "commandCatalog": {
@@ -1726,9 +1594,6 @@
     "skipLink": "کمانڈ کیٹلاگ پر جائیں۔",
     "heroTitle": "Saropa کمانڈ کیٹلاگ کا کاتالوج۔",
     "status": {
-      "commands": "{count} کمانڈز",
-      "categories": "{count} زمرے",
-      "recent": "{count} حالیہ",
       "internalHidden": "صرف {count} سیاق و سباق مینو (پوشیدہ)",
       "wordCommands": "کمانڈو کمانڈز",
       "wordCategories": "زمرے",
@@ -1806,7 +1671,6 @@
     "documentTitle": "Saropa کوڈ ہیلتھ ڈیش بورڈ",
     "skipToTable": "ٹیبل افعال پر جائیں۔",
     "openWorkspaceFirst": "پہلے ایک Dart/Flutter ورک اسپیس کھولیں۔",
-    "scanningTitle": "کوڈ صحت: صحت اسکیننگ فنکشنز...",
     "scan": {
       "title": "اسکیننگ پروجیکٹ صحت کی صحت",
       "subtitle": "آپ کا کوڈ پڑھ رہا ہے۔ ڈیش بورڈ اسکین کے مزید سیکھنے کے ساتھ ہی بھر جاتا ہے۔",
@@ -1864,10 +1728,6 @@
       "gatesFailing": "ناکام گیٹس",
       "gatesPassing": "کامیاب گیٹس"
     },
-    "gauge": {
-      "tooltip": "اوسط سکور {rounded} 100 (گریڈ {grade}) کا ہے۔",
-      "ariaLabel": "اوسط سکور 100 کے {rounded} کا اوسط اسکور ہے."
-    },
     "gate": {
       "fallback": "کوالٹی گیٹس ناکام  ⁇ کوڈ ہیلتھ کی ترتیبات میں حدوں کا جائزہ لیں.",
       "failingOne": "{count} گیٹ ناکام — حدوں کا جائزہ لیں، یا gates.violations کا معائنہ کرنے کے لیے JSON کاپی کریں۔",
@@ -1906,8 +1766,6 @@
     "table": {
       "ariaLabel": "اسکور کے لحاظ سے بدترین افعال",
       "heading": "بدترین فنکشنز",
-      "topCount": "{total} کے اوپر {shown}",
-      "colGrade": "درجہ",
       "colScore": "اسکور",
       "colFunction": "فنکشن",
       "colFile": "فائل",
@@ -1919,7 +1777,6 @@
       "noMatch": "کوئی فنکشن موجودہ فلٹرز سے مماثل نہیں ہے۔",
       "resetFiltersTitle": "تلاش اور کسی بھی فعال پرچم فلٹر کو صاف کریں۔",
       "resetFilters": "فلٹرز ری سیٹ کریں",
-      "hint": "اسکور کے لحاظ سے بدترین 200 افعال دکھا رہا ہے۔ مزید محدود کرنے کے لئے تلاش کے فیلڈ کا استعمال کریں.",
       "expanderAriaCollapsed": "مسئلہ کی تفصیلات دکھائیں۔",
       "expanderAriaExpanded": "مسئلہ کی تفصیلات چھپائیں۔",
       "detailHeading": "اس فنکشن نے {score} سکور کیوں کیا؟",
@@ -1978,11 +1835,7 @@
     },
     "script": {
       "activeFiltersLabel": "فعال فلٽر:",
-      "searchChip": "تلاش: سرچ کریں \"{q}\"۔ اس کا مطلب ہے کہ",
-      "flagChip": "پرچم: {flag}",
-      "removeAria": "{key} کو ہٹا دیں۔",
       "clearAll": "سڀ صاف ڪريو",
-      "rowsVisible": "{total} میں سے {visible} قطاریں نظر آ رہی ہیں",
       "neverRun": "کبھی نہیں چلایا"
     },
     "freshness": {
@@ -2199,9 +2052,6 @@
     }
   },
   "debug": {
-    "panel": {
-      "title": "ڈیbug پنل"
-    },
     "section": {
       "engines": "دیاگنوسٹک انجنوز",
       "log": "لاگ"
@@ -2211,7 +2061,6 @@
       "scanDaemon": "سکن کریں اور ذخیرہ کریں",
       "lspServer": "LSP سرور",
       "pid": "PID:",
-      "status": "حالة:",
       "rules": "قواعد:",
       "rss": "RSS:",
       "statusLabel": "حالة:",
@@ -2268,7 +2117,6 @@
       "enginesLabel": "انجن: {count} چل رہا ہے۔"
     },
     "ci": {
-      "enabled": "saropa_lints CI {path} میں لکھ دیا گیا۔ تبدیلی کا جائزہ لیں اور کمٹ کریں — یہ فائل ہر شراکت کار کی پل ریکوسٹ پر لاگو ہوتی ہے، اس لیے یہ آپ کے لیے کمٹ نہیں کی جاتی۔",
       "disableFailed": "CI بند نہیں ہو سکا: {path} موجود نہیں یا اس کی ساخت ایسی ہے جسے Saropa Lints خودکار طور پر ایڈٹ نہیں کرے گا۔ CI اب بھی چل رہا ہے۔ فائل کھولیں اور ورک فلو ہاتھ سے غیر فعال کریں۔",
       "openWorkflow": "ورک فلو کھولیں",
       "openWorkflowFailed": "{path} نہیں کھل سکی۔",
@@ -2667,7 +2515,6 @@
       "upgradeCheckerUpgraded": "Saropa Lints کو اپ گریڈ کیا گیا ہے _{version}.",
       "actionUpgrade": "اپ گریڈ",
       "actionViewChangelog": "تبدیلیوں کا لاگ دیکھیں",
-      "actionDismiss": "برطرفی۔",
       "healthCodeLensEnabled": "Saropa پروجیکٹ کا نقشہ heat CodeLens فعال ہے۔",
       "healthCodeLensDisabled": "Saropa پروجیکٹ کا نقشہ ہیٹ کوڈ لینس غیر فعال۔",
       "reportViewCopiedPath": "نقل شدہ رپورٹ کا راستہ: {path}",
@@ -2770,7 +2617,6 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "آخری تجزیہ: {ago}",
       "neverRunLabel": "صحت:-",
       "neverRunDescription": "اپنے ہیلتھ اسکور کو دیکھنے کے لیے تجزیہ چلائیں۔"
     },

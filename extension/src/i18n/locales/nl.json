@@ -395,39 +395,12 @@
       "showOverlay": "Toon deze snelkoppeling overlay."
     }
   },
-  "consolidated": {
-    "kicker": "Veiligheid · Kwaliteit · Beveiliging.",
-    "searchPlaceholder": "Filterregels... filterregels.",
-    "empty": "Alles is veilig  ⁇ geen bevindingen gevonden.",
-    "liveTitle": "Live  ⁇  Leven  ⁇ updates als je bewerkingen maakt.",
-    "fetching": "Ophalen…",
-    "noOccurrences": "Geen voorkomens",
-    "summaryFindings": "{count} bevindingen",
-    "summaryRules": "{count} regels",
-    "more": "+{count} meer meer",
-    "wordErrors": "fouten",
-    "wordWarnings": "waarschuwingen",
-    "wordInfo": "info",
-    "wordFiles": "bestanden",
-    "gradeExcellent": "Uitstekend",
-    "gradeGood": "Goed",
-    "gradeFair": "Redelijk",
-    "gradeWeak": "Zwak",
-    "gradeSevere": "Ernstig",
-    "evidence": {
-      "advisor": "Adviseur bevestigt op runtime.",
-      "logCapture": "Log Capture zag {count}."
-    }
-  },
   "dashboards": {
     "lintsConfig": {
       "description": "Niveau: {tier} · Baan: {lane}",
       "descriptionNoLane": "Tier: de hoogste niveau. {tier} is een PH0__."
     },
     "controls": {
-      "analyzerPlugin": "Live analyse",
-      "analyzerPluginDisabled": "Off — scan bij opslaan alleen",
-      "analyzerPluginAbsent": "Niet geconfigureerd",
       "laneLight": "Light — ~200 regels in-editor, rest op slaan",
       "laneFull": "Volledig — elke ingeschakelde regel in de editor",
       "migrateLegacyKeys": "Migrateer {count} legacy config key(s)",
@@ -468,7 +441,6 @@
       "writeReport": "Rapport opstellen"
     },
     "report": {
-      "noWorkspace": "Geen werkruimte map is open — kan het rapport niet schrijven.",
       "noContent": "Geen pakketten hebben AI prompt inhoud om te schrijven.",
       "written": "Rapport opgesteld — pad gekopieerd naar klembord: {path}",
       "failed": "Mislukt om opportunities rapport te schrijven: {error}"
@@ -633,36 +605,12 @@
   },
   "toolbar": {
     "runAnalysis": "Analyse uitvoeren",
-    "rescan": "Opnieuw scannen",
-    "refresh": "Vernieuwen",
     "copyJson": "JSON kopieren",
     "saveReport": "Rapport opslaan",
     "moreActions": "Meer acties",
-    "clearAll": "Alles wissen",
-    "resetView": "Weergave resetten"
-  },
-  "empty": {
-    "noFindingsTitle": "Geen bevindingen",
-    "noFindingsMessage": "Voer een analyse uit om de werkruimte te scannen.",
-    "noFindingsCta": "Analyse uitvoeren",
-    "noMatchTitle": "Geen overeenkomsten",
-    "noMatchMessage": "Geen rijen komen overeen met de huidige filters.",
-    "noMatchCta": "Filters resetten",
-    "noProjectTitle": "Geen werkruimte geopend",
-    "noProjectMessage": "Open een Flutter- of Dart-project om bevindingen te zien.",
-    "noProjectCta": "Map openen",
-    "noDataTitle": "Nog geen gegevens",
-    "noDataMessage": "Voer een scan uit om dit dashboard te vullen.",
-    "noDataCta": "Analyse uitvoeren"
+    "clearAll": "Alles wissen"
   },
   "loading": {
-    "thinking": "Denken…",
-    "preparing": "Voorbereiden…",
-    "checking": "Controleren…",
-    "fetching": "Ophalen…",
-    "working": "Bezig…",
-    "scanning": "Scannen…",
-    "cancel": "Annuleren",
     "runningAnalysis": "Het uitvoeren van analyses...",
     "analysisComplete": "Analyse compleet analyse afgerond.",
     "analysisClean": "Geen problemen gevonden.",
@@ -670,40 +618,14 @@
     "analysisStartedDetail": "De analyse is gestart. Diagnostiek verzamelen...",
     "analysisFailedDetail": "Analyse mislukt. Controleer de uitgang voor details."
   },
-  "error": {
-    "genericTitle": "Er is iets misgegaan",
-    "retry": "Opnieuw proberen",
-    "reload": "Opnieuw laden",
-    "copyDetails": "Details kopieren",
-    "unreachable": "{target} kon niet worden bereikt",
-    "partialSummary": "{loaded} van {total} {item} geladen. {failed} mislukt.",
-    "partialRetry": "Opnieuw proberen mislukt"
-  },
-  "offline": {
-    "banner": "Offline — maak opnieuw verbinding om te vernieuwen.",
-    "cachedFooter": "Gecachte gegevens van {when} worden getoond.",
-    "reconnecting": "Opnieuw verbinden…"
-  },
-  "stale": {
-    "statusPill": "Laatste succesvolle run {when} — vernieuwen mislukt"
-  },
   "filter": {
-    "searchPlaceholder": "Zoeken…",
-    "clearSearch": "Zoeken wissen",
     "activeLabel": "Actieve filters:",
-    "recentLabel": "Recent ▾",
     "chipRemove": "Verwijderen"
   },
   "a11y": {
     "toggleFullWidth": "Lay-out op volledige breedte in-/uitschakelen",
-    "sortBy": "Sorteren op {column}",
     "expandRow": "Rij uitvouwen",
-    "copyRow": "Rij kopiëren",
-    "comparisonDimension": "Meetwaarde",
-    "collapseRow": "Rij samenvouwen",
-    "selectAll": "Alle rijen selecteren",
-    "keyboardShortcuts": "Sneltoetsen",
-    "announcer": "Updates van filter- en sorteertoestand worden hier aangekondigd."
+    "comparisonDimension": "Meetwaarde"
   },
   "uiLanguage": {
     "pick": {
@@ -788,9 +710,6 @@
       "confirm": "{count} ordeelproces(zen) gevonden met behulp van {size}. Verwijderen?",
       "killButton": "Kil Orphans",
       "cancelButton": "Annuleren"
-    },
-    "command": {
-      "killOrphans": "Kil Orphane Flutter Daemonen"
     },
     "orphanPreflight": {
       "found": "{count} gescheiden model host process(en) van een vroegere sessie houden {size} van gecommitted geheugen.",
@@ -901,7 +820,6 @@
     },
     "heapCap": {
       "promptWithRecommendation": "Heap-limiet van de analyseserver in MB. Aanbevolen voor de {totalGb} van deze computer: {recommendedMb} MB.",
-      "prompt": "Analyseer server heap cap in MB (bijv. 4096)",
       "invalid": "Geef een geheel getal in megabytes dat groter is dan 0.",
       "applied": "Analyseer server heap cap instellen op {mb} MB. Herstart de analyseer server voor het te werken.",
       "restartNow": "Nu opnieuw starten"
@@ -924,7 +842,6 @@
       "pressureNoShed": "⚠ Memory druk ({rssMb} MB)"
     },
     "tooltip": {
-      "shedLevel0": "Memory pressure: normaal",
       "shedLevel1": "Memory pressure: {count} duurzame regels (type-resolver + hoge kosten) verminderen om RSS",
       "shedLevel2": "Memory pressure: {count} regels weergeven (duurzaam + INFO ernst)",
       "shedLevel3": "Memory pressure: {count} regels weggooien (alle niet-essentiële niet-ERROR)",
@@ -952,16 +869,12 @@
       "restartTooltip": "Herstart de Dart analyse-server om geheugenbelasting te verlagen en schaduwregels te herstellen."
     }
   },
-  "brand": {
-    "prefix": "Saropa "
-  },
   "findingsDash": {
     "pageTitle": "Saropa Het bevindingen dashboard.",
     "documentTitle": "Saropa Het bevindingen dashboard.",
     "skipToFindings": "Spring naar de bevindingen.",
     "secondaryAsideLabel": "Secundaire diagnostiek is een tweede diagnose.",
     "hero": {
-      "productTitle": "Het bevindingen dashboard.",
       "gaugeTitle": "Gezondheidscore {score} (graad {grade}). Fouten wegen het zwaarst.",
       "gaugePending": "…"
     },
@@ -972,7 +885,6 @@
       "daysAgo": "{day} d geleden"
     },
     "status": {
-      "lastRunPrefix": "Laatste uitvoering",
       "updatedPrefix": "Bijgewerkt",
       "refreshHint": "Klik om te vernieuwen vanaf de analysator.",
       "lastRunUnknown": "Laatste run onbekend.",
@@ -1012,8 +924,7 @@
       "pack": "Pack(s)"
     },
     "seg": {
-      "toggleSeverityTitle": "Schakel {v} zwaartegraad in.",
-      "toggleImpactTitle": "Schakel {v} impact van de botsing."
+      "toggleSeverityTitle": "Schakel {v} zwaartegraad in."
     },
     "kpi": {
       "visibleLabel": "Zichtbare bevindingen",
@@ -1055,11 +966,8 @@
       "clearRecentButton": "Wissen",
       "recentFiltersListAria": "Recente filters",
       "runAnalysisTitle": "Voer Saropa Lints analyse uit.",
-      "refreshViolationsTitle": "Herlaad violations.json van de schijf.",
       "severityGroupAria": "Ernstfilter",
       "severityLabel": "Ernst",
-      "impactGroupAria": "Impactfilter",
-      "impactLabel": "Impact",
       "moreSummary": "Meer",
       "moreChevron": "▾",
       "copyJsonTitle": "Kopieer gefilterde schendingen als JSON ({count})",
@@ -1091,9 +999,6 @@
       "cancelButton": "Annuleren",
       "runningLabel": "Auditeren…",
       "runningMeta": "Audit CLI starten…",
-      "completedLabel": "Audit volledig",
-      "failedLabel": "Controle mislukt",
-      "canceledLabel": "Controle geannuleerd",
       "statusFull": "Volledige project-audit tonen van {time}",
       "statusChangedRef": "Bestanden weergeven die gewijzigd zijn vs {ref}, beoordeeld {time}",
       "notRunYet": "Kies een scope hierboven, dan Run audit"
@@ -1101,9 +1006,7 @@
     "chip": {
       "contains": "bevat \"{q}\"",
       "severityOff": "de ernst ≠ {v}",
-      "impactOff": "impact ≠ {v}",
-      "resetAllTitle": "Stel alle filters opnieuw in.",
-      "removeFilterAria": "Filter verwijderen"
+      "resetAllTitle": "Stel alle filters opnieuw in."
     },
     "menuPalette": {
       "help": "Help",
@@ -1125,7 +1028,6 @@
       "reloadFromDiskTitle": "Herhaal het dashboard van de laatste violations.json zonder opnieuw te starten met de analysator.",
       "reEnableDisabledRules": "Her-activeren uitgeschakelde regels...",
       "reEnableDisabledRulesTitle": "Open een snelle keuze van de regels die momenteel uitgeschakeld zijn in analysis_options_custom.yaml en activeer opnieuw de gekozen regels.",
-      "reEnableNoneTitle": "Geen regels momenteel uitgeschakeld.",
       "reEnableNoneMessage": "Er zijn momenteel geen regels uitgeschakeld via analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Re-enable deactiveren uitgeschakelde regels.",
       "reEnableQuickPickPlaceholder": "Selecteer een of meer regels om deze opnieuw in te schakelen.",
@@ -1200,7 +1102,6 @@
       "heading": "Verdeling",
       "metaClickSlice": "Klik op een slice om te filteren.",
       "severityMix": "Ernstverdeling",
-      "impactMix": "Impactverdeling",
       "filterBarTitle": "Filter alleen naar {key}.",
       "donutTotal": "totaal"
     },
@@ -1276,25 +1177,14 @@
       "foldersSample": "Mappen (sample)",
       "filesSample": "Bestanden / globs (monster)",
       "rulesSample": "Regels (sample)",
-      "perFileRulesSample": "Per-file regels (sample)",
-      "unknownKind": "Onbekend"
+      "perFileRulesSample": "Per-file regels (sample)"
     },
     "script": {
-      "analysisRunning": "Het uitvoeren van analyses...",
-      "analysisComplete": "Analyse compleet analyse afgerond.",
-      "metaRunning": "Dit kan een tijdje duren bij grote projecten.",
-      "metaDone": "Verfrissend dashboard met de nieuwste bevindingen.",
-      "announceSearch": "zoek {q}",
-      "announceSeverities": "{n} graden van ernst",
-      "announceImpacts": "{n} effecten",
       "announceCleared": "Alle filters zijn schoongemaakt.",
       "announceFiltersPrefix": "Filters:",
-      "bulkSelected": "{n} geselecteerd",
-      "analysisStartedDetail": "De analyse is gestart. Diagnostiek verzamelen...",
       "announceStarted": "Analyse gestart",
       "announceComplete": "Analyse compleet analyse afgerond.",
       "announceFailed": "Analyse mislukt",
-      "analysisFailedDetail": "Analyse mislukt. Controleer de uitgang voor details.",
       "removeRecentAria": "Verwijderen",
       "removeRecentTitle": "Verwijderen",
       "bulkSelectedTpl": "{n} geselecteerd",
@@ -1315,12 +1205,7 @@
     },
     "unknownAnalyzerKind": "Onbekend",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} andere bevindingen van de analysator.",
-      "otherAnalyzerPromo": "+? andere analyser bevindingen  ⁇  tonen",
-      "analyzerTodosOn": "+{count} analysator TODOs",
-      "analyzerTodosPromo": "+? analysator TODO's  ⁇  show",
       "scannerPromo": "Schakel de TODO/HACK scanner in.",
-      "tooltipLive": "Live vanuit het VS Code Problemen paneel. Updates naarmate de analyse is voltooid. Klik om te verbergen.",
       "tooltipScanner": "Saropa bestandssysteem scanner  ⁇  telt open TODO/HACK markers in de bron.",
       "tooltipPromoClickToOn": "Klik om in te schakelen en activeer."
     }
@@ -1354,7 +1239,6 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "Open eerst een werkruimte map.",
-    "noReportYet": "Er zijn nog geen meldingen van overtredingen. Voer eerst Saropa Lints analyse uit.",
     "clipboardCopyFailed": "Kon niet kopiëren naar het klembord.",
     "copiedViolationsJson": "Gekopieerd {count} overtreding (en) als JSON.",
     "copiedEverythingJson": "Gecopieerd {count} ongefilterde resultaten naar het klembord.",
@@ -1662,13 +1546,9 @@
     "references": {
       "noImports": "Geen bronbestand invoer gedetecteerd.",
       "reExportLine": "{location} (heruitvoer)",
-      "reExportSuffix": "(heruitvoer)",
       "publicApiSurface": "Openbare API-oppervlakte  ⁇  ten minste één gebruik is een wederuitvoer.",
       "reExportedBadge": "Heruitgevoerd her-geëxporteerd",
-      "openFileReferences": "Open bestandverwijzingen.",
-      "searchImports": "Imports zoeken",
-      "fileReferencesHeading": "Bestandsverwijzingen ({count})",
-      "andMore": "... en {count} meer."
+      "openFileReferences": "Open bestandverwijzingen."
     },
     "deps": {
       "noTransitives": "Geen transitieve afhankelijkheden.",
@@ -1677,9 +1557,7 @@
       "tooltipDepShared": "• {dep} (gedeeld)",
       "tooltipHeader": "{total} transitieve deps.",
       "tooltipHeaderShared": "{total} transitieve deps ({shared} gedeeld)",
-      "sharedBadgeTitle": "{count} gedeeld met andere pakketten.",
-      "sharedBadge": "gedeeld",
-      "transitiveDepsHeading": "Transitieve afhankelijkheden ({count})"
+      "sharedBadgeTitle": "{count} gedeeld met andere pakketten."
     },
     "dormancy": {
       "noActivity6mo": "Geen commits en geen releases in 6+ maanden.",
@@ -1708,17 +1586,7 @@
       "resolutionVelocity": "Resolutie snelheid",
       "engagementLevel": "Betrokkenheidsniveau",
       "popularity": "Populariteit populariteit",
-      "publisherTrust": "Uitgeverij Trust Trust",
-      "fixInVersion": "→ repareren in {version}",
-      "vulnerabilitiesHeading": "Kwetsbaarheden ({count})"
-    },
-    "links": {
-      "heading": "Links Linken",
-      "pubDev": "pub.dev",
-      "changelog": "changelog",
-      "versions": "versies",
-      "repository": "repository",
-      "issues": "issues"
+      "publisherTrust": "Uitgeverij Trust Trust"
     }
   },
   "commandCatalog": {
@@ -1726,9 +1594,6 @@
     "skipLink": "Skip to command catalogus, gebruik de opdracht om te navigeren naar het bestur",
     "heroTitle": "Saropa Bevelslijst Katalogus",
     "status": {
-      "commands": "{count} opdrachten",
-      "categories": "{count} categorieën",
-      "recent": "{count} recent",
       "internalHidden": "{count} alleen contextmenu (verborgen)",
       "wordCommands": "opdrachten",
       "wordCategories": "categorieën",
@@ -1806,7 +1671,6 @@
     "documentTitle": "Saropa Code Gezondheid Dashboard",
     "skipToTable": "Ga over naar functies van de tabel.",
     "openWorkspaceFirst": "Open eerst een Dart/Flutter werkruimte.",
-    "scanningTitle": "Code Gezondheid: scanning functies...",
     "scan": {
       "title": "Scanning project gezondheidszorg.",
       "subtitle": "Ik lees je code. Het dashboard vult zich aan als de scan meer leert.",
@@ -1864,10 +1728,6 @@
       "gatesFailing": "gates mislukt",
       "gatesPassing": "gates geslaagd"
     },
-    "gauge": {
-      "tooltip": "Gemiddelde score {rounded} van 100 (graad {grade}).",
-      "ariaLabel": "Gemiddelde score {rounded} van 100"
-    },
     "gate": {
       "fallback": "Kwaliteitspoorten mislukten  ⁇  review drempels in Code Health instellingen.",
       "failingOne": "{count} gate faalt — controleer drempelwaarden of kopieer de JSON om gates.violations te inspecteren.",
@@ -1906,8 +1766,6 @@
     "table": {
       "ariaLabel": "Slechtste functies naar score.",
       "heading": "Slechtste functies",
-      "topCount": "top {shown} van de {total}",
-      "colGrade": "Cijfer",
       "colScore": "Score",
       "colFunction": "Functie",
       "colFile": "Bestand",
@@ -1919,7 +1777,6 @@
       "noMatch": "Geen functies passen bij de huidige filters.",
       "resetFiltersTitle": "Verwijder het zoekopdracht en alle actieve vlaggenfilters.",
       "resetFilters": "Filters resetten",
-      "hint": "De slechtste 200 functies per score. Gebruik het zoekveld om verder te beperken.",
       "expanderAriaCollapsed": "Toon details van de kwestie.",
       "expanderAriaExpanded": "Verberg details van de kwestie.",
       "detailHeading": "Waarom deze functie een score van {score} behaalde",
@@ -1978,11 +1835,7 @@
     },
     "script": {
       "activeFiltersLabel": "Actieve filters:",
-      "searchChip": "Zoek: \"{q}\"",
-      "flagChip": "vlag: {flag}",
-      "removeAria": "Verwijder {key}.",
       "clearAll": "Alles wissen",
-      "rowsVisible": "{visible} van {total} rijen zichtbaar",
       "neverRun": "nooit uitgevoerd"
     },
     "freshness": {
@@ -2199,9 +2052,6 @@
     }
   },
   "debug": {
-    "panel": {
-      "title": "Foutopsporingspaneel"
-    },
     "section": {
       "engines": "Diagnostische Engines",
       "log": "Logboek"
@@ -2211,7 +2061,6 @@
       "scanDaemon": "Scan bij opslaan",
       "lspServer": "LSP-server",
       "pid": "PID:",
-      "status": "Status:",
       "rules": "Regels:",
       "rss": "RSS:",
       "statusLabel": "Status:",
@@ -2268,7 +2117,6 @@
       "enginesLabel": "Engines: {count} draait"
     },
     "ci": {
-      "enabled": "saropa_lints CI geschreven naar {path}. Controleer de wijziging en commit hem. Dit bestand bepaalt de pull requests van elke bijdrager, dus het wordt niet voor je gecommit.",
       "disableFailed": "CI kon niet worden uitgezet: {path} ontbreekt of heeft een structuur die Saropa Lints niet automatisch bewerkt. CI draait nog steeds. Open het bestand en schakel de workflow handmatig uit.",
       "openWorkflow": "Workflow openen",
       "openWorkflowFailed": "Kan {path} niet openen.",
@@ -2667,7 +2515,6 @@
       "upgradeCheckerUpgraded": "Saropa Lints is geüpgraded naar {version}.",
       "actionUpgrade": "Upgraden",
       "actionViewChangelog": "Changelog bekijken",
-      "actionDismiss": "Sluiten",
       "healthCodeLensEnabled": "Saropa Project Map heat CodeLens ingeschakeld.",
       "healthCodeLensDisabled": "Saropa Project Map heat CodeLens uitgeschakeld.",
       "reportViewCopiedPath": "Gekopieerd rapport pad: {path} is een PH0__.",
@@ -2770,7 +2617,6 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "Laatste analyse: {ago}",
       "neverRunLabel": "Gezondheid: —",
       "neverRunDescription": "Analyseer uit te voeren om je gezondheids score te zien"
     },

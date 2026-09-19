@@ -395,39 +395,12 @@
       "showOverlay": "Show this shortcut overlay"
     }
   },
-  "consolidated": {
-    "kicker": "Security · Quality",
-    "searchPlaceholder": "Filter rules…",
-    "empty": "All clear — no findings",
-    "liveTitle": "Live — updates as you edit",
-    "fetching": "Fetching…",
-    "noOccurrences": "No occurrences",
-    "summaryFindings": "{count} findings",
-    "summaryRules": "{count} rules",
-    "more": "+{count} more",
-    "wordErrors": "errors",
-    "wordWarnings": "warnings",
-    "wordInfo": "info",
-    "wordFiles": "files",
-    "gradeExcellent": "Excellent",
-    "gradeGood": "Good",
-    "gradeFair": "Fair",
-    "gradeWeak": "Weak",
-    "gradeSevere": "Severe",
-    "evidence": {
-      "advisor": "Advisor confirms at runtime",
-      "logCapture": "Log Capture saw {count}"
-    }
-  },
   "dashboards": {
     "lintsConfig": {
       "description": "Tier: {tier} · Lane: {lane}",
       "descriptionNoLane": "Tier: {tier}"
     },
     "controls": {
-      "analyzerPlugin": "Live analysis",
-      "analyzerPluginDisabled": "Off — scan on save only",
-      "analyzerPluginAbsent": "Not configured",
       "laneLight": "Light — ~200 rules in-editor, rest on save",
       "laneFull": "Full — every enabled rule in-editor",
       "migrateLegacyKeys": "Migrate {count} legacy config key(s)",
@@ -468,7 +441,6 @@
       "writeReport": "Write Report"
     },
     "report": {
-      "noWorkspace": "No workspace folder is open — cannot write the report.",
       "noContent": "No packages have AI prompt content to write.",
       "written": "Report written — path copied to clipboard: {path}",
       "failed": "Failed to write opportunities report: {error}"
@@ -633,36 +605,12 @@
   },
   "toolbar": {
     "runAnalysis": "Run analysis",
-    "rescan": "Rescan",
-    "refresh": "Refresh",
     "copyJson": "Copy JSON",
     "saveReport": "Save report",
     "moreActions": "More actions",
-    "clearAll": "Clear all",
-    "resetView": "Reset view"
-  },
-  "empty": {
-    "noFindingsTitle": "No findings",
-    "noFindingsMessage": "Run analysis to scan the workspace.",
-    "noFindingsCta": "Run analysis",
-    "noMatchTitle": "No matches",
-    "noMatchMessage": "No rows match the current filters.",
-    "noMatchCta": "Reset filters",
-    "noProjectTitle": "No workspace open",
-    "noProjectMessage": "Open a Flutter or Dart project to see findings.",
-    "noProjectCta": "Open folder",
-    "noDataTitle": "No data yet",
-    "noDataMessage": "Run a scan to populate this dashboard.",
-    "noDataCta": "Run analysis"
+    "clearAll": "Clear all"
   },
   "loading": {
-    "thinking": "Thinking…",
-    "preparing": "Preparing…",
-    "checking": "Checking…",
-    "fetching": "Fetching…",
-    "working": "Working…",
-    "scanning": "Scanning…",
-    "cancel": "Cancel",
     "runningAnalysis": "Running analysis…",
     "analysisComplete": "Analysis complete",
     "analysisClean": "No issues found.",
@@ -670,40 +618,14 @@
     "analysisStartedDetail": "Analysis started. Collecting diagnostics…",
     "analysisFailedDetail": "Analysis failed. Check output for details."
   },
-  "error": {
-    "genericTitle": "Something went wrong",
-    "retry": "Retry",
-    "reload": "Reload",
-    "copyDetails": "Copy details",
-    "unreachable": "Could not reach {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
-    "partialRetry": "Retry failed"
-  },
-  "offline": {
-    "banner": "Offline — reconnect to refresh.",
-    "cachedFooter": "Showing cached data from {when}.",
-    "reconnecting": "Reconnecting…"
-  },
-  "stale": {
-    "statusPill": "Last successful run {when} — refresh failed"
-  },
   "filter": {
-    "searchPlaceholder": "Search…",
-    "clearSearch": "Clear search",
     "activeLabel": "Active filters:",
-    "recentLabel": "Recent ▾",
     "chipRemove": "Remove"
   },
   "a11y": {
     "toggleFullWidth": "Toggle full-width layout",
-    "sortBy": "Sort by {column}",
     "expandRow": "Expand row",
-    "copyRow": "Copy row",
-    "comparisonDimension": "Metric",
-    "collapseRow": "Collapse row",
-    "selectAll": "Select all rows",
-    "keyboardShortcuts": "Keyboard shortcuts",
-    "announcer": "Updates to filter and sort state are announced here."
+    "comparisonDimension": "Metric"
   },
   "uiLanguage": {
     "pick": {
@@ -788,9 +710,6 @@
       "confirm": "Found {count} orphaned daemon process(es) using {size}. Kill them?",
       "killButton": "Kill Orphans",
       "cancelButton": "Cancel"
-    },
-    "command": {
-      "killOrphans": "Kill Orphaned Flutter Daemons"
     },
     "orphanPreflight": {
       "found": "{count} orphaned model host process(es) from an earlier session are holding {size} of committed memory.",
@@ -901,7 +820,6 @@
     },
     "heapCap": {
       "promptWithRecommendation": "Analysis server heap cap in MB. Recommended for this machine's {totalGb}: {recommendedMb} MB.",
-      "prompt": "Analysis server heap cap in MB (e.g. 4096)",
       "invalid": "Enter a whole number of megabytes greater than 0.",
       "applied": "Set analysis server heap cap to {mb} MB. Restart the analysis server for it to take effect.",
       "restartNow": "Restart Now"
@@ -924,7 +842,6 @@
       "pressureNoShed": "⚠ Memory pressure ({rssMb} MB)"
     },
     "tooltip": {
-      "shedLevel0": "Memory pressure: normal",
       "shedLevel1": "Memory pressure: {count} expensive rules shed (type-resolving + high-cost) to reduce RSS",
       "shedLevel2": "Memory pressure: {count} rules shed (expensive + INFO severity)",
       "shedLevel3": "Memory pressure: {count} rules shed (all non-essential non-ERROR)",
@@ -952,16 +869,12 @@
       "restartTooltip": "Restart the Dart analysis server to clear memory pressure and restore shed rules."
     }
   },
-  "brand": {
-    "prefix": "Saropa "
-  },
   "findingsDash": {
     "pageTitle": "Saropa Findings Dashboard",
     "documentTitle": "Saropa Findings Dashboard",
     "skipToFindings": "Skip to findings",
     "secondaryAsideLabel": "Secondary diagnostics",
     "hero": {
-      "productTitle": "Findings Dashboard",
       "gaugeTitle": "Health score {score} (grade {grade}). Errors weigh heaviest.",
       "gaugePending": "…"
     },
@@ -972,7 +885,6 @@
       "daysAgo": "{day}d ago"
     },
     "status": {
-      "lastRunPrefix": "Last run",
       "updatedPrefix": "Updated",
       "refreshHint": "Click to refresh from the analyzer",
       "lastRunUnknown": "Last run unknown",
@@ -1012,8 +924,7 @@
       "pack": "Pack(s)"
     },
     "seg": {
-      "toggleSeverityTitle": "Toggle {v} severity",
-      "toggleImpactTitle": "Toggle {v} impact"
+      "toggleSeverityTitle": "Toggle {v} severity"
     },
     "kpi": {
       "visibleLabel": "Visible findings",
@@ -1055,11 +966,8 @@
       "clearRecentButton": "Clear",
       "recentFiltersListAria": "Recent filters",
       "runAnalysisTitle": "Run Saropa Lints analysis",
-      "refreshViolationsTitle": "Reload violations.json from disk",
       "severityGroupAria": "Severity filter",
       "severityLabel": "Severity",
-      "impactGroupAria": "Impact filter",
-      "impactLabel": "Impact",
       "moreSummary": "More",
       "moreChevron": "▾",
       "copyJsonTitle": "Copy filtered violations as JSON ({count})",
@@ -1091,9 +999,6 @@
       "cancelButton": "Cancel",
       "runningLabel": "Auditing…",
       "runningMeta": "Starting the audit CLI…",
-      "completedLabel": "Audit complete",
-      "failedLabel": "Audit failed",
-      "canceledLabel": "Audit canceled",
       "statusFull": "Showing the full-project audit from {time}",
       "statusChangedRef": "Showing files changed vs {ref}, audited {time}",
       "notRunYet": "Choose a scope above, then Run audit"
@@ -1101,9 +1006,7 @@
     "chip": {
       "contains": "contains \"{q}\"",
       "severityOff": "severity ≠ {v}",
-      "impactOff": "impact ≠ {v}",
-      "resetAllTitle": "Reset all filters",
-      "removeFilterAria": "Remove filter"
+      "resetAllTitle": "Reset all filters"
     },
     "menuPalette": {
       "help": "Help",
@@ -1125,7 +1028,6 @@
       "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
       "reEnableDisabledRules": "Re-enable disabled rules…",
       "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
       "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Re-enable disabled rules",
       "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
@@ -1200,7 +1102,6 @@
       "heading": "Mix",
       "metaClickSlice": "click a slice to filter",
       "severityMix": "Severity mix",
-      "impactMix": "Impact mix",
       "filterBarTitle": "Filter to {key} only",
       "donutTotal": "total"
     },
@@ -1276,25 +1177,14 @@
       "foldersSample": "Folders (sample)",
       "filesSample": "Files / globs (sample)",
       "rulesSample": "Rules (sample)",
-      "perFileRulesSample": "Per-file rules (sample)",
-      "unknownKind": "Unknown"
+      "perFileRulesSample": "Per-file rules (sample)"
     },
     "script": {
-      "analysisRunning": "Running analysis…",
-      "analysisComplete": "Analysis complete",
-      "metaRunning": "This can take a moment on large projects.",
-      "metaDone": "Refreshing dashboard with the latest findings.",
-      "announceSearch": "search {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
       "announceCleared": "All filters cleared",
       "announceFiltersPrefix": "Filters:",
-      "bulkSelected": "{n} selected",
-      "analysisStartedDetail": "Analysis started. Collecting diagnostics…",
       "announceStarted": "Analysis started",
       "announceComplete": "Analysis complete",
       "announceFailed": "Analysis failed",
-      "analysisFailedDetail": "Analysis failed. Check output for details.",
       "removeRecentAria": "Remove",
       "removeRecentTitle": "Remove",
       "bulkSelectedTpl": "{n} selected",
@@ -1315,12 +1205,7 @@
     },
     "unknownAnalyzerKind": "Unknown",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
       "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
       "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
       "tooltipPromoClickToOn": "Click to enable"
     }
@@ -1354,7 +1239,6 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "Open a workspace folder first.",
-    "noReportYet": "No violations report yet. Run Saropa Lints analysis first.",
     "clipboardCopyFailed": "Could not copy to clipboard.",
     "copiedViolationsJson": "Copied {count} violation(s) as JSON.",
     "copiedEverythingJson": "Copied {count} unfiltered findings to clipboard.",
@@ -1662,13 +1546,9 @@
     "references": {
       "noImports": "No source file imports detected",
       "reExportLine": "{location} (re-export)",
-      "reExportSuffix": "(re-export)",
       "publicApiSurface": "Public API surface — at least one usage is a re-export.",
       "reExportedBadge": "Re-exported",
-      "openFileReferences": "Open file references",
-      "searchImports": "Search imports",
-      "fileReferencesHeading": "File References ({count})",
-      "andMore": "... and {count} more"
+      "openFileReferences": "Open file references"
     },
     "deps": {
       "noTransitives": "No transitive dependencies",
@@ -1677,9 +1557,7 @@
       "tooltipDepShared": "• {dep} (shared)",
       "tooltipHeader": "{total} transitive deps",
       "tooltipHeaderShared": "{total} transitive deps ({shared} shared)",
-      "sharedBadgeTitle": "{count} shared with other packages",
-      "sharedBadge": "shared",
-      "transitiveDepsHeading": "Transitive Dependencies ({count})"
+      "sharedBadgeTitle": "{count} shared with other packages"
     },
     "dormancy": {
       "noActivity6mo": "No commits and no releases in 6+ months",
@@ -1708,17 +1586,7 @@
       "resolutionVelocity": "Resolution Velocity",
       "engagementLevel": "Engagement Level",
       "popularity": "Popularity",
-      "publisherTrust": "Publisher Trust",
-      "fixInVersion": "→ fix in {version}",
-      "vulnerabilitiesHeading": "Vulnerabilities ({count})"
-    },
-    "links": {
-      "heading": "Links",
-      "pubDev": "pub.dev",
-      "changelog": "changelog",
-      "versions": "versions",
-      "repository": "repository",
-      "issues": "issues"
+      "publisherTrust": "Publisher Trust"
     }
   },
   "commandCatalog": {
@@ -1726,9 +1594,6 @@
     "skipLink": "Skip to command catalog",
     "heroTitle": "Saropa Command Catalog",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
       "internalHidden": "{count} context-menu only (hidden)",
       "wordCommands": "commands",
       "wordCategories": "categories",
@@ -1806,7 +1671,6 @@
     "documentTitle": "Saropa Code Health Dashboard",
     "skipToTable": "Skip to functions table",
     "openWorkspaceFirst": "Open a Dart/Flutter workspace first.",
-    "scanningTitle": "Code Health: scanning functions…",
     "scan": {
       "title": "Scanning project health",
       "subtitle": "Reading your code. The dashboard fills in as the scan learns more.",
@@ -1864,10 +1728,6 @@
       "gatesFailing": "gates failing",
       "gatesPassing": "gates passing"
     },
-    "gauge": {
-      "tooltip": "Average score {rounded} of 100 (grade {grade}).",
-      "ariaLabel": "Average score {rounded} of 100"
-    },
     "gate": {
       "fallback": "Quality gates failed — review thresholds in Code Health settings.",
       "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
@@ -1906,8 +1766,6 @@
     "table": {
       "ariaLabel": "Worst functions by score",
       "heading": "Worst functions",
-      "topCount": "top {shown} of {total}",
-      "colGrade": "Grade",
       "colScore": "Score",
       "colFunction": "Function",
       "colFile": "File",
@@ -1919,7 +1777,6 @@
       "noMatch": "No functions match the current filters.",
       "resetFiltersTitle": "Clear the search and any active flag filter.",
       "resetFilters": "Reset filters",
-      "hint": "Showing the worst 200 functions by score. Use the search field to narrow further.",
       "expanderAriaCollapsed": "Show issue details",
       "expanderAriaExpanded": "Hide issue details",
       "detailHeading": "Why this function scored {score}",
@@ -1978,11 +1835,7 @@
     },
     "script": {
       "activeFiltersLabel": "Active filters:",
-      "searchChip": "search: \"{q}\"",
-      "flagChip": "flag: {flag}",
-      "removeAria": "Remove {key}",
       "clearAll": "Clear all",
-      "rowsVisible": "{visible} of {total} rows visible",
       "neverRun": "never run"
     },
     "freshness": {
@@ -2199,9 +2052,6 @@
     }
   },
   "debug": {
-    "panel": {
-      "title": "Debug Panel"
-    },
     "section": {
       "engines": "Diagnostic Engines",
       "log": "Log"
@@ -2211,7 +2061,6 @@
       "scanDaemon": "Scan on Save",
       "lspServer": "LSP Server",
       "pid": "PID:",
-      "status": "Status:",
       "rules": "Rules:",
       "rss": "RSS:",
       "statusLabel": "Status:",
@@ -2268,7 +2117,6 @@
       "enginesLabel": "Engines: {count} running"
     },
     "ci": {
-      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
       "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
       "openWorkflow": "Open workflow",
       "openWorkflowFailed": "Could not open {path}.",
@@ -2667,7 +2515,6 @@
       "upgradeCheckerUpgraded": "Saropa Lints upgraded to {version}.",
       "actionUpgrade": "Upgrade",
       "actionViewChangelog": "View Changelog",
-      "actionDismiss": "Dismiss",
       "healthCodeLensEnabled": "Saropa Project Map heat CodeLens enabled.",
       "healthCodeLensDisabled": "Saropa Project Map heat CodeLens disabled.",
       "reportViewCopiedPath": "Copied report path: {path}",
@@ -2770,7 +2617,6 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "Last analysis: {ago}",
       "neverRunLabel": "Health: —",
       "neverRunDescription": "Run analysis to see your health score"
     },

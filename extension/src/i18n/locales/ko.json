@@ -395,39 +395,12 @@
       "showOverlay": "이 단축키 오버레이를 표시합니다."
     }
   },
-  "consolidated": {
-    "kicker": "보안 · 품질 · 안전성 · 품질",
-    "searchPlaceholder": "필터 규칙...필터 규칙을 따르십시오.",
-    "empty": "모든 것이 깨끗합니다. 발견은 없습니다.",
-    "liveTitle": "라이브  ⁇  Live 편집을 하면서 업데이트가 됩니다.",
-    "fetching": "가져오기... 데려오는..",
-    "noOccurrences": "발생 없음",
-    "summaryFindings": "{count}개 결과",
-    "summaryRules": "{count}개 규칙",
-    "more": "+{count} 더 많은",
-    "wordErrors": "오류",
-    "wordWarnings": "경고, 경고를 통해",
-    "wordInfo": "정보",
-    "wordFiles": "파일",
-    "gradeExcellent": "우수",
-    "gradeGood": "좋은, 좋은, 좋음",
-    "gradeFair": "보통",
-    "gradeWeak": "약하고 약한 것은",
-    "gradeSevere": "매우 심한 중증",
-    "evidence": {
-      "advisor": "어드바이저는 런타임에서 확인합니다.",
-      "logCapture": "로그 캡처는 {count}를 보았고,"
-    }
-  },
   "dashboards": {
     "lintsConfig": {
       "description": "레이어: {tier} · 라인: {lane}",
       "descriptionNoLane": "Tier: 계층, 즉 수준 {tier} _PH0_는 PH0__의 제곱근을 나타냅니다"
     },
     "controls": {
-      "analyzerPlugin": "라이브 분석",
-      "analyzerPluginDisabled": "오프 — 저장 시만 스캔",
-      "analyzerPluginAbsent": "설정되지 않음",
       "laneLight": "경량 — ~200 규칙 인-에디터, 나머지는 저장 시",
       "laneFull": "완전 — 에디터 내에서 활성화된 모든 규칙",
       "migrateLegacyKeys": "{count} 유산 구성 요소 키(s) 마이그레이션",
@@ -468,7 +441,6 @@
       "writeReport": "보고 작성"
     },
     "report": {
-      "noWorkspace": "작업 영역 폴더가 열려 있지 않음 — 보고서를 작성할 수 없습니다.",
       "noContent": "AI 프롬프트 콘텐츠를 작성할 패키지가 없습니다.",
       "written": "보고서 작성 완료 — 경로 클립보드에 복사됨: {path}",
       "failed": "기회 보고서를 작성하지 못했습니다: {error}"
@@ -633,36 +605,12 @@
   },
   "toolbar": {
     "runAnalysis": "분석 실행",
-    "rescan": "다시 스캔",
-    "refresh": "새로 고침",
     "copyJson": "JSON 복사",
     "saveReport": "보고서 저장",
     "moreActions": "추가 작업",
-    "clearAll": "모두 지우기",
-    "resetView": "보기 초기화"
-  },
-  "empty": {
-    "noFindingsTitle": "결과 없음",
-    "noFindingsMessage": "작업 공간을 스캔하기 위해 분석을 실행하십시오.",
-    "noFindingsCta": "분석 실행",
-    "noMatchTitle": "일치 항목 없음",
-    "noMatchMessage": "현재 필터와 일치하는 행은 없습니다.",
-    "noMatchCta": "필터 초기화",
-    "noProjectTitle": "작업 공간이 열려 있지 않습니다.",
-    "noProjectMessage": "Flutter 또는 Dart 프로젝트를 열어서 결과를 확인하세요.",
-    "noProjectCta": "폴더 열기",
-    "noDataTitle": "아직 데이터 없음.",
-    "noDataMessage": "이 대시보드를 채우기 위해 스캔을 실행하십시오.",
-    "noDataCta": "분석 실행"
+    "clearAll": "모두 지우기"
   },
   "loading": {
-    "thinking": "생각... 생각하고 있다.",
-    "preparing": "준비하고... 준비를 하고 있다.",
-    "checking": "확인... 체크하고 있습니다.",
-    "fetching": "가져오기... 데려오는..",
-    "working": "일...일하다.",
-    "scanning": "스캔...스캐닝",
-    "cancel": "취소",
     "runningAnalysis": "분석을 실행하고 있습니다...",
     "analysisComplete": "분석 완료, 분석을 완료",
     "analysisClean": "문제가 없습니다.",
@@ -670,40 +618,14 @@
     "analysisStartedDetail": "분석이 시작되었습니다. 진단 자료를 수집하고...",
     "analysisFailedDetail": "분석 실패. 자세한 내용은 출력을 확인하십시오."
   },
-  "error": {
-    "genericTitle": "뭔가 잘못됐다고 생각해서",
-    "retry": "다시 시도",
-    "reload": "다시 불러오기",
-    "copyDetails": "세부 정보 복사",
-    "unreachable": "{target}에 도달할 수 없습니다.",
-    "partialSummary": "{total}개의 {item} 중 {loaded}개 로드됨. {failed}개 실패.",
-    "partialRetry": "실패한 항목 재시도"
-  },
-  "offline": {
-    "banner": "오프라인  ⁇  새로 고치기 위해 다시 연결하십시오.",
-    "cachedFooter": "{when}.에서 캐시된 데이터를 보여줍니다.",
-    "reconnecting": "다시 연결..."
-  },
-  "stale": {
-    "statusPill": "마지막 성공적인 실행 {when}  ⁇  업데이트가 실패"
-  },
   "filter": {
-    "searchPlaceholder": "검색...검색...수색",
-    "clearSearch": "검색 지우기",
     "activeLabel": "활성 필터:",
-    "recentLabel": "최근  ⁇  최근",
     "chipRemove": "제거 삭제 제거"
   },
   "a11y": {
     "toggleFullWidth": "전체 너비 레이아웃을 Toggle full-width layout로 전환할 수 있습니다.",
-    "sortBy": "{column}로 분류합니다.",
     "expandRow": "행 펼치기",
-    "copyRow": "행 복사",
-    "comparisonDimension": "지표",
-    "collapseRow": "행 접기",
-    "selectAll": "모든 행을 선택합니다.",
-    "keyboardShortcuts": "키보드 단축키",
-    "announcer": "필터 및 정렬 상태의 업데이트는 여기에서 발표됩니다."
+    "comparisonDimension": "지표"
   },
   "uiLanguage": {
     "pick": {
@@ -788,9 +710,6 @@
       "confirm": "{count}개의 방치된 daemon 프로세스(들)을 {size}를 사용하여 찾았습니다. 종료할까요?",
       "killButton": "고아 프로세스 종료",
       "cancelButton": "취소"
-    },
-    "command": {
-      "killOrphans": "사망한 Flutter 데몬 종료"
     },
     "orphanPreflight": {
       "found": "{count} 이전 세션에서 생성된 모델 호스트 프로세스(들)이 {size}의 커밋된 메모리를 차지하고 있습니다.",
@@ -901,7 +820,6 @@
     },
     "heapCap": {
       "promptWithRecommendation": "분석 서버 힙 상한(MB). 이 컴퓨터의 {totalGb}에 대한 권장값: {recommendedMb} MB.",
-      "prompt": "분석 서버 힙 제한 (MB, 예: 4096)",
       "invalid": "0보다 큰 정수 메가바이트를 입력하세요.",
       "applied": "분석 서버 힙 크기 제한을 {mb} MB로 설정합니다. 분석 서버를 다시 시작해야 적용됩니다.",
       "restartNow": "지금 재시작"
@@ -924,7 +842,6 @@
       "pressureNoShed": "⚠ 메모리 압력 ({rssMb} MB)"
     },
     "tooltip": {
-      "shedLevel0": "메모리 압력: 정상",
       "shedLevel1": "메모리 압력: {count} 비용이 많이 드는 규칙은 (타입 분석 + 고비용)을 제거하여 RSS",
       "shedLevel2": "메모리 압력: {count} 규칙이 제거됨 (비용이 많이 들고 + INFO 심각도)",
       "shedLevel3": "메모리 압력: {count} 규칙은 (모든 비필수 비-ERROR)을 제거합니다",
@@ -952,16 +869,12 @@
       "restartTooltip": "Dart 분석 서버를 다시 시작하여 메모리 압력을 해제하고 쉐드 규칙을 복원하세요."
     }
   },
-  "brand": {
-    "prefix": "Saropa "
-  },
   "findingsDash": {
     "pageTitle": "Saropa 결과 대시보드",
     "documentTitle": "Saropa 결과 대시보드",
     "skipToFindings": "발견으로 넘어갑니다.",
     "secondaryAsideLabel": "2차 진단은 2차 진단을 통해 이루어진다.",
     "hero": {
-      "productTitle": "결과 대시보드 (Dashboard)",
       "gaugeTitle": "건강 점수 {score} (등급 {grade}). 실수로 인해 가장 큰 부담을 받는다.",
       "gaugePending": "…"
     },
@@ -972,7 +885,6 @@
       "daysAgo": "{day}일 전"
     },
     "status": {
-      "lastRunPrefix": "마지막 실행",
       "updatedPrefix": "업데이트됨",
       "refreshHint": "분석기에서 업데이트를 클릭하여 새로 고치십시오.",
       "lastRunUnknown": "마지막 실행은 알려지지 않았습니다.",
@@ -1012,8 +924,7 @@
       "pack": "패키지 (pack)"
     },
     "seg": {
-      "toggleSeverityTitle": "토글 {v} 중증도 변전",
-      "toggleImpactTitle": "토글 {v} 충격 타겟팅"
+      "toggleSeverityTitle": "토글 {v} 중증도 변전"
     },
     "kpi": {
       "visibleLabel": "표시된 결과",
@@ -1055,11 +966,8 @@
       "clearRecentButton": "맑은 선명한 선명한",
       "recentFiltersListAria": "최근 필터링",
       "runAnalysisTitle": "Saropa Lints 분석을 실행합니다.",
-      "refreshViolationsTitle": "디스크에서 violations.json를 다시 로드하십시오.",
       "severityGroupAria": "심각도 필터",
       "severityLabel": "심각성 정도 중증상태",
-      "impactGroupAria": "영향도 필터",
-      "impactLabel": "영향도",
       "moreSummary": "더 보기",
       "moreChevron": "▾",
       "copyJsonTitle": "필터링된 위반사항을 JSON ({count}) 으로 복사합니다.",
@@ -1091,9 +999,6 @@
       "cancelButton": "취소",
       "runningLabel": "점검 중…",
       "runningMeta": "점검 CLI 시작 중…",
-      "completedLabel": "점검 완료",
-      "failedLabel": "감사 실패",
-      "canceledLabel": "감사가 취소되었습니다",
       "statusFull": "{time} 전체 프로젝트 감사 표시",
       "statusChangedRef": "파일 변경 내용 보여주기 vs {ref}, 검사 {time}",
       "notRunYet": "위에서 범위를 선택한 후 실행 auditing"
@@ -1101,9 +1006,7 @@
     "chip": {
       "contains": "\"{q}\"를 포함하고 있습니다.",
       "severityOff": "중증도는 ≠ {v}입니다.",
-      "impactOff": "충격 ≠ {v}",
-      "resetAllTitle": "모든 필터를 리셋하십시오.",
-      "removeFilterAria": "필터 제거"
+      "resetAllTitle": "모든 필터를 리셋하십시오."
     },
     "menuPalette": {
       "help": "도움말",
@@ -1125,7 +1028,6 @@
       "reloadFromDiskTitle": "분석기를 다시 실행하지 않고 마지막 violations.json에서 대시보드를 재 렌더링하십시오.",
       "reEnableDisabledRules": "비활성화 된 규칙을 다시 활성화하십시오 ...",
       "reEnableDisabledRulesTitle": "analysis_options_custom.yaml에서 현재 비활성화 된 규칙을 빠르게 선택하여 선택한 규칙들을 다시 활성화하십시오.",
-      "reEnableNoneTitle": "현재 비활성화 된 규칙이 없습니다.",
       "reEnableNoneMessage": "analysis_options_custom.yaml.를 통해 현재 규칙이 비활성화되어 있지 않습니다.",
       "reEnableQuickPickTitle": "비활성화 된 규칙을 다시 활성화하십시오.",
       "reEnableQuickPickPlaceholder": "하나 또는 여러 개의 규칙을 선택하여 다시 활성화하십시오.",
@@ -1200,7 +1102,6 @@
       "heading": "믹스 믹스를 섞어",
       "metaClickSlice": "슬라이스를 클릭하여 필터를 합니다.",
       "severityMix": "심각성의 혼합물",
-      "impactMix": "영향도 구성",
       "filterBarTitle": "{key}에만 필터를 합니다.",
       "donutTotal": "합계"
     },
@@ -1276,25 +1177,14 @@
       "foldersSample": "폴더 ( 샘플)",
       "filesSample": "파일 / 글러브 ( 샘플)",
       "rulesSample": "규칙 ( 샘플)",
-      "perFileRulesSample": "파일별 규칙 ( 샘플)",
-      "unknownKind": "알 수 없음"
+      "perFileRulesSample": "파일별 규칙 ( 샘플)"
     },
     "script": {
-      "analysisRunning": "분석을 실행하고 있습니다...",
-      "analysisComplete": "분석 완료, 분석을 완료",
-      "metaRunning": "이것은 큰 프로젝트에서 잠시 걸릴 수 있습니다.",
-      "metaDone": "최신 연구결과와 함께 신선한 대시보드.",
-      "announceSearch": "검색 {q}를 찾습니다.",
-      "announceSeverities": "{n}개 심각도",
-      "announceImpacts": "{n}개 영향",
       "announceCleared": "모든 필터가 청소되었습니다.",
       "announceFiltersPrefix": "필터: 필터",
-      "bulkSelected": "{n}개 선택됨",
-      "analysisStartedDetail": "분석이 시작되었습니다. 진단 자료를 수집하고...",
       "announceStarted": "분석 시작됨",
       "announceComplete": "분석 완료, 분석을 완료",
       "announceFailed": "분석 실패",
-      "analysisFailedDetail": "분석 실패. 자세한 내용은 출력을 확인하십시오.",
       "removeRecentAria": "제거 삭제 제거",
       "removeRecentTitle": "제거 삭제 제거",
       "bulkSelectedTpl": "{n}개 선택됨",
@@ -1315,12 +1205,7 @@
     },
     "unknownAnalyzerKind": "알 수 없음",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} 다른 분석기 결과",
-      "otherAnalyzerPromo": "+? 다른 분석기 결과  ⁇  쇼",
-      "analyzerTodosOn": "+{count} 분석기 TODOs",
-      "analyzerTodosPromo": "+? 분석기 TODOs  ⁇  쇼",
       "scannerPromo": "TODO/HACK 스캐너를 활성화하십시오.",
-      "tooltipLive": "VS Code 문제 패널에서 생방송으로. 분석이 완료되면 업데이트됩니다. 숨기려면 클릭하십시오.",
       "tooltipScanner": "Saropa 파일 시스템 스캐너  ⁇  오픈 TODO/HACK 마커를 소스에서 계산합니다.",
       "tooltipPromoClickToOn": "클릭하여 활성화합니다."
     }
@@ -1354,7 +1239,6 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "먼저 작업 영역 폴더를 열으십시오.",
-    "noReportYet": "아직 위반 보고는 없습니다. 먼저 Saropa Lints 분석을 실행하십시오.",
     "clipboardCopyFailed": "클립보드에 복사할 수 없습니다.",
     "copiedViolationsJson": "{count} 위반을 JSON로 복사했습니다.",
     "copiedEverythingJson": "복사된 {count} 필터링되지 않은 결과를 클립보드에 복사했습니다.",
@@ -1662,13 +1546,9 @@
     "references": {
       "noImports": "출처 파일 수입이 검출되지 않았습니다.",
       "reExportLine": "{location} (재수출)",
-      "reExportSuffix": "(재수출)",
       "publicApiSurface": "공공 API 표면  ⁇  적어도 한 가지 사용은 재 수출입니다.",
       "reExportedBadge": "재내보내짐",
-      "openFileReferences": "파일 참조를 열기",
-      "searchImports": "검색 수입 수요",
-      "fileReferencesHeading": "파일 참조 ({count})",
-      "andMore": "... 그리고 {count} 더 많이."
+      "openFileReferences": "파일 참조를 열기"
     },
     "deps": {
       "noTransitives": "과도한 의존성이 없는 상태입니다.",
@@ -1677,9 +1557,7 @@
       "tooltipDepShared": "• {dep} (공유)",
       "tooltipHeader": "{total} 과도기적 기하급수",
       "tooltipHeaderShared": "{total} 과도기적 deps ({shared} 공유)",
-      "sharedBadgeTitle": "{count}는 다른 패키지와 공유됩니다.",
-      "sharedBadge": "공유됨",
-      "transitiveDepsHeading": "과도적 의존성 ({count})"
+      "sharedBadgeTitle": "{count}는 다른 패키지와 공유됩니다."
     },
     "dormancy": {
       "noActivity6mo": "6개월 이상 커밋도, 릴리스도 없었다.",
@@ -1708,17 +1586,7 @@
       "resolutionVelocity": "해상도 속도 (Resolution Velocity) 는",
       "engagementLevel": "참여 수준",
       "popularity": "인기도",
-      "publisherTrust": "게시자 신뢰도",
-      "fixInVersion": "→ {version}에 고정",
-      "vulnerabilitiesHeading": "취약점 ({count})"
-    },
-    "links": {
-      "heading": "링크",
-      "pubDev": "pub.dev",
-      "changelog": "변경 내역",
-      "versions": "버전",
-      "repository": "리포지토리 레퍼시토리는",
-      "issues": "이슈"
+      "publisherTrust": "게시자 신뢰도"
     }
   },
   "commandCatalog": {
@@ -1726,9 +1594,6 @@
     "skipLink": "스키프 톱 커맨드 카탈로그",
     "heroTitle": "Saropa 명령 카탈로그",
     "status": {
-      "commands": "{count}개 명령",
-      "categories": "{count}개 카테고리",
-      "recent": "최근 {count}개",
       "internalHidden": "{count}개 컨텍스트 메뉴 전용(숨김)",
       "wordCommands": "명령",
       "wordCategories": "카테고리, 범주, 분류",
@@ -1806,7 +1671,6 @@
     "documentTitle": "Saropa 코드 건강 대시보드",
     "skipToTable": "테이블 함수들로 건너뛰십시오.",
     "openWorkspaceFirst": "먼저 Dart/Flutter 작업 공간을 열어보세요.",
-    "scanningTitle": "코드 건강: 스캔 기능...스캐닝 기능을 제공합니다.",
     "scan": {
       "title": "스캔 프로젝트 건강검진",
       "subtitle": "당신의 코드를 읽고 있습니다. 스캔이 더 많은 것을 배우면서 대시보드가 채워집니다.",
@@ -1864,10 +1728,6 @@
       "gatesFailing": "게이트가 실패하는 것은",
       "gatesPassing": "게이트 통과"
     },
-    "gauge": {
-      "tooltip": "평균 점수는 100점으로 {rounded} (등급 {grade}).",
-      "ariaLabel": "평균 점수는 100점 중 {rounded}입니다."
-    },
     "gate": {
       "fallback": "품질 게이트가 실패했습니다.  ⁇  코드 건강 설정에서 기준을 검토하십시오.",
       "failingOne": "{count}개 게이트 실패 — 임계값을 검토하거나 JSON을 복사하여 gates.violations를 검사하세요.",
@@ -1906,8 +1766,6 @@
     "table": {
       "ariaLabel": "점수별로 최악의 기능",
       "heading": "최악의 함수",
-      "topCount": "{total}의 {shown} 상단",
-      "colGrade": "등급",
       "colScore": "점수 스코어",
       "colFunction": "함수",
       "colFile": "파일파일 파일이",
@@ -1919,7 +1777,6 @@
       "noMatch": "현재 필터와 일치하는 기능은 없습니다.",
       "resetFiltersTitle": "검색을 삭제하고 모든 활성 플래그 필터를 제거합니다.",
       "resetFilters": "필터 초기화",
-      "hint": "점수별로 최악의 200개의 기능을 보여준다. 검색 필드를 사용하여 더 좁히기 위해 추가로 사용하십시오.",
       "expanderAriaCollapsed": "문제 세부 정보를 표시합니다.",
       "expanderAriaExpanded": "이슈 세부사항을 숨기기 위해 문제를 숨겨주세요.",
       "detailHeading": "왜 이 함수가 {score}를 득점했는지",
@@ -1978,11 +1835,7 @@
     },
     "script": {
       "activeFiltersLabel": "활성 필터:",
-      "searchChip": "검색: \"{q}\"",
-      "flagChip": "깃발: {flag}",
-      "removeAria": "{key}를 제거합니다.",
       "clearAll": "모두 지우기",
-      "rowsVisible": "{total}개 행 중 {visible}개 표시됨",
       "neverRun": "실행 안 됨"
     },
     "freshness": {
@@ -2199,9 +2052,6 @@
     }
   },
   "debug": {
-    "panel": {
-      "title": "디버그 패널"
-    },
     "section": {
       "engines": "진단 엔진",
       "log": "로그"
@@ -2211,7 +2061,6 @@
       "scanDaemon": "저장 시 스캔",
       "lspServer": "LSP 서버",
       "pid": "PID:",
-      "status": "상태:",
       "rules": "규칙:",
       "rss": "RSS:",
       "statusLabel": "상태:",
@@ -2268,7 +2117,6 @@
       "enginesLabel": "엔진: {count} 실행"
     },
     "ci": {
-      "enabled": "saropa_lints CI를 {path}에 작성했습니다. 변경 사항을 검토하고 커밋하세요. 이 파일은 모든 기여자의 풀 리퀘스트에 적용되므로 자동으로 커밋되지 않습니다.",
       "disableFailed": "CI를 끌 수 없습니다. {path}이(가) 없거나 Saropa Lints가 자동으로 수정하지 않는 구조입니다. CI는 계속 실행 중입니다. 파일을 열어 워크플로를 직접 비활성화하세요.",
       "openWorkflow": "워크플로 열기",
       "openWorkflowFailed": "{path}을(를) 열 수 없습니다.",
@@ -2667,7 +2515,6 @@
       "upgradeCheckerUpgraded": "Saropa Lints가 {version}로 업그레이드 되었습니다.",
       "actionUpgrade": "업그레이드",
       "actionViewChangelog": "변경록을 보기",
-      "actionDismiss": "해고 처분",
       "healthCodeLensEnabled": "Saropa 프로젝트 맵 열 코드렌즈 활성화.",
       "healthCodeLensDisabled": "Saropa 프로젝트 맵 열 코드 렌즈 비활성화.",
       "reportViewCopiedPath": "복사된 보고서 경로: 복사 된 보고서 경로는 다음과 같습니다. {path} _PH0_는 PH0__의 제곱근을 나타냅니다",
@@ -2770,7 +2617,6 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "마지막 분석: {ago}",
       "neverRunLabel": "건강: —",
       "neverRunDescription": "분석을 실행하여 건강 점수를 확인하세요"
     },

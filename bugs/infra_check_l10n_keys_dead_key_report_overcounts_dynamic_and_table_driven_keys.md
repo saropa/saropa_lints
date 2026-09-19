@@ -1,6 +1,6 @@
 # BUG: `check_l10n_keys.py` — dead-key report overcounts: 260 of 392 "unreferenced" keys are live (dynamic or table-driven)
 
-**Status: Fix Ready**
+**Status: Closed**
 
 <!-- Checker fix applied. Remaining work: delete the 132 truly dead keys (list below) from en.json and all 24 locale files. -->
 
@@ -236,3 +236,13 @@ Partly closed: unit tests cover the new detectors. There is still no end-to-end 
 ## Environment
 
 - Script: `extension/scripts/check_l10n_keys.py`; verified 2026-09-19 against 2194 en.json leaf keys
+
+---
+
+## Changes Made
+
+- Deleted the 132 verified-dead keys (checker output re-verified by full-tree grep; only substring hits, no real references) from `extension/src/i18n/locales/en.json` and the 23 other locale files (24 files x 132 keys); emptied parent objects removed.
+- Removed 99 now-orphaned entries from `extension/scripts/i18n/english_allowed.json` (`keys` and `reviewed_ok`).
+- The 39 a11y/empty/error/filter/loading/offline/stale keys with hard-coded English copies in `webview-strings.ts` were included; that file is untouched.
+- `locale_coverage.json` not regenerated (generator requires the translation pipeline, no offline mode).
+- Result: checker reports 0 unreferenced, 0 missing, exit 0.

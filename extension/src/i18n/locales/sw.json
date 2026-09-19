@@ -395,39 +395,12 @@
       "showOverlay": "Onyesha hii njia ya mkato overlay."
     }
   },
-  "consolidated": {
-    "kicker": "Usalama · Ubora wa ubora.",
-    "searchPlaceholder": "Kanuni za kuchuja... sheria za kufuta.",
-    "empty": "All clear  ⁇   ⁇ hakuna matokeo ya kugundua.",
-    "liveTitle": "Live  ⁇  Kuishi updates kama wewe hariri kuhariri.",
-    "fetching": "Kuleta ... kuleta...",
-    "noOccurrences": "Hakuna matukio",
-    "summaryFindings": "matokeo {count}",
-    "summaryRules": "sheria {count}",
-    "more": "+{count} zaidi zaidi.",
-    "wordErrors": "hitilafu",
-    "wordWarnings": "maonyo",
-    "wordInfo": "taarifa",
-    "wordFiles": "faili",
-    "gradeExcellent": "Bora sana",
-    "gradeGood": "Nzuri",
-    "gradeFair": "Wastani",
-    "gradeWeak": "Dhaifu",
-    "gradeSevere": "Kali",
-    "evidence": {
-      "advisor": "Mshauri anathibitisha wakati wa kukimbia.",
-      "logCapture": "Kuweka kumbukumbu Capture aliona {count}."
-    }
-  },
   "dashboards": {
     "lintsConfig": {
       "description": "Ngazi: {tier} · Lane: {lane}",
       "descriptionNoLane": "Tier: Kiwango cha juu zaidi. {tier} _ PH0__ - Msaada wa kuokoa maisha."
     },
     "controls": {
-      "analyzerPlugin": "Uchambuzi wa moja kwa moja",
-      "analyzerPluginDisabled": "Off — kusimama kwenye kuzalisha",
-      "analyzerPluginAbsent": "Hakuna inayozungumzwa",
       "laneLight": "Light — ~200 hadi kwenye editor, wengine kwenye kuzalisha",
       "laneFull": "Panda — kila neno ya kipengele kizalishwa katika kipengele ya editor",
       "migrateLegacyKeys": "Hamisha vitufe vya usanidi vya {count}",
@@ -468,7 +441,6 @@
       "writeReport": "Tuma Ripoti"
     },
     "report": {
-      "noWorkspace": "Hakuna jumla ya folder ya workspace — hakuna kuzalishia raporti.",
       "noContent": "Hakuna paketi ambayo ina kifungu ya AI ya kuzunguka.",
       "written": "Unganisha wakati — jina la jalan ya kujitokeza kuzalisha kwenye clipboard: {path}",
       "failed": "Hakikisha ujumbe wa matokeo ya muda mwingi: {error}"
@@ -633,36 +605,12 @@
   },
   "toolbar": {
     "runAnalysis": "Endesha uchambuzi",
-    "rescan": "Skani tena",
-    "refresh": "Onyesha upya",
     "copyJson": "Nakili JSON",
     "saveReport": "Hifadhi ripoti",
     "moreActions": "Vitendo zaidi",
-    "clearAll": "Futa vyote",
-    "resetView": "Weka upya mwonekano"
-  },
-  "empty": {
-    "noFindingsTitle": "Hakuna matokeo",
-    "noFindingsMessage": "Endesha uchambuzi ili kuchunguza eneo la kazi.",
-    "noFindingsCta": "Endesha uchambuzi",
-    "noMatchTitle": "Hakuna zinazolingana",
-    "noMatchMessage": "Hakuna safu zinazolingana na filters za sasa.",
-    "noMatchCta": "Weka upya vichujio",
-    "noProjectTitle": "Hakuna nafasi ya kazi wazi wazi.",
-    "noProjectMessage": "Fungua mradi wa Flutter au Dart ili uone matokeo.",
-    "noProjectCta": "Fungua folda",
-    "noDataTitle": "Bado hakuna data.",
-    "noDataMessage": "Endesha skana ili kujaza dashibodi hii.",
-    "noDataCta": "Endesha uchambuzi"
+    "clearAll": "Futa vyote"
   },
   "loading": {
-    "thinking": "Kufikiria... kufikiri.",
-    "preparing": "Kujiandaa... kujitayarisha.",
-    "checking": "Kuangalia... kuangalia.",
-    "fetching": "Kuleta ... kuleta...",
-    "working": "Kufanya kazi...kufanya kazi.",
-    "scanning": "Kuchunguza... kuchunguza ...",
-    "cancel": "Ghairi",
     "runningAnalysis": "Kuendesha uchambuzi ... uchambuzaji.",
     "analysisComplete": "Uchambuzi kamilifu ukamilifu.",
     "analysisClean": "Hakuna maswala yoyote.",
@@ -670,40 +618,14 @@
     "analysisStartedDetail": "Uchambuzi ulianza. Kukusanya diagnostics ...",
     "analysisFailedDetail": "Uchambuzi umeshindwa. Angalia pato kwa maelezo."
   },
-  "error": {
-    "genericTitle": "Kuna kitu kilienda vibaya.",
-    "retry": "Jaribu tena",
-    "reload": "Pakia upya",
-    "copyDetails": "Nakili maelezo",
-    "unreachable": "Haikuweza kufikia {target}.",
-    "partialSummary": "{loaded} kati ya {total} {item} zimepakiwa. {failed} zimeshindwa.",
-    "partialRetry": "Jaribu tena zilizoshindwa"
-  },
-  "offline": {
-    "banner": "Nje ya mtandao  ⁇  unganisha tena ili kuburudisha.",
-    "cachedFooter": "Inaonyesha data zilizohifadhiwa kutoka kwa {when}.",
-    "reconnecting": "Kuunganisha tena... kuungana tena."
-  },
-  "stale": {
-    "statusPill": "Mwisho wa kufanikiwa kukimbia {when}  ⁇  refresh failed failed."
-  },
   "filter": {
-    "searchPlaceholder": "Search... search... utafutaji.",
-    "clearSearch": "Futa utafutaji",
     "activeLabel": "Vichujio vinavyotumika:",
-    "recentLabel": "Za hivi karibuni ▾",
     "chipRemove": "Ondoa"
   },
   "a11y": {
     "toggleFullWidth": "Toggle full-width layout ya mpangilio wa upana.",
-    "sortBy": "Chagua kwa {column}",
     "expandRow": "Panua safu",
-    "copyRow": "Nakili safu",
-    "comparisonDimension": "Kipimo",
-    "collapseRow": "Kunja safu",
-    "selectAll": "Chagua safu zote chagua mistari yote.",
-    "keyboardShortcuts": "Njia za mkato za kibodi.",
-    "announcer": "Sasisho za hali ya kuchuja na kuchagua zinatangazwa hapa."
+    "comparisonDimension": "Kipimo"
   },
   "uiLanguage": {
     "pick": {
@@ -788,9 +710,6 @@
       "confirm": "Imeongezwa {count} process ya daemon ya kifalme (kifalme) kwa kutumia {size}. Uko kujikosoa?",
       "killButton": "Kifungu Kifungu Kifungu",
       "cancelButton": "Ghairi"
-    },
-    "command": {
-      "killOrphans": "Kifungu Ya Flutter Ya Daemons Ya Kifungu"
     },
     "orphanPreflight": {
       "found": "Mchakato (michakato) {count} ya mwenyeji wa modeli yatima kutoka kipindi kilichopita yanashikilia {size} ya kumbukumbu iliyotengwa.",
@@ -901,7 +820,6 @@
     },
     "heapCap": {
       "promptWithRecommendation": "Kikomo cha heap cha seva ya uchambuzi katika MB. Kinachopendekezwa kwa {totalGb} ya kompyuta hii: {recommendedMb} MB.",
-      "prompt": "Kapu ya heap ya server ya analysis (mbadala ya 4096)",
       "invalid": "Tuma namba ya kipindani ya megabytes ya kati ya 0.",
       "applied": "Tuma kipengele cha heap ya server ya analysis kwenye {mb} MB. Tumia server ya analysis yenye kipengele kwa kufanya kutoa.",
       "restartNow": "Anzisha upya sasa"
@@ -924,7 +842,6 @@
       "pressureNoShed": "⚠ Kifungu ya mifano ({rssMb} MB)"
     },
     "tooltip": {
-      "shedLevel0": "Unganisho wa matokeo: normal",
       "shedLevel1": "Unganisho wa moyo: {count} kundi ya kifedha kubadilisha (kifedha ya kifedha + kifedha ya kifedha kubadilisha) kuzuka RSS",
       "shedLevel2": "Unganishaji wa memory: {count} rules shed (expensive + INFO severity)",
       "shedLevel3": "Unganishaji wa moyo: {count} kujifunza (kote kila kipengele kikubwa kikubwa)",
@@ -952,16 +869,12 @@
       "restartTooltip": "Tumia kujaribu kifedha kwa server ya analizi ya Dart kujaribu kujikumbuka kujikosomaa kwa muda mlele na kujikosomaa kifedha ya kifedha."
     }
   },
-  "brand": {
-    "prefix": "Saropa "
-  },
   "findingsDash": {
     "pageTitle": "Saropa Matokeo ya Dashibodi ya Deshibodi.",
     "documentTitle": "Saropa Matokeo ya Dashibodi ya Deshibodi.",
     "skipToFindings": "Skip to matokeo ya utafiti.",
     "secondaryAsideLabel": "Secondary diagnostics ni utambuzi wa sekondari.",
     "hero": {
-      "productTitle": "Matokeo ya Dashibodi ya Deshibodi.",
       "gaugeTitle": "Alama ya afya {score} (daraja la {grade}). Makosa hubeba uzito zaidi.",
       "gaugePending": "…"
     },
@@ -972,7 +885,6 @@
       "daysAgo": "siku {day} zilizopita"
     },
     "status": {
-      "lastRunPrefix": "Uendeshaji wa mwisho",
       "updatedPrefix": "Imesasishwa",
       "refreshHint": "Bonyeza ili kuburudisha kutoka kwa mchanganuzi.",
       "lastRunUnknown": "Mwisho wa kukimbia haijulikani.",
@@ -1012,8 +924,7 @@
       "pack": "Kifurushi/Vifurushi"
     },
     "seg": {
-      "toggleSeverityTitle": "Toggle {v} ukali wa uzito.",
-      "toggleImpactTitle": "Toggle {v} athari ya mgomo wa kugonga."
+      "toggleSeverityTitle": "Toggle {v} ukali wa uzito."
     },
     "kpi": {
       "visibleLabel": "Matokeo yanayoonekana",
@@ -1055,11 +966,8 @@
       "clearRecentButton": "Futa",
       "recentFiltersListAria": "Vichujio vya hivi karibuni",
       "runAnalysisTitle": "Endesha uchambuzi wa Saropa Lints.",
-      "refreshViolationsTitle": "Reload violations.json kutoka diski disk.",
       "severityGroupAria": "Kichujio cha ukali",
       "severityLabel": "Ukali",
-      "impactGroupAria": "Kichujio cha athari",
-      "impactLabel": "Athari",
       "moreSummary": "Zaidi",
       "moreChevron": "▾",
       "copyJsonTitle": "Nakili ukiukaji uliochujwa kama JSON ({count})",
@@ -1091,9 +999,6 @@
       "cancelButton": "Ghairi",
       "runningLabel": "Kuamini…",
       "runningMeta": "Kuanza kujaribu CLI...",
-      "completedLabel": "Unganisha muda muda",
-      "failedLabel": "Ukaguzi haukufaulu",
-      "canceledLabel": "Ukaguzi umeghairiwa",
       "statusFull": "Kupangalia audit ya project kwa kati ya {time}",
       "statusChangedRef": "Kupangalia faili zilizokosa ya {ref}, zilizokosa {time}",
       "notRunYet": "Chagua scope ya kati ya kati, sasa Tumia audit"
@@ -1101,9 +1006,7 @@
     "chip": {
       "contains": "ina \"{q}\"",
       "severityOff": "ukali ≠ {v}",
-      "impactOff": "athari ≠ {v}",
-      "resetAllTitle": "Rudisha upya vichungi vyote.",
-      "removeFilterAria": "Ondoa kichujio"
+      "resetAllTitle": "Rudisha upya vichungi vyote."
     },
     "menuPalette": {
       "help": "Msaada",
@@ -1125,7 +1028,6 @@
       "reloadFromDiskTitle": "Render tena dashibodi kutoka mwisho violations.json bila kuendesha upya analyzer.",
       "reEnableDisabledRules": "Re-enable disabled rules... re-enabling disabled rule.... tena kuwezesha sheria zilizozimwa ...",
       "reEnableDisabledRulesTitle": "Fungua chaguo la haraka la sheria ambazo hazijatumika kwa sasa katika analysis_options_custom.yaml na uache tena zile zilizochaguliwa.",
-      "reEnableNoneTitle": "Hakuna sheria kwa sasa imezimwa.",
       "reEnableNoneMessage": "Hakuna sheria ambazo kwa sasa zimezimwa kupitia analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Re-Enable Disabled Rules - Kuwezesha tena sheria zilizozimwa.",
       "reEnableQuickPickPlaceholder": "Chagua moja au zaidi ya sheria ili kuwezesha tena.",
@@ -1200,7 +1102,6 @@
       "heading": "Mchanganyiko",
       "metaClickSlice": "bonyeza kipande cha kuchuja ili uchuje.",
       "severityMix": "Mchanganyiko wa ukali",
-      "impactMix": "Mchanganyiko wa athari",
       "filterBarTitle": "Chuja kwa {key} tu.",
       "donutTotal": "jumla"
     },
@@ -1276,25 +1177,14 @@
       "foldersSample": "Folda (sampuli)",
       "filesSample": "Faili / globs (mfano)",
       "rulesSample": "Kanuni (mfano)",
-      "perFileRulesSample": "Sheria za kila faili (mfano)",
-      "unknownKind": "Haijulikani"
+      "perFileRulesSample": "Sheria za kila faili (mfano)"
     },
     "script": {
-      "analysisRunning": "Kuendesha uchambuzi ... uchambuzaji.",
-      "analysisComplete": "Uchambuzi kamilifu ukamilifu.",
-      "metaRunning": "Hii inaweza kuchukua muda kwenye miradi mikubwa.",
-      "metaDone": "Dashibodi ya kuburudisha na matokeo ya hivi karibuni.",
-      "announceSearch": "search {q} utafutaji",
-      "announceSeverities": "viwango vya ukali {n}",
-      "announceImpacts": "athari {n}",
       "announceCleared": "Vichungi vyote vimeondolewa.",
       "announceFiltersPrefix": "Vichujio:",
-      "bulkSelected": "{n} zimechaguliwa",
-      "analysisStartedDetail": "Uchambuzi ulianza. Kukusanya diagnostics ...",
       "announceStarted": "Uchambuzi umeanza",
       "announceComplete": "Uchambuzi kamilifu ukamilifu.",
       "announceFailed": "Uchambuzi umeshindwa",
-      "analysisFailedDetail": "Uchambuzi umeshindwa. Angalia pato kwa maelezo.",
       "removeRecentAria": "Ondoa",
       "removeRecentTitle": "Ondoa",
       "bulkSelectedTpl": "{n} zimechaguliwa",
@@ -1315,12 +1205,7 @@
     },
     "unknownAnalyzerKind": "Haijulikani",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} matokeo mengine ya analyzer.",
-      "otherAnalyzerPromo": "+? matokeo mengine ya analyzer  ⁇  show",
-      "analyzerTodosOn": "+{count} analyzer TODOs zote mbili.",
-      "analyzerTodosPromo": "+? analyzer TODOs  ⁇  show show",
       "scannerPromo": "Kuwezesha TODO / HACK scanner.",
-      "tooltipLive": "Moja kwa moja kutoka VS Code Jopo la Matatizo. Updates kama uchambuzi kukamilika. Bonyeza ili kuficha.",
       "tooltipScanner": "Saropa filesystem scanner  ⁇  counts open TODO/HACK markers in source. ilitumwa zaidi ya mwaka mmoja uliopita",
       "tooltipPromoClickToOn": "Bonyeza ili kuwezesha."
     }
@@ -1354,7 +1239,6 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "Fungua folda ya eneo la kazi kwanza.",
-    "noReportYet": "Hakuna ripoti ya ukiukaji bado. Fanya uchambuzi wa Saropa Lints kwanza.",
     "clipboardCopyFailed": "Haikuweza kunakili kwenye clipboard.",
     "copiedViolationsJson": "Nakala {count} ukiukaji (((s) kama JSON.",
     "copiedEverythingJson": "Mlango wa {count} ya kifungu kwa kutoa kwa kipanda.",
@@ -1662,13 +1546,9 @@
     "references": {
       "noImports": "Hakuna faili chanzo cha uagizaji wa bidhaa zilizochunguzwa.",
       "reExportLine": "{location} (kuuza nje tena)",
-      "reExportSuffix": "(kuuza nje tena)",
       "publicApiSurface": "Public API surface  ⁇  at least one use is a re-export. zaidi ya mwaka mmoja uliopita",
       "reExportedBadge": "Imehamishwa tena",
-      "openFileReferences": "Fungua marejeleo ya faili za wazi.",
-      "searchImports": "Tafuta uagizaji",
-      "fileReferencesHeading": "Marejeleo ya Faili ({count})",
-      "andMore": "... na {count} zaidi."
+      "openFileReferences": "Fungua marejeleo ya faili za wazi."
     },
     "deps": {
       "noTransitives": "Hakuna utegemezi wa mpito.",
@@ -1677,9 +1557,7 @@
       "tooltipDepShared": "• {dep} (imeshirikiwa)",
       "tooltipHeader": "tegemezi za pili {total}",
       "tooltipHeaderShared": "{total} transitive deps ({shared} imeshirikiwa)",
-      "sharedBadgeTitle": "{count} inashirikiwa na vifurushi vingine.",
-      "sharedBadge": "inashirikiwa",
-      "transitiveDepsHeading": "Utegemezi wa mpito ({count})"
+      "sharedBadgeTitle": "{count} inashirikiwa na vifurushi vingine."
     },
     "dormancy": {
       "noActivity6mo": "Hakuna ahadi na hakuna kutolewa katika miezi 6+",
@@ -1708,17 +1586,7 @@
       "resolutionVelocity": "Resolution Velocity Kasi ya azimio",
       "engagementLevel": "Kiwango cha ushiriki",
       "popularity": "Umaarufu",
-      "publisherTrust": "Uaminifu wa mchapishaji",
-      "fixInVersion": "→ kurekebisha katika {version}.",
-      "vulnerabilitiesHeading": "Udhaifu ({count})"
-    },
-    "links": {
-      "heading": "Viungo",
-      "pubDev": "pub.dev",
-      "changelog": "orodha ya mabadiliko",
-      "versions": "matoleo",
-      "repository": "hazina",
-      "issues": "matatizo"
+      "publisherTrust": "Uaminifu wa mchapishaji"
     }
   },
   "commandCatalog": {
@@ -1726,9 +1594,6 @@
     "skipLink": "Skip to command catalogue, uhamishe kwenye orodha ya amri.",
     "heroTitle": "Saropa Katalogi ya Amri ya Kiongozi _ PH0__",
     "status": {
-      "commands": "amri {count}",
-      "categories": "kategoria {count}",
-      "recent": "{count} za hivi karibuni",
       "internalHidden": "menyu muktadha pekee {count} (imefichwa)",
       "wordCommands": "amri",
       "wordCategories": "kategoria",
@@ -1806,7 +1671,6 @@
     "documentTitle": "Saropa Code Health Dashboard Dashibodi ya Afya.",
     "skipToTable": "Tembea kwa kazi za meza ya meza.",
     "openWorkspaceFirst": "Fungua nafasi ya kazi Dart/Flutter kwanza.",
-    "scanningTitle": "Afya ya Nambari: kazi za skanning... utendaji wa skana.",
     "scan": {
       "title": "Scan ya mradi wa afya ya afya.",
       "subtitle": "Kusoma code yako. Dashibodi hujaza wakati skana inapojifunza zaidi.",
@@ -1864,10 +1728,6 @@
       "gatesFailing": "vizingiti vinavyoshindwa",
       "gatesPassing": "vizingiti vinavyopita"
     },
-    "gauge": {
-      "tooltip": "Alama ya wastani {rounded} ya 100 (darasa {grade}).",
-      "ariaLabel": "Wastani wa alama {rounded} ya 100 kwa kila mmoja."
-    },
     "gate": {
       "fallback": "Quality gates failed  ⁇  review thresholds in Code Health settings. - Vipimo vya ubora vimeshindwa",
       "failingOne": "lango {count} linaloshindwa — kagua viwango, au nakili JSON ili kukagua gates.violations.",
@@ -1906,8 +1766,6 @@
     "table": {
       "ariaLabel": "Kazi mbaya zaidi kwa alama ya alama.",
       "heading": "Vitendakazi vibaya zaidi",
-      "topCount": "juu {shown} ya {total}.",
-      "colGrade": "Daraja",
       "colScore": "Alama",
       "colFunction": "Kitendakazi",
       "colFile": "Faili",
@@ -1919,7 +1777,6 @@
       "noMatch": "Hakuna kazi zinazolingana na vichungi vya sasa.",
       "resetFiltersTitle": "Futa utaftaji na kichujio chochote cha bendera kilicho hai.",
       "resetFilters": "Weka upya vichujio",
-      "hint": "Inaonyesha kazi mbaya zaidi 200 kwa alama. Tumia uwanja wa utaftaji kupunguza zaidi.",
       "expanderAriaCollapsed": "Onyesha maelezo ya suala la kuonyesha.",
       "expanderAriaExpanded": "Ficha maelezo ya suala la siri.",
       "detailHeading": "Kwa nini kazi hii ilipata alama ya {score}",
@@ -1978,11 +1835,7 @@
     },
     "script": {
       "activeFiltersLabel": "Vichujio vinavyotumika:",
-      "searchChip": "search: utafutaji: \"{q}\" ilitumwa zaidi ya mwaka mmoja uliopita",
-      "flagChip": "bendera: {flag}",
-      "removeAria": "Ondoa {key}.",
       "clearAll": "Futa vyote",
-      "rowsVisible": "safu mlalo {visible} kati ya {total} zinaonekana",
       "neverRun": "haijawahi kuendeshwa"
     },
     "freshness": {
@@ -2199,9 +2052,6 @@
     }
   },
   "debug": {
-    "panel": {
-      "title": "Panel ya Debug"
-    },
     "section": {
       "engines": "Engines ya Diagnostiki",
       "log": "Kumbukumbu"
@@ -2211,7 +2061,6 @@
       "scanDaemon": "Tafuta kama inzalo",
       "lspServer": "Server ya LSP",
       "pid": "PID:",
-      "status": "Hali:",
       "rules": "Kanuni:",
       "rss": "RSS:",
       "statusLabel": "Hali:",
@@ -2268,7 +2117,6 @@
       "enginesLabel": "Injini: {count} inayoendesha"
     },
     "ci": {
-      "enabled": "CI ya saropa_lints imeandikwa kwenye {path}. Kagua badiliko na ufanye commit — faili hii inaongoza pull request za wachangiaji wote, kwa hiyo haifanyiwi commit kwa ajili yako.",
       "disableFailed": "Haikuweza kuzima CI: {path} haipo au ina muundo ambao Saropa Lints haihariri kiotomatiki. CI bado inaendelea. Fungua faili na uzime workflow kwa mkono.",
       "openWorkflow": "Fungua workflow",
       "openWorkflowFailed": "Haikuweza kufungua {path}.",
@@ -2667,7 +2515,6 @@
       "upgradeCheckerUpgraded": "Saropa Lints imeboreshwa hadi {version}.",
       "actionUpgrade": "Boresha",
       "actionViewChangelog": "Tazama Changelog",
-      "actionDismiss": "Ondoa",
       "healthCodeLensEnabled": "Saropa Ramani ya Mradi joto CodeLens kuwezeshwa.",
       "healthCodeLensDisabled": "Saropa Ramani ya Mradi joto CodeLens imezimwa.",
       "reportViewCopiedPath": "Nambari ya njia iliyopigwa nakala: {path} _ PH0__ - Msaada wa kuokoa maisha.",
@@ -2770,7 +2617,6 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "Uchambuzi wa mwisho: {ago}",
       "neverRunLabel": "Afya:-",
       "neverRunDescription": "Fanya uchambuzi ili kuona alama yako ya afya"
     },
