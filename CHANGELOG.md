@@ -98,6 +98,10 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 - `require_error_logging` no longer flags a catch block that propagates the error via `return Error.throwWithStackTrace(...)` or a bare call to it. No action required.
 - `require_yield_after_db_write` and `suggest_yield_after_db_read` no longer fire in packages that do not depend on Flutter — their premise, protecting a UI thread, does not apply there. No action required.
 
+### Added (Extension)
+
+- Package Vibrancy now checks what an upgrade would break before recommending it, and replaces the upgrade nudge with the reason when dependents cap the package below the new version or the upgrade is known to be held back (for example `analyzer` 13, which needs a newer `meta` than Flutter stable ships). Blocked packages are also skipped by "upgrade all". No action required.
+
 ### Fixed (Extension)
 
 - The Package Dashboard no longer shows a white page with unreadable dark text under dark themes; the Feature Inventory tab's browser-only colors were overriding the editor theme. No action required.

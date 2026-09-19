@@ -12,6 +12,7 @@ import { buildExceededDiagnostics } from '../scoring/budget-checker';
 import { filterBySeverity } from '../scoring/vuln-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 import { isHostedUpgradeable } from '../scoring/blocker-analyzer';
+import { isUpgradeSuppressed } from '../scoring/blast-radius-attacher';
 import { getEnabledSeverities } from '../../config/severityConfig';
 
 // Maps scan results to VS Code diagnostics (budget, vulns, EOL, known issues).
@@ -138,7 +139,9 @@ export class VibrancyDiagnostics {
                 && isHostedUpgradeable(result.package.source)
                 // A documented do-not-upgrade / do-not-use hold is deliberate;
                 // nagging to bump it is noise the maintainer already answered.
-                && !result.pinIntent) {
+                && !result.pinIntent
+                // A non-safe blast radius means the upgrade would break something.
+                && !isUpgradeSuppressed(result)) {
                 const updateMsg = `${result.package.name} — Update available: ${result.updateInfo.currentVersion} → ${result.updateInfo.latestVersion} (${result.updateInfo.updateStatus})`;
                 const updateDiag = new vscode.Diagnostic(
                     vscodeRange, updateMsg, vscode.DiagnosticSeverity.Hint,
@@ -270,7 +273,8 @@ function buildMessage(result: VibrancyResult): string {
         msg += ` — ${result.knownIssue.reason}`;
     }
     if (result.updateInfo
-        && result.updateInfo.updateStatus !== 'up-to-date') {
+        && result.updateInfo.updateStatus !== 'up-to-date'
+        && !isUpgradeSuppressed(result)) {
         msg += ` | Update: ${result.updateInfo.currentVersion} → ${result.updateInfo.latestVersion}`;
     }
     if (result.blocker) {

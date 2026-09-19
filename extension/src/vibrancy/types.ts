@@ -358,6 +358,8 @@ export interface VibrancyResult {
     readonly popularity: number;
     readonly publisherTrust: number;
     readonly updateInfo: UpdateInfo | null;
+    /** Upgrade blast-radius verdict; a non-'safe' verdict suppresses the upgrade nudge. */
+    readonly blastRadius?: import('./scoring/upgrade-blast-radius').BlastRadius | null;
     readonly license: string | null;
     readonly archiveSizeBytes: number | null;
     /**

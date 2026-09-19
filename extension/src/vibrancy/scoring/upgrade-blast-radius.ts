@@ -69,21 +69,26 @@ function parseRange(raw: string): string | null {
 /** True only when both sides parse and `version` lies outside `rawRange`. */
 function excludes(rawRange: string, version: string): boolean {
     const range = parseRange(rawRange);
-    const v = semver.coerce(version);
+    const v = toVersion(version);
     if (!range || !v) { return false; }
-    return !semver.satisfies(v.version, range);
+    return !semver.satisfies(v, range, { includePrerelease: true });
+}
+
+/** Exact parse first (keeps prerelease tags); coerce only as a fallback. */
+function toVersion(raw: string): string | null {
+    return semver.valid(raw.trim()) ?? semver.coerce(raw)?.version ?? null;
 }
 
 /** Held-back entry whose package and range cover the target version, if any. */
 function findHeldBack(
     pkg: string, to: string, heldBack: readonly HeldBackEntry[],
 ): HeldBackEntry | null {
-    const v = semver.coerce(to);
+    const v = toVersion(to);
     if (!v) { return null; }
     for (const entry of heldBack) {
         if (entry.pkg !== pkg) { continue; }
         const range = parseRange(entry.range);
-        if (range && semver.satisfies(v.version, range)) { return entry; }
+        if (range && semver.satisfies(v, range, { includePrerelease: true })) { return entry; }
     }
     return null;
 }
@@ -107,9 +112,13 @@ function findSdkBlock(
  * Packages with no dependents of their own. The caller does not pass the
  * direct-dep set, so graph roots stand in for it when tracing a chain.
  */
+const rootsCache = new WeakMap<object, Set<string>>();
+
 function graphRoots(
     reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,
 ): Set<string> {
+    const cached = rootsCache.get(reverseDeps);
+    if (cached) { return cached; }
     const roots = new Set<string>();
     for (const edges of reverseDeps.values()) {
         for (const edge of edges) {
@@ -118,12 +127,13 @@ function graphRoots(
             }
         }
     }
+    rootsCache.set(reverseDeps, roots);
     return roots;
 }
 
 /** Dependents whose declared range on `pkg` excludes `to`. */
 function findBreakers(input: BlastRadiusInput): BlastBreaker[] {
-    const roots = graphRoots(input.reverseDeps);
+    let roots: Set<string> | null = null;
     const breakers: BlastBreaker[] = [];
     const seen = new Set<string>();
     for (const edge of input.reverseDeps.get(input.pkg) ?? []) {
@@ -133,32 +143,18 @@ function findBreakers(input: BlastRadiusInput): BlastBreaker[] {
         const constraint = input.constraints.get(name)?.get(input.pkg);
         if (!constraint || !excludes(constraint, input.to)) { continue; }
 
+        roots ??= graphRoots(input.reverseDeps);
         const path = pathToDirectDep(name, input.reverseDeps, roots);
-        const latest = input.latestOf?.get(name);
         breakers.push({
             name,
             constraint,
             chain: path.length > 1 ? path : null,
-            fixedInLatest: newerThanConstraint(constraint, latest),
+            // latestOf carries only a version number, not that release's ranges,
+            // so a fix cannot be confirmed from it; stay unknown, never guess.
+            fixedInLatest: null,
         });
     }
     return breakers;
-}
-
-/**
- * Approximates "the breaker has a fix": its latest release is newer than the
- * floor of the range that excludes the target, so a later release may have
- * widened it. Null when the latest version is unknown or unparseable.
- */
-function newerThanConstraint(
-    constraint: string, latest: string | undefined,
-): boolean | null {
-    if (latest === undefined) { return null; }
-    const range = parseRange(constraint);
-    const floor = range ? semver.minVersion(range) : null;
-    const latestV = semver.coerce(latest);
-    if (!floor || !latestV) { return null; }
-    return semver.gt(latestV.version, floor.version);
 }
 
 export function computeBlastRadius(input: BlastRadiusInput): BlastRadius {

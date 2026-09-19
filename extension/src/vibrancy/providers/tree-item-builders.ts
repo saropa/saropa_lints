@@ -8,6 +8,7 @@ import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
 import { formatSharedDepDetail, formatConstrainedReason, formatPinIntent, formatVersionDrift } from '../scoring/blocker-analyzer';
+import { isUpgradeSuppressed, formatBreakers } from '../scoring/blast-radius-attacher';
 import { DetailItem, GroupItem, SourceCodeItem } from './tree-item-classes';
 
 /** Tree group/detail builders: version rows, community, licenses, dep graph items. */
@@ -172,12 +173,18 @@ function buildUpdateGroup(result: VibrancyResult): GroupItem | null {
     }
     const ui = result.updateInfo;
     const emoji = updateEmoji(ui.updateStatus);
-    const items: DetailItem[] = [
-        new DetailItem(
+    const items: DetailItem[] = [];
+    if (isUpgradeSuppressed(result) && result.blastRadius) {
+        items.push(new DetailItem('⚠️ Upgrade not recommended', result.blastRadius.summary));
+        for (const line of formatBreakers(result.blastRadius)) {
+            items.push(new DetailItem('  breaks', line));
+        }
+    } else {
+        items.push(new DetailItem(
             `${emoji} ${ui.currentVersion} → ${ui.latestVersion}`,
             `(${ui.updateStatus})`,
-        ),
-    ];
+        ));
+    }
     if (result.blocker) {
         const b = result.blocker;
         const detail = formatSharedDepDetail(b);

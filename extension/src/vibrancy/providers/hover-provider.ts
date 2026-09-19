@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
 import { escapeMarkdown } from '../../markdownUtils';
 import { VibrancyResult, FamilySplit, PackageInsight, activeFileUsages } from '../types';
 import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
+import { isUpgradeSuppressed, formatBreakers } from '../scoring/blast-radius-attacher';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
@@ -178,7 +179,14 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
         // Annotate non-hosted deps so the version gap doesn't read as a stuck
         // pub upgrade — git/path/SDK deps aren't bumped by editing a caret.
         const srcNote = managedSourceNote(r.package.source);
-        rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus})${srcNote ? ` — ${srcNote}` : ''} |`);
+        if (r.blastRadius && isUpgradeSuppressed(r)) {
+            rows.push(`| Upgrade | ${escapeMarkdown(r.blastRadius.summary)} |`);
+            for (const line of formatBreakers(r.blastRadius)) {
+                rows.push(`| Breaks | ${escapeMarkdown(line)} |`);
+            }
+        } else {
+            rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus})${srcNote ? ` — ${srcNote}` : ''} |`);
+        }
         if (r.blocker) {
             const detail = formatSharedDepDetail(r.blocker);
             rows.push(

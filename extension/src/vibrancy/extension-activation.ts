@@ -87,6 +87,7 @@ import {
     runOverrideAnalysis, overrideConstrainerCandidates,
 } from './services/override-runner';
 import { buildConstraintIndex } from './services/shared-dep-constraints';
+import { attachBlastRadius, blastRadiusCandidates } from './scoring/blast-radius-attacher';
 import { OverrideAnalysis, NewVersionNotification, PackageInsight } from './types';
 import { consolidateInsights } from './scoring/consolidate-insights';
 import {
@@ -1394,6 +1395,16 @@ async function runScanInner(
                 getSiblingRepoPaths(),
             );
             results = attachVersionDrift(results, siblingConstraints);
+            // Upgrade blast radius: a non-safe verdict suppresses the plain
+            // upgrade nudge and excludes the package from bulk upgrade-all.
+            const blastConstraints = await buildConstraintIndex(
+                workspaceRoot,
+                blastRadiusCandidates(results, enrichResult.reverseDeps),
+            );
+            results = attachBlastRadius(results, {
+                reverseDeps: enrichResult.reverseDeps,
+                constraints: blastConstraints,
+            });
             lastReverseDeps = enrichResult.reverseDeps;
             lastFloors = enrichResult.floors;
             lastForbiddens = enrichResult.forbiddens;

@@ -106,21 +106,14 @@ describe('computeBlastRadius', () => {
         assert.strictEqual(r.verdict, 'safe');
     });
 
-    it('sets fixedInLatest from the dependent latest version', () => {
-        const input = {
+    it('leaves fixedInLatest unknown (null) even when latestOf is given', () => {
+        const r = computeBlastRadius({
             ...base,
             reverseDeps: reverse([['lints', 'analyzer']]),
             constraints: constraintsOf([['lints', 'analyzer', '^12.0.0']]),
-        };
-        assert.strictEqual(computeBlastRadius(input).breakers[0].fixedInLatest, null);
-        const newer = computeBlastRadius({
-            ...input, latestOf: new Map([['lints', '3.0.0']]),
+            latestOf: new Map([['lints', '3.0.0']]),
         });
-        assert.strictEqual(newer.breakers[0].fixedInLatest, true);
-        const same = computeBlastRadius({
-            ...input, latestOf: new Map([['lints', '12.0.0']]),
-        });
-        assert.strictEqual(same.breakers[0].fixedInLatest, false);
+        assert.strictEqual(r.breakers[0].fixedInLatest, null);
     });
 
     it('is sdk-blocked when a target dep excludes the SDK pin', () => {
@@ -185,5 +178,34 @@ describe('computeBlastRadius', () => {
             sdkPins: new Map([['meta', '1.18.0']]),
         });
         assert.strictEqual(r.verdict, 'sdk-blocked');
+    });
+
+    it('caret on 0.x excludes the next minor', () => {
+        const r = computeBlastRadius({
+            ...base, pkg: 'p', from: '0.1.0', to: '0.2.0',
+            reverseDeps: reverse([['a', 'p']]),
+            constraints: constraintsOf([['a', 'p', '^0.1.0']]),
+        });
+        assert.strictEqual(r.verdict, 'breaks-dependents');
+    });
+
+    it('prerelease target is not treated as its release version', () => {
+        const r = computeBlastRadius({
+            ...base, pkg: 'p', from: '1.0.0', to: '2.0.0-dev.1',
+            reverseDeps: reverse([['a', 'p']]),
+            constraints: constraintsOf([['a', 'p', '>=2.0.0 <3.0.0']]),
+        });
+        assert.strictEqual(r.verdict, 'breaks-dependents');
+    });
+
+    it('treats `any` and unparseable constraints as non-breaking', () => {
+        for (const c of ['any', 'garbage']) {
+            const r = computeBlastRadius({
+                ...base,
+                reverseDeps: reverse([['a', 'analyzer']]),
+                constraints: constraintsOf([['a', 'analyzer', c]]),
+            });
+            assert.strictEqual(r.verdict, 'safe', c);
+        }
     });
 });
