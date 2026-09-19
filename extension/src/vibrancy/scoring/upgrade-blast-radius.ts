@@ -39,12 +39,31 @@ export interface BlastRadius {
     readonly to: string;
     readonly verdict: BlastVerdict;
     readonly breakers: readonly BlastBreaker[];
-    /** e.g. "analyzer 13.1.0 needs meta ^1.18.3; Flutter pins meta 1.18.0". */
-    readonly sdkBlock: string | null;
+    /** Structured SDK conflict (formatted at the UI edge, see blast-radius-attacher). */
+    readonly sdkBlock: SdkBlock | null;
+    /** Curated maintainer explanation (data, not localized). */
     readonly heldBackReason: string | null;
-    /** One line, user-facing. */
-    readonly summary: string;
+    /** l10n key of the one-line summary; format with `describeBlastSummary`. */
+    readonly summaryKey: BlastSummaryKey;
+    /** Params for `summaryKey`; `sdk` is pre-formatted by the edge, never here. */
+    readonly summaryParams: Readonly<Record<string, string | number>>;
 }
+
+/** A target dependency range that excludes an SDK-pinned version. */
+export interface SdkBlock {
+    readonly pkg: string;
+    readonly to: string;
+    readonly dep: string;
+    readonly range: string;
+    readonly pinned: string;
+}
+
+export type BlastSummaryKey =
+    | 'blastRadius.summary.heldBack'
+    | 'blastRadius.summary.sdkBlocked'
+    | 'blastRadius.summary.breaksOne'
+    | 'blastRadius.summary.breaksOther'
+    | 'blastRadius.summary.safe';
 
 export interface BlastRadiusInput {
     pkg: string;
@@ -98,12 +117,12 @@ function findSdkBlock(
     pkg: string, to: string,
     targetDeps: ReadonlyMap<string, string> | null,
     sdkPins: ReadonlyMap<string, string>,
-): string | null {
+): SdkBlock | null {
     if (!targetDeps) { return null; }
     for (const [dep, range] of targetDeps) {
         const pinned = sdkPins.get(dep);
         if (pinned === undefined || !excludes(range, pinned)) { continue; }
-        return `${pkg} ${to} needs ${dep} ${range}; Flutter pins ${dep} ${pinned}`;
+        return { pkg, to, dep, range, pinned };
     }
     return null;
 }
@@ -165,31 +184,39 @@ export function computeBlastRadius(input: BlastRadiusInput): BlastRadius {
     const sdkBlock = findSdkBlock(pkg, to, input.targetDeps, input.sdkPins);
     const breakers = findBreakers(input);
 
+    const pkgTo = { pkg, to };
     if (held) {
         return {
             ...base, verdict: 'held-back', breakers, sdkBlock,
             heldBackReason: held.reason,
-            summary: `${pkg} ${to} is held back: ${held.reason}`,
+            summaryKey: 'blastRadius.summary.heldBack',
+            summaryParams: { ...pkgTo, reason: held.reason },
         };
     }
     if (sdkBlock) {
         return {
             ...base, verdict: 'sdk-blocked', breakers, sdkBlock,
             heldBackReason: null,
-            summary: `${pkg} ${to} is blocked by the SDK: ${sdkBlock}`,
+            summaryKey: 'blastRadius.summary.sdkBlocked',
+            summaryParams: { ...pkgTo },
         };
     }
     if (breakers.length > 0) {
-        const names = breakers.map(b => b.name).join(', ');
         return {
             ...base, verdict: 'breaks-dependents', breakers, sdkBlock: null,
             heldBackReason: null,
-            summary: `${pkg} ${to} would break ${breakers.length} dependent`
-                + `${breakers.length === 1 ? '' : 's'}: ${names}`,
+            summaryKey: breakers.length === 1
+                ? 'blastRadius.summary.breaksOne' : 'blastRadius.summary.breaksOther',
+            summaryParams: {
+                ...pkgTo, count: breakers.length,
+                names: breakers.map(b => b.name).join(', '),
+            },
         };
     }
     return {
         ...base, verdict: 'safe', breakers: [], sdkBlock: null,
-        heldBackReason: null, summary: `${pkg} ${from} -> ${to} looks safe`,
+        heldBackReason: null,
+        summaryKey: 'blastRadius.summary.safe',
+        summaryParams: { pkg, from, to },
     };
 }

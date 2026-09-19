@@ -8,7 +8,8 @@ import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
 import { formatSharedDepDetail, formatConstrainedReason, formatPinIntent, formatVersionDrift } from '../scoring/blocker-analyzer';
-import { isUpgradeSuppressed, formatBreakers } from '../scoring/blast-radius-attacher';
+import { l10n } from '../../i18n/runtime';
+import { isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { DetailItem, GroupItem, SourceCodeItem } from './tree-item-classes';
 
 /** Tree group/detail builders: version rows, community, licenses, dep graph items. */
@@ -175,9 +176,9 @@ function buildUpdateGroup(result: VibrancyResult): GroupItem | null {
     const emoji = updateEmoji(ui.updateStatus);
     const items: DetailItem[] = [];
     if (isUpgradeSuppressed(result) && result.blastRadius) {
-        items.push(new DetailItem('⚠️ Upgrade not recommended', result.blastRadius.summary));
+        items.push(new DetailItem(l10n('blastRadius.label.upgradeNotRecommended'), describeBlastSummary(result.blastRadius)));
         for (const line of formatBreakers(result.blastRadius)) {
-            items.push(new DetailItem('  breaks', line));
+            items.push(new DetailItem(`  ${l10n('blastRadius.label.breaksLower')}`, line));
         }
     } else {
         items.push(new DetailItem(

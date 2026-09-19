@@ -57,6 +57,8 @@
     "src/test/vibrancy/scoring/constraint-chain.test.ts",
     "src/test/vibrancy/scoring/upgrade-blast-radius.test.ts",
     "src/test/vibrancy/scoring/blast-radius-attacher.test.ts",
+    "src/test/vibrancy/services/bulk-updater.test.ts",
+    "src/test/vibrancy/services/upgrade-target-deps.test.ts",
     "src/test/vibrancy/scoring/floor-constraints.test.ts",
     "src/test/vibrancy/scoring/forbidden-constraints.test.ts",
     "src/test/vibrancy/scoring/dual-dependency-detector.test.ts",

@@ -86,6 +86,8 @@ import { allKnownIssues } from './scoring/known-issues';
 import {
     runOverrideAnalysis, overrideConstrainerCandidates,
 } from './services/override-runner';
+import { fetchTargetDepsFor } from './services/upgrade-target-deps';
+import { deriveSdkPins } from './services/sdk-pins';
 import { buildConstraintIndex } from './services/shared-dep-constraints';
 import { attachBlastRadius, blastRadiusCandidates } from './scoring/blast-radius-attacher';
 import { OverrideAnalysis, NewVersionNotification, PackageInsight } from './types';
@@ -1401,9 +1403,14 @@ async function runScanInner(
                 workspaceRoot,
                 blastRadiusCandidates(results, enrichResult.reverseDeps),
             );
+            const targetDeps = await fetchTargetDepsFor(results, targets.cache);
+            const derivedPins = await deriveSdkPins(workspaceRoot.fsPath);
             results = attachBlastRadius(results, {
                 reverseDeps: enrichResult.reverseDeps,
                 constraints: blastConstraints,
+                targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
+                // Undefined -> attacher falls back to the documented table.
+                sdkPins: derivedPins.size > 0 ? derivedPins : undefined,
             });
             lastReverseDeps = enrichResult.reverseDeps;
             lastFloors = enrichResult.floors;

@@ -15,7 +15,7 @@ import { formatSizeMB } from '../scoring/bloat-calculator';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
-import { isUpgradeSuppressed, formatBreakers } from '../scoring/blast-radius-attacher';
+import { isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { createWebviewCspNonce, escapeHtml, resolveRepoUrl } from './html-utils';
 import { l10n } from '../../i18n/runtime';
@@ -264,9 +264,9 @@ function buildVersionSection(r: VibrancyResult): string {
         rows.push(row(l10n('packageDetail.version.published'), escapeHtml(r.pubDev.publishedDate.split('T')[0])));
     }
     if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date' && r.blastRadius && isUpgradeSuppressed(r)) {
-        rows.push(row('Upgrade', escapeHtml(r.blastRadius.summary)));
+        rows.push(row(l10n('blastRadius.label.upgrade'), escapeHtml(describeBlastSummary(r.blastRadius))));
         for (const line of formatBreakers(r.blastRadius)) {
-            rows.push(row('Breaks', escapeHtml(line)));
+            rows.push(row(l10n('blastRadius.label.breaks'), escapeHtml(line)));
         }
     } else if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date') {
         rows.push(row(l10n('packageDetail.version.update'),

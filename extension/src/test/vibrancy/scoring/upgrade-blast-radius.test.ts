@@ -67,7 +67,8 @@ describe('computeBlastRadius', () => {
         assert.strictEqual(r.breakers[0].name, 'lints');
         assert.strictEqual(r.breakers[0].constraint, '^12.0.0');
         assert.deepStrictEqual(r.breakers[0].chain, ['app', 'lints']);
-        assert.ok(r.summary.includes('lints'));
+        assert.strictEqual(r.summaryKey, 'blastRadius.summary.breaksOne');
+        assert.strictEqual(r.summaryParams.names, 'lints');
     });
 
     it('has a null chain when the breaker has no ancestor', () => {
@@ -123,10 +124,10 @@ describe('computeBlastRadius', () => {
             sdkPins: new Map([['meta', '1.18.0']]),
         });
         assert.strictEqual(r.verdict, 'sdk-blocked');
-        assert.strictEqual(
-            r.sdkBlock,
-            'analyzer 13.1.0 needs meta ^1.18.3; Flutter pins meta 1.18.0',
-        );
+        assert.deepStrictEqual(r.sdkBlock, {
+            pkg: 'analyzer', to: '13.1.0', dep: 'meta',
+            range: '^1.18.3', pinned: '1.18.0',
+        });
     });
 
     it('is not sdk-blocked when the pin satisfies the range', () => {

@@ -7,13 +7,14 @@
 
 import { DepEdge, VibrancyResult } from '../types';
 import { ConstraintIndex } from './shared-dep-conflict-detector';
-import { computeBlastRadius, BlastRadius } from './upgrade-blast-radius';
+import { computeBlastRadius, BlastRadius, SdkBlock } from './upgrade-blast-radius';
+import { l10n } from '../../i18n/runtime';
 import { HELD_BACK_UPGRADES, HeldBackEntry } from './held-back-upgrades';
 
 /**
- * Packages whose exact version is pinned by the Flutter SDK. Small documented
- * table: no existing source carries these. `meta` matches the pin cited in the
- * root pubspec.yaml HARD STOP comment for analyzer 13.
+ * FALLBACK ONLY. Used when SDK pins cannot be derived from the environment
+ * (see services/sdk-pins.ts). `meta` matches the pin cited in the root
+ * pubspec.yaml HARD STOP comment for analyzer 13.
  */
 export const SDK_PINNED_PACKAGES: ReadonlyMap<string, string> = new Map([
     ['meta', '1.18.0'],
@@ -73,8 +74,23 @@ export function isUpgradeSuppressed(r: VibrancyResult): boolean {
     return !!b && b.verdict !== 'safe';
 }
 
-/** Breaker lines for display: "name (^12.0.0) via a -> b". */
+/** Localized SDK conflict line, e.g. "analyzer 13.1.0 needs meta ^1.18.3; Flutter pins meta 1.18.0". */
+export function formatSdkBlock(b: SdkBlock): string {
+    return l10n('blastRadius.sdkBlock', { ...b });
+}
+
+/** Localized one-line verdict summary (UI edge; computeBlastRadius stays pure). */
+export function describeBlastSummary(b: BlastRadius): string {
+    return l10n(b.summaryKey, b.sdkBlock
+        ? { ...b.summaryParams, sdk: formatSdkBlock(b.sdkBlock) }
+        : b.summaryParams);
+}
+
+/** Localized breaker lines: "name (^12.0.0) via a -> b". */
 export function formatBreakers(b: BlastRadius): string[] {
-    return b.breakers.map(x =>
-        `${x.name} (${x.constraint})${x.chain ? ` via ${x.chain.join(' -> ')}` : ''}`);
+    return b.breakers.map(x => x.chain
+        ? l10n('blastRadius.breakerVia', {
+            name: x.name, constraint: x.constraint, chain: x.chain.join(' -> '),
+        })
+        : l10n('blastRadius.breaker', { name: x.name, constraint: x.constraint }));
 }

@@ -2856,5 +2856,25 @@
     "discovering": "Discovering server and fetching issues…",
     "noServerFound": "No Drift Advisor server found. Start your app with the server running, then click Refresh.",
     "integrationOff": "Drift Advisor integration is off. Enable it in settings (saropaLints.driftAdvisor.integration), then click Refresh."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "Upgrade",
+      "breaks": "Breaks",
+      "breaksLower": "breaks",
+      "upgradeNotRecommended": "⚠️ Upgrade not recommended"
+    },
+    "notRecommended": "Upgrade not recommended",
+    "skipReason": "upgrade not recommended: {summary}",
+    "sdkBlock": "{pkg} {to} needs {dep} {range}; Flutter pins {dep} {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) via {chain}",
+    "summary": {
+      "heldBack": "{pkg} {to} is held back: {reason}",
+      "sdkBlocked": "{pkg} {to} is blocked by the SDK: {sdk}",
+      "breaksOne": "{pkg} {to} would break {count} dependent: {names}",
+      "breaksOther": "{pkg} {to} would break {count} dependents: {names}",
+      "safe": "{pkg} {from} -> {to} looks safe"
+    }
   }
 }

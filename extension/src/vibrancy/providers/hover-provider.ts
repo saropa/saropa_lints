@@ -9,7 +9,7 @@ import * as vscode from 'vscode';
 import { escapeMarkdown } from '../../markdownUtils';
 import { VibrancyResult, FamilySplit, PackageInsight, activeFileUsages } from '../types';
 import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
-import { isUpgradeSuppressed, formatBreakers } from '../scoring/blast-radius-attacher';
+import { isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
@@ -21,6 +21,7 @@ import {
     PACKAGE_VIBRANCY_DOC_URL,
 } from '../sdk-vibrancy-table';
 import { resolveRepoUrl } from '../views/html-utils';
+import { l10n } from '../../i18n/runtime';
 
 export class VibrancyHoverProvider implements vscode.HoverProvider {
     private _results = new Map<string, VibrancyResult>();
@@ -180,9 +181,9 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
         // pub upgrade — git/path/SDK deps aren't bumped by editing a caret.
         const srcNote = managedSourceNote(r.package.source);
         if (r.blastRadius && isUpgradeSuppressed(r)) {
-            rows.push(`| Upgrade | ${escapeMarkdown(r.blastRadius.summary)} |`);
+            rows.push(`| ${l10n('blastRadius.label.upgrade')} | ${escapeMarkdown(describeBlastSummary(r.blastRadius))} |`);
             for (const line of formatBreakers(r.blastRadius)) {
-                rows.push(`| Breaks | ${escapeMarkdown(line)} |`);
+                rows.push(`| ${l10n('blastRadius.label.breaks')} | ${escapeMarkdown(line)} |`);
             }
         } else {
             rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus})${srcNote ? ` — ${srcNote}` : ''} |`);

@@ -11,7 +11,7 @@ import {
     classifyIncrement, filterByIncrement, formatIncrement,
     IncrementFilter, VersionIncrement,
 } from '../scoring/version-increment';
-import { isUpgradeSuppressed } from '../scoring/blast-radius-attacher';
+import { isUpgradeSuppressed, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { buildVersionEdit, findPubspecYaml } from './pubspec-editor';
 import { l10n } from '../../i18n/runtime';
 
@@ -69,7 +69,9 @@ export function getUpdatablePackages(
         if (isUpgradeSuppressed(pkg)) {
             skipped.push({
                 name,
-                reason: `upgrade not recommended: ${pkg.blastRadius?.summary ?? ''}`,
+                reason: l10n('blastRadius.skipReason', {
+                    summary: pkg.blastRadius ? describeBlastSummary(pkg.blastRadius) : '',
+                }),
             });
             continue;
         }
