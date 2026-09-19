@@ -34,6 +34,28 @@ class Foo {
     assert.strictEqual(m.hasAsyncCode, true);
   });
 
+  it('detects StatefulWidget classes', () => {
+    const content = `class MyPage extends StatefulWidget {
+  @override
+  State<MyPage> createState() => _MyPageState();
+}
+`;
+    const m = computeFileMetrics(content, 'lib/my_page.dart');
+    assert.strictEqual(m.hasWidgets, true);
+  });
+
+  it('detects ConsumerWidget classes with a build(BuildContext) method', () => {
+    const content = `class MyConsumer extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container();
+  }
+}
+`;
+    const m = computeFileMetrics(content, 'lib/my_consumer.dart');
+    assert.strictEqual(m.hasWidgets, true);
+  });
+
   it('does not flag plain data classes as widgets or async', () => {
     const content = `class Point {
   final int x;
