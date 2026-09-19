@@ -104,6 +104,7 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Fixed (Extension)
 
+- Every translated language now has complete, correct translations: missing strings were added, broken placeholders and code snippets repaired, and hundreds of nonsensical machine translations replaced. No action required.
 - The "Dismiss" button in every translated language now reads correctly; several languages previously showed unrelated machine-translated phrases. No action required.
 - Package Vibrancy's known-issues data now marks `cubit`, `shared_preferences_ios`, `url_strategy` and `integration_test` as end of life, no longer flags eight revived packages (such as `alice` and `rubber`), and stops flagging current `flutter_secure_storage` versions for a pre-5.0 problem. No action required.
 - The Analysis Optimizer's git-based scan now also covers Dart code inside git submodules and nested repositories. No action required.

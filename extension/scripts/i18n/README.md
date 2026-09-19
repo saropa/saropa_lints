@@ -1,5 +1,29 @@
 # Extension i18n generator
 
+## Rules (read first)
+
+- **Never run `generate_locales.py` without machine translation enabled**
+  (`SAROPA_I18N_MACHINE_TRANSLATE=1` and its dependencies). Without it the
+  script fills missing keys with English, which then ships as "translated".
+- Translations are self-enforced by `verify_locales.py` (stdlib, no network) and
+  by the mocha test `src/test/i18n/localeParity.test.ts`.
+
+### Adding a string
+
+1. Add the key to `src/i18n/locales/en.json` (runtime) or `package.nls.json` (manifest).
+2. Run `python3 scripts/i18n/verify_locales.py --json /tmp/audit.json`; it lists
+   missing keys, placeholder mismatches, identical-to-English values,
+   empty values and suspicious short labels per locale.
+3. Fill in translations for every locale. `{name}` tokens, backticked code and
+   markdown/command links must match English exactly.
+4. Re-run the verifier, `python3 -m unittest discover scripts/i18n/tests`, and
+   the mocha parity test. All must pass.
+
+Brand names, code tokens and legitimate identical cognates go in
+`english_allowed.json` (`values`, `words`, `keys`). The parity test only warns on
+identical-to-English until `FAIL_ON_IDENTICAL` in `localeParity.test.ts` is set to `true`.
+
+
 Generates localized JSON files from English sources for:
 
 - `extension/package.nls.<locale>.json`

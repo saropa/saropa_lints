@@ -8,6 +8,7 @@
   "include": [
     "src/services/todosAndHacksScannerCore.ts",
     "src/views/todosAndHacksDefaults.ts",
+    "src/test/i18n/localeParity.test.ts",
     "src/test/todosAndHacks/**/*.ts",
     "src/driftAdvisor/types.ts",
     "src/driftAdvisor/discovery.ts",

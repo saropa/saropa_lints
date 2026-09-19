@@ -80,21 +80,21 @@
       "subtitle": "یافته های {count} · {timestamp}",
       "baselineSubtitle": "مقایسه با خط پایه از {date}",
       "searchPlaceholder": "فیلتر کردن بر اساس قاعده، فایل یا پیام…",
-      "filterTier": "در این صورت، سطح سرمایه گذاری شما به طور کامل تحت کنترل قرار خواهد گرفت.",
-      "filterSeverity": "شدت: میزان شدید بودن",
-      "filterImpact": "تاثیرات بر اثر اثرات تأثیر",
+      "filterTier": "سطح",
+      "filterSeverity": "شدت",
+      "filterImpact": "تأثیر",
       "filterBaselineStatus": "بازه پایه",
       "baselineNew": "جدید",
       "baselineUnchanged": "غیر تغییر یافته",
       "saveBaseline": "بازگرداندن به پایه",
-      "copyJson": "کپی JSON را کپی کنید",
-      "toggleGroup": "گروه بندی را فعال / غیر فعال کنید",
-      "colFile": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "copyJson": "کپی JSON",
+      "toggleGroup": "تغییر گروه‌بندی",
+      "colFile": "فایل",
       "colLine": "خط خط خط",
-      "colRule": "قاعده قانون اساسی",
-      "colSeverity": "شدت: میزان شدید بودن",
-      "colTier": "در این صورت، سطح سرمایه گذاری شما به طور کامل تحت کنترل قرار خواهد گرفت.",
-      "colMessage": "پیام پیغام پیام پیام",
+      "colRule": "قاعده",
+      "colSeverity": "شدت",
+      "colTier": "سطح",
+      "colMessage": "پیام",
       "empty": "پروژه پاک است — چیزی پیدا نشد.",
       "filteredEmpty": "نتیجه ای با فیلترهای موجود مطابقت ندارد.",
       "loadMore": "نمایش بیشتر",
@@ -159,25 +159,25 @@
       "filterLabel": "فیلتر ویژگی ها",
       "filterPlaceholder": "فیلتر کردن بر اساس متن ویژگی، نماد یا نسخه...",
       "unusedOnly": "استفاده نشده فقط",
-      "usedOnly": "فقط استفاده شده است",
+      "usedOnly": "فقط استفاده‌شده",
       "deprecatedOnly": "منسوخ شده تنها",
-      "expandAll": "همه را گسترش دهید",
-      "collapseAll": "همه چیز فرو می ریزد.",
+      "expandAll": "باز کردن همه",
+      "collapseAll": "بستن همه",
       "indexLabel": "پکیج ایندکس"
     },
     "summary": {
       "title": "چکیده پکیج",
       "sortHint": "این ستون را برای مرتب سازی انتخاب کنید",
       "colPackage": "بسته بندی پکیج:",
-      "colVersion": "نسخه ای از این کتاب،",
+      "colVersion": "نسخه",
       "colFeatures": "ویژگی ها",
       "colAdopted": "دریافت شده",
       "colUnadopted": "غیر پذیرفته شده",
       "colUsages": "استفاده ها",
-      "colScore": "امتیاز نمره ای را بدست آورید"
+      "colScore": "امتیاز"
     },
     "packages": {
-      "title": "بسته های حمل و نقل"
+      "title": "بسته‌ها"
     },
     "empty": {
       "body": "هیچ پکیجی اسکن نشد، بنابراین هیچ ویژگی برای لیست کردن وجود ندارد."
@@ -207,27 +207,27 @@
       "usagesOne": "استفاده از {count}",
       "usagesUnknown": "استفاده قابل اندازه گیری نیست",
       "apiHeading": "{symbol} ({count})",
-      "viewCode": "کد را مشاهده کنید View code",
-      "viewDocs": "View docs (دستورها را مشاهده کنید)",
+      "viewCode": "مشاهده کد",
+      "viewDocs": "مشاهده مستندات",
       "noUsages": "استفاده‌ای در منبع پروژه یافت نشد.",
       "moreUsages": "{count} بیشترین استفاده ها",
       "moreUsagesOne": "{count} بیشتر استفاده کنید"
     },
     "chip": {
       "adopted": "دریافت شده",
-      "partial": "بخشی از آن گرفته شده است",
-      "unused": "هرگز استفاده نشده است",
-      "unmeasurable": "قابل اندازه گیری نیست"
+      "partial": "تا حدی به‌کار رفته",
+      "unused": "هرگز استفاده نشده",
+      "unmeasurable": "غیرقابل اندازه‌گیری"
     }
   },
   "stylistic": {
     "title": "سبک و نظرات",
     "intro": "قوانین سبک اظهار نظر، به طور پیش فرض خاموش است. فقط مواردی را روشن کنید که تیم شما با آن موافقت کرده باشد. انتخاب های متضاد با هم گروه بندی می شوند تا شما یکی را انتخاب کنید.",
     "searchPlaceholder": "قوانین سبک جستجو...",
-    "pickOne": "یکی را انتخاب کنید.",
-    "none": "هیچ کدام از این ها وجود ندارد.",
-    "enableAll": "همه را فعال کنید enable all",
-    "disableAll": "همه را غیرفعال کنید",
+    "pickOne": "یکی را انتخاب کنید",
+    "none": "هیچ",
+    "enableAll": "فعال‌سازی همه",
+    "disableAll": "غیرفعال‌سازی همه",
     "noMatch": "هیچ کدام از قوانین سبک با هم مطابقت ندارند.",
     "desc": {
       "ordering_sorting": "اعضای مرتب، پارامترها، زمینه ها و کلید های نقشه را برای طرح قابل پیش بینی ترتیب می دهد. ⁇  در کد های موجود بسیار پر سر و صدا است بهترین کار روی کد جدید یا مخازن کوچک",
@@ -248,7 +248,7 @@
     "forYourProject": "برای پروژه شما",
     "forYourProjectHint": "بسته هایی که وابستگی یا SDK آنها با مشخصات pub شما مطابقت دارد. این قوانین برای کدی که شما در واقع ارسال می کنید، اعمال می شود.",
     "noneDetected": "هنوز هیچ بسته ای با وابستگی های شما مطابقت ندارد. یک بسته پشتیبانی شده اضافه کنید یا تمام بسته های زیر را باز کنید.",
-    "allPackages": "همه بسته ها تمام بسته ها",
+    "allPackages": "همه بسته‌ها",
     "allPackagesHint": "هر بسته ای که در دسترس است، از جمله آنهایی که در این پروژه شناسایی نشده اند. این امکان را به یک دسته می دهد تا قوانین خود را انتخاب کند.",
     "versionGroup": {
       "tag": "یک نسخه را انتخاب کنید.",
@@ -274,18 +274,18 @@
       "ariaLabel": "قواعد و سطوح پانل نمایشگر"
     },
     "tab": {
-      "tier": "در این صورت، سطح سرمایه گذاری شما به طور کامل تحت کنترل قرار خواهد گرفت.",
-      "packs": "بسته های قواعد Rule Packs",
-      "overrides": "Overrides را نادیده می گیرد.",
+      "tier": "سطح",
+      "packs": "بسته‌های قاعده",
+      "overrides": "بازنویسی‌ها",
       "sdk": "SDK رولآوت",
       "configFile": "فایل تنظیم",
       "automation": "ان 자تو میشن",
       "extension": "افزونه"
     },
     "common": {
-      "rule": "قاعده قانون اساسی",
+      "rule": "قاعده",
       "add": "افزودن",
-      "remove": "حذف remove از بین بردن"
+      "remove": "حذف"
     },
     "sdk": {
       "summary": "بسته های مهاجرت SDK {total} به این پروژه اعمال می شود — {breaking} شکست، {deprecation} منسوخ شدن.",
@@ -372,7 +372,7 @@
           "resolvedSection": "حل شده ({count})",
           "newSection": "جدید از پایه ({count})",
           "moreRows": "+{count} بیشتر نمایش داده نشده است.",
-          "fileCol": "فایل های فولدر را به صورت زیر نمایش دهید:",
+          "fileCol": "فایل",
           "lineCol": "خط خط خط"
         }
       },
@@ -401,18 +401,18 @@
     "empty": "همه چیز روشن است  ⁇ هیچ یافته ای در این مورد وجود ندارد.",
     "liveTitle": "زنده  ⁇  زندگی کنید به روزرسانی ها در حین ویرایش شما انجام می شود.",
     "fetching": "...منتظر...",
-    "noOccurrences": "هیچ اتفاقاتی رخ نداد",
+    "noOccurrences": "بدون رخداد",
     "summaryFindings": "{count} یافته",
     "summaryRules": "{count} قانون",
     "more": "+{count} بیشتر",
-    "wordErrors": "اشتباهات خطا خطاهای خطا",
-    "wordWarnings": "هشدارها و هشدارهای هشداردهنده",
-    "wordInfo": "اطلاعات، اطلاعات، اطلاعاتی",
-    "wordFiles": "فایل های فايل ها را به صورت",
-    "gradeExcellent": "عالی، بسیار عالی.",
+    "wordErrors": "خطا",
+    "wordWarnings": "هشدار",
+    "wordInfo": "اطلاعات",
+    "wordFiles": "فایل",
+    "gradeExcellent": "عالی",
     "gradeGood": "خوب خوب خوب",
-    "gradeFair": "منصفانه، عادلانه و منصفانه",
-    "gradeWeak": "ضعیف و ضعیف، ضعف را به خود جلب می کند.",
+    "gradeFair": "متوسط",
+    "gradeWeak": "ضعیف",
     "gradeSevere": "شدید بسیار شدید",
     "evidence": {
       "advisor": "مشاور در زمان اجرا تایید می کند.",
@@ -444,7 +444,7 @@
   },
   "startupNudge": {
     "message": "Saropa Lints: _PH1_: به معنی PH1. {count} پیشنهاد بسته قواعد (s) به این پروژه اعمال می شود.",
-    "review": "بررسی Review Review بازبینی",
+    "review": "بازبینی",
     "dismiss": "رد کردن",
     "reviewFailed": "بازبینی بسته قانون Saropa Lints باز نشد. {error}"
   },
@@ -456,7 +456,7 @@
     "openFileFailed": "نتوانست {file} را باز کند  ⁇ ممکن است از آخرین اسکن به بعد جابجا شده باشد.",
     "card": {
       "versionUpgrade": "به روز رسانی در دسترس برای {latest}",
-      "versionCurrent": "در مورد آخرین اخبار",
+      "versionCurrent": "آخرین نسخه",
       "featuresTitle": "ویژگی هایی که هنوز استفاده نشده اند",
       "locationsTitle": "جایی که پروژه شما از این بسته استفاده می کند.",
       "noLocations": "در منبع پروژه وارد نشده است  ⁇ احتمالا یک وابستگی dev یا transitive است.",
@@ -481,11 +481,11 @@
   "packageDetail": {
     "section": {
       "version": "نسخه",
-      "changelog": "CHANGELOGEGANGELOG تغییر در زمان",
+      "changelog": "تاریخچه تغییرات",
       "community": "جامعه ی جهانی:",
       "dependencies": "وابستگی ها (Dependences)",
-      "alerts": "هشدارها: هشدارهای هشداردهنده",
-      "platforms": "پلتفرم های پلی استور",
+      "alerts": "هشدارها",
+      "platforms": "پلتفرم‌ها",
       "suggestions": "پیشنهادات پیشنهادی",
       "readmeImages": "تصاویر README"
     },
@@ -502,7 +502,7 @@
       "listTwo": "{first} و {second}",
       "listMany": "{head}، و {last}",
       "message": "برخی از بخش ها نتوانستند بارگذاری شوند: {list}.",
-      "retry": "دوباره تلاش کنید Retry",
+      "retry": "تلاش مجدد",
       "retrying": "دوباره تلاش می کنم...",
       "retryTitle": "دوباره تلاش کنید تا بازیافت های ناموفق را انجام دهید."
     },
@@ -511,25 +511,25 @@
     },
     "version": {
       "constraint": "محدودیت محدود کننده",
-      "latest": "آخرین تازه ترین جدیدترین",
+      "latest": "آخرین",
       "prerelease": "پیش انتشار (Pre-Release)",
-      "published": "منتشر شده انتشار یافته",
-      "update": "Update update به روز رسانی کنید",
+      "published": "منتشرشده",
+      "update": "به‌روزرسانی",
       "blockedBy": "بلاک شده توسط:",
       "blockedVia": "{blocker} کپس های {dep} {constraint} ({resolvable} قابل حل، {latest} جدیدترین)",
       "blockedViaSdk": "پین شده توسط {blocker} (Flutter SDK) برای {dep} ({resolvable} قابل حل، آخرین {latest})",
-      "constrained": "محدود شده و محدود شد.",
+      "constrained": "محدودشده",
       "constrainedBy": "محدودیت {constraint} شما این را محدود می کند ({resolvable} قابل حل، {latest} جدیدترین)",
-      "pinHeld": "برگزار شد برگزار شد",
+      "pinHeld": "نگه‌داشته",
       "pinDoNotUse": "استفاده نکنید از آن استفاده نکنید.",
       "drift": "جریان پروژه های متقابل در حال حرکت است.",
       "driftBehind": "پشت: از عقب {siblings} (شما دارای {own} هستید)",
       "driftDiffers": "تفاوت ها: متفاوت است. {siblings} (شما دارای {own} هستید)",
-      "codeSize": "کد سایز اندازه کد",
-      "archiveSize": "اندازه آرشیو: حجم آرکائیو",
+      "codeSize": "اندازه کد",
+      "archiveSize": "اندازه آرشیو",
       "bloat": "({rating}/10 نفخ)",
-      "onDisk": "در دیسک روی دیسک",
-      "upgrade": "ارتقاء Upgrade به روزرسانی",
+      "onDisk": "روی دیسک",
+      "upgrade": "ارتقا",
       "upgrading": "ارتقاء... ارتقای ...",
       "viewChangelog": "مشاهده Changelog"
     },
@@ -540,25 +540,25 @@
       "viewFull": "مشاهده کل تغییرات در pub.dev"
     },
     "community": {
-      "stars": "ستاره ها ستارگان ستارگان",
-      "likes": "لایک ها را دوست دارد",
-      "report": "گزارش گزارش گزارش گزارشی",
-      "openIssues": "مسائل باز (Open Issues)",
-      "openPrs": "روابط عمومی باز (Open PRs)",
+      "stars": "ستاره‌ها",
+      "likes": "پسندها",
+      "report": "گزارش",
+      "openIssues": "مسائل باز",
+      "openPrs": "PRهای باز",
       "activity": "فعالیت (90d)",
       "activityValue": "{closed} مسائل بسته شده، {merged} PRs ادغام شد.",
       "noActivity": "هیچ فعالیت اخیر در این مدت وجود ندارد.",
-      "lastCommit": "آخرین تعهد: Last Commit",
-      "pubPoints": "پب ها (Pub Points) نقطه های شرابخانه ای هستند.",
+      "lastCommit": "آخرین کامیت",
+      "pubPoints": "امتیازهای Pub",
       "verified": "(تایید شده)",
       "publisher": "ناشر ناشر انتشارات",
       "flagged": "({count} پرچم دار)",
-      "transitiveDeps": "ذخایر انتقالی (Transitive Deps)",
+      "transitiveDeps": "وابستگی‌های غیرمستقیم",
       "footprintBreakdown": "{unique} منحصر به فرد و متوسط؛ +{shared} مشترک = {total} مجموع",
       "footprintTooltip": "{own} خود + ترانزیتیو های منحصر به فرد {unique} + ترانسیتوی مشترک {shared}. حذف این dep باعث ذخیره {saved} می شود (deps مشترک توسط دیگران کشیده می شوند).",
-      "trueFootprint": "اثر واقعی پا (True Footprint)",
+      "trueFootprint": "ردپای واقعی",
       "packagesCount": "{count} بسته",
-      "dependents": "افراد وابسته به شما"
+      "dependents": "وابسته‌ها"
     },
     "fileUsages": {
       "commentedOut": "مرجع های بدون نظر:",
@@ -568,12 +568,12 @@
       "header": "استفاده از فایل ها ({label})",
       "commentedReexportTitle": "بازآفرینی با نظرات خارج شده",
       "reexportTitle": "باز صادر شده  ⁇  بخشی از API عمومی این کتابخانه است.",
-      "reexportBadge": "صادرات مجدد - بازآفرینی"
+      "reexportBadge": "صادرکردن مجدد"
     },
     "opportunities": {
       "header": "فرصت ها ({count})",
-      "viewCode": "کد را مشاهده کنید View code",
-      "viewDocs": "View docs (دستورها را مشاهده کنید)"
+      "viewCode": "مشاهده کد",
+      "viewDocs": "مشاهده مستندات"
     },
     "alerts": {
       "archived": "آرشیو شده  ⁇  مخزن فقط برای خواندن است.",
@@ -582,29 +582,29 @@
       "fix": "⁇  درست کردن: {version}"
     },
     "versionGap": {
-      "versionTitle": "نسخه Gap ورژن گپ",
-      "overrideTitle": "Override Gap را نادیده بگیرید",
+      "versionTitle": "شکاف نسخه",
+      "overrideTitle": "شکاف بازنویسی",
       "noDates": "نتوانست تاریخ نسخه برای این بسته را تعیین کند.",
       "noItems": "هیچ PR یا مشکلی بین این نسخه ها پیدا نشد.",
-      "prsMerged": "PRs ادغام شده اند.",
-      "issuesClosed": "مسایل بسته شده مسائل بسته شده",
+      "prsMerged": "PRهای ادغام‌شده",
+      "issuesClosed": "مسائل بسته‌شده",
       "searchLabel": "جستجو PRs و مسائل را پیدا کنید.",
       "searchPlaceholder": "جستجو در مورد روابط عمومی و مسائل...",
       "filterAria": "فیلتر بر اساس دسته بندی",
-      "filterAll": "همه، همه، همگی",
-      "filterUnreviewed": "بررسی نشده است.",
-      "filterPrs": "PRs (اعلام عمومی)",
-      "filterIssues": "مسائل و مسائلی که مطرح می شود",
-      "typePr": "PR PR PR در حال حاضر",
-      "typeIssue": "موضوع: مسئله ی قضایی",
-      "reviewReviewed": "بررسی شده است.",
-      "reviewApplicable": "قابل استفاده قابل اجرا",
-      "reviewNotApplicable": "قابل اجرا نیست",
+      "filterAll": "همه",
+      "filterUnreviewed": "بازبینی‌نشده",
+      "filterPrs": "PRها",
+      "filterIssues": "مسائل",
+      "typePr": "PR",
+      "typeIssue": "مسئله",
+      "reviewReviewed": "بازبینی‌شده",
+      "reviewApplicable": "قابل اعمال",
+      "reviewNotApplicable": "ندارد",
       "notesPlaceholder": "یادداشت ها...",
-      "colType": "نوع: نوع نوع نوع",
-      "colTitle": "عنوان عنوان عنوان نام",
-      "colAuthor": "نویسنده ی کتاب: مؤلف",
-      "colReview": "بررسی Review Review بازبینی",
+      "colType": "نوع",
+      "colTitle": "عنوان",
+      "colAuthor": "نویسنده",
+      "colReview": "بازبینی",
       "summaryFooter": "{triaged} از {total} تریاژ شده | {applicable} قابل اجرا | {notApplicable} N/A | {unreviewed} باقی مانده است",
       "truncated": "نتایج به موارد {limit} قطع شده است."
     },
@@ -612,16 +612,16 @@
       "wasm": "WASM"
     },
     "images": {
-      "alt": "تصویر README image را بخوانید"
+      "alt": "تصویر README"
     },
     "links": {
       "viewOnPubDev": "نمای pub.dev",
       "documentation": "مستندات اسناد مدارک",
-      "changelog": "Changelog: تغییرات در ژورنال",
-      "versions": "نسخه ها Versions ورژن ها",
+      "changelog": "تاریخچه تغییرات",
+      "versions": "نسخه‌ها",
       "repository": "مخزن اطلاعات Repository",
-      "openIssues": "مسائل باز (Open Issues)",
-      "reportIssue": "گزارش موضوعی، مسئله ای"
+      "openIssues": "مسائل باز",
+      "reportIssue": "گزارش مشکل"
     },
     "a11y": {
       "skipToDetails": "به جزئیات بسته بندی بروید."
@@ -632,28 +632,28 @@
     }
   },
   "toolbar": {
-    "runAnalysis": "تحلیل را اجرا کنید.",
+    "runAnalysis": "اجرای تحلیل",
     "rescan": "اسکن مجدد Rescan",
-    "refresh": "به راحتی و با آرامش استراحت کنید.",
-    "copyJson": "کپی JSON را کپی کنید",
-    "saveReport": "ذخیره گزارش Save report را انجام دهید.",
-    "moreActions": "اقدامات بیشتری انجام شود.",
-    "clearAll": "همه چیز را پاک کنید.",
-    "resetView": "نمایش Reset View در حالت ریست قرار می گیرد."
+    "refresh": "تازه‌سازی",
+    "copyJson": "کپی JSON",
+    "saveReport": "ذخیره گزارش",
+    "moreActions": "عملیات بیشتر",
+    "clearAll": "پاک کردن همه",
+    "resetView": "بازنشانی نما"
   },
   "empty": {
-    "noFindingsTitle": "هیچ یافته ای در این مورد وجود ندارد.",
+    "noFindingsTitle": "یافته‌ای نیست",
     "noFindingsMessage": "برای اسکن فضای کاری، تجزیه و تحلیل را اجرا کنید.",
-    "noFindingsCta": "تحلیل را اجرا کنید.",
-    "noMatchTitle": "هیچ تطابقی وجود ندارد",
+    "noFindingsCta": "اجرای تحلیل",
+    "noMatchTitle": "موردی مطابقت ندارد",
     "noMatchMessage": "هیچ ردیفی با فیلترهای فعلی مطابقت ندارد.",
-    "noMatchCta": "فیلترهای ریست فلترها را از نو تنظیم کنید.",
+    "noMatchCta": "بازنشانی فیلترها",
     "noProjectTitle": "هیچ فضای کاری باز نیست.",
     "noProjectMessage": "یک پروژه Flutter یا Dart را باز کنید تا یافته ها را ببینید.",
-    "noProjectCta": "پوشه های فولدر را باز کنید",
+    "noProjectCta": "باز کردن پوشه",
     "noDataTitle": "هنوز هیچ داده ای وجود ندارد.",
     "noDataMessage": "برای پر کردن این داشبورد، اسکن را اجرا کنید.",
-    "noDataCta": "تحلیل را اجرا کنید."
+    "noDataCta": "اجرای تحلیل"
   },
   "loading": {
     "thinking": "فکر کردن...فکر کردن",
@@ -662,7 +662,7 @@
     "fetching": "...منتظر...",
     "working": "کار کردن...کارکردن",
     "scanning": "اسکن...اسکین کردن",
-    "cancel": "لغو کن لغو کنید",
+    "cancel": "لغو",
     "runningAnalysis": "انجام تجزیه و تحلیل...",
     "analysisComplete": "تجزیه و تحلیل کامل تکمیل شده است.",
     "analysisClean": "هیچ مشکلی یافت نشد.",
@@ -672,12 +672,12 @@
   },
   "error": {
     "genericTitle": "یک چیزی اشتباه پیش رفت.",
-    "retry": "دوباره تلاش کنید Retry",
-    "reload": "بارگذاری مجدد را انجام دهید.",
-    "copyDetails": "جزئیات کپی را کپی کنید.",
+    "retry": "تلاش مجدد",
+    "reload": "بارگذاری مجدد",
+    "copyDetails": "کپی جزئیات",
     "unreachable": "نتوانسته به {target} دسترسی پیدا کند.",
     "partialSummary": "{loaded} از {total} {item} بارگذاری شد. {failed} مورد ناموفق بود.",
-    "partialRetry": "تلاش مجدد شکست خورده است."
+    "partialRetry": "تلاش مجدد برای موارد ناموفق"
   },
   "offline": {
     "banner": "آفلاین  ⁇  برای تازه شدن دوباره به اینترنت متصل شوید.",
@@ -689,16 +689,16 @@
   },
   "filter": {
     "searchPlaceholder": "جستجو... جست وجو ...",
-    "clearSearch": "پاک کردن جستجو از جستجوی واضح",
-    "activeLabel": "فیلترهای فعال: فیلتر های فعال",
+    "clearSearch": "پاک کردن جستجو",
+    "activeLabel": "فیلترهای فعال:",
     "recentLabel": "⁇  اخیر  ⁇",
-    "chipRemove": "حذف remove از بین بردن"
+    "chipRemove": "حذف"
   },
   "a11y": {
     "toggleFullWidth": "طرح بندی با عرض کامل Toggle را تغییر دهید.",
     "sortBy": "مرتب کردن بر اساس {column}",
-    "expandRow": "ردیف را گسترش دهید",
-    "copyRow": "ردیف کپی را کپی کنید",
+    "expandRow": "باز کردن ردیف",
+    "copyRow": "کپی ردیف",
     "comparisonDimension": "متریک متریک Metric",
     "collapseRow": "ردیف سقوط:",
     "selectAll": "همه ردیف ها را انتخاب کنید",
@@ -713,7 +713,7 @@
       "coverage": "{pct}% ترجمه شده  ⁇ نمایش های استراحت به زبان انگلیسی"
     },
     "reloadPrompt": "زبان را به {locale}. پنجره را بارگذاری کنید تا برچسب های نوار کناری و فرمان ها به روز شود.",
-    "reloadNow": "حالا بارگیری مجدد کنید.",
+    "reloadNow": "بارگذاری مجدد اکنون",
     "reloadLater": "بعد بعداً بعدها"
   },
   "statusBar": {
@@ -771,13 +771,13 @@
       "optimizeAnalysis": "بهینه سازی تحلیل",
       "dontShowAgain": "باز نشان نده",
       "openMachineDashboard": "مکانیزم سلامت ماشین",
-      "restartAnalysisServer": "راه اندازی مجدد دوباره Restart کردن"
+      "restartAnalysisServer": "راه‌اندازی مجدد"
     },
     "cleanup": {
       "noOrphans": "هیچ دمین نیافته شد.",
       "confirm": "تعداد {count} فرآیند پردازشی {size} پیدا شد. خواهید کشت؟",
       "killButton": "کیل یاورفان",
-      "cancelButton": "لغو کن لغو کنید"
+      "cancelButton": "لغو"
     },
     "command": {
       "killOrphans": "کیل یا دمین اورفان شده Flutter"
@@ -785,11 +785,11 @@
     "orphanPreflight": {
       "found": "{count} فرآیند(ها) میزبان مدل ترکیبی از جلسه‌ای پیشین در حال حمله {size} از حافظه ویژه مitted است.",
       "reclaimAction": "حافظه را بازگردانید",
-      "detailsAction": "جزئیات را نمایش دهید",
+      "detailsAction": "نمایش جزئیات",
       "none": "هیچ فرآیند میزبان مدل گم شده ای پیدا نشد.",
       "confirmTitle": "پروسه(های) اورفان {count} بازمانده برای {size}؟",
       "confirmDetail": "این فرآیندها به طور فوری پایان خواهند یافت و قابل بازیابی نیست:",
-      "confirmKill": "پروسه ها را پایان بدهید",
+      "confirmKill": "پایان فرایندها",
       "listEntry": "{name} (PID {pid}) — {size}",
       "reclaimed": "процیس(های) تکلیف داده شده {count} پایان یافت، تعداد {size} بازگردانی شد.",
       "reclaimFailed": "процیس(ها) {count} را نتوانست پایان داد. ممکن است نیاز به اجازه‌های بالاتر داشته باشند.",
@@ -802,11 +802,11 @@
       "processes": "پروسیس‌ها",
       "totalRss": "کل RSS",
       "orphaned": "孤儿",
-      "refresh": "به راحتی و با آرامش استراحت کنید.",
+      "refresh": "تازه‌سازی",
       "colPid": "PID",
       "colParent": "والد",
       "colRss": "RSS",
-      "colType": "نوع: نوع نوع نوع",
+      "colType": "نوع",
       "colCommand": "کامند",
       "colAction": "عملیات",
       "typeOrphan": "孤儿",
@@ -855,10 +855,10 @@
   },
   "machineDashboard": {
     "title": "سلامت ماشین",
-    "refresh": "به راحتی و با آرامش استراحت کنید.",
+    "refresh": "تازه‌سازی",
     "systemUnknown": "ذخیره‌سازی حافظه سیستم در این پلتفرم قابل خواندن نیست.",
     "platformUnsupported": "سلامت دستگاه در این پلتفرم در دسترس نیست — درخواست‌های پردازش در ویندوز، macOS و لینوکس پشتیبانی می‌شوند.",
-    "freeOf": "رایگان است / بدون تفکر",
+    "freeOf": "آزاد از",
     "used": "استفاده شده",
     "recommendationsTitle": "پیشنهادات",
     "recommendationsNone": "هیچ مشکلی کشف نشد.",
@@ -883,7 +883,7 @@
     },
     "action": {
       "reclaim": "بازگرداندن",
-      "restartAnalysisServer": "راه اندازی مجدد دوباره Restart کردن",
+      "restartAnalysisServer": "راه‌اندازی مجدد",
       "setHeapCap": "تنظیم حداکثری",
       "unloadModel": "بی‌باریک کردن"
     },
@@ -920,8 +920,8 @@
     },
     "notification": {
       "shedDisabled": "فشار حافظه تحلیلگر تشخیص داده شد (RSS {rssMb} MB، محدوده نرم {softLimitMb} MB). قوانین را به طور خودکار غیرفعال کنید تا در زمان فشار، قوانین گران قیمت غیرفعال شوند.",
-      "enableButton": "فعال کردن enable Enable امکان پذیر ساختن",
-      "learnMoreButton": "بیشتر بدانید Learn More بیشتر بدانید",
+      "enableButton": "فعال‌سازی",
+      "learnMoreButton": "اطلاعات بیشتر",
       "runInit": "'dart run saropa_lints:init' را اجرا کنید تا analysis_options_custom.yaml ایجاد شود، سپس shed_rules: true را تنظیم کنید.",
       "enabledConfirmation": "قاعده پرتاب در analysis_options_custom.yaml فعال شده است. تحلیلگر تغییر را در بارگذاری بعدی خود تشخیص خواهد داد."
     },
@@ -935,7 +935,7 @@
       "categoryInfoSeverity": "اخطار سطح",
       "categoryWarningSeverity": "تحذير جدیت",
       "moreRules": "بیشتر نمایش داده نشده",
-      "restartButton": "تحلیل کننده را بازگردانید",
+      "restartButton": "راه‌اندازی مجدد تحلیلگر",
       "restartTooltip": "سرویس تحلیل Dart را مجدد راه اندازی کنید تا فشار حافظه را پاک کرده و قوانین ارائه شده را بازگردانید."
     }
   },
@@ -953,14 +953,14 @@
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "همین الان، درست در این لحظه.",
+      "justNow": "همین الان",
       "minutesAgo": "{min} دقیقه پیش",
       "hoursAgo": "{hr} ساعت پیش",
       "daysAgo": "{day} روز پیش"
     },
     "status": {
-      "lastRunPrefix": "آخرین اجرا، آخرین اجرای",
-      "updatedPrefix": "به روز شده است",
+      "lastRunPrefix": "آخرین اجرا",
+      "updatedPrefix": "به‌روزرسانی",
       "refreshHint": "برای تازه کردن از آنالیزور کلیک کنید.",
       "lastRunUnknown": "آخرین اجرا ناشناخته نامعلوم",
       "noTimestampTitle": "هیچ زمان بندی در violations.json نیست.",
@@ -971,7 +971,7 @@
       "driftOnTitle": "Drift Advisor متصل: {label}",
       "driftOnPill": "در حال حرکت بر روی · {count}",
       "driftOfflineTitle": "Drift Advisor فعال شده اما هیچ سرور پیدا نشده است.",
-      "driftOfflinePill": "درایف کردن به صورت آفلاین",
+      "driftOfflinePill": "Drift آفلاین",
       "driftAuthRequiredTitle": "سرویس Drift Advisor پیدا شد اما نیاز به یک توکن احراز هویت دارد — سرور saropaLints.driftAdvisor.authToken را تنظیم کنید",
       "driftAuthRequiredPill": "د rift نیاز به تکنیک دارد",
       "driftAuthFailedTitle": "Drift Advisor مجوز ورود پیکربندی شده را رد کرد — کلیک کنید تا آن را به‌روزرسانی کنید",
@@ -988,14 +988,14 @@
       "qualityGateFailingPill": "درگاه شکسته است"
     },
     "groupBy": {
-      "severity": "شدت: میزان شدید بودن",
-      "file": "فایل های فولدر را به صورت زیر نمایش دهید:",
-      "impact": "تاثیرات بر اثر اثرات تأثیر",
-      "rule": "قاعده قانون اساسی",
+      "severity": "شدت",
+      "file": "فایل",
+      "impact": "تأثیر",
+      "rule": "قاعده",
       "owasp": "OWASP",
-      "ruleType": "نوع قاعده: نوع قانون",
-      "ruleStatus": "وضعیت قاعده در قانون",
-      "tier": "در این صورت، سطح سرمایه گذاری شما به طور کامل تحت کنترل قرار خواهد گرفت.",
+      "ruleType": "نوع قاعده",
+      "ruleStatus": "وضعیت قاعده",
+      "tier": "سطح",
       "pack": "بسته بندی (pack)"
     },
     "seg": {
@@ -1003,27 +1003,27 @@
       "toggleImpactTitle": "Toggle {v} تاثیر ضربه ای"
     },
     "kpi": {
-      "visibleLabel": "یافته های قابل مشاهده",
-      "allMatched": "همه آنها با هم تطبیق داشتند.",
+      "visibleLabel": "یافته‌های قابل مشاهده",
+      "allMatched": "همه مطابق",
       "ofTotal": "از مجموع {total}",
       "clearFiltersTitle": "برای پاک کردن تمام فیلترها روی آن کلیک کنید.",
       "errorsLabel": "اشتباهات خطا ها",
-      "errorsSubFix": "باید درست کرد باید درست کند",
+      "errorsSubFix": "باید رفع شود",
       "errorsSubClear": "هیچ  ⁇  روشن",
       "errorsTitle": "فیلترهای پیدا شده برای خطا (باید درست شود  ⁇  شکسته / سقوط خواهد کرد / قابل استفاده)",
-      "warningsLabel": "هشدارها و هشدارهای مربوط به آن",
+      "warningsLabel": "هشدارها",
       "warningsSubBad": "می تواند شکست بخورد یا بد به نظر برسد.",
       "warningsSubClear": "هیچ  ⁇  روشن",
       "warningsTitle": "نتایج را به هشدارها فیلتر کنید (ممکن است شکست بخورد یا بد به نظر برسد)",
-      "infoLabel": "اطلاعات و اطلاعیه ها را به اشتراک بگذارید",
+      "infoLabel": "اطلاعات",
       "infoSub": "برای اطلاع شما  ⁇  سبک / پیشنهادات",
-      "infoSubNone": "هیچ کدام از این ها وجود ندارد.",
+      "infoSubNone": "هیچ",
       "infoTitle": "نتایج را به اطلاعات فیلتر کنید (برای اطلاع شما، سبک و پیشنهادات)",
-      "filesLabel": "فایل های تحت تاثیر قرار گرفته،",
+      "filesLabel": "فایل‌های متأثر",
       "filesSubAcross": "در سراسر صادرات و صادرات.",
       "filesSubNone": "هیچ فایل ای تحت تاثیر قرار نگرفته است.",
       "filesTitle": "فایل های متمایز که حداقل یک یافته را به دست می آورند.",
-      "topRuleLabel": "قانون برتر، قاعده ی بالاست.",
+      "topRuleLabel": "قاعده برتر",
       "topRuleTitle": "یافته های فیلتر را به {name} قانون بفرستید.",
       "sectionHeading": "مقدمه",
       "sectionAria": "مقدمه آماری"
@@ -1031,10 +1031,10 @@
     "toolbar": {
       "ariaFiltersActions": "فیلترها و اقدامات انجام شده",
       "groupByFieldTitle": "یافته های گروهی بر اساس ابعاد انتخاب شده",
-      "groupByLabel": "گروه به گروه بر اساس گروه",
+      "groupByLabel": "گروه‌بندی بر اساس",
       "textFilterTitle": "یافته های فیلتر شده را بر اساس مسیر فایل، قاعده یا متن پیام فیلتری کنید.",
       "textFilterPlaceholder": "فیلتر کردن بر اساس فایل، قاعده یا پیام...",
-      "textFilterAria": "فیلتر متن: فیلتر متنی",
+      "textFilterAria": "فیلتر متن",
       "clearTextFilterTitle": "فیلتر متن پاک را تمیز کنید",
       "clearTextFilterAria": "فیلتر متن پاک را تمیز کنید",
       "recentFiltersTitle": "فیلترهای اخیر:",
@@ -1043,11 +1043,11 @@
       "recentFiltersListAria": "فیلترهای اخیر:",
       "runAnalysisTitle": "Saropa Lints تحلیل را اجرا کنید.",
       "refreshViolationsTitle": "بارگذاری مجدد violations.json از دیسک",
-      "severityGroupAria": "فیلتر شدت: فیلتری که در آن میزان شدید بودن بیماری مشخص می شود.",
-      "severityLabel": "شدت: میزان شدید بودن",
-      "impactGroupAria": "فیلتر ضربه ای (Impact Filter) ، یک فیلتر موشک است.",
-      "impactLabel": "تاثیرات بر اثر اثرات تأثیر",
-      "moreSummary": "بیشتر بیشتر بیشتر More",
+      "severityGroupAria": "فیلتر شدت",
+      "severityLabel": "شدت",
+      "impactGroupAria": "فیلتر تأثیر",
+      "impactLabel": "تأثیر",
+      "moreSummary": "بیشتر",
       "moreChevron": "▾",
       "copyJsonTitle": "کپی کردن نقض های فیلتر شده به عنوان JSON ({count})",
       "saveReportTitle": "ذخیره نقض فیلتر شده به عنوان JSON در گزارش ها / YYYYMMDD/",
@@ -1058,7 +1058,7 @@
       "suppressAll": "همهٔ قابل مشاهده را غیر فعال کن",
       "suppressAllTitle": "کد // نادیده گرفتن: در بالای هر یافته دیده شدنی قرار دهید",
       "suppressAllConfirm": "این اینترس خواهد کرد {count} // ignore: کامنت هایی را در تمام فایل های منبع خود وارد می کند. این کار از پانل کنترل قابل برگشت نیست — از ویژیون یا کنترل نسخه ای را برگشت دهید. ادامه؟",
-      "suppressAllProceed": "همه را غیر فعال کن",
+      "suppressAllProceed": "سرکوب همه",
       "suppressAllDone": "درج شده {count} // نادیده گرفته شود: نظرات.",
       "suppressAllFailed": "نمی تواند اعمال محدودیت جمعی را انجام دهد — چندین فایل ممکن است فقط خواندنی باشند."
     },
@@ -1075,7 +1075,7 @@
       "includeSuppressedTitle": "همچنین پیدا کردن یافته‌هایی که معمولاً توسط // ignore:، // ignore_for_file: یا ورودی پایه مخفی می‌شوند — هر کدام با نحوهٔ غیرفعال‌سازی آن‌ها مشخص شده‌اند. تنظیمات پروژه شما تغییر نمی‌کند.",
       "runButton": "اجرای آ审计",
       "runButtonTitle": "تمام پروژه را با CLI ا审计 اجرا کنید و نتایج آن را اینجا بارگذاری کنید",
-      "cancelButton": "لغو کن لغو کنید",
+      "cancelButton": "لغو",
       "runningLabel": "بررسی...",
       "runningMeta": "برنامه ا审计 CLI را شروع می کنیم...",
       "completedLabel": "تحقيق كامل",
@@ -1090,16 +1090,16 @@
       "severityOff": "شدت ≠ {v}",
       "impactOff": "تاثیر ≠ {v}",
       "resetAllTitle": "همه فیلترها را از نو تنظیم کنید.",
-      "removeFilterAria": "فیلتر را از بین ببرید"
+      "removeFilterAria": "حذف فیلتر"
     },
     "menuPalette": {
-      "help": "کمک به یاری کردن",
+      "help": "راهنما",
       "groupBy": "گروه بندی به ...",
       "textFilter": "فیلتر متن ...",
       "severityImpact": "فیلتر شدت...",
       "hideRules": "قوانین پنهان... قواعد مخفی",
-      "ruleMetadata": "Rule metadata میتا داده ها",
-      "clearFilters": "فیلترهای پاک را از بین ببرید.",
+      "ruleMetadata": "فراداده قاعده",
+      "clearFilters": "پاک کردن فیلترها",
       "clearSuppressions": "سرکوب های آشکار",
       "clearFileFocus": "تمرکز فایل را پاک کنید",
       "matchActiveEditor": "مطابقت با ویرایشگر فعال Match Active",
@@ -1119,7 +1119,7 @@
       "menuGroupExport": "صادرات و فروش:",
       "menuGroupBulk": "عملیات جمعی",
       "menuGroupFilter": "فیلتر و فوکوس کنید",
-      "menuGroupOpen": "داشبورد را باز کنید.",
+      "menuGroupOpen": "باز کردن داشبورد",
       "menuGroupSystem": "سیستم سیستم System"
     },
     "progress": {
@@ -1129,7 +1129,7 @@
     "topRules": {
       "sectionAria": "قوانین برتر به ترتیب تعداد بازی ها",
       "hideTitle": "فقط برای من پنهان کنید  ⁇  سطح فضای کاری، قابل برگشت از طریق Clear Suppressions",
-      "hideButton": "پنهان شدن، مخفی کردن",
+      "hideButton": "پنهان کردن",
       "disableTitle": "غیرفعال کردن برای کل پروژه  ⁇  می نویسد analysis_options_custom.yaml و دوباره اجرا تجزیه و تحلیل",
       "disableButton": "غیرفعال کردن Disable",
       "workspaceOnlyShort": "فقط فضای کاری",
@@ -1137,33 +1137,33 @@
       "topRulesOne": "قاعده {count} بالا",
       "topRulesOther": "قوانین برتر {count}",
       "colRank": "#",
-      "colRule": "قاعده قانون اساسی",
+      "colRule": "قاعده",
       "colCount": "شمارش و شمردن",
-      "colSeverity": "شدت: میزان شدید بودن",
-      "colActionsAria": "اقدامات صف (Row actions) اعمال ردیف",
+      "colSeverity": "شدت",
+      "colActionsAria": "عملیات ردیف",
       "filesAffected": "فایل های تحت تاثیر ({count})",
       "howToFixHeading": "چگونه باید رفع کنیم",
-      "owaspMobileLabel": "Mobile",
-      "owaspWebLabel": "Web",
+      "owaspMobileLabel": "موبایل",
+      "owaspWebLabel": "وب",
       "relatedRulesHeading": "قواعد مرتبط",
       "sameTagHeading": "یافتن همچین جستجو",
-      "migrationHeading": "Migration",
+      "migrationHeading": "مهاجرت",
       "supersedesLabel": "جایگزین می‌شود:"
     },
     "findings": {
-      "sectionAria": "یافته ها: نتایج حاصل از بررسی",
-      "heading": "یافته ها: نتایج حاصل از بررسی",
-      "expandAll": "همه را گسترش دهید",
-      "collapseAll": "همه چیز فرو می ریزد.",
+      "sectionAria": "یافته‌ها",
+      "heading": "یافته‌ها",
+      "expandAll": "باز کردن همه",
+      "collapseAll": "بستن همه",
       "bulkSelected": "{count} انتخاب شده",
       "bulkCopy": "کپی کردن انتخاب شده به عنوان JSON",
       "selectAllTitle": "تمام یافته های قابل مشاهده را انتخاب کنید.",
       "selectAllAria": "تمام یافته های قابل مشاهده را انتخاب کنید.",
-      "colSeverity": "شدت: میزان شدید بودن",
-      "colRule": "قاعده قانون اساسی",
-      "colMessage": "پیام پیغام پیام پیام",
+      "colSeverity": "شدت",
+      "colRule": "قاعده",
+      "colMessage": "پیام",
       "colLine": "خط خط خط",
-      "colActionsAria": "اقدامات صف (Row actions) اعمال ردیف",
+      "colActionsAria": "عملیات ردیف",
       "selectRowAria": "این ردیف یافتن را انتخاب کنید.",
       "copyRowTitle": "این یافته را به عنوان JSON کپی کنید.",
       "suppressedBadge": "ممنوع شده",
@@ -1176,49 +1176,49 @@
       "runAgain": "دوباره آنالیز را اجرا کنید.",
       "emptyNoViolations": "هیچ نقض در آخرین تحلیل اجرا نشده است.",
       "emptyNoMatch": "هیچ نقض ای با فیلترهای فعلی مطابقت ندارد.",
-      "emptyHintNoData": "برای پر کردن گزارش ها، تجزیه و تحلیل را اجرا کنید/.saropa_lints/violations.json`, سپس refresh .",
+      "emptyHintNoData": "برای پر شدن `reports/.saropa_lints/violations.json` تحلیل را اجرا کنید، سپس تازه‌سازی کنید.",
       "emptyHintFilters": "فیلترها را تنظیم کنید یا تجزیه و تحلیل را دوباره اجرا کنید تا یافته ها را ببینید.",
-      "reRunAnalysis": "تجزیه و تحلیل Re-run Analysis: بررسی مجدد",
-      "resetFilters": "فیلترهای ریست فلترها را از نو تنظیم کنید.",
+      "reRunAnalysis": "اجرای مجدد تحلیل",
+      "resetFilters": "بازنشانی فیلترها",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "نمودار های مخلوط (mix chart)",
-      "heading": "مخلوط کردن، ترکیب کردن",
+      "sectionAria": "نمودارهای ترکیب",
+      "heading": "ترکیب",
       "metaClickSlice": "برای فیلتر کردن یک تراشه روی آن کلیک کنید.",
-      "severityMix": "ترکیبی از شدت و شدت.",
-      "impactMix": "ترکیب اثرات مخلوط اثر",
+      "severityMix": "ترکیب شدت",
+      "impactMix": "ترکیب تأثیر",
       "filterBarTitle": "فیلتر فقط به {key}",
-      "donutTotal": "کل مجموعی از مجموعه ها"
+      "donutTotal": "مجموع"
     },
     "todoHack": {
       "sectionAria": "همه چیز و هک ها",
       "headingDisabled": "همه چیز و حقه ها",
-      "metaDisabled": "اسکن غیرفعال شده است",
+      "metaDisabled": "اسکن غیرفعال",
       "scanOff": "اسکن فضای کاری غیرفعال است  ⁇  امکان نمایش سطح مارکرها از فایل های پروژه را فراهم می کند.",
-      "enableScan": "فعال کردن اسکن سکان",
+      "enableScan": "فعال‌سازی اسکن",
       "heading": "همه چیز و حقه ها",
       "subsectionNone": "{title}: هیچ موردی در محدوده اسکن نیست.",
       "capNote": "اسکن به محدودیت فایل خود رسید، بنابراین برخی از پرونده ها حذف شدند.",
       "raiseCap": "افزایش حد مجاز",
-      "notePill": "یادداشت ها: یادآوری",
-      "todosLabel": "کارهای باقی‌مانده",
+      "notePill": "یادداشت",
+      "todosLabel": "TODOها",
       "hacksLabel": "HACKS هاکس"
     },
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "ادغام کردن، از هم جدا شدن.",
+      "metaOff": "یکپارچه‌سازی خاموش",
       "enableBlurb": "ادغام Drift Advisor را با پیشنهادات پایگاه داده های سطحی در اینجا فعال کنید.",
-      "enable": "فعال کردن enable Enable امکان پذیر ساختن",
+      "enable": "فعال‌سازی",
       "headingNoServer": "Drift Advisor",
-      "metaNoServer": "هیچ سرور و سرور نیست.",
+      "metaNoServer": "بدون سرور",
       "noServerBlurb": "هیچ سرور Drift Advisor در پورت های پیکربندی شده یافت نشد.",
-      "retry": "دوباره تلاش کنید Retry",
+      "retry": "تلاش مجدد",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "متصل به هم پیوسته شده است.",
+      "metaConnected": "متصل",
       "noIssues": "به {label} متصل شده است  ⁇  هیچ مشکلی در حال حاضر وجود ندارد.",
-      "refresh": "به راحتی و با آرامش استراحت کنید.",
+      "refresh": "تازه‌سازی",
       "openBrowser": "در مرورگر باز شود.",
       "headingIssues": "Drift Advisor",
       "disable": "غیرفعال کردن Drift Advisor"
@@ -1233,9 +1233,9 @@
       "unsuppressButton": "غیر فعال سازی",
       "unsuppressTitle": "محدودیت را حذف کنید تا این یافته در اسکن‌های معمولی ظاهر شود",
       "unsuppressHint": "برای غیر فعال کردن {rule} در {file}:{line}: نظریه // ignore: را بالای خط حذف کنید.",
-      "columnFile": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "columnFile": "فایل",
       "columnLine": "خط خط خط",
-      "columnRule": "قاعده قانون اساسی",
+      "columnRule": "قاعده",
       "columnKind": "کیند",
       "columnAction": "عملیات"
     },
@@ -1243,9 +1243,9 @@
       "sectionAria": "سرکوب های سرکوب",
       "headingExport": "حذف (صادرات)",
       "viewHidesHeading": "دیدگاه مسائل پنهان می کند",
-      "viewHidesMetaActive": "فعالان فعال فعال فعال هستند.",
-      "viewHidesMetaNone": "هیچ کدام از این ها وجود ندارد.",
-      "noneInExport": "هیچ سرکوب آنالیزور در صادرات فعلی `violations.json̅. تحلیل را پس از ویرایش نادیده می گیرد یا خطوط پایه برای پر کردن.",
+      "viewHidesMetaActive": "فعال",
+      "viewHidesMetaNone": "هیچ",
+      "noneInExport": "در خروجی فعلی `violations.json` هیچ سرکوب تحلیلگری وجود ندارد. پس از ویرایش ignoreها یا baselineها، تحلیل را اجرا کنید تا پر شود.",
       "totalRow": "مجموع  ⁇  فیلترهای شفاف و یافته های باز",
       "byRule": "به طور معمول ({count})",
       "byFile": "با فایل ({count})",
@@ -1264,7 +1264,7 @@
       "filesSample": "فایل ها / گلوب (نمونه)",
       "rulesSample": "قوانین (نمونه)",
       "perFileRulesSample": "قوانین پرونده ای (نمونه)",
-      "unknownKind": "ناشناخته نامعلوم ناشناخت"
+      "unknownKind": "ناشناخته"
     },
     "script": {
       "analysisRunning": "انجام تجزیه و تحلیل...",
@@ -1278,12 +1278,12 @@
       "announceFiltersPrefix": "فیلترها: فیلترهای",
       "bulkSelected": "{n} مورد انتخاب شد",
       "analysisStartedDetail": "تجزیه و تحلیل شروع شد. جمع آوری تشخیص...",
-      "announceStarted": "شروع به تجزیه و تحلیل شد",
+      "announceStarted": "تحلیل آغاز شد",
       "announceComplete": "تجزیه و تحلیل کامل تکمیل شده است.",
-      "announceFailed": "تجزیه و تحلیل شکست خورده است.",
+      "announceFailed": "تحلیل ناموفق بود",
       "analysisFailedDetail": "تجزیه و تحلیل شکست خورده است. برای جزئیات، خروجی را بررسی کنید.",
-      "removeRecentAria": "حذف remove از بین بردن",
-      "removeRecentTitle": "حذف remove از بین بردن",
+      "removeRecentAria": "حذف",
+      "removeRecentTitle": "حذف",
       "bulkSelectedTpl": "{n} مورد انتخاب شد",
       "announceSearchVerb": "جستجو کردن",
       "severitiesNoun": "جدیت ها",
@@ -1300,7 +1300,7 @@
       "activateKpiSpace": "کارت KPI متمرکز یا نوار نمودار را فعال کنید.",
       "showOverlay": "این shortcut overlay را نشان دهید."
     },
-    "unknownAnalyzerKind": "ناشناخته نامعلوم ناشناخت",
+    "unknownAnalyzerKind": "ناشناخته",
     "supplementary": {
       "otherAnalyzerOn": "+{count} سایر یافته های آنالیزور",
       "otherAnalyzerPromo": "+? سایر یافته های آنالیزور  ⁇  نشان می دهد",
@@ -1314,23 +1314,23 @@
   },
   "triageDash": {
     "showInIssues": "در مسائل نشان دهید.",
-    "disableRules": "قوانین غیرفعال کردن را از کار ببرید",
-    "enableRules": "قوانین فعال سازی (enable rules)",
-    "issues": "مسائل و مسائلی که مطرح می شود",
-    "off": "بیرون و بیرون، دور و بر",
-    "on": "و در ادامه به این موضوع اشاره کرد.",
-    "colRule": "قاعده قانون اساسی",
-    "colIssues": "مسائل و مسائلی که مطرح می شود",
+    "disableRules": "غیرفعال‌سازی قاعده‌ها",
+    "enableRules": "فعال‌سازی قاعده‌ها",
+    "issues": "مسائل",
+    "off": "خاموش",
+    "on": "روشن",
+    "colRule": "قاعده",
+    "colIssues": "مسائل",
     "zeroIssueRules": "{count} قانون بدون مشکل — در این سطح به‌طور خودکار فعال شد.",
     "disabledOverrides": "{count} قانون به دلیل بازنویسی در `analysis_options_custom.yaml` غیرفعال شدند.",
-    "summaryRuleTriage": "قانون تریج (Rule Triage) ، در مورد انتخاب افراد برای کار است.",
-    "hintNoViolations": "هنوز هیچ «گزارش/.saropa_lints/violations.json» وجود ندارد. تجزیه و تحلیل را اجرا کنید، سپس این برگه را بازخوانی کنید.",
+    "summaryRuleTriage": "اولویت‌بندی قاعده‌ها",
+    "hintNoViolations": "هنوز `reports/.saropa_lints/violations.json` وجود ندارد. تحلیل را اجرا کنید و سپس این برگه را تازه‌سازی کنید.",
     "hintUnreadable": "هیچ نقض قابل خواندن صادرات. ابتدا تجزیه و تحلیل Saropa Lints را اجرا کنید.",
     "hintStale": "داده های تریاژ ممکن است قدیمی باشند (برآمد {age} قدیمی است). تجزیه و تحلیل تکرار برای گروه های فعلی.",
     "hintNoPerRule": "این صادرات هیچ شمارش اصولی برای هر موضوع ندارد. دوباره با یک افزونه Saropa Lints فعلی آنالیز کنید.",
     "hintBuildFailed": "نمی توان از این صادرات، یک سریال ساخت. یک تحلیل تازه را اجرا کنید.",
     "summaryVolume": "ردیابی قوانین (حجم / باید ثابت شود / سبک)",
-    "hintSameAsTree": "همان گروه بندی که در درخت فعالیت-بار Triage وجود دارد: مسائل فیلتر، یا قوانین غیرفعال / فعال کردن در `analysis_options_custom.yaml゙. گروه های بزرگ ممکن است برای تایید درخواست کنند."
+    "hintSameAsTree": "همان گروه‌بندی درخت اولویت‌بندی در نوار فعالیت: مسائل را فیلتر کنید یا قاعده‌ها را در `analysis_options_custom.yaml` غیرفعال/فعال کنید. گروه‌های بزرگ ممکن است تأیید بخواهند."
   },
   "kbdOverlay": {
     "toggleTitle": "میانبر های صفحه کلید را نشان دهید (?)",
@@ -1368,20 +1368,20 @@
       "fullReportGenerating": "گزارش کامل را تولید می‌کند — هر بست پaketی که اسکن شده، هر ویژگی لگ اصلاحاتی که استخراج شده. این کار هر بار که اسکن می‌شود اجرا می‌شود و در حافظه نگه داشته می‌شود تا زمانی که دوباره اسکن کنید.",
       "knownIssues": "مشکلات شناخته شده",
       "knownIssuesDesc": "پیکربندی های مرتبط با امنیت را که علیه وابستگی های شما گزارش شده است، مرور کنید.",
-      "compare": "مقایسه کنید با هم مقایسه کنید",
+      "compare": "مقایسه",
       "compareDesc": "نمره، اندازه و فعالیت دو یا چند پکیج را به صورت کنار هم مقایسه کنید.",
       "settings": "تنظیمات Settings تنظیمات",
       "openButton": "باز کنید {tab}"
     },
     "settingsTab": {
       "intro": "هر تنظیم packageVibrancy.*، گروه‌بندی شده است. تغییرات به صورت فوری به تنظیمات فضای کاری شما ذخیره می‌شود.",
-      "noLimit": "هیچ محدودیتی /هیچ محدودیتی نیست",
+      "noLimit": "بدون محدودیت",
       "group": {
         "access": "دسترسی و رجیستری ها",
         "scan": "اسکن",
         "display": "نمایش",
         "weights": "وزن امتیازات",
-        "upgrade": "ارتقاء Upgrade به روزرسانی",
+        "upgrade": "ارتقا",
         "watch": "دیدن",
         "budget": "بجت",
         "vuln": "ضعفیت ها"
@@ -1390,7 +1390,7 @@
     "detailPane": {
       "aria": "جزئیات بسته بندی:",
       "title": "جزئیات بسته بندی:",
-      "close": "جزئیات نزدیک به دقیق",
+      "close": "بستن جزئیات",
       "copyForAi": "کپی کردن درخواست ارتقاء برای هوش مصنوعی"
     },
     "status": {
@@ -1405,7 +1405,7 @@
       "lastScanUnknownTitle": "این اسکن قبل از اینکه داشبورد زمان ثبت شده را ردیابی کند، انجام شد. برای اسکن مجدد کلیک کنید و به روزرسانی های بسته را بررسی کنید."
     },
     "time": {
-      "justNow": "همین الان، درست در این لحظه.",
+      "justNow": "همین الان",
       "minutesAgo": "{min} دقیقه پیش",
       "hoursAgo": "{hr} ساعت پیش",
       "daysAgo": "{day} روز پیش"
@@ -1422,22 +1422,23 @@
     },
     "gaugeTitle": "بسته پروژه درجه: {grade}",
     "summary": {
-      "packages": "بسته های حمل و نقل",
+      "packages": "بسته‌ها",
       "projectGrade": "بسته پروژه درجه بندی پکیج پروژه",
       "totalSize": "اندازه کل*",
       "gradeTooltip": "درجه پروژه {avgGrade}\nمیانگین امتیاز: {avgScore}/100\nبسته بندی: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "پر جنب و جوش، پرانرژی.",
-      "stableTitle": "پایدار استوار است.",
-      "outdatedTitle": "قدیمی و منسوخ شده",
-      "abandonedTitle": "رها شده و متروک",
+      "vibrantTitle": "پویا",
+      "stableTitle": "پایدار",
+      "outdatedTitle": "قدیمی",
+      "abandonedTitle": "رهاشده",
       "eolTitle": "پایان زندگی:",
-      "updates": "به روزرسانی ها Updates",
-      "unused": "استفاده نشده است.",
-      "singleUse": "یکبار مصرفی برای استفاده ی واحد",
-      "vulnerable": "آسیب پذیر: آسیب پذیر.",
-      "overrides": "Overrides را نادیده می گیرد.",
+      "updates": "به‌روزرسانی‌ها",
+      "unused": "استفاده‌نشده",
+      "singleUse": "تک‌استفاده",
+      "vulnerable": "آسیب‌پذیر",
+      "overrides": "بازنویسی‌ها",
       "caveatLine1": "* اندازه کد نشان داده شده (lib + declared assets) ، در صورت عدم دسترسی به اندازه کد، به اندازه آرشیو pub.dev باز می گردد. شامل dev_dependencies (build_runner، lints، saropa_lints و غیره)  ⁇  آنها هرگز به بسته APK / IPA / وب ارسال نمی شوند. اندازه واقعی اپلیکیشن پس از لرزش درخت کوچکتر خواهد شد.",
-      "caveatLine2": "آستانه های فعالیت: 90d = قدیمی، 180d = خواب (تزمه های زمانی تعهد + آزاد کردن)."
+      "caveatLine2": "آستانه های فعالیت: 90d = قدیمی، 180d = خواب (تزمه های زمانی تعهد + آزاد کردن).",
+      "upgradeTitle": "ارتقا لازم است"
     },
     "breakdown": {
       "title": "چرا نمره {grade}؟  ⁇  {avgScore}/100 میانگین در بسته های {pkgCount}",
@@ -1463,53 +1464,53 @@
     "sections": {
       "sizeDistribution": "توزیع اندازه، توزیع سایز",
       "sizeDistributionCaption": "dev_dependencies را حذف می کند  ⁇  آنها هرگز به بسته APK / IPA / وب ارسال نمی شوند.",
-      "filters": "فیلترها: فیلترهای فیلتر",
-      "packages": "بسته های حمل و نقل"
+      "filters": "فیلترها",
+      "packages": "بسته‌ها"
     },
     "toolbar": {
       "openPubspecTitle": "pubspec.yaml را باز کنید.",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "کپی گزارش JSON (همه ردیف ها + جزئیات)",
-      "copyAllLabel": "کپی کپی کاپیتو",
+      "copyAllLabel": "کپی",
       "copyOpportunitiesTitle": "درخواست های ارتقاء هوش مصنوعی را برای بسته های زیر پذیرفته شده بالا به یک پیست کپی کنید.",
       "copyOpportunitiesLabel": "فرصت های کپی برای هوش مصنوعی را کپی کنید.",
       "saveAllTitle": "ذخیره گزارش JSON به گزارش ها/سالسالMMDD/...",
-      "saveAllLabel": "Save Save ذخیره کنید",
+      "saveAllLabel": "ذخیره",
       "saveUpgradeTitle": "یک گزارش را فقط از بسته ها با به روزرسانی موجود برای گزارشات/YYY YMMDD/... ذخیره کنید.",
       "saveUpgradeLabel": "گزارش ارتقاء را ذخیره کنید Save Upgrade Report",
       "resetViewTitle": "فیلترها را از نو تنظیم کنید، مرتب سازی و ذخیره وضعیت نمایش.",
-      "resetViewLabel": "نمایش Reset View در حالت ریست قرار می گیرد.",
+      "resetViewLabel": "بازنشانی نما",
       "rescanTitle": "Rescan بسته ها  ⁇  کش pub.dev را پاک می کند و نسخه های نسخه ای را دوباره بازمی گرداند.",
       "rescanLabel": "اسکن مجدد Rescan",
       "openOtherTitle": "پروژه ی pubspec.yaml را در پنجره ای جدید برای اسکن Vibrancy باز کنید.",
       "openOtherLabel": "پروژه باز...",
       "footprintGroupAria": "حالت چاپ پا ستون اندازه (size column)",
       "footprintGroupTitle": "آنچه ستون Size نشان می دهد: فقط اندازه کد خود، به علاوه ترانزیتیو های منحصر به فرد (اگر هزینه حذف شود) ، یا به اضافه همه ترانزیت ها (محدودی نظری). زمانی که کد در دسترس نباشد، به اندازه آرشیو باز می گردد.",
-      "footprintLabel": "اثرپذیری: Footprint: رد پا",
+      "footprintLabel": "ردپا:",
       "footprintOwnTitle": "فقط اندازه کد خود (lib + declared assets) ؛ وقتی که در دسترس نباشد به pub.dev باز می گردد.",
-      "footprintOwn": "مالکیت خود را داشته باشید",
+      "footprintOwn": "خودی",
       "footprintUniqueTitle": "اندازه خود + ترانزیتیو هایی که فقط توسط این بخش استفاده می شود (اگر آن را حذف کنید، پس انداز خواهید کرد)",
-      "footprintUnique": "+ منحصر به فرد",
+      "footprintUnique": "+ یکتا",
       "footprintTotalTitle": "اندازه خود + تمام ترانزیتیو ها، از جمله آنهایی که با سایر بخش ها به اشتراک گذاشته شده اند.",
-      "footprintTotal": "+ همه + تمام",
-      "searchLabel": "بسته های جستجو برای جستجوی بسته ها",
+      "footprintTotal": "+ همه",
+      "searchLabel": "جستجوی بسته‌ها",
       "searchPlaceholder": "بسته های جستجو ...",
-      "clearSearchTitle": "پاک کردن جستجو از جستجوی واضح",
-      "clearSearchAria": "پاک کردن جستجو از جستجوی واضح",
+      "clearSearchTitle": "پاک کردن جستجو",
+      "clearSearchAria": "پاک کردن جستجو",
       "ageFilterTitle": "فیلتر کردن بر اساس سن انتشار",
-      "publishedAgeLabel": "سن انتشار: سن منتشر شده",
-      "ageMaxAll": "همه، همه، همگی",
+      "publishedAgeLabel": "سن انتشار",
+      "ageMaxAll": "همه",
       "presetFilterTitle": "اعمال پیش تنظیمات سریع فیلتر",
-      "presetLabel": "پیش تنظیم شده Preset",
-      "presetNone": "هیچ کدام از این ها وجود ندارد.",
+      "presetLabel": "پیش‌تنظیم",
+      "presetNone": "هیچ",
       "presetModernization": "مدرنیزه کردن (Modernisation)",
-      "presetRiskHotspots": "نقاط خطر خطرناک (Risk hotspots)",
+      "presetRiskHotspots": "کانون‌های ریسک",
       "presetCleanup": "کاندیداهای تمیز کردن",
-      "presetDirectOnly": "فقط مستقیم تنها مستقیم",
+      "presetDirectOnly": "فقط مستقیم",
       "devToggleTitle": "وابستگی های dev را در جدول و مجموع ها شامل شوید.",
-      "includeDev": "شامل dev dev شود.",
-      "activeFiltersLabel": "فیلترهای فعال: فیلتر های فعال",
-      "clearAllFilters": "همه چیز را پاک کنید."
+      "includeDev": "شامل توسعه",
+      "activeFiltersLabel": "فیلترهای فعال:",
+      "clearAllFilters": "پاک کردن همه"
     },
     "columns": {
       "name": {
@@ -1517,15 +1518,15 @@
         "tooltip": "نام بسته  ⁇  برای باز کردن ورودی pubspec.yaml کلیک کنید."
       },
       "version": {
-        "label": "نسخه ای از این کتاب،",
+        "label": "نسخه",
         "tooltip": "نسخه نصب شده از pubspec.lock"
       },
       "score": {
-        "label": "دسته بندی: Category Category دسته بندی",
+        "label": "دسته",
         "tooltip": "طبقه بندی حیات و امتیاز سلامت (0 ⁇ 10)"
       },
       "published": {
-        "label": "منتشر شده انتشار یافته",
+        "label": "منتشرشده",
         "tooltip": "تاریخ انتشار نسخه نصب شده به pub.dev"
       },
       "activity": {
@@ -1533,7 +1534,7 @@
         "tooltip": "درجه فعالیت کد و انتشار از commit + publish recency"
       },
       "likes": {
-        "label": "لایک ها را دوست دارد",
+        "label": "پسندها",
         "tooltip": "pub.dev لایک  ⁇  کلیک کنید تا صفحه نمره بسته باز شود."
       },
       "downloads": {
@@ -1541,15 +1542,15 @@
         "tooltip": "pub.dev دانلود در 30 روز گذشته  ⁇  برای باز کردن صفحه نمره بسته کلیک کنید تا صفحه نمرات بسته را باز کنید."
       },
       "issues": {
-        "label": "مسائل و مسائلی که مطرح می شود",
+        "label": "مسائل",
         "tooltip": "باز کردن مسائل GitHub (با استثنای درخواست های pull در صورت وجود)"
       },
       "prs": {
-        "label": "PRs (اعلام عمومی)",
+        "label": "PRها",
         "tooltip": "GitHub باز کردن درخواست های pull"
       },
       "size": {
-        "label": "اندازه ی سایز: Size",
+        "label": "اندازه",
         "tooltip": "اندازه کد (lib + declared assets) ؛ وقتی که سایز کد در دسترس نباشد، به pub.dev باز می گردد."
       },
       "deps": {
@@ -1557,7 +1558,7 @@
         "tooltip": "وابستگی های مستقیم انتقالی  ⁇  مشترک بودن بخش ها برجسته شده است."
       },
       "files": {
-        "label": "مرجع ها مرجع های ارجاعی",
+        "label": "ارجاع‌ها",
         "tooltip": "تعداد فایل های منبع که این بسته را وارد می کنند  ⁇  برای جستجو کلیک کنید تا جستجو کنید."
       },
       "transitives": {
@@ -1573,26 +1574,26 @@
         "tooltip": "SPDX شناسه مجوز از pub.dev"
       },
       "update": {
-        "label": "Update update به روز رسانی کنید",
+        "label": "به‌روزرسانی",
         "tooltip": "به روز رسانی نسخه موجود: مهم، جزئی یا پچ"
       },
       "opportunities": {
-        "label": "فرصت ها و فرصت های موجود",
+        "label": "فرصت‌ها",
         "tooltip": "ویژگی های موجود در changelog این بسته هنوز در کد شما استفاده نشده است  ⁇ مرتب کردن برای پیدا کردن بسته های کم مصرف ترین"
       },
       "status": {
-        "label": "وضعیت Status موقعیت وضعیت",
+        "label": "وضعیت",
         "tooltip": "وضعیت استفاده: آیا بسته در کد شما به عنوان غیرمستعمل ظاهر می شود یا خیر."
       },
       "description": {
-        "label": "توضیحات توصیف شرح مشخصات",
+        "label": "توضیحات",
         "tooltip": "توضیحات بسته بندی از pub.dev"
       }
     },
     "cells": {
       "noGithub": "هیچ مخزن GitHub پیدا نشد.",
-      "devBadge": "دیوید dev dev",
-      "transitiveBadge": "ترانزیتیو transitive: انتقال پذیر.",
+      "devBadge": "توسعه",
+      "transitiveBadge": "غیرمستقیم",
       "opportunitiesTooltip": "ویژگی های استفاده نشده: {features}",
       "publishDateUnavailable": "تاریخ انتشار از pub.dev در دسترس نیست.",
       "activityGradeUnavailable": "درجه فعالیت در دسترس نیست (داده های commit یا release را از دست داده است)",
@@ -1604,11 +1605,11 @@
       "sizeUnavailable": "اندازه در دسترس نیست از pub.dev",
       "noVulnerabilities": "هیچ آسیب پذیری شناخته شده ای وجود ندارد.",
       "licenseUnspecified": "مجوز مشخص نشده در pub.dev",
-      "unusedBadge": "استفاده نشده است.",
+      "unusedBadge": "استفاده‌نشده",
       "packageInUse": "بسته در حال استفاده است"
     },
     "row": {
-      "expandDetails": "جزئیات را گسترش دهید.",
+      "expandDetails": "باز کردن جزئیات",
       "copyRowJson": "ردیف را به عنوان JSON کپی کنید."
     },
     "shortcuts": {
@@ -1650,9 +1651,9 @@
       "reExportLine": "{location} (باز صادرات)",
       "reExportSuffix": "(باز صادرات)",
       "publicApiSurface": "سطح API عمومی  ⁇  حداقل یک استفاده از آن، صادرات مجدد است.",
-      "reExportedBadge": "باز صادر شده و مجدداً صادر می شود.",
+      "reExportedBadge": "صادرشده مجدد",
       "openFileReferences": "باز کردن مرجع فایل های باز",
-      "searchImports": "جستجو واردات و واردات",
+      "searchImports": "جستجوی importها",
       "fileReferencesHeading": "ارجاعات فایل ({count})",
       "andMore": "... و {count} بیشتر"
     },
@@ -1664,7 +1665,7 @@
       "tooltipHeader": "{total} deps انتقالی",
       "tooltipHeaderShared": "عمق انتقالی {total} ({shared} مشترک)",
       "sharedBadgeTitle": "{count} با سایر بسته ها به اشتراک گذاشته شده است.",
-      "sharedBadge": "اشتراک گذاری مشترک به اشتراک گذاشته شده است",
+      "sharedBadge": "مشترک",
       "transitiveDepsHeading": "وابستگی های انتقالی ({count})"
     },
     "dormancy": {
@@ -1680,19 +1681,19 @@
     "detail": {
       "codeCommitActivity": "کد تعهد فعالیت انجام می دهد",
       "releaseActivity": "فعالیت انتشار:",
-      "dormancySignal": "سیگنال خوابگاهی، یک سیگنال بیکار است.",
+      "dormancySignal": "نشانه رکود",
       "ago": "{age} پیش از این",
       "qualityExample": "+مثال مثال",
       "qualityExampleTitle": "یک نسخه ی نمایشی قابل اجرا را با ما همراه می کند.",
       "qualityTests": "+تست های آزمایشی",
       "qualityTestsTitle": "یک مجموعه تست را به همراه دارد.",
-      "qualityTools": "+ ابزارها و ابزارهایی که برای استفاده در کار هستند",
+      "qualityTools": "+ابزارها",
       "qualityToolsTitle": "ابزار نگهداری کشتی ها",
-      "qualityDocs": "+docs: دستاویزات",
+      "qualityDocs": "+مستندات",
       "qualityDocsTitle": "کشتی ها اسناد مستندات گسترده را ارائه می دهند.",
-      "healthScore": "نمره سلامت Health Score به صورت زیر است:",
+      "healthScore": "امتیاز سلامت",
       "resolutionVelocity": "سرعت رزولوشن Resolution Velocity (سرعت قطعنامه)",
-      "engagementLevel": "سطح مشارکت: میزان تعامل",
+      "engagementLevel": "سطح مشارکت",
       "popularity": "محبوبیت شهرت",
       "publisherTrust": "ناشر اعتماد اعتماد",
       "fixInVersion": "→ در {version} ثابت کنید",
@@ -1701,10 +1702,10 @@
     "links": {
       "heading": "لینک ها Links",
       "pubDev": "pub.dev",
-      "changelog": "در changelog تغییرات ایجاد شده است.",
-      "versions": "نسخه ها: نسخه های ورژن",
-      "repository": "مخزن ذخیره سازی repo.",
-      "issues": "مسائل مربوط به موضوعات موضوعاتی"
+      "changelog": "تاریخچه تغییرات",
+      "versions": "نسخه‌ها",
+      "repository": "مخزن",
+      "issues": "مسائل"
     }
   },
   "commandCatalog": {
@@ -1717,35 +1718,35 @@
       "recent": "{count} اخیر",
       "internalHidden": "{count} فقط منوی کلیک‌راست (پنهان)",
       "wordCommands": "دستورات فرماندهی",
-      "wordCategories": "دسته بندی ها: Categories",
-      "wordRecent": "اخیراً اخیر، تازه ترین"
+      "wordCategories": "دسته",
+      "wordRecent": "اخیر"
     },
     "search": {
       "placeholder": "عنوان جستجو، توصیف یا ID فرمان...",
-      "ariaLabel": "دستورات جستجو فرمان های جستجو",
-      "clearAria": "پاک کردن جستجو از جستجوی واضح",
+      "ariaLabel": "جستجوی دستورها",
+      "clearAria": "پاک کردن جستجو",
       "hintLine1": "با هر فرماندهی مطابقت دارد.",
-      "hintStrongTitle": "عنوان عنوان عنوان title",
+      "hintStrongTitle": "عنوان",
       "hintStrongDesc": "توضیحات: توصیف مشخصات",
-      "hintStrongId": "id id id Id این است که",
+      "hintStrongId": "شناسه",
       "hintLine2": "(توکن های id نیز با فاصله  ⁇  نوع هستند.",
-      "hintLine2kbd": "تحلیل اجرا، تجزیه و تحلیل اجرا",
+      "hintLine2kbd": "اجرای تحلیل",
       "hintLine2End": "بدون نقطه).) ، و در این صورت،"
     },
     "toolbar": {
       "showInternal": "نمایش دستورات منوی زمینه ای",
-      "collapseAll": "همه چیز فرو می ریزد."
+      "collapseAll": "بستن همه"
     },
     "recentPopover": {
-      "title": "جستجوهای اخیر جستجو های اخیر",
+      "title": "جستجوهای اخیر",
       "clearTitle": "پاک کردن تمام جستجوهای اخیر",
       "clearButton": "صاف شفاف روشن",
-      "listAria": "جستجوهای اخیر جستجو های اخیر"
+      "listAria": "جستجوهای اخیر"
     },
     "filterChips": {
-      "ariaRegion": "فیلترهای فعال: فیلتر های فعال",
-      "activeLabel": "فیلترهای فعال: فیلتر های فعال",
-      "clearAll": "همه چیز را پاک کنید."
+      "ariaRegion": "فیلترهای فعال",
+      "activeLabel": "فیلترهای فعال:",
+      "clearAll": "پاک کردن همه"
     },
     "bands": {
       "frequentTitle": "اغلب مکرر متداول",
@@ -1756,11 +1757,11 @@
     },
     "noResults": {
       "message": "هیچ فرمان دیگری با جستجوی شما مطابقت ندارد.",
-      "reset": "فیلترهای ریست فلترها را از نو تنظیم کنید."
+      "reset": "بازنشانی فیلترها"
     },
     "entry": {
       "internalBadgeTitle": "فقط از منوهای زمینه ای فعال می شود.",
-      "internalBadge": "منوی منو Menu",
+      "internalBadge": "منو",
       "copyTitle": "کپی از id فرمان ({id})",
       "copyAria": "کپی ID فرمان را کپی کنید."
     },
@@ -1775,15 +1776,15 @@
     },
     "script": {
       "moreSuffix": "+{count} بیشتر",
-      "showLess": "Show less کمتر نشان دهید",
-      "runSingular": "فرار، فرار، دویدن",
-      "runPlural": "می رود، می رود.",
-      "recentWord": "اخیراً اخیر، تازه ترین",
-      "expandAll": "همه را گسترش دهید",
-      "collapseAll": "همه چیز فرو می ریزد.",
+      "showLess": "نمایش کمتر",
+      "runSingular": " اجرا",
+      "runPlural": " اجرا",
+      "recentWord": "اخیر",
+      "expandAll": "باز کردن همه",
+      "collapseAll": "بستن همه",
       "searchChip": "جستجو: \"{query}\"",
       "internalChip": "نمایش دستورات منوی زمینه ای",
-      "removeFilterPrefix": "فیلتر را از بین ببرید",
+      "removeFilterPrefix": "حذف فیلتر ",
       "matchOne": "{count} تطابق",
       "matchOther": "{count} تطابق"
     }
@@ -1800,39 +1801,39 @@
       "launching": "... اسکنر پرتاب",
       "collect": "کشف پرونده ها...",
       "firstRunHint": "اولین اجرا اسکنر را کامپایل می کند؛ پروژه های بزرگ قبل از ظاهر شدن فایل ها یک لحظه طول می کشد.",
-      "paused": "توقف و متوقف شدن",
+      "paused": "متوقف‌شده",
       "stopped": "اسکن متوقف شد",
       "elapsed": "زمان سپری شده",
       "phase": {
-        "parse": "تجزیه فایل های پارس",
+        "parse": "تجزیه فایل‌ها",
         "history": "خواندن تاریخچه Git git",
         "blame": "سن کد محاسباتی Age Code",
         "usage": "شمارش مرجع ها",
         "score": "عملکردهای امتیاز دهی:"
       },
       "counter": {
-        "files": "فایل ها و فایلها",
+        "files": "فایل‌ها",
         "functions": "وظایف عملکردها",
-        "problems": "مشکلات پیدا شده مسائل یافت شد"
+        "problems": "مشکلات یافت‌شده"
       },
       "counters": {
         "aria": "شمارنده های اسکن زنده، شماری از اسکن های زنده را نشان می دهند."
       },
       "controls": {
-        "aria": "اسکن کنترل های اسکن کنترلهای اسکن"
+        "aria": "کنترل‌های اسکن"
       },
       "btn": {
-        "pause": "توقف مکث (pause)",
-        "resume": "رزومه ی زندگی خود را ادامه دهید",
-        "restart": "راه اندازی مجدد دوباره Restart کردن",
-        "cancel": "لغو کن لغو کنید"
+        "pause": "توقف موقت",
+        "resume": "ادامه",
+        "restart": "راه‌اندازی مجدد",
+        "cancel": "لغو"
       },
       "preview": {
         "heading": "مشکلات یافت شده تا کنون",
         "empty": "هنوز هیچ مشکلی پیدا نشده است ..."
       },
       "version": {
-        "engine": "موتورهای ماشین، موتورز و موتورها",
+        "engine": "موتور",
         "detecting": "کشف... تشخیص ...",
         "legacy": "میراث  ⁇  هیچ پیشرفت زنده ای وجود ندارد (پروژه saropa_lints این پروژه از آن پیش می رود)"
       }
@@ -1843,12 +1844,12 @@
     "panelTitle": "Saropa کد Health Dashboard صفحه کنترل سلامت",
     "hero": {
       "title": "Saropa کد Health Dashboard صفحه کنترل سلامت",
-      "generated": "تولید شده ایجاد شده",
+      "generated": "تولید شده",
       "functionOne": "{count} تابع",
       "functionOther": "{count} تابع",
       "avgFormat": "avg {score} ({grade}) است.",
-      "gatesFailing": "دروازه ها شکست خورده اند",
-      "gatesPassing": "دروازه های عبور از گذرگاه"
+      "gatesFailing": "گیت ناموفق",
+      "gatesPassing": "گیت موفق"
     },
     "gauge": {
       "tooltip": "نمره متوسط {rounded} از 100 (درجه {grade}).",
@@ -1866,15 +1867,15 @@
       "allClear": "هیچ عملکردی در هر دسته بندی پرچم دار نشده است  ⁇  همه چیز روشن است.",
       "clickToFilter": "برای فیلتر کردن جدول به سمت توابع با پرچم {flag} کلیک کنید.",
       "noFlagged": "هیچ عملکردی با پرچم {flag}.",
-      "unused": "استفاده نشده است.",
+      "unused": "استفاده‌نشده",
       "unusedSub": "توابع که در هیچ جا به آنها اشاره نشده است.",
-      "uncovered": "پرده از روی سرش برداشته شد.",
+      "uncovered": "بدون پوشش",
       "uncoveredSub": "هیچ پوشش LCOV وجود ندارد.",
-      "stubTested": "تست های ضدعفونی شده با استوب",
+      "stubTested": "آزمون با stub",
       "stubTestedSub": "آزمایشات وجود دارد اما ادعا کمی را تایید می کند.",
       "suspiciousCoverage": "پوشش مشکوک: پوشش مشکوکی",
       "suspiciousCoverageSub": "پوشش ظاهراً ساختگی است.",
-      "testDrift": "در آزمایش drift test drift استفاده می شود.",
+      "testDrift": "انحراف آزمون",
       "testDriftSub": "تست ها عملکرد تابع را عقب می اندازند."
     },
     "toolbar": {
@@ -1882,66 +1883,66 @@
       "rescanTitle": "اسکن سلامت کد را دوباره اجرا کنید و این داشبورد را تازه کنید.",
       "rescan": "اسکن مجدد Rescan",
       "copyJsonTitle": "کد خام سلامت JSON را به کلیپ بورد کپی کنید.",
-      "copyJson": "کپی JSON را کپی کنید",
+      "copyJson": "کپی JSON",
       "settingsTitle": "تنظیمات سلامت کد را باز کنید.",
       "settingsButton": "کد تنظیمات بهداشتی تنظیمات سلامتی",
       "filterTitle": "ردیف های فیلتر را بر اساس نام، فایل یا پرچم.",
-      "filterLabel": "ردیف های فیلتر:صفحات فیلتری",
+      "filterLabel": "فیلتر ردیف‌ها",
       "filterPlaceholder": "ردیف های فیلتر..."
     },
     "table": {
       "ariaLabel": "بدترین عملکردها بر اساس نمره",
-      "heading": "بدترین عملکردها، کارکردهای بد هستند.",
+      "heading": "بدترین توابع",
       "topCount": "{shown} بالای {total}",
-      "colGrade": "درجه ی تحصیلی: نمره ای که به آن می رسید.",
-      "colScore": "امتیاز نمره ای را بدست آورید",
+      "colGrade": "نمره",
+      "colScore": "امتیاز",
       "colFunction": "عملکرد تابع تابع",
-      "colFile": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "colFile": "فایل",
       "colLine": "خط خط خط",
-      "colUsage": "استفاده از کاربرد Usage",
+      "colUsage": "استفاده",
       "colCoverage": "پوشش: پوشش کلیه",
       "colComplexity": "پیچیدگی: پیچیده بودن",
       "colFlags": "پرچم ها پرچمها",
       "noMatch": "هیچ عملکردی با فیلترهای فعلی مطابقت ندارد.",
       "resetFiltersTitle": "جستجو و هر فیلتر پرچم فعال را پاک کنید.",
-      "resetFilters": "فیلترهای ریست فلترها را از نو تنظیم کنید.",
+      "resetFilters": "بازنشانی فیلترها",
       "hint": "نمایش بدترین 200 عملکرد بر اساس امتیاز. از فیلد جستجو برای محدود کردن بیشتر استفاده کنید.",
       "expanderAriaCollapsed": "جزئیات مسئله را نشان دهید",
       "expanderAriaExpanded": "جزئیات مسئله را پنهان کنید Hide issue details",
       "detailHeading": "چرا این تابع {score} امتیاز داده است؟",
       "detailNoIssues": "هیچ پرچم در این ردیف  ⁇  امتیاز توسط مقادیر ستون بالا (استفاده، پوشش، پیچیدگی، سن، مستندات) هدایت می شود.",
       "suppressLabel": "Suppress در فایل suppress را سرکوب کنید.",
-      "suppressTooltip": "`// ignore_for_file: code_health:<flag>̅ را در این فایل می نویسد تا اسکن های آینده، این پرچم را برای کل پرونده حذف کند."
+      "suppressTooltip": "`// ignore_for_file: code_health:<flag>` را در این فایل می‌نویسد تا اسکن‌های بعدی این پرچم را برای کل فایل نادیده بگیرند."
     },
     "flag": {
       "unused": {
-        "label": "استفاده نشده و غیرمستعمل",
+        "label": "استفاده‌نشده",
         "evidence": "0 تماس گیرنده",
         "rule": "پرچم گذاری شده زمانی که هیچ فایل دیگری به این نام تابع ارجاع نمی دهد."
       },
       "uncovered": {
-        "label": "پرده برنمی دارد.",
+        "label": "بدون پوشش",
         "evidence": "{pct}% تست های آزمایش",
         "rule": "هنگامی که LCOV گزارش می دهد پوشش خط 0٪ را نشان می دهد."
       },
       "complex": {
-        "label": "پیچیده ای که به صورت پیچیده و پیچیده است.",
+        "label": "پیچیده",
         "evidence": "CC {cc} _پروتین",
         "rule": "هنگامی که پیچیدگی سایکلوماتیک بیش از ۱۰ باشد، پرچم گذاری می شود."
       },
       "undocumented": {
-        "label": "افراد بدون اسناد و مدارک",
+        "label": "بدون مستندات",
         "evidence": "CC {cc}، بدون هیچ مدرکی.",
         "rule": "پرچم گذاری زمانی که یک تابع پیچیده (CC > 10) هیچ کامنت doc ندارد."
       },
       "test_drift": {
-        "label": "تست drift در آزمون Drift",
+        "label": "انحراف آزمون",
         "evidence": "تست ها عملکرد تابع را عقب می اندازند.",
         "rule": "پرچم گذاری زمانی که جدیدترین فایل تست مرتبط به طور معنی داری قدیمی تر از پرونده منبع تابع است."
       },
       "stub_tested": {
-        "label": "تست های Stub-tested انجام شده است.",
-        "evidence": "پتین ادعا می کند که ادعای خود را دارد.",
+        "label": "آزمون با stub",
+        "evidence": "assertهای ضعیف",
         "rule": "پرچم گذاری زمانی انجام می شود که یک تست مرتبط وجود داشته باشد اما به سختی چیزی را تأیید کند."
       },
       "suspicious_coverage": {
@@ -1963,16 +1964,16 @@
       "showOverlay": "این shortcut overlay را نشان دهید."
     },
     "script": {
-      "activeFiltersLabel": "فیلترهای فعال: فیلتر های فعال",
+      "activeFiltersLabel": "فیلترهای فعال:",
       "searchChip": "جستجو: \"{q}\"",
       "flagChip": "پرچم: {flag}",
       "removeAria": "{key} را حذف کنید.",
-      "clearAll": "همه چیز را پاک کنید.",
+      "clearAll": "پاک کردن همه",
       "rowsVisible": "{visible} از {total} ردیف قابل مشاهده است",
-      "neverRun": "هرگز نروید، فرار نکنید."
+      "neverRun": "هرگز اجرا نشده"
     },
     "freshness": {
-      "justNow": "همین الان، درست در این لحظه.",
+      "justNow": "همین الان",
       "minutesAgo": "{min} دقیقه پیش",
       "hoursAgo": "{hr} ساعت پیش",
       "daysAgo": "{day} روز پیش",
@@ -1989,8 +1990,8 @@
     "scan": {
       "subtitle": "پروژه را در مورد حجم، پیچیدگی و نواحی گرم اسکن می‌کنیم...",
       "elapsed": "زمان سپری شده",
-      "cancel": "لغو کن لغو کنید",
-      "restart": "راه اندازی مجدد دوباره Restart کردن",
+      "cancel": "لغو",
+      "restart": "راه‌اندازی مجدد",
       "stopped": "توقف کرده است",
       "logHeading": "فعالیت های فعالانه",
       "logEmpty": "خروجی ایجاد نشده است — این لاگ فقط در صورتی پر می‌شود که اسکن پیامی دیagnostیک چاپ کند.",
@@ -2034,17 +2035,17 @@
         "desc": "بررسی analysis_options.yaml و analysis_options_custom.yaml برای مشکلات رایج در تنظیمات: کلیدهایی که در فایل اشتباه قرار دارند، یک فایل سفارشی که وجود ندارد یا یک محدودیت نسخه که وجود ندارد."
       },
       "gate": {
-        "editorLabel": "saropa_quality_gate.yaml thresholds",
+        "editorLabel": "آستانه‌های saropa_quality_gate.yaml",
         "placeholder": "کیفیت_درگاه:\n  شرایط:\n    - معیار: جدید_مشکلات_حرجی\n      عملگر: برابر\n      مقدار: 0\n      در_صورت_ناموفق: شکست /نیاز_به_فکر",
-        "save": "Save Save ذخیره کنید",
+        "save": "ذخیره",
         "saved": "ذخیره شده",
         "saveError": "نمی توان ذخیره کرد"
       },
-      "colFile": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "colFile": "فایل",
       "colLineNum": "خط خط خط",
-      "colRule": "قاعده قانون اساسی",
-      "colSeverity": "شدت: میزان شدید بودن",
-      "colMessage": "پیام پیغام پیام پیام",
+      "colRule": "قاعده",
+      "colSeverity": "شدت",
+      "colMessage": "پیام",
       "colKey": "کلید"
     },
     "shortcuts": {
@@ -2052,9 +2053,9 @@
       "showOverlay": "این shortcut overlay را نشان دهید."
     },
     "hero": {
-      "files": "فایل ها و فایلها",
+      "files": "فایل‌ها",
       "lines": "خطوط",
-      "size": "اندازه ی سایز: Size"
+      "size": "اندازه"
     }
   },
   "suppressionsStrip": {
@@ -2084,13 +2085,13 @@
     "noCountersTitle": "هیچ شمارنده ای برای تنظیم مجدد وجود ندارد.",
     "resetTitle": "همه شمارنده ها را از نو تنظیم کنید.",
     "refreshTitle": "شمارنده های تله متری را از دیسک بارگیری مجدد کنید.",
-    "refresh": "به راحتی و با آرامش استراحت کنید.",
+    "refresh": "تازه‌سازی",
     "copyTitle": "اسنپ شات را به عنوان JSON کپی کنید.",
-    "copyJson": "کپی JSON را کپی کنید",
-    "resetCounters": "شمارنده های ریست کردن را از نو تنظیم کنید.",
+    "copyJson": "کپی JSON",
+    "resetCounters": "بازنشانی شمارنده‌ها",
     "countersAria": "- شمارنده ها:",
     "countersHeading": "شمارنده های رویداد،",
-    "thEvent": "رویداد حوادث رخداد حوادثی که اتفاق می افتد",
+    "thEvent": "رویداد",
     "thCount": "شمارش و شمردن",
     "emptyMessage": "هنوز هیچ رویدادی از طریق تله متری ثبت نشده است  ⁇  یک قانون را در داشبورد یافته ها باز کنید تا شروع به ضبط شمارنده کند.",
     "openFindingsTitle": "صفحه نمایش Saropa Findings را باز کنید.",
@@ -2106,8 +2107,8 @@
   "securityPosture": {
     "issueOne": "{count} مشکل",
     "issueOther": "{count} مشکل",
-    "noIssues": "هیچ مشکلی وجود ندارد No issues",
-    "showIssues": "مسائل نمایش را نشان دهید",
+    "noIssues": "بدون مشکل",
+    "showIssues": "نمایش مشکلات",
     "violationTooltip": "{count} نقض در {ruleCount} قانون. برای نمایش در مشکلات کلیک کنید.",
     "noViolationsTooltip": "هیچ نقض ای در این دسته بندی مشخص نشده است."
   },
@@ -2118,28 +2119,28 @@
     },
     "table": {
       "row": {
-        "vibrancyGrade": "درجه ی زندگی پذیری (Vibrancy Grade)",
-        "category": "دسته بندی: Category Category دسته بندی",
-        "latestVersion": "آخرین نسخه جدیدترین نسخه",
-        "published": "منتشر شده انتشار یافته",
+        "vibrancyGrade": "نمره پویایی",
+        "category": "دسته",
+        "latestVersion": "آخرین نسخه",
+        "published": "منتشرشده",
         "publisher": "ناشر ناشر انتشارات",
-        "pubPoints": "پب ها (Pub Points) نقطه های شرابخانه ای هستند.",
-        "githubStars": "GitHub ستاره های ستارگان",
-        "openIssues": "مسائل باز (Open Issues)",
-        "codeSize": "کد سایز اندازه کد",
+        "pubPoints": "امتیازهای Pub",
+        "githubStars": "ستاره‌های GitHub",
+        "openIssues": "مسائل باز",
+        "codeSize": "اندازه کد",
         "bloatRating": "رتبه بندی Bloat",
         "license": "مجوزهای مجاز:",
-        "platforms": "پلتفرم های پلی استار",
+        "platforms": "پلتفرم‌ها",
         "inThisProject": "در این پروژه،"
       },
       "value": {
-        "unverified": "⁇  (غیر تأیید شده)",
-        "allPlatforms": "همه، همه، همگی",
-        "yes": "بله بله بله، بله بله.",
-        "no": "نه، نه، ننه."
+        "unverified": "— (تأییدنشده)",
+        "allPlatforms": "همه",
+        "yes": "بله",
+        "no": "خیر"
       },
       "badge": {
-        "inProject": "در پروژه In Project"
+        "inProject": "در پروژه"
       }
     },
     "status": {
@@ -2150,9 +2151,9 @@
       "morePackages": "+{count} بیشتر"
     },
     "empty": {
-      "ariaLabel": "بدون بسته بندی هیچ گونه بسته ای وجود ندارد.",
+      "ariaLabel": "بدون بسته",
       "message": "هیچ بسته ای برای مقایسه انتخاب نشده است. دو یا چند بسته را در داشبورد Package با کلیک راست بر روی آن ها کلیک کنید و {compare}.",
-      "compareWord": "مقایسه کنید با هم مقایسه کنید",
+      "compareWord": "مقایسه",
       "openDashboard": "داشبورد بسته را باز کنید",
       "openDashboardTitle": "صفحه کنترل بسته Saropa را باز کنید."
     },
@@ -2171,12 +2172,12 @@
       "leadingTitle": "بسته ای که با بیشترین ابعاد پیشتاز است برنده می شود.",
       "dimensionWinsOne": "{count} بعد برنده شدن",
       "dimensionWinsOther": "بعد {count} برنده است",
-      "packages": "بسته های حمل و نقل",
+      "packages": "بسته‌ها",
       "packagesTitle": "تعداد بسته ها در مقایسه با هم.",
-      "inComparison": "در مقایسه با آن.",
+      "inComparison": "در مقایسه",
       "dimensions": "ابعاد: ابعاد",
       "dimensionsTitle": "تعداد ابعاد که در آن یک برنده می تواند رتبه بندی شود.",
-      "ranked": "رتبه بندی شده در رده بندی."
+      "ranked": "رتبه‌بندی‌شده"
     },
     "toolbar": {
       "ariaLabel": "اقدامات مقایسه ای:",
@@ -2202,7 +2203,7 @@
       "rss": "RSS:",
       "statusLabel": "وضعیت:",
       "statusValue": {
-        "active": "فعالان فعال فعال فعال هستند.",
+        "active": "فعال",
         "idle": "آیدل",
         "running": "اجرای کردن",
         "stopped": "توقف کرده است",
@@ -2226,7 +2227,7 @@
       "ci": "CI گیت‌هاب اکشنز"
     },
     "toggle": {
-      "on": "اون /نیست",
+      "on": "روشن",
       "off": "اُف اف"
     },
     "action": {
@@ -2254,10 +2255,28 @@
       "enginesLabel": "موتورها: {count} اجرا می‌شود"
     },
     "ci": {
-      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
-      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
-      "openWorkflow": "Open workflow",
-      "openWorkflowFailed": "Could not open {path}."
+      "enabled": "CI مربوط به saropa_lints در {path} نوشته شد. تغییر را بررسی و کامیت کنید — این فایل بر pull requestهای همه مشارکت‌کنندگان اثر می‌گذارد، بنابراین برای شما کامیت نمی‌شود.",
+      "disableFailed": "خاموش کردن CI ممکن نشد: {path} وجود ندارد یا ساختاری دارد که Saropa Lints آن را خودکار ویرایش نمی‌کند. CI همچنان در حال اجرا است. فایل را باز کنید و گردش کار را دستی غیرفعال کنید.",
+      "openWorkflow": "باز کردن گردش کار",
+      "openWorkflowFailed": "{path} باز نشد.",
+      "publish": {
+        "heading": "انتشار این تغییر",
+        "introEnable": "{path} در درخت کاری شما نوشته شد. تا زمانی که روی {base} نباشد، هیچ چیزی در CI اجرا نمی‌شود. این دستورها آن را روی شاخه جدیدی به نام {branch} قرار می‌دهند و برای بازبینی یک pull request باز می‌کنند — خودتان اجرایشان کنید، یا دکمه را بزنید تا Saropa Lints همین دستورها را اجرا کند.",
+        "introDisable": "{path} در درخت کاری شما ویرایش شد تا همه کارها متوقف شوند. CI تا زمانی که این تغییر به {base} برسد به اجرا ادامه می‌دهد. این دستورها تغییر را روی شاخه جدیدی به نام {branch} قرار می‌دهند و یک pull request باز می‌کنند — خودتان اجرایشان کنید، یا دکمه را بزنید تا Saropa Lints همین دستورها را اجرا کند. برای توقف فوری CI، گردش کار را از برگه Actions مخزن غیرفعال کنید.",
+        "commandsLabel": "دستورها",
+        "copy": "کپی",
+        "copied": "دستورها در کلیپ‌بورد کپی شدند.",
+        "createPr": "ایجاد شاخه، کامیت، push و باز کردن pull request",
+        "notNow": "اکنون نه",
+        "noGitHubRemote": "remote به نام origin این مخزن GitHub نیست، بنابراین pull request برای شما باز نمی‌شود. دستورهای بالا را اجرا کنید و آن را به روش میزبان خود باز کنید.",
+        "running": "در حال ایجاد شاخه و push…",
+        "failed": "{command} ناموفق بود، بنابراین چیزی push نشد. {details}",
+        "pushedNoPr": "{branch} push شد. pull request به‌طور خودکار باز نشد — آن را از صفحه مقایسه باز کنید.",
+        "openCompare": "باز کردن صفحه مقایسه",
+        "created": "pull request برای {branch} باز شد.",
+        "openPr": "باز کردن pull request",
+        "notARepository": "{path} نوشته شد، اما این پوشه مخزن git نیست، پس جایی برای انتشار وجود ندارد."
+      }
     }
   },
   "detailView": {
@@ -2266,26 +2285,26 @@
     },
     "section": {
       "version": "نسخه",
-      "update": "UPDATE به روز رسانی",
-      "suggestion": "پیشنهادات: پیشنهادی است.",
+      "update": "به‌روزرسانی",
+      "suggestion": "پیشنهاد",
       "community": "جامعه ی جهانی:",
       "dependencies": "وابستگی ها (Dependences)",
-      "alerts": "هشدارها: هشدارهای هشداردهنده",
-      "platforms": "پلتفرم های پلی استور",
-      "directDeps": "ذخایر مستقیم (Direct Deposits)",
+      "alerts": "هشدارها",
+      "platforms": "پلتفرم‌ها",
+      "directDeps": "وابستگی‌های مستقیم",
       "readmeImages": "تصاویر README"
     },
     "version": {
       "published": "منتشر شده توسط: {date}",
-      "codeSize": "کد سایز اندازه کد",
+      "codeSize": "اندازه کد",
       "archive": "آرشیو بایگانی",
       "sizeLabel": "{label}: {size}",
       "source": "منبع: کد {code} · نظرات {comments} · فایل های {files}",
       "replace": "جایگزین: {summary}"
     },
     "update": {
-      "upgrade": "ارتقاء Upgrade به روزرسانی",
-      "changelog": "Changelog: تغییرات در ژورنال",
+      "upgrade": "ارتقا",
+      "changelog": "تاریخچه تغییرات",
       "blockedBy": "بلاک شده توسط {package}"
     },
     "suggestion": {
@@ -2325,18 +2344,18 @@
       "viewFullDetails": "مشاهده جزئیات کامل View Full Details",
       "pubDev": "pub.dev",
       "documentation": "مستندات اسناد مدارک",
-      "changelog": "Changelog: تغییرات در ژورنال",
+      "changelog": "تاریخچه تغییرات",
       "repository": "مخزن اطلاعات Repository",
-      "issues": "مسائل و مسائلی که مطرح می شود",
-      "reportIssue": "گزارش موضوعی، مسئله ای"
+      "issues": "مسائل",
+      "reportIssue": "گزارش مشکل"
     },
     "logoAlt": "{packageName} لوگو _ PH0__",
-    "readMore": "بیشتر بیشتر بیشتر بیش تر",
-    "readmeImageAlt": "تصویر README image را بخوانید"
+    "readMore": "بیشتر",
+    "readmeImageAlt": "تصویر README"
   },
   "chart": {
     "toggle": {
-      "excludeShared": "حذف اشتراک گذاری مشترک"
+      "excludeShared": "حذف مشترک‌ها"
     },
     "filter": {
       "clear": "صاف شفاف روشن"
@@ -2347,8 +2366,8 @@
       "sharedTransitives": "ترازیتیو های مشترک ({count})"
     },
     "noun": {
-      "package": "بسته بندی پکیج، یک بسته ی بسته ای است.",
-      "packages": "بسته های حمل و نقل"
+      "package": "بسته",
+      "packages": "بسته"
     }
   },
   "suite": {
@@ -2357,7 +2376,7 @@
     },
     "enableRule": {
       "done": "قاعده {ruleId}. فعال شده استفاده از تجزیه و تحلیل Re-run برای اعمال.",
-      "runAnalysis": "تحلیل را اجرا کنید.",
+      "runAnalysis": "اجرای تحلیل",
       "noWorkspace": "یک پوشه فضای کاری را برای فعال کردن یک قاعده باز کنید."
     },
     "openFinding": {
@@ -2366,7 +2385,7 @@
     },
     "crashNudge": {
       "message": "ضبط لاگ یک خرابی {count} زمان را مشاهده کرد که قاعده {ruleId} می توانست آن را بگیرد. این قانون در حال حاضر غیرفعال است.",
-      "enable": "فعال کردن قاعده enable rule"
+      "enable": "فعال‌سازی قاعده"
     },
     "deepLink": {
       "showDriftIssues": "نمایش زنده مسائل درایو (Drift Advisor)"
@@ -2391,8 +2410,8 @@
       "runScanFirst": "ابتدا اسکن را اجرا کنید.",
       "noUpgradable": "هیچ بسته ای قابل ارتقاء پیدا نشد.",
       "proceedUpgrades": "با {count} ارتقاء ادامه دهید؟ گام های شکست خورده به عقب برمی گردند و برنامه ادامه می یابد.",
-      "actionExecute": "اجرا کنید اجرای اجراء کنید",
-      "actionCancel": "لغو کن لغو کنید",
+      "actionExecute": "اجرا",
+      "actionCancel": "لغو",
       "upgradeStopped": "ارتقاء در {failedAt}  ⁇  متوقف شد. {completed}/{total} تکمیل شده",
       "upgradeAllComplete": "تمام ارتقاء های {count} با موفقیت به پایان رسید.",
       "notPubspec": "فایل انتخاب شده یک pubspec.yaml نیست.",
@@ -2413,7 +2432,7 @@
       "ciRunScanFirst": "ابتدا یک اسکن را اجرا کنید تا CI config با آستانه های مناسب ایجاد شود.",
       "noWorkspace": "بدون پوشه فضای کاری باز است",
       "ciOverwriteConfirm": "{path} قبلا وجود دارد. بر روی نوشته ها؟",
-      "actionOverwrite": "Overwrite overwrite را می نویسد.",
+      "actionOverwrite": "بازنویسی",
       "ciGenerated": "خط لوله CI تولید شده: {path}",
       "compareSelectCount": "برای مقایسه دو یا سه بسته انتخاب کنید.",
       "compareMax": "حداکثر 3 بسته برای مقایسه",
@@ -2423,7 +2442,7 @@
       "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} خطا{suffix}  ⁇ دیدگاه.نگرانی.",
       "regressionScoreDipped": "نمره زیر {threshold}  ⁇  کاهش یافت. مسائل دید.مسائل دید.",
-      "actionViewViolations": "نقض دیدگاه ها View Violations",
+      "actionViewViolations": "مشاهده تخلف‌ها",
       "noErrors": "Saropa Lints: _PH0_: = PH0__::: -پای بدون خطا!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: _PH0_: = PH0__::: -پای هیچ پوشه ای از فضای کاری باز نیست. ابتدا پروژه Dart/Flutter خود را باز کنید.",
       "lintIntegrationOffCannotAnalyze": "Saropa Lints: اسکن در زمان ذخیره غیر فعال است. آن را قبل از اجرای تحلیل فعال کنید.",
@@ -2444,15 +2463,15 @@
       "openReportFailed": "Saropa Lints: گزارش باز نشد - {message}",
       "noAnalysisData": "هیچ داده ای از تجزیه و تحلیل وجود ندارد. ابتدا آنالیز را اجرا کنید.",
       "actionDisable": "غیرفعال کردن Disable",
-      "actionEnable": "فعال کردن enable Enable امکان پذیر ساختن",
+      "actionEnable": "فعال‌سازی",
       "bulkRuleToggleConfirm": "{verb} {count} قوانین؟ این analysis_options_custom.yaml را به روز می کند",
       "setupPrompt": "Saropa Lints یک پروژه Dart بدون پیکربندی saropa_lints تشخیص داد. اکنون پیکربندی کنید تا 2300 + قاعده لینت را فعال کنید.",
       "actionSetUpProject": "راه اندازی پروژه تنظیم پروژه",
-      "actionNotNow": "حالا نه، الان نه"
+      "actionNotNow": "اکنون نه"
     },
     "setup": {
       "requiresDartProject": "Saropa Lints نیاز به یک پروژه Dart یا Flutter دارد (هیچ pubspec.yaml پیدا نشد).",
-      "actionLearnMore": "بیشتر بدانید Learn More بیشتر بدانید",
+      "actionLearnMore": "اطلاعات بیشتر",
       "noWorkspaceFolder": "هیچ پوشه ای از فضای کاری باز نشده است.",
       "pubGetFailed": "Saropa Lints: میخانه شکست خورد. {details}",
       "checkOutput": "خروجی را چک کنید.",
@@ -2470,13 +2489,13 @@
       "configWriteFailed": "نوشتن پیکربندی ناموفق شد. {details}",
       "scaffoldGateTitle": "پلاگین تجزیه و تحلیلگر کامپوزیت پلگ ان داربست",
       "scaffoldGateDetail": "این یک بسته جدید Dart را در زیر فضای کاری شما می نویسد (pubspec.yaml، lib/main.dart، README): یک افزونه custom_lint که Saropa را ثبت می کند و قلاب هایی برای قوانین خود شما باقی می گذارد.\n\nفقط زمانی از این استفاده کنید که قوانین تحلیلگر سفارشی را همراه با Saropa ارسال می کنید. پروژه های معمولی فقط Saropa می توانند آن را حذف کنند.آنالیزور اجازه ورود یک پلاگین به هر زمینه را می دهد.\n\nبعدی: \"مردان\" یک پوشه مربوط به فضای کاری را انتخاب کنید. اگر این پوشه قبلا وجود داشته باشد، قبل از اینکه هر چیزی روی آن نوشته شود، از شما خواسته می شود.",
-      "actionContinue": "ادامه مطلب ادامه مطلب",
-      "actionOpenGuide": "راهنمای باز کردن را باز کنید.",
+      "actionContinue": "ادامه",
+      "actionOpenGuide": "باز کردن راهنما",
       "scaffoldPathOutsideWorkspace": "مسیر Scaffold باید در داخل پوشه workspace باشد.",
       "scaffoldFolderExists": "پوشه قبلا وجود دارد: {folder}. . _PH0_. . . . _فروغ از فایل ها ممکن است اضافه شوند یا بر روی آنها نوشته شود. ادامه بده؟",
       "scaffoldCreated": "ساخت و ساز پلاگین کامپوزیت ساخته شده است. باز کردن اصلی تولید شده .dart",
       "actionOpenMainDart": "باز کردن main.dart",
-      "actionOpenReadme": "README را باز کنید",
+      "actionOpenReadme": "باز کردن README",
       "scaffoldFailed": "داربست شکست خورد. {details}",
       "scaffoldFailedHint": "مطمئن شوید که saropa_lints در dev_dependencies است و pub get را اجرا کنید.",
       "alreadyOnTier": "در حال حاضر در سطح {tier} است.",
@@ -2516,7 +2535,7 @@
       "crossFileReportNoIndex": "گزارش پرونده های متقابل تکمیل شد اما index.html پیدا نشد.",
       "crossFileHtmlReportGenerated": "گزارش HTML Cross-file تولید شده است.",
       "actionOpenInBrowser": "در مرورگر باز کنید",
-      "actionOpenFile": "باز کردن فایل Open File",
+      "actionOpenFile": "باز کردن فایل",
       "crossFileSnapshotFailed": "عکس فوری میان فایل ناموفق بود: {message}",
       "crossFileSnapshotNoJson": "عکس فوری از فایل های متقابل تکمیل شد اما پرونده JSON پیدا نشد.",
       "crossFileSnapshotWritten": "عکس فوری از فایل های متقاطع به گزارش ها نوشته شده است/.saropa_lints/cross_file_snapshot.json",
@@ -2540,7 +2559,7 @@
       "projectMapCouldNotOpen": "Saropa نقشه پروژه: نتوانست {file} را باز کند.",
       "issuesNoQuickFix": "هیچ راه حل سریع برای این نقض وجود ندارد.",
       "issuesFileNotFound": "فایل یافت نشد: {file}. . _PH0_. . . . _فروغ از تجزیه و تحلیل را دوباره اجرا کنید تا به روز شود.",
-      "actionFixAll": "Fix All Fix همه را درست کنید",
+      "actionFixAll": "رفع همه",
       "issuesConfirmFixAll": "آیا نقض {count} را در {fileName} برطرف می کنید؟",
       "issuesBulkFixResult": "{fixed}. ثابت شده برای به روز رسانی امتیاز، تجزیه و تحلیل را اجرا کنید.",
       "issuesBulkFixResultSkipped": "{fixed} را اصلاح کردم، {skipped} را حذف کردم (اصلاح در دسترس نیست). برای به روز رسانی امتیاز، تجزیه و تحلیل را اجرا کنید.",
@@ -2592,7 +2611,7 @@
       "registryRemoveFailed": "رجیستری حذف نشد: {message}",
       "registryTokenUpdated": "✓ توکن به روز شده است",
       "registryTokenUpdateFailed": "رمز به‌روزرسانی نشد: {message}",
-      "actionRemove": "حذف remove از بین بردن",
+      "actionRemove": "حذف",
       "removeAuthPrompt": "حذف احراز هویت برای {name}؟",
       "annotateInProgress": "اینتونیشن در حال حاضر در جریان است.",
       "noPubspecInWorkspace": "هیچ pubspec.yaml در فضای کاری پیدا نشده است.",
@@ -2614,23 +2633,23 @@
       "openFolderBeforeEnablePacks": "Saropa Lints: _PH0_: = PH0__::: -پای قبل از فعال کردن بسته ها یک پوشه workspace را باز کنید.",
       "allApplicablePacksEnabled": "Saropa Lints: _PH0_: = PH0__::: -پای هر بسته قاعده قابل اجرا در حال حاضر فعال است.",
       "noApplicablePacksDetected": "Saropa Lints: هیچ قاعده ای برای پروژه ای که انتخاب کردید پیدا نشد. هر قاعده را به طور جداگانه در پنجره تنظیمات فعال یا غیرفعال کنید.",
-      "actionEnable": "فعال کردن enable Enable امکان پذیر ساختن",
+      "actionEnable": "فعال‌سازی",
       "enableRecommendedPacksPrompt": "{count} بسته توصیه شده را فعال کنید؟",
       "enablePacksDetail": "این rule_packs.enabled را در analysis_options.yaml به روز می کند. {preview}",
       "enabledRecommendedPacks": "Saropa Lints: _PH1_: به معنی PH1. {count} بسته توصیه شده (((s) فعال است.",
       "enableModePacksPrompt": "{count} {modeLabel} بسته را فعال کنید؟"
     },
     "misc": {
-      "upgradeCheckerMajorUpdate": "به روز رسانی عمده ی Major update",
-      "upgradeCheckerMinorUpdate": "به روزرسانی جزئی (Minor update)",
-      "upgradeCheckerPatchUpdate": "به روز رسانی پچ (Patch)",
+      "upgradeCheckerMajorUpdate": "به‌روزرسانی اصلی",
+      "upgradeCheckerMinorUpdate": "به‌روزرسانی جزئی",
+      "upgradeCheckerPatchUpdate": "به‌روزرسانی وصله",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: _ PH2__::: به صورت یکپارچه و در کنار نتوانست pubspec.yaml را به روزرسانی کند  ⁇ saropa_lints ورودی یافت نشد.",
-      "upgradeCheckerCancelled": "Saropa Lints ارتقاء لغو شد. pubspec.yaml به ^{version}; بروزرسانی شده است run `{cmd} pub get ゙ to finish, or reverse the change. اجرا کردن پب برای پایان دادن به کار، یا تغییر را معکوس می کند.",
+      "upgradeCheckerCancelled": "ارتقای Saropa Lints لغو شد. pubspec.yaml به ^{version} به‌روزرسانی شد؛ برای تکمیل `{cmd} pub get` را اجرا کنید، یا تغییر را برگردانید.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: میخانه شکست خورد. {detail}",
       "upgradeCheckerCheckOutput": "خروجی را چک کنید.",
       "upgradeCheckerUpgraded": "Saropa Lints به {version} ارتقا یافت.",
-      "actionUpgrade": "ارتقاء Upgrade به روزرسانی",
+      "actionUpgrade": "ارتقا",
       "actionViewChangelog": "مشاهده Changelog",
       "actionDismiss": "اخراج از کار",
       "healthCodeLensEnabled": "Saropa نقشه پروژه heat CodeLens فعال شده است.",
@@ -2665,7 +2684,7 @@
     "kpi": {
       "filesInScope": "فایل های در دامنۀ بررسی",
       "lines": "خطوط",
-      "files": "فایل های فايل ها را به صورت",
+      "files": "فایل",
       "estimatedCost": "هزینه تخمینی تحلیل",
       "costUnits": "واحد هزینه",
       "potentialSavings": "میزان پسندشده",
@@ -2676,20 +2695,20 @@
     "costLight": "نور",
     "exclusions": "استثنا ها",
     "noExclusions": "هیچ استثناء اعمال یا توصیه نشده است — فضای کاری قبلاً به خوبی مشخص شده است",
-    "applyAll": "همه را اعمال کنید",
+    "applyAll": "اعمال همه",
     "applySelected": "اعمال انتخاب شده",
     "apply": "اعمال",
-    "remove": "حذف remove از بین بردن",
-    "selectAll": "همه را انتخاب کنید",
+    "remove": "حذف",
+    "selectAll": "انتخاب همه",
     "defaultLabel": "پیش‌فرض",
     "sortHint": "کلیک کنید تا مرتب کنید",
     "previewToggle": "پیش نمایش",
     "previewLine": "خط دقیقی که افزوده می‌شود را پیش نمایش دهید",
     "previewApprox": "تقریبی — ترکیب دقیق ا-indentation و قرار گیری نظریه ها با فایل شما هنگام اعمال مطابقت دارد",
     "col": {
-      "status": "وضعیت Status موقعیت وضعیت",
+      "status": "وضعیت",
       "pattern": "ال mẫu",
-      "files": "فایل ها و فایلها",
+      "files": "فایل‌ها",
       "cost": "هزینه تخمینی",
       "priority": "اولویت"
     },
@@ -2771,7 +2790,7 @@
       "message": "نگهداری ناگهانی: قاعده '{ruleName}' دیگر روی این خط اجرا نمی‌شود."
     },
     "sidebar": {
-      "fixLabel": "کم کردن نادیده گرفته می‌شود",
+      "fixLabel": "پاکسازی ignoreها",
       "fixDescription": "یافته و خودکار حذف کامنت های // ignore: مرده"
     },
     "quickFix": {
@@ -2797,9 +2816,9 @@
   },
   "sidebar": {
     "actions": {
-      "runAnalysisLabel": "تحلیل را اجرا کنید.",
-      "runAnalysisDescription": "تحلیل کننده را مجدد اجرا کنید",
-      "updateConfigLabel": "کنfig را به‌روزرسانی کنید",
+      "runAnalysisLabel": "اجرای تحلیل",
+      "runAnalysisDescription": "اجرای مجدد تحلیلگر",
+      "updateConfigLabel": "به‌روزرسانی پیکربندی",
       "updateConfigDescription": "انتخاب یا به‌روزرسانی گزینه‌های تحلیل"
     },
     "status": {
@@ -2840,6 +2859,29 @@
     "integrationOff": "نتیجه ی انتگراسيون Drift Advisor غیر فعال است. آن را در تنظیمات (saropaLints.driftAdvisor.integration) فعال کنید، سپس روی به‌روزرسانی کلیک کنید."
   },
   "blastRadius": {
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) از طریق {chain}",
+    "label": {
+      "upgrade": "ارتقا",
+      "breaks": "می‌شکند",
+      "breaksLower": "می‌شکند",
+      "upgradeNotRecommended": "⚠️ ارتقا توصیه نمی‌شود"
+    },
+    "notRecommended": "ارتقا توصیه نمی‌شود",
+    "skipReason": "ارتقا توصیه نمی‌شود: {summary}",
+    "sdkBlock": "{pkg} {to} به {dep} {range} نیاز دارد؛ Flutter نسخه {dep} را روی {pinned} ثابت کرده است",
+    "summary": {
+      "heldBack": "{pkg} {to} نگه داشته شده است: {reason}",
+      "sdkBlocked": "{pkg} {to} توسط SDK مسدود شده است: {sdk}",
+      "depCapped": "{pkg} {to} به {dep} {range} نیاز دارد، اما {dep} توسط {cappers} محدود شده است",
+      "depHeldBack": "{pkg} {to} به {dep} {range} نیاز دارد که نگه داشته شده است: {reason}",
+      "breaksOne": "{pkg} {to} باعث خرابی {count} وابسته می‌شود: {names}",
+      "breaksOther": "{pkg} {to} باعث خرابی {count} وابسته می‌شود: {names}",
+      "safe": "{pkg} {from} -> {to} ایمن به نظر می‌رسد",
+      "newestCompatible": "جدیدترین نسخه سازگار: {pkg} {version}"
+    }
+  },
+  "blastRadius": {
     "label": {
       "upgrade": "ارتقا",
       "breaks": "می‌شکند",
@@ -2860,6 +2902,19 @@
       "breaksOther": "{pkg} {to} باعث شکستن {count} وابسته می‌شود: {names}",
       "safe": "{pkg} {from} -> {to} ایمن به نظر می‌رسد",
       "newestCompatible": "جدیدترین نسخهٔ سازگار: {pkg} {version}"
+    }
+  },
+  "lifecycle": {
+    "note": {
+      "statusMayBeOutdated": "وضعیت ممکن است قدیمی باشد: به‌عنوان پایان عمر ثبت شده، اما pub.dev نشان می‌دهد که متوقف نشده و در ۱۲ ماه گذشته منتشر شده است.",
+      "maintenanceMode": "حالت نگهداری: فقط رفع اشکال‌های حیاتی انتظار می‌رود.",
+      "caution": "احتیاط: پیش از اتکا به این بسته، مشکل شناخته‌شده را بررسی کنید.",
+      "unlisted": "در pub.dev فهرست نشده: از نتایج جست‌وجو پنهان است؛ کاربران فعلی همچنان می‌توانند به آن وابسته باشند."
+    },
+    "upgradeRequired": {
+      "diagnostic": "{name} را ارتقا دهید — نسخه نصب‌شده به‌طور شناخته‌شده خراب است",
+      "problem": "امتیاز {score}/100 — نسخه نصب‌شده نیاز به ارتقا دارد",
+      "insight": "نسخه نصب‌شده به‌طور شناخته‌شده خراب است — ارتقا الزامی است"
     }
   }
 }

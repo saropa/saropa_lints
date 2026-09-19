@@ -80,8 +80,8 @@
       "subtitle": "{count} けいとう · {timestamp}",
       "baselineSubtitle": "ベースラインと比較して{date}",
       "searchPlaceholder": "ルール、ファイル、またはメッセージでフィルタ…",
-      "filterTier": "準額 (Tier) の基準となる.",
-      "filterSeverity": "深刻度 (severity) とは,重度の程度を問わず",
+      "filterTier": "Tier",
+      "filterSeverity": "重大度",
       "filterImpact": "影響の影響を,その効果が",
       "filterBaselineStatus": "ベースライン",
       "baselineNew": "新規",
@@ -89,11 +89,11 @@
       "saveBaseline": "ベースラインとして保存",
       "copyJson": "JSONをコピーする",
       "toggleGroup": "グループ化を切り替える",
-      "colFile": "ファイルは,ファイルの形式で",
-      "colLine": "ライン・ライン・線・ライン",
-      "colRule": "ルール ルールはルールの規則",
-      "colSeverity": "深刻度 (severity) とは,重度の程度を問わず",
-      "colTier": "準額 (Tier) の基準となる.",
+      "colFile": "ファイル",
+      "colLine": "行",
+      "colRule": "ルール",
+      "colSeverity": "重大度",
+      "colTier": "Tier",
       "colMessage": "メッセージ・メッセージを伝える",
       "empty": "見つかりません — プロジェクトはクリーンです。",
       "filteredEmpty": "現在のフィルタに一致する結果がありません。",
@@ -104,7 +104,7 @@
       "exportJsonTitle": "アジャイル結果をJSONとしてエクスポート",
       "exportJsonSaved": "JSONをauditしました",
       "exportJsonFailed": "audit JSON のエクスポートに失敗しました: {message}",
-      "clearRuleFilter": "清々しい,はっきりとした.",
+      "clearRuleFilter": "クリア",
       "paginationNote": "フィルタリングされた結果にはページ制限が適用されます。",
       "sevBarError": "{count}エラー({pct}%)",
       "sevBarWarning": "{count} わarnings ({pct}%)",
@@ -162,7 +162,7 @@
       "usedOnly": "使用のみ",
       "deprecatedOnly": "非推奨のみ",
       "expandAll": "Expand all を拡張する",
-      "collapseAll": "すべてが崩壊する.",
+      "collapseAll": "すべて折りたたむ",
       "indexLabel": "パッケージインデックス"
     },
     "summary": {
@@ -174,7 +174,7 @@
       "colAdopted": "採用済み",
       "colUnadopted": "未採用",
       "colUsages": "使用方法",
-      "colScore": "スコアを記録する."
+      "colScore": "スコア"
     },
     "packages": {
       "title": "パッケージパッケージは,"
@@ -224,10 +224,10 @@
     "title": "スタイルと意見",
     "intro": "意見のスタイルルール,デフォルトでオフ. チームが同意したものをのみ起動します. 矛盾する選択はグループ化され,あなたが1つを選ぶようにします.",
     "searchPlaceholder": "検索スタイルルール...",
-    "pickOne": "1つを選んでください.",
-    "none": "別に,誰もいない.",
-    "enableAll": "すべてを有効にします.",
-    "disableAll": "すべてを無効にします.",
+    "pickOne": "1 つ選択",
+    "none": "なし",
+    "enableAll": "すべて有効にする",
+    "disableAll": "すべて無効にする",
     "noMatch": "スタイルルールが一致しない.",
     "desc": {
       "ordering_sorting": "構成員,パラメータ,フィールド,マップキーを並べて予測可能なレイアウトを実現します. 既存のコードでは非常に騒がしいです. 新しいコードや小さなリポジトリでベストです.",
@@ -274,16 +274,16 @@
       "ariaLabel": "ルール＆ティアスダッシュボードタブ"
     },
     "tab": {
-      "tier": "準額 (Tier) の基準となる.",
-      "packs": "ルールパックとは,ルール・パッケージです.",
-      "overrides": "オーバーライドは,オーバレーズを無視する.",
+      "tier": "Tier",
+      "packs": "ルールパック",
+      "overrides": "オーバーライド",
       "sdk": "SDK ロールアウト",
       "configFile": "設定ファイル",
       "automation": "オートメーション",
       "extension": "拡張機能"
     },
     "common": {
-      "rule": "ルール ルールはルールの規則",
+      "rule": "ルール",
       "add": "追加",
       "remove": "削除する Remove remove"
     },
@@ -372,8 +372,8 @@
           "resolvedSection": "解決済み({count})",
           "newSection": "ベースラインからの新機能({count})",
           "moreRows": "＋{count} 以降は表示されません。",
-          "fileCol": "ファイルは,ファイルの形式で",
-          "lineCol": "ライン・ライン・線・ライン"
+          "fileCol": "ファイル",
+          "lineCol": "行"
         }
       },
       "optimizer": {
@@ -401,17 +401,17 @@
     "empty": "オーールクリアです. 発見はなし",
     "liveTitle": "ライブ  ⁇  生放送 編集するにつれて更新されます.",
     "fetching": "引き寄せ...取り寄せる",
-    "noOccurrences": "発生はなし.",
+    "noOccurrences": "該当なし",
     "summaryFindings": "{count} 件の検出",
     "summaryRules": "{count} つのルール",
     "more": "+{count} もっともっと",
-    "wordErrors": "誤り,エラーの発生が原因です.",
-    "wordWarnings": "警告や警告が付いている.",
-    "wordInfo": "情報は情報,情報が情報.",
-    "wordFiles": "ファイルは,ファイルのファイルを",
-    "gradeExcellent": "優秀で,とても優れている.",
-    "gradeGood": "いいね!いいよ,良いこと",
-    "gradeFair": "フェア・フェア・ファール 公平",
+    "wordErrors": "エラー",
+    "wordWarnings": "警告",
+    "wordInfo": "情報",
+    "wordFiles": "ファイル",
+    "gradeExcellent": "優秀",
+    "gradeGood": "良好",
+    "gradeFair": "普通",
     "gradeWeak": "弱く,弱いから",
     "gradeSevere": "極度に重症で,",
     "evidence": {
@@ -484,10 +484,10 @@
       "changelog": "チェンジログの変更",
       "community": "コミュニティー (共同体)",
       "dependencies": "依存関係にあるもの",
-      "alerts": "警告は,警戒を促すものである.",
+      "alerts": "アラート",
       "platforms": "プラットフォームのプラットフォーム",
-      "suggestions": "提案は,提案としてあります.",
-      "readmeImages": "README IMAGES (リーズミーの画像) をダウンロードする"
+      "suggestions": "提案",
+      "readmeImages": "README の画像"
     },
     "header": {
       "logoAlt": "{name} ロゴを貼る",
@@ -502,7 +502,7 @@
       "listTwo": "{first}と {second} との2つの値が求められている.",
       "listMany": "{head},そして {last}",
       "message": "一部のセクションがロードできませんでした: {list}.",
-      "retry": "再試行してみる.",
+      "retry": "再試行",
       "retrying": "再試し...やってみる",
       "retryTitle": "失敗した fetch を再試してください."
     },
@@ -510,15 +510,15 @@
       "readMore": "read more もっと読む"
     },
     "version": {
-      "constraint": "制約は,制限の束縛である.",
-      "latest": "最新の最新 更新しました.",
+      "constraint": "制約",
+      "latest": "最新",
       "prerelease": "プレリリースのプリリース",
       "published": "出版された 発行された",
       "update": "アップデートアップデートの更新",
       "blockedBy": "ブロックされた by",
       "blockedVia": "{blocker} キャップ {dep} {constraint} ({resolvable} は解決可能、{latest} は最新)",
       "blockedViaSdk": "{blocker} (Flutter SDK) によって {dep} 用に固定 ({resolvable} は解決可能、{latest} 最新)",
-      "constrained": "拘束された,制約されている.",
+      "constrained": "制約あり",
       "constrainedBy": "あなたの制約である {constraint} はこれを制限します ({resolvable} 解決可能,{latest} 最新)",
       "pinHeld": "開催された Held",
       "pinDoNotUse": "使用しないでください.",
@@ -540,11 +540,11 @@
       "viewFull": "完全な変更ログを pub.dev で参照してください."
     },
     "community": {
-      "stars": "星は,星の星である.",
-      "likes": "気に入ったものは好き.",
+      "stars": "スター",
+      "likes": "いいね",
       "report": "報告書 レポート",
       "openIssues": "オープンな問題",
-      "openPrs": "オープンPRは,公開のP.R.sである",
+      "openPrs": "オープンな PR",
       "activity": "活動 (90d)",
       "activityValue": "{closed} の問題は終了し、{merged} PR は統合されました",
       "noActivity": "最近の活動はありません.",
@@ -553,7 +553,7 @@
       "verified": "(検証された)",
       "publisher": "出版社 編集者 発行者",
       "flagged": "({count}フラグが付けられている)",
-      "transitiveDeps": "変形型貯水槽は,トランジティブの貯水庫です.",
+      "transitiveDeps": "間接依存関係",
       "footprintBreakdown": "{unique} ユニーク&middot; +{shared}共有 = {total} トータル",
       "footprintTooltip": "独自の {own} + ユニークなトランジティブ {unique} + 共用トランジティブな {shared}. このデップを削除すると, {saved} (共有のデップは他者によって引き込まれる) を保存します.",
       "trueFootprint": "真の足跡とは",
@@ -568,7 +568,7 @@
       "header": "ファイル利用 ({label})",
       "commentedReexportTitle": "コメントされた再輸出",
       "reexportTitle": "再輸出  ⁇  このライブラリのパブリックAPIの一部",
-      "reexportBadge": "再輸出は,再輸出を目的としたものです."
+      "reexportBadge": "再エクスポート"
     },
     "opportunities": {
       "header": "チャンス ({count})",
@@ -586,20 +586,20 @@
       "overrideTitle": "オーバーライドギャップを無視する",
       "noDates": "このパッケージのバージョン日付を決定できません.",
       "noItems": "これらのバージョンの間には,PRや問題が見つかりませんでした.",
-      "prsMerged": "PRsは合併した.",
+      "prsMerged": "マージ済み PR",
       "issuesClosed": "終了した問題,閉鎖された問題",
       "searchLabel": "検索PRや問題について",
       "searchPlaceholder": "検索PRと問題...",
       "filterAria": "カテゴリ別フィルター",
-      "filterAll": "すべて,すべて,全て.",
-      "filterUnreviewed": "レビューされていない.",
-      "filterPrs": "PRsはPRを目的としたものです.",
+      "filterAll": "すべて",
+      "filterUnreviewed": "未レビュー",
+      "filterPrs": "PR",
       "filterIssues": "課題の問題点問題",
-      "typePr": "PRPRPR プランプリ",
+      "typePr": "PR",
       "typeIssue": "発行件数について",
-      "reviewReviewed": "レビューされた.",
+      "reviewReviewed": "レビュー済み",
       "reviewApplicable": "適用される 適用可能な",
-      "reviewNotApplicable": "N/A ありません.",
+      "reviewNotApplicable": "該当なし",
       "notesPlaceholder": "メモ... ノート",
       "colType": "タイプ 種類型 タイプ",
       "colTitle": "タイトル タイトルの名前",
@@ -609,15 +609,15 @@
       "truncated": "結果は,{limit}項目に切り詰められています."
     },
     "platforms": {
-      "wasm": "WASMは,WASMとは違うもの."
+      "wasm": "WASM"
     },
     "images": {
-      "alt": "README画像を表示しています."
+      "alt": "README の画像"
     },
     "links": {
       "viewOnPubDev": "pub.devのビュー",
       "documentation": "文書化 ドキュメント",
-      "changelog": "チェンジログは,変更日誌に記載されています.",
+      "changelog": "変更履歴",
       "versions": "バージョン 版",
       "repository": "データベースのリポジトリ",
       "openIssues": "オープンな問題",
@@ -632,19 +632,19 @@
     }
   },
   "toolbar": {
-    "runAnalysis": "分析を実行する.",
-    "rescan": "再スキャンして再スキャニングします.",
-    "refresh": "爽やかにリフレッシュする.",
+    "runAnalysis": "分析を実行",
+    "rescan": "再スキャン",
+    "refresh": "更新",
     "copyJson": "JSONをコピーする",
     "saveReport": "報告書を保存する",
-    "moreActions": "より多くの行動が求められる.",
-    "clearAll": "完全にクリア.",
+    "moreActions": "その他の操作",
+    "clearAll": "すべてクリア",
     "resetView": "セットアップをリセットするビュー"
   },
   "empty": {
     "noFindingsTitle": "発見はなし",
     "noFindingsMessage": "作業スペースをスキャンするために分析を実行します.",
-    "noFindingsCta": "分析を実行する.",
+    "noFindingsCta": "分析を実行",
     "noMatchTitle": "匹配がない",
     "noMatchMessage": "現在のフィルターに一致する行はありません.",
     "noMatchCta": "フィルターのリセットは,",
@@ -653,7 +653,7 @@
     "noProjectCta": "オープンフォルダーを開く",
     "noDataTitle": "まだデータはありません.",
     "noDataMessage": "このダッシュボードに表示するためにスキャンを実行します.",
-    "noDataCta": "分析を実行する."
+    "noDataCta": "分析を実行"
   },
   "loading": {
     "thinking": "考えていた...考えていた.",
@@ -672,12 +672,12 @@
   },
   "error": {
     "genericTitle": "何か間違ってしまいました.",
-    "retry": "再試行してみる.",
-    "reload": "再充電する.",
+    "retry": "再試行",
+    "reload": "再読み込み",
     "copyDetails": "詳細をコピーして,",
     "unreachable": "{target} に届かない",
     "partialSummary": "{total} 中 {loaded} の {item} がロードされました。{failed} 件失敗。",
-    "partialRetry": "再試行は失敗しました."
+    "partialRetry": "失敗した項目を再試行"
   },
   "offline": {
     "banner": "オフライン  ⁇  リフレッシュするために再接続.",
@@ -697,9 +697,9 @@
   "a11y": {
     "toggleFullWidth": "トーグリングの全幅レイアウトをトロールします.",
     "sortBy": "{column}によってソートする.",
-    "expandRow": "拡張行を展開する.",
-    "copyRow": "コピー行をコピーする.",
-    "comparisonDimension": "メトリックメトリクスのことです.",
+    "expandRow": "行を展開",
+    "copyRow": "行をコピー",
+    "comparisonDimension": "指標",
     "collapseRow": "崩壊列の倒壊は,",
     "selectAll": "すべての行を選択します.",
     "keyboardShortcuts": "キーボードショートカットです.",
@@ -713,7 +713,7 @@
       "coverage": "{pct}% 翻訳された ⁇ rest showsは英語で放送されている."
     },
     "reloadPrompt": "言語を {locale} に設定する. サイドバーとコマンドのラベルを更新するためにウィンドウを再起動します.",
-    "reloadNow": "今すぐ再充電する.",
+    "reloadNow": "今すぐ再読み込み",
     "reloadLater": "後 遅い 後になって"
   },
   "statusBar": {
@@ -771,7 +771,7 @@
       "optimizeAnalysis": "分析を最適化",
       "dontShowAgain": "もう一度表示しない",
       "openMachineDashboard": "オープン マシン ヘルス",
-      "restartAnalysisServer": "再起動してリスタートします."
+      "restartAnalysisServer": "再起動"
     },
     "cleanup": {
       "noOrphans": "孤児のデーモンは見つかりません。",
@@ -790,7 +790,7 @@
       "confirmTitle": "終了 {count} が {size} を保持しているプロセス(たち)はありますか？",
       "confirmDetail": "これらのプロセスは即座に終了され、復元できません:",
       "confirmKill": "プロセスを終了する",
-      "listEntry": "{name} (PID {pid}) — {size}",
+      "listEntry": "{name}（PID {pid}）— {size}",
       "reclaimed": "終了しました {count} 孤児プロセス(ス)，約 {size} を回収しました。",
       "reclaimFailed": "{count}プロセス(たち)を終了できませんでした。管理者権限が必要かもしれません。",
       "bannerTitle": "{count} 廃棄されたモデルホストプロセス(es) が {size} を保持しています",
@@ -802,7 +802,7 @@
       "processes": "プロセス",
       "totalRss": "トータル RSS",
       "orphaned": "孤児",
-      "refresh": "爽やかにリフレッシュする.",
+      "refresh": "更新",
       "colPid": "PID",
       "colParent": "親",
       "colRss": "RSS",
@@ -811,7 +811,7 @@
       "colAction": "アクション",
       "typeOrphan": "孤児",
       "typeSaropa": "Saropa",
-      "typeDaemon": "Daemon",
+      "typeDaemon": "デーモン",
       "typeProcess": "プロセス",
       "kill": "キル",
       "killed": "殺された",
@@ -855,7 +855,7 @@
   },
   "machineDashboard": {
     "title": "機械の健康",
-    "refresh": "爽やかにリフレッシュする.",
+    "refresh": "更新",
     "systemUnknown": "このプラットフォームではシステムメモリが読み取れません。",
     "platformUnsupported": "マシンヘルスはこのプラットフォームでは利用できません — プロセスクエリはWindows、macOS、Linuxでサポートされています。",
     "freeOf": "フリーの",
@@ -883,7 +883,7 @@
     },
     "action": {
       "reclaim": "リカイン",
-      "restartAnalysisServer": "再起動してリスタートします.",
+      "restartAnalysisServer": "再起動",
       "setHeapCap": "設定上限",
       "unloadModel": "アンロード"
     },
@@ -920,7 +920,7 @@
     },
     "notification": {
       "shedDisabled": "分析器メモリ圧力検出 (RSS {rssMb} MB, ソフト制限 {softLimitMb} MB)。負荷下で高コストなルールを自動的に無効にするルールシャーディングを有効にしてください。",
-      "enableButton": "Enable 設定を有効にします.",
+      "enableButton": "有効にする",
       "learnMoreButton": "もっともっと学び,もっと学ぶ",
       "runInit": "'dart run saropa_lints:init'を実行してanalysis_options_custom.yamlを生成し、その後shed_rules: trueを設定してください。",
       "enabledConfirmation": "ルールの削除がanalysis_options_custom.yamlで有効化されました。解析器は次の再起動時に変更を検知します。"
@@ -953,14 +953,14 @@
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "ちょうど今,ちょうど今.",
+      "justNow": "たった今",
       "minutesAgo": "{min} 分前",
       "hoursAgo": "{hr} 時間前",
       "daysAgo": "{day} 日前"
     },
     "status": {
       "lastRunPrefix": "最後の走行 ランニング",
-      "updatedPrefix": "更新されました.",
+      "updatedPrefix": "更新：",
       "refreshHint": "クリックすると,分析器からリフレッシュされます.",
       "lastRunUnknown": "最後の実行は不明.",
       "noTimestampTitle": "violations.jsonにタイムスタンプが付けられていない.",
@@ -971,7 +971,7 @@
       "driftOnTitle": "Drift Advisor 接続: _PH1_ で接続されている {label} フォローしている",
       "driftOnPill": "漂流する · {count}",
       "driftOfflineTitle": "Drift Advisor が有効になっているが,サーバーが見つかりませんでした.",
-      "driftOfflinePill": "漂流はオフラインでドリフトする.",
+      "driftOfflinePill": "Drift オフライン",
       "driftAuthRequiredTitle": "Drift Advisor サーバーが見つかったが認証トークンが必要です — saropaLints.driftAdvisor.authToken を設定してください",
       "driftAuthRequiredPill": "Drift にはトークンが必要です",
       "driftAuthFailedTitle": "Drift Advisor 設定された認証トークンを拒否しました — 更新するにはクリックしてください",
@@ -988,14 +988,14 @@
       "qualityGateFailingPill": "ゲート失敗"
     },
     "groupBy": {
-      "severity": "深刻度 (severity) とは,重度の程度を問わず",
-      "file": "ファイルは,ファイルの形式で",
+      "severity": "重大度",
+      "file": "ファイル",
       "impact": "影響の影響を,その効果が",
-      "rule": "ルール ルールはルールの規則",
+      "rule": "ルール",
       "owasp": "OWASP",
       "ruleType": "ルールタイプ ルールの種類",
       "ruleStatus": "ルール・ステータス",
-      "tier": "準額 (Tier) の基準となる.",
+      "tier": "Tier",
       "pack": "パック (pack) とは"
     },
     "seg": {
@@ -1003,21 +1003,21 @@
       "toggleImpactTitle": "トーグル {v} 衝撃のトロール"
     },
     "kpi": {
-      "visibleLabel": "明らかな発見は,目に見えるもの.",
-      "allMatched": "すべてが一致した.",
+      "visibleLabel": "表示中の検出結果",
+      "allMatched": "すべて一致",
       "ofTotal": "合計{total}の総量である.",
       "clearFiltersTitle": "クリックすると,すべてのフィルターをクリアします.",
       "errorsLabel": "エラー 間違い",
-      "errorsSubFix": "修正しなければならない.",
+      "errorsSubFix": "要修正",
       "errorsSubClear": "none  ⁇  クリア",
       "errorsTitle": "フィルターでエラーの検出 (修正しなければならない/壊れた/クラッシュする/利用可能)",
       "warningsLabel": "警告の文字が表示される",
       "warningsSubBad": "失敗したり,悪名高い姿を見せるかもしれない.",
       "warningsSubClear": "none  ⁇  クリア",
       "warningsTitle": "警告 (失敗したり,悪いように見えたり) に結果をフィルターします.",
-      "infoLabel": "情報は情報,情報が情報.",
+      "infoLabel": "情報",
       "infoSub": "FYI  ⁇ スタイル / 提案",
-      "infoSubNone": "どれも,何もない.",
+      "infoSubNone": "なし",
       "infoTitle": "検索結果をフィルターで情報 (FYI:スタイルと提案) にします.",
       "filesLabel": "影響を受けたファイルは,",
       "filesSubAcross": "輸出の全域で,",
@@ -1039,12 +1039,12 @@
       "clearTextFilterAria": "文字フィルターをクリアする",
       "recentFiltersTitle": "最近のフィルター",
       "clearRecentTitle": "最近のフィルターをすべてクリアする.",
-      "clearRecentButton": "清々しい,はっきりとした.",
+      "clearRecentButton": "クリア",
       "recentFiltersListAria": "最近のフィルター",
       "runAnalysisTitle": "Saropa Lints分析を実行する.",
       "refreshViolationsTitle": "ディスクから violations.json を再ロードします.",
       "severityGroupAria": "厳重度フィルター",
-      "severityLabel": "深刻度 (severity) とは,重度の程度を問わず",
+      "severityLabel": "重大度",
       "impactGroupAria": "衝撃フィルターによる",
       "impactLabel": "影響の影響を,その効果が",
       "moreSummary": "もっともっともっともっと",
@@ -1090,16 +1090,16 @@
       "severityOff": "症状の重度 ≠ {v}",
       "impactOff": "衝撃は, {v} で≠",
       "resetAllTitle": "すべてのフィルターをリセットします.",
-      "removeFilterAria": "フィルターを削除します."
+      "removeFilterAria": "フィルターを削除"
     },
     "menuPalette": {
-      "help": "援助・支援をすること.",
+      "help": "ヘルプ",
       "groupBy": "グループで... 順番にまとめて",
       "textFilter": "テキストフィルター...",
       "severityImpact": "厳重度フィルター...",
       "hideRules": "隠しルール...",
       "ruleMetadata": "メタデータに関するルールのルール",
-      "clearFilters": "フィルターをクリアする.",
+      "clearFilters": "フィルターをクリア",
       "clearSuppressions": "明確な抑圧が明らかである.",
       "clearFileFocus": "ファイルフォーカスをクリアします.",
       "matchActiveEditor": "アクティブエディタをマッチする",
@@ -1119,7 +1119,7 @@
       "menuGroupExport": "輸出 エクスポート",
       "menuGroupBulk": "一括操作",
       "menuGroupFilter": "フィルター&フォーカスを設定する",
-      "menuGroupOpen": "ダッシュボードを開けてダッシュボードをクリックします.",
+      "menuGroupOpen": "ダッシュボードを開く",
       "menuGroupSystem": "システム・システム・システムの"
     },
     "progress": {
@@ -1137,33 +1137,33 @@
       "topRulesOne": "トップの {count} ルール",
       "topRulesOther": "トップの {count} ルール",
       "colRank": "#",
-      "colRule": "ルール ルールはルールの規則",
+      "colRule": "ルール",
       "colCount": "カウント・カウント・カウンット",
-      "colSeverity": "深刻度 (severity) とは,重度の程度を問わず",
-      "colActionsAria": "ローアクション (Row actions) は,行列のアクションをすること.",
+      "colSeverity": "重大度",
+      "colActionsAria": "行の操作",
       "filesAffected": "影響を受けたファイル ({count})",
       "howToFixHeading": "どう修正する",
-      "owaspMobileLabel": "Mobile",
-      "owaspWebLabel": "Web",
+      "owaspMobileLabel": "モバイル",
+      "owaspWebLabel": "ウェブ",
       "relatedRulesHeading": "関連ルール",
       "sameTagHeading": "同じタグの発見",
-      "migrationHeading": "Migration",
+      "migrationHeading": "移行",
       "supersedesLabel": "上位:"
     },
     "findings": {
       "sectionAria": "発見結果は,",
       "heading": "発見結果は,",
       "expandAll": "Expand all を拡張する",
-      "collapseAll": "すべてが崩壊する.",
+      "collapseAll": "すべて折りたたむ",
       "bulkSelected": "{count} 件選択中",
       "bulkCopy": "JSONとして選択したものをコピーします.",
       "selectAllTitle": "すべての可視化可能な発見を選択します.",
       "selectAllAria": "すべての可視化可能な発見を選択します.",
-      "colSeverity": "深刻度 (severity) とは,重度の程度を問わず",
-      "colRule": "ルール ルールはルールの規則",
+      "colSeverity": "重大度",
+      "colRule": "ルール",
       "colMessage": "メッセージ・メッセージを伝える",
-      "colLine": "ライン・ライン・線・ライン",
-      "colActionsAria": "ローアクション (Row actions) は,行列のアクションをすること.",
+      "colLine": "行",
+      "colActionsAria": "行の操作",
       "selectRowAria": "この検索行を選択してください.",
       "copyRowTitle": "この発見をJSONとしてコピーします.",
       "suppressedBadge": "抑制された",
@@ -1176,15 +1176,15 @@
       "runAgain": "分析を再び実行する.",
       "emptyNoViolations": "最後の分析の実行では違反はありません.",
       "emptyNoMatch": "違反は現在のフィルターに一致しません.",
-      "emptyHintNoData": "分析を実行して「reports/.saropa_lints/violations.json」を設定し、更新します。",
+      "emptyHintNoData": "分析を実行して `reports/.saropa_lints/violations.json` を生成し、更新してください。",
       "emptyHintFilters": "フィルターを調整するか,分析を再び実行して結果を表示します.",
-      "reRunAnalysis": "再実行分析は,再起動解析を繰り返すことで行われます.",
+      "reRunAnalysis": "分析を再実行",
       "resetFilters": "フィルターのリセットは,",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "ミックスチャート (mix chart) は,ミックスチャートを組み合わせる.",
-      "heading": "ミックス・ミックス・ミックスをする.",
+      "sectionAria": "内訳チャート",
+      "heading": "内訳",
       "metaClickSlice": "スライスをクリックしてフィルタを入れます.",
       "severityMix": "厳しさのミックス",
       "impactMix": "衝撃のミックス",
@@ -1194,31 +1194,31 @@
     "todoHack": {
       "sectionAria": "トドーとハックス (Todos and Haks) とは",
       "headingDisabled": "トドー&ハックス (Todos & Haks) とは",
-      "metaDisabled": "スキャンが無効化されました.",
+      "metaDisabled": "スキャン無効",
       "scanOff": "ワークスペースのスキャンがオフになっている. プロジェクトファイルから表面マーカーを表示する機能にします.",
-      "enableScan": "スキャンを有効にします.",
+      "enableScan": "スキャンを有効にする",
       "heading": "トドー&ハックス (Todos & Haks) とは",
       "subsectionNone": "{title}: スキャン範囲にありません。",
       "capNote": "スキャンがファイル制限に達したので,一部のファイルをスキップしました.",
       "raiseCap": "制限値を上げよう",
-      "notePill": "参考までに,ノート・ノート",
+      "notePill": "メモ",
       "todosLabel": "TODOsは,すべてのもの",
       "hacksLabel": "ハックズ (HACKS) とは"
     },
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "統合から脱却,統合から離脱.",
+      "metaOff": "連携オフ",
       "enableBlurb": "ここからデータベースの提案を表面化するために Drift Advisor 統合を有効にします.",
-      "enable": "Enable 設定を有効にします.",
+      "enable": "有効にする",
       "headingNoServer": "Drift Advisor",
-      "metaNoServer": "サーバーなし,サーバがない.",
+      "metaNoServer": "サーバーなし",
       "noServerBlurb": "設定されたポートで Drift Advisor のサーバーが見つかりませんでした.",
-      "retry": "再試行してみる.",
+      "retry": "再試行",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "接続された,繋がった.",
+      "metaConnected": "接続済み",
       "noIssues": "{label}に接続  ⁇  現在の問題はありません.",
-      "refresh": "爽やかにリフレッシュする.",
+      "refresh": "更新",
       "openBrowser": "ブラウザで開きます.",
       "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor を無効にする"
@@ -1233,9 +1233,9 @@
       "unsuppressButton": "アンスプレス",
       "unsuppressTitle": "この見つかりを通常のスキャンに表示するため、抑制を解除してください",
       "unsuppressHint": "{rule}を{file}:{line}で無視解除するには、その行の上にある// ignore:コメントを削除してください。",
-      "columnFile": "ファイルは,ファイルの形式で",
-      "columnLine": "ライン・ライン・線・ライン",
-      "columnRule": "ルール ルールはルールの規則",
+      "columnFile": "ファイル",
+      "columnLine": "行",
+      "columnRule": "ルール",
       "columnKind": "キンド",
       "columnAction": "アクション"
     },
@@ -1243,8 +1243,8 @@
       "sectionAria": "抑圧の抑制は,",
       "headingExport": "削除 (輸出)",
       "viewHidesHeading": "課題のビューは,表示が隠されています.",
-      "viewHidesMetaActive": "活力のあるアクティブです.",
-      "viewHidesMetaNone": "どれも,何もない.",
+      "viewHidesMetaActive": "有効",
+      "viewHidesMetaNone": "なし",
       "noneInExport": "現在の `violations.json` エクスポートにはアナライザーの抑制はありません。無視または入力するベースラインを編集した後に分析を実行します。",
       "totalRow": "合計  ⁇  クリアフィルターとオープン 発見",
       "byRule": "規則として ({count})",
@@ -1264,7 +1264,7 @@
       "filesSample": "ファイル/グローブ (サンプル)",
       "rulesSample": "ルール (サンプル)",
       "perFileRulesSample": "ファイル別ルール (サンプル)",
-      "unknownKind": "知らない人,わからない人."
+      "unknownKind": "不明"
     },
     "script": {
       "analysisRunning": "分析を進めています...",
@@ -1278,9 +1278,9 @@
       "announceFiltersPrefix": "フィルター: フィルタ",
       "bulkSelected": "{n} 件選択中",
       "analysisStartedDetail": "分析が始まりました. 診断データを収集する...",
-      "announceStarted": "分析が始まりました.",
+      "announceStarted": "分析を開始しました",
       "announceComplete": "分析完了,解析を完了する",
-      "announceFailed": "分析が失敗した.",
+      "announceFailed": "分析に失敗しました",
       "analysisFailedDetail": "分析は失敗しました. 詳細については出力をチェックしてください.",
       "removeRecentAria": "削除する Remove remove",
       "removeRecentTitle": "削除する Remove remove",
@@ -1300,7 +1300,7 @@
       "activateKpiSpace": "焦点を当てたKPIカードまたはチャートバーをアクティブにします.",
       "showOverlay": "このショートカットでオーバーレイを表示します."
     },
-    "unknownAnalyzerKind": "知らない人,わからない人.",
+    "unknownAnalyzerKind": "不明",
     "supplementary": {
       "otherAnalyzerOn": "+{count} 他の分析器の検出結果",
       "otherAnalyzerPromo": "+? 他の分析器の発見  ⁇  が示した.",
@@ -1315,11 +1315,11 @@
   "triageDash": {
     "showInIssues": "問題を示して,問題点に目を向ける.",
     "disableRules": "ルール無効化規則は,",
-    "enableRules": "有効化ルールがある.",
+    "enableRules": "ルールを有効化",
     "issues": "課題の問題点問題",
-    "off": "オフ・オフ・オフ オーバー・オフ",
-    "on": "続けて,そしてまた.",
-    "colRule": "ルール ルールはルールの規則",
+    "off": "オフ",
+    "on": "オン",
+    "colRule": "ルール",
     "colIssues": "課題の問題点問題",
     "zeroIssueRules": "問題ゼロの {count} つのルール — 階層で自動有効化されました。",
     "disabledOverrides": "`analysis_options_custom.yaml` のオーバーライドにより {count} つのルールが無効化されました。",
@@ -1368,9 +1368,9 @@
       "fullReportGenerating": "レポートの生成中 — すべてのスキャンされたパッケージ、すべての抽出された変更ログの機能。これは各スキャンごとに実行され、再スキャンするまでキャッシュされます。",
       "knownIssues": "既知の問題",
       "knownIssuesDesc": "依存関係に対して報告された既知の脆弱性とアドバイザリを閲覧します。",
-      "compare": "比較して,比べてみる.",
+      "compare": "比較",
       "compareDesc": "スコア、サイズ、アクティビティに基づき、2つ以上のパッケージを横断して比較します。",
-      "settings": "設定セットは,設定を設定する.",
+      "settings": "設定",
       "openButton": "{tab}を開く"
     },
     "settingsTab": {
@@ -1388,9 +1388,9 @@
       }
     },
     "detailPane": {
-      "aria": "パッケージの詳細は,パッケージに記載されています.",
-      "title": "パッケージの詳細は,パッケージに記載されています.",
-      "close": "細部から詳細まで,クローズアップ.",
+      "aria": "パッケージの詳細",
+      "title": "パッケージの詳細",
+      "close": "詳細を閉じる",
       "copyForAi": "AI のアップグレードプロンプトをコピーする"
     },
     "status": {
@@ -1405,7 +1405,7 @@
       "lastScanUnknownTitle": "このスキャンは,ダッシュボードがタイムスタンプを追跡する前に実行されました. 再スキャンをクリックして,パッケージの更新を確認します."
     },
     "time": {
-      "justNow": "ちょうど今,ちょうど今.",
+      "justNow": "たった今",
       "minutesAgo": "{min} 分前",
       "hoursAgo": "{hr} 時間前",
       "daysAgo": "{day} 日前"
@@ -1427,22 +1427,23 @@
       "totalSize": "総サイズ*",
       "gradeTooltip": "プロジェクトグレード {avgGrade}\n平均スコア: {avgScore}/100\nパッケージ: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "活気のある,生き生きとした",
-      "stableTitle": "安定した状態です.",
-      "outdatedTitle": "時代遅れで,過時なものです.",
+      "stableTitle": "安定",
+      "outdatedTitle": "古い",
       "abandonedTitle": "捨てられたもの",
       "eolTitle": "人生の終わりについて",
       "updates": "アップデート 更新",
       "unused": "未使用の未使用品",
-      "singleUse": "単発の使い捨て品です.",
+      "singleUse": "単一利用",
       "vulnerable": "脆弱な人は,弱い人",
-      "overrides": "オーバーライドは,オーバレーズを無視する.",
+      "overrides": "オーバーライド",
       "caveatLine1": "*コードサイズが表示されている (lib + 宣言されたアセット),コードサイズは利用できない場合, pub.dev アーカイブサイズに戻ります. dev_dependencies (build_runner,lints,saropa_lintsなど) は含まれていません. APK / IPA / Web バンドルには送られてこないのです. tree shakingの後,実際のアプリのサイズは小さくなります.",
-      "caveatLine2": "活動スリーフ:90d = 滞留状態,180d = 不活性 (コミット+リリースタイムライン)."
+      "caveatLine2": "活動スリーフ:90d = 滞留状態,180d = 不活性 (コミット+リリースタイムライン).",
+      "upgradeTitle": "アップグレードが必要"
     },
     "breakdown": {
       "title": "なぜ {grade} を評価するのでしょうか? — {pkgCount} パッケージ全体の平均 {avgScore}/100",
       "hint": "クリックすると拡大できます.",
-      "distributionHeading": "配給の流通が進んでいる.",
+      "distributionHeading": "分布",
       "signalsHeading": "リスクシグナルがスコアを落とし下げている",
       "signalFlagged": "{count}フラグ付け (放棄された/寿命が終わった)",
       "signalVulnerable": "{count} 既知の脆弱性がある",
@@ -1470,7 +1471,7 @@
       "openPubspecTitle": "オープン _pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "レポートのJSONをコピーする (すべての行 + 詳細)",
-      "copyAllLabel": "コピー・コピー・コピー した",
+      "copyAllLabel": "コピー",
       "copyOpportunitiesTitle": "AIアップグレードプロンプトをコピーして,採用されていないパッケージのトップに1つのペーストで貼り付けます.",
       "copyOpportunitiesLabel": "AIの機会をコピーする.",
       "saveAllTitle": "レポートのJSONをレポート/YYY YMMDD/...に保存する.",
@@ -1480,14 +1481,14 @@
       "resetViewTitle": "フィルターをリセットし,ソートして保存したビュー状態を表示します.",
       "resetViewLabel": "セットアップをリセットするビュー",
       "rescanTitle": "パッケージを再スキャンする  ⁇  pub.dev キャッシュをクリアし,バージョンの再取得",
-      "rescanLabel": "再スキャンして再スキャニングします.",
+      "rescanLabel": "再スキャン",
       "openOtherTitle": "別の pubspec.yaml のプロジェクトを新しいウィンドウで開いて,Vibrancy スキャンを行います.",
       "openOtherLabel": "オープン・プロジェクト...",
       "footprintGroupAria": "サイズ コラム フットプリント モード",
       "footprintGroupTitle": "サイズ列が表示する内容:独自のコードの大きさのみ,さらにユニークなトランジティブ (削除された場合のコスト),またはすべてのトランジティヴ (理論上の最大値) を加える. コードサイズが利用できない場合,アーカイブ サイズに戻ります.",
       "footprintLabel": "足跡: フットプリント",
       "footprintOwnTitle": "独自のコードサイズのみ (lib + デклаアされた資産);利用できない場合, pub.dev アーカイブサイズに戻ります.",
-      "footprintOwn": "独自の,自分のもの.",
+      "footprintOwn": "自身",
       "footprintUniqueTitle": "独自のサイズ + このデパートでしか使用されていないトランジティブ (削除すると節約)",
       "footprintUnique": "+ ユニークで",
       "footprintTotalTitle": "独自の規模 + 他の部門と共有するものを含むすべてのトランジティブ",
@@ -1498,18 +1499,18 @@
       "clearSearchAria": "検索をクリアする",
       "ageFilterTitle": "出版年齢によるフィルター",
       "publishedAgeLabel": "出版年数 年齢",
-      "ageMaxAll": "すべて,すべて,全て.",
+      "ageMaxAll": "すべて",
       "presetFilterTitle": "フィルターのプリセットを適用する.",
-      "presetLabel": "プレセットは,プリセットです.",
-      "presetNone": "別に,誰もいない.",
+      "presetLabel": "プリセット",
+      "presetNone": "なし",
       "presetModernization": "近代化について",
       "presetRiskHotspots": "リスクホットスポットは,",
       "presetCleanup": "清掃候補者について",
       "presetDirectOnly": "直接のみ,直通のみ",
       "devToggleTitle": "テーブルと合計に dev の依存関係を含める.",
-      "includeDev": "dev を含む.",
+      "includeDev": "dev を含める",
       "activeFiltersLabel": "アクティブフィルター:アクティブなフィルタ",
-      "clearAllFilters": "完全にクリア."
+      "clearAllFilters": "すべてクリア"
     },
     "columns": {
       "name": {
@@ -1533,7 +1534,7 @@
         "tooltip": "コミット+公開の最新度からコード&リリース活動のグレード"
       },
       "likes": {
-        "label": "気に入ったものは好き.",
+        "label": "いいね",
         "tooltip": "pub.dev 好き  ⁇  クリックすると,パッケージスコアページが開きます."
       },
       "downloads": {
@@ -1545,7 +1546,7 @@
         "tooltip": "オープン GitHub の問題 (利用可能な場合,プルリクエストを除く)"
       },
       "prs": {
-        "label": "PRsはPRを目的としたものです.",
+        "label": "PR",
         "tooltip": "オープン GitHub pull リクエストを表示する."
       },
       "size": {
@@ -1565,7 +1566,7 @@
         "tooltip": "このパッケージが引き込むトランジティブ (間接) 依存関係の数"
       },
       "vulns": {
-        "label": "ヴァルンズ (vulns) とは,ヴァルンのような人間です.",
+        "label": "脆弱性",
         "tooltip": "OSVと GitHub アドバイザリーデータベースからの既知のセキュリティの脆弱性"
       },
       "license": {
@@ -1577,7 +1578,7 @@
         "tooltip": "入手可能なバージョンアップデート:メジャー,マイナーまたはパッチ"
       },
       "opportunities": {
-        "label": "機会やチャンスが生まれます.",
+        "label": "改善機会",
         "tooltip": "このパッケージの変更ログにある機能は,まだあなたのコードで使用されていません. 最も採用されていないパッケージをソートして探す."
       },
       "status": {
@@ -1591,7 +1592,7 @@
     },
     "cells": {
       "noGithub": "GitHub リポジトリが見つかりませんでした.",
-      "devBadge": "dev dev dev について",
+      "devBadge": "dev",
       "transitiveBadge": "変形性 (トランジティブ)",
       "opportunitiesTooltip": "未使用の機能:未使用の機能を表示する {features} フォローしている",
       "publishDateUnavailable": "公開日: pub.dev から利用できません.",
@@ -1650,7 +1651,7 @@
       "reExportLine": "{location} (再輸出) について",
       "reExportSuffix": "(再輸出) について",
       "publicApiSurface": "公開APIの表面上では,少なくとも1つの使用が再輸出である.",
-      "reExportedBadge": "再輸出された.",
+      "reExportedBadge": "再エクスポート",
       "openFileReferences": "ファイル参照を開く",
       "searchImports": "検索輸入品の調査",
       "fileReferencesHeading": "ファイル参照 ({count})",
@@ -1664,7 +1665,7 @@
       "tooltipHeader": "{total} 移行的なデップス",
       "tooltipHeaderShared": "{total} 推移性デプス ({shared} 共有)",
       "sharedBadgeTitle": "{count}は他のパッケージと共有されている.",
-      "sharedBadge": "共有された,共有されたもの.",
+      "sharedBadge": "共有",
       "transitiveDepsHeading": "移行的依存関係 ({count})"
     },
     "dormancy": {
@@ -1680,7 +1681,7 @@
     "detail": {
       "codeCommitActivity": "コードコミット アクティビティ",
       "releaseActivity": "リリース活動",
-      "dormancySignal": "休眠信号が発信されています.",
+      "dormancySignal": "休眠シグナル",
       "ago": "{age}前 前のこと",
       "qualityExample": "+例として,例文",
       "qualityExampleTitle": "実行可能なデモを配信します.",
@@ -1701,8 +1702,8 @@
     "links": {
       "heading": "リンクは,リンクを繋ぐ",
       "pubDev": "pub.dev",
-      "changelog": "チェンジログは,変更日誌に記載されています.",
-      "versions": "版はバージョンのものです.",
+      "changelog": "変更履歴",
+      "versions": "バージョン",
       "repository": "データベースのリポジトリ",
       "issues": "課題は,問題点について"
     }
@@ -1716,7 +1717,7 @@
       "categories": "{count} カテゴリ",
       "recent": "{count} 件の最近の項目",
       "internalHidden": "{count} コンテキストメニューのみ（非表示）",
-      "wordCommands": "コマンドはコマンドを出す.",
+      "wordCommands": "コマンド",
       "wordCategories": "カテゴリー カテゴリ カテゴリーのカテゴリ",
       "wordRecent": "最近の最近の最近"
     },
@@ -1727,31 +1728,31 @@
       "hintLine1": "各コマンドのそれぞれにマッチする.",
       "hintStrongTitle": "タイトル タイトルの名前",
       "hintStrongDesc": "記述の説明は,描写",
-      "hintStrongId": "id id id について",
+      "hintStrongId": "id",
       "hintLine2": "(idトークンは,タイプ ⁇ のスペースも設けられています.",
       "hintLine2kbd": "ラン分析,ラン解析",
       "hintLine2End": "ポイントなし)."
     },
     "toolbar": {
       "showInternal": "文脈メニューコマンドを表示する",
-      "collapseAll": "すべてが崩壊する."
+      "collapseAll": "すべて折りたたむ"
     },
     "recentPopover": {
       "title": "最近の検索結果について",
       "clearTitle": "最近の検索をすべてクリアする",
-      "clearButton": "清々しい,はっきりとした.",
+      "clearButton": "クリア",
       "listAria": "最近の検索結果について"
     },
     "filterChips": {
       "ariaRegion": "アクティブフィルター 活性フィルタ",
       "activeLabel": "アクティブフィルター:アクティブなフィルタ",
-      "clearAll": "完全にクリア."
+      "clearAll": "すべてクリア"
     },
     "bands": {
       "frequentTitle": "頻繁に頻繁な",
       "frequentHint": "セッション全体で最も多く使用されている.",
       "recentTitle": "最近最近 近年近年のこと",
-      "recentClear": "清々しい,はっきりとした.",
+      "recentClear": "クリア",
       "recentHint": "再起動するにはクリックします · 最新の先が先に"
     },
     "noResults": {
@@ -1776,14 +1777,14 @@
     "script": {
       "moreSuffix": "+{count} もっともっと",
       "showLess": "Show less より少ない表示を表示する",
-      "runSingular": "走って,走って.",
+      "runSingular": "回実行",
       "runPlural": "走る,走って走って",
       "recentWord": "最近の最近の最近",
       "expandAll": "Expand all を拡張する",
-      "collapseAll": "すべてが崩壊する.",
+      "collapseAll": "すべて折りたたむ",
       "searchChip": "検索: \"{query}\"と表示されました.",
       "internalChip": "文脈メニューのコマンドを表示する",
-      "removeFilterPrefix": "フィルターを削除します.",
+      "removeFilterPrefix": "フィルターを削除：",
       "matchOne": "{count} 件の一致",
       "matchOther": "{count} 件の一致"
     }
@@ -1801,8 +1802,8 @@
       "collect": "ファイルを発見する...",
       "firstRunHint": "最初の実行ではスキャナーがコンパイルされ,大規模なプロジェクトにはファイルが現れるまでしばらくかかります.",
       "paused": "停止された,一時停止した",
-      "stopped": "スキャンが止まった.",
-      "elapsed": "過ぎ去った時間.",
+      "stopped": "スキャンを停止しました",
+      "elapsed": "経過時間",
       "phase": {
         "parse": "ファイル解析のパーシング",
         "history": "読み書きはギットの歴史を語る.",
@@ -1811,20 +1812,20 @@
         "score": "ポイントを決める機能"
       },
       "counter": {
-        "files": "ファイルは,ファイルのことです.",
-        "functions": "機能の役割は,その役割を担う.",
+        "files": "ファイル",
+        "functions": "関数",
         "problems": "発見した問題,見つけた問題"
       },
       "counters": {
         "aria": "ライブスキャンのカウンター"
       },
       "controls": {
-        "aria": "スキャンコントロールをスキャンする."
+        "aria": "スキャンの操作"
       },
       "btn": {
         "pause": "パウズ・パウス 休止",
         "resume": "履歴書 再開する",
-        "restart": "再起動してリスタートします.",
+        "restart": "再開始",
         "cancel": "キャンセル キャンセル"
       },
       "preview": {
@@ -1843,12 +1844,12 @@
     "panelTitle": "Saropa コード 健康ダッシュボード",
     "hero": {
       "title": "Saropa コード 健康ダッシュボード",
-      "generated": "作成されたもの.",
+      "generated": "生成日時",
       "functionOne": "{count} 関数",
       "functionOther": "{count} 関数",
       "avgFormat": "avg {score} ({grade}) でした.",
       "gatesFailing": "ゲートが故障する",
-      "gatesPassing": "ゲートを通過する門."
+      "gatesPassing": "ゲート合格"
     },
     "gauge": {
       "tooltip": "平均スコアは100の {rounded} (グレードは{grade}) である.",
@@ -1870,7 +1871,7 @@
       "unusedSub": "機能は,どこにも参照されていない.",
       "uncovered": "覆い隠れのない露出",
       "uncoveredSub": "LCOVのカバーがない.",
-      "stubTested": "ストップテストを受けた.",
+      "stubTested": "スタブのみテスト",
       "stubTestedSub": "テストは存在しますが,ほとんど主張しません.",
       "suspiciousCoverage": "怪しい内容の報道がされている.",
       "suspiciousCoverageSub": "報道は作り物のように見えます.",
@@ -1880,28 +1881,28 @@
     "toolbar": {
       "ariaLabel": "行動法 健康対策",
       "rescanTitle": "コードヘルスのスキャンを再実行し,このダッシュボードをリフレッシュします.",
-      "rescan": "再スキャンして再スキャニングします.",
+      "rescan": "再スキャン",
       "copyJsonTitle": "粗製のコードヘルスJSONをクリップボードにコピーします.",
       "copyJson": "JSONをコピーする",
       "settingsTitle": "コードヘルスケア設定を開きます.",
       "settingsButton": "コード 保健施設 健康管理",
       "filterTitle": "フィルター行は名前,ファイルまたはフラグによって.",
-      "filterLabel": "フィルター行は,フィルタリングの列です.",
+      "filterLabel": "行を絞り込む",
       "filterPlaceholder": "フィルター列... フィルターの行"
     },
     "table": {
       "ariaLabel": "スコアによって最悪の機能",
-      "heading": "最悪な機能は,最悪な機能を果たしている.",
+      "heading": "ワースト関数",
       "topCount": "{total}のトップ {shown}を表示する",
       "colGrade": "グレードのレベルは,",
-      "colScore": "スコアを記録する.",
-      "colFunction": "機能の役割は,その役割を担う.",
-      "colFile": "ファイルは,ファイルの形式で",
-      "colLine": "ライン・ライン・線・ライン",
+      "colScore": "スコア",
+      "colFunction": "関数",
+      "colFile": "ファイル",
+      "colLine": "行",
       "colUsage": "用途 使用方法",
       "colCoverage": "対象の範囲は,",
-      "colComplexity": "複雑さとは,複雑なものです.",
-      "colFlags": "旗,国旗を掲げている.",
+      "colComplexity": "複雑度",
+      "colFlags": "フラグ",
       "noMatch": "現在のフィルターに一致する機能はありません.",
       "resetFiltersTitle": "検索とすべてのアクティブなフラグフィルターをクリアします.",
       "resetFilters": "フィルターのリセットは,",
@@ -1920,7 +1921,7 @@
         "rule": "他のファイルがこの関数名に参照しない場合にフラグ付けされます."
       },
       "uncovered": {
-        "label": "覆い隠れのない露出.",
+        "label": "未カバー",
         "evidence": "{pct}%テストのテスト",
         "rule": "LCOVが 0% のラインカバーを報告するときにフラグ付けされます."
       },
@@ -1940,8 +1941,8 @@
         "rule": "最新のリンクされたテストファイルが関数のソースファイルより有意に古い場合,フラグ付けされます."
       },
       "stub_tested": {
-        "label": "ストップテストされた.",
-        "evidence": "薄い主張は,断言する.",
+        "label": "スタブのみテスト",
+        "evidence": "アサーションが少ない",
         "rule": "リンクされたテストが存在しますが,ほとんど何も主張しない場合にフラグ付けされます."
       },
       "suspicious_coverage": {
@@ -1967,12 +1968,12 @@
       "searchChip": "検索: \"{q}\"と表示する",
       "flagChip": "フラグ: {flag} フォローする",
       "removeAria": "{key}を削除する",
-      "clearAll": "完全にクリア.",
+      "clearAll": "すべてクリア",
       "rowsVisible": "{total} 行中 {visible} 行を表示",
-      "neverRun": "決して走ってはいけません."
+      "neverRun": "未実行"
     },
     "freshness": {
-      "justNow": "ちょうど今,ちょうど今.",
+      "justNow": "たった今",
       "minutesAgo": "{min} 分前",
       "hoursAgo": "{hr} 時間前",
       "daysAgo": "{day} 日前",
@@ -1988,9 +1989,9 @@
     },
     "scan": {
       "subtitle": "プロジェクトの規模、複雑さ、ホットスポットのスキャン中…",
-      "elapsed": "過ぎ去った時間.",
+      "elapsed": "経過時間",
       "cancel": "キャンセル キャンセル",
-      "restart": "再起動してリスタートします.",
+      "restart": "再開始",
       "stopped": "停止",
       "logHeading": "活動 (アクティビティー)",
       "logEmpty": "まだ出力はありません — このログはスキャンが診断メッセージを出力した場合にのみ埋まります。",
@@ -2040,10 +2041,10 @@
         "saved": "保存されました",
         "saveError": "保存できませんでした"
       },
-      "colFile": "ファイルは,ファイルの形式で",
-      "colLineNum": "ライン・ライン・線・ライン",
-      "colRule": "ルール ルールはルールの規則",
-      "colSeverity": "深刻度 (severity) とは,重度の程度を問わず",
+      "colFile": "ファイル",
+      "colLineNum": "行",
+      "colRule": "ルール",
+      "colSeverity": "重大度",
       "colMessage": "メッセージ・メッセージを伝える",
       "colKey": "キーポイント"
     },
@@ -2052,7 +2053,7 @@
       "showOverlay": "このショートカットでオーバーレイを表示します."
     },
     "hero": {
-      "files": "ファイルは,ファイルのことです.",
+      "files": "ファイル",
       "lines": "行",
       "size": "サイズ サイズは"
     }
@@ -2084,13 +2085,13 @@
     "noCountersTitle": "カウンターをリセットする時間はありません.",
     "resetTitle": "すべてのカウンターをリセットします.",
     "refreshTitle": "ディスクからテレメトリカウンターをリロードします.",
-    "refresh": "爽やかにリフレッシュする.",
+    "refresh": "更新",
     "copyTitle": "スナップショットをJSONとしてコピーします.",
     "copyJson": "JSONをコピーする",
-    "resetCounters": "カウンターをリセットする.",
+    "resetCounters": "カウンターをリセット",
     "countersAria": "カウンターカウンタ",
     "countersHeading": "イベントカウンター",
-    "thEvent": "出来事は,事件が起こる.",
+    "thEvent": "イベント",
     "thCount": "カウント・カウント・カウンット",
     "emptyMessage": "遠隔測定イベントはまだ記録されていません. カウンターをキャプチャ開始するために,Findings Dashboardからルールを開きます.",
     "openFindingsTitle": "Saropa 発見ダッシュボードを開きます.",
@@ -2106,8 +2107,8 @@
   "securityPosture": {
     "issueOne": "{count} 件の問題",
     "issueOther": "{count} 件の問題",
-    "noIssues": "課題はありません.",
-    "showIssues": "問題表示 問題を示します.",
+    "noIssues": "問題なし",
+    "showIssues": "問題を表示",
     "violationTooltip": "{ruleCount} 個のルール全体で {count} 件の違反。クリックして問題(Issues)に表示します。",
     "noViolationsTooltip": "このカテゴリーにマッピングされた違反はありません."
   },
@@ -2118,7 +2119,7 @@
     },
     "table": {
       "row": {
-        "vibrancyGrade": "活力度 (Vibrancy Grade) とは,生機勃発度のレベル",
+        "vibrancyGrade": "Vibrancy グレード",
         "category": "カテゴリー カテゴリ カテゴリーのカテゴリ",
         "latestVersion": "最新バージョンの最新版",
         "published": "出版された 発行された",
@@ -2127,16 +2128,16 @@
         "githubStars": "GitHub スターズ・スターズは",
         "openIssues": "オープンな問題",
         "codeSize": "コードサイズ コードサイズは",
-        "bloatRating": "膨らんだ評価は,ブローアット・レーティングです.",
+        "bloatRating": "肥大化評価",
         "license": "ライセンス・ライセンスは,",
         "platforms": "プラットフォーム・プラットホーム",
         "inThisProject": "このプロジェクトでは,"
       },
       "value": {
         "unverified": "⁇  (未確認)",
-        "allPlatforms": "すべて,すべて,全て.",
-        "yes": "はい,はい,はい. ありがとうございました.",
-        "no": "違う,違う,いいじゃない."
+        "allPlatforms": "すべて",
+        "yes": "はい",
+        "no": "いいえ"
       },
       "badge": {
         "inProject": "プロジェクトで,プロジェクトの中で"
@@ -2152,13 +2153,13 @@
     "empty": {
       "ariaLabel": "パッケージなし 包装がない",
       "message": "比較のために選択されたパッケージはありません. パッケージダッシュボードの 2 つ以上のパッケージを右クリックして {compare} を選択します.",
-      "compareWord": "比較して,比べてみる.",
+      "compareWord": "比較",
       "openDashboard": "パッケージダッシュボードを開く",
       "openDashboardTitle": "Saropa パッケージダッシュボードを開きます."
     },
     "a11y": {
       "skipToTable": "比較表にスキップする",
-      "recommendation": "勧告 (RECOMMENDATION) とは,推奨事項を提出するものです.",
+      "recommendation": "推奨",
       "addingToProject": "プロジェクトに {name} を追加する"
     },
     "shortcuts": {
@@ -2167,7 +2168,7 @@
     },
     "kpi": {
       "ariaLabel": "比較の要約をまとめました.",
-      "leading": "リードする,主導する.",
+      "leading": "首位",
       "leadingTitle": "最も多くの次元でリードするパッケージが勝利します.",
       "dimensionWinsOne": "{count}次元で勝利する",
       "dimensionWinsOther": "{count}次元が勝利する.",
@@ -2176,7 +2177,7 @@
       "inComparison": "比較して,比べると",
       "dimensions": "寸法:次元は,その大きさから",
       "dimensionsTitle": "勝者がランク付けできる次元の数.",
-      "ranked": "ランキング順位を上げました."
+      "ranked": "ランク付け"
     },
     "toolbar": {
       "ariaLabel": "比較行動とは,比較行動を指すものです.",
@@ -2202,7 +2203,7 @@
       "rss": "RSS:",
       "statusLabel": "状態:",
       "statusValue": {
-        "active": "活力のあるアクティブです.",
+        "active": "アクティブ",
         "idle": "アイドル",
         "running": "実行中",
         "stopped": "停止",
@@ -2254,10 +2255,28 @@
       "enginesLabel": "エンジン: {count} 実行中"
     },
     "ci": {
-      "enabled": "saropa_lints CI written to {path}. Review the change and commit it — this file governs every contributor’s pull requests, so it is not committed for you.",
-      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
-      "openWorkflow": "Open workflow",
-      "openWorkflowFailed": "Could not open {path}."
+      "enabled": "saropa_lints CI を {path} に書き込みました。変更を確認してコミットしてください。このファイルはすべての貢献者のプルリクエストに影響するため、自動ではコミットされません。",
+      "disableFailed": "CI をオフにできませんでした：{path} が存在しないか、Saropa Lints が自動編集しない構造になっています。CI は引き続き実行されています。ファイルを開き、ワークフローを手動で無効にしてください。",
+      "openWorkflow": "ワークフローを開く",
+      "openWorkflowFailed": "{path} を開けませんでした。",
+      "publish": {
+        "heading": "この変更を公開",
+        "introEnable": "作業ツリーに {path} を書き込みました。{base} に反映されるまで、CI では何も実行されません。以下のコマンドは、{branch} という新しいブランチに変更を置き、レビュー用のプルリクエストを開きます。ご自身で実行するか、ボタンを押すと Saropa Lints がこれらとまったく同じコマンドを実行します。",
+        "introDisable": "すべてのジョブを停止するよう、作業ツリー内の {path} を編集しました。この変更が {base} に反映されるまで、CI は動き続けます。以下のコマンドは、{branch} という新しいブランチに変更を置き、プルリクエストを開きます。ご自身で実行するか、ボタンを押すと Saropa Lints がこれらとまったく同じコマンドを実行します。CI をすぐに止めたい場合は、リポジトリの Actions タブからワークフローを無効にしてください。",
+        "commandsLabel": "コマンド",
+        "copy": "コピー",
+        "copied": "コマンドをクリップボードにコピーしました。",
+        "createPr": "ブランチを作成し、コミット、プッシュしてプルリクエストを開く",
+        "notNow": "今はしない",
+        "noGitHubRemote": "このリポジトリの origin リモートは GitHub ではないため、プルリクエストを自動で開けません。上のコマンドを実行し、ホスト先の方法でプルリクエストを開いてください。",
+        "running": "ブランチを作成してプッシュしています…",
+        "failed": "{command} が失敗したため、何もプッシュされていません。{details}",
+        "pushedNoPr": "{branch} をプッシュしました。プルリクエストを自動で開けませんでした。比較ページから開いてください。",
+        "openCompare": "比較ページを開く",
+        "created": "{branch} のプルリクエストを開きました。",
+        "openPr": "プルリクエストを開く",
+        "notARepository": "{path} を書き込みましたが、このフォルダーは git リポジトリではないため、公開先がありません。"
+      }
     }
   },
   "detailView": {
@@ -2266,14 +2285,14 @@
     },
     "section": {
       "version": "バージョンバージョン",
-      "update": "UPDATE アップデートしました.",
-      "suggestion": "暗示とは,提案をすること.",
+      "update": "更新",
+      "suggestion": "提案",
       "community": "コミュニティー (共同体)",
       "dependencies": "依存関係にあるもの",
-      "alerts": "警告は,警戒を促すものである.",
+      "alerts": "アラート",
       "platforms": "プラットフォームのプラットフォーム",
-      "directDeps": "直接預金 (Direct Deposits) は,投資先から直接の預",
-      "readmeImages": "README IMAGES (リーズミーの画像) をダウンロードする"
+      "directDeps": "直接の依存関係",
+      "readmeImages": "README の画像"
     },
     "version": {
       "published": "出版: {date} _ PH0__ 発行した",
@@ -2285,7 +2304,7 @@
     },
     "update": {
       "upgrade": "アップグレードアップデート",
-      "changelog": "チェンジログは,変更日誌に記載されています.",
+      "changelog": "変更履歴",
       "blockedBy": "{package}によってブロックされています."
     },
     "suggestion": {
@@ -2319,27 +2338,27 @@
       "sharedList": "共有: {names} で公開されました."
     },
     "platforms": {
-      "wasm": "WASMは,WASMとは違うもの."
+      "wasm": "WASM"
     },
     "links": {
       "viewFullDetails": "詳細をすべて表示する View Full Details",
       "pubDev": "pub.dev",
       "documentation": "文書化 ドキュメント",
-      "changelog": "チェンジログは,変更日誌に記載されています.",
+      "changelog": "変更履歴",
       "repository": "データベースのリポジトリ",
       "issues": "課題の問題点問題",
       "reportIssue": "報告書の問題報告"
     },
     "logoAlt": "{packageName} ロゴを貼る",
-    "readMore": "もっともっと,もっともっと",
-    "readmeImageAlt": "README画像を表示しています."
+    "readMore": "続きを読む",
+    "readmeImageAlt": "README の画像"
   },
   "chart": {
     "toggle": {
-      "excludeShared": "共有の除外は,共有を排除する."
+      "excludeShared": "共有を除外"
     },
     "filter": {
-      "clear": "清々しい,はっきりとした."
+      "clear": "クリア"
     },
     "bucket": {
       "other": "その他 ({count} {noun})",
@@ -2357,7 +2376,7 @@
     },
     "enableRule": {
       "done": "ルール {ruleId}.を有効にした 再実行分析を適用する.",
-      "runAnalysis": "分析を実行する.",
+      "runAnalysis": "分析を実行",
       "noWorkspace": "ルールを有効にするには,ワークスペースのフォルダを開きます."
     },
     "openFinding": {
@@ -2366,7 +2385,7 @@
     },
     "crashNudge": {
       "message": "ログキャプチャは,規則 {ruleId} が捕まえたであろう {count} 時間 (s) のクラッシュを目撃しました. このルールは現在無効です.",
-      "enable": "ルール有効化 (enable rule) を適用する"
+      "enable": "ルールを有効化"
     },
     "deepLink": {
       "showDriftIssues": "ライブで表示するDrift問題 (Drift Advisor)"
@@ -2444,11 +2463,11 @@
       "openReportFailed": "Saropa Lints: ヒトの体内にある 報告書を開くことに失敗した. {message} フォローしている",
       "noAnalysisData": "分析データがない. まず分析を走らせてください.",
       "actionDisable": "禁断する Disable",
-      "actionEnable": "Enable 設定を有効にします.",
+      "actionEnable": "有効にする",
       "bulkRuleToggleConfirm": "{verb} {count} ルール? これは analysis_options_custom.yaml.を更新しています.",
       "setupPrompt": "Saropa Lints により saropa_lints が設定されていない Dart プロジェクトが検出されました。2300 以上の lint ルールの設定を今すぐ行います。",
       "actionSetUpProject": "プロジェクトを設定する プロジェクトのセットアップ",
-      "actionNotNow": "今,今ではない."
+      "actionNotNow": "今はしない"
     },
     "setup": {
       "requiresDartProject": "Saropa Lints には Dart または Flutter プロジェクトが必要です (pubspec.yaml が見つかりません)。",
@@ -2470,13 +2489,13 @@
       "configWriteFailed": "コンフィギュレーション書き込みが失敗しました. {details}",
       "scaffoldGateTitle": "複合分析器プラグインのエスカフォールド",
       "scaffoldGateDetail": "これは,新しい Dart パッケージをあなたのワークスペース (pubspec.yaml, lib/main.dart, README) の下に書き込む: Saropaを登録し,独自のルールにフックを残すカスタム_リントのプラグインです.\n\nこの機能は, Saropa. と一緒にカスタム分析ルールを出荷するときにのみ使用してください. 通常の Saropa プロジェクトのみは,それをスキップできます. アナライザーはコンテキストごとに 1 つのプラグインエントリを許可します.\n\n次へ: フォローする ワークスペースに関するフォルダを選択します. そのフォルダーが既に存在している場合,何事も書き換えられる前に質問されます.",
-      "actionContinue": "続行する,継続する.",
+      "actionContinue": "続行",
       "actionOpenGuide": "オープンガイドを開く",
       "scaffoldPathOutsideWorkspace": "工作スペースのフォルダの中に,スカフォルドパスがなければなりません.",
       "scaffoldFolderExists": "フォルダはすでに存在しています: {folder}. . フォローしているユーザー: ファイルは追加または上書きすることができます. 継続する?",
       "scaffoldCreated": "Composite プラグインのエスカフォールが作成されました. オープンで生成されたメイン.ダート?",
       "actionOpenMainDart": "メイン・ドールトを開けます.",
-      "actionOpenReadme": "READMEを開いて読みます.",
+      "actionOpenReadme": "README を開く",
       "scaffoldFailed": "足場が失敗しました。 {details}",
       "scaffoldFailedHint": "saropa_lints が dev_dependencies にあることを確認して、pub get を実行します。",
       "alreadyOnTier": "すでに {tier} レベルにいます.",
@@ -2516,7 +2535,7 @@
       "crossFileReportNoIndex": "クロスファイルレポートが完了したが,index.htmlは見つかりませんでした.",
       "crossFileHtmlReportGenerated": "クロスファイル HTML レポート生成.",
       "actionOpenInBrowser": "ブラウザで開きます.",
-      "actionOpenFile": "ファイルを開く File を開きます.",
+      "actionOpenFile": "ファイルを開く",
       "crossFileSnapshotFailed": "クロスファイルスナップショットが失敗: {message} フォローしている",
       "crossFileSnapshotNoJson": "クロスファイルスナップショットが完了したが,JSON ファイルが見つかりませんでした.",
       "crossFileSnapshotWritten": "報告書に書かれたクロスファイル・スナップショット/.saropa_lints/cross_file_snapshot.json",
@@ -2614,7 +2633,7 @@
       "openFolderBeforeEnablePacks": "Saropa Lints: フォローしている pack. enabling を有効にする前に,ワークスペースのフォルダーを開きます.",
       "allApplicablePacksEnabled": "Saropa Lints: フォローしている すべての適用可能なルールパックは既に有効です.",
       "noApplicablePacksDetected": "Saropa Lints: このプロジェクトには適用可能なルールパックが検出されませんでした。設定ダッシュボードでパックを個別に切り替えてください。",
-      "actionEnable": "Enable 設定を有効にします.",
+      "actionEnable": "有効にする",
       "enableRecommendedPacksPrompt": "{count} 推奨パックを有効にする (s)?",
       "enablePacksDetail": "これにより、analysis_options.yaml の rules_packs.enabled が更新されます。 {preview}",
       "enabledRecommendedPacks": "Saropa Lints: ヒトの体内にある {count}が有効になっている.",
@@ -2622,11 +2641,11 @@
     },
     "misc": {
       "upgradeCheckerMajorUpdate": "メジャーアップデート 更新",
-      "upgradeCheckerMinorUpdate": "マイナーな更新は,マイナスのアップデートです.",
-      "upgradeCheckerPatchUpdate": "パッチアップデート更新は,パッチの更新です.",
+      "upgradeCheckerMinorUpdate": "マイナーアップデート",
+      "upgradeCheckerPatchUpdate": "パッチアップデート",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: ヒトの体内にある pubspec.yaml  ⁇ を更新できませんでした. saropa_lints エントリーは見つかりませんでした.",
-      "upgradeCheckerCancelled": "Saropa Lints アップグレードがキャンセルされました. pubspec.yaml は ^{version} に更新されました; run `{cmd} pub get ゙ を終了させるか,変更を逆行する.",
+      "upgradeCheckerCancelled": "Saropa Lints のアップグレードをキャンセルしました。pubspec.yaml は ^{version} に更新済みです。`{cmd} pub get` を実行して完了するか、変更を元に戻してください。",
       "upgradeCheckerPubGetFailed": "Saropa Lints: パブの取得に失敗しました。 {detail}",
       "upgradeCheckerCheckOutput": "チェックアウトプット.",
       "upgradeCheckerUpgraded": "Saropa Lintsを {version} にアップグレードしました.",
@@ -2642,7 +2661,7 @@
       "reportViewAlreadySuppressed": "{file}では既に\"{flag}\"が抑制されている.",
       "reportViewSuppressed": "{file}.で\"{flag}\"が抑制されました.",
       "reportViewCouldNotSuppress": "{file}で '{flag}' を抑制できませんでした: {error} _ ヒトの体内にある",
-      "actionRescan": "再スキャンして再スキャニングします.",
+      "actionRescan": "再スキャン",
       "bulkUpdateNoUpdates": "アップデートはありません.",
       "bulkUpdateNoUpdatesFiltered": "{filter}の更新は利用できません.",
       "bulkUpdateFailed": "大量更新が失敗しました: {error} フォローしている",
@@ -2658,14 +2677,14 @@
     "subtitle": "不要なファイルを分析から除外して、アナライザのメモリ使用量を減らす",
     "emptyDescription": "ワークスペースをスキャンして、Dart分析機から除外することでメモリ使用量を減らすことができる高コストのファイルとフォルダを特定します。",
     "scanButton": "ワークスペースをスキャン",
-    "rescanButton": "再スキャンして再スキャニングします.",
+    "rescanButton": "再スキャン",
     "scanning": "ワークスペースのスキャン中…",
     "openConfig": "analysis_options.yamlを開く",
     "lastScan": "最終スキャン: {time}",
     "kpi": {
       "filesInScope": "スコープ内のファイル",
       "lines": "ライン",
-      "files": "ファイルは,ファイルのファイルを",
+      "files": "ファイル",
       "estimatedCost": "推定分析コスト",
       "costUnits": "コスト単位",
       "potentialSavings": "潜在的な節約",
@@ -2689,7 +2708,7 @@
     "col": {
       "status": "ステータス (Status) 状態",
       "pattern": "パターン",
-      "files": "ファイルは,ファイルのことです.",
+      "files": "ファイル",
       "cost": "概算費用",
       "priority": "優先度"
     },
@@ -2797,7 +2816,7 @@
   },
   "sidebar": {
     "actions": {
-      "runAnalysisLabel": "分析を実行する.",
+      "runAnalysisLabel": "分析を実行",
       "runAnalysisDescription": "再実行分析",
       "updateConfigLabel": "設定を更新",
       "updateConfigDescription": "分析オプションを初期化または再構成する"
@@ -2860,6 +2879,19 @@
       "breaksOther": "{pkg} {to} は {count} 件の依存元を壊します：{names}",
       "safe": "{pkg} {from} -> {to} は安全と思われます",
       "newestCompatible": "互換性のある最新版：{pkg} {version}"
+    }
+  },
+  "lifecycle": {
+    "note": {
+      "statusMayBeOutdated": "ステータスが古い可能性があります: サポート終了として記録されていますが、pub.dev では提供終了ではなく、過去12か月以内に公開されています。",
+      "maintenanceMode": "メンテナンスモード: 重大な修正のみが行われる見込みです。",
+      "caution": "注意: このパッケージに依存する前に、既知の問題を確認してください。",
+      "unlisted": "pub.dev で非公開リスト: 検索結果には表示されませんが、既存のユーザーは引き続き依存できます。"
+    },
+    "upgradeRequired": {
+      "diagnostic": "{name} をアップグレードしてください — インストール済みバージョンは既知の不具合があります",
+      "problem": "スコア {score}/100 — インストール済みバージョンのアップグレードが必要です",
+      "insight": "インストール済みバージョンは既知の不具合があります — アップグレードが必要です"
     }
   }
 }
