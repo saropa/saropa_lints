@@ -86,8 +86,8 @@ import { allKnownIssues } from './scoring/known-issues';
 import {
     runOverrideAnalysis, overrideConstrainerCandidates,
 } from './services/override-runner';
-import { fetchTargetDepsFor } from './services/upgrade-target-deps';
-import { deriveSdkPins } from './services/sdk-pins';
+import { fetchTargetDepsFor, fetchVersionListsFor } from './services/upgrade-target-deps';
+import { deriveSdkPins, parseLockedVersions } from './services/sdk-pins';
 import { buildConstraintIndex } from './services/shared-dep-constraints';
 import { attachBlastRadius, blastRadiusCandidates } from './scoring/blast-radius-attacher';
 import { OverrideAnalysis, NewVersionNotification, PackageInsight } from './types';
@@ -1405,9 +1405,26 @@ async function runScanInner(
             );
             const targetDeps = await fetchTargetDepsFor(results, targets.cache);
             const derivedPins = await deriveSdkPins(workspaceRoot.fsPath);
+            // Full lock (incl. transitives) so a satisfied transitive is not blocked.
+            const lockText = await vscode.workspace.fs
+                .readFile(vscode.Uri.joinPath(workspaceRoot, 'pubspec.lock'))
+                .then(b => Buffer.from(b).toString('utf8'), () => null);
+            const fullLock = lockText ? parseLockedVersions(lockText) : undefined;
+            // Prefetch release lists only for packages whose latest is blocked.
+            const blockedPkgs = attachBlastRadius(results, {
+                reverseDeps: enrichResult.reverseDeps,
+                constraints: blastConstraints,
+                targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
+                sdkPins: derivedPins.size > 0 ? derivedPins : undefined,
+                lockedVersions: fullLock,
+            }).filter(r => r.blastRadius && r.blastRadius.verdict !== 'safe')
+                .map(r => r.package.name);
+            const versionLists = await fetchVersionListsFor(blockedPkgs, targets.cache);
             results = attachBlastRadius(results, {
                 reverseDeps: enrichResult.reverseDeps,
                 constraints: blastConstraints,
+                lockedVersions: fullLock,
+                versionsOf: p => versionLists.get(p) ?? null,
                 targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
                 // Undefined -> attacher falls back to the documented table.
                 sdkPins: derivedPins.size > 0 ? derivedPins : undefined,

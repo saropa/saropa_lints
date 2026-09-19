@@ -8,6 +8,7 @@ import { fetchWithRetry } from './fetch-retry';
 import { CacheService } from './cache-service';
 import { ScanLogger } from './scan-logger';
 import { VibrancyResult } from '../types';
+import { VersionCandidate } from '../scoring/upgrade-blast-radius';
 
 const PUB_DEV_URL = 'https://pub.dev';
 
@@ -59,6 +60,58 @@ export async function fetchTargetDepsFor(
         const v = r.updateInfo!.latestVersion;
         const deps = await fetcher(r.package.name, v, cache, logger);
         if (deps) { out.set(`${r.package.name}@${v}`, deps); }
+    }));
+    return out;
+}
+
+/** Pure: /api/packages/<pkg> response -> releases with string dependency ranges. */
+export function parseVersionList(json: unknown): VersionCandidate[] | null {
+    const list = (json as { versions?: unknown } | null)?.versions;
+    if (!Array.isArray(list)) { return null; }
+    const out: VersionCandidate[] = [];
+    for (const v of list as Record<string, any>[]) {
+        if (typeof v?.version !== 'string') { continue; }
+        const deps = new Map<string, string>();
+        for (const [n, r] of Object.entries(v.pubspec?.dependencies ?? {})) {
+            if (typeof r === 'string') { deps.set(n, r); }
+        }
+        out.push({ version: v.version, deps, retracted: v.retracted === true });
+    }
+    return out;
+}
+
+/** All releases of a package in one request; cached; null on failure. */
+export async function fetchVersionList(
+    pkg: string, cache?: CacheService, logger?: ScanLogger, registryUrl = PUB_DEV_URL,
+): Promise<VersionCandidate[] | null> {
+    const key = `pub.versionList.${pkg}`;
+    const cached = cache?.get<{ version: string; deps: Record<string, string>; retracted?: boolean }[]>(key);
+    if (cached) {
+        return cached.map(c => ({ ...c, deps: new Map(Object.entries(c.deps)) }));
+    }
+    try {
+        const resp = await fetchWithRetry(
+            `${registryUrl}/api/packages/${encodeURIComponent(pkg)}`, undefined, logger);
+        if (!resp.ok) { return null; }
+        const list = parseVersionList(await resp.json());
+        if (list) {
+            await cache?.set(key, list.map(c => ({ ...c, deps: Object.fromEntries(c.deps) })));
+        }
+        return list;
+    } catch {
+        return null;
+    }
+}
+
+/** Release lists for packages whose latest is blocked; only those, to bound requests. */
+export async function fetchVersionListsFor(
+    pkgs: readonly string[], cache?: CacheService, logger?: ScanLogger,
+    fetcher: typeof fetchVersionList = fetchVersionList,
+): Promise<Map<string, VersionCandidate[]>> {
+    const out = new Map<string, VersionCandidate[]>();
+    await Promise.all(pkgs.map(async p => {
+        const l = await fetcher(p, cache, logger);
+        if (l) { out.set(p, l); }
     }));
     return out;
 }

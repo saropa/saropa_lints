@@ -2875,7 +2875,8 @@
       "depHeldBack": "{pkg} {to} needs {dep} {range}, which is held back: {reason}",
       "breaksOne": "{pkg} {to} would break {count} dependent: {names}",
       "breaksOther": "{pkg} {to} would break {count} dependents: {names}",
-      "safe": "{pkg} {from} -> {to} looks safe"
+      "safe": "{pkg} {from} -> {to} looks safe",
+      "newestCompatible": "Newest compatible: {pkg} {version}"
     }
   }
 }

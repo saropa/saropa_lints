@@ -46,6 +46,8 @@ export interface BlastRadius {
     readonly depHeldBack?: DepHeldBack | null;
     /** Curated maintainer explanation (data, not localized). */
     readonly heldBackReason: string | null;
+    /** Newest release newer than `from` that is not blocked; set by the attacher. */
+    readonly newestCompatible?: string | null;
     /** l10n key of the one-line summary; format with `describeBlastSummary`. */
     readonly summaryKey: BlastSummaryKey;
     /** Params for `summaryKey`; `sdk` is pre-formatted by the edge, never here. */
@@ -269,4 +271,40 @@ export function computeBlastRadius(input: BlastRadiusInput): BlastRadius {
         summaryKey: 'blastRadius.summary.safe',
         summaryParams: { pkg, from, to },
     };
+}
+
+/** One published release: its version and dependency ranges. */
+export interface VersionCandidate {
+    readonly version: string;
+    readonly deps: ReadonlyMap<string, string>;
+    readonly retracted?: boolean;
+}
+
+/** Max candidate releases evaluated per package. */
+export const MAX_COMPAT_CANDIDATES = 25;
+
+/**
+ * Newest release in (from, blockedTo) that computeBlastRadius rates safe.
+ * Skips retracted releases and prereleases (unless `from` is a prerelease).
+ * Pure; `base` supplies everything except the target version and its deps.
+ */
+export function findNewestCompatible(
+    base: Omit<BlastRadiusInput, 'to' | 'targetDeps'>,
+    blockedTo: string,
+    versions: readonly VersionCandidate[],
+): string | null {
+    const fromV = toVersion(base.from);
+    if (!fromV) { return null; }
+    const allowPre = !!semver.prerelease(fromV);
+    const cands = versions
+        .filter(c => !c.retracted && semver.valid(c.version)
+            && semver.gt(c.version, fromV) && semver.lt(c.version, toVersion(blockedTo) ?? blockedTo)
+            && (allowPre || !semver.prerelease(c.version)))
+        .sort((a, b) => semver.rcompare(a.version, b.version))
+        .slice(0, MAX_COMPAT_CANDIDATES);
+    for (const c of cands) {
+        const r = computeBlastRadius({ ...base, to: c.version, targetDeps: c.deps });
+        if (r.verdict === 'safe') { return c.version; }
+    }
+    return null;
 }

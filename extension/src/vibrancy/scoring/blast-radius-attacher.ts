@@ -7,7 +7,9 @@
 
 import { DepEdge, VibrancyResult } from '../types';
 import { ConstraintIndex } from './shared-dep-conflict-detector';
-import { computeBlastRadius, BlastRadius, SdkBlock } from './upgrade-blast-radius';
+import {
+    computeBlastRadius, findNewestCompatible, BlastRadius, SdkBlock, VersionCandidate,
+} from './upgrade-blast-radius';
 import { l10n } from '../../i18n/runtime';
 import { HELD_BACK_UPGRADES, HeldBackEntry } from './held-back-upgrades';
 
@@ -26,6 +28,10 @@ export interface BlastRadiusContext {
     readonly sdkPins?: ReadonlyMap<string, string>;
     readonly heldBack?: readonly HeldBackEntry[];
     /** Optional: target version's own dependency ranges, when known. */
+    /** Full pubspec.lock name -> version (includes transitives). */
+    readonly lockedVersions?: ReadonlyMap<string, string>;
+    /** Published releases of a package (for the newest-compatible search). */
+    readonly versionsOf?: (pkg: string) => readonly VersionCandidate[] | null;
     readonly targetDepsOf?: (pkg: string, version: string) => ReadonlyMap<string, string> | null;
 }
 
@@ -52,20 +58,30 @@ function hasNewerVersion(r: VibrancyResult): boolean {
 export function attachBlastRadius<T extends VibrancyResult>(
     results: readonly T[], ctx: BlastRadiusContext,
 ): T[] {
-    const lockedVersions = new Map(results.map(r => [r.package.name, r.package.version] as const));
+    // Lock (incl. transitives) is authoritative; direct results fill any gap.
+    const lockedVersions = new Map<string, string>(
+        results.map(r => [r.package.name, r.package.version] as const));
+    for (const [k, v] of ctx.lockedVersions ?? []) { lockedVersions.set(k, v); }
     return results.map(r => {
         if (!hasNewerVersion(r) || !r.updateInfo) { return r; }
-        const blastRadius = computeBlastRadius({
+        const base = {
             pkg: r.package.name,
             from: r.updateInfo.currentVersion,
-            to: r.updateInfo.latestVersion,
             reverseDeps: ctx.reverseDeps,
             constraints: ctx.constraints,
-            targetDeps: ctx.targetDepsOf?.(r.package.name, r.updateInfo.latestVersion) ?? null,
             sdkPins: ctx.sdkPins ?? SDK_PINNED_PACKAGES,
             heldBack: ctx.heldBack ?? HELD_BACK_UPGRADES,
             lockedVersions,
+        };
+        const to = r.updateInfo.latestVersion;
+        let blastRadius = computeBlastRadius({
+            ...base, to, targetDeps: ctx.targetDepsOf?.(r.package.name, to) ?? null,
         });
+        if (blastRadius.verdict !== 'safe' && ctx.versionsOf) {
+            const versions = ctx.versionsOf(r.package.name);
+            const newest = versions ? findNewestCompatible(base, to, versions) : null;
+            if (newest) { blastRadius = { ...blastRadius, newestCompatible: newest }; }
+        }
         return { ...r, blastRadius };
     });
 }
@@ -83,9 +99,12 @@ export function formatSdkBlock(b: SdkBlock): string {
 
 /** Localized one-line verdict summary (UI edge; computeBlastRadius stays pure). */
 export function describeBlastSummary(b: BlastRadius): string {
-    return l10n(b.summaryKey, b.sdkBlock
+    const base = l10n(b.summaryKey, b.sdkBlock
         ? { ...b.summaryParams, sdk: formatSdkBlock(b.sdkBlock) }
         : b.summaryParams);
+    return b.newestCompatible
+        ? `${base} ${l10n('blastRadius.summary.newestCompatible', { pkg: b.pkg, version: b.newestCompatible })}`
+        : base;
 }
 
 /** Localized breaker lines: "name (^12.0.0) via a -> b". */
