@@ -81,6 +81,102 @@ def _collect_union_keys() -> dict[str, str]:
     return found
 
 
+# ---------------------------------------------------------------------------
+# Additional "reference" detectors used ONLY for the dead-key warning. They
+# never add keys to the "missing from en.json" check (a dotted string that is
+# not an en.json key is usually not an l10n key at all).
+# ---------------------------------------------------------------------------
+
+# Any quoted / backtick string (no interpolation) shaped like a dotted key.
+# Catches keys held as plain data (`titleKey: 'x.y'`, `const K = 'x.y'`,
+# tables serialised into webview scripts) that never sit inside l10n('...').
+_DOTTED_STRING_RE = re.compile(r"""['"`]([a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+)['"`]""")
+
+# `const s = 'commandCatalog.script';` — a file-local key-prefix constant.
+_PREFIX_CONST_RE = re.compile(
+    r"""(?:const|let)\s+(\w+)\s*(?::\s*string\s*)?=\s*['"]([a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)*)['"]"""
+)
+
+
+def _prefix_const_refs(text: str) -> set[str]:
+    """Resolve `${NAME}.rest` / `NAME + '.rest'` against file-local prefix consts."""
+    # A name may be reused for different prefixes in different functions
+    # (e.g. `const s` twice); try every pair. Wrong pairings yield keys that
+    # are not in en.json and are discarded by the caller.
+    consts = _PREFIX_CONST_RE.findall(text)
+    out: set[str] = set()
+    for name, prefix in consts:
+        for m in re.finditer(r"\$\{" + re.escape(name) + r"\}\.([a-zA-Z0-9_.]+)", text):
+            out.add(f"{prefix}.{m.group(1)}")
+        for m in re.finditer(r"\b" + re.escape(name) + r"\s*\+\s*['\"]\.([a-zA-Z0-9_.]+)['\"]", text):
+            out.add(f"{prefix}.{m.group(1)}")
+    return out
+
+
+# Dynamic key families: keys assembled at runtime from an id (enum value,
+# table row id, pack id, ...), invisible to any static literal scan. Each
+# entry is (key prefix, suffix regex, mechanism file, regex that must still
+# appear in that file). The checker re-verifies the mechanism regex on every
+# run, so an entry goes stale (and its keys go back to being reported) if the
+# code that builds the keys is removed. Add a family ONLY after confirming the
+# runtime id set really covers the keys.
+_DYNAMIC_FAMILIES: list[tuple[str, str, str, str]] = [
+    ("packageDashboard.columns.", r".+\.(?:label|tooltip)", "extension/src/vibrancy/views/report-html-table.ts",
+     r"packageDashboard\.columns\.\$\{cid\}\.\$\{part\}"),
+    ("codeHealth.flag.", r".+\.(?:label|evidence|rule)", "extension/src/views/projectVibrancyClientScript.ts",
+     r"codeHealth\.flag\.'\s*\+\s*k"),
+    ("stylistic.desc.", r"[^.]+", "extension/src/rulePacks/rulePacksWebviewProvider.ts",
+     r"stylistic\.desc\.'\s*\+\s*pack\.id"),
+    ("packs.domainDesc.", r"[^.]+", "extension/src/rulePacks/rulePacksWebviewProvider.ts",
+     r"packs\.domainDesc\.'\s*\+\s*slug"),
+    ("debug.engine.statusValue.", r"[^.]+", "extension/src/systemHealth/engineCardsHtml.ts",
+     r"debug\.engine\.statusValue\.\$\{engine\.status\}"),
+    ("debug.engine.description.", r"[^.]+", "extension/src/systemHealth/engineCardsHtml.ts",
+     r"debug\.engine\.description\.\$\{descriptionKey\}"),
+    ("debug.engine.", r"(?:analyzerPlugin|scanDaemon|lspServer|ci)", "extension/src/views/sectionedSidebar.ts",
+     r"debug\.engine\.\$\{ENGINE_NAME_KEY\["),
+    ("packageDashboard.summary.", r"[a-z]+Title", "extension/src/vibrancy/views/report-html-top.ts",
+     r"packageDashboard\.summary\.\$\{key\}Title"),
+    ("featureInventory.category.", r"[^.]+", "extension/src/vibrancy/views/feature-inventory-utils.ts",
+     r"featureInventory\.category\.\$\{category\}"),
+    ("featureInventory.chip.", r"[^.]+", "extension/src/vibrancy/views/feature-inventory-utils.ts",
+     r"featureInventory\.chip\.\$\{state\}"),
+    ("analysisOptimizer.priority.", r"(?:high|medium|low)", "extension/src/analysisOptimizer/analysisOptimizerWebviewProvider.ts",
+     r"analysisOptimizer\.priority\.\$\{row\.priority\}"),
+]
+
+
+def _collect_extra_refs(catalog_keys: set[str]) -> tuple[dict[str, str], dict[str, str]]:
+    """Return (literal_refs, family_refs), each {key: mechanism note}.
+
+    literal_refs: dotted-shaped string literal (or file-local prefix const +
+    suffix) that exactly equals an en.json key in non-test, non-catalog TS.
+    family_refs: keys covered by a still-verified _DYNAMIC_FAMILIES entry.
+    """
+    literal: dict[str, str] = {}
+    for ts_file in sorted(_SRC.rglob("*.ts")):
+        rel = str(ts_file.relative_to(_REPO)).replace("\\", "/")
+        if rel in _FIXTURE_FILES or "/test/" in rel or "/i18n/locales/" in rel:
+            continue
+        text = _strip_comments(ts_file.read_text(encoding="utf-8"))
+        for k in _DOTTED_STRING_RE.findall(text):
+            if k in catalog_keys:
+                literal.setdefault(k, f"literal string in {rel}")
+        for k in _prefix_const_refs(text):
+            if k in catalog_keys:
+                literal.setdefault(k, f"prefix-const template in {rel}")
+
+    family: dict[str, str] = {}
+    for prefix, suffix_re, rel, needle in _DYNAMIC_FAMILIES:
+        path = _REPO / rel
+        if not path.exists() or not re.search(needle, path.read_text(encoding="utf-8")):
+            continue  # mechanism vanished: stop trusting this family
+        for k in catalog_keys:
+            if k.startswith(prefix) and re.fullmatch(suffix_re, k[len(prefix):]):
+                family.setdefault(k, f"dynamic family {prefix}* built in {rel}")
+    return literal, family
+
+
 def _flatten(obj: dict, prefix: str = "") -> dict[str, str]:
     """Flatten a nested dict into {dotted.key: value} for leaves."""
     result: dict[str, str] = {}
@@ -465,7 +561,8 @@ def main() -> int:
                 print(issue)
 
     # Keys defined in en.json but never referenced in code.
-    unused = sorted(defined - used_keys - set(union_keys))
+    literal_refs, family_refs = _collect_extra_refs(defined)
+    unused = sorted(defined - used_keys - set(union_keys) - set(literal_refs) - set(family_refs))
     if unused:
         # Warning only — translations cost money, but don't block the build.
         print(f"\n⚠ {len(unused)} key(s) defined in en.json but never referenced in code:\n")
