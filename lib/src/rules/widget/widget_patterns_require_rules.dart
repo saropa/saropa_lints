@@ -2565,11 +2565,18 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
 
 /// Reminder to add Info.plist entries for iOS permissions.
 ///
-/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.3.3 | Updated: v16.4.0 | Rule version: v4
 ///
 /// Alias: ios_plist_permission, permission_handler_plist
 ///
 /// iOS permissions require Info.plist usage description strings.
+///
+/// `Permission.notification` is exempt: iOS notification authorization
+/// (`UNUserNotificationCenter.requestAuthorization`) shows the system
+/// dialog without any Info.plist usage-description key, so there is no
+/// key to add. A request that also includes a protected resource (for
+/// example `[Permission.camera, Permission.notification].request()`) is
+/// still reported.
 ///
 /// **Example for ios/Runner/Info.plist:**
 /// ```xml
@@ -2597,7 +2604,7 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_permission_plist_ios',
     '[require_permission_plist_ios] iOS requires usage descriptions in '
-        'Info.plist. App crashes or gets rejected from App Store without them. {v3}',
+        'Info.plist. App crashes or gets rejected from App Store without them. {v4}',
     correctionMessage:
         'Add NSxxxUsageDescription key to Info.plist for each permission.',
     severity: DiagnosticSeverity.WARNING,
@@ -2614,10 +2621,25 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
       final target = node.target;
       if (target == null) return;
 
-      if (!RegExp(r'Permission\.').hasMatch(target.toSource())) return;
+      final names = _permissionPattern
+          .allMatches(target.toSource())
+          .map((m) => m.group(1)!)
+          .toList();
+      if (names.isEmpty) return;
+      // Report unless every requested permission is one iOS grants without
+      // a usage-description key.
+      if (names.every(_noPlistKeyPermissions.contains)) return;
       reporter.atNode(node);
     });
   }
+
+  static final RegExp _permissionPattern = RegExp(r'Permission\.(\w+)');
+
+  // Notification authorization on iOS shows the system dialog with no
+  // Info.plist usage-description key (NSUserNotificationUsageDescription is
+  // not a real requirement), so flagging it asks for a key that does not
+  // exist.
+  static const Set<String> _noPlistKeyPermissions = {'notification'};
 }
 
 /// Reminder to add queries element for url_launcher on Android 11+.
