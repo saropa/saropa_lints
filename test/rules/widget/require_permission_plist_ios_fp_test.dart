@@ -208,10 +208,9 @@ ${keys.map((k) => '  <key>$k</key>\n  <string>Reason</string>').join('\n')}
 
     test('a satisfied group is not reported', () {
       expect(
-        IosPermissionHandlerMapping.missingKeys(
-          const ['bluetooth'],
-          (k) => k == 'NSBluetoothPeripheralUsageDescription',
-        ),
+        IosPermissionHandlerMapping.missingKeys(const [
+          'bluetooth',
+        ], (k) => k == 'NSBluetoothPeripheralUsageDescription'),
         isEmpty,
       );
     });

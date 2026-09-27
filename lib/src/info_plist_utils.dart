@@ -455,7 +455,8 @@ class IosPermissionHandlerMapping {
   ) {
     final missing = <String>[];
     for (final name in permissionNames) {
-      for (final group in permissionToKeyGroups[name] ?? const <List<String>>[]) {
+      for (final group
+          in permissionToKeyGroups[name] ?? const <List<String>>[]) {
         if (group.any(hasKey)) continue;
         final rendered = group.join(' or ');
         if (!missing.contains(rendered)) missing.add(rendered);
