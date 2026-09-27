@@ -2563,15 +2563,33 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
   }
 }
 
-/// Reminder to add Info.plist entries for iOS permissions.
+/// Requires Info.plist usage descriptions for `permission_handler` requests.
 ///
-/// Since: v2.3.3 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.3.3 | Updated: v16.4.0 | Rule version: v5
 ///
 /// Alias: ios_plist_permission, permission_handler_plist
 ///
-/// iOS permissions require Info.plist usage description strings.
+/// iOS crashes (or App Store review rejects the build) when a protected
+/// resource is requested without its usage-description key.
 ///
-/// **Example for ios/Runner/Info.plist:**
+/// The rule reads the project's `ios/Runner/Info.plist` and reports a
+/// `Permission.<x>.request()` only when a key that permission needs is
+/// actually missing. It stays silent when:
+/// - the key is already declared;
+/// - the permission needs no key on iOS, such as `Permission.notification`
+///   (iOS shows the notification dialog without one), `criticalAlerts`, or
+///   Android-only permissions like `sms` and `systemAlertWindow`;
+/// - there is no `ios/Runner/Info.plist` to check (not an iOS app, or a
+///   package), because the rule cannot confirm anything is missing.
+///
+/// See [IosPermissionHandlerMapping] for the permission-to-key table.
+///
+/// **BAD** (Info.plist has no `NSCameraUsageDescription`):
+/// ```dart
+/// await Permission.camera.request();
+/// ```
+///
+/// **GOOD:**
 /// ```xml
 /// <key>NSCameraUsageDescription</key>
 /// <string>Camera access for photo capture</string>
@@ -2597,24 +2615,42 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_permission_plist_ios',
     '[require_permission_plist_ios] iOS requires usage descriptions in '
-        'Info.plist. App crashes or gets rejected from App Store without them. {v3}',
+        'Info.plist. App crashes or gets rejected from App Store without them. {v5}',
     correctionMessage:
-        'Add NSxxxUsageDescription key to Info.plist for each permission.',
+        'Add the usage-description key this permission needs (for example '
+        'NSCameraUsageDescription for Permission.camera) to '
+        'ios/Runner/Info.plist.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  static final RegExp _permissionPattern = RegExp(r'\bPermission\.(\w+)');
 
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Without a real Info.plist the rule cannot know whether a key is
+    // missing; asserting it anyway was a guaranteed false positive on every
+    // project that had already declared its keys.
+    final checker = InfoPlistChecker.forFile(context.filePath);
+    if (checker == null || !checker.hasInfoPlist) return;
+
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'request') return;
 
       final target = node.target;
       if (target == null) return;
 
-      if (!RegExp(r'Permission\.').hasMatch(target.toSource())) return;
+      final names = _permissionPattern
+          .allMatches(target.toSource())
+          .map((m) => m.group(1)!);
+      if (IosPermissionHandlerMapping.missingKeys(
+        names,
+        checker.hasKey,
+      ).isEmpty) {
+        return;
+      }
       reporter.atNode(node);
     });
   }

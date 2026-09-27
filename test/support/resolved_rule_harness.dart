@@ -70,14 +70,22 @@ class HarnessDiagnostic {
 /// `dart test` runs test files concurrently in separate isolates: a single
 /// shared fixture path would let one isolate's cleanup delete another's
 /// in-flight fixture, producing flaky empty results.
+///
+/// Pass [projectRoot] to write the fixture under `<projectRoot>/lib/` instead,
+/// for rules that read project files next to the pubspec (for example
+/// `ios/Runner/Info.plist`). Such a fixture resolves against the SDK only, so
+/// it must not import packages.
 Future<List<HarnessDiagnostic>> runRuleResolved(
   SaropaLintRule rule,
   String code, {
   String fileStem = 'fixture',
+  Directory? projectRoot,
 }) async {
   final provider = PhysicalResourceProvider.INSTANCE;
-  final exampleLib = p.normalize(p.absolute(p.join('example', 'lib')));
-  final base = Directory(p.join(exampleLib, '__rule_harness__'))
+  final libDir = projectRoot == null
+      ? p.normalize(p.absolute(p.join('example', 'lib')))
+      : p.normalize(p.absolute(p.join(projectRoot.path, 'lib')));
+  final base = Directory(p.join(libDir, '__rule_harness__'))
     ..createSync(recursive: true);
   // OS-level unique subdir name avoids collisions across concurrent isolates.
   final dir = base.createTempSync('h');
@@ -149,8 +157,12 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
 }
 
 /// Convenience: the set of distinct rule codes reported for [code].
-Future<Set<String>> reportedRuleCodes(SaropaLintRule rule, String code) async {
-  final diags = await runRuleResolved(rule, code);
+Future<Set<String>> reportedRuleCodes(
+  SaropaLintRule rule,
+  String code, {
+  Directory? projectRoot,
+}) async {
+  final diags = await runRuleResolved(rule, code, projectRoot: projectRoot);
   return diags.map((d) => d.ruleName).toSet();
 }
 

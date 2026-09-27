@@ -96,6 +96,7 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 - `prefer_typed_route_params` no longer flags a parameter passed into a call whose resolved return type is `int`, `double`, or `num` (for example `parseLimit(...)`), regardless of the call's own name. No action required.
 - `require_data_encryption` no longer flags auth-status metadata (`authStatusFields`, `authConfigured`, `authScheme`, `authRequired`/`authRequiredMessage`) as a credential. A real credential in the same call is still reported. No action required.
 - `require_error_logging` no longer flags a catch block that propagates the error via `return Error.throwWithStackTrace(...)` or a bare call to it. No action required.
+- `require_permission_plist_ios` now reads your `ios/Runner/Info.plist` and reports a permission request only when a usage-description key that permission needs is actually missing, so notification, critical-alert and Android-only permissions (which need no key on iOS) and permissions whose keys are already declared are no longer flagged. No action required, though you can remove any `// ignore:` comments you added for this rule.
 - `require_yield_after_db_write` and `suggest_yield_after_db_read` no longer fire in packages that do not depend on Flutter — their premise, protecting a UI thread, does not apply there. No action required.
 
 ### Added (Extension)
