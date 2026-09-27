@@ -358,3 +358,109 @@ class IosPermissionMapping {
     return keys.join(' + ');
   }
 }
+
+/// Maps `permission_handler` `Permission.<name>` values to the Info.plist
+/// usage-description keys iOS requires before the permission can be requested.
+///
+/// Each permission maps to a list of requirement groups. Every group must be
+/// satisfied, and a group is satisfied when ANY one of its keys is present
+/// (for example `calendar` accepts the pre-iOS 17 key or the iOS 17
+/// full-access key).
+///
+/// Permissions absent from this map need no usage-description key on iOS:
+/// - `notification`: `UNUserNotificationCenter.requestAuthorization` shows the
+///   system dialog without any key (`NSUserNotificationUsageDescription` does
+///   not exist as a requirement).
+/// - `criticalAlerts`: gated by an Apple entitlement, not a plist key.
+/// - `backgroundRefresh`, `storage`: status-only or implicitly granted on iOS.
+/// - Android-only values (`phone`, `sms`, `systemAlertWindow`,
+///   `ignoreBatteryOptimizations`, `manageExternalStorage`,
+///   `requestInstallPackages`, `accessMediaLocation`, `activityRecognition`,
+///   `accessNotificationPolicy`, `bluetoothScan`, `bluetoothAdvertise`,
+///   `bluetoothConnect`, `nearbyWifiDevices`, `videos`, `audio`,
+///   `scheduleExactAlarm`, `sensorsAlways`): no iOS counterpart.
+class IosPermissionHandlerMapping {
+  const IosPermissionHandlerMapping._();
+
+  static const Map<String, List<List<String>>> permissionToKeyGroups = {
+    'camera': [
+      ['NSCameraUsageDescription'],
+    ],
+    'microphone': [
+      ['NSMicrophoneUsageDescription'],
+    ],
+    'photos': [
+      ['NSPhotoLibraryUsageDescription'],
+    ],
+    'photosAddOnly': [
+      ['NSPhotoLibraryAddUsageDescription'],
+    ],
+    'contacts': [
+      ['NSContactsUsageDescription'],
+    ],
+    'location': [
+      ['NSLocationWhenInUseUsageDescription'],
+    ],
+    'locationWhenInUse': [
+      ['NSLocationWhenInUseUsageDescription'],
+    ],
+    'locationAlways': [
+      ['NSLocationWhenInUseUsageDescription'],
+      [
+        'NSLocationAlwaysAndWhenInUseUsageDescription',
+        'NSLocationAlwaysUsageDescription',
+      ],
+    ],
+    'calendar': [
+      ['NSCalendarsUsageDescription', 'NSCalendarsFullAccessUsageDescription'],
+    ],
+    'calendarFullAccess': [
+      ['NSCalendarsFullAccessUsageDescription'],
+    ],
+    'calendarWriteOnly': [
+      ['NSCalendarsWriteOnlyAccessUsageDescription'],
+    ],
+    'reminders': [
+      ['NSRemindersUsageDescription', 'NSRemindersFullAccessUsageDescription'],
+    ],
+    'mediaLibrary': [
+      ['NSAppleMusicUsageDescription'],
+    ],
+    'sensors': [
+      ['NSMotionUsageDescription'],
+    ],
+    'speech': [
+      ['NSSpeechRecognitionUsageDescription'],
+    ],
+    'bluetooth': [
+      [
+        'NSBluetoothAlwaysUsageDescription',
+        'NSBluetoothPeripheralUsageDescription',
+      ],
+    ],
+    'appTrackingTransparency': [
+      ['NSUserTrackingUsageDescription'],
+    ],
+    'assistant': [
+      ['NSSiriUsageDescription'],
+    ],
+  };
+
+  /// Returns the unsatisfied requirement groups for [permissionNames], each
+  /// rendered as `KeyA` or `KeyA or KeyB`, in first-seen order without
+  /// duplicates. Unknown names and names needing no key contribute nothing.
+  static List<String> missingKeys(
+    Iterable<String> permissionNames,
+    bool Function(String key) hasKey,
+  ) {
+    final missing = <String>[];
+    for (final name in permissionNames) {
+      for (final group in permissionToKeyGroups[name] ?? const <List<String>>[]) {
+        if (group.any(hasKey)) continue;
+        final rendered = group.join(' or ');
+        if (!missing.contains(rendered)) missing.add(rendered);
+      }
+    }
+    return missing;
+  }
+}
