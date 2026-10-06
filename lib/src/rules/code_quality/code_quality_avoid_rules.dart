@@ -1265,6 +1265,24 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
 /// final result = text.length >= 10 ? text.substring(5, 10) : text;
 /// // or use split/pattern matching for extracting parts
 /// ```
+///
+/// ### Known scope limit: bounds proven inside a callee
+///
+/// This rule reasons about a single `substring()` call site: its receiver,
+/// its arguments, and the caller-side control flow (`if`/`while`/`for`
+/// guards, indexOf/regex-derived indices) surrounding it. It cannot inline
+/// a helper function's body to prove that the helper's return value is
+/// always in bounds — e.g. a private, same-file helper whose every `return`
+/// is provably `0 <= r <= sql.length`, used as `sql.substring(helper(sql))`
+/// with no guard at the call site. Verifying that soundly across arbitrary
+/// control flow (including early returns inside loops) is a data-flow/range-
+/// analysis problem, not something a single-hop AST/syntax heuristic can
+/// decide correctly — an attempted heuristic was reverted for being both
+/// unsound (see `plans/declined/avoid_string_substring_false_positive_local_helper_bounds_argument.md`)
+/// and unable to soundly change per-call-site severity without also
+/// extending `SaropaDiagnosticReporter`, which is out of scope here. When
+/// the helper is genuinely bounds-safe, suppress with `// ignore:` at the
+/// call site rather than restructuring the code around the lint.
 class AvoidSubstringRule extends SaropaLintRule {
   AvoidSubstringRule() : super(code: _code);
 
