@@ -65,6 +65,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 -->
 
 ---
+## [16.6.1] — Unreleased
+
+Test-suite repair only; no change to rule behaviour or shipped output.
+
+### Internal
+
+- Restored the cross-file, structure and example fixture sources that an earlier bulk commit deleted, which had made the CI `test` job fail.
+
 ## [16.6.0]
 
 Minor release adding a new essential-tier rule that catches an unguarded `dart:developer`
