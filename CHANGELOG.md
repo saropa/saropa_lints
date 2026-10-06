@@ -71,7 +71,7 @@ Test-suite repair only; no change to rule behaviour or shipped output.
 
 ### Internal
 
-- Restored the cross-file, structure and example fixture sources that an earlier bulk commit deleted, which had made the CI `test` job fail.
+- Restored the scripts package markers and the cross-file, structure and example fixture sources that an earlier bulk commit deleted, which had made the CI `test` job fail.
 - Health history no longer labels a point with the wrong tag when two tags (such as `v16` and `v16.6.0`) share a commit.
 
 ## [16.6.0]
