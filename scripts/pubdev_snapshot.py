@@ -23,7 +23,7 @@ Two subcommands, deliberately separate so the (slow, networked) fetch and the
     FLAGGED report for a human to decide. Key order and formatting are
     preserved so the git diff stays minimal.
 
-    Flags are printed as ``[kind] message`` and summarised per kind:
+    Flags are printed as ``[kind] message`` and summarized per kind:
 
     * ``revived``: unbounded ``end_of_life`` released <12 months ago.
     * ``stale``: ``active`` 12-24 months old (maintenance_mode candidate) or
@@ -167,7 +167,7 @@ def tracked_names(extra: list[str]) -> list[str]:
 # --------------------------------------------------------------------------
 def _request(url: str, method: str, timeout: float, retries: int):
     """Return (status, body_bytes, headers). Retries 429/5xx/network errors
-    with exponential backoff (honouring Retry-After). 404 returns (404,...)."""
+    with exponential backoff (honoring Retry-After). 404 returns (404,...)."""
     delay = 1.0
     for attempt in range(retries + 1):
         try:
@@ -180,7 +180,7 @@ def _request(url: str, method: str, timeout: float, retries: int):
             if e.code not in (429, 500, 502, 503, 504) or attempt == retries:
                 return e.code, b"", e.headers
             ra = e.headers.get("Retry-After")
-            # Retry-After may be an HTTP date; only honour delta-seconds, capped.
+            # Retry-After may be an HTTP date; only honor delta-seconds, capped.
             time.sleep(min(float(ra), 60.0) if ra and ra.isdigit() else delay)
         except (urllib.error.URLError, TimeoutError, OSError):
             if attempt == retries:

@@ -65,10 +65,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 -->
 
 ---
+## [16.6.0] — Unreleased
 
-## [16.4.0] — Unreleased
+Minor release adding a new essential-tier rule that catches an unguarded `dart:developer`
+`debugger()` call before it can hang a test run. It also fixes the extension's CI switch for
+workflows whose jobs already carry their own conditions.
 
-Minor release adding a new essential-tier rule that catches an unguarded `dart:developer` `debugger()` call before it can hang a test run. It also fixes the extension's CI switch for workflows whose jobs already carry their own conditions.
+### Version Note
+
+The pub.dev package and the VS Code extension now share one version number and will match from here on; previously the extension's minor was shifted up by two, so package `16.2.1` reached the Marketplace as extension `16.4.1`. Stable releases now use even minors only, since VS Code reserves odd ones for pre-release builds — hence the jump from `16.2.2`.
 
 ### Added
 
@@ -102,11 +107,14 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 ### Added (Extension)
 
 - The extension now checks the Dart analysis server's memory cap against this machine's RAM at startup and, when there is no cap or it leaves less than half the RAM for everything else, explains the trade-off and offers a recommended value in one click. Click Apply, or choose Don't ask again to keep your setting.
-- Package Vibrancy now shows a separate "Upgrade Required" status for packages that are alive but where your installed old major version is known to be broken, instead of labelling them "End of Life"; "End of Life" now means only that the package itself is dead. No action required.
+- Package Vibrancy now shows a separate "Upgrade Required" status for packages that are alive but where your installed old major version is known to be broken, instead of labeling them "End of Life"; "End of Life" now means only that the package itself is dead. No action required.
 - Package Vibrancy now checks what an upgrade would break before recommending it, and replaces the upgrade nudge with the reason when dependents cap the package below the new version or the new version needs a newer dependency than your Flutter SDK pins (for example `analyzer` 13, which needs a newer `meta` than Flutter stable ships) or needs a dependency that another package in your project caps (for example a `drift_dev` release that requires `analyzer` 13 while a dependency caps it below 13), naming the package responsible. Blocked packages are also skipped by "upgrade all", and the newest version you can still take is suggested. No action required.
 
 ### Fixed (Extension)
 
+- Manage Rule Packs no longer resets itself while the Dart analyzer is running. Your pack search, the Matching rules list, filters, sort order, opened rule lists and scroll position now stay put, and the page redraws only when something on it actually changed. No action required.
+- Clicking a pack name in Manage Rule Packs' Matching rules list now scrolls to that pack, highlights it, opens its rule list and puts focus on its on/off switch. If another filter (type, Detected, Enabled) was hiding the pack, that filter is cleared and your search is kept. No action required.
+- The rule detail panel now shows the rule's problem, how to fix it, impact, type and OWASP mapping when opened from Manage Rule Packs, a related-rule link or the Explain Rule command. Before, it showed only the rule name. No action required.
 - Turning a rule pack off in `analysis_options_custom.yaml` no longer deletes the blank line and the next top-level section (such as `platforms:`) after it. No action required.
 - Machine Health, Workspace Readiness, Set Analysis Server Heap Cap and Unload Ollama Model now appear in the command catalog. No action required.
 - The saropa_lints update prompt now appears at every startup while your project is behind, instead of only once per release even when the notification was missed. Choose Don't ask for this version to silence a release.
@@ -134,6 +142,8 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 
 ### Internal
 
+- The extension compiles again with `vscode-languageclient` 10: the LSP client's output channel is now a log channel, which that version requires.
+- The bundled rule catalog (`extension/media/rules_catalog.json`) and each rule's metadata in the `violations.json` export now include the rule's `problemMessage` and `impact`, taken from the same `LintCode` a live diagnostic uses. The catalog was regenerated.
 - Restored the state and problems index modules of Package Vibrancy, which an earlier cleanup deleted and which stopped the extension from compiling.
 - Added `scripts/pubdev_snapshot.py`, which downloads the latest pub.dev data for every tracked package into a reusable snapshot and refreshes the Package Vibrancy known-issues data from it; the analyzer entries now record why analyzer 13 and later is held back. It also flags packages that look revived or stale, and seven long-quiet packages moved to maintenance mode.
 - The localization key checker no longer crashes, ignores its test fixture, and recognizes keys referenced through key-type unions.

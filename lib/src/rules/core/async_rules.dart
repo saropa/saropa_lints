@@ -2256,7 +2256,7 @@ class PreferUtcForStorageRule extends SaropaLintRule {
 }
 
 /// Collects the first [VariableDeclaration] whose declared element matches
-/// [_target], reporting it via [_onFound]. Still walks the rest of the
+/// `_target`, reporting it via [_onFound]. Still walks the rest of the
 /// compilation unit after a match (`_found` only guards against reporting
 /// more than once — elements are unique per declaration, so a second match
 /// can't occur in practice, but the traversal itself isn't short-circuited).

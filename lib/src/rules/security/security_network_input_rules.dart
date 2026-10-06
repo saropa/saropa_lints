@@ -5235,7 +5235,7 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
 }
 
 /// Finds the [FunctionDeclaration]/[MethodDeclaration] whose declared
-/// element matches [_target] and extracts the single expression its body
+/// element matches `_target` and extracts the single expression its body
 /// evaluates, so [AvoidStackTraceInProductionRule] can inspect a
 /// zero-arg debug-guard helper's actual condition. Stops descending as
 /// soon as it finds the target — no other rule in this package uses

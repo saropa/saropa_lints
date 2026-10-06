@@ -237,6 +237,16 @@ function gaugeAndRulesCellStyles(): string {
   outline-offset: 2px;
   border-radius: 3px;
 }
+
+/* A pack revealed from a finder "in <pack>" link: briefly highlighted so the eye lands on
+   the row (and its on/off toggle) after the scroll. */
+tr.pack-flash > td {
+  background: var(--vscode-editor-findMatchHighlightBackground, rgba(255, 200, 0, 0.35));
+  transition: background 0.6s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  tr.pack-flash > td { transition: none; }
+}
 `;
 }
 

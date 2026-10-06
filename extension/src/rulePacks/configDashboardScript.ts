@@ -31,6 +31,7 @@ export function getConfigDashboardScript(): string {
     SCRIPT_SORT,
     SCRIPT_KPI_AND_CHART,
     SCRIPT_FIND,
+    SCRIPT_VIEW_PERSIST,
     SCRIPT_GAUGE,
     SCRIPT_DISABLED_RULES_SEARCH,
     SCRIPT_STYLISTIC,
@@ -67,6 +68,10 @@ const SCRIPT_PREAMBLE = `
     /** When set, KPI preset filter is active ('enabled' or 'applicable-sdk'). */
     kpi: null,
   };
+  // Pack ids whose rule list the user opened on purpose (disclosure button or a finder
+  // "in <pack>" link). applyFilters() must not collapse these, and they are restored after
+  // a host rebuild so the pack the user navigated to stays open.
+  const expandedPacks = new Set();
 `;
 
 /** Tier radio control + toggle switches + rules link wiring. */
@@ -119,6 +124,8 @@ const SCRIPT_TIER_AND_TOGGLES = `
       btn.setAttribute('aria-expanded', open ? 'false' : 'true');
       btn.classList.toggle('open', !open);
       detail.hidden = open;
+      if (open) expandedPacks.delete(id); else expandedPacks.add(id);
+      persistPackView();
     });
   });
 
@@ -169,6 +176,8 @@ const SCRIPT_FILTER_STATE = `
   if (searchInput) {
     searchInput.addEventListener('input', function() {
       state.search = (searchInput.value || '').toLowerCase();
+      // A new query re-decides which rule lists open (rule-code hits auto-expand).
+      expandedPacks.clear();
       applyFilters();
     });
   }
@@ -260,7 +269,7 @@ const SCRIPT_FILTER_APPLY = `
           if (show && matchedRuleOnly) {
             detail.hidden = false;
             if (toggle) { toggle.setAttribute('aria-expanded', 'true'); toggle.classList.add('open'); }
-          } else if (state.search) {
+          } else if (state.search && !expandedPacks.has(pack)) {
             detail.hidden = true;
             if (toggle) { toggle.setAttribute('aria-expanded', 'false'); toggle.classList.remove('open'); }
           }
@@ -291,6 +300,7 @@ const SCRIPT_FILTER_APPLY = `
     renderMatchCount(grandVisible, grandRuleMatches);
     highlightRuleLinks();
     renderRuleFinder();
+    persistPackView();
   }
 
   // Per-table empty state: each pack table shows its own "no matches" row so a
@@ -314,13 +324,21 @@ const SCRIPT_FILTER_APPLY = `
   }
 
   function resetFilters() {
-    state.search = '';
+    clearFilters(false);
+  }
+
+  // keepSearch: drop every filter except the text search — used when a finder link targets
+  // a pack that the type / detected / enabled / KPI / chart filters currently hide.
+  function clearFilters(keepSearch) {
+    if (!keepSearch) {
+      state.search = '';
+      if (searchInput) searchInput.value = '';
+    }
     state.type = 'all';
     state.detectedOnly = false;
     state.enabledOnly = false;
     state.barPack = null;
     state.kpi = null;
-    if (searchInput) searchInput.value = '';
     if (typeSelect) typeSelect.value = 'all';
     document.querySelectorAll('.seg-btn[data-toggle-filter]').forEach(function(b) {
       b.setAttribute('aria-pressed', 'false');
@@ -445,6 +463,7 @@ const SCRIPT_SORT = `
           ? (state.sortDir === 'asc' ? 'ascending' : 'descending')
           : 'none');
     });
+    persistPackView();
   }
 `;
 
@@ -556,21 +575,48 @@ const SCRIPT_FIND = `
     });
   }
 
-  // Open a pack wherever it lives (detected table or a collapsed domain group),
-  // expand its rule list, and scroll it into view.
+  function packRows(packId) {
+    return Array.from(document.querySelectorAll('tr[data-pack="' + cssEscape(packId) + '"]'));
+  }
+
+  // Open a pack row's rule list (detail row is looked up in the row's own table so a pack
+  // listed in both tables expands the right copy).
+  function expandPackRules(row, packId) {
+    const scope = row.parentNode || document;
+    const detail = scope.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(packId) + '"]');
+    const toggle = row.querySelector('button.rules-toggle');
+    if (detail && row.style.display !== 'none') { detail.hidden = false; detail.style.display = ''; }
+    if (toggle) { toggle.setAttribute('aria-expanded', 'true'); toggle.classList.add('open'); }
+  }
+
+  // Open a pack wherever it lives (detected table or a collapsed domain group), expand its
+  // rule list, scroll it into view, flash it, and put keyboard focus on its on/off toggle.
   function focusPack(packId) {
-    const row = document.querySelector('tr[data-pack="' + cssEscape(packId) + '"]');
-    if (!row) return;
+    let rows = packRows(packId);
+    if (rows.length === 0) return;
+    // The finder lists packs by search match only, so the pack can be hidden by another
+    // active filter (type, Detected/Enabled, KPI, chart). Drop those, keep the search.
+    const isShown = function(r) { return r.style.display !== 'none'; };
+    if (!rows.some(isShown)) {
+      clearFilters(true);
+      rows = packRows(packId);
+    }
+    const row = rows.find(isShown) || rows[0];
     let node = row.parentNode;
     while (node && node !== document) {
       if (node.tagName === 'DETAILS') node.open = true;
       node = node.parentNode;
     }
-    const detail = document.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(packId) + '"]');
-    const toggle = row.querySelector('button.rules-toggle');
-    if (detail) { detail.hidden = false; detail.style.display = ''; }
-    if (toggle) { toggle.setAttribute('aria-expanded', 'true'); toggle.classList.add('open'); }
+    expandedPacks.add(packId);
+    expandPackRules(row, packId);
+    persistPackView();
     row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.classList.add('pack-flash');
+    setTimeout(function() { row.classList.remove('pack-flash'); }, 1600);
+    const toggleInput = row.querySelector('input[type=checkbox][data-pack]');
+    if (toggleInput) {
+      try { toggleInput.focus({ preventScroll: true }); } catch (_) { toggleInput.focus(); }
+    }
   }
 
   const RULE_FINDER_CAP = 60;
@@ -623,6 +669,97 @@ const SCRIPT_FIND = `
         focusPack(a.getAttribute('data-pack'));
       });
     });
+  }
+`;
+
+/**
+ * Rule packs view state that must survive a host rebuild (`webview.html` reassignment).
+ *
+ * Bug fix (v16.4.1): a background refresh — diagnostics tick, config save, rule-count
+ * arrival — replaced the whole document and reset the pack search, the client-rendered
+ * "Matching rules" finder, filters, sort, opened rule lists and scroll position. The host's
+ * focus guard only covered the moment the search box itself had focus, so clicking a finder
+ * link (which blurs the box) released the queued rebuild and wiped everything. Stored in
+ * `vscode.setState` under `packView` (the same state object the tab bar uses), which
+ * outlives `webview.html` reassignment for the life of the panel.
+ */
+const SCRIPT_VIEW_PERSIST = `
+  function persistPackView() {
+    let saved;
+    saved = vscode.getState() || {};
+    const prev = saved.packView || {};
+    saved.packView = {
+      search: searchInput ? (searchInput.value || '') : '',
+      type: state.type,
+      detectedOnly: state.detectedOnly,
+      enabledOnly: state.enabledOnly,
+      kpi: state.kpi,
+      barPack: state.barPack,
+      sortKey: state.sortKey,
+      sortDir: state.sortDir,
+      expanded: Array.from(expandedPacks),
+      scrollY: typeof prev.scrollY === 'number' ? prev.scrollY : 0,
+    };
+    vscode.setState(saved);
+  }
+
+  function wireScrollPersistence() {
+    let timer = null;
+    window.addEventListener('scroll', function() {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(function() {
+        timer = null;
+        const saved = vscode.getState() || {};
+        if (!saved.packView) return;
+        saved.packView.scrollY = window.scrollY;
+        vscode.setState(saved);
+      }, 150);
+    }, { passive: true });
+  }
+
+  // Apply the saved view to state + controls. Returns the saved record (or null) so init
+  // can restore scroll after the rows are filtered.
+  function restorePackView() {
+    const saved = (vscode.getState() || {}).packView;
+    if (!saved) return null;
+    if (searchInput && typeof saved.search === 'string') {
+      searchInput.value = saved.search;
+      state.search = saved.search.toLowerCase();
+    }
+    if (typeSelect && typeof saved.type === 'string' &&
+        Array.from(typeSelect.options).some(function(o) { return o.value === saved.type; })) {
+      typeSelect.value = saved.type;
+      state.type = saved.type;
+    }
+    state.detectedOnly = saved.detectedOnly === true;
+    state.enabledOnly = saved.enabledOnly === true;
+    document.querySelectorAll('.seg-btn[data-toggle-filter]').forEach(function(b) {
+      const key = b.getAttribute('data-toggle-filter');
+      const on = key === 'detected' ? state.detectedOnly : key === 'enabled' ? state.enabledOnly : false;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if (typeof saved.kpi === 'string') {
+      const card = document.querySelector('.kpi-card.interactive[data-kpi-filter="' + cssEscape(saved.kpi) + '"]');
+      if (card) { state.kpi = saved.kpi; card.classList.add('active'); }
+    }
+    if (typeof saved.barPack === 'string') {
+      const targets = document.querySelectorAll('[data-bar-pack="' + cssEscape(saved.barPack) + '"]');
+      if (targets.length > 0) {
+        state.barPack = saved.barPack;
+        targets.forEach(function(el) { el.classList.add('active'); });
+        const donut = document.querySelector('.donut');
+        if (donut) donut.setAttribute('data-has-active', '1');
+      }
+    }
+    if (typeof saved.sortKey === 'string' &&
+        document.querySelector('th.sortable[data-sort="' + cssEscape(saved.sortKey) + '"]')) {
+      state.sortKey = saved.sortKey;
+      state.sortDir = saved.sortDir === 'desc' ? 'desc' : 'asc';
+    }
+    if (Array.isArray(saved.expanded)) {
+      saved.expanded.forEach(function(id) { if (typeof id === 'string') expandedPacks.add(id); });
+    }
+    return saved;
   }
 `;
 
@@ -1159,15 +1296,27 @@ const SCRIPT_SECTION_STATE = `
  */
 const SCRIPT_REFRESH_PENDING_INDICATOR = `
   window.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'refreshPending') {
-      var el = document.getElementById('refresh-pending-indicator');
-      if (el) el.hidden = false;
-    }
+    var type = event.data && event.data.type;
+    var el = document.getElementById('refresh-pending-indicator');
+    if (!el) return;
+    if (type === 'refreshPending') el.hidden = false;
+    // The deferred refresh turned out to be a no-op (identical page) — nothing is pending.
+    else if (type === 'refreshSkipped') el.hidden = true;
   });
 `;
 
 const SCRIPT_INIT = `
+  const restoredView = restorePackView();
   applySort();
   applyFilters();
+  // Re-open rule lists the user had opened before the rebuild. Runs after applyFilters so
+  // row visibility is settled (a hidden row's rules stay hidden).
+  expandedPacks.forEach(function(packId) {
+    packRows(packId).forEach(function(row) { expandPackRules(row, packId); });
+  });
+  if (restoredView && typeof restoredView.scrollY === 'number') {
+    window.scrollTo(0, restoredView.scrollY);
+  }
+  wireScrollPersistence();
 })();
 `;

@@ -429,6 +429,27 @@ export function buildConfigSnippetYaml(tier: string, enabledPackIds: readonly st
   ].join('\n');
 }
 
+/**
+ * Replace every CSP nonce in a built page with a fixed token. The nonce is regenerated on
+ * every build, so without masking two otherwise identical pages would never compare equal.
+ * Exported for tests.
+ */
+export function maskCspNonce(html: string): string {
+  return html.replaceAll(/nonce(-|=")[A-Za-z0-9]+/g, 'nonce$1_');
+}
+
+/**
+ * Client messages that report UI state rather than asking for a change. They never invalidate
+ * the no-op-rebuild signature (see `_lastHtmlSignature`).
+ */
+const PASSIVE_DASHBOARD_MESSAGES: ReadonlySet<string> = new Set([
+  'uiFocus',
+  'uiBlur',
+  'sectionToggled',
+  'setActiveTab',
+  'explainRule',
+]);
+
 /** Per-workspace storage key for `<details>` open/closed state — see `_sectionOpenState`. */
 const SECTION_STATE_STORAGE_KEY = 'saropa.configDashboard.sectionState';
 
@@ -465,6 +486,13 @@ export class RulePacksWebviewProvider {
   // the field so no update is permanently lost — just delayed until it is safe to redraw.
   private _userInteracting = false;
   private _refreshPending = false;
+  // Bug fix (v16.4.1 "constantly refreshing"): the focus guard above only defers while a text
+  // field has focus. The moment the user clicked a "Matching rules" link, a pack link, or just
+  // scrolled the list, the next diagnostics tick (~every 400ms during analysis) reassigned
+  // `webview.html` and wiped the client-rendered finder, the pack they had just revealed, and
+  // their scroll position — even though nothing on the page had changed. Remember the last
+  // HTML we assigned (with the per-build CSP nonce masked out) and skip identical rebuilds.
+  private _lastHtmlSignature: string | undefined;
   // Bug fix: `<details>` sections (packs accordions, disabled/shed/stylistic sections) reset to
   // their hardcoded default open/closed state on every rebuild because nothing read the user's
   // choice back before regenerating the HTML string. Persisted per-workspace using the same
@@ -555,6 +583,12 @@ export class RulePacksWebviewProvider {
         sectionId?: string;
         open?: boolean;
       }) => {
+        // Anything the user *did* (toggle, tier, write, command) must redraw even if the rebuilt
+        // HTML happens to match the last one — e.g. a pack toggle whose write failed has to snap
+        // the checkbox back. Only passive notifications may be skipped as no-op rebuilds.
+        if (!PASSIVE_DASHBOARD_MESSAGES.has(msg.type)) {
+          this._lastHtmlSignature = undefined;
+        }
         // The user entered/left an editable control (search box, text field). While focused,
         // `refresh()` queues instead of rebuilding; on blur, replay any queued refresh so
         // nothing requested while they were typing is silently dropped.
@@ -696,6 +730,8 @@ export class RulePacksWebviewProvider {
       // dashboard stays blank. Reset both flags on dispose so a reopen always starts clean.
       this._userInteracting = false;
       this._refreshPending = false;
+      // The next panel is a fresh webview with no DOM — it must get a full first render.
+      this._lastHtmlSignature = undefined;
     });
 
     this._loadRuleCounts();
@@ -743,7 +779,16 @@ export class RulePacksWebviewProvider {
       void webview.postMessage({ type: 'refreshPending' });
       return;
     }
-    webview.html = this._buildHtml();
+    const html = this._buildHtml();
+    const signature = maskCspNonce(html);
+    if (signature === this._lastHtmlSignature) {
+      // Nothing changed — keep the live DOM (search, finder, scroll, expanded rows). Clear the
+      // "Update pending" hint a deferred refresh may have shown; there is nothing to apply.
+      void webview.postMessage({ type: 'refreshSkipped' });
+      return;
+    }
+    this._lastHtmlSignature = signature;
+    webview.html = html;
   }
 
   /**

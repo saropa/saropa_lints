@@ -56,7 +56,8 @@ export class SaropaLspClient implements vscode.Disposable {
   private _client: LanguageClient | undefined;
 
   /** Dedicated output channel for server logs and lifecycle messages. */
-  private readonly _outputChannel: vscode.OutputChannel;
+  // A log channel: vscode-languageclient 10's `outputChannel` option requires one.
+  private readonly _outputChannel: vscode.LogOutputChannel;
 
   /** Subscriptions pushed during start(); cleared on stop(). */
   private readonly _disposables: vscode.Disposable[] = [];
@@ -88,7 +89,7 @@ export class SaropaLspClient implements vscode.Disposable {
   ) {
     // Create the output channel once — it survives stop/start cycles so
     // the user doesn't lose earlier log lines when the server restarts.
-    this._outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
+    this._outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME, { log: true });
 
     // Register for VS Code deactivation teardown exactly once per instance,
     // so the spawned dart process is stopped even if dispose() is never

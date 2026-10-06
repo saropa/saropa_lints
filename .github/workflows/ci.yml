@@ -206,7 +206,7 @@ jobs:
   # Scoping choices, since auditing every rule against the whole repo on
   # every PR could be slow:
   # `mode: gate` resolves to the `scan` command, which is what makes this
-  # dogfooding rather than theatre:
+  # dogfooding rather than theater:
   #   - scan honors this repo's own analysis_options.yaml, so the job runs
   #     the rule set the project actually configures — the thing the analyze
   #     job strips away.

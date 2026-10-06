@@ -89,7 +89,7 @@ def _collect_union_keys() -> dict[str, str]:
 
 # Any quoted / backtick string (no interpolation) shaped like a dotted key.
 # Catches keys held as plain data (`titleKey: 'x.y'`, `const K = 'x.y'`,
-# tables serialised into webview scripts) that never sit inside l10n('...').
+# tables serialized into webview scripts) that never sit inside l10n('...').
 _DOTTED_STRING_RE = re.compile(r"""['"`]([a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+)['"`]""")
 
 # `const s = 'commandCatalog.script';` — a file-local key-prefix constant.

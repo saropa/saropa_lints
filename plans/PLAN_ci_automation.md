@@ -162,7 +162,7 @@ wired (below), show default-branch state as the authoritative value.
 
 ### OFF should write `if: false`, not delete
 
-Not for safety — for edit preservation. A team that customised the generated workflow loses that
+Not for safety — for edit preservation. A team that customized the generated workflow loses that
 work on a delete/regenerate cycle. `if: false` is a one-line reversible diff that keeps their edits
 intact. Deletion stays available as an explicit "Remove" action, distinct from the toggle.
 
