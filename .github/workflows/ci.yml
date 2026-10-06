@@ -185,9 +185,8 @@ jobs:
   # `recommended` is the tier the README points consumers at, so self-linting
   # at the same level is the honest comparison.
   #
-  # This job CANNOT fail, by construction: `continue-on-error` on the step
-  # itself (not just the job) means the action's exit code never fails the
-  # job, whatever it finds. That is deliberate and it is not the vibrancy
+  # Findings CANNOT fail this job, by construction: `continue-on-error` on the
+  # step means the action's verdict on findings never fails the job. That is deliberate and it is not the vibrancy
   # generator's mistake repeated — that workflow claimed to gate and silently
   # did not. This one states plainly that it reports and never gates, and the
   # full findings are in the log for anyone who opens it.
@@ -222,9 +221,11 @@ jobs:
   # validation. scan's default fast syntactic parse makes a whole-repo run
   # affordable without it.
   #
-  # Non-blocking by `continue-on-error: true` alone, since gate mode DOES
-  # fail on findings by design. That is intentional: the job reports, the
-  # job never blocks.
+  # Non-blocking on findings by the step's `continue-on-error: true`, since
+  # gate mode DOES fail on findings by design. But "reports, never blocks" must
+  # not become "always green": exit 2 means nothing was analysed (a renamed
+  # CLI flag, a broken action), and the step after it fails the job for that.
+  # This job is the only thing that runs the action on ordinary pull requests.
   #
   # To turn these findings into inline PR annotations instead of log output,
   # set mode: annotate with upload-sarif: true and add
@@ -233,7 +234,6 @@ jobs:
   # this repository's Security tab rather than a default worth assuming.
   self-lint:
     runs-on: ubuntu-latest
-    continue-on-error: true
     # Skip the redundant main-push run on release commits; see the analyze job.
     if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
     steps:
@@ -246,6 +246,7 @@ jobs:
         with:
           sdk: '3.10.8'
       - name: Run saropa_lints on itself
+        id: selflint
         # On the step, so a finding can never fail the job. See above.
         continue-on-error: true
         uses: ./
@@ -254,6 +255,14 @@ jobs:
           tier: recommended
           min-severity: warning
           exclude-globs: '**/test/**,**/example/**,**/example_packages/**'
+      - name: Fail if saropa_lints could not run
+        env:
+          CODE: ${{ steps.selflint.outputs.exit-code }}
+        run: |
+          case "$CODE" in
+            0|1) echo "saropa_lints ran (exit $CODE); findings are reported above, not gated." ;;
+            *) echo "::error::saropa_lints did not analyse this repository (exit '${CODE}'). See the step above."; exit 1 ;;
+          esac
 
   extension-manifest-nls:
     runs-on: ubuntu-latest

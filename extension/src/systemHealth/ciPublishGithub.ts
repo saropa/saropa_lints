@@ -1,7 +1,7 @@
-import * as https from 'https';
 import * as vscode from 'vscode';
 
 import type { CiPublishPlan } from './ciPublish';
+import { postJson, pullRequestCall } from './ciPublishHttp';
 
 /**
  * Opens the pull request for a pushed CI change.
@@ -45,52 +45,6 @@ export async function getGitHubSession(
   }
 }
 
-/** Minimal POST to the GitHub REST API. Resolves undefined on any non-2xx or transport error. */
-function postJson(
-  path: string,
-  token: string,
-  payload: unknown,
-): Promise<Record<string, unknown> | undefined> {
-  return new Promise((resolve) => {
-    const body = JSON.stringify(payload);
-    const req = https.request(
-      {
-        hostname: 'api.github.com',
-        path,
-        method: 'POST',
-        headers: {
-          Accept: 'application/vnd.github+json',
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body),
-          // GitHub rejects API requests without one.
-          'User-Agent': 'saropa-lints-vscode',
-          'X-GitHub-Api-Version': '2022-11-28',
-        },
-      },
-      (res) => {
-        const chunks: Buffer[] = [];
-        res.on('data', (c: Buffer) => chunks.push(c));
-        res.on('end', () => {
-          const status = res.statusCode ?? 0;
-          if (status < 200 || status >= 300) {
-            resolve(undefined);
-            return;
-          }
-          try {
-            resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')) as Record<string, unknown>);
-          } catch {
-            resolve(undefined);
-          }
-        });
-      },
-    );
-    req.on('error', () => resolve(undefined));
-    req.write(body);
-    req.end();
-  });
-}
-
 /**
  * Creates the pull request and returns its URL, or undefined if anything at
  * all went wrong — no session, no GitHub remote, API refusal, network error.
@@ -99,21 +53,13 @@ function postJson(
  * those cases lands the user one click from the same outcome.
  */
 export async function createPullRequest(plan: CiPublishPlan): Promise<string | undefined> {
-  if (!plan.slug) return undefined;
+  const call = pullRequestCall(plan);
+  if (!call) return undefined;
 
   const session = await getGitHubSession(true);
   if (!session) return undefined;
 
-  const response = await postJson(
-    `/repos/${plan.slug.owner}/${plan.slug.repo}/pulls`,
-    session.accessToken,
-    {
-      title: plan.prTitle,
-      body: plan.prBody,
-      head: plan.branch,
-      base: plan.baseBranch,
-    },
-  );
+  const response = await postJson(call.path, session.accessToken, call.payload);
 
   const url = response?.['html_url'];
   return typeof url === 'string' ? url : undefined;

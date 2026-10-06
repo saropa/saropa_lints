@@ -25,8 +25,7 @@ import 'package:saropa_lints/saropa_lints.dart'
     show getAllDefinedRules, saropaLintsVersion;
 import 'package:saropa_lints/scan.dart';
 import 'package:saropa_lints/src/config/rule_lane.dart' show RuleLane;
-import 'package:saropa_lints/src/native/saropa_context.dart'
-    show SaropaContext;
+import 'package:saropa_lints/src/native/saropa_context.dart' show SaropaContext;
 import 'package:saropa_lints/src/report/timing_emitter.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart'
     show RuleTimingTracker, SuppressionKind, SuppressionTracker;
@@ -148,8 +147,9 @@ Future<void> main(List<String> args) async {
   var filtered = diagnostics;
   if (parsed.minSeverity != null) {
     final threshold = _severityRank(parsed.minSeverity!);
-    filtered =
-        filtered.where((d) => _severityRank(d.severity) >= threshold).toList();
+    filtered = filtered
+        .where((d) => _severityRank(d.severity) >= threshold)
+        .toList();
   }
   if (parsed.minImpact != null) {
     final threshold = _impactRank(parsed.minImpact!);
@@ -206,11 +206,15 @@ Future<void> main(List<String> args) async {
 
   // Baseline diffing: compare current diagnostics against the saved baseline
   // and tag each diagnostic with `baselineStatus` (new / unchanged).
+  //
+  // When a baseline is loaded, only NEW findings decide the exit code — the
+  // point of a baseline in CI is to accept the known backlog and fail on
+  // regressions. Same contract as `cross_file --baseline` and
+  // `project_health --baseline`. With no baseline file this stays null and
+  // every finding counts, so a mistyped path cannot quietly pass a gate.
+  int? newSinceBaseline;
   if (parsed.useBaseline) {
-    final baseline = loadBaseline(
-      path,
-      overridePath: parsed.baselinePath,
-    );
+    final baseline = loadBaseline(path, overridePath: parsed.baselinePath);
     if (baseline == null) {
       stderr.writeln(
         'Warning: no baseline found at '
@@ -222,6 +226,7 @@ Future<void> main(List<String> args) async {
       final diagMaps = (json['diagnostics'] as List<dynamic>)
           .cast<Map<String, dynamic>>();
       final diff = diffAgainstBaseline(diagMaps, baseline);
+      newSinceBaseline = diff.newCount;
 
       // Add baseline summary to the JSON output.
       json['baseline'] = {
@@ -297,8 +302,22 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  // Exit 0 for clean audit, 1 when diagnostics were found.
-  exit(filtered.isEmpty ? 0 : 1);
+  // Exit 0 for clean audit, 1 when diagnostics were found — or, with a loaded
+  // baseline, 1 only when some of them are new.
+  exit(
+    auditExitCode(
+      findings: filtered.length,
+      newSinceBaseline: newSinceBaseline,
+    ),
+  );
+}
+
+/// Exit code for an audit: 1 when there is something to act on, else 0.
+///
+/// [newSinceBaseline] is non-null only when a baseline was loaded; then only
+/// findings absent from it count.
+int auditExitCode({required int findings, int? newSinceBaseline}) {
+  return (newSinceBaseline ?? findings) == 0 ? 0 : 1;
 }
 
 // ── Arg parsing ──────────────────────────────────────────────────────
@@ -602,9 +621,12 @@ void _printUsage() {
   print('  --min-impact <i>      Post-filter: hide below this impact');
   print('                        (critical, high, medium, low, minimal)');
   print('  --exclude-globs <g>   Comma-separated glob patterns to skip');
-  print('  --include-globs <g>   Comma-separated glob patterns to force-include');
+  print(
+    '  --include-globs <g>   Comma-separated glob patterns to force-include',
+  );
   print('  --save-baseline       Save this audit as the project baseline');
-  print('  --baseline            Compare against the saved baseline');
+  print('  --baseline            Compare against the saved baseline; only new');
+  print('                        findings then make the exit code 1');
   print('  --baseline-path <p>   Override baseline file path');
   print('  --include-suppressed  Also include findings normally dropped by');
   print('                        // ignore:, // ignore_for_file:, or the');
@@ -625,7 +647,9 @@ void _printUsage() {
   print('  dart run saropa_lints audit /path/to/project --output report.json');
   print('  dart run saropa_lints audit . --since main');
   print('  dart run saropa_lints audit . --min-severity warning --quiet');
-  print('  dart run saropa_lints audit . --since main --format sarif '
-      '--output results.sarif');
+  print(
+    '  dart run saropa_lints audit . --since main --format sarif '
+    '--output results.sarif',
+  );
   print('  dart run saropa_lints audit . --include-suppressed');
 }
