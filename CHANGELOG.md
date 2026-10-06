@@ -65,9 +65,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 -->
 
 ---
-## [16.6.1] — Unreleased
+## [16.7.0]
 
-Test-suite repair, dependency security updates, and a linting fix. No change to rule behaviour or shipped output.
+Test-suite repair, dependency security updates, and a linting fix. No change to rule behavior or shipped output. [log](https://github.com/saropa/saropa_lints/blob/v16.7.0/CHANGELOG.md)
 
 ### Security (Extension)
 
@@ -198,6 +198,8 @@ The pub.dev package and the VS Code extension now share one version number and w
 - Section bounding for the line-based config readers is now a single directly tested helper, adopted by all three readers.
 - The Flutter SDK contract lookup behind `avoid_public_members_in_states` is computed on demand, so a `State` class with no public overridden members no longer pays for element resolution and a supertype walk.
 - `avoid_string_substring` now documents that it cannot prove bounds established inside a helper function it would have to inline; suppress with `// ignore:` at the call site when the helper is bounds-safe. No action required.
+
+---
 
 ## [16.3.0]
 

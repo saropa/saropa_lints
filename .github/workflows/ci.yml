@@ -223,7 +223,7 @@ jobs:
   #
   # Non-blocking on findings by the step's `continue-on-error: true`, since
   # gate mode DOES fail on findings by design. But "reports, never blocks" must
-  # not become "always green": exit 2 means nothing was analysed (a renamed
+  # not become "always green": exit 2 means nothing was analyzed (a renamed
   # CLI flag, a broken action), and the step after it fails the job for that.
   # This job is the only thing that runs the action on ordinary pull requests.
   #
@@ -261,7 +261,7 @@ jobs:
         run: |
           case "$CODE" in
             0|1) echo "saropa_lints ran (exit $CODE); findings are reported above, not gated." ;;
-            *) echo "::error::saropa_lints did not analyse this repository (exit '${CODE}'). See the step above."; exit 1 ;;
+            *) echo "::error::saropa_lints did not analyze this repository (exit '${CODE}'). See the step above."; exit 1 ;;
           esac
 
   extension-manifest-nls:

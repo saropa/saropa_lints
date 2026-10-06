@@ -468,7 +468,7 @@ class TestEvaluateResult(ActionHarness):
         self.assertNotEqual(self.evaluate("both", "1").returncode, 0)
 
     def test_exit_2_fails_every_mode(self) -> None:
-        # Exit 2 means nothing was analysed; green would claim otherwise.
+        # Exit 2 means nothing was analyzed; green would claim otherwise.
         for mode in ("annotate", "gate", "both"):
             self.assertNotEqual(self.evaluate(mode, "2").returncode, 0, mode)
 
