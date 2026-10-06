@@ -33,5 +33,42 @@ class DottedStringTests(unittest.TestCase):
         self.assertEqual(_mod._DOTTED_STRING_RE.findall("x = 'plain'"), [])
 
 
+class KeyUnionRegexTests(unittest.TestCase):
+    def _members(self, text):
+        out = []
+        for m in _mod._KEY_UNION_RE.finditer(text):
+            out += _mod._UNION_MEMBER_RE.findall(m.group(1))
+        return out
+
+    def test_single_member(self):
+        self.assertEqual(self._members("type AKey = 'a.b';"), ["a.b"])
+
+    def test_multi_member(self):
+        self.assertEqual(
+            self._members("type AKey = 'a.b' | \"c.d.e\" | 'f.g';"),
+            ["a.b", "c.d.e", "f.g"])
+
+    def test_leading_pipe(self):
+        self.assertEqual(self._members("type AKey =\n  | 'a.b'\n  | 'c.d';"),
+                         ["a.b", "c.d"])
+
+    def test_multiline(self):
+        self.assertEqual(
+            self._members("type XKey =\n  'a.b'\n  | 'c.d'\n  ;"),
+            ["a.b", "c.d"])
+
+    def test_non_matching(self):
+        self.assertEqual(self._members("type AKey = 'plain';"), [])
+        self.assertEqual(self._members("type A = 'a.b';"), [])
+        self.assertEqual(self._members("type AKey = 'a.b' | string;"), [])
+
+    def test_pathological_input_is_fast(self):
+        import time
+        text = 'type Key="0.0"' + '\t"0.0"' * 5000
+        start = time.perf_counter()
+        self.assertEqual(self._members(text), [])
+        self.assertLess(time.perf_counter() - start, 1.0)
+
+
 if __name__ == "__main__":
     unittest.main()
