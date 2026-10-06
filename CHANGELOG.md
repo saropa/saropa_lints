@@ -65,6 +65,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 -->
 
 ---
+## [16.6.1] — Unreleased
+
+Test-suite repair only; no change to rule behaviour or shipped output.
+
+### Internal
+
+- Restored the scripts package markers and the cross-file, structure and example fixture sources that an earlier bulk commit deleted, which had made the CI `test` job fail.
+- Health history no longer labels a point with the wrong tag when two tags (such as `v16` and `v16.6.0`) share a commit.
+
 ## [16.6.0]
 
 Minor release adding a new essential-tier rule that catches an unguarded `dart:developer`
