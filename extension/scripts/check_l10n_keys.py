@@ -61,8 +61,12 @@ _FIXTURE_FILES = frozenset({"extension/src/test/l10nParsers.test.ts"})
 # members are all dotted string literals is treated as a declaration of
 # dynamically-referenced keys; each member counts as used (so the dead-key
 # warning skips it) and is also validated against en.json.
+# Built from one literal pattern so members are separated only by an explicit
+# `|` (unambiguous: no optional-pipe + `\s*` overlap, so no ReDoS backtracking).
+_KEY_LITERAL = r"""['"][a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)+['"]"""
 _KEY_UNION_RE = re.compile(
-    r"type\s+\w*Key\s*=\s*((?:\|?\s*['\"][a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)+['\"]\s*)+);"
+    r"type\s+\w*Key\s*=\s*((?:\|\s*)?" + _KEY_LITERAL
+    + r"(?:\s*\|\s*" + _KEY_LITERAL + r")*)\s*;"
 )
 _UNION_MEMBER_RE = re.compile(r"""['"]([a-zA-Z0-9_.]+)['"]""")
 
