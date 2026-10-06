@@ -48895,8 +48895,8 @@
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
       },
-      "correction": "Add NSxxxUsageDescription key to Info.plist for each permission.",
-      "problemMessage": "[require_permission_plist_ios] iOS requires usage descriptions in Info.plist. App crashes or gets rejected from App Store without them. {v3}",
+      "correction": "Add the usage-description key this permission needs (for example NSCameraUsageDescription for Permission.camera) to ios/Runner/Info.plist.",
+      "problemMessage": "[require_permission_plist_ios] iOS requires usage descriptions in Info.plist. App crashes or gets rejected from App Store without them. {v5}",
       "impact": "error",
       "owasp": {
         "mobile": [],
