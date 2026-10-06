@@ -67,7 +67,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ---
 ## [16.6.1] — Unreleased
 
-Test-suite repair only; no change to rule behaviour or shipped output.
+Test-suite repair, dependency security updates, and a linting fix. No change to rule behaviour or shipped output.
+
+### Security (Extension)
+
+- Dependency bumps: undici 8.10.0 → 8.11.2 (clears 8 Dependabot alerts); brace-expansion 5.0.9 → 5.0.12 and source-map-js 1.2.1 → 1.2.2 (clears 4 alerts).
+
+### Fixed
+
+- `extension/scripts/check_l10n_keys.py` key-union regex rewritten to eliminate exponential backtracking (ReDoS vulnerability, code-scanning alert 23). No action required.
+- `avoid_string_substring` now documents that it cannot prove bounds established inside a helper function it would have to inline; suppress with `// ignore:` at the call site when the helper is bounds-safe. No action required.
 
 ### Internal
 
