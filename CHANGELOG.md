@@ -72,6 +72,7 @@ Test-suite repair, dependency security updates, and a linting fix. No change to 
 ### Security (Extension)
 
 - Dependency bumps: undici 8.10.0 → 8.11.2 (clears 8 Dependabot alerts); brace-expansion 5.0.9 → 5.0.12 and source-map-js 1.2.1 → 1.2.2 (clears 4 alerts).
+- Dependency bump: shell-quote 1.10.0 → 1.12.0 (clears critical command-injection Dependabot alert 33, fixed in 1.11.0; dev-tooling only via npm-run-all2).
 
 ### Fixed
 
