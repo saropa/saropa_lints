@@ -65,6 +65,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 -->
 
 ---
+
+## [Unreleased]
+
+---
+
 ## [16.6.0]
 
 Minor release adding a new essential-tier rule that catches an unguarded `dart:developer`
