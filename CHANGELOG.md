@@ -65,9 +65,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 -->
 
 ---
-## [16.7.0]
 
-Test-suite repair, dependency security updates, and a linting fix. No change to rule behavior or shipped output. [log](https://github.com/saropa/saropa_lints/blob/v16.7.0/CHANGELOG.md)
+## [16.8.0]
+
+Test-suite repair, dependency security updates, and a linting fix. No change to rule behavior or shipped output. [log](https://github.com/saropa/saropa_lints/blob/v16.8.0/CHANGELOG.md)
 
 ### Security (Extension)
 
@@ -98,6 +99,13 @@ Test-suite repair, dependency security updates, and a linting fix. No change to 
 - Health history no longer labels a point with the wrong tag when two tags (such as `v16` and `v16.6.0`) share a commit.
 
 ---
+
+## [16.7.0]
+
+**Skipped release - use 16.8.0**
+
+---
+
 ## [16.6.0]
 
 Minor release adding a new essential-tier rule that catches an unguarded `dart:developer`

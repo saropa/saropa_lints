@@ -79,6 +79,46 @@ _PRERELEASE_CHANNEL_BAND = 1000
 _PRERELEASE_ITERATION_RE = _re.compile(r"(\d+)\s*$")
 
 
+def suggest_even_minor_stable(version: str) -> str:
+    """Return *version* with an odd minor bumped to the next even minor.
+
+    ``16.7.0`` -> ``16.8.0``. Even-minor and prerelease versions are
+    returned unchanged.
+    """
+    if is_prerelease_version(version):
+        return version
+    major, minor, _patch = version.split(".")
+    if int(minor) % 2 == 0:
+        return version
+    return f"{major}.{int(minor) + 1}.0"
+
+
+def stable_version_error(version: str) -> str | None:
+    """Return an error message if *version* is an unsafe stable release.
+
+    Stable versions with an ODD minor are refused: ``extension_version_for``
+    treats odd minors as already-converted prerelease values and leaves them
+    unchanged, so e.g. 16.7.0 would publish as extension 16.7.0 -- lower than
+    an already-published 16.8.0. Prerelease versions (any minor) are allowed.
+    Returns None when the version is acceptable. Does not affect
+    ``extension_version_for`` idempotency (validation only).
+    """
+    if is_prerelease_version(version):
+        return None
+    parts = version.split(".")
+    if len(parts) != 3 or not parts[1].isdigit():
+        return None  # format errors are reported by the regex check
+    if int(parts[1]) % 2 == 0:
+        return None
+    return (
+        "Stable versions must have an even minor (e.g. "
+        f"{parts[0]}.{int(parts[1]) + 1}.0) because the extension maps odd "
+        "minors to pre-release; odd-minor stable would produce an extension "
+        "version lower than an already-published one. "
+        f"Use {suggest_even_minor_stable(version)}."
+    )
+
+
 def extension_version_for(version: str) -> str:
     """Return the extension/package.json version to publish for *version*.
 

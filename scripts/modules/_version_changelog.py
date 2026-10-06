@@ -27,6 +27,8 @@ from scripts.modules._utils import (
     print_info,
     print_success,
     print_warning,
+    stable_version_error,
+    suggest_even_minor_stable,
 )
 from scripts.modules._git_ops import tag_exists_on_remote
 
@@ -683,7 +685,13 @@ def prompt_version_until_valid(default_version: str) -> str:
     while True:
         version = prompt_version(default_version)
         if re.match(rf"^{_VERSION_RE}$", version):
-            return version
+            # Refuse before any file/git change (caller mutates afterwards).
+            error = stable_version_error(version)
+            if error is None:
+                return version
+            print_warning(error)
+            default_version = suggest_even_minor_stable(version)
+            continue
         print_warning(
             f"Invalid version format '{version}'. "
             f"Use X.Y.Z or X.Y.Z-pre.N"
@@ -707,6 +715,7 @@ def prompt_version_with_prerelease_toggle(default_version: str) -> str:
     if "-" in default_version:
         return prompt_version_until_valid(default_version)
 
+    stable_default = suggest_even_minor_stable(default_version)
     try:
         answer = input(
             f"  Publish {default_version} as a pre-release (beta)? [y/N]: "
@@ -715,6 +724,9 @@ def prompt_version_with_prerelease_toggle(default_version: str) -> str:
         answer = ""
     if answer in ("y", "yes"):
         default_version = f"{default_version}-beta.1"
+    else:
+        # Never propose an odd-minor stable (see stable_version_error).
+        default_version = stable_default
     return prompt_version_until_valid(default_version)
 
 
@@ -756,6 +768,10 @@ def apply_version_and_rename_unreleased(
                 Color.CYAN,
             )
             version_to_sync = prompt_version(suggested)
+            odd_error = stable_version_error(version_to_sync)
+            if odd_error:
+                print_warning(odd_error)
+                version_to_sync = suggest_even_minor_stable(version_to_sync)
             if not re.match(rf"^{_VERSION_RE}$", version_to_sync):
                 print_warning(
                     f"Invalid version format '{version_to_sync}'. "
