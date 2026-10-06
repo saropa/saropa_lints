@@ -65,10 +65,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 -->
 
 ---
+## [16.6.0]
 
-## [16.4.0] — Unreleased
+Minor release adding a new essential-tier rule that catches an unguarded `dart:developer`
+`debugger()` call before it can hang a test run. It also fixes the extension's CI switch for
+workflows whose jobs already carry their own conditions. [log](https://github.com/saropa/saropa_lints/blob/v16.6.0/CHANGELOG.md)
 
-Minor release adding a new essential-tier rule that catches an unguarded `dart:developer` `debugger()` call before it can hang a test run. It also fixes the extension's CI switch for workflows whose jobs already carry their own conditions.
+### Version Note
+
+The pub.dev package and the VS Code extension now share one version number and will match from here on; previously the extension's minor was shifted up by two, so package `16.2.1` reached the Marketplace as extension `16.4.1`. Stable releases now use even minors only, since VS Code reserves odd ones for pre-release builds — hence the jump from `16.2.2`.
 
 ### Added
 
@@ -99,14 +104,27 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 - `require_permission_plist_ios` now reads your `ios/Runner/Info.plist` and reports a permission request only when a usage-description key that permission needs is actually missing, so notification, critical-alert and Android-only permissions (which need no key on iOS) and permissions whose keys are already declared are no longer flagged. No action required, though you can remove any `// ignore:` comments you added for this rule.
 - `require_yield_after_db_write` and `suggest_yield_after_db_read` no longer fire in packages that do not depend on Flutter — their premise, protecting a UI thread, does not apply there. No action required.
 
+`google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on a nullable authorization result — the exact shape v7's scope-authorization call returns — so correctly migrated code is left alone. No action required.
+
+`prefer_late_final` no longer flags a `late` field whose assigning method is captured as a tear-off in a field initializer; the 16.2.1 fix covered only tear-offs written inside a method or constructor body, so taking the suggestion could still produce a late-initialization error at run time. No action required.
+
+`avoid_ignoring_return_values` now reads `safe_to_ignore:` only from its own section of `analysis_options_custom.yaml` instead of silently adopting a same-named list from an unrelated section further down the file. No action required unless a stray allowlist was being picked up, in which case move those names into the rule's own section.
+
+`banned_usage` now reads its banned-identifier list only from its own section of `analysis_options_custom.yaml`, instead of adopting a same-named list from an unrelated section further down the file or appending that section's items to its own. No action required unless stray bans were being picked up, in which case move those identifiers into the rule's own section.
+
+`always_specify_parameter_names` now reads its allowlist only from its own section of `analysis_options_custom.yaml`, with the same fix for adopted and appended entries. No action required unless a stray allowlist was being picked up, in which case move those entries into the rule's own section.
+
 ### Added (Extension)
 
 - The extension now checks the Dart analysis server's memory cap against this machine's RAM at startup and, when there is no cap or it leaves less than half the RAM for everything else, explains the trade-off and offers a recommended value in one click. Click Apply, or choose Don't ask again to keep your setting.
-- Package Vibrancy now shows a separate "Upgrade Required" status for packages that are alive but where your installed old major version is known to be broken, instead of labelling them "End of Life"; "End of Life" now means only that the package itself is dead. No action required.
+- Package Vibrancy now shows a separate "Upgrade Required" status for packages that are alive but where your installed old major version is known to be broken, instead of labeling them "End of Life"; "End of Life" now means only that the package itself is dead. No action required.
 - Package Vibrancy now checks what an upgrade would break before recommending it, and replaces the upgrade nudge with the reason when dependents cap the package below the new version or the new version needs a newer dependency than your Flutter SDK pins (for example `analyzer` 13, which needs a newer `meta` than Flutter stable ships) or needs a dependency that another package in your project caps (for example a `drift_dev` release that requires `analyzer` 13 while a dependency caps it below 13), naming the package responsible. Blocked packages are also skipped by "upgrade all", and the newest version you can still take is suggested. No action required.
 
 ### Fixed (Extension)
 
+- Manage Rule Packs no longer resets itself while the Dart analyzer is running. Your pack search, the Matching rules list, filters, sort order, opened rule lists and scroll position now stay put, and the page redraws only when something on it actually changed. No action required.
+- Clicking a pack name in Manage Rule Packs' Matching rules list now scrolls to that pack, highlights it, opens its rule list and puts focus on its on/off switch. If another filter (type, Detected, Enabled) was hiding the pack, that filter is cleared and your search is kept. No action required.
+- The rule detail panel now shows the rule's problem, how to fix it, impact, type and OWASP mapping when opened from Manage Rule Packs, a related-rule link or the Explain Rule command. Before, it showed only the rule name. No action required.
 - Turning a rule pack off in `analysis_options_custom.yaml` no longer deletes the blank line and the next top-level section (such as `platforms:`) after it. No action required.
 - Machine Health, Workspace Readiness, Set Analysis Server Heap Cap and Unload Ollama Model now appear in the command catalog. No action required.
 - The saropa_lints update prompt now appears at every startup while your project is behind, instead of only once per release even when the notification was missed. Choose Don't ask for this version to silence a release.
@@ -132,13 +150,20 @@ Minor release adding a new essential-tier rule that catches an unguarded `dart:d
 - `buildCiWorkflow`'s dartdoc had been merged into `ciNeedsExplicitTier`'s by a missing blank line, so `--emit-ci`'s workflow-generating function carried no documentation. Restored to the function it describes; no behavior change.
 - The CI card and `init --emit-ci` write identical workflow files again. Their header and comments had drifted apart.
 
+- The Config Dashboard now redraws as soon as you toggle a rule pack, enable a rule, or pick a dropdown value, instead of showing "Update pending" until you click somewhere else — only in-progress text entry defers a refresh now.
+
 ### Internal
 
+- The extension compiles again with `vscode-languageclient` 10: the LSP client's output channel is now a log channel, which that version requires.
+- The bundled rule catalog (`extension/media/rules_catalog.json`) and each rule's metadata in the `violations.json` export now include the rule's `problemMessage` and `impact`, taken from the same `LintCode` a live diagnostic uses. The catalog was regenerated.
 - Restored the state and problems index modules of Package Vibrancy, which an earlier cleanup deleted and which stopped the extension from compiling.
 - Added `scripts/pubdev_snapshot.py`, which downloads the latest pub.dev data for every tracked package into a reusable snapshot and refreshes the Package Vibrancy known-issues data from it; the analyzer entries now record why analyzer 13 and later is held back. It also flags packages that look revived or stale, and seven long-quiet packages moved to maintenance mode.
 - The localization key checker no longer crashes, ignores its test fixture, and recognizes keys referenced through key-type unions.
 - Test descriptions for the shared CI workflow fixture checks now state the expected behavior, satisfying `require_test_description_convention`.
 - `CHANGELOG_ARCHIVE.md` (11k+ lines) split into one file per major.minor line under `changelog/archive/` (e.g. `15.2.x.md`); the old file is now a short index. Every release entry is preserved (plus 10.12.0–12.2.1, recovered from git history where an earlier trim had deleted them without archiving) and stays greppable with `grep -r <term> changelog/archive/`. `scripts/split_changelog_archive.py` regenerates the split and index; `compact_changelog_archive.py` and the rule-version-history scan now read the directory, and `changelog/` is excluded from the pub.dev package.
+
+- Section bounding for the line-based config readers is now a single directly tested helper, adopted by all three readers.
+- The Flutter SDK contract lookup behind `avoid_public_members_in_states` is computed on demand, so a `State` class with no public overridden members no longer pays for element resolution and a supertype walk.
 
 ## [16.3.0]
 
@@ -160,33 +185,6 @@ A composite GitHub Action at the repository root runs saropa_lints against a pro
 
 - The Diagnostic Engines section of the System Health panel is no longer hidden when `saropaLints.debug.enabled` is off. These controls decide whether analysis runs at all, and one of them turns off a project's CI.
 - Package Vibrancy's "Generate CI Pipeline" produced workflows that always passed: thresholds were printed but never compared, and the generated checker was invoked in a way that never executed it. The generated workflow now compares against `maxOutdated` and fails the job when it is breached. Thresholds that `pub outdated` carries no data for are now stated as unenforceable rather than silently ignored.
-
----
-
-## [16.2.2] — Unreleased
-
-Patch release correcting follow-on defects in the rule and dashboard changes that shipped in 16.2.1, and fixing how several rules read their project configuration from `analysis_options_custom.yaml`. Two lint rules stopped short of the cases they were meant to cover, three rules could silently pick up settings written under an unrelated section of your config file, and the Config Dashboard could sit on a stale view after you flipped a toggle. [log](https://github.com/saropa/saropa_lints/blob/v16.2.2/CHANGELOG.md)
-
-### Fixed
-
-`google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on a nullable authorization result — the exact shape v7's scope-authorization call returns — so correctly migrated code is left alone. No action required.
-
-`prefer_late_final` no longer flags a `late` field whose assigning method is captured as a tear-off in a field initializer; the 16.2.1 fix covered only tear-offs written inside a method or constructor body, so taking the suggestion could still produce a late-initialization error at run time. No action required.
-
-`avoid_ignoring_return_values` now reads `safe_to_ignore:` only from its own section of `analysis_options_custom.yaml` instead of silently adopting a same-named list from an unrelated section further down the file. No action required unless a stray allowlist was being picked up, in which case move those names into the rule's own section.
-
-`banned_usage` now reads its banned-identifier list only from its own section of `analysis_options_custom.yaml`, instead of adopting a same-named list from an unrelated section further down the file or appending that section's items to its own. No action required unless stray bans were being picked up, in which case move those identifiers into the rule's own section.
-
-`always_specify_parameter_names` now reads its allowlist only from its own section of `analysis_options_custom.yaml`, with the same fix for adopted and appended entries. No action required unless a stray allowlist was being picked up, in which case move those entries into the rule's own section.
-
-### Fixed (Extension)
-
-- The Config Dashboard now redraws as soon as you toggle a rule pack, enable a rule, or pick a dropdown value, instead of showing "Update pending" until you click somewhere else — only in-progress text entry defers a refresh now.
-
-### Internal
-
-- Section bounding for the line-based config readers is now a single directly tested helper, adopted by all three readers.
-- The Flutter SDK contract lookup behind `avoid_public_members_in_states` is computed on demand, so a `State` class with no public overridden members no longer pays for element resolution and a supertype walk.
 
 ---
 

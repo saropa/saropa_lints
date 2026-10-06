@@ -140,9 +140,7 @@ void main() {
         test(
           'DOES flag when 3+ tests share setup and diverge only in the act step',
           () async {
-            final diags = await runRuleResolved(
-              PreferSetupTeardownRule(),
-              '''
+            final diags = await runRuleResolved(PreferSetupTeardownRule(), '''
 class _Repo {}
 class _Svc {
   _Svc(_Repo repo);
@@ -170,9 +168,7 @@ void run() {
     });
   });
 }
-''',
-              fileStem: 'shared_prefix_diverging_act_test',
-            );
+''', fileStem: 'shared_prefix_diverging_act_test');
             final codes = diags.map((d) => d.ruleName).toSet();
             expect(
               codes,
@@ -187,9 +183,7 @@ void run() {
 
         test('DOES flag the report\'s shape: shared ctx/handler, diverging '
             'follow-on argument', () async {
-          final diags = await runRuleResolved(
-            PreferSetupTeardownRule(),
-            '''
+          final diags = await runRuleResolved(PreferSetupTeardownRule(), '''
 class _TestContext {}
 class _SchemaHandler {
   _SchemaHandler(_TestContext ctx);
@@ -215,9 +209,7 @@ void run() {
     });
   });
 }
-''',
-            fileStem: 'shared_prefix_diverging_argument_test',
-          );
+''', fileStem: 'shared_prefix_diverging_argument_test');
           final codes = diags.map((d) => d.ruleName).toSet();
           expect(
             codes,

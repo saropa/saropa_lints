@@ -14,7 +14,8 @@
 
 import * as vscode from 'vscode';
 import { createWebviewCspNonce, jsonForScriptBlock } from '../vibrancy/views/html-utils';
-import { Violation, OwaspData } from '../violationsReader';
+import { Violation, OwaspData, type RuleMetadataData } from '../violationsReader';
+import { getRuleCatalog } from '../ruleCatalog';
 import { getRuleExplainPanelStyles } from './ruleExplainPanelStyles';
 import {
   getRelatedRules,
@@ -62,6 +63,8 @@ export interface RuleExplainInput {
   /** Optional location for context (e.g. "lib/main.dart:42") */
   location?: string;
   relatedRules?: string[];
+  /** Catalog rule type (bug, vulnerability, codeSmell, …); shown as a status pill. */
+  ruleType?: string;
 }
 
 function fromViolation(v: Violation): RuleExplainInput {
@@ -74,6 +77,46 @@ function fromViolation(v: Violation): RuleExplainInput {
     owasp: v.owasp,
     location: `${v.file}:${v.line}`,
   };
+}
+
+/**
+ * Fill whatever the caller did not supply from the bundled rule catalog.
+ *
+ * Most entry points (Rule Packs "Matching rules" finder, pack rule lists, related-rule
+ * links, suite envelopes, the `saropaLints.explainRule <name>` command) only know the rule
+ * name. Without this backfill the panel rendered a header and nothing else. Caller-supplied
+ * fields win, so a violation's own message/severity still take precedence over the
+ * rule-level defaults. `catalog` is injectable for tests.
+ */
+export function withCatalogDetails(
+  input: RuleExplainInput,
+  catalog: Record<string, RuleMetadataData> = getRuleCatalog(),
+): RuleExplainInput {
+  const meta = catalog[input.ruleName];
+  if (!meta) return input;
+  const owaspHasEntries = (o?: OwaspData): boolean => !!(o?.mobile?.length || o?.web?.length);
+  return {
+    ...input,
+    message: input.message ?? meta.problemMessage,
+    correction: input.correction ?? meta.correction,
+    impact: input.impact ?? meta.impact,
+    owasp: owaspHasEntries(input.owasp) ? input.owasp : meta.owasp,
+    ruleType: input.ruleType ?? meta.ruleType,
+  };
+}
+
+/**
+ * Lint problem messages are prefixed `[rule_name] ` for the Problems panel; the rule name
+ * already heads this panel, so repeating it in the Problem section is noise.
+ */
+function stripRulePrefix(message: string, ruleName: string): string {
+  const prefix = `[${ruleName}]`;
+  return message.startsWith(prefix) ? message.slice(prefix.length).trimStart() : message;
+}
+
+/** `codeSmell` -> `code smell` for the status pill. */
+function humanizeRuleType(ruleType: string): string {
+  return ruleType.replaceAll(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
 }
 
 /** Escape user content for HTML (matches vibrancy/views/html-utils for consistency). */
@@ -97,7 +140,7 @@ export function buildRuleExplainHtml(input: RuleExplainInput): string {
 
 function buildHtml(input: RuleExplainInput): string {
   const rule = escapeHtml(input.ruleName);
-  const message = input.message ? escapeHtml(input.message) : '';
+  const message = input.message ? escapeHtml(stripRulePrefix(input.message, input.ruleName)) : '';
   const correction = input.correction ? escapeHtml(input.correction) : '';
   const severity = input.severity ? escapeHtml(input.severity) : '';
   const impact = input.impact ? escapeHtml(input.impact) : '';
@@ -149,6 +192,7 @@ function buildHtml(input: RuleExplainInput): string {
     ...(location ? [{ glyph: '📍', label: input.location ?? '', title: input.location }] : []),
     ...(severity ? [{ label: `severity: ${input.severity ?? ''}`, tone: severityTone(input.severity) }] : []),
     ...(impact ? [{ label: `impact: ${input.impact ?? ''}`, tone: impactTone(input.impact) }] : []),
+    ...(input.ruleType ? [{ label: `type: ${humanizeRuleType(input.ruleType)}` }] : []),
     { label: input.ruleName, title: 'Rule identifier' },
   ];
   const statusLineHtml = buildStatusLine(statusPills);
@@ -230,12 +274,15 @@ function severityTone(severity: string | undefined): 'good' | 'warn' | 'bad' | '
   return 'neutral';
 }
 
-/** Map analyzer impact tokens to status-pill tones — critical/high call out the worst cases. */
+/**
+ * Map impact tokens to status-pill tones — the worst cases get called out. Accepts both the
+ * report's critical/high scale and the rule catalog's `LintImpact` names (error/warning).
+ */
 function impactTone(impact: string | undefined): 'good' | 'warn' | 'bad' | 'neutral' {
   if (!impact) return 'neutral';
   const s = impact.toLowerCase();
-  if (s === 'critical') return 'bad';
-  if (s === 'high') return 'warn';
+  if (s === 'critical' || s === 'error') return 'bad';
+  if (s === 'high' || s === 'warning') return 'warn';
   return 'neutral';
 }
 
@@ -245,7 +292,8 @@ let activePanel: vscode.WebviewPanel | undefined;
  * Opens the rule explain panel to the side of the active editor with the given
  * rule details. Reuses the existing panel if already open (updates title and content).
  */
-export function openRuleExplainPanel(input: RuleExplainInput): void {
+export function openRuleExplainPanel(rawInput: RuleExplainInput): void {
+  const input = withCatalogDetails(rawInput);
   ruleExplainTelemetry?.('open', { ruleName: input.ruleName });
   const title = PANEL_TITLE + input.ruleName;
 

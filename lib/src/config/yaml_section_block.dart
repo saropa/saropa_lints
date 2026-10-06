@@ -26,7 +26,7 @@ library;
 /// the substring — and is skipped rather than kept. A body passed in directly,
 /// without a leading line break, keeps its first line.
 ///
-/// Line endings are normalised first, matching the sibling config readers
+/// Line endings are normalized first, matching the sibling config readers
 /// (`runtime_tier_cap.dart`, `analysis_options_rule_packs.dart`,
 /// `config_loader.dart`), which all accept a Windows-authored
 /// `analysis_options_custom.yaml`. Without it a CRLF blank line arrives here

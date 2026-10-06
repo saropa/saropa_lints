@@ -15,7 +15,7 @@ import '../vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
 
-import { buildRuleExplainHtml, type RuleExplainInput } from '../../views/ruleExplainView';
+import { buildRuleExplainHtml, withCatalogDetails, type RuleExplainInput } from '../../views/ruleExplainView';
 
 function input(overrides: Partial<RuleExplainInput> = {}): RuleExplainInput {
   return {
@@ -64,5 +64,45 @@ describe('Rule Explain panel HTML', () => {
     const html = buildRuleExplainHtml(input());
     assert.ok(!html.includes('doc-link'));
     assert.ok(!html.includes('View in ROADMAP'));
+  });
+});
+
+// Most entry points (Rule Packs finder, pack rule lists, related-rule links) pass only the rule
+// name. Before the catalog backfill the panel rendered its header and no body at all.
+describe('Rule Explain catalog backfill', () => {
+  const catalog = {
+    avoid_cached_isar_stream: {
+      problemMessage: '[avoid_cached_isar_stream] Caching Isar streams causes runtime errors.',
+      correction: 'Create Isar streams inline.',
+      impact: 'warning',
+      ruleType: 'codeSmell',
+      owasp: { mobile: [], web: [] },
+    },
+  };
+
+  it('fills problem, fix, impact and type for a name-only open', () => {
+    const html = buildRuleExplainHtml(withCatalogDetails({ ruleName: 'avoid_cached_isar_stream' }, catalog));
+    assert.ok(html.includes('<h4>Problem</h4>'));
+    assert.ok(html.includes('Caching Isar streams causes runtime errors.'));
+    // The [rule_name] prefix is dropped — the name already heads the panel.
+    assert.ok(!html.includes('<p>[avoid_cached_isar_stream]'));
+    assert.ok(html.includes('<h4>How to fix</h4>'));
+    assert.ok(html.includes('impact: warning'));
+    assert.ok(html.includes('type: code smell'));
+  });
+
+  it('keeps caller-supplied violation details over catalog defaults', () => {
+    const merged = withCatalogDetails(
+      { ruleName: 'avoid_cached_isar_stream', message: 'Live message', impact: 'error' },
+      catalog,
+    );
+    assert.strictEqual(merged.message, 'Live message');
+    assert.strictEqual(merged.impact, 'error');
+    assert.strictEqual(merged.correction, 'Create Isar streams inline.');
+  });
+
+  it('returns the input unchanged for a rule missing from the catalog', () => {
+    const input = { ruleName: 'not_a_rule' };
+    assert.strictEqual(withCatalogDetails(input, catalog), input);
   });
 });

@@ -38,7 +38,7 @@ void main() {
     test('a CRLF blank line does not end the block', () {
       // Regression: `split('\n')` leaves a bare `\r` for a blank line in a
       // Windows-authored file. It is not empty, not indented and not a
-      // comment, so an un-normalised loop breaks here and truncates the
+      // comment, so an un-normalized loop breaks here and truncates the
       // section.
       expect(
         yamlSectionBlock('\r\n  entries:\r\n\r\n    - a\r\nother_rule:\r\n'),
@@ -46,7 +46,7 @@ void main() {
       );
     });
 
-    test('CRLF input is normalised to LF in the result', () {
+    test('CRLF input is normalized to LF in the result', () {
       expect(yamlSectionBlock('\r\n  entries:\r\n'), '\n  entries:\n');
     });
 
