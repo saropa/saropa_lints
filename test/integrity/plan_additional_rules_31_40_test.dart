@@ -19,7 +19,7 @@ void main() {
     'abstract_field_initializer',
     'abi_specific_integer_invalid',
     'annotate_inherited_member_redeclaration',
-    'deprecated_new_in_comment_reference',
+    'deprecated_new_in_comment_reference_extended',
     'document_analyzer_ignore_rationale',
     'non_constant_map_element',
     'return_in_generator',
@@ -85,7 +85,7 @@ void main() {
       expectPatterns('return_in_generator', <String>['async*', 'sync*']);
       expectPatterns('yield_in_non_generator', <String>['yield']);
       expectPatterns('document_analyzer_ignore_rationale', <String>['ignore:']);
-      expectPatterns('deprecated_new_in_comment_reference', <String>['[new ']);
+      expectPatterns('deprecated_new_in_comment_reference_extended', <String>['[new ']);
     });
   });
 
@@ -115,7 +115,7 @@ void main() {
       },
     );
 
-    test('deprecated_new_in_comment_reference: [new Type] only', () {
+    test('deprecated_new_in_comment_reference_extended: [new Type] only', () {
       expect(_deprecatedNewDocRefTest.hasMatch('See [new Foo] x.'), isTrue);
       expect(_deprecatedNewDocRefTest.hasMatch('[new foo.bar]'), isTrue);
       expect(_deprecatedNewDocRefTest.hasMatch('See [Foo] x.'), isFalse);

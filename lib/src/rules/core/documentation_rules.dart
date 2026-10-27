@@ -1441,7 +1441,7 @@ class UriDoesNotExistInDocImportRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// deprecated_new_in_comment_reference
+// deprecated_new_in_comment_reference_extended
 // =============================================================================
 
 /// Doc comments should not use deprecated `new` in reference links.
@@ -1482,8 +1482,8 @@ class DeprecatedNewInCommentReferenceRule extends SaropaLintRule {
   static final RegExp _newRef = RegExp(r'\[\s*new\s+[\w.]+\s*\]');
 
   static const LintCode _code = LintCode(
-    'deprecated_new_in_comment_reference',
-    '[deprecated_new_in_comment_reference] Documentation references should not use the deprecated `new` keyword inside `[...]` links. Use `[ClassName]` or `[prefix.ClassName]` instead. {v1}',
+    'deprecated_new_in_comment_reference_extended',
+    '[deprecated_new_in_comment_reference_extended] Documentation references should not use the deprecated `new` keyword inside `[...]` links. Use `[ClassName]` or `[prefix.ClassName]` instead. {v1}',
     correctionMessage:
         'Remove `new` from the doc reference so it uses modern Dart doc link syntax.',
     severity: DiagnosticSeverity.INFO,

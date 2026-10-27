@@ -841,7 +841,7 @@ export const RULE_TIER_BY_CODE: Readonly<Record<string, string>> = {
   'conflicting_constructor_and_static_member': 'essential',
   'connectivity_satellite_missing': 'comprehensive',
   'consistent_update_render_object': 'professional',
-  'deprecated_new_in_comment_reference': 'essential',
+  'deprecated_new_in_comment_reference_extended': 'essential',
   'device_calendar_event_missing_calendar_id': 'comprehensive',
   'device_calendar_event_utc_timezone': 'comprehensive',
   'device_calendar_missing_permission_check': 'comprehensive',

@@ -938,7 +938,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_misleading_documentation',
-      'deprecated_new_in_comment_reference',
+      'deprecated_new_in_comment_reference_extended',
       'prefer_correct_throws',
       'require_complex_logic_comments',
       'require_deprecation_message',

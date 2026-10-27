@@ -141,7 +141,6 @@ void main() {
         'abi_specific_integer_invalid',
         'abstract_field_initializer',
         'conflicting_constructor_and_static_member',
-        'deprecated_new_in_comment_reference',
         'duplicate_field_name',
         'external_with_initializer',
         'field_initializer_redirecting_constructor',

@@ -19231,7 +19231,7 @@
         "web": []
       }
     },
-    "deprecated_new_in_comment_reference": {
+    "deprecated_new_in_comment_reference_extended": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -19247,7 +19247,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Remove `new` from the doc reference so it uses modern Dart doc link syntax.",
-      "problemMessage": "[deprecated_new_in_comment_reference] Documentation references should not use the deprecated `new` keyword inside `[...]` links. Use `[ClassName]` or `[prefix.ClassName]` instead. {v1}",
+      "problemMessage": "[deprecated_new_in_comment_reference_extended] Documentation references should not use the deprecated `new` keyword inside `[...]` links. Use `[ClassName]` or `[prefix.ClassName]` instead. {v1}",
       "impact": "info",
       "owasp": {
         "mobile": [],

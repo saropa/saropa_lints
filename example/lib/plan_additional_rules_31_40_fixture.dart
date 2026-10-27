@@ -50,8 +50,8 @@ class _RedeclareChild extends _RedeclareParent {
   void redeclareMe() {} // expect_lint: annotate_inherited_member_redeclaration
 }
 
-// ========== deprecated_new_in_comment_reference ==========
-/// See [new Object] in docs. // expect_lint: deprecated_new_in_comment_reference
+// ========== deprecated_new_in_comment_reference_extended ==========
+/// See [new Object] in docs. // expect_lint: deprecated_new_in_comment_reference_extended
 class _DeprecatedNewDoc {}
 
 // ========== document_analyzer_ignore_rationale ==========

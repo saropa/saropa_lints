@@ -865,7 +865,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'consistent_update_render_object': 'widget',
   'constructor_parameters_and_fields_should_have_the_same_order':
       'architecture',
-  'deprecated_new_in_comment_reference': 'core',
+  'deprecated_new_in_comment_reference_extended': 'core',
   'device_calendar_event_missing_calendar_id': 'packages',
   'device_calendar_event_utc_timezone': 'packages',
   'device_calendar_missing_permission_check': 'packages',

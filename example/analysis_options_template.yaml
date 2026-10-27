@@ -685,7 +685,7 @@ saropa_lints:
     - abstract_field_initializer: false
     - abi_specific_integer_invalid: false
     - annotate_inherited_member_redeclaration: false
-    - deprecated_new_in_comment_reference: false
+    - deprecated_new_in_comment_reference_extended: false
     - document_analyzer_ignore_rationale: false
     - non_constant_map_element: false
     - return_in_generator: false

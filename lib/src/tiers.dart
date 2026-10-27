@@ -769,7 +769,7 @@ const Set<String> essentialRules = <String>{
   'abstract_field_initializer',
   'abi_specific_integer_invalid',
   'annotate_inherited_member_redeclaration',
-  'deprecated_new_in_comment_reference',
+  'deprecated_new_in_comment_reference_extended',
   'document_analyzer_ignore_rationale',
   'non_constant_map_element',
   'return_in_generator',
@@ -4808,7 +4808,7 @@ const Set<String> documentationRules = <String>{
   'prefer_correct_throws',
   'avoid_misleading_documentation',
   'verify_documented_parameters_exist',
-  'deprecated_new_in_comment_reference',
+  'deprecated_new_in_comment_reference_extended',
   'unintended_html_in_doc_comment_strict',
   'uri_does_not_exist_in_doc_import',
 };
