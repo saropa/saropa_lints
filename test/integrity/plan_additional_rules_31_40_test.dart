@@ -85,7 +85,9 @@ void main() {
       expectPatterns('return_in_generator', <String>['async*', 'sync*']);
       expectPatterns('yield_in_non_generator', <String>['yield']);
       expectPatterns('document_analyzer_ignore_rationale', <String>['ignore:']);
-      expectPatterns('deprecated_new_in_comment_reference_extended', <String>['[new ']);
+      expectPatterns('deprecated_new_in_comment_reference_extended', <String>[
+        '[new ',
+      ]);
     });
   });
 
