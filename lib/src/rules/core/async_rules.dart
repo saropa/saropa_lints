@@ -4589,6 +4589,13 @@ class AvoidAsyncInBuildRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
+      // Only Flutter widget/State builds; skips non-widget `build` methods
+      // such as Serverpod's WidgetRoute.build(Session, Request).
+      final classDecl = node.parent?.parent;
+      if (classDecl is! ClassDeclaration || !isWidgetOrStateClass(classDecl)) {
+        return;
+      }
+
       if (node.body.isAsynchronous) {
         reporter.atToken(node.name, code);
       }
