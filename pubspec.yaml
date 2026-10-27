@@ -7,7 +7,7 @@ description: >-
   Static analysis for security, accessibility, and performance.
 
 # SemVer version used by pub.dev and dependency resolution
-version: 16.7.0
+version: 16.10.0
 
 # SPDX license identifier shown on pub.dev
 license: MIT
@@ -156,12 +156,12 @@ dependencies:
   # publish` rejects a package that imports `package:meta/meta.dart` without
   # declaring meta as a DIRECT dependency (CI Dart 3.12.2 errors with exit 65 on
   # the 13.12.7 tag; local 3.12.1 dry-run did not flag it, which is why it slipped
-  # through). Constraint deliberately ^1.18.0, NOT ^1.18.3: Flutter stable pins
-  # meta to EXACTLY 1.18.0, so a ^1.18.3 floor would make saropa_lints
-  # unresolvable for Flutter consumers. ^1.18.0 accepts Flutter's 1.18.0 and the
+  # through). Constraint deliberately ^1.18.0, NOT ^1.18.3: Flutter 3.44 and
+  # older pin meta to EXACTLY 1.18.0, so a ^1.18.3 floor makes saropa_lints
+  # unresolvable for those Flutter consumers (14.0.3 to 16.7.0 had that bug). ^1.18.0 accepts Flutter's 1.18.0 and the
   # 1.18.3 already resolved here transitively. See the analyzer note below for the
   # full meta-pin rationale — do NOT raise this floor.
-  meta: ^1.18.3
+  meta: ^1.18.0
 
   # A string-based path manipulation library. All of the path operations you know...
   # https://pub.dev/packages/path

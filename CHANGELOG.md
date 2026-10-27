@@ -66,9 +66,21 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.8.1]
+## [16.10.0] — Unreleased
 
-A false-positive fix for `avoid_async_in_build`.
+Restores installation on Flutter 3.44 and older, and renames one rule whose name matched a core analyzer diagnostic.
+
+### Fixed
+
+- Projects on Flutter 3.44 and older could not add saropa_lints as a dev dependency from 14.0.3 onward: the `meta ^1.18.3` floor conflicted with the `meta 1.18.0` that those Flutter versions pin. The floor is back to `meta ^1.18.0`. No other dependency changed.
+
+### Changed
+
+- `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended` because the old name matched a core analyzer diagnostic that the analyzer is removing; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
+
+## [16.9.0]
+
+A false-positive fix for `avoid_async_in_build`. [log](https://github.com/saropa/saropa_lints/blob/v16.9.0/CHANGELOG.md)
 
 ### Fixed
 
