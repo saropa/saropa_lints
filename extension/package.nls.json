@@ -338,6 +338,7 @@
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — building digital safeguards since 2010.\n\nDart packages, VS Code extensions, and consumer apps for developers who value reliability.\n\n[Visit saropa.com](https://saropa.com/)",
   "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
   "command.killOrphanedDaemons.title": "Saropa Lints: Kill Orphaned Flutter Daemons",
+  "command.configureCompatibility.title": "Saropa Lints: Configure Version Compatibility",
   "command.showProcessHealth.title": "Saropa Lints: Process Health",
   "command.showMachineDashboard.title": "Saropa Lints: Machine Health",
   "command.showWorkspaceReadiness.title": "Saropa Lints: Workspace Readiness",

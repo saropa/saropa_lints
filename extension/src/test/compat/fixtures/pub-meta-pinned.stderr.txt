@@ -1,0 +1,2 @@
+Because saropa_lints >=16.10.0 depends on meta ^1.18.0 and saropa_lints >=14.0.3 <16.10.0 depends on meta ^1.18.3, saropa_lints >=14.0.3 requires meta ^1.18.0.
+So, because t depends on both meta 1.17.0 and saropa_lints ^16.7.0, version solving failed.

@@ -219,6 +219,17 @@ ${getEngineCardsStyles()}
   opacity: .5;
   cursor: default;
 }
+.compat-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 14px;
+  margin: 8px 0;
+  font-size: 12px;
+}
+.compat-facts dt { color: var(--vscode-descriptionForeground, #94a3b8); }
+.compat-facts dd { margin: 0; font-family: var(--vscode-editor-font-family, monospace); }
+.compat-message { margin: 8px 0; font-size: 13px; line-height: 1.5; }
+.compat-list { margin: 4px 0 8px; padding-left: 18px; font-size: 12px; line-height: 1.5; }
 .empty-state {
   text-align: center;
   padding: 48px 16px;

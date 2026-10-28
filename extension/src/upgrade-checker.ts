@@ -22,10 +22,11 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { fetchWithRetry } from './vibrancy/services/fetch-retry';
+import { getPubVersions, PubVersionsCache } from './compat/pubVersions';
 import { compareVersions } from './vibrancy/services/changelog-service';
-import { resolveDependencies } from './setup';
 import { l10n } from './i18n/runtime';
+import { VERSIONS_CACHE_KEY } from './compat/upgradeGate';
+import { readConfiguredPluginVersion, type ConfiguredPluginVersion } from './analysisOptionsVersion';
 
 // ── Constants ────────────────────────────────────────────────────────────
 
@@ -41,7 +42,6 @@ const STATE_KEY = 'saropaLints.upgradeCheck';
 const ANTI_THRASH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 /** Network-failure cooldown — slightly shorter than ANTI_THRASH so we recover quickly. */
 const RETRY_INTERVAL_MS = 30 * 60 * 1000;       // 30 minutes
-const PUB_API_URL = 'https://pub.dev/api/packages/saropa_lints';
 const CHANGELOG_URL = 'https://pub.dev/packages/saropa_lints/changelog';
 
 // ── Throttle state ───────────────────────────────────────────────────────
@@ -158,26 +158,57 @@ export function readInstalledVersion(
 }
 
 /**
- * Replace the saropa_lints version constraint in pubspec.yaml.
- * Preserves existing line endings (CRLF on Windows) to avoid git noise.
+ * Read the lock-resolved version and the version configured under
+ * `plugins: saropa_lints:` in analysis_options.yaml, side by side.
+ * Either side is null when its file is missing or has no matching entry.
  */
-export function updatePubspecConstraint(
-  pubspecPath: string,
-  newVersion: string,
-): boolean {
-  if (!fs.existsSync(pubspecPath)) return false;
+export function readVersions(workspaceRoot: string): {
+  installed: { version: string; source: string } | null;
+  configured: ConfiguredPluginVersion | null;
+} {
+  const readIfExists = (name: string): string | null => {
+    const p = path.join(workspaceRoot, name);
+    return fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : null;
+  };
+  const lock = readIfExists('pubspec.lock');
+  return {
+    installed: lock ? readInstalledVersion(lock) : null,
+    configured: readConfiguredPluginVersion(readIfExists('analysis_options.yaml')),
+  };
+}
 
-  const content = fs.readFileSync(pubspecPath, 'utf-8');
-
-  // Match the saropa_lints dependency line. The \r? captures an optional
-  // carriage return so we can preserve CRLF endings on Windows.
-  const pattern = /^(\s+saropa_lints\s*:\s*).*?(\r?)$/m;
-  if (!pattern.test(content)) return false;
-
-  // $2 restores \r if the original line had CRLF, preventing EOL corruption.
-  const updated = content.replace(pattern, `$1^${newVersion}$2`);
-  fs.writeFileSync(pubspecPath, updated, 'utf-8');
-  return true;
+/**
+ * Replace the saropa_lints version constraint in pubspec.yaml. Only the
+ * `dev_dependencies:` / `dependencies:` sections are searched (never
+ * `dependency_overrides:` or a nested key), and only a direct child of the
+ * section is rewritten. Preserves line endings (CRLF on Windows) to avoid git
+ * noise. Returns null when no such line exists.
+ */
+export function applyPubspecConstraint(content: string, newVersion: string): string | null {
+  const lines = content.split('\n');
+  let inSection = false;
+  let childIndent: number | undefined;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].replace(/\r$/, '');
+    if (/^\S/.test(line)) {
+      // New top-level key (comments at column 0 start with '#').
+      if (line.startsWith('#')) continue;
+      inSection = /^(dev_dependencies|dependencies)\s*:\s*(#.*)?$/.test(line);
+      childIndent = undefined;
+      continue;
+    }
+    if (!inSection || line.trim() === '' || /^\s*#/.test(line)) continue;
+    const indent = /^\s*/.exec(line)![0].length;
+    childIndent ??= indent;
+    if (indent !== childIndent) continue;
+    const m = /^(\s+saropa_lints\s*:\s*).*?(\r?)$/.exec(lines[i]);
+    if (m) {
+      // m[2] restores \r if the original line had CRLF, preventing EOL corruption.
+      lines[i] = `${m[1]}^${newVersion}${m[2]}`;
+      return lines.join('\n');
+    }
+  }
+  return null;
 }
 
 // ── Main entry point ─────────────────────────────────────────────────────
@@ -211,12 +242,14 @@ export async function checkForUpgrade(
     saved?.cachedLatest ?? (typeof legacyLatest === 'string' ? legacyLatest : undefined);
 
   // Read the resolved version from pubspec.lock.
-  const lockPath = path.join(workspaceRoot, 'pubspec.lock');
-  if (!fs.existsSync(lockPath)) return;
-
-  const lockContent = fs.readFileSync(lockPath, 'utf-8');
-  const installed = readInstalledVersion(lockContent);
+  const { installed, configured } = readVersions(workspaceRoot);
   if (!installed) return;
+  if (configured && configured.raw !== installed.version) {
+    console.log(
+      `[saropa_lints] analysis_options plugin version ${configured.raw}` +
+      `${configured.isRange ? ' (range)' : ''} vs pubspec.lock ${installed.version}`,
+    );
+  }
 
   // Skip path/git dependencies — developer is using a local or pinned version.
   if (installed.source === 'path' || installed.source === 'git') return;
@@ -227,17 +260,20 @@ export async function checkForUpgrade(
   // returning — the fetch throttle must never silence a due prompt.
   if (shouldFetchNow(saved, Date.now())) {
     try {
-      const resp = await fetchWithRetry(PUB_API_URL);
-      if (!resp.ok) {
+      const result = await getPubVersions({
+        store: {
+          get: () => context.globalState.get<PubVersionsCache>(VERSIONS_CACHE_KEY),
+          set: (c) => context.globalState.update(VERSIONS_CACHE_KEY, c),
+        },
+      });
+      if (result.stale) {
         // Non-fatal: shorter cooldown so we retry sooner. Preserve any
         // previously-cached latest so a transient outage doesn't blank
         // out an otherwise-due prompt.
         await persistState(context, RETRY_INTERVAL_MS, latestVersion, saved?.dismissedVersion);
       } else {
-        const json: any = await resp.json();
-        const fetched = json?.latest?.version;
-        if (typeof fetched === 'string' && fetched) {
-          latestVersion = fetched;
+        if (result.latest) {
+          latestVersion = result.latest;
         }
         await persistState(context, ANTI_THRASH_INTERVAL_MS, latestVersion, saved?.dismissedVersion);
       }
@@ -249,6 +285,15 @@ export async function checkForUpgrade(
 
   // No fetch has ever succeeded and there's nothing cached — stay silent.
   if (!latestVersion) return;
+
+  // Offer only a version the compatibility recommender accepts for this
+  // project (Dart SDK, meta pin). The solver is not run here; it runs when
+  // the user clicks Upgrade. Loaded lazily: the controller imports modules
+  // that import this one.
+  const { offeredVersion } = await import('./compat/compatController');
+  const offered = await offeredVersion(context, workspaceRoot, installed.version);
+  if (!offered) return;
+  latestVersion = offered;
 
   // Compare versions.
   const status = compareVersions(installed.version, latestVersion);
@@ -293,7 +338,7 @@ export async function checkForUpgrade(
   );
 
   if (choice === upgradeAction) {
-    await performUpgrade(workspaceRoot, latestVersion);
+    await performUpgrade(workspaceRoot, latestVersion, context);
   } else if (choice === viewChangelogAction) {
     await vscode.env.openExternal(vscode.Uri.parse(CHANGELOG_URL));
   } else if (choice === dontAskAction) {
@@ -350,70 +395,43 @@ async function persistState(
 
 async function performUpgrade(
   workspaceRoot: string,
-  latestVersion: string,
+  offered: string,
+  context: vscode.ExtensionContext,
 ): Promise<void> {
+  const { computeCompat, applyCompatNow, describeOutcome } = await import('./compat/compatController');
+  const { decideOnUpgrade } = await import('./compat/upgradeGate');
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: `Upgrading Saropa Lints to ${latestVersion}`,
-      // Cancellable: the prior `cancellable: false` combined with a synchronous
-      // `spawnSync` for `pub get` blocked the extension host event loop for the
-      // full duration of pub resolution (often 30s+), locking up VS Code with no
-      // way out. The token below kills the child process tree on cancel.
+      title: `Upgrading Saropa Lints to ${offered}`,
+      // Cancellable: pub resolution can take 30s+; the token kills the child
+      // process tree on cancel.
       cancellable: true,
     },
-    async (_progress, token) => {
-      // Step 1: Update the version constraint in pubspec.yaml.
-      const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
-      if (!updatePubspecConstraint(pubspecPath, latestVersion)) {
+    async (progress, token) => {
+      // Ask the pub solver now (on demand). If it cannot resolve the offered
+      // version, show the compatibility card instead of failing after pub get.
+      let rec: Awaited<ReturnType<typeof computeCompat>>['rec'];
+      try {
+        rec = (await computeCompat(context, workspaceRoot, true)).rec;
+      } catch (err) {
         void vscode.window.showErrorMessage(
-          l10n('notify.misc.upgradeCheckerPubspecNotFound'),
+          l10n('compat.card.loadFailed', { detail: err instanceof Error ? err.message : String(err) }),
         );
         return;
       }
-
-      // Step 2: Run pub get to resolve the new version. Async + cancellable so the
-      // extension host stays responsive while pub fetches and resolves the graph.
-      // `dart`, not `flutter`, for the same reason as the Enable flow: the
-      // flutter wrapper boots flutter_tool before pub runs, measured at ~114 s
-      // of pure overhead on a large project. resolveDependencies falls back to
-      // `flutter pub get` when — and only when — the dart resolve fails on the
-      // Flutter SDK itself.
-      const { ok, stderr, cancelled, command: pubCmd } = await resolveDependencies(
-        workspaceRoot,
-        token,
-      );
-      if (cancelled) {
-        // pubspec.yaml constraint already changed; tell the user how to recover.
-        // We deliberately don't auto-revert \u2014 they may want to retry pub get.
-        void vscode.window.showWarningMessage(
-          l10n('notify.misc.upgradeCheckerCancelled', {
-            version: latestVersion,
-            cmd: pubCmd,
-          }),
-        );
-        return;
-      }
-      if (!ok) {
-        void vscode.window.showErrorMessage(
-          l10n('notify.misc.upgradeCheckerPubGetFailed', {
-            detail: stderr || l10n('notify.misc.upgradeCheckerCheckOutput'),
-          }),
-        );
-        return;
-      }
-
-      // Bail before kicking off config init if the user cancelled between steps.
       if (token.isCancellationRequested) return;
+      if (decideOnUpgrade(rec, offered) === 'openCard') {
+        await vscode.commands.executeCommand('saropaLints.configureCompatibility');
+        return;
+      }
 
-      // Step 3: Re-initialize config so analysis_options.yaml reflects
-      // any new rules or changes in the updated package version.
-      // (`initializeConfig` is itself cancellable and async \u2014 see setup.ts.)
-      await vscode.commands.executeCommand('saropaLints.initializeConfig');
-
-      void vscode.window.showInformationMessage(
-        l10n('notify.misc.upgradeCheckerUpgraded', { version: latestVersion }),
-      );
+      // Edit both files, pub get, align the plugin version, init config;
+      // restores both files if pub get fails.
+      const outcome = await applyCompatNow(workspaceRoot, rec, token, progress);
+      const { text, isError } = describeOutcome(outcome);
+      if (isError) void vscode.window.showErrorMessage(text);
+      else void vscode.window.showInformationMessage(text);
     },
   );
 }

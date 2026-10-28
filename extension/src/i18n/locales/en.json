@@ -2757,5 +2757,66 @@
       "problem": "Score {score}/100 — installed version needs upgrading",
       "insight": "Installed version is known-broken — upgrade required"
     }
+  },
+  "compat": {
+    "recommend": {
+      "latestOk": "saropa_lints {version} is the newest release and works with this project. Use ^{version}.",
+      "alreadyCorrect": "This project already uses the recommended saropa_lints configuration. No action needed.",
+      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "metaExcludesPin": "saropa_lints {newest} needs a newer meta package than your Flutter SDK pins ({pin}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "packageHoldsAnalyzer": "The package {package} holds the analyzer back, so saropa_lints {newest} cannot be installed. Use ^{chosen}, or update {package} to use {newest}.",
+      "noVersionResolves": "No saropa_lints version can be installed as a dependency because {package} requires an older analyzer. The plugin route still works.",
+      "pluginOnly": "Set the saropa_lints plugin version in analysis_options.yaml to {version}.",
+      "alignPlugin": "The plugin version in analysis_options.yaml ({plugin}) differs from the locked saropa_lints version ({locked}). Set the plugin version to {locked}.",
+      "localSource": "saropa_lints comes from a local {source} source, so the extension shows facts only and changes nothing.",
+      "noCompatible": "No published saropa_lints version works with this project's Dart SDK.",
+      "noVersions": "No saropa_lints versions are available to recommend.",
+      "probeFailed": "Could not check which saropa_lints version this project can use because the Dart tooling did not run ({detail}). Make sure dart or flutter is on your PATH and you are online, then re-check.",
+      "staleVersions": "The version list could not be refreshed (offline), so this advice may be out of date.",
+      "blockerSdk": "saropa_lints {version} requires a newer Dart SDK than {dart}.",
+      "blockerMeta": "saropa_lints {version} is not compatible with the meta version {pin} pinned by your Flutter SDK.",
+      "blockerPackage": "{package} prevents the install by requiring a different analyzer version.",
+      "fixFlutterUpgrade": "Run flutter upgrade.",
+      "fixUpgradeFlutterMeta": "Upgrade Flutter to a release that pins a newer meta.",
+      "fixKeepVersion": "Keep saropa_lints at ^{version}.",
+      "fixUpdateHolder": "Update {package} to a version that supports a newer analyzer.",
+      "fixUsePluginRoute": "Use the plugin route: set the plugin version in analysis_options.yaml to {version}.",
+      "fixAlignPlugin": "Set the plugin version in analysis_options.yaml to {version}."
+    },
+    "card": {
+      "heading": "Version compatibility",
+      "loading": "Checking which saropa_lints version this project can use...",
+      "notDetected": "not detected",
+      "dart": "Dart SDK",
+      "flutter": "Flutter SDK",
+      "lockedSaropa": "Locked saropa_lints",
+      "lockedAnalyzer": "Locked analyzer",
+      "plugin": "Plugin version (analysis_options.yaml)",
+      "blockers": "What blocks a newer version",
+      "fixes": "How to fix",
+      "apply": "Apply",
+      "applying": "Applying...",
+      "preview": "Preview diff",
+      "refresh": "Re-check",
+      "diffTitle": "{file}: proposed version change",
+      "staleReloaded": "The project changed while you were looking at this card, so nothing was applied. Review the updated advice and click Apply again.",
+      "loadFailed": "Could not check version compatibility: {detail}",
+      "routeLabel": "Install route",
+      "routes": {
+        "dependency": "Dependency in pubspec.yaml",
+        "plugin": "Plugin in analysis_options.yaml only",
+        "both": "Dependency and plugin",
+        "none": "No change possible"
+      }
+    },
+    "apply": {
+      "progress": "Applying saropa_lints version change",
+      "applied": "saropa_lints {version} is installed and configured.",
+      "noChange": "No file changes are needed.",
+      "failedRestored": "The version change failed: {detail} pubspec.yaml and analysis_options.yaml were restored to their previous content.",
+      "failedNotRestored": "The version change failed: {detail} The files could not be restored automatically; check pubspec.yaml and analysis_options.yaml.",
+      "cancelledRestored": "The version change was cancelled. pubspec.yaml and analysis_options.yaml were restored to their previous content.",
+      "cancelledNotRestored": "The version change was cancelled, but the files could not be restored automatically; check pubspec.yaml and analysis_options.yaml."
+    }
   }
 }

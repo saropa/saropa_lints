@@ -47,6 +47,15 @@ document.addEventListener('click', function(e) {
     btn.disabled = true;
     btn.textContent = btn.dataset.labelRunning || btn.textContent;
     vscode.postMessage({ type: 'ciPublish' });
+  } else if (action === 'compatApply') {
+    // Disabled at once: the apply rewrites two files and runs pub get.
+    btn.disabled = true;
+    btn.textContent = btn.dataset.labelRunning || btn.textContent;
+    vscode.postMessage({ type: 'compatApply' });
+  } else if (action === 'compatPreview') {
+    vscode.postMessage({ type: 'compatPreview' });
+  } else if (action === 'compatRefresh') {
+    vscode.postMessage({ type: 'compatRefresh' });
   } else if (action === 'ciPublishDismiss') {
     vscode.postMessage({ type: 'ciPublishDismiss' });
   }

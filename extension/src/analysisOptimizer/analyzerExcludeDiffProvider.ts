@@ -38,10 +38,13 @@ export async function showAnalyzerExcludeDiff(
   proposedContent: string,
   title: string,
 ): Promise<void> {
+  // Name the preview after the real file so the diff header and syntax
+  // highlighting match (analysis_options.yaml, pubspec.yaml, ...).
+  const fileName = filePath.split(/[\\/]/).pop() || 'analysis_options.yaml';
   if (!_provider) return;
   // Query string uniquifies the URI per call so VS Code doesn't reuse a
   // cached editor for a stale previous proposal when this is invoked twice.
-  const previewUri = vscode.Uri.parse(`${PREVIEW_SCHEME}:/analysis_options.yaml?${Date.now()}`);
+  const previewUri = vscode.Uri.parse(`${PREVIEW_SCHEME}:/${encodeURIComponent(fileName)}?${Date.now()}`);
   _provider.set(previewUri, proposedContent);
   const fileUri = vscode.Uri.file(filePath);
   await vscode.commands.executeCommand('vscode.diff', fileUri, previewUri, title, {

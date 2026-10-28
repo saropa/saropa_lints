@@ -399,6 +399,13 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'pulse',
   },
   {
+    command: 'saropaLints.configureCompatibility',
+    title: 'Configure Version Compatibility',
+    description: 'Check which saropa_lints version suits this project and preview or apply the pubspec.yaml and analysis_options.yaml changes.',
+    category: 'Analysis',
+    icon: 'versions',
+  },
+  {
     command: 'saropaLints.showMachineDashboard',
     title: 'Machine Health',
     description: 'Open the machine health dashboard showing RAM, CPU, and heavy background processes.',
