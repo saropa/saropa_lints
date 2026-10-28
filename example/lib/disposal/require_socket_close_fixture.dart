@@ -113,7 +113,7 @@ class _bad331__MyWidgetState extends State<MyWidget> {
   Future<void> connect() async {
     _socket = await Socket.connect('host', 80);
   }
-// Missing close!
+  // Missing close!
 }
 
 // GOOD: Should NOT trigger require_socket_close

@@ -118,9 +118,7 @@ final _incompleteColorMap = <_Color, String>{
 
 // BAD: Missing _Status.inactive
 // expect_lint: avoid_missing_enum_constant_in_map
-final _incompleteStatusMap = <_Status, int>{
-  _Status.active: 1,
-};
+final _incompleteStatusMap = <_Status, int>{_Status.active: 1};
 
 // GOOD: All enum constants present (3 of 3)
 final _completeColorMap = <_Color, String>{
@@ -140,16 +138,10 @@ final _completeStatusMap = <_Status, int>{
 // cross-file null-safe read, so the supported escape hatch is a verified
 // // ignore: on the line directly above the declaration.
 // ignore: avoid_missing_enum_constant_in_map
-final _sparseWeights = <_Color, int>{
-  _Color.red: 3,
-  _Color.blue: 3,
-};
+final _sparseWeights = <_Color, int>{_Color.red: 3, _Color.blue: 3};
 
 // GOOD: Not enum-keyed
-final _stringMap = <String, int>{
-  'a': 1,
-  'b': 2,
-};
+final _stringMap = <String, int>{'a': 1, 'b': 2};
 
 // GOOD: Empty map
 final _emptyMap = <_Color, String>{};
@@ -167,15 +159,11 @@ class _Constrained {
 // subset, so omitting the unreachable keys is intentional. No lint.
 final _withConstraint = _Constrained(
   direction: _Color.red,
-  thresholds: <_Color, double>{
-    _Color.red: 0.25,
-  },
+  thresholds: <_Color, double>{_Color.red: 0.25},
 );
 
 // BAD: partial map with NO constraining sibling argument — still flags.
 // expect_lint: avoid_missing_enum_constant_in_map
 final _withoutConstraint = _Constrained(
-  thresholds: <_Color, double>{
-    _Color.red: 0.25,
-  },
+  thresholds: <_Color, double>{_Color.red: 0.25},
 );

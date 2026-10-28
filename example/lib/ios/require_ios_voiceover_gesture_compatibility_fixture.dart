@@ -112,9 +112,7 @@ dynamic details;
 // expect_lint: require_ios_voiceover_gesture_compatibility
 void _bad923() {
   // Custom gesture without accessibility action
-  GestureDetector(
-    onHorizontalDragEnd: (details) => dismissItem(),
-  );
+  GestureDetector(onHorizontalDragEnd: (details) => dismissItem());
 }
 
 // GOOD: Should NOT trigger require_ios_voiceover_gesture_compatibility
@@ -122,8 +120,6 @@ void _good923() {
   // Provide accessibility action
   Semantics(
     onDismiss: () => dismissItem(),
-    child: GestureDetector(
-      onHorizontalDragEnd: (details) => dismissItem(),
-    ),
+    child: GestureDetector(onHorizontalDragEnd: (details) => dismissItem()),
   );
 }

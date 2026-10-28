@@ -70,9 +70,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 void badProviderOfInCallback() {
   // expect_lint: prefer_change_notifier_proxy
   ChangeNotifierProvider(
-    create: (context) => MyNotifier(
-      Provider.of<OtherNotifier>(context, listen: false),
-    ),
+    create: (context) =>
+        MyNotifier(Provider.of<OtherNotifier>(context, listen: false)),
   );
 }
 
@@ -161,11 +160,7 @@ void badGetxGlobalState() {
 
 void goodGetxBinding() {
   // Use bindings for scoped injection
-  GetPage(
-    name: '/home',
-    page: () => HomePage(),
-    binding: HomeBinding(),
-  );
+  GetPage(name: '/home', page: () => HomePage(), binding: HomeBinding());
 }
 
 // =========================================================================

@@ -2,8 +2,8 @@
  * Computes what upgrading a package `from -> to` would break, so the advisor
  * can suppress or annotate a "newer version available" nudge.
  *
- * pub.dev's latest is not always adoptable: analyzer 13 needs `meta ^1.18.3`
- * while Flutter stable pins `meta 1.18.0`, and several dependents cap analyzer
+ * pub.dev's latest is not always adoptable: analyzer 13.1+ needs `meta ^1.18.3`
+ * while Flutter 3.44 and older pin `meta 1.18.0`, and several dependents cap analyzer
  * below 13. Three independent signals are combined, in precedence order
  * held-back > sdk-blocked > dependency-capped > dependency-held-back >
  * breaks-dependents > safe:

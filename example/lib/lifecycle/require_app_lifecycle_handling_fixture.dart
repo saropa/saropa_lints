@@ -123,7 +123,8 @@ class _good463__MyState extends State<MyWidget> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused)
       _timer?.cancel();
-    else if (state == AppLifecycleState.resumed) _startTimer();
+    else if (state == AppLifecycleState.resumed)
+      _startTimer();
   }
 }
 

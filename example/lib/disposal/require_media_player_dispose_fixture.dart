@@ -116,7 +116,7 @@ class _bad325__VideoPageState extends State<VideoPage> {
     _controller = VideoPlayerController.asset('video.mp4');
     _controller.initialize();
   }
-// Missing dispose - video hardware stays locked!
+  // Missing dispose - video hardware stays locked!
 }
 
 // GOOD: Should NOT trigger require_media_player_dispose

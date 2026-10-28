@@ -27,7 +27,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.8'
+          sdk: '3.11.6'
       - name: Install dependencies
         run: dart pub get
       # Same as publish.yml: root `dart analyze` resolves nested packages (SDK 3.11+); each
@@ -152,7 +152,7 @@ jobs:
           fetch-depth: 0
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.8'
+          sdk: '3.11.6'
       - name: Install dependencies
         run: dart pub get
       - name: Stub test integrity report
@@ -244,7 +244,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.8'
+          sdk: '3.11.6'
       - name: Run saropa_lints on itself
         id: selflint
         # On the step, so a finding can never fail the job. See above.

@@ -59,9 +59,7 @@ class BadCachedImageNoManager extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // expect_lint: prefer_cached_image_cache_manager
-    return CachedNetworkImage(
-      imageUrl: 'https://example.com/image.jpg',
-    );
+    return CachedNetworkImage(imageUrl: 'https://example.com/image.jpg');
   }
 }
 
@@ -85,12 +83,8 @@ class GoodCachedImageWithManager extends StatelessWidget {
 class Image extends Widget {
   const Image({super.key});
 
-  const Image.network(
-    String url, {
-    Key? key,
-    int? cacheWidth,
-    int? cacheHeight,
-  }) : super(key: key);
+  const Image.network(String url, {Key? key, int? cacheWidth, int? cacheHeight})
+    : super(key: key);
 
   const Image.asset(String name, {Key? key}) : super(key: key);
 }

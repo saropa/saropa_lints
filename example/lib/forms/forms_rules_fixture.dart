@@ -76,13 +76,9 @@ class BadTextFieldNoKeyboardType extends StatelessWidget {
     return Column(
       children: [
         // expect_lint: require_text_input_type
-        TextField(
-          controller: TextEditingController(),
-        ),
+        TextField(controller: TextEditingController()),
         // expect_lint: require_text_input_type
-        TextFormField(
-          controller: TextEditingController(),
-        ),
+        TextFormField(controller: TextEditingController()),
       ],
     );
   }
@@ -123,13 +119,9 @@ class BadTextFieldNoInputAction extends StatelessWidget {
     return Column(
       children: [
         // expect_lint: prefer_text_input_action
-        TextField(
-          controller: TextEditingController(),
-        ),
+        TextField(controller: TextEditingController()),
         // expect_lint: prefer_text_input_action
-        TextFormField(
-          controller: TextEditingController(),
-        ),
+        TextFormField(controller: TextEditingController()),
       ],
     );
   }
@@ -174,10 +166,7 @@ class _BadFormKeyInBuildState extends State<BadFormKeyInBuild> {
   // expect_lint: require_form_key_in_stateful_widget
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>(); // New key every build!
-    return Form(
-      key: formKey,
-      child: Container(),
-    );
+    return Form(key: formKey, child: Container());
   }
 }
 
@@ -194,10 +183,7 @@ class _GoodFormKeyAsFieldState extends State<GoodFormKeyAsField> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Container(),
-    );
+    return Form(key: _formKey, child: Container());
   }
 }
 

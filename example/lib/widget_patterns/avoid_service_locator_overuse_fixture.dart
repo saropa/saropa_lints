@@ -123,5 +123,5 @@ class _bad1377_MyWidget extends StatelessWidget {
 class _good1377_MyWidget extends StatelessWidget {
   final MyService service;
   const _good1377_MyWidget({required this.service});
-// Constructor injection
+  // Constructor injection
 }

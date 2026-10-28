@@ -113,17 +113,11 @@ final context = BuildContext();
 // expect_lint: prefer_actions_and_shortcuts
 void _bad1429() {
   ListView(
-    children: [
-      LayoutBuilder(builder: (context, constraints) => Container()),
-    ],
+    children: [LayoutBuilder(builder: (context, constraints) => Container())],
   );
 }
 
 // GOOD: Should NOT trigger prefer_actions_and_shortcuts
 void _good1429() {
-  LayoutBuilder(
-    builder: (context, constraints) => ListView(
-      children: [],
-    ),
-  );
+  LayoutBuilder(builder: (context, constraints) => ListView(children: []));
 }

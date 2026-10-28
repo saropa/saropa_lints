@@ -27,7 +27,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart' show AstVisitor;
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/string_source.dart';
+import 'package:analyzer/source/file_source.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:saropa_lints/src/scan/capturing_registry.dart';
@@ -75,7 +75,10 @@ List<SyntacticDiagnostic> runRuleSyntactic(
   ).unit;
 
   final listener = RecordingDiagnosticListener();
-  final reporter = DiagnosticReporter(listener, StringSource(code, path));
+  final reporter = DiagnosticReporter(
+    listener,
+    FileSource(provider.getFile(path)),
+  );
   final ctxUnit = RuleContextUnit(
     file: file,
     content: code,

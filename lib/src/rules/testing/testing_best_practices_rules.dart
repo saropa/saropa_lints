@@ -128,7 +128,7 @@ class RequireTestAssertionsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test body (second argument, usually a function)
-      final Expression? bodyArg = args.arguments.length >= 2
+      final Argument? bodyArg = args.arguments.length >= 2
           ? args.arguments[1]
           : null;
 
@@ -234,7 +234,7 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! StringLiteral) return;
 
       final String? description = firstArg.stringValue?.toLowerCase();
@@ -354,7 +354,7 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg = args.arguments.length >= 2
+      final Argument? bodyArg = args.arguments.length >= 2
           ? args.arguments[1]
           : null;
 
@@ -643,7 +643,7 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg = args.arguments.length >= 2
+      final Argument? bodyArg = args.arguments.length >= 2
           ? args.arguments[1]
           : null;
 
@@ -1101,7 +1101,7 @@ class AvoidFindByTextRule extends SaropaLintRule {
       if (!_interactionMethods.contains(methodName)) return;
 
       // Check if any argument uses find.text()
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is MethodInvocation) {
           if (arg.methodName.name == 'text') {
             final Expression? target = arg.target;
@@ -1205,8 +1205,8 @@ class RequireTestKeysRule extends SaropaLintRule {
 
       // Check if key is provided
       bool hasKey = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'key') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'key') {
           hasKey = true;
           break;
         }
@@ -1302,7 +1302,7 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression bodyArg = args.arguments[1];
+      final Argument bodyArg = args.arguments[1];
 
       final String bodySource = bodyArg.toSource();
 
@@ -1666,7 +1666,7 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression matcher = args.arguments[1];
+      final Argument matcher = args.arguments[1];
 
       // Check for literal booleans
       if (matcher is BooleanLiteral) {
@@ -1681,7 +1681,7 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
       }
 
       // Check for .length comparisons
-      final Expression actual = args.arguments.first;
+      final Argument actual = args.arguments.first;
       if (actual is PrefixedIdentifier && actual.identifier.name == 'length') {
         reporter.atNode(node);
       }
@@ -1790,11 +1790,11 @@ class PreferTestWrapperRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression widget = args.arguments.first;
+      final Argument widget = args.arguments.first;
       final String widgetSource = widget.toSource();
 
       // Skip teardown patterns - simple widgets used to unmount before disposal
-      if (_isTeardownWidget(widget)) return;
+      if (_isTeardownWidget(widget.argumentExpression)) return;
 
       // Check if wrapped with MaterialApp or CupertinoApp
       if (!widgetSource.contains('MaterialApp') &&
@@ -1828,8 +1828,8 @@ class PreferTestWrapperRule extends SaropaLintRule {
       // If only has simple args like width/height, it's likely teardown
       if (typeName == 'SizedBox' || typeName == 'Container') {
         final bool hasOnlySimpleArgs = args.every((arg) {
-          if (arg is NamedExpression) {
-            final name = arg.name.label.name;
+          if (arg is NamedArgument) {
+            final name = arg.name.lexeme;
             return name == 'width' ||
                 name == 'height' ||
                 name == 'key' ||
@@ -1921,7 +1921,7 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test name
-      final Expression nameArg = args.arguments.first;
+      final Argument nameArg = args.arguments.first;
       if (nameArg is! StringLiteral) return;
       final String? testName = nameArg.stringValue?.toLowerCase();
       if (testName == null) return;
@@ -2164,7 +2164,7 @@ class RequireGoldenTestRule extends SaropaLintRule {
       if (args.arguments.isEmpty) return;
 
       // Get the test name
-      final Expression nameArg = args.arguments.first;
+      final Argument nameArg = args.arguments.first;
       if (nameArg is! StringLiteral) return;
       final String? testName = nameArg.stringValue?.toLowerCase();
       if (testName == null) return;
@@ -2317,7 +2317,7 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test body
-      final Expression bodyArg = args.arguments[1];
+      final Argument bodyArg = args.arguments[1];
       final String bodySource = bodyArg.toSource();
 
       // Skip if test has safe patterns (mocking in place; word-boundary)
@@ -2550,7 +2550,7 @@ class AvoidFindAllRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression typeArg = args.arguments.first;
+      final Argument typeArg = args.arguments.first;
       final String typeSource = typeArg.toSource();
 
       if (_genericTypes.contains(typeSource)) {
@@ -4124,10 +4124,10 @@ class RequireTestDocumentationRule extends SaropaLintRule {
       if (methodName != 'testWidgets' && methodName != 'test') return;
 
       // Get the test body
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
-      final Expression? testBody = args.length >= 2 ? args[1] : null;
+      final Argument? testBody = args.length >= 2 ? args[1] : null;
       if (testBody is! FunctionExpression) return;
 
       final FunctionBody body = testBody.body;

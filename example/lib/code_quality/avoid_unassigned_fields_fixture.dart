@@ -125,7 +125,10 @@ class _GoodClass200 {
 // GOOD: Named required initializing formal — `required this.x` is wrapped in a
 // DefaultFormalParameter; the field IS assigned, so no lint.
 final class _GoodNamedRequired200 {
-  const _GoodNamedRequired200({required this.beforeRows, required this.afterRows});
+  const _GoodNamedRequired200({
+    required this.beforeRows,
+    required this.afterRows,
+  });
 
   final List<int>? beforeRows; // assigned via named required formal
   final List<int>? afterRows; // assigned via named required formal

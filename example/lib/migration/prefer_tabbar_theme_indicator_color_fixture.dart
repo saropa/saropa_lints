@@ -8,9 +8,7 @@ import '../flutter_mocks.dart';
 // BAD: Using deprecated 'indicatorColor' in ThemeData constructor
 // expect_lint: prefer_tabbar_theme_indicator_color
 ThemeData _badConstructor() {
-  return ThemeData(
-    indicatorColor: Colors.blue,
-  );
+  return ThemeData(indicatorColor: Colors.blue);
 }
 
 // BAD: Using deprecated 'indicatorColor' in ThemeData.copyWith
@@ -30,17 +28,13 @@ void _badPropertyAccess() {
 // GOOD: Using TabBarThemeData.indicatorColor instead
 ThemeData _goodTabBarTheme() {
   return ThemeData(
-    tabBarTheme: const TabBarThemeData(
-      indicatorColor: Colors.blue,
-    ),
+    tabBarTheme: const TabBarThemeData(indicatorColor: Colors.blue),
   );
 }
 
 // GOOD: ThemeData constructor without indicatorColor
 ThemeData _goodNoIndicatorColor() {
-  return ThemeData(
-    primaryColor: Colors.blue,
-  );
+  return ThemeData(primaryColor: Colors.blue);
 }
 
 // GOOD: copyWith without indicatorColor

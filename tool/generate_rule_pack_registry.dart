@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 // CLI tool — print() is the standard mechanism for command-line output; both
 // the SDK rule (avoid_print) and the saropa_lints v3 rule (avoid_print_in_release)
 // fire here as false positives because this script never runs in a release app.
@@ -292,7 +293,10 @@ const Map<String, ({String label, List<String> paths})> kThemePacks = {
       'widget/scroll_rules.dart',
     ],
   ),
-  'animation': (label: 'Animation & motion', paths: ['ui/animation_rules.dart']),
+  'animation': (
+    label: 'Animation & motion',
+    paths: ['ui/animation_rules.dart'],
+  ),
   'dialogs': (
     label: 'Dialogs & overlays',
     paths: ['widget/dialog_snackbar_rules.dart'],
@@ -321,7 +325,10 @@ const Map<String, ({String label, List<String> paths})> kThemePacks = {
     label: 'Hardware & sensors',
     paths: ['hardware/bluetooth_hardware_rules.dart'],
   ),
-  'freezed': (label: 'Freezed (codegen)', paths: ['codegen/freezed_rules.dart']),
+  'freezed': (
+    label: 'Freezed (codegen)',
+    paths: ['codegen/freezed_rules.dart'],
+  ),
   'file_io': (
     label: 'File I/O & handles',
     paths: ['resources/file_handling_rules.dart'],
@@ -394,12 +401,16 @@ Map<String, Set<String>> extractThemePacks(Directory rulesRoot) {
         for (final f in dir.listSync(recursive: true)) {
           if (f is! File || !f.path.endsWith('_rules.dart')) continue;
           codes.addAll(
-            _themeLintNameRe.allMatches(f.readAsStringSync()).map((m) => m.group(1)!),
+            _themeLintNameRe
+                .allMatches(f.readAsStringSync())
+                .map((m) => m.group(1)!),
           );
         }
       } else if (file.existsSync()) {
         codes.addAll(
-          _themeLintNameRe.allMatches(file.readAsStringSync()).map((m) => m.group(1)!),
+          _themeLintNameRe
+              .allMatches(file.readAsStringSync())
+              .map((m) => m.group(1)!),
         );
       }
     }
@@ -520,13 +531,17 @@ void main() {
   final sortedThemeIds = themePacks.keys.toList()..sort();
   for (final id in sortedThemeIds) {
     if (themePacks[id]!.isEmpty) {
-      warnings.add('Theme pack "$id" matched no LintCode names — check kThemePacks paths');
+      warnings.add(
+        'Theme pack "$id" matched no LintCode names — check kThemePacks paths',
+      );
     }
   }
   buf.writeln(
     '/// Theme ("concern") pack rule codes, derived from lib/src/rules/ source paths.',
   );
-  buf.writeln('const Map<String, Set<String>> kRuleThemePackCodesGenerated = {');
+  buf.writeln(
+    'const Map<String, Set<String>> kRuleThemePackCodesGenerated = {',
+  );
   for (final id in sortedThemeIds) {
     buf.writeln("  '$id': {");
     buf.write(_dartSetLiteral(themePacks[id]!));
@@ -639,7 +654,9 @@ void _writeStylisticPackDefinitionsTs({required Directory root}) {
   sb.writeln('export interface StylisticPackDefinition {');
   sb.writeln('  /** Stable snake_case id derived from the category name. */');
   sb.writeln('  readonly id: string;');
-  sb.writeln('  /** Display name (category name minus the conflict marker). */');
+  sb.writeln(
+    '  /** Display name (category name minus the conflict marker). */',
+  );
   sb.writeln('  readonly label: string;');
   sb.writeln(
     "  /** 'pickOne' renders a radio group (mutually exclusive); 'multi' renders toggles. */",
@@ -722,7 +739,9 @@ void _writeRuleTierDefinitionsTs({required Directory root}) {
   );
   sb.writeln(' */');
   sb.writeln();
-  sb.writeln('export const RULE_TIER_BY_CODE: Readonly<Record<string, string>> = {');
+  sb.writeln(
+    'export const RULE_TIER_BY_CODE: Readonly<Record<string, string>> = {',
+  );
   for (final rule in allRules) {
     sb.writeln("  '$rule': '${_introducingTier(rule)}',");
   }

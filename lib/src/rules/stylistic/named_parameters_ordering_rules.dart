@@ -222,15 +222,15 @@ class NamedParametersOrderingRule extends SaropaLintRule {
     if (declaredIndexByName.length < 2) return;
 
     // Named arguments actually present at the call site, in source order.
-    final List<NamedExpression> namedArgs = <NamedExpression>[];
-    for (final Expression arg in argumentList.arguments) {
-      if (arg is NamedExpression) namedArgs.add(arg);
+    final List<NamedArgument> namedArgs = <NamedArgument>[];
+    for (final Argument arg in argumentList.arguments) {
+      if (arg is NamedArgument) namedArgs.add(arg);
     }
     if (namedArgs.length < 2) return;
 
     int lastSeenDeclaredIndex = -1;
-    for (final NamedExpression arg in namedArgs) {
-      final String argName = arg.name.label.name;
+    for (final NamedArgument arg in namedArgs) {
+      final String argName = arg.name.lexeme;
       final int? declaredIndex = declaredIndexByName[argName];
       // An argument name with no matching declared parameter means the
       // signature could not be fully resolved for this call (e.g. a

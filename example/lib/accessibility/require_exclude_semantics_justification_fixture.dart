@@ -111,15 +111,11 @@ dynamic image;
 // BAD: Should trigger require_exclude_semantics_justification
 // expect_lint: require_exclude_semantics_justification
 void _bad2() {
-  ExcludeSemantics(
-    child: DecorativeImage(),
-  );
+  ExcludeSemantics(child: DecorativeImage());
 }
 
 // GOOD: Should NOT trigger require_exclude_semantics_justification
 void _good2() {
   // Decorative image, no semantic meaning
-  ExcludeSemantics(
-    child: DecorativeImage(),
-  );
+  ExcludeSemantics(child: DecorativeImage());
 }

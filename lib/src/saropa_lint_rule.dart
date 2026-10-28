@@ -1773,8 +1773,8 @@ extension InstanceCreationExpressionUtils on InstanceCreationExpression {
   /// node.hasNamedParameter('obscureText')   // false
   /// ```
   bool hasNamedParameter(String name) {
-    for (final Expression arg in argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == name) {
+    for (final Argument arg in argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == name) {
         return true;
       }
     }
@@ -1788,8 +1788,8 @@ extension InstanceCreationExpressionUtils on InstanceCreationExpression {
   /// node.hasAnyNamedParameter({'keyboardType', 'inputType'})
   /// ```
   bool hasAnyNamedParameter(Set<String> names) {
-    for (final Expression arg in argumentList.arguments) {
-      if (arg is NamedExpression && names.contains(arg.name.label.name)) {
+    for (final Argument arg in argumentList.arguments) {
+      if (arg is NamedArgument && names.contains(arg.name.lexeme)) {
         return true;
       }
     }
@@ -1800,9 +1800,9 @@ extension InstanceCreationExpressionUtils on InstanceCreationExpression {
   ///
   /// Returns the [Expression] for the parameter value, or null if not found.
   Expression? getNamedParameterValue(String name) {
-    for (final Expression arg in argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == name) {
-        return arg.expression;
+    for (final Argument arg in argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == name) {
+        return arg.argumentExpression;
       }
     }
     return null;

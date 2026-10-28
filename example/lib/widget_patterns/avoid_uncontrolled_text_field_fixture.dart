@@ -115,7 +115,7 @@ class _bad1374__MyWidgetState extends State<MyWidget> {
     super.initState();
     _controller = TextEditingController();
   }
-// Missing dispose() - memory leak!
+  // Missing dispose() - memory leak!
 }
 
 // GOOD: Should NOT trigger avoid_uncontrolled_text_field

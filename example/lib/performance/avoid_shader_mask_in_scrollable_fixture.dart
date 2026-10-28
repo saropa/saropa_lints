@@ -10,10 +10,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: ShaderMask forces an offscreen saveLayer for every visible item.
 // expect_lint: avoid_shader_mask_in_scrollable
 Widget _bad(List<Widget> items, dynamic cb) => ListView(
-      children: [
-        for (final w in items) ShaderMask(shaderCallback: cb, child: w),
-      ],
-    );
+  children: [for (final w in items) ShaderMask(shaderCallback: cb, child: w)],
+);
 
 // GOOD: gradient applied as a decoration per item — no per-item saveLayer.
 Widget _good(List<Widget> items) => ListView(children: items);

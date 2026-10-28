@@ -37,10 +37,12 @@ class ReplaceFirstWhereWithByNameFix extends SaropaFixProducer {
       return;
     }
 
-    final NodeList<Expression> args = invocation.argumentList.arguments;
-    if (args.isEmpty) return;
+    final NodeList<Argument> args = invocation.argumentList.arguments;
+    // Only a positional predicate qualifies; `firstWhere(orElse: ...)` must
+    // not have its named closure unwrapped and mistaken for the predicate.
+    if (args.isEmpty || args.first is NamedArgument) return;
 
-    final Expression firstArg = args.first;
+    final Expression firstArg = args.first.argumentExpression;
     if (firstArg is! FunctionExpression) return;
 
     final FunctionBody body = firstArg.body;

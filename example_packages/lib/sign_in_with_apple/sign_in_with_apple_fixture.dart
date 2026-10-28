@@ -20,15 +20,13 @@ class SignInWithApple {
   static Future<AuthorizationCredentialAppleID> getAppleIDCredential({
     required List<dynamic> scopes,
     String? nonce,
-  }) async =>
-      throw UnimplementedError();
+  }) async => throw UnimplementedError();
 
   static Future<bool> isAvailable() async => true;
 
   static Future<CredentialState> getCredentialState(
     String userIdentifier,
-  ) async =>
-      CredentialState.authorized;
+  ) async => CredentialState.authorized;
 }
 
 class AuthorizationCredentialAppleID {

@@ -111,19 +111,13 @@ final message = 'Message';
 // BAD: Should trigger avoid_image_buttons_without_tooltip
 // expect_lint: avoid_image_buttons_without_tooltip
 void _bad9() {
-  InkWell(
-    onTap: () {},
-    child: Image.asset('assets/logo.png'),
-  );
+  InkWell(onTap: () {}, child: Image.asset('assets/logo.png'));
 }
 
 // GOOD: Should NOT trigger avoid_image_buttons_without_tooltip
 void _good9() {
   Tooltip(
     message: 'Go to home',
-    child: InkWell(
-      onTap: () {},
-      child: Image.asset('assets/logo.png'),
-    ),
+    child: InkWell(onTap: () {}, child: Image.asset('assets/logo.png')),
   );
 }

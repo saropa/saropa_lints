@@ -536,7 +536,7 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
       }
 
       // Check if any string argument contains OAuth URL
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource();
         for (final String pattern in _oauthPatterns) {
           if (argSource.contains(pattern)) {
@@ -811,8 +811,8 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
               return;
             }
           }
-          if (parent is NamedExpression) {
-            final String paramName = parent.name.label.name.toLowerCase();
+          if (parent is NamedArgument) {
+            final String paramName = parent.name.lexeme.toLowerCase();
             if (paramName.contains('bundle') ||
                 paramName.contains('package') ||
                 paramName.contains('appid')) {
@@ -1320,9 +1320,11 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
       }
 
       // Check if key contains sensitive patterns
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'key') {
-          final String keyValue = arg.expression.toSource().toLowerCase();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'key') {
+          final String keyValue = arg.argumentExpression
+              .toSource()
+              .toLowerCase();
           for (final String pattern in _sensitiveKeyPatterns) {
             if (keyValue.contains(pattern)) {
               // Check if ThisDeviceOnly is specified

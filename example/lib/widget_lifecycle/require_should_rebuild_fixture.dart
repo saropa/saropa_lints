@@ -113,7 +113,7 @@ dynamic value;
 class _bad1361_MyInherited extends InheritedWidget {
   final int value;
   const _bad1361_MyInherited({required this.value, required super.child});
-// Missing updateShouldNotify — causes unnecessary rebuilds.
+  // Missing updateShouldNotify — causes unnecessary rebuilds.
 }
 
 // GOOD: Should NOT trigger require_should_rebuild

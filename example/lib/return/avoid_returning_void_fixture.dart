@@ -117,5 +117,5 @@ void doOther() {
 
 // GOOD: Should NOT trigger avoid_returning_void
 void _good979_doSomething() {
-// Just don't return
+  // Just don't return
 }

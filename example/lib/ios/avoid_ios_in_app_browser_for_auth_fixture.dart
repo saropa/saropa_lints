@@ -109,9 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: avoid_ios_in_app_browser_for_auth
 void _bad855() {
   // OAuth in WebView - blocked by Google/Apple
-  WebView(
-    initialUrl: 'https://accounts.google.com/o/oauth2/auth?',
-  );
+  WebView(initialUrl: 'https://accounts.google.com/o/oauth2/auth?');
 }
 
 // GOOD: Should NOT trigger avoid_ios_in_app_browser_for_auth

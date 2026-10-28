@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 // CLI tool — print() is the standard mechanism for command-line output; both
 // the SDK rule (avoid_print) and the saropa_lints v3 rule (avoid_print_in_release)
 // fire here as false positives because this script never runs in a release app.

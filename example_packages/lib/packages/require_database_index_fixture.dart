@@ -120,8 +120,10 @@ class _bad612_Product {
 
 // Slow query!
 Future<void> _bad612_usage() async {
-  final products =
-      await isar.products.filter().categoryEqualTo('electronics').findAll();
+  final products = await isar.products
+      .filter()
+      .categoryEqualTo('electronics')
+      .findAll();
 }
 
 // GOOD: Should NOT trigger require_database_index

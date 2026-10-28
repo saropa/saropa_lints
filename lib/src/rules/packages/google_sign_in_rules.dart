@@ -93,7 +93,8 @@ bool _isInsideCallbackClosure(AstNode node) {
     if (current is FunctionExpression) {
       final AstNode? parent = current.parent;
       if (parent is ArgumentList ||
-          parent is NamedExpression ||
+          parent is NamedArgument ||
+          parent is RecordLiteralNamedField ||
           parent is FunctionExpressionInvocation) {
         return true;
       }

@@ -118,8 +118,6 @@ void _bad1328() {
 
 // GOOD: Should NOT trigger avoid_absorb_pointer_misuse
 void _good1328() {
-  Container(
-    color: Theme.of(context).colorScheme.primary,
-  );
+  Container(color: Theme.of(context).colorScheme.primary);
   Icon(Icons.home, color: Theme.of(context).colorScheme.onSurface);
 }

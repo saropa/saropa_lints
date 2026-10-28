@@ -117,8 +117,5 @@ void _bad1423() {
 
 // GOOD: Should NOT trigger prefer_asset_image_for_local
 void _good1423() {
-  Wrap(
-    spacing: 8,
-    children: [Chip(), Chip(), Chip(), Chip()],
-  );
+  Wrap(spacing: 8, children: [Chip(), Chip(), Chip(), Chip()]);
 }

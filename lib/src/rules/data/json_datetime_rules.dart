@@ -290,10 +290,10 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
   bool _isProvablyParseableArgument(
     MethodInvocation parseCall, {
     required String parseType,
-    required NodeList<Expression> argument,
+    required NodeList<Argument> argument,
   }) {
     if (argument.length != 1) return false;
-    final Expression raw = _unwrapExpression(argument.first);
+    final Expression raw = _unwrapExpression(argument.first.argumentExpression);
     return _isValidLiteralForParseType(raw, parseType: parseType) ||
         _isDigitOnlyRegexCapture(raw, parseCall) ||
         _isRegexValidatedSubstring(raw, parseCall);
@@ -403,7 +403,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
         expression.methodName.name == 'group' &&
         expression.target is SimpleIdentifier &&
         expression.argumentList.arguments.length == 1) {
-      final Expression groupArg = expression.argumentList.arguments.first;
+      final Argument groupArg = expression.argumentList.arguments.first;
       if (groupArg is IntegerLiteral) {
         final int? groupIndex = groupArg.value;
         if (groupIndex != null && groupIndex > 0) {
@@ -457,7 +457,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
     if (operand.argumentList.arguments.length != 1) return false;
     final Expression arg = _unwrapExpression(
-      operand.argumentList.arguments.first,
+      operand.argumentList.arguments.first.argumentExpression,
     );
     if (arg is! SimpleIdentifier || arg.name != variableName) return false;
 
@@ -535,9 +535,9 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     return null;
   }
 
-  String? _extractPatternFromRegExpArgs(NodeList<Expression> args) {
+  String? _extractPatternFromRegExpArgs(NodeList<Argument> args) {
     if (args.isEmpty) return null;
-    final Expression first = _unwrapExpression(args.first);
+    final Expression first = _unwrapExpression(args.first.argumentExpression);
     if (first is! StringLiteral) return null;
     return first.stringValue;
   }
@@ -684,10 +684,10 @@ class PreferDurationConstantsRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Duration') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        final String name = arg.name.label.name;
-        final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        final String name = arg.name.lexeme;
+        final Expression value = arg.argumentExpression;
 
         if (value is! IntegerLiteral) continue;
         final int intValue = value.value ?? 0;
@@ -1115,10 +1115,10 @@ class RequireDateFormatSpecificationRule extends SaropaLintRule {
       if (node.methodName.name != 'parse') return;
 
       // Check if the argument is from JSON or a variable (not a literal)
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
       // If it's a string literal, it's probably fine (developer knows the format)
       if (firstArg is StringLiteral) return;
 
@@ -1185,10 +1185,10 @@ class PreferIso8601DatesRule extends SaropaLintRule {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'DateFormat') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
       if (firstArg is! StringLiteral) return;
 
       final String? format = firstArg.stringValue;
@@ -1364,8 +1364,8 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
 
       // Count manual mappings (json['key'] patterns)
       int manualMappings = 0;
-      for (final Expression arg in expr.argumentList.arguments) {
-        if (_isManualJsonAccess(arg)) {
+      for (final Argument arg in expr.argumentList.arguments) {
+        if (_isManualJsonAccess(arg.argumentExpression)) {
           manualMappings++;
         }
       }
@@ -1377,9 +1377,9 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
     });
   }
 
-  bool _isManualJsonAccess(Expression expr) {
-    if (expr is NamedExpression) {
-      return _isManualJsonAccess(expr.expression);
+  bool _isManualJsonAccess(Argument expr) {
+    if (expr is NamedArgument) {
+      return _isManualJsonAccess(expr.argumentExpression);
     }
     if (expr is IndexExpression) {
       final Expression? target = expr.target;
@@ -1756,15 +1756,15 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
       }
 
       // Check format string in default constructor
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
       String? formatString;
       if (firstArg is SimpleStringLiteral) {
         formatString = firstArg.value;
-      } else if (firstArg is NamedExpression) {
-        if (firstArg.expression case SimpleStringLiteral s) {
+      } else if (firstArg is NamedArgument) {
+        if (firstArg.argumentExpression case SimpleStringLiteral s) {
           formatString = s.value;
         }
       }
@@ -2028,7 +2028,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
       final String? namedConstructor = constructorName.name?.name;
       if (namedConstructor != null && namedConstructor != 'utc') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
 
       if (allLiteralsInRange(args)) return;
 
@@ -2044,7 +2044,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
   /// Returns true when every positional argument is an integer literal
   /// within the valid range for its position in the DateTime constructor.
   /// Day upper bound is 31 (not calendar-aware — Feb 31 passes).
-  static bool allLiteralsInRange(NodeList<Expression> args) {
+  static bool allLiteralsInRange(NodeList<Argument> args) {
     if (args.isEmpty) return false;
 
     // DateTime constructor takes up to 8 positional int args, no named args.
@@ -2053,7 +2053,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
     const List<int> minValues = [0, 1, 0, 0, 0, 0, 0, 0];
 
     for (int i = 0; i < args.length; i++) {
-      final Expression arg = args[i];
+      final Argument arg = args[i];
       if (arg is! IntegerLiteral) return false;
       final int? value = arg.value;
       if (value == null) return false;
@@ -2074,12 +2074,12 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
   ///
   /// Remaining args (positions 3+) may be anything — hour/min/sec/ms/us don't
   /// affect date validity and are commonly set to literal 0 in strip-time code.
-  static bool componentsFromValidDateTime(NodeList<Expression> args) {
+  static bool componentsFromValidDateTime(NodeList<Argument> args) {
     if (args.length < 3) return false;
 
     // Named arguments are unusual for DateTime() and signal intent we can't
     // verify with this positional heuristic.
-    if (args.any((a) => a is NamedExpression)) return false;
+    if (args.any((a) => a is NamedArgument)) return false;
 
     const List<String> expectedProperties = ['year', 'month', 'day'];
 
@@ -2089,7 +2089,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
 
     for (int i = 0; i < 3; i++) {
       final _DateComponentMatch? match = _matchDateComponent(
-        args[i],
+        args[i].argumentExpression,
         expectedProperties[i],
         // Only the day arg (i==2) allows ± arithmetic for rollover.
         allowArithmetic: i == 2,
@@ -2105,7 +2105,9 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
     }
 
     // Verify the receiver's static type is DateTime (or DateTime?).
-    final DartType? receiverType = _receiverStaticType(args[0]);
+    final DartType? receiverType = _receiverStaticType(
+      args[0].argumentExpression,
+    );
     if (receiverType == null || !_isCoreDateTime(receiverType)) return false;
 
     return true;
@@ -2288,7 +2290,7 @@ class AvoidDateTimeConstructorUnvalidatedRule extends SaropaLintRule {
       final String? named = constructorName.name?.name;
       if (named != null && named != 'utc') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
 
       if (AvoidDateTimeConstructorRule.allLiteralsInRange(args)) return;
 
@@ -2315,7 +2317,8 @@ class AvoidDateTimeConstructorUnvalidatedRule extends SaropaLintRule {
     if (parent is ReturnStatement) return true;
 
     // Used in a named expression (widget parameter).
-    if (parent is NamedExpression) return true;
+    if (parent is NamedArgument || parent is RecordLiteralNamedField)
+      return true;
 
     // Field initializer (not a local variable).
     if (parent is VariableDeclaration) {

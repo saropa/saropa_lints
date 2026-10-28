@@ -115,8 +115,5 @@ void _bad1284() {
 
 // GOOD: Should NOT trigger avoid_shrink_wrap_in_lists
 void _good1284() {
-  Image.asset(
-    'logo.png',
-    semanticLabel: 'Company logo',
-  );
+  Image.asset('logo.png', semanticLabel: 'Company logo');
 }

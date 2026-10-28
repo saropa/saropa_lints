@@ -121,8 +121,5 @@ void _bad450() {
 
 // GOOD: Should NOT trigger require_intl_args_match
 void _good450() {
-  Intl.message(
-    'Hello $name, you have $count items',
-    args: [name, count],
-  );
+  Intl.message('Hello $name, you have $count items', args: [name, count]);
 }

@@ -118,8 +118,10 @@ void _bad589() async {
 
 // GOOD: Should NOT trigger require_dio_timeout
 void _good589() {
-  final dio = Dio(BaseOptions(
-    connectTimeout: Duration(seconds: 10),
-    receiveTimeout: Duration(seconds: 30),
-  ));
+  final dio = Dio(
+    BaseOptions(
+      connectTimeout: Duration(seconds: 10),
+      receiveTimeout: Duration(seconds: 30),
+    ),
+  );
 }

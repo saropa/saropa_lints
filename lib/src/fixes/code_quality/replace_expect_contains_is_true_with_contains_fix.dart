@@ -36,7 +36,10 @@ class ReplaceExpectContainsIsTrueWithContainsFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<MethodInvocation>();
     if (expectCall == null || expectCall.methodName.name != 'expect') return;
 
-    final List<Expression> args = expectCall.argumentList.arguments.toList();
+    final List<Expression> args = expectCall.argumentList.arguments
+        .where((a) => a is! NamedArgument)
+        .map((a) => a.argumentExpression)
+        .toList();
     if (args.length < 2) return;
 
     final Expression actual = args[0];
@@ -58,6 +61,8 @@ class ReplaceExpectContainsIsTrueWithContainsFix extends SaropaFixProducer {
     final Expression? containsTarget = actual.target;
     if (containsTarget == null) return;
     final List<Expression> containsArgs = actual.argumentList.arguments
+        .where((a) => a is! NamedArgument)
+        .map((a) => a.argumentExpression)
         .toList();
     if (containsArgs.isEmpty) return;
     final Expression firstArg = containsArgs[0];

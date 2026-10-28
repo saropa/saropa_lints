@@ -91,14 +91,18 @@ void _bad3() async {
 
 // GOOD: orderByChild without filter (simple sort)
 void _good1() async {
-  final snapshot =
-      await FirebaseDatabase.instance.ref('users').orderByChild('name').once();
+  final snapshot = await FirebaseDatabase.instance
+      .ref('users')
+      .orderByChild('name')
+      .once();
 }
 
 // GOOD: filter without orderByChild (no compound query)
 void _good2() async {
-  final snapshot =
-      await FirebaseDatabase.instance.ref('users').limitToFirst(10).once();
+  final snapshot = await FirebaseDatabase.instance
+      .ref('users')
+      .limitToFirst(10)
+      .once();
 }
 
 // GOOD: simple ref query (no ordering or filtering)
@@ -108,6 +112,8 @@ void _good3() async {
 
 // GOOD: child path access (not a query)
 void _good4() async {
-  final snapshot =
-      await FirebaseDatabase.instance.ref('users').child('user123').get();
+  final snapshot = await FirebaseDatabase.instance
+      .ref('users')
+      .child('user123')
+      .get();
 }

@@ -73,8 +73,8 @@ List<Expression> collectPositionalArgs(ArgumentList arguments) {
   final positionalArgs = <Expression>[];
   for (final arg in arguments.arguments) {
     // Named expressions are already disambiguated — skip them
-    if (arg is NamedExpression) continue;
-    positionalArgs.add(arg);
+    if (arg is NamedArgument) continue;
+    positionalArgs.add(arg.argumentExpression);
   }
   return positionalArgs;
 }

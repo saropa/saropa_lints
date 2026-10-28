@@ -256,5 +256,45 @@ class TestGeneratedDartMapParity(unittest.TestCase):
         )
 
 
+class TriePatternEquivalenceTests(unittest.TestCase):
+    """The prefix-factored patterns must match exactly like a flat list."""
+
+    def test_trie_patterns_match_flat_alternation(self) -> None:
+        import re
+
+        from scripts.modules import _us_spelling as sp
+
+        flat_word = re.compile(
+            r"\b(" + "|".join(re.escape(w) for w in sp._SORTED_UK) + r")\b",
+            re.IGNORECASE,
+        )
+        flat_camel = re.compile(
+            r"(?<=[a-z])("
+            + "|".join(re.escape(w) for w in sp._CAPITALIZED_UK)
+            + r")(?![a-z])"
+        )
+
+        def spans(pattern: "re.Pattern[str]", line: str) -> list:
+            return [(m.span(), m.group(1)) for m in pattern.finditer(line)]
+
+        for word in sp._SORTED_UK:
+            for line in (
+                word,
+                word.upper(),
+                word + "s",
+                f"{word}ed {word}",
+                "x" + word.capitalize() + "y",
+                "aa" + word.capitalize(),
+            ):
+                self.assertEqual(
+                    spans(flat_word, line), spans(sp._UK_PATTERN, line), line
+                )
+                self.assertEqual(
+                    spans(flat_camel, line),
+                    spans(sp._UK_CAMEL_PATTERN, line),
+                    line,
+                )
+
+
 if __name__ == "__main__":
     unittest.main()

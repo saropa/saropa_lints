@@ -162,8 +162,10 @@ Widget _good787_onPressed_build(BuildContext context) {
 // current build pass. (The build-time scheduling itself is the concern of
 // other rules such as avoid_future_in_build, not this one.)
 Widget _good787_then_build(BuildContext context) {
-  Future.value(0).then((_) => setState(() {
-    /**/
-  }));
+  Future.value(0).then(
+    (_) => setState(() {
+      /**/
+    }),
+  );
   return Container();
 }

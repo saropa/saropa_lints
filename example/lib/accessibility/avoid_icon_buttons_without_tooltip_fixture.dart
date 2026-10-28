@@ -110,17 +110,10 @@ dynamic item;
 // BAD: Should trigger avoid_icon_buttons_without_tooltip
 // expect_lint: avoid_icon_buttons_without_tooltip
 void _bad0() {
-  IconButton(
-    icon: Icon(Icons.add),
-    onPressed: () {},
-  );
+  IconButton(icon: Icon(Icons.add), onPressed: () {});
 }
 
 // GOOD: Should NOT trigger avoid_icon_buttons_without_tooltip
 void _good0() {
-  IconButton(
-    icon: Icon(Icons.add),
-    onPressed: () {},
-    tooltip: 'Add item',
-  );
+  IconButton(icon: Icon(Icons.add), onPressed: () {}, tooltip: 'Add item');
 }

@@ -25,9 +25,9 @@ class RemoveAlwaysNullArgumentFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final arg = node is NamedExpression
+    final arg = node is NamedArgument
         ? node
-        : node.thisOrAncestorOfType<NamedExpression>();
+        : node.thisOrAncestorOfType<NamedArgument>();
     if (arg == null) return;
 
     final content = unitResult.content;

@@ -113,16 +113,15 @@ dynamic state;
 // BAD: Should trigger require_go_router_fallback_route
 // expect_lint: require_go_router_fallback_route
 void _bad526() {
-  GoRouter(routes: [
-    GoRoute(path: '/', builder: (_, __) => Container()),
-    // No fallback!
-  ]);
+  GoRouter(
+    routes: [
+      GoRoute(path: '/', builder: (_, __) => Container()),
+      // No fallback!
+    ],
+  );
 }
 
 // GOOD: Should NOT trigger require_go_router_fallback_route
 void _good526() {
-  GoRouter(
-    errorBuilder: (context, state) => ErrorPage(),
-    routes: [],
-  );
+  GoRouter(errorBuilder: (context, state) => ErrorPage(), routes: []);
 }

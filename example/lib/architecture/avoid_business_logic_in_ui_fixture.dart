@@ -114,8 +114,10 @@ final items = <dynamic>[];
 // expect_lint: avoid_business_logic_in_ui
 class _bad77_CartWidget extends StatelessWidget {
   double calculateTotal() {
-    return items.fold(0,
-        (sum, item) => sum + item.price * item.quantity * (1 - item.discount));
+    return items.fold(
+      0,
+      (sum, item) => sum + item.price * item.quantity * (1 - item.discount),
+    );
   }
 }
 

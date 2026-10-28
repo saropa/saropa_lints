@@ -217,9 +217,7 @@ void testOpenAiKeyInCode() {
 
 void testWebViewWithoutSslHandler() {
   // expect_lint: require_webview_ssl_error_handling
-  final webView = WebView(
-    initialUrl: 'https://example.com',
-  );
+  final webView = WebView(initialUrl: 'https://example.com');
 }
 
 void testWebViewWithSslHandler() {
@@ -352,9 +350,7 @@ void testGoogleFontsWithoutFallback() {
 
 void testGoogleFontsWithFallback() {
   // GOOD: Has fontFamilyFallback
-  final style = GoogleFonts.roboto(
-    fontFamilyFallback: ['Arial', 'sans-serif'],
-  );
+  final style = GoogleFonts.roboto(fontFamilyFallback: ['Arial', 'sans-serif']);
 }
 
 // -----------------------------------------------------------------------------
@@ -409,8 +405,9 @@ class FirebaseInBuildWidgetDemo extends StatelessWidgetDemo {
   @override
   Widget build(BuildContext context) {
     // expect_lint: avoid_firebase_realtime_in_build
-    final stream =
-        FirebaseFirestoreDemo.instance.collection('users').snapshots();
+    final stream = FirebaseFirestoreDemo.instance
+        .collection('users')
+        .snapshots();
     return Container();
   }
 }

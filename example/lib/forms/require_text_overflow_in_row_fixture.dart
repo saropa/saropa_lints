@@ -124,12 +124,7 @@ void _bad394() {
 void _good394() {
   Row(
     children: [
-      Expanded(
-        child: Text(
-          userName,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
+      Expanded(child: Text(userName, overflow: TextOverflow.ellipsis)),
     ],
   );
 }

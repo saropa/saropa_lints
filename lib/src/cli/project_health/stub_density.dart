@@ -112,8 +112,8 @@ class _EmptyBodyStubVisitor extends RecursiveAstVisitor<void> {
       // stub that earns misleading coverage. Excluding it lets such cases be
       // recorded explicitly while the gate still rejects real `() {}` stubs.
       final isSkipped = node.argumentList.arguments
-          .whereType<NamedExpression>()
-          .any((arg) => arg.name.label.name == 'skip');
+          .whereType<NamedArgument>()
+          .any((arg) => arg.name.lexeme == 'skip');
       if (!isSkipped) {
         final callback = node.argumentList.arguments
             .whereType<FunctionExpression>()

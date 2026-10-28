@@ -21,8 +21,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart' show AstVisitor, CompilationUnit;
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-// ignore: implementation_imports -- no public API for StringSource (analyzer <=7.4.x)
-import 'package:analyzer/src/string_source.dart';
+import 'package:analyzer/source/file_source.dart';
 import 'package:path/path.dart' as p;
 
 import '../config/memory_mode.dart' show MemoryModeConfig;
@@ -638,7 +637,9 @@ class ScanRunner {
     ).unit;
 
     final listener = RecordingDiagnosticListener();
-    final source = StringSource(content, filePath);
+    final source = FileSource(
+      PhysicalResourceProvider.INSTANCE.getFile(filePath),
+    );
     final reporter = DiagnosticReporter(listener, source);
     final ctxUnit = _createContextUnit(content, filePath, unit: unit);
 
@@ -788,7 +789,7 @@ class ScanRunner {
     final listener = RecordingDiagnosticListener();
     final reporter = DiagnosticReporter(
       listener,
-      StringSource(result.content, filePath),
+      FileSource(PhysicalResourceProvider.INSTANCE.getFile(filePath)),
     );
     final ctxUnit = RuleContextUnit(
       file: PhysicalResourceProvider.INSTANCE.getFile(filePath),
@@ -894,10 +895,7 @@ class ScanRunner {
     final provider = PhysicalResourceProvider.INSTANCE;
     final file = provider.getFile(filePath);
     final listener = RecordingDiagnosticListener();
-    final reporter = DiagnosticReporter(
-      listener,
-      StringSource(content, filePath),
-    );
+    final reporter = DiagnosticReporter(listener, FileSource(file));
     return RuleContextUnit(
       file: file,
       content: content,

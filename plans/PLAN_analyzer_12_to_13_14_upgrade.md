@@ -87,7 +87,7 @@
 ### Source and scope
 
 - Start from the earlier migration commits (section 1). Cherry-pick, then redo the renames over code added since 2026-08-25: 541 commits, 185 `lib/` files, about 100 under `lib/src/rules`.
-- The Dart 3.13.0 SDK floor of `39b665c8` is not required. Keep `sdk: ">=3.9.0 <4.0.0"`. Analyzer 13.0.0 needs only Dart 3.9.
+- The Dart 3.13.0 SDK floor of `39b665c8` is not required. CORRECTED by CI (PR 366): analyzer 13.0.0 depends on `_fe_analyzer_shared` ^100.0.0, which needs Dart 3.11, so the floor is `sdk: ">=3.11.0 <4.0.0"` and CI runs 3.11.6.
 - Typedef aliases do not work: `NamedArgument` is not an `Expression` and its getters differ.
 
 ### Renames (counts from HEAD `0efa9cab`)
@@ -150,12 +150,12 @@ Dart 3.13 adds six lints: `use_declaring_parameters`, `initialize_in_field_decla
 | Plugin `analysis_server_plugin` | Pins analyzer | analyzer sdk | analyzer meta |
 |---|---|---|---|
 | 0.3.14 | 12.1.0 | ^3.9.0 | ^1.18.0 |
-| 0.3.15 | 13.0.0 | ^3.9.0 | ^1.18.0 |
+| 0.3.15 | 13.0.0 | ^3.11.0 (via _fe_analyzer_shared 100; pub.dev metadata says ^3.9.0 but the solver rejects 3.10.8) | ^1.18.0 |
 | 0.3.16 / 0.3.17 / 0.3.18 | 13.1.0 / 13.2.0 / 13.3.0 | ^3.11.0 | ^1.18.3 |
 | 0.3.19 to 0.3.24 | 14.0.0 to 14.5.0 | ^3.11.0 | ^1.18.3 |
 | 0.3.25 | 14.6.0 | ^3.13.0 | ^1.18.3 |
 
-Each plugin release pins one analyzer exactly. pub picks the newest analyzer the project's Dart allows: Dart 3.9/3.10 gets 13.0.0; Dart 3.11/3.12 up to 14.5.0; Dart 3.13 gets 14.6.0.
+Each plugin release pins one analyzer exactly. pub picks the newest analyzer the project's Dart allows: Dart 3.11/3.12 up to 14.5.0; Dart 3.13 gets 14.6.0.
 
 ### Analyzer 14 behavior (analyzer changelog; nothing compiled)
 

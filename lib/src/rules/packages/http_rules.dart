@@ -144,8 +144,10 @@ class _BodyScan extends RecursiveAstVisitor<void> {
   /// local leak can no longer be proven. Conservative on purpose.
   bool escapesAsArgument(String varName) {
     for (final MethodInvocation inv in invocations) {
-      for (final Expression arg in inv.argumentList.arguments) {
-        final Expression value = arg is NamedExpression ? arg.expression : arg;
+      for (final Argument arg in inv.argumentList.arguments) {
+        final Argument value = arg is NamedArgument
+            ? arg.argumentExpression
+            : arg;
         if (value is SimpleIdentifier && value.name == varName) return true;
       }
     }
@@ -451,9 +453,9 @@ class AvoidHttpStringUrlRule extends SaropaLintRule {
   }
 
   Expression? _firstPositional(MethodInvocation node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression) continue;
-      return arg;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument) continue;
+      return arg.argumentExpression;
     }
     return null;
   }

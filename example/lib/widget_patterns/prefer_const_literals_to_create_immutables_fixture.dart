@@ -18,8 +18,7 @@ Widget good() => Column(children: const [Text('a')]);
 Widget goodConstParent() => const Column(children: [Text('a')]);
 
 // GOOD: Same as above with an already-explicit const on the literal.
-Widget goodConstParentAndLiteral() =>
-    const Column(children: const [Text('a')]);
+Widget goodConstParentAndLiteral() => const Column(children: const [Text('a')]);
 
 // GOOD: const context propagates through nested const constructors. The
 // Column has no explicit `const` keyword, but it inherits a const context

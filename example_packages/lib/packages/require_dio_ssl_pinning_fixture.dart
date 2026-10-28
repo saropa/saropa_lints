@@ -121,8 +121,8 @@ void _good593() {
   dio.httpClientAdapter = IOHttpClientAdapter(
     createHttpClient: () {
       final client = HttpClient(context: SecurityContext());
-      client.badCertificateCallback =
-          (cert, host, port) => validateCertificate(cert);
+      client.badCertificateCallback = (cert, host, port) =>
+          validateCertificate(cert);
       return client;
     },
   );

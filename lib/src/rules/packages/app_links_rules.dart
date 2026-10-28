@@ -231,8 +231,7 @@ class AppLinksUncaughtStreamErrorRule extends SaropaLintRule {
       }
 
       final bool hasOnError = node.argumentList.arguments.any(
-        (Expression arg) =>
-            arg is NamedExpression && arg.name.label.name == 'onError',
+        (Argument arg) => arg is NamedArgument && arg.name.lexeme == 'onError',
       );
       if (hasOnError) return;
 

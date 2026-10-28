@@ -577,7 +577,7 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
       if (!isLongLivedCallback) return;
 
       // Check if any argument is an inline function that uses setState or this
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String funcSource = arg.toSource();
           if (funcSource.contains('setState') ||
@@ -941,7 +941,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
 
       // Check for compute() calls
       if (methodName == 'compute') {
-        final NodeList<Expression> args = node.argumentList.arguments;
+        final NodeList<Argument> args = node.argumentList.arguments;
         if (args.length >= 2) {
           final String argSource = args[1].toSource().toLowerCase();
 
@@ -963,7 +963,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
           final String targetSource = target.toSource().toLowerCase();
           if (RegExp(r'\bport\b').hasMatch(targetSource) ||
               RegExp(r'\bsendport\b').hasMatch(targetSource)) {
-            final NodeList<Expression> args = node.argumentList.arguments;
+            final NodeList<Argument> args = node.argumentList.arguments;
             if (args.isNotEmpty) {
               final String argSource = args.first.toSource().toLowerCase();
               if (argSource.contains('list') ||
@@ -1996,7 +1996,7 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
 
     // The closure may be a direct argument or inside an ArgumentList
     AstNode? argContext = parent;
-    if (argContext is NamedExpression) {
+    if (argContext is NamedArgument) {
       argContext = argContext.parent;
     }
     if (argContext is! ArgumentList) return false;

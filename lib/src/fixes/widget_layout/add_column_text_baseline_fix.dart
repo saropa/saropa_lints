@@ -30,7 +30,7 @@ class AddColumnTextBaselineFix extends SaropaFixProducer {
     final ice = parent;
 
     for (final arg in ice.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'textBaseline') {
+      if (arg is NamedArgument && arg.name.lexeme == 'textBaseline') {
         return;
       }
     }

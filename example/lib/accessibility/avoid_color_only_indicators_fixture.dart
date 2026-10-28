@@ -114,9 +114,7 @@ const accent = Colors.blue;
 // BAD: Should trigger avoid_color_only_indicators
 // expect_lint: avoid_color_only_indicators
 void _bad3() {
-  Container(
-    color: isError ? Colors.red : Colors.green,
-  );
+  Container(color: isError ? Colors.red : Colors.green);
 }
 
 // GOOD: Should NOT trigger avoid_color_only_indicators
@@ -133,10 +131,7 @@ void _good3() {
 void _goodTransparencyToggle() {
   Column(
     children: <Widget>[
-      Container(
-        height: 2.5,
-        color: active ? accent : Colors.transparent,
-      ),
+      Container(height: 2.5, color: active ? accent : Colors.transparent),
     ],
   );
 }
@@ -145,11 +140,13 @@ void _goodTransparencyToggle() {
 void _goodSiblingWeightCue() {
   Column(
     children: <Widget>[
-      Text('Email', style: TextStyle(fontWeight: active ? FontWeight.bold : FontWeight.normal)),
-      Container(
-        height: 2.5,
-        color: active ? accent : Colors.grey,
+      Text(
+        'Email',
+        style: TextStyle(
+          fontWeight: active ? FontWeight.bold : FontWeight.normal,
+        ),
       ),
+      Container(height: 2.5, color: active ? accent : Colors.grey),
     ],
   );
 }
@@ -164,10 +161,7 @@ void _goodSiblingGlyphCue() {
           Text('Tab'),
         ],
       ),
-      Container(
-        height: 2.5,
-        color: active ? accent : Colors.grey,
-      ),
+      Container(height: 2.5, color: active ? accent : Colors.grey),
     ],
   );
 }

@@ -101,11 +101,11 @@ class PreferSuperKeyRule extends SaropaLintRule {
       final SuperConstructorInvocation? superInit =
           PreferSuperKeyDetection.soleSuperKeyForwarding(node);
       if (superInit == null) return;
-      final NodeList<Expression> args = superInit.argumentList.arguments;
+      final NodeList<Argument> args = superInit.argumentList.arguments;
       if (args.isEmpty) return;
-      final Expression a = args.single;
-      if (a is NamedExpression) {
-        reporter.atNode(a.name);
+      final Argument a = args.single;
+      if (a is NamedArgument) {
+        reporter.atToken(a.name);
       }
     });
   }
@@ -192,9 +192,9 @@ class AvoidChipDeleteInkWellCircleBorderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    void reportIfBad(NamedExpression? bad) {
+    void reportIfBad(NamedArgument? bad) {
       if (bad == null) return;
-      reporter.atNode(bad.name);
+      reporter.atToken(bad.name);
     }
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {

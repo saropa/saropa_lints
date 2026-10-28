@@ -115,9 +115,5 @@ void _bad748_main() {
 
 // GOOD: Should NOT trigger require_provider_scope
 void _good748_main() {
-  runApp(
-    ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(ProviderScope(child: MyApp()));
 }

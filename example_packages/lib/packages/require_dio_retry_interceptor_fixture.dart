@@ -115,9 +115,5 @@ void _bad600() {
 
 // GOOD: Should NOT trigger require_dio_retry_interceptor
 void _good600() {
-  final dio = Dio()
-    ..interceptors.add(RetryInterceptor(
-      dio: dio,
-      retries: 3,
-    ));
+  final dio = Dio()..interceptors.add(RetryInterceptor(dio: dio, retries: 3));
 }

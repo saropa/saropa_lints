@@ -108,12 +108,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger prefer_theme_extensions
 // expect_lint: prefer_theme_extensions
 void _bad1219() {
-  ThemeData(
-    primaryColor: Colors.blue,
-    extensions: [],
-  ).copyWith(
-      // Using copyWith to add custom "fields"
-      );
+  ThemeData(primaryColor: Colors.blue, extensions: []).copyWith(
+    // Using copyWith to add custom "fields"
+  );
 }
 
 // GOOD: Should NOT trigger prefer_theme_extensions
@@ -121,10 +118,7 @@ void _good1219() {
   ThemeData(
     primaryColor: Colors.blue,
     extensions: [
-      MyAppColors(
-        brandPrimary: Colors.blue,
-        brandSecondary: Colors.green,
-      ),
+      MyAppColors(brandPrimary: Colors.blue, brandSecondary: Colors.green),
     ],
   );
 }

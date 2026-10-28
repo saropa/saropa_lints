@@ -10,10 +10,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Opacity creates a per-item offscreen layer while scrolling.
 // expect_lint: avoid_opacity_in_scrollable
 Widget _bad(List<Widget> items) => ListView(
-      children: [
-        for (final w in items) Opacity(opacity: 0.5, child: w),
-      ],
-    );
+  children: [for (final w in items) Opacity(opacity: 0.5, child: w)],
+);
 
 // GOOD: no per-item Opacity — bake alpha into the child instead.
 Widget _good(List<Widget> items) => ListView(children: items);

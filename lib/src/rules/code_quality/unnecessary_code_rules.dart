@@ -578,7 +578,7 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
       if (args == null || args.arguments.isEmpty) return;
 
       // Check for common default value patterns
-      for (final Expression arg in args.arguments) {
+      for (final Argument arg in args.arguments) {
         if (arg is BooleanLiteral && !arg.value) {
           // false is often a default
           reporter.atNode(arg);
@@ -2003,9 +2003,12 @@ class AvoidUnnecessaryParenthesesRule extends SaropaLintRule {
     if (parent is ExpressionStatement) return parent.expression == node;
     if (parent is ExpressionFunctionBody) return parent.expression == node;
     if (parent is AssignmentExpression) return parent.rightHandSide == node;
-    if (parent is NamedExpression) return parent.expression == node;
+    if (parent is NamedArgument) return parent.argumentExpression == node;
+    if (parent is RecordLiteralNamedField) {
+      return parent.fieldExpression == node;
+    }
     // A bare (positional) call argument: named arguments are wrapped in a
-    // NamedExpression, which becomes the immediate parent instead, so
+    // NamedArgument, which becomes the immediate parent instead, so
     // reaching ArgumentList directly means this is a plain positional arg.
     if (parent is ArgumentList) return true;
     if (parent is ListLiteral) return true;

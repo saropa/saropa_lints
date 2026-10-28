@@ -248,7 +248,8 @@ class _NonTrivialAssertionScanner extends RecursiveAstVisitor<void> {
       }
     } else if (name == 'assert') {
       final args = node.argumentList.arguments;
-      if (args.length == 1 && !_isTriviallyTrueExpression(args[0])) {
+      if (args.length == 1 &&
+          !_isTriviallyTrueExpression(args[0].argumentExpression)) {
         found = true;
       }
     }

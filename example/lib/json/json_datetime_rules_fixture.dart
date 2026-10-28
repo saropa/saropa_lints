@@ -265,10 +265,10 @@ class UserJsonDemo {
 
   // expect_lint: prefer_explicit_json_keys
   factory UserJsonDemo.fromJson(Map<String, dynamic> json) => UserJsonDemo(
-        userName: json['user_name'] as String,
-        emailAddress: json['email'] as String,
-        userAge: json['age'] as int,
-      );
+    userName: json['user_name'] as String,
+    emailAddress: json['email'] as String,
+    userAge: json['age'] as int,
+  );
 }
 
 // Mock DateFormat
