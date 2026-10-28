@@ -108,7 +108,7 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
         return action;
     }
 
-    /** Quick fixes for sdk-constraint: set Dart SDK minimum to >=3.10.0 (preferred) or >=3.9.0 (legacy). Only on sdk: line. */
+    /** Quick fixes for sdk-constraint: set Dart SDK minimum to >=3.11.0 (saropa_lints 17 floor). Only on sdk: line. */
     private createSdkConstraintActions(
         document: vscode.TextDocument,
         diag: vscode.Diagnostic,
@@ -120,8 +120,7 @@ export class VibrancyCodeActionProvider implements vscode.CodeActionProvider {
         const upper = upperMatch ? ` <${upperMatch[1]}` : '';
         const actions: vscode.CodeAction[] = [];
         for (const [min, label, preferred] of [
-            ['>=3.10.0', 'Set Dart SDK to >=3.10.0', true],
-            ['>=3.9.0', 'Set Dart SDK to >=3.9.0 (legacy support)', false],
+            ['>=3.11.0', 'Set Dart SDK to >=3.11.0', true],
         ] as const) {
             const replacement = min + upper;
             const action = new vscode.CodeAction(
