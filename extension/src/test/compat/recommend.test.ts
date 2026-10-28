@@ -50,9 +50,34 @@ describe('recommend', () => {
     assert.strictEqual(r.blockers[0].key, K + 'blockerMeta');
   });
 
-  it('another package holds the analyzer: names it, falls back one major', async () => {
+  it('another package holds the analyzer, Dart >= 3.11: plugin route with newest, pubspec fallback offered', async () => {
     const r = await recommend(facts(), VERSIONS, probeFor({ '^17.0.0': fail('objectbox_generator'), '^16.10.0': ok }));
+    assert.strictEqual(r.messageKey, K + 'blockedUsePlugin');
+    assert.strictEqual(r.route, 'plugin');
+    assert.strictEqual(r.pluginVersion, '17.0.0');
+    assert.strictEqual(r.constraint, '');
+    assert.strictEqual(r.blockers[0].params.package, 'objectbox_generator');
+    assert.deepStrictEqual(r.fixes.map((f) => f.key), [K + 'fixUsePluginRoute', K + 'fixPubspecFallback']);
+    assert.strictEqual(r.fixes[1].params.version, '16.10.0');
+    assert.strictEqual(r.fixes[1].params.package, 'objectbox_generator');
+    assert.deepStrictEqual(r.notes.map((n) => n.key), [K + 'cliNeedsPubspec']);
+  });
+
+  it('plugin route with an older pubspec dependency: notes editor vs command line versions', async () => {
+    const r = await recommend(
+      facts({ locked: { saropaLints: { version: '16.7.0', source: 'hosted' } } }),
+      VERSIONS,
+      probeFor({ '^17.0.0': fail('objectbox_generator'), '^16.10.0': ok }),
+    );
+    assert.strictEqual(r.route, 'plugin');
+    assert.deepStrictEqual(r.notes.map((n) => n.key), [K + 'editorVsCli', K + 'cliNeedsPubspec']);
+    assert.deepStrictEqual(r.notes[0].params, { plugin: '17.0.0', pubspec: '16.7.0' });
+  });
+
+  it('another package holds the analyzer, Dart < 3.11: stays on 16.x as a dependency', async () => {
+    const r = await recommend(facts({ dartVersion: '3.10.5' }), VERSIONS, probeFor({ '^17.0.0': fail('objectbox_generator'), '^16.10.0': ok }));
     assert.strictEqual(r.messageKey, K + 'packageHoldsAnalyzer');
+    assert.strictEqual(r.route, 'dependency');
     assert.strictEqual(r.constraint, '^16.10.0');
     assert.strictEqual(r.blockers[0].params.package, 'objectbox_generator');
     assert.strictEqual(r.messageParams.package, 'objectbox_generator');
@@ -64,10 +89,23 @@ describe('recommend', () => {
     assert.deepStrictEqual(probed, ['^17.0.0', '^16.10.0', '^15.2.0']);
   });
 
-  it('no version resolves: plugin candidate that failed the solver is not offered', async () => {
+  it('no version resolves, Dart >= 3.11: plugin route with newest, no fallback, no probe of the plugin', async () => {
     let n = 0;
     const vs = [...VERSIONS, V('14.0.0')];
     const r = await recommend(facts(), vs, async () => (n++, fail('custom_lint')));
+    assert.strictEqual(n, 3);
+    assert.strictEqual(r.messageKey, K + 'blockedUsePlugin');
+    assert.strictEqual(r.route, 'plugin');
+    assert.strictEqual(r.pluginVersion, '17.0.0');
+    assert.strictEqual(r.constraint, '');
+    assert.deepStrictEqual(r.fixes.map((f) => f.key), [K + 'fixUsePluginRoute']);
+    assert.strictEqual(r.blockers[0].params.package, 'custom_lint');
+  });
+
+  it('no version resolves, Dart < 3.11: a plugin candidate that failed the solver is not offered', async () => {
+    let n = 0;
+    const vs = [...VERSIONS, V('14.0.0')];
+    const r = await recommend(facts({ dartVersion: '3.10.5' }), vs, async () => (n++, fail('custom_lint')));
     assert.strictEqual(n, 3);
     assert.strictEqual(r.messageKey, K + 'noPluginResolves');
     assert.strictEqual(r.route, 'none');
@@ -76,24 +114,19 @@ describe('recommend', () => {
     assert.strictEqual(r.blockers[0].params.package, 'custom_lint');
   });
 
-  it('no version resolves: plugin route offered only when its candidate passes the probe', async () => {
-    // Newest survivor is meta-excluded, so it was never probed as a dependency; the plugin probe passes.
+  it('newest meta-excluded and nothing resolves, Dart >= 3.11: plugin route without probing it', async () => {
     const vs = [V('17.0.0', '>=3.9.0 <4.0.0', '^1.19.0'), V('16.10.0')];
     const probed: string[] = [];
-    const r = await recommend(facts({ flutterMetaPin: '1.18.0' }), vs, async (c) => {
-      probed.push(c);
-      return c === '^17.0.0' ? ok : fail('custom_lint');
-    });
-    assert.strictEqual(r.messageKey, K + 'noVersionResolves');
+    const r = await recommend(facts({ flutterMetaPin: '1.18.0' }), vs, async (c) => (probed.push(c), fail('custom_lint')));
+    assert.strictEqual(r.messageKey, K + 'blockedUsePlugin');
     assert.strictEqual(r.route, 'plugin');
     assert.strictEqual(r.pluginVersion, '17.0.0');
-    assert.ok(probed.includes('^17.0.0'));
-    assert.strictEqual(r.notes.some((x) => x.key === K + 'pluginUnverified'), false);
+    assert.ok(!probed.includes('^17.0.0'));
   });
 
-  it('no version resolves and no solver: plugin route says it is unverified', async () => {
+  it('no version resolves, Dart < 3.11 and no solver: plugin route says it is unverified', async () => {
     const vs = [V('17.0.0', '>=3.9.0 <4.0.0', '^1.19.0')];
-    const r = await recommend(facts({ flutterMetaPin: '1.18.0' }), vs);
+    const r = await recommend(facts({ dartVersion: '3.10.5', flutterMetaPin: '1.18.0' }), vs);
     assert.strictEqual(r.route, 'plugin');
     assert.ok(r.notes.some((x) => x.key === K + 'pluginUnverified'));
   });

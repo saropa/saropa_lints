@@ -35,6 +35,10 @@ describe('decideOnUpgrade', () => {
     const r = rec({ route: 'plugin', constraint: '', messageKey: 'compat.recommend.noVersionResolves' });
     assert.strictEqual(decideOnUpgrade(r, '16.10.0'), 'openCard');
   });
+  it('opens the card when the recommendation is the blocked-use-plugin route', () => {
+    const r = rec({ route: 'plugin', constraint: '', pluginVersion: '17.0.0', messageKey: 'compat.recommend.blockedUsePlugin' });
+    assert.strictEqual(decideOnUpgrade(r, '17.0.0'), 'openCard');
+  });
   it('opens the card when route is none', () => {
     assert.strictEqual(decideOnUpgrade(rec({ route: 'none', pluginVersion: '' }), '16.10.0'), 'openCard');
   });

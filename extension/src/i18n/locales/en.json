@@ -2767,6 +2767,9 @@
       "packageHoldsAnalyzer": "The package {package} holds the analyzer back, so saropa_lints {newest} cannot be installed. Use ^{chosen}, or update {package} to use {newest}.",
       "noVersionResolves": "No saropa_lints version can be installed as a dependency because {package} requires an older analyzer. The plugin route still works.",
       "noPluginResolves": "No saropa_lints version can be installed as a dependency, and {version} did not pass the pub solver as a plugin either ({package} requires an older analyzer). Nothing was changed.",
+      "blockedUsePlugin": "{package} holds the analyzer back, so saropa_lints cannot be installed as a dependency. The plugin route is not affected: set the plugin version in analysis_options.yaml to {version}.",
+      "editorVsCli": "The editor will use the plugin version {plugin}. The command line (dart run saropa_lints:init, scan, baseline) keeps using the pubspec.yaml version {pubspec}.",
+      "cliNeedsPubspec": "dart run saropa_lints:init, scan and baseline need saropa_lints in pubspec.yaml.",
       "pluginUnverified": "The plugin version {version} could not be checked with the pub solver. It is suggested from the Dart SDK constraint only.",
       "pluginOnly": "Set the saropa_lints plugin version in analysis_options.yaml to {version}.",
       "alignPlugin": "The plugin version in analysis_options.yaml ({plugin}) differs from the locked saropa_lints version ({locked}). Set the plugin version to {locked}.",
@@ -2783,6 +2786,7 @@
       "fixKeepVersion": "Keep saropa_lints at ^{version}.",
       "fixUpdateHolder": "Update {package} to a version that supports a newer analyzer.",
       "fixUsePluginRoute": "Use the plugin route: set the plugin version in analysis_options.yaml to {version}.",
+      "fixPubspecFallback": "Or stay on the pubspec route: use saropa_lints ^{version}, or update {package} to a version that supports a newer analyzer.",
       "fixAlignPlugin": "Set the plugin version in analysis_options.yaml to {version}."
     },
     "card": {

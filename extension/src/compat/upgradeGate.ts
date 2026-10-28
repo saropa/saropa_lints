@@ -24,6 +24,7 @@ export function offerableVersion(rec: Recommendation, installed: string): string
 export function decideOnUpgrade(rec: Recommendation, offered: string): 'apply' | 'openCard' {
   if (rec.route === 'none' || !rec.pluginVersion) return 'openCard';
   if (rec.messageKey === 'compat.recommend.noVersionResolves') return 'openCard';
+  if (rec.messageKey === 'compat.recommend.blockedUsePlugin') return 'openCard';
   // The solver chose something other than what the toast promised: explain.
   if (rec.pluginVersion !== offered) return 'openCard';
   return 'apply';
