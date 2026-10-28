@@ -30,11 +30,17 @@ jobs:
           - analyzer: '13.0.0'
             plugin: '0.3.15'
             dart: '3.11' # analyzer 13.0.0 -> _fe_analyzer_shared ^100 needs Dart >=3.11.0
+            # dart_style >=3.1.10 needs analyzer >=13.1.0; an analyzer override
+            # ignores that constraint, so pin the last dart_style on analyzer ^13.0.0.
+            dart_style: '3.1.9'
           - analyzer: '14.6.0'
             plugin: '0.3.25'
             dart: '3.13'
+            dart_style: ''
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # tests walk git tags (health_history_test)
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.dart }}
@@ -47,6 +53,9 @@ jobs:
           fi
           printf '\ndependency_overrides:\n  analyzer: %s\n  analysis_server_plugin: %s\n' \
             '${{ matrix.analyzer }}' '${{ matrix.plugin }}' >> pubspec.yaml
+          if [ -n '${{ matrix.dart_style }}' ]; then
+            printf '  dart_style: %s\n' '${{ matrix.dart_style }}' >> pubspec.yaml
+          fi
           tail -4 pubspec.yaml
       # Drop the committed lock so pub resolves a coherent set (dart_style,
       # analyzer_plugin, test, ...) for the pinned analyzer instead of the
