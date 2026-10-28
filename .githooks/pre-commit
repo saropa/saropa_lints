@@ -98,6 +98,14 @@ if [ -n "$guide_files" ] || [ -n "$tier_file" ] || [ -n "$rule_files" ]; then
   fi
 fi
 
+# The two whole-repo dart gates below depend only on Dart sources and the
+# analyzer config, so a commit touching none of them (docs-only, scripts-only)
+# cannot change their result. Skipping saves ~25s+ per such commit.
+dart_inputs=$(echo "$files" | grep -E '\.dart$|^pubspec\.yaml$|^analysis_options.*\.yaml$')
+if [ -z "$dart_inputs" ]; then
+  exit 0
+fi
+
 # ── dart fix dry-run gate (exit 2 = dart missing, skip gracefully) ──
 $PY scripts/check_dart_fix.py
 fix_status=$?
