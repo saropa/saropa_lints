@@ -21,7 +21,7 @@ export interface HeldBackEntry {
 export const HELD_BACK_UPGRADES: readonly HeldBackEntry[] = [
     {
         pkg: 'analyzer',
-        range: '>=13.0.0',
-        reason: '(curated fallback) analyzer 13.0.0 needs meta ^1.18.0; 13.1.0 and later need meta ^1.18.3; Flutter 3.47+ satisfies it',
+        range: '>=13.1.0',
+        reason: '(curated fallback) analyzer 13.1.0 and later need meta ^1.18.3; Flutter 3.44 and older pin meta 1.18.0, Flutter 3.47+ satisfies it (analyzer 13.0.0 needs only meta ^1.18.0)',
     },
 ];

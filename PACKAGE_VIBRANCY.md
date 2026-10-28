@@ -44,14 +44,14 @@ Any verdict other than `safe` replaces the plain "newer version available" nudge
 
 ### How the checks are derived
 
-- **SDK pins.** The extension reads the installed Flutter SDK's own package pubspecs (for example, `flutter` depends on `meta: 1.18.0`). Only exact pins count; a caret range such as `^1.2.0` is a range, not a pin. Only if the SDK cannot be inspected does it fall back to a built-in table of known pins.
+- **SDK pins.** The extension reads the installed Flutter SDK's own package pubspecs (for example, Flutter 3.44 and older depend on `meta: 1.18.0`). Only exact pins count; a caret range such as `^1.2.0` is a range, not a pin. Only if the SDK cannot be inspected does it fall back to a built-in table of known pins.
 - **Full lock file.** All of `pubspec.lock`, including transitive packages, is read, so a dependency you already satisfy is not reported as a blocker.
 - **Target-version dependencies.** The dependency ranges of the version you would upgrade to come from pub.dev per version and are cached, then compared with the SDK pins and the lock file.
 - **Dependents.** The ranges that your other packages declare on the package are compared with the target version.
 
 ### The held-back list (fallback only)
 
-`extension/src/vibrancy/scoring/held-back-upgrades.ts` lists packages and target-version ranges known to break this kind of project (for example `analyzer >=13.0.0`: analyzer 13.0.0 needs `meta ^1.18.0`; 13.1.0 and later need `meta ^1.18.3`; Flutter 3.47+ satisfies it). It is used only when lock and range data cannot decide. When they can, they win: if the needed version is not capped by anything in your project, the upgrade is not blocked whatever the list says.
+`extension/src/vibrancy/scoring/held-back-upgrades.ts` lists packages and target-version ranges known to break this kind of project (for example `analyzer >=13.1.0`: 13.1.0 and later need `meta ^1.18.3`, which Flutter 3.44 and older (meta 1.18.0) cannot satisfy and Flutter 3.47+ does; analyzer 13.0.0 needs only `meta ^1.18.0`). It is used only when lock and range data cannot decide. When they can, they win: if the needed version is not capped by anything in your project, the upgrade is not blocked whatever the list says.
 
 ### Bulk updates
 

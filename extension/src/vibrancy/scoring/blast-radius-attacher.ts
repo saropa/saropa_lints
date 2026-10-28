@@ -95,7 +95,7 @@ export function isUpgradeSuppressed(r: VibrancyResult): boolean {
     return !!b && b.verdict !== 'safe';
 }
 
-/** Localized SDK conflict line, e.g. "analyzer 13.1.0 needs meta ^1.18.3; Flutter pins meta 1.18.0". */
+/** Localized SDK conflict line, e.g. "analyzer 13.1.0 needs meta ^1.18.3; Flutter 3.44 pins meta 1.18.0". */
 export function formatSdkBlock(b: SdkBlock): string {
     return l10n('blastRadius.sdkBlock', { ...b });
 }
