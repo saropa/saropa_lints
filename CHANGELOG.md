@@ -66,9 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.10.0] — Unreleased
+## [16.10.0]
 
-Restores installation on Flutter 3.44 and older, and renames one rule whose name matched a core analyzer diagnostic.
+Restores installation on Flutter 3.44 and older, and renames one rule whose name matched a core analyzer diagnostic. [log](https://github.com/saropa/saropa_lints/blob/v16.10.0/CHANGELOG.md)
 
 ### Fixed
 
