@@ -27,7 +27,8 @@ abstract final class PreferSuperKeyDetection {
     for (final FormalParameter p in ctor.parameters.parameters) {
       if (p is SuperFormalParameter) continue;
       final FormalParameter inner = p;
-      if (inner is! RegularFormalParameter) continue;
+      if (inner is! RegularFormalParameter || inner.functionTypedSuffix != null)
+        continue;
       if (inner.name?.lexeme != 'key') continue;
       final TypeAnnotation? ta = inner.type;
       if (ta is! NamedType || ta.name.lexeme != 'Key') continue;

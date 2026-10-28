@@ -273,7 +273,8 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
         if (member is ConstructorDeclaration) {
           for (final FormalParameter param in member.parameters.parameters) {
             String? paramType;
-            if (param is RegularFormalParameter) {
+            if (param is RegularFormalParameter &&
+                param.functionTypedSuffix == null) {
               paramType = param.type?.toSource();
             }
 
@@ -488,7 +489,8 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
       for (final FormalParameter param
           in node.parameters?.parameters ?? <FormalParameter>[]) {
         String? paramType;
-        if (param is RegularFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           paramType = param.type?.toSource();
         }
         if (paramType != null) {

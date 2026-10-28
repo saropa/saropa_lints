@@ -34,7 +34,7 @@ class RemoveClosureParameterTypeFix extends SaropaFixProducer {
     final RegularFormalParameter? param = node is RegularFormalParameter
         ? node
         : node.thisOrAncestorOfType<RegularFormalParameter>();
-    if (param == null) return;
+    if (param == null || param.functionTypedSuffix != null) return;
 
     final TypeAnnotation? type = param.type;
     if (type == null) return;

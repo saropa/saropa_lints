@@ -2076,7 +2076,8 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
         String? typeName;
         String? paramName;
 
-        if (param is RegularFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           typeName = param.type?.toSource();
           paramName = param.name?.lexeme;
         }

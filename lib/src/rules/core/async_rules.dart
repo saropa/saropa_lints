@@ -1328,6 +1328,7 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
 
     // Check parameter declarations (in constructors and functions)
     context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       final TypeAnnotation? type = node.type;
       if (!_isVoidCallback(type)) return;
 
@@ -4829,7 +4830,7 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
   }
 
   static String? _extractParamType(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       return param.type?.toSource();
     }
     return null;

@@ -4625,7 +4625,7 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
   }
 
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       return param.type?.toSource();
     }
     return null;
@@ -4718,7 +4718,8 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
   ) {
     for (final param in constructor.parameters.parameters) {
       String? typeName;
-      if (param is RegularFormalParameter) {
+      if (param is RegularFormalParameter &&
+          param.functionTypedSuffix == null) {
         typeName = param.type?.toSource();
       }
       if (typeName == 'BuildContext') {

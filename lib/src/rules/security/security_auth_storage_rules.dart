@@ -736,7 +736,7 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
   /// Extracts the type string from a formal parameter.
   static String? _extractParamType(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       return param.type?.toSource();
     }
     return null;

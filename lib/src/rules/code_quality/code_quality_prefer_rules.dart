@@ -311,7 +311,11 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
     context.addFunctionExpression((FunctionExpression node) {
       // Skip if not used as an argument
       final AstNode? parent = node.parent;
-      if (parent is! NamedArgument && parent is! ArgumentList) return;
+      if (parent is! NamedArgument &&
+          parent is! RecordLiteralNamedField &&
+          parent is! ArgumentList) {
+        return;
+      }
 
       // Check function body size
       final FunctionBody body = node.body;
@@ -1112,6 +1116,7 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
     // acted on RegularFormalParameter (it read `.type`), so addRegularFormalParameter
     // is the correct real registration (BUG FIX 2026-07-16).
     context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       // Check for Accept-style annotations
       for (final Annotation annotation in node.metadata) {
         final String annotationName = annotation.name.name;
@@ -1781,7 +1786,8 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
   ) {
     context.addFormalParameterList((FormalParameterList node) {
       for (final FormalParameter param in node.parameters) {
-        if (param is RegularFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           final TypeAnnotation? type = param.type;
           if (type is GenericFunctionType) {
             reporter.atNode(type);
@@ -2392,7 +2398,7 @@ class PreferNamedBoolParamsRule extends SaropaLintRule {
         return;
       }
       for (final FormalParameter p in node.parameters) {
-        if (p is RegularFormalParameter) {
+        if (p is RegularFormalParameter && p.functionTypedSuffix == null) {
           if (p.isNamed) continue;
           if (_isBoolType(p)) reporter.atNode(p);
         }

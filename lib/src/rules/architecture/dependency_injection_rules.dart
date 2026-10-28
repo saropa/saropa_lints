@@ -193,7 +193,7 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
   }
 
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       return param.type?.toSource();
     } else if (param is FieldFormalParameter) {
       return param.type?.toSource();
@@ -408,7 +408,7 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
   }
 
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       return param.type?.toSource();
     } else if (param is FieldFormalParameter) {
       return param.type?.toSource();
@@ -586,7 +586,7 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
   }
 
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       return param.type?.toSource();
     } else if (param is FieldFormalParameter) {
       return param.type?.toSource();
@@ -1113,7 +1113,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     final FormalParameter param = params.parameters.first;
     String? typeStr;
 
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       typeStr = param.type?.toSource();
     }
 
@@ -1147,7 +1147,8 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     for (final FormalParameter param in params.parameters) {
       String? typeStr;
 
-      if (param is RegularFormalParameter) {
+      if (param is RegularFormalParameter &&
+          param.functionTypedSuffix == null) {
         typeStr = param.type?.toSource();
       }
 
@@ -1507,7 +1508,8 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
       for (final FormalParameter param in params.parameters) {
         String? typeStr;
 
-        if (param is RegularFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           typeStr = param.type?.toSource();
         } else if (param is FieldFormalParameter) {
           typeStr = param.type?.toSource();

@@ -504,7 +504,11 @@ class PreferExtractingCallbacksRule extends SaropaLintRule {
     context.addFunctionExpression((FunctionExpression node) {
       // Only check callbacks passed as arguments
       final AstNode? parent = node.parent;
-      if (parent is! NamedArgument && parent is! ArgumentList) return;
+      if (parent is! NamedArgument &&
+          parent is! RecordLiteralNamedField &&
+          parent is! ArgumentList) {
+        return;
+      }
 
       // Check callback length
       final FunctionBody body = node.body;
@@ -5281,7 +5285,9 @@ class AvoidBoolInWidgetConstructorsRule extends SaropaLintRule {
       final FormalParameterList params = node.parameters;
       for (final FormalParameter p in params.parameters) {
         final FormalParameter inner = p;
-        if (inner is! RegularFormalParameter) continue;
+        if (inner is! RegularFormalParameter ||
+            inner.functionTypedSuffix != null)
+          continue;
         if (!inner.isNamed) continue;
         final String? name = inner.name?.lexeme;
         if (name == null || _widgetBoolParamAllowlist.contains(name)) continue;

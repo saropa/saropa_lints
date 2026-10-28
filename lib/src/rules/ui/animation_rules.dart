@@ -3256,7 +3256,8 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
   /// inherited from the field or superclass, which we don't follow in v1).
   static TypeAnnotation? _parameterTypeAnnotation(FormalParameter param) {
     final FormalParameter inner = param;
-    if (inner is RegularFormalParameter) return inner.type;
+    if (inner is RegularFormalParameter && inner.functionTypedSuffix == null)
+      return inner.type;
     return null;
   }
 

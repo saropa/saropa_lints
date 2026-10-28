@@ -625,7 +625,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
   /// Returns the simple name of a parameter's declared type, or null when it
   /// has no explicit annotation. Unwraps optional/default parameters.
   static String? _declaredTypeName(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       final TypeAnnotation? type = param.type;
       if (type is NamedType) return type.name.lexeme;
     }
@@ -863,7 +863,8 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
       for (final FormalParameter param in params.parameters) {
         // Check if parameter type is nullable
         TypeAnnotation? type;
-        if (param is RegularFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           type = param.type;
         }
 

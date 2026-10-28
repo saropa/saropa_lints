@@ -269,7 +269,8 @@ class NeverDiscardBuildContextRule extends SaropaLintRule {
   /// untyped with one of the conventional context parameter names.
   static bool _looksLikeBuildContext(FormalParameter param, String name) {
     final normalized = param;
-    if (normalized is RegularFormalParameter) {
+    if (normalized is RegularFormalParameter &&
+        normalized.functionTypedSuffix == null) {
       final type = normalized.type;
       if (type is NamedType) {
         return type.name.lexeme == 'BuildContext';

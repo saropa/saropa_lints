@@ -3354,7 +3354,8 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
       final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final param = params.first;
-      if (param is! RegularFormalParameter) return;
+      if (param is! RegularFormalParameter || param.functionTypedSuffix != null)
+        return;
       final TypeAnnotation? repType = param.type;
       if (repType == null) return;
 
@@ -4683,7 +4684,7 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
         return;
       }
       for (final FormalParameter p in node.parameters) {
-        if (p is RegularFormalParameter) {
+        if (p is RegularFormalParameter && p.functionTypedSuffix == null) {
           if (!_isPositional(node, p)) continue;
           if (_isBoolType(p)) reporter.atNode(p);
         }

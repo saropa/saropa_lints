@@ -1271,7 +1271,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     String? paramName;
     Token? nameToken;
 
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       typeAnnotation = param.type;
       paramName = param.name?.lexeme;
       nameToken = param.name;
@@ -1462,7 +1462,8 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
         TypeAnnotation? typeAnnotation;
         String? paramName;
 
-        if (param is RegularFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           typeAnnotation = param.type;
           paramName = param.name?.lexeme;
         }

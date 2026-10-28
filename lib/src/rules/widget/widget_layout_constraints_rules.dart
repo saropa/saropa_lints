@@ -3018,7 +3018,9 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
   static bool _declaresBuildContextParameter(FormalParameterList? parameters) {
     if (parameters == null) return false;
     for (final FormalParameter parameter in parameters.parameters) {
-      if (parameter is! RegularFormalParameter) continue;
+      if (parameter is! RegularFormalParameter ||
+          parameter.functionTypedSuffix != null)
+        continue;
       final TypeAnnotation? type = parameter.type;
       if (type is NamedType && type.name.lexeme == 'BuildContext') {
         return true;

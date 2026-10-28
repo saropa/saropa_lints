@@ -1718,7 +1718,8 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
 
         // Check if the parameter type is bool
         RegularFormalParameter? simpleParam;
-        if (param is RegularFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           simpleParam = param;
         }
 
@@ -4035,7 +4036,8 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
 
       final FormalParameter first = params.parameters.first;
       final FormalParameter inner = first;
-      if (inner is! RegularFormalParameter) return;
+      if (inner is! RegularFormalParameter || inner.functionTypedSuffix != null)
+        return;
 
       final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
@@ -4121,7 +4123,8 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
 
       final FormalParameter first = params.parameters.first;
       final FormalParameter inner = first;
-      if (inner is! RegularFormalParameter) return;
+      if (inner is! RegularFormalParameter || inner.functionTypedSuffix != null)
+        return;
 
       final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
@@ -4280,7 +4283,10 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
         if (params == null || params.isEmpty) return;
         final p = params.first;
         final inner = p;
-        final innerType = inner is RegularFormalParameter ? inner.type : null;
+        final innerType =
+            inner is RegularFormalParameter && inner.functionTypedSuffix == null
+            ? inner.type
+            : null;
         if (innerType is NamedType) {
           firstParamTypeNames.add(innerType.name.lexeme);
         }

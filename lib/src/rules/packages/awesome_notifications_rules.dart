@@ -1033,7 +1033,7 @@ NamedArgument? _findNamedArg(ArgumentList argList, String argName) {
 /// when the type is absent, dynamic, or not a simple named type.
 String? _paramTypeName(FormalParameter param) {
   TypeAnnotation? type;
-  if (param is RegularFormalParameter) {
+  if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
     type = param.type;
   }
   if (type == null) return null;

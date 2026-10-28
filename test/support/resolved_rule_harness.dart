@@ -46,7 +46,15 @@ class HarnessDiagnostic {
     required this.ruleName,
     required this.line,
     required this.message,
+    this.offset = 0,
+    this.length = 0,
   });
+
+  /// Zero-based source offset of the diagnostic.
+  final int offset;
+
+  /// Length in characters of the reported range.
+  final int length;
 
   /// The rule code (e.g. `avoid_expensive_build`).
   final String ruleName;
@@ -221,6 +229,8 @@ Future<List<HarnessDiagnostic>> _runLocked(
           ruleName: d.diagnosticCode.lowerCaseName,
           line: result.unit.lineInfo.getLocation(d.offset).lineNumber,
           message: d.problemMessage.messageText(includeUrl: false),
+          offset: d.offset,
+          length: d.length,
         ),
     ];
   } finally {

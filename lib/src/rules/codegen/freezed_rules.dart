@@ -425,7 +425,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   bool _isComplexType(FormalParameter param) {
     TypeAnnotation? type;
 
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       type = param.type;
     }
 
@@ -585,7 +585,7 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
     }
 
     // Check if type is nullable
-    if (param is RegularFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       final TypeAnnotation? type = param.type;
       if (type is NamedType) {
         // Check for ? suffix indicating nullable
@@ -697,7 +697,8 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
 
           for (final FormalParameter param in params.parameters) {
             String? typeSource;
-            if (param is RegularFormalParameter) {
+            if (param is RegularFormalParameter &&
+                param.functionTypedSuffix == null) {
               typeSource = param.type?.toSource();
             }
 

@@ -3458,7 +3458,12 @@ class DuplicateRecordFieldNameRule extends SaropaLintRule {
       for (final List<(Token, AstNode)> group in byName.values) {
         if (group.length <= 1) continue;
         for (final (_, AstNode n) in group) {
-          reporter.atNode(n, code);
+          // Record literal fields: report the label only, not `a: value`.
+          if (n is RecordLiteralNamedField) {
+            reporter.atToken(n.name, code);
+          } else {
+            reporter.atNode(n, code);
+          }
         }
       }
     }
@@ -3533,7 +3538,7 @@ class InvalidRecordFieldNameRule extends SaropaLintRule {
       for (final RecordLiteralField e in node.fields) {
         if (e is! RecordLiteralNamedField) continue;
         if (_tokenIsReservedKeyword(e.name)) {
-          reporter.atNode(e, code);
+          reporter.atToken(e.name, code);
         }
       }
     });

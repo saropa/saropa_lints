@@ -1138,7 +1138,11 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
       if (params.isEmpty) return;
       final repParam = params.first;
       final String repFieldName = repParam.name?.lexeme ?? '';
-      final repType = repParam is RegularFormalParameter ? repParam.type : null;
+      final repType =
+          repParam is RegularFormalParameter &&
+              repParam.functionTypedSuffix == null
+          ? repParam.type
+          : null;
       final String repTypeSource = (repType?.toSource() ?? '')
           .replaceAll(RegExp(r'\s+'), ' ')
           .trim();
@@ -2532,7 +2536,8 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
     for (final FormalParameter p in node.parameters.parameters) {
       final FormalParameter param = p;
       TypeAnnotation? type;
-      if (param is RegularFormalParameter) {
+      if (param is RegularFormalParameter &&
+          param.functionTypedSuffix == null) {
         type = param.type;
       } else if (param is FieldFormalParameter) {
         type = param.type;

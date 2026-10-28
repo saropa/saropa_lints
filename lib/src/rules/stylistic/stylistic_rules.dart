@@ -521,6 +521,7 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       if (node.type == null) return;
       AstNode? parent = node.parent;
       while (parent != null) {
@@ -530,7 +531,8 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
         }
         if (parent is MethodDeclaration ||
             parent is FunctionDeclaration ||
-            parent is ConstructorDeclaration) {
+            parent is ConstructorDeclaration ||
+            parent is FunctionTypedFormalParameterSuffix) {
           return;
         }
         parent = parent.parent;
@@ -811,7 +813,8 @@ class PreferOptionalPositionalParamsRule extends SaropaLintRule {
   }
 
   static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
-    if (p is RegularFormalParameter) return p.type;
+    if (p is RegularFormalParameter && p.functionTypedSuffix == null)
+      return p.type;
     return null;
   }
 }
@@ -895,7 +898,8 @@ class PreferPositionalBoolParamsRule extends SaropaLintRule {
   }
 
   static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
-    if (p is RegularFormalParameter) return p.type;
+    if (p is RegularFormalParameter && p.functionTypedSuffix == null)
+      return p.type;
     return null;
   }
 }
@@ -3081,6 +3085,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
 
     // Check parameters
     context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       // Check the type annotation
       final TypeAnnotation? typeAnnotation = node.type;
       if (typeAnnotation == null) return;
@@ -3272,6 +3277,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
 
     // Check parameters
     context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       // Check the type annotation
       final TypeAnnotation? typeAnnotation = node.type;
       if (typeAnnotation == null) return;
