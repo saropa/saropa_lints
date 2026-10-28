@@ -48,7 +48,10 @@ jobs:
           printf '\ndependency_overrides:\n  analyzer: %s\n  analysis_server_plugin: %s\n' \
             '${{ matrix.analyzer }}' '${{ matrix.plugin }}' >> pubspec.yaml
           tail -4 pubspec.yaml
-      - run: dart pub get
+      # Drop the committed lock so pub resolves a coherent set (dart_style,
+      # analyzer_plugin, test, ...) for the pinned analyzer instead of the
+      # versions locked for the repo's own analyzer.
+      - run: rm -f pubspec.lock && dart pub get
       - run: dart analyze lib bin tool test
       - run: dart test
 
