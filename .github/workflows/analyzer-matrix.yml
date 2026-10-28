@@ -1,0 +1,64 @@
+name: analyzer-matrix
+
+# Compiles and tests saropa_lints against the lowest (13.0.0) and latest (14.6.0)
+# analyzer in the planned supported range. See
+# plans/PLAN_analyzer_12_to_13_14_upgrade.md section 5 step 4 and section 12.
+#
+# NON-BLOCKING until the analyzer 13/14 migration lands: every job here uses
+# continue-on-error, so a red run does not fail the check. Remove
+# continue-on-error once the migration is merged.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyzer-pin:
+    name: analyzer ${{ matrix.analyzer }} (Dart ${{ matrix.dart }})
+    runs-on: ubuntu-latest
+    continue-on-error: true # non-blocking until migration lands
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - analyzer: '13.0.0'
+            plugin: '0.3.15'
+            dart: '3.9'
+          - analyzer: '14.6.0'
+            plugin: '0.3.25'
+            dart: '3.13'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.dart }}
+      - name: Pin analyzer via dependency_overrides
+        run: |
+          set -euo pipefail
+          if grep -q '^dependency_overrides:' pubspec.yaml; then
+            echo "::error::pubspec.yaml already has dependency_overrides; merge manually"
+            exit 1
+          fi
+          printf '\ndependency_overrides:\n  analyzer: %s\n  analysis_server_plugin: %s\n' \
+            '${{ matrix.analyzer }}' '${{ matrix.plugin }}' >> pubspec.yaml
+          tail -4 pubspec.yaml
+      - run: dart pub get
+      - run: dart analyze
+      - run: dart test
+
+  solver:
+    name: pub solver scratch projects
+    runs-on: ubuntu-latest
+    continue-on-error: true # non-blocking until migration lands
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.9'
+      - run: python3 scripts/check_pub_solver.py
