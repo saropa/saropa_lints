@@ -15,6 +15,7 @@ import { probeConstraint } from './solverProbe';
 import { recommend, sameRecommendation, type Recommendation } from './recommend';
 import { atomicWrite } from './atomicWrite';
 import { applyCompatibility, planEdits, type ApplyDeps, type ApplyOutcome, type ApplyPaths } from './applyCompat';
+import { offerRenameMigration } from '../ruleMigration/migrateController';
 import { offerableVersion, VERSIONS_CACHE_KEY } from './upgradeGate';
 import type { CompatCardState } from './compatCardHtml';
 import type { ProjectFacts } from './projectFacts';
@@ -157,5 +158,7 @@ export async function applyCompatWithUi(root: string, rec: Recommendation): Prom
   const { text, isError } = describeOutcome(outcome);
   if (isError) void vscode.window.showErrorMessage(text);
   else void vscode.window.showInformationMessage(text);
+  // Renamed rules may now be in use: offer the rename migration once.
+  if (outcome.status === 'applied') void offerRenameMigration();
   return outcome;
 }

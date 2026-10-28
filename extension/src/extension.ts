@@ -36,6 +36,7 @@ import {
   showOutputChannel,
 } from './setup';
 import { runMigrateConfig } from './config/migrateConfig';
+import { runMigrateRuleNames } from './ruleMigration/migrateController';
 import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
 import { surfacePluginDivergence } from './pluginDivergencePrompt';
 import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
@@ -2481,6 +2482,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.migrateConfig', async () => {
       const root = getProjectRoot();
       await runMigrateConfig(root);
+      refreshAll();
+    }),
+    // Rewrite renamed rule names (ignore comments, analysis options, baselines) with diff preview.
+    vscode.commands.registerCommand('saropaLints.migrateRuleNames', async () => {
+      await runMigrateRuleNames();
       refreshAll();
     }),
     // One-click enable of a rule pack (used by the startup toast follow-through
