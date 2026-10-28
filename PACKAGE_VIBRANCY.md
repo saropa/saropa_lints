@@ -40,7 +40,7 @@ pub.dev's latest version is not always one you can adopt. Before Package Vibranc
 | `breaks-dependents`    | One or more packages that depend on it declare a version range that excludes the target.                                                |
 | `safe`                 | Nothing found; the upgrade is offered as normal.                                                                                        |
 
-Any verdict other than `safe` replaces the plain "newer version available" nudge with a one-line explanation of what blocks it (for example, "analyzer 13.1.0 needs meta ^1.18.3; Flutter pins meta 1.18.0"). When the latest version is blocked, the newest version you can still take is suggested as **Newest compatible**. Retracted releases are never offered.
+Any verdict other than `safe` replaces the plain "newer version available" nudge with a one-line explanation of what blocks it (for example, "analyzer 13.1.0 needs meta ^1.18.3; Flutter 3.47+ satisfies it"). When the latest version is blocked, the newest version you can still take is suggested as **Newest compatible**. Retracted releases are never offered.
 
 ### How the checks are derived
 
@@ -51,7 +51,7 @@ Any verdict other than `safe` replaces the plain "newer version available" nudge
 
 ### The held-back list (fallback only)
 
-`extension/src/vibrancy/scoring/held-back-upgrades.ts` lists packages and target-version ranges known to break this kind of project (for example `analyzer >=13.0.0`, which needs `meta ^1.18.3` while Flutter stable pins `meta 1.18.0`). It is used only when lock and range data cannot decide. When they can, they win: if the needed version is not capped by anything in your project, the upgrade is not blocked whatever the list says.
+`extension/src/vibrancy/scoring/held-back-upgrades.ts` lists packages and target-version ranges known to break this kind of project (for example `analyzer >=13.0.0`: analyzer 13.0.0 needs `meta ^1.18.0`; 13.1.0 and later need `meta ^1.18.3`; Flutter 3.47+ satisfies it). It is used only when lock and range data cannot decide. When they can, they win: if the needed version is not capped by anything in your project, the upgrade is not blocked whatever the list says.
 
 ### Bulk updates
 
