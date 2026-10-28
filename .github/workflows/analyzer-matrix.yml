@@ -49,7 +49,7 @@ jobs:
             '${{ matrix.analyzer }}' '${{ matrix.plugin }}' >> pubspec.yaml
           tail -4 pubspec.yaml
       - run: dart pub get
-      - run: dart analyze
+      - run: dart analyze lib bin tool test
       - run: dart test
 
   solver:
