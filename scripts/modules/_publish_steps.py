@@ -2131,11 +2131,13 @@ def run_tests(project_dir: Path) -> bool:
         for f in delta_files:
             print_colored(f"    {f}", Color.CYAN)
         # Pass the specific test files — dart test compiles only these.
-        # No tag filter: delta runs exactly these files, even if slow-tagged.
+        # Slow-tagged tests are excluded here (e.g. scan_runner_test does a
+        # synchronous full-repo scan the 2m timeout cannot interrupt); they
+        # run in the dedicated slow pass / CI.
         delta_ok = _run_test_pass(
             project_dir, env, reports_dir, date_str, time_str,
             label="delta",
-            extra_args=delta_files,
+            extra_args=["-x", "slow"] + delta_files,
             concurrency=tuned_j,
         )
         if not delta_ok:
