@@ -86,3 +86,31 @@ describe('applyRecommendation', () => {
     assert.deepStrictEqual(applyRecommendation({}, { constraint: '1.0.0', pluginVersion: '1.0.0' }), {});
   });
 });
+
+describe('applyRecommendation plugin entry forms', () => {
+  const wrap = (entry: string[]): string => ['plugins:', ...entry, 'linter:', '  rules: {}', ''].join('\n');
+
+  it('edits shorthand `saropa_lints: ^x`', () => {
+    const ao = wrap(['  saropa_lints: ^16.7.0']);
+    const r = applyRecommendation({ analysisOptions: ao }, { pluginVersion: '16.10.0' });
+    assert.strictEqual(r.analysisOptions, wrap(['  saropa_lints: 16.10.0']));
+  });
+
+  it('edits shorthand with quotes and trailing comment', () => {
+    const ao = wrap(['  saropa_lints: "^16.7.0"  # pinned']);
+    const r = applyRecommendation({ analysisOptions: ao }, { pluginVersion: '16.10.0' });
+    assert.strictEqual(r.analysisOptions, wrap(['  saropa_lints: "16.10.0"  # pinned']));
+  });
+
+  it('edits block form with trailing comment on the key and CRLF', () => {
+    const ao = wrap(['  saropa_lints: # main', '    version: 16.7.0 # keep']).replace(/\n/g, '\r\n');
+    const r = applyRecommendation({ analysisOptions: ao }, { pluginVersion: '16.10.0' });
+    assert.strictEqual(r.analysisOptions, ao.replace('16.7.0', '16.10.0'));
+  });
+
+  it('leaves a commented-out plugins block alone', () => {
+    const ao = '# plugins:\n#   saropa_lints: ^16.7.0\n';
+    const r = applyRecommendation({ analysisOptions: ao }, { pluginVersion: '16.10.0' });
+    assert.strictEqual(r.analysisOptions, ao);
+  });
+});

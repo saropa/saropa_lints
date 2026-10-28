@@ -11,7 +11,7 @@
  * dismissal — these tests pin that migration.
  */
 import * as assert from 'node:assert';
-import { applyPubspecConstraint, shouldFetchNow, shouldPromptForVersion } from '../upgrade-checker';
+import { applyPubspecConstraint, readVersions, shouldFetchNow, shouldPromptForVersion } from '../upgrade-checker';
 
 const MIN = 60 * 1000;
 const HOUR = 60 * MIN;
@@ -144,5 +144,18 @@ describe('applyPubspecConstraint', () => {
   it('preserves CRLF', () => {
     const src = 'dev_dependencies:\r\n  saropa_lints: ^16.0.0\r\n';
     assert.strictEqual(applyPubspecConstraint(src, '16.10.0'), 'dev_dependencies:\r\n  saropa_lints: ^16.10.0\r\n');
+  });
+});
+
+describe('readVersions', () => {
+  it('returns only the lock-resolved version (no unused configured value)', () => {
+    const fs = require('node:fs') as typeof import('node:fs');
+    const os = require('node:os') as typeof import('node:os');
+    const path = require('node:path') as typeof import('node:path');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rv-'));
+    fs.writeFileSync(path.join(dir, 'analysis_options.yaml'), 'plugins:\n  saropa_lints: 1.0.0\n');
+    const r = readVersions(dir);
+    assert.strictEqual(r.installed, null);
+    assert.deepStrictEqual(Object.keys(r), ['installed']);
   });
 });

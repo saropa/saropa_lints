@@ -72,3 +72,23 @@ describe('readConfiguredPluginVersion', () => {
     );
   });
 });
+
+describe('findPluginEntry / readConfiguredPluginVersion forms', () => {
+  it('reads shorthand with quotes and trailing comment, CRLF', () => {
+    assert.deepStrictEqual(
+      readConfiguredPluginVersion('plugins:\r\n  saropa_lints: "^16.7.0" # c\r\n'),
+      { raw: '^16.7.0', isRange: true },
+    );
+  });
+
+  it('reads block version with comment on the key line', () => {
+    assert.deepStrictEqual(
+      readConfiguredPluginVersion('plugins: # x\n  saropa_lints: # y\n    version: 16.7.0 # z\n'),
+      { raw: '16.7.0', isRange: false },
+    );
+  });
+
+  it('ignores a commented-out plugins block', () => {
+    assert.strictEqual(readConfiguredPluginVersion('# plugins:\n#   saropa_lints: 1.0.0\n'), null);
+  });
+});

@@ -9,7 +9,8 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { findPluginsBlock, getPluginsIntegrationState } from '../setup';
+import { getPluginsIntegrationState } from '../setup';
+import { readConfiguredPluginVersion } from '../analysisOptionsVersion';
 import { readInstalledVersion } from '../upgrade-checker';
 import { deriveSdkPinsOrNull } from '../vibrancy/services/sdk-pins';
 
@@ -100,27 +101,7 @@ export function pubspecDeclaresSaropaLints(pubspec: string): boolean {
  * Handles the nested form (`version: "x"`) and the shorthand (`saropa_lints: x`).
  */
 export function parsePluginVersion(analysisOptions: string): string | undefined {
-  const lines = analysisOptions.split(/\r?\n/);
-  const block = findPluginsBlock(lines);
-  if (!block) return undefined;
-  for (let i = block.start + 1; i < block.end; i++) {
-    const line = lines[i];
-    if (/^\s*#/.test(line)) continue;
-    const short = line.match(/^\s+saropa_lints:\s*["']?([^"'\s#]+)["']?\s*(?:#.*)?$/);
-    if (short) return short[1];
-    if (/^\s+saropa_lints:\s*(?:#.*)?$/.test(line)) {
-      const indent = line.search(/\S/);
-      for (let j = i + 1; j < block.end; j++) {
-        const inner = lines[j];
-        if (inner.trim() === '' || /^\s*#/.test(inner)) continue;
-        if (inner.search(/\S/) <= indent) break;
-        const v = inner.match(/^\s+version:\s*["']?([^"'\s#]+)["']?\s*(?:#.*)?$/);
-        if (v) return v[1];
-      }
-      return undefined;
-    }
-  }
-  return undefined;
+  return readConfiguredPluginVersion(analysisOptions)?.raw;
 }
 
 /** Nearest ancestor directory whose pubspec declares a workspace. */
@@ -133,6 +114,13 @@ function findWorkspaceRoot(start: string): string | undefined {
     if (parent === dir) return undefined;
     dir = parent;
   }
+}
+
+/** Directory holding pubspec.lock and .dart_tool: the workspace root for a pub workspace member. */
+export function resolveDataRoot(root: string): string {
+  const pubspec = readText(path.join(root, 'pubspec.yaml'));
+  const member = pubspec !== undefined && isWorkspaceMember(pubspec);
+  return (member ? findWorkspaceRoot(root) : undefined) ?? root;
 }
 
 export async function readProjectFacts(

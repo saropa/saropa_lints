@@ -26,7 +26,6 @@ import { getPubVersions, PubVersionsCache } from './compat/pubVersions';
 import { compareVersions } from './vibrancy/services/changelog-service';
 import { l10n } from './i18n/runtime';
 import { VERSIONS_CACHE_KEY } from './compat/upgradeGate';
-import { readConfiguredPluginVersion, type ConfiguredPluginVersion } from './analysisOptionsVersion';
 
 // ── Constants ────────────────────────────────────────────────────────────
 
@@ -157,24 +156,13 @@ export function readInstalledVersion(
   return { version, source };
 }
 
-/**
- * Read the lock-resolved version and the version configured under
- * `plugins: saropa_lints:` in analysis_options.yaml, side by side.
- * Either side is null when its file is missing or has no matching entry.
- */
+/** Read the lock-resolved saropa_lints version; null when there is no lock or no entry. */
 export function readVersions(workspaceRoot: string): {
   installed: { version: string; source: string } | null;
-  configured: ConfiguredPluginVersion | null;
 } {
-  const readIfExists = (name: string): string | null => {
-    const p = path.join(workspaceRoot, name);
-    return fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : null;
-  };
-  const lock = readIfExists('pubspec.lock');
-  return {
-    installed: lock ? readInstalledVersion(lock) : null,
-    configured: readConfiguredPluginVersion(readIfExists('analysis_options.yaml')),
-  };
+  const p = path.join(workspaceRoot, 'pubspec.lock');
+  const lock = fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : null;
+  return { installed: lock ? readInstalledVersion(lock) : null };
 }
 
 /**
@@ -242,14 +230,8 @@ export async function checkForUpgrade(
     saved?.cachedLatest ?? (typeof legacyLatest === 'string' ? legacyLatest : undefined);
 
   // Read the resolved version from pubspec.lock.
-  const { installed, configured } = readVersions(workspaceRoot);
+  const { installed } = readVersions(workspaceRoot);
   if (!installed) return;
-  if (configured && configured.raw !== installed.version) {
-    console.log(
-      `[saropa_lints] analysis_options plugin version ${configured.raw}` +
-      `${configured.isRange ? ' (range)' : ''} vs pubspec.lock ${installed.version}`,
-    );
-  }
 
   // Skip path/git dependencies — developer is using a local or pinned version.
   if (installed.source === 'path' || installed.source === 'git') return;

@@ -2766,6 +2766,8 @@
       "metaExcludesPin": "saropa_lints {newest} needs a newer meta package than your Flutter SDK pins ({pin}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
       "packageHoldsAnalyzer": "The package {package} holds the analyzer back, so saropa_lints {newest} cannot be installed. Use ^{chosen}, or update {package} to use {newest}.",
       "noVersionResolves": "No saropa_lints version can be installed as a dependency because {package} requires an older analyzer. The plugin route still works.",
+      "noPluginResolves": "No saropa_lints version can be installed as a dependency, and {version} did not pass the pub solver as a plugin either ({package} requires an older analyzer). Nothing was changed.",
+      "pluginUnverified": "The plugin version {version} could not be checked with the pub solver. It is suggested from the Dart SDK constraint only.",
       "pluginOnly": "Set the saropa_lints plugin version in analysis_options.yaml to {version}.",
       "alignPlugin": "The plugin version in analysis_options.yaml ({plugin}) differs from the locked saropa_lints version ({locked}). Set the plugin version to {locked}.",
       "localSource": "saropa_lints comes from a local {source} source, so the extension shows facts only and changes nothing.",

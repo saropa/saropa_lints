@@ -64,16 +64,38 @@ describe('recommend', () => {
     assert.deepStrictEqual(probed, ['^17.0.0', '^16.10.0', '^15.2.0']);
   });
 
-  it('no version resolves: plugin route only, at most 3 probes', async () => {
+  it('no version resolves: plugin candidate that failed the solver is not offered', async () => {
     let n = 0;
     const vs = [...VERSIONS, V('14.0.0')];
     const r = await recommend(facts(), vs, async () => (n++, fail('custom_lint')));
     assert.strictEqual(n, 3);
+    assert.strictEqual(r.messageKey, K + 'noPluginResolves');
+    assert.strictEqual(r.route, 'none');
+    assert.strictEqual(r.pluginVersion, '');
+    assert.strictEqual(r.constraint, '');
+    assert.strictEqual(r.blockers[0].params.package, 'custom_lint');
+  });
+
+  it('no version resolves: plugin route offered only when its candidate passes the probe', async () => {
+    // Newest survivor is meta-excluded, so it was never probed as a dependency; the plugin probe passes.
+    const vs = [V('17.0.0', '>=3.9.0 <4.0.0', '^1.19.0'), V('16.10.0')];
+    const probed: string[] = [];
+    const r = await recommend(facts({ flutterMetaPin: '1.18.0' }), vs, async (c) => {
+      probed.push(c);
+      return c === '^17.0.0' ? ok : fail('custom_lint');
+    });
     assert.strictEqual(r.messageKey, K + 'noVersionResolves');
     assert.strictEqual(r.route, 'plugin');
     assert.strictEqual(r.pluginVersion, '17.0.0');
-    assert.strictEqual(r.constraint, '');
-    assert.strictEqual(r.blockers[0].params.package, 'custom_lint');
+    assert.ok(probed.includes('^17.0.0'));
+    assert.strictEqual(r.notes.some((x) => x.key === K + 'pluginUnverified'), false);
+  });
+
+  it('no version resolves and no solver: plugin route says it is unverified', async () => {
+    const vs = [V('17.0.0', '>=3.9.0 <4.0.0', '^1.19.0')];
+    const r = await recommend(facts({ flutterMetaPin: '1.18.0' }), vs);
+    assert.strictEqual(r.route, 'plugin');
+    assert.ok(r.notes.some((x) => x.key === K + 'pluginUnverified'));
   });
 
   it('plugin-only project: no probe, no meta filter, sdk filter only', async () => {

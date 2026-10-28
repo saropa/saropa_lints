@@ -9,7 +9,7 @@ import * as path from 'node:path';
 import { l10n } from '../i18n/runtime';
 import { resolveDependencies } from '../setup';
 import { showAnalyzerExcludeDiff } from '../analysisOptimizer/analyzerExcludeDiffProvider';
-import { readProjectFacts } from './projectFacts';
+import { readProjectFacts, resolveDataRoot } from './projectFacts';
 import { getPubVersions, type PubVersionsCache } from './pubVersions';
 import { probeConstraint } from './solverProbe';
 import { recommend, sameRecommendation, type Recommendation } from './recommend';
@@ -35,7 +35,8 @@ export function pathsFor(root: string): ApplyPaths {
   return {
     pubspec: path.join(root, 'pubspec.yaml'),
     analysisOptions: path.join(root, 'analysis_options.yaml'),
-    lock: path.join(root, 'pubspec.lock'),
+    // Pub workspace members keep the lock at the workspace root.
+    lock: path.join(resolveDataRoot(root), 'pubspec.lock'),
   };
 }
 

@@ -177,3 +177,11 @@ describe('readProjectFacts', () => {
     assert.deepStrictEqual(f.locked, {});
   });
 });
+
+describe('parsePluginVersion shared-parser forms', () => {
+  it('handles shorthand, quoted, trailing comment and CRLF', () => {
+    assert.strictEqual(parsePluginVersion('plugins:\r\n  saropa_lints: "16.7.0" # x\r\n'), '16.7.0');
+    assert.strictEqual(parsePluginVersion('plugins:\n  saropa_lints: ^16.7.0\n'), '^16.7.0');
+    assert.strictEqual(parsePluginVersion('plugins:\n  saropa_lints: # c\n    version: 16.7.0 # d\n'), '16.7.0');
+  });
+});

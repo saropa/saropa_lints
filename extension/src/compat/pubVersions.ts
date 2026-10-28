@@ -105,7 +105,8 @@ export async function getPubVersions(
   const store = opts.store ?? memoryStore;
   const now = opts.now ?? Date.now;
 
-  let failure: PubVersionsError;
+  let failure: PubVersionsError | undefined;
+  let fresh: PubVersionsCache | undefined;
   try {
     const resp = await fetchFn(PUB_API_URL);
     if (!resp.ok) {
@@ -117,20 +118,24 @@ export async function getPubVersions(
         failure = new PubVersionsError('parse', 'pub.dev response has no versions list');
       } else {
         const versions = raw.map(parsePubVersion).filter((v): v is PubVersion => v !== null);
-        const cache: PubVersionsCache = {
-          versions,
-          fetchedAt: now(),
-          latest: str(json?.latest?.version),
-        };
-        await store.set(cache);
-        return { ...cache, stale: false };
+        fresh = { versions, fetchedAt: now(), latest: str(json?.latest?.version) };
       }
     }
   } catch (err) {
     failure = new PubVersionsError('network', err instanceof Error ? err.message : String(err));
   }
 
+  if (fresh) {
+    // A cache-write failure must not look like a network failure: the data is good.
+    try {
+      await store.set(fresh);
+    } catch {
+      /* storage unavailable: serve the fresh data uncached */
+    }
+    return { ...fresh, stale: false };
+  }
+
   const cached = store.get();
   if (cached) { return { ...cached, stale: true }; }
-  throw failure;
+  throw failure ?? new PubVersionsError('network', 'no response');
 }

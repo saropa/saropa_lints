@@ -131,6 +131,7 @@ export async function recommend(
   // Dependency route (alone or with the plugin).
   const survivors = sdkOk.filter((v) => !excludes(v.meta, facts.flutterMetaPin));
   const lastProbe: { holder?: string } = {};
+  const failedProbes = new Set<string>();
   let chosen: PubVersion | undefined;
   let probes = 0;
   let ceilingMajor = Infinity;
@@ -153,26 +154,43 @@ export async function recommend(
       return result({ route: 'none', messageKey: 'probeFailed', messageParams: { detail: res.reason } }, stale);
     }
     lastProbe.holder ??= res.blockingPackage;
+    failedProbes.add(cand.version);
     ceilingMajor = semver.major(cand.version);
   }
 
   if (!chosen) {
-    // Nothing resolves as a dependency: the plugin route still works if the SDK allows.
+    // Nothing resolves as a dependency. The plugin route is offered only when
+    // its candidate passed the solver; with no solver it is offered unchecked and says so.
     const pick = sdkOk[0];
     const holder = lastProbe.holder ?? 'unknown';
     const blockers = [msg('blockerPackage', { package: holder })];
-    if (!pick || survivors.length === 0) {
-      if (!pick) blockers.push(msg('blockerSdk', { version: newest.version, dart }));
-      else blockers.push(msg('blockerMeta', { version: newest.version, pin: facts.flutterMetaPin ?? '' }));
+    if (!pick) {
+      blockers.push(msg('blockerSdk', { version: newest.version, dart }));
+      return result({ route: 'none', messageKey: 'noVersionResolves', messageParams: { package: holder }, blockers, fixes: [upgradeDart] }, stale);
     }
-    return result({
-      route: pick ? 'plugin' : 'none',
-      pluginVersion: pick?.version ?? '',
+    if (survivors.length === 0) blockers.push(msg('blockerMeta', { version: newest.version, pin: facts.flutterMetaPin ?? '' }));
+    if (probe && !failedProbes.has(pick.version)) {
+      const res = await probe('^' + pick.version);
+      if (!res.ok) {
+        if (res.toolError) {
+          return result({ route: 'none', messageKey: 'probeFailed', messageParams: { detail: res.reason } }, stale);
+        }
+        failedProbes.add(pick.version);
+      }
+    }
+    if (failedProbes.has(pick.version)) {
+      return result({ route: 'none', messageKey: 'noPluginResolves', messageParams: { package: holder, version: pick.version }, blockers, fixes: [upgradeDart] }, stale);
+    }
+    const out = result({
+      route: 'plugin',
+      pluginVersion: pick.version,
       messageKey: 'noVersionResolves',
       messageParams: { package: holder },
       blockers,
-      fixes: pick ? [msg('fixUsePluginRoute', { version: pick.version })] : [upgradeDart],
+      fixes: [msg('fixUsePluginRoute', { version: pick.version })],
     }, stale);
+    if (!probe) out.notes.push(msg('pluginUnverified', { version: pick.version }));
+    return out;
   }
 
   const constraint = '^' + chosen.version;

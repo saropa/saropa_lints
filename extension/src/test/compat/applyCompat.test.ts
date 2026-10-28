@@ -179,3 +179,20 @@ describe('applyCompatibility', () => {
     assert.strictEqual(files[lockPaths.lock], undefined);
   });
 });
+
+describe('applyCompatibility truthfulness', () => {
+  it('shorthand plugin entry is edited and plugin-only apply reports applied', async () => {
+    const { deps, files } = fake({}, { [paths.analysisOptions]: 'plugins:\n  saropa_lints: ^16.0.0\n' });
+    const out = await applyCompatibility(deps, paths, { pluginVersion: '16.10.0' });
+    assert.strictEqual(out.status, 'applied');
+    assert.strictEqual(files[paths.analysisOptions], 'plugins:\n  saropa_lints: 16.10.0\n');
+  });
+
+  it('reports noChange when no edit applies (no plugins block, no pubspec edit)', async () => {
+    const { deps, files } = fake({}, { [paths.analysisOptions]: 'linter:\n  rules: {}\n' });
+    const before = files[paths.analysisOptions];
+    const out = await applyCompatibility(deps, paths, { pluginVersion: '16.10.0' });
+    assert.strictEqual(out.status, 'noChange');
+    assert.strictEqual(files[paths.analysisOptions], before);
+  });
+});

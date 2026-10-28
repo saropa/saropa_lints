@@ -9,7 +9,7 @@
  * saropa_lints plugin entry with no `version:` line gets one.
  */
 import { applyPubspecConstraint } from '../upgrade-checker';
-import { findPluginsBlock } from '../setup';
+import { findPluginEntry, splitScalar } from '../analysisOptionsVersion';
 
 export interface ConfigFiles {
   pubspec?: string;
@@ -40,43 +40,25 @@ function eolOf(line: string): string {
 
 function applyPluginVersion(content: string, version: string): string {
   const lines = splitKeepEol(content);
-  const block = findPluginsBlock(lines.map(stripEol));
-  if (!block) return content;
+  const e = findPluginEntry(lines.map(stripEol));
+  if (!e) return content;
 
-  const entry = lines.findIndex(
-    (l, i) => i > block.start && i < block.end && /^  saropa_lints:\s*$/.test(stripEol(l)),
-  );
-  if (entry === -1) return content;
-
-  // Entry body: following lines indented deeper than 2, plus blank/comment lines.
-  let end = entry + 1;
-  while (end < block.end) {
-    const t = stripEol(lines[end]);
-    if (t.trim() === '' || /^\s*#/.test(t) || /^ {3,}\S/.test(t)) end++;
-    else break;
-  }
-
-  for (let i = entry + 1; i < end; i++) {
-    const m = /^(\s+version:\s*)(["']?)[^"'#\s]*\2(.*)$/.exec(stripEol(lines[i]));
-    if (m) {
-      lines[i] = `${m[1]}${m[2]}${version}${m[2]}${m[3]}${eolOf(lines[i])}`;
-      return lines.join('');
-    }
+  if (e.valueLine >= 0) {
+    const parts = splitScalar(stripEol(lines[e.valueLine]), e.valueKey);
+    if (!parts) return content;
+    lines[e.valueLine] = `${parts.prefix}${parts.quote}${version}${parts.quote}${parts.suffix}${eolOf(lines[e.valueLine])}`;
+    return lines.join('');
   }
 
   // No version line: insert as first child, matching existing child indent.
-  const child = lines
-    .slice(entry + 1, end)
-    .map((l) => /^( {3,})\S/.exec(stripEol(l)))
-    .find((m) => m !== null);
-  const indent = child ? child[1] : '    ';
-  let eol = eolOf(lines[entry]);
+  const indent = ' '.repeat(e.childIndent ?? e.entryIndent + 2);
+  let eol = eolOf(lines[e.entry]);
   if (eol === '') {
     // The entry was the unterminated last line; give it a terminator.
     eol = content.includes('\r\n') ? '\r\n' : '\n';
-    lines[entry] += eol;
+    lines[e.entry] += eol;
   }
-  lines.splice(entry + 1, 0, `${indent}version: "${version}"${eol}`);
+  lines.splice(e.entry + 1, 0, `${indent}version: "${version}"${eol}`);
   return lines.join('');
 }
 

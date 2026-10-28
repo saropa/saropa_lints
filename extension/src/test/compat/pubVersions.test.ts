@@ -87,3 +87,16 @@ describe('getPubVersions', () => {
     assert.strictEqual(parsePubVersion({}), null);
   });
 });
+
+describe('getPubVersions storage failure', () => {
+  it('a throwing store.set does not look like a network error', async () => {
+    const store: PubVersionsStore = {
+      get: () => undefined,
+      set: () => { throw new Error('quota'); },
+    };
+    const r = await getPubVersions({ fetchFn: okFetch(), store, now: () => 7 });
+    assert.strictEqual(r.stale, false);
+    assert.strictEqual(r.fetchedAt, 7);
+    assert.strictEqual(r.versions.length, 2);
+  });
+});
