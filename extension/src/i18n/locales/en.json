@@ -2779,7 +2779,27 @@
       "offerNoDart": "saropa_lints: your project uses {route} at {installed}. {offered} is available. Migrate?",
       "offerRenames": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. {count} rules were renamed since {installed}. Migrate?",
       "offerNoDartRenames": "saropa_lints: your project uses {route} at {installed}. {offered} is available. {count} rules were renamed since {installed}. Migrate?",
+      "offerRenamesUnknown": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. Renamed rules will be checked after the upgrade. Migrate?",
+      "offerNoDartRenamesUnknown": "saropa_lints: your project uses {route} at {installed}. {offered} is available. Renamed rules will be checked after the upgrade. Migrate?",
       "actionMigrate": "Migrate"
+    },
+    "status": {
+      "pubspec": "saropa_lints: pubspec {version}",
+      "pubspecUnlocked": "saropa_lints: pubspec (not locked yet)",
+      "plugin": "saropa_lints: plugin route {version}",
+      "both": "saropa_lints: pubspec + plugin {version}",
+      "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (disagree)",
+      "neither": "saropa_lints: not configured",
+      "localSource": "saropa_lints: local source",
+      "dartTooOld": "saropa_lints: plugin needs newer Dart",
+      "tipPubspec": "This project uses the pubspec route: saropa_lints is a dependency in pubspec.yaml. You get editor diagnostics and the command line commands (dart run saropa_lints:init, scan, baseline).",
+      "tipPlugin": "This project uses the plugin route: saropa_lints is set as a plugin in analysis_options.yaml. You get editor diagnostics only. The command line commands (dart run saropa_lints:init, scan, baseline) need saropa_lints in pubspec.yaml.",
+      "tipBoth": "This project uses both routes and they agree. You get editor diagnostics and the command line commands.",
+      "tipDisagree": "pubspec.yaml and analysis_options.yaml name different saropa_lints versions. The editor uses the plugin version ({plugin}); the command line commands use the pubspec.yaml version ({pubspec}).",
+      "tipNeither": "saropa_lints is not set up in this project: it is neither a dependency in pubspec.yaml nor a plugin in analysis_options.yaml.",
+      "tipLocalSource": "saropa_lints comes from a local path or git source, so the extension shows facts only and changes nothing.",
+      "tipDartTooOld": "The plugin route in analysis_options.yaml needs a newer Dart SDK than this project has, so the editor cannot load the plugin.",
+      "tipClick": "Click to open the version compatibility card."
     },
     "recommend": {
       "latestOk": "saropa_lints {version} is the newest release and works with this project. Use ^{version}.",

@@ -36,8 +36,8 @@ export interface StartupOffer {
   installed: Installed;
   offered: string;
   dart?: string;
-  /** Renamed rules between the lowest installed version and `offered`. */
-  renamedCount: number;
+  /** Renamed rules between the lowest installed version and `offered`; undefined when no registry is installed to read. */
+  renamedCount?: number;
 }
 
 export interface StartupResult {
@@ -81,12 +81,12 @@ function routeOf(state: RouteState, facts: ProjectFacts): StartupOffer['route'] 
 /**
  * Detect the route and compute the offer. Offered only when a recommended
  * version (Dart SDK and meta filtered, no solver) is newer than at least one
- * installed version. `renamedBetween` counts renamed rules in a version range.
+ * installed version. `renamedBetween` counts renamed rules in a version range (undefined = unknown).
  */
 export async function computeStartup(
   facts: ProjectFacts,
   versions: PubVersion[],
-  renamedBetween: (from: string, to: string) => number = () => 0,
+  renamedBetween: (from: string, to: string) => number | undefined = () => undefined,
 ): Promise<StartupResult> {
   const state = detectState(facts);
   const installed = installedVersions(facts);
@@ -133,12 +133,14 @@ export function offerMessage(offer: StartupOffer, t: Translate): string {
     ? t(K + 'installedDisagree', { pubspec: pubspec!, plugin: plugin! })
     : (pubspec ?? plugin ?? '');
   const routeKey = { dependency: 'routeDependency', plugin: 'routePlugin', both: 'routeBoth' }[offer.route];
-  const suffix = (offer.dart ? '' : 'NoDart') + (offer.renamedCount > 0 ? 'Renames' : '');
+  const count = offer.renamedCount;
+  const renames = count === undefined ? 'RenamesUnknown' : count > 0 ? 'Renames' : '';
+  const suffix = (offer.dart ? '' : 'NoDart') + renames;
   return t(K + 'offer' + suffix, {
     route: t(K + routeKey),
     installed,
     offered: offer.offered,
     dart: offer.dart ?? '',
-    count: String(offer.renamedCount),
+    count: String(count ?? 0),
   });
 }

@@ -106,11 +106,14 @@ describe('dont-ask keys', () => {
 describe('offerMessage', () => {
   const t = (k: string, p: Record<string, string> = {}) => `${k}|${Object.entries(p).map(([a, b]) => `${a}=${b}`).join(',')}`;
   it('picks the key by Dart and rename presence', async () => {
-    const base = (await computeStartup(facts({ pluginVersion: '16.10.0' }), versions)).offer!;
+    const base = { ...(await computeStartup(facts({ pluginVersion: '16.10.0' }), versions)).offer!, renamedCount: 0 };
     assert.ok(offerMessage(base, t).startsWith('compat.startup.offer|'));
     assert.ok(offerMessage({ ...base, dart: undefined }, t).startsWith('compat.startup.offerNoDart|'));
     assert.ok(offerMessage({ ...base, renamedCount: 2 }, t).startsWith('compat.startup.offerRenames|'));
     assert.ok(offerMessage({ ...base, dart: undefined, renamedCount: 2 }, t).startsWith('compat.startup.offerNoDartRenames|'));
+    assert.ok(offerMessage({ ...base, renamedCount: 0 }, t).startsWith('compat.startup.offer|'));
+    assert.ok(offerMessage({ ...base, renamedCount: undefined }, t).startsWith('compat.startup.offerRenamesUnknown|'));
+    assert.ok(offerMessage({ ...base, dart: undefined, renamedCount: undefined }, t).startsWith('compat.startup.offerNoDartRenamesUnknown|'));
   });
   it('states both versions when the routes disagree', async () => {
     const o = (await computeStartup(facts({ inPubspec: true, lock: '17.0.0', pluginVersion: '16.10.0' }), versions)).offer!;
