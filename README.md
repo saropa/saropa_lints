@@ -18,7 +18,7 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 ## Quick Start
 
-**Requirements:** Dart SDK `>=3.9.0 <4.0.0`.
+**Requirements:** Dart SDK `>=3.11.0 <4.0.0`.
 
 ### Option A — VS Code extension (recommended)
 

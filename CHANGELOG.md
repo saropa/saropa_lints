@@ -72,7 +72,7 @@ Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 project
 
 ### Changed
 
-- **Breaking:** saropa_lints now requires `analyzer >=13.0.0 <15.0.0`, and pub picks the newest allowed by your Dart version (3.9 and 3.10 get 13.0.0, 3.11 and 3.12 up to 14.5.0, 3.13 14.6.0); projects held on analyzer 12 stay on `saropa_lints: ^16.7.0`, which is frozen with no back-ports.
+- **Breaking:** saropa_lints now requires Dart `>=3.11.0` (analyzer 13.0.0 depends on `_fe_analyzer_shared` 100, which needs 3.11) and `analyzer >=13.0.0 <15.0.0`, and pub picks the newest allowed by your Dart version (3.11 and 3.12 up to 14.5.0, 3.13 14.6.0); projects held on analyzer 12 stay on `saropa_lints: ^16.7.0`, which is frozen with no back-ports.
 - `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended`; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
 - Reports on named arguments now highlight only the argument name instead of the whole `name: value` text, so editor squiggles and `// ignore:` placement for those reports shift to the name; no action required.
 - Widget rules that match by name no longer match record fields that share a widget's name, which removes false positives; no action required.
