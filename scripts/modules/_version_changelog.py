@@ -27,8 +27,7 @@ from scripts.modules._utils import (
     print_info,
     print_success,
     print_warning,
-    stable_version_error,
-    suggest_even_minor_stable,
+    extension_version_for,
 )
 from scripts.modules._git_ops import tag_exists_on_remote
 
@@ -686,12 +685,12 @@ def prompt_version_until_valid(default_version: str) -> str:
         version = prompt_version(default_version)
         if re.match(rf"^{_VERSION_RE}$", version):
             # Refuse before any file/git change (caller mutates afterwards).
-            error = stable_version_error(version)
-            if error is None:
-                return version
-            print_warning(error)
-            default_version = suggest_even_minor_stable(version)
-            continue
+            try:
+                extension_version_for(version)
+            except ValueError as exc:
+                print_warning(str(exc))
+                continue
+            return version
         print_warning(
             f"Invalid version format '{version}'. "
             f"Use X.Y.Z or X.Y.Z-pre.N"
@@ -715,7 +714,6 @@ def prompt_version_with_prerelease_toggle(default_version: str) -> str:
     if "-" in default_version:
         return prompt_version_until_valid(default_version)
 
-    stable_default = suggest_even_minor_stable(default_version)
     try:
         answer = input(
             f"  Publish {default_version} as a pre-release (beta)? [y/N]: "
@@ -724,9 +722,6 @@ def prompt_version_with_prerelease_toggle(default_version: str) -> str:
         answer = ""
     if answer in ("y", "yes"):
         default_version = f"{default_version}-beta.1"
-    else:
-        # Never propose an odd-minor stable (see stable_version_error).
-        default_version = stable_default
     return prompt_version_until_valid(default_version)
 
 
@@ -767,16 +762,7 @@ def apply_version_and_rename_unreleased(
                 f"  Suggested version: {suggested} (press Enter or edit)",
                 Color.CYAN,
             )
-            version_to_sync = prompt_version(suggested)
-            odd_error = stable_version_error(version_to_sync)
-            if odd_error:
-                print_warning(odd_error)
-                version_to_sync = suggest_even_minor_stable(version_to_sync)
-            if not re.match(rf"^{_VERSION_RE}$", version_to_sync):
-                print_warning(
-                    f"Invalid version format '{version_to_sync}'. "
-                    f"Use X.Y.Z or X.Y.Z-pre.N"
-                )
+            version_to_sync = prompt_version_until_valid(suggested)
 
 
 def reconcile_pubspec_changelog_versions(
