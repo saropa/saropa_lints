@@ -393,6 +393,10 @@ dart analyze
 
 The `expect_lint` comments assert that a lint fires on the next line. If the lint doesn't fire, the test fails. If a lint fires without an `expect_lint` comment, that also fails. If the rule is not implemented yet, do not add the fixture.
 
+## Versioning
+
+The Dart package and the VS Code extension always share the same major.minor version and may differ only in the patch digit. A beta is a pre-release, and the stable release follows with the same major.minor. The full rule is in [plans/TESTING_AND_RELEASE.md](plans/TESTING_AND_RELEASE.md#version-sync-rule).
+
 ## Audit New Rules Checklist
 
 Before submitting a PR with new or modified lint rules, review **only the files you changed** against this checklist. This ensures consistency, performance, and completeness.
