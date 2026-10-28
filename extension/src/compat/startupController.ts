@@ -4,13 +4,17 @@
  * analysis_options.yaml change, and shows the single migration prompt.
  * Cached version list and cheap filters only: no solver probe here.
  */
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
 import { getProjectRoot } from '../projectRoot';
 import { readProjectFacts } from './projectFacts';
 import { getPubVersions, type PubVersion, type PubVersionsCache } from './pubVersions';
 import { VERSIONS_CACHE_KEY } from './upgradeGate';
-import { computeStartup, dontAskKey, isSuppressed, offerMessage, type StartupOffer } from './startupDetection';
+import { computeStartup, detectState, dontAskKey, installedVersions, isSuppressed, offerMessage, type StartupOffer } from './startupDetection';
+import { routeStatus } from './routeStatus';
+import { loadRenames } from '../ruleMigration/registry';
 
 const DISMISSED_KEY = 'saropaLints.startupDismissed';
 const DEBOUNCE_MS = 1000;
@@ -42,6 +46,27 @@ async function loadVersions(context: vscode.ExtensionContext): Promise<PubVersio
   }
 }
 
+/**
+ * Cheap rename count from the registry of the installed saropa_lints (the
+ * offered version is not installed yet, so this is what is on disk now).
+ * Undefined when no installed version ships the file.
+ */
+function renamedCount(dataRoot: string, from: string, to: string): number | undefined {
+  const read = (file: string): string | undefined => {
+    try {
+      return fs.readFileSync(file, 'utf8');
+    } catch {
+      return undefined;
+    }
+  };
+  const dartTool = path.join(dataRoot, '.dart_tool', 'package_config.json');
+  if (read(dartTool) === undefined) return undefined;
+  // loadRenames returns [] both for "no file" and "no matches"; probe the file via an unbounded load.
+  const any = loadRenames({ read }, dataRoot, undefined, '999.0.0');
+  if (any.length === 0) return undefined;
+  return loadRenames({ read }, dataRoot, from, to).length;
+}
+
 export function registerStartupDetection(
   context: vscode.ExtensionContext,
   log: (message: string) => void,
@@ -51,16 +76,44 @@ export function registerStartupDetection(
   const running = new Set<string>();
   const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
+  // Persistent, quiet route status: always shown for Dart projects, no popup.
+  const statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 98);
+  statusItem.command = 'saropaLints.configureCompatibility';
+  context.subscriptions.push(statusItem);
+  const statuses = new Map<string, { text: string; tooltip: string } | undefined>();
+  const showStatus = () => {
+    const primary = getProjectRoot();
+    const s = (primary !== undefined && statuses.has(primary) ? statuses.get(primary) : undefined)
+      ?? [...statuses.values()].find((v) => v !== undefined);
+    if (!s) {
+      statusItem.hide();
+      return;
+    }
+    statusItem.text = s.text;
+    statusItem.tooltip = s.tooltip;
+    statusItem.show();
+  };
+
   const check = async (root: string): Promise<void> => {
     if (running.has(root)) return;
-    if (!vscode.workspace.getConfiguration('saropaLints').get<boolean>('checkForUpdates', true)) return;
     running.add(root);
     try {
+      const facts = await readProjectFacts(root);
+      const detected = detectState(facts);
+      // A non-Dart folder with nothing configured gets no item.
+      statuses.set(
+        root,
+        detected === 'neither' && !fs.existsSync(path.join(root, 'pubspec.yaml'))
+          ? undefined
+          : routeStatus(detected, installedVersions(facts), (k, p) => l10n(k, p)),
+      );
+      showStatus();
+      if (!vscode.workspace.getConfiguration('saropaLints').get<boolean>('checkForUpdates', true)) return;
       const versions = await loadVersions(context);
       if (versions.length === 0) return;
-      const facts = await readProjectFacts(root);
-      // The renamed-rule data source lands with saropaLints.migrateRuleNames; none yet.
-      const { state, offer } = await computeStartup(facts, versions);
+      const { state, offer } = await computeStartup(facts, versions, (from, to) =>
+        renamedCount(facts.workspaceRoot ?? root, from, to),
+      );
       log(`[saropa] start-up detection (${root}): ${state}${offer ? `, offering ${offer.offered}` : ', no offer'}`);
       if (!offer) return;
       const key = dontAskKey(root, offer.route, offer.offered);
@@ -129,7 +182,7 @@ async function prompt(context: vscode.ExtensionContext, offer: StartupOffer, key
   if (choice === migrate) {
     await vscode.commands.executeCommand('saropaLints.configureCompatibility');
     // Another change adds the rename migration; degrade to the card alone when absent.
-    if (offer.renamedCount > 0 && (await vscode.commands.getCommands(true)).includes(MIGRATE_RULES_COMMAND)) {
+    if ((offer.renamedCount ?? 0) > 0 && (await vscode.commands.getCommands(true)).includes(MIGRATE_RULES_COMMAND)) {
       await vscode.commands.executeCommand(MIGRATE_RULES_COMMAND);
     }
   } else if (choice === dontAsk) {
