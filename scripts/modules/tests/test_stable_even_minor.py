@@ -41,8 +41,8 @@ class TestStableVersionError(unittest.TestCase):
 
 
 class TestExtensionVersionIdempotencyUnchanged(unittest.TestCase):
-    def test_even_stable_maps_up(self) -> None:
-        self.assertEqual(extension_version_for("16.6.0"), "16.8.0")
+    def test_even_stable_unchanged(self) -> None:
+        self.assertEqual(extension_version_for("16.6.0"), "16.6.0")
 
     def test_odd_minor_left_unchanged(self) -> None:
         self.assertEqual(extension_version_for("16.7.0"), "16.7.0")

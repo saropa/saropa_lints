@@ -20,7 +20,12 @@ import tempfile
 from pathlib import Path
 
 from scripts.modules.strip_commit_msg_trailers import strip_commit_message
-from scripts.modules._extension_publish import set_extension_version
+from scripts.modules._extension_publish import (
+    _fetch_marketplace_latest_version,
+    extension_version_sync_error,
+    get_extension_identity,
+    set_extension_version,
+)
 from scripts.modules._utils import (
     Color,
     VERSION_RE as _VERSION_RE,
@@ -213,6 +218,20 @@ def _verify_versions_on_disk(
     else:
         print_success(f"Verified extension/package.json version is {expected_ext}")
 
+    # Fail loudly before any publishing if the extension would go below the
+    # Marketplace version. Reuses the existing Marketplace lookup.
+    if pkg_path.exists():
+        publisher, name = get_extension_identity(project_dir)
+        live = (
+            _fetch_marketplace_latest_version(f"{publisher}.{name}")
+            if publisher and name else None
+        )
+        sync_err = extension_version_sync_error(
+            version, _read_package_json_version(pkg_path), live,
+        )
+        if sync_err:
+            print_error(sync_err)
+            return False
     return True
 
 

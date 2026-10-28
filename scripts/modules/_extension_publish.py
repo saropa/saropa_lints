@@ -161,6 +161,49 @@ def set_extension_version(
     return True
 
 
+def _version_tuple(v: str) -> tuple[int, ...] | None:
+    """Parse 'X.Y.Z' into ints, or None if not plain numeric semver."""
+    parts = v.split(".")
+    if len(parts) != 3 or not all(p.isdigit() for p in parts):
+        return None
+    return tuple(int(p) for p in parts)
+
+
+def extension_version_sync_error(
+    dart_version: str,
+    package_json_version: str | None,
+    marketplace_version: str | None,
+) -> str | None:
+    """Return an error message if the extension version is unsafe, else None.
+
+    The extension version must equal the Dart package version (prereleases
+    use the hyphen-free form from ``extension_version_for``), and must not
+    be lower than the version already on the Marketplace. A missing
+    *marketplace_version* (lookup failed or never published) skips only
+    the floor check.
+    """
+    from scripts.modules._utils import extension_version_for
+
+    expected = extension_version_for(dart_version)
+    if package_json_version != expected:
+        return (
+            f"extension/package.json version is {package_json_version}, but "
+            f"the Dart package version {dart_version} requires {expected}. "
+            "Extension and Dart package versions must always be equal."
+        )
+    if marketplace_version:
+        new_t = _version_tuple(expected)
+        live_t = _version_tuple(marketplace_version)
+        if new_t and live_t and new_t < live_t:
+            return (
+                f"Extension version {expected} is lower than the "
+                f"Marketplace-published {marketplace_version}; the "
+                "Marketplace would reject it. Publish a Dart version at "
+                "least as high as the Marketplace version."
+            )
+    return None
+
+
 def audit_extension_locales(project_dir: Path) -> bool | None:
     """Audit (never translate) extension locale coverage before packaging.
 

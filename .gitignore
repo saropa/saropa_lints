@@ -95,3 +95,4 @@ plans/known_issues_review.md
 *.vsix
 /docs/handover
 self_check/pubspec.lock
+test/aggregate/

@@ -1391,7 +1391,94 @@ def _run_dart_test_to_file(
     return returncode
 
 
-def _prompt_test_failure(is_crash: bool = False) -> str:
+_FAILED_TEST_PATH_RE = re.compile(r"(test/[^\s:]+\.dart):")
+# Aggregated runs name the group after the original file: the text after the
+# aggregate path's colon starts with the original ``test/..._test.dart`` path.
+_AGGREGATE_ORIG_RE = re.compile(r"\s*(test/[^\s:]+_test\.dart)\b")
+_AGGREGATE_PREFIX = "test/aggregate/"
+
+
+def _aggregate_targets(manifest: dict) -> list[str]:
+    """Build dart test targets from a gen_test_aggregates manifest dict."""
+    targets = [f"test/aggregate/{name}" for name in manifest.get("aggregates", {})]
+    targets.extend(manifest.get("left_out", []))
+    return targets
+
+
+def _generate_aggregate_targets(project_dir: Path) -> list[str] | None:
+    """Run the aggregate generator; return dart test targets, or None on any
+    failure (caller falls back to running the full test directory)."""
+    import json
+
+    gen = project_dir / "scripts" / "gen_test_aggregates.py"
+    if not gen.is_file():
+        print_warning("gen_test_aggregates.py missing; running full test dir")
+        return None
+    try:
+        res = subprocess.run(
+            ["python3", "scripts/gen_test_aggregates.py"],
+            cwd=project_dir, capture_output=True, text=True,
+        )
+        if res.returncode != 0:
+            print_warning(
+                f"Aggregate generator exited {res.returncode}; running full test dir"
+            )
+            return None
+        manifest = json.loads(
+            (project_dir / "test" / "aggregate" / "manifest.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        targets = _aggregate_targets(manifest)
+    except (OSError, ValueError) as e:
+        print_warning(f"Aggregate generator failed ({e}); running full test dir")
+        return None
+    if not targets:
+        return None
+    print_info(f"Aggregated fast pass: {len(targets)} test target(s)")
+    return targets
+
+
+def _parse_failed_test_files(log_path: Path, project_dir: Path) -> list[str]:
+    """Return existing test file paths that failed in a dart test log.
+
+    Reads "path: name [E]" failure lines and the "Failing tests:" summary
+    block. Progress lines are ignored: after the first failure every progress
+    line carries a non-zero fail count, so they cannot identify the culprit.
+    Deduped, in first-seen order. Empty when nothing parseable (e.g. crash).
+    """
+    try:
+        lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return []
+    found: list[str] = []
+    in_summary = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("Failing tests:"):
+            in_summary = True
+            continue
+        if in_summary and not stripped:
+            in_summary = False
+        if not (in_summary or stripped.endswith("[E]")):
+            continue
+        m = _FAILED_TEST_PATH_RE.search(stripped)
+        if not m:
+            continue
+        path = m.group(1)
+        if path.startswith(_AGGREGATE_PREFIX):
+            # Map to the original file named by the group; never return
+            # aggregate paths (targeted retry reruns the originals).
+            orig = _AGGREGATE_ORIG_RE.match(stripped[m.end():])
+            if not orig:
+                continue
+            path = orig.group(1)
+        if path not in found and (project_dir / path).is_file():
+            found.append(path)
+    return found
+
+
+def _prompt_test_failure(is_crash: bool = False, failed_files: int = 0) -> str:
     """Ask user what to do after tests failed.
 
     Returns 'continue' | 'retry' | 'retry_fewer' | 'abort'.
@@ -1403,7 +1490,8 @@ def _prompt_test_failure(is_crash: bool = False) -> str:
     # Loop until a valid choice is entered — typos no longer abort.
     while True:
         print_warning("Tests failed. Choose an action:")
-        print_colored("  [R]etry (re-run tests after fixing the issue)", Color.CYAN)
+        scope = f"{failed_files} failed files" if failed_files else "full suite"
+        print_colored(f"  [R]etry ({scope}; re-run after fixing the issue)", Color.CYAN)
         if is_crash:
             print_colored(
                 "  [F]ewer workers (retry with halved concurrency — fixes compiler crashes)",
@@ -1569,7 +1657,8 @@ def _run_test_pass(
         else:
             print_info("  (No failure markers found in log; open the log file to see output.)")
 
-        choice = _prompt_test_failure(is_crash=is_crash)
+        failed_files = _parse_failed_test_files(last_log, project_dir)
+        choice = _prompt_test_failure(is_crash=is_crash, failed_files=len(failed_files))
         if choice == "continue":
             print_info("Continuing despite test failure.")
             return True
@@ -1594,8 +1683,11 @@ def _run_test_pass(
             relog_time = datetime.now().strftime("%H%M%S")
             relog_name = f"{date_str}_{relog_time}_dart_test_{label}_retry.log"
             last_log = reports_dir / relog_name
+            # Re-run only the previously failed files when known; else full pass.
             rc = _run_dart_test_to_file(
-                project_dir, env, last_log, extra_args, concurrency=next_j,
+                project_dir, env, last_log,
+                (extra_args or []) + failed_files if failed_files else extra_args,
+                concurrency=next_j,
             )
             last_j = next_j
             if rc == 0:
@@ -1603,10 +1695,36 @@ def _run_test_pass(
                 return True
             continue
         # Abort: run chain-stack-traces so a detailed log exists, then return False
-        print_warning("Aborting — capturing one final diagnostic trace (this is NOT a retry)...")
-        _run_chain_stack_traces_and_check(project_dir, env, extra_args)
+        # Only the failed files are re-run; if none parse, skip (a full-suite
+        # re-run costs 30-80 min and the original log already has the failures).
+        if failed_files:
+            print_warning(
+                f"Aborting — capturing a diagnostic trace of {len(failed_files)} "
+                "failed file(s) (this is NOT a retry)..."
+            )
+            _run_chain_stack_traces_and_check(project_dir, env, failed_files)
+        else:
+            print_info("Aborting — no failed test files parsed, skipping diagnostic re-run.")
         print_info("Diagnostic trace saved. Aborting publish.")
         return False
+
+
+def _parse_vm_stat(text: str) -> float | None:
+    """Parse macOS ``vm_stat`` output into reclaimable GB (free + inactive + speculative)."""
+    m = re.search(r"page size of (\d+) bytes", text)
+    if not m:
+        return None
+    page_size = int(m.group(1))
+    pages = 0
+    found = False
+    for key in ("Pages free", "Pages inactive", "Pages speculative"):
+        km = re.search(rf"^{key}:\s+(\d+)\.", text, re.MULTILINE)
+        if km:
+            pages += int(km.group(1))
+            found = True
+    if not found:
+        return None
+    return pages * page_size / (1024 ** 3)
 
 
 def _available_ram_gb() -> float | None:
@@ -1618,6 +1736,14 @@ def _available_ram_gb() -> float | None:
     cached under light load can OOM-crash the compiler on a later run where
     other processes (IDE, browser, another publish) are competing for RAM.
     """
+    if sys.platform == "darwin":
+        try:
+            out = subprocess.run(
+                ["vm_stat"], capture_output=True, text=True, timeout=10,
+            ).stdout
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+        return _parse_vm_stat(out)
     if not is_windows():
         return None
     try:
@@ -1702,8 +1828,8 @@ def _auto_tune_concurrency(
     ram_bucket = int(ram_gb // 4) if ram_gb is not None else "unknown"
     cache_key = f"{sdk_version}|{os.cpu_count()}|ram{ram_bucket}"
 
-    # Read cached result if it exists and matches.
-    if cache_file.exists():
+    # Read cached result if it exists and matches (never for unknown RAM).
+    if ram_gb is not None and cache_file.exists():
         try:
             lines = cache_file.read_text(encoding="utf-8").splitlines()
             if len(lines) >= 2 and lines[0] == cache_key:
@@ -1741,7 +1867,11 @@ def _auto_tune_concurrency(
     # than probing all the way up and risking the crash the probe exists to
     # avoid. Thresholds are conservative estimates (~1.5 GB/worker), not
     # measured; the probe itself is still the authority on what's stable.
-    if ram_gb is not None:
+    if ram_gb is not None and sys.platform == "darwin":
+        # macOS: ~1 GB per worker, clamped 2..8 (8 GB Macs thrash otherwise).
+        cap = max(2, min(8, int(ram_gb)))
+        levels = [j for j in levels if j <= cap] or [cap]
+    elif ram_gb is not None:
         if ram_gb < 4:
             levels = [j for j in levels if j <= 2] or [2]
         elif ram_gb < 8:
@@ -1783,18 +1913,44 @@ def _auto_tune_concurrency(
             print_info(f"  -j {j}: timeout — stopping")
             break
 
-    # Cache the result.
-    try:
-        cache_file.write_text(f"{cache_key}\n{best_j}\n", encoding="utf-8")
-    except OSError:
-        pass
+    # Cache the result — but never when RAM is unknown: the value would be
+    # pinned to a guess and reused regardless of later memory pressure.
+    if ram_gb is not None:
+        try:
+            cache_file.write_text(f"{cache_key}\n{best_j}\n", encoding="utf-8")
+        except OSError:
+            pass
 
     print_success(f"Test concurrency: -j {best_j}")
     return best_j
 
 
+def _changed_since_last_tag(project_dir: Path, use_shell: bool) -> list[str]:
+    """Files changed between the latest release tag and HEAD (empty if no tag/git)."""
+    try:
+        tag = subprocess.run(
+            ["git", "describe", "--tags", "--abbrev=0"],
+            cwd=project_dir, capture_output=True, text=True,
+            timeout=10, shell=use_shell,
+        )
+        name = (tag.stdout or "").strip()
+        if tag.returncode != 0 or not name:
+            return []
+        diff = subprocess.run(
+            ["git", "diff", "--name-only", f"{name}..HEAD"],
+            cwd=project_dir, capture_output=True, text=True,
+            timeout=10, shell=use_shell,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    return (diff.stdout or "").splitlines()
+
+
 def _find_delta_test_files(project_dir: Path) -> list[str]:
-    """Identify test files affected by uncommitted changes (staged + unstaged).
+    """Identify test files affected by changes since the last release tag
+    plus uncommitted changes (staged + unstaged).
+
+    Returns [] (full suite) when SAROPA_FULL_TESTS=1 (set by --full-tests).
 
     Maps changed lib/ source files to their corresponding test/ files by
     mirroring the directory structure:
@@ -1809,6 +1965,8 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
     (infrastructure files like tiers.dart or all_rules.dart changed), or no
     test files can be mapped — the caller should fall back to the full suite.
     """
+    if os.environ.get("SAROPA_FULL_TESTS", "").strip() == "1":
+        return []
     use_shell = get_shell_mode()
     try:
         result = subprocess.run(
@@ -1832,7 +1990,8 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
         return []
 
     changed = set()
-    for line in (result.stdout + "\n" + staged.stdout).splitlines():
+    since_tag = _changed_since_last_tag(project_dir, use_shell)
+    for line in (result.stdout + "\n" + staged.stdout).splitlines() + since_tag:
         line = line.strip().replace("\\", "/")
         if line:
             changed.add(line)
@@ -1987,9 +2146,10 @@ def run_tests(project_dir: Path) -> bool:
 
     # No delta (broad infrastructure changes or clean tree) — run full suite.
     print_info("No delta (broad changes or clean tree) — running full suite")
+    agg_targets = _generate_aggregate_targets(project_dir)
     return _run_test_pass(
         project_dir, env, reports_dir, date_str, time_str,
-        label="fast", extra_args=["-x", "slow"],
+        label="fast", extra_args=["-x", "slow"] + (agg_targets or []),
         concurrency=tuned_j,
     )
 

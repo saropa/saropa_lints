@@ -131,19 +131,11 @@ def extension_version_for(version: str) -> str:
     a channel-derived band plus the iteration number, so successive beta
     iterations produce distinct versions.
 
-    Stable (e.g. "16.0.1") → even minor one above the prerelease band:
-    ``16.2.1``.  This guarantees stable > prerelease in semver, so
-    marketplace users on a beta auto-update to the stable release.
-    The even minor is ``(original_minor | 1) + 1`` — the next even
-    integer at or above the prerelease odd minor.
+    Stable (e.g. "16.10.0") -> returned unchanged: extension and Dart
+    package versions must always be equal.
 
-    **Idempotency guarantee:** calling this function twice on the same input
-    returns the same result. A converted prerelease version (e.g. "16.1.913")
-    contains no ``-``, so ``is_prerelease_version`` returns False and the
-    stable path returns it unchanged (odd minor stays odd because
-    ``(1 | 1) + 1 = 2`` would break idempotency — so the stable path
-    only bumps when the minor is even, i.e. not already converted).
-    ``set_extension_version`` relies on this property.
+    **Idempotency:** a converted prerelease value has no ``-``, so it takes
+    the stable path and is returned unchanged.
     """
     base = strip_prerelease_suffix(version)
     major, minor, patch = base.split(".")
@@ -162,15 +154,10 @@ def extension_version_for(version: str) -> str:
         )
         return f"{major}.{prerelease_minor}.{new_patch}"
 
-    # Stable: bump minor to the next even above the prerelease odd minor,
-    # so stable always supersedes its betas (e.g. 16.2.x > 16.1.x).
-    # Skip the bump when minor is already odd — that means this value was
-    # already converted from a prerelease (idempotency guard).
-    if minor_int % 2 == 0:
-        stable_minor = (minor_int | 1) + 1
-    else:
-        stable_minor = minor_int
-    return f"{major}.{stable_minor}.{patch}"
+    # Stable: the extension version ALWAYS equals the Dart package version.
+    # (Only prereleases are converted, because vsce rejects a hyphenated
+    # version.) Never add an independent bump here.
+    return f"{major}.{minor_int}.{patch}"
 
 
 # =============================================================================
