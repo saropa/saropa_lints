@@ -178,11 +178,7 @@ Future<Directory> getApplicationSupportDirectory() async => Directory('.');
 Future<Directory> getTemporaryDirectory() async => Directory('.');
 
 class TextStyle {
-  const TextStyle({
-    this.fontFamily,
-    this.fontFamilyFallback,
-    this.fontSize,
-  });
+  const TextStyle({this.fontFamily, this.fontFamilyFallback, this.fontSize});
   final String? fontFamily;
   final List<String>? fontFamilyFallback;
   final double? fontSize;

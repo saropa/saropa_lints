@@ -7,16 +7,10 @@ void testPreferAlignOverContainer() {
   // BAD: Container with only alignment
   // BAD: Container with only alignment, should trigger lint
   // expect_lint: prefer_align_over_container
-  final bad1 = Container(
-    alignment: Alignment.topLeft,
-    child: Text('Hello'),
-  );
+  final bad1 = Container(alignment: Alignment.topLeft, child: Text('Hello'));
 
   // GOOD: Using Align widget
-  final good1 = Align(
-    alignment: Alignment.topLeft,
-    child: Text('Hello'),
-  );
+  final good1 = Align(alignment: Alignment.topLeft, child: Text('Hello'));
 
   // GOOD: Container with multiple properties
   final good2 = Container(
@@ -30,16 +24,10 @@ void testPreferPaddingOverContainer() {
   // BAD: Container with only padding
   // BAD: Container with only padding, should trigger lint
   // expect_lint: prefer_padding_over_container
-  final bad1 = Container(
-    padding: EdgeInsets.all(16),
-    child: Text('Hello'),
-  );
+  final bad1 = Container(padding: EdgeInsets.all(16), child: Text('Hello'));
 
   // GOOD: Using Padding widget
-  final good1 = Padding(
-    padding: EdgeInsets.all(16),
-    child: Text('Hello'),
-  );
+  final good1 = Padding(padding: EdgeInsets.all(16), child: Text('Hello'));
 
   // GOOD: Container with multiple properties
   final good2 = Container(
@@ -82,10 +70,7 @@ class TestWidget extends StatelessWidget {
         // BAD: Container with only alignment in widget tree
         // BAD: Container with only alignment in widget tree, should trigger lint
         // expect_lint: prefer_align_over_container
-        Container(
-          alignment: Alignment.bottomRight,
-          child: Icon(Icons.star),
-        ),
+        Container(alignment: Alignment.bottomRight, child: Icon(Icons.star)),
 
         // BAD: Container with only padding in widget tree
         // BAD: Container with only padding in widget tree, should trigger lint

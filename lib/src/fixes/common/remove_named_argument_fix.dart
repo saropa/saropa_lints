@@ -14,7 +14,7 @@ import '../../native/saropa_fix.dart';
 ///
 /// Used by rules that flag a redundant or disallowed named argument (e.g.
 /// `avoid_icon_size_override` removing `size:`, `avoid_riverpod_string_provider_name`
-/// removing `name:`). The rule must report at the [NamedExpression] node.
+/// removing `name:`). The rule must report at the [NamedArgument] node.
 ///
 /// Comma handling: if a trailing comma follows the argument it is consumed; if
 /// only a leading comma exists (the argument is last) that comma is consumed
@@ -37,9 +37,9 @@ class RemoveNamedArgumentFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final named = node is NamedExpression
+    final named = node is NamedArgument
         ? node
-        : node.thisOrAncestorOfType<NamedExpression>();
+        : node.thisOrAncestorOfType<NamedArgument>();
     if (named == null) return;
     if (named.parent is! ArgumentList) return;
 

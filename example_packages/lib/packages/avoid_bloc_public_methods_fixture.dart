@@ -114,7 +114,7 @@ class _bad574_MyBloc extends Bloc<Event, State> {
 
 // GOOD: Should NOT trigger avoid_bloc_public_methods
 class _good574_MyBloc extends Bloc<Event, State> {
-// Use events instead
-// bloc.add(LoadDataEvent());
-// bloc.add(ResetEvent());
+  // Use events instead
+  // bloc.add(LoadDataEvent());
+  // bloc.add(ResetEvent());
 }

@@ -144,9 +144,7 @@ class _good3_GuardedDisposeState extends State<StatefulWidget> {
 // initializes exactly once on first read and is out of this rule's scope
 // (candidateFields excludes fields with a non-null initializer).
 class _good4_LazyControllerState extends State<StatefulWidget> {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-  );
+  late final AnimationController _controller = AnimationController(vsync: this);
 
   @override
   void dispose() {

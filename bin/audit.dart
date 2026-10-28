@@ -30,8 +30,6 @@ import 'package:saropa_lints/src/report/timing_emitter.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart'
     show RuleTimingTracker, SuppressionKind, SuppressionTracker;
 import 'package:saropa_lints/src/scan/audit_baseline.dart';
-import 'package:saropa_lints/src/scan/git_changed_files.dart';
-import 'package:saropa_lints/src/scan/rule_tier_index.dart';
 
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {

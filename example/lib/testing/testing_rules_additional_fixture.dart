@@ -234,10 +234,7 @@ void badManualBlocTest() {
     // expect_lint: prefer_bloc_test_package
     final bloc = MyBloc();
     bloc.add(MyEvent());
-    await expectLater(
-      bloc.stream,
-      emitsInOrder([MyState()]),
-    );
+    await expectLater(bloc.stream, emitsInOrder([MyState()]));
   });
 }
 

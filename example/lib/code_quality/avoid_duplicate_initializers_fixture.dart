@@ -113,16 +113,12 @@ dynamic b;
 class _bad185_Foo {
   final int a;
   final int b;
-  _bad185_Foo()
-      : a = compute(),
-        b = compute(); // Same initializer
+  _bad185_Foo() : a = compute(), b = compute(); // Same initializer
 }
 
 // GOOD: Should NOT trigger avoid_duplicate_initializers
 class _good185_Bar {
   final int a;
   final int b;
-  _good185_Bar()
-      : a = 1,
-        b = 2; // Different initializers for each field
+  _good185_Bar() : a = 1, b = 2; // Different initializers for each field
 }

@@ -112,7 +112,7 @@ final name = 'example';
 @freezed
 class _bad414_User with _$User {
   factory _bad414_User({String? name}) = _User;
-// Missing: const _bad414_User._();
+  // Missing: const _bad414_User._();
 }
 
 // GOOD: Should NOT trigger require_freezed_private_constructor

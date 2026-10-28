@@ -75,7 +75,7 @@ void _checkPubspecDependency(LogWriter log, String targetDir) {
   return (major, minor);
 }
 
-/// Check that the Dart SDK version supports the plugin system (>= 3.6).
+/// Check that the Dart SDK meets the saropa_lints 17 floor (>= 3.11).
 void _checkDartSdkVersion(LogWriter log) {
   final parsed = _parseDartSdkVersion();
   if (parsed == null) {
@@ -89,13 +89,16 @@ void _checkDartSdkVersion(LogWriter log) {
   }
 
   final (major, minor) = parsed;
-  if (major > 3 || (major == 3 && minor >= 6)) {
+  if (major > 3 || (major == 3 && minor >= 11)) {
     log.check('Dart SDK $major.$minor (plugin support OK)', pass: true);
   } else {
     log.check(
       'Dart SDK version',
       pass: false,
-      detail: '$major.$minor detected — native plugins require Dart >= 3.6',
+      detail:
+          '$major.$minor detected — saropa_lints 17 requires Dart >= 3.11 '
+          '(analyzer 13). Upgrade Dart/Flutter, or stay on saropa_lints '
+          '^16.7.0 for Dart 3.9/3.10.',
     );
   }
 }

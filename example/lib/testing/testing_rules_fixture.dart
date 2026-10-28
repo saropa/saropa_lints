@@ -190,13 +190,13 @@ class UserBuilder {
   }
 
   User build() => User(
-        id: _id,
-        name: _name,
-        email: _email,
-        age: _age,
-        phone: _phone,
-        address: _address,
-      );
+    id: _id,
+    name: _name,
+    email: _email,
+    age: _age,
+    phone: _phone,
+    address: _address,
+  );
 }
 
 // Usage:

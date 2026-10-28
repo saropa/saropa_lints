@@ -111,17 +111,10 @@ final label = 'label';
 // BAD: Should trigger require_semantics_label
 // expect_lint: require_semantics_label
 void _bad5() {
-  Semantics(
-    button: true,
-    child: MyCustomButton(),
-  );
+  Semantics(button: true, child: MyCustomButton());
 }
 
 // GOOD: Should NOT trigger require_semantics_label
 void _good5() {
-  Semantics(
-    button: true,
-    label: 'Submit form',
-    child: MyCustomButton(),
-  );
+  Semantics(button: true, label: 'Submit form', child: MyCustomButton());
 }

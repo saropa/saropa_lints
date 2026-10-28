@@ -171,10 +171,8 @@ class GoodFunctionTypeWithNamedContext extends StatelessWidget {
   // These should NOT trigger avoid_storing_context - they are function
   // signatures with named (not positional) BuildContext parameters
   final Widget Function({required BuildContext context}) builder;
-  final Widget Function({
-    required BuildContext context,
-    required bool value,
-  }) builderWithValue;
+  final Widget Function({required BuildContext context, required bool value})
+  builderWithValue;
   final void Function({BuildContext? context})? optionalCallback;
 
   @override
@@ -569,8 +567,11 @@ class GoodNullableSafeMountedCheck {
       // This nullable-safe pattern should NOT trigger lint
       // context?.mounted ?? false ? context : null is functionally equivalent to
       // context.mounted ? context : null for nullable context
-      debugException(error, stack,
-          context: context?.mounted ?? false ? context : null);
+      debugException(
+        error,
+        stack,
+        context: context?.mounted ?? false ? context : null,
+      );
       return false;
     }
   }
@@ -588,19 +589,18 @@ class GoodTernaryInCatchBlockNamedParams extends StatefulWidget {
 
 class _GoodTernaryInCatchBlockNamedParamsState
     extends State<GoodTernaryInCatchBlockNamedParams> {
-  Future<bool> showDialogAddContact({
-    FamilyGroupModel? familyGroup,
-  }) async {
+  Future<bool> showDialogAddContact({FamilyGroupModel? familyGroup}) async {
     try {
-      return await showDialogCommon(
-        context: context,
-        child: Container(),
-      );
+      return await showDialogCommon(context: context, child: Container());
     } on Object catch (error, stack) {
       // This ternary pattern in catch block should NOT trigger lint
       // Even when passed as named argument in function call
-      debugException(error, stack,
-          contact: this, context: context.mounted ? context : null);
+      debugException(
+        error,
+        stack,
+        contact: this,
+        context: context.mounted ? context : null,
+      );
       return false;
     }
   }
@@ -719,8 +719,9 @@ class GoodInstanceMethod extends StatefulWidget {
 class _GoodInstanceMethodState extends State<GoodInstanceMethod> {
   void showError(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(); // Instance method can check mounted
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(); // Instance method can check mounted
   }
 
   @override

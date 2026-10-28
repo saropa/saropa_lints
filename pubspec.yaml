@@ -71,7 +71,7 @@ executables:
 
 # Dart SDK constraint (pure Dart package; Flutter topic tag provides discoverability)
 environment:
-  sdk: ">=3.9.0 <4.0.0" # detect: flutter doctor -v Dart version
+  sdk: ">=3.11.0 <4.0.0" # detect: flutter doctor -v Dart version
 
 # Runtime dependencies for lint rule implementation
 ##################################################################################################
@@ -83,68 +83,25 @@ dependencies:
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analysis_server_plugin
   #
-  # ====================================================================
-  # ###### HARD STOP: DO NOT bump this past ^0.3.14 until the analyzer
-  # ###### constraint below can move to ^13 or higher.
-  #
-  # analysis_server_plugin versions pin their analyzer dependency EXACTLY:
-  #   - 0.3.14  -> analyzer 12.1.0  (compatible — this is what we use)
-  #   - 0.3.16  -> analyzer 13.1.0  (BREAKS — meta ^1.18.3 floor)
-  #   - 0.3.18  -> analyzer 13.3.0  (BREAKS)
-  #   - 0.3.20  -> analyzer 14.1.0  (BREAKS)
-  # Every version after 0.3.14 drags in an analyzer that requires
-  # meta ^1.18.3, which Flutter stable (meta 1.18.0) cannot satisfy.
-  # See the full meta-pin reasoning on the analyzer constraint below.
-  # ====================================================================
-  analysis_server_plugin: ^0.3.14
+  # Each analysis_server_plugin release pins exactly one analyzer version
+  # (0.3.15 -> analyzer 13.0.0, 0.3.25 -> analyzer 14.6.0), so this range plus
+  # the analyzer range below lets pub pick the newest pair the project's Dart
+  # SDK allows. Do not narrow it to a single release.
+  analysis_server_plugin: ^0.3.15
 
   # This package provides a library that performs static analysis of Dart code.
   # https://pub.dev/packages/analyzer
-  # CRITICAL: Must stay compatible with Flutter stable's exact `meta` pin.
-  # Flutter stable (3.44.x, May 2026) pins meta to EXACTLY 1.18.0, so any
-  # transitive dependency that demands a higher meta makes saropa_lints
-  # unresolvable for Flutter consumers (`flutter pub add` resolution failure).
-  #   - analyzer 12.x requires meta ^1.18.0 -> satisfied by 1.18.0 (OK).
-  #   - analyzer 13.x requires meta ^1.18.3 -> NOT satisfied by 1.18.0 (BREAKS).
-  # History: the original regression (commit 0bab4ea0, Apr 27 2026) was an
-  # analyzer ^12 bump back when Flutter stable still pinned meta 1.17.0. That
-  # blocker is gone now that stable ships meta 1.18.0; the live blocker is
-  # analyzer 13's meta ^1.18.3 floor.
-  #
-  # Why the pin exists upstream: meta ships INSIDE the Flutter SDK (with
-  # intl/collection/path/vector_math/async) at an EXACT version, so a new pub
-  # release cannot break apps on an older SDK. analyzer is not itself pinned but
-  # depends on meta, so analyzer's meta floor must stay <= Flutter's meta pin.
-  # We cannot "widen below a hard floor", so this clears only when Flutter
-  # stable bumps its bundled meta. Intentional and acknowledged-painful; tracked
-  # for removal upstream:
-  #   - rationale: https://github.com/dart-lang/sdk/blob/main/docs/Flutter-Pinned-Packages.md
-  #   - unpin effort: https://github.com/flutter/flutter/issues/158050
-  # Re-verified 2026-08-12: Flutter stable 3.44.9 still pins meta EXACTLY 1.18.0 (checked packages/flutter/pubspec.yaml); analyzer 14.1.0 requires meta ^1.18.3 -> still unresolvable for Flutter consumers.
-  #
-  # ====================================================================
-  # ###### HARD STOP: DO NOT bump this to analyzer ^13 (or higher) until
-  # ###### Flutter stable ships meta ^1.18.3. See the meta-pin reasoning
-  # ###### above — analyzer 13's meta ^1.18.3 floor makes the package
-  # ###### unresolvable in any Flutter-stable app.
-  #
-  # It also breaks the build outright: analyzer 13 RENAMED the public AST
-  # classes this package is built on, and the old names are gone (no
-  # deprecated aliases):
-  #     NamedExpression        -> NamedArgument
-  #     SimpleFormalParameter  -> RegularFormalParameter
-  #     DefaultFormalParameter -> removed (FormalParameter.parameter gone)
-  # That is ~912 references across ~148 files in lib/ — every rule and fix
-  # that inspects arguments or parameters. A bump here is a full source
-  # migration, not a constraint change. Leave at ^12.1.0.
-  # ====================================================================
-  analyzer: ^12.1.0
+  # Supports analyzer 13 and 14. Pub picks per Dart SDK: Dart >=3.11 is required
+  # (13.0.0 needs _fe_analyzer_shared 100): 3.11/3.12 get up to 14.5.0, 3.13 to 14.6.0. Projects held on
+  # analyzer 12 stay on saropa_lints ^16.7.0 (16.x is frozen, no back-ports).
+  # analyzer 13.0.0 requires meta ^1.18.0, so Flutter 3.44 (meta 1.18.0) still
+  # resolves; do not raise the meta floor below.
+  analyzer: ">=13.0.0 <15.0.0"
 
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analyzer_plugin
-  # Capped below 0.15.0: analyzer_plugin 0.14.10 pulls analyzer 13.1.0 (meta
-  # ^1.18.3, breaks Flutter consumers per the analyzer note above). The pub
-  # solver backtracks to the highest 0.14.x that pairs with analyzer 12.x.
+  # Capped below 0.15.0; the pub solver picks the 0.14.x that pairs with the
+  # resolved analyzer.
   analyzer_plugin: ^0.14.8
 
   # Collections and utilities functions and classes related to collections.
@@ -158,9 +115,8 @@ dependencies:
   # the 13.12.7 tag; local 3.12.1 dry-run did not flag it, which is why it slipped
   # through). Constraint deliberately ^1.18.0, NOT ^1.18.3: Flutter 3.44 and
   # older pin meta to EXACTLY 1.18.0, so a ^1.18.3 floor makes saropa_lints
-  # unresolvable for those Flutter consumers (14.0.3 to 16.7.0 had that bug). ^1.18.0 accepts Flutter's 1.18.0 and the
-  # 1.18.3 already resolved here transitively. See the analyzer note below for the
-  # full meta-pin rationale — do NOT raise this floor.
+  # unresolvable for those Flutter consumers (14.0.3 to 16.7.0 had that bug).
+  # ^1.18.0 accepts Flutter's 1.18.0 and newer. Do NOT raise this floor.
   meta: ^1.18.0
 
   # A string-based path manipulation library. All of the path operations you know...
@@ -193,5 +149,5 @@ dependencies:
 dev_dependencies:
   # A full featured library for writing and running Dart tests across platforms.
   # https://pub.dev/packages/test
-  ################ Because test >=1.31.2 depends on analyzer >=13.0.0 <15.0.0 and saropa_lints depends on analyzer ^12.1.0, test >=1.31.2 is forbidden.
+  ################ Because test >=1.31.2 depends on analyzer >=13.0.0 <15.0.0 and saropa_lints previously depended on analyzer ^12.1.0, test >=1.31.2 is forbidden.
   test: ^1.31.1 # Unit testing framework

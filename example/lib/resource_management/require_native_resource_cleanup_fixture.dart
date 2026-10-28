@@ -109,14 +109,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: require_native_resource_cleanup
 void _bad968_processImage() {
   final pointer = calloc<Uint8>(1024);
-// pointer never freed
+  // pointer never freed
 }
 
 // GOOD: Should NOT trigger require_native_resource_cleanup
 void _good968_processImage() {
   final pointer = calloc<Uint8>(1024);
   try {
-// Use pointer
+    // Use pointer
   } finally {
     calloc.free(pointer);
   }

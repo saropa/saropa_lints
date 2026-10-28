@@ -110,10 +110,7 @@ dynamic child;
 // BAD: Should trigger require_disabled_state
 // expect_lint: require_disabled_state
 void _bad1425() {
-  ElevatedButton(
-    onPressed: canSubmit ? submit : null,
-    child: Text('Submit'),
-  );
+  ElevatedButton(onPressed: canSubmit ? submit : null, child: Text('Submit'));
 }
 
 // GOOD: Should NOT trigger require_disabled_state

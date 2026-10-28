@@ -131,7 +131,9 @@ void _good753() async {
   });
 
   // Or handle in UI:
-  ref.watch(userProvider).when(
+  ref
+      .watch(userProvider)
+      .when(
         data: (user) => Text(user.name),
         loading: () => CircularProgressIndicator(),
         error: (e, st) => Text('Error: $e'),

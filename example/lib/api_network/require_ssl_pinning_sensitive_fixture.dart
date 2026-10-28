@@ -21,8 +21,5 @@ Future<void> fetchAuthConfigGood(dynamic http) async {
 // ============ GOOD: localhost suppressed (should NOT trigger) ============
 
 Future<void> loginLocalhost(dynamic http) async {
-  await http.post(
-    Uri.parse('http://localhost:8080/auth/login'),
-    body: {},
-  );
+  await http.post(Uri.parse('http://localhost:8080/auth/login'), body: {});
 }

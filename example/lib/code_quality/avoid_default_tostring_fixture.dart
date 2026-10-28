@@ -114,7 +114,7 @@ class _bad183_User {
   void _topLevel113() {
     _bad183_User(this.name);
   }
-// Missing toString override
+  // Missing toString override
 }
 
 // GOOD: Should NOT trigger avoid_default_tostring

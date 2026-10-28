@@ -125,9 +125,7 @@ void _bad33() {
 // GOOD: Should NOT trigger avoid_layout_passes
 void _good33() {
   ListView.builder(
-    itemBuilder: (context, index) => Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [],
-    ),
+    itemBuilder: (context, index) =>
+        Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: []),
   );
 }

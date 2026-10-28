@@ -129,6 +129,7 @@ void _good60() async {
     final data = jsonDecode(response.body);
   } else {
     throw FormatException(
-        'Expected JSON but got ${response.headers['content-type']}');
+      'Expected JSON but got ${response.headers['content-type']}',
+    );
   }
 }

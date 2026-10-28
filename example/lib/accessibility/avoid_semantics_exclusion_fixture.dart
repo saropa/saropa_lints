@@ -110,17 +110,11 @@ dynamic content;
 // BAD: Should trigger avoid_semantics_exclusion
 // expect_lint: avoid_semantics_exclusion
 void _bad20() {
-  Image.asset(
-    'assets/icon.png',
-    excludeFromSemantics: true,
-  );
+  Image.asset('assets/icon.png', excludeFromSemantics: true);
 }
 
 // GOOD: Should NOT trigger avoid_semantics_exclusion
 void _good20() {
   // Decorative background pattern, no informational content
-  Image.asset(
-    'assets/pattern.png',
-    excludeFromSemantics: true,
-  );
+  Image.asset('assets/pattern.png', excludeFromSemantics: true);
 }

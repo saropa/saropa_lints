@@ -115,10 +115,7 @@ final userName = 'John';
 // expect_lint: avoid_provider_of_in_build
 Widget _bad704_build(BuildContext context) {
   final user = Provider.of<User>(context); // Rebuilds on every change
-  return ElevatedButton(
-    onPressed: () => user.logout(),
-    child: Text('Logout'),
-  );
+  return ElevatedButton(onPressed: () => user.logout(), child: Text('Logout'));
 }
 
 // GOOD: Should NOT trigger avoid_provider_of_in_build

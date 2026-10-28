@@ -123,9 +123,6 @@ void _good1190() async {
   test('should update after delay', () async {
     await tester.pumpAndSettle();
     // or
-    await expectLater(
-      stream,
-      emitsInOrder([]),
-    );
+    await expectLater(stream, emitsInOrder([]));
   });
 }

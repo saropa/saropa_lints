@@ -33,7 +33,7 @@ import 'package:analyzer/dart/element/type_system.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/file_system/overlay_file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/string_source.dart';
+import 'package:analyzer/source/file_source.dart';
 import 'package:analyzer/workspace/workspace.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart';
@@ -46,7 +46,15 @@ class HarnessDiagnostic {
     required this.ruleName,
     required this.line,
     required this.message,
+    this.offset = 0,
+    this.length = 0,
   });
+
+  /// Zero-based source offset of the diagnostic.
+  final int offset;
+
+  /// Length in characters of the reported range.
+  final int length;
 
   /// The rule code (e.g. `avoid_expensive_build`).
   final String ruleName;
@@ -108,6 +116,11 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
   String fileStem = 'fixture',
   Directory? projectRoot,
 }) async {
+  // Fixtures outside example/ have no `lane: full` config; never let the
+  // default light lane gate the rule under test. The previous lane is
+  // restored in `finally` so the override never leaks into other tests.
+  final previousLane = activeRuleLane;
+  setActiveRuleLane(RuleLane.full);
   final libDir = projectRoot == null
       ? p.normalize(p.absolute(p.join('example', 'lib')))
       : p.normalize(p.absolute(p.join(projectRoot.path, 'lib')));
@@ -124,6 +137,7 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
     await prev;
     return await _runLocked(env, libDir, rule, code, fileStem);
   } finally {
+    setActiveRuleLane(previousLane);
     done.complete();
     if (!cached) await env.collection.dispose();
   }
@@ -178,7 +192,7 @@ Future<List<HarnessDiagnostic>> _runLocked(
     final listener = RecordingDiagnosticListener();
     final reporter = DiagnosticReporter(
       listener,
-      StringSource(result.content, path),
+      FileSource(provider.getFile(path)),
     );
     final ctxUnit = RuleContextUnit(
       file: provider.getFile(path),
@@ -218,6 +232,8 @@ Future<List<HarnessDiagnostic>> _runLocked(
           ruleName: d.diagnosticCode.lowerCaseName,
           line: result.unit.lineInfo.getLocation(d.offset).lineNumber,
           message: d.problemMessage.messageText(includeUrl: false),
+          offset: d.offset,
+          length: d.length,
         ),
     ];
   } finally {

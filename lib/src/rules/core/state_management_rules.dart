@@ -563,7 +563,7 @@ class _ValueNotifierDisposeVisitor extends RecursiveAstVisitor<void> {
         // Check if the forEach callback disposes items
         final ArgumentList args = node.argumentList;
         if (args.arguments.isNotEmpty) {
-          final Expression firstArg = args.arguments.first;
+          final Argument firstArg = args.arguments.first;
           if (firstArg is FunctionExpression) {
             // Check if the function body contains a dispose call
             if (_containsDisposeCall(firstArg.body)) {

@@ -111,7 +111,7 @@ final userId = '123';
 // expect_lint: require_crashlytics_user_id
 void _bad624_initCrashlytics() async {
   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
-// Missing setUserIdentifier!
+  // Missing setUserIdentifier!
 }
 
 // GOOD: Should NOT trigger require_crashlytics_user_id

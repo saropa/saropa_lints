@@ -171,7 +171,7 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
       }
 
       // Check arguments for sensitive data
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern) &&
@@ -192,7 +192,7 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
 
       if (!_loggingFunctions.contains(function.name)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern) &&
@@ -293,7 +293,7 @@ class RequireInputSanitizationRule extends SaropaLintRule {
         // Check if first argument is string interpolation
         if (node.argumentList.arguments.isEmpty) return;
 
-        final Expression firstArg = node.argumentList.arguments.first;
+        final Argument firstArg = node.argumentList.arguments.first;
         if (firstArg is StringInterpolation) {
           reporter.atNode(node);
         }
@@ -305,7 +305,7 @@ class RequireInputSanitizationRule extends SaropaLintRule {
           methodName == 'launchUrl') {
         if (node.argumentList.arguments.isEmpty) return;
 
-        final Expression firstArg = node.argumentList.arguments.first;
+        final Argument firstArg = node.argumentList.arguments.first;
         // If it's a direct variable without validation, flag it. The name
         // heuristic is the only signal available (the rule cannot prove the
         // variable is attacker-controlled), so this branch can never be
@@ -401,9 +401,9 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
         return;
       }
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        final String name = arg.name.lexeme;
 
         // `javascriptMode: JavascriptMode.unrestricted` enables scripting.
         // Read the enum value's trailing identifier and compare it exactly
@@ -412,7 +412,7 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
         // anti-pattern integrity test), and a substring scan would also match
         // an unrelated identifier that merely embeds "unrestricted".
         if (name == 'javascriptMode') {
-          final Expression value = arg.expression;
+          final Expression value = arg.argumentExpression;
           String? valueName;
           if (value is PrefixedIdentifier) {
             valueName = value.identifier.name;
@@ -432,7 +432,7 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
         // A scan of the arg source would also match a `true` that belongs to an
         // unrelated key when the value is itself an expression.
         if (name == 'javaScriptEnabled') {
-          if (_isTrueLiteral(arg.expression)) {
+          if (_isTrueLiteral(arg.argumentExpression)) {
             reporter.atNode(arg);
             return;
           }
@@ -444,7 +444,7 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
         // value specifically, so a `true` on a sibling key (e.g.
         // `isInspectable: true`) does not falsely trigger.
         if (name == 'initialSettings') {
-          if (_settingsEnableJavaScript(arg.expression)) {
+          if (_settingsEnableJavaScript(arg.argumentExpression)) {
             reporter.atNode(arg);
             return;
           }
@@ -464,10 +464,9 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   /// reference) because the value cannot be statically determined here.
   static bool _settingsEnableJavaScript(Expression expression) {
     if (expression is! InstanceCreationExpression) return false;
-    for (final Expression arg in expression.argumentList.arguments) {
-      if (arg is NamedExpression &&
-          arg.name.label.name == 'javaScriptEnabled') {
-        return _isTrueLiteral(arg.expression);
+    for (final Argument arg in expression.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'javaScriptEnabled') {
+        return _isTrueLiteral(arg.argumentExpression);
       }
     }
     return false;
@@ -698,10 +697,10 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
     MethodInvocation node,
     SaropaDiagnosticReporter reporter,
   ) {
-    final NodeList<Expression> args = node.argumentList.arguments;
+    final NodeList<Argument> args = node.argumentList.arguments;
     if (args.isEmpty) return;
 
-    final Expression firstArg = args.first;
+    final Argument firstArg = args.first;
     if (firstArg is! StringLiteral) return;
 
     final String? executable = firstArg.stringValue;
@@ -711,7 +710,7 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
 
     // Check if second argument contains install-like commands
     if (args.length < 2) return;
-    final Expression secondArg = args[1];
+    final Argument secondArg = args[1];
     if (secondArg is! ListLiteral) return;
 
     for (final CollectionElement element in secondArg.elements) {
@@ -812,10 +811,10 @@ class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
       if (target == null) return;
       if (target.toSource() != 'DynamicLibrary') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
 
       // Non-constant argument (variable, interpolation, etc.)
       if (firstArg is! SimpleStringLiteral) {
@@ -1223,7 +1222,7 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
       if (target is! SimpleIdentifier || target.name != 'Clipboard') return;
 
       // Check arguments for sensitive variable names
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern)) {
@@ -1315,12 +1314,12 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
       if (node.argumentList.arguments.isEmpty) return;
 
-      final Expression firstArg = node.argumentList.arguments.first;
+      final Argument firstArg = node.argumentList.arguments.first;
 
       // PRAGMA statements do not support parameter binding — SQLite
       // rejects placeholders in PRAGMA syntax, so interpolation is
       // the only option and flagging it is always a false positive.
-      if (_isPragmaStatement(firstArg)) return;
+      if (_isPragmaStatement(firstArg.argumentExpression)) return;
 
       // Check for string interpolation
       if (firstArg is StringInterpolation) {
@@ -2329,7 +2328,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       final String argSource = firstArg.toSource();
 
       // Check if path uses string interpolation or concatenation
@@ -2503,13 +2502,13 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
       // mis-fires when an unrelated named argument (a callback, a controller)
       // contains interpolation while the HTML body is a constant literal.
       Expression? htmlArg;
-      for (final Expression arg in node.argumentList.arguments) {
-        final Expression value = arg is NamedExpression ? arg.expression : arg;
+      for (final Argument arg in node.argumentList.arguments) {
+        final Expression value = arg.argumentExpression;
         final String argSource = value.toSource();
         if (argSource.contains('data:text/html') ||
             argSource.contains('loadHtml') ||
             argSource.contains('loadData')) {
-          htmlArg = value;
+          htmlArg = value.argumentExpression;
           break;
         }
       }
@@ -2549,9 +2548,9 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
       // invocation. A non-content named argument (e.g. a `baseUrl:` built
       // from a variable) otherwise satisfies the `$` test even when the HTML
       // body is a constant literal, producing a false positive.
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
-      final Expression htmlArg = args.first;
+      final Argument htmlArg = args.first;
       final String htmlSource = htmlArg.toSource();
 
       // Check for interpolation without escaping
@@ -2809,10 +2808,8 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
 
       // Check arguments for redirect-related variable names
       for (final arg in node.argumentList.arguments) {
-        // Get the actual expression (unwrap NamedExpression if needed)
-        final Expression actualArg = arg is NamedExpression
-            ? arg.expression
-            : arg;
+        // Get the actual expression (unwrap NamedArgument if needed)
+        final Expression actualArg = arg.argumentExpression;
 
         // Skip property access on typed objects (e.g., item.destination)
         // Even though item.destination has type String, the source is a typed
@@ -2822,7 +2819,7 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
         }
 
         // Only flag String or Uri types - not object types like AppGridMenuItem
-        final argType = actualArg.staticType;
+        final argType = actualArg.argumentExpression.staticType;
 
         // If type is resolved, check if it's a URL-like type
         if (argType != null) {
@@ -3114,9 +3111,9 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
       // Check for JavaScript-related parameters
       bool hasJavaScriptSetting = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name.toLowerCase();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme.toLowerCase();
           // cspell:ignore javascriptmode javascriptenabled initialsettings
           if (paramName == 'javascriptmode' ||
               paramName == 'javascriptenabled' ||
@@ -3128,7 +3125,9 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
           if (paramName == 'initialsettings' ||
               paramName == 'settings' ||
               paramName == 'options') {
-            final String argSource = arg.expression.toSource().toLowerCase();
+            final String argSource = arg.argumentExpression
+                .toSource()
+                .toLowerCase();
             if (argSource.contains('javascript')) {
               hasJavaScriptSetting = true;
               break;
@@ -3227,12 +3226,14 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
         return;
       }
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name.toLowerCase();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme.toLowerCase();
           // cspell:disable
           if (paramName == 'mixedcontentmode') {
-            final String value = arg.expression.toSource().toLowerCase();
+            final String value = arg.argumentExpression
+                .toSource()
+                .toLowerCase();
             if (value.contains('always_allow') ||
                 value.contains('alwaysallow') ||
                 value.contains('compatibility_mode') ||
@@ -3253,7 +3254,7 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
       // cspell:ignore setmixedcontentmode allowmixedcontent
       if (methodName == 'setmixedcontentmode' ||
           methodName == 'allowmixedcontent') {
-        for (final Expression arg in node.argumentList.arguments) {
+        for (final Argument arg in node.argumentList.arguments) {
           final String argSource = arg.toSource().toLowerCase();
           if (argSource.contains('always') ||
               argSource.contains('compatibility')) {
@@ -3373,9 +3374,9 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
       // Check for error handling callbacks
       bool hasErrorHandler = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name.toLowerCase();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme.toLowerCase();
           if (_errorHandlerParams.contains(paramName)) {
             hasErrorHandler = true;
             break;
@@ -3647,11 +3648,11 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
 
     // Check for named parameter in constructor calls (e.g., dio)
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
 
         // cspell:disable
-        final String paramName = arg.name.label.name.toLowerCase();
+        final String paramName = arg.name.lexeme.toLowerCase();
         if (paramName != 'onbadcertificate' &&
             paramName != 'badcertificatecallback' &&
             paramName != 'validatecertificate') {
@@ -3659,7 +3660,7 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
         }
         // cspell:enable
 
-        if (_returnsUnconditionalTrue(arg.expression)) {
+        if (_returnsUnconditionalTrue(arg.argumentExpression)) {
           reporter.atNode(arg);
         }
       }
@@ -3791,11 +3792,11 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     }
 
     // Check if first arg is 'http://' and second is 'https://'
-    final NodeList<Expression> args = parent.arguments;
+    final NodeList<Argument> args = parent.arguments;
     if (args.length < 2) return false;
 
-    final Expression first = args[0];
-    final Expression second = args[1];
+    final Argument first = args[0];
+    final Argument second = args[1];
     if (first is! SimpleStringLiteral || second is! SimpleStringLiteral) {
       return false;
     }
@@ -3851,7 +3852,7 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
       // The literal must be the first (pattern/needle) argument. Guards
       // against shapes like `text.contains(other, http_literal)` where the
       // literal is not the search pattern.
-      final NodeList<Expression> args = parent.arguments;
+      final NodeList<Argument> args = parent.arguments;
       return args.isNotEmpty && identical(args.first, node);
     }
 
@@ -4382,7 +4383,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
       if (!isHttpClient) return;
 
       // Check arguments for user-controlled input
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
 
         // Check for user input patterns
@@ -4441,7 +4442,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
       if (typeName != 'Uri') return;
 
       // Check if any argument contains user input patterns
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
 
         final bool isUserControlled = _userInputPatterns.any(
@@ -4882,9 +4883,10 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
   }
 
   bool _hasStackTraceArg(ArgumentList argList) {
-    for (final Expression arg in argList.arguments) {
+    for (final Argument arg in argList.arguments) {
       // Prefer type-based detection when type info is available
-      final String typeName = arg.staticType?.element?.name ?? '';
+      final String typeName =
+          arg.argumentExpression.staticType?.element?.name ?? '';
       if (typeName == 'StackTrace') return true;
 
       // Fall back to source-text heuristic for interpolations and .toString()
@@ -5130,16 +5132,15 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
     final ConstructorName ctor = atom.constructorName;
     if (ctor.type.name.lexeme != 'bool') return false;
     if (ctor.name?.name != 'fromEnvironment') return false;
-    final List<Expression> args = atom.argumentList.arguments;
+    final List<Argument> args = atom.argumentList.arguments;
     if (args.isEmpty) return false;
-    final Expression first = args.first;
+    final Argument first = args.first;
     if (first is! SimpleStringLiteral || first.value != 'dart.vm.product') {
       return false;
     }
     for (int i = 1; i < args.length; i++) {
-      final Expression extra = args[i];
-      if (extra is! NamedExpression ||
-          extra.name.label.name != 'defaultValue') {
+      final Argument extra = args[i];
+      if (extra is! NamedArgument || extra.name.lexeme != 'defaultValue') {
         return false;
       }
     }
@@ -5372,10 +5373,10 @@ class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
   ) {
     // Check named arguments in constructor calls (e.g., InAppWebViewSettings)
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            _dangerousSettings.contains(arg.name.label.name)) {
-          final String value = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument &&
+            _dangerousSettings.contains(arg.name.lexeme)) {
+          final String value = arg.argumentExpression.toSource();
           if (value == 'true') {
             reporter.atNode(arg);
           }
@@ -5393,7 +5394,7 @@ class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
         return;
       }
 
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg.toSource() == 'true') {
           reporter.atNode(node);
           return;

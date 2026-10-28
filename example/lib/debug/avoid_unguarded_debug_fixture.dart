@@ -121,7 +121,7 @@ void _good307_someMethod() {
     debugPrint('Value: $x');
   }
 
-// debug() is always allowed — it's production-safe
+  // debug() is always allowed — it's production-safe
   debug('Missing data');
   debug('Important warning', level: DebugLevels.Warning);
 }

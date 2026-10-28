@@ -110,10 +110,7 @@ dynamic child;
 // BAD: Should trigger avoid_misnamed_padding
 // expect_lint: avoid_misnamed_padding
 void _bad1283() {
-  Opacity(
-    opacity: 0.5,
-    child: Image.asset('icon.png'),
-  );
+  Opacity(opacity: 0.5, child: Image.asset('icon.png'));
 }
 
 // GOOD: Should NOT trigger avoid_misnamed_padding

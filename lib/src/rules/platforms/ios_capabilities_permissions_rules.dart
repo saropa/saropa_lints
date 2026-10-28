@@ -236,9 +236,9 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   /// Extracts the ImageSource from a method invocation's source parameter.
   static _ImageSource _getImageSource(MethodInvocation node) {
     // Look for the 'source' named parameter.
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'source') {
-        final Expression value = arg.expression;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'source') {
+        final Expression value = arg.argumentExpression;
 
         // Check for ImageSource.gallery or ImageSource.camera.
         if (value is PrefixedIdentifier) {

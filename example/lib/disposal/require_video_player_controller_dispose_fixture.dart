@@ -117,7 +117,7 @@ class _bad328_MyState extends State<MyWidget> {
     super.initState();
     _controller = VideoPlayerController.network(url);
   }
-// Missing dispose!
+  // Missing dispose!
 }
 
 // GOOD: Should NOT trigger require_video_player_controller_dispose

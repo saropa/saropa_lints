@@ -118,12 +118,10 @@ void _bad35() {
 
 // GOOD: Should NOT trigger require_animation_curve
 void _good35() {
-  CurvedAnimation(
-    parent: _controller,
-    curve: Curves.easeInOut,
-  );
+  CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
 
-  Tween<double>(begin: 0, end: 1).animate(
-    CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-  );
+  Tween<double>(
+    begin: 0,
+    end: 1,
+  ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 }

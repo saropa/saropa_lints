@@ -4,9 +4,13 @@
 
 // BAD: Deep link without auth check
 // expect_lint: prefer_deep_link_auth
-void bad(Uri link) { /* navigate(link); */ }
+void bad(Uri link) {
+  /* navigate(link); */
+}
 
 // GOOD: Verify auth before handling deep link
-void good(Uri link) { /* if (isAuthenticated) navigate(link); */ }
+void good(Uri link) {
+  /* if (isAuthenticated) navigate(link); */
+}
 
 void main() {}

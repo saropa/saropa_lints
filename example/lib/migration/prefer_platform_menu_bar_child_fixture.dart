@@ -8,25 +8,17 @@ import '../flutter_mocks.dart';
 // BAD: Using deprecated 'body' parameter
 // expect_lint: prefer_platform_menu_bar_child
 Widget _badBody() {
-  return PlatformMenuBar(
-    menus: [],
-    body: const Text('app'),
-  );
+  return PlatformMenuBar(menus: [], body: const Text('app'));
 }
 
 // GOOD: Using the new 'child' parameter
 Widget _goodChild() {
-  return PlatformMenuBar(
-    menus: [],
-    child: const Text('app'),
-  );
+  return PlatformMenuBar(menus: [], child: const Text('app'));
 }
 
 // GOOD: No body or child parameter
 Widget _goodNoBody() {
-  return PlatformMenuBar(
-    menus: [],
-  );
+  return PlatformMenuBar(menus: []);
 }
 
 // FALSE POSITIVE: 'body' named argument on a different widget type

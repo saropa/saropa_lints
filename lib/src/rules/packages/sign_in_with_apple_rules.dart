@@ -891,9 +891,9 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
 
       // Check for nonce parameter
       final ArgumentList args = node.argumentList;
-      final bool hasNonce = args.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'nonce';
+      final bool hasNonce = args.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'nonce';
         }
         return false;
       });

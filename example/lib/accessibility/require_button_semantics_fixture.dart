@@ -114,9 +114,7 @@ final label = 'label';
 void _bad14() {
   GestureDetector(
     onTap: () => doSomething(),
-    child: Container(
-      child: Icon(Icons.add),
-    ),
+    child: Container(child: Icon(Icons.add)),
   );
 }
 
@@ -127,9 +125,7 @@ void _good14() {
     label: 'Add item',
     child: GestureDetector(
       onTap: () => doSomething(),
-      child: Container(
-        child: Icon(Icons.add),
-      ),
+      child: Container(child: Icon(Icons.add)),
     ),
   );
   // Or use IconButton which has built-in semantics:

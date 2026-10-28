@@ -859,7 +859,7 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
         final parameters = node.functionExpression.parameters?.parameters;
         if (parameters != null) {
           for (final param in parameters) {
-            if (param is SimpleFormalParameter && !param.isFinal) {
+            if (param is RegularFormalParameter && !param.isFinal) {
               reporter.atNode(param);
             }
           }
@@ -1944,10 +1944,10 @@ class AvoidRiverpodStringProviderNameRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_providerTypes.contains(typeName)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        if (arg.name.label.name != 'name') continue;
-        final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        if (arg.name.lexeme != 'name') continue;
+        final Expression value = arg.argumentExpression;
         if (value is SimpleStringLiteral || value is StringInterpolation) {
           reporter.atNode(arg);
           return;
@@ -2434,7 +2434,7 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! FunctionExpression) return;
 
       final FormalParameterList? params = firstArg.parameters;
@@ -3214,9 +3214,9 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
       // Check named arguments order
       final List<String> paramOrder = <String>[];
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'data' || name == 'error' || name == 'loading') {
             paramOrder.add(name);
           }

@@ -115,8 +115,9 @@ void _bad322_setupDI() {
 
 // GOOD: Should NOT trigger prefer_lazy_singleton_registration
 void _good322_setupDI() {
-  GetIt.I
-      .registerLazySingleton(() => DatabaseService()); // Created on first use
+  GetIt.I.registerLazySingleton(
+    () => DatabaseService(),
+  ); // Created on first use
   GetIt.I.registerLazySingleton(() => AnalyticsService());
   GetIt.I.registerLazySingleton(() => CacheService());
 }

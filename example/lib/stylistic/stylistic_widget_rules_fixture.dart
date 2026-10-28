@@ -86,11 +86,7 @@ class SizedBoxVsContainerExamples extends StatelessWidget {
         Container(height: 50),
 
         // expect_lint: prefer_sizedbox_over_container
-        Container(
-          width: 100,
-          height: 100,
-          child: Text('Hello'),
-        ),
+        Container(width: 100, height: 100, child: Text('Hello')),
 
         // GOOD: Container with decoration (not flagged)
         Container(
@@ -100,10 +96,7 @@ class SizedBoxVsContainerExamples extends StatelessWidget {
         ),
 
         // GOOD: Container with color (not flagged)
-        Container(
-          width: 100,
-          color: Colors.blue,
-        ),
+        Container(width: 100, color: Colors.blue),
 
         // GOOD: SizedBox for sizing
         SizedBox(width: 16, height: 16),
@@ -133,7 +126,9 @@ class TextRichVsRichTextExamples extends StatelessWidget {
             text: 'Hello ',
             children: [
               TextSpan(
-                  text: 'World', style: TextStyle(fontWeight: FontWeight.bold)),
+                text: 'World',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ),
@@ -144,7 +139,9 @@ class TextRichVsRichTextExamples extends StatelessWidget {
             text: 'Hello ',
             children: [
               TextSpan(
-                  text: 'World', style: TextStyle(fontWeight: FontWeight.bold)),
+                text: 'World',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ],
           ),
         ),
@@ -244,9 +241,7 @@ class BorderRadiusExamples extends StatelessWidget {
 
         // GOOD: BorderRadius.circular()
         Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
         ),
 
         // GOOD: BorderRadius.all with elliptical (different use case)
@@ -273,26 +268,16 @@ class ExpandedVsFlexibleExamples extends StatelessWidget {
       children: [
         // BAD: Flexible with FlexFit.tight (prefer_expanded_over_flexible)
         // expect_lint: prefer_expanded_over_flexible
-        Flexible(
-          fit: FlexFit.tight,
-          child: Text('Should be Expanded'),
-        ),
+        Flexible(fit: FlexFit.tight, child: Text('Should be Expanded')),
 
         // GOOD: Expanded
-        Expanded(
-          child: Text('Already Expanded'),
-        ),
+        Expanded(child: Text('Already Expanded')),
 
         // GOOD: Flexible with FlexFit.loose (different behavior)
-        Flexible(
-          fit: FlexFit.loose,
-          child: Text('Flexible loose'),
-        ),
+        Flexible(fit: FlexFit.loose, child: Text('Flexible loose')),
 
         // GOOD: Flexible without explicit fit (defaults to loose)
-        Flexible(
-          child: Text('Flexible default'),
-        ),
+        Flexible(child: Text('Flexible default')),
       ],
     );
   }
@@ -348,9 +333,7 @@ class ClipRSuperellipseExamples extends StatelessWidget {
 
         // BAD: ClipRRect with only child (prefer_clip_r_superellipse)
         // expect_lint: prefer_clip_r_superellipse
-        ClipRRect(
-          child: Image.network('https://example.com/image.png'),
-        ),
+        ClipRRect(child: Image.network('https://example.com/image.png')),
 
         // BAD: ClipRRect with clipBehavior (prefer_clip_r_superellipse)
         // expect_lint: prefer_clip_r_superellipse
@@ -379,10 +362,8 @@ class ClipRSuperellipseExamples extends StatelessWidget {
 
 class _MyCustomClipper extends CustomClipper<RRect> {
   @override
-  RRect getClip(Size size) => RRect.fromRectAndRadius(
-        Offset.zero & size,
-        const Radius.circular(10),
-      );
+  RRect getClip(Size size) =>
+      RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(10));
 
   @override
   bool shouldReclip(covariant CustomClipper<RRect> oldClipper) => false;

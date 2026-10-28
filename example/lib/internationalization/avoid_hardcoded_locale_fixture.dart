@@ -125,11 +125,7 @@ void _good440() {
 // --- False-positive regression tests (bug fix) ---
 
 // GOOD: Locale strings in a Set (lookup data, not formatting args)
-const Set<String> _monthFirstLocales = <String>{
-  'en_US',
-  'en_CA',
-  'en_PH',
-};
+const Set<String> _monthFirstLocales = <String>{'en_US', 'en_CA', 'en_PH'};
 
 // GOOD: Locale strings in a List
 const List<String> _supportedLocales = <String>['en_US', 'es_MX', 'pt_BR'];

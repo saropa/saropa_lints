@@ -459,12 +459,12 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
       }
 
       // Check arguments for string interpolation
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         // Check named 'where' argument
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (paramName == 'where' || paramName == 'sql') {
-            if (_hasInterpolation(arg.expression)) {
+            if (_hasInterpolation(arg.argumentExpression)) {
               reporter.atNode(arg);
               return;
             }
@@ -1146,10 +1146,10 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
       }
 
       // Get the SQL string
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression sqlArg = args.first;
+      final Argument sqlArg = args.first;
       final String sqlSource = sqlArg.toSource().toLowerCase();
 
       // Check for CREATE TABLE or column definition patterns
@@ -1260,14 +1260,14 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
       if (!_sqfliteMethods.contains(node.methodName.name)) return;
 
       // Check the first argument (SQL string) for SELECT *
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       // Get the first positional argument
       Expression? sqlArg;
       for (final arg in args) {
-        if (arg is! NamedExpression) {
-          sqlArg = arg;
+        if (arg is! NamedArgument) {
+          sqlArg = arg.argumentExpression;
           break;
         }
       }
@@ -1402,12 +1402,12 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
       if (!_pdfTypes.contains(typeName)) return;
 
       // Check for data/bytes parameters
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         String argSource = '';
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (paramName == 'data' || paramName == 'bytes') {
-            argSource = arg.expression.toSource();
+            argSource = arg.argumentExpression.toSource();
           }
         } else {
           argSource = arg.toSource();
@@ -1613,9 +1613,9 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
 
       // Check for string literal column names in columns parameter
       final ArgumentList args = node.argumentList;
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'columns') {
-          final Expression value = arg.expression;
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'columns') {
+          final Expression value = arg.argumentExpression;
           if (value is ListLiteral) {
             for (final CollectionElement element in value.elements) {
               if (element is SimpleStringLiteral) {
@@ -1846,10 +1846,10 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
       if (typeName != 'File' && typeName != 'Directory') return;
 
       // Check if path is constructed with string interpolation using parameter
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression pathArg = args.first;
+      final Argument pathArg = args.first;
       final String pathSource = pathArg.toSource();
 
       // Check for string interpolation

@@ -22,10 +22,7 @@ Widget _badAnimatedOpacity() {
     animation: _controller,
     builder: (BuildContext context, Widget? child) {
       // expect_lint: avoid_opacity_animation
-      return Opacity(
-        opacity: _controller.value,
-        child: const Text('animated'),
-      );
+      return Opacity(opacity: _controller.value, child: const Text('animated'));
     },
   );
 }

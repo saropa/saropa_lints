@@ -14,9 +14,7 @@ void badNoOptions() {
 
 void badOptionsWithoutAuth() {
   // LINT: prefer_biometric_protection
-  final storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(),
-  );
+  final storage = FlutterSecureStorage(aOptions: AndroidOptions());
 }
 
 void goodWithBiometric() {

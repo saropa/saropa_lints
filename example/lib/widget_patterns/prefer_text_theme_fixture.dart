@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: prefer_text_theme
 class _bad1414__MyState extends State<MyWidget> {
   final _scrollController = ScrollController();
-// Missing dispose - MEMORY LEAK!
+  // Missing dispose - MEMORY LEAK!
 }
 
 // GOOD: Should NOT trigger prefer_text_theme

@@ -280,7 +280,7 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
     final AstNode? parent = node.parent;
 
     // Check if it's a simple formal parameter
-    if (parent is SimpleFormalParameter) {
+    if (parent is RegularFormalParameter) {
       return true;
     }
 
@@ -361,10 +361,10 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'setState') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression callback = args.first;
+      final Expression callback = args.first.argumentExpression;
       if (callback is FunctionExpression) {
         final FunctionBody body = callback.body;
         if (body is BlockFunctionBody && body.block.statements.isEmpty) {
@@ -496,8 +496,8 @@ class AvoidLateContextRule extends SaropaLintRule {
     // Check for method calls like Theme.of(context)
     if (expr is MethodInvocation) {
       // Check arguments
-      for (final Expression arg in expr.argumentList.arguments) {
-        if (_usesContext(arg)) return true;
+      for (final Argument arg in expr.argumentList.arguments) {
+        if (_usesContext(arg.argumentExpression)) return true;
       }
       // Check target
       final Expression? target = expr.target;
@@ -593,7 +593,7 @@ class AvoidMountedInSetStateRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first.argumentExpression;
 
       // Check if the callback contains 'mounted' reference
       final _MountedVisitor visitor = _MountedVisitor();
@@ -1162,7 +1162,7 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first.argumentExpression;
       if (firstArg is FunctionExpression) {
         reporter.atNode(firstArg);
       }
@@ -2635,7 +2635,7 @@ class _AddListenerFinder extends RecursiveAstVisitor<void> {
       final String target = _normalizeListenerToken(
         node.realTarget?.toSource() ?? '',
       );
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isNotEmpty) {
         final String callback = _normalizeListenerToken(args.first.toSource());
         onFound(target, callback, node);
@@ -2655,7 +2655,7 @@ class _RemoveListenerFinder extends RecursiveAstVisitor<void> {
       final String target = _normalizeListenerToken(
         node.realTarget?.toSource() ?? '',
       );
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isNotEmpty) {
         final String callback = _normalizeListenerToken(args.first.toSource());
         onFound(target, callback);
@@ -3800,9 +3800,9 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
       if (typeName != 'FutureBuilder') return;
 
       // Check future argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'future') {
-          final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'future') {
+          final Expression value = arg.argumentExpression;
 
           // Flag method invocations that create a new Future each rebuild.
           // Exempt the cache-method pattern: a private method whose name
@@ -3948,9 +3948,9 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
       if (typeName != 'StreamBuilder') return;
 
       // Check stream argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'stream') {
-          final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'stream') {
+          final Expression value = arg.argumentExpression;
 
           // Warn if stream is a method invocation (creating new stream).
           // Skip the cache-method pattern: a private instance method on a class
@@ -4808,8 +4808,7 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
       for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           for (final FormalParameter param in member.parameters.parameters) {
-            final FormalParameter effectiveParam =
-                param is DefaultFormalParameter ? param.parameter : param;
+            final FormalParameter effectiveParam = param;
             if (effectiveParam is FieldFormalParameter) {
               final Token name = effectiveParam.name;
               constructorFieldParams.add(name.lexeme);

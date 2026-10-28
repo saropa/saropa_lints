@@ -950,13 +950,8 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
         String? paramName;
         TypeAnnotation? paramType;
 
-        if (param is DefaultFormalParameter) {
-          final NormalFormalParameter inner = param.parameter;
-          if (inner is SimpleFormalParameter) {
-            paramName = inner.name?.lexeme;
-            paramType = inner.type;
-          }
-        } else if (param is SimpleFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           paramName = param.name?.lexeme;
           paramType = param.type;
         }

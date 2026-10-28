@@ -118,9 +118,7 @@ void _bad1344() {
 
 // GOOD: Should NOT trigger require_field_dispose
 void _good1344() {
-  Container(
-    padding: EdgeInsets.all(8),
-  );
+  Container(padding: EdgeInsets.all(8));
 }
 
 // GOOD: field disposed via a multi-section null-aware cascade (dispose() is the
@@ -132,7 +130,9 @@ class _CascadeDisposeState extends State<StatefulWidget> {
 
   @override
   void dispose() {
-    _c?..removeListener(_tick)..dispose();
+    _c
+      ?..removeListener(_tick)
+      ..dispose();
     super.dispose();
   }
 }
@@ -146,7 +146,10 @@ class _ThreeSectionState extends State<StatefulWidget> {
 
   @override
   void dispose() {
-    _c?..removeListener(_tick)..removeListener(_tock)..dispose();
+    _c
+      ?..removeListener(_tick)
+      ..removeListener(_tock)
+      ..dispose();
     super.dispose();
   }
 }
@@ -160,7 +163,9 @@ class _NoDisposeState extends State<StatefulWidget> {
 
   @override
   void dispose() {
-    _c?..removeListener(_tick)..reset();
+    _c
+      ?..removeListener(_tick)
+      ..reset();
     super.dispose();
   }
 }

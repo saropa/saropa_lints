@@ -110,9 +110,7 @@ final children = <Widget>[];
 // BAD: Should trigger require_keyboard_dismiss_on_scroll
 // expect_lint: require_keyboard_dismiss_on_scroll
 void _bad406() {
-  ListView(
-    children: [TextField(), TextField()],
-  );
+  ListView(children: [TextField(), TextField()]);
 }
 
 // GOOD: Should NOT trigger require_keyboard_dismiss_on_scroll
@@ -137,9 +135,7 @@ void _goodNoTextField() {
 
 // GOOD: grid of non-editable tiles, no text field — no lint.
 void _goodGridNoTextField() {
-  GridView(
-    children: [Text('a'), Text('b')],
-  );
+  GridView(children: [Text('a'), Text('b')]);
 }
 
 // GOOD: builder/opaque content — the children are not syntactically visible,

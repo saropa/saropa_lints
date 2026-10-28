@@ -29,8 +29,8 @@ void _dupRecordField() {
 class _RedirectField {
   final int x;
   _RedirectField()
-      : x = 1,
-        this.named(); // expect_lint: field_initializer_redirecting_constructor
+    : x = 1,
+      this.named(); // expect_lint: field_initializer_redirecting_constructor
   _RedirectField.named() : x = 0;
 }
 

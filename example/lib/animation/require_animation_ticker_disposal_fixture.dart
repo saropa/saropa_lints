@@ -117,11 +117,11 @@ class _bad42__MyWidgetState extends State<MyWidget>
   void initState() {
     super.initState();
     _ticker = createTicker((elapsed) {
-// Frame callback
+      // Frame callback
     });
     _ticker.start();
   }
-// Missing stop() in dispose - memory leak!
+  // Missing stop() in dispose - memory leak!
 }
 
 // GOOD: Should NOT trigger require_animation_ticker_disposal
@@ -133,7 +133,7 @@ class _good42__MyWidgetState extends State<MyWidget>
   void initState() {
     super.initState();
     _ticker = createTicker((elapsed) {
-// Frame callback
+      // Frame callback
     });
     _ticker.start();
   }

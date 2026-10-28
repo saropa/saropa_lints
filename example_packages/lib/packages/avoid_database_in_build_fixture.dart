@@ -132,9 +132,6 @@ void _good608() {
   }
 
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _usersFuture,
-      builder: (_, __) => Container(),
-    );
+    return FutureBuilder(future: _usersFuture, builder: (_, __) => Container());
   }
 }

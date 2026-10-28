@@ -122,9 +122,7 @@ void _good623() {
   FlutterMap(
     children: [
       MarkerClusterLayerWidget(
-        options: MarkerClusterLayerOptions(
-          markers: markers,
-        ),
+        options: MarkerClusterLayerOptions(markers: markers),
       ),
     ],
   );

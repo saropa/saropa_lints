@@ -108,13 +108,10 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Two consecutive blank lines between declarations
 // LINT: prefer_single_blank_line_max
 
-
 void _bad1148a() {}
 
 // BAD: Three consecutive blank lines between declarations
 // LINT: prefer_single_blank_line_max
-
-
 
 void _bad1148b() {}
 
@@ -145,6 +142,5 @@ void _good1148f() {}
 void _bad1148c() {}
 
 // A comment
-
 
 void _bad1148d() {}

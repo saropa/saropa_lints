@@ -339,13 +339,8 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
 
       String paramName = 'oldWidget';
       final FormalParameter firstParam = params.first;
-      if (firstParam is SimpleFormalParameter) {
+      if (firstParam is RegularFormalParameter) {
         paramName = firstParam.name?.lexeme ?? 'oldWidget';
-      } else if (firstParam is DefaultFormalParameter) {
-        final NormalFormalParameter normalParam = firstParam.parameter;
-        if (normalParam is SimpleFormalParameter) {
-          paramName = normalParam.name?.lexeme ?? 'oldWidget';
-        }
       }
 
       final String bodySource = body.toSource();

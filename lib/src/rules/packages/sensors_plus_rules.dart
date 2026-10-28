@@ -235,7 +235,7 @@ class SensorsPlusNoSamplingPeriodRule extends SaropaLintRule {
 
       // Already has a samplingPeriod: arg — compliant.
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'samplingPeriod') {
+        if (arg is NamedArgument && arg.name.lexeme == 'samplingPeriod') {
           return;
         }
       }
@@ -363,14 +363,14 @@ class SensorsPlusFastestIntervalRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
+    context.addNamedArgument((NamedArgument node) {
       // Only match `samplingPeriod:` arguments.
-      if (node.name.label.name != 'samplingPeriod') return;
+      if (node.name.lexeme != 'samplingPeriod') return;
       if (!fileImportsPackage(node, _sensorsImport)) return;
 
       // Value must reference SensorInterval.fastestInterval syntactically.
       // We match the prefixed-identifier form `SensorInterval.fastestInterval`.
-      final value = node.expression;
+      final value = node.argumentExpression;
       if (value is! PrefixedIdentifier) return;
       if (value.prefix.name != 'SensorInterval') return;
       if (value.identifier.name != 'fastestInterval') return;
@@ -395,7 +395,7 @@ class _ReplaceFastestIntervalFix extends ReplaceNodeFix {
   @override
   AstNode? findTargetNode(AstNode node) {
     // The covering node may be a SimpleIdentifier ('fastestInterval') or the
-    // full NamedExpression. Navigate to the PrefixedIdentifier value to replace
+    // full NamedArgument. Navigate to the PrefixedIdentifier value to replace
     // exactly `SensorInterval.fastestInterval`.
     AstNode? current = node;
     while (current != null) {
@@ -493,7 +493,7 @@ class SensorsPlusMissingOnErrorRule extends SaropaLintRule {
 
       // Already has onError: — compliant.
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onError') {
+        if (arg is NamedArgument && arg.name.lexeme == 'onError') {
           return;
         }
       }

@@ -117,7 +117,7 @@ class _bad648_MyController extends GetxController {
     super.onInit();
     _worker = ever(count, (_) => print('changed'));
   }
-// Missing onClose with _worker.dispose()!
+  // Missing onClose with _worker.dispose()!
 }
 
 // GOOD: Should NOT trigger dispose_getx_fields

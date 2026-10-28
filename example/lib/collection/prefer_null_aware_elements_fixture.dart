@@ -110,10 +110,7 @@ final items = <dynamic>[];
 // BAD: Should trigger prefer_null_aware_elements
 // expect_lint: prefer_null_aware_elements
 void _bad255() {
-  final items = [
-    item1,
-    if (item2 != null) item2,
-  ];
+  final items = [item1, if (item2 != null) item2];
 }
 
 // GOOD: Should NOT trigger prefer_null_aware_elements

@@ -33,9 +33,9 @@ String _typeName(InstanceCreationExpression node) =>
     node.constructorName.type.name.lexeme;
 
 /// Returns the named argument with [name], or null if absent.
-NamedExpression? _namedArg(InstanceCreationExpression node, String name) {
-  for (final Expression arg in node.argumentList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) {
+NamedArgument? _namedArg(InstanceCreationExpression node, String name) {
+  for (final Argument arg in node.argumentList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) {
       return arg;
     }
   }
@@ -49,9 +49,9 @@ NamedExpression? _namedArg(InstanceCreationExpression node, String name) {
 /// literal is recognized — a provider hidden behind a variable is a known
 /// (accepted) false negative rather than risk a false positive.
 bool _hasOfflineTileProvider(InstanceCreationExpression node) {
-  final NamedExpression? provider = _namedArg(node, 'tileProvider');
+  final NamedArgument? provider = _namedArg(node, 'tileProvider');
   if (provider == null) return false;
-  final Expression value = provider.expression;
+  final Expression value = provider.argumentExpression;
   if (value is InstanceCreationExpression) {
     return _offlineTileProviders.contains(_typeName(value));
   }
@@ -196,7 +196,7 @@ class FlutterMapDeprecatedTileSizeRule extends SaropaLintRule {
       if (_typeName(node) != 'TileLayer') return;
       if (!fileImportsPackage(node, PackageImports.flutterMap)) return;
 
-      final NamedExpression? arg = _namedArg(node, 'tileSize');
+      final NamedArgument? arg = _namedArg(node, 'tileSize');
       if (arg == null) return;
 
       reporter.atNode(arg);
@@ -217,8 +217,8 @@ class _RenameTileSizeFix extends ReplaceNodeFix {
 
   @override
   String computeReplacement(AstNode node) {
-    if (node is NamedExpression) {
-      final Expression value = node.expression;
+    if (node is NamedArgument) {
+      final Expression value = node.argumentExpression;
       // A double literal (e.g. 256.0) becomes its int form; arbitrary
       // expressions keep their source so the developer can adjust the type.
       if (value is DoubleLiteral) {
@@ -301,9 +301,8 @@ class FlutterMapLegacyMapOptionsCenterRule extends SaropaLintRule {
       if (_typeName(node) != 'MapOptions') return;
       if (!fileImportsPackage(node, PackageImports.flutterMap)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            _renames.containsKey(arg.name.label.name)) {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && _renames.containsKey(arg.name.lexeme)) {
           reporter.atNode(arg);
         }
       }
@@ -331,10 +330,10 @@ class _RenameMapOptionsArgFix extends ReplaceNodeFix {
 
   @override
   String computeReplacement(AstNode node) {
-    if (node is NamedExpression) {
-      final String? replacement = _renames[node.name.label.name];
+    if (node is NamedArgument) {
+      final String? replacement = _renames[node.name.lexeme];
       if (replacement != null) {
-        return '$replacement: ${node.expression.toSource()}';
+        return '$replacement: ${node.argumentExpression.toSource()}';
       }
     }
     return node.toSource();
@@ -473,7 +472,7 @@ class FlutterMapDeprecatedPolygonLabelPlacementRule extends SaropaLintRule {
       if (_typeName(node) != 'Polygon') return;
       if (!fileImportsPackage(node, PackageImports.flutterMap)) return;
 
-      final NamedExpression? arg = _namedArg(node, 'labelPlacement');
+      final NamedArgument? arg = _namedArg(node, 'labelPlacement');
       if (arg == null) return;
 
       reporter.atNode(arg);
@@ -538,7 +537,7 @@ class FlutterMapFallbackUrlDisablesCacheRule extends SaropaLintRule {
       if (_typeName(node) != 'TileLayer') return;
       if (!fileImportsPackage(node, PackageImports.flutterMap)) return;
 
-      final NamedExpression? fallback = _namedArg(node, 'fallbackUrl');
+      final NamedArgument? fallback = _namedArg(node, 'fallbackUrl');
       if (fallback == null) return;
 
       // The cache-disable only affects NetworkTileProvider. An explicit
@@ -548,9 +547,9 @@ class FlutterMapFallbackUrlDisablesCacheRule extends SaropaLintRule {
 
       // An explicit non-network, non-offline provider (e.g. a custom one) is
       // out of scope: only flag the default or an explicit NetworkTileProvider.
-      final NamedExpression? provider = _namedArg(node, 'tileProvider');
+      final NamedArgument? provider = _namedArg(node, 'tileProvider');
       if (provider != null) {
-        final Expression value = provider.expression;
+        final Expression value = provider.argumentExpression;
         if (value is InstanceCreationExpression &&
             _typeName(value) != 'NetworkTileProvider') {
           return;

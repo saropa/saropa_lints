@@ -123,8 +123,5 @@ void _good26() {
     semanticLabel: 'Profile photo of user',
   );
   // For decorative images:
-  Image.asset(
-    'assets/decoration.png',
-    excludeFromSemantics: true,
-  );
+  Image.asset('assets/decoration.png', excludeFromSemantics: true);
 }

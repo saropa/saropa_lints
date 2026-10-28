@@ -139,10 +139,8 @@ void _good508() {
   GoRouter(
     routes: [
       ShellRoute(
-        builder: (_, __, child) => Scaffold(
-          body: child,
-          bottomNavigationBar: BottomNav(),
-        ),
+        builder: (_, __, child) =>
+            Scaffold(body: child, bottomNavigationBar: BottomNav()),
         routes: [
           GoRoute(path: '/home', builder: (_, __) => HomePage()),
           GoRoute(path: '/profile', builder: (_, __) => ProfilePage()),

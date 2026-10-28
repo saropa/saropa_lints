@@ -125,8 +125,14 @@ void _good1436() {
   Text.rich(
     TextSpan(
       children: [
-        TextSpan(text: 'Hello ', style: TextStyle(fontWeight: FontWeight.bold)),
-        TextSpan(text: 'world', style: TextStyle(color: Colors.blue)),
+        TextSpan(
+          text: 'Hello ',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        TextSpan(
+          text: 'world',
+          style: TextStyle(color: Colors.blue),
+        ),
         TextSpan(text: '!', style: TextStyle(fontSize: 20)),
       ],
     ),

@@ -80,11 +80,7 @@ class ContactImportCacheDBModel {
 
   // These methods use Map<String, dynamic> for serialization, not caching
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-    };
+    return {'id': id, 'name': name, 'email': email};
   }
 
   static ContactImportCacheDBModel fromMap(Map<String, dynamic> map) {
@@ -208,10 +204,7 @@ class SimpleCacheService {
 
 // OK: Final map with no methods that add entries
 class ReadOnlyCache {
-  final Map<String, String> _cache = {
-    'key1': 'value1',
-    'key2': 'value2',
-  };
+  final Map<String, String> _cache = {'key1': 'value1', 'key2': 'value2'};
 
   String? get(String key) => _cache[key];
   bool contains(String key) => _cache.containsKey(key);

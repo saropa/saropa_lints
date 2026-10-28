@@ -112,10 +112,7 @@ dynamic details;
 // BAD: Should trigger avoid_navigator_push_unnamed
 // expect_lint: avoid_navigator_push_unnamed
 void _bad504() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => DetailsPage()),
-  );
+  Navigator.push(context, MaterialPageRoute(builder: (_) => DetailsPage()));
 }
 
 // GOOD: Should NOT trigger avoid_navigator_push_unnamed

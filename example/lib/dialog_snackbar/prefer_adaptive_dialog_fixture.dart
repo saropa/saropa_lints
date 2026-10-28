@@ -114,10 +114,8 @@ final title = 'Title';
 void _bad323() {
   showDialog(
     context: context,
-    builder: (ctx) => AlertDialog(
-      title: Text('Confirm'),
-      actions: [TextButton()],
-    ),
+    builder: (ctx) =>
+        AlertDialog(title: Text('Confirm'), actions: [TextButton()]),
   );
 }
 
@@ -125,9 +123,7 @@ void _bad323() {
 void _good323() {
   showDialog(
     context: context,
-    builder: (ctx) => AlertDialog.adaptive(
-      title: Text('Confirm'),
-      actions: [TextButton()],
-    ),
+    builder: (ctx) =>
+        AlertDialog.adaptive(title: Text('Confirm'), actions: [TextButton()]),
   );
 }
