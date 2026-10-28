@@ -292,6 +292,7 @@
     "src/compat/recommend.ts",
     "src/compat/applyCompat.ts",
     "src/compat/upgradeGate.ts",
+    "src/compat/startupDetection.ts",
     "src/compat/compatCardHtml.ts",
     "src/compat/compatController.ts",
     "src/test/compat/projectFacts.test.ts",
