@@ -1037,6 +1037,14 @@ def _ensure_pubdev_login(project_dir: Path) -> bool:
     return True
 
 
+_AUTH_PROMPT_RE = re.compile(r"authorize|\baccounts\.google\.com\b")
+
+
+def _is_auth_prompt_line(line: str) -> bool:
+    """True for a `dart pub publish` output line that asks the user to sign in."""
+    return _AUTH_PROMPT_RE.search(line.lower()) is not None
+
+
 def _offer_local_publish(project_dir: Path) -> bool:
     """Offer to publish from the local machine when CI publish fails.
 
@@ -1080,8 +1088,7 @@ def _offer_local_publish(project_dir: Path) -> bool:
     assert proc.stdout is not None
     for raw in proc.stdout:
         captured.append(raw)
-        low = raw.lower()
-        if "authorize" in low or "accounts.google.com" in low:
+        if _is_auth_prompt_line(raw):
             print_warning(f"  {raw.strip()}")
     proc.wait()
     result = subprocess.CompletedProcess(
