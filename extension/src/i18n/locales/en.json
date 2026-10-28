@@ -2758,6 +2758,17 @@
       "insight": "Installed version is known-broken — upgrade required"
     }
   },
+  "ruleMigration": {
+    "skip": {
+      "generated": "Skipped generated file {file}.",
+      "unreadable": "Skipped {file}: it could not be read.",
+      "unparseable": "Skipped {file}: it is not valid JSON."
+    },
+    "finding": {
+      "bareName": "{file}:{line} ignores {name} without the saropa_lints/ prefix. Left unchanged; add the prefix and run the migration again.",
+      "clash": "{file}:{line} has both {name} and its replacement. Kept the replacement and removed {name}."
+    }
+  },
   "compat": {
     "recommend": {
       "latestOk": "saropa_lints {version} is the newest release and works with this project. Use ^{version}.",
