@@ -6,7 +6,11 @@
 library;
 
 import 'package:saropa_lints/saropa_lints.dart'
-    show RuleLane, ensureRuleRegistryBuilt, ruleAllowedByLane, setActiveRuleLane;
+    show
+        RuleLane,
+        ensureRuleRegistryBuilt,
+        ruleAllowedByLane,
+        setActiveRuleLane;
 import 'package:saropa_lints/src/rules/core/async_rules.dart';
 import 'package:test/test.dart';
 
