@@ -11,7 +11,7 @@
  * dismissal — these tests pin that migration.
  */
 import * as assert from 'node:assert';
-import { shouldFetchNow, shouldPromptForVersion } from '../upgrade-checker';
+import { applyPubspecConstraint, readVersions, shouldFetchNow, shouldPromptForVersion } from '../upgrade-checker';
 
 const MIN = 60 * 1000;
 const HOUR = 60 * MIN;
@@ -120,5 +120,42 @@ describe('shouldPromptForVersion', () => {
     const legacy = { nextCheckDueMs: now - HOUR, lastKnownLatest: '16.2.1' };
     assert.strictEqual(shouldFetchNow(legacy, now), true);
     assert.strictEqual(shouldPromptForVersion(legacy, '16.2.1'), true);
+  });
+});
+
+describe('applyPubspecConstraint', () => {
+  it('rewrites the dev_dependencies entry', () => {
+    const src = 'name: a\ndev_dependencies:\n  saropa_lints: ^16.0.0\n';
+    assert.strictEqual(applyPubspecConstraint(src, '16.10.0'), 'name: a\ndev_dependencies:\n  saropa_lints: ^16.10.0\n');
+  });
+
+  it('never touches dependency_overrides', () => {
+    const src = 'name: a\ndependency_overrides:\n  saropa_lints: ^1.0.0\ndev_dependencies:\n  saropa_lints: ^16.0.0\n';
+    const out = applyPubspecConstraint(src, '16.10.0')!;
+    assert.ok(out.includes('dependency_overrides:\n  saropa_lints: ^1.0.0\n'));
+    assert.ok(out.includes('dev_dependencies:\n  saropa_lints: ^16.10.0\n'));
+  });
+
+  it('returns null when saropa_lints appears only in dependency_overrides', () => {
+    const src = 'name: a\ndependency_overrides:\n  saropa_lints: ^1.0.0\n';
+    assert.strictEqual(applyPubspecConstraint(src, '16.10.0'), null);
+  });
+
+  it('preserves CRLF', () => {
+    const src = 'dev_dependencies:\r\n  saropa_lints: ^16.0.0\r\n';
+    assert.strictEqual(applyPubspecConstraint(src, '16.10.0'), 'dev_dependencies:\r\n  saropa_lints: ^16.10.0\r\n');
+  });
+});
+
+describe('readVersions', () => {
+  it('returns only the lock-resolved version (no unused configured value)', () => {
+    const fs = require('node:fs') as typeof import('node:fs');
+    const os = require('node:os') as typeof import('node:os');
+    const path = require('node:path') as typeof import('node:path');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rv-'));
+    fs.writeFileSync(path.join(dir, 'analysis_options.yaml'), 'plugins:\n  saropa_lints: 1.0.0\n');
+    const r = readVersions(dir);
+    assert.strictEqual(r.installed, null);
+    assert.deepStrictEqual(Object.keys(r), ['installed']);
   });
 });

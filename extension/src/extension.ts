@@ -1719,6 +1719,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.showProcessHealth', () => {
       HealthPanel.createOrShow(context);
     }),
+    // Version compatibility card: facts, recommendation, Preview diff / Apply.
+    vscode.commands.registerCommand('saropaLints.configureCompatibility', () => {
+      void HealthPanel.openCompat(context);
+    }),
     vscode.commands.registerCommand('saropaLints.showMachineDashboard', () => {
       MachineDashboard.createOrShow(context);
     }),

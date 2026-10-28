@@ -8,6 +8,7 @@ import type { DartProcessInfo } from './types';
 import type { OrphanHostScan } from './orphanHosts';
 import { buildCiPublishSection } from './ciPublishHtml';
 import type { CiPublishPlan } from './ciPublish';
+import { buildCompatSection, type CompatCardState } from '../compat/compatCardHtml';
 
 export interface HealthPanelData {
   processes: DartProcessInfo[];
@@ -41,6 +42,8 @@ export interface HealthPanelRender {
    * bottom of a panel they would have to scroll to find.
    */
   ciPublish?: CiPublishPlan;
+  /** Version-compatibility card; absent until the user opens it. */
+  compat?: CompatCardState;
 }
 
 export function buildHealthPanelHtml(render: HealthPanelRender): string {
@@ -76,6 +79,7 @@ export function buildHealthPanelHtml(render: HealthPanelRender): string {
 <body>
   ${buildOrphanHostBanner(render.orphanHosts)}
   ${publishHtml}
+  ${buildCompatSection(render.compat)}
   ${enginesHtml}
   ${data ? buildSummaryBar(data) : ''}
   ${body}

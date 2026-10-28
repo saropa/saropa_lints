@@ -8,6 +8,17 @@ import { scanOrphanedHosts, type OrphanHostScan } from './orphanHosts';
 import { CHECK_ORPHANS_COMMAND } from './orphanPreflight';
 import type { EngineStatus, EngineStatusDeps } from './engineCardsHtml';
 import type { CiPublishPlan } from './ciPublish';
+import type { CompatCardState } from '../compat/compatCardHtml';
+import { getProjectRoot } from '../projectRoot';
+import {
+  applyCompatWithUi,
+  computeCompat,
+  describeOutcome,
+  loadCompatState,
+  previewCompat,
+} from '../compat/compatController';
+import { sameRecommendation } from '../compat/recommend';
+import { createLatestRequest } from '../compat/latestRequest';
 
 /** Maximum number of engine-log entries retained in the scrollback buffer. */
 const MAX_LOG_ENTRIES = 100;
@@ -26,7 +37,10 @@ type HealthPanelMessage =
   | { type: 'reclaimOrphans' }
   | { type: 'ciCopyCommands'; commands: string }
   | { type: 'ciPublish' }
-  | { type: 'ciPublishDismiss' };
+  | { type: 'ciPublishDismiss' }
+  | { type: 'compatPreview' }
+  | { type: 'compatApply' }
+  | { type: 'compatRefresh' };
 
 // Singleton webview panel: only one System Health view makes sense at a
 // time, so re-invoking the command reveals + refreshes the existing panel
@@ -82,6 +96,74 @@ export class HealthPanel implements vscode.Disposable {
   static setPendingCiPublish(plan: CiPublishPlan | undefined): void {
     HealthPanel.pendingCiPublish = plan;
     void HealthPanel.instance?.refresh();
+  }
+
+  /**
+   * Version-compatibility card. Undefined until the user opens it (command or
+   * a failed upgrade probe): the solver probe runs only then, never on the
+   * frequent panel refreshes.
+   */
+  private static compatState: CompatCardState | undefined;
+  private static compatContext: vscode.ExtensionContext | undefined;
+
+  /** Open the panel and (re)load the compatibility card, running the solver probe. */
+  static async openCompat(context: vscode.ExtensionContext): Promise<void> {
+    HealthPanel.createOrShow(context);
+    await HealthPanel.loadCompat(context);
+  }
+
+  /** Newest loadCompat call; older results are discarded. */
+  private static readonly compatRequest = createLatestRequest();
+  /** True while an Apply runs; survives card reloads so Apply cannot run twice. */
+  private static compatApplying = false;
+
+  private static async loadCompat(
+    context: vscode.ExtensionContext,
+    error?: string,
+  ): Promise<void> {
+    HealthPanel.compatContext = context;
+    const id = HealthPanel.compatRequest.begin();
+    const busy = HealthPanel.compatApplying;
+    const root = getProjectRoot();
+    if (!root) {
+      HealthPanel.compatState = { error: l10n('notify.setup.noWorkspaceFolder') };
+      void HealthPanel.instance?.refresh();
+      return;
+    }
+    HealthPanel.compatState = { loading: true, busy };
+    void HealthPanel.instance?.refresh();
+    const state = await loadCompatState(context, root);
+    if (!HealthPanel.compatRequest.isCurrent(id)) return;
+    HealthPanel.compatState = { ...(error ? { ...state, error } : state), busy: HealthPanel.compatApplying };
+    void HealthPanel.instance?.refresh();
+  }
+
+  private async runCompatApply(): Promise<void> {
+    const state = HealthPanel.compatState;
+    const context = HealthPanel.compatContext;
+    const root = getProjectRoot();
+    if (!state?.rec || !context || !root || HealthPanel.compatApplying) return;
+    HealthPanel.compatApplying = true;
+    HealthPanel.compatState = { ...state, busy: true };
+    void this.refresh();
+    let message: string | undefined;
+    try {
+      // The card may be stale: re-derive the recommendation now (the solver
+      // result is cached) and only apply if it matches what the user saw.
+      const fresh = await computeCompat(context, root, true);
+      if (!sameRecommendation(fresh.rec, state.rec)) {
+        message = l10n('compat.card.staleReloaded');
+      } else {
+        const outcome = await applyCompatWithUi(root, fresh.rec);
+        const { text, isError } = describeOutcome(outcome);
+        if (isError) message = text;
+      }
+    } catch (err) {
+      message = l10n('compat.card.loadFailed', { detail: err instanceof Error ? err.message : String(err) });
+    } finally {
+      HealthPanel.compatApplying = false;
+    }
+    await HealthPanel.loadCompat(context, message);
   }
 
   private readonly panel: vscode.WebviewPanel;
@@ -205,6 +287,7 @@ export class HealthPanel implements vscode.Disposable {
       logEntries: HealthPanel.logEntries,
       orphanHosts,
       ciPublish: HealthPanel.pendingCiPublish,
+      compat: HealthPanel.compatState,
     });
   }
 
@@ -278,6 +361,18 @@ export class HealthPanel implements vscode.Disposable {
         // "I will deal with this myself", not "undo the edit" — reverting
         // someone's working tree from a Not now button would be its own bug.
         HealthPanel.setPendingCiPublish(undefined);
+        break;
+      case 'compatPreview': {
+        const root = getProjectRoot();
+        const rec = HealthPanel.compatState?.rec;
+        if (root && rec) void previewCompat(root, rec);
+        break;
+      }
+      case 'compatApply':
+        void this.runCompatApply();
+        break;
+      case 'compatRefresh':
+        if (HealthPanel.compatContext) void HealthPanel.loadCompat(HealthPanel.compatContext);
         break;
       case 'reclaimOrphans':
         // Delegated to the command so the confirmation modal and the kill
