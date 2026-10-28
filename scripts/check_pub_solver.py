@@ -49,30 +49,39 @@ def main():
         if not ok:
             failures.append(label)
 
+    def show(r):
+        # Surface pub output on failure so CI logs explain a None version.
+        if r.returncode != 0:
+            print((r.stdout + r.stderr).strip()[-1500:])
+
     with tempfile.TemporaryDirectory() as t:
         root = Path(t)
         held = "dependencies:\n  analyzer: ^12.1.0\n"
 
         p = project(root, "add", held)
         r = run(["dart", "pub", "add", "saropa_lints"], p)
+        show(r)
         v = lock_version(p, "saropa_lints")
         check("pub add resolves to 16.x with analyzer 12",
               r.returncode == 0 and bool(v) and v.startswith("16."), f"(got {v})")
 
         p = project(root, "caret16", held + "  saropa_lints: ^16.7.0\n")
         r = run(["dart", "pub", "get"], p)
+        show(r)
         v = lock_version(p, "saropa_lints")
         check("^16.7.0 stays on 16.x",
               r.returncode == 0 and bool(v) and v.startswith("16."), f"(got {v})")
 
         p = project(root, "caret17", held + "  saropa_lints: ^17.0.0\n")
         r = run(["dart", "pub", "get"], p)
+        show(r)
         out = r.stdout + r.stderr
         check("^17 fails with solver message",
               r.returncode != 0 and "saropa_lints" in out)
 
         p = project(root, "meta", "dependencies:\n  meta: 1.18.0\n  saropa_lints: ^16.7.0\n")
         r = run(["dart", "pub", "get"], p)
+        show(r)
         v = lock_version(p, "saropa_lints")
         check("meta 1.18.0 resolves 16.x",
               r.returncode == 0 and bool(v) and v.startswith("16."), f"(got {v})")
