@@ -135,7 +135,7 @@ Test-suite repair, dependency security updates, and a linting fix. No change to 
 
 ## [16.7.0]
 
-**Skipped release - use 16.8.0**
+**Published 2026-10-06 - superseded by 16.8.0**
 
 ---
 
