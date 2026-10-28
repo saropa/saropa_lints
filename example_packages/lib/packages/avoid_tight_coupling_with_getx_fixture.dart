@@ -116,11 +116,15 @@ dynamic value;
 // expect_lint: avoid_tight_coupling_with_getx
 class _bad651_MyWidget extends GetView<MyController> {
   Widget build(BuildContext context) {
-    return Obx(() => Column(children: [
+    return Obx(
+      () => Column(
+        children: [
           Text(controller.name.value),
           Text(Get.find<UserController>().email.value),
           ElevatedButton(onTap: () => Get.to(() => NextPage())),
-        ]));
+        ],
+      ),
+    );
   }
 }
 
@@ -128,5 +132,5 @@ class _bad651_MyWidget extends GetView<MyController> {
 // Use GetX selectively, not for everything
 class _good651_MyWidget extends StatelessWidget {
   final MyController controller;
-// Direct injection for testability
+  // Direct injection for testability
 }

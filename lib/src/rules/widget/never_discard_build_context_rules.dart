@@ -138,7 +138,7 @@ class NeverDiscardBuildContextRule extends SaropaLintRule {
     // Gate 1 (cheap, token-level): the function expression must be the value
     // of a `builder:` named argument.
     final parent = node.parent;
-    if (parent is! NamedExpression || parent.name.label.name != 'builder') {
+    if (parent is! NamedArgument || parent.name.lexeme != 'builder') {
       return null;
     }
 
@@ -219,7 +219,7 @@ class NeverDiscardBuildContextRule extends SaropaLintRule {
   /// the syntactic type name rather than the resolved type keeps detection
   /// identical in both modes; a resolved-only check would silently disable
   /// the rule for every unresolved scan.
-  static bool _isContextSupplyingBuilderWidget(NamedExpression namedArgument) {
+  static bool _isContextSupplyingBuilderWidget(NamedArgument namedArgument) {
     final argumentList = namedArgument.parent;
     if (argumentList is! ArgumentList) return false;
 
@@ -243,13 +243,9 @@ class NeverDiscardBuildContextRule extends SaropaLintRule {
     return false;
   }
 
-  /// Extracts the declared name of a formal parameter, unwrapping
-  /// [DefaultFormalParameter] (named/optional params) down to the
-  /// underlying [SimpleFormalParameter].
+  /// Extracts the declared name of a formal parameter.
   static String? _parameterName(FormalParameter param) {
-    final normalized = param is DefaultFormalParameter
-        ? param.parameter
-        : param;
+    final normalized = param;
     return normalized.name?.lexeme;
   }
 
@@ -272,10 +268,8 @@ class NeverDiscardBuildContextRule extends SaropaLintRule {
   /// `BuildContext`: either explicitly typed as `BuildContext`, or left
   /// untyped with one of the conventional context parameter names.
   static bool _looksLikeBuildContext(FormalParameter param, String name) {
-    final normalized = param is DefaultFormalParameter
-        ? param.parameter
-        : param;
-    if (normalized is SimpleFormalParameter) {
+    final normalized = param;
+    if (normalized is RegularFormalParameter) {
       final type = normalized.type;
       if (type is NamedType) {
         return type.name.lexeme == 'BuildContext';
@@ -439,15 +433,11 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
     return false;
   }
 
-  /// Whether [parameters] declares a formal parameter named [name],
-  /// unwrapping [DefaultFormalParameter] down to the underlying
-  /// [SimpleFormalParameter]/other formal to reach the declared name.
+  /// Whether [parameters] declares a formal parameter named [name].
   static bool _declaresParameter(FormalParameterList? parameters, String name) {
     if (parameters == null) return false;
     for (final param in parameters.parameters) {
-      final normalized = param is DefaultFormalParameter
-          ? param.parameter
-          : param;
+      final normalized = param;
       if (normalized.name?.lexeme == name) return true;
     }
     return false;

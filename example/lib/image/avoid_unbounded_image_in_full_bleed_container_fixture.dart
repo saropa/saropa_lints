@@ -108,13 +108,20 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: no size/cache bound, Stack forces expand
 // expect_lint: avoid_unbounded_image_in_full_bleed_container
 void _bad901() {
-  Stack(fit: StackFit.expand, children: [Image.asset('assets/hero.png'), const Text('Overlay')]);
+  Stack(
+    fit: StackFit.expand,
+    children: [Image.asset('assets/hero.png'), const Text('Overlay')],
+  );
 }
 
 // BAD: no size/cache bound, Positioned.fill forces expand
 // expect_lint: avoid_unbounded_image_in_full_bleed_container
 void _bad902() {
-  Stack(children: [Positioned.fill(child: Image.network('https://example.com/bg.jpg'))]);
+  Stack(
+    children: [
+      Positioned.fill(child: Image.network('https://example.com/bg.jpg')),
+    ],
+  );
 }
 
 // BAD: no size/cache bound, SizedBox.expand forces expand

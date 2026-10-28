@@ -354,7 +354,7 @@ class AvoidAndroidTaskAffinityDefaultRule extends SaropaLintRule {
       if (methodName != 'invokeMethod') return;
 
       // Check arguments for activity-related calls
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         if (argSource.contains('activity') ||
             argSource.contains('startactivity') ||
@@ -512,7 +512,7 @@ class PreferPendingIntentFlagsRule extends SaropaLintRule {
       if (methodName != 'invokeMethod') return;
 
       // Check first argument for PendingIntent-related method names
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String firstArg = args.first.toSource().toLowerCase();
@@ -598,7 +598,7 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
       if (node.methodName.name == 'parse') {
         final Expression? target = node.target;
         if (target is SimpleIdentifier && target.name == 'Uri') {
-          final NodeList<Expression> args = node.argumentList.arguments;
+          final NodeList<Argument> args = node.argumentList.arguments;
           if (args.isNotEmpty) {
             final String urlArg = args.first.toSource();
             // Check for http:// but not https://
@@ -622,7 +622,7 @@ class AvoidAndroidCleartextTrafficRule extends SaropaLintRule {
           methodName == 'post' ||
           methodName == 'put' ||
           methodName == 'delete') {
-        final NodeList<Expression> args = node.argumentList.arguments;
+        final NodeList<Argument> args = node.argumentList.arguments;
         if (args.isNotEmpty) {
           final String firstArg = args.first.toSource();
           if (firstArg.contains("'http://") || firstArg.contains('"http://')) {
@@ -750,7 +750,7 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
       }
 
       // Check if storing sensitive data
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String keyArg = args.first.toSource().toLowerCase();
@@ -1129,9 +1129,9 @@ class RequireAndroidExactAlarmPermissionRule extends SaropaLintRule {
 
   static bool _argsRequestExactSchedule(MethodInvocation node) {
     for (final arg in node.argumentList.arguments) {
-      if (arg is NamedExpression &&
-          arg.name.label.name == 'androidScheduleMode' &&
-          _exactScheduleMode.hasMatch(arg.expression.toSource())) {
+      if (arg is NamedArgument &&
+          arg.name.lexeme == 'androidScheduleMode' &&
+          _exactScheduleMode.hasMatch(arg.argumentExpression.toSource())) {
         return true;
       }
     }
@@ -1140,9 +1140,9 @@ class RequireAndroidExactAlarmPermissionRule extends SaropaLintRule {
 
   static bool _hasExactTrueArg(MethodInvocation node) {
     for (final arg in node.argumentList.arguments) {
-      if (arg is NamedExpression &&
-          arg.name.label.name == 'exact' &&
-          arg.expression.toSource() == 'true') {
+      if (arg is NamedArgument &&
+          arg.name.lexeme == 'exact' &&
+          arg.argumentExpression.toSource() == 'true') {
         return true;
       }
     }

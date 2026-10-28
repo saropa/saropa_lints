@@ -47,11 +47,7 @@ enum PaymentStatus {
 // GOOD: private enum is not public API — never flagged
 // =============================================================================
 
-enum _InternalRetryPhase {
-  initial,
-  backoff,
-  giveUp,
-}
+enum _InternalRetryPhase { initial, backoff, giveUp }
 
 // =============================================================================
 // Annotated constants: verifies the doc-comment-vs-annotation ordering does

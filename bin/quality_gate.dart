@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 /// Module overview (comment coverage pass).
 /// comment-coverage: module overview (batch).
 ///

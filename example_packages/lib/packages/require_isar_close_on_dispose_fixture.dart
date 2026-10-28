@@ -114,7 +114,7 @@ class _bad675_MyState extends State<MyWidget> {
   void initState() {
     isar = Isar.openSync([UserSchema]);
   }
-// Missing close in dispose!
+  // Missing close in dispose!
 }
 
 // GOOD: Should NOT trigger require_isar_close_on_dispose

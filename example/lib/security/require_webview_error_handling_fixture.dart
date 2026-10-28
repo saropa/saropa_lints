@@ -113,9 +113,7 @@ final url = 'https://example.com';
 // BAD: Should trigger require_webview_error_handling
 // expect_lint: require_webview_error_handling
 void _bad1022() {
-  WebView(
-    initialUrl: 'https://example.com',
-  ); // No error handling!
+  WebView(initialUrl: 'https://example.com'); // No error handling!
 
   InAppWebView(
     initialUrlRequest: URLRequest(url: Uri.parse(url)),

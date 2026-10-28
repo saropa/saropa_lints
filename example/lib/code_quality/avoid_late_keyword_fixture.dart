@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: avoid_late_keyword
 class _Bad151 {
   late int
-      value; // Runtime crash risk — use nullable or initialize at declaration
+  value; // Runtime crash risk — use nullable or initialize at declaration
 }
 
 // GOOD: Should NOT trigger avoid_late_keyword

@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 // ignore_for_file: avoid_print
 
 /// Dart CLI tool to summarize the analysis server's RSS trend from
@@ -112,7 +113,9 @@ void main(List<String> args) {
   print('Memory trend report - ${logFile.path}');
   print('');
   print('Samples: ${samples.length}');
-  print('First:   ${first.timestamp} - ${first.rssMb}MB (cap ${first.capMb}MB)');
+  print(
+    'First:   ${first.timestamp} - ${first.rssMb}MB (cap ${first.capMb}MB)',
+  );
   print('Latest:  ${last.timestamp} - ${last.rssMb}MB (cap ${last.capMb}MB)');
   print('Min RSS: ${minRss}MB');
   print('Max RSS: ${maxRss}MB');
@@ -148,7 +151,11 @@ void _printUsage() {
 
 /// One parsed `[memory]` trend line from `plugin.log`.
 class _MemorySample {
-  _MemorySample({required this.timestamp, required this.rssMb, required this.capMb});
+  _MemorySample({
+    required this.timestamp,
+    required this.rssMb,
+    required this.capMb,
+  });
 
   final String timestamp;
   final int rssMb;

@@ -117,7 +117,7 @@ class _bad638_MyController extends GetxController {
     super.onInit();
     _countWorker = ever(count, (_) => print('changed'));
   }
-// Missing onClose with _countWorker.dispose()!
+  // Missing onClose with _countWorker.dispose()!
 }
 
 // GOOD: Should NOT trigger require_getx_worker_dispose

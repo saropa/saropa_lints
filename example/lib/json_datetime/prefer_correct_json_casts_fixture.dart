@@ -7,6 +7,7 @@
 DateTime bad(Map<String, dynamic> json) => json['at'] as DateTime;
 
 // GOOD: Parse ISO string to DateTime
-DateTime good(Map<String, dynamic> json) => DateTime.parse(json['at'] as String);
+DateTime good(Map<String, dynamic> json) =>
+    DateTime.parse(json['at'] as String);
 
 void main() {}

@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 /// CLI: measure rule liveness against the `expect_lint` fixture ground truth.
 ///
 /// For every rule declared by an `// expect_lint:` marker in a fixtures tree
@@ -44,8 +45,8 @@ Future<void> main(List<String> args) async {
   // "silent". `--tier <name>` narrows the measurement to one tier when wanted.
   final tier = _readOption(args, '--tier');
   final failOn = _readOption(args, '--fail-on') ?? 'silent';
-  final asJson = args.contains('--format') &&
-      (_readOption(args, '--format') == 'json');
+  final asJson =
+      args.contains('--format') && (_readOption(args, '--format') == 'json');
 
   if (!const {'silent', 'none'}.contains(failOn)) {
     print('Error: --fail-on must be one of silent, none (got "$failOn").');
@@ -88,7 +89,11 @@ List<LintLocation> _collectExpectedLints(Directory dir) {
     if (entity is! File || !entity.path.endsWith('.dart')) continue;
     final canonicalPath = p.canonicalize(entity.path);
     for (final marker in parseExpectedLints(entity.readAsStringSync())) {
-      locations.add((rule: marker.rule, file: canonicalPath, line: marker.line));
+      locations.add((
+        rule: marker.rule,
+        file: canonicalPath,
+        line: marker.line,
+      ));
     }
   }
   return locations;
@@ -124,7 +129,7 @@ LintLocation _toLocation(ScanDiagnostic d) =>
 Map<String, AccuracyTarget?> _buildTargets() {
   final targets = <String, AccuracyTarget?>{};
   for (final rule in allSaropaRules) {
-    targets[rule.code.name] = rule.accuracyTarget;
+    targets[rule.code.lowerCaseName] = rule.accuracyTarget;
   }
   return targets;
 }
@@ -166,8 +171,10 @@ void _printReport(AccuracyReport report) {
     print('');
     print('Partially-firing rules (fire in some declaring fixtures):');
     for (final r in partial) {
-      print('  - ${r.rule}: ${r.firedFiles.length}/${r.testedFiles.length} '
-          'fixtures; silent in [${r.silentFiles.join(', ')}]');
+      print(
+        '  - ${r.rule}: ${r.firedFiles.length}/${r.testedFiles.length} '
+        'fixtures; silent in [${r.silentFiles.join(', ')}]',
+      );
     }
   }
 }
@@ -175,14 +182,16 @@ void _printReport(AccuracyReport report) {
 /// Serializes the report to stable JSON for CI consumption / diffing.
 String _reportToJson(AccuracyReport report) {
   final rules = report.rules
-      .map((r) => {
-            'rule': r.rule,
-            'testedFiles': r.testedFiles.length,
-            'firedFiles': r.firedFiles.length,
-            'firingRate': r.firingRate,
-            'silent': r.isSilent,
-            'silentFiles': r.silentFiles.toList()..sort(),
-          })
+      .map(
+        (r) => {
+          'rule': r.rule,
+          'testedFiles': r.testedFiles.length,
+          'firedFiles': r.firedFiles.length,
+          'firingRate': r.firingRate,
+          'silent': r.isSilent,
+          'silentFiles': r.silentFiles.toList()..sort(),
+        },
+      )
       .toList();
 
   final payload = {

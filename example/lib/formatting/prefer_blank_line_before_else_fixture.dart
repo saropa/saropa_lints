@@ -7,7 +7,8 @@ void _bad() {
   final x = true;
   if (x) {
     return;
-  } else { // expect_lint: prefer_blank_line_before_else
+  } else {
+    // expect_lint: prefer_blank_line_before_else
     return;
   }
 }
@@ -17,9 +18,7 @@ void _good() {
   final x = true;
   if (x) {
     return;
-  }
-
-  else {
+  } else {
     return;
   }
 }

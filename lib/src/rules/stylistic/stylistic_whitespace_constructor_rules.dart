@@ -765,14 +765,13 @@ class PreferSuperParametersRule extends SaropaLintRule {
         if (initializer is SuperConstructorInvocation) {
           // Check if any arguments just pass through a parameter
           for (final arg in initializer.argumentList.arguments) {
-            if (arg is NamedExpression) {
-              final expr = arg.expression;
+            if (arg is NamedArgument) {
+              final expr = arg.argumentExpression;
               if (expr is SimpleIdentifier) {
                 // Check if this identifier matches a constructor parameter
                 for (final param in node.parameters.parameters) {
                   final paramName = param.name?.lexeme;
-                  if (paramName == expr.name &&
-                      arg.name.label.name == paramName) {
+                  if (paramName == expr.name && arg.name.lexeme == paramName) {
                     reporter.atNode(arg);
                   }
                 }
@@ -1408,10 +1407,8 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
       // already use shorthand or delegate elsewhere.
       final paramNames = <String>{};
       for (final param in node.parameters.parameters) {
-        final normalized = param is DefaultFormalParameter
-            ? param.parameter
-            : param;
-        if (normalized is SimpleFormalParameter) {
+        final normalized = param;
+        if (normalized is RegularFormalParameter) {
           final name = normalized.name?.lexeme;
           if (name != null) paramNames.add(name);
         }

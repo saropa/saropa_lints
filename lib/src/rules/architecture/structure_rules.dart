@@ -1717,12 +1717,9 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
         if (param.isNamed) continue;
 
         // Check if the parameter type is bool
-        SimpleFormalParameter? simpleParam;
-        if (param is SimpleFormalParameter) {
+        RegularFormalParameter? simpleParam;
+        if (param is RegularFormalParameter) {
           simpleParam = param;
-        } else if (param is DefaultFormalParameter) {
-          final p = param.parameter;
-          simpleParam = p is SimpleFormalParameter ? p : null;
         }
 
         if (simpleParam == null) continue;
@@ -4037,10 +4034,8 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
       if (params == null || params.parameters.isEmpty) return;
 
       final FormalParameter first = params.parameters.first;
-      final FormalParameter inner = first is DefaultFormalParameter
-          ? first.parameter
-          : first;
-      if (inner is! SimpleFormalParameter) return;
+      final FormalParameter inner = first;
+      if (inner is! RegularFormalParameter) return;
 
       final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
@@ -4125,10 +4120,8 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
       if (params == null || params.parameters.isEmpty) return;
 
       final FormalParameter first = params.parameters.first;
-      final FormalParameter inner = first is DefaultFormalParameter
-          ? first.parameter
-          : first;
-      if (inner is! SimpleFormalParameter) return;
+      final FormalParameter inner = first;
+      if (inner is! RegularFormalParameter) return;
 
       final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
@@ -4286,8 +4279,8 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
         final params = m.parameters?.parameters;
         if (params == null || params.isEmpty) return;
         final p = params.first;
-        final inner = p is DefaultFormalParameter ? p.parameter : p;
-        final innerType = inner is SimpleFormalParameter ? inner.type : null;
+        final inner = p;
+        final innerType = inner is RegularFormalParameter ? inner.type : null;
         if (innerType is NamedType) {
           firstParamTypeNames.add(innerType.name.lexeme);
         }
@@ -4373,9 +4366,7 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
       final ConstructorDeclaration ctor = constructors[0];
       if (ctor.parameters.parameters.length != 1) return;
       final FormalParameter p = ctor.parameters.parameters.single;
-      final FormalParameter inner = p is DefaultFormalParameter
-          ? p.parameter
-          : p;
+      final FormalParameter inner = p;
       if (inner is! FieldFormalParameter) return;
 
       final int methodCount = node.bodyMembers
@@ -4777,7 +4768,7 @@ class WrongNumberOfParametersForSetterRule extends SaropaLintRule {
       }
 
       final FormalParameter single = list.single;
-      if (single is DefaultFormalParameter || single.isNamed) {
+      if (!single.isRequiredPositional) {
         reporter.atNode(node);
       }
     });
@@ -5083,11 +5074,7 @@ class ConstructorParametersAndFieldsShouldHaveTheSameOrderRule
       final List<FormalParameter> namedForwarding = <FormalParameter>[];
 
       for (final FormalParameter p in node.parameters.parameters) {
-        // Named/optional/required params are wrapped in DefaultFormalParameter;
-        // unwrap to inspect the underlying parameter kind.
-        final FormalParameter inner = p is DefaultFormalParameter
-            ? p.parameter
-            : p;
+        final FormalParameter inner = p;
         // Only `this.field` shorthand parameters have a corresponding field
         // position to compare against — a parameter used purely to compute
         // a derived initializer-list value has none (edge case 3).
@@ -5130,9 +5117,7 @@ class ConstructorParametersAndFieldsShouldHaveTheSameOrderRule
     if (group.length < 2) return;
 
     final List<String> paramNames = group.map((FormalParameter p) {
-      final FormalParameter inner = p is DefaultFormalParameter
-          ? p.parameter
-          : p;
+      final FormalParameter inner = p;
       return (inner as FieldFormalParameter).name.lexeme;
     }).toList();
 

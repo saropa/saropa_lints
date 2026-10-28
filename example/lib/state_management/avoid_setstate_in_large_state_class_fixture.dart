@@ -113,7 +113,7 @@ dynamic widget;
 // BAD: Should trigger avoid_setstate_in_large_state_class
 // expect_lint: avoid_setstate_in_large_state_class
 class _bad1031__MyPageState extends State<MyPage> {
-//200+ lines of code, many fields and methods
+  //200+ lines of code, many fields and methods
 
   void _onTap() {
     setState(() {
@@ -123,7 +123,7 @@ class _bad1031__MyPageState extends State<MyPage> {
 
   @override
   Widget build(BuildContext context) {
-//complex widget tree
+    //complex widget tree
   }
 }
 

@@ -387,9 +387,20 @@ Show your code quality standards:
 [![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-recommended%2B-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints)
 ```
 
+## Choosing a Version
+
+The constraint you need depends on the analyzer your project resolves:
+
+| Your analyzer | Use |
+| --- | --- |
+| 13 or 14 | `saropa_lints: ^17.0.0` |
+| 12 | `saropa_lints: ^16.7.0` (frozen, no back-ports) |
+
+The VS Code extension's compatibility card shows which analyzer your workspace resolves and which constraint to use.
+
 ## Supported Versions
 
-The current major (`12.x`) is the actively maintained line. Earlier majors are updated only for security-impacting issues. [Open an issue](https://github.com/saropa/saropa_lints/issues/new) tagged `backport-request` if needed.
+The current major (`17.x`, analyzer `>=13 <15`) is the actively maintained line. `16.x` (analyzer 12) is frozen: no back-ports, including for security-impacting issues. See Choosing a Version above.
 
 ## License
 

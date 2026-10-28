@@ -146,7 +146,8 @@ class _good596_MethodBody {
 // GOOD: Dio() inside a nested closure (DI registration pattern)
 class _good596_NestedClosure {
   void register() {
-    final factory = () => () => Dio();
+    final factory = () =>
+        () => Dio();
   }
 }
 

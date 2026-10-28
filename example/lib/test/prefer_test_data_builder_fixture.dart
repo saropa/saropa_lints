@@ -128,7 +128,9 @@ void _bad1176() {
 // GOOD: Should NOT trigger prefer_test_data_builder
 void _good1176() {
   test('user profile', () {
-    final user =
-        UserBuilder().withName('Test').withEmail('test@example.com').build();
+    final user = UserBuilder()
+        .withName('Test')
+        .withEmail('test@example.com')
+        .build();
   });
 }

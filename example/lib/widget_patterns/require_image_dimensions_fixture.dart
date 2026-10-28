@@ -118,11 +118,7 @@ void _bad1412() {
 
 // GOOD: Should NOT trigger require_image_dimensions
 void _good1412() {
-  Image.network(
-    'https://example.com/image.png',
-    width: 200,
-    height: 150,
-  );
+  Image.network('https://example.com/image.png', width: 200, height: 150);
   SizedBox(
     width: 200,
     height: 150,

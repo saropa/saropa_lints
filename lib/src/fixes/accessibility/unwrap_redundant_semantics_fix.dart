@@ -32,16 +32,16 @@ class UnwrapRedundantSemanticsFix extends SaropaFixProducer {
     final semantics = parent;
     if (semantics.constructorName.type.name.lexeme != 'Semantics') return;
 
-    NamedExpression? childArg;
+    NamedArgument? childArg;
     for (final arg in semantics.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'child') {
+      if (arg is NamedArgument && arg.name.lexeme == 'child') {
         childArg = arg;
         break;
       }
     }
     if (childArg == null) return;
 
-    final childSource = childArg.expression.toSource();
+    final childSource = childArg.argumentExpression.toSource();
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

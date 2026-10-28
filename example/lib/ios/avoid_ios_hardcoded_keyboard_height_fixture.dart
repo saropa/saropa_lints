@@ -121,9 +121,7 @@ void _bad913() {
 // GOOD: Should NOT trigger avoid_ios_hardcoded_keyboard_height
 void _good913() {
   Padding(
-    padding: EdgeInsets.only(
-      bottom: MediaQuery.of(context).viewInsets.bottom,
-    ),
+    padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
     child: content,
   );
 }

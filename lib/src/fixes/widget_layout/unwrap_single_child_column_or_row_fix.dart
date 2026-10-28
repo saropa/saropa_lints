@@ -33,9 +33,9 @@ class UnwrapSingleChildColumnOrRowFix extends SaropaFixProducer {
     if (type != 'Column' && type != 'Row') return;
 
     for (final arg in ice.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name != 'children') continue;
-      final list = arg.expression;
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme != 'children') continue;
+      final list = arg.argumentExpression;
       if (list is! ListLiteral) return;
       if (list.elements.length != 1) return;
       final only = list.elements.single;

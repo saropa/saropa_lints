@@ -98,10 +98,9 @@ class _MissingPragmaGood {
 // =============================================================================
 
 Future<void> undeclaredChannelKeyBad() async {
-  await AwesomeNotifications().initialize(
-    null,
-    [NotificationChannel(channelKey: 'alerts', channelName: 'Alerts')],
-  );
+  await AwesomeNotifications().initialize(null, [
+    NotificationChannel(channelKey: 'alerts', channelName: 'Alerts'),
+  ]);
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: 1,
@@ -115,10 +114,9 @@ Future<void> undeclaredChannelKeyBad() async {
 }
 
 Future<void> undeclaredChannelKeyGood() async {
-  await AwesomeNotifications().initialize(
-    null,
-    [NotificationChannel(channelKey: 'alerts', channelName: 'Alerts')],
-  );
+  await AwesomeNotifications().initialize(null, [
+    NotificationChannel(channelKey: 'alerts', channelName: 'Alerts'),
+  ]);
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: 1,

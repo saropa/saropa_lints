@@ -110,13 +110,13 @@ final context = BuildContext();
 // BAD: Should trigger prefer_custom_single_child_layout
 // expect_lint: prefer_custom_single_child_layout
 void _bad1333_initState() {
-// super.initState();
+  // super.initState();
   showDialog(context: context); // Context not ready!
 }
 
 // GOOD: Should NOT trigger prefer_custom_single_child_layout
 void _good1333_initState() {
-// super.initState();
+  // super.initState();
   WidgetsBinding.instance.addPostFrameCallback((_) {
     showDialog(context: context);
   });

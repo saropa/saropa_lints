@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: require_dispose_pattern
 class _bad803_MyManager {
   final _controller = StreamController<int>();
-// Missing close!
+  // Missing close!
 }
 
 // GOOD: Should NOT trigger require_dispose_pattern

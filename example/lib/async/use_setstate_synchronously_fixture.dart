@@ -232,9 +232,8 @@ class _BadMultipleAwaitsPartialGuardState
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-        children: [Text(_data1), Text(_data2)],
-      );
+  Widget build(BuildContext context) =>
+      Column(children: [Text(_data1), Text(_data2)]);
 }
 
 // GOOD: Multiple awaits with guard after each
@@ -262,9 +261,8 @@ class _GoodMultipleAwaitsWithGuardsState
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-        children: [Text(_data1), Text(_data2)],
-      );
+  Widget build(BuildContext context) =>
+      Column(children: [Text(_data1), Text(_data2)]);
 }
 
 // =========================================================================
@@ -534,7 +532,8 @@ class _GoodDoubleGuardState extends State<GoodDoubleGuard> {
     await Future.value(null);
     if (!mounted) return;
     setState(
-        () => _data = data); // Protected by second guard after second await
+      () => _data = data,
+    ); // Protected by second guard after second await
   }
 
   @override
@@ -559,7 +558,8 @@ class _BadGuardBeforeSecondAwaitState extends State<BadGuardBeforeSecondAwait> {
     await Future.value(null); // Second await invalidates the first guard
     // expect_lint: check_mounted_after_async
     setState(
-        () => _data = data); // NOT protected — needs guard after second await
+      () => _data = data,
+    ); // NOT protected — needs guard after second await
   }
 
   @override

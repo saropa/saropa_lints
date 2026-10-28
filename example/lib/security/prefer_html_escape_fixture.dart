@@ -114,9 +114,7 @@ final text = 'text';
 // BAD: Should trigger prefer_html_escape
 // expect_lint: prefer_html_escape
 void _bad1014() {
-  WebView(
-    initialUrl: 'data:text/html,<html><body>$userComment</body></html>',
-  );
+  WebView(initialUrl: 'data:text/html,<html><body>$userComment</body></html>');
 }
 
 // GOOD: Should NOT trigger prefer_html_escape

@@ -114,5 +114,5 @@ enum _Good391Status {
   active,
   approved,
   canceled,
-  pending
+  pending,
 } // Alphabetical order

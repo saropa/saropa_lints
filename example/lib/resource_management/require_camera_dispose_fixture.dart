@@ -116,7 +116,7 @@ class _bad972__CameraPageState extends State<CameraPage> {
     _controller = CameraController(cameras[0], ResolutionPreset.high);
     _controller.initialize();
   }
-// Missing dispose - camera stays locked!
+  // Missing dispose - camera stays locked!
 }
 
 // GOOD: Should NOT trigger require_camera_dispose

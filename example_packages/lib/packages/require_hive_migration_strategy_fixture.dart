@@ -118,7 +118,7 @@ final name = 'example';
 class _bad669_User {
   @HiveField(0) // Was 'name', now 'fullName' - data corrupted!
   final String fullName;
-// email field removed - existing data orphaned
+  // email field removed - existing data orphaned
 }
 
 // GOOD: Should NOT trigger require_hive_migration_strategy

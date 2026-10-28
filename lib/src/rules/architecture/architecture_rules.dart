@@ -273,13 +273,8 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
         if (member is ConstructorDeclaration) {
           for (final FormalParameter param in member.parameters.parameters) {
             String? paramType;
-            if (param is SimpleFormalParameter) {
+            if (param is RegularFormalParameter) {
               paramType = param.type?.toSource();
-            } else if (param is DefaultFormalParameter) {
-              final NormalFormalParameter normalParam = param.parameter;
-              if (normalParam is SimpleFormalParameter) {
-                paramType = normalParam.type?.toSource();
-              }
             }
 
             if (paramType != null &&
@@ -493,7 +488,7 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
       for (final FormalParameter param
           in node.parameters?.parameters ?? <FormalParameter>[]) {
         String? paramType;
-        if (param is SimpleFormalParameter) {
+        if (param is RegularFormalParameter) {
           paramType = param.type?.toSource();
         }
         if (paramType != null) {
@@ -734,8 +729,8 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
       bool hasSecondaryOrHover = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final name = arg.name.label.name;
+        if (arg is NamedArgument) {
+          final name = arg.name.lexeme;
           if (name == 'onTap' || name == 'onTapDown') {
             hasOnTap = true;
           }

@@ -149,8 +149,7 @@ class RouteNames {
   static const String settings = 'settings_page';
 }
 
-bool sameRouteViaClassConstant() =>
-    RouteNames.settings == kInternalRouteNameA;
+bool sameRouteViaClassConstant() => RouteNames.settings == kInternalRouteNameA;
 
 // =============================================================================
 // GOOD near-miss: not a String comparison at all (int/bool operands)

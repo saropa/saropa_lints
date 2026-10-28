@@ -113,5 +113,5 @@ class _bad1272_MyClass {
 
 // GOOD: Should NOT trigger avoid_unnecessary_constructor
 class _good1272_MyClass {
-// No constructor needed, Dart provides default
+  // No constructor needed, Dart provides default
 }

@@ -114,10 +114,9 @@ dynamic map;
 Widget _bad621_build(BuildContext context) {
   return GoogleMap(
     markers: locations
-        .map((loc) => Marker(
-              markerId: MarkerId(loc.id),
-              position: loc.position,
-            ))
+        .map(
+          (loc) => Marker(markerId: MarkerId(loc.id), position: loc.position),
+        )
         .toSet(),
   );
 }
@@ -128,9 +127,6 @@ void _good621() {
 
   // Getter would be on a class; here just show the caching pattern:
   _cachedMarkers ??= locations
-      .map((loc) => Marker(
-            markerId: MarkerId(loc.id),
-            position: loc.position,
-          ))
+      .map((loc) => Marker(markerId: MarkerId(loc.id), position: loc.position))
       .toSet();
 }

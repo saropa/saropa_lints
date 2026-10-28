@@ -112,7 +112,7 @@ dynamic service;
 void _bad637_main() {
   test('my test', () {
     final service = GetIt.I<MyService>();
-// Uses stale singleton from previous test!
+    // Uses stale singleton from previous test!
   });
 }
 

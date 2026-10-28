@@ -79,8 +79,8 @@ class HomeTab extends StatelessWidget {
       debounce: const Duration(milliseconds: 300),
       builder:
           (BuildContext context, AsyncSnapshot<List<ContactModel>?> snapshot) {
-        return Container();
-      },
+            return Container();
+          },
     );
     return content;
   }

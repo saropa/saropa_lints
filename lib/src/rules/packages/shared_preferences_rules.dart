@@ -94,7 +94,7 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
 
       // Check for patterns that suggest large data storage
       if (node.argumentList.arguments.length >= 2) {
-        final Expression keyArg = node.argumentList.arguments.first;
+        final Argument keyArg = node.argumentList.arguments.first;
         final String keySource = keyArg.toSource().toLowerCase();
 
         // Flag keys that suggest storing collections
@@ -354,13 +354,8 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
   }
 
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter) {
       return param.type?.toSource();
-    } else if (param is DefaultFormalParameter) {
-      final inner = param.parameter;
-      if (inner is SimpleFormalParameter) {
-        return inner.type?.toSource();
-      }
     }
     return null;
   }
@@ -455,10 +450,10 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
       }
 
       // Check if key is a string literal (not a constant)
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression keyArg = args.first;
+      final Argument keyArg = args.first;
       if (keyArg is SimpleStringLiteral) {
         // Direct string literal - suggests not using a wrapper
         reporter.atNode(node);
@@ -804,10 +799,10 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
       }
 
       // Check first argument (key) for sensitive patterns
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression keyArg = args.first;
+      final Argument keyArg = args.first;
       final String keySource = keyArg.toSource().toLowerCase();
 
       for (final String sensitiveKey in _sensitiveKeys) {
@@ -984,10 +979,10 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
       }
 
       // Check first argument for string literal
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression keyArg = args.first;
+      final Argument keyArg = args.first;
       if (keyArg is SimpleStringLiteral || keyArg is AdjacentStrings) {
         reporter.atNode(keyArg);
       }
@@ -1074,7 +1069,7 @@ class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
       }
 
       // Check if value argument contains serialization
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
       final String valueSource = args[1].toSource();

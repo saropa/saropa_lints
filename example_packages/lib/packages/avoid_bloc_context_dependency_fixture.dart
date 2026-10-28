@@ -111,11 +111,11 @@ final context = BuildContext();
 // expect_lint: avoid_bloc_context_dependency
 class _bad585_MyBloc extends Bloc<MyEvent, MyState> {
   _bad585_MyBloc(BuildContext context) : super(MyInitial()) {}
-// Using context in bloc
+  // Using context in bloc
 }
 
 // GOOD: Should NOT trigger avoid_bloc_context_dependency
 class _good585_MyBloc extends Bloc<MyEvent, MyState> {
   _good585_MyBloc(MyRepository repository) : super(MyInitial()) {}
-// Inject dependencies, not context
+  // Inject dependencies, not context
 }

@@ -116,8 +116,5 @@ void _bad1400() {
 
 // GOOD: Should NOT trigger avoid_icon_size_override
 void _good1400() {
-  IconTheme(
-    data: IconThemeData(size: 24),
-    child: Icon(Icons.home),
-  );
+  IconTheme(data: IconThemeData(size: 24), child: Icon(Icons.home));
 }

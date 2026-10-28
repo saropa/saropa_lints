@@ -426,10 +426,8 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
   }
 
   String? _getParameterName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter) {
       return param.name?.lexeme;
-    } else if (param is DefaultFormalParameter) {
-      return _getParameterName(param.parameter);
     } else if (param is FieldFormalParameter) {
       return param.name.lexeme;
     }
@@ -1026,10 +1024,8 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
   }
 
   String? _getParameterName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter) {
       return param.name?.lexeme;
-    } else if (param is DefaultFormalParameter) {
-      return _getParameterName(param.parameter);
     } else if (param is FieldFormalParameter) {
       return param.name.lexeme;
     } else if (param is SuperFormalParameter) {

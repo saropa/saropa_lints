@@ -176,16 +176,12 @@ bool hasAncestorMountedCheck(AstNode node) {
 /// Returns true for `BuildContext`, `BuildContext?`, or any type containing
 /// `BuildContext` (e.g., generic types).
 bool isBuildContextParam(FormalParameter param) {
-  if (param is SimpleFormalParameter) {
+  if (param is RegularFormalParameter) {
     final typeSource = param.type?.toSource();
     if (typeSource == null) return false;
     return typeSource == 'BuildContext' ||
         typeSource == 'BuildContext?' ||
         typeSource.contains('BuildContext');
-  }
-
-  if (param is DefaultFormalParameter) {
-    return isBuildContextParam(param.parameter);
   }
 
   return false;
@@ -196,7 +192,7 @@ bool isBuildContextParam(FormalParameter param) {
 /// Useful for tracking context parameter names in static methods where
 /// the parameter might not be named 'context'.
 String? getBuildContextParamName(FormalParameter param) {
-  if (param is SimpleFormalParameter) {
+  if (param is RegularFormalParameter) {
     final typeSource = param.type?.toSource();
     if (typeSource == null) return null;
     if (typeSource == 'BuildContext' ||
@@ -204,10 +200,6 @@ String? getBuildContextParamName(FormalParameter param) {
         typeSource.contains('BuildContext')) {
       return param.name?.lexeme;
     }
-  }
-
-  if (param is DefaultFormalParameter) {
-    return getBuildContextParamName(param.parameter);
   }
 
   return null;

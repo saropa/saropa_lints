@@ -132,7 +132,7 @@ bool _isAllowlistedConstructor(InstanceCreationExpression node) {
   // Only allowlist when the call has at most the expected positional count —
   // unusual overloads should still be checked.
   final positionalCount = node.argumentList.arguments
-      .where((arg) => arg is! NamedExpression)
+      .where((arg) => arg is! NamedArgument)
       .length;
   return positionalCount <= maxArgs;
 }

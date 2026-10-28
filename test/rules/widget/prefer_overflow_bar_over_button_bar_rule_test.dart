@@ -118,7 +118,7 @@ void f({int a = 0, int b = 0, int c = 0}) {}
         featureSet: FeatureSet.latestLanguageVersion(),
         throwIfDiagnostics: false,
       );
-      NamedExpression? named;
+      NamedArgument? named;
       result.unit.accept(_FindNamedArgVisitor('b', (n) => named = n));
       expect(named, isNotNull);
       final range = sourceRangeForDeletingNamedArgument(result.content, named!);
@@ -166,8 +166,7 @@ class _OverflowBarIceVisitor extends RecursiveAstVisitor<void> {
         compilationUnit: unit,
       )) {
         for (final arg in node.argumentList.arguments) {
-          if (arg is NamedExpression &&
-              arg.name.label.name == 'buttonBarTheme') {
+          if (arg is NamedArgument && arg.name.lexeme == 'buttonBarTheme') {
             count++;
             break;
           }
@@ -192,7 +191,7 @@ class _OverflowBarIceVisitor extends RecursiveAstVisitor<void> {
     if (m == 'ThemeData') {
       if (compilationUnitDeclaresClassLikeName(unit, 'ThemeData')) return;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'buttonBarTheme') {
+        if (arg is NamedArgument && arg.name.lexeme == 'buttonBarTheme') {
           count++;
           return;
         }
@@ -206,13 +205,13 @@ class _FindNamedArgVisitor extends RecursiveAstVisitor<void> {
   _FindNamedArgVisitor(this.name, this.onFound);
 
   final String name;
-  final void Function(NamedExpression node) onFound;
+  final void Function(NamedArgument node) onFound;
 
   @override
-  void visitNamedExpression(NamedExpression node) {
-    if (node.name.label.name == name) {
+  void visitNamedArgument(NamedArgument node) {
+    if (node.name.lexeme == name) {
       onFound(node);
     }
-    super.visitNamedExpression(node);
+    super.visitNamedArgument(node);
   }
 }

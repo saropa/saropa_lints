@@ -66,6 +66,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.0.0] — Unreleased
+
+Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 projects on the frozen 16.x line. [log](https://github.com/saropa/saropa_lints/blob/v17.0.0/CHANGELOG.md)
+
+### Changed
+
+- **Breaking:** saropa_lints now requires `analyzer >=13.0.0 <15.0.0`, and pub picks the newest allowed by your Dart version (3.9 and 3.10 get 13.0.0, 3.11 and 3.12 up to 14.5.0, 3.13 14.6.0); projects held on analyzer 12 stay on `saropa_lints: ^16.7.0`, which is frozen with no back-ports.
+- `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended`; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
+- Reports on named arguments now highlight only the argument name instead of the whole `name: value` text, so editor squiggles and `// ignore:` placement for those reports shift to the name; no action required.
+- Widget rules that match by name no longer match record fields that share a widget's name, which removes false positives; no action required.
+
 ## [16.10.0]
 
 Restores installation on Flutter 3.44 and older, and renames one rule whose name matched a core analyzer diagnostic. [log](https://github.com/saropa/saropa_lints/blob/v16.10.0/CHANGELOG.md)

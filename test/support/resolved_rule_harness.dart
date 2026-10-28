@@ -33,7 +33,7 @@ import 'package:analyzer/dart/element/type_system.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/file_system/overlay_file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/string_source.dart';
+import 'package:analyzer/source/file_source.dart';
 import 'package:analyzer/workspace/workspace.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart';
@@ -108,6 +108,9 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
   String fileStem = 'fixture',
   Directory? projectRoot,
 }) async {
+  // Fixtures outside example/ have no `lane: full` config; never let the
+  // default light lane gate the rule under test.
+  setActiveRuleLane(RuleLane.full);
   final libDir = projectRoot == null
       ? p.normalize(p.absolute(p.join('example', 'lib')))
       : p.normalize(p.absolute(p.join(projectRoot.path, 'lib')));
@@ -178,7 +181,7 @@ Future<List<HarnessDiagnostic>> _runLocked(
     final listener = RecordingDiagnosticListener();
     final reporter = DiagnosticReporter(
       listener,
-      StringSource(result.content, path),
+      FileSource(provider.getFile(path)),
     );
     final ctxUnit = RuleContextUnit(
       file: provider.getFile(path),

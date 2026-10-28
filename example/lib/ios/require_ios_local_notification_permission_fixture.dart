@@ -119,7 +119,8 @@ void _good861() async {
   // Request permission first
   final granted = await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>()
+        IOSFlutterLocalNotificationsPlugin
+      >()
       ?.requestPermissions(alert: true, badge: true, sound: true);
 
   if (granted ?? false) {

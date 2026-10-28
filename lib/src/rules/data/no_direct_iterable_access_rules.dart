@@ -390,7 +390,7 @@ class NoDirectIterableAccessRule extends SaropaLintRule {
       if (expression.methodName.name != 'checkValidIndex') continue;
       if (expression.target?.toSource() != 'RangeError') continue;
 
-      final NodeList<Expression> args = expression.argumentList.arguments;
+      final NodeList<Argument> args = expression.argumentList.arguments;
       if (args.length < 2) continue;
       if (args[0].toSource() == indexSource &&
           args[1].toSource() == targetSource) {

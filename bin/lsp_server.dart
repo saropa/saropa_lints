@@ -166,15 +166,12 @@ void main(List<String> args) {
   // below the Dart runtime and bypass this handler entirely — the async I/O
   // conversions in _analyzeWorkspace/_prewarm are the real fix for thread-
   // pool exhaustion, not this zone.
-  runZonedGuarded(
-    () => _startServer(args),
-    (error, stack) {
-      _log('fatal uncaught error: $error');
-      _logTrace('stack: $stack');
-      // Exit 1 so VS Code shows "server exited" instead of looping.
-      exit(1);
-    },
-  );
+  runZonedGuarded(() => _startServer(args), (error, stack) {
+    _log('fatal uncaught error: $error');
+    _logTrace('stack: $stack');
+    // Exit 1 so VS Code shows "server exited" instead of looping.
+    exit(1);
+  });
 }
 
 /// Inner entry point wrapped by runZonedGuarded — reads JSON-RPC messages
@@ -366,7 +363,9 @@ Future<void> _handleMessage(Map<String, dynamic> message) async {
       // enables high-frequency _logTrace output; 'messages'/'off' suppress.
       final traceValue = params['value'] as String? ?? 'off';
       _traceEnabled = traceValue == 'verbose';
-      _log('setTrace: $traceValue (trace logging ${_traceEnabled ? 'on' : 'off'})');
+      _log(
+        'setTrace: $traceValue (trace logging ${_traceEnabled ? 'on' : 'off'})',
+      );
     case 'workspace/didChangeConfiguration':
       // Cancel any running or deferred workspace scan — its results are
       // about to be invalidated by the config change anyway.
@@ -430,10 +429,7 @@ Map<String, dynamic> _handleInitialize() {
       // We provide quick-fix code actions (Phase 2).
       'codeActionProvider': true,
     },
-    'serverInfo': {
-      'name': 'saropa_lints_lsp',
-      'version': '1.0.0',
-    },
+    'serverInfo': {'name': 'saropa_lints_lsp', 'version': '1.0.0'},
   };
 }
 
@@ -473,8 +469,10 @@ void _parseInitializationOptions(Map<String, dynamic> params) {
   try {
     final raw = params['initializationOptions'];
     if (raw is! Map<String, dynamic>) {
-      _log('no initializationOptions — using defaults '
-          '(workspaceScan: true, dirs: [lib, bin, test])');
+      _log(
+        'no initializationOptions — using defaults '
+        '(workspaceScan: true, dirs: [lib, bin, test])',
+      );
       return;
     }
 
@@ -492,8 +490,10 @@ void _parseInitializationOptions(Map<String, dynamic> params) {
         _scanDirectories = valid;
       }
       if (valid.length != dirs.length) {
-        _log('warning: scanDirectories contained non-string entries, '
-            'ignored ${dirs.length - valid.length} invalid value(s)');
+        _log(
+          'warning: scanDirectories contained non-string entries, '
+          'ignored ${dirs.length - valid.length} invalid value(s)',
+        );
       }
     }
 
@@ -506,12 +506,16 @@ void _parseInitializationOptions(Map<String, dynamic> params) {
       _workspaceScanDelaySecs = delay.toInt().clamp(0, 60);
     }
 
-    _log('initializationOptions: workspaceScan=$_workspaceScanEnabled, '
-        'delay=${_workspaceScanDelaySecs}s, dirs=$_scanDirectories');
+    _log(
+      'initializationOptions: workspaceScan=$_workspaceScanEnabled, '
+      'delay=${_workspaceScanDelaySecs}s, dirs=$_scanDirectories',
+    );
   } on Object catch (e) {
     // Parse failure must never break the handshake — fall back to defaults.
-    _log('warning: failed to parse initializationOptions ($e), '
-        'using defaults');
+    _log(
+      'warning: failed to parse initializationOptions ($e), '
+      'using defaults',
+    );
   }
 }
 
@@ -663,8 +667,10 @@ Future<void> _analyzeWorkspace(String root) async {
     // scanDirectories to stay under the cap.
     const maxFiles = 5000;
     if (dartFiles.length > maxFiles) {
-      _log('workspace scan: ${dartFiles.length} files exceeds $maxFiles cap, '
-          'scanning first $maxFiles only — narrow scanDirectories to cover all');
+      _log(
+        'workspace scan: ${dartFiles.length} files exceeds $maxFiles cap, '
+        'scanning first $maxFiles only — narrow scanDirectories to cover all',
+      );
       dartFiles.length = maxFiles;
     }
 
@@ -683,8 +689,10 @@ Future<void> _analyzeWorkspace(String root) async {
       // Check cancellation between batches so shutdown/config-reload
       // aborts the mtime-check phase promptly.
       if (_workspaceScanCanceled) {
-        _log('workspace scan: canceled during mtime check '
-            '(${filesToAnalyze.length} files queued so far)');
+        _log(
+          'workspace scan: canceled during mtime check '
+          '(${filesToAnalyze.length} files queued so far)',
+        );
         return;
       }
 
@@ -724,8 +732,10 @@ Future<void> _analyzeWorkspace(String root) async {
     }
 
     if (skippedUnchanged > 0) {
-      _log('workspace scan: $skippedUnchanged unchanged files skipped '
-          '(incremental)');
+      _log(
+        'workspace scan: $skippedUnchanged unchanged files skipped '
+        '(incremental)',
+      );
     }
 
     final totalToAnalyze = filesToAnalyze.length;
@@ -755,9 +765,11 @@ Future<void> _analyzeWorkspace(String root) async {
       // new scan superseding this one sets the flag. Diagnostics published
       // so far remain valid (each _analyzeFile publishes incrementally).
       if (_workspaceScanCanceled || _collection == null) {
-        _log('workspace scan: canceled after $analyzed/$totalToAnalyze files, '
-            '$diagnosticCount diagnostic(s) published '
-            'in ${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s');
+        _log(
+          'workspace scan: canceled after $analyzed/$totalToAnalyze files, '
+          '$diagnosticCount diagnostic(s) published '
+          'in ${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s',
+        );
         // Terminal tick on cancellation: `done: true` tells the client this
         // scan has ended, even though filesScanned < totalFiles. Without it
         // the engine card stays stuck showing "scanning 300/1900" forever.
@@ -790,8 +802,10 @@ Future<void> _analyzeWorkspace(String root) async {
       // alive — especially useful on large projects where the full scan
       // takes minutes.
       if (analyzed % progressInterval == 0) {
-        _log('workspace scan: $analyzed/$totalToAnalyze files '
-            '($diagnosticCount diagnostics so far)');
+        _log(
+          'workspace scan: $analyzed/$totalToAnalyze files '
+          '($diagnosticCount diagnostics so far)',
+        );
         _sendScanProgress(
           filesScanned: analyzed,
           totalFiles: totalToAnalyze,
@@ -823,8 +837,10 @@ Future<void> _analyzeWorkspace(String root) async {
     // A filesystem error (permission denied, symlink cycle, path deleted
     // mid-walk) must not crash the isolate — the scan is fire-and-forget
     // via unawaited(), so an unhandled error would be an uncaught future.
-    _log('workspace scan failed after '
-        '${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s: $e');
+    _log(
+      'workspace scan failed after '
+      '${(sw.elapsedMilliseconds / 1000).toStringAsFixed(1)}s: $e',
+    );
     _logTrace('workspace scan stack trace: $st');
   }
 }
@@ -926,22 +942,19 @@ void _handleDidOpen(Map<String, dynamic> params) {
   _didOpenDebounce?.cancel();
   _pendingDidOpenParams = params;
 
-  _didOpenDebounce = Timer(
-    Duration(milliseconds: _didOpenDebounceMs),
-    () {
-      final pending = _pendingDidOpenParams;
-      _pendingDidOpenParams = null;
-      if (pending == null) return;
+  _didOpenDebounce = Timer(Duration(milliseconds: _didOpenDebounceMs), () {
+    final pending = _pendingDidOpenParams;
+    _pendingDidOpenParams = null;
+    if (pending == null) return;
 
-      // Enqueue a synthetic message so analysis runs inside _processQueue's
-      // sequential loop, preventing concurrent analysis with didSave.
-      _messageQueue.add({
-        'method': '_internal/analyzeFromDidOpen',
-        'params': pending,
-      });
-      _processQueue();
-    },
-  );
+    // Enqueue a synthetic message so analysis runs inside _processQueue's
+    // sequential loop, preventing concurrent analysis with didSave.
+    _messageQueue.add({
+      'method': '_internal/analyzeFromDidOpen',
+      'params': pending,
+    });
+    _processQueue();
+  });
 }
 
 /// Runs saropa_lints rules against the file identified in [params] and
@@ -1059,10 +1072,7 @@ int _lspSeverity(String severity) {
 }
 
 /// Sends a textDocument/publishDiagnostics notification to the client.
-void _publishDiagnostics(
-  String uri,
-  List<Map<String, dynamic>> diagnostics,
-) {
+void _publishDiagnostics(String uri, List<Map<String, dynamic>> diagnostics) {
   _sendNotification('textDocument/publishDiagnostics', {
     'uri': uri,
     'diagnostics': diagnostics,
@@ -1177,9 +1187,7 @@ Future<List<Map<String, dynamic>>> _handleCodeAction(
     final diagnostic = _buildDiagnostic(diag, resolvedUnit);
 
     // Build the workspace and fix context needed by the correction producer.
-    final workspace = DartChangeWorkspace(
-      [resolvedUnit.session],
-    );
+    final workspace = DartChangeWorkspace([resolvedUnit.session]);
     final fixContext = DartFixContext(
       instrumentationService: InstrumentationService.NULL_SERVICE,
       workspace: workspace,
@@ -1317,12 +1325,12 @@ Map<String, int> _offsetToPosition(String content, int offset) {
 /// matter for fix dispatch — the rest is pass-through.
 class _ScanDiagnosticCode extends DiagnosticCode {
   _ScanDiagnosticCode(String ruleName, String severityStr)
-      : _severity = _parseSeverity(severityStr),
-        super(
-          name: ruleName,
-          problemMessage: ruleName,
-          uniqueName: 'saropa_lints.$ruleName',
-        );
+    : _severity = _parseSeverity(severityStr),
+      super(
+        name: ruleName,
+        problemMessage: ruleName,
+        uniqueName: 'saropa_lints.$ruleName',
+      );
 
   /// Converts a ScanDiagnostic severity string to the analyzer enum.
   static DiagnosticSeverity _parseSeverity(String s) {

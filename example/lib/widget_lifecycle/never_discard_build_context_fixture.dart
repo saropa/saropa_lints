@@ -212,8 +212,7 @@ class _UntypedUnusedState extends State<StatefulWidget> {
 // to deliver `snapshot`; the context parameter is incidental and resolves the
 // same scope the enclosing build() already has, so discarding it is idiomatic.
 // This was the single largest source of v1 false positives.
-class _GoodFutureBuilderDiscardedContextState
-    extends State<StatefulWidget> {
+class _GoodFutureBuilderDiscardedContextState extends State<StatefulWidget> {
   Future<String>? _future;
 
   @override
@@ -228,8 +227,7 @@ class _GoodFutureBuilderDiscardedContextState
 }
 
 // GOOD: StreamBuilder — same reasoning as FutureBuilder above.
-class _GoodStreamBuilderDiscardedContextState
-    extends State<StatefulWidget> {
+class _GoodStreamBuilderDiscardedContextState extends State<StatefulWidget> {
   Stream<String>? _stream;
 
   @override
@@ -245,8 +243,7 @@ class _GoodStreamBuilderDiscardedContextState
 
 // GOOD: AnimatedBuilder's callback exists to signal a repaint driven by the
 // animation, not to scope a context — discarding the context is the norm.
-class _GoodAnimatedBuilderDiscardedContextState
-    extends State<StatefulWidget> {
+class _GoodAnimatedBuilderDiscardedContextState extends State<StatefulWidget> {
   // `ValueNotifier` implements `Listenable`, which is all AnimatedBuilder
   // needs — avoids the mock AnimationController's required `vsync`.
   final ValueNotifier<int> _repaint = ValueNotifier<int>(0);

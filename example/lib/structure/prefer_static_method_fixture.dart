@@ -174,7 +174,9 @@ class _ImplicitAccessState {
   // must still lint. Regression case for the cascade/target-detection gap.
   // expect_lint: prefer_static_method
   int cascadeOnLocalGood(int x, int y) {
-    final List<int> values = <int>[]..add(x)..add(y);
+    final List<int> values = <int>[]
+      ..add(x)
+      ..add(y);
     return values.length;
   }
 

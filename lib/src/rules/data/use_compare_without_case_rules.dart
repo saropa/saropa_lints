@@ -166,11 +166,13 @@ class UseCompareWithoutCaseRule extends SaropaLintRule {
     if (compareToCall.methodName.name != 'compareTo') return null;
 
     final Expression? target = compareToCall.target;
-    final List<Expression> args = compareToCall.argumentList.arguments;
+    final List<Argument> args = compareToCall.argumentList.arguments;
     if (target == null || args.length != 1) return null;
-    if (!_isStringTyped(target) || !_isStringTyped(args.first)) return null;
+    if (!_isStringTyped(target) ||
+        !_isStringTyped(args.first.argumentExpression))
+      return null;
 
-    return _StringPair(target, args.first);
+    return _StringPair(target, args.first.argumentExpression);
   }
 
   /// True when [expr]'s static type is exactly `String` (nullable or not) —

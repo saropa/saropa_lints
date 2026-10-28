@@ -121,8 +121,5 @@ void _good19() {
     semanticLabel: 'Product photo showing blue widget',
   );
   // Or for decorative images:
-  Image.asset(
-    'assets/decoration.png',
-    excludeFromSemantics: true,
-  );
+  Image.asset('assets/decoration.png', excludeFromSemantics: true);
 }

@@ -18,8 +18,8 @@ String _bad(int x) {
 
 // GOOD: Should NOT trigger prefer_switch_expression
 String _good(int x) => switch (x) {
-      // Switch expression
-      1 => 'one',
-      2 => 'two',
-      _ => 'other',
-    };
+  // Switch expression
+  1 => 'one',
+  2 => 'two',
+  _ => 'other',
+};

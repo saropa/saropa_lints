@@ -112,9 +112,7 @@ final items = <dynamic>[];
 // BAD: Should trigger prefer_cached_network_image
 // expect_lint: prefer_cached_network_image
 void _bad1393() {
-  SliverList(
-    delegate: SliverChildListDelegate(items),
-  );
+  SliverList(delegate: SliverChildListDelegate(items));
 }
 
 // GOOD: Should NOT trigger prefer_cached_network_image

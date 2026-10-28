@@ -103,10 +103,7 @@ void testAvoidInstantiatingInValueProvider() {
   final existingService = AuthService();
 
   // GOOD: Using existing instance in value
-  final good1 = Provider.value(
-    value: existingService,
-    child: Container(),
-  );
+  final good1 = Provider.value(value: existingService, child: Container());
 
   // GOOD: Creating new instance with create
   final good2 = Provider<AuthService>(

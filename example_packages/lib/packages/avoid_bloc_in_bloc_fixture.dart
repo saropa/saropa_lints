@@ -129,10 +129,11 @@ class _bad559_OrderBloc extends Bloc<OrderEvent, OrderState> {
 void _good559() {
   // Coordinate in widget or use streams
   BlocListener<OrderBloc, OrderState>(
-      listener: (context, state) {
-        if (state is OrderPlaced) {
-          context.read<UserBloc>().add(UpdatePoints());
-        }
-      },
-      child: child);
+    listener: (context, state) {
+      if (state is OrderPlaced) {
+        context.read<UserBloc>().add(UpdatePoints());
+      }
+    },
+    child: child,
+  );
 }

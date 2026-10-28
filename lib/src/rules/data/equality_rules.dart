@@ -439,7 +439,7 @@ class NoEqualArgumentsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addArgumentList((ArgumentList node) {
-      final List<Expression> args = node.arguments.toList();
+      final List<Argument> args = node.arguments.toList();
       if (args.length < 2) return;
 
       // Constructors/factories where equal positional arguments are
@@ -453,9 +453,9 @@ class NoEqualArgumentsRule extends SaropaLintRule {
 
       // Check positional arguments for duplicates
       final Set<String> seen = <String>{};
-      for (final Expression arg in args) {
+      for (final Argument arg in args) {
         // Skip named arguments for this check
-        if (arg is NamedExpression) continue;
+        if (arg is NamedArgument) continue;
 
         // Skip numeric literals - it's common to have Alignment(0.7, 0.7),
         // Offset(10, 10), Size(100, 100), etc.
@@ -749,7 +749,7 @@ class AvoidNullChecksInEqualityOperatorsRule extends SaropaLintRule {
       // comparisons specifically against it (not any other identifier).
       final FormalParameter? firstParam =
           node.parameters?.parameters.firstOrNull;
-      if (firstParam is! SimpleFormalParameter) return;
+      if (firstParam is! RegularFormalParameter) return;
       final String? paramName = firstParam.name?.lexeme;
       if (paramName == null) return;
 
@@ -789,9 +789,9 @@ class _NullCheckVisitor extends RecursiveAstVisitor<void> {
     // idiomatic spelling of a reference-equality null check.
     if (node.methodName.name == 'identical' &&
         node.argumentList.arguments.length == 2) {
-      final Expression a = node.argumentList.arguments[0];
-      final Expression b = node.argumentList.arguments[1];
-      if (_isParamNullPair(a, b)) {
+      final Argument a = node.argumentList.arguments[0];
+      final Argument b = node.argumentList.arguments[1];
+      if (_isParamNullPair(a.argumentExpression, b.argumentExpression)) {
         _reporter.atNode(node);
       }
     }

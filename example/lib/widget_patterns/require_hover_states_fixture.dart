@@ -110,10 +110,7 @@ dynamic child;
 // BAD: Should trigger require_hover_states
 // expect_lint: require_hover_states
 void _bad1418() {
-  InkWell(
-    onTap: () => doSomething(),
-    child: MyButton(),
-  );
+  InkWell(onTap: () => doSomething(), child: MyButton());
 }
 
 // GOOD: Should NOT trigger require_hover_states

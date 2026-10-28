@@ -52,12 +52,12 @@ class _BadCanonical extends State<StatefulWidget>
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () {
-          // expect_lint: prefer_animation_controller_forward_from_zero
-          _controller.forward();
-        },
-        child: Container(),
-      );
+    onTap: () {
+      // expect_lint: prefer_animation_controller_forward_from_zero
+      _controller.forward();
+    },
+    child: Container(),
+  );
 }
 
 // Three press callbacks on the same controller — each is its own site.
@@ -80,20 +80,20 @@ class _BadMultipleGestures extends State<StatefulWidget>
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () {
-          // expect_lint: prefer_animation_controller_forward_from_zero
-          _controller.forward();
-        },
-        onLongPress: () {
-          // expect_lint: prefer_animation_controller_forward_from_zero
-          _controller.forward();
-        },
-        onDoubleTap: () {
-          // expect_lint: prefer_animation_controller_forward_from_zero
-          _controller.forward();
-        },
-        child: Container(),
-      );
+    onTap: () {
+      // expect_lint: prefer_animation_controller_forward_from_zero
+      _controller.forward();
+    },
+    onLongPress: () {
+      // expect_lint: prefer_animation_controller_forward_from_zero
+      _controller.forward();
+    },
+    onDoubleTap: () {
+      // expect_lint: prefer_animation_controller_forward_from_zero
+      _controller.forward();
+    },
+    child: Container(),
+  );
 }
 
 // Arrow-form gesture callback — same detection.
@@ -114,10 +114,10 @@ class _BadArrowCallback extends State<StatefulWidget>
 
   @override
   Widget build(BuildContext context) => IconButton(
-        // expect_lint: prefer_animation_controller_forward_from_zero
-        onPressed: () => _controller.forward(),
-        icon: Container(),
-      );
+    // expect_lint: prefer_animation_controller_forward_from_zero
+    onPressed: () => _controller.forward(),
+    icon: Container(),
+  );
 }
 
 // ============================================================================
@@ -142,9 +142,9 @@ class _GoodFromZero extends State<StatefulWidget>
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () => _controller.forward(from: 0.0),
-        child: Container(),
-      );
+    onTap: () => _controller.forward(from: 0.0),
+    child: Container(),
+  );
 }
 
 // Equivalent reset-then-forward pair.
@@ -165,12 +165,12 @@ class _GoodResetThenForward extends State<StatefulWidget>
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () {
-          _controller.reset();
-          _controller.forward();
-        },
-        child: Container(),
-      );
+    onTap: () {
+      _controller.reset();
+      _controller.forward();
+    },
+    child: Container(),
+  );
 }
 
 // Deliberate resume from current value — user intent, not a bug.
@@ -191,9 +191,9 @@ class _GoodExplicitResume extends State<StatefulWidget>
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: () => _controller.forward(from: _controller.value),
-        child: Container(),
-      );
+    onTap: () => _controller.forward(from: _controller.value),
+    child: Container(),
+  );
 }
 
 // No status listener — plain forward() in a gesture is fine.
@@ -205,10 +205,8 @@ class _GoodNoStatusListener extends State<StatefulWidget>
   );
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () => _controller.forward(),
-        child: Container(),
-      );
+  Widget build(BuildContext context) =>
+      GestureDetector(onTap: () => _controller.forward(), child: Container());
 }
 
 // Status listener calls reset() instead of reverse() — no sticky case.
@@ -228,10 +226,8 @@ class _GoodListenerCallsReset extends State<StatefulWidget>
   }
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () => _controller.forward(),
-        child: Container(),
-      );
+  Widget build(BuildContext context) =>
+      GestureDetector(onTap: () => _controller.forward(), child: Container());
 }
 
 // forward() in initState is a one-shot entry animation, not a gesture.
@@ -300,10 +296,8 @@ class _GoodOtherControllerListener extends State<StatefulWidget>
   }
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () => _this.forward(),
-        child: Container(),
-      );
+  Widget build(BuildContext context) =>
+      GestureDetector(onTap: () => _this.forward(), child: Container());
 }
 
 // Non-AnimationController custom type with a forward() method. Type gate
@@ -316,8 +310,6 @@ class _GoodNonControllerForward extends State<StatefulWidget> {
   final _NotAController _thing = _NotAController();
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () => _thing.forward(),
-        child: Container(),
-      );
+  Widget build(BuildContext context) =>
+      GestureDetector(onTap: () => _thing.forward(), child: Container());
 }

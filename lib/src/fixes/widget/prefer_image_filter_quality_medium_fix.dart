@@ -11,7 +11,7 @@ import '../../rules/widget/image_filter_quality_detection.dart';
 /// (e.g. `ui.FilterQuality.low` → `ui.FilterQuality.medium`).
 ///
 /// Triggered when the diagnostic is anchored on the `filterQuality:` label;
-/// `coveringNode` is resolved to the enclosing [NamedExpression] and only the
+/// `coveringNode` is resolved to the enclosing [NamedArgument] and only the
 /// value expression is rewritten.
 class PreferImageFilterQualityMediumFix extends SaropaFixProducer {
   PreferImageFilterQualityMediumFix({required super.context});
@@ -30,10 +30,10 @@ class PreferImageFilterQualityMediumFix extends SaropaFixProducer {
     final AstNode? node = coveringNode;
     if (node == null) return;
 
-    final NamedExpression? named = node.thisOrAncestorOfType<NamedExpression>();
-    if (named == null || named.name.label.name != 'filterQuality') return;
+    final NamedArgument? named = node.thisOrAncestorOfType<NamedArgument>();
+    if (named == null || named.name.lexeme != 'filterQuality') return;
 
-    final Expression value = named.expression;
+    final Expression value = named.argumentExpression;
     if (!ImageFilterQualityLowDetection.isFilterQualityLowValue(value)) {
       return;
     }

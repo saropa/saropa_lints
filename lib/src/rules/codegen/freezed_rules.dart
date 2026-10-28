@@ -425,13 +425,8 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   bool _isComplexType(FormalParameter param) {
     TypeAnnotation? type;
 
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter) {
       type = param.type;
-    } else if (param is DefaultFormalParameter) {
-      final FormalParameter innerParam = param.parameter;
-      if (innerParam is SimpleFormalParameter) {
-        type = innerParam.type;
-      }
     }
 
     if (type is NamedType) {
@@ -582,27 +577,16 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
   }
 
   bool _isNullableWithoutDefault(FormalParameter param) {
-    // Handle DefaultFormalParameter (optional parameters)
-    FormalParameter actualParam = param;
-    if (param is DefaultFormalParameter) {
-      actualParam = param.parameter;
-    }
-
     // Check if parameter has @Default annotation
-    final NodeList<Annotation>? metadata = actualParam is NormalFormalParameter
-        ? actualParam.metadata
-        : null;
-    if (metadata != null) {
-      for (final Annotation annotation in metadata) {
-        if (annotation.name.name == 'Default') {
-          return false; // Already has @Default
-        }
+    for (final Annotation annotation in param.metadata) {
+      if (annotation.name.name == 'Default') {
+        return false; // Already has @Default
       }
     }
 
     // Check if type is nullable
-    if (actualParam is SimpleFormalParameter) {
-      final TypeAnnotation? type = actualParam.type;
+    if (param is RegularFormalParameter) {
+      final TypeAnnotation? type = param.type;
       if (type is NamedType) {
         // Check for ? suffix indicating nullable
         if (type.question != null) {
@@ -713,12 +697,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
 
           for (final FormalParameter param in params.parameters) {
             String? typeSource;
-            if (param is DefaultFormalParameter) {
-              final NormalFormalParameter inner = param.parameter;
-              if (inner is SimpleFormalParameter) {
-                typeSource = inner.type?.toSource();
-              }
-            } else if (param is SimpleFormalParameter) {
+            if (param is RegularFormalParameter) {
               typeSource = param.type?.toSource();
             }
 

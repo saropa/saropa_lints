@@ -111,15 +111,10 @@ final key = 'key';
 // BAD: Should trigger avoid_form_without_key
 // expect_lint: avoid_form_without_key
 void _bad1391() {
-  Form(
-    child: Column(),
-  );
+  Form(child: Column());
 }
 
 // GOOD: Should NOT trigger avoid_form_without_key
 void _good1391() {
-  Form(
-    key: _formKey,
-    child: Column(),
-  );
+  Form(key: _formKey, child: Column());
 }
