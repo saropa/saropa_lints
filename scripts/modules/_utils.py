@@ -61,103 +61,50 @@ def strip_prerelease_suffix(version: str) -> str:
     return version.split("-", 1)[0]
 
 
-# Base offset band added to PATCH for every prerelease extension version.
-# Large enough that it will never collide with a genuine stable PATCH
-# release (this project's patch history tops out in the low teens), small
-# enough to stay legible. See extension_version_for() for why this exists.
-_PRERELEASE_PATCH_OFFSET = 500
-
-# Second band, added on top of _PRERELEASE_PATCH_OFFSET, derived from the
-# prerelease CHANNEL name (the "beta" in "beta.1") so different channels of
-# the same base version ("16.0.0-beta.1" vs "16.0.0-rc.1") don't collide —
-# the version prompt accepts any channel tag, not just "beta". Bounded to
-# keep the final number readable; collisions between two DIFFERENT channel
-# names are reduced, not mathematically ruled out (this is a hash band, not
-# a registry of issued versions).
-_PRERELEASE_CHANNEL_BAND = 1000
-
 _PRERELEASE_ITERATION_RE = _re.compile(r"(\d+)\s*$")
 
-
-def suggest_even_minor_stable(version: str) -> str:
-    """Return *version* with an odd minor bumped to the next even minor.
-
-    ``16.7.0`` -> ``16.8.0``. Even-minor and prerelease versions are
-    returned unchanged.
-    """
-    if is_prerelease_version(version):
-        return version
-    major, minor, _patch = version.split(".")
-    if int(minor) % 2 == 0:
-        return version
-    return f"{major}.{int(minor) + 1}.0"
-
-
-def stable_version_error(version: str) -> str | None:
-    """Return an error message if *version* is an unsafe stable release.
-
-    Stable versions with an ODD minor are refused: ``extension_version_for``
-    treats odd minors as already-converted prerelease values and leaves them
-    unchanged, so e.g. 16.7.0 would publish as extension 16.7.0 -- lower than
-    an already-published 16.8.0. Prerelease versions (any minor) are allowed.
-    Returns None when the version is acceptable. Does not affect
-    ``extension_version_for`` idempotency (validation only).
-    """
-    if is_prerelease_version(version):
-        return None
-    parts = version.split(".")
-    if len(parts) != 3 or not parts[1].isdigit():
-        return None  # format errors are reported by the regex check
-    if int(parts[1]) % 2 == 0:
-        return None
-    return (
-        "Stable versions must have an even minor (e.g. "
-        f"{parts[0]}.{int(parts[1]) + 1}.0) because the extension maps odd "
-        "minors to pre-release; odd-minor stable would produce an extension "
-        "version lower than an already-published one. "
-        f"Use {suggest_even_minor_stable(version)}."
-    )
+# Each Dart package patch P owns ten extension patches 10*P .. 10*P+9
+# ("fixed slots"): slots 0-8 are prerelease iterations 1-9, slot 9 is stable.
+_STABLE_SLOT = 9
+_MAX_PRERELEASE_ITERATION = 9
 
 
 def extension_version_for(version: str) -> str:
     """Return the extension/package.json version to publish for *version*.
 
-    VS Code uses an odd/even minor convention: odd minor = pre-release,
-    even minor = stable. Both stable and prerelease versions get their
-    MINOR adjusted so stable always supersedes its betas numerically.
+    *version* must ALWAYS be the Dart package version (never an already
+    converted value): the mapping is not idempotent.
 
-    Prerelease (e.g. "16.0.0-beta.1") → odd minor, offset patch:
-    ``16.1.913``.  The PATCH is offset by _PRERELEASE_PATCH_OFFSET plus
-    a channel-derived band plus the iteration number, so successive beta
-    iterations produce distinct versions.
+    The extension shares the package's MAJOR.MINOR always; only the PATCH
+    differs. With P the package patch, extension patch = ``10*P + slot``:
 
-    Stable (e.g. "16.10.0") -> returned unchanged: extension and Dart
-    package versions must always be equal.
+    - Prerelease ``X.Y.Z-<channel>.N`` -> slot N-1 (N in 1..9; a bare
+      ``-beta`` counts as N=1). N > 9 raises ValueError.
+    - Stable -> slot 9.
 
-    **Idempotency:** a converted prerelease value has no ``-``, so it takes
-    the stable path and is returned unchanged.
+    Examples: 17.0.0-beta.1 -> 17.0.0, 17.0.0-beta.2 -> 17.0.1,
+    17.0.0 -> 17.0.9, 17.0.1-beta.1 -> 17.0.10, 17.0.1 -> 17.0.19.
+    Every successive publish is strictly higher, and a stable always beats
+    its prereleases. The channel name is ignored, so ``-alpha.1`` and
+    ``-beta.1`` of the same patch share a slot and must not both be
+    published.
     """
-    base = strip_prerelease_suffix(version)
-    major, minor, patch = base.split(".")
-    minor_int = int(minor)
-
+    major, minor, patch = strip_prerelease_suffix(version).split(".")
     if is_prerelease_version(version):
-        # Odd minor for prerelease so VS Code's "Switch to Pre-Release" works.
-        prerelease_minor = minor_int | 1
         suffix = version.split("-", 1)[1]
         match = _PRERELEASE_ITERATION_RE.search(suffix)
         iteration = int(match.group(1)) if match else 1
-        channel = suffix[: match.start()].rstrip(".") if match else suffix
-        channel_band = sum(ord(c) for c in channel) % _PRERELEASE_CHANNEL_BAND
-        new_patch = (
-            int(patch) + _PRERELEASE_PATCH_OFFSET + channel_band + iteration
-        )
-        return f"{major}.{prerelease_minor}.{new_patch}"
-
-    # Stable: the extension version ALWAYS equals the Dart package version.
-    # (Only prereleases are converted, because vsce rejects a hyphenated
-    # version.) Never add an independent bump here.
-    return f"{major}.{minor_int}.{patch}"
+        if not 1 <= iteration <= _MAX_PRERELEASE_ITERATION:
+            raise ValueError(
+                f"Prerelease iteration {iteration} in '{version}' is out of "
+                f"range: only iterations 1-{_MAX_PRERELEASE_ITERATION} fit "
+                "the extension's patch slots. Bump the patch version "
+                "instead."
+            )
+        slot = iteration - 1
+    else:
+        slot = _STABLE_SLOT
+    return f"{major}.{minor}.{int(patch) * 10 + slot}"
 
 
 # =============================================================================

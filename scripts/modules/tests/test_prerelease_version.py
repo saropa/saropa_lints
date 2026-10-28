@@ -16,11 +16,9 @@ Pins three things:
    caught-in-review bug where the full pub.dev version was written
    straight through and broke every prerelease extension packaging
    attempt.
-3. Successive beta iterations of the same base version ("16.0.0-beta.1",
-   "16.0.0-beta.2", ...) produce DISTINCT extension versions. Naively
-   stripping the suffix collapses every iteration to the same value
-   ("16.0.0"), which collides at the Marketplace/Open VSX level on the
-   second publish.
+3. The fixed-slot mapping (ext patch = 10*P + slot) gives every publish a
+   distinct, strictly increasing extension version with the package's
+   major.minor.
 """
 
 from __future__ import annotations
@@ -67,70 +65,55 @@ class TestPrereleaseVersionHelpers(unittest.TestCase):
 
 
 class TestExtensionVersionFor(unittest.TestCase):
-    """Pin extension_version_for's stable pass-through and beta-offset scheme."""
+    """Pin the fixed-slot mapping: ext patch = 10*P + slot, same major.minor."""
 
     def setUp(self) -> None:
         from scripts.modules._utils import extension_version_for
 
         self.fn = extension_version_for
 
-    def test_stable_version_unchanged(self) -> None:
-        # Stable versions bump minor to the next even above the prerelease
-        # odd minor, so stable always supersedes its betas in semver.
-        self.assertEqual(self.fn("15.2.7"), "15.2.7")
+    def test_mapping_table(self) -> None:
+        table = [
+            ("17.0.0-beta.1", "17.0.0"),
+            ("17.0.0-beta.2", "17.0.1"),
+            ("17.0.0", "17.0.9"),
+            ("17.0.1-beta.1", "17.0.10"),
+            ("17.0.1-beta.2", "17.0.11"),
+            ("17.0.1", "17.0.19"),
+        ]
+        for dart, ext in table:
+            with self.subTest(dart=dart):
+                self.assertEqual(self.fn(dart), ext)
 
-    def test_stable_version_zero_minor(self) -> None:
-        self.assertEqual(self.fn("16.0.1"), "16.0.1")
+    def test_table_is_strictly_increasing(self) -> None:
+        order = [
+            "17.0.0-beta.1", "17.0.0-beta.2", "17.0.0-beta.9", "17.0.0",
+            "17.0.1-beta.1", "17.0.1-beta.2", "17.0.1",
+            "17.0.2-beta.1", "17.0.2",
+        ]
+        tup = [tuple(int(x) for x in self.fn(v).split(".")) for v in order]
+        for lo, hi in zip(tup, tup[1:]):
+            self.assertLess(lo, hi)
 
-    def test_first_beta_gets_offset_patch(self) -> None:
-        # Minor is forced to odd (0 → 1) for pre-release so the VS Code
-        # "Switch to Pre-Release Version" button works.
-        self.assertEqual(self.fn("16.0.0-beta.1"), "16.1.913")
+    def test_major_minor_preserved(self) -> None:
+        for v in ("17.0.0", "16.13.4-beta.3", "9.2.0-rc.1"):
+            self.assertEqual(self.fn(v).rsplit(".", 1)[0], v.split("-")[0].rsplit(".", 1)[0])
 
-    def test_successive_betas_are_distinct(self) -> None:
-        v1 = self.fn("16.0.0-beta.1")
-        v2 = self.fn("16.0.0-beta.2")
-        self.assertNotEqual(
-            v1, v2,
-            msg="successive beta iterations of the same base version must "
-                "not collapse to the same extension version",
-        )
-        # Minor forced odd (0 → 1), patch offset incremented by iteration.
-        self.assertEqual(v2, "16.1.914")
+    def test_bare_channel_is_iteration_one(self) -> None:
+        self.assertEqual(self.fn("17.0.0-beta"), "17.0.0")
 
-    def test_offset_preserves_original_patch(self) -> None:
-        # A prerelease of a non-zero base patch keeps that patch as part
-        # of the offset base. Minor forced odd (2 → 3).
-        self.assertEqual(self.fn("15.2.7-beta.3"), "15.3.922")
+    def test_tenth_beta_refused(self) -> None:
+        self.assertEqual(self.fn("17.0.0-beta.9"), "17.0.8")
+        with self.assertRaises(ValueError):
+            self.fn("17.0.0-beta.10")
+        with self.assertRaises(ValueError):
+            self.fn("17.0.0-beta.0")
 
-    def test_missing_iteration_number_defaults_to_one(self) -> None:
-        # Minor forced odd (0 → 1).
-        self.assertEqual(self.fn("16.0.0-beta"), "16.1.913")
-
-    def test_different_channels_of_same_base_version_are_distinct(self) -> None:
-        # The version prompt accepts any prerelease tag, not just "beta" —
-        # a beta.1 build and a later rc.1 of the same base version must not
-        # collide at the Marketplace/Open VSX level.
-        beta = self.fn("16.0.0-beta.1")
-        rc = self.fn("16.0.0-rc.1")
-        self.assertNotEqual(beta, rc)
-
-    def test_double_conversion_is_idempotent(self) -> None:
-        # set_extension_version() calls extension_version_for() internally.
-        # If a caller also wraps, the double-conversion must not corrupt
-        # the version. Converted pre-release versions look stable (no
-        # hyphen), so the second call hits the identity path.
-        once = self.fn("16.0.0-beta.2")
-        twice = self.fn(once)
-        self.assertEqual(
-            once, twice,
-            msg="double-converting a pre-release version must be idempotent "
-                "— set_extension_version relies on this",
-        )
-
-    def test_stable_double_conversion_is_idempotent(self) -> None:
-        once = self.fn("15.2.12")
-        self.assertEqual(self.fn(once), once)
+    def test_channels_share_a_slot(self) -> None:
+        # The channel name is ignored: -alpha.1 and -beta.1 of the same
+        # patch map to the same extension version, so they must not both
+        # be published for the same patch.
+        self.assertEqual(self.fn("17.0.0-alpha.1"), self.fn("17.0.0-beta.1"))
 
 
 class TestPackageExtensionWritesSafeVersion(unittest.TestCase):
@@ -162,19 +145,17 @@ class TestPackageExtensionWritesSafeVersion(unittest.TestCase):
              mock.patch.object(self._mod, "run_extension_package", return_value=None):
             self._mod.package_extension(self.root, version)
 
-    def test_stable_version_unchanged(self) -> None:
-        # Stable versions bump minor to even above prerelease odd minor.
-        # 15.2.7 → "15.2.7"
+    def test_stable_version_mapped(self) -> None:
+        # Stable takes slot 9: 15.2.7 -> 15.2.79.
         self._package_with_mocks("15.2.7")
         pkg = json.loads((self.root / "extension" / "package.json").read_text(encoding="utf-8"))
-        self.assertEqual(pkg["version"], "15.2.7")
+        self.assertEqual(pkg["version"], "15.2.79")
 
     def test_prerelease_version_offset_before_writing(self) -> None:
-        # Minor forced odd (2 → 3) for pre-release channel detection.
         self._package_with_mocks("15.2.7-beta.1")
         pkg = json.loads((self.root / "extension" / "package.json").read_text(encoding="utf-8"))
         self.assertEqual(
-            pkg["version"], "15.3.920",
+            pkg["version"], "15.2.70",
             msg="extension/package.json must never contain a hyphenated "
                 "version — vsce rejects it even with --pre-release",
         )
@@ -205,7 +186,7 @@ class TestSetExtensionVersionDryRun(unittest.TestCase):
         result = self._mod.set_extension_version(
             self.root, "16.0.0-beta.2", dry_run=True,
         )
-        self.assertEqual(result, "16.1.914")
+        self.assertEqual(result, "16.0.1")
 
     def test_dry_run_does_not_modify_file(self) -> None:
         # File must keep the seed version after a dry run.
@@ -217,12 +198,12 @@ class TestSetExtensionVersionDryRun(unittest.TestCase):
         )
         self.assertEqual(pkg["version"], "0.0.0")
 
-    def test_dry_run_stable_returns_same_version(self) -> None:
-        # Stable versions are unchanged: 15.2.7 → "15.2.7".
+    def test_dry_run_stable_returns_mapped_version(self) -> None:
+        # Stable takes slot 9: 15.2.7 -> 15.2.79.
         result = self._mod.set_extension_version(
             self.root, "15.2.7", dry_run=True,
         )
-        self.assertEqual(result, "15.2.7")
+        self.assertEqual(result, "15.2.79")
 
     def test_dry_run_missing_package_json_returns_empty(self) -> None:
         # When extension dir has no package.json, dry-run returns "".

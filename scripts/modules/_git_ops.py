@@ -188,8 +188,8 @@ def _verify_versions_on_disk(
     print_success(f"Verified pubspec.yaml version is {version}")
 
     # --- extension/package.json (self-healing) ---
-    # package.json uses the converted extension version (odd minor for
-    # pre-release, offset patch), not the raw pub.dev version. The publish
+    # package.json uses the converted extension version (same major.minor,
+    # patch = 10*P + slot), not the raw pub.dev version. The publish
     # script owns this file's version field, so a mismatch is always safe
     # to fix in-place — no need to bail and make the user retry.
     expected_ext = extension_version_for(version)
@@ -396,7 +396,7 @@ def _verify_versions_in_commit(
         return True
 
     # Compare against the converted extension version, not the raw pub.dev
-    # version — package.json carries the odd-minor, offset-patch form.
+    # version — package.json carries the mapped patch form.
     expected_ext = extension_version_for(version)
     pkg_actual = pkg_match.group(1)
     if pkg_actual != expected_ext:

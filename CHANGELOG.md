@@ -77,6 +77,10 @@ Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 project
 - Reports on named arguments now highlight only the argument name instead of the whole `name: value` text, so editor squiggles and `// ignore:` placement for those reports shift to the name; no action required.
 - Widget rules that match by name no longer match record fields that share a widget's name, which removes false positives; no action required.
 
+### Internal
+
+- Extension version now keeps the package's major.minor and maps only the patch (10 x package patch + slot; stable uses slot 9, prerelease N uses slot N-1), so every publish is strictly higher; a 10th prerelease of one patch is refused.
+
 ## [16.10.0]
 
 Restores installation on Flutter 3.44 and older, and renames one rule whose name matched a core analyzer diagnostic. [log](https://github.com/saropa/saropa_lints/blob/v16.10.0/CHANGELOG.md)

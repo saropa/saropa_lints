@@ -1442,7 +1442,7 @@ def run_full_publish(
         print_colored(f"      Publishing: {version}", Color.CYAN)
         print_colored(f"      Tag:        v{version}", Color.CYAN)
         # set_extension_version() handles the pub.dev → extension version
-        # conversion internally (odd minor for pre-release, offset patch).
+        # conversion internally (same major.minor, mapped patch).
         if extension_exists(ctx.project_dir):
             set_extension_version(ctx.project_dir, version)
         print()
