@@ -1925,32 +1925,13 @@ def _auto_tune_concurrency(
     return best_j
 
 
-def _changed_since_last_tag(project_dir: Path, use_shell: bool) -> list[str]:
-    """Files changed between the latest release tag and HEAD (empty if no tag/git)."""
-    try:
-        tag = subprocess.run(
-            ["git", "describe", "--tags", "--abbrev=0"],
-            cwd=project_dir, capture_output=True, text=True,
-            timeout=10, shell=use_shell,
-        )
-        name = (tag.stdout or "").strip()
-        if tag.returncode != 0 or not name:
-            return []
-        diff = subprocess.run(
-            ["git", "diff", "--name-only", f"{name}..HEAD"],
-            cwd=project_dir, capture_output=True, text=True,
-            timeout=10, shell=use_shell,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return []
-    return (diff.stdout or "").splitlines()
-
-
 def _find_delta_test_files(project_dir: Path) -> list[str]:
-    """Identify test files affected by changes since the last release tag
-    plus uncommitted changes (staged + unstaged).
+    """Identify test files affected by uncommitted changes (staged + unstaged).
 
-    Returns [] (full suite) when SAROPA_FULL_TESTS=1 (set by --full-tests).
+    Only the working-tree delta counts; earlier commits were tested when they
+    were merged. Returns [] when SAROPA_FULL_TESTS=1 (the caller then runs the
+    full suite), when the tree is clean, or when nothing maps to a test file
+    (the caller then skips testing).
 
     Maps changed lib/ source files to their corresponding test/ files by
     mirroring the directory structure:
@@ -1961,9 +1942,8 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
     Also includes any directly changed test files. Returns paths relative to
     project_dir, suitable for passing to `dart test <file> <file> ...`.
 
-    Returns an empty list when git is unavailable, the diff is too broad
-    (infrastructure files like tiers.dart or all_rules.dart changed), or no
-    test files can be mapped — the caller should fall back to the full suite.
+    A broad-impact change (tiers.dart, all_rules.dart, plugin entry point)
+    selects the integrity + config test dirs only, never the full suite.
     """
     if os.environ.get("SAROPA_FULL_TESTS", "").strip() == "1":
         return []
@@ -1990,8 +1970,7 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
         return []
 
     changed = set()
-    since_tag = _changed_since_last_tag(project_dir, use_shell)
-    for line in (result.stdout + "\n" + staged.stdout).splitlines() + since_tag:
+    for line in (result.stdout + "\n" + staged.stdout).splitlines():
         line = line.strip().replace("\\", "/")
         if line:
             changed.add(line)
@@ -1999,17 +1978,15 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
     if not changed:
         return []
 
-    # Infrastructure files affect everything — bail to full suite.
-    # Changes to tiers, registration, or the plugin entry point can break any test.
+    # Infrastructure files can affect anything — run the integrity + config
+    # dirs (whole-codebase audits), never the full suite.
     # pubspec.yaml is NOT here: version bumps and metadata don't affect tests.
     _BROAD_IMPACT = (
         "lib/saropa_lints.dart",
         "lib/src/rules/all_rules.dart",
         "lib/src/tiers.dart",
     )
-    for broad in _BROAD_IMPACT:
-        if broad in changed:
-            return []
+    broad_hit = any(broad in changed for broad in _BROAD_IMPACT)
 
     test_dir = project_dir / "test"
     delta_files: set[str] = set()
@@ -2024,7 +2001,7 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
         "tool/",
         "doc/guides/migration_guides/",
     )
-    if any(
+    if broad_hit or any(
         any(p.startswith(trigger) for trigger in _INTEGRITY_TRIGGERS)
         for p in changed
     ):
@@ -2079,13 +2056,13 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
 
 
 def run_tests(project_dir: Path) -> bool:
-    """Step 7: Run tests — delta only when possible, full suite as fallback.
+    """Step 7: Run tests — uncommitted delta only; full suite only on request.
 
-    Detects changed files via git diff and runs only their corresponding tests
-    (seconds, not minutes). If delta passes, done — CI runs the full suite on
-    push. If delta fails, stops immediately. Falls back to the full fast suite
-    only when no delta can be computed (broad infrastructure changes or clean
-    tree). Slow-tagged integration tests are always deferred to CI.
+    Detects uncommitted (staged + unstaged) changes via git diff and runs only
+    their corresponding tests. A clean tree or an unmappable delta skips
+    testing (changes were tested when merged). The full fast suite runs only
+    with --full-tests (SAROPA_FULL_TESTS=1). Slow-tagged tests are always
+    deferred to CI.
 
     Test output streams to both the terminal (live progress bar with pass/skip/fail
     counts) and a log file (full output). Failures print immediately on the terminal.
@@ -2125,7 +2102,14 @@ def run_tests(project_dir: Path) -> bool:
 
     # Delta pass: run only tests affected by uncommitted changes.
     # Compiles a handful of files instead of 340+, giving feedback in seconds.
-    delta_files = _find_delta_test_files(project_dir)
+    full_requested = os.environ.get("SAROPA_FULL_TESTS", "").strip() == "1"
+    delta_files = [] if full_requested else _find_delta_test_files(project_dir)
+    if not full_requested and not delta_files:
+        print_info(
+            "No uncommitted changes to test; tests ran when each change "
+            "was merged"
+        )
+        return True
     if delta_files:
         print_info(f"Delta: {len(delta_files)} test file(s) affected by changes")
         for f in delta_files:
@@ -2146,8 +2130,8 @@ def run_tests(project_dir: Path) -> bool:
         print_success("Delta tests passed. Full suite deferred to CI.")
         return True
 
-    # No delta (broad infrastructure changes or clean tree) — run full suite.
-    print_info("No delta (broad changes or clean tree) — running full suite")
+    # --full-tests requested — run the full fast suite.
+    print_info("--full-tests: running full suite")
     agg_targets = _generate_aggregate_targets(project_dir)
     return _run_test_pass(
         project_dir, env, reports_dir, date_str, time_str,
