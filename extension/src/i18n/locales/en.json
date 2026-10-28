@@ -2759,6 +2759,17 @@
     }
   },
   "compat": {
+    "startup": {
+      "routeDependency": "the pubspec route (pubspec.yaml)",
+      "routePlugin": "the plugin route (analysis_options.yaml)",
+      "routeBoth": "both routes (pubspec.yaml and analysis_options.yaml)",
+      "installedDisagree": "{pubspec} in pubspec.yaml and {plugin} in analysis_options.yaml",
+      "offer": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. Migrate?",
+      "offerNoDart": "saropa_lints: your project uses {route} at {installed}. {offered} is available. Migrate?",
+      "offerRenames": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. {count} rules were renamed since {installed}. Migrate?",
+      "offerNoDartRenames": "saropa_lints: your project uses {route} at {installed}. {offered} is available. {count} rules were renamed since {installed}. Migrate?",
+      "actionMigrate": "Migrate"
+    },
     "recommend": {
       "latestOk": "saropa_lints {version} is the newest release and works with this project. Use ^{version}.",
       "alreadyCorrect": "This project already uses the recommended saropa_lints configuration. No action needed.",

@@ -76,6 +76,7 @@ Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 project
 - `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended`; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
 - Reports on named arguments now highlight only the argument name instead of the whole `name: value` text, so editor squiggles and `// ignore:` placement for those reports shift to the name; no action required.
 - Widget rules that match by name no longer match record fields that share a widget's name, which removes false positives; no action required.
+- The extension now detects at start-up whether a project uses the pubspec route, the plugin route or both, and shows one prompt offering Migrate when a newer saropa_lints works with the project's Dart. Plugin-only projects (saropa_lints only in `analysis_options.yaml`) get the same offer as pubspec projects.
 
 ### Internal
 
