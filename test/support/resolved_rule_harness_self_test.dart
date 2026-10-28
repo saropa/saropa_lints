@@ -8,6 +8,7 @@ library;
 import 'package:saropa_lints/saropa_lints.dart'
     show
         RuleLane,
+        activeRuleLane,
         ensureRuleRegistryBuilt,
         ruleAllowedByLane,
         setActiveRuleLane;
@@ -38,6 +39,8 @@ Future<void> f() async {
       // when that build happened to land first. The oracle must always run
       // the rule at full fidelity.
       ensureRuleRegistryBuilt();
+      final originalLane = activeRuleLane;
+      addTearDown(() => setActiveRuleLane(originalLane));
       setActiveRuleLane(RuleLane.light);
       final diags = await runRuleResolved(AvoidRedundantAwaitRule(), '''
 Future<void> f() async {
@@ -45,6 +48,9 @@ Future<void> f() async {
 }
 ''');
       expect(diags.map((d) => d.ruleName), contains('avoid_redundant_await'));
+      // The harness override must not leak: the caller's lane is restored.
+      expect(activeRuleLane, RuleLane.light);
+      setActiveRuleLane(RuleLane.full);
       expect(ruleAllowedByLane('avoid_redundant_await'), isTrue);
     });
 

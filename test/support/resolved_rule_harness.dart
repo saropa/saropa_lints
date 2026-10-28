@@ -109,7 +109,9 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
   Directory? projectRoot,
 }) async {
   // Fixtures outside example/ have no `lane: full` config; never let the
-  // default light lane gate the rule under test.
+  // default light lane gate the rule under test. The previous lane is
+  // restored in `finally` so the override never leaks into other tests.
+  final previousLane = activeRuleLane;
   setActiveRuleLane(RuleLane.full);
   final libDir = projectRoot == null
       ? p.normalize(p.absolute(p.join('example', 'lib')))
@@ -127,6 +129,7 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
     await prev;
     return await _runLocked(env, libDir, rule, code, fileStem);
   } finally {
+    setActiveRuleLane(previousLane);
     done.complete();
     if (!cached) await env.collection.dispose();
   }
