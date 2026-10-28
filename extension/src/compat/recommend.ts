@@ -43,6 +43,8 @@ export interface RecommendOptions {
 }
 
 const MAX_PROBES = 3;
+/** The plugin route resolves in the analyzer server's private package; it needs this Dart. */
+const PLUGIN_MIN_DART = '3.11.0';
 const K = 'compat.recommend.';
 
 const msg = (key: string, params: Record<string, string> = {}): Msg => ({ key: K + key, params });
@@ -156,6 +158,31 @@ export async function recommend(
     lastProbe.holder ??= res.blockingPackage;
     failedProbes.add(cand.version);
     ceilingMajor = semver.major(cand.version);
+  }
+
+  // Decision 19: a newest version blocked on the pubspec route still works as a
+  // plugin (private package, own analyzer) on Dart >= 3.11. Filter on sdk only: no probe.
+  const newestOk = sdkOk[0];
+  const dartCoerced = semver.coerce(facts.dartVersion ?? '')?.version;
+  const pluginEligible = !!newestOk && !!dartCoerced && semver.gte(dartCoerced, PLUGIN_MIN_DART);
+  if (pluginEligible && (!chosen || failedProbes.has(newestOk.version))) {
+    const holder = lastProbe.holder ?? 'unknown';
+    const blockers = [msg('blockerPackage', { package: holder })];
+    if (!chosen && survivors.length === 0) blockers.push(msg('blockerMeta', { version: newest.version, pin: facts.flutterMetaPin ?? '' }));
+    const fixes = [msg('fixUsePluginRoute', { version: newestOk.version })];
+    if (chosen) fixes.push(msg('fixPubspecFallback', { version: chosen.version, package: holder }));
+    const out = result({
+      route: 'plugin',
+      pluginVersion: newestOk.version,
+      messageKey: facts.pluginVersion === newestOk.version && !facts.pluginBlockDisabled ? 'alreadyCorrect' : 'blockedUsePlugin',
+      messageParams: { version: newestOk.version, package: holder },
+      blockers,
+      fixes,
+    }, stale);
+    const pubspecVersion = locked?.version;
+    if (pubspecVersion) out.notes.push(msg('editorVsCli', { plugin: newestOk.version, pubspec: pubspecVersion }));
+    out.notes.push(msg('cliNeedsPubspec'));
+    return out;
   }
 
   if (!chosen) {
