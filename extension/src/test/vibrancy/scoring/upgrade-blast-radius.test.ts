@@ -145,6 +145,11 @@ describe('computeBlastRadius', () => {
         assert.ok(r.heldBackReason?.includes('meta'));
     });
 
+    it('does not hold back analyzer 13.0.0 (needs only meta ^1.18.0)', () => {
+        const r = computeBlastRadius({ ...base, to: '13.0.0', heldBack: HELD_BACK_UPGRADES });
+        assert.strictEqual(r.verdict, 'safe');
+    });
+
     it('does not hold back a target outside the range or another package', () => {
         const below = computeBlastRadius({
             ...base, to: '12.5.0', heldBack: HELD_BACK_UPGRADES,
@@ -214,7 +219,7 @@ describe('computeBlastRadius', () => {
 describe('dependency-held-back verdict', () => {
     const drift = {
         ...base, pkg: 'drift_dev', from: '2.28.0', to: '2.30.0',
-        targetDeps: new Map([['analyzer', '^13.0.0']]),
+        targetDeps: new Map([['analyzer', '^13.1.0']]),
         heldBack: HELD_BACK_UPGRADES,
     };
 
@@ -223,7 +228,7 @@ describe('dependency-held-back verdict', () => {
         assert.strictEqual(r.verdict, 'dependency-held-back');
         assert.strictEqual(r.summaryKey, 'blastRadius.summary.depHeldBack');
         assert.strictEqual(r.summaryParams.dep, 'analyzer');
-        assert.strictEqual(r.summaryParams.range, '^13.0.0');
+        assert.strictEqual(r.summaryParams.range, '^13.1.0');
     });
 
     it('is safe when analyzer is not held back', () => {
@@ -254,7 +259,7 @@ describe('dependency-held-back verdict', () => {
 describe('dependency-capped verdict (data-driven)', () => {
     const drift = {
         ...base, pkg: 'drift_dev', from: '2.28.0', to: '2.35.0',
-        targetDeps: new Map([['analyzer', '>=13.0.0']]),
+        targetDeps: new Map([['analyzer', '>=13.1.0']]),
         reverseDeps: reverse([['drift_dev', 'analyzer'], ['saropa_lints', 'analyzer']]),
         constraints: constraintsOf([
             ['drift_dev', 'analyzer', '>=12.0.0 <13.0.0'],
@@ -299,7 +304,7 @@ describe('dependency-capped verdict (data-driven)', () => {
 
     it('sdk-blocked outranks it', () => {
         const r = computeBlastRadius({
-            ...drift, targetDeps: new Map([['analyzer', '>=13.0.0'], ['meta', '^1.18.3']]),
+            ...drift, targetDeps: new Map([['analyzer', '>=13.1.0'], ['meta', '^1.18.3']]),
             sdkPins: new Map([['meta', '1.18.0']]),
         });
         assert.strictEqual(r.verdict, 'sdk-blocked');
