@@ -115,6 +115,10 @@
         "title": "%command.migrateConfig.title%"
       },
       {
+        "command": "saropaLints.migrateRuleNames",
+        "title": "%command.migrateRuleNames.title%"
+      },
+      {
         "command": "saropaLints.createBaseline",
         "title": "%command.createBaseline.title%"
       },

@@ -2835,5 +2835,25 @@
       "cancelledRestored": "The version change was cancelled. pubspec.yaml and analysis_options.yaml were restored to their previous content.",
       "cancelledNotRestored": "The version change was cancelled, but the files could not be restored automatically; check pubspec.yaml and analysis_options.yaml."
     }
+  },
+  "ruleMigration": {
+    "none": "No renamed rules need migrating.",
+    "noWorkspace": "Open a Dart project folder to migrate rule names.",
+    "pickTitle": "Migrate renamed rules",
+    "pickPlaceholder": "Choose the files to update",
+    "fileHits": "{hits} change(s)",
+    "diffTitle": "Rule rename: {file}",
+    "confirm": "Apply rule renames to {count} file(s)? The diffs are open for review.",
+    "apply": "Apply",
+    "progress": "Migrating renamed rules",
+    "applied": "Updated {hits} rule reference(s) in {count} file(s): {files}.",
+    "bareNames": "Left unchanged (ignore comments without the saropa_lints/ prefix): {items}.",
+    "clashes": "Both the old and new rule name are set, please merge by hand: {items}.",
+    "skipped": "Skipped: {items}.",
+    "failedRestored": "Rule migration failed: {detail} All files were restored to their previous content.",
+    "failedNotRestored": "Rule migration failed: {detail} Some files could not be restored automatically; check them with git.",
+    "offer": "Rename {hits} renamed rules in {count} files?",
+    "offerPreview": "Preview",
+    "offerNotNow": "Not now"
   }
 }
