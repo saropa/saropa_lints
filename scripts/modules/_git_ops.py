@@ -13,6 +13,7 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import tempfile
@@ -968,6 +969,55 @@ def _report_workflow_failure(
             pass
 
 
+def _pubdev_credentials_path() -> Path:
+    """Location of the credentials file written by `dart pub login`."""
+    import os
+    import sys
+
+    if sys.platform == "win32":
+        base = Path(os.environ.get("APPDATA", Path.home()))
+        return base / "dart" / "pub-credentials.json"
+    if sys.platform == "darwin":
+        return (Path.home() / "Library" / "Application Support"
+                / "dart" / "pub-credentials.json")
+    xdg = os.environ.get("XDG_CONFIG_HOME") or str(Path.home() / ".config")
+    return Path(xdg) / "dart" / "pub-credentials.json"
+
+
+def _pubdev_login_valid() -> bool:
+    """True if stored credentials exist and can be used or refreshed."""
+    import time
+
+    path = _pubdev_credentials_path()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    if data.get("refreshToken"):
+        return True
+    expiry = data.get("expiration")
+    return bool(data.get("accessToken")) and (
+        not isinstance(expiry, (int, float)) or expiry / 1000 > time.time()
+    )
+
+
+def _ensure_pubdev_login(project_dir: Path) -> bool:
+    """Run interactive `dart pub login` when credentials are missing/expired."""
+    if _pubdev_login_valid():
+        return True
+    print_warning("pub.dev credentials missing or expired.")
+    print_info("  Running `dart pub login`. Open the URL it prints.")
+    # Inherit the terminal so the URL and prompts are visible.
+    rc = subprocess.run(
+        ["dart", "pub", "login"], cwd=project_dir, shell=get_shell_mode(),
+    ).returncode
+    if rc != 0 or not _pubdev_login_valid():
+        print_error("pub.dev login failed. Publish aborted.")
+        return False
+    print_success("Logged in to pub.dev.")
+    return True
+
+
 def _offer_local_publish(project_dir: Path) -> bool:
     """Offer to publish from the local machine when CI publish fails.
 
@@ -990,17 +1040,33 @@ def _offer_local_publish(project_dir: Path) -> bool:
     if choice == "n":
         return False
 
+    if not _ensure_pubdev_login(project_dir):
+        return False
+
     print_info("Publishing locally...")
-    # Capture output so the file-tree listing dart emits does not flood the
-    # terminal and push prior history out of the scrollback buffer.
-    result = subprocess.run(
+    # Stream output so a mid-publish auth prompt (URL to open in a browser)
+    # is shown immediately instead of hanging silently. Everything else is
+    # captured to keep the file-tree listing out of the scrollback.
+    proc = subprocess.Popen(
         ["dart", "pub", "publish", "--force"],
         cwd=project_dir,
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
         encoding="utf-8",
         errors="replace",
         shell=get_shell_mode(),
+    )
+    captured: list[str] = []
+    assert proc.stdout is not None
+    for raw in proc.stdout:
+        captured.append(raw)
+        low = raw.lower()
+        if "authorize" in low or "accounts.google.com" in low:
+            print_warning(f"  {raw.strip()}")
+    proc.wait()
+    result = subprocess.CompletedProcess(
+        proc.args, proc.returncode, "".join(captured), "",
     )
     if result.returncode == 0:
         # Surface only the pub.dev confirmation line, not the full tree.
