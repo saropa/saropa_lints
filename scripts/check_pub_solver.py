@@ -7,7 +7,12 @@ Creates scratch projects and asserts how `dart pub` resolves saropa_lints:
   3. analyzer held at 12: `saropa_lints: ^17.0.0` fails with a solver message.
   4. meta pinned to 1.18.0: `saropa_lints: ^16.7.0` resolves.
 
-Needs network and `dart` on PATH. Exit 0 if all assertions hold.
+Needs network and `dart` on PATH. Run with Dart >= 3.13: on Dart 3.9 the solver
+cannot place saropa_lints 16.x next to analyzer 12 (analyzer_plugin >=0.14.19
+needs Dart ^3.13), so checks 1, 2 and 4 would fail for environment reasons.
+The scratch SDK constraint (>=3.9.0, saropa_lints 16.x's own floor) is unchanged.
+For reference, analyzer 13.0.0 needs Dart >=3.11.0 (_fe_analyzer_shared ^100) and
+analyzer 14.6.0 needs Dart 3.13. Exit 0 if all assertions hold.
 Check 3 only holds while no 17.x is published; after the major ships, update
 it to expect a clear failure for the held-at-12 project (not a resolve).
 Usage: python3 scripts/check_pub_solver.py

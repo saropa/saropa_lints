@@ -29,7 +29,7 @@ jobs:
         include:
           - analyzer: '13.0.0'
             plugin: '0.3.15'
-            dart: '3.9'
+            dart: '3.11' # analyzer 13.0.0 -> _fe_analyzer_shared ^100 needs Dart >=3.11.0
           - analyzer: '14.6.0'
             plugin: '0.3.25'
             dart: '3.13'
@@ -60,5 +60,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.9'
+          # Dart 3.9 cannot resolve saropa_lints 16.x with analyzer 12 (analyzer_plugin
+          # >=0.14.19 needs Dart ^3.13, older ones need analyzer <11), so use 3.13.
+          sdk: '3.13'
       - run: python3 scripts/check_pub_solver.py
