@@ -23,6 +23,11 @@ from pathlib import Path
 from typing import NamedTuple
 
 from scripts.modules._utils import (
+    LONG_TIMEOUT_S,
+    hardened_env,
+    safe_input,
+    safe_run,
+    start_watchdog,
     Color,
     OutputLevel,
     clear_flutter_lock,
@@ -361,7 +366,7 @@ def _try_fix_stale_plugin_cache(
     )
     print_colored("  [S]kip (continue with failure)", Color.CYAN)
     try:
-        raw = input("  Choice [f/s]: ").strip().lower() or "s"
+        raw = safe_input("  Choice [f/s]: ").strip().lower() or "s"
     except (EOFError, KeyboardInterrupt):
         return False
 
@@ -484,7 +489,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     # --- AUTO-FIX: Apply dart fix for auto-fixable lint issues ---
     # shell=get_shell_mode() is required on Windows: `dart` resolves to
     # dart.bat, which CreateProcess cannot launch directly without a shell.
-    dart_fix_result = subprocess.run(
+    dart_fix_result = safe_run(
         ['dart', 'fix', '--dry-run'],
         capture_output=True, text=True, timeout=300,
         cwd=str(project_dir),
@@ -496,7 +501,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
         print_warning(
             f"{fix_match.group(1)} auto-fixable dart issue(s) found, applying..."
         )
-        subprocess.run(
+        safe_run(
             ['dart', 'fix', '--apply'],
             capture_output=True, text=True, timeout=300,
             cwd=str(project_dir),
@@ -788,7 +793,7 @@ def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
     print_header("STEP 3: CHECKING WORKING TREE")
 
     use_shell = get_shell_mode()
-    result = subprocess.run(
+    result = safe_run(
         ["git", "status", "--porcelain"],
         cwd=project_dir,
         capture_output=True,
@@ -801,7 +806,7 @@ def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
         print_colored(result.stdout, Color.YELLOW)
         print()
         response = (
-            input(
+            safe_input(
                 "  These changes will be included in the "
                 "release commit. Continue? [Y/n] "
             )
@@ -846,7 +851,7 @@ def _ask_remote_sync_recovery(
         Color.CYAN,
     )
     try:
-        raw = input("  Choice [1]: ").strip() or "1"
+        raw = safe_input("  Choice [1]: ").strip() or "1"
     except (KeyboardInterrupt, EOFError):
         print()
         return False
@@ -859,7 +864,7 @@ def _ask_remote_sync_recovery(
         return False
     # Choice 1: reset to remote
     print_info(f"Resetting local {branch} to origin/{branch}...")
-    reset_result = subprocess.run(
+    reset_result = safe_run(
         ["git", "reset", "--hard", f"origin/{branch}"],
         cwd=project_dir,
         capture_output=True,
@@ -883,7 +888,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 
     # Fetch from remote
     print_info("Fetching from remote...")
-    result = subprocess.run(
+    result = safe_run(
         ["git", "fetch", "origin", branch],
         cwd=project_dir,
         capture_output=True,
@@ -902,7 +907,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
             if result.stdout and result.stdout.strip():
                 print_colored(result.stdout.strip(), Color.RED)
             print_info("Trying 'git fetch origin' (all refs)...")
-        fallback = subprocess.run(
+        fallback = safe_run(
             ["git", "fetch", "origin"],
             cwd=project_dir,
             capture_output=True,
@@ -917,7 +922,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
         print_success("Fetched from remote.")
 
     # Check if behind
-    result = subprocess.run(
+    result = safe_run(
         ["git", "rev-list", "--count", f"HEAD..origin/{branch}"],
         cwd=project_dir,
         capture_output=True,
@@ -931,7 +936,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
                 f"Local branch is behind remote by {behind_count} commit(s)."
             )
             print_info(f"Pulling changes from origin/{branch}...")
-            pull_result = subprocess.run(
+            pull_result = safe_run(
                 ["git", "pull", "origin", branch],
                 cwd=project_dir,
                 capture_output=True,
@@ -960,7 +965,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
             print_success(f"Pulled {behind_count} commit(s) from remote")
 
     # Check if ahead
-    result = subprocess.run(
+    result = safe_run(
         ["git", "rev-list", "--count", f"origin/{branch}..HEAD"],
         cwd=project_dir,
         capture_output=True,
@@ -1177,7 +1182,7 @@ def _run_chain_stack_traces_and_check(
         result = None
         try:
             with open(log_path, "w", encoding="utf-8") as out:
-                result = subprocess.run(
+                result = safe_run(
                     [
                         "dart", "test", "--chain-stack-traces",
                         "-j", str(diag_j),
@@ -1313,9 +1318,12 @@ def _run_dart_test_to_file(
         cwd=project_dir,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        env=env,
+        stdin=subprocess.DEVNULL,
+        env=hardened_env(env),
         shell=use_shell,
+        start_new_session=not is_windows(),
     )
+    watchdog = start_watchdog(proc, LONG_TIMEOUT_S, "dart test")
 
     # Track whether we have an active CR-overwritten progress line on screen.
     wrote_progress = False
@@ -1385,9 +1393,12 @@ def _run_dart_test_to_file(
     sys.stdout.flush()
 
     returncode = proc.wait()
+    watchdog.set()
     if returncode != 0:
         with open(log_path, "a", encoding="utf-8") as ap:
             ap.write(f"\n[Tests failed — exit code {returncode}.]\n")
+            if watchdog.timed_out:
+                ap.write(f"[Killed by watchdog after {LONG_TIMEOUT_S}s.]\n")
     return returncode
 
 
@@ -1415,7 +1426,7 @@ def _generate_aggregate_targets(project_dir: Path) -> list[str] | None:
         print_warning("gen_test_aggregates.py missing; running full test dir")
         return None
     try:
-        res = subprocess.run(
+        res = safe_run(
             ["python3", "scripts/gen_test_aggregates.py"],
             cwd=project_dir, capture_output=True, text=True,
         )
@@ -1500,7 +1511,7 @@ def _prompt_test_failure(is_crash: bool = False, failed_files: int = 0) -> str:
         print_colored("  [C]ontinue anyway (proceed with publish)", Color.CYAN)
         print_colored("  [A]bort (stop publish)", Color.CYAN)
         try:
-            raw = input(prompt).strip().lower()
+            raw = safe_input(prompt).strip().lower()
         except (EOFError, KeyboardInterrupt):
             return "abort"
         if not raw:
@@ -1738,7 +1749,7 @@ def _available_ram_gb() -> float | None:
     """
     if sys.platform == "darwin":
         try:
-            out = subprocess.run(
+            out = safe_run(
                 ["vm_stat"], capture_output=True, text=True, timeout=10,
             ).stdout
         except (OSError, subprocess.TimeoutExpired):
@@ -1816,7 +1827,7 @@ def _auto_tune_concurrency(
     cache_file = cache_dir / ".dart_test_max_j"
     sdk_version = ""
     try:
-        sdk_result = subprocess.run(
+        sdk_result = safe_run(
             ["dart", "--version"],
             capture_output=True, text=True, timeout=10,
             shell=get_shell_mode(),
@@ -1883,7 +1894,7 @@ def _auto_tune_concurrency(
 
     for j in levels:
         try:
-            result = subprocess.run(
+            result = safe_run(
                 ["dart", "test", "-j", str(j), probe_file],
                 cwd=project_dir,
                 capture_output=True,
@@ -1949,7 +1960,7 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
         return []
     use_shell = get_shell_mode()
     try:
-        result = subprocess.run(
+        result = safe_run(
             ["git", "diff", "--name-only", "HEAD"],
             cwd=project_dir,
             capture_output=True,
@@ -1958,7 +1969,7 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
             shell=use_shell,
         )
         # Also pick up staged-but-not-yet-in-HEAD changes.
-        staged = subprocess.run(
+        staged = safe_run(
             ["git", "diff", "--name-only", "--cached"],
             cwd=project_dir,
             capture_output=True,
@@ -2204,7 +2215,7 @@ def run_pub_get(project_dir: Path) -> bool:
             else pubspec_dir.relative_to(project_dir)
         )
         print_info(f"dart pub get  ({rel})")
-        result = subprocess.run(
+        result = safe_run(
             ["dart", "pub", "get"],
             cwd=pubspec_dir,
             capture_output=True,
@@ -2238,7 +2249,7 @@ def run_format(project_dir: Path) -> bool:
     use_shell = get_shell_mode()
 
     if is_windows():
-        subprocess.run(
+        safe_run(
             ["git", "config", "core.autocrlf", "false"],
             cwd=project_dir,
             capture_output=True,
@@ -2252,7 +2263,7 @@ def run_format(project_dir: Path) -> bool:
     if get_output_level().value >= OutputLevel.VERBOSE.value:
         print_colored(f"      $ {' '.join(cmd)}", Color.WHITE)
 
-    result = subprocess.run(
+    result = safe_run(
         cmd,
         cwd=project_dir,
         capture_output=True,
@@ -2269,7 +2280,7 @@ def run_format(project_dir: Path) -> bool:
             f"Formatting failed (exit code {result.returncode})"
         )
         if is_windows():
-            subprocess.run(
+            safe_run(
                 ["git", "config", "core.autocrlf", "true"],
                 cwd=project_dir,
                 capture_output=True,
@@ -2284,7 +2295,7 @@ def run_format(project_dir: Path) -> bool:
                 print_info(f"  {line}")
                 break
 
-    subprocess.run(
+    safe_run(
         ["git", "add", "-A"],
         cwd=project_dir,
         capture_output=True,
@@ -2292,7 +2303,7 @@ def run_format(project_dir: Path) -> bool:
     )
 
     if is_windows():
-        subprocess.run(
+        safe_run(
             ["git", "config", "core.autocrlf", "true"],
             cwd=project_dir,
             capture_output=True,
@@ -2342,7 +2353,7 @@ def _run_dart_analyze_core(project_dir: Path) -> bool:
     spinner.start()
 
     try:
-        result = subprocess.run(
+        result = safe_run(
             ["dart", "analyze", "--fatal-infos"],
             cwd=project_dir,
             capture_output=True,
@@ -2428,7 +2439,7 @@ def _prompt_analysis_failure() -> str:
     print_colored("  [R]etry (re-run dart analyze)", Color.CYAN)
     print_colored("  [A]bort (stop publish)", Color.CYAN)
     try:
-        raw = input("  Choice [i/r/a]: ").strip().lower() or "a"
+        raw = safe_input("  Choice [i/r/a]: ").strip().lower() or "a"
         if raw.startswith("i"):
             return "ignore"
         if raw.startswith("r"):
@@ -2456,7 +2467,7 @@ def _prompt_spelling_retry() -> bool:
     print_colored("  [R]etry (re-scan after fixing)", Color.CYAN)
     print_colored("  [A]bort publish", Color.CYAN)
     try:
-        raw = input("  Choice [r/a]: ").strip().lower() or "r"
+        raw = safe_input("  Choice [r/a]: ").strip().lower() or "r"
     except EOFError:
         return False
     return not raw.startswith("a")
@@ -2565,7 +2576,7 @@ def _gate_changelog_overview(project_dir: Path, version: str) -> bool:
         for problem in problems:
             print_warning(problem)
         choice = (
-            input(
+            safe_input(
                 "  Overview/log-link check failed. "
                 "[R]etry / [i]gnore / [a]bort? [R] "
             )
@@ -2603,7 +2614,7 @@ def _gate_changelog_internal_heading(
         for problem in problems:
             print_warning(problem)
         choice = (
-            input(
+            safe_input(
                 "  Internal-heading check failed. "
                 "[R]etry / [i]gnore / [a]bort? [R] "
             )
@@ -2649,7 +2660,7 @@ def validate_changelog(
 
     if not release_notes:
         response = (
-            input(f"  Use generic message 'Release {version}'? [Y/n] ")
+            safe_input(f"  Use generic message 'Release {version}'? [Y/n] ")
             .strip()
             .lower()
         )
@@ -2714,7 +2725,7 @@ def generate_docs(project_dir: Path) -> bool:
 
     print_info(f"Generating docs (output → reports/{date_prefix}/{log_name})")
     use_shell = get_shell_mode()
-    result = subprocess.run(
+    result = safe_run(
         ["dart", "doc"],
         cwd=project_dir,
         capture_output=True,
@@ -2756,7 +2767,7 @@ def pre_publish_validation(project_dir: Path) -> bool:
     # (e.g. 0x8f) that crash the subprocess reader thread on Windows where
     # text=True defaults to cp1252. The return code survived the crash, but
     # stdout/stderr were lost — hiding real validation errors on failure.
-    result = subprocess.run(
+    result = safe_run(
         ["dart", "pub", "publish", "--dry-run"],
         cwd=project_dir,
         capture_output=True,

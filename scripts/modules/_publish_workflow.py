@@ -22,6 +22,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from scripts.modules._utils import (
+    safe_input,
+    safe_run,
     Color,
     ExitCode,
     exit_with_error,
@@ -308,7 +310,7 @@ def _get_last_published_tag_version(project_dir: Path) -> str | None:
     every mid-cycle beta bump look like it has "no prior tag" at all.
     """
     import subprocess
-    result = subprocess.run(
+    result = safe_run(
         ["git", "tag", "--sort=-v:refname"],
         capture_output=True, text=True, cwd=project_dir,
     )
@@ -336,7 +338,7 @@ def _release_commit_exists_without_tag(
     import subprocess
     if tag_exists_on_remote(project_dir, tag_name):
         return False
-    result = subprocess.run(
+    result = safe_run(
         ["git", "log", "--oneline", "--all",
          f"--grep=Release v{pubspec_version}$"],
         capture_output=True, text=True, cwd=project_dir,
@@ -401,7 +403,7 @@ def check_orphaned_version_bump(
         Color.CYAN,
     )
     try:
-        choice = input("  Choice [1]: ").strip() or "1"
+        choice = safe_input("  Choice [1]: ").strip() or "1"
     except (EOFError, KeyboardInterrupt):
         print()
         exit_with_error("Aborted.", ExitCode.USER_CANCELLED)
