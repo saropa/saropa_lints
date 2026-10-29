@@ -66,7 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.0.1-beta.4] — Unreleased
+## [17.0.1-beta.4]
+
+This update removes false positives from 19 rules, mostly the mounted-check and context rules that flagged code that was already safe. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.4/CHANGELOG.md)
 
 ### Fixed
 

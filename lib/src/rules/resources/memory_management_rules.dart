@@ -1897,7 +1897,8 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
   bool _isConstValueClass(ClassDeclaration node) {
     bool hasConst = false;
     for (final ClassMember m in node.bodyMembers) {
-      if (m is ConstructorDeclaration && m.constKeyword != null) hasConst = true;
+      if (m is ConstructorDeclaration && m.constKeyword != null)
+        hasConst = true;
       if (m is FieldDeclaration &&
           !m.isStatic &&
           !m.fields.isFinal &&
@@ -1919,7 +1920,8 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
     if (element == null) return false;
     for (final InterfaceType st in element.allSupertypes) {
       final String n = st.element.name ?? '';
-      if ((n == 'Widget' || n == 'State') && isFlutterSdkInterface(st.element)) {
+      if ((n == 'Widget' || n == 'State') &&
+          isFlutterSdkInterface(st.element)) {
         return true;
       }
     }
