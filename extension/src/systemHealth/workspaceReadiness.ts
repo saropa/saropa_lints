@@ -193,3 +193,14 @@ export function readinessStatusBarText(
     ? l10n('workspaceReadiness.statusBar.red', { count })
     : l10n('workspaceReadiness.statusBar.yellow', { count });
 }
+
+/** Plain-text tooltip lines naming each readiness issue (codicon markers
+ *  stripped — tooltips are plain strings and would show "$(warning)" raw). */
+export function readinessTooltipLines(
+  readiness: WorkspaceReadiness,
+  hostMemory: ExtensionHostMemory | undefined,
+): string[] {
+  return buildIssueItems(readiness, hostMemory).map(
+    (i) => `• ${i.label.replace(/\$\([^)]+\)\s*/g, '')}`,
+  );
+}

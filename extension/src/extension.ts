@@ -173,7 +173,7 @@ import { auditWatcherExcludes } from './systemHealth/watcherExcludeAudit';
 import { auditNestedPackageRoots } from './systemHealth/nestedRootsAudit';
 import { auditHeapCap } from './systemHealth/heapCapAudit';
 import { scanWorkspaceForHazards } from './systemHealth/workspaceHazardScan';
-import { gatherReadiness, readinessStatusBarText, showWorkspaceReadiness, ReadinessLevel } from './systemHealth/workspaceReadiness';
+import { gatherReadiness, readinessStatusBarText, readinessTooltipLines, showWorkspaceReadiness, ReadinessLevel } from './systemHealth/workspaceReadiness';
 import { HealthLevel } from './systemHealth/types';
 import type { ExtensionHostMemory } from './systemHealth/types';
 import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
@@ -1199,6 +1199,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // the readiness command is invoked. Avoids running the filesystem-heavy
   // hazard scan on every status bar poll tick.
   let cachedReadinessText: string | undefined;
+  // Issue lines for the status bar tooltip, so the red/yellow count is explained.
+  let cachedReadinessLines: string[] = [];
 
   /**
    * Pick the background for the memory status bar item.
@@ -1415,6 +1417,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // or system-level health issue is already displayed.
     if (!text && cachedReadinessText) {
       text = cachedReadinessText;
+      tooltipLines.push(...cachedReadinessLines);
     }
 
     if (!text) {
@@ -1702,6 +1705,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   setTimeout(() => {
     void gatherReadiness(processMonitor.getLastHostMemory()).then((r) => {
       cachedReadinessText = readinessStatusBarText(r);
+      cachedReadinessLines = readinessTooltipLines(r, processMonitor.getLastHostMemory());
       updateMemoryStatusBar();
     });
   }, 20_000);
