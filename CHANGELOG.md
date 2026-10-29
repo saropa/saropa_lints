@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-TODO [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
+The unreleased version focuses heavily on optimizing the VS Code extension's performance and improving the reliability of its Language Server Protocol (LSP) controls. Key updates include a smarter workspace hazard scan that automatically flags massive files or crowded directories for `watcherExclude`—now with built-in coverage for heavy Android and iOS build outputs—to protect extension host memory. It also overhauls the Health Panel's LSP management so server toggles work predictably without infinite spawn loops, and ensures critical upgrade prompts and detailed status tooltips remain visible even when lint integration is temporarily disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
 
 ### Added
 
@@ -82,6 +82,7 @@ TODO [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
 
 ### Fixed
 
+- **Extension:** the start-up upgrade offer (for example `^16.x` to 17.0.0) now also runs when Lint integration is Off (`saropaLints.enabled` false); it was skipped exactly in the projects that most needed it. The status bar item and upgrade prompt now also appear when Lint integration is Off.
 - **Extension:** the status bar "N workspace issue(s)" item now lists each issue in its tooltip (large unexcluded files, missing watcher exclusions, extension host memory). Before, the tooltip showed only process stats, so the red dot gave no hint of the cause.
 - **Extension:** the Health Panel "LSP Server" ON toggle no longer does nothing. The setting defaults to true, so clicking ON while the server was stopped (failed start, or after Kill All) rewrote the same value, fired no change event, and started nothing. The toggle now starts or stops the server directly, and the Health Panel refreshes. A failed start now shows an error message with the reason instead of only logging to the output channel.
 - **Extension:** Health Panel "Kill All" and "Restart All" buttons now name their target ("Kill All LSP Server", "Restart LSP Server").
@@ -501,68 +502,6 @@ Process Health now tracks only saropa-owned memory, so other VS Code windows no 
 - Added 45 tests total in the systemHealth suite (90 passing): `classifyProcess` discriminated union (8), process partition mutual exclusivity (3), marker substring containment invariant (1), plus the existing `processLabel` (9), `isAnalysisServerProcess` (4), `truncateLabel` (5), RSS trend boundary (2), `renderSparkline` (6), `detectMonotonicGrowth` (7).
 - Extracted `getDetectedPackIds` in `rulePackDefinitions.ts` as the single source of truth for pack applicability. The dashboard table and "Enable all" button both call it instead of inlining `isPackDetected` filters independently.
 - Replaced the collapsed HTML Maintenance expander changelog convention with a `### Internal` heading, enforced by a pre-commit hook and a publish-time gate.
-
----
-
-## [16.0.0-beta.6]
-
-Fixes a false positive in the l10n diagnostic provider and catches more CI-only test failures locally before publishing. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.6/CHANGELOG.md)
-
-### Fixed
-
-- Fixed the l10n diagnostic provider (`saropa-l10n`) reporting false-positive "expects params but none passed" warnings when `l10n()` receives its params via a variable or expression instead of an inline object literal. The parser now recognizes non-literal second arguments and skips static key extraction for them.
-- Fixed the l10n diagnostic silently accepting `l10n('key', undefined)` and `l10n('key', null)` without warning when the template expects params. These keyword arguments are now correctly treated as "no params passed."
-
-### Internal
-
-- Introduced a branded `OpaqueParams` type for the l10n parser sentinel, preventing accidental use of the sentinel string in key-extraction functions at compile time.
-- Extracted `extractBalancedBrace` as a shared export from `l10nParsers.ts`, deduplicating the brace-matching loop previously inlined in `extractParamsBlock`.
-- Added missing `usesTypeResolution` override to `AvoidCaseSensitivePathComparisonRule` (uses `staticType`).
-- Added 4 missing codes to the `flutter_skill_lints` migration pack that moved from TODO/PARTIAL to HAVE.
-- Publish script: `create_git_tag` now prompts before moving a stale remote tag to HEAD on retry instead of hard-failing.
-- Publish script: `_find_workflow_run` skips already-failed runs so retry doesn't re-attach to old workflows.
-- Publish script: delta test pass now includes integrity and config test suites when rule/config files change, catching cross-cutting failures locally instead of deferring to CI.
-
----
-
-## [16.0.0-beta.5]
-
-Hardens memory safety and scan reliability across the extension and CLI. Memory pressure detection now attributes usage correctly, preventing false pauses on large projects, and a stalled scan on save can no longer disable the feature for the session. Also fixes false positives in timer-lifecycle and manifest rules, and adds orphaned-process detection at startup. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.5/CHANGELOG.md)
-
-### Added
-
-- Memory debug mode: set `SAROPA_LINTS_DEBUG_MEMORY=1` to log per-cache size breakdowns on every periodic memory trend line. Helps diagnose which plugin caches are growing when investigating memory pressure.
-- Orphaned process check: finds model host and Dart processes left behind by earlier sessions, reports how much memory they hold, and offers to reclaim them after you confirm. Runs once shortly after startup and is also available from the Process Health panel and the command palette.
-- New `saropaLints.scanOnSave.timeoutSeconds` setting (default 180, range 30 to 1800) caps how long a single scan on save may run before it is abandoned. Raise it on very large projects if scans are cut short.
-- Diagnostic triage script: `python scripts/triage_scan.py` post-processes `--format json` scan output into five priority buckets (errors → bulk fixes → individual triage → dev code → forked code), replacing manual categorization of bulk lint sweeps. Supports `--suppress-dirs`, `--dev-dirs`, `--bulk-threshold`, and `--format json` for machine-readable output.
-
-### Fixed
-
-- Fixed stale diagnostics persisting in the Problems panel after adding `// ignore:` directives or fixing code. The scan CLI now honors `// ignore:` and `// ignore_for_file:` directives, and "Restart Analysis Server" now also clears scan-on-save diagnostics and rescans open editors.
-- Fixed hard RSS valve pausing all rules based on the analysis server's total process memory instead of the plugin's own contribution. On large projects the server's AST caches and resolved element model consume 70–90% of RSS, tripping the valve even when the plugin's estimated footprint is under 100 MB. The valve now checks plugin attribution: it only pauses rules when the plugin's estimated memory exceeds 100 MB or 5% of process RSS. A separate unconditional panic threshold at 90% of system RAM provides last-resort OOM protection.
-- Fixed the Drift Advisor integration opening every Dart file in the workspace on each 30-second poll, which could cascade into repeated whole-project scans and exhaust system memory until VS Code crashed. Table lookups now read files directly without creating editor documents, and results are cached until Dart sources change. No action required; the integration is off by default, so only users who enabled it were affected.
-- Fixed scan on save treating a file opened by other extension code as a file the user opened, which let any extension's background file access trigger lint scans. Scans now run only for files you actually have open or have saved.
-- Fixed a stalled scan permanently disabling scan on save for the rest of the session. Scans now time out, are canceled when a newer save supersedes them, and release their slot on every failure path.
-- Fixed the memory status bar showing a red critical badge next to a healthy memory figure when the real trigger was orphaned background processes. The badge now names whichever condition actually tripped, and a memory reading shows the same total the warning threshold is compared against.
-- Fixed every level of memory pressure painting the status bar error red, including informational ones such as a light rule shed. Only genuinely severe states are red now, with moderate states amber and informational states left uncolored.
-- Fixed a Dart file open only as one side of a diff or merge view never receiving scan on save diagnostics, because only ordinary tabs were recognized.
-- Fixed a canceled scan leaving an orphaned Dart process on macOS and Linux, and a failure to launch the process cleanup command being able to crash the extension host.
-- Fixed the memory status bar showing plugin state that was no longer live, so a project with the analyzer plugin switched off could still display paused rules and a large memory figure from an earlier session. Nothing is shown now unless the plugin is enrolled and the reading is from the current session.
-- Fixed the memory safety valve never resuming rules after it paused them. Clearing the plugin's own caches made it a minor memory contributor, but release was tested against total process memory, which the analysis server keeps high, so rules stayed paused indefinitely.
-- Fixed the memory valve repeatedly re-measuring every cache while the analysis server sat above the memory cap, which made the common case the most expensive one.
-- Fixed the translation tooling abandoning multi-gigabyte model host processes on every run, by terminating whole process trees rather than a parent alone, sweeping for survivors, and refusing to start when abandoned processes are already present.
-- Fixed `require_copy_with_null_handling` firing on `copyWith` methods where all fields using `??` are non-nullable types. The sentinel/wrapper pattern adds no value when a field cannot be null, so `??` is the correct pattern. The rule now checks class field nullability before emitting.
-- Fixed `require_permission_manifest_android` asserting a missing manifest entry when it cannot read AndroidManifest.xml. Downgraded to INFO severity since the rule is advisory only.
-- Fixed `require_url_launcher_queries_android` asserting missing `<queries>` blocks when it cannot read AndroidManifest.xml. Downgraded to INFO severity since the rule is advisory only.
-- Fixed `require_workmanager_for_background` firing on `Timer.periodic` inside `State` subclasses with proper `cancel()` in `dispose()`. UI-lifecycle timers are not background tasks.
-- Extended `require_workmanager_for_background` to also detect `Stream.periodic` — the same background-polling anti-pattern using the stream API.
-- Fixed `avoid_ios_battery_drain_patterns` firing on `Timer.periodic` inside `State` subclasses with proper `cancel()` in `dispose()`. Widget-bound timers cannot drain battery in the background.
-
-### Internal
-
-- Triage script (`scripts/triage_scan.py`): added diagnostic-key validation (warns when `filePath`/`severity`/`ruleName` are missing), and a 29-test unit-test suite covering path classification, bucket assignment, and output formatting.
-- Changelog guard hook (`scripts/hooks/changelog_guard.py`): removed the `package.json` version-drift check that false-alarmed every beta cycle because VS Code uses a different version scheme. Guard 1 (multiple unreleased sections) still triggers on `package.json` edits.
-- Extracted shared `isTimerLifecycleBoundToDisposableState()` helper to eliminate duplicate private implementations across timer lifecycle rules.
 
 ---
 

@@ -2,7 +2,7 @@
 
 Archived releases, one file per major.minor line in [changelog/archive/](changelog/archive/). Search the whole record with `grep -r <term> changelog/archive/`. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
 
-- [16.0.x](changelog/archive/16.0.x.md) — 4 release(s), 16.0.0–16.0.0
+- [16.0.x](changelog/archive/16.0.x.md) — 6 release(s), 16.0.0–16.0.0-beta.7
 - [15.2.x](changelog/archive/15.2.x.md) — 12 release(s), 15.2.0–15.2.12
 - [15.1.x](changelog/archive/15.1.x.md) — 3 release(s), 15.1.0–15.1.2
 - [15.0.x](changelog/archive/15.0.x.md) — 5 release(s), 15.0.0–15.0.4
