@@ -5,6 +5,7 @@
 enum BadEnum {
   a,
   b;
+
   // LINT: illegal_enum_values — shadows static values getter
   int get values => 0;
 }
@@ -12,5 +13,6 @@ enum BadEnum {
 enum GoodEnum {
   a,
   b;
+
   int get count => 0;
 }

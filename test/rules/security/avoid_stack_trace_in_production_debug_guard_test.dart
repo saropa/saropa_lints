@@ -20,7 +20,7 @@ import 'package:analyzer/dart/element/type_system.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 // ignore: implementation_imports
-import 'package:analyzer/src/string_source.dart';
+import 'package:analyzer/source/file_source.dart';
 import 'package:analyzer/workspace/workspace.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/rules/security/security_network_input_rules.dart';
@@ -119,7 +119,7 @@ const bool kDebugMode = !kReleaseMode && !kProfileMode;
     final RecordingDiagnosticListener listener = RecordingDiagnosticListener();
     final DiagnosticReporter reporter = DiagnosticReporter(
       listener,
-      StringSource(result.content, path),
+      FileSource(provider.getFile(path)),
     );
     final RuleContextUnit ctxUnit = RuleContextUnit(
       file: provider.getFile(path),

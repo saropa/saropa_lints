@@ -118,7 +118,5 @@ void _bad1304() {
 
 // GOOD: Should NOT trigger prefer_listview_builder
 void _good1304() {
-  MaterialApp(
-    home: MyHomePage(),
-  );
+  MaterialApp(home: MyHomePage());
 }

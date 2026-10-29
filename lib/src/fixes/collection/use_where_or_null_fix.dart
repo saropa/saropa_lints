@@ -49,7 +49,7 @@ class UseWhereOrNullFix extends SaropaFixProducer {
     // Get the predicate (first positional arg), skip orElse
     final args = invocation.argumentList.arguments;
     final predicate = args.firstOrNull;
-    if (predicate == null || predicate is NamedExpression) return;
+    if (predicate == null || predicate is NamedArgument) return;
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

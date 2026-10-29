@@ -377,8 +377,8 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
     // Nullable-safe: an empty argument list cannot identify a thrown value, so
     // fall back to the original operand (which resolves to Never and is skipped
     // by the null-type guard upstream rather than misfiring).
-    final NodeList<Expression> args = operand.argumentList.arguments;
-    return args.isEmpty ? operand : args.first;
+    final NodeList<Argument> args = operand.argumentList.arguments;
+    return args.isEmpty ? operand : args.first.argumentExpression;
   }
 
   /// True when [type] (or any non-Object supertype) declares `toString()`.

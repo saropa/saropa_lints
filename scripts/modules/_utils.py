@@ -61,116 +61,50 @@ def strip_prerelease_suffix(version: str) -> str:
     return version.split("-", 1)[0]
 
 
-# Base offset band added to PATCH for every prerelease extension version.
-# Large enough that it will never collide with a genuine stable PATCH
-# release (this project's patch history tops out in the low teens), small
-# enough to stay legible. See extension_version_for() for why this exists.
-_PRERELEASE_PATCH_OFFSET = 500
-
-# Second band, added on top of _PRERELEASE_PATCH_OFFSET, derived from the
-# prerelease CHANNEL name (the "beta" in "beta.1") so different channels of
-# the same base version ("16.0.0-beta.1" vs "16.0.0-rc.1") don't collide —
-# the version prompt accepts any channel tag, not just "beta". Bounded to
-# keep the final number readable; collisions between two DIFFERENT channel
-# names are reduced, not mathematically ruled out (this is a hash band, not
-# a registry of issued versions).
-_PRERELEASE_CHANNEL_BAND = 1000
-
 _PRERELEASE_ITERATION_RE = _re.compile(r"(\d+)\s*$")
 
-
-def suggest_even_minor_stable(version: str) -> str:
-    """Return *version* with an odd minor bumped to the next even minor.
-
-    ``16.7.0`` -> ``16.8.0``. Even-minor and prerelease versions are
-    returned unchanged.
-    """
-    if is_prerelease_version(version):
-        return version
-    major, minor, _patch = version.split(".")
-    if int(minor) % 2 == 0:
-        return version
-    return f"{major}.{int(minor) + 1}.0"
-
-
-def stable_version_error(version: str) -> str | None:
-    """Return an error message if *version* is an unsafe stable release.
-
-    Stable versions with an ODD minor are refused: ``extension_version_for``
-    treats odd minors as already-converted prerelease values and leaves them
-    unchanged, so e.g. 16.7.0 would publish as extension 16.7.0 -- lower than
-    an already-published 16.8.0. Prerelease versions (any minor) are allowed.
-    Returns None when the version is acceptable. Does not affect
-    ``extension_version_for`` idempotency (validation only).
-    """
-    if is_prerelease_version(version):
-        return None
-    parts = version.split(".")
-    if len(parts) != 3 or not parts[1].isdigit():
-        return None  # format errors are reported by the regex check
-    if int(parts[1]) % 2 == 0:
-        return None
-    return (
-        "Stable versions must have an even minor (e.g. "
-        f"{parts[0]}.{int(parts[1]) + 1}.0) because the extension maps odd "
-        "minors to pre-release; odd-minor stable would produce an extension "
-        "version lower than an already-published one. "
-        f"Use {suggest_even_minor_stable(version)}."
-    )
+# Each Dart package patch P owns ten extension patches 10*P .. 10*P+9
+# ("fixed slots"): slots 0-8 are prerelease iterations 1-9, slot 9 is stable.
+_STABLE_SLOT = 9
+_MAX_PRERELEASE_ITERATION = 9
 
 
 def extension_version_for(version: str) -> str:
     """Return the extension/package.json version to publish for *version*.
 
-    VS Code uses an odd/even minor convention: odd minor = pre-release,
-    even minor = stable. Both stable and prerelease versions get their
-    MINOR adjusted so stable always supersedes its betas numerically.
+    *version* must ALWAYS be the Dart package version (never an already
+    converted value): the mapping is not idempotent.
 
-    Prerelease (e.g. "16.0.0-beta.1") → odd minor, offset patch:
-    ``16.1.913``.  The PATCH is offset by _PRERELEASE_PATCH_OFFSET plus
-    a channel-derived band plus the iteration number, so successive beta
-    iterations produce distinct versions.
+    The extension shares the package's MAJOR.MINOR always; only the PATCH
+    differs. With P the package patch, extension patch = ``10*P + slot``:
 
-    Stable (e.g. "16.0.1") → even minor one above the prerelease band:
-    ``16.2.1``.  This guarantees stable > prerelease in semver, so
-    marketplace users on a beta auto-update to the stable release.
-    The even minor is ``(original_minor | 1) + 1`` — the next even
-    integer at or above the prerelease odd minor.
+    - Prerelease ``X.Y.Z-<channel>.N`` -> slot N-1 (N in 1..9; a bare
+      ``-beta`` counts as N=1). N > 9 raises ValueError.
+    - Stable -> slot 9.
 
-    **Idempotency guarantee:** calling this function twice on the same input
-    returns the same result. A converted prerelease version (e.g. "16.1.913")
-    contains no ``-``, so ``is_prerelease_version`` returns False and the
-    stable path returns it unchanged (odd minor stays odd because
-    ``(1 | 1) + 1 = 2`` would break idempotency — so the stable path
-    only bumps when the minor is even, i.e. not already converted).
-    ``set_extension_version`` relies on this property.
+    Examples: 17.0.0-beta.1 -> 17.0.0, 17.0.0-beta.2 -> 17.0.1,
+    17.0.0 -> 17.0.9, 17.0.1-beta.1 -> 17.0.10, 17.0.1 -> 17.0.19.
+    Every successive publish is strictly higher, and a stable always beats
+    its prereleases. The channel name is ignored, so ``-alpha.1`` and
+    ``-beta.1`` of the same patch share a slot and must not both be
+    published.
     """
-    base = strip_prerelease_suffix(version)
-    major, minor, patch = base.split(".")
-    minor_int = int(minor)
-
+    major, minor, patch = strip_prerelease_suffix(version).split(".")
     if is_prerelease_version(version):
-        # Odd minor for prerelease so VS Code's "Switch to Pre-Release" works.
-        prerelease_minor = minor_int | 1
         suffix = version.split("-", 1)[1]
         match = _PRERELEASE_ITERATION_RE.search(suffix)
         iteration = int(match.group(1)) if match else 1
-        channel = suffix[: match.start()].rstrip(".") if match else suffix
-        channel_band = sum(ord(c) for c in channel) % _PRERELEASE_CHANNEL_BAND
-        new_patch = (
-            int(patch) + _PRERELEASE_PATCH_OFFSET + channel_band + iteration
-        )
-        return f"{major}.{prerelease_minor}.{new_patch}"
-
-    # Stable: bump minor to the next even above the prerelease odd minor,
-    # so stable always supersedes its betas (e.g. 16.2.x > 16.1.x).
-    # Skip the bump when minor is already odd — that means this value was
-    # already converted from a prerelease (idempotency guard).
-    if minor_int % 2 == 0:
-        stable_minor = (minor_int | 1) + 1
+        if not 1 <= iteration <= _MAX_PRERELEASE_ITERATION:
+            raise ValueError(
+                f"Prerelease iteration {iteration} in '{version}' is out of "
+                f"range: only iterations 1-{_MAX_PRERELEASE_ITERATION} fit "
+                "the extension's patch slots. Bump the patch version "
+                "instead."
+            )
+        slot = iteration - 1
     else:
-        stable_minor = minor_int
-    return f"{major}.{stable_minor}.{patch}"
+        slot = _STABLE_SLOT
+    return f"{major}.{minor}.{int(patch) * 10 + slot}"
 
 
 # =============================================================================
@@ -684,6 +618,193 @@ def get_shell_mode() -> bool:
 # =============================================================================
 
 
+# Default ceiling for any non-test, non-build subprocess in the publish path.
+DEFAULT_TIMEOUT_S = 120
+# Generous ceilings for steps that legitimately run long.
+LONG_TIMEOUT_S = 30 * 60
+# Seconds between "still running" lines for steps with captured output.
+HEARTBEAT_S = 30
+
+
+def hardened_env(env: dict[str, str] | None = None) -> dict[str, str]:
+    """Environment that makes tools fail fast instead of prompting."""
+    merged = dict(os.environ if env is None else env)
+    merged.setdefault("GIT_TERMINAL_PROMPT", "0")
+    merged.setdefault("npm_config_yes", "true")
+    merged.setdefault("npm_config_update_notifier", "false")
+    merged.setdefault("npm_config_fund", "false")
+    merged.setdefault("npm_config_audit", "false")
+    merged.setdefault("CI_NO_PROMPT", "1")
+    merged.setdefault("PUB_ENVIRONMENT", "saropa_publish")
+    return merged
+
+
+def kill_process_tree(proc: subprocess.Popen) -> None:
+    """Kill *proc* and all its descendants (best effort)."""
+    try:
+        if is_windows():
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                capture_output=True, stdin=subprocess.DEVNULL, timeout=15,
+            )
+        else:
+            import signal
+
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    try:
+        proc.kill()
+    except OSError:
+        pass
+
+
+def _tail(text: str | bytes | None, n: int = 10) -> str:
+    if not text:
+        return ""
+    if isinstance(text, bytes):
+        text = text.decode("utf-8", errors="replace")
+    return "\n".join(text.strip().splitlines()[-n:])
+
+
+def _report_timeout(cmd: list[str], elapsed: float, out: str, err: str) -> str:
+    msg = (
+        f"TIMEOUT after {elapsed:.0f}s: {' '.join(map(str, cmd))}\n"
+        f"last output:\n{_tail(out)}\n{_tail(err)}"
+    )
+    print_error(msg)
+    log_write(msg)
+    return msg
+
+
+def start_watchdog(
+    proc: subprocess.Popen, timeout: float, label: str,
+    heartbeat: float = HEARTBEAT_S,
+):
+    """Kill *proc*'s tree after *timeout*s and print a heartbeat meanwhile.
+
+    For streaming Popen sites whose read loop blocks. Returns an Event; call
+    .set() when the process is done. Check ``event.timed_out`` afterwards.
+    """
+    import threading
+    import time
+
+    done = threading.Event()
+    done.timed_out = False  # type: ignore[attr-defined]
+    started = time.monotonic()
+
+    def _watch() -> None:
+        while not done.wait(heartbeat):
+            elapsed = time.monotonic() - started
+            if elapsed >= timeout:
+                done.timed_out = True  # type: ignore[attr-defined]
+                msg = f"TIMEOUT after {elapsed:.0f}s: {label}"
+                print_error(msg)
+                log_write(msg)
+                kill_process_tree(proc)
+                return
+            print_info(f"still running: {label} ({elapsed:.0f}s)")
+
+    threading.Thread(target=_watch, daemon=True).start()
+    return done
+
+
+def safe_run(
+    cmd: list[str],
+    *,
+    timeout: float | None | str = "auto",
+    tty: bool = False,
+    label: str | None = None,
+    heartbeat: float = HEARTBEAT_S,
+    **kwargs,
+) -> subprocess.CompletedProcess:
+    """Drop-in for subprocess.run that cannot hang silently.
+
+    - stdin is /dev/null unless tty=True (auth/OTP prompts), so a hidden
+      prompt fails fast.
+    - the whole process tree is killed after *timeout* seconds ("auto" picks
+      a per-command default, None = no limit, only for tty=True); on timeout returns returncode 124 with the
+      command, elapsed time and last output lines in stderr.
+    - when output is captured a "still running" line prints every
+      *heartbeat* seconds.
+    """
+    import time
+
+    if timeout == "auto":
+        timeout = _default_timeout(cmd)
+    capture = kwargs.pop("capture_output", False)
+    if capture:
+        kwargs.setdefault("stdout", subprocess.PIPE)
+        kwargs.setdefault("stderr", subprocess.PIPE)
+    if not tty:
+        kwargs.setdefault("stdin", subprocess.DEVNULL)
+    kwargs["env"] = hardened_env(kwargs.get("env"))
+    if not is_windows():
+        kwargs.setdefault("start_new_session", True)
+    kwargs.pop("check", None)
+    text_in = kwargs.pop("input", None)
+    if text_in is not None:
+        kwargs["stdin"] = subprocess.PIPE
+    if kwargs.get("text") and "encoding" not in kwargs:
+        kwargs["encoding"] = "utf-8"
+        kwargs.setdefault("errors", "replace")
+
+    name = label or " ".join(map(str, cmd))[:80]
+    started = time.monotonic()
+    proc = subprocess.Popen(cmd, **kwargs)
+    out: str | bytes | None = None
+    err: str | bytes | None = None
+    pending_input = text_in
+    while True:
+        elapsed = time.monotonic() - started
+        wait = heartbeat
+        if timeout is not None:
+            wait = max(0.1, min(heartbeat, timeout - elapsed))
+        try:
+            out, err = proc.communicate(input=pending_input, timeout=wait)
+            break
+        except subprocess.TimeoutExpired as exc:
+            pending_input = None
+            elapsed = time.monotonic() - started
+            if timeout is not None and elapsed >= timeout:
+                kill_process_tree(proc)
+                try:
+                    out, err = proc.communicate(timeout=5)
+                except (subprocess.TimeoutExpired, ValueError, OSError):
+                    out, err = exc.stdout, exc.stderr
+                msg = _report_timeout(
+                    cmd, elapsed, out if isinstance(out, (str, bytes)) else "",
+                    err if isinstance(err, (str, bytes)) else "",
+                )
+                is_text = bool(kwargs.get("text") or kwargs.get("encoding"))
+                return subprocess.CompletedProcess(
+                    cmd, 124,
+                    (out or ("" if is_text else b"")),
+                    msg if is_text else msg.encode(),
+                )
+            if capture or kwargs.get("stdout") is not None:
+                print_info(f"still running: {name} ({elapsed:.0f}s)")
+    return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
+
+
+def _default_timeout(cmd: list[str]) -> float:
+    """Per-command ceiling: generous for builds/hooks/network, else 120s."""
+    head = [str(c) for c in cmd[:3]]
+    exe = Path(head[0]).name.lower().split(".")[0] if head else ""
+    if exe in ("npm", "npx", "vsce", "ovsx", "python", "python3", "flutter"):
+        return 600
+    sub = head[1] if len(head) > 1 else ""
+    if exe == "dart" and sub == "test":
+        return LONG_TIMEOUT_S
+    if exe == "dart" and sub in ("run", "pub", "analyze", "doc", "fix"):
+        return 900
+    if exe == "git" and len(head) > 1 and head[1] in (
+        "commit", "push", "pull", "fetch", "clone",
+    ):
+        return 600  # commit runs pre-commit hooks
+    return DEFAULT_TIMEOUT_S
+
+
 def run_command(
     cmd: list[str],
     cwd: Path,
@@ -692,6 +813,8 @@ def run_command(
     allow_failure: bool = False,
     summarize: bool = False,
     env: dict[str, str] | None = None,
+    timeout: float | None = None,
+    tty: bool = False,
 ) -> subprocess.CompletedProcess:
     """Run a shell command and handle errors.
 
@@ -706,6 +829,9 @@ def run_command(
             On failure: prints the last 10 lines of output.
             Full output is shown in --verbose mode on failure.
         env: Optional environment for the process. If None, inherits current env.
+        timeout: Seconds before the process tree is killed (exit 124).
+            None picks a default from the command (see _default_timeout).
+        tty: True only for steps that need the terminal (auth/OTP prompts).
 
     Returns:
         The CompletedProcess result.
@@ -720,14 +846,19 @@ def run_command(
 
     # summarize mode always captures output
     should_capture = capture_output or summarize
+    if timeout is None:
+        timeout = _default_timeout(cmd)
 
-    result = subprocess.run(
+    result = safe_run(
         cmd,
         cwd=cwd,
         capture_output=should_capture,
         text=True,
         shell=use_shell,
         env=env,
+        timeout=timeout,
+        tty=tty,
+        label=description,
         # Force UTF-8 to avoid UnicodeDecodeError on Windows,
         # where the default cp1252 can't handle all dart output bytes
         encoding="utf-8",

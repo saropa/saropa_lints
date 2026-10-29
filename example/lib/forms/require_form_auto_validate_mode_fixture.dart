@@ -112,10 +112,7 @@ dynamic user;
 // BAD: Should trigger require_form_auto_validate_mode
 // expect_lint: require_form_auto_validate_mode
 void _bad408() {
-  Form(
-    key: _formKey,
-    child: TextFormField(),
-  );
+  Form(key: _formKey, child: TextFormField());
   // Uses default AutovalidateMode.disabled - no automatic validation
 }
 

@@ -117,12 +117,12 @@ class _bad433__MyWidgetState extends State<MyWidget> {
   void initState() {
     super.initState();
     _listener = ImageStreamListener((image, sync) {
-// Handle image
+      // Handle image
     });
     _imageStream = ImageProvider.resolve(configuration);
     _imageStream?.addListener(_listener);
   }
-// Missing removeListener in dispose!
+  // Missing removeListener in dispose!
 }
 
 // GOOD: Should NOT trigger require_image_stream_dispose
@@ -134,7 +134,7 @@ class _good433__MyWidgetState extends State<MyWidget> {
   void initState() {
     super.initState();
     _listener = ImageStreamListener((image, sync) {
-// Handle image
+      // Handle image
     });
     _imageStream = ImageProvider.resolve(configuration);
     _imageStream?.addListener(_listener);

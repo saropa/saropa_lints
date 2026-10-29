@@ -2757,5 +2757,134 @@
       "problem": "Score {score}/100 — installed version needs upgrading",
       "insight": "Installed version is known-broken — upgrade required"
     }
+  },
+  "ruleMigration": {
+    "skip": {
+      "generated": "Skipped generated file {file}.",
+      "unreadable": "Skipped {file}: it could not be read.",
+      "unparseable": "Skipped {file}: it is not valid JSON."
+    },
+    "finding": {
+      "bareName": "{file}:{line} ignores {name} without the saropa_lints/ prefix. Left unchanged; add the prefix and run the migration again.",
+      "clash": "{file}:{line} has both {name} and its replacement. Kept the replacement and removed {name}."
+    }
+  },
+  "compat": {
+    "startup": {
+      "routeDependency": "the pubspec route (pubspec.yaml)",
+      "routePlugin": "the plugin route (analysis_options.yaml)",
+      "routeBoth": "both routes (pubspec.yaml and analysis_options.yaml)",
+      "installedDisagree": "{pubspec} in pubspec.yaml and {plugin} in analysis_options.yaml",
+      "offer": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. Migrate?",
+      "offerNoDart": "saropa_lints: your project uses {route} at {installed}. {offered} is available. Migrate?",
+      "offerRenames": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. {count} rules were renamed since {installed}. Migrate?",
+      "offerNoDartRenames": "saropa_lints: your project uses {route} at {installed}. {offered} is available. {count} rules were renamed since {installed}. Migrate?",
+      "offerRenamesUnknown": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. Renamed rules will be checked after the upgrade. Migrate?",
+      "offerNoDartRenamesUnknown": "saropa_lints: your project uses {route} at {installed}. {offered} is available. Renamed rules will be checked after the upgrade. Migrate?",
+      "actionMigrate": "Migrate"
+    },
+    "status": {
+      "pubspec": "saropa_lints: pubspec {version}",
+      "pubspecUnlocked": "saropa_lints: pubspec (not locked yet)",
+      "plugin": "saropa_lints: plugin route {version}",
+      "both": "saropa_lints: pubspec + plugin {version}",
+      "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (disagree)",
+      "neither": "saropa_lints: not configured",
+      "localSource": "saropa_lints: local source",
+      "dartTooOld": "saropa_lints: plugin needs newer Dart",
+      "tipPubspec": "This project uses the pubspec route: saropa_lints is a dependency in pubspec.yaml. You get editor diagnostics and the command line commands (dart run saropa_lints:init, scan, baseline).",
+      "tipPlugin": "This project uses the plugin route: saropa_lints is set as a plugin in analysis_options.yaml. You get editor diagnostics only. The command line commands (dart run saropa_lints:init, scan, baseline) need saropa_lints in pubspec.yaml.",
+      "tipBoth": "This project uses both routes and they agree. You get editor diagnostics and the command line commands.",
+      "tipDisagree": "pubspec.yaml and analysis_options.yaml name different saropa_lints versions. The editor uses the plugin version ({plugin}); the command line commands use the pubspec.yaml version ({pubspec}).",
+      "tipNeither": "saropa_lints is not set up in this project: it is neither a dependency in pubspec.yaml nor a plugin in analysis_options.yaml.",
+      "tipLocalSource": "saropa_lints comes from a local path or git source, so the extension shows facts only and changes nothing.",
+      "tipDartTooOld": "The plugin route in analysis_options.yaml needs a newer Dart SDK than this project has, so the editor cannot load the plugin.",
+      "tipClick": "Click to open the version compatibility card."
+    },
+    "recommend": {
+      "latestOk": "saropa_lints {version} is the newest release and works with this project. Use ^{version}.",
+      "alreadyCorrect": "This project already uses the recommended saropa_lints configuration. No action needed.",
+      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "metaExcludesPin": "saropa_lints {newest} needs a newer meta package than your Flutter SDK pins ({pin}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "packageHoldsAnalyzer": "The package {package} holds the analyzer back, so saropa_lints {newest} cannot be installed. Use ^{chosen}, or update {package} to use {newest}.",
+      "noVersionResolves": "No saropa_lints version can be installed as a dependency because {package} requires an older analyzer. The plugin route still works.",
+      "noPluginResolves": "No saropa_lints version can be installed as a dependency, and {version} did not pass the pub solver as a plugin either ({package} requires an older analyzer). Nothing was changed.",
+      "blockedUsePlugin": "{package} holds the analyzer back, so saropa_lints cannot be installed as a dependency. The plugin route is not affected: set the plugin version in analysis_options.yaml to {version}.",
+      "editorVsCli": "The editor will use the plugin version {plugin}. The command line (dart run saropa_lints:init, scan, baseline) keeps using the pubspec.yaml version {pubspec}.",
+      "cliNeedsPubspec": "dart run saropa_lints:init, scan and baseline need saropa_lints in pubspec.yaml.",
+      "pluginUnverified": "The plugin version {version} could not be checked with the pub solver. It is suggested from the Dart SDK constraint only.",
+      "pluginOnly": "Set the saropa_lints plugin version in analysis_options.yaml to {version}.",
+      "alignPlugin": "The plugin version in analysis_options.yaml ({plugin}) differs from the locked saropa_lints version ({locked}). Set the plugin version to {locked}.",
+      "localSource": "saropa_lints comes from a local {source} source, so the extension shows facts only and changes nothing.",
+      "noCompatible": "No published saropa_lints version works with this project's Dart SDK.",
+      "noVersions": "No saropa_lints versions are available to recommend.",
+      "probeFailed": "Could not check which saropa_lints version this project can use because the Dart tooling did not run ({detail}). Make sure dart or flutter is on your PATH and you are online, then re-check.",
+      "staleVersions": "The version list could not be refreshed (offline), so this advice may be out of date.",
+      "blockerSdk": "saropa_lints {version} requires a newer Dart SDK than {dart}.",
+      "blockerMeta": "saropa_lints {version} is not compatible with the meta version {pin} pinned by your Flutter SDK.",
+      "blockerPackage": "{package} prevents the install by requiring a different analyzer version.",
+      "fixFlutterUpgrade": "Run flutter upgrade.",
+      "fixUpgradeFlutterMeta": "Upgrade Flutter to a release that pins a newer meta.",
+      "fixKeepVersion": "Keep saropa_lints at ^{version}.",
+      "fixUpdateHolder": "Update {package} to a version that supports a newer analyzer.",
+      "fixUsePluginRoute": "Use the plugin route: set the plugin version in analysis_options.yaml to {version}.",
+      "fixPubspecFallback": "Or stay on the pubspec route: use saropa_lints ^{version}, or update {package} to a version that supports a newer analyzer.",
+      "fixAlignPlugin": "Set the plugin version in analysis_options.yaml to {version}."
+    },
+    "card": {
+      "heading": "Version compatibility",
+      "loading": "Checking which saropa_lints version this project can use...",
+      "notDetected": "not detected",
+      "dart": "Dart SDK",
+      "flutter": "Flutter SDK",
+      "lockedSaropa": "Locked saropa_lints",
+      "lockedAnalyzer": "Locked analyzer",
+      "plugin": "Plugin version (analysis_options.yaml)",
+      "blockers": "What blocks a newer version",
+      "fixes": "How to fix",
+      "apply": "Apply",
+      "applying": "Applying...",
+      "preview": "Preview diff",
+      "refresh": "Re-check",
+      "diffTitle": "{file}: proposed version change",
+      "staleReloaded": "The project changed while you were looking at this card, so nothing was applied. Review the updated advice and click Apply again.",
+      "loadFailed": "Could not check version compatibility: {detail}",
+      "routeLabel": "Install route",
+      "routes": {
+        "dependency": "Dependency in pubspec.yaml",
+        "plugin": "Plugin in analysis_options.yaml only",
+        "both": "Dependency and plugin",
+        "none": "No change possible"
+      }
+    },
+    "apply": {
+      "progress": "Applying saropa_lints version change",
+      "applied": "saropa_lints {version} is installed and configured.",
+      "noChange": "No file changes are needed.",
+      "failedRestored": "The version change failed: {detail} pubspec.yaml and analysis_options.yaml were restored to their previous content.",
+      "failedNotRestored": "The version change failed: {detail} The files could not be restored automatically; check pubspec.yaml and analysis_options.yaml.",
+      "cancelledRestored": "The version change was cancelled. pubspec.yaml and analysis_options.yaml were restored to their previous content.",
+      "cancelledNotRestored": "The version change was cancelled, but the files could not be restored automatically; check pubspec.yaml and analysis_options.yaml."
+    }
+  },
+  "ruleMigration": {
+    "none": "No renamed rules need migrating.",
+    "noWorkspace": "Open a Dart project folder to migrate rule names.",
+    "pickTitle": "Migrate renamed rules",
+    "pickPlaceholder": "Choose the files to update",
+    "fileHits": "{hits} change(s)",
+    "diffTitle": "Rule rename: {file}",
+    "confirm": "Apply rule renames to {count} file(s)? The diffs are open for review.",
+    "apply": "Apply",
+    "progress": "Migrating renamed rules",
+    "applied": "Updated {hits} rule reference(s) in {count} file(s): {files}.",
+    "bareNames": "Left unchanged (ignore comments without the saropa_lints/ prefix): {items}.",
+    "clashes": "Both the old and new rule name are set, please merge by hand: {items}.",
+    "skipped": "Skipped: {items}.",
+    "failedRestored": "Rule migration failed: {detail} All files were restored to their previous content.",
+    "failedNotRestored": "Rule migration failed: {detail} Some files could not be restored automatically; check them with git.",
+    "offer": "Rename {hits} renamed rules in {count} files?",
+    "offerPreview": "Preview",
+    "offerNotNow": "Not now"
   }
 }

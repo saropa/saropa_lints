@@ -119,9 +119,7 @@ void _bad1203() async {
 // GOOD: Should NOT trigger prefer_test_wrapper
 void _good1203() async {
   testWidgets('shows button', (tester) async {
-    await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: MyButton())),
-    );
+    await tester.pumpWidget(MaterialApp(home: Scaffold(body: MyButton())));
   });
 
   // Teardown pattern (OK - not flagged):

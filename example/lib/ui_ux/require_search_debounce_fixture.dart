@@ -110,16 +110,12 @@ final text = 'text';
 // BAD: Should trigger require_search_debounce
 // expect_lint: require_search_debounce
 void _bad1264() {
-  TextField(
-    onChanged: (text) => searchApi(text),
-  );
+  TextField(onChanged: (text) => searchApi(text));
 }
 
 // GOOD: Should NOT trigger require_search_debounce
 void _good1264() {
-  TextField(
-    onChanged: (text) => _debouncer.run(() => searchApi(text)),
-  );
+  TextField(onChanged: (text) => _debouncer.run(() => searchApi(text)));
 }
 
 /// GOOD (6.0.4 regression): Debounce as class field — rule checks enclosing

@@ -113,18 +113,14 @@ dynamic child;
 void _bad1388() {
   Scaffold(
     appBar: AppBar(title: Text('Title')),
-    body: SafeArea(
-      child: ListView(),
-    ),
+    body: SafeArea(child: ListView()),
   );
 }
 
 // GOOD: No appBar/bottomNavBar; SafeArea is appropriate (must NOT trigger).
 void _goodNoAppBar() {
   Scaffold(
-    body: SafeArea(
-      child: Center(child: Text('Full-screen, no app bar')),
-    ),
+    body: SafeArea(child: Center(child: Text('Full-screen, no app bar'))),
   );
 }
 
@@ -140,9 +136,6 @@ void _good1388() {
 void _goodSafeAreaTopFalse() {
   Scaffold(
     appBar: AppBar(title: Text('Title')),
-    body: SafeArea(
-      top: false,
-      child: Center(child: Text('Content')),
-    ),
+    body: SafeArea(top: false, child: Center(child: Text('Content'))),
   );
 }

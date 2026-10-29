@@ -13,14 +13,24 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import tempfile
 from pathlib import Path
 
 from scripts.modules.strip_commit_msg_trailers import strip_commit_message
-from scripts.modules._extension_publish import set_extension_version
+from scripts.modules._extension_publish import (
+    _fetch_marketplace_latest_version,
+    extension_version_sync_error,
+    get_extension_identity,
+    set_extension_version,
+)
 from scripts.modules._utils import (
+    hardened_env,
+    is_windows,
+    safe_run,
+    start_watchdog,
     Color,
     VERSION_RE as _VERSION_RE,
     extension_version_for,
@@ -39,7 +49,7 @@ from scripts.modules._utils import (
 def get_current_branch(project_dir: Path) -> str:
     """Get the current git branch name."""
     use_shell = get_shell_mode()
-    result = subprocess.run(
+    result = safe_run(
         ["git", "rev-parse", "--abbrev-ref", "HEAD"],
         cwd=project_dir,
         capture_output=True,
@@ -52,7 +62,7 @@ def get_current_branch(project_dir: Path) -> str:
 def get_remote_url(project_dir: Path) -> str:
     """Get the git remote URL."""
     use_shell = get_shell_mode()
-    result = subprocess.run(
+    result = safe_run(
         ["git", "remote", "get-url", "origin"],
         cwd=project_dir,
         capture_output=True,
@@ -71,7 +81,7 @@ def extract_repo_path(remote_url: str) -> str:
 def tag_exists_on_remote(project_dir: Path, tag_name: str) -> bool:
     """Check if a git tag already exists on the remote."""
     use_shell = get_shell_mode()
-    result = subprocess.run(
+    result = safe_run(
         ["git", "ls-remote", "--tags", "origin", tag_name],
         cwd=project_dir,
         capture_output=True,
@@ -101,7 +111,7 @@ def ensure_publish_workflow_committed(
     if not workflow_path.exists():
         return True
 
-    result = subprocess.run(
+    result = safe_run(
         ["git", "status", "--porcelain", "--", _PUBLISH_WORKFLOW_PATH],
         cwd=project_dir,
         capture_output=True,
@@ -182,8 +192,8 @@ def _verify_versions_on_disk(
     print_success(f"Verified pubspec.yaml version is {version}")
 
     # --- extension/package.json (self-healing) ---
-    # package.json uses the converted extension version (odd minor for
-    # pre-release, offset patch), not the raw pub.dev version. The publish
+    # package.json uses the converted extension version (same major.minor,
+    # patch = 10*P + slot), not the raw pub.dev version. The publish
     # script owns this file's version field, so a mismatch is always safe
     # to fix in-place — no need to bail and make the user retry.
     expected_ext = extension_version_for(version)
@@ -212,6 +222,20 @@ def _verify_versions_on_disk(
     else:
         print_success(f"Verified extension/package.json version is {expected_ext}")
 
+    # Fail loudly before any publishing if the extension would go below the
+    # Marketplace version. Reuses the existing Marketplace lookup.
+    if pkg_path.exists():
+        publisher, name = get_extension_identity(project_dir)
+        live = (
+            _fetch_marketplace_latest_version(f"{publisher}.{name}")
+            if publisher and name else None
+        )
+        sync_err = extension_version_sync_error(
+            version, _read_package_json_version(pkg_path), live,
+        )
+        if sync_err:
+            print_error(sync_err)
+            return False
     return True
 
 
@@ -230,7 +254,7 @@ def _is_head_pushed(project_dir: Path) -> bool:
     """
     use_shell = get_shell_mode()
     # Get current branch name. Returns "HEAD" when detached.
-    branch_result = subprocess.run(
+    branch_result = safe_run(
         ["git", "rev-parse", "--abbrev-ref", "HEAD"],
         cwd=project_dir, capture_output=True, text=True, shell=use_shell,
     )
@@ -242,7 +266,7 @@ def _is_head_pushed(project_dir: Path) -> bool:
         return False
     # Check if origin/<branch> contains HEAD. Fails (returncode != 0)
     # when origin/<branch> doesn't exist or remote is unreachable.
-    contains_result = subprocess.run(
+    contains_result = safe_run(
         ["git", "merge-base", "--is-ancestor", "HEAD", f"origin/{branch}"],
         cwd=project_dir, capture_output=True, text=True, shell=use_shell,
     )
@@ -329,7 +353,7 @@ def _verify_versions_in_commit(
     use_shell = get_shell_mode()
 
     # --- pubspec.yaml in the committed tree (mandatory) ---
-    result = subprocess.run(
+    result = safe_run(
         ["git", "show", "HEAD:pubspec.yaml"],
         cwd=project_dir, capture_output=True, text=True, shell=use_shell,
     )
@@ -354,7 +378,7 @@ def _verify_versions_in_commit(
     print_success(f"Verified HEAD:pubspec.yaml version is {version}")
 
     # --- extension/package.json in the committed tree ---
-    result = subprocess.run(
+    result = safe_run(
         ["git", "show", "HEAD:extension/package.json"],
         cwd=project_dir, capture_output=True, text=True, shell=use_shell,
     )
@@ -376,7 +400,7 @@ def _verify_versions_in_commit(
         return True
 
     # Compare against the converted extension version, not the raw pub.dev
-    # version — package.json carries the odd-minor, offset-patch form.
+    # version — package.json carries the mapped patch form.
     expected_ext = extension_version_for(version)
     pkg_actual = pkg_match.group(1)
     if pkg_actual != expected_ext:
@@ -447,7 +471,7 @@ def git_commit_and_push(
     # immediately below, so the normalization is intended. Collapse them to a
     # single count line and pass through any other stderr unchanged.
     print_info("Staging changes...")
-    result = subprocess.run(
+    result = safe_run(
         ["git", "add", "-A"],
         cwd=project_dir,
         capture_output=True,
@@ -479,7 +503,7 @@ def git_commit_and_push(
     if not _verify_versions_on_disk(project_dir, version):
         return False
 
-    result = subprocess.run(
+    result = safe_run(
         ["git", "status", "--porcelain"],
         cwd=project_dir,
         capture_output=True,
@@ -508,7 +532,7 @@ def git_commit_and_push(
 
 def _strip_ai_attribution_from_head(project_dir: Path, use_shell: bool) -> None:
     """If HEAD commit message contains AI attribution, amend to remove it."""
-    result = subprocess.run(
+    result = safe_run(
         ["git", "log", "-1", "--format=%B"],
         cwd=project_dir,
         capture_output=True,
@@ -577,7 +601,7 @@ def _attempt_push_with_rebase(
     for attempt in range(max_retries + 1):
         print_info(f"Pushing to {branch}...")
         try:
-            result = subprocess.run(
+            result = safe_run(
                 ["git", "push", "origin", branch],
                 cwd=project_dir,
                 capture_output=True,
@@ -588,7 +612,7 @@ def _attempt_push_with_rebase(
             # Push may have already landed on the remote before the
             # interrupt — must not let this crash publish.py with a raw
             # traceback (same failure class fixed for `gh run watch`).
-            # subprocess.run() already kills the child on any exception.
+            # safe_run() already kills the child on any exception.
             print()
             print_warning(
                 f"Push to {branch} interrupted — it may have already "
@@ -608,7 +632,7 @@ def _attempt_push_with_rebase(
                 print_warning(
                     "Push rejected - pulling and retrying..."
                 )
-                pull_result = subprocess.run(
+                pull_result = safe_run(
                     ["git", "pull", "--rebase", "origin", branch],
                     cwd=project_dir,
                     capture_output=True,
@@ -640,7 +664,7 @@ def _prompt_retry_or_abort(context: str) -> bool:
     """
     print()
     try:
-        raw = input(
+        raw = safe_input(
             f"  {context}. [r]etry after fixing the issue, "
             f"or [a]bort? [r]: "
         ).strip().lower()
@@ -667,7 +691,7 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
         return False
 
     # Check if tag exists locally
-    result = subprocess.run(
+    result = safe_run(
         ["git", "tag", "-l", tag_name],
         cwd=project_dir,
         capture_output=True,
@@ -689,7 +713,7 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
             return False
 
     # Check if tag exists on remote — may need moving on retry
-    result = subprocess.run(
+    result = safe_run(
         ["git", "ls-remote", "--tags", "origin", tag_name],
         cwd=project_dir,
         capture_output=True,
@@ -699,7 +723,7 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
     if result.stdout.strip():
         # Tag exists remotely. Check if it already points to HEAD.
         remote_sha = result.stdout.strip().split()[0]
-        head_result = subprocess.run(
+        head_result = safe_run(
             ["git", "rev-parse", "HEAD"],
             cwd=project_dir,
             capture_output=True, text=True, shell=use_shell,
@@ -731,7 +755,7 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
             return False
 
         # Delete remote tag, then fall through to re-push below.
-        del_result = subprocess.run(
+        del_result = safe_run(
             ["git", "push", "origin", f":refs/tags/{tag_name}"],
             cwd=project_dir,
             capture_output=True, text=True, shell=use_shell,
@@ -743,12 +767,12 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
             )
             return False
         # Delete and re-create local tag at HEAD
-        subprocess.run(
+        safe_run(
             ["git", "tag", "-d", tag_name],
             cwd=project_dir,
             capture_output=True, text=True, shell=use_shell,
         )
-        result2 = subprocess.run(
+        result2 = safe_run(
             ["git", "tag", "-a", tag_name,
              "-m", f"Release {tag_name}"],
             cwd=project_dir,
@@ -826,7 +850,7 @@ def _move_major_version_tag(project_dir: Path, version: str) -> bool:
     # -f locally and --force on push: this tag is meant to move. Target the
     # exact release tag's commit, not HEAD: they differ when the exact tag
     # already existed locally at another commit (create_git_tag only warns).
-    result = subprocess.run(
+    result = safe_run(
         ["git", "tag", "-f", major_tag, "-m", f"Latest {major_tag}.x release",
          f"v{version}^{{commit}}"],
         cwd=project_dir,
@@ -838,7 +862,7 @@ def _move_major_version_tag(project_dir: Path, version: str) -> bool:
         )
         return True
 
-    result = subprocess.run(
+    result = safe_run(
         ["git", "push", "--force", "origin", major_tag],
         cwd=project_dir,
         capture_output=True, text=True, shell=use_shell,
@@ -887,7 +911,7 @@ def _find_workflow_run(
             )
             time.sleep(interval)
 
-        result = subprocess.run(
+        result = safe_run(
             [
                 "gh", "run", "list",
                 "--workflow=publish.yml",
@@ -948,7 +972,7 @@ def _report_workflow_failure(
         Color.DIM,
     )
 
-    log_result = subprocess.run(
+    log_result = safe_run(
         ["gh", "run", "view", run_id, "--json=jobs"],
         cwd=project_dir,
         capture_output=True,
@@ -966,6 +990,64 @@ def _report_workflow_failure(
                         )
         except (json.JSONDecodeError, KeyError):
             pass
+
+
+def _pubdev_credentials_path() -> Path:
+    """Location of the credentials file written by `dart pub login`."""
+    import os
+    import sys
+
+    if sys.platform == "win32":
+        base = Path(os.environ.get("APPDATA", Path.home()))
+        return base / "dart" / "pub-credentials.json"
+    if sys.platform == "darwin":
+        return (Path.home() / "Library" / "Application Support"
+                / "dart" / "pub-credentials.json")
+    xdg = os.environ.get("XDG_CONFIG_HOME") or str(Path.home() / ".config")
+    return Path(xdg) / "dart" / "pub-credentials.json"
+
+
+def _pubdev_login_valid() -> bool:
+    """True if stored credentials exist and can be used or refreshed."""
+    import time
+
+    path = _pubdev_credentials_path()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    if data.get("refreshToken"):
+        return True
+    expiry = data.get("expiration")
+    return bool(data.get("accessToken")) and (
+        not isinstance(expiry, (int, float)) or expiry / 1000 > time.time()
+    )
+
+
+def _ensure_pubdev_login(project_dir: Path) -> bool:
+    """Run interactive `dart pub login` when credentials are missing/expired."""
+    if _pubdev_login_valid():
+        return True
+    print_warning("pub.dev credentials missing or expired.")
+    print_info("  Running `dart pub login`. Open the URL it prints.")
+    # Inherit the terminal so the URL and prompts are visible.
+    rc = safe_run(
+        ["dart", "pub", "login"], cwd=project_dir, shell=get_shell_mode(),
+        tty=True, timeout=600,
+    ).returncode
+    if rc != 0 or not _pubdev_login_valid():
+        print_error("pub.dev login failed. Publish aborted.")
+        return False
+    print_success("Logged in to pub.dev.")
+    return True
+
+
+_AUTH_PROMPT_RE = re.compile(r"authorize|\baccounts\.google\.com\b")
+
+
+def _is_auth_prompt_line(line: str) -> bool:
+    """True for a `dart pub publish` output line that asks the user to sign in."""
+    return _AUTH_PROMPT_RE.search(line.lower()) is not None
 
 
 def _offer_local_publish(project_dir: Path) -> bool:
@@ -990,17 +1072,40 @@ def _offer_local_publish(project_dir: Path) -> bool:
     if choice == "n":
         return False
 
+    if not _ensure_pubdev_login(project_dir):
+        return False
+
     print_info("Publishing locally...")
-    # Capture output so the file-tree listing dart emits does not flood the
-    # terminal and push prior history out of the scrollback buffer.
-    result = subprocess.run(
+    # Stream output so a mid-publish auth prompt (URL to open in a browser)
+    # is shown immediately instead of hanging silently. Everything else is
+    # captured to keep the file-tree listing out of the scrollback.
+    proc = subprocess.Popen(
         ["dart", "pub", "publish", "--force"],
         cwd=project_dir,
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
         encoding="utf-8",
         errors="replace",
         shell=get_shell_mode(),
+        stdin=subprocess.DEVNULL,
+        env=hardened_env(),
+        start_new_session=not is_windows(),
+    )
+    # Auth is a browser flow (URL printed, no stdin); cap a stuck upload.
+    watchdog = start_watchdog(proc, 1200, "dart pub publish --force")
+    captured: list[str] = []
+    assert proc.stdout is not None
+    try:
+        for raw in proc.stdout:
+            captured.append(raw)
+            if _is_auth_prompt_line(raw):
+                print_warning(f"  {raw.strip()}")
+        proc.wait()
+    finally:
+        watchdog.set()
+    result = subprocess.CompletedProcess(
+        proc.args, proc.returncode, "".join(captured), "",
     )
     if result.returncode == 0:
         # Surface only the pub.dev confirmation line, not the full tree.
@@ -1066,7 +1171,7 @@ def publish_to_pubdev_step(
     else:
         print_info(f"Watching workflow run {run_id}...")
         try:
-            watch_result = subprocess.run(
+            watch_result = safe_run(
                 ["gh", "run", "watch", run_id, "--exit-status"],
                 cwd=project_dir,
                 capture_output=True,
@@ -1108,7 +1213,7 @@ def create_github_release(
     use_shell = get_shell_mode()
 
     # Check if release exists
-    result = subprocess.run(
+    result = safe_run(
         ["gh", "release", "view", tag_name],
         cwd=project_dir,
         capture_output=True,
@@ -1141,7 +1246,7 @@ def create_github_release(
             # A prerelease-suffixed version (e.g. "1.2.3-beta.1") marks the
             # GitHub release as a prerelease so it's excluded from "latest".
             release_cmd.append("--prerelease")
-        result = subprocess.run(
+        result = safe_run(
             release_cmd,
             cwd=project_dir,
             capture_output=True,
@@ -1181,7 +1286,7 @@ def post_publish_commit(
     """
     use_shell = get_shell_mode()
 
-    result = subprocess.run(
+    result = safe_run(
         ["git", "add", "pubspec.yaml", "CHANGELOG.md"],
         cwd=project_dir,
         capture_output=True,
@@ -1191,7 +1296,7 @@ def post_publish_commit(
     if result.returncode != 0:
         return False
 
-    result = subprocess.run(
+    result = safe_run(
         ["git", "commit", "-m", f"chore: bump version to {next_version}"],
         cwd=project_dir,
         capture_output=True,

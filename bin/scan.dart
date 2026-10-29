@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 // ignore_for_file: avoid_print
 
 /// Module overview (comment coverage pass).
@@ -139,7 +140,8 @@ Future<void> main(List<String> args) async {
     } else {
       // An empty tracker after a profiled run means no rule callbacks
       // executed — surface it, never let profiling fail silently again.
-      if (!quiet) stderr.writeln('Timing profile: no data collected (no rules ran).');
+      if (!quiet)
+        stderr.writeln('Timing profile: no data collected (no rules ran).');
     }
   }
 
@@ -177,11 +179,13 @@ Future<void> main(List<String> args) async {
   // Resolve the scanned file list the same way stale-ignore does.
   final scannedFiles = dartFiles.isNotEmpty
       ? dartFiles
-          .map(
-            (f) => p.isAbsolute(f) ? p.normalize(f) : p.normalize(p.join(p.absolute(path), f)),
-          )
-          .where((f) => f.endsWith('.dart'))
-          .toList()
+            .map(
+              (f) => p.isAbsolute(f)
+                  ? p.normalize(f)
+                  : p.normalize(p.join(p.absolute(path), f)),
+            )
+            .where((f) => f.endsWith('.dart'))
+            .toList()
       : ScanRunner.discoverDartFiles(p.absolute(path));
   final effectiveDiagnostics = filterIgnoredDiagnostics(
     diagnostics: diagnostics,
@@ -196,13 +200,17 @@ Future<void> main(List<String> args) async {
         .where((s) => !_knownSeverities.contains(s))
         .toSet();
     for (final s in unknown) {
-      if (!quiet) stderr.writeln('Warning: unrecognized severity "$s" — excluded by filter.');
+      if (!quiet)
+        stderr.writeln(
+          'Warning: unrecognized severity "$s" — excluded by filter.',
+        );
     }
   }
 
   // Apply --min-severity / --max-severity / --min-impact filters to exclude
   // diagnostics outside the requested window.
-  final hasFilter = parsed.minSeverity != null ||
+  final hasFilter =
+      parsed.minSeverity != null ||
       parsed.maxSeverity != null ||
       parsed.minImpact != null;
   final filtered = hasFilter
@@ -256,7 +264,8 @@ Future<void> main(List<String> args) async {
   // BREAKING for consumers that check `failOn == null`: this object is now
   // non-null when --fail-on-impact or --fail-on-tier is used alone. The
   // `threshold` key is still absent in that case — check for it specifically.
-  final failOnMeta = parsed.failOn != null ||
+  final failOnMeta =
+      parsed.failOn != null ||
           parsed.failOnImpact != null ||
           parsed.failOnTier != null
       ? <String, Object>{
@@ -266,12 +275,10 @@ Future<void> main(List<String> args) async {
           if (parsed.failOnImpact != null)
             'impactThreshold': parsed.failOnImpact!,
           // Tier threshold (--fail-on-tier).
-          if (parsed.failOnTier != null)
-            'tierThreshold': parsed.failOnTier!,
+          if (parsed.failOnTier != null) 'tierThreshold': parsed.failOnTier!,
           'thresholdMet': exitCode == 1,
           // Include the count baselines when active.
-          if (parsed.failOnCount != null)
-            'countBaseline': parsed.failOnCount!,
+          if (parsed.failOnCount != null) 'countBaseline': parsed.failOnCount!,
           if (parsed.failOnImpactCount != null)
             'impactCountBaseline': parsed.failOnImpactCount!,
         }
@@ -292,16 +299,16 @@ Future<void> main(List<String> args) async {
     }
     // When a --fail-on* flag causes a non-zero exit despite no displayed
     // diagnostics, explain so automation doesn't see "No issues" + exit 1.
-    if (!formatJson && exitCode != 0 &&
-        (parsed.failOn != null || parsed.failOnImpact != null ||
-         parsed.failOnTier != null)) {
+    if (!formatJson &&
+        exitCode != 0 &&
+        (parsed.failOn != null ||
+            parsed.failOnImpact != null ||
+            parsed.failOnTier != null)) {
       final reasons = [
-        if (parsed.failOn != null)
-          '--fail-on ${parsed.failOn!.toLowerCase()}',
+        if (parsed.failOn != null) '--fail-on ${parsed.failOn!.toLowerCase()}',
         if (parsed.failOnImpact != null)
           '--fail-on-impact ${parsed.failOnImpact!.toLowerCase()}',
-        if (parsed.failOnTier != null)
-          '--fail-on-tier ${parsed.failOnTier!}',
+        if (parsed.failOnTier != null) '--fail-on-tier ${parsed.failOnTier!}',
       ];
       print(
         '(exit 1: ${reasons.join(' or ')} threshold met '
@@ -309,13 +316,21 @@ Future<void> main(List<String> args) async {
       );
     }
     if (formatJson) {
-      _writeJson(scanDiagnosticsToJsonString(filtered, failOn: failOnMeta), parsed.jsonFilePath, quiet: quiet);
+      _writeJson(
+        scanDiagnosticsToJsonString(filtered, failOn: failOnMeta),
+        parsed.jsonFilePath,
+        quiet: quiet,
+      );
     }
     exit(exitCode);
   }
 
   if (formatJson) {
-    _writeJson(scanDiagnosticsToJsonString(filtered, failOn: failOnMeta), parsed.jsonFilePath, quiet: quiet);
+    _writeJson(
+      scanDiagnosticsToJsonString(filtered, failOn: failOnMeta),
+      parsed.jsonFilePath,
+      quiet: quiet,
+    );
     exit(exitCode);
   }
 
@@ -484,11 +499,13 @@ void _runFindStaleIgnores(
   // file the scan covered — including files with zero diagnostics.
   final files = dartFiles.isNotEmpty
       ? dartFiles
-          .map(
-            (f) => p.isAbsolute(f) ? p.normalize(f) : p.normalize(p.join(p.absolute(targetPath), f)),
-          )
-          .where((f) => f.endsWith('.dart'))
-          .toList()
+            .map(
+              (f) => p.isAbsolute(f)
+                  ? p.normalize(f)
+                  : p.normalize(p.join(p.absolute(targetPath), f)),
+            )
+            .where((f) => f.endsWith('.dart'))
+            .toList()
       : ScanRunner.discoverDartFiles(p.absolute(targetPath));
 
   final stale = detectStaleIgnores(diagnostics: diagnostics, files: files);
@@ -555,11 +572,13 @@ void _runFixStaleIgnores(
   // Resolve the scanned file list identically to _runFindStaleIgnores.
   final files = dartFiles.isNotEmpty
       ? dartFiles
-          .map(
-            (f) => p.isAbsolute(f) ? p.normalize(f) : p.normalize(p.join(p.absolute(targetPath), f)),
-          )
-          .where((f) => f.endsWith('.dart'))
-          .toList()
+            .map(
+              (f) => p.isAbsolute(f)
+                  ? p.normalize(f)
+                  : p.normalize(p.join(p.absolute(targetPath), f)),
+            )
+            .where((f) => f.endsWith('.dart'))
+            .toList()
       : ScanRunner.discoverDartFiles(p.absolute(targetPath));
 
   final stale = detectStaleIgnores(diagnostics: diagnostics, files: files);
@@ -575,7 +594,9 @@ void _runFixStaleIgnores(
   if (results.isEmpty) {
     // Detection found stale ignores but the fixer couldn't modify any files
     // (e.g. files were deleted between detection and fix).
-    print('\nDetected ${stale.length} stale ignore(s) but no files were modified.');
+    print(
+      '\nDetected ${stale.length} stale ignore(s) but no files were modified.',
+    );
     exit(1);
   }
 
@@ -586,7 +607,9 @@ void _runFixStaleIgnores(
   print('Fixed $totalRemoved stale ignore(s) in $fileCount file(s):');
   print('');
   for (final r in results) {
-    print('  ${r.removedCount} removed in ${p.relative(r.filePath, from: targetPath)}');
+    print(
+      '  ${r.removedCount} removed in ${p.relative(r.filePath, from: targetPath)}',
+    );
   }
   print('');
 
@@ -656,8 +679,9 @@ int _computeExitCode({
 
   if (failOn != null) {
     // Count diagnostics in the full set that meet the severity threshold.
-    final matchCount =
-        allDiagnostics.where((d) => _meetsMinSeverity(d.severity, failOn)).length;
+    final matchCount = allDiagnostics
+        .where((d) => _meetsMinSeverity(d.severity, failOn))
+        .length;
     // Without --fail-on-count: any match → exit 1 (count > 0).
     // With --fail-on-count: exit 1 only when count exceeds the baseline.
     final threshold = failOnCount ?? 0;
@@ -672,7 +696,9 @@ int _computeExitCode({
     // while failOnImpact is uppercased by the parser — _severityRank handles
     // both cases via .toUpperCase() internally.
     final impactMatchCount = allDiagnostics
-        .where((d) => d.impact != null && _meetsMinSeverity(d.impact!, failOnImpact))
+        .where(
+          (d) => d.impact != null && _meetsMinSeverity(d.impact!, failOnImpact),
+        )
         .length;
     // Without --fail-on-impact-count: any match → exit 1 (count > 0).
     // With --fail-on-impact-count: exit 1 only when count exceeds baseline.
@@ -722,15 +748,11 @@ void _printUsage() {
     '  --files <path>...    Scan only these Dart files (paths relative to path).',
   );
   print('  --files-from-stdin  Read one file path per line from stdin.');
-  print(
-    '  --exclude-globs <p> Exclude files matching these glob patterns.',
-  );
+  print('  --exclude-globs <p> Exclude files matching these glob patterns.');
   print(
     '                      Supports ** (any path segments), * (any chars),',
   );
-  print(
-    '                      ? (single char). Platform ephemeral dirs and',
-  );
+  print('                      ? (single char). Platform ephemeral dirs and');
   print(
     '                      .plugin_symlinks are already excluded by default.',
   );
@@ -740,21 +762,13 @@ void _printUsage() {
   print(
     '                      When a path matches both a default exclusion and',
   );
-  print(
-    '                      an include-glob, the include wins. Useful for',
-  );
-  print(
-    '                      auditing third-party code in ephemeral dirs.',
-  );
+  print('                      an include-glob, the include wins. Useful for');
+  print('                      auditing third-party code in ephemeral dirs.');
   print(
     '  --no-exclude        Disable ALL hardcoded path exclusions (example/,',
   );
-  print(
-    '                      build/, .dart_tool/, etc.). User-supplied',
-  );
-  print(
-    '                      --exclude-globs still apply.',
-  );
+  print('                      build/, .dart_tool/, etc.). User-supplied');
+  print('                      --exclude-globs still apply.');
   print(
     '  --resolve           Fully resolve each file (type/element resolution)',
   );
@@ -764,9 +778,7 @@ void _printUsage() {
   print(
     '                      and the target project must have had `pub get` run.',
   );
-  print(
-    '  --fix-ignores       Bulk-convert bare // ignore: rule_name to',
-  );
+  print('  --fix-ignores       Bulk-convert bare // ignore: rule_name to');
   print(
     '                      // ignore: saropa_lints/rule_name for all known rules.',
   );
@@ -775,28 +787,18 @@ void _printUsage() {
   print(
     '  Stale ignores are // ignore: comments whose suppressed rule no longer',
   );
-  print(
-    '  fires — the code was fixed but the suppression was left behind.',
-  );
+  print('  fires — the code was fixed but the suppression was left behind.');
   print('');
-  print(
-    '  --find-stale-ignores',
-  );
+  print('  --find-stale-ignores');
   print(
     '                      Detect stale // ignore: directives and report them.',
   );
   print(
     '                      Reports each stale ignore with file, line, and rule.',
   );
-  print(
-    '                      Exits 1 if any found, 0 if clean.',
-  );
-  print(
-    '                      Supports --format json and --json-file-path.',
-  );
-  print(
-    '  --fix-stale-ignores',
-  );
+  print('                      Exits 1 if any found, 0 if clean.');
+  print('                      Supports --format json and --json-file-path.');
+  print('  --fix-stale-ignores');
   print(
     '                      Detect AND automatically remove stale // ignore:',
   );
@@ -806,9 +808,7 @@ void _printUsage() {
   print(
     '                      are deleted; inline comments are stripped; multi-rule',
   );
-  print(
-    '                      comments have only the stale rules pruned.',
-  );
+  print('                      comments have only the stale rules pruned.');
   print(
     '                      Prints a summary of files modified and ignores removed.',
   );
@@ -818,15 +818,11 @@ void _printUsage() {
   print(
     '                      SDK lower bound against syntax features in lib/.',
   );
-  print(
-    '                      Exits 1 on mismatch, 0 when compatible.',
-  );
+  print('                      Exits 1 on mismatch, 0 when compatible.');
   print(
     '  --min-severity <s>  Only show diagnostics at or above this severity.',
   );
-  print(
-    '                      Values: info (default/all), warning, error.',
-  );
+  print('                      Values: info (default/all), warning, error.');
   print(
     '  --max-severity <s>  Only show diagnostics at or below this severity.',
   );
@@ -845,9 +841,7 @@ void _printUsage() {
   print(
     '                      see all diagnostics but gate CI on errors only.',
   );
-  print(
-    '                      Values: info, warning, error.',
-  );
+  print('                      Values: info, warning, error.');
   print(
     '  --fail-on-impact <s> Exit 1 when any saropa diagnostic has rule-declared',
   );
@@ -857,27 +851,15 @@ void _printUsage() {
   print(
     '                      checks the author\'s impact rating, not analyzer',
   );
-  print(
-    '                      severity. Non-saropa diagnostics are excluded.',
-  );
-  print(
-    '                      Values: info, warning, error.',
-  );
-  print(
-    '  --fail-on-count <n> With --fail-on: exit 1 only when the count of',
-  );
+  print('                      severity. Non-saropa diagnostics are excluded.');
+  print('                      Values: info, warning, error.');
+  print('  --fail-on-count <n> With --fail-on: exit 1 only when the count of');
   print(
     '                      matching diagnostics exceeds <n>. Lets CI tolerate',
   );
-  print(
-    '                      a known baseline (e.g. --fail-on warning',
-  );
-  print(
-    '                      --fail-on-count 5 allows up to 5 warnings).',
-  );
-  print(
-    '  --fail-on-impact-count <n>',
-  );
+  print('                      a known baseline (e.g. --fail-on warning');
+  print('                      --fail-on-count 5 allows up to 5 warnings).');
+  print('  --fail-on-impact-count <n>');
   print(
     '                      With --fail-on-impact: exit 1 only when the count',
   );
@@ -893,18 +875,10 @@ void _printUsage() {
   print(
     '                      in this tier or below. Lets CI see all diagnostics',
   );
-  print(
-    '                      at a high tier but only fail on essential-tier',
-  );
-  print(
-    '                      findings during incremental adoption.',
-  );
-  print(
-    '                      Values: essential, recommended, professional,',
-  );
-  print(
-    '                      comprehensive, pedantic.',
-  );
+  print('                      at a high tier but only fail on essential-tier');
+  print('                      findings during incremental adoption.');
+  print('                      Values: essential, recommended, professional,');
+  print('                      comprehensive, pedantic.');
   print(
     '  --min-impact <s>    Only show diagnostics whose rule-declared impact is',
   );
@@ -926,9 +900,7 @@ void _printUsage() {
   print(
     '                      stdout. Implies --format json. Avoids stdout redirection.',
   );
-  print(
-    '  -q, --quiet         Suppress all stderr progress/status messages.',
-  );
+  print('  -q, --quiet         Suppress all stderr progress/status messages.');
   print(
     '                      The caller gets only stdout output and the exit code.',
   );
@@ -953,24 +925,18 @@ void _printUsage() {
   print(
     '                      free rules only (the same subset the analysis server',
   );
-  print(
-    '                      uses in its default lane).',
-  );
+  print('                      uses in its default lane).');
   print(
     '  --lane-stats        Print how many rules are light-lane vs full-only.',
   );
   print(
     '  --debug-rule <name> Emit per-node type-resolution trace for the named',
   );
-  print(
-    '                      rule. Shows staticType, staticInvokeType, and',
-  );
+  print('                      rule. Shows staticType, staticInvokeType, and');
   print(
     '                      returnType at each visited node. Use with --resolve',
   );
-  print(
-    '                      for full type information.',
-  );
+  print('                      for full type information.');
   print('');
   print('Resolution note:');
   print(
@@ -1011,15 +977,33 @@ void _printUsage() {
   );
   print('  dart run saropa_lints scan . --min-severity warning  # skip info');
   print('  dart run saropa_lints scan . --max-severity warning  # skip errors');
-  print('  dart run saropa_lints scan . --min-impact warning    # by rule impact');
-  print('  dart run saropa_lints scan . --fail-on error         # exit 1 on errors only');
-  print('  dart run saropa_lints scan . --fail-on warning --fail-on-count 5  # tolerate up to 5 warnings');
-  print('  dart run saropa_lints scan . --fail-on-impact error           # exit 1 on high-impact rules only');
-  print('  dart run saropa_lints scan . --fail-on-tier essential          # fail on essential-tier rules only');
-  print('  dart run saropa_lints scan . --exclude-globs **/vendor/**  # skip vendor');
+  print(
+    '  dart run saropa_lints scan . --min-impact warning    # by rule impact',
+  );
+  print(
+    '  dart run saropa_lints scan . --fail-on error         # exit 1 on errors only',
+  );
+  print(
+    '  dart run saropa_lints scan . --fail-on warning --fail-on-count 5  # tolerate up to 5 warnings',
+  );
+  print(
+    '  dart run saropa_lints scan . --fail-on-impact error           # exit 1 on high-impact rules only',
+  );
+  print(
+    '  dart run saropa_lints scan . --fail-on-tier essential          # fail on essential-tier rules only',
+  );
+  print(
+    '  dart run saropa_lints scan . --exclude-globs **/vendor/**  # skip vendor',
+  );
   print('  dart run saropa_lints scan . --format json  # JSON to stdout');
-  print('  dart run saropa_lints scan . -q --json-file-path out.json  # silent');
-  print('  dart run saropa_lints scan . --find-stale-ignores  # detect dead ignores');
+  print(
+    '  dart run saropa_lints scan . -q --json-file-path out.json  # silent',
+  );
+  print(
+    '  dart run saropa_lints scan . --find-stale-ignores  # detect dead ignores',
+  );
   print('  dart run saropa_lints scan . --find-stale-ignores --format json');
-  print('  dart run saropa_lints scan . --fix-stale-ignores  # auto-remove dead ignores');
+  print(
+    '  dart run saropa_lints scan . --fix-stale-ignores  # auto-remove dead ignores',
+  );
 }

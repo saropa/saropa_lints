@@ -58,3 +58,7 @@ equivalent for **~75%** (1,258/1,670).
 ## One-click migration packs
 
 Packages with meaningful HAVE coverage now have a corresponding **migration pack** in the VS Code extension. When a project still depends on one of these packages, the extension surfaces a "Migrate from …" pack in the Rule Packs dashboard under the **Migrations** domain. Toggling it on enables all equivalent saropa rules in one click — no manual rule-by-rule configuration needed.
+
+## Renamed or removed saropa_lints rules
+
+Rules renamed or removed between saropa_lints releases are listed in [`lib/src/config/rule_renames.json`](../../../lib/src/config/rule_renames.json) (`old`, `new`, `since`; `new` is null for a removed rule). Update `// ignore:` comments and `analysis_options.yaml` entries that use an old name.

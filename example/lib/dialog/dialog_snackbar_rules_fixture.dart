@@ -34,10 +34,7 @@ class GoodSnackbarWidget extends StatelessWidget {
       onPressed: () {
         ScaffoldMessenger.of(context).showSnackBar(
           // GOOD: Has explicit duration
-          SnackBar(
-            content: Text('Message'),
-            duration: Duration(seconds: 4),
-          ),
+          SnackBar(content: Text('Message'), duration: Duration(seconds: 4)),
         );
       },
       child: Text('Show Snackbar'),
@@ -59,10 +56,8 @@ class BadDialogWidget extends StatelessWidget {
         // expect_lint: require_dialog_barrier_dismissible
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Title'),
-            content: Text('Content'),
-          ),
+          builder: (context) =>
+              AlertDialog(title: Text('Title'), content: Text('Content')),
         );
       },
       child: Text('Show Dialog'),
@@ -81,10 +76,8 @@ class GoodDialogWidget extends StatelessWidget {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            title: Text('Title'),
-            content: Text('Content'),
-          ),
+          builder: (context) =>
+              AlertDialog(title: Text('Title'), content: Text('Content')),
         );
       },
       child: Text('Show Dialog'),

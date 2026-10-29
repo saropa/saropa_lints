@@ -121,10 +121,7 @@ void _bad1424() {
 void _good1424() {
   Container(
     decoration: BoxDecoration(
-      image: DecorationImage(
-        image: AssetImage('bg.png'),
-        fit: BoxFit.cover,
-      ),
+      image: DecorationImage(image: AssetImage('bg.png'), fit: BoxFit.cover),
     ),
   );
 }

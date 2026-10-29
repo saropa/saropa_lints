@@ -117,7 +117,9 @@ void _badWebViewSandboxUnconfigured() {
 // GOOD: Should NOT trigger (controller has setNavigationDelegate).
 void _goodWebViewSandboxWithNavigationDelegate() {
   final controller = WebViewController()
-    ..setNavigationDelegate(const NavigationDelegate(onNavigationRequest: null));
+    ..setNavigationDelegate(
+      const NavigationDelegate(onNavigationRequest: null),
+    );
   return WebViewWidget(controller: controller);
 }
 
@@ -134,7 +136,9 @@ void _goodWebViewSandboxWithFileAccessDisabled() {
 // BAD: Second controller is not configured; only first is. Should trigger once.
 void _badTwoControllersOnlyOneConfigured() {
   final configured = WebViewController()
-    ..setNavigationDelegate(const NavigationDelegate(onNavigationRequest: null));
+    ..setNavigationDelegate(
+      const NavigationDelegate(onNavigationRequest: null),
+    );
   final unconfigured = WebViewController();
   return Column(
     children: [

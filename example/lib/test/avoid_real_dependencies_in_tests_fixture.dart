@@ -123,9 +123,9 @@ void _bad1171() async {
 void _good1171() async {
   test('fetches user', () async {
     final mockClient = MockClient();
-    when(() => mockClient.get(any())).thenAnswer(
-      (_) async => Response('{"name": "Test"}', 200),
-    );
+    when(
+      () => mockClient.get(any()),
+    ).thenAnswer((_) async => Response('{"name": "Test"}', 200));
 
     final user = await fetchUser(mockClient);
     expect(user.name, 'Test');

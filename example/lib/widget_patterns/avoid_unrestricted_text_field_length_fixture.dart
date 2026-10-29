@@ -115,8 +115,5 @@ void _bad1389() {
 
 // GOOD: Should NOT trigger avoid_unrestricted_text_field_length
 void _good1389() {
-  TextField(
-    controller: _controller,
-    maxLength: 500,
-  );
+  TextField(controller: _controller, maxLength: 500);
 }

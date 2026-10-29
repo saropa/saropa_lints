@@ -11,6 +11,33 @@ import 'package:test/test.dart';
 
 import '../support/safe_delete.dart';
 
+/// Kernel snapshot of `bin/scan.dart`, compiled once per file. Spawning
+/// `dart run saropa_lints:scan` recompiles the whole package on every call
+/// (~20 s each); running the precompiled snapshot executes the same entrypoint.
+Future<String>? _scanSnapshot;
+
+Future<ProcessResult> runScanSnapshot(List<String> args) async {
+  final dill = await (_scanSnapshot ??= () async {
+    final dir = Directory.systemTemp.createTempSync('scan_snapshot_');
+    final out = '${dir.path}/scan.dill';
+    final r = await Process.run('dart', [
+      'compile',
+      'kernel',
+      'bin/scan.dart',
+      '-o',
+      out,
+    ], workingDirectory: Directory.current.path);
+    if (r.exitCode != 0) {
+      throw StateError('scan snapshot compile failed: ${r.stdout}${r.stderr}');
+    }
+    return out;
+  }());
+  return Process.run('dart', [
+    dill,
+    ...args,
+  ], workingDirectory: Directory.current.path);
+}
+
 void main() {
   // Group-tagged 'slow': each test in these groups shells out to a real
   // `dart run saropa_lints:scan` subprocess, which cold-starts (no
@@ -852,22 +879,15 @@ void main() {
         () async {
           // Runs against the project itself with --tier essential (mostly info/warning),
           // filtered to ERROR-only — expect exit 0 and the "below threshold" message.
-          final result = await Process.run(
-            'dart',
-            [
-              'run',
-              'saropa_lints:scan',
-              '.',
-              '--tier',
-              'essential',
-              '--min-severity',
-              'error',
-              '--files',
-              'lib/src/scan/scan_cli_args.dart',
-            ],
-            runInShell: true,
-            workingDirectory: Directory.current.path,
-          );
+          final result = await runScanSnapshot(<String>[
+            '.',
+            '--tier',
+            'essential',
+            '--min-severity',
+            'error',
+            '--files',
+            'lib/src/scan/scan_cli_args.dart',
+          ]);
           // If there are no error-level diagnostics in this file, expect exit 0
           // and either "No issues found" or the "below threshold" message.
           if (result.exitCode == 0) {
@@ -883,12 +903,11 @@ void main() {
       );
 
       test('--min-severity invalid value exits 2', () async {
-        final result = await Process.run(
-          'dart',
-          ['run', 'saropa_lints:scan', '.', '--min-severity', 'debug'],
-          runInShell: true,
-          workingDirectory: Directory.current.path,
-        );
+        final result = await runScanSnapshot(<String>[
+          '.',
+          '--min-severity',
+          'debug',
+        ]);
         expect(result.exitCode, 2);
         expect(
           result.stdout.toString(),
@@ -909,24 +928,17 @@ void main() {
           // Scan a file that produces diagnostics but none at ERROR level.
           // --min-severity info ensures diagnostics are shown, --fail-on error
           // means exit 0 because no diagnostic reaches the error threshold.
-          final result = await Process.run(
-            'dart',
-            [
-              'run',
-              'saropa_lints:scan',
-              '.',
-              '--tier',
-              'essential',
-              '--min-severity',
-              'info',
-              '--fail-on',
-              'error',
-              '--files',
-              'lib/src/scan/scan_cli_args.dart',
-            ],
-            runInShell: true,
-            workingDirectory: Directory.current.path,
-          );
+          final result = await runScanSnapshot(<String>[
+            '.',
+            '--tier',
+            'essential',
+            '--min-severity',
+            'info',
+            '--fail-on',
+            'error',
+            '--files',
+            'lib/src/scan/scan_cli_args.dart',
+          ]);
           // If any diagnostics were found but none are ERROR, exit should be 0.
           // If no diagnostics at all, exit 0 is also correct.
           expect(
@@ -941,22 +953,17 @@ void main() {
 
       test('--fail-on info exits 1 when any diagnostic exists', () async {
         // --fail-on info is the lowest threshold: any diagnostic at all → exit 1.
-        // Scan the entire lib/src/rules/ directory (which always has diagnostics
-        // under essential) to avoid depending on a single file's lint state.
-        final result = await Process.run(
-          'dart',
-          [
-            'run',
-            'saropa_lints:scan',
-            '.',
-            '--tier',
-            'essential',
-            '--fail-on',
-            'info',
-          ],
-          runInShell: true,
-          workingDirectory: Directory.current.path,
-        );
+        // Scan lib/src/saropa_lint_rule.dart (a stable file that always has
+        // essential-tier info diagnostics); a whole-project scan took ~60 s per test.
+        final result = await runScanSnapshot(<String>[
+          '.',
+          '--tier',
+          'essential',
+          '--fail-on',
+          'info',
+          '--files',
+          'lib/src/saropa_lint_rule.dart',
+        ]);
         // The project always produces diagnostics under essential — if this
         // ever returns "No issues" the test legitimately fails.
         expect(
@@ -978,24 +985,19 @@ void main() {
         // output) but exit code is 0 because the error count doesn't exceed
         // the --fail-on-count baseline. The project may have a few error-level
         // diagnostics, so we set a generous count threshold to ensure exit 0.
-        final result = await Process.run(
-          'dart',
-          [
-            'run',
-            'saropa_lints:scan',
-            '.',
-            '--tier',
-            'essential',
-            '--min-severity',
-            'info',
-            '--fail-on',
-            'error',
-            '--fail-on-count',
-            '9999',
-          ],
-          runInShell: true,
-          workingDirectory: Directory.current.path,
-        );
+        final result = await runScanSnapshot(<String>[
+          '.',
+          '--tier',
+          'essential',
+          '--min-severity',
+          'info',
+          '--fail-on',
+          'error',
+          '--fail-on-count',
+          '9999',
+          '--files',
+          'lib/src/saropa_lint_rule.dart',
+        ]);
         final stdout = result.stdout.toString();
         // The project has info/warning diagnostics under essential — confirm
         // they are displayed while exit code remains 0.
@@ -1015,12 +1017,11 @@ void main() {
 
       test('--fail-on invalid value exits 2', () async {
         // Invalid severity value should be caught at parse time.
-        final result = await Process.run(
-          'dart',
-          ['run', 'saropa_lints:scan', '.', '--fail-on', 'debug'],
-          runInShell: true,
-          workingDirectory: Directory.current.path,
-        );
+        final result = await runScanSnapshot(<String>[
+          '.',
+          '--fail-on',
+          'debug',
+        ]);
         expect(result.exitCode, 2);
         expect(result.stdout.toString(), contains('--fail-on must be one of'));
       });
@@ -1031,22 +1032,17 @@ void main() {
           // Display is capped at warning (no errors shown), but --fail-on info
           // checks the FULL set. The project always has info-level diagnostics,
           // so exit should be 1 even though the display window excludes errors.
-          final result = await Process.run(
-            'dart',
-            [
-              'run',
-              'saropa_lints:scan',
-              '.',
-              '--tier',
-              'essential',
-              '--max-severity',
-              'warning',
-              '--fail-on',
-              'info',
-            ],
-            runInShell: true,
-            workingDirectory: Directory.current.path,
-          );
+          final result = await runScanSnapshot(<String>[
+            '.',
+            '--tier',
+            'essential',
+            '--max-severity',
+            'warning',
+            '--fail-on',
+            'info',
+            '--files',
+            'lib/src/saropa_lint_rule.dart',
+          ]);
           expect(
             result.exitCode,
             1,
@@ -1061,22 +1057,17 @@ void main() {
         // The project has many info+ diagnostics under essential. Without
         // --fail-on-count, --fail-on info exits 1. With a very high count
         // baseline, the matching count won't exceed it — exit 0.
-        final result = await Process.run(
-          'dart',
-          [
-            'run',
-            'saropa_lints:scan',
-            '.',
-            '--tier',
-            'essential',
-            '--fail-on',
-            'info',
-            '--fail-on-count',
-            '99999',
-          ],
-          runInShell: true,
-          workingDirectory: Directory.current.path,
-        );
+        final result = await runScanSnapshot(<String>[
+          '.',
+          '--tier',
+          'essential',
+          '--fail-on',
+          'info',
+          '--fail-on-count',
+          '99999',
+          '--files',
+          'lib/src/saropa_lint_rule.dart',
+        ]);
         // With a baseline of 99999, the project's diagnostics can't exceed it.
         expect(
           result.exitCode,
@@ -1096,21 +1087,14 @@ void main() {
     () {
       test('--quiet suppresses stderr messages', () async {
         // Run with -q to verify no stderr output from the scanner.
-        final result = await Process.run(
-          'dart',
-          [
-            'run',
-            'saropa_lints:scan',
-            '.',
-            '--tier',
-            'essential',
-            '-q',
-            '--files',
-            'lib/src/scan/scan_cli_args.dart',
-          ],
-          runInShell: true,
-          workingDirectory: Directory.current.path,
-        );
+        final result = await runScanSnapshot(<String>[
+          '.',
+          '--tier',
+          'essential',
+          '-q',
+          '--files',
+          'lib/src/scan/scan_cli_args.dart',
+        ]);
         // stderr should be empty or contain only whitespace when --quiet is set.
         final stderrOutput = result.stderr.toString().trim();
         expect(
@@ -1232,22 +1216,15 @@ void main() {
         final tempDir = Directory.systemTemp.createTempSync('scan_json_test_');
         final jsonPath = '${tempDir.path}/output.json';
         try {
-          final result = await Process.run(
-            'dart',
-            [
-              'run',
-              'saropa_lints:scan',
-              '.',
-              '--tier',
-              'essential',
-              '--json-file-path',
-              jsonPath,
-              '--files',
-              'lib/src/scan/scan_cli_args.dart',
-            ],
-            runInShell: true,
-            workingDirectory: Directory.current.path,
-          );
+          final result = await runScanSnapshot(<String>[
+            '.',
+            '--tier',
+            'essential',
+            '--json-file-path',
+            jsonPath,
+            '--files',
+            'lib/src/scan/scan_cli_args.dart',
+          ]);
           // The file should exist and start with a JSON array/object.
           final file = File(jsonPath);
           expect(
@@ -1282,22 +1259,15 @@ void main() {
         final tempDir = Directory.systemTemp.createTempSync('scan_json_mkdir_');
         final nestedPath = '${tempDir.path}/sub/dir/output.json';
         try {
-          final result = await Process.run(
-            'dart',
-            [
-              'run',
-              'saropa_lints:scan',
-              '.',
-              '--tier',
-              'essential',
-              '--json-file-path',
-              nestedPath,
-              '--files',
-              'lib/src/scan/scan_cli_args.dart',
-            ],
-            runInShell: true,
-            workingDirectory: Directory.current.path,
-          );
+          final result = await runScanSnapshot(<String>[
+            '.',
+            '--tier',
+            'essential',
+            '--json-file-path',
+            nestedPath,
+            '--files',
+            'lib/src/scan/scan_cli_args.dart',
+          ]);
           final file = File(nestedPath);
           expect(
             file.existsSync(),

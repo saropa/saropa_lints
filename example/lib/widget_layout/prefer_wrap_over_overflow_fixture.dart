@@ -123,8 +123,6 @@ void _bad1314() {
 void _good1314() {
   DefaultTextStyle(
     style: TextStyle(fontSize: 24),
-    child: Column(
-      children: [Text('Title'), Text('Subtitle')],
-    ),
+    child: Column(children: [Text('Title'), Text('Subtitle')]),
   );
 }

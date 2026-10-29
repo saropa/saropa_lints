@@ -110,8 +110,8 @@ Future<void> missingExceptionHandlerBad() async {
 
 Future<void> missingExceptionHandlerAttemptBad() async {
   // expect_lint: google_sign_in_missing_exception_handler
-  final account =
-      await GoogleSignIn.instance.attemptLightweightAuthentication();
+  final account = await GoogleSignIn.instance
+      .attemptLightweightAuthentication();
 }
 
 Future<void> missingExceptionHandlerGood() async {

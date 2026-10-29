@@ -41,16 +41,12 @@ library;
 import 'dart:developer' as developer;
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
-// ignore: implementation_imports -- no public API for fix generator registration (analysis_server_plugin <=0.x)
-import 'package:analysis_server_plugin/src/correction/fix_generators.dart';
+import 'package:analyzer/dart/analysis/results.dart' show ParsedUnitResult;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/source_range.dart';
 
 export 'package:analysis_server_plugin/edit/dart/correction_producer.dart'
     show CorrectionApplicability, CorrectionProducerContext;
-// ignore: implementation_imports -- no public API for ProducerGenerator (analysis_server_plugin <=0.x)
-export 'package:analysis_server_plugin/src/correction/fix_generators.dart'
-    show ProducerGenerator;
 export 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart'
     show ChangeBuilder;
 export 'package:analyzer_plugin/utilities/fixes/fixes.dart' show FixKind;
@@ -108,7 +104,7 @@ abstract class SaropaFixProducer extends ResolvedCorrectionProducer {
 
   /// Returns a [SourceRange] covering the complete line(s) of [comment],
   /// from the start of its first line to the start of the next line after
-  /// its last line. Uses [lineInfo] for line-ending-agnostic boundary
+  /// its last line. Uses `lineInfo` for line-ending-agnostic boundary
   /// detection — handles LF, CRLF, and tab indentation transparently
   /// without manual character scanning.
   SourceRange lineBoundaryRange(Comment comment) {
@@ -134,8 +130,15 @@ abstract class SaropaFixProducer extends ResolvedCorrectionProducer {
   }
 }
 
-/// Factory function that creates a fix producer.
+/// A function that creates a [CorrectionProducer].
 ///
-/// Re-exported from [ProducerGenerator] for convenience so rule files
-/// don't need to import from analysis_server_plugin internals.
+/// Structurally identical to `ProducerGenerator` in analysis_server_plugin
+/// (whose defining file is not public API), so values are interchangeable
+/// with `PluginRegistry.registerFixForRule`.
+typedef ProducerGenerator =
+    CorrectionProducer<ParsedUnitResult> Function({
+      required CorrectionProducerContext context,
+    });
+
+/// Factory function that creates a fix producer.
 typedef SaropaFixGenerator = ProducerGenerator;

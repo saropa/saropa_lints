@@ -798,7 +798,7 @@ const DISABLE_END_MARKER =
  * "Lint integration: Off" left every diagnostic in place
  * (plans/history/2026.06/2026.06.18/BUG_cant turn off lints.md).
  */
-function findPluginsBlock(lines: string[]): { start: number; end: number } | null {
+export function findPluginsBlock(lines: string[]): { start: number; end: number } | null {
   const start = lines.findIndex((l) => /^plugins:\s*$/.test(l));
   if (start === -1) return null;
 

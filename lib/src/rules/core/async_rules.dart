@@ -1327,7 +1327,8 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
     });
 
     // Check parameter declarations (in constructors and functions)
-    context.addSimpleFormalParameter((SimpleFormalParameter node) {
+    context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       final TypeAnnotation? type = node.type;
       if (!_isVoidCallback(type)) return;
 
@@ -1871,7 +1872,7 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! FunctionExpression) return;
 
       final String bodySource = firstArg.body.toSource();
@@ -1963,7 +1964,7 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
       }
 
       // OK if passed to a parameter with default
-      if (parent is NamedExpression) return;
+      if (parent is NamedArgument || parent is RecordLiteralNamedField) return;
 
       // OK if assigned to a variable with default
       if (parent is VariableDeclaration) return;
@@ -2383,9 +2384,8 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 
   /// Checks if any named argument is a timeout parameter.
   static bool _hasTimeoutArg(MethodInvocation node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression &&
-          _timeoutArgNames.contains(arg.name.label.name)) {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && _timeoutArgNames.contains(arg.name.lexeme)) {
         return true;
       }
     }
@@ -2573,10 +2573,10 @@ class _StreamInBuildVisitor extends RecursiveAstVisitor<void> {
   /// Inspects the stream: named argument for method invocations.
   void _checkStreamArgument(ArgumentList argList) {
     for (final arg in argList.arguments) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name != 'stream') continue;
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme != 'stream') continue;
 
-      final expr = arg.expression;
+      final expr = arg.argumentExpression;
       // Unwrap the actual value — may be wrapped in an assignment
       final effectiveExpr = _unwrapAssignment(expr);
       if (effectiveExpr == null) break;
@@ -2927,7 +2927,7 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
       bool hasOnError = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onError') {
+        if (arg is NamedArgument && arg.name.lexeme == 'onError') {
           hasOnError = true;
           break;
         }
@@ -3105,7 +3105,7 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
       // Check for eagerError parameter
       bool hasEagerError = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'eagerError') {
+        if (arg is NamedArgument && arg.name.lexeme == 'eagerError') {
           hasEagerError = true;
           break;
         }
@@ -3184,7 +3184,7 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
       // Check for onDone parameter
       bool hasOnDone = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onDone') {
+        if (arg is NamedArgument && arg.name.lexeme == 'onDone') {
           hasOnDone = true;
           break;
         }
@@ -3860,8 +3860,8 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
     // Walk up AST to find if we're in an onDone/onError named parameter
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is NamedExpression) {
-        final String paramName = current.name.label.name;
+      if (current is NamedArgument) {
+        final String paramName = current.name.lexeme;
         return paramName == 'onDone' || paramName == 'onError';
       }
       // Stop searching if we hit a method or function declaration
@@ -4362,10 +4362,10 @@ class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
     //
     // The ??= caching idiom (`_f ??= method()`) is naturally safe here:
     // the MethodInvocation's parent is AssignmentExpression, not
-    // NamedExpression, so the guard below never matches it.
+    // NamedArgument, so the guard below never matches it.
     final parent = node.parent;
-    if (parent is NamedExpression &&
-        parent.name.label.name == 'future' &&
+    if (parent is NamedArgument &&
+        parent.name.lexeme == 'future' &&
         _isInsideFutureBuilder(parent)) {
       onFutureCreated(node);
     }
@@ -4377,8 +4377,8 @@ class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
     // Flag Future constructors in FutureBuilder's `future:` arg, but exempt
     // Future.value() and Future.error() since they're deterministic / no I/O.
     final parent = node.parent;
-    if (parent is NamedExpression &&
-        parent.name.label.name == 'future' &&
+    if (parent is NamedArgument &&
+        parent.name.lexeme == 'future' &&
         _isInsideFutureBuilder(parent)) {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'Future') {
@@ -4391,11 +4391,11 @@ class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
     super.visitInstanceCreationExpression(node);
   }
 
-  /// Walks up from a NamedExpression to check if it's inside a FutureBuilder
+  /// Walks up from a NamedArgument to check if it's inside a FutureBuilder
   /// constructor. Prevents false positives on custom widgets with `future:`
   /// parameters that may not have the same rebuild-subscription semantics.
-  bool _isInsideFutureBuilder(NamedExpression namedExpr) {
-    // NamedExpression → ArgumentList → InstanceCreationExpression
+  bool _isInsideFutureBuilder(NamedArgument namedExpr) {
+    // NamedArgument → ArgumentList → InstanceCreationExpression
     final argList = namedExpr.parent;
     if (argList is! ArgumentList) return false;
     final creation = argList.parent;
@@ -4830,14 +4830,8 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
   }
 
   static String? _extractParamType(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       return param.type?.toSource();
-    }
-    if (param is DefaultFormalParameter) {
-      final NormalFormalParameter normalParam = param.parameter;
-      if (normalParam is SimpleFormalParameter) {
-        return normalParam.type?.toSource();
-      }
     }
     return null;
   }
@@ -4938,8 +4932,8 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
 
       // Check onChanged callback
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onChanged') {
-          final callback = arg.expression;
+        if (arg is NamedArgument && arg.name.lexeme == 'onChanged') {
+          final callback = arg.argumentExpression;
           final callbackSource = callback.toSource();
 
           // Check for API/network calls in onChanged

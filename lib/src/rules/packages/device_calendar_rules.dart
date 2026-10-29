@@ -43,9 +43,9 @@ bool _isTestFilePath(String path) {
 }
 
 Expression? _namedArg(InstanceCreationExpression node, String name) {
-  for (final Expression arg in node.argumentList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) {
-      return arg.expression;
+  for (final Argument arg in node.argumentList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) {
+      return arg.argumentExpression;
     }
   }
   return null;
@@ -478,7 +478,7 @@ class DeviceCalendarEventMissingCalendarIdRule extends SaropaLintRule {
       // when neither a positional value nor a non-null calendarId: is present.
       final bool hasPositional =
           node.argumentList.arguments.isNotEmpty &&
-          node.argumentList.arguments.first is! NamedExpression &&
+          node.argumentList.arguments.first is! NamedArgument &&
           node.argumentList.arguments.first is! NullLiteral;
       if (hasPositional) return;
       if (_argProvided(node, 'calendarId')) return;
@@ -587,8 +587,8 @@ class DeviceCalendarEventUtcTimezoneRule extends SaropaLintRule {
 
       // Used as the start: or end: argument of an Event(...) construction.
       final AstNode? namedExpr = node.parent;
-      if (namedExpr is! NamedExpression) return;
-      final String label = namedExpr.name.label.name;
+      if (namedExpr is! NamedArgument) return;
+      final String label = namedExpr.name.lexeme;
       if (label != 'start' && label != 'end') return;
 
       final AstNode? argList = namedExpr.parent;
@@ -771,7 +771,7 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
       // device_calendar Event requires a positional calendarId as first arg
       // This helps distinguish it from other Event classes
       final bool hasPositionalArg =
-          args.arguments.isNotEmpty && args.arguments.first is! NamedExpression;
+          args.arguments.isNotEmpty && args.arguments.first is! NamedArgument;
       if (!hasPositionalArg) return;
 
       // Must have both 'start' and 'end' named parameters (device_calendar pattern)
@@ -779,9 +779,9 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
       bool hasEnd = false;
       bool hasTimeZone = false;
 
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'start') hasStart = true;
           if (name == 'end') hasEnd = true;
           if (name == 'timeZone') hasTimeZone = true;

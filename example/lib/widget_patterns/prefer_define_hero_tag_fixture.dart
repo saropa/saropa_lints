@@ -110,12 +110,12 @@ dynamic state;
 // BAD: Should trigger prefer_define_hero_tag
 // expect_lint: prefer_define_hero_tag
 void _bad1369_initState() {
-// super.initState();
+  // super.initState();
   setState(() {}); // Wrong - causes issues
 }
 
 // GOOD: Should NOT trigger prefer_define_hero_tag
 void _good1369_initState() {
-// super.initState();
-// Update state directly in initState, no setState needed
+  // super.initState();
+  // Update state directly in initState, no setState needed
 }

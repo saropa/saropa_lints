@@ -211,9 +211,8 @@ class _GoodAnimatedBuilderChildReads extends State<MyWidget>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
-      builder: (BuildContext context, Widget? _) => _GoodDisplayWidget(
-        opacityAnimation: _opacityAnimation,
-      ),
+      builder: (BuildContext context, Widget? _) =>
+          _GoodDisplayWidget(opacityAnimation: _opacityAnimation),
     );
   }
 }

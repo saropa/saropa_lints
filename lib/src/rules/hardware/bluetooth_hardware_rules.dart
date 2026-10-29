@@ -91,8 +91,8 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
 
       // Check for timeout parameter
       bool hasTimeout = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'timeout') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'timeout') {
           hasTimeout = true;
           break;
         }

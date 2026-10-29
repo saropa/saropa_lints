@@ -129,8 +129,5 @@ void _good722() {
   );
 
   // Or use Provider constructor
-  Provider(
-    create: (_) => MyNotifier(),
-    child: child,
-  );
+  Provider(create: (_) => MyNotifier(), child: child);
 }

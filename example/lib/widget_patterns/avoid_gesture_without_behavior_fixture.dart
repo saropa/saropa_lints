@@ -124,9 +124,7 @@ void _bad1415() {
 // GOOD: Should NOT trigger avoid_gesture_without_behavior
 void _good1415() {
   NestedScrollView(
-    headerSliverBuilder: (context, innerBoxIsScrolled) => [
-      SliverAppBar(),
-    ],
+    headerSliverBuilder: (context, innerBoxIsScrolled) => [SliverAppBar()],
     body: ListView.builder(),
   );
   // Or use shrinkWrap + NeverScrollableScrollPhysics for inner list

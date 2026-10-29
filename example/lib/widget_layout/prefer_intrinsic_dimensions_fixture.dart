@@ -122,9 +122,6 @@ void _bad1316() {
 // GOOD: Should NOT trigger prefer_intrinsic_dimensions
 void _good1316() {
   IntrinsicWidth(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [],
-    ),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: []),
   );
 }

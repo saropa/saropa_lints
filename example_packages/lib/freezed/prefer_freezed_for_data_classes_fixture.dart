@@ -141,11 +141,8 @@ class _bad417_User {
 // GOOD: Should NOT trigger prefer_freezed_for_data_classes
 @freezed
 class _good417_User with _$User {
-  const factory User({
-    required String name,
-    required int age,
-    String? email,
-  }) = _User;
+  const factory User({required String name, required int age, String? email}) =
+      _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

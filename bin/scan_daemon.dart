@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 // ignore_for_file: avoid_print
 
 /// Long-lived resolved-scan daemon for save-triggered IDE scans.
@@ -144,9 +145,8 @@ Future<void> _serveRequests(
   required int maxRssMb,
 }) async {
   var requestCount = 0;
-  await for (final line in stdin
-      .transform(utf8.decoder)
-      .transform(const LineSplitter())) {
+  await for (final line
+      in stdin.transform(utf8.decoder).transform(const LineSplitter())) {
     final trimmed = line.trim();
     if (trimmed.isEmpty) continue;
 
@@ -176,10 +176,7 @@ Future<void> _serveRequests(
 
     // Check AFTER responding so the triggering request still gets its
     // result; the extension sees the exit and respawns a fresh daemon.
-    if (_memoryBudgetExceeded(
-      maxRssMb: maxRssMb,
-      requestCount: requestCount,
-    )) {
+    if (_memoryBudgetExceeded(maxRssMb: maxRssMb, requestCount: requestCount)) {
       stderr.writeln(
         '[scan_daemon] Recycling after $requestCount request(s), '
         'RSS ${_currentRssMb() ?? '?'} MB (limit $maxRssMb MB).',
@@ -278,10 +275,7 @@ int? _currentRssMb() {
 /// True when the daemon should recycle: RSS past the ceiling, or the
 /// request-count backstop reached (covers platforms where RSS is
 /// unreadable).
-bool _memoryBudgetExceeded({
-  required int maxRssMb,
-  required int requestCount,
-}) {
+bool _memoryBudgetExceeded({required int maxRssMb, required int requestCount}) {
   if (requestCount >= _maxRequestsBeforeRecycle) return true;
   final rssMb = _currentRssMb();
   return rssMb != null && rssMb > maxRssMb;

@@ -916,13 +916,13 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
       if (!_logMethods.contains(methodName)) return;
 
       // Check if first argument uses string concatenation
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
-      if (firstArg is NamedExpression) return;
+      final Argument firstArg = args.first;
+      if (firstArg is NamedArgument) return;
 
-      if (_usesConcatenation(firstArg)) {
+      if (_usesConcatenation(firstArg.argumentExpression)) {
         reporter.atNode(firstArg);
       }
     });
@@ -1051,12 +1051,12 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
       if (!_logMethods.contains(methodName)) return;
 
       // Check all arguments for sensitive patterns
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (_containsSensitiveData(arg.expression)) {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (_containsSensitiveData(arg.argumentExpression)) {
             reporter.atNode(arg);
           }
-        } else if (_containsSensitiveData(arg)) {
+        } else if (_containsSensitiveData(arg.argumentExpression)) {
           reporter.atNode(arg);
         }
       }
@@ -1132,12 +1132,12 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
     // by name (e.g., getToken() might return masked data)
     if (expr is MethodInvocation) {
       // But do check arguments being passed
-      for (final Expression arg in expr.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (_containsSensitiveData(arg.expression)) {
+      for (final Argument arg in expr.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (_containsSensitiveData(arg.argumentExpression)) {
             return true;
           }
-        } else if (_containsSensitiveData(arg)) {
+        } else if (_containsSensitiveData(arg.argumentExpression)) {
           return true;
         }
       }
@@ -1421,12 +1421,10 @@ class PreferConditionalLoggingRule extends SaropaLintRule {
       if (targetNode is! SimpleIdentifier) return;
       if (targetNode.name != 'log') return;
       if (!_logMethods.contains(node.methodName.name)) return;
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
       final firstArg = args.first;
-      final Expression first = firstArg is NamedExpression
-          ? firstArg.expression
-          : firstArg;
+      final Expression first = firstArg.argumentExpression;
       if (first is! StringInterpolation && first is! AdjacentStrings) return;
       reporter.atNode(node.methodName, code);
     });

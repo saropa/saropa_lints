@@ -198,6 +198,14 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'replace-all',
   },
   {
+    // Rewrite renamed rule names in ignore comments, analysis options and baselines.
+    command: 'saropaLints.migrateRuleNames',
+    title: 'Migrate Renamed Rules',
+    description: 'Update renamed rule names in ignore comments, analysis_options files and baselines, with a diff preview.',
+    category: 'Setup & Configuration',
+    icon: 'replace-all',
+  },
+  {
     // Pick which analysis lane to run in (light or full).
     command: 'saropaLints.setLane',
     title: 'Set Analysis Lane',
@@ -397,6 +405,13 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     description: 'Open the Health Panel showing engine status and background process diagnostics.',
     category: 'Analysis',
     icon: 'pulse',
+  },
+  {
+    command: 'saropaLints.configureCompatibility',
+    title: 'Configure Version Compatibility',
+    description: 'Check which saropa_lints version suits this project and preview or apply the pubspec.yaml and analysis_options.yaml changes.',
+    category: 'Analysis',
+    icon: 'versions',
   },
   {
     command: 'saropaLints.showMachineDashboard',

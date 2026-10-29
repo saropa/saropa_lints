@@ -23,6 +23,11 @@ from pathlib import Path
 from typing import NamedTuple
 
 from scripts.modules._utils import (
+    LONG_TIMEOUT_S,
+    hardened_env,
+    safe_input,
+    safe_run,
+    start_watchdog,
     Color,
     OutputLevel,
     clear_flutter_lock,
@@ -361,7 +366,7 @@ def _try_fix_stale_plugin_cache(
     )
     print_colored("  [S]kip (continue with failure)", Color.CYAN)
     try:
-        raw = input("  Choice [f/s]: ").strip().lower() or "s"
+        raw = safe_input("  Choice [f/s]: ").strip().lower() or "s"
     except (EOFError, KeyboardInterrupt):
         return False
 
@@ -484,7 +489,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     # --- AUTO-FIX: Apply dart fix for auto-fixable lint issues ---
     # shell=get_shell_mode() is required on Windows: `dart` resolves to
     # dart.bat, which CreateProcess cannot launch directly without a shell.
-    dart_fix_result = subprocess.run(
+    dart_fix_result = safe_run(
         ['dart', 'fix', '--dry-run'],
         capture_output=True, text=True, timeout=300,
         cwd=str(project_dir),
@@ -496,7 +501,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
         print_warning(
             f"{fix_match.group(1)} auto-fixable dart issue(s) found, applying..."
         )
-        subprocess.run(
+        safe_run(
             ['dart', 'fix', '--apply'],
             capture_output=True, text=True, timeout=300,
             cwd=str(project_dir),
@@ -788,7 +793,7 @@ def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
     print_header("STEP 3: CHECKING WORKING TREE")
 
     use_shell = get_shell_mode()
-    result = subprocess.run(
+    result = safe_run(
         ["git", "status", "--porcelain"],
         cwd=project_dir,
         capture_output=True,
@@ -801,7 +806,7 @@ def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
         print_colored(result.stdout, Color.YELLOW)
         print()
         response = (
-            input(
+            safe_input(
                 "  These changes will be included in the "
                 "release commit. Continue? [Y/n] "
             )
@@ -846,7 +851,7 @@ def _ask_remote_sync_recovery(
         Color.CYAN,
     )
     try:
-        raw = input("  Choice [1]: ").strip() or "1"
+        raw = safe_input("  Choice [1]: ").strip() or "1"
     except (KeyboardInterrupt, EOFError):
         print()
         return False
@@ -859,7 +864,7 @@ def _ask_remote_sync_recovery(
         return False
     # Choice 1: reset to remote
     print_info(f"Resetting local {branch} to origin/{branch}...")
-    reset_result = subprocess.run(
+    reset_result = safe_run(
         ["git", "reset", "--hard", f"origin/{branch}"],
         cwd=project_dir,
         capture_output=True,
@@ -883,7 +888,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 
     # Fetch from remote
     print_info("Fetching from remote...")
-    result = subprocess.run(
+    result = safe_run(
         ["git", "fetch", "origin", branch],
         cwd=project_dir,
         capture_output=True,
@@ -902,7 +907,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
             if result.stdout and result.stdout.strip():
                 print_colored(result.stdout.strip(), Color.RED)
             print_info("Trying 'git fetch origin' (all refs)...")
-        fallback = subprocess.run(
+        fallback = safe_run(
             ["git", "fetch", "origin"],
             cwd=project_dir,
             capture_output=True,
@@ -917,7 +922,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
         print_success("Fetched from remote.")
 
     # Check if behind
-    result = subprocess.run(
+    result = safe_run(
         ["git", "rev-list", "--count", f"HEAD..origin/{branch}"],
         cwd=project_dir,
         capture_output=True,
@@ -931,7 +936,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
                 f"Local branch is behind remote by {behind_count} commit(s)."
             )
             print_info(f"Pulling changes from origin/{branch}...")
-            pull_result = subprocess.run(
+            pull_result = safe_run(
                 ["git", "pull", "origin", branch],
                 cwd=project_dir,
                 capture_output=True,
@@ -960,7 +965,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
             print_success(f"Pulled {behind_count} commit(s) from remote")
 
     # Check if ahead
-    result = subprocess.run(
+    result = safe_run(
         ["git", "rev-list", "--count", f"origin/{branch}..HEAD"],
         cwd=project_dir,
         capture_output=True,
@@ -1177,7 +1182,7 @@ def _run_chain_stack_traces_and_check(
         result = None
         try:
             with open(log_path, "w", encoding="utf-8") as out:
-                result = subprocess.run(
+                result = safe_run(
                     [
                         "dart", "test", "--chain-stack-traces",
                         "-j", str(diag_j),
@@ -1313,9 +1318,12 @@ def _run_dart_test_to_file(
         cwd=project_dir,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        env=env,
+        stdin=subprocess.DEVNULL,
+        env=hardened_env(env),
         shell=use_shell,
+        start_new_session=not is_windows(),
     )
+    watchdog = start_watchdog(proc, LONG_TIMEOUT_S, "dart test")
 
     # Track whether we have an active CR-overwritten progress line on screen.
     wrote_progress = False
@@ -1385,13 +1393,103 @@ def _run_dart_test_to_file(
     sys.stdout.flush()
 
     returncode = proc.wait()
+    watchdog.set()
     if returncode != 0:
         with open(log_path, "a", encoding="utf-8") as ap:
             ap.write(f"\n[Tests failed — exit code {returncode}.]\n")
+            if watchdog.timed_out:
+                ap.write(f"[Killed by watchdog after {LONG_TIMEOUT_S}s.]\n")
     return returncode
 
 
-def _prompt_test_failure(is_crash: bool = False) -> str:
+_FAILED_TEST_PATH_RE = re.compile(r"(test/[^\s:]+\.dart):")
+# Aggregated runs name the group after the original file: the text after the
+# aggregate path's colon starts with the original ``test/..._test.dart`` path.
+_AGGREGATE_ORIG_RE = re.compile(r"\s*(test/[^\s:]+_test\.dart)\b")
+_AGGREGATE_PREFIX = "test/aggregate/"
+
+
+def _aggregate_targets(manifest: dict) -> list[str]:
+    """Build dart test targets from a gen_test_aggregates manifest dict."""
+    targets = [f"test/aggregate/{name}" for name in manifest.get("aggregates", {})]
+    targets.extend(manifest.get("left_out", []))
+    return targets
+
+
+def _generate_aggregate_targets(project_dir: Path) -> list[str] | None:
+    """Run the aggregate generator; return dart test targets, or None on any
+    failure (caller falls back to running the full test directory)."""
+    import json
+
+    gen = project_dir / "scripts" / "gen_test_aggregates.py"
+    if not gen.is_file():
+        print_warning("gen_test_aggregates.py missing; running full test dir")
+        return None
+    try:
+        res = safe_run(
+            ["python3", "scripts/gen_test_aggregates.py"],
+            cwd=project_dir, capture_output=True, text=True,
+        )
+        if res.returncode != 0:
+            print_warning(
+                f"Aggregate generator exited {res.returncode}; running full test dir"
+            )
+            return None
+        manifest = json.loads(
+            (project_dir / "test" / "aggregate" / "manifest.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        targets = _aggregate_targets(manifest)
+    except (OSError, ValueError) as e:
+        print_warning(f"Aggregate generator failed ({e}); running full test dir")
+        return None
+    if not targets:
+        return None
+    print_info(f"Aggregated fast pass: {len(targets)} test target(s)")
+    return targets
+
+
+def _parse_failed_test_files(log_path: Path, project_dir: Path) -> list[str]:
+    """Return existing test file paths that failed in a dart test log.
+
+    Reads "path: name [E]" failure lines and the "Failing tests:" summary
+    block. Progress lines are ignored: after the first failure every progress
+    line carries a non-zero fail count, so they cannot identify the culprit.
+    Deduped, in first-seen order. Empty when nothing parseable (e.g. crash).
+    """
+    try:
+        lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return []
+    found: list[str] = []
+    in_summary = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("Failing tests:"):
+            in_summary = True
+            continue
+        if in_summary and not stripped:
+            in_summary = False
+        if not (in_summary or stripped.endswith("[E]")):
+            continue
+        m = _FAILED_TEST_PATH_RE.search(stripped)
+        if not m:
+            continue
+        path = m.group(1)
+        if path.startswith(_AGGREGATE_PREFIX):
+            # Map to the original file named by the group; never return
+            # aggregate paths (targeted retry reruns the originals).
+            orig = _AGGREGATE_ORIG_RE.match(stripped[m.end():])
+            if not orig:
+                continue
+            path = orig.group(1)
+        if path not in found and (project_dir / path).is_file():
+            found.append(path)
+    return found
+
+
+def _prompt_test_failure(is_crash: bool = False, failed_files: int = 0) -> str:
     """Ask user what to do after tests failed.
 
     Returns 'continue' | 'retry' | 'retry_fewer' | 'abort'.
@@ -1403,7 +1501,8 @@ def _prompt_test_failure(is_crash: bool = False) -> str:
     # Loop until a valid choice is entered — typos no longer abort.
     while True:
         print_warning("Tests failed. Choose an action:")
-        print_colored("  [R]etry (re-run tests after fixing the issue)", Color.CYAN)
+        scope = f"{failed_files} failed files" if failed_files else "full suite"
+        print_colored(f"  [R]etry ({scope}; re-run after fixing the issue)", Color.CYAN)
         if is_crash:
             print_colored(
                 "  [F]ewer workers (retry with halved concurrency — fixes compiler crashes)",
@@ -1412,7 +1511,7 @@ def _prompt_test_failure(is_crash: bool = False) -> str:
         print_colored("  [C]ontinue anyway (proceed with publish)", Color.CYAN)
         print_colored("  [A]bort (stop publish)", Color.CYAN)
         try:
-            raw = input(prompt).strip().lower()
+            raw = safe_input(prompt).strip().lower()
         except (EOFError, KeyboardInterrupt):
             return "abort"
         if not raw:
@@ -1569,7 +1668,8 @@ def _run_test_pass(
         else:
             print_info("  (No failure markers found in log; open the log file to see output.)")
 
-        choice = _prompt_test_failure(is_crash=is_crash)
+        failed_files = _parse_failed_test_files(last_log, project_dir)
+        choice = _prompt_test_failure(is_crash=is_crash, failed_files=len(failed_files))
         if choice == "continue":
             print_info("Continuing despite test failure.")
             return True
@@ -1594,8 +1694,11 @@ def _run_test_pass(
             relog_time = datetime.now().strftime("%H%M%S")
             relog_name = f"{date_str}_{relog_time}_dart_test_{label}_retry.log"
             last_log = reports_dir / relog_name
+            # Re-run only the previously failed files when known; else full pass.
             rc = _run_dart_test_to_file(
-                project_dir, env, last_log, extra_args, concurrency=next_j,
+                project_dir, env, last_log,
+                (extra_args or []) + failed_files if failed_files else extra_args,
+                concurrency=next_j,
             )
             last_j = next_j
             if rc == 0:
@@ -1603,10 +1706,36 @@ def _run_test_pass(
                 return True
             continue
         # Abort: run chain-stack-traces so a detailed log exists, then return False
-        print_warning("Aborting — capturing one final diagnostic trace (this is NOT a retry)...")
-        _run_chain_stack_traces_and_check(project_dir, env, extra_args)
+        # Only the failed files are re-run; if none parse, skip (a full-suite
+        # re-run costs 30-80 min and the original log already has the failures).
+        if failed_files:
+            print_warning(
+                f"Aborting — capturing a diagnostic trace of {len(failed_files)} "
+                "failed file(s) (this is NOT a retry)..."
+            )
+            _run_chain_stack_traces_and_check(project_dir, env, failed_files)
+        else:
+            print_info("Aborting — no failed test files parsed, skipping diagnostic re-run.")
         print_info("Diagnostic trace saved. Aborting publish.")
         return False
+
+
+def _parse_vm_stat(text: str) -> float | None:
+    """Parse macOS ``vm_stat`` output into reclaimable GB (free + inactive + speculative)."""
+    m = re.search(r"page size of (\d+) bytes", text)
+    if not m:
+        return None
+    page_size = int(m.group(1))
+    pages = 0
+    found = False
+    for key in ("Pages free", "Pages inactive", "Pages speculative"):
+        km = re.search(rf"^{key}:\s+(\d+)\.", text, re.MULTILINE)
+        if km:
+            pages += int(km.group(1))
+            found = True
+    if not found:
+        return None
+    return pages * page_size / (1024 ** 3)
 
 
 def _available_ram_gb() -> float | None:
@@ -1618,6 +1747,14 @@ def _available_ram_gb() -> float | None:
     cached under light load can OOM-crash the compiler on a later run where
     other processes (IDE, browser, another publish) are competing for RAM.
     """
+    if sys.platform == "darwin":
+        try:
+            out = safe_run(
+                ["vm_stat"], capture_output=True, text=True, timeout=10,
+            ).stdout
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+        return _parse_vm_stat(out)
     if not is_windows():
         return None
     try:
@@ -1690,7 +1827,7 @@ def _auto_tune_concurrency(
     cache_file = cache_dir / ".dart_test_max_j"
     sdk_version = ""
     try:
-        sdk_result = subprocess.run(
+        sdk_result = safe_run(
             ["dart", "--version"],
             capture_output=True, text=True, timeout=10,
             shell=get_shell_mode(),
@@ -1702,8 +1839,8 @@ def _auto_tune_concurrency(
     ram_bucket = int(ram_gb // 4) if ram_gb is not None else "unknown"
     cache_key = f"{sdk_version}|{os.cpu_count()}|ram{ram_bucket}"
 
-    # Read cached result if it exists and matches.
-    if cache_file.exists():
+    # Read cached result if it exists and matches (never for unknown RAM).
+    if ram_gb is not None and cache_file.exists():
         try:
             lines = cache_file.read_text(encoding="utf-8").splitlines()
             if len(lines) >= 2 and lines[0] == cache_key:
@@ -1741,7 +1878,11 @@ def _auto_tune_concurrency(
     # than probing all the way up and risking the crash the probe exists to
     # avoid. Thresholds are conservative estimates (~1.5 GB/worker), not
     # measured; the probe itself is still the authority on what's stable.
-    if ram_gb is not None:
+    if ram_gb is not None and sys.platform == "darwin":
+        # macOS: ~1 GB per worker, clamped 2..8 (8 GB Macs thrash otherwise).
+        cap = max(2, min(8, int(ram_gb)))
+        levels = [j for j in levels if j <= cap] or [cap]
+    elif ram_gb is not None:
         if ram_gb < 4:
             levels = [j for j in levels if j <= 2] or [2]
         elif ram_gb < 8:
@@ -1753,7 +1894,7 @@ def _auto_tune_concurrency(
 
     for j in levels:
         try:
-            result = subprocess.run(
+            result = safe_run(
                 ["dart", "test", "-j", str(j), probe_file],
                 cwd=project_dir,
                 capture_output=True,
@@ -1783,11 +1924,13 @@ def _auto_tune_concurrency(
             print_info(f"  -j {j}: timeout — stopping")
             break
 
-    # Cache the result.
-    try:
-        cache_file.write_text(f"{cache_key}\n{best_j}\n", encoding="utf-8")
-    except OSError:
-        pass
+    # Cache the result — but never when RAM is unknown: the value would be
+    # pinned to a guess and reused regardless of later memory pressure.
+    if ram_gb is not None:
+        try:
+            cache_file.write_text(f"{cache_key}\n{best_j}\n", encoding="utf-8")
+        except OSError:
+            pass
 
     print_success(f"Test concurrency: -j {best_j}")
     return best_j
@@ -1795,6 +1938,11 @@ def _auto_tune_concurrency(
 
 def _find_delta_test_files(project_dir: Path) -> list[str]:
     """Identify test files affected by uncommitted changes (staged + unstaged).
+
+    Only the working-tree delta counts; earlier commits were tested when they
+    were merged. Returns [] when SAROPA_FULL_TESTS=1 (the caller then runs the
+    full suite), when the tree is clean, or when nothing maps to a test file
+    (the caller then skips testing).
 
     Maps changed lib/ source files to their corresponding test/ files by
     mirroring the directory structure:
@@ -1805,13 +1953,14 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
     Also includes any directly changed test files. Returns paths relative to
     project_dir, suitable for passing to `dart test <file> <file> ...`.
 
-    Returns an empty list when git is unavailable, the diff is too broad
-    (infrastructure files like tiers.dart or all_rules.dart changed), or no
-    test files can be mapped — the caller should fall back to the full suite.
+    A broad-impact change (tiers.dart, all_rules.dart, plugin entry point)
+    selects the integrity + config test dirs only, never the full suite.
     """
+    if os.environ.get("SAROPA_FULL_TESTS", "").strip() == "1":
+        return []
     use_shell = get_shell_mode()
     try:
-        result = subprocess.run(
+        result = safe_run(
             ["git", "diff", "--name-only", "HEAD"],
             cwd=project_dir,
             capture_output=True,
@@ -1820,7 +1969,7 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
             shell=use_shell,
         )
         # Also pick up staged-but-not-yet-in-HEAD changes.
-        staged = subprocess.run(
+        staged = safe_run(
             ["git", "diff", "--name-only", "--cached"],
             cwd=project_dir,
             capture_output=True,
@@ -1840,17 +1989,15 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
     if not changed:
         return []
 
-    # Infrastructure files affect everything — bail to full suite.
-    # Changes to tiers, registration, or the plugin entry point can break any test.
+    # Infrastructure files can affect anything — run the integrity + config
+    # dirs (whole-codebase audits), never the full suite.
     # pubspec.yaml is NOT here: version bumps and metadata don't affect tests.
     _BROAD_IMPACT = (
         "lib/saropa_lints.dart",
         "lib/src/rules/all_rules.dart",
         "lib/src/tiers.dart",
     )
-    for broad in _BROAD_IMPACT:
-        if broad in changed:
-            return []
+    broad_hit = any(broad in changed for broad in _BROAD_IMPACT)
 
     test_dir = project_dir / "test"
     delta_files: set[str] = set()
@@ -1865,7 +2012,7 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
         "tool/",
         "doc/guides/migration_guides/",
     )
-    if any(
+    if broad_hit or any(
         any(p.startswith(trigger) for trigger in _INTEGRITY_TRIGGERS)
         for p in changed
     ):
@@ -1920,13 +2067,13 @@ def _find_delta_test_files(project_dir: Path) -> list[str]:
 
 
 def run_tests(project_dir: Path) -> bool:
-    """Step 7: Run tests — delta only when possible, full suite as fallback.
+    """Step 7: Run tests — uncommitted delta only; full suite only on request.
 
-    Detects changed files via git diff and runs only their corresponding tests
-    (seconds, not minutes). If delta passes, done — CI runs the full suite on
-    push. If delta fails, stops immediately. Falls back to the full fast suite
-    only when no delta can be computed (broad infrastructure changes or clean
-    tree). Slow-tagged integration tests are always deferred to CI.
+    Detects uncommitted (staged + unstaged) changes via git diff and runs only
+    their corresponding tests. A clean tree or an unmappable delta skips
+    testing (changes were tested when merged). The full fast suite runs only
+    with --full-tests (SAROPA_FULL_TESTS=1). Slow-tagged tests are always
+    deferred to CI.
 
     Test output streams to both the terminal (live progress bar with pass/skip/fail
     counts) and a log file (full output). Failures print immediately on the terminal.
@@ -1966,17 +2113,26 @@ def run_tests(project_dir: Path) -> bool:
 
     # Delta pass: run only tests affected by uncommitted changes.
     # Compiles a handful of files instead of 340+, giving feedback in seconds.
-    delta_files = _find_delta_test_files(project_dir)
+    full_requested = os.environ.get("SAROPA_FULL_TESTS", "").strip() == "1"
+    delta_files = [] if full_requested else _find_delta_test_files(project_dir)
+    if not full_requested and not delta_files:
+        print_info(
+            "No uncommitted changes to test; tests ran when each change "
+            "was merged"
+        )
+        return True
     if delta_files:
         print_info(f"Delta: {len(delta_files)} test file(s) affected by changes")
         for f in delta_files:
             print_colored(f"    {f}", Color.CYAN)
         # Pass the specific test files — dart test compiles only these.
-        # No tag filter: delta runs exactly these files, even if slow-tagged.
+        # Slow-tagged tests are excluded here (e.g. scan_runner_test does a
+        # synchronous full-repo scan the 2m timeout cannot interrupt); they
+        # run in the dedicated slow pass / CI.
         delta_ok = _run_test_pass(
             project_dir, env, reports_dir, date_str, time_str,
             label="delta",
-            extra_args=delta_files,
+            extra_args=["-x", "slow"] + delta_files,
             concurrency=tuned_j,
         )
         if not delta_ok:
@@ -1985,11 +2141,12 @@ def run_tests(project_dir: Path) -> bool:
         print_success("Delta tests passed. Full suite deferred to CI.")
         return True
 
-    # No delta (broad infrastructure changes or clean tree) — run full suite.
-    print_info("No delta (broad changes or clean tree) — running full suite")
+    # --full-tests requested — run the full fast suite.
+    print_info("--full-tests: running full suite")
+    agg_targets = _generate_aggregate_targets(project_dir)
     return _run_test_pass(
         project_dir, env, reports_dir, date_str, time_str,
-        label="fast", extra_args=["-x", "slow"],
+        label="fast", extra_args=["-x", "slow"] + (agg_targets or []),
         concurrency=tuned_j,
     )
 
@@ -2058,7 +2215,7 @@ def run_pub_get(project_dir: Path) -> bool:
             else pubspec_dir.relative_to(project_dir)
         )
         print_info(f"dart pub get  ({rel})")
-        result = subprocess.run(
+        result = safe_run(
             ["dart", "pub", "get"],
             cwd=pubspec_dir,
             capture_output=True,
@@ -2092,7 +2249,7 @@ def run_format(project_dir: Path) -> bool:
     use_shell = get_shell_mode()
 
     if is_windows():
-        subprocess.run(
+        safe_run(
             ["git", "config", "core.autocrlf", "false"],
             cwd=project_dir,
             capture_output=True,
@@ -2106,7 +2263,7 @@ def run_format(project_dir: Path) -> bool:
     if get_output_level().value >= OutputLevel.VERBOSE.value:
         print_colored(f"      $ {' '.join(cmd)}", Color.WHITE)
 
-    result = subprocess.run(
+    result = safe_run(
         cmd,
         cwd=project_dir,
         capture_output=True,
@@ -2123,7 +2280,7 @@ def run_format(project_dir: Path) -> bool:
             f"Formatting failed (exit code {result.returncode})"
         )
         if is_windows():
-            subprocess.run(
+            safe_run(
                 ["git", "config", "core.autocrlf", "true"],
                 cwd=project_dir,
                 capture_output=True,
@@ -2138,7 +2295,7 @@ def run_format(project_dir: Path) -> bool:
                 print_info(f"  {line}")
                 break
 
-    subprocess.run(
+    safe_run(
         ["git", "add", "-A"],
         cwd=project_dir,
         capture_output=True,
@@ -2146,7 +2303,7 @@ def run_format(project_dir: Path) -> bool:
     )
 
     if is_windows():
-        subprocess.run(
+        safe_run(
             ["git", "config", "core.autocrlf", "true"],
             cwd=project_dir,
             capture_output=True,
@@ -2196,7 +2353,7 @@ def _run_dart_analyze_core(project_dir: Path) -> bool:
     spinner.start()
 
     try:
-        result = subprocess.run(
+        result = safe_run(
             ["dart", "analyze", "--fatal-infos"],
             cwd=project_dir,
             capture_output=True,
@@ -2282,7 +2439,7 @@ def _prompt_analysis_failure() -> str:
     print_colored("  [R]etry (re-run dart analyze)", Color.CYAN)
     print_colored("  [A]bort (stop publish)", Color.CYAN)
     try:
-        raw = input("  Choice [i/r/a]: ").strip().lower() or "a"
+        raw = safe_input("  Choice [i/r/a]: ").strip().lower() or "a"
         if raw.startswith("i"):
             return "ignore"
         if raw.startswith("r"):
@@ -2310,7 +2467,7 @@ def _prompt_spelling_retry() -> bool:
     print_colored("  [R]etry (re-scan after fixing)", Color.CYAN)
     print_colored("  [A]bort publish", Color.CYAN)
     try:
-        raw = input("  Choice [r/a]: ").strip().lower() or "r"
+        raw = safe_input("  Choice [r/a]: ").strip().lower() or "r"
     except EOFError:
         return False
     return not raw.startswith("a")
@@ -2419,7 +2576,7 @@ def _gate_changelog_overview(project_dir: Path, version: str) -> bool:
         for problem in problems:
             print_warning(problem)
         choice = (
-            input(
+            safe_input(
                 "  Overview/log-link check failed. "
                 "[R]etry / [i]gnore / [a]bort? [R] "
             )
@@ -2457,7 +2614,7 @@ def _gate_changelog_internal_heading(
         for problem in problems:
             print_warning(problem)
         choice = (
-            input(
+            safe_input(
                 "  Internal-heading check failed. "
                 "[R]etry / [i]gnore / [a]bort? [R] "
             )
@@ -2503,7 +2660,7 @@ def validate_changelog(
 
     if not release_notes:
         response = (
-            input(f"  Use generic message 'Release {version}'? [Y/n] ")
+            safe_input(f"  Use generic message 'Release {version}'? [Y/n] ")
             .strip()
             .lower()
         )
@@ -2568,7 +2725,7 @@ def generate_docs(project_dir: Path) -> bool:
 
     print_info(f"Generating docs (output → reports/{date_prefix}/{log_name})")
     use_shell = get_shell_mode()
-    result = subprocess.run(
+    result = safe_run(
         ["dart", "doc"],
         cwd=project_dir,
         capture_output=True,
@@ -2610,7 +2767,7 @@ def pre_publish_validation(project_dir: Path) -> bool:
     # (e.g. 0x8f) that crash the subprocess reader thread on Windows where
     # text=True defaults to cp1252. The return code survived the crash, but
     # stdout/stderr were lost — hiding real validation errors on failure.
-    result = subprocess.run(
+    result = safe_run(
         ["dart", "pub", "publish", "--dry-run"],
         cwd=project_dir,
         capture_output=True,

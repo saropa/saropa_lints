@@ -110,10 +110,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // Multi-line argument list without trailing comma
 void _badMultiLineArgs() {
   _threeArgs(
-      'alpha',
-      'beta',
-      // expect_lint: prefer_trailing_comma_always
-      'gamma');
+    'alpha',
+    'beta',
+    // expect_lint: prefer_trailing_comma_always
+    'gamma',
+  );
 }
 
 // Multi-line list literal without trailing comma
@@ -122,16 +123,17 @@ void _badMultiLineList() {
     'first',
     'second',
     // expect_lint: prefer_trailing_comma_always
-    'third'
+    'third',
   ];
 }
 
 // Multi-line parameter list without trailing comma
 void _badMultiLineParams(
-    int a,
-    int b,
-    // expect_lint: prefer_trailing_comma_always
-    int c) {}
+  int a,
+  int b,
+  // expect_lint: prefer_trailing_comma_always
+  int c,
+) {}
 
 // --- GOOD: Should NOT trigger prefer_trailing_comma_always ---
 
@@ -152,41 +154,31 @@ void _goodCallbackWithArgs() {
 
 // Named callback argument (false positive fix)
 void _goodNamedCallback() {
-  _namedCallback(builder: (x) {
-    return x.toString();
-  });
+  _namedCallback(
+    builder: (x) {
+      return x.toString();
+    },
+  );
 }
 
 // Sole set-literal argument, block-formatted — no comma wanted (false positive fix)
 void _goodSoleSetLiteralArg(Iterable<DateTime> holidays) {
-  Set<DateTime>.unmodifiable(<DateTime>{
-    for (final DateTime h in holidays) h,
-  });
+  Set<DateTime>.unmodifiable(<DateTime>{for (final DateTime h in holidays) h});
 }
 
 // Sole list-literal argument, block-formatted — no comma wanted (false positive fix)
 void _goodSoleListLiteralArg() {
-  _oneArg(<int>[
-    1,
-    2,
-  ]);
+  _oneArg(<int>[1, 2]);
 }
 
 // Named collection-literal last argument — no comma wanted (false positive fix)
 void _goodNamedListLiteralArg() {
-  _namedList(values: <int>[
-    1,
-    2,
-  ]);
+  _namedList(values: <int>[1, 2]);
 }
 
 // Already has trailing comma — compliant
 void _goodTrailingCommaPresent() {
-  _threeArgs(
-    'alpha',
-    'beta',
-    'gamma',
-  );
+  _threeArgs('alpha', 'beta', 'gamma');
 }
 
 // Single-line argument list — not multi-line, no comma needed

@@ -136,9 +136,6 @@ void _good562() async {
   Future<void> _onSubmitForm(SubmitForm event, Emitter<State> emit) async {
     emit(Loading());
     final result = await _submitFormUseCase(event.data);
-    emit(result.fold(
-      (error) => Error(error),
-      (user) => Success(user),
-    ));
+    emit(result.fold((error) => Error(error), (user) => Success(user)));
   }
 }

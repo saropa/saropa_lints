@@ -4,9 +4,13 @@
 
 // BAD: Counter update without transaction
 // expect_lint: prefer_firebase_transaction_for_counters
-void bad() { /* doc.update({'count': count + 1}); */ }
+void bad() {
+  /* doc.update({'count': count + 1}); */
+}
 
 // GOOD: Transaction for counter
-void good() { /* runTransaction((t) => t.update(ref, {'count': FieldValue.increment(1)})); */ }
+void good() {
+  /* runTransaction((t) => t.update(ref, {'count': FieldValue.increment(1)})); */
+}
 
 void main() {}

@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 // ignore_for_file: avoid_print
 
 /// Module overview (comment coverage pass).
@@ -125,7 +126,9 @@ Future<void> main(List<String> args) async {
     );
     // Exit code contract is unchanged by --format: caller (CI, the extension)
     // still gets a non-zero code proportional to the error count.
-    final errorCount = violations.where((v) => v.impact == LintImpact.error).length;
+    final errorCount = violations
+        .where((v) => v.impact == LintImpact.error)
+        .length;
     if (errorCount > 0) exit(errorCount > 125 ? 125 : errorCount);
     return;
   }

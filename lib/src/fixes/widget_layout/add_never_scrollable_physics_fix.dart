@@ -30,7 +30,7 @@ class AddNeverScrollablePhysicsFix extends SaropaFixProducer {
     final ice = parent;
 
     for (final arg in ice.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'physics') {
+      if (arg is NamedArgument && arg.name.lexeme == 'physics') {
         return;
       }
     }

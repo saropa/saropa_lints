@@ -45,6 +45,7 @@ class StorePublicationResult(NamedTuple):
 
 from scripts.modules._utils import (
     extension_version_for,
+    safe_input,
     is_prerelease_version,
     print_colored,
     print_error,
@@ -114,9 +115,9 @@ def set_extension_version(
     """Set extension/package.json version from a pub.dev-style version string.
 
     Internally converts *version* via ``extension_version_for()`` so callers
-    never need to remember the conversion — package.json always gets the
-    odd-minor / offset-patch form for prereleases, and the raw value for
-    stable releases.
+    never need to remember the conversion. *version* must be the Dart package
+    version, never an already-converted one (the mapping is not idempotent):
+    same major.minor, patch = 10*P + slot (see ``extension_version_for``).
 
     When *dry_run* is True, the file is not modified — returns the converted
     version string that **would** be written (useful for preflight checks
@@ -129,10 +130,8 @@ def set_extension_version(
     from scripts.modules._utils import extension_version_for
 
     # Convert once here so every call site is safe by construction.
-    # Double-conversion is safe (converted versions look stable and pass
-    # through unchanged), but the early-return below avoids a needless
-    # file write when the version already matches — cleaner git diffs on
-    # publish retries.
+    # The early-return below avoids a needless file write when the version
+    # already matches — cleaner git diffs on publish retries.
     ext_version = extension_version_for(version)
 
     # Dry-run: return what would be written without touching the file.
@@ -159,6 +158,55 @@ def set_extension_version(
         return False
     pkg_path.write_text(new_text, encoding="utf-8")
     return True
+
+
+def _version_tuple(v: str) -> tuple[int, ...] | None:
+    """Parse 'X.Y.Z' into ints, or None if not plain numeric semver."""
+    parts = v.split(".")
+    if len(parts) != 3 or not all(p.isdigit() for p in parts):
+        return None
+    return tuple(int(p) for p in parts)
+
+
+def extension_version_sync_error(
+    dart_version: str,
+    package_json_version: str | None,
+    marketplace_version: str | None,
+) -> str | None:
+    """Return an error message if the extension version is unsafe, else None.
+
+    package.json must equal ``extension_version_for(dart_version)`` (same
+    major.minor as the package, patch mapped), and must be strictly higher
+    than the version already on the Marketplace (a version cannot be
+    reused). A missing
+    *marketplace_version* (lookup failed or never published) skips only
+    the floor check.
+    """
+    from scripts.modules._utils import extension_version_for
+
+    expected = extension_version_for(dart_version)
+    if expected.rsplit(".", 1)[0] != dart_version.split("-", 1)[0].rsplit(".", 1)[0]:
+        return (
+            f"Expected extension version {expected} does not share "
+            f"major.minor with the Dart package version {dart_version}."
+        )
+    if package_json_version != expected:
+        return (
+            f"extension/package.json version is {package_json_version}, but "
+            f"the Dart package version {dart_version} requires {expected}. "
+            "Extension and Dart package versions must share major.minor; "
+            "only the patch is mapped."
+        )
+    if marketplace_version:
+        new_t = _version_tuple(expected)
+        live_t = _version_tuple(marketplace_version)
+        if new_t and live_t and new_t <= live_t:
+            return (
+                f"Extension version {expected} is not higher than the "
+                f"Marketplace-published {marketplace_version}; a version "
+                "cannot be reused. Publish a higher Dart version."
+            )
+    return None
 
 
 def audit_extension_locales(project_dir: Path) -> bool | None:
@@ -227,7 +275,7 @@ def _prompt_locale_coverage_failure() -> str:
     print_colored("  [I]gnore and continue (ship with missing translations)", Color.CYAN)
     print_colored("  [A]bort (stop publish)", Color.CYAN)
     try:
-        raw = input("  Choice [R/i/a]: ").strip().lower() or "r"
+        raw = safe_input("  Choice [R/i/a]: ").strip().lower() or "r"
         if raw.startswith("i"):
             return "ignore"
         if raw.startswith("a"):
@@ -301,7 +349,7 @@ def run_extension_package(project_dir: Path, version: str) -> Path | None:
     for old_vsix in project_dir.glob("*.vsix"):
         old_vsix.unlink()
 
-    package_cmd = ["npx", "@vscode/vsce", "package", "--no-dependencies",
+    package_cmd = ["npx", "--yes", "@vscode/vsce", "package", "--no-dependencies",
                    "--out", str(out_path)]
     if is_prerelease_version(version):
         # vsce rejects a prerelease-suffixed version unless --pre-release
@@ -432,7 +480,7 @@ def _has_stored_vsce_credential(publisher: str) -> bool:
         return False
     # verify-pat queries the gallery; it does not package, so cwd is irrelevant.
     r = run_command(
-        ["npx", "@vscode/vsce", "verify-pat", publisher],
+        ["npx", "--yes", "@vscode/vsce", "verify-pat", publisher],
         Path.cwd(),
         "Check stored VS Code Marketplace credential",
         capture_output=True,
@@ -464,6 +512,7 @@ def publish_extension_to_marketplace(
     ext_dir = _extension_dir(project_dir)
     publish_cmd = [
         "npx",
+        "--yes",
         "@vscode/vsce",
         "publish",
         "--packagePath",
@@ -546,7 +595,7 @@ def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path, version: str) 
             print_info("Skipping Open VSX publish.")
             return True
     ext_dir = _extension_dir(project_dir)
-    ovsx_cmd = ["npx", "ovsx", "publish", str(vsix_path), "-p", ovsx_pat]
+    ovsx_cmd = ["npx", "--yes", "ovsx", "publish", str(vsix_path), "-p", ovsx_pat]
     if is_prerelease_version(version):
         ovsx_cmd.append("--pre-release")
     r = run_command(

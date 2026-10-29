@@ -116,9 +116,7 @@ dynamic map;
 // BAD: Should trigger avoid_widget_creation_in_loop
 // expect_lint: avoid_widget_creation_in_loop
 Widget _bad797_build(BuildContext context) {
-  return Column(
-    children: items.map((item) => ItemWidget(item)).toList(),
-  );
+  return Column(children: items.map((item) => ItemWidget(item)).toList());
 }
 
 // GOOD: Should NOT trigger avoid_widget_creation_in_loop

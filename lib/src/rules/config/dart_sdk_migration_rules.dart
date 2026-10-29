@@ -236,8 +236,7 @@ bool isPrimaryConstructorEligible(ClassDeclaration node) {
   final coveredFields = <String>{};
 
   for (final FormalParameter param in params) {
-    // Unwrap DefaultFormalParameter to get the actual parameter.
-    final actual = param is DefaultFormalParameter ? param.parameter : param;
+    final actual = param;
     if (actual is! FieldFormalParameter) return false;
     // Same rationale as field annotations above — annotated constructor
     // parameters (e.g. @Default()) have no established primary-ctor form.

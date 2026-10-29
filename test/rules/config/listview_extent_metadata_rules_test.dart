@@ -323,17 +323,17 @@ class _ListViewExtentVisitor extends RecursiveAstVisitor<void> {
     var shrinkWrapTrue = false;
     var neverScrollablePhysics = false;
     for (final arg in argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      final name = arg.name.label.name;
+      if (arg is! NamedArgument) continue;
+      final name = arg.name.lexeme;
       if (name == 'itemExtent') hasItemExtent = true;
       if (name == 'prototypeItem') hasPrototypeItem = true;
       if (name == 'itemExtentBuilder') hasItemExtentBuilder = true;
       if (name == 'shrinkWrap') {
-        final v = arg.expression;
+        final v = arg.argumentExpression;
         if (v is BooleanLiteral && v.value) shrinkWrapTrue = true;
       }
       if (name == 'physics') {
-        Expression v = arg.expression;
+        Expression v = arg.argumentExpression;
         if (v is ParenthesizedExpression) v = v.expression;
         if (v is InstanceCreationExpression &&
             v.constructorName.type.name.lexeme ==

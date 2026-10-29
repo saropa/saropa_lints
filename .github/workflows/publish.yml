@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v5
 
       # Use stable channel so the SDK is always available (no exact-version lookup failures).
-      # Pubspec allows sdk: ">=3.6.0 <4.0.0", so any current stable is valid.
+      # Pubspec allows sdk: ">=3.11.0 <4.0.0", so any current stable is valid.
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable

@@ -1,0 +1,72 @@
+name: analyzer-matrix
+
+# Compiles and tests saropa_lints against the lowest (13.0.0) and latest (14.6.0)
+# analyzer in the planned supported range. See
+# plans/PLAN_analyzer_12_to_13_14_upgrade.md section 5 step 4 and section 12.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyzer-pin:
+    name: analyzer ${{ matrix.analyzer }} (Dart ${{ matrix.dart }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - analyzer: '13.0.0'
+            plugin: '0.3.15'
+            dart: '3.11' # analyzer 13.0.0 -> _fe_analyzer_shared ^100 needs Dart >=3.11.0
+            # dart_style >=3.1.10 needs analyzer >=13.1.0; an analyzer override
+            # ignores that constraint, so pin the last dart_style on analyzer ^13.0.0.
+            dart_style: '3.1.9'
+          - analyzer: '14.6.0'
+            plugin: '0.3.25'
+            dart: '3.13'
+            dart_style: ''
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # tests walk git tags (health_history_test)
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.dart }}
+      - name: Pin analyzer via dependency_overrides
+        run: |
+          set -euo pipefail
+          if grep -q '^dependency_overrides:' pubspec.yaml; then
+            echo "::error::pubspec.yaml already has dependency_overrides; merge manually"
+            exit 1
+          fi
+          printf '\ndependency_overrides:\n  analyzer: %s\n  analysis_server_plugin: %s\n' \
+            '${{ matrix.analyzer }}' '${{ matrix.plugin }}' >> pubspec.yaml
+          if [ -n '${{ matrix.dart_style }}' ]; then
+            printf '  dart_style: %s\n' '${{ matrix.dart_style }}' >> pubspec.yaml
+          fi
+          tail -4 pubspec.yaml
+      # Drop the committed lock so pub resolves a coherent set (dart_style,
+      # analyzer_plugin, test, ...) for the pinned analyzer instead of the
+      # versions locked for the repo's own analyzer.
+      - run: rm -f pubspec.lock && dart pub get
+      - run: dart analyze lib bin tool test
+      - run: dart test
+
+  solver:
+    name: pub solver scratch projects
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dart-lang/setup-dart@v1
+        with:
+          # Dart 3.9 cannot resolve saropa_lints 16.x with analyzer 12 (analyzer_plugin
+          # >=0.14.19 needs Dart ^3.13, older ones need analyzer <11), so use 3.13.
+          sdk: '3.13'
+      - run: python3 scripts/check_pub_solver.py

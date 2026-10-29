@@ -68,16 +68,16 @@ bool _isLottieFactory(MethodInvocation node, Set<String> methodNames) {
 
 /// True when [argList] contains a named argument called [name].
 bool _hasNamedArg(ArgumentList argList, String name) {
-  for (final Expression arg in argList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) return true;
+  for (final Argument arg in argList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) return true;
   }
   return false;
 }
 
-/// Returns the [NamedExpression] with [name] from [argList], or null.
-NamedExpression? _namedArg(ArgumentList argList, String name) {
-  for (final Expression arg in argList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) return arg;
+/// Returns the [NamedArgument] with [name] from [argList], or null.
+NamedArgument? _namedArg(ArgumentList argList, String name) {
+  for (final Argument arg in argList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) return arg;
   }
   return null;
 }
@@ -155,7 +155,7 @@ class LottieControllerMissingOnLoadedRule extends SaropaLintRule {
 
       // Only report when controller: is present — no controller means the
       // package self-manages the animation, so onLoaded: is optional.
-      final NamedExpression? controllerArg = _namedArg(args, 'controller');
+      final NamedArgument? controllerArg = _namedArg(args, 'controller');
       if (controllerArg == null) return;
 
       // onLoaded: present → developer is handling duration assignment.
@@ -303,13 +303,17 @@ class LottieFrameRateMaxWithoutRenderCacheRule extends SaropaLintRule {
 
       final ArgumentList args = node.argumentList;
 
-      final NamedExpression? frameRateArg = _namedArg(args, 'frameRate');
+      final NamedArgument? frameRateArg = _namedArg(args, 'frameRate');
       if (frameRateArg == null) return;
 
       // Only match the static member access `FrameRate.max`.
       // A variable holding FrameRate.max is not statically resolvable here;
       // the conservative approach is not to flag it (avoids FPs).
-      if (!_isPrefixedAccess(frameRateArg.expression, 'FrameRate', 'max')) {
+      if (!_isPrefixedAccess(
+        frameRateArg.argumentExpression,
+        'FrameRate',
+        'max',
+      )) {
         return;
       }
 
@@ -383,7 +387,7 @@ class LottieRenderCacheRasterLargeRiskRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (!_isLottieFactory(node, _lottieFactoryMethods)) return;
 
-      final NamedExpression? renderCacheArg = _namedArg(
+      final NamedArgument? renderCacheArg = _namedArg(
         node.argumentList,
         'renderCache',
       );
@@ -391,7 +395,7 @@ class LottieRenderCacheRasterLargeRiskRule extends SaropaLintRule {
 
       // Only match the static member access `RenderCache.raster`.
       if (!_isPrefixedAccess(
-        renderCacheArg.expression,
+        renderCacheArg.argumentExpression,
         'RenderCache',
         'raster',
       )) {
@@ -469,7 +473,7 @@ class LottieNetworkMissingBackgroundLoadingRule extends SaropaLintRule {
 
       final ArgumentList args = node.argumentList;
 
-      final NamedExpression? bgArg = _namedArg(args, 'backgroundLoading');
+      final NamedArgument? bgArg = _namedArg(args, 'backgroundLoading');
 
       // Absent backgroundLoading: → default false → UI-thread parse.
       if (bgArg == null) {
@@ -478,7 +482,7 @@ class LottieNetworkMissingBackgroundLoadingRule extends SaropaLintRule {
       }
 
       // Explicit backgroundLoading: false is as bad as omitting it.
-      final Expression value = bgArg.expression;
+      final Expression value = bgArg.argumentExpression;
       if (value is BooleanLiteral && value.value == true) return;
 
       // Any other value (variable, false literal) → report at the argument.

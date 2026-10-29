@@ -110,10 +110,7 @@ dynamic image;
 // BAD: Should trigger avoid_image_repeat
 // expect_lint: avoid_image_repeat
 void _bad1399() {
-  Image.asset(
-    'image.png',
-    repeat: ImageRepeat.repeat,
-  );
+  Image.asset('image.png', repeat: ImageRepeat.repeat);
 }
 
 // GOOD: Should NOT trigger avoid_image_repeat

@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: require_value_notifier_dispose
 class _bad1028_MyWidget extends StatefulWidget {
   final counter = ValueNotifier<int>(0);
-// Missing dispose
+  // Missing dispose
 }
 
 // GOOD: Should NOT trigger require_value_notifier_dispose

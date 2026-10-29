@@ -116,6 +116,6 @@ Widget _bad129_build(BuildContext context) {
 
 // GOOD: Should NOT trigger avoid_analytics_in_build
 void _good129_initState() {
-// super.initState();
+  // super.initState();
   analytics.logEvent('page_view');
 }

@@ -22,7 +22,7 @@ import 'package:analyzer/dart/element/type_system.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/string_source.dart';
+import 'package:analyzer/source/file_source.dart';
 import 'package:analyzer/workspace/workspace.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart';
@@ -50,7 +50,7 @@ Future<List<String>> _reportedLines(String filePath) async {
   final listener = RecordingDiagnosticListener();
   final reporter = DiagnosticReporter(
     listener,
-    StringSource(result.content, filePath),
+    FileSource(provider.getFile(filePath)),
   );
   final ctxUnit = RuleContextUnit(
     file: provider.getFile(filePath),

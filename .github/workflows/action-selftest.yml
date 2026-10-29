@@ -31,7 +31,7 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.8'
+          sdk: '3.11.6'
 
       # self_check depends on the root package by path, so the root must be
       # resolved before the action runs pub get inside self_check.

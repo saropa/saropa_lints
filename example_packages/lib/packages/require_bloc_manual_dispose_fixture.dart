@@ -112,7 +112,7 @@ class _bad581_MyBloc extends Bloc<MyEvent, MyState> {
   final _textController = TextEditingController();
 
   _bad581_MyBloc() : super(MyInitial());
-// Missing close() - resources leak!
+  // Missing close() - resources leak!
 }
 
 // GOOD: Should NOT trigger require_bloc_manual_dispose

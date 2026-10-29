@@ -85,10 +85,10 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
         return;
       }
 
-      final bool hasObfuscate = args.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'obfuscate') {
-            return arg.expression.toSource() == 'true';
+      final bool hasObfuscate = args.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'obfuscate') {
+            return arg.argumentExpression.toSource() == 'true';
           }
         }
         return false;
@@ -115,9 +115,9 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
         final ArgumentList? args = annotation.arguments;
         if (args == null) return false;
 
-        final bool specifiesObfuscate = args.arguments.any((Expression arg) {
-          if (arg is NamedExpression) {
-            return arg.name.label.name == 'obfuscate';
+        final bool specifiesObfuscate = args.arguments.any((Argument arg) {
+          if (arg is NamedArgument) {
+            return arg.name.lexeme == 'obfuscate';
           }
           return false;
         });

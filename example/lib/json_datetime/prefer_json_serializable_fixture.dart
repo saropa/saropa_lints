@@ -128,10 +128,10 @@ class _bad458_User {
   }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'age': age,
-        'created_at': createdAt?.toIso8601String(),
-      };
+    'name': name,
+    'age': age,
+    'created_at': createdAt?.toIso8601String(),
+  };
 }
 
 // GOOD: Should NOT trigger prefer_json_serializable

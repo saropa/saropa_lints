@@ -120,8 +120,6 @@ void _bad1394() {
 // GOOD: Should NOT trigger avoid_stateful_widget_in_list
 void _good1394() {
   ListView(
-    children: [
-      GestureDetector(onTap: () {}, child: ListItem()),
-    ],
+    children: [GestureDetector(onTap: () {}, child: ListItem())],
   );
 }

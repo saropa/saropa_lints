@@ -19,6 +19,7 @@
 // need a Flutter-resolved fixture package and are out of scope for this oracle.
 library;
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:analyzer/analysis_rule/rule_context.dart';
@@ -30,15 +31,14 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type_provider.dart';
 import 'package:analyzer/dart/element/type_system.dart';
 import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/file_system/overlay_file_system.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
-import 'package:analyzer/src/string_source.dart';
+import 'package:analyzer/source/file_source.dart';
 import 'package:analyzer/workspace/workspace.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:saropa_lints/src/scan/capturing_registry.dart';
 import 'package:saropa_lints/src/scan/scan_walker.dart';
-
-import 'safe_delete.dart';
 
 /// A single diagnostic reported by a rule during a harness run.
 class HarnessDiagnostic {
@@ -46,7 +46,15 @@ class HarnessDiagnostic {
     required this.ruleName,
     required this.line,
     required this.message,
+    this.offset = 0,
+    this.length = 0,
   });
+
+  /// Zero-based source offset of the diagnostic.
+  final int offset;
+
+  /// Length in characters of the reported range.
+  final int length;
 
   /// The rule code (e.g. `avoid_expensive_build`).
   final String ruleName;
@@ -61,54 +69,130 @@ class HarnessDiagnostic {
   String toString() => '$ruleName:$line';
 }
 
+/// One long-lived analysis setup per project root (per isolate). Re-creating an
+/// [AnalysisContextCollection] per call re-links dart:core/async/meta each time
+/// and exhausts memory over hundreds of tests, so it is built once and reused.
+class _HarnessEnv {
+  _HarnessEnv(this.overlay, this.collection);
+  final OverlayResourceProvider overlay;
+  final AnalysisContextCollection collection;
+
+  /// Tail of the per-env call chain; serializes overlapping calls so the
+  /// driver never sees concurrent edits (InconsistentAnalysisException).
+  Future<void> lock = Future<void>.value();
+}
+
+_HarnessEnv _newEnv(String libDir) {
+  final overlay = OverlayResourceProvider(PhysicalResourceProvider.INSTANCE);
+  return _HarnessEnv(
+    overlay,
+    AnalysisContextCollection(
+      includedPaths: [libDir],
+      resourceProvider: overlay,
+    ),
+  );
+}
+
+final Map<String, _HarnessEnv> _envs = {};
+int _fixtureCounter = 0;
+
 /// Runs [rule] against [code] with full resolution and returns the diagnostics
-/// it reports. The fixture is written to a UNIQUE temp subdirectory under
-/// `example/lib/` (so it inherits the example package's resolved config) and
-/// removed afterward.
+/// it reports. The fixture exists only as an in-memory overlay at a unique
+/// virtual path under `example/lib/__rule_harness__/` (so it inherits the
+/// example package's resolved config); nothing is written to disk.
 ///
-/// A unique per-call directory (via `createTempSync`) is required because
-/// `dart test` runs test files concurrently in separate isolates: a single
-/// shared fixture path would let one isolate's cleanup delete another's
-/// in-flight fixture, producing flaky empty results.
+/// Pass [projectRoot] to use `<projectRoot>/lib/` instead, for rules that read
+/// project files next to the pubspec (for example `ios/Runner/Info.plist`);
+/// those real files are still read through the physical provider. Such a
+/// fixture resolves against the SDK only, so it must not import packages.
 ///
-/// Pass [projectRoot] to write the fixture under `<projectRoot>/lib/` instead,
-/// for rules that read project files next to the pubspec (for example
-/// `ios/Runner/Info.plist`). Such a fixture resolves against the SDK only, so
-/// it must not import packages.
+/// The default example/lib collection is cached and never disposed per call; a
+/// [projectRoot] collection is one-off and disposed after the call. A
+/// failed SDK / `package:meta` load throws instead of silently yielding an
+/// empty diagnostic set that looks like "rule reported nothing".
 Future<List<HarnessDiagnostic>> runRuleResolved(
   SaropaLintRule rule,
   String code, {
   String fileStem = 'fixture',
   Directory? projectRoot,
 }) async {
-  final provider = PhysicalResourceProvider.INSTANCE;
+  // Fixtures outside example/ have no `lane: full` config; never let the
+  // default light lane gate the rule under test. The previous lane is
+  // restored in `finally` so the override never leaks into other tests.
+  final previousLane = activeRuleLane;
+  setActiveRuleLane(RuleLane.full);
   final libDir = projectRoot == null
       ? p.normalize(p.absolute(p.join('example', 'lib')))
       : p.normalize(p.absolute(p.join(projectRoot.path, 'lib')));
-  final base = Directory(p.join(libDir, '__rule_harness__'))
-    ..createSync(recursive: true);
-  // OS-level unique subdir name avoids collisions across concurrent isolates.
-  final dir = base.createTempSync('h');
-
-  final file = File(p.join(dir.path, '$fileStem.dart'));
-  file.writeAsStringSync(code);
-  final path = file.absolute.path;
-
+  final cached = projectRoot == null;
+  // The context root must exist on disk even though the fixture is an overlay.
+  if (!cached) Directory(libDir).createSync(recursive: true);
+  final env = cached
+      ? _envs.putIfAbsent(libDir, () => _newEnv(libDir))
+      : _newEnv(libDir);
+  final prev = env.lock;
+  final done = Completer<void>();
+  env.lock = done.future;
   try {
-    final collection = AnalysisContextCollection(
-      includedPaths: [path],
-      resourceProvider: provider,
+    await prev;
+    return await _runLocked(env, libDir, rule, code, fileStem);
+  } finally {
+    setActiveRuleLane(previousLane);
+    done.complete();
+    if (!cached) await env.collection.dispose();
+  }
+}
+
+Future<List<HarnessDiagnostic>> _runLocked(
+  _HarnessEnv env,
+  String libDir,
+  SaropaLintRule rule,
+  String code,
+  String fileStem,
+) async {
+  final provider = env.overlay;
+  // Unique per call within this isolate; pid distinguishes concurrent isolates
+  // (harmless here since overlays are in-memory, but keeps paths distinct).
+  final path = p.join(
+    libDir,
+    '__rule_harness__',
+    'h${pid}_${_fixtureCounter++}',
+    '$fileStem.dart',
+  );
+
+  final actx = env.collection.contextFor(path);
+  try {
+    provider.setOverlay(
+      path,
+      content: code,
+      modificationStamp: DateTime.now().microsecondsSinceEpoch,
     );
-    final session = collection.contextFor(path).currentSession;
+    final session = actx.currentSession;
     final result = await session.getResolvedUnit(path);
     if (result is! ResolvedUnitResult) {
       throw StateError('Fixture failed to resolve: $result');
+    }
+    // Flutter imports legitimately fail to resolve (see header); a missing
+    // dart: library or package:meta means the SDK/package config did not load.
+    final loadFailures = [
+      for (final d in result.diagnostics)
+        if (d.diagnosticCode.lowerCaseName == 'uri_does_not_exist' &&
+            RegExp(
+              r"'(dart:|package:meta/)",
+            ).hasMatch(d.problemMessage.messageText(includeUrl: false)))
+          d.problemMessage.messageText(includeUrl: false),
+    ];
+    if (loadFailures.isNotEmpty) {
+      throw StateError(
+        'Analysis environment failed to load (SDK/package config): '
+        '${loadFailures.join('; ')}',
+      );
     }
 
     final listener = RecordingDiagnosticListener();
     final reporter = DiagnosticReporter(
       listener,
-      StringSource(result.content, path),
+      FileSource(provider.getFile(path)),
     );
     final ctxUnit = RuleContextUnit(
       file: provider.getFile(path),
@@ -148,11 +232,14 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
           ruleName: d.diagnosticCode.lowerCaseName,
           line: result.unit.lineInfo.getLocation(d.offset).lineNumber,
           message: d.problemMessage.messageText(includeUrl: false),
+          offset: d.offset,
+          length: d.length,
         ),
     ];
   } finally {
-    // Retry-tolerant cleanup: Windows file handles can linger after tests
-    safeDeleteDir(dir);
+    provider.removeOverlay(path);
+    actx.changeFile(path);
+    await actx.applyPendingFileChanges();
   }
 }
 

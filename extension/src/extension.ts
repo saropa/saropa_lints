@@ -36,6 +36,7 @@ import {
   showOutputChannel,
 } from './setup';
 import { runMigrateConfig } from './config/migrateConfig';
+import { runMigrateRuleNames } from './ruleMigration/migrateController';
 import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
 import { surfacePluginDivergence } from './pluginDivergencePrompt';
 import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
@@ -155,7 +156,8 @@ import {
   setDriftAdvisorServerConnected,
 } from './driftAdvisor/driftAdvisorUiState';
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
-import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
+import { forceUpgradeCheck } from './upgrade-checker';
+import { registerStartupDetection } from './compat/startupController';
 import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
@@ -1719,6 +1721,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.showProcessHealth', () => {
       HealthPanel.createOrShow(context);
     }),
+    // Version compatibility card: facts, recommendation, Preview diff / Apply.
+    vscode.commands.registerCommand('saropaLints.configureCompatibility', () => {
+      void HealthPanel.openCompat(context);
+    }),
     vscode.commands.registerCommand('saropaLints.showMachineDashboard', () => {
       MachineDashboard.createOrShow(context);
     }),
@@ -2476,6 +2482,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.migrateConfig', async () => {
       const root = getProjectRoot();
       await runMigrateConfig(root);
+      refreshAll();
+    }),
+    // Rewrite renamed rule names (ignore comments, analysis options, baselines) with diff preview.
+    vscode.commands.registerCommand('saropaLints.migrateRuleNames', async () => {
+      await runMigrateRuleNames();
       refreshAll();
     }),
     // One-click enable of a rule pack (used by the startup toast follow-through
@@ -3373,10 +3384,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   // Background upgrade check — runs asynchronously, fails silently.
   // Only checks when saropa_lints is already in the project and extension is enabled.
+  // Start-up detection supersedes the old lock-only toast: it covers pubspec,
+  // plugin-only and both routes with one prompt (compat/startupController.ts).
   if (isDartProject && enabled && root) {
-    void checkForUpgrade(context, root).catch((err) => {
-      console.error('[Saropa Lints] Upgrade check failed:', err);
-    });
+    registerStartupDetection(context, (m) => console.log(m));
   }
 
   // Prompt setup when this is a Dart project but saropa_lints is not in

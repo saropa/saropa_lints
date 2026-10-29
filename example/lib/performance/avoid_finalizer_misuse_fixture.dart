@@ -108,8 +108,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_finalizer_misuse
 // expect_lint: avoid_finalizer_misuse
 class _bad819_MyResource {
-  static final Finalizer<MyResource> _finalizer =
-      Finalizer((r) => r._cleanup());
+  static final Finalizer<MyResource> _finalizer = Finalizer(
+    (r) => r._cleanup(),
+  );
 
   MyResource() {
     _finalizer.attach(this, this);

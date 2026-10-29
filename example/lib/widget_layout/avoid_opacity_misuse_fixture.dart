@@ -110,10 +110,7 @@ dynamic child;
 // BAD: Should trigger avoid_opacity_misuse
 // expect_lint: avoid_opacity_misuse
 void _bad1320() {
-  Opacity(
-    opacity: _isVisible ? 1.0 : 0.0,
-    child: MyWidget(),
-  );
+  Opacity(opacity: _isVisible ? 1.0 : 0.0, child: MyWidget());
 }
 
 // GOOD: Should NOT trigger avoid_opacity_misuse

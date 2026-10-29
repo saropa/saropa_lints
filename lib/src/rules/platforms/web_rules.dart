@@ -1084,8 +1084,8 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
 
       String? headersSource;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'headers') {
-          headersSource = arg.expression.toSource().toLowerCase();
+        if (arg is NamedArgument && arg.name.lexeme == 'headers') {
+          headersSource = arg.argumentExpression.toSource().toLowerCase();
           break;
         }
       }

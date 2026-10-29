@@ -115,7 +115,7 @@ class _bad1005_AuthService {
 
   Future<Response> makeRequest(String url) async {
     return http.get(url, headers: {'Authorization': 'Bearer $accessToken'});
-// Token may be expired!
+    // Token may be expired!
   }
 }
 

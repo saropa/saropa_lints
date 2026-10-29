@@ -116,7 +116,7 @@ class _bad695__MyState extends State<MyWidget> {
     _keyboardController = KeyboardVisibilityController();
     _keyboardController.onChange.listen((visible) {});
   }
-// Missing dispose!
+  // Missing dispose!
 }
 
 // GOOD: Should NOT trigger require_keyboard_visibility_dispose

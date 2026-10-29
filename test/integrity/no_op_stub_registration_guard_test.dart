@@ -13,8 +13,7 @@ import 'package:test/test.dart';
 /// `bugs/dead_rules_from_noop_stub_registrations.md`). This test fails the build
 /// if a rule reaches for one again, forcing the author to the real methods:
 /// `addCompilationUnit` (aggregate-then-report), `addBlockFunctionBody` /
-/// `addExpressionFunctionBody`, and `addSimpleFormalParameter` /
-/// `addDefaultFormalParameter`.
+/// `addExpressionFunctionBody`, and `addRegularFormalParameter`.
 void main() {
   // Match a METHOD CALL on the stub (dot + name + open paren), e.g.
   // `context.addPostRunCallback(`. The leading `\.` keeps the prose mentions in
@@ -53,8 +52,7 @@ void main() {
           'Found ${offenders.length} call(s) to a no-op registration stub. '
           'These silently discard their callback so the rule never fires. '
           'Use addCompilationUnit (aggregate-then-report), addBlockFunctionBody '
-          '/ addExpressionFunctionBody, or addSimpleFormalParameter / '
-          'addDefaultFormalParameter instead.\n${offenders.join('\n')}',
+          '/ addExpressionFunctionBody, or addRegularFormalParameter instead.\n${offenders.join('\n')}',
     );
   });
 }

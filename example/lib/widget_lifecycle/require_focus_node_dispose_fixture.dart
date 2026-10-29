@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: require_focus_node_dispose
 class _bad1360__MyState extends State<MyWidget> {
   final _focusNode = FocusNode();
-// Missing dispose - MEMORY LEAK!
+  // Missing dispose - MEMORY LEAK!
 }
 
 // GOOD: Should NOT trigger require_focus_node_dispose

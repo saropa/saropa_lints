@@ -31,8 +31,8 @@ class AddItemExtentPlaceholderFix extends SaropaFixProducer {
     final ice = parent;
 
     for (final arg in ice.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        final n = arg.name.label.name;
+      if (arg is NamedArgument) {
+        final n = arg.name.lexeme;
         if (n == 'itemExtent' ||
             n == 'prototypeItem' ||
             n == 'itemExtentBuilder') {
