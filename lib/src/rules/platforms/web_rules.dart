@@ -213,9 +213,11 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
     if (names.isEmpty) return false;
     for (final AstNode n in _declarationsNamed(unit, names)) {
       // Exact token match (not substring) so `kIsWebFoo` does not count.
-      for (Token? t = n.beginToken;
-          t != null;
-          t = t == n.endToken ? null : t.next) {
+      for (
+        Token? t = n.beginToken;
+        t != null;
+        t = t == n.endToken ? null : t.next
+      ) {
         if (t.lexeme == 'kIsWeb') return true;
       }
     }

@@ -1,6 +1,6 @@
 # BUG: `avoid_context_across_async` — flags context use that is behind `context.mounted`
 
-**Status: Open**
+**Status: Resolved (duplicate)**
 
 Created: 2026-10-28
 Rule: `avoid_context_across_async`
@@ -65,3 +65,7 @@ Accept `context.mounted ? context : null` (and `context.mounted && ...`) as a gu
 ## Status 2026-10-28
 
 context_across_async: no code change, ternary report unconfirmed. Regression test added 2026-10-28; not reproducible; keep open until reporter confirms.
+
+## Status 2026-10-29
+
+Duplicate of `avoid_context_across_async_false_positive_await_in_returning_branch.md` (same site, `run_command_user_type.dart:74`). Fixed there: an `if` whose awaits sit only in returning branches no longer counts as an await. Archived.
