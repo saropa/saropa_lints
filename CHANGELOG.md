@@ -78,6 +78,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 projects on the frozen 16.x line. [log](https://github.com/saropa/saropa_lints/blob/v17.0.0/CHANGELOG.md)
 
 ### Changed
+- **Extension:** the "zero rules enabled" modal no longer appears after Enable when `violations.json` was written by the extension itself (live-diagnostics snapshot with no `enabledRuleCount`), e.g. while Lint integration is Off. A missing count is now treated as unknown, not zero.
 
 - **Breaking:** saropa_lints now requires Dart `>=3.11.0` (analyzer 13.0.0 depends on `_fe_analyzer_shared` 100, which needs 3.11) and `analyzer >=13.0.0 <15.0.0`, and pub picks the newest allowed by your Dart version (3.11 and 3.12 up to 14.5.0, 3.13 14.6.0); projects held on analyzer 12 stay on `saropa_lints: ^16.7.0`, which is frozen with no back-ports.
 - `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended`; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.

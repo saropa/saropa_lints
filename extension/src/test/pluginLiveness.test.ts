@@ -185,6 +185,25 @@ describe('verifyPluginLiveness — no-report classification (issue #208 follow-u
     assert.strictEqual(r.setUpActionable, true);
   });
 
+  it('extension-written snapshot (no enabledRuleCount) is not treated as zero rules', () => {
+    // The extension writes violations.json from live diagnostics after
+    // Enable; that file has no enabledRuleCount. It must not trigger the
+    // "zero rules enabled" modal (seen when Lint integration is Off).
+    fs.writeFileSync(path.join(tmpRoot, 'pubspec.yaml'), PUBSPEC_WITH_SAROPA);
+    const reportDir = path.join(tmpRoot, 'reports', '.saropa_lints');
+    fs.mkdirSync(reportDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(reportDir, 'violations.json'),
+      JSON.stringify({
+        violations: [],
+        summary: { totalViolations: 0 },
+        config: { tier: 'recommended', ruleMetadataByRule: {} },
+      }),
+    );
+    const r = verifyPluginLiveness(tmpRoot);
+    assert.strictEqual(r.status, 'alive');
+  });
+
   it('no-files-analyzed does NOT offer Set Up Project (would clobber excludes)', () => {
     // Set Up Project rewrites analysis_options.yaml — when the user's
     // exclude list is the problem, setup would lose their customizations.

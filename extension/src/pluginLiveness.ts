@@ -371,6 +371,22 @@ export function verifyPluginLiveness(workspaceRoot: string): PluginLivenessResul
   }
 
   const data = readViolations(workspaceRoot);
+  // A missing enabledRuleCount means the file was written by the extension
+  // (live-diagnostics snapshot after Enable/Run Analysis), not by the plugin.
+  // The plugin always writes the count, so absence is "unknown", not zero.
+  // Treating it as zero showed the "zero rules" modal after every Enable
+  // whenever the plugin block was commented out (Lint integration Off).
+  if (data && data.config?.enabledRuleCount === undefined) {
+    return {
+      status: 'alive',
+      enabledRuleCount: 0,
+      filesAnalyzed: 0,
+      reportPath,
+      message: '',
+      recovery: '',
+      setUpActionable: false,
+    };
+  }
   const enabledRuleCount = data?.config?.enabledRuleCount ?? 0;
   const filesAnalyzed = data?.summary?.filesAnalyzed ?? 0;
 
