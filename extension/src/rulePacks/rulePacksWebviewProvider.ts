@@ -40,6 +40,9 @@ import { l10n } from '../i18n/runtime';
 import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
+import { buildWatcherExcludeSectionHtml, WATCHER_SETTING_KEYS, type WatcherScanData } from './watcherExcludeSection';
+import { getLastUncoveredHazards, getUncoveredHazards } from '../systemHealth/workspaceHazardScan';
+import { findMissingExcludes } from '../systemHealth/watcherExcludeAudit';
 // Phase 7 leftover (deferred): Rules & Tiers already ships working digit shortcuts (1-7, see
 // _buildTabBar) but never surfaced the shared '?' overlay that Findings/Packages use, so those
 // shortcuts were undiscoverable. Wires the same button + overlay + script + styles pattern.
@@ -555,6 +558,7 @@ export class RulePacksWebviewProvider {
       },
     );
     this._panel = panel;
+    this._startWatcherScan();
 
     panel.webview.onDidReceiveMessage(
       (msg: {
@@ -2227,12 +2231,32 @@ ${detailRow}`;
   // ZERO changes to this file; only the manifest-key EXCLUSION list is hand-maintained.
   // ---------------------------------------------------------------------------------------------
 
+  /** Hazard-scan + missing-excludes results for the Watcher excludes block; filled once, async. */
+  private _watcherScan: WatcherScanData | undefined;
+
+  /** Runs the scan (reusing the shared hazard-scan result) when the panel opens, then redraws. */
+  private _startWatcherScan(): void {
+    this._watcherScan = undefined;
+    const cached = getLastUncoveredHazards();
+    void Promise.all([cached ? Promise.resolve(cached) : getUncoveredHazards(), findMissingExcludes()])
+      .then(([hazards, missingExcludes]) => {
+        this._watcherScan = { hazards, missingExcludes };
+        this.refresh();
+      })
+      .catch(() => undefined);
+  }
+
   private _buildAutomationTab(): string {
-    const rows = buildSettingsCatalog().filter((e) => e.tab === 'automation').map((e) => this._buildSettingRow(e)).join('\n');
+    const entries = buildSettingsCatalog().filter((e) => e.tab === 'automation');
+    const watcherKeys: readonly string[] = WATCHER_SETTING_KEYS;
+    const rows = entries.filter((e) => !watcherKeys.includes(e.key)).map((e) => this._buildSettingRow(e)).join('\n');
+    const watcherRows: Record<string, string> = {};
+    for (const e of entries) if (watcherKeys.includes(e.key)) watcherRows[e.key] = this._buildSettingRow(e);
     const content = `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.tab.automation'))}">
   <p class="hint">${escapeHtml(l10n('rulesTiers.automation.hint'))}</p>
   <table class="dash-table settings-table"><tbody>${rows}</tbody></table>
-</section>`;
+</section>
+${buildWatcherExcludeSectionHtml(watcherRows, this._watcherScan)}`;
     return this._tabPanel('automation', content);
   }
 

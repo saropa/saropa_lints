@@ -1,10 +1,10 @@
 /**
  * One-shot workspace hazard scan for dangerously large files.
  *
- * Walks the workspace root for files that VS Code's file watcher will try to
+ * Walks the workspace root for folders with too many files and files that VS Code's file watcher will try to
  * track and that are large enough to crash it — a 2.2 GB `.hprof` caused the
  * 2026-09-05 VS Code crash because the watcher memory-mapped it. Flags known
- * hazard patterns above 50 MB and any file above 100 MB, warns when they are
+ * hazard patterns above 50 MB and any file above `saropaLints.watcherExclude.maxFileKb`, warns when they are
  * NOT covered by `files.watcherExclude`, and offers a one-click fix.
  *
  * Runs once per session, deferred 10 s past activation. Disabled via
@@ -20,14 +20,24 @@ import { isCovered, mergeWatcherExcludes } from './watcherExcludeHelpers';
 
 /** Known hazard patterns (heap dumps, crash logs) trigger at this bar. */
 const HAZARD_THRESHOLD = 50 * 1024 * 1024;
-/** Any file above this size is flagged regardless of extension. */
-const GENERIC_THRESHOLD = 100 * 1024 * 1024;
+/** Defaults for `saropaLints.watcherExclude.maxFileKb` / `maxFolderFiles`. */
+const DEFAULT_MAX_FILE_KB = 5120;
+const DEFAULT_MAX_FOLDER_FILES = 1000;
+
+/** Scan limits resolved from settings. */
+interface ScanLimits {
+  /** Size bar in bytes applied to any file. */
+  fileBytes: number;
+  /** Max direct files per folder before the folder is flagged. */
+  folderFiles: number;
+}
 /** Max directory depth — guards against symlink loops. */
 const MAX_DEPTH = 8;
 
 /** Directories always skipped — huge, irrelevant, or tracked elsewhere. */
 const ALWAYS_SKIP: ReadonlySet<string> = new Set([
   'build', '.dart_tool', 'node_modules', '.git', 'reports', 'blobs',
+  '.gradle', 'pods', 'deriveddata',
 ]);
 
 /** Known hazard name matchers — files matching these use the lower 50 MB bar. */
@@ -42,8 +52,10 @@ const KNOWN_HAZARDS: ReadonlyArray<(name: string) => boolean> = [
 export interface HazardFile {
   /** Workspace-relative path (forward slashes) for display. */
   relative: string;
-  /** Size in bytes. */
+  /** Size in bytes (0 for folder hazards). */
   size: number;
+  /** Set for folder hazards: direct file count. `relative` is the folder. */
+  fileCount?: number;
 }
 
 /**
@@ -55,9 +67,12 @@ async function checkFileHazard(
   entry: fs.Dirent,
   dir: string,
   root: string,
+  limits: ScanLimits,
 ): Promise<HazardFile | undefined> {
   const isKnown = KNOWN_HAZARDS.some((test) => test(entry.name));
-  const threshold = isKnown ? HAZARD_THRESHOLD : GENERIC_THRESHOLD;
+  const threshold = isKnown
+    ? Math.min(HAZARD_THRESHOLD, limits.fileBytes)
+    : limits.fileBytes;
   let size: number;
   try {
     const stat = await fs.promises.stat(path.join(dir, entry.name));
@@ -79,6 +94,7 @@ async function collectHazards(
   dir: string,
   root: string,
   depth: number,
+  limits: ScanLimits,
 ): Promise<HazardFile[]> {
   if (depth > MAX_DEPTH) return [];
   let entries: fs.Dirent[];
@@ -96,10 +112,10 @@ async function collectHazards(
     if (entry.isDirectory()) {
       if (ALWAYS_SKIP.has(entry.name.toLowerCase())) continue;
       subDirs.push(
-        collectHazards(path.join(dir, entry.name), root, depth + 1),
+        collectHazards(path.join(dir, entry.name), root, depth + 1, limits),
       );
     } else if (entry.isFile()) {
-      fileChecks.push(checkFileHazard(entry, dir, root));
+      fileChecks.push(checkFileHazard(entry, dir, root, limits));
     }
   }
 
@@ -109,6 +125,15 @@ async function collectHazards(
     ...subDirs,
   ]);
   const results: HazardFile[] = [];
+  // Direct children only (not recursive) keeps the count cheap. Root is never flagged.
+  const fileCount = entries.filter((e) => e.isFile()).length;
+  if (dir !== root && limits.folderFiles > 0 && fileCount > limits.folderFiles) {
+    results.push({
+      relative: path.relative(root, dir).replace(/\\/g, '/'),
+      size: 0,
+      fileCount,
+    });
+  }
   for (const hit of fileResults) {
     if (hit) results.push(hit);
   }
@@ -120,9 +145,17 @@ async function collectHazards(
 
 /** Build minimal glob patterns that cover the given files.
  *  Prefers extension-based globs (e.g. `**\/*.hprof`) over per-file entries. */
-function buildExcludePatterns(files: readonly HazardFile[]): string[] {
+export function buildExcludePatterns(files: readonly HazardFile[]): string[] {
   const patterns = new Set<string>();
   for (const f of files) {
+    if (f.fileCount !== undefined) {
+      patterns.add(`${f.relative}/**`);
+      continue;
+    }
+    if (f.relative.split('/').includes('.gradle')) {
+      patterns.add('**/.gradle/**');
+      continue;
+    }
     const ext = path.extname(f.relative);
     // Known hazard extensions get a broad glob; others get a literal path.
     if (ext === '.hprof' || ext === '.log') {
@@ -138,7 +171,11 @@ function buildExcludePatterns(files: readonly HazardFile[]): string[] {
  *  add watcher exclude patterns for them. */
 async function notifyUncovered(uncovered: readonly HazardFile[]): Promise<void> {
   const summary = uncovered
-    .map((f) => `${f.relative} (${formatBytes(f.size)})`)
+    .map((f) =>
+      f.fileCount === undefined
+        ? `${f.relative} (${formatBytes(f.size)})`
+        : `${f.relative}/ (${f.fileCount} files)`,
+    )
     .join(', ');
   const addLabel = l10n('systemHealth.hazardScan.addExclusions');
   const dismissLabel = l10n('systemHealth.hazardScan.dismiss');
@@ -164,6 +201,17 @@ async function notifyUncovered(uncovered: readonly HazardFile[]): Promise<void> 
  * the setting is disabled or no workspace folder is open.
  */
 export async function getUncoveredHazards(): Promise<HazardFile[]> {
+  lastUncovered = await computeUncoveredHazards();
+  return lastUncovered;
+}
+
+/** Most recent result of {@link getUncoveredHazards}, so UI can reuse it without rescanning. */
+let lastUncovered: HazardFile[] | undefined;
+export function getLastUncoveredHazards(): HazardFile[] | undefined {
+  return lastUncovered;
+}
+
+async function computeUncoveredHazards(): Promise<HazardFile[]> {
   const cfg = vscode.workspace.getConfiguration('saropaLints.systemHealth');
   if (!cfg.get<boolean>('workspaceHazardScan', true)) return [];
 
@@ -171,13 +219,20 @@ export async function getUncoveredHazards(): Promise<HazardFile[]> {
   if (!folder) return [];
 
   const root = folder.uri.fsPath;
-  const hazards = await collectHazards(root, root, 0);
+  const wcfg = vscode.workspace.getConfiguration('saropaLints.watcherExclude');
+  const limits: ScanLimits = {
+    fileBytes: Math.max(1, wcfg.get<number>('maxFileKb', DEFAULT_MAX_FILE_KB)) * 1024,
+    folderFiles: wcfg.get<number>('maxFolderFiles', DEFAULT_MAX_FOLDER_FILES),
+  };
+  const hazards = await collectHazards(root, root, 0, limits);
   if (hazards.length === 0) return [];
 
   // Filter to files not already covered by watcher excludes.
   const excludesCfg = vscode.workspace.getConfiguration('files');
   const excludes = excludesCfg.get<Record<string, boolean>>('watcherExclude') ?? {};
-  return hazards.filter((f) => !isCovered(f.relative, excludes));
+  return hazards.filter((f) =>
+    !isCovered(f.fileCount === undefined ? f.relative : `${f.relative}/`, excludes),
+  );
 }
 
 /** Run the workspace hazard scan. Called once from `activate()` via a

@@ -385,6 +385,14 @@
     "automation": {
       "hint": "Extension settings that control when analysis runs and how findings are shown. These mirror the same settings in File > Preferences > Settings under Saropa Lints."
     },
+    "watcher": {
+      "title": "Watcher excludes",
+      "hint": "Files and folders VS Code's file watcher should ignore. Counts come from the workspace hazard scan; use List to see the paths, then exclude them from the warning that scan shows.",
+      "scanning": "Scanning the workspace...",
+      "affected": "{count} affected",
+      "list": "List",
+      "recommended": "Recommended excludes not yet in files.watcherExclude"
+    },
     "extension": {
       "hint": "Extension-wide display preferences.",
       "linkNote": "Scan on save on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
@@ -2054,6 +2062,7 @@
   "debug": {
     "section": {
       "engines": "Diagnostic Engines",
+      "enginesRecommendation": "Recommended: LSP Server ON (default, beta), Scan on Save ON, Live Analysis OFF (LSP already covers live diagnostics; both on may show duplicates), GitHub Actions CI ON only if you want pull requests gated. If a rule stops firing under LSP, turn Live Analysis ON and LSP Server OFF.",
       "log": "Log"
     },
     "engine": {
@@ -2085,6 +2094,12 @@
         "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting.",
         "ci": "Reads and writes .github/workflows/saropa-lints.yml in your working tree to enable or disable the bundled GitHub Actions workflow. This reflects the file on your current branch — the default branch's copy is what actually gates pull requests, and the two can drift apart. Toggling never runs or deletes the workflow; you still review and commit the change yourself."
       },
+      "recommended": {
+        "analyzerPlugin": "Recommended: OFF while LSP Server is on. Turn ON (with LSP OFF) if a rule stops firing under LSP.",
+        "scanDaemon": "Recommended: ON.",
+        "lspServer": "Recommended: ON (default, beta). Covers live diagnostics.",
+        "ci": "Recommended: ON only if you want pull requests gated."
+      },
       "scanProgress": "Scan: {done}/{total} files",
       "ci": "GitHub Actions CI"
     },
@@ -2093,8 +2108,8 @@
       "off": "OFF"
     },
     "action": {
-      "killAll": "Kill All",
-      "restartAll": "Restart All",
+      "killAll": "Kill All {name}",
+      "restartAll": "Restart {name}",
       "killAllDescription": "Force-stops the LSP Server only. Analyzer Plugin and Scan Daemon cannot be killed independently yet — use each engine's own ON/OFF toggle instead.",
       "restartAllDescription": "Stops and relaunches the LSP Server (or starts it if it isn't running). Analyzer Plugin and Scan Daemon are unaffected — use each engine's own ON/OFF toggle instead."
     },
@@ -2105,7 +2120,10 @@
       "lspToggleOn": "LSP Server: enabling…",
       "lspToggleOff": "LSP Server: disabling…",
       "lspStarted": "LSP Server: started.",
+      "lspDisabledPrompt": "The LSP server is disabled in settings (saropaLints.lspServer.enabled). Enable it and start?",
+      "lspEnableButton": "Enable",
       "lspStopped": "LSP Server: stopped.",
+      "lspStartFailed": "LSP Server: failed to start (see the error message and the Saropa Lints LSP output channel).",
       "analyzerToggleOn": "Analyzer Plugin: enabling…",
       "analyzerToggleOff": "Analyzer Plugin: disabling…",
       "daemonToggleOn": "Scan Daemon: resuming…",
@@ -2330,6 +2348,11 @@
       "setupPrompt": "Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2300+ lint rules.",
       "actionSetUpProject": "Set Up Project",
       "actionNotNow": "Not Now"
+    },
+    "lsp": {
+      "noWorkspaceFolder": "Saropa Lints: cannot start the LSP Server because no workspace folder is open.",
+      "startFailed": "Saropa Lints: the LSP Server failed to start. {reason}",
+      "settingWriteFailed": "Saropa Lints: could not save the LSP Server setting. {reason}"
     },
     "setup": {
       "requiresDartProject": "Saropa Lints requires a Dart or Flutter project (no pubspec.yaml found).",

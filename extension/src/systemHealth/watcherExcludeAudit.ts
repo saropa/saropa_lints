@@ -64,6 +64,13 @@ const RECOMMENDED_EXCLUDES: readonly string[] = [
   '**/.vs/**',
   '**/dependency_overrides/**/build/**',
   '**/dependency_overrides/**/.dart_tool/**',
+  '**/.gradle/**',
+  '**/android/build/**',
+  '**/android/app/build/**',
+  '**/ios/build/**',
+  '**/ios/Pods/**',
+  '**/ios/.symlinks/**',
+  '**/DerivedData/**',
 ];
 
 /**

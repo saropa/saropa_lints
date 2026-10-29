@@ -39,6 +39,13 @@ const UNCONDITIONAL_PATTERNS = [
   '**/.vs/**',
   '**/dependency_overrides/**/build/**',
   '**/dependency_overrides/**/.dart_tool/**',
+  '**/.gradle/**',
+  '**/android/build/**',
+  '**/android/app/build/**',
+  '**/ios/build/**',
+  '**/ios/Pods/**',
+  '**/ios/.symlinks/**',
+  '**/DerivedData/**',
 ];
 
 /** All unconditional patterns set to true, as if fully configured. */

@@ -1767,42 +1767,50 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     disablePluginsIntegration(lspRoot);
   }
 
-  // React to setting changes — start/stop the LSP server without reload.
-  // Log to the Health Panel's engine log after each lifecycle change so the
-  // toggle shows the updated state (the toggle handler's own log entry
-  // fires before this listener runs, so it sees stale status).
+  // Idempotent start/stop shared by the setting-change listener AND the Health
+  // Panel toggle. The toggle must not rely on the listener alone: the setting
+  // defaults to true, so clicking ON when the server is stopped (start failed,
+  // or Kill All) writes the same value, fires no change event, and nothing
+  // happened. Calling these directly makes ON always attempt a start.
+  const startLsp = async (): Promise<void> => {
+    if (!lspRoot) {
+      void vscode.window.showErrorMessage(l10n('notify.lsp.noWorkspaceFolder'));
+      return;
+    }
+    if (lspClient?.isRunning) { return; }
+    lspClient ??= new SaropaLspClient(context, lspRoot);
+    await lspClient.start();
+    if (lspClient.isRunning) {
+      // LSP replaces the analyzer plugin — comment out the plugins: block to
+      // free the ~10GB the in-process plugin uses. Does NOT touch
+      // saropaLints.enabled (that would kill the whole extension UI).
+      disablePluginsIntegration(lspRoot);
+      HealthPanel.addLogEntry(l10n('debug.log.lspStarted'));
+    } else {
+      // start() already shows the specific reason; log it for the panel too.
+      HealthPanel.addLogEntry(l10n('debug.log.lspStartFailed'));
+    }
+    HealthPanel.refreshIfOpen();
+  };
+  const stopLsp = async (): Promise<void> => {
+    const client = lspClient;
+    if (!client) { return; }
+    lspClient = undefined;
+    // Await stop before dispose to avoid a double-stop race.
+    await client.stop();
+    client.dispose();
+    // Re-enable the analyzer plugin so the user keeps diagnostics.
+    if (lspRoot) { restorePluginsIntegration(lspRoot); }
+    HealthPanel.addLogEntry(l10n('debug.log.lspStopped'));
+    HealthPanel.refreshIfOpen();
+  };
+
+  // React to setting changes (Settings UI / settings.json) without reload.
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('saropaLints.lspServer.enabled')) {
         const enabled = vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled');
-        if (enabled && !lspClient && lspRoot) {
-          lspClient = new SaropaLspClient(context, lspRoot);
-          void lspClient.start().then(() => {
-            HealthPanel.addLogEntry(l10n('debug.log.lspStarted'));
-          });
-          // LSP replaces the analyzer plugin — disable the plugin to free
-          // the ~10GB RAM the in-process plugin consumes. Comments out
-          // the plugins: block in analysis_options.yaml only. Does NOT
-          // touch saropaLints.enabled (that would kill the whole extension UI).
-          if (lspRoot) {
-            disablePluginsIntegration(lspRoot);
-          }
-        } else if (!enabled && lspClient) {
-          // Await stop before dispose to avoid a double-stop race —
-          // dispose() calls stop() again if _client is still set.
-          const client = lspClient;
-          lspClient = undefined;
-          void client.stop().then(() => {
-            client.dispose();
-            HealthPanel.addLogEntry(l10n('debug.log.lspStopped'));
-          });
-          // Re-enable the analyzer plugin when LSP is turned off so the
-          // user doesn't lose all diagnostics. restorePluginsIntegration
-          // uncomments the plugins: block — does NOT touch saropaLints.enabled.
-          if (lspRoot) {
-            restorePluginsIntegration(lspRoot);
-          }
-        }
+        void (enabled ? startLsp() : stopLsp());
       }
     }),
   );
@@ -1811,6 +1819,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.lspServer.start', async () => {
       if (!lspRoot) { return; }
+      if (!vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
+        const enable = l10n('debug.log.lspEnableButton');
+        const choice = await vscode.window.showInformationMessage(
+          l10n('debug.log.lspDisabledPrompt'),
+          enable,
+        );
+        if (choice === enable) {
+          // The onDidChangeConfiguration listener above creates and starts
+          // the client — starting here too would double-start it.
+          await vscode.workspace
+            .getConfiguration('saropaLints.lspServer')
+            .update('enabled', true, vscode.ConfigurationTarget.Workspace);
+        }
+        return;
+      }
       if (!lspClient) {
         lspClient = new SaropaLspClient(context, lspRoot);
       }
@@ -1939,7 +1962,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   HealthPanel.onRestartAll(async () => {
     if (lspClient) {
       await lspClient.restart();
-    } else if (lspRoot) {
+    } else if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
       lspClient = new SaropaLspClient(context, lspRoot);
       await lspClient.start();
     }
@@ -1954,9 +1977,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       HealthPanel.addLogEntry(
         enabled ? l10n('debug.log.lspToggleOn') : l10n('debug.log.lspToggleOff'),
       );
-      await vscode.workspace
-        .getConfiguration('saropaLints.lspServer')
-        .update('enabled', enabled, vscode.ConfigurationTarget.Workspace);
+      try {
+        await vscode.workspace
+          .getConfiguration('saropaLints.lspServer')
+          .update('enabled', enabled, vscode.ConfigurationTarget.Workspace);
+      } catch (err) {
+        void vscode.window.showErrorMessage(
+          l10n('notify.lsp.settingWriteFailed', { reason: err instanceof Error ? err.message : String(err) }),
+        );
+      }
+      // Act directly (idempotent) — the change listener may not fire when
+      // the setting already holds this value.
+      await (enabled ? startLsp() : stopLsp());
     } else if (engine === 'analyzer') {
       // Reuses the exact mechanism behind the "Lint integration" sidebar
       // toggle (saropaLints.disable / .reenablePlugin) so this isn't a

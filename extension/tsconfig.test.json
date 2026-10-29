@@ -304,6 +304,8 @@
     "src/ruleMigration/applyMigration.ts",
     "src/test/ruleMigration/**/*.ts",
     "src/test/commandGuards.test.ts",
+    "src/debug/lspResolution.ts",
+    "src/test/debug/lspResolution.test.ts",
     "src/extensionChecks/docConventions.ts",
     "src/extensionChecks/bugArchivalCheck.ts",
     "src/test/extensionChecks/bugArchivalCheck.test.ts",

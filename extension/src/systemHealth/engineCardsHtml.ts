@@ -55,9 +55,11 @@ export interface EngineStatusDeps {
 export function buildEnginesSection(engines: EngineStatus[]): string {
   const heading = escapeHtml(l10n('debug.section.engines'));
   const cards = engines.map(buildEngineCard).join('');
+  const summary = escapeHtml(l10n('debug.section.enginesRecommendation'));
 
   return `<section class="engines-section">
   <h2 class="section-heading">${heading}</h2>
+  <div class="engine-recommendation">${summary}</div>
   ${cards}
 </section>`;
 }
@@ -80,6 +82,8 @@ function buildEngineCard(engine: EngineStatus): string {
   // key "Live Analysis") rather than the terser 'analyzer' EngineStatus.key.
   const descriptionKey = engineKey === 'analyzer' ? 'analyzerPlugin' : engineKey;
   const description = escapeHtml(l10n(`debug.engine.description.${descriptionKey}`));
+
+  const recommended = escapeHtml(l10n(`debug.engine.recommended.${descriptionKey}`));
 
   // Toggle button labels — ON is highlighted when enabled, OFF when disabled.
   const onLabel = escapeHtml(l10n('debug.toggle.on'));
@@ -110,6 +114,7 @@ function buildEngineCard(engine: EngineStatus): string {
     ${pidValue}
   </div>
   <div class="engine-description">${description}</div>
+  <div class="engine-recommended">${recommended}</div>
   <div class="engine-detail">
     <span class="engine-status"><span class="status-label">${statusLabel}</span> <span class="status-value ${statusClass}">${statusText}</span></span>
   </div>
@@ -171,8 +176,10 @@ function buildMetricsLine(engine: EngineStatus): string {
  * more than the buttons actually do.
  */
 export function buildActionsBar(): string {
-  const killLabel = escapeHtml(l10n('debug.action.killAll'));
-  const restartLabel = escapeHtml(l10n('debug.action.restartAll'));
+  // Both buttons act on the LSP Server only; name it in the label.
+  const target = { name: l10n('debug.engine.lspServer') };
+  const killLabel = escapeHtml(l10n('debug.action.killAll', target));
+  const restartLabel = escapeHtml(l10n('debug.action.restartAll', target));
   const killDescription = escapeHtml(l10n('debug.action.killAllDescription'));
   const restartDescription = escapeHtml(l10n('debug.action.restartAllDescription'));
 
@@ -288,6 +295,17 @@ export function getEngineCardsStyles(): string {
 }
 .engine-description {
   margin-top: 2px;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+}
+.engine-recommended {
+  margin-top: 2px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--vscode-descriptionForeground, #94a3b8);
+}
+.engine-recommendation {
+  padding: 6px 12px;
   font-size: 12px;
   color: var(--vscode-descriptionForeground, #94a3b8);
 }
