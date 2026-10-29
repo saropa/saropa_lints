@@ -88,7 +88,8 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
 
       // Hooks only exist when the file imports flutter_hooks (or a
       // package built on it, e.g. hooks_riverpod).
-      final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
+      final CompilationUnit? unit = node
+          .thisOrAncestorOfType<CompilationUnit>();
       if (unit != null &&
           !unit.directives.whereType<ImportDirective>().any(
             (ImportDirective d) => _isHooksPackage(d.uri.stringValue ?? ''),

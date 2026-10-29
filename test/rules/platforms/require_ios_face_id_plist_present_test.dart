@@ -45,12 +45,11 @@ Future<bool> go() => auth.authenticate(localizedReason: 'Unlock');
       '${project.path}/ios/Runner/Info.plist',
     ).writeAsStringSync('<plist version="1.0"><dict>$body</dict></plist>');
 
-    Future<int> hits() async =>
-        (await runRuleResolved(
-          rule,
-          fixture,
-          projectRoot: project,
-        )).where((d) => d.ruleName == ruleName).length;
+    Future<int> hits() async => (await runRuleResolved(
+      rule,
+      fixture,
+      projectRoot: project,
+    )).where((d) => d.ruleName == ruleName).length;
 
     test('GOOD: plist declares NSFaceIDUsageDescription -> silent', () async {
       writePlist(
