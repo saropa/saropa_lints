@@ -76,6 +76,10 @@ TODO [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
 - **Extension:** new settings `saropaLints.watcherExclude.maxFileKb` (default 5120) and `saropaLints.watcherExclude.maxFolderFiles` (default 1000). The workspace hazard scan now flags any file above the size bar and any folder with more direct files than the limit, and offers to add them to `files.watcherExclude`. Rules & Tiers > Automation has a new "Watcher excludes" block with both settings, the count of files, folders and missing recommended excludes affected, and a List control for each.
 - **Extension:** the recommended watcher excludes now cover Android/iOS build output (`.gradle`, `android/build`, `android/app/build`, `ios/build`, `ios/Pods`, `ios/.symlinks`, `DerivedData`); the hazard scan no longer descends into `.gradle`, `Pods` and `DerivedData`, and files under `.gradle` are excluded with `**/.gradle/**`.
 
+### Changed
+
+- **Extension:** dev dependencies `serialize-javascript` 7.1.0 → 7.1.4 and `undici` bumped (Dependabot, PR #360). No action required.
+
 ### Fixed
 
 - **Extension:** the status bar "N workspace issue(s)" item now lists each issue in its tooltip (large unexcluded files, missing watcher exclusions, extension host memory). Before, the tooltip showed only process stats, so the red dot gave no hint of the cause.
