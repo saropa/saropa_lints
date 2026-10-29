@@ -64,3 +64,7 @@ Report at `invokeMethod`/`invokeListMethod`/`invokeMapMethod` calls, not at the 
 
 - saropa_lints version: 17.0.1-beta.1
 - Triggering project/file: saropa contacts app — `lib/utils/system/haptics/saropa_haptics.dart:43`
+
+## Status 2026-10-28
+
+platform_channel_on_web: flagging unguarded invokeMethod calls not implemented.

@@ -61,3 +61,7 @@ Accept `context.mounted ? context : null` (and `context.mounted && ...`) as a gu
 
 - saropa_lints version: 17.0.1-beta.1
 - Triggering project/file: saropa contacts app — `lib/utils/system/system_commands/run_command_location.dart:150`, `lib/utils/system/system_commands/run_command_user_type.dart:74`
+
+## Status 2026-10-28
+
+context_across_async: no code change, ternary report unconfirmed.

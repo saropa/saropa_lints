@@ -74,3 +74,7 @@ Walk up from the analyzed file to the first `pubspec.yaml` and read `ios/Runner/
 
 - saropa_lints version: 17.0.1-beta.1
 - Triggering project/file: saropa contacts app — `lib/utils/user/security/biometrics.dart:16,54,57,62`
+
+## Status 2026-10-28
+
+face_id: fix attempted in 17.0.1-beta.2, root cause unconfirmed.

@@ -67,3 +67,7 @@ Skip when each interpolation expression is a const expression, a for-each variab
 
 - saropa_lints version: 17.0.1-beta.1
 - Triggering project/file: saropa contacts app — `lib/database/drift/migration_steps/migration_steps_v77.dart:9`, `lib/database/drift/migration_steps/migration_steps_v79.dart:13`
+
+## Status 2026-10-28
+
+drift: private-method parameter case not implemented.
