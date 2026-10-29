@@ -898,7 +898,16 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
         return false;
       });
 
-      if (!hasNonce) {
+      // `scopes: []` requests no identity data; the call only yields a
+      // one-time authorization code (e.g. for token revocation), so there is
+      // no identity token for a nonce to protect.
+      final bool emptyScopes = args.arguments.any((Argument arg) {
+        if (arg is! NamedArgument || arg.name.lexeme != 'scopes') return false;
+        final Expression value = arg.argumentExpression;
+        return value is ListLiteral && value.elements.isEmpty;
+      });
+
+      if (!hasNonce && !emptyScopes) {
         reporter.atNode(node);
       }
     });

@@ -295,9 +295,46 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     if (argument.length != 1) return false;
     final Expression raw = _unwrapExpression(argument.first.argumentExpression);
     return _isValidLiteralForParseType(raw, parseType: parseType) ||
+        (parseType == 'Uri' && _isConstOrEncodedInterpolation(raw)) ||
         _isDigitOnlyRegexCapture(raw, parseCall) ||
         _isRegexValidatedSubstring(raw, parseCall);
   }
+
+  /// A `Uri.parse` argument interpolating only compile-time constants and
+  /// `Uri.encode*` results cannot be malformed by external data.
+  bool _isConstOrEncodedInterpolation(Expression argument) {
+    if (argument is! StringInterpolation) return false;
+    for (final InterpolationElement element in argument.elements) {
+      if (element is! InterpolationExpression) continue;
+      final Expression e = element.expression;
+      if (_isConstReference(e) || _isUriEncodeCall(e)) continue;
+      return false;
+    }
+    return true;
+  }
+
+  bool _isConstReference(Expression e) {
+    final Element? el = e is SimpleIdentifier
+        ? e.element
+        : e is PrefixedIdentifier
+        ? e.identifier.element
+        : null;
+    if (el is PropertyAccessorElement) {
+      final VariableElement? v = el.variable;
+      return v != null && v.isConst;
+    }
+    return el is VariableElement && el.isConst;
+  }
+
+  bool _isUriEncodeCall(Expression e) =>
+      e is MethodInvocation &&
+      const <String>{
+        'encodeComponent',
+        'encodeQueryComponent',
+        'encodeFull',
+      }.contains(e.methodName.name) &&
+      e.target is SimpleIdentifier &&
+      (e.target! as SimpleIdentifier).name == 'Uri';
 
   Expression _unwrapExpression(Expression expression) {
     Expression current = expression;
@@ -2048,8 +2085,44 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
       // object, so the constructor cannot produce a silently wrong date.
       if (componentsFromValidDateTime(args)) return;
 
+      // Suppress when the result is stored in a local and a later `if` in
+      // the same block compares its components back to the inputs.
+      if (isRoundTripValidated(node)) return;
+
       reporter.atNode(node);
     });
+  }
+
+  /// True when [node] initializes a local variable and a following `if` in
+  /// the same block reads that local's `month` or `day` in its condition and
+  /// exits (return / throw / continue / break) when the check fails. That is
+  /// the round-trip validation (`date.month != month || date.day != day`)
+  /// the correction message recommends.
+  static bool isRoundTripValidated(InstanceCreationExpression node) {
+    final AstNode? decl = node.parent;
+    if (decl is! VariableDeclaration) return false;
+    final AstNode? stmt = decl.parent?.parent;
+    if (stmt is! VariableDeclarationStatement) return false;
+    final AstNode? block = stmt.parent;
+    if (block is! Block) return false;
+    final String name = decl.name.lexeme;
+
+    bool exits(Statement s) =>
+        s is ReturnStatement ||
+        s is BreakStatement ||
+        s is ContinueStatement ||
+        (s is ExpressionStatement && s.expression is ThrowExpression) ||
+        (s is Block && s.statements.isNotEmpty && exits(s.statements.last));
+
+    for (final Statement next in block.statements) {
+      if (next.offset <= stmt.offset) continue;
+      if (next is! IfStatement || !exits(next.thenStatement)) continue;
+      final String cond = next.expression.toSource();
+      if (cond.contains('$name.month') || cond.contains('$name.day')) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Returns true when every positional argument is an integer literal

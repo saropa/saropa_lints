@@ -513,7 +513,8 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
 
   static const Set<String> _qrWidgets = <String>{
     'QRView',
-    'MobileScanner',
+    // `MobileScanner` is intentionally absent: mobile_scanner requests camera
+    // permission itself and surfaces a denial via errorBuilder.
     'QrScannerOverlay',
     'BarcodeScanner',
     'QRCodeScanner',

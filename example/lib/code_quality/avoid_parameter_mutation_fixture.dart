@@ -224,3 +224,25 @@ _ContactDraft _fillDraftReturning(_ContactDraft d) {
   d.photo = 'x';
   return d;
 }
+
+class _Model {
+  int x = 0;
+}
+
+/// Updates [m] in place.
+// GOOD: documented in-place contract, void.
+void _changeInPlace(_Model m) {
+  m.x = 1; // No lint
+}
+
+// GOOD: mutator verb name, bool return.
+bool _restoreModel(_Model m, int saved) {
+  m.x = saved; // No lint
+  return true;
+}
+
+// BAD: neutral name, no doc.
+void _processModel(_Model m) {
+  // expect_lint: avoid_parameter_mutation
+  m.x = 1;
+}

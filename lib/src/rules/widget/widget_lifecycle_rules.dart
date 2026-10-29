@@ -2447,6 +2447,23 @@ class _OrderedSetStateScanner extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitIfStatement(IfStatement node) {
+    // An await confined to an always-exiting branch never precedes code after
+    // the `if`: restore await/guard state once the `if` is walked.
+    if (awaitConfinedToExitingBranches(node) && containsAwait(node)) {
+      final bool seen = _seenAwait;
+      final List<bool> guards = List<bool>.of(_guardStack);
+      super.visitIfStatement(node);
+      _seenAwait = seen;
+      for (int i = 0; i < guards.length; i++) {
+        _guardStack[i] = guards[i];
+      }
+      return;
+    }
+    super.visitIfStatement(node);
+  }
+
+  @override
   void visitAwaitExpression(AwaitExpression node) {
     _seenAwait = true;
     // A new async gap invalidates every prior guard at every enclosing scope —

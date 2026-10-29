@@ -219,3 +219,11 @@ enum _ImplicitAccessEnum {
   // — must NOT lint.
   int enumReadsGood() => _value;
 }
+
+class _SingletonSvc {
+  _SingletonSvc._();
+  static final _SingletonSvc instance = _SingletonSvc._();
+
+  // GOOD: singleton instance API - callers use `_SingletonSvc.instance.ping()`.
+  String ping() => 'pong';
+}

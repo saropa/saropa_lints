@@ -309,3 +309,19 @@ Future<int> Function() _awaitedWriteInitializerNotFlagged = () async {
   await _write('d');
   return deleted;
 };
+
+final Set<String> _snapStore = <String>{};
+Set<String> _loadSnap() => Set<String>.of(_snapStore);
+Future<void> _mutateSnap(String k) async => _snapStore.add(k);
+
+// GOOD: snapshot of mutable state taken before awaited writes; moving it down
+// would capture the post-mutation state.
+Future<Set<String>> _snapshotBeforeAwaitedLoop(List<String> items) async {
+  final Set<String> before = _loadSnap();
+  for (final String i in items) {
+    await _mutateSnap(i);
+  }
+  _step();
+  _step();
+  return _loadSnap().difference(before);
+}

@@ -2165,6 +2165,12 @@ class PreferStaticMethodRule extends SaropaLintRule {
       // Skip abstract methods
       if (node.isAbstract) return;
 
+      // Singleton instance methods are the public API (`Class.instance.m()`);
+      // making them static would break every caller.
+      final ClassDeclaration? owner = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (owner != null && _isSingletonClass(owner)) return;
+
       // Check if method body uses 'this' or instance members
       final bool usesThis = _usesThisOrInstanceMembers(node);
 
@@ -2179,6 +2185,42 @@ class PreferStaticMethodRule extends SaropaLintRule {
       if (annotation.name.name == 'override') return true;
     }
     return false;
+  }
+
+  /// A singleton has constructors, none of them a public generative one, and
+  /// a `static` field or getter typed as the class itself.
+  static bool _isSingletonClass(ClassDeclaration cls) {
+    final String className = cls.namePart.typeName.lexeme;
+    bool hasConstructor = false;
+    bool hasStaticSelf = false;
+    for (final ClassMember m
+        in cls.body is BlockClassBody
+            ? (cls.body as BlockClassBody).members
+            : const <ClassMember>[]) {
+      if (m is ConstructorDeclaration) {
+        hasConstructor = true;
+        final String? ctorName = m.name?.lexeme;
+        final bool isPrivate = ctorName != null && ctorName.startsWith('_');
+        if (m.factoryKeyword == null && !isPrivate) return false;
+      } else if (m is FieldDeclaration && m.isStatic) {
+        final TypeAnnotation? type = m.fields.type;
+        if (type is NamedType && type.name.lexeme == className) {
+          hasStaticSelf = true;
+        } else if (type == null &&
+            m.fields.variables.any(
+              (VariableDeclaration v) =>
+                  (v.initializer?.toSource() ?? '').startsWith(className),
+            )) {
+          hasStaticSelf = true;
+        }
+      } else if (m is MethodDeclaration && m.isStatic && m.isGetter) {
+        final TypeAnnotation? type = m.returnType;
+        if (type is NamedType && type.name.lexeme == className) {
+          hasStaticSelf = true;
+        }
+      }
+    }
+    return hasConstructor && hasStaticSelf;
   }
 
   bool _usesThisOrInstanceMembers(MethodDeclaration node) {

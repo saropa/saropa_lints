@@ -6,3 +6,7 @@ void badExamples() {}
 
 // Good examples (should NOT trigger)
 void goodExamples() {}
+
+// GOOD: `column.equals(Holder.someStringConst)` where the constant is a
+// `static const String` (or int) is a raw SQL value, not an enum.
+// BAD: `column.equals(Status.active)` where `Status` is an enum.

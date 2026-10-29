@@ -129,3 +129,35 @@ class _good476_MyService {
 class MyWidget extends StatefulWidget {
   final Widget child; // OK - widget tree composition
 }
+
+// GOOD: immutable const row descriptor, built in `build` and discarded.
+class _good476_RowData {
+  const _good476_RowData({this.leading, this.trailing});
+  final Widget? leading; // OK - const value class, all final
+  final Widget? trailing; // OK
+}
+
+// GOOD: render-time delegate recreated with its owning widget.
+class _FlowDelegate476 {}
+
+class _good476_ParallaxDelegate extends _FlowDelegate476 {
+  _good476_ParallaxDelegate({required this.itemContext});
+  final BuildContext itemContext; // OK
+}
+
+// GOOD: Widget subclass through a base outside the fixed name list.
+class _PopupMenuEntry476 extends StatefulWidget {
+  const _PopupMenuEntry476();
+}
+
+class _good476_StaggeredEntry extends _PopupMenuEntry476 {
+  const _good476_StaggeredEntry({required this.animatedChild});
+  final Widget animatedChild; // OK - class is a widget
+}
+
+// BAD: mutable non-const holder still reported.
+class _bad476_MutableHolder {
+  _bad476_MutableHolder(this.child);
+  // expect_lint: avoid_retaining_disposed_widgets
+  Widget child; // LINT
+}

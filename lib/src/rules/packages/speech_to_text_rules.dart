@@ -7,7 +7,9 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../../interprocedural_cleanup_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
 
@@ -117,10 +119,20 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
       // Check if speech is stopped
       for (final String name in speechFieldNames) {
+        // Follow same-class helpers (`dispose()` -> `_cancelEngine()`), and
+        // trust a private helper that is not declared in the class body: it
+        // lives in an extension, mixin or `part` file that this single-file
+        // AST cannot read, so flagging it would be a false positive.
         final bool isStopped =
             disposeMethod != null &&
-            (isFieldCleanedUp(name, 'stop', disposeMethod.body) ||
-                isFieldCleanedUp(name, 'cancel', disposeMethod.body));
+            (anyReachableBody(
+                  disposeMethod,
+                  node,
+                  (FunctionBody b) =>
+                      isFieldCleanedUp(name, 'stop', b) ||
+                      isFieldCleanedUp(name, 'cancel', b),
+                ) ||
+                _callsExternalPrivateHelper(disposeMethod, node));
 
         if (!isStopped) {
           for (final ClassMember member in node.bodyMembers) {
@@ -136,5 +148,40 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when [dispose] calls a receiver-less (or `this.`) private method
+  /// that is not declared in [cls] -- i.e. one defined in an extension, mixin
+  /// or `part` file.
+  static bool _callsExternalPrivateHelper(
+    MethodDeclaration dispose,
+    ClassDeclaration cls,
+  ) {
+    final Set<String> declared = <String>{
+      for (final ClassMember m in cls.bodyMembers)
+        if (m is MethodDeclaration) m.name.lexeme,
+    };
+    final _PrivateCallFinder finder = _PrivateCallFinder(declared);
+    dispose.body.accept(finder);
+    return finder.found;
+  }
+}
+
+class _PrivateCallFinder extends RecursiveAstVisitor<void> {
+  _PrivateCallFinder(this._declared);
+
+  final Set<String> _declared;
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final Expression? target = node.target;
+    final String name = node.methodName.name;
+    if ((target == null || target is ThisExpression) &&
+        name.startsWith('_') &&
+        !_declared.contains(name)) {
+      found = true;
+    }
+    super.visitMethodInvocation(node);
   }
 }

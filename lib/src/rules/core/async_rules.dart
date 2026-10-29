@@ -8,7 +8,8 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../early_exit_guard_utils.dart';
-import '../../async_context_utils.dart' show isMapRemoveCall;
+import '../../async_context_utils.dart'
+    show awaitConfinedToExitingBranches, containsAwait, isMapRemoveCall;
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
 import '../../fixes/async/avoid_redundant_async_fix.dart';
@@ -1689,6 +1690,9 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
           if (awaitNode.offset < target.offset) {
             // Skip the target's own await (e.g., `await showDialog(...)`)
             if (awaitNode.expression == target) return;
+            // Await confined to an always-exiting `if` branch the target is
+            // not part of cannot precede the target on any path.
+            if (_inExitingBranchExcluding(awaitNode, target, body)) return;
             foundAwait = true;
           }
         },
@@ -1700,6 +1704,25 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
     );
 
     return foundAwait;
+  }
+
+  /// True when [awaitNode] sits inside an `if` (below [body]) whose awaits
+  /// all live in always-exiting branches and which does not contain [target].
+  bool _inExitingBranchExcluding(
+    AwaitExpression awaitNode,
+    AstNode target,
+    FunctionBody body,
+  ) {
+    AstNode? current = awaitNode.parent;
+    while (current != null && current != body) {
+      if (current is IfStatement &&
+          !(target.offset >= current.offset && target.end <= current.end) &&
+          awaitConfinedToExitingBranches(current)) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 
   bool _hasMountedGuard(FunctionBody body, AstNode target) {
@@ -4500,6 +4523,20 @@ class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitIfStatement(IfStatement node) {
+    // An await confined to an always-exiting branch (`if (c) { await x;
+    // return; }`) never precedes code after the `if`: scope its effects.
+    if (awaitConfinedToExitingBranches(node) && containsAwait(node)) {
+      final bool seen = _didSeeAwait;
+      final bool checked = _hasMountedCheck;
+      _visitIfBody(node);
+      _didSeeAwait = seen;
+      _hasMountedCheck = checked;
+      return;
+    }
+    _visitIfBody(node);
+  }
+
+  void _visitIfBody(IfStatement node) {
     if (_mountedInCondition.hasMatch(node.expression.toSource())) {
       _hasMountedCheck = true;
     }

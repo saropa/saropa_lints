@@ -128,3 +128,8 @@ Widget _good123_build(context) {
     },
   );
 }
+
+// GOOD: MobileScanner requests camera permission itself (errorBuilder).
+Widget _good124_build(context) {
+  return MobileScanner(onDetect: _onDetect);
+}

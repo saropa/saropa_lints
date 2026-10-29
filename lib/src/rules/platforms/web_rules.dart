@@ -91,6 +91,10 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // A project with a platform folder layout but no `web/` target (and not
+    // a pure Dart library) can never run on web, so the hazard is absent.
+    if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'MethodChannel' &&
@@ -185,11 +189,58 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
       if (stmt.offset >= node.offset) break;
 
       if (stmt is IfStatement &&
-          (_isWebExitGuard(stmt) || _isGetterExitGuard(stmt))) {
+          (_isWebExitGuard(stmt) ||
+              _isGetterExitGuard(stmt) ||
+              _isNegatedPlatformExitGuard(stmt) ||
+              _isNullFieldExitGuard(stmt))) {
         return true;
       }
     }
     return false;
+  }
+
+  /// `if (!Platform.isAndroid) return;` — `dart:io` `Platform` is unusable on
+  /// web, so only a non-web platform can pass a negated `Platform.isX` exit.
+  /// Positive `if (Platform.isIOS) return;` is not a guard (web may pass it).
+  bool _isNegatedPlatformExitGuard(IfStatement stmt) {
+    if (!_isEarlyExit(stmt.thenStatement)) return false;
+    bool negatedPlatform(Expression e) {
+      if (e is ParenthesizedExpression) return negatedPlatform(e.expression);
+      if (e is PrefixExpression && e.operator.type == TokenType.BANG) {
+        final Expression o = e.operand;
+        return o is PrefixedIdentifier && o.prefix.name == 'Platform';
+      }
+      // `!a && !b` exits unless both fail; still requires a platform to pass.
+      if (e is BinaryExpression &&
+          e.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+        return negatedPlatform(e.leftOperand) &&
+            negatedPlatform(e.rightOperand);
+      }
+      return false;
+    }
+
+    return negatedPlatform(stmt.expression);
+  }
+
+  /// `if (_channel == null) return;` where `_channel` is a field/getter in
+  /// the same compilation unit whose declaration mentions `kIsWeb` (e.g.
+  /// `kIsWeb ? null : MethodChannel(...)`), so it is null on web.
+  bool _isNullFieldExitGuard(IfStatement stmt) {
+    final Expression expr = stmt.expression;
+    if (expr is! BinaryExpression ||
+        expr.operator.type != TokenType.EQ_EQ ||
+        !_isEarlyExit(stmt.thenStatement)) {
+      return false;
+    }
+    final Expression other;
+    if (expr.rightOperand is NullLiteral) {
+      other = expr.leftOperand;
+    } else if (expr.leftOperand is NullLiteral) {
+      other = expr.rightOperand;
+    } else {
+      return false;
+    }
+    return _mentionsWebGetter(other, stmt);
   }
 
   /// `if (!_supported) return;` where `_supported` is a getter in the same

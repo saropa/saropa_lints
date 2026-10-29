@@ -2788,15 +2788,73 @@ class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
               rightOperand.identifier.name == 'length');
       if (!boundIsLength) return;
       if (parts.updaters.length != 1) return;
+      // The index is the algorithm, not bookkeeping, when the loop does not
+      // start at 0 (e.g. the inner `j = i + 1` of a pairwise scan) or when
+      // it seeds a nested loop's range (the outer `i` of that scan).
+      final Expression? init = indexVar.initializer;
+      if (init is! IntegerLiteral || init.value != 0) return;
+      if (_indexFeedsNestedLoop(node.body, indexName)) return;
       if (!_bodyUsesIndex(node.body, indexName)) return;
       reporter.atNode(node);
     });
+  }
+
+  static bool _indexFeedsNestedLoop(Statement body, String indexName) {
+    var found = false;
+    body.accept(_NestedLoopBoundVisitor(indexName, () => found = true));
+    return found;
   }
 
   static bool _bodyUsesIndex(Statement body, String indexName) {
     var found = false;
     body.visitChildren(_IndexAccessVisitor(indexName, () => found = true));
     return found;
+  }
+}
+
+/// Detects a nested `for` whose declaration or condition reads [_indexName].
+class _NestedLoopBoundVisitor extends RecursiveAstVisitor<void> {
+  _NestedLoopBoundVisitor(this._indexName, this._onMatch);
+
+  final String _indexName;
+  final void Function() _onMatch;
+
+  @override
+  void visitForStatement(ForStatement node) {
+    final ForLoopParts parts = node.forLoopParts;
+    if (parts is ForPartsWithDeclarations) {
+      final Iterable<AstNode?> bounds = <AstNode?>[
+        ...parts.variables.variables.map(
+          (VariableDeclaration v) => v.initializer,
+        ),
+        parts.condition,
+      ];
+      for (final AstNode? bound in bounds) {
+        if (bound != null && _mentions(bound)) {
+          _onMatch();
+          return;
+        }
+      }
+    }
+    super.visitForStatement(node);
+  }
+
+  bool _mentions(AstNode node) {
+    var hit = false;
+    node.accept(_IdentifierMentionVisitor(_indexName, () => hit = true));
+    return hit;
+  }
+}
+
+class _IdentifierMentionVisitor extends RecursiveAstVisitor<void> {
+  _IdentifierMentionVisitor(this._name, this._onMatch);
+
+  final String _name;
+  final void Function() _onMatch;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == _name) _onMatch();
   }
 }
 

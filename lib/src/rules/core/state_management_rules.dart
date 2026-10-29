@@ -13,6 +13,8 @@ import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/navigation/add_mounted_check_fix.dart';
+import '../../async_context_utils.dart'
+    show awaitConfinedToExitingBranches, containsAwait;
 import '../../target_matcher_utils.dart';
 
 /// Warns when ChangeNotifier subclass doesn't call notifyListeners.
@@ -727,6 +729,20 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitIfStatement(IfStatement node) {
+    // An await confined to an always-exiting branch never precedes code after
+    // the `if`: scope its effects to the `if`.
+    if (awaitConfinedToExitingBranches(node) && containsAwait(node)) {
+      final bool seen = _hasSeenAwait;
+      final bool checked = _hasMountedCheck;
+      _visitIfBody(node);
+      _hasSeenAwait = seen;
+      _hasMountedCheck = checked;
+      return;
+    }
+    _visitIfBody(node);
+  }
+
+  void _visitIfBody(IfStatement node) {
     // Check for mounted check: if (!mounted) return; or if (mounted)
     final String condition = node.expression.toSource();
     if (condition.contains('mounted')) {

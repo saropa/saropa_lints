@@ -47,3 +47,10 @@ int goodInlineRegexDigitGroups(String trimmed) {
   final int day = int.parse(m.group(2)!);
   return month * 100 + day;
 }
+
+const String _apiBase = 'https://example.com/api';
+
+// GOOD: constants and percent-encoded parts cannot make the URI malformed.
+Uri goodConstBaseUri() => Uri.parse('$_apiBase/items');
+Uri goodEncodedQueryUri(String v) =>
+    Uri.parse('app:///co?q=${Uri.encodeComponent(v)}');

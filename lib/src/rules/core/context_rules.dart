@@ -89,9 +89,20 @@ class AvoidStoringContextRule extends SaropaLintRule {
       // string matching, which can fail for named-parameter function types.
       if (node.fields.type is GenericFunctionType) return;
 
+      final AstNode? owner = node.parent?.parent;
+      final ClassDeclaration? cls = owner is ClassDeclaration ? owner : null;
+      // Render-time delegates are recreated with their owning widget.
+      final String? base = cls?.extendsClause?.superclass.name.lexeme;
+      if (base != null && _renderDelegateBases.contains(base)) return;
+
       for (final variable in node.fields.variables) {
         final type = node.fields.type?.toSource() ?? '';
         if (_isContextType(type)) {
+          if (cls != null &&
+              node.fields.isFinal &&
+              _allUsesMountedGuarded(cls, variable.name.lexeme)) {
+            continue;
+          }
           reporter.atNode(variable);
         }
       }
@@ -120,6 +131,47 @@ class AvoidStoringContextRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  static const Set<String> _renderDelegateBases = <String>{
+    'FlowDelegate',
+    'CustomPainter',
+    'CustomClipper',
+    'SingleChildLayoutDelegate',
+    'MultiChildLayoutDelegate',
+  };
+
+  /// True when the field is read at least once and every read other than a
+  /// `.mounted` check sits in a function body that tests `<field>.mounted`
+  /// earlier.
+  bool _allUsesMountedGuarded(ClassDeclaration cls, String name) {
+    final _FieldUseCollector c = _FieldUseCollector(name);
+    cls.accept(c);
+    if (c.uses.isEmpty) return false;
+    for (final SimpleIdentifier use in c.uses) {
+      if (_isMountedAccess(use)) continue;
+      final FunctionBody? body = use.thisOrAncestorOfType<FunctionBody>();
+      if (body == null) return false;
+      final bool guarded = c.uses.any(
+        (SimpleIdentifier m) =>
+            _isMountedAccess(m) &&
+            m.offset < use.offset &&
+            m.thisOrAncestorOfType<FunctionBody>() == body,
+      );
+      if (!guarded) return false;
+    }
+    return true;
+  }
+
+  bool _isMountedAccess(SimpleIdentifier id) {
+    final AstNode? p = id.parent;
+    if (p is PrefixedIdentifier) {
+      return p.prefix == id && p.identifier.name == 'mounted';
+    }
+    if (p is PropertyAccess) {
+      return p.target == id && p.propertyName.name == 'mounted';
+    }
+    return false;
   }
 
   bool _isContextType(String type) {
@@ -1523,4 +1575,16 @@ class UseClosestBuildContextRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {}
+}
+
+class _FieldUseCollector extends RecursiveAstVisitor<void> {
+  _FieldUseCollector(this.name);
+
+  final String name;
+  final List<SimpleIdentifier> uses = <SimpleIdentifier>[];
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == name && !node.inDeclarationContext()) uses.add(node);
+  }
 }

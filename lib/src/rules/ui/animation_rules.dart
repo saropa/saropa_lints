@@ -3178,8 +3178,42 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
 
     if (!_isInertReadInBuild(accessNode)) return;
     if (_isReadInListeningBuilderRebuiltWidget(accessNode, receiver)) return;
+    if (_isStaticBranchBesideListeningBuilder(accessNode, receiver)) return;
 
     reporter.atNode(accessNode);
+  }
+
+  /// Returns `true` when the read sits in one branch of a conditional
+  /// (`?:` or `if`/`else`) whose other branch builds an `AnimatedBuilder` /
+  /// `ListenableBuilder` driven by the same animation. The live case is
+  /// already served, so the read here is a deliberate static frame
+  /// (e.g. reduced-motion), not an inert animation.
+  static bool _isStaticBranchBesideListeningBuilder(
+    AstNode accessNode,
+    Expression receiver,
+  ) {
+    final String receiverSource = receiver.toSource();
+    AstNode child = accessNode;
+    for (AstNode? p = accessNode.parent; p != null; child = p, p = p.parent) {
+      if (p is MethodDeclaration) return false;
+      final List<AstNode> others = <AstNode>[];
+      if (p is ConditionalExpression) {
+        if (identical(child, p.thenExpression)) others.add(p.elseExpression);
+        if (identical(child, p.elseExpression)) others.add(p.thenExpression);
+      } else if (p is IfStatement) {
+        if (identical(child, p.thenStatement) && p.elseStatement != null) {
+          others.add(p.elseStatement!);
+        }
+        if (identical(child, p.elseStatement)) others.add(p.thenStatement);
+      }
+      for (final AstNode other in others) {
+        final _SiblingListeningBuilderFinder finder =
+            _SiblingListeningBuilderFinder(receiverSource);
+        other.accept(finder);
+        if (finder.found) return true;
+      }
+    }
+    return false;
   }
 
   /// Returns `true` when [node] is the left-hand side of an assignment
@@ -3331,6 +3365,32 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
     final _ClassFieldNameVisitor visitor = _ClassFieldNameVisitor(fieldName);
     classDecl.visitChildren(visitor);
     return visitor.found;
+  }
+}
+
+/// Finds a listening builder (`AnimatedBuilder` / `ListenableBuilder`)
+/// whose `animation:` / `listenable:` argument has source [receiverSource].
+class _SiblingListeningBuilderFinder extends RecursiveAstVisitor<void> {
+  _SiblingListeningBuilderFinder(this.receiverSource);
+
+  final String receiverSource;
+  bool found = false;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String type = node.constructorName.type.name.lexeme;
+    if (type == 'AnimatedBuilder' || type == 'ListenableBuilder') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument &&
+            (arg.name.lexeme == 'animation' ||
+                arg.name.lexeme == 'listenable') &&
+            arg.argumentExpression.toSource() == receiverSource) {
+          found = true;
+          return;
+        }
+      }
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 

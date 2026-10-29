@@ -1515,6 +1515,51 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     RegExp(r'encrypted\('),
   ];
 
+  /// True when [args] is a single companion/constructor call (or map literal)
+  /// whose every field is assigned `null` / `Value(null)`: the call removes
+  /// data rather than storing it, even though the class or column names
+  /// (`AuthCompanion(token: ...)`) look sensitive.
+  static bool _onlyClearsFields(ArgumentList args) {
+    if (args.arguments.length != 1) return false;
+    final Argument only = args.arguments.first;
+    final Expression expr = only is NamedArgument
+        ? only.argumentExpression
+        : only as Expression;
+    final Iterable<Expression> values;
+    if (expr is InstanceCreationExpression) {
+      values = _fieldValues(expr.argumentList);
+    } else if (expr is MethodInvocation) {
+      values = _fieldValues(expr.argumentList);
+    } else if (expr is SetOrMapLiteral) {
+      values = <Expression>[
+        for (final CollectionElement e in expr.elements)
+          if (e is MapLiteralEntry) e.value else expr,
+      ];
+    } else {
+      return false;
+    }
+    return values.isNotEmpty && values.every(_isNullOrValueNull);
+  }
+
+  static List<Expression> _fieldValues(ArgumentList list) => <Expression>[
+    for (final Argument a in list.arguments)
+      if (a is NamedArgument) a.argumentExpression else a as Expression,
+  ];
+
+  static bool _isNullOrValueNull(Expression e) {
+    if (e is NullLiteral) return true;
+    final ArgumentList? inner = e is InstanceCreationExpression
+        ? e.argumentList
+        : e is MethodInvocation
+        ? e.argumentList
+        : null;
+    if (inner == null || inner.arguments.length != 1) return false;
+    final String callee = e is InstanceCreationExpression
+        ? e.constructorName.type.name.lexeme
+        : (e as MethodInvocation).methodName.name;
+    return callee == 'Value' && inner.arguments.first is NullLiteral;
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1539,6 +1584,9 @@ class RequireDataEncryptionRule extends SaropaLintRule {
           return;
         }
       }
+
+      // Clearing credentials (every field set to null) stores nothing.
+      if (_onlyClearsFields(node.argumentList)) return;
 
       // Check if arguments contain sensitive data (not the full node source,
       // which includes target/receiver names that may incidentally match).

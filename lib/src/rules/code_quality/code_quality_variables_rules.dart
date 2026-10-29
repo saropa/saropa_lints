@@ -498,6 +498,12 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
 /// `ro`) and `setupParentData(RenderObject child)` (assigning `child.parentData`).
 /// There is no copy alternative; the framework owns the object and requires
 /// in-place mutation.
+///
+/// A `void` or `bool` function/method whose contract is to update the passed
+/// object is also exempt: its dartdoc says "in place" or "mutates", or its
+/// name starts with a mutator verb (`apply`, `restore`, `rollback`, `inherit`,
+/// `carry`, `merge`, `stamp`, `mark`). A neutral name with no such doc, or a
+/// function that returns the object, is still flagged.
 class AvoidParameterMutationRule extends SaropaLintRule {
   AvoidParameterMutationRule() : super(code: _code);
 
@@ -537,6 +543,11 @@ class AvoidParameterMutationRule extends SaropaLintRule {
         node.functionExpression.body,
         reporter,
         isVoid: node.returnType?.toSource() == 'void',
+        isMutatorContract: _isDocumentedMutator(
+          node.name.lexeme,
+          node.returnType,
+          node.documentationComment,
+        ),
       );
     });
 
@@ -546,6 +557,11 @@ class AvoidParameterMutationRule extends SaropaLintRule {
         node.body,
         reporter,
         isVoid: node.returnType?.toSource() == 'void',
+        isMutatorContract: _isDocumentedMutator(
+          node.name.lexeme,
+          node.returnType,
+          node.documentationComment,
+        ),
         exemptParamNames: _renderObjectOverrideMutationTargets(node),
       );
     });
@@ -557,8 +573,9 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter, {
     Set<String> exemptParamNames = const <String>{},
     bool isVoid = false,
+    bool isMutatorContract = false,
   }) {
-    if (params == null) return;
+    if (params == null || isMutatorContract) return;
 
     // Map each parameter name to its declared type name (syntactic). The
     // declared name lets us recognize mutation-by-design types even under a
@@ -629,6 +646,30 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     }
 
     return const <String>{};
+  }
+
+  static final RegExp _mutatorVerbName = RegExp(
+    r'^_*(apply|restore|rollback|inherit|carry|merge|stamp|mark)($|[A-Z0-9_])',
+  );
+
+  /// True when a `void`/`bool` function states in-place update as its
+  /// contract: dartdoc mentioning "in place" / "mutates", or a mutator-verb
+  /// name. Callers read the mutated object afterward, so a copy is not an
+  /// alternative. Non-void/bool returns (e.g. returning the object) stay linted.
+  static bool _isDocumentedMutator(
+    String name,
+    TypeAnnotation? returnType,
+    Comment? doc,
+  ) {
+    final String? ret = returnType?.toSource();
+    if (ret != 'void' && ret != 'bool') return false;
+    if (_mutatorVerbName.hasMatch(name)) return true;
+    if (doc == null) return false;
+    final String text = doc.tokens.map((Token t) => t.lexeme).join(' ');
+    return RegExp(
+      r'\bin[- ]place\b|\bmutates\b',
+      caseSensitive: false,
+    ).hasMatch(text);
   }
 
   static bool _isAccumulatorTypeName(String? type) =>
@@ -2607,6 +2648,17 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     final int useIndex = statements.indexOf(useStatement);
     if (declIndex < 0 || useIndex <= declIndex) return false;
 
+    // A state snapshot: the initializer reads mutable state (a call or member
+    // read) and an intervening statement awaits (so shared state can change
+    // before the use). Moving it would capture the post-change state.
+    if (decl.initializer != null &&
+        _readsMutableState(decl.initializer!) &&
+        statements
+            .sublist(declIndex + 1, useIndex)
+            .any(_statementContainsAwait)) {
+      return false;
+    }
+
     // The maximal contiguous run of declaration statements containing
     // [decl] — its "load group". Membership in this run, not merely being a
     // declaration anywhere in the block, is what a legitimate batch sibling
@@ -2672,6 +2724,20 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     return false;
   }
 
+  /// True when [expression] contains a method call or member read, i.e. its
+  /// value may depend on state that other statements can change.
+  bool _readsMutableState(Expression expression) {
+    final _StateReadFinder finder = _StateReadFinder();
+    expression.accept(finder);
+    return finder.found;
+  }
+
+  bool _statementContainsAwait(Statement statement) {
+    final _AwaitFinder finder = _AwaitFinder();
+    statement.accept(finder);
+    return finder.found;
+  }
+
   /// Returns true when [expression] itself contains an `await` — not one
   /// nested inside a closure, which runs on its own schedule and doesn't
   /// affect the ordering of statements in the enclosing block.
@@ -2716,6 +2782,31 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
   @override
   void visitFunctionExpression(FunctionExpression node) {
     // Do not descend: an await inside a nested closure doesn't run inline.
+  }
+}
+
+/// Finds a method call or member read (`a.b`, `a.b()`, `f()`) in an expression.
+class _StateReadFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    found = true;
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    found = true;
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    found = true;
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    found = true;
   }
 }
 

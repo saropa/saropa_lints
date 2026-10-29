@@ -122,7 +122,9 @@ void sendFile(FakeResponse res) {
     );
 
     test(
-      'LINT: throwing await outside any try/catch is still flagged',
+      // Superseded by 8f258f2f: an awaited initializer is an ordered side
+      // effect, so it is never relocated, try/catch or not.
+      'NO lint: awaited initializer outside any try/catch is not relocated',
       () async {
         const String code = '''
 Future<List<int>> getBytes() async => <int>[1, 2, 3];
@@ -139,7 +141,7 @@ Future<void> f() async {
           MoveVariableCloserToUsageRule(),
           code,
         );
-        expect(codes, contains(_rule));
+        expect(codes, isNot(contains(_rule)));
       },
     );
   });

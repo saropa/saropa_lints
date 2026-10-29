@@ -66,6 +66,31 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.0.1-beta.4] — Unreleased
+
+### Fixed
+
+- **`check_mounted_after_async`:** no longer treats an `await` inside an always-returning `if` branch as an await before a later `setState`.
+- **`require_mounted_check_after_await`, `require_mounted_check`:** an `await` confined to an always-exiting `if` branch no longer triggers `setState` reports after the `if`.
+- **`use_setstate_synchronously`:** await and guard state are now restored after an `if` whose awaits all sit in exiting branches.
+- **`avoid_platform_channel_on_web`:** no longer flags calls after `if (field == null) return` (field null on web) or after a negated `Platform.isX` early exit, and is skipped in Flutter projects with no `web/` target.
+- **`avoid_inert_animation_value_in_build`:** no longer flags an `animation.value` read in a branch whose sibling branch uses an `AnimatedBuilder` or `ListenableBuilder` on the same animation.
+- **`avoid_datetime_constructor`:** no longer flags a `DateTime(...)` assigned to a local and then round-trip validated by an `if` on its `month` or `day` that exits.
+- **`avoid_retaining_disposed_widgets`:** no longer flags immutable `const` descriptor classes, render-time delegates (`FlowDelegate`, `CustomPainter` and similar), or widgets that reach `Widget` or `State` through a non-listed Flutter base class.
+- **`avoid_storing_context`:** no longer flags a `BuildContext` field on render-time delegates, or a `final` field whose every use follows a `.mounted` check.
+- **`avoid_parameter_mutation`:** no longer flags `void`/`bool` functions documented as in-place ("in place"/"mutates") or named with a mutator verb (`apply`, `restore`, `rollback`, `inherit`, `carry`, `merge`, `stamp`, `mark`).
+- **`move_variable_closer_to_its_usage`:** no longer flags a state snapshot (call or member-read initializer) taken before intervening `await`s.
+- **`prefer_asmap_over_indexed_iteration`:** no longer flags pairwise loops (inner start not 0, or index feeding a nested loop bound).
+- **`prefer_static_method`:** no longer flags instance methods of singleton classes (private/factory constructors plus a static self-typed instance).
+- **`prefer_try_parse_for_dynamic_data`:** `Uri.parse` of an interpolation made only of `const` references and `Uri.encode*` calls is no longer flagged.
+- **`require_apple_signin_nonce`:** no longer reports `getAppleIDCredential(scopes: [])`, which only fetches an authorization code for token revocation.
+- **`require_data_encryption`:** no longer reports calls that only clear credential fields with `null` or `Value(null)`.
+- **`require_drift_equals_value`:** now resolves the argument type and reports only enums, so `static const String` or int arguments pass.
+- **`require_qr_permission_check`:** no longer reports `MobileScanner`, which handles camera permission itself.
+- **`require_speech_stop_on_dispose`:** follows same-class and externally declared private helpers called from `dispose()`.
+
+---
+
 ## [17.0.1-beta.3]
 
 This update makes the command-line setup report problems honestly instead of finishing as if everything worked. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.3/CHANGELOG.md)

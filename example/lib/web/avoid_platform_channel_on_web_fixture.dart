@@ -218,3 +218,37 @@ abstract final class _GuardedHaptics939 {
     await _channel.invokeMethod<void>('x');
   }
 }
+
+// Channel field that is null on web.
+abstract final class _NullOnWeb939 {
+  static const MethodChannel? _channel = kIsWeb
+      ? null
+      : MethodChannel('app/widget_paths');
+
+  // GOOD: `_channel == null` early return; the field is null on web.
+  static Future<String?> containerPath() async {
+    if (_channel == null) {
+      return null;
+    }
+    return _channel?.invokeMethod<String>('getPath');
+  }
+}
+
+abstract final class _PlatformGuard939 {
+  static const MethodChannel _channel = MethodChannel('app/network_country');
+
+  // GOOD: negated Platform check exits for every non-Android platform.
+  static Future<String?> get() async {
+    if (!Platform.isAndroid) {
+      return null;
+    }
+    return _channel.invokeMethod<String>('getNetworkCountry');
+  }
+
+  // BAD: positive Platform exit does not exclude web.
+  static Future<String?> bad() async {
+    if (Platform.isIOS) return null;
+    // expect_lint: avoid_platform_channel_on_web
+    return _channel.invokeMethod<String>('x');
+  }
+}

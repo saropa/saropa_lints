@@ -1819,6 +1819,11 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip widget classes — they can hold widget references
       if (_isWidgetClass(node)) return;
+      // Render-time delegates are rebuilt with their owning widget.
+      if (_isRenderDelegateClass(node)) return;
+      // Immutable value descriptors (const ctor, only final fields) are
+      // built in `build` and die with the frame.
+      if (_isConstValueClass(node)) return;
       for (final ClassMember member in node.bodyMembers) {
         if (member is! FieldDeclaration) continue;
 
@@ -1873,13 +1878,52 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
         isFlutterSdkInterface(element);
   }
 
-  /// Check if class extends a known Flutter widget base class.
-  /// Uses explicit inheritance only — no name-based heuristics.
+  /// Short-lived helpers owned by a widget and recreated on every build.
+  static const Set<String> _renderDelegateBases = <String>{
+    'FlowDelegate',
+    'CustomPainter',
+    'CustomClipper',
+    'SingleChildLayoutDelegate',
+    'MultiChildLayoutDelegate',
+  };
+
+  bool _isRenderDelegateClass(ClassDeclaration node) {
+    final String? name = node.extendsClause?.superclass.name.lexeme;
+    return name != null && _renderDelegateBases.contains(name);
+  }
+
+  /// True for a class with a `const` constructor and only `final` instance
+  /// fields (an immutable descriptor, not a long-lived holder).
+  bool _isConstValueClass(ClassDeclaration node) {
+    bool hasConst = false;
+    for (final ClassMember m in node.bodyMembers) {
+      if (m is ConstructorDeclaration && m.constKeyword != null) hasConst = true;
+      if (m is FieldDeclaration &&
+          !m.isStatic &&
+          !m.fields.isFinal &&
+          !m.fields.isConst) {
+        return false;
+      }
+    }
+    return hasConst;
+  }
+
+  /// Check if class is a widget/State: a known base name, or (when resolved)
+  /// any transitive subtype of Flutter's `Widget` or `State`.
   bool _isWidgetClass(ClassDeclaration node) {
     final NamedType? superclass = node.extendsClause?.superclass;
     if (superclass == null) return false;
+    if (_widgetBaseClasses.contains(superclass.name.lexeme)) return true;
 
-    return _widgetBaseClasses.contains(superclass.name.lexeme);
+    final InterfaceElement? element = node.declaredFragment?.element;
+    if (element == null) return false;
+    for (final InterfaceType st in element.allSupertypes) {
+      final String n = st.element.name ?? '';
+      if ((n == 'Widget' || n == 'State') && isFlutterSdkInterface(st.element)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

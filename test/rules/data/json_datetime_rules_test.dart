@@ -111,6 +111,17 @@ void main() {
     );
   });
 
+  group('avoid_datetime_constructor round-trip validation', () {
+    test('validated fixture carries no expect_lint marker', () {
+      final content = File(
+        'example/lib/json_datetime/avoid_datetime_constructor_fixture.dart',
+      ).readAsStringSync();
+      final start = content.indexOf('DateTime? roundTripValidated');
+      expect(start, greaterThan(-1));
+      expect(content.substring(start), isNot(contains('expect_lint')));
+    });
+  });
+
   group('Json Datetime Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/json_datetime');
     final fixtures = discoverFixtures(fixtureDir);

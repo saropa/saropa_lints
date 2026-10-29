@@ -2937,6 +2937,9 @@ class RequireDriftEqualsValueRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   /// Uppercase-prefix types that are valid raw SQL values, not enums.
   static const _nonEnumPrefixes = <String>{
     'Variable', // Drift's Variable type
@@ -2980,6 +2983,12 @@ class RequireDriftEqualsValueRule extends SaropaLintRule {
         // Heuristic: PrefixedIdentifier like Status.active looks like an enum.
         // Exclude common non-enum uppercase types that are valid raw values.
         final prefix = arg.prefix.name;
+        // When the type resolves, trust it: only enums need equalsValue().
+        // A `static const String`/int on a user class is a raw SQL value.
+        final DartType? argType = arg.staticType;
+        if (argType is InterfaceType && argType.element is! EnumElement) {
+          return;
+        }
         if (prefix[0].toUpperCase() == prefix[0] &&
             !_nonEnumPrefixes.contains(prefix)) {
           reporter.atNode(node.methodName);

@@ -381,3 +381,8 @@ void _badAuthenticationStillTriggers1010() async {
 void _goodVCardFileName() async {
   await file.writeAsString(makeVCardFileName());
 }
+
+// GOOD: clearing credentials (every field null) stores nothing.
+void _goodClearCredentialsWithNull() async {
+  await db.write(AuthCompanion(token: Value<String?>(null)));
+}

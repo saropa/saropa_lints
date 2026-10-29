@@ -8,6 +8,28 @@ import '../../helpers/fixture_discovery.dart';
 ///
 /// Test fixtures: example/lib/web/
 void main() {
+  group('avoid_platform_channel_on_web guards', () {
+    final fixture = File(
+      'example/lib/web/avoid_platform_channel_on_web_fixture.dart',
+    ).readAsStringSync();
+
+    test(
+      'null-on-web field early return and negated Platform guard are GOOD',
+      () {
+        final start = fixture.indexOf('class _NullOnWeb939');
+        final end = fixture.indexOf('// BAD: positive Platform exit');
+        expect(start, greaterThan(-1));
+        expect(end, greaterThan(start));
+        expect(fixture.substring(start, end), isNot(contains('expect_lint')));
+      },
+    );
+
+    test('positive Platform exit still flagged', () {
+      final start = fixture.indexOf('// BAD: positive Platform exit');
+      expect(fixture.substring(start), contains('expect_lint'));
+    });
+  });
+
   group('Web Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
       test(name, () {
