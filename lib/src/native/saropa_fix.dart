@@ -104,7 +104,7 @@ abstract class SaropaFixProducer extends ResolvedCorrectionProducer {
 
   /// Returns a [SourceRange] covering the complete line(s) of [comment],
   /// from the start of its first line to the start of the next line after
-  /// its last line. Uses [lineInfo] for line-ending-agnostic boundary
+  /// its last line. Uses `lineInfo` for line-ending-agnostic boundary
   /// detection — handles LF, CRLF, and tab indentation transparently
   /// without manual character scanning.
   SourceRange lineBoundaryRange(Comment comment) {
