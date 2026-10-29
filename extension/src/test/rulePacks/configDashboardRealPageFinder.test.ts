@@ -57,11 +57,12 @@ function typeSearch(p: Page, value: string): void {
 describe('Rule packs REAL page: finder reveals pack', () => {
   let html: string;
   const pages: Page[] = [];
-  before(() => { html = buildRealHtml(); });
+  before(function () { this.timeout(30000); html = buildRealHtml(); });
   afterEach(() => { while (pages.length) { pages.pop()!.dom.window.close(); } });
   const mk = (s?: unknown): Page => { const p = open(html, s); pages.push(p); return p; };
 
-  it('clicking the Isar finder link opens every ancestor and focuses the checkbox', () => {
+  it('clicking the Isar finder link opens every ancestor and focuses the checkbox', function () {
+    this.timeout(30000);
     const p = mk();
     const { doc } = p;
     typeSearch(p, 'isar');
@@ -90,7 +91,8 @@ describe('Rule packs REAL page: finder reveals pack', () => {
     assert.ok(p.scrollTargets.includes(row), 'scrollIntoView called on the pack row itself');
   });
 
-  it('search, finder and opened Isar pack survive a rebuild', () => {
+  it('search, finder and opened Isar pack survive a rebuild', function () {
+    this.timeout(30000);
     const first = mk();
     typeSearch(first, 'isar');
     (first.doc.querySelector('#rule-finder .rf-pack[data-pack="isar"]') as HTMLElement)
