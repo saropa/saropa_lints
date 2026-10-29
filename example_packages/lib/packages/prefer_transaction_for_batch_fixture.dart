@@ -103,6 +103,7 @@
 // Test fixture for: prefer_transaction_for_batch
 // Source: lib\src\rules\packages\firebase_rules.dart
 
+import 'dart:async';
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic box;
@@ -129,4 +130,24 @@ void _good613() async {
   batch.set(ref1, data1);
   batch.set(ref2, data2);
   await batch.commit();
+}
+
+// Regression (must NOT trigger): one write per path, each path returns.
+Future<void> _exclusiveBranches(dynamic db, int? id, String? v) async {
+  if (v == null) {
+    if (id != null) await db.delete(id);
+    return;
+  }
+  if (id != null) {
+    await db.update(id);
+    return;
+  }
+  await db.insert(v);
+}
+
+// Regression (must NOT trigger): StreamController.add is not a DB write.
+void _streamAdds(StreamController<int> c) {
+  c.add(1);
+  c.add(2);
+  c.add(3);
 }

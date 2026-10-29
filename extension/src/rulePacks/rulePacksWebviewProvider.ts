@@ -37,6 +37,7 @@ import { enforceSingleVersion, versionGroupIndex } from './versionGroups';
 import { STYLISTIC_PACK_DEFINITIONS } from './stylisticPackDefinitions';
 import { packDomainForId, PACK_DOMAIN_ORDER } from './packDomains';
 import { l10n } from '../i18n/runtime';
+import { getLintsSwitchState, lintsSwitchDashboardMessage } from '../lintsSwitch';
 import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
@@ -821,7 +822,7 @@ export class RulePacksWebviewProvider {
     const ctx = this._collectDashboardContext(root, pubspecContent);
     const body = [
       this._buildHeader(ctx),
-      this._buildKpiStrip(ctx),
+      this._buildLintsOffBanner() ? '' : this._buildKpiStrip(ctx),
       this._buildTabBar(),
       this._buildTierTab(ctx),
       this._buildPacksTab(ctx),
@@ -1048,6 +1049,10 @@ export class RulePacksWebviewProvider {
    * from fighting inline geometry (per §5).
    */
   private _buildHeader(ctx: DashboardContext): string {
+    // Off or Partly off: never show healthy-looking coverage numbers. The
+    // tuning tabs below stay available; only the headline is replaced.
+    const offBanner = this._buildLintsOffBanner();
+    if (offBanner) return offBanner;
     const sdkApplicable = ctx.detectedSdkPacks.length;
     const freshness = formatRelativeFreshness(ctx.analysisTimestamp);
     const parts = [
@@ -1069,6 +1074,25 @@ export class RulePacksWebviewProvider {
     <p class="status-line">${statusLine}<span class="refresh-pending-indicator" id="refresh-pending-indicator" hidden title="${escapeHtml(l10n('dashboards.refreshPending.title'))}">${escapeHtml(l10n('dashboards.refreshPending.label'))}</span>${buildKeyboardShortcutsButton()}</p>
   </div>
   ${this._buildCoverageGauge(ctx)}
+</header>`;
+  }
+
+  /**
+   * "Lints are off. [Turn on]" (or the partly-off sentence + Fix) in place of the
+   * coverage header; '' when the single switch is On. The button runs
+   * `saropaLints.toggleLints`, which turns everything on from Off or Partly off.
+   */
+  private _buildLintsOffBanner(): string {
+    const root = getProjectRoot();
+    if (!root) return '';
+    const state = getLintsSwitchState(root);
+    if (state.kind === 'on') return '';
+    const label = state.kind === 'off' ? l10n('lintsSwitch.dashboardTurnOn') : l10n('lintsSwitch.dashboardFix');
+    return `<header class="dash-hero lints-off">
+  <div class="hero-text">
+    <h1>Saropa Lints Config</h1>
+    <p class="status-line" role="status"><span>${escapeHtml(lintsSwitchDashboardMessage(state))}</span> <button type="button" class="btn tier-1" data-command="toggleLints">${escapeHtml(label)}</button></p>
+  </div>
 </header>`;
   }
 
@@ -2657,6 +2681,12 @@ ${buildWatcherExcludeSectionHtml(watcherRows, this._watcherScan)}`;
     // Restart the Dart analysis server to clear memory pressure — RSS resets
     // on restart, so shedding de-escalates to level 0 if the project fits in
     // memory on a fresh start.
+    // Off / Partly off banner button: the single switch's turn-on / Fix.
+    if (id === 'toggleLints') {
+      await vscode.commands.executeCommand('saropaLints.toggleLints');
+      this.refresh();
+      return;
+    }
     if (id === 'restartAnalyzer') {
       await vscode.commands.executeCommand('dart.restartAnalysisServer');
       return;

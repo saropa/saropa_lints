@@ -151,9 +151,15 @@ void _auditExistingConfig(
     );
   }
 
-  // Check for plugins section missing version key
-  if (RegExp(r'^\s+saropa_lints:', multiLine: true).hasMatch(content) &&
-      !RegExp(r'^\s+version:', multiLine: true).hasMatch(content)) {
+  // Scope version checks to the saropa_lints entry under plugins: — an
+  // unrelated `version:` elsewhere in the file must not be read.
+  final hasEntry = RegExp(
+    r'^\s+saropa_lints:',
+    multiLine: true,
+  ).hasMatch(content);
+  final existing = findSaropaLintsPluginVersion(content);
+
+  if (hasEntry && existing == null) {
     log.check(
       'Existing config',
       pass: false,
@@ -163,23 +169,15 @@ void _auditExistingConfig(
     );
   }
 
-  // Check for stale version constraint
-  final versionMatch = RegExp(
-    r'version:\s*"?\^?([^"\s]+)"?',
-    multiLine: true,
-  ).firstMatch(content);
-
-  if (versionMatch != null && currentVersion != 'unknown') {
-    final existing = versionMatch.group(1);
-    if (existing != null &&
-        existing != currentVersion &&
-        !existing.startsWith(currentVersion)) {
+  // Check for stale version constraint (drift vs resolved package version)
+  if (existing != null && currentVersion != 'unknown') {
+    if (existing != currentVersion && !existing.startsWith(currentVersion)) {
       log.check(
         'Existing config',
         pass: false,
         detail:
-            'version $existing may be stale (current: $currentVersion) '
-            '— re-run "dart run saropa_lints" to update',
+            'version $existing differs from resolved $currentVersion '
+            '— run "dart run saropa_lints:init" to update it',
       );
     }
   }
@@ -188,4 +186,39 @@ void _auditExistingConfig(
   if (!log.warnings.any((w) => w.startsWith('Existing config'))) {
     log.check('Existing analysis_options.yaml looks OK', pass: true);
   }
+}
+
+/// Returns the `version:` value of the `saropa_lints:` entry under the
+/// top-level `plugins:` block, or null if absent. Commented lines and
+/// `version:` keys elsewhere in the file are ignored.
+String? findSaropaLintsPluginVersion(String content) {
+  final lines = content.split(RegExp(r'\r?\n'));
+  var inPlugins = false;
+  int? entryIndent;
+  for (final line in lines) {
+    if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
+    final indent = line.length - line.trimLeft().length;
+    if (indent == 0) {
+      inPlugins = line.trimRight() == 'plugins:';
+      entryIndent = null;
+      continue;
+    }
+    if (!inPlugins) continue;
+    if (entryIndent != null && indent <= entryIndent) entryIndent = null;
+    if (entryIndent == null) {
+      if (RegExp(r'^\s+saropa_lints:').hasMatch(line)) {
+        entryIndent = indent;
+        // Inline form: `saropa_lints: ^1.2.3` or `saropa_lints: "1.2.3"`.
+        final inline = RegExp(
+          r'saropa_lints:\s*"?\^?([^"\s#]+)"?',
+        ).firstMatch(line);
+        if (inline != null) return inline.group(1);
+      }
+      continue;
+    }
+    final m = RegExp(r'^\s+version:\s*"?\^?([^"\s#]+)"?').firstMatch(line);
+    if (m != null) return m.group(1);
+  }
+
+  return null;
 }

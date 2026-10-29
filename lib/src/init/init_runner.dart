@@ -248,8 +248,9 @@ Future<void> runInit(List<String> args) async {
   showWhatsNew(version, packageDir);
   // I4: Deprecation notice — extension is the supported setup path.
   log.terminal(
-    '${InitColors.yellow}Note: CLI init is deprecated. '
-    'Use the Saropa Lints VS Code extension for setup.${InitColors.reset}',
+    '${InitColors.yellow}Note: CLI init is deprecated; the Saropa Lints '
+    'VS Code extension is the supported setup path. If the extension turned '
+    'Lint integration OFF, init does not turn it back on.${InitColors.reset}',
   );
   log.terminal('');
 
@@ -722,6 +723,14 @@ Future<void> runInit(List<String> args) async {
 
   // Validate the written file has the critical sections
   validateWrittenConfig(log, resolvedOutput, allRules.length);
+  // A config with no active plugins block or zero rules is a failed init,
+  // except a brand-new file, which is written disabled on purpose.
+  final writtenFile = File(resolvedOutput);
+  if (!isNewFile &&
+      (!writtenFile.existsSync() ||
+          isConfigUnusable(writtenFile.readAsStringSync()))) {
+    exitCode = 1;
+  }
   await runPostWriteActions(
     cliArgs: cliArgs,
     v4Detected: v4Detected,

@@ -45,6 +45,7 @@ import '../../fixes/code_quality/convert_to_named_bool_param_fix.dart';
 import '../../fixes/code_quality/replace_weak_crypto_fix.dart';
 import '../../fixes/code_quality/wrap_unawaited_fix.dart';
 import '../../early_exit_guard_utils.dart';
+import '../../async_context_utils.dart' show isMapRemoveCall;
 import '../../saropa_lint_rule.dart';
 
 class AvoidAdjacentStringsRule extends SaropaLintRule {
@@ -1403,6 +1404,15 @@ class AvoidSubstringRule extends SaropaLintRule {
       } else if (current is ForStatement) {
         // for (...; end >= offset + 3; ...) — condition bounds the body.
         if (_forConditionInvolvesArgs(current, argNames)) return true;
+      } else if (current is ForElement) {
+        // Collection-for: `[for (var i = 0; i + 1 < s.length; i += 2) ...]`
+        // — same loop condition as the statement form bounds the body.
+        final forParts = current.forLoopParts;
+        if (forParts is ForParts &&
+            forParts.condition != null &&
+            _conditionInvolvesArgs(forParts.condition!, argNames)) {
+          return true;
+        }
       } else if (current is Block) {
         // Preceding if-return/break/continue/throw that checks the substring
         // args OR proves the receiver length/format (startsWith / isEmpty /
@@ -2383,6 +2393,9 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
   }
 
   bool _shouldReport(MethodInvocation node) {
+    // Map.remove(key) returns the stored value; no Future is created.
+    if (isMapRemoveCall(node)) return false;
+
     // Check if the return type is Future
     final DartType? returnType = node.staticType;
     if (returnType == null) return false;
@@ -4357,8 +4370,15 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
         return true;
       }
     }
+    // Domain-prefixed names put the verb later (`dbActivityAdd`,
+    // `dbActivityAddForContact`): accept any camelCase word that is a verb.
+    for (final RegExpMatch m in _camelWord.allMatches(methodName)) {
+      if (_mutateVerbPrefixes.contains(m.group(0)!.toLowerCase())) return true;
+    }
     return false;
   }
+
+  static final RegExp _camelWord = RegExp('[A-Z]?[a-z0-9]+|[A-Z]+(?![a-z])');
 
   /// True if [element] is a method declared inside an `extension` block
   /// AND that extension is defined in the current project's own package
@@ -4445,6 +4465,8 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
       if (returnType == null || returnType is VoidType) return;
       if (returnType is DynamicType) return;
       if (returnType.isDartCoreNull) return;
+      // `Never` calls (throw helpers, exit) never return a value.
+      if (returnType is NeverType) return;
 
       // Skip Future<void>
       if (returnType.isDartAsyncFuture && returnType is InterfaceType) {

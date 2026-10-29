@@ -8,6 +8,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../early_exit_guard_utils.dart';
+import '../../async_context_utils.dart' show isMapRemoveCall;
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
 import '../../fixes/async/avoid_redundant_async_fix.dart';
@@ -3697,6 +3698,8 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 
       // Check if this is a method invocation that returns a Future
       if (expr is MethodInvocation) {
+        // Map.remove(key) returns the stored value; no Future is created.
+        if (isMapRemoveCall(expr)) return;
         final DartType? returnType = expr.staticType;
         if (returnType != null && _staticTypeIsFuture(returnType)) {
           // Skip safe patterns: subscription.cancel() in dispose(),

@@ -208,3 +208,19 @@ class MyWidget {
     user.name = 'changed';
   }
 }
+
+class _ContactDraft {
+  String? photo;
+}
+
+// GOOD: void handler filling a *Draft accumulator.
+void _fillDraft(_ContactDraft d) {
+  d.photo = 'x'; // No lint
+}
+
+// BAD: non-void return keeps the lint.
+_ContactDraft _fillDraftReturning(_ContactDraft d) {
+  // expect_lint: avoid_parameter_mutation
+  d.photo = 'x';
+  return d;
+}

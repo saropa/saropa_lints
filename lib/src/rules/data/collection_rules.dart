@@ -655,6 +655,35 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
       return true;
     }
 
+    // Check for short-circuit guard: list.isNotEmpty && f(list.first)
+    if (_isGuardedByShortCircuit(node, collectionName)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// True when [node] is the right operand of `&&` whose left operand proves
+  /// non-empty, or of `||` whose left operand is an emptiness check — the
+  /// right side is only evaluated when the collection is non-empty.
+  bool _isGuardedByShortCircuit(AstNode node, String collectionName) {
+    AstNode? prev = node;
+    AstNode? current = node.parent;
+    while (current != null && current is! FunctionBody) {
+      if (current is BinaryExpression && current.rightOperand == prev) {
+        final TokenType op = current.operator.type;
+        if (op == TokenType.AMPERSAND_AMPERSAND &&
+            _isValidGuardCondition(current.leftOperand, collectionName)) {
+          return true;
+        }
+        if (op == TokenType.BAR_BAR &&
+            _isInvertedGuardCondition(current.leftOperand, collectionName)) {
+          return true;
+        }
+      }
+      prev = current;
+      current = current.parent;
+    }
     return false;
   }
 

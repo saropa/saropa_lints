@@ -14,6 +14,7 @@ import 'package:analyzer/dart/element/element.dart';
 
 import '../../analyzer_metadata_compat_utils.dart';
 import '../../catch_body_logging_utils.dart';
+import '../../async_context_utils.dart' show isMapRemoveCall;
 import '../../saropa_lint_rule.dart';
 import '../../fixes/error_handling/add_debug_print_in_catch_fix.dart';
 import '../../fixes/error_handling/add_rethrow_in_catch_fix.dart';
@@ -1003,6 +1004,8 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
       // We do NOT flag awaited futures because await propagates errors to the
       // enclosing async function's Future - that's proper Dart error handling.
       if (expression is MethodInvocation) {
+        // Map.remove(key) returns the stored value; no Future is created.
+        if (isMapRemoveCall(expression)) return;
         final type = expression.staticType;
         if (type != null && type.isDartAsyncFuture) {
           // Skip if inside dispose() method - it's synchronous and can't await

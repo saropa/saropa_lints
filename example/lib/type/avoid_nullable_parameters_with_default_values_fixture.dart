@@ -111,3 +111,10 @@ void _bad1226({String? name = 'default'}) {} // Nullable with non-null default
 
 // GOOD: Should NOT trigger avoid_nullable_parameters_with_default_values
 void _good1226({String name = 'default'}) {} // Non-nullable with default
+
+// GOOD: tri-state - null is a distinct "all rows" value in the body.
+String _goodTriState({bool? isHidden = false}) {
+  if (isHidden == true) return 'hidden';
+  if (isHidden == false) return 'visible';
+  return 'all';
+}

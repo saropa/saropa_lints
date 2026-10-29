@@ -1584,8 +1584,10 @@ class RequireDataEncryptionRule extends SaropaLintRule {
         reporter.atNode(node);
         return;
       }
+      // `vcard` (contact file format) contains the substring `card`.
+      final String keywordSource = scannedArgsSource.replaceAll('vcard', ' ');
       for (final String keyword in _sensitiveKeywords) {
-        if (scannedArgsSource.contains(keyword)) {
+        if (keywordSource.contains(keyword)) {
           reporter.atNode(node);
           return;
         }

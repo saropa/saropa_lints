@@ -6,3 +6,14 @@ void badExamples() {}
 
 // Good examples (should NOT trigger)
 void goodExamples() {}
+
+// Regression: Value<String?>(null) on a nullable column is the correct way to
+// write SQL NULL; must NOT trigger.
+void nullableValueGood() {
+  const Object a = Value<String?>(null); // OK: nullable type argument
+}
+
+class Value<T> {
+  const Value(this.value);
+  final T value;
+}

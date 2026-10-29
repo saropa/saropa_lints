@@ -5,6 +5,24 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/init/display.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
+import 'package:saropa_lints/src/init/preflight.dart'
+    show findSaropaLintsPluginVersion;
+
+/// Marker the VS Code extension writes when it comments out the plugin block.
+const String extensionDisabledMarker =
+    '# >>> saropa_lints integration turned OFF by the VS Code extension';
+
+/// True when the config has no active `plugins:` block or lists no rules,
+/// i.e. the analyzer would run no saropa_lints rules.
+bool isConfigUnusable(String content) {
+  final hasPlugins = RegExp(r'^plugins:', multiLine: true).hasMatch(content);
+  final ruleLines = RegExp(
+    r'^\s{6}\w+:\s*(true|false)',
+    multiLine: true,
+  ).allMatches(content).length;
+
+  return !hasPlugins || ruleLines == 0;
+}
 
 /// Validate the written configuration file has the critical sections.
 ///
@@ -31,12 +49,20 @@ bool validateWrittenConfig(
   if (RegExp(r'^plugins:', multiLine: true).hasMatch(content)) {
     log.check('plugins: section present', pass: true);
   } else {
-    log.check('plugins:', pass: false, detail: 'section missing');
+    log.check(
+      'plugins:',
+      pass: false,
+      detail: content.contains(extensionDisabledMarker)
+          ? 'section is commented out because the VS Code extension turned '
+                'Lint integration OFF — toggle "Lint integration" On in the '
+                'extension to restore it (init does not re-enable it)'
+          : 'section missing',
+    );
     allPassed = false;
   }
 
   // Check version: key under saropa_lints
-  if (RegExp(r'^\s+version:', multiLine: true).hasMatch(content)) {
+  if (findSaropaLintsPluginVersion(content) != null) {
     log.check('version: key present', pass: true);
   } else {
     log.check(

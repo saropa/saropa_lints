@@ -376,3 +376,8 @@ void _badAuthenticationStillTriggers1010() async {
   // No other sensitive keyword in the call.
   await prefs.setString('authentication_state', 'value');
 }
+
+// GOOD: `vCard` contains the substring `card` but is a contact file format.
+void _goodVCardFileName() async {
+  await file.writeAsString(makeVCardFileName());
+}

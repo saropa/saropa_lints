@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -1127,6 +1128,20 @@ class _CacheClearVisitor extends RecursiveAstVisitor<void> {
 
   /// Set to true when a matching `.clear()` or `.remove(` is found.
   bool found = false;
+
+  /// `_cache = null` invalidates a wholesale-replaced snapshot cache as
+  /// strongly as `.clear()` does (the next warm rebuilds it from scratch).
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    if (found) return;
+    if (node.operator.type == TokenType.EQ &&
+        node.rightHandSide is NullLiteral &&
+        _targetMatchesCacheField(node.leftHandSide)) {
+      found = true;
+      return;
+    }
+    super.visitAssignmentExpression(node);
+  }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {

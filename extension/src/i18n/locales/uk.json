@@ -2761,5 +2761,22 @@
   "lifecycle.note.unlisted": "Не в списку на pub.dev: приховано з результатів пошуку; наявні користувачі все ще можуть залежати від нього.",
   "lifecycle.upgradeRequired.diagnostic": "Оновіть {name} — встановлена версія має відому несправність",
   "lifecycle.upgradeRequired.insight": "Встановлена версія має відому несправність — потрібне оновлення",
-  "lifecycle.upgradeRequired.problem": "Оцінка {score}/100 — встановлену версію потрібно оновити"
+  "lifecycle.upgradeRequired.problem": "Оцінка {score}/100 — встановлену версію потрібно оновити",
+  "lintsSwitch": {
+    "statusOn": "Saropa Lints: On",
+    "statusOff": "Saropa Lints: Off",
+    "statusPartial": "Saropa Lints: Partly off",
+    "tooltipOn": "Saropa Lints is on (setting and analyzer plugin). Click to turn it off.",
+    "tooltipOff": "Saropa Lints is off (setting and analyzer plugin). Click to turn it on.",
+    "tooltipPartialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on. Click to fix (turns both on).",
+    "tooltipPartialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on. Click to fix (turns both on).",
+    "dashboardOff": "Lints are off.",
+    "dashboardPartialSetting": "Lints are partly off: the saropaLints.enabled setting is off.",
+    "dashboardPartialPlugin": "Lints are partly off: the analyzer plugin is off in analysis_options.yaml.",
+    "dashboardTurnOn": "Turn on",
+    "dashboardFix": "Fix",
+    "driftRowLabel": "Plugin version out of sync",
+    "driftRowDescription": "analysis_options.yaml says {configured}, pubspec.lock pins {pinned}. Click to sync.",
+    "driftSynced": "analysis_options.yaml plugin version updated to {pinned}."
+  }
 }

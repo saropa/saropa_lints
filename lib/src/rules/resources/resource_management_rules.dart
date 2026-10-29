@@ -74,8 +74,10 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // `openRead` is deliberately absent: it returns a Stream that closes its
+  // descriptor on completion, error or cancel — there is no handle to close.
   static final RegExp _fileOpenMethodPattern = RegExp(
-    r'\.(?:openRead|openWrite|openSync)\s*\(',
+    r'\.(?:openWrite|openSync)\s*\(',
   );
   static final RegExp _genericOpenPattern = RegExp(r'\.open\s*\(');
   // `\b` before `File(` so the indicator does not match `XFile(`, `ProfileX(`,
@@ -94,7 +96,7 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
   // sibling, so flagging here is a guaranteed false positive for the
   // store-then-dispose-elsewhere pattern. Detect the field-assignment shape.
   static final RegExp _fieldAssignedOpenPattern = RegExp(
-    r'_\w+\s*=\s*\w+\.(?:openRead|openWrite|openSync|open)\s*\(',
+    r'_\w+\s*=\s*\w+\.(?:openWrite|openSync|open)\s*\(',
   );
   static final RegExp _closeCallPattern = RegExp(r'\.close\s*\(');
   static final RegExp _readWriteConveniencePattern = RegExp(

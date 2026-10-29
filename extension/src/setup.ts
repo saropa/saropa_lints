@@ -1181,6 +1181,10 @@ export async function runReenablePlugin(context: vscode.ExtensionContext): Promi
     return;
   }
 
+  // The single on/off switch means the full live plugin: turning the plugin
+  // back on must also turn the setting on, or the two disagree silently.
+  await vscode.workspace.getConfiguration('saropaLints').update('enabled', true, vscode.ConfigurationTarget.Workspace);
+
   const restored = restorePluginsIntegration(root);
   // The block is live again however it got there, so drop any claim that our
   // Disable still owns its off state — otherwise the next Enable would try to

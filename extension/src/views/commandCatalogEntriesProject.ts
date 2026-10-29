@@ -28,6 +28,20 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'circle-slash',
   },
   {
+    command: 'saropaLints.toggleLints',
+    title: 'Turn Saropa Lints On / Off',
+    description: 'Flip the setting and the analyzer plugin together. From Partly off, turns both on.',
+    category: 'Setup & Configuration',
+    icon: 'power',
+  },
+  {
+    command: 'saropaLints.syncPluginVersion',
+    title: 'Sync Plugin Version to pubspec.lock',
+    description: 'Set the version line in analysis_options.yaml to the version pinned in pubspec.lock.',
+    category: 'Setup & Configuration',
+    icon: 'sync',
+  },
+  {
     command: 'saropaLints.reenablePlugin',
     title: 'Re-enable Live Analysis',
     description: 'Restore the plugins: block after Disable Saropa Lints and restart the analysis server.',

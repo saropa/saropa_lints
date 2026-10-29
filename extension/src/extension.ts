@@ -39,6 +39,13 @@ import { runMigrateConfig } from './config/migrateConfig';
 import { runMigrateRuleNames } from './ruleMigration/migrateController';
 import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
 import { surfacePluginDivergence } from './pluginDivergencePrompt';
+import {
+  getLintsSwitchState,
+  lintsSwitchDetail,
+  lintsSwitchLabel,
+  syncVersionWithMessage,
+  toggleLints,
+} from './lintsSwitch';
 import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
 import type { SaropaLintsApi } from './api';
 import { buildDailySummary } from './dailySummary';
@@ -831,6 +838,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         // but refreshing it unconditionally here is harmless (it no-ops without an open panel).
         rulePacksWebviewProvider.refresh();
         analysisOptimizerProvider.refresh();
+        // The plugins block feeds the On / Off / Partly off switch.
+        refreshAll();
+        updateAllStatusBars();
       }
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
       if (!cfg.get<boolean>('workspaceScanEnabled', false)) return;
@@ -1165,6 +1175,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   context.subscriptions.push(statusBarItem);
+
+  // The single Saropa Lints On / Off / Partly off switch. Separate from the
+  // score item so one click flips setting + plugin together (see lintsSwitch.ts).
+  const switchStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 101);
+  switchStatusBarItem.command = 'saropaLints.toggleLints';
+  context.subscriptions.push(switchStatusBarItem);
 
   // Dedicated memory/system-health item, separate from the lint-score item
   // above. Previously this state was crammed as a text suffix onto the main
@@ -1528,6 +1544,24 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     statusBarItem.command = 'saropaLints.openViolationsWideReport';
   }
 
+  // Render the On / Off / Partly off switch from the computed state. Off and
+  // Partly off use the warning background so "not running" is never silent.
+  function updateSwitchStatusBar(): void {
+    const switchRoot = getProjectRoot();
+    if (!switchRoot) {
+      switchStatusBarItem.hide();
+      return;
+    }
+    const state = getLintsSwitchState(switchRoot);
+    const icon = state.kind === 'on' ? '$(check)' : '$(warning)';
+    switchStatusBarItem.text = `${icon} ${lintsSwitchLabel(state)}`;
+    switchStatusBarItem.tooltip = lintsSwitchDetail(state);
+    switchStatusBarItem.backgroundColor = state.kind === 'on'
+      ? undefined
+      : new vscode.ThemeColor('statusBarItem.warningBackground');
+    switchStatusBarItem.show();
+  }
+
   // Inner implementation of updateAllStatusBars, extracted so the outer
   // function can wrap it in a single try/catch without exceeding the
   // 50-line function limit.
@@ -1544,8 +1578,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.command = 'saropaLints.showAbout';
       statusBarItem.show();
       memoryStatusBarItem.hide();
+      switchStatusBarItem.hide();
       return;
     }
+    updateSwitchStatusBar();
     const en = getConfig().get<boolean>('enabled', true) ?? true;
     // analysis_options.yaml is the tier source of truth (see tierConfig.ts) —
     // fall back to the saropaLints.tier setting only when no yaml tier is
@@ -2413,6 +2449,19 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // disable commented out, then restarts the analysis server so the
     // in-process plugin actually reloads. Distinct from `saropaLints.enable`,
     // which only turns on scan-on-save delivery and never touches this block.
+    // The one on/off switch (status bar, sidebar, dashboard): On turns setting
+    // and plugin off together; Off / Partly off (the Fix) turns both on.
+    vscode.commands.registerCommand('saropaLints.toggleLints', async () => {
+      await toggleLints(context);
+      updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
+      refreshAll();
+      updateAllStatusBars();
+    }),
+    vscode.commands.registerCommand('saropaLints.syncPluginVersion', async () => {
+      const syncRoot = getProjectRoot();
+      if (syncRoot) await syncVersionWithMessage(syncRoot);
+      refreshAll();
+    }),
     vscode.commands.registerCommand('saropaLints.reenablePlugin', async () => {
       await runReenablePlugin(context);
       updateContext(true, issuesProvider.hasViolations());

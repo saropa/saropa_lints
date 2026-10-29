@@ -132,11 +132,35 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
       if (body.statements.length == 1) {
         final Statement statement = body.statements.first;
         if (statement is ExpressionStatement &&
-            statement.expression is RethrowExpression) {
+            statement.expression is RethrowExpression &&
+            !_shieldsLaterClause(node)) {
           reporter.atNode(node);
         }
       }
     });
+  }
+
+  /// True when a later clause of the same `try` would catch what this
+  /// rethrow-only clause catches (catch-all, `Object`/`dynamic`, or a
+  /// supertype). Dart runs the first matching clause, so removing this
+  /// clause would change which handler runs.
+  static bool _shieldsLaterClause(CatchClause node) {
+    final AstNode? parent = node.parent;
+    if (parent is! TryStatement) return false;
+    final List<CatchClause> clauses = parent.catchClauses;
+    final DartType? own = node.exceptionType?.type;
+    for (final CatchClause later in clauses.skip(clauses.indexOf(node) + 1)) {
+      final TypeAnnotation? laterType = later.exceptionType;
+      if (laterType == null) return true;
+      final String name = laterType is NamedType ? laterType.name.lexeme : '';
+      if (name == 'Object' || name == 'dynamic') return true;
+      if (own is InterfaceType &&
+          (own.element.name == name ||
+              own.allSupertypes.any((t) => t.element.name == name))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override

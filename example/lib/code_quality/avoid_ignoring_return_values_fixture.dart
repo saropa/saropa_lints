@@ -71,3 +71,25 @@ class _Hasher {
 void _goodConfigAllowlisted(_Hasher hasher) {
   hasher.computeHash('hello'); // Exempt — project-level config allowlist
 }
+
+// GOOD: verb as a later camelCase word in a local extension bool mutator.
+extension _ActivityExtensions on _NameSpans {
+  bool dbActivityAdd() => true;
+  bool dbActivityAddForContact() => true;
+  bool validateEmail() => true;
+}
+
+void _goodPrefixedVerbExtension(_NameSpans m) {
+  m.dbActivityAdd(); // Exempt
+  m.dbActivityAddForContact(); // Exempt
+  // expect_lint: avoid_ignoring_return_values
+  m.validateEmail();
+}
+
+// GOOD: Never-returning calls cannot have an ignored value.
+Never _fail() => throw StateError('x');
+
+void _goodNever(Object e, StackTrace s) {
+  _fail();
+  Error.throwWithStackTrace(e, s);
+}

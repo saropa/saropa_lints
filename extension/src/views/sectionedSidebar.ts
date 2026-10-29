@@ -104,6 +104,7 @@ import { readRawLaneFromCustomConfig } from '../config/laneConfig';
 // is safe to call on every sidebar rebuild — see its own doc comment.
 import { getLastProjectVibrancyPayload } from './projectVibrancyReportView';
 import { saropaLintsDataPath } from '../reportsPaths';
+import { detectPluginVersionDrift, getLintsSwitchState, lintsSwitchDetail, lintsSwitchLabel } from '../lintsSwitch';
 
 export type SectionNode = vscode.TreeItem | ConfigTreeNode;
 
@@ -330,7 +331,29 @@ function buildBannerItems(): LeafItem[] {
             new vscode.ThemeColor('list.warningForeground'),
         )];
     }
-    return [];
+    // Dependency present: the single On / Off / Partly off switch sits at the
+    // top of the sidebar. Not a Status row, so the "a Status click never
+    // changes anything" rule still holds. Off and Partly off are worded and
+    // coloured so the state is never silent.
+    const state = getLintsSwitchState(root);
+    const items = [new LeafItem(
+        lintsSwitchLabel(state),
+        lintsSwitchDetail(state),
+        'saropaLints.toggleLints',
+        state.kind === 'on' ? 'check' : 'warning',
+        state.kind === 'on' ? undefined : new vscode.ThemeColor('list.warningForeground'),
+    )];
+    const drift = detectPluginVersionDrift(root);
+    if (drift) {
+        items.push(new LeafItem(
+            l10n('lintsSwitch.driftRowLabel'),
+            l10n('lintsSwitch.driftRowDescription', { configured: drift.configured, pinned: drift.pinned }),
+            'saropaLints.syncPluginVersion',
+            'sync',
+            new vscode.ThemeColor('list.warningForeground'),
+        ));
+    }
+    return items;
 }
 
 /**
@@ -1150,9 +1173,8 @@ export function updateSidebarSectionContext(workspaceState: vscode.Memento): voi
         void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', false);
         return;
     }
-    const cfg = vscode.workspace.getConfiguration('saropaLints');
-    const enabled = cfg.get<boolean>('enabled', true) ?? true;
-    const needsBanner = !hasSaropaLintsDep(root) || !enabled;
+    // The banner view hosts the on/off switch, so it shows for every Dart project.
+    const needsBanner = true;
     void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', needsBanner);
     // Cache invalidation moved to prepareRefreshCycle — called once at the
     // top of refreshAllSections instead of per-provider and per-context-update.

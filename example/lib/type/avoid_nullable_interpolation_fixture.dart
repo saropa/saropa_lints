@@ -166,7 +166,7 @@ String _goodCompoundAndGuard(_ChurnFile f) {
 
 // GOOD (v6): interpolation inside developer-facing log call.
 // "null" in the output IS the diagnostic signal.
-void debug(String message) {}
+void debug(Object message) {}
 void breadcrumb(String message) {}
 
 void _goodDebugLogString(String? name) {
@@ -231,4 +231,9 @@ class _UiCard {
 
   // expect_lint: avoid_nullable_interpolation
   String build() => 'Hello, $name';
+}
+
+// GOOD: lazy-message closure passed to a developer log call.
+void _goodDebugClosure(String? uuid) {
+  debug(() => 'Missing avatar `$uuid`');
 }

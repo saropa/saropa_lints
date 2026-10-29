@@ -536,6 +536,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
         node.functionExpression.parameters,
         node.functionExpression.body,
         reporter,
+        isVoid: node.returnType?.toSource() == 'void',
       );
     });
 
@@ -544,6 +545,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
         node.parameters,
         node.body,
         reporter,
+        isVoid: node.returnType?.toSource() == 'void',
         exemptParamNames: _renderObjectOverrideMutationTargets(node),
       );
     });
@@ -554,6 +556,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     FunctionBody body,
     SaropaDiagnosticReporter reporter, {
     Set<String> exemptParamNames = const <String>{},
+    bool isVoid = false,
   }) {
     if (params == null) return;
 
@@ -568,6 +571,12 @@ class AvoidParameterMutationRule extends SaropaLintRule {
       // setupParentData). Dropping them from the map means the visitor never
       // sees them as mutation targets.
       if (name != null && !exemptParamNames.contains(name.lexeme)) {
+        // A `void` handler filling a purpose-built `*Draft` / `*Builder` /
+        // `*Accumulator` / `*Collector` / `*Buffer` object is the
+        // accumulator pattern (same intent as `list.add`).
+        if (isVoid && _isAccumulatorTypeName(_declaredTypeName(param))) {
+          continue;
+        }
         paramTypeNames[name.lexeme] = _declaredTypeName(param);
       }
     }
@@ -621,6 +630,10 @@ class AvoidParameterMutationRule extends SaropaLintRule {
 
     return const <String>{};
   }
+
+  static bool _isAccumulatorTypeName(String? type) =>
+      type != null &&
+      RegExp(r'(Draft|Builder|Accumulator|Collector|Buffer)$').hasMatch(type);
 
   /// Returns the simple name of a parameter's declared type, or null when it
   /// has no explicit annotation. Unwraps optional/default parameters.
@@ -2580,6 +2593,12 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     if (decl.initializer != null &&
         _containsAwait(decl.initializer!) &&
         _isDirectTryBodyWithHandler(declStatement)) {
+      return false;
+    }
+
+    // An awaited initializer is an ordered side effect (e.g. a DB write);
+    // relocating it past sibling statements reorders those effects.
+    if (decl.initializer != null && _containsAwait(decl.initializer!)) {
       return false;
     }
 

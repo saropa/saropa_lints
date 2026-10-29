@@ -297,3 +297,15 @@ int _syncInitializerInTryStillFlagged(int seed) {
     return -1;
   }
 }
+
+Future<int> _write(String t) async => 1;
+
+// GOOD: awaited write initializer in a closure block; reordering the writes
+// would change behavior.
+Future<int> Function() _awaitedWriteInitializerNotFlagged = () async {
+  final int deleted = await _write('a');
+  await _write('b');
+  await _write('c');
+  await _write('d');
+  return deleted;
+};

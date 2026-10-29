@@ -388,7 +388,8 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
       bool implementsObject = false;
       if (implementsClause != null) {
         for (final NamedType type in implementsClause.interfaces) {
-          if (type.name.lexeme == 'Object') {
+          if (type.name.lexeme == 'Object' ||
+              _isNonNullableInterface(type.type)) {
             implementsObject = true;
             break;
           }
@@ -400,6 +401,20 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
         reporter.atToken(primaryCtor.typeName, code);
       }
     });
+  }
+
+  /// True when [type] is an interface type that is itself a subtype of
+  /// `Object` (e.g. `List<T>`, `String`, or an extension type that in turn
+  /// implements such a type), so an extension type implementing it cannot be
+  /// implicitly nullable.
+  static bool _isNonNullableInterface(DartType? type, [int depth = 0]) {
+    if (type is! InterfaceType || depth > 8) return false;
+    if (type.nullabilitySuffix == NullabilitySuffix.question) return false;
+    final InterfaceElement element = type.element;
+    if (element is! ExtensionTypeElement) return true;
+    return element.interfaces.any(
+      (InterfaceType i) => _isNonNullableInterface(i, depth + 1),
+    );
   }
 }
 
@@ -578,6 +593,15 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
       }
       if (current is FunctionExpressionInvocation) return false;
       if (current is InstanceCreationExpression) return false;
+      // Lazy-message closure form: `debug(() => '...$x')`. Step over the
+      // closure to reach the enclosing log call.
+      if (current is ExpressionFunctionBody &&
+          current.parent is FunctionExpression &&
+          current.parent!.parent is ArgumentList) {
+        current = current.parent;
+        hops++;
+        continue;
+      }
       if (current is FunctionBody) return false;
       current = current.parent;
       hops++;
@@ -907,9 +931,36 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
       final TypeAnnotation? typeAnnotation = node.type;
 
       if (typeAnnotation is NamedType && typeAnnotation.question != null) {
+        // Tri-state: the body distinguishes `null` from the default, so the
+        // `?` carries meaning (e.g. `bool? hidden = false`, null = all).
+        if (_bodyComparesToNull(node)) return;
         reporter.atNode(typeAnnotation);
       }
     });
+  }
+
+  /// True when the enclosing function body contains `name == null` /
+  /// `name != null` (either order) for this parameter.
+  static bool _bodyComparesToNull(RegularFormalParameter node) {
+    final String? name = node.name?.lexeme;
+    if (name == null) return false;
+    final FunctionBody? body = _siblingBody(node);
+    if (body == null) return false;
+    final _NullCompareFinder finder = _NullCompareFinder(name);
+    body.accept(finder);
+    return finder.found;
+  }
+
+  static FunctionBody? _siblingBody(AstNode node) {
+    AstNode? p = node.parent;
+    while (p != null) {
+      if (p is MethodDeclaration) return p.body;
+      if (p is FunctionDeclaration) return p.functionExpression.body;
+      if (p is ConstructorDeclaration) return p.body;
+      if (p is FunctionExpression) return p.body;
+      p = p.parent;
+    }
+    return null;
   }
 
   @override
@@ -917,6 +968,26 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
     ({required CorrectionProducerContext context}) =>
         RemoveTypeQuestionFix(context: context),
   ];
+}
+
+class _NullCompareFinder extends RecursiveAstVisitor<void> {
+  _NullCompareFinder(this.name);
+  final String name;
+  bool found = false;
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    final String op = node.operator.lexeme;
+    if (op == '==' || op == '!=') {
+      final Expression l = node.leftOperand;
+      final Expression r = node.rightOperand;
+      if ((l is SimpleIdentifier && l.name == name && r is NullLiteral) ||
+          (r is SimpleIdentifier && r.name == name && l is NullLiteral)) {
+        found = true;
+      }
+    }
+    super.visitBinaryExpression(node);
+  }
 }
 
 /// Warns when calling `.toString()` on a nullable value without null check.

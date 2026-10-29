@@ -1429,6 +1429,10 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
       final DartType? targetType = node.readType;
       if (targetType == null || !targetType.isDartCoreString) return;
 
+      // A per-iteration local (declared inside the nearest enclosing loop) is
+      // re-created each pass and is not an accumulator.
+      if (isDeclaredInsideNearestLoop(node)) return;
+
       reporter.atNode(node);
     });
   }
@@ -3050,6 +3054,39 @@ class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
   }
 }
 
+/// True when the local variable written by compound assignment [node] is
+/// declared inside the nearest loop enclosing [node] — a per-iteration local
+/// that is re-created every pass, so it cannot accumulate across iterations.
+/// Shared by `avoid_string_concatenation_loop` and
+/// `avoid_memory_intensive_operations`.
+bool isDeclaredInsideNearestLoop(AssignmentExpression node) {
+  AstNode? loop = node.parent;
+  while (loop != null &&
+      loop is! ForStatement &&
+      loop is! ForElement &&
+      loop is! WhileStatement &&
+      loop is! DoStatement) {
+    loop = loop.parent;
+  }
+  if (loop == null) return false;
+
+  final Element? element = node.writeElement;
+  if (element is! LocalVariableElement) return false;
+  final int? declOffset = element.firstFragment.nameOffset;
+  if (declOffset == null) return false;
+  // A for-loop's own variable (`for (var s = ''; ...)`) is declared in the
+  // header, inside the loop node's range, but persists across iterations.
+  if (loop is ForStatement || loop is ForElement) {
+    final ForLoopParts parts = loop is ForStatement
+        ? loop.forLoopParts
+        : (loop as ForElement).forLoopParts;
+    if (parts is ForParts && declOffset < parts.rightSeparator.offset) {
+      return false;
+    }
+  }
+  return declOffset > loop.offset && declOffset < loop.end;
+}
+
 class _StringConcatVisitor extends RecursiveAstVisitor<void> {
   _StringConcatVisitor(this.reporter, this.code);
 
@@ -3061,7 +3098,8 @@ class _StringConcatVisitor extends RecursiveAstVisitor<void> {
     // Report only when += is operating on string data.
     if (node.operator.type == TokenType.PLUS_EQ &&
         _isStringLikeExpression(node.leftHandSide, fallback: true) &&
-        _isStringLikeExpression(node.rightHandSide)) {
+        _isStringLikeExpression(node.rightHandSide) &&
+        !isDeclaredInsideNearestLoop(node)) {
       reporter.atNode(node);
     }
     super.visitAssignmentExpression(node);
@@ -3326,6 +3364,18 @@ class RequireDisposePatternRule extends SaropaLintRule {
             m is ConstructorDeclaration && m.constKeyword != null,
       );
       if (hasConstConstructor) return;
+
+      // An `abstract final` / `abstract` holder of static members cannot be
+      // instantiated: there is no instance to dispose.
+      if (node.abstractKeyword != null &&
+          node.bodyMembers.every(
+            (ClassMember m) =>
+                (m is FieldDeclaration && m.isStatic) ||
+                (m is MethodDeclaration && m.isStatic) ||
+                m is ConstructorDeclaration,
+          )) {
+        return;
+      }
 
       bool hasDisposable = false;
       bool hasDisposeMethod = false;

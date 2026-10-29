@@ -103,6 +103,9 @@
 // Test fixture for: require_file_close_in_finally
 // Source: lib\src\rules\resource_management_rules.dart
 
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
@@ -134,4 +137,17 @@ void _good965() async {
   } finally {
     await sink.close();
   }
+}
+
+// GOOD: Should NOT trigger require_file_close_in_finally
+// openRead() is a Stream that closes its descriptor itself.
+Future<int> _countLines(File file) async {
+  int count = 0;
+  await for (final String _ in file
+      .openRead()
+      .transform(utf8.decoder)
+      .transform(const LineSplitter())) {
+    count++;
+  }
+  return count;
 }

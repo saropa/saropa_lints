@@ -120,3 +120,26 @@ void _good365() {
   // Remove the try-catch entirely, or add meaningful handling
   doSomething();
 }
+
+// GOOD: rethrow-only clause shields the exception from a later catch-all.
+void _goodShieldsLaterClause() {
+  try {
+    doSomething();
+  } on FormatException {
+    rethrow;
+  } on Object catch (e) {
+    print(e);
+  }
+}
+
+// BAD: later clause is unrelated, so the rethrow clause is dead code.
+void _badUnrelatedLaterClause() {
+  try {
+    doSomething();
+    // expect_lint: avoid_only_rethrow
+  } on FormatException {
+    rethrow;
+  } on StateError catch (e) {
+    print(e);
+  }
+}

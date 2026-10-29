@@ -120,3 +120,8 @@ class _good803_MyManager {
     _controller.close();
   }
 }
+
+// GOOD: abstract final static holder - no instance to dispose.
+abstract final class _good803_StaticHolder {
+  static StreamController<int>? _shared;
+}

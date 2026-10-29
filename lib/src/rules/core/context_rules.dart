@@ -311,6 +311,9 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
 
       // Await found: enter danger zone, reset any previous guard
       if (containsAwait(statement)) {
+        // `if (c) { return await x; }`: the await only runs on a path that
+        // exits, so code after the `if` is not after an async gap.
+        if (awaitConfinedToExitingBranches(statement)) continue;
         seenAwait = true;
         hasGuard = false;
         // Context in same statement as await is OK (e.g., `await foo(context)`)
@@ -573,6 +576,9 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
 
       // Await found: enter danger zone, reset any previous guard
       if (containsAwait(statement)) {
+        // `if (c) { return await x; }`: the await only runs on a path that
+        // exits, so code after the `if` is not after an async gap.
+        if (awaitConfinedToExitingBranches(statement)) continue;
         seenAwait = true;
         hasGuard = false;
         // Context in same statement as await is OK (e.g., `await foo(context)`)

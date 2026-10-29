@@ -66,6 +66,42 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.0.1-beta.3] — Unreleased
+
+This update makes the command-line setup report problems honestly instead of finishing as if everything worked. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.3/CHANGELOG.md)
+
+### Added
+
+- **VS Code extension:** one On / Off / Partly off switch for Saropa Lints, in the status bar and at the top of the sidebar. One click turns the setting and the analyzer plugin on or off together; "Partly off" says which part is off and the same click fixes it.
+- **VS Code extension:** a one-click row in the sidebar that syncs the plugin version in `analysis_options.yaml` to the version pinned in `pubspec.lock` when they differ.
+
+### Fixed
+
+- **`dart run saropa_lints:init`:** exits with a failure code when the resulting configuration has no active `plugins:` block or lists no rules, and says so plainly when the VS Code extension turned Lint integration OFF.
+- **`dart run saropa_lints:init`:** the stale-version warning now reads the version of the `saropa_lints` plugin entry only (it previously could report an unrelated `version:` such as `true`) and names the command that updates it.
+- **`dart run saropa_lints:init`:** the deprecation note no longer implies the extension will undo an OFF state that init cannot undo.
+- **VS Code extension:** the Lints Config dashboard shows "Lints are off" with a Turn on (or Fix) button instead of coverage numbers while lints are off or partly off.
+- **VS Code extension:** Re-enable In-Process Plugin now also turns the `saropaLints.enabled` setting back on, so the two can no longer disagree.
+- **`avoid_async_call_in_sync_function`, `avoid_unawaited_future`, `avoid_uncaught_future_errors`:** no longer report `Map<K, Future<V>>.remove(key)` statements.
+- **`avoid_context_across_async`, `avoid_context_after_await_in_static`:** no longer treat an `if` as an await when the await sits only in branches that always return or throw.
+- **`avoid_drift_value_null_vs_absent`:** no longer reports `Value<T?>(null)` on a nullable column.
+- **`avoid_ignoring_return_values`:** no longer reports `Never`-returning calls, or extension methods whose name contains a mutate verb word (for example `dbActivityAdd`).
+- **`avoid_implicitly_nullable_extension_types`:** no longer reports an extension type that implements a non-nullable interface.
+- **`avoid_memory_intensive_operations`, `avoid_string_concatenation_loop`:** no longer report `+=` on a String declared inside the same loop.
+- **`avoid_nullable_interpolation`:** no longer reports interpolation inside a lazy debug-log closure.
+- **`avoid_nullable_parameters_with_default_values`:** no longer reports a parameter the body compares to `null`.
+- **`avoid_only_rethrow`:** no longer reports a rethrow-only clause when a later clause in the same `try` also catches the exception.
+- **`avoid_parameter_mutation`:** no longer reports `Draft`, `Builder`, `Accumulator`, `Collector` and `Buffer` parameters in `void` functions.
+- **`avoid_string_substring`:** recognizes a length guard in a collection-for loop condition.
+- **`avoid_unbounded_cache_growth`, `require_cache_expiration`:** treat `field = null` on a Map field as invalidation (wholesale-replaced snapshot caches).
+- **`avoid_unsafe_collection_methods`:** recognizes `isNotEmpty && ....first` and `isEmpty || ....first` short-circuit guards.
+- **`move_variable_closer_to_its_usage`:** no longer reports a declaration whose initializer contains `await`.
+- **`prefer_drift_batch_operations`:** no longer reports `batch.insert` inside a batch callback or `update(...).write`.
+- **`prefer_transaction_for_batch`:** counts writes per execution path (exclusive branches) and ignores `StreamController.add` and other sinks.
+- **`require_data_encryption`:** no longer matches `card` inside `vcard`.
+- **`require_dispose_pattern`:** no longer reports abstract classes with only static members.
+- **`require_file_close_in_finally`:** no longer reports `File.openRead` (the stream closes itself).
+
 ## [17.0.1-beta.2]
 
 The latest release, `17.0.1-beta.2`, focuses entirely on refining existing rules to eliminate false positives in specific code contexts.  Key fixes include recognizing `!context.mounted` guards in static methods, allowing constant or literal interpolations in Drift SQL strings, and properly handling RegExp group matches for dynamic data parsing. It also improves checks for hooks outside build methods, platform channel declarations, and null-safe JSON accesses by better analyzing the surrounding code logic and type guards.[log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.2/CHANGELOG.md)

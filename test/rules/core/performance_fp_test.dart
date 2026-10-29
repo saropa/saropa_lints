@@ -209,5 +209,86 @@ String build(List<String> items) {
       );
       expect(codes, contains('avoid_string_concatenation_loop'));
     });
+
+    test(
+      'does NOT flag += on a per-iteration local (declared in loop)',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidStringConcatenationLoopRule(),
+          '''
+String unfold(List<String> physical) {
+  final out = <String>[];
+  var i = 0;
+  while (i < physical.length) {
+    String line = physical[i];
+    i++;
+    final StringBuffer pending = StringBuffer();
+    pending.write('x');
+    if (pending.isNotEmpty) line += pending.toString();
+    out.add(line);
+  }
+  return out.join('\\n');
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_string_concatenation_loop')));
+      },
+    );
+
+    test(
+      'STILL flags += when outer var is appended in an inner loop',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidStringConcatenationLoopRule(),
+          '''
+void f(List<String> xs) {
+  for (final x in xs) {
+    var line = x;
+    for (final y in xs) {
+      line += y;
+    }
+  }
+}
+''',
+        );
+        expect(codes, contains('avoid_string_concatenation_loop'));
+      },
+    );
+  });
+
+  group('avoid_memory_intensive_operations', () {
+    test('does NOT flag += on a per-iteration local', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMemoryIntensiveOperationsRule(),
+        '''
+void f(List<String> physical) {
+  var i = 0;
+  while (i < physical.length) {
+    String line = physical[i];
+    i++;
+    final StringBuffer pending = StringBuffer();
+    if (pending.isNotEmpty) line += pending.toString();
+  }
+}
+''',
+      );
+      expect(codes, isNot(contains('avoid_memory_intensive_operations')));
+    });
+
+    test('STILL flags accumulator declared outside the loop', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMemoryIntensiveOperationsRule(),
+        '''
+String f(List<String> xs) {
+  String s = '';
+  for (final x in xs) {
+    s += x;
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, contains('avoid_memory_intensive_operations'));
+    });
   });
 }

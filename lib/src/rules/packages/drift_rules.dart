@@ -10,6 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
 
 import '../../import_utils.dart';
@@ -1419,6 +1420,9 @@ class PreferDriftBatchOperationsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_drift_batch_operations',
     '[prefer_drift_batch_operations] Individual Drift insert() or write() '
@@ -1446,12 +1450,58 @@ class PreferDriftBatchOperationsRule extends SaropaLintRule {
       if (!_insertMethods.contains(node.methodName.name)) return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
+      // `Batch.insert` / `Batch.write` already queue into a batch, and
+      // `UpdateStatement.write` (row-specific WHERE) has no insertAll form.
+      if (_isBatchOrUpdateReceiver(node)) return;
+
       // Check if inside a loop
       if (_isInsideLoop(node)) {
         reporter.atNode(node.methodName);
       }
     });
   }
+}
+
+bool _isBatchOrUpdateReceiver(MethodInvocation node) {
+  final Expression? target = node.target;
+  if (target == null) return false;
+  final String? typeName = target.staticType?.element?.name;
+  if (typeName == 'Batch') return true;
+  if (typeName == 'UpdateStatement' && node.methodName.name == 'write') {
+    return true;
+  }
+  if (typeName != null) return false;
+
+  // Unresolved fallback: receiver is the parameter of a `batch(...)` callback,
+  // or an `update(...)` statement (possibly cascaded / parenthesized).
+  if (node.methodName.name == 'write') {
+    Expression? t = target;
+    while (t is ParenthesizedExpression) {
+      t = t.expression;
+    }
+    if (t is CascadeExpression) t = t.target;
+    if (t is MethodInvocation && t.methodName.name == 'update') return true;
+  }
+  if (target is SimpleIdentifier) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) {
+        final AstNode? args = current.parent;
+        final AstNode? call = args?.parent;
+        if (args is ArgumentList &&
+            call is MethodInvocation &&
+            call.methodName.name == 'batch' &&
+            current.parameters?.parameters.any(
+                  (FormalParameter p) => p.name?.lexeme == target.name,
+                ) ==
+                true) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+  }
+  return false;
 }
 
 bool _isInsideLoop(AstNode node) {
@@ -2795,6 +2845,9 @@ class AvoidDriftValueNullVsAbsentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_drift_value_null_vs_absent',
     '[avoid_drift_value_null_vs_absent] Value(null) used in a Drift '
@@ -2822,11 +2875,25 @@ class AvoidDriftValueNullVsAbsentRule extends SaropaLintRule {
       if (args.length != 1) return;
 
       // Check if the single argument is null literal
-      if (args.first is NullLiteral) {
+      if (args.first is NullLiteral && !_isNullableValue(node)) {
         reporter.atNode(node);
       }
     });
   }
+}
+
+/// `Value<T?>(null)` (explicit or inferred) targets a nullable column, where
+/// it is the correct way to write SQL NULL.
+bool _isNullableValue(InstanceCreationExpression node) {
+  final TypeAnnotation? explicit =
+      node.constructorName.type.typeArguments?.arguments.firstOrNull;
+  if (explicit is NamedType) return explicit.question != null;
+  final DartType? type = node.staticType;
+  if (type is InterfaceType && type.typeArguments.isNotEmpty) {
+    final DartType arg = type.typeArguments.first;
+    return arg.toString().endsWith('?');
+  }
+  return false;
 }
 
 // =============================================================================

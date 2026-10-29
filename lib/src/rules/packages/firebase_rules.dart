@@ -826,13 +826,84 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       final _DatabaseWriteCounter counter = _DatabaseWriteCounter();
       node.body.accept(counter);
-
       if (counter.hasTransaction || counter.writeCount < 3) return;
+
+      // Writes on mutually exclusive branches (each ended by return/throw)
+      // never run together: count the worst single execution path instead.
+      final _Flow flow = _flowOf(_bodyStatements(node.body));
+      if (flow.best < 3) return;
 
       reporter.atNode(node);
     });
   }
 }
+
+class _Flow {
+  const _Flow(this.best, this.cont);
+
+  /// Max writes along any path, including early exits.
+  final int best;
+
+  /// Max writes on paths that fall through to the next statement; -1 if none.
+  final int cont;
+}
+
+List<Statement> _bodyStatements(FunctionBody body) =>
+    body is BlockFunctionBody ? body.block.statements : <Statement>[];
+
+int _countWrites(AstNode? node) {
+  if (node == null) return 0;
+  final _DatabaseWriteCounter c = _DatabaseWriteCounter();
+  node.accept(c);
+  return c.writeCount;
+}
+
+_Flow _flowOf(List<Statement> statements) {
+  int acc = 0;
+  int best = 0;
+  for (final Statement stmt in statements) {
+    if (stmt is ReturnStatement ||
+        (stmt is ExpressionStatement && stmt.expression is ThrowExpression)) {
+      final int total = acc + _countWrites(stmt);
+      return _Flow(total > best ? total : best, -1);
+    }
+    final List<_Flow> branches = <_Flow>[];
+    int pre = 0;
+    if (stmt is IfStatement) {
+      pre = _countWrites(stmt.expression);
+      branches.add(_flowOf(_asList(stmt.thenStatement)));
+      branches.add(
+        stmt.elseStatement == null
+            ? const _Flow(0, 0)
+            : _flowOf(_asList(stmt.elseStatement!)),
+      );
+    } else if (stmt is Block) {
+      branches.add(_flowOf(stmt.statements));
+    } else if (stmt is TryStatement) {
+      final int fin = _countWrites(stmt.finallyBlock);
+      pre = fin;
+      branches.add(_flowOf(stmt.body.statements));
+      for (final CatchClause c in stmt.catchClauses) {
+        branches.add(_flowOf(c.body.statements));
+      }
+    } else {
+      acc += _countWrites(stmt);
+      if (acc > best) best = acc;
+      continue;
+    }
+    int next = -1;
+    for (final _Flow b in branches) {
+      if (acc + pre + b.best > best) best = acc + pre + b.best;
+      if (b.cont >= 0 && acc + pre + b.cont > next) next = acc + pre + b.cont;
+    }
+    if (next < 0) return _Flow(best, -1);
+    acc = next;
+  }
+  return _Flow(acc > best ? acc : best, acc);
+}
+
+List<Statement> _asList(Statement s) =>
+    s is Block ? s.statements : <Statement>[s];
 
 /// Walks a method body's AST to count potential database write operations,
 /// skipping known in-memory collection types to avoid false positives.
@@ -882,6 +953,15 @@ class _DatabaseWriteCounter extends RecursiveAstVisitor<void> {
     'SplayTreeSet',
     'UnmodifiableListView',
     'UnmodifiableMapView',
+    // Stream/sink types: `add` pushes an event, it is not a database write.
+    'EventSink',
+    'IOSink',
+    'Sink',
+    'StreamController',
+    'StreamSink',
+    'StringBuffer',
+    'StringSink',
+    'SynchronousStreamController',
   };
 
   @override
@@ -909,9 +989,14 @@ class _DatabaseWriteCounter extends RecursiveAstVisitor<void> {
     final String? elementName = type.element?.name;
     if (elementName == null) return; // dynamic or unresolvable
 
-    if (!_safeCollectionTypes.contains(elementName)) {
-      writeCount++;
+    if (_safeCollectionTypes.contains(elementName)) return;
+    if (type is InterfaceType &&
+        type.allSupertypes.any(
+          (InterfaceType t) => _safeCollectionTypes.contains(t.element.name),
+        )) {
+      return;
     }
+    writeCount++;
   }
 }
 

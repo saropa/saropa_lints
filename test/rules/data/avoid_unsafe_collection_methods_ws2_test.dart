@@ -98,6 +98,27 @@ void main() {
     });
   });
 
+  group('short-circuit guard (&& / ||)', () {
+    test('NO lint: `isNotEmpty && f(list.first)`', () {
+      expect(guarded('if (list.isNotEmpty && f(list.first)) {}'), isTrue);
+    });
+    test('NO lint: `final ok = list.isNotEmpty && list.first == x`', () {
+      expect(
+        guarded("final ok = list.isNotEmpty && list.first == 'x';"),
+        isTrue,
+      );
+    });
+    test('NO lint: `isEmpty || list.first == x`', () {
+      expect(guarded("if (list.isEmpty || list.first == 'x') {}"), isTrue);
+    });
+    test('LINT: guard on a different collection', () {
+      expect(guarded('if (other.isNotEmpty && f(list.first)) {}'), isFalse);
+    });
+    test('LINT: guard on the wrong side', () {
+      expect(guarded('if (f(list.first) && list.isNotEmpty) {}'), isFalse);
+    });
+  });
+
   group('LINT — genuinely unguarded (true positives preserved)', () {
     test('bare access with no guard', () {
       expect(guarded('items.last;'), isFalse);
