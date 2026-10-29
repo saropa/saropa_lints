@@ -3472,7 +3472,7 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-  /// Quick fix: auto-generate a "should [verb] ..." description prefix
+  /// Quick fix: auto-generate a "should `verb` ..." description prefix
   /// based on expect() matchers found in the test body.
   @override
   List<SaropaFixGenerator> get fixGenerators => [

@@ -1330,7 +1330,7 @@ class AvoidSubstringRule extends SaropaLintRule {
     });
   }
 
-  /// Exposed for unit tests: the pure-AST bounds-guard check used by [run].
+  /// Exposed for unit tests: the pure-AST bounds-guard check used by `run`.
   /// It operates entirely on syntax (`toSource` / AST shape) with no resolved
   /// type binding, so it is verifiable on unresolved `parseString` ASTs — the
   /// only place this rule's guard logic can be exercised, since the scan CLI
