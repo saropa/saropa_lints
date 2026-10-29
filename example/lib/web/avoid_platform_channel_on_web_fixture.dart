@@ -186,3 +186,35 @@ final Object Function() _badLazyChannel939 = () {
   // expect_lint: avoid_platform_channel_on_web
   return MethodChannel('app/lazy');
 };
+
+// Channel in a field; invocations guarded via a same-class getter.
+abstract final class _GuardedHaptics939 {
+  static const MethodChannel _channel = MethodChannel('app/haptics');
+
+  static bool get _supported => !kIsWeb && someCheck;
+
+  // GOOD: early exit through a getter containing a kIsWeb check.
+  static Future<void> tick() async {
+    if (!_supported) return;
+    await _channel.invokeMethod<void>('tick');
+  }
+
+  // GOOD: invocation inside `if (getter)`.
+  static Future<void> tock() async {
+    if (_supported) {
+      await _channel.invokeMethod<void>('tock');
+    }
+  }
+
+  // GOOD: direct kIsWeb guard.
+  static Future<void> direct() async {
+    if (kIsWeb) return;
+    await _channel.invokeMethod<void>('direct');
+  }
+
+  // BAD: unguarded invocation on a field channel.
+  static Future<void> unguarded() async {
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('x');
+  }
+}

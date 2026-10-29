@@ -68,13 +68,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [17.0.1-beta.2]
 
+The latest release, `17.0.1-beta.2`, focuses entirely on refining existing rules to eliminate false positives in specific code contexts.  Key fixes include recognizing `!context.mounted` guards in static methods, allowing constant or literal interpolations in Drift SQL strings, and properly handling RegExp group matches for dynamic data parsing. It also improves checks for hooks outside build methods, platform channel declarations, and null-safe JSON accesses by better analyzing the surrounding code logic and type guards.[log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.2/CHANGELOG.md)
+
 ### Fixed
 
 - **`avoid_context_after_await_in_static`:** no longer reports after a `!context.mounted || ...` guard.
 - **`avoid_drift_raw_sql_interpolation`:** no longer reports SQL built only from constant or literal interpolations, including loop variables over a literal list of strings.
+- **`avoid_drift_raw_sql_interpolation`:** no longer reports SQL built from a private method's parameter when every caller passes a literal.
 - **`avoid_hardcoded_credentials`:** no longer reports a short plain word assigned to a bare `token` name (for example `_unitToken = 'unit'`).
 - **`avoid_hooks_outside_build`:** no longer reports static `ClassName.useX(...)` helper calls, and only applies to files that import a hooks package.
 - **`avoid_platform_channel_on_web`:** no longer reports channel declarations in field or top-level variable initializers; calls inside closures or methods still report.
+- **`avoid_platform_channel_on_web`:** unguarded `invokeMethod`, `invokeListMethod` and `invokeMapMethod` calls on field channels are now reported; calls guarded by `kIsWeb` are skipped.
 - **`prefer_try_parse_for_dynamic_data`:** digit group lookups on a RegExp match (`match.group(1)`) are recognized, and inline `RegExp(...).firstMatch(...)` matches are checked.
 - **`require_ios_face_id_usage_description`:** no longer reports when the project root cannot be found or when Info.plist is missing, and the plist lookup now works for relative file paths.
 - **`require_null_safe_json_access`:** no longer reports casts guarded by an `is` test in a conditional, or after the key was assigned earlier in the same block.

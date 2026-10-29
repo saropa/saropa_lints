@@ -77,4 +77,4 @@ Walk up from the analyzed file to the first `pubspec.yaml` and read `ios/Runner/
 
 ## Status 2026-10-28
 
-face_id: fix attempted in 17.0.1-beta.2, root cause unconfirmed.
+face_id: fix attempted in 17.0.1-beta.2, root cause unconfirmed. Regression test added 2026-10-28; not reproducible; keep open until reporter confirms.

@@ -23,6 +23,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -115,14 +116,42 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
 
       reporter.atNode(node.constructorName, code);
     });
+
+    // Invocations on a channel held in a field / top-level variable (the
+    // declaration itself is exempt above). Channels held in locals are
+    // already reported at their construction site.
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_invokeNames.contains(node.methodName.name)) return;
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String? typeName = target.staticType?.element?.name;
+      if (typeName != 'MethodChannel' &&
+          typeName != 'EventChannel' &&
+          typeName != 'BasicMessageChannel') {
+        return;
+      }
+      if (target is SimpleIdentifier &&
+          target.element is LocalVariableElement) {
+        return;
+      }
+      if (_hasWebPlatformCheck(node)) return;
+      reporter.atNode(node.methodName, code);
+    });
   }
+
+  static const Set<String> _invokeNames = <String>{
+    'invokeMethod',
+    'invokeListMethod',
+    'invokeMapMethod',
+  };
 
   bool _hasWebPlatformCheck(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is IfStatement) {
         final String condition = current.expression.toSource();
-        if (_containsPlatformCheck(condition)) {
+        if (_containsPlatformCheck(condition) ||
+            _mentionsWebGetter(current.expression, current)) {
           return true;
         }
       }
@@ -155,11 +184,46 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
       // Only look at statements that precede the target node
       if (stmt.offset >= node.offset) break;
 
-      if (stmt is IfStatement && _isWebExitGuard(stmt)) {
+      if (stmt is IfStatement &&
+          (_isWebExitGuard(stmt) || _isGetterExitGuard(stmt))) {
         return true;
       }
     }
     return false;
+  }
+
+  /// `if (!_supported) return;` where `_supported` is a getter in the same
+  /// compilation unit whose body checks `kIsWeb`.
+  bool _isGetterExitGuard(IfStatement stmt) {
+    final Expression expr = stmt.expression;
+    if (expr is! PrefixExpression || expr.operator.type != TokenType.BANG) {
+      return false;
+    }
+    return _mentionsWebGetter(expr.operand, stmt) &&
+        _isEarlyExit(stmt.thenStatement);
+  }
+
+  /// Whether [expr] is (or contains) a bare identifier naming a getter or
+  /// field in [from]'s compilation unit whose declaration mentions `kIsWeb`.
+  bool _mentionsWebGetter(Expression expr, AstNode from) {
+    final CompilationUnit? unit = from.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return false;
+    final Set<String> names = <String>{};
+    expr.accept(_IdentCollector(names));
+    if (names.isEmpty) return false;
+    for (final AstNode n in _declarationsNamed(unit, names)) {
+      if (n.toSource().contains('kIsWeb')) return true;
+    }
+    return false;
+  }
+
+  Iterable<AstNode> _declarationsNamed(
+    CompilationUnit unit,
+    Set<String> names,
+  ) {
+    final List<AstNode> out = <AstNode>[];
+    unit.accept(_NamedDeclFinder(names, out));
+    return out;
   }
 
   /// Whether [stmt] is an if-statement that exits when running on web.
@@ -231,6 +295,32 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
     return condition.contains('kIsWeb') ||
         condition.contains('Platform.') ||
         condition.contains('defaultTargetPlatform');
+  }
+}
+
+class _IdentCollector extends RecursiveAstVisitor<void> {
+  _IdentCollector(this.names);
+  final Set<String> names;
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    names.add(node.name);
+  }
+}
+
+class _NamedDeclFinder extends RecursiveAstVisitor<void> {
+  _NamedDeclFinder(this.names, this.out);
+  final Set<String> names;
+  final List<AstNode> out;
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    if (node.isGetter && names.contains(node.name.lexeme)) out.add(node);
+    super.visitMethodDeclaration(node);
+  }
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    if (names.contains(node.name.lexeme)) out.add(node);
+    super.visitVariableDeclaration(node);
   }
 }
 

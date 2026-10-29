@@ -8,6 +8,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/source/source_range.dart';
 
@@ -1264,7 +1265,116 @@ class AvoidDriftRawSqlInterpolationRule extends SaropaLintRule {
       }
       current = current.parent;
     }
-    return false;
+    return _isLiteralOnlyPrivateParameter(expr);
+  }
+
+  /// True when [expr] names a parameter of an enclosing private method or
+  /// private top-level function, and every reference to that function in the
+  /// file is a direct call passing a plain string literal for it. Any other
+  /// reference (tear-off, non-literal argument, missing argument, no callers)
+  /// returns false so the report is kept.
+  static bool _isLiteralOnlyPrivateParameter(SimpleIdentifier expr) {
+    final FormalParameterList? params;
+    final String fnName;
+    final AstNode? owner = expr.thisOrAncestorMatching(
+      (AstNode n) => n is MethodDeclaration || n is FunctionDeclaration,
+    );
+    if (owner is MethodDeclaration) {
+      params = owner.parameters;
+      fnName = owner.name.lexeme;
+    } else if (owner is FunctionDeclaration) {
+      // Nested local functions are not tracked; top-level only.
+      if (owner.parent is! CompilationUnit) return false;
+      params = owner.functionExpression.parameters;
+      fnName = owner.name.lexeme;
+    } else {
+      return false;
+    }
+    if (params == null || !fnName.startsWith('_')) return false;
+
+    FormalParameter? target;
+    int positionalIndex = 0;
+    int targetPositional = -1;
+    for (final FormalParameter p in params.parameters) {
+      if (p.isPositional) {
+        if (p.name?.lexeme == expr.name) targetPositional = positionalIndex;
+        positionalIndex++;
+      }
+      if (p.name?.lexeme == expr.name) target = p;
+    }
+    // Field-formal / super parameters are not plain locals.
+    if (target == null ||
+        target is FieldFormalParameter ||
+        target is SuperFormalParameter) {
+      return false;
+    }
+    final bool isNamed = target.isNamed;
+
+    final CompilationUnit? unit = owner
+        ?.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return false;
+    final _CallSiteScan scan = _CallSiteScan(
+      fnName,
+      isNamed ? expr.name : null,
+      targetPositional,
+    );
+    unit.accept(scan);
+    return scan.callCount > 0 && !scan.unsafe;
+  }
+}
+
+/// Collects references to a private function and checks the argument bound to
+/// one parameter at each call site.
+class _CallSiteScan extends RecursiveAstVisitor<void> {
+  _CallSiteScan(this.fnName, this.namedParam, this.positionalIndex);
+
+  final String fnName;
+  final String? namedParam;
+  final int positionalIndex;
+  int callCount = 0;
+  bool unsafe = false;
+  final Set<SimpleIdentifier> _callNames = <SimpleIdentifier>{};
+
+  static bool _isPlainLiteral(Expression e) =>
+      e is StringLiteral && e is! StringInterpolation;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == fnName) {
+      _callNames.add(node.methodName);
+      callCount++;
+      Expression? arg;
+      final NodeList<Argument> args = node.argumentList.arguments;
+      if (namedParam != null) {
+        for (final Argument a in args) {
+          if (a is NamedArgument && a.name.lexeme == namedParam) {
+            arg = a.argumentExpression;
+          }
+        }
+      } else {
+        final List<Argument> positional = args
+            .where((Argument a) => a is! NamedArgument)
+            .toList();
+        if (positionalIndex >= 0 && positionalIndex < positional.length) {
+          arg = positional[positionalIndex].argumentExpression;
+        }
+      }
+      if (arg == null || !_isPlainLiteral(arg)) unsafe = true;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    // Any other mention of the name (tear-off, prefixed access) is unknown.
+    if (node.name == fnName &&
+        !_callNames.contains(node) &&
+        node.parent is! MethodDeclaration &&
+        node.parent is! FunctionDeclaration &&
+        node.parent is! Label) {
+      unsafe = true;
+    }
+    super.visitSimpleIdentifier(node);
   }
 }
 

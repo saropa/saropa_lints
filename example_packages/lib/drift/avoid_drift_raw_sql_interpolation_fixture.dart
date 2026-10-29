@@ -21,4 +21,31 @@ Future<void> _badInterpolation(String name) async {
   await customStatement('DROP TABLE $name');
 }
 
+// GOOD (should NOT lint): private method, every caller passes a literal.
+Future<void> _addColumn(String definition) async {
+  await customStatement('ALTER TABLE t ADD COLUMN $definition');
+}
+
+Future<void> _goodCallers() async {
+  await _addColumn('a TEXT');
+  await _addColumn('b INTEGER');
+}
+
+// BAD (should lint): one caller passes a non-literal.
+Future<void> _addMixed(String definition) async {
+  // expect_lint: avoid_drift_raw_sql_interpolation
+  await customStatement('ALTER TABLE t ADD COLUMN $definition');
+}
+
+Future<void> _mixedCallers(String input) async {
+  await _addMixed('a TEXT');
+  await _addMixed(input);
+}
+
+// BAD (should lint): public method, callers unknown.
+Future<void> addPublic(String definition) async {
+  // expect_lint: avoid_drift_raw_sql_interpolation
+  await customStatement('ALTER TABLE t ADD COLUMN $definition');
+}
+
 void main() {}

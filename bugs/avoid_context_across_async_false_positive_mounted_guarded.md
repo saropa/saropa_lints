@@ -64,4 +64,4 @@ Accept `context.mounted ? context : null` (and `context.mounted && ...`) as a gu
 
 ## Status 2026-10-28
 
-context_across_async: no code change, ternary report unconfirmed.
+context_across_async: no code change, ternary report unconfirmed. Regression test added 2026-10-28; not reproducible; keep open until reporter confirms.
