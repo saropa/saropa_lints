@@ -842,12 +842,11 @@ def _ask_remote_sync_recovery(
             Color.CYAN,
         )
     print_colored(
-        "    1) Reset local branch to remote (git reset --hard origin/"
-        f"{branch})\n"
-        "       → Discards local commit history on this branch; "
-        "uncommitted changes to tracked files may be lost.\n"
+        "    1) Abort (default). Resolve the conflict by hand, then re-run.\n"
         "    2) Continue without syncing (push may fail later)\n"
-        "    3) Abort",
+        "    3) DESTRUCTIVE: reset local branch to remote (git reset --hard "
+        f"origin/{branch})\n"
+        "       → Permanently drops local commits and uncommitted changes.",
         Color.CYAN,
     )
     try:
@@ -859,10 +858,21 @@ def _ask_remote_sync_recovery(
     if choice == "2":
         print_warning("Continuing without syncing.")
         return True
-    if choice == "3" or choice not in ("1", ""):
-        print_info("Aborting. Fix sync manually (e.g. git fetch && git reset --hard origin/main) and re-run publish.")
+    if choice != "3":
+        print_info(
+            f"Aborting. Fix sync manually (git pull --rebase origin {branch}) "
+            "and re-run publish."
+        )
         return False
-    # Choice 1: reset to remote
+    try:
+        confirm = safe_input("  Type 'reset' to discard local work: ").strip()
+    except (KeyboardInterrupt, EOFError):
+        print()
+        return False
+    if confirm != "reset":
+        print_info("Aborting.")
+        return False
+    # Choice 3: reset to remote
     print_info(f"Resetting local {branch} to origin/{branch}...")
     reset_result = safe_run(
         ["git", "reset", "--hard", f"origin/{branch}"],
@@ -937,7 +947,7 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
             )
             print_info(f"Pulling changes from origin/{branch}...")
             pull_result = safe_run(
-                ["git", "pull", "origin", branch],
+                ["git", "pull", "--rebase", "--autostash", "origin", branch],
                 cwd=project_dir,
                 capture_output=True,
                 text=True,
@@ -945,6 +955,14 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
             )
             if pull_result.returncode != 0:
                 print_error("Failed to pull changes from remote.")
+                # Leave no half-finished rebase behind; autostash is restored.
+                safe_run(
+                    ["git", "rebase", "--abort"],
+                    cwd=project_dir,
+                    capture_output=True,
+                    text=True,
+                    shell=use_shell,
+                )
                 if pull_result.stderr:
                     print_colored(pull_result.stderr, Color.RED)
                 unrelated = "unrelated histories" in (
