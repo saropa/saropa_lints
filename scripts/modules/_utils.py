@@ -618,6 +618,193 @@ def get_shell_mode() -> bool:
 # =============================================================================
 
 
+# Default ceiling for any non-test, non-build subprocess in the publish path.
+DEFAULT_TIMEOUT_S = 120
+# Generous ceilings for steps that legitimately run long.
+LONG_TIMEOUT_S = 30 * 60
+# Seconds between "still running" lines for steps with captured output.
+HEARTBEAT_S = 30
+
+
+def hardened_env(env: dict[str, str] | None = None) -> dict[str, str]:
+    """Environment that makes tools fail fast instead of prompting."""
+    merged = dict(os.environ if env is None else env)
+    merged.setdefault("GIT_TERMINAL_PROMPT", "0")
+    merged.setdefault("npm_config_yes", "true")
+    merged.setdefault("npm_config_update_notifier", "false")
+    merged.setdefault("npm_config_fund", "false")
+    merged.setdefault("npm_config_audit", "false")
+    merged.setdefault("CI_NO_PROMPT", "1")
+    merged.setdefault("PUB_ENVIRONMENT", "saropa_publish")
+    return merged
+
+
+def kill_process_tree(proc: subprocess.Popen) -> None:
+    """Kill *proc* and all its descendants (best effort)."""
+    try:
+        if is_windows():
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                capture_output=True, stdin=subprocess.DEVNULL, timeout=15,
+            )
+        else:
+            import signal
+
+            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    try:
+        proc.kill()
+    except OSError:
+        pass
+
+
+def _tail(text: str | bytes | None, n: int = 10) -> str:
+    if not text:
+        return ""
+    if isinstance(text, bytes):
+        text = text.decode("utf-8", errors="replace")
+    return "\n".join(text.strip().splitlines()[-n:])
+
+
+def _report_timeout(cmd: list[str], elapsed: float, out: str, err: str) -> str:
+    msg = (
+        f"TIMEOUT after {elapsed:.0f}s: {' '.join(map(str, cmd))}\n"
+        f"last output:\n{_tail(out)}\n{_tail(err)}"
+    )
+    print_error(msg)
+    log_write(msg)
+    return msg
+
+
+def start_watchdog(
+    proc: subprocess.Popen, timeout: float, label: str,
+    heartbeat: float = HEARTBEAT_S,
+):
+    """Kill *proc*'s tree after *timeout*s and print a heartbeat meanwhile.
+
+    For streaming Popen sites whose read loop blocks. Returns an Event; call
+    .set() when the process is done. Check ``event.timed_out`` afterwards.
+    """
+    import threading
+    import time
+
+    done = threading.Event()
+    done.timed_out = False  # type: ignore[attr-defined]
+    started = time.monotonic()
+
+    def _watch() -> None:
+        while not done.wait(heartbeat):
+            elapsed = time.monotonic() - started
+            if elapsed >= timeout:
+                done.timed_out = True  # type: ignore[attr-defined]
+                msg = f"TIMEOUT after {elapsed:.0f}s: {label}"
+                print_error(msg)
+                log_write(msg)
+                kill_process_tree(proc)
+                return
+            print_info(f"still running: {label} ({elapsed:.0f}s)")
+
+    threading.Thread(target=_watch, daemon=True).start()
+    return done
+
+
+def safe_run(
+    cmd: list[str],
+    *,
+    timeout: float | None | str = "auto",
+    tty: bool = False,
+    label: str | None = None,
+    heartbeat: float = HEARTBEAT_S,
+    **kwargs,
+) -> subprocess.CompletedProcess:
+    """Drop-in for subprocess.run that cannot hang silently.
+
+    - stdin is /dev/null unless tty=True (auth/OTP prompts), so a hidden
+      prompt fails fast.
+    - the whole process tree is killed after *timeout* seconds ("auto" picks
+      a per-command default, None = no limit, only for tty=True); on timeout returns returncode 124 with the
+      command, elapsed time and last output lines in stderr.
+    - when output is captured a "still running" line prints every
+      *heartbeat* seconds.
+    """
+    import time
+
+    if timeout == "auto":
+        timeout = _default_timeout(cmd)
+    capture = kwargs.pop("capture_output", False)
+    if capture:
+        kwargs.setdefault("stdout", subprocess.PIPE)
+        kwargs.setdefault("stderr", subprocess.PIPE)
+    if not tty:
+        kwargs.setdefault("stdin", subprocess.DEVNULL)
+    kwargs["env"] = hardened_env(kwargs.get("env"))
+    if not is_windows():
+        kwargs.setdefault("start_new_session", True)
+    kwargs.pop("check", None)
+    text_in = kwargs.pop("input", None)
+    if text_in is not None:
+        kwargs["stdin"] = subprocess.PIPE
+    if kwargs.get("text") and "encoding" not in kwargs:
+        kwargs["encoding"] = "utf-8"
+        kwargs.setdefault("errors", "replace")
+
+    name = label or " ".join(map(str, cmd))[:80]
+    started = time.monotonic()
+    proc = subprocess.Popen(cmd, **kwargs)
+    out: str | bytes | None = None
+    err: str | bytes | None = None
+    pending_input = text_in
+    while True:
+        elapsed = time.monotonic() - started
+        wait = heartbeat
+        if timeout is not None:
+            wait = max(0.1, min(heartbeat, timeout - elapsed))
+        try:
+            out, err = proc.communicate(input=pending_input, timeout=wait)
+            break
+        except subprocess.TimeoutExpired as exc:
+            pending_input = None
+            elapsed = time.monotonic() - started
+            if timeout is not None and elapsed >= timeout:
+                kill_process_tree(proc)
+                try:
+                    out, err = proc.communicate(timeout=5)
+                except (subprocess.TimeoutExpired, ValueError, OSError):
+                    out, err = exc.stdout, exc.stderr
+                msg = _report_timeout(
+                    cmd, elapsed, out if isinstance(out, (str, bytes)) else "",
+                    err if isinstance(err, (str, bytes)) else "",
+                )
+                is_text = bool(kwargs.get("text") or kwargs.get("encoding"))
+                return subprocess.CompletedProcess(
+                    cmd, 124,
+                    (out or ("" if is_text else b"")),
+                    msg if is_text else msg.encode(),
+                )
+            if capture or kwargs.get("stdout") is not None:
+                print_info(f"still running: {name} ({elapsed:.0f}s)")
+    return subprocess.CompletedProcess(cmd, proc.returncode, out, err)
+
+
+def _default_timeout(cmd: list[str]) -> float:
+    """Per-command ceiling: generous for builds/hooks/network, else 120s."""
+    head = [str(c) for c in cmd[:3]]
+    exe = Path(head[0]).name.lower().split(".")[0] if head else ""
+    if exe in ("npm", "npx", "vsce", "ovsx", "python", "python3", "flutter"):
+        return 600
+    sub = head[1] if len(head) > 1 else ""
+    if exe == "dart" and sub == "test":
+        return LONG_TIMEOUT_S
+    if exe == "dart" and sub in ("run", "pub", "analyze", "doc", "fix"):
+        return 900
+    if exe == "git" and len(head) > 1 and head[1] in (
+        "commit", "push", "pull", "fetch", "clone",
+    ):
+        return 600  # commit runs pre-commit hooks
+    return DEFAULT_TIMEOUT_S
+
+
 def run_command(
     cmd: list[str],
     cwd: Path,
@@ -626,6 +813,8 @@ def run_command(
     allow_failure: bool = False,
     summarize: bool = False,
     env: dict[str, str] | None = None,
+    timeout: float | None = None,
+    tty: bool = False,
 ) -> subprocess.CompletedProcess:
     """Run a shell command and handle errors.
 
@@ -640,6 +829,9 @@ def run_command(
             On failure: prints the last 10 lines of output.
             Full output is shown in --verbose mode on failure.
         env: Optional environment for the process. If None, inherits current env.
+        timeout: Seconds before the process tree is killed (exit 124).
+            None picks a default from the command (see _default_timeout).
+        tty: True only for steps that need the terminal (auth/OTP prompts).
 
     Returns:
         The CompletedProcess result.
@@ -654,14 +846,19 @@ def run_command(
 
     # summarize mode always captures output
     should_capture = capture_output or summarize
+    if timeout is None:
+        timeout = _default_timeout(cmd)
 
-    result = subprocess.run(
+    result = safe_run(
         cmd,
         cwd=cwd,
         capture_output=should_capture,
         text=True,
         shell=use_shell,
         env=env,
+        timeout=timeout,
+        tty=tty,
+        label=description,
         # Force UTF-8 to avoid UnicodeDecodeError on Windows,
         # where the default cp1252 can't handle all dart output bytes
         encoding="utf-8",

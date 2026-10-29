@@ -47,7 +47,7 @@ class TestDeltaUncommitted(unittest.TestCase):
             out = staged if "--cached" in cmd else head
             return subprocess.CompletedProcess(cmd, 0, stdout=out, stderr="")
 
-        with mock.patch.object(ps.subprocess, "run", side_effect=fake_run), \
+        with mock.patch.object(ps, "safe_run", side_effect=fake_run), \
                 mock.patch.dict(ps.os.environ, {"SAROPA_FULL_TESTS": ""}):
             return ps._find_delta_test_files(root)
 

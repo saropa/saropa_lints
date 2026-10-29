@@ -45,6 +45,7 @@ class StorePublicationResult(NamedTuple):
 
 from scripts.modules._utils import (
     extension_version_for,
+    safe_input,
     is_prerelease_version,
     print_colored,
     print_error,
@@ -274,7 +275,7 @@ def _prompt_locale_coverage_failure() -> str:
     print_colored("  [I]gnore and continue (ship with missing translations)", Color.CYAN)
     print_colored("  [A]bort (stop publish)", Color.CYAN)
     try:
-        raw = input("  Choice [R/i/a]: ").strip().lower() or "r"
+        raw = safe_input("  Choice [R/i/a]: ").strip().lower() or "r"
         if raw.startswith("i"):
             return "ignore"
         if raw.startswith("a"):
