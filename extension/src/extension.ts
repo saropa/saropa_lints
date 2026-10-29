@@ -3419,10 +3419,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   }, 3_000);
 
   // Background upgrade check — runs asynchronously, fails silently.
-  // Only checks when saropa_lints is already in the project and extension is enabled.
+  // Runs even when Lint integration is Off (saropaLints.enabled=false): that is
+  // exactly when an outdated dependency goes unnoticed. Besides reading files, it shows a
+  // status bar item and an upgrade prompt; that is intended when integration is Off.
   // Start-up detection supersedes the old lock-only toast: it covers pubspec,
   // plugin-only and both routes with one prompt (compat/startupController.ts).
-  if (isDartProject && enabled && root) {
+  if (isDartProject && root) {
     registerStartupDetection(context, (m) => console.log(m));
   }
 

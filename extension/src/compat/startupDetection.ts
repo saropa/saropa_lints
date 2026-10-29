@@ -2,7 +2,7 @@
  * Pure start-up detection: which route a project uses (pubspec, plugin, both,
  * neither), whether a newer applicable saropa_lints exists for it, and the
  * single prompt that offers the migration. Decision 20 of
- * plans/PLAN_analyzer_12_to_13_14_upgrade.md.
+ * plans/history/2026.10/2026.10.28/PLAN_analyzer_12_to_13_14_upgrade.md.
  *
  * No vscode, fs or network here: facts and the version list are injected. The
  * pub solver is never run (cheap filters only, via `recommend` without a prober).
