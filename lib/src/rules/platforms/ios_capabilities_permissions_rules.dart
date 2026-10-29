@@ -740,8 +740,11 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
     final filePath = context.filePath;
     final plistChecker = InfoPlistChecker.forFile(filePath);
 
-    // Skip if NSFaceIDUsageDescription is already in Info.plist.
-    if (plistChecker?.hasKey('NSFaceIDUsageDescription') ?? false) {
+    // Skip when the key is present, or when the plist cannot be located at all
+    // (no project root found): the key cannot be verified, so do not report.
+    // A located project with no Info.plist also reports present (hasKey).
+    if (plistChecker == null ||
+        plistChecker.hasKey('NSFaceIDUsageDescription')) {
       return;
     }
 

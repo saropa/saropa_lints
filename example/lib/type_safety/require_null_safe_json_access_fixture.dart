@@ -129,3 +129,27 @@ void _good1247() {
   final nameValue = json['name'];
   if (nameValue is String) {}
 }
+
+// GOOD: cast guarded by an `is` test in a conditional expression
+bool? _goodGuardedCast(Map<String, dynamic> decoded) {
+  return decoded['show_years'] is bool ? decoded['show_years'] as bool : null;
+}
+
+// GOOD: key assigned earlier in the same block
+void _goodAssignedKey(Map<dynamic, dynamic> trimmed, Map<dynamic, dynamic> a) {
+  trimmed['android'] = Map<dynamic, dynamic>.of(a);
+  (trimmed['android'] as Map<dynamic, dynamic>)['identifiers'] = 1;
+}
+
+// BAD: `is` test checks a different type than the cast
+int _badMismatchedIs(Map<String, dynamic> decoded) {
+  // expect_lint: require_null_safe_json_access
+  return decoded['n'] is String ? decoded['n'] as int : 0;
+}
+
+// BAD: key assigned null earlier, so the cast fails
+void _badNullAssigned(Map<String, dynamic> m) {
+  m['k'] = null;
+  // expect_lint: require_null_safe_json_access
+  final int v = m['k'] as int;
+}

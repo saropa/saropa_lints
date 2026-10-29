@@ -98,6 +98,18 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
         return;
       }
 
+      // A channel field declaration is harmless on web: only invocations
+      // throw, and those are typically guarded elsewhere.
+      // Constructions inside a closure or method body nested in the
+      // initializer still execute at runtime, so they are not exempt.
+      if (node.thisOrAncestorOfType<FunctionBody>() == null &&
+          node.thisOrAncestorOfType<FunctionExpression>() == null &&
+          (node.thisOrAncestorOfType<FieldDeclaration>() != null ||
+              node.thisOrAncestorOfType<TopLevelVariableDeclaration>() !=
+                  null)) {
+        return;
+      }
+
       // Check if wrapped in platform check
       if (_hasWebPlatformCheck(node)) return;
 

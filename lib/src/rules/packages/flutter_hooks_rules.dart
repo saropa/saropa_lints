@@ -77,11 +77,41 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
       // Check if it's a hook function (use + PascalCase, e.g., useState, useEffect)
       if (!_isHookFunction(methodName)) return;
 
+      // `ClassName.useX(...)` is a static member call, never a hook.
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier &&
+          target.name.isNotEmpty &&
+          target.name.replaceFirst(RegExp(r'^_+'), '').isNotEmpty &&
+          _isUpperStart(target.name.replaceFirst(RegExp(r'^_+'), ''))) {
+        return;
+      }
+
+      // Hooks only exist when the file imports flutter_hooks (or a
+      // package built on it, e.g. hooks_riverpod).
+      final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
+      if (unit != null &&
+          !unit.directives.whereType<ImportDirective>().any(
+            (ImportDirective d) => _isHooksPackage(d.uri.stringValue ?? ''),
+          )) {
+        return;
+      }
+
       // Check if we're inside a build method
       if (!_isInsideBuildMethod(node)) {
         reporter.atNode(node);
       }
     });
+  }
+
+  static bool _isUpperStart(String name) => name[0] != name[0].toLowerCase();
+
+  /// flutter_hooks, hooks_riverpod and similar (`*_hooks`, `hooks_*`),
+  /// but not e.g. `webhooks`.
+  static bool _isHooksPackage(String uri) {
+    final String path = uri.startsWith('package:')
+        ? uri.substring(8).split('/').first
+        : uri;
+    return RegExp(r'(^|_)hooks($|_)').hasMatch(path);
   }
 
   bool _isInsideBuildMethod(AstNode node) {

@@ -122,7 +122,7 @@ class InfoPlistChecker {
   /// `dart:`) so callers can safely skip project-root discovery.
   static String? _toFilesystemPath(String filePath) {
     final trimmed = filePath.trim();
-    if (!trimmed.contains(':')) return trimmed;
+    if (!trimmed.contains(':')) return _absolutize(trimmed);
     if (RegExp(r'^[A-Za-z]:[\\/]').hasMatch(trimmed)) return trimmed;
     try {
       final uri = Uri.parse(trimmed);
@@ -140,6 +140,19 @@ class InfoPlistChecker {
       );
     }
     return trimmed;
+  }
+
+  /// Resolves a relative path against the current directory so project-root
+  /// discovery can walk up from it (relative paths never start with `/`).
+  static String _absolutize(String path) {
+    if (path.isEmpty || path.startsWith('/') || path.startsWith('\\')) {
+      return path;
+    }
+    try {
+      return File(path).absolute.path;
+    } catch (_) {
+      return path;
+    }
   }
 
   /// Finds the project root directory by looking for pubspec.yaml.

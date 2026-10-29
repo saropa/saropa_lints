@@ -1420,8 +1420,50 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
       // Check if inside null check conditional
       if (_hasNullCheckGuard(node)) return;
 
+      // `m['k'] is T ? m['k'] as T : x` — the `is` test guards the cast.
+      if (_isGuardedByConditional(node, expression.toSource())) return;
+
+      // `m['k'] = v;` earlier in the same block — key is known present.
+      if (_isKeyAssignedEarlier(node, expression.toSource())) return;
+
       reporter.atNode(node);
     });
+  }
+
+  bool _isGuardedByConditional(AsExpression node, String indexSource) {
+    AstNode child = node;
+    AstNode? current = node.parent;
+    while (current != null && current is! Statement) {
+      if (current is ConditionalExpression &&
+          identical(current.thenExpression, child) &&
+          RegExp(
+            '${RegExp.escape(indexSource)} is '
+            '${RegExp.escape(node.type.toSource())}(?![\\w?])',
+          ).hasMatch(current.condition.toSource())) {
+        return true;
+      }
+      child = current;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _isKeyAssignedEarlier(AsExpression node, String indexSource) {
+    final Statement? statement = node.thisOrAncestorOfType<Statement>();
+    final AstNode? block = statement?.parent;
+    if (statement == null || block is! Block) return false;
+    for (final Statement prior in block.statements) {
+      if (identical(prior, statement)) break;
+      if (prior is! ExpressionStatement) continue;
+      final Expression e = prior.expression;
+      if (e is AssignmentExpression &&
+          e.operator.lexeme == '=' &&
+          e.leftHandSide.toSource() == indexSource &&
+          e.rightHandSide is! NullLiteral) {
+        return true;
+      }
+    }
+    return false;
   }
 
   bool _hasNullCheckGuard(AstNode node) {

@@ -504,6 +504,16 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  /// True for names that denote a size, not an IV value (`ivLength`,
+  /// `ivSize`, `ivLengthBytes`). Plain `ivBytes`/`nonceBytes` are values.
+  static bool _isIvSizeName(String lowerName) =>
+      lowerName.endsWith('length') ||
+      lowerName.endsWith('size') ||
+      lowerName.endsWith('lengthbytes') ||
+      lowerName.endsWith('sizebytes');
+
+  static bool _isIntInitializer(Expression? init) => init is IntegerLiteral;
+
   /// Checks if a variable name indicates an IV/nonce variable.
   /// Avoids false positives like "activity", "private", "derivative".
   static bool _isIvVariableName(String originalName) {
@@ -576,6 +586,10 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.fields.variables) {
         final String originalName = variable.name.lexeme;
         final String lowerName = originalName.toLowerCase();
+        if (_isIvSizeName(lowerName) ||
+            _isIntInitializer(variable.initializer)) {
+          continue;
+        }
         final bool hasIvName =
             lowerName == 'iv' ||
             lowerName == 'nonce' ||
@@ -600,6 +614,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
       final String originalName = node.name.lexeme;
       final String lowerName = originalName.toLowerCase();
+      if (_isIvSizeName(lowerName) || _isIntInitializer(node.initializer)) {
+        return;
+      }
       if (lowerName == 'iv' ||
           lowerName == 'nonce' ||
           _isIvVariableName(originalName)) {

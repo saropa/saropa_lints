@@ -743,6 +743,15 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
       }
     }
 
+    // `cond || !context.mounted` / `!context.mounted || cond`: for an
+    // early-exit `if (X) return;` the fall-through proves !X, so any
+    // not-mounted operand of the `||` proves mounted. (`||` is NOT valid for
+    // the positive form, which is why this lives only on the negated side.)
+    if (expr is BinaryExpression && expr.operator.type == TokenType.BAR_BAR) {
+      return _checksNotContextMounted(expr.leftOperand, contextParamNames) ||
+          _checksNotContextMounted(expr.rightOperand, contextParamNames);
+    }
+
     return false;
   }
 

@@ -485,6 +485,26 @@ class MountedCallbackPattern {
   }
 }
 
+// GOOD: `|| !context.mounted` early exit and mounted ternary in static methods
+class GoodStaticMountedGuards {
+  static Future<bool> preFlight(BuildContext context) async {
+    final bool ok = await Future.value(true);
+    if (!context.mounted || !ok) return false;
+    return Future.value(true) == null ? false : _next(context);
+  }
+
+  static Future<bool> run(BuildContext context) async {
+    try {
+      return await Future.value(true);
+    } on Object catch (e) {
+      someHelper(context: context.mounted ? context : null);
+      return false;
+    }
+  }
+
+  static bool _next(BuildContext context) => true;
+}
+
 // GOOD: Use context BEFORE await (no lint triggered)
 class GoodContextBeforeAwait {
   static Future<void> captureTheme(BuildContext context) async {

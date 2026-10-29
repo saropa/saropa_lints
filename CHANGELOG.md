@@ -66,6 +66,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.0.1-beta.2]
+
+### Fixed
+
+- **`avoid_context_after_await_in_static`:** no longer reports after a `!context.mounted || ...` guard.
+- **`avoid_drift_raw_sql_interpolation`:** no longer reports SQL built only from constant or literal interpolations, including loop variables over a literal list of strings.
+- **`avoid_hardcoded_credentials`:** no longer reports a short plain word assigned to a bare `token` name (for example `_unitToken = 'unit'`).
+- **`avoid_hooks_outside_build`:** no longer reports static `ClassName.useX(...)` helper calls, and only applies to files that import a hooks package.
+- **`avoid_platform_channel_on_web`:** no longer reports channel declarations in field or top-level variable initializers; calls inside closures or methods still report.
+- **`prefer_try_parse_for_dynamic_data`:** digit group lookups on a RegExp match (`match.group(1)`) are recognized, and inline `RegExp(...).firstMatch(...)` matches are checked.
+- **`require_ios_face_id_usage_description`:** no longer reports when the project root cannot be found or when Info.plist is missing, and the plist lookup now works for relative file paths.
+- **`require_null_safe_json_access`:** no longer reports casts guarded by an `is` test in a conditional, or after the key was assigned earlier in the same block.
+- **`require_unique_iv_per_encryption`:** no longer reports IV size constants (`ivLength`, `ivSize`, and similar) or whose initializer is an integer literal.
+
 ## [17.0.1-beta.1]
 
 This beta focuses heavily on optimizing the VS Code extension's performance and improving the reliability of its Language Server Protocol (LSP) controls. Key updates include a smarter workspace hazard scan that automatically flags massive files or crowded directories for `watcherExclude`—now with built-in coverage for heavy Android and iOS build outputs—to protect extension host memory. It also overhauls the Health Panel's LSP management so server toggles work predictably without infinite spawn loops, and ensures critical upgrade prompts and detailed status tooltips remain visible even when lint integration is temporarily disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.1/CHANGELOG.md)

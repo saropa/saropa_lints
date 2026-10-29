@@ -403,7 +403,8 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
         expression.methodName.name == 'group' &&
         expression.target is SimpleIdentifier &&
         expression.argumentList.arguments.length == 1) {
-      final Argument groupArg = expression.argumentList.arguments.first;
+      final Expression groupArg =
+          expression.argumentList.arguments.first.argumentExpression;
       if (groupArg is IntegerLiteral) {
         final int? groupIndex = groupArg.value;
         if (groupIndex != null && groupIndex > 0) {
@@ -522,6 +523,16 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
         if (methodName == 'firstMatch' && initializer is MethodInvocation) {
           if (initializer.methodName.name != 'firstMatch') return null;
           final Expression? target = initializer.target;
+          // Inline `RegExp(r'...').firstMatch(x)`.
+          if (target is InstanceCreationExpression &&
+              target.constructorName.type.name.lexeme == 'RegExp') {
+            return _extractPatternFromRegExpArgs(target.argumentList.arguments);
+          }
+          if (target is MethodInvocation &&
+              target.target == null &&
+              target.methodName.name == 'RegExp') {
+            return _extractPatternFromRegExpArgs(target.argumentList.arguments);
+          }
           if (target is! SimpleIdentifier) return null;
           final String regExpName = target.name;
           return _findRegexPatternForVariable(

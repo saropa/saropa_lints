@@ -39,3 +39,11 @@ void goodRegexGuardedSubstring(String password) {
     }
   }
 }
+
+int goodInlineRegexDigitGroups(String trimmed) {
+  final RegExpMatch? m = RegExp(r'^--(\d{2})-?(\d{2})$').firstMatch(trimmed);
+  if (m == null) return 0;
+  final int month = int.parse(m.group(1)!);
+  final int day = int.parse(m.group(2)!);
+  return month * 100 + day;
+}

@@ -223,6 +223,9 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
     'clientSecret',
   };
 
+  /// Short plain word (letters only), not secret-shaped.
+  static final RegExp _plainWord = RegExp(r'^[A-Za-z]{1,16}$');
+
   // Patterns that look like real credentials
   // Note: Bearer/Basic tokens should be a single base64-like token without spaces
   static final RegExp _credentialPatterns = RegExp(
@@ -238,17 +241,22 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
       final String varName = node.name.lexeme.toLowerCase();
 
       // Check if variable name suggests credentials
-      final bool isCredentialName = _credentialNames.any(
-        (String pattern) => varName.contains(pattern),
-      );
+      final List<String> matched = _credentialNames
+          .where((String pattern) => varName.contains(pattern.toLowerCase()))
+          .toList();
 
-      if (!isCredentialName) return;
+      if (matched.isEmpty) return;
+      // A bare "token" in the name is ambiguous (linguistic/lexer token, e.g.
+      // `_unitToken = 'unit'`); only specific names (authToken, apiKey, ...)
+      // imply a secret.
+      final bool onlyBareToken = matched.every((String m) => m == 'token');
 
       // Check if it's assigned a string literal
       final Expression? initializer = node.initializer;
       if (initializer is StringLiteral) {
         final String? value = initializer.stringValue;
         if (value != null && value.isNotEmpty && value.length > 3) {
+          if (onlyBareToken && _plainWord.hasMatch(value)) return;
           reporter.atNode(node);
         }
       }

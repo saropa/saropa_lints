@@ -8,6 +8,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/source/source_range.dart';
 
 import '../../import_utils.dart';
@@ -1207,6 +1208,14 @@ class AvoidDriftRawSqlInterpolationRule extends SaropaLintRule {
 
       // Check for string interpolation
       if (firstArg is StringInterpolation) {
+        // Skip when every interpolated value is compile-time constant or a
+        // for-each variable over a literal list of plain strings: no
+        // external input can reach the SQL.
+        if (firstArg.elements.whereType<InterpolationExpression>().every(
+          (InterpolationExpression e) => _isConstantOrigin(e.expression),
+        )) {
+          return;
+        }
         reporter.atNode(firstArg);
         return;
       }
@@ -1216,6 +1225,46 @@ class AvoidDriftRawSqlInterpolationRule extends SaropaLintRule {
         reporter.atNode(firstArg);
       }
     });
+  }
+
+  static bool _isConstantOrigin(Expression expr) {
+    if (expr is StringLiteral) {
+      return expr is! StringInterpolation ||
+          expr.elements.whereType<InterpolationExpression>().every(
+            (InterpolationExpression e) => _isConstantOrigin(e.expression),
+          );
+    }
+    if (expr is ParenthesizedExpression) {
+      return _isConstantOrigin(expr.expression);
+    }
+    if (expr is! SimpleIdentifier) return false;
+
+    final Object? element = expr.element;
+    if (element is VariableElement && element.isConst) return true;
+
+    // Loop variable of `for (final x in <String>['a', 'b'])`.
+    AstNode? current = expr.parent;
+    while (current != null) {
+      if (current is ForStatement) {
+        final ForLoopParts parts = current.forLoopParts;
+        if (parts is ForEachPartsWithDeclaration &&
+            parts.loopVariable.name.lexeme == expr.name) {
+          final Expression iterable = parts.iterable;
+          final List<CollectionElement>? items = iterable is ListLiteral
+              ? iterable.elements
+              : iterable is SetOrMapLiteral && iterable.isSet
+              ? iterable.elements
+              : null;
+          return items != null &&
+              items.every(
+                (CollectionElement e) =>
+                    e is StringLiteral && e is! StringInterpolation,
+              );
+        }
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 

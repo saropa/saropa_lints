@@ -172,3 +172,17 @@ void _good_6939() async {
   final platform = MethodChannel('my_channel');
   final result = await platform.invokeMethod('getData');
 }
+
+// GOOD: Channel declared as a field; only invocations are web-sensitive.
+abstract final class _Haptics939 {
+  static const MethodChannel _channel = MethodChannel('app/haptics');
+}
+
+// GOOD: Top-level channel declaration.
+const MethodChannel _topChannel939 = MethodChannel('app/top');
+
+// BAD: Channel built inside a closure nested in a field initializer.
+final Object Function() _badLazyChannel939 = () {
+  // expect_lint: avoid_platform_channel_on_web
+  return MethodChannel('app/lazy');
+};
