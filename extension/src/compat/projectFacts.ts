@@ -2,7 +2,7 @@
  * Read-only facts about a target project, gathered from files on disk only
  * (no network, no process spawn except the optional Flutter SDK lookup that
  * `deriveSdkPinsOrNull` already performs). Slice A of the extension
- * compatibility design in plans/PLAN_analyzer_12_to_13_14_upgrade.md.
+ * compatibility design in plans/history/2026.10/2026.10.28/PLAN_analyzer_12_to_13_14_upgrade.md.
  *
  * Every field is optional/absent when its source is missing or unparseable;
  * a reader never throws.

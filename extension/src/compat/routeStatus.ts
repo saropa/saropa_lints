@@ -1,6 +1,6 @@
 /**
  * Pure text for the persistent, quiet route status (start-up detection,
- * decision 20 of plans/PLAN_analyzer_12_to_13_14_upgrade.md): which route the
+ * decision 20 of plans/history/2026.10/2026.10.28/PLAN_analyzer_12_to_13_14_upgrade.md): which route the
  * project uses, what that gives, in plain words. No vscode here.
  */
 import type { Installed, RouteState, Translate } from './startupDetection';

@@ -1,7 +1,7 @@
 /**
  * Pure recommendation: which saropa_lints constraint and plugin version suit
  * a project, from its facts, the published versions and (optionally) the pub
- * solver. Slice E of plans/PLAN_analyzer_12_to_13_14_upgrade.md (decision 12).
+ * solver. Slice E of plans/history/2026.10/2026.10.28/PLAN_analyzer_12_to_13_14_upgrade.md (decision 12).
  *
  * Never hard-codes a version. Cheap filters (Dart SDK, `meta` pin) run first;
  * the solver then probes the newest survivor, falling back one major at a

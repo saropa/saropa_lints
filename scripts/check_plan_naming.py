@@ -18,7 +18,7 @@ from pathlib import Path
 PLANS_DIR = Path('plans')
 
 # PLAN_<name>.md, case-sensitive prefix — matches the convention used by
-# plans/PLAN_analyzer_12_to_13_14_upgrade.md and similar phased-checklist plans.
+# other phased-checklist plans under plans/.
 _PLAN_NAME = re.compile(r'^PLAN_.+\.md$')
 
 

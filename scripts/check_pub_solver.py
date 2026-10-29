@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pub solver test for plans/PLAN_analyzer_12_to_13_14_upgrade.md section 12 items 2-3.
+"""Pub solver test for plans/history/2026.10/2026.10.28/PLAN_analyzer_12_to_13_14_upgrade.md section 12 items 2-3.
 
 Creates scratch projects and asserts how `dart pub` resolves saropa_lints:
   1. analyzer held at 12: `dart pub add saropa_lints` resolves to a 16.x release.

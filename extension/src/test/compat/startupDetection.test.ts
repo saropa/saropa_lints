@@ -48,6 +48,16 @@ describe('computeStartup', () => {
     assert.strictEqual(r.offer?.offered, '17.0.0');
     assert.strictEqual(r.offer?.route, 'dependency');
   });
+  it('offers 17.0.0 when the plugin block is disabled (commented out) and the dependency is ^16 on analyzer 12', async () => {
+    const f = facts({
+      inPubspec: true, lock: '16.10.0', pluginVersion: '16.10.0', pluginBlockDisabled: true,
+      locked: { saropaLints: { version: '16.10.0', source: 'hosted' }, analyzer: '12.1.0' },
+    });
+    const r = await computeStartup(f, versions);
+    assert.strictEqual(r.state, 'pubspecOnly');
+    assert.strictEqual(r.offer?.offered, '17.0.0');
+    assert.strictEqual(r.offer?.installed.pubspec, '16.10.0');
+  });
   it('offers to a plugin-only project using the plugin version', async () => {
     const r = await computeStartup(facts({ pluginVersion: '16.10.0' }), versions);
     assert.strictEqual(r.offer?.offered, '17.0.0');
