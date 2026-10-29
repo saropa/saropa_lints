@@ -75,9 +75,36 @@ describe('lints on/off switch', () => {
     assert.deepStrictEqual(computeLintsSwitchState(true, 'live'), { kind: 'on' });
     assert.deepStrictEqual(computeLintsSwitchState(false, 'disabled'), { kind: 'off' });
     assert.deepStrictEqual(computeLintsSwitchState(false, 'absent'), { kind: 'off' });
-    assert.deepStrictEqual(computeLintsSwitchState(true, 'disabled'), { kind: 'partial', off: 'plugin' });
+    assert.deepStrictEqual(computeLintsSwitchState(true, 'disabled', true), { kind: 'partial', off: 'plugin' });
     assert.deepStrictEqual(computeLintsSwitchState(true, 'absent'), { kind: 'partial', off: 'plugin' });
     assert.deepStrictEqual(computeLintsSwitchState(false, 'live'), { kind: 'partial', off: 'setting' });
+  });
+
+  it('default new project (sentinel block, no ownership) is On, not Partly off', () => {
+    fs.writeFileSync(options, LIVE);
+    disablePluginsIntegration(tmp); // sentinel block, no ownership record
+    setTestConfig('saropaLints', 'enabled', true);
+    assert.deepStrictEqual(getLintsSwitchState(tmp), { kind: 'on' });
+    assert.deepStrictEqual(computeLintsSwitchState(true, 'disabled'), { kind: 'on' });
+  });
+
+  it('extension-disabled block is Partly off; both off is Off', async () => {
+    fs.writeFileSync(options, LIVE);
+    await runDisable(fakeContext()); // sets ownership sidecar + setting false
+    setTestConfig('saropaLints', 'enabled', true);
+    assert.deepStrictEqual(getLintsSwitchState(tmp), { kind: 'partial', off: 'plugin' });
+    setTestConfig('saropaLints', 'enabled', false);
+    assert.deepStrictEqual(getLintsSwitchState(tmp), { kind: 'off' });
+  });
+
+  it('turning On from the default state sets the setting without loading the plugin', async () => {
+    fs.writeFileSync(options, LIVE);
+    disablePluginsIntegration(tmp);
+    setTestConfig('saropaLints', 'enabled', false);
+    configUpdates.length = 0;
+    await toggleLints(fakeContext());
+    assert.ok(configUpdates.some((u) => u.key === 'enabled' && u.value === true));
+    assert.ok(!/^plugins:/m.test(fs.readFileSync(options, 'utf-8')));
   });
 
   it('says Off in words when both switches are off (the silent case)', () => {
@@ -107,16 +134,17 @@ describe('lints on/off switch', () => {
 
   it('toggle from Partly off turns both on; from On turns both off', async () => {
     fs.writeFileSync(options, LIVE);
-    disablePluginsIntegration(tmp);
+    const ctx = fakeContext();
+    await runDisable(ctx);
     setTestConfig('saropaLints', 'enabled', true); // partly off: plugin
     configUpdates.length = 0;
-    await toggleLints(fakeContext());
+    await toggleLints(ctx);
     assert.ok(configUpdates.some((u) => u.key === 'enabled' && u.value === true));
     assert.ok(/^plugins:/m.test(fs.readFileSync(options, 'utf-8')));
 
     setTestConfig('saropaLints', 'enabled', true); // now On
     configUpdates.length = 0;
-    await toggleLints(fakeContext());
+    await toggleLints(ctx);
     assert.ok(configUpdates.some((u) => u.key === 'enabled' && u.value === false));
     assert.ok(!/^plugins:/m.test(fs.readFileSync(options, 'utf-8')));
   });

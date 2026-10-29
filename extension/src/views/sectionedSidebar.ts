@@ -1173,8 +1173,10 @@ export function updateSidebarSectionContext(workspaceState: vscode.Memento): voi
         void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', false);
         return;
     }
-    // The banner view hosts the on/off switch, so it shows for every Dart project.
-    const needsBanner = true;
+    // The banner view hosts the Set Up row (no dependency) and the on/off
+    // switch row, which only shows for projects using saropa_lints and only
+    // when the switch is not fully On.
+    const needsBanner = !hasSaropaLintsDep(root) || getLintsSwitchState(root).kind !== 'on';
     void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', needsBanner);
     // Cache invalidation moved to prepareRefreshCycle — called once at the
     // top of refreshAllSections instead of per-provider and per-context-update.

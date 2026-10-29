@@ -72,8 +72,8 @@ This update makes the command-line setup report problems honestly instead of fin
 
 ### Added
 
-- **VS Code extension:** one On / Off / Partly off switch for Saropa Lints, in the status bar and at the top of the sidebar. One click turns the setting and the analyzer plugin on or off together; "Partly off" says which part is off and the same click fixes it.
-- **VS Code extension:** a one-click row in the sidebar that syncs the plugin version in `analysis_options.yaml` to the version pinned in `pubspec.lock` when they differ.
+- **VS Code extension:** one On / Off / Partly off switch for Saropa Lints, in the status bar and at the top of the sidebar. One click turns it on or off. "On" means the setting is on and the analyzer plugin block is live or was never turned off by the extension (a new project's default daemon-only block counts as On, and turning On from there does not load the heavy plugin). "Partly off" shows only when the extension itself turned the block off or the setting and block otherwise disagree; it says which part is off and the same click fixes it.
+- **VS Code extension:** a version-sync row in the sidebar that, in one click, syncs the plugin version in `analysis_options.yaml` to the version pinned in `pubspec.lock` when they differ.
 
 ### Fixed
 

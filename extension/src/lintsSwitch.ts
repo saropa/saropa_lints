@@ -5,10 +5,14 @@
  *   - the `saropaLints.enabled` setting (scan-on-save delivery), and
  *   - the live `plugins: saropa_lints:` block in analysis_options.yaml (the
  *     in-process analyzer plugin).
- * "On" means BOTH are on (the full live plugin). "Off" means both are off.
- * Anything else is "Partly off" and names the part that is off. The plugin
- * ownership record (plugin_ownership.json) is internal bookkeeping and plays no
- * part here. Pure state logic is exported separately so it is unit-testable.
+ * "On" means the setting is on AND the plugin block is live OR was never turned
+ * off by the extension: a new project's default sentinel-wrapped block is
+ * deliberate daemon-only delivery (the in-process plugin costs several GB), so
+ * with no ownership record it counts as On and turning On must not load it.
+ * "Partly off" shows only when the extension itself turned the block off
+ * (ownership record present) or the setting and block otherwise disagree.
+ * "Off" means both are off. Pure state logic is exported separately so it is
+ * unit-testable.
  */
 
 import * as vscode from 'vscode';
@@ -17,6 +21,8 @@ import * as path from 'node:path';
 import { getProjectRoot } from './projectRoot';
 import {
   getPluginsIntegrationState,
+  readPluginOwnershipFile,
+  wasPluginDisabledByExtension,
   runDisable,
   runReenablePlugin,
   type PluginsIntegrationState,
@@ -30,21 +36,29 @@ export type LintsSwitchState =
   | { kind: 'off' }
   | { kind: 'partial'; off: 'setting' | 'plugin' };
 
-/** Combine the setting and the plugins block into one state. A missing block counts as plugin off. */
+/**
+ * Combine the setting, the plugins block and the ownership record into one
+ * state. A sentinel-disabled block the extension did not turn off (default
+ * daemon-only) counts as plugin on; a missing block counts as plugin off.
+ */
 export function computeLintsSwitchState(
   enabledSetting: boolean,
   block: PluginsIntegrationState,
+  disabledByExtension = false,
 ): LintsSwitchState {
-  const pluginOn = block === 'live';
+  const pluginOn = block === 'live' || (block === 'disabled' && !disabledByExtension);
   if (enabledSetting && pluginOn) return { kind: 'on' };
   if (!enabledSetting && !pluginOn) return { kind: 'off' };
+  // Setting off with a default (daemon-only) block is the plain Off case.
+  if (!enabledSetting && block === 'disabled') return { kind: 'off' };
   return { kind: 'partial', off: enabledSetting ? 'plugin' : 'setting' };
 }
 
-/** Read the live state for a project root. */
-export function getLintsSwitchState(root: string): LintsSwitchState {
+/** Read the live state for a project root (context adds the workspace memento to the ownership check). */
+export function getLintsSwitchState(root: string, context?: vscode.ExtensionContext): LintsSwitchState {
   const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
-  return computeLintsSwitchState(enabled, getPluginsIntegrationState(root));
+  const owned = context ? wasPluginDisabledByExtension(context, root) : readPluginOwnershipFile(root);
+  return computeLintsSwitchState(enabled, getPluginsIntegrationState(root), owned);
 }
 
 /** Short label ("Saropa Lints: Partly off") for the status bar and sidebar. */
@@ -131,10 +145,20 @@ export function syncPluginVersionToPinned(root: string): PluginVersionDrift | nu
  */
 export async function turnLintsOn(context: vscode.ExtensionContext): Promise<void> {
   const root = getProjectRoot();
-  await runReenablePlugin(context);
-  if (!root) return;
-  if (getPluginsIntegrationState(root) !== 'live') {
-    await vscode.commands.executeCommand('saropaLints.enable');
+  if (!root) {
+    await runReenablePlugin(context); // reports the no-workspace error
+    return;
+  }
+  const block = getPluginsIntegrationState(root);
+  if (block === 'disabled' && !wasPluginDisabledByExtension(context, root)) {
+    // Default daemon-only block: only the setting is on the switch. Do not
+    // restore the block, which would load the heavy in-process plugin.
+    await vscode.workspace.getConfiguration('saropaLints').update('enabled', true, vscode.ConfigurationTarget.Workspace);
+  } else {
+    await runReenablePlugin(context);
+    if (getPluginsIntegrationState(root) !== 'live') {
+      await vscode.commands.executeCommand('saropaLints.enable');
+    }
   }
   await syncVersionWithMessage(root);
 }
@@ -154,7 +178,7 @@ export async function toggleLints(context: vscode.ExtensionContext): Promise<voi
     await runReenablePlugin(context); // reports the no-workspace error
     return;
   }
-  if (getLintsSwitchState(root).kind === 'on') {
+  if (getLintsSwitchState(root, context).kind === 'on') {
     await runDisable(context);
   } else {
     await turnLintsOn(context);

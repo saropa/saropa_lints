@@ -1,6 +1,6 @@
 # PROPOSAL: One obvious on/off switch for Saropa Lints in the VS Code extension
 
-**Status: Open**
+**Status: Fixed pending owner verification** (switch state, sidebar banner, dashboard off banner, version-sync row, init exit code and version regex). Still open: Unverified toggle repro and pack-detection mismatch.
 
 Created: 2026-10-29
 Type: Tooling / Infrastructure (extension UX)
@@ -8,6 +8,8 @@ Engine: extension-native (`extension/src/`)
 Found in: extension 17.0.11, package 17.0.0 (project pinned to 17.0.1-beta.2 afterward)
 
 **Owner decisions (2026-10-29):** treat as a bug report; fix all issues. The single switch controls the full live plugin and `saropaLints.enabled` follows it. Ownership record stays internal.
+
+**Owner decision (2026-10-29), On definition:** "On" = setting `saropaLints.enabled` true AND the plugin block is live OR was never turned off by the extension (default new-project sentinel-wrapped block, no ownership memento = daemon-only = On). "Partly off" shows only when the extension itself turned the block off (ownership memento present) or the setting and block otherwise disagree in a non-default way. Turning On from the default state must NOT load the heavy plugin.
 
 **Review notes:** defect 5 root cause is `lib/src/init/preflight.dart:165` (regex matches the first `version:` anywhere). `pluginDivergencePrompt.ts` already exists but is silent when both switches are off. Fix split: Dart (`lib/`) and extension (`extension/`).
 

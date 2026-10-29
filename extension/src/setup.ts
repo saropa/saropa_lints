@@ -1021,7 +1021,7 @@ function pluginOwnershipFilePath(root: string): string {
 }
 
 /** True when the durable sidecar claims our Disable owns this root's off state. */
-function readPluginOwnershipFile(root: string): boolean {
+export function readPluginOwnershipFile(root: string): boolean {
   try {
     const file = pluginOwnershipFilePath(root);
     if (!fs.existsSync(file)) return false;
