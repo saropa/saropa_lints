@@ -78,6 +78,7 @@ TODO [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
 
 ### Fixed
 
+- **Extension:** the status bar "N workspace issue(s)" item now lists each issue in its tooltip (large unexcluded files, missing watcher exclusions, extension host memory). Before, the tooltip showed only process stats, so the red dot gave no hint of the cause.
 - **Extension:** the Health Panel "LSP Server" ON toggle no longer does nothing. The setting defaults to true, so clicking ON while the server was stopped (failed start, or after Kill All) rewrote the same value, fired no change event, and started nothing. The toggle now starts or stops the server directly, and the Health Panel refreshes. A failed start now shows an error message with the reason instead of only logging to the output channel.
 - **Extension:** Health Panel "Kill All" and "Restart All" buttons now name their target ("Kill All LSP Server", "Restart LSP Server").
 - **Extension:** the `saropaLints.lspServer.start` command and Health Panel "Restart All" no longer start the LSP server when `saropaLints.lspServer.enabled` is off; the start command now offers an Enable button. No action required.
