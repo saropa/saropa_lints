@@ -348,7 +348,7 @@ def run_extension_package(project_dir: Path, version: str) -> Path | None:
     for old_vsix in project_dir.glob("*.vsix"):
         old_vsix.unlink()
 
-    package_cmd = ["npx", "@vscode/vsce", "package", "--no-dependencies",
+    package_cmd = ["npx", "--yes", "@vscode/vsce", "package", "--no-dependencies",
                    "--out", str(out_path)]
     if is_prerelease_version(version):
         # vsce rejects a prerelease-suffixed version unless --pre-release
@@ -479,7 +479,7 @@ def _has_stored_vsce_credential(publisher: str) -> bool:
         return False
     # verify-pat queries the gallery; it does not package, so cwd is irrelevant.
     r = run_command(
-        ["npx", "@vscode/vsce", "verify-pat", publisher],
+        ["npx", "--yes", "@vscode/vsce", "verify-pat", publisher],
         Path.cwd(),
         "Check stored VS Code Marketplace credential",
         capture_output=True,
@@ -511,6 +511,7 @@ def publish_extension_to_marketplace(
     ext_dir = _extension_dir(project_dir)
     publish_cmd = [
         "npx",
+        "--yes",
         "@vscode/vsce",
         "publish",
         "--packagePath",
@@ -593,7 +594,7 @@ def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path, version: str) 
             print_info("Skipping Open VSX publish.")
             return True
     ext_dir = _extension_dir(project_dir)
-    ovsx_cmd = ["npx", "ovsx", "publish", str(vsix_path), "-p", ovsx_pat]
+    ovsx_cmd = ["npx", "--yes", "ovsx", "publish", str(vsix_path), "-p", ovsx_pat]
     if is_prerelease_version(version):
         ovsx_cmd.append("--pre-release")
     r = run_command(
