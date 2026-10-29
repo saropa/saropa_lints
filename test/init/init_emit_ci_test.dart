@@ -193,24 +193,19 @@ void main() {
     }
   });
 
-  test(
-    'an unwritable location is reported, not thrown',
-    () {
-      final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
-      try {
-        Process.runSync('chmod', ['555', dir.path]);
-        final outFile = File('${dir.path}/.github/workflows/saropa-lints.yml');
-        expect(
-          emitCiWorkflow(outFile, dryRun: false),
-          EmitCiResult.writeFailed,
-        );
-      } finally {
-        Process.runSync('chmod', ['755', dir.path]);
-        safeDeleteDir(dir);
-      }
-    },
-    skip: Platform.isWindows ? 'chmod is POSIX-only' : false,
-  );
+  test('an unwritable location is reported, not thrown', () {
+    // chmod is POSIX-only; nothing to assert on Windows.
+    if (Platform.isWindows) return;
+    final dir = Directory.systemTemp.createTempSync('saropa_emit_ci_');
+    try {
+      Process.runSync('chmod', ['555', dir.path]);
+      final outFile = File('${dir.path}/.github/workflows/saropa-lints.yml');
+      expect(emitCiWorkflow(outFile, dryRun: false), EmitCiResult.writeFailed);
+    } finally {
+      Process.runSync('chmod', ['755', dir.path]);
+      safeDeleteDir(dir);
+    }
+  });
 
   test('buildCiWorkflow emits a tier only when asked for one', () {
     // A project that configures saropa_lints gets no tier: naming one here

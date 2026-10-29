@@ -66,6 +66,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **Extension:** the "zero rules enabled" modal no longer reopens in a loop after clicking "Set Up Project". If setup does not fix the config, a single non-modal warning is shown instead.
+- **Tests:** the unwritable-location test in `init_emit_ci_test.dart` no longer uses `skip:` (flagged by `avoid_skipped_tests`). It returns early on Windows instead.
+
 ## [17.0.0]
 
 Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 projects on the frozen 16.x line. [log](https://github.com/saropa/saropa_lints/blob/v17.0.0/CHANGELOG.md)
