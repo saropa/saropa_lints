@@ -20,3 +20,7 @@
 
 1. **Translations (decision 2026-10-28).** 124 strings across 24 locales are untranslated (`debug.ci.publish.pubspecHasOtherEdits`, `compat.recommend.*`, `compat.card.*`, `compat.apply.*`, `command.configureCompatibility.title` in `package.nls.<locale>.json`). `localeParity.test.js` keeps failing (npm test exit 48). Owner has no GPU, cannot run the translation pipeline, and chose to move past it. English sources: `extension/src/i18n/locales/en.json`, `extension/package.nls.json`.
 2. **Never exercised:** extension `HealthPanel` flow (needs a live VS Code host); scan CLI after `init`; first run of the light/full rule lane in an isolate with a custom `projectRoot`.
+
+## Decision 2026-10-28: 17.0.0 retraction
+
+17.0.0 was published to pub.dev as stable (2026-10-29 00:30 UTC, tag v17.0.0) but was meant to be a beta. Owner decided: retract 17.0.0 on pub.dev (allowed for 7 days after publish) and continue with 17.0.1-beta.1.
