@@ -17,6 +17,7 @@ import * as path from 'path';
 import { l10n } from '../i18n/runtime';
 import { formatBytes } from './processQuery';
 import { isCovered, mergeWatcherExcludes } from './watcherExcludeHelpers';
+import { getProjectRoot } from '../projectRoot';
 
 /** Known hazard patterns (heap dumps, crash logs) trigger at this bar. */
 const HAZARD_THRESHOLD = 50 * 1024 * 1024;
@@ -37,8 +38,13 @@ const MAX_DEPTH = 8;
 /** Directories always skipped — huge, irrelevant, or tracked elsewhere. */
 const ALWAYS_SKIP: ReadonlySet<string> = new Set([
   'build', '.dart_tool', 'node_modules', '.git', 'reports', 'blobs',
-  '.gradle', 'pods', 'deriveddata',
+  '.gradle', 'pods', 'deriveddata', '.venv',
 ]);
+
+/** True for `.claude/worktrees` — agent copies of the repo, not workspace content. */
+function isAgentWorktreesDir(parent: string, name: string): boolean {
+  return name.toLowerCase() === 'worktrees' && path.basename(parent).toLowerCase() === '.claude';
+}
 
 /** Known hazard name matchers — files matching these use the lower 50 MB bar. */
 const KNOWN_HAZARDS: ReadonlyArray<(name: string) => boolean> = [
@@ -111,6 +117,7 @@ async function collectHazards(
   for (const entry of entries) {
     if (entry.isDirectory()) {
       if (ALWAYS_SKIP.has(entry.name.toLowerCase())) continue;
+      if (isAgentWorktreesDir(dir, entry.name)) continue;
       subDirs.push(
         collectHazards(path.join(dir, entry.name), root, depth + 1, limits),
       );
@@ -214,6 +221,9 @@ export function getLastUncoveredHazards(): HazardFile[] | undefined {
 async function computeUncoveredHazards(): Promise<HazardFile[]> {
   const cfg = vscode.workspace.getConfiguration('saropaLints.systemHealth');
   if (!cfg.get<boolean>('workspaceHazardScan', true)) return [];
+  // The watcher-crash hazards this scan targets are Dart/Flutter tooling output;
+  // other workspaces (web, Python) only produced false alarms on media assets.
+  if (getProjectRoot() === undefined) return [];
 
   const folder = vscode.workspace.workspaceFolders?.[0];
   if (!folder) return [];

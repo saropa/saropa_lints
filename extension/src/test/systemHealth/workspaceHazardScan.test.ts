@@ -17,6 +17,7 @@ import {
   mockWorkspaceFolders,
   setTestConfig,
 } from '../vibrancy/vscode-mock';
+import { invalidateProjectRoot } from '../../projectRoot';
 
 function write(root: string, rel: string, bytes: number): void {
   const p = path.join(root, rel);
@@ -47,11 +48,14 @@ describe('getUncoveredHazards', () => {
   beforeEach(() => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), 'hazard-'));
     mockWorkspaceFolders.value = [{ uri: { fsPath: root } }];
+    invalidateProjectRoot();
+    fs.writeFileSync(path.join(root, 'pubspec.yaml'), 'name: x\n');
   });
   afterEach(() => {
     clearTestConfig();
     mockWorkspaceFolders.value = undefined;
     fs.rmSync(root, { recursive: true, force: true });
+    invalidateProjectRoot();
   });
 
   it('flags files above maxFileKb and ignores smaller ones', async () => {
@@ -67,6 +71,28 @@ describe('getUncoveredHazards', () => {
     write(root, '.gradle/a.bin', 4096);
     write(root, 'ios/Pods/a.bin', 4096);
     write(root, 'DerivedData/a.bin', 4096);
+    assert.deepStrictEqual(await getUncoveredHazards(), []);
+  });
+
+  it('skips .claude/worktrees and .venv directories', async () => {
+    setTestConfig('saropaLints.watcherExclude', 'maxFileKb', 1);
+    write(root, '.claude/worktrees/agent-1/big.bin', 4096);
+    write(root, 'scripts/.venv/lib/big.bin', 4096);
+    write(root, '.venv/big.bin', 4096);
+    assert.deepStrictEqual(await getUncoveredHazards(), []);
+  });
+
+  it('still scans other .claude subfolders', async () => {
+    setTestConfig('saropaLints.watcherExclude', 'maxFileKb', 1);
+    write(root, '.claude/other/big.bin', 4096);
+    assert.deepStrictEqual((await getUncoveredHazards()).map((f) => f.relative), ['.claude/other/big.bin']);
+  });
+
+  it('does not scan a non-Dart workspace (no pubspec.yaml)', async () => {
+    fs.rmSync(path.join(root, 'pubspec.yaml'));
+    invalidateProjectRoot();
+    setTestConfig('saropaLints.watcherExclude', 'maxFileKb', 1);
+    write(root, 'media/clip.mp4', 4096);
     assert.deepStrictEqual(await getUncoveredHazards(), []);
   });
 
