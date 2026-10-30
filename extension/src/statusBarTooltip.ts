@@ -272,7 +272,7 @@ export interface StatusBarInput {
 
 const REPORT_CMD = 'saropaLints.openViolationsWideReport';
 const VIBRANCY_CMD = 'saropaLints.openProjectVibrancyReport';
-const TOGGLE_CMD = 'saropaLints.toggleLints';
+const HEALTH_CMD = 'saropaLints.showProcessHealth';
 const COMPAT_CMD = 'saropaLints.configureCompatibility';
 
 /** One diagnosis per state — the "not set up" case is the same message whichever source noticed it. */
@@ -290,8 +290,9 @@ export function buildStatusBarModel(input: StatusBarInput): StatusBarModel {
   const fix: TooltipLink | undefined = input.kind === 'on'
     ? undefined
     : {
-        label: l10n(notSetUp ? T + 'fix.setUp' : T + 'fix.turnOn'),
-        commandId: TOGGLE_CMD,
+        // Opens the webview with the toggles; a click here never flips lints.
+        label: l10n(notSetUp ? T + 'fix.setUp' : 'statusBar.menu.openProcessHealth'),
+        commandId: HEALTH_CMD,
         title: l10n(T + 'fix.title'),
       };
 
@@ -428,7 +429,7 @@ export function renderStatusBarTooltip(model: StatusBarModel): string {
   }
 
   out.push(`#### ${l10n(T + 'section.actions')}`);
-  for (const group of ['toggle', 'report', 'utility'] as const) {
+  for (const group of ['report', 'utility'] as const) {
     const links = model.actions
       .filter((a) => a.group === group)
       .map((a) => linkMd(`${a.icon} ${escapeMd(l10n(a.labelKey))}`, a.commandId));

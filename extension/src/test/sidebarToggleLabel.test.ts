@@ -50,12 +50,11 @@ describe('buildStatusBarMenuItems', () => {
         });
     }
 
-    it('toggle row label follows the real state (never "enabled" while partly off)', () => {
-        assert.strictEqual(buildStatusBarMenuItems('on')[0].labelKey, 'statusBar.tooltip.action.turnOff');
-        assert.strictEqual(buildStatusBarMenuItems('off')[0].labelKey, 'statusBar.tooltip.action.turnOn');
-        assert.strictEqual(buildStatusBarMenuItems('partial')[0].labelKey, 'statusBar.tooltip.action.turnBothOn');
+    it('no row toggles lints; Process Health opens the toggles', () => {
         for (const kind of ['on', 'off', 'partial'] as const) {
-            assert.strictEqual(buildStatusBarMenuItems(kind)[0].commandId, 'saropaLints.toggleLints');
+            const ids = buildStatusBarMenuItems(kind).map((item) => item.commandId);
+            assert.ok(!ids.includes('saropaLints.toggleLints'));
+            assert.ok(ids.includes('saropaLints.showProcessHealth'));
         }
     });
 });

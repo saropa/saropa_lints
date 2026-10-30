@@ -18,8 +18,8 @@ export interface StatusBarMenuItem {
   readonly labelKey: string;
   /** Command id the row executes. Must appear in {@link STATUS_BAR_TRUSTED_COMMANDS}. */
   readonly commandId: string;
-  /** Tooltip grouping: toggle first, then reports, then utility links. */
-  readonly group: 'toggle' | 'report' | 'utility';
+  /** Tooltip grouping: reports first, then utility links. */
+  readonly group: 'report' | 'utility';
 }
 
 /**
@@ -33,7 +33,6 @@ export interface StatusBarMenuItem {
  * this list (or vice versa).
  */
 export const STATUS_BAR_TRUSTED_COMMANDS: readonly string[] = [
-  'saropaLints.toggleLints',
   'saropaLints.openViolationsWideReport',
   'saropaLints.openProjectVibrancyReport',
   'saropaLints.showProcessHealth',
@@ -44,20 +43,12 @@ export const STATUS_BAR_TRUSTED_COMMANDS: readonly string[] = [
 ];
 
 /**
- * Rows for the status bar action menu, in render order. The first row is the
- * switch toggle; its label follows the real state (never "enabled" while
- * partly off). `toggleLints` turns everything off from On and everything on
- * from Off or Partly off.
+ * Rows for the status bar action menu, in render order. No row turns lints on
+ * or off: a single click never changes the switch. The Process Health row
+ * opens the webview that holds the toggles.
  */
-export function buildStatusBarMenuItems(kind: StatusBarSwitchKind): readonly StatusBarMenuItem[] {
-  const toggle: StatusBarMenuItem =
-    kind === 'on'
-      ? { icon: '$(circle-slash)', labelKey: 'statusBar.tooltip.action.turnOff', commandId: 'saropaLints.toggleLints', group: 'toggle' }
-      : kind === 'off'
-        ? { icon: '$(play)', labelKey: 'statusBar.tooltip.action.turnOn', commandId: 'saropaLints.toggleLints', group: 'toggle' }
-        : { icon: '$(play)', labelKey: 'statusBar.tooltip.action.turnBothOn', commandId: 'saropaLints.toggleLints', group: 'toggle' };
+export function buildStatusBarMenuItems(_kind: StatusBarSwitchKind): readonly StatusBarMenuItem[] {
   return [
-    toggle,
     { icon: '$(checklist)', labelKey: 'statusBar.menu.openViolations', commandId: 'saropaLints.openViolationsWideReport', group: 'report' },
     { icon: '$(package)', labelKey: 'statusBar.menu.openPackageDashboard', commandId: 'saropaLints.openProjectVibrancyReport', group: 'report' },
     { icon: '$(pulse)', labelKey: 'statusBar.menu.openProcessHealth', commandId: 'saropaLints.showProcessHealth', group: 'report' },

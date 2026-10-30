@@ -72,6 +72,7 @@ The "large files not excluded from the file watcher" warning no longer appears i
 
 ### Changed
 
+- **Lints switch (extension):** a single click on the sidebar switch row, or on the status bar tooltip link and menu, no longer turns lints on or off. They open Process Health, which holds the toggles. The `Saropa Lints: Toggle` command and the Lints Config dashboard button are unchanged.
 - **Lints switch (extension):** the status bar and sidebar showed "Partly off" when every engine was off but the Scan on Save toggle in Process Health had only suspended the scan daemon. A suspended daemon now counts as the setting being off, so the switch shows "Off".
 - **Large-file watcher warning (extension):** the message now names the open folder, says the listed paths are relative to it, shows at most 3 files with sizes or file counts plus "and N more", and explains that VS Code watches every file in the folder for changes and large files can slow it down or crash it. The "Exclude from Watcher" button is unchanged.
 - **Status bar hover (extension):** the tooltip is now laid out in sections (Status, Project, Problems, Memory, Actions) with tables, colored pills with hover text, and one link per action. Findings read "18,368 findings (all errors)" or "N errors · M warnings", long numbers have thousands separators, each problem names itself with its own link, and the memory detail is unchanged but tabulated. The toggle label follows the real state, and the two conflicting "not set up" messages are now one.

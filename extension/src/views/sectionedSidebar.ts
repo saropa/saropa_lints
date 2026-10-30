@@ -339,7 +339,7 @@ function buildBannerItems(): LeafItem[] {
     const items = [new LeafItem(
         lintsSwitchLabel(state),
         lintsSwitchDetail(state),
-        'saropaLints.toggleLints',
+        'saropaLints.showProcessHealth',
         state.kind === 'on' ? 'check' : 'warning',
         state.kind === 'on' ? undefined : new vscode.ThemeColor('list.warningForeground'),
     )];

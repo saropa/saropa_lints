@@ -80,10 +80,10 @@ describe('buildStatusBarModel / renderStatusBarTooltip', () => {
       ...base, kind: 'partial', partialOff: 'plugin', label: 'Saropa Lints: Partly off',
     }));
     assert.ok(!partial.includes('Analysis enabled'));
-    assert.ok(partial.includes('Turn both on'));
-    assert.ok(partial.includes('Fix: turn both on'));
+    assert.ok(!partial.includes('command:saropaLints.toggleLints'));
+    assert.ok(partial.includes('command:saropaLints.showProcessHealth'));
     const on = renderStatusBarTooltip(buildStatusBarModel(base));
-    assert.ok(on.includes('Turn Lints off'));
+    assert.ok(!on.includes('command:saropaLints.toggleLints'));
     assert.ok(!on.includes('Fix:'));
   });
 
@@ -135,13 +135,12 @@ describe('buildStatusBarModel / renderStatusBarTooltip', () => {
 });
 
 describe('buildStatusBarQuickPickItems', () => {
-  it('has the status, problems and action rows, with the toggle as a row', () => {
+  it('has the status, problems and action rows, and no toggle row', () => {
     const model = buildStatusBarModel({
       ...base, kind: 'partial', partialOff: 'plugin', readinessIssues: ['Heap dump'],
     });
     const rows = buildStatusBarQuickPickItems(model);
-    const toggles = rows.filter((r) => r.commandId === 'saropaLints.toggleLints');
-    assert.strictEqual(toggles.length, 2); // the Fix row and the toggle row
+    assert.ok(rows.every((r) => r.commandId !== 'saropaLints.toggleLints'));
     assert.ok(rows.some((r) => r.separator && r.label === 'Problems'));
     assert.ok(rows.some((r) => r.label.includes('Heap dump') && r.commandId === 'saropaLints.showWorkspaceReadiness'));
     assert.ok(rows.some((r) => r.commandId === 'saropaLints.showAbout'));
