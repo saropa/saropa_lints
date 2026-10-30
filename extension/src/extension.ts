@@ -41,6 +41,7 @@ import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
 import { surfacePluginDivergence } from './pluginDivergencePrompt';
 import {
   getLintsSwitchState,
+  type LintsSwitchState,
   initLintsSwitch,
   lintsSwitchDetail,
   lintsSwitchLabel,
@@ -165,8 +166,8 @@ import {
 } from './driftAdvisor/driftAdvisorUiState';
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
 import { forceUpgradeCheck } from './upgrade-checker';
-import { registerStartupDetection } from './compat/startupController';
-import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
+import { getRouteStatus, onRouteStatusChange, registerStartupDetection } from './compat/startupController';
+import { buildUnifiedStatusText, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor, RssTrend, systemHealthStatusBarText } from './systemHealth/processMonitor';
@@ -1178,21 +1179,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   context.subscriptions.push(statusBarItem);
 
-  // The single Saropa Lints On / Off / Partly off switch. Separate from the
-  // score item so one click flips setting + plugin together (see lintsSwitch.ts).
-  const switchStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 101);
-  switchStatusBarItem.command = 'saropaLints.toggleLints';
-  context.subscriptions.push(switchStatusBarItem);
+  // One status bar item: switch state + score in the text; route, memory,
+  // workspace issues and details go in the tooltip. Click flips the switch.
+  statusBarItem.command = 'saropaLints.toggleLints';
 
-  // Dedicated memory/system-health item, separate from the lint-score item
-  // above. Previously this state was crammed as a text suffix onto the main
-  // item (e.g. "90% ▲2 · V4/10 · ⚠ 4.2G"), which both read as clutter and
-  // had no click target of its own — the main item's command always opened
-  // the violations report, so clicking a memory warning never led anywhere
-  // memory-related. Hidden entirely when there is nothing to report.
-  const memoryStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
-  memoryStatusBarItem.command = 'saropaLints.showProcessHealth';
-  context.subscriptions.push(memoryStatusBarItem);
+  // Memory / system-health / workspace-readiness state, computed by
+  // updateMemoryStatusBar and rendered into the single item (tooltip lines,
+  // plus a warning background when it is a problem). Undefined = nothing to report.
+  let memoryStatus: { text: string; tooltipLines: string[]; background: vscode.ThemeColor | undefined } | undefined;
 
   // System health snapshot pushed from the process monitor.
   let systemHealthSnapshot: DartProcessSnapshot | null = null;
@@ -1252,11 +1246,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   };
 
   /**
-   * Drive the dedicated memory/system-health status bar item. Hidden when
-   * there is nothing to report — plugin-level memory pressure takes
-   * priority over aggregate process RSS (matches the old suffix priority).
-   * Clicking always opens the System Health panel (the memory breakdown
-   * page), which the old crammed-in text suffix never linked to.
+   * Compute the memory/system-health state for the single status bar item
+   * (stored in `memoryStatus`; undefined when there is nothing to report).
+   * Plugin-level memory pressure takes priority over aggregate process RSS.
    */
   /**
    * Build per-process tooltip lines from a snapshot. Three sections:
@@ -1438,18 +1430,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       tooltipLines.push(...cachedReadinessLines);
     }
 
-    if (!text) {
-      memoryStatusBarItem.hide();
-      return;
-    }
-    memoryStatusBarItem.text = `$(pulse) ${text}`;
-    memoryStatusBarItem.tooltip = [
-      l10n('systemHealth.panel.title'),
-      ...tooltipLines,
-      l10n('systemHealth.statusBar.openHint'),
-    ].join('\n');
-    memoryStatusBarItem.backgroundColor = memoryStatusBarBackground(memPressureSuffix !== undefined);
-    memoryStatusBarItem.show();
+    memoryStatus = text
+      ? { text, tooltipLines, background: memoryStatusBarBackground(memPressureSuffix !== undefined) }
+      : undefined;
   };
 
   /** Build tooltip lines for the status bar (version, tier, score, vibrancy details). */
@@ -1482,9 +1465,33 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     return base;
   }
 
-  // Renders the status bar content when analysis is enabled — extracted from
-  // the main status bar update to keep each function under the 50-line limit.
+  // Renders the one status bar item. Text = switch state + score; everything
+  // else (route, memory, workspace issues, details) is tooltip. Warning
+  // background when the switch is not On or memory/workspace needs attention.
+  function renderStatusBar(
+    state: LintsSwitchState,
+    scoreParts: Array<string | undefined>,
+    badgeSuffix: string,
+    detailLines: string[],
+  ): void {
+    const icon = state.kind === 'on' ? '$(checklist)' : '$(warning)';
+    statusBarItem.text = `${icon} ${buildUnifiedStatusText(lintsSwitchLabel(state), scoreParts)}${badgeSuffix}`;
+    const lines = [lintsSwitchDetail(state), ...detailLines];
+    const route = getRouteStatus();
+    if (route) lines.push(route.tooltip);
+    if (memoryStatus) lines.push(memoryStatus.text, ...memoryStatus.tooltipLines);
+    statusBarItem.tooltip = buildStatusBarTooltipMarkdown(lines, state.kind !== 'off');
+    statusBarItem.backgroundColor = state.kind === 'on'
+      ? memoryStatus?.background
+      : new vscode.ThemeColor('statusBarItem.warningBackground');
+    statusBarItem.command = 'saropaLints.toggleLints';
+    statusBarItem.show();
+  }
+
+  // Score parts and detail lines for the enabled state (extracted to keep
+  // each function under the 50-line limit).
   function updateEnabledStatusBar(
+    state: LintsSwitchState,
     preloadedData: ViolationsData | undefined,
     root: string | undefined,
     tier: string,
@@ -1497,71 +1504,26 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const health = data ? computeHealthScore(data) : null;
     // Finding count folded into this single item (was a separate ⚠ entry).
     const badge = findingsBadge(data);
-    const badgeSuffix = badge?.suffix ?? '';
 
-    // Memory/system-health state now renders in its own status bar item
-    // (updateMemoryStatusBar) rather than as a text suffix here.
     updateMemoryStatusBar();
 
+    let healthPart: string | undefined;
     if (health) {
-      const history = loadHistory(context.workspaceState);
-      const prevScore = findPreviousScore(history);
+      const prevScore = findPreviousScore(loadHistory(context.workspaceState));
       const delta = prevScore === undefined ? '' : ` ${formatScoreDelta(health.score, prevScore)}`;
-      const detailLabel = buildStatusBarLabel({
-        hasHealth: true,
-        healthScore: health.score,
-        delta,
-        tier,
-        showVibrancy,
-        vibrancyLabel,
-      });
-      statusBarItem.text = `$(checklist) Saropa: ${detailLabel}${badgeSuffix}`;
-      statusBarItem.backgroundColor = undefined;
-    } else {
-      statusBarItem.text = `$(checklist) ${buildStatusBarLabel({
-        hasHealth: false,
-        tier,
-        showVibrancy,
-        vibrancyLabel,
-      })}${badgeSuffix}`;
-      statusBarItem.backgroundColor = undefined;
+      healthPart = `${health.score}%${delta}`;
     }
     // "Score pending": we have a report but it covers too little of the
     // project to score (partial IDE sweep) — surface a hint, not a blank.
     const scorePending = health === null && data !== null && isReportTooPartial(data);
-    const tooltipLines = buildStatusBarTooltipLines(
-      tier,
-      health,
-      showVibrancy,
-      vibrancyLabel,
-      scorePending,
-    );
+    const tooltipLines = buildStatusBarTooltipLines(tier, health, showVibrancy, vibrancyLabel, scorePending);
     if (badge) tooltipLines.push(badge.tooltip);
-    // Memory/system-health detail moved to its own status bar item
-    // (updateMemoryStatusBar) — no longer duplicated in this tooltip.
-    // Rich tooltip: clickable action menu (toggle + report/panel shortcuts)
-    // instead of plain read-only text — mirrors saropa-log-capture's
-    // status bar menu tooltip pattern.
-    statusBarItem.tooltip = buildStatusBarTooltipMarkdown(tooltipLines, true);
-    statusBarItem.command = 'saropaLints.openViolationsWideReport';
-  }
-
-  // Render the On / Off / Partly off switch from the computed state. Off and
-  // Partly off use the warning background so "not running" is never silent.
-  function updateSwitchStatusBar(): void {
-    const switchRoot = getProjectRoot();
-    if (!switchRoot) {
-      switchStatusBarItem.hide();
-      return;
-    }
-    const state = getLintsSwitchState(switchRoot);
-    const icon = state.kind === 'on' ? '$(check)' : '$(warning)';
-    switchStatusBarItem.text = `${icon} ${lintsSwitchLabel(state)}`;
-    switchStatusBarItem.tooltip = lintsSwitchDetail(state);
-    switchStatusBarItem.backgroundColor = state.kind === 'on'
-      ? undefined
-      : new vscode.ThemeColor('statusBarItem.warningBackground');
-    switchStatusBarItem.show();
+    renderStatusBar(
+      state,
+      [healthPart, showVibrancy ? `V${vibrancyLabel}` : undefined],
+      badge?.suffix ?? '',
+      tooltipLines,
+    );
   }
 
   // Inner implementation of updateAllStatusBars, extracted so the outer
@@ -1570,26 +1532,23 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   function updateAllStatusBarsInner(preloadedData?: ViolationsData): void {
     if (!isDartProject) {
       // Surface the version even outside a Dart workspace so users can verify
-      // that a fresh build has loaded — previously the bar was hidden here and
-      // the only version readout was a tooltip on a tree that itself required
-      // a Dart project to render. That made "is my build live?" unanswerable
-      // before opening a project.
+      // that a fresh build has loaded.
       statusBarItem.text = `$(checklist) Saropa Lints v${extVersion}`;
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — open a folder containing pubspec.yaml to enable analysis.`;
       statusBarItem.backgroundColor = undefined;
       statusBarItem.command = 'saropaLints.showAbout';
       statusBarItem.show();
-      memoryStatusBarItem.hide();
-      switchStatusBarItem.hide();
       return;
     }
-    updateSwitchStatusBar();
     const en = getConfig().get<boolean>('enabled', true) ?? true;
     // analysis_options.yaml is the tier source of truth (see tierConfig.ts) —
     // fall back to the saropaLints.tier setting only when no yaml tier is
     // configured, so the status bar can't show a tier that disagrees with
     // what actually gets scanned.
     const statusBarRoot = getProjectRoot();
+    const state: LintsSwitchState = statusBarRoot
+      ? getLintsSwitchState(statusBarRoot)
+      : { kind: en ? 'on' : 'off' };
     const tier = (statusBarRoot && readTierFromAnalysisOptionsYaml(statusBarRoot))
       || (getConfig().get<string>('tier', 'recommended') ?? 'recommended');
     const showVibrancy =
@@ -1598,18 +1557,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const vibrancyLabel = showVibrancy ? `${Math.round(vibrancyData!.averageScore / 10)}/10` : null;
 
     if (en) {
-      updateEnabledStatusBar(preloadedData, statusBarRoot, tier, showVibrancy, vibrancyLabel);
+      updateEnabledStatusBar(state, preloadedData, statusBarRoot, tier, showVibrancy, vibrancyLabel);
     } else {
-      statusBarItem.text = '$(checklist) Saropa Lints: Off';
-      statusBarItem.tooltip = buildStatusBarTooltipMarkdown(
-        [`Saropa Lints v${extVersion} — Disabled`],
-        en,
-      );
-      statusBarItem.backgroundColor = undefined;
-      statusBarItem.command = 'saropaLints.openViolationsWideReport';
-      memoryStatusBarItem.hide();
+      memoryStatus = undefined;
+      renderStatusBar(state, [], '', [`Saropa Lints v${extVersion} — Disabled`]);
     }
-    statusBarItem.show();
   }
 
   // Single unified status bar item showing lint score, tier, and vibrancy.
@@ -1645,11 +1597,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       // Safe fallback command — About panel works without any project state.
       statusBarItem.command = 'saropaLints.showAbout';
       statusBarItem.show();
-
-      // Hide the memory bar — its data may also be stale/corrupt, and
-      // showing a healthy-looking memory readout next to an error is
-      // misleading.
-      memoryStatusBarItem.hide();
     }
   };
   updateAllStatusBars();
@@ -1744,7 +1691,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     void gatherReadiness(processMonitor.getLastHostMemory()).then((r) => {
       cachedReadinessText = readinessStatusBarText(r);
       cachedReadinessLines = readinessTooltipLines(r, processMonitor.getLastHostMemory());
-      updateMemoryStatusBar();
+      updateAllStatusBars();
     });
   }, 20_000);
   // One-shot audit of the Dart analysis server's VM heap cap — warns when
@@ -3476,6 +3423,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Start-up detection supersedes the old lock-only toast: it covers pubspec,
   // plugin-only and both routes with one prompt (compat/startupController.ts).
   if (isDartProject && root) {
+    onRouteStatusChange(() => updateAllStatusBars());
     registerStartupDetection(context, (m) => console.log(m));
   }
 

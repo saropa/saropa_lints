@@ -68,6 +68,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Changed
+
+- **Status bar (extension):** the four Saropa status bar items (switch, score, "Saropa: ready/disabled", route and memory/workspace issues) are now one item, e.g. `Saropa Lints: On · 90% · V9/10`, `Saropa Lints: Off`, or `Saropa Lints: Partly off`. It turns to the warning colour when lints are Off or Partly off, or when memory or workspace issues need attention. The route (`saropa_lints: pubspec 17.0.1`), memory, health and workspace-issue details moved into its tooltip. Click still flips the Lints On/Off switch; the tooltip links open the report. The scan-on-save item now appears only while a scan is running or has just finished.
+
 ### Fixed
 
 - **Lints On/Off switch (extension):** the status bar, sidebar and dashboards now read the saved ownership record, so the displayed state matches what a click does (e.g. after `flutter clean` deletes `.dart_tool`).

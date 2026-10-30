@@ -1,7 +1,7 @@
 /** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Extension Jest tests: validates commands, webviews, parsers, and state against VS Code APIs (often with local mocks). */
 import * as assert from 'node:assert';
 import { formatSidebarToggleLabel } from '../sidebarToggleLabel';
-import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from '../statusBarLabel';
+import { buildUnifiedStatusText, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from '../statusBarLabel';
 
 /** Sidebar activity-bar labels with optional issue counts (finite / NaN edge cases). */
 
@@ -23,51 +23,17 @@ describe('formatSidebarToggleLabel', () => {
     });
 });
 
-describe('buildStatusBarLabel', () => {
-    it('formats compact mixed metrics for health + vibrancy', () => {
-        const label = buildStatusBarLabel({
-            hasHealth: true,
-            healthScore: 90,
-            delta: ' ▲1',
-            tier: 'recommended',
-            showVibrancy: true,
-            vibrancyLabel: '4/10',
-        });
-        assert.strictEqual(label, '90% ▲1 · V4/10');
+describe('buildUnifiedStatusText', () => {
+    it('joins switch label and score parts', () => {
+        assert.strictEqual(buildUnifiedStatusText('Saropa Lints: On', ['90% ▲1', 'V9/10']), 'Saropa Lints: On · 90% ▲1 · V9/10');
     });
 
-    it('falls back to tier when vibrancy is hidden', () => {
-        const label = buildStatusBarLabel({
-            hasHealth: true,
-            healthScore: 90,
-            delta: '',
-            tier: 'recommended',
-            showVibrancy: false,
-            vibrancyLabel: null,
-        });
-        assert.strictEqual(label, '90% · recommended');
+    it('skips missing score parts', () => {
+        assert.strictEqual(buildUnifiedStatusText('Saropa Lints: On', [undefined, 'V9/10']), 'Saropa Lints: On · V9/10');
     });
 
-    it('keeps non-health label short but disambiguated', () => {
-        const label = buildStatusBarLabel({
-            hasHealth: false,
-            tier: 'recommended',
-            showVibrancy: true,
-            vibrancyLabel: '4/10',
-        });
-        assert.strictEqual(label, 'Saropa Lints · V4/10');
-    });
-
-    it('formats health-only label without a system health suffix (moved to its own status bar item)', () => {
-        const label = buildStatusBarLabel({
-            hasHealth: true,
-            healthScore: 85,
-            delta: '',
-            tier: 'recommended',
-            showVibrancy: false,
-            vibrancyLabel: null,
-        });
-        assert.strictEqual(label, '85% · recommended');
+    it('is just the label when Off (no score)', () => {
+        assert.strictEqual(buildUnifiedStatusText('Saropa Lints: Off', []), 'Saropa Lints: Off');
     });
 });
 

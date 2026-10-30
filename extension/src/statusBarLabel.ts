@@ -1,35 +1,10 @@
 /**
- * Centralized status bar label formatting for the unified Saropa item.
- *
- * Why this exists:
- * - The status bar has tight horizontal space, so labels must stay compact.
- * - We still need to disambiguate lint score (`%`) from vibrancy score (`/10`).
- * - A dedicated formatter keeps this logic testable and avoids drift across call sites.
- *
- * Formatting contract:
- * - With health + vibrancy: `90% ▲2 · V4/10`
- * - With health only: `90% ▲2 · recommended`
- * - Without health + vibrancy: `Saropa Lints · V4/10`
- * - Without health + vibrancy disabled: `Saropa Lints · recommended`
+ * Text of the single status bar item (pure, unit-testable): switch label plus
+ * whichever score parts exist, e.g. `Saropa Lints: On · 90% ▲2 · V9/10`;
+ * just the label when none.
  */
-export function buildStatusBarLabel(params: {
-  hasHealth: boolean;
-  healthScore?: number;
-  delta?: string;
-  tier: string;
-  showVibrancy: boolean;
-  vibrancyLabel: string | null;
-}): string {
-  const { hasHealth, healthScore, delta = '', tier, showVibrancy, vibrancyLabel } = params;
-
-  if (hasHealth) {
-    return showVibrancy
-      ? `${healthScore}%${delta} · V${vibrancyLabel}`
-      : `${healthScore}%${delta} · ${tier}`;
-  }
-  return showVibrancy
-    ? `Saropa Lints · V${vibrancyLabel}`
-    : `Saropa Lints · ${tier}`;
+export function buildUnifiedStatusText(switchLabel: string, scoreParts: Array<string | undefined>): string {
+  return [switchLabel, ...scoreParts.filter((p): p is string => !!p)].join(' · ');
 }
 
 /** One row of the main status bar's action-menu tooltip. */

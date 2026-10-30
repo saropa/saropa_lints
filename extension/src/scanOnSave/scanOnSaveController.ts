@@ -522,31 +522,21 @@ export class ScanOnSaveController implements vscode.Disposable {
   }
 
   /**
-   * Sets the status bar to the correct initial state on activation, so the
-   * user sees feedback before any save event fires. Without this, a broken
-   * pipeline (no project root, disabled) produces absolute silence — the
-   * extension looks dead.
+   * Logs the initial pipeline state on activation, so a broken pipeline
+   * (no project root, disabled) is diagnosable from the output channel.
    */
   private _showInitialState(): void {
+    // Idle states (disabled / no project / ready) are shown by the single
+    // Saropa status bar item; this item appears only for scan activity.
     if (!this._isEnabled()) {
-      this._statusBarItem.text = l10n('scanOnSave.statusBar.disabled');
-      this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.disabled');
-      this._statusBarItem.show();
       this._log('disabled via saropaLints.enabled setting');
       return;
     }
     const root = this._getProjectRoot();
     if (!root) {
-      this._statusBarItem.text = l10n('scanOnSave.statusBar.noProject');
-      this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.noProject');
-      this._statusBarItem.show();
       this._log('no Dart project root found (no pubspec.yaml at workspace root or one level deep)');
       return;
     }
-    // Everything looks viable — show "ready" and wait for saves.
-    this._statusBarItem.text = l10n('scanOnSave.statusBar.ready');
-    this._statusBarItem.tooltip = l10n('scanOnSave.statusBar.ready');
-    this._statusBarItem.show();
     this._log(`ready — project root: ${root}`);
   }
 

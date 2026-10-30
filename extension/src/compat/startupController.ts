@@ -67,6 +67,19 @@ function renamedCount(dataRoot: string, from: string, to: string): number | unde
   return loadRenames({ read }, dataRoot, from, to).length;
 }
 
+let currentRouteStatus: { text: string; tooltip: string } | undefined;
+let routeStatusListener: (() => void) | undefined;
+
+/** Current route status ("saropa_lints: pubspec 17.0.1") for the single status bar item's tooltip. */
+export function getRouteStatus(): { text: string; tooltip: string } | undefined {
+  return currentRouteStatus;
+}
+
+/** Called whenever the route status changes, so the status bar item can re-render. */
+export function onRouteStatusChange(listener: () => void): void {
+  routeStatusListener = listener;
+}
+
 export function registerStartupDetection(
   context: vscode.ExtensionContext,
   log: (message: string) => void,
@@ -76,22 +89,14 @@ export function registerStartupDetection(
   const running = new Set<string>();
   const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
-  // Persistent, quiet route status: always shown for Dart projects, no popup.
-  const statusItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 98);
-  statusItem.command = 'saropaLints.configureCompatibility';
-  context.subscriptions.push(statusItem);
+  // Persistent, quiet route status: no popup and no status bar item of its own;
+  // the single Saropa status bar item shows it as a tooltip line.
   const statuses = new Map<string, { text: string; tooltip: string } | undefined>();
   const showStatus = () => {
     const primary = getProjectRoot();
-    const s = (primary !== undefined && statuses.has(primary) ? statuses.get(primary) : undefined)
+    currentRouteStatus = (primary !== undefined && statuses.has(primary) ? statuses.get(primary) : undefined)
       ?? [...statuses.values()].find((v) => v !== undefined);
-    if (!s) {
-      statusItem.hide();
-      return;
-    }
-    statusItem.text = s.text;
-    statusItem.tooltip = s.tooltip;
-    statusItem.show();
+    routeStatusListener?.();
   };
 
   const check = async (root: string): Promise<void> => {
