@@ -252,3 +252,109 @@ abstract final class _PlatformGuard939 {
     return _channel.invokeMethod<String>('x');
   }
 }
+
+// Capability flag only ever set true after a web-guarded early exit.
+abstract final class _CapabilityFlag939 {
+  static const MethodChannel _channel = MethodChannel('x/haptics');
+  static bool? _isSupported;
+  static bool get _isPlatformSupported =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  static bool get isSupported => _isSupported ?? false;
+
+  static Future<void> ensureInitialized() async {
+    if (!_isPlatformSupported) {
+      _isSupported = false;
+      return;
+    }
+    _isSupported = await _channel.invokeMethod<bool>('canVibrate') ?? false;
+  }
+
+  // GOOD: isSupported is always false on web.
+  static Future<void> vibrate() async {
+    if (!isSupported) return;
+    await _channel.invokeMethod<void>('buzz');
+  }
+}
+
+abstract final class _CapabilityFlagUnguarded939 {
+  static const MethodChannel _channel = MethodChannel('x/haptics2');
+  static bool? _isSupported;
+  static bool get isSupported => _isSupported ?? false;
+
+  static Future<void> ensureInitialized() async {
+    // expect_lint: avoid_platform_channel_on_web
+    _isSupported = await _channel.invokeMethod<bool>('canVibrate') ?? false;
+  }
+
+  // BAD: the flag can be true on web (assigned with no web guard).
+  static Future<void> vibrate() async {
+    if (!isSupported) return;
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('buzz');
+  }
+}
+
+// Wrong polarity: `_canUse` is TRUE on web (`kIsWeb || ...`), so the flag
+// can be set on web even though the write sits behind `if (!_canUse) return;`.
+abstract final class _WrongPolarityFlag939 {
+  static const MethodChannel _channel = MethodChannel('x/haptics3');
+  static bool? _isSupported;
+  static bool get _canUse =>
+      kIsWeb || defaultTargetPlatform == TargetPlatform.android;
+  static bool get isSupported => _isSupported ?? false;
+
+  static void init() {
+    if (!_canUse) return;
+    _isSupported = true;
+  }
+
+  // BAD: the flag can be true on web.
+  static Future<void> vibrate() async {
+    if (!isSupported) return;
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('buzz');
+  }
+}
+
+// Wrong polarity: `_canUse` is true on web, so `if (!_canUse) return;` does
+// not keep web off the channel call.
+abstract final class _WrongPolarityGetterGuard939 {
+  static const MethodChannel _channel = MethodChannel('x/haptics5');
+  static bool get _canUse =>
+      kIsWeb || defaultTargetPlatform == TargetPlatform.android;
+
+  // BAD: the guard passes on web.
+  static Future<void> vibrate() async {
+    if (!_canUse) return;
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('buzz');
+  }
+}
+
+// A `this._flag = true;` write with no web guard must be seen as a write.
+class _ThisAssignFlag939 {
+  final MethodChannel _channel = MethodChannel('x/haptics4');
+  bool? _isSupported;
+  bool get _isPlatformSupported =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  bool get isSupported => _isSupported ?? false;
+
+  void init() {
+    if (!_isPlatformSupported) {
+      _isSupported = false;
+      return;
+    }
+    _isSupported = true;
+  }
+
+  void forceOn() {
+    this._isSupported = true;
+  }
+
+  // BAD: `forceOn` sets the flag with no web guard.
+  Future<void> vibrate() async {
+    if (!isSupported) return;
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('buzz');
+  }
+}

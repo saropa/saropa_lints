@@ -1,6 +1,6 @@
 # PROPOSAL: One obvious on/off switch for Saropa Lints in the VS Code extension
 
-**Status: Fixed pending owner verification** (switch state, sidebar banner, dashboard off banner, version-sync row, init exit code and version regex). Still open: Unverified toggle repro and pack-detection mismatch.
+**Status: Implemented in 17.0.1-beta.3. Follow-up fixes (display ignores saved record; init exit on default projects) in Unreleased. Original toggle failure in the contacts project not reproduced; closed per owner 2026-10-29.**
 
 Created: 2026-10-29
 Type: Tooling / Infrastructure (extension UX)
@@ -17,7 +17,7 @@ Found in: extension 17.0.11, package 17.0.0 (project pinned to 17.0.1-beta.2 aft
 
 ## Summary
 
-Turning Saropa Lints on or off takes three separate states and several screens.
+Turning Saropa Lints on or off takes two switches (setting, plugin block) plus one internal record of whether the extension turned the block off, across several screens.
 The owner could not turn it on from the UI. The UI showed a healthy state while nothing ran.
 Wanted: one switch, one true state, one repair button.
 
@@ -58,13 +58,13 @@ Wanted: one switch, one true state, one repair button.
 
 ## Proposal
 
-1. **One switch, top of the Saropa Lints sidebar and in the status bar:** `Saropa Lints: On` / `Off`. One click flips all three states together.
-2. **One computed state.** The switch shows the real state from all three sources:
-   - `On`: setting true, block live, rules loaded.
-   - `Off`: all three off.
-   - `Partly off: <which one>`, with a `Fix` button that makes all three agree. Never show healthy numbers in this state.
+1. **One switch, top of the Saropa Lints sidebar and in the status bar:** `Saropa Lints: On` / `Off`. One click turns lints on or off. Turning On from a new project's default state turns on only the `saropaLints.enabled` setting and does not load the in-process plugin.
+2. **One computed state.** The switch shows the real state from two switches (setting, plugin block) plus one internal record of whether the extension turned the block off:
+   - `On`: setting true AND the plugin block is live or was never turned off by the extension.
+   - `Off`: setting false and the block is not live.
+   - `Partly off: <setting|plugin>`: the extension turned the block off while the setting is on, or the block is live while the setting is off. A `Fix` button makes both agree. Never show healthy numbers in this state.
 3. **Dashboard banner when off.** Replace the coverage ring and counts with `Lints are off. [Turn on]`.
-4. **`init` must fail loudly.** Exit non-zero when it finds 0 rules or a missing `plugins:` block. If the block is commented out by the extension, restore it or say so in plain words.
+4. **`init` must fail loudly.** `init` exits non-zero when the result has no `plugins:` block at all, a live block with 0 rules, or the extension turned lints off. A commented default block exits 0 with a plain sentence. The sentence says 'switched off in the extension' only when the ownership record exists; otherwise it says 'default lightweight mode'.
 5. **Fix the `version true` text** and auto-sync the `version:` line to the package in `pubspec.lock`, or offer a one-click sync.
 6. **Keep the 7-tab dashboard for tuning only.** Turning on and off must not need it.
 
@@ -73,7 +73,7 @@ Wanted: one switch, one true state, one repair button.
 ## Acceptance
 
 - A new user can turn lints on in one click without opening the dashboard.
-- With any one of the three switches off, the UI says so in words and offers one `Fix` action.
+- With either switch off, the UI says so in words and offers one `Fix` action.
 - `dart run saropa_lints:init` never reports success with 0 rules found.
 
 ---

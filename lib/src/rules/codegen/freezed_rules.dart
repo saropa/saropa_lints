@@ -969,6 +969,16 @@ class PreferFreezedForDataClassesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      // The suggestion is only actionable when the project can use @freezed.
+      // Checked per node: the file path is only reliable once a unit is visited.
+      if (!ProjectContext.hasDependency(
+            context.filePath,
+            'freezed_annotation',
+          ) &&
+          !ProjectContext.hasDependency(context.filePath, 'freezed')) {
+        return;
+      }
+
       // Check if already using freezed/equatable
       for (final annotation in node.metadata) {
         final name = annotation.name.name;

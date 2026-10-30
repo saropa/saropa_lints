@@ -113,6 +113,48 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 //
 // GOOD:
 // Future<void> save() async { await db.writeTxn(...); await yieldToUI(); }
+class _DbIo {
+  static Future<List<int>?> dbContactLoadDBListByStatus(int s) async => null;
+  static Future<int> dbContactLoadDBCount() async => 0;
+  static Future<int> dbContactComputeTotals() async => 0;
+  static Future<int> dbContactCalculateScore() async => 0;
+  static Future<bool> dbContactCheckExists() async => true;
+  static Future<void> dbContactSave(int c) async {}
+  static Future<void> dbContactAddToGroup(int c) async {}
+}
+
+// GOOD: `Load` followed by `DB` must not be misread as a write ("add").
+Future<List<int>?> _goodLoadList(int s) async {
+  return await _DbIo.dbContactLoadDBListByStatus(s);
+}
+
+Future<int> _goodLoadCount() async {
+  return await _DbIo.dbContactLoadDBCount();
+}
+
+Future<int> _goodComputeTotals() async {
+  return await _DbIo.dbContactComputeTotals();
+}
+
+Future<int> _goodCalculateScore() async {
+  return await _DbIo.dbContactCalculateScore();
+}
+
+Future<bool> _goodCheckExists() async {
+  return await _DbIo.dbContactCheckExists();
+}
+
+// BAD: real writes still lint.
+Future<void> _badSave(int c) async {
+  // expect_lint: avoid_return_await_db
+  return await _DbIo.dbContactSave(c);
+}
+
+Future<void> _badAdd(int c) async {
+  // expect_lint: avoid_return_await_db
+  return await _DbIo.dbContactAddToGroup(c);
+}
+
 class _NoteClass305 {
   void noteMethod() {}
 }

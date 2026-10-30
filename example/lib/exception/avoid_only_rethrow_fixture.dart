@@ -143,3 +143,27 @@ void _badUnrelatedLaterClause() {
     print(e);
   }
 }
+
+class _KeyStoreException implements Exception {}
+
+// GOOD: custom exception rethrown before an `on Object catch` that wraps it.
+void _goodCustomExceptionBeforeObjectCatch() {
+  try {
+    doSomething();
+  } on _KeyStoreException {
+    rethrow;
+  } on Object catch (error, stack) {
+    print('$error $stack');
+  }
+}
+
+// GOOD: untyped later catch also shields the rethrow-only clause.
+void _goodShieldsUntypedCatch() {
+  try {
+    doSomething();
+  } on _KeyStoreException {
+    rethrow;
+  } catch (e) {
+    print(e);
+  }
+}

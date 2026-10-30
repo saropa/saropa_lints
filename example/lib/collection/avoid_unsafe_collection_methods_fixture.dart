@@ -77,4 +77,35 @@ String _goodSplitViaVariable(String prefix) {
   return parts.first;
 }
 
+// --- Short-circuit guard regression tests (access in right operand) ---
+
+bool _same(String a, String b) => a == b;
+
+// GOOD: `.first` as call argument in the right operand of `isNotEmpty &&`.
+void _goodAndGuardArgument(List<String> list, String x) {
+  if (list.isNotEmpty && _same(list.first, x)) {}
+}
+
+// GOOD: `.first` in the right operand of `isEmpty ||`.
+void _goodOrGuardArgument(List<String> list, String x) {
+  if (list.isEmpty || _same(list.first, x)) return;
+}
+
+// GOOD: `.first` as a direct operand of `isNotEmpty &&`.
+void _goodAndGuardDirect(List<String> list, String x) {
+  final bool ok = list.isNotEmpty && list.first == x;
+}
+
+// BAD: wrong operator (`||` with isNotEmpty does not guard).
+void _badWrongOperator(List<String> list, String x) {
+  // expect_lint: avoid_unsafe_collection_methods
+  if (list.isNotEmpty || _same(list.first, x)) {}
+}
+
+// BAD: guard is on a different collection.
+void _badOtherCollection(List<String> list, List<String> other, String x) {
+  // expect_lint: avoid_unsafe_collection_methods
+  if (other.isNotEmpty && _same(list.first, x)) {}
+}
+
 void main() {}

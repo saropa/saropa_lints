@@ -14,7 +14,11 @@ const String extensionDisabledMarker =
 
 /// True when the config has no active `plugins:` block or lists no rules,
 /// i.e. the analyzer would run no saropa_lints rules.
-bool isConfigUnusable(String content) {
+///
+/// A marker-wrapped (commented-out) block is the default for new projects,
+/// so it is usable unless [ownedOff] says the extension itself turned lints off.
+bool isConfigUnusable(String content, {required bool ownedOff}) {
+  if (!ownedOff && content.contains(extensionDisabledMarker)) return false;
   final hasPlugins = RegExp(r'^plugins:', multiLine: true).hasMatch(content);
   final ruleLines = RegExp(
     r'^\s{6}\w+:\s*(true|false)',
@@ -30,8 +34,9 @@ bool isConfigUnusable(String content) {
 bool validateWrittenConfig(
   LogWriter log,
   String filePath,
-  int expectedRuleCount,
-) {
+  int expectedRuleCount, {
+  required bool ownedOff,
+}) {
   log.terminal('');
   log.terminal('${InitColors.bold}Post-write validation${InitColors.reset}');
 
@@ -53,12 +58,23 @@ bool validateWrittenConfig(
       'plugins:',
       pass: false,
       detail: content.contains(extensionDisabledMarker)
-          ? 'section is commented out because the VS Code extension turned '
-                'Lint integration OFF — toggle "Lint integration" On in the '
-                'extension to restore it (init does not re-enable it)'
+          ? (ownedOff
+                ? "switched off in the VS Code extension — click 'Saropa "
+                      "Lints: Off' in the status bar to turn it on (init does "
+                      'not re-enable it)'
+                : 'commented out: default lightweight mode (the daemon '
+                      'delivers diagnostics; the in-process plugin is not '
+                      'loaded)')
           : 'section missing',
     );
     allPassed = false;
+  }
+
+  // A marker-wrapped block is commented out on purpose, so the live-block
+  // checks below (version, diagnostics, rule count) do not apply.
+  if (content.contains(extensionDisabledMarker)) {
+    log.terminal('');
+    return allPassed;
   }
 
   // Check version: key under saropa_lints

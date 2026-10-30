@@ -236,6 +236,33 @@ String unfold(List<String> physical) {
     );
 
     test(
+      'does NOT flag line += buffer.toString() flush in a nested loop',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidStringConcatenationLoopRule(),
+          '''
+void f(List<String> physical) {
+  var i = 0;
+  while (i < physical.length) {
+    String line = physical[i];
+    i++;
+    final StringBuffer pending = StringBuffer();
+    while (i < physical.length) {
+      if (pending.isNotEmpty) {
+        line += pending.toString();
+        pending.clear();
+      }
+      i++;
+    }
+  }
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_string_concatenation_loop')));
+      },
+    );
+
+    test(
       'STILL flags += when outer var is appended in an inner loop',
       () async {
         final codes = await reportedRuleCodes(
@@ -254,6 +281,40 @@ void f(List<String> xs) {
         expect(codes, contains('avoid_string_concatenation_loop'));
       },
     );
+
+    test('STILL flags outer += other.toString() (non-StringBuffer)', () async {
+      final codes = await reportedRuleCodes(
+        AvoidStringConcatenationLoopRule(),
+        '''
+String f(List<int> xs) {
+  String s = '';
+  for (final x in xs) {
+    s += x.toString();
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, contains('avoid_string_concatenation_loop'));
+    });
+
+    test('does NOT flag outer += StringBuffer.toString() drain', () async {
+      final codes = await reportedRuleCodes(
+        AvoidStringConcatenationLoopRule(),
+        '''
+String f(List<String> xs) {
+  String s = '';
+  final StringBuffer sb = StringBuffer();
+  for (final x in xs) {
+    sb.write(x);
+    s += sb.toString();
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, isNot(contains('avoid_string_concatenation_loop')));
+    });
   });
 
   group('avoid_memory_intensive_operations', () {
@@ -289,6 +350,40 @@ String f(List<String> xs) {
 ''',
       );
       expect(codes, contains('avoid_memory_intensive_operations'));
+    });
+
+    test('STILL flags outer += other.toString() (non-StringBuffer)', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMemoryIntensiveOperationsRule(),
+        '''
+String f(List<int> xs) {
+  String s = '';
+  for (final x in xs) {
+    s += x.toString();
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, contains('avoid_memory_intensive_operations'));
+    });
+
+    test('does NOT flag outer += StringBuffer.toString() drain', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMemoryIntensiveOperationsRule(),
+        '''
+String f(List<String> xs) {
+  String s = '';
+  final StringBuffer sb = StringBuffer();
+  for (final x in xs) {
+    sb.write(x);
+    s += sb.toString();
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, isNot(contains('avoid_memory_intensive_operations')));
     });
   });
 }

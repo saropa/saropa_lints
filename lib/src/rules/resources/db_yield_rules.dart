@@ -107,15 +107,17 @@ bool _isDbPrefix(String name) {
       (name.length == 2 || name[2] == name[2].toUpperCase());
 }
 
-/// Heuristic: classify a method name by looking for write- or read-like
-/// substrings. Falls back to [_DbOperationType.write] (safer to yield).
+/// Heuristic: classify a method name by its camel-case words. The first word
+/// starting with a write or read keyword decides, so `dbContactLoadDBCount`
+/// is a read (not a write because `loaddb` contains `add`). Falls back to
+/// [_DbOperationType.write] (safer to yield) when no word matches.
 _DbOperationType _classifyByHeuristic(String name) {
-  final lower = name.toLowerCase();
-  for (final kw in _writeKeywords) {
-    if (lower.contains(kw)) return _DbOperationType.write;
-  }
-  for (final kw in _readKeywords) {
-    if (lower.contains(kw)) return _DbOperationType.bulkRead;
+  final words = RegExp(r'[A-Z]?[a-z]+|[A-Z]+(?![a-z])|[0-9]+')
+      .allMatches(name)
+      .map((m) => m.group(0)!.toLowerCase());
+  for (final word in words) {
+    if (_writeKeywords.any(word.startsWith)) return _DbOperationType.write;
+    if (_readKeywords.any(word.startsWith)) return _DbOperationType.bulkRead;
   }
   // Unknown — default to write (safer to yield than not).
   return _DbOperationType.write;
@@ -142,6 +144,9 @@ const List<String> _readKeywords = [
   'count',
   'list',
   'stream',
+  'compute',
+  'calculate',
+  'check',
 ];
 
 // -- Target detection ------------------------------------------------------

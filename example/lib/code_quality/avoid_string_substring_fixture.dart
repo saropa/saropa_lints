@@ -232,3 +232,10 @@ String _goodRegexMatchEndDirectNoGuard(String content, RegExp header) {
   final pos = headerMatch.end;
   return content.substring(pos);
 }
+
+// GOOD: collection-for condition `i + 1 < hex.length` bounds substring(i, i + 2).
+// Regression case for the hexToBytes FP report (ForElement guard walk).
+List<int> _goodCollectionForHexPairs(String hex) => <int>[
+  for (int i = 0; i + 1 < hex.length; i += 2)
+    int.parse(hex.substring(i, i + 2), radix: 16),
+];

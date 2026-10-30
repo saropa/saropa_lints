@@ -41,6 +41,7 @@ import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
 import { surfacePluginDivergence } from './pluginDivergencePrompt';
 import {
   getLintsSwitchState,
+  initLintsSwitch,
   lintsSwitchDetail,
   lintsSwitchLabel,
   syncVersionWithMessage,
@@ -566,6 +567,7 @@ function buildStatusBarTooltipMarkdown(infoLines: string[], enabled: boolean): v
 }
 
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
+  initLintsSwitch(context);
   const applyUiLocalePreference = (): string => {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const preferred = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';

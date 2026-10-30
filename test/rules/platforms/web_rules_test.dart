@@ -24,6 +24,38 @@ void main() {
       },
     );
 
+    test('capability flag guarded by web exit is GOOD, unguarded flag BAD', () {
+      final start = fixture.indexOf('class _CapabilityFlag939');
+      final end = fixture.indexOf('class _CapabilityFlagUnguarded939');
+      expect(start, greaterThan(-1));
+      expect(end, greaterThan(start));
+      expect(fixture.substring(start, end), isNot(contains('expect_lint')));
+      expect(fixture.substring(end), contains('expect_lint'));
+    });
+
+    test('wrong-polarity getter (kIsWeb || ...) flag is BAD', () {
+      final start = fixture.indexOf('class _WrongPolarityFlag939');
+      final end = fixture.indexOf('class _ThisAssignFlag939');
+      expect(start, greaterThan(-1));
+      expect(end, greaterThan(start));
+      expect(fixture.substring(start, end), contains('expect_lint'));
+    });
+
+    test('wrong-polarity getter exit guard (kIsWeb || ...) is BAD', () {
+      final start = fixture.indexOf('class _WrongPolarityGetterGuard939');
+      final end = fixture.indexOf('class _ThisAssignFlag939');
+      expect(start, greaterThan(-1));
+      expect(end, greaterThan(start));
+      expect(fixture.substring(start, end), contains('expect_lint'));
+    });
+
+    test('unguarded `this._flag = true` write makes the flag BAD', () {
+      final start = fixture.indexOf('class _ThisAssignFlag939');
+      expect(start, greaterThan(-1));
+      expect(fixture.substring(start), contains('this._isSupported = true'));
+      expect(fixture.substring(start), contains('expect_lint'));
+    });
+
     test('positive Platform exit still flagged', () {
       final start = fixture.indexOf('// BAD: positive Platform exit');
       expect(fixture.substring(start), contains('expect_lint'));

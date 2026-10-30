@@ -382,6 +382,20 @@ void _goodVCardFileName() async {
   await file.writeAsString(makeVCardFileName());
 }
 
+// GOOD: static `write` call whose file name comes from a `...VCard...` helper.
+void _goodVCardStreamWriterCall() async {
+  await BackupVCardStreamWriter.write(
+    folder: dir,
+    fileName: makeVCardFileName(suffix: 'all'),
+    contacts: list,
+  );
+}
+
+// expect_lint: require_data_encryption
+void _badCardNumberFileWrite() async {
+  await file.writeAsString(cardNumber);
+}
+
 // GOOD: clearing credentials (every field null) stores nothing.
 void _goodClearCredentialsWithNull() async {
   await db.write(AuthCompanion(token: Value<String?>(null)));

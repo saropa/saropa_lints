@@ -40,21 +40,41 @@ plugins:
   });
 
   group('isConfigUnusable', () {
-    test('commented-out plugin block is unusable', () {
+    test(
+      'default marker-wrapped block without an ownership record is usable',
+      () {
+        expect(
+          isConfigUnusable(
+            '$extensionDisabledMarker >>>\n# plugins:\n',
+            ownedOff: false,
+          ),
+          isFalse,
+        );
+      },
+    );
+
+    test('marker-wrapped block the extension turned off is unusable', () {
       expect(
-        isConfigUnusable('$extensionDisabledMarker >>>\n# plugins:\n'),
+        isConfigUnusable(
+          '$extensionDisabledMarker >>>\n# plugins:\n',
+          ownedOff: true,
+        ),
         isTrue,
       );
     });
 
     test('plugins block with zero rules is unusable', () {
-      expect(isConfigUnusable('plugins:\n  saropa_lints:\n'), isTrue);
+      expect(
+        isConfigUnusable('plugins:\n  saropa_lints:\n', ownedOff: false),
+        isTrue,
+      );
     });
 
     test('plugins block with a rule is usable', () {
       expect(
         isConfigUnusable(
           'plugins:\n  saropa_lints:\n    diagnostics:\n      a_rule: true\n',
+          ownedOff: false,
         ),
         isFalse,
       );

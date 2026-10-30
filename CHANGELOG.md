@@ -66,6 +66,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **Lints On/Off switch (extension):** the status bar, sidebar and dashboards now read the saved ownership record, so the displayed state matches what a click does (e.g. after `flutter clean` deletes `.dart_tool`).
+- **`init`:** a re-run on a project with the default commented-out plugin block no longer exits 1, no longer claims the extension turned lints off, and no longer warns "0 rules found"; it exits 1 only when the extension recorded turning lints off.
+- **`avoid_return_await_db`:** no longer treats `db*` reads such as `dbContactLoadDBListByStatus` as writes (the name `LoadDB` contains `add`). Method names are now matched by camel-case word; `compute`, `calculate` and `check` are now read verbs (`dbContactComputeTotals` no longer lints). `dbContactSave` and `dbContactAddToGroup` still lint.
+- **`prefer_freezed_for_data_classes`:** no longer flags data classes in projects that do not depend on `freezed` or `freezed_annotation`, where the suggestion could not be acted on. No action required.
+- **`require_catch_logging`:** no longer flags a catch whose only statement returns a constructed typed result (e.g. `return const DecryptResult(DecryptStatus.authFailed)`). `return null;`, `return false;` and empty catches still lint.
+- **`avoid_memory_intensive_operations`, `avoid_string_concatenation_loop`:** no longer flag `line += buffer.toString()` where `buffer` is a `StringBuffer` (flushing a buffer into a string).
+- **`avoid_platform_channel_on_web`:** no longer flags channel calls after `if (!isSupported) return;` when `isSupported` reads a private flag that is only ever set true after a `kIsWeb`-guarded early exit. A flag assigned with no web guard still lints. The guard flag must be false on web (for example `!kIsWeb && ...`); a flag such as `kIsWeb || ...` and writes through `this._flag = ...` are now handled correctly. An early exit `if (!_canUse) return;` on a getter such as `kIsWeb || ...` no longer counts as a web guard; only a getter that is false on web (`!kIsWeb && ...`) does.
+
 ## [17.0.1-beta.4]
 
 This update removes false positives from 19 rules, mostly the mounted-check and context rules that flagged code that was already safe. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.4/CHANGELOG.md)

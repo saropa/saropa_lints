@@ -237,3 +237,22 @@ class _UiCard {
 void _goodDebugClosure(String? uuid) {
   debug(() => 'Missing avatar `$uuid`');
 }
+
+// GOOD: multi-line closure with adjacent strings and a trailing named
+// argument, nested in an `if` (beta.4 evidence shape).
+void _goodDebugClosureAdjacentNamed(String? name, int? count, bool flag) {
+  if (flag) {
+    debug(
+      () =>
+          'no stored type for '
+          '`$name` (count=${count?.toString()})',
+      level: 1,
+    );
+  }
+}
+
+// BAD: closure not passed to a log call still lints.
+void _badClosureNotLog(String? name) {
+  // expect_lint: avoid_nullable_interpolation
+  final Function g = () => 'a $name';
+}

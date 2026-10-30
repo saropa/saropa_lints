@@ -109,7 +109,12 @@ final email = 'test@example.com';
 dynamic json;
 final name = 'example';
 
-// BAD: Should trigger prefer_freezed_for_data_classes
+// NOTE: the rule only fires when the package depends on freezed or
+// freezed_annotation. This example package declares neither, so the BAD case
+// below only lints in a project that does; without the dependency it must NOT
+// lint (bug: prefer_freezed_for_data_classes_false_positive_project_does_not_depend_on_freezed).
+
+// BAD: Should trigger prefer_freezed_for_data_classes (when freezed is a dependency)
 // expect_lint: prefer_freezed_for_data_classes
 class _bad417_User {
   final String name;
@@ -145,4 +150,11 @@ class _good417_User with _$User {
       _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+}
+
+// GOOD: Should NOT trigger prefer_freezed_for_data_classes (already @freezed,
+// and no lint at all in a package without a freezed dependency)
+@freezed
+class _good417_Point with _$Point {
+  const factory Point(int x, int y, int z) = _Point;
 }

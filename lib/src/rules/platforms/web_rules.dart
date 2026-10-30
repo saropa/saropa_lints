@@ -250,27 +250,137 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
     if (expr is! PrefixExpression || expr.operator.type != TokenType.BANG) {
       return false;
     }
-    return _mentionsWebGetter(expr.operand, stmt) &&
+    return _mentionsWebGetter(expr.operand, stmt, requireFalseOnWeb: true) &&
         _isEarlyExit(stmt.thenStatement);
   }
 
   /// Whether [expr] is (or contains) a bare identifier naming a getter or
   /// field in [from]'s compilation unit whose declaration mentions `kIsWeb`.
-  bool _mentionsWebGetter(Expression expr, AstNode from) {
+  /// With [requireFalseOnWeb], a bare `kIsWeb` mention is not enough: the
+  /// declaration must be false on web (`!kIsWeb && ...`), so `kIsWeb || x`
+  /// does not make `if (!flag) return;` a web guard.
+  bool _mentionsWebGetter(
+    Expression expr,
+    AstNode from, {
+    bool requireFalseOnWeb = false,
+  }) {
     final CompilationUnit? unit = from.thisOrAncestorOfType<CompilationUnit>();
     if (unit == null) return false;
     final Set<String> names = <String>{};
     expr.accept(_IdentCollector(names));
     if (names.isEmpty) return false;
-    for (final AstNode n in _declarationsNamed(unit, names)) {
-      // Exact token match (not substring) so `kIsWebFoo` does not count.
-      for (
-        Token? t = n.beginToken;
-        t != null;
-        t = t == n.endToken ? null : t.next
-      ) {
-        if (t.lexeme == 'kIsWeb') return true;
+    final List<AstNode> decls = _declarationsNamed(unit, names).toList();
+    if (decls.any(
+      requireFalseOnWeb ? _isFalseOnWebDecl : _mentionsKIsWebToken,
+    )) {
+      return true;
+    }
+    // Scope the flag analysis to the enclosing class so same-named fields in
+    // sibling classes do not mix their assignments.
+    final AstNode root =
+        from.thisOrAncestorOfType<ClassDeclaration>() ??
+        from.thisOrAncestorOfType<MixinDeclaration>() ??
+        unit;
+    return _readsWebSafeFlag(root, decls, names);
+  }
+
+  /// Exact token match (not substring) so `kIsWebFoo` does not count.
+  bool _mentionsKIsWebToken(AstNode n) {
+    for (
+      Token? t = n.beginToken;
+      t != null;
+      t = t == n.endToken ? null : t.next
+    ) {
+      if (t.lexeme == 'kIsWeb') return true;
+    }
+    return false;
+  }
+
+  /// A capability flag: a field (named directly, or read by a named getter)
+  /// that is never `true` on web because every non-`false` assignment sits
+  /// after a web early-exit, e.g. `isSupported => _isSupported ?? false`
+  /// where `_isSupported` is only set after `if (!_isPlatformSupported) return;`.
+  bool _readsWebSafeFlag(AstNode unit, List<AstNode> decls, Set<String> names) {
+    final Set<String> fieldNames = <String>{...names};
+    for (final AstNode d in decls) {
+      if (d is MethodDeclaration) d.body.accept(_IdentCollector(fieldNames));
+    }
+    final List<VariableDeclaration> candidates = <VariableDeclaration>[];
+    final List<AstNode> found = <AstNode>[];
+    unit.accept(_NamedDeclFinder(fieldNames, found));
+    candidates.addAll(found.whereType<VariableDeclaration>());
+    for (final VariableDeclaration field in candidates) {
+      final Expression? init = field.initializer;
+      if (init != null &&
+          init is! NullLiteral &&
+          !(init is BooleanLiteral && !init.value)) {
+        continue;
       }
+      final List<AssignmentExpression> writes = <AssignmentExpression>[];
+      unit.accept(_AssignmentFinder(field.name.lexeme, writes));
+      if (writes.isNotEmpty && writes.every(_isWebSafeWrite)) return true;
+    }
+    return false;
+  }
+
+  bool _isWebSafeWrite(AssignmentExpression a) {
+    final Expression rhs = a.rightHandSide;
+    if (rhs is BooleanLiteral && !rhs.value) return true;
+    for (AstNode? c = a.parent; c != null; c = c.parent) {
+      if (c is! Block) continue;
+      for (final Statement stmt in c.statements) {
+        if (stmt.offset >= a.offset) break;
+        if (stmt is! IfStatement || !_isEarlyExit(stmt.thenStatement)) continue;
+        if (_isWebExitGuard(stmt)) return true;
+        final Expression e = stmt.expression;
+        if (e is PrefixExpression &&
+            e.operator.type == TokenType.BANG &&
+            _hasKIsWebDecl(stmt, e.operand)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool _hasKIsWebDecl(AstNode from, Expression expr) {
+    final CompilationUnit? unit = from.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return false;
+    final Set<String> names = <String>{};
+    expr.accept(_IdentCollector(names));
+    return _declarationsNamed(unit, names).any(_isFalseOnWebDecl);
+  }
+
+  /// Whether a getter/field declaration is false on web: its value expression
+  /// is `!kIsWeb` or an `&&` chain with a `!kIsWeb` conjunct. A bare mention
+  /// (`kIsWeb || x`) says nothing about polarity and does not qualify.
+  bool _isFalseOnWebDecl(AstNode decl) {
+    Expression? value;
+    if (decl is VariableDeclaration) {
+      value = decl.initializer;
+    } else if (decl is MethodDeclaration) {
+      final FunctionBody body = decl.body;
+      if (body is ExpressionFunctionBody) {
+        value = body.expression;
+      } else if (body is BlockFunctionBody &&
+          body.block.statements.length == 1) {
+        final Statement s = body.block.statements.single;
+        if (s is ReturnStatement) value = s.expression;
+      }
+    }
+    return value != null && _impliesNotWeb(value);
+  }
+
+  bool _impliesNotWeb(Expression e) {
+    if (e is ParenthesizedExpression) return _impliesNotWeb(e.expression);
+    if (e is PrefixExpression && e.operator.type == TokenType.BANG) {
+      final Expression o = e.operand;
+      return o is SimpleIdentifier && o.name == 'kIsWeb' ||
+          o is PrefixedIdentifier && o.identifier.name == 'kIsWeb';
+    }
+    if (e is BinaryExpression &&
+        e.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+      return _impliesNotWeb(e.leftOperand) || _impliesNotWeb(e.rightOperand);
     }
     return false;
   }
@@ -362,6 +472,23 @@ class _IdentCollector extends RecursiveAstVisitor<void> {
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     names.add(node.name);
+  }
+}
+
+class _AssignmentFinder extends RecursiveAstVisitor<void> {
+  _AssignmentFinder(this.name, this.out);
+  final String name;
+  final List<AssignmentExpression> out;
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression lhs = node.leftHandSide;
+    final String? target = lhs is SimpleIdentifier
+        ? lhs.name
+        : lhs is PropertyAccess && lhs.target is ThisExpression
+        ? lhs.propertyName.name
+        : null;
+    if (target == name) out.add(node);
+    super.visitAssignmentExpression(node);
   }
 }
 

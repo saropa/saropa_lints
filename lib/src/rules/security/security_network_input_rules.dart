@@ -4646,6 +4646,18 @@ class RequireCatchLoggingRule extends SaropaLintRule {
 
       if (hasRethrow) return;
 
+      // A lone `return Foo(...)` maps the failure to a typed result (e.g.
+      // `return const DecryptResult(DecryptStatus.authFailed)`). The caller
+      // receives the failure as data, so nothing is swallowed. Literals
+      // (`null`, `false`, `[]`) are not constructor calls and stay flagged.
+      if (body.statements.length == 1) {
+        final Statement only = body.statements.first;
+        if (only is ReturnStatement &&
+            only.expression is InstanceCreationExpression) {
+          return;
+        }
+      }
+
       // Check if the exception variable is actually used in the body.
       // This MUST come BEFORE the control-flow check (C1 fix): a catch
       // like `catch (e) { return null; }` where `e` is never referenced

@@ -70,4 +70,75 @@ void _good600Break(List<String> files) {
   }
 }
 
+// Typed-result stand-ins for the cases below.
+enum _Status { ok, failed }
+
+class _Result {
+  const _Result(this.status, [this.text]);
+  final _Status status;
+  final String? text;
+}
+
+// GOOD: the failure is mapped to a typed result returned to the caller.
+// Mirrors bugs/require_catch_logging_false_positive_typed_result_status_mapping.md.
+_Result _good600TypedResult() {
+  try {
+    riskyCheck();
+    return const _Result(_Status.ok);
+  } on Object {
+    return const _Result(_Status.failed);
+  }
+}
+
+// GOOD: same with a non-const constructor call and a named/positional arg.
+_Result _good600TypedResultNew() {
+  try {
+    riskyCheck();
+    return const _Result(_Status.ok);
+  } on Object {
+    return _Result(_Status.failed, 'x');
+  }
+}
+
+// BAD: returning null discards the failure.
+// expect_lint: require_catch_logging
+_Result? _bad600ReturnNull() {
+  try {
+    return riskyCheck() as _Result;
+  } on Object {
+    return null;
+  }
+}
+
+// BAD: returning a bool literal discards the failure.
+// expect_lint: require_catch_logging
+bool _bad600ReturnFalse() {
+  try {
+    riskyCheck();
+    return true;
+  } on Object {
+    return false;
+  }
+}
+
+// BAD: empty catch.
+// expect_lint: require_catch_logging
+void _bad600Empty() {
+  try {
+    riskyCheck();
+  } on Object {}
+}
+
+// BAD: two statements, not a pure typed-result mapping.
+// expect_lint: require_catch_logging
+_Result _bad600TwoStatements() {
+  try {
+    riskyCheck();
+    return const _Result(_Status.ok);
+  } on Object {
+    showStatus('x');
+    return const _Result(_Status.failed);
+  }
+}
+
 void main() {}

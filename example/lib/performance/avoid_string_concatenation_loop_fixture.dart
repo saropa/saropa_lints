@@ -128,3 +128,21 @@ void _good788() {
 
   final result = buffer.toString();
 }
+
+// GOOD: Should NOT trigger avoid_string_concatenation_loop
+// (StringBuffer flush into an outer-loop local from a nested loop)
+void _good788_bufferFlush(List<String> physical) {
+  var i = 0;
+  while (i < physical.length) {
+    String line = physical[i];
+    i++;
+    final StringBuffer pending = StringBuffer();
+    while (i < physical.length) {
+      if (pending.isNotEmpty) {
+        line += pending.toString();
+        pending.clear();
+      }
+      i++;
+    }
+  }
+}

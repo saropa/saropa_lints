@@ -12,6 +12,7 @@ import {
   computeLintsSwitchState,
   detectPluginVersionDrift,
   getLintsSwitchState,
+  initLintsSwitch,
   lintsSwitchDashboardMessage,
   lintsSwitchLabel,
   syncPluginVersionToPinned,
@@ -95,6 +96,20 @@ describe('lints on/off switch', () => {
     assert.deepStrictEqual(getLintsSwitchState(tmp), { kind: 'partial', off: 'plugin' });
     setTestConfig('saropaLints', 'enabled', false);
     assert.deepStrictEqual(getLintsSwitchState(tmp), { kind: 'off' });
+  });
+
+  it('display without context still sees the saved ownership record', async () => {
+    fs.writeFileSync(options, LIVE);
+    const ctx = fakeContext();
+    await runDisable(ctx); // memento + sidecar
+    fs.rmSync(path.join(tmp, '.dart_tool'), { recursive: true, force: true }); // like flutter clean
+    setTestConfig('saropaLints', 'enabled', true);
+    initLintsSwitch(ctx);
+    try {
+      assert.deepStrictEqual(getLintsSwitchState(tmp), { kind: 'partial', off: 'plugin' });
+    } finally {
+      initLintsSwitch(undefined);
+    }
   });
 
   it('turning On from the default state sets the setting without loading the plugin', async () => {

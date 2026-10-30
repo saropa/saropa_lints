@@ -93,3 +93,28 @@ void _goodNever(Object e, StackTrace s) {
   _fail();
   Error.throwWithStackTrace(e, s);
 }
+
+// GOOD: `Error.throwWithStackTrace` as the last statement of an async catch
+// block, multi-line with a named-argument constructor (static type `Never`).
+class _KeyStoreException implements Exception {
+  const _KeyStoreException(this.message, {this.unsupported = false});
+  final String message;
+  final bool unsupported;
+}
+
+Future<int?> _goodNeverInAsyncCatch() async {
+  try {
+    return 1;
+  } on Object catch (error, stack) {
+    Error.throwWithStackTrace(
+      _KeyStoreException('failed: $error', unsupported: true),
+      stack,
+    );
+  }
+}
+
+// BAD: an ignored `Future<T>` (non-void) is still reported.
+void _badIgnoredTimeout(Future<int> pending) {
+  // expect_lint: avoid_ignoring_return_values
+  pending.timeout(const Duration(seconds: 1));
+}

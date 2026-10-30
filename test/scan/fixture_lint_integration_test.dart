@@ -418,9 +418,9 @@ void main() {
 
         expect(
           fixtureViolations.length,
-          equals(1),
+          equals(2),
           reason:
-              'Fixture has one BAD string concat line and GOOD numeric += '
+              'Fixture has two BAD string concat lines and GOOD numeric += '
               'accumulation that must not trigger; got '
               '${fixtureViolations.length}',
         );

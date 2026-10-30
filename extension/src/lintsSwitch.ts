@@ -54,10 +54,18 @@ export function computeLintsSwitchState(
   return { kind: 'partial', off: enabledSetting ? 'plugin' : 'setting' };
 }
 
+/** Context saved at activation so display paths see the workspace ownership record too. */
+let switchContext: vscode.ExtensionContext | undefined;
+
+export function initLintsSwitch(ctx: vscode.ExtensionContext | undefined): void {
+  switchContext = ctx;
+}
+
 /** Read the live state for a project root (context adds the workspace memento to the ownership check). */
 export function getLintsSwitchState(root: string, context?: vscode.ExtensionContext): LintsSwitchState {
+  const ctx = context ?? switchContext;
   const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
-  const owned = context ? wasPluginDisabledByExtension(context, root) : readPluginOwnershipFile(root);
+  const owned = ctx ? wasPluginDisabledByExtension(ctx, root) : readPluginOwnershipFile(root);
   return computeLintsSwitchState(enabled, getPluginsIntegrationState(root), owned);
 }
 

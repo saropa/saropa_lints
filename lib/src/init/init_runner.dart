@@ -2,6 +2,7 @@
 library;
 
 // Pre-write checks, pack merge, `analysis_options.yaml`, migration, and logs.
+import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
 
@@ -722,14 +723,33 @@ Future<void> runInit(List<String> args) async {
   }
 
   // Validate the written file has the critical sections
-  validateWrittenConfig(log, resolvedOutput, allRules.length);
+  final bool ownedOff = _isOffByExtension(targetDir);
+  validateWrittenConfig(
+    log,
+    resolvedOutput,
+    allRules.length,
+    ownedOff: ownedOff,
+  );
   // A config with no active plugins block or zero rules is a failed init,
   // except a brand-new file, which is written disabled on purpose.
   final writtenFile = File(resolvedOutput);
   if (!isNewFile &&
       (!writtenFile.existsSync() ||
-          isConfigUnusable(writtenFile.readAsStringSync()))) {
+          isConfigUnusable(
+            writtenFile.readAsStringSync(),
+            ownedOff: ownedOff,
+          ))) {
     exitCode = 1;
+  }
+  if (writtenFile.existsSync() &&
+      writtenFile.readAsStringSync().contains(extensionDisabledMarker)) {
+    log.terminal(
+      ownedOff
+          ? "Saropa Lints is switched off in the VS Code extension. Click "
+                "'Saropa Lints: Off' in the status bar."
+          : 'Saropa Lints is in default lightweight mode: the plugin block is '
+                'commented out and the daemon delivers diagnostics.',
+    );
   }
   await runPostWriteActions(
     cliArgs: cliArgs,
@@ -743,6 +763,21 @@ Future<void> runInit(List<String> args) async {
     resolvedTier: resolvedTier,
     targetDir: targetDir,
   );
+}
+
+/// True when the VS Code extension recorded that it turned lints off
+/// (`.dart_tool/saropa_lints/plugin_ownership.json`, `disabledByExtension`).
+bool _isOffByExtension(String projectDir) {
+  try {
+    final File f = File(
+      p.join(projectDir, '.dart_tool', 'saropa_lints', 'plugin_ownership.json'),
+    );
+    if (!f.existsSync()) return false;
+    final Object? json = jsonDecode(f.readAsStringSync());
+    return json is Map && json['disabledByExtension'] == true;
+  } on Object {
+    return false;
+  }
 }
 
 /// Print rule count summary to terminal.

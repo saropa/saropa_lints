@@ -1433,6 +1433,9 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
       // re-created each pass and is not an accumulator.
       if (isDeclaredInsideNearestLoop(node)) return;
 
+      // `s += buffer.toString()` drains a StringBuffer (the recommended fix).
+      if (isStringBufferDrain(node)) return;
+
       reporter.atNode(node);
     });
   }
@@ -3087,6 +3090,18 @@ bool isDeclaredInsideNearestLoop(AssignmentExpression node) {
   return declOffset > loop.offset && declOffset < loop.end;
 }
 
+/// True when [node] is `s += <buffer>.toString()` with a `StringBuffer`
+/// receiver: a flush of an already-buffered value, not a per-element append.
+bool isStringBufferDrain(AssignmentExpression node) {
+  final Expression rhs = node.rightHandSide;
+  if (rhs is! MethodInvocation || rhs.methodName.name != 'toString') {
+    return false;
+  }
+  final DartType? targetType = rhs.target?.staticType;
+  return targetType is InterfaceType &&
+      targetType.element.name == 'StringBuffer';
+}
+
 class _StringConcatVisitor extends RecursiveAstVisitor<void> {
   _StringConcatVisitor(this.reporter, this.code);
 
@@ -3099,7 +3114,8 @@ class _StringConcatVisitor extends RecursiveAstVisitor<void> {
     if (node.operator.type == TokenType.PLUS_EQ &&
         _isStringLikeExpression(node.leftHandSide, fallback: true) &&
         _isStringLikeExpression(node.rightHandSide) &&
-        !isDeclaredInsideNearestLoop(node)) {
+        !isDeclaredInsideNearestLoop(node) &&
+        !isStringBufferDrain(node)) {
       reporter.atNode(node);
     }
     super.visitAssignmentExpression(node);
