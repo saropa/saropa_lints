@@ -2,7 +2,7 @@
 
 Archived releases, one file per major version in [changelog/](changelog/). Search the whole record with `grep -r <term> changelog/`. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
 
-- [16.x](changelog/16.x.md) — 9 release(s), 16.0.0–16.0.0
+- [16.x](changelog/16.x.md) — 10 release(s), 16.0.0–16.0.1
 - [15.x](changelog/15.x.md) — 20 release(s), 15.0.0–15.2.12
 - [14.x](changelog/14.x.md) — 42 release(s), 14.0.0–14.5.9
 - [13.x](changelog/13.x.md) — 54 release(s), 13.0.0–13.13.0
