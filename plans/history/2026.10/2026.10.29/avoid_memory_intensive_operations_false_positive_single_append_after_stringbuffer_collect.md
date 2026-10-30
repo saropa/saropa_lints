@@ -1,6 +1,6 @@
 # BUG: `avoid_memory_intensive_operations` — `+=` of a `StringBuffer` result once per outer iteration is flagged as quadratic
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_memory_intensive_operations`

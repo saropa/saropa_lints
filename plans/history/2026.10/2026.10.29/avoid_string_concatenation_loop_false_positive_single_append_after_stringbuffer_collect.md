@@ -1,6 +1,6 @@
 # BUG: `avoid_string_concatenation_loop` — `+=` on a per-iteration local is flagged as an O(n^2) accumulator
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_string_concatenation_loop`

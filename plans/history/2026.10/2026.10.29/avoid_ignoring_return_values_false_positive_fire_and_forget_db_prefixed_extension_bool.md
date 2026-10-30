@@ -1,6 +1,6 @@
 # BUG: `avoid_ignoring_return_values` — flags a fire-and-forget project extension that returns `bool` when its name is `dbActivityAdd`
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_ignoring_return_values`

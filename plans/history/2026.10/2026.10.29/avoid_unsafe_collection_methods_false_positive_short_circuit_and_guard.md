@@ -1,6 +1,6 @@
 # BUG: `avoid_unsafe_collection_methods` — False Positive: `.first` Guarded by `isNotEmpty &&` in the Same Condition
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_unsafe_collection_methods`

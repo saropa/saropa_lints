@@ -1,6 +1,6 @@
 # BUG: `require_file_close_in_finally` — `File.openRead()` consumed by `await for` is treated as an unclosed handle
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `require_file_close_in_finally`

@@ -1,6 +1,6 @@
 # BUG: `require_data_encryption` — keyword `card` matches inside the identifier `makeVCardFileName()` (vCard file export)
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `require_data_encryption`

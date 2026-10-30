@@ -1,6 +1,6 @@
 # BUG: `avoid_parameter_mutation` — flags handler functions whose only job is to fill a mutable `*Draft` accumulator passed in as the first argument
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_parameter_mutation`

@@ -1,6 +1,6 @@
 # BUG: `avoid_parameter_mutation` — Fires on functions whose documented contract is to update the passed model in place
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_parameter_mutation`

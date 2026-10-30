@@ -1,6 +1,6 @@
 # BUG: `avoid_string_substring` — `substring` bounded by a collection-`for` condition is not recognized as guarded
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_string_substring`

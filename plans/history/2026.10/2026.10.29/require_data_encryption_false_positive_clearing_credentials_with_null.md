@@ -1,6 +1,6 @@
 # BUG: `require_data_encryption` — flags a Drift update that writes `null` to clear stored credentials
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `require_data_encryption`

@@ -1,6 +1,6 @@
 # BUG: `avoid_only_rethrow` — Flags `on SpecificException { rethrow; }` that shields the exception from a later broader catch clause
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_only_rethrow`

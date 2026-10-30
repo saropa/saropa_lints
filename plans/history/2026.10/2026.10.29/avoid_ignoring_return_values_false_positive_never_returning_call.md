@@ -1,6 +1,6 @@
 # BUG: `avoid_ignoring_return_values` — Flags a call whose return type is `Never` (`Error.throwWithStackTrace`)
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_ignoring_return_values`

@@ -1,6 +1,6 @@
 # BUG: `avoid_ignoring_return_values` — mutate-verb exemption misses local extension `dbActivityAdd()` (verb not at the start of the name)
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-10-29
 Rule: `avoid_ignoring_return_values`
