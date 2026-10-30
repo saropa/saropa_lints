@@ -89,9 +89,14 @@ export function formatFindings(total: number, errors: number): string {
   });
 }
 
-/** Escape text for a markdown table cell / link label inside an html-enabled hover. */
+/** Escape text for a markdown table cell / link label inside an html-enabled hover:
+ *  newlines collapse to a space, `$` is escaped so text cannot render codicons. */
 export function escapeMd(text: string): string {
-  return text.replace(/[\\`*_[\]|]/g, (c) => `\\${c}`).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return text
+    .replace(/\s*[\r\n]+\s*/g, ' ')
+    .replace(/[\\`*_[\]|$]/g, (c) => `\\${c}`)
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
 const PILL_COLORS: Readonly<Record<PillKind, string>> = {

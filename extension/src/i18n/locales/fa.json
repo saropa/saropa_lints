@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} پردازش‌کننده (ها) ترک شده",
       "criticalOrphans": "🔴 {count} پرورش دهنده(ها) ترک شده",
       "openHint": "کلیک کنید تا پرچه سلامت را باز کنید",
-      "systemRam": "سیستم: {free} از {total} رایگان",
       "systemLow": "⚠ سیستم: {free} از {total} رایگان",
       "extensionHostWarning": "⚠ افزونه هاست: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} فرآیند(ها) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} فرآیند(ها) ({size} RSS) ✓",
-      "sparkline": "RSS روند: {chart}",
-      "otherSection": "دیگر فرآیندهای Dart: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "تحلیل سرور {count} تشخیص داده شد — بستن پنجره های VS Code نا مورد استفاده",
-      "daemonCount": "Flutter نیمکت‌ها: {total} ({orphaned} بدون والد)",
-      "scanDaemonOrphans": "اسکن های پیگیری فرزندناشده: {count} — از تمیز کردن برای خاتمه دادن استفاده کنید",
-      "extensionHostSection": "تکنولوژی افزونه: {rss} RSS ({heap} / {heapTotal} پشته)",
       "warningHint": "ذخیره سازی Saropa بالا است — کلیک کنید تا جزئیات را ببینید",
       "criticalHint": "ذخیره سازی Saropa اهمیت ویژه ای دارد — تمیز کردن پیشنهاد می‌شود"
     },

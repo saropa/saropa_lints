@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} عملية(s) خلفية مهجورة",
       "criticalOrphans": "🔴 {count} daemon(s) مهجور",
       "openHint": "اضغط لفتح صحة العملية",
-      "systemRam": "نظام: {free} من {total} مجاني",
       "systemLow": "⚠ النظام: {free} من {total} مجاني",
       "extensionHostWarning": "⚠ مضيف التمديد: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} عملية(ات) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} عملية(ات) ({size} RSS) ✓",
-      "sparkline": "RSS الاتجاه: {chart}",
-      "otherSection": "الإجراءات الأخرى Dart: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "خادم تحليل {count} تم اكتشافه — إغلاق النوافذ VS Code غير المستخدمة",
-      "daemonCount": "Flutter مُساعدين: {total} ({orphaned} مهجور)",
-      "scanDaemonOrphans": "الـديـمـونـات الـمُرَدَّدَة: {count} — استخدم تنظيف لـإنهاء",
-      "extensionHostSection": "مُضيف التمديد: {rss} RSS ({heap} / {heapTotal} ذاكرة)",
       "warningHint": "ذاكرة Saropa مرتفعة — انقر للحصول على التفاصيل",
       "criticalHint": "ذاكرة Saropa حيوية — يُنصح بالتنظيف"
     },

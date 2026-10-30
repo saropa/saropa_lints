@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} орфанованные демон(ы)",
       "criticalOrphans": "🔴 {count} орфанных демонов",
       "openHint": "Нажмите, чтобы открыть Процесс Здоровье",
-      "systemRam": "Система: {free} из {total} свободных",
       "systemLow": "⚠ Система: {free} из {total} свободных",
       "extensionHostWarning": "⚠ Расширение-хост: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} процесс(ов) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} процесс(ов) ({size} RSS) ✓",
-      "sparkline": "RSS тренд: {chart}",
-      "otherSection": "Другие Dart процессы: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} анализатор сервер(ов) обнаружен — закройте ненужные VS Code окна",
-      "daemonCount": "Flutter демоны: {total} ({orphaned} орфанованных)",
-      "scanDaemonOrphans": "Орфанированные деймоны сканирования: {count} — используйте Clean Up для уничтожения",
-      "extensionHostSection": "Расширение-хост: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa память высока — нажмите для деталей",
       "criticalHint": "Saropa память критична — рекомендуется очистить"
     },

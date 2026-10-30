@@ -750,21 +750,11 @@
       "warningOrphans": "⚠ {count} orphaned daemon(s)",
       "criticalOrphans": "🔴 {count} orphaned daemon(s)",
       "openHint": "Click to open Process Health",
-      "systemRam": "System: {free} of {total} free",
       "systemLow": "⚠ System: {free} of {total} free",
       "extensionHostWarning": "⚠ Extension host: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} process(es) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} process(es) ({size} RSS) ✓",
-      "sparkline": "RSS trend: {chart}",
-      "otherSection": "Other Dart processes: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} analysis server(s) detected — close unused VS Code windows",
-      "daemonCount": "Flutter daemons: {total} ({orphaned} orphaned)",
-      "scanDaemonOrphans": "Orphaned scan daemons: {count} — use Clean Up to kill",
-      "extensionHostSection": "Extension host: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa memory is high — click for details",
       "criticalHint": "Saropa memory is critical — clean up recommended"
     },
@@ -2895,8 +2885,7 @@
       "tipDisagree": "pubspec.yaml and analysis_options.yaml name different saropa_lints versions. The editor uses the plugin version ({plugin}); the command line commands use the pubspec.yaml version ({pubspec}).",
       "tipNeither": "saropa_lints is not set up in this project: it is neither a dependency in pubspec.yaml nor a plugin in analysis_options.yaml.",
       "tipLocalSource": "saropa_lints comes from a local path or git source, so the extension shows facts only and changes nothing.",
-      "tipDartTooOld": "The plugin route in analysis_options.yaml needs a newer Dart SDK than this project has, so the editor cannot load the plugin.",
-      "tipClick": "Click to open the version compatibility card."
+      "tipDartTooOld": "The plugin route in analysis_options.yaml needs a newer Dart SDK than this project has, so the editor cannot load the plugin."
     },
     "recommend": {
       "latestOk": "saropa_lints {version} is the newest release and works with this project. Use ^{version}.",

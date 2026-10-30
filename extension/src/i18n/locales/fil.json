@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} na walang magulang na daemon(s)",
       "criticalOrphans": "🔴 {count} na walang magulang na daemon(s)",
       "openHint": "Click para magbukas ng Process Health",
-      "systemRam": "Sistema: {free} ng {total} libre",
       "systemLow": "⚠ Sistema: {free} ng {total} libre",
       "extensionHostWarning": "⚠ Extension host: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} proseso(s) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} proseso(s) ({size} RSS) ✓",
-      "sparkline": "Takbo ng RSS: {chart}",
-      "otherSection": "Mga iba pang proseso Dart: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "Nakita ang (mga) server ng pagsusuri ng {count} — isara ang hindi nagamit na mga window ng VS Code",
-      "daemonCount": "Flutter daemon: {total} ({orphaned} na walang magulang)",
-      "scanDaemonOrphans": "Nakalabas na mga daemon ng scan: {count} — gamitin ang Clean Up para i-kill",
-      "extensionHostSection": "Extension host: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Ang Saropa memory ay mataas — i-click para sa mga detalye",
       "criticalHint": "Saropa memory ay kritikal — puntaan ang pagtanggal"
     },

@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} daemoni orfani",
       "criticalOrphans": "🔴 {count} daemoni orfani",
       "openHint": "Fai clic per aprire Process Health",
-      "systemRam": "Sistema: {free} di {total} libero",
       "systemLow": "⚠ Sistema: {free} di {total} libero",
       "extensionHostWarning": "⚠ Host dell'estensione: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} processo(i) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} processo(i) ({size} RSS) ✓",
-      "sparkline": "Andamento RSS: {chart}",
-      "otherSection": "Altri processi Dart: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "Server di analisi {count} rilevati — chiudi finestre VS Code non utilizzate",
-      "daemonCount": "Flutter daemon: {total} ({orphaned} orfani)",
-      "scanDaemonOrphans": "Scan daemons orfani: {count} — utilizza Clean Up per terminare",
-      "extensionHostSection": "Estensione host: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Memoria Saropa è alta — clicca per i dettagli",
       "criticalHint": "Memoria Saropa è critica — pulizia consigliata"
     },

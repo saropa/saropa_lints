@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} وارث کے بے گھر ڈیمین",
       "criticalOrphans": "🔴 {count} ورثہ دار ڈیمون(s)",
       "openHint": "عمل صحت کو کھولنے کے لیے کلک کریں۔",
-      "systemRam": "سسٹم: {free} آزاد {total} سے",
       "systemLow": "⚠ نظام: {free} / {total} آزاد",
       "extensionHostWarning": "⚠ امتداد ہوست: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} عمل ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} عمل ({size} RSS) ✓",
-      "sparkline": "RSS رجحان: {chart}",
-      "otherSection": "دیگر Dart پروسسز: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} تحلیل سرور(س) پایا گیا — غیر استعمالی VS Code ونڈوز بند کریں",
-      "daemonCount": "Flutter ڈیمینس: {total} ({orphaned} چھوڑے گئے)",
-      "scanDaemonOrphans": "کھوکھلے اسکن ڈیمُن: {count} — استعمال کریں کلین اپ کریں تاکہ",
-      "extensionHostSection": "اکسنسن ہوست: {rss} RSS ({heap} / {heapTotal} ہیپ)",
       "warningHint": "Saropa یاد کریں ہے — کلک کریں تفصیلات کے لئے",
       "criticalHint": "Saropa یاد کریں اہم ہے — تیزی سے صاف کریں"
     },

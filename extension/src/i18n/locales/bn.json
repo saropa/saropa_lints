@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} অপসারিত ডেমন(s)",
       "criticalOrphans": "🔴 {count} অপরিচিত ডেমন(s)",
       "openHint": "ক্লিক করুন প্রক্রিয়া স্বাস্থ্য খুলতে",
-      "systemRam": "সিস্টেম: {free} টি ফ্রি এর মধ্যে {total} টি",
       "systemLow": "⚠ সিস্টেম: {free} টি {total} টি ফ্রি",
       "extensionHostWarning": "⚠ একসেনশন হোস্ট: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} প্রক্রিয়া(গুলি) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} প্রক্রিয়া(গুলি) ({size} RSS) ✓",
-      "sparkline": "RSS প্রবণতা: {chart}",
-      "otherSection": "অন্যান্য Dart প্রক্রিয়া: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} এনালাইসিস সার্ভার(গুলো) পাওয়া গেল — ব্যবহার করা হয়নি VS Code ওপেন করুন",
-      "daemonCount": "Flutter ডেমন: {total} ({orphaned} অপসারিত)",
-      "scanDaemonOrphans": "অপরিচ্ছন্ন স্ক্যান ডেমন: {count} — ক্লিন আপ ব্যবহার করুন যাতে মারা যায়",
-      "extensionHostSection": "একসাথে ব্যবহারকারী: {rss} RSS ({heap} / {heapTotal} মেমরি)",
       "warningHint": "Saropa মেমোরি উচ্চ — বিস্তারিত দেখুন",
       "criticalHint": "Saropa মেমোরি গুরুত্বপূর্ণ — পরিষ্কার করার পরামর্শ দেওয়া হয়েছে"
     },

@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} tiến trình daemon bị bỏ rơi",
       "criticalOrphans": "🔴 {count} daemon(s) bị bỏ rơi",
       "openHint": "Nhấp để mở Tình trạng quy trình",
-      "systemRam": "Hệ thống: {free} của {total} miễn phí",
       "systemLow": "⚠ Hệ thống: {free} của {total} miễn phí",
       "extensionHostWarning": "⚠ Host mở rộng: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} quy trình(es) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} quy trình(s) ({size} RSS) ✓",
-      "sparkline": "RSS xu hướng: {chart}",
-      "otherSection": "Các quy trình khác Dart: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} server phân tích được phát hiện — đóng các cửa sổ VS Code không sử dụng",
-      "daemonCount": "Flutter daemon: {total} ({orphaned} bị bỏ rơi)",
-      "scanDaemonOrphans": "Daemon quét bị bỏ rơi: {count} — dùng Clean Up để giết",
-      "extensionHostSection": "Máy chủ mở rộng: {rss} RSS (đống {heap} / {heapTotal})",
       "warningHint": "Saropa bộ nhớ cao — click để xem chi tiết",
       "criticalHint": "Saropa memory là quan trọng — được khuyến nghị dọn dẹp"
     },

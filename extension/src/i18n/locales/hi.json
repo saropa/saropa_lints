@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} अकेले डेमोन (s)",
       "criticalOrphans": "🔴 {count} अकेले डेमोन(s)",
       "openHint": "क्लिक करें ताकि प्रोसेस हेल्थ खोलें",
-      "systemRam": "सिस्टम: {free} में {total} खाली",
       "systemLow": "⚠ सिस्टम: {free} में {total} मुक्त",
       "extensionHostWarning": "⚠ एक्सटेंशन होस्ट: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} प्रक्रिया(एं) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} प्रक्रिया(एं) ({size} RSS) ✓",
-      "sparkline": "RSS तरल: {chart}",
-      "otherSection": "अन्य Dart प्रक्रियाएं: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} विश्लेषण सर्वर (सर्वर) डिटेक्टेड — अनुपयोगी VS Code विंडोज़ बंद करें",
-      "daemonCount": "Flutter डेमोन्स: {total} ({orphaned} अकेला)",
-      "scanDaemonOrphans": "अकेले स्कैन डेमोन: {count} — स्वच्छ करें के उपयोग करके मारें",
-      "extensionHostSection": "प्रस्तावक: {rss} RSS ({heap} / {heapTotal} खाली स्थान)",
       "warningHint": "Saropa स्मृति उच्च है — विवरण के लिए क्लिक करें",
       "criticalHint": "Saropa मेमोरी काफी महत्वपूर्ण है — सफाई करना अनुशोधन किया जाता है"
     },

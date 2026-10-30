@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} daemon(s) ที่ถูกทอดทิ้ง",
       "criticalOrphans": "🔴 {count} daemon(s) ที่ถูกทอดทิ้ง",
       "openHint": "คลิกเพื่อเปิดความสมบูรณ์ของกระบวนการ",
-      "systemRam": "ระบบ: {free} จาก {total} ฟรี",
       "systemLow": "⚠ ระบบ: {free} จาก {total} ฟรี",
       "extensionHostWarning": "⚠ ตัวดำเนินการขยาย: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} กระบวนการ(ๆ) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} กระบวนการ(ๆ) ({size} RSS) ✓",
-      "sparkline": "RSS แนวโน้ม: {chart}",
-      "otherSection": "กระบวนการอื่น ๆ Dart: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "เซิร์ฟเวอร์การวิเคราะห์ {count} ตรวจพบ — ปิดหน้าต่าง VS Code ที่ไม่ได้ใช้",
-      "daemonCount": "Flutter ผู้ดูแลระบบ: {total} ({orphaned} ทิ้งไว้)",
-      "scanDaemonOrphans": "Daemon ที่ถูกทอดทิ้งในการสแกน: {count} — ใช้ Clean Up เพื่อปิด",
-      "extensionHostSection": "ตัวขยาย: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "หน่วยความจำ Saropa สูง — คลิกเพื่อดูรายละเอียด",
       "criticalHint": "Saropa memory คือสิ่งสำคัญ — แนะนำให้ทำความสะอาด"
     },

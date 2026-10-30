@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count}daemon(s) מבודדים",
       "criticalOrphans": "🔴 {count}daemon(s) מוסתרים",
       "openHint": "לחץ כדי לפתוח מצב בריאות תהליך",
-      "systemRam": "מערכת: {free} מתוך {total} חפשי",
       "systemLow": "⚠ מערכת: {free} מתוך {total} חופשיים",
       "extensionHostWarning": "⚠ מארח הרחבת אקס텐שן: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} תהליך(ים) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} תהליך(ים) ({size} RSS) ✓",
-      "sparkline": "RSS ת趋: {chart}",
-      "otherSection": "אחרי Dart תהליכים: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "שרת ניתוח {count} détected — סגור חלונות VS Code לא בשימוש",
-      "daemonCount": "Flutter דמונים: {total} ({orphaned} אובד)",
-      "scanDaemonOrphans": "דמוניס קסן אובירנים: {count} — השתמש בנקה כדי לסיים",
-      "extensionHostSection": "מארח הרחבת אפליקציה: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "זיכרון Saropa גבוה — לחץ כדי לראות פרטים",
       "criticalHint": "הזיכרון Saropa קריטי — מומלץ לנקות"
     },

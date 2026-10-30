@@ -4,6 +4,7 @@
 import * as assert from 'node:assert';
 import {
   buildMemoryModel,
+  escapeMd,
   buildStatusBarModel,
   buildStatusBarQuickPickItems,
   formatFindings,
@@ -44,6 +45,15 @@ describe('formatFindings', () => {
   it('handles no errors and a single error', () => {
     assert.strictEqual(formatFindings(1200, 0), '1,200 findings');
     assert.strictEqual(formatFindings(1, 1), '1 finding (an error)');
+  });
+});
+
+describe('escapeMd', () => {
+  it('collapses newlines to a single space', () => {
+    assert.strictEqual(escapeMd('a\r\n\nb\n  c'), 'a b c');
+  });
+  it('escapes dollar signs so text cannot render codicons', () => {
+    assert.strictEqual(escapeMd('$(error) x'), '\\$(error) x');
   });
 });
 

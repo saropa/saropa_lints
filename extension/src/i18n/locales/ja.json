@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} 廃棄されたデーモン(s)",
       "criticalOrphans": "🔴 {count} 廃棄されたデーモン(s)",
       "openHint": "クリックしてプロセスヘルスを開く",
-      "systemRam": "システム: {free} / {total} が無料",
       "systemLow": "⚠ システム: {free} / {total} が空いています",
       "extensionHostWarning": "⚠ エクステンションホスト: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} プロセス(es) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} プロセス(es) ({size} RSS) ✓",
-      "sparkline": "RSS テンド: {chart}",
-      "otherSection": "他の Dart プロセス: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count}分析サーバー（ス）が検出されました — 使っていないVS Codeウィンドウを閉じる",
-      "daemonCount": "Flutter デーモン: {total} ({orphaned} 遺棄)",
-      "scanDaemonOrphans": "孤立したスキャンデーモン: {count} — クリーンアップを使用して終了",
-      "extensionHostSection": "拡張機能ホスト: {rss} RSS ({heap} / {heapTotal} ヘップ)",
       "warningHint": "Saropa メモリが多い — 詳細についてはクリックしてください",
       "criticalHint": "メモリSaropaは重要 — 推奨されるクリーンアップ"
     },

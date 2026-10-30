@@ -19,7 +19,7 @@ describe('routeStatus', () => {
     for (const [state, installed, text, tip] of cases) {
       const r = routeStatus(state, installed, t);
       assert.strictEqual(r.text, text, state);
-      assert.strictEqual(r.tooltip, `${tip}\n\ntipClick`, state);
+      assert.strictEqual(r.tip, tip, state);
     }
   });
 });

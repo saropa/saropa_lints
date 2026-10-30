@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} daemon(s) ya kifalaki",
       "criticalOrphans": "🔴 {count} daemon(s) ya kifalaki",
       "openHint": "Bofya ili kufungua Mchakato wa Afya",
-      "systemRam": "System: {free} ya {total} kwa kuanza",
       "systemLow": "⚠ Sistema: {free} ya {total} kati",
       "extensionHostWarning": "⚠ Mwenyeji wa kiendelezi: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} prosesu ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} proses(s) ({size} RSS) ✓",
-      "sparkline": "Mwenendo wa RSS: {chart}",
-      "otherSection": "Picha ya Dart: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} server ya analizi (analysis server) zilizotajwa — tuma kipengele ya VS Code kozalishwa",
-      "daemonCount": "Daemons Flutter: {total} ({orphaned} yatima)",
-      "scanDaemonOrphans": "Daemons ya scan ya kifupishwa: {count} — kuzalishia kwa kutumia Clean Up",
-      "extensionHostSection": "Mshirika wa extension: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa memory ni kubwa — click kwa detali",
       "criticalHint": "Saropa memory ni kifaa kubadilishwa — kusalama kwa makosa kwa kutoa"
     },

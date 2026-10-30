@@ -1157,9 +1157,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(statusBarItem);
 
   // One status bar item: switch state + score in the text; route, memory,
-  // workspace issues and details go in the tooltip. Click opens the status
-  // menu (the toggle is one row in it, not the click action).
-  statusBarItem.command = 'saropaLints.showStatusBarMenu';
+  // workspace issues and details go in the tooltip. Every render sets
+  // `command` to showStatusBarMenu (the toggle is one row in it, not the click action).
 
   // Memory / system-health / workspace-readiness state, computed by
   // updateMemoryStatusBar and rendered into the single item (tooltip lines,
@@ -1400,7 +1399,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.text = `$(checklist) Saropa Lints v${extVersion}`;
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — open a folder containing pubspec.yaml to enable analysis.`;
       statusBarItem.backgroundColor = undefined;
-      statusBarItem.command = 'saropaLints.showAbout';
+      statusBarItem.command = 'saropaLints.showStatusBarMenu';
       statusBarItem.show();
       return;
     }
@@ -1458,8 +1457,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.backgroundColor = new vscode.ThemeColor(
         'statusBarItem.errorBackground',
       );
-      // Safe fallback command — About panel works without any project state.
-      statusBarItem.command = 'saropaLints.showAbout';
+      // Click always opens the menu; with no model it falls back to About.
+      statusBarItem.command = 'saropaLints.showStatusBarMenu';
       statusBarItem.show();
     }
   };
@@ -1554,8 +1553,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   setTimeout(() => {
     void gatherReadiness(processMonitor.getLastHostMemory()).then((r) => {
       cachedReadinessText = readinessStatusBarText(r);
-      cachedReadinessLines = readinessTooltipLines(r, processMonitor.getLastHostMemory())
-        .map((l) => l.replace(/^•\s*/, ''));
+      cachedReadinessLines = readinessTooltipLines(r, processMonitor.getLastHostMemory());
       updateAllStatusBars();
     });
   }, 20_000);
@@ -2274,10 +2272,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // Status bar click: the same status, problems and action rows as the hover
     // in a QuickPick. Clicking the item never flips the switch; the toggle is a row.
     vscode.commands.registerCommand('saropaLints.showStatusBarMenu', async () => {
-      if (!statusBarModel) return;
+      if (!statusBarModel) {
+        await vscode.commands.executeCommand('saropaLints.showAbout');
+        return;
+      }
       const rows = buildStatusBarQuickPickItems(statusBarModel);
-      const picked = await vscode.window.showQuickPick(
-        rows.map((r) => ({
+      const picked = await vscode.window.showQuickPick<StatusBarPickItem>(
+        rows.map((r): StatusBarPickItem => ({
           label: r.label,
           description: r.description,
           detail: r.detail,
@@ -3393,6 +3394,11 @@ function resolveRulesFromArg(arg: unknown): string[] | undefined {
     if (node.kind === 'violation' && typeof node.violation?.rule === 'string') return [node.violation.rule];
   }
   return undefined;
+}
+
+/** A status bar menu row: a QuickPick item that carries the command it runs. */
+interface StatusBarPickItem extends vscode.QuickPickItem {
+  commandId?: string;
 }
 
 /** Pre-computed counts passed from the tier-change handler to the notification. */

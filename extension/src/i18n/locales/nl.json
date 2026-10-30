@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} orphello daemon(s)",
       "criticalOrphans": "🔴 {count} orphane daemon(s)",
       "openHint": "Klik om Process Health te openen",
-      "systemRam": "Systeem: {free} van {total} vrij",
       "systemLow": "⚠ Systeem: {free} van {total} vrij",
       "extensionHostWarning": "⚠ Extensiehost: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} proces(sen) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} proces(sen) ({size} RSS) ✓",
-      "sparkline": "RSS-trend: {chart}",
-      "otherSection": "Andere Dart processen: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} analyseer server(s) gedetecteerd — sluit ongebruikte VS Code vensters",
-      "daemonCount": "Flutter daemonen: {total} ({orphaned} orphane)",
-      "scanDaemonOrphans": "Geïsoleerde scan-daemonen: {count} — gebruik Clean Up om te killen",
-      "extensionHostSection": "Extensiehost: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa geheugen is hoog — klik voor details",
       "criticalHint": "Saropa geheugen is kritisch — schoonmaken wordt aanbevolen"
     },

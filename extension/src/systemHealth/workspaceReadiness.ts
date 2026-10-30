@@ -194,13 +194,13 @@ export function readinessStatusBarText(
     : l10n('workspaceReadiness.statusBar.yellow', { count });
 }
 
-/** Plain-text tooltip lines naming each readiness issue (codicon markers
- *  stripped — tooltips are plain strings and would show "$(warning)" raw). */
+/** Plain-text lines naming each readiness issue (codicon markers stripped,
+ *  no bullet prefix; the caller formats them). */
 export function readinessTooltipLines(
   readiness: WorkspaceReadiness,
   hostMemory: ExtensionHostMemory | undefined,
 ): string[] {
   return buildIssueItems(readiness, hostMemory).map(
-    (i) => `• ${i.label.replace(/\$\([^)]+\)\s*/g, '')}`,
+    (i) => i.label.replace(/\$\([^)]+\)\s*/g, ''),
   );
 }

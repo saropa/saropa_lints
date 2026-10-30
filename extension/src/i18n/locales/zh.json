@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} 已弃用的守护进程(进程)",
       "criticalOrphans": "🔴 {count} 孤儿守护进程(进程)",
       "openHint": "单击打开进程运行状况",
-      "systemRam": "系统：{free} / {total} 免费",
       "systemLow": "⚠ 系统：{free} / {total} 个免费",
       "extensionHostWarning": "⚠ 扩展主机: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints：{count}个进程({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} 个进程({size} RSS) ✓",
-      "sparkline": "RSS 趋势: {chart}",
-      "otherSection": "其他 Dart 进程: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count}分析服务器检测到 — 关闭未使用的VS Code窗口",
-      "daemonCount": "Flutter 守护进程：{total}（{orphaned} 孤儿）",
-      "scanDaemonOrphans": "孤立的扫描守护进程：{count} — 使用清理功能终止",
-      "extensionHostSection": "扩展主机：{rss} RSS（{heap} / {heapTotal} 堆）",
       "warningHint": "Saropa 内存使用率高 — 点击查看详情",
       "criticalHint": "Saropa内存是关键 —— 推荐清理"
     },

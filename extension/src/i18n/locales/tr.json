@@ -742,21 +742,11 @@
       "warningOrphans": "⚠ {count} izole edilmiş daemon(s)",
       "criticalOrphans": "🔴 {count} izole edilmiş daemon(s)",
       "openHint": "Süreç Sağlığı'nı açmak için tıklayın",
-      "systemRam": "Sistem: {free} / {total} ücretsiz",
       "systemLow": "⚠ Sistem: {free} / {total} ücretsiz",
       "extensionHostWarning": "⚠ Eklenti ana bilgisayarı: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} işlem(ler) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} işlem(ler) ({size} RSS) ✓",
-      "sparkline": "RSS trendi: {chart}",
-      "otherSection": "Diğer Dart süreçleri: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} analiz sunucusu(t) tespit edildi — kullanılmayan VS Code pencereleri kapat",
-      "daemonCount": "Flutter daemonları: {total} ({orphaned} izole)",
-      "scanDaemonOrphans": "Artık tarama programları: {count} — öldürmek için Temizleme'yi kullanın",
-      "extensionHostSection": "Eklenti ana bilgisayarı: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa belleği yüksek — detaylar için tıklayınız",
       "criticalHint": "Saropa belleği kritik — temizleme önerilir"
     },
