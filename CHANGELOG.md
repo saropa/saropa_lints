@@ -66,6 +66,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.0.1-beta.6] — Unreleased
+
+The large-file warning in the VS Code extension now says which folder it is about and why the files matter. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.6/CHANGELOG.md)
+
+### Changed
+
+- **Large-file watcher warning (extension):** the message now names the open folder, says the listed paths are relative to it, shows at most 3 files with their sizes plus "and N more", and explains that VS Code watches every file in the folder for changes and large files can slow it down or crash it. The "Exclude from Watcher" button is unchanged.
+
 ## [17.0.1-beta.5]
 
 The VS Code status bar now shows one Saropa item instead of four, the Lints On/Off state now matches what a click does, and 6 rules and the `init` command no longer report problems that are not there. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.5/CHANGELOG.md)

@@ -767,7 +767,8 @@
       "fixed": "Excluded {folders} from analysis and file watching."
     },
     "hazardScan": {
-      "warning": "Found {count} large file(s) not excluded from the file watcher: {files}. These can exhaust memory and crash VS Code.",
+      "warning": "Found {count} large file(s) inside the open folder \"{folder}\" (paths are relative to that folder): {files}. VS Code watches every file in the folder for changes, and large files can slow it down or crash it.",
+      "andMore": "and {count} more",
       "addExclusions": "Exclude from Watcher",
       "dismiss": "Dismiss",
       "added": "Added {count} watcher exclusion pattern(s) to workspace settings."

@@ -11,6 +11,7 @@ import * as path from 'node:path';
 import {
   buildExcludePatterns,
   getUncoveredHazards,
+  summarizeHazards,
 } from '../../systemHealth/workspaceHazardScan';
 import {
   clearTestConfig,
@@ -23,6 +24,21 @@ function write(root: string, rel: string, bytes: number): void {
   fs.mkdirSync(path.dirname(p), { recursive: true });
   fs.writeFileSync(p, Buffer.alloc(bytes));
 }
+
+describe('summarizeHazards', () => {
+  it('lists at most 3 entries and summarizes the rest', () => {
+    const files = [1, 2, 3, 4, 5].map((n) => ({ relative: `f${n}.bin`, size: 1024 }));
+    const out = summarizeHazards(files);
+    assert.ok(out.includes('f3.bin'));
+    assert.ok(!out.includes('f4.bin'));
+    assert.ok(out.endsWith('and 2 more'));
+  });
+
+  it('adds no "more" suffix for 3 or fewer', () => {
+    const out = summarizeHazards([{ relative: 'a.bin', size: 1024 }]);
+    assert.ok(!out.includes('more'));
+  });
+});
 
 describe('buildExcludePatterns', () => {
   it('uses **/.gradle/** for files under a .gradle directory', () => {

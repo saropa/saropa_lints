@@ -169,19 +169,33 @@ export function buildExcludePatterns(files: readonly HazardFile[]): string[] {
 
 /** Show a warning listing uncovered hazard files with an action to
  *  add watcher exclude patterns for them. */
-async function notifyUncovered(uncovered: readonly HazardFile[]): Promise<void> {
-  const summary = uncovered
+/** Max files named in the warning; the rest are summarized as "and N more". */
+const MAX_LISTED = 3;
+
+/** Build the {files} text: at most MAX_LISTED entries plus "and N more". */
+export function summarizeHazards(uncovered: readonly HazardFile[]): string {
+  const listed = uncovered
+    .slice(0, MAX_LISTED)
     .map((f) =>
       f.fileCount === undefined
         ? `${f.relative} (${formatBytes(f.size)})`
         : `${f.relative}/ (${f.fileCount} files)`,
-    )
-    .join(', ');
+    );
+  const extra = uncovered.length - MAX_LISTED;
+  if (extra > 0) {
+    listed.push(l10n('systemHealth.hazardScan.andMore', { count: String(extra) }));
+  }
+  return listed.join(', ');
+}
+
+async function notifyUncovered(uncovered: readonly HazardFile[]): Promise<void> {
+  const summary = summarizeHazards(uncovered);
+  const folder = path.basename(vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '');
   const addLabel = l10n('systemHealth.hazardScan.addExclusions');
   const dismissLabel = l10n('systemHealth.hazardScan.dismiss');
 
   const choice = await vscode.window.showWarningMessage(
-    l10n('systemHealth.hazardScan.warning', { count: String(uncovered.length), files: summary }),
+    l10n('systemHealth.hazardScan.warning', { count: String(uncovered.length), folder, files: summary }),
     addLabel,
     dismissLabel,
   );
