@@ -68,11 +68,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [17.0.1-beta.6] — Unreleased
 
-The large-file warning in the VS Code extension now says which folder it is about and why the files matter. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.6/CHANGELOG.md)
+The "large files not excluded from the file watcher" warning no longer appears in workspaces that are not Dart projects, and no longer lists tool-managed folders.
 
 ### Changed
 
-- **Large-file watcher warning (extension):** the message now names the open folder, says the listed paths are relative to it, shows at most 3 files with their sizes plus "and N more", and explains that VS Code watches every file in the folder for changes and large files can slow it down or crash it. The "Exclude from Watcher" button is unchanged.
+- **Large-file watcher warning (extension):** the message now names the open folder, says the listed paths are relative to it, shows at most 3 files with sizes or file counts plus "and N more", and explains that VS Code watches every file in the folder for changes and large files can slow it down or crash it. The "Exclude from Watcher" button is unchanged.
+
+### Fixed
+
+- **Large-file watcher warning (extension):** the scan now runs only in Dart/Flutter workspaces, and skips `.claude/worktrees` and `.venv` folders, so web or Python workspaces no longer get warnings about virtual-environment files and media assets. The 5 MB default size bar (`saropaLints.watcherExclude.maxFileKb`) is unchanged.
+
+---
 
 ## [17.0.1-beta.5]
 
