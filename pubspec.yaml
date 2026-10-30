@@ -128,8 +128,8 @@ dependencies:
   # https://pub.dev/packages/pub_semver
   pub_semver: ^2.2.1
 
-  # # https://pub.dev/packages/yaml/changelog
-  # yaml: ^3.1.3 # YAML parsing for CLI tool
+  # https://pub.dev/packages/yaml/changelog
+  # YAML parsing for CLI tool
   yaml: ^3.1.4
 
 #
@@ -147,7 +147,7 @@ dependencies:
 ##########################                                   #####################################
 ##################################################################################################
 dev_dependencies:
+  saropa_lints: ^16.2.1
   # A full featured library for writing and running Dart tests across platforms.
   # https://pub.dev/packages/test
-  ################ Because test >=1.31.2 depends on analyzer >=13.0.0 <15.0.0 and saropa_lints previously depended on analyzer ^12.1.0, test >=1.31.2 is forbidden.
-  test: ^1.31.1 # Unit testing framework
+  test: ^1.33.0 # Unit testing framework
