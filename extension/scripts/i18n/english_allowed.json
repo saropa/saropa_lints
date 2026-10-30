@@ -76,6 +76,9 @@
   ],
   "keys": [
     "lintsSwitch.*",
+    "statusBar.tooltip.*",
+    "statusBar.quickPick.*",
+    "command.showStatusBarMenu.title",
     "command.toggleLints.title",
     "command.syncPluginVersion.title",
     "analysisOptimizer.applyAll",

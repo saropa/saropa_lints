@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "Secondi di attesa dopo che l'analizzatore è pronto prima di avviare la scansione dell'area di lavoro. Consente a VS Code di terminare prima il burst di avvio in modo che la scansione non competa con l'analisi iniziale del file. Impostato su 0 per nessun ritardo.",
   "config.property.lspServer.scanDirectories.description": "Cartelle da scansionare all'avvio (relative alla radice del progetto). Utilizzate solo quando è abilitata la scansione dello spazio di lavoro. Modificate questa impostazione per corrispondere alla vostra struttura del progetto — ad esempio, aggiungere 'src' o rimuovere 'test' se i file di test non sono rilevanti.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

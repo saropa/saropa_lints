@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "アナライザーの準備が整った後、ワークスペース スキャンを開始するまでに待機する秒数。 VS Code が最初に起動バーストを終了するようにして、スキャンが最初のファイル分析と競合しないようにします。遅延なしの場合は 0 に設定します。",
   "config.property.lspServer.scanDirectories.description": "起動時にスキャンするディレクトリ（プロジェクトルートに対して相対パス）。ワークスペーススキャンが有効になっている場合のみ使用されます。プロジェクト構造に合わせて調整してください — 例えば、'src' を追加するか、テストファイルが関係ない場合は 'test' を削除するなど。",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

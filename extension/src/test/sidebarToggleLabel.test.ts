@@ -41,20 +41,21 @@ describe('buildStatusBarMenuItems', () => {
     // Regression guard for the status bar tooltip action menu: every command
     // a menu row links to must be allow-listed, or VS Code silently refuses
     // to execute the `command:` link on click (isTrusted.enabledCommands).
-    // This is the only check tying the two lists together — without it,
-    // renaming a command in one place but not the other breaks the link
-    // with no test failure elsewhere.
-    for (const enabled of [true, false]) {
-        it(`every commandId is covered by STATUS_BAR_TRUSTED_COMMANDS (enabled=${enabled})`, () => {
-            const uncovered = buildStatusBarMenuItems(enabled)
+    for (const kind of ['on', 'off', 'partial'] as const) {
+        it(`every commandId is covered by STATUS_BAR_TRUSTED_COMMANDS (${kind})`, () => {
+            const uncovered = buildStatusBarMenuItems(kind)
                 .map((item) => item.commandId)
                 .filter((id) => !STATUS_BAR_TRUSTED_COMMANDS.includes(id));
             assert.deepStrictEqual(uncovered, []);
         });
     }
 
-    it('toggle row flips between disable (enabled) and enable (disabled)', () => {
-        assert.strictEqual(buildStatusBarMenuItems(true)[0].commandId, 'saropaLints.disable');
-        assert.strictEqual(buildStatusBarMenuItems(false)[0].commandId, 'saropaLints.enable');
+    it('toggle row label follows the real state (never "enabled" while partly off)', () => {
+        assert.strictEqual(buildStatusBarMenuItems('on')[0].labelKey, 'statusBar.tooltip.action.turnOff');
+        assert.strictEqual(buildStatusBarMenuItems('off')[0].labelKey, 'statusBar.tooltip.action.turnOn');
+        assert.strictEqual(buildStatusBarMenuItems('partial')[0].labelKey, 'statusBar.tooltip.action.turnBothOn');
+        for (const kind of ['on', 'off', 'partial'] as const) {
+            assert.strictEqual(buildStatusBarMenuItems(kind)[0].commandId, 'saropaLints.toggleLints');
+        }
     });
 });

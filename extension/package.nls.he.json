@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "שניות לחכות לאחר שהנתח מוכן לפני תחילת סריקת סביבת העבודה. מאפשר ל-VS Code לסיים את פרץ האתחול שלו ראשון כך שהסריקה לא תתחרה בניתוח קבצים ראשוני. הגדר ל-0 ללא עיכוב.",
   "config.property.lspServer.scanDirectories.description": "תיקיות לסריקה בעת הפעלה (לפי יחס ל根本 הפרויקט). משמשות רק כאשר פעולת סריקה של סביבת העבודה מופעלת. ערוך את זה כדי להתאים למבנה הפרויקט שלך — לדוגמה, הוסף 'src' או הסר 'test' אם קבציทดสอบ אינם רלוונטיים.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

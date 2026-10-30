@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "Çalışma alanı taramasına başlamadan önce analiz cihazı hazır olduktan sonra beklenecek saniyeler. Taramanın ilk dosya analiziyle rekabet etmemesi için VS Code'nin başlangıç ​​patlamasını ilk önce bitirmesine izin verin. Gecikme olmaması için 0'a ayarlayın.",
   "config.property.lspServer.scanDirectories.description": "Başlangıçta taranacak dizinler (proje köküne göre). Yalnızca Çalışma Alanı Taraması etkinleştirildiğinde kullanılır. Bunu proje yapınıza uyacak şekilde ayarlayın - ör. Test dosyaları alakalı değilse 'src' ekleyin veya 'test'i kaldırın.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

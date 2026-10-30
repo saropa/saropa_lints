@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "چند ثانیه منتظر ماندن پس از آماده شدن تحلیلگر قبل از شروع اسکن فضای کاری. به VS Code اجازه می‌دهیم اول راه‌اندازی انفجاری خود را تمام کند تا اسکن با تجزیه و تحلیل فایل اولیه رقابت نکند. بدون تاخیر روی 0 تنظیم کنید.",
   "config.property.lspServer.scanDirectories.description": "دایرکتوری‌هایی که در زمان راه‌اندازی اسکن می‌شوند (نسبت به ریشه پروژه). فقط در صورت فعال بودن اسکن فضای کاری استفاده می‌شود. این تنظیم را تنظیم کنید تا با ساختار پروژه شما هم خوانا باشد — مثال: اگر فایل‌های تست مرتبط نیستند، 'test' را اضافه یا حذف کنید.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

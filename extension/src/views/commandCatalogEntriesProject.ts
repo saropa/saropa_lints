@@ -35,6 +35,13 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'power',
   },
   {
+    command: 'saropaLints.showStatusBarMenu',
+    title: 'Status Menu',
+    description: 'Show the status bar menu: current status, problems, and shortcuts (the toggle, reports, About). Opened by clicking the status bar item.',
+    category: 'Setup & Configuration',
+    icon: 'list-selection',
+  },
+  {
     command: 'saropaLints.syncPluginVersion',
     title: 'Sync Plugin Version to pubspec.lock',
     description: 'Set the version line in analysis_options.yaml to the version pinned in pubspec.lock.',

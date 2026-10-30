@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "ثواني للانتظار بعد أن يصبح المحلل جاهزًا قبل بدء فحص مساحة العمل. يتيح لـ VS Code إنهاء عملية بدء التشغيل أولاً حتى لا يتنافس الفحص مع التحليل الأولي للملف. اضبط على 0 بدون تأخير.",
   "config.property.lspServer.scanDirectories.description": "الأدلة التي تُفحص عند بدء التشغيل (نسبةً إلى جذر المشروع). تُستخدم فقط عند تفعيل Workspace Scan. عدّلها لتناسب بنية مشروعك — مثلًا أضف 'src' أو احذف 'test' إذا لم تكن ملفات الاختبار ذات صلة.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "Seconden die moeten worden gewacht nadat de analysator gereed is voordat de werkruimtescan wordt gestart. Laat VS Code eerst zijn opstartburst voltooien, zodat de scan niet concurreert met de initiële bestandsanalyse. Stel in op 0 voor geen vertraging.",
   "config.property.lspServer.scanDirectories.description": "Directories om te scannen bij opstarten (relatief ten opzichte van de projectwortel). Alleen gebruikt wanneer Workspace Scan is ingeschakeld. Pas dit aan om overeen te komen met je projectstructuur — bijv. voeg 'src' toe of verwijder 'test' als testbestanden niet relevant zijn.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

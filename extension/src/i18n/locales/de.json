@@ -644,13 +644,85 @@
       "tooltip": "Statusleiste-Update fehlgeschlagen — klicken Sie für Details. Die Erweiterung funktioniert möglicherweise immer noch; versuchen Sie, einen Befehl aus der Befehlspalette auszuführen."
     },
     "menu": {
-      "enableOn": "Analyse aktiviert (klicken, um zu deaktivieren)",
-      "enableOff": "Analyse deaktiviert (klicken, um zu aktivieren)",
       "openViolations": "Öffnen Sie Bericht über Verstöße",
       "openPackageDashboard": "Öffnen Sie das Package Dashboard.",
       "openProcessHealth": "Prozess Gesundheit öffnen",
       "commandCatalog": "Befehlskatalog",
       "about": "Über"
+    },
+    "tooltip": {
+      "section": {
+        "status": "Status",
+        "project": "Project",
+        "problems": "Problems",
+        "memory": "Memory",
+        "actions": "Actions"
+      },
+      "cause": {
+        "on": "Analysis is running: the setting and the analyzer plugin are both on.",
+        "off": "Analysis is off: the setting and the analyzer plugin are both off.",
+        "partialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on.",
+        "partialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on.",
+        "notSetUp": "saropa_lints is not set up in this project: it is not a dependency in pubspec.yaml and analysis_options.yaml has no plugin entry."
+      },
+      "fix": {
+        "turnOn": "Fix: turn both on",
+        "setUp": "Fix: set up and turn on",
+        "title": "Turns the saropaLints.enabled setting and the analyzer plugin on together."
+      },
+      "pill": {
+        "statusOn": "Lints are running. Click to open the Violations Report.",
+        "findings": "Open the Violations Report.",
+        "vibrancy": "Open the Package Dashboard."
+      },
+      "project": {
+        "version": "Version",
+        "tier": "Tier",
+        "vibrancy": "Vibrancy",
+        "packages": "Packages scanned",
+        "packagesSuppressed": "{count} ({suppressed} suppressed)",
+        "score": "Lint score",
+        "scorePending": "run a full analysis (partial scan)",
+        "findings": "Findings",
+        "updates": "Updates available",
+        "actionItems": "Action items",
+        "route": "Route"
+      },
+      "findings": {
+        "allErrors": "{count} findings (all errors)",
+        "allErrorsOne": "1 finding (an error)",
+        "mixed": "{errors} errors · {warnings} warnings",
+        "noErrors": "{total} findings"
+      },
+      "problem": {
+        "openCompat": "Open version compatibility card",
+        "reviewReadiness": "Review workspace issues"
+      },
+      "memory": {
+        "saropa": "Saropa Lints",
+        "none": "none running",
+        "processes": "{count} process(es) · {size} RSS",
+        "daemons": "Flutter daemons",
+        "daemonsValue": "{total} ({orphaned} orphaned)",
+        "scanDaemons": "Orphaned scan daemons",
+        "scanDaemonsValue": "{count}, use Clean Up to kill",
+        "other": "Other Dart",
+        "extHost": "Extension host",
+        "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
+        "ram": "Machine RAM",
+        "ramValue": "{free} free of {total}",
+        "trend": "RSS trend (last ~30 min)"
+      },
+      "action": {
+        "turnOff": "Turn Lints off",
+        "turnOn": "Turn Lints on",
+        "turnBothOn": "Turn both on",
+        "versionCompat": "Version Compatibility"
+      }
+    },
+    "quickPick": {
+      "title": "Saropa Lints",
+      "placeholder": "Pick an action"
     }
   },
   "systemHealth": {

@@ -43,7 +43,6 @@ import {
   getLintsSwitchState,
   type LintsSwitchState,
   initLintsSwitch,
-  lintsSwitchDetail,
   lintsSwitchLabel,
   syncVersionWithMessage,
   toggleLints,
@@ -167,11 +166,21 @@ import {
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
 import { forceUpgradeCheck } from './upgrade-checker';
 import { getRouteStatus, onRouteStatusChange, registerStartupDetection } from './compat/startupController';
-import { buildUnifiedStatusText, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
+import { buildUnifiedStatusText, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
+import {
+  buildStatusBarModel,
+  buildStatusBarQuickPickItems,
+  buildMemoryModel,
+  renderStatusBarTooltip,
+  type MemoryModel,
+  type StatusBarInput,
+  type StatusBarModel,
+} from './statusBarTooltip';
+import { formatNumber } from './views/webview-format';
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor, RssTrend, systemHealthStatusBarText } from './systemHealth/processMonitor';
-import { classifyProcess, formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, ProcessCategory, processLabel, renderSparkline, truncateLabel } from './systemHealth/processQuery';
+import { formatBytes } from './systemHealth/processQuery';
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
 import { registerOrphanPreflight } from './systemHealth/orphanPreflight';
 import { HealthPanel } from './systemHealth/healthPanel';
@@ -185,7 +194,7 @@ import { scanWorkspaceForHazards } from './systemHealth/workspaceHazardScan';
 import { gatherReadiness, readinessStatusBarText, readinessTooltipLines, showWorkspaceReadiness, ReadinessLevel } from './systemHealth/workspaceReadiness';
 import { HealthLevel } from './systemHealth/types';
 import type { ExtensionHostMemory } from './systemHealth/types';
-import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
+import type { DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
@@ -499,15 +508,11 @@ function readVisibleViolations(root: string): ViolationsData {
  */
 function findingsBadge(
   data: ViolationsData | null,
-): { suffix: string; tooltip: string } | null {
+): { suffix: string; total: number; errors: number } | null {
   const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
   if (total <= 0) return null;
-  const errorCount = data?.summary?.byImpact?.error ?? 0;
-  const shown = errorCount > 0 ? errorCount : total;
-  const tooltip = errorCount > 0
-    ? `${errorCount} error(s) of ${total} finding(s)`
-    : `${total} finding(s)`;
-  return { suffix: ` · $(warning) ${shown}`, tooltip };
+  const errors = data?.summary?.byImpact?.error ?? 0;
+  return { suffix: ` · $(warning) ${formatNumber(errors > 0 ? errors : total)}`, total, errors };
 }
 
 function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
@@ -535,36 +540,6 @@ function countOutdatedPackages(): number | undefined {
     const status = r.updateInfo?.updateStatus;
     return status === 'patch' || status === 'minor' || status === 'major';
   }).length;
-}
-
-/**
- * Builds the main status bar's tooltip as a clickable action menu instead of
- * plain text — a hover-activated toolbar of checkbox-style toggle links and
- * shortcuts to the reports/panels the plain text used to only describe.
- * `infoLines` renders first as read-only context, then a divider, then the
- * menu links from {@link buildStatusBarMenuItems} (mirrors the pattern
- * saropa-log-capture uses for its own status bar menu tooltip). Menu data
- * lives in statusBarLabel.ts, not here, so a unit test can assert every
- * commandId stays covered by STATUS_BAR_TRUSTED_COMMANDS.
- */
-function buildStatusBarTooltipMarkdown(infoLines: string[], enabled: boolean): vscode.MarkdownString {
-  const md = new vscode.MarkdownString('', true);
-  md.isTrusted = { enabledCommands: [...STATUS_BAR_TRUSTED_COMMANDS] };
-
-  for (const line of infoLines) {
-    md.appendMarkdown(`${line}\n\n`);
-  }
-  md.appendMarkdown('---\n\n');
-
-  const items = buildStatusBarMenuItems(enabled);
-  items.forEach((item, index) => {
-    md.appendMarkdown(`[${item.icon} ${l10n(item.labelKey)}](command:${item.commandId})`);
-    // Divider after the toggle + report/panel shortcuts (index 3), before the
-    // trailing utility links (Command Catalog / About).
-    md.appendMarkdown(index === items.length - 3 ? '\n\n---\n\n' : '\n\n');
-  });
-
-  return md;
 }
 
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
@@ -655,6 +630,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   let extVersion = '0.0.0';
   let driftAdvisorRefreshInProgress = false;
   let vibrancyData: VibrancyStatusData | null = null;
+  // Latest model behind the hover; the click menu shows the same rows.
+  let statusBarModel: StatusBarModel | undefined;
 
   try {
 
@@ -1180,13 +1157,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(statusBarItem);
 
   // One status bar item: switch state + score in the text; route, memory,
-  // workspace issues and details go in the tooltip. Click flips the switch.
-  statusBarItem.command = 'saropaLints.toggleLints';
+  // workspace issues and details go in the tooltip. Click opens the status
+  // menu (the toggle is one row in it, not the click action).
+  statusBarItem.command = 'saropaLints.showStatusBarMenu';
 
   // Memory / system-health / workspace-readiness state, computed by
   // updateMemoryStatusBar and rendered into the single item (tooltip lines,
   // plus a warning background when it is a problem). Undefined = nothing to report.
-  let memoryStatus: { text: string; tooltipLines: string[]; background: vscode.ThemeColor | undefined } | undefined;
+  let memoryStatus: { text: string; hints: string[]; memory: MemoryModel | undefined; background: vscode.ThemeColor | undefined } | undefined;
 
   // System health snapshot pushed from the process monitor.
   let systemHealthSnapshot: DartProcessSnapshot | null = null;
@@ -1211,7 +1189,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // the readiness command is invoked. Avoids running the filesystem-heavy
   // hazard scan on every status bar poll tick.
   let cachedReadinessText: string | undefined;
-  // Issue lines for the status bar tooltip, so the red/yellow count is explained.
+  // Issue names for the status bar tooltip's Problems section.
   let cachedReadinessLines: string[] = [];
 
   /**
@@ -1245,166 +1223,47 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       : new vscode.ThemeColor('statusBarItem.warningBackground');
   };
 
+  /** Arrow suffix after a size when its RSS trend is known (" ↑", " ↓", " →"). */
+  const trendArrow = (t: RssTrend): string =>
+    t === RssTrend.Rising ? ' ↑' : t === RssTrend.Falling ? ' ↓' : t === RssTrend.Stable ? ' →' : '';
+
   /**
    * Compute the memory/system-health state for the single status bar item
    * (stored in `memoryStatus`; undefined when there is nothing to report).
    * Plugin-level memory pressure takes priority over aggregate process RSS.
+   * `hints` are the summary sentences shown bold above the Memory table;
+   * `memory` is the per-process detail (see buildMemoryModel).
    */
-  /**
-   * Build per-process tooltip lines from a snapshot. Three sections:
-   * saropa-owned (health-colored), Flutter daemons, and other Dart
-   * processes (informational only). Top 3 by RSS shown per section.
-   *
-   * Uses classifyProcess for a single-pass partition — the enum is
-   * exhaustive, so adding a new ProcessCategory without handling it
-   * here is a compile-time error (if the switch is kept exhaustive).
-   */
-  function buildProcessTooltipLines(
-    snap: DartProcessSnapshot,
-    assessment: HealthAssessment,
-    trend: RssTrend,
-    rssHistory: readonly number[] = [],
-    extHost?: ExtensionHostMemory,
-    extHostTrend: RssTrend = RssTrend.Unknown,
-  ): string[] {
-    const lines: string[] = [];
-
-    // Single-pass partition — each process is classified once and lands
-    // in exactly one bucket. No runtime assertion needed because the
-    // classifyProcess enum is exhaustive.
-    const saropaProcs: DartProcessInfo[] = [];
-    const daemonProcs: DartProcessInfo[] = [];
-    const otherProcs: DartProcessInfo[] = [];
-    for (const p of snap.processes) {
-      const cat = classifyProcess(p).category;
-      if (cat === ProcessCategory.Saropa) saropaProcs.push(p);
-      else if (cat === ProcessCategory.Daemon) daemonProcs.push(p);
-      // AnalysisServer and Other both go in the "other" tooltip section.
-      else otherProcs.push(p);
-    }
-
-    // --- Saropa-owned section (colored by health level) ---
-    const saropaRss = saropaProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
-    const isHealthy = assessment.level === HealthLevel.Healthy;
-    // When trend is rising, suppress the ✓ — a rising arrow next to a check
-    // mark sends mixed signals. The arrow IS the warning; ✓ contradicts it.
-    const showCheck = isHealthy && trend !== RssTrend.Rising;
-    const saropaHeader = showCheck ? 'systemHealth.tooltip.saropaHealthy' : 'systemHealth.tooltip.saropaSection';
-    // Trend arrow after the header — rising RSS is an early leak warning
-    // even when the absolute value is below the red threshold.
-    const trendSuffix = trend === RssTrend.Rising ? ' ↑'
-      : trend === RssTrend.Falling ? ' ↓'
-      : trend === RssTrend.Stable ? ' →' : '';
-    lines.push(l10n(saropaHeader, {
-      count: String(saropaProcs.length),
-      size: formatBytes(saropaRss),
-    }) + trendSuffix);
-    // Top 3 saropa processes by RSS for actionable detail.
-    const topSaropa = [...saropaProcs].sort((a, b) => b.workingSetSize - a.workingSetSize).slice(0, 3);
-    for (const p of topSaropa) {
-      lines.push(l10n('systemHealth.tooltip.saropaProcessEntry', {
-        label: truncateLabel(processLabel(p)), size: formatBytes(p.workingSetSize),
-      }));
-    }
-
-    // RSS sparkline — visual trend over the last ~30 minutes.
-    // Only shown when enough data points exist for a meaningful shape.
-    const sparkline = renderSparkline(rssHistory);
-    if (sparkline) {
-      lines.push(l10n('systemHealth.tooltip.sparkline', { chart: sparkline }));
-    }
-
-    // --- Flutter daemons ---
-    const sTotal = String(snap.legitimateDaemonCount + snap.orphanedDaemonPids.length);
-    lines.push(l10n('systemHealth.tooltip.daemonCount', {
-      total: sTotal, orphaned: String(snap.orphanedDaemonPids.length),
-    }));
-    if (snap.orphanedScanDaemonPids.length > 0) {
-      lines.push(l10n('systemHealth.tooltip.scanDaemonOrphans', {
-        count: String(snap.orphanedScanDaemonPids.length),
-      }));
-    }
-
-    // --- Other Dart processes (informational, never red) ---
-    if (otherProcs.length > 0) {
-      const otherRss = otherProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
-      lines.push(l10n('systemHealth.tooltip.otherSection', {
-        count: String(otherProcs.length), size: formatBytes(otherRss),
-      }));
-      // Top 3 other processes by RSS so users can identify memory hogs.
-      const topOther = [...otherProcs].sort((a, b) => b.workingSetSize - a.workingSetSize).slice(0, 3);
-      for (const p of topOther) {
-        lines.push(l10n('systemHealth.tooltip.otherProcessEntry', {
-          label: truncateLabel(processLabel(p)), size: formatBytes(p.workingSetSize),
-        }));
-      }
-      // Hint when multiple analysis servers are detected.
-      const serverCount = otherProcs.filter(isAnalysisServerProcess).length;
-      if (serverCount >= 2) {
-        lines.push(l10n('systemHealth.tooltip.otherHint', { count: String(serverCount) }));
-      }
-    }
-
-    // --- Extension host (the Node.js process running this extension) ---
-    if (extHost) {
-      const hostTrendSuffix = extHostTrend === RssTrend.Rising ? ' ↑'
-        : extHostTrend === RssTrend.Falling ? ' ↓'
-        : extHostTrend === RssTrend.Stable ? ' →' : '';
-      lines.push(l10n('systemHealth.tooltip.extensionHostSection', {
-        rss: formatBytes(extHost.rssBytes),
-        heap: formatBytes(extHost.heapUsedBytes),
-        heapTotal: formatBytes(extHost.heapTotalBytes),
-      }) + hostTrendSuffix);
-    }
-
-    // --- Health hints (saropa-owned only) ---
-    if (assessment.level === HealthLevel.Warning) {
-      lines.push(l10n('systemHealth.tooltip.warningHint'));
-    } else if (assessment.level === HealthLevel.Critical) {
-      lines.push(l10n('systemHealth.tooltip.criticalHint'));
-    }
-    return lines;
-  }
-
   const updateMemoryStatusBar = () => {
     const memPressureSuffix = memoryPressureSuffix(memoryPressureState);
     let text: string | undefined;
-    const tooltipLines: string[] = [];
+    const hints: string[] = [];
 
     if (memPressureSuffix) {
       text = memPressureSuffix;
       const line = memoryPressureTooltipLine(memoryPressureState);
-      if (line) tooltipLines.push(line);
+      if (line) hints.push(line);
     } else if (systemHealthSnapshot) {
       // Delegate the wording to the health module so the text always names
       // whatever actually tripped the level.
       text = systemHealthStatusBarText(systemHealthSnapshot, systemHealthAssessment);
+      if (text) hints.push(text);
     }
 
-    // Per-process breakdown in the tooltip (separate from the status text).
-    if (systemHealthSnapshot) {
-      tooltipLines.push(...buildProcessTooltipLines(systemHealthSnapshot, systemHealthAssessment, saropaTrend, saropaRssHistory, hostMemory, hostTrend));
-    }
-
-    // Machine-wide RAM: show in tooltip always (when available), and promote
-    // to the status bar text when free RAM is below the configured threshold
-    // and no saropa-specific or memory-pressure issue is already displayed.
+    // Machine-wide RAM: shown in the Memory table always (when available),
+    // and promoted to the status bar text when free RAM is below the
+    // configured threshold and no saropa-specific or memory-pressure issue
+    // is already displayed.
     const systemMem = processMonitor.getLastSystemMemory();
-    if (systemMem) {
+    if (systemMem && !text) {
       const config = vscode.workspace.getConfiguration('saropaLints.systemHealth');
       const threshold = config.get<number>('systemMemoryWarningPercent', 15);
-      const freePercent = systemMem.freeFraction * 100;
-      // Always show machine RAM in the tooltip for at-a-glance context.
-      tooltipLines.push(l10n('systemHealth.statusBar.systemRam', {
-        free: formatBytes(systemMem.freeBytes),
-        total: formatBytes(systemMem.totalBytes),
-      }));
-      // When system RAM is low and no other health text is showing, surface it.
-      if (!text && freePercent < threshold) {
+      if (systemMem.freeFraction * 100 < threshold) {
         text = l10n('systemHealth.statusBar.systemLow', {
           free: formatBytes(systemMem.freeBytes),
           total: formatBytes(systemMem.totalBytes),
         });
+        hints.push(text);
       }
     }
 
@@ -1415,76 +1274,69 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     if (!text && hostMemory) {
       const hostConfig = vscode.workspace.getConfiguration('saropaLints.systemHealth');
       const hostWarningGB = hostConfig.get<number>('extensionHostWarningGB', 1);
-      const hostRssGB = hostMemory.rssBytes / 1_073_741_824;
-      if (hostRssGB >= hostWarningGB) {
+      if (hostMemory.rssBytes / 1_073_741_824 >= hostWarningGB) {
         text = l10n('systemHealth.statusBar.extensionHostWarning', {
           size: formatBytes(hostMemory.rssBytes),
         });
+        hints.push(text);
       }
     }
 
-    // Workspace readiness — lowest priority, shown only when no process-level
-    // or system-level health issue is already displayed.
-    if (!text && cachedReadinessText) {
-      text = cachedReadinessText;
-      tooltipLines.push(...cachedReadinessLines);
-    }
+    // Workspace readiness — lowest priority for the status bar text. Its
+    // issues are listed by name under Problems, not repeated here.
+    if (!text && cachedReadinessText) text = cachedReadinessText;
+
+    // Per-process breakdown + machine RAM as the Memory table.
+    const memory = systemHealthSnapshot || systemMem
+      ? buildMemoryModel({
+          snap: systemHealthSnapshot ?? undefined,
+          assessment: systemHealthAssessment,
+          saropaTrendArrow: trendArrow(saropaTrend),
+          saropaRising: saropaTrend === RssTrend.Rising,
+          rssHistory: saropaRssHistory,
+          extHost: hostMemory,
+          extHostTrendArrow: trendArrow(hostTrend),
+          systemRam: systemMem ?? undefined,
+        })
+      : undefined;
 
     memoryStatus = text
-      ? { text, tooltipLines, background: memoryStatusBarBackground(memPressureSuffix !== undefined) }
+      ? { text, hints, memory, background: memoryStatusBarBackground(memPressureSuffix !== undefined) }
       : undefined;
   };
-
-  /** Build tooltip lines for the status bar (version, tier, score, vibrancy details). */
-  function buildStatusBarTooltipLines(
-    tier: string,
-    health: { score: number } | null,
-    showVibrancy: boolean,
-    vibrancyLabel: string | null,
-    scorePending: boolean,
-  ): string[] {
-    const base = [`Saropa Lints v${extVersion}`, `Tier: ${tier}`];
-    if (health) {
-      base.push(`Lint score: ${health.score}%`);
-    } else if (scorePending) {
-      // The report covers too little of the project to score reliably. Tell
-      // the user how to get a real score instead of leaving the line blank.
-      base.push('Lint score: run a full analysis (partial scan)');
-    }
-    if (showVibrancy && vibrancyData !== null) {
-      // "Scanned" counts everything; the suffix explains why the assessment
-      // numbers below (vibrancy, updates) are over the smaller active set.
-      const scanned =
-        vibrancyData.suppressedCount > 0
-          ? `${vibrancyData.packageCount} packages scanned (${vibrancyData.suppressedCount} suppressed)`
-          : `${vibrancyData.packageCount} packages scanned`;
-      base.push(`Vibrancy: ${vibrancyLabel}`, scanned);
-      if (vibrancyData.updateCount > 0) base.push(`${vibrancyData.updateCount} update(s) available`);
-      if (vibrancyData.actionCount > 0) base.push(`${vibrancyData.actionCount} action item(s)`);
-    }
-    return base;
-  }
 
   // Renders the one status bar item. Text = switch state + score; everything
   // else (route, memory, workspace issues, details) is tooltip. Warning
   // background when the switch is not On or memory/workspace needs attention.
+  // Click opens the status menu (never toggles); the toggle is one menu row.
   function renderStatusBar(
     state: LintsSwitchState,
     scoreParts: Array<string | undefined>,
     badgeSuffix: string,
-    detailLines: string[],
+    details?: StatusBarInput['details'],
   ): void {
     const icon = state.kind === 'on' ? '$(checklist)' : '$(warning)';
     statusBarItem.text = `${icon} ${buildUnifiedStatusText(lintsSwitchLabel(state), scoreParts)}${badgeSuffix}`;
-    const lines = [lintsSwitchDetail(state), ...detailLines];
     const route = getRouteStatus();
-    if (route) lines.push(route.tooltip);
-    if (memoryStatus) lines.push(memoryStatus.text, ...memoryStatus.tooltipLines);
-    statusBarItem.tooltip = buildStatusBarTooltipMarkdown(lines, state.kind !== 'off');
+    statusBarModel = buildStatusBarModel({
+      kind: state.kind,
+      partialOff: state.kind === 'partial' ? state.off : undefined,
+      label: lintsSwitchLabel(state),
+      extVersion,
+      details,
+      route: route ? { state: route.state, text: route.text, tip: route.tip } : undefined,
+      readinessIssues: cachedReadinessLines,
+      memoryHints: memoryStatus?.hints ?? [],
+      memory: memoryStatus?.memory,
+    });
+    const md = new vscode.MarkdownString(renderStatusBarTooltip(statusBarModel), true);
+    md.supportHtml = true;
+    md.isTrusted = { enabledCommands: [...STATUS_BAR_TRUSTED_COMMANDS] };
+    statusBarItem.tooltip = md;
     statusBarItem.backgroundColor = state.kind === 'on'
       ? memoryStatus?.background
       : new vscode.ThemeColor('statusBarItem.warningBackground');
-    statusBarItem.command = 'saropaLints.toggleLints';
+    statusBarItem.command = 'saropaLints.showStatusBarMenu';
     statusBarItem.show();
   }
 
@@ -1516,13 +1368,25 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // "Score pending": we have a report but it covers too little of the
     // project to score (partial IDE sweep) — surface a hint, not a blank.
     const scorePending = health === null && data !== null && isReportTooPartial(data);
-    const tooltipLines = buildStatusBarTooltipLines(tier, health, showVibrancy, vibrancyLabel, scorePending);
-    if (badge) tooltipLines.push(badge.tooltip);
     renderStatusBar(
       state,
       [healthPart, showVibrancy ? `V${vibrancyLabel}` : undefined],
       badge?.suffix ?? '',
-      tooltipLines,
+      {
+        tier,
+        scorePercent: health?.score,
+        scorePending,
+        vibrancy: showVibrancy && vibrancyData !== null
+          ? {
+              label: vibrancyLabel ?? '',
+              packageCount: vibrancyData.packageCount,
+              suppressedCount: vibrancyData.suppressedCount,
+              updateCount: vibrancyData.updateCount,
+              actionCount: vibrancyData.actionCount,
+            }
+          : undefined,
+        findings: badge ? { total: badge.total, errors: badge.errors } : undefined,
+      },
     );
   }
 
@@ -1560,7 +1424,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       updateEnabledStatusBar(state, preloadedData, statusBarRoot, tier, showVibrancy, vibrancyLabel);
     } else {
       memoryStatus = undefined;
-      renderStatusBar(state, [], '', [`Saropa Lints v${extVersion} — Disabled`]);
+      renderStatusBar(state, [], '', undefined);
     }
   }
 
@@ -1690,7 +1554,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   setTimeout(() => {
     void gatherReadiness(processMonitor.getLastHostMemory()).then((r) => {
       cachedReadinessText = readinessStatusBarText(r);
-      cachedReadinessLines = readinessTooltipLines(r, processMonitor.getLastHostMemory());
+      cachedReadinessLines = readinessTooltipLines(r, processMonitor.getLastHostMemory())
+        .map((l) => l.replace(/^•\s*/, ''));
       updateAllStatusBars();
     });
   }, 20_000);
@@ -2405,6 +2270,23 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
       refreshAll();
       updateAllStatusBars();
+    }),
+    // Status bar click: the same status, problems and action rows as the hover
+    // in a QuickPick. Clicking the item never flips the switch; the toggle is a row.
+    vscode.commands.registerCommand('saropaLints.showStatusBarMenu', async () => {
+      if (!statusBarModel) return;
+      const rows = buildStatusBarQuickPickItems(statusBarModel);
+      const picked = await vscode.window.showQuickPick(
+        rows.map((r) => ({
+          label: r.label,
+          description: r.description,
+          detail: r.detail,
+          kind: r.separator ? vscode.QuickPickItemKind.Separator : vscode.QuickPickItemKind.Default,
+          commandId: r.commandId,
+        })),
+        { title: l10n('statusBar.quickPick.title'), placeHolder: l10n('statusBar.quickPick.placeholder') },
+      );
+      if (picked?.commandId) await vscode.commands.executeCommand(picked.commandId);
     }),
     vscode.commands.registerCommand('saropaLints.syncPluginVersion', async () => {
       const syncRoot = getProjectRoot();

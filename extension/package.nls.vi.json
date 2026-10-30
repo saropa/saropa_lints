@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "Vài giây chờ sau khi máy phân tích sẵn sàng trước khi bắt đầu quét không gian làm việc. Cho phép VS Code hoàn tất quá trình khởi động trước để quá trình quét không cạnh tranh với quá trình phân tích tệp ban đầu. Đặt thành 0 để không bị trễ.",
   "config.property.lspServer.scanDirectories.description": "Các thư mục cần quét khi khởi động (liên quan đến thư mục gốc của dự án). Chỉ được sử dụng khi Quét không gian làm việc được bật. Điều chỉnh điều này để phù hợp với cấu trúc dự án của bạn - ví dụ: thêm 'src' hoặc xóa 'test' nếu tệp kiểm tra không liên quan.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

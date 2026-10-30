@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "Segundos de espera depois que o analisador estiver pronto antes de iniciar a verificação do espaço de trabalho. Permite que o VS Code termine sua inicialização primeiro para que a varredura não concorra com a análise inicial do arquivo. Defina como 0 para nenhum atraso.",
   "config.property.lspServer.scanDirectories.description": "Diretórios para varrer no início (em relação à raiz do projeto). Apenas usado quando o Varredura de Workspace estiver habilitado. Ajuste isso para corresponder à sua estrutura de projeto — por exemplo, adicione 'src' ou remova 'test' se os arquivos de teste não forem relevantes.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

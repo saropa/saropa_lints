@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "Quelques secondes à attendre après que l'analyseur soit prêt avant de démarrer l'analyse de l'espace de travail. Permet à VS Code de terminer sa rafale de démarrage en premier afin que l'analyse n'entre pas en concurrence avec l'analyse initiale du fichier. Réglez sur 0 pour aucun délai.",
   "config.property.lspServer.scanDirectories.description": "Répertoires à analyser au démarrage (par rapport à la racine du projet). Utilisé uniquement lorsque le balayage du workspace est activé. Ajustez cela pour correspondre à votre structure de projet — par exemple, ajoutez 'src' ou supprimez 'test' si les fichiers de test ne sont pas pertinents.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

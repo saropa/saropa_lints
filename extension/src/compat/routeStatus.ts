@@ -8,6 +8,10 @@ import type { Installed, RouteState, Translate } from './startupDetection';
 export interface RouteStatus {
   text: string;
   tooltip: string;
+  /** The explanation alone, without the trailing "click" sentence. */
+  tip: string;
+  /** Detected route state, so callers can tell "not set up" from the rest. */
+  state: RouteState;
 }
 
 export function routeStatus(state: RouteState, installed: Installed, t: Translate): RouteStatus {
@@ -44,5 +48,5 @@ export function routeStatus(state: RouteState, installed: Installed, t: Translat
       text = t(K + 'neither');
       tip = t(K + 'tipNeither');
   }
-  return { text, tooltip: `${tip}\n\n${t(K + 'tipClick')}` };
+  return { text, tooltip: `${tip}\n\n${t(K + 'tipClick')}`, tip, state };
 }

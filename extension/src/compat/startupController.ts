@@ -13,7 +13,7 @@ import { readProjectFacts } from './projectFacts';
 import { getPubVersions, type PubVersion, type PubVersionsCache } from './pubVersions';
 import { VERSIONS_CACHE_KEY } from './upgradeGate';
 import { computeStartup, detectState, dontAskKey, installedVersions, isSuppressed, offerMessage, type StartupOffer } from './startupDetection';
-import { routeStatus } from './routeStatus';
+import { routeStatus, type RouteStatus } from './routeStatus';
 import { loadRenames } from '../ruleMigration/registry';
 
 const DISMISSED_KEY = 'saropaLints.startupDismissed';
@@ -67,11 +67,11 @@ function renamedCount(dataRoot: string, from: string, to: string): number | unde
   return loadRenames({ read }, dataRoot, from, to).length;
 }
 
-let currentRouteStatus: { text: string; tooltip: string } | undefined;
+let currentRouteStatus: RouteStatus | undefined;
 let routeStatusListener: (() => void) | undefined;
 
 /** Current route status ("saropa_lints: pubspec 17.0.1") for the single status bar item's tooltip. */
-export function getRouteStatus(): { text: string; tooltip: string } | undefined {
+export function getRouteStatus(): RouteStatus | undefined {
   return currentRouteStatus;
 }
 
@@ -91,7 +91,7 @@ export function registerStartupDetection(
 
   // Persistent, quiet route status: no popup and no status bar item of its own;
   // the single Saropa status bar item shows it as a tooltip line.
-  const statuses = new Map<string, { text: string; tooltip: string } | undefined>();
+  const statuses = new Map<string, RouteStatus | undefined>();
   const showStatus = () => {
     const primary = getProjectRoot();
     currentRouteStatus = (primary !== undefined && statuses.has(primary) ? statuses.get(primary) : undefined)

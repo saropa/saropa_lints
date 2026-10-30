@@ -100,6 +100,7 @@
     "src/test/sidebarSectionVisibilityKeys.test.ts",
     "src/test/sidebarToggleCommand.test.ts",
     "src/test/sidebarToggleLabel.test.ts",
+    "src/test/statusBarTooltip.test.ts",
     "src/test/overviewEmbeddedConfigKinds.test.ts",
     "src/copyTreeAsJson.ts",
     "src/copyTreeAsJsonSelection.ts",

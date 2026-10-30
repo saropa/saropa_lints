@@ -368,5 +368,6 @@
   "config.property.lspServer.workspaceScanDelay.description": "Sekunde chache za kusubiri baada ya kichanganuzi kuwa tayari kabla ya kuanza kutafuta nafasi ya kazi. Huruhusu VS Code imalizie uanzishaji wake kwanza ili uchanganuzi usishindane na uchanganuzi wa awali wa faili. Weka hadi 0 bila kuchelewa.",
   "config.property.lspServer.scanDirectories.description": "Makutano ya kusimama kwenye muda wa kuanza (kulingana na mbingu wa project). Iliyotumika kwa kipato kwenye Workspace Scan. Tafuta kujaribu kujua mbingu wako — tafsiri kujadili 'src' au kushinda 'test' kama faili ya test hufaniki.",
   "command.toggleLints.title": "Saropa Lints: Turn On / Off",
-  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock"
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }
