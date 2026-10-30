@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Split CHANGELOG_ARCHIVE.md into changelog/archive/<major>.<minor>.x.md files.
+"""Split CHANGELOG_ARCHIVE.md into changelog/<major>.x.md files.
 
 Idempotent: re-reads existing per-line files plus any new release sections in
 CHANGELOG_ARCHIVE.md, merges them (newest first), and rewrites the index.
@@ -11,7 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ARCHIVE = ROOT / "CHANGELOG_ARCHIVE.md"
-OUT_DIR = ROOT / "changelog" / "archive"
+OUT_DIR = ROOT / "changelog"
 HEADING = re.compile(r"^## \[(\d+)\.(\d+)\.(\d+)(?:[-+][^\]]*)?\]")
 REPO = "https://github.com/saropa/saropa_lints/blob/main"
 
@@ -43,22 +43,22 @@ def main() -> int:
             seen.setdefault(head, (ver, body))  # first occurrence wins
     groups: "OrderedDict[tuple, list]" = OrderedDict()
     for head, (ver, body) in sorted(seen.items(), key=lambda kv: kv[1][0], reverse=True):
-        groups.setdefault(ver[:2], []).append((ver, body))
-    for (maj, mnr), items in groups.items():
-        out = OUT_DIR / f"{maj}.{mnr}.x.md"
+        groups.setdefault(ver[:1], []).append((ver, body))
+    for (maj,), items in groups.items():
+        out = OUT_DIR / f"{maj}.x.md"
         out.write_text(
-            f"# Changelog Archive: {maj}.{mnr}.x\n\n<!-- cspell:disable -->\n\n"
+            f"# Changelog Archive: {maj}.x\n\n<!-- cspell:disable -->\n\n"
             + "\n".join(b for _, b in items),
             encoding="utf-8", newline="\n")
     rows = "\n".join(
-        f"- [{maj}.{mnr}.x](changelog/archive/{maj}.{mnr}.x.md) — "
-        f"{len(items)} release(s), {items[-1][0][2] if False else ''}"
-        f"{maj}.{mnr}.{min(i[0][2] for i in items)}–{maj}.{mnr}.{max(i[0][2] for i in items)}"
-        for (maj, mnr), items in groups.items())
+        f"- [{maj}.x](changelog/{maj}.x.md) — {len(items)} release(s), "
+        f"{items[-1][0][0]}.{items[-1][0][1]}.{items[-1][0][2]}–"
+        f"{items[0][0][0]}.{items[0][0][1]}.{items[0][0][2]}"
+        for (maj,), items in groups.items())
     ARCHIVE.write_text(
-        "# Changelog Archive\n\nArchived releases, one file per major.minor line "
-        "in [changelog/archive/](changelog/archive/). Search the whole record with "
-        "`grep -r <term> changelog/archive/`. See "
+        "# Changelog Archive\n\nArchived releases, one file per major version "
+        "in [changelog/](changelog/). Search the whole record with "
+        "`grep -r <term> changelog/`. See "
         f"[CHANGELOG.md]({REPO}/CHANGELOG.md) for the latest versions.\n\n"
         + rows + "\n", encoding="utf-8", newline="\n")
     print(f"{len(seen)} releases -> {len(groups)} files")

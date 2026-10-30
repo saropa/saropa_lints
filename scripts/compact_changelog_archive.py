@@ -131,9 +131,9 @@ def process(text: str) -> str:
 
 
 def main() -> int:
-    files = sorted((ROOT / "changelog" / "archive").glob("*.md"))
+    files = sorted((ROOT / "changelog").glob("*.md"))
     if not files:
-        print("missing changelog/archive/*.md", file=sys.stderr)
+        print("missing changelog/*.md", file=sys.stderr)
         return 1
     for path in files:
         data = path.read_text(encoding="utf-8")

@@ -30,7 +30,7 @@ from typing import Optional
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 RULES_DIR = PROJECT_ROOT / "lib" / "src" / "rules"
 CHANGELOG_PATH = PROJECT_ROOT / "CHANGELOG.md"
-CHANGELOG_ARCHIVE_DIR = PROJECT_ROOT / "changelog" / "archive"
+CHANGELOG_ARCHIVE_DIR = PROJECT_ROOT / "changelog"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 CACHE_DIR = REPORTS_DIR / "_cache"
 CACHE_PATH = CACHE_DIR / "rule_version_cache.json"
@@ -441,7 +441,7 @@ def _get_commits_touching_rules() -> list[tuple[str, str]]:
     result = subprocess.run(
         [
             "git", "log", "--oneline", "--all",
-            "--", "lib/src/rules/", "CHANGELOG.md", "CHANGELOG_ARCHIVE.md", "changelog/archive/",
+            "--", "lib/src/rules/", "CHANGELOG.md", "CHANGELOG_ARCHIVE.md", "changelog/",
         ],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         cwd=str(PROJECT_ROOT), timeout=60,
@@ -462,7 +462,7 @@ def _get_commit_diff(commit_hash: str) -> str:
         [
             "git", "diff-tree", "-p", "--no-commit-id",
             commit_hash,
-            "--", "lib/src/rules/", "CHANGELOG.md", "CHANGELOG_ARCHIVE.md", "changelog/archive/",
+            "--", "lib/src/rules/", "CHANGELOG.md", "CHANGELOG_ARCHIVE.md", "changelog/",
         ],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         cwd=str(PROJECT_ROOT), timeout=30,

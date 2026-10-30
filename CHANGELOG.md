@@ -66,11 +66,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [17.0.1-beta.5]
+
+The VS Code status bar now shows one Saropa item instead of four, the Lints On/Off state now matches what a click does, and 6 rules and the `init` command no longer report problems that are not there. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.5/CHANGELOG.md)
 
 ### Changed
 
-- **Status bar (extension):** the four Saropa status bar items (switch, score, "Saropa: ready/disabled", route and memory/workspace issues) are now one item, e.g. `Saropa Lints: On · 90% · V9/10`, `Saropa Lints: Off`, or `Saropa Lints: Partly off`. It turns to the warning colour when lints are Off or Partly off, or when memory or workspace issues need attention. The route (`saropa_lints: pubspec 17.0.1`), memory, health and workspace-issue details moved into its tooltip. Click still flips the Lints On/Off switch; the tooltip links open the report. The scan-on-save item now appears only while a scan is running or has just finished.
+- **Status bar (extension):** the four Saropa status bar items (switch, score, "Saropa: ready/disabled", route and memory/workspace issues) are now one item, e.g. `Saropa Lints: On · 90% · V9/10`, `Saropa Lints: Off`, or `Saropa Lints: Partly off`. It turns to the warning color when lints are Off or Partly off, or when memory or workspace issues need attention. The route (`saropa_lints: pubspec 17.0.1`), memory, health and workspace-issue details moved into its tooltip. Click still flips the Lints On/Off switch; the tooltip links open the report. The scan-on-save item now appears only while a scan is running or has just finished.
 
 ### Fixed
 
@@ -81,6 +83,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **`require_catch_logging`:** no longer flags a catch whose only statement returns a constructed typed result (e.g. `return const DecryptResult(DecryptStatus.authFailed)`). `return null;`, `return false;` and empty catches still lint.
 - **`avoid_memory_intensive_operations`, `avoid_string_concatenation_loop`:** no longer flag `line += buffer.toString()` where `buffer` is a `StringBuffer` (flushing a buffer into a string).
 - **`avoid_platform_channel_on_web`:** no longer flags channel calls after `if (!isSupported) return;` when `isSupported` reads a private flag that is only ever set true after a `kIsWeb`-guarded early exit. A flag assigned with no web guard still lints. The guard flag must be false on web (for example `!kIsWeb && ...`); a flag such as `kIsWeb || ...` and writes through `this._flag = ...` are now handled correctly. An early exit `if (!_canUse) return;` on a getter such as `kIsWeb || ...` no longer counts as a web guard; only a getter that is false on web (`!kIsWeb && ...`) does.
+
+---
 
 ## [17.0.1-beta.4]
 
@@ -145,6 +149,8 @@ This update makes the command-line setup report problems honestly instead of fin
 - **`require_dispose_pattern`:** no longer reports abstract classes with only static members.
 - **`require_file_close_in_finally`:** no longer reports `File.openRead` (the stream closes itself).
 
+---
+
 ## [17.0.1-beta.2]
 
 The latest release, `17.0.1-beta.2`, focuses entirely on refining existing rules to eliminate false positives in specific code contexts.  Key fixes include recognizing `!context.mounted` guards in static methods, allowing constant or literal interpolations in Drift SQL strings, and properly handling RegExp group matches for dynamic data parsing. It also improves checks for hooks outside build methods, platform channel declarations, and null-safe JSON accesses by better analyzing the surrounding code logic and type guards.[log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.2/CHANGELOG.md)
@@ -162,6 +168,8 @@ The latest release, `17.0.1-beta.2`, focuses entirely on refining existing rules
 - **`require_ios_face_id_usage_description`:** no longer reports when the project root cannot be found or when Info.plist is missing, and the plist lookup now works for relative file paths.
 - **`require_null_safe_json_access`:** no longer reports casts guarded by an `is` test in a conditional, or after the key was assigned earlier in the same block.
 - **`require_unique_iv_per_encryption`:** no longer reports IV size constants (`ivLength`, `ivSize`, and similar) or whose initializer is an integer literal.
+
+---
 
 ## [17.0.1-beta.1]
 
@@ -209,6 +217,8 @@ Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 project
 
 - Extension version now keeps the package's major.minor and maps only the patch (10 x package patch + slot; stable uses slot 9, prerelease N uses slot N-1), so every publish is strictly higher; a 10th prerelease of one patch is refused.
 
+---
+
 ## [16.10.0]
 
 Restores installation on Flutter 3.44 and older, and renames one rule whose name matched a core analyzer diagnostic. [log](https://github.com/saropa/saropa_lints/blob/v16.10.0/CHANGELOG.md)
@@ -220,6 +230,8 @@ Restores installation on Flutter 3.44 and older, and renames one rule whose name
 ### Changed
 
 - `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended` because the old name matched a core analyzer diagnostic that the analyzer is removing; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
+
+---
 
 ## [16.9.0]
 
@@ -491,116 +503,6 @@ Adds a "What's New" panel that surfaces on activation, flagging the v16 diagnost
 
 - Fixed the publish workflow authenticating to pub.dev with a stale OIDC token. `setup-dart` mints the credential once, right after SDK install; Analyze plus the full test suite then run for 9-10 minutes before the publish step, long enough for the short-lived token to expire and be rejected as `Invalid JWT token: invalid timestamps`. This had been misdiagnosed twice (beta.6, beta.9) as a transient pub.dev outage. `setup-dart` now re-runs immediately before `dart pub publish` so the token is minted at the point of use.
 - Bumped GitHub Actions across all workflows to Node.js 24-compatible major versions (`actions/checkout` v4→v5, `actions/setup-python` v5→v6, `actions/setup-node` v4→v5 with runtime bumped to Node 22, `actions/upload-artifact` v4→v5, `actions/github-script` v7→v8), resolving the Node.js 20 deprecation warning on GitHub-hosted runners.
-
----
-
-## [16.0.0-beta.9]
-
-Activation is now resilient — commands register and the sidebar warns on failure instead of going blank. The Findings Dashboard absorbs the full-project audit as a scope selector and gains severity coloring, clickable file paths and rule names, a filter-aware page limit, and JSON export. Sidebar rows show live counts, and per-file analysis no longer blocks the extension host. Publish-pipeline fixes stop the i18n audit from launching Ollama and the local pub.dev fallback from flooding the terminal. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.9/CHANGELOG.md)
-
-
-### Fixed (Extension)
-
-- Fixed "command not found" errors for dashboard and config commands when unrelated activation setup threw an error. The 80-command registration block now always executes regardless of whether earlier setup (providers, watchers, LSP) succeeded or failed.
-- When activation setup fails, the sidebar now shows a warning banner ("Activation Error — Check Extension Host log for details") instead of empty panels.
-- Fixed "Prune ignores" crashing the Flutter daemon on Windows by spawning `dart` directly instead of via a `cmd.exe` wrapper, eliminating process-tree complexity that competed for SDK resources. All `dart` CLI invocations now use direct spawn; `flutter` (a `.bat` wrapper) retains the shell path, and an ENOENT fallback retries with a shell for legacy SDK installs.
-- Fixed per-file analysis (`runAnalysisForFiles`) blocking the extension host with a synchronous `spawnSync` call for the entire `dart analyze` duration. Converted to the async `runInWorkspaceAsync` variant that the full-workspace analysis already uses, keeping the event loop responsive and adding a Cancel button to the progress notification.
-- "Run Analysis" now reads live VS Code diagnostics instantly instead of spawning a `dart analyze` subprocess. Completes in milliseconds instead of tens of seconds. The zero-violations case now shows a confirmation message instead of silent completion. Config-change rescans use an event-driven freshness gate instead of a fixed delay.
-- Sidebar dashboard rows now show live counts instead of static labels — Findings Dashboard shows violation count and health score, Package Dashboard shows how many packages have features to adopt, and the activity bar badge now reflects only lint violations.
-- Findings Dashboard sidebar row now shows "updated Ns ago" once live diagnostics have changed at least once this session, so a stale-looking count can be told apart from a genuinely fresh one at a glance. The freshness timestamp now only updates for `.dart` file diagnostics, not unrelated file types, and the row's icon switches from a warning triangle to a clock once the timestamp is over an hour old, so an aging count no longer reads as an up-to-date warning.
-
-### Improved (Extension)
-
-- Full Audit is now a "Source" scope selector inside the Findings Dashboard toolbar (Live diagnostics / Full project / Changed vs main / Changed vs branch) instead of a separate sidebar entry that opened a VS Code quick-pick menu and a second report panel. Progress and results render in the same dashboard you already have open, the chosen scope is remembered across sessions, and a legacy `saropa_lints` version's audit output normalizes to the current severity vocabulary the same way the batch report already did.
-- Audit report: severity is now color-coded — error rows get a red left border, warning rows amber, and severity pills/chips use tinted text for quick scanning.
-- Audit report: all counts use thousands separators (e.g. 151,919 instead of 151919) for readability.
-- Audit report: filter chip counts use a consistent badge style instead of bare parenthesized numbers.
-- Audit report: removed the duplicate read-only KPI chip strip — the interactive filter chips already show the same counts.
-- Audit report: the 500-row page limit now applies after filtering, not before. The pagination note clarifies this.
-- Audit report: added "Export JSON" button that saves the full diagnostics to a user-chosen file.
-- Audit report: file paths are visually clickable (link color + underline on hover) and now jump to the diagnostic line instead of just opening the file.
-- Audit report: rule names are clickable — clicking one filters the table to show only findings for that rule, with a dismissible banner.
-- Audit report: when errors or warnings exist, INFO findings are hidden by default so actionable findings are immediately visible. Click the INFO chip to show them.
-- Audit report: a severity summary bar below the header shows the error/warning/info ratio as colored segments with tooltips.
-- Audit report: clicking a file path now jumps to the exact column, not just the line.
-
-### Internal
-
-- Sidebar data is now computed once per refresh cycle (`prepareRefreshCycle`) instead of being cleared and rebuilt by each provider independently. Eliminates redundant `readVisibleLiveViolations` + `computeLiveHealthScore` calls when multiple sidebar sections refresh together.
-- Fixed i18n audit (`--mode audit`) probing Ollama engine availability via `low_quality_entries()`, which self-provisioned the daemon and pulled the model — an expensive, risky side effect during a read-only coverage check. Audit now uses `audit_only=True` to scan cache provenance tags without any subprocess calls.
-- Fixed `dart pub publish --force` (local fallback) printing its full file-tree listing to stdout, flooding the terminal and pushing prior publish-step output out of the scrollback buffer. Output is now captured; only the pub.dev confirmation line is surfaced.
-- Added manual translations to `dictionaries.py` for 5 gaps across 4 locales (ar, de, fil, pt) that MT engines did not translate: RSS warning description, "Dev Tool Budget", "Set Cap", "Translation Engine (Ollama)".
-- Added `COGNATES` approval list to `dictionaries.py` for words that are spelled identically in specific target languages (e.g. "Source" in French). Previously each cognate needed a per-locale `"X": "X"` passthrough scattered across the file; the centralized list merges them at import time, with locale-code validation (typos raise `ValueError`), empty/duplicate-locale guards, drift detection (`--fail-on-drift`), and a `--check-cognates` flag (now in the publish pipeline) that catches conflicts and DO_NOT_TRANSLATE redundancies.
-
----
-
-## [16.0.0-beta.8]
-
-🌍 **Milestone: 25 languages, 2,319 translated fields** — extension ships in 25 locales (Arabic, Bengali, Chinese, Dutch, English, Farsi, Filipino, French, German, Hebrew, Hindi, Indonesian, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Swahili, Thai, Turkish, Ukrainian, Urdu, Vietnamese).
-
-Fixed a sidebar action that could crash on a project's first scan or run twice on rapid clicks, and shortened several sidebar labels. System Health now monitors the whole machine — not just saropa_lints' own processes — with proactive warnings and one-click fixes. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.8/CHANGELOG.md)
-
-### Added (Extension)
-
-- Machine-wide health monitoring: system RAM, every Dart analysis server, Flutter daemon, and Ollama/llama-server process grouped by category with contextual recommendations and one-click actions (restart server, set heap cap, reclaim orphans, unload model). Accessible from the sidebar and command palette.
-- Dev Tool Budget indicator: a single percentage showing how much of the machine's RAM dev tools consume versus a configurable target (`saropaLints.systemHealth.devToolBudgetPercent`, default 60%). Warns when dev tools exceed the budget.
-- Proactive warnings when free RAM drops below a configurable threshold (`saropaLints.systemHealth.systemMemoryWarningPercent`, default 15%) or any single analysis server exceeds a configurable size (`saropaLints.systemHealth.analysisServerWarningGB`, default 4 GB), plus a one-time session-start check. System-wide free RAM now appears in the status bar tooltip.
-
-### Fixed (Extension)
-
-- Fixed "Fix stale ignores" sidebar action crashing with ENOENT when the `reports/.saropa_lints/` directory does not yet exist (e.g. first run on a project). The directory is now created before the scan CLI writes its JSON output.
-- Fixed all stale-ignore commands allowing concurrent execution when double-clicked or triggered in rapid succession, which could launch duplicate CLI processes. A busy guard now shows a brief status-bar message and drops the duplicate click.
-
-### Changed (Extension)
-
-- Shortened sidebar action labels: "Fix stale ignores" → "Prune ignores", "Initialize / Update config" → "Update config". Descriptions now carry the detail the labels shed.
-
-### Internal
-
-- Extracted `createBusyGuard` to `commandGuards.ts` as a reusable concurrency guard with visible status-bar feedback, replacing four identical inline busy-flag patterns in the stale-ignore commands.
-- Routed the three sidebar Actions labels ("Run analysis", "Prune ignores", "Update config") through `l10n()` with new `sidebar.actions.*` keys in `en.json`, closing an i18n gap where two of the three labels were hardcoded English.
-- Hardened Machine Health dashboard: Windows-only platform guard with localized message, narrow viewport wrapping/scrolling, two-tier query/notification throttle (2 min / 10 min) to reduce unnecessary PowerShell shell-outs, undefined-arg guard on Unload Ollama Model command.
-- System memory warning now honors the user's configured threshold directly instead of silently clamping to a 20% minimum at session start.
-
----
-
-## [16.0.0-beta.7]
-
-Process Health now tracks only saropa-owned memory, so other VS Code windows no longer trigger false alerts. The tooltip adds a trend arrow, sparkline chart, and early leak detection. Also fixes the dashboard's "Enable all recommended packs" button showing stale results. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.7/CHANGELOG.md)
-
-### Added
-
-- New rule `add_resolution_workspace` (recommended tier, WARNING): flags a package listed in a Dart pub workspace that is missing `resolution: workspace` in its pubspec.yaml, catching version drift before `pub get` fails. Quick fix inserts the key after the `environment:` block.
-- New rule `flag_missing_workspace_member` (recommended tier, INFO): flags a workspace root whose subdirectories contain pubspec.yaml files not listed in the `workspace:` list, catching packages that silently resolve independently instead of joining the shared lockfile. Scans up to 3 levels deep, skips listed members' children (no example/ false positives).
-- New rule `workspace_dependency_version_sync` (recommended tier, INFO): flags a workspace whose member packages declare different version constraints for the same dependency, catching version drift that produces misleading pubspecs since all members share one lockfile.
-- New rule `workspace_member_order` (recommended tier, INFO): flags a workspace root whose `workspace:` list entries are not in alphabetical order, making large workspaces easier to scan and reducing merge conflicts from unordered insertions.
-- New rule `prefer_publish_to_none` (recommended tier, INFO): flags a pubspec.yaml that has no `publish_to` field and appears to be an application (missing homepage/repository metadata), guarding against accidental `dart pub publish` to pub.dev. Quick fix inserts `publish_to: none` after `description:` (or after `name:` if there is no description).
-- New rule `avoid_dependency_overrides` (recommended tier, WARNING): flags any non-empty `dependency_overrides:` section in pubspec.yaml, which silently diverges the resolved dependency graph from declared constraints and masks real conflicts.
-- New rule `prefer_pinned_version_syntax` (stylistic tier, INFO): flags caret-range version constraints (`^X.Y.Z`) in app pubspecs (`publish_to: none`), suggesting exact pins for reproducible builds. Conflicting pair with `prefer_caret_constraint_in_app` — opt-in only.
-- Process Health tooltip now shows an RSS trend arrow (↑ rising / → stable / ↓ falling) next to the saropa section header. A rising trend is an early memory-leak warning before the red threshold trips. Based on a 5-sample split-mean with a 10% change threshold.
-- Process Health tooltip includes a Unicode sparkline chart (▁▂▃▄▅▆▇█) showing saropa RSS over the last ~30 minutes. Gives a visual memory profile at a glance without opening a panel.
-- Process Health now detects monotonically rising RSS and shows a one-time "possible memory leak" notification before the red threshold trips. Based on 8/10 consecutive non-decreasing comparisons, tolerating brief GC dips.
-
-### Fixed
-
-- Fixed Process Health status bar falsely attributing system-wide Dart memory to saropa_lints. The red/yellow thresholds now evaluate saropa-owned process RSS only (scan daemon, CLI scans), not the aggregate of all Dart processes. A 12GB analysis server from another VS Code window no longer makes the saropa_lints indicator go red.
-- Process Health tooltip now shows a per-process breakdown: saropa-owned processes first (with health check), Flutter daemons, then other Dart processes as informational. Top 3 processes per category listed by RSS. Hints when multiple analysis servers are detected.
-- Fixed "Enable all recommended packs" button showing "no applicable rule packs detected" while the dashboard table correctly showed 87 detected packs. The button now uses `getDetectedPackIds`, a shared helper that both the table and the button call, so the two surfaces can never diverge.
-
-### Internal
-
-- Hardened `add_resolution_workspace` quick fix: re-verifies `resolution: workspace` absence before inserting (guards against stale diagnostics and batch "fix all" duplicates), added trailing-newline guard when inserting after the environment block, and tolerates blank lines inside the environment block. The detection regex now also accepts quoted forms (`"workspace"` / `'workspace'`).
-- Hardened `flag_missing_workspace_member` scan: deduplicated path-normalization logic into a shared public helper, extended case-insensitive path comparison to macOS (default APFS), and made the `build/` directory skip case-insensitive.
-- Extracted `findDivergentDependencyConstraints` from `workspace_dependency_version_sync` into the pubspec constraint parser, creating a pure-function seam for unit testing and removing an unreachable block-dep guard that the parser already handles.
-- Hardened Process Health tooltip: process labels truncated at 30 chars for width safety, analysis server detection broadened with `--protocol=lsp` for future binary rename resilience, ✓/↑ conflict resolved (rising trend suppresses the healthy checkmark to avoid mixed signals), and partition assertion added to catch filter coupling drift.
-- Expanded RSS history ring buffer from 5 to 30 samples for sparkline rendering while preserving trend computation on the most recent 5.
-- Added monotonic growth detector as a pure function with 8/10 threshold — fires a one-time informational toast directing the user to the health panel.
-- Hardened sparkline renderer to use reduce loops instead of spread for stack safety, and ProcessMonitor returns a defensive copy of the RSS history buffer.
-- Added `classifyProcess()` as a discriminated union (`ProcessCategory` + label) replacing the duplicated predicate chains across tooltip, snapshot, and label functions. Boolean predicates (`isSaropaProcess`, `isDaemonProcess`, `isAnalysisServerProcess`) now delegate to it, and the tooltip builder uses a single-pass partition instead of three independent filter passes with a runtime assertion.
-- Fixed leak detection "Open Health Panel" button silently no-oping because it called unregistered command `showHealthPanel` instead of the registered `showProcessHealth`.
-- Added 45 tests total in the systemHealth suite (90 passing): `classifyProcess` discriminated union (8), process partition mutual exclusivity (3), marker substring containment invariant (1), plus the existing `processLabel` (9), `isAnalysisServerProcess` (4), `truncateLabel` (5), RSS trend boundary (2), `renderSparkline` (6), `detectMonotonicGrowth` (7).
-- Extracted `getDetectedPackIds` in `rulePackDefinitions.ts` as the single source of truth for pack applicability. The dashboard table and "Enable all" button both call it instead of inlining `isPackDetected` filters independently.
-- Replaced the collapsed HTML Maintenance expander changelog convention with a `### Internal` heading, enforced by a pre-commit hook and a publish-time gate.
 
 ---
 
