@@ -68,10 +68,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [17.0.1-beta.6] — Unreleased
 
-The "large files not excluded from the file watcher" warning no longer appears in workspaces that are not Dart projects, and no longer lists tool-managed folders.
+The "large files not excluded from the file watcher" warning no longer appears in workspaces that are not Dart projects, and no longer lists tool-managed folders. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.6/CHANGELOG.md)
 
 ### Changed
 
+- **Lints switch (extension):** the status bar and sidebar showed "Partly off" when every engine was off but the Scan on Save toggle in Process Health had only suspended the scan daemon. A suspended daemon now counts as the setting being off, so the switch shows "Off".
 - **Large-file watcher warning (extension):** the message now names the open folder, says the listed paths are relative to it, shows at most 3 files with sizes or file counts plus "and N more", and explains that VS Code watches every file in the folder for changes and large files can slow it down or crash it. The "Exclude from Watcher" button is unchanged.
 - **Status bar hover (extension):** the tooltip is now laid out in sections (Status, Project, Problems, Memory, Actions) with tables, colored pills with hover text, and one link per action. Findings read "18,368 findings (all errors)" or "N errors · M warnings", long numbers have thousands separators, each problem names itself with its own link, and the memory detail is unchanged but tabulated. The toggle label follows the real state, and the two conflicting "not set up" messages are now one.
 - **Status bar click (extension):** clicking the status bar item no longer flips Lints on or off. It opens a menu (new command `Saropa Lints: Status Menu`) with the status, problems and actions; the toggle is one row.

@@ -61,10 +61,18 @@ export function initLintsSwitch(ctx: vscode.ExtensionContext | undefined): void 
   switchContext = ctx;
 }
 
+/** Reports whether the scan daemon is suspended (debug-panel toggle); a suspended daemon counts as the setting being off. */
+let scanSuspendedProvider: (() => boolean) | undefined;
+
+export function setScanSuspendedProvider(fn: (() => boolean) | undefined): void {
+  scanSuspendedProvider = fn;
+}
+
 /** Read the live state for a project root (context adds the workspace memento to the ownership check). */
 export function getLintsSwitchState(root: string, context?: vscode.ExtensionContext): LintsSwitchState {
   const ctx = context ?? switchContext;
-  const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
+  const enabled = (vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true)
+    && !scanSuspendedProvider?.();
   const owned = ctx ? wasPluginDisabledByExtension(ctx, root) : readPluginOwnershipFile(root);
   return computeLintsSwitchState(enabled, getPluginsIntegrationState(root), owned);
 }

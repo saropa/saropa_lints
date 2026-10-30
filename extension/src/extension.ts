@@ -41,6 +41,7 @@ import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
 import { surfacePluginDivergence } from './pluginDivergencePrompt';
 import {
   getLintsSwitchState,
+  setScanSuspendedProvider,
   type LintsSwitchState,
   initLintsSwitch,
   lintsSwitchLabel,
@@ -648,6 +649,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(scanOnSaveDiagCollection);
   scanOnSaveController = new ScanOnSaveController(scanOnSaveDiagCollection, getProjectRoot, getSharedOutputChannel());
   context.subscriptions.push(scanOnSaveController);
+  setScanSuspendedProvider(() => scanOnSaveController.isDaemonSuspended);
 
   // Pubspec validation: inline diagnostics for dependency ordering,
   // version syntax, and constraint issues on pubspec.yaml.
@@ -1873,6 +1875,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       } else {
         scanOnSaveController.suspendDaemon();
       }
+      // Suspension feeds the On / Off / Partly off switch.
+      refreshAll();
+      updateAllStatusBars();
     } else if (engine === 'ci') {
       // Edits .github/workflows/saropa-lints.yml in the workspace's working
       // tree only — never runs git. ON writes the workflow if it's missing,
