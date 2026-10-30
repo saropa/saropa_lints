@@ -62,6 +62,31 @@ from scripts.modules._utils import (
 MARKETPLACE_MANAGE_URL = (
     "https://marketplace.visualstudio.com/manage/publishers/Saropa"
 )
+OPENVSX_MANAGE_URL = "https://open-vsx.org/user-settings/extensions"
+
+# Stores that were skipped or failed in this run; printed with the .vsix path
+# at the end of publish_extension so the user can upload by hand.
+_manual_upload_stores: list[str] = []
+
+
+def _mark_manual_upload(store: str) -> None:
+    if store not in _manual_upload_stores:
+        _manual_upload_stores.append(store)
+
+
+def _print_manual_upload_help(vsix_path: Path) -> None:
+    """Print store URLs and the .vsix path for stores needing a manual upload."""
+    if not _manual_upload_stores:
+        return
+    urls = {
+        "marketplace": MARKETPLACE_MANAGE_URL,
+        "openvsx": OPENVSX_MANAGE_URL,
+    }
+    print_warning("UPLOAD BY HAND:")
+    for store in _manual_upload_stores:
+        print_info(f"    {store}: {urls[store]}")
+        print_info(f"      file: {vsix_path.resolve()}")
+    _manual_upload_stores.clear()
 
 
 def _extension_dir(project_dir: Path) -> Path:
@@ -332,6 +357,7 @@ def run_extension_compile(project_dir: Path) -> bool:
             print_error(r.stderr.strip())
         if r.stdout:
             print_error(r.stdout.strip())
+        _mark_manual_upload("openvsx")
         return False
     return True
 
@@ -508,6 +534,7 @@ def publish_extension_to_marketplace(
             vsce_pat = _prompt_for_vsce_pat()
             if not vsce_pat:
                 print_info("Skipping VS Code Marketplace publish.")
+                _mark_manual_upload("marketplace")
                 return True
     ext_dir = _extension_dir(project_dir)
     publish_cmd = [
@@ -540,6 +567,7 @@ def publish_extension_to_marketplace(
         print_info(
             f"  You can also upload the .vsix manually: {vsix_path.name}"
         )
+        _mark_manual_upload("marketplace")
         return False
     return True
 
@@ -593,6 +621,7 @@ def publish_extension_to_ovsx(project_dir: Path, vsix_path: Path, version: str) 
         ovsx_pat = _prompt_for_ovsx_pat()
         if not ovsx_pat:
             print_info("Skipping Open VSX publish.")
+            _mark_manual_upload("openvsx")
             return True
     ext_dir = _extension_dir(project_dir)
     ovsx_cmd = ["npx", "--yes", "ovsx", "publish", str(vsix_path), "-p", ovsx_pat]
@@ -698,6 +727,7 @@ def publish_extension(project_dir: Path, vsix_path: Path, version: str) -> bool:
             "VS Code Marketplace publish failed — still attempting Open VSX."
         )
     ovsx_ok = publish_extension_to_ovsx(project_dir, vsix_path, version)
+    _print_manual_upload_help(vsix_path)
     return marketplace_ok and ovsx_ok
 
 

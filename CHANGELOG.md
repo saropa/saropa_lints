@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.0.1-beta.6] — Unreleased
+## [17.0.1-beta.6]
 
 The "large files not excluded from the file watcher" warning no longer appears in workspaces that are not Dart projects, and no longer lists tool-managed folders. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.6/CHANGELOG.md)
 
