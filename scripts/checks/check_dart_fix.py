@@ -4,7 +4,7 @@ Runs `dart fix --dry-run` and exits non-zero if any auto-fixable
 issues are found.  Intended for CI or pre-push validation.
 
 Usage:
-    python scripts/check_dart_fix.py
+    python scripts/checks/check_dart_fix.py
 """
 
 import re

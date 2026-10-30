@@ -13,10 +13,10 @@ groups diagnostics into five priority buckets:
   5. Any severity in forked/vendored directories — suppress
 
 Usage:
-    dart run saropa_lints scan . --format json | python scripts/triage_scan.py
-    python scripts/triage_scan.py --input scan_output.json
-    python scripts/triage_scan.py --input scan.json --suppress-dirs vendor third_party
-    python scripts/triage_scan.py --input scan.json --format json
+    dart run saropa_lints scan . --format json | python scripts/triage/triage_scan.py
+    python scripts/triage/triage_scan.py --input scan_output.json
+    python scripts/triage/triage_scan.py --input scan.json --suppress-dirs vendor third_party
+    python scripts/triage/triage_scan.py --input scan.json --format json
 
 Exit code 0 always (triage is advisory, not a gate).
 

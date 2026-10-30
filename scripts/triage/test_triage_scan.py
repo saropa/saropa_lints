@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Unit tests for scripts/triage_scan.py.
+Unit tests for scripts/triage/triage_scan.py.
 
-Run:  python -m pytest scripts/test_triage_scan.py -v
-      python scripts/test_triage_scan.py          (unittest runner)
+Run:  python -m pytest scripts/triage/test_triage_scan.py -v
+      python scripts/triage/test_triage_scan.py          (unittest runner)
 
 Version:   1.0
 Author:    Saropa

@@ -15,7 +15,7 @@ For reference, analyzer 13.0.0 needs Dart >=3.11.0 (_fe_analyzer_shared ^100) an
 analyzer 14.6.0 needs Dart 3.13. Exit 0 if all assertions hold.
 Check 3 only holds while no 17.x is published; after the major ships, update
 it to expect a clear failure for the held-at-12 project (not a resolve).
-Usage: python3 scripts/check_pub_solver.py
+Usage: python3 scripts/checks/check_pub_solver.py
 """
 import re
 import subprocess

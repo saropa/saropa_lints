@@ -35,7 +35,7 @@ that is the failure mode this guard targets.
 
 Run from repository root::
 
-    python scripts/check_doc_links_excluded_paths.py
+    python scripts/checks/check_doc_links_excluded_paths.py
 
 Exit codes:
     0 - no shipped doc has a broken link or a link into an excluded path
@@ -135,7 +135,7 @@ def _violations(doc_path: Path, repo_root: Path, excluded_prefixes: tuple[str, .
 
 
 def main() -> int:
-    repo_root = Path(__file__).resolve().parent.parent
+    repo_root = Path(__file__).resolve().parent.parent.parent
     excluded_prefixes = _excluded_prefixes(repo_root)
     violations: list[str] = []
     for doc_path in _shipped_doc_files(repo_root, excluded_prefixes):

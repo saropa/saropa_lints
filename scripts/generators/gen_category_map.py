@@ -11,7 +11,7 @@ stale, naming the run of this script as the fix.
 import re
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 RULES_DIR = REPO_ROOT / "lib" / "src" / "rules"
 OUTPUT = REPO_ROOT / "lib" / "src" / "scan" / "rule_category_map.dart"
 
@@ -49,7 +49,7 @@ def main() -> None:
         "///",
         "/// Category is derived from the parent directory of each rule's source",
         "/// file under `lib/src/rules/`. Run the generator to regenerate:",
-        "///   `python scripts/gen_category_map.py`",
+        "///   `python scripts/generators/gen_category_map.py`",
         "///",
         "/// DO NOT EDIT BY HAND — changes will be overwritten on regeneration.",
         "/// A unit test validates that every registered rule appears in this map.",

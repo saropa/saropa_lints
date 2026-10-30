@@ -644,7 +644,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     # --- Core lint names freshness (non-blocking, needs network) ---
     core_lint_check: list[tuple[str, str, list[str]]] = []
     try:
-        from scripts.update_core_lint_names import fetch_rule_names, update_file
+        from scripts.generators.update_core_lint_names import fetch_rule_names, update_file
         # Fetch live rule names and check without modifying the file.
         live_names = fetch_rule_names()
         changed = update_file(live_names, check_only=True)
@@ -675,7 +675,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     # This catches the silent-no-coverage class of bug before publish.
     fixture_path_check: list[tuple[str, str, list[str]]] = []
     try:
-        from scripts.check_fixture_filetype_match import (
+        from scripts.checks.check_fixture_filetype_match import (
             collect_mismatched_fixtures,
         )
         mismatched = collect_mismatched_fixtures(project_dir)
@@ -683,7 +683,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
             fixture_path_check.append((
                 "fail",
                 f"{len(mismatched)} FileType.test fixture(s) at non-isTestPath "
-                f"paths — run `python scripts/check_fixture_filetype_match.py "
+                f"paths — run `python scripts/checks/check_fixture_filetype_match.py "
                 f"--fix` to relocate them",
                 [f"{name}: {old}" for name, old, _new in mismatched[:10]],
             ))
@@ -1439,13 +1439,13 @@ def _generate_aggregate_targets(project_dir: Path) -> list[str] | None:
     failure (caller falls back to running the full test directory)."""
     import json
 
-    gen = project_dir / "scripts" / "gen_test_aggregates.py"
+    gen = project_dir / "scripts" / "generators" / "gen_test_aggregates.py"
     if not gen.is_file():
         print_warning("gen_test_aggregates.py missing; running full test dir")
         return None
     try:
         res = safe_run(
-            ["python3", "scripts/gen_test_aggregates.py"],
+            ["python3", "scripts/generators/gen_test_aggregates.py"],
             cwd=project_dir, capture_output=True, text=True,
         )
         if res.returncode != 0:

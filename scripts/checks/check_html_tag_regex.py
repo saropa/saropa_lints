@@ -14,7 +14,7 @@ them before CodeQL reports them on push.
 
 Run from repository root::
 
-    python scripts/check_html_tag_regex.py
+    python scripts/checks/check_html_tag_regex.py
 
 Exit codes:
     0 - no violations found

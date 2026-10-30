@@ -10,8 +10,8 @@ core Dart/Flutter analyzer lint names. This script rewrites:
   - Rule names in `analysis_options.yaml` lint config sections
 
 Usage:
-    python scripts/fix_ignores.py <directory>           # dry run
-    python scripts/fix_ignores.py <directory> --apply   # rewrite in place
+    python scripts/dev/fix_ignores.py <directory>           # dry run
+    python scripts/dev/fix_ignores.py <directory> --apply   # rewrite in place
 
 Version:   1.0
 Author:    Saropa

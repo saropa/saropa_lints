@@ -10,8 +10,8 @@ sense of coverage.
 
 Run from repository root::
 
-    python scripts/check_fixture_filetype_match.py          # audit only
-    python scripts/check_fixture_filetype_match.py --fix    # relocate via git mv
+    python scripts/checks/check_fixture_filetype_match.py          # audit only
+    python scripts/checks/check_fixture_filetype_match.py --fix    # relocate via git mv
 
 Also called by the publish pipeline (``run_pre_publish_audits``) via
 ``collect_mismatched_fixtures()`` — a misplaced fixture blocks publish.

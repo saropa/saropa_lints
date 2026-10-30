@@ -110,9 +110,9 @@ TIER_SET_PATTERNS: dict[str, str] = {
 # Core Dart/Flutter analyzer lint names. saropa_lints must NEVER register
 # a rule under any of these names — zero collisions permitted. Auto-generated
 # from dart-lang/linter (tool/machine/rules.json). To update:
-#     python scripts/update_core_lint_names.py
+#     python scripts/generators/update_core_lint_names.py
 # To check staleness without modifying:
-#     python scripts/update_core_lint_names.py --check
+#     python scripts/generators/update_core_lint_names.py --check
 CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "always_declare_return_types",
     "always_put_control_body_on_new_line",

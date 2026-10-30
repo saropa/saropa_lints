@@ -240,7 +240,7 @@ class TestGeneratedDartMapParity(unittest.TestCase):
     def test_committed_dart_file_matches_generator_output(self) -> None:
         from pathlib import Path
 
-        from scripts.generate_us_english_rule_data import (
+        from scripts.generators.generate_us_english_rule_data import (
             render_dart,
             _OUTPUT_REL,
             _REPO_ROOT,
@@ -252,7 +252,7 @@ class TestGeneratedDartMapParity(unittest.TestCase):
             committed,
             expected,
             "lib/src/rules/data/uk_to_us_spellings.dart is stale. "
-            "Run: py -3 scripts/generate_us_english_rule_data.py",
+            "Run: py -3 scripts/generators/generate_us_english_rule_data.py",
         )
 
 

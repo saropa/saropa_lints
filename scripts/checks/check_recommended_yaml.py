@@ -9,7 +9,7 @@ Uses dart analyze's exit code (non-zero = issues found) rather than parsing
 its output format, which may change across SDK versions.
 
 Usage:
-    python scripts/check_recommended_yaml.py
+    python scripts/checks/check_recommended_yaml.py
 """
 
 import re

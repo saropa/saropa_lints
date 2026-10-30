@@ -15,13 +15,13 @@ python scripts/publish.py
 ### Run VS Code extension locally (Extension Development Host)
 
 ```bash
-python scripts/run_extension_local.py
-python scripts/run_extension_local.py --compile-only --no-logo
+python scripts/dev/run_extension_local.py
+python scripts/dev/run_extension_local.py --compile-only --no-logo
 ```
 
 Uses `scripts/modules/_utils` (Saropa logo, colors, progress), validates Node 18+ / npm / `dist/extension.js`,
 runs `npm ci` when `extension/package-lock.json` exists, then launches VS Code (or Cursor) with
-`--extensionDevelopmentPath` and **opens this repo** as the host folder (`--new-window` so the folder is not lost to an empty restored session). See `python scripts/run_extension_local.py --help`.
+`--extensionDevelopmentPath` and **opens this repo** as the host folder (`--new-window` so the folder is not lost to an empty restored session). See `python scripts/dev/run_extension_local.py --help`.
 
 `publish.py` has no CLI flags; it prompts for one of eight modes:
 
@@ -112,7 +112,7 @@ Scripts in this directory that can run independently:
 | `bulk_rule_metadata.py` | Bulk metadata operations |
 | `export_saropa_rules_for_gap.py` | Export rules for external tools |
 | `list_rules_without_fixes.py` | Query rules lacking quick fixes |
-| `pubdev_snapshot.py` | `snapshot`: cache pub.dev facts for every tracked package (`reports/pubdev_snapshot.json`, gitignored, has `fetched_at`). `apply`: offline refresh of machine-derivable fields in `extension/src/vibrancy/data/known_issues.json`; status changes are only flagged. `apply` also prints per-kind flags: revived, stale (age plus a corroborating signal; pubPoints>=140 exempt), bounded-entry rechecks, replacement-target problems (404/discontinued/chain/cycle), dead-data, retracted/advisories (snapshot format 2; `advisories` fires only when latest is inside an unfixed OSV range, fixed-in-latest ones print as INFO), and stale-as-of (`--strict` exits 1; `--refresh-as-of-only-verified` withholds as_of on flagged entries). `snapshot` writes atomically (temp file + rename), keeps prior good data when a re-fetch fails, and exits 2 if any package could not be fetched; `apply` accepts format-1 and format-2 snapshots and rejects a malformed `--as-of` (exit 2). `selftest` runs built-in checks. Flags: `--dry-run`, `--only PKG`, `--concurrency`, `--retries`. Run `python scripts/pubdev_snapshot.py --help` |
+| `pubdev_snapshot.py` | `snapshot`: cache pub.dev facts for every tracked package (`reports/pubdev_snapshot.json`, gitignored, has `fetched_at`). `apply`: offline refresh of machine-derivable fields in `extension/src/vibrancy/data/known_issues.json`; status changes are only flagged. `apply` also prints per-kind flags: revived, stale (age plus a corroborating signal; pubPoints>=140 exempt), bounded-entry rechecks, replacement-target problems (404/discontinued/chain/cycle), dead-data, retracted/advisories (snapshot format 2; `advisories` fires only when latest is inside an unfixed OSV range, fixed-in-latest ones print as INFO), and stale-as-of (`--strict` exits 1; `--refresh-as-of-only-verified` withholds as_of on flagged entries). `snapshot` writes atomically (temp file + rename), keeps prior good data when a re-fetch fails, and exits 2 if any package could not be fetched; `apply` accepts format-1 and format-2 snapshots and rejects a malformed `--as-of` (exit 2). `selftest` runs built-in checks. Flags: `--dry-run`, `--only PKG`, `--concurrency`, `--retries`. Run `python scripts/dev/pubdev_snapshot.py --help` |
 
 Historical scripts in `scripts/historical/` are not part of the build.
 

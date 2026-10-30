@@ -12,7 +12,7 @@ catches them before a user ever sees a crash.
 
 Run from repository root::
 
-    python scripts/check_analyzer_api_compat.py
+    python scripts/checks/check_analyzer_api_compat.py
 
 Exit codes:
     0 - no removed API usage found
@@ -71,7 +71,7 @@ _ALLOWLIST: dict[str, str] = {
 
 
 def main() -> int:
-    repo = Path(__file__).resolve().parent.parent
+    repo = Path(__file__).resolve().parent.parent.parent
     rules_dir = repo / "lib" / "src" / "rules"
 
     if not rules_dir.is_dir():
@@ -124,7 +124,7 @@ def main() -> int:
     print()
     print("These APIs compile under `dart analyze` because rule files are")
     print("loaded at runtime, but crash the LSP server and scan CLI at")
-    print("startup (exit 255).  See scripts/check_analyzer_api_compat.py")
+    print("startup (exit 255).  See scripts/checks/check_analyzer_api_compat.py")
     print("to add new patterns when the analyzer package removes more APIs.")
     return 1
 

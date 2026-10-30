@@ -23,15 +23,15 @@ with ``--editor cursor`` or ``SAROPA_VSCODE_CLI``.
 
 Usage (from repository root):
 
-    python scripts/run_extension_local.py
-    python scripts/run_extension_local.py --compile-only
-    python scripts/run_extension_local.py --launch-only
-    python scripts/run_extension_local.py --bare
-    python scripts/run_extension_local.py D:\\src\\my_dart_app
-    python scripts/run_extension_local.py --editor code
-    python scripts/run_extension_local.py --no-logo --quiet
-    python scripts/run_extension_local.py --verbose-npm
-    python scripts/run_extension_local.py --no-watch
+    python scripts/dev/run_extension_local.py
+    python scripts/dev/run_extension_local.py --compile-only
+    python scripts/dev/run_extension_local.py --launch-only
+    python scripts/dev/run_extension_local.py --bare
+    python scripts/dev/run_extension_local.py D:\\src\\my_dart_app
+    python scripts/dev/run_extension_local.py --editor code
+    python scripts/dev/run_extension_local.py --no-logo --quiet
+    python scripts/dev/run_extension_local.py --verbose-npm
+    python scripts/dev/run_extension_local.py --no-watch
 
 Environment:
 
@@ -69,7 +69,7 @@ from typing import Callable
 # Import shared terminal helpers (colors, banners) from the same tree as ``publish.py``.
 # ``__file__`` lives under ``scripts/``; parent.parent is the repo root — insert it first so
 # ``from scripts.modules...`` resolves the same way whether you run from repo root or elsewhere.
-_SCRIPTS_PARENT = str(Path(__file__).resolve().parent.parent)
+_SCRIPTS_PARENT = str(Path(__file__).resolve().parent.parent.parent)
 if _SCRIPTS_PARENT not in sys.path:
     sys.path.insert(0, _SCRIPTS_PARENT)
 
@@ -102,7 +102,7 @@ _DIST_ENTRY = Path("dist") / "extension.js"
 
 # All paths derived from this file so the script is cwd-independent (important on Windows when
 # launched from Explorer or another drive letter).
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 _EXTENSION_DIR = _REPO_ROOT / "extension"
 _LOCKFILE = _EXTENSION_DIR / "package-lock.json"
 _ESBUILD = _EXTENSION_DIR / "esbuild.js"

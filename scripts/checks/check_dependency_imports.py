@@ -17,7 +17,7 @@ headers directly. Shares the single source of truth with the release audit
 
 Run from repository root::
 
-    python scripts/check_dependency_imports.py
+    python scripts/checks/check_dependency_imports.py
 
 Exit codes:
     0 - every shipped import is a declared dependency
@@ -29,10 +29,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-# Allow running as `python scripts/check_dependency_imports.py` from the
+# Allow running as `python scripts/checks/check_dependency_imports.py` from the
 # project root: add the repo root so `scripts.modules.*` imports resolve (same
 # bootstrap as publish.py).
-_repo_root = str(Path(__file__).resolve().parent.parent)
+_repo_root = str(Path(__file__).resolve().parent.parent.parent)
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
@@ -40,7 +40,7 @@ from scripts.modules._audit_checks import get_dependency_import_status
 
 
 def main() -> int:
-    project_dir = Path(__file__).resolve().parent.parent
+    project_dir = Path(__file__).resolve().parent.parent.parent
     status = get_dependency_import_status(project_dir)
     missing = status.get("missing", {})
     if not missing:

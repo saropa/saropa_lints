@@ -13,7 +13,7 @@ code, so a collision means renaming a string in a proposal doc instead of
 renaming files across lib/, test/, and example/.
 
 Usage:
-    python scripts/check_rule_name.py <proposed_name> [<proposed_name> ...]
+    python scripts/checks/check_rule_name.py <proposed_name> [<proposed_name> ...]
 
 Exit code 0 if every name is clear, 1 if any collides.
 
@@ -32,7 +32,7 @@ from pathlib import Path
 # from the same gate that runs at publish time. Mirrors publish.py's
 # sys.path setup so `scripts.modules._tier_integrity`'s own absolute
 # imports resolve when this script is run directly.
-_scripts_parent = str(Path(__file__).resolve().parent.parent)
+_scripts_parent = str(Path(__file__).resolve().parent.parent.parent)
 if _scripts_parent not in sys.path:
     sys.path.insert(0, _scripts_parent)
 from scripts.modules._tier_integrity import CORE_DART_LINT_NAMES  # noqa: E402

@@ -15,8 +15,8 @@ so a manual run and the automated pre-publish audit report identically.
 
 Run from repository root::
 
-    python scripts/check_known_issues_freshness.py
-    python scripts/check_known_issues_freshness.py --fail-on-stale
+    python scripts/checks/check_known_issues_freshness.py
+    python scripts/checks/check_known_issues_freshness.py --fail-on-stale
 
 Exit codes:
     0 - no confirmed-stale entries found (or --fail-on-stale not passed)
@@ -29,7 +29,7 @@ import argparse
 import sys
 from pathlib import Path
 
-_repo_root = str(Path(__file__).resolve().parent.parent)
+_repo_root = str(Path(__file__).resolve().parent.parent.parent)
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
@@ -45,7 +45,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    project_dir = Path(__file__).resolve().parent.parent
+    project_dir = Path(__file__).resolve().parent.parent.parent
     result = check_known_issues_freshness(project_dir)
 
     print(

@@ -8,7 +8,7 @@ human can periodically eyeball the list rather than a plan silently never
 getting the PLAN_* phased-checklist treatment.
 
 Usage:
-    python scripts/check_plan_naming.py
+    python scripts/checks/check_plan_naming.py
 """
 
 import re

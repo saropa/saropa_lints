@@ -2,7 +2,7 @@
 
 **Goal:** Increase quick fix coverage by implementing fixes in priority order, with fixtures + tests, and validating via the audit script.
 
-**Current state:** Run `python scripts/list_rules_without_fixes.py` for an up-to-date list — the script prints a one-line **`Quick-fix audit: …`** summary to stdout plus writes the grouped log under `reports/<yyyymmdd>/`. Baseline stamped **2026-06-10:** **1693** rules lack fix producers across **110** rule files (down from 1701 after Batches 16–18; the file/rule counts grew vs. the 2026-05-08 baseline of 1698 because new rules were added in the interim).
+**Current state:** Run `python scripts/generators/list_rules_without_fixes.py` for an up-to-date list — the script prints a one-line **`Quick-fix audit: …`** summary to stdout plus writes the grouped log under `reports/<yyyymmdd>/`. Baseline stamped **2026-06-10:** **1693** rules lack fix producers across **110** rule files (down from 1701 after Batches 16–18; the file/rule counts grew vs. the 2026-05-08 baseline of 1698 because new rules were added in the interim).
 
 ## Execution snapshot
 
@@ -44,7 +44,7 @@ _Generated from codebase scan + spot-reading rule sources._
 
 ### 1. Rules missing quick fixes (full checklist)
 
-Every rule below has no quick fix. For each: add a fix producer under `lib/src/fixes/**`, wire it on the rule with `fixGenerators`, add a fixture and test. See **B. Batch workflow** and **2. How quick fixes work** below. Regenerate this list with: `python scripts/list_rules_without_fixes.py`.
+Every rule below has no quick fix. For each: add a fix producer under `lib/src/fixes/**`, wire it on the rule with `fixGenerators`, add a fixture and test. See **B. Batch workflow** and **2. How quick fixes work** below. Regenerate this list with: `python scripts/generators/list_rules_without_fixes.py`.
 
 #### architecture_rules.dart
 - [ ] avoid_business_logic_in_ui

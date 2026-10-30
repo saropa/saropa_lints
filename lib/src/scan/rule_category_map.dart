@@ -2,7 +2,7 @@
 ///
 /// Category is derived from the parent directory of each rule's source
 /// file under `lib/src/rules/`. Run the generator to regenerate:
-///   `python scripts/gen_category_map.py`
+///   `python scripts/generators/gen_category_map.py`
 ///
 /// DO NOT EDIT BY HAND — changes will be overwritten on regeneration.
 /// A unit test validates that every registered rule appears in this map.

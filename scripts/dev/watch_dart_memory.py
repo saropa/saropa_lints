@@ -4,12 +4,12 @@ Watch dart.exe memory usage live, for diagnosing the "Lint integration off
 but dart.exe stays huge" bug (plans/history/2026.08/2026.08.13/
 extension-lint-integration-off-still-analyzes.md).
 
-Pairs with scripts/run_extension_local.py, which builds and launches the
+Pairs with scripts/dev/run_extension_local.py, which builds and launches the
 Extension Development Host. This script only watches memory — run both in
 separate terminals:
 
-    python scripts/run_extension_local.py D:\\src\\saropa_kykto
-    python scripts/watch_dart_memory.py
+    python scripts/dev/run_extension_local.py D:\\src\\saropa_kykto
+    python scripts/dev/watch_dart_memory.py
 
 Then in the launched VS Code window: confirm "Lint integration" is on, let
 dart.exe warm up, toggle it off, and watch the numbers below for a drop.

@@ -80,13 +80,13 @@ The data lives in `extension/src/vibrancy/data/known_issues.json`, validated by 
 
 Rule of thumb for `status`: package dead, no fix except replacing it, use `end_of_life`; package alive but an old major is broken, use `upgrade_required` with version bounds; slow but usable, `maintenance_mode`; risky or contested, `caution`.
 
-`scripts/pubdev_snapshot.py` refreshes the machine-derivable facts from pub.dev:
+`scripts/dev/pubdev_snapshot.py` refreshes the machine-derivable facts from pub.dev:
 
 ```
-python3 scripts/pubdev_snapshot.py snapshot            # fetch pub.dev facts (network)
-python3 scripts/pubdev_snapshot.py apply --dry-run     # preview the offline update
-python3 scripts/pubdev_snapshot.py apply
-python3 scripts/pubdev_snapshot.py selftest            # built-in flag self-test
+python3 scripts/dev/pubdev_snapshot.py snapshot            # fetch pub.dev facts (network)
+python3 scripts/dev/pubdev_snapshot.py apply --dry-run     # preview the offline update
+python3 scripts/dev/pubdev_snapshot.py apply
+python3 scripts/dev/pubdev_snapshot.py selftest            # built-in flag self-test
 ```
 
 `apply` only refreshes last updated, pub points, archive size, verified publisher, platforms and `as_of`. Hand-written text, `status` and `replacement` are never rewritten; changes that matter for them are printed as flags for you to review. `--only NAME` limits a run; `--strict` fails when un-refreshed entries have an `as_of` older than 90 days.

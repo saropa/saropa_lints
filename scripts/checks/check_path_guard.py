@@ -8,7 +8,7 @@ the file imports ``path_guard.dart`` or calls ``sanitizePath``.
 
 Run from repository root::
 
-    python scripts/check_path_guard.py
+    python scripts/checks/check_path_guard.py
 
 Exit codes:
     0 - every file with interpolated paths imports path_guard or sanitizes
@@ -51,7 +51,7 @@ _ALLOWLIST: dict[str, str] = {
 
 
 def main() -> int:
-    repo = Path(__file__).resolve().parent.parent
+    repo = Path(__file__).resolve().parent.parent.parent
     failures: list[str] = []
 
     for scan_dir in _SCAN_DIRS:

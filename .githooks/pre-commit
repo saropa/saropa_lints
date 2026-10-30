@@ -57,7 +57,7 @@ fi
 # Only runs when a shipped doc (.md in doc/ or README.md) is being committed.
 doc_files=$(echo "$files" | grep -E '^(doc/|README\.md$|\.pubignore$)')
 if [ -n "$doc_files" ]; then
-  $PY scripts/check_doc_links_excluded_paths.py
+  $PY scripts/checks/check_doc_links_excluded_paths.py
   doc_status=$?
   if [ "$doc_status" -ne 0 ]; then
     echo ""
@@ -75,7 +75,7 @@ tier_file=$(echo "$files" | grep -E '^lib/src/tiers\.dart$')
 
 if [ -n "$rule_files" ] || [ -n "$tier_file" ]; then
   echo "Pre-commit: regenerating category map (rule/tier files changed)..."
-  $PY scripts/gen_category_map.py
+  $PY scripts/generators/gen_category_map.py
   gen_cat_status=$?
   if [ "$gen_cat_status" -ne 0 ]; then
     echo "Commit blocked: gen_category_map.py failed."
@@ -101,13 +101,13 @@ fi
 # The two whole-repo dart gates below depend only on Dart sources and the
 # analyzer config, so a commit touching none of them (docs-only, scripts-only)
 # cannot change their result. Skipping saves ~25s+ per such commit.
-dart_inputs=$(echo "$files" | grep -E '\.dart$|^pubspec\.(yaml|lock)$|^analysis_options.*\.yaml$|^scripts/check_.*\.py$')
+dart_inputs=$(echo "$files" | grep -E '\.dart$|^pubspec\.(yaml|lock)$|^analysis_options.*\.yaml$|^scripts/checks/check_.*\.py$')
 if [ -z "$dart_inputs" ]; then
   exit 0
 fi
 
 # ── dart fix dry-run gate (exit 2 = dart missing, skip gracefully) ──
-$PY scripts/check_dart_fix.py
+$PY scripts/checks/check_dart_fix.py
 fix_status=$?
 if [ "$fix_status" -eq 1 ]; then
   echo ""
@@ -116,7 +116,7 @@ if [ "$fix_status" -eq 1 ]; then
 fi
 
 # ── recommended.yaml regression gate (exit 2 = dart missing, skip gracefully) ──
-$PY scripts/check_recommended_yaml.py
+$PY scripts/checks/check_recommended_yaml.py
 rec_status=$?
 if [ "$rec_status" -eq 1 ]; then
   echo ""

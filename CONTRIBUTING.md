@@ -131,7 +131,7 @@ Relationship metadata guidance:
 - Use `conflictingRules` for mutually exclusive style/opinionated alternatives.
 - Use `supersedesRules` when a newer rule replaces or migrates from older guidance.
 
-Folder-level defaults were applied with [scripts/bulk_rule_metadata.py](scripts/bulk_rule_metadata.py). For new or security-sensitive rules, set **`RuleType.securityHotspot`** and tag **`review-required`** when the finding may be intentional; add **CWE** IDs where the mapping is clear ([MITRE CWE](https://cwe.mitre.org/)). Progress and conventions: [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
+Folder-level defaults were applied with [scripts/generators/bulk_rule_metadata.py](scripts/generators/bulk_rule_metadata.py). For new or security-sensitive rules, set **`RuleType.securityHotspot`** and tag **`review-required`** when the finding may be intentional; add **CWE** IDs where the mapping is clear ([MITRE CWE](https://cwe.mitre.org/)). Progress and conventions: [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
 
 ### 3. Set performance optimizations (optional but recommended)
 

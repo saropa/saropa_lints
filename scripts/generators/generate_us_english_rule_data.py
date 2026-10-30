@@ -7,7 +7,7 @@ canonical `UK_TO_US` dictionary in `scripts/modules/_us_spelling.py`.
 
 Run from the repository root:
 
-    py -3 scripts/generate_us_english_rule_data.py
+    py -3 scripts/generators/generate_us_english_rule_data.py
 
 A parity test (`scripts/modules/tests/test_us_spelling.py`) regenerates the
 content in memory and fails if the committed Dart file is stale, so a change
@@ -23,7 +23,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).resolve().parent.parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
@@ -46,7 +46,7 @@ def render_dart() -> str:
         "// GENERATED FILE - DO NOT EDIT BY HAND.",
         "//",
         "// Source of truth: scripts/modules/_us_spelling.py (UK_TO_US).",
-        "// Regenerate with: py -3 scripts/generate_us_english_rule_data.py",
+        "// Regenerate with: py -3 scripts/generators/generate_us_english_rule_data.py",
         "// A parity test fails the build if this file drifts from the source.",
         "//",
         "// Consumed by the prefer_us_english_spelling lint rule. Keys are",

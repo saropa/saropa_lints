@@ -3,8 +3,8 @@
 Export saropa_lints rule names and categories to JSON for gap analysis.
 
 Usage (from repo root):
-  python scripts/export_saropa_rules_for_gap.py
-  python scripts/export_saropa_rules_for_gap.py -o saropa_rules.json
+  python scripts/generators/export_saropa_rules_for_gap.py
+  python scripts/generators/export_saropa_rules_for_gap.py -o saropa_rules.json
 
 Reads lib/src/rules via scripts.modules._rule_metrics and outputs a JSON array
 of {"name": "rule_name", "category": "category"} for comparison with external
@@ -19,8 +19,8 @@ import json
 import sys
 from pathlib import Path
 
-# Allow running as `python scripts/export_saropa_rules_for_gap.py` from project root
-_project_root = Path(__file__).resolve().parent.parent
+# Allow running as `python scripts/generators/export_saropa_rules_for_gap.py` from project root
+_project_root = Path(__file__).resolve().parent.parent.parent
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 

@@ -65,14 +65,14 @@ it, or pass ``--package NAME`` (repeatable) / ``--packages-file FILE``.
 
 Examples (from the repo root)::
 
-    python scripts/pubdev_snapshot.py snapshot
-    python scripts/pubdev_snapshot.py snapshot --only analyzer --only meta
-    python scripts/pubdev_snapshot.py snapshot --concurrency 4 --retries 5
-    python scripts/pubdev_snapshot.py apply --dry-run
-    python scripts/pubdev_snapshot.py apply --only analyzer
-    python scripts/pubdev_snapshot.py apply --snapshot path/to/old.json
-    python scripts/pubdev_snapshot.py apply --as-of 2026-09-19
-    python scripts/pubdev_snapshot.py selftest
+    python scripts/dev/pubdev_snapshot.py snapshot
+    python scripts/dev/pubdev_snapshot.py snapshot --only analyzer --only meta
+    python scripts/dev/pubdev_snapshot.py snapshot --concurrency 4 --retries 5
+    python scripts/dev/pubdev_snapshot.py apply --dry-run
+    python scripts/dev/pubdev_snapshot.py apply --only analyzer
+    python scripts/dev/pubdev_snapshot.py apply --snapshot path/to/old.json
+    python scripts/dev/pubdev_snapshot.py apply --as-of 2026-09-19
+    python scripts/dev/pubdev_snapshot.py selftest
 
 ``snapshot --only`` merges into an existing snapshot rather than replacing it.
 Related: ``check_known_issues_freshness.py`` (lifecycle-claim audit).
@@ -92,7 +92,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Iterable
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parent.parent.parent
 KNOWN_ISSUES = REPO / "extension/src/vibrancy/data/known_issues.json"
 DEFAULT_SNAPSHOT = REPO / "reports/pubdev_snapshot.json"
 VALID_NAME = re.compile(r"^[a-z0-9_]+$")  # excludes synthetic "x (Orig)" names

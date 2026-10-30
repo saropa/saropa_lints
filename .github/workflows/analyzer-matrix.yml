@@ -69,4 +69,4 @@ jobs:
           # Dart 3.9 cannot resolve saropa_lints 16.x with analyzer 12 (analyzer_plugin
           # >=0.14.19 needs Dart ^3.13, older ones need analyzer <11), so use 3.13.
           sdk: '3.13'
-      - run: python3 scripts/check_pub_solver.py
+      - run: python3 scripts/checks/check_pub_solver.py

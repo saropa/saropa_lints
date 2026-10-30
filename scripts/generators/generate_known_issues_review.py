@@ -17,8 +17,8 @@ This does not edit known_issues.json — it only writes a report.
 
 Run from repository root::
 
-    python scripts/generate_known_issues_review.py
-    python scripts/generate_known_issues_review.py --write
+    python scripts/generators/generate_known_issues_review.py
+    python scripts/generators/generate_known_issues_review.py --write
 
 Exit codes:
     0 - report generated (regardless of whether any entries were found)
@@ -30,7 +30,7 @@ import argparse
 import sys
 from pathlib import Path
 
-_repo_root = str(Path(__file__).resolve().parent.parent)
+_repo_root = str(Path(__file__).resolve().parent.parent.parent)
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
@@ -57,7 +57,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    project_dir = Path(__file__).resolve().parent.parent
+    project_dir = Path(__file__).resolve().parent.parent.parent
     report = build_known_issues_review_report(project_dir)
     generated_on = args.date or "(date not specified — pass --date YYYY-MM-DD)"
     markdown = render_markdown(report, generated_on=generated_on)

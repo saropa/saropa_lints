@@ -8,8 +8,8 @@ publish to catch new core lints that might collide with saropa_lints
 rule names.
 
 Usage:
-    python scripts/update_core_lint_names.py          # update in place
-    python scripts/update_core_lint_names.py --check  # exit 1 if stale
+    python scripts/generators/update_core_lint_names.py          # update in place
+    python scripts/generators/update_core_lint_names.py --check  # exit 1 if stale
 
 Version:   1.0
 Author:    Saropa
@@ -34,7 +34,7 @@ _RULES_URL = (
 
 # Path to the tier integrity module relative to this script.
 _TIER_INTEGRITY = (
-    Path(__file__).resolve().parent / "modules" / "_tier_integrity.py"
+    Path(__file__).resolve().parent.parent / "modules" / "_tier_integrity.py"
 )
 
 # Regex matching the CORE_DART_LINT_NAMES block in _tier_integrity.py.
@@ -129,7 +129,7 @@ def main() -> None:
 
     if check_only and changed:
         print(
-            "\nRun `python scripts/update_core_lint_names.py` to update.",
+            "\nRun `python scripts/generators/update_core_lint_names.py` to update.",
             file=sys.stderr,
         )
         sys.exit(1)

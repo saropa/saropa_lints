@@ -9,7 +9,7 @@ import sys
 from collections import OrderedDict
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 ARCHIVE = ROOT / "CHANGELOG_ARCHIVE.md"
 OUT_DIR = ROOT / "changelog"
 HEADING = re.compile(r"^## \[(\d+)\.(\d+)\.(\d+)(?:[-+][^\]]*)?\]")

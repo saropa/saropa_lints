@@ -76,7 +76,7 @@ If you don't see that line, the analyzer didn't pick up the plugin.
 The fix producers ship inside saropa_lints itself; if the rule is registered without `fixGenerators` wired up, no lightbulb appears. To check whether a specific rule has any fix at all:
 
 ```bash
-python scripts/list_rules_without_fixes.py
+python scripts/generators/list_rules_without_fixes.py
 ```
 
 If your rule is in that list, it has no fix to offer — that's not a bug, that's missing coverage. The open list is tracked internally in the project's planning docs (not shipped with the package).

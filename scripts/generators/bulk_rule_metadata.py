@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Bulk-add ruleType and tags to SaropaLintRule classes by folder.
-Run from repo root: python scripts/bulk_rule_metadata.py
+Run from repo root: python scripts/generators/bulk_rule_metadata.py
 Skips files that already contain 'get ruleType =>' (idempotent).
 """
 from pathlib import Path
@@ -92,7 +92,7 @@ def process_file(path: Path, rule_type: str, tags: set[str]) -> bool:
 
 
 def main() -> None:
-    root = Path(__file__).resolve().parent.parent
+    root = Path(__file__).resolve().parent.parent.parent
     rules_dir = root / RULES_DIR
     if not rules_dir.is_dir():
         print(f"Not found: {rules_dir}")
