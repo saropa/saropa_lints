@@ -112,9 +112,9 @@ bool _isDbPrefix(String name) {
 /// is a read (not a write because `loaddb` contains `add`). Falls back to
 /// [_DbOperationType.write] (safer to yield) when no word matches.
 _DbOperationType _classifyByHeuristic(String name) {
-  final words = RegExp(r'[A-Z]?[a-z]+|[A-Z]+(?![a-z])|[0-9]+')
-      .allMatches(name)
-      .map((m) => m.group(0)!.toLowerCase());
+  final words = RegExp(
+    r'[A-Z]?[a-z]+|[A-Z]+(?![a-z])|[0-9]+',
+  ).allMatches(name).map((m) => m.group(0)!.toLowerCase());
   for (final word in words) {
     if (_writeKeywords.any(word.startsWith)) return _DbOperationType.write;
     if (_readKeywords.any(word.startsWith)) return _DbOperationType.bulkRead;
