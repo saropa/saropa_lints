@@ -1,6 +1,6 @@
 # BUG: `require_catch_logging` — Flags a typed catch whose purpose is control flow when a later generic catch in the same try logs
 
-**Status: Open**
+**Status: Closed** — Resolution: partial rule fix landed; the remaining 3 sites are handled by `// ignore:` comments in the app (app commit feb9277092).
 
 Created: 2026-10-31
 Rule: `require_catch_logging`
@@ -91,3 +91,7 @@ Partly fixed: a typed catch is now skipped when a sibling catch in the same `try
 Still flagged, not fixed: the three `sql_sentinel.dart` sites (101, 206, 216), a documented silent probe with no sibling logging catch. Missing to close:
 - Confirmation from the owner that "empty/silent body with an explanatory comment" or "caught type is a private control-flow class" should suppress this rule (a security rule; both signals widen the exemption), or that those sites should use `// ignore:` instead.
 - The actual source of those three catch clauses (caught type, body, comment) to build a fixture.
+
+## Owner decision (2026-10-31)
+
+Owner chose: keep the rule strict. The app adds // ignore: saropa_lints/require_catch_logging at the 3 sql_sentinel.dart sites. Source of the three catch clauses: `on NoSuchMethodError { /* comment: error has no .cause getter */ }`, `on ArgumentError { return false; }`, `on ArgumentError { /* comment: Not Expando-able */ }`. saropa_lints version in use: ^17.0.1-beta.6. No rule change needed; this report can close once the app commit lands.

@@ -76,3 +76,5 @@ Exempt a field when a `dispose()` method of the same class assigns `null` to it.
 ## Resolution
 
 Fixed 2026-10-31. The rule now collects the names of fields assigned `null` (`x = null` / `this.x = null`) inside the class's own `dispose()` and skips non-static fields whose declarators are all cleared. Fields not cleared, partially cleared declarations, and static fields are still reported. Fixture cases added; verified with `dart run saropa_lints:scan --tier comprehensive` on a scratch copy (cleared fields silent, 3 uncleared/static cases flagged).
+
+GitHub issue saropa/saropa_lints#393 is the same report and is being closed as a duplicate of this file.

@@ -18042,7 +18042,7 @@
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
       },
-      "correction": "Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing.",
+      "correction": "Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing. If the list is non-empty by API contract, add `// non-empty: <reason>` on the same line or the line above.",
       "problemMessage": "[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time. {v10}",
       "impact": "warning",
       "owasp": {
