@@ -80,6 +80,7 @@ The "large files not excluded from the file watcher" warning no longer appears i
 
 ### Fixed
 
+- **`require_ios_push_notification_capability`:** no longer flags `requestPermission()` on non-push receivers (`Geolocator.requestPermission()` and similar location/contacts/audio permission APIs). `requestPermission()` is flagged only when its receiver looks like messaging/notification/push (`FirebaseMessaging.instance`, `messaging`, `fcm`); `getToken`, `onMessage`, and the push class patterns are unchanged.
 - **`require_data_encryption`:** no longer flags `StringBuffer.write(...)` / `StringSink.write(...)` (an in-memory hash input, not storage), or a static call whose only sensitive-looking word is the receiver class's own name repeated as a qualifier (`SuccessCardGate.write([SuccessCardGate.milestoneKey(id)])`). Real credentials in the payload are still flagged.
 - **Master switch (extension):** turning `saropaLints.enabled` off now also stops the standalone language server, even when its own setting is on, and turning it back on restarts it. Before, the server kept running and its findings stayed in the Problems panel after an "Off" toggle. Starting the server by command while the master switch is off now says why it did not start.
 - **`require_catch_logging`:** no longer flags a typed catch (`on _NoV1Rebuild { return null; }`) when another catch clause of the same `try` logs or rethrows (`on Object catch (e, st) { debugException(e, st); }`). A typed catch whose sibling catches are also silent, and a lone typed catch, are still flagged.

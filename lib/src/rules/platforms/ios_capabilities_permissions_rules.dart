@@ -969,6 +969,15 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
     'OneSignal',
   };
 
+  static bool _looksLikePushReceiver(Expression? target) {
+    if (target == null) return false;
+    final String src = target.toSource().toLowerCase();
+    return src.contains('messaging') ||
+        src.contains('notification') ||
+        src.contains('push') ||
+        src.contains('fcm');
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -981,6 +990,14 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
 
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
+
+      // `requestPermission` is also the name of location/contacts/audio
+      // permission APIs (e.g. `Geolocator.requestPermission()`); only count
+      // it when the receiver looks like a messaging/notification object.
+      if (methodName == 'requestPermission' &&
+          !_looksLikePushReceiver(target)) {
+        return;
+      }
 
       // Check method name (exact match)
       if (_pushMethodPatterns.contains(methodName) ||
