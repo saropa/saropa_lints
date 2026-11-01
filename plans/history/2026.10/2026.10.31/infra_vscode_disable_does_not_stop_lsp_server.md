@@ -53,7 +53,11 @@ These are not extension bugs on their own. They show there is no single off swit
 - Suggested item 4: README section "How to turn saropa_lints completely off" written.
 - Unknown on `lspServer.enabled`: audited. The extension never writes `saropaLints.lspServer.enabled` (tier change writes only `saropaLints.tier`); the value true comes from the `package.json` default (true), so a user's file with it set was set by the user or an earlier session. Not a bug; no change.
 
-## Owner step to close
+## Closed (2026-10-31)
+
+Owner closed on the fixes: master switch stops the LSP server, scan exits 0 when disabled, README off-switch section written, default audit found no bug. The live VS Code check was not performed; reopen if the server still runs with `saropaLints.enabled=false`.
+
+Live check steps (reference):
 
 1. Set `saropaLints.enabled` to `false` and `saropaLints.lspServer.enabled` to `true` in `.vscode/settings.json`, then run "Developer: Reload Window".
 2. In a terminal run `ps aux | grep lsp_server.dart`; expect no match other than the grep line itself.
