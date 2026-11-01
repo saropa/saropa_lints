@@ -943,6 +943,20 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
       // is the sole statement, not embedded inside another expression.
       if (parent is ExpressionFunctionBody) return;
 
+      // Skip the grouping idiom `(map[key] ??= <T>[]).add(item)`: a
+      // parenthesized `??=` on an index target used as a call/property/index
+      // target. It avoids a second map lookup.
+      if (node.operator.type == TokenType.QUESTION_QUESTION_EQ &&
+          node.leftHandSide is IndexExpression &&
+          parent is ParenthesizedExpression) {
+        final AstNode? grand = parent.parent;
+        if ((grand is MethodInvocation && grand.target == parent) ||
+            (grand is PropertyAccess && grand.target == parent) ||
+            (grand is IndexExpression && grand.target == parent)) {
+          return;
+        }
+      }
+
       // Report nested assignment
       reporter.atNode(node);
     });
