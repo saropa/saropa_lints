@@ -255,6 +255,13 @@ class ProjectContext {
         false;
   }
 
+  /// Returns `true` only when the project containing [filePath] is a Flutter
+  /// app with `android/` and/or `ios/` and no web or desktop folder.
+  /// Defaults to `false` when unknown, so rules keep firing.
+  static bool isMobileOnlyApp(String? filePath) {
+    return getProjectInfo(filePath)?.isMobileOnlyApp ?? false;
+  }
+
   /// Returns `true` when the project containing [filePath] declares a
   /// Flutter SDK constraint whose **lower bound** is ≥ `major.minor.patch`.
   ///
@@ -614,6 +621,7 @@ class _ProjectInfo {
     required this.hasPointerPlatform,
     required this.targetPlatforms,
     required this.isCliOrToolPackage,
+    this.isMobileOnlyApp = false,
   });
 
   factory _ProjectInfo._fromProjectRoot(String projectRoot) {
@@ -746,6 +754,14 @@ class _ProjectInfo {
           if (hasMacosDir) 'macos',
           if (hasLinuxDir) 'linux',
         },
+        // Flutter app with android/ and/or ios/ and no web or desktop dir.
+        isMobileOnlyApp:
+            isFlutter &&
+            (hasAndroidDir || hasIosDir) &&
+            !hasWebDir &&
+            !hasMacosDir &&
+            !hasWindowsDir &&
+            !hasLinuxDir,
         // CLI tools and analyzer plugins run on the VM only — rules
         // framed around "user-facing UI" or "breaks on web" don't apply.
         // Signals: `executables:` section (declares CLI entrypoints), or a
@@ -794,6 +810,9 @@ class _ProjectInfo {
       );
     }
   }
+
+  /// Flutter app targeting only Android/iOS (see [ProjectContext.isMobileOnlyApp]).
+  final bool isMobileOnlyApp;
 
   /// Whether this is a Flutter project (has flutter SDK dependency).
   final bool isFlutterProject;

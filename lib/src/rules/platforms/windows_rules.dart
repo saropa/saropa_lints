@@ -312,6 +312,11 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Forward slash is correct on Android/iOS; a Flutter app with only those
+    // platform folders can never run on Windows. Checked inside each callback
+    // because the scan runner registers once and replays per file.
+    bool mobileOnly() => ProjectContext.isMobileOnlyApp(context.filePath);
+
     context.addBinaryExpression((BinaryExpression node) {
       // Look for string + '/' + string pattern (path concatenation)
       if (node.operator.type.lexeme != '+') return;
@@ -319,6 +324,7 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
       final Expression right = node.rightOperand;
       if (right is! SimpleStringLiteral) return;
       if (right.value != '/') return;
+      if (mobileOnly()) return;
 
       // Check if left side looks like a path variable
       if (_containsPathPattern(node.leftOperand.toSource())) {
@@ -330,6 +336,7 @@ class AvoidForwardSlashPathAssumptionRule extends SaropaLintRule {
     context.addStringInterpolation((StringInterpolation node) {
       final NodeList<InterpolationElement> elements = node.elements;
       if (elements.length < 3) return;
+      if (mobileOnly()) return;
 
       for (int i = 1; i < elements.length - 1; i++) {
         final InterpolationElement element = elements[i];
