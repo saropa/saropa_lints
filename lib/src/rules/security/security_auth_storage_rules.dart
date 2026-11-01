@@ -1585,12 +1585,27 @@ class RequireDataEncryptionRule extends SaropaLintRule {
         }
       }
 
+      // In-memory text builders are not storage: `StringBuffer.write` builds
+      // a string (e.g. a hash input), it persists nothing.
+      final String? targetType = target?.staticType?.element?.name;
+      if (targetType == 'StringBuffer' || targetType == 'StringSink') return;
+
       // Clearing credentials (every field set to null) stores nothing.
       if (_onlyClearsFields(node.argumentList)) return;
 
       // Check if arguments contain sensitive data (not the full node source,
       // which includes target/receiver names that may incidentally match).
-      final String argsSource = node.argumentList.toSource().toLowerCase();
+      String argsSource = node.argumentList.toSource().toLowerCase();
+
+      // A static call `SuccessCardGate.write([SuccessCardGate.key(id)])`
+      // repeats the receiver class name as a qualifier inside its own
+      // arguments; that name (here "card") describes the class, not the stored
+      // data. Strip only the `ClassName.` qualifier so `Secret.write(Secret.x)`
+      // still scans `x`.
+      if (target is SimpleIdentifier &&
+          target.name[0] != target.name[0].toLowerCase()) {
+        argsSource = argsSource.replaceAll('${target.name.toLowerCase()}.', ' ');
+      }
 
       if (_argumentEncryptionSignalPatterns.any(
         (RegExp p) => p.hasMatch(argsSource),

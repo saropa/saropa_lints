@@ -400,3 +400,27 @@ void _badCardNumberFileWrite() async {
 void _goodClearCredentialsWithNull() async {
   await db.write(AuthCompanion(token: Value<String?>(null)));
 }
+
+// GOOD: `StringBuffer.write` builds a hash input; it persists nothing.
+void _goodStringBufferWriteHashInput1010(List<String> tokenParts) {
+  final StringBuffer buffer = StringBuffer();
+  for (final String part in tokenParts) {
+    buffer.write(part);
+  }
+  buffer.write('credit_card');
+}
+
+class SuccessCardGate1010 {
+  static String milestoneKey(String id) => 'milestone_$id';
+  static Future<void> write(List<String> keys) async {}
+}
+
+// GOOD: the receiver class name ("Card") is not the stored data; the payload
+// is a dismissal key.
+Future<void> _goodDismissalKeyOnCardNamedClass1010(String id) =>
+    SuccessCardGate1010.write(<String>[SuccessCardGate1010.milestoneKey(id)]);
+
+// BAD: same receiver, but the payload itself is a sensitive value.
+// expect_lint: require_data_encryption
+Future<void> _badSensitivePayloadOnCardNamedClass1010(String password) =>
+    SuccessCardGate1010.write(<String>[password]);
