@@ -256,3 +256,34 @@ void _badClosureNotLog(String? name) {
   // expect_lint: avoid_nullable_interpolation
   final Function g = () => 'a $name';
 }
+
+// GOOD: collection-if guard on the receiver of a null-aware chain.
+List<String> _goodCollectionIfReceiverGuard(List<String>? statuses) => <String>[
+  if (statuses != null) 'S: `${statuses?.map((String e) => e).join(',')}`',
+];
+
+// GOOD: `&&` guard on the same property, interpolation in the right operand.
+class _GuardedAnd {
+  _GuardedAnd(this.uuid);
+  final String? uuid;
+  bool has(List<String> answered, String code) =>
+      uuid != null && answered.contains('${uuid}|$code');
+}
+
+// BAD: no guard in the same condition.
+class _MissingGuardAnd {
+  _MissingGuardAnd(this.uuid);
+  final String? uuid;
+  bool has(List<String> answered, String code) =>
+      // expect_lint: avoid_nullable_interpolation
+      answered.contains('${uuid}|$code');
+}
+
+// BAD: guard on the left of `||` proves nothing.
+class _OrGuard {
+  _OrGuard(this.uuid);
+  final String? uuid;
+  bool has(List<String> answered, String code) =>
+      // expect_lint: avoid_nullable_interpolation
+      uuid != null || answered.contains('${uuid}|$code');
+}

@@ -822,6 +822,14 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
           _isNotNullCheckFor(parent.expression, exprSource)) {
         return true;
       }
+      // `guard != null && <interpolation in right operand>`: the right
+      // operand only evaluates when the left conjunct held.
+      if (parent is BinaryExpression &&
+          parent.operator.type == TokenType.AMPERSAND_AMPERSAND &&
+          identical(parent.rightOperand, child) &&
+          _isNotNullCheckFor(parent.leftOperand, exprSource)) {
+        return true;
+      }
       // Don't escape past a function body — a guard outside the closure
       // doesn't carry into it.
       if (parent is FunctionBody) return false;
@@ -840,10 +848,10 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
       final Expression left = c.leftOperand;
       final Expression right = c.rightOperand;
       if (right is NullLiteral) {
-        return _normalizeSource(left.toSource()) == exprSource;
+        return _guardCovers(_normalizeSource(left.toSource()), exprSource);
       }
       if (left is NullLiteral) {
-        return _normalizeSource(right.toSource()) == exprSource;
+        return _guardCovers(_normalizeSource(right.toSource()), exprSource);
       }
     }
     // Recurse into `&&` compounds: `if (a.contains('x') && f.churn != null)`
@@ -858,6 +866,12 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
     }
     return false;
   }
+
+  /// True when the guarded source equals the interpolated source, or the
+  /// interpolation is a null-aware chain off the guarded receiver
+  /// (`x != null` covers `x?.map(...).join()`; the `?.` is redundant there).
+  bool _guardCovers(String guarded, String exprSource) =>
+      guarded == exprSource || exprSource.startsWith('$guarded?.');
 
   /// Strip whitespace so `widget.contact.uuid` matches across line breaks
   /// inside multi-line conditions. We deliberately do NOT strip `?` here
