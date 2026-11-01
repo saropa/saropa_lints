@@ -2962,9 +2962,108 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
         return;
       }
 
+      // A length check on the same collection (`&&` left operand, enclosing
+      // `if`/ternary, or a preceding early-exit `if`) means the access is
+      // deliberate and in range, not a forgotten loop variable.
+      final Expression? target = node.target;
+      if (target != null && _isLengthGuarded(node, target.toSource())) {
+        super.visitIndexExpression(node);
+        return;
+      }
+
       reporter.atNode(node);
     }
     super.visitIndexExpression(node);
+  }
+
+  static bool _isLengthGuarded(IndexExpression node, String target) {
+    AstNode child = node;
+    AstNode? parent = node.parent;
+    while (parent != null && parent is! FunctionBody) {
+      if (parent is BinaryExpression &&
+          parent.operator.lexeme == '&&' &&
+          parent.rightOperand == child &&
+          _checksLength(parent.leftOperand, target)) {
+        return true;
+      }
+      if (parent is IfStatement &&
+          child != parent.expression &&
+          _checksLength(parent.expression, target)) {
+        return true;
+      }
+      if (parent is ConditionalExpression &&
+          child != parent.condition &&
+          _checksLength(parent.condition, target)) {
+        return true;
+      }
+      if (parent is Block) {
+        for (final Statement s in parent.statements) {
+          if (s == child) break;
+          if (s is IfStatement &&
+              s.elseStatement == null &&
+              _exitsScope(s.thenStatement) &&
+              _checksLength(s.expression, target)) {
+            return true;
+          }
+        }
+      }
+      child = parent;
+      parent = parent.parent;
+    }
+    return false;
+  }
+
+  static bool _exitsScope(Statement s) {
+    final Statement last = s is Block
+        ? (s.statements.isEmpty ? s : s.statements.last)
+        : s;
+    return last is ContinueStatement ||
+        last is BreakStatement ||
+        last is ReturnStatement ||
+        (last is ExpressionStatement && last.expression is ThrowExpression);
+  }
+
+  static bool _checksLength(Expression condition, String target) {
+    final _LengthCheckFinder finder = _LengthCheckFinder(target);
+    condition.accept(finder);
+    return finder.found;
+  }
+}
+
+/// Finds a comparison such as `target.length == 2` or `target.length < 2`.
+class _LengthCheckFinder extends RecursiveAstVisitor<void> {
+  _LengthCheckFinder(this.target);
+
+  final String target;
+  bool found = false;
+
+  static const Set<String> _comparisons = <String>{
+    '==',
+    '!=',
+    '<',
+    '<=',
+    '>',
+    '>=',
+  };
+
+  bool _isLength(Expression e) {
+    if (e is PrefixedIdentifier) {
+      return e.identifier.name == 'length' && e.prefix.toSource() == target;
+    }
+    if (e is PropertyAccess) {
+      return e.propertyName.name == 'length' &&
+          e.realTarget.toSource() == target;
+    }
+    return false;
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    if (_comparisons.contains(node.operator.lexeme) &&
+        (_isLength(node.leftOperand) || _isLength(node.rightOperand))) {
+      found = true;
+    }
+    super.visitBinaryExpression(node);
   }
 }
 

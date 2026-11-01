@@ -146,3 +146,38 @@ void _goodConstantWriteConstantValue(List<int> curr, int m) {
     curr[0] = 42;
   }
 }
+
+// GOOD: length proven by a preceding early-exit guard.
+void _goodLengthGuardContinue(List<String> lines) {
+  for (final String line in lines) {
+    final List<String> cols = line.split('\t');
+    if (cols.length != 2 || line.startsWith('#')) continue;
+    final key = cols[0];
+    final val = cols[1];
+  }
+}
+
+// GOOD: length proven by the left operand of `&&`.
+void _goodLengthGuardAnd(List<List<String>> rows) {
+  for (final List<String> c in rows) {
+    final bool ok = c.length == 2 && c[0].isNotEmpty && c[1].isNotEmpty;
+  }
+}
+
+// GOOD: length proven by an enclosing `if`.
+void _goodLengthGuardIf(List<List<String>> rows) {
+  for (final List<String> c in rows) {
+    if (c.length > 1) {
+      print(c[1]);
+    }
+  }
+}
+
+// BAD: near miss, no length guard on the collection that is indexed.
+// expect_lint: avoid_accessing_collections_by_constant_index
+void _badNoLengthGuard(List<String> lines, List<String> other) {
+  for (final String line in lines) {
+    if (other.length != 2) continue;
+    print(line[0]);
+  }
+}
