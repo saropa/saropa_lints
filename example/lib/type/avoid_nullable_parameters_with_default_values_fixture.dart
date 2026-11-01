@@ -136,3 +136,26 @@ bool _goodNullCoalesce({bool? ignoreEpoch = false}) {
 bool _badNoNullHandling({bool? flag = false}) {
   return flag == true;
 }
+
+void _query({List<int>? excludeSources, bool? isHidden}) {}
+void _queryStrict({List<int>? excludeSources, required bool isHidden}) {}
+
+// GOOD: forwarded unchanged to a callee whose parameter accepts null.
+void _goodPassThrough({
+  List<int>? excludeSources = const <int>[0],
+  bool? isHidden = false,
+}) {
+  _query(excludeSources: excludeSources, isHidden: isHidden);
+}
+
+// BAD: forwarded to a callee whose parameter is non-nullable (the `?` is moot).
+// expect_lint: avoid_nullable_parameters_with_default_values
+void _badPassToNonNull({bool? isHidden = false}) {
+  _queryStrict(isHidden: isHidden!);
+}
+
+// BAD: used in a call but not passed directly as an argument.
+// expect_lint: avoid_nullable_parameters_with_default_values
+void _badNotForwarded({List<int>? excludeSources = const <int>[0]}) {
+  _query(excludeSources: [1]);
+}

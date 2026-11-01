@@ -953,8 +953,9 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
     });
   }
 
-  /// True when the enclosing function body contains `name == null` /
-  /// `name != null` (either order) for this parameter.
+  /// True when the enclosing function body acts on `null` for this parameter:
+  /// `name == null` / `!= null`, `name ??`, `name ??=`, or forwards `name` to
+  /// a nullable parameter of another call.
   static bool _bodyComparesToNull(RegularFormalParameter node) {
     final String? name = node.name?.lexeme;
     if (name == null) return false;
@@ -1006,6 +1007,22 @@ class _NullCompareFinder extends RecursiveAstVisitor<void> {
       if (l is SimpleIdentifier && l.name == name) found = true;
     }
     super.visitBinaryExpression(node);
+  }
+
+  /// `name` passed directly as an argument whose resolved target parameter is
+  /// nullable: the callee gives `null` its meaning, so the `?` is required.
+  @override
+  void visitArgumentList(ArgumentList node) {
+    for (final Argument arg in node.arguments) {
+      final Expression e = arg.argumentExpression;
+      if (e is SimpleIdentifier && e.name == name) {
+        final DartType? t = arg.correspondingParameter?.type;
+        if (t != null && t.nullabilitySuffix == NullabilitySuffix.question) {
+          found = true;
+        }
+      }
+    }
+    super.visitArgumentList(node);
   }
 
   /// `name ??= fallback` resolves null in the body.
