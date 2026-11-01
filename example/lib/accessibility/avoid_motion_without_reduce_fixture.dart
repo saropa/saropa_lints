@@ -138,3 +138,14 @@ class _ToastMotionState extends State<StatefulWidget> {
   Widget build(BuildContext context) =>
       FadeTransition(opacity: _opacity, child: child);
 }
+
+// BAD: reduced motion is only mentioned in a comment and `settlement` is an
+// unrelated word; neither handles the preference.
+class _CommentOnlyMotionState extends State<StatefulWidget> {
+  // TODO: respect reduceMotion and disableAnimations here.
+  int settlement = 0;
+
+  Widget build(BuildContext context) =>
+      // expect_lint: avoid_motion_without_reduce
+      FadeTransition(opacity: _opacity, child: child);
+}

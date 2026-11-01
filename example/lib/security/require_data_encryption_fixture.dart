@@ -424,3 +424,13 @@ Future<void> _goodDismissalKeyOnCardNamedClass1010(String id) =>
 // expect_lint: require_data_encryption
 Future<void> _badSensitivePayloadOnCardNamedClass1010(String password) =>
     SuccessCardGate1010.write(<String>[password]);
+
+class Card {
+  static Future<void> write(List<String> values) async {}
+}
+
+// BAD: `Card.` as a leading qualifier is stripped, but `userCreditCard.number`
+// is a sensitive value whose own `Card.` text must still be scanned.
+// expect_lint: require_data_encryption
+Future<void> _badQualifierInsideIdentifier1010(Object userCreditCard) =>
+    Card.write(<String>[userCreditCard.number]);

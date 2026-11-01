@@ -1604,7 +1604,12 @@ class RequireDataEncryptionRule extends SaropaLintRule {
       // still scans `x`.
       if (target is SimpleIdentifier &&
           target.name[0] != target.name[0].toLowerCase()) {
-        argsSource = argsSource.replaceAll('${target.name.toLowerCase()}.', ' ');
+        // Only a leading qualifier: not preceded by an identifier character or
+        // `.`, so `userCreditCard.number` keeps its `card` / `number` text.
+        argsSource = argsSource.replaceAll(
+          RegExp('(?<![\\w\$.])${RegExp.escape(target.name.toLowerCase())}\\.'),
+          ' ',
+        );
       }
 
       if (_argumentEncryptionSignalPatterns.any(

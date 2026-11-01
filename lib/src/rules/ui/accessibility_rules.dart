@@ -3494,19 +3494,40 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
       if (typeName.endsWith('Transition')) {
         final ClassDeclaration? cls = node
             .thisOrAncestorOfType<ClassDeclaration>();
-        if (cls != null && _reducedMotionHandled.hasMatch(cls.toSource())) {
-          return;
+        if (cls != null) {
+          final _ReducedMotionIdentifierFinder finder =
+              _ReducedMotionIdentifierFinder();
+          cls.accept(finder);
+          if (finder.found) return;
         }
       }
 
       reporter.atNode(node.constructorName, code);
     });
   }
+}
 
-  static final RegExp _reducedMotionHandled = RegExp(
-    r'disableAnimations|accessibleNavigation|reduce[d]?Motion|settle',
+/// Finds an identifier (never a comment or string) naming the reduced-motion
+/// preference or a `settle` helper (`toastPlayOrSettle`, not `settlement`).
+class _ReducedMotionIdentifierFinder extends RecursiveAstVisitor<void> {
+  static final RegExp _preference = RegExp(
+    r'disableAnimations|accessibleNavigation|reduce[d]?Motion',
     caseSensitive: false,
   );
+
+  // `settle` as a whole camelCase/snake word: not `settlement`.
+  static final RegExp _settle = RegExp(
+    r'(?<![a-zA-Z])settle(?![a-z])|Settle(?![a-z])',
+  );
+
+  bool found = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (_preference.hasMatch(node.name) || _settle.hasMatch(node.name)) {
+      found = true;
+    }
+  }
 }
 
 /// Warns when Icon widget is used without a semanticLabel for accessibility.
