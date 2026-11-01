@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [17.0.1-beta.7]
 
-Nineteen false-positive hardening fixes across lint rules, and the master switch now stops the language server.
+False-positive hardening for 15 lint rules; the master switch now stops the language server; scan exits 0 when disabled.
 
 ### Fixed
 
