@@ -133,7 +133,12 @@ const List<String> _kMedial = <String>[
 // GOOD: list passed as argument to a positional-slot constructor.
 void _good250Slots(String multiline) {
   final slots = Object.hash(<String?>['', '', multiline, '', '', '']);
-  api = [multiline, '', ''];
+  final api = _Slots250([multiline, '', '']);
+}
+
+class _Slots250 {
+  const _Slots250(this.values);
+  final List<String> values;
 }
 
 // BAD: near-miss; short non-const list with no positional guard.

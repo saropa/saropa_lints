@@ -131,4 +131,9 @@ Object? _badNullAssertedNoGuard(List<Object>? xs) =>
 // GOOD: split() never returns an empty list.
 String _goodSplitInline(String line) => line.split('\t').first;
 
+// BAD: guard names `items`, which merely ends with the accessed name `s`.
+Object _badSuffixNameGuard(List<Object> s, List<Object> items) =>
+    // expect_lint: avoid_unsafe_collection_methods
+    items.length == 1 ? s.first : Object();
+
 void main() {}

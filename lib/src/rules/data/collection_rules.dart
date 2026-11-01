@@ -829,8 +829,12 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     // guard covers `countries!.first`.
     final String src = _stripNullOps(condition.toSource());
     final String bareName = _stripNullOps(collectionName);
-    if (src.contains('$bareName.length') ||
-        src.contains('$bareName.isNotEmpty')) {
+    // The name must start at an identifier boundary: `items.length` must not
+    // satisfy a guard on `s`.
+    final RegExp namedGuard = RegExp(
+      '(?<![\\w\$])${RegExp.escape(bareName)}\\.(?:length|isNotEmpty)',
+    );
+    if (namedGuard.hasMatch(src)) {
       return true;
     }
 
