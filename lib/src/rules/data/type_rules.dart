@@ -1000,7 +1000,24 @@ class _NullCompareFinder extends RecursiveAstVisitor<void> {
         found = true;
       }
     }
+    // `name ?? fallback` resolves null in the body (null = use the fallback).
+    if (op == '??') {
+      final Expression l = node.leftOperand;
+      if (l is SimpleIdentifier && l.name == name) found = true;
+    }
     super.visitBinaryExpression(node);
+  }
+
+  /// `name ??= fallback` resolves null in the body.
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression l = node.leftHandSide;
+    if (node.operator.lexeme == '??=' &&
+        l is SimpleIdentifier &&
+        l.name == name) {
+      found = true;
+    }
+    super.visitAssignmentExpression(node);
   }
 }
 

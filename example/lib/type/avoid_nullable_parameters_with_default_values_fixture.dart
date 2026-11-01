@@ -114,7 +114,25 @@ void _good1226({String name = 'default'}) {} // Non-nullable with default
 
 // GOOD: tri-state - null is a distinct "all rows" value in the body.
 String _goodTriState({bool? isHidden = false}) {
+  if (isHidden == null) return 'all';
   if (isHidden == true) return 'hidden';
   if (isHidden == false) return 'visible';
   return 'all';
+}
+
+// GOOD: tri-state - null is resolved with `??=` in the body.
+bool _goodNullAssign({bool? ignoreEpoch = false}) {
+  ignoreEpoch ??= true;
+  return !ignoreEpoch;
+}
+
+// GOOD: tri-state - null is resolved with `??` in the body.
+bool _goodNullCoalesce({bool? ignoreEpoch = false}) {
+  return ignoreEpoch ?? true;
+}
+
+// BAD: only uses the value, never acts on null.
+// expect_lint: avoid_nullable_parameters_with_default_values
+bool _badNoNullHandling({bool? flag = false}) {
+  return flag == true;
 }

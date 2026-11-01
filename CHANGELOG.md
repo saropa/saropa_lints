@@ -80,6 +80,7 @@ The "large files not excluded from the file watcher" warning no longer appears i
 
 ### Fixed
 
+- **`avoid_nullable_parameters_with_default_values`:** no longer flags a nullable parameter with a default when the body resolves `null` with `x ??= fallback` or `x ?? fallback` (null is a distinct input, same as the existing `== null` / `!= null` exemption). Parameters whose body never acts on `null` are still flagged.
 - **`avoid_nullable_interpolation`:** no longer flags an interpolation guarded by `x != null &&` on its left (e.g. `uuid != null && list.contains('${uuid}|$code')`), or a null-aware chain off a receiver already checked non-null (`if (x != null) '${x?.map(...).join()}'`). Unguarded interpolations and `||` conditions are still flagged.
 - **`avoid_nested_assignments`:** no longer flags the grouping idiom `(map[key] ??= <T>[]).add(item)` (a parenthesized `??=` on a map index used as a call, property or index target). Other nested assignments, including `??=` on plain variables and `=` on an index, are still flagged.
 - **`avoid_motion_without_reduce`:** no longer flags `FadeTransition` / `SlideTransition` / `ScaleTransition` / `RotationTransition` inside a class that already reads `disableAnimations` / `accessibleNavigation`, or calls a reduced-motion or `settle` helper to settle the controller. Transitions in classes with no such handling, and non-transition widgets, are still flagged.
