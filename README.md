@@ -224,6 +224,14 @@ The scanner works on **any Dart project** — even without saropa_lints as a dep
 
 ---
 
+## How to turn saropa_lints completely off
+
+1. **VS Code extension:** set `saropaLints.enabled` to `false`. This master switch also stops the language server, even if `saropaLints.lspServer.enabled` is `true`.
+2. **Analyzer plugin:** toggle "Lint integration" Off in the extension, or comment out the `saropa_lints:` block under `plugins:` in `analysis_options.yaml`, then restart the Dart analysis server.
+3. **Hooks and CI:** with the plugin block commented out by the extension, `dart run saropa_lints scan` prints a "disabled" line and exits 0. A CI workflow from `init --emit-ci` has no off switch of its own; delete or disable the workflow file.
+
+---
+
 ## Scope: Static Code vs. Runtime Data
 
 `saropa_lints` and **[Saropa Drift Advisor](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-drift-advisor)** are complementary. They analyze different things and should both be installed when you use Drift.

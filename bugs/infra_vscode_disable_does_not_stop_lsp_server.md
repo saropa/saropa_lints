@@ -46,15 +46,21 @@ These are not extension bugs on their own. They show there is no single off swit
 2. Leave `saropaLints.lspServer.enabled` true.
 3. Reload the window. Check `ps` for `lsp_server.dart` and the Problems panel for saropa_lints entries.
 
-## Info needed to close
+## Done
 
-Landed (code + unit test of the gate): `saropaLints.enabled: false` now stops the LSP server (without re-enabling the plugin block), blocks start by setting/command/Restart All, and restarts it when the master switch returns on. Suggested fix items 1 and 2 are covered in code (message is English-only; the owner's translation pipeline must add a catalog key if wanted).
+- Master switch `saropaLints.enabled: false` stops the LSP server, blocks start by setting/command/Restart All, and restarts it when the master switch returns on (suggested items 1 and 2; message is English-only, the owner's translation pipeline must add a catalog key if wanted).
+- Suggested item 3: `dart run saropa_lints scan` prints a "disabled" line and exits 0 when the extension's OFF marker is in `analysis_options.yaml` and no `--tier` is given (test: `test/scan/scan_integration_disabled_test.dart`). A project with no config and no marker still exits 2.
+- Suggested item 4: README section "How to turn saropa_lints completely off" written.
+- Unknown on `lspServer.enabled`: audited. The extension never writes `saropaLints.lspServer.enabled` (tier change writes only `saropaLints.tier`); the value true comes from the `package.json` default (true), so a user's file with it set was set by the user or an earlier session. Not a bug; no change.
 
-Still missing:
-1. Live VS Code check: with `saropaLints.enabled=false` and `saropaLints.lspServer.enabled=true`, reload; confirm no `lsp_server.dart` process in `ps` and no saropa_lints entries in Problems (the client's diagnostics clearing on stop was not read/verified).
-2. Suggested item 3: `dart run saropa_lints scan` should exit 0 with a "disabled" line when the plugin block is commented out (Dart CLI side, not done; owner decision on exit code).
-3. Suggested item 4: README section "How to turn saropa_lints completely off" (not written).
-4. Unknown: whether `lspServer.enabled` default true was written by the extension on a tier change (package.json default not audited).
+## Owner step to close
+
+1. Set `saropaLints.enabled` to `false` and `saropaLints.lspServer.enabled` to `true` in `.vscode/settings.json`, then run "Developer: Reload Window".
+2. In a terminal run `ps aux | grep lsp_server.dart`; expect no match other than the grep line itself.
+3. Open the Problems panel; expect no saropa_lints entries.
+4. Set `saropaLints.enabled` to `true`; confirm `lsp_server.dart` appears in `ps` again and findings return.
+
+Report the result and this bug can be closed.
 
 ## Owner decision (2026-10-31)
 

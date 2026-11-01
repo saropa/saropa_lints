@@ -6,6 +6,8 @@
 library;
 
 import 'dart:io' show File, Platform;
+import 'package:saropa_lints/src/native/config_loader.dart'
+    show kIntegrationOffSentinel;
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Rule configuration loaded from a project's config files.
@@ -14,6 +16,15 @@ class ScanConfig {
 
   final Set<String> enabledRules;
   final Set<String> disabledRules;
+}
+
+/// True when the project's `analysis_options.yaml` carries the marker the
+/// VS Code extension writes when "Lint integration" is turned off (the
+/// `plugins:` block is commented out). The scan CLI then reports "disabled"
+/// and exits 0 instead of failing with "no configuration found".
+bool isScanIntegrationDisabled(String projectRoot) {
+  final content = _readFile(projectRoot, 'analysis_options.yaml');
+  return content != null && content.contains(kIntegrationOffSentinel);
 }
 
 /// Attempts to load rule config from the project at [projectRoot].

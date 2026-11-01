@@ -30,7 +30,8 @@ library;
 
 export 'package:analyzer/dart/analysis/analysis_context_collection.dart'
     show AnalysisContextCollection;
-export 'src/scan/scan_config.dart' show ScanConfig, loadScanConfig;
+export 'src/scan/scan_config.dart'
+    show ScanConfig, loadScanConfig, isScanIntegrationDisabled;
 export 'src/scan/scan_diagnostic.dart' show ScanDiagnostic;
 export 'src/scan/scan_runner.dart' show ScanMessageSink, ScanRunner;
 export 'src/scan/scan_json.dart'

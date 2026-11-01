@@ -39,6 +39,7 @@ import 'package:saropa_lints/src/tiers.dart';
 /// Exit codes:
 ///   0 - No issues found (or none at/above --fail-on threshold)
 ///   1 - Issues found (or at least one at/above --fail-on threshold)
+///   0 - Also returned (with a "disabled" line) when lint integration is off
 ///   2 - No configuration found / invalid tier / parse error
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
@@ -81,6 +82,16 @@ Future<void> main(List<String> args) async {
     stdout.write(formatSdkCompatResult(result));
     // Exit 1 if there's a mismatch, 0 if OK.
     exit(result.hasMismatch ? 1 : 0);
+  }
+
+  // Lint integration turned off (plugin block commented out by the VS Code
+  // extension) and no explicit tier: report "disabled" and succeed so hooks
+  // and CI do not show a failure for a deliberate off switch.
+  if (tier == null &&
+      loadScanConfig(p.absolute(path)) == null &&
+      isScanIntegrationDisabled(p.absolute(path))) {
+    print('saropa_lints is disabled in analysis_options.yaml; scan skipped.');
+    exit(0);
   }
 
   // --profile: arm per-rule timing capture BEFORE any rule callback runs and
