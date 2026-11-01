@@ -108,4 +108,27 @@ void _badOtherCollection(List<String> list, List<String> other, String x) {
   if (other.isNotEmpty && _same(list.first, x)) {}
 }
 
+// --- Null-aware guard vs null-asserted access ---
+
+// GOOD: `countries?.length == 1` guard covers `countries!.first`.
+Object? _goodNullAwareLengthGuard(List<Object>? countries) =>
+    countries?.length == 1 ? countries!.first : null;
+
+// GOOD: `(xs?.isNotEmpty ?? false)` guard covers `xs!.first`.
+Object? _goodNullAwareIsNotEmptyGuard(List<Object>? xs) =>
+    (xs?.isNotEmpty ?? false) ? xs!.first : null;
+
+// BAD: null-aware guard is on a different collection.
+Object? _badNullAwareOtherCollection(List<Object>? xs, List<Object>? other) =>
+    // expect_lint: avoid_unsafe_collection_methods
+    other?.length == 1 ? xs!.first : null;
+
+// BAD: no guard at all.
+Object? _badNullAssertedNoGuard(List<Object>? xs) =>
+    // expect_lint: avoid_unsafe_collection_methods
+    xs!.first;
+
+// GOOD: split() never returns an empty list.
+String _goodSplitInline(String line) => line.split('\t').first;
+
 void main() {}

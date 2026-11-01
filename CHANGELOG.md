@@ -80,6 +80,7 @@ The "large files not excluded from the file watcher" warning no longer appears i
 
 ### Fixed
 
+- **`avoid_unsafe_collection_methods`:** no longer flags `xs!.first` when the guard is written null-aware on the same collection (`xs?.length == 1 ? xs!.first : null`, `(xs?.isNotEmpty ?? false) ? xs!.first : null`). Also no longer flags `parts.first` where `parts` is a local initialized from `s.split(...)` (always non-empty). A guard on a different collection, or no guard, is still flagged.
 - **`avoid_string_substring`:** no longer flags `s.substring(...)` on the right side of `&&` when the left side checks the same string (`s.startsWith('c') && s.substring(1) == 'x'`, `s.length > 3 && ...`) or the slice arguments. A guard on a different string, or no guard, is still flagged.
 - **`avoid_return_await_db`:** no longer flags `return await dbWrite(...)` inside the body of a `try` that has a `catch` clause or a `finally` block, where the `await` is required for the handler to see the async error. Returns outside a guarded try body (including inside the `catch` itself) are still flagged.
 - **`avoid_retaining_disposed_widgets`:** no longer flags a non-static `Widget` / `State` / `BuildContext` field (or `List` of them) that the same class's `dispose()` assigns `null` (`_ghost = null` / `this._cards = null`). Fields `dispose()` does not clear, and static fields, are still flagged.

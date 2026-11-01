@@ -493,7 +493,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
           typeName.startsWith('Iterable') ||
           typeName.startsWith('Queue')) {
         // Check if this is a guaranteed non-empty collection (e.g., EnumType.values)
-        if (_isGuaranteedNonEmptyPrefixed(node)) {
+        if (_isGuaranteedNonEmptyPrefixed(node) ||
+            _isGuaranteedNonEmpty(node.prefix)) {
           return;
         }
 
@@ -824,9 +825,12 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     // Fallback: check source text for guard patterns that the structured
     // checks above may miss due to AST node type differences between
     // analyzer versions (PrefixedIdentifier vs PropertyAccess).
-    final String src = condition.toSource();
-    if (src.contains('$collectionName.length') ||
-        src.contains('$collectionName.isNotEmpty')) {
+    // Null operators are stripped on both sides so a `countries?.length == 1`
+    // guard covers `countries!.first`.
+    final String src = _stripNullOps(condition.toSource());
+    final String bareName = _stripNullOps(collectionName);
+    if (src.contains('$bareName.length') ||
+        src.contains('$bareName.isNotEmpty')) {
       return true;
     }
 
@@ -876,7 +880,9 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
       lengthTarget = left.target?.toSource();
     }
 
-    if (lengthTarget == collectionName && right is IntegerLiteral) {
+    if (lengthTarget != null &&
+        _stripNullOps(lengthTarget) == _stripNullOps(collectionName) &&
+        right is IntegerLiteral) {
       final int? value = right.value;
       if (value != null) {
         // list.length > 0, list.length > 1, etc.
