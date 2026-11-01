@@ -161,3 +161,29 @@ class _bad476_MutableHolder {
   // expect_lint: avoid_retaining_disposed_widgets
   Widget child; // LINT
 }
+
+// GOOD: helper clears its widget fields in dispose().
+class _good476_ClearsInDispose {
+  Widget? _ghost; // OK - nulled in dispose
+  List<Widget>? _cards; // OK - nulled in dispose
+  void dispose() {
+    _ghost = null;
+    this._cards = null;
+  }
+}
+
+// BAD: dispose() does not clear the field.
+class _bad476_DisposeDoesNotClear {
+  // expect_lint: avoid_retaining_disposed_widgets
+  Widget? _ghost; // LINT
+  void dispose() {}
+}
+
+// BAD: static field is never cleared by an instance dispose().
+class _bad476_StaticShared {
+  // expect_lint: avoid_retaining_disposed_widgets
+  static Widget? shared; // LINT
+  void dispose() {
+    shared = null;
+  }
+}

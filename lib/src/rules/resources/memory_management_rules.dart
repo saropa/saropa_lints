@@ -1824,8 +1824,18 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
       // Immutable value descriptors (const ctor, only final fields) are
       // built in `build` and die with the frame.
       if (_isConstValueClass(node)) return;
+      final Set<String> clearedInDispose = _fieldsNulledInDispose(node);
       for (final ClassMember member in node.bodyMembers) {
         if (member is! FieldDeclaration) continue;
+        // A field the class's own `dispose()` sets to null does not outlive
+        // the widget tree.
+        if (!member.isStatic &&
+            member.fields.variables.every(
+              (VariableDeclaration v) =>
+                  clearedInDispose.contains(v.name.lexeme),
+            )) {
+          continue;
+        }
 
         final TypeAnnotation? type = member.fields.type;
         if (type == null) continue;
@@ -1878,6 +1888,17 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
         isFlutterSdkInterface(element);
   }
 
+  /// Names of fields assigned `null` (`x = null` / `this.x = null`) inside
+  /// this class's `dispose()` method.
+  Set<String> _fieldsNulledInDispose(ClassDeclaration node) {
+    final Set<String> names = <String>{};
+    for (final ClassMember m in node.bodyMembers) {
+      if (m is! MethodDeclaration || m.name.lexeme != 'dispose') continue;
+      m.body.visitChildren(_NullAssignCollector(names));
+    }
+    return names;
+  }
+
   /// Short-lived helpers owned by a widget and recreated on every build.
   static const Set<String> _renderDelegateBases = <String>{
     'FlowDelegate',
@@ -1926,6 +1947,26 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
       }
     }
     return false;
+  }
+}
+
+/// Collects the target names of `x = null` assignments.
+class _NullAssignCollector extends RecursiveAstVisitor<void> {
+  _NullAssignCollector(this.names);
+
+  final Set<String> names;
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    if (node.operator.lexeme == '=' && node.rightHandSide is NullLiteral) {
+      final Expression left = node.leftHandSide;
+      if (left is SimpleIdentifier) {
+        names.add(left.name);
+      } else if (left is PropertyAccess && left.target is ThisExpression) {
+        names.add(left.propertyName.name);
+      }
+    }
+    super.visitAssignmentExpression(node);
   }
 }
 
