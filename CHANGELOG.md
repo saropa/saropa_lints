@@ -80,6 +80,7 @@ The "large files not excluded from the file watcher" warning no longer appears i
 
 ### Fixed
 
+- **`avoid_duplicate_string_elements`:** no longer flags empty strings repeated in a list, lists passed as call or constructor arguments (fixed positional slots), or const lookup tables of 6+ elements indexed by position. Set literals and short plain lists with repeats are still flagged.
 - **`avoid_accessing_collections_by_constant_index`:** no longer flags `list[0]` / `list[1]` in a loop when the same list's `length` is checked first, in the left side of `&&`, in an enclosing `if` or ternary, or in an earlier `if (...) continue/break/return/throw;`. Accesses with no length check are still flagged.
 - **Large-file watcher warning (extension):** the scan now runs only in Dart/Flutter workspaces, and skips `.claude/worktrees` and `.venv` folders, so web or Python workspaces no longer get warnings about virtual-environment files and media assets. The 5 MB default size bar (`saropaLints.watcherExclude.maxFileKb`) is unchanged.
 

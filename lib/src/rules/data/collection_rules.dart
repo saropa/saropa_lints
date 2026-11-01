@@ -2535,7 +2535,14 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addListLiteral((ListLiteral node) {
-      _checkForDuplicateStrings(node.elements, reporter, code);
+      // Lists where position carries meaning may legitimately repeat values.
+      if (_isPositionalStringList(node)) return;
+      _checkForDuplicateStrings(
+        node.elements,
+        reporter,
+        code,
+        skipEmpty: true,
+      );
     });
 
     context.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -2543,6 +2550,18 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
         _checkForDuplicateStrings(node.elements, reporter, code);
       }
     });
+  }
+
+  /// A list is positional when it is an argument to a call or constructor
+  /// (fixed slots, e.g. `VCardValue.structured([...])`), or a const lookup
+  /// table of 6+ elements indexed by position.
+  static bool _isPositionalStringList(ListLiteral node) {
+    final AstNode? parent = node.parent;
+    if (parent is ArgumentList) return true;
+    if (node.elements.length < 6) return false;
+    if (node.constKeyword != null) return true;
+    final AstNode? decl = parent is VariableDeclaration ? parent.parent : null;
+    return decl is VariableDeclarationList && decl.isConst;
   }
 }
 
@@ -2902,12 +2921,16 @@ void _checkForDuplicateNumbers(
 void _checkForDuplicateStrings(
   NodeList<CollectionElement> elements,
   SaropaDiagnosticReporter reporter,
-  LintCode code,
-) {
+  LintCode code, {
+  bool skipEmpty = false,
+}) {
   final Set<String> seen = <String>{};
   for (final CollectionElement element in elements) {
     if (element is! Expression) continue;
     if (element is! StringLiteral) continue;
+    if (skipEmpty && element is SimpleStringLiteral && element.value.isEmpty) {
+      continue;
+    }
 
     final String source = element.toSource();
     if (seen.contains(source)) {

@@ -123,3 +123,21 @@ void _good250() {
   final list = ['a', 'b', 'c'];
   final set = {'hello', 'world', 'foo'};
 }
+
+// GOOD: positional lookup table (const, 6+ elements); repeats are the data.
+const List<String> _kMedial = <String>[
+  'ah', 'eh', 'yah', 'yeh', 'uh', 'eh', //
+  'yuh', 'yeh', 'oh', 'wah', 'weh',
+];
+
+// GOOD: list passed as argument to a positional-slot constructor.
+void _good250Slots(String multiline) {
+  final slots = Object.hash(<String?>['', '', multiline, '', '', '']);
+  api = [multiline, '', ''];
+}
+
+// BAD: near-miss; short non-const list with no positional guard.
+// expect_lint: avoid_duplicate_string_elements
+void _bad250Short() {
+  final names = ['x', 'y', 'x'];
+}
