@@ -2819,7 +2819,19 @@ class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
       final Expression? init = indexVar.initializer;
       if (init is! IntegerLiteral || init.value != 0) return;
       if (_indexFeedsNestedLoop(node.body, indexName)) return;
-      if (!_bodyUsesIndex(node.body, indexName)) return;
+      final Set<String> targets = _indexedTargets(node.body, indexName);
+      if (targets.isEmpty) return;
+      // The index also addresses a second collection: asMap() on one list
+      // would not remove the index.
+      if (targets.length > 1) return;
+      // The iterated list grows/shrinks in the loop (BFS style): asMap()
+      // would throw ConcurrentModificationError.
+      final String? boundTarget = switch (rightOperand) {
+        PropertyAccess() => rightOperand.target?.toSource(),
+        PrefixedIdentifier() => rightOperand.prefix.name,
+        _ => null,
+      };
+      if (boundTarget != null && _mutatesTarget(node.body, boundTarget)) return;
       reporter.atNode(node);
     });
   }
@@ -2830,10 +2842,49 @@ class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
     return found;
   }
 
-  static bool _bodyUsesIndex(Statement body, String indexName) {
+  static Set<String> _indexedTargets(Statement body, String indexName) {
+    final Set<String> targets = <String>{};
+    body.visitChildren(_IndexAccessVisitor(indexName, targets.add));
+    return targets;
+  }
+
+  static const Set<String> _mutators = <String>{
+    'add',
+    'addAll',
+    'insert',
+    'insertAll',
+    'remove',
+    'removeAt',
+    'removeLast',
+    'removeWhere',
+    'removeRange',
+    'clear',
+  };
+
+  static bool _mutatesTarget(Statement body, String target) {
     var found = false;
-    body.visitChildren(_IndexAccessVisitor(indexName, () => found = true));
+    body.accept(
+      _MutationVisitor(target, _mutators, () => found = true),
+    );
     return found;
+  }
+}
+
+/// Detects a call to a growing/shrinking method on [_target].
+class _MutationVisitor extends RecursiveAstVisitor<void> {
+  _MutationVisitor(this._target, this._mutators, this._onMatch);
+
+  final String _target;
+  final Set<String> _mutators;
+  final void Function() _onMatch;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (_mutators.contains(node.methodName.name) &&
+        node.target?.toSource() == _target) {
+      _onMatch();
+    }
+    super.visitMethodInvocation(node);
   }
 }
 
@@ -2887,13 +2938,13 @@ class _IndexAccessVisitor extends RecursiveAstVisitor<void> {
   _IndexAccessVisitor(this._indexName, this._onMatch);
 
   final String _indexName;
-  final void Function() _onMatch;
+  final void Function(String target) _onMatch;
 
   @override
   void visitIndexExpression(IndexExpression node) {
     final index = node.index;
     if (index is SimpleIdentifier && index.name == _indexName) {
-      _onMatch();
+      _onMatch(node.target?.toSource() ?? '');
     }
     super.visitIndexExpression(node);
   }

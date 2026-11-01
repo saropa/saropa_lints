@@ -25,3 +25,26 @@ void goodPairwise(List<int> l) {
     }
   }
 }
+
+// GOOD: the index also addresses a second collection.
+void goodSecondCollection(List<int> a, List<int> b) {
+  for (int j = 0; j < a.length; j++) {
+    print(a[j] + b[j]);
+  }
+}
+
+// GOOD: the iterated list grows during the loop (BFS).
+void goodGrowingList(List<int> seed) {
+  final group = <int>[...seed];
+  for (int i = 0; i < group.length; i++) {
+    group.addAll(<int>[group[i] + 1]);
+  }
+}
+
+// BAD: near miss - mutates a different list, one indexed target.
+// expect_lint: prefer_asmap_over_indexed_iteration
+void badMutatesOther(List<int> a, List<int> out) {
+  for (int i = 0; i < a.length; i++) {
+    out.add(a[i]);
+  }
+}
