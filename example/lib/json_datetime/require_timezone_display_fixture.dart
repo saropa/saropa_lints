@@ -152,3 +152,17 @@ void _good459f() {
 void _bad459c() {
   final fmt = DateFormat('mm:ss');
 }
+
+// GOOD: user-facing local time of day (jm/Hm/Hms formatted from a local value)
+String _good459g(DateTime local, String? locale) =>
+    DateFormat.jm(locale).format(local);
+String _good459h(DateTime local) => DateFormat.Hm().format(local);
+String _good459i(DateTime local) => DateFormat.Hms().format(local);
+
+// BAD: value is explicitly UTC, zone is ambiguous when displayed
+// expect_lint: require_timezone_display
+String _bad459d(DateTime t) => DateFormat.jm().format(t.toUtc());
+
+// BAD: stored formatter, value unknown at the construction site
+// expect_lint: require_timezone_display
+final DateFormat _bad459e = DateFormat.jm();

@@ -1792,6 +1792,12 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
       // is structurally impossible and reporting here is a false positive.
       if (_isPatternIntrospection(node)) return;
 
+      // Skip `DateFormat.jm(l).format(local)`: a time of day shown on the
+      // user's own device needs no zone suffix. Still reported when the
+      // formatted value is visibly UTC (`.toUtc()`, `DateTime.utc`, `isUtc`)
+      // and when the formatter is stored/returned without an immediate format.
+      if (_isFormatOfLocalValue(node)) return;
+
       final String? namedCtor = node.constructorName.name?.name;
 
       // Check named constructors (e.g., DateFormat.Hm())
@@ -1824,6 +1830,19 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// True when the `DateFormat` is immediately applied via `.format(value)`
+  /// and `value` shows no sign of being UTC.
+  static bool _isFormatOfLocalValue(InstanceCreationExpression node) {
+    final AstNode? parent = node.parent;
+    if (parent is! MethodInvocation ||
+        parent.target != node ||
+        parent.methodName.name != 'format') {
+      return false;
+    }
+    final String arg = parent.argumentList.toSource().toLowerCase();
+    return !arg.contains('utc');
   }
 
   /// True when the constructed `DateFormat`'s immediate consumer is its
