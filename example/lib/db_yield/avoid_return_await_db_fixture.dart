@@ -155,6 +155,34 @@ Future<void> _badAdd(int c) async {
   return await _DbIo.dbContactAddToGroup(c);
 }
 
+// GOOD: inside try with catch, `await` is required for the catch to run.
+Future<void> _goodTryCatch(int c) async {
+  try {
+    return await _DbIo.dbContactSave(c);
+  } on Object catch (error) {
+    return;
+  }
+}
+
+// GOOD: try/finally also needs the await.
+Future<void> _goodTryFinally(int c) async {
+  try {
+    return await _DbIo.dbContactSave(c);
+  } finally {
+    // cleanup
+  }
+}
+
+// BAD: return in the catch clause is not protected by the try.
+Future<void> _badInCatch(int c) async {
+  try {
+    await _DbIo.dbContactLoadDBCount();
+  } on Object catch (error) {
+    // expect_lint: avoid_return_await_db
+    return await _DbIo.dbContactSave(c);
+  }
+}
+
 class _NoteClass305 {
   void noteMethod() {}
 }

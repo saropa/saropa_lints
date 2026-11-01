@@ -557,11 +557,29 @@ class AvoidReturnAwaitDbRule extends SaropaLintRule {
         if (expr is! AwaitExpression) return;
         final opType = _classifyDbAwait(expr);
         if (opType != _DbOperationType.write) return;
+        // `await` is required inside a guarded try body so the catch /
+        // finally sees the async error or completion.
+        if (_isInGuardedTryBody(s)) return;
         reporter.atNode(s);
       });
     }
 
     context.addMethodDeclaration((n) => visit(n.body));
     context.addFunctionDeclaration((n) => visit(n.functionExpression.body));
+  }
+
+  static bool _isInGuardedTryBody(ReturnStatement node) {
+    AstNode child = node;
+    AstNode? parent = node.parent;
+    while (parent != null && parent is! FunctionBody) {
+      if (parent is TryStatement &&
+          identical(child, parent.body) &&
+          (parent.catchClauses.isNotEmpty || parent.finallyBlock != null)) {
+        return true;
+      }
+      child = parent;
+      parent = parent.parent;
+    }
+    return false;
   }
 }

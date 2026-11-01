@@ -80,6 +80,7 @@ The "large files not excluded from the file watcher" warning no longer appears i
 
 ### Fixed
 
+- **`avoid_return_await_db`:** no longer flags `return await dbWrite(...)` inside the body of a `try` that has a `catch` clause or a `finally` block, where the `await` is required for the handler to see the async error. Returns outside a guarded try body (including inside the `catch` itself) are still flagged.
 - **`avoid_retaining_disposed_widgets`:** no longer flags a non-static `Widget` / `State` / `BuildContext` field (or `List` of them) that the same class's `dispose()` assigns `null` (`_ghost = null` / `this._cards = null`). Fields `dispose()` does not clear, and static fields, are still flagged.
 - **`avoid_nullable_parameters_with_default_values`:** no longer flags a nullable parameter with a default that the body forwards unchanged as an argument to a callee parameter that is itself nullable (`query(isHidden: isHidden)`); the callee gives `null` its meaning. Forwarding to a non-nullable parameter, or not forwarding directly, is still flagged.
 - **`avoid_nullable_parameters_with_default_values`:** no longer flags a nullable parameter with a default when the body resolves `null` with `x ??= fallback` or `x ?? fallback` (null is a distinct input, same as the existing `== null` / `!= null` exemption). Parameters whose body never acts on `null` are still flagged.
