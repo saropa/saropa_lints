@@ -166,4 +166,16 @@ Object? _bad600SiblingSilent() {
   }
 }
 
+// BAD: an empty typed catch is flagged even beside a logging sibling.
+Object? _bad600SiblingLogsButEmpty() {
+  try {
+    return riskyCheck();
+    // expect_lint: require_catch_logging
+  } on StateError {
+  } on Object catch (error, stack) {
+    print('$error $stack');
+    return null;
+  }
+}
+
 void main() {}

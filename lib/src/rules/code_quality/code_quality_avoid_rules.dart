@@ -2993,18 +2993,27 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
       if (parent is BinaryExpression &&
           parent.operator.lexeme == '&&' &&
           parent.rightOperand == child &&
-          _checksLength(parent.leftOperand, target)) {
+          _checksLength(parent.leftOperand, target, whenTrue: true)) {
         return true;
       }
-      if (parent is IfStatement &&
-          child != parent.expression &&
-          _checksLength(parent.expression, target)) {
-        return true;
+      if (parent is IfStatement && child != parent.expression) {
+        // Then-branch runs when the condition holds; else-branch when not.
+        if (_checksLength(
+          parent.expression,
+          target,
+          whenTrue: child == parent.thenStatement,
+        )) {
+          return true;
+        }
       }
-      if (parent is ConditionalExpression &&
-          child != parent.condition &&
-          _checksLength(parent.condition, target)) {
-        return true;
+      if (parent is ConditionalExpression && child != parent.condition) {
+        if (_checksLength(
+          parent.condition,
+          target,
+          whenTrue: child == parent.thenExpression,
+        )) {
+          return true;
+        }
       }
       if (parent is Block) {
         for (final Statement s in parent.statements) {
@@ -3012,7 +3021,7 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
           if (s is IfStatement &&
               s.elseStatement == null &&
               _exitsScope(s.thenStatement) &&
-              _checksLength(s.expression, target)) {
+              _checksLength(s.expression, target, whenTrue: false)) {
             return true;
           }
         }
@@ -3033,28 +3042,63 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
         (last is ExpressionStatement && last.expression is ThrowExpression);
   }
 
-  static bool _checksLength(Expression condition, String target) {
-    final _LengthCheckFinder finder = _LengthCheckFinder(target);
+  /// [whenTrue]: the access runs where [condition] is true (`&&` right side,
+  /// then-branch); false where it is false (else-branch, after an early exit).
+  static bool _checksLength(
+    Expression condition,
+    String target, {
+    required bool whenTrue,
+  }) {
+    final _LengthCheckFinder finder = _LengthCheckFinder(target, whenTrue);
     condition.accept(finder);
     return finder.found;
   }
 }
 
-/// Finds a comparison such as `target.length == 2` or `target.length < 2`.
+/// Finds a comparison on `target.length` that proves the collection is
+/// non-empty where the guarded access runs (`length > 0`, `length == 2`,
+/// `length != 0`, `length >= n`; or, on the false side, `length == 0`,
+/// `length < n`, `length != n`). `length == 0` / `length < n` in a then-branch
+/// prove nothing and do not count.
 class _LengthCheckFinder extends RecursiveAstVisitor<void> {
-  _LengthCheckFinder(this.target);
+  _LengthCheckFinder(this.target, this.whenTrue);
 
   final String target;
+  final bool whenTrue;
   bool found = false;
 
-  static const Set<String> _comparisons = <String>{
-    '==',
-    '!=',
-    '<',
-    '<=',
-    '>',
-    '>=',
+  static const Map<String, String> _negated = <String, String>{
+    '==': '!=',
+    '!=': '==',
+    '<': '>=',
+    '<=': '>',
+    '>': '<=',
+    '>=': '<',
   };
+
+  static const Map<String, String> _flipped = <String, String>{
+    '==': '==',
+    '!=': '!=',
+    '<': '>',
+    '<=': '>=',
+    '>': '<',
+    '>=': '<=',
+  };
+
+  /// True when `length <op> n` (n null = not a literal) implies non-empty.
+  static bool _impliesNonEmpty(String op, int? n) {
+    switch (op) {
+      case '==':
+        return n == null || n > 0;
+      case '!=':
+        return n == 0;
+      case '>':
+        return n == null || n >= 0;
+      case '>=':
+        return n == null || n >= 1;
+    }
+    return false;
+  }
 
   bool _isLength(Expression e) {
     if (e is PrefixedIdentifier) {
@@ -3069,9 +3113,17 @@ class _LengthCheckFinder extends RecursiveAstVisitor<void> {
 
   @override
   void visitBinaryExpression(BinaryExpression node) {
-    if (_comparisons.contains(node.operator.lexeme) &&
-        (_isLength(node.leftOperand) || _isLength(node.rightOperand))) {
-      found = true;
+    String op = node.operator.lexeme;
+    Expression? other;
+    if (_isLength(node.leftOperand)) {
+      other = node.rightOperand;
+    } else if (_isLength(node.rightOperand)) {
+      other = node.leftOperand;
+      op = _flipped[op] ?? op;
+    }
+    if (other != null && _negated.containsKey(op)) {
+      final int? n = other is IntegerLiteral ? other.value : null;
+      if (_impliesNonEmpty(whenTrue ? op : _negated[op]!, n)) found = true;
     }
     super.visitBinaryExpression(node);
   }

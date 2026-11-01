@@ -181,3 +181,23 @@ void _badNoLengthGuard(List<String> lines, List<String> other) {
     print(line[0]);
   }
 }
+
+// BAD: `length == 0` in the then-branch proves nothing about the index.
+void _badEmptyCheckThen(List<List<String>> rows) {
+  for (final List<String> c in rows) {
+    if (c.length == 0) {
+      // expect_lint: avoid_accessing_collections_by_constant_index
+      print(c[1]);
+    }
+  }
+}
+
+// BAD: `length < 2` in the then-branch is the opposite of a guard.
+void _badShortCheckThen(List<List<String>> rows) {
+  for (final List<String> c in rows) {
+    if (c.length < 2) {
+      // expect_lint: avoid_accessing_collections_by_constant_index
+      print(c[0]);
+    }
+  }
+}
