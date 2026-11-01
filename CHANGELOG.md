@@ -80,6 +80,7 @@ The "large files not excluded from the file watcher" warning no longer appears i
 
 ### Fixed
 
+- **`avoid_motion_without_reduce`:** no longer flags `FadeTransition` / `SlideTransition` / `ScaleTransition` / `RotationTransition` inside a class that already reads `disableAnimations` / `accessibleNavigation`, or calls a reduced-motion or `settle` helper to settle the controller. Transitions in classes with no such handling, and non-transition widgets, are still flagged.
 - **`avoid_forward_slash_path_assumption`:** no longer runs in a Flutter app whose only platform folders are `android/` and/or `ios/` (forward slash is correct there). Apps or packages that can run on Windows are still flagged.
 - **`avoid_duplicate_string_elements`:** no longer flags empty strings repeated in a list, lists passed as call or constructor arguments (fixed positional slots), or const lookup tables of 6+ elements indexed by position. Set literals and short plain lists with repeats are still flagged.
 - **`avoid_accessing_collections_by_constant_index`:** no longer flags `list[0]` / `list[1]` in a loop when the same list's `length` is checked first, in the left side of `&&`, in an enclosing `if` or ternary, or in an earlier `if (...) continue/break/return/throw;`. Accesses with no length check are still flagged.

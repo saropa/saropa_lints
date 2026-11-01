@@ -121,3 +121,20 @@ void _good24() {
         : Duration(milliseconds: 500),
   );
 }
+
+// BAD: transition in a class with no reduced-motion handling.
+class _BadMotionState extends State<StatefulWidget> {
+  Widget build(BuildContext context) =>
+      // expect_lint: avoid_motion_without_reduce
+      FadeTransition(opacity: _opacity, child: child);
+}
+
+// GOOD: controller is settled via a reduced-motion helper in the same class.
+class _ToastMotionState extends State<StatefulWidget> {
+  void initState() {
+    toastPlayOrSettle(_controller);
+  }
+
+  Widget build(BuildContext context) =>
+      FadeTransition(opacity: _opacity, child: child);
+}

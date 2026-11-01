@@ -3488,9 +3488,25 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
         }
       }
 
+      // Transition widgets are driven by a controller; if the enclosing
+      // class reads the reduced-motion preference or settles the controller
+      // through a helper, the motion is already handled.
+      if (typeName.endsWith('Transition')) {
+        final ClassDeclaration? cls = node
+            .thisOrAncestorOfType<ClassDeclaration>();
+        if (cls != null && _reducedMotionHandled.hasMatch(cls.toSource())) {
+          return;
+        }
+      }
+
       reporter.atNode(node.constructorName, code);
     });
   }
+
+  static final RegExp _reducedMotionHandled = RegExp(
+    r'disableAnimations|accessibleNavigation|reduce[d]?Motion|settle',
+    caseSensitive: false,
+  );
 }
 
 /// Warns when Icon widget is used without a semanticLabel for accessibility.
