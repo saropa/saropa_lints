@@ -1,6 +1,6 @@
 # BUG: `avoid_unsafe_collection_methods` — Flags `.first`/`.last`/`.single` where non-emptiness is guaranteed (split result, length check, firstOrNull fallback)
 
-**Status: Fixed (partial; see Resolution)**
+**Status: Open (partial fix landed; remaining feature request: a marker the rule honors for lists non-empty by API contract, chosen by owner 2026-10-31)**
 
 Created: 2026-10-31
 Rule: `avoid_unsafe_collection_methods`
@@ -96,3 +96,7 @@ Partly fixed (null-aware guards and `split(...)` locals). Still flagged: `rs == 
 Needed to close:
 1. Owner decision: keep `// ignore:` for contract-guaranteed non-empty lists, or add a marker the rule honors.
 2. The `firstOrNull` sites (voice_lexicon:492, 505) are not from this rule; confirm which rule emits them and file a separate report.
+
+## Owner decision (2026-10-31)
+
+Owner chose: add a marker the rule honors for lists that are non-empty by API contract (answers Info-needed item 1). The firstOrNull sites at voice_lexicon:492 and :505 are emitted by avoid_unsafe_collection_methods and avoid_null_assertion (505, 508), per the app's Problems export; file separately if the rule claims it does not emit them.

@@ -86,3 +86,12 @@ Outcome: not fixed. The rule decides from the map literal alone; the reads (`map
 1. Owner decision on one detectable signal, since read sites cannot be seen. Options: (a) a `// partial` marker comment opt-out (new feature), (b) skip `const` maps (would hide true positives), (c) keep `// ignore:` only. Report suggests (a) but it duplicates `// ignore:`.
 2. If a same-file heuristic is wanted: a minimal reproducer where the map and its reads are in the SAME file. The 5 reported sites have reads in other files and cannot be told apart from true positives.
 3. Rule version / saropa_lints version in use (reported as "unknown").
+
+## Owner decision
+
+Owner has not yet chosen between ignore comments, a `// partial` marker, or skipping const maps.
+Owner asked why a marker is not a duplicate of `// ignore` (a marker the rule honors would differ only if it also documents intent).
+
+## Closed (2026-10-31)
+
+Owner decision: keep `// ignore:` only. A `// partial` marker would behave the same as `// ignore:` (it only documents intent), so no marker and no const-map skip. No code change; consistent with the 2026.06.03 and 2026.06.09 closures. Closed as won't-fix.

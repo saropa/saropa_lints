@@ -55,3 +55,7 @@ Still missing:
 2. Suggested item 3: `dart run saropa_lints scan` should exit 0 with a "disabled" line when the plugin block is commented out (Dart CLI side, not done; owner decision on exit code).
 3. Suggested item 4: README section "How to turn saropa_lints completely off" (not written).
 4. Unknown: whether `lspServer.enabled` default true was written by the extension on a tier change (package.json default not audited).
+
+## Owner decision (2026-10-31)
+
+`dart run saropa_lints scan` exits 0 with a "disabled" line when the plugin block is commented out (answers item 2). README off-switch section and the `lspServer.enabled` default audit (items 3 and 4) are in scope. Item 1 (live VS Code check) stays with the owner.
