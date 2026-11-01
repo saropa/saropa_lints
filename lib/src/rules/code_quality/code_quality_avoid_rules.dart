@@ -1396,6 +1396,16 @@ class AvoidSubstringRule extends SaropaLintRule {
             _conditionHasRegexGuard(current.condition, receiverSource)) {
           return true;
         }
+      } else if (current is BinaryExpression &&
+          current.operator.lexeme == '&&' &&
+          current.rightOperand == prev) {
+        // `s.startsWith('c') && s.substring(1) == 'x'` — the left operand
+        // short-circuits, so the slice only runs when the guard held.
+        if (_conditionGuardsLength(current.leftOperand, receiverSource) ||
+            _conditionInvolvesArgs(current.leftOperand, argNames) ||
+            _conditionHasRegexGuard(current.leftOperand, receiverSource)) {
+          return true;
+        }
       } else if (current is WhileStatement) {
         // while (offset < length) — loop condition bounds the body.
         if (_conditionInvolvesArgs(current.condition, argNames)) {

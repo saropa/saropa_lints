@@ -239,3 +239,15 @@ List<int> _goodCollectionForHexPairs(String hex) => <int>[
   for (int i = 0; i + 1 < hex.length; i += 2)
     int.parse(hex.substring(i, i + 2), radix: 16),
 ];
+
+// GOOD: `&&` left operand guards the slice (short-circuit).
+bool _goodAndStartsWith(String first) =>
+    first.startsWith('c') && first.substring(1) == 'x';
+
+bool _goodAndLength(String first) =>
+    first.length > 3 && first.substring(1) == 'x';
+
+// BAD: the `&&` guard checks a different string, so the slice is unguarded.
+// expect_lint: avoid_string_substring
+bool _badAndWrongReceiver(String first, String other) =>
+    other.startsWith('c') && first.substring(1) == 'x';
