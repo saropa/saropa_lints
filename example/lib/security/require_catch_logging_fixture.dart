@@ -141,4 +141,29 @@ _Result _bad600TwoStatements() {
   }
 }
 
+// GOOD: typed catch is expected control flow; the generic sibling logs.
+Object? _good600SiblingLogs() {
+  try {
+    return riskyCheck();
+  } on StateError {
+    return null;
+  } on Object catch (error, stack) {
+    print('$error $stack');
+    return null;
+  }
+}
+
+// BAD: near miss - sibling catch does not log either.
+// expect_lint: require_catch_logging
+Object? _bad600SiblingSilent() {
+  try {
+    return riskyCheck();
+  } on StateError {
+    return null;
+  } on Object {
+    showStatus('x');
+    return null;
+  }
+}
+
 void main() {}

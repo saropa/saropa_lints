@@ -4624,6 +4624,11 @@ class RequireCatchLoggingRule extends SaropaLintRule {
     context.addCatchClause((CatchClause node) {
       final Block body = node.body;
 
+      // A typed catch whose sibling catch in the same try logs (or
+      // rethrows) is control flow for an expected case; the sibling
+      // already reports every unexpected error.
+      if (node.exceptionType != null && _siblingCatchLogs(node)) return;
+
       // Empty catch blocks are always bad — nothing handles the error.
       if (body.statements.isEmpty) {
         reporter.atNode(node);
@@ -4686,6 +4691,21 @@ class RequireCatchLoggingRule extends SaropaLintRule {
 
       reporter.atNode(node);
     });
+  }
+
+  /// True when another catch clause of the same `try` logs or rethrows.
+  bool _siblingCatchLogs(CatchClause node) {
+    final AstNode? parent = node.parent;
+    if (parent is! TryStatement) return false;
+    for (final CatchClause other in parent.catchClauses) {
+      if (identical(other, node)) continue;
+      final String src = other.body.toSource().toLowerCase();
+      if (_loggingBodyPatterns.any((p) => p.hasMatch(src)) ||
+          _rethrowBodyPatterns.any((p) => p.hasMatch(src))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Returns true when the exception variable is referenced in a meaningful
