@@ -89,3 +89,10 @@ Fixed in `lib/src/rules/data/collection_rules.dart`:
 - Not fixable: `rs == null ? null : mapWord(rs.first)` relies on an external API contract (non-empty list) that is invisible to the rule; keep an `// ignore:` there.
 
 Fixture: `example/lib/collection/avoid_unsafe_collection_methods_fixture.dart` (good and bad cases added). Verified with `dart run saropa_lints:scan --tier comprehensive --resolve`: only the 5 bad cases are flagged.
+
+## Info needed to close
+
+Partly fixed (null-aware guards and `split(...)` locals). Still flagged: `rs == null ? null : mapWord(rs.first)`, where non-emptiness comes from the app's API contract and is invisible to the rule.
+Needed to close:
+1. Owner decision: keep `// ignore:` for contract-guaranteed non-empty lists, or add a marker the rule honors.
+2. The `firstOrNull` sites (voice_lexicon:492, 505) are not from this rule; confirm which rule emits them and file a separate report.
