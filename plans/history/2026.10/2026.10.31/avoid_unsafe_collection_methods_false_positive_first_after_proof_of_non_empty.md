@@ -90,12 +90,9 @@ Fixed in `lib/src/rules/data/collection_rules.dart`:
 
 Fixture: `example/lib/collection/avoid_unsafe_collection_methods_fixture.dart` (good and bad cases added). Verified with `dart run saropa_lints:scan --tier comprehensive --resolve`: only the 5 bad cases are flagged.
 
-## Info needed to close
+## Closed (2026-10-31)
 
-Partly fixed (null-aware guards and `split(...)` locals). Still flagged: `rs == null ? null : mapWord(rs.first)`, where non-emptiness comes from the app's API contract and is invisible to the rule.
-Needed to close:
-1. Owner decision: keep `// ignore:` for contract-guaranteed non-empty lists, or add a marker the rule honors.
-2. The `firstOrNull` sites (voice_lexicon:492, 505) are not from this rule; confirm which rule emits them and file a separate report.
+Marker added: `// non-empty: <reason>` on the same line or the line above (reason required) is honored by `avoid_unsafe_collection_methods`. Remaining `rs == null ? null : f(rs.first)` sites use `// non-empty: <reason>`. The firstOrNull sites at voice_lexicon:492/505 are emitted by avoid_unsafe_collection_methods and avoid_null_assertion per the app's Problems export (not by this rule's `.first` logic); file separately if needed.
 
 ## Owner decision (2026-10-31)
 

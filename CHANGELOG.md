@@ -80,6 +80,7 @@ The "large files not excluded from the file watcher" warning no longer appears i
 
 ### Fixed
 
+- **`avoid_unsafe_collection_methods`:** a `.first`/`.last`/`.single` access is no longer flagged when the same line or the line directly above carries `// non-empty: <reason>` (the reason is required). Use it for lists that are non-empty by an API contract the rule cannot see; a marker with no reason is ignored.
 - **`require_timezone_display`:** no longer flags `DateFormat.jm()/Hm()/Hms(...).format(local)` (a time of day shown on the user's own device). Still flagged when the formatted value is visibly UTC (`.toUtc()`, `DateTime.utc`, `isUtc`) and for a stored `DateFormat` that is not formatted at the construction site.
 - **`require_ios_push_notification_capability`:** no longer flags `requestPermission()` on non-push receivers (`Geolocator.requestPermission()` and similar location/contacts/audio permission APIs). `requestPermission()` is flagged only when its receiver looks like messaging/notification/push (`FirebaseMessaging.instance`, `messaging`, `fcm`); `getToken`, `onMessage`, and the push class patterns are unchanged.
 - **`require_data_encryption`:** no longer flags `StringBuffer.write(...)` / `StringSink.write(...)` (an in-memory hash input, not storage), or a static call whose only sensitive-looking word is the receiver class's own name repeated as a leading qualifier (`SuccessCardGate.write([SuccessCardGate.milestoneKey(id)])`; `Card.write([userCreditCard.number])` is still flagged). Real credentials in the payload are still flagged.

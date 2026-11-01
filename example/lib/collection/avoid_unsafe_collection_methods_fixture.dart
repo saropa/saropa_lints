@@ -136,4 +136,19 @@ Object _badSuffixNameGuard(List<Object> s, List<Object> items) =>
     // expect_lint: avoid_unsafe_collection_methods
     items.length == 1 ? s.first : Object();
 
+// GOOD: marker with a reason on the line above.
+Object? _goodNonEmptyMarkerAbove(List<Object>? rs) =>
+    // non-empty: API returns at least one result
+    rs == null ? null : rs.first;
+
+// GOOD: marker with a reason on the same line.
+Object? _goodNonEmptyMarkerSameLine(List<Object> rs) =>
+    rs.first; // non-empty: API contract
+
+// BAD: marker without a reason does not count.
+Object _badNonEmptyMarkerNoReason(List<Object> rs) =>
+    // non-empty:
+    // expect_lint: avoid_unsafe_collection_methods
+    rs.first;
+
 void main() {}

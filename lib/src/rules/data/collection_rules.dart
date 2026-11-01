@@ -68,8 +68,7 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_collection_equality_checks',
     '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior. Collections (List, Set, Map) use reference equality by default, not value equality. Use listEquals, setEquals, or mapEquals instead. {v5}',
-    correctionMessage:
-        'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    correctionMessage: 'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -169,8 +168,7 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_duplicate_map_keys',
     '[avoid_duplicate_map_keys] Duplicate key in map literal silently overwrites the earlier value, causing data loss and unpredictable behavior. Only the last value assigned to the key will persist in the resulting map. {v4}',
-    correctionMessage:
-        'Remove the duplicate key entry or rename it to a unique key to preserve all intended values.',
+    correctionMessage: 'Remove the duplicate key entry or rename it to a unique key to preserve all intended values.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -242,8 +240,7 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_map_keys_contains',
     '[avoid_map_keys_contains] Calling .keys.contains() allocates an iterable of all keys and performs a linear search, while .containsKey() uses the map hash table for O(1) lookup. This wastes memory and CPU cycles on every call. {v6}',
-    correctionMessage:
-        'Replace map.keys.contains(key) with map.containsKey(key) to use the efficient hash-based lookup.',
+    correctionMessage: 'Replace map.keys.contains(key) with map.containsKey(key) to use the efficient hash-based lookup.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -320,8 +317,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_unnecessary_collections',
     '[avoid_unnecessary_collections] Wrapping an existing collection literal with List.of() or Set.of() creates a redundant copy, wasting memory and adding unnecessary overhead. The literal itself already produces the correct collection type. {v5}',
-    correctionMessage:
-        'Remove the List.of() or Set.of() wrapper and use the collection literal directly to eliminate the extra allocation.',
+    correctionMessage: 'Remove the List.of() or Set.of() wrapper and use the collection literal directly to eliminate the extra allocation.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -407,6 +403,10 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 /// // or
 /// final item = items.length > 1 ? items.last : fallback;
 /// ```
+///
+/// For a list that is non-empty by an API contract the rule cannot see, put
+/// `// non-empty: <reason>` on the same line or the line above (the reason
+/// is required). Use `// ignore: avoid_unsafe_collection_methods` otherwise.
 class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   AvoidUnsafeCollectionMethodsRule() : super(code: _code);
 
@@ -429,12 +429,28 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_unsafe_collection_methods',
     '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time. {v10}',
-    correctionMessage:
-        'Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing.',
+    correctionMessage: 'Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing. If the list is non-empty by API contract, add `// non-empty: <reason>` on the same line or the line above.',
     severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _unsafeMethods = <String>{'first', 'last', 'single'};
+
+  static final RegExp _nonEmptyMarker = RegExp(r'//\s*non-empty:\s*\S');
+
+  /// True if the access line, or the line directly above, carries
+  /// `// non-empty: <reason>` with a non-blank reason.
+  static bool _hasNonEmptyMarker(AstNode node, SaropaContext context) {
+    final int line = context.lineInfo.getLocation(node.offset).lineNumber;
+    final List<String> lines = context.fileContent.split('\n');
+    for (final int n in <int>[line, line - 1]) {
+      if (n >= 1 &&
+          n <= lines.length &&
+          _nonEmptyMarker.hasMatch(lines[n - 1])) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   @override
   void runWithReporter(
@@ -475,6 +491,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
           return;
         }
 
+        if (_hasNonEmptyMarker(node, context)) return;
+
         reporter.atNode(node);
       }
     });
@@ -510,6 +528,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
             _isGuardedByEnclosingLoop(node, collectionName)) {
           return;
         }
+
+        if (_hasNonEmptyMarker(node, context)) return;
 
         reporter.atNode(node);
       }
@@ -1229,8 +1249,7 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_unsafe_reduce',
     '[avoid_unsafe_reduce] Calling reduce() on an empty collection throws a StateError at runtime, crashing the app. Unlike fold(), reduce() has no initial value and requires at least one element to operate. {v7}',
-    correctionMessage:
-        'Replace reduce() with fold() and provide an initial value, or guard the call with an isEmpty check first.',
+    correctionMessage: 'Replace reduce() with fold() and provide an initial value, or guard the call with an isEmpty check first.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -1536,8 +1555,7 @@ class PreferConstructorOverLiteralsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_constructor_over_literals',
     '[prefer_constructor_over_literals] Prefer List.empty()/Map()/Set.empty() over empty literals for explicitness.',
-    correctionMessage:
-        'Consider using List.empty(), Map(), or Set.empty() instead of literals.',
+    correctionMessage: 'Consider using List.empty(), Map(), or Set.empty() instead of literals.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1603,8 +1621,7 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_unsafe_where_methods',
     '[avoid_unsafe_where_methods] Calling firstWhere, lastWhere, or singleWhere without an orElse callback throws a StateError when no element matches the predicate. This crashes the app at runtime, especially when filtering data from external sources where matches are not guaranteed. {v4}',
-    correctionMessage:
-        'Use firstWhereOrNull, lastWhereOrNull, or singleWhereOrNull from package:collection, or provide an orElse callback to handle the no-match case.',
+    correctionMessage: 'Use firstWhereOrNull, lastWhereOrNull, or singleWhereOrNull from package:collection, or provide an orElse callback to handle the no-match case.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -1698,8 +1715,7 @@ class PreferWhereOrNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_where_or_null',
     '[prefer_where_or_null] Using firstWhere/lastWhere/singleWhere with an orElse callback is verbose and harder to read. The *OrNull variant from package:collection combined with ?? produces cleaner, more idiomatic Dart code. {v4}',
-    correctionMessage:
-        'Replace .firstWhere(..., orElse: () => x) with .firstWhereOrNull(...) ?? x to reduce boilerplate and improve readability.',
+    correctionMessage: 'Replace .firstWhere(..., orElse: () => x) with .firstWhereOrNull(...) ?? x to reduce boilerplate and improve readability.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1805,8 +1821,7 @@ class MapKeysOrderingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'map_keys_ordering',
     '[map_keys_ordering] Ordering map keys alphabetically is a stylistic preference for readability. Key order does not affect map behavior or performance at runtime. Enable via the stylistic tier. {v4}',
-    correctionMessage:
-        'Reorder the map entries alphabetically by key to improve readability and make diffs easier to review.',
+    correctionMessage: 'Reorder the map entries alphabetically by key to improve readability and make diffs easier to review.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1886,8 +1901,7 @@ class PreferContainsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_list_contains',
     '[prefer_list_contains] Using indexOf() with a comparison to -1 or 0 to check element presence is verbose and error-prone. The contains() method expresses intent directly, improving readability and reducing off-by-one mistakes. {v3}',
-    correctionMessage:
-        'Replace the indexOf() comparison with contains() to express the presence check directly and clearly.',
+    correctionMessage: 'Replace the indexOf() comparison with contains() to express the presence check directly and clearly.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1988,8 +2002,7 @@ class PreferFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_list_first',
     '[prefer_list_first] Using [0] instead of .first is a stylistic choice. The .first getter calls [0] internally — there is no performance benefit. Enable via the stylistic tier. {v4}',
-    correctionMessage:
-        'Replace [0] with .first or .firstOrNull to clearly communicate the intent of accessing the first element.',
+    correctionMessage: 'Replace [0] with .first or .firstOrNull to clearly communicate the intent of accessing the first element.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2125,8 +2138,7 @@ class PreferIterableOfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_iterable_of',
     '[prefer_iterable_of] Using .from() performs a runtime cast on each element, which can silently succeed with wrong types and throw later. The .of() constructor enforces type safety at the call site, catching type mismatches immediately. {v4}',
-    correctionMessage:
-        'Replace .from() with .of() to enforce compile-time type checking and prevent silent runtime cast failures.',
+    correctionMessage: 'Replace .from() with .of() to enforce compile-time type checking and prevent silent runtime cast failures.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -2213,8 +2225,7 @@ class PreferLastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_list_last',
     '[prefer_list_last] Using [length-1] instead of .last is a stylistic choice. The .last getter does the same indexing internally — no performance benefit. Enable via the stylistic tier. {v3}',
-    correctionMessage:
-        'Replace list[list.length - 1] with list.last to improve readability and reduce off-by-one error risk.',
+    correctionMessage: 'Replace list[list.length - 1] with list.last to improve readability and reduce off-by-one error risk.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2318,8 +2329,7 @@ class PreferAddAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_add_all',
     '[prefer_add_all] Looping with forEach or for-in to call add() one element at a time is verbose and slower than addAll(), which can pre-allocate capacity and copy elements in bulk. This pattern also obscures the intent of batch insertion. {v4}',
-    correctionMessage:
-        'Replace the forEach/for loop with list.addAll(items) to reduce boilerplate and enable bulk insertion optimization.',
+    correctionMessage: 'Replace the forEach/for loop with list.addAll(items) to reduce boilerplate and enable bulk insertion optimization.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -2444,8 +2454,7 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_duplicate_number_elements',
     '[avoid_duplicate_number_elements] Duplicate numeric element in collection literal typically indicates a copy-paste error or logic mistake. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
-    correctionMessage:
-        'Remove the duplicate numeric element. If intentional (e.g., days-in-month arrays), suppress with // ignore.',
+    correctionMessage: 'Remove the duplicate numeric element. If intentional (e.g., days-in-month arrays), suppress with // ignore.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -2528,8 +2537,7 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_duplicate_string_elements',
     '[avoid_duplicate_string_elements] Duplicate string element in collection literal typically indicates a copy-paste error or incomplete refactoring. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
-    correctionMessage:
-        'Remove the duplicate string element or verify the values are intentionally repeated. In Sets, duplicates are silently discarded.',
+    correctionMessage: 'Remove the duplicate string element or verify the values are intentionally repeated. In Sets, duplicates are silently discarded.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -2547,12 +2555,7 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
     context.addListLiteral((ListLiteral node) {
       // Lists where position carries meaning may legitimately repeat values.
       if (_isPositionalStringList(node)) return;
-      _checkForDuplicateStrings(
-        node.elements,
-        reporter,
-        code,
-        skipEmpty: true,
-      );
+      _checkForDuplicateStrings(node.elements, reporter, code, skipEmpty: true);
     });
 
     context.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -2630,8 +2633,7 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_duplicate_object_elements',
     '[avoid_duplicate_object_elements] Duplicate object reference or literal (bool, null, identifier) in collection typically indicates a copy-paste error. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
-    correctionMessage:
-        'Remove the duplicate object element or verify the references are intentionally repeated. In Sets, duplicates are silently discarded.',
+    correctionMessage: 'Remove the duplicate object element or verify the references are intentionally repeated. In Sets, duplicates are silently discarded.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -2867,9 +2869,7 @@ class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
 
   static bool _mutatesTarget(Statement body, String target) {
     var found = false;
-    body.accept(
-      _MutationVisitor(target, _mutators, () => found = true),
-    );
+    body.accept(_MutationVisitor(target, _mutators, () => found = true));
     return found;
   }
 }
@@ -3074,8 +3074,7 @@ class PreferSetForLookupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_set_for_lookup',
     '[prefer_set_for_lookup] Calling contains() on a List performs a linear O(n) scan through every element, while a Set uses hash-based O(1) lookup. For collections used primarily for membership testing, this causes unnecessary performance degradation. {v5}',
-    correctionMessage:
-        'Change the collection type from List to Set to use hash-based O(1) lookup instead of linear O(n) scanning.',
+    correctionMessage: 'Change the collection type from List to Set to use hash-based O(1) lookup instead of linear O(n) scanning.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3151,8 +3150,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_correct_for_loop_increment',
     '[prefer_correct_for_loop_increment] Non-standard for loop increment (e.g., i += 2, i = i + 3) reduces readability and can hide off-by-one errors. Standard i++ makes the iteration pattern immediately recognizable to all developers. {v2}',
-    correctionMessage:
-        'Use i++ for standard iteration, or add a comment explaining why a non-standard increment step is necessary.',
+    correctionMessage: 'Use i++ for standard iteration, or add a comment explaining why a non-standard increment step is necessary.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3287,8 +3285,7 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_unreachable_for_loop',
     '[avoid_unreachable_for_loop] For loop with impossible bounds will never execute, resulting in dead code. This often indicates a logic error, typo, or incorrect increment direction. Unreachable loops can hide bugs, confuse maintainers, and lead to missed updates or calculations. {v3}',
-    correctionMessage:
-        'Review the loop condition and increment direction. Ensure the bounds allow the loop to execute at least once, and correct any off-by-one errors or typos. Add tests to verify loop behavior.',
+    correctionMessage: 'Review the loop condition and increment direction. Ensure the bounds allow the loop to execute at least once, and correct any off-by-one errors or typos. Add tests to verify loop behavior.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -3431,8 +3428,7 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_null_aware_elements',
     '[prefer_null_aware_elements] Explicit null check with if (x != null) x in collection literals is verbose. Dart 3 supports the ?element syntax, which eliminates the boilerplate and expresses nullable inclusion more concisely. {v5}',
-    correctionMessage:
-        'Replace `if (x != null) x` with `?x` to use the Dart 3 null-aware element syntax and reduce collection boilerplate.',
+    correctionMessage: 'Replace `if (x != null) x` with `?x` to use the Dart 3 null-aware element syntax and reduce collection boilerplate.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3528,8 +3524,7 @@ class PreferIterableOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_iterable_operations',
     '[prefer_iterable_operations] Calling .toList() at the end of an iterable chain inside a for-in loop forces eager evaluation and allocates an intermediate list that is iterated once and then discarded. This wastes memory and CPU cycles. {v2}',
-    correctionMessage:
-        'Remove .toList() to keep the iteration lazy and eliminate the unnecessary intermediate list allocation.',
+    correctionMessage: 'Remove .toList() to keep the iteration lazy and eliminate the unnecessary intermediate list allocation.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3616,8 +3611,7 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_key_for_collection',
     '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues. {v5}',
-    correctionMessage:
-        'Add a Key (such as ValueKey, ObjectKey, or UniqueKey) to each list item. Ensure the key is unique and stable for each item, especially when items are reordered or updated. Document key usage in your builder methods to prevent state loss.',
+    correctionMessage: 'Add a Key (such as ValueKey, ObjectKey, or UniqueKey) to each list item. Ensure the key is unique and stable for each item, especially when items are reordered or updated. Document key usage in your builder methods to prevent state loss.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -3844,8 +3838,7 @@ class PreferInlinedAddsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_inlined_adds_strict',
     '[prefer_inlined_adds_strict] Prefer inline collection literal instead of empty literal followed by add/addAll.',
-    correctionMessage:
-        'Replace with a single literal containing the elements (e.g. <String>[\'a\', \'b\']).',
+    correctionMessage: 'Replace with a single literal containing the elements (e.g. <String>[\'a\', \'b\']).',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -3936,8 +3929,7 @@ class PreferForElementsToMapFromIterableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_for_elements_to_map_from_iterable',
     '[prefer_for_elements_to_map_from_iterable] Map.fromIterable can be replaced with a for-element map literal. The for-element syntax { for (final e in items) key: value } is more concise, avoids unnecessary closure allocation, and is the idiomatic Dart pattern recommended by the language team. {v1}',
-    correctionMessage:
-        'Replace with a for-element map literal: { for (final e in iterable) keyExpr: valueExpr }.',
+    correctionMessage: 'Replace with a for-element map literal: { for (final e in iterable) keyExpr: valueExpr }.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -4044,8 +4036,7 @@ class NonConstantMapElementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'non_constant_map_element',
     '[non_constant_map_element] A const map literal contains an if-element or spread whose sub-expressions are not compile-time constants. Remove const from the literal or make the elements constant. {v1}',
-    correctionMessage:
-        'Use only constant conditions and constant spreads inside const map literals, or drop const from the map.',
+    correctionMessage: 'Use only constant conditions and constant spreads inside const map literals, or drop const from the map.',
     severity: DiagnosticSeverity.WARNING,
   );
 
