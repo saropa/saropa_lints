@@ -48,6 +48,7 @@ import {
   syncVersionWithMessage,
   toggleLints,
 } from './lintsSwitch';
+import { shouldRunLsp } from './lspGate';
 import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
 import type { SaropaLintsApi } from './api';
 import { buildDailySummary } from './dailySummary';
@@ -1608,6 +1609,15 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // diagnostics. Users can also toggle via the Health Panel engine cards.
   let lspClient: SaropaLspClient | undefined;
   const lspRoot = getProjectRoot();
+  // The master switch `saropaLints.enabled` wins over `lspServer.enabled`.
+  // English-only for now: new catalog keys need the owner's translation pipeline.
+  const LSP_BLOCKED_MSG =
+    'LSP Server not started: the saropaLints.enabled master switch is off. Turn it on to use the language server.';
+  const lspAllowed = (): boolean =>
+    shouldRunLsp(
+      vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true,
+      vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled') ?? false,
+    );
 
   // Start LSP server on activation if the setting is already enabled.
   // When LSP is on, the analyzer plugin is redundant (and costs ~10GB RAM),
@@ -1615,7 +1625,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // IMPORTANT: we call disablePluginsIntegration directly — NOT runDisable,
   // which would also set saropaLints.enabled=false and kill the entire
   // extension UI (sidebar views, status bar, scan-on-save).
-  if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
+  if (lspRoot && lspAllowed()) {
     lspClient = new SaropaLspClient(context, lspRoot);
     void lspClient.start();
     disablePluginsIntegration(lspRoot);
@@ -1632,6 +1642,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       return;
     }
     if (lspClient?.isRunning) { return; }
+    if (!lspAllowed()) {
+      HealthPanel.addLogEntry(LSP_BLOCKED_MSG);
+      return;
+    }
     lspClient ??= new SaropaLspClient(context, lspRoot);
     await lspClient.start();
     if (lspClient.isRunning) {
@@ -1646,7 +1660,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }
     HealthPanel.refreshIfOpen();
   };
-  const stopLsp = async (): Promise<void> => {
+  const stopLsp = async (restorePlugin = true): Promise<void> => {
     const client = lspClient;
     if (!client) { return; }
     lspClient = undefined;
@@ -1654,7 +1668,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     await client.stop();
     client.dispose();
     // Re-enable the analyzer plugin so the user keeps diagnostics.
-    if (lspRoot) { restorePluginsIntegration(lspRoot); }
+    // Skipped when the master switch is off: the user turned everything off.
+    if (lspRoot && restorePlugin) { restorePluginsIntegration(lspRoot); }
     HealthPanel.addLogEntry(l10n('debug.log.lspStopped'));
     HealthPanel.refreshIfOpen();
   };
@@ -1665,6 +1680,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (e.affectsConfiguration('saropaLints.lspServer.enabled')) {
         const enabled = vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled');
         void (enabled ? startLsp() : stopLsp());
+      }
+      // Master switch: off stops the server (plugin block stays off); back on
+      // restarts it when lspServer.enabled is still true.
+      if (e.affectsConfiguration('saropaLints.enabled')) {
+        void (lspAllowed() ? startLsp() : stopLsp(false));
       }
     }),
   );
@@ -1686,6 +1706,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
             .getConfiguration('saropaLints.lspServer')
             .update('enabled', true, vscode.ConfigurationTarget.Workspace);
         }
+        return;
+      }
+      if (!lspAllowed()) {
+        void vscode.window.showInformationMessage(LSP_BLOCKED_MSG);
         return;
       }
       if (!lspClient) {
@@ -1816,7 +1840,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   HealthPanel.onRestartAll(async () => {
     if (lspClient) {
       await lspClient.restart();
-    } else if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
+    } else if (lspRoot && lspAllowed()) {
       lspClient = new SaropaLspClient(context, lspRoot);
       await lspClient.start();
     }
