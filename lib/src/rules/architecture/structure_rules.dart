@@ -139,7 +139,7 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 /// Warns on every `export` directive; re-exports hide where a symbol is
 /// defined.
 ///
-/// Since: v17.0.1-beta.7 | Rule version: v1
+/// Since: v17.0.1-beta.8 | Rule version: v1
 ///
 /// Unlike [AvoidBarrelFilesRule], this flags any file with an `export`, even
 /// one that also declares code. Not configurable: re-exports are never wanted.

@@ -68,7 +68,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [17.0.1-beta.8] — Unreleased
 
-Security update for a dependency bundled with the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.8/CHANGELOG.md)
+New `avoid_reexports` rule; security update for a dependency bundled with the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.8/CHANGELOG.md)
+
+### Added
+
+- **`avoid_reexports`:** new rule (comprehensive tier, INFO) that flags every `export` directive; re-exports hide where a symbol is defined. The package entry point `lib/<package_name>.dart` is exempt. No option to allow re-exports.
 
 ### Fixed
 
@@ -77,10 +81,6 @@ Security update for a dependency bundled with the VS Code extension. [log](https
 ## [17.0.1-beta.7]
 
 False-positive hardening for 15 lint rules; the master switch now stops the language server; scan exits 0 when disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.7/CHANGELOG.md)
-
-### Added
-
-- **`avoid_reexports`:** new rule (comprehensive tier, INFO) that flags every `export` directive; re-exports hide where a symbol is defined. The package entry point `lib/<package_name>.dart` is exempt. No option to allow re-exports.
 
 ### Fixed
 
