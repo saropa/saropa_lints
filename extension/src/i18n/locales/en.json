@@ -2752,6 +2752,23 @@
       "message": "This report is marked \"{status}\" but is still in bugs/ — archive it to plans/history/ before closing (see ISSUE_REPORT_GUIDE.md)."
     }
   },
+  "analyzerExclusions": {
+    "diagnostic": {
+      "missing": "Folder \"{folder}\" is analyzed but does not need to be. Add it to dart.analysisExcludedFolders in .vscode/settings.json to speed up quick fixes and cut memory use.",
+      "missingCreate": "Folder \"{folder}\" is analyzed but does not need to be. Add it to dart.analysisExcludedFolders (this creates .vscode/settings.json) to speed up quick fixes and cut memory use.",
+      "driftOnly": "Folder \"{folder}\" is in analyzer: exclude: of analysis_options.yaml, which only hides its diagnostics. Also add it to dart.analysisExcludedFolders so the analysis server stops analyzing it.",
+      "imported": "Folder \"{folder}\" looks excludable, but a path dependency in pubspec.yaml points into it, so excluding it is not suggested.",
+      "large": "{count} Dart files are analyzed on a machine with {ram} GB of RAM. Exclude folders that need no analysis to reduce memory use and quick-fix delay.",
+      "largeNoRam": "{count} Dart files are analyzed. Exclude folders that need no analysis to reduce memory use and quick-fix delay."
+    },
+    "quickFix": {
+      "title": "Add to dart.analysisExcludedFolders",
+      "pickPlaceholder": "Select the folders to exclude from analysis"
+    },
+    "error": {
+      "writeFailed": "Could not update dart.analysisExcludedFolders: {error}"
+    }
+  },
   "docPlacement": {
     "diagnostic": {
       "message": "This document still reads as open work but is filed in the archive/history location — move it to {openIssuesDir} instead."

@@ -70,6 +70,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 False-positive hardening for 15 lint rules; the master switch now stops the language server; scan exits 0 when disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.7/CHANGELOG.md)
 
+### Added
+
+- **Extension: analyzer exclusions check.** Suggests excluding folders that need no analysis (`android`, `ios`, `build`, `docs`, `.claude/worktrees` and similar) from `dart.analysisExcludedFolders`, flags folders excluded only in `analysis_options.yaml` (diagnostics hidden but still analyzed), and notes large analyzed file counts on 8 GB machines. Findings appear in the Problems panel on `pubspec.yaml`; the quick action "Add to dart.analysisExcludedFolders" edits only `.vscode/settings.json` for the folders you select. On by default; turn off with `saropaLints.analyzerExclusions.enabled`.
+
 ### Fixed
 
 - **`avoid_unsafe_collection_methods`:** a `.first`/`.last`/`.single` access is no longer flagged when the same line or the line directly above carries `// non-empty: <reason>` (the reason is required). Use it for lists that are non-empty by an API contract the rule cannot see; a marker with no reason is ignored.

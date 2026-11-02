@@ -224,6 +224,7 @@ import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
 import { registerBugArchivalCheck } from './extensionChecks/bugArchivalCheck';
 import { registerDocPlacementCheck } from './extensionChecks/docPlacementCheck';
+import { registerAnalyzerExclusions } from './analyzerExclusions';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, postDashboardAnalysisProgress, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
@@ -799,6 +800,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Mirror image of the above: flags a still-open report filed under the
   // configured archive/history glob instead of the open-issues directory.
   registerDocPlacementCheck(context);
+  // Suggests excluding no-analysis folders via dart.analysisExcludedFolders
+  // (setting saropaLints.analyzerExclusions.enabled, default on).
+  registerAnalyzerExclusions(context);
   registerProjectMapCommand(context);
   registerHealthCodeLens(context);
 

@@ -1700,6 +1700,16 @@
         }
       },
       {
+        "title": "%config.section.Analyzer.Exclusions.title%",
+        "properties": {
+          "saropaLints.analyzerExclusions.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "%config.property.analyzerExclusions.enabled.description%"
+          }
+        }
+      },
+      {
         "title": "%config.section.Drift.Advisor.title%",
         "properties": {
           "saropaLints.driftAdvisor.integration": {

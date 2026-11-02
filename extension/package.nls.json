@@ -225,6 +225,8 @@
   "config.property.todosAndHacks.groupByTag.description": "Group tree by tag (TODO, FIXME, …) then by file; when off, group by folder then file.",
   "config.property.todosAndHacks.customRegex.description": "Optional regex override for matching comment markers. Line-based; use capture group 1 for tag and optional group 2 for snippet. Empty = use default (//, #, <!-- + tags). Invalid regex falls back to default.",
   "config.section.Doc.Placement.title": "Doc Placement",
+  "config.section.Analyzer.Exclusions.title": "Analyzer Exclusions",
+  "config.property.analyzerExclusions.enabled.description": "Suggest excluding folders that need no analysis (platform folders, build output, docs, worktrees) from dart.analysisExcludedFolders, and flag exclusions that exist only in analysis_options.yaml. Large analyzed file counts slow quick fixes and raise analysis-server memory.",
   "config.property.docPlacement.enabled.description": "Flag a markdown file that matches the archive glob below but still reads as open work (an open Status/Severity field or an unaddressed action-items heading).",
   "config.property.docPlacement.archiveGlob.description": "Glob pattern for the workspace's closed/archive doc directory. A matching file is checked for open-work signals.",
   "config.property.docPlacement.openIssuesDir.description": "Directory name shown in the diagnostic message as where an open document should be moved instead.",
