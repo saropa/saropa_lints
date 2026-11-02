@@ -1,6 +1,6 @@
 # saropa_lints rule request: warn on `export` of another library
 
-Status: implemented on branch `worktree-agent-a3ae8862c6431cb42` (not merged). Rule `avoid_reexports`, comprehensive tier, INFO.
+Status: merged to main (beta.8); tests not yet run. Rule `avoid_reexports`, comprehensive tier, INFO.
 
 ## Problem
 A Dart `export` directive makes one symbol importable from two libraries.
