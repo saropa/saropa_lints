@@ -78,6 +78,10 @@ Security update for a dependency bundled with the VS Code extension. [log](https
 
 False-positive hardening for 15 lint rules; the master switch now stops the language server; scan exits 0 when disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.7/CHANGELOG.md)
 
+### Added
+
+- **`avoid_reexports`:** new rule (comprehensive tier, INFO) that flags every `export` directive; re-exports hide where a symbol is defined. The package entry point `lib/<package_name>.dart` is exempt. No option to allow re-exports.
+
 ### Fixed
 
 - **`avoid_unsafe_collection_methods`:** a `.first`/`.last`/`.single` access is no longer flagged when the same line or the line directly above carries `// non-empty: <reason>` (the reason is required). Use it for lists that are non-empty by an API contract the rule cannot see; a marker with no reason is ignored.

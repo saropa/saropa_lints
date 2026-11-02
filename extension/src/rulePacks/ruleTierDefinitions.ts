@@ -65,6 +65,7 @@ export const RULE_TIER_BY_CODE: Readonly<Record<string, string>> = {
   'avoid_backdrop_filter_in_scrollable': 'recommended',
   'avoid_badge_without_meaning': 'professional',
   'avoid_barrel_files': 'professional',
+  'avoid_reexports': 'comprehensive',
   'avoid_behavior_subject_last_value': 'professional',
   'avoid_bitwise_operators_with_booleans': 'recommended',
   'avoid_bloc_business_logic_in_ui': 'recommended',

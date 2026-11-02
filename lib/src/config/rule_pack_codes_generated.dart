@@ -787,6 +787,7 @@ const Map<String, Set<String>> kRuleThemePackCodesGenerated = {
   'architecture': {
     'abstract_field_initializer',
     'avoid_barrel_files',
+    'avoid_reexports',
     'avoid_business_logic_in_ui',
     'avoid_circular_dependencies',
     'avoid_circular_di_dependencies',
