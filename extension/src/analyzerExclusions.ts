@@ -60,6 +60,11 @@ export interface ExclusionInputs {
   readonly existingFolders: readonly string[];
   /** Dart file count per entry of `existingFolders`. */
   readonly dartFileCounts: Readonly<Record<string, number>>;
+  /**
+   * Dart file count per nested entry of `settingsExcluded` (for example
+   * `lib/generated`), so the analyzed total can subtract them.
+   */
+  readonly nestedExcludedCounts?: Readonly<Record<string, number>>;
   /** Entries of `dart.analysisExcludedFolders`. */
   readonly settingsExcluded: readonly string[];
   /** Plain-folder entries of `analyzer: exclude:` (see `parseAnalyzerExclude`). */
@@ -169,9 +174,16 @@ export function evaluateAnalyzerExclusions(i: ExclusionInputs): ExclusionFinding
     }
   }
 
-  const analyzed = existing
-    .filter((f) => !isCovered(f, i.settingsExcluded))
-    .reduce((sum, f) => sum + (i.dartFileCounts[f] ?? 0), 0);
+  const uncovered = existing.filter((f) => !isCovered(f, i.settingsExcluded));
+  const topLevel = uncovered.reduce((sum, f) => sum + (i.dartFileCounts[f] ?? 0), 0);
+  // Nested excluded folders (e.g. lib/generated) inside a still-analyzed folder.
+  const entries = Object.keys(i.nestedExcludedCounts ?? {}).map(normalizeFolder);
+  const nestedExcluded = entries
+    .filter((n) => uncovered.some((f) => n.startsWith(`${f}/`)))
+    // Skip an entry nested inside another listed entry (avoid double subtraction).
+    .filter((n) => !entries.some((o) => o !== n && n.startsWith(`${o}/`)))
+    .reduce((sum, n) => sum + (i.nestedExcludedCounts?.[n] ?? 0), 0);
+  const analyzed = Math.max(0, topLevel - nestedExcluded);
   const threshold = i.fileThreshold ?? FILE_COUNT_THRESHOLD;
   if (analyzed > threshold) {
     // Edge case 5: RAM unknown -> report the file count only.
@@ -191,6 +203,14 @@ export function addableFolders(findings: readonly ExclusionFinding[]): string[] 
     .map((f) => f.folder as string);
 }
 
+/** Run token: only the latest run may publish results; older runs are dropped. */
+export class RunToken {
+  private _latest = 0;
+  /** Starts a new run and returns its id. */
+  next(): number { return ++this._latest; }
+  isLatest(id: number): boolean { return id === this._latest; }
+}
+
 // ── Extension wiring ───────────────────────────────────────────
 
 const SETTING_SECTION = 'saropaLints.analyzerExclusions';
@@ -208,6 +228,7 @@ interface FolderState {
 let _collection: vscode.DiagnosticCollection | undefined;
 /** Latest findings per workspace folder (keyed by folder uri string). */
 const _state = new Map<string, FolderState>();
+const _runs = new RunToken();
 
 function isEnabled(): boolean {
   return vscode.workspace.getConfiguration(SETTING_SECTION).get<boolean>('enabled', true);
@@ -262,7 +283,7 @@ export function findingMessage(f: ExclusionFinding, hasSettingsFile: boolean): s
   }
 }
 
-async function checkWorkspaceFolder(wf: vscode.WorkspaceFolder): Promise<void> {
+async function checkWorkspaceFolder(wf: vscode.WorkspaceFolder, runId: number): Promise<void> {
   const root = wf.uri.fsPath;
   const pubspecPath = path.join(root, 'pubspec.yaml');
   const key = wf.uri.toString();
@@ -281,9 +302,19 @@ async function checkWorkspaceFolder(wf: vscode.WorkspaceFolder): Promise<void> {
   const settingsExcluded = vscode.workspace
     .getConfiguration('dart', wf.uri)
     .get<string[]>('analysisExcludedFolders', []);
+  const nestedExcludedCounts: Record<string, number> = {};
+  for (const raw of settingsExcluded) {
+    const n = normalizeFolder(raw);
+    if (n.includes('/') && !(n in nestedExcludedCounts)) {
+      nestedExcludedCounts[n] = await countDartFiles(path.join(root, n));
+    }
+  }
+  // A newer run started while we were scanning: drop this result.
+  if (!_runs.isLatest(runId)) return;
   const findings = evaluateAnalyzerExclusions({
     existingFolders,
     dartFileCounts,
+    nestedExcludedCounts,
     settingsExcluded,
     analysisOptionsExcluded: parseAnalyzerExclude(readText(path.join(root, 'analysis_options.yaml'))),
     pathDependencies: parsePathDependencies(readText(pubspecPath)),
@@ -304,12 +335,16 @@ async function checkWorkspaceFolder(wf: vscode.WorkspaceFolder): Promise<void> {
 
 async function checkAll(): Promise<void> {
   if (!_collection) return;
+  const runId = _runs.next();
   if (!isEnabled()) {
     _collection.clear();
     _state.clear();
     return;
   }
-  for (const wf of vscode.workspace.workspaceFolders ?? []) await checkWorkspaceFolder(wf);
+  for (const wf of vscode.workspace.workspaceFolders ?? []) {
+    if (!_runs.isLatest(runId)) return;
+    await checkWorkspaceFolder(wf, runId);
+  }
 }
 
 /**
@@ -370,7 +405,13 @@ export function registerAnalyzerExclusions(context: vscode.ExtensionContext): vo
     vscode.workspace.onDidSaveTextDocument((doc) => {
       if (WATCHED_FILES.has(path.basename(doc.fileName))) run();
     }),
-    vscode.workspace.onDidChangeWorkspaceFolders(run),
+    vscode.workspace.onDidChangeWorkspaceFolders((e) => {
+      for (const wf of e.removed) {
+        _state.delete(wf.uri.toString());
+        _collection?.delete(vscode.Uri.file(path.join(wf.uri.fsPath, 'pubspec.yaml')));
+      }
+      run();
+    }),
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration(SETTING_SECTION) || e.affectsConfiguration('dart.analysisExcludedFolders')) run();
     }),

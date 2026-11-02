@@ -128,3 +128,10 @@ Review risks:
 ## Commits
 
 - none yet
+
+## Review findings and fixes
+
+1. Changelog entry sat under the released `17.0.1-beta.7`; moved to a new `17.0.1-beta.8` section.
+2. Removed workspace folders kept stale `_state` and diagnostics. Fixed: `onDidChangeWorkspaceFolders` clears both for `e.removed`.
+3. Overlapping `checkAll` runs could let an older result overwrite a newer one. Fixed: a `RunToken`; each run takes an id, and results from a run that is no longer the latest are dropped (test: `RunToken`).
+4. The analyzed file count only subtracted top-level excluded folders. Fixed: nested entries such as `lib/generated` are counted (`nestedExcludedCounts`) and subtracted, without double-subtracting entries nested inside another excluded entry (tests: nested excluded folders).

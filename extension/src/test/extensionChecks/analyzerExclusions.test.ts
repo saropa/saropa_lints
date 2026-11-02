@@ -12,6 +12,7 @@ import {
   evaluateAnalyzerExclusions,
   parseAnalyzerExclude,
   parsePathDependencies,
+  RunToken,
   ExclusionInputs,
 } from '../../analyzerExclusions';
 
@@ -149,5 +150,62 @@ describe('analyzerExclusions: parsePathDependencies', () => {
       '    path: dependency_overrides/other',
     ].join('\n');
     assert.deepStrictEqual(parsePathDependencies(yaml), ['third_party/local_a', '../sibling', 'vendor/tool']);
+  });
+});
+
+describe('analyzerExclusions: nested excluded folders in file count', () => {
+  it('subtracts a nested excluded folder from the analyzed total', () => {
+    const f = evaluateAnalyzerExclusions(inputs({
+      existingFolders: ['lib'],
+      dartFileCounts: { lib: 3500 },
+      settingsExcluded: ['lib/generated'],
+      nestedExcludedCounts: { 'lib/generated': 1000 },
+      ramGb: undefined,
+    }));
+    assert.strictEqual(f.length, 0, '2500 analyzed is under the threshold');
+  });
+
+  it('still reports when the remainder exceeds the threshold', () => {
+    const f = evaluateAnalyzerExclusions(inputs({
+      existingFolders: ['lib'],
+      dartFileCounts: { lib: 5000 },
+      settingsExcluded: ['lib/generated'],
+      nestedExcludedCounts: { 'lib/generated': 1000 },
+      ramGb: undefined,
+    }));
+    assert.strictEqual(f[0].fileCount, 4000);
+  });
+
+  it('does not double-subtract an entry nested in another excluded entry', () => {
+    const f = evaluateAnalyzerExclusions(inputs({
+      existingFolders: ['lib'],
+      dartFileCounts: { lib: 4000 },
+      settingsExcluded: ['lib/gen', 'lib/gen/deep'],
+      nestedExcludedCounts: { 'lib/gen': 500, 'lib/gen/deep': 200 },
+      ramGb: undefined,
+    }));
+    assert.strictEqual(f[0].fileCount, 3500);
+  });
+
+  it('ignores nested entries under a fully excluded top-level folder', () => {
+    const f = evaluateAnalyzerExclusions(inputs({
+      existingFolders: ['lib', 'docs'],
+      dartFileCounts: { lib: 3100, docs: 50 },
+      settingsExcluded: ['docs', 'docs/x'],
+      nestedExcludedCounts: { 'docs/x': 40 },
+      ramGb: undefined,
+    }));
+    assert.strictEqual(f[0].fileCount, 3100);
+  });
+});
+
+describe('analyzerExclusions: RunToken', () => {
+  it('only the latest run is current', () => {
+    const t = new RunToken();
+    const a = t.next();
+    assert.strictEqual(t.isLatest(a), true);
+    const b = t.next();
+    assert.strictEqual(t.isLatest(a), false);
+    assert.strictEqual(t.isLatest(b), true);
   });
 });
