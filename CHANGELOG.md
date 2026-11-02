@@ -66,13 +66,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.0.1-beta.8] — Unreleased
+
+Security update for a dependency bundled with the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.8/CHANGELOG.md)
+
+### Fixed
+
+- **Security (extension):** `minimatch` forced to `>=11.0.1` via npm `overrides` (Dependabot #44, denial of service via globparts amplification). Resolved version is 11.0.4; `npm audit --omit=dev` reports 0 vulnerabilities.
+
 ## [17.0.1-beta.7]
 
 False-positive hardening for 15 lint rules; the master switch now stops the language server; scan exits 0 when disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.7/CHANGELOG.md)
 
 ### Fixed
 
-- **Security (extension):** `minimatch` forced to `>=11.0.1` via npm `overrides` (Dependabot #44, denial of service via globparts amplification). Resolved version is 11.0.4; `npm audit --omit=dev` reports 0 vulnerabilities.
 - **`avoid_unsafe_collection_methods`:** a `.first`/`.last`/`.single` access is no longer flagged when the same line or the line directly above carries `// non-empty: <reason>` (the reason is required). Use it for lists that are non-empty by an API contract the rule cannot see; a marker with no reason is ignored.
 - **`require_timezone_display`:** no longer flags `DateFormat.jm()/Hm()/Hms(...).format(local)` (a time of day shown on the user's own device). Still flagged when the formatted value is visibly UTC (`.toUtc()`, `DateTime.utc`, `isUtc`) and for a stored `DateFormat` that is not formatted at the construction site.
 - **`require_ios_push_notification_capability`:** no longer flags `requestPermission()` on non-push receivers (`Geolocator.requestPermission()` and similar location/contacts/audio permission APIs). `requestPermission()` is flagged only when its receiver looks like messaging/notification/push (`FirebaseMessaging.instance`, `messaging`, `fcm`); `getToken`, `onMessage`, and the push class patterns are unchanged.
