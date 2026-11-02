@@ -164,6 +164,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ruleCodes: [
       'abstract_field_initializer',
       'avoid_barrel_files',
+      'avoid_reexports',
       'avoid_business_logic_in_ui',
       'avoid_circular_dependencies',
       'avoid_circular_di_dependencies',
@@ -2192,6 +2193,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_async_call_in_sync_function',
       'avoid_async_callback_in_fake_async',
       'avoid_barrel_files',
+      'avoid_reexports',
       'avoid_bitwise_operators_with_booleans',
       'avoid_bloc_public_fields',
       'avoid_bloc_public_methods',
@@ -2457,6 +2459,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_async_call_in_sync_function',
       'avoid_auth_in_query_params',
       'avoid_barrel_files',
+      'avoid_reexports',
       'avoid_bitwise_operators_with_booleans',
       'avoid_bloc_public_fields',
       'avoid_bloc_public_methods',

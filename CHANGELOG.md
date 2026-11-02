@@ -66,11 +66,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.0.1-beta.8]
+## [17.0.1-beta.8] — Unreleased
+
+New `avoid_reexports` rule; analyzer exclusions check in the VS Code extension; security update for a dependency bundled with the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.8/CHANGELOG.md)
 
 ### Added
 
 - **Extension: analyzer exclusions check.** Suggests excluding folders that need no analysis (`android`, `ios`, `build`, `docs`, `.claude/worktrees` and similar) from `dart.analysisExcludedFolders`, flags folders excluded only in `analysis_options.yaml` (diagnostics hidden but still analyzed), and notes large analyzed file counts on 8 GB machines. Findings appear in the Problems panel on `pubspec.yaml`; the quick action "Add to dart.analysisExcludedFolders" edits only `.vscode/settings.json` for the folders you select. On by default; turn off with `saropaLints.analyzerExclusions.enabled`.
+- **`avoid_reexports`:** new rule (comprehensive tier, INFO) that flags every `export` directive; re-exports hide where a symbol is defined. The package entry point `lib/<package_name>.dart` is exempt. No option to allow re-exports.
+
+### Fixed
+
+- **Security (extension):** `minimatch` forced to `>=11.0.1` via npm `overrides` (Dependabot #44, denial of service via globparts amplification). Resolved version is 11.0.4; `npm audit --omit=dev` reports 0 vulnerabilities.
 
 ---
 

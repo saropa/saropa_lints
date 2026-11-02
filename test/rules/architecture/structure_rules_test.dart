@@ -25,6 +25,11 @@ void main() {
       () => AvoidBarrelFilesRule(),
     );
     testRule(
+      'AvoidReexportsRule',
+      'avoid_reexports',
+      () => AvoidReexportsRule(),
+    );
+    testRule(
       'AvoidImportingEntrypointExportsRule',
       'avoid_importing_entrypoint_exports',
       () => AvoidImportingEntrypointExportsRule(),

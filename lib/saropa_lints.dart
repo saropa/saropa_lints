@@ -427,6 +427,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnnecessaryGestureDetectorRule.new,
   PreferWidgetPrivateMembersRule.new,
   AvoidBarrelFilesRule.new,
+  AvoidReexportsRule.new,
   AvoidImportingEntrypointExportsRule.new,
   PreferConstructorsFirstRule.new,
   PreferFactoryBeforeNamedRule.new,

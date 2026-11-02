@@ -28,6 +28,17 @@ import '../../fixes/structure/sort_named_parameters_fix.dart';
 import '../../fixes/return/inline_immediate_return_fix.dart';
 import '../../saropa_lint_rule.dart';
 
+/// True when [path] is the package entry point (`lib/<package_name>.dart`),
+/// which the Dart package layout convention requires and which may re-export.
+bool _isPackageEntryPoint(String path) {
+  if (path.isEmpty) return false;
+  final String? projectRoot = ProjectContext.findProjectRoot(path);
+  if (projectRoot == null) return false;
+  final String packageName = ProjectContext.getPackageName(projectRoot);
+  if (packageName.isEmpty) return false;
+  return path.replaceAll('\\', '/').endsWith('lib/$packageName.dart');
+}
+
 /// Warns when a file only contains export statements (barrel file).
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
@@ -112,20 +123,7 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
       // intentional library entry points, not accidental barrels.
       if (hasLibraryDirective) return;
 
-      // Skip the mandatory package entry point (lib/<package_name>.dart).
-      // The Dart package layout convention requires this file to exist.
-      final String path = context.filePath;
-      if (path.isNotEmpty) {
-        final String? projectRoot = ProjectContext.findProjectRoot(path);
-        if (projectRoot != null) {
-          final String packageName = ProjectContext.getPackageName(projectRoot);
-          if (packageName.isNotEmpty) {
-            final String entryPoint = 'lib/$packageName.dart';
-            final String normalized = path.replaceAll('\\', '/');
-            if (normalized.endsWith(entryPoint)) return;
-          }
-        }
-      }
+      if (_isPackageEntryPoint(context.filePath)) return;
 
       // If only exports (no declarations, possibly some imports for types)
       if (exportCount > 0 && unit.declarations.isEmpty) {
@@ -134,6 +132,68 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
           reporter.atToken(unit.beginToken, code);
         }
       }
+    });
+  }
+}
+
+/// Warns on every `export` directive; re-exports hide where a symbol is
+/// defined.
+///
+/// Since: v17.0.1-beta.8 | Rule version: v1
+///
+/// Unlike [AvoidBarrelFilesRule], this flags any file with an `export`, even
+/// one that also declares code. Not configurable: re-exports are never wanted.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// export 'package:app/src/user.dart';
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// import 'package:app/src/user.dart';
+/// ```
+///
+/// **Exempt:** the package entry point (`lib/<package_name>.dart`).
+class AvoidReexportsRule extends SaropaLintRule {
+  AvoidReexportsRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => false;
+
+  static const LintCode _code = LintCode(
+    'avoid_reexports',
+    '[avoid_reexports] Do not re-export. Import the defining library '
+        'directly. Re-exports hide where a symbol is defined and widen the '
+        'public API of this library. {v1}',
+    correctionMessage:
+        'Remove the export and import the defining library where needed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (_isPackageEntryPoint(context.filePath)) return;
+    context.addExportDirective((ExportDirective node) {
+      reporter.atNode(node);
     });
   }
 }

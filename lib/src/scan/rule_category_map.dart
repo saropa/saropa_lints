@@ -69,6 +69,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'avoid_backdrop_filter_in_scrollable': 'core',
   'avoid_badge_without_meaning': 'widget',
   'avoid_barrel_files': 'architecture',
+  'avoid_reexports': 'architecture',
   'avoid_behavior_subject_last_value': 'packages',
   'avoid_bitwise_operators_with_booleans': 'code_quality',
   'avoid_bloc_business_logic_in_ui': 'packages',

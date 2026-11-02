@@ -155,6 +155,7 @@ plugins:
       # IMPORTS - Complete
       # =========================================================================
       avoid_barrel_files: true
+      avoid_reexports: true
       avoid_double_slash_imports: true
       avoid_duplicate_exports: true
       avoid_duplicate_named_imports: true

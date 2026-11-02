@@ -661,6 +661,7 @@ saropa_lints:
     # IMPORTS
     # =========================================================================
     - avoid_barrel_files: false
+    - avoid_reexports: false
     - avoid_double_slash_imports: false
     - avoid_duplicate_exports: false
     - avoid_duplicate_named_imports: false
