@@ -1,6 +1,6 @@
 # saropa_lints rule request: warn on `export` of another library
 
-Status: merged to main (beta.8); tests not yet run. Rule `avoid_reexports`, comprehensive tier, INFO.
+Status: resolved. Merged to main (beta.8); structure_rules_test.dart passes (126 tests). Rule `avoid_reexports`, comprehensive tier, INFO.
 
 ## Problem
 A Dart `export` directive makes one symbol importable from two libraries.

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2386,
+  "ruleCount": 2387,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -13345,6 +13345,28 @@
       },
       "correction": "Remove the outer Semantics wrapper (preferred) or remove the semanticLabel from the Image to avoid duplicate announcements.",
       "problemMessage": "[avoid_redundant_semantics] Semantics widget wraps an Image that already has a semanticLabel. The screen reader announces the image description twice — once from the Semantics label and once from the Image semanticLabel — creating a confusing and repetitive experience for users relying on assistive technology. Remove the outer Semantics wrapper or the Image semanticLabel. {v1}",
+      "impact": "warning",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "avoid_reexports": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "architecture"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Remove the export and import the defining library where needed.",
+      "problemMessage": "[avoid_reexports] Do not re-export. Import the defining library directly. Re-exports hide where a symbol is defined and widen the public API of this library. {v1}",
       "impact": "warning",
       "owasp": {
         "mobile": [],

@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.0.1-beta.8] — Unreleased
+## [17.0.1-beta.8]
 
 New `avoid_reexports` rule; analyzer exclusions check in the VS Code extension; security update for a dependency bundled with the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.8/CHANGELOG.md)
 
