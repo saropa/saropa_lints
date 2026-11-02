@@ -66,6 +66,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.0.1-beta.9]
+
+Removes a false positive from `avoid_unremovable_callbacks_in_listeners`. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.9/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_unremovable_callbacks_in_listeners`:** no longer flags `addPostFrameCallback` or `addPersistentFrameCallback`, which have no remove API, so a named function cannot help. No action required.
+
+---
+
 ## [17.0.1-beta.8]
 
 New `avoid_reexports` rule; analyzer exclusions check in the VS Code extension; security update for a dependency bundled with the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.8/CHANGELOG.md)

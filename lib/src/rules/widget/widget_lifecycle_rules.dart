@@ -1144,10 +1144,11 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // Only methods with a matching remove API. `addPostFrameCallback` (called
+  // exactly once, cannot be unregistered) and `addPersistentFrameCallback`
+  // (no remove API) are excluded: a named function would not help there.
   static const List<String> _listenerMethods = <String>[
     'addListener',
-    'addPostFrameCallback',
-    'addPersistentFrameCallback',
     'addTimingsCallback',
   ];
 
