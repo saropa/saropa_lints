@@ -7328,7 +7328,7 @@
         "description": "Code smell default target: zero false positives."
       },
       "correction": "Use theme colors from Theme.of(context).colorScheme (e.g., colorScheme.primary, colorScheme.surface) or define semantic color tokens in your ThemeData. This ensures colors adapt automatically when the theme changes and maintains WCAG contrast ratios across all theme variants.",
-      "problemMessage": "[avoid_hardcoded_colors] Hardcoded color value bypasses the theme system, breaking dark mode and dynamic theming. When users switch themes, hardcoded colors remain unchanged, creating contrast issues, illegible text, and an inconsistent visual experience that can fail accessibility requirements. {v6}",
+      "problemMessage": "[avoid_hardcoded_colors] Hardcoded color value bypasses the theme system, breaking dark mode and dynamic theming. When users switch themes, hardcoded colors remain unchanged, creating contrast issues, illegible text, and an inconsistent visual experience that can fail accessibility requirements. {v7}",
       "impact": "warning",
       "owasp": {
         "mobile": [],
