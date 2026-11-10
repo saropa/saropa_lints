@@ -27,9 +27,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.11.6'
+          sdk: '3.13.7'
       - name: Install dependencies
-        run: dart pub get
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
       # Same as publish.yml: root `dart analyze` resolves nested packages (SDK 3.11+); each
       # needs `pub get` so package: URIs work before the first analyze step.
       - name: Install nested package dependencies
@@ -128,16 +132,22 @@ jobs:
             echo "::error::Dry run failed with exit code $code (e.g. missing dependency in pubspec.yaml)"
             exit 1
           fi
+      - name: Lockfiles unchanged
+        # CI must never change dependency versions. Fail if any step above
+        # rewrote a committed lockfile (e.g. an SDK too old for it).
+        run: git diff --exit-code -- pubspec.lock
       - name: Format
         # Only format lib/ and test/; example_* use experimental features and are excluded from analyze
         run: dart format lib test
       # Only on PRs so we don't push to main (avoids permission/loop issues)
+      # Stage only lib/ and test/ (what `dart format` touches). The bot must
+      # never commit dependency or version changes.
       - name: Commit formatting changes
         if: github.event_name == 'pull_request'
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git diff --quiet || (git add -A && git commit -m "Format Dart files" && git push)
+          git diff --quiet -- lib test || (git add -- lib test && git commit -m "Format Dart files" && git push)
 
   test:
     runs-on: ubuntu-latest
@@ -152,9 +162,13 @@ jobs:
           fetch-depth: 0
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.11.6'
+          sdk: '3.13.7'
       - name: Install dependencies
-        run: dart pub get
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
       - name: Stub test integrity report
         run: dart run bin/stub_test_report.dart --write=reports/stub-test-report.json
       - name: Run tests
@@ -244,7 +258,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.11.6'
+          sdk: '3.13.7'
       - name: Run saropa_lints on itself
         id: selflint
         # On the step, so a finding can never fail the job. See above.

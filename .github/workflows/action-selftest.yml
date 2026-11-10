@@ -31,12 +31,16 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.11.6'
+          sdk: '3.13.7'
 
       # self_check depends on the root package by path, so the root must be
       # resolved before the action runs pub get inside self_check.
       - name: Resolve root package
-        run: dart pub get
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
 
       # --- Happy path -----------------------------------------------------
       # install-sdk is left at its default `auto`, which exercises the

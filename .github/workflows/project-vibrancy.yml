@@ -20,9 +20,13 @@ jobs:
       - uses: actions/checkout@v5
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.11.6'
+          sdk: '3.13.7'
       - name: Install dependencies
-        run: dart pub get
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
       - name: Run Project Vibrancy JSON scan
         run: |
           mkdir -p reports
