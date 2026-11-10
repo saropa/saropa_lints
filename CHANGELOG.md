@@ -75,6 +75,10 @@ Removes false positives from `avoid_hardcoded_colors` where colors define the th
 - **`avoid_hardcoded_colors`:** no longer flags colors written inside `ColorScheme`, `TextTheme`, `*ThemeData` constructors or `ThemeExtension` classes, or a private constant used only there (such as a seed passed to `ColorScheme.fromSeed`), so theme definitions stay clean. No action required.
 - **`avoid_hardcoded_colors`:** no longer flags fully transparent colors (`Colors.transparent`, alpha 0), which look the same in every theme. No action required.
 
+### Changed
+
+- **Package Vibrancy known issues:** the pricing notes for 11 hosted-service packages (AppsFlyer, CometChat, Datadog, UXCam, Mapbox, RevenueCat, Scanbot, Stream, Superwall, Syncfusion, ZEGOCLOUD) were re-checked against vendor pricing pages and reworded to plain facts. AppsFlyer and CometChat now show as freemium, as both offer a free tier. No action required.
+
 ### Internal
 
 - **CI never changes dependency versions:** jobs now run on the Dart SDK the lockfile requires, fail if installing dependencies would change the lockfile, and the formatting bot can only commit source and test files, so it can no longer push a downgraded analyzer to a pull request.
