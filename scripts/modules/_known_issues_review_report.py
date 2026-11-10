@@ -19,6 +19,7 @@ Copyright: (c) 2025-2026 Saropa
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 from pathlib import Path
 
 from scripts.modules._known_issues_freshness import (
@@ -41,6 +42,12 @@ _BUSINESS_MODEL_STATUSES = {
     "paid",
     "enterprise",
 }
+
+# A business-model entry whose human-only "reasonVerified" date (YYYY-MM-DD,
+# set by a person who read the reason; never by tooling, unlike "as_of") is
+# within this many days of the run date is not re-listed. Lifecycle entries
+# are never skipped.
+_RECENTLY_VERIFIED_DAYS = 183
 
 _REVIEWABLE_STATUSES = CHECKABLE_LIFECYCLE_STATUSES | _BUSINESS_MODEL_STATUSES
 
@@ -77,6 +84,7 @@ class ReviewEntry:
 class KnownIssuesReviewReport:
     checked_count: int = 0
     network_error_count: int = 0
+    skipped_recently_verified_count: int = 0
     entries: list[ReviewEntry] = field(default_factory=list)
 
     def by_tier(self, tier: str) -> list[ReviewEntry]:
@@ -93,8 +101,26 @@ def _classify_tier(issue: dict) -> str:
     return "low"  # business-model status
 
 
+def _is_recently_verified(issue: dict, today: date) -> bool:
+    """True for a business-model entry whose reasonVerified is within the
+    window (and not in the future). Missing or unparsable is never recent."""
+    if issue["status"] not in _BUSINESS_MODEL_STATUSES:
+        return False
+    try:
+        verified = date.fromisoformat(str(issue.get("reasonVerified", "")))
+    except ValueError:
+        return False
+    return verified <= today and today - verified < timedelta(
+        days=_RECENTLY_VERIFIED_DAYS
+    )
+
+
 def _review_report_from_fetched(
-    fetched: list[dict], network_error_count: int, *, checked_count: int
+    fetched: list[dict],
+    network_error_count: int,
+    *,
+    checked_count: int,
+    today: date | None = None,
 ) -> KnownIssuesReviewReport:
     """Derive a review report from an already-fetched candidate set. Shared
     by ``build_known_issues_review_report`` and ``run_known_issues_checks``
@@ -103,9 +129,13 @@ def _review_report_from_fetched(
     report = KnownIssuesReviewReport(
         checked_count=checked_count, network_error_count=network_error_count
     )
+    today = today or date.today()
     for issue in fetched:
         if not is_outgrown(issue):
             continue  # not outgrown by pub.dev's account — nothing to review
+        if _is_recently_verified(issue, today):
+            report.skipped_recently_verified_count += 1
+            continue
         report.entries.append(
             ReviewEntry(
                 name=issue["name"],
@@ -205,7 +235,14 @@ def render_markdown(report: KnownIssuesReviewReport, *, generated_on: str) -> st
         f"Generated {generated_on}. Checked {report.checked_count} "
         f"lifecycle/business-model entries against live pub.dev "
         f"({report.network_error_count} network error(s)); "
-        f"{len(report.entries)} appear outgrown by a newer release.",
+        f"{len(report.entries)} appear outgrown by a newer release"
+        + (
+            f" ({report.skipped_recently_verified_count} business-model "
+            f"entries skipped from the outgrown list as verified within the "
+            f"last {_RECENTLY_VERIFIED_DAYS} days)."
+            if report.skipped_recently_verified_count
+            else "."
+        ),
         "",
         "Each entry needs a human read of the current reason against the "
         "package's present state before editing `known_issues.json` — this "

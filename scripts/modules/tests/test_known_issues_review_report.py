@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
@@ -85,6 +86,58 @@ class TestReviewReportFromFetched(unittest.TestCase):
             [(e.name, e.tier) for e in report.entries],
             [("pkgHigh", "high"), ("pkgMedium", "medium"), ("pkgLow", "low")],
         )
+
+
+class TestRecentlyVerifiedSkip(unittest.TestCase):
+    TODAY = date(2026, 11, 10)
+
+    def _run(self, status: str, verified: str | None, **extra: str) -> object:
+        from scripts.modules._known_issues_review_report import (
+            _review_report_from_fetched,
+        )
+
+        issue = {
+            "name": "pkg",
+            "status": status,
+            "reason": "Requires paid license",
+            "lastUpdated": "2026-01-01",
+            "_actual_published": "2026-06-01",
+            "_actual_version": "1.0.0",
+            "_is_discontinued": False,
+        }
+        issue.update(extra)
+        if verified is not None:
+            issue["reasonVerified"] = verified
+        return _review_report_from_fetched(
+            [issue], 0, checked_count=1, today=self.TODAY
+        )
+
+    def test_recent_reason_verified_low_entry_skipped(self) -> None:
+        r = self._run("commercial", "2026-09-19")
+        self.assertEqual(r.entries, [])
+        self.assertEqual(r.skipped_recently_verified_count, 1)
+
+    def test_old_reason_verified_low_entry_listed(self) -> None:
+        self.assertEqual(len(self._run("commercial", "2026-01-01").entries), 1)
+
+    def test_missing_or_bad_reason_verified_listed(self) -> None:
+        self.assertEqual(len(self._run("commercial", None).entries), 1)
+        self.assertEqual(len(self._run("commercial", "garbage").entries), 1)
+
+    def test_future_reason_verified_listed(self) -> None:
+        self.assertEqual(len(self._run("commercial", "2026-12-01").entries), 1)
+
+    def test_exact_183_day_boundary(self) -> None:
+        # 2026-11-10 minus 182 days = 2026-05-12 (skipped); 183 days = 05-11.
+        self.assertEqual(self._run("commercial", "2026-05-12").entries, [])
+        self.assertEqual(len(self._run("commercial", "2026-05-11").entries), 1)
+
+    def test_recent_as_of_without_reason_verified_listed(self) -> None:
+        r = self._run("commercial", None, as_of="2026-11-01")
+        self.assertEqual(len(r.entries), 1)
+
+    def test_lifecycle_entry_with_recent_as_of_listed(self) -> None:
+        self.assertEqual(len(self._run("end_of_life", "2026-09-19").entries), 1)
 
 
 class TestRunKnownIssuesChecksSharesOneFetch(unittest.TestCase):
