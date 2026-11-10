@@ -70,6 +70,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 Removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.10/CHANGELOG.md)
 
+### Upgrading from 16.x
+
+- **Requirements:** the 17 line needs Dart 3.11 or newer and analyzer 13 or 14. Projects held on analyzer 12 stay on `^16.7.0`.
+- **Rule renamed:** `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended`. Update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name. The extension's compatibility card offers to rewrite them for you.
+
 ### Fixed
 
 - **New-project setup picks a current version (extension):** enabling Saropa Lints in a project that does not depend on it yet now writes the newest `saropa_lints` its Dart SDK supports (the same choice the compatibility card makes) instead of the frozen `^16.2.1`. If the Dart version or the pub.dev list cannot be read, it writes `^16.7.0`, which works on any Dart.
