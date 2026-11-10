@@ -288,9 +288,9 @@ This beta focuses heavily on optimizing the VS Code extension's performance and 
 
 ---
 
-## [17.0.0] - retracted
+## [17.0.0] - published as stable by mistake
 
-Retracted on pub.dev: this was meant to be a beta. Use 17.0.1-beta.1 or later.
+Published to pub.dev as a stable release by mistake: it was meant to be a beta. It is not retracted. Use 17.0.1-beta.1 or later, or the next stable release.
 
 Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 projects on the frozen 16.x line. [log](https://github.com/saropa/saropa_lints/blob/v17.0.0/CHANGELOG.md)
 
