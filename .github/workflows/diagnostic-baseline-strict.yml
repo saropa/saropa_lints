@@ -15,7 +15,11 @@ jobs:
         with:
           sdk: '3.13.7'
       - name: Install dependencies
-        run: dart pub get --enforce-lockfile
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
       - name: Run saropa scan (allow lint findings)
         # scan exits 1 when issues are found; we still need the report artifact.
         run: dart run saropa_lints:scan . || test $? -eq 1

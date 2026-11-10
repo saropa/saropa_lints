@@ -29,7 +29,11 @@ jobs:
         with:
           sdk: '3.13.7'
       - name: Install dependencies
-        run: dart pub get --enforce-lockfile
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
       # Same as publish.yml: root `dart analyze` resolves nested packages (SDK 3.11+); each
       # needs `pub get` so package: URIs work before the first analyze step.
       - name: Install nested package dependencies
@@ -160,7 +164,11 @@ jobs:
         with:
           sdk: '3.13.7'
       - name: Install dependencies
-        run: dart pub get --enforce-lockfile
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
       - name: Stub test integrity report
         run: dart run bin/stub_test_report.dart --write=reports/stub-test-report.json
       - name: Run tests
