@@ -43,9 +43,10 @@ _BUSINESS_MODEL_STATUSES = {
     "enterprise",
 }
 
-# A business-model entry whose "as_of" (date the claim was last verified,
-# YYYY-MM-DD) is within this window was just checked by a human, so it is not
-# re-listed. Lifecycle entries are never skipped.
+# A business-model entry whose human-only "reasonVerified" date (YYYY-MM-DD,
+# set by a person who read the reason; never by tooling, unlike "as_of") is
+# within this many days of the run date is not re-listed. Lifecycle entries
+# are never skipped.
 _RECENTLY_VERIFIED_DAYS = 183
 
 _REVIEWABLE_STATUSES = CHECKABLE_LIFECYCLE_STATUSES | _BUSINESS_MODEL_STATUSES
@@ -101,15 +102,17 @@ def _classify_tier(issue: dict) -> str:
 
 
 def _is_recently_verified(issue: dict, today: date) -> bool:
-    """True for a business-model entry whose as_of is within the window.
-    Missing or unparsable as_of is never recent."""
+    """True for a business-model entry whose reasonVerified is within the
+    window (and not in the future). Missing or unparsable is never recent."""
     if issue["status"] not in _BUSINESS_MODEL_STATUSES:
         return False
     try:
-        as_of = date.fromisoformat(str(issue.get("as_of", "")))
+        verified = date.fromisoformat(str(issue.get("reasonVerified", "")))
     except ValueError:
         return False
-    return today - as_of < timedelta(days=_RECENTLY_VERIFIED_DAYS)
+    return verified <= today and today - verified < timedelta(
+        days=_RECENTLY_VERIFIED_DAYS
+    )
 
 
 def _review_report_from_fetched(
@@ -235,7 +238,8 @@ def render_markdown(report: KnownIssuesReviewReport, *, generated_on: str) -> st
         f"{len(report.entries)} appear outgrown by a newer release"
         + (
             f" ({report.skipped_recently_verified_count} business-model "
-            f"entries skipped as verified within the last 6 months)."
+            f"entries skipped from the outgrown list as verified within the "
+            f"last {_RECENTLY_VERIFIED_DAYS} days)."
             if report.skipped_recently_verified_count
             else "."
         ),
