@@ -119,3 +119,16 @@ void _good1062() {
   Container(color: Theme.of(context).colorScheme.surface);
   Text('Hi', style: Theme.of(context).textTheme.bodyMedium);
 }
+
+// GOOD: Colors that define the theme itself are exempt (GitHub issue #398)
+const _brandSeed = Color(0xFFB39DDB);
+final _goodTheme1062 = ThemeData(
+  primaryColor: Colors.indigo,
+  colorScheme: ColorScheme.light(primary: _brandSeed),
+);
+
+// GOOD: Fully transparent colors look the same in every theme
+void _goodTransparent1062() {
+  Container(color: Colors.transparent);
+  Container(color: Color(0x00000000));
+}

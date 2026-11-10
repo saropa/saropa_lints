@@ -66,6 +66,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.0.1-beta.10] — Unreleased
+
+Removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.10/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_hardcoded_colors`:** no longer flags colors written inside `ColorScheme`, `TextTheme`, `*ThemeData` constructors or `ThemeExtension` classes, or a private constant used only there (such as a seed passed to `ColorScheme.fromSeed`), so theme definitions stay clean. No action required.
+- **`avoid_hardcoded_colors`:** no longer flags fully transparent colors (`Colors.transparent`, alpha 0), which look the same in every theme. No action required.
+
+---
+
 ## [17.0.1-beta.9]
 
 Removes a false positive from `avoid_unremovable_callbacks_in_listeners`. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.9/CHANGELOG.md)
