@@ -84,7 +84,7 @@ dependencies:
   # https://pub.dev/packages/analysis_server_plugin
   #
   # Each analysis_server_plugin release pins exactly one analyzer version
-  # (0.3.15 -> analyzer 13.0.0, 0.3.25 -> analyzer 14.6.0), so this range plus
+  # (0.3.15 -> analyzer 13.0.0, 0.3.26 -> analyzer 14.7.0), so this range plus
   # the analyzer range below lets pub pick the newest pair the project's Dart
   # SDK allows. Do not narrow it to a single release.
   analysis_server_plugin: ^0.3.15
@@ -92,7 +92,7 @@ dependencies:
   # This package provides a library that performs static analysis of Dart code.
   # https://pub.dev/packages/analyzer
   # Supports analyzer 13 and 14. Pub picks per Dart SDK: Dart >=3.11 is required
-  # (13.0.0 needs _fe_analyzer_shared 100): 3.11/3.12 get up to 14.5.0, 3.13 to 14.6.0. Projects held on
+  # (13.0.0 needs _fe_analyzer_shared 100): 3.11/3.12 get up to 14.5.0, 3.13 to 14.7.0. Projects held on
   # analyzer 12 stay on saropa_lints ^16.7.0 (16.x is frozen, no back-ports).
   # analyzer 13.0.0 requires meta ^1.18.0, so Flutter 3.44 (meta 1.18.0) still
   # resolves; do not raise the meta floor below.

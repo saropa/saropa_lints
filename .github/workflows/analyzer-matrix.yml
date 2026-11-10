@@ -28,8 +28,8 @@ jobs:
             # dart_style >=3.1.10 needs analyzer >=13.1.0; an analyzer override
             # ignores that constraint, so pin the last dart_style on analyzer ^13.0.0.
             dart_style: '3.1.9'
-          - analyzer: '14.6.0'
-            plugin: '0.3.25'
+          - analyzer: '14.7.0'
+            plugin: '0.3.26'
             dart: '3.13'
             dart_style: ''
     steps:
