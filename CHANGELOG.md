@@ -66,16 +66,6 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.1.1] — Unreleased
-
-Re-checks three Package Vibrancy warnings against current package changelogs and repositories and corrects the wording that did not match them. [log](https://github.com/saropa/saropa_lints/blob/v17.1.1/CHANGELOG.md)
-
-### Changed
-
-- **Package Vibrancy known issues:** reworded three warnings after a manual check. `flutter_sticky_header` now cites the open scroll-lag issue instead of an unconfirmed physics conflict; `google_api_availability` no longer claims false negatives (none are reported) and notes it is Android-only since 5.0.0; `blinkid_flutter` now says the wrapper is open source and the Microblink SDK needs a license key (trial key available, production via sales). Statuses are unchanged.
-
----
-
 ## [17.1.0]
 
 Removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
@@ -94,6 +84,7 @@ Removes false positives from `avoid_hardcoded_colors` where colors define the th
 ### Changed
 
 - **Package Vibrancy known issues:** the pricing notes for 11 hosted-service packages (AppsFlyer, CometChat, Datadog, UXCam, Mapbox, RevenueCat, Scanbot, Stream, Superwall, Syncfusion, ZEGOCLOUD) were re-checked against vendor pricing pages and reworded to plain facts. AppsFlyer and CometChat now show as freemium, as both offer a free tier. The AppsFlyer migration notes no longer recommend Firebase Dynamic Links, which Google shut down in 2025. A new optional `reasonVerified` field in the known-issues schema records the date a person last checked an entry's reason text; those 11 entries carry it. No action required.
+- **Package Vibrancy known issues:** the warnings for flutter_sticky_header, google_api_availability and blinkid_flutter were re-checked and reworded to match their changelogs and repositories (blinkid_flutter's wrapper is open source and only the Microblink SDK needs a license key), with statuses unchanged. No action required.
 
 ### Internal
 
