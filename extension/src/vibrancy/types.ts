@@ -149,6 +149,8 @@ export interface KnownIssue {
     readonly status: string;
     readonly reason?: string;
     readonly as_of?: string;
+    /** Date a person last checked `reason` (YYYY-MM-DD). Human-set only. */
+    readonly reasonVerified?: string;
     readonly replacement?: string;
     /** When set, do not show replacement message when user's version >= this (e.g. "9.0.0" for "Update to v9+"). Parsed and compared as semver. */
     readonly replacementObsoleteFromVersion?: string;

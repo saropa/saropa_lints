@@ -40,7 +40,12 @@
           "as_of": {
             "type": "string",
             "format": "date",
-            "description": "The date this issue was recorded (YYYY-MM-DD)."
+            "description": "The date of the last data refresh or verification of this entry (YYYY-MM-DD)."
+          },
+          "reasonVerified": {
+            "type": "string",
+            "format": "date",
+            "description": "Date a person last checked the reason text against the package's current state. Set only by a human review; scripts never write it."
           },
           "replacement": {
             "type": ["string", "null"],
