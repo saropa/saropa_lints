@@ -81,6 +81,10 @@ Removes false positives from `avoid_hardcoded_colors` where colors define the th
 - **`avoid_hardcoded_colors`:** no longer flags colors written inside `ColorScheme`, `TextTheme`, `*ThemeData` constructors or `ThemeExtension` classes, or a private constant used only there (such as a seed passed to `ColorScheme.fromSeed`), so theme definitions stay clean. No action required.
 - **`avoid_hardcoded_colors`:** no longer flags fully transparent colors (`Colors.transparent`, alpha 0), which look the same in every theme. No action required.
 
+### Changed
+
+- **Package Vibrancy known issues:** the pricing notes for 11 hosted-service packages (AppsFlyer, CometChat, Datadog, UXCam, Mapbox, RevenueCat, Scanbot, Stream, Superwall, Syncfusion, ZEGOCLOUD) were re-checked against vendor pricing pages and reworded to plain facts. AppsFlyer and CometChat now show as freemium, as both offer a free tier. The AppsFlyer migration notes no longer recommend Firebase Dynamic Links, which Google shut down in 2025. A new optional `reasonVerified` field in the known-issues schema records the date a person last checked an entry's reason text; those 11 entries carry it. No action required.
+
 ### Internal
 
 - **CI tests the newest analyzer:** the analyzer matrix now pins analyzer 14.7.0 (with `analysis_server_plugin` 0.3.26) for its Dart 3.13 row instead of 14.6.0, so the range users actually get on Dart 3.13 is the one tested.
