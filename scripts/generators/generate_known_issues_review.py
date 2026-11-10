@@ -61,11 +61,16 @@ def main() -> int:
 
     project_dir = Path(__file__).resolve().parent.parent.parent
     report = build_known_issues_review_report(project_dir)
-    generated_on = args.date or "(date not specified — pass --date YYYY-MM-DD)"
+    out_path = review_report_path(project_dir, args.date)
+    # Header date matches the file name's resolved date (invalid --date -> today).
+    generated_on = (
+        out_path.name[:10]
+        if args.date
+        else "(date not specified — pass --date YYYY-MM-DD)"
+    )
     markdown = render_markdown(report, generated_on=generated_on)
 
     if args.write:
-        out_path = review_report_path(project_dir, args.date)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(markdown, encoding="utf-8")
         print(f"Wrote {out_path} ({len(report.entries)} entrie(s) to review).")

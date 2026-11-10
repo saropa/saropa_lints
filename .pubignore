@@ -75,8 +75,6 @@ self_check/pubspec.lock
 # Bug tracking / internal issue docs
 bugs/
 
-# Internal planning docs that shouldn't ship (generated/local-only)
-
 # Backup files
 *.bak
 

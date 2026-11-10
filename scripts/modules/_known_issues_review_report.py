@@ -199,7 +199,8 @@ def run_known_issues_checks(
     and derives both results from it, so the publish pipeline pays for one
     ~302-entry pass instead of 70 + 302. Used by the publish pipeline, which
     needs both the pass/warn gate line and a fresh dated review report
-    (``bugs/YYYY-MM-DD_known_issues_review_queue.md``) on every run — see ``scripts/modules/_publish_steps.py``.
+    (``bugs/YYYY-MM-DD_known_issues_review_queue.md``) on every run — see
+    ``scripts/modules/_publish_steps.py``.
     """
     issues = load_known_issues(project_dir)
     # Skip version-scoped entries — see build_known_issues_review_report.
