@@ -151,10 +151,15 @@ class TestRecentlyVerifiedSkip(unittest.TestCase):
     def test_lifecycle_entry_future_verified_listed(self) -> None:
         self.assertEqual(len(self._run("end_of_life", "2026-12-01").entries), 1)
 
-    def test_old_low_entry_verified_after_release_skipped(self) -> None:
-        # Verified long ago (outside 183 days) but after the release.
-        r = self._run("commercial", "2026-06-02", _actual_published="2025-01-01")
+    def test_low_entry_outside_window_skipped_only_by_release_rule(self) -> None:
+        # Release (2026-04-01) is after lastUpdated, so the entry is outgrown;
+        # verified 2026-04-02 is outside the 183-day window (run 2026-11-10),
+        # so only the verified-after-release rule can skip it.
+        r = self._run(
+            "commercial", "2026-04-02", _actual_published="2026-04-01"
+        )
         self.assertEqual(r.entries, [])
+        self.assertEqual(r.skipped_recently_verified_count, 1)
 
 
 class TestZeroEntriesWritesNoFile(unittest.TestCase):
