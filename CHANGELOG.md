@@ -66,6 +66,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.1.1] — Unreleased
+
+Re-checks three Package Vibrancy warnings against current package changelogs and repositories and corrects the wording that did not match them. [log](https://github.com/saropa/saropa_lints/blob/v17.1.1/CHANGELOG.md)
+
+### Changed
+
+- **Package Vibrancy known issues:** reworded three warnings after a manual check. `flutter_sticky_header` now cites the open scroll-lag issue instead of an unconfirmed physics conflict; `google_api_availability` no longer claims false negatives (none are reported) and notes it is Android-only since 5.0.0; `blinkid_flutter` now says the wrapper is open source and the Microblink SDK needs a license key (trial key available, production via sales). Statuses are unchanged.
+
+---
+
 ## [17.1.0]
 
 Removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
