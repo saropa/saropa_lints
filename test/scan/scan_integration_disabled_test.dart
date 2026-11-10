@@ -31,17 +31,21 @@ void main() {
     expect(isScanIntegrationDisabled(dir.path), isFalse);
   });
 
-  test('scan CLI exits 0 and prints a disabled line', () async {
-    writeOptions(
-      '# >>> saropa_lints integration turned OFF by the VS Code extension >>>\n',
-    );
-    final result = await Process.run('dart', [
-      'run',
-      'saropa_lints',
-      'scan',
-      dir.path,
-    ]);
-    expect(result.exitCode, 0, reason: '${result.stdout}${result.stderr}');
-    expect(result.stdout, contains('disabled'));
-  }, timeout: const Timeout(Duration(minutes: 3)));
+  test(
+    'scan CLI exits 0 and prints a disabled line',
+    () async {
+      writeOptions(
+        '# >>> saropa_lints integration turned OFF by the VS Code extension >>>\n',
+      );
+      final result = await Process.run('dart', [
+        'run',
+        'saropa_lints',
+        'scan',
+        dir.path,
+      ]);
+      expect(result.exitCode, 0, reason: '${result.stdout}${result.stderr}');
+      expect(result.stdout, contains('disabled'));
+    },
+    timeout: const Timeout(Duration(minutes: 3)),
+  );
 }
