@@ -1,5 +1,5 @@
 import * as assert from 'node:assert';
-import { chooseNewProjectConstraint, FALLBACK_CONSTRAINT } from '../../compat/newProjectConstraint';
+import { chooseNewProjectConstraint, FALLBACK_CONSTRAINT, versionsWithin } from '../../compat/newProjectConstraint';
 import type { PubVersion } from '../../compat/pubVersions';
 
 const V = (version: string, sdk: string): PubVersion => ({ version, sdk });
@@ -30,5 +30,17 @@ describe('chooseNewProjectConstraint', () => {
 
   it('falls back when no version fits the Dart SDK', async () => {
     assert.strictEqual(await chooseNewProjectConstraint('2.19.0', VERSIONS), FALLBACK_CONSTRAINT);
+  });
+});
+
+describe('versionsWithin', () => {
+  it('yields the fallback when the lookup never settles', async () => {
+    const versions = await versionsWithin(() => new Promise(() => {}), 20);
+    assert.deepStrictEqual(versions, []);
+    assert.strictEqual(await chooseNewProjectConstraint('3.13.0', versions), FALLBACK_CONSTRAINT);
+  });
+
+  it('returns the versions when the lookup settles in time', async () => {
+    assert.deepStrictEqual(await versionsWithin(async () => ({ versions: VERSIONS }), 1000), VERSIONS);
   });
 });

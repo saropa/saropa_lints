@@ -25,3 +25,25 @@ export async function chooseNewProjectConstraint(
   );
   return rec.route === 'dependency' && rec.constraint ? rec.constraint : FALLBACK_CONSTRAINT;
 }
+
+/** Longest the pub.dev lookup may delay writing a new project's pubspec. */
+export const VERSION_LOOKUP_TIMEOUT_MS = 8000;
+
+/**
+ * Runs [lookup], resolving to an empty list (which selects the fallback) if it
+ * has not settled within [timeoutMs]. The timer is always cleared.
+ */
+export async function versionsWithin(
+  lookup: () => Promise<{ versions: PubVersion[] }>,
+  timeoutMs: number = VERSION_LOOKUP_TIMEOUT_MS,
+): Promise<PubVersion[]> {
+  let timer: NodeJS.Timeout | undefined;
+  const timeout = new Promise<PubVersion[]>((resolve) => {
+    timer = setTimeout(() => resolve([]), timeoutMs);
+  });
+  try {
+    return await Promise.race([lookup().then((r) => r.versions), timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+}

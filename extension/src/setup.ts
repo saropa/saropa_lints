@@ -21,7 +21,7 @@ import {
 } from './config/laneConfig';
 import { l10n } from './i18n/runtime';
 import { addDevDependency } from './pubspecDevDependency';
-import { chooseNewProjectConstraint, FALLBACK_CONSTRAINT } from './compat/newProjectConstraint';
+import { chooseNewProjectConstraint, FALLBACK_CONSTRAINT, versionsWithin } from './compat/newProjectConstraint';
 import { getPubVersions } from './compat/pubVersions';
 import { parseDartVersion, pubspecDeclaresSaropaLints } from './compat/projectFacts';
 import { detectDartVersion } from './vibrancy/services/sdk-detector';
@@ -123,7 +123,7 @@ async function resolveNewProjectConstraint(workspaceRoot: string): Promise<strin
       const detected = await detectDartVersion();
       dart = /^\d+\.\d+\.\d+/.test(detected) ? detected : undefined;
     }
-    const { versions } = await getPubVersions();
+    const versions = await versionsWithin(() => getPubVersions());
     return await chooseNewProjectConstraint(dart, versions);
   } catch {
     return FALLBACK_CONSTRAINT;
