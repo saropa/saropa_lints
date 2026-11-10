@@ -72,6 +72,7 @@ Removes false positives from `avoid_hardcoded_colors` where colors define the th
 
 ### Fixed
 
+- **New-project setup picks a current version (extension):** enabling Saropa Lints in a project that does not depend on it yet now writes the newest `saropa_lints` its Dart SDK supports (the same choice the compatibility card makes) instead of the frozen `^16.2.1`. If the Dart version or the pub.dev list cannot be read, it writes `^16.7.0`, which works on any Dart.
 - **`avoid_hardcoded_colors`:** no longer flags colors written inside `ColorScheme`, `TextTheme`, `*ThemeData` constructors or `ThemeExtension` classes, or a private constant used only there (such as a seed passed to `ColorScheme.fromSeed`), so theme definitions stay clean. No action required.
 - **`avoid_hardcoded_colors`:** no longer flags fully transparent colors (`Colors.transparent`, alpha 0), which look the same in every theme. No action required.
 

@@ -1934,7 +1934,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const pubspecHadEdits =
           isGitRepository(ciRoot) && hasUncommittedChanges(ciRoot, 'pubspec.yaml');
         const before = readCiWorkflow(ciRoot);
-        const added = ensureSaropaLintsInPubspec(ciRoot);
+        const added = await ensureSaropaLintsInPubspec(ciRoot);
         if (!added.ok) return; // ensureSaropaLintsInPubspec already explained why
 
         // `gate` runs the scan command, which honors THIS project's own

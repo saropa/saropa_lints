@@ -21,19 +21,14 @@ import {
 } from './config/laneConfig';
 import { l10n } from './i18n/runtime';
 import { addDevDependency } from './pubspecDevDependency';
+import { chooseNewProjectConstraint, FALLBACK_CONSTRAINT } from './compat/newProjectConstraint';
+import { getPubVersions } from './compat/pubVersions';
+import { parseDartVersion, pubspecDeclaresSaropaLints } from './compat/projectFacts';
+import { detectDartVersion } from './vibrancy/services/sdk-detector';
 // Shared path-segment constants/helpers — keeps 'reports'/'.saropa_lints' in one place.
 import { REPORTS_DIR } from './reportsPaths';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
-/**
- * Constraint written when a project does not depend on saropa_lints yet.
- *
- * The latest release on pub.dev, as a caret so `pub get` takes every later
- * 16.x. It was `^9.1.0` long after 16.x shipped, which resolved to a 9.x CLI:
- * too old for this extension, and too old for the CI workflow the System
- * Health card writes, whose action needs the 16.x `scan` flags.
- */
-const DEFAULT_VERSION = '^16.2.1';
 
 /** Composite meta-plugin guide (browser); stable for marketplace installs. */
 const COMPOSITE_PLUGIN_SCAFFOLD_GUIDE_URL =
@@ -109,9 +104,35 @@ interface PubspecEnsureResult {
   changed: boolean;
 }
 
-export function ensureSaropaLintsInPubspec(
+/**
+ * Constraint for a project that does not depend on saropa_lints yet: what the
+ * compatibility recommender picks for the project's Dart SDK, or the safe 16.x
+ * fallback when the Dart version or the pub.dev list cannot be read.
+ */
+async function resolveNewProjectConstraint(workspaceRoot: string): Promise<string> {
+  try {
+    let dart: string | undefined;
+    try {
+      dart = parseDartVersion(
+        fs.readFileSync(path.join(workspaceRoot, '.dart_tool', 'package_config.json'), 'utf-8'),
+      );
+    } catch {
+      // No resolved project yet: ask the installed SDK instead.
+    }
+    if (!dart) {
+      const detected = await detectDartVersion();
+      dart = /^\d+\.\d+\.\d+/.test(detected) ? detected : undefined;
+    }
+    const { versions } = await getPubVersions();
+    return await chooseNewProjectConstraint(dart, versions);
+  } catch {
+    return FALLBACK_CONSTRAINT;
+  }
+}
+
+export async function ensureSaropaLintsInPubspec(
   workspaceRoot: string,
-): PubspecEnsureResult {
+): Promise<PubspecEnsureResult> {
   const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
   if (!fs.existsSync(pubspecPath)) {
     void vscode.window.showErrorMessage(
@@ -129,7 +150,13 @@ export function ensureSaropaLintsInPubspec(
   // Already declared => nothing written => the caller can skip `pub get`.
   // The edit itself (indentation, comments, CRLF) lives in
   // pubspecDevDependency.ts, where each of those shapes is tested.
-  const next = addDevDependency(content, SAROPA_LINTS_DEV_DEP, DEFAULT_VERSION);
+  // Looked up only when it will be written: skips the pub.dev call otherwise.
+  if (pubspecDeclaresSaropaLints(content)) return { ok: true, changed: false };
+  const next = addDevDependency(
+    content,
+    SAROPA_LINTS_DEV_DEP,
+    await resolveNewProjectConstraint(workspaceRoot),
+  );
   if (next === undefined) return { ok: true, changed: false };
   fs.writeFileSync(pubspecPath, next, 'utf-8');
   return { ok: true, changed: true };
@@ -591,7 +618,7 @@ async function runEnableExclusive(context: vscode.ExtensionContext): Promise<boo
     async (progress, token) => {
       logSection('Enable');
 
-      const pubspec = ensureSaropaLintsInPubspec(workspaceRoot);
+      const pubspec = await ensureSaropaLintsInPubspec(workspaceRoot);
       if (!pubspec.ok) return;
       logReport(pubspec.changed
         ? '- Added saropa_lints to pubspec.yaml'
