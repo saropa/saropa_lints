@@ -914,8 +914,9 @@
     {
       "name": "flutter_sticky_header",
       "status": "caution",
-      "reason": "May conflict with Flutter's modern sliver scroll physics; potential jank reported.",
+      "reason": "Open issue reports scroll performance lag on recent Flutter versions (letsar/flutter_sticky_header issue 111); the changelog notes no fix.",
       "as_of": "2026-09-19",
+      "reasonVerified": "2026-11-10",
       "replacement": "sliver_tools",
       "migrationNotes": "Moderate rewrite. Use native sliver logic wrapped in tools.",
       "archiveSizeBytes": 4434186,
@@ -1618,8 +1619,9 @@
     {
       "name": "google_api_availability",
       "status": "maintenance_mode",
-      "reason": "Obsolete detection methods return false negatives on modern devices.",
+      "reason": "Releases are limited to SDK-constraint and build updates; Android-only since 5.0.0, which removed iOS support.",
       "as_of": "2026-09-19",
+      "reasonVerified": "2026-11-10",
       "replacement": "Use Native Channels",
       "migrationNotes": "Write custom Kotlin script for exact API versioning.",
       "archiveSizeBytes": 15031,
@@ -6453,8 +6455,9 @@
     {
       "name": "blinkid_flutter",
       "status": "commercial",
-      "reason": "Premium, closed-source SDK wrapper. Requires a paid commercial license key from Microblink to function in production.",
+      "reason": "The wrapper is open source (MIT), but the Microblink BlinkID SDK requires a license key to initialize. A free trial key is available; production licenses are obtained from Microblink sales.",
       "as_of": "2026-09-19",
+      "reasonVerified": "2026-11-10",
       "replacement": "google_mlkit_document_scanner",
       "migrationNotes": "Migrate to free, on-device alternatives like Google ML Kit for standard document, ID, and barcode scanning needs.",
       "archiveSizeBytes": 98842,
