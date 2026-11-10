@@ -76,7 +76,6 @@ self_check/pubspec.lock
 bugs/
 
 # Internal planning docs that shouldn't ship (generated/local-only)
-plans/known_issues_review.md
 
 # Backup files
 *.bak

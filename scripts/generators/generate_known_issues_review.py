@@ -37,6 +37,7 @@ if _repo_root not in sys.path:
 from scripts.modules._known_issues_review_report import (
     build_known_issues_review_report,
     render_markdown,
+    review_report_path,
 )
 
 
@@ -45,7 +46,8 @@ def main() -> int:
     parser.add_argument(
         "--write",
         action="store_true",
-        help="Write the report to plans/known_issues_review.md instead of stdout.",
+        help="Write the report to bugs/YYYY-MM-DD_known_issues_review_queue.md "
+        "(dated by --date if valid, else today) instead of stdout.",
     )
     parser.add_argument(
         "--date",
@@ -63,7 +65,7 @@ def main() -> int:
     markdown = render_markdown(report, generated_on=generated_on)
 
     if args.write:
-        out_path = project_dir / "plans" / "known_issues_review.md"
+        out_path = review_report_path(project_dir, args.date)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(markdown, encoding="utf-8")
         print(f"Wrote {out_path} ({len(report.entries)} entrie(s) to review).")
