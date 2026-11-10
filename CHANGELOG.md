@@ -88,6 +88,7 @@ Removes false positives from `avoid_hardcoded_colors` where colors define the th
 
 ### Internal
 
+- **Known-issues review queue is now a tracked dated file:** the publish-time report is written to `bugs/YYYY-MM-DD_known_issues_review_queue.md` on every run (even with zero entries) instead of the gitignored `plans/known_issues_review.md`; older dated files are kept.
 - **CI tests the newest analyzer:** the analyzer matrix now pins analyzer 14.7.0 (with `analysis_server_plugin` 0.3.26) for its Dart 3.13 row instead of 14.6.0, so the range users actually get on Dart 3.13 is the one tested.
 - **Known-issues review report skips recently verified paid-package warnings:** the publish-time review no longer re-lists business-model (paid/commercial) entries whose human-set `reasonVerified` date is within the last 183 days, so a warning a person just checked is not flagged again on every release. Tooling-refreshed `as_of` dates do not count. Lifecycle entries are unchanged.
 - **CI never changes dependency versions:** jobs now run on the Dart SDK the lockfile requires, fail if installing dependencies would change the lockfile, and the formatting bot can only commit source and test files, so it can no longer push a downgraded analyzer to a pull request.

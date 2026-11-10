@@ -19,7 +19,7 @@ Copyright: (c) 2025-2026 Saropa
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from scripts.modules._known_issues_freshness import (
@@ -198,8 +198,9 @@ def run_known_issues_checks(
     entries twice; this fetches the review candidate set once (a superset)
     and derives both results from it, so the publish pipeline pays for one
     ~302-entry pass instead of 70 + 302. Used by the publish pipeline, which
-    needs both the pass/warn gate line and a fresh ``known_issues_review.md``
-    on every run — see ``scripts/modules/_publish_steps.py``.
+    needs both the pass/warn gate line and a fresh dated review report
+    (``bugs/YYYY-MM-DD_known_issues_review_queue.md``) on every run — see
+    ``scripts/modules/_publish_steps.py``.
     """
     issues = load_known_issues(project_dir)
     # Skip version-scoped entries — see build_known_issues_review_report.
@@ -225,6 +226,21 @@ def run_known_issues_checks(
         fetched, network_error_count, checked_count=len(candidates)
     )
     return freshness, review
+
+
+def review_report_path(project_dir: Path, date_text: str | None = None) -> Path:
+    """Return ``bugs/YYYY-MM-DD_known_issues_review_queue.md`` under *project_dir*.
+
+    Uses *date_text* when it parses as a real YYYY-MM-DD date, else today.
+    Shared by the publish pipeline and the standalone generator.
+    """
+    day = date.today()
+    if date_text:
+        try:
+            day = datetime.strptime(date_text, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+    return project_dir / "bugs" / f"{day.isoformat()}_known_issues_review_queue.md"
 
 
 def render_markdown(report: KnownIssuesReviewReport, *, generated_on: str) -> str:
