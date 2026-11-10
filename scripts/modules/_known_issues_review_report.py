@@ -43,10 +43,11 @@ _BUSINESS_MODEL_STATUSES = {
     "enterprise",
 }
 
-# A business-model entry whose human-only "reasonVerified" date (YYYY-MM-DD,
-# set by a person who read the reason; never by tooling, unlike "as_of") is
-# within this many days of the run date is not re-listed. Lifecycle entries
-# are never skipped.
+# Any entry whose human-only "reasonVerified" date (YYYY-MM-DD, set by a
+# person who read the reason; never by tooling, unlike "as_of") is on or after
+# the package's latest pub.dev release date is not re-listed; a newer release
+# brings it back. A business-model entry is also skipped when reasonVerified
+# is within this many days of the run date.
 _RECENTLY_VERIFIED_DAYS = 183
 
 _REVIEWABLE_STATUSES = CHECKABLE_LIFECYCLE_STATUSES | _BUSINESS_MODEL_STATUSES
@@ -102,16 +103,24 @@ def _classify_tier(issue: dict) -> str:
 
 
 def _is_recently_verified(issue: dict, today: date) -> bool:
-    """True for a business-model entry whose reasonVerified is within the
-    window (and not in the future). Missing or unparsable is never recent."""
-    if issue["status"] not in _BUSINESS_MODEL_STATUSES:
-        return False
+    """True when a person's reasonVerified date makes re-listing pointless:
+    on or after the latest pub.dev release date (any tier), or, for a
+    business-model entry, within the day window. Missing, unparsable or
+    future reasonVerified is never verified."""
     try:
         verified = date.fromisoformat(str(issue.get("reasonVerified", "")))
     except ValueError:
         return False
-    return verified <= today and today - verified < timedelta(
-        days=_RECENTLY_VERIFIED_DAYS
+    if verified > today:
+        return False
+    try:
+        latest = date.fromisoformat(str(issue.get("_actual_published", ""))[:10])
+    except ValueError:
+        latest = None
+    if latest is not None and verified >= latest:
+        return True
+    return issue["status"] in _BUSINESS_MODEL_STATUSES and (
+        today - verified < timedelta(days=_RECENTLY_VERIFIED_DAYS)
     )
 
 
@@ -237,9 +246,9 @@ def render_markdown(report: KnownIssuesReviewReport, *, generated_on: str) -> st
         f"({report.network_error_count} network error(s)); "
         f"{len(report.entries)} appear outgrown by a newer release"
         + (
-            f" ({report.skipped_recently_verified_count} business-model "
-            f"entries skipped from the outgrown list as verified within the "
-            f"last {_RECENTLY_VERIFIED_DAYS} days)."
+            f" ({report.skipped_recently_verified_count} entries skipped "
+            f"because a person already verified their reason recently or "
+            f"since the latest release)."
             if report.skipped_recently_verified_count
             else "."
         ),

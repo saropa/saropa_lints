@@ -136,8 +136,45 @@ class TestRecentlyVerifiedSkip(unittest.TestCase):
         r = self._run("commercial", None, as_of="2026-11-01")
         self.assertEqual(len(r.entries), 1)
 
-    def test_lifecycle_entry_with_recent_as_of_listed(self) -> None:
-        self.assertEqual(len(self._run("end_of_life", "2026-09-19").entries), 1)
+    def test_lifecycle_entry_verified_after_latest_release_skipped(self) -> None:
+        # Latest release 2026-06-01; verified 2026-09-19 (after it).
+        r = self._run("end_of_life", "2026-09-19")
+        self.assertEqual(r.entries, [])
+        self.assertEqual(r.skipped_recently_verified_count, 1)
+
+    def test_lifecycle_entry_verified_before_latest_release_listed(self) -> None:
+        self.assertEqual(len(self._run("end_of_life", "2026-05-31").entries), 1)
+
+    def test_lifecycle_entry_verified_on_release_date_skipped(self) -> None:
+        self.assertEqual(self._run("end_of_life", "2026-06-01").entries, [])
+
+    def test_lifecycle_entry_future_verified_listed(self) -> None:
+        self.assertEqual(len(self._run("end_of_life", "2026-12-01").entries), 1)
+
+    def test_old_low_entry_verified_after_release_skipped(self) -> None:
+        # Verified long ago (outside 183 days) but after the release.
+        r = self._run("commercial", "2026-06-02", _actual_published="2025-01-01")
+        self.assertEqual(r.entries, [])
+
+
+class TestZeroEntriesWritesNoFile(unittest.TestCase):
+    def test_generator_write_with_no_entries_creates_no_file(self) -> None:
+        from scripts.generators import generate_known_issues_review as gen
+        from scripts.modules._known_issues_review_report import (
+            KnownIssuesReviewReport,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            fake_file = Path(tmp) / "scripts" / "generators" / "gen.py"
+            fake_file.parent.mkdir(parents=True)
+            with patch.object(
+                gen, "build_known_issues_review_report",
+                return_value=KnownIssuesReviewReport(checked_count=3),
+            ), patch.object(gen, "__file__", str(fake_file)), patch(
+                "sys.argv", ["gen", "--write"]
+            ):
+                self.assertEqual(gen.main(), 0)
+            self.assertFalse((Path(tmp) / "plans").exists())
 
 
 class TestRunKnownIssuesChecksSharesOneFetch(unittest.TestCase):

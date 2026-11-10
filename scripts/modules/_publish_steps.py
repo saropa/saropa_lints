@@ -619,12 +619,18 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
         # either — a disk-write failure or a report-rendering bug is a
         # tooling defect, not a reason to stop shipping.
         try:
-            review_path = project_dir / "plans" / "known_issues_review.md"
-            review_path.parent.mkdir(parents=True, exist_ok=True)
-            review_path.write_text(
-                render_markdown(review_report, generated_on="(regenerated at publish time)"),
-                encoding="utf-8",
-            )
+            if review_report.entries:
+                review_path = project_dir / "plans" / "known_issues_review.md"
+                review_path.parent.mkdir(parents=True, exist_ok=True)
+                review_path.write_text(
+                    render_markdown(
+                        review_report,
+                        generated_on="(regenerated at publish time)",
+                    ),
+                    encoding="utf-8",
+                )
+            else:
+                print("known_issues review: nothing needed review; no file written.")
         except Exception as exc:  # noqa: BLE001 (see comment above)
             known_issues_check.append((
                 "warn",

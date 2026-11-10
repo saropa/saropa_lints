@@ -62,7 +62,9 @@ def main() -> int:
     generated_on = args.date or "(date not specified — pass --date YYYY-MM-DD)"
     markdown = render_markdown(report, generated_on=generated_on)
 
-    if args.write:
+    if args.write and not report.entries:
+        print("Nothing needed review; no file written.")
+    elif args.write:
         out_path = project_dir / "plans" / "known_issues_review.md"
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(markdown, encoding="utf-8")
