@@ -36,6 +36,13 @@ The publish-time queue (`plans/known_issues_review.md`) flagged 11 LOW-confidenc
 
 5. **The review queue becomes a tracked bug file** (owner, 2026-11-10). Each publish writes `bugs/YYYY-MM-DD_known_issues_review_queue.md`, tracked by git (no ignore rule). Every dated file is kept; the owner declined the recommended option to replace older files and skip empty runs. A second run on the same day overwrites that day's file. The old `plans/known_issues_review.md` path and its ignore rules are removed. Today's queue moves to `bugs/2026-11-10_known_issues_review_queue.md`.
 
+6. **Make the queue show only new work** (owner, 2026-11-10; chose all three ideas; recommended was 1 and 2). Reason: a later publish re-listed `flutter_sticky_header` and `google_api_availability`, already fixed today, because only business-model entries honored `reasonVerified`.
+   - Idea 1: any entry is skipped when its `reasonVerified` date is on or after the package's latest pub.dev release date. A new release brings it back. Business-model entries keep the 183-day rule as well.
+   - Idea 2: a publish with zero entries writes no queue file. Every file that is written is kept.
+   - Idea 3: a saved review command (local Claude Code skill at `.claude/skills/known-issues-review/SKILL.md`; `.claude/` is gitignored, so it is not tracked) that checks each queued entry, fixes it, records the findings in plans history and archives the queue file there.
+
+7. **No AI attribution in commits** (owner, 2026-11-10). No `Co-Authored-By` line or AI or model name in any commit. Today's 15 unpushed commits are rewritten to remove the line (owner chose the recommended option). Commits already on GitHub stay as they are.
+
 ## Findings for the 3 regenerated-queue entries (decision 4)
 
 All three reasons were rewritten; statuses unchanged; `reasonVerified: 2026-11-10` set.
