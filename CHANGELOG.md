@@ -77,6 +77,7 @@ Removes false positives from `avoid_hardcoded_colors` where colors define the th
 
 ### Internal
 
+- **Known-issues review report skips recently verified paid-package warnings:** the publish-time review no longer re-lists business-model (paid/commercial) entries whose `as_of` date is within the last 6 months, so a just-verified warning is not flagged again on every release. Lifecycle entries are unchanged.
 - **CI never changes dependency versions:** jobs now run on the Dart SDK the lockfile requires, fail if installing dependencies would change the lockfile, and the formatting bot can only commit source and test files, so it can no longer push a downgraded analyzer to a pull request.
 
 ---

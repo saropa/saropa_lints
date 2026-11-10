@@ -87,6 +87,45 @@ class TestReviewReportFromFetched(unittest.TestCase):
         )
 
 
+class TestRecentlyVerifiedSkip(unittest.TestCase):
+    TODAY = __import__("datetime").date(2026, 11, 10)
+
+    def _run(self, status: str, as_of: str | None) -> object:
+        from scripts.modules._known_issues_review_report import (
+            _review_report_from_fetched,
+        )
+
+        issue = {
+            "name": "pkg",
+            "status": status,
+            "reason": "Requires paid license",
+            "lastUpdated": "2026-01-01",
+            "_actual_published": "2026-06-01",
+            "_actual_version": "1.0.0",
+            "_is_discontinued": False,
+        }
+        if as_of is not None:
+            issue["as_of"] = as_of
+        return _review_report_from_fetched(
+            [issue], 0, checked_count=1, today=self.TODAY
+        )
+
+    def test_recent_as_of_low_entry_skipped(self) -> None:
+        r = self._run("commercial", "2026-09-19")
+        self.assertEqual(r.entries, [])
+        self.assertEqual(r.skipped_recently_verified_count, 1)
+
+    def test_old_as_of_low_entry_listed(self) -> None:
+        self.assertEqual(len(self._run("commercial", "2026-01-01").entries), 1)
+
+    def test_missing_or_bad_as_of_listed(self) -> None:
+        self.assertEqual(len(self._run("commercial", None).entries), 1)
+        self.assertEqual(len(self._run("commercial", "garbage").entries), 1)
+
+    def test_lifecycle_entry_with_recent_as_of_listed(self) -> None:
+        self.assertEqual(len(self._run("end_of_life", "2026-09-19").entries), 1)
+
+
 class TestRunKnownIssuesChecksSharesOneFetch(unittest.TestCase):
     """The core contract of the publish-pipeline integration: one fetch."""
 
