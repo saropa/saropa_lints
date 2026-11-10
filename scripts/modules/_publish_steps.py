@@ -568,7 +568,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     # surfaces the class of defect fixed 2026-08-18 (timezone flagged
     # "pre-null-safety" long after it shipped a null-safe release) so it's
     # caught before it goes stale for months. The review-report half
-    # regenerates plans/known_issues_review.md on every publish instead of
+    # regenerates bugs/YYYY-MM-DD_known_issues_review_queue.md on every publish instead of
     # only on manual invocation — a standalone-only tool goes stale exactly
     # like the data it's meant to catch going stale.
     #
@@ -579,6 +579,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     # network cost of the ~70-entry freshness scan that was already here.
     from scripts.modules._known_issues_review_report import (
         render_markdown,
+        review_report_path,
         run_known_issues_checks,
     )
 
@@ -620,7 +621,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
         # tooling defect, not a reason to stop shipping.
         try:
             if review_report.entries:
-                review_path = project_dir / "plans" / "known_issues_review.md"
+                review_path = review_report_path(project_dir)
                 review_path.parent.mkdir(parents=True, exist_ok=True)
                 review_path.write_text(
                     render_markdown(
@@ -634,16 +635,16 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
         except Exception as exc:  # noqa: BLE001 (see comment above)
             known_issues_check.append((
                 "warn",
-                f"known_issues_review.md regeneration errored ({exc}); skipped",
+                f"known issues review queue regeneration errored ({exc}); skipped",
                 [],
             ))
         else:
             if review_report.entries:
                 known_issues_check.append((
                     "warn",
-                    f"known_issues_review.md: {len(review_report.entries)} "
+                    f"known issues review queue: {len(review_report.entries)} "
                     f"entrie(s) queued for manual triage "
-                    f"(plans/known_issues_review.md regenerated)",
+                    f"({review_path.relative_to(project_dir).as_posix()} written)",
                     [],
                 ))
 

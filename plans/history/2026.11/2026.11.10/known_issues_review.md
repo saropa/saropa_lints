@@ -32,6 +32,20 @@ The publish-time queue (`plans/known_issues_review.md`) flagged 11 LOW-confidenc
 2. **Report skips business-model entries verified under 6 months ago** (owner, 2026-11-10; recommended option). A LOW-tier (business-model) entry whose `as_of` is less than 6 months before the run date is not listed. Lifecycle entries are unchanged.
 3. **The skip uses a new human-only date, `reasonVerified`, not `as_of`** (owner, 2026-11-10; recommended option). Reason: review found `scripts/dev/pubdev_snapshot.py` refreshes `as_of` on every entry with an ok pub.dev snapshot, without anyone reading the reason, so an `as_of` gate would hide unchecked claims (AppsFlyer's wrong claim carried a September `as_of`). `reasonVerified` is optional, set only after a person checks the reason, and never written by scripts. The 11 entries above get `reasonVerified: 2026-11-10`.
 
+4. **Review the 3 entries in the regenerated queue** (owner, 2026-11-10; recommended option): `flutter_sticky_header` (caution), `google_api_availability` (maintenance_mode), `blinkid_flutter` (commercial). All three released in the week before. Findings are recorded in the section below.
+
+5. **The review queue becomes a tracked bug file** (owner, 2026-11-10). Each publish writes `bugs/YYYY-MM-DD_known_issues_review_queue.md`, tracked by git (no ignore rule). Every dated file is kept; the owner declined the recommended option to replace older files and skip empty runs. A second run on the same day overwrites that day's file. The old `plans/known_issues_review.md` path and its ignore rules are removed. Today's queue moves to `bugs/2026-11-10_known_issues_review_queue.md`.
+
+## Findings for the 3 regenerated-queue entries (decision 4)
+
+All three reasons were rewritten; statuses unchanged; `reasonVerified: 2026-11-10` set.
+
+| Package | Verdict | Evidence | New reason |
+|---|---|---|---|
+| flutter_sticky_header (caution) | Rewrite | Changelog 0.7.0–0.11.0 has no physics or jank note. Open issue #111 (2026-11-03) reports scroll lag on recent Flutter. (pub.dev changelog; github.com/letsar/flutter_sticky_header/issues) | Open issue reports scroll performance lag on recent Flutter versions (letsar/flutter_sticky_header issue 111); the changelog notes no fix. |
+| google_api_availability (maintenance_mode) | Rewrite | No false-negative reports; the only related issue (#26) closed in 2022. 5.0.0 removed iOS; 5.0.1 and 5.1.0 are build and constraint updates. (pub.dev changelog; github.com/baseflowit/flutter-google-api-availability) | Releases are limited to SDK-constraint and build updates; Android-only since 5.0.0, which removed iOS support. |
+| blinkid_flutter (commercial) | Rewrite | Wrapper is MIT open source; SDK needs a license key; free trial key; production via Microblink sales, prices unpublished. (pub.dev; github.com/microblink/blinkid-flutter) | The wrapper is open source (MIT), but the Microblink BlinkID SDK requires a license key to initialize. A free trial key is available; production licenses are obtained from Microblink sales. |
+
 ## Review notes
 
 - Kept: the `appsflyer_sdk` migrationNotes change (it recommended Firebase Dynamic Links, which Google shut down in 2025).

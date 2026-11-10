@@ -174,7 +174,7 @@ class TestZeroEntriesWritesNoFile(unittest.TestCase):
                 "sys.argv", ["gen", "--write"]
             ):
                 self.assertEqual(gen.main(), 0)
-            self.assertFalse((Path(tmp) / "plans").exists())
+            self.assertFalse((Path(tmp) / "bugs").exists())
 
 
 class TestRunKnownIssuesChecksSharesOneFetch(unittest.TestCase):
@@ -348,6 +348,21 @@ class TestRenderMarkdown(unittest.TestCase):
         self.assertIn("LOW confidence", markdown)
         self.assertIn("pkgA", markdown)
         self.assertIn("_None._", markdown)  # medium/low sections are empty
+
+
+class ReviewReportPathTests(unittest.TestCase):
+    def test_valid_date_used(self) -> None:
+        from scripts.modules._known_issues_review_report import review_report_path
+
+        path = review_report_path(Path("/p"), "2026-08-18")
+        self.assertEqual(path, Path("/p/bugs/2026-08-18_known_issues_review_queue.md"))
+
+    def test_invalid_or_missing_date_falls_back_to_today(self) -> None:
+        from scripts.modules._known_issues_review_report import review_report_path
+
+        expected = f"{date.today().isoformat()}_known_issues_review_queue.md"
+        self.assertEqual(review_report_path(Path("/p"), "(not a date)").name, expected)
+        self.assertEqual(review_report_path(Path("/p")).name, expected)
 
 
 if __name__ == "__main__":

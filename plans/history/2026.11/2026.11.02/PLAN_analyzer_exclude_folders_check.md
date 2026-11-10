@@ -1,6 +1,6 @@
 # PROPOSAL: Check analyzer exclusions and suggest excluding folders for performance
 
-**Status: Implemented (pending merge)**
+**Status: Implemented and merged to main (2026-11-02). Archived 2026-11-10.**
 
 Created: 2026-11-02
 Type: Tooling / Infrastructure
@@ -127,7 +127,8 @@ Review risks:
 
 ## Commits
 
-- none yet
+- c93fa6f2 feat(extension): analyzer exclusions check with Add to dart.analysisExcludedFolders quick action
+- f2dd5a65 fix(extension): analyzer exclusions review fixes
 
 ## Review findings and fixes
 
