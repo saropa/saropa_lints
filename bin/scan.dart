@@ -103,6 +103,11 @@ Future<void> main(List<String> args) async {
     SaropaContext.runtimeProfilingEnabled = true;
   }
 
+  // `analyzer: exclude:` from the nearest analysis_options.yaml, then
+  // --exclude-globs (#403). Built once; also used by the stale-ignore file
+  // discovery so excluded files are never treated as scanned.
+  final excludeGlobs = [...loadAnalyzerExcludes(path), ...parsed.excludeGlobs];
+
   // --quiet: suppress ALL stderr progress/status from the scanner by routing
   // messages to a no-op sink. The caller gets only the exit code + stdout.
   final runner = ScanRunner(
@@ -118,7 +123,7 @@ Future<void> main(List<String> args) async {
     messageSink: parsed.quiet ? (_) {} : null,
     // Keep the IDE issue cap — scan output may feed the Problems tab.
     // disableIssueCap: false (default),
-    excludeGlobs: parsed.excludeGlobs,
+    excludeGlobs: excludeGlobs,
     includeGlobs: parsed.includeGlobs,
     // When the user explicitly names files via --files, honor that intent —
     // don't silently drop them because they sit under an excluded path
@@ -171,6 +176,8 @@ Future<void> main(List<String> args) async {
       formatJson,
       parsed.jsonFilePath,
       quiet,
+      excludeGlobs,
+      parsed.includeGlobs,
     );
     // _runFindStaleIgnores calls exit() internally.
   }
@@ -179,7 +186,14 @@ Future<void> main(List<String> args) async {
   // from the source files. Runs the same detection as --find-stale-ignores,
   // then writes the cleaned files back to disk.
   if (parsed.fixStaleIgnores) {
-    _runFixStaleIgnores(diagnostics, path, dartFiles, quiet);
+    _runFixStaleIgnores(
+      diagnostics,
+      path,
+      dartFiles,
+      quiet,
+      excludeGlobs,
+      parsed.includeGlobs,
+    );
     // _runFixStaleIgnores calls exit() internally.
   }
 
@@ -197,7 +211,11 @@ Future<void> main(List<String> args) async {
             )
             .where((f) => f.endsWith('.dart'))
             .toList()
-      : ScanRunner.discoverDartFiles(p.absolute(path));
+      : ScanRunner.discoverDartFiles(
+          p.absolute(path),
+          excludeGlobs: excludeGlobs,
+          includeGlobs: parsed.includeGlobs,
+        );
   final effectiveDiagnostics = filterIgnoredDiagnostics(
     diagnostics: diagnostics,
     files: scannedFiles,
@@ -505,6 +523,8 @@ void _runFindStaleIgnores(
   bool formatJson,
   String? jsonFilePath,
   bool quiet,
+  List<String> excludeGlobs,
+  List<String> includeGlobs,
 ) {
   // Resolve the scanned file list so we can parse ignore comments from every
   // file the scan covered — including files with zero diagnostics.
@@ -517,7 +537,11 @@ void _runFindStaleIgnores(
             )
             .where((f) => f.endsWith('.dart'))
             .toList()
-      : ScanRunner.discoverDartFiles(p.absolute(targetPath));
+      : ScanRunner.discoverDartFiles(
+          p.absolute(targetPath),
+          excludeGlobs: excludeGlobs,
+          includeGlobs: includeGlobs,
+        );
 
   final stale = detectStaleIgnores(diagnostics: diagnostics, files: files);
 
@@ -579,6 +603,8 @@ void _runFixStaleIgnores(
   String targetPath,
   List<String> dartFiles,
   bool quiet,
+  List<String> excludeGlobs,
+  List<String> includeGlobs,
 ) {
   // Resolve the scanned file list identically to _runFindStaleIgnores.
   final files = dartFiles.isNotEmpty
@@ -590,7 +616,11 @@ void _runFixStaleIgnores(
             )
             .where((f) => f.endsWith('.dart'))
             .toList()
-      : ScanRunner.discoverDartFiles(p.absolute(targetPath));
+      : ScanRunner.discoverDartFiles(
+          p.absolute(targetPath),
+          excludeGlobs: excludeGlobs,
+          includeGlobs: includeGlobs,
+        );
 
   final stale = detectStaleIgnores(diagnostics: diagnostics, files: files);
 

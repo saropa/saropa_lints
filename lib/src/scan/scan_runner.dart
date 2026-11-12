@@ -1050,9 +1050,13 @@ class ScanRunner {
           .replaceAll('\\', '/');
       if (rel != '..' && !rel.startsWith('../')) relative = rel;
     }
+    // Absolute form too, so absolute globs (analyzer excludes, #403) match
+    // when the scan target is relative.
+    final absolute = p.absolute(path).replaceAll('\\', '/');
     return excludePatterns.any(
       (re) =>
           re.hasMatch(normalized) ||
+          re.hasMatch(absolute) ||
           (relative != null && re.hasMatch(relative)),
     );
   }
