@@ -74,8 +74,14 @@ Adds a rule that suggests the narrower width and height lookups on `MediaQuery`,
 
 - **`prefer_media_query_width_height_of`:** new rule (comprehensive tier, INFO, quick fix) that flags `MediaQuery.sizeOf(context).width` and `.height`, the `maybeSizeOf` form, and `MediaQuery.of(context).size.width`, because the whole screen size is watched when only one dimension is read; it stays silent on Flutter older than 3.35, where `widthOf` and `heightOf` do not exist, so no action is required there ([#406](https://github.com/saropa/saropa_lints/issues/406)).
 
----
+### Changed
 
+- **Bug report form is shorter ([#404](https://github.com/saropa/saropa_lints/issues/404)):** only the rule name, a summary, a code sample that shows the problem, expected versus actual behavior, and the saropa_lints version are required. Severity, frequency, the rule's source file and the attribution check are optional. The form says that reports without a code sample, or without replies to follow-up questions, may be closed.
+
+### Fixed
+
+- **`scan --exclude-globs` and `--include-globs` match relative to the scanned folder ([#405](https://github.com/saropa/saropa_lints/issues/405)):** a pattern such as `packages/**` now matches `packages/mypackage/lib/src/x.dart` under the folder being scanned. Before, only `**/packages/**` worked. Every pattern that worked before still works.
+>
 ## [17.1.0]
 
 The 17 line is out of beta: this is the first stable release since the 17.0.1 betas, and it includes all of their changes. It also removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
