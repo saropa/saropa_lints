@@ -373,14 +373,6 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
-    id: 'avoid_implementing_value_types_extended',
-    label: 'avoid_implementing_value_types_extended',
-    matchPubNames: [],
-    ruleCodes: [
-      'avoid_implementing_value_types_extended',
-    ],
-  },
-  {
     id: 'awesome_notifications',
     label: 'Awesome Notifications',
     matchPubNames: ['awesome_notifications'],
