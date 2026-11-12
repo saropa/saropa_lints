@@ -77,6 +77,7 @@ Adds a rule that suggests the narrower width and height lookups on `MediaQuery`,
 ### Changed
 
 - **Bug report form is shorter ([#404](https://github.com/saropa/saropa_lints/issues/404)):** only the rule name, a summary, a code sample that shows the problem, expected versus actual behavior, and the saropa_lints version are required. Severity, frequency, the rule's source file and the attribution check are optional. The form says that reports without a code sample, or without replies to follow-up questions, may be closed.
+- **Rule pack lists regenerated:** the VS Code extension's pack and tier lists now include every rule. `avoid_reexports` is no longer in the "Migrate from awesome_lints" and "Migrate from DCM" packs, because neither tool has a matching rule; it stays in the architecture pack.
 
 ### Fixed
 

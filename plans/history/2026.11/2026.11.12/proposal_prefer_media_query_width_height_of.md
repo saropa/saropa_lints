@@ -40,3 +40,7 @@ Generated lists (rule category map, rule pack codes, extension pack and tier def
 ## Scope notes (2026-11-12)
 
 `maybeOf(c)?.size.width` and `maybeOf(c)!.size.width` are out of scope for now. The `?.` chain case (for example `maybeSizeOf(c)?.width.toInt()`) is skipped on purpose, because the rewrite to `maybeWidthOf(c)` leaves a nullable receiver and would not compile.
+
+## Regeneration result (2026-11-12)
+
+Generator fixed to keep `getDetectedPackIds`, skip the one-rule file `avoid_implementing_value_types_extended_rules.dart` as a pack, and format its output. `avoid_reexports` dropped from the awesome_lints and DCM migration packs (no matching rule in either tool); owner agreed it needed no question.
