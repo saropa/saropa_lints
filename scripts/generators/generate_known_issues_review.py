@@ -46,7 +46,7 @@ def main() -> int:
     parser.add_argument(
         "--write",
         action="store_true",
-        help="Write the report to bugs/YYYY-MM-DD_known_issues_review_queue.md "
+        help="Write the report to reports/known_issues_review/YYYY-MM-DD_known_issues_review_queue.md "
         "(dated by --date if valid, else today) instead of stdout.",
     )
     parser.add_argument(

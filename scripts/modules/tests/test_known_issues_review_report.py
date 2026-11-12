@@ -360,7 +360,7 @@ class ReviewReportPathTests(unittest.TestCase):
         from scripts.modules._known_issues_review_report import review_report_path
 
         path = review_report_path(Path("/p"), "2026-08-18")
-        self.assertEqual(path, Path("/p/bugs/2026-08-18_known_issues_review_queue.md"))
+        self.assertEqual(path, Path("/p/reports/known_issues_review/2026-08-18_known_issues_review_queue.md"))
 
     def test_invalid_or_missing_date_falls_back_to_today(self) -> None:
         from scripts.modules._known_issues_review_report import review_report_path
