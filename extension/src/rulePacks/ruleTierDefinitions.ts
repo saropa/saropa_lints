@@ -1403,6 +1403,7 @@ export const RULE_TIER_BY_CODE: Readonly<Record<string, string>> = {
   'prefer_matcher_over_equals': 'recommended',
   'prefer_material_theme_colors': 'stylistic',
   'prefer_maybe_pop': 'professional',
+  'prefer_media_query_width_height_of': 'comprehensive',
   'prefer_member_ordering': 'stylistic',
   'prefer_merge_semantics': 'recommended',
   'prefer_method_channel_note_if_slow': 'comprehensive',

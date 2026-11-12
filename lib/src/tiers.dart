@@ -3018,6 +3018,7 @@ const Set<String> professionalOnlyRules = <String>{
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_reexports',
+  'prefer_media_query_width_height_of',
   // Cross-platform dependency compatibility (plugin_platform_support_rules.dart).
   // Comprehensive, not Essential: detection is anchored on the import and backed
   // by a curated list, so a project that imports a plugin but guards its calls

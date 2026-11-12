@@ -317,6 +317,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferSimplerBooleanExpressionsRule.new,
   PreferWhenGuardOverIfRule.new,
   PreferDedicatedMediaQueryMethodRule.new,
+  PreferMediaQueryWidthHeightOfRule.new,
   AvoidCascadeAfterIfNullRule.new,
   AvoidCascadeShuffleRule.new,
   AvoidDuplicateExportsRule.new,

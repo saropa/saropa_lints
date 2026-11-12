@@ -1689,6 +1689,13 @@ class Platform {
 class MediaQuery {
   static dynamic of(BuildContext context) => _MediaQueryData();
   static dynamic maybeOf(BuildContext context) => null;
+  static dynamic sizeOf(BuildContext context) => null;
+  static dynamic maybeSizeOf(BuildContext context) => null;
+  // widthOf/heightOf exist from Flutter 3.35; the rule needs them to report.
+  static double widthOf(BuildContext context) => 0;
+  static double heightOf(BuildContext context) => 0;
+  static double? maybeWidthOf(BuildContext context) => null;
+  static double? maybeHeightOf(BuildContext context) => null;
 }
 
 class _MediaQueryData {

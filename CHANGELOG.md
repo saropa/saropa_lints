@@ -66,6 +66,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.2.0] — Unreleased
+
+Adds a rule that suggests the narrower width and height lookups on `MediaQuery`, so widgets rebuild only when the dimension they read changes. [log](https://github.com/saropa/saropa_lints/blob/v17.2.0/CHANGELOG.md)
+
+### Added
+
+- **`prefer_media_query_width_height_of`:** new rule (comprehensive tier, INFO, quick fix) that flags `MediaQuery.sizeOf(context).width` and `.height`, the `maybeSizeOf` form, and `MediaQuery.of(context).size.width`, because the whole screen size is watched when only one dimension is read; it stays silent on Flutter older than 3.35, where `widthOf` and `heightOf` do not exist, so no action is required there ([#406](https://github.com/saropa/saropa_lints/issues/406)).
+
+---
+
 ## [17.1.0]
 
 The 17 line is out of beta: this is the first stable release since the 17.0.1 betas, and it includes all of their changes. It also removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)

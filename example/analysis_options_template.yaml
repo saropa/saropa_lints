@@ -1272,6 +1272,7 @@ saropa_lints:
     - prefer_closure_over_builder: false         # Opposite - closures for simplicity
     - prefer_fractionally_sized_box: false       # FractionallySizedBox over MediaQuery
     - prefer_media_query_over_fractional: false  # Opposite - explicit MediaQuery
+    - prefer_media_query_width_height_of: false  # INFO - widthOf/heightOf over sizeOf().width (comprehensive, Flutter 3.35+)
 
     # --- Null & Collection Style Rules (v2.7.0) ---
     - prefer_if_null_operator: false             # ?? over ternary null checks

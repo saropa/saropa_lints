@@ -156,6 +156,7 @@ plugins:
       # =========================================================================
       avoid_barrel_files: true
       avoid_reexports: true
+      prefer_media_query_width_height_of: true
       avoid_double_slash_imports: true
       avoid_duplicate_exports: true
       avoid_duplicate_named_imports: true

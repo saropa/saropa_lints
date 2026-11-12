@@ -1446,6 +1446,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'prefer_matcher_over_equals': 'testing',
   'prefer_material_theme_colors': 'stylistic',
   'prefer_maybe_pop': 'ui',
+  'prefer_media_query_width_height_of': 'code_quality',
   'prefer_member_ordering': 'stylistic',
   'prefer_merge_semantics': 'ui',
   'prefer_method_channel_note_if_slow': 'platforms',

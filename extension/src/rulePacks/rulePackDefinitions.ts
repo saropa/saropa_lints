@@ -630,6 +630,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'prefer_inferred_type_arguments',
       'prefer_late_final',
       'prefer_late_lazy_initialization',
+      'prefer_media_query_width_height_of',
       'prefer_moving_to_variable',
       'prefer_named_bool_params',
       'prefer_null_aware_spread',
