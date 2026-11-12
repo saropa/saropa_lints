@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.2.0] — Unreleased
+## [17.2.0]
 
 Adds a rule that suggests the narrower width and height lookups on `MediaQuery`, so widgets rebuild only when the dimension they read changes. [log](https://github.com/saropa/saropa_lints/blob/v17.2.0/CHANGELOG.md)
 
