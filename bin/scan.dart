@@ -761,6 +761,9 @@ void _printUsage() {
   print('  --files-from-stdin  Read one file path per line from stdin.');
   print('  --exclude-globs <p> Exclude files matching these glob patterns.');
   print(
+    '                      Patterns are matched relative to the scanned folder.',
+  );
+  print(
     '                      Supports ** (any path segments), * (any chars),',
   );
   print('                      ? (single char). Platform ephemeral dirs and');
