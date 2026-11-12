@@ -7,6 +7,7 @@ library;
 
 import 'dart:io' show File, Platform;
 
+import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart' show YamlList, YamlMap, loadYaml;
 import 'package:saropa_lints/src/native/config_loader.dart'
     show kIntegrationOffSentinel;
@@ -114,19 +115,32 @@ void _loadSeverityOverrides(
   }
 }
 
-/// Reads the `analyzer: exclude:` glob list from the project's
-/// `analysis_options.yaml` (#403), so the scan skips what `dart analyze`
-/// skips. Patterns are relative to [projectRoot]. Returns an empty list when
-/// the file, the section or valid YAML is missing.
-List<String> loadAnalyzerExcludes(String projectRoot) {
-  final content = _readFile(projectRoot, 'analysis_options.yaml');
+/// Reads `analyzer: exclude:` for a scan of [scanRoot] (#403).
+///
+/// Matches dart analyze: nearest analysis_options.yaml at or above the target;
+/// patterns are relative to its folder. Each pattern is returned as an
+/// absolute glob (that folder + pattern) so it matches however the scan
+/// target was given. Returns an empty list when no options file, no section
+/// or invalid YAML is found. Does not follow `include:` chains.
+List<String> loadAnalyzerExcludes(String scanRoot) {
+  var dir = p.normalize(p.absolute(scanRoot));
+  while (!File(p.join(dir, 'analysis_options.yaml')).existsSync()) {
+    final parent = p.dirname(dir);
+    if (parent == dir) return const [];
+    dir = parent;
+  }
+  final content = _readFile(dir, 'analysis_options.yaml');
   if (content == null) return const [];
   try {
     final doc = loadYaml(content);
     final analyzer = doc is YamlMap ? doc['analyzer'] : null;
     final exclude = analyzer is YamlMap ? analyzer['exclude'] : null;
     if (exclude is! YamlList) return const [];
-    return [for (final item in exclude) item.toString()];
+    final base = dir.replaceAll('\\', '/');
+    return [
+      for (final item in exclude)
+        if (item is String) '$base/$item',
+    ];
   } on Object {
     // Malformed YAML: rule loading has its own handling; add no excludes.
     return const [];

@@ -75,7 +75,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Fixed
 
 - **`scan --exclude-globs` and `--include-globs` match relative to the scanned folder ([#405](https://github.com/saropa/saropa_lints/issues/405)):** a pattern such as `packages/**` now matches `packages/mypackage/lib/src/x.dart` under the folder being scanned. Before, only `**/packages/**` worked. Every pattern that worked before still works.
-- **`scan` honors `analyzer: exclude:` ([#403](https://github.com/saropa/saropa_lints/issues/403)):** `dart run saropa_lints scan` now skips the paths listed under `analyzer: exclude:` in the project's `analysis_options.yaml`, the same as `dart analyze`. Patterns match relative to the scanned folder, like `--exclude-globs`. No action required.
+- **`scan` honors `analyzer: exclude:` ([#403](https://github.com/saropa/saropa_lints/issues/403)):** `dart run saropa_lints scan` now skips the paths listed under `analyzer: exclude:`. It uses the nearest `analysis_options.yaml` at or above the scanned folder, with patterns relative to that file's folder, which matches how `dart analyze` picks the options file. `--find-stale-ignores` and `--fix-stale-ignores` skip the same files. Explicit `--files` lists are not filtered, same as `--exclude-globs`. No action required.
 
 ## [17.1.0]
 

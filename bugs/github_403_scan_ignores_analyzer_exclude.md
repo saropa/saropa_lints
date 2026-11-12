@@ -44,6 +44,29 @@ analyzer.
   project root). Recommended option; chosen because users expect the scan to skip what the
   analyzer skips. The issue reply is posted only after release, with owner say-so.
 
+- 2026-11-12: analyzer.exclude comes from the nearest analysis_options.yaml at or above the
+  scanned folder, with patterns relative to that file's folder, matching dart analyze.
+  Recommended option, chosen so the scan skips the same files as dart analyze.
+
+## Review follow-up (2026-11-12)
+
+- `loadAnalyzerExcludes(scanRoot)` walks up from the scan target to the nearest
+  `analysis_options.yaml` and returns each pattern joined to that file's folder as an absolute
+  glob. Chosen because main's #405 matcher already tests the absolute path, so no matcher change
+  is needed and subfolder targets work. `bin/scan.dart` now passes an absolute `targetPath` so
+  discovered paths are absolute too.
+- `--find-stale-ignores` / `--fix-stale-ignores` file discovery (three
+  `ScanRunner.discoverDartFiles` calls) now gets the same combined exclude list (built once)
+  and the include globs, so excluded files are not treated as scanned and their ignore comments
+  are not reported or removed.
+- Non-string list items are skipped. `--files` lists are not filtered (same as
+  `--exclude-globs`).
+- Known limit: `include:` chains in analysis_options.yaml are not followed.
+- Known limit: matching is case-insensitive (the analyzer is case-sensitive).
+- Tests added: negative control, subfolder target, non-string items, `discoverDartFiles` with
+  analyzer excludes (the function the stale-ignore path calls; the CLI wiring itself is not
+  covered by a test).
+
 ## Implemented (2026-11-12)
 
 - `loadAnalyzerExcludes(projectRoot)` in `lib/src/scan/scan_config.dart` (exported from
@@ -77,3 +100,14 @@ relative-matching change was dropped; it now covers `analyzer: exclude:` only, f
 section above describes the first version; the relative-matching bullets there are superseded by
 #405. Tests: `test/scan/scan_analyzer_exclude_test.dart` (3 tests: reader, empty cases, end-to-end
 drop). Changelog: one bullet under `## [17.2.0]` / Fixed.
+
+## Review
+
+Verdict: no blocking defects; four non-blocking findings. Test run: `dart test test/scan/scan_analyzer_exclude_test.dart`, 3 passed, exit 0.
+
+1. Scan target a subfolder (`bin/scan.dart:~123`, `lib/src/scan/scan_config.dart:122`): the reader looks only in `<target>/analysis_options.yaml`. `scan lib/` in a project whose options file is at the project root reads nothing, so `analyzer.exclude` is silently not applied (the analyzer would apply it). Same limitation as `loadScanConfig`, but the changelog says "the same as `dart analyze`". Either state "the scanned folder's analysis_options.yaml" or accept.
+2. `--files` (`bin/scan.dart`, `applyExclusionsToFileList: dartFiles.isEmpty`): with explicit files, analyzer excludes (like `--exclude-globs`) are not applied. Consistent with existing intent; the changelog does not mention it.
+3. Reader fidelity (`scan_config.dart:122-130`): does not follow `include:` chains (an exclude defined in an included options file is missed); a non-string list item is turned into junk by `toString()`; matching is case-insensitive while the analyzer is case-sensitive. Rare.
+4. Tests: no negative control (same project without excludes yields 2 files), no test of the `bin/scan.dart` wiring or of a subfolder target. The message assertion (`'Scanning 1 files...'`) passes only if the exclude applied, so it is meaningful.
+
+Checked and fine: other `ScanRunner(` callers. `lsp_server.dart:1005` and `scan_daemon.dart:217` pass explicit files with exclusions off by design; `audit.dart` and `accuracy_report.dart` do not read excludes (no impact for IDE flows, where the analyzer already applied the exclude). The `lib/scan.dart` export is additive and consistent with `loadScanConfig`. The `yaml` dependency is already in pubspec. CHANGELOG bullet is otherwise accurate (relative matching comes from #405). The first "Implemented (2026-11-12)" section of this doc is stale and marked superseded.
