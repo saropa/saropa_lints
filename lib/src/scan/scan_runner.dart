@@ -1048,7 +1048,7 @@ class ScanRunner {
       final rel = p
           .relative(p.absolute(path), from: p.absolute(root))
           .replaceAll('\\', '/');
-      if (!rel.startsWith('..')) relative = rel;
+      if (rel != '..' && !rel.startsWith('../')) relative = rel;
     }
     return excludePatterns.any(
       (re) =>
