@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2387,
+  "ruleCount": 2388,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -32189,6 +32189,28 @@
       "correction": "Replace Navigator.pop(context) with Navigator.maybePop(context), or check canPop() before calling pop. This prevents runtime errors and ensures your app only attempts to pop routes when it is safe to do so.",
       "problemMessage": "[prefer_maybe_pop] Navigator.pop() called without verifying that a route exists on the navigation stack to pop. When the stack is empty or contains only the root route, this call throws a FlutterError at runtime, crashing the app. On Android, this also bypasses the system back button contract, preventing the app from exiting gracefully. {v3}",
       "impact": "warning",
+      "owasp": {
+        "mobile": [],
+        "web": []
+      }
+    },
+    "prefer_media_query_width_height_of": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "performance"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      },
+      "correction": "Use MediaQuery.widthOf(context) or MediaQuery.heightOf(context) (or the maybe variants) to depend on one dimension only.",
+      "problemMessage": "[prefer_media_query_width_height_of] Only the width or height is read from MediaQuery.sizeOf(context), so the widget also rebuilds when the other dimension changes (for example when the keyboard opens). {v1}",
+      "impact": "info",
       "owasp": {
         "mobile": [],
         "web": []

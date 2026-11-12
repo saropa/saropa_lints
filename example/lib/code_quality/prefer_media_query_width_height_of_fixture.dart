@@ -117,6 +117,10 @@ void _bad() {
   final maybeWidth = MediaQuery.maybeSizeOf(context)?.width;
   // expect_lint: prefer_media_query_width_height_of
   final legacyHeight = MediaQuery.of(context).size.height;
+  // expect_lint: prefer_media_query_width_height_of
+  final maybeHeight = MediaQuery.maybeSizeOf(context)?.height;
+  // expect_lint: prefer_media_query_width_height_of
+  final legacyWidth = MediaQuery.of(context).size.width;
 }
 
 // GOOD: Should NOT trigger prefer_media_query_width_height_of
@@ -129,4 +133,7 @@ void _good() {
   final size = MediaQuery.sizeOf(context);
   final w = size.width;
   final h = size.height;
+
+  // Not reported: the chain continues after `?.`, and the fix would not compile.
+  final rounded = MediaQuery.maybeSizeOf(context)?.width.toInt();
 }

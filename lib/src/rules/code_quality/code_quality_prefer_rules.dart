@@ -256,6 +256,16 @@ class PreferMediaQueryWidthHeightOfRule extends SaropaLintRule {
       // Flutter older than 3.35 has no widthOf: stay silent.
       if (element.getMethod('widthOf') == null) return;
 
+      // `maybeSizeOf(c)?.width.toInt()`: the fix would leave a nullable
+      // receiver for the rest of the chain and not compile, so skip it.
+      if (node.isNullAware) {
+        final AstNode? parent = node.parent;
+        if ((parent is PropertyAccess && parent.target == node) ||
+            (parent is MethodInvocation && parent.target == node)) {
+          return;
+        }
+      }
+
       reporter.atNode(node);
     });
   }

@@ -3018,7 +3018,6 @@ const Set<String> professionalOnlyRules = <String>{
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_reexports',
-  'prefer_media_query_width_height_of',
   // Cross-platform dependency compatibility (plugin_platform_support_rules.dart).
   // Comprehensive, not Essential: detection is anchored on the import and backed
   // by a curated list, so a project that imports a plugin but guards its calls
@@ -3160,6 +3159,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_geolocator_distance_filter', // battery optimization
   'prefer_inherited_widget_cache', // cache optimization
   'prefer_layout_builder_over_media_query', // rebuild optimization
+  'prefer_media_query_width_height_of', // rebuild optimization (Flutter 3.35+)
   'require_list_preallocate', // list allocation
   'require_const_list_items', // const constructor items in lists when possible
   'prefer_compute_over_isolate_run', // isolate efficiency

@@ -32,3 +32,11 @@ Scope of the rule (proposed):
 ## Implementation (2026-11-12)
 
 Implemented as `PreferMediaQueryWidthHeightOfRule` in `lib/src/rules/code_quality/code_quality_prefer_rules.dart`, fix in `lib/src/fixes/code_quality/prefer_media_query_width_height_of_fix.dart`. Comprehensive tier, INFO. Reports only the direct `sizeOf(...).width|height`, `maybeSizeOf(...)?.width|height` and `of(...).size.width|height` chains, and only when the resolved `MediaQuery` class declares `widthOf`. A stored `sizeOf` result is not flagged. Fixture: `example/lib/code_quality/prefer_media_query_width_height_of_fixture.dart` (the example mock `MediaQuery` gained `sizeOf`/`widthOf` members). Generated registry files were patched with only this rule (full regeneration also pulls in unrelated drift from other rules). Status: implemented.
+
+## Follow-up decision (2026-11-12)
+
+Generated lists (rule category map, rule pack codes, extension pack and tier definitions) miss entries for many existing rules. Owner chose: after this rule merges, regenerate them on main in a separate commit (recommended option).
+
+## Scope notes (2026-11-12)
+
+`maybeOf(c)?.size.width` and `maybeOf(c)!.size.width` are out of scope for now. The `?.` chain case (for example `maybeSizeOf(c)?.width.toInt()`) is skipped on purpose, because the rewrite to `maybeWidthOf(c)` leaves a nullable receiver and would not compile.
