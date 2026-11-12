@@ -31,6 +31,7 @@ plugins:
       prefer_const_border_radius: true
       prefer_correct_edge_insets_constructor: true
       prefer_text_rich: true
+      prefer_media_query_width_height_of: true
       prefer_define_hero_tag: true
       prefer_sliver_prefix: true
       prefer_widget_private_members: true

@@ -137,10 +137,16 @@ List<String> loadAnalyzerExcludes(String scanRoot) {
     final exclude = analyzer is YamlMap ? analyzer['exclude'] : null;
     if (exclude is! YamlList) return const [];
     final base = dir.replaceAll('\\', '/');
-    return [
-      for (final item in exclude)
-        if (item is String) '$base/$item',
-    ];
+    final globs = <String>[];
+    for (final item in exclude) {
+      if (item is String) {
+        final glob = p.posix.normalize('$base/$item');
+        globs.add(glob);
+        // Like dart analyze, a folder pattern also excludes its contents.
+        if (!glob.endsWith('**')) globs.add('$glob/**');
+      }
+    }
+    return globs;
   } on Object {
     // Malformed YAML: rule loading has its own handling; add no excludes.
     return const [];

@@ -26,6 +26,7 @@ import '../../fixes/code_quality/replace_expect_length_equals_zero_with_is_empty
 import '../../fixes/code_quality/replace_first_where_with_by_name_fix.dart';
 import '../../fixes/code_quality/add_missing_inlining_pragma_fix.dart';
 import '../../fixes/code_quality/prefer_dedicated_media_query_method_fix.dart';
+import '../../fixes/code_quality/prefer_media_query_width_height_of_fix.dart';
 import '../../fixes/code_quality/replace_where_is_empty_with_any_fix.dart';
 import '../../fixes/code_quality/simplify_boolean_comparison_fix.dart';
 import '../../fixes/code_quality/simplify_redundant_null_aware_spread_fix.dart';
@@ -176,6 +177,103 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         PreferDedicatedMediaQueryMethodFix(context: context),
+  ];
+}
+
+/// Warns when only the width or height of the screen is read through
+/// `MediaQuery.sizeOf(context)` (or `MediaQuery.of(context).size`).
+///
+/// Since: v17.2.0 | Rule version: v1
+///
+/// `MediaQuery.sizeOf(context).width` makes the widget rebuild when the height
+/// changes too (for example when the keyboard opens). `MediaQuery.widthOf`
+/// and `MediaQuery.heightOf` depend on one dimension only. They exist from
+/// Flutter 3.35, so the rule reports only when the resolved `MediaQuery` class
+/// declares `widthOf`; on older SDKs it stays silent.
+///
+/// Only the direct chain on the call is reported. One `sizeOf` result stored
+/// in a variable and used for both dimensions is correct and is not flagged.
+///
+/// **Quick fix available:** rewrites to `widthOf` / `heightOf` (or the
+/// `maybe` forms).
+///
+/// Example of **bad** code:
+/// ```dart
+/// final width = MediaQuery.sizeOf(context).width;
+/// final height = MediaQuery.maybeSizeOf(context)?.height;
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final width = MediaQuery.widthOf(context);
+/// final height = MediaQuery.maybeHeightOf(context);
+/// final size = MediaQuery.sizeOf(context); // both dimensions needed
+/// ```
+class PreferMediaQueryWidthHeightOfRule extends SaropaLintRule {
+  PreferMediaQueryWidthHeightOfRule() : super(code: _code);
+
+  /// Rebuild-scope optimization. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'performance'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
+
+  static const LintCode _code = LintCode(
+    'prefer_media_query_width_height_of',
+    '[prefer_media_query_width_height_of] Only the width or height is read from MediaQuery.sizeOf(context), so the widget also rebuilds when the other dimension changes (for example when the keyboard opens). {v1}',
+    correctionMessage:
+        'Use MediaQuery.widthOf(context) or MediaQuery.heightOf(context) (or the maybe variants) to depend on one dimension only.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPropertyAccess((PropertyAccess node) {
+      final String property = node.propertyName.name;
+      if (property != 'width' && property != 'height') return;
+
+      final MethodInvocation? call = mediaQuerySizeCall(node);
+      if (call == null) return;
+
+      final Expression? receiver = call.target;
+      if (receiver is! Identifier) return;
+      final Element? element = receiver.element;
+      if (element is! ClassElement || element.name != 'MediaQuery') return;
+
+      // Flutter older than 3.35 has no widthOf: stay silent.
+      if (element.getMethod('widthOf') == null) return;
+
+      // `maybeSizeOf(c)?.width.toInt()`: the fix would leave a nullable
+      // receiver for the rest of the chain and not compile, so skip it.
+      if (node.isNullAware) {
+        final AstNode? parent = node.parent;
+        if ((parent is PropertyAccess && parent.target == node) ||
+            (parent is MethodInvocation && parent.target == node)) {
+          return;
+        }
+      }
+
+      reporter.atNode(node);
+    });
+  }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferMediaQueryWidthHeightOfFix(context: context),
   ];
 }
 

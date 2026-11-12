@@ -67,6 +67,20 @@ analyzer.
   analyzer excludes (the function the stale-ignore path calls; the CLI wiring itself is not
   covered by a test).
 
+## Fresh-eyes round 2 fixes (2026-11-12)
+
+- Reverted `targetPath: p.absolute(path)` in `bin/scan.dart` (it made JSON `filePath` and report
+  grouping absolute for relative targets). `ScanRunner._matchesExcludeGlob` now also tests the
+  absolute form of each candidate path, so absolute analyzer-exclude globs match while displayed
+  paths stay as before. #405 matching is unchanged.
+- `loadAnalyzerExcludes` normalizes each joined pattern, so `./packages/**` works.
+- A pattern not ending in `**` (a folder such as `packages/a`) also emits `<pattern>/**`, as
+  `dart analyze` excludes the folder's contents.
+- The `excludeGlobs` comment in `bin/scan.dart` now sits directly above its declaration.
+- Tests: `./` pattern, folder pattern, and a relative-target check. A full `run()` on a relative
+  target fails in the analyzer file system (existing limitation), so the relative-path test checks
+  `ScanRunner.discoverDartFiles` output: paths stay relative and the exclude applies.
+
 ## Implemented (2026-11-12)
 
 - `loadAnalyzerExcludes(projectRoot)` in `lib/src/scan/scan_config.dart` (exported from

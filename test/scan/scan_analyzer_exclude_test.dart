@@ -5,6 +5,7 @@ library;
 
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
 import 'package:saropa_lints/scan.dart';
 import 'package:test/test.dart';
 
@@ -47,19 +48,63 @@ void main() {
     expect(loadAnalyzerExcludes(tempDir.path), [
       '$base/packages/**',
       '$base/**/*.g.dart',
+      '$base/**/*.g.dart/**',
     ]);
   });
 
-  test('returns empty for a missing section or bad YAML; skips non-strings', () {
-    options().writeAsStringSync('linter:\n  rules: []\n');
-    expect(loadAnalyzerExcludes(tempDir.path), isEmpty);
-    options().writeAsStringSync('analyzer: [unclosed\n');
-    expect(loadAnalyzerExcludes(tempDir.path), isEmpty);
+  test('normalizes patterns such as ./packages/**', () {
     options().writeAsStringSync(
-      'analyzer:\n  exclude:\n    - 42\n    - "packages/**"\n    - {a: b}\n',
+      'analyzer:\n  exclude:\n    - "./packages/**"\n',
     );
-    expect(loadAnalyzerExcludes(tempDir.path), hasLength(1));
+    final base = tempDir.path.replaceAll('\\', '/');
+    expect(loadAnalyzerExcludes(tempDir.path), ['$base/packages/**']);
+    expect(scannedCount(tempDir.path), 1);
   });
+
+  test('a folder pattern without /** also excludes its contents', () {
+    options().writeAsStringSync('analyzer:\n  exclude:\n    - "packages/a"\n');
+    expect(scannedCount(tempDir.path), 1);
+  });
+
+  test('relative target keeps relative paths and the exclude applies', () {
+    // Directory discovery on a relative target is the closest working case:
+    // a full run() with a relative target fails in the analyzer file system
+    // (existing limitation), so this checks the discovered file list.
+    final local = Directory.current.createTempSync('tmp_scan_403_');
+    try {
+      for (final f in ['lib/app.dart', 'packages/a/a.dart']) {
+        File('${local.path}/$f')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('void f() {}\n');
+      }
+      File(
+        '${local.path}/analysis_options.yaml',
+      ).writeAsStringSync('analyzer:\n  exclude:\n    - "packages/**"\n');
+      final rel = p.relative(local.path, from: Directory.current.path);
+      final files = ScanRunner.discoverDartFiles(
+        rel,
+        excludeGlobs: loadAnalyzerExcludes(rel),
+      );
+      expect(files, [p.join(rel, 'lib', 'app.dart')]);
+      expect(p.isRelative(files.single), isTrue);
+    } finally {
+      safeDeleteDir(local);
+    }
+  });
+
+  test(
+    'returns empty for a missing section or bad YAML; skips non-strings',
+    () {
+      options().writeAsStringSync('linter:\n  rules: []\n');
+      expect(loadAnalyzerExcludes(tempDir.path), isEmpty);
+      options().writeAsStringSync('analyzer: [unclosed\n');
+      expect(loadAnalyzerExcludes(tempDir.path), isEmpty);
+      options().writeAsStringSync(
+        'analyzer:\n  exclude:\n    - 42\n    - "packages/**"\n    - {a: b}\n',
+      );
+      expect(loadAnalyzerExcludes(tempDir.path), hasLength(1));
+    },
+  );
 
   test('negative control: no excludes scans both files', () {
     options().writeAsStringSync('linter:\n  rules: []\n');

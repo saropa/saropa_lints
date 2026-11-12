@@ -103,15 +103,15 @@ Future<void> main(List<String> args) async {
     SaropaContext.runtimeProfilingEnabled = true;
   }
 
-  // --quiet: suppress ALL stderr progress/status from the scanner by routing
-  // messages to a no-op sink. The caller gets only the exit code + stdout.
   // `analyzer: exclude:` from the nearest analysis_options.yaml, then
   // --exclude-globs (#403). Built once; also used by the stale-ignore file
   // discovery so excluded files are never treated as scanned.
   final excludeGlobs = [...loadAnalyzerExcludes(path), ...parsed.excludeGlobs];
+
+  // --quiet: suppress ALL stderr progress/status from the scanner by routing
+  // messages to a no-op sink. The caller gets only the exit code + stdout.
   final runner = ScanRunner(
-    // Absolute so the absolute analyzer-exclude globs match discovered paths.
-    targetPath: p.absolute(path),
+    targetPath: path,
     dartFiles: dartFiles.isEmpty ? null : dartFiles,
     tier: tier,
     debugRule: parsed.debugRule,

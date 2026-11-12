@@ -66,7 +66,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.2.0]
+## [17.2.0] — Unreleased
+
+Adds a rule that suggests the narrower width and height lookups on `MediaQuery`, so widgets rebuild only when the dimension they read changes. [log](https://github.com/saropa/saropa_lints/blob/v17.2.0/CHANGELOG.md)
+
+### Added
+
+- **`prefer_media_query_width_height_of`:** new rule (comprehensive tier, INFO, quick fix) that flags `MediaQuery.sizeOf(context).width` and `.height`, the `maybeSizeOf` form, and `MediaQuery.of(context).size.width`, because the whole screen size is watched when only one dimension is read; it stays silent on Flutter older than 3.35, where `widthOf` and `heightOf` do not exist, so no action is required there ([#406](https://github.com/saropa/saropa_lints/issues/406)).
 
 ### Changed
 
@@ -77,6 +83,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **`scan --exclude-globs` and `--include-globs` match relative to the scanned folder ([#405](https://github.com/saropa/saropa_lints/issues/405)):** a pattern such as `packages/**` now matches `packages/mypackage/lib/src/x.dart` under the folder being scanned. Before, only `**/packages/**` worked. Every pattern that worked before still works.
 - **`scan` honors `analyzer: exclude:` ([#403](https://github.com/saropa/saropa_lints/issues/403)):** `dart run saropa_lints scan` now skips the paths listed under `analyzer: exclude:`. It uses the nearest `analysis_options.yaml` at or above the scanned folder, with patterns relative to that file's folder, which matches how `dart analyze` picks the options file. `--find-stale-ignores` and `--fix-stale-ignores` skip the same files. Explicit `--files` lists are not filtered, same as `--exclude-globs`. No action required.
 
+>
 ## [17.1.0]
 
 The 17 line is out of beta: this is the first stable release since the 17.0.1 betas, and it includes all of their changes. It also removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)

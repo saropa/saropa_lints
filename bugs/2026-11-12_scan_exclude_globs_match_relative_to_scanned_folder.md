@@ -35,7 +35,4 @@ relative include-glob overrides a hardcoded exclusion. Existing
 
 ## Reply to the reporter
 
-Thanks for the report. This was a bug: patterns like `packages/**` were
-compared against the full path instead of the path inside the folder you
-scanned, so only `**/packages/**` matched. It is fixed and will be in the next
-release; until then `--exclude-globs "**/packages/**"` works.
+Good catch, and no, that's not expected. We were matching your pattern against the whole file path rather than the part inside the folder you scanned, which is why only the `**/` version worked. Fixed now, and it'll be in 17.2.0. Until then, `"**/packages/**"` will do the job.
