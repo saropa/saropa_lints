@@ -103,7 +103,8 @@ Known existing limitation (not changed): scanning a relative target whose path h
 directory discovery on a relative target, fails in the analyzer file system; the
 relative-target test uses an explicit file list instead.
 
-Status: fixed on branch, not merged. Issue reply after release, with owner say-so.
+Status: superseded by the sections below. Final state: fixed, reviewed and merged to main on
+2026-11-12 (commit e7788a2e), shipping in 17.2.0. Issue reply after release.
 
 ## Reconciled with main (2026-11-12)
 
