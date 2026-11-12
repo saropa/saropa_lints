@@ -178,6 +178,12 @@ String packIdForStem(String stem) {
   return stem;
 }
 
+/// Files in `lib/src/rules/packages` named `*_rules.dart` that hold a single
+/// rule and are not a pack (the stem is a rule name, not a pub package id).
+const Set<String> kNonPackRuleFiles = {
+  'avoid_implementing_value_types_extended_rules.dart',
+};
+
 Map<String, Set<String>> extractFromPackagesDir(Directory dir) {
   final out = <String, Set<String>>{};
   for (final entity in dir.listSync()) {
@@ -187,6 +193,7 @@ Map<String, Set<String>> extractFromPackagesDir(Directory dir) {
     final name = entity.uri.pathSegments.lastOrNull;
     if (name == null) continue;
     if (!name.endsWith('_rules.dart')) continue;
+    if (kNonPackRuleFiles.contains(name)) continue;
     final stem = name.replaceAll('.dart', '');
     final pack = packIdForStem(stem);
     final text = entity.readAsStringSync();

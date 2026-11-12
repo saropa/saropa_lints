@@ -9,6 +9,7 @@ stale, naming the run of this script as the fix.
 """
 
 import re
+import subprocess
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -62,6 +63,8 @@ def main() -> None:
     lines.append("};")
 
     OUTPUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Match committed formatting so regeneration does not churn the diff.
+    subprocess.run(["dart", "format", str(OUTPUT)], check=True)
     print(f"Generated {len(sorted_entries)} entries -> {OUTPUT}")
 
 
