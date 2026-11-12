@@ -118,7 +118,11 @@ Future<void> main(List<String> args) async {
     messageSink: parsed.quiet ? (_) {} : null,
     // Keep the IDE issue cap — scan output may feed the Problems tab.
     // disableIssueCap: false (default),
-    excludeGlobs: parsed.excludeGlobs,
+    // `analyzer: exclude:` from analysis_options.yaml, then --exclude-globs (#403).
+    excludeGlobs: [
+      ...loadAnalyzerExcludes(p.absolute(path)),
+      ...parsed.excludeGlobs,
+    ],
     includeGlobs: parsed.includeGlobs,
     // When the user explicitly names files via --files, honor that intent —
     // don't silently drop them because they sit under an excluded path

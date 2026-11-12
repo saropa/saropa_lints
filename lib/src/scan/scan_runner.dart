@@ -485,6 +485,7 @@ class ScanRunner {
         _excludePatterns,
         _includePatterns,
         noExclude,
+        targetPath,
       );
     }
     final root = p.absolute(targetPath);
@@ -510,6 +511,7 @@ class ScanRunner {
               _excludePatterns,
               _includePatterns,
               noExclude,
+              targetPath,
             ),
           )
           .toList();
@@ -917,6 +919,7 @@ class ScanRunner {
     List<RegExp> excludePatterns = const [],
     List<RegExp> includePatterns = const [],
     bool skipHardcodedExclusions = false,
+    String? projectRoot,
   ]) {
     final dir = io.Directory(directory);
     if (!dir.existsSync()) return const [];
@@ -931,6 +934,7 @@ class ScanRunner {
             excludePatterns,
             includePatterns,
             skipHardcodedExclusions,
+            projectRoot ?? directory,
           ),
         )
         .map((f) => p.normalize(f.path))
@@ -949,12 +953,18 @@ class ScanRunner {
     List<RegExp> excludePatterns,
     List<RegExp> includePatterns, [
     bool skipHardcodedExclusions = false,
+    String? projectRoot,
   ]) {
+    // User globs match the path relative to the project root (#403), so
+    // `packages/**` works for relative and absolute scan targets alike.
+    final globPath = projectRoot == null
+        ? path
+        : p.relative(p.absolute(path), from: p.absolute(projectRoot));
     // Include-globs override all exclusions — check first.
-    if (_matchesExcludeGlob(path, includePatterns)) return true;
+    if (_matchesExcludeGlob(globPath, includePatterns)) return true;
     // Normal exclusion chain: hardcoded defaults + user-supplied globs.
     if (!skipHardcodedExclusions && _isExcluded(path)) return false;
-    if (_matchesExcludeGlob(path, excludePatterns)) return false;
+    if (_matchesExcludeGlob(globPath, excludePatterns)) return false;
     return true;
   }
 

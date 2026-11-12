@@ -66,6 +66,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.2.0] — Unreleased
+
+### Fixed
+
+- **`scan` honors `analyzer: exclude:` (#403):** `dart run saropa_lints scan` now skips the paths listed under `analyzer: exclude:` in the project's `analysis_options.yaml`, the same as `dart analyze`. `--exclude-globs` and `--include-globs` patterns now match against the path relative to the project root, so `packages/**` works whether the scan target is relative or absolute (`**/packages/**` still works). A pattern that previously matched only because of a folder above the project root no longer does. `--no-exclude` still skips only the built-in list.
+
 ## [17.1.0]
 
 The 17 line is out of beta: this is the first stable release since the 17.0.1 betas, and it includes all of their changes. It also removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
