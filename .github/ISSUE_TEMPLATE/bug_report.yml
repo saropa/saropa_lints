@@ -18,14 +18,15 @@ body:
         reproduce.
 
         **Optional tip:** run `grep -rn "'rule_name'" lib/src/rules/` in the
-        saropa_lints repo to confirm the rule lives here. See
-        [Confirm Attribution Before Filing](../../bugs/ISSUE_REPORT_GUIDE.md#confirm-attribution-before-filing).
+        saropa_lints repo. Zero matches means the rule lives in another
+        package, so please file it there. See
+        [Confirm Attribution Before Filing](https://github.com/saropa/saropa_lints/blob/main/bugs/ISSUE_REPORT_GUIDE.md#confirm-attribution-before-filing).
 
   - type: dropdown
     id: severity
     attributes:
       label: Severity (optional)
-      description: Helps us triage, but not needed.
+      description: Helps us triage.
       options:
         - "False positive"
         - "False negative"
@@ -48,7 +49,7 @@ body:
       label: Rule source file (optional)
       description: >
         Helps us find the rule faster if you know it
-        (e.g. `lib/src/rules/category/xxx_rules.dart:42`). Not needed.
+        (e.g. `lib/src/rules/category/xxx_rules.dart:42`).
       placeholder: "lib/src/rules/category/xxx_rules.dart (line ~NNN)"
 
   # -- Summary --
@@ -67,7 +68,7 @@ body:
       label: Attribution evidence (optional)
       description: >
         Helps if the diagnostic source is unclear: paste the output of the
-        positive grep (and negative grep for sibling repos). Not needed.
+        positive grep (and negative grep for sibling repos).
       render: bash
       placeholder: |
         # Positive — rule IS defined here
