@@ -67,3 +67,13 @@ directory discovery on a relative target, fails in the analyzer file system; the
 relative-target test uses an explicit file list instead.
 
 Status: fixed on branch, not merged. Issue reply after release, with owner say-so.
+
+## Reconciled with main (2026-11-12)
+
+The relative-pattern part (second problem) landed on main as #405
+(`bugs/2026-11-12_scan_exclude_globs_match_relative_to_scanned_folder.md`). This branch's own
+relative-matching change was dropped; it now covers `analyzer: exclude:` only, feeding
+`loadAnalyzerExcludes` into the existing exclude list in `bin/scan.dart`. The "Implemented"
+section above describes the first version; the relative-matching bullets there are superseded by
+#405. Tests: `test/scan/scan_analyzer_exclude_test.dart` (3 tests: reader, empty cases, end-to-end
+drop). Changelog: one bullet under `## [17.2.0]` / Fixed.
