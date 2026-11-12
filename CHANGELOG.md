@@ -66,6 +66,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **`scan --exclude-globs` and `--include-globs` match relative to the scanned folder ([#405](https://github.com/saropa/saropa_lints/issues/405)):** a pattern such as `packages/**` now matches `packages/mypackage/lib/src/x.dart` under the folder being scanned. Before, only `**/packages/**` worked. Every pattern that worked before still works.
+
 ## [17.1.0]
 
 The 17 line is out of beta: this is the first stable release since the 17.0.1 betas, and it includes all of their changes. It also removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)

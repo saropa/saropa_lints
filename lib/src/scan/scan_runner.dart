@@ -510,6 +510,7 @@ class ScanRunner {
               _excludePatterns,
               _includePatterns,
               noExclude,
+              targetPath,
             ),
           )
           .toList();
@@ -909,8 +910,18 @@ class ScanRunner {
   /// project's discovered file list up front (e.g. the scan daemon's
   /// `listFiles` request, which the IDE baseline scan uses to build chunked
   /// batches before issuing per-chunk resolved scans).
-  static List<String> discoverDartFiles(String directory) =>
-      _findDartFiles(directory);
+  ///
+  /// Optional [excludeGlobs] / [includeGlobs] use the same matching as the
+  /// CLI flags (relative to [directory], or the path as listed).
+  static List<String> discoverDartFiles(
+    String directory, {
+    List<String> excludeGlobs = const [],
+    List<String> includeGlobs = const [],
+  }) => _findDartFiles(
+    directory,
+    excludeGlobs.map(_globToRegex).toList(),
+    includeGlobs.map(_globToRegex).toList(),
+  );
 
   static List<String> _findDartFiles(
     String directory, [
@@ -931,6 +942,7 @@ class ScanRunner {
             excludePatterns,
             includePatterns,
             skipHardcodedExclusions,
+            directory,
           ),
         )
         .map((f) => p.normalize(f.path))
@@ -949,12 +961,13 @@ class ScanRunner {
     List<RegExp> excludePatterns,
     List<RegExp> includePatterns, [
     bool skipHardcodedExclusions = false,
+    String? root,
   ]) {
     // Include-globs override all exclusions — check first.
-    if (_matchesExcludeGlob(path, includePatterns)) return true;
+    if (_matchesExcludeGlob(path, includePatterns, root)) return true;
     // Normal exclusion chain: hardcoded defaults + user-supplied globs.
     if (!skipHardcodedExclusions && _isExcluded(path)) return false;
-    if (_matchesExcludeGlob(path, excludePatterns)) return false;
+    if (_matchesExcludeGlob(path, excludePatterns, root)) return false;
     return true;
   }
 
@@ -1019,10 +1032,29 @@ class ScanRunner {
   }
 
   /// Returns true if [path] matches any of the compiled [excludePatterns].
-  static bool _matchesExcludeGlob(String path, List<RegExp> excludePatterns) {
+  ///
+  /// Each pattern is tested against the path as given and, when [root] is
+  /// set, against the path relative to [root] (forward slashes, no leading
+  /// `./`), so `packages/**` works whether the scan path is `.` or absolute.
+  static bool _matchesExcludeGlob(
+    String path,
+    List<RegExp> excludePatterns, [
+    String? root,
+  ]) {
     if (excludePatterns.isEmpty) return false;
     final normalized = path.replaceAll('\\', '/');
-    return excludePatterns.any((re) => re.hasMatch(normalized));
+    String? relative;
+    if (root != null) {
+      final rel = p
+          .relative(p.absolute(path), from: p.absolute(root))
+          .replaceAll('\\', '/');
+      if (!rel.startsWith('..')) relative = rel;
+    }
+    return excludePatterns.any(
+      (re) =>
+          re.hasMatch(normalized) ||
+          (relative != null && re.hasMatch(relative)),
+    );
   }
 }
 
