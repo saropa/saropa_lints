@@ -172,7 +172,7 @@ def get_failed_runs_safe(limit: int = 10) -> tuple[bool, list[dict]]:
         [
             "gh", "run", "list",
             "--limit", str(limit),
-            "--json", "databaseId,name,status,conclusion,event,headBranch,createdAt,workflowName",
+            "--json", "databaseId,name,status,conclusion,event,headBranch,headSha,createdAt,workflowName",
         ],
         cwd=get_project_dir(),
         capture_output=True,
@@ -193,11 +193,26 @@ def get_failed_runs_safe(limit: int = 10) -> tuple[bool, list[dict]]:
 OFFER_RETRIGGER_MAX_AGE_MINUTES = 60
 
 
+def _head_sha() -> str | None:
+    """Return the full local HEAD commit sha, or None if it cannot be read."""
+    r = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=get_project_dir(),
+        capture_output=True,
+        text=True,
+        shell=get_shell_mode(),
+    )
+    sha = r.stdout.strip()
+    return sha if r.returncode == 0 and sha else None
+
+
 def offer_retrigger_ci(limit: int = 10) -> None:
-    """If there are failed runs (current branch, last hour), display them and prompt to re-run / watch.
+    """If there are failed runs (current branch, last hour, HEAD commit), display them and prompt to re-run / watch.
 
     Used by publish. Only shows failures for the current git branch that were created in the last
-    OFFER_RETRIGGER_MAX_AGE_MINUTES, so old or other-branch failures do not trigger the prompt.
+    OFFER_RETRIGGER_MAX_AGE_MINUTES and ran on the local HEAD commit (``headSha``), so old,
+    other-branch, or already-superseded commit failures do not trigger the prompt. If HEAD
+    cannot be read, the HEAD-commit filter is skipped.
     """
     ok, failed_runs = get_failed_runs_safe(limit)
     if not ok or not failed_runs:
@@ -208,6 +223,9 @@ def offer_retrigger_ci(limit: int = 10) -> None:
         branch,
         OFFER_RETRIGGER_MAX_AGE_MINUTES,
     )
+    head = _head_sha()
+    if head is not None:
+        failed_runs = [r for r in failed_runs if r.get("headSha") == head]
     if not failed_runs:
         return
     print_warning(f"Found {len(failed_runs)} failed CI run(s):")
