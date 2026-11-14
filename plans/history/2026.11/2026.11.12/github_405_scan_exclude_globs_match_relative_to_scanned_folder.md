@@ -2,7 +2,7 @@
 
 Issue: https://github.com/saropa/saropa_lints/issues/405
 
-Status: fixed on branch, awaiting release.
+Status: resolved. Shipped in 17.2.0; GitHub issue closed.
 
 ## Cause
 
