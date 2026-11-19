@@ -191,7 +191,6 @@ dependencies:
 ##########################                                   #####################################
 ##################################################################################################
 dev_dependencies:
-  saropa_lints: ^17.2.0
   # A full featured library for writing and running Dart tests across platforms.
   # https://pub.dev/packages/test
   ################ Because test >=1.31.2 depends on analyzer >=13.0.0 <15.0.0 and saropa_lints depends on analyzer ^12.1.0, test >=1.31.2 is forbidden.
