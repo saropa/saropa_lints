@@ -121,7 +121,5 @@ void _good1437() {
     themeMode: ThemeMode.system, // Respects OS setting
   );
   // Or let user choose with setting stored:
-  MaterialApp(
-    themeMode: userThemePreference ?? ThemeMode.system,
-  );
+  MaterialApp(themeMode: userThemePreference ?? ThemeMode.system);
 }

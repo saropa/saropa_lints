@@ -115,7 +115,8 @@ void _bad382() async {
   Future<File> getUserFile(String filename) async {
     final dir = await getApplicationDocumentsDirectory();
     return File(
-        '${dir.path}/$filename'); // User could pass '../../../etc/passwd'!
+      '${dir.path}/$filename',
+    ); // User could pass '../../../etc/passwd'!
   }
 }
 
@@ -125,8 +126,9 @@ void _good382() async {
     final dir = await getApplicationDocumentsDirectory();
 
     // Sanitize: remove path separators and special sequences
-    final sanitized =
-        path.basename(filename).replaceAll(RegExp(r'[^\w.-]'), '');
+    final sanitized = path
+        .basename(filename)
+        .replaceAll(RegExp(r'[^\w.-]'), '');
 
     // Verify result is within intended directory
     final file = File(path.join(dir.path, sanitized));

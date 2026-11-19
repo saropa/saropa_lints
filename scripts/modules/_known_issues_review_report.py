@@ -19,6 +19,7 @@ Copyright: (c) 2025-2026 Saropa
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from scripts.modules._known_issues_freshness import (
@@ -41,6 +42,13 @@ _BUSINESS_MODEL_STATUSES = {
     "paid",
     "enterprise",
 }
+
+# Any entry whose human-only "reasonVerified" date (YYYY-MM-DD, set by a
+# person who read the reason; never by tooling, unlike "as_of") is on or after
+# the package's latest pub.dev release date is not re-listed; a newer release
+# brings it back. A business-model entry is also skipped when reasonVerified
+# is within this many days of the run date.
+_RECENTLY_VERIFIED_DAYS = 183
 
 _REVIEWABLE_STATUSES = CHECKABLE_LIFECYCLE_STATUSES | _BUSINESS_MODEL_STATUSES
 
@@ -77,6 +85,7 @@ class ReviewEntry:
 class KnownIssuesReviewReport:
     checked_count: int = 0
     network_error_count: int = 0
+    skipped_recently_verified_count: int = 0
     entries: list[ReviewEntry] = field(default_factory=list)
 
     def by_tier(self, tier: str) -> list[ReviewEntry]:
@@ -93,8 +102,34 @@ def _classify_tier(issue: dict) -> str:
     return "low"  # business-model status
 
 
+def _is_recently_verified(issue: dict, today: date) -> bool:
+    """True when a person's reasonVerified date makes re-listing pointless:
+    on or after the latest pub.dev release date (any tier), or, for a
+    business-model entry, within the day window. Missing, unparsable or
+    future reasonVerified is never verified."""
+    try:
+        verified = date.fromisoformat(str(issue.get("reasonVerified", "")))
+    except ValueError:
+        return False
+    if verified > today:
+        return False
+    try:
+        latest = date.fromisoformat(str(issue.get("_actual_published", ""))[:10])
+    except ValueError:
+        latest = None
+    if latest is not None and verified >= latest:
+        return True
+    return issue["status"] in _BUSINESS_MODEL_STATUSES and (
+        today - verified < timedelta(days=_RECENTLY_VERIFIED_DAYS)
+    )
+
+
 def _review_report_from_fetched(
-    fetched: list[dict], network_error_count: int, *, checked_count: int
+    fetched: list[dict],
+    network_error_count: int,
+    *,
+    checked_count: int,
+    today: date | None = None,
 ) -> KnownIssuesReviewReport:
     """Derive a review report from an already-fetched candidate set. Shared
     by ``build_known_issues_review_report`` and ``run_known_issues_checks``
@@ -103,9 +138,13 @@ def _review_report_from_fetched(
     report = KnownIssuesReviewReport(
         checked_count=checked_count, network_error_count=network_error_count
     )
+    today = today or date.today()
     for issue in fetched:
         if not is_outgrown(issue):
             continue  # not outgrown by pub.dev's account — nothing to review
+        if _is_recently_verified(issue, today):
+            report.skipped_recently_verified_count += 1
+            continue
         report.entries.append(
             ReviewEntry(
                 name=issue["name"],
@@ -168,8 +207,9 @@ def run_known_issues_checks(
     entries twice; this fetches the review candidate set once (a superset)
     and derives both results from it, so the publish pipeline pays for one
     ~302-entry pass instead of 70 + 302. Used by the publish pipeline, which
-    needs both the pass/warn gate line and a fresh ``known_issues_review.md``
-    on every run — see ``scripts/modules/_publish_steps.py``.
+    needs both the pass/warn gate line and a fresh dated review report
+    (``reports/known_issues_review/YYYY-MM-DD_known_issues_review_queue.md``, git-ignored) on every run — see
+    ``scripts/modules/_publish_steps.py``.
     """
     issues = load_known_issues(project_dir)
     # Skip version-scoped entries — see build_known_issues_review_report.
@@ -197,6 +237,21 @@ def run_known_issues_checks(
     return freshness, review
 
 
+def review_report_path(project_dir: Path, date_text: str | None = None) -> Path:
+    """Return ``reports/known_issues_review/YYYY-MM-DD_known_issues_review_queue.md`` under *project_dir*.
+
+    Uses *date_text* when it parses as a real YYYY-MM-DD date, else today.
+    Shared by the publish pipeline and the standalone generator.
+    """
+    day = date.today()
+    if date_text:
+        try:
+            day = datetime.strptime(date_text, "%Y-%m-%d").date()
+        except ValueError:
+            pass
+    return project_dir / "reports" / "known_issues_review" / f"{day.isoformat()}_known_issues_review_queue.md"
+
+
 def render_markdown(report: KnownIssuesReviewReport, *, generated_on: str) -> str:
     """Render the report as a Markdown triage list, one section per tier."""
     lines = [
@@ -205,7 +260,14 @@ def render_markdown(report: KnownIssuesReviewReport, *, generated_on: str) -> st
         f"Generated {generated_on}. Checked {report.checked_count} "
         f"lifecycle/business-model entries against live pub.dev "
         f"({report.network_error_count} network error(s)); "
-        f"{len(report.entries)} appear outgrown by a newer release.",
+        f"{len(report.entries)} appear outgrown by a newer release"
+        + (
+            f" ({report.skipped_recently_verified_count} entries skipped "
+            f"because a person already verified their reason recently or "
+            f"since the latest release)."
+            if report.skipped_recently_verified_count
+            else "."
+        ),
         "",
         "Each entry needs a human read of the current reason against the "
         "package's present state before editing `known_issues.json` — this "

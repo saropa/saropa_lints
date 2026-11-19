@@ -146,3 +146,58 @@ void _goodConstantWriteConstantValue(List<int> curr, int m) {
     curr[0] = 42;
   }
 }
+
+// GOOD: length proven by a preceding early-exit guard.
+void _goodLengthGuardContinue(List<String> lines) {
+  for (final String line in lines) {
+    final List<String> cols = line.split('\t');
+    if (cols.length != 2 || line.startsWith('#')) continue;
+    final key = cols[0];
+    final val = cols[1];
+  }
+}
+
+// GOOD: length proven by the left operand of `&&`.
+void _goodLengthGuardAnd(List<List<String>> rows) {
+  for (final List<String> c in rows) {
+    final bool ok = c.length == 2 && c[0].isNotEmpty && c[1].isNotEmpty;
+  }
+}
+
+// GOOD: length proven by an enclosing `if`.
+void _goodLengthGuardIf(List<List<String>> rows) {
+  for (final List<String> c in rows) {
+    if (c.length > 1) {
+      print(c[1]);
+    }
+  }
+}
+
+// BAD: near miss, no length guard on the collection that is indexed.
+// expect_lint: avoid_accessing_collections_by_constant_index
+void _badNoLengthGuard(List<String> lines, List<String> other) {
+  for (final String line in lines) {
+    if (other.length != 2) continue;
+    print(line[0]);
+  }
+}
+
+// BAD: `length == 0` in the then-branch proves nothing about the index.
+void _badEmptyCheckThen(List<List<String>> rows) {
+  for (final List<String> c in rows) {
+    if (c.length == 0) {
+      // expect_lint: avoid_accessing_collections_by_constant_index
+      print(c[1]);
+    }
+  }
+}
+
+// BAD: `length < 2` in the then-branch is the opposite of a guard.
+void _badShortCheckThen(List<List<String>> rows) {
+  for (final List<String> c in rows) {
+    if (c.length < 2) {
+      // expect_lint: avoid_accessing_collections_by_constant_index
+      print(c[0]);
+    }
+  }
+}

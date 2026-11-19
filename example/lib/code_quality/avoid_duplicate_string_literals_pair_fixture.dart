@@ -104,6 +104,10 @@
 // Source: lib\src\rules\code_quality_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
+// GOOD: Directive URIs are compiler-mandated string literals and cannot be
+// extracted to a constant, so the same URI appearing in both an import and
+// an export directive must NOT trigger avoid_duplicate_string_literals_pair.
+export 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 

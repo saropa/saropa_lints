@@ -115,8 +115,14 @@ Widget _bad793_build(BuildContext context) {
   return RichText(
     text: TextSpan(
       children: [
-        TextSpan(text: 'Hello ', style: TextStyle(color: Colors.black)),
-        TextSpan(text: 'World', style: TextStyle(color: Colors.blue)),
+        TextSpan(
+          text: 'Hello ',
+          style: TextStyle(color: Colors.black),
+        ),
+        TextSpan(
+          text: 'World',
+          style: TextStyle(color: Colors.blue),
+        ),
       ],
     ),
   );
@@ -127,8 +133,14 @@ void _good793() {
   // Cache as static const or class field
   final _textSpan = TextSpan(
     children: [
-      TextSpan(text: 'Hello ', style: TextStyle(color: Colors.black)),
-      TextSpan(text: 'World', style: TextStyle(color: Colors.blue)),
+      TextSpan(
+        text: 'Hello ',
+        style: TextStyle(color: Colors.black),
+      ),
+      TextSpan(
+        text: 'World',
+        style: TextStyle(color: Colors.blue),
+      ),
     ],
   );
 

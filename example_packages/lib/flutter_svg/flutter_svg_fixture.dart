@@ -31,8 +31,7 @@ class SvgPicture {
     double? height,
     Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
     Widget Function(BuildContext)? placeholderBuilder,
-  }) =>
-      const SizedBox.shrink();
+  }) => const SizedBox.shrink();
 
   // ignore: prefer_constructors_over_static_methods
   static Widget network(
@@ -46,8 +45,7 @@ class SvgPicture {
     double? height,
     Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
     Widget Function(BuildContext)? placeholderBuilder,
-  }) =>
-      const SizedBox.shrink();
+  }) => const SizedBox.shrink();
 
   // ignore: prefer_constructors_over_static_methods
   static Widget string(
@@ -58,8 +56,7 @@ class SvgPicture {
     double? width,
     double? height,
     Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
-  }) =>
-      const SizedBox.shrink();
+  }) => const SizedBox.shrink();
 
   // ignore: prefer_constructors_over_static_methods
   static Widget memory(
@@ -70,8 +67,7 @@ class SvgPicture {
     double? width,
     double? height,
     Widget Function(BuildContext, Object, StackTrace?)? errorBuilder,
-  }) =>
-      const SizedBox.shrink();
+  }) => const SizedBox.shrink();
 }
 
 // ---------------------------------------------------------------------------
@@ -80,7 +76,11 @@ class SvgPicture {
 
 void badPreferSvgColorFilter() {
   // LINT: prefer_svg_color_filter — color + colorBlendMode both present
-  SvgPicture.asset('icon.svg', color: Colors.red, colorBlendMode: BlendMode.srcIn);
+  SvgPicture.asset(
+    'icon.svg',
+    color: Colors.red,
+    colorBlendMode: BlendMode.srcIn,
+  );
 
   // LINT: prefer_svg_color_filter — color only (colorBlendMode absent; srcIn default)
   SvgPicture.asset('icon.svg', color: Colors.blue);
@@ -105,7 +105,10 @@ void goodPreferSvgColorFilter() {
   const Icon(Icons.home, color: Colors.red); // OK — FP guard
 
   // OK — FP guard: Container has a color argument but is not SvgPicture
-  Container(color: Colors.blue, child: const SizedBox.shrink()); // OK — FP guard
+  Container(
+    color: Colors.blue,
+    child: const SizedBox.shrink(),
+  ); // OK — FP guard
 }
 
 // ---------------------------------------------------------------------------
@@ -127,7 +130,8 @@ void goodSvgNetworkMissingErrorBuilder() {
   // OK — errorBuilder present
   SvgPicture.network(
     'https://example.com/icon.svg',
-    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+    errorBuilder: (context, error, stackTrace) =>
+        const Icon(Icons.broken_image),
     placeholderBuilder: (context) => const CircularProgressIndicator(),
     semanticsLabel: 'Remote icon',
   );
@@ -203,7 +207,10 @@ void goodSvgMissingSemanticsLabel() {
   const Icon(Icons.star, color: Colors.yellow); // OK — FP guard
 
   // OK — FP guard: Container — not SvgPicture
-  Container(color: Colors.green, child: const SizedBox.shrink()); // OK — FP guard
+  Container(
+    color: Colors.green,
+    child: const SizedBox.shrink(),
+  ); // OK — FP guard
 }
 
 // ---------------------------------------------------------------------------
@@ -226,7 +233,8 @@ void goodSvgStringMissingErrorBuilder() {
   // OK — errorBuilder present on dynamic input
   SvgPicture.string(
     dynamicSvg as String,
-    errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+    errorBuilder: (context, error, stackTrace) =>
+        const Icon(Icons.broken_image),
     semanticsLabel: 'Dynamic SVG',
   );
 

@@ -114,7 +114,7 @@ void _bad801_initState() {
   someStream.listen((data) {
     setState(() => _data = data); // Captures State
   });
-// super.initState();
+  // super.initState();
 }
 
 // GOOD: Should NOT trigger avoid_closure_memory_leak

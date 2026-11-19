@@ -27,8 +27,9 @@ void badListViewSeparated(BuildContext context) {
 void badGridViewBuilder(BuildContext context) {
   // LINT: prefer_cache_extent
   final bad = GridView.builder(
-    gridDelegate:
-        const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+    ),
     itemCount: 100,
     itemBuilder: (context, i) => ListTile(title: Text('$i')),
   );

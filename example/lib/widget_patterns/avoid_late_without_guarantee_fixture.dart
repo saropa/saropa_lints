@@ -121,7 +121,7 @@ class _bad1454_MyWidget extends StatefulWidget {
 class _good1454_MyWidget extends StatefulWidget {
   String? _data; // Null-safe alternative
 
-// Or use late only with guaranteed init in initState:
+  // Or use late only with guaranteed init in initState:
   late final AnimationController _controller;
 
   @override

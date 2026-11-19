@@ -204,9 +204,7 @@ class MutableTearoffRule extends SaropaLintRule {
       // Positional record field: `(handler.handleTap,)`.
       return true;
     }
-    if (parent is NamedExpression &&
-        parent.expression == node &&
-        parent.parent is RecordLiteral) {
+    if (parent is RecordLiteralNamedField && parent.fieldExpression == node) {
       // Named record field: `(named: handler.handleTap,)`. Deliberately
       // NOT true for a named expression whose parent is an argument list
       // (`fn(named: handler.handleTap)`) — that shape is a call argument,

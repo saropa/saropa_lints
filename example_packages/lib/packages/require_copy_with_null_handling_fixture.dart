@@ -161,7 +161,10 @@ class Settings {
 
   // expect_lint: require_copy_with_null_handling
   Settings copyWith({String? theme, bool? enabled}) {
-    return Settings(theme: theme ?? this.theme, enabled: enabled ?? this.enabled);
+    return Settings(
+      theme: theme ?? this.theme,
+      enabled: enabled ?? this.enabled,
+    );
   }
 }
 

@@ -8,6 +8,9 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/source_range.dart';
 
 import '../../import_utils.dart';
@@ -701,13 +704,13 @@ Set<String> _readUniqueIndexColumns(ClassDeclaration decl) {
     bool? unique;
     Set<String>? cols;
     for (final arg in args) {
-      if (arg is! NamedExpression) continue;
-      final label = arg.name.label.name;
+      if (arg is! NamedArgument) continue;
+      final label = arg.name.lexeme;
       if (label == 'unique') {
-        final expr = arg.expression;
+        final expr = arg.argumentExpression;
         if (expr is BooleanLiteral) unique = expr.value;
       } else if (label == 'columns') {
-        cols = _parseSymbolSet(arg.expression);
+        cols = _parseSymbolSet(arg.argumentExpression);
       }
     }
     if (unique != true || cols == null || cols.isEmpty) continue;
@@ -771,7 +774,7 @@ String? _extractTargetTableIdentifier(MethodInvocation node) {
   // Batch shapes pass the table as the first positional argument.
   if (methodName == 'insert' || methodName == 'insertAll') {
     final positional = node.argumentList.arguments
-        .where((a) => a is! NamedExpression)
+        .whereType<Expression>()
         .toList();
     if (positional.isNotEmpty) {
       final fromArg = _identifierOfTableExpr(positional.first);
@@ -788,7 +791,7 @@ String? _extractTargetTableIdentifier(MethodInvocation node) {
     // Walk into `into(<table>)` when the target is such a call.
     if (target is MethodInvocation && target.methodName.name == 'into') {
       final intoArgs = target.argumentList.arguments
-          .where((a) => a is! NamedExpression)
+          .whereType<Expression>()
           .toList();
       if (intoArgs.isNotEmpty) {
         return _identifierOfTableExpr(intoArgs.first);
@@ -836,7 +839,7 @@ bool _hasMatchingConflictTarget(MethodInvocation node, Set<String> uniqueCols) {
   final onConflict = _namedArg(node, 'onConflict');
   if (onConflict == null) return false;
 
-  Expression value = onConflict.expression;
+  Expression value = onConflict.argumentExpression;
   // Allow nested parens/as/await.
   while (value is ParenthesizedExpression) {
     value = value.expression;
@@ -854,7 +857,7 @@ bool _hasMatchingConflictTarget(MethodInvocation node, Set<String> uniqueCols) {
       return false;
     }
     final target = _namedArgFromArgList(value.argumentList, 'target');
-    return _targetSetContainsAny(target?.expression, uniqueCols);
+    return _targetSetContainsAny(target?.argumentExpression, uniqueCols);
   }
   if (value is MethodInvocation) {
     // DoUpdate.withExcluded(...) — receiver is the class name.
@@ -864,7 +867,7 @@ bool _hasMatchingConflictTarget(MethodInvocation node, Set<String> uniqueCols) {
     final isBareCtor = value.methodName.name == 'DoUpdate';
     if (!isNamedCtor && !isBareCtor) return false;
     final target = _namedArgFromArgList(value.argumentList, 'target');
-    return _targetSetContainsAny(target?.expression, uniqueCols);
+    return _targetSetContainsAny(target?.argumentExpression, uniqueCols);
   }
   return false;
 }
@@ -887,7 +890,7 @@ bool _targetSetContainsAny(Expression? expr, Set<String> uniqueCols) {
 bool _hasReplaceMode(MethodInvocation node) {
   final mode = _namedArg(node, 'mode');
   if (mode == null) return false;
-  final expr = mode.expression;
+  final expr = mode.argumentExpression;
   // Match InsertMode.replace regardless of whether it's via PrefixedIdentifier
   // or PropertyAccess (e.g. drift.InsertMode.replace).
   String? propertyName;
@@ -899,12 +902,12 @@ bool _hasReplaceMode(MethodInvocation node) {
   return propertyName == 'replace';
 }
 
-NamedExpression? _namedArg(MethodInvocation node, String name) =>
+NamedArgument? _namedArg(MethodInvocation node, String name) =>
     _namedArgFromArgList(node.argumentList, name);
 
-NamedExpression? _namedArgFromArgList(ArgumentList args, String name) {
+NamedArgument? _namedArgFromArgList(ArgumentList args, String name) {
   for (final arg in args.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) return arg;
+    if (arg is NamedArgument && arg.name.lexeme == name) return arg;
   }
   return null;
 }
@@ -1207,6 +1210,14 @@ class AvoidDriftRawSqlInterpolationRule extends SaropaLintRule {
 
       // Check for string interpolation
       if (firstArg is StringInterpolation) {
+        // Skip when every interpolated value is compile-time constant or a
+        // for-each variable over a literal list of plain strings: no
+        // external input can reach the SQL.
+        if (firstArg.elements.whereType<InterpolationExpression>().every(
+          (InterpolationExpression e) => _isConstantOrigin(e.expression),
+        )) {
+          return;
+        }
         reporter.atNode(firstArg);
         return;
       }
@@ -1216,6 +1227,155 @@ class AvoidDriftRawSqlInterpolationRule extends SaropaLintRule {
         reporter.atNode(firstArg);
       }
     });
+  }
+
+  static bool _isConstantOrigin(Expression expr) {
+    if (expr is StringLiteral) {
+      return expr is! StringInterpolation ||
+          expr.elements.whereType<InterpolationExpression>().every(
+            (InterpolationExpression e) => _isConstantOrigin(e.expression),
+          );
+    }
+    if (expr is ParenthesizedExpression) {
+      return _isConstantOrigin(expr.expression);
+    }
+    if (expr is! SimpleIdentifier) return false;
+
+    final Object? element = expr.element;
+    if (element is VariableElement && element.isConst) return true;
+
+    // Loop variable of `for (final x in <String>['a', 'b'])`.
+    AstNode? current = expr.parent;
+    while (current != null) {
+      if (current is ForStatement) {
+        final ForLoopParts parts = current.forLoopParts;
+        if (parts is ForEachPartsWithDeclaration &&
+            parts.loopVariable.name.lexeme == expr.name) {
+          final Expression iterable = parts.iterable;
+          final List<CollectionElement>? items = iterable is ListLiteral
+              ? iterable.elements
+              : iterable is SetOrMapLiteral && iterable.isSet
+              ? iterable.elements
+              : null;
+          return items != null &&
+              items.every(
+                (CollectionElement e) =>
+                    e is StringLiteral && e is! StringInterpolation,
+              );
+        }
+      }
+      current = current.parent;
+    }
+    return _isLiteralOnlyPrivateParameter(expr);
+  }
+
+  /// True when [expr] names a parameter of an enclosing private method or
+  /// private top-level function, and every reference to that function in the
+  /// file is a direct call passing a plain string literal for it. Any other
+  /// reference (tear-off, non-literal argument, missing argument, no callers)
+  /// returns false so the report is kept.
+  static bool _isLiteralOnlyPrivateParameter(SimpleIdentifier expr) {
+    final FormalParameterList? params;
+    final String fnName;
+    final AstNode? owner = expr.thisOrAncestorMatching(
+      (AstNode n) => n is MethodDeclaration || n is FunctionDeclaration,
+    );
+    if (owner is MethodDeclaration) {
+      params = owner.parameters;
+      fnName = owner.name.lexeme;
+    } else if (owner is FunctionDeclaration) {
+      // Nested local functions are not tracked; top-level only.
+      if (owner.parent is! CompilationUnit) return false;
+      params = owner.functionExpression.parameters;
+      fnName = owner.name.lexeme;
+    } else {
+      return false;
+    }
+    if (params == null || !fnName.startsWith('_')) return false;
+
+    FormalParameter? target;
+    int positionalIndex = 0;
+    int targetPositional = -1;
+    for (final FormalParameter p in params.parameters) {
+      if (p.isPositional) {
+        if (p.name?.lexeme == expr.name) targetPositional = positionalIndex;
+        positionalIndex++;
+      }
+      if (p.name?.lexeme == expr.name) target = p;
+    }
+    // Field-formal / super parameters are not plain locals.
+    if (target == null ||
+        target is FieldFormalParameter ||
+        target is SuperFormalParameter) {
+      return false;
+    }
+    final bool isNamed = target.isNamed;
+
+    final CompilationUnit? unit = owner
+        ?.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return false;
+    final _CallSiteScan scan = _CallSiteScan(
+      fnName,
+      isNamed ? expr.name : null,
+      targetPositional,
+    );
+    unit.accept(scan);
+    return scan.callCount > 0 && !scan.unsafe;
+  }
+}
+
+/// Collects references to a private function and checks the argument bound to
+/// one parameter at each call site.
+class _CallSiteScan extends RecursiveAstVisitor<void> {
+  _CallSiteScan(this.fnName, this.namedParam, this.positionalIndex);
+
+  final String fnName;
+  final String? namedParam;
+  final int positionalIndex;
+  int callCount = 0;
+  bool unsafe = false;
+  final Set<SimpleIdentifier> _callNames = <SimpleIdentifier>{};
+
+  static bool _isPlainLiteral(Expression e) =>
+      e is StringLiteral && e is! StringInterpolation;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == fnName) {
+      _callNames.add(node.methodName);
+      callCount++;
+      Expression? arg;
+      final NodeList<Argument> args = node.argumentList.arguments;
+      if (namedParam != null) {
+        for (final Argument a in args) {
+          if (a is NamedArgument && a.name.lexeme == namedParam) {
+            arg = a.argumentExpression;
+          }
+        }
+      } else {
+        final List<Argument> positional = args
+            .where((Argument a) => a is! NamedArgument)
+            .toList();
+        if (positionalIndex >= 0 && positionalIndex < positional.length) {
+          arg = positional[positionalIndex].argumentExpression;
+        }
+      }
+      if (arg == null || !_isPlainLiteral(arg)) unsafe = true;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    // Any other mention of the name (tear-off, prefixed access) is unknown.
+    if (node.name == fnName &&
+        !_callNames.contains(node) &&
+        node.parent is! MethodDeclaration &&
+        node.parent is! FunctionDeclaration &&
+        node.parent is! Label) {
+      unsafe = true;
+    }
+    super.visitSimpleIdentifier(node);
   }
 }
 
@@ -1260,6 +1420,9 @@ class PreferDriftBatchOperationsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_drift_batch_operations',
     '[prefer_drift_batch_operations] Individual Drift insert() or write() '
@@ -1287,12 +1450,58 @@ class PreferDriftBatchOperationsRule extends SaropaLintRule {
       if (!_insertMethods.contains(node.methodName.name)) return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
+      // `Batch.insert` / `Batch.write` already queue into a batch, and
+      // `UpdateStatement.write` (row-specific WHERE) has no insertAll form.
+      if (_isBatchOrUpdateReceiver(node)) return;
+
       // Check if inside a loop
       if (_isInsideLoop(node)) {
         reporter.atNode(node.methodName);
       }
     });
   }
+}
+
+bool _isBatchOrUpdateReceiver(MethodInvocation node) {
+  final Expression? target = node.target;
+  if (target == null) return false;
+  final String? typeName = target.staticType?.element?.name;
+  if (typeName == 'Batch') return true;
+  if (typeName == 'UpdateStatement' && node.methodName.name == 'write') {
+    return true;
+  }
+  if (typeName != null) return false;
+
+  // Unresolved fallback: receiver is the parameter of a `batch(...)` callback,
+  // or an `update(...)` statement (possibly cascaded / parenthesized).
+  if (node.methodName.name == 'write') {
+    Expression? t = target;
+    while (t is ParenthesizedExpression) {
+      t = t.expression;
+    }
+    if (t is CascadeExpression) t = t.target;
+    if (t is MethodInvocation && t.methodName.name == 'update') return true;
+  }
+  if (target is SimpleIdentifier) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) {
+        final AstNode? args = current.parent;
+        final AstNode? call = args?.parent;
+        if (args is ArgumentList &&
+            call is MethodInvocation &&
+            call.methodName.name == 'batch' &&
+            current.parameters?.parameters.any(
+                  (FormalParameter p) => p.name?.lexeme == target.name,
+                ) ==
+                true) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+  }
+  return false;
 }
 
 bool _isInsideLoop(AstNode node) {
@@ -1585,11 +1794,11 @@ class AvoidDriftLogStatementsProductionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      if (node.name.label.name != 'logStatements') return;
+    context.addNamedArgument((NamedArgument node) {
+      if (node.name.lexeme != 'logStatements') return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
-      final value = node.expression;
+      final value = node.argumentExpression;
       // Only flag if value is literal true
       if (value is BooleanLiteral && value.value) {
         reporter.atNode(node);
@@ -1749,7 +1958,7 @@ class PreferDriftUseColumnsFalseRule extends SaropaLintRule {
       // Check if useColumns parameter is already set
       final args = node.argumentList.arguments;
       for (final arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'useColumns') {
+        if (arg is NamedArgument && arg.name.lexeme == 'useColumns') {
           return;
         }
       }
@@ -2020,8 +2229,8 @@ class AvoidDriftQueryInMigrationRule extends SaropaLintRule {
   bool _isInsideMigrationCallback(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is NamedExpression) {
-        final label = current.name.label.name;
+      if (current is NamedArgument) {
+        final label = current.name.lexeme;
         if (_migrationCallbacks.contains(label)) return true;
       }
       // Stop at class boundary
@@ -2219,8 +2428,8 @@ class AvoidDriftForeignKeyInMigrationRule extends SaropaLintRule {
       // Check if inside onCreate or onUpgrade
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is NamedExpression) {
-          final label = current.name.label.name;
+        if (current is NamedArgument) {
+          final label = current.name.lexeme;
           if (_migrationCallbacks.contains(label)) {
             reporter.atNode(node);
             return;
@@ -2479,8 +2688,8 @@ class AvoidDriftCloseStreamsInTestsRule extends SaropaLintRule {
           if (wrapperType == 'DatabaseConnection') {
             // Check for closeStreamsSynchronously parameter
             for (final arg in grandparent.argumentList.arguments) {
-              if (arg is NamedExpression &&
-                  arg.name.label.name == 'closeStreamsSynchronously') {
+              if (arg is NamedArgument &&
+                  arg.name.lexeme == 'closeStreamsSynchronously') {
                 return; // Already wrapped correctly
               }
             }
@@ -2636,6 +2845,9 @@ class AvoidDriftValueNullVsAbsentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_drift_value_null_vs_absent',
     '[avoid_drift_value_null_vs_absent] Value(null) used in a Drift '
@@ -2663,11 +2875,25 @@ class AvoidDriftValueNullVsAbsentRule extends SaropaLintRule {
       if (args.length != 1) return;
 
       // Check if the single argument is null literal
-      if (args.first is NullLiteral) {
+      if (args.first is NullLiteral && !_isNullableValue(node)) {
         reporter.atNode(node);
       }
     });
   }
+}
+
+/// `Value<T?>(null)` (explicit or inferred) targets a nullable column, where
+/// it is the correct way to write SQL NULL.
+bool _isNullableValue(InstanceCreationExpression node) {
+  final TypeAnnotation? explicit =
+      node.constructorName.type.typeArguments?.arguments.firstOrNull;
+  if (explicit is NamedType) return explicit.question != null;
+  final DartType? type = node.staticType;
+  if (type is InterfaceType && type.typeArguments.isNotEmpty) {
+    final DartType arg = type.typeArguments.first;
+    return arg.toString().endsWith('?');
+  }
+  return false;
 }
 
 // =============================================================================
@@ -2710,6 +2936,9 @@ class RequireDriftEqualsValueRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   /// Uppercase-prefix types that are valid raw SQL values, not enums.
   static const _nonEnumPrefixes = <String>{
@@ -2754,6 +2983,12 @@ class RequireDriftEqualsValueRule extends SaropaLintRule {
         // Heuristic: PrefixedIdentifier like Status.active looks like an enum.
         // Exclude common non-enum uppercase types that are valid raw values.
         final prefix = arg.prefix.name;
+        // When the type resolves, trust it: only enums need equalsValue().
+        // A `static const String`/int on a user class is a raw SQL value.
+        final DartType? argType = arg.staticType;
+        if (argType is InterfaceType && argType.element is! EnumElement) {
+          return;
+        }
         if (prefix[0].toUpperCase() == prefix[0] &&
             !_nonEnumPrefixes.contains(prefix)) {
           reporter.atNode(node.methodName);
@@ -2912,8 +3147,8 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      if (node.name.label.name != 'onCreate') return;
+    context.addNamedArgument((NamedArgument node) {
+      if (node.name.lexeme != 'onCreate') return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
       // `onCreate:` is a generic parameter name used far beyond Drift
@@ -2927,7 +3162,7 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
       // (`onCreate: _seedSchema`) delegates to a method we cannot read here;
       // assuming it omits createAll() would be a false positive, so stay
       // silent on anything that is not a function literal.
-      final callback = node.expression;
+      final callback = node.argumentExpression;
       if (callback is! FunctionExpression) return;
 
       // Check if the callback body contains createAll
@@ -2944,7 +3179,7 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
 /// ArgumentList to the construction node, so the onCreate handler we flag is
 /// unambiguously Drift's migration callback and not some unrelated
 /// `onCreate:` parameter that happens to share the name.
-bool _isMigrationStrategyArgument(NamedExpression arg) {
+bool _isMigrationStrategyArgument(NamedArgument arg) {
   final argList = arg.parent;
   if (argList is! ArgumentList) return false;
   final creation = argList.parent;
@@ -3196,7 +3431,7 @@ class AvoidDriftMissingUpdatesParamRule extends SaropaLintRule {
       // Check if updates parameter is present
       final args = node.argumentList.arguments;
       for (final arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'updates') {
+        if (arg is NamedArgument && arg.name.lexeme == 'updates') {
           return; // Has updates parameter
         }
       }

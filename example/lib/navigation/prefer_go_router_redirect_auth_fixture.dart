@@ -133,8 +133,6 @@ void _good518() {
       }
       return null;
     },
-    routes: [
-      GoRoute(path: '/profile', builder: (_, __) => ProfilePage()),
-    ],
+    routes: [GoRoute(path: '/profile', builder: (_, __) => ProfilePage())],
   );
 }

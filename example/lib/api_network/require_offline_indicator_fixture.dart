@@ -115,7 +115,7 @@ class _bad51_MyApp extends StatefulWidget {
   void initState() {
     Connectivity().onConnectivityChanged.listen((result) {
       _isOnline = result != ConnectivityResult.none;
-// No UI feedback!
+      // No UI feedback!
     });
   }
 }
@@ -126,9 +126,9 @@ class _good51_MyApp extends StatefulWidget {
     Connectivity().onConnectivityChanged.listen((result) {
       _isOnline = result != ConnectivityResult.none;
       if (!_isOnline) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('You are offline')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('You are offline')));
       }
     });
   }

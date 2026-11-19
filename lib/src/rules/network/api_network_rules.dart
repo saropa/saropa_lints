@@ -896,7 +896,8 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
 
       if (node.argumentList.arguments.isEmpty) return;
 
-      final Expression callback = node.argumentList.arguments.first;
+      final Expression callback =
+          node.argumentList.arguments.first.argumentExpression;
       final String callbackSource = callback.toSource();
 
       if (!_uiFeedbackPatterns.any((p) => p.hasMatch(callbackSource))) {
@@ -1890,8 +1891,8 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
       return false;
     }
 
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'onError') {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'onError') {
         return false;
       }
     }
@@ -2402,8 +2403,8 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
 
       // Check for hardcoded ImageSource
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'source') {
-          final sourceValue = arg.expression.toSource();
+        if (arg is NamedArgument && arg.name.lexeme == 'source') {
+          final sourceValue = arg.argumentExpression.toSource();
           if (sourceValue == 'ImageSource.camera' ||
               sourceValue == 'ImageSource.gallery') {
             // Hardcoded source - check if in a method that handles both
@@ -2424,7 +2425,7 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
               if (params.contains('ImageSource')) return;
             }
 
-            reporter.atNode(arg.expression, code);
+            reporter.atNode(arg.argumentExpression, code);
           }
         }
       }
@@ -2501,7 +2502,7 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
       // Check for timeLimit parameter
       bool hasTimeLimit = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'timeLimit') {
+        if (arg is NamedArgument && arg.name.lexeme == 'timeLimit') {
           hasTimeLimit = true;
           break;
         }
@@ -3051,8 +3052,8 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
 
       // Check cacheKey argument
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'cacheKey') {
-          final valueSource = arg.expression.toSource();
+        if (arg is NamedArgument && arg.name.lexeme == 'cacheKey') {
+          final valueSource = arg.argumentExpression.toSource();
           // Flag if using DateTime.now(), Random, uuid generation, etc.
           if (valueSource.contains('DateTime.now') ||
               valueSource.contains('Random') ||
@@ -3156,8 +3157,8 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
             return;
           }
         }
-        if (current is NamedExpression) {
-          final name = current.name.label.name.toLowerCase();
+        if (current is NamedArgument) {
+          final name = current.name.lexeme.toLowerCase();
           if (name.contains('onupgrade') || name.contains('on_upgrade')) {
             reporter.atNode(node);
             return;
@@ -4071,15 +4072,15 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
   }
 
   static String? _extractEventName(MethodInvocation node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'name') {
-        final Expression value = arg.expression;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'name') {
+        final Expression value = arg.argumentExpression;
         if (value is StringLiteral) return value.stringValue;
         return null;
       }
     }
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is! NamedExpression && arg is StringLiteral) {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is! NamedArgument && arg is StringLiteral) {
         return arg.stringValue;
       }
     }
@@ -4220,8 +4221,8 @@ class RequireCompressionRule extends SaropaLintRule {
       }
       bool hasGzip = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'headers') {
-          final String headers = arg.expression.toSource();
+        if (arg is NamedArgument && arg.name.lexeme == 'headers') {
+          final String headers = arg.argumentExpression.toSource();
           if (headers.contains('Accept-Encoding') || headers.contains('gzip')) {
             hasGzip = true;
           }
@@ -4344,12 +4345,12 @@ class RequireSslPinningSensitiveRule extends SaropaLintRule {
     final args = node.argumentList.arguments;
     if (args.isEmpty) return null;
     final first = args.first;
-    if (first is NamedExpression) {
-      final name = first.name.label.name;
+    if (first is NamedArgument) {
+      final name = first.name.lexeme;
       if (name != 'url' && name != 'uri' && name != 'path') return null;
-      return _extractStringLiteral(first.expression);
+      return _extractStringLiteral(first.argumentExpression);
     }
-    return _extractStringLiteral(first);
+    return _extractStringLiteral(first.argumentExpression);
   }
 
   String? _extractStringLiteral(Expression expr) {

@@ -36,11 +36,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 <!-- MAINTENANCE NOTES -- IMPORTANT --
 
-   Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Versioning: [SemVer](https://semver.org/spec/v2.0.0.html). Omit dates from headers; [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays them.
+   Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/); versioning: [SemVer](https://semver.org/spec/v2.0.0.html). Omit dates from headers, because [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays them.
 
-   **Overview** — Every release (and [Unreleased]) opens with a 2–4 sentence user-facing summary. Do not restate the detailed bullets. Banned in the overview: file paths, line numbers, regex snippets, internal flag names, project-specific counts or percentages, and AST or visitor terminology. End with `[log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md)` (no preceding line break), substituting the version.
+   **Overview** — Every release (and [Unreleased]) opens with a 2–4 sentence user-facing summary that doesn't restate the bullets. Banned: file paths, line numbers, regex snippets, internal flag names, project-specific counts or percentages, and AST or visitor terminology. End with `[log](https://github.com/saropa/saropa_lints/blob/vX.Y.Z/CHANGELOG.md)` (no preceding line break), substituting the version.
 
-   **Bullet density (HARD RULE)** — Applies to every bullet under `### Added`, `### Changed`, `### Fixed`, `### Removed`, and their `(Extension)` variants. One sentence per bullet, ordered: *what changed → why the user cares → what the user must do* (write "No action required" when true). A second sentence is permitted only when a required user action does not fit in the first. Three-sentence bullets are forbidden — split, or move detail to the commit message, PR, bug report, or code comment, and link out. Concision edits may touch historical sections.
+   **Bullet density (HARD RULE)** — Applies to every bullet under `### Added`, `### Changed`, `### Fixed`, `### Removed`, and their `(Extension)` variants. Write one sentence per bullet, in the order *what changed → why the user cares → what the user must do* ("No action required" when true). A second sentence is allowed only when a required user action doesn't fit in the first. Never write three; split the bullet, or move the detail to the commit message, PR, bug report, or code comment and link out. Concision edits may touch historical sections.
 
    **Banned inside bullets** (move to commit message, PR, or code comment):
    - **PR archaeology** — prior attempts, rename history, "after X didn't hold". Describe the landed state only.
@@ -48,15 +48,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
    - **Test counts** — that is CI output.
    - **Code-internal names** — AST classes, regex flags, function signatures, field or type names, private identifiers.
    - **Bug-report, fixture, or test paths** — commit message footer only.
-   - **Decision-making narrative** — one clause of reasoning is fine; a paragraph is not.
+   - **Decision-making narrative** — one clause of reasoning is fine, not a paragraph.
 
    **Internal bullets** — Same bans apply (no test counts, no file inventories). The what→why→must-do template is optional for infra-only entries.
 
-   **Internal section** — Changes with no end-user impact (publish/CI tooling, internal refactors, test harness, plan housekeeping, developer scripts) belong under a `### Internal` heading at the bottom of the version section, never in `### Added` / `### Changed` / `### Fixed`. NEVER use `<details><summary>Maintenance</summary>`. Test: if a pub.dev or Marketplace user would notice, it is top-level; otherwise Internal.
+   **Internal section** — Changes with no end-user impact (publish/CI tooling, internal refactors, test harness, plan housekeeping, developer scripts) go under `### Internal` at the bottom of the version section, never in `### Added` / `### Changed` / `### Fixed`. NEVER use `<details><summary>Maintenance</summary>`. Test: if a pub.dev or Marketplace user would notice, it's top-level; otherwise Internal.
 
-   **Unreleased convention** — The top changelog section MUST use the heading `## [X.Y.Z] — Unreleased` (with ` — Unreleased` suffix) while work is in progress. All new entries go into this ONE section — never create a second unreleased section or bump the version number. The publish script strips ` — Unreleased` (and typo variants like ` - Unreleased`) at publish time via `_strip_unreleased_suffix()`. The version numbers in `pubspec.yaml` and `package.json` stay at the LAST PUBLISHED version until the publish script updates them. After publishing, manually add a new `## [X.Y.Z] — Unreleased` section for the next cycle.
+   **Unreleased convention** — While work is in progress, the top section MUST be headed `## [X.Y.Z] — Unreleased`. Put all new entries in this ONE section: never create a second unreleased section or bump the version. The publish script strips ` — Unreleased` (and typo variants like ` - Unreleased`) via `_strip_unreleased_suffix()`. `pubspec.yaml` and `package.json` stay at the LAST PUBLISHED version until the publish script updates them. After publishing, manually add a new `## [X.Y.Z] — Unreleased` section for the next cycle. A section is published only when its git tag `vX.Y.Z` exists (`git tag -l vX.Y.Z`). If the top section has no tag, it is the unreleased section even when the ` — Unreleased` suffix is missing, so add entries there.
 
-   **Tagged changelog** — Published versions use git tag `vx.y.z`. Each section ends its summary with `[log](url)` pointing to that tag's snapshot. Compare against [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
+   **Tagged changelog** — Published versions use git tag `vx.y.z`, and each section ends its summary with `[log](url)` pointing to that tag's snapshot. Compare against [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
 
    **Published version** — `"version": "x.y.z"` in [package.json](./package.json).
 
@@ -66,28 +66,486 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [16.2.2] - Unreleased
-
-This release focuses on streamlining the rule management experience by introducing direct enable/disable toggles within the search and explanation panels. It restores rich metadata visibility for all workspace rules and resolves a styling policy bug that degraded dashboard visualizations. A minor background refresh glitch in the search box has also been fixed. [log](https://github.com/saropa/saropa_lints/blob/v16.2.2/CHANGELOG.md)
+## [Unreleased]
 
 ### Added
 
 - Added a disable/enable action directly on Rules & Tiers rule-search results and on the standalone "Explain rule" panel, so a rule can be turned off without switching to the Overrides tab.
-- The "Explain rule" panel now shows a rule's tier and rule pack when it hasn't fired anywhere in the workspace yet, instead of showing only the bare rule name with nothing else.
 
 ### Fixed
 
-- Fixed a webview CSP directive that combined a nonce with `unsafe-inline` for `style-src`, which per spec silently dropped inline `style="..."` writes across several dashboards (the Rules & Tiers coverage gauge, chart bars, and score pills now render correctly again). No action required.
-- Fixed the Rules & Tiers rule-search box losing its typed text when a background refresh landed right after clicking a search result. No action required.
-- Fixed the "Explain rule" panel showing only the bare rule name for a rule that has already fired in the workspace; it now shows full detail (message, correction, severity) as expected. No action required.
-- The `saropaLints.scanOnSave.enabled` setting was removed from the extension's schema when scan-on-save gating merged into the single `saropaLints.enabled` switch, but the key still worked in `settings.json` with no effect and no warning. The extension now detects it and warns (Problems output channel + a one-time notification) that it does nothing and should be removed.
-- Fixed the "Explain rule" panel showing misleading "Run analysis to see it in context" text for a disabled rule that has never fired — the body now explains the rule is disabled and suggests re-enabling it. No action required.
-- Fixed the "Explain rule" fallback panel showing an unbounded pack-label list (up to 265 characters for rules in 10+ migration packs) — the list now caps at 3 labels with a "(+N more)" overflow indicator. No action required.
+- Fixed a webview CSP directive that combined a nonce with `unsafe-inline` for `style-src`, which per spec silently dropped inline style writes across several dashboards (the Rules & Tiers coverage gauge, chart bars, and score pills now render correctly again). No action required.
+- The removed `saropaLints.scanOnSave.enabled` setting is now detected and flagged (output channel plus a one-time notification) instead of silently doing nothing; remove it from `settings.json`.
+- Fixed the "Explain rule" panel showing "Run analysis to see it in context" for a disabled rule that has never fired; it now explains the rule is disabled and suggests re-enabling it. No action required.
+- Fixed the "Explain rule" fallback panel showing an unbounded pack-label list; it now caps at 3 labels with a "(+N more)" indicator. No action required.
 
 ### Internal
 
-- Audited all extension webviews for the CSP nonce + `unsafe-inline` anti-pattern; confirmed the two remaining nonce-less files (`detail-view-html.ts`, `projectMapShell.ts`) are intentionally nonce-free and unaffected.
-- Documented the version-floor guarantee in the CSP builder: `style-src-elem`/`style-src-attr` shipped in Chrome 75, and the extension's minimum VS Code `^1.74.0` bundles Chrome 102, so the legacy fallback is defense-in-depth only.
+- Added a GitHub Actions workflow that runs saropa_lints on pull requests.
+- The publish script now writes the known-issues review list to the ignored `reports/` folder and prints the queued packages, instead of committing a file to `bugs/`.
+
+---
+
+## [17.2.0]
+
+Adds a rule that suggests the narrower width and height lookups on `MediaQuery`, so widgets rebuild only when the dimension they read changes. [log](https://github.com/saropa/saropa_lints/blob/v17.2.0/CHANGELOG.md)
+
+### Added
+
+- **`prefer_media_query_width_height_of`:** new rule (comprehensive tier, INFO, quick fix) that flags `MediaQuery.sizeOf(context).width` and `.height`, the `maybeSizeOf` form, and `MediaQuery.of(context).size.width`, because the whole screen size is watched when only one dimension is read; it stays silent on Flutter older than 3.35, where `widthOf` and `heightOf` do not exist, so no action is required there ([#406](https://github.com/saropa/saropa_lints/issues/406)).
+
+### Changed
+
+- **Bug report form is shorter ([#404](https://github.com/saropa/saropa_lints/issues/404)):** only the rule name, a summary, a code sample that shows the problem, expected versus actual behavior, and the saropa_lints version are required. Severity, frequency, the rule's source file and the attribution check are optional. The form says that reports without a code sample, or without replies to follow-up questions, may be closed.
+- **Rule pack lists regenerated:** the VS Code extension's pack and tier lists now include every rule. `avoid_reexports` is no longer in the "Migrate from awesome_lints" and "Migrate from DCM" packs, because neither tool has a matching rule; it stays in the architecture pack.
+
+### Fixed
+
+- **`scan --exclude-globs` and `--include-globs` match relative to the scanned folder ([#405](https://github.com/saropa/saropa_lints/issues/405)):** a pattern such as `packages/**` now matches `packages/mypackage/lib/src/x.dart` under the folder being scanned. Before, only `**/packages/**` worked. Every pattern that worked before still works.
+- **`scan` honors `analyzer: exclude:` ([#403](https://github.com/saropa/saropa_lints/issues/403)):** `dart run saropa_lints scan` now skips the paths listed under `analyzer: exclude:`. It uses the nearest `analysis_options.yaml` at or above the scanned folder, with patterns relative to that file's folder, which matches how `dart analyze` picks the options file. `--find-stale-ignores` and `--fix-stale-ignores` skip the same files. Explicit `--files` lists are not filtered, same as `--exclude-globs`. No action required.
+
+## [17.1.0]
+
+The 17 line is out of beta: this is the first stable release since the 17.0.1 betas, and it includes all of their changes. It also removes false positives from `avoid_hardcoded_colors` where colors define the theme rather than bypass it. [log](https://github.com/saropa/saropa_lints/blob/v17.1.0/CHANGELOG.md)
+
+### Upgrading from 16.x
+
+- **Requirements:** the 17 line needs Dart 3.11 or newer and analyzer 13 or 14. Projects held on analyzer 12 stay on `^16.7.0`.
+- **Rule renamed:** `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended`. Update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name. The extension's compatibility card offers to rewrite them for you.
+
+### Fixed
+
+- **New-project setup picks a current version (extension):** enabling Saropa Lints in a project that does not depend on it yet now writes the newest `saropa_lints` its Dart SDK supports (the same choice the compatibility card makes) instead of the frozen `^16.2.1`. If the Dart version or the pub.dev list cannot be read, it writes `^16.7.0`, and it does the same when the pub.dev lookup takes longer than 8 seconds. `^16.7.0` needs Dart 3.9 or newer.
+- **`avoid_hardcoded_colors`:** no longer flags colors written inside `ColorScheme`, `TextTheme`, `*ThemeData` constructors or `ThemeExtension` classes, or a private constant used only there (such as a seed passed to `ColorScheme.fromSeed`), so theme definitions stay clean. No action required.
+- **`avoid_hardcoded_colors`:** no longer flags fully transparent colors (`Colors.transparent`, alpha 0), which look the same in every theme. No action required.
+
+### Changed
+
+- **Package Vibrancy known issues:** the pricing notes for 11 hosted-service packages (AppsFlyer, CometChat, Datadog, UXCam, Mapbox, RevenueCat, Scanbot, Stream, Superwall, Syncfusion, ZEGOCLOUD) were re-checked against vendor pricing pages and reworded to plain facts. AppsFlyer and CometChat now show as freemium, as both offer a free tier. The AppsFlyer migration notes no longer recommend Firebase Dynamic Links, which Google shut down in 2025. A new optional `reasonVerified` field in the known-issues schema records the date a person last checked an entry's reason text; those 11 entries carry it. No action required.
+- **Package Vibrancy known issues:** the warnings for flutter_sticky_header, google_api_availability and blinkid_flutter were re-checked and reworded to match their changelogs and repositories (blinkid_flutter's wrapper is open source and only the Microblink SDK needs a license key), with statuses unchanged. No action required.
+
+### Internal
+
+- **Known-issues review queue is now a tracked dated file:** the publish-time report is written to `bugs/YYYY-MM-DD_known_issues_review_queue.md` on every run (even with zero entries) instead of the gitignored `plans/known_issues_review.md`; older dated files are kept.
+- **CI tests the newest analyzer:** the analyzer matrix now pins analyzer 14.7.0 (with `analysis_server_plugin` 0.3.26) for its Dart 3.13 row instead of 14.6.0, so the range users actually get on Dart 3.13 is the one tested.
+- **Known-issues review report skips recently verified paid-package warnings:** the publish-time review no longer re-lists business-model (paid/commercial) entries whose human-set `reasonVerified` date is within the last 183 days, so a warning a person just checked is not flagged again on every release. Tooling-refreshed `as_of` dates do not count.
+- **Known-issues review report skips entries verified since the latest release:** any entry (every tier) whose human-set `reasonVerified` date is on or after the package's latest pub.dev release date is no longer re-listed; a newer release brings it back. The publish step and generator write no review file when nothing needs review.
+- **CI never changes dependency versions:** jobs now run on the Dart SDK the lockfile requires, fail if installing dependencies would change the lockfile, and the formatting bot can only commit source and test files, so it can no longer push a downgraded analyzer to a pull request.
+
+---
+
+## [17.0.1-beta.9]
+
+Removes a false positive from `avoid_unremovable_callbacks_in_listeners`. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.9/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_unremovable_callbacks_in_listeners`:** no longer flags `addPostFrameCallback` or `addPersistentFrameCallback`, which have no remove API, so a named function cannot help. No action required.
+
+---
+
+## [17.0.1-beta.8]
+
+New `avoid_reexports` rule; analyzer exclusions check in the VS Code extension; security update for a dependency bundled with the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.8/CHANGELOG.md)
+
+### Added
+
+- **Extension: analyzer exclusions check.** Suggests excluding folders that need no analysis (`android`, `ios`, `build`, `docs`, `.claude/worktrees` and similar) from `dart.analysisExcludedFolders`, flags folders excluded only in `analysis_options.yaml` (diagnostics hidden but still analyzed), and notes large analyzed file counts on 8 GB machines. Findings appear in the Problems panel on `pubspec.yaml`; the quick action "Add to dart.analysisExcludedFolders" edits only `.vscode/settings.json` for the folders you select. On by default; turn off with `saropaLints.analyzerExclusions.enabled`.
+- **`avoid_reexports`:** new rule (comprehensive tier, INFO) that flags every `export` directive; re-exports hide where a symbol is defined. The package entry point `lib/<package_name>.dart` is exempt. No option to allow re-exports.
+
+### Fixed
+
+- **Security (extension):** `minimatch` forced to `>=11.0.1` via npm `overrides` (Dependabot #44, denial of service via globparts amplification). Resolved version is 11.0.4; `npm audit --omit=dev` reports 0 vulnerabilities.
+
+---
+
+## [17.0.1-beta.7]
+
+False-positive hardening for 15 lint rules; the master switch now stops the language server; scan exits 0 when disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.7/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_unsafe_collection_methods`:** a `.first`/`.last`/`.single` access is no longer flagged when the same line or the line directly above carries `// non-empty: <reason>` (the reason is required). Use it for lists that are non-empty by an API contract the rule cannot see; a marker with no reason is ignored.
+- **`require_timezone_display`:** no longer flags `DateFormat.jm()/Hm()/Hms(...).format(local)` (a time of day shown on the user's own device). Still flagged when the formatted value is visibly UTC (`.toUtc()`, `DateTime.utc`, `isUtc`) and for a stored `DateFormat` that is not formatted at the construction site.
+- **`require_ios_push_notification_capability`:** no longer flags `requestPermission()` on non-push receivers (`Geolocator.requestPermission()` and similar location/contacts/audio permission APIs). `requestPermission()` is flagged only when its receiver looks like messaging/notification/push (`FirebaseMessaging.instance`, `messaging`, `fcm`); `getToken`, `onMessage`, and the push class patterns are unchanged.
+- **`require_data_encryption`:** no longer flags `StringBuffer.write(...)` / `StringSink.write(...)` (an in-memory hash input, not storage), or a static call whose only sensitive-looking word is the receiver class's own name repeated as a leading qualifier (`SuccessCardGate.write([SuccessCardGate.milestoneKey(id)])`; `Card.write([userCreditCard.number])` is still flagged). Real credentials in the payload are still flagged.
+- **Master switch (extension):** turning `saropaLints.enabled` off now also stops the standalone language server, even when its own setting is on, and turning it back on restarts it. Before, the server kept running and its findings stayed in the Problems panel after an "Off" toggle. Starting the server by command while the master switch is off now says why it did not start.
+- **`scan` command:** `dart run saropa_lints scan` now prints a "disabled" line and exits 0 when the VS Code extension has turned Lint integration off (plugin block commented out), instead of exiting 2 and failing every pre-commit hook. No action required; the README now has a "How to turn saropa_lints completely off" section.
+- **`require_catch_logging`:** no longer flags a typed catch (`on _NoV1Rebuild { return null; }`) when another catch clause of the same `try` logs or rethrows (`on Object catch (e, st) { debugException(e, st); }`). A typed catch whose sibling catches are also silent, a lone typed catch, and an empty typed catch, are still flagged.
+- **`prefer_asmap_over_indexed_iteration`:** no longer flags an index loop where the index also addresses a second collection (`a[j] + b[j]`), or where the body adds to / removes from the iterated list (BFS-style `group.addAll(...)`). A single-collection loop, including one that mutates a different list, is still flagged.
+- **`avoid_unsafe_collection_methods`:** no longer flags `xs!.first` when the guard is written null-aware on the same collection (`xs?.length == 1 ? xs!.first : null`, `(xs?.isNotEmpty ?? false) ? xs!.first : null`). Also no longer flags `parts.first` where `parts` is a local initialized from `s.split(...)` (always non-empty). A guard on a different collection, or no guard, is still flagged.
+- **`avoid_string_substring`:** no longer flags `s.substring(...)` on the right side of `&&` when the left side checks the same string (`s.startsWith('c') && s.substring(1) == 'x'`, `s.length > 3 && ...`) or the slice arguments. A guard on a different string, or no guard, is still flagged.
+- **`avoid_return_await_db`:** no longer flags `return await dbWrite(...)` inside the body of a `try` that has a `catch` clause or a `finally` block, where the `await` is required for the handler to see the async error. Returns outside a guarded try body (including inside the `catch` itself) are still flagged.
+- **`avoid_retaining_disposed_widgets`:** no longer flags a non-static `Widget` / `State` / `BuildContext` field (or `List` of them) that the same class's `dispose()` assigns `null` (`_ghost = null` / `this._cards = null`). Fields `dispose()` does not clear, and static fields, are still flagged.
+- **`avoid_nullable_parameters_with_default_values`:** no longer flags a nullable parameter with a default that the body forwards unchanged as an argument to a callee parameter that is itself nullable (`query(isHidden: isHidden)`); the callee gives `null` its meaning. Forwarding to a non-nullable parameter, or not forwarding directly, is still flagged.
+- **`avoid_nullable_parameters_with_default_values`:** no longer flags a nullable parameter with a default when the body resolves `null` with `x ??= fallback` or `x ?? fallback` (null is a distinct input, same as the existing `== null` / `!= null` exemption). Parameters whose body never acts on `null` are still flagged.
+- **`avoid_nullable_interpolation`:** no longer flags an interpolation guarded by `x != null &&` on its left (e.g. `uuid != null && list.contains('${uuid}|$code')`), or a null-aware chain off a receiver already checked non-null (`if (x != null) '${x?.map(...).join()}'`). Unguarded interpolations and `||` conditions are still flagged.
+- **`avoid_nested_assignments`:** no longer flags the grouping idiom `(map[key] ??= <T>[]).add(item)` (a parenthesized `??=` on a map index used as a call, property or index target). Other nested assignments, including `??=` on plain variables and `=` on an index, are still flagged.
+- **`avoid_motion_without_reduce`:** no longer flags `FadeTransition` / `SlideTransition` / `ScaleTransition` / `RotationTransition` inside a class that already reads `disableAnimations` / `accessibleNavigation`, or calls a reduced-motion or `settle` helper to settle the controller (matched as identifiers, so comments and words like `settlement` do not count). Transitions in classes with no such handling, and non-transition widgets, are still flagged.
+- **`avoid_forward_slash_path_assumption`:** no longer runs in a Flutter app whose only platform folders are `android/` and/or `ios/` (forward slash is correct there). Apps or packages that can run on Windows are still flagged.
+- **`avoid_duplicate_string_elements`:** no longer flags empty strings repeated in a list, lists passed as call or constructor arguments (fixed positional slots), or const lookup tables of 6+ elements indexed by position. Set literals and short plain lists with repeats are still flagged.
+- **`avoid_accessing_collections_by_constant_index`:** no longer flags `list[0]` / `list[1]` in a loop when the same list's `length` is checked first, in the left side of `&&`, in an enclosing `if` or ternary, or in an earlier `if (...) continue/break/return/throw;`, and the check implies a non-empty list (`> 0`, `>= n`, `== n`, `!= 0`; or the reverse in an else-branch or early exit). `length == 0` / `length < n` in a then-branch, and accesses with no length check, are still flagged.
+
+---
+
+## [17.0.1-beta.6]
+
+The "large files not excluded from the file watcher" warning no longer appears in workspaces that are not Dart projects, and no longer lists tool-managed folders. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.6/CHANGELOG.md)
+
+### Changed
+
+- **Lints switch (extension):** a single click on the sidebar switch row, or on the status bar tooltip link and menu, no longer turns lints on or off. They open Process Health, which holds the toggles. The `Saropa Lints: Toggle` command and the Lints Config dashboard button are unchanged.
+- **Lints switch (extension):** the status bar and sidebar showed "Partly off" when every engine was off but the Scan on Save toggle in Process Health had only suspended the scan daemon. A suspended daemon now counts as the setting being off, so the switch shows "Off".
+- **Large-file watcher warning (extension):** the message now names the open folder, says the listed paths are relative to it, shows at most 3 files with sizes or file counts plus "and N more", and explains that VS Code watches every file in the folder for changes and large files can slow it down or crash it. The "Exclude from Watcher" button is unchanged.
+- **Status bar hover (extension):** the tooltip is now laid out in sections (Status, Project, Problems, Memory, Actions) with tables, colored pills with hover text, and one link per action. Findings read "18,368 findings (all errors)" or "N errors · M warnings", long numbers have thousands separators, each problem names itself with its own link, and the memory detail is unchanged but tabulated. The toggle label follows the real state, and the two conflicting "not set up" messages are now one.
+- **Status bar click (extension):** clicking the status bar item no longer flips Lints on or off. It opens a menu (new command `Saropa Lints: Status Menu`) with the status, problems and actions; the toggle is one row.
+
+### Fixed
+
+- **Large-file watcher warning (extension):** the scan now runs only in Dart/Flutter workspaces, and skips `.claude/worktrees` and `.venv` folders, so web or Python workspaces no longer get warnings about virtual-environment files and media assets. The 5 MB default size bar (`saropaLints.watcherExclude.maxFileKb`) is unchanged.
+
+---
+
+## [17.0.1-beta.5]
+
+The VS Code status bar now shows one Saropa item instead of four, the Lints On/Off state now matches what a click does, and 6 rules and the `init` command no longer report problems that are not there. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.5/CHANGELOG.md)
+
+### Changed
+
+- **Status bar (extension):** the four Saropa status bar items (switch, score, "Saropa: ready/disabled", route and memory/workspace issues) are now one item, e.g. `Saropa Lints: On · 90% · V9/10`, `Saropa Lints: Off`, or `Saropa Lints: Partly off`. It turns to the warning color when lints are Off or Partly off, or when memory or workspace issues need attention. The route (`saropa_lints: pubspec 17.0.1`), memory, health and workspace-issue details moved into its tooltip. Click still flips the Lints On/Off switch; the tooltip links open the report. The scan-on-save item now appears only while a scan is running or has just finished.
+
+### Fixed
+
+- **Lints On/Off switch (extension):** the status bar, sidebar and dashboards now read the saved ownership record, so the displayed state matches what a click does (e.g. after `flutter clean` deletes `.dart_tool`).
+- **`init`:** a re-run on a project with the default commented-out plugin block no longer exits 1, no longer claims the extension turned lints off, and no longer warns "0 rules found"; it exits 1 only when the extension recorded turning lints off.
+- **`avoid_return_await_db`:** no longer treats `db*` reads such as `dbContactLoadDBListByStatus` as writes (the name `LoadDB` contains `add`). Method names are now matched by camel-case word; `compute`, `calculate` and `check` are now read verbs (`dbContactComputeTotals` no longer lints). `dbContactSave` and `dbContactAddToGroup` still lint.
+- **`prefer_freezed_for_data_classes`:** no longer flags data classes in projects that do not depend on `freezed` or `freezed_annotation`, where the suggestion could not be acted on. No action required.
+- **`require_catch_logging`:** no longer flags a catch whose only statement returns a constructed typed result (e.g. `return const DecryptResult(DecryptStatus.authFailed)`). `return null;`, `return false;` and empty catches still lint.
+- **`avoid_memory_intensive_operations`, `avoid_string_concatenation_loop`:** no longer flag `line += buffer.toString()` where `buffer` is a `StringBuffer` (flushing a buffer into a string).
+- **`avoid_platform_channel_on_web`:** no longer flags channel calls after `if (!isSupported) return;` when `isSupported` reads a private flag that is only ever set true after a `kIsWeb`-guarded early exit. A flag assigned with no web guard still lints. The guard flag must be false on web (for example `!kIsWeb && ...`); a flag such as `kIsWeb || ...` and writes through `this._flag = ...` are now handled correctly. An early exit `if (!_canUse) return;` on a getter such as `kIsWeb || ...` no longer counts as a web guard; only a getter that is false on web (`!kIsWeb && ...`) does.
+
+---
+
+## [17.0.1-beta.4]
+
+This update removes false positives from 19 rules, mostly the mounted-check and context rules that flagged code that was already safe. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.4/CHANGELOG.md)
+
+### Fixed
+
+- **`check_mounted_after_async`:** no longer treats an `await` inside an always-returning `if` branch as an await before a later `setState`.
+- **`require_mounted_check_after_await`, `require_mounted_check`:** an `await` confined to an always-exiting `if` branch no longer triggers `setState` reports after the `if`.
+- **`use_setstate_synchronously`:** await and guard state are now restored after an `if` whose awaits all sit in exiting branches.
+- **`avoid_platform_channel_on_web`:** no longer flags calls after `if (field == null) return` (field null on web) or after a negated `Platform.isX` early exit, and is skipped in Flutter projects with no `web/` target.
+- **`avoid_inert_animation_value_in_build`:** no longer flags an `animation.value` read in a branch whose sibling branch uses an `AnimatedBuilder` or `ListenableBuilder` on the same animation.
+- **`avoid_datetime_constructor`:** no longer flags a `DateTime(...)` assigned to a local and then round-trip validated by an `if` on its `month` or `day` that exits.
+- **`avoid_retaining_disposed_widgets`:** no longer flags immutable `const` descriptor classes, render-time delegates (`FlowDelegate`, `CustomPainter` and similar), or widgets that reach `Widget` or `State` through a non-listed Flutter base class.
+- **`avoid_storing_context`:** no longer flags a `BuildContext` field on render-time delegates, or a `final` field whose every use follows a `.mounted` check.
+- **`avoid_parameter_mutation`:** no longer flags `void`/`bool` functions documented as in-place ("in place"/"mutates") or named with a mutator verb (`apply`, `restore`, `rollback`, `inherit`, `carry`, `merge`, `stamp`, `mark`).
+- **`move_variable_closer_to_its_usage`:** no longer flags a state snapshot (call or member-read initializer) taken before intervening `await`s.
+- **`prefer_asmap_over_indexed_iteration`:** no longer flags pairwise loops (inner start not 0, or index feeding a nested loop bound).
+- **`prefer_static_method`:** no longer flags instance methods of singleton classes (private/factory constructors plus a static self-typed instance).
+- **`prefer_try_parse_for_dynamic_data`:** `Uri.parse` of an interpolation made only of `const` references and `Uri.encode*` calls is no longer flagged.
+- **`require_apple_signin_nonce`:** no longer reports `getAppleIDCredential(scopes: [])`, which only fetches an authorization code for token revocation.
+- **`require_data_encryption`:** no longer reports calls that only clear credential fields with `null` or `Value(null)`.
+- **`require_drift_equals_value`:** now resolves the argument type and reports only enums, so `static const String` or int arguments pass.
+- **`require_qr_permission_check`:** no longer reports `MobileScanner`, which handles camera permission itself.
+- **`require_speech_stop_on_dispose`:** follows same-class and externally declared private helpers called from `dispose()`.
+
+---
+
+## [17.0.1-beta.3]
+
+This update makes the command-line setup report problems honestly instead of finishing as if everything worked. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.3/CHANGELOG.md)
+
+### Added
+
+- **VS Code extension:** one On / Off / Partly off switch for Saropa Lints, in the status bar and at the top of the sidebar. One click turns it on or off. "On" means the setting is on and the analyzer plugin block is live or was never turned off by the extension (a new project's default daemon-only block counts as On, and turning On from there does not load the heavy plugin). "Partly off" shows only when the extension itself turned the block off or the setting and block otherwise disagree; it says which part is off and the same click fixes it.
+- **VS Code extension:** a version-sync row in the sidebar that, in one click, syncs the plugin version in `analysis_options.yaml` to the version pinned in `pubspec.lock` when they differ.
+
+### Fixed
+
+- **`dart run saropa_lints:init`:** exits with a failure code when the resulting configuration has no active `plugins:` block or lists no rules, and says so plainly when the VS Code extension turned Lint integration OFF.
+- **`dart run saropa_lints:init`:** the stale-version warning now reads the version of the `saropa_lints` plugin entry only (it previously could report an unrelated `version:` such as `true`) and names the command that updates it.
+- **`dart run saropa_lints:init`:** the deprecation note no longer implies the extension will undo an OFF state that init cannot undo.
+- **VS Code extension:** the Lints Config dashboard shows "Lints are off" with a Turn on (or Fix) button instead of coverage numbers while lints are off or partly off.
+- **VS Code extension:** Re-enable In-Process Plugin now also turns the `saropaLints.enabled` setting back on, so the two can no longer disagree.
+- **`avoid_async_call_in_sync_function`, `avoid_unawaited_future`, `avoid_uncaught_future_errors`:** no longer report `Map<K, Future<V>>.remove(key)` statements.
+- **`avoid_context_across_async`, `avoid_context_after_await_in_static`:** no longer treat an `if` as an await when the await sits only in branches that always return or throw.
+- **`avoid_drift_value_null_vs_absent`:** no longer reports `Value<T?>(null)` on a nullable column.
+- **`avoid_ignoring_return_values`:** no longer reports `Never`-returning calls, or extension methods whose name contains a mutate verb word (for example `dbActivityAdd`).
+- **`avoid_implicitly_nullable_extension_types`:** no longer reports an extension type that implements a non-nullable interface.
+- **`avoid_memory_intensive_operations`, `avoid_string_concatenation_loop`:** no longer report `+=` on a String declared inside the same loop.
+- **`avoid_nullable_interpolation`:** no longer reports interpolation inside a lazy debug-log closure.
+- **`avoid_nullable_parameters_with_default_values`:** no longer reports a parameter the body compares to `null`.
+- **`avoid_only_rethrow`:** no longer reports a rethrow-only clause when a later clause in the same `try` also catches the exception.
+- **`avoid_parameter_mutation`:** no longer reports `Draft`, `Builder`, `Accumulator`, `Collector` and `Buffer` parameters in `void` functions.
+- **`avoid_string_substring`:** recognizes a length guard in a collection-for loop condition.
+- **`avoid_unbounded_cache_growth`, `require_cache_expiration`:** treat `field = null` on a Map field as invalidation (wholesale-replaced snapshot caches).
+- **`avoid_unsafe_collection_methods`:** recognizes `isNotEmpty && ....first` and `isEmpty || ....first` short-circuit guards.
+- **`move_variable_closer_to_its_usage`:** no longer reports a declaration whose initializer contains `await`.
+- **`prefer_drift_batch_operations`:** no longer reports `batch.insert` inside a batch callback or `update(...).write`.
+- **`prefer_transaction_for_batch`:** counts writes per execution path (exclusive branches) and ignores `StreamController.add` and other sinks.
+- **`require_data_encryption`:** no longer matches `card` inside `vcard`.
+- **`require_dispose_pattern`:** no longer reports abstract classes with only static members.
+- **`require_file_close_in_finally`:** no longer reports `File.openRead` (the stream closes itself).
+
+---
+
+## [17.0.1-beta.2]
+
+The latest release, `17.0.1-beta.2`, focuses entirely on refining existing rules to eliminate false positives in specific code contexts.  Key fixes include recognizing `!context.mounted` guards in static methods, allowing constant or literal interpolations in Drift SQL strings, and properly handling RegExp group matches for dynamic data parsing. It also improves checks for hooks outside build methods, platform channel declarations, and null-safe JSON accesses by better analyzing the surrounding code logic and type guards.[log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.2/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_context_after_await_in_static`:** no longer reports after a `!context.mounted || ...` guard.
+- **`avoid_drift_raw_sql_interpolation`:** no longer reports SQL built only from constant or literal interpolations, including loop variables over a literal list of strings.
+- **`avoid_drift_raw_sql_interpolation`:** no longer reports SQL built from a private method's parameter when every caller passes a literal.
+- **`avoid_hardcoded_credentials`:** no longer reports a short plain word assigned to a bare `token` name (for example `_unitToken = 'unit'`).
+- **`avoid_hooks_outside_build`:** no longer reports static `ClassName.useX(...)` helper calls, and only applies to files that import a hooks package.
+- **`avoid_platform_channel_on_web`:** no longer reports channel declarations in field or top-level variable initializers; calls inside closures or methods still report.
+- **`avoid_platform_channel_on_web`:** unguarded `invokeMethod`, `invokeListMethod` and `invokeMapMethod` calls on field channels are now reported; calls guarded by `kIsWeb` are skipped.
+- **`prefer_try_parse_for_dynamic_data`:** digit group lookups on a RegExp match (`match.group(1)`) are recognized, and inline `RegExp(...).firstMatch(...)` matches are checked.
+- **`require_ios_face_id_usage_description`:** no longer reports when the project root cannot be found or when Info.plist is missing, and the plist lookup now works for relative file paths.
+- **`require_null_safe_json_access`:** no longer reports casts guarded by an `is` test in a conditional, or after the key was assigned earlier in the same block.
+- **`require_unique_iv_per_encryption`:** no longer reports IV size constants (`ivLength`, `ivSize`, and similar) or whose initializer is an integer literal.
+
+---
+
+## [17.0.1-beta.1]
+
+This beta focuses heavily on optimizing the VS Code extension's performance and improving the reliability of its Language Server Protocol (LSP) controls. Key updates include a smarter workspace hazard scan that automatically flags massive files or crowded directories for `watcherExclude`—now with built-in coverage for heavy Android and iOS build outputs—to protect extension host memory. It also overhauls the Health Panel's LSP management so server toggles work predictably without infinite spawn loops, and ensures critical upgrade prompts and detailed status tooltips remain visible even when lint integration is temporarily disabled. [log](https://github.com/saropa/saropa_lints/blob/v17.0.1-beta.1/CHANGELOG.md)
+
+### Added
+
+- **Extension:** the Health Panel "Diagnostic Engines" section now states the recommended setup (LSP Server ON, Scan on Save ON, Live Analysis OFF, CI ON only if you want PRs gated, and the fallback if a rule stops firing under LSP) above the cards and as a short note on each card.
+- **Extension:** new settings `saropaLints.watcherExclude.maxFileKb` (default 5120) and `saropaLints.watcherExclude.maxFolderFiles` (default 1000). The workspace hazard scan now flags any file above the size bar and any folder with more direct files than the limit, and offers to add them to `files.watcherExclude`. Rules & Tiers > Automation has a new "Watcher excludes" block with both settings, the count of files, folders and missing recommended excludes affected, and a List control for each.
+- **Extension:** the recommended watcher excludes now cover Android/iOS build output (`.gradle`, `android/build`, `android/app/build`, `ios/build`, `ios/Pods`, `ios/.symlinks`, `DerivedData`); the hazard scan no longer descends into `.gradle`, `Pods` and `DerivedData`, and files under `.gradle` are excluded with `**/.gradle/**`.
+
+### Changed
+
+- **Extension:** dev dependencies `serialize-javascript` 7.1.0 → 7.1.4 and `undici` bumped (Dependabot, PR #360). No action required.
+
+### Fixed
+
+- **Extension:** the start-up upgrade offer (for example `^16.x` to 17.0.0) now also runs when Lint integration is Off (`saropaLints.enabled` false); it was skipped exactly in the projects that most needed it. The status bar item and upgrade prompt now also appear when Lint integration is Off.
+- **Extension:** the status bar "N workspace issue(s)" item now lists each issue in its tooltip (large unexcluded files, missing watcher exclusions, extension host memory). Before, the tooltip showed only process stats, so the red dot gave no hint of the cause.
+- **Extension:** the Health Panel "LSP Server" ON toggle no longer does nothing. The setting defaults to true, so clicking ON while the server was stopped (failed start, or after Kill All) rewrote the same value, fired no change event, and started nothing. The toggle now starts or stops the server directly, and the Health Panel refreshes. A failed start now shows an error message with the reason instead of only logging to the output channel.
+- **Extension:** Health Panel "Kill All" and "Restart All" buttons now name their target ("Kill All LSP Server", "Restart LSP Server").
+- **Extension:** the `saropaLints.lspServer.start` command and Health Panel "Restart All" no longer start the LSP server when `saropaLints.lspServer.enabled` is off; the start command now offers an Enable button. No action required.
+- **Extension:** the LSP client no longer spawns `dart run saropa_lints:lsp_server` when `saropa_lints` is missing from `.dart_tool/package_config.json`; it shows one warning ("run `dart pub get`") instead of restarting 5 times with stacked error toasts.
+- **Extension:** the "zero rules enabled" modal no longer reopens in a loop after clicking "Set Up Project". If setup does not fix the config, a single non-modal warning is shown instead.
+- **Extension:** the "zero rules enabled" modal no longer appears after Enable when `violations.json` was written by the extension itself (live-diagnostics snapshot with no `enabledRuleCount`), e.g. while Lint integration is Off. A missing count is now treated as unknown, not zero.
+- **Tests:** the unwritable-location test in `init_emit_ci_test.dart` no longer uses `skip:` (flagged by `avoid_skipped_tests`). It returns early on Windows instead.
+
+---
+
+## [17.0.0] - published as stable by mistake
+
+Published to pub.dev as a stable release by mistake: it was meant to be a beta. It is not retracted. Use 17.0.1-beta.1 or later, or the next stable release.
+
+Moves saropa_lints to the analyzer 13 and 14 lines and keeps analyzer 12 projects on the frozen 16.x line. [log](https://github.com/saropa/saropa_lints/blob/v17.0.0/CHANGELOG.md)
+
+### Changed
+
+- **Breaking:** saropa_lints now requires Dart `>=3.11.0` (analyzer 13.0.0 depends on `_fe_analyzer_shared` 100, which needs 3.11) and `analyzer >=13.0.0 <15.0.0`, and pub picks the newest allowed by your Dart version (3.11 and 3.12 up to 14.5.0, 3.13 14.6.0); projects held on analyzer 12 stay on `saropa_lints: ^16.7.0`, which is frozen with no back-ports.
+- `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended`; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
+- Reports on named arguments now highlight only the argument name instead of the whole `name: value` text, so editor squiggles and `// ignore:` placement for those reports shift to the name; no action required.
+- Widget rules that match by name no longer match record fields that share a widget's name, which removes false positives; no action required.
+- The extension now detects at start-up whether a project uses the pubspec route, the plugin route or both, and shows one prompt offering Migrate when a newer saropa_lints works with the project's Dart. Plugin-only projects (saropa_lints only in `analysis_options.yaml`) get the same offer as pubspec projects.
+
+### Internal
+
+- Extension version now keeps the package's major.minor and maps only the patch (10 x package patch + slot; stable uses slot 9, prerelease N uses slot N-1), so every publish is strictly higher; a 10th prerelease of one patch is refused.
+
+---
+
+## [16.10.0]
+
+Restores installation on Flutter 3.44 and older, and renames one rule whose name matched a core analyzer diagnostic. [log](https://github.com/saropa/saropa_lints/blob/v16.10.0/CHANGELOG.md)
+
+### Fixed
+
+- Projects on Flutter 3.44 and older could not add saropa_lints as a dev dependency from 14.0.3 onward: the `meta ^1.18.3` floor conflicted with the `meta 1.18.0` that those Flutter versions pin. The floor is back to `meta ^1.18.0`. No other dependency changed.
+
+### Changed
+
+- `deprecated_new_in_comment_reference` is now `deprecated_new_in_comment_reference_extended` because the old name matched a core analyzer diagnostic that the analyzer is removing; update any `// ignore:` comments, `ignore_for_file` lines and `analysis_options.yaml` entries that use the old name.
+
+---
+
+## [16.9.0]
+
+A false-positive fix for `avoid_async_in_build`. [log](https://github.com/saropa/saropa_lints/blob/v16.9.0/CHANGELOG.md)
+
+### Fixed
+
+- `avoid_async_in_build` no longer flags an async `build` method in a class that is not a Flutter widget or State (for example a Serverpod `WidgetRoute`). Fixes [#359](https://github.com/saropa/saropa_lints/issues/359).
+
+---
+
+## [16.8.0]
+
+Test-suite repair, dependency security updates, and a linting fix. No change to rule behavior or shipped output. [log](https://github.com/saropa/saropa_lints/blob/v16.8.0/CHANGELOG.md)
+
+### Security (Extension)
+
+- Dependency bumps: undici 8.10.0 → 8.11.2 (clears 8 Dependabot alerts); brace-expansion 5.0.9 → 5.0.12 and source-map-js 1.2.1 → 1.2.2 (clears 4 alerts).
+- Dependency bump: shell-quote 1.10.0 → 1.12.0 (clears critical command-injection Dependabot alert 33, fixed in 1.11.0; dev-tooling only via npm-run-all2).
+
+### Fixed
+
+- `audit --baseline` now exits 1 only when a finding is new. It used to exit 1 for every finding, baselined or not, so the action's `baseline` input could never let a gate accept a known backlog. Same contract as `cross_file --baseline` and `project_health --baseline`. With no baseline file, every finding still counts.
+- `audit --since` works for a project in a subdirectory of its repository (a monorepo package). The changed-file paths were joined onto the project path twice and matched nothing, so the audit covered no files. An unknown ref now also returns an empty list on git versions that report it as a "bad revision", instead of crashing.
+- `init --emit-ci` writes the workflow at the repository root, where GitHub runs workflows from, and adds `working-directory` when the project is in a subdirectory. It honors an explicit `--tier`, and reports a write failure instead of printing a stack trace.
+- The composite action trims glob patterns (`lib/gen/**, test/**` no longer yields a pattern with a leading space that matches nothing), accepts one pattern per line, and no longer aborts on an empty pattern. It fetches `since` given as a bare branch name, a branch with slashes or a commit SHA, and names the problem when it is on a remote other than origin. It removes a stale SARIF file before the run, creates the SARIF directory, handles an absolute `sarif-file`, and rejects `resolve` values other than true/false and a `fail-on-count` without its `fail-on`.
+- Releases no longer start a second publish run for the moving `v16` tag, which matched the publish workflow's `v*` trigger. Pre-releases leave `v16` on the last stable release, the tag points at the release commit rather than whatever is checked out, and re-running the tag step repairs a `v16` push that failed.
+- `extension/scripts/check_l10n_keys.py` key-union regex rewritten to eliminate exponential backtracking (ReDoS vulnerability, code-scanning alert 23).
+- `avoid_string_substring` now documents that it cannot prove bounds established inside a helper function it would have to inline; suppress with `// ignore:` at the call site when the helper is bounds-safe.
+
+### Fixed (Extension)
+
+- The CI card writes the workflow at the repository root with `working-directory` for a project in a subdirectory. It was written under the project, where GitHub never runs it.
+- Publishing the CI change no longer freezes VS Code while git pushes, and pressing the button again after a failure resumes on the same branch instead of failing at `git checkout -b`. It refuses to publish when `pubspec.yaml` already had uncommitted edits of yours (a commit takes whole files, so they would have been pushed too), when there is nothing to publish, and when a branch of the same name already exists on the remote. Opening the pull request gives up after 15 seconds on a connection that never answers and offers the compare page.
+- Adding `saropa_lints` to `pubspec.yaml` keeps valid YAML for a `dev_dependencies:` with a trailing comment, four-space indentation, an existing entry at any indentation, and an empty `{}`. It also adds `^16.2.1` instead of the long-stale `^9.1.0`.
+- Turning CI off a second time also suspends a job added since the first time, and toggling to the state the file is already in no longer offers an empty pull request.
+- Package Vibrancy's "Generate CI Pipeline" counts only direct and dev dependencies that have a newer version, the same measure its suggested threshold now uses. Transitive packages the project cannot upgrade no longer fail a fresh pipeline. `failOnVulnerability` is enforced from the security advisories `pub outdated` reports, where it used to claim there was no data and pass. The pull request comment shows pass or fail against the threshold, the shell script uses a private temporary directory, and the GitLab job uses the maintained Flutter image.
+
+### Internal
+
+- Restored the scripts package markers and the cross-file, structure and example fixture sources that an earlier bulk commit deleted, which had made the CI `test` job fail.
+- Health history no longer labels a point with the wrong tag when two tags (such as `v16` and `v16.6.0`) share a commit.
+
+---
+
+## [16.7.0]
+
+**Published 2026-10-06 - superseded by 16.8.0**
+
+---
+
+## [16.6.0]
+
+Minor release adding a new essential-tier rule that catches an unguarded `dart:developer`
+`debugger()` call before it can hang a test run. It also fixes the extension's CI switch for
+workflows whose jobs already carry their own conditions. [log](https://github.com/saropa/saropa_lints/blob/v16.6.0/CHANGELOG.md)
+
+### Version Note
+
+The pub.dev package and the VS Code extension now share one version number and will match from here on; previously the extension's minor was shifted up by two, so package `16.2.1` reached the Marketplace as extension `16.4.1`. Stable releases now use even minors only, since VS Code reserves odd ones for pre-release builds — hence the jump from `16.2.2`.
+
+### Added
+
+`guard_debugger_against_test_environment` flags any `debugger()` call not lexically guarded against the test environment. A VM service attaches during `flutter test` too, so an unguarded call pauses the isolate and hangs the run with no verdict — `kDebugMode` does not help, since `flutter test` itself runs in debug mode. Guard it with a condition mentioning an `isTestEnvironment`-shaped check or `FLUTTER_TEST`, anywhere up the enclosing `if` chain. The negated `if` (`if (!isTestEnvironment) { … }`), the inverted branch (`if (isTestEnvironment) { } else { … }`) and the early-return guard clause (`if (isTestEnvironment) return;`) all count. `&&` and `||` are not interchangeable: one guarded term guards an `&&`, but every term of an `||` must guarantee non-test, so `if (isBreak || !isTestEnvironment)` is still reported. No action required unless the rule fires.
+
+### Fixed
+
+- `prefer_utc_for_storage` no longer flags `.toIso8601String()`/epoch calls on a `final` local variable whose initializer is already UTC — directly, through a `.add()`/`.subtract()` call on a UTC value, or when the variable is read inside a nested closure — even though the receiver's own source at the call site has no `.toUtc()`/`.utc` text. `.toUtc().toLocal()` is now correctly still reported, on the receiver itself or through a local variable, since `.toLocal()` undoes the UTC conversion.
+- `always_specify_parameter_names` no longer flags calls to Dart SDK (`dart:*`) methods such as `String.substring` — their positional-only parameter lists can never be changed by any caller, so the rule's own suggestion was always inapplicable there.
+- `avoid_case_sensitive_path_comparison` no longer flags:
+  - a path comparison on `.uri`, `.requestedUri`, or `.url` of a `dart:io` `HttpRequest` or package:shelf `Request` — an HTTP route path, not a filesystem path
+  - the root-walk idiom when the `.parent` hop is held in a `final` local before the comparison
+
+  Filesystem URIs, plain `Uri` parameters, and reassigned locals are still reported.
+- `avoid_duplicate_string_literals` and `avoid_duplicate_string_literals_pair` no longer flag a URI repeated across `import`/`export`/`part` directives — Dart requires a directive URI to be a string literal, so there is no legal way to deduplicate it.
+- `avoid_misused_set_literals` now flags an empty `{}` only when nothing gives it a type. It is no longer flagged when its position already supplies a `Map`/`Set` type, or when it initializes a declaration with an explicit `Map` annotation. `var x = {}` — genuinely ambiguous — is still reported.
+- `avoid_stack_trace_in_production`:
+  - It now recognizes a debug guard reached through a `final` local or a zero-argument helper, `!bool.fromEnvironment('dart.vm.product')`, and `kDebugMode == true`-style comparisons.
+  - Behavior change: `&&`/`||`/`!` are now evaluated soundly, so a condition such as `if (verbose || kDebugMode)`, which the old text match silenced, is now reported. No action required unless a condition like this was previously silent for you, in which case it was never soundly guarded.
+- `avoid_throw_in_catch_block` no longer flags `throw Error.throwWithStackTrace(...)`, including a `core.`-prefixed call and in the unresolved CLI scan pass.
+- `avoid_unused_assignment` no longer flags a closure-captured variable's reset that the closure's own next invocation reads back.
+- `function_always_returns_null` no longer flags null-only members in the web-side stub of a `dart.library.io`/`.ffi` conditional import — a null-only body there is the documented contract, mirrored by the native sibling file.
+- `move_variable_closer_to_its_usage` no longer suggests moving an `await`-initialized declaration inside a `try` block that has a `catch`/`finally` — moving it could let an intervening statement's side effects run before the possible throw instead of after.
+- `prefer_cached_getter` no longer flags repeated `.length`/`.isEmpty`/`.isNotEmpty`/`.first`/`.last` reads on a `List`, `String`, `Set`, or `Map`, or an unoverridden `.hashCode`. A lazy `Iterable` (for example a `.where(...)` result) is still reported, since those accessors are not O(1) there.
+- `prefer_typed_route_params` no longer flags a parameter passed into a call whose resolved return type is `int`, `double`, or `num` (for example `parseLimit(...)`), regardless of the call's own name.
+- `require_data_encryption` no longer flags auth-status metadata (`authStatusFields`, `authConfigured`, `authScheme`, `authRequired`/`authRequiredMessage`) as a credential. A real credential in the same call is still reported.
+- `require_error_logging` no longer flags a catch block that propagates the error via `return Error.throwWithStackTrace(...)` or a bare call to it.
+- `require_permission_plist_ios` now reads your `ios/Runner/Info.plist` and reports a permission request only when a usage-description key that permission needs is actually missing, so notification, critical-alert and Android-only permissions (which need no key on iOS) and permissions whose keys are already declared are no longer flagged. No action required, though you can remove any `// ignore:` comments you added for this rule.
+- `require_yield_after_db_write` and `suggest_yield_after_db_read` no longer fire in packages that do not depend on Flutter — their premise, protecting a UI thread, does not apply there.
+
+`google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on a nullable authorization result — the exact shape v7's scope-authorization call returns — so correctly migrated code is left alone.
+
+`prefer_late_final` no longer flags a `late` field whose assigning method is captured as a tear-off in a field initializer; the 16.2.1 fix covered only tear-offs written inside a method or constructor body, so taking the suggestion could still produce a late-initialization error at run time.
+
+`avoid_ignoring_return_values` now reads `safe_to_ignore:` only from its own section of `analysis_options_custom.yaml` instead of silently adopting a same-named list from an unrelated section further down the file. No action required unless a stray allowlist was being picked up, in which case move those names into the rule's own section.
+
+`banned_usage` now reads its banned-identifier list only from its own section of `analysis_options_custom.yaml`, instead of adopting a same-named list from an unrelated section further down the file or appending that section's items to its own. No action required unless stray bans were being picked up, in which case move those identifiers into the rule's own section.
+
+`always_specify_parameter_names` now reads its allowlist only from its own section of `analysis_options_custom.yaml`, with the same fix for adopted and appended entries. No action required unless a stray allowlist was being picked up, in which case move those entries into the rule's own section.
+
+### Added (Extension)
+
+- The extension now checks the Dart analysis server's memory cap against this machine's RAM at startup and, when there is no cap or it leaves less than half the RAM for everything else, explains the trade-off and offers a recommended value in one click. Click Apply, or choose Don't ask again to keep your setting.
+- Package Vibrancy now shows a separate "Upgrade Required" status for packages that are alive but where your installed old major version is known to be broken, instead of labeling them "End of Life"; "End of Life" now means only that the package itself is dead.
+- Package Vibrancy now checks what an upgrade would break before recommending it, and replaces the upgrade nudge with the reason when dependents cap the package below the new version or the new version needs a newer dependency than your Flutter SDK pins (for example `analyzer` 13, which needs a newer `meta` than Flutter stable ships) or needs a dependency that another package in your project caps (for example a `drift_dev` release that requires `analyzer` 13 while a dependency caps it below 13), naming the package responsible. Blocked packages are also skipped by "upgrade all", and the newest version you can still take is suggested.
+
+### Fixed (Extension)
+
+- Manage Rule Packs no longer resets itself while the Dart analyzer is running. Your pack search, the Matching rules list, filters, sort order, opened rule lists and scroll position now stay put, and the page redraws only when something on it actually changed.
+- Clicking a pack name in Manage Rule Packs' Matching rules list now scrolls to that pack, highlights it, opens its rule list and puts focus on its on/off switch. If another filter (type, Detected, Enabled) was hiding the pack, that filter is cleared and your search is kept.
+- The rule detail panel now shows the rule's problem, how to fix it, impact, type and OWASP mapping when opened from Manage Rule Packs, a related-rule link or the Explain Rule command. Before, it showed only the rule name.
+- Turning a rule pack off in `analysis_options_custom.yaml` no longer deletes the blank line and the next top-level section (such as `platforms:`) after it.
+- Machine Health, Workspace Readiness, Set Analysis Server Heap Cap and Unload Ollama Model now appear in the command catalog.
+- The saropa_lints update prompt now appears at every startup while your project is behind, instead of only once per release even when the notification was missed. Choose Don't ask for this version to silence a release.
+- Setting the analysis server heap cap from System Health now changes the settings file that actually controls it, instead of reporting success while a workspace setting kept the old value.
+- Package Vibrancy no longer marks healthy packages such as `flutter_map`, `camera` and `location` as end of life when checking for new adoption or offering quick fixes, because a problem recorded for an old version was being applied to every version.
+- Package Vibrancy now notes when a package is unlisted, in maintenance mode or under a caution, warns when an end-of-life record may be out of date, and never offers a retracted release as the latest version.
+- The known-issues data was cleaned up: about a dozen dead entries removed, wrong version limits on `hive`, `flutter_hooks`, `camera` and `responsive_builder` corrected, and long-quiet packages such as `beamer` and `camerawesome` moved to maintenance mode.
+- Every translated language now has complete, correct translations: missing strings were added, broken placeholders and code snippets repaired, and hundreds of nonsensical machine translations replaced.
+- The "Dismiss" button in every translated language now reads correctly; several languages previously showed unrelated machine-translated phrases.
+- Package Vibrancy's known-issues data now marks `cubit`, `shared_preferences_ios`, `url_strategy` and `integration_test` as end of life, no longer flags eight revived packages (such as `alice` and `rubber`), and stops flagging current `flutter_secure_storage` versions for a pre-5.0 problem.
+- The Analysis Optimizer's git-based scan now also covers Dart code inside git submodules and nested repositories.
+- The nested-package warning is now translated into all supported languages.
+- The Analysis Optimizer now lists Dart files through git in one pass when the project is a git repository, so scans are faster, ignored files never count, and the 50,000-file cap no longer applies there. Projects without git keep the previous scan.
+- The System Health panel warns when a Dart project contains git-ignored nested package roots, which the analysis server treats as separate contexts, and offers a one-click exclude or a per-folder dismiss.
+- The Analysis Optimizer now lists nested Dart package contexts as a high-priority exclusion row, and its scan honors `files.exclude` and `.gitignore`.
+- The Analysis Optimizer's scan now detects `StatelessWidget` and `StatefulWidget` classes as widgets.
+- The Package Dashboard no longer shows a white page with unreadable dark text under dark themes; the Feature Inventory tab's browser-only colors were overriding the editor theme.
+- The System Health panel now tracks Dart processes and memory on macOS and Linux instead of only Windows, whatever the system language.
+- The Analysis Optimizer now skips dot-folders such as agent worktree copies, which the Dart analyzer never analyzes, so they no longer inflate costs or crowd out real files, and a scan that hits its file cap now says the results are partial.
+- The file-watcher exclude audit now suggests excluding agent worktree copies when a workspace has any, and dismissing the audit hides only the patterns shown, so a new suggestion can still appear once. Accept the prompt to add the exclusion.
+- Turning CI off in the System Health panel no longer breaks a workflow whose job already has its own `if:` condition. It used to add a second `if:`, which GitHub rejects as an invalid workflow. The existing condition is now swapped for `if: false` and put back exactly when CI is turned on again. A workflow with a job it cannot safely switch off is left untouched, and the panel reports that CI is still running.
+- Turning CI off no longer misses a job's own `if:` when a comment sits above it at 0-2 spaces of indent. The body scan stopped at the comment, so the `if:` further down was never found, and a second `if: false` was inserted before it — the same duplicate-key failure the previous fix was meant to prevent.
+- `buildCiWorkflow`'s dartdoc had been merged into `ciNeedsExplicitTier`'s by a missing blank line, so `--emit-ci`'s workflow-generating function carried no documentation. Restored to the function it describes; no behavior change.
+- The CI card and `init --emit-ci` write identical workflow files again. Their header and comments had drifted apart.
+
+- The Config Dashboard now redraws as soon as you toggle a rule pack, enable a rule, or pick a dropdown value, instead of showing "Update pending" until you click somewhere else — only in-progress text entry defers a refresh now.
+
+### Internal
+
+- The extension compiles again with `vscode-languageclient` 10: the LSP client's output channel is now a log channel, which that version requires.
+- The bundled rule catalog (`extension/media/rules_catalog.json`) and each rule's metadata in the `violations.json` export now include the rule's `problemMessage` and `impact`, taken from the same `LintCode` a live diagnostic uses. The catalog was regenerated.
+- Restored the state and problems index modules of Package Vibrancy, which an earlier cleanup deleted and which stopped the extension from compiling.
+- Added `scripts/pubdev_snapshot.py`, which downloads the latest pub.dev data for every tracked package into a reusable snapshot and refreshes the Package Vibrancy known-issues data from it; the analyzer entries now record why analyzer 13 and later is held back. It also flags packages that look revived or stale, and seven long-quiet packages moved to maintenance mode.
+- The localization key checker no longer crashes, ignores its test fixture, and recognizes keys referenced through key-type unions.
+- Test descriptions for the shared CI workflow fixture checks now state the expected behavior, satisfying `require_test_description_convention`.
+- `CHANGELOG_ARCHIVE.md` (11k+ lines) split into one file per major.minor line under `changelog/archive/` (e.g. `15.2.x.md`); the old file is now a short index. Every release entry is preserved (plus 10.12.0–12.2.1, recovered from git history where an earlier trim had deleted them without archiving) and stays greppable with `grep -r <term> changelog/archive/`. `scripts/split_changelog_archive.py` regenerates the split and index; `compact_changelog_archive.py` and the rule-version-history scan now read the directory, and `changelog/` is excluded from the pub.dev package.
+
+- Section bounding for the line-based config readers is now a single directly tested helper, adopted by all three readers.
+- The Flutter SDK contract lookup behind `avoid_public_members_in_states` is computed on demand, so a `State` class with no public overridden members no longer pays for element resolution and a supertype walk.
+- `avoid_string_substring` now documents that it cannot prove bounds established inside a helper function it would have to inline; suppress with `// ignore:` at the call site when the helper is bounds-safe.
+
+---
+
+## [16.3.0]
+
+Minor release adding a GitHub Actions integration: a composite action, a CLI flag that writes the workflow for you, and a switch in the extension that turns it on and off. [log](https://github.com/saropa/saropa_lints/blob/v16.3.0/CHANGELOG.md)
+
+### Added
+
+A composite GitHub Action at the repository root runs saropa_lints against a project's pull requests. Reference it as `saropa/saropa_lints@v16`, which now tracks the latest 16.x. `mode` decides what a finding does — `annotate` posts SARIF to the pull request diff, `gate` fails the build, `both` does each. `command` decides which rules produce one — `scan` honors the project's own `analysis_options.yaml`, `audit` runs every rule regardless of configured tier, and `auto` picks per mode. An analysis that could not run fails the job in every mode, so a green check always means it actually ran.
+
+`dart run saropa_lints:init --emit-ci` writes `.github/workflows/saropa-lints.yml` into a project, pinned to the saropa_lints version doing the generating. It refuses to overwrite an existing file, so a re-run cannot discard workflow edits a team has made.
+
+### Added (Extension)
+
+- A **GitHub Actions CI** card in the System Health panel turns CI on and off for the project. ON adds the dependency if missing and writes the workflow; OFF adds one `if: false` line per job rather than deleting the file, so the change is reversible and any customization survives. Neither direction commits anything on its own — the file governs every contributor's pull requests, so it goes through normal review.
+- The generated workflow runs the `scan` command, which honors the project's configured tier and per-rule choices rather than reporting all 2332 rules, and carries `continue-on-error` so it reports without failing pull requests. Removing that line makes it enforce.
+- Both directions of that switch offer to open a pull request for the change, since nothing reaches CI until it is on the default branch. It is a deliberate step, never automatic: the panel shows the exact git commands it would run, beside a copy button, and cuts no branch until the button is pressed. Only the workflow file is ever staged, the branch is always new and the push is never forced, and a failure names the step that failed and leaves the commands valid to finish by hand.
+
+### Fixed (Extension)
+
+- The Diagnostic Engines section of the System Health panel is no longer hidden when `saropaLints.debug.enabled` is off. These controls decide whether analysis runs at all, and one of them turns off a project's CI.
+- Package Vibrancy's "Generate CI Pipeline" produced workflows that always passed: thresholds were printed but never compared, and the generated checker was invoked in a way that never executed it. The generated workflow now compares against `maxOutdated` and fails the job when it is breached. Thresholds that `pub outdated` carries no data for are now stated as unenforceable rather than silently ignored.
 
 ---
 
@@ -101,15 +559,15 @@ Patch release fixing false positives in two lint rules, adding a project-level a
 
 ### Fixed
 
-`google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on already-migrated `GoogleSignInClientAuthorization` results or unrelated model classes with a same-named field. No action required.
+`google_sign_in_auth_token_from_authenticate` no longer flags `.accessToken` reads on already-migrated `GoogleSignInClientAuthorization` results or unrelated model classes with a same-named field.
 
-`avoid_public_members_in_states` no longer flags `WidgetsBindingObserver`/`RouteAware`/`AutomaticKeepAliveClientMixin` callback methods (e.g. `didChangeAppLifecycleState`, `didPushNext`, `wantKeepAlive`) on a `State` class that carries the interface via `with` or `implements` — their public spelling is mandated by the framework, so the rule's own suggested private-rename fix would have silently broken dispatch. No action required.
+`avoid_public_members_in_states` no longer flags `WidgetsBindingObserver`/`RouteAware`/`AutomaticKeepAliveClientMixin` callback methods (e.g. `didChangeAppLifecycleState`, `didPushNext`, `wantKeepAlive`) on a `State` class that carries the interface via `with` or `implements` — their public spelling is mandated by the framework, so the rule's own suggested private-rename fix would have silently broken dispatch.
 
-`prefer_late_final` no longer flags a `late` field whose assigning method is passed elsewhere as a bare tear-off (e.g. `setState(_initFutures)`) — the tear-off's runtime call count can't be bounded from the declaration site, so the field may genuinely be reassigned even though only one direct call site is visible in the AST. No action required.
+`prefer_late_final` no longer flags a `late` field whose assigning method is passed elsewhere as a bare tear-off (e.g. `setState(_initFutures)`) — the tear-off's runtime call count can't be bounded from the declaration site, so the field may genuinely be reassigned even though only one direct call site is visible in the AST.
 
-`avoid_ignoring_return_values` no longer flags a project-local `extension` method whose name follows a mutate-verb convention (`add*`, `append*`, `insert*`, `remove*`, `update*`, `set*`) and returns `bool` — the same structural shape as allowlisted stdlib mutators like `List.add`, where the bool is a "did it happen" convenience the caller is not required to consult. No action required.
+`avoid_ignoring_return_values` no longer flags a project-local `extension` method whose name follows a mutate-verb convention (`add*`, `append*`, `insert*`, `remove*`, `update*`, `set*`) and returns `bool` — the same structural shape as allowlisted stdlib mutators like `List.add`, where the bool is a "did it happen" convenience the caller is not required to consult.
 
-`require_ios_accessibility_large_text` no longer flags `TextStyle(fontSize:)` when the value comes from a non-const getter, method call, or property access — only bare numeric literals and const identifiers are flagged. Previously the rule pattern-matched source text for `textScaleFactor`/`textScaler`/`MediaQuery` substrings and missed any design-system token that applies Dynamic Type scaling through a helper. No action required.
+`require_ios_accessibility_large_text` no longer flags `TextStyle(fontSize:)` when the value comes from a non-const getter, method call, or property access — only bare numeric literals and const identifiers are flagged. Previously the rule pattern-matched source text for `textScaleFactor`/`textScaler`/`MediaQuery` substrings and missed any design-system token that applies Dynamic Type scaling through a helper.
 
 ### Fixed (Extension)
 
@@ -157,358 +615,7 @@ New rule `avoid_unbounded_image_in_full_bleed_container`: flags an `Image`/`Imag
 - Extracted duplicate watcher-exclude merge logic (read config, spread, set keys, write at workspace level) from both `workspaceHazardScan.ts` and `watcherExcludeAudit.ts` into a shared `mergeWatcherExcludes` helper in `watcherExcludeHelpers.ts`.
 - Added a guard around the watcher-exclude audit's `workspaceState.get` call so a corrupted workspace state after a VS Code crash does not prevent the audit from running.
 - Fixed extension version scheme so stable releases supersede their betas on Marketplace and Open VSX. Stable versions now bump minor to the next even above the prerelease odd minor (e.g. `16.2.x` > `16.1.x`).
-- Documented the split between Dart AST rules (`lib/src/rules/`, scoped to resolved `.dart` files) and ad hoc extension-native checks (`extension/src/`, full workspace file access, own `DiagnosticCollection` each, not yet surfaced in the web report) in `bugs/ISSUE_REPORT_GUIDE.md`, so non-Dart-file issues are routed correctly instead of being misfiled as out of scope. No action required.
-
----
-
-## [16.0.1]
-
-Adds a "What's New" panel that surfaces on activation, flagging the v16 diagnostic engine change (LSP server replacing the Analyzer Plugin), the new machine health monitoring, and the sidebar redesign — with a one-click revert to the previous engine. [log](https://github.com/saropa/saropa_lints/blob/v16.0.1/CHANGELOG.md)
-
-### Added (Extension)
-
-- New "What's New" panel opens on activation, summarizing the v16 diagnostic engine change (Analyzer Plugin → LSP server, on by default), the new machine health monitoring, and the sidebar redesign — with one-click actions including reverting to the Analyzer Plugin, plus a live rule-count stat strip and a discovery grid linking straight into the Findings, Package, and Rules & Tiers dashboards. The panel keeps reappearing on every activation until you scroll through it and uncheck "Show this next time"; reopen it anytime from the Command Palette or Help Hub ("Saropa Lints: What's New"). No action required unless your diagnostics look different after this upgrade, in which case the panel's revert button restores the previous engine.
-
-### Added (Lint Rules)
-
-- New `always_specify_parameter_names` rule (Professional tier) flags call sites passing 2+ consecutive positional arguments of the same or confusable type (e.g. two Strings, int+double), where named arguments could prevent silent swap bugs. Allowlists idiomatic Dart/Flutter constructors like `Offset(dx, dy)` (matched by declaring library, so a project's own same-named class is never silently exempted); add project-specific allowlist entries under `always_specify_parameter_names: allowlist:` in `analysis_options_custom.yaml`.
-
-### Fixed (Lint Rules)
-
-- Fixed `avoid_unbounded_dependency` false positive in Melos/pub-workspace monorepos where a dependency with `any` constraint is paired with a `path:` entry in `dependency_overrides:`. The `any` is inert in that case because pub resolves via the local path, not the loose constraint. Only `path:` overrides suppress the lint; `git:` and `hosted:` overrides do not.
-
-### Improved (Extension)
-
-- "Run analysis" now reads live VS Code diagnostics instead of spawning a cold `dart analyze` subprocess, completing in milliseconds instead of tens of seconds on large projects. The three analysis paths (full workspace, per-file, and post-config-change) all use the live diagnostic stream. The data written to `violations.json` is structurally identical to what the Problems panel shows, eliminating stale-data divergence between runs.
-
-### Internal
-
-- Fixed the publish workflow authenticating to pub.dev with a stale OIDC token. `setup-dart` mints the credential once, right after SDK install; Analyze plus the full test suite then run for 9-10 minutes before the publish step, long enough for the short-lived token to expire and be rejected as `Invalid JWT token: invalid timestamps`. This had been misdiagnosed twice (beta.6, beta.9) as a transient pub.dev outage. `setup-dart` now re-runs immediately before `dart pub publish` so the token is minted at the point of use.
-- Bumped GitHub Actions across all workflows to Node.js 24-compatible major versions (`actions/checkout` v4→v5, `actions/setup-python` v5→v6, `actions/setup-node` v4→v5 with runtime bumped to Node 22, `actions/upload-artifact` v4→v5, `actions/github-script` v7→v8), resolving the Node.js 20 deprecation warning on GitHub-hosted runners.
-
----
-
-## [16.0.0-beta.9]
-
-Activation is now resilient — commands register and the sidebar warns on failure instead of going blank. The Findings Dashboard absorbs the full-project audit as a scope selector and gains severity coloring, clickable file paths and rule names, a filter-aware page limit, and JSON export. Sidebar rows show live counts, and per-file analysis no longer blocks the extension host. Publish-pipeline fixes stop the i18n audit from launching Ollama and the local pub.dev fallback from flooding the terminal. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.9/CHANGELOG.md)
-
-
-### Fixed (Extension)
-
-- Fixed "command not found" errors for dashboard and config commands when unrelated activation setup threw an error. The 80-command registration block now always executes regardless of whether earlier setup (providers, watchers, LSP) succeeded or failed. No action required.
-- When activation setup fails, the sidebar now shows a warning banner ("Activation Error — Check Extension Host log for details") instead of empty panels. No action required.
-- Fixed "Prune ignores" crashing the Flutter daemon on Windows by spawning `dart` directly instead of via a `cmd.exe` wrapper, eliminating process-tree complexity that competed for SDK resources. All `dart` CLI invocations now use direct spawn; `flutter` (a `.bat` wrapper) retains the shell path, and an ENOENT fallback retries with a shell for legacy SDK installs. No action required.
-- Fixed per-file analysis (`runAnalysisForFiles`) blocking the extension host with a synchronous `spawnSync` call for the entire `dart analyze` duration. Converted to the async `runInWorkspaceAsync` variant that the full-workspace analysis already uses, keeping the event loop responsive and adding a Cancel button to the progress notification. No action required.
-- "Run Analysis" now reads live VS Code diagnostics instantly instead of spawning a `dart analyze` subprocess. Completes in milliseconds instead of tens of seconds. The zero-violations case now shows a confirmation message instead of silent completion. Config-change rescans use an event-driven freshness gate instead of a fixed delay. No action required.
-- Sidebar dashboard rows now show live counts instead of static labels — Findings Dashboard shows violation count and health score, Package Dashboard shows how many packages have features to adopt, and the activity bar badge now reflects only lint violations. No action required.
-- Findings Dashboard sidebar row now shows "updated Ns ago" once live diagnostics have changed at least once this session, so a stale-looking count can be told apart from a genuinely fresh one at a glance. The freshness timestamp now only updates for `.dart` file diagnostics, not unrelated file types, and the row's icon switches from a warning triangle to a clock once the timestamp is over an hour old, so an aging count no longer reads as an up-to-date warning. No action required.
-
-### Improved (Extension)
-
-- Full Audit is now a "Source" scope selector inside the Findings Dashboard toolbar (Live diagnostics / Full project / Changed vs main / Changed vs branch) instead of a separate sidebar entry that opened a VS Code quick-pick menu and a second report panel. Progress and results render in the same dashboard you already have open, the chosen scope is remembered across sessions, and a legacy `saropa_lints` version's audit output normalizes to the current severity vocabulary the same way the batch report already did.
-- Audit report: severity is now color-coded — error rows get a red left border, warning rows amber, and severity pills/chips use tinted text for quick scanning.
-- Audit report: all counts use thousands separators (e.g. 151,919 instead of 151919) for readability.
-- Audit report: filter chip counts use a consistent badge style instead of bare parenthesized numbers.
-- Audit report: removed the duplicate read-only KPI chip strip — the interactive filter chips already show the same counts.
-- Audit report: the 500-row page limit now applies after filtering, not before. The pagination note clarifies this.
-- Audit report: added "Export JSON" button that saves the full diagnostics to a user-chosen file.
-- Audit report: file paths are visually clickable (link color + underline on hover) and now jump to the diagnostic line instead of just opening the file.
-- Audit report: rule names are clickable — clicking one filters the table to show only findings for that rule, with a dismissible banner.
-- Audit report: when errors or warnings exist, INFO findings are hidden by default so actionable findings are immediately visible. Click the INFO chip to show them.
-- Audit report: a severity summary bar below the header shows the error/warning/info ratio as colored segments with tooltips. No action required.
-- Audit report: clicking a file path now jumps to the exact column, not just the line. No action required.
-
-### Internal
-
-- Sidebar data is now computed once per refresh cycle (`prepareRefreshCycle`) instead of being cleared and rebuilt by each provider independently. Eliminates redundant `readVisibleLiveViolations` + `computeLiveHealthScore` calls when multiple sidebar sections refresh together.
-- Fixed i18n audit (`--mode audit`) probing Ollama engine availability via `low_quality_entries()`, which self-provisioned the daemon and pulled the model — an expensive, risky side effect during a read-only coverage check. Audit now uses `audit_only=True` to scan cache provenance tags without any subprocess calls. No action required.
-- Fixed `dart pub publish --force` (local fallback) printing its full file-tree listing to stdout, flooding the terminal and pushing prior publish-step output out of the scrollback buffer. Output is now captured; only the pub.dev confirmation line is surfaced. No action required.
-- Added manual translations to `dictionaries.py` for 5 gaps across 4 locales (ar, de, fil, pt) that MT engines did not translate: RSS warning description, "Dev Tool Budget", "Set Cap", "Translation Engine (Ollama)". No action required.
-- Added `COGNATES` approval list to `dictionaries.py` for words that are spelled identically in specific target languages (e.g. "Source" in French). Previously each cognate needed a per-locale `"X": "X"` passthrough scattered across the file; the centralized list merges them at import time, with locale-code validation (typos raise `ValueError`), empty/duplicate-locale guards, drift detection (`--fail-on-drift`), and a `--check-cognates` flag (now in the publish pipeline) that catches conflicts and DO_NOT_TRANSLATE redundancies. No action required.
-
----
-
-## [16.0.0-beta.8]
-
-🌍 **Milestone: 25 languages, 2,319 translated fields** — extension ships in 25 locales (Arabic, Bengali, Chinese, Dutch, English, Farsi, Filipino, French, German, Hebrew, Hindi, Indonesian, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Swahili, Thai, Turkish, Ukrainian, Urdu, Vietnamese).
-
-Fixed a sidebar action that could crash on a project's first scan or run twice on rapid clicks, and shortened several sidebar labels. System Health now monitors the whole machine — not just saropa_lints' own processes — with proactive warnings and one-click fixes. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.8/CHANGELOG.md)
-
-### Added (Extension)
-
-- Machine-wide health monitoring: system RAM, every Dart analysis server, Flutter daemon, and Ollama/llama-server process grouped by category with contextual recommendations and one-click actions (restart server, set heap cap, reclaim orphans, unload model). Accessible from the sidebar and command palette. No action required.
-- Dev Tool Budget indicator: a single percentage showing how much of the machine's RAM dev tools consume versus a configurable target (`saropaLints.systemHealth.devToolBudgetPercent`, default 60%). Warns when dev tools exceed the budget. No action required.
-- Proactive warnings when free RAM drops below a configurable threshold (`saropaLints.systemHealth.systemMemoryWarningPercent`, default 15%) or any single analysis server exceeds a configurable size (`saropaLints.systemHealth.analysisServerWarningGB`, default 4 GB), plus a one-time session-start check. System-wide free RAM now appears in the status bar tooltip. No action required.
-
-### Fixed (Extension)
-
-- Fixed "Fix stale ignores" sidebar action crashing with ENOENT when the `reports/.saropa_lints/` directory does not yet exist (e.g. first run on a project). The directory is now created before the scan CLI writes its JSON output. No action required.
-- Fixed all stale-ignore commands allowing concurrent execution when double-clicked or triggered in rapid succession, which could launch duplicate CLI processes. A busy guard now shows a brief status-bar message and drops the duplicate click. No action required.
-
-### Changed (Extension)
-
-- Shortened sidebar action labels: "Fix stale ignores" → "Prune ignores", "Initialize / Update config" → "Update config". Descriptions now carry the detail the labels shed. No action required.
-
-### Internal
-
-- Extracted `createBusyGuard` to `commandGuards.ts` as a reusable concurrency guard with visible status-bar feedback, replacing four identical inline busy-flag patterns in the stale-ignore commands. No action required.
-- Routed the three sidebar Actions labels ("Run analysis", "Prune ignores", "Update config") through `l10n()` with new `sidebar.actions.*` keys in `en.json`, closing an i18n gap where two of the three labels were hardcoded English. No action required.
-- Hardened Machine Health dashboard: Windows-only platform guard with localized message, narrow viewport wrapping/scrolling, two-tier query/notification throttle (2 min / 10 min) to reduce unnecessary PowerShell shell-outs, undefined-arg guard on Unload Ollama Model command. No action required.
-- System memory warning now honors the user's configured threshold directly instead of silently clamping to a 20% minimum at session start. No action required.
-
----
-
-## [16.0.0-beta.7]
-
-Process Health now tracks only saropa-owned memory, so other VS Code windows no longer trigger false alerts. The tooltip adds a trend arrow, sparkline chart, and early leak detection. Also fixes the dashboard's "Enable all recommended packs" button showing stale results. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.7/CHANGELOG.md)
-
-### Added
-
-- New rule `add_resolution_workspace` (recommended tier, WARNING): flags a package listed in a Dart pub workspace that is missing `resolution: workspace` in its pubspec.yaml, catching version drift before `pub get` fails. Quick fix inserts the key after the `environment:` block. No action required.
-- New rule `flag_missing_workspace_member` (recommended tier, INFO): flags a workspace root whose subdirectories contain pubspec.yaml files not listed in the `workspace:` list, catching packages that silently resolve independently instead of joining the shared lockfile. Scans up to 3 levels deep, skips listed members' children (no example/ false positives). No action required.
-- New rule `workspace_dependency_version_sync` (recommended tier, INFO): flags a workspace whose member packages declare different version constraints for the same dependency, catching version drift that produces misleading pubspecs since all members share one lockfile. No action required.
-- New rule `workspace_member_order` (recommended tier, INFO): flags a workspace root whose `workspace:` list entries are not in alphabetical order, making large workspaces easier to scan and reducing merge conflicts from unordered insertions. No action required.
-- New rule `prefer_publish_to_none` (recommended tier, INFO): flags a pubspec.yaml that has no `publish_to` field and appears to be an application (missing homepage/repository metadata), guarding against accidental `dart pub publish` to pub.dev. Quick fix inserts `publish_to: none` after `description:` (or after `name:` if there is no description). No action required.
-- New rule `avoid_dependency_overrides` (recommended tier, WARNING): flags any non-empty `dependency_overrides:` section in pubspec.yaml, which silently diverges the resolved dependency graph from declared constraints and masks real conflicts. No action required.
-- New rule `prefer_pinned_version_syntax` (stylistic tier, INFO): flags caret-range version constraints (`^X.Y.Z`) in app pubspecs (`publish_to: none`), suggesting exact pins for reproducible builds. Conflicting pair with `prefer_caret_constraint_in_app` — opt-in only. No action required.
-- Process Health tooltip now shows an RSS trend arrow (↑ rising / → stable / ↓ falling) next to the saropa section header. A rising trend is an early memory-leak warning before the red threshold trips. Based on a 5-sample split-mean with a 10% change threshold. No action required.
-- Process Health tooltip includes a Unicode sparkline chart (▁▂▃▄▅▆▇█) showing saropa RSS over the last ~30 minutes. Gives a visual memory profile at a glance without opening a panel. No action required.
-- Process Health now detects monotonically rising RSS and shows a one-time "possible memory leak" notification before the red threshold trips. Based on 8/10 consecutive non-decreasing comparisons, tolerating brief GC dips. No action required.
-
-### Fixed
-
-- Fixed Process Health status bar falsely attributing system-wide Dart memory to saropa_lints. The red/yellow thresholds now evaluate saropa-owned process RSS only (scan daemon, CLI scans), not the aggregate of all Dart processes. A 12GB analysis server from another VS Code window no longer makes the saropa_lints indicator go red.
-- Process Health tooltip now shows a per-process breakdown: saropa-owned processes first (with health check), Flutter daemons, then other Dart processes as informational. Top 3 processes per category listed by RSS. Hints when multiple analysis servers are detected.
-- Fixed "Enable all recommended packs" button showing "no applicable rule packs detected" while the dashboard table correctly showed 87 detected packs. The button now uses `getDetectedPackIds`, a shared helper that both the table and the button call, so the two surfaces can never diverge. No action required.
-
-### Internal
-
-- Hardened `add_resolution_workspace` quick fix: re-verifies `resolution: workspace` absence before inserting (guards against stale diagnostics and batch "fix all" duplicates), added trailing-newline guard when inserting after the environment block, and tolerates blank lines inside the environment block. The detection regex now also accepts quoted forms (`"workspace"` / `'workspace'`).
-- Hardened `flag_missing_workspace_member` scan: deduplicated path-normalization logic into a shared public helper, extended case-insensitive path comparison to macOS (default APFS), and made the `build/` directory skip case-insensitive.
-- Extracted `findDivergentDependencyConstraints` from `workspace_dependency_version_sync` into the pubspec constraint parser, creating a pure-function seam for unit testing and removing an unreachable block-dep guard that the parser already handles.
-- Hardened Process Health tooltip: process labels truncated at 30 chars for width safety, analysis server detection broadened with `--protocol=lsp` for future binary rename resilience, ✓/↑ conflict resolved (rising trend suppresses the healthy checkmark to avoid mixed signals), and partition assertion added to catch filter coupling drift.
-- Expanded RSS history ring buffer from 5 to 30 samples for sparkline rendering while preserving trend computation on the most recent 5.
-- Added monotonic growth detector as a pure function with 8/10 threshold — fires a one-time informational toast directing the user to the health panel.
-- Hardened sparkline renderer to use reduce loops instead of spread for stack safety, and ProcessMonitor returns a defensive copy of the RSS history buffer.
-- Added `classifyProcess()` as a discriminated union (`ProcessCategory` + label) replacing the duplicated predicate chains across tooltip, snapshot, and label functions. Boolean predicates (`isSaropaProcess`, `isDaemonProcess`, `isAnalysisServerProcess`) now delegate to it, and the tooltip builder uses a single-pass partition instead of three independent filter passes with a runtime assertion.
-- Fixed leak detection "Open Health Panel" button silently no-oping because it called unregistered command `showHealthPanel` instead of the registered `showProcessHealth`.
-- Added 45 tests total in the systemHealth suite (90 passing): `classifyProcess` discriminated union (8), process partition mutual exclusivity (3), marker substring containment invariant (1), plus the existing `processLabel` (9), `isAnalysisServerProcess` (4), `truncateLabel` (5), RSS trend boundary (2), `renderSparkline` (6), `detectMonotonicGrowth` (7).
-- Extracted `getDetectedPackIds` in `rulePackDefinitions.ts` as the single source of truth for pack applicability. The dashboard table and "Enable all" button both call it instead of inlining `isPackDetected` filters independently.
-- Replaced the collapsed HTML Maintenance expander changelog convention with a `### Internal` heading, enforced by a pre-commit hook and a publish-time gate. No action required.
-
----
-
-## [16.0.0-beta.6]
-
-Fixes a false positive in the l10n diagnostic provider and catches more CI-only test failures locally before publishing. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.6/CHANGELOG.md)
-
-### Fixed
-
-- Fixed the l10n diagnostic provider (`saropa-l10n`) reporting false-positive "expects params but none passed" warnings when `l10n()` receives its params via a variable or expression instead of an inline object literal. The parser now recognizes non-literal second arguments and skips static key extraction for them. No action required.
-- Fixed the l10n diagnostic silently accepting `l10n('key', undefined)` and `l10n('key', null)` without warning when the template expects params. These keyword arguments are now correctly treated as "no params passed." No action required.
-
-### Internal
-
-- Introduced a branded `OpaqueParams` type for the l10n parser sentinel, preventing accidental use of the sentinel string in key-extraction functions at compile time.
-- Extracted `extractBalancedBrace` as a shared export from `l10nParsers.ts`, deduplicating the brace-matching loop previously inlined in `extractParamsBlock`.
-- Added missing `usesTypeResolution` override to `AvoidCaseSensitivePathComparisonRule` (uses `staticType`).
-- Added 4 missing codes to the `flutter_skill_lints` migration pack that moved from TODO/PARTIAL to HAVE.
-- Publish script: `create_git_tag` now prompts before moving a stale remote tag to HEAD on retry instead of hard-failing.
-- Publish script: `_find_workflow_run` skips already-failed runs so retry doesn't re-attach to old workflows.
-- Publish script: delta test pass now includes integrity and config test suites when rule/config files change, catching cross-cutting failures locally instead of deferring to CI.
-
----
-
-## [16.0.0-beta.5]
-
-Hardens memory safety and scan reliability across the extension and CLI. Memory pressure detection now attributes usage correctly, preventing false pauses on large projects, and a stalled scan on save can no longer disable the feature for the session. Also fixes false positives in timer-lifecycle and manifest rules, and adds orphaned-process detection at startup. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.5/CHANGELOG.md)
-
-### Added
-
-- Memory debug mode: set `SAROPA_LINTS_DEBUG_MEMORY=1` to log per-cache size breakdowns on every periodic memory trend line. Helps diagnose which plugin caches are growing when investigating memory pressure. No action required.
-- Orphaned process check: finds model host and Dart processes left behind by earlier sessions, reports how much memory they hold, and offers to reclaim them after you confirm. Runs once shortly after startup and is also available from the Process Health panel and the command palette. No action required.
-- New `saropaLints.scanOnSave.timeoutSeconds` setting (default 180, range 30 to 1800) caps how long a single scan on save may run before it is abandoned. Raise it on very large projects if scans are cut short. No action required.
-- Diagnostic triage script: `python scripts/triage_scan.py` post-processes `--format json` scan output into five priority buckets (errors → bulk fixes → individual triage → dev code → forked code), replacing manual categorization of bulk lint sweeps. Supports `--suppress-dirs`, `--dev-dirs`, `--bulk-threshold`, and `--format json` for machine-readable output. No action required.
-
-### Fixed
-
-- Fixed stale diagnostics persisting in the Problems panel after adding `// ignore:` directives or fixing code. The scan CLI now honors `// ignore:` and `// ignore_for_file:` directives, and "Restart Analysis Server" now also clears scan-on-save diagnostics and rescans open editors. No action required.
-- Fixed hard RSS valve pausing all rules based on the analysis server's total process memory instead of the plugin's own contribution. On large projects the server's AST caches and resolved element model consume 70–90% of RSS, tripping the valve even when the plugin's estimated footprint is under 100 MB. The valve now checks plugin attribution: it only pauses rules when the plugin's estimated memory exceeds 100 MB or 5% of process RSS. A separate unconditional panic threshold at 90% of system RAM provides last-resort OOM protection. No action required.
-- Fixed the Drift Advisor integration opening every Dart file in the workspace on each 30-second poll, which could cascade into repeated whole-project scans and exhaust system memory until VS Code crashed. Table lookups now read files directly without creating editor documents, and results are cached until Dart sources change. No action required; the integration is off by default, so only users who enabled it were affected.
-- Fixed scan on save treating a file opened by other extension code as a file the user opened, which let any extension's background file access trigger lint scans. Scans now run only for files you actually have open or have saved. No action required.
-- Fixed a stalled scan permanently disabling scan on save for the rest of the session. Scans now time out, are canceled when a newer save supersedes them, and release their slot on every failure path. No action required.
-- Fixed the memory status bar showing a red critical badge next to a healthy memory figure when the real trigger was orphaned background processes. The badge now names whichever condition actually tripped, and a memory reading shows the same total the warning threshold is compared against. No action required.
-- Fixed every level of memory pressure painting the status bar error red, including informational ones such as a light rule shed. Only genuinely severe states are red now, with moderate states amber and informational states left uncolored. No action required.
-- Fixed a Dart file open only as one side of a diff or merge view never receiving scan on save diagnostics, because only ordinary tabs were recognized. No action required.
-- Fixed a canceled scan leaving an orphaned Dart process on macOS and Linux, and a failure to launch the process cleanup command being able to crash the extension host. No action required.
-- Fixed the memory status bar showing plugin state that was no longer live, so a project with the analyzer plugin switched off could still display paused rules and a large memory figure from an earlier session. Nothing is shown now unless the plugin is enrolled and the reading is from the current session. No action required.
-- Fixed the memory safety valve never resuming rules after it paused them. Clearing the plugin's own caches made it a minor memory contributor, but release was tested against total process memory, which the analysis server keeps high, so rules stayed paused indefinitely. No action required.
-- Fixed the memory valve repeatedly re-measuring every cache while the analysis server sat above the memory cap, which made the common case the most expensive one. No action required.
-- Fixed the translation tooling abandoning multi-gigabyte model host processes on every run, by terminating whole process trees rather than a parent alone, sweeping for survivors, and refusing to start when abandoned processes are already present. No action required.
-- Fixed `require_copy_with_null_handling` firing on `copyWith` methods where all fields using `??` are non-nullable types. The sentinel/wrapper pattern adds no value when a field cannot be null, so `??` is the correct pattern. The rule now checks class field nullability before emitting. No action required.
-- Fixed `require_permission_manifest_android` asserting a missing manifest entry when it cannot read AndroidManifest.xml. Downgraded to INFO severity since the rule is advisory only. No action required.
-- Fixed `require_url_launcher_queries_android` asserting missing `<queries>` blocks when it cannot read AndroidManifest.xml. Downgraded to INFO severity since the rule is advisory only. No action required.
-- Fixed `require_workmanager_for_background` firing on `Timer.periodic` inside `State` subclasses with proper `cancel()` in `dispose()`. UI-lifecycle timers are not background tasks. No action required.
-- Extended `require_workmanager_for_background` to also detect `Stream.periodic` — the same background-polling anti-pattern using the stream API. No action required.
-- Fixed `avoid_ios_battery_drain_patterns` firing on `Timer.periodic` inside `State` subclasses with proper `cancel()` in `dispose()`. Widget-bound timers cannot drain battery in the background. No action required.
-
-### Internal
-
-- Triage script (`scripts/triage_scan.py`): added diagnostic-key validation (warns when `filePath`/`severity`/`ruleName` are missing), and a 29-test unit-test suite covering path classification, bucket assignment, and output formatting. No action required.
-- Changelog guard hook (`scripts/hooks/changelog_guard.py`): removed the `package.json` version-drift check that false-alarmed every beta cycle because VS Code uses a different version scheme. Guard 1 (multiple unreleased sections) still triggers on `package.json` edits. No action required.
-- Extracted shared `isTimerLifecycleBoundToDisposableState()` helper to eliminate duplicate private implementations across timer lifecycle rules. No action required.
-
----
-
-## [16.0.0-beta.4]
-
-Adds five new lint rules covering unsafe late-final fields, constructor and widget ordering, and Equatable prop sorting. Extends the dashboards with inline rule guidance, embedded Package Dashboard tabs, live sidebar data, and scan progress in Health Panel and Project Map. Also fixes several false-positive and over-suppression bugs in existing rules. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.4/CHANGELOG.md)
-
-### Added
-
-- New rule `avoid_public_late_final_without_initializer`: flags public `late final` fields with no initializer — a runtime crash waiting to happen if any caller reads the field before it is assigned. No action required.
-- New rule `avoid_unnecessary_factory_constructor`: flags `factory` constructors whose body just returns `ClassName(...)` — a factory keyword adds indirection with no benefit when the constructor could be a regular named or unnamed constructor. No action required.
-- New rule `no_internal_method_docs`: flags DartDoc comments on private methods in non-library code — internal-only methods rarely benefit from doc comments and the noise makes public API docs harder to find. No action required.
-- New rule `prefer_state_class_below_widget`: flags a `State<X>` class declared above its `StatefulWidget X` — the conventional Flutter ordering places the widget's public API first. Closes the DCM `keep-state-below-its-widget` gap. No action required.
-- New rule `prefer_sorted_equatable_props`: flags an Equatable `props` getter whose field order doesn't match the class's field declaration order — props that drift out of declaration order are harder to audit for missing fields. Closes the DCM `sort-equatable-props` gap. No action required.
-- Findings dashboard: the top-rules expander now shows each rule's how-to-fix guidance, OWASP mapping, related rules, and supersedes/migration notes inline, instead of requiring a jump to the separate Rule Explain screen. This detail is now also available during live analysis, not only after a batch export. No action required.
-- Package Dashboard: the Upgrades, Full report, and Known issues tabs now render their content inline instead of opening a separate editor tab. Compare still opens as its own panel. No action required.
-- Analysis Optimizer (embedded in the Lints Config dashboard): sortable columns and a working select-all, matching the standalone panel. Sort choice is remembered per dashboard. No action required.
-- Project Map: a live percentage progress bar with a file count during scanning, plus pause and cancel, and a Files / Lines / Size summary in the header. Older engines without progress support fall back to the previous elapsed-time view. No action required.
-- Project Map reports: the severity and doctor reports now render as sortable typed tables rather than preformatted text, via a new `--format json` mode on both command-line tools. No action required.
-- Health Panel: engine cards now show live scan progress ("Scan: N/M files") while the language server is scanning a workspace. No action required.
-- Lints Config, Config file tab: a "Migrate config keys" action now appears there when legacy plugin-block keys remain, replacing the sidebar row that previously carried it. No action required.
-- Findings dashboard status line and the sidebar's Code Health row now show quality-gate state. A failing gate previously appeared only inside the Code Health screen, so it was invisible unless you went looking for it. No action required.
-- Sidebar Code Health and Project Map rows now show live data — health grade and score, and how long ago the project was last scanned — instead of fixed descriptive text. Both read already-computed results and never start a scan. No action required.
-- Scan CLI: `--no-exclude` flag disables all hardcoded path exclusions (`example/`, `build/`, `.dart_tool/`, etc.) so the scan covers every `.dart` file it finds. User-supplied `--exclude-globs` still apply. No action required.
-- LSP Server: new `saropaLints.lspServer.workspaceScanDelay` setting (default 5 seconds) defers the workspace scan after the analyzer is ready, letting VS Code's startup burst settle first. Set to 0 for immediate scan. No action required.
-
-### Changed
-
-- `require_test_description_convention` now recognizes 23 additional action verbs as good description indicators and uses word-boundary matching to prevent false negatives on substring matches (e.g. "maps" no longer matches inside "hashmaps"). No action required.
-- `require_test_description_convention` quick fix now handles interpolated test descriptions — previously it silently skipped them because the full string value was null. No action required.
-- `prefer_state_class_below_widget` now detects third-party widget/state pairs — Riverpod's `ConsumerStatefulWidget`/`ConsumerState` and flutter_hooks' `HookStatefulWidget`/`HookState` — in addition to core Flutter's `StatefulWidget`/`State`. No action required.
-- Renamed engine names throughout the extension: "Analyzer Plugin" → "Live Analysis", "Scan Daemon" → "Scan on Save" in the Health Panel; "Turn Off Lint Integration" → "Disable Saropa Lints" and "Re-enable In-Process Plugin" → "Re-enable Live Analysis" in the command catalog. Updated notification strings that referenced "Lint integration" to say "Scan on save". No action required.
-
-- Sidebar restructured into three sections totalling 14 rows: Dashboards, Status, and Actions. Rows that open a screen, rows that report state, and rows that run something are now separated, so a row's section tells you what clicking it will do. No setting is flipped from the sidebar any more. No action required.
-- Package Dashboard now uses the shared dashboard chrome for page spacing and typography. Body padding, base font size, and line height change slightly as a result; layout is otherwise unchanged.
-- The bundled rule catalog now carries correction text and OWASP mappings for every rule, so live analysis can show them without a batch export. This grows the packaged catalog by roughly 0.5 MB. No action required.
-
-### Fixed
-
-- Fixed LSP Server flooding the output channel with `didClose` messages on startup — VS Code sends a burst of didClose notifications for files from the previous session; these are now trace-level and only visible with verbose logging. No action required.
-- Fixed `avoid_string_substring` false positives where the index was already guaranteed in bounds by a regex `hasMatch()` guard, an `indexOf()`/`lastIndexOf()` result, or a `RegExpMatch`'s `.start`/`.end`/`.group()`. No action required.
-- Fixed `avoid_case_sensitive_path_comparison` false positives on non-path string comparisons: CLI flag literals, Dart import URI comparisons, filesystem root-detection idioms (`dir.path != dir.parent.path`), and identifiers where "path" was embedded in an unrelated word (e.g. "pathology"). Also fixed import-URI suppression failing to detect camelCase `Uri` segments (e.g. `namedUri`) because the boundary check ran on the lowercased name. No action required.
-- Fixed `avoid_unsafe_cast` false positives on `ProcessResult.stdout`/`.stderr` cast to `String` — the SDK default encoding always decodes to `String`, so the cast is only unsafe when the call explicitly passes a `null` encoding to request raw bytes. Also fixed a false positive when a cast is preceded by an exact-type `is` check on the same expression in an enclosing `if` condition (e.g. `if (v is List) { v as List }`); only `&&` compounds are recognized as guards — an `is` check inside `||` does not guarantee the type. No action required.
-- Fixed `avoid_nullable_interpolation` false positive when a `!= null` guard for the interpolated expression is buried inside a compound `&&` condition (e.g. `if (isChurning(f) && f.churn != null)`), not just a bare `if (expr != null)`. No action required.
-- Fixed `avoid_stack_trace_in_production` false positives in developer-tool code: `dart:developer`'s `log()` is now recognized as a diagnostics API (never user-visible output) regardless of package type, and files under a `bin/`/`tool/` directory are skipped even in mixed packages that aren't wholly CLI tools. No action required.
-- Fixed `require_url_validation` false positive on local `file://` path validation — the scheme-guard heuristic now also recognizes `.isScheme('file')` checks and the `file` scheme, not just `.scheme` reads against `https`/`http`. No action required.
-
-- Fixed `runtime_tier` being silently ignored when set in `analysis_options_custom.yaml`. The Config file tab writes this key, but the parser only ever recognized `saropa_tier`, so the chosen value was written to disk and then dropped with no warning. It is now recognized as a deprecated alias and reports a migration warning. Set the tier in the `plugins: saropa_lints:` block to have it take effect.
-- Fixed the Health Panel reporting scan-on-save as "idle" while it was actually disabled — the status only tracked memory-pressure suspension and never read the master switch, so a disabled scanner looked healthy. No action required.
-- Fixed `--format` being swallowed as the target path by the severity report and doctor command-line tools, so the flag had no effect and the positional path was lost. No action required.
-- Fixed selecting a package from the embedded Upgrades tab opening the detail pane behind a hidden tab; the dashboard now switches back to Overview first. No action required.
-- Fixed Package Dashboard's Full report and Upgrades embedded tabs showing "Generating…" forever on first open, and rendering stale data from the previous scan on subsequent opens. The async builders now read the current scan results instead of the not-yet-assigned options object. No action required.
-- Fixed Full report tab's "Expand/Collapse all" button toggling every `<details>` element in the Package Dashboard (charts, package filters, grade breakdown in Overview), not just the Feature Inventory's own disclosures. The script is now IIFE-wrapped and scoped to its own tab container. No action required.
-- Fixed the Health Panel engine card showing "scanning N/M files" indefinitely after a canceled workspace scan. The LSP server's scan progress notification now carries an explicit `done` flag on terminal ticks (cancel or completion), so the client no longer relies solely on the filesScanned/totalFiles ratio. No action required.
-- Fixed severity report and doctor typed tables falling back to raw text on the first run after install or `pub get`, because Dart's "Building package executable…" stderr banner was mixed into the JSON parse buffer. Only stdout is now accumulated for JSON parsing. No action required.
-- Fixed Project Map progress bar never reaching 100% when the CLI's final progress event arrived without a trailing newline. The partial-line flush on process exit now routes through the progress parser instead of bypassing it. No action required.
-- Fixed `avoid_nullable_interpolation` false positive on `Match[n]` and `Match.group(n)` in string interpolations — when the regex pattern literal is visible, a group-count parser now verifies the accessed index refers to a required capture group; the parser now also traces through variable assignments (`final re = RegExp(r'...'); re.firstMatch(...)`) and correctly handles groups containing alternation (e.g. `(a|b)` is always required). No action required.
-- Fixed `avoid_dynamic_calls_extended` over-suppression: dynamic calls inside catch clauses and finally blocks are no longer wrongly exempted by the try/catch guard (only the try body is exempted). Bare `catch(e)` and `on Object` no longer suppress dynamic-call warnings — only `on NoSuchMethodError` and `on TypeError` indicate intentional duck-typing. No action required.
-- Fixed `require_catch_logging` over-suppression: `catch (e) { return null; }` with an unused exception variable was falsely exempt — the return/continue/break exemption now fires only when the exception variable is actually referenced. No action required.
-- Fixed `require_url_validation` over-suppression: substring `'file'` no longer matches inside identifiers like `profileId`; `startsWith` guards are now checked against the actual URL variable; CLI exemption is scoped to the file's directory rather than disabling the rule project-wide. No action required.
-- Fixed `avoid_global_state` over-suppression: `_hasClearOrResetFunction` now matches exact identifier tokens instead of substrings; `??=` lazy-init detection uses a word-boundary regex instead of raw source text; multi-variable declarations no longer fire duplicate diagnostics. No action required.
-- Fixed `require_cache_expiration` over-suppression: `.clear()` detection is now scoped to the flagged cache class's own Map fields rather than matching any `.clear()` in the file; `HashMap`/`hashCode` are no longer treated as crypto-hash indicators. No action required.
-- Fixed `avoid_string_substring` over-suppression: `indexOf` results are recognized as safe index sources alongside `RegExpMatch.start`/`.end`/`.group()`; a regex `hasMatch()` guard on the receiver is now accepted in `if`-condition and ternary branches. No action required.
-- Fixed `avoid_case_sensitive_path_comparison` over-suppression: the root-detection idiom check now verifies both sides of a `||` share the same base expression. No action required.
-- Fixed `require_test_description_convention` false positives on data-driven test descriptions built with string interpolation (e.g. `test('${'$'}{c.rule} should ...', ...)`) — the rule read `stringValue`, which is always null for a non-constant string, so every interpolated description was flagged regardless of its actual wording. It now reads the literal text segments instead. No action required.
-
-### Internal
-
-- Archived 36 tier-1 quick-win proposals already covered by existing rules — 19 implemented under the same name, 8 under a different name or alias, and 9 identified as functional duplicates of rules shipped in prior versions. Updated 15 migration guides to reflect the closures (TODO → HAVE with correct saropa rule name). No action required.
-- Added fixture coverage for `require_ios_deployment_target_consistency`'s collection-literal guard — GOOD cases with a rule-name string inside a `Set` and as a `Map` value, confirming `isDataLiteralElement()` (shipped in beta.3) already prevents the false positive reported in a duplicate bug report. No action required.
-- Added GOOD fixture cases for `require_catch_logging` and `avoid_swallowing_exceptions` covering fallback-return, loop-continue, and loop-break catch bodies, confirming the return/continue/break handling guard closes the intentional-fallback false positive reported against both rules. No action required.
-- Fixed 12 false-positive rule implementations: `avoid_unsafe_reduce` now skips non-empty list/set literals; `avoid_accessing_collections_by_constant_index` now skips write targets (DP row init); `require_catch_logging` and `avoid_swallowing_exceptions` now accept return/continue/break as valid handling; `avoid_dynamic_calls_extended` now exempts Object methods and try/catch-guarded duck-typing; `avoid_unsafe_cast` now recognizes preceding `is` checks; `avoid_global_state` now exempts lazy-init (`??=`) and managed-lifecycle globals; `avoid_case_sensitive_path_comparison` now skips root-detection idioms and CLI flag literals; `avoid_platform_specific_imports`, `avoid_stack_trace_in_production`, `require_cache_expiration`, `avoid_unbounded_cache_growth`, and `require_url_validation` now skip CLI tool and analyzer plugin packages via new `ProjectContext.isCliOrToolPackage()`. No action required.
-- Extended `avoid_global_state`'s managed-lifecycle exemption to also recognize a same-file `dispose*` function (previously only `clear*`/`reset*`), and confirmed `late final` globals were already exempt via the existing const/final skip. No action required.
-- Fixed `avoid_unnecessary_factory_constructor` compile error against analyzer 12.x — used removed `ClassDeclaration.name` getter instead of `nameToken`, causing the LSP server to crash on startup (exit 255).
-- Fixed unsafe `as Map<String, dynamic>` cast in `audit_baseline.dart` — `jsonDecode` on a valid-but-non-object baseline file (e.g. `[]`) threw `TypeError` instead of returning `null` per the documented contract. Replaced with `is!` type check.
-- Fixed 6 broken `// ignore:` comments missing the `saropa_lints/` prefix — suppressions in `project_context.dart`, `pubspec_constraint_parser.dart` (3), `project_context_parallel_batch.dart`, and `project_vibrancy_resolved_usage.dart` were silently ineffective.
-- Fixed case-sensitive path comparison in `project_vibrancy.dart` — `--file` CLI argument now compared with `p.equals()` for Windows/macOS compatibility.
-- Fixed nullable interpolation in `health_export_markdown.dart` — `churn` field interpolated without null guard, producing "null commits" in markdown export.
-- Fixed forward-slash path construction in `log_writer.dart` (2 sites) and `init_runner.dart` — replaced string interpolation with `p.join()`/`p.basename()` for cross-platform correctness.
-- Filed 13 false-positive bug reports across 13 rules against own-dogfood scan findings (305 total, 295 confirmed FP). See `bugs/` for details.
-- Fixed `commandCatalogRegistry.test.ts` failures: added 17 missing catalog entries for commands that existed in `package.json` but had no catalog registration, and marked 15 palette-hidden commands as `internal`. All 17 catalog sync tests now pass.
-- Fixed remaining `require_cache_expiration` / `avoid_unbounded_cache_growth` false positives on content-addressed caches: both rules now skip classes keyed by hash/sha/fingerprint/digest (a stale entry under an unchanged key is structurally impossible), skip files under a `bin/`/`tool/` directory in addition to the existing whole-package check, and skip caches with an explicit `.clear()` call anywhere in the same file. No action required.
-
-- Partially migrated the Package Dashboard's parallel stylesheet onto the shared dashboard chrome: the accessibility helper, hero header, status line, and page layout families now come from the shared layer. The remaining duplicated families cannot be adopted piecemeal because the shared chrome's exported functions bundle unrelated rules — adopting the motion helper would also restyle inline code, and adopting the layout helper drags a full body reset with it. Splitting the chrome into single-concern exports is a prerequisite for finishing this.
-- Reworked the embedded Known issues tab to prefix element ids and scope its script, preventing collisions with the host dashboard's own search and table when both render in one document.
-- Added regression coverage for the areas above: the scan progress event schema and cancel path, the language server's progress notification shape, the rule-catalog correction/OWASP backfill, the report totals parser, the optimizer sort and bulk-select, the rule-detail expander, and the embedded tab contracts.
-- Added CI compile-check gate (`dart compile kernel`) for all `bin/` entry points — catches build-breaking analyzer API changes that `dart analyze` misses because rule files are loaded at runtime.
-- Added CI `check_analyzer_api_compat.py` script that greps rule files for known-removed analyzer package APIs (e.g. `ClassDeclaration.name.lexeme`) before they reach users as a crash.
-
-- Extracted shared `catchHandlesViaControlFlow()` and `catchBodyUsesException()` utilities into `catch_body_logging_utils.dart` — eliminates duplicated return/continue/break and exception-usage checks between `require_catch_logging` and `avoid_swallowing_exceptions`. No action required.
-
-- Split the shared dashboard chrome stylesheet into single-concern exports, with the existing public functions preserved as compositions so every consumer renders identically. The previous bundling made the layer un-adoptable piecemeal: taking the hero animation also took an unrelated monospace rule, and taking the full-width toggle dragged a whole body reset with it. A unit test now pins each composition.
-- Removed a duplicate `.sr-only` accessibility rule from the token layer after confirming every consumer already pairs it with the accessibility helper; the test suite now pins that rule as defined exactly once.
-- Fixed 9 self-dogfood lint warnings in test files: 3 `avoid_misused_test_matchers` (raw `true`/`false` → `isTrue`/`isFalse`), 5 `require_test_description_convention` (added "should" keyword to interpolated test descriptions), and 1 `prefer_setup_teardown` (hoisted repeated `_violationsForExample()` call into `setUpAll`).
-- Adopted the shared hero animation and reduced-motion rules in the Package Dashboard stylesheet. The summary cards, table toolbar, and footprint toggle stay local by decision, not omission — each differs from its chrome counterpart in layout semantics, domain color vocabulary, or ARIA interaction model, and the reasons are documented in the code. See `plans/PLAN_ext_ui_report_styles.md` for the full disposition.
-- Fixed 2 stale curated dictionary keys in `dictionaries.py`: removed the `de` entry whose English source text was rewritten (daemon label, LSP/plugin separation), and capitalized the `fil` "Analyzer Plugin" key to match the current source strings. Patched 48 missing translations across 21 locales — 4 format/loanword strings added to `DO_NOT_TRANSLATE`, 15 locale-specific entries hand-translated. Added `--strict-dnt` flag to `generate_locales.py` — treats `DO_NOT_TRANSLATE` collision warnings as errors for CI gating.
-- Added "Make member public (remove underscore)" quick fix for `no_internal_method_docs` — strips the leading `_` from the declaration name as an alternative to the existing "Convert to a regular comment" fix.
-- Added fixture files for `no_internal_method_docs`, `prefer_state_class_below_widget`, and `prefer_sorted_equatable_props`. Extended `avoid_public_late_final_without_initializer` fixture with static and multi-variable edge cases.
-- Added `DeprecatedNewInCommentReferenceRule` instantiation test to the documentation rules test suite.
-- Fixed scan CLI silently excluding `example_packages/` fixtures: the hardcoded `/example` substring in `scan_runner.dart` matched `example_packages/`, the `--files` flag applied exclusions to explicitly named files, and `shouldSkipFile`'s fixture-skip exemption missed relative paths and `example_packages/`. Three-part fix: tightened the substring to `/example/`, bypassed exclusions when `--files` is explicitly provided, and added `startsWith` checks for relative paths.
-- Fixed three CodeQL `js/bad-tag-filter` alerts (two reported, one preemptive) in test infrastructure — closing-tag regexes now tolerate attributes and case variants. No action required.
-- Added `check_html_tag_regex.py` CI script that detects HTML tag regexes missing case-insensitive flags or attribute-tolerant closing tags before CodeQL reports them on push. No action required.
-- Moved `require_test_description_convention` fixture from `example/lib/testing_best_practices/` (where `isTestPath` never matched, so the `FileType.test`-gated rule silently never ran) to `example/lib/test/` with real BAD/GOOD examples covering simple strings and interpolated descriptions. Added to `expectedFromFixtures` in the integration test.
-- Added `check_fixture_filetype_match.py` CI script that audits all rules with `applicableFileTypes => {FileType.test}` and verifies their fixture files live at paths matching `isTestPath()` — wired into the publish pipeline as a blocking check via `run_pre_publish_audits()`, and supports `--fix` to bulk-relocate misplaced fixtures via `git mv`. No action required.
-
----
-
-## [16.0.0-beta.3]
-
-Streamlines the extension sidebar by moving rows that duplicated dashboard controls onto the Findings and Rules & Tiers dashboards instead. Fixes path traversal vulnerabilities in the HTML reporter and package detection, plus false positives in the path-comparison rule and several iOS rules. Also fixes a startup crash on large workspaces and makes the in-editor scan progressive and cancelable. [log](https://github.com/saropa/saropa_lints/blob/v16.0.0-beta.3/CHANGELOG.md)
-
-### Changed
-
-- Sidebar collapsed from 25–39 rows to 13 steady-state (15 worst case). Severity toggles, setting-value rows (run-after-config/dependency, UI language, detected packages), and triage rows removed from the Settings panel — each was a duplicate of a richer control on the Rules & Tiers Automation/Extension tabs, Package Dashboard, or Findings Dashboard's top-rules table. No action required.
-- Sidebar Tier and Lane rows folded into the Dashboards "Lints Config" row description (`Tier: recommended · Lane: light`), replacing two click-only rows with always-visible state. No action required.
-- Sidebar "Migrate config keys" row now appears only while legacy plugin-block keys remain to clean up, instead of rendering unconditionally. No action required.
-- Findings dashboard status line gains trend, regression, and security-hotspot pills — the same data the sidebar Status rows showed, now persistent and clickable instead of buried in a collapsible panel. No action required.
-- Sidebar Status section: Hotspots, Trends, Score regression, Suppression count, and Last-run rows removed — all now live on the Findings dashboard's status line or are straight duplicates of Findings data. Health row gains a "Last analysis: {ago}" tooltip. No action required.
-- Sidebar Status panel now visible on all Dart projects, not just those with violations — Lint integration status was hidden exactly when it mattered most (integration off = no violations = panel gone). No action required.
-
-### Added
-
-- Quick fix for `avoid_misused_test_matchers` — auto-rewrites `expect(x, true)` → `expect(x, isTrue)`, `expect(x, false)` → `expect(x, isFalse)`, `expect(x, null)` → `expect(x, isNull)`, and `expect(x.length, N)` → `expect(x, hasLength(N))`. No action required.
-- Rules & Tiers Config file tab: Lane card. Switch between Light (~200 rules in-editor) and Full (all enabled rules) from the same dashboard that already shows every other `analysis_options_custom.yaml` key. No action required.
-- Config file tab: the Baseline card now shows a "Diff vs current" subsection listing violations resolved since the baseline and new since the baseline, each with a file/line/rule table. Reads live diagnostics — never triggers a scan and stays current as you edit. No action required.
-- Live sidebar badges: the Status view's Activity Bar icon now carries a numeric badge (critical count when any exist, else total violations), and the Dashboards view carries a badge for packages with unadopted features. No action required.
-- Rules & Tiers and Project Map dashboards now show a "?" button that opens a list of the tab-jump shortcuts already available (`1`-`7` on Rules & Tiers, `1`/`2` on Project Map) — previously these shortcuts worked but had no in-app way to discover them.
-
-### Fixed
-
-- Fixed path traversal vulnerability in `cross_file report` HTML output — `outputDir` from `--output-dir` is now normalized and rejected if it contains `..` segments. No action required.
-- Fixed `avoid_path_traversal` in `detectProjectPackages` — `targetDir` parameter is now canonicalized before reaching `File()`. No action required.
-- Fixed `avoid_case_sensitive_path_comparison` false positive on non-string comparisons — null checks, boolean/integer/double/enum guards on path-named variables no longer fire. No action required.
-- Fixed `require_ios_deployment_target_consistency` false positive on any string literal containing "async" — the rule's `_ios15PlusApis` map included a bare `'async'` entry intended to detect Swift concurrency, but it substring-matched every Dart string containing "async" (rule names, identifiers, comments). Removed the entry. No action required.
-- Hardened 6 iOS rules against false positives on collection-literal data tables — string literals inside list, set, or map literals (rule-name registries, route catalogs, path inventories) are now skipped by `AvoidIos13DeprecationsRule`, `AvoidIosSimulatorOnlyCodeRule`, `RequireIosMinimumVersionCheckRule`, `AvoidIosDeprecatedUikitRule`, `RequireIosDeploymentTargetConsistencyRule`, and `RequireIosCertificatePinningRule`. No action required.
-- Sidebar Status panel no longer silently drops the Health row before any analysis has ever run — it now shows a "Health: —" row explaining why, with a one-click link to run analysis. No action required.
-- Fixed LSP server crash on startup in large projects — the Dart VM exhausted its OS thread pool when the workspace scan called `lastModifiedSync` / `listSync` on hundreds of files. Replaced sync I/O with batched async equivalents (capped at 20 concurrent file operations) and added error handlers so failures exit cleanly instead of triggering an infinite restart loop. No action required.
-- LSP workspace scan is now progressive and cancelable — diagnostics publish incrementally as each file is analyzed, and the scan aborts cleanly on shutdown or config reload instead of racing to completion. Progress is logged every 50 files. No action required.
-
-### Internal
-
-- Fixed 15 pre-existing extension test failures: added missing `onDidChangeConfiguration` mock (13 issuesTree tests), updated stale locale coverage assertions (languagePick), and updated sidebar panel count from 5 to 4 after Help view removal (uxLabels). No action required.
-- Updated stale path reference in the UI redesign plan after archiving completed sub-plans. No action required.
-- Package Dashboard (Overview and Upgrades tabs): now pulls its color/spacing/radius design tokens from the same canonical token layer already used by the Settings and tab-bar surfaces, instead of only the legacy report stylesheet. No visible change — additive groundwork for retiring the older parallel styling system.
-- l10n diagnostics now recognize `// l10n:passthrough` on the same line as a suppress directive for calls whose `{placeholders}` are substituted by caller code (e.g. `pluralize()`) rather than by `l10n()` itself. Annotated all existing `pluralize()`+`l10n()` call sites. No action required.
-- Removed `transformProjectMapHtml()` and `webviewThemeOverride()` from `projectMapView.ts` — dead since the standalone Project Map panel switched to the composed `projectMapShell.ts` document in Phase 6; their only remaining reference was a historical code comment.
-- Added unit test coverage for `projectMapShell.ts` (shell tab structure, scanning-state pane, done-state pane) and `projectMapReports.ts` (report-card catalog, Reports tab HTML, quality-gate config read/write, panel-message routing) — both had zero tests before this pass.
-- Fixed null-unsafe map access and direct `as` casts in `asset_scanner.dart`, `health_cache.dart`, and `saropa_lint_rule.dart` — own-dogfood violations from `require_null_safe_json_access` and `avoid_unsafe_cast`. No action required.
-- Fixed 5 own-dogfood `avoid_misused_test_matchers` violations across 4 test files — replaced `expect(x.length, N)` with `expect(x, hasLength(N))`. No action required.
-- Extracted shared `sanitizePath()` utility to `path_guard.dart` — centralizes the normalize-and-reject-traversal pattern so future CLI entry points get path safety automatically. No action required.
-- README rewritten for readability — cut from 1,598 lines to ~430. Extension detail moved to `doc/guides/extension.md`, configuration reference to `doc/guides/configuration.md`, troubleshooting merged into `doc/troubleshooting.md`, FAQ to `doc/faq.md`. Added alternative package coverage table (46 packages audited, ~75% rule coverage). Deleted redundant `plans/GAP_ANALYSIS.md` — per-package data lives in migration guides.
-- Suppressed own-dogfood false positives in `analyzer_compat.dart` (dynamic dispatch, bare catches, swallowed exceptions are intentional version-probing shims) and `scan_runner.dart` (safe-by-construction cast). Fixed nullable interpolation in `DiagnosticCodeLowerCaseCompat.lowerCaseName`.
+- Documented the split between Dart AST rules (`lib/src/rules/`, scoped to resolved `.dart` files) and ad hoc extension-native checks (`extension/src/`, full workspace file access, own `DiagnosticCollection` each, not yet surfaced in the web report) in `bugs/ISSUE_REPORT_GUIDE.md`, so non-Dart-file issues are routed correctly instead of being misfiled as out of scope.
 
 ---
 

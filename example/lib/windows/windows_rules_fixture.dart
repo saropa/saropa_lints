@@ -209,9 +209,15 @@ void runApp(String app) {}
 
 /// Mock path package to provide a target for method invocation detection.
 class _Path {
-  String join(String a,
-          [String? b, String? c, String? d, String? e, String? f, String? g]) =>
-      '$a\\$b';
+  String join(
+    String a, [
+    String? b,
+    String? c,
+    String? d,
+    String? e,
+    String? f,
+    String? g,
+  ]) => '$a\\$b';
 }
 
 final p = _Path();

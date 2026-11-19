@@ -227,8 +227,8 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
       // Check for legacy WebView/InAppWebView constructors
       if (typeName == 'WebView' || typeName == 'InAppWebView') {
         final bool hasOnSslError = node.argumentList.arguments.any((arg) {
-          if (arg is NamedExpression) {
-            final String name = arg.name.label.name;
+          if (arg is NamedArgument) {
+            final String name = arg.name.lexeme;
             return name == 'onSslError' ||
                 name == 'onReceivedServerTrustAuthRequest';
           }
@@ -247,8 +247,8 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
       // See: https://pub.dev/documentation/webview_flutter/latest/webview_flutter/NavigationDelegate-class.html
       if (typeName == 'NavigationDelegate') {
         final bool hasOnSslError = node.argumentList.arguments.any((arg) {
-          if (arg is NamedExpression) {
-            final String name = arg.name.label.name;
+          if (arg is NamedArgument) {
+            final String name = arg.name.lexeme;
             return name == 'onSslAuthError';
           }
           return false;
@@ -336,12 +336,12 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
         return;
       }
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'allowFileAccess' ||
               name == 'allowFileAccessFromFileURLs') {
-            final String value = arg.expression.toSource();
+            final String value = arg.argumentExpression.toSource();
             if (value == 'true') {
               reporter.atNode(arg);
             }

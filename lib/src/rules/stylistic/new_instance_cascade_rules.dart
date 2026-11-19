@@ -76,8 +76,9 @@ bool _isFreshInstanceConfigStatement(Statement stmt, String varName) {
 /// identifier [varName] — used to reject method-call statements that would
 /// self-reference the receiver if folded into its own cascade initializer.
 bool _argumentsReferenceVariable(ArgumentList args, String varName) {
-  for (final Expression arg in args.arguments) {
-    if (_expressionReferencesVariable(arg, varName)) return true;
+  for (final Argument arg in args.arguments) {
+    if (_expressionReferencesVariable(arg.argumentExpression, varName))
+      return true;
   }
   return false;
 }

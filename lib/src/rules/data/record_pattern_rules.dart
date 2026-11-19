@@ -596,8 +596,8 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
       bool hasPositional = false;
       bool hasNamed = false;
 
-      for (final Expression field in node.fields) {
-        if (field is NamedExpression) {
+      for (final RecordLiteralField field in node.fields) {
+        if (field is RecordLiteralNamedField) {
           hasNamed = true;
         } else {
           hasPositional = true;

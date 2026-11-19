@@ -116,8 +116,6 @@ void _bad618() {
 
 // GOOD: Should NOT trigger prefer_firebase_remote_config_defaults
 void _good618() async {
-  await remoteConfig.setDefaults({
-    'feature_key': 'default_value',
-  });
+  await remoteConfig.setDefaults({'feature_key': 'default_value'});
   final value = remoteConfig.getString('feature_key');
 }

@@ -163,22 +163,19 @@ void fpCascade() {
 // BAD: Semantics wraps Column without container: true
 // expect_lint: prefer_semantics_container
 Widget badSemantics() => Semantics(
-      label: 'User info',
-      child: Column(children: []),
-    );
+  label: 'User info',
+  child: Column(children: []),
+);
 
 // GOOD: Has container: true
 Widget goodSemantics() => Semantics(
-      container: true,
-      label: 'User info',
-      child: Column(children: []),
-    );
+  container: true,
+  label: 'User info',
+  child: Column(children: []),
+);
 
 // FALSE POSITIVE: Semantics with non-group child (Text)
-Widget fpSemantics() => Semantics(
-      label: 'Title',
-      child: Text('Hello'),
-    );
+Widget fpSemantics() => Semantics(label: 'Title', child: Text('Hello'));
 
 // =============================================================================
 // avoid_redundant_semantics
@@ -187,18 +184,16 @@ Widget fpSemantics() => Semantics(
 // BAD: Semantics wrapping Image with semanticLabel
 // expect_lint: avoid_redundant_semantics
 Widget badRedundant() => Semantics(
-      label: 'Logo',
-      child: Image.asset('logo.png', semanticLabel: 'Logo'),
-    );
+  label: 'Logo',
+  child: Image.asset('logo.png', semanticLabel: 'Logo'),
+);
 
 // GOOD: Image with semanticLabel only (no Semantics wrapper)
 Widget goodRedundant() => Image.asset('logo.png', semanticLabel: 'Logo');
 
 // FALSE POSITIVE: Semantics wrapping Image WITHOUT semanticLabel
-Widget fpRedundant() => Semantics(
-      label: 'Logo',
-      child: Image.asset('logo.png'),
-    );
+Widget fpRedundant() =>
+    Semantics(label: 'Logo', child: Image.asset('logo.png'));
 
 // =============================================================================
 // avoid_image_picker_quick_succession

@@ -119,7 +119,7 @@ void _bad402__onSubmit() {
 // GOOD: Should NOT trigger avoid_clearing_form_on_error
 void _good402__onSubmit() {
   if (!_formKey.currentState!.validate()) {
-// Keep input, just show errors
+    // Keep input, just show errors
     return;
   }
 }

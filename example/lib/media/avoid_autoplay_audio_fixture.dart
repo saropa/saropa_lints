@@ -117,7 +117,8 @@ void _bad464() {
     ..setUrl(url)
     ..play(); // Auto-plays on load
   BetterPlayerController(
-      configuration: BetterPlayerConfiguration(autoPlay: true));
+    configuration: BetterPlayerConfiguration(autoPlay: true),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_autoplay_audio
@@ -126,5 +127,6 @@ void _good464() {
   // User presses play button to start
 
   BetterPlayerController(
-      configuration: BetterPlayerConfiguration(autoPlay: false));
+    configuration: BetterPlayerConfiguration(autoPlay: false),
+  );
 }

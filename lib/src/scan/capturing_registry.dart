@@ -77,14 +77,8 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addBlock(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockClassBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  // analyzer 11 has a single addEnumBody (covers both block and empty enum
-  // bodies). analyzer 12 split it into addBlockEnumBody + addEmptyEnumBody and
-  // dropped addEnumBody. The package supports analyzer 9-12, so all three are
-  // implemented: addEnumBody satisfies the 9-11 interface, the split pair
-  // satisfies the 12 interface. The unused override on each version is an
   @override
   void addBlockEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  void addEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockFunctionBody(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -145,9 +139,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addDeclaredVariablePattern(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
-  void addDefaultFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
-  @override
   void addDoStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addDotShorthandConstructorInvocation(
@@ -171,9 +162,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
       _capture(v);
   @override
   void addEmptyStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  // analyzer 12-only: the addEnumBody split (see addBlockEnumBody above).
-  // analyzer 9-11 route empty enum bodies through addEnumBody, where this is an
-  // override_on_non_overriding_member warning suppressed by the lib/** exclude.
   @override
   void addEmptyEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
@@ -255,9 +243,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addFunctionTypeAlias(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
-  void addFunctionTypedFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
-  @override
   void addGenericFunctionType(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
@@ -301,10 +286,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addLabeledStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addLibraryDirective(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  // analyzer 11 keeps addLibraryIdentifier (LibraryDirective.name typed as
-  // LibraryIdentifier?). analyzer 12 dropped this in favor of addDottedName.
-  void addLibraryIdentifier(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
   @override
   void addListLiteral(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
@@ -330,7 +311,20 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addMixinOnClause(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
-  void addNamedExpression(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  void addNamedArgument(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  @override
+  void addRecordLiteralNamedField(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  @override
+  void addFormalParameterDefaultClause(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  @override
+  void addFunctionTypedFormalParameterSuffix(
+    AbstractAnalysisRule r,
+    AstVisitor v,
+  ) => _capture(v);
+  @override
+  void addLabelReference(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addNamedType(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
@@ -441,7 +435,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addShowCombinator(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
-  void addSimpleFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
+  void addRegularFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
   void addSimpleIdentifier(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
@@ -512,10 +506,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addWildcardPattern(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addWithClause(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  void addRepresentationConstructorName(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
-  void addRepresentationDeclaration(AbstractAnalysisRule r, AstVisitor v) =>
-      _capture(v);
   @override
   void addYieldStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override

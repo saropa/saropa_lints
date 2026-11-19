@@ -26,9 +26,5 @@ Widget _goodInitialValue() {
 
 // FALSE POSITIVE: DropdownButton (not FormField variant) has 'value' legitimately
 Widget _fpDropdownButton() {
-  return DropdownButton<String>(
-    value: 'hello',
-    onChanged: (v) {},
-    items: [],
-  );
+  return DropdownButton<String>(value: 'hello', onChanged: (v) {}, items: []);
 }

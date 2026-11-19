@@ -111,7 +111,7 @@ final name = 'example';
 // expect_lint: require_equatable_props_override
 class _bad606_User extends Equatable {
   final String name;
-// Missing props!
+  // Missing props!
 }
 
 // GOOD: Should NOT trigger require_equatable_props_override

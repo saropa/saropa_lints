@@ -111,15 +111,17 @@ dynamic error;
 // BAD: Should trigger require_dio_interceptor_error_handler
 // expect_lint: require_dio_interceptor_error_handler
 void _bad591() {
-  dio.interceptors.add(InterceptorsWrapper(
-    onRequest: (options, handler) => handler.next(options),
-  ));
+  dio.interceptors.add(
+    InterceptorsWrapper(onRequest: (options, handler) => handler.next(options)),
+  );
 }
 
 // GOOD: Should NOT trigger require_dio_interceptor_error_handler
 void _good591() {
-  dio.interceptors.add(InterceptorsWrapper(
-    onRequest: (options, handler) => handler.next(options),
-    onError: (error, handler) => handler.next(error),
-  ));
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) => handler.next(options),
+      onError: (error, handler) => handler.next(error),
+    ),
+  );
 }

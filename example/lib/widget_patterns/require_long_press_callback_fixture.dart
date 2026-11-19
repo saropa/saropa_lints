@@ -110,10 +110,7 @@ dynamic child;
 // BAD: Should trigger require_long_press_callback
 // expect_lint: require_long_press_callback
 void _bad1430() {
-  GestureDetector(
-    onTap: () => selectItem(),
-    child: ListTile(),
-  );
+  GestureDetector(onTap: () => selectItem(), child: ListTile());
 }
 
 // GOOD: Should NOT trigger require_long_press_callback

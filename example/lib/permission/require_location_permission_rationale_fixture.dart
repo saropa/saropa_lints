@@ -136,7 +136,9 @@ void _good822() async {
           content: Text('We need your location to show nearby restaurants.'),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(context), child: Text('OK')),
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
           ],
         ),
       );

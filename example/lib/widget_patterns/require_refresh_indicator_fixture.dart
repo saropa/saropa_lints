@@ -113,10 +113,7 @@ final key = 'key';
 // BAD: Should trigger require_refresh_indicator
 // expect_lint: require_refresh_indicator
 void _bad1421() {
-  ListView.builder(
-    itemBuilder: (context, index) => ListTile(),
-    itemCount: 100,
-  );
+  ListView.builder(itemBuilder: (context, index) => ListTile(), itemCount: 100);
 }
 
 // GOOD: Should NOT trigger require_refresh_indicator

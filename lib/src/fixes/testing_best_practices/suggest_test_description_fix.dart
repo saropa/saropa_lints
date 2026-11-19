@@ -260,8 +260,18 @@ class _ExpectCollector extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     if (_expectNames.contains(node.methodName.name) &&
         node.argumentList.arguments.length >= 2) {
-      final actual = node.argumentList.arguments[0];
-      final matcher = node.argumentList.arguments[1];
+      // Positional arguments only: `expect(x, reason: ...)` must not have a
+      // named argument unwrapped into the matcher slot.
+      final positional = node.argumentList.arguments
+          .where((a) => a is! NamedArgument)
+          .map((a) => a.argumentExpression)
+          .toList();
+      if (positional.length < 2) {
+        super.visitMethodInvocation(node);
+        return;
+      }
+      final actual = positional[0];
+      final matcher = positional[1];
 
       final subject = _extractSubject(actual);
       final matcherName = _extractMatcherName(matcher);

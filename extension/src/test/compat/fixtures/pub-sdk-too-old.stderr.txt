@@ -1,0 +1,3 @@
+The current Dart SDK version is 3.13.7.
+
+Because t depends on newpkg from path which requires SDK version ^3.99.0, version solving failed.

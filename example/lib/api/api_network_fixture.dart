@@ -86,10 +86,12 @@ Future<void> goodHttpGetWithTimeout() async {
 
 // GOOD: Using Dio with base timeout configuration
 Future<void> goodDioWithTimeout() async {
-  final dio = Dio(BaseOptions(
-    connectTimeout: Duration(seconds: 30),
-    receiveTimeout: Duration(seconds: 30),
-  ));
+  final dio = Dio(
+    BaseOptions(
+      connectTimeout: Duration(seconds: 30),
+      receiveTimeout: Duration(seconds: 30),
+    ),
+  );
   final response = await dio.get('/data');
 }
 

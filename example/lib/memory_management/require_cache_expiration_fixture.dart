@@ -117,7 +117,7 @@ class _bad474_UserCache {
 
   User? get(String id) => _cache[id];
   void set(String id, User user) => _cache[id] = user;
-// No expiration - data stays forever!
+  // No expiration - data stays forever!
 }
 
 // GOOD: Should NOT trigger require_cache_expiration
@@ -204,7 +204,8 @@ class _good474_ExternallyManagedCache {
 }
 
 class _good474_CacheInvalidator {
-  final _good474_ExternallyManagedCache cache = _good474_ExternallyManagedCache();
+  final _good474_ExternallyManagedCache cache =
+      _good474_ExternallyManagedCache();
 
   // Scheduled/triggered from elsewhere; presence of any `.clear()` call in
   // the file is the signal, not who calls it or when.

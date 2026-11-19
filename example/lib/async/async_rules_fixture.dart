@@ -79,11 +79,13 @@ Future<void> badFutureThenInAsync() async {
 // BAD: Nested .then() in async function
 Future<void> badNestedThenInAsync() async {
   // expect_lint: avoid_future_then_in_async
-  fetchData().then((data) {
-    return processData(data);
-  }).then((result) {
-    print(result);
-  });
+  fetchData()
+      .then((data) {
+        return processData(data);
+      })
+      .then((result) {
+        print(result);
+      });
 }
 
 // GOOD: Using await instead of .then()

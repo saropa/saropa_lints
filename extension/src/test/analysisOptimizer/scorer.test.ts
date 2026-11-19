@@ -197,3 +197,33 @@ describe('scorer', () => {
     });
   });
 });
+
+describe('buildExclusionRows nested package roots', () => {
+  const groups = [
+    { folder: 'scratch/a', contextCount: 7, packages: [] as string[] },
+    { folder: 'tmp/x', contextCount: 2, packages: [] as string[] },
+  ];
+
+  it('adds a high-priority row per group, ranked by context count', () => {
+    const rows = buildExclusionRows([], [], [], groups);
+    assert.deepStrictEqual(rows.map(r => r.pattern), ['scratch/a/**', 'tmp/x/**']);
+    assert.strictEqual(rows[0].priority, 'high');
+    assert.strictEqual(rows[0].contextCount, 7);
+    assert.ok(rows[0].reason.startsWith('7 nested Dart package(s)'));
+  });
+
+  it('ranks by context count ahead of cost among same-priority rows', () => {
+    const big = file({ relativePath: 'a/b/x.dart', lineCount: 100000, isGenerated: true, daysSinceLastEdit: 1 });
+    const folders = aggregateByFolder([big, big, big]);
+    const rows = buildExclusionRows(folders, [big], [], groups);
+    assert.strictEqual(rows[0].pattern, 'scratch/a/**');
+  });
+
+  it('marks a group applied when analysis_options already covers it, and does not duplicate rows', () => {
+    const rows = buildExclusionRows([], [], ['scratch/a/**'], groups);
+    const claude = rows.filter(r => r.pattern === 'scratch/a/**');
+    assert.strictEqual(claude.length, 1);
+    assert.strictEqual(claude[0].isApplied, true);
+    assert.strictEqual(claude[0].contextCount, 7);
+  });
+});

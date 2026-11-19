@@ -6,6 +6,7 @@ import {
     OverrideAnalysis, DependencySection, PackageInsight,
 } from '../types';
 import { categoryIcon, categoryLabel } from '../scoring/status-classifier';
+import { isUpgradeSuppressed } from '../scoring/blast-radius-attacher';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 
 /**
@@ -31,6 +32,7 @@ export function categoryColor(cat: VibrancyCategory): vscode.ThemeColor {
         case 'stable': return new vscode.ThemeColor('editorInfo.foreground');
         case 'outdated': return new vscode.ThemeColor('editorWarning.foreground');
         case 'abandoned': return new vscode.ThemeColor('editorWarning.foreground');
+        case 'upgrade-required': return new vscode.ThemeColor('editorWarning.foreground');
         case 'end-of-life': return new vscode.ThemeColor('editorError.foreground');
     }
 }
@@ -58,7 +60,8 @@ export class PackageItem extends vscode.TreeItem {
     ) {
         super(result.package.name, vscode.TreeItemCollapsibleState.Collapsed);
         const hasUpdate = result.updateInfo?.updateStatus
-            && result.updateInfo.updateStatus !== 'up-to-date';
+            && result.updateInfo.updateStatus !== 'up-to-date'
+            && !isUpgradeSuppressed(result);
         // Compact rating: category label in parentheses, consistent with vibrancy report
         this.description = `(${categoryLabel(result.category)})`;
         // Append shared% so users can tell at a glance whether a package's

@@ -11,7 +11,7 @@ import {
     fetchArchiveSize,
 } from '../../../vibrancy/services/pub-dev-api';
 
-const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
+const fixturesDir = path.join(__dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures');
 
 describe('pub-dev-api', () => {
     let fetchStub: sinon.SinonStub;

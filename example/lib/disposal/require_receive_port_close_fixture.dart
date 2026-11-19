@@ -115,7 +115,7 @@ class _bad330__MyWidgetState extends State<MyWidget> {
     super.initState();
     _receivePort = ReceivePort();
   }
-// Missing close!
+  // Missing close!
 }
 
 // GOOD: Should NOT trigger require_receive_port_close

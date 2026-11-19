@@ -123,8 +123,8 @@ void _good427() async {
   onPressed:
   () async {
     await Clipboard.setData(ClipboardData(text: 'copied'));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Copied to clipboard')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Copied to clipboard')));
   };
 }

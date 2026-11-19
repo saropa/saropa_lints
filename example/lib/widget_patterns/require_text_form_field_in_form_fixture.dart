@@ -123,10 +123,6 @@ void _bad1448() {
 
 // GOOD: Should NOT trigger require_text_form_field_in_form
 void _good1448() {
-  Form(
-    child: TextFormField(
-      validator: (v) => v!.isEmpty ? 'Required' : null,
-    ),
-  );
+  Form(child: TextFormField(validator: (v) => v!.isEmpty ? 'Required' : null));
   // Or use TextField if no form validation needed
 }

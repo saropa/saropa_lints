@@ -280,7 +280,7 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
     final AstNode? parent = node.parent;
 
     // Check if it's a simple formal parameter
-    if (parent is SimpleFormalParameter) {
+    if (parent is RegularFormalParameter) {
       return true;
     }
 
@@ -361,10 +361,10 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'setState') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression callback = args.first;
+      final Expression callback = args.first.argumentExpression;
       if (callback is FunctionExpression) {
         final FunctionBody body = callback.body;
         if (body is BlockFunctionBody && body.block.statements.isEmpty) {
@@ -496,8 +496,8 @@ class AvoidLateContextRule extends SaropaLintRule {
     // Check for method calls like Theme.of(context)
     if (expr is MethodInvocation) {
       // Check arguments
-      for (final Expression arg in expr.argumentList.arguments) {
-        if (_usesContext(arg)) return true;
+      for (final Argument arg in expr.argumentList.arguments) {
+        if (_usesContext(arg.argumentExpression)) return true;
       }
       // Check target
       final Expression? target = expr.target;
@@ -593,7 +593,7 @@ class AvoidMountedInSetStateRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first.argumentExpression;
 
       // Check if the callback contains 'mounted' reference
       final _MountedVisitor visitor = _MountedVisitor();
@@ -1144,10 +1144,11 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // Only methods with a matching remove API. `addPostFrameCallback` (called
+  // exactly once, cannot be unregistered) and `addPersistentFrameCallback`
+  // (no remove API) are excluded: a named function would not help there.
   static const List<String> _listenerMethods = <String>[
     'addListener',
-    'addPostFrameCallback',
-    'addPersistentFrameCallback',
     'addTimingsCallback',
   ];
 
@@ -1162,7 +1163,7 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first.argumentExpression;
       if (firstArg is FunctionExpression) {
         reporter.atNode(firstArg);
       }
@@ -2447,6 +2448,23 @@ class _OrderedSetStateScanner extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitIfStatement(IfStatement node) {
+    // An await confined to an always-exiting branch never precedes code after
+    // the `if`: restore await/guard state once the `if` is walked.
+    if (awaitConfinedToExitingBranches(node) && containsAwait(node)) {
+      final bool seen = _seenAwait;
+      final List<bool> guards = List<bool>.of(_guardStack);
+      super.visitIfStatement(node);
+      _seenAwait = seen;
+      for (int i = 0; i < guards.length; i++) {
+        _guardStack[i] = guards[i];
+      }
+      return;
+    }
+    super.visitIfStatement(node);
+  }
+
+  @override
   void visitAwaitExpression(AwaitExpression node) {
     _seenAwait = true;
     // A new async gap invalidates every prior guard at every enclosing scope —
@@ -2635,7 +2653,7 @@ class _AddListenerFinder extends RecursiveAstVisitor<void> {
       final String target = _normalizeListenerToken(
         node.realTarget?.toSource() ?? '',
       );
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isNotEmpty) {
         final String callback = _normalizeListenerToken(args.first.toSource());
         onFound(target, callback, node);
@@ -2655,7 +2673,7 @@ class _RemoveListenerFinder extends RecursiveAstVisitor<void> {
       final String target = _normalizeListenerToken(
         node.realTarget?.toSource() ?? '',
       );
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isNotEmpty) {
         final String callback = _normalizeListenerToken(args.first.toSource());
         onFound(target, callback);
@@ -3800,9 +3818,9 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
       if (typeName != 'FutureBuilder') return;
 
       // Check future argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'future') {
-          final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'future') {
+          final Expression value = arg.argumentExpression;
 
           // Flag method invocations that create a new Future each rebuild.
           // Exempt the cache-method pattern: a private method whose name
@@ -3948,9 +3966,9 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
       if (typeName != 'StreamBuilder') return;
 
       // Check stream argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'stream') {
-          final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'stream') {
+          final Expression value = arg.argumentExpression;
 
           // Warn if stream is a method invocation (creating new stream).
           // Skip the cache-method pattern: a private instance method on a class
@@ -4808,8 +4826,7 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
       for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           for (final FormalParameter param in member.parameters.parameters) {
-            final FormalParameter effectiveParam =
-                param is DefaultFormalParameter ? param.parameter : param;
+            final FormalParameter effectiveParam = param;
             if (effectiveParam is FieldFormalParameter) {
               final Token name = effectiveParam.name;
               constructorFieldParams.add(name.lexeme);
@@ -5168,13 +5185,17 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       if (!_isStateSubclass(node)) return;
 
       final Set<String> mixinExemptMethods = _mixinExemptMethods(node);
-      final InterfaceElement? classElement = node.declaredFragment?.element;
-      // Computed once per class rather than per member: walking
-      // allSupertypes is the expensive part of the resolved fallback, and
-      // every public @override method on this class shares the same
-      // answer for "which names does a Flutter SDK supertype declare".
-      final _FlutterSdkContractMembers flutterSdkContractMembers =
-          _flutterSdkContractMembers(classElement);
+      // Memoised per class, and deliberately *lazy*: resolving the class
+      // element and walking `allSupertypes` is the expensive part of this
+      // rule, but it is only ever consulted for a public `@override` member.
+      // Most `State` classes have none, so computing it eagerly forced
+      // element resolution on every single one for an answer nobody read.
+      // Every public `@override` member on the class shares the same answer,
+      // so the first one that asks pays for all of them.
+      final _LazyFlutterSdkContractMembers flutterSdkContractMembers =
+          _LazyFlutterSdkContractMembers(
+            () => _flutterSdkContractMembers(node.declaredFragment?.element),
+          );
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
@@ -5250,7 +5271,7 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     MethodDeclaration node,
     Set<String> mixinExemptMethods,
-    _FlutterSdkContractMembers flutterSdkContractMembers,
+    _LazyFlutterSdkContractMembers flutterSdkContractMembers,
   ) {
     final String name = node.name.lexeme;
     if (name.startsWith('_')) return;
@@ -5280,9 +5301,13 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
     // code is exactly the encapsulation leak this rule exists to catch, so
     // it must still be flagged even though it is also an @override.
     if (_hasAnnotation(node.metadata, 'override')) {
+      // First read of `.value` is what triggers the supertype walk — see the
+      // laziness note at the construction site.
+      final _FlutterSdkContractMembers contract =
+          flutterSdkContractMembers.value;
       final bool isSdkContract = node.isGetter
-          ? flutterSdkContractMembers.getters.contains(name)
-          : flutterSdkContractMembers.methods.contains(name);
+          ? contract.getters.contains(name)
+          : contract.methods.contains(name);
       if (isSdkContract) return;
     }
 
@@ -5355,4 +5380,17 @@ class _FlutterSdkContractMembers {
 
   final Set<String> methods;
   final Set<String> getters;
+}
+
+/// Defers [AvoidPublicMembersInStatesRule._flutterSdkContractMembers] — and
+/// the element resolution it needs — until a member actually asks for it,
+/// then caches the answer for the rest of the class. A `State` class with no
+/// public `@override` member never triggers the supertype walk at all.
+class _LazyFlutterSdkContractMembers {
+  _LazyFlutterSdkContractMembers(this._compute);
+
+  final _FlutterSdkContractMembers Function() _compute;
+  _FlutterSdkContractMembers? _cached;
+
+  _FlutterSdkContractMembers get value => _cached ??= _compute();
 }

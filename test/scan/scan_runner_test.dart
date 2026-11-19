@@ -252,9 +252,8 @@ plugins:
           '${tempDir.path}/vendor/pkg/dep.dart',
         ).writeAsStringSync('void dep() {}\n');
 
-        // discoverDartFiles is static and doesn't take globs, so verify
-        // indirectly: construct with explicit dartFiles and check the glob
-        // filter drops the vendor file.
+        // Verify through the runner: construct with explicit dartFiles and
+        // check the glob filter drops the vendor file.
         final runnerWithFiles = ScanRunner(
           targetPath: tempDir.path,
           dartFiles: ['lib/app.dart', 'vendor/pkg/dep.dart'],

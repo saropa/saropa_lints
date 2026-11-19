@@ -113,6 +113,37 @@ Object f(Object? context) {
   // the same shared helpers. Driving the helpers directly with a param-
   // name predicate mirrors that visitor's call shape and lets us verify
   // the static path without exposing the visitor.
+  group('ContextUsageFinder — ternary as named argument in catch', () {
+    // Regression for bugs/avoid_context_across_async_false_positive_mounted_guarded.md
+    // (`return await` in try, `context: context.mounted ? context : null`
+    // in the catch). Not reproduced: the finder accepts this shape.
+    test('catch body after `return await` stays silent', () {
+      final result = parseString(
+        content: '''
+Future<bool> run(Object context) async {
+  try {
+    return await work(context);
+  } on Object catch (error, stack) {
+    debugException(error, stack, context: context.mounted ? context : null);
+    return false;
+  }
+}
+''',
+        featureSet: FeatureSet.latestLanguageVersion(),
+        throwIfDiagnostics: false,
+      );
+      final reported = <SimpleIdentifier>[];
+      result.unit.accept(
+        _CatchVisitor(
+          (clause) => clause.body.visitChildren(
+            ContextUsageFinder(onContextFound: reported.add),
+          ),
+        ),
+      );
+      expect(reported, isEmpty);
+    });
+  });
+
   group('isInsideMountedGuardedCondition / isNullCheckOperand', () {
     test(
       'compound `param != null && param.mounted` ternary: param-name predicate sees a guard',
@@ -363,5 +394,17 @@ class _BodyVisitor extends RecursiveAstVisitor<void> {
   void visitExpressionFunctionBody(ExpressionFunctionBody node) {
     onBody(node);
     super.visitExpressionFunctionBody(node);
+  }
+}
+
+/// Visits every catch clause so the finder runs on catch bodies only.
+class _CatchVisitor extends RecursiveAstVisitor<void> {
+  _CatchVisitor(this.onClause);
+  final void Function(CatchClause) onClause;
+
+  @override
+  void visitCatchClause(CatchClause node) {
+    onClause(node);
+    super.visitCatchClause(node);
   }
 }

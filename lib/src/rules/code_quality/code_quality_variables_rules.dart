@@ -16,6 +16,7 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../conditional_import_utils.dart';
 import '../../fixes/code_quality/add_late_final_fix.dart';
 import '../../fixes/code_quality/move_declaration_closer_fix.dart';
 import '../../fixes/code_quality/remove_late_keyword_fix.dart';
@@ -257,15 +258,15 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
     EnumElement enumElement,
   ) {
     final AstNode? named = mapNode.parent;
-    if (named is! NamedExpression) return false;
+    if (named is! NamedArgument) return false;
     final AstNode? argumentList = named.parent;
     if (argumentList is! ArgumentList) return false;
 
-    for (final Expression arg in argumentList.arguments) {
+    for (final Argument arg in argumentList.arguments) {
       if (identical(arg, named)) continue;
-      if (arg is! NamedExpression) continue;
+      if (arg is! NamedArgument) continue;
 
-      final DartType? siblingType = arg.expression.staticType;
+      final DartType? siblingType = arg.argumentExpression.staticType;
       if (siblingType is InterfaceType &&
           identical(siblingType.element, enumElement)) {
         return true;
@@ -497,6 +498,12 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
 /// `ro`) and `setupParentData(RenderObject child)` (assigning `child.parentData`).
 /// There is no copy alternative; the framework owns the object and requires
 /// in-place mutation.
+///
+/// A `void` or `bool` function/method whose contract is to update the passed
+/// object is also exempt: its dartdoc says "in place" or "mutates", or its
+/// name starts with a mutator verb (`apply`, `restore`, `rollback`, `inherit`,
+/// `carry`, `merge`, `stamp`, `mark`). A neutral name with no such doc, or a
+/// function that returns the object, is still flagged.
 class AvoidParameterMutationRule extends SaropaLintRule {
   AvoidParameterMutationRule() : super(code: _code);
 
@@ -535,6 +542,12 @@ class AvoidParameterMutationRule extends SaropaLintRule {
         node.functionExpression.parameters,
         node.functionExpression.body,
         reporter,
+        isVoid: node.returnType?.toSource() == 'void',
+        isMutatorContract: _isDocumentedMutator(
+          node.name.lexeme,
+          node.returnType,
+          node.documentationComment,
+        ),
       );
     });
 
@@ -543,6 +556,12 @@ class AvoidParameterMutationRule extends SaropaLintRule {
         node.parameters,
         node.body,
         reporter,
+        isVoid: node.returnType?.toSource() == 'void',
+        isMutatorContract: _isDocumentedMutator(
+          node.name.lexeme,
+          node.returnType,
+          node.documentationComment,
+        ),
         exemptParamNames: _renderObjectOverrideMutationTargets(node),
       );
     });
@@ -553,8 +572,10 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     FunctionBody body,
     SaropaDiagnosticReporter reporter, {
     Set<String> exemptParamNames = const <String>{},
+    bool isVoid = false,
+    bool isMutatorContract = false,
   }) {
-    if (params == null) return;
+    if (params == null || isMutatorContract) return;
 
     // Map each parameter name to its declared type name (syntactic). The
     // declared name lets us recognize mutation-by-design types even under a
@@ -567,6 +588,12 @@ class AvoidParameterMutationRule extends SaropaLintRule {
       // setupParentData). Dropping them from the map means the visitor never
       // sees them as mutation targets.
       if (name != null && !exemptParamNames.contains(name.lexeme)) {
+        // A `void` handler filling a purpose-built `*Draft` / `*Builder` /
+        // `*Accumulator` / `*Collector` / `*Buffer` object is the
+        // accumulator pattern (same intent as `list.add`).
+        if (isVoid && _isAccumulatorTypeName(_declaredTypeName(param))) {
+          continue;
+        }
         paramTypeNames[name.lexeme] = _declaredTypeName(param);
       }
     }
@@ -621,13 +648,39 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     return const <String>{};
   }
 
+  static final RegExp _mutatorVerbName = RegExp(
+    r'^_*(apply|restore|rollback|inherit|carry|merge|stamp|mark)($|[A-Z0-9_])',
+  );
+
+  /// True when a `void`/`bool` function states in-place update as its
+  /// contract: dartdoc mentioning "in place" / "mutates", or a mutator-verb
+  /// name. Callers read the mutated object afterward, so a copy is not an
+  /// alternative. Non-void/bool returns (e.g. returning the object) stay linted.
+  static bool _isDocumentedMutator(
+    String name,
+    TypeAnnotation? returnType,
+    Comment? doc,
+  ) {
+    final String? ret = returnType?.toSource();
+    if (ret != 'void' && ret != 'bool') return false;
+    if (_mutatorVerbName.hasMatch(name)) return true;
+    if (doc == null) return false;
+    final String text = doc.tokens.map((Token t) => t.lexeme).join(' ');
+    return RegExp(
+      r'\bin[- ]place\b|\bmutates\b',
+      caseSensitive: false,
+    ).hasMatch(text);
+  }
+
+  static bool _isAccumulatorTypeName(String? type) =>
+      type != null &&
+      RegExp(r'(Draft|Builder|Accumulator|Collector|Buffer)$').hasMatch(type);
+
   /// Returns the simple name of a parameter's declared type, or null when it
   /// has no explicit annotation. Unwraps optional/default parameters.
   static String? _declaredTypeName(FormalParameter param) {
-    FormalParameter inner = param;
-    if (inner is DefaultFormalParameter) inner = inner.parameter;
-    if (inner is SimpleFormalParameter) {
-      final TypeAnnotation? type = inner.type;
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
+      final TypeAnnotation? type = param.type;
       if (type is NamedType) return type.name.lexeme;
     }
     return null;
@@ -864,13 +917,9 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
       for (final FormalParameter param in params.parameters) {
         // Check if parameter type is nullable
         TypeAnnotation? type;
-        if (param is SimpleFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           type = param.type;
-        } else if (param is DefaultFormalParameter) {
-          final FormalParameter normalParam = param.parameter;
-          if (normalParam is SimpleFormalParameter) {
-            type = normalParam.type;
-          }
         }
 
         if (type == null) continue;
@@ -951,6 +1000,15 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Files that are the web/stub branch of a `dart.library.io`/`.ffi`
+    // conditional import exist only to mirror a sibling native
+    // implementation's same-named members. A stub member that always returns
+    // `null` (e.g. `static int? get port => null;`) is honoring that
+    // contract, not exhibiting a code smell — the rule cannot see the
+    // sibling file to confirm the return type is meaningful there, so it
+    // skips the whole file instead.
+    if (isConditionalImportStubTarget(context.filePath)) return;
+
     context.addFunctionDeclaration((FunctionDeclaration node) {
       // Top-level functions cannot override anything, but the annotation
       // check is harmless and keeps both call sites symmetrical.
@@ -1285,6 +1343,19 @@ class _AssignmentUsageVisitor extends RecursiveAstVisitor<void> {
     usedVariables.add(node.name);
     super.visitSimpleIdentifier(node);
   }
+
+  // Don't descend into nested closures/local functions: a closure may be
+  // invoked repeatedly (e.g. from a loop at its call site), so an
+  // assignment inside it that resets state for the closure's OWN next
+  // invocation is not dead relative to unrelated assignments elsewhere in
+  // the enclosing block's single top-to-bottom source order. Each nested
+  // function body is a separate `Block` and gets its own independent
+  // `addBlock` pass (see runWithReporter), so genuine same-invocation dead
+  // writes inside the closure are still caught there.
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Skip
+  }
 }
 
 /// Warns when an instance is created but never used.
@@ -1595,16 +1666,10 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
             }
           }
           // A field is assigned when a constructor declares it via an
-          // initializing formal (`this.x`) or a super formal (`super.x`). For
-          // NAMED and OPTIONAL parameters the analyzer wraps the real parameter
-          // in a DefaultFormalParameter, so unwrap before the type test —
-          // otherwise a `required this.x` named parameter (the common
-          // const-data-class pattern) is missed and the field is wrongly
-          // reported as unassigned.
+          // initializing formal (`this.x`) or a super formal (`super.x`),
+          // including `required this.x` named parameters.
           for (final FormalParameter param in member.parameters.parameters) {
-            final FormalParameter inner = param is DefaultFormalParameter
-                ? param.parameter
-                : param;
+            final FormalParameter inner = param;
             if (inner is FieldFormalParameter) {
               assignedFields.add(inner.name.lexeme);
             } else if (inner is SuperFormalParameter) {
@@ -2299,9 +2364,7 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 
         // Check parameters with default values
         for (final FormalParameter param in params.parameters) {
-          if (param is! DefaultFormalParameter) continue;
-
-          final Expression? defaultValue = param.defaultValue;
+          final Expression? defaultValue = param.defaultClause?.value;
           if (defaultValue == null) continue;
 
           // Flag non-standard defaults that are likely to differ from parent
@@ -2560,10 +2623,41 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
         .thisOrAncestorOfType<VariableDeclarationStatement>();
     if (declStatement == null) return false;
 
+    // A declaration whose own initializer can throw (contains `await`) must
+    // not be relocated past sibling statements it currently precedes when it
+    // sits directly in the `try` block of a `TryStatement` that has a
+    // `catch`/`finally` — moving it later would let those sibling statements'
+    // side effects (e.g. HTTP status/header writes) run *before* the
+    // possible throw instead of after, changing what the `catch`/`finally`
+    // observes. See bugs/move_variable_closer_to_its_usage_false_positive_
+    // throwing_await_before_header_writes.md.
+    if (decl.initializer != null &&
+        _containsAwait(decl.initializer!) &&
+        _isDirectTryBodyWithHandler(declStatement)) {
+      return false;
+    }
+
+    // An awaited initializer is an ordered side effect (e.g. a DB write);
+    // relocating it past sibling statements reorders those effects.
+    if (decl.initializer != null && _containsAwait(decl.initializer!)) {
+      return false;
+    }
+
     final List<Statement> statements = block.statements;
     final int declIndex = statements.indexOf(declStatement);
     final int useIndex = statements.indexOf(useStatement);
     if (declIndex < 0 || useIndex <= declIndex) return false;
+
+    // A state snapshot: the initializer reads mutable state (a call or member
+    // read) and an intervening statement awaits (so shared state can change
+    // before the use). Moving it would capture the post-change state.
+    if (decl.initializer != null &&
+        _readsMutableState(decl.initializer!) &&
+        statements
+            .sublist(declIndex + 1, useIndex)
+            .any(_statementContainsAwait)) {
+      return false;
+    }
 
     // The maximal contiguous run of declaration statements containing
     // [decl] — its "load group". Membership in this run, not merely being a
@@ -2630,11 +2724,90 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     return false;
   }
 
+  /// True when [expression] contains a method call or member read, i.e. its
+  /// value may depend on state that other statements can change.
+  bool _readsMutableState(Expression expression) {
+    final _StateReadFinder finder = _StateReadFinder();
+    expression.accept(finder);
+    return finder.found;
+  }
+
+  bool _statementContainsAwait(Statement statement) {
+    final _AwaitFinder finder = _AwaitFinder();
+    statement.accept(finder);
+    return finder.found;
+  }
+
+  /// Returns true when [expression] itself contains an `await` — not one
+  /// nested inside a closure, which runs on its own schedule and doesn't
+  /// affect the ordering of statements in the enclosing block.
+  bool _containsAwait(Expression expression) {
+    final _AwaitFinder finder = _AwaitFinder();
+    expression.accept(finder);
+    return finder.found;
+  }
+
+  /// Returns true when [declStatement] is a direct child of the `try` block
+  /// of a [TryStatement] that has at least one `catch` clause or a `finally`
+  /// block — i.e. a handler that could observe side effects performed by
+  /// statements between the declaration and wherever it might be moved.
+  bool _isDirectTryBodyWithHandler(Statement declStatement) {
+    final AstNode? parent = declStatement.parent;
+    if (parent is! Block) return false;
+    final AstNode? grandparent = parent.parent;
+    if (grandparent is! TryStatement) return false;
+    if (grandparent.body != parent) return false;
+    return grandparent.catchClauses.isNotEmpty ||
+        grandparent.finallyBlock != null;
+  }
+
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         MoveDeclarationCloserFix(context: context),
   ];
+}
+
+/// Finds a top-level `await` expression, not descending into closures
+/// (`FunctionExpression`) since an `await` inside a closure body runs when
+/// that closure is later invoked, not as part of evaluating the declaration.
+class _AwaitFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    found = true;
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Do not descend: an await inside a nested closure doesn't run inline.
+  }
+}
+
+/// Finds a method call or member read (`a.b`, `a.b()`, `f()`) in an expression.
+class _StateReadFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    found = true;
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    found = true;
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    found = true;
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    found = true;
+  }
 }
 
 class _FirstUsageVisitor extends RecursiveAstVisitor<void> {
@@ -2775,8 +2948,8 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
     // Check for common loop-invariant patterns
     if (expr is InstanceCreationExpression) {
       // Constructor calls with only literal arguments
-      for (final Expression arg in expr.argumentList.arguments) {
-        if (!_isConstant(arg)) return false;
+      for (final Argument arg in expr.argumentList.arguments) {
+        if (!_isConstant(arg.argumentExpression)) return false;
       }
       return true;
     }
@@ -2788,8 +2961,8 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
         final String name = target.name;
         // Check if it's a type name (static call)
         if (name.isNotEmpty && name[0] == name[0].toUpperCase()) {
-          for (final Expression arg in expr.argumentList.arguments) {
-            if (!_isConstant(arg)) return false;
+          for (final Argument arg in expr.argumentList.arguments) {
+            if (!_isConstant(arg.argumentExpression)) return false;
           }
           return true;
         }
@@ -2799,9 +2972,9 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
     return false;
   }
 
-  bool _isConstant(Expression expr) {
+  bool _isConstant(Argument expr) {
     if (expr is Literal) return true;
-    if (expr is NamedExpression) return _isConstant(expr.expression);
+    if (expr is NamedArgument) return _isConstant(expr.argumentExpression);
     return false;
   }
 }
@@ -3439,14 +3612,13 @@ class PreferLateFinalRule extends SaropaLintRule {
     final _LateFinalMethodCallCounterVisitor callVisitor =
         _LateFinalMethodCallCounterVisitor(methodCallCounts);
 
+    // Every class member, not just method/constructor bodies: a tear-off in a
+    // field initializer (`final VoidCallback _retry = _loadUser;`) or in a
+    // constructor's initializer list is just as unbounded a call site as one
+    // inside a body, and missing it let `prefer_late_final` recommend the
+    // change that throws `LateInitializationError` at run time.
     for (final ClassMember member in node.bodyMembers) {
-      if (member is MethodDeclaration) {
-        member.body.visitChildren(callVisitor);
-      }
-      if (member is ConstructorDeclaration &&
-          member.body is BlockFunctionBody) {
-        member.body.visitChildren(callVisitor);
-      }
+      member.visitChildren(callVisitor);
     }
 
     for (final MapEntry<String, Set<String>> entry

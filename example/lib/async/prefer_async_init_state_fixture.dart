@@ -137,6 +137,8 @@ class _good113__MyState extends State<MyWidget> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _dataFuture, builder: (context, snapshot) => Container());
+      future: _dataFuture,
+      builder: (context, snapshot) => Container(),
+    );
   }
 }

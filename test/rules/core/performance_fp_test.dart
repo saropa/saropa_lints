@@ -88,6 +88,77 @@ class C {
 ''');
       expect(diags.map((d) => d.ruleName), contains('prefer_cached_getter'));
     });
+
+    test(
+      'does NOT flag List.length read twice (dart:core O(1) getter)',
+      () async {
+        final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+class Importer {
+  void importRow(List<String> rowValues, List<String> headers) {
+    if (rowValues.length >= headers.length) {
+      // ...
+    } else {
+      final colCount = rowValues.length;
+      final headerCount = headers.length;
+      print('\$colCount vs \$headerCount');
+    }
+  }
+}
+''');
+        expect(codes, isNot(contains('prefer_cached_getter')));
+      },
+    );
+
+    test('does NOT flag String/Set/Map .length read twice', () async {
+      // Wrapped in a class method (not a top-level function) — the rule
+      // only inspects `MethodDeclaration` bodies, so a top-level function
+      // would trivially never be flagged regardless of this fix.
+      final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+class C {
+  void run(String text, Set<int> ids, Map<String, int> counts) {
+    print(text.length.toString() + text.length.toString());
+    print(ids.length.toString() + ids.length.toString());
+    print(counts.length.toString() + counts.length.toString());
+  }
+}
+''');
+      expect(codes, isNot(contains('prefer_cached_getter')));
+    });
+
+    test('does NOT flag List.isEmpty/first read twice', () async {
+      final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+class C {
+  void run(List<int> values) {
+    if (values.isEmpty || values.isEmpty) {
+      return;
+    }
+    print(values.first.toString() + values.first.toString());
+  }
+}
+''');
+      expect(codes, isNot(contains('prefer_cached_getter')));
+    });
+
+    test(
+      'STILL flags a lazy Iterable .length read twice (genuinely O(n))',
+      () async {
+        // `list.where(...)` returns a lazy `Iterable<int>`, not a `List`.
+        // `.length` on a lazy Iterable walks the whole chain each read, so
+        // this must stay flagged even though `.length` is exempt for a
+        // concrete List/String/Set/Map receiver. The rule only inspects
+        // `MethodDeclaration` bodies, so this is wrapped in a class (as the
+        // other "STILL flags" case above is) rather than a top-level function.
+        final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+class C {
+  void run(List<int> values) {
+    final it = values.where((x) => x > 0);
+    print(it.length.toString() + it.length.toString());
+  }
+}
+''');
+        expect(codes, contains('prefer_cached_getter'));
+      },
+    );
   });
 
   group('avoid_string_concatenation_loop', () {
@@ -137,6 +208,182 @@ String build(List<String> items) {
 ''',
       );
       expect(codes, contains('avoid_string_concatenation_loop'));
+    });
+
+    test(
+      'does NOT flag += on a per-iteration local (declared in loop)',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidStringConcatenationLoopRule(),
+          '''
+String unfold(List<String> physical) {
+  final out = <String>[];
+  var i = 0;
+  while (i < physical.length) {
+    String line = physical[i];
+    i++;
+    final StringBuffer pending = StringBuffer();
+    pending.write('x');
+    if (pending.isNotEmpty) line += pending.toString();
+    out.add(line);
+  }
+  return out.join('\\n');
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_string_concatenation_loop')));
+      },
+    );
+
+    test(
+      'does NOT flag line += buffer.toString() flush in a nested loop',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidStringConcatenationLoopRule(),
+          '''
+void f(List<String> physical) {
+  var i = 0;
+  while (i < physical.length) {
+    String line = physical[i];
+    i++;
+    final StringBuffer pending = StringBuffer();
+    while (i < physical.length) {
+      if (pending.isNotEmpty) {
+        line += pending.toString();
+        pending.clear();
+      }
+      i++;
+    }
+  }
+}
+''',
+        );
+        expect(codes, isNot(contains('avoid_string_concatenation_loop')));
+      },
+    );
+
+    test(
+      'STILL flags += when outer var is appended in an inner loop',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidStringConcatenationLoopRule(),
+          '''
+void f(List<String> xs) {
+  for (final x in xs) {
+    var line = x;
+    for (final y in xs) {
+      line += y;
+    }
+  }
+}
+''',
+        );
+        expect(codes, contains('avoid_string_concatenation_loop'));
+      },
+    );
+
+    test('STILL flags outer += other.toString() (non-StringBuffer)', () async {
+      final codes = await reportedRuleCodes(
+        AvoidStringConcatenationLoopRule(),
+        '''
+String f(List<int> xs) {
+  String s = '';
+  for (final x in xs) {
+    s += x.toString();
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, contains('avoid_string_concatenation_loop'));
+    });
+
+    test('does NOT flag outer += StringBuffer.toString() drain', () async {
+      final codes = await reportedRuleCodes(
+        AvoidStringConcatenationLoopRule(),
+        '''
+String f(List<String> xs) {
+  String s = '';
+  final StringBuffer sb = StringBuffer();
+  for (final x in xs) {
+    sb.write(x);
+    s += sb.toString();
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, isNot(contains('avoid_string_concatenation_loop')));
+    });
+  });
+
+  group('avoid_memory_intensive_operations', () {
+    test('does NOT flag += on a per-iteration local', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMemoryIntensiveOperationsRule(),
+        '''
+void f(List<String> physical) {
+  var i = 0;
+  while (i < physical.length) {
+    String line = physical[i];
+    i++;
+    final StringBuffer pending = StringBuffer();
+    if (pending.isNotEmpty) line += pending.toString();
+  }
+}
+''',
+      );
+      expect(codes, isNot(contains('avoid_memory_intensive_operations')));
+    });
+
+    test('STILL flags accumulator declared outside the loop', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMemoryIntensiveOperationsRule(),
+        '''
+String f(List<String> xs) {
+  String s = '';
+  for (final x in xs) {
+    s += x;
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, contains('avoid_memory_intensive_operations'));
+    });
+
+    test('STILL flags outer += other.toString() (non-StringBuffer)', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMemoryIntensiveOperationsRule(),
+        '''
+String f(List<int> xs) {
+  String s = '';
+  for (final x in xs) {
+    s += x.toString();
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, contains('avoid_memory_intensive_operations'));
+    });
+
+    test('does NOT flag outer += StringBuffer.toString() drain', () async {
+      final codes = await reportedRuleCodes(
+        AvoidMemoryIntensiveOperationsRule(),
+        '''
+String f(List<String> xs) {
+  String s = '';
+  final StringBuffer sb = StringBuffer();
+  for (final x in xs) {
+    sb.write(x);
+    s += sb.toString();
+  }
+  return s;
+}
+''',
+      );
+      expect(codes, isNot(contains('avoid_memory_intensive_operations')));
     });
   });
 }

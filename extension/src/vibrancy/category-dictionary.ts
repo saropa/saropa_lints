@@ -67,6 +67,15 @@ export const CATEGORY_DICTIONARY: Readonly<Record<VibrancyCategory, CategoryDisp
         severity: 2,
         cssClass: 'abandoned',
     },
+    'upgrade-required': {
+        label: 'Upgrade Required',
+        shortLabel: 'Upgrade',
+        emoji: '🟠',
+        grade: 'D',
+        iconId: 'arrow-up',
+        severity: 2,
+        cssClass: 'upgrade',
+    },
     'end-of-life': {
         label: 'End of Life',
         shortLabel: 'EOL',

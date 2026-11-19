@@ -22,8 +22,5 @@ void good() {
   );
 
   // Asset provider is not a NetworkTileProvider, so the cache concern is moot.
-  TileLayer(
-    fallbackUrl: 'unused',
-    tileProvider: AssetTileProvider(),
-  );
+  TileLayer(fallbackUrl: 'unused', tileProvider: AssetTileProvider());
 }

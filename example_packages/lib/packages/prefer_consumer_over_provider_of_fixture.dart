@@ -120,7 +120,5 @@ Widget _bad715_build(BuildContext context) {
 
 // GOOD: Should NOT trigger prefer_consumer_over_provider_of
 Widget _good715_build(BuildContext context) {
-  return Consumer<User>(
-    builder: (context, user, child) => Text(user.name),
-  );
+  return Consumer<User>(builder: (context, user, child) => Text(user.name));
 }

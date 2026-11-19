@@ -112,7 +112,7 @@ dynamic state;
 // expect_lint: avoid_qr_scanner_always_active
 class _bad725__ScannerState extends State<Scanner> {
   final controller = MobileScannerController();
-// No lifecycle handling - camera runs in background!
+  // No lifecycle handling - camera runs in background!
 }
 
 // GOOD: Should NOT trigger avoid_qr_scanner_always_active

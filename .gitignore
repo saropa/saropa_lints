@@ -87,11 +87,9 @@ AGENTS.md
 CLAUDE*.md
 CODEBASE_INDEX.md
 
-# Generated publish-pipeline reports (regenerated each publish run)
-plans/known_issues_review.md
-
 # Saropa Log Capture (index & cache)
 .saropa/
 *.vsix
 /docs/handover
 self_check/pubspec.lock
+test/aggregate/

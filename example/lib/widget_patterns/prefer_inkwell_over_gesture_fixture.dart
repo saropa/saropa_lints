@@ -193,12 +193,18 @@ void _good1401ColoredContainerChild() {
 void _good1401DecoratedContainerChild() {
   GestureDetector(
     onTap: () {},
-    child: Container(decoration: BoxDecoration(color: Colors.red), child: MyWidget()),
+    child: Container(
+      decoration: BoxDecoration(color: Colors.red),
+      child: MyWidget(),
+    ),
   );
 }
 
 // BAD: Plain container still should trigger.
 // expect_lint: prefer_inkwell_over_gesture
 void _bad1401PlainContainerChild() {
-  GestureDetector(onTap: () {}, child: Container(child: MyWidget()));
+  GestureDetector(
+    onTap: () {},
+    child: Container(child: MyWidget()),
+  );
 }

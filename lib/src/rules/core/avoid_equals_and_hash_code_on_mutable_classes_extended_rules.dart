@@ -51,7 +51,7 @@ import '../../saropa_lint_rule.dart';
 ///   Equatable`) — both are legal but unusual ways to reach Equatable and
 ///   are not recognized here.
 /// - Mutable fields are only collected from the class that declares
-///   `==`/`hashCode` itself ([_findMutableFields] walks `node.bodyMembers`
+///   `==`/`hashCode` itself (`_findMutableFields` walks `node.bodyMembers`
 ///   only); a mutable field inherited from a plain (non-Equatable)
 ///   superclass and referenced by a subclass's `==`/`hashCode` is not
 ///   detected (false negative).

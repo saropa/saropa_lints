@@ -372,7 +372,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
   /// and resolved detection paths.
   bool _wrapsCollectionLiteral(ArgumentList args) {
     if (args.arguments.length != 1) return false;
-    final Expression arg = args.arguments.first;
+    final Argument arg = args.arguments.first;
     return arg is ListLiteral || arg is SetOrMapLiteral;
   }
 
@@ -407,6 +407,10 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 /// // or
 /// final item = items.length > 1 ? items.last : fallback;
 /// ```
+///
+/// For a list that is non-empty by an API contract the rule cannot see, put
+/// `// non-empty: <reason>` on the same line or the line above (the reason
+/// is required). Use `// ignore: avoid_unsafe_collection_methods` otherwise.
 class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   AvoidUnsafeCollectionMethodsRule() : super(code: _code);
 
@@ -430,11 +434,28 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     'avoid_unsafe_collection_methods',
     '[avoid_unsafe_collection_methods] Calling .first, .last, or .single on an empty collection throws a StateError at runtime, crashing the app. This is especially dangerous when the collection comes from an API response, database query, or user input where emptiness cannot be guaranteed at compile time. {v10}',
     correctionMessage:
-        'Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing.',
+        'Use .firstOrNull, .lastOrNull, or .singleOrNull from package:collection, or guard with an isEmpty check before accessing. If the list is non-empty by API contract, add `// non-empty: <reason>` on the same line or the line above.',
     severity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _unsafeMethods = <String>{'first', 'last', 'single'};
+
+  static final RegExp _nonEmptyMarker = RegExp(r'//\s*non-empty:\s*\S');
+
+  /// True if the access line, or the line directly above, carries
+  /// `// non-empty: <reason>` with a non-blank reason.
+  static bool _hasNonEmptyMarker(AstNode node, SaropaContext context) {
+    final int line = context.lineInfo.getLocation(node.offset).lineNumber;
+    final List<String> lines = context.fileContent.split('\n');
+    for (final int n in <int>[line, line - 1]) {
+      if (n >= 1 &&
+          n <= lines.length &&
+          _nonEmptyMarker.hasMatch(lines[n - 1])) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   @override
   void runWithReporter(
@@ -475,6 +496,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
           return;
         }
 
+        if (_hasNonEmptyMarker(node, context)) return;
+
         reporter.atNode(node);
       }
     });
@@ -493,7 +516,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
           typeName.startsWith('Iterable') ||
           typeName.startsWith('Queue')) {
         // Check if this is a guaranteed non-empty collection (e.g., EnumType.values)
-        if (_isGuaranteedNonEmptyPrefixed(node)) {
+        if (_isGuaranteedNonEmptyPrefixed(node) ||
+            _isGuaranteedNonEmpty(node.prefix)) {
           return;
         }
 
@@ -509,6 +533,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
             _isGuardedByEnclosingLoop(node, collectionName)) {
           return;
         }
+
+        if (_hasNonEmptyMarker(node, context)) return;
 
         reporter.atNode(node);
       }
@@ -655,6 +681,35 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
       return true;
     }
 
+    // Check for short-circuit guard: list.isNotEmpty && f(list.first)
+    if (_isGuardedByShortCircuit(node, collectionName)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// True when [node] is the right operand of `&&` whose left operand proves
+  /// non-empty, or of `||` whose left operand is an emptiness check — the
+  /// right side is only evaluated when the collection is non-empty.
+  bool _isGuardedByShortCircuit(AstNode node, String collectionName) {
+    AstNode? prev = node;
+    AstNode? current = node.parent;
+    while (current != null && current is! FunctionBody) {
+      if (current is BinaryExpression && current.rightOperand == prev) {
+        final TokenType op = current.operator.type;
+        if (op == TokenType.AMPERSAND_AMPERSAND &&
+            _isValidGuardCondition(current.leftOperand, collectionName)) {
+          return true;
+        }
+        if (op == TokenType.BAR_BAR &&
+            _isInvertedGuardCondition(current.leftOperand, collectionName)) {
+          return true;
+        }
+      }
+      prev = current;
+      current = current.parent;
+    }
     return false;
   }
 
@@ -795,9 +850,16 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     // Fallback: check source text for guard patterns that the structured
     // checks above may miss due to AST node type differences between
     // analyzer versions (PrefixedIdentifier vs PropertyAccess).
-    final String src = condition.toSource();
-    if (src.contains('$collectionName.length') ||
-        src.contains('$collectionName.isNotEmpty')) {
+    // Null operators are stripped on both sides so a `countries?.length == 1`
+    // guard covers `countries!.first`.
+    final String src = _stripNullOps(condition.toSource());
+    final String bareName = _stripNullOps(collectionName);
+    // The name must start at an identifier boundary: `items.length` must not
+    // satisfy a guard on `s`.
+    final RegExp namedGuard = RegExp(
+      '(?<![\\w\$])${RegExp.escape(bareName)}\\.(?:length|isNotEmpty)',
+    );
+    if (namedGuard.hasMatch(src)) {
       return true;
     }
 
@@ -847,7 +909,9 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
       lengthTarget = left.target?.toSource();
     }
 
-    if (lengthTarget == collectionName && right is IntegerLiteral) {
+    if (lengthTarget != null &&
+        _stripNullOps(lengthTarget) == _stripNullOps(collectionName) &&
+        right is IntegerLiteral) {
       final int? value = right.value;
       if (value != null) {
         // list.length > 0, list.length > 1, etc.
@@ -913,8 +977,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
 
     // Check if the callback is the value of a known named argument
     final AstNode? callbackParent = callback.parent;
-    if (callbackParent is NamedExpression) {
-      final String argName = callbackParent.name.label.name;
+    if (callbackParent is NamedArgument) {
+      final String argName = callbackParent.name.lexeme;
       if (_nonEmptyCallbackNames.contains(argName)) return true;
     }
 
@@ -1600,9 +1664,9 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
       }
 
       // Check if orElse is provided - if so, it's safe
-      final NodeList<Expression> args = node.argumentList.arguments;
-      for (final Expression arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'orElse') {
+      final NodeList<Argument> args = node.argumentList.arguments;
+      for (final Argument arg in args) {
+        if (arg is NamedArgument && arg.name.lexeme == 'orElse') {
           return; // Has orElse callback, safe to use
         }
       }
@@ -1697,10 +1761,10 @@ class PreferWhereOrNullRule extends SaropaLintRule {
       }
 
       // Only flag if orElse IS provided (otherwise AvoidUnsafeWhereMethodsRule handles it)
-      final NodeList<Expression> args = node.argumentList.arguments;
-      NamedExpression? orElseArg;
-      for (final Expression arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'orElse') {
+      final NodeList<Argument> args = node.argumentList.arguments;
+      NamedArgument? orElseArg;
+      for (final Argument arg in args) {
+        if (arg is NamedArgument && arg.name.lexeme == 'orElse') {
           orElseArg = arg;
           break;
         }
@@ -2293,10 +2357,10 @@ class PreferAddAllRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'forEach') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
       if (firstArg is! FunctionExpression) return;
 
       final FunctionBody body = firstArg.body;
@@ -2307,7 +2371,7 @@ class PreferAddAllRule extends SaropaLintRule {
           final FormalParameterList? params = firstArg.parameters;
           if (params != null && params.parameters.isNotEmpty) {
             final String? paramName = params.parameters.first.name?.lexeme;
-            final NodeList<Expression> addArgs = expr.argumentList.arguments;
+            final NodeList<Argument> addArgs = expr.argumentList.arguments;
             final firstAddArg = addArgs.isNotEmpty ? addArgs.first : null;
             if (firstAddArg is SimpleIdentifier &&
                 firstAddArg.name == paramName) {
@@ -2336,7 +2400,7 @@ class PreferAddAllRule extends SaropaLintRule {
 
       // Check if add argument matches loop variable
       final String loopVar = parts.loopVariable.name.lexeme;
-      final NodeList<Expression> addArgs = expr.argumentList.arguments;
+      final NodeList<Argument> addArgs = expr.argumentList.arguments;
       final firstAddArg = addArgs.isNotEmpty ? addArgs.first : null;
       if (firstAddArg is SimpleIdentifier && firstAddArg.name == loopVar) {
         reporter.atNode(node);
@@ -2506,7 +2570,9 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addListLiteral((ListLiteral node) {
-      _checkForDuplicateStrings(node.elements, reporter, code);
+      // Lists where position carries meaning may legitimately repeat values.
+      if (_isPositionalStringList(node)) return;
+      _checkForDuplicateStrings(node.elements, reporter, code, skipEmpty: true);
     });
 
     context.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -2514,6 +2580,18 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
         _checkForDuplicateStrings(node.elements, reporter, code);
       }
     });
+  }
+
+  /// A list is positional when it is an argument to a call or constructor
+  /// (fixed slots, e.g. `VCardValue.structured([...])`), or a const lookup
+  /// table of 6+ elements indexed by position.
+  static bool _isPositionalStringList(ListLiteral node) {
+    final AstNode? parent = node.parent;
+    if (parent is ArgumentList) return true;
+    if (node.elements.length < 6) return false;
+    if (node.constKeyword != null) return true;
+    final AstNode? decl = parent is VariableDeclaration ? parent.parent : null;
+    return decl is VariableDeclarationList && decl.isConst;
   }
 }
 
@@ -2619,8 +2697,8 @@ const Set<String> _positionSensitiveSequenceParams = <String>{
 /// a repeated entry is part of the intended ordered sequence.
 bool _isPositionSensitiveSequenceList(ListLiteral node) {
   final AstNode? parent = node.parent;
-  if (parent is! NamedExpression) return false;
-  return _positionSensitiveSequenceParams.contains(parent.name.label.name);
+  if (parent is! NamedArgument) return false;
+  return _positionSensitiveSequenceParams.contains(parent.name.lexeme);
 }
 
 /// Suggests const constructor calls in list literals when possible.
@@ -2759,15 +2837,122 @@ class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
               rightOperand.identifier.name == 'length');
       if (!boundIsLength) return;
       if (parts.updaters.length != 1) return;
-      if (!_bodyUsesIndex(node.body, indexName)) return;
+      // The index is the algorithm, not bookkeeping, when the loop does not
+      // start at 0 (e.g. the inner `j = i + 1` of a pairwise scan) or when
+      // it seeds a nested loop's range (the outer `i` of that scan).
+      final Expression? init = indexVar.initializer;
+      if (init is! IntegerLiteral || init.value != 0) return;
+      if (_indexFeedsNestedLoop(node.body, indexName)) return;
+      final Set<String> targets = _indexedTargets(node.body, indexName);
+      if (targets.isEmpty) return;
+      // The index also addresses a second collection: asMap() on one list
+      // would not remove the index.
+      if (targets.length > 1) return;
+      // The iterated list grows/shrinks in the loop (BFS style): asMap()
+      // would throw ConcurrentModificationError.
+      final String? boundTarget = switch (rightOperand) {
+        PropertyAccess() => rightOperand.target?.toSource(),
+        PrefixedIdentifier() => rightOperand.prefix.name,
+        _ => null,
+      };
+      if (boundTarget != null && _mutatesTarget(node.body, boundTarget)) return;
       reporter.atNode(node);
     });
   }
 
-  static bool _bodyUsesIndex(Statement body, String indexName) {
+  static bool _indexFeedsNestedLoop(Statement body, String indexName) {
     var found = false;
-    body.visitChildren(_IndexAccessVisitor(indexName, () => found = true));
+    body.accept(_NestedLoopBoundVisitor(indexName, () => found = true));
     return found;
+  }
+
+  static Set<String> _indexedTargets(Statement body, String indexName) {
+    final Set<String> targets = <String>{};
+    body.visitChildren(_IndexAccessVisitor(indexName, targets.add));
+    return targets;
+  }
+
+  static const Set<String> _mutators = <String>{
+    'add',
+    'addAll',
+    'insert',
+    'insertAll',
+    'remove',
+    'removeAt',
+    'removeLast',
+    'removeWhere',
+    'removeRange',
+    'clear',
+  };
+
+  static bool _mutatesTarget(Statement body, String target) {
+    var found = false;
+    body.accept(_MutationVisitor(target, _mutators, () => found = true));
+    return found;
+  }
+}
+
+/// Detects a call to a growing/shrinking method on `_target`.
+class _MutationVisitor extends RecursiveAstVisitor<void> {
+  _MutationVisitor(this._target, this._mutators, this._onMatch);
+
+  final String _target;
+  final Set<String> _mutators;
+  final void Function() _onMatch;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (_mutators.contains(node.methodName.name) &&
+        node.target?.toSource() == _target) {
+      _onMatch();
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Detects a nested `for` whose declaration or condition reads [_indexName].
+class _NestedLoopBoundVisitor extends RecursiveAstVisitor<void> {
+  _NestedLoopBoundVisitor(this._indexName, this._onMatch);
+
+  final String _indexName;
+  final void Function() _onMatch;
+
+  @override
+  void visitForStatement(ForStatement node) {
+    final ForLoopParts parts = node.forLoopParts;
+    if (parts is ForPartsWithDeclarations) {
+      final Iterable<AstNode?> bounds = <AstNode?>[
+        ...parts.variables.variables.map(
+          (VariableDeclaration v) => v.initializer,
+        ),
+        parts.condition,
+      ];
+      for (final AstNode? bound in bounds) {
+        if (bound != null && _mentions(bound)) {
+          _onMatch();
+          return;
+        }
+      }
+    }
+    super.visitForStatement(node);
+  }
+
+  bool _mentions(AstNode node) {
+    var hit = false;
+    node.accept(_IdentifierMentionVisitor(_indexName, () => hit = true));
+    return hit;
+  }
+}
+
+class _IdentifierMentionVisitor extends RecursiveAstVisitor<void> {
+  _IdentifierMentionVisitor(this._name, this._onMatch);
+
+  final String _name;
+  final void Function() _onMatch;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == _name) _onMatch();
   }
 }
 
@@ -2775,13 +2960,13 @@ class _IndexAccessVisitor extends RecursiveAstVisitor<void> {
   _IndexAccessVisitor(this._indexName, this._onMatch);
 
   final String _indexName;
-  final void Function() _onMatch;
+  final void Function(String target) _onMatch;
 
   @override
   void visitIndexExpression(IndexExpression node) {
     final index = node.index;
     if (index is SimpleIdentifier && index.name == _indexName) {
-      _onMatch();
+      _onMatch(node.target?.toSource() ?? '');
     }
     super.visitIndexExpression(node);
   }
@@ -2815,12 +3000,16 @@ void _checkForDuplicateNumbers(
 void _checkForDuplicateStrings(
   NodeList<CollectionElement> elements,
   SaropaDiagnosticReporter reporter,
-  LintCode code,
-) {
+  LintCode code, {
+  bool skipEmpty = false,
+}) {
   final Set<String> seen = <String>{};
   for (final CollectionElement element in elements) {
     if (element is! Expression) continue;
     if (element is! StringLiteral) continue;
+    if (skipEmpty && element is SimpleStringLiteral && element.value.isEmpty) {
+      continue;
+    }
 
     final String source = element.toSource();
     if (seen.contains(source)) {
@@ -3520,9 +3709,9 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
     ArgumentList args,
     SaropaDiagnosticReporter reporter,
   ) {
-    for (final Expression arg in args.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
-        final Expression builderExpr = arg.expression;
+    for (final Argument arg in args.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'itemBuilder') {
+        final Expression builderExpr = arg.argumentExpression;
         if (builderExpr is FunctionExpression) {
           _checkBuilderForKey(builderExpr, reporter);
         }
@@ -3562,8 +3751,8 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   }
 
   bool _hasKeyArgument(InstanceCreationExpression widget) {
-    for (final Expression arg in widget.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'key') {
+    for (final Argument arg in widget.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'key') {
         return true;
       }
     }
@@ -3625,7 +3814,7 @@ class AvoidFunctionLiteralsInForeachCallsRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'forEach') return;
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.length != 1) return;
       if (args.first is! FunctionExpression) return;
       final DartType? targetType = node.realTarget?.staticType;
@@ -3806,12 +3995,12 @@ class PreferForElementsToMapFromIterableRule extends SaropaLintRule {
     bool hasValue = false;
 
     for (final arg in args.arguments) {
-      if (arg is! NamedExpression) continue;
-      final label = arg.name.label.name;
+      if (arg is! NamedArgument) continue;
+      final label = arg.name.lexeme;
 
-      if (label == 'key' && _isSimpleClosure(arg.expression)) {
+      if (label == 'key' && _isSimpleClosure(arg.argumentExpression)) {
         hasKey = true;
-      } else if (label == 'value' && _isSimpleClosure(arg.expression)) {
+      } else if (label == 'value' && _isSimpleClosure(arg.argumentExpression)) {
         hasValue = true;
       }
     }

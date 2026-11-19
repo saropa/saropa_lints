@@ -37,9 +37,13 @@ import { enforceSingleVersion, versionGroupIndex } from './versionGroups';
 import { STYLISTIC_PACK_DEFINITIONS } from './stylisticPackDefinitions';
 import { packDomainForId, PACK_DOMAIN_ORDER, isStylisticRule } from './packDomains';
 import { l10n } from '../i18n/runtime';
+import { getLintsSwitchState, lintsSwitchDashboardMessage } from '../lintsSwitch';
 import { createWebviewCspNonce, buildWebviewCsp } from '../vibrancy/views/html-utils';
 import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
+import { buildWatcherExcludeSectionHtml, WATCHER_SETTING_KEYS, type WatcherScanData } from './watcherExcludeSection';
+import { getLastUncoveredHazards, getUncoveredHazards } from '../systemHealth/workspaceHazardScan';
+import { findMissingExcludes } from '../systemHealth/watcherExcludeAudit';
 // Phase 7 leftover (deferred): Rules & Tiers already ships working digit shortcuts (1-7, see
 // _buildTabBar) but never surfaced the shared '?' overlay that Findings/Packages use, so those
 // shortcuts were undiscoverable. Wires the same button + overlay + script + styles pattern.
@@ -429,6 +433,27 @@ export function buildConfigSnippetYaml(tier: string, enabledPackIds: readonly st
   ].join('\n');
 }
 
+/**
+ * Replace every CSP nonce in a built page with a fixed token. The nonce is regenerated on
+ * every build, so without masking two otherwise identical pages would never compare equal.
+ * Exported for tests.
+ */
+export function maskCspNonce(html: string): string {
+  return html.replaceAll(/nonce(-|=")[A-Za-z0-9]+/g, 'nonce$1_');
+}
+
+/**
+ * Client messages that report UI state rather than asking for a change. They never invalidate
+ * the no-op-rebuild signature (see `_lastHtmlSignature`).
+ */
+const PASSIVE_DASHBOARD_MESSAGES: ReadonlySet<string> = new Set([
+  'uiFocus',
+  'uiBlur',
+  'sectionToggled',
+  'setActiveTab',
+  'explainRule',
+]);
+
 /** Per-workspace storage key for `<details>` open/closed state — see `_sectionOpenState`. */
 const SECTION_STATE_STORAGE_KEY = 'saropa.configDashboard.sectionState';
 
@@ -465,6 +490,13 @@ export class RulePacksWebviewProvider {
   // the field so no update is permanently lost — just delayed until it is safe to redraw.
   private _userInteracting = false;
   private _refreshPending = false;
+  // Bug fix (v16.4.1 "constantly refreshing"): the focus guard above only defers while a text
+  // field has focus. The moment the user clicked a "Matching rules" link, a pack link, or just
+  // scrolled the list, the next diagnostics tick (~every 400ms during analysis) reassigned
+  // `webview.html` and wiped the client-rendered finder, the pack they had just revealed, and
+  // their scroll position — even though nothing on the page had changed. Remember the last
+  // HTML we assigned (with the per-build CSP nonce masked out) and skip identical rebuilds.
+  private _lastHtmlSignature: string | undefined;
   // Bug fix: `<details>` sections (packs accordions, disabled/shed/stylistic sections) reset to
   // their hardcoded default open/closed state on every rebuild because nothing read the user's
   // choice back before regenerating the HTML string. Persisted per-workspace using the same
@@ -527,6 +559,7 @@ export class RulePacksWebviewProvider {
       },
     );
     this._panel = panel;
+    this._startWatcherScan();
 
     panel.webview.onDidReceiveMessage(
       (msg: {
@@ -560,6 +593,12 @@ export class RulePacksWebviewProvider {
         // an arbitrary matched rule code needs its own message type and semantics.
         disable?: boolean;
       }) => {
+        // Anything the user *did* (toggle, tier, write, command) must redraw even if the rebuilt
+        // HTML happens to match the last one — e.g. a pack toggle whose write failed has to snap
+        // the checkbox back. Only passive notifications may be skipped as no-op rebuilds.
+        if (!PASSIVE_DASHBOARD_MESSAGES.has(msg.type)) {
+          this._lastHtmlSignature = undefined;
+        }
         // The user entered/left an editable control (search box, text field). While focused,
         // `refresh()` queues instead of rebuilding; on blur, replay any queued refresh so
         // nothing requested while they were typing is silently dropped.
@@ -706,6 +745,8 @@ export class RulePacksWebviewProvider {
       // dashboard stays blank. Reset both flags on dispose so a reopen always starts clean.
       this._userInteracting = false;
       this._refreshPending = false;
+      // The next panel is a fresh webview with no DOM — it must get a full first render.
+      this._lastHtmlSignature = undefined;
     });
 
     this._loadRuleCounts();
@@ -753,7 +794,16 @@ export class RulePacksWebviewProvider {
       void webview.postMessage({ type: 'refreshPending' });
       return;
     }
-    webview.html = this._buildHtml();
+    const html = this._buildHtml();
+    const signature = maskCspNonce(html);
+    if (signature === this._lastHtmlSignature) {
+      // Nothing changed — keep the live DOM (search, finder, scroll, expanded rows). Clear the
+      // "Update pending" hint a deferred refresh may have shown; there is nothing to apply.
+      void webview.postMessage({ type: 'refreshSkipped' });
+      return;
+    }
+    this._lastHtmlSignature = signature;
+    webview.html = html;
   }
 
   /**
@@ -782,7 +832,7 @@ export class RulePacksWebviewProvider {
     const ctx = this._collectDashboardContext(root, pubspecContent);
     const body = [
       this._buildHeader(ctx),
-      this._buildKpiStrip(ctx),
+      this._buildLintsOffBanner() ? '' : this._buildKpiStrip(ctx),
       this._buildTabBar(),
       this._buildTierTab(ctx),
       this._buildPacksTab(ctx),
@@ -1015,6 +1065,10 @@ export class RulePacksWebviewProvider {
    * from fighting inline geometry (per §5).
    */
   private _buildHeader(ctx: DashboardContext): string {
+    // Off or Partly off: never show healthy-looking coverage numbers. The
+    // tuning tabs below stay available; only the headline is replaced.
+    const offBanner = this._buildLintsOffBanner();
+    if (offBanner) return offBanner;
     const sdkApplicable = ctx.detectedSdkPacks.length;
     const freshness = formatRelativeFreshness(ctx.analysisTimestamp);
     const parts = [
@@ -1036,6 +1090,25 @@ export class RulePacksWebviewProvider {
     <p class="status-line">${statusLine}<span class="refresh-pending-indicator" id="refresh-pending-indicator" hidden title="${escapeHtml(l10n('dashboards.refreshPending.title'))}">${escapeHtml(l10n('dashboards.refreshPending.label'))}</span>${buildKeyboardShortcutsButton()}</p>
   </div>
   ${this._buildCoverageGauge(ctx)}
+</header>`;
+  }
+
+  /**
+   * "Lints are off. [Turn on]" (or the partly-off sentence + Fix) in place of the
+   * coverage header; '' when the single switch is On. The button runs
+   * `saropaLints.toggleLints`, which turns everything on from Off or Partly off.
+   */
+  private _buildLintsOffBanner(): string {
+    const root = getProjectRoot();
+    if (!root) return '';
+    const state = getLintsSwitchState(root);
+    if (state.kind === 'on') return '';
+    const label = state.kind === 'off' ? l10n('lintsSwitch.dashboardTurnOn') : l10n('lintsSwitch.dashboardFix');
+    return `<header class="dash-hero lints-off">
+  <div class="hero-text">
+    <h1>Saropa Lints Config</h1>
+    <p class="status-line" role="status"><span>${escapeHtml(lintsSwitchDashboardMessage(state))}</span> <button type="button" class="btn tier-1" data-command="toggleLints">${escapeHtml(label)}</button></p>
+  </div>
 </header>`;
   }
 
@@ -2200,12 +2273,32 @@ ${detailRow}`;
   // ZERO changes to this file; only the manifest-key EXCLUSION list is hand-maintained.
   // ---------------------------------------------------------------------------------------------
 
+  /** Hazard-scan + missing-excludes results for the Watcher excludes block; filled once, async. */
+  private _watcherScan: WatcherScanData | undefined;
+
+  /** Runs the scan (reusing the shared hazard-scan result) when the panel opens, then redraws. */
+  private _startWatcherScan(): void {
+    this._watcherScan = undefined;
+    const cached = getLastUncoveredHazards();
+    void Promise.all([cached ? Promise.resolve(cached) : getUncoveredHazards(), findMissingExcludes()])
+      .then(([hazards, missingExcludes]) => {
+        this._watcherScan = { hazards, missingExcludes };
+        this.refresh();
+      })
+      .catch(() => undefined);
+  }
+
   private _buildAutomationTab(): string {
-    const rows = buildSettingsCatalog().filter((e) => e.tab === 'automation').map((e) => this._buildSettingRow(e)).join('\n');
+    const entries = buildSettingsCatalog().filter((e) => e.tab === 'automation');
+    const watcherKeys: readonly string[] = WATCHER_SETTING_KEYS;
+    const rows = entries.filter((e) => !watcherKeys.includes(e.key)).map((e) => this._buildSettingRow(e)).join('\n');
+    const watcherRows: Record<string, string> = {};
+    for (const e of entries) if (watcherKeys.includes(e.key)) watcherRows[e.key] = this._buildSettingRow(e);
     const content = `<section class="section" aria-label="${escapeHtml(l10n('rulesTiers.tab.automation'))}">
   <p class="hint">${escapeHtml(l10n('rulesTiers.automation.hint'))}</p>
   <table class="dash-table settings-table"><tbody>${rows}</tbody></table>
-</section>`;
+</section>
+${buildWatcherExcludeSectionHtml(watcherRows, this._watcherScan)}`;
     return this._tabPanel('automation', content);
   }
 
@@ -2631,6 +2724,12 @@ ${detailRow}`;
     // Restart the Dart analysis server to clear memory pressure — RSS resets
     // on restart, so shedding de-escalates to level 0 if the project fits in
     // memory on a fresh start.
+    // Off / Partly off banner button: the single switch's turn-on / Fix.
+    if (id === 'toggleLints') {
+      await vscode.commands.executeCommand('saropaLints.toggleLints');
+      this.refresh();
+      return;
+    }
     if (id === 'restartAnalyzer') {
       await vscode.commands.executeCommand('dart.restartAnalysisServer');
       return;

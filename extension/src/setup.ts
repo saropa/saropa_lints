@@ -20,11 +20,15 @@ import {
   type RuleLaneValue,
 } from './config/laneConfig';
 import { l10n } from './i18n/runtime';
+import { addDevDependency } from './pubspecDevDependency';
+import { chooseNewProjectConstraint, FALLBACK_CONSTRAINT, versionsWithin } from './compat/newProjectConstraint';
+import { getPubVersions } from './compat/pubVersions';
+import { parseDartVersion, pubspecDeclaresSaropaLints } from './compat/projectFacts';
+import { detectDartVersion } from './vibrancy/services/sdk-detector';
 // Shared path-segment constants/helpers — keeps 'reports'/'.saropa_lints' in one place.
 import { REPORTS_DIR } from './reportsPaths';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
-const DEFAULT_VERSION = '^9.1.0';
 
 /** Composite meta-plugin guide (browser); stable for marketplace installs. */
 const COMPOSITE_PLUGIN_SCAFFOLD_GUIDE_URL =
@@ -100,7 +104,35 @@ interface PubspecEnsureResult {
   changed: boolean;
 }
 
-function ensureSaropaLintsInPubspec(workspaceRoot: string): PubspecEnsureResult {
+/**
+ * Constraint for a project that does not depend on saropa_lints yet: what the
+ * compatibility recommender picks for the project's Dart SDK, or the safe 16.x
+ * fallback when the Dart version or the pub.dev list cannot be read.
+ */
+async function resolveNewProjectConstraint(workspaceRoot: string): Promise<string> {
+  try {
+    let dart: string | undefined;
+    try {
+      dart = parseDartVersion(
+        fs.readFileSync(path.join(workspaceRoot, '.dart_tool', 'package_config.json'), 'utf-8'),
+      );
+    } catch {
+      // No resolved project yet: ask the installed SDK instead.
+    }
+    if (!dart) {
+      const detected = await detectDartVersion();
+      dart = /^\d+\.\d+\.\d+/.test(detected) ? detected : undefined;
+    }
+    const versions = await versionsWithin(() => getPubVersions());
+    return await chooseNewProjectConstraint(dart, versions);
+  } catch {
+    return FALLBACK_CONSTRAINT;
+  }
+}
+
+export async function ensureSaropaLintsInPubspec(
+  workspaceRoot: string,
+): Promise<PubspecEnsureResult> {
   const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
   if (!fs.existsSync(pubspecPath)) {
     void vscode.window.showErrorMessage(
@@ -115,25 +147,18 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): PubspecEnsureResult 
   }
   const content = fs.readFileSync(pubspecPath, 'utf-8');
 
-  // Precision check: match as an actual dependency entry, not a substring
-  // in comments or similarly-named packages like saropa_lints_extra.
   // Already declared => nothing written => the caller can skip `pub get`.
-  if (/^\s{2}saropa_lints\s*:/m.test(content)) return { ok: true, changed: false };
-
-  // Line-based insertion avoids regex backtracking bugs that corrupted YAML
-  // by placing the dependency on the same line as dev_dependencies:.
-  // Preserve original line endings (CRLF on Windows) to avoid git noise.
-  const eol = content.includes('\r\n') ? '\r\n' : '\n';
-  const lines = content.split(eol);
-  const devDepsIdx = lines.findIndex(l => /^dev_dependencies:\s*$/.test(l));
-  const entry = `  ${SAROPA_LINTS_DEV_DEP}: ${DEFAULT_VERSION}`;
-
-  if (devDepsIdx === -1) {
-    lines.push('', 'dev_dependencies:', entry);
-  } else {
-    lines.splice(devDepsIdx + 1, 0, entry);
-  }
-  fs.writeFileSync(pubspecPath, lines.join(eol), 'utf-8');
+  // The edit itself (indentation, comments, CRLF) lives in
+  // pubspecDevDependency.ts, where each of those shapes is tested.
+  // Looked up only when it will be written: skips the pub.dev call otherwise.
+  if (pubspecDeclaresSaropaLints(content)) return { ok: true, changed: false };
+  const next = addDevDependency(
+    content,
+    SAROPA_LINTS_DEV_DEP,
+    await resolveNewProjectConstraint(workspaceRoot),
+  );
+  if (next === undefined) return { ok: true, changed: false };
+  fs.writeFileSync(pubspecPath, next, 'utf-8');
   return { ok: true, changed: true };
 }
 
@@ -593,7 +618,7 @@ async function runEnableExclusive(context: vscode.ExtensionContext): Promise<boo
     async (progress, token) => {
       logSection('Enable');
 
-      const pubspec = ensureSaropaLintsInPubspec(workspaceRoot);
+      const pubspec = await ensureSaropaLintsInPubspec(workspaceRoot);
       if (!pubspec.ok) return;
       logReport(pubspec.changed
         ? '- Added saropa_lints to pubspec.yaml'
@@ -800,7 +825,7 @@ const DISABLE_END_MARKER =
  * "Lint integration: Off" left every diagnostic in place
  * (plans/history/2026.06/2026.06.18/BUG_cant turn off lints.md).
  */
-function findPluginsBlock(lines: string[]): { start: number; end: number } | null {
+export function findPluginsBlock(lines: string[]): { start: number; end: number } | null {
   const start = lines.findIndex((l) => /^plugins:\s*$/.test(l));
   if (start === -1) return null;
 
@@ -1023,7 +1048,7 @@ function pluginOwnershipFilePath(root: string): string {
 }
 
 /** True when the durable sidecar claims our Disable owns this root's off state. */
-function readPluginOwnershipFile(root: string): boolean {
+export function readPluginOwnershipFile(root: string): boolean {
   try {
     const file = pluginOwnershipFilePath(root);
     if (!fs.existsSync(file)) return false;
@@ -1182,6 +1207,10 @@ export async function runReenablePlugin(context: vscode.ExtensionContext): Promi
     vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
     return;
   }
+
+  // The single on/off switch means the full live plugin: turning the plugin
+  // back on must also turn the setting on, or the two disagree silently.
+  await vscode.workspace.getConfiguration('saropaLints').update('enabled', true, vscode.ConfigurationTarget.Workspace);
 
   const restored = restorePluginsIntegration(root);
   // The block is live again however it got there, so drop any claim that our

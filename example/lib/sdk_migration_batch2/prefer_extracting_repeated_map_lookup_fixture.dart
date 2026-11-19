@@ -155,9 +155,7 @@ void goodSameNameLoopVarsInSiblingScopes(
   }
 
   for (final String id in ids) {
-    final String? contact = contacts.firstWhereOrNull(
-      (String c) => c == id,
-    );
+    final String? contact = contacts.firstWhereOrNull((String c) => c == id);
     if (contact == null) continue;
 
     final int? types = contactIndustryMap[contact];

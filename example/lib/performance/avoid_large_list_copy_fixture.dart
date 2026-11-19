@@ -190,24 +190,18 @@ void _good794j() {
 // GOOD: .toList() is the value of a map literal entry (e.g. a toJson() map).
 // jsonEncode rejects a lazy Iterable, so the value must be a concrete List.
 Map<String, Object?> _good794k() {
-  return <String, Object?>{
-    'items': largeList.map((e) => '$e').toList(),
-  };
+  return <String, Object?>{'items': largeList.map((e) => '$e').toList()};
 }
 
 // GOOD: .toList() is an element of a set literal — the element slot expects a
 // concrete List, not a lazy Iterable.
 void _good794l() {
-  final set = <List<int>>{
-    largeList.where((e) => e > 0).toList(),
-  };
+  final set = <List<int>>{largeList.where((e) => e > 0).toList()};
 }
 
 // GOOD: .toList() is an element of a list literal (a List<List<int>>).
 void _good794m() {
-  final nested = <List<int>>[
-    largeList.map((e) => e * 2).toList(),
-  ];
+  final nested = <List<int>>[largeList.map((e) => e * 2).toList()];
 }
 
 // GOOD: .toList() in a switch-expression arm inside a List<T> getter. The arm

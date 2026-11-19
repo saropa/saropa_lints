@@ -144,7 +144,14 @@ class _IterationInBuildOk extends StatelessWidget {
     final sorted = [...items]..sort();
     final joined = items.fold<String>('', (acc, s) => '$acc$s');
     final firstNonEmpty = filtered.reduce((a, b) => a.isNotEmpty ? a : b);
-    return Column(children: <Widget>[Text(joined), Text(firstNonEmpty), ...mapped, ...sorted.map(Text.new)]);
+    return Column(
+      children: <Widget>[
+        Text(joined),
+        Text(firstNonEmpty),
+        ...mapped,
+        ...sorted.map(Text.new),
+      ],
+    );
   }
 }
 

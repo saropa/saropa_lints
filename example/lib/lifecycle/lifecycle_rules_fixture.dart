@@ -134,10 +134,7 @@ class _GoodDidUpdateWidgetEqualityState
 
 // GOOD: didUpdateWidget with listEquals
 class GoodDidUpdateWidgetListEquals extends StatefulWidget {
-  const GoodDidUpdateWidgetListEquals({
-    super.key,
-    required this.countries,
-  });
+  const GoodDidUpdateWidgetListEquals({super.key, required this.countries});
   final List<String> countries;
 
   @override
@@ -247,10 +244,7 @@ class _GoodDidUpdateWidgetMapEqualsState
 
 // GOOD: didUpdateWidget with identical
 class GoodDidUpdateWidgetIdentical extends StatefulWidget {
-  const GoodDidUpdateWidgetIdentical({
-    super.key,
-    required this.callback,
-  });
+  const GoodDidUpdateWidgetIdentical({super.key, required this.callback});
   final VoidCallback callback;
 
   @override
@@ -321,8 +315,7 @@ class _GoodDialogWidgetState extends State<GoodDialogWidget> {
 Future<T?> showDialog<T>({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
-}) async =>
-    null;
+}) async => null;
 
 class WidgetsBinding {
   static final WidgetsBinding instance = WidgetsBinding._();

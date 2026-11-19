@@ -81,7 +81,7 @@ export async function gatherReadiness(
   hostMemory: ExtensionHostMemory | undefined,
 ): Promise<WorkspaceReadiness> {
   const hazardCount = (await getUncoveredHazards()).length;
-  const missingCount = findMissingExcludes().length;
+  const missingCount = (await findMissingExcludes()).length;
 
   // Check host memory against the configured threshold.
   let hostWarn = false;
@@ -192,4 +192,15 @@ export function readinessStatusBarText(
   return readiness.level === ReadinessLevel.Red
     ? l10n('workspaceReadiness.statusBar.red', { count })
     : l10n('workspaceReadiness.statusBar.yellow', { count });
+}
+
+/** Plain-text lines naming each readiness issue (codicon markers stripped,
+ *  no bullet prefix; the caller formats them). */
+export function readinessTooltipLines(
+  readiness: WorkspaceReadiness,
+  hostMemory: ExtensionHostMemory | undefined,
+): string[] {
+  return buildIssueItems(readiness, hostMemory).map(
+    (i) => i.label.replace(/\$\([^)]+\)\s*/g, ''),
+  );
 }

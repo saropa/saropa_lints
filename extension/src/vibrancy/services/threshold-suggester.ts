@@ -12,14 +12,17 @@ import { VibrancyResult, CiThresholds } from '../types';
  * 
  * Strategy:
  * - maxEndOfLife: current count (so existing ones don't fail; any new ones will)
- * - maxOutdated: current count + 1 (small buffer)
+ * - maxOutdated: direct and dev dependencies with a newer version available,
+ *   + 1 (small buffer). The same measure the generated CI check enforces
+ *   (see buildCheckerScript), so a pipeline built from these suggestions
+ *   passes on the project it was suggested for.
  * - minAverageVibrancy: current average rounded down to nearest 5
  * - failOnVulnerability: always true for safety
  */
 export function suggestThresholds(results: readonly VibrancyResult[]): CiThresholds {
     const endOfLifeCount = countCategory(results, 'end-of-life');
     const abandonedCount = countCategory(results, 'abandoned');
-    const outdatedCount = countCategory(results, 'outdated');
+    const outdatedCount = countUpdatableDirect(results);
     const averageVibrancy = computeAverageVibrancy(results);
 
     return {
@@ -36,6 +39,17 @@ function countCategory(
     category: string,
 ): number {
     return results.filter(r => r.category === category).length;
+}
+
+/**
+ * Direct (including dev) dependencies with an update available — not the
+ * `outdated` vibrancy category, which is a score band, not version currency.
+ */
+function countUpdatableDirect(results: readonly VibrancyResult[]): number {
+    return results.filter((r) => {
+        const status = r.updateInfo?.updateStatus;
+        return r.package.isDirect && (status === 'patch' || status === 'minor' || status === 'major');
+    }).length;
 }
 
 function computeAverageVibrancy(results: readonly VibrancyResult[]): number {

@@ -2,6 +2,7 @@
 library;
 
 // Pre-write checks, pack merge, `analysis_options.yaml`, migration, and logs.
+import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
 
@@ -14,6 +15,7 @@ import 'package:saropa_lints/src/init/config_reader.dart';
 import 'package:saropa_lints/src/init/config_writer.dart';
 import 'package:saropa_lints/src/init/custom_overrides_core.dart';
 import 'package:saropa_lints/src/init/display.dart';
+import 'package:saropa_lints/src/init/emit_ci_workflow.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/init/init_post_write.dart';
 import 'package:saropa_lints/src/init/migration.dart';
@@ -156,6 +158,75 @@ Future<void> runInit(List<String> args) async {
     return;
   }
 
+  if (cliArgs.emitCi != null) {
+    final String raw = cliArgs.emitCi!;
+    final Directory projectDir = Directory(targetDir);
+    // The default location is relative to the REPOSITORY root, not the
+    // project: GitHub only runs workflows from the root's .github/workflows,
+    // so a project in a subdirectory written to its own .github would never
+    // run. An explicit relative path keeps its old meaning (from --target).
+    final String base = raw == defaultEmitCiPath
+        ? (findRepoRoot(projectDir)?.path ?? targetDir)
+        : targetDir;
+    final String outPath = p.isAbsolute(raw)
+        ? p.normalize(raw)
+        : p.normalize(p.join(base, raw));
+    final File outFile = File(outPath);
+
+    // An explicit --tier is honored as asked. Otherwise one is written only
+    // when the project has no rule configuration (see ciNeedsExplicitTier).
+    String? tier;
+    if (cliArgs.tier != null) {
+      tier = resolveTier(cliArgs.tier);
+      if (tier == null) {
+        stderr.writeln(
+          'Unknown --tier "${cliArgs.tier}". '
+          'Use 1-5 or: ${tierIds.keys.join(', ')}.',
+        );
+        exitCode = 2;
+        return;
+      }
+    }
+
+    final EmitCiResult result = emitCiWorkflow(
+      outFile,
+      dryRun: cliArgs.isDryRun,
+      // Read for its analysis_options.yaml (a project with no saropa_lints
+      // rule configuration needs an explicit tier, or the generated `scan`
+      // exits 2 the first time CI runs) and for its place in the repository.
+      projectDir: projectDir,
+      tier: tier,
+    );
+
+    switch (result) {
+      case EmitCiResult.written:
+        // ignore: avoid_print
+        print('Wrote GitHub Actions workflow to: $outPath');
+        break;
+      case EmitCiResult.wouldWrite:
+        // ignore: avoid_print
+        print('[dry-run] Would write GitHub Actions workflow to: $outPath');
+        break;
+      case EmitCiResult.refusedExists:
+        // Never overwrite: a workflow a human has since hand-edited must not
+        // be silently clobbered just because it started as a generated file.
+        stderr.writeln(
+          'Refusing to overwrite existing file: $outPath\n'
+          'Remove it first, or point --emit-ci at a different path.',
+        );
+        exitCode = 1;
+        break;
+      case EmitCiResult.writeFailed:
+        stderr.writeln(
+          'Could not write $outPath. Check the directory is writable.',
+        );
+        exitCode = 1;
+        break;
+    }
+
+    return;
+  }
+
   if (cliArgs.enablePackIds.isNotEmpty) {
     for (final String id in cliArgs.enablePackIds) {
       if (!knownRulePackIds.contains(id)) {
@@ -178,8 +249,9 @@ Future<void> runInit(List<String> args) async {
   showWhatsNew(version, packageDir);
   // I4: Deprecation notice — extension is the supported setup path.
   log.terminal(
-    '${InitColors.yellow}Note: CLI init is deprecated. '
-    'Use the Saropa Lints VS Code extension for setup.${InitColors.reset}',
+    '${InitColors.yellow}Note: CLI init is deprecated; the Saropa Lints '
+    'VS Code extension is the supported setup path. If the extension turned '
+    'Lint integration OFF, init does not turn it back on.${InitColors.reset}',
   );
   log.terminal('');
 
@@ -651,7 +723,34 @@ Future<void> runInit(List<String> args) async {
   }
 
   // Validate the written file has the critical sections
-  validateWrittenConfig(log, resolvedOutput, allRules.length);
+  final bool ownedOff = _isOffByExtension(targetDir);
+  validateWrittenConfig(
+    log,
+    resolvedOutput,
+    allRules.length,
+    ownedOff: ownedOff,
+  );
+  // A config with no active plugins block or zero rules is a failed init,
+  // except a brand-new file, which is written disabled on purpose.
+  final writtenFile = File(resolvedOutput);
+  if (!isNewFile &&
+      (!writtenFile.existsSync() ||
+          isConfigUnusable(
+            writtenFile.readAsStringSync(),
+            ownedOff: ownedOff,
+          ))) {
+    exitCode = 1;
+  }
+  if (writtenFile.existsSync() &&
+      writtenFile.readAsStringSync().contains(extensionDisabledMarker)) {
+    log.terminal(
+      ownedOff
+          ? "Saropa Lints is switched off in the VS Code extension. Click "
+                "'Saropa Lints: Off' in the status bar."
+          : 'Saropa Lints is in default lightweight mode: the plugin block is '
+                'commented out and the daemon delivers diagnostics.',
+    );
+  }
   await runPostWriteActions(
     cliArgs: cliArgs,
     v4Detected: v4Detected,
@@ -664,6 +763,21 @@ Future<void> runInit(List<String> args) async {
     resolvedTier: resolvedTier,
     targetDir: targetDir,
   );
+}
+
+/// True when the VS Code extension recorded that it turned lints off
+/// (`.dart_tool/saropa_lints/plugin_ownership.json`, `disabledByExtension`).
+bool _isOffByExtension(String projectDir) {
+  try {
+    final File f = File(
+      p.join(projectDir, '.dart_tool', 'saropa_lints', 'plugin_ownership.json'),
+    );
+    if (!f.existsSync()) return false;
+    final Object? json = jsonDecode(f.readAsStringSync());
+    return json is Map && json['disabledByExtension'] == true;
+  } on Object {
+    return false;
+  }
 }
 
 /// Print rule count summary to terminal.

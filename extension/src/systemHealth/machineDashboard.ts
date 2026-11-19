@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
 import { buildSnapshot, killProcess, queryDartProcesses } from './processQuery';
+import { isSystemHealthPlatformSupported } from './processMonitor';
 import { killProcessTree, queryModelHostProcesses, scanOrphanedHosts } from './orphanHosts';
 import { queryLoadedModels } from './ollamaQuery';
 import { querySystemMemory } from './systemQuery';
@@ -40,9 +41,9 @@ export class MachineDashboard implements vscode.Disposable {
    * minutes, while the tab sits unfocused in the background.
    */
   static createOrShow(context: vscode.ExtensionContext): void {
-    // All data sources are Windows-only CIM queries — show a clear message
-    // rather than an empty webview on other platforms.
-    if (process.platform !== 'win32') {
+    // Process/memory queries only have implementations for win32/darwin/linux
+    // — show a clear message rather than an empty webview elsewhere.
+    if (!isSystemHealthPlatformSupported()) {
       void vscode.window.showInformationMessage(
         l10n('machineDashboard.platformUnsupported'),
       );
@@ -88,16 +89,22 @@ export class MachineDashboard implements vscode.Disposable {
    * that never opens the panel.
    */
   static async queryData(): Promise<MachineDashboardData> {
-    // Every data source here shells out to PowerShell CIM queries — all
-    // Windows-only, same constraint as processQuery.ts and orphanHosts.ts.
-    // Returning the empty shape (not throwing) lets the HTML layer render
-    // its normal empty state rather than needing a separate error path.
-    if (process.platform !== 'win32') {
+    // Process/memory queries (queryDartProcesses, querySystemMemory) only
+    // have implementations for win32/darwin/linux; the whole-machine picture
+    // is meaningless without them. Returning the empty shape (not throwing)
+    // lets the HTML layer render its normal empty state rather than needing
+    // a separate error path.
+    if (!isSystemHealthPlatformSupported()) {
       return { system: undefined, groups: [], recommendations: [], budget: undefined };
     }
     // Five independent queries fired concurrently rather than sequentially —
     // none depends on another's result, and this panel already reads as
-    // slow (each PowerShell shell-out is tens of ms) if run in series.
+    // slow (each shell-out is tens of ms) if run in series.
+    //
+    // queryModelHostProcesses / scanOrphanedHosts are genuinely Windows-only
+    // (orphanHosts.ts looks for llama-server.exe) and already degrade to
+    // empty results on their own on other platforms — no extra platform
+    // check needed here for those two.
     const [system, dartProcesses, modelHosts, loadedModels, orphanHostScan] = await Promise.all([
       querySystemMemory(),
       queryDartProcesses(),

@@ -12,7 +12,7 @@ import {
     buildUpdateInfo,
 } from '../../../vibrancy/services/changelog-service';
 
-const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
+const fixturesDir = path.join(__dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures');
 
 /**
  * Tests **changelog-service**: semver compare, pub constraint satisfaction, repo subpath extraction,

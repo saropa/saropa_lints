@@ -118,9 +118,11 @@ void _bad64() {
 // GOOD: Should NOT trigger require_image_picker_source_choice
 void _good64() {
   showModalBottomSheet(
-    builder: (_) => Column(children: [
-      ListTile(onTap: () => pickImage(ImageSource.camera)),
-      ListTile(onTap: () => pickImage(ImageSource.gallery)),
-    ]),
+    builder: (_) => Column(
+      children: [
+        ListTile(onTap: () => pickImage(ImageSource.camera)),
+        ListTile(onTap: () => pickImage(ImageSource.gallery)),
+      ],
+    ),
   );
 }

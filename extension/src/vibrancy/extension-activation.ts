@@ -86,7 +86,10 @@ import { allKnownIssues } from './scoring/known-issues';
 import {
     runOverrideAnalysis, overrideConstrainerCandidates,
 } from './services/override-runner';
+import { fetchTargetDepsFor, fetchVersionListsFor } from './services/upgrade-target-deps';
+import { deriveSdkPinsOrNull, parseLockedVersions } from './services/sdk-pins';
 import { buildConstraintIndex } from './services/shared-dep-constraints';
+import { attachBlastRadius, blastRadiusCandidates } from './scoring/blast-radius-attacher';
 import { OverrideAnalysis, NewVersionNotification, PackageInsight } from './types';
 import { consolidateInsights } from './scoring/consolidate-insights';
 import {
@@ -1394,6 +1397,43 @@ async function runScanInner(
                 getSiblingRepoPaths(),
             );
             results = attachVersionDrift(results, siblingConstraints);
+            // Upgrade blast radius: a non-safe verdict suppresses the plain
+            // upgrade nudge and excludes the package from bulk upgrade-all.
+            const blastConstraints = await buildConstraintIndex(
+                workspaceRoot,
+                blastRadiusCandidates(results, enrichResult.reverseDeps),
+            );
+            const targetDeps = await fetchTargetDepsFor(results, targets.cache);
+            // null = SDK not found (curated fallback pins apply); empty map = SDK found, nothing pinned.
+            const derivedPins = await deriveSdkPinsOrNull(workspaceRoot.fsPath);
+            // Full lock (incl. transitives) so a satisfied transitive is not blocked.
+            const lockText = await vscode.workspace.fs
+                .readFile(vscode.Uri.joinPath(workspaceRoot, 'pubspec.lock'))
+                .then(b => Buffer.from(b).toString('utf8'), () => null);
+            const fullLock = lockText ? parseLockedVersions(lockText) : undefined;
+            // dependency_overrides bypass dependents' caps on the overridden package.
+            const blastOverrides = new Set(parseDependencyOverrides(parsed.yamlContent));
+            // Prefetch release lists only for packages whose latest is blocked.
+            const blockedPkgs = attachBlastRadius(results, {
+                reverseDeps: enrichResult.reverseDeps,
+                constraints: blastConstraints,
+                targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
+                sdkPins: derivedPins ?? undefined,
+                lockedVersions: fullLock,
+                overrides: blastOverrides,
+            }).filter(r => r.blastRadius && r.blastRadius.verdict !== 'safe')
+                .map(r => r.package.name);
+            const versionLists = await fetchVersionListsFor(blockedPkgs, targets.cache);
+            results = attachBlastRadius(results, {
+                reverseDeps: enrichResult.reverseDeps,
+                constraints: blastConstraints,
+                lockedVersions: fullLock,
+                overrides: blastOverrides,
+                versionsOf: p => versionLists.get(p) ?? null,
+                targetDepsOf: (p, v) => targetDeps.get(`${p}@${v}`) ?? null,
+                // Undefined -> attacher falls back to the documented table.
+                sdkPins: derivedPins ?? undefined,
+            });
             lastReverseDeps = enrichResult.reverseDeps;
             lastFloors = enrichResult.floors;
             lastForbiddens = enrichResult.forbiddens;
@@ -1576,7 +1616,7 @@ async function runScanInner(
             logger.info(
                 `Scan complete — ${logger.elapsedMs}ms — ` +
                 `vibrant:${counts.vibrant} stable:${counts.stable} ` +
-                `outdated:${counts.outdated} abandoned:${counts.abandoned} eol:${counts.eol}`,
+                `outdated:${counts.outdated} abandoned:${counts.abandoned} upgrade:${counts.upgradeRequired} eol:${counts.eol}`,
             );
 
             publishResults(targets, results, parsed, depGraphSummary);

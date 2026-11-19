@@ -97,11 +97,8 @@ class Uri {
   final String? path;
 
   static Uri parse(String source) => Uri();
-  static Uri https(String host, String path) => Uri(
-        scheme: 'https',
-        host: host,
-        path: path,
-      );
+  static Uri https(String host, String path) =>
+      Uri(scheme: 'https', host: host, path: path);
 }
 
 extension GoRouterExtension on BuildContext {
@@ -116,9 +113,7 @@ extension GoRouterExtension on BuildContext {
 
 void testRouteSettings(BuildContext context) {
   // expect_lint: prefer_route_settings_name
-  Navigator.of(context).push(
-    MaterialPageRoute(builder: (_) => Container()),
-  );
+  Navigator.of(context).push(MaterialPageRoute(builder: (_) => Container()));
 
   // GOOD: With RouteSettings
   Navigator.of(context).push(
@@ -164,9 +159,9 @@ final GlobalKey<State<StatefulWidget>> navKey = GlobalKey();
 // BAD: Using GlobalKey.currentContext with Navigator.of
 void badNavigatorOfWithCurrentContext() {
   // expect_lint: avoid_navigator_context_issue
-  Navigator.of(scaffoldKey.currentContext!).push(
-    MaterialPageRoute(builder: (_) => Container()),
-  );
+  Navigator.of(
+    scaffoldKey.currentContext!,
+  ).push(MaterialPageRoute(builder: (_) => Container()));
 }
 
 // BAD: Using GlobalKey.currentContext with Navigator static method
@@ -183,18 +178,14 @@ void badNavigatorPushWithCurrentContext(BuildContext context) {
 
 // GOOD: Using direct BuildContext from widget tree
 void goodNavigatorOfWithContext(BuildContext context) {
-  Navigator.of(context).push(
-    MaterialPageRoute(builder: (_) => Container()),
-  );
+  Navigator.of(context).push(MaterialPageRoute(builder: (_) => Container()));
 }
 
 // GOOD: Using context with mounted check
 void goodNavigatorWithMountedCheck(BuildContext context) async {
   await Future.delayed(const Duration(seconds: 1));
   if (context.mounted) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => Container()),
-    );
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => Container()));
   }
 }
 

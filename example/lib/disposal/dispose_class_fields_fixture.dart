@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: dispose_class_fields
 class _bad336_MyService {
   final _controller = StreamController<int>();
-// No close() called!
+  // No close() called!
 }
 
 // GOOD: Should NOT trigger dispose_class_fields

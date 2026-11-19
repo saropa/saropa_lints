@@ -191,8 +191,40 @@ UK_TO_US.pop("paralyses", None)
 # Build a single regex that matches any UK spelling as a whole word.
 # Sorted longest-first so "behaviours" matches before "behaviour".
 _SORTED_UK = sorted(UK_TO_US.keys(), key=len, reverse=True)
+
+
+def _trie_alternation(words: list[str]) -> str:
+    """Regex alternation of [words] factored by shared prefix.
+
+    A flat ``a|b|c`` alternation of ~270 words makes ``re`` try every
+    branch at every character, which dominated pre-commit time on large
+    staged sets. Prefix-factoring keeps the matched set identical (longer
+    continuations are tried before the shorter terminal) but prunes most
+    branches after the first character.
+    """
+    trie: dict = {}
+    for word in words:
+        node = trie
+        for ch in word:
+            node = node.setdefault(ch, {})
+        node[""] = {}
+
+    def emit(node: dict) -> str:
+        branches = [
+            re.escape(ch) + emit(child)
+            for ch, child in sorted(node.items())
+            if ch
+        ]
+        body = "|".join(branches)
+        if "" in node:
+            return f"(?:{body})?" if body else ""
+        return f"(?:{body})"
+
+    return emit(trie)
+
+
 _UK_PATTERN = re.compile(
-    r"\b(" + "|".join(re.escape(w) for w in _SORTED_UK) + r")\b",
+    r"\b(" + _trie_alternation(_SORTED_UK) + r")\b",
     re.IGNORECASE,
 )
 
@@ -205,7 +237,7 @@ _UK_PATTERN = re.compile(
 # camel chunk, underscore, digit, or non-letter).
 _CAPITALIZED_UK = [w[0].upper() + w[1:] for w in _SORTED_UK]
 _UK_CAMEL_PATTERN = re.compile(
-    r"(?<=[a-z])(" + "|".join(re.escape(w) for w in _CAPITALIZED_UK) + r")(?![a-z])"
+    r"(?<=[a-z])(" + _trie_alternation(_CAPITALIZED_UK) + r")(?![a-z])"
 )
 
 # File extensions to scan

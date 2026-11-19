@@ -2748,16 +2748,9 @@ class DisposeClassFieldsRule extends SaropaLintRule {
         if (member is ConstructorDeclaration) {
           // Check formal parameters
           for (final param in member.parameters.parameters) {
-            if (param is DefaultFormalParameter) {
-              final normalParam = param.parameter;
-              if (normalParam is FieldFormalParameter) {
-                constructorParams.add(normalParam.name.lexeme);
-              } else if (normalParam is SimpleFormalParameter) {
-                constructorParams.add(normalParam.name?.lexeme ?? '');
-              }
-            } else if (param is FieldFormalParameter) {
+            if (param is FieldFormalParameter) {
               constructorParams.add(param.name.lexeme);
-            } else if (param is SimpleFormalParameter) {
+            } else if (param is RegularFormalParameter) {
               constructorParams.add(param.name?.lexeme ?? '');
             }
           }

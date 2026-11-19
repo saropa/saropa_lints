@@ -112,7 +112,7 @@ dynamic widget;
 // BAD: Should trigger require_getx_binding
 // expect_lint: require_getx_binding
 class _bad650_MyController extends GetxController {
-// Used directly without binding
+  // Used directly without binding
 }
 
 // In widget:

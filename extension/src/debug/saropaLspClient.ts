@@ -17,6 +17,8 @@ import {
   type LanguageClientOptions,
   type ServerOptions,
 } from 'vscode-languageclient/node';
+import { isSaropaLintsResolved } from './lspResolution';
+import { l10n } from '../i18n/runtime';
 import { HealthPanel } from '../systemHealth/healthPanel';
 
 // CVE-2024-27980 / PATHEXT: on Windows, `dart` resolves to `dart.bat` which
@@ -56,7 +58,8 @@ export class SaropaLspClient implements vscode.Disposable {
   private _client: LanguageClient | undefined;
 
   /** Dedicated output channel for server logs and lifecycle messages. */
-  private readonly _outputChannel: vscode.OutputChannel;
+  // A log channel: vscode-languageclient 10's `outputChannel` option requires one.
+  private readonly _outputChannel: vscode.LogOutputChannel;
 
   /** Subscriptions pushed during start(); cleared on stop(). */
   private readonly _disposables: vscode.Disposable[] = [];
@@ -88,7 +91,7 @@ export class SaropaLspClient implements vscode.Disposable {
   ) {
     // Create the output channel once — it survives stop/start cycles so
     // the user doesn't lose earlier log lines when the server restarts.
-    this._outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
+    this._outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME, { log: true });
 
     // Register for VS Code deactivation teardown exactly once per instance,
     // so the spawned dart process is stopped even if dispose() is never
@@ -113,6 +116,18 @@ export class SaropaLspClient implements vscode.Disposable {
     this._outputChannel.appendLine(
       `[SaropaLspClient] Starting LSP server for project: ${this._projectRoot}`,
     );
+
+    // Do not spawn when the package is not resolved: dart exits 255 and the
+    // client would restart 5x with stacked error toasts. One warning instead.
+    if (!isSaropaLintsResolved(this._projectRoot)) {
+      this._outputChannel.appendLine(
+        '[SaropaLspClient] saropa_lints not found in .dart_tool/package_config.json — not starting.',
+      );
+      void vscode.window.showWarningMessage(
+        "Saropa Lints: saropa_lints is not resolved in this project. Run 'dart pub get' and restart the server.",
+      );
+      return;
+    }
 
     // Server spawn configuration — identical for run and debug because
     // the Dart VM doesn't need a separate debug launch profile here.
@@ -205,6 +220,7 @@ export class SaropaLspClient implements vscode.Disposable {
       // and doesn't silently vanish.
       const message = err instanceof Error ? err.message : String(err);
       this._outputChannel.appendLine(`[SaropaLspClient] Failed to start LSP server: ${message}`);
+      void vscode.window.showErrorMessage(l10n('notify.lsp.startFailed', { reason: message }));
       // Don't hold a half-started client reference.
       this._client = undefined;
     }

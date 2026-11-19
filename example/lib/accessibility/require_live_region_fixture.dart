@@ -116,8 +116,5 @@ void _bad7() {
 
 // GOOD: Should NOT trigger require_live_region
 void _good7() {
-  Semantics(
-    liveRegion: true,
-    child: Text(errorMessage),
-  );
+  Semantics(liveRegion: true, child: Text(errorMessage));
 }

@@ -297,5 +297,254 @@ void f(String named_uri, String other_uri) {
 }
 ''');
     });
+
+    // Regression coverage for the false-positive bug report:
+    // bugs/avoid_case_sensitive_path_comparison_false_positive_http_route_paths.md
+
+    test('does NOT fire on root-detection idiom via an intermediate '
+        '.parent variable', () async {
+      // `.parent` is factored into a named local (as it must be when the
+      // loop also reassigns `dir = parent;` on the next line) — the
+      // root-detection exemption has to trace back through that single
+      // assignment, not just match `.parent.path` as literal source text.
+      await assertFixtureMarkers(rule, '''
+class D {
+  String get path => '';
+  D get parent => this;
+}
+
+void f(D dir) {
+  while (true) {
+    final parent = dir.parent;
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (parent.path == dir.path) break;
+    dir = parent;
+  }
+}
+''');
+    });
+
+    test('does NOT fire on direct HttpRequest.uri.path compared to a route '
+        'constant', () async {
+      // The real-world router shape (`req.uri.path == ...`). Identified
+      // via `HttpRequest`'s declaring library (dart:io) — a bare
+      // `Uri`-typed parameter alone is NOT enough, see the false-negative
+      // regression tests below.
+      await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+void f(HttpRequest request) {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (request.uri.path == '/api/health') {}
+}
+''');
+    });
+
+    test('does NOT fire on HttpRequest.uri.path stored in a local variable '
+        'before comparison', () async {
+      // The real-world router shape: `Uri.path` assigned to a local
+      // named `path`, then compared against a route constant. HTTP
+      // request-target paths are case-sensitive by specification, so
+      // this must not be treated as a filesystem path comparison.
+      await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+void f(HttpRequest request) {
+  final String path = request.uri.path;
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (path == '/api/health') {}
+}
+''');
+    });
+
+    // Soundness regressions from code review of the above fix: the HTTP-Uri
+    // and intermediate-variable exemptions must stay narrow. An arbitrary
+    // `Uri` (not traceably from an HTTP request) is still a filesystem
+    // path, and tracing through a mutable or since-reassigned local is
+    // unsound — all of the following must still fire.
+
+    test(
+      'fires on Platform.script.path (an arbitrary Uri is not an HTTP path)',
+      () async {
+        await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+void f(String expectedPath) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (Platform.script.path == expectedPath) {}
+}
+''');
+      },
+    );
+
+    test(
+      'fires on File(...).uri.path (a filesystem Uri, not an HTTP one)',
+      () async {
+        await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+void f(File a, File b) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (a.uri.path == b.path) {}
+}
+''');
+      },
+    );
+
+    test(
+      'fires on a user-defined class literally named Uri (not dart:core Uri)',
+      () async {
+        // A custom `Uri` class must not be mistaken for dart:core's Uri —
+        // the type check has to verify the declaring library too.
+        await assertFixtureMarkers(rule, '''
+class Uri {
+  String get path => '';
+}
+
+void f(Uri requestUri, String expectedPath) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (requestUri.path == expectedPath) {}
+}
+''');
+      },
+    );
+
+    test('fires on root-detection idiom traced through a reassignable (var) '
+        'local', () async {
+      await assertFixtureMarkers(rule, '''
+class D {
+  String get path => '';
+  D get parent => this;
+}
+
+void f(D dir, D other) {
+  var parent = dir.parent;
+  parent = other;
+  // LINT: avoid_case_sensitive_path_comparison
+  if (parent.path == dir.path) {}
+}
+''');
+    });
+
+    test(
+      'fires on Uri-path traced through a reassignable (var) local',
+      () async {
+        await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+void f(Uri u, File file, String expectedPath) {
+  var path = u.path;
+  path = file.path;
+  // LINT: avoid_case_sensitive_path_comparison
+  if (path == expectedPath) {}
+}
+''');
+      },
+    );
+
+    test('fires on root-detection idiom when the captured base is reassigned '
+        'afterward', () async {
+      await assertFixtureMarkers(rule, '''
+class D {
+  String get path => '';
+  D get parent => this;
+}
+
+void f(D dir, D other) {
+  final parent = dir.parent;
+  dir = other;
+  // LINT: avoid_case_sensitive_path_comparison
+  if (parent.path == dir.path) {}
+}
+''');
+    });
+
+    test('fires on mismatched root-detection bases via an intermediate '
+        'variable', () async {
+      await assertFixtureMarkers(rule, '''
+class D {
+  String get path => '';
+  D get parent => this;
+}
+
+void f(D a, D b) {
+  final parent = b.parent;
+  // LINT: avoid_case_sensitive_path_comparison
+  if (parent.path == a.path) {}
+}
+''');
+    });
+
+    // Second-round soundness regressions (Opus re-review): a bare
+    // `Uri`-typed parameter/local is NOT evidence of an HTTP request on its
+    // own, and the request-type check must be library-scoped, not
+    // name-suffix-scoped.
+
+    test('fires on a bare Uri-typed parameter compared directly (not '
+        'traceable to an HTTP request)', () async {
+      // Nothing distinguishes this from `File(...).uri.path` or
+      // `Platform.script.path` — a bare `Uri` alone must not be exempted.
+      await assertFixtureMarkers(rule, '''
+void f(Uri fileUri, String expectedPath) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (fileUri.path == expectedPath) {}
+}
+''');
+    });
+
+    test(
+      'fires on a bare Uri-typed parameter leaked through a final local',
+      () async {
+        await assertFixtureMarkers(rule, '''
+void f(Uri fileUri, String expectedPath) {
+  final String path = fileUri.path;
+  // LINT: avoid_case_sensitive_path_comparison
+  if (path == expectedPath) {}
+}
+''');
+      },
+    );
+
+    test('fires on a user-defined class merely named/suffixed "Request" '
+        '(not dart:io HttpRequest or shelf Request)', () async {
+      // `UploadRequest` is not dart:io's `HttpRequest` or package:shelf's
+      // `Request` — matching on the class name's "Request" suffix alone
+      // (the first-round fix) was unsound; only the declaring library
+      // identifies a real HTTP request object.
+      await assertFixtureMarkers(rule, '''
+class UploadRequest {
+  UploadRequest(this.uri);
+  final Uri uri;
+}
+
+class FakePath {
+  final String path = '';
+}
+
+void f(UploadRequest r, FakePath p) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (r.uri.path == p.path) {}
+}
+''');
+    });
+
+    test('fires on a hand-rolled class literally named Request (not '
+        'package:shelf Request)', () async {
+      await assertFixtureMarkers(rule, '''
+class Request {
+  Request(this.uri);
+  final Uri uri;
+}
+
+class FakePath {
+  final String path = '';
+}
+
+void f(Request r, FakePath p) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (r.uri.path == p.path) {}
+}
+''');
+    });
   });
 }

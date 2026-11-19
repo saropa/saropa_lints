@@ -51,7 +51,7 @@ class ConvertStatelessToStatefulForStreamFix extends SaropaFixProducer {
     // assignment-wrapped forms (`stream: x = method()`), which would also
     // require relocating a local variable declaration.
     final namedArg = streamExpr.parent;
-    if (namedArg is! NamedExpression || namedArg.name.label.name != 'stream') {
+    if (namedArg is! NamedArgument || namedArg.name.lexeme != 'stream') {
       return;
     }
 

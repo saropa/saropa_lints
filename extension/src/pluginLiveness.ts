@@ -371,6 +371,22 @@ export function verifyPluginLiveness(workspaceRoot: string): PluginLivenessResul
   }
 
   const data = readViolations(workspaceRoot);
+  // A missing enabledRuleCount means the file was written by the extension
+  // (live-diagnostics snapshot after Enable/Run Analysis), not by the plugin.
+  // The plugin always writes the count, so absence is "unknown", not zero.
+  // Treating it as zero showed the "zero rules" modal after every Enable
+  // whenever the plugin block was commented out (Lint integration Off).
+  if (data && data.config?.enabledRuleCount === undefined) {
+    return {
+      status: 'alive',
+      enabledRuleCount: 0,
+      filesAnalyzed: 0,
+      reportPath,
+      message: '',
+      recovery: '',
+      setUpActionable: false,
+    };
+  }
   const enabledRuleCount = data?.config?.enabledRuleCount ?? 0;
   const filesAnalyzed = data?.summary?.filesAnalyzed ?? 0;
 
@@ -436,6 +452,9 @@ export function verifyPluginLiveness(workspaceRoot: string): PluginLivenessResul
   };
 }
 
+/** True while a "Set Up Project" click is running `saropaLints.enable`. */
+let setUpInFlight = false;
+
 /**
  * Surface a non-alive liveness result to the user as a warning notification
  * with a "Show Details" button that opens an output channel with the
@@ -453,6 +472,21 @@ export async function surfaceLivenessResult(
   outputChannel: vscode.OutputChannel,
 ): Promise<void> {
   if (result.status === 'alive') return;
+
+  // Re-entry guard: "Set Up Project" runs `saropaLints.enable`, which runs
+  // the liveness check again. If setup did not fix the config, a second
+  // modal would open, and clicking its button would loop forever. While a
+  // setup is in flight, report the result without a modal.
+  if (setUpInFlight) {
+    outputChannel.appendLine(
+      `Saropa Lints: still not alive after Set Up Project — ${result.message}`,
+    );
+    void vscode.window.showWarningMessage(
+      `${result.message} Set Up Project did not resolve this; see the ` +
+        'Saropa Lints output channel for details.',
+    );
+    return;
+  }
 
   // Write a detailed diagnosis to the output channel for users who want to
   // inspect the report path, copy-paste, or share the error.
@@ -517,7 +551,12 @@ export async function surfaceLivenessResult(
     // (pubspec, pub get, write_config, analyze). Reusing it keeps a
     // single code path for setup so future changes don't have to update
     // two flows in lockstep.
-    await vscode.commands.executeCommand('saropaLints.enable');
+    setUpInFlight = true;
+    try {
+      await vscode.commands.executeCommand('saropaLints.enable');
+    } finally {
+      setUpInFlight = false;
+    }
     return;
   }
   if (choice === 'Show Details') {

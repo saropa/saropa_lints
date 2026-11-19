@@ -27,9 +27,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.8'
+          sdk: '3.13.7'
       - name: Install dependencies
-        run: dart pub get
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
       # Same as publish.yml: root `dart analyze` resolves nested packages (SDK 3.11+); each
       # needs `pub get` so package: URIs work before the first analyze step.
       - name: Install nested package dependencies
@@ -102,7 +106,7 @@ jobs:
         # Rule files are loaded at runtime (not statically imported), so
         # `dart analyze` cannot catch removed getters — they crash the LSP
         # server at startup. This script greps for known-removed patterns.
-        run: python scripts/check_analyzer_api_compat.py
+        run: python scripts/checks/check_analyzer_api_compat.py
       - name: Verify dependency-import consistency
         # Deterministic, version-independent guard: every package imported by
         # shipped code (lib/ + bin/) must be a declared pubspec dependency.
@@ -110,13 +114,13 @@ jobs:
         # missing dependency is Dart-version-dependent (warning on 3.10.x,
         # hard reject on the publish job's stable SDK), so it let the missing
         # `meta` dep through as a non-fatal warning and burned v13.12.6/.7.
-        # This Python gate has no such ambiguity. See scripts/check_dependency_imports.py.
-        run: python scripts/check_dependency_imports.py
+        # This Python gate has no such ambiguity. See scripts/checks/check_dependency_imports.py.
+        run: python scripts/checks/check_dependency_imports.py
       - name: Verify shipped docs don't link into .pubignore-excluded paths
         # A doc under doc/ (shipped) that links to plans/, bugs/, or scripts/
         # (all excluded from the pub.dev tarball) is a dead link for anyone
-        # reading the published package. See scripts/check_doc_links_excluded_paths.py.
-        run: python scripts/check_doc_links_excluded_paths.py
+        # reading the published package. See scripts/checks/check_doc_links_excluded_paths.py.
+        run: python scripts/checks/check_doc_links_excluded_paths.py
       - name: Dry run (pub.dev validation)
         # Catches missing direct dependencies and other pub.dev rules; exit 65 = warnings, 66+ = errors
         run: |
@@ -128,16 +132,22 @@ jobs:
             echo "::error::Dry run failed with exit code $code (e.g. missing dependency in pubspec.yaml)"
             exit 1
           fi
+      - name: Lockfiles unchanged
+        # CI must never change dependency versions. Fail if any step above
+        # rewrote a committed lockfile (e.g. an SDK too old for it).
+        run: git diff --exit-code -- pubspec.lock
       - name: Format
         # Only format lib/ and test/; example_* use experimental features and are excluded from analyze
         run: dart format lib test
       # Only on PRs so we don't push to main (avoids permission/loop issues)
+      # Stage only lib/ and test/ (what `dart format` touches). The bot must
+      # never commit dependency or version changes.
       - name: Commit formatting changes
         if: github.event_name == 'pull_request'
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git diff --quiet || (git add -A && git commit -m "Format Dart files" && git push)
+          git diff --quiet -- lib test || (git add -- lib test && git commit -m "Format Dart files" && git push)
 
   test:
     runs-on: ubuntu-latest
@@ -152,9 +162,13 @@ jobs:
           fetch-depth: 0
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: '3.10.8'
+          sdk: '3.13.7'
       - name: Install dependencies
-        run: dart pub get
+        # Install the committed versions and fail if pub changed pubspec.lock.
+        # (Not --enforce-lockfile: it also demands a lock for example/, which is gitignored.)
+        run: |
+          dart pub get
+          git diff --exit-code -- pubspec.lock
       - name: Stub test integrity report
         run: dart run bin/stub_test_report.dart --write=reports/stub-test-report.json
       - name: Run tests
@@ -169,6 +183,100 @@ jobs:
           python-version: "3.12"
       - name: Python script tests (tier integrity)
         run: python -m unittest discover -s scripts/modules/tests -t . -v
+
+  # This repo's own 2332 rules have never run against its own pull requests.
+  # The committed analysis_options.yaml carries no `include:` of a tier and no
+  # `plugins:` section at all (the analyze job's "Strip self-plugin reference"
+  # step is a no-op against the current file — it deletes lines that are not
+  # there), so `dart analyze` here only ever applies stock Dart rules. This
+  # job closes that gap, running the checkout through the repo's own composite
+  # action and dogfooding the exact code under review.
+  #
+  # `tier` is REQUIRED, not cosmetic: scan reads the project's per-rule config
+  # from analysis_options.yaml and exits 2 when it finds none, which is exactly
+  # what happens here. Passing a tier makes scan use that rule set directly
+  # (scan_runner.dart:431 returns the tier rules before ever reading config).
+  # `recommended` is the tier the README points consumers at, so self-linting
+  # at the same level is the honest comparison.
+  #
+  # Findings CANNOT fail this job, by construction: `continue-on-error` on the
+  # step means the action's verdict on findings never fails the job. That is deliberate and it is not the vibrancy
+  # generator's mistake repeated — that workflow claimed to gate and silently
+  # did not. This one states plainly that it reports and never gates, and the
+  # full findings are in the log for anyone who opens it.
+  #
+  # Why it cannot gate yet: at `recommended` this repo reports 282 findings
+  # (155 error, 127 warning) against its own code. That is a backlog, not a
+  # regression, and turning it into a required check would mean either a red X
+  # on every pull request or a rushed sweep of 155 errors. `baseline` is the
+  # designed answer when the team wants to gate on new findings only.
+  #
+  # test/ and the example trees are excluded because they are rule FIXTURES:
+  # files that deliberately violate the rules they test. Counting
+  # avoid_hardcoded_credentials against the fixture written to trigger
+  # avoid_hardcoded_credentials makes the number meaningless.
+  #
+  # Scoping choices, since auditing every rule against the whole repo on
+  # every PR could be slow:
+  # `mode: gate` resolves to the `scan` command, which is what makes this
+  # dogfooding rather than theater:
+  #   - scan honors this repo's own analysis_options.yaml, so the job runs
+  #     the rule set the project actually configures — the thing the analyze
+  #     job strips away.
+  #   - scan writes a human-readable report to stdout, so findings are
+  #     visible in the job log.
+  # `mode: annotate` would be wrong here despite the name: it writes SARIF to
+  # a file and passes --quiet, so with upload-sarif off the findings would go
+  # nowhere at all and this job would prove only that the action does not
+  # crash — which action-selftest already proves.
+  #
+  # `since` is deliberately absent: it is an audit-only flag (scan has no
+  # --since), and passing it here would be rejected by the action's input
+  # validation. scan's default fast syntactic parse makes a whole-repo run
+  # affordable without it.
+  #
+  # Non-blocking on findings by the step's `continue-on-error: true`, since
+  # gate mode DOES fail on findings by design. But "reports, never blocks" must
+  # not become "always green": exit 2 means nothing was analyzed (a renamed
+  # CLI flag, a broken action), and the step after it fails the job for that.
+  # This job is the only thing that runs the action on ordinary pull requests.
+  #
+  # To turn these findings into inline PR annotations instead of log output,
+  # set mode: annotate with upload-sarif: true and add
+  # `permissions: security-events: write` to this job. That posts results to
+  # the repo's code-scanning dashboard, which is a deliberate choice about
+  # this repository's Security tab rather than a default worth assuming.
+  self-lint:
+    runs-on: ubuntu-latest
+    # Skip the redundant main-push run on release commits; see the analyze job.
+    if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Same ref/token as the other jobs so this audits identical code.
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.13.7'
+      - name: Run saropa_lints on itself
+        id: selflint
+        # On the step, so a finding can never fail the job. See above.
+        continue-on-error: true
+        uses: ./
+        with:
+          mode: gate
+          tier: recommended
+          min-severity: warning
+          exclude-globs: '**/test/**,**/example/**,**/example_packages/**'
+      - name: Fail if saropa_lints could not run
+        env:
+          CODE: ${{ steps.selflint.outputs.exit-code }}
+        run: |
+          case "$CODE" in
+            0|1) echo "saropa_lints ran (exit $CODE); findings are reported above, not gated." ;;
+            *) echo "::error::saropa_lints did not analyze this repository (exit '${CODE}'). See the step above."; exit 1 ;;
+          esac
 
   extension-manifest-nls:
     runs-on: ubuntu-latest

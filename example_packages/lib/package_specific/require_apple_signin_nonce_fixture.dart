@@ -7,3 +7,8 @@
 // See rule documentation for bad/good examples.
 
 void main() {}
+
+// GOOD: `SignInWithApple.getAppleIDCredential(scopes: const [])` only fetches
+// a one-time authorization code (token revocation); no nonce needed.
+// BAD: `getAppleIDCredential(scopes: [AppleIDAuthorizationScopes.email])`
+// without `nonce:`.

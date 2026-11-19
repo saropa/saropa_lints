@@ -183,6 +183,16 @@ class _LoggingCallVisitor extends RecursiveAstVisitor<void> {
         if (receiver != null &&
             catchBodyLoggerReceiverNames.contains(receiver)) {
           found = true;
+        } else if (methodName == 'throwWithStackTrace' && receiver == 'Error') {
+          // `Error.throwWithStackTrace(error, stackTrace)` is dart:core's
+          // rethrow-equivalent for propagating an error while preserving
+          // its original stack trace - typically written as `throw
+          // Error.throwWithStackTrace(...)` or `return
+          // Error.throwWithStackTrace(...)`. The `throw`-wrapped form is
+          // already exempt via visitThrowExpression below; this covers the
+          // bare/`return`-wrapped form, which is itself a MethodInvocation
+          // with no ThrowExpression/RethrowExpression node in its AST.
+          found = true;
         }
       }
     }

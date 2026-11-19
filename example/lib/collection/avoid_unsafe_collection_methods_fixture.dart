@@ -77,4 +77,78 @@ String _goodSplitViaVariable(String prefix) {
   return parts.first;
 }
 
+// --- Short-circuit guard regression tests (access in right operand) ---
+
+bool _same(String a, String b) => a == b;
+
+// GOOD: `.first` as call argument in the right operand of `isNotEmpty &&`.
+void _goodAndGuardArgument(List<String> list, String x) {
+  if (list.isNotEmpty && _same(list.first, x)) {}
+}
+
+// GOOD: `.first` in the right operand of `isEmpty ||`.
+void _goodOrGuardArgument(List<String> list, String x) {
+  if (list.isEmpty || _same(list.first, x)) return;
+}
+
+// GOOD: `.first` as a direct operand of `isNotEmpty &&`.
+void _goodAndGuardDirect(List<String> list, String x) {
+  final bool ok = list.isNotEmpty && list.first == x;
+}
+
+// BAD: wrong operator (`||` with isNotEmpty does not guard).
+void _badWrongOperator(List<String> list, String x) {
+  // expect_lint: avoid_unsafe_collection_methods
+  if (list.isNotEmpty || _same(list.first, x)) {}
+}
+
+// BAD: guard is on a different collection.
+void _badOtherCollection(List<String> list, List<String> other, String x) {
+  // expect_lint: avoid_unsafe_collection_methods
+  if (other.isNotEmpty && _same(list.first, x)) {}
+}
+
+// --- Null-aware guard vs null-asserted access ---
+
+// GOOD: `countries?.length == 1` guard covers `countries!.first`.
+Object? _goodNullAwareLengthGuard(List<Object>? countries) =>
+    countries?.length == 1 ? countries!.first : null;
+
+// GOOD: `(xs?.isNotEmpty ?? false)` guard covers `xs!.first`.
+Object? _goodNullAwareIsNotEmptyGuard(List<Object>? xs) =>
+    (xs?.isNotEmpty ?? false) ? xs!.first : null;
+
+// BAD: null-aware guard is on a different collection.
+Object? _badNullAwareOtherCollection(List<Object>? xs, List<Object>? other) =>
+    // expect_lint: avoid_unsafe_collection_methods
+    other?.length == 1 ? xs!.first : null;
+
+// BAD: no guard at all.
+Object? _badNullAssertedNoGuard(List<Object>? xs) =>
+    // expect_lint: avoid_unsafe_collection_methods
+    xs!.first;
+
+// GOOD: split() never returns an empty list.
+String _goodSplitInline(String line) => line.split('\t').first;
+
+// BAD: guard names `items`, which merely ends with the accessed name `s`.
+Object _badSuffixNameGuard(List<Object> s, List<Object> items) =>
+    // expect_lint: avoid_unsafe_collection_methods
+    items.length == 1 ? s.first : Object();
+
+// GOOD: marker with a reason on the line above.
+Object? _goodNonEmptyMarkerAbove(List<Object>? rs) =>
+    // non-empty: API returns at least one result
+    rs == null ? null : rs.first;
+
+// GOOD: marker with a reason on the same line.
+Object? _goodNonEmptyMarkerSameLine(List<Object> rs) =>
+    rs.first; // non-empty: API contract
+
+// BAD: marker without a reason does not count.
+Object _badNonEmptyMarkerNoReason(List<Object> rs) =>
+    // non-empty:
+    // expect_lint: avoid_unsafe_collection_methods
+    rs.first;
+
 void main() {}

@@ -10,18 +10,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: ColorFiltered pushes an offscreen filter layer for every visible item.
 // expect_lint: avoid_image_filter_in_scrollable
 Widget _badColor(List<Widget> items, dynamic cf) => ListView(
-      children: [
-        for (final w in items) ColorFiltered(colorFilter: cf, child: w),
-      ],
-    );
+  children: [for (final w in items) ColorFiltered(colorFilter: cf, child: w)],
+);
 
 // BAD: ImageFiltered has the same per-item cost inside a scrollable.
 // expect_lint: avoid_image_filter_in_scrollable
 Widget _badImage(List<Widget> items, dynamic f) => GridView(
-      children: [
-        for (final w in items) ImageFiltered(imageFilter: f, child: w),
-      ],
-    );
+  children: [for (final w in items) ImageFiltered(imageFilter: f, child: w)],
+);
 
 // GOOD: pre-render the filtered image; no per-item filter layer.
 Widget _good(List<Widget> items) => ListView(children: items);

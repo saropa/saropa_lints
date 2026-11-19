@@ -239,10 +239,13 @@ void testCurrencyFormatting() {
   final badPrice5 = 'USD ' + amount.toString();
 
   // GOOD: Using NumberFormat.currency
-  final goodPrice1 =
-      NumberFormat.currency(locale: 'en_US', symbol: r'$').format(price);
-  final goodPrice2 =
-      NumberFormat.simpleCurrency(locale: 'en_US').format(amount);
+  final goodPrice1 = NumberFormat.currency(
+    locale: 'en_US',
+    symbol: r'$',
+  ).format(price);
+  final goodPrice2 = NumberFormat.simpleCurrency(
+    locale: 'en_US',
+  ).format(amount);
 
   // GOOD: Non-currency strings with $ (like shell variables)
   final shellVar = 'HOME=\$HOME';
@@ -370,9 +373,7 @@ Widget testKeyForCollection(List<String> items) {
   // expect_lint: require_key_for_collection
   final badList = ListView.builder(
     itemCount: items.length,
-    itemBuilder: (context, index) => ListTile(
-      title: Text(items[index]),
-    ),
+    itemBuilder: (context, index) => ListTile(title: Text(items[index])),
   );
 
   // expect_lint: require_key_for_collection
@@ -384,18 +385,14 @@ Widget testKeyForCollection(List<String> items) {
   // GOOD: ListView.builder with key on items
   final goodList = ListView.builder(
     itemCount: items.length,
-    itemBuilder: (context, index) => ListTile(
-      key: ValueKey(items[index]),
-      title: Text(items[index]),
-    ),
+    itemBuilder: (context, index) =>
+        ListTile(key: ValueKey(items[index]), title: Text(items[index])),
   );
 
   // GOOD: GridView.builder with key
   final goodGrid = GridView.builder(
     itemCount: items.length,
-    itemBuilder: (context, index) => Container(
-      key: ValueKey(index),
-    ),
+    itemBuilder: (context, index) => Container(key: ValueKey(index)),
   );
 
   return goodList;

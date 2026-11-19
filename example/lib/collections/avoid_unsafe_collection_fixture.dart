@@ -66,9 +66,7 @@ void testUnsafeCollectionMethods() {
   ];
 
   // GOOD: Collection-if with else inverted guard (should NOT trigger)
-  final collectionIfElse = <int>[
-    if (emptyList.isEmpty) 0 else emptyList.first,
-  ];
+  final collectionIfElse = <int>[if (emptyList.isEmpty) 0 else emptyList.first];
 
   // GOOD: Nested property access with collection-if guard (should NOT trigger)
   final options = _TestOptions(colors: <int>[1, 2, 3]);

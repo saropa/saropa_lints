@@ -105,3 +105,11 @@ void goodExamples(String dateString) {
   // OK — DateTime.fromMicrosecondsSinceEpoch
   final micro = DateTime.fromMicrosecondsSinceEpoch(1000000);
 }
+
+// OK — result stored in a local, then components round-trip checked.
+DateTime? roundTripValidated(int? year, int? month, int? day) {
+  if (year == null || month == null || day == null) return null;
+  final DateTime date = DateTime(year, month, day);
+  if (date.year != year || date.month != month || date.day != day) return null;
+  return date;
+}

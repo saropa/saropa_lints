@@ -321,6 +321,15 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--allow-english-fallback",
+        action="store_true",
+        help=(
+            "Permit overwriting an existing non-English translation with the "
+            "English source string (what happens when no MT engine is "
+            "available). Without this flag the run aborts before writing."
+        ),
+    )
+    parser.add_argument(
         "--fail-on-missing",
         action="store_true",
         help=(
@@ -1020,6 +1029,35 @@ class _TranslationProgress:
         return "[" + "#" * filled + "-" * (self._BAR_WIDTH - filled) + "]"
 
 
+def find_english_regressions(en_tree: object, old_tree: object, new_tree: object) -> list[str]:
+    """Return key paths where ``new_tree`` would replace an existing non-English
+    translation in ``old_tree`` with the English source string from ``en_tree``."""
+    found: list[str] = []
+
+    def walk(en: object, old: object, new: object, path: str) -> None:
+        if isinstance(en, dict):
+            for k, v in en.items():
+                walk(v, old.get(k) if isinstance(old, dict) else None,
+                     new.get(k) if isinstance(new, dict) else None, f"{path}.{k}" if path else k)
+        elif isinstance(en, str):
+            if (isinstance(old, str) and isinstance(new, str)
+                    and old != en and new == en):
+                found.append(path)
+
+    walk(en_tree, old_tree, new_tree, "")
+    return found
+
+
+def _guard_english_overwrite(locale: str, en_tree: object, path: Path, new_tree: object) -> list[str]:
+    if not path.exists():
+        return []
+    try:
+        old_tree = read_json(path)
+    except Exception:  # unreadable existing file: nothing to protect
+        return []
+    return find_english_regressions(en_tree, old_tree, new_tree)
+
+
 def main() -> int:
     args = parse_args()
 
@@ -1225,6 +1263,21 @@ def main() -> int:
             package_out_path = root / f"package.nls.{locale}.json"
             runtime_out_path = root / "src" / "i18n" / "locales" / f"{locale}.json"
 
+            if not getattr(args, "allow_english_fallback", False):
+                regressions = (
+                    _guard_english_overwrite(locale, package_en, package_out_path, package_out)
+                    + _guard_english_overwrite(locale, runtime_en, runtime_out_path, runtime_out)
+                )
+                if regressions:
+                    print(c("red", (
+                        f"  ✗ {locale}: aborting — {len(regressions)} existing translation(s) "
+                        "would be overwritten with English (no machine translation engine "
+                        "produced a result; check SAROPA_I18N_MACHINE_TRANSLATE / "
+                        "deep_translator / Qwen / NLLB availability). Examples: "
+                        + ", ".join(regressions[:5])
+                        + ". Nothing was written for this locale. Fix the engine, or pass "
+                        "--allow-english-fallback to overwrite anyway.")), file=sys.stderr)
+                    return 1
             write_json(package_out_path, package_out)
             write_json(runtime_out_path, runtime_out)
 

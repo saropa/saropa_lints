@@ -208,3 +208,71 @@ class MyWidget {
     user.name = 'changed';
   }
 }
+
+class _ContactDraft {
+  String? photo;
+}
+
+// GOOD: void handler filling a *Draft accumulator.
+void _fillDraft(_ContactDraft d) {
+  d.photo = 'x'; // No lint
+}
+
+class _VCardContactDraft {
+  String? fn;
+  String? phonetic;
+  bool isBusiness = false;
+}
+
+// GOOD: static void handlers on a *Draft accumulator (`=`, `??=`, in if/else,
+// unbraced if).
+abstract final class _VCardHandlers {
+  static void fn(_VCardContactDraft d, String v) {
+    d.fn = v; // No lint
+  }
+
+  static void phonetic(_VCardContactDraft d, String v) {
+    d.phonetic ??= v; // No lint
+  }
+
+  static void kind(_VCardContactDraft d, String v) {
+    if (v == 'org') {
+      d.isBusiness = true; // No lint
+    } else {
+      d.fn = v; // No lint
+    }
+  }
+
+  static void showAs(_VCardContactDraft d, String v) {
+    if (v == 'COMPANY') d.isBusiness = true; // No lint
+  }
+}
+
+// BAD: non-void return keeps the lint.
+_ContactDraft _fillDraftReturning(_ContactDraft d) {
+  // expect_lint: avoid_parameter_mutation
+  d.photo = 'x';
+  return d;
+}
+
+class _Model {
+  int x = 0;
+}
+
+/// Updates [m] in place.
+// GOOD: documented in-place contract, void.
+void _changeInPlace(_Model m) {
+  m.x = 1; // No lint
+}
+
+// GOOD: mutator verb name, bool return.
+bool _restoreModel(_Model m, int saved) {
+  m.x = saved; // No lint
+  return true;
+}
+
+// BAD: neutral name, no doc.
+void _processModel(_Model m) {
+  // expect_lint: avoid_parameter_mutation
+  m.x = 1;
+}

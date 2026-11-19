@@ -118,7 +118,7 @@ void _bad610_main() {
 
 class MyApp extends StatelessWidget {
   Widget build(context) {
-// Crashes! Firebase not initialized
+    // Crashes! Firebase not initialized
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('users').snapshots(),
     );

@@ -392,6 +392,14 @@
     "automation": {
       "hint": "Extension settings that control when analysis runs and how findings are shown. These mirror the same settings in File > Preferences > Settings under Saropa Lints."
     },
+    "watcher": {
+      "title": "Watcher excludes",
+      "hint": "Files and folders VS Code's file watcher should ignore. Counts come from the workspace hazard scan; use List to see the paths, then exclude them from the warning that scan shows.",
+      "scanning": "Scanning the workspace...",
+      "affected": "{count} affected",
+      "list": "List",
+      "recommended": "Recommended excludes not yet in files.watcherExclude"
+    },
     "extension": {
       "hint": "Extension-wide display preferences.",
       "linkNote": "Scan on save on/off lives in the sidebar's status row; the analysis tier lives on the Tier tab — both do more than a plain setting write, so they are not duplicated here."
@@ -402,39 +410,12 @@
       "showOverlay": "Show this shortcut overlay"
     }
   },
-  "consolidated": {
-    "kicker": "Security · Quality",
-    "searchPlaceholder": "Filter rules…",
-    "empty": "All clear — no findings",
-    "liveTitle": "Live — updates as you edit",
-    "fetching": "Fetching…",
-    "noOccurrences": "No occurrences",
-    "summaryFindings": "{count} findings",
-    "summaryRules": "{count} rules",
-    "more": "+{count} more",
-    "wordErrors": "errors",
-    "wordWarnings": "warnings",
-    "wordInfo": "info",
-    "wordFiles": "files",
-    "gradeExcellent": "Excellent",
-    "gradeGood": "Good",
-    "gradeFair": "Fair",
-    "gradeWeak": "Weak",
-    "gradeSevere": "Severe",
-    "evidence": {
-      "advisor": "Advisor confirms at runtime",
-      "logCapture": "Log Capture saw {count}"
-    }
-  },
   "dashboards": {
     "lintsConfig": {
       "description": "Tier: {tier} · Lane: {lane}",
       "descriptionNoLane": "Tier: {tier}"
     },
     "controls": {
-      "analyzerPlugin": "Live analysis",
-      "analyzerPluginDisabled": "Off — scan on save only",
-      "analyzerPluginAbsent": "Not configured",
       "laneLight": "Light — ~200 rules in-editor, rest on save",
       "laneFull": "Full — every enabled rule in-editor",
       "migrateLegacyKeys": "Migrate {count} legacy config key(s)",
@@ -475,7 +456,6 @@
       "writeReport": "Write Report"
     },
     "report": {
-      "noWorkspace": "No workspace folder is open — cannot write the report.",
       "noContent": "No packages have AI prompt content to write.",
       "written": "Report written — path copied to clipboard: {path}",
       "failed": "Failed to write opportunities report: {error}"
@@ -640,36 +620,12 @@
   },
   "toolbar": {
     "runAnalysis": "Run analysis",
-    "rescan": "Rescan",
-    "refresh": "Refresh",
     "copyJson": "Copy JSON",
     "saveReport": "Save report",
     "moreActions": "More actions",
-    "clearAll": "Clear all",
-    "resetView": "Reset view"
-  },
-  "empty": {
-    "noFindingsTitle": "No findings",
-    "noFindingsMessage": "Run analysis to scan the workspace.",
-    "noFindingsCta": "Run analysis",
-    "noMatchTitle": "No matches",
-    "noMatchMessage": "No rows match the current filters.",
-    "noMatchCta": "Reset filters",
-    "noProjectTitle": "No workspace open",
-    "noProjectMessage": "Open a Flutter or Dart project to see findings.",
-    "noProjectCta": "Open folder",
-    "noDataTitle": "No data yet",
-    "noDataMessage": "Run a scan to populate this dashboard.",
-    "noDataCta": "Run analysis"
+    "clearAll": "Clear all"
   },
   "loading": {
-    "thinking": "Thinking…",
-    "preparing": "Preparing…",
-    "checking": "Checking…",
-    "fetching": "Fetching…",
-    "working": "Working…",
-    "scanning": "Scanning…",
-    "cancel": "Cancel",
     "runningAnalysis": "Running analysis…",
     "analysisComplete": "Analysis complete",
     "analysisClean": "No issues found.",
@@ -677,40 +633,14 @@
     "analysisStartedDetail": "Analysis started. Collecting diagnostics…",
     "analysisFailedDetail": "Analysis failed. Check output for details."
   },
-  "error": {
-    "genericTitle": "Something went wrong",
-    "retry": "Retry",
-    "reload": "Reload",
-    "copyDetails": "Copy details",
-    "unreachable": "Could not reach {target}",
-    "partialSummary": "{loaded} of {total} {item} loaded. {failed} failed.",
-    "partialRetry": "Retry failed"
-  },
-  "offline": {
-    "banner": "Offline — reconnect to refresh.",
-    "cachedFooter": "Showing cached data from {when}.",
-    "reconnecting": "Reconnecting…"
-  },
-  "stale": {
-    "statusPill": "Last successful run {when} — refresh failed"
-  },
   "filter": {
-    "searchPlaceholder": "Search…",
-    "clearSearch": "Clear search",
     "activeLabel": "Active filters:",
-    "recentLabel": "Recent ▾",
     "chipRemove": "Remove"
   },
   "a11y": {
     "toggleFullWidth": "Toggle full-width layout",
-    "sortBy": "Sort by {column}",
     "expandRow": "Expand row",
-    "copyRow": "Copy row",
-    "comparisonDimension": "Metric",
-    "collapseRow": "Collapse row",
-    "selectAll": "Select all rows",
-    "keyboardShortcuts": "Keyboard shortcuts",
-    "announcer": "Updates to filter and sort state are announced here."
+    "comparisonDimension": "Metric"
   },
   "uiLanguage": {
     "pick": {
@@ -729,37 +659,109 @@
       "tooltip": "Status bar update failed — click for details. The extension may still work; try running a command from the Command Palette."
     },
     "menu": {
-      "enableOn": "Analysis enabled (click to disable)",
-      "enableOff": "Analysis disabled (click to enable)",
       "openViolations": "Open Violations Report",
       "openPackageDashboard": "Open Package Dashboard",
       "openProcessHealth": "Open Process Health",
       "commandCatalog": "Command Catalog",
       "about": "About"
+    },
+    "tooltip": {
+      "section": {
+        "status": "Status",
+        "project": "Project",
+        "problems": "Problems",
+        "memory": "Memory",
+        "actions": "Actions"
+      },
+      "cause": {
+        "on": "Analysis is running: the setting and the analyzer plugin are both on.",
+        "off": "Analysis is off: the setting and the analyzer plugin are both off.",
+        "partialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on.",
+        "partialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on.",
+        "notSetUp": "saropa_lints is not set up in this project: it is not a dependency in pubspec.yaml and analysis_options.yaml has no plugin entry."
+      },
+      "fix": {
+        "turnOn": "Fix: turn both on",
+        "setUp": "Fix: set up and turn on",
+        "title": "Turns the saropaLints.enabled setting and the analyzer plugin on together."
+      },
+      "pill": {
+        "statusOn": "Lints are running. Click to open the Violations Report.",
+        "findings": "Open the Violations Report.",
+        "vibrancy": "Open the Package Dashboard."
+      },
+      "project": {
+        "version": "Version",
+        "tier": "Tier",
+        "vibrancy": "Vibrancy",
+        "packages": "Packages scanned",
+        "packagesSuppressed": "{count} ({suppressed} suppressed)",
+        "score": "Lint score",
+        "scorePending": "run a full analysis (partial scan)",
+        "findings": "Findings",
+        "updates": "Updates available",
+        "actionItems": "Action items",
+        "route": "Route"
+      },
+      "findings": {
+        "allErrors": "{count} findings (all errors)",
+        "allErrorsOne": "1 finding (an error)",
+        "mixed": "{errors} errors · {warnings} warnings",
+        "noErrors": "{total} findings"
+      },
+      "problem": {
+        "openCompat": "Open version compatibility card",
+        "reviewReadiness": "Review workspace issues"
+      },
+      "memory": {
+        "saropa": "Saropa Lints",
+        "none": "none running",
+        "processes": "{count} process(es) · {size} RSS",
+        "daemons": "Flutter daemons",
+        "daemonsValue": "{total} ({orphaned} orphaned)",
+        "scanDaemons": "Orphaned scan daemons",
+        "scanDaemonsValue": "{count}, use Clean Up to kill",
+        "other": "Other Dart",
+        "extHost": "Extension host",
+        "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
+        "ram": "Machine RAM",
+        "ramValue": "{free} free of {total}",
+        "trend": "RSS trend (last ~30 min)"
+      },
+      "action": {
+        "turnOff": "Turn Lints off",
+        "turnOn": "Turn Lints on",
+        "turnBothOn": "Turn both on",
+        "versionCompat": "Version Compatibility"
+      }
+    },
+    "quickPick": {
+      "title": "Saropa Lints",
+      "placeholder": "Pick an action"
     }
   },
   "systemHealth": {
+    "heapCap": {
+      "noneMessage": "Your machine has {totalGb} of memory. The Dart analysis server has no memory ceiling, so it can grow until the machine slows down or starts swapping. Recommended cap: {recommendedGb}.",
+      "tooHighMessage": "Your machine has {totalGb} of memory. The Dart analysis server is allowed to use up to {capGb} (set in {location}), which leaves about {freeGb} for the OS, VS Code and other Dart tools, so the machine may slow down or swap. Recommended cap: {recommendedGb}.",
+      "locationGlobal": "your user settings",
+      "locationWorkspace": "this workspace's settings",
+      "locationWorkspaceFolder": "this workspace folder's settings",
+      "apply": "Apply {gb}",
+      "notNow": "Not now",
+      "dontAskAgain": "Don't ask again"
+    },
     "statusBar": {
       "warning": "⚠ {size}",
       "critical": "🔴 {size}",
       "warningOrphans": "⚠ {count} orphaned daemon(s)",
       "criticalOrphans": "🔴 {count} orphaned daemon(s)",
       "openHint": "Click to open Process Health",
-      "systemRam": "System: {free} of {total} free",
       "systemLow": "⚠ System: {free} of {total} free",
       "extensionHostWarning": "⚠ Extension host: {size}"
     },
     "tooltip": {
-      "saropaSection": "Saropa Lints: {count} process(es) ({size} RSS)",
-      "saropaProcessEntry": "  {label}  {size}",
-      "saropaHealthy": "Saropa Lints: {count} process(es) ({size} RSS) ✓",
-      "sparkline": "RSS trend: {chart}",
-      "otherSection": "Other Dart processes: {count} ({size} RSS)",
-      "otherProcessEntry": "  {label}  {size}",
       "otherHint": "{count} analysis server(s) detected — close unused VS Code windows",
-      "daemonCount": "Flutter daemons: {total} ({orphaned} orphaned)",
-      "scanDaemonOrphans": "Orphaned scan daemons: {count} — use Clean Up to kill",
-      "extensionHostSection": "Extension host: {rss} RSS ({heap} / {heapTotal} heap)",
       "warningHint": "Saropa memory is high — click for details",
       "criticalHint": "Saropa memory is critical — clean up recommended"
     },
@@ -785,9 +787,6 @@
       "confirm": "Found {count} orphaned daemon process(es) using {size}. Kill them?",
       "killButton": "Kill Orphans",
       "cancelButton": "Cancel"
-    },
-    "command": {
-      "killOrphans": "Kill Orphaned Flutter Daemons"
     },
     "orphanPreflight": {
       "found": "{count} orphaned model host process(es) from an earlier session are holding {size} of committed memory.",
@@ -830,8 +829,16 @@
       "dismiss": "Dismiss",
       "added": "Added {count} file-watcher exclusion(s) to workspace settings."
     },
+    "nestedRoots": {
+      "prompt": "{folders} contains {count} nested Dart package root(s) that git ignores. Each is analyzed as a separate context and can bloat the analysis server's memory.",
+      "fix": "Exclude from Analysis",
+      "dismiss": "Dismiss",
+      "fixed": "Excluded {folders} from analysis and file watching."
+    },
     "hazardScan": {
-      "warning": "Found {count} large file(s) not excluded from the file watcher: {files}. These can exhaust memory and crash VS Code.",
+      "warning": "Found {count} large file(s) inside the open folder \"{folder}\" (paths are relative to that folder): {files}. VS Code watches every file in the folder for changes, and large files can slow it down or crash it.",
+      "andMore": "and {count} more",
+      "unnamedFolder": "(unnamed folder)",
       "addExclusions": "Exclude from Watcher",
       "dismiss": "Dismiss",
       "added": "Added {count} watcher exclusion pattern(s) to workspace settings."
@@ -858,7 +865,7 @@
     "title": "Machine Health",
     "refresh": "Refresh",
     "systemUnknown": "System memory could not be read on this platform.",
-    "platformUnsupported": "Machine Health requires Windows — process queries are not available on this platform.",
+    "platformUnsupported": "Machine Health is not available on this platform — process queries support Windows, macOS and Linux.",
     "freeOf": "free of",
     "used": "used",
     "recommendationsTitle": "Recommendations",
@@ -874,6 +881,8 @@
       "modelHost": "Translation Engine (Ollama)"
     },
     "recommendation": {
+      "heapCapTooHigh": "The analysis server's heap cap ({capMb} MB) leaves less than half this machine's RAM for everything else. Recommended cap: {recommendedMb} MB.",
+      "noHeapCapWithSuggestion": "The Dart analysis server has no memory ceiling configured. Recommended cap for this machine: {mb} MB.",
       "systemLowMemory": "Only {free} of {total} RAM is free machine-wide. Close unused applications or VS Code windows.",
       "orphansFound": "{count} orphaned process(es) are holding {size} of memory from an earlier session.",
       "analysisServerLarge": "{count} Dart analysis server process(es) are using up to {size}. A restart releases the memory.",
@@ -889,7 +898,7 @@
       "unloadModel": "Unload"
     },
     "heapCap": {
-      "prompt": "Analysis server heap cap in MB (e.g. 4096)",
+      "promptWithRecommendation": "Analysis server heap cap in MB. Recommended for this machine's {totalGb}: {recommendedMb} MB.",
       "invalid": "Enter a whole number of megabytes greater than 0.",
       "applied": "Set analysis server heap cap to {mb} MB. Restart the analysis server for it to take effect.",
       "restartNow": "Restart Now"
@@ -912,7 +921,6 @@
       "pressureNoShed": "⚠ Memory pressure ({rssMb} MB)"
     },
     "tooltip": {
-      "shedLevel0": "Memory pressure: normal",
       "shedLevel1": "Memory pressure: {count} expensive rules shed (type-resolving + high-cost) to reduce RSS",
       "shedLevel2": "Memory pressure: {count} rules shed (expensive + INFO severity)",
       "shedLevel3": "Memory pressure: {count} rules shed (all non-essential non-ERROR)",
@@ -940,16 +948,12 @@
       "restartTooltip": "Restart the Dart analysis server to clear memory pressure and restore shed rules."
     }
   },
-  "brand": {
-    "prefix": "Saropa "
-  },
   "findingsDash": {
     "pageTitle": "Saropa Findings Dashboard",
     "documentTitle": "Saropa Findings Dashboard",
     "skipToFindings": "Skip to findings",
     "secondaryAsideLabel": "Secondary diagnostics",
     "hero": {
-      "productTitle": "Findings Dashboard",
       "gaugeTitle": "Health score {score} (grade {grade}). Errors weigh heaviest.",
       "gaugePending": "…"
     },
@@ -960,7 +964,6 @@
       "daysAgo": "{day}d ago"
     },
     "status": {
-      "lastRunPrefix": "Last run",
       "updatedPrefix": "Updated",
       "refreshHint": "Click to refresh from the analyzer",
       "lastRunUnknown": "Last run unknown",
@@ -1000,8 +1003,7 @@
       "pack": "Pack(s)"
     },
     "seg": {
-      "toggleSeverityTitle": "Toggle {v} severity",
-      "toggleImpactTitle": "Toggle {v} impact"
+      "toggleSeverityTitle": "Toggle {v} severity"
     },
     "kpi": {
       "visibleLabel": "Visible findings",
@@ -1043,11 +1045,8 @@
       "clearRecentButton": "Clear",
       "recentFiltersListAria": "Recent filters",
       "runAnalysisTitle": "Run Saropa Lints analysis",
-      "refreshViolationsTitle": "Reload violations.json from disk",
       "severityGroupAria": "Severity filter",
       "severityLabel": "Severity",
-      "impactGroupAria": "Impact filter",
-      "impactLabel": "Impact",
       "moreSummary": "More",
       "moreChevron": "▾",
       "copyJsonTitle": "Copy filtered violations as JSON ({count})",
@@ -1079,9 +1078,6 @@
       "cancelButton": "Cancel",
       "runningLabel": "Auditing…",
       "runningMeta": "Starting the audit CLI…",
-      "completedLabel": "Audit complete",
-      "failedLabel": "Audit failed",
-      "canceledLabel": "Audit canceled",
       "statusFull": "Showing the full-project audit from {time}",
       "statusChangedRef": "Showing files changed vs {ref}, audited {time}",
       "notRunYet": "Choose a scope above, then Run audit"
@@ -1089,9 +1085,7 @@
     "chip": {
       "contains": "contains \"{q}\"",
       "severityOff": "severity ≠ {v}",
-      "impactOff": "impact ≠ {v}",
-      "resetAllTitle": "Reset all filters",
-      "removeFilterAria": "Remove filter"
+      "resetAllTitle": "Reset all filters"
     },
     "menuPalette": {
       "help": "Help",
@@ -1113,7 +1107,6 @@
       "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
       "reEnableDisabledRules": "Re-enable disabled rules…",
       "reEnableDisabledRulesTitle": "Open a quick-pick of rules currently disabled in analysis_options_custom.yaml and re-enable the chosen ones.",
-      "reEnableNoneTitle": "No rules currently disabled",
       "reEnableNoneMessage": "No rules are currently disabled via analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Re-enable disabled rules",
       "reEnableQuickPickPlaceholder": "Select one or more rules to re-enable",
@@ -1188,7 +1181,6 @@
       "heading": "Mix",
       "metaClickSlice": "click a slice to filter",
       "severityMix": "Severity mix",
-      "impactMix": "Impact mix",
       "filterBarTitle": "Filter to {key} only",
       "donutTotal": "total"
     },
@@ -1264,25 +1256,14 @@
       "foldersSample": "Folders (sample)",
       "filesSample": "Files / globs (sample)",
       "rulesSample": "Rules (sample)",
-      "perFileRulesSample": "Per-file rules (sample)",
-      "unknownKind": "Unknown"
+      "perFileRulesSample": "Per-file rules (sample)"
     },
     "script": {
-      "analysisRunning": "Running analysis…",
-      "analysisComplete": "Analysis complete",
-      "metaRunning": "This can take a moment on large projects.",
-      "metaDone": "Refreshing dashboard with the latest findings.",
-      "announceSearch": "search {q}",
-      "announceSeverities": "{n} severities",
-      "announceImpacts": "{n} impacts",
       "announceCleared": "All filters cleared",
       "announceFiltersPrefix": "Filters:",
-      "bulkSelected": "{n} selected",
-      "analysisStartedDetail": "Analysis started. Collecting diagnostics…",
       "announceStarted": "Analysis started",
       "announceComplete": "Analysis complete",
       "announceFailed": "Analysis failed",
-      "analysisFailedDetail": "Analysis failed. Check output for details.",
       "removeRecentAria": "Remove",
       "removeRecentTitle": "Remove",
       "bulkSelectedTpl": "{n} selected",
@@ -1303,12 +1284,7 @@
     },
     "unknownAnalyzerKind": "Unknown",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} other analyzer findings",
-      "otherAnalyzerPromo": "+? other analyzer findings — show",
-      "analyzerTodosOn": "+{count} analyzer TODOs",
-      "analyzerTodosPromo": "+? analyzer TODOs — show",
       "scannerPromo": "Enable TODO/HACK scanner",
-      "tooltipLive": "Live from VS Code Problems panel. Updates as analysis completes. Click to hide.",
       "tooltipScanner": "Saropa file-system scanner — counts open TODO/HACK markers in source.",
       "tooltipPromoClickToOn": "Click to enable"
     }
@@ -1358,7 +1334,6 @@
   },
   "wideReport": {
     "openWorkspaceFirst": "Open a workspace folder first.",
-    "noReportYet": "No violations report yet. Run Saropa Lints analysis first.",
     "clipboardCopyFailed": "Could not copy to clipboard.",
     "copiedViolationsJson": "Copied {count} violation(s) as JSON.",
     "copiedEverythingJson": "Copied {count} unfiltered findings to clipboard.",
@@ -1454,7 +1429,8 @@
       "vulnerable": "Vulnerable",
       "overrides": "Overrides",
       "caveatLine1": "*Code sizes shown (lib + declared assets), falling back to the pub.dev archive size when code size is unavailable. Excludes dev_dependencies (build_runner, lints, saropa_lints, etc.) — they never ship to the APK / IPA / web bundle. Actual app size will be smaller after tree shaking.",
-      "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines)."
+      "caveatLine2": "Activity thresholds: 90d = stale, 180d = dormant (commit + release timelines).",
+      "upgradeTitle": "Upgrade Required"
     },
     "breakdown": {
       "title": "Why grade {grade}? — {avgScore}/100 average across {pkgCount} packages",
@@ -1665,13 +1641,9 @@
     "references": {
       "noImports": "No source file imports detected",
       "reExportLine": "{location} (re-export)",
-      "reExportSuffix": "(re-export)",
       "publicApiSurface": "Public API surface — at least one usage is a re-export.",
       "reExportedBadge": "Re-exported",
-      "openFileReferences": "Open file references",
-      "searchImports": "Search imports",
-      "fileReferencesHeading": "File References ({count})",
-      "andMore": "... and {count} more"
+      "openFileReferences": "Open file references"
     },
     "deps": {
       "noTransitives": "No transitive dependencies",
@@ -1680,9 +1652,7 @@
       "tooltipDepShared": "• {dep} (shared)",
       "tooltipHeader": "{total} transitive deps",
       "tooltipHeaderShared": "{total} transitive deps ({shared} shared)",
-      "sharedBadgeTitle": "{count} shared with other packages",
-      "sharedBadge": "shared",
-      "transitiveDepsHeading": "Transitive Dependencies ({count})"
+      "sharedBadgeTitle": "{count} shared with other packages"
     },
     "dormancy": {
       "noActivity6mo": "No commits and no releases in 6+ months",
@@ -1711,17 +1681,7 @@
       "resolutionVelocity": "Resolution Velocity",
       "engagementLevel": "Engagement Level",
       "popularity": "Popularity",
-      "publisherTrust": "Publisher Trust",
-      "fixInVersion": "→ fix in {version}",
-      "vulnerabilitiesHeading": "Vulnerabilities ({count})"
-    },
-    "links": {
-      "heading": "Links",
-      "pubDev": "pub.dev",
-      "changelog": "changelog",
-      "versions": "versions",
-      "repository": "repository",
-      "issues": "issues"
+      "publisherTrust": "Publisher Trust"
     }
   },
   "commandCatalog": {
@@ -1729,9 +1689,6 @@
     "skipLink": "Skip to command catalog",
     "heroTitle": "Saropa Command Catalog",
     "status": {
-      "commands": "{count} commands",
-      "categories": "{count} categories",
-      "recent": "{count} recent",
       "internalHidden": "{count} context-menu only (hidden)",
       "wordCommands": "commands",
       "wordCategories": "categories",
@@ -1809,7 +1766,6 @@
     "documentTitle": "Saropa Code Health Dashboard",
     "skipToTable": "Skip to functions table",
     "openWorkspaceFirst": "Open a Dart/Flutter workspace first.",
-    "scanningTitle": "Code Health: scanning functions…",
     "scan": {
       "title": "Scanning project health",
       "subtitle": "Reading your code. The dashboard fills in as the scan learns more.",
@@ -1867,10 +1823,6 @@
       "gatesFailing": "gates failing",
       "gatesPassing": "gates passing"
     },
-    "gauge": {
-      "tooltip": "Average score {rounded} of 100 (grade {grade}).",
-      "ariaLabel": "Average score {rounded} of 100"
-    },
     "gate": {
       "fallback": "Quality gates failed — review thresholds in Code Health settings.",
       "failingOne": "{count} gate failing — review thresholds, or copy the JSON to inspect gates.violations.",
@@ -1909,8 +1861,6 @@
     "table": {
       "ariaLabel": "Worst functions by score",
       "heading": "Worst functions",
-      "topCount": "top {shown} of {total}",
-      "colGrade": "Grade",
       "colScore": "Score",
       "colFunction": "Function",
       "colFile": "File",
@@ -1922,7 +1872,6 @@
       "noMatch": "No functions match the current filters.",
       "resetFiltersTitle": "Clear the search and any active flag filter.",
       "resetFilters": "Reset filters",
-      "hint": "Showing the worst 200 functions by score. Use the search field to narrow further.",
       "expanderAriaCollapsed": "Show issue details",
       "expanderAriaExpanded": "Hide issue details",
       "detailHeading": "Why this function scored {score}",
@@ -1981,11 +1930,7 @@
     },
     "script": {
       "activeFiltersLabel": "Active filters:",
-      "searchChip": "search: \"{q}\"",
-      "flagChip": "flag: {flag}",
-      "removeAria": "Remove {key}",
       "clearAll": "Clear all",
-      "rowsVisible": "{visible} of {total} rows visible",
       "neverRun": "never run"
     },
     "freshness": {
@@ -2202,11 +2147,9 @@
     }
   },
   "debug": {
-    "panel": {
-      "title": "Debug Panel"
-    },
     "section": {
       "engines": "Diagnostic Engines",
+      "enginesRecommendation": "Recommended: LSP Server ON (default, beta), Scan on Save ON, Live Analysis OFF (LSP already covers live diagnostics; both on may show duplicates), GitHub Actions CI ON only if you want pull requests gated. If a rule stops firing under LSP, turn Live Analysis ON and LSP Server OFF.",
       "log": "Log"
     },
     "engine": {
@@ -2214,7 +2157,6 @@
       "scanDaemon": "Scan on Save",
       "lspServer": "LSP Server",
       "pid": "PID:",
-      "status": "Status:",
       "rules": "Rules:",
       "rss": "RSS:",
       "statusLabel": "Status:",
@@ -2225,26 +2167,36 @@
         "stopped": "stopped",
         "suspended": "suspended",
         "starting": "starting",
-        "scanning": "scanning"
+        "scanning": "scanning",
+        "notConfigured": "not configured"
       },
       "rssNote": {
         "inProcess": "in-process, not separately measurable",
-        "notRunning": "not running"
+        "notRunning": "not running",
+        "remote": "runs on GitHub's hosted runners — not measurable from here"
       },
       "description": {
         "analyzerPlugin": "Runs inside the Dart analysis server — live squiggles in the editor as you type, no scan needed. Toggling rewrites the plugins: block in analysis_options.yaml.",
         "scanDaemon": "Background process that rescans the whole project on save and writes reports/.saropa_lints/violations.json. Toggling off suspends it; the next save resumes it.",
-        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting."
+        "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting.",
+        "ci": "Reads and writes .github/workflows/saropa-lints.yml in your working tree to enable or disable the bundled GitHub Actions workflow. This reflects the file on your current branch — the default branch's copy is what actually gates pull requests, and the two can drift apart. Toggling never runs or deletes the workflow; you still review and commit the change yourself."
       },
-      "scanProgress": "Scan: {done}/{total} files"
+      "recommended": {
+        "analyzerPlugin": "Recommended: OFF while LSP Server is on. Turn ON (with LSP OFF) if a rule stops firing under LSP.",
+        "scanDaemon": "Recommended: ON.",
+        "lspServer": "Recommended: ON (default, beta). Covers live diagnostics.",
+        "ci": "Recommended: ON only if you want pull requests gated."
+      },
+      "scanProgress": "Scan: {done}/{total} files",
+      "ci": "GitHub Actions CI"
     },
     "toggle": {
       "on": "ON",
       "off": "OFF"
     },
     "action": {
-      "killAll": "Kill All",
-      "restartAll": "Restart All",
+      "killAll": "Kill All {name}",
+      "restartAll": "Restart {name}",
       "killAllDescription": "Force-stops the LSP Server only. Analyzer Plugin and Scan Daemon cannot be killed independently yet — use each engine's own ON/OFF toggle instead.",
       "restartAllDescription": "Stops and relaunches the LSP Server (or starts it if it isn't running). Analyzer Plugin and Scan Daemon are unaffected — use each engine's own ON/OFF toggle instead."
     },
@@ -2255,14 +2207,43 @@
       "lspToggleOn": "LSP Server: enabling…",
       "lspToggleOff": "LSP Server: disabling…",
       "lspStarted": "LSP Server: started.",
+      "lspDisabledPrompt": "The LSP server is disabled in settings (saropaLints.lspServer.enabled). Enable it and start?",
+      "lspEnableButton": "Enable",
       "lspStopped": "LSP Server: stopped.",
+      "lspStartFailed": "LSP Server: failed to start (see the error message and the Saropa Lints LSP output channel).",
       "analyzerToggleOn": "Analyzer Plugin: enabling…",
       "analyzerToggleOff": "Analyzer Plugin: disabling…",
       "daemonToggleOn": "Scan Daemon: resuming…",
-      "daemonToggleOff": "Scan Daemon: suspending…"
+      "daemonToggleOff": "Scan Daemon: suspending…",
+      "ciToggleOn": "CI: enabling…",
+      "ciToggleOff": "CI: disabling…"
     },
     "sidebar": {
       "enginesLabel": "Engines: {count} running"
+    },
+    "ci": {
+      "disableFailed": "Could not turn CI off: {path} is missing or has a structure Saropa Lints will not edit automatically. CI is still running. Open the file and disable the workflow by hand.",
+      "openWorkflow": "Open workflow",
+      "openWorkflowFailed": "Could not open {path}.",
+      "publish": {
+        "heading": "Publish this change",
+        "introEnable": "{path} has been written in your working tree. Nothing runs in CI until it is on {base}. These commands put it on a new branch called {branch} and open a pull request for review — run them yourself, or press the button and Saropa Lints will run exactly these.",
+        "introDisable": "{path} has been edited in your working tree to suspend every job. CI keeps running until that reaches {base}. These commands put the change on a new branch called {branch} and open a pull request — run them yourself, or press the button and Saropa Lints will run exactly these. To stop CI immediately instead, disable the workflow from the repository's Actions tab.",
+        "commandsLabel": "Commands",
+        "copy": "Copy",
+        "copied": "Commands copied to the clipboard.",
+        "createPr": "Create branch, commit, push and open pull request",
+        "notNow": "Not now",
+        "noGitHubRemote": "This repository's origin remote is not GitHub, so the pull request cannot be opened for you. Run the commands above and open it however your host does.",
+        "running": "Creating the branch and pushing…",
+        "failed": "{command} failed, so nothing was pushed. {details}",
+        "pushedNoPr": "Pushed {branch}. The pull request could not be opened automatically — open it from the compare page.",
+        "openCompare": "Open compare page",
+        "created": "Pull request opened for {branch}.",
+        "openPr": "Open pull request",
+        "notARepository": "{path} was written, but this folder is not a git repository, so there is nothing to publish to.",
+        "pubspecHasOtherEdits": "pubspec.yaml already had uncommitted edits of yours. A commit takes whole files, so publishing from here would push those edits too. Commit or stash them, then run the commands above yourself."
+      }
     }
   },
   "detailView": {
@@ -2455,6 +2436,11 @@
       "actionSetUpProject": "Set Up Project",
       "actionNotNow": "Not Now"
     },
+    "lsp": {
+      "noWorkspaceFolder": "Saropa Lints: cannot start the LSP Server because no workspace folder is open.",
+      "startFailed": "Saropa Lints: the LSP Server failed to start. {reason}",
+      "settingWriteFailed": "Saropa Lints: could not save the LSP Server setting. {reason}"
+    },
     "setup": {
       "requiresDartProject": "Saropa Lints requires a Dart or Flutter project (no pubspec.yaml found).",
       "actionLearnMore": "Learn More",
@@ -2626,6 +2612,9 @@
       "enableModePacksPrompt": "Enable {count} {modeLabel} pack(s)?"
     },
     "misc": {
+      "actionDontAskForVersion": "Don't ask for this version",
+      "actionLater": "Later",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. This is a major version and may need config changes — see the changelog.",
       "upgradeCheckerMajorUpdate": "Major update",
       "upgradeCheckerMinorUpdate": "Minor update",
       "upgradeCheckerPatchUpdate": "Patch update",
@@ -2637,7 +2626,6 @@
       "upgradeCheckerUpgraded": "Saropa Lints upgraded to {version}.",
       "actionUpgrade": "Upgrade",
       "actionViewChangelog": "View Changelog",
-      "actionDismiss": "Dismiss",
       "healthCodeLensEnabled": "Saropa Project Map heat CodeLens enabled.",
       "healthCodeLensDisabled": "Saropa Project Map heat CodeLens disabled.",
       "reportViewCopiedPath": "Copied report path: {path}",
@@ -2740,7 +2728,6 @@
   },
   "status": {
     "health": {
-      "lastRunTooltip": "Last analysis: {ago}",
       "neverRunLabel": "Health: —",
       "neverRunDescription": "Run analysis to see your health score"
     },
@@ -2786,6 +2773,23 @@
   "bugArchival": {
     "diagnostic": {
       "message": "This report is marked \"{status}\" but is still in bugs/ — archive it to plans/history/ before closing (see ISSUE_REPORT_GUIDE.md)."
+    }
+  },
+  "analyzerExclusions": {
+    "diagnostic": {
+      "missing": "Folder \"{folder}\" is analyzed but does not need to be. Add it to dart.analysisExcludedFolders in .vscode/settings.json to speed up quick fixes and cut memory use.",
+      "missingCreate": "Folder \"{folder}\" is analyzed but does not need to be. Add it to dart.analysisExcludedFolders (this creates .vscode/settings.json) to speed up quick fixes and cut memory use.",
+      "driftOnly": "Folder \"{folder}\" is in analyzer: exclude: of analysis_options.yaml, which only hides its diagnostics. Also add it to dart.analysisExcludedFolders so the analysis server stops analyzing it.",
+      "imported": "Folder \"{folder}\" looks excludable, but a path dependency in pubspec.yaml points into it, so excluding it is not suggested.",
+      "large": "{count} Dart files are analyzed on a machine with {ram} GB of RAM. Exclude folders that need no analysis to reduce memory use and quick-fix delay.",
+      "largeNoRam": "{count} Dart files are analyzed. Exclude folders that need no analysis to reduce memory use and quick-fix delay."
+    },
+    "quickFix": {
+      "title": "Add to dart.analysisExcludedFolders",
+      "pickPlaceholder": "Select the folders to exclude from analysis"
+    },
+    "error": {
+      "writeFailed": "Could not update dart.analysisExcludedFolders: {error}"
     }
   },
   "docPlacement": {
@@ -2843,5 +2847,187 @@
     "discovering": "Discovering server and fetching issues…",
     "noServerFound": "No Drift Advisor server found. Start your app with the server running, then click Refresh.",
     "integrationOff": "Drift Advisor integration is off. Enable it in settings (saropaLints.driftAdvisor.integration), then click Refresh."
+  },
+  "blastRadius": {
+    "label": {
+      "upgrade": "Upgrade",
+      "breaks": "Breaks",
+      "breaksLower": "breaks",
+      "upgradeNotRecommended": "⚠️ Upgrade not recommended"
+    },
+    "notRecommended": "Upgrade not recommended",
+    "skipReason": "upgrade not recommended: {summary}",
+    "sdkBlock": "{pkg} {to} needs {dep} {range}; Flutter pins {dep} {pinned}",
+    "breaker": "{name} ({constraint})",
+    "breakerVia": "{name} ({constraint}) via {chain}",
+    "unverified": "Upgrade check incomplete: dependency data for {to} could not be fetched",
+    "summary": {
+      "heldBack": "{pkg} {to} is held back: {reason}",
+      "sdkBlocked": "{pkg} {to} is blocked by the SDK: {sdk}",
+      "depCapped": "{pkg} {to} needs {dep} {range}, but {dep} is capped by {cappers}",
+      "depHeldBack": "{pkg} {to} needs {dep} {range}, which is held back: {reason}",
+      "breaksOne": "{pkg} {to} would break {count} dependent: {names}",
+      "breaksOther": "{pkg} {to} would break {count} dependents: {names}",
+      "safe": "{pkg} {from} -> {to} looks safe",
+      "newestCompatible": "Newest compatible: {pkg} {version}"
+    }
+  },
+  "lifecycle": {
+    "note": {
+      "statusMayBeOutdated": "Status may be outdated: recorded as end of life, but pub.dev shows it is not discontinued and was published within the last 12 months.",
+      "maintenanceMode": "Maintenance mode: only critical fixes are expected.",
+      "caution": "Caution: review the known issue before relying on this package.",
+      "unlisted": "Unlisted on pub.dev: hidden from search results; existing users can still depend on it."
+    },
+    "upgradeRequired": {
+      "diagnostic": "Upgrade {name} — installed version is known-broken",
+      "problem": "Score {score}/100 — installed version needs upgrading",
+      "insight": "Installed version is known-broken — upgrade required"
+    }
+  },
+  "ruleMigration": {
+    "skip": {
+      "generated": "Skipped generated file {file}.",
+      "unreadable": "Skipped {file}: it could not be read.",
+      "unparseable": "Skipped {file}: it is not valid JSON."
+    },
+    "finding": {
+      "bareName": "{file}:{line} ignores {name} without the saropa_lints/ prefix. Left unchanged; add the prefix and run the migration again.",
+      "clash": "{file}:{line} has both {name} and its replacement. Kept the replacement and removed {name}."
+    }
+  },
+  "compat": {
+    "startup": {
+      "routeDependency": "the pubspec route (pubspec.yaml)",
+      "routePlugin": "the plugin route (analysis_options.yaml)",
+      "routeBoth": "both routes (pubspec.yaml and analysis_options.yaml)",
+      "installedDisagree": "{pubspec} in pubspec.yaml and {plugin} in analysis_options.yaml",
+      "offer": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. Migrate?",
+      "offerNoDart": "saropa_lints: your project uses {route} at {installed}. {offered} is available. Migrate?",
+      "offerRenames": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. {count} rules were renamed since {installed}. Migrate?",
+      "offerNoDartRenames": "saropa_lints: your project uses {route} at {installed}. {offered} is available. {count} rules were renamed since {installed}. Migrate?",
+      "offerRenamesUnknown": "saropa_lints: your project uses {route} at {installed}. {offered} is available and works with your Dart {dart}. Renamed rules will be checked after the upgrade. Migrate?",
+      "offerNoDartRenamesUnknown": "saropa_lints: your project uses {route} at {installed}. {offered} is available. Renamed rules will be checked after the upgrade. Migrate?",
+      "actionMigrate": "Migrate"
+    },
+    "status": {
+      "pubspec": "saropa_lints: pubspec {version}",
+      "pubspecUnlocked": "saropa_lints: pubspec (not locked yet)",
+      "plugin": "saropa_lints: plugin route {version}",
+      "both": "saropa_lints: pubspec + plugin {version}",
+      "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (disagree)",
+      "neither": "saropa_lints: not configured",
+      "localSource": "saropa_lints: local source",
+      "dartTooOld": "saropa_lints: plugin needs newer Dart",
+      "tipPubspec": "This project uses the pubspec route: saropa_lints is a dependency in pubspec.yaml. You get editor diagnostics and the command line commands (dart run saropa_lints:init, scan, baseline).",
+      "tipPlugin": "This project uses the plugin route: saropa_lints is set as a plugin in analysis_options.yaml. You get editor diagnostics only. The command line commands (dart run saropa_lints:init, scan, baseline) need saropa_lints in pubspec.yaml.",
+      "tipBoth": "This project uses both routes and they agree. You get editor diagnostics and the command line commands.",
+      "tipDisagree": "pubspec.yaml and analysis_options.yaml name different saropa_lints versions. The editor uses the plugin version ({plugin}); the command line commands use the pubspec.yaml version ({pubspec}).",
+      "tipNeither": "saropa_lints is not set up in this project: it is neither a dependency in pubspec.yaml nor a plugin in analysis_options.yaml.",
+      "tipLocalSource": "saropa_lints comes from a local path or git source, so the extension shows facts only and changes nothing.",
+      "tipDartTooOld": "The plugin route in analysis_options.yaml needs a newer Dart SDK than this project has, so the editor cannot load the plugin."
+    },
+    "recommend": {
+      "latestOk": "saropa_lints {version} is the newest release and works with this project. Use ^{version}.",
+      "alreadyCorrect": "This project already uses the recommended saropa_lints configuration. No action needed.",
+      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "metaExcludesPin": "saropa_lints {newest} needs a newer meta package than your Flutter SDK pins ({pin}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "packageHoldsAnalyzer": "The package {package} holds the analyzer back, so saropa_lints {newest} cannot be installed. Use ^{chosen}, or update {package} to use {newest}.",
+      "noVersionResolves": "No saropa_lints version can be installed as a dependency because {package} requires an older analyzer. The plugin route still works.",
+      "noPluginResolves": "No saropa_lints version can be installed as a dependency, and {version} did not pass the pub solver as a plugin either ({package} requires an older analyzer). Nothing was changed.",
+      "blockedUsePlugin": "{package} holds the analyzer back, so saropa_lints cannot be installed as a dependency. The plugin route is not affected: set the plugin version in analysis_options.yaml to {version}.",
+      "editorVsCli": "The editor will use the plugin version {plugin}. The command line (dart run saropa_lints:init, scan, baseline) keeps using the pubspec.yaml version {pubspec}.",
+      "cliNeedsPubspec": "dart run saropa_lints:init, scan and baseline need saropa_lints in pubspec.yaml.",
+      "pluginUnverified": "The plugin version {version} could not be checked with the pub solver. It is suggested from the Dart SDK constraint only.",
+      "pluginOnly": "Set the saropa_lints plugin version in analysis_options.yaml to {version}.",
+      "alignPlugin": "The plugin version in analysis_options.yaml ({plugin}) differs from the locked saropa_lints version ({locked}). Set the plugin version to {locked}.",
+      "localSource": "saropa_lints comes from a local {source} source, so the extension shows facts only and changes nothing.",
+      "noCompatible": "No published saropa_lints version works with this project's Dart SDK.",
+      "noVersions": "No saropa_lints versions are available to recommend.",
+      "probeFailed": "Could not check which saropa_lints version this project can use because the Dart tooling did not run ({detail}). Make sure dart or flutter is on your PATH and you are online, then re-check.",
+      "staleVersions": "The version list could not be refreshed (offline), so this advice may be out of date.",
+      "blockerSdk": "saropa_lints {version} requires a newer Dart SDK than {dart}.",
+      "blockerMeta": "saropa_lints {version} is not compatible with the meta version {pin} pinned by your Flutter SDK.",
+      "blockerPackage": "{package} prevents the install by requiring a different analyzer version.",
+      "fixFlutterUpgrade": "Run flutter upgrade.",
+      "fixUpgradeFlutterMeta": "Upgrade Flutter to a release that pins a newer meta.",
+      "fixKeepVersion": "Keep saropa_lints at ^{version}.",
+      "fixUpdateHolder": "Update {package} to a version that supports a newer analyzer.",
+      "fixUsePluginRoute": "Use the plugin route: set the plugin version in analysis_options.yaml to {version}.",
+      "fixPubspecFallback": "Or stay on the pubspec route: use saropa_lints ^{version}, or update {package} to a version that supports a newer analyzer.",
+      "fixAlignPlugin": "Set the plugin version in analysis_options.yaml to {version}."
+    },
+    "card": {
+      "heading": "Version compatibility",
+      "loading": "Checking which saropa_lints version this project can use...",
+      "notDetected": "not detected",
+      "dart": "Dart SDK",
+      "flutter": "Flutter SDK",
+      "lockedSaropa": "Locked saropa_lints",
+      "lockedAnalyzer": "Locked analyzer",
+      "plugin": "Plugin version (analysis_options.yaml)",
+      "blockers": "What blocks a newer version",
+      "fixes": "How to fix",
+      "apply": "Apply",
+      "applying": "Applying...",
+      "preview": "Preview diff",
+      "refresh": "Re-check",
+      "diffTitle": "{file}: proposed version change",
+      "staleReloaded": "The project changed while you were looking at this card, so nothing was applied. Review the updated advice and click Apply again.",
+      "loadFailed": "Could not check version compatibility: {detail}",
+      "routeLabel": "Install route",
+      "routes": {
+        "dependency": "Dependency in pubspec.yaml",
+        "plugin": "Plugin in analysis_options.yaml only",
+        "both": "Dependency and plugin",
+        "none": "No change possible"
+      }
+    },
+    "apply": {
+      "progress": "Applying saropa_lints version change",
+      "applied": "saropa_lints {version} is installed and configured.",
+      "noChange": "No file changes are needed.",
+      "failedRestored": "The version change failed: {detail} pubspec.yaml and analysis_options.yaml were restored to their previous content.",
+      "failedNotRestored": "The version change failed: {detail} The files could not be restored automatically; check pubspec.yaml and analysis_options.yaml.",
+      "cancelledRestored": "The version change was cancelled. pubspec.yaml and analysis_options.yaml were restored to their previous content.",
+      "cancelledNotRestored": "The version change was cancelled, but the files could not be restored automatically; check pubspec.yaml and analysis_options.yaml."
+    }
+  },
+  "ruleMigration": {
+    "none": "No renamed rules need migrating.",
+    "noWorkspace": "Open a Dart project folder to migrate rule names.",
+    "pickTitle": "Migrate renamed rules",
+    "pickPlaceholder": "Choose the files to update",
+    "fileHits": "{hits} change(s)",
+    "diffTitle": "Rule rename: {file}",
+    "confirm": "Apply rule renames to {count} file(s)? The diffs are open for review.",
+    "apply": "Apply",
+    "progress": "Migrating renamed rules",
+    "applied": "Updated {hits} rule reference(s) in {count} file(s): {files}.",
+    "bareNames": "Left unchanged (ignore comments without the saropa_lints/ prefix): {items}.",
+    "clashes": "Both the old and new rule name are set, please merge by hand: {items}.",
+    "skipped": "Skipped: {items}.",
+    "failedRestored": "Rule migration failed: {detail} All files were restored to their previous content.",
+    "failedNotRestored": "Rule migration failed: {detail} Some files could not be restored automatically; check them with git.",
+    "offer": "Rename {hits} renamed rules in {count} files?",
+    "offerPreview": "Preview",
+    "offerNotNow": "Not now"
+  },
+  "lintsSwitch": {
+    "statusOn": "Saropa Lints: On",
+    "statusOff": "Saropa Lints: Off",
+    "statusPartial": "Saropa Lints: Partly off",
+    "tooltipOn": "Saropa Lints is on (setting and analyzer plugin). Click to turn it off.",
+    "tooltipOff": "Saropa Lints is off (setting and analyzer plugin). Click to turn it on.",
+    "tooltipPartialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on. Click to fix (turns both on).",
+    "tooltipPartialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on. Click to fix (turns both on).",
+    "dashboardOff": "Lints are off.",
+    "dashboardPartialSetting": "Lints are partly off: the saropaLints.enabled setting is off.",
+    "dashboardPartialPlugin": "Lints are partly off: the analyzer plugin is off in analysis_options.yaml.",
+    "dashboardTurnOn": "Turn on",
+    "dashboardFix": "Fix",
+    "driftRowLabel": "Plugin version out of sync",
+    "driftRowDescription": "analysis_options.yaml says {configured}, pubspec.lock pins {pinned}. Click to sync.",
+    "driftSynced": "analysis_options.yaml plugin version updated to {pinned}."
   }
 }

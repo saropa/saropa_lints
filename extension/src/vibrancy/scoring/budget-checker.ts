@@ -72,7 +72,8 @@ export function computeActuals(results: readonly VibrancyResult[]): {
         if (r.category === 'end-of-life') {
             endOfLifeCount++;
         }
-        if (r.category === 'outdated') {
+        // upgrade-required was 'end-of-life' before the split; keep it budgeted.
+        if (r.category === 'outdated' || r.category === 'upgrade-required') {
             outdatedCount++;
         }
         if (r.isUnused) {
@@ -277,7 +278,8 @@ export function getPackagesByCategory(
         return results.filter(r => r.isUnused).map(r => r.package.name);
     }
     return results
-        .filter(r => r.category === category)
+        .filter(r => r.category === category
+            || (category === 'outdated' && r.category === 'upgrade-required'))
         .map(r => r.package.name);
 }
 

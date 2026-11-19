@@ -47,7 +47,10 @@ function dismissedKey(root: string): string {
  *    state we chose for them on purpose. The ownership claim is what turns the
  *    same on-disk shape into real drift: it means OUR Disable took a live block
  *    away and the matching Enable never gave it back.
- *  - disabled + `disabled`, enabled + `live`: both switches agree.
+ *  - disabled + `disabled`, enabled + `live`: both switches agree. "Both off"
+ *    is made visible in words by the single on/off switch (status bar,
+ *    sidebar top row, dashboard banner; see lintsSwitch.ts), not by a prompt
+ *    on every activation.
  */
 function classify(context: vscode.ExtensionContext, root: string): Divergence | undefined {
   const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;

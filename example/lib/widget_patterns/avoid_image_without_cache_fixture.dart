@@ -115,5 +115,5 @@ class _bad1384__MyWidgetState extends State<MyWidget> {
 // GOOD: Should NOT trigger avoid_image_without_cache
 class _good1384__MyWidgetState extends State<MyWidget>
     with WidgetStateMixin<MyWidget> {
-// Use WidgetState for hover, pressed, etc.
+  // Use WidgetState for hover, pressed, etc.
 }

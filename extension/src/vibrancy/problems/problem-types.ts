@@ -5,6 +5,7 @@
  * Vibrancy UI experiment: scoring, providers, and webview assets.
  */
 
+import { l10n } from '../../i18n/runtime';
 import { VibrancyCategory } from '../types';
 import { categoryLabel } from '../scoring/status-classifier';
 
@@ -114,6 +115,9 @@ export function problemMessage(problem: Problem): string {
             // so the message adds context: the vibrancy score
             if (problem.category === 'end-of-life') {
                 return `Score ${problem.score}/100 — discontinued or abandoned`;
+            }
+            if (problem.category === 'upgrade-required') {
+                return l10n('lifecycle.upgradeRequired.problem', { score: problem.score });
             }
             if (problem.category === 'abandoned') {
                 return `Score ${problem.score}/100 — low maintenance activity`;

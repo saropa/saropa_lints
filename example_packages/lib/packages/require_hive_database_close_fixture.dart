@@ -114,7 +114,7 @@ class _bad660_MyService {
   Future<void> init() async {
     _box = await Hive.openBox('data');
   }
-// No dispose method!
+  // No dispose method!
 }
 
 // GOOD: Should NOT trigger require_hive_database_close

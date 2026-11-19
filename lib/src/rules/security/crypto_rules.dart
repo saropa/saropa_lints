@@ -135,7 +135,7 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
 
       // Check if argument is a string literal (hardcoded key)
       if (node.argumentList.arguments.isNotEmpty) {
-        final Expression firstArg = node.argumentList.arguments.first;
+        final Argument firstArg = node.argumentList.arguments.first;
         if (firstArg is StringLiteral) {
           reporter.atNode(firstArg);
         }
@@ -158,7 +158,7 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
 
       // Check if argument is a string literal (hardcoded key)
       if (node.argumentList.arguments.isNotEmpty) {
-        final Expression firstArg = node.argumentList.arguments.first;
+        final Argument firstArg = node.argumentList.arguments.first;
         if (firstArg is StringLiteral) {
           reporter.atNode(firstArg);
         }
@@ -504,6 +504,16 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
+  /// True for names that denote a size, not an IV value (`ivLength`,
+  /// `ivSize`, `ivLengthBytes`). Plain `ivBytes`/`nonceBytes` are values.
+  static bool _isIvSizeName(String lowerName) =>
+      lowerName.endsWith('length') ||
+      lowerName.endsWith('size') ||
+      lowerName.endsWith('lengthbytes') ||
+      lowerName.endsWith('sizebytes');
+
+  static bool _isIntInitializer(Expression? init) => init is IntegerLiteral;
+
   /// Checks if a variable name indicates an IV/nonce variable.
   /// Avoids false positives like "activity", "private", "derivative".
   static bool _isIvVariableName(String originalName) {
@@ -576,6 +586,10 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.fields.variables) {
         final String originalName = variable.name.lexeme;
         final String lowerName = originalName.toLowerCase();
+        if (_isIvSizeName(lowerName) ||
+            _isIntInitializer(variable.initializer)) {
+          continue;
+        }
         final bool hasIvName =
             lowerName == 'iv' ||
             lowerName == 'nonce' ||
@@ -600,6 +614,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
       final String originalName = node.name.lexeme;
       final String lowerName = originalName.toLowerCase();
+      if (_isIvSizeName(lowerName) || _isIntInitializer(node.initializer)) {
+        return;
+      }
       if (lowerName == 'iv' ||
           lowerName == 'nonce' ||
           _isIvVariableName(originalName)) {
@@ -620,7 +637,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
       // Check if argument is a string literal (fixed IV)
       if (node.argumentList.arguments.isNotEmpty) {
-        final Expression firstArg = node.argumentList.arguments.first;
+        final Argument firstArg = node.argumentList.arguments.first;
         if (firstArg is StringLiteral) {
           reporter.atNode(node);
         }
@@ -735,10 +752,10 @@ class RequireSecureKeyGenerationRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_keyClasses.contains(typeName)) return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
 
       // Key([1, 2, 3, ...]) — direct list literal
       if (firstArg is ListLiteral) {
@@ -750,8 +767,7 @@ class RequireSecureKeyGenerationRule extends SaropaLintRule {
       if (firstArg is MethodInvocation) {
         final String method = firstArg.methodName.name;
         if (method == 'fromList' || method == 'filled') {
-          final NodeList<Expression> innerArgs =
-              firstArg.argumentList.arguments;
+          final NodeList<Argument> innerArgs = firstArg.argumentList.arguments;
           if (innerArgs.isNotEmpty && innerArgs.first is ListLiteral) {
             reporter.atNode(node);
           } else if (method == 'filled') {

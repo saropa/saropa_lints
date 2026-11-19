@@ -110,7 +110,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 class _bad1363__MyWidgetState extends State<MyWidget> {
   @override
   void initState() {
-// Missing super.initState()!
+    // Missing super.initState()!
     _initSomething();
   }
 }

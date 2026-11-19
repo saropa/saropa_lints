@@ -108,6 +108,7 @@ import 'dart:developer' as developer;
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 const kDebugMode = true;
+const kReleaseMode = false;
 final context = BuildContext();
 
 // ============================================================================
@@ -214,6 +215,264 @@ void _falsePositive3() {
     fetchData();
   } catch (e, stackTrace) {
     developer.log('Fetch failed', error: e, stackTrace: stackTrace);
+  }
+}
+
+// OK: Stack trace guarded by the Dart-VM-native `dart.vm.product` flag
+// directly in the `if` condition — the non-Flutter equivalent of
+// `kDebugMode`, appropriate for `dart:` packages that can't depend on
+// `package:flutter/foundation.dart`.
+// See bugs/avoid_stack_trace_in_production_false_positive_indirect_debug_guard.md.
+void _falsePositive4() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (!bool.fromEnvironment('dart.vm.product')) {
+      print(stackTrace);
+    }
+  }
+}
+
+// OK: Same guard, but reached through a local `bool` variable rather
+// than inline in the `if` condition.
+void _falsePositive5() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    final bool includeTrace = !bool.fromEnvironment('dart.vm.product');
+    if (includeTrace) {
+      print(stackTrace);
+    }
+  }
+}
+
+// OK: Same guard, reached through a zero-arg local helper function call.
+bool _isDebugEnvironment() =>
+    !bool.fromEnvironment('dart.vm.product', defaultValue: false);
+
+void _falsePositive6() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (_isDebugEnvironment()) {
+      print(stackTrace);
+    }
+  }
+}
+
+// OK: The exact two-hop shape from the bug report — a local variable
+// whose initializer combines an unrelated flag with a helper-function
+// call that itself resolves to the `dart.vm.product` guard.
+void _falsePositive7({bool includeStack = true}) {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    final bool includeTrace = includeStack && _isDebugEnvironment();
+    if (includeTrace) {
+      print(stackTrace);
+    }
+  }
+}
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: `dart.vm.product` guard NOT negated — this actually guards for
+// production (the inverse of what's intended), so the stack trace is
+// genuinely reachable in every release build. The indirection fix must
+// not suppress this.
+void _bad4() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    final bool isProduction = bool.fromEnvironment('dart.vm.product');
+    if (isProduction) {
+      print(stackTrace);
+    }
+  }
+}
+
+// ============================================================================
+// TRUE POSITIVES: sound-guard-analysis regressions
+// ============================================================================
+// These all look superficially like a debug guard (they mention a
+// recognized debug/production check somewhere in the condition) but are
+// NOT sound guards for the then-branch, and must keep firing. Confirms the
+// `&&`/`||`/`!` duality fix — see
+// bugs/avoid_stack_trace_in_production_false_positive_indirect_debug_guard.md
+// Finish Report (2026-09-18) — doesn't treat these as "either operand /
+// any substring counts".
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: negated helper call — `!isDebug()` guarantees PRODUCTION, not debug.
+void _bad5() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (!_isDebugEnvironment()) {
+      print(stackTrace);
+    }
+  }
+}
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: `||` with an unguarded operand — the branch still runs outside
+// debug whenever `verbose` is true, regardless of `_isDebugEnvironment()`.
+void _bad6({bool verbose = false}) {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (verbose || _isDebugEnvironment()) {
+      print(stackTrace);
+    }
+  }
+}
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: local variable holding a NEGATED guard — `release` is true exactly
+// when NOT in debug, so `if (release)` is the opposite of a debug guard.
+void _bad7() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    final bool release = !_isDebugEnvironment();
+    if (release) {
+      print(stackTrace);
+    }
+  }
+}
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: unmodeled binary operator (`!=`) — not a recognized guard shape,
+// so it must stay reported rather than be assumed safe.
+void _bad8({bool x = true}) {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (x != _isDebugEnvironment()) {
+      print(stackTrace);
+    }
+  }
+}
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: local variable whose initializer is `||` with an unguarded operand
+// — same shape as _bad6, reached through one hop of variable indirection.
+void _bad9({bool verbose = false}) {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    final bool show = verbose || !bool.fromEnvironment('dart.vm.product');
+    if (show) {
+      print(stackTrace);
+    }
+  }
+}
+
+// A helper whose body mentions `kDebugMode` as one arm of an `||` whose
+// other arm is the (unnegated) production check — the whole expression is
+// true only in production (or when `kDebugMode` is somehow false there
+// too), so `isRelease()` is a production check, not a debug guard. The
+// old whole-text `contains('kDebugMode')` check matched this body's
+// source regardless of position; the atoms-only fix must not.
+bool _isRelease() => bool.fromEnvironment('dart.vm.product') || !kDebugMode;
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: helper-call indirection to a production check, not a debug guard.
+void _bad10() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (_isRelease()) {
+      print(stackTrace);
+    }
+  }
+}
+
+// ============================================================================
+// TRUE POSITIVES: reassigned-local and exact-atom-match regressions
+// ============================================================================
+// A second review pass caught two more soundness gaps: the initializer
+// resolver trusted a mutable local's initializer even after the local was
+// reassigned, and the atom check used `toSource().contains(...)`, so any
+// expression that merely MENTIONS a recognized name anywhere in its text
+// (not just as the whole atom) counted as a guard. See
+// bugs/avoid_stack_trace_in_production_false_positive_indirect_debug_guard.md
+// Finish Report Amendment (2026-09-18, V3).
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: `t` is reassigned to `true` AFTER its debug-guard initializer and
+// BEFORE the `if` — the initializer no longer describes `t`'s value at
+// the use site, so it must not be trusted.
+void _bad11() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    var t = _isDebugEnvironment();
+    t = true;
+    if (t) {
+      print(stackTrace);
+    }
+  }
+}
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: same shape, but the reassignment is conditional (`if (v) t = true;`)
+// — still enough to make the mutable local's initializer untrustworthy at
+// the use site, regardless of whether the reassignment actually runs.
+void _bad12({bool v = false}) {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    bool t = kDebugMode;
+    if (v) {
+      t = true;
+    }
+    if (t) {
+      print(stackTrace);
+    }
+  }
+}
+
+bool _hide(bool b) => !b;
+
+// expect_lint: avoid_stack_trace_in_production
+// BAD: `kDebugMode` is merely an ARGUMENT to an unrelated call, not the
+// condition itself — `hide(kDebugMode)` is not a recognized guard shape
+// (a 1-arg call isn't followed by indirection, and the call expression
+// itself doesn't match any atom). The old substring check on
+// `toSource()` would have matched 'kDebugMode' anywhere in the text and
+// wrongly suppressed this.
+void _bad13() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (_hide(kDebugMode)) {
+      print(stackTrace);
+    }
+  }
+}
+
+// OK: `kDebugMode == true` is recognized as equivalent to bare
+// `kDebugMode` (the `== true`/`!= false`/`== false`/`!= true` comparison
+// forms are modeled for a flag atom).
+void _falsePositive8() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (kDebugMode == true) {
+      print(stackTrace);
+    }
+  }
+}
+
+// OK: `kReleaseMode == false` is recognized as equivalent to
+// `!kReleaseMode`.
+void _falsePositive9() {
+  try {
+    fetchData();
+  } catch (e, stackTrace) {
+    if (kReleaseMode == false) {
+      print(stackTrace);
+    }
   }
 }
 

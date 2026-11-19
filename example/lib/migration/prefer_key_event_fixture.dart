@@ -38,10 +38,7 @@ void _badRawKeyboard(RawKeyboard keyboard) {}
 // BAD: Using deprecated 'onKey:' on Focus
 // expect_lint: prefer_key_event
 Widget _badFocusOnKey() {
-  return Focus(
-    onKey: (node, event) {},
-    child: const Text('focus'),
-  );
+  return Focus(onKey: (node, event) {}, child: const Text('focus'));
 }
 
 // BAD: Using deprecated 'onKey:' on FocusNode
@@ -69,10 +66,7 @@ void _goodKeyDownCheck(dynamic event) {
 
 // GOOD: Using onKeyEvent instead of onKey on Focus
 Widget _goodFocusOnKeyEvent() {
-  return Focus(
-    onKeyEvent: (node, event) {},
-    child: const Text('focus'),
-  );
+  return Focus(onKeyEvent: (node, event) {}, child: const Text('focus'));
 }
 
 // FALSE POSITIVE: 'RawKey' string in a comment or variable name

@@ -8,8 +8,9 @@ output: both
 rule_packs:
   enabled:
     - collection_compat
-
-# PLATFORM SETTINGS
+    - dart_sdk_3_2
+    - dart_sdk_3_4
+    - testing
 # Disable platforms your project doesn't target.
 platforms:
   ios: true

@@ -119,7 +119,7 @@ class _bad333__ClockState extends State<Clock> {
       setState(() {});
     });
   }
-// Missing cancel - timer runs forever!
+  // Missing cancel - timer runs forever!
 }
 
 // GOOD: Should NOT trigger require_interval_timer_cancel

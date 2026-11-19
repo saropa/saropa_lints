@@ -24,6 +24,29 @@ void main() {
   bool guarded(String body) =>
       AvoidSubstringRule.guardsBoundsForTesting(firstSubstring(body));
 
+  group('avoid_string_substring collection-for', () {
+    test('NO lint: loop condition bounds substring in collection-for', () {
+      expect(
+        guarded('''
+List<int> f(String s) => <int>[
+  for (int i = 0; i + 1 < s.length; i += 2) g(s.substring(i, i + 2)),
+];
+'''),
+        isTrue,
+      );
+    });
+
+    test('LINT: unbounded collection-for over names', () {
+      expect(
+        guarded('''
+List<String> f(List<String> names) =>
+    <String>[for (final n in names) n.substring(3)];
+'''),
+        isFalse,
+      );
+    });
+  });
+
   group('avoid_string_substring guard recognition — NO lint (guarded)', () {
     test('else-branch of indexOf ternary (< 0)', () {
       expect(

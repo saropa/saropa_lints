@@ -117,11 +117,11 @@ Widget _bad814_build(BuildContext context) {
 
 // GOOD: Should NOT trigger avoid_rebuild_on_scroll
 void _good814_initState() {
-// super.initState();
+  // super.initState();
   _scrollController.addListener(_onScroll);
 }
 
 void dispose() {
   _scrollController.removeListener(_onScroll);
-// super.dispose();
+  // super.dispose();
 }

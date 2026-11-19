@@ -134,10 +134,7 @@ void _good114() async {
 
 // GOOD: Server-side handler with HttpResponse param — NOT an outbound call
 class _ServerHandlerGood {
-  Future<void> handleSessionGet(
-    HttpResponse response,
-    String sessionId,
-  ) async {
+  Future<void> handleSessionGet(HttpResponse response, String sessionId) async {
     final session = _sessionStore.get(sessionId);
     response.write(jsonEncode(session));
     await response.close();

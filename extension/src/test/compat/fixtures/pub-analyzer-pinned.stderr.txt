@@ -1,0 +1,2 @@
+Because saropa_lints >=14.0.3 depends on analyzer ^12.1.0 and t depends on analyzer 11.0.0, saropa_lints >=14.0.3 is forbidden.
+So, because t depends on saropa_lints ^16.7.0, version solving failed.

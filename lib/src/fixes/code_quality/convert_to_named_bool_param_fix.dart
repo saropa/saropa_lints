@@ -29,8 +29,8 @@ class ConvertToNamedBoolParamFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // The rule reports on the FormalParameter (SimpleFormalParameter
-    // or DefaultFormalParameter). Get the parameter's source text and
+    // The rule reports on the FormalParameter (RegularFormalParameter).
+    // Get the parameter's source text and
     // the enclosing parameter list.
     FormalParameter? param;
     if (node is FormalParameter) {

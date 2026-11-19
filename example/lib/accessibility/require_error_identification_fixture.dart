@@ -112,10 +112,7 @@ dynamic error;
 // BAD: Should trigger require_error_identification
 // expect_lint: require_error_identification
 void _bad17() {
-  Container(
-    color: hasError ? Colors.red : Colors.grey,
-    child: Text('Email'),
-  );
+  Container(color: hasError ? Colors.red : Colors.grey, child: Text('Email'));
 }
 
 // GOOD: Should NOT trigger require_error_identification
@@ -123,10 +120,7 @@ void _good17() {
   Row(
     children: [
       if (hasError) Icon(Icons.error, color: Colors.red),
-      Text(
-        'Email',
-        style: TextStyle(color: hasError ? Colors.red : null),
-      ),
+      Text('Email', style: TextStyle(color: hasError ? Colors.red : null)),
       if (hasError) Text(' - Required field'),
     ],
   );

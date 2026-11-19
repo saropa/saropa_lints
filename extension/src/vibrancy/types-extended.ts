@@ -129,7 +129,7 @@ export type ActionType =
     | 'none';
 
 /** Vibrancy category for display; must match VibrancyCategory in types. */
-export type PackageInsightCategory = 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'end-of-life';
+export type PackageInsightCategory = 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'upgrade-required' | 'end-of-life';
 
 /** Consolidated insight for a package. */
 export interface PackageInsight {

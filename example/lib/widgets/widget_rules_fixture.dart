@@ -218,11 +218,7 @@ class GoodStackWithPositioned extends StatelessWidget {
     return Stack(
       children: [
         Positioned.fill(child: Container(color: Colors.red)),
-        Positioned(
-          top: 10,
-          left: 10,
-          child: Container(color: Colors.blue),
-        ),
+        Positioned(top: 10, left: 10, child: Container(color: Colors.blue)),
       ],
     );
   }
@@ -234,11 +230,7 @@ class GoodStackSingleChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(color: Colors.red),
-      ],
-    );
+    return Stack(children: [Container(color: Colors.red)]);
   }
 }
 
@@ -255,9 +247,8 @@ class BadExpandedInBuild extends StatelessWidget {
   @override
   // BAD: Returning Expanded from build(), should trigger lint
   // expect_lint: prefer_expanded_at_call_site
-  Widget build(BuildContext context) => Expanded(
-        child: Column(children: const []),
-      );
+  Widget build(BuildContext context) =>
+      Expanded(child: Column(children: const []));
 }
 
 // BAD: Returning Flexible from build()
@@ -277,10 +268,8 @@ class GoodNoExpandedInBuild extends StatelessWidget {
   const GoodNoExpandedInBuild({super.key});
 
   @override
-  Widget build(BuildContext context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: const [],
-      );
+  Widget build(BuildContext context) =>
+      Column(mainAxisSize: MainAxisSize.min, children: const []);
 }
 
 // GOOD: Expanded used inside build but not as return value
@@ -381,13 +370,7 @@ class GoodSpacerInColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(),
-        const Spacer(),
-        Container(),
-      ],
-    );
+    return Column(children: [Container(), const Spacer(), Container()]);
   }
 }
 
@@ -484,10 +467,10 @@ class Positioned extends Widget {
   final Widget child;
 
   const Positioned.fill({super.key, required this.child})
-      : top = 0,
-        left = 0,
-        right = 0,
-        bottom = 0;
+    : top = 0,
+      left = 0,
+      right = 0,
+      bottom = 0;
 }
 
 class Colors {
@@ -561,8 +544,7 @@ Future<T?> showDialog<T>({
   required BuildContext context,
   required Widget Function(BuildContext) builder,
   bool barrierDismissible = true,
-}) async =>
-    null;
+}) async => null;
 
 class AlertDialog extends Widget {
   const AlertDialog({super.key, this.title, this.content});

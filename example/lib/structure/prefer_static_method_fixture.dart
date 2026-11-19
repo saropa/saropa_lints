@@ -174,7 +174,9 @@ class _ImplicitAccessState {
   // must still lint. Regression case for the cascade/target-detection gap.
   // expect_lint: prefer_static_method
   int cascadeOnLocalGood(int x, int y) {
-    final List<int> values = <int>[]..add(x)..add(y);
+    final List<int> values = <int>[]
+      ..add(x)
+      ..add(y);
     return values.length;
   }
 
@@ -216,4 +218,12 @@ enum _ImplicitAccessEnum {
   // GOOD: enum instance method reading its own field via a bare identifier
   // — must NOT lint.
   int enumReadsGood() => _value;
+}
+
+class _SingletonSvc {
+  _SingletonSvc._();
+  static final _SingletonSvc instance = _SingletonSvc._();
+
+  // GOOD: singleton instance API - callers use `_SingletonSvc.instance.ping()`.
+  String ping() => 'pong';
 }

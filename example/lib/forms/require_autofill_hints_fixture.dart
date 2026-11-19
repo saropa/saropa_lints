@@ -110,9 +110,7 @@ final email = 'test@example.com';
 // BAD: Should trigger require_autofill_hints
 // expect_lint: require_autofill_hints
 void _bad409() {
-  TextFormField(
-    decoration: InputDecoration(labelText: 'Email'),
-  );
+  TextFormField(decoration: InputDecoration(labelText: 'Email'));
   // User must type email manually
 }
 

@@ -7,7 +7,7 @@ import { parsePubOutdatedJson } from '../../../vibrancy/services/pub-outdated';
 /** Parses `dart pub outdated --json` fixture into structured outdated rows. */
 
 const fixturesDir = path.join(
-    __dirname, '..', '..', '..', 'src', 'test', 'fixtures',
+    __dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures',
 );
 const FIXTURE_PATH = path.join(fixturesDir, 'pub-outdated.json');
 

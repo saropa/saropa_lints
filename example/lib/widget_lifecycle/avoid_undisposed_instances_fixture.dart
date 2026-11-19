@@ -146,7 +146,9 @@ class _CascadeState extends State<_GoodClass1354_MyWidget> {
 
   @override
   void dispose() {
-    _c?..removeListener(_tick)..dispose();
+    _c
+      ?..removeListener(_tick)
+      ..dispose();
     super.dispose();
   }
 

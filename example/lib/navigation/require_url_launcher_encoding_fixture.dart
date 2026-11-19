@@ -108,14 +108,16 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger require_url_launcher_encoding
 // expect_lint: require_url_launcher_encoding
 void _bad522() async {
-  await launchUrl(Uri.parse(
-      'https://example.com/search?q=$query')); // query may have spaces
+  await launchUrl(
+    Uri.parse('https://example.com/search?q=$query'),
+  ); // query may have spaces
 }
 
 // GOOD: Should NOT trigger require_url_launcher_encoding
 void _good522() async {
   await launchUrl(
-      Uri.parse('https://example.com/search?q=${Uri.encodeComponent(query)}'));
+    Uri.parse('https://example.com/search?q=${Uri.encodeComponent(query)}'),
+  );
   // Or use Uri constructor which auto-encodes:
   await launchUrl(Uri.https('example.com', '/search', {'q': query}));
 }

@@ -117,7 +117,7 @@ class _bad326__ClockState extends State<Clock> {
     super.initState();
     _timer = Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
   }
-// Timer fires in background, wasting battery!
+  // Timer fires in background, wasting battery!
 }
 
 // GOOD: Should NOT trigger require_lifecycle_observer

@@ -110,14 +110,10 @@ final text = 'text';
 // BAD: Should trigger prefer_using_list_view
 // expect_lint: prefer_using_list_view
 void _bad1291() {
-  RichText(
-    text: TextSpan(text: 'Hello'),
-  );
+  RichText(text: TextSpan(text: 'Hello'));
 }
 
 // GOOD: Should NOT trigger prefer_using_list_view
 void _good1291() {
-  Text.rich(
-    TextSpan(text: 'Hello'),
-  );
+  Text.rich(TextSpan(text: 'Hello'));
 }

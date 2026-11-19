@@ -172,3 +172,189 @@ void _good_6939() async {
   final platform = MethodChannel('my_channel');
   final result = await platform.invokeMethod('getData');
 }
+
+// GOOD: Channel declared as a field; only invocations are web-sensitive.
+abstract final class _Haptics939 {
+  static const MethodChannel _channel = MethodChannel('app/haptics');
+}
+
+// GOOD: Top-level channel declaration.
+const MethodChannel _topChannel939 = MethodChannel('app/top');
+
+// BAD: Channel built inside a closure nested in a field initializer.
+final Object Function() _badLazyChannel939 = () {
+  // expect_lint: avoid_platform_channel_on_web
+  return MethodChannel('app/lazy');
+};
+
+// Channel in a field; invocations guarded via a same-class getter.
+abstract final class _GuardedHaptics939 {
+  static const MethodChannel _channel = MethodChannel('app/haptics');
+
+  static bool get _supported => !kIsWeb && someCheck;
+
+  // GOOD: early exit through a getter containing a kIsWeb check.
+  static Future<void> tick() async {
+    if (!_supported) return;
+    await _channel.invokeMethod<void>('tick');
+  }
+
+  // GOOD: invocation inside `if (getter)`.
+  static Future<void> tock() async {
+    if (_supported) {
+      await _channel.invokeMethod<void>('tock');
+    }
+  }
+
+  // GOOD: direct kIsWeb guard.
+  static Future<void> direct() async {
+    if (kIsWeb) return;
+    await _channel.invokeMethod<void>('direct');
+  }
+
+  // BAD: unguarded invocation on a field channel.
+  static Future<void> unguarded() async {
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('x');
+  }
+}
+
+// Channel field that is null on web.
+abstract final class _NullOnWeb939 {
+  static const MethodChannel? _channel = kIsWeb
+      ? null
+      : MethodChannel('app/widget_paths');
+
+  // GOOD: `_channel == null` early return; the field is null on web.
+  static Future<String?> containerPath() async {
+    if (_channel == null) {
+      return null;
+    }
+    return _channel?.invokeMethod<String>('getPath');
+  }
+}
+
+abstract final class _PlatformGuard939 {
+  static const MethodChannel _channel = MethodChannel('app/network_country');
+
+  // GOOD: negated Platform check exits for every non-Android platform.
+  static Future<String?> get() async {
+    if (!Platform.isAndroid) {
+      return null;
+    }
+    return _channel.invokeMethod<String>('getNetworkCountry');
+  }
+
+  // BAD: positive Platform exit does not exclude web.
+  static Future<String?> bad() async {
+    if (Platform.isIOS) return null;
+    // expect_lint: avoid_platform_channel_on_web
+    return _channel.invokeMethod<String>('x');
+  }
+}
+
+// Capability flag only ever set true after a web-guarded early exit.
+abstract final class _CapabilityFlag939 {
+  static const MethodChannel _channel = MethodChannel('x/haptics');
+  static bool? _isSupported;
+  static bool get _isPlatformSupported =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  static bool get isSupported => _isSupported ?? false;
+
+  static Future<void> ensureInitialized() async {
+    if (!_isPlatformSupported) {
+      _isSupported = false;
+      return;
+    }
+    _isSupported = await _channel.invokeMethod<bool>('canVibrate') ?? false;
+  }
+
+  // GOOD: isSupported is always false on web.
+  static Future<void> vibrate() async {
+    if (!isSupported) return;
+    await _channel.invokeMethod<void>('buzz');
+  }
+}
+
+abstract final class _CapabilityFlagUnguarded939 {
+  static const MethodChannel _channel = MethodChannel('x/haptics2');
+  static bool? _isSupported;
+  static bool get isSupported => _isSupported ?? false;
+
+  static Future<void> ensureInitialized() async {
+    // expect_lint: avoid_platform_channel_on_web
+    _isSupported = await _channel.invokeMethod<bool>('canVibrate') ?? false;
+  }
+
+  // BAD: the flag can be true on web (assigned with no web guard).
+  static Future<void> vibrate() async {
+    if (!isSupported) return;
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('buzz');
+  }
+}
+
+// Wrong polarity: `_canUse` is TRUE on web (`kIsWeb || ...`), so the flag
+// can be set on web even though the write sits behind `if (!_canUse) return;`.
+abstract final class _WrongPolarityFlag939 {
+  static const MethodChannel _channel = MethodChannel('x/haptics3');
+  static bool? _isSupported;
+  static bool get _canUse =>
+      kIsWeb || defaultTargetPlatform == TargetPlatform.android;
+  static bool get isSupported => _isSupported ?? false;
+
+  static void init() {
+    if (!_canUse) return;
+    _isSupported = true;
+  }
+
+  // BAD: the flag can be true on web.
+  static Future<void> vibrate() async {
+    if (!isSupported) return;
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('buzz');
+  }
+}
+
+// Wrong polarity: `_canUse` is true on web, so `if (!_canUse) return;` does
+// not keep web off the channel call.
+abstract final class _WrongPolarityGetterGuard939 {
+  static const MethodChannel _channel = MethodChannel('x/haptics5');
+  static bool get _canUse =>
+      kIsWeb || defaultTargetPlatform == TargetPlatform.android;
+
+  // BAD: the guard passes on web.
+  static Future<void> vibrate() async {
+    if (!_canUse) return;
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('buzz');
+  }
+}
+
+// A `this._flag = true;` write with no web guard must be seen as a write.
+class _ThisAssignFlag939 {
+  final MethodChannel _channel = MethodChannel('x/haptics4');
+  bool? _isSupported;
+  bool get _isPlatformSupported =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  bool get isSupported => _isSupported ?? false;
+
+  void init() {
+    if (!_isPlatformSupported) {
+      _isSupported = false;
+      return;
+    }
+    _isSupported = true;
+  }
+
+  void forceOn() {
+    this._isSupported = true;
+  }
+
+  // BAD: `forceOn` sets the flag with no web guard.
+  Future<void> vibrate() async {
+    if (!isSupported) return;
+    // expect_lint: avoid_platform_channel_on_web
+    await _channel.invokeMethod<void>('buzz');
+  }
+}

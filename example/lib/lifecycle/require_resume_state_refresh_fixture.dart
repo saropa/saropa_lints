@@ -115,7 +115,7 @@ class _bad461__MyState extends State<MyWidget> with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused) {
       saveData();
     }
-// Missing resumed handling!
+    // Missing resumed handling!
   }
 }
 

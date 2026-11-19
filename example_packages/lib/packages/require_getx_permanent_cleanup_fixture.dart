@@ -111,7 +111,7 @@ class _bad639_MyApp extends StatelessWidget {
   @override
   void initState() {
     Get.put(AuthController(), permanent: true);
-// Never cleaned up!
+    // Never cleaned up!
   }
 }
 
@@ -123,7 +123,7 @@ class _good639_MyApp extends StatelessWidget {
   }
 
   void logout() {
-// Manually clean up when no longer needed
+    // Manually clean up when no longer needed
     Get.delete<AuthController>();
   }
 }

@@ -113,7 +113,7 @@ void _bad945_main() {
 
 // GOOD: Should NOT trigger require_windows_single_instance_check
 void _good945_main() async {
-// Using windows_single_instance or similar package
+  // Using windows_single_instance or similar package
   final isFirstInstance = await WindowsSingleInstance.ensureSingleInstance(
     args,
     'my_app_unique_id',

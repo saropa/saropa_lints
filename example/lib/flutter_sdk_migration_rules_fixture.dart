@@ -228,7 +228,9 @@ ColorScheme scrollbarThemeFalsePositive(BuildContext context) {
   return Theme.of(context).colorScheme;
 }
 
-_UserScrollbarThemeData scrollbarThemeUserThemeFalsePositive(BuildContext context) {
+_UserScrollbarThemeData scrollbarThemeUserThemeFalsePositive(
+  BuildContext context,
+) {
   // OK: user-defined Theme-like APIs must not lint.
   return _UserTheme.of(context).scrollbarTheme;
 }

@@ -7,6 +7,8 @@
 const String bad = 'Hello' + ' world';
 
 // GOOD: Adjacent string literals
-const String good = 'Hello' ' world';
+const String good =
+    'Hello'
+    ' world';
 
 void main() {}

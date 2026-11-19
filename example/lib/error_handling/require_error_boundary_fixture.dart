@@ -138,9 +138,7 @@ void main() {
     runApp(MyHomePage());
   } on Object catch (error, stack) {
     debugException(error, stack);
-    MaterialApp(
-      home: MyHomePage(),
-    );
+    MaterialApp(home: MyHomePage());
   }
 
   // GOOD: same shape, but the logging call is a receiver-based logger
@@ -150,9 +148,7 @@ void main() {
     runApp(MyHomePage());
   } on Object catch (error, stack) {
     analytics.track(error);
-    MaterialApp(
-      home: MyHomePage(),
-    );
+    MaterialApp(home: MyHomePage());
   }
 }
 
@@ -166,9 +162,7 @@ void _bad361() {
     doSomethingUnrelated();
   } on Object catch (error, stack) {
     debugException(error, stack);
-    MaterialApp(
-      home: MyHomePage(),
-    );
+    MaterialApp(home: MyHomePage());
   }
 }
 
@@ -182,9 +176,7 @@ void _bad363() {
     runApp(MyHomePage());
   } on Object catch (error, stack) {
     debugException(error, stack);
-    MaterialApp(
-      home: MyHomePage(),
-    );
+    MaterialApp(home: MyHomePage());
   }
 }
 

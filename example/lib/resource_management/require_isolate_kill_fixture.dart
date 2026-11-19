@@ -115,7 +115,7 @@ class _bad971_Processor {
   Future<void> start() async {
     _isolate = await Isolate.spawn(processData, data);
   }
-// Isolate never killed
+  // Isolate never killed
 }
 
 // GOOD: Should NOT trigger require_isolate_kill

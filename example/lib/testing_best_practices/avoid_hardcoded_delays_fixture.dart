@@ -125,6 +125,7 @@ void _good1212() async {
     expect(find.byType(LoadingIndicator), findsNothing);
   });
   // Or wait for specific condition:
-  await tester
-      .pumpUntil(() => find.byType(LoadingIndicator).evaluate().isEmpty);
+  await tester.pumpUntil(
+    () => find.byType(LoadingIndicator).evaluate().isEmpty,
+  );
 }

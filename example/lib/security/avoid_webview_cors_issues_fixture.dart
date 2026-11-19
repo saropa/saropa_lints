@@ -145,9 +145,7 @@ void _good1() {
 
 // OK: Settings explicitly set to false
 void _good2() {
-  final settings = InAppWebViewSettings(
-    allowFileAccessFromFileURLs: false,
-  );
+  final settings = InAppWebViewSettings(allowFileAccessFromFileURLs: false);
 }
 
 // OK: Settings omitted entirely (defaults to false)
@@ -157,9 +155,7 @@ void _good3() {
 
 // OK: Other settings are fine
 void _good4() {
-  final settings = InAppWebViewSettings(
-    javaScriptEnabled: true,
-  );
+  final settings = InAppWebViewSettings(javaScriptEnabled: true);
 }
 
 // ============================================================================
@@ -168,9 +164,7 @@ void _good4() {
 
 // OK: Similar named parameter on a custom class
 void _falsePositive1() {
-  final config = _CustomConfig(
-    allowUniversalAccessFromFileURLs: true,
-  );
+  final config = _CustomConfig(allowUniversalAccessFromFileURLs: true);
 }
 
 // OK: Setting to false is always safe

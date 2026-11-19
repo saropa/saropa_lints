@@ -58,10 +58,7 @@ Widget goodChipDelete() {
 Widget goodChipDeleteNonCircleBorder() {
   return RawChip(
     label: const Text('y'),
-    deleteIcon: InkWell(
-      onTap: () {},
-      child: const Icon(Icons.close),
-    ),
+    deleteIcon: InkWell(onTap: () {}, child: const Icon(Icons.close)),
   );
 }
 

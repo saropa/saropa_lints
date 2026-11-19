@@ -117,8 +117,5 @@ void _bad453() {
 
 // GOOD: Should NOT trigger prefer_intl_message_description
 void _good453() {
-  Intl.message(
-    'Submit',
-    desc: 'Button text to submit the registration form',
-  );
+  Intl.message('Submit', desc: 'Button text to submit the registration form');
 }

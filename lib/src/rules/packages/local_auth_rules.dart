@@ -87,9 +87,9 @@ class _IdentifierScan extends GeneralizingAstVisitor<void> {
 }
 
 Expression? _namedArgValue(MethodInvocation node, String name) {
-  for (final Expression arg in node.argumentList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) {
-      return arg.expression;
+  for (final Argument arg in node.argumentList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) {
+      return arg.argumentExpression;
     }
   }
   return null;
@@ -542,8 +542,7 @@ class _AddBiometricOnlyFix extends SaropaFixProducer {
     if (args.isEmpty) return;
     // Already present — do nothing.
     final bool hasBioOnly = args.any(
-      (Expression a) =>
-          a is NamedExpression && a.name.label.name == 'biometricOnly',
+      (Argument a) => a is NamedArgument && a.name.lexeme == 'biometricOnly',
     );
     if (hasBioOnly) return;
     final int offset = args.last.end;
@@ -697,10 +696,9 @@ class LocalAuthUseErrorDialogsRemovedRule extends SaropaLintRule {
       // Locate the useErrorDialogs named argument and flag only it, giving the
       // developer a precise call-out on the removed field rather than the whole
       // constructor site (which local_auth_deprecated_options_class already covers).
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'useErrorDialogs') {
-          reporter.atNode(arg.name);
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'useErrorDialogs') {
+          reporter.atToken(arg.name);
           return;
         }
       }
@@ -779,10 +777,10 @@ class LocalAuthStickyAuthRenamedRule extends SaropaLintRule {
         return;
       }
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'stickyAuth') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'stickyAuth') {
           // Report on the label only so the squiggle is precise.
-          reporter.atNode(arg.name);
+          reporter.atToken(arg.name);
           return;
         }
       }
@@ -807,7 +805,7 @@ class _RenameStickyAuthFix extends ReplaceNodeFix {
   @override
   AstNode? findTargetNode(AstNode node) {
     // The diagnostic is reported on the Label node (e.g. `stickyAuth:`).
-    // Walk up to the NamedExpression so the replacement covers the full label
+    // Walk up to the NamedArgument so the replacement covers the full label
     // including the colon, then return only the Label portion for replacement.
     if (node is Label) return node;
     // coveringNode may be the SimpleIdentifier inside the label — step up.

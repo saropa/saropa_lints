@@ -23,6 +23,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -90,6 +91,10 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // A project with a platform folder layout but no `web/` target (and not
+    // a pure Dart library) can never run on web, so the hazard is absent.
+    if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'MethodChannel' &&
@@ -98,19 +103,59 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
         return;
       }
 
+      // A channel field declaration is harmless on web: only invocations
+      // throw, and those are typically guarded elsewhere.
+      // Constructions inside a closure or method body nested in the
+      // initializer still execute at runtime, so they are not exempt.
+      if (node.thisOrAncestorOfType<FunctionBody>() == null &&
+          node.thisOrAncestorOfType<FunctionExpression>() == null &&
+          (node.thisOrAncestorOfType<FieldDeclaration>() != null ||
+              node.thisOrAncestorOfType<TopLevelVariableDeclaration>() !=
+                  null)) {
+        return;
+      }
+
       // Check if wrapped in platform check
       if (_hasWebPlatformCheck(node)) return;
 
       reporter.atNode(node.constructorName, code);
     });
+
+    // Invocations on a channel held in a field / top-level variable (the
+    // declaration itself is exempt above). Channels held in locals are
+    // already reported at their construction site.
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_invokeNames.contains(node.methodName.name)) return;
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String? typeName = target.staticType?.element?.name;
+      if (typeName != 'MethodChannel' &&
+          typeName != 'EventChannel' &&
+          typeName != 'BasicMessageChannel') {
+        return;
+      }
+      if (target is SimpleIdentifier &&
+          target.element is LocalVariableElement) {
+        return;
+      }
+      if (_hasWebPlatformCheck(node)) return;
+      reporter.atNode(node.methodName, code);
+    });
   }
+
+  static const Set<String> _invokeNames = <String>{
+    'invokeMethod',
+    'invokeListMethod',
+    'invokeMapMethod',
+  };
 
   bool _hasWebPlatformCheck(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is IfStatement) {
         final String condition = current.expression.toSource();
-        if (_containsPlatformCheck(condition)) {
+        if (_containsPlatformCheck(condition) ||
+            _mentionsWebGetter(current.expression, current)) {
           return true;
         }
       }
@@ -143,11 +188,210 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
       // Only look at statements that precede the target node
       if (stmt.offset >= node.offset) break;
 
-      if (stmt is IfStatement && _isWebExitGuard(stmt)) {
+      if (stmt is IfStatement &&
+          (_isWebExitGuard(stmt) ||
+              _isGetterExitGuard(stmt) ||
+              _isNegatedPlatformExitGuard(stmt) ||
+              _isNullFieldExitGuard(stmt))) {
         return true;
       }
     }
     return false;
+  }
+
+  /// `if (!Platform.isAndroid) return;` — `dart:io` `Platform` is unusable on
+  /// web, so only a non-web platform can pass a negated `Platform.isX` exit.
+  /// Positive `if (Platform.isIOS) return;` is not a guard (web may pass it).
+  bool _isNegatedPlatformExitGuard(IfStatement stmt) {
+    if (!_isEarlyExit(stmt.thenStatement)) return false;
+    bool negatedPlatform(Expression e) {
+      if (e is ParenthesizedExpression) return negatedPlatform(e.expression);
+      if (e is PrefixExpression && e.operator.type == TokenType.BANG) {
+        final Expression o = e.operand;
+        return o is PrefixedIdentifier && o.prefix.name == 'Platform';
+      }
+      // `!a && !b` exits unless both fail; still requires a platform to pass.
+      if (e is BinaryExpression &&
+          e.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+        return negatedPlatform(e.leftOperand) &&
+            negatedPlatform(e.rightOperand);
+      }
+      return false;
+    }
+
+    return negatedPlatform(stmt.expression);
+  }
+
+  /// `if (_channel == null) return;` where `_channel` is a field/getter in
+  /// the same compilation unit whose declaration mentions `kIsWeb` (e.g.
+  /// `kIsWeb ? null : MethodChannel(...)`), so it is null on web.
+  bool _isNullFieldExitGuard(IfStatement stmt) {
+    final Expression expr = stmt.expression;
+    if (expr is! BinaryExpression ||
+        expr.operator.type != TokenType.EQ_EQ ||
+        !_isEarlyExit(stmt.thenStatement)) {
+      return false;
+    }
+    final Expression other;
+    if (expr.rightOperand is NullLiteral) {
+      other = expr.leftOperand;
+    } else if (expr.leftOperand is NullLiteral) {
+      other = expr.rightOperand;
+    } else {
+      return false;
+    }
+    return _mentionsWebGetter(other, stmt);
+  }
+
+  /// `if (!_supported) return;` where `_supported` is a getter in the same
+  /// compilation unit whose body checks `kIsWeb`.
+  bool _isGetterExitGuard(IfStatement stmt) {
+    final Expression expr = stmt.expression;
+    if (expr is! PrefixExpression || expr.operator.type != TokenType.BANG) {
+      return false;
+    }
+    return _mentionsWebGetter(expr.operand, stmt, requireFalseOnWeb: true) &&
+        _isEarlyExit(stmt.thenStatement);
+  }
+
+  /// Whether [expr] is (or contains) a bare identifier naming a getter or
+  /// field in [from]'s compilation unit whose declaration mentions `kIsWeb`.
+  /// With [requireFalseOnWeb], a bare `kIsWeb` mention is not enough: the
+  /// declaration must be false on web (`!kIsWeb && ...`), so `kIsWeb || x`
+  /// does not make `if (!flag) return;` a web guard.
+  bool _mentionsWebGetter(
+    Expression expr,
+    AstNode from, {
+    bool requireFalseOnWeb = false,
+  }) {
+    final CompilationUnit? unit = from.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return false;
+    final Set<String> names = <String>{};
+    expr.accept(_IdentCollector(names));
+    if (names.isEmpty) return false;
+    final List<AstNode> decls = _declarationsNamed(unit, names).toList();
+    if (decls.any(
+      requireFalseOnWeb ? _isFalseOnWebDecl : _mentionsKIsWebToken,
+    )) {
+      return true;
+    }
+    // Scope the flag analysis to the enclosing class so same-named fields in
+    // sibling classes do not mix their assignments.
+    final AstNode root =
+        from.thisOrAncestorOfType<ClassDeclaration>() ??
+        from.thisOrAncestorOfType<MixinDeclaration>() ??
+        unit;
+    return _readsWebSafeFlag(root, decls, names);
+  }
+
+  /// Exact token match (not substring) so `kIsWebFoo` does not count.
+  bool _mentionsKIsWebToken(AstNode n) {
+    for (
+      Token? t = n.beginToken;
+      t != null;
+      t = t == n.endToken ? null : t.next
+    ) {
+      if (t.lexeme == 'kIsWeb') return true;
+    }
+    return false;
+  }
+
+  /// A capability flag: a field (named directly, or read by a named getter)
+  /// that is never `true` on web because every non-`false` assignment sits
+  /// after a web early-exit, e.g. `isSupported => _isSupported ?? false`
+  /// where `_isSupported` is only set after `if (!_isPlatformSupported) return;`.
+  bool _readsWebSafeFlag(AstNode unit, List<AstNode> decls, Set<String> names) {
+    final Set<String> fieldNames = <String>{...names};
+    for (final AstNode d in decls) {
+      if (d is MethodDeclaration) d.body.accept(_IdentCollector(fieldNames));
+    }
+    final List<VariableDeclaration> candidates = <VariableDeclaration>[];
+    final List<AstNode> found = <AstNode>[];
+    unit.accept(_NamedDeclFinder(fieldNames, found));
+    candidates.addAll(found.whereType<VariableDeclaration>());
+    for (final VariableDeclaration field in candidates) {
+      final Expression? init = field.initializer;
+      if (init != null &&
+          init is! NullLiteral &&
+          !(init is BooleanLiteral && !init.value)) {
+        continue;
+      }
+      final List<AssignmentExpression> writes = <AssignmentExpression>[];
+      unit.accept(_AssignmentFinder(field.name.lexeme, writes));
+      if (writes.isNotEmpty && writes.every(_isWebSafeWrite)) return true;
+    }
+    return false;
+  }
+
+  bool _isWebSafeWrite(AssignmentExpression a) {
+    final Expression rhs = a.rightHandSide;
+    if (rhs is BooleanLiteral && !rhs.value) return true;
+    for (AstNode? c = a.parent; c != null; c = c.parent) {
+      if (c is! Block) continue;
+      for (final Statement stmt in c.statements) {
+        if (stmt.offset >= a.offset) break;
+        if (stmt is! IfStatement || !_isEarlyExit(stmt.thenStatement)) continue;
+        if (_isWebExitGuard(stmt)) return true;
+        final Expression e = stmt.expression;
+        if (e is PrefixExpression &&
+            e.operator.type == TokenType.BANG &&
+            _hasKIsWebDecl(stmt, e.operand)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  bool _hasKIsWebDecl(AstNode from, Expression expr) {
+    final CompilationUnit? unit = from.thisOrAncestorOfType<CompilationUnit>();
+    if (unit == null) return false;
+    final Set<String> names = <String>{};
+    expr.accept(_IdentCollector(names));
+    return _declarationsNamed(unit, names).any(_isFalseOnWebDecl);
+  }
+
+  /// Whether a getter/field declaration is false on web: its value expression
+  /// is `!kIsWeb` or an `&&` chain with a `!kIsWeb` conjunct. A bare mention
+  /// (`kIsWeb || x`) says nothing about polarity and does not qualify.
+  bool _isFalseOnWebDecl(AstNode decl) {
+    Expression? value;
+    if (decl is VariableDeclaration) {
+      value = decl.initializer;
+    } else if (decl is MethodDeclaration) {
+      final FunctionBody body = decl.body;
+      if (body is ExpressionFunctionBody) {
+        value = body.expression;
+      } else if (body is BlockFunctionBody &&
+          body.block.statements.length == 1) {
+        final Statement s = body.block.statements.single;
+        if (s is ReturnStatement) value = s.expression;
+      }
+    }
+    return value != null && _impliesNotWeb(value);
+  }
+
+  bool _impliesNotWeb(Expression e) {
+    if (e is ParenthesizedExpression) return _impliesNotWeb(e.expression);
+    if (e is PrefixExpression && e.operator.type == TokenType.BANG) {
+      final Expression o = e.operand;
+      return o is SimpleIdentifier && o.name == 'kIsWeb' ||
+          o is PrefixedIdentifier && o.identifier.name == 'kIsWeb';
+    }
+    if (e is BinaryExpression &&
+        e.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+      return _impliesNotWeb(e.leftOperand) || _impliesNotWeb(e.rightOperand);
+    }
+    return false;
+  }
+
+  Iterable<AstNode> _declarationsNamed(
+    CompilationUnit unit,
+    Set<String> names,
+  ) {
+    final List<AstNode> out = <AstNode>[];
+    unit.accept(_NamedDeclFinder(names, out));
+    return out;
   }
 
   /// Whether [stmt] is an if-statement that exits when running on web.
@@ -219,6 +463,49 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
     return condition.contains('kIsWeb') ||
         condition.contains('Platform.') ||
         condition.contains('defaultTargetPlatform');
+  }
+}
+
+class _IdentCollector extends RecursiveAstVisitor<void> {
+  _IdentCollector(this.names);
+  final Set<String> names;
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    names.add(node.name);
+  }
+}
+
+class _AssignmentFinder extends RecursiveAstVisitor<void> {
+  _AssignmentFinder(this.name, this.out);
+  final String name;
+  final List<AssignmentExpression> out;
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression lhs = node.leftHandSide;
+    final String? target = lhs is SimpleIdentifier
+        ? lhs.name
+        : lhs is PropertyAccess && lhs.target is ThisExpression
+        ? lhs.propertyName.name
+        : null;
+    if (target == name) out.add(node);
+    super.visitAssignmentExpression(node);
+  }
+}
+
+class _NamedDeclFinder extends RecursiveAstVisitor<void> {
+  _NamedDeclFinder(this.names, this.out);
+  final Set<String> names;
+  final List<AstNode> out;
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    if (node.isGetter && names.contains(node.name.lexeme)) out.add(node);
+    super.visitMethodDeclaration(node);
+  }
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    if (names.contains(node.name.lexeme)) out.add(node);
+    super.visitVariableDeclaration(node);
   }
 }
 
@@ -1084,8 +1371,8 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
 
       String? headersSource;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'headers') {
-          headersSource = arg.expression.toSource().toLowerCase();
+        if (arg is NamedArgument && arg.name.lexeme == 'headers') {
+          headersSource = arg.argumentExpression.toSource().toLowerCase();
           break;
         }
       }

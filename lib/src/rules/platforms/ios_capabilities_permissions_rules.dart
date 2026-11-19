@@ -236,9 +236,9 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   /// Extracts the ImageSource from a method invocation's source parameter.
   static _ImageSource _getImageSource(MethodInvocation node) {
     // Look for the 'source' named parameter.
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'source') {
-        final Expression value = arg.expression;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'source') {
+        final Expression value = arg.argumentExpression;
 
         // Check for ImageSource.gallery or ImageSource.camera.
         if (value is PrefixedIdentifier) {
@@ -740,8 +740,11 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
     final filePath = context.filePath;
     final plistChecker = InfoPlistChecker.forFile(filePath);
 
-    // Skip if NSFaceIDUsageDescription is already in Info.plist.
-    if (plistChecker?.hasKey('NSFaceIDUsageDescription') ?? false) {
+    // Skip when the key is present, or when the plist cannot be located at all
+    // (no project root found): the key cannot be verified, so do not report.
+    // A located project with no Info.plist also reports present (hasKey).
+    if (plistChecker == null ||
+        plistChecker.hasKey('NSFaceIDUsageDescription')) {
       return;
     }
 
@@ -966,6 +969,15 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
     'OneSignal',
   };
 
+  static bool _looksLikePushReceiver(Expression? target) {
+    if (target == null) return false;
+    final String src = target.toSource().toLowerCase();
+    return src.contains('messaging') ||
+        src.contains('notification') ||
+        src.contains('push') ||
+        src.contains('fcm');
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -978,6 +990,14 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
 
       final String methodName = node.methodName.name;
       final Expression? target = node.target;
+
+      // `requestPermission` is also the name of location/contacts/audio
+      // permission APIs (e.g. `Geolocator.requestPermission()`); only count
+      // it when the receiver looks like a messaging/notification object.
+      if (methodName == 'requestPermission' &&
+          !_looksLikePushReceiver(target)) {
+        return;
+      }
 
       // Check method name (exact match)
       if (_pushMethodPatterns.contains(methodName) ||

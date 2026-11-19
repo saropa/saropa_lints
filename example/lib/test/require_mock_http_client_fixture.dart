@@ -141,9 +141,9 @@ void _bad2() {
 void _good1() {
   test('fetches user with mock', () async {
     final mockClient = MockClient();
-    when(() => mockClient.get(any())).thenAnswer(
-      (_) async => Response('{"name": "Test"}', 200),
-    );
+    when(
+      () => mockClient.get(any()),
+    ).thenAnswer((_) async => Response('{"name": "Test"}', 200));
     final response = await mockClient.get(Uri.parse('https://example.com'));
     expect(response, isNotNull);
   });

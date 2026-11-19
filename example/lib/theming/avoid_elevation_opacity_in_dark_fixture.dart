@@ -112,10 +112,7 @@ final context = BuildContext();
 // BAD: Should trigger avoid_elevation_opacity_in_dark
 // expect_lint: avoid_elevation_opacity_in_dark
 void _bad1218() {
-  Card(
-    elevation: 8,
-    child: content,
-  );
+  Card(elevation: 8, child: content);
 }
 
 // GOOD: Should NOT trigger avoid_elevation_opacity_in_dark

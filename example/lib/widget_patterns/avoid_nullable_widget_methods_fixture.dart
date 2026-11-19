@@ -137,9 +137,5 @@ Widget _good1443__buildHeader() {
 // Or use conditional rendering directly:
 @override
 Widget build(BuildContext context) {
-  return Column(
-    children: [
-      if (showHeader) const Text('Header'),
-    ],
-  );
+  return Column(children: [if (showHeader) const Text('Header')]);
 }

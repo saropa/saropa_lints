@@ -1,0 +1,37 @@
+# PLAN: Find what really drives analysis-server memory on the 8 GB Mac
+
+Created: 2026-09-19
+Origin: `plans/history/2026.09/2026.09.19/infra_exclusion_audits_miss_claude_worktrees_nested_package_roots.md` (closed: its premise was disproved)
+Related: `plans/ANALYSIS_dev_machine_stability.md`
+
+---
+
+## Question
+
+On 2026-09-18 the `dart language-server` for the contacts workspace reached 6.7 GB on an 8 GB Mac. The closed report blamed `.claude/worktrees` copies. That is ruled out (step 1). What does drive it, and what should saropa_lints tell the user?
+
+---
+
+## Done (2026-09-19, by Claude, read-only on this machine)
+
+1. **Dot-folder probe: worktrees ruled out.** A throwaway package with an error-bearing nested package in `claude/worktrees/w/` and an identical one in `.claude/worktrees/w/` gave, under `dart analyze` (SDK 3.13.3), only the `claude/` error. The analyzer skips dot-folders.
+2. **Heap cap found.** The contacts workspace's `.vscode/settings.json` sets `dart.analyzerVmAdditionalArgs: ["--old_gen_heap_size=6144"]`. The server may grow to about 6 GB of heap before the VM collects hard, which matches the 6.7 GB reading (heap plus VM overhead).
+3. **Live snapshot.** `top` MEM: language server 5.1 GB (PID 63549, up 8.5 h), plus saropa_lints' own `scan_daemon` at 3.1 GB for the same project (`--tier recommended`). Together that is more than the machine's RAM, hence the paging (149k pageouts).
+4. **Worktree count.** Only one worktree (about 1 GB) is under `.claude/worktrees`. The other copies (`contacts-fr`, `-fs`, `-slice1`, `-slice2`) are sibling folders outside the workspace and cost the server nothing.
+
+---
+
+## Remaining steps
+
+| # | Step | Who | Notes |
+|---|---|---|---|
+| 5 | Lower the heap cap in contacts, restart the analysis server, and check whether it settles lower and stays usable | User (via the extension) | Now offered by the startup heap-cap prompt (`d9a00310`), which recommends 3072 MB on this 8 GB Mac and writes to the workspace setting that holds 6144. Needs an extension build containing that commit. If the server hits the cap it slows down or restarts; watch for that. |
+| 6 | Measure the project's real peak: `/usr/bin/time -l dart analyze` in contacts, reading "maximum resident set size" | Claude | Run only when the contacts sessions are idle. The run itself needs a few GB, and running it now would push the machine further into swap. |
+| 7 | Decide whether a resident 3–3.6 GB `scan_daemon` is acceptable on an 8 GB machine | Claude + user | Not a leak. The daemon keeps a warm analyzer for the whole project on purpose; `bin/scan_daemon.dart` records about 3650 MB after prewarm on contacts, and it recycles itself above its ceiling. Contacts is locked to saropa_lints 15.2.12 (`^15.2.4`), so none of v16's memory work is active there, but v16 did not change this warm-daemon cost either. Options: upgrade contacts to v16 (same `analyzer ^12.1.0`, so the analyzer block doesn't apply), shut the daemon down when idle, or skip the daemon when physical RAM is low. |
+| 8 | ~~System Health: warn when the heap cap is above about 50% of physical RAM, and suggest a RAM-based value~~ | Done | `d9a00310`: startup prompt plus dashboard warning, recommending 40% of RAM (2–8 GB), written to the scope that controls the setting. |
+
+## Done when
+
+- Step 6 gives a baseline peak for the project, and step 5 shows whether a lower cap holds under normal editing.
+- Step 7 ends in a decision on the warm daemon for low-RAM machines (and whether contacts moves to v16).
+- ~~Step 8 is filed as a proposal.~~ Shipped instead (`d9a00310`).

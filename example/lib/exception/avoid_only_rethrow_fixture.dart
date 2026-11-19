@@ -120,3 +120,50 @@ void _good365() {
   // Remove the try-catch entirely, or add meaningful handling
   doSomething();
 }
+
+// GOOD: rethrow-only clause shields the exception from a later catch-all.
+void _goodShieldsLaterClause() {
+  try {
+    doSomething();
+  } on FormatException {
+    rethrow;
+  } on Object catch (e) {
+    print(e);
+  }
+}
+
+// BAD: later clause is unrelated, so the rethrow clause is dead code.
+void _badUnrelatedLaterClause() {
+  try {
+    doSomething();
+    // expect_lint: avoid_only_rethrow
+  } on FormatException {
+    rethrow;
+  } on StateError catch (e) {
+    print(e);
+  }
+}
+
+class _KeyStoreException implements Exception {}
+
+// GOOD: custom exception rethrown before an `on Object catch` that wraps it.
+void _goodCustomExceptionBeforeObjectCatch() {
+  try {
+    doSomething();
+  } on _KeyStoreException {
+    rethrow;
+  } on Object catch (error, stack) {
+    print('$error $stack');
+  }
+}
+
+// GOOD: untyped later catch also shields the rethrow-only clause.
+void _goodShieldsUntypedCatch() {
+  try {
+    doSomething();
+  } on _KeyStoreException {
+    rethrow;
+  } catch (e) {
+    print(e);
+  }
+}

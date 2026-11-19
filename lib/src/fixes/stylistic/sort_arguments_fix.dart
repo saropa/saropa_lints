@@ -30,20 +30,20 @@ class SortArgumentsFix extends SaropaFixProducer {
 
     // Separate positional and named arguments
     final positional = <Expression>[];
-    final named = <NamedExpression>[];
+    final named = <NamedArgument>[];
     for (final arg in target.arguments) {
-      if (arg is NamedExpression) {
+      if (arg is NamedArgument) {
         named.add(arg);
       } else {
-        positional.add(arg);
+        positional.add(arg.argumentExpression);
       }
     }
 
     if (named.length < 2) return;
 
     // Sort named arguments alphabetically by name
-    final sortedNamed = List<NamedExpression>.from(named)
-      ..sort((a, b) => a.name.label.name.compareTo(b.name.label.name));
+    final sortedNamed = List<NamedArgument>.from(named)
+      ..sort((a, b) => a.name.lexeme.compareTo(b.name.lexeme));
 
     // Build replacement argument list
     final parts = <String>[

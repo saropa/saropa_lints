@@ -15,6 +15,9 @@ import { clearTestConfig, setTestConfig } from '../vscode-mock';
 describe('VibrancyStateManager', () => {
     let manager: VibrancyStateManager;
     let contextValues: Record<string, any> = {};
+    // Saved so the override below can be undone: leaking it breaks every later
+    // suite that dispatches through vscode.commands.executeCommand.
+    const originalExecuteCommand = vscode.commands.executeCommand;
 
     beforeEach(() => {
         clearTestConfig();
@@ -28,6 +31,7 @@ describe('VibrancyStateManager', () => {
     });
 
     afterEach(() => {
+        (vscode.commands as any).executeCommand = originalExecuteCommand;
         manager.dispose();
         clearTestConfig();
     });

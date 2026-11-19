@@ -12,7 +12,7 @@ import { KnownIssue } from '../../../vibrancy/types';
 
 // Dep-graph fixtures: shared deps, risk flags, and transitive rollups.
 const fixturesDir = path.join(
-    __dirname, '..', '..', '..', 'src', 'test', 'fixtures',
+    __dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures',
 );
 const FIXTURE_PATH = path.join(fixturesDir, 'pub-deps.json');
 

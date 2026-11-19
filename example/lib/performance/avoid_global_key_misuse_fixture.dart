@@ -126,7 +126,5 @@ void _good791() {
   final _formKey = GlobalKey<FormState>();
 
   // Use ObjectKey or ValueKey for list items
-  ListView.builder(
-    itemBuilder: (_, i) => ListTile(key: ValueKey(items[i].id)),
-  );
+  ListView.builder(itemBuilder: (_, i) => ListTile(key: ValueKey(items[i].id)));
 }

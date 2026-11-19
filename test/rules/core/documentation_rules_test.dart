@@ -86,7 +86,7 @@ void main() {
     );
     testRule(
       'DeprecatedNewInCommentReferenceRule',
-      'deprecated_new_in_comment_reference',
+      'deprecated_new_in_comment_reference_extended',
       () => DeprecatedNewInCommentReferenceRule(),
     );
   });

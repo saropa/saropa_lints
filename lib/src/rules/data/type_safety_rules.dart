@@ -270,13 +270,9 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
       expression.propertyName.name == 'parentData';
 
   String? _parameterName(FormalParameter parameter) {
-    if (parameter is SimpleFormalParameter) return parameter.name?.lexeme;
-    if (parameter is DefaultFormalParameter) {
-      return _parameterName(parameter.parameter);
-    }
+    if (parameter is RegularFormalParameter) return parameter.name?.lexeme;
     if (parameter is FieldFormalParameter) return parameter.name.lexeme;
     if (parameter is SuperFormalParameter) return parameter.name.lexeme;
-    if (parameter is FunctionTypedFormalParameter) return parameter.name.lexeme;
     return null;
   }
 
@@ -389,11 +385,11 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
     final String encodingArgName = propertyName == 'stdout'
         ? 'stdoutEncoding'
         : 'stderrEncoding';
-    for (final Expression arg in call.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == encodingArgName) {
+    for (final Argument arg in call.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == encodingArgName) {
         // Explicit `null` opts out of decoding — output stays raw bytes,
         // so the cast really can throw. Any other value still decodes.
-        return arg.expression is! NullLiteral;
+        return arg.argumentExpression is! NullLiteral;
       }
     }
     // Argument omitted entirely: the SDK default (systemEncoding) still
@@ -589,16 +585,7 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
       if (params == null) return;
 
       for (final FormalParameter param in params.parameters) {
-        if (param is DefaultFormalParameter) {
-          final NormalFormalParameter normalParam = param.parameter;
-          if (normalParam.covariantKeyword != null) {
-            // Check if method has documentation
-            final Comment? doc = node.documentationComment;
-            if (doc == null) {
-              reporter.atNode(param);
-            }
-          }
-        } else if (param.covariantKeyword != null) {
+        if (param.covariantKeyword != null) {
           final Comment? doc = node.documentationComment;
           if (doc == null) {
             reporter.atNode(param);
@@ -1433,8 +1420,50 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
       // Check if inside null check conditional
       if (_hasNullCheckGuard(node)) return;
 
+      // `m['k'] is T ? m['k'] as T : x` — the `is` test guards the cast.
+      if (_isGuardedByConditional(node, expression.toSource())) return;
+
+      // `m['k'] = v;` earlier in the same block — key is known present.
+      if (_isKeyAssignedEarlier(node, expression.toSource())) return;
+
       reporter.atNode(node);
     });
+  }
+
+  bool _isGuardedByConditional(AsExpression node, String indexSource) {
+    AstNode child = node;
+    AstNode? current = node.parent;
+    while (current != null && current is! Statement) {
+      if (current is ConditionalExpression &&
+          identical(current.thenExpression, child) &&
+          RegExp(
+            '${RegExp.escape(indexSource)} is '
+            '${RegExp.escape(node.type.toSource())}(?![\\w?])',
+          ).hasMatch(current.condition.toSource())) {
+        return true;
+      }
+      child = current;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _isKeyAssignedEarlier(AsExpression node, String indexSource) {
+    final Statement? statement = node.thisOrAncestorOfType<Statement>();
+    final AstNode? block = statement?.parent;
+    if (statement == null || block is! Block) return false;
+    for (final Statement prior in block.statements) {
+      if (identical(prior, statement)) break;
+      if (prior is! ExpressionStatement) continue;
+      final Expression e = prior.expression;
+      if (e is AssignmentExpression &&
+          e.operator.lexeme == '=' &&
+          e.leftHandSide.toSource() == indexSource &&
+          e.rightHandSide is! NullLiteral) {
+        return true;
+      }
+    }
+    return false;
   }
 
   bool _hasNullCheckGuard(AstNode node) {
@@ -1629,8 +1658,8 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
             RegExp(r'\.values\b').hasMatch(target.toSource())) {
           // Check if has orElse parameter
           bool hasOrElse = false;
-          for (final Expression arg in node.argumentList.arguments) {
-            if (arg is NamedExpression && arg.name.label.name == 'orElse') {
+          for (final Argument arg in node.argumentList.arguments) {
+            if (arg is NamedArgument && arg.name.lexeme == 'orElse') {
               hasOrElse = true;
               break;
             }
@@ -1739,15 +1768,15 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
       if (typeName != 'TextFormField') return;
 
       // Find validator argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'validator') {
-          final Expression validatorExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'validator') {
+          final Expression validatorExpr = arg.argumentExpression;
 
           // Check function expression validators
           if (validatorExpr is FunctionExpression) {
             final FunctionBody body = validatorExpr.body;
             if (!_hasNullReturn(body)) {
-              reporter.atNode(arg.name, code);
+              reporter.atToken(arg.name, code);
             }
           }
         }

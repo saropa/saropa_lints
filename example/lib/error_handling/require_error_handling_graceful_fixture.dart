@@ -5,9 +5,9 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: raw exception in UI — expect_lint: require_error_handling_graceful
 void badShowError(BuildContext context, Object e) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(e.toString())),
-  );
+  ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(SnackBar(content: Text(e.toString())));
 }
 
 // GOOD: friendly message

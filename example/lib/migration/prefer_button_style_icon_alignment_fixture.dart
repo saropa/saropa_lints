@@ -68,10 +68,7 @@ Widget _goodStyleFrom() {
 
 // GOOD: No iconAlignment parameter at all
 Widget _goodNoIconAlignment() {
-  return ElevatedButton(
-    onPressed: () {},
-    child: const Text('Button'),
-  );
+  return ElevatedButton(onPressed: () {}, child: const Text('Button'));
 }
 
 // FALSE POSITIVE: iconAlignment in a map literal

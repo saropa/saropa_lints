@@ -136,8 +136,8 @@ final _allowedExportDestinationsRedirect = {'clipboard', 'notes'};
 void goodAllowlistValidatedDestination(String destination) {
   final validatedDestination =
       _allowedExportDestinationsRedirect.contains(destination)
-          ? destination
-          : null;
+      ? destination
+      : null;
   push('/', exportDestination: validatedDestination);
 }
 

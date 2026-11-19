@@ -36,6 +36,14 @@ export interface RuleMetadataData {
   correction?: string;
   /** Rule-level OWASP mapping, same shape/source as `Violation.owasp`. */
   owasp?: OwaspData;
+  /**
+   * Rule-level problem text (`LintCode.problemMessage`) — the same text a live
+   * diagnostic shows. Lets the Rule Explain panel render a "Problem" section
+   * when opened by rule name alone, with no violation to read it from.
+   */
+  problemMessage?: string;
+  /** Rule-level `LintImpact` name (error/warning/info). */
+  impact?: string;
 }
 
 export interface Violation {

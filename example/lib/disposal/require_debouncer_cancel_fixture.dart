@@ -116,7 +116,7 @@ class _bad332__SearchState extends State<Search> {
       performSearch(query);
     });
   }
-// Missing cancel in dispose!
+  // Missing cancel in dispose!
 }
 
 // GOOD: Should NOT trigger require_debouncer_cancel
@@ -139,7 +139,8 @@ class _good332__SearchState extends State<Search> {
 
 // GOOD: Regression for State with mixin — dispose() has _debounce?.cancel();
 // must NOT trigger require_debouncer_cancel (bug: false positive when using mixin)
-class _goodDebouncerWithMixinState extends State<Search> with WidgetsBindingObserver {
+class _goodDebouncerWithMixinState extends State<Search>
+    with WidgetsBindingObserver {
   Timer? _debounce;
 
   @override
@@ -158,7 +159,8 @@ class _goodDebouncerWithMixinState extends State<Search> with WidgetsBindingObse
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       _debounce?.cancel();
       _debounce = null;
     }

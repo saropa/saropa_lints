@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 // ignore_for_file: avoid_print
 
 /// Project Health CLI — size scan increment.
@@ -116,7 +117,10 @@ Future<void> main(List<String> args) async {
   // engine new enough to emit progress at all (a published CLI predating
   // this feature emits no 'meta' event, which is itself the "legacy" signal).
   if (progress != null) {
-    _emitEvent(<String, Object?>{'event': 'meta', 'version': saropaLintsVersion});
+    _emitEvent(<String, Object?>{
+      'event': 'meta',
+      'version': saropaLintsVersion,
+    });
   }
 
   final shard = File(p.join(outputDir, 'files.ndjson')).openWrite();

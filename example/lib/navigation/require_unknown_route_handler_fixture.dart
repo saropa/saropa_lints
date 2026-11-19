@@ -111,9 +111,7 @@ dynamic builder;
 // expect_lint: require_unknown_route_handler
 void _bad501() {
   MaterialApp(
-    routes: {
-      '/home': (_) => HomePage(),
-    },
+    routes: {'/home': (_) => HomePage()},
     // Missing onUnknownRoute - app crashes on unknown routes!
   );
 }
@@ -121,11 +119,8 @@ void _bad501() {
 // GOOD: Should NOT trigger require_unknown_route_handler
 void _good501() {
   MaterialApp(
-    routes: {
-      '/home': (_) => HomePage(),
-    },
-    onUnknownRoute: (settings) => MaterialPageRoute(
-      builder: (_) => NotFoundPage(),
-    ),
+    routes: {'/home': (_) => HomePage()},
+    onUnknownRoute: (settings) =>
+        MaterialPageRoute(builder: (_) => NotFoundPage()),
   );
 }

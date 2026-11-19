@@ -162,7 +162,8 @@ class _BadNestedStreamWidgetState extends State<BadNestedStreamWidget> {
 // BAD: double-call — getStream()() parses as FunctionExpressionInvocation,
 // not MethodInvocation, since the parser can't resolve getStream() as an
 // identifier target once it's already been invoked once.
-Stream<int> Function() _getStreamFactory() => () => Stream.value(1);
+Stream<int> Function() _getStreamFactory() =>
+    () => Stream.value(1);
 
 class BadFunctionExpressionInvocationWidget extends StatelessWidget {
   @override

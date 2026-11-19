@@ -115,7 +115,7 @@ class _bad334__FileReaderState extends State<FileReader> {
   Future<void> openFile() async {
     _file = await File('path').open();
   }
-// Missing close!
+  // Missing close!
 }
 
 // GOOD: Should NOT trigger require_file_handle_close

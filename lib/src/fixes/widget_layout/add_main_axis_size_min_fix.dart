@@ -30,7 +30,7 @@ class AddMainAxisSizeMinFix extends SaropaFixProducer {
     final ice = parent;
 
     for (final arg in ice.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'mainAxisSize') {
+      if (arg is NamedArgument && arg.name.lexeme == 'mainAxisSize') {
         return;
       }
     }

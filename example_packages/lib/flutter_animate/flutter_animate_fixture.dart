@@ -60,10 +60,7 @@ class Animate extends Widget {
 /// Stub for `AnimateList` widget.
 class AnimateList extends Widget {
   // ignore: avoid_unused_constructor_parameters
-  const AnimateList({
-    List<Widget> children = const [],
-    Key? key,
-  });
+  const AnimateList({List<Widget> children = const [], Key? key});
 }
 
 extension AnimateExtension on Widget {
@@ -76,8 +73,7 @@ extension AnimateExtension on Widget {
     double? value,
     void Function(AnimationController)? onPlay,
     Key? key,
-  }) =>
-      Animate();
+  }) => Animate();
 }
 
 extension AnimateListExtension on List<Widget> {
@@ -161,20 +157,16 @@ void goodRestartFalse() {
 
 // BAD: Animate in Column children — no key.
 // expect_lint: flutter_animate_no_key_in_list
-final badNoKeyInList = Column(children: [
-  _myWidget.animate().fade(),
-]);
+final badNoKeyInList = Column(children: [_myWidget.animate().fade()]);
 
 // BAD: Animate constructor in Row children — no key.
 // expect_lint: flutter_animate_no_key_in_list
-final badAnimateCtorNoKey = Row(children: [
-  Animate(child: _myWidget),
-]);
+final badAnimateCtorNoKey = Row(children: [Animate(child: _myWidget)]);
 
 // GOOD: key present on the .animate() call.
-final goodKeyOnAnimate = Column(children: [
-  _myWidget.animate(key: const ValueKey('a')).fade(),
-]);
+final goodKeyOnAnimate = Column(
+  children: [_myWidget.animate(key: const ValueKey('a')).fade()],
+);
 
 // ---------------------------------------------------------------------------
 // 4. flutter_animate_empty_animate_list
@@ -212,8 +204,9 @@ final badTargetNegative = _myWidget.animate(target: -1.0).fade();
 
 // GOOD: target is a conditional expression.
 bool _isActive = false;
-final goodTargetConditional =
-    _myWidget.animate(target: _isActive ? 1.0 : 0.0).fade();
+final goodTargetConditional = _myWidget
+    .animate(target: _isActive ? 1.0 : 0.0)
+    .fade();
 
 // GOOD: target is a variable.
 double _targetValue = 0.5;
@@ -229,12 +222,14 @@ final badAutoPlayFalseNoDriver = _myWidget.animate(autoPlay: false).fade();
 
 // GOOD: autoPlay: false with a controller.
 final _ctrl = AnimationController();
-final goodAutoPlayFalseWithController =
-    _myWidget.animate(autoPlay: false, controller: _ctrl).fade();
+final goodAutoPlayFalseWithController = _myWidget
+    .animate(autoPlay: false, controller: _ctrl)
+    .fade();
 
 // GOOD: autoPlay: false with a target.
-final goodAutoPlayFalseWithTarget =
-    _myWidget.animate(autoPlay: false, target: _isActive ? 1.0 : 0.0).fade();
+final goodAutoPlayFalseWithTarget = _myWidget
+    .animate(autoPlay: false, target: _isActive ? 1.0 : 0.0)
+    .fade();
 
 // GOOD: autoPlay: true (default) — not flagged.
 final goodAutoPlayTrue = _myWidget.animate().fade();

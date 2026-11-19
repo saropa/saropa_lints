@@ -126,9 +126,7 @@ void _bad6() {
 void _good6() {
   Column(
     children: [
-      MergeSemantics(
-        child: Row(children: [Text('Price:'), Text('\$99.99')]),
-      ),
+      MergeSemantics(child: Row(children: [Text('Price:'), Text('\$99.99')])),
       ElevatedButton(onPressed: () {}, child: Text('Buy')),
     ],
   );

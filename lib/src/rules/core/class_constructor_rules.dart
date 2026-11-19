@@ -1138,7 +1138,11 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
       if (params.isEmpty) return;
       final repParam = params.first;
       final String repFieldName = repParam.name?.lexeme ?? '';
-      final repType = repParam is SimpleFormalParameter ? repParam.type : null;
+      final repType =
+          repParam is RegularFormalParameter &&
+              repParam.functionTypedSuffix == null
+          ? repParam.type
+          : null;
       final String repTypeSource = (repType?.toSource() ?? '')
           .replaceAll(RegExp(r'\s+'), ' ')
           .trim();
@@ -1927,10 +1931,7 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
         if (param is FieldFormalParameter) continue;
         if (param is SuperFormalParameter) continue;
 
-        // Get the actual parameter (unwrap DefaultFormalParameter)
-        final FormalParameter actual = param is DefaultFormalParameter
-            ? param.parameter
-            : param;
+        final FormalParameter actual = param;
         if (actual is FieldFormalParameter) continue;
         if (actual is SuperFormalParameter) continue;
 
@@ -1948,8 +1949,7 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
   }
 
   static String? _paramName(FormalParameter param) {
-    if (param is SimpleFormalParameter) return param.name?.lexeme;
-    if (param is FunctionTypedFormalParameter) return param.name.lexeme;
+    if (param is RegularFormalParameter) return param.name?.lexeme;
     return null;
   }
 }
@@ -2286,12 +2286,10 @@ class PreferAssertsInInitializerListsRule extends SaropaLintRule {
   static Set<String> _constructorParamNames(ConstructorDeclaration node) {
     final Set<String> names = <String>{};
     for (final FormalParameter p in node.parameters.parameters) {
-      final FormalParameter inner = p is DefaultFormalParameter
-          ? p.parameter
-          : p;
+      final FormalParameter inner = p;
       if (inner is FieldFormalParameter && inner.name.lexeme.isNotEmpty) {
         names.add(inner.name.lexeme);
-      } else if (inner is SimpleFormalParameter) {
+      } else if (inner is RegularFormalParameter) {
         final name = inner.name;
         if (name != null) names.add(name.lexeme);
       }
@@ -2536,11 +2534,10 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
   /// True if any parameter is a function type (const constructor impossible).
   static bool _constructorHasFunctionTypeParam(ConstructorDeclaration node) {
     for (final FormalParameter p in node.parameters.parameters) {
-      final FormalParameter param = p is DefaultFormalParameter
-          ? p.parameter
-          : p;
+      final FormalParameter param = p;
       TypeAnnotation? type;
-      if (param is SimpleFormalParameter) {
+      if (param is RegularFormalParameter &&
+          param.functionTypedSuffix == null) {
         type = param.type;
       } else if (param is FieldFormalParameter) {
         type = param.type;
@@ -2570,8 +2567,8 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
       if (init is ConstructorFieldInitializer) {
         if (_expressionIsNonConst(init.expression)) return true;
       } else if (init is SuperConstructorInvocation) {
-        for (final Expression arg in init.argumentList.arguments) {
-          if (_expressionIsNonConst(arg)) return true;
+        for (final Argument arg in init.argumentList.arguments) {
+          if (_expressionIsNonConst(arg.argumentExpression)) return true;
         }
       }
     }

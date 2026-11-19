@@ -120,7 +120,7 @@ class _bad335__MyWidgetState extends State<MyWidget> {
     _subscription = stream.listen((_) {});
     _timer = Timer.periodic(Duration(seconds: 1), (_) {});
   }
-// Missing dispose() - all resources leak!
+  // Missing dispose() - all resources leak!
 }
 
 // GOOD: Should NOT trigger require_dispose_implementation

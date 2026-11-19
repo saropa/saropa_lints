@@ -129,8 +129,5 @@ void _good16() {
     ),
   );
   // Or use Tooltip which handles both:
-  Tooltip(
-    message: 'Information',
-    child: Icon(Icons.info),
-  );
+  Tooltip(message: 'Information', child: Icon(Icons.info));
 }

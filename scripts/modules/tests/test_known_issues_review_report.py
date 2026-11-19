@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
@@ -85,6 +86,100 @@ class TestReviewReportFromFetched(unittest.TestCase):
             [(e.name, e.tier) for e in report.entries],
             [("pkgHigh", "high"), ("pkgMedium", "medium"), ("pkgLow", "low")],
         )
+
+
+class TestRecentlyVerifiedSkip(unittest.TestCase):
+    TODAY = date(2026, 11, 10)
+
+    def _run(self, status: str, verified: str | None, **extra: str) -> object:
+        from scripts.modules._known_issues_review_report import (
+            _review_report_from_fetched,
+        )
+
+        issue = {
+            "name": "pkg",
+            "status": status,
+            "reason": "Requires paid license",
+            "lastUpdated": "2026-01-01",
+            "_actual_published": "2026-06-01",
+            "_actual_version": "1.0.0",
+            "_is_discontinued": False,
+        }
+        issue.update(extra)
+        if verified is not None:
+            issue["reasonVerified"] = verified
+        return _review_report_from_fetched(
+            [issue], 0, checked_count=1, today=self.TODAY
+        )
+
+    def test_recent_reason_verified_low_entry_skipped(self) -> None:
+        r = self._run("commercial", "2026-09-19")
+        self.assertEqual(r.entries, [])
+        self.assertEqual(r.skipped_recently_verified_count, 1)
+
+    def test_old_reason_verified_low_entry_listed(self) -> None:
+        self.assertEqual(len(self._run("commercial", "2026-01-01").entries), 1)
+
+    def test_missing_or_bad_reason_verified_listed(self) -> None:
+        self.assertEqual(len(self._run("commercial", None).entries), 1)
+        self.assertEqual(len(self._run("commercial", "garbage").entries), 1)
+
+    def test_future_reason_verified_listed(self) -> None:
+        self.assertEqual(len(self._run("commercial", "2026-12-01").entries), 1)
+
+    def test_exact_183_day_boundary(self) -> None:
+        # 2026-11-10 minus 182 days = 2026-05-12 (skipped); 183 days = 05-11.
+        self.assertEqual(self._run("commercial", "2026-05-12").entries, [])
+        self.assertEqual(len(self._run("commercial", "2026-05-11").entries), 1)
+
+    def test_recent_as_of_without_reason_verified_listed(self) -> None:
+        r = self._run("commercial", None, as_of="2026-11-01")
+        self.assertEqual(len(r.entries), 1)
+
+    def test_lifecycle_entry_verified_after_latest_release_skipped(self) -> None:
+        # Latest release 2026-06-01; verified 2026-09-19 (after it).
+        r = self._run("end_of_life", "2026-09-19")
+        self.assertEqual(r.entries, [])
+        self.assertEqual(r.skipped_recently_verified_count, 1)
+
+    def test_lifecycle_entry_verified_before_latest_release_listed(self) -> None:
+        self.assertEqual(len(self._run("end_of_life", "2026-05-31").entries), 1)
+
+    def test_lifecycle_entry_verified_on_release_date_skipped(self) -> None:
+        self.assertEqual(self._run("end_of_life", "2026-06-01").entries, [])
+
+    def test_lifecycle_entry_future_verified_listed(self) -> None:
+        self.assertEqual(len(self._run("end_of_life", "2026-12-01").entries), 1)
+
+    def test_low_entry_outside_window_skipped_only_by_release_rule(self) -> None:
+        # Release (2026-04-01) is after lastUpdated, so the entry is outgrown;
+        # verified 2026-04-02 is outside the 183-day window (run 2026-11-10),
+        # so only the verified-after-release rule can skip it.
+        r = self._run(
+            "commercial", "2026-04-02", _actual_published="2026-04-01"
+        )
+        self.assertEqual(r.entries, [])
+        self.assertEqual(r.skipped_recently_verified_count, 1)
+
+
+class TestZeroEntriesWritesNoFile(unittest.TestCase):
+    def test_generator_write_with_no_entries_creates_no_file(self) -> None:
+        from scripts.generators import generate_known_issues_review as gen
+        from scripts.modules._known_issues_review_report import (
+            KnownIssuesReviewReport,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            fake_file = Path(tmp) / "scripts" / "generators" / "gen.py"
+            fake_file.parent.mkdir(parents=True)
+            with patch.object(
+                gen, "build_known_issues_review_report",
+                return_value=KnownIssuesReviewReport(checked_count=3),
+            ), patch.object(gen, "__file__", str(fake_file)), patch(
+                "sys.argv", ["gen", "--write"]
+            ):
+                self.assertEqual(gen.main(), 0)
+            self.assertFalse((Path(tmp) / "bugs").exists())
 
 
 class TestRunKnownIssuesChecksSharesOneFetch(unittest.TestCase):
@@ -258,6 +353,21 @@ class TestRenderMarkdown(unittest.TestCase):
         self.assertIn("LOW confidence", markdown)
         self.assertIn("pkgA", markdown)
         self.assertIn("_None._", markdown)  # medium/low sections are empty
+
+
+class ReviewReportPathTests(unittest.TestCase):
+    def test_valid_date_used(self) -> None:
+        from scripts.modules._known_issues_review_report import review_report_path
+
+        path = review_report_path(Path("/p"), "2026-08-18")
+        self.assertEqual(path, Path("/p/reports/known_issues_review/2026-08-18_known_issues_review_queue.md"))
+
+    def test_invalid_or_missing_date_falls_back_to_today(self) -> None:
+        from scripts.modules._known_issues_review_report import review_report_path
+
+        expected = f"{date.today().isoformat()}_known_issues_review_queue.md"
+        self.assertEqual(review_report_path(Path("/p"), "(not a date)").name, expected)
+        self.assertEqual(review_report_path(Path("/p")).name, expected)
 
 
 if __name__ == "__main__":

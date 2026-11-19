@@ -98,9 +98,9 @@ class PreferImageFilterQualityMediumRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    void reportNamed(NamedExpression? named) {
+    void reportNamed(NamedArgument? named) {
       if (named == null) return;
-      reporter.atNode(named.name);
+      reporter.atToken(named.name);
     }
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {

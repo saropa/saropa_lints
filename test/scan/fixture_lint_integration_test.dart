@@ -141,7 +141,6 @@ void main() {
         'abi_specific_integer_invalid',
         'abstract_field_initializer',
         'conflicting_constructor_and_static_member',
-        'deprecated_new_in_comment_reference',
         'duplicate_field_name',
         'external_with_initializer',
         'field_initializer_redirecting_constructor',
@@ -419,9 +418,9 @@ void main() {
 
         expect(
           fixtureViolations.length,
-          equals(1),
+          equals(2),
           reason:
-              'Fixture has one BAD string concat line and GOOD numeric += '
+              'Fixture has two BAD string concat lines and GOOD numeric += '
               'accumulation that must not trigger; got '
               '${fixtureViolations.length}',
         );

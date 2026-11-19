@@ -32,10 +32,7 @@ void preferCsrfBad(String sessionCookie) {
 void preferCsrfGood(String sessionCookie, String csrfToken) {
   http.post(
     Uri.parse('https://api.example.com/transfer'),
-    headers: {
-      'Cookie': sessionCookie,
-      'X-CSRF-Token': csrfToken,
-    },
+    headers: {'Cookie': sessionCookie, 'X-CSRF-Token': csrfToken},
     body: '{}',
   );
 }
@@ -46,8 +43,12 @@ void preferCsrfGood(String sessionCookie, String csrfToken) {
 
 // -----------------------------------------------------------------------------
 // prefer_sqflite_encryption — sqflite + sensitive path, no sqlcipher
-Future<void> preferSqfliteEncryptionBad(dynamic openDatabase, dynamic join,
-    dynamic getDatabasesPath, String createTable) async {
+Future<void> preferSqfliteEncryptionBad(
+  dynamic openDatabase,
+  dynamic join,
+  dynamic getDatabasesPath,
+  String createTable,
+) async {
   await openDatabase(
     join(await getDatabasesPath(), 'user_accounts.db'), // LINT: sensitive name
     version: 1,
@@ -58,12 +59,18 @@ Future<void> preferSqfliteEncryptionBad(dynamic openDatabase, dynamic join,
 // -----------------------------------------------------------------------------
 // require_conflict_resolution_strategy — sync method overwrites without check
 Future<void> requireConflictResolutionBad(
-    dynamic api, dynamic box, List<dynamic> remote) async {
+  dynamic api,
+  dynamic box,
+  List<dynamic> remote,
+) async {
   await api.put('/items/1', {}); // LINT: no updatedAt/version check
 }
 
 Future<void> requireConflictResolutionGood(
-    dynamic api, dynamic localItem, dynamic remoteItem) async {
+  dynamic api,
+  dynamic localItem,
+  dynamic remoteItem,
+) async {
   if (localItem.updatedAt.isAfter(remoteItem.updatedAt)) {
     await api.put('/items/${localItem.id}', localItem.toJson());
   }
@@ -99,12 +106,16 @@ Future<void> requireConnectivityTimeoutGood() async {
 // -----------------------------------------------------------------------------
 // require_input_validation — .text in API body without trim/validate
 Future<void> requireInputValidationBad(
-    dynamic api, dynamic nameController) async {
+  dynamic api,
+  dynamic nameController,
+) async {
   await api.post('/users', body: {'name': nameController.text}); // LINT
 }
 
 Future<void> requireInputValidationGood(
-    dynamic api, dynamic nameController) async {
+  dynamic api,
+  dynamic nameController,
+) async {
   final name = nameController.text.trim();
   if (name.isEmpty) return;
   await api.post('/users', body: {'name': name});

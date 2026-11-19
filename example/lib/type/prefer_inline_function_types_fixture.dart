@@ -7,4 +7,5 @@ typedef Predicate = bool Function(int);
 void f(Predicate p) {}
 
 // OK: inline type at use site (or typedef for non-function)
-bool Function(int) g() => (x) => x > 0;
+bool Function(int) g() =>
+    (x) => x > 0;

@@ -408,7 +408,7 @@ export class VibrancyTreeProvider implements vscode.TreeDataProvider<TreeNode> {
         if (result.category === 'end-of-life' || result.category === 'abandoned') {
             return 'high';
         }
-        if (result.category === 'outdated') { return 'medium'; }
+        if (result.category === 'outdated' || result.category === 'upgrade-required') { return 'medium'; }
         return 'healthy';
     }
 

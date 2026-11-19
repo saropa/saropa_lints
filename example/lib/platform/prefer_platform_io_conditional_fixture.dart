@@ -121,7 +121,11 @@ void _bad827() {
 // GOOD: Should NOT trigger prefer_platform_io_conditional
 void _good827() {
   if (!kIsWeb) {
-    if (Platform.isAndroid) {/* Android code */}
-    if (Platform.isIOS) {/* iOS code */}
+    if (Platform.isAndroid) {
+      /* Android code */
+    }
+    if (Platform.isIOS) {
+      /* iOS code */
+    }
   }
 }

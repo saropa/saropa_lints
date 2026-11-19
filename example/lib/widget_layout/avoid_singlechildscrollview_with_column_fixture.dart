@@ -122,7 +122,5 @@ void _bad1299() {
 
 // GOOD: Should NOT trigger avoid_singlechildscrollview_with_column
 void _good1299() {
-  ListView(
-    children: [],
-  );
+  ListView(children: []);
 }

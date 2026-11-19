@@ -124,12 +124,6 @@ void _bad1326() {
 // GOOD: Should NOT trigger prefer_safe_area_aware
 void _good1326() {
   Scaffold(
-    body: SafeArea(
-      child: Column(
-        children: [
-          Text('Title'),
-        ],
-      ),
-    ),
+    body: SafeArea(child: Column(children: [Text('Title')])),
   );
 }

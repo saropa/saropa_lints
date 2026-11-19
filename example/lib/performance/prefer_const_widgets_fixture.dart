@@ -117,7 +117,5 @@ void _bad795() {
 
 // GOOD: Should NOT trigger prefer_const_widgets
 void _good795() {
-  Container(
-    child: const Text('Hello'),
-  );
+  Container(child: const Text('Hello'));
 }

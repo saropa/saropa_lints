@@ -30,6 +30,52 @@ bool containsAwait(AstNode node) {
   return found;
 }
 
+/// True when [statement] is an `if` whose awaits all sit in branches that
+/// always exit (return/throw), so no await can have run on any path that
+/// continues past the `if`. The condition itself must not contain an await.
+bool awaitConfinedToExitingBranches(Statement statement) {
+  if (statement is! IfStatement) return false;
+  // containsAwait scans children only, so test the node itself as well.
+  if (statement.expression is AwaitExpression ||
+      containsAwait(statement.expression)) {
+    return false;
+  }
+
+  bool ok(Statement? branch) =>
+      branch == null || !containsAwait(branch) || _alwaysExits(branch);
+
+  return ok(statement.thenStatement) && ok(statement.elseStatement);
+}
+
+bool _alwaysExits(Statement statement) {
+  if (statement is ReturnStatement) return true;
+  if (statement is ExpressionStatement) {
+    return statement.expression is ThrowExpression;
+  }
+  if (statement is Block) {
+    return statement.statements.isNotEmpty &&
+        _alwaysExits(statement.statements.last);
+  }
+  if (statement is IfStatement) {
+    final Statement? other = statement.elseStatement;
+    return other != null &&
+        _alwaysExits(statement.thenStatement) &&
+        _alwaysExits(other);
+  }
+  return false;
+}
+
+/// True for `someMap.remove(key)`: its static type is the stored value type
+/// (e.g. `Future<V>?`), but no Future is created, so fire-and-forget rules
+/// must not treat the statement as a dropped Future.
+bool isMapRemoveCall(MethodInvocation node) {
+  if (node.methodName.name != 'remove') return false;
+  final DartType? targetType = node.realTarget?.staticType;
+  if (targetType is! InterfaceType) return false;
+  return targetType.isDartCoreMap ||
+      targetType.allSupertypes.any((InterfaceType t) => t.isDartCoreMap);
+}
+
 /// Checks if expression is `mounted`, `this.mounted`, or `context.mounted`.
 ///
 /// Uses proper AST type checking instead of string matching to avoid
@@ -176,16 +222,12 @@ bool hasAncestorMountedCheck(AstNode node) {
 /// Returns true for `BuildContext`, `BuildContext?`, or any type containing
 /// `BuildContext` (e.g., generic types).
 bool isBuildContextParam(FormalParameter param) {
-  if (param is SimpleFormalParameter) {
+  if (param is RegularFormalParameter) {
     final typeSource = param.type?.toSource();
     if (typeSource == null) return false;
     return typeSource == 'BuildContext' ||
         typeSource == 'BuildContext?' ||
         typeSource.contains('BuildContext');
-  }
-
-  if (param is DefaultFormalParameter) {
-    return isBuildContextParam(param.parameter);
   }
 
   return false;
@@ -196,7 +238,7 @@ bool isBuildContextParam(FormalParameter param) {
 /// Useful for tracking context parameter names in static methods where
 /// the parameter might not be named 'context'.
 String? getBuildContextParamName(FormalParameter param) {
-  if (param is SimpleFormalParameter) {
+  if (param is RegularFormalParameter) {
     final typeSource = param.type?.toSource();
     if (typeSource == null) return null;
     if (typeSource == 'BuildContext' ||
@@ -204,10 +246,6 @@ String? getBuildContextParamName(FormalParameter param) {
         typeSource.contains('BuildContext')) {
       return param.name?.lexeme;
     }
-  }
-
-  if (param is DefaultFormalParameter) {
-    return getBuildContextParamName(param.parameter);
   }
 
   return null;

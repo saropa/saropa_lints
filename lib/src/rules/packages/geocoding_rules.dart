@@ -631,9 +631,9 @@ class GeocodingCallInTextFieldListenerRule extends SaropaLintRule {
   bool _isTextFieldCallback(FunctionExpression closure) {
     final AstNode? parent = closure.parent;
     // onChanged: (q) { ... }
-    if (parent is NamedExpression &&
-        (parent.name.label.name == 'onChanged' ||
-            parent.name.label.name == 'onFieldSubmitted')) {
+    if (parent is NamedArgument &&
+        (parent.name.lexeme == 'onChanged' ||
+            parent.name.lexeme == 'onFieldSubmitted')) {
       return true;
     }
     // controller.addListener(() { ... })
@@ -704,9 +704,8 @@ class GeocodingDeprecatedLocaleParamRule extends SaropaLintRule {
       if (!_isGeocodingLookup(node)) return;
       if (!fileImportsPackage(node, PackageImports.geocoding)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'localeIdentifier') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'localeIdentifier') {
           reporter.atNode(arg);
           return;
         }

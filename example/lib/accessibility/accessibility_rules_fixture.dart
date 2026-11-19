@@ -101,10 +101,7 @@ class BadBadgeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // expect_lint: require_badge_semantics
-    return Badge(
-      label: Text('5'),
-      child: Icon(Icons.notifications),
-    );
+    return Badge(label: Text('5'), child: Icon(Icons.notifications));
   }
 }
 
@@ -116,10 +113,7 @@ class GoodBadgeWidget extends StatelessWidget {
     // GOOD: Wrapped in Semantics
     return Semantics(
       label: '5 notifications',
-      child: Badge(
-        label: Text('5'),
-        child: Icon(Icons.notifications),
-      ),
+      child: Badge(label: Text('5'), child: Icon(Icons.notifications)),
     );
   }
 }
@@ -152,10 +146,7 @@ class GoodBadgeCountWidget extends StatelessWidget {
     // GOOD: Using 99+ pattern
     return Semantics(
       label: '99+ notifications',
-      child: Badge(
-        label: Text('99+'),
-        child: Icon(Icons.mail),
-      ),
+      child: Badge(label: Text('99+'), child: Icon(Icons.mail)),
     );
   }
 }
@@ -216,8 +207,11 @@ class SnackBar {
 }
 
 class ReorderableListView extends StatelessWidget {
-  const ReorderableListView(
-      {super.key, required this.children, this.onReorder});
+  const ReorderableListView({
+    super.key,
+    required this.children,
+    this.onReorder,
+  });
   final List<Widget> children;
   final void Function(int, int)? onReorder;
 
@@ -264,40 +258,31 @@ void badFastRepeatNoReverse() {
 // GOOD: Fast forward-only animation - no flashing (single direction)
 void goodFastForwardOnly() {
   // OK: Single-direction animations don't flash
-  AnimationController(
-    duration: Duration(milliseconds: 100),
-  )..forward();
+  AnimationController(duration: Duration(milliseconds: 100))..forward();
 }
 
 // GOOD: Fast reverse-only animation - no flashing (single direction)
 void goodFastReverseOnly() {
   // OK: Single-direction animations don't flash
-  AnimationController(
-    duration: Duration(milliseconds: 100),
-  )..reverse();
+  AnimationController(duration: Duration(milliseconds: 100))..reverse();
 }
 
 // GOOD: Slow repeat animation - under 3Hz threshold
 void goodSlowRepeat() {
   // OK: 500ms duration = 2 flashes/second
-  AnimationController(
-    duration: Duration(milliseconds: 500),
-  )..repeat(reverse: true);
+  AnimationController(duration: Duration(milliseconds: 500))
+    ..repeat(reverse: true);
 }
 
 // GOOD: No cascade - can't detect repeat usage
 void goodNoCascade() {
   // OK: Without cascade, we can't know if it repeats
-  final controller = AnimationController(
-    duration: Duration(milliseconds: 100),
-  );
+  final controller = AnimationController(duration: Duration(milliseconds: 100));
   controller.forward();
 }
 
 // GOOD: Fast animateTo - single direction
 void goodFastAnimateTo() {
   // OK: animateTo is single-direction
-  AnimationController(
-    duration: Duration(milliseconds: 100),
-  )..animateTo(1.0);
+  AnimationController(duration: Duration(milliseconds: 100))..animateTo(1.0);
 }

@@ -111,10 +111,7 @@ dynamic event;
 // BAD: Should trigger avoid_gesture_only_interactions
 // expect_lint: avoid_gesture_only_interactions
 void _bad4() {
-  GestureDetector(
-    onTap: () => doSomething(),
-    child: MyWidget(),
-  );
+  GestureDetector(onTap: () => doSomething(), child: MyWidget());
 }
 
 // GOOD: Should NOT trigger avoid_gesture_only_interactions
@@ -128,9 +125,6 @@ void _good4() {
       }
       return KeyEventResult.ignored;
     },
-    child: GestureDetector(
-      onTap: () => doSomething(),
-      child: MyWidget(),
-    ),
+    child: GestureDetector(onTap: () => doSomething(), child: MyWidget()),
   );
 }

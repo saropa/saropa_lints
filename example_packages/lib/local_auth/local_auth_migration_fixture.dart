@@ -75,7 +75,10 @@ Future<void> badUseErrorDialogs() async {
 /// GOOD: build your own error UI in the catch handler; no useErrorDialogs.
 Future<void> goodUseErrorDialogs() async {
   try {
-    if (await _auth.authenticate(localizedReason: 'Pay', biometricOnly: true)) {}
+    if (await _auth.authenticate(
+      localizedReason: 'Pay',
+      biometricOnly: true,
+    )) {}
   } on LocalAuthException catch (e) {
     // Show custom error UI here.
     _showError(e);
@@ -90,10 +93,7 @@ Future<void> goodUseErrorDialogs() async {
 Future<void> badStickyAuthRenamed() async {
   // expect_lint: local_auth_deprecated_options_class
   // expect_lint: local_auth_sticky_auth_renamed
-  final options = AuthenticationOptions(
-    stickyAuth: true,
-    biometricOnly: true,
-  );
+  final options = AuthenticationOptions(stickyAuth: true, biometricOnly: true);
   if (await _auth.authenticate(localizedReason: 'Unlock')) {}
 }
 

@@ -115,7 +115,5 @@ final context = BuildContext();
 // file — require_menu_bar_for_desktop_good.dart — or its menu bar would mask this.
 // expect_lint: require_menu_bar_for_desktop
 void _bad807() {
-  MaterialApp(
-    home: Scaffold(),
-  );
+  MaterialApp(home: Scaffold());
 }

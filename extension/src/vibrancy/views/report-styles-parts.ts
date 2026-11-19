@@ -386,6 +386,7 @@ export function reportStylesPart3(): string {
         .stable .count { color: var(--vscode-editorInfo-foreground); }
         .outdated .count { color: var(--vscode-editorWarning-foreground); }
         .abandoned .count { color: var(--vscode-editorWarning-foreground); }
+        .upgrade .count { color: var(--vscode-editorWarning-foreground); }
         .eol .count { color: var(--vscode-editorError-foreground); }
         .updates .count { color: var(--vscode-textLink-foreground); }
         .unused .count { color: var(--vscode-editorWarning-foreground); }

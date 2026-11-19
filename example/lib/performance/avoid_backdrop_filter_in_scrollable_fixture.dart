@@ -10,10 +10,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: BackdropFilter re-filters the whole backdrop for every visible item.
 // expect_lint: avoid_backdrop_filter_in_scrollable
 Widget _bad(List<Widget> items, dynamic blur) => GridView(
-      children: [
-        for (final w in items) BackdropFilter(filter: blur, child: w),
-      ],
-    );
+  children: [for (final w in items) BackdropFilter(filter: blur, child: w)],
+);
 
 // GOOD: single BackdropFilter applied once, outside the scrollable.
 Widget _good(Widget list, dynamic blur) =>

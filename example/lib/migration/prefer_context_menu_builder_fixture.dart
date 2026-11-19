@@ -24,9 +24,7 @@ Widget _goodBuilder() {
 
 // GOOD: No builder parameter at all
 Widget _goodNoBuilder() {
-  return CupertinoContextMenu(
-    child: const Text('long press me'),
-  );
+  return CupertinoContextMenu(child: const Text('long press me'));
 }
 
 // FALSE POSITIVE: 'previewBuilder' on a different widget type

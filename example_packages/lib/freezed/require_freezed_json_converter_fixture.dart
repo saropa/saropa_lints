@@ -118,7 +118,5 @@ class _bad415_User with _$User {
 @freezed
 class _good415_User with _$User {
   @JsonSerializable(converters: [DateTimeConverter()])
-  factory User({
-    required DateTime createdAt,
-  }) = _User;
+  factory User({required DateTime createdAt}) = _User;
 }

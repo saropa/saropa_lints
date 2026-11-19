@@ -5,7 +5,9 @@
 // BAD: Union without freezed union typing
 // expect_lint: prefer_freezed_union_types
 sealed class Result {}
+
 class Ok extends Result {}
+
 class Err extends Result {}
 
 // GOOD: Freezed union types

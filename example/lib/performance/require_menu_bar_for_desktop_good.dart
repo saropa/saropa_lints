@@ -8,10 +8,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // GOOD: Should NOT trigger require_menu_bar_for_desktop
 void goodMenuBar() {
   MaterialApp(
-    builder: (context, child) => PlatformMenuBar(
-      menus: [],
-      child: child!,
-    ),
+    builder: (context, child) => PlatformMenuBar(menus: [], child: child!),
     home: Scaffold(),
   );
 }

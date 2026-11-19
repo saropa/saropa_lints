@@ -130,7 +130,5 @@ void _goodGradient() {
     colors: [baseColor, highlightColor, baseColor],
     stops: const [0.0, 0.5, 1.0],
   );
-  final pulse = RadialGradient(
-    colors: [accentColor, fadeColor, accentColor],
-  );
+  final pulse = RadialGradient(colors: [accentColor, fadeColor, accentColor]);
 }

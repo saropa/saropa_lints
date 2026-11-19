@@ -30,9 +30,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 /// avoid_pre_v4_webview_widget.
 Widget badWebViewWidget() {
   // LINT: avoid_pre_v4_webview_widget
-  return WebView(
-    initialUrl: 'https://flutter.dev',
-  );
+  return WebView(initialUrl: 'https://flutter.dev');
 }
 
 /// BAD: named constructor form still matches the type name 'WebView'.
@@ -56,6 +54,5 @@ Widget goodWebViewWidget() {
 /// GOOD: constructing WebViewController alone — no WebView widget.
 /// Must NOT trigger avoid_pre_v4_webview_widget.
 WebViewController goodControllerOnly() {
-  return WebViewController()
-    ..loadRequest(Uri.parse('https://flutter.dev'));
+  return WebViewController()..loadRequest(Uri.parse('https://flutter.dev'));
 }

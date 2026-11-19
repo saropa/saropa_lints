@@ -110,10 +110,7 @@ final url = 'https://example.com';
 // BAD: Should trigger avoid_webview_javascript_enabled
 // expect_lint: avoid_webview_javascript_enabled
 void _bad992() {
-  WebView(
-    initialUrl: url,
-    javascriptMode: JavascriptMode.unrestricted,
-  );
+  WebView(initialUrl: url, javascriptMode: JavascriptMode.unrestricted);
 }
 
 // GOOD: Should NOT trigger avoid_webview_javascript_enabled

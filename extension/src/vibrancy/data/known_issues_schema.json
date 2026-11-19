@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Flutter Package Known Issues Schema",
+  "description": "Machine-derivable fields (lastUpdated, pubPoints, archiveSize*, verifiedPublisher, platforms, as_of) are refreshed from pub.dev with scripts/dev/pubdev_snapshot.py (snapshot, then apply); see scripts/README.md.",
   "type": "object",
   "properties": {
     "$schema": {
@@ -24,12 +25,13 @@
               "commercial",
               "caution",
               "end_of_life",
+              "upgrade_required",
               "enterprise",
               "freemium",
               "maintenance_mode",
               "paid"
             ],
-            "description": "The category of the hazard."
+            "description": "The category of the hazard. end_of_life = the package itself is dead (unscoped). upgrade_required = the installed old major version is broken but the package lives on; use with appliesToMinVersion/appliesToMaxVersion."
           },
           "reason": {
             "type": "string",
@@ -38,7 +40,12 @@
           "as_of": {
             "type": "string",
             "format": "date",
-            "description": "The date this issue was recorded (YYYY-MM-DD)."
+            "description": "The date of the last data refresh or verification of this entry (YYYY-MM-DD)."
+          },
+          "reasonVerified": {
+            "type": "string",
+            "format": "date",
+            "description": "Date a person last checked the reason text against the package's current state. Set only by a human review; scripts never write it."
           },
           "replacement": {
             "type": ["string", "null"],

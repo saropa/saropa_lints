@@ -124,12 +124,6 @@ void _bad835() {
 // GOOD: Should NOT trigger prefer_ios_safe_area
 void _good835() {
   Scaffold(
-    body: SafeArea(
-      child: Column(
-        children: [
-          Text('Header'),
-        ],
-      ),
-    ),
+    body: SafeArea(child: Column(children: [Text('Header')])),
   );
 }

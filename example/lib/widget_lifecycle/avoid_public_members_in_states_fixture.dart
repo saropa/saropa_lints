@@ -213,7 +213,8 @@ class _GoodObserverState extends State<MyWidget> with WidgetsBindingObserver {
 // method, but its public spelling is equally mandated by the mixin's
 // contract — the framework reads it directly, so this must not be flagged
 // even though `_checkMethod` sees a getter as a MethodDeclaration.
-class _GoodKeepAliveState extends State<MyWidget> with AutomaticKeepAliveClientMixin {
+class _GoodKeepAliveState extends State<MyWidget>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -228,7 +229,8 @@ class _GoodKeepAliveState extends State<MyWidget> with AutomaticKeepAliveClientM
 // state, so `implements` is just as valid as `with` for them — Flutter's
 // own samples use both spellings interchangeably. The exemption must not
 // depend on which clause the author chose.
-class _GoodImplementsObserverState extends State<MyWidget> implements RouteAware {
+class _GoodImplementsObserverState extends State<MyWidget>
+    implements RouteAware {
   @override
   void didPush() {}
 
@@ -249,7 +251,8 @@ class _GoodImplementsObserverState extends State<MyWidget> implements RouteAware
 // but is not part of the mixed-in interface's contract must still be
 // flagged — the exemption is scoped to the mixin's own callback names,
 // not to every method on a class that mixes in a framework interface.
-class _BadObserverExtraMethodState extends State<MyWidget> with WidgetsBindingObserver {
+class _BadObserverExtraMethodState extends State<MyWidget>
+    with WidgetsBindingObserver {
   // expect_lint: avoid_public_members_in_states
   void refreshFromObserver() {}
 

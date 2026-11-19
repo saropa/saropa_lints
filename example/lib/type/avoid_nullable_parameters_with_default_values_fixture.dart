@@ -111,3 +111,51 @@ void _bad1226({String? name = 'default'}) {} // Nullable with non-null default
 
 // GOOD: Should NOT trigger avoid_nullable_parameters_with_default_values
 void _good1226({String name = 'default'}) {} // Non-nullable with default
+
+// GOOD: tri-state - null is a distinct "all rows" value in the body.
+String _goodTriState({bool? isHidden = false}) {
+  if (isHidden == null) return 'all';
+  if (isHidden == true) return 'hidden';
+  if (isHidden == false) return 'visible';
+  return 'all';
+}
+
+// GOOD: tri-state - null is resolved with `??=` in the body.
+bool _goodNullAssign({bool? ignoreEpoch = false}) {
+  ignoreEpoch ??= true;
+  return !ignoreEpoch;
+}
+
+// GOOD: tri-state - null is resolved with `??` in the body.
+bool _goodNullCoalesce({bool? ignoreEpoch = false}) {
+  return ignoreEpoch ?? true;
+}
+
+// BAD: only uses the value, never acts on null.
+// expect_lint: avoid_nullable_parameters_with_default_values
+bool _badNoNullHandling({bool? flag = false}) {
+  return flag == true;
+}
+
+void _query({List<int>? excludeSources, bool? isHidden}) {}
+void _queryStrict({List<int>? excludeSources, required bool isHidden}) {}
+
+// GOOD: forwarded unchanged to a callee whose parameter accepts null.
+void _goodPassThrough({
+  List<int>? excludeSources = const <int>[0],
+  bool? isHidden = false,
+}) {
+  _query(excludeSources: excludeSources, isHidden: isHidden);
+}
+
+// BAD: forwarded to a callee whose parameter is non-nullable (the `?` is moot).
+// expect_lint: avoid_nullable_parameters_with_default_values
+void _badPassToNonNull({bool? isHidden = false}) {
+  _queryStrict(isHidden: isHidden!);
+}
+
+// BAD: used in a call but not passed directly as an argument.
+// expect_lint: avoid_nullable_parameters_with_default_values
+void _badNotForwarded({List<int>? excludeSources = const <int>[0]}) {
+  _query(excludeSources: [1]);
+}

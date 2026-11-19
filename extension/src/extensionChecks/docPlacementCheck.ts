@@ -38,7 +38,7 @@ const MOVE_COMMAND = 'saropaLints.docPlacement.moveToOpenIssues';
 
 /**
  * Default glob for the "closed/archive" directory convention. Matches this
- * repo's own convention (`plans/history/YYYY.MM/YYYYMMDD/*.md`, per
+ * repo's own convention (`plans/history/YYYY.MM/YYYY.MM.DD/*.md`, per
  * ISSUE_REPORT_GUIDE.md and `bugArchivalCheck.ts`'s archive target) so the
  * check fires out of the box here, not just for workspaces that opt in with
  * an override. Built from the shared `ARCHIVE_DIR` constant so it can't

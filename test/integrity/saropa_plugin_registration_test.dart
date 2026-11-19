@@ -1,11 +1,10 @@
 import 'package:analysis_server_plugin/registry.dart';
-import 'package:analysis_server_plugin/src/correction/fix_generators.dart'
-    show ProducerGenerator;
 import 'package:analyzer/analysis_rule/analysis_rule.dart'
     show AbstractAnalysisRule;
 import 'package:analyzer/error/error.dart' show DiagnosticCode, LintCode;
 import 'package:analyzer/src/lint/config.dart' show RuleConfig;
 import 'package:saropa_lints/saropa_lints.dart';
+import 'package:saropa_lints/src/native/saropa_fix.dart' show ProducerGenerator;
 import 'package:test/test.dart';
 
 /// Captures registrations without touching the global analyzer rule registry.

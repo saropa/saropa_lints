@@ -108,19 +108,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_auto_play_media
 // expect_lint: avoid_auto_play_media
 void _bad27() {
-  VideoPlayer(
-    autoPlay: true,
-  );
-  AudioPlayer(
-    autoPlay: true,
-  );
+  VideoPlayer(autoPlay: true);
+  AudioPlayer(autoPlay: true);
 }
 
 // GOOD: Should NOT trigger avoid_auto_play_media
 void _good27() {
-  VideoPlayer(
-    autoPlay: false,
-  );
+  VideoPlayer(autoPlay: false);
   // Or without autoPlay (defaults to false in most players);
   VideoPlayer();
 }

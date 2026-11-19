@@ -5,7 +5,9 @@
 // BAD: Connectivity checked on every change without debounce
 // expect_lint: prefer_connectivity_debounce
 void bad(Stream<int> stream) {
-  stream.listen((_) { /* check connectivity on every event */ });
+  stream.listen((_) {
+    /* check connectivity on every event */
+  });
 }
 
 // GOOD: Debounced connectivity checks

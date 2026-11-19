@@ -118,8 +118,5 @@ void _bad743() {
 // GOOD: Should NOT trigger avoid_global_riverpod_providers
 void _good743() {
   // Use ProviderScope for proper scoping
-  ProviderScope(
-    overrides: [myProvider.overrideWith()],
-    child: MyApp(),
-  );
+  ProviderScope(overrides: [myProvider.overrideWith()], child: MyApp());
 }

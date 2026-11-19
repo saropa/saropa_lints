@@ -120,10 +120,7 @@ void _bad1395() {
 void _good1395() {
   Opacity(
     opacity: 0.5,
-    child: Container(
-      color: Colors.red,
-      child: ExpensiveWidget(),
-    ),
+    child: Container(color: Colors.red, child: ExpensiveWidget()),
   );
   // Or better, use AnimatedOpacity for animations
 }

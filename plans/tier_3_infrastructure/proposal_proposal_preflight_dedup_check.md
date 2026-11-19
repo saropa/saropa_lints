@@ -4,7 +4,7 @@
 
 Created: 2026-09-06
 Type: Tooling / process
-Related: `plans/tier_1_quick_wins/duplicate_manifest.json`, `scripts/check_rule_name.py`,
+Related: `plans/tier_1_quick_wins/duplicate_manifest.json`, `scripts/checks/check_rule_name.py`,
 `scripts/modules/_duplicated_messages.py`
 
 ---

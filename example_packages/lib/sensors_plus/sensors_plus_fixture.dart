@@ -26,8 +26,12 @@ abstract class GyroscopeEvent {
 }
 
 class SensorInterval {
-  static const SensorInterval normalInterval = SensorInterval._('normalInterval');
-  static const SensorInterval fastestInterval = SensorInterval._('fastestInterval');
+  static const SensorInterval normalInterval = SensorInterval._(
+    'normalInterval',
+  );
+  static const SensorInterval fastestInterval = SensorInterval._(
+    'fastestInterval',
+  );
   static const SensorInterval gameInterval = SensorInterval._('gameInterval');
 
   const SensorInterval._(String _);
@@ -40,28 +44,23 @@ Stream<GyroscopeEvent> magnetometerEvents = const Stream.empty();
 
 Stream<AccelerometerEvent> accelerometerEventStream({
   SensorInterval samplingPeriod = const SensorInterval._('normalInterval'),
-}) =>
-    const Stream.empty();
+}) => const Stream.empty();
 
 Stream<GyroscopeEvent> gyroscopeEventStream({
   SensorInterval samplingPeriod = const SensorInterval._('normalInterval'),
-}) =>
-    const Stream.empty();
+}) => const Stream.empty();
 
 Stream<AccelerometerEvent> userAccelerometerEventStream({
   SensorInterval samplingPeriod = const SensorInterval._('normalInterval'),
-}) =>
-    const Stream.empty();
+}) => const Stream.empty();
 
 Stream<GyroscopeEvent> magnetometerEventStream({
   SensorInterval samplingPeriod = const SensorInterval._('normalInterval'),
-}) =>
-    const Stream.empty();
+}) => const Stream.empty();
 
 Stream<Object> barometerEventStream({
   SensorInterval samplingPeriod = const SensorInterval._('normalInterval'),
-}) =>
-    const Stream.empty();
+}) => const Stream.empty();
 
 // =============================================================================
 // prefer_sensors_event_stream
@@ -90,10 +89,7 @@ void goodPreferEventStream() {
 
   gyroscopeEventStream(
     samplingPeriod: SensorInterval.normalInterval,
-  ).listen(
-    (e) => print(e.z),
-    onError: (Object err) => print(err),
-  );
+  ).listen((e) => print(e.z), onError: (Object err) => print(err));
 }
 
 // =============================================================================
@@ -115,17 +111,11 @@ void goodNoSamplingPeriod() {
   // samplingPeriod present — no lint.
   accelerometerEventStream(
     samplingPeriod: SensorInterval.normalInterval,
-  ).listen(
-    (_) {},
-    onError: (Object err) => print(err),
-  );
+  ).listen((_) {}, onError: (Object err) => print(err));
 
   gyroscopeEventStream(
     samplingPeriod: SensorInterval.gameInterval,
-  ).listen(
-    (_) {},
-    onError: (Object err) => print(err),
-  );
+  ).listen((_) {}, onError: (Object err) => print(err));
 }
 
 // =============================================================================

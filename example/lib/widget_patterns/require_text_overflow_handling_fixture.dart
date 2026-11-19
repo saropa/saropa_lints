@@ -122,7 +122,11 @@ void _bad1410() {
 void _good1410() {
   // Wrapping constrains width naturally — preferred over ellipsis
   Row(children: [Expanded(child: Text(userName))]);
-  Text(userName, overflow: TextOverflow.ellipsis, maxLines: 1); // Ellipsis OK when truncation is intentional
+  Text(
+    userName,
+    overflow: TextOverflow.ellipsis,
+    maxLines: 1,
+  ); // Ellipsis OK when truncation is intentional
   Text(userName, maxLines: 3); // Multi-line cap keeps text readable
   Text('OK'); // Static short text is fine
   Text('Submit', maxLines: 1); // Has maxLines

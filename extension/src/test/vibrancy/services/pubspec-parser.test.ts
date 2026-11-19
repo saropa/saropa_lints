@@ -9,7 +9,7 @@ import {
     parseDependencyOverrides,
 } from '../../../vibrancy/services/pubspec-parser';
 
-const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
+const fixturesDir = path.join(__dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures');
 
 /**
  * Tests **pubspec-parser**: [parsePubspecYaml], [parsePubspecLock], [findPackageRange] for edits,

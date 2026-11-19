@@ -121,7 +121,7 @@ class _bad747__MyWidgetState extends ConsumerState<MyWidget> {
 class _good747__MyWidgetState extends ConsumerState<MyWidget> {
   @override
   void dispose() {
-// Clean up local resources only
+    // Clean up local resources only
     _controller.dispose();
     super.dispose();
   }

@@ -122,11 +122,5 @@ void _bad1336() {
 
 // GOOD: Should NOT trigger avoid_late_context
 void _good1336() {
-  Row(
-    children: [
-      Text('Start'),
-      Spacer(),
-      Text('End'),
-    ],
-  );
+  Row(children: [Text('Start'), Spacer(), Text('End')]);
 }

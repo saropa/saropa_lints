@@ -115,20 +115,11 @@ void _bad506() {
     path: '/login',
     redirect: (_, __) => '/home', // Always redirects!
   );
-  GoRoute(
-    path: '/home',
-    redirect: (_, __) => isLoggedIn ? null : '/login',
-  );
+  GoRoute(path: '/home', redirect: (_, __) => isLoggedIn ? null : '/login');
 }
 
 // GOOD: Should NOT trigger avoid_circular_redirects
 void _good506() {
-  GoRoute(
-    path: '/login',
-    redirect: (_, __) => isLoggedIn ? '/home' : null,
-  );
-  GoRoute(
-    path: '/home',
-    redirect: (_, __) => isLoggedIn ? null : '/login',
-  );
+  GoRoute(path: '/login', redirect: (_, __) => isLoggedIn ? '/home' : null);
+  GoRoute(path: '/home', redirect: (_, __) => isLoggedIn ? null : '/login');
 }

@@ -105,13 +105,14 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_ios_push_notification_capability
-// expect_lint: require_ios_push_notification_capability
+// BAD: push permission request on a messaging object
 void _bad859() {
-  // NOTE: require_ios_push_notification_capability — see rule docs for triggering pattern
+  // expect_lint: require_ios_push_notification_capability
+  FirebaseMessaging.instance.requestPermission();
 }
 
-// GOOD: Should NOT trigger require_ios_push_notification_capability
-void _good859() {
-  // Compliant version — see rule docs
+// GOOD: location / contacts permission requests are not push
+Future<void> _good859() async {
+  await Geolocator.requestPermission();
+  await Permission.contacts.request();
 }

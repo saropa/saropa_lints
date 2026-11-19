@@ -117,7 +117,7 @@ class _bad772__ChatState extends State<Chat> {
     super.initState();
     _channel = supabase.channel('room').subscribe();
   }
-// Missing unsubscribe in dispose!
+  // Missing unsubscribe in dispose!
 }
 
 // GOOD: Should NOT trigger require_supabase_realtime_unsubscribe

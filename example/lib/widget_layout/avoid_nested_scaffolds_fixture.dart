@@ -121,8 +121,5 @@ void _bad1303() {
 
 // GOOD: Should NOT trigger avoid_nested_scaffolds
 void _good1303() {
-  Scaffold(
-    appBar: AppBar(),
-    body: CustomScrollView(),
-  );
+  Scaffold(appBar: AppBar(), body: CustomScrollView());
 }

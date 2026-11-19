@@ -111,7 +111,7 @@ final context = BuildContext();
 // expect_lint: avoid_form_without_unfocus
 void _bad400__onSubmit() {
   if (_formKey.currentState!.validate()) {
-// Submit without closing keyboard
+    // Submit without closing keyboard
     _doSubmit();
   }
 }

@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: avoid_wrapping_in_padding
 class _bad1285__MyWidgetState extends State<MyWidget> {
   _MyWidgetState() {
-// initialization code
+    // initialization code
   }
 }
 
@@ -118,6 +118,6 @@ class _good1285__MyWidgetState extends State<MyWidget> {
   @override
   void initState() {
     super.initState();
-// initialization code
+    // initialization code
   }
 }

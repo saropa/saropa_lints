@@ -35,7 +35,7 @@ script would still need to touch:
 2. **`lib/src/tiers.dart`** — ~3,348 quoted rule-id references across the 6 tier `Set<String>`s.
 3. **`lib/tiers/*.yaml`** (essential/recommended/professional/comprehensive/pedantic) — published,
    pub.dev-shipped presets that consumers `include:` directly. **User-facing.**
-4. **`lib/src/scan/rule_category_map.dart`** — GENERATED via `scripts/gen_category_map.py`; needs
+4. **`lib/src/scan/rule_category_map.dart`** — GENERATED via `scripts/generators/gen_category_map.py`; needs
    regeneration, not hand-editing.
 5. **`lib/src/config/rule_pack_codes_generated.dart`** — GENERATED via
    `tool/generate_rule_pack_registry.dart`; needs regeneration.
@@ -80,7 +80,7 @@ script would still need to touch:
    comments — before moving to the next pack. 10+ packs × ~2,300 touched call sites total means a
    single all-at-once PR would be unreviewable and unrevert-able if something breaks a generated
    file's consistency check.
-3. **Use `scripts/check_rule_name.py`** for every new id before writing it anywhere, per existing
+3. **Use `scripts/checks/check_rule_name.py`** for every new id before writing it anywhere, per existing
    convention — it has already caught collisions with core Dart/Flutter lint names 3 times in 3
    days on unrelated new-rule work.
 4. **Every renamed rule gets `configAliases => const <String>['<old_id>']`**, a `Formerly:

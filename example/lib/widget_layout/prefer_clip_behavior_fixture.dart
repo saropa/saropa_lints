@@ -110,9 +110,7 @@ final children = <Widget>[];
 // BAD: Should trigger prefer_clip_behavior
 // expect_lint: prefer_clip_behavior
 void _bad1321() {
-  Stack(
-    children: [OverflowingWidget()],
-  );
+  Stack(children: [OverflowingWidget()]);
 }
 
 // GOOD: Should NOT trigger prefer_clip_behavior

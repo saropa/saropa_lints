@@ -43,6 +43,7 @@ class CliArgs {
     required this.listPacksOnly,
     required this.enablePackIds,
     this.emitCompositePluginScaffold,
+    this.emitCi,
     this.targetDir,
   });
 
@@ -69,6 +70,11 @@ class CliArgs {
   /// Optional output directory for `--emit-composite-plugin-scaffold` (relative
   /// to `--target` or cwd when not absolute). Default basename when flag has no value.
   final String? emitCompositePluginScaffold;
+
+  /// Optional output path for `--emit-ci` (relative to `--target` or cwd
+  /// when not absolute). Default path when the flag has no value:
+  /// `.github/workflows/saropa-lints.yml`.
+  final String? emitCi;
 
   /// Target project directory. `null` means current working directory.
   final String? targetDir;
@@ -160,6 +166,16 @@ CliArgs parseArguments(List<String> args) {
     }
   }
 
+  String? emitCi;
+  final int ciIdx = args.indexOf('--emit-ci');
+  if (ciIdx != -1) {
+    if (ciIdx + 1 < args.length && !args[ciIdx + 1].startsWith('-')) {
+      emitCi = args[ciIdx + 1];
+    } else {
+      emitCi = defaultEmitCiPath;
+    }
+  }
+
   return CliArgs(
     isShowHelp: showHelp,
     isDryRun: dryRun,
@@ -172,9 +188,14 @@ CliArgs parseArguments(List<String> args) {
     listPacksOnly: listPacksOnly,
     enablePackIds: enablePackIds,
     emitCompositePluginScaffold: emitCompositePluginScaffold,
+    emitCi: emitCi,
     targetDir: targetDir,
   );
 }
+
+/// Where `--emit-ci` writes when given no path, relative to the repository
+/// root. The one location GitHub runs workflows from.
+const String defaultEmitCiPath = '.github/workflows/saropa-lints.yml';
 
 /// Resolve a tier input (numeric 1-5 or name) to a canonical tier name.
 ///

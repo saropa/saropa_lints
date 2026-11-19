@@ -113,9 +113,7 @@ dynamic value;
 // BAD: Should trigger require_webview_progress_indicator
 // expect_lint: require_webview_progress_indicator
 void _bad1266() {
-  WebView(
-    initialUrl: 'https://example.com',
-  ); // No loading feedback!
+  WebView(initialUrl: 'https://example.com'); // No loading feedback!
 
   InAppWebView(
     initialUrlRequest: URLRequest(url: Uri.parse(url)),

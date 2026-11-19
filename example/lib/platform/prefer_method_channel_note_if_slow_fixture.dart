@@ -25,8 +25,7 @@ class BareInvokeService {
   Future<List<Object?>?> getAll() => channel.invokeListMethod('getAll');
 
   // expect_lint: prefer_method_channel_note_if_slow
-  Future<Map<Object?, Object?>?> getMap() =>
-      channel.invokeMapMethod('getMap');
+  Future<Map<Object?, Object?>?> getMap() => channel.invokeMapMethod('getMap');
 }
 
 // ---------------------------------------------------------------------------

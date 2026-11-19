@@ -30,68 +30,39 @@ class ExampleWidget {
 
 void goodExamples() {
   // GOOD: Named arguments in alphabetical order
-  exampleFunction(
-    alpha: 'first',
-    beta: 'second',
-    gamma: 'third',
-  );
+  exampleFunction(alpha: 'first', beta: 'second', gamma: 'third');
 
   // GOOD: Named arguments in alphabetical order
-  final widget = ExampleWidget(
-    alpha: 'a',
-    beta: 'b',
-    gamma: 'c',
-  );
+  final widget = ExampleWidget(alpha: 'a', beta: 'b', gamma: 'c');
 
   // GOOD: Single named argument (nothing to order)
-  exampleFunction(
-    alpha: 'only',
-    beta: 'b',
-    gamma: 'c',
-  );
+  exampleFunction(alpha: 'only', beta: 'b', gamma: 'c');
 }
 
 void badExamples() {
   // expect_lint: arguments_ordering
-  exampleFunction(
-    gamma: 'third',
-    beta: 'second',
-    alpha: 'first',
-  );
+  exampleFunction(gamma: 'third', beta: 'second', alpha: 'first');
 
   // expect_lint: arguments_ordering
-  final widget = ExampleWidget(
-    gamma: 'c',
-    alpha: 'a',
-    beta: 'b',
-  );
+  final widget = ExampleWidget(gamma: 'c', alpha: 'a', beta: 'b');
 
   // expect_lint: arguments_ordering
-  exampleFunction(
-    beta: 'second',
-    alpha: 'first',
-    gamma: 'third',
-  );
+  exampleFunction(beta: 'second', alpha: 'first', gamma: 'third');
 }
 
 void mixedPositionalAndNamedExamples() {
   // Example with positional and named arguments
-  void mixedFunction(String positional,
-      {required String alpha, required String beta}) {}
+  void mixedFunction(
+    String positional, {
+    required String alpha,
+    required String beta,
+  }) {}
 
   // GOOD: Named arguments alphabetically ordered after positional
-  mixedFunction(
-    'positional',
-    alpha: 'a',
-    beta: 'b',
-  );
+  mixedFunction('positional', alpha: 'a', beta: 'b');
 
   // expect_lint: arguments_ordering
-  mixedFunction(
-    'positional',
-    beta: 'b',
-    alpha: 'a',
-  );
+  mixedFunction('positional', beta: 'b', alpha: 'a');
 }
 
 void flutterStyleExamples() {

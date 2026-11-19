@@ -124,9 +124,9 @@ void _bad654() async {
   ''');
 
   // Or using graphql_flutter
-  final result = await client.query(QueryOptions(
-    document: gql('{ users { id name } }'),
-  ));
+  final result = await client.query(
+    QueryOptions(document: gql('{ users { id name } }')),
+  );
 }
 
 // GOOD: Should NOT trigger avoid_graphql_string_queries

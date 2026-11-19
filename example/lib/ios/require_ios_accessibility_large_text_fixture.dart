@@ -134,10 +134,7 @@ enum ThemeCommonFontSize {
 }
 
 void _goodGetterIndirection() {
-  Text(
-    'Hello',
-    style: TextStyle(fontSize: ThemeCommonFontSize.medium.size),
-  );
+  Text('Hello', style: TextStyle(fontSize: ThemeCommonFontSize.medium.size));
 }
 
 // GOOD: non-const method call — may apply scaling internally.

@@ -106,8 +106,7 @@ class _NonAllowlistedTokenState extends State {
   Widget build(BuildContext context) {
     // OK — ThemeCommonSize folds the avatar-scale pref; even mixed with an
     // allowlisted token the whole expression must be rejected.
-    final double box =
-        ThemeCommonSize.Small.size + ThemeCommonSpace.Small.size;
+    final double box = ThemeCommonSize.Small.size + ThemeCommonSpace.Small.size;
 
     // OK — ThemeCommonSize getter * literal.
     final double huge = ThemeCommonSize.Huge.size * 2;

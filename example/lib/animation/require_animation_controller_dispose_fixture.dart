@@ -113,13 +113,13 @@ class _RequireAnimDisposeHostWidget extends StatefulWidget {
       _RequireAnimDisposeHostWidgetState();
 }
 
-class _RequireAnimDisposeHostWidgetState extends State<_RequireAnimDisposeHostWidget> {
+class _RequireAnimDisposeHostWidgetState
+    extends State<_RequireAnimDisposeHostWidget> {
   @override
   Widget build(BuildContext context) => Container();
 }
 
-extension _RequireAnimationControllerDisposeFixtureExt
-    on AnimationController {
+extension _RequireAnimationControllerDisposeFixtureExt on AnimationController {
   void disposeSafe() => dispose();
   void disposeAll() {}
 }
@@ -132,7 +132,7 @@ class _bad31__MyState extends State<_RequireAnimDisposeHostWidget>
     vsync: this,
     duration: Duration(seconds: 1),
   );
-// Missing dispose - memory leak!
+  // Missing dispose - memory leak!
 }
 
 // GOOD: Should NOT trigger require_animation_controller_dispose

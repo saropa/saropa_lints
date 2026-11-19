@@ -110,7 +110,7 @@ dynamic channel;
 // BAD: Should trigger require_ios_method_channel_cleanup
 // expect_lint: require_ios_method_channel_cleanup
 void _bad888_initState() {
-// super.initState();
+  // super.initState();
   channel.setMethodCallHandler(_handleMethod);
 }
 // No cleanup!
@@ -118,5 +118,5 @@ void _bad888_initState() {
 // GOOD: Should NOT trigger require_ios_method_channel_cleanup
 void _good888_dispose() {
   channel.setMethodCallHandler(null);
-// super.dispose();
+  // super.dispose();
 }

@@ -111,19 +111,13 @@ final context = BuildContext();
 // BAD: Should trigger require_heading_semantics
 // expect_lint: require_heading_semantics
 void _bad8() {
-  Text(
-    'Settings',
-    style: Theme.of(context).textTheme.headlineMedium,
-  );
+  Text('Settings', style: Theme.of(context).textTheme.headlineMedium);
 }
 
 // GOOD: Should NOT trigger require_heading_semantics
 void _good8() {
   Semantics(
     header: true,
-    child: Text(
-      'Settings',
-      style: Theme.of(context).textTheme.headlineMedium,
-    ),
+    child: Text('Settings', style: Theme.of(context).textTheme.headlineMedium),
   );
 }

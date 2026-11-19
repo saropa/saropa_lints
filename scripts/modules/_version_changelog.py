@@ -27,6 +27,7 @@ from scripts.modules._utils import (
     print_info,
     print_success,
     print_warning,
+    extension_version_for,
 )
 from scripts.modules._git_ops import tag_exists_on_remote
 
@@ -683,6 +684,12 @@ def prompt_version_until_valid(default_version: str) -> str:
     while True:
         version = prompt_version(default_version)
         if re.match(rf"^{_VERSION_RE}$", version):
+            # Refuse before any file/git change (caller mutates afterwards).
+            try:
+                extension_version_for(version)
+            except ValueError as exc:
+                print_warning(str(exc))
+                continue
             return version
         print_warning(
             f"Invalid version format '{version}'. "
@@ -755,12 +762,7 @@ def apply_version_and_rename_unreleased(
                 f"  Suggested version: {suggested} (press Enter or edit)",
                 Color.CYAN,
             )
-            version_to_sync = prompt_version(suggested)
-            if not re.match(rf"^{_VERSION_RE}$", version_to_sync):
-                print_warning(
-                    f"Invalid version format '{version_to_sync}'. "
-                    f"Use X.Y.Z or X.Y.Z-pre.N"
-                )
+            version_to_sync = prompt_version_until_valid(suggested)
 
 
 def reconcile_pubspec_changelog_versions(

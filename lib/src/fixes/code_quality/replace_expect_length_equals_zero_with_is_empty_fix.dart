@@ -30,7 +30,10 @@ class ReplaceExpectLengthEqualsZeroWithIsEmptyFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<MethodInvocation>();
     if (expectCall == null || expectCall.methodName.name != 'expect') return;
 
-    final List<Expression> args = expectCall.argumentList.arguments.toList();
+    final List<Expression> args = expectCall.argumentList.arguments
+        .where((a) => a is! NamedArgument)
+        .map((a) => a.argumentExpression)
+        .toList();
     if (args.length < 2) return;
 
     final Expression actual = args[0];
@@ -43,6 +46,8 @@ class ReplaceExpectLengthEqualsZeroWithIsEmptyFix extends SaropaFixProducer {
       return;
     }
     final List<Expression> matcherArgs = matcher.argumentList.arguments
+        .where((a) => a is! NamedArgument)
+        .map((a) => a.argumentExpression)
         .toList();
     if (matcherArgs.isEmpty) return;
     final Expression matcherArg = matcherArgs[0];

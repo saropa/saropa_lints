@@ -166,7 +166,7 @@ String _goodCompoundAndGuard(_ChurnFile f) {
 
 // GOOD (v6): interpolation inside developer-facing log call.
 // "null" in the output IS the diagnostic signal.
-void debug(String message) {}
+void debug(Object message) {}
 void breadcrumb(String message) {}
 
 void _goodDebugLogString(String? name) {
@@ -231,4 +231,59 @@ class _UiCard {
 
   // expect_lint: avoid_nullable_interpolation
   String build() => 'Hello, $name';
+}
+
+// GOOD: lazy-message closure passed to a developer log call.
+void _goodDebugClosure(String? uuid) {
+  debug(() => 'Missing avatar `$uuid`');
+}
+
+// GOOD: multi-line closure with adjacent strings and a trailing named
+// argument, nested in an `if` (beta.4 evidence shape).
+void _goodDebugClosureAdjacentNamed(String? name, int? count, bool flag) {
+  if (flag) {
+    debug(
+      () =>
+          'no stored type for '
+          '`$name` (count=${count?.toString()})',
+      level: 1,
+    );
+  }
+}
+
+// BAD: closure not passed to a log call still lints.
+void _badClosureNotLog(String? name) {
+  // expect_lint: avoid_nullable_interpolation
+  final Function g = () => 'a $name';
+}
+
+// GOOD: collection-if guard on the receiver of a null-aware chain.
+List<String> _goodCollectionIfReceiverGuard(List<String>? statuses) => <String>[
+  if (statuses != null) 'S: `${statuses?.map((String e) => e).join(',')}`',
+];
+
+// GOOD: `&&` guard on the same property, interpolation in the right operand.
+class _GuardedAnd {
+  _GuardedAnd(this.uuid);
+  final String? uuid;
+  bool has(List<String> answered, String code) =>
+      uuid != null && answered.contains('${uuid}|$code');
+}
+
+// BAD: no guard in the same condition.
+class _MissingGuardAnd {
+  _MissingGuardAnd(this.uuid);
+  final String? uuid;
+  bool has(List<String> answered, String code) =>
+      // expect_lint: avoid_nullable_interpolation
+      answered.contains('${uuid}|$code');
+}
+
+// BAD: guard on the left of `||` proves nothing.
+class _OrGuard {
+  _OrGuard(this.uuid);
+  final String? uuid;
+  bool has(List<String> answered, String code) =>
+      // expect_lint: avoid_nullable_interpolation
+      uuid != null || answered.contains('${uuid}|$code');
 }

@@ -54,18 +54,16 @@ String? _receiverName(Expression? target) {
 /// `play(..., mode: PlayerMode.lowLatency)` form. Resolved structurally
 /// (prefix `PlayerMode`, identifier `lowLatency`) rather than by type element
 /// so the rule fires without the package being fully resolvable.
-bool _argIsLowLatency(Expression arg) {
-  Expression value = arg;
-  if (value is NamedExpression) value = value.expression;
+bool _argIsLowLatency(Argument arg) {
+  final Expression value = arg.argumentExpression;
   return value is PrefixedIdentifier &&
       value.prefix.name == 'PlayerMode' &&
       value.identifier.name == 'lowLatency';
 }
 
 /// True when `ReleaseMode.loop` appears as an argument of [node].
-bool _argIsReleaseLoop(Expression arg) {
-  Expression value = arg;
-  if (value is NamedExpression) value = value.expression;
+bool _argIsReleaseLoop(Argument arg) {
+  final Expression value = arg.argumentExpression;
   return value is PrefixedIdentifier &&
       value.prefix.name == 'ReleaseMode' &&
       value.identifier.name == 'loop';
@@ -84,7 +82,7 @@ class _ModeScan extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final String name = node.methodName.name;
-    final List<Expression> args = node.argumentList.arguments;
+    final List<Argument> args = node.argumentList.arguments;
 
     // play(...) and setPlayerMode(...) can both carry the lowLatency mode.
     if (name == 'setPlayerMode' || name == 'play') {
@@ -529,7 +527,7 @@ class AudioplayersUrlSourceInAssetContextRule extends SaropaLintRule {
       if (node.constructorName.type.name.lexeme != 'UrlSource') return;
       if (!fileImportsPackage(node, PackageImports.audioplayers)) return;
 
-      final Expression? arg = node.argumentList.arguments.firstOrNull;
+      final Argument? arg = node.argumentList.arguments.firstOrNull;
       if (arg is! SimpleStringLiteral) return;
       final String value = arg.value;
       // Bundled-asset paths only — a real URL ("https://.../assets/..") contains
@@ -556,7 +554,7 @@ class _SwapToAssetSourceFix extends ReplaceNodeFix {
   @override
   String computeReplacement(AstNode node) {
     if (node is! InstanceCreationExpression) return node.toSource();
-    final Expression? arg = node.argumentList.arguments.firstOrNull;
+    final Argument? arg = node.argumentList.arguments.firstOrNull;
     if (arg is! SimpleStringLiteral) return node.toSource();
 
     // Strip the leading assets/ (or asset/) — AudioCache.prefix re-adds it.
@@ -630,7 +628,7 @@ class AudioplayersHardcodedVolumeAboveOneRule extends SaropaLintRule {
       if (!fileImportsPackage(node, PackageImports.audioplayers)) return;
 
       final Expression? value = method == 'setVolume'
-          ? node.argumentList.arguments.firstOrNull
+          ? node.argumentList.arguments.firstOrNull?.argumentExpression
           : _namedArg(node, 'volume');
       if (value == null) return;
 
@@ -643,9 +641,9 @@ class AudioplayersHardcodedVolumeAboveOneRule extends SaropaLintRule {
 
   /// The first named argument [name] of [node], or null.
   Expression? _namedArg(MethodInvocation node, String name) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == name) {
-        return arg.expression;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == name) {
+        return arg.argumentExpression;
       }
     }
     return null;

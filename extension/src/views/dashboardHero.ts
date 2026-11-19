@@ -162,7 +162,7 @@ export function getFullWidthToggleScript(): string {
 }
 
 /**
- * Inline script that reports focus in/out on editable controls (`uiFocus`/`uiBlur`
+ * Inline script that reports focus in/out on text-entry controls (`uiFocus`/`uiBlur`
  * postMessage) so the host can defer a background-triggered `webview.html` reassignment
  * (diagnostics ticks, file-save watchers, tree-data refreshes) while the user is mid-edit
  * instead of tearing the DOM out from under an in-progress keystroke. Shared by the Config
@@ -171,10 +171,30 @@ export function getFullWidthToggleScript(): string {
  */
 export function getFocusTrackingScript(): string {
   return `(function() {
+    // Only controls holding *uncommitted keystrokes* count as "editable" here. A
+    // checkbox, radio, or <select> commits its value the instant it changes and then
+    // keeps focus, so counting them would latch \`_userInteracting\` on the very click
+    // that asks for a redraw: the pack toggle's own refresh() would be queued behind a
+    // \`uiBlur\` that never fires (focus stays on the checkbox), leaving the dashboard
+    // stuck on "Update pending". Deny-list rather than allow-list the input types so a
+    // text-like type we haven't enumerated still defers correctly.
+    var NON_TEXT_INPUT_TYPES = {
+      button: 1, checkbox: 1, color: 1, file: 1, hidden: 1, image: 1,
+      radio: 1, range: 1, reset: 1, submit: 1,
+    };
     function isEditableTarget(el) {
       if (!el) return false;
+      if (el.isContentEditable === true) return true;
+      // Attribute fallback for hosts that don't implement the isContentEditable
+      // property (jsdom, where this script is unit-tested, is one). Explicit
+      // \`contenteditable="false"\` opts out, matching the property's semantics.
+      var ce = el.getAttribute && el.getAttribute('contenteditable');
+      if (ce !== null && ce !== undefined && ce.toLowerCase() !== 'false') return true;
       var tag = el.tagName;
-      return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable === true;
+      if (tag === 'TEXTAREA') return true;
+      if (tag !== 'INPUT') return false;
+      var type = (el.getAttribute('type') || 'text').toLowerCase();
+      return NON_TEXT_INPUT_TYPES[type] !== 1;
     }
     document.addEventListener('focusin', function(e) {
       if (isEditableTarget(e.target)) vscode.postMessage({ type: 'uiFocus' });

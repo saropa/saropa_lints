@@ -126,11 +126,7 @@ void _badPositionedInColumn() {
 // ---------------------------------------------------------------------------
 
 void _goodPositionedInStack() {
-  Stack(
-    children: [
-      Positioned(top: 10, child: Text('ok')),
-    ],
-  );
+  Stack(children: [Positioned(top: 10, child: Text('ok'))]);
 }
 
 // ---------------------------------------------------------------------------
@@ -138,11 +134,7 @@ void _goodPositionedInStack() {
 // ---------------------------------------------------------------------------
 
 void _goodPositionedInIndexedStack() {
-  IndexedStack(
-    children: [
-      Positioned(top: 10, child: Text('ok')),
-    ],
-  );
+  IndexedStack(children: [Positioned(top: 10, child: Text('ok'))]);
 }
 
 // ---------------------------------------------------------------------------
@@ -163,12 +155,7 @@ class FocusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        ...backgroundLayers,
-        const SizedBox(),
-      ],
-    );
+    return Stack(children: <Widget>[...backgroundLayers, const SizedBox()]);
   }
 }
 

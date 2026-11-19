@@ -176,6 +176,7 @@ function categoryFromLegacyStatus(status: string): string | null {
     if (normalized === 'stable') { return 'stable'; }
     if (normalized === 'outdated') { return 'outdated'; }
     if (normalized === 'abandoned') { return 'abandoned'; }
+    if (normalized === 'upgrade required') { return 'upgrade-required'; }
     if (normalized === 'end of life') { return 'end-of-life'; }
     return null;
 }

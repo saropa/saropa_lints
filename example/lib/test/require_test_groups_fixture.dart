@@ -116,7 +116,7 @@ void _bad1168_main() {
   test('login fails with unknown user', () {});
   test('logout clears session', () {});
   test('logout redirects to login', () {});
-// 10+ tests without organization
+  // 10+ tests without organization
 }
 
 // GOOD: Should NOT trigger require_test_groups

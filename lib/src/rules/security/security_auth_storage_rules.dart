@@ -123,7 +123,7 @@ class RequireSecureStorageRule extends SaropaLintRule {
 
       if (node.argumentList.arguments.isEmpty) return;
 
-      final Expression firstArg = node.argumentList.arguments.first;
+      final Argument firstArg = node.argumentList.arguments.first;
       final String keySource = firstArg.toSource().toLowerCase();
 
       if (_sensitiveKeyPatterns.any((p) => p.hasMatch(keySource))) {
@@ -223,6 +223,9 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
     'clientSecret',
   };
 
+  /// Short plain word (letters only), not secret-shaped.
+  static final RegExp _plainWord = RegExp(r'^[A-Za-z]{1,16}$');
+
   // Patterns that look like real credentials
   // Note: Bearer/Basic tokens should be a single base64-like token without spaces
   static final RegExp _credentialPatterns = RegExp(
@@ -238,17 +241,22 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
       final String varName = node.name.lexeme.toLowerCase();
 
       // Check if variable name suggests credentials
-      final bool isCredentialName = _credentialNames.any(
-        (String pattern) => varName.contains(pattern),
-      );
+      final List<String> matched = _credentialNames
+          .where((String pattern) => varName.contains(pattern.toLowerCase()))
+          .toList();
 
-      if (!isCredentialName) return;
+      if (matched.isEmpty) return;
+      // A bare "token" in the name is ambiguous (linguistic/lexer token, e.g.
+      // `_unitToken = 'unit'`); only specific names (authToken, apiKey, ...)
+      // imply a secret.
+      final bool onlyBareToken = matched.every((String m) => m == 'token');
 
       // Check if it's assigned a string literal
       final Expression? initializer = node.initializer;
       if (initializer is StringLiteral) {
         final String? value = initializer.stringValue;
         if (value != null && value.isNotEmpty && value.length > 3) {
+          if (onlyBareToken && _plainWord.hasMatch(value)) return;
           reporter.atNode(node);
         }
       }
@@ -371,10 +379,10 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
       if (!_isBiometricReceiver(target)) return;
 
       // Check for biometricOnly: true
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'biometricOnly') {
-            final expr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'biometricOnly') {
+            final expr = arg.argumentExpression;
             if (expr is BooleanLiteral && expr.value) {
               reporter.atNode(arg);
               return;
@@ -491,7 +499,7 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 
       if (node.argumentList.arguments.isEmpty) return;
 
-      final Expression firstArg = node.argumentList.arguments.first;
+      final Argument firstArg = node.argumentList.arguments.first;
       final String keySource = firstArg.toSource().toLowerCase();
 
       if (_passwordKeyPatterns.any((p) => p.hasMatch(keySource))) {
@@ -736,14 +744,8 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
   /// Extracts the type string from a formal parameter.
   static String? _extractParamType(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
       return param.type?.toSource();
-    }
-    if (param is DefaultFormalParameter) {
-      final NormalFormalParameter normalParam = param.parameter;
-      if (normalParam is SimpleFormalParameter) {
-        return normalParam.type?.toSource();
-      }
     }
     return null;
   }
@@ -1313,6 +1315,13 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 /// not immediately preceded by an ASCII letter; delimiters such as `.`, `_`,
 /// `(`, or start-of-argument still allow real `pin` arguments to match.
 ///
+/// **Not flagged (auth-status metadata):** Identifiers describing auth
+/// *configuration/status* rather than a credential — `authStatusFields`,
+/// `authConfigured`, `authRequired`/`authRequiredMessage`, `authScheme` — skip
+/// the `auth` keyword match even though they contain the substring `auth`.
+/// Only that identifier is stripped from the scanned text, so a credential
+/// elsewhere in the same call still triggers.
+///
 /// **BAD:**
 /// ```dart
 /// await prefs.setString('password', value);
@@ -1463,6 +1472,28 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     RegExp(r'stoptokens?\b'),
     RegExp(r'nlptokens?\b'),
   ];
+
+  /// Auth-**status**/configuration metadata anywhere in the call's args means
+  /// that identifier is a boolean/enum describing whether or how auth is
+  /// configured (or a static rejection message), not a credential — even
+  /// though it contains the `auth` substring matched by [_authKeywordPattern].
+  /// Anchored with `\b` on both ends so prefixed/suffixed identifiers like
+  /// `userAuthScheme` or `isAuthRequired` do NOT match (only the bare
+  /// metadata names do).
+  ///
+  /// Unlike [_argumentSearchIndexContextPatterns] (which skips the whole
+  /// call), a match here only strips that one identifier out of the scanned
+  /// text — see `runWithReporter` — so a metadata field sitting alongside a
+  /// real credential in the same call (e.g. `{'authScheme': 'basic',
+  /// 'password': pwd}`) still triggers on the credential. See
+  /// `bugs/require_data_encryption_false_positive_auth_status_metadata_keyword_match.md`.
+  static final List<RegExp> _argumentAuthStatusContextPatterns = <RegExp>[
+    RegExp(r'\bauthstatusfields?\b'),
+    RegExp(r'\bauthconfigured\b'),
+    RegExp(r'\bauthrequired(?:message)?\b'),
+    RegExp(r'\bauthscheme\b'),
+  ];
+
   static final List<RegExp> _secureStorageTargetPatterns = [
     RegExp(r'\bsecure\b'),
     RegExp(r'\bencrypt\b'),
@@ -1483,6 +1514,51 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     // Method names ending in Encrypted(…)
     RegExp(r'encrypted\('),
   ];
+
+  /// True when [args] is a single companion/constructor call (or map literal)
+  /// whose every field is assigned `null` / `Value(null)`: the call removes
+  /// data rather than storing it, even though the class or column names
+  /// (`AuthCompanion(token: ...)`) look sensitive.
+  static bool _onlyClearsFields(ArgumentList args) {
+    if (args.arguments.length != 1) return false;
+    final Argument only = args.arguments.first;
+    final Expression expr = only is NamedArgument
+        ? only.argumentExpression
+        : only as Expression;
+    final Iterable<Expression> values;
+    if (expr is InstanceCreationExpression) {
+      values = _fieldValues(expr.argumentList);
+    } else if (expr is MethodInvocation) {
+      values = _fieldValues(expr.argumentList);
+    } else if (expr is SetOrMapLiteral) {
+      values = <Expression>[
+        for (final CollectionElement e in expr.elements)
+          if (e is MapLiteralEntry) e.value else expr,
+      ];
+    } else {
+      return false;
+    }
+    return values.isNotEmpty && values.every(_isNullOrValueNull);
+  }
+
+  static List<Expression> _fieldValues(ArgumentList list) => <Expression>[
+    for (final Argument a in list.arguments)
+      if (a is NamedArgument) a.argumentExpression else a as Expression,
+  ];
+
+  static bool _isNullOrValueNull(Expression e) {
+    if (e is NullLiteral) return true;
+    final ArgumentList? inner = e is InstanceCreationExpression
+        ? e.argumentList
+        : e is MethodInvocation
+        ? e.argumentList
+        : null;
+    if (inner == null || inner.arguments.length != 1) return false;
+    final String callee = e is InstanceCreationExpression
+        ? e.constructorName.type.name.lexeme
+        : (e as MethodInvocation).methodName.name;
+    return callee == 'Value' && inner.arguments.first is NullLiteral;
+  }
 
   @override
   void runWithReporter(
@@ -1509,9 +1585,32 @@ class RequireDataEncryptionRule extends SaropaLintRule {
         }
       }
 
+      // In-memory text builders are not storage: `StringBuffer.write` builds
+      // a string (e.g. a hash input), it persists nothing.
+      final String? targetType = target?.staticType?.element?.name;
+      if (targetType == 'StringBuffer' || targetType == 'StringSink') return;
+
+      // Clearing credentials (every field set to null) stores nothing.
+      if (_onlyClearsFields(node.argumentList)) return;
+
       // Check if arguments contain sensitive data (not the full node source,
       // which includes target/receiver names that may incidentally match).
-      final String argsSource = node.argumentList.toSource().toLowerCase();
+      String argsSource = node.argumentList.toSource().toLowerCase();
+
+      // A static call `SuccessCardGate.write([SuccessCardGate.key(id)])`
+      // repeats the receiver class name as a qualifier inside its own
+      // arguments; that name (here "card") describes the class, not the stored
+      // data. Strip only the `ClassName.` qualifier so `Secret.write(Secret.x)`
+      // still scans `x`.
+      if (target is SimpleIdentifier &&
+          target.name[0] != target.name[0].toLowerCase()) {
+        // Only a leading qualifier: not preceded by an identifier character or
+        // `.`, so `userCreditCard.number` keeps its `card` / `number` text.
+        argsSource = argsSource.replaceAll(
+          RegExp('(?<![\\w\$.])${RegExp.escape(target.name.toLowerCase())}\\.'),
+          ' ',
+        );
+      }
 
       if (_argumentEncryptionSignalPatterns.any(
         (RegExp p) => p.hasMatch(argsSource),
@@ -1529,20 +1628,34 @@ class RequireDataEncryptionRule extends SaropaLintRule {
         return;
       }
 
-      if (_pinKeywordPattern.hasMatch(argsSource)) {
+      // Strip auth-status/configuration metadata or static rejection-message
+      // identifiers (e.g. `authStatusFields`, `authRequiredMessage`) out of
+      // the scanned text rather than skipping the whole call: a metadata
+      // field can sit alongside a real credential in the same argument list
+      // (e.g. `{'authScheme': 'basic', 'password': pwd}`), which must still
+      // be flagged. See
+      // bugs/require_data_encryption_false_positive_auth_status_metadata_keyword_match.md.
+      String scannedArgsSource = argsSource;
+      for (final RegExp pattern in _argumentAuthStatusContextPatterns) {
+        scannedArgsSource = scannedArgsSource.replaceAll(pattern, ' ');
+      }
+
+      if (_pinKeywordPattern.hasMatch(scannedArgsSource)) {
         reporter.atNode(node);
         return;
       }
-      if (_tokenKeywordPattern.hasMatch(argsSource)) {
+      if (_tokenKeywordPattern.hasMatch(scannedArgsSource)) {
         reporter.atNode(node);
         return;
       }
-      if (_authKeywordPattern.hasMatch(argsSource)) {
+      if (_authKeywordPattern.hasMatch(scannedArgsSource)) {
         reporter.atNode(node);
         return;
       }
+      // `vcard` (contact file format) contains the substring `card`.
+      final String keywordSource = scannedArgsSource.replaceAll('vcard', ' ');
       for (final String keyword in _sensitiveKeywords) {
-        if (argsSource.contains(keyword)) {
+        if (keywordSource.contains(keyword)) {
           reporter.atNode(node);
           return;
         }
@@ -1630,16 +1743,16 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
       // `enableSuggestions:false` (no space) or split across wrapped lines by
       // the formatter was a false positive, and `obscureText: true` matched even
       // when `true` was actually a getter expression. Reading the literal value
-      // off each NamedExpression removes that formatting dependence.
+      // off each NamedArgument removes that formatting dependence.
       bool obscureTextTrue = false;
       bool enableSuggestionsFalse = false;
       bool autocorrectFalse = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
 
-        final String label = arg.name.label.name;
-        final Expression value = arg.expression;
+        final String label = arg.name.lexeme;
+        final Expression value = arg.argumentExpression;
 
         // Only a literal `true` / `false` is decidable here. A non-literal
         // (e.g. `obscureText: _obscure`) leaves the flag at its default, so a
@@ -1803,7 +1916,7 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
       if (!isPrefs) return;
 
       // Check VALUE argument for auth patterns (key is checked by other rule)
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
       final String valueSource = args[1].toSource().toLowerCase();
@@ -2202,13 +2315,13 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       String? keyValue;
 
       if (firstArg is SimpleStringLiteral) {
         keyValue = firstArg.value.toLowerCase();
-      } else if (firstArg is NamedExpression) {
-        final expr = firstArg.expression;
+      } else if (firstArg is NamedArgument) {
+        final expr = firstArg.argumentExpression;
         if (expr is SimpleStringLiteral) {
           keyValue = expr.value.toLowerCase();
         }
@@ -2434,9 +2547,9 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
       }
 
       // Check the value being written
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'value') {
-          final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'value') {
+          final Expression value = arg.argumentExpression;
 
           // cspell:ignore imagedata
           // Check for indicators of large data
@@ -2528,9 +2641,8 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
   static bool _hasAuthenticationRequired(Expression optionsExpr) {
     if (optionsExpr is! InstanceCreationExpression) return false;
     for (final arg in optionsExpr.argumentList.arguments) {
-      if (arg is NamedExpression &&
-          arg.name.label.name == 'authenticationRequired') {
-        final expr = arg.expression;
+      if (arg is NamedArgument && arg.name.lexeme == 'authenticationRequired') {
+        final expr = arg.argumentExpression;
         if (expr is BooleanLiteral && expr.value) return true;
       }
     }
@@ -2547,11 +2659,11 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
       if (typeName != 'FlutterSecureStorage') return;
 
       bool hasBiometric = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final name = arg.name.lexeme;
           if (name == 'aOptions' || name == 'iOptions') {
-            if (_hasAuthenticationRequired(arg.expression)) {
+            if (_hasAuthenticationRequired(arg.argumentExpression)) {
               hasBiometric = true;
               break;
             }
@@ -2650,7 +2762,7 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
       if (target is! SimpleIdentifier || target.name != 'Clipboard') return;
 
       // Check the argument for sensitive patterns
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource();
         if (_sensitivePattern.hasMatch(argSource)) {
           reporter.atNode(node);
@@ -3014,9 +3126,9 @@ class PreferOauthPkceRule extends SaropaLintRule {
       if (!_oauthConstructors.contains(typeName)) return;
 
       // Check for PKCE-related parameters
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (paramName == 'codeVerifier' ||
               paramName == 'codeChallenge' ||
               paramName == 'pkce') {
@@ -3411,9 +3523,9 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
   /// Returns the source of the controller argument (root identifier/chain), or
   /// null if there is no named `controller` argument.
   static String? _controllerRootFromCreation(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'controller') {
-        return _controllerRootFromExpression(arg.expression);
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'controller') {
+        return _controllerRootFromExpression(arg.argumentExpression);
       }
     }
     return null;

@@ -240,7 +240,7 @@ class TestGeneratedDartMapParity(unittest.TestCase):
     def test_committed_dart_file_matches_generator_output(self) -> None:
         from pathlib import Path
 
-        from scripts.generate_us_english_rule_data import (
+        from scripts.generators.generate_us_english_rule_data import (
             render_dart,
             _OUTPUT_REL,
             _REPO_ROOT,
@@ -252,8 +252,48 @@ class TestGeneratedDartMapParity(unittest.TestCase):
             committed,
             expected,
             "lib/src/rules/data/uk_to_us_spellings.dart is stale. "
-            "Run: py -3 scripts/generate_us_english_rule_data.py",
+            "Run: py -3 scripts/generators/generate_us_english_rule_data.py",
         )
+
+
+class TriePatternEquivalenceTests(unittest.TestCase):
+    """The prefix-factored patterns must match exactly like a flat list."""
+
+    def test_trie_patterns_match_flat_alternation(self) -> None:
+        import re
+
+        from scripts.modules import _us_spelling as sp
+
+        flat_word = re.compile(
+            r"\b(" + "|".join(re.escape(w) for w in sp._SORTED_UK) + r")\b",
+            re.IGNORECASE,
+        )
+        flat_camel = re.compile(
+            r"(?<=[a-z])("
+            + "|".join(re.escape(w) for w in sp._CAPITALIZED_UK)
+            + r")(?![a-z])"
+        )
+
+        def spans(pattern: "re.Pattern[str]", line: str) -> list:
+            return [(m.span(), m.group(1)) for m in pattern.finditer(line)]
+
+        for word in sp._SORTED_UK:
+            for line in (
+                word,
+                word.upper(),
+                word + "s",
+                f"{word}ed {word}",
+                "x" + word.capitalize() + "y",
+                "aa" + word.capitalize(),
+            ):
+                self.assertEqual(
+                    spans(flat_word, line), spans(sp._UK_PATTERN, line), line
+                )
+                self.assertEqual(
+                    spans(flat_camel, line),
+                    spans(sp._UK_CAMEL_PATTERN, line),
+                    line,
+                )
 
 
 if __name__ == "__main__":

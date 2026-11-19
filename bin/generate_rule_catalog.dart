@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 /// Generates the bundled rule-metadata catalog the VS Code extension ships.
 ///
 /// Usage: `dart run saropa_lints:generate_rule_catalog [--output <file>]`
@@ -55,7 +56,5 @@ void main(List<String> args) {
   file.parent.createSync(recursive: true);
   file.writeAsStringSync('$encoded\n');
 
-  stdout.writeln(
-    'Wrote ${metadata.length} rules to ${file.absolute.path}',
-  );
+  stdout.writeln('Wrote ${metadata.length} rules to ${file.absolute.path}');
 }

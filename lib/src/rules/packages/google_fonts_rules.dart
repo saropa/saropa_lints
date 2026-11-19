@@ -69,11 +69,9 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
       if (target != 'GoogleFonts') return;
 
       // Check for fontFamilyFallback parameter
-      final bool hasFallback = node.argumentList.arguments.any((
-        Expression arg,
-      ) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'fontFamilyFallback';
+      final bool hasFallback = node.argumentList.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'fontFamilyFallback';
         }
         return false;
       });

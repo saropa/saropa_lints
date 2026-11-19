@@ -285,15 +285,16 @@ class _ExternalControllerWidgetState extends State<ExternalControllerWidget> {
     return Autocomplete<String>(
       optionsBuilder: (TextEditingValue value) =>
           const Iterable<String>.empty(),
-      fieldViewBuilder: (
-        BuildContext context,
-        TextEditingController controller,
-        FocusNode focusNode,
-        VoidCallback onSubmitted,
-      ) {
-        _autocompleteController = controller; // Assigned, not created
-        return TextField(controller: controller, focusNode: focusNode);
-      },
+      fieldViewBuilder:
+          (
+            BuildContext context,
+            TextEditingController controller,
+            FocusNode focusNode,
+            VoidCallback onSubmitted,
+          ) {
+            _autocompleteController = controller; // Assigned, not created
+            return TextField(controller: controller, focusNode: focusNode);
+          },
     );
   }
 }
@@ -320,11 +321,7 @@ class _BadPageViewWidgetState extends State<BadPageViewWidget> {
   Widget build(BuildContext context) {
     return PageView(
       controller: _pageController,
-      children: const [
-        Text('Page 1'),
-        Text('Page 2'),
-        Text('Page 3'),
-      ],
+      children: const [Text('Page 1'), Text('Page 2'), Text('Page 3')],
     );
   }
 }
@@ -350,11 +347,7 @@ class _GoodPageViewWidgetState extends State<GoodPageViewWidget> {
   Widget build(BuildContext context) {
     return PageView(
       controller: _pageController,
-      children: const [
-        Text('Page 1'),
-        Text('Page 2'),
-        Text('Page 3'),
-      ],
+      children: const [Text('Page 1'), Text('Page 2'), Text('Page 3')],
     );
   }
 }
@@ -631,11 +624,11 @@ class _GoodMixedSubscriptionWidgetState
   @override
   void initState() {
     super.initState();
-    _singleSub = Stream.periodic(const Duration(seconds: 1), (i) => i)
-        .listen((data) => setState(() {}));
-    _multiSubs.add(
-      Stream.periodic(const Duration(seconds: 2)).listen((_) {}),
-    );
+    _singleSub = Stream.periodic(
+      const Duration(seconds: 1),
+      (i) => i,
+    ).listen((data) => setState(() {}));
+    _multiSubs.add(Stream.periodic(const Duration(seconds: 2)).listen((_) {}));
   }
 
   @override

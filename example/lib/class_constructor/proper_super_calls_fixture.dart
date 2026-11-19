@@ -120,12 +120,12 @@ void dispose() {
 
 // GOOD: Should NOT trigger proper_super_calls
 void _good143_initState() {
-// super.initState();
+  // super.initState();
   _controller = TextEditingController();
 }
 
 @override
 void dispose() {
   _controller.dispose();
-// super.dispose();
+  // super.dispose();
 }

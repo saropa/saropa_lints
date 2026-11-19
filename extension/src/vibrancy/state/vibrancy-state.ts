@@ -88,7 +88,8 @@ export class VibrancyStateManager implements vscode.Disposable {
         this.updatableCount.value = active.filter(isUpdatable).length;
         // End-of-life, abandoned, and outdated packages are all counted as problems
         this.problemCount.value = active.filter(
-            r => r.category === 'end-of-life' || r.category === 'abandoned' || r.category === 'outdated',
+            r => r.category === 'end-of-life' || r.category === 'abandoned' || r.category === 'outdated'
+                || r.category === 'upgrade-required',
         ).length;
         this._onDidChangeResults.fire();
     }

@@ -68,9 +68,9 @@ bool _isTestFilePath(String path) {
 }
 
 Expression? _namedArg(ArgumentList args, String name) {
-  for (final Expression arg in args.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) {
-      return arg.expression;
+  for (final Argument arg in args.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) {
+      return arg.argumentExpression;
     }
   }
   return null;
@@ -101,8 +101,8 @@ bool _isUtcTaintedExpression(Expression expr) {
     if (expr.methodName.name == 'parse' &&
         target is SimpleIdentifier &&
         target.name == 'DateTime') {
-      final List<Expression> args = expr.argumentList.arguments;
-      final Expression? first = args.isEmpty ? null : args.first;
+      final List<Argument> args = expr.argumentList.arguments;
+      final Argument? first = args.isEmpty ? null : args.first;
       final String? value = first is StringLiteral ? first.stringValue : null;
       return value != null && value.trim().toUpperCase().endsWith('Z');
     }
@@ -410,9 +410,9 @@ class DeviceCalendarPlusEmptyUpdateEventRule extends SaropaLintRule {
 
       bool hasEventId = false;
       bool hasChange = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        final String name = arg.name.lexeme;
         if (name == 'eventId') {
           hasEventId = true;
         } else if (_updateEventChangeArgs.contains(name)) {

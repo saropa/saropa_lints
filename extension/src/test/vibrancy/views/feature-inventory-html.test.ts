@@ -7,11 +7,26 @@
 import '../register-vscode-mock';
 import * as assert from 'assert';
 import { buildFeatureInventoryHtml } from '../../../vibrancy/views/feature-inventory-html';
+import { getFeatureInventoryStyles } from '../../../vibrancy/views/feature-inventory-styles';
 import { getFeatureInventoryScript } from '../../../vibrancy/views/feature-inventory-script';
 import { l10n } from '../../../i18n/runtime';
 import { api, feature, occurrences, pkg, report } from './feature-inventory-fixture';
 
 describe('feature-inventory-html', () => {
+    it('embedded styles emit no body rule and use VS Code theme tokens', () => {
+        const embedded = getFeatureInventoryStyles(true);
+        assert.ok(!/(^|[\s,}])body\s*\{/.test(embedded), 'embedded must not restyle body');
+        assert.ok(embedded.includes('var(--vscode-'), 'embedded must use theme tokens');
+        assert.ok(!embedded.includes('#1f2328'), 'no hard-coded light text colour');
+    });
+
+    it('default styles are unchanged (standalone body rule, no theme tokens)', () => {
+        const std = getFeatureInventoryStyles();
+        assert.strictEqual(std, getFeatureInventoryStyles(false));
+        assert.ok(/(^|[\s,}])body\s*\{/.test(std));
+        assert.ok(std.includes('#1f2328'));
+    });
+
     it('renders zero-usage and unmeasurable chips distinguishably', () => {
         const html = buildFeatureInventoryHtml(report([pkg({
             features: [

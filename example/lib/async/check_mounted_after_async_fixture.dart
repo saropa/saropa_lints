@@ -19,4 +19,13 @@ Future<void> _good() async {
   setState(() {}); // mounted check before setState
 }
 
+// GOOD: the only await sits in a branch that returns
+Future<void> _goodAwaitInReturningBranch(bool hasPicks) async {
+  if (!hasPicks) {
+    await _fetch();
+    return;
+  }
+  setState(() {});
+}
+
 void main() {}

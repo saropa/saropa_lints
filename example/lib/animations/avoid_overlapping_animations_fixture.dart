@@ -29,8 +29,10 @@ class _AvoidOverlappingAnimationsFixtureState
       vsync: this,
     );
     _animation = CurvedAnimation(parent: _animation, curve: Curves.easeIn);
-    _anotherAnimation =
-        CurvedAnimation(parent: _animation, curve: Curves.easeOut);
+    _anotherAnimation = CurvedAnimation(
+      parent: _animation,
+      curve: Curves.easeOut,
+    );
   }
 
   @override

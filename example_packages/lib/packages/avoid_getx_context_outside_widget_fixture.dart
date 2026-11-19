@@ -118,9 +118,9 @@ dynamic widget;
 class _bad640_MyController extends GetxController {
   void showMessage(String msg) {
     void _topLevel119() {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        SnackBar(content: Text(msg)),
-      );
+      ScaffoldMessenger.of(
+        Get.context!,
+      ).showSnackBar(SnackBar(content: Text(msg)));
     }
   }
 

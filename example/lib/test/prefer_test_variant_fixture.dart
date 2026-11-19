@@ -123,8 +123,9 @@ void _bad1182() async {
 
 // GOOD: Should NOT trigger prefer_test_variant
 void _good1182() async {
-  testWidgets('renders correctly', variant: ScreenSizeVariant(),
-      (tester) async {
+  testWidgets('renders correctly', variant: ScreenSizeVariant(), (
+    tester,
+  ) async {
     await tester.pumpWidget(MyWidget());
     expect();
   });

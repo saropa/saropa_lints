@@ -110,17 +110,11 @@ dynamic child;
 // BAD: Should trigger prefer_action_button_tooltip
 // expect_lint: prefer_action_button_tooltip
 void _bad1444() {
-  OverflowBox(
-    maxWidth: 300,
-    child: MyWidget(),
-  );
+  OverflowBox(maxWidth: 300, child: MyWidget());
 }
 
 // GOOD: Should NOT trigger prefer_action_button_tooltip
 void _good1444() {
   // OverflowBox needed: menu must extend beyond AppBar bounds
-  OverflowBox(
-    maxWidth: 300,
-    child: MyWidget(),
-  );
+  OverflowBox(maxWidth: 300, child: MyWidget());
 }

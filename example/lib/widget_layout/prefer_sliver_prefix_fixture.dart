@@ -111,15 +111,10 @@ dynamic image;
 // BAD: Should trigger prefer_sliver_prefix
 // expect_lint: prefer_sliver_prefix
 void _bad1290() {
-  Hero(
-    child: Image.asset('image.png'),
-  ); // Missing heroTag
+  Hero(child: Image.asset('image.png')); // Missing heroTag
 }
 
 // GOOD: Should NOT trigger prefer_sliver_prefix
 void _good1290() {
-  Hero(
-    tag: 'my-hero-tag',
-    child: Image.asset('image.png'),
-  );
+  Hero(tag: 'my-hero-tag', child: Image.asset('image.png'));
 }

@@ -113,5 +113,13 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 //
 // Suppressions (no lint): write as last statement; next stmt is return;
 // inside compute()/Isolate.run(); test directory; or followed by
-// yieldToUI, Future.microtask(() {}), Future.delayed(Duration.zero, ...).
+// yieldToUI, Future.microtask(() {}), Future.delayed(Duration.zero, ...);
+// or the enclosing package does not depend on Flutter (no UI thread to
+// protect — see bugs/require_yield_after_db_write_false_positive_one_shot_file_io_non_flutter_server.md).
+// This example package is itself non-Flutter (see example/pubspec.yaml),
+// so no code below fires this rule regardless of shape — resolved-harness
+// regression coverage for the Flutter-gate lives in
+// test/rules/resources/db_yield_rules_test.dart, which fabricates a
+// synthetic Flutter-declaring project to prove the true positive above
+// still fires there.
 void _note303() {}

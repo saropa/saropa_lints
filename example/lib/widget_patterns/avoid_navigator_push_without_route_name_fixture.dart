@@ -111,10 +111,7 @@ final context = BuildContext();
 // BAD: Should trigger avoid_navigator_push_without_route_name
 // expect_lint: avoid_navigator_push_without_route_name
 void _bad1386() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => NextPage()),
-  );
+  Navigator.push(context, MaterialPageRoute(builder: (_) => NextPage()));
 }
 
 // GOOD: Should NOT trigger avoid_navigator_push_without_route_name

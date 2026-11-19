@@ -122,10 +122,7 @@ void _good1199() async {
   testWidgets('navigates to details', (tester) async {
     final mockNavigator = MockNavigatorObserver();
     await tester.pumpWidget(
-      MaterialApp(
-        navigatorObservers: [mockNavigator],
-        home: MyWidget(),
-      ),
+      MaterialApp(navigatorObservers: [mockNavigator], home: MyWidget()),
     );
     await tester.tap(find.byType(ListTile));
     verify(mockNavigator.didPush(any, any));

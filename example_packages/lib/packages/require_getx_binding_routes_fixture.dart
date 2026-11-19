@@ -119,9 +119,5 @@ void _bad642() {
 
 // GOOD: Should NOT trigger require_getx_binding_routes
 void _good642() {
-  GetPage(
-    name: '/home',
-    page: () => HomePage(),
-    binding: HomeBinding(),
-  );
+  GetPage(name: '/home', page: () => HomePage(), binding: HomeBinding());
 }

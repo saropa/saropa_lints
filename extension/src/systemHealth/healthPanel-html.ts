@@ -6,6 +6,9 @@ import { formatBytes, isDaemonProcess, isSaropaProcess } from './processQuery';
 import { buildEnginesSection, buildActionsBar, buildLogSection, type EngineStatus } from './engineCardsHtml';
 import type { DartProcessInfo } from './types';
 import type { OrphanHostScan } from './orphanHosts';
+import { buildCiPublishSection } from './ciPublishHtml';
+import type { CiPublishPlan } from './ciPublish';
+import { buildCompatSection, type CompatCardState } from '../compat/compatCardHtml';
 
 export interface HealthPanelData {
   processes: DartProcessInfo[];
@@ -32,6 +35,15 @@ export interface HealthPanelRender {
    * process running can still be carrying tens of GB of stranded model hosts.
    */
   orphanHosts?: OrphanHostScan;
+  /**
+   * A CI workflow change written to the working tree and not yet published.
+   * Rendered directly above the engine cards — it is the consequence of the
+   * toggle the user just pressed, so it belongs next to it rather than at the
+   * bottom of a panel they would have to scroll to find.
+   */
+  ciPublish?: CiPublishPlan;
+  /** Version-compatibility card; absent until the user opens it. */
+  compat?: CompatCardState;
 }
 
 export function buildHealthPanelHtml(render: HealthPanelRender): string {
@@ -44,6 +56,11 @@ export function buildHealthPanelHtml(render: HealthPanelRender): string {
   const body = data && data.processes.length > 0
     ? buildTableHtml(data)
     : `<div class="empty-state">${escapeHtml(l10n('systemHealth.panel.empty'))}</div>`;
+
+  // Rendered outside the `engines` guard: a pending change must remain
+  // visible (and dismissible) even in the window before the engine deps are
+  // wired, or the user is left with an edited working tree and no explanation.
+  const publishHtml = buildCiPublishSection(render.ciPublish);
 
   const enginesHtml = engines && engines.length > 0
     ? `${buildEnginesSection(engines)}${buildActionsBar()}${buildLogSection(logEntries ?? [])}`
@@ -61,6 +78,8 @@ export function buildHealthPanelHtml(render: HealthPanelRender): string {
 </head>
 <body>
   ${buildOrphanHostBanner(render.orphanHosts)}
+  ${publishHtml}
+  ${buildCompatSection(render.compat)}
   ${enginesHtml}
   ${data ? buildSummaryBar(data) : ''}
   ${body}

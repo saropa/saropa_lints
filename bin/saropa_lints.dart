@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 /// Module overview (comment coverage pass).
 /// comment-coverage: module overview (batch).
 ///
@@ -100,7 +101,9 @@ void _printUsage() {
   print('  severity-report Run analysis and show results grouped by severity');
   print('  scan            Run configured lint rules against any Dart project');
   print('  doctor          Check project configuration for common issues');
-  print('  memory-report   Summarize analysis server RSS trend from plugin.log');
+  print(
+    '  memory-report   Summarize analysis server RSS trend from plugin.log',
+  );
   print('');
   print('Options:');
   print('  -h, --help      Show this help message');

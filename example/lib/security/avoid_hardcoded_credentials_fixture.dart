@@ -98,3 +98,8 @@ class ClipboardDataDemo {
   ClipboardDataDemo({this.text});
   final String? text;
 }
+
+// GOOD: bare "token" naming a linguistic token with a short plain word.
+class AddressNormalizer {
+  static const String _unitToken = 'unit';
+}

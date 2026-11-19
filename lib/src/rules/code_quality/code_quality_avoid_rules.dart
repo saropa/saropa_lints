@@ -45,6 +45,7 @@ import '../../fixes/code_quality/convert_to_named_bool_param_fix.dart';
 import '../../fixes/code_quality/replace_weak_crypto_fix.dart';
 import '../../fixes/code_quality/wrap_unawaited_fix.dart';
 import '../../early_exit_guard_utils.dart';
+import '../../async_context_utils.dart' show isMapRemoveCall;
 import '../../saropa_lint_rule.dart';
 
 class AvoidAdjacentStringsRule extends SaropaLintRule {
@@ -209,10 +210,10 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (methodName != 'parse' && methodName != 'tryParse') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
       if (firstArg is! SimpleStringLiteral) return;
 
       final String uriString = firstArg.value;
@@ -380,10 +381,10 @@ class AvoidMissedCallsRule extends SaropaLintRule {
         return;
       }
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
 
       // Check if argument is a simple identifier (potential tear-off)
       if (firstArg is SimpleIdentifier) {
@@ -438,19 +439,39 @@ class AvoidMissedCallsRule extends SaropaLintRule {
 ///
 /// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
 ///
-/// This catches cases where `{}` is used but interpreted as a Set
-/// when a Map was likely intended.
+/// This catches cases where an empty `{}` has NO written `Map` annotation
+/// and NO other typing context — not a declared type, not an
+/// argument/return/default-value context, not a surrounding map/list value
+/// slot. With no annotation and no context, Dart silently resolves `{}` to
+/// `Map<dynamic, dynamic>`, which can surprise a reader expecting a `Set`.
+///
+/// An empty `{}` is NOT flagged when EITHER of the following holds:
+/// - the enclosing variable has a written `Map` annotation — even a raw
+///   `Map` (no type arguments) or a typedef alias for one — because the
+///   annotation itself already answers "did you mean Set?"; or
+/// - the literal sits in ANY position that supplies a real context type
+///   (a declared `Set`/`Iterable` type, a parameter type, a return type, a
+///   map value slot, ...), because Dart resolves `{}` against that context
+///   directly.
+///
+/// An unhelpful annotation (`dynamic`, `Object`) does not count as a `Map`
+/// annotation, so it still falls through to the "no context" check below
+/// and is flagged.
 ///
 /// Example of **bad** code:
 /// ```dart
-/// Map<String, int> map = {};  // This is actually a Set literal!
-/// var items = {1, 2, 3};  // Set when Map might be expected
+/// var map = {};  // No context anywhere - silently becomes a Map, not a Set!
+/// dynamic map = {};  // dynamic gives no disambiguation either
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// Map<String, int> map = <String, int>{};  // Explicit Map
+/// Map<String, int> map = {};  // Explicit declared type - unambiguous
+/// Map raw = {};  // Written Map annotation (even raw) - unambiguous
+/// var map = <String, int>{};  // Explicit type argument - unambiguous
 /// Set<int> items = {1, 2, 3};  // Explicit Set type
+/// void f(Map<String, int> m) {}
+/// f({});  // Argument context - unambiguous
 /// ```
 class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
   AvoidMisusedSetLiteralsRule() : super(code: _code);
@@ -491,14 +512,45 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
       if (node.elements.isNotEmpty) return;
       if (node.typeArguments != null) return;
 
-      // Check if context expects a specific type
+      // A written `Map` annotation on the enclosing variable already
+      // answers "did you mean Set?" for the reader — even a raw `Map`
+      // (which resolves to `Map<dynamic, dynamic>`, same as no annotation
+      // at all) or a typedef alias for one. Checked via the declared
+      // element's resolved `type` (so a typedef is followed structurally,
+      // not by re-parsing the annotation's source text), and only when
+      // the annotation is explicit (`!hasImplicitType`) — `var`/inferred
+      // declarations fall through to the general check below.
+      final AstNode? parent = node.parent;
+      if (parent is VariableDeclaration && parent.initializer == node) {
+        final Element? element = parent.declaredFragment?.element;
+        if (element is VariableElement && !element.hasImplicitType) {
+          final DartType declaredType = element.type;
+          if (declaredType is InterfaceType && declaredType.isDartCoreMap) {
+            return;
+          }
+        }
+      }
+
+      // `node.staticType` is the analyzer's *resolved* type for this
+      // literal, which already reflects Dart's own context-typing —
+      // whatever position `{}` sits in (declaration, argument, default
+      // value, return, map value, index assignment, `??` operand, ...).
+      // When a real context type is available, Dart resolves `{}` against
+      // it directly: a `Map`-compatible context yields `Map<K, V>`, an
+      // `Iterable`-compatible-but-not-Map context yields `Set<E>`. Only
+      // when there is NO context type at all (and no written `Map`
+      // annotation, excluded above) does Dart fall back to its hardcoded
+      // default of `Map<dynamic, dynamic>` — and that default-with-no-
+      // context is the *only* shape where a reader could plausibly have
+      // meant `Set`. So: flag exactly that structural default (dart:core
+      // `Map` with both type arguments `dynamic`), not a display-string
+      // comparison, so it isn't fooled by an unrelated user-defined `Map`
+      // shadow or formatting differences.
       final DartType? contextType = node.staticType;
       if (contextType == null) return;
-
-      // Warn if the empty literal could be ambiguous
-      final String typeStr = contextType.getDisplayString();
-      if (typeStr.startsWith('Map<') || typeStr.startsWith('Set<')) {
-        // Type is inferred, but empty {} can be confusing
+      if (contextType is InterfaceType &&
+          contextType.isDartCoreMap &&
+          contextType.typeArguments.every((arg) => arg is DynamicType)) {
         reporter.atNode(node);
       }
     });
@@ -577,10 +629,8 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
       final String targetSource = target.toSource();
 
       // Check if any argument matches the target
-      for (final Expression arg in node.argumentList.arguments) {
-        final Expression actualArg = arg is NamedExpression
-            ? arg.expression
-            : arg;
+      for (final Argument arg in node.argumentList.arguments) {
+        final Expression actualArg = arg.argumentExpression;
         if (actualArg.toSource() == targetSource) {
           reporter.atNode(actualArg);
         }
@@ -1161,7 +1211,7 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
         if (annotation.name.name == 'pragma') {
           final ArgumentList? args = annotation.arguments;
           if (args != null && args.arguments.isNotEmpty) {
-            final Expression firstArg = args.arguments.first;
+            final Argument firstArg = args.arguments.first;
             if (firstArg is SimpleStringLiteral) {
               if (firstArg.value.contains('inline')) {
                 hasPragmaInline = true;
@@ -1214,6 +1264,24 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
 /// final result = text.length >= 10 ? text.substring(5, 10) : text;
 /// // or use split/pattern matching for extracting parts
 /// ```
+///
+/// ### Known scope limit: bounds proven inside a callee
+///
+/// This rule reasons about a single `substring()` call site: its receiver,
+/// its arguments, and the caller-side control flow (`if`/`while`/`for`
+/// guards, indexOf/regex-derived indices) surrounding it. It cannot inline
+/// a helper function's body to prove that the helper's return value is
+/// always in bounds — e.g. a private, same-file helper whose every `return`
+/// is provably `0 <= r <= sql.length`, used as `sql.substring(helper(sql))`
+/// with no guard at the call site. Verifying that soundly across arbitrary
+/// control flow (including early returns inside loops) is a data-flow/range-
+/// analysis problem, not something a single-hop AST/syntax heuristic can
+/// decide correctly — an attempted heuristic was reverted for being both
+/// unsound (see `plans/declined/avoid_string_substring_false_positive_local_helper_bounds_argument.md`)
+/// and unable to soundly change per-call-site severity without also
+/// extending `SaropaDiagnosticReporter`, which is out of scope here. When
+/// the helper is genuinely bounds-safe, suppress with `// ignore:` at the
+/// call site rather than restructuring the code around the lint.
 class AvoidSubstringRule extends SaropaLintRule {
   AvoidSubstringRule() : super(code: _code);
 
@@ -1263,7 +1331,7 @@ class AvoidSubstringRule extends SaropaLintRule {
     });
   }
 
-  /// Exposed for unit tests: the pure-AST bounds-guard check used by [run].
+  /// Exposed for unit tests: the pure-AST bounds-guard check used by `run`.
   /// It operates entirely on syntax (`toSource` / AST shape) with no resolved
   /// type binding, so it is verifiable on unresolved `parseString` ASTs — the
   /// only place this rule's guard logic can be exercised, since the scan CLI
@@ -1328,6 +1396,16 @@ class AvoidSubstringRule extends SaropaLintRule {
             _conditionHasRegexGuard(current.condition, receiverSource)) {
           return true;
         }
+      } else if (current is BinaryExpression &&
+          current.operator.lexeme == '&&' &&
+          current.rightOperand == prev) {
+        // `s.startsWith('c') && s.substring(1) == 'x'` — the left operand
+        // short-circuits, so the slice only runs when the guard held.
+        if (_conditionGuardsLength(current.leftOperand, receiverSource) ||
+            _conditionInvolvesArgs(current.leftOperand, argNames) ||
+            _conditionHasRegexGuard(current.leftOperand, receiverSource)) {
+          return true;
+        }
       } else if (current is WhileStatement) {
         // while (offset < length) — loop condition bounds the body.
         if (_conditionInvolvesArgs(current.condition, argNames)) {
@@ -1336,6 +1414,15 @@ class AvoidSubstringRule extends SaropaLintRule {
       } else if (current is ForStatement) {
         // for (...; end >= offset + 3; ...) — condition bounds the body.
         if (_forConditionInvolvesArgs(current, argNames)) return true;
+      } else if (current is ForElement) {
+        // Collection-for: `[for (var i = 0; i + 1 < s.length; i += 2) ...]`
+        // — same loop condition as the statement form bounds the body.
+        final forParts = current.forLoopParts;
+        if (forParts is ForParts &&
+            forParts.condition != null &&
+            _conditionInvolvesArgs(forParts.condition!, argNames)) {
+          return true;
+        }
       } else if (current is Block) {
         // Preceding if-return/break/continue/throw that checks the substring
         // args OR proves the receiver length/format (startsWith / isEmpty /
@@ -1523,7 +1610,7 @@ class AvoidSubstringRule extends SaropaLintRule {
     final arguments = substringCall.argumentList.arguments;
     if (arguments.isEmpty) return false;
     for (final arg in arguments) {
-      if (_isSafeIndexSource(arg)) continue;
+      if (_isSafeIndexSource(arg.argumentExpression)) continue;
       if (arg is SimpleIdentifier) {
         final Expression? initializer = _findLocalInitializer(arg);
         if (initializer != null && _isSafeIndexSource(initializer)) continue;
@@ -1599,7 +1686,7 @@ class AvoidSubstringRule extends SaropaLintRule {
   static Set<String> _substringArgNames(MethodInvocation call) {
     final names = <String>{};
     for (final arg in call.argumentList.arguments) {
-      _collectIdentifierNames(arg, names);
+      _collectIdentifierNames(arg.argumentExpression, names);
     }
     return names;
   }
@@ -1710,7 +1797,7 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
       final ArgumentList? args = node.arguments;
       if (args == null || args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! SimpleStringLiteral) return;
 
       final String pragmaValue = firstArg.value;
@@ -2126,18 +2213,18 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
   ) {
     // Check each method invocation for null arguments
     context.addMethodInvocation((MethodInvocation node) {
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         // Only check named parameters passed as explicit null
-        if (arg is NamedExpression && arg.expression is NullLiteral) {
+        if (arg is NamedArgument && arg.argumentExpression is NullLiteral) {
           reporter.atNode(arg);
         }
       }
     });
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         // Only check named parameters passed as explicit null
-        if (arg is NamedExpression && arg.expression is NullLiteral) {
+        if (arg is NamedArgument && arg.argumentExpression is NullLiteral) {
           reporter.atNode(arg);
         }
       }
@@ -2316,6 +2403,9 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
   }
 
   bool _shouldReport(MethodInvocation node) {
+    // Map.remove(key) returns the stored value; no Future is created.
+    if (isMapRemoveCall(node)) return false;
+
     // Check if the return type is Future
     final DartType? returnType = node.staticType;
     if (returnType == null) return false;
@@ -2405,8 +2495,8 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
 
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is NamedExpression) {
-        final String name = current.name.label.name;
+      if (current is NamedArgument) {
+        final String name = current.name.lexeme;
         return name == 'onDone' || name == 'onError';
       }
       if (current is MethodDeclaration || current is FunctionDeclaration) {
@@ -2659,7 +2749,7 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
       if (node.methodName.name != 'completeError') return;
 
       // Check argument count
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.length < 2) {
         reporter.atNode(node);
       }
@@ -2882,9 +2972,160 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
         return;
       }
 
+      // A length check on the same collection (`&&` left operand, enclosing
+      // `if`/ternary, or a preceding early-exit `if`) means the access is
+      // deliberate and in range, not a forgotten loop variable.
+      final Expression? target = node.target;
+      if (target != null && _isLengthGuarded(node, target.toSource())) {
+        super.visitIndexExpression(node);
+        return;
+      }
+
       reporter.atNode(node);
     }
     super.visitIndexExpression(node);
+  }
+
+  static bool _isLengthGuarded(IndexExpression node, String target) {
+    AstNode child = node;
+    AstNode? parent = node.parent;
+    while (parent != null && parent is! FunctionBody) {
+      if (parent is BinaryExpression &&
+          parent.operator.lexeme == '&&' &&
+          parent.rightOperand == child &&
+          _checksLength(parent.leftOperand, target, whenTrue: true)) {
+        return true;
+      }
+      if (parent is IfStatement && child != parent.expression) {
+        // Then-branch runs when the condition holds; else-branch when not.
+        if (_checksLength(
+          parent.expression,
+          target,
+          whenTrue: child == parent.thenStatement,
+        )) {
+          return true;
+        }
+      }
+      if (parent is ConditionalExpression && child != parent.condition) {
+        if (_checksLength(
+          parent.condition,
+          target,
+          whenTrue: child == parent.thenExpression,
+        )) {
+          return true;
+        }
+      }
+      if (parent is Block) {
+        for (final Statement s in parent.statements) {
+          if (s == child) break;
+          if (s is IfStatement &&
+              s.elseStatement == null &&
+              _exitsScope(s.thenStatement) &&
+              _checksLength(s.expression, target, whenTrue: false)) {
+            return true;
+          }
+        }
+      }
+      child = parent;
+      parent = parent.parent;
+    }
+    return false;
+  }
+
+  static bool _exitsScope(Statement s) {
+    final Statement last = s is Block
+        ? (s.statements.isEmpty ? s : s.statements.last)
+        : s;
+    return last is ContinueStatement ||
+        last is BreakStatement ||
+        last is ReturnStatement ||
+        (last is ExpressionStatement && last.expression is ThrowExpression);
+  }
+
+  /// [whenTrue]: the access runs where [condition] is true (`&&` right side,
+  /// then-branch); false where it is false (else-branch, after an early exit).
+  static bool _checksLength(
+    Expression condition,
+    String target, {
+    required bool whenTrue,
+  }) {
+    final _LengthCheckFinder finder = _LengthCheckFinder(target, whenTrue);
+    condition.accept(finder);
+    return finder.found;
+  }
+}
+
+/// Finds a comparison on `target.length` that proves the collection is
+/// non-empty where the guarded access runs (`length > 0`, `length == 2`,
+/// `length != 0`, `length >= n`; or, on the false side, `length == 0`,
+/// `length < n`, `length != n`). `length == 0` / `length < n` in a then-branch
+/// prove nothing and do not count.
+class _LengthCheckFinder extends RecursiveAstVisitor<void> {
+  _LengthCheckFinder(this.target, this.whenTrue);
+
+  final String target;
+  final bool whenTrue;
+  bool found = false;
+
+  static const Map<String, String> _negated = <String, String>{
+    '==': '!=',
+    '!=': '==',
+    '<': '>=',
+    '<=': '>',
+    '>': '<=',
+    '>=': '<',
+  };
+
+  static const Map<String, String> _flipped = <String, String>{
+    '==': '==',
+    '!=': '!=',
+    '<': '>',
+    '<=': '>=',
+    '>': '<',
+    '>=': '<=',
+  };
+
+  /// True when `length <op> n` (n null = not a literal) implies non-empty.
+  static bool _impliesNonEmpty(String op, int? n) {
+    switch (op) {
+      case '==':
+        return n == null || n > 0;
+      case '!=':
+        return n == 0;
+      case '>':
+        return n == null || n >= 0;
+      case '>=':
+        return n == null || n >= 1;
+    }
+    return false;
+  }
+
+  bool _isLength(Expression e) {
+    if (e is PrefixedIdentifier) {
+      return e.identifier.name == 'length' && e.prefix.toSource() == target;
+    }
+    if (e is PropertyAccess) {
+      return e.propertyName.name == 'length' &&
+          e.realTarget.toSource() == target;
+    }
+    return false;
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    String op = node.operator.lexeme;
+    Expression? other;
+    if (_isLength(node.leftOperand)) {
+      other = node.rightOperand;
+    } else if (_isLength(node.rightOperand)) {
+      other = node.leftOperand;
+      op = _flipped[op] ?? op;
+    }
+    if (other != null && _negated.containsKey(op)) {
+      final int? n = other is IntegerLiteral ? other.value : null;
+      if (_impliesNonEmpty(whenTrue ? op : _negated[op]!, n)) found = true;
+    }
+    super.visitBinaryExpression(node);
   }
 }
 
@@ -3287,7 +3528,8 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
       final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final param = params.first;
-      if (param is! SimpleFormalParameter) return;
+      if (param is! RegularFormalParameter || param.functionTypedSuffix != null)
+        return;
       final TypeAnnotation? repType = param.type;
       if (repType == null) return;
 
@@ -3556,10 +3798,10 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
     ArgumentList argList,
     SaropaDiagnosticReporter reporter,
   ) {
-    for (final Expression arg in argList.arguments) {
-      if (arg is! NamedExpression) continue;
+    for (final Argument arg in argList.arguments) {
+      if (arg is! NamedArgument) continue;
 
-      final Expression value = arg.expression;
+      final Expression value = arg.argumentExpression;
 
       // Only flag empty collection literals - these are almost always defaults
       if (_isEmptyCollectionLiteral(value)) {
@@ -3717,6 +3959,11 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
       // Skip short strings
       if (value.length < _minLength) return;
 
+      // Skip directive URIs (import/export/part): Dart requires these to be
+      // string literals, so there is no legal way to extract them to a
+      // constant. See isInImportOrExport doc for details.
+      if (isInImportOrExport(node)) return;
+
       // Skip excluded patterns
       if (_shouldSkipString(value)) return;
 
@@ -3857,6 +4104,11 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
       // Skip short strings
       if (value.length < _minLength) return;
 
+      // Skip directive URIs (import/export/part): Dart requires these to be
+      // string literals, so there is no legal way to extract them to a
+      // constant. See isInImportOrExport doc for details.
+      if (isInImportOrExport(node)) return;
+
       // Skip excluded patterns
       if (_shouldSkipString(value)) return;
 
@@ -3953,8 +4205,8 @@ class AvoidExpensiveLogStringConstructionRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'log') return;
 
-      final List<Expression> args = node.argumentList.arguments;
-      final Expression? first = args.isEmpty ? null : args.first;
+      final List<Argument> args = node.argumentList.arguments;
+      final Argument? first = args.isEmpty ? null : args.first;
       if (first == null) return;
       if (first is! StringInterpolation) return;
 
@@ -4014,9 +4266,9 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'BlocBuilder' && typeName != 'BlocConsumer') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'buildWhen') {
-          final Expression expr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'buildWhen') {
+          final Expression expr = arg.argumentExpression;
           if (expr is FunctionExpression) {
             final FunctionBody body = expr.body;
             // Check for => true
@@ -4279,8 +4531,15 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
         return true;
       }
     }
+    // Domain-prefixed names put the verb later (`dbActivityAdd`,
+    // `dbActivityAddForContact`): accept any camelCase word that is a verb.
+    for (final RegExpMatch m in _camelWord.allMatches(methodName)) {
+      if (_mutateVerbPrefixes.contains(m.group(0)!.toLowerCase())) return true;
+    }
     return false;
   }
+
+  static final RegExp _camelWord = RegExp('[A-Z]?[a-z0-9]+|[A-Z]+(?![a-z])');
 
   /// True if [element] is a method declared inside an `extension` block
   /// AND that extension is defined in the current project's own package
@@ -4367,6 +4626,8 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
       if (returnType == null || returnType is VoidType) return;
       if (returnType is DynamicType) return;
       if (returnType.isDartCoreNull) return;
+      // `Never` calls (throw helpers, exit) never return a value.
+      if (returnType is NeverType) return;
 
       // Skip Future<void>
       if (returnType.isDartAsyncFuture && returnType is InterfaceType) {
@@ -4602,16 +4863,11 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
         if (parent.metadata.any((a) => a.name.name == 'override')) return;
       } else if (parent is FunctionExpression) {
         return;
-      } else if (parent is FunctionTypedFormalParameter) {
+      } else if (parent is FunctionTypedFormalParameterSuffix) {
         return;
       }
       for (final FormalParameter p in node.parameters) {
-        if (p is DefaultFormalParameter) {
-          final param = p.parameter;
-          if (param is! SimpleFormalParameter) continue;
-          if (!_isPositional(node, p)) continue;
-          if (_isBoolType(param)) reporter.atNode(p);
-        } else if (p is SimpleFormalParameter) {
+        if (p is RegularFormalParameter && p.functionTypedSuffix == null) {
           if (!_isPositional(node, p)) continue;
           if (_isBoolType(p)) reporter.atNode(p);
         }
@@ -4623,7 +4879,7 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
     return p.isNamed == false;
   }
 
-  bool _isBoolType(SimpleFormalParameter p) {
+  bool _isBoolType(RegularFormalParameter p) {
     final TypeAnnotation? type = p.type;
     if (type is! NamedType) return false;
     final String name = type.name.lexeme;

@@ -85,14 +85,14 @@ function mdHeader(meta: ReportMetadata, isoTimestamp: string): string[] {
 
 function mdSummary(
     total: number,
-    counts: { vibrant: number; stable: number; outdated: number; abandoned: number; eol: number },
+    counts: { vibrant: number; stable: number; outdated: number; abandoned: number; upgradeRequired: number; eol: number },
     totalSize?: string,
 ): string[] {
     const rows = [
         '', '## Summary', '',
-        `| Total | Vibrant | Stable | Outdated | Abandoned | End of Life |`,
-        `|-------|---------|--------|----------|-----------|-------------|`,
-        `| ${total} | ${counts.vibrant} | ${counts.stable} | ${counts.outdated} | ${counts.abandoned} | ${counts.eol} |`,
+        `| Total | Vibrant | Stable | Outdated | Abandoned | Upgrade Required | End of Life |`,
+        `|-------|---------|--------|----------|-----------|------------------|-------------|`,
+        `| ${total} | ${counts.vibrant} | ${counts.stable} | ${counts.outdated} | ${counts.abandoned} | ${counts.upgradeRequired} | ${counts.eol} |`,
     ];
     if (totalSize) {
         rows.push('', `**Total archive size:** ${totalSize} *(before tree shaking)*`);
@@ -145,7 +145,8 @@ function buildJsonReport(
         summary: {
             total: results.length, vibrant: counts.vibrant,
             stable: counts.stable, outdated: counts.outdated,
-            abandoned: counts.abandoned, end_of_life: counts.eol,
+            abandoned: counts.abandoned, upgrade_required: counts.upgradeRequired,
+            end_of_life: counts.eol,
         },
         packages: results.map(mapPackageToJson),
     };

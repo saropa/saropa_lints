@@ -8,19 +8,13 @@ import '../flutter_mocks.dart';
 // BAD: Using deprecated 'alignPanAxis' parameter
 // expect_lint: prefer_pan_axis
 Widget _badAlignPanAxis() {
-  return InteractiveViewer(
-    alignPanAxis: true,
-    child: const Text('content'),
-  );
+  return InteractiveViewer(alignPanAxis: true, child: const Text('content'));
 }
 
 // BAD: alignPanAxis set to false (also deprecated)
 // expect_lint: prefer_pan_axis
 Widget _badAlignPanAxisFalse() {
-  return InteractiveViewer(
-    alignPanAxis: false,
-    child: const Text('content'),
-  );
+  return InteractiveViewer(alignPanAxis: false, child: const Text('content'));
 }
 
 // GOOD: Using the new 'panAxis' enum parameter
@@ -33,9 +27,7 @@ Widget _goodPanAxis() {
 
 // GOOD: No pan axis parameter at all (default is PanAxis.free)
 Widget _goodDefault() {
-  return InteractiveViewer(
-    child: const Text('content'),
-  );
+  return InteractiveViewer(child: const Text('content'));
 }
 
 // FALSE POSITIVE: 'alignPanAxis' string in a map literal

@@ -116,11 +116,7 @@ void _bad1330() {
 
 // GOOD: Should NOT trigger avoid_unconstrained_images
 void _good1330() {
-  Image.network(
-    'https://example.com/image.jpg',
-    width: 200,
-    height: 150,
-  );
+  Image.network('https://example.com/image.jpg', width: 200, height: 150);
   // Or:
   SizedBox(
     width: 200,

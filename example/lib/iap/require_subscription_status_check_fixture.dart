@@ -116,7 +116,7 @@ dynamic subscription;
 // Only checking once after purchase
 class _bad419_PremiumFeature extends StatelessWidget {
   Widget build(context) {
-// Just assuming subscription is still valid
+    // Just assuming subscription is still valid
     return PremiumContent();
   }
 }

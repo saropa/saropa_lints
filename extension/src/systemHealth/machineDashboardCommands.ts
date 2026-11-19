@@ -7,22 +7,44 @@
  * name, so the command's own confirmation/input flow can be reused by a
  * future command-palette entry without the panel knowing it exists.
  */
+import * as os from 'node:os';
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
-import { HEAP_CAP_FLAG } from './processQuery';
 import { unloadModel } from './ollamaQuery';
+import {
+  pickWriteTarget,
+  recommendHeapCapMb,
+  withHeapCap,
+  writeTargetToConfigurationTargetValue,
+  type HeapCapInspectResult,
+} from './heapCap';
+
+/** Whole-or-half GB string for the recommendation prompt, e.g. "8 GB" or "2.5 GB". */
+function formatGb(bytes: number): string {
+  const gb = bytes / 1_073_741_824;
+  const rounded = Math.round(gb * 10) / 10;
+  return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)} GB`;
+}
 
 /**
- * Insert or replace `--old_gen_heap_size=<mb>` in the user's global
- * `dart.analyzerVmAdditionalArgs` setting. Prompts for the value via a plain
- * input box rather than the dashboard's own webview — VS Code settings
- * writes belong to the extension host regardless of which UI surface
- * triggered them, and a webview `<input>` would need its own round-trip
- * message protocol to achieve the same thing with no added benefit.
+ * Insert or replace `--old_gen_heap_size=<mb>` in `dart.analyzerVmAdditionalArgs`.
+ * Prompts for the value via a plain input box rather than the dashboard's own
+ * webview — VS Code settings writes belong to the extension host regardless
+ * of which UI surface triggered them, and a webview `<input>` would need its
+ * own round-trip message protocol to achieve the same thing with no added
+ * benefit. Prefilled with the value recommended for this machine's RAM so
+ * most users can just hit Enter.
  */
 async function setAnalysisServerHeapCap(): Promise<void> {
+  const totalBytes = os.totalmem();
+  const recommendedMb = recommendHeapCapMb(totalBytes);
+
   const raw = await vscode.window.showInputBox({
-    prompt: l10n('machineDashboard.heapCap.prompt'),
+    prompt: l10n('machineDashboard.heapCap.promptWithRecommendation', {
+      totalGb: formatGb(totalBytes),
+      recommendedMb: String(recommendedMb),
+    }),
+    value: String(recommendedMb),
     validateInput: (value) => {
       const n = Number(value);
       // Reject non-numeric, fractional, zero, and negative input up front —
@@ -36,13 +58,23 @@ async function setAnalysisServerHeapCap(): Promise<void> {
 
   const config = vscode.workspace.getConfiguration('dart');
   const current = config.get<string[]>('analyzerVmAdditionalArgs', []);
+  // Write to whichever scope currently defines the setting (workspace folder
+  // > workspace > global) — writing to Global when a workspace value already
+  // overrides it would silently do nothing, which was the original bug here.
+  const inspected = config.inspect<string[]>('analyzerVmAdditionalArgs') as
+    | HeapCapInspectResult
+    | undefined;
+  const target = pickWriteTarget(inspected);
   // Strip any existing heap-cap flag before appending the new one — leaving
   // a stale `--old_gen_heap_size=2048` alongside a fresh `=4096` would pass
   // both to the VM, and only one of the two duplicate flags wins depending
   // on VM argument-parsing order, which is not a behavior to depend on.
-  const withoutOldCap = current.filter((a) => !a.includes(HEAP_CAP_FLAG));
-  const updated = [...withoutOldCap, `${HEAP_CAP_FLAG}=${mb}`];
-  await config.update('analyzerVmAdditionalArgs', updated, vscode.ConfigurationTarget.Global);
+  const updated = withHeapCap(current, mb);
+  await config.update(
+    'analyzerVmAdditionalArgs',
+    updated,
+    writeTargetToConfigurationTargetValue(target) as vscode.ConfigurationTarget,
+  );
 
   const restartLabel = l10n('machineDashboard.heapCap.restartNow');
   const choice = await vscode.window.showInformationMessage(

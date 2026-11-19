@@ -97,6 +97,7 @@ const CATEGORY_TO_CONFIG_KEY: Record<VibrancyCategory, keyof IndicatorConfig> = 
     'stable': 'stable',
     'outdated': 'outdated',
     'abandoned': 'abandoned',
+    'upgrade-required': 'outdated',
     'end-of-life': 'endOfLife',
 };
 

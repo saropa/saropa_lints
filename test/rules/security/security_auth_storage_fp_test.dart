@@ -235,4 +235,132 @@ Future<void> connect() async {
       },
     );
   });
+
+  // --------------------------------------------------------------------------
+  // require_data_encryption
+  //
+  // Audit: `_authKeywordPattern` matched the bare substring `auth` anywhere in
+  // the argument-list source, so calls writing auth-**status**/configuration
+  // metadata (`authStatusFields`, `authRequiredMessage`) — not credentials —
+  // were flagged. The fix strips only the matched metadata identifier out of
+  // the scanned text rather than skipping the whole call, so a metadata field
+  // sitting alongside a real credential in the same call still triggers. See
+  // bugs/require_data_encryption_false_positive_auth_status_metadata_keyword_match.md
+  // (relocated to plans/history/2026.09/2026.09.18/ once resolved).
+  // --------------------------------------------------------------------------
+  group('require_data_encryption', () {
+    test('does NOT report a spread auth-status/config metadata map', () async {
+      const code = '''
+import 'dart:convert';
+import 'dart:io';
+
+class ServerContext {
+  Map<String, dynamic> get authStatusFields =>
+      <String, dynamic>{'authRequired': false, 'authScheme': null};
+}
+
+class Handler {
+  final ServerContext ctx = ServerContext();
+
+  void sendHealth(HttpResponse res) {
+    res.write(
+      jsonEncode(<String, dynamic>{'ok': true, ...ctx.authStatusFields}),
+    );
+  }
+}
+''';
+      final codes = await reportedRuleCodes(RequireDataEncryptionRule(), code);
+      expect(codes.contains('require_data_encryption'), isFalse);
+    });
+
+    test(
+      'does NOT report a static authRequiredMessage rejection string',
+      () async {
+        const code = '''
+import 'dart:convert';
+import 'dart:io';
+
+class Handler {
+  void sendUnauthorized(HttpResponse res) {
+    const String authRequiredMessage = 'Authentication required';
+    res.write(
+      jsonEncode(<String, String>{'error': authRequiredMessage}),
+    );
+  }
+}
+''';
+        final codes = await reportedRuleCodes(
+          RequireDataEncryptionRule(),
+          code,
+        );
+        expect(codes.contains('require_data_encryption'), isFalse);
+      },
+    );
+
+    test(
+      'STILL reports when a metadata field AND a real credential are in '
+      'the SAME call (the metadata exclusion must not blanket-skip)',
+      () async {
+        const code = '''
+import 'dart:convert';
+import 'dart:io';
+
+void sendHealth(HttpResponse res, String password) {
+  res.write(
+    jsonEncode(<String, dynamic>{'authScheme': 'basic', 'password': password}),
+  );
+}
+''';
+        final codes = await reportedRuleCodes(
+          RequireDataEncryptionRule(),
+          code,
+        );
+        expect(codes.contains('require_data_encryption'), isTrue);
+      },
+    );
+
+    test(
+      'STILL reports authRequired metadata alongside a real accessToken',
+      () async {
+        const code = '''
+import 'dart:convert';
+import 'dart:io';
+
+void sendHealth(HttpResponse res, String accessToken) {
+  res.write(
+    jsonEncode(<String, dynamic>{
+      'authRequired': true,
+      'accessToken': accessToken,
+    }),
+  );
+}
+''';
+        final codes = await reportedRuleCodes(
+          RequireDataEncryptionRule(),
+          code,
+        );
+        expect(codes.contains('require_data_encryption'), isTrue);
+      },
+    );
+
+    test(
+      'STILL reports a bare userAuthScheme identifier (the metadata patterns '
+      "are anchored with \\b, so a prefixed identifier isn't recognized as "
+      'safe metadata and falls through to the generic auth keyword check)',
+      () async {
+        const code = '''
+void store(String userAuthScheme) {
+  box.put('scheme', userAuthScheme);
+}
+
+dynamic box;
+''';
+        final codes = await reportedRuleCodes(
+          RequireDataEncryptionRule(),
+          code,
+        );
+        expect(codes.contains('require_data_encryption'), isTrue);
+      },
+    );
+  });
 }

@@ -331,7 +331,7 @@ class NoMagicNumberRule extends SaropaLintRule {
   /// parameter. The parameter name provides context, making it not "magic."
   static bool _isDefaultParameterValue(AstNode node) {
     final AstNode? parent = node.parent;
-    return parent is DefaultFormalParameter;
+    return parent is FormalParameterDefaultClause;
   }
 }
 

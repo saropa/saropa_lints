@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { VibrancyResult } from '../types';
 import { findPackageRange } from '../services/pubspec-parser';
 import { CodeLensDetail } from '../scoring/codelens-formatter';
+import { isUpgradeSuppressed } from '../scoring/blast-radius-attacher';
 import { CodeLensToggle } from '../ui/codelens-toggle';
 import { PrereleaseToggle, arePrereleasesEnabled, getPrereleaseTagFilter } from '../ui/prerelease-toggle';
 import { getCategoryIndicator, getIndicator } from '../services/indicator-config';
@@ -104,7 +105,8 @@ function buildLensesForPackage(
 
     const latestVersion = result.updateInfo?.latestVersion;
     const hasUpdate = latestVersion
-        && result.updateInfo?.updateStatus !== 'up-to-date';
+        && result.updateInfo?.updateStatus !== 'up-to-date'
+        && !isUpgradeSuppressed(result);
 
     if (hasUpdate) {
         const args: UpdateFromCodeLensArgs = {

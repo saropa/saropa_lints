@@ -31,6 +31,13 @@ void main() {
       expect(File(fixturePath).existsSync(), isTrue);
     });
 
+    test('GOOD static-frame branch beside AnimatedBuilder has no marker', () {
+      final content = File(fixturePath).readAsStringSync();
+      final start = content.indexOf('class _GoodStaticFrameBranch');
+      expect(start, greaterThan(-1));
+      expect(content.substring(start), isNot(contains('expect_lint')));
+    });
+
     test('GOOD AnimatedBuilder builder block has no expect_lint marker', () {
       final content = File(fixturePath).readAsStringSync();
       final start = content.indexOf('class _GoodAnimatedBuilderChildReads');

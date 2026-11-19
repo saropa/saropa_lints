@@ -119,9 +119,6 @@ bool _methodHasConcreteBody(MethodDeclaration m) {
 bool _hasSuperFormalParameter(ConstructorDeclaration c) {
   for (final FormalParameter p in c.parameters.parameters) {
     if (p is SuperFormalParameter) return true;
-    if (p is DefaultFormalParameter && p.parameter is SuperFormalParameter) {
-      return true;
-    }
   }
   return false;
 }

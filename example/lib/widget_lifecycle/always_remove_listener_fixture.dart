@@ -110,20 +110,20 @@ dynamic controller;
 // BAD: Should trigger always_remove_listener
 // expect_lint: always_remove_listener
 void _bad1347_initState() {
-// super.initState();
+  // super.initState();
   controller.addListener(_onChanged); // Never removed!
 }
 
 // GOOD: Should NOT trigger always_remove_listener
 void _good1347_initState() {
-// super.initState();
+  // super.initState();
   controller.addListener(_onChanged);
 }
 
 @override
 void dispose() {
   controller.removeListener(_onChanged);
-// super.dispose();
+  // super.dispose();
 }
 
 // GOOD: the SAME listenable reached via `field!` (add) and `field?` (remove) —

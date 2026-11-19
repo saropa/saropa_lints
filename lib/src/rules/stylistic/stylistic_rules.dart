@@ -520,7 +520,8 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addSimpleFormalParameter((SimpleFormalParameter node) {
+    context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       if (node.type == null) return;
       AstNode? parent = node.parent;
       while (parent != null) {
@@ -530,7 +531,8 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
         }
         if (parent is MethodDeclaration ||
             parent is FunctionDeclaration ||
-            parent is ConstructorDeclaration) {
+            parent is ConstructorDeclaration ||
+            parent is FunctionTypedFormalParameterSuffix) {
           return;
         }
         parent = parent.parent;
@@ -811,8 +813,8 @@ class PreferOptionalPositionalParamsRule extends SaropaLintRule {
   }
 
   static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
-    if (p is SimpleFormalParameter) return p.type;
-    if (p is DefaultFormalParameter) return _getTypeAnnotation(p.parameter);
+    if (p is RegularFormalParameter && p.functionTypedSuffix == null)
+      return p.type;
     return null;
   }
 }
@@ -896,8 +898,8 @@ class PreferPositionalBoolParamsRule extends SaropaLintRule {
   }
 
   static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
-    if (p is SimpleFormalParameter) return p.type;
-    if (p is DefaultFormalParameter) return _getTypeAnnotation(p.parameter);
+    if (p is RegularFormalParameter && p.functionTypedSuffix == null)
+      return p.type;
     return null;
   }
 }
@@ -1261,11 +1263,9 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   /// collection literal (`[...]` / `{...}`). In both shapes dart format adds
   /// no trailing comma, so the rule must not demand one. Handles both
   /// positional and named arguments.
-  bool _lastArgIsBlockFormatted(NodeList<Expression> arguments) {
-    final Expression lastArg = arguments.last;
-    final Expression expr = lastArg is NamedExpression
-        ? lastArg.expression
-        : lastArg;
+  bool _lastArgIsBlockFormatted(NodeList<Argument> arguments) {
+    final Argument lastArg = arguments.last;
+    final Expression expr = lastArg.argumentExpression;
     return expr is FunctionExpression ||
         expr is ListLiteral ||
         expr is SetOrMapLiteral;
@@ -1899,13 +1899,9 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      final String paramName = node.name.label.name;
-
+    void check(String paramName, Expression expression) {
       // Only check common callback parameters
       if (!_callbackParams.contains(paramName)) return;
-
-      final Expression expression = node.expression;
 
       // Check if it's a simple identifier (method reference)
       if (expression is SimpleIdentifier) {
@@ -1922,6 +1918,13 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
         // Any prefixed identifier used as callback is a method/getter reference
         reporter.atNode(expression);
       }
+    }
+
+    context.addNamedArgument((NamedArgument node) {
+      check(node.name.lexeme, node.argumentExpression);
+    });
+    context.addRecordLiteralNamedField((RecordLiteralNamedField node) {
+      check(node.name.lexeme, node.fieldExpression);
     });
   }
 }
@@ -3081,7 +3084,8 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
     });
 
     // Check parameters
-    context.addSimpleFormalParameter((SimpleFormalParameter node) {
+    context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       // Check the type annotation
       final TypeAnnotation? typeAnnotation = node.type;
       if (typeAnnotation == null) return;
@@ -3272,7 +3276,8 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
     });
 
     // Check parameters
-    context.addSimpleFormalParameter((SimpleFormalParameter node) {
+    context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       // Check the type annotation
       final TypeAnnotation? typeAnnotation = node.type;
       if (typeAnnotation == null) return;
@@ -3610,12 +3615,12 @@ class AvoidSmallTextRule extends SaropaLintRule {
   }
 
   void _checkFontSize(
-    NodeList<Expression> arguments,
+    NodeList<Argument> arguments,
     SaropaDiagnosticReporter reporter,
   ) {
-    for (final Expression arg in arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'fontSize') {
-        final Expression expression = arg.expression;
+    for (final Argument arg in arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'fontSize') {
+        final Expression expression = arg.argumentExpression;
 
         double? fontSize;
         if (expression is IntegerLiteral) {
@@ -4503,9 +4508,9 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   ) {
     context.addArgumentList((ArgumentList node) {
       // Extract only named arguments
-      final List<NamedExpression> namedArgs = <NamedExpression>[];
-      for (final Expression arg in node.arguments) {
-        if (arg is NamedExpression) {
+      final List<NamedArgument> namedArgs = <NamedArgument>[];
+      for (final Argument arg in node.arguments) {
+        if (arg is NamedArgument) {
           namedArgs.add(arg);
         }
       }
@@ -4515,8 +4520,8 @@ class ArgumentsOrderingRule extends SaropaLintRule {
 
       // Check if named arguments are in alphabetical order
       for (int i = 1; i < namedArgs.length; i++) {
-        final String currentName = namedArgs[i].name.label.name;
-        final String previousName = namedArgs[i - 1].name.label.name;
+        final String currentName = namedArgs[i].name.lexeme;
+        final String previousName = namedArgs[i - 1].name.lexeme;
 
         if (currentName.compareTo(previousName) < 0) {
           // Found an argument that should come before the previous one

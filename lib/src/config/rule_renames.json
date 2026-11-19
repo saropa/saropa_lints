@@ -1,0 +1,1 @@
+{"version": 1, "renames": [{"old": "deprecated_new_in_comment_reference", "new": "deprecated_new_in_comment_reference_extended", "since": "17.0.0", "note": "Renamed to avoid a name clash with the analyzer's own diagnostic."}]}

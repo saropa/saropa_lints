@@ -111,24 +111,14 @@ dynamic error;
 // BAD: Should trigger require_bloc_observer
 // expect_lint: require_bloc_observer
 void _bad553_main() {
-  runApp(
-    BlocProvider(
-      create: (_) => AuthBloc(),
-      child: MyApp(),
-    ),
-  );
-// No BlocObserver - no centralized logging!
+  runApp(BlocProvider(create: (_) => AuthBloc(), child: MyApp()));
+  // No BlocObserver - no centralized logging!
 }
 
 // GOOD: Should NOT trigger require_bloc_observer
 void _good553_main() {
   Bloc.observer = AppBlocObserver();
-  runApp(
-    BlocProvider(
-      create: (_) => AuthBloc(),
-      child: MyApp(),
-    ),
-  );
+  runApp(BlocProvider(create: (_) => AuthBloc(), child: MyApp()));
 }
 
 class AppBlocObserver extends BlocObserver {

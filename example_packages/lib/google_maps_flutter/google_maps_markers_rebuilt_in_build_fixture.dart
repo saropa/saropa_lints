@@ -12,9 +12,7 @@ class _BadMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // expect_lint: google_maps_markers_rebuilt_in_build
-    final Set<Marker> markers = <Marker>{
-      const Marker(markerId: MarkerId('a')),
-    };
+    final Set<Marker> markers = <Marker>{const Marker(markerId: MarkerId('a'))};
     return GoogleMap(
       initialCameraPosition: const CameraPosition(target: LatLng(0, 0)),
       markers: markers,

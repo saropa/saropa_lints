@@ -110,10 +110,7 @@ dynamic child;
 // BAD: Should trigger avoid_touch_only_gestures
 // expect_lint: avoid_touch_only_gestures
 void _bad83() {
-  GestureDetector(
-    onTap: () => selectItem(),
-    child: ListTile(),
-  );
+  GestureDetector(onTap: () => selectItem(), child: ListTile());
 }
 
 // GOOD: Should NOT trigger avoid_touch_only_gestures

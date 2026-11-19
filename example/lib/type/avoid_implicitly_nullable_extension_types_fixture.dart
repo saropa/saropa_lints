@@ -111,3 +111,7 @@ extension type _BadET1224(int value) {} // No implements Object — nullable
 
 // GOOD: Should NOT trigger avoid_implicitly_nullable_extension_types
 extension type _GoodET1224(int value) implements Object {} // Safe
+
+// GOOD: implements a non-nullable interface, so it is already a subtype of Object.
+extension type _GoodETList(List<int> _list) implements List<int> {}
+extension type _GoodETString(String _s) implements String {}

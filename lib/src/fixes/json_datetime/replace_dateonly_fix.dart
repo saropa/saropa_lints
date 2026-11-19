@@ -57,7 +57,7 @@ class ReplaceDateOnlyFix extends SaropaFixProducer {
     // if the trailing args are all integer literal 0 (the explicit-midnight
     // variant: DateTime(x.year, x.month, x.day, 0, 0, 0)).
     if (args.length < 3 || args.length > 6) return;
-    if (args.any((a) => a is NamedExpression)) return;
+    if (args.any((a) => a is NamedArgument)) return;
 
     // Trailing args beyond the first 3 must all be literal 0.
     for (var i = 3; i < args.length; i++) {
@@ -70,7 +70,7 @@ class ReplaceDateOnlyFix extends SaropaFixProducer {
     final receivers = <String>[];
 
     for (var i = 0; i < 3; i++) {
-      final arg = args[i];
+      final arg = args[i].argumentExpression;
       final propertyName = _getPropertyName(arg);
       if (propertyName != expectedProperties[i]) return;
 
@@ -83,7 +83,7 @@ class ReplaceDateOnlyFix extends SaropaFixProducer {
     if (receivers[0] != receivers[1] || receivers[1] != receivers[2]) return;
 
     // Receiver's static type must be non-nullable DateTime.
-    final receiverType = _getReceiverStaticType(args[0]);
+    final receiverType = _getReceiverStaticType(args[0].argumentExpression);
     if (receiverType == null) return;
     if (!_isDateTime(receiverType)) return;
     if (receiverType.nullabilitySuffix != NullabilitySuffix.none) return;

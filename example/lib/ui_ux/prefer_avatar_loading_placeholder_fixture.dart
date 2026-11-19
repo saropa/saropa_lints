@@ -112,9 +112,7 @@ dynamic user;
 // BAD: Should trigger prefer_avatar_loading_placeholder
 // expect_lint: prefer_avatar_loading_placeholder
 void _bad1268() {
-  CircleAvatar(
-    backgroundImage: NetworkImage(user.avatarUrl),
-  );
+  CircleAvatar(backgroundImage: NetworkImage(user.avatarUrl));
 }
 
 // GOOD: Should NOT trigger prefer_avatar_loading_placeholder

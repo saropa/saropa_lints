@@ -110,9 +110,7 @@ final isLoading = false;
 // BAD: Should trigger require_search_loading_indicator
 // expect_lint: require_search_loading_indicator
 void _bad1263() {
-  TextField(
-    onSubmitted: (query) => searchApi(query),
-  );
+  TextField(onSubmitted: (query) => searchApi(query));
 }
 
 // GOOD: Should NOT trigger require_search_loading_indicator

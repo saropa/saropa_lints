@@ -115,10 +115,7 @@ void _bad1440() {
   // Using Material AlertDialog on iOS
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Confirm'),
-      actions: [],
-    ),
+    builder: (context) => AlertDialog(title: Text('Confirm'), actions: []),
   );
 }
 

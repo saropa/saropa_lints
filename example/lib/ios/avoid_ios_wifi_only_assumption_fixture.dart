@@ -132,10 +132,13 @@ void _good908() async {
         content: Text('Download 500MB over cellular?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Wait for WiFi')),
+            onPressed: () => Navigator.pop(context),
+            child: Text('Wait for WiFi'),
+          ),
           TextButton(
-              onPressed: () => downloadLargeFile(url), child: Text('Download')),
+            onPressed: () => downloadLargeFile(url),
+            child: Text('Download'),
+          ),
         ],
       ),
     );

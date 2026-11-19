@@ -112,10 +112,7 @@ dynamic item;
 // BAD: Should trigger require_drag_feedback
 // expect_lint: require_drag_feedback
 void _bad1426() {
-  Draggable(
-    data: item,
-    child: ItemWidget(item),
-  );
+  Draggable(data: item, child: ItemWidget(item));
 }
 
 // GOOD: Should NOT trigger require_drag_feedback

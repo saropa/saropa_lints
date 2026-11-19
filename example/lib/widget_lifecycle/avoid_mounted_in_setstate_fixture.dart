@@ -128,9 +128,6 @@ class _good1337_MyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: margin ?? EdgeInsets.zero,
-      child: Container(),
-    );
+    return Padding(padding: margin ?? EdgeInsets.zero, child: Container());
   }
 }

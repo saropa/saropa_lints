@@ -114,10 +114,7 @@ void _bad709() {
     create: (_) => A(),
     child: Provider<B>(
       create: (_) => B(),
-      child: Provider<C>(
-        create: (_) => C(),
-        child: MyApp(),
-      ),
+      child: Provider<C>(create: (_) => C(), child: MyApp()),
     ),
   );
 }

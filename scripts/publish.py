@@ -69,6 +69,7 @@ Exit Codes:
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -374,10 +375,13 @@ def _parse_args(argv: list[str]) -> _ParsedArgs:
             print("  --auto-retry <n>        Auto-retry failed steps up to n times")
             print("  --output-level <level>  Console verbosity:")
             print(f"    Valid: {', '.join(sorted(_OUTPUT_LEVELS))}")
+            print("  --full-tests            Run the full test suite (skip delta selection)")
             print("  --help, -h              Show this help")
             sys.exit(0)
         elif arg == "--dry-run":
             result.mode = "dry_run"
+        elif arg == "--full-tests":
+            os.environ["SAROPA_FULL_TESTS"] = "1"
         elif arg == "--log-append":
             result.log_append = True
         elif arg == "--mode":

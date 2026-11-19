@@ -150,3 +150,34 @@ class _Geometry {
   const _Geometry(this.maxScrollObstructionExtent);
   final double maxScrollObstructionExtent;
 }
+
+// GOOD: Flushing a StringBuffer into a String accumulator is not per-element
+// concatenation (nested loops, local declared in the outer loop).
+void _good800_bufferDrain(List<String> physical) {
+  var i = 0;
+  while (i < physical.length) {
+    String line = physical[i];
+    i++;
+    final StringBuffer pending = StringBuffer();
+    while (i < physical.length) {
+      if (pending.isNotEmpty) {
+        line += pending.toString();
+        pending.clear();
+      }
+      pending.write(physical[i]);
+      i++;
+    }
+    if (pending.isNotEmpty) line += pending.toString();
+  }
+}
+
+// BAD: Accumulator declared before both loops, plain String appended.
+// expect_lint: avoid_memory_intensive_operations
+void _bad800_nested(List<List<String>> rows) {
+  String out = '';
+  for (final row in rows) {
+    for (final s in row) {
+      out += s;
+    }
+  }
+}

@@ -28,6 +28,17 @@ import '../../fixes/structure/sort_named_parameters_fix.dart';
 import '../../fixes/return/inline_immediate_return_fix.dart';
 import '../../saropa_lint_rule.dart';
 
+/// True when [path] is the package entry point (`lib/<package_name>.dart`),
+/// which the Dart package layout convention requires and which may re-export.
+bool _isPackageEntryPoint(String path) {
+  if (path.isEmpty) return false;
+  final String? projectRoot = ProjectContext.findProjectRoot(path);
+  if (projectRoot == null) return false;
+  final String packageName = ProjectContext.getPackageName(projectRoot);
+  if (packageName.isEmpty) return false;
+  return path.replaceAll('\\', '/').endsWith('lib/$packageName.dart');
+}
+
 /// Warns when a file only contains export statements (barrel file).
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
@@ -112,20 +123,7 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
       // intentional library entry points, not accidental barrels.
       if (hasLibraryDirective) return;
 
-      // Skip the mandatory package entry point (lib/<package_name>.dart).
-      // The Dart package layout convention requires this file to exist.
-      final String path = context.filePath;
-      if (path.isNotEmpty) {
-        final String? projectRoot = ProjectContext.findProjectRoot(path);
-        if (projectRoot != null) {
-          final String packageName = ProjectContext.getPackageName(projectRoot);
-          if (packageName.isNotEmpty) {
-            final String entryPoint = 'lib/$packageName.dart';
-            final String normalized = path.replaceAll('\\', '/');
-            if (normalized.endsWith(entryPoint)) return;
-          }
-        }
-      }
+      if (_isPackageEntryPoint(context.filePath)) return;
 
       // If only exports (no declarations, possibly some imports for types)
       if (exportCount > 0 && unit.declarations.isEmpty) {
@@ -134,6 +132,68 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
           reporter.atToken(unit.beginToken, code);
         }
       }
+    });
+  }
+}
+
+/// Warns on every `export` directive; re-exports hide where a symbol is
+/// defined.
+///
+/// Since: v17.0.1-beta.8 | Rule version: v1
+///
+/// Unlike [AvoidBarrelFilesRule], this flags any file with an `export`, even
+/// one that also declares code. Not configurable: re-exports are never wanted.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// export 'package:app/src/user.dart';
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// import 'package:app/src/user.dart';
+/// ```
+///
+/// **Exempt:** the package entry point (`lib/<package_name>.dart`).
+class AvoidReexportsRule extends SaropaLintRule {
+  AvoidReexportsRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => false;
+
+  static const LintCode _code = LintCode(
+    'avoid_reexports',
+    '[avoid_reexports] Do not re-export. Import the defining library '
+        'directly. Re-exports hide where a symbol is defined and widen the '
+        'public API of this library. {v1}',
+    correctionMessage:
+        'Remove the export and import the defining library where needed.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    if (_isPackageEntryPoint(context.filePath)) return;
+    context.addExportDirective((ExportDirective node) {
+      reporter.atNode(node);
     });
   }
 }
@@ -1717,12 +1777,10 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
         if (param.isNamed) continue;
 
         // Check if the parameter type is bool
-        SimpleFormalParameter? simpleParam;
-        if (param is SimpleFormalParameter) {
+        RegularFormalParameter? simpleParam;
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           simpleParam = param;
-        } else if (param is DefaultFormalParameter) {
-          final p = param.parameter;
-          simpleParam = p is SimpleFormalParameter ? p : null;
         }
 
         if (simpleParam == null) continue;
@@ -2167,6 +2225,12 @@ class PreferStaticMethodRule extends SaropaLintRule {
       // Skip abstract methods
       if (node.isAbstract) return;
 
+      // Singleton instance methods are the public API (`Class.instance.m()`);
+      // making them static would break every caller.
+      final ClassDeclaration? owner = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (owner != null && _isSingletonClass(owner)) return;
+
       // Check if method body uses 'this' or instance members
       final bool usesThis = _usesThisOrInstanceMembers(node);
 
@@ -2181,6 +2245,42 @@ class PreferStaticMethodRule extends SaropaLintRule {
       if (annotation.name.name == 'override') return true;
     }
     return false;
+  }
+
+  /// A singleton has constructors, none of them a public generative one, and
+  /// a `static` field or getter typed as the class itself.
+  static bool _isSingletonClass(ClassDeclaration cls) {
+    final String className = cls.namePart.typeName.lexeme;
+    bool hasConstructor = false;
+    bool hasStaticSelf = false;
+    for (final ClassMember m
+        in cls.body is BlockClassBody
+            ? (cls.body as BlockClassBody).members
+            : const <ClassMember>[]) {
+      if (m is ConstructorDeclaration) {
+        hasConstructor = true;
+        final String? ctorName = m.name?.lexeme;
+        final bool isPrivate = ctorName != null && ctorName.startsWith('_');
+        if (m.factoryKeyword == null && !isPrivate) return false;
+      } else if (m is FieldDeclaration && m.isStatic) {
+        final TypeAnnotation? type = m.fields.type;
+        if (type is NamedType && type.name.lexeme == className) {
+          hasStaticSelf = true;
+        } else if (type == null &&
+            m.fields.variables.any(
+              (VariableDeclaration v) =>
+                  (v.initializer?.toSource() ?? '').startsWith(className),
+            )) {
+          hasStaticSelf = true;
+        }
+      } else if (m is MethodDeclaration && m.isStatic && m.isGetter) {
+        final TypeAnnotation? type = m.returnType;
+        if (type is NamedType && type.name.lexeme == className) {
+          hasStaticSelf = true;
+        }
+      }
+    }
+    return hasConstructor && hasStaticSelf;
   }
 
   bool _usesThisOrInstanceMembers(MethodDeclaration node) {
@@ -2378,7 +2478,7 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
 
 /// Warns when Color values are hardcoded instead of using theme colors.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+/// Since: v0.1.4 | Updated: v17.0.1 | Rule version: v7
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -2391,6 +2491,16 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
 /// Container(color: Theme.of(context).colorScheme.surface);
 /// Text('Hi', style: Theme.of(context).textTheme.bodyMedium);
 /// ```
+///
+/// **Exempt** (these define the theme rather than bypass it):
+/// - Colors written inside a `ColorScheme`, `TextTheme` or any `*ThemeData`
+///   constructor, e.g. `ColorScheme.fromSeed(seedColor: Colors.indigo)`.
+/// - Colors written inside a class that extends `ThemeExtension`.
+/// - A private or local `const`/`final` color whose every use in the file is
+///   inside one of the above, e.g. a seed constant passed to
+///   `ColorScheme.fromSeed`.
+/// - Fully transparent colors (`Colors.transparent`, `Color(0x00000000)`,
+///   alpha 0), which look the same in every theme.
 class AvoidHardcodedColorsRule extends SaropaLintRule {
   AvoidHardcodedColorsRule() : super(code: _code);
 
@@ -2413,7 +2523,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_hardcoded_colors',
     '[avoid_hardcoded_colors] Hardcoded color value bypasses the theme system, breaking dark mode and dynamic theming. '
-        'When users switch themes, hardcoded colors remain unchanged, creating contrast issues, illegible text, and an inconsistent visual experience that can fail accessibility requirements. {v6}',
+        'When users switch themes, hardcoded colors remain unchanged, creating contrast issues, illegible text, and an inconsistent visual experience that can fail accessibility requirements. {v7}',
     correctionMessage:
         'Use theme colors from Theme.of(context).colorScheme (e.g., colorScheme.primary, colorScheme.surface) or define semantic color tokens in your ThemeData. '
         'This ensures colors adapt automatically when the theme changes and maintains WCAG contrast ratios across all theme variants.',
@@ -2425,32 +2535,128 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Color(...), Color.fromARGB(...), Color.fromRGBO(...), Color.from(...)
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme;
+      if (node.constructorName.type.name.lexeme != 'Color') return;
+      if (_isTransparentColorCreation(node)) return;
+      if (_isThemeDefinition(node)) return;
+      reporter.atNode(node);
+    });
 
-      // Check for Color constructor
-      if (typeName == 'Color') {
-        reporter.atNode(node);
-        return;
+    // Colors.xxx
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.prefix.name != 'Colors') return;
+      if (node.identifier.name == 'transparent') return;
+      if (_isThemeDefinition(node)) return;
+      reporter.atNode(node);
+    });
+  }
+
+  /// True when [node] is written where the theme itself is defined: inside
+  /// a theme constructor, a `ThemeExtension` class, or a private/local
+  /// constant that is only used in theme constructors.
+  static bool _isThemeDefinition(Expression node) =>
+      _isInsideThemeConstructor(node) || _isThemeOnlyConstant(node);
+
+  /// Class names whose constructors build theme data. Widgets such as
+  /// `Theme`, `IconTheme` or `SliderTheme` are deliberately not matched:
+  /// their `child:` subtree is ordinary UI.
+  static bool _isThemeTypeName(String name) =>
+      name == 'ColorScheme' ||
+      name == 'TextTheme' ||
+      name.endsWith('ThemeData');
+
+  static bool _isInsideThemeConstructor(AstNode node) {
+    for (AstNode? n = node.parent; n != null; n = n.parent) {
+      if (n is InstanceCreationExpression &&
+          _isThemeTypeName(n.constructorName.type.name.lexeme)) {
+        return true;
       }
-
-      // Check for Color.fromARGB, Color.fromRGBO
-      if (typeName == 'Color' ||
-          node.constructorName.name?.name == 'fromARGB' ||
-          node.constructorName.name?.name == 'fromRGBO') {
-        final NamedType type = node.constructorName.type;
-        if (type.name.lexeme == 'Color') {
-          reporter.atNode(node);
+      // Unresolved code parses `ColorScheme.fromSeed(...)` and
+      // `ThemeData(...)` as method invocations.
+      if (n is MethodInvocation) {
+        final Expression? target = n.target;
+        if (target == null && _isThemeTypeName(n.methodName.name)) {
+          return true;
+        }
+        if (target is SimpleIdentifier && _isThemeTypeName(target.name)) {
+          return true;
         }
       }
-    });
-
-    context.addPrefixedIdentifier((PrefixedIdentifier node) {
-      // Check for Colors.xxx usage
-      if (node.prefix.name == 'Colors') {
-        reporter.atNode(node);
+      if (n is ClassDeclaration) {
+        final NamedType? superclass = n.extendsClause?.superclass;
+        return superclass != null && superclass.name.lexeme == 'ThemeExtension';
       }
-    });
+    }
+    return false;
+  }
+
+  /// True when [node] is the whole initializer of a private or local
+  /// `const`/`final` variable, and every use of that variable in the file is
+  /// inside a theme constructor. Public names are not exempt: they can be
+  /// used in widgets in other files.
+  static bool _isThemeOnlyConstant(Expression node) {
+    final AstNode? parent = node.parent;
+    if (parent is! VariableDeclaration || parent.initializer != node) {
+      return false;
+    }
+    final AstNode? list = parent.parent;
+    if (list is! VariableDeclarationList || (!list.isConst && !list.isFinal)) {
+      return false;
+    }
+    final String name = parent.name.lexeme;
+    final bool isLocal = list.parent is VariableDeclarationStatement;
+    if (!isLocal && !name.startsWith('_')) return false;
+
+    final _IdentifierUseCollector collector = _IdentifierUseCollector(name);
+    node.root.accept(collector);
+    if (collector.uses.isEmpty) return false;
+    return collector.uses.every(_isInsideThemeConstructor);
+  }
+
+  /// True for a `Color` constructor call whose alpha is a literal zero.
+  static bool _isTransparentColorCreation(InstanceCreationExpression node) {
+    final String? ctor = node.constructorName.name?.name;
+    final List<Argument> args = node.argumentList.arguments;
+    switch (ctor) {
+      case null:
+        // Color(0x00RRGGBB): alpha is the top byte.
+        if (args.isEmpty) return false;
+        final Expression first = args.first.argumentExpression;
+        if (first is! IntegerLiteral) return false;
+        final int? value = first.value;
+        return value != null && (value >> 24) & 0xFF == 0;
+      case 'fromARGB':
+        return args.isNotEmpty && _isLiteralZero(args.first.argumentExpression);
+      case 'fromRGBO':
+        return args.length >= 4 && _isLiteralZero(args[3].argumentExpression);
+      case 'from':
+        for (final Argument arg in args) {
+          if (arg is NamedArgument && arg.name.lexeme == 'alpha') {
+            return _isLiteralZero(arg.argumentExpression);
+          }
+        }
+        return false;
+    }
+    return false;
+  }
+
+  static bool _isLiteralZero(Expression e) =>
+      (e is IntegerLiteral && e.value == 0) ||
+      (e is DoubleLiteral && e.value == 0);
+}
+
+/// Collects every read of a variable named [name], skipping the declaration
+/// name itself.
+class _IdentifierUseCollector extends RecursiveAstVisitor<void> {
+  _IdentifierUseCollector(this.name);
+  final String name;
+  final List<SimpleIdentifier> uses = <SimpleIdentifier>[];
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == name) uses.add(node);
+    super.visitSimpleIdentifier(node);
   }
 }
 
@@ -4037,10 +4243,9 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
       if (params == null || params.parameters.isEmpty) return;
 
       final FormalParameter first = params.parameters.first;
-      final FormalParameter inner = first is DefaultFormalParameter
-          ? first.parameter
-          : first;
-      if (inner is! SimpleFormalParameter) return;
+      final FormalParameter inner = first;
+      if (inner is! RegularFormalParameter || inner.functionTypedSuffix != null)
+        return;
 
       final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
@@ -4125,10 +4330,9 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
       if (params == null || params.parameters.isEmpty) return;
 
       final FormalParameter first = params.parameters.first;
-      final FormalParameter inner = first is DefaultFormalParameter
-          ? first.parameter
-          : first;
-      if (inner is! SimpleFormalParameter) return;
+      final FormalParameter inner = first;
+      if (inner is! RegularFormalParameter || inner.functionTypedSuffix != null)
+        return;
 
       final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
@@ -4286,8 +4490,11 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
         final params = m.parameters?.parameters;
         if (params == null || params.isEmpty) return;
         final p = params.first;
-        final inner = p is DefaultFormalParameter ? p.parameter : p;
-        final innerType = inner is SimpleFormalParameter ? inner.type : null;
+        final inner = p;
+        final innerType =
+            inner is RegularFormalParameter && inner.functionTypedSuffix == null
+            ? inner.type
+            : null;
         if (innerType is NamedType) {
           firstParamTypeNames.add(innerType.name.lexeme);
         }
@@ -4373,9 +4580,7 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
       final ConstructorDeclaration ctor = constructors[0];
       if (ctor.parameters.parameters.length != 1) return;
       final FormalParameter p = ctor.parameters.parameters.single;
-      final FormalParameter inner = p is DefaultFormalParameter
-          ? p.parameter
-          : p;
+      final FormalParameter inner = p;
       if (inner is! FieldFormalParameter) return;
 
       final int methodCount = node.bodyMembers
@@ -4777,7 +4982,7 @@ class WrongNumberOfParametersForSetterRule extends SaropaLintRule {
       }
 
       final FormalParameter single = list.single;
-      if (single is DefaultFormalParameter || single.isNamed) {
+      if (!single.isRequiredPositional) {
         reporter.atNode(node);
       }
     });
@@ -5083,11 +5288,7 @@ class ConstructorParametersAndFieldsShouldHaveTheSameOrderRule
       final List<FormalParameter> namedForwarding = <FormalParameter>[];
 
       for (final FormalParameter p in node.parameters.parameters) {
-        // Named/optional/required params are wrapped in DefaultFormalParameter;
-        // unwrap to inspect the underlying parameter kind.
-        final FormalParameter inner = p is DefaultFormalParameter
-            ? p.parameter
-            : p;
+        final FormalParameter inner = p;
         // Only `this.field` shorthand parameters have a corresponding field
         // position to compare against — a parameter used purely to compute
         // a derived initializer-list value has none (edge case 3).
@@ -5130,9 +5331,7 @@ class ConstructorParametersAndFieldsShouldHaveTheSameOrderRule
     if (group.length < 2) return;
 
     final List<String> paramNames = group.map((FormalParameter p) {
-      final FormalParameter inner = p is DefaultFormalParameter
-          ? p.parameter
-          : p;
+      final FormalParameter inner = p;
       return (inner as FieldFormalParameter).name.lexeme;
     }).toList();
 

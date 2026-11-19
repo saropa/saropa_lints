@@ -123,3 +123,36 @@ void _good782() {
     return Text('$result');
   }
 }
+
+// The rule only inspects MethodDeclaration bodies (context.addMethodDeclaration),
+// so these GOOD cases are wrapped in a class method rather than top-level
+// functions — a top-level function is never visited and would be a vacuous
+// (always-pass) fixture case regardless of whether the fix is correct.
+class _GoodCheapGetterCases {
+  // GOOD: `List.length` is a dart:core O(1) getter, not an expensive
+  // computed value — repeating it must NOT be flagged.
+  void goodListLength(List<String> rowValues, List<String> headers) {
+    if (rowValues.length >= headers.length) {
+      // ...
+    } else {
+      final colCount = rowValues.length;
+      final headerCount = headers.length;
+      print('$colCount vs $headerCount');
+    }
+  }
+
+  // GOOD: same dart:core O(1) contract for String/Set/Map .length.
+  void goodOtherLengths(String text, Set<int> ids, Map<String, int> counts) {
+    print('${text.length} ${text.length}');
+    print('${ids.length} ${ids.length}');
+    print('${counts.length} ${counts.length}');
+  }
+
+  // GOOD: dart:core isEmpty/first read twice — also O(1), must NOT be flagged.
+  void goodIsEmptyAndFirst(List<int> values) {
+    if (values.isEmpty || values.isEmpty) {
+      return;
+    }
+    print('${values.first} ${values.first}');
+  }
+}

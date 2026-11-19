@@ -110,7 +110,7 @@ dynamic data;
 // BAD: Should trigger require_update_should_notify
 // expect_lint: require_update_should_notify
 class _bad703_MyData extends InheritedWidget {
-// Missing updateShouldNotify
+  // Missing updateShouldNotify
 }
 
 // GOOD: Should NOT trigger require_update_should_notify

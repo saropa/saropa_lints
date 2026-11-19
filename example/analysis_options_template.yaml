@@ -661,6 +661,7 @@ saropa_lints:
     # IMPORTS
     # =========================================================================
     - avoid_barrel_files: false
+    - avoid_reexports: false
     - avoid_double_slash_imports: false
     - avoid_duplicate_exports: false
     - avoid_duplicate_named_imports: false
@@ -685,7 +686,7 @@ saropa_lints:
     - abstract_field_initializer: false
     - abi_specific_integer_invalid: false
     - annotate_inherited_member_redeclaration: false
-    - deprecated_new_in_comment_reference: false
+    - deprecated_new_in_comment_reference_extended: false
     - document_analyzer_ignore_rationale: false
     - non_constant_map_element: false
     - return_in_generator: false
@@ -1271,6 +1272,7 @@ saropa_lints:
     - prefer_closure_over_builder: false         # Opposite - closures for simplicity
     - prefer_fractionally_sized_box: false       # FractionallySizedBox over MediaQuery
     - prefer_media_query_over_fractional: false  # Opposite - explicit MediaQuery
+    - prefer_media_query_width_height_of: false  # INFO - widthOf/heightOf over sizeOf().width (comprehensive, Flutter 3.35+)
 
     # --- Null & Collection Style Rules (v2.7.0) ---
     - prefer_if_null_operator: false             # ?? over ternary null checks

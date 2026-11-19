@@ -7,3 +7,13 @@
 // See rule documentation for bad/good examples.
 
 void main() {}
+
+// GOOD: static helper whose name starts with `use` is not a hook, and this
+// file does not import flutter_hooks.
+class _ClaimWrite {
+  static List<String> useCleanedRows(List<String> rows) => rows;
+}
+
+Future<void> _process(List<String> rows) async {
+  final List<String> out = _ClaimWrite.useCleanedRows(rows);
+}

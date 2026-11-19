@@ -684,6 +684,9 @@ class ViolationExporter {
         },
         // correction intentionally omitted — mirrors toJson()'s conditional
         // emit: absent when no correction message exists for the rule.
+        // problemMessage/impact are omitted too: with no rule snapshot there
+        // is no LintCode to read them from, and the violation itself already
+        // carries its own message and impact.
       };
     }
     return metadata.toJson();
@@ -769,6 +772,8 @@ class _RuleMetadataSnapshot {
     required this.tags,
     required this.accuracyTarget,
     required this.correction,
+    required this.problemMessage,
+    required this.impact,
     required this.owasp,
   });
 
@@ -799,6 +804,13 @@ class _RuleMetadataSnapshot {
       // ViolationRecord at all) can be backfilled from the catalog instead
       // of going without a "How to fix" section.
       correction: rule.code.correctionMessage,
+      // Same source the live diagnostic's message text comes from. The
+      // extension's Rule Explain panel reads it to render the "Problem"
+      // section when opened by rule name alone (from the Rule Packs finder,
+      // related-rule links, suite envelopes) — without it that panel had no
+      // body at all, only the rule name in its header.
+      problemMessage: rule.code.problemMessage,
+      impact: rule.impact.name,
       // Same reasoning for OWASP: `rule.owasp` is the rule-level mapping
       // getter the batch export's `owaspLookup` is meant to be built from
       // (see `AnalysisReporter.setOwaspLookup`); reading it directly here
@@ -820,6 +832,13 @@ class _RuleMetadataSnapshot {
   /// [LintCode] carries no correction message.
   final String? correction;
 
+  /// Rule-level problem text (`LintCode.problemMessage`), the same text a
+  /// live diagnostic shows.
+  final String problemMessage;
+
+  /// Rule-level [LintImpact] name (error/warning/info).
+  final String impact;
+
   /// Rule-level OWASP mapping. Null for non-security rules.
   final OwaspMapping? owasp;
 
@@ -834,6 +853,8 @@ class _RuleMetadataSnapshot {
       'tags': tags,
       'accuracyTarget': accuracyTarget,
       if (correction != null) 'correction': correction,
+      'problemMessage': problemMessage,
+      'impact': impact,
       // Reuse the exact same conversion the per-violation export uses so
       // the catalog's OWASP shape (mobile/web lowercase id arrays) is
       // byte-identical to what a batch export would produce for this rule.

@@ -112,7 +112,7 @@ final users = <dynamic>[];
 // expect_lint: require_firebase_app_check
 void _bad625_initFirebase() async {
   await Firebase.initializeApp();
-// Using Firestore without App Check
+  // Using Firestore without App Check
   FirebaseFirestore.instance.collection('users').get();
 }
 

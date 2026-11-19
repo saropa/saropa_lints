@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: dispose_widget_fields
 class _bad1356__MyState extends State<MyWidget> {
   final _controller = TextEditingController();
-// Missing dispose() override
+  // Missing dispose() override
 }
 
 // GOOD: Should NOT trigger dispose_widget_fields

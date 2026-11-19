@@ -15,28 +15,40 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
-  runEnable,
-  runDisable,
-  runReenablePlugin,
+  TIER_ORDER,
   disablePluginsIntegration,
-  restorePluginsIntegration,
+  ensureSaropaLintsInPubspec,
   getPluginsIntegrationState,
+  getSharedOutputChannel,
+  openConfig,
+  restorePluginsIntegration,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
-  runInitializeConfig,
   runCreateBaseline,
+  runDisable,
   runEmitCompositePluginScaffold,
-  openConfig,
+  runEnable,
+  runInitializeConfig,
+  runReenablePlugin,
   runRepairConfig,
-  runSetTier,
   runSetLane,
+  runSetTier,
   showOutputChannel,
-  getSharedOutputChannel,
-  TIER_ORDER,
 } from './setup';
 import { runMigrateConfig } from './config/migrateConfig';
+import { runMigrateRuleNames } from './ruleMigration/migrateController';
 import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
 import { surfacePluginDivergence } from './pluginDivergencePrompt';
+import {
+  getLintsSwitchState,
+  setScanSuspendedProvider,
+  type LintsSwitchState,
+  initLintsSwitch,
+  lintsSwitchLabel,
+  syncVersionWithMessage,
+  toggleLints,
+} from './lintsSwitch';
+import { shouldRunLsp } from './lspGate';
 import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
 import type { SaropaLintsApi } from './api';
 import { buildDailySummary } from './dailySummary';
@@ -154,12 +166,23 @@ import {
   setDriftAdvisorServerConnected,
 } from './driftAdvisor/driftAdvisorUiState';
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
-import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
-import { buildStatusBarLabel, buildStatusBarMenuItems, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
+import { forceUpgradeCheck } from './upgrade-checker';
+import { getRouteStatus, onRouteStatusChange, registerStartupDetection } from './compat/startupController';
+import { buildUnifiedStatusText, STATUS_BAR_TRUSTED_COMMANDS } from './statusBarLabel';
+import {
+  buildStatusBarModel,
+  buildStatusBarQuickPickItems,
+  buildMemoryModel,
+  renderStatusBarTooltip,
+  type MemoryModel,
+  type StatusBarInput,
+  type StatusBarModel,
+} from './statusBarTooltip';
+import { formatNumber } from './views/webview-format';
 import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, pressureBackgroundColorId, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor, RssTrend, systemHealthStatusBarText } from './systemHealth/processMonitor';
-import { classifyProcess, formatBytes, isAnalysisServerProcess, isDaemonProcess, isSaropaProcess, ProcessCategory, processLabel, renderSparkline, truncateLabel } from './systemHealth/processQuery';
+import { formatBytes } from './systemHealth/processQuery';
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
 import { registerOrphanPreflight } from './systemHealth/orphanPreflight';
 import { HealthPanel } from './systemHealth/healthPanel';
@@ -167,19 +190,41 @@ import { MachineDashboard } from './systemHealth/machineDashboard';
 import { registerMachineDashboardCommands } from './systemHealth/machineDashboardCommands';
 import { querySystemMemory } from './systemHealth/systemQuery';
 import { auditWatcherExcludes } from './systemHealth/watcherExcludeAudit';
+import { auditNestedPackageRoots } from './systemHealth/nestedRootsAudit';
+import { auditHeapCap } from './systemHealth/heapCapAudit';
 import { scanWorkspaceForHazards } from './systemHealth/workspaceHazardScan';
-import { gatherReadiness, readinessStatusBarText, showWorkspaceReadiness, ReadinessLevel } from './systemHealth/workspaceReadiness';
+import { gatherReadiness, readinessStatusBarText, readinessTooltipLines, showWorkspaceReadiness, ReadinessLevel } from './systemHealth/workspaceReadiness';
 import { HealthLevel } from './systemHealth/types';
 import type { ExtensionHostMemory } from './systemHealth/types';
-import type { DartProcessInfo, DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
+import type { DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
+import {
+  ciWorkflowPathFromProject,
+  disableCiWorkflow,
+  enableCiWorkflow,
+  getCiWorkflowPath,
+  getCiWorkflowState,
+  needsExplicitTier,
+  readCiWorkflow,
+} from './systemHealth/ciWorkflow';
+import {
+  buildCiPublishPlan,
+  compareUrl,
+  hasUncommittedChanges,
+  isGitRepository,
+  runCiPublish,
+  type CiPublishDirection,
+  type CiPublishPlan,
+} from './systemHealth/ciPublish';
+import { createPullRequest } from './systemHealth/ciPublishGithub';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
 import { registerBugArchivalCheck } from './extensionChecks/bugArchivalCheck';
 import { registerDocPlacementCheck } from './extensionChecks/docPlacementCheck';
+import { registerAnalyzerExclusions } from './analyzerExclusions';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, postDashboardAnalysisProgress, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
@@ -466,15 +511,11 @@ function readVisibleViolations(root: string): ViolationsData {
  */
 function findingsBadge(
   data: ViolationsData | null,
-): { suffix: string; tooltip: string } | null {
+): { suffix: string; total: number; errors: number } | null {
   const total = data?.summary?.totalViolations ?? data?.violations?.length ?? 0;
   if (total <= 0) return null;
-  const errorCount = data?.summary?.byImpact?.error ?? 0;
-  const shown = errorCount > 0 ? errorCount : total;
-  const tooltip = errorCount > 0
-    ? `${errorCount} error(s) of ${total} finding(s)`
-    : `${total} finding(s)`;
-  return { suffix: ` · $(warning) ${shown}`, tooltip };
+  const errors = data?.summary?.byImpact?.error ?? 0;
+  return { suffix: ` · $(warning) ${formatNumber(errors > 0 ? errors : total)}`, total, errors };
 }
 
 function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
@@ -504,37 +545,8 @@ function countOutdatedPackages(): number | undefined {
   }).length;
 }
 
-/**
- * Builds the main status bar's tooltip as a clickable action menu instead of
- * plain text — a hover-activated toolbar of checkbox-style toggle links and
- * shortcuts to the reports/panels the plain text used to only describe.
- * `infoLines` renders first as read-only context, then a divider, then the
- * menu links from {@link buildStatusBarMenuItems} (mirrors the pattern
- * saropa-log-capture uses for its own status bar menu tooltip). Menu data
- * lives in statusBarLabel.ts, not here, so a unit test can assert every
- * commandId stays covered by STATUS_BAR_TRUSTED_COMMANDS.
- */
-function buildStatusBarTooltipMarkdown(infoLines: string[], enabled: boolean): vscode.MarkdownString {
-  const md = new vscode.MarkdownString('', true);
-  md.isTrusted = { enabledCommands: [...STATUS_BAR_TRUSTED_COMMANDS] };
-
-  for (const line of infoLines) {
-    md.appendMarkdown(`${line}\n\n`);
-  }
-  md.appendMarkdown('---\n\n');
-
-  const items = buildStatusBarMenuItems(enabled);
-  items.forEach((item, index) => {
-    md.appendMarkdown(`[${item.icon} ${l10n(item.labelKey)}](command:${item.commandId})`);
-    // Divider after the toggle + report/panel shortcuts (index 3), before the
-    // trailing utility links (Command Catalog / About).
-    md.appendMarkdown(index === items.length - 3 ? '\n\n---\n\n' : '\n\n');
-  });
-
-  return md;
-}
-
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
+  initLintsSwitch(context);
   const applyUiLocalePreference = (): string => {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const preferred = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
@@ -621,6 +633,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   let extVersion = '0.0.0';
   let driftAdvisorRefreshInProgress = false;
   let vibrancyData: VibrancyStatusData | null = null;
+  // Latest model behind the hover; the click menu shows the same rows.
+  let statusBarModel: StatusBarModel | undefined;
 
   try {
 
@@ -637,6 +651,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(scanOnSaveDiagCollection);
   scanOnSaveController = new ScanOnSaveController(scanOnSaveDiagCollection, getProjectRoot, getSharedOutputChannel());
   context.subscriptions.push(scanOnSaveController);
+  setScanSuspendedProvider(() => scanOnSaveController.isDaemonSuspended);
 
   // Pubspec validation: inline diagnostics for dependency ordering,
   // version syntax, and constraint issues on pubspec.yaml.
@@ -785,6 +800,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Mirror image of the above: flags a still-open report filed under the
   // configured archive/history glob instead of the open-issues directory.
   registerDocPlacementCheck(context);
+  // Suggests excluding no-analysis folders via dart.analysisExcludedFolders
+  // (setting saropaLints.analyzerExclusions.enabled, default on).
+  registerAnalyzerExclusions(context);
   registerProjectMapCommand(context);
   registerHealthCodeLens(context);
 
@@ -807,6 +825,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         // but refreshing it unconditionally here is harmless (it no-ops without an open panel).
         rulePacksWebviewProvider.refresh();
         analysisOptimizerProvider.refresh();
+        // The plugins block feeds the On / Off / Partly off switch.
+        refreshAll();
+        updateAllStatusBars();
       }
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
       if (!cfg.get<boolean>('workspaceScanEnabled', false)) return;
@@ -1142,15 +1163,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   context.subscriptions.push(statusBarItem);
 
-  // Dedicated memory/system-health item, separate from the lint-score item
-  // above. Previously this state was crammed as a text suffix onto the main
-  // item (e.g. "90% ▲2 · V4/10 · ⚠ 4.2G"), which both read as clutter and
-  // had no click target of its own — the main item's command always opened
-  // the violations report, so clicking a memory warning never led anywhere
-  // memory-related. Hidden entirely when there is nothing to report.
-  const memoryStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 99);
-  memoryStatusBarItem.command = 'saropaLints.showProcessHealth';
-  context.subscriptions.push(memoryStatusBarItem);
+  // One status bar item: switch state + score in the text; route, memory,
+  // workspace issues and details go in the tooltip. Every render sets
+  // `command` to showStatusBarMenu (the toggle is one row in it, not the click action).
+
+  // Memory / system-health / workspace-readiness state, computed by
+  // updateMemoryStatusBar and rendered into the single item (tooltip lines,
+  // plus a warning background when it is a problem). Undefined = nothing to report.
+  let memoryStatus: { text: string; hints: string[]; memory: MemoryModel | undefined; background: vscode.ThemeColor | undefined } | undefined;
 
   // System health snapshot pushed from the process monitor.
   let systemHealthSnapshot: DartProcessSnapshot | null = null;
@@ -1175,6 +1195,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // the readiness command is invoked. Avoids running the filesystem-heavy
   // hazard scan on every status bar poll tick.
   let cachedReadinessText: string | undefined;
+  // Issue names for the status bar tooltip's Problems section.
+  let cachedReadinessLines: string[] = [];
 
   /**
    * Pick the background for the memory status bar item.
@@ -1207,168 +1229,47 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       : new vscode.ThemeColor('statusBarItem.warningBackground');
   };
 
+  /** Arrow suffix after a size when its RSS trend is known (" ↑", " ↓", " →"). */
+  const trendArrow = (t: RssTrend): string =>
+    t === RssTrend.Rising ? ' ↑' : t === RssTrend.Falling ? ' ↓' : t === RssTrend.Stable ? ' →' : '';
+
   /**
-   * Drive the dedicated memory/system-health status bar item. Hidden when
-   * there is nothing to report — plugin-level memory pressure takes
-   * priority over aggregate process RSS (matches the old suffix priority).
-   * Clicking always opens the System Health panel (the memory breakdown
-   * page), which the old crammed-in text suffix never linked to.
+   * Compute the memory/system-health state for the single status bar item
+   * (stored in `memoryStatus`; undefined when there is nothing to report).
+   * Plugin-level memory pressure takes priority over aggregate process RSS.
+   * `hints` are the summary sentences shown bold above the Memory table;
+   * `memory` is the per-process detail (see buildMemoryModel).
    */
-  /**
-   * Build per-process tooltip lines from a snapshot. Three sections:
-   * saropa-owned (health-colored), Flutter daemons, and other Dart
-   * processes (informational only). Top 3 by RSS shown per section.
-   *
-   * Uses classifyProcess for a single-pass partition — the enum is
-   * exhaustive, so adding a new ProcessCategory without handling it
-   * here is a compile-time error (if the switch is kept exhaustive).
-   */
-  function buildProcessTooltipLines(
-    snap: DartProcessSnapshot,
-    assessment: HealthAssessment,
-    trend: RssTrend,
-    rssHistory: readonly number[] = [],
-    extHost?: ExtensionHostMemory,
-    extHostTrend: RssTrend = RssTrend.Unknown,
-  ): string[] {
-    const lines: string[] = [];
-
-    // Single-pass partition — each process is classified once and lands
-    // in exactly one bucket. No runtime assertion needed because the
-    // classifyProcess enum is exhaustive.
-    const saropaProcs: DartProcessInfo[] = [];
-    const daemonProcs: DartProcessInfo[] = [];
-    const otherProcs: DartProcessInfo[] = [];
-    for (const p of snap.processes) {
-      const cat = classifyProcess(p).category;
-      if (cat === ProcessCategory.Saropa) saropaProcs.push(p);
-      else if (cat === ProcessCategory.Daemon) daemonProcs.push(p);
-      // AnalysisServer and Other both go in the "other" tooltip section.
-      else otherProcs.push(p);
-    }
-
-    // --- Saropa-owned section (colored by health level) ---
-    const saropaRss = saropaProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
-    const isHealthy = assessment.level === HealthLevel.Healthy;
-    // When trend is rising, suppress the ✓ — a rising arrow next to a check
-    // mark sends mixed signals. The arrow IS the warning; ✓ contradicts it.
-    const showCheck = isHealthy && trend !== RssTrend.Rising;
-    const saropaHeader = showCheck ? 'systemHealth.tooltip.saropaHealthy' : 'systemHealth.tooltip.saropaSection';
-    // Trend arrow after the header — rising RSS is an early leak warning
-    // even when the absolute value is below the red threshold.
-    const trendSuffix = trend === RssTrend.Rising ? ' ↑'
-      : trend === RssTrend.Falling ? ' ↓'
-      : trend === RssTrend.Stable ? ' →' : '';
-    lines.push(l10n(saropaHeader, {
-      count: String(saropaProcs.length),
-      size: formatBytes(saropaRss),
-    }) + trendSuffix);
-    // Top 3 saropa processes by RSS for actionable detail.
-    const topSaropa = [...saropaProcs].sort((a, b) => b.workingSetSize - a.workingSetSize).slice(0, 3);
-    for (const p of topSaropa) {
-      lines.push(l10n('systemHealth.tooltip.saropaProcessEntry', {
-        label: truncateLabel(processLabel(p)), size: formatBytes(p.workingSetSize),
-      }));
-    }
-
-    // RSS sparkline — visual trend over the last ~30 minutes.
-    // Only shown when enough data points exist for a meaningful shape.
-    const sparkline = renderSparkline(rssHistory);
-    if (sparkline) {
-      lines.push(l10n('systemHealth.tooltip.sparkline', { chart: sparkline }));
-    }
-
-    // --- Flutter daemons ---
-    const sTotal = String(snap.legitimateDaemonCount + snap.orphanedDaemonPids.length);
-    lines.push(l10n('systemHealth.tooltip.daemonCount', {
-      total: sTotal, orphaned: String(snap.orphanedDaemonPids.length),
-    }));
-    if (snap.orphanedScanDaemonPids.length > 0) {
-      lines.push(l10n('systemHealth.tooltip.scanDaemonOrphans', {
-        count: String(snap.orphanedScanDaemonPids.length),
-      }));
-    }
-
-    // --- Other Dart processes (informational, never red) ---
-    if (otherProcs.length > 0) {
-      const otherRss = otherProcs.reduce((sum, p) => sum + p.workingSetSize, 0);
-      lines.push(l10n('systemHealth.tooltip.otherSection', {
-        count: String(otherProcs.length), size: formatBytes(otherRss),
-      }));
-      // Top 3 other processes by RSS so users can identify memory hogs.
-      const topOther = [...otherProcs].sort((a, b) => b.workingSetSize - a.workingSetSize).slice(0, 3);
-      for (const p of topOther) {
-        lines.push(l10n('systemHealth.tooltip.otherProcessEntry', {
-          label: truncateLabel(processLabel(p)), size: formatBytes(p.workingSetSize),
-        }));
-      }
-      // Hint when multiple analysis servers are detected.
-      const serverCount = otherProcs.filter(isAnalysisServerProcess).length;
-      if (serverCount >= 2) {
-        lines.push(l10n('systemHealth.tooltip.otherHint', { count: String(serverCount) }));
-      }
-    }
-
-    // --- Extension host (the Node.js process running this extension) ---
-    if (extHost) {
-      const hostTrendSuffix = extHostTrend === RssTrend.Rising ? ' ↑'
-        : extHostTrend === RssTrend.Falling ? ' ↓'
-        : extHostTrend === RssTrend.Stable ? ' →' : '';
-      lines.push(l10n('systemHealth.tooltip.extensionHostSection', {
-        rss: formatBytes(extHost.rssBytes),
-        heap: formatBytes(extHost.heapUsedBytes),
-        heapTotal: formatBytes(extHost.heapTotalBytes),
-      }) + hostTrendSuffix);
-    }
-
-    // --- Health hints (saropa-owned only) ---
-    if (assessment.level === HealthLevel.Warning) {
-      lines.push(l10n('systemHealth.tooltip.warningHint'));
-    } else if (assessment.level === HealthLevel.Critical) {
-      lines.push(l10n('systemHealth.tooltip.criticalHint'));
-    }
-    return lines;
-  }
-
   const updateMemoryStatusBar = () => {
     const memPressureSuffix = memoryPressureSuffix(memoryPressureState);
     let text: string | undefined;
-    const tooltipLines: string[] = [];
+    const hints: string[] = [];
 
     if (memPressureSuffix) {
       text = memPressureSuffix;
       const line = memoryPressureTooltipLine(memoryPressureState);
-      if (line) tooltipLines.push(line);
+      if (line) hints.push(line);
     } else if (systemHealthSnapshot) {
       // Delegate the wording to the health module so the text always names
       // whatever actually tripped the level.
       text = systemHealthStatusBarText(systemHealthSnapshot, systemHealthAssessment);
+      if (text) hints.push(text);
     }
 
-    // Per-process breakdown in the tooltip (separate from the status text).
-    if (systemHealthSnapshot) {
-      tooltipLines.push(...buildProcessTooltipLines(systemHealthSnapshot, systemHealthAssessment, saropaTrend, saropaRssHistory, hostMemory, hostTrend));
-    }
-
-    // Machine-wide RAM: show in tooltip always (when available), and promote
-    // to the status bar text when free RAM is below the configured threshold
-    // and no saropa-specific or memory-pressure issue is already displayed.
+    // Machine-wide RAM: shown in the Memory table always (when available),
+    // and promoted to the status bar text when free RAM is below the
+    // configured threshold and no saropa-specific or memory-pressure issue
+    // is already displayed.
     const systemMem = processMonitor.getLastSystemMemory();
-    if (systemMem) {
+    if (systemMem && !text) {
       const config = vscode.workspace.getConfiguration('saropaLints.systemHealth');
       const threshold = config.get<number>('systemMemoryWarningPercent', 15);
-      const freePercent = systemMem.freeFraction * 100;
-      // Always show machine RAM in the tooltip for at-a-glance context.
-      tooltipLines.push(l10n('systemHealth.statusBar.systemRam', {
-        free: formatBytes(systemMem.freeBytes),
-        total: formatBytes(systemMem.totalBytes),
-      }));
-      // When system RAM is low and no other health text is showing, surface it.
-      if (!text && freePercent < threshold) {
+      if (systemMem.freeFraction * 100 < threshold) {
         text = l10n('systemHealth.statusBar.systemLow', {
           free: formatBytes(systemMem.freeBytes),
           total: formatBytes(systemMem.totalBytes),
         });
+        hints.push(text);
       }
     }
 
@@ -1379,67 +1280,76 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     if (!text && hostMemory) {
       const hostConfig = vscode.workspace.getConfiguration('saropaLints.systemHealth');
       const hostWarningGB = hostConfig.get<number>('extensionHostWarningGB', 1);
-      const hostRssGB = hostMemory.rssBytes / 1_073_741_824;
-      if (hostRssGB >= hostWarningGB) {
+      if (hostMemory.rssBytes / 1_073_741_824 >= hostWarningGB) {
         text = l10n('systemHealth.statusBar.extensionHostWarning', {
           size: formatBytes(hostMemory.rssBytes),
         });
+        hints.push(text);
       }
     }
 
-    // Workspace readiness — lowest priority, shown only when no process-level
-    // or system-level health issue is already displayed.
-    if (!text && cachedReadinessText) {
-      text = cachedReadinessText;
-    }
+    // Workspace readiness — lowest priority for the status bar text. Its
+    // issues are listed by name under Problems, not repeated here.
+    if (!text && cachedReadinessText) text = cachedReadinessText;
 
-    if (!text) {
-      memoryStatusBarItem.hide();
-      return;
-    }
-    memoryStatusBarItem.text = `$(pulse) ${text}`;
-    memoryStatusBarItem.tooltip = [
-      l10n('systemHealth.panel.title'),
-      ...tooltipLines,
-      l10n('systemHealth.statusBar.openHint'),
-    ].join('\n');
-    memoryStatusBarItem.backgroundColor = memoryStatusBarBackground(memPressureSuffix !== undefined);
-    memoryStatusBarItem.show();
+    // Per-process breakdown + machine RAM as the Memory table.
+    const memory = systemHealthSnapshot || systemMem
+      ? buildMemoryModel({
+          snap: systemHealthSnapshot ?? undefined,
+          assessment: systemHealthAssessment,
+          saropaTrendArrow: trendArrow(saropaTrend),
+          saropaRising: saropaTrend === RssTrend.Rising,
+          rssHistory: saropaRssHistory,
+          extHost: hostMemory,
+          extHostTrendArrow: trendArrow(hostTrend),
+          systemRam: systemMem ?? undefined,
+        })
+      : undefined;
+
+    memoryStatus = text
+      ? { text, hints, memory, background: memoryStatusBarBackground(memPressureSuffix !== undefined) }
+      : undefined;
   };
 
-  /** Build tooltip lines for the status bar (version, tier, score, vibrancy details). */
-  function buildStatusBarTooltipLines(
-    tier: string,
-    health: { score: number } | null,
-    showVibrancy: boolean,
-    vibrancyLabel: string | null,
-    scorePending: boolean,
-  ): string[] {
-    const base = [`Saropa Lints v${extVersion}`, `Tier: ${tier}`];
-    if (health) {
-      base.push(`Lint score: ${health.score}%`);
-    } else if (scorePending) {
-      // The report covers too little of the project to score reliably. Tell
-      // the user how to get a real score instead of leaving the line blank.
-      base.push('Lint score: run a full analysis (partial scan)');
-    }
-    if (showVibrancy && vibrancyData !== null) {
-      // "Scanned" counts everything; the suffix explains why the assessment
-      // numbers below (vibrancy, updates) are over the smaller active set.
-      const scanned =
-        vibrancyData.suppressedCount > 0
-          ? `${vibrancyData.packageCount} packages scanned (${vibrancyData.suppressedCount} suppressed)`
-          : `${vibrancyData.packageCount} packages scanned`;
-      base.push(`Vibrancy: ${vibrancyLabel}`, scanned);
-      if (vibrancyData.updateCount > 0) base.push(`${vibrancyData.updateCount} update(s) available`);
-      if (vibrancyData.actionCount > 0) base.push(`${vibrancyData.actionCount} action item(s)`);
-    }
-    return base;
+  // Renders the one status bar item. Text = switch state + score; everything
+  // else (route, memory, workspace issues, details) is tooltip. Warning
+  // background when the switch is not On or memory/workspace needs attention.
+  // Click opens the status menu (never toggles); the toggle is one menu row.
+  function renderStatusBar(
+    state: LintsSwitchState,
+    scoreParts: Array<string | undefined>,
+    badgeSuffix: string,
+    details?: StatusBarInput['details'],
+  ): void {
+    const icon = state.kind === 'on' ? '$(checklist)' : '$(warning)';
+    statusBarItem.text = `${icon} ${buildUnifiedStatusText(lintsSwitchLabel(state), scoreParts)}${badgeSuffix}`;
+    const route = getRouteStatus();
+    statusBarModel = buildStatusBarModel({
+      kind: state.kind,
+      partialOff: state.kind === 'partial' ? state.off : undefined,
+      label: lintsSwitchLabel(state),
+      extVersion,
+      details,
+      route: route ? { state: route.state, text: route.text, tip: route.tip } : undefined,
+      readinessIssues: cachedReadinessLines,
+      memoryHints: memoryStatus?.hints ?? [],
+      memory: memoryStatus?.memory,
+    });
+    const md = new vscode.MarkdownString(renderStatusBarTooltip(statusBarModel), true);
+    md.supportHtml = true;
+    md.isTrusted = { enabledCommands: [...STATUS_BAR_TRUSTED_COMMANDS] };
+    statusBarItem.tooltip = md;
+    statusBarItem.backgroundColor = state.kind === 'on'
+      ? memoryStatus?.background
+      : new vscode.ThemeColor('statusBarItem.warningBackground');
+    statusBarItem.command = 'saropaLints.showStatusBarMenu';
+    statusBarItem.show();
   }
 
-  // Renders the status bar content when analysis is enabled — extracted from
-  // the main status bar update to keep each function under the 50-line limit.
+  // Score parts and detail lines for the enabled state (extracted to keep
+  // each function under the 50-line limit).
   function updateEnabledStatusBar(
+    state: LintsSwitchState,
     preloadedData: ViolationsData | undefined,
     root: string | undefined,
     tier: string,
@@ -1452,53 +1362,38 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const health = data ? computeHealthScore(data) : null;
     // Finding count folded into this single item (was a separate ⚠ entry).
     const badge = findingsBadge(data);
-    const badgeSuffix = badge?.suffix ?? '';
 
-    // Memory/system-health state now renders in its own status bar item
-    // (updateMemoryStatusBar) rather than as a text suffix here.
     updateMemoryStatusBar();
 
+    let healthPart: string | undefined;
     if (health) {
-      const history = loadHistory(context.workspaceState);
-      const prevScore = findPreviousScore(history);
+      const prevScore = findPreviousScore(loadHistory(context.workspaceState));
       const delta = prevScore === undefined ? '' : ` ${formatScoreDelta(health.score, prevScore)}`;
-      const detailLabel = buildStatusBarLabel({
-        hasHealth: true,
-        healthScore: health.score,
-        delta,
-        tier,
-        showVibrancy,
-        vibrancyLabel,
-      });
-      statusBarItem.text = `$(checklist) Saropa: ${detailLabel}${badgeSuffix}`;
-      statusBarItem.backgroundColor = undefined;
-    } else {
-      statusBarItem.text = `$(checklist) ${buildStatusBarLabel({
-        hasHealth: false,
-        tier,
-        showVibrancy,
-        vibrancyLabel,
-      })}${badgeSuffix}`;
-      statusBarItem.backgroundColor = undefined;
+      healthPart = `${health.score}%${delta}`;
     }
     // "Score pending": we have a report but it covers too little of the
     // project to score (partial IDE sweep) — surface a hint, not a blank.
     const scorePending = health === null && data !== null && isReportTooPartial(data);
-    const tooltipLines = buildStatusBarTooltipLines(
-      tier,
-      health,
-      showVibrancy,
-      vibrancyLabel,
-      scorePending,
+    renderStatusBar(
+      state,
+      [healthPart, showVibrancy ? `V${vibrancyLabel}` : undefined],
+      badge?.suffix ?? '',
+      {
+        tier,
+        scorePercent: health?.score,
+        scorePending,
+        vibrancy: showVibrancy && vibrancyData !== null
+          ? {
+              label: vibrancyLabel ?? '',
+              packageCount: vibrancyData.packageCount,
+              suppressedCount: vibrancyData.suppressedCount,
+              updateCount: vibrancyData.updateCount,
+              actionCount: vibrancyData.actionCount,
+            }
+          : undefined,
+        findings: badge ? { total: badge.total, errors: badge.errors } : undefined,
+      },
     );
-    if (badge) tooltipLines.push(badge.tooltip);
-    // Memory/system-health detail moved to its own status bar item
-    // (updateMemoryStatusBar) — no longer duplicated in this tooltip.
-    // Rich tooltip: clickable action menu (toggle + report/panel shortcuts)
-    // instead of plain read-only text — mirrors saropa-log-capture's
-    // status bar menu tooltip pattern.
-    statusBarItem.tooltip = buildStatusBarTooltipMarkdown(tooltipLines, true);
-    statusBarItem.command = 'saropaLints.openViolationsWideReport';
   }
 
   // Inner implementation of updateAllStatusBars, extracted so the outer
@@ -1507,16 +1402,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   function updateAllStatusBarsInner(preloadedData?: ViolationsData): void {
     if (!isDartProject) {
       // Surface the version even outside a Dart workspace so users can verify
-      // that a fresh build has loaded — previously the bar was hidden here and
-      // the only version readout was a tooltip on a tree that itself required
-      // a Dart project to render. That made "is my build live?" unanswerable
-      // before opening a project.
+      // that a fresh build has loaded.
       statusBarItem.text = `$(checklist) Saropa Lints v${extVersion}`;
       statusBarItem.tooltip = `Saropa Lints v${extVersion} — open a folder containing pubspec.yaml to enable analysis.`;
       statusBarItem.backgroundColor = undefined;
-      statusBarItem.command = 'saropaLints.showAbout';
+      statusBarItem.command = 'saropaLints.showStatusBarMenu';
       statusBarItem.show();
-      memoryStatusBarItem.hide();
       return;
     }
     const en = getConfig().get<boolean>('enabled', true) ?? true;
@@ -1525,6 +1416,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // configured, so the status bar can't show a tier that disagrees with
     // what actually gets scanned.
     const statusBarRoot = getProjectRoot();
+    const state: LintsSwitchState = statusBarRoot
+      ? getLintsSwitchState(statusBarRoot)
+      : { kind: en ? 'on' : 'off' };
     const tier = (statusBarRoot && readTierFromAnalysisOptionsYaml(statusBarRoot))
       || (getConfig().get<string>('tier', 'recommended') ?? 'recommended');
     const showVibrancy =
@@ -1533,18 +1427,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     const vibrancyLabel = showVibrancy ? `${Math.round(vibrancyData!.averageScore / 10)}/10` : null;
 
     if (en) {
-      updateEnabledStatusBar(preloadedData, statusBarRoot, tier, showVibrancy, vibrancyLabel);
+      updateEnabledStatusBar(state, preloadedData, statusBarRoot, tier, showVibrancy, vibrancyLabel);
     } else {
-      statusBarItem.text = '$(checklist) Saropa Lints: Off';
-      statusBarItem.tooltip = buildStatusBarTooltipMarkdown(
-        [`Saropa Lints v${extVersion} — Disabled`],
-        en,
-      );
-      statusBarItem.backgroundColor = undefined;
-      statusBarItem.command = 'saropaLints.openViolationsWideReport';
-      memoryStatusBarItem.hide();
+      memoryStatus = undefined;
+      renderStatusBar(state, [], '', undefined);
     }
-    statusBarItem.show();
   }
 
   // Single unified status bar item showing lint score, tier, and vibrancy.
@@ -1577,14 +1464,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       statusBarItem.backgroundColor = new vscode.ThemeColor(
         'statusBarItem.errorBackground',
       );
-      // Safe fallback command — About panel works without any project state.
-      statusBarItem.command = 'saropaLints.showAbout';
+      // Click always opens the menu; with no model it falls back to About.
+      statusBarItem.command = 'saropaLints.showStatusBarMenu';
       statusBarItem.show();
-
-      // Hide the memory bar — its data may also be stale/corrupt, and
-      // showing a healthy-looking memory readout next to an error is
-      // misleading.
-      memoryStatusBarItem.hide();
     }
   };
   updateAllStatusBars();
@@ -1667,6 +1549,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // and tooling caches that can exhaust memory and crash the host. Fires
   // first (10 s) so its patterns are in place before the hazard scan runs.
   setTimeout(() => void auditWatcherExcludes(context), 10_000);
+  setTimeout(() => void auditNestedPackageRoots(context), 12_000);
   // One-shot scan for dangerously large files (heap dumps, oversized logs)
   // that the file watcher would try to track. Runs after the audit (15 s)
   // so files the user just auto-excluded don't trigger a redundant warning.
@@ -1677,9 +1560,17 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   setTimeout(() => {
     void gatherReadiness(processMonitor.getLastHostMemory()).then((r) => {
       cachedReadinessText = readinessStatusBarText(r);
-      updateMemoryStatusBar();
+      cachedReadinessLines = readinessTooltipLines(r, processMonitor.getLastHostMemory());
+      updateAllStatusBars();
     });
   }, 20_000);
+  // One-shot audit of the Dart analysis server's VM heap cap — warns when
+  // there's no ceiling at all, or when a stale/copied cap now exceeds half
+  // this machine's RAM (see heapCapAudit.ts). Dart-only and deferred past
+  // every other startup check (25 s) since it's informational, not urgent.
+  if (isDartProject) {
+    setTimeout(() => void auditHeapCap(context), 25_000);
+  }
   // Heap-cap and Ollama-unload actions the Machine Health dashboard's
   // Recommendations panel dispatches by command name (see machineDashboard.ts's
   // handleMessage) — registered independently of the panel so they also work
@@ -1688,6 +1579,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.showProcessHealth', () => {
       HealthPanel.createOrShow(context);
+    }),
+    // Version compatibility card: facts, recommendation, Preview diff / Apply.
+    vscode.commands.registerCommand('saropaLints.configureCompatibility', () => {
+      void HealthPanel.openCompat(context);
     }),
     vscode.commands.registerCommand('saropaLints.showMachineDashboard', () => {
       MachineDashboard.createOrShow(context);
@@ -1718,6 +1613,15 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // diagnostics. Users can also toggle via the Health Panel engine cards.
   let lspClient: SaropaLspClient | undefined;
   const lspRoot = getProjectRoot();
+  // The master switch `saropaLints.enabled` wins over `lspServer.enabled`.
+  // English-only for now: new catalog keys need the owner's translation pipeline.
+  const LSP_BLOCKED_MSG =
+    'LSP Server not started: the saropaLints.enabled master switch is off. Turn it on to use the language server.';
+  const lspAllowed = (): boolean =>
+    shouldRunLsp(
+      vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true,
+      vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled') ?? false,
+    );
 
   // Start LSP server on activation if the setting is already enabled.
   // When LSP is on, the analyzer plugin is redundant (and costs ~10GB RAM),
@@ -1725,48 +1629,66 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // IMPORTANT: we call disablePluginsIntegration directly — NOT runDisable,
   // which would also set saropaLints.enabled=false and kill the entire
   // extension UI (sidebar views, status bar, scan-on-save).
-  if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
+  if (lspRoot && lspAllowed()) {
     lspClient = new SaropaLspClient(context, lspRoot);
     void lspClient.start();
     disablePluginsIntegration(lspRoot);
   }
 
-  // React to setting changes — start/stop the LSP server without reload.
-  // Log to the Health Panel's engine log after each lifecycle change so the
-  // toggle shows the updated state (the toggle handler's own log entry
-  // fires before this listener runs, so it sees stale status).
+  // Idempotent start/stop shared by the setting-change listener AND the Health
+  // Panel toggle. The toggle must not rely on the listener alone: the setting
+  // defaults to true, so clicking ON when the server is stopped (start failed,
+  // or Kill All) writes the same value, fires no change event, and nothing
+  // happened. Calling these directly makes ON always attempt a start.
+  const startLsp = async (): Promise<void> => {
+    if (!lspRoot) {
+      void vscode.window.showErrorMessage(l10n('notify.lsp.noWorkspaceFolder'));
+      return;
+    }
+    if (lspClient?.isRunning) { return; }
+    if (!lspAllowed()) {
+      HealthPanel.addLogEntry(LSP_BLOCKED_MSG);
+      return;
+    }
+    lspClient ??= new SaropaLspClient(context, lspRoot);
+    await lspClient.start();
+    if (lspClient.isRunning) {
+      // LSP replaces the analyzer plugin — comment out the plugins: block to
+      // free the ~10GB the in-process plugin uses. Does NOT touch
+      // saropaLints.enabled (that would kill the whole extension UI).
+      disablePluginsIntegration(lspRoot);
+      HealthPanel.addLogEntry(l10n('debug.log.lspStarted'));
+    } else {
+      // start() already shows the specific reason; log it for the panel too.
+      HealthPanel.addLogEntry(l10n('debug.log.lspStartFailed'));
+    }
+    HealthPanel.refreshIfOpen();
+  };
+  const stopLsp = async (restorePlugin = true): Promise<void> => {
+    const client = lspClient;
+    if (!client) { return; }
+    lspClient = undefined;
+    // Await stop before dispose to avoid a double-stop race.
+    await client.stop();
+    client.dispose();
+    // Re-enable the analyzer plugin so the user keeps diagnostics.
+    // Skipped when the master switch is off: the user turned everything off.
+    if (lspRoot && restorePlugin) { restorePluginsIntegration(lspRoot); }
+    HealthPanel.addLogEntry(l10n('debug.log.lspStopped'));
+    HealthPanel.refreshIfOpen();
+  };
+
+  // React to setting changes (Settings UI / settings.json) without reload.
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('saropaLints.lspServer.enabled')) {
         const enabled = vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled');
-        if (enabled && !lspClient && lspRoot) {
-          lspClient = new SaropaLspClient(context, lspRoot);
-          void lspClient.start().then(() => {
-            HealthPanel.addLogEntry(l10n('debug.log.lspStarted'));
-          });
-          // LSP replaces the analyzer plugin — disable the plugin to free
-          // the ~10GB RAM the in-process plugin consumes. Comments out
-          // the plugins: block in analysis_options.yaml only. Does NOT
-          // touch saropaLints.enabled (that would kill the whole extension UI).
-          if (lspRoot) {
-            disablePluginsIntegration(lspRoot);
-          }
-        } else if (!enabled && lspClient) {
-          // Await stop before dispose to avoid a double-stop race —
-          // dispose() calls stop() again if _client is still set.
-          const client = lspClient;
-          lspClient = undefined;
-          void client.stop().then(() => {
-            client.dispose();
-            HealthPanel.addLogEntry(l10n('debug.log.lspStopped'));
-          });
-          // Re-enable the analyzer plugin when LSP is turned off so the
-          // user doesn't lose all diagnostics. restorePluginsIntegration
-          // uncomments the plugins: block — does NOT touch saropaLints.enabled.
-          if (lspRoot) {
-            restorePluginsIntegration(lspRoot);
-          }
-        }
+        void (enabled ? startLsp() : stopLsp());
+      }
+      // Master switch: off stops the server (plugin block stays off); back on
+      // restarts it when lspServer.enabled is still true.
+      if (e.affectsConfiguration('saropaLints.enabled')) {
+        void (lspAllowed() ? startLsp() : stopLsp(false));
       }
     }),
   );
@@ -1775,6 +1697,25 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.lspServer.start', async () => {
       if (!lspRoot) { return; }
+      if (!vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
+        const enable = l10n('debug.log.lspEnableButton');
+        const choice = await vscode.window.showInformationMessage(
+          l10n('debug.log.lspDisabledPrompt'),
+          enable,
+        );
+        if (choice === enable) {
+          // The onDidChangeConfiguration listener above creates and starts
+          // the client — starting here too would double-start it.
+          await vscode.workspace
+            .getConfiguration('saropaLints.lspServer')
+            .update('enabled', true, vscode.ConfigurationTarget.Workspace);
+        }
+        return;
+      }
+      if (!lspAllowed()) {
+        void vscode.window.showInformationMessage(LSP_BLOCKED_MSG);
+        return;
+      }
       if (!lspClient) {
         lspClient = new SaropaLspClient(context, lspRoot);
       }
@@ -1865,6 +1806,23 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           : undefined,
       };
     },
+    // CI status — derived entirely from `.github/workflows/saropa-lints.yml`
+    // on disk, never from a live GitHub Actions run (the token in
+    // saropaLints.packageVibrancy.githubToken is optional and usually
+    // empty, so there is no reliable run result to show). "enabled" tracks
+    // whether the file is present and not suspended — never a stand-in for
+    // "the last CI run passed".
+    getCiStatus: (): EngineStatus => {
+      const ciRoot = getProjectRoot();
+      const state = ciRoot ? getCiWorkflowState(ciRoot) : 'absent';
+      return {
+        key: 'ci',
+        name: l10n('debug.engine.ci'),
+        enabled: state === 'active',
+        status: state === 'absent' ? 'notConfigured' : state,
+        rssNote: l10n('debug.engine.rssNote.remote'),
+      };
+    },
   });
   // The sidebar Status section's Engines row (sectionedSidebar.ts) reads
   // HealthPanel.getEngineStatuses(), but the section providers were created
@@ -1886,7 +1844,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   HealthPanel.onRestartAll(async () => {
     if (lspClient) {
       await lspClient.restart();
-    } else if (lspRoot) {
+    } else if (lspRoot && lspAllowed()) {
       lspClient = new SaropaLspClient(context, lspRoot);
       await lspClient.start();
     }
@@ -1901,9 +1859,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       HealthPanel.addLogEntry(
         enabled ? l10n('debug.log.lspToggleOn') : l10n('debug.log.lspToggleOff'),
       );
-      await vscode.workspace
-        .getConfiguration('saropaLints.lspServer')
-        .update('enabled', enabled, vscode.ConfigurationTarget.Workspace);
+      try {
+        await vscode.workspace
+          .getConfiguration('saropaLints.lspServer')
+          .update('enabled', enabled, vscode.ConfigurationTarget.Workspace);
+      } catch (err) {
+        void vscode.window.showErrorMessage(
+          l10n('notify.lsp.settingWriteFailed', { reason: err instanceof Error ? err.message : String(err) }),
+        );
+      }
+      // Act directly (idempotent) — the change listener may not fire when
+      // the setting already holds this value.
+      await (enabled ? startLsp() : stopLsp());
     } else if (engine === 'analyzer') {
       // Reuses the exact mechanism behind the "Lint integration" sidebar
       // toggle (saropaLints.disable / .reenablePlugin) so this isn't a
@@ -1936,8 +1903,198 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       } else {
         scanOnSaveController.suspendDaemon();
       }
+      // Suspension feeds the On / Off / Partly off switch.
+      refreshAll();
+      updateAllStatusBars();
+    } else if (engine === 'ci') {
+      // Edits .github/workflows/saropa-lints.yml in the workspace's working
+      // tree only — never runs git. ON writes the workflow if it's missing,
+      // or re-enables it if it was suspended; OFF sets `if: false` on the
+      // job rather than deleting the file, so the change is a one-line,
+      // reversible diff and any customisation the team made survives. The
+      // user still reviews and commits this themselves, same as any other
+      // edit to a file that governs the whole team's PRs.
+      HealthPanel.addLogEntry(
+        enabled ? l10n('debug.log.ciToggleOn') : l10n('debug.log.ciToggleOff'),
+      );
+      const ciRoot = getProjectRoot();
+      if (!ciRoot) {
+        vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+        return;
+      }
+      if (enabled) {
+        // Turning CI on is more than writing a file. A workflow that calls
+        // saropa_lints against a project that does not depend on it, or that
+        // runs `scan` where no rule config exists, is a workflow that fails on
+        // its first run. Resolve both here rather than leaving the user to
+        // discover them from a red PR.
+        // Asked before the edit below: were there already edits of the
+        // user's in pubspec.yaml? A commit takes whole files, so publishing
+        // the dependency would push those too — the plan is then blocked.
+        const pubspecHadEdits =
+          isGitRepository(ciRoot) && hasUncommittedChanges(ciRoot, 'pubspec.yaml');
+        const before = readCiWorkflow(ciRoot);
+        const added = await ensureSaropaLintsInPubspec(ciRoot);
+        if (!added.ok) return; // ensureSaropaLintsInPubspec already explained why
+
+        // `gate` runs the scan command, which honors THIS project's own
+        // analysis_options.yaml. That is the whole point: annotate runs
+        // audit, which bypasses the configured tier and reports every one of
+        // 2332 rules, so a project on `essential` would get its pull requests
+        // papered with findings from rules it never enabled.
+        //
+        // The generated step carries continue-on-error, so it reports without
+        // failing the pull request. Enforcing is a decision a project makes
+        // once it is clean enough, by deleting that line — not a default
+        // imposed on it the first time CI runs.
+        //
+        // A tier is written only when the project has no rule config at all,
+        // which is the one case where scan cannot run. When the project IS
+        // configured, no tier is written and its own choices apply untouched.
+        //
+        // No prompt, and `--emit-ci` generates the identical file: a card that
+        // quietly differed from the CLI would be its own bug.
+        const tier = needsExplicitTier(ciRoot) ? 'recommended' : undefined;
+        enableCiWorkflow(ciRoot, { mode: 'gate', tier });
+
+        // When the dependency was just added, that edit has to travel with the
+        // workflow. A pull request carrying the workflow alone would fail its
+        // very first run with "saropa_lints is not a resolved dependency".
+        //
+        // Nothing to publish when neither file changed (CI was already on):
+        // a plan then would cut a branch and fail with nothing to commit.
+        if (added.changed || readCiWorkflow(ciRoot) !== before) {
+          presentCiPublishStep(
+            ciRoot,
+            'enable',
+            added.changed ? ['pubspec.yaml'] : [],
+            added.changed && pubspecHadEdits
+              ? l10n('debug.ci.publish.pubspecHasOtherEdits')
+              : undefined,
+          );
+        }
+      } else {
+        const beforeOff = readCiWorkflow(ciRoot);
+        if (!disableCiWorkflow(ciRoot)) {
+          // The off switch failed: the file is missing, or its shape is one we
+          // will not edit blind. Never let that look like success — CI is still
+          // running and the user believes they stopped it. Say so, and open the
+          // file so they can stop it by hand right now.
+          const openLabel = l10n('debug.ci.openWorkflow');
+          const choice = await vscode.window.showErrorMessage(
+            l10n('debug.ci.disableFailed', { path: ciWorkflowPathFromProject(ciRoot) }),
+            openLabel,
+          );
+          if (choice === openLabel) {
+            const uri = vscode.Uri.file(getCiWorkflowPath(ciRoot));
+            try {
+              await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(uri));
+            } catch {
+              void vscode.window.showErrorMessage(
+                l10n('debug.ci.openWorkflowFailed', { path: ciWorkflowPathFromProject(ciRoot) }),
+              );
+            }
+          }
+        } else if (readCiWorkflow(ciRoot) !== beforeOff) {
+          // Only when OFF changed the file: already off means nothing to publish.
+          presentCiPublishStep(ciRoot, 'disable');
+        }
+      }
+      HealthPanel.refreshIfOpen();
     }
   });
+
+  // Turning the card on or off only edits the working tree. Publishing that
+  // edit is a separate, explicit act — see ciPublishHtml.ts for why it is a
+  // button in the panel rather than something the toggle does on its own.
+  context.subscriptions.push(HealthPanel.onCiPublish((plan) => void publishCiChange(plan)));
+
+  /**
+   * Shows the publish step for a change just written to the working tree.
+   *
+   * A folder that is not a git repository has nothing to publish to, so it
+   * gets the plain "the file is written, it is yours now" message instead of
+   * a panel section offering commands that could not run.
+   */
+  function presentCiPublishStep(
+    root: string,
+    direction: CiPublishDirection,
+    extraPaths: readonly string[] = [],
+    blockedReason?: string,
+  ): void {
+    if (!isGitRepository(root)) {
+      void vscode.window.showInformationMessage(
+        l10n('debug.ci.publish.notARepository', { path: ciWorkflowPathFromProject(root) }),
+      );
+      return;
+    }
+    // Opening the panel is the point: the step is only meaningful if the user
+    // can see it, and the toggle may have come from the sidebar row.
+    HealthPanel.createOrShow(context);
+    HealthPanel.setPendingCiPublish(buildCiPublishPlan(root, direction, extraPaths, blockedReason));
+  }
+
+  /**
+   * Runs an accepted publish plan: branch, commit, push, then open the pull
+   * request.
+   *
+   * Failure is reported at the step that failed and nothing is retried. A push
+   * rejected by a protection rule, a commit blocked by a hook, a branch name
+   * that raced with another clone — each is something only the user can
+   * resolve, and each leaves the commands in the panel still valid for them to
+   * finish by hand.
+   */
+  async function publishCiChange(plan: CiPublishPlan): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+
+    const result = await vscode.window.withProgress(
+      { location: vscode.ProgressLocation.Notification, title: l10n('debug.ci.publish.running') },
+      async () => runCiPublish(root, plan),
+    );
+
+    if (!result.ok) {
+      // The pending plan is deliberately left on screen: its commands are how
+      // the user finishes the job themselves, so clearing it would take away
+      // the remedy at the moment they need it.
+      void vscode.window.showErrorMessage(
+        l10n('debug.ci.publish.failed', {
+          command: result.failedCommand ?? '',
+          details: result.stderr ?? '',
+        }),
+      );
+      HealthPanel.refreshIfOpen();
+      return;
+    }
+
+    // Pushed. From here the change exists on the remote whatever happens next,
+    // so the panel section has done its job and comes down.
+    HealthPanel.setPendingCiPublish(undefined);
+
+    const prUrl = await createPullRequest(plan);
+    if (prUrl) {
+      const open = l10n('debug.ci.publish.openPr');
+      const choice = await vscode.window.showInformationMessage(
+        l10n('debug.ci.publish.created', { branch: plan.branch }),
+        open,
+      );
+      if (choice === open) void vscode.env.openExternal(vscode.Uri.parse(prUrl));
+      return;
+    }
+
+    // No pull request — not signed in, not a GitHub remote, or the API refused.
+    // The branch is pushed either way, so hand over the compare page rather
+    // than treating this as an error.
+    const compare = compareUrl(plan);
+    const openCompare = l10n('debug.ci.publish.openCompare');
+    const choice = await vscode.window.showInformationMessage(
+      l10n('debug.ci.publish.pushedNoPr', { branch: plan.branch }),
+      ...(compare ? [openCompare] : []),
+    );
+    if (choice === openCompare && compare) {
+      void vscode.env.openExternal(vscode.Uri.parse(compare));
+    }
+  }
 
   // Kept as a command-palette/history-compatible alias now that the
   // formerly separate Debug Panel sidebar webview merged into the Health
@@ -2137,6 +2294,39 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // disable commented out, then restarts the analysis server so the
     // in-process plugin actually reloads. Distinct from `saropaLints.enable`,
     // which only turns on scan-on-save delivery and never touches this block.
+    // The one on/off switch (status bar, sidebar, dashboard): On turns setting
+    // and plugin off together; Off / Partly off (the Fix) turns both on.
+    vscode.commands.registerCommand('saropaLints.toggleLints', async () => {
+      await toggleLints(context);
+      updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
+      refreshAll();
+      updateAllStatusBars();
+    }),
+    // Status bar click: the same status, problems and action rows as the hover
+    // in a QuickPick. Clicking the item never flips the switch; the toggle is a row.
+    vscode.commands.registerCommand('saropaLints.showStatusBarMenu', async () => {
+      if (!statusBarModel) {
+        await vscode.commands.executeCommand('saropaLints.showAbout');
+        return;
+      }
+      const rows = buildStatusBarQuickPickItems(statusBarModel);
+      const picked = await vscode.window.showQuickPick<StatusBarPickItem>(
+        rows.map((r): StatusBarPickItem => ({
+          label: r.label,
+          description: r.description,
+          detail: r.detail,
+          kind: r.separator ? vscode.QuickPickItemKind.Separator : vscode.QuickPickItemKind.Default,
+          commandId: r.commandId,
+        })),
+        { title: l10n('statusBar.quickPick.title'), placeHolder: l10n('statusBar.quickPick.placeholder') },
+      );
+      if (picked?.commandId) await vscode.commands.executeCommand(picked.commandId);
+    }),
+    vscode.commands.registerCommand('saropaLints.syncPluginVersion', async () => {
+      const syncRoot = getProjectRoot();
+      if (syncRoot) await syncVersionWithMessage(syncRoot);
+      refreshAll();
+    }),
     vscode.commands.registerCommand('saropaLints.reenablePlugin', async () => {
       await runReenablePlugin(context);
       updateContext(true, issuesProvider.hasViolations());
@@ -2242,6 +2432,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.migrateConfig', async () => {
       const root = getProjectRoot();
       await runMigrateConfig(root);
+      refreshAll();
+    }),
+    // Rewrite renamed rule names (ignore comments, analysis options, baselines) with diff preview.
+    vscode.commands.registerCommand('saropaLints.migrateRuleNames', async () => {
+      await runMigrateRuleNames();
       refreshAll();
     }),
     // One-click enable of a rule pack (used by the startup toast follow-through
@@ -3152,11 +3347,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   }, 3_000);
 
   // Background upgrade check — runs asynchronously, fails silently.
-  // Only checks when saropa_lints is already in the project and extension is enabled.
-  if (isDartProject && enabled && root) {
-    void checkForUpgrade(context, root).catch((err) => {
-      console.error('[Saropa Lints] Upgrade check failed:', err);
-    });
+  // Runs even when Lint integration is Off (saropaLints.enabled=false): that is
+  // exactly when an outdated dependency goes unnoticed. Besides reading files, it shows a
+  // status bar item and an upgrade prompt; that is intended when integration is Off.
+  // Start-up detection supersedes the old lock-only toast: it covers pubspec,
+  // plugin-only and both routes with one prompt (compat/startupController.ts).
+  if (isDartProject && root) {
+    onRouteStatusChange(() => updateAllStatusBars());
+    registerStartupDetection(context, (m) => console.log(m));
   }
 
   // Prompt setup when this is a Dart project but saropa_lints is not in
@@ -3243,6 +3441,11 @@ function resolveRulesFromArg(arg: unknown): string[] | undefined {
     if (node.kind === 'violation' && typeof node.violation?.rule === 'string') return [node.violation.rule];
   }
   return undefined;
+}
+
+/** A status bar menu row: a QuickPick item that carries the command it runs. */
+interface StatusBarPickItem extends vscode.QuickPickItem {
+  commandId?: string;
 }
 
 /** Pre-computed counts passed from the tier-change handler to the notification. */

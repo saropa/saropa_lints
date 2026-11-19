@@ -18,7 +18,7 @@ Developed by [Saropa](https://saropa.com) to make the world of Dart & Flutter be
 
 ## Quick Start
 
-**Requirements:** Dart SDK `>=3.9.0 <4.0.0`.
+**Requirements:** Dart SDK `>=3.11.0 <4.0.0`.
 
 ### Option A — VS Code extension (recommended)
 
@@ -224,6 +224,14 @@ The scanner works on **any Dart project** — even without saropa_lints as a dep
 
 ---
 
+## How to turn saropa_lints completely off
+
+1. **VS Code extension:** set `saropaLints.enabled` to `false`. This master switch also stops the language server, even if `saropaLints.lspServer.enabled` is `true`.
+2. **Analyzer plugin:** toggle "Lint integration" Off in the extension, or comment out the `saropa_lints:` block under `plugins:` in `analysis_options.yaml`, then restart the Dart analysis server.
+3. **Hooks and CI:** with the plugin block commented out by the extension, `dart run saropa_lints scan` prints a "disabled" line and exits 0. A CI workflow from `init --emit-ci` has no off switch of its own; delete or disable the workflow file.
+
+---
+
 ## Scope: Static Code vs. Runtime Data
 
 `saropa_lints` and **[Saropa Drift Advisor](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-drift-advisor)** are complementary. They analyze different things and should both be installed when you use Drift.
@@ -387,9 +395,20 @@ Show your code quality standards:
 [![Saropa Lints Badge](https://img.shields.io/badge/saropa_lints-recommended%2B-blue?style=flat&logo=flutter&logoColor=white&color=435489)](https://pub.dev/packages/saropa_lints)
 ```
 
+## Choosing a Version
+
+The constraint you need depends on the analyzer your project resolves:
+
+| Your analyzer | Use |
+| --- | --- |
+| 13 or 14 | `saropa_lints: ^17.0.0` |
+| 12 | `saropa_lints: ^16.7.0` (frozen, no back-ports) |
+
+The VS Code extension's compatibility card shows which analyzer your workspace resolves and which constraint to use.
+
 ## Supported Versions
 
-The current major (`12.x`) is the actively maintained line. Earlier majors are updated only for security-impacting issues. [Open an issue](https://github.com/saropa/saropa_lints/issues/new) tagged `backport-request` if needed.
+The current major (`17.x`, analyzer `>=13 <15`) is the actively maintained line. `16.x` (analyzer 12) is frozen: no back-ports, including for security-impacting issues. See Choosing a Version above.
 
 ## License
 

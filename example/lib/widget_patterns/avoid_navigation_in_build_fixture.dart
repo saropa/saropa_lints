@@ -110,7 +110,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 class _bad1447__MyWidgetState extends State<MyWidget> {
   @override
   void dispose() {
-// Missing super.dispose()!
+    // Missing super.dispose()!
   }
 }
 
@@ -118,7 +118,7 @@ class _bad1447__MyWidgetState extends State<MyWidget> {
 class _good1447__MyWidgetState extends State<MyWidget> {
   @override
   void dispose() {
-// Clean up resources
+    // Clean up resources
     super.dispose();
   }
 }

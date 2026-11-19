@@ -111,18 +111,10 @@ dynamic event;
 // BAD: Should trigger avoid_raw_keyboard_listener
 // expect_lint: avoid_raw_keyboard_listener
 void _bad1398() {
-  RawKeyboardListener(
-    focusNode: _focusNode,
-    onKey: (event) {},
-    child: child,
-  );
+  RawKeyboardListener(focusNode: _focusNode, onKey: (event) {}, child: child);
 }
 
 // GOOD: Should NOT trigger avoid_raw_keyboard_listener
 void _good1398() {
-  KeyboardListener(
-    focusNode: _focusNode,
-    onKeyEvent: (event) {},
-    child: child,
-  );
+  KeyboardListener(focusNode: _focusNode, onKeyEvent: (event) {}, child: child);
 }

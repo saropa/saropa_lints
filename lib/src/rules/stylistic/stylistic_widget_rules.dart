@@ -100,8 +100,8 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
       final argNames = <String>{};
 
       for (final arg in args) {
-        if (arg is NamedExpression) {
-          argNames.add(arg.name.label.name);
+        if (arg is NamedArgument) {
+          argNames.add(arg.name.lexeme);
         }
       }
 
@@ -435,8 +435,8 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
       // Extract values
       final args = <String, String>{};
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          args[arg.name.label.name] = arg.expression.toString();
+        if (arg is NamedArgument) {
+          args[arg.name.lexeme] = arg.argumentExpression.toString();
         }
       }
 
@@ -720,8 +720,8 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
 
       // Check for fit: FlexFit.tight
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'fit') {
-          final expr = arg.expression;
+        if (arg is NamedArgument && arg.name.lexeme == 'fit') {
+          final expr = arg.argumentExpression;
           if (expr is PrefixedIdentifier) {
             if (expr.prefix.name == 'FlexFit' &&
                 expr.identifier.name == 'tight') {
@@ -883,8 +883,8 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
         // Check if this is a color assignment in a widget context
         // We look for common color parameter names
         final parent = node.parent;
-        if (parent is NamedExpression) {
-          final paramName = parent.name.label.name;
+        if (parent is NamedArgument) {
+          final paramName = parent.name.lexeme;
           if (_isColorParam(paramName)) {
             reporter.atNode(node);
           }
@@ -1084,7 +1084,7 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
       // Only flag when no custom clipper is used (safe drop-in replacement)
       final args = node.argumentList.arguments;
       for (final arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'clipper') {
+        if (arg is NamedArgument && arg.name.lexeme == 'clipper') {
           return;
         }
       }
@@ -1176,7 +1176,7 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
 
       // Only flag when a custom clipper IS used (no auto-fix possible)
       final hasClipper = node.argumentList.arguments.any(
-        (arg) => arg is NamedExpression && arg.name.label.name == 'clipper',
+        (arg) => arg is NamedArgument && arg.name.lexeme == 'clipper',
       );
       if (!hasClipper) return;
 

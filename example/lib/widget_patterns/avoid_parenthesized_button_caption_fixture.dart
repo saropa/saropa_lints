@@ -71,35 +71,27 @@ class _MarkerWidget extends StatelessWidget {
 // BAD: Parenthesized text in CommonButton text parameter
 // expect_lint: avoid_parenthesized_button_caption
 void _bad1() {
-  CommonButton(
-    text: 'Delete All Contacts (User & Imported)',
-    onPressed: () {},
-  );
+  CommonButton(text: 'Delete All Contacts (User & Imported)', onPressed: () {});
 }
 
 // BAD: Parenthesized text in CommonButtonWait text parameter
 // expect_lint: avoid_parenthesized_button_caption
 void _bad2() {
-  CommonButtonWait(
-    text: 'Import Contacts (Quick Pass)',
-    onPressed: () {},
-  );
+  CommonButtonWait(text: 'Import Contacts (Quick Pass)', onPressed: () {});
 }
 
 // BAD: Entire string is parenthesized — still belongs in subtitleText
 // expect_lint: avoid_parenthesized_button_caption
 void _bad3() {
-  CommonButton(
-    text: '(Coming Soon)',
-    onPressed: () {},
-  );
+  CommonButton(text: '(Coming Soon)', onPressed: () {});
 }
 
 // BAD: Adjacent string literal concatenation containing parens
 // expect_lint: avoid_parenthesized_button_caption
 void _bad4() {
   CommonButton(
-    text: 'Clean Database '
+    text:
+        'Clean Database '
         '(Full Rebuild)',
     onPressed: () {},
   );
@@ -108,10 +100,7 @@ void _bad4() {
 // BAD: `+`-operator string concatenation containing parens
 // expect_lint: avoid_parenthesized_button_caption
 void _bad5() {
-  CommonButton(
-    text: 'Clean Database ' + '(Full Rebuild)',
-    onPressed: () {},
-  );
+  CommonButton(text: 'Clean Database ' + '(Full Rebuild)', onPressed: () {});
 }
 
 // GOOD: No parentheses in text
@@ -134,16 +123,11 @@ void _good2() {
 
 // GOOD: No text parameter at all
 void _good3() {
-  CommonButton(
-    onPressed: () {},
-  );
+  CommonButton(onPressed: () {});
 }
 
 // GOOD: l10n reference — not a string literal, accepted false-negative gap
 dynamic l10n;
 void _good4() {
-  CommonButton(
-    text: l10n.someKey,
-    onPressed: () {},
-  );
+  CommonButton(text: l10n.someKey, onPressed: () {});
 }

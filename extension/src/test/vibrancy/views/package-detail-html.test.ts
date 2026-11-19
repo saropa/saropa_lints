@@ -17,6 +17,7 @@ import * as assert from 'node:assert';
 
 import { buildPackageDetailHtml } from '../../../vibrancy/views/package-detail-html';
 import type { VibrancyResult } from '../../../vibrancy/types';
+import type { BlastRadius } from '../../../vibrancy/scoring/upgrade-blast-radius';
 
 function makeResult(name = 'http'): VibrancyResult {
     return {
@@ -339,4 +340,18 @@ describe('Package Detail Panel — opportunities section', () => {
         assert.ok(!html.includes('<script>alert(1)</script>'), 'bullet text must be escaped');
         assert.ok(!html.includes('<img src=x onerror=alert(1)>'), 'API name must be escaped');
     });
+
+describe('package detail unverified blast radius note', () => {
+    it('renders the note only for a safe unverified verdict', () => {
+        const br = (unverified: boolean): BlastRadius => ({
+            pkg: 'http', from: '1.0.0', to: '2.0.0', verdict: 'safe', breakers: [], sdkBlock: null,
+            heldBackReason: null, unverified,
+            summaryKey: 'blastRadius.summary.safe', summaryParams: { pkg: 'http', from: '1.0.0', to: '2.0.0' },
+        });
+        const upd = { currentVersion: '1.0.0', latestVersion: '2.0.0', updateStatus: 'major' as const, changelog: null };
+        const html = (u: boolean) => buildPackageDetailHtml({ ...makeResult('http'), updateInfo: upd, blastRadius: br(u) }, [], null);
+        assert.ok(html(true).includes('Upgrade check incomplete: dependency data for 2.0.0 could not be fetched'));
+        assert.ok(!html(false).includes('Upgrade check incomplete'));
+    });
+});
 });

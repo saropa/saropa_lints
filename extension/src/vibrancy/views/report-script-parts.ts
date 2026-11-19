@@ -226,6 +226,7 @@ export function reportScriptPart2(): string {
                 return vulns > 0
                     || category === 'abandoned'
                     || category === 'end-of-life'
+                    || category === 'upgrade-required'
                     || ageMonths >= 36;
             }
             if (activePreset === 'cleanup-candidates') {
@@ -240,7 +241,7 @@ export function reportScriptPart2(): string {
         function matchesCardFilter(row, filter) {
             switch (filter) {
                 case 'vibrant': case 'stable': case 'outdated':
-                case 'abandoned': case 'end-of-life':
+                case 'abandoned': case 'upgrade-required': case 'end-of-life':
                     return row.dataset.category === filter;
                 case 'updates':
                     return row.dataset.update !== 'up-to-date'

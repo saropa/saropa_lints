@@ -12,7 +12,7 @@ plugins:
   saropa_lints:
     # Kept in sync with pubspec.yaml at publish time — see issue #216
     # and the comment in tiers/essential.yaml for the full rationale.
-    version: "^16.0.0"
+    version: "^17.0.0"
     diagnostics:
       # =========================================================================
       # ARCHITECTURE - Complete
@@ -31,6 +31,7 @@ plugins:
       prefer_const_border_radius: true
       prefer_correct_edge_insets_constructor: true
       prefer_text_rich: true
+      prefer_media_query_width_height_of: true
       prefer_define_hero_tag: true
       prefer_sliver_prefix: true
       prefer_widget_private_members: true
@@ -155,6 +156,7 @@ plugins:
       # IMPORTS - Complete
       # =========================================================================
       avoid_barrel_files: true
+      avoid_reexports: true
       avoid_double_slash_imports: true
       avoid_duplicate_exports: true
       avoid_duplicate_named_imports: true

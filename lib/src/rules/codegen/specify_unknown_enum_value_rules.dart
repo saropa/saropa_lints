@@ -226,8 +226,8 @@ class SpecifyUnknownEnumValueRule extends SaropaLintRule {
   bool _hasNamedArgument(Annotation annotation, String argumentName) {
     final ArgumentList? args = annotation.arguments;
     if (args == null) return false;
-    for (final Expression arg in args.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == argumentName) {
+    for (final Argument arg in args.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == argumentName) {
         return true;
       }
     }
@@ -247,10 +247,10 @@ class SpecifyUnknownEnumValueRule extends SaropaLintRule {
   }) {
     final ArgumentList? args = annotation.arguments;
     if (args == null) return false;
-    for (final Expression arg in args.arguments) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name != argumentName) continue;
-      final Expression value = arg.expression;
+    for (final Argument arg in args.arguments) {
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme != argumentName) continue;
+      final Expression value = arg.argumentExpression;
       if (value is BooleanLiteral) return value.value == expected;
       return false;
     }

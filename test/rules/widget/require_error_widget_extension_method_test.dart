@@ -22,10 +22,8 @@ void main() {
     final NodeList<FormalParameter> list = params.parameters;
     if (list.length < 2) return null;
     final FormalParameter second = list[1];
-    final FormalParameter inner = second is DefaultFormalParameter
-        ? second.parameter
-        : second;
-    if (inner is SimpleFormalParameter) {
+    final FormalParameter inner = second;
+    if (inner is RegularFormalParameter) {
       return inner.name?.lexeme;
     }
     return null;
@@ -172,8 +170,8 @@ void main() {
     final list = params.parameters;
     if (list.length < 2) return null;
     final second = list[1];
-    final inner = second is DefaultFormalParameter ? second.parameter : second;
-    if (inner is SimpleFormalParameter) return inner.name?.lexeme;
+    final inner = second;
+    if (inner is RegularFormalParameter) return inner.name?.lexeme;
     return null;
   }
 

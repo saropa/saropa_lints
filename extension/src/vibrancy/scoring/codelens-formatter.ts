@@ -12,6 +12,8 @@ import { formatSizeMB } from './bloat-calculator';
 import {
     getCategoryIndicator, getIndicator, loadIndicatorStyle,
 } from '../services/indicator-config';
+import { isUpgradeSuppressed, describeBlastSummary } from './blast-radius-attacher';
+import { l10n } from '../../i18n/runtime';
 import { categoryEmoji } from '../category-dictionary';
 
 export type CodeLensDetail = 'minimal' | 'standard' | 'full';
@@ -23,6 +25,9 @@ function formatUpdateSegment(result: VibrancyResult): string {
     if (!result.updateInfo
         || result.updateInfo.updateStatus === 'up-to-date') {
         return `${getIndicator('upToDate')} Up to date`;
+    }
+    if (isUpgradeSuppressed(result)) {
+        return `${getIndicator('warning')} ${result.blastRadius ? describeBlastSummary(result.blastRadius) : l10n('blastRadius.notRecommended')}`;
     }
     const { currentVersion, latestVersion, updateStatus } = result.updateInfo;
     return `${getIndicator('updateAvailable')} ${currentVersion} → ${latestVersion} (${updateStatus})`;

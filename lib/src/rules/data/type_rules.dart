@@ -156,10 +156,10 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
       final DartType? targetType = target.staticType;
       if (targetType == null) return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final DartType? argType = args.first.staticType;
+      final DartType? argType = args.first.argumentExpression.staticType;
       if (argType == null) return;
 
       // Get the element type of the collection
@@ -312,7 +312,7 @@ class AvoidDynamicRule extends SaropaLintRule {
   /// `List<dynamic>`), so `dynamic` is imposed, not chosen.
   static bool _isClosureParameter(NamedType node) {
     final AstNode? parent = node.parent;
-    if (parent is! SimpleFormalParameter) return false;
+    if (parent is! RegularFormalParameter) return false;
     final AstNode? paramList = parent.parent;
     if (paramList is! FormalParameterList) return false;
     final AstNode? paramListParent = paramList.parent;
@@ -388,7 +388,8 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
       bool implementsObject = false;
       if (implementsClause != null) {
         for (final NamedType type in implementsClause.interfaces) {
-          if (type.name.lexeme == 'Object') {
+          if (type.name.lexeme == 'Object' ||
+              _isNonNullableInterface(type.type)) {
             implementsObject = true;
             break;
           }
@@ -400,6 +401,20 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
         reporter.atToken(primaryCtor.typeName, code);
       }
     });
+  }
+
+  /// True when [type] is an interface type that is itself a subtype of
+  /// `Object` (e.g. `List<T>`, `String`, or an extension type that in turn
+  /// implements such a type), so an extension type implementing it cannot be
+  /// implicitly nullable.
+  static bool _isNonNullableInterface(DartType? type, [int depth = 0]) {
+    if (type is! InterfaceType || depth > 8) return false;
+    if (type.nullabilitySuffix == NullabilitySuffix.question) return false;
+    final InterfaceElement element = type.element;
+    if (element is! ExtensionTypeElement) return true;
+    return element.interfaces.any(
+      (InterfaceType i) => _isNonNullableInterface(i, depth + 1),
+    );
   }
 }
 
@@ -578,6 +593,15 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
       }
       if (current is FunctionExpressionInvocation) return false;
       if (current is InstanceCreationExpression) return false;
+      // Lazy-message closure form: `debug(() => '...$x')`. Step over the
+      // closure to reach the enclosing log call.
+      if (current is ExpressionFunctionBody &&
+          current.parent is FunctionExpression &&
+          current.parent!.parent is ArgumentList) {
+        current = current.parent;
+        hops++;
+        continue;
+      }
       if (current is FunctionBody) return false;
       current = current.parent;
       hops++;
@@ -751,7 +775,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   String? _extractRegExpFromCallArgs(MethodInvocation call) {
     final args = call.argumentList.arguments;
     if (args.isEmpty) return null;
-    final Expression first = args.first;
+    final Argument first = args.first;
     // Direct inline constructor: `replaceAllMapped(RegExp(r'...'), ...)`
     if (first is InstanceCreationExpression) {
       return _extractPatternFromRegExpCtor(first);
@@ -774,7 +798,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
     if (ctorName != 'RegExp') return null;
     final args = expr.argumentList.arguments;
     if (args.isEmpty) return null;
-    final Expression first = args.first;
+    final Argument first = args.first;
     if (first is SimpleStringLiteral) return first.value;
     return null;
   }
@@ -798,6 +822,14 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
           _isNotNullCheckFor(parent.expression, exprSource)) {
         return true;
       }
+      // `guard != null && <interpolation in right operand>`: the right
+      // operand only evaluates when the left conjunct held.
+      if (parent is BinaryExpression &&
+          parent.operator.type == TokenType.AMPERSAND_AMPERSAND &&
+          identical(parent.rightOperand, child) &&
+          _isNotNullCheckFor(parent.leftOperand, exprSource)) {
+        return true;
+      }
       // Don't escape past a function body — a guard outside the closure
       // doesn't carry into it.
       if (parent is FunctionBody) return false;
@@ -816,10 +848,10 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
       final Expression left = c.leftOperand;
       final Expression right = c.rightOperand;
       if (right is NullLiteral) {
-        return _normalizeSource(left.toSource()) == exprSource;
+        return _guardCovers(_normalizeSource(left.toSource()), exprSource);
       }
       if (left is NullLiteral) {
-        return _normalizeSource(right.toSource()) == exprSource;
+        return _guardCovers(_normalizeSource(right.toSource()), exprSource);
       }
     }
     // Recurse into `&&` compounds: `if (a.contains('x') && f.churn != null)`
@@ -834,6 +866,12 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
     }
     return false;
   }
+
+  /// True when the guarded source equals the interpolated source, or the
+  /// interpolation is a null-aware chain off the guarded receiver
+  /// (`x != null` covers `x?.map(...).join()`; the `?.` is redundant there).
+  bool _guardCovers(String guarded, String exprSource) =>
+      guarded == exprSource || exprSource.startsWith('$guarded?.');
 
   /// Strip whitespace so `widget.contact.uuid` matches across line breaks
   /// inside multi-line conditions. We deliberately do NOT strip `?` here
@@ -893,25 +931,51 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addDefaultFormalParameter((DefaultFormalParameter node) {
-      final Expression? defaultValue = node.defaultValue;
+    context.addRegularFormalParameter((RegularFormalParameter node) {
+      final Expression? defaultValue = node.defaultClause?.value;
       if (defaultValue == null) return;
 
       // Skip if default value is null
       if (defaultValue is NullLiteral) return;
 
-      // Check if the parameter type is nullable
-      final NormalFormalParameter parameter = node.parameter;
-      TypeAnnotation? typeAnnotation;
+      // Function-typed parameters keep the old behavior: no type check.
+      if (node.functionTypedSuffix != null) return;
 
-      if (parameter is SimpleFormalParameter) {
-        typeAnnotation = parameter.type;
-      }
+      // Check if the parameter type is nullable
+      final TypeAnnotation? typeAnnotation = node.type;
 
       if (typeAnnotation is NamedType && typeAnnotation.question != null) {
+        // Tri-state: the body distinguishes `null` from the default, so the
+        // `?` carries meaning (e.g. `bool? hidden = false`, null = all).
+        if (_bodyComparesToNull(node)) return;
         reporter.atNode(typeAnnotation);
       }
     });
+  }
+
+  /// True when the enclosing function body acts on `null` for this parameter:
+  /// `name == null` / `!= null`, `name ??`, `name ??=`, or forwards `name` to
+  /// a nullable parameter of another call.
+  static bool _bodyComparesToNull(RegularFormalParameter node) {
+    final String? name = node.name?.lexeme;
+    if (name == null) return false;
+    final FunctionBody? body = _siblingBody(node);
+    if (body == null) return false;
+    final _NullCompareFinder finder = _NullCompareFinder(name);
+    body.accept(finder);
+    return finder.found;
+  }
+
+  static FunctionBody? _siblingBody(AstNode node) {
+    AstNode? p = node.parent;
+    while (p != null) {
+      if (p is MethodDeclaration) return p.body;
+      if (p is FunctionDeclaration) return p.functionExpression.body;
+      if (p is ConstructorDeclaration) return p.body;
+      if (p is FunctionExpression) return p.body;
+      p = p.parent;
+    }
+    return null;
   }
 
   @override
@@ -919,6 +983,59 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
     ({required CorrectionProducerContext context}) =>
         RemoveTypeQuestionFix(context: context),
   ];
+}
+
+class _NullCompareFinder extends RecursiveAstVisitor<void> {
+  _NullCompareFinder(this.name);
+  final String name;
+  bool found = false;
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    final String op = node.operator.lexeme;
+    if (op == '==' || op == '!=') {
+      final Expression l = node.leftOperand;
+      final Expression r = node.rightOperand;
+      if ((l is SimpleIdentifier && l.name == name && r is NullLiteral) ||
+          (r is SimpleIdentifier && r.name == name && l is NullLiteral)) {
+        found = true;
+      }
+    }
+    // `name ?? fallback` resolves null in the body (null = use the fallback).
+    if (op == '??') {
+      final Expression l = node.leftOperand;
+      if (l is SimpleIdentifier && l.name == name) found = true;
+    }
+    super.visitBinaryExpression(node);
+  }
+
+  /// `name` passed directly as an argument whose resolved target parameter is
+  /// nullable: the callee gives `null` its meaning, so the `?` is required.
+  @override
+  void visitArgumentList(ArgumentList node) {
+    for (final Argument arg in node.arguments) {
+      final Expression e = arg.argumentExpression;
+      if (e is SimpleIdentifier && e.name == name) {
+        final DartType? t = arg.correspondingParameter?.type;
+        if (t != null && t.nullabilitySuffix == NullabilitySuffix.question) {
+          found = true;
+        }
+      }
+    }
+    super.visitArgumentList(node);
+  }
+
+  /// `name ??= fallback` resolves null in the body.
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression l = node.leftHandSide;
+    if (node.operator.lexeme == '??=' &&
+        l is SimpleIdentifier &&
+        l.name == name) {
+      found = true;
+    }
+    super.visitAssignmentExpression(node);
+  }
 }
 
 /// Warns when calling `.toString()` on a nullable value without null check.
@@ -1153,9 +1270,9 @@ class AvoidNullAssertionRule extends SaropaLintRule {
     // full match (always non-null on a successful match); `group(N >= 1)` is a
     // specific capture group. Non-literal arguments are rejected because we
     // cannot reason about runtime values.
-    final NodeList<Expression> args = operand.argumentList.arguments;
+    final NodeList<Argument> args = operand.argumentList.arguments;
     if (args.length != 1) return false;
-    final Expression arg = args.first;
+    final Argument arg = args.first;
     if (arg is! IntegerLiteral) return false;
     final int? groupIndex = arg.value;
     if (groupIndex == null || groupIndex < 0) return false;
@@ -2535,11 +2652,11 @@ class ArgumentMustBeNativeRule extends SaropaLintRule {
         if (targetStr != 'Native' && !targetStr.endsWith('.Native')) return;
       }
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression arg = args.first;
-      final DartType? argType = arg.staticType;
+      final Argument arg = args.first;
+      final DartType? argType = arg.argumentExpression.staticType;
       if (argType == null) return;
 
       final Element? el = argType.element;
@@ -3460,17 +3577,21 @@ class DuplicateRecordFieldNameRule extends SaropaLintRule {
       for (final List<(Token, AstNode)> group in byName.values) {
         if (group.length <= 1) continue;
         for (final (_, AstNode n) in group) {
-          reporter.atNode(n, code);
+          // Record literal fields: report the label only, not `a: value`.
+          if (n is RecordLiteralNamedField) {
+            reporter.atToken(n.name, code);
+          } else {
+            reporter.atNode(n, code);
+          }
         }
       }
     }
 
     context.addRecordLiteral((RecordLiteral node) {
       final List<(Token, AstNode)> fields = <(Token, AstNode)>[];
-      for (final Expression e in node.fields) {
-        if (e is NamedExpression) {
-          final SimpleIdentifier id = e.name.label;
-          fields.add((id.token, id));
+      for (final RecordLiteralField e in node.fields) {
+        if (e is RecordLiteralNamedField) {
+          fields.add((e.name, e));
         }
       }
       reportDuplicates(fields);
@@ -3533,11 +3654,10 @@ class InvalidRecordFieldNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addRecordLiteral((RecordLiteral node) {
-      for (final Expression e in node.fields) {
-        if (e is! NamedExpression) continue;
-        final SimpleIdentifier id = e.name.label;
-        if (_tokenIsReservedKeyword(id.token)) {
-          reporter.atNode(id, code);
+      for (final RecordLiteralField e in node.fields) {
+        if (e is! RecordLiteralNamedField) continue;
+        if (_tokenIsReservedKeyword(e.name)) {
+          reporter.atToken(e.name, code);
         }
       }
     });

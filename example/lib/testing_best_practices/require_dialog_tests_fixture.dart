@@ -139,7 +139,9 @@ String emergencyDirectoryDialogHeader(String a, String b) => '$a $b';
 
 void _goodDialogNamedStringGetter() async {
   testWidgets('localized header resolves', (tester) async {
-    expect(emergencyDirectoryDialogHeader('Australian', 'Banks'),
-        equals('Australian Banks'));
+    expect(
+      emergencyDirectoryDialogHeader('Australian', 'Banks'),
+      equals('Australian Banks'),
+    );
   });
 }

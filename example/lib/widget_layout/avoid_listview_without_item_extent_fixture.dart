@@ -208,10 +208,8 @@ Widget goodShrinkWrapDefaultPhysics(List<String> rows) {
 Widget goodSelfSizingListTile(List<String> rows) {
   return ListView.builder(
     itemCount: rows.length,
-    itemBuilder: (BuildContext c, int i) => ListTile(
-      title: Text(rows[i]),
-      subtitle: i.isEven ? Text('sub') : null,
-    ),
+    itemBuilder: (BuildContext c, int i) =>
+        ListTile(title: Text(rows[i]), subtitle: i.isEven ? Text('sub') : null),
   );
 }
 
@@ -219,8 +217,7 @@ Widget goodSelfSizingListTile(List<String> rows) {
 Widget goodSelfSizingExpansionTile(List<String> rows) {
   return ListView.builder(
     itemCount: rows.length,
-    itemBuilder: (BuildContext c, int i) =>
-        ExpansionTile(title: Text(rows[i])),
+    itemBuilder: (BuildContext c, int i) => ExpansionTile(title: Text(rows[i])),
   );
 }
 

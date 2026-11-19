@@ -246,3 +246,82 @@ int _multiVariableDeclarationInBatch(int seed) {
   final sum = a + b + c;
   return sum;
 }
+
+class _FakeResponse {
+  int statusCode = 0;
+  String? disposition;
+}
+
+Future<List<int>> _getBytes() async => <int>[1, 2, 3];
+
+// NO LINT (Defect 5, throwing await before side-effecting statements a
+// sibling catch depends on): moving this declaration down past the
+// status/header writes below would let a throw from `_getBytes()` happen
+// AFTER those writes ran, so the catch's response would carry a stale
+// success status on an error body.
+// See: bugs/move_variable_closer_to_its_usage_false_positive_throwing_await_before_header_writes.md
+Future<void> _sendDatabaseFile(_FakeResponse res) async {
+  try {
+    final bytes = await _getBytes();
+    res.statusCode = 200;
+    res.disposition = 'attachment; filename="db.sqlite"';
+    _step();
+    _step();
+    // ignore: avoid_print
+    print(bytes.length);
+  } catch (error) {
+    res.statusCode = 500;
+    res.disposition = null;
+  }
+}
+
+// LINT (throwing-await guard must not over-suppress unrelated cases): same
+// distance and shape as Defect 5, but the initializer has no `await`, so the
+// new guard (which keys specifically on `await` as a checkable proxy for
+// "can suspend and skip the rest of the block") does not apply and the
+// declaration is still flagged. NOTE: this is a narrower guard than the
+// hazard in principle — a synchronous call that can throw (e.g.
+// `int.parse(...)`) has the same before/after-the-side-effects reordering
+// risk as an `await` that can throw, but is NOT exempted here and remains a
+// known, not-yet-fixed false-positive shape. See "Known remaining gap" in
+// bugs history: plans/history/2026.09/2026.09.18/move_variable_closer_to_its_usage_false_positive_throwing_await_before_header_writes.md.
+int _syncInitializerInTryStillFlagged(int seed) {
+  try {
+    // expect_lint: move_variable_closer_to_its_usage
+    final result = _compute(seed);
+    _step();
+    _step();
+    _step();
+    return result;
+  } catch (error) {
+    return -1;
+  }
+}
+
+Future<int> _write(String t) async => 1;
+
+// GOOD: awaited write initializer in a closure block; reordering the writes
+// would change behavior.
+Future<int> Function() _awaitedWriteInitializerNotFlagged = () async {
+  final int deleted = await _write('a');
+  await _write('b');
+  await _write('c');
+  await _write('d');
+  return deleted;
+};
+
+final Set<String> _snapStore = <String>{};
+Set<String> _loadSnap() => Set<String>.of(_snapStore);
+Future<void> _mutateSnap(String k) async => _snapStore.add(k);
+
+// GOOD: snapshot of mutable state taken before awaited writes; moving it down
+// would capture the post-mutation state.
+Future<Set<String>> _snapshotBeforeAwaitedLoop(List<String> items) async {
+  final Set<String> before = _loadSnap();
+  for (final String i in items) {
+    await _mutateSnap(i);
+  }
+  _step();
+  _step();
+  return _loadSnap().difference(before);
+}

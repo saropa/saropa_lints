@@ -118,7 +118,7 @@ class _bad327_MyState extends State<MyWidget> {
     super.initState();
     channel = WebSocketChannel.connect(uri);
   }
-// Missing dispose!
+  // Missing dispose!
 }
 
 // GOOD: Should NOT trigger avoid_websocket_memory_leak

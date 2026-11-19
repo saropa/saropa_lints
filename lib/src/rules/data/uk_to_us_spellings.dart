@@ -1,7 +1,7 @@
 // GENERATED FILE - DO NOT EDIT BY HAND.
 //
 // Source of truth: scripts/modules/_us_spelling.py (UK_TO_US).
-// Regenerate with: py -3 scripts/generate_us_english_rule_data.py
+// Regenerate with: py -3 scripts/generators/generate_us_english_rule_data.py
 // A parity test fails the build if this file drifts from the source.
 //
 // Consumed by the prefer_us_english_spelling lint rule. Keys are

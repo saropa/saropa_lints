@@ -119,7 +119,7 @@ Widget _bad789_build(BuildContext context) {
 
 // GOOD: Should NOT trigger avoid_scroll_listener_in_build
 void _good789_initState() {
-// super.initState();
+  // super.initState();
   scrollController.addListener(_onScroll);
 }
 

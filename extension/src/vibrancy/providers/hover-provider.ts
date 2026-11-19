@@ -9,6 +9,7 @@ import * as vscode from 'vscode';
 import { escapeMarkdown } from '../../markdownUtils';
 import { VibrancyResult, FamilySplit, PackageInsight, activeFileUsages } from '../types';
 import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
+import { describeUnverified, isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
@@ -20,6 +21,8 @@ import {
     PACKAGE_VIBRANCY_DOC_URL,
 } from '../sdk-vibrancy-table';
 import { resolveRepoUrl } from '../views/html-utils';
+import { l10n } from '../../i18n/runtime';
+import { getLifecycleNotes } from '../scoring/lifecycle-notes';
 
 export class VibrancyHoverProvider implements vscode.HoverProvider {
     private _results = new Map<string, VibrancyResult>();
@@ -178,7 +181,18 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
         // Annotate non-hosted deps so the version gap doesn't read as a stuck
         // pub upgrade — git/path/SDK deps aren't bumped by editing a caret.
         const srcNote = managedSourceNote(r.package.source);
-        rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus})${srcNote ? ` — ${srcNote}` : ''} |`);
+        if (r.blastRadius && isUpgradeSuppressed(r)) {
+            rows.push(`| ${l10n('blastRadius.label.upgrade')} | ${escapeMarkdown(describeBlastSummary(r.blastRadius))} |`);
+            for (const line of formatBreakers(r.blastRadius)) {
+                rows.push(`| ${l10n('blastRadius.label.breaks')} | ${escapeMarkdown(line)} |`);
+            }
+        } else {
+            rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus})${srcNote ? ` — ${srcNote}` : ''} |`);
+            const unverifiedNote = r.blastRadius ? describeUnverified(r.blastRadius) : null;
+            if (unverifiedNote) {
+                rows.push(`| ${l10n('blastRadius.label.upgrade')} | ${escapeMarkdown(unverifiedNote)} |`);
+            }
+        }
         if (r.blocker) {
             const detail = formatSharedDepDetail(r.blocker);
             rows.push(
@@ -391,6 +405,9 @@ function appendHoverAlerts(
     if (r.knownIssue?.reason) {
         // Escape external issue reason text
         alerts.push(`❌ **Known Issue:** ${escapeMarkdown(truncateBody(r.knownIssue.reason))}`);
+    }
+    for (const note of getLifecycleNotes(r)) {
+        alerts.push(`ℹ️ ${escapeMarkdown(note.text)}`);
     }
     if (r.isUnused) {
         alerts.push('⚠️ **Unused** — no imports detected');

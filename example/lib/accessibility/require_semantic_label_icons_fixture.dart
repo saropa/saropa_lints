@@ -120,8 +120,5 @@ void _good25() {
   Icon(Icons.add, semanticLabel: 'Add item');
   Icon(Icons.home, semanticLabel: 'Home');
   // Or for decorative icons that should be ignored:
-  Semantics(
-    excludeSemantics: true,
-    child: Icon(Icons.star),
-  );
+  Semantics(excludeSemantics: true, child: Icon(Icons.star));
 }

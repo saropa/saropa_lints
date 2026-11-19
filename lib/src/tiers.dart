@@ -579,6 +579,7 @@ const Set<String> essentialRules = <String>{
   'require_form_key_in_stateful_widget', // WARNING - form state loss
   'prefer_timeout_on_requests', // WARNING - hang prevention
   'require_connectivity_timeout', // WARNING - hang prevention
+  'guard_debugger_against_test_environment', // WARNING - hangs flutter test
   'avoid_bloc_context_dependency', // WARNING - testability
   'avoid_provider_value_rebuild', // WARNING - memory leak
   'avoid_notification_same_id', // WARNING - overwrites
@@ -768,7 +769,7 @@ const Set<String> essentialRules = <String>{
   'abstract_field_initializer',
   'abi_specific_integer_invalid',
   'annotate_inherited_member_redeclaration',
-  'deprecated_new_in_comment_reference',
+  'deprecated_new_in_comment_reference_extended',
   'document_analyzer_ignore_rationale',
   'non_constant_map_element',
   'return_in_generator',
@@ -3016,6 +3017,7 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  'avoid_reexports',
   // Cross-platform dependency compatibility (plugin_platform_support_rules.dart).
   // Comprehensive, not Essential: detection is anchored on the import and backed
   // by a curated list, so a project that imports a plugin but guards its calls
@@ -3157,6 +3159,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_geolocator_distance_filter', // battery optimization
   'prefer_inherited_widget_cache', // cache optimization
   'prefer_layout_builder_over_media_query', // rebuild optimization
+  'prefer_media_query_width_height_of', // rebuild optimization (Flutter 3.35+)
   'require_list_preallocate', // list allocation
   'require_const_list_items', // const constructor items in lists when possible
   'prefer_compute_over_isolate_run', // isolate efficiency
@@ -4807,7 +4810,7 @@ const Set<String> documentationRules = <String>{
   'prefer_correct_throws',
   'avoid_misleading_documentation',
   'verify_documented_parameters_exist',
-  'deprecated_new_in_comment_reference',
+  'deprecated_new_in_comment_reference_extended',
   'unintended_html_in_doc_comment_strict',
   'uri_does_not_exist_in_doc_import',
 };

@@ -120,7 +120,7 @@ class _bad1345__MyState extends State<MyWidget> {
 
   @override
   void dispose() {
-// Missing: _timer?.cancel();
+    // Missing: _timer?.cancel();
     super.dispose();
   }
 }

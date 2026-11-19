@@ -1,3 +1,9 @@
+# The rule test oracle (test/support/resolved_rule_harness.dart) analyses
+# fixtures under example/lib. The default `light` lane only admits cheap,
+# resolution-free rules once the rule registry has been built, silently
+# turning every other rule into a no-op mid-suite. Tests must run all rules.
+lane: full
+
 rule_packs:
   enabled:
     - dart_sdk_3_2

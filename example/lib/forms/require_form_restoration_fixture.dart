@@ -114,12 +114,12 @@ class _bad401__FormState extends State<MyForm> {
   String? _email;
   String? _address;
   String? _phone;
-// 5+ fields without restoration = data loss risk
+  // 5+ fields without restoration = data loss risk
 }
 
 // GOOD: Should NOT trigger require_form_restoration
 class _good401__FormState extends State<MyForm> with RestorationMixin {
   final RestorableTextEditingController _name =
       RestorableTextEditingController();
-// Or persist drafts to SharedPreferences
+  // Or persist drafts to SharedPreferences
 }

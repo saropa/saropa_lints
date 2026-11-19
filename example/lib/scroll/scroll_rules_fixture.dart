@@ -78,9 +78,7 @@ class BadNestedScrollOnlyWidget extends StatelessWidget {
         children: [
           // This ListView is nested without physics - triggers conflict rule
           // expect_lint: avoid_nested_scrollables_conflict
-          ListView(
-            children: [Text('Item 1'), Text('Item 2')],
-          ),
+          ListView(children: [Text('Item 1'), Text('Item 2')]),
         ],
       ),
     );
@@ -141,9 +139,7 @@ class BadLargeListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Note: This rule only detects literal lists, not List.generate
-    return ListView(
-      children: List.generate(50, (i) => Text('Item $i')),
-    );
+    return ListView(children: List.generate(50, (i) => Text('Item $i')));
   }
 }
 
@@ -266,11 +262,7 @@ class BadReorderableWidget extends StatelessWidget {
     return ReorderableListView(
       onReorder: (oldIndex, newIndex) {},
       // expect_lint: require_key_for_reorderable
-      children: [
-        Text('Item 1'),
-        Text('Item 2'),
-        Text('Item 3'),
-      ],
+      children: [Text('Item 1'), Text('Item 2'), Text('Item 3')],
     );
   }
 }

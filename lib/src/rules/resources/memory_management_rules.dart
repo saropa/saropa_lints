@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -577,7 +578,7 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
       if (!isLongLivedCallback) return;
 
       // Check if any argument is an inline function that uses setState or this
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String funcSource = arg.toSource();
           if (funcSource.contains('setState') ||
@@ -941,7 +942,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
 
       // Check for compute() calls
       if (methodName == 'compute') {
-        final NodeList<Expression> args = node.argumentList.arguments;
+        final NodeList<Argument> args = node.argumentList.arguments;
         if (args.length >= 2) {
           final String argSource = args[1].toSource().toLowerCase();
 
@@ -963,7 +964,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
           final String targetSource = target.toSource().toLowerCase();
           if (RegExp(r'\bport\b').hasMatch(targetSource) ||
               RegExp(r'\bsendport\b').hasMatch(targetSource)) {
-            final NodeList<Expression> args = node.argumentList.arguments;
+            final NodeList<Argument> args = node.argumentList.arguments;
             if (args.isNotEmpty) {
               final String argSource = args.first.toSource().toLowerCase();
               if (argSource.contains('list') ||
@@ -1127,6 +1128,20 @@ class _CacheClearVisitor extends RecursiveAstVisitor<void> {
 
   /// Set to true when a matching `.clear()` or `.remove(` is found.
   bool found = false;
+
+  /// `_cache = null` invalidates a wholesale-replaced snapshot cache as
+  /// strongly as `.clear()` does (the next warm rebuilds it from scratch).
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    if (found) return;
+    if (node.operator.type == TokenType.EQ &&
+        node.rightHandSide is NullLiteral &&
+        _targetMatchesCacheField(node.leftHandSide)) {
+      found = true;
+      return;
+    }
+    super.visitAssignmentExpression(node);
+  }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -1804,8 +1819,23 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Skip widget classes — they can hold widget references
       if (_isWidgetClass(node)) return;
+      // Render-time delegates are rebuilt with their owning widget.
+      if (_isRenderDelegateClass(node)) return;
+      // Immutable value descriptors (const ctor, only final fields) are
+      // built in `build` and die with the frame.
+      if (_isConstValueClass(node)) return;
+      final Set<String> clearedInDispose = _fieldsNulledInDispose(node);
       for (final ClassMember member in node.bodyMembers) {
         if (member is! FieldDeclaration) continue;
+        // A field the class's own `dispose()` sets to null does not outlive
+        // the widget tree.
+        if (!member.isStatic &&
+            member.fields.variables.every(
+              (VariableDeclaration v) =>
+                  clearedInDispose.contains(v.name.lexeme),
+            )) {
+          continue;
+        }
 
         final TypeAnnotation? type = member.fields.type;
         if (type == null) continue;
@@ -1858,13 +1888,85 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
         isFlutterSdkInterface(element);
   }
 
-  /// Check if class extends a known Flutter widget base class.
-  /// Uses explicit inheritance only — no name-based heuristics.
+  /// Names of fields assigned `null` (`x = null` / `this.x = null`) inside
+  /// this class's `dispose()` method.
+  Set<String> _fieldsNulledInDispose(ClassDeclaration node) {
+    final Set<String> names = <String>{};
+    for (final ClassMember m in node.bodyMembers) {
+      if (m is! MethodDeclaration || m.name.lexeme != 'dispose') continue;
+      m.body.visitChildren(_NullAssignCollector(names));
+    }
+    return names;
+  }
+
+  /// Short-lived helpers owned by a widget and recreated on every build.
+  static const Set<String> _renderDelegateBases = <String>{
+    'FlowDelegate',
+    'CustomPainter',
+    'CustomClipper',
+    'SingleChildLayoutDelegate',
+    'MultiChildLayoutDelegate',
+  };
+
+  bool _isRenderDelegateClass(ClassDeclaration node) {
+    final String? name = node.extendsClause?.superclass.name.lexeme;
+    return name != null && _renderDelegateBases.contains(name);
+  }
+
+  /// True for a class with a `const` constructor and only `final` instance
+  /// fields (an immutable descriptor, not a long-lived holder).
+  bool _isConstValueClass(ClassDeclaration node) {
+    bool hasConst = false;
+    for (final ClassMember m in node.bodyMembers) {
+      if (m is ConstructorDeclaration && m.constKeyword != null)
+        hasConst = true;
+      if (m is FieldDeclaration &&
+          !m.isStatic &&
+          !m.fields.isFinal &&
+          !m.fields.isConst) {
+        return false;
+      }
+    }
+    return hasConst;
+  }
+
+  /// Check if class is a widget/State: a known base name, or (when resolved)
+  /// any transitive subtype of Flutter's `Widget` or `State`.
   bool _isWidgetClass(ClassDeclaration node) {
     final NamedType? superclass = node.extendsClause?.superclass;
     if (superclass == null) return false;
+    if (_widgetBaseClasses.contains(superclass.name.lexeme)) return true;
 
-    return _widgetBaseClasses.contains(superclass.name.lexeme);
+    final InterfaceElement? element = node.declaredFragment?.element;
+    if (element == null) return false;
+    for (final InterfaceType st in element.allSupertypes) {
+      final String n = st.element.name ?? '';
+      if ((n == 'Widget' || n == 'State') &&
+          isFlutterSdkInterface(st.element)) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// Collects the target names of `x = null` assignments.
+class _NullAssignCollector extends RecursiveAstVisitor<void> {
+  _NullAssignCollector(this.names);
+
+  final Set<String> names;
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    if (node.operator.lexeme == '=' && node.rightHandSide is NullLiteral) {
+      final Expression left = node.leftHandSide;
+      if (left is SimpleIdentifier) {
+        names.add(left.name);
+      } else if (left is PropertyAccess && left.target is ThisExpression) {
+        names.add(left.propertyName.name);
+      }
+    }
+    super.visitAssignmentExpression(node);
   }
 }
 
@@ -1996,7 +2098,7 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
 
     // The closure may be a direct argument or inside an ArgumentList
     AstNode? argContext = parent;
-    if (argContext is NamedExpression) {
+    if (argContext is NamedArgument) {
       argContext = argContext.parent;
     }
     if (argContext is! ArgumentList) return false;

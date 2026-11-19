@@ -15,9 +15,11 @@ import { formatSizeMB } from '../scoring/bloat-calculator';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
+import { describeUnverified, isUpgradeSuppressed, formatBreakers, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { formatPrereleaseTag } from '../scoring/prerelease-classifier';
 import { createWebviewCspNonce, escapeHtml, resolveRepoUrl } from './html-utils';
 import { l10n } from '../../i18n/runtime';
+import { getLifecycleNotes } from '../scoring/lifecycle-notes';
 import { getPackageDetailStyles } from './package-detail-styles';
 import { getPillButtonStyles } from './pill-button-styles';
 import { getPackageDetailScript } from './package-detail-script';
@@ -262,9 +264,18 @@ function buildVersionSection(r: VibrancyResult): string {
         }
         rows.push(row(l10n('packageDetail.version.published'), escapeHtml(r.pubDev.publishedDate.split('T')[0])));
     }
-    if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date') {
+    if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date' && r.blastRadius && isUpgradeSuppressed(r)) {
+        rows.push(row(l10n('blastRadius.label.upgrade'), escapeHtml(describeBlastSummary(r.blastRadius))));
+        for (const line of formatBreakers(r.blastRadius)) {
+            rows.push(row(l10n('blastRadius.label.breaks'), escapeHtml(line)));
+        }
+    } else if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date') {
         rows.push(row(l10n('packageDetail.version.update'),
             `${escapeHtml(r.updateInfo.currentVersion)} &rarr; ${escapeHtml(r.updateInfo.latestVersion)} (${escapeHtml(r.updateInfo.updateStatus)})`));
+        const unverifiedNote = r.blastRadius ? describeUnverified(r.blastRadius) : null;
+        if (unverifiedNote) {
+            rows.push(row(l10n('blastRadius.label.upgrade'), escapeHtml(unverifiedNote)));
+        }
         if (r.blocker) {
             rows.push(row(l10n('packageDetail.version.blockedBy'), `<strong>${escapeHtml(r.blocker.blockerPackage)}</strong>`));
             // Diamond conflict: name the shared transitive dep and the binding
@@ -335,7 +346,7 @@ function buildVersionSection(r: VibrancyResult): string {
     }
 
     const buttons: string[] = [];
-    if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date' && !r.blocker) {
+    if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date' && !r.blocker && !isUpgradeSuppressed(r)) {
         buttons.push(
             `<button class="action-btn" data-action="upgrade" `
             + `data-name="${escapeHtml(r.package.name)}" `
@@ -676,6 +687,9 @@ function buildAlertsSection(r: VibrancyResult): string {
     }
     if (r.knownIssue?.reason) {
         items.push(alertItem(escapeHtml(l10n('packageDetail.alerts.knownIssue', { reason: r.knownIssue.reason })), 'critical'));
+    }
+    for (const note of getLifecycleNotes(r)) {
+        items.push(alertItem(escapeHtml(note.text), 'info'));
     }
     if (r.isUnused) {
         items.push(alertItem(escapeHtml(l10n('packageDetail.alerts.unused')), 'info'));

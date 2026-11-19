@@ -110,17 +110,21 @@ final children = <Widget>[];
 // BAD: Should trigger prefer_adequate_spacing
 // expect_lint: prefer_adequate_spacing
 void _bad23() {
-  Row(children: [
-    IconButton(onPressed: _action1, icon: Icon(Icons.add)),
-    IconButton(onPressed: _action2, icon: Icon(Icons.remove)),
-  ]);
+  Row(
+    children: [
+      IconButton(onPressed: _action1, icon: Icon(Icons.add)),
+      IconButton(onPressed: _action2, icon: Icon(Icons.remove)),
+    ],
+  );
 }
 
 // GOOD: Should NOT trigger prefer_adequate_spacing
 void _good23() {
-  Row(children: [
-    IconButton(onPressed: _action1, icon: Icon(Icons.add)),
-    SizedBox(width: 8),
-    IconButton(onPressed: _action2, icon: Icon(Icons.remove)),
-  ]);
+  Row(
+    children: [
+      IconButton(onPressed: _action1, icon: Icon(Icons.add)),
+      SizedBox(width: 8),
+      IconButton(onPressed: _action2, icon: Icon(Icons.remove)),
+    ],
+  );
 }

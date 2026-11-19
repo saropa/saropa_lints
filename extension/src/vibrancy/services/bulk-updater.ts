@@ -11,6 +11,7 @@ import {
     classifyIncrement, filterByIncrement, formatIncrement,
     IncrementFilter, VersionIncrement,
 } from '../scoring/version-increment';
+import { isUpgradeSuppressed, describeBlastSummary } from '../scoring/blast-radius-attacher';
 import { buildVersionEdit, findPubspecYaml } from './pubspec-editor';
 import { l10n } from '../../i18n/runtime';
 
@@ -62,6 +63,16 @@ export function getUpdatablePackages(
         const updateInfo = pkg.updateInfo;
 
         if (!updateInfo || updateInfo.updateStatus === 'up-to-date') {
+            continue;
+        }
+
+        if (isUpgradeSuppressed(pkg)) {
+            skipped.push({
+                name,
+                reason: l10n('blastRadius.skipReason', {
+                    summary: pkg.blastRadius ? describeBlastSummary(pkg.blastRadius) : '',
+                }),
+            });
             continue;
         }
 

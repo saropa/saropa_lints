@@ -3,8 +3,9 @@
 
 void bad() {
   final numbers = <int>[1, 2, 3];
-  final sum =
-      numbers.reduce((a, b) => a + b); // expect_lint: prefer_fold_over_reduce
+  final sum = numbers.reduce(
+    (a, b) => a + b,
+  ); // expect_lint: prefer_fold_over_reduce
 }
 
 void good() {

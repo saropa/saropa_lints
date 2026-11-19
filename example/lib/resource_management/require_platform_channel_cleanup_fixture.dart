@@ -116,7 +116,7 @@ class _bad970__MyState extends State<MyWidget> {
     super.initState();
     channel.setMethodCallHandler(_handleCall);
   }
-// Handler never removed
+  // Handler never removed
 }
 
 // GOOD: Should NOT trigger require_platform_channel_cleanup

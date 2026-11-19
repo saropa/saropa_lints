@@ -25,9 +25,9 @@
 // line, and any future quick fix must target `x = a` as its node.
 class Point {
   Point(int a, int b)
-      : y = b,
-        // expect_lint: initializers_ordering
-        x = a;
+    : y = b,
+      // expect_lint: initializers_ordering
+      x = a;
 
   final int x;
   final int y;
@@ -47,10 +47,10 @@ class PointOk {
 // node is `b = b` — the second entry of the offending pair, not `c = c`.
 class ThreeFields {
   ThreeFields(int a, int b, int c)
-      : a = a,
-        c = c,
-        // expect_lint: initializers_ordering
-        b = b;
+    : a = a,
+      c = c,
+      // expect_lint: initializers_ordering
+      b = b;
 
   final int a;
   final int b;
@@ -62,11 +62,7 @@ class ThreeFields {
 // field-declaration-order concept and must not be counted or cause a false
 // positive.
 class AssertBetween {
-  AssertBetween(int a, int b)
-      : assert(a >= 0),
-        x = a,
-        assert(b >= 0),
-        y = b;
+  AssertBetween(int a, int b) : assert(a >= 0), x = a, assert(b >= 0), y = b;
 
   final int x;
   final int y;
@@ -81,10 +77,7 @@ class Base {
 }
 
 class RedirectingSuper extends Base {
-  RedirectingSuper(int a, int b, String label)
-      : x = a,
-        y = b,
-        super(label);
+  RedirectingSuper(int a, int b, String label) : x = a, y = b, super(label);
 
   final int x;
   final int y;
@@ -118,9 +111,9 @@ class ThisShorthandOk {
 // ConstructorFieldInitializer and never enters the comparison at all).
 class ThisShorthandBad {
   ThisShorthandBad(this.x, int b, int c)
-      : z = c,
-        // expect_lint: initializers_ordering
-        y = b;
+    : z = c,
+      // expect_lint: initializers_ordering
+      y = b;
 
   final int x;
   final int y;
@@ -136,9 +129,9 @@ enum EnumBad {
   b(2, 'two');
 
   const EnumBad(int code, String label)
-      : label = label,
-        // expect_lint: initializers_ordering
-        code = code;
+    : label = label,
+      // expect_lint: initializers_ordering
+      code = code;
 
   final int code;
   final String label;

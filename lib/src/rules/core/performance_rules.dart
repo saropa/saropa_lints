@@ -93,9 +93,9 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
       if (!_animatedListWidgets.contains(constructorName)) return;
 
       // Find itemBuilder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
-          final Expression builderExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'itemBuilder') {
+          final Expression builderExpr = arg.argumentExpression;
           if (builderExpr is FunctionExpression) {
             _checkBuilderForKey(builderExpr.body, reporter);
           }
@@ -126,9 +126,9 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
     AstNode reportNode,
   ) {
     if (expr is InstanceCreationExpression) {
-      final bool hasKey = expr.argumentList.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'key';
+      final bool hasKey = expr.argumentList.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'key';
         }
         return false;
       });
@@ -740,7 +740,8 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
     // repeating it costs nothing and must NOT be flagged. The new element model
     // distinguishes the two via `isOriginDeclaration` (true for a real `get`)
     // vs `isOriginVariable` (true for a field's implicit getter).
-    if (_isDeclaredGetter(node.identifier.element)) {
+    if (_isDeclaredGetter(node.identifier.element) &&
+        !_isKnownCheapGetter(node.identifier.element, node.prefix)) {
       final String key = node.toSource();
       getterCalls.putIfAbsent(key, () => <AstNode>[]).add(node);
     }
@@ -751,7 +752,8 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
   void visitPropertyAccess(PropertyAccess node) {
     // Same rationale as visitPrefixedIdentifier: skip field reads (synthetic
     // getters), only track repeated reads of an explicitly-declared getter.
-    if (_isDeclaredGetter(node.propertyName.element)) {
+    if (_isDeclaredGetter(node.propertyName.element) &&
+        !_isKnownCheapGetter(node.propertyName.element, node.realTarget)) {
       final String key = node.toSource();
       getterCalls.putIfAbsent(key, () => <AstNode>[]).add(node);
     }
@@ -764,6 +766,56 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
   /// cannot prove the access is an expensive getter must stay silent.
   static bool _isDeclaredGetter(Element? element) {
     return element is GetterElement && element.isOriginDeclaration;
+  }
+
+  /// `dart:core` collection/string getter names that are O(1) *when read on
+  /// a concrete `List`/`String`/`Set`/`Map`*, but are NOT safe to assume
+  /// cheap in general: `length`/`isEmpty`/`isNotEmpty`/`first`/`last` are
+  /// also declared on `Iterable` (inherited by e.g. a lazy `.where(...)`
+  /// result), where they are genuinely O(n) — evaluating the whole lazy
+  /// chain each time. So this name check alone is not enough; see
+  /// [_isKnownCheapGetter], which additionally requires the *receiver's
+  /// static type* to be one of the four concrete SDK types.
+  static const Set<String> _knownCheapCollectionGetterNames = <String>{
+    'length',
+    'isEmpty',
+    'isNotEmpty',
+    'first',
+    'last',
+  };
+
+  /// True when [element]/[receiver] together prove the read is a `dart:core`
+  /// O(1) accessor that is never worth caching:
+  ///
+  /// * [_knownCheapCollectionGetterNames] (`length`, `isEmpty`, ...) ONLY when
+  ///   [receiver]'s static type is exactly `List`/`String`/`Set`/`Map` —
+  ///   checked via the receiver type, not the getter's declaring class,
+  ///   because `List`/`Set` inherit several of these from `Iterable` and a
+  ///   lazy `Iterable` (e.g. a `.where(...)` result) resolves to the exact
+  ///   same declared getter while genuinely being O(n) per read.
+  /// * `hashCode` ONLY when it resolves to `Object`'s own declaration (i.e.
+  ///   not overridden) — an unoverridden `hashCode` is the cheap identity
+  ///   hash; a class that overrides it with an expensive computation
+  ///   resolves to that subclass's element instead, so it is unaffected and
+  ///   still tracked.
+  static bool _isKnownCheapGetter(Element? element, Expression? receiver) {
+    if (element is! GetterElement) return false;
+
+    if (element.name == 'hashCode') {
+      final Element? enclosing = element.enclosingElement;
+      return enclosing is InterfaceElement &&
+          enclosing.thisType.isDartCoreObject;
+    }
+
+    if (!_knownCheapCollectionGetterNames.contains(element.name)) {
+      return false;
+    }
+    final DartType? receiverType = receiver?.staticType;
+    if (receiverType == null) return false;
+    return receiverType.isDartCoreList ||
+        receiverType.isDartCoreString ||
+        receiverType.isDartCoreSet ||
+        receiverType.isDartCoreMap;
   }
 }
 
@@ -871,11 +923,11 @@ class _DepthVisitor extends RecursiveAstVisitor<void> {
     onDepth(newDepth, node);
 
     // Continue with increased depth for child arguments
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'child') {
-        arg.expression.visitChildren(_DepthVisitor(onDepth, newDepth));
-      } else if (arg is NamedExpression && arg.name.label.name == 'children') {
-        arg.expression.visitChildren(_DepthVisitor(onDepth, newDepth));
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'child') {
+        arg.argumentExpression.visitChildren(_DepthVisitor(onDepth, newDepth));
+      } else if (arg is NamedArgument && arg.name.lexeme == 'children') {
+        arg.argumentExpression.visitChildren(_DepthVisitor(onDepth, newDepth));
       }
     }
   }
@@ -951,9 +1003,9 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
       bool hasPrototypeItem = false;
       int? itemCount;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'itemExtent' || name == 'itemExtentBuilder') {
             hasItemExtent = true;
           }
@@ -961,7 +1013,7 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
             hasPrototypeItem = true;
           }
           if (name == 'itemCount') {
-            final expr = arg.expression;
+            final expr = arg.argumentExpression;
             if (expr is IntegerLiteral) {
               itemCount = expr.value;
             }
@@ -1056,7 +1108,7 @@ class PreferImagePrecacheRule extends SaropaLintRule {
       // Check if image name suggests it's a hero/important image
       if (node.argumentList.arguments.isEmpty) return;
 
-      final Expression firstArg = node.argumentList.arguments.first;
+      final Argument firstArg = node.argumentList.arguments.first;
       final String argSource = firstArg.toSource().toLowerCase();
 
       for (final String indicator in _heroIndicators) {
@@ -1246,7 +1298,7 @@ class _SetStateVisitor extends RecursiveAstVisitor<void> {
   // Skipping the entire `FunctionExpression` subtree is the conventional
   // pattern for "synchronous-execution" detection rules. It also subsumes
   // every special-case (addPostFrameCallback, then, Future, scheduleMicrotask,
-  // GestureDetector callbacks bound via NamedExpression, etc.) that the
+  // GestureDetector callbacks bound via NamedArgument, etc.) that the
   // previous `walk-up` logic tried — and missed — to enumerate. See
   // bugs/avoid_setstate_in_build_false_positive_setstate_inside_event_handler_closure.md.
   @override
@@ -1376,6 +1428,13 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
       // carries the resolved String type of the accumulator being read each pass.
       final DartType? targetType = node.readType;
       if (targetType == null || !targetType.isDartCoreString) return;
+
+      // A per-iteration local (declared inside the nearest enclosing loop) is
+      // re-created each pass and is not an accumulator.
+      if (isDeclaredInsideNearestLoop(node)) return;
+
+      // `s += buffer.toString()` drains a StringBuffer (the recommended fix).
+      if (isStringBufferDrain(node)) return;
 
       reporter.atNode(node);
     });
@@ -2218,10 +2277,10 @@ class _TextSpanVisitor extends RecursiveAstVisitor<void> {
       if (!node.isConst) {
         // Check if it has children (complex TextSpan worth caching)
         final bool hasChildren = node.argumentList.arguments.any((
-          Expression arg,
+          Argument arg,
         ) {
-          if (arg is NamedExpression) {
-            return arg.name.label.name == 'children';
+          if (arg is NamedArgument) {
+            return arg.name.lexeme == 'children';
           }
           return false;
         });
@@ -2357,7 +2416,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
       // needed — keep climbing to whatever consumes their value. A named
       // argument (`children: x.toList()`) is also just a transparent wrapper:
       // its parent is the ArgumentList, where a concrete List is required.
-      // Without unwrapping NamedExpression the .toList() is judged against the
+      // Without unwrapping NamedArgument the .toList() is judged against the
       // wrapper and fires a false positive on every `children:`-style call.
       //
       // A switch-expression arm and the switch expression itself are likewise
@@ -2372,7 +2431,8 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
       // return/assignment.
       if (parent is ParenthesizedExpression ||
           parent is ConditionalExpression ||
-          parent is NamedExpression ||
+          parent is NamedArgument ||
+          parent is RecordLiteralNamedField ||
           parent is SwitchExpressionCase ||
           parent is SwitchExpression ||
           parent is RecordLiteral) {
@@ -2513,8 +2573,8 @@ class PreferConstWidgetsRule extends SaropaLintRule {
 
       // Check if all arguments are literals or const
       bool canBeConst = true;
-      for (final Expression arg in node.argumentList.arguments) {
-        final Expression expr = arg is NamedExpression ? arg.expression : arg;
+      for (final Argument arg in node.argumentList.arguments) {
+        final Expression expr = arg.argumentExpression;
         if (expr is! Literal && !_isConstExpression(expr)) {
           canBeConst = false;
           break;
@@ -2714,7 +2774,7 @@ class _MapWidgetVisitor extends RecursiveAstVisitor<void> {
     if (node.methodName.name == 'map') {
       // Check if the argument creates widgets
       final widgetCtorRegex = RegExp(r'\b[A-Z][a-zA-Z]+\(');
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String bodySource = arg.body.toSource();
           // Simple heuristic: uppercase first letter suggests widget
@@ -2997,6 +3057,51 @@ class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
   }
 }
 
+/// True when the local variable written by compound assignment [node] is
+/// declared inside the nearest loop enclosing [node] — a per-iteration local
+/// that is re-created every pass, so it cannot accumulate across iterations.
+/// Shared by `avoid_string_concatenation_loop` and
+/// `avoid_memory_intensive_operations`.
+bool isDeclaredInsideNearestLoop(AssignmentExpression node) {
+  AstNode? loop = node.parent;
+  while (loop != null &&
+      loop is! ForStatement &&
+      loop is! ForElement &&
+      loop is! WhileStatement &&
+      loop is! DoStatement) {
+    loop = loop.parent;
+  }
+  if (loop == null) return false;
+
+  final Element? element = node.writeElement;
+  if (element is! LocalVariableElement) return false;
+  final int? declOffset = element.firstFragment.nameOffset;
+  if (declOffset == null) return false;
+  // A for-loop's own variable (`for (var s = ''; ...)`) is declared in the
+  // header, inside the loop node's range, but persists across iterations.
+  if (loop is ForStatement || loop is ForElement) {
+    final ForLoopParts parts = loop is ForStatement
+        ? loop.forLoopParts
+        : (loop as ForElement).forLoopParts;
+    if (parts is ForParts && declOffset < parts.rightSeparator.offset) {
+      return false;
+    }
+  }
+  return declOffset > loop.offset && declOffset < loop.end;
+}
+
+/// True when [node] is `s += <buffer>.toString()` with a `StringBuffer`
+/// receiver: a flush of an already-buffered value, not a per-element append.
+bool isStringBufferDrain(AssignmentExpression node) {
+  final Expression rhs = node.rightHandSide;
+  if (rhs is! MethodInvocation || rhs.methodName.name != 'toString') {
+    return false;
+  }
+  final DartType? targetType = rhs.target?.staticType;
+  return targetType is InterfaceType &&
+      targetType.element.name == 'StringBuffer';
+}
+
 class _StringConcatVisitor extends RecursiveAstVisitor<void> {
   _StringConcatVisitor(this.reporter, this.code);
 
@@ -3008,7 +3113,9 @@ class _StringConcatVisitor extends RecursiveAstVisitor<void> {
     // Report only when += is operating on string data.
     if (node.operator.type == TokenType.PLUS_EQ &&
         _isStringLikeExpression(node.leftHandSide, fallback: true) &&
-        _isStringLikeExpression(node.rightHandSide)) {
+        _isStringLikeExpression(node.rightHandSide) &&
+        !isDeclaredInsideNearestLoop(node) &&
+        !isStringBufferDrain(node)) {
       reporter.atNode(node);
     }
     super.visitAssignmentExpression(node);
@@ -3108,7 +3215,7 @@ class _StreamListenVisitor extends RecursiveAstVisitor<void> {
       // Check if callback has setState without mounted check
       final setStateRegex = RegExp(r'\bsetState\b');
       final mountedRegex = RegExp(r'\bmounted\b');
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String bodySource = arg.body.toSource();
           if (setStateRegex.hasMatch(bodySource) &&
@@ -3273,6 +3380,18 @@ class RequireDisposePatternRule extends SaropaLintRule {
             m is ConstructorDeclaration && m.constKeyword != null,
       );
       if (hasConstConstructor) return;
+
+      // An `abstract final` / `abstract` holder of static members cannot be
+      // instantiated: there is no instance to dispose.
+      if (node.abstractKeyword != null &&
+          node.bodyMembers.every(
+            (ClassMember m) =>
+                (m is FieldDeclaration && m.isStatic) ||
+                (m is MethodDeclaration && m.isStatic) ||
+                m is ConstructorDeclaration,
+          )) {
+        return;
+      }
 
       bool hasDisposable = false;
       bool hasDisposeMethod = false;
@@ -3552,7 +3671,7 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
       if (_expensiveWidgets.contains(typeName)) {
         // Check if already wrapped in Builder
         final AstNode? parent = expr.parent;
-        if (parent is NamedExpression && parent.name.label.name == 'builder') {
+        if (parent is NamedArgument && parent.name.lexeme == 'builder') {
           return; // Already using Builder pattern
         }
         reporter.atNode(expr.constructorName, code);
@@ -3638,9 +3757,9 @@ class RequireWidgetKeyStrategyRule extends SaropaLintRule {
       if (!_builderWidgets.contains(typeName)) return;
 
       // Find itemBuilder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
-          final Expression builderExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'itemBuilder') {
+          final Expression builderExpr = arg.argumentExpression;
           if (builderExpr is FunctionExpression) {
             _checkBuilderForConsistentKeys(
               builderExpr.body,
@@ -3677,9 +3796,9 @@ class _KeyConsistencyVisitor extends RecursiveAstVisitor<void> {
   void visitReturnStatement(ReturnStatement node) {
     final Expression? expr = node.expression;
     if (expr is InstanceCreationExpression) {
-      final bool hasKey = expr.argumentList.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'key';
+      final bool hasKey = expr.argumentList.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'key';
         }
         return false;
       });
@@ -3970,9 +4089,9 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
 
       // Check if dialog is for file selection
       final ArgumentList args = node.argumentList;
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'builder') {
-          final String builderSource = arg.expression.toSource();
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
+          final String builderSource = arg.argumentExpression.toSource();
           if (builderSource.contains('File') &&
               (builderSource.contains('Picker') ||
                   builderSource.contains('Selector') ||
@@ -4164,8 +4283,8 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
       bool inItemBuilder = false;
 
       while (current != null) {
-        if (current is NamedExpression) {
-          final paramName = current.name.label.name;
+        if (current is NamedArgument) {
+          final paramName = current.name.lexeme;
           if (paramName == 'itemBuilder' ||
               paramName == 'separatorBuilder' ||
               paramName == 'delegate') {
@@ -4666,11 +4785,11 @@ class AvoidAnimationInLargeListRule extends SaropaLintRule {
       if (methodName != 'builder' && methodName != 'separated') return;
 
       // Check itemBuilder for animation widgets
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (paramName == 'itemBuilder') {
-            final String builderSource = arg.expression.toSource();
+            final String builderSource = arg.argumentExpression.toSource();
 
             for (final String animWidget in _animationWidgets) {
               if (builderSource.contains(animWidget)) {
@@ -4771,8 +4890,8 @@ class PreferLazyLoadingImagesRule extends SaropaLintRule {
       AstNode? current = node.parent;
 
       while (current != null) {
-        if (current is NamedExpression) {
-          final String paramName = current.name.label.name;
+        if (current is NamedArgument) {
+          final String paramName = current.name.lexeme;
           if (paramName == 'itemBuilder' ||
               paramName == 'builder' ||
               paramName == 'separatorBuilder') {

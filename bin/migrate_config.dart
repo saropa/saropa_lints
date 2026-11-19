@@ -56,8 +56,10 @@ void main(List<String> args) {
 
   // Normalize line endings so removal regexes (which match `\n`) work on
   // Windows files that may contain `\r\n`.
-  final mainContent =
-      mainFile.readAsStringSync().replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+  final mainContent = mainFile
+      .readAsStringSync()
+      .replaceAll('\r\n', '\n')
+      .replaceAll('\r', '\n');
 
   // --- Scalar keys (log_level, lane, memory_mode) ---
   final found = <String, String>{};
@@ -79,15 +81,20 @@ void main(List<String> args) {
   ).hasMatch(mainContent);
 
   if (found.isEmpty && rulePackIds.isEmpty && !hasRulePacksKeyInPluginBlock) {
-    print('Nothing to migrate — no legacy config keys found under '
-        'plugins > saropa_lints:');
+    print(
+      'Nothing to migrate — no legacy config keys found under '
+      'plugins > saropa_lints:',
+    );
     return;
   }
 
   // Read or create the custom file.
   final customFile = File('$dir${sep}analysis_options_custom.yaml');
   var customContent = customFile.existsSync()
-      ? customFile.readAsStringSync().replaceAll('\r\n', '\n').replaceAll('\r', '\n')
+      ? customFile
+            .readAsStringSync()
+            .replaceAll('\r\n', '\n')
+            .replaceAll('\r', '\n')
       : '';
 
   // Only add scalar keys that aren't already in the custom file, but always
@@ -172,8 +179,10 @@ void main(List<String> args) {
   final totalMoved = added.length + (hasLegacyRulePacks ? 1 : 0);
   print('');
   if (dryRun) {
-    print('[dry-run] Would migrate $totalMoved key(s) to '
-        'analysis_options_custom.yaml. No files were modified.');
+    print(
+      '[dry-run] Would migrate $totalMoved key(s) to '
+      'analysis_options_custom.yaml. No files were modified.',
+    );
   } else {
     print('Migrated $totalMoved key(s) to analysis_options_custom.yaml.');
     print('The unsupported_option warnings will no longer appear.');

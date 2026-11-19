@@ -45,10 +45,7 @@ void testAvoidInstantiatingInBlocValueProvider() {
   final existingBloc = AuthBloc();
 
   // GOOD: Using existing instance in value
-  final good1 = BlocProvider.value(
-    value: existingBloc,
-    child: Container(),
-  );
+  final good1 = BlocProvider.value(value: existingBloc, child: Container());
 
   // GOOD: Creating new instance with create
   final good2 = BlocProvider<AuthBloc>(
@@ -74,10 +71,7 @@ void testAvoidExistingInstancesInBlocProvider() {
   );
 
   // GOOD: Using existing instance with value
-  final good2 = BlocProvider.value(
-    value: existingBloc,
-    child: Container(),
-  );
+  final good2 = BlocProvider.value(value: existingBloc, child: Container());
 }
 
 class TestWidget extends StatelessWidget {

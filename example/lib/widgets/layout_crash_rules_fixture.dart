@@ -14,9 +14,11 @@ Widget testTableCellBad() {
 }
 
 Widget testTableCellGood() {
-  return Table(children: [
-    TableRow(children: [TableCell(child: Text('x'))]),
-  ]);
+  return Table(
+    children: [
+      TableRow(children: [TableCell(child: Text('x'))]),
+    ],
+  );
 }
 
 // ============================================================
@@ -66,9 +68,7 @@ class _PositionedInStreamBuilder extends StatelessWidget {
 class _PositionedInBuilderArrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) => Positioned(top: 10, child: Text('x')),
-    );
+    return Builder(builder: (context) => Positioned(top: 10, child: Text('x')));
   }
 }
 
@@ -119,9 +119,7 @@ Widget testPositionedInCustomWidgetBackgroundLayersIndeterminate() {
   // internally spreads the list into a Stack. The static walker cannot see
   // into `_FocusCard.build()`, so this is indeterminate (no lint).
   return _FocusCard(
-    backgroundLayers: <Widget>[
-      Positioned(top: 10, child: Text('watermark')),
-    ],
+    backgroundLayers: <Widget>[Positioned(top: 10, child: Text('watermark'))],
     child: Text('content'),
   );
 }
@@ -224,7 +222,12 @@ Widget testListViewInColumnBad() {
 }
 
 Widget testListViewInColumnGood() {
-  return Column(children: [Text('header'), Expanded(child: ListView())]);
+  return Column(
+    children: [
+      Text('header'),
+      Expanded(child: ListView()),
+    ],
+  );
 }
 
 Widget testListViewInColumnShrinkWrap() {
@@ -242,7 +245,12 @@ Widget testTextFieldInRowBad() {
 }
 
 Widget testTextFieldInRowGood() {
-  return Row(children: [Icon(Icons.search), Expanded(child: TextField())]);
+  return Row(
+    children: [
+      Icon(Icons.search),
+      Expanded(child: TextField()),
+    ],
+  );
 }
 
 // ============================================================
@@ -305,7 +313,5 @@ Widget testUnboundedConstraintsGoodHorizontalRow() {
 
 Widget testUnboundedConstraintsGoodNoExpandedChild() {
   // Column in scroll view without Expanded/Flexible children -- OK
-  return SingleChildScrollView(
-    child: Column(children: [Text('a'), Text('b')]),
-  );
+  return SingleChildScrollView(child: Column(children: [Text('a'), Text('b')]));
 }

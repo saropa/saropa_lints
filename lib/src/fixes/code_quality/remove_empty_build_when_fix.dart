@@ -26,7 +26,7 @@ class RemoveEmptyBuildWhenFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final NamedExpression? named = node.thisOrAncestorOfType<NamedExpression>();
+    final NamedArgument? named = node.thisOrAncestorOfType<NamedArgument>();
     if (named == null) return;
 
     final content = unitResult.content;

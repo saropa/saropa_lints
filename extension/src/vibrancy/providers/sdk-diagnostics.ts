@@ -41,7 +41,7 @@ function isAtLeast(a: SemverParts, b: SemverParts): boolean {
 }
 
 /** Don't show "behind latest" when SDK minimum is already at or above this. */
-const ACCEPTABLE_SDK_FLOOR: SemverParts = { major: 3, minor: 9, patch: 0 };
+const ACCEPTABLE_SDK_FLOOR: SemverParts = { major: 3, minor: 11, patch: 0 };
 
 /** Parse a Dart/Flutter SDK constraint string into min and upper bound. */
 function parseConstraint(
@@ -181,7 +181,7 @@ function buildConstraintDiagnostics(
         }
     }
 
-    // Check if min version is behind latest (only for Dart SDK; don't nag when already >= 3.9.0)
+    // Check if min version is behind latest (only for Dart SDK; don't nag when already >= 3.11.0, the saropa_lints 17 floor)
     if (parsed.min) {
         const minSemver = parseSemver(parsed.min);
         if (minSemver) {
@@ -189,7 +189,7 @@ function buildConstraintDiagnostics(
             if (!atOrAboveFloor) {
                 const status = classifyBehind(minSemver, latestSemver);
                 const recommendation = key === 'sdk'
-                    ? ' Aim for >=3.10.0; use >=3.9.0 only if you need to support more legacy setups.'
+                    ? ' Aim for >=3.11.0 (required by saropa_lints 17; projects on older Dart stay on saropa_lints 16.x).'
                     : '';
                 if (status === 'minor') {
                     const msg = `${label} minimum (${parsed.min}) is behind latest stable (${latestVersion}).${recommendation}`;

@@ -138,5 +138,5 @@ class _good588_UserState {
   final User? user;
   final bool isLoading;
   final String? error;
-// Single state class with clear properties
+  // Single state class with clear properties
 }

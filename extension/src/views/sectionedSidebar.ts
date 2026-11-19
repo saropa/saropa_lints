@@ -104,6 +104,7 @@ import { readRawLaneFromCustomConfig } from '../config/laneConfig';
 // is safe to call on every sidebar rebuild — see its own doc comment.
 import { getLastProjectVibrancyPayload } from './projectVibrancyReportView';
 import { saropaLintsDataPath } from '../reportsPaths';
+import { detectPluginVersionDrift, getLintsSwitchState, lintsSwitchDetail, lintsSwitchLabel } from '../lintsSwitch';
 
 export type SectionNode = vscode.TreeItem | ConfigTreeNode;
 
@@ -330,7 +331,29 @@ function buildBannerItems(): LeafItem[] {
             new vscode.ThemeColor('list.warningForeground'),
         )];
     }
-    return [];
+    // Dependency present: the single On / Off / Partly off switch sits at the
+    // top of the sidebar. Not a Status row, so the "a Status click never
+    // changes anything" rule still holds. Off and Partly off are worded and
+    // coloured so the state is never silent.
+    const state = getLintsSwitchState(root);
+    const items = [new LeafItem(
+        lintsSwitchLabel(state),
+        lintsSwitchDetail(state),
+        'saropaLints.showProcessHealth',
+        state.kind === 'on' ? 'check' : 'warning',
+        state.kind === 'on' ? undefined : new vscode.ThemeColor('list.warningForeground'),
+    )];
+    const drift = detectPluginVersionDrift(root);
+    if (drift) {
+        items.push(new LeafItem(
+            l10n('lintsSwitch.driftRowLabel'),
+            l10n('lintsSwitch.driftRowDescription', { configured: drift.configured, pinned: drift.pinned }),
+            'saropaLints.syncPluginVersion',
+            'sync',
+            new vscode.ThemeColor('list.warningForeground'),
+        ));
+    }
+    return items;
 }
 
 /**
@@ -822,18 +845,21 @@ function appendHotspotsRow(
 
 // Maps the machine-readable EngineStatus.key to the debug.engine.* l10n
 // namespace, which uses 'analyzerPlugin' rather than 'analyzer'.
-const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer', string> = {
+const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer' | 'ci', string> = {
     analyzer: 'analyzerPlugin',
     scanDaemon: 'scanDaemon',
     lspServer: 'lspServer',
+    ci: 'ci',
 };
 
 /**
  * "Engines: N running" summary row, sourced from the same snapshot the
  * Health Panel shows (HealthPanel.getEngineStatuses() — see its doc comment:
  * built specifically so the sidebar and panel can never disagree). Silently
- * omitted when saropaLints.debug.enabled is off or engines aren't wired up
- * yet, matching the panel's own behavior.
+ * omitted only while the engines aren't wired up yet (early in activate).
+ * No longer gated on saropaLints.debug.enabled: this row is the way into the
+ * panel that holds the CI off switch, and an off switch you cannot find is
+ * not an off switch.
  */
 function appendEnginesRow(items: LeafItem[]): void {
     const engines = HealthPanel.getEngineStatuses();
@@ -1147,9 +1173,10 @@ export function updateSidebarSectionContext(workspaceState: vscode.Memento): voi
         void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', false);
         return;
     }
-    const cfg = vscode.workspace.getConfiguration('saropaLints');
-    const enabled = cfg.get<boolean>('enabled', true) ?? true;
-    const needsBanner = !hasSaropaLintsDep(root) || !enabled;
+    // The banner view hosts the Set Up row (no dependency) and the on/off
+    // switch row, which only shows for projects using saropa_lints and only
+    // when the switch is not fully On.
+    const needsBanner = !hasSaropaLintsDep(root) || getLintsSwitchState(root).kind !== 'on';
     void vscode.commands.executeCommand('setContext', 'saropaLints.needsBanner', needsBanner);
     // Cache invalidation moved to prepareRefreshCycle — called once at the
     // top of refreshAllSections instead of per-provider and per-context-update.

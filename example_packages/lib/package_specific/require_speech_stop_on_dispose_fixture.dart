@@ -7,3 +7,6 @@
 // See rule documentation for bad/good examples.
 
 void main() {}
+
+// GOOD: dispose() calls `_cancelEngine()`, a helper that calls
+// `_speech.cancel()` (same class, or an extension/part file).

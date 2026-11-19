@@ -201,16 +201,17 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       if (!_isHiveBoxTarget(node.target)) return;
 
       // Check arguments - if it's a custom object (not primitive)
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       // Get the value argument (2nd for put, 1st for add)
-      final Expression valueArg = methodName == 'put' && args.length > 1
+      final Argument valueArg = methodName == 'put' && args.length > 1
           ? args[1]
           : args.first;
 
       // Check if value is a user-defined class instance
-      final String? typeName = valueArg.staticType?.element?.name;
+      final String? typeName =
+          valueArg.argumentExpression.staticType?.element?.name;
       if (typeName != null && !_isPrimitiveType(typeName)) {
         reporter.atNode(node);
       }
@@ -409,7 +410,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
       if (!_isHiveBoxTarget(node.target)) return;
 
       // Check key for sensitive patterns
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String keySource = args.first.toSource().toLowerCase();
@@ -484,10 +485,10 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
       if (typeName != 'HiveAesCipher') return;
 
       // Check if argument is a literal
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression keyArg = args.first;
+      final Argument keyArg = args.first;
 
       // Check for list literal
       if (keyArg is ListLiteral) {
@@ -790,7 +791,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       final String boxName = firstArg.toSource().toLowerCase();
 
       // Check if this looks like a potentially large collection
@@ -1026,7 +1027,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
     final ArgumentList? args = annotation.arguments;
     if (args == null || args.arguments.isEmpty) return null;
 
-    final Expression firstArg = args.arguments.first;
+    final Argument firstArg = args.arguments.first;
     if (firstArg is IntegerLiteral) {
       return firstArg.value;
     }
@@ -1122,9 +1123,9 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
         return;
       }
 
-      final bool hasDefaultValue = args.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'defaultValue';
+      final bool hasDefaultValue = args.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'defaultValue';
         }
         return false;
       });
@@ -1443,7 +1444,7 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! SimpleStringLiteral) return;
 
       final String boxName = firstArg.value.toLowerCase();
@@ -2083,7 +2084,7 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
       if (target is! SimpleIdentifier || target.name != 'Hive') return;
 
       // Check if subDir argument is provided
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) {
         // No arguments at all - missing subDir
         reporter.atNode(node);
@@ -2091,7 +2092,7 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
       }
 
       // Check if first positional arg is a non-empty string
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
       if (firstArg is StringLiteral) {
         final String? value = firstArg.stringValue;
         if (value == null || value.isEmpty) {
@@ -2168,11 +2169,12 @@ class AvoidHiveDatetimeLocalRule extends SaropaLintRule {
       if (!RegExp(r'\bBox\b').hasMatch(targetStr)) return;
 
       // Get the value argument (second positional arg)
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
-      final Expression value = args[1];
-      final String? valueType = value.staticType?.getDisplayString();
+      final Argument value = args[1];
+      final String? valueType = value.argumentExpression.staticType
+          ?.getDisplayString();
       if (valueType == null || !valueType.startsWith('DateTime')) return;
 
       // Allow if already calling .toUtc()
@@ -2275,10 +2277,10 @@ class AvoidHiveTypeModificationRule extends SaropaLintRule {
         if (member is! FieldDeclaration) continue;
         for (final Annotation annotation in member.metadata) {
           if (annotation.name.name != 'HiveField') continue;
-          final NodeList<Expression>? args = annotation.arguments?.arguments;
+          final NodeList<Argument>? args = annotation.arguments?.arguments;
           if (args == null || args.isEmpty) continue;
 
-          final Expression indexExpr = args.first;
+          final Argument indexExpr = args.first;
           if (indexExpr is IntegerLiteral && indexExpr.value != null) {
             indexToFields.putIfAbsent(indexExpr.value!, () => []).add(member);
           }
@@ -2366,10 +2368,11 @@ class AvoidHiveLargeSingleEntryRule extends SaropaLintRule {
       if (!RegExp(r'\bBox\b').hasMatch(targetStr)) return;
 
       // Get the value argument
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
-      final String? valueType = args[1].staticType?.getDisplayString();
+      final String? valueType = args[1].argumentExpression.staticType
+          ?.getDisplayString();
       if (valueType == null) return;
 
       // Flag Uint8List and List<non-primitive> types

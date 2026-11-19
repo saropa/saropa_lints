@@ -211,9 +211,8 @@ class _GoodAnimatedBuilderChildReads extends State<MyWidget>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _controller,
-      builder: (BuildContext context, Widget? _) => _GoodDisplayWidget(
-        opacityAnimation: _opacityAnimation,
-      ),
+      builder: (BuildContext context, Widget? _) =>
+          _GoodDisplayWidget(opacityAnimation: _opacityAnimation),
     );
   }
 }
@@ -226,5 +225,26 @@ class _GoodDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Opacity(opacity: opacityAnimation.value, child: const Text('x'));
+  }
+}
+
+// ─── GOOD: static-frame branch beside an AnimatedBuilder branch of the same
+//          conditional. The live case is already served by the builder. ─────
+
+class _GoodStaticFrameBranch extends State<MyWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  bool reduced = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final Animation<double> animation = _controller;
+    return reduced
+        ? Opacity(opacity: animation.value, child: const Text('x'))
+        : AnimatedBuilder(
+            animation: animation,
+            builder: (BuildContext _, Widget? __) =>
+                Opacity(opacity: animation.value, child: const Text('x')),
+          );
   }
 }

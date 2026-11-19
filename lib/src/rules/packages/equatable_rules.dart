@@ -900,6 +900,11 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
 /// }
 /// // Or using freezed with @Default
 /// ```
+///
+/// Note: `x ?? this.x` cannot set a nullable field to null. The Dart lint
+/// `prefer_if_null_operators` suggests exactly that form for copyWith, so
+/// disable `prefer_if_null_operators` for copyWith methods, or use a
+/// sentinel/closure parameter to allow clearing.
 class RequireCopyWithNullHandlingRule extends SaropaLintRule {
   RequireCopyWithNullHandlingRule() : super(code: _code);
 
@@ -950,13 +955,8 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
         String? paramName;
         TypeAnnotation? paramType;
 
-        if (param is DefaultFormalParameter) {
-          final NormalFormalParameter inner = param.parameter;
-          if (inner is SimpleFormalParameter) {
-            paramName = inner.name?.lexeme;
-            paramType = inner.type;
-          }
-        } else if (param is SimpleFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           paramName = param.name?.lexeme;
           paramType = param.type;
         }

@@ -109,10 +109,7 @@ final context = BuildContext();
 // BAD: Anonymous route — no settings/name. Should trigger prefer_named_routes_for_deep_links.
 // expect_lint: prefer_named_routes_for_deep_links
 void _badAnonymousRoute() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (_) => HomePage()),
-  );
+  Navigator.push(context, MaterialPageRoute(builder: (_) => HomePage()));
 }
 
 // GOOD: Named route via RouteSettings(name: ...). Should NOT trigger.

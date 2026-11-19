@@ -148,14 +148,7 @@ class _CopyWithExample {
   final int? e;
   final int? f;
 
-  _CopyWithExample copyWith({
-    int? a,
-    int? b,
-    int? c,
-    int? d,
-    int? e,
-    int? f,
-  }) {
+  _CopyWithExample copyWith({int? a, int? b, int? c, int? d, int? e, int? f}) {
     return _CopyWithExample(
       a: a ?? this.a,
       b: b ?? this.b,

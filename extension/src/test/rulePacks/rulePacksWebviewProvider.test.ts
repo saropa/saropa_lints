@@ -9,6 +9,7 @@ import {
   computePackDashboardStats,
   formatRelativeFreshness,
   hslForCoverageScore,
+  maskCspNonce,
   packsAndRulesLabel,
   sdkPackMatchesSelection,
   sdkPackRiskKind,
@@ -220,5 +221,18 @@ describe('rulePacksWebviewProvider dashboard helpers', () => {
     assert.strictEqual(shouldRenderPackCoverageChart(allOff), false);
     assert.strictEqual(shouldRenderPackCoverageChart(oneDetected), true);
     assert.strictEqual(shouldRenderPackCoverageChart(oneEnabled), true);
+  });
+});
+
+describe('maskCspNonce (no-op rebuild detection)', () => {
+  const page = (nonce: string, body: string): string =>
+    `<meta content="style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'"><style nonce="${nonce}"></style>${body}<script nonce="${nonce}"></script>`;
+
+  it('treats pages that differ only by nonce as identical', () => {
+    assert.strictEqual(maskCspNonce(page('AbC123', '<p>x</p>')), maskCspNonce(page('zzZ999', '<p>x</p>')));
+  });
+
+  it('still distinguishes pages whose content differs', () => {
+    assert.notStrictEqual(maskCspNonce(page('AbC123', '<p>x</p>')), maskCspNonce(page('AbC123', '<p>y</p>')));
   });
 });

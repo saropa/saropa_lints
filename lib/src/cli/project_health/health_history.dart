@@ -81,7 +81,20 @@ Future<List<HistoryPoint>> loadHealthHistory(
     final cacheKey = sha == null ? null : '${sha}_$withComplexity';
     final cached = cacheKey == null ? null : cache.get(cacheKey);
     if (cached != null) {
-      points.add(cached);
+      // The cache is keyed by commit SHA, so an alias tag on the same commit
+      // (e.g. a moving `v16` beside `v16.6.0`) hits another tag's entry.
+      // Re-label it so each point carries the tag it was requested for.
+      points.add(
+        cached.tag == tag
+            ? cached
+            : HistoryPoint(
+                tag: tag,
+                fileCount: cached.fileCount,
+                loc: cached.loc,
+                codeLoc: cached.codeLoc,
+                maxCognitive: cached.maxCognitive,
+              ),
+      );
       continue;
     }
 

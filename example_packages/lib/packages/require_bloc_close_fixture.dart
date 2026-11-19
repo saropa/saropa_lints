@@ -109,7 +109,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // expect_lint: require_bloc_close
 class _bad551__MyState extends State<MyWidget> {
   final _counterBloc = CounterBloc();
-// Missing close - MEMORY LEAK!
+  // Missing close - MEMORY LEAK!
 }
 
 // GOOD: Should NOT trigger require_bloc_close

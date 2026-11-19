@@ -935,6 +935,20 @@ void main() {
             );
           }
 
+          // `problemMessage`/`impact` feed the extension's Rule Explain
+          // panel when it is opened by rule name alone (no violation to
+          // read them from) — pin them to the same per-rule getters.
+          expect(
+            meta['problemMessage'],
+            rule.code.problemMessage,
+            reason: rule.code.lowerCaseName,
+          );
+          expect(
+            meta['impact'],
+            rule.impact.name,
+            reason: rule.code.lowerCaseName,
+          );
+
           // `owasp` is always present, as `{mobile: [], web: []}` for
           // non-security rules — same shape `_owaspToJson` produces for the
           // per-violation export.

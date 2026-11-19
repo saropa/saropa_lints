@@ -110,7 +110,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 void _bad386() {
   final list = [
     'first item in list',
-    'second item in list' // No trailing comma on last element
+    'second item in list', // No trailing comma on last element
   ];
 }
 

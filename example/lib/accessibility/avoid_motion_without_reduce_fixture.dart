@@ -110,9 +110,7 @@ final context = BuildContext();
 // BAD: Should trigger avoid_motion_without_reduce
 // expect_lint: avoid_motion_without_reduce
 void _bad24() {
-  AnimatedContainer(
-    duration: Duration(milliseconds: 500),
-  );
+  AnimatedContainer(duration: Duration(milliseconds: 500));
 }
 
 // GOOD: Should NOT trigger avoid_motion_without_reduce
@@ -122,4 +120,32 @@ void _good24() {
         ? Duration.zero
         : Duration(milliseconds: 500),
   );
+}
+
+// BAD: transition in a class with no reduced-motion handling.
+class _BadMotionState extends State<StatefulWidget> {
+  Widget build(BuildContext context) =>
+      // expect_lint: avoid_motion_without_reduce
+      FadeTransition(opacity: _opacity, child: child);
+}
+
+// GOOD: controller is settled via a reduced-motion helper in the same class.
+class _ToastMotionState extends State<StatefulWidget> {
+  void initState() {
+    toastPlayOrSettle(_controller);
+  }
+
+  Widget build(BuildContext context) =>
+      FadeTransition(opacity: _opacity, child: child);
+}
+
+// BAD: reduced motion is only mentioned in a comment and `settlement` is an
+// unrelated word; neither handles the preference.
+class _CommentOnlyMotionState extends State<StatefulWidget> {
+  // TODO: respect reduceMotion and disableAnimations here.
+  int settlement = 0;
+
+  Widget build(BuildContext context) =>
+      // expect_lint: avoid_motion_without_reduce
+      FadeTransition(opacity: _opacity, child: child);
 }

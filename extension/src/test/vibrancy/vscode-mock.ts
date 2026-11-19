@@ -159,7 +159,11 @@ export function setTestConfig(section: string, key: string, value: any): void {
     testConfigValues[`${section}.${key}`] = value;
 }
 
+/** Every `config.update(...)` call made through the mocked workspace config. */
+export const configUpdates: Array<{ section?: string; key: string; value: any; target?: any }> = [];
+
 export function clearTestConfig(): void {
+    configUpdates.length = 0;
     for (const key of Object.keys(testConfigValues)) {
         delete testConfigValues[key];
     }
@@ -185,7 +189,10 @@ export const workspace: Record<string, any> = {
                 ? { key: fullKey, workspaceValue: testConfigValues[fullKey] as T }
                 : { key: fullKey };
         },
-        update: async (_key: string, _value: any, _target?: any): Promise<void> => {},
+        // Records writes so tests can assert on config updates.
+        update: async (key: string, value: any, target?: any): Promise<void> => {
+            configUpdates.push({ section, key, value, target });
+        },
     }),
     findFiles: async (_include: any, _exclude?: any): Promise<any[]> => [],
     createFileSystemWatcher: (_glob: string) => ({
@@ -268,7 +275,8 @@ export const Uri = {
     parse: (v: string) => ({ toString: () => v, scheme: 'http', path: v, fsPath: v }),
     file: (p: string) => ({ toString: () => p, scheme: 'file', path: p, fsPath: p }),
     joinPath: (base: any, ...segments: string[]) => {
-        const joined = [base.fsPath ?? base.path, ...segments].join('/');
+        // Normalise like the real vscode.Uri.joinPath so '..' segments resolve.
+        const joined = require('node:path').posix.join(base.fsPath ?? base.path, ...segments);
         return { toString: () => joined, scheme: 'file', path: joined, fsPath: joined };
     },
 };

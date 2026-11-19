@@ -114,10 +114,7 @@ final label = 'label';
 void _bad12() {
   Semantics(
     excludeFromSemantics: true,
-    child: GestureDetector(
-      onTap: () => doSomething(),
-      child: Icon(Icons.add),
-    ),
+    child: GestureDetector(onTap: () => doSomething(), child: Icon(Icons.add)),
   );
 }
 
@@ -126,9 +123,6 @@ void _good12() {
   Semantics(
     button: true,
     label: 'Add item',
-    child: GestureDetector(
-      onTap: () => doSomething(),
-      child: Icon(Icons.add),
-    ),
+    child: GestureDetector(onTap: () => doSomething(), child: Icon(Icons.add)),
   );
 }

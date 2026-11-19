@@ -121,8 +121,5 @@ void _bad1427() {
 
 // GOOD: Should NOT trigger avoid_gesture_conflict
 void _good1427() {
-  GestureDetector(
-    onTap: handleTap,
-    child: Content(),
-  );
+  GestureDetector(onTap: handleTap, child: Content());
 }

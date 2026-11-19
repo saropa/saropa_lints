@@ -132,11 +132,35 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
       if (body.statements.length == 1) {
         final Statement statement = body.statements.first;
         if (statement is ExpressionStatement &&
-            statement.expression is RethrowExpression) {
+            statement.expression is RethrowExpression &&
+            !_shieldsLaterClause(node)) {
           reporter.atNode(node);
         }
       }
     });
+  }
+
+  /// True when a later clause of the same `try` would catch what this
+  /// rethrow-only clause catches (catch-all, `Object`/`dynamic`, or a
+  /// supertype). Dart runs the first matching clause, so removing this
+  /// clause would change which handler runs.
+  static bool _shieldsLaterClause(CatchClause node) {
+    final AstNode? parent = node.parent;
+    if (parent is! TryStatement) return false;
+    final List<CatchClause> clauses = parent.catchClauses;
+    final DartType? own = node.exceptionType?.type;
+    for (final CatchClause later in clauses.skip(clauses.indexOf(node) + 1)) {
+      final TypeAnnotation? laterType = later.exceptionType;
+      if (laterType == null) return true;
+      final String name = laterType is NamedType ? laterType.name.lexeme : '';
+      if (name == 'Object' || name == 'dynamic') return true;
+      if (own is InterfaceType &&
+          (own.element.name == name ||
+              own.allSupertypes.any((t) => t.element.name == name))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
@@ -222,8 +246,42 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitThrowExpression(ThrowExpression node) {
-    reporter.atNode(node);
+    if (!_throwsViaThrowWithStackTrace(node.expression)) {
+      reporter.atNode(node);
+    }
     super.visitThrowExpression(node);
+  }
+
+  /// Whether [expression] is a call to `Error.throwWithStackTrace(...)`
+  /// (`dart:core`) — the SDK's own documented mechanism for throwing a new
+  /// error while explicitly preserving an existing [StackTrace]. This is
+  /// exactly the pattern this rule's `correctionMessage` recommends, so it
+  /// must not itself be flagged as "losing the original stack trace".
+  bool _throwsViaThrowWithStackTrace(Expression expression) {
+    if (expression is! MethodInvocation) return false;
+    if (expression.methodName.name != 'throwWithStackTrace') return false;
+
+    // Accept both a bare `Error` target and an import-prefixed one (e.g.
+    // `core.Error.throwWithStackTrace(...)` when dart:core is imported with
+    // a prefix) — element resolution below is what actually confirms it's
+    // dart:core's `Error`, this is just extracting the simple name.
+    final target = expression.target;
+    final String? targetName = switch (target) {
+      SimpleIdentifier() => target.name,
+      PrefixedIdentifier() => target.identifier.name,
+      _ => null,
+    };
+    if (targetName != 'Error') return false;
+
+    final element = expression.methodName.element;
+    // No resolved element (e.g. the scan CLI's syntactic/unresolved mode,
+    // where usesTypeResolution can't be honored): fall back to the
+    // syntactic match already performed above rather than under-report.
+    if (element == null) return true;
+
+    if (element is! MethodElement || !element.isStatic) return false;
+
+    return element.library.uri.toString() == 'dart:core';
   }
 }
 
@@ -343,8 +401,8 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
     // Nullable-safe: an empty argument list cannot identify a thrown value, so
     // fall back to the original operand (which resolves to Never and is skipped
     // by the null-type guard upstream rather than misfiring).
-    final NodeList<Expression> args = operand.argumentList.arguments;
-    return args.isEmpty ? operand : args.first;
+    final NodeList<Argument> args = operand.argumentList.arguments;
+    return args.isEmpty ? operand : args.first.argumentExpression;
   }
 
   /// True when [type] (or any non-Object supertype) declares `toString()`.

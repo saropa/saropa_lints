@@ -21,8 +21,7 @@ class Order {
   }
 
   // expect_lint: getters_in_member_list
-  double get total =>
-      items.fold(0, (double sum, Item i) => sum + i.price);
+  double get total => items.fold(0, (double sum, Item i) => sum + i.price);
 }
 
 // OrderOk: GOOD — the getter is grouped with the field, before the first
@@ -32,8 +31,7 @@ class OrderOk {
 
   final List<Item> items;
 
-  double get total =>
-      items.fold(0, (double sum, Item i) => sum + i.price);
+  double get total => items.fold(0, (double sum, Item i) => sum + i.price);
 
   void addItem(Item item) {
     items.add(item);

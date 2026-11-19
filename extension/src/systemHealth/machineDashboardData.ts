@@ -12,8 +12,12 @@
  * translates its enum into dashboard group keys, so a category rename
  * upstream fails to compile here rather than silently mis-bucketing.
  *
- * **Platform assumption:** all data sources are Windows-only (CIM queries,
- * Ollama CLI). Non-Windows callers receive empty results, never errors.
+ * **Platform assumption:** process/memory queries (Dart processes, system
+ * RAM) are supported on win32/darwin/linux. `ollamaQuery.ts`'s loaded-model
+ * query is cross-platform (plain HTTP + the `ollama` CLI), but
+ * `orphanHosts.ts`'s model-host process scan is genuinely Windows-only
+ * (CIM/taskkill against `llama-server.exe`). Every source degrades to empty
+ * results, never errors, on a platform it does not support.
  */
 import { l10n } from '../i18n/runtime';
 import {
@@ -22,6 +26,7 @@ import {
   ProcessCategory,
   HEAP_CAP_FLAG,
 } from './processQuery';
+import { assessHeapCap, parseHeapCapMb, recommendHeapCapMb } from './heapCap';
 import type { DartProcessInfo } from './types';
 import type { HostProcessInfo } from './orphanHosts';
 import type { LoadedModel } from './ollamaQuery';
@@ -292,15 +297,40 @@ export function buildRecommendations(input: RecommendationInput): Recommendation
     // ceiling at all — see ANALYSIS_dev_machine_stability.md §1: this is the
     // one lever Dart-Code exposes and most users never discover it because
     // it's a VM flag buried in an "additional args" setting, not a checkbox.
+    // recommendHeapCapMb/assessHeapCap share the same 40%/50%-of-RAM rules
+    // as the startup audit (heapCapAudit.ts) so the dashboard card and the
+    // proactive notification never disagree about what "too high" means.
     const hasHeapCap = input.analyzerVmArgs.some((a) => a.includes(HEAP_CAP_FLAG));
     if (!hasHeapCap && analysisGroup.processCount > 0) {
+      const recommendedMb = input.system ? recommendHeapCapMb(input.system.totalBytes) : undefined;
       recs.push({
         id: 'noHeapCap',
         severity: 'info',
-        text: l10n('machineDashboard.recommendation.noHeapCap'),
+        text: recommendedMb !== undefined
+          ? l10n('machineDashboard.recommendation.noHeapCapWithSuggestion', {
+              mb: String(recommendedMb),
+            })
+          : l10n('machineDashboard.recommendation.noHeapCap'),
         actionCommand: 'saropaLints.setAnalysisServerHeapCap',
         actionLabel: l10n('machineDashboard.action.setHeapCap'),
       });
+    } else if (hasHeapCap && input.system) {
+      // A cap is set — check it isn't a stale/copied value that now exceeds
+      // half this machine's RAM (e.g. carried over from a bigger machine).
+      const capMb = parseHeapCapMb(input.analyzerVmArgs);
+      const recommendedMb = recommendHeapCapMb(input.system.totalBytes);
+      if (assessHeapCap({ capMb, totalBytes: input.system.totalBytes }) === 'tooHigh') {
+        recs.push({
+          id: 'heapCapTooHigh',
+          severity: 'warning',
+          text: l10n('machineDashboard.recommendation.heapCapTooHigh', {
+            capMb: String(capMb),
+            recommendedMb: String(recommendedMb),
+          }),
+          actionCommand: 'saropaLints.setAnalysisServerHeapCap',
+          actionLabel: l10n('machineDashboard.action.setHeapCap'),
+        });
+      }
     }
   }
 

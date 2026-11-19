@@ -65,33 +65,19 @@ void testPreferCenterOverAlign() {
   // BAD: Align with Alignment.center
   // BAD: Align with Alignment.center, should trigger lint
   // expect_lint: prefer_center_over_align
-  final bad1 = Align(
-    alignment: Alignment.center,
-    child: Text('Hello'),
-  );
+  final bad1 = Align(alignment: Alignment.center, child: Text('Hello'));
 
   // GOOD: Using Center widget
-  final good1 = Center(
-    child: Text('Hello'),
-  );
+  final good1 = Center(child: Text('Hello'));
 
   // GOOD: Align with different alignment
-  final good2 = Align(
-    alignment: Alignment.topLeft,
-    child: Text('Hello'),
-  );
+  final good2 = Align(alignment: Alignment.topLeft, child: Text('Hello'));
 
   // GOOD: Align with Alignment.centerLeft
-  final good3 = Align(
-    alignment: Alignment.centerLeft,
-    child: Text('Hello'),
-  );
+  final good3 = Align(alignment: Alignment.centerLeft, child: Text('Hello'));
 
   // GOOD: Align with Alignment.centerRight
-  final good4 = Align(
-    alignment: Alignment.centerRight,
-    child: Text('Hello'),
-  );
+  final good4 = Align(alignment: Alignment.centerRight, child: Text('Hello'));
 }
 
 class TestWidget extends StatelessWidget {
@@ -104,15 +90,10 @@ class TestWidget extends StatelessWidget {
         // BAD: In widget tree
         // BAD: Align with Alignment.center in widget tree, should trigger lint
         // expect_lint: prefer_center_over_align
-        Align(
-          alignment: Alignment.center,
-          child: Icon(Icons.star),
-        ),
+        Align(alignment: Alignment.center, child: Icon(Icons.star)),
 
         // GOOD: Already using Center
-        Center(
-          child: Icon(Icons.star),
-        ),
+        Center(child: Icon(Icons.star)),
       ],
     );
   }

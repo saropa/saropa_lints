@@ -125,7 +125,7 @@ void _good424() {
       return CircularProgressIndicator(
         value: loadingProgress.expectedTotalBytes != null
             ? loadingProgress.cumulativeBytesLoaded /
-                loadingProgress.expectedTotalBytes!
+                  loadingProgress.expectedTotalBytes!
             : null,
       );
     },

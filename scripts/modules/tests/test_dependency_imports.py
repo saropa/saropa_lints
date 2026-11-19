@@ -29,7 +29,7 @@ _PUBSPEC = """\
 name: demo_pkg
 version: 1.0.0
 environment:
-  sdk: ">=3.9.0 <4.0.0"
+  sdk: ">=3.11.0 <4.0.0"
 dependencies:
   analyzer: ^1.0.0
   collection: ^1.19.1
@@ -123,7 +123,7 @@ class TestDependencyImportStatus(unittest.TestCase):
             "name: demo_pkg\n"
             "version: 1.0.0\n"
             "environment:\n"
-            '  sdk: ">=3.9.0 <4.0.0"\n'
+            '  sdk: ">=3.11.0 <4.0.0"\n'
             "dependencies:  # runtime dependencies only\n"
             "  analyzer: ^1.0.0\n"
             "  meta: ^1.18.0\n"

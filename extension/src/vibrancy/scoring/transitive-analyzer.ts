@@ -8,6 +8,7 @@
 import {
     TransitiveInfo, SharedDep, DepGraphSummary, KnownIssue,
 } from '../types';
+import { effectiveIssueStatus } from './known-issues';
 import { DepGraphPackage } from '../services/dep-graph';
 
 /**
@@ -130,7 +131,7 @@ export function flagRiskyTransitives(
             const issues = knownIssues.get(transitive);
             // No version context for transitives — flag if ANY entry is risky
             const risky = issues?.find(
-                i => i.status === 'discontinued' || i.status === 'end_of_life',
+                i => i.status === 'discontinued' || effectiveIssueStatus(i) === 'end_of_life',
             );
             if (risky) {
                 flagged.push({
@@ -175,7 +176,7 @@ export function enrichTransitiveInfo(
         for (const transitive of info.transitives) {
             const issues = knownIssues.get(transitive);
             // No version context for transitives — flag if ANY entry is risky
-            if (issues?.some(i => i.status === 'discontinued' || i.status === 'end_of_life')) {
+            if (issues?.some(i => i.status === 'discontinued' || effectiveIssueStatus(i) === 'end_of_life')) {
                 flaggedCount++;
             }
             const isShared = sharedSet.has(transitive);

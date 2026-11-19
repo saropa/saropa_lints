@@ -30,12 +30,12 @@ class PreferSizedBoxSquareFix extends SaropaFixProducer {
 
     // Find width and height arguments
     final args = target.argumentList.arguments;
-    NamedExpression? widthArg;
-    NamedExpression? heightArg;
+    NamedArgument? widthArg;
+    NamedArgument? heightArg;
     for (final arg in args) {
-      if (arg is NamedExpression) {
-        if (arg.name.label.name == 'width') widthArg = arg;
-        if (arg.name.label.name == 'height') heightArg = arg;
+      if (arg is NamedArgument) {
+        if (arg.name.lexeme == 'width') widthArg = arg;
+        if (arg.name.lexeme == 'height') heightArg = arg;
       }
     }
     if (widthArg == null) return;

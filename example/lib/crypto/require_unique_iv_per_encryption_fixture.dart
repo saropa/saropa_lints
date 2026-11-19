@@ -125,3 +125,10 @@ String _good301_encrypt(String data) {
     return '${iv.base64}:${encrypted.base64}'; // Store IV with ciphertext
   }
 }
+
+// GOOD: int constant is the IV byte length, not an IV value.
+const int _credentialIvLength = 12;
+
+class _IvLengthHolder {
+  static const int ivLength = 12;
+}

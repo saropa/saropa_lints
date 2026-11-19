@@ -61,7 +61,8 @@ export function collectProblemsForPackage(
     const name = result.package.name;
 
     // Abandoned packages (score < 20) are unhealthy but not end-of-life
-    if (result.category === 'end-of-life' || result.category === 'abandoned' || result.category === 'outdated') {
+    if (result.category === 'end-of-life' || result.category === 'abandoned' || result.category === 'outdated'
+        || result.category === 'upgrade-required') {
         registry.add(createUnhealthyProblem(result, line));
     }
 

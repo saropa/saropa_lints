@@ -307,4 +307,3 @@ class OkViewportFractionVariable extends StatelessWidget {
     );
   }
 }
-

@@ -108,7 +108,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_god_class
 // expect_lint: avoid_god_class
 class _bad79_AppManager {
-// 20+ fields and 30+ methods doing everything
+  // 20+ fields and 30+ methods doing everything
 }
 
 // GOOD: Should NOT trigger avoid_god_class

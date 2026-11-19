@@ -35,9 +35,7 @@ class GoodImageListWidget extends StatelessWidget {
       itemCount: urls.length,
       itemBuilder: (context, index) {
         // CachedNetworkImage would be used here in real code
-        return Container(
-          child: Text('Image ${index + 1}'),
-        );
+        return Container(child: Text('Image ${index + 1}'));
       },
     );
   }

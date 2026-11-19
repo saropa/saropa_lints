@@ -103,22 +103,14 @@
 // Test fixture for: require_file_close_in_finally
 // Source: lib\src\rules\resource_management_rules.dart
 
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 dynamic file;
 final path = '/path';
-
-// BAD: Should trigger require_file_close_in_finally
-// expect_lint: require_file_close_in_finally
-void _bad965() async {
-  Future<String> readFile(String path) async {
-    final file = File(path).openRead();
-    final contents = await file.transform(utf8.decoder).join();
-    // file not closed if exception occurs
-    return contents;
-  }
-}
 
 // GOOD: Should NOT trigger require_file_close_in_finally
 void _good965() async {
@@ -134,4 +126,45 @@ void _good965() async {
   } finally {
     await sink.close();
   }
+}
+
+// GOOD: Should NOT trigger require_file_close_in_finally
+// openRead() is a Stream that closes its descriptor itself.
+Future<int> _countLines(File file) async {
+  int count = 0;
+  await for (final String _ in file
+      .openRead()
+      .transform(utf8.decoder)
+      .transform(const LineSplitter())) {
+    count++;
+  }
+  return count;
+}
+
+// GOOD: Should NOT trigger require_file_close_in_finally
+// openRead(start, end) consumed by `await for` inside try/catch.
+Future<bool> _headHasData(File file) async {
+  try {
+    final List<int> head = <int>[];
+    await for (final List<int> chunk in file.openRead(0, 1024)) {
+      head.addAll(chunk);
+    }
+    return head.isNotEmpty;
+  } on Object {
+    return false;
+  }
+}
+
+// BAD: Should trigger require_file_close_in_finally
+// expect_lint: require_file_close_in_finally
+void _badOpenWriteNoClose(File file) {
+  final sink = file.openWrite();
+  sink.write('x');
+}
+
+// BAD: Should trigger require_file_close_in_finally
+// expect_lint: require_file_close_in_finally
+void _badOpenSyncNoClose(File file) {
+  final raf = file.openSync();
+  raf.readSync(4);
 }

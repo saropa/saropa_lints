@@ -2,12 +2,13 @@
 ///
 /// Category is derived from the parent directory of each rule's source
 /// file under `lib/src/rules/`. Run the generator to regenerate:
-///   `python scripts/gen_category_map.py`
+///   `python scripts/generators/gen_category_map.py`
 ///
 /// DO NOT EDIT BY HAND — changes will be overwritten on regeneration.
 /// A unit test validates that every registered rule appears in this map.
 // ignore_for_file: prefer_single_quotes
 library;
+
 const Map<String, String> ruleCategoryMap = <String, String>{
   'abi_specific_integer_invalid': 'data',
   'abstract_field_initializer': 'architecture',
@@ -602,6 +603,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'avoid_redundant_pragma_inline': 'code_quality',
   'avoid_redundant_requests': 'network',
   'avoid_redundant_semantics': 'ui',
+  'avoid_reexports': 'architecture',
   'avoid_ref_in_build_body': 'packages',
   'avoid_ref_in_dispose': 'packages',
   'avoid_ref_inside_state_dispose': 'packages',
@@ -862,8 +864,9 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'conflicting_constructor_and_static_member': 'architecture',
   'connectivity_satellite_missing': 'packages',
   'consistent_update_render_object': 'widget',
-  'constructor_parameters_and_fields_should_have_the_same_order': 'architecture',
-  'deprecated_new_in_comment_reference': 'core',
+  'constructor_parameters_and_fields_should_have_the_same_order':
+      'architecture',
+  'deprecated_new_in_comment_reference_extended': 'core',
   'device_calendar_event_missing_calendar_id': 'packages',
   'device_calendar_event_utc_timezone': 'packages',
   'device_calendar_missing_permission_check': 'packages',
@@ -938,6 +941,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'google_sign_in_canceled_not_handled': 'packages',
   'google_sign_in_missing_exception_handler': 'packages',
   'google_sign_in_unchecked_supports_authenticate': 'packages',
+  'guard_debugger_against_test_environment': 'testing',
   'handle_throwing_invocations': 'flow',
   'home_widget_callback_missing_pragma': 'packages',
   'home_widget_callback_not_top_level': 'packages',
@@ -1442,6 +1446,7 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'prefer_matcher_over_equals': 'testing',
   'prefer_material_theme_colors': 'stylistic',
   'prefer_maybe_pop': 'ui',
+  'prefer_media_query_width_height_of': 'code_quality',
   'prefer_member_ordering': 'stylistic',
   'prefer_merge_semantics': 'ui',
   'prefer_method_channel_note_if_slow': 'platforms',

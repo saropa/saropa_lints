@@ -110,7 +110,9 @@ dynamic value;
 // BAD: Should trigger avoid_nested_extension_types
 // expect_lint: avoid_nested_extension_types
 extension type Inner(int value) {}
-extension type Outer(Inner inner) {}  // Nested extension type
+extension type Outer(Inner inner) {} // Nested extension type
 
 // GOOD: Should NOT trigger avoid_nested_extension_types
-extension type _good198_Meters(double value) {} // Wraps a primitive, not another extension type
+extension type _good198_Meters(
+  double value
+) {} // Wraps a primitive, not another extension type

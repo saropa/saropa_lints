@@ -108,10 +108,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // BAD: Should trigger avoid_hardcoded_duration
 // expect_lint: avoid_hardcoded_duration
 void _bad34() {
-  AnimationController(
-    duration: Duration(milliseconds: 300),
-    vsync: this,
-  );
+  AnimationController(duration: Duration(milliseconds: 300), vsync: this);
   Future.delayed(Duration(seconds: 2));
 }
 
@@ -119,9 +116,6 @@ void _bad34() {
 void _good34() {
   const kAnimationDuration = Duration(milliseconds: 300);
 
-  AnimationController(
-    duration: kAnimationDuration,
-    vsync: this,
-  );
+  AnimationController(duration: kAnimationDuration, vsync: this);
   Future.delayed(kDelayDuration);
 }

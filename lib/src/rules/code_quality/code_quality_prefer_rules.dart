@@ -26,6 +26,7 @@ import '../../fixes/code_quality/replace_expect_length_equals_zero_with_is_empty
 import '../../fixes/code_quality/replace_first_where_with_by_name_fix.dart';
 import '../../fixes/code_quality/add_missing_inlining_pragma_fix.dart';
 import '../../fixes/code_quality/prefer_dedicated_media_query_method_fix.dart';
+import '../../fixes/code_quality/prefer_media_query_width_height_of_fix.dart';
 import '../../fixes/code_quality/replace_where_is_empty_with_any_fix.dart';
 import '../../fixes/code_quality/simplify_boolean_comparison_fix.dart';
 import '../../fixes/code_quality/simplify_redundant_null_aware_spread_fix.dart';
@@ -58,7 +59,7 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
         final ArgumentList? args = annotation.arguments;
         if (args == null || args.arguments.isEmpty) continue;
 
-        final Expression firstArg = args.arguments.first;
+        final Argument firstArg = args.arguments.first;
         if (firstArg is! SimpleStringLiteral) continue;
 
         final String value = firstArg.value;
@@ -179,6 +180,103 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
   ];
 }
 
+/// Warns when only the width or height of the screen is read through
+/// `MediaQuery.sizeOf(context)` (or `MediaQuery.of(context).size`).
+///
+/// Since: v17.2.0 | Rule version: v1
+///
+/// `MediaQuery.sizeOf(context).width` makes the widget rebuild when the height
+/// changes too (for example when the keyboard opens). `MediaQuery.widthOf`
+/// and `MediaQuery.heightOf` depend on one dimension only. They exist from
+/// Flutter 3.35, so the rule reports only when the resolved `MediaQuery` class
+/// declares `widthOf`; on older SDKs it stays silent.
+///
+/// Only the direct chain on the call is reported. One `sizeOf` result stored
+/// in a variable and used for both dimensions is correct and is not flagged.
+///
+/// **Quick fix available:** rewrites to `widthOf` / `heightOf` (or the
+/// `maybe` forms).
+///
+/// Example of **bad** code:
+/// ```dart
+/// final width = MediaQuery.sizeOf(context).width;
+/// final height = MediaQuery.maybeSizeOf(context)?.height;
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final width = MediaQuery.widthOf(context);
+/// final height = MediaQuery.maybeHeightOf(context);
+/// final size = MediaQuery.sizeOf(context); // both dimensions needed
+/// ```
+class PreferMediaQueryWidthHeightOfRule extends SaropaLintRule {
+  PreferMediaQueryWidthHeightOfRule() : super(code: _code);
+
+  /// Rebuild-scope optimization. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'performance'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
+
+  static const LintCode _code = LintCode(
+    'prefer_media_query_width_height_of',
+    '[prefer_media_query_width_height_of] Only the width or height is read from MediaQuery.sizeOf(context), so the widget also rebuilds when the other dimension changes (for example when the keyboard opens). {v1}',
+    correctionMessage:
+        'Use MediaQuery.widthOf(context) or MediaQuery.heightOf(context) (or the maybe variants) to depend on one dimension only.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addPropertyAccess((PropertyAccess node) {
+      final String property = node.propertyName.name;
+      if (property != 'width' && property != 'height') return;
+
+      final MethodInvocation? call = mediaQuerySizeCall(node);
+      if (call == null) return;
+
+      final Expression? receiver = call.target;
+      if (receiver is! Identifier) return;
+      final Element? element = receiver.element;
+      if (element is! ClassElement || element.name != 'MediaQuery') return;
+
+      // Flutter older than 3.35 has no widthOf: stay silent.
+      if (element.getMethod('widthOf') == null) return;
+
+      // `maybeSizeOf(c)?.width.toInt()`: the fix would leave a nullable
+      // receiver for the rest of the chain and not compile, so skip it.
+      if (node.isNullAware) {
+        final AstNode? parent = node.parent;
+        if ((parent is PropertyAccess && parent.target == node) ||
+            (parent is MethodInvocation && parent.target == node)) {
+          return;
+        }
+      }
+
+      reporter.atNode(node);
+    });
+  }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferMediaQueryWidthHeightOfFix(context: context),
+  ];
+}
+
 /// Warns when enum values are found using firstWhere instead of byName.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
@@ -232,10 +330,10 @@ class PreferEnumsByNameRule extends SaropaLintRule {
       if (target.propertyName.name != 'values') return;
 
       // Check if the argument is a function that compares .name
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
       if (firstArg is FunctionExpression) {
         final FunctionBody body = firstArg.body;
         if (body is ExpressionFunctionBody) {
@@ -311,7 +409,11 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
     context.addFunctionExpression((FunctionExpression node) {
       // Skip if not used as an argument
       final AstNode? parent = node.parent;
-      if (parent is! NamedExpression && parent is! ArgumentList) return;
+      if (parent is! NamedArgument &&
+          parent is! RecordLiteralNamedField &&
+          parent is! ArgumentList) {
+        return;
+      }
 
       // Check function body size
       final FunctionBody body = node.body;
@@ -840,9 +942,9 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
           if (thenTarget == elseTarget) {
             // Check if only one argument differs
-            final List<Expression> thenArgs = thenExpr.argumentList.arguments
+            final List<Argument> thenArgs = thenExpr.argumentList.arguments
                 .toList();
-            final List<Expression> elseArgs = elseExpr.argumentList.arguments
+            final List<Argument> elseArgs = elseExpr.argumentList.arguments
                 .toList();
 
             if (thenArgs.length == elseArgs.length && thenArgs.length >= 2) {
@@ -936,7 +1038,7 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
       final ArgumentList args = bodyExpr.argumentList;
       if (args.arguments.length != 1) return;
 
-      final Expression arg = args.arguments.first;
+      final Argument arg = args.arguments.first;
       if (arg is SimpleIdentifier && arg.name == paramName) {
         reporter.atNode(node);
       }
@@ -1062,7 +1164,7 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! FunctionExpression) return;
 
       final FunctionBody body = firstArg.body;
@@ -1109,16 +1211,17 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
   ) {
     // addFormalParameter is a no-op stub in the native engine (FormalParameter
     // is not a visitable node), so this rule never fired. This rule only ever
-    // acted on SimpleFormalParameter (it read `.type`), so addSimpleFormalParameter
+    // acted on RegularFormalParameter (it read `.type`), so addRegularFormalParameter
     // is the correct real registration (BUG FIX 2026-07-16).
-    context.addSimpleFormalParameter((SimpleFormalParameter node) {
+    context.addRegularFormalParameter((RegularFormalParameter node) {
+      if (node.functionTypedSuffix != null) return;
       // Check for Accept-style annotations
       for (final Annotation annotation in node.metadata) {
         final String annotationName = annotation.name.name;
         if (annotationName == 'Accept' || annotationName == 'AcceptType') {
           final ArgumentList? args = annotation.arguments;
           if (args != null && args.arguments.isNotEmpty) {
-            final Expression firstArg = args.arguments.first;
+            final Argument firstArg = args.arguments.first;
             if (firstArg is TypeLiteral) {
               // Get expected type from annotation
               final String expectedTypeName = firstArg.type.toSource();
@@ -1445,20 +1548,20 @@ class PreferTestMatchersRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'expect') return;
 
-      final List<Expression> args = node.argumentList.arguments.toList();
+      final List<Argument> args = node.argumentList.arguments.toList();
       if (args.length < 2) return;
 
-      final Expression actual = args[0];
-      final Expression matcher = args[1];
+      final Argument actual = args[0];
+      final Argument matcher = args[1];
 
       // Check for list.length == 0 pattern
       if (actual is PropertyAccess && actual.propertyName.name == 'length') {
         if (matcher is MethodInvocation &&
             matcher.methodName.name == 'equals') {
-          final List<Expression> matcherArgs = matcher.argumentList.arguments
+          final List<Argument> matcherArgs = matcher.argumentList.arguments
               .toList();
           if (matcherArgs.isNotEmpty) {
-            final Expression matcherArg = matcherArgs[0];
+            final Argument matcherArg = matcherArgs[0];
             if (matcherArg is IntegerLiteral && matcherArg.value == 0) {
               reporter.atNode(node);
               return;
@@ -1781,7 +1884,8 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
   ) {
     context.addFormalParameterList((FormalParameterList node) {
       for (final FormalParameter param in node.parameters) {
-        if (param is SimpleFormalParameter) {
+        if (param is RegularFormalParameter &&
+            param.functionTypedSuffix == null) {
           final TypeAnnotation? type = param.type;
           if (type is GenericFunctionType) {
             reporter.atNode(type);
@@ -1849,7 +1953,7 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
         if (init is SuperConstructorInvocation) {
           // Check if super call has simple parameter forwarding
           final ArgumentList args = init.argumentList;
-          for (final Expression arg in args.arguments) {
+          for (final Argument arg in args.arguments) {
             if (arg is SimpleIdentifier) {
               // Check if the identifier matches a constructor parameter
               final FormalParameterList params = node.parameters;
@@ -2087,7 +2191,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
           // Type is explicit, shorthand could be used
           reporter.atNode(node);
         }
-      } else if (parent is NamedExpression) {
+      } else if (parent is NamedArgument || parent is RecordLiteralNamedField) {
         // In named parameter, type is known from function signature
         reporter.atNode(node);
       } else if (parent is AssignmentExpression &&
@@ -2392,12 +2496,7 @@ class PreferNamedBoolParamsRule extends SaropaLintRule {
         return;
       }
       for (final FormalParameter p in node.parameters) {
-        if (p is DefaultFormalParameter) {
-          final param = p.parameter;
-          if (param is! SimpleFormalParameter) continue;
-          if (param.isNamed) continue;
-          if (_isBoolType(param)) reporter.atNode(p);
-        } else if (p is SimpleFormalParameter) {
+        if (p is RegularFormalParameter && p.functionTypedSuffix == null) {
           if (p.isNamed) continue;
           if (_isBoolType(p)) reporter.atNode(p);
         }
@@ -2405,7 +2504,7 @@ class PreferNamedBoolParamsRule extends SaropaLintRule {
     });
   }
 
-  bool _isBoolType(SimpleFormalParameter p) {
+  bool _isBoolType(RegularFormalParameter p) {
     final TypeAnnotation? type = p.type;
     if (type is! NamedType) return false;
     return type.name.lexeme == 'bool' || type.name.lexeme == 'bool?';

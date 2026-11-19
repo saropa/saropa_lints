@@ -110,7 +110,9 @@ final message = 'Message';
 // BAD: Should trigger avoid_adjacent_strings
 // expect_lint: avoid_adjacent_strings
 void _bad148() {
-  final message = 'Hello' 'World';
+  final message =
+      'Hello'
+      'World';
 }
 
 // GOOD: Should NOT trigger avoid_adjacent_strings

@@ -17,11 +17,7 @@ class BadUserProfile {
   final String email;
 
   // expect_lint: constructor_parameters_and_fields_should_have_the_same_order
-  BadUserProfile({
-    required this.email,
-    required this.age,
-    required this.name,
-  });
+  BadUserProfile({required this.email, required this.age, required this.name});
 }
 
 /// GOOD — constructor parameters match field declaration order exactly.
@@ -30,11 +26,7 @@ class GoodUserProfile {
   final int age;
   final String email;
 
-  GoodUserProfile({
-    required this.name,
-    required this.age,
-    required this.email,
-  });
+  GoodUserProfile({required this.name, required this.age, required this.email});
 }
 
 /// BAD — positional constructor whose forwarding order is reversed relative
@@ -56,8 +48,7 @@ class GoodPartialForwarding {
   final int age;
   final String email;
 
-  GoodPartialForwarding({required this.name, required this.email})
-    : age = 0;
+  GoodPartialForwarding({required this.name, required this.email}) : age = 0;
 }
 
 /// BAD — one of two constructors on the same class has drifted order; each

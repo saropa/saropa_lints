@@ -188,11 +188,11 @@ class _PreferSharePlusInstanceFix extends ReplaceNodeFix {
     if (node is! MethodInvocation) return node.toSource();
 
     final String methodName = node.methodName.name;
-    final NodeList<Expression> args = node.argumentList.arguments;
+    final NodeList<Argument> args = node.argumentList.arguments;
 
     // Suppress the fix when any argument uses a spread or await expression —
     // changing the call shape could alter evaluation order.
-    for (final Expression arg in args) {
+    for (final Argument arg in args) {
       final String src = arg.toSource();
       if (arg is SpreadElement) return node.toSource();
       // Detect await by source text since AwaitExpression is not directly
@@ -207,10 +207,10 @@ class _PreferSharePlusInstanceFix extends ReplaceNodeFix {
       // Share.share(text, subject: s, sharePositionOrigin: r, ...)
       // First positional arg → ShareParams(text: <arg>)
       bool first = true;
-      for (final Expression arg in args) {
+      for (final Argument arg in args) {
         if (!first) params.write(', ');
         first = false;
-        if (arg is NamedExpression) {
+        if (arg is NamedArgument) {
           // Named args (subject, sharePositionOrigin, etc.) pass through.
           params.write(arg.toSource());
         } else {
@@ -222,10 +222,10 @@ class _PreferSharePlusInstanceFix extends ReplaceNodeFix {
       // Share.shareUri(uri) → ShareParams(uri: uri)
       // All other named args pass through.
       bool first = true;
-      for (final Expression arg in args) {
+      for (final Argument arg in args) {
         if (!first) params.write(', ');
         first = false;
-        if (arg is NamedExpression) {
+        if (arg is NamedArgument) {
           params.write(arg.toSource());
         } else {
           params.write('uri: ${arg.toSource()}');
@@ -234,10 +234,10 @@ class _PreferSharePlusInstanceFix extends ReplaceNodeFix {
     } else {
       // shareXFiles / shareFiles: first positional → files, rest named.
       bool first = true;
-      for (final Expression arg in args) {
+      for (final Argument arg in args) {
         if (!first) params.write(', ');
         first = false;
-        if (arg is NamedExpression) {
+        if (arg is NamedArgument) {
           params.write(arg.toSource());
         } else {
           params.write('files: ${arg.toSource()}');
@@ -320,8 +320,7 @@ class SharePlusMissingPositionOriginRule extends SaropaLintRule {
       // Check for sharePositionOrigin named argument.
       final bool hasOrigin = node.argumentList.arguments.any(
         (arg) =>
-            arg is NamedExpression &&
-            arg.name.label.name == 'sharePositionOrigin',
+            arg is NamedArgument && arg.name.lexeme == 'sharePositionOrigin',
       );
 
       if (!hasOrigin) {
@@ -512,7 +511,7 @@ class SharePlusEmptyShareParamsRule extends SaropaLintRule {
       final String ctorName = node.constructorName.type.name.lexeme;
       if (ctorName != 'ShareParams') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
 
       // Evaluate the three content fields independently.
       // A field is "statically empty" when it is absent, a NullLiteral, an
@@ -535,15 +534,15 @@ class SharePlusEmptyShareParamsRule extends SaropaLintRule {
   /// empty expression — a variable, method call, conditional, or non-empty
   /// literal — because the runtime value is unknown.
   static bool _fieldIsStaticallyEmpty(
-    NodeList<Expression> args,
+    NodeList<Argument> args,
     String fieldName,
   ) {
     // Find the named argument by label.
-    for (final Expression arg in args) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name != fieldName) continue;
+    for (final Argument arg in args) {
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme != fieldName) continue;
 
-      final Expression value = arg.expression;
+      final Expression value = arg.argumentExpression;
 
       // Explicit null literal → empty.
       if (value is NullLiteral) return true;
@@ -645,7 +644,7 @@ class SharePlusUriAndTextConflictRule extends SaropaLintRule {
       final String ctorName = node.constructorName.type.name.lexeme;
       if (ctorName != 'ShareParams') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
 
       final bool uriProvided = _fieldIsProvablyNonNull(args, 'uri');
       final bool textProvided = _fieldIsProvablyNonNull(args, 'text');
@@ -662,14 +661,14 @@ class SharePlusUriAndTextConflictRule extends SaropaLintRule {
   ///
   /// Returns false for absent, NullLiteral, and nullable-typed expressions.
   static bool _fieldIsProvablyNonNull(
-    NodeList<Expression> args,
+    NodeList<Argument> args,
     String fieldName,
   ) {
-    for (final Expression arg in args) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name != fieldName) continue;
+    for (final Argument arg in args) {
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme != fieldName) continue;
 
-      final Expression value = arg.expression;
+      final Expression value = arg.argumentExpression;
 
       // Explicit null → not non-null.
       if (value is NullLiteral) return false;

@@ -115,10 +115,7 @@ dynamic value;
 Widget _bad707_build(context) {
   final notifier = MyChangeNotifier(); // New instance every build!
   void _topLevel116() {
-    return ChangeNotifierProvider.value(
-      value: notifier,
-      child: child,
-    );
+    return ChangeNotifierProvider.value(value: notifier, child: child);
   }
 }
 

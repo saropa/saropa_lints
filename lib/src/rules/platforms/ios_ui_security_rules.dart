@@ -594,12 +594,12 @@ class RequireHttpsForIosRule extends SaropaLintRule {
         return;
       }
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) {
         return;
       }
 
-      final Expression urlArg = args.first;
+      final Argument urlArg = args.first;
       if (urlArg is! StringLiteral) {
         return;
       }
@@ -890,10 +890,10 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
         if (target != null &&
             _secureStorageTargets.contains(extractTargetName(target))) {
           bool hasIOSOptions = false;
-          for (final Expression arg in node.argumentList.arguments) {
-            if (arg is NamedExpression) {
-              if (arg.name.label.name == 'iOptions' ||
-                  arg.name.label.name == 'aOptions') {
+          for (final Argument arg in node.argumentList.arguments) {
+            if (arg is NamedArgument) {
+              if (arg.name.lexeme == 'iOptions' ||
+                  arg.name.lexeme == 'aOptions') {
                 hasIOSOptions = true;
                 break;
               }

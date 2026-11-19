@@ -304,6 +304,30 @@ NSCameraUsageDescription
     );
   });
 
+  group('InfoPlistChecker relative paths', () {
+    test('resolves project root from a relative file path', () {
+      final tempDir = Directory.systemTemp.createTempSync('info_plist_rel_');
+      final original = Directory.current;
+      try {
+        File('${tempDir.path}/pubspec.yaml').writeAsStringSync('name: a\n');
+        Directory('${tempDir.path}/ios/Runner').createSync(recursive: true);
+        Directory('${tempDir.path}/lib').createSync();
+        File('${tempDir.path}/ios/Runner/Info.plist').writeAsStringSync(
+          '<dict><key>NSFaceIDUsageDescription</key><string>x</string></dict>',
+        );
+        InfoPlistChecker.clearCache();
+        Directory.current = tempDir.path;
+        final checker = InfoPlistChecker.forFile('lib/a.dart');
+        expect(checker, isNotNull);
+        expect(checker!.hasKey('NSFaceIDUsageDescription'), isTrue);
+      } finally {
+        Directory.current = original;
+        InfoPlistChecker.clearCache();
+        safeDeleteDir(tempDir);
+      }
+    });
+  });
+
   group('IosPermissionMapping', () {
     test('getRequiredKeys returns correct keys for SpeechToText', () {
       final keys = IosPermissionMapping.getRequiredKeys('SpeechToText');

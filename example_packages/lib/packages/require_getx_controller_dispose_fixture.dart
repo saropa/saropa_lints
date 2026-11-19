@@ -118,7 +118,7 @@ class _bad644_MyController extends GetxController {
     sub = stream.listen((_) {});
     super.onInit();
   }
-// Missing onClose! Memory leak.
+  // Missing onClose! Memory leak.
 }
 
 // GOOD: Should NOT trigger require_getx_controller_dispose

@@ -114,8 +114,7 @@ class _bad226_Parent {
 
 class Child extends Parent {
   @override
-  bool operator ==(Object other) =>
-      other is Child; // Doesn't call super or check Parent equality
+  bool operator ==(Object other) => other is Child; // Doesn't call super or check Parent equality
 }
 
 // GOOD: Should NOT trigger prefer_overriding_parent_equality
@@ -127,6 +126,5 @@ class _GoodClass226_Parent {
 class _GoodClass226_Child extends _GoodClass226_Parent {
   @override
   bool operator ==(Object other) =>
-      other is _GoodClass226_Child &&
-      super == other; // Chains to parent equality
+      other is _GoodClass226_Child && super == other; // Chains to parent equality
 }

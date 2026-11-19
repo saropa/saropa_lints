@@ -122,9 +122,6 @@ void _bad1318() {
 void _good1318() {
   SizedBox(
     width: 100,
-    child: FittedBox(
-      fit: BoxFit.contain,
-      child: Image.asset('wide_image.png'),
-    ),
+    child: FittedBox(fit: BoxFit.contain, child: Image.asset('wide_image.png')),
   );
 }

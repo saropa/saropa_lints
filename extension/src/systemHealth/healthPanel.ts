@@ -1,11 +1,24 @@
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
 import { queryDartProcesses, buildSnapshot, killProcess } from './processQuery';
+import { isSystemHealthPlatformSupported } from './processMonitor';
 import { buildHealthPanelHtml } from './healthPanel-html';
 import type { HealthPanelData } from './healthPanel-html';
 import { scanOrphanedHosts, type OrphanHostScan } from './orphanHosts';
 import { CHECK_ORPHANS_COMMAND } from './orphanPreflight';
 import type { EngineStatus, EngineStatusDeps } from './engineCardsHtml';
+import type { CiPublishPlan } from './ciPublish';
+import type { CompatCardState } from '../compat/compatCardHtml';
+import { getProjectRoot } from '../projectRoot';
+import {
+  applyCompatWithUi,
+  computeCompat,
+  describeOutcome,
+  loadCompatState,
+  previewCompat,
+} from '../compat/compatController';
+import { sameRecommendation } from '../compat/recommend';
+import { createLatestRequest } from '../compat/latestRequest';
 
 /** Maximum number of engine-log entries retained in the scrollback buffer. */
 const MAX_LOG_ENTRIES = 100;
@@ -18,10 +31,16 @@ const MAX_LOG_ENTRIES = 100;
 type HealthPanelMessage =
   | { type: 'refresh' }
   | { type: 'killProcess'; pid: number }
-  | { type: 'toggle'; engine: 'analyzer' | 'scanDaemon' | 'lspServer'; enabled: boolean }
+  | { type: 'toggle'; engine: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci'; enabled: boolean }
   | { type: 'killAll' }
   | { type: 'restartAll' }
-  | { type: 'reclaimOrphans' };
+  | { type: 'reclaimOrphans' }
+  | { type: 'ciCopyCommands'; commands: string }
+  | { type: 'ciPublish' }
+  | { type: 'ciPublishDismiss' }
+  | { type: 'compatPreview' }
+  | { type: 'compatApply' }
+  | { type: 'compatRefresh' };
 
 // Singleton webview panel: only one System Health view makes sense at a
 // time, so re-invoking the command reveals + refreshes the existing panel
@@ -37,10 +56,11 @@ export class HealthPanel implements vscode.Disposable {
   private static engineDeps: EngineStatusDeps | undefined;
   private static readonly logEntries: string[] = [];
   private static readonly _onToggle = new vscode.EventEmitter<{
-    engine: 'analyzer' | 'scanDaemon' | 'lspServer';
+    engine: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci';
     enabled: boolean;
   }>();
   private static readonly _onKillAll = new vscode.EventEmitter<void>();
+  private static readonly _onCiPublish = new vscode.EventEmitter<CiPublishPlan>();
   private static readonly _onRestartAll = new vscode.EventEmitter<void>();
 
   /** Subscribe to engine toggle requests from the panel UI. */
@@ -49,6 +69,102 @@ export class HealthPanel implements vscode.Disposable {
   static readonly onKillAll = HealthPanel._onKillAll.event;
   /** Subscribe to restart-all requests from the panel UI. */
   static readonly onRestartAll = HealthPanel._onRestartAll.event;
+  /**
+   * Subscribe to the user accepting the publish step. Carries the plan that
+   * was on screen when they pressed the button, so the host commits the
+   * change they were actually shown rather than re-deriving one that may have
+   * picked a different branch name in the meantime.
+   */
+  static readonly onCiPublish = HealthPanel._onCiPublish.event;
+
+  /**
+   * The CI change waiting to be published, if any.
+   *
+   * Static, like the engine deps: the toggle can be flipped from the sidebar
+   * while the panel is closed, and the pending change must still be there when
+   * it opens. Cleared by dismissing it, by publishing it, or by toggling in
+   * the opposite direction (which supersedes it).
+   */
+  private static pendingCiPublish: CiPublishPlan | undefined;
+
+  /**
+   * Record (or clear, with undefined) the pending CI change and redraw.
+   *
+   * Never performs git itself — see `ciPublish.ts` for why the separation
+   * matters.
+   */
+  static setPendingCiPublish(plan: CiPublishPlan | undefined): void {
+    HealthPanel.pendingCiPublish = plan;
+    void HealthPanel.instance?.refresh();
+  }
+
+  /**
+   * Version-compatibility card. Undefined until the user opens it (command or
+   * a failed upgrade probe): the solver probe runs only then, never on the
+   * frequent panel refreshes.
+   */
+  private static compatState: CompatCardState | undefined;
+  private static compatContext: vscode.ExtensionContext | undefined;
+
+  /** Open the panel and (re)load the compatibility card, running the solver probe. */
+  static async openCompat(context: vscode.ExtensionContext): Promise<void> {
+    HealthPanel.createOrShow(context);
+    await HealthPanel.loadCompat(context);
+  }
+
+  /** Newest loadCompat call; older results are discarded. */
+  private static readonly compatRequest = createLatestRequest();
+  /** True while an Apply runs; survives card reloads so Apply cannot run twice. */
+  private static compatApplying = false;
+
+  private static async loadCompat(
+    context: vscode.ExtensionContext,
+    error?: string,
+  ): Promise<void> {
+    HealthPanel.compatContext = context;
+    const id = HealthPanel.compatRequest.begin();
+    const busy = HealthPanel.compatApplying;
+    const root = getProjectRoot();
+    if (!root) {
+      HealthPanel.compatState = { error: l10n('notify.setup.noWorkspaceFolder') };
+      void HealthPanel.instance?.refresh();
+      return;
+    }
+    HealthPanel.compatState = { loading: true, busy };
+    void HealthPanel.instance?.refresh();
+    const state = await loadCompatState(context, root);
+    if (!HealthPanel.compatRequest.isCurrent(id)) return;
+    HealthPanel.compatState = { ...(error ? { ...state, error } : state), busy: HealthPanel.compatApplying };
+    void HealthPanel.instance?.refresh();
+  }
+
+  private async runCompatApply(): Promise<void> {
+    const state = HealthPanel.compatState;
+    const context = HealthPanel.compatContext;
+    const root = getProjectRoot();
+    if (!state?.rec || !context || !root || HealthPanel.compatApplying) return;
+    HealthPanel.compatApplying = true;
+    HealthPanel.compatState = { ...state, busy: true };
+    void this.refresh();
+    let message: string | undefined;
+    try {
+      // The card may be stale: re-derive the recommendation now (the solver
+      // result is cached) and only apply if it matches what the user saw.
+      const fresh = await computeCompat(context, root, true);
+      if (!sameRecommendation(fresh.rec, state.rec)) {
+        message = l10n('compat.card.staleReloaded');
+      } else {
+        const outcome = await applyCompatWithUi(root, fresh.rec);
+        const { text, isError } = describeOutcome(outcome);
+        if (isError) message = text;
+      }
+    } catch (err) {
+      message = l10n('compat.card.loadFailed', { detail: err instanceof Error ? err.message : String(err) });
+    } finally {
+      HealthPanel.compatApplying = false;
+    }
+    await HealthPanel.loadCompat(context, message);
+  }
 
   private readonly panel: vscode.WebviewPanel;
   private readonly disposables: vscode.Disposable[] = [];
@@ -137,16 +253,21 @@ export class HealthPanel implements vscode.Disposable {
    * the two surfaces can never disagree.
    */
   static getEngineStatuses(): EngineStatus[] | undefined {
-    // saropaLints.debug.enabled now gates the Engines section within this
-    // panel (it used to gate the standalone Debug Panel sidebar webview's
-    // existence entirely).
-    const showEngines = vscode.workspace.getConfiguration('saropaLints.debug').get<boolean>('enabled', true);
+    // No longer gated on saropaLints.debug.enabled. These are not debug
+    // internals: they are the controls for whether analysis runs at all, and
+    // one of them is the off switch for the project's CI. A kill switch behind
+    // a setting the user has to know to enable is not a kill switch.
+    //
+    // The only remaining reason to return undefined is that the engine deps
+    // have not been wired yet (early in activate), which is a timing fact
+    // rather than a preference.
     const deps = HealthPanel.engineDeps;
-    if (!showEngines || !deps) return undefined;
+    if (!deps) return undefined;
     return [
       deps.getAnalyzerPluginStatus(),
       deps.getScanDaemonStatus(),
       deps.getLspServerStatus(),
+      deps.getCiStatus(),
     ];
   }
 
@@ -165,6 +286,8 @@ export class HealthPanel implements vscode.Disposable {
       engines: this.collectEngines(),
       logEntries: HealthPanel.logEntries,
       orphanHosts,
+      ciPublish: HealthPanel.pendingCiPublish,
+      compat: HealthPanel.compatState,
     });
   }
 
@@ -179,10 +302,11 @@ export class HealthPanel implements vscode.Disposable {
   }
 
   private async queryData(): Promise<HealthPanelData | null> {
-    // Process enumeration (queryDartProcesses) shells out to a Windows-only
-    // tool; on other platforms there is no data source, so show the empty
-    // state rather than attempting a query that would just fail.
-    if (process.platform !== 'win32') return null;
+    // Process enumeration (queryDartProcesses) shells out to a platform tool
+    // that only exists for the supported platforms below; anywhere else there
+    // is no data source, so show the empty state rather than attempting a
+    // query that would just fail.
+    if (!isSystemHealthPlatformSupported()) return null;
     const processes = await queryDartProcesses();
     if (processes.length === 0) return null;
     const snapshot = await buildSnapshot(processes);
@@ -218,6 +342,37 @@ export class HealthPanel implements vscode.Disposable {
         break;
       case 'restartAll':
         HealthPanel._onRestartAll.fire();
+        break;
+      case 'ciCopyCommands':
+        void vscode.env.clipboard.writeText(msg.commands).then(() => {
+          void vscode.window.showInformationMessage(l10n('debug.ci.publish.copied'));
+        });
+        break;
+      case 'ciPublish': {
+        // Read before firing: the handler clears the pending plan, and an
+        // event carrying undefined would be a silent no-op the user reads as
+        // a dead button.
+        const plan = HealthPanel.pendingCiPublish;
+        if (plan) HealthPanel._onCiPublish.fire(plan);
+        break;
+      }
+      case 'ciPublishDismiss':
+        // The file on disk is deliberately left as it is. Dismissing means
+        // "I will deal with this myself", not "undo the edit" — reverting
+        // someone's working tree from a Not now button would be its own bug.
+        HealthPanel.setPendingCiPublish(undefined);
+        break;
+      case 'compatPreview': {
+        const root = getProjectRoot();
+        const rec = HealthPanel.compatState?.rec;
+        if (root && rec) void previewCompat(root, rec);
+        break;
+      }
+      case 'compatApply':
+        void this.runCompatApply();
+        break;
+      case 'compatRefresh':
+        if (HealthPanel.compatContext) void HealthPanel.loadCompat(HealthPanel.compatContext);
         break;
       case 'reclaimOrphans':
         // Delegated to the command so the confirmation modal and the kill

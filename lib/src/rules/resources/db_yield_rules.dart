@@ -107,15 +107,17 @@ bool _isDbPrefix(String name) {
       (name.length == 2 || name[2] == name[2].toUpperCase());
 }
 
-/// Heuristic: classify a method name by looking for write- or read-like
-/// substrings. Falls back to [_DbOperationType.write] (safer to yield).
+/// Heuristic: classify a method name by its camel-case words. The first word
+/// starting with a write or read keyword decides, so `dbContactLoadDBCount`
+/// is a read (not a write because `loaddb` contains `add`). Falls back to
+/// [_DbOperationType.write] (safer to yield) when no word matches.
 _DbOperationType _classifyByHeuristic(String name) {
-  final lower = name.toLowerCase();
-  for (final kw in _writeKeywords) {
-    if (lower.contains(kw)) return _DbOperationType.write;
-  }
-  for (final kw in _readKeywords) {
-    if (lower.contains(kw)) return _DbOperationType.bulkRead;
+  final words = RegExp(
+    r'[A-Z]?[a-z]+|[A-Z]+(?![a-z])|[0-9]+',
+  ).allMatches(name).map((m) => m.group(0)!.toLowerCase());
+  for (final word in words) {
+    if (_writeKeywords.any(word.startsWith)) return _DbOperationType.write;
+    if (_readKeywords.any(word.startsWith)) return _DbOperationType.bulkRead;
   }
   // Unknown — default to write (safer to yield than not).
   return _DbOperationType.write;
@@ -142,6 +144,9 @@ const List<String> _readKeywords = [
   'count',
   'list',
   'stream',
+  'compute',
+  'calculate',
+  'check',
 ];
 
 // -- Target detection ------------------------------------------------------
@@ -208,11 +213,11 @@ bool _isFutureDelayedZero(MethodInvocation node) {
   final Expression? target = node.target;
   if (target is! PrefixedIdentifier) return false;
   if (target.identifier.name != 'Future') return false;
-  final List<Expression> args = node.argumentList.arguments;
+  final List<Argument> args = node.argumentList.arguments;
   if (args.isEmpty) return false;
   final arg0 = args[0];
-  final Expression durationArg = args.length == 2 && arg0 is NamedExpression
-      ? arg0.expression
+  final Argument durationArg = args.length == 2 && arg0 is NamedArgument
+      ? arg0.argumentExpression
       : arg0;
   if (durationArg is PropertyAccess) {
     return durationArg.propertyName.name == 'zero';
@@ -334,6 +339,8 @@ bool _isFollowedBySafe(List<Statement> stmts, int i) {
 /// - The next statement is `return` (no further UI work in this function).
 /// - The write is inside `compute(...)` or `Isolate.run(...)` (separate isolate).
 /// - The file is in a test directory (`_test.dart`, `test/`, `integration_test/`).
+/// - The enclosing package does not depend on Flutter (no UI thread to
+///   protect, and `DelayUtils.yieldToUI()` is not importable there).
 ///
 /// **Heuristic:** Detection uses method and target name matching; identically
 /// named methods in non-DB code may cause false positives. See file header.
@@ -383,6 +390,14 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     if (context.isInTestDirectory) return;
+    // The entire threat model here is "blocking Flutter's UI thread" (see
+    // file header) and the correction message names `DelayUtils.yieldToUI()`
+    // — a Flutter-app symbol. A pure-Dart package (CLI tool, headless
+    // server) has no UI thread to protect and nothing importable to yield
+    // to, so gate on the enclosing package actually depending on Flutter.
+    // See bugs/require_yield_after_db_write_false_positive_one_shot_file_io_non_flutter_server.md.
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
     _registerYieldCheck(context, reporter, _code, _DbOperationType.write);
   }
 }
@@ -402,6 +417,10 @@ class RequireYieldAfterDbWriteRule extends SaropaLintRule {
 /// **Excluded:** `findFirst` — a single-object read is fast and does not
 /// benefit from a yield. Adding one introduces unnecessary latency and
 /// a stale-data window.
+///
+/// **Also excluded:** packages that do not depend on Flutter — there is no
+/// UI thread to protect there, and `DelayUtils.yieldToUI()` is not
+/// importable.
 ///
 /// ```dart
 /// // INFO (suggestion)
@@ -442,6 +461,11 @@ class SuggestYieldAfterDbReadRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Same Flutter-only threat model as RequireYieldAfterDbWriteRule above —
+    // see the comment there and
+    // bugs/suggest_yield_after_db_read_false_positive_one_shot_file_io_non_flutter_server.md.
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
     _registerYieldCheck(context, reporter, _code, _DbOperationType.bulkRead);
   }
 }
@@ -533,11 +557,29 @@ class AvoidReturnAwaitDbRule extends SaropaLintRule {
         if (expr is! AwaitExpression) return;
         final opType = _classifyDbAwait(expr);
         if (opType != _DbOperationType.write) return;
+        // `await` is required inside a guarded try body so the catch /
+        // finally sees the async error or completion.
+        if (_isInGuardedTryBody(s)) return;
         reporter.atNode(s);
       });
     }
 
     context.addMethodDeclaration((n) => visit(n.body));
     context.addFunctionDeclaration((n) => visit(n.functionExpression.body));
+  }
+
+  static bool _isInGuardedTryBody(ReturnStatement node) {
+    AstNode child = node;
+    AstNode? parent = node.parent;
+    while (parent != null && parent is! FunctionBody) {
+      if (parent is TryStatement &&
+          identical(child, parent.body) &&
+          (parent.catchClauses.isNotEmpty || parent.finallyBlock != null)) {
+        return true;
+      }
+      child = parent;
+      parent = parent.parent;
+    }
+    return false;
   }
 }

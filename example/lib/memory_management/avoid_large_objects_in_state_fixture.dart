@@ -231,7 +231,8 @@ class _good471__LazyInitState extends State<MyWidget> {
 // diagnostic for `a`'s accumulation — per-variable tracking required.
 // expect_lint: avoid_large_objects_in_state
 class _bad472__MultiVarMixedState extends State<MyWidget> {
-  List<String> a = [], b = []; // LINT — `a` accumulates, `b`'s reassignment shouldn't suppress
+  List<String> a = [],
+      b = []; // LINT — `a` accumulates, `b`'s reassignment shouldn't suppress
 
   void grow() {
     a.add('item'); // accumulation on `a`

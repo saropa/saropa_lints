@@ -127,12 +127,7 @@ void _good407() {
   Scaffold(
     resizeToAvoidBottomInset: true,
     body: SingleChildScrollView(
-      child: Column(
-        children: [
-          Spacer(),
-          TextField(),
-        ],
-      ),
+      child: Column(children: [Spacer(), TextField()]),
     ),
   );
 }

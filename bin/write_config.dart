@@ -1,4 +1,5 @@
 #!/usr/bin/env dart
+
 /// Module overview (comment coverage pass).
 /// comment-coverage: module overview (batch).
 ///
@@ -68,13 +69,15 @@ void main(List<String> args) {
       ? Directory(targetDir).absolute.path
       : Directory.current.path;
 
-  final result = runWriteConfig(WriteConfigOptions(
-    targetDir: dir,
-    tier: tier,
-    stylisticAll: stylisticAll,
-    reset: reset,
-    outputPath: outputPath,
-  ));
+  final result = runWriteConfig(
+    WriteConfigOptions(
+      targetDir: dir,
+      tier: tier,
+      stylisticAll: stylisticAll,
+      reset: reset,
+      outputPath: outputPath,
+    ),
+  );
 
   if (!result.ok) {
     // Default nullable error to a descriptive placeholder (avoid_nullable_interpolation).
@@ -84,13 +87,21 @@ void main(List<String> args) {
 }
 
 void _printUsage() {
-  stdout.writeln('Usage: dart run saropa_lints:write_config --tier <tier> [options]');
+  stdout.writeln(
+    'Usage: dart run saropa_lints:write_config --tier <tier> [options]',
+  );
   stdout.writeln('');
   stdout.writeln('Options:');
-  stdout.writeln('  --tier, -t <name>   Tier: essential, recommended, professional, comprehensive, pedantic');
+  stdout.writeln(
+    '  --tier, -t <name>   Tier: essential, recommended, professional, comprehensive, pedantic',
+  );
   stdout.writeln('  --target <path>    Project directory (default: current)');
   stdout.writeln('  --stylistic-all    Enable all stylistic rules');
-  stdout.writeln('  --reset            Do not preserve user customizations from existing analysis_options.yaml');
-  stdout.writeln('  --output, -o <file> Output path (default: analysis_options.yaml)');
+  stdout.writeln(
+    '  --reset            Do not preserve user customizations from existing analysis_options.yaml',
+  );
+  stdout.writeln(
+    '  --output, -o <file> Output path (default: analysis_options.yaml)',
+  );
   stdout.writeln('  --help, -h          Show this help');
 }

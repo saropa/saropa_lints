@@ -62,6 +62,7 @@ from scripts.modules._duplicated_messages import (
     print_duplicated_messages_report,
 )
 from scripts.modules._utils import (
+    safe_run,
     Color,
     get_project_dir,
     get_shell_mode,
@@ -415,7 +416,7 @@ def run_stub_guard_check(project_dir: Path) -> _Check:
             ["Cannot verify the test suite is free of always-pass stubs."],
         )
     try:
-        result = subprocess.run(
+        result = safe_run(
             ["dart", "test", _STUB_GUARD_TEST],
             cwd=project_dir,
             capture_output=True,

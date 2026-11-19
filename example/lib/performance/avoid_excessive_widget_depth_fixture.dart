@@ -116,13 +116,7 @@ void _bad783() {
       child: Column(
         children: [
           Row(
-            children: [
-              Expanded(
-                child: Container(
-                  child: Text('Too deep!'),
-                ),
-              ),
-            ],
+            children: [Expanded(child: Container(child: Text('Too deep!')))],
           ),
         ],
       ),

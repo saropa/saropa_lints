@@ -14,6 +14,7 @@
   "command.runAnalysis.title": "Saropa Lints: Run Analysis",
   "command.verifyPlugin.title": "Saropa Lints: Verify Plugin Is Running (liveness check)",
   "command.initializeConfig.title": "Saropa Lints: Initialize / Update Analysis Options",
+  "command.migrateRuleNames.title": "Saropa Lints: Migrate Renamed Rules",
   "command.migrateConfig.title": "Saropa Lints: Migrate Config Keys (fix unsupported_option warnings)",
   "command.createBaseline.title": "Saropa Lints: Create Baseline (suppress existing violations)",
   "command.checkForUpdatesNow.title": "Saropa Lints: Check for Package Updates Now",
@@ -224,6 +225,8 @@
   "config.property.todosAndHacks.groupByTag.description": "Group tree by tag (TODO, FIXME, …) then by file; when off, group by folder then file.",
   "config.property.todosAndHacks.customRegex.description": "Optional regex override for matching comment markers. Line-based; use capture group 1 for tag and optional group 2 for snippet. Empty = use default (//, #, <!-- + tags). Invalid regex falls back to default.",
   "config.section.Doc.Placement.title": "Doc Placement",
+  "config.section.Analyzer.Exclusions.title": "Analyzer Exclusions",
+  "config.property.analyzerExclusions.enabled.description": "Suggest excluding folders that need no analysis (platform folders, build output, docs, worktrees) from dart.analysisExcludedFolders, and flag exclusions that exist only in analysis_options.yaml. Large analyzed file counts slow quick fixes and raise analysis-server memory.",
   "config.property.docPlacement.enabled.description": "Flag a markdown file that matches the archive glob below but still reads as open work (an open Status/Severity field or an unaddressed action-items heading).",
   "config.property.docPlacement.archiveGlob.description": "Glob pattern for the workspace's closed/archive doc directory. A matching file is checked for open-work signals.",
   "config.property.docPlacement.openIssuesDir.description": "Directory name shown in the diagnostic message as where an open document should be moved instead.",
@@ -338,6 +341,7 @@
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — building digital safeguards since 2010.\n\nDart packages, VS Code extensions, and consumer apps for developers who value reliability.\n\n[Visit saropa.com](https://saropa.com/)",
   "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner",
   "command.killOrphanedDaemons.title": "Saropa Lints: Kill Orphaned Flutter Daemons",
+  "command.configureCompatibility.title": "Saropa Lints: Configure Version Compatibility",
   "command.showProcessHealth.title": "Saropa Lints: Process Health",
   "command.showMachineDashboard.title": "Saropa Lints: Machine Health",
   "command.showWorkspaceReadiness.title": "Saropa Lints: Workspace Readiness",
@@ -356,6 +360,8 @@
   "config.property.systemHealth.systemMemoryWarningPercent.description": "Warn when free physical RAM across the whole machine falls below this percentage.",
   "config.property.systemHealth.devToolBudgetPercent.description": "Target percentage of total system RAM for all dev tools (Dart, Flutter, Ollama). The dashboard warns when dev tools exceed this budget.",
   "config.property.systemHealth.workspaceHazardScan.description": "Scan the workspace on activation for dangerously large files (heap dumps, oversized logs) not excluded from the file watcher. Uncovered files can exhaust memory and crash VS Code.",
+  "config.property.watcherExclude.maxFileKb.description": "Size bar in KB. The workspace hazard scan flags any file above it that files.watcherExclude does not cover and offers to exclude it (default 5120 = 5 MB).",
+  "config.property.watcherExclude.maxFolderFiles.description": "Maximum number of files directly inside one folder. The workspace hazard scan flags a folder above it that files.watcherExclude does not cover and offers to exclude it (default 1000).",
   "config.property.systemHealth.extensionHostWarningGB.description": "Warn when the VS Code extension host process RSS exceeds this value (GB). The extension host running saropa_lints was invisible to the Dart process monitor and can exhaust memory independently.",
   "command.toggleDebugPanel.title": "Saropa Lints: Show Health Panel (Engines + Processes)",
   "command.lspServer.start.title": "Saropa Lints: Start LSP Server",
@@ -366,5 +372,8 @@
   "config.property.lspServer.enabled.description": "Run the standalone Saropa Lints LSP server for diagnostics. When enabled, spawns a separate Dart process that delivers squiggles and quick fixes via the Language Server Protocol. Automatically disables the analyzer plugin to save ~10GB of RAM. Turning this off re-enables the analyzer plugin.",
   "config.property.lspServer.workspaceScan.description": "Scan the entire workspace on startup so diagnostics appear project-wide in the Problems panel, not just for files you open. Disable this for very large projects where the initial scan takes too long.",
   "config.property.lspServer.workspaceScanDelay.description": "Seconds to wait after the analyzer is ready before starting the workspace scan. Lets VS Code finish its startup burst first so the scan does not compete with initial file analysis. Set to 0 for no delay.",
-  "config.property.lspServer.scanDirectories.description": "Directories to scan on startup (relative to the project root). Only used when Workspace Scan is enabled. Adjust this to match your project structure — e.g. add 'src' or remove 'test' if test files are not relevant."
+  "config.property.lspServer.scanDirectories.description": "Directories to scan on startup (relative to the project root). Only used when Workspace Scan is enabled. Adjust this to match your project structure — e.g. add 'src' or remove 'test' if test files are not relevant.",
+  "command.toggleLints.title": "Saropa Lints: Turn On / Off",
+  "command.syncPluginVersion.title": "Saropa Lints: Sync Plugin Version to pubspec.lock",
+  "command.showStatusBarMenu.title": "Saropa Lints: Status Menu"
 }

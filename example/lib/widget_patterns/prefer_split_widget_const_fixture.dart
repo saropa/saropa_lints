@@ -111,13 +111,7 @@ dynamic widget;
 // BAD: Should trigger prefer_split_widget_const
 // expect_lint: prefer_split_widget_const
 void _bad1385() {
-  Column(
-    children: [
-      Text('Title'),
-      Text('Subtitle'),
-      Icon(Icons.star),
-    ],
-  );
+  Column(children: [Text('Title'), Text('Subtitle'), Icon(Icons.star)]);
 }
 
 // GOOD: Should NOT trigger prefer_split_widget_const

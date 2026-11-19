@@ -38,7 +38,8 @@ class ReplaceMisusedTestMatcherFix extends SaropaFixProducer {
     if (invocation.methodName.name != 'expect') return;
 
     final positionalArgs = invocation.argumentList.arguments
-        .where((e) => e is! NamedExpression)
+        .where((e) => e is! NamedArgument)
+        .map((e) => e.argumentExpression)
         .toList();
     if (positionalArgs.length < 2) return;
 

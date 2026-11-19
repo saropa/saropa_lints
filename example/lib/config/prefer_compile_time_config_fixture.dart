@@ -7,6 +7,9 @@
 const apiHost = 'https://api.example.com'; // from runtime env only
 
 // GOOD: Compile-time configuration
-const apiHost = String.fromEnvironment('API_HOST', defaultValue: 'https://api.example.com');
+const apiHost = String.fromEnvironment(
+  'API_HOST',
+  defaultValue: 'https://api.example.com',
+);
 
 void main() {}

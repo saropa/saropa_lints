@@ -123,6 +123,241 @@ class Ui {
         expect(codes, isNot(contains('prefer_utc_for_storage')));
       },
     );
+
+    // THE BUG (already_utc_via_upstream_construction), reproducer from the
+    // bug report: a `final` field promoted via `this.field` whose only
+    // visible construction site always passes a UTC value. The receiver's
+    // own source (`at`) never mentions `.toUtc()`/`.utc`.
+    //
+    // NOT suppressed (unlike the local-variable case below): an earlier
+    // version of this rule tried to resolve a field back to its
+    // construction site(s) the same way, but that requires whole-program
+    // (not just whole-file) analysis to be sound — a field can be set via
+    // a redirecting factory constructor, a subclass constructor forwarding
+    // through `super(...)`, a mixin-application class alias, a tear-off, or
+    // (for any non-private class, including the report's own reproducer) a
+    // construction site in another file/part this scan can never see. That
+    // approximation was found to still miss several of those paths and was
+    // removed rather than patched further, so field access is always
+    // flagged — this rule is only PARTIALLY fixed relative to the report.
+    test('still fires (NOT fixed) on a constructor-promoted field whose '
+        'only visible construction site is already UTC', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class HostStatement {
+  const HostStatement({required this.at});
+
+  final DateTime at;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'at': at.toIso8601String(),
+  };
+}
+
+HostStatement makeEntry() => HostStatement(at: DateTime.now().toUtc());
+''');
+      expect(codes, contains('prefer_utc_for_storage'));
+    });
+
+    // Local-variable counterpart of the fix that IS sound: a `final` local
+    // whose initializer is UTC, referenced later by a bare identifier with
+    // no `.toUtc()`/`.utc` in its own source. Unlike a field, a local
+    // variable's only possible assignment is its own declaration
+    // (`final` forbids reassignment), so a single-hop, same-file lookup of
+    // its initializer is sufficient to be sound.
+    test('does NOT fire on a final local variable whose initializer is '
+        'already UTC', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db) {
+  final utcNow = DateTime.now().toUtc();
+  db.insert({'timestamp': utcNow.toIso8601String()});
+}
+''');
+      expect(codes, isNot(contains('prefer_utc_for_storage')));
+    });
+
+    // Closure-captured counterpart: the `final` local is declared in the
+    // outer function but read inside a nested closure. The identifier's
+    // nearest enclosing FunctionBody is the closure's own body, which does
+    // NOT contain the declaration -- resolution must search the whole
+    // compilation unit (not just the nearest FunctionBody) to still find
+    // it and correctly suppress.
+    test('does NOT fire on a final local variable read inside a nested '
+        'closure', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db) {
+  final utcNow = DateTime.now().toUtc();
+  void inner() {
+    db.insert({'timestamp': utcNow.toIso8601String()});
+  }
+  inner();
+}
+''');
+      expect(codes, isNot(contains('prefer_utc_for_storage')));
+    });
+
+    // Real positive: the local variable's initializer converts to UTC and
+    // then back to local time -> the OUTERMOST expression is `.toLocal()`,
+    // not `.toUtc()`, so the value is not UTC. Structural (not substring)
+    // matching is required: a text search for `.toUtc(` would wrongly
+    // treat this as UTC.
+    test('still fires on a final local variable whose initializer is '
+        '.toUtc().toLocal()', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db) {
+  final localNow = DateTime.now().toUtc().toLocal();
+  db.insert({'timestamp': localNow.toIso8601String()});
+}
+''');
+      expect(codes, contains('prefer_utc_for_storage'));
+    });
+
+    // Real positive: same structural fix applied to the RECEIVER check
+    // itself (not just the upstream-resolution hop) -- a chained
+    // `.toUtc().toLocal().toIso8601String()` call inside a storage context
+    // must still fire, because the outermost form before
+    // `.toIso8601String()` is `.toLocal()`, not `.toUtc()`.
+    test(
+      'still fires when the receiver itself is .toUtc().toLocal()',
+      () async {
+        final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db, DateTime created) {
+  db.insert({
+    'timestamp': created.toUtc().toLocal().toIso8601String(),
+  });
+}
+''');
+        expect(codes, contains('prefer_utc_for_storage'));
+      },
+    );
+
+    // THE BUG (UTC-preserving arithmetic): `.add(Duration)`/
+    // `.subtract(Duration)` don't change a DateTime's UTC-ness, so a
+    // `.toUtc()` (or `DateTime.utc(...)`) further back in the chain still
+    // makes the whole expression UTC. Requiring the OUTERMOST form to be a
+    // bare `.toUtc()` call broke this: `.add(...)` became the outermost
+    // call, so these were wrongly flagged again even though the receiver
+    // is genuinely UTC.
+    test('does NOT fire when .toUtc() is followed by .add(Duration)', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db) {
+  db.insert({
+    't': DateTime.now().toUtc().add(const Duration(days: 1)).toIso8601String(),
+  });
+}
+''');
+      expect(codes, isNot(contains('prefer_utc_for_storage')));
+    });
+
+    test(
+      'does NOT fire when DateTime.utc(...) is followed by .subtract(Duration)',
+      () async {
+        final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db) {
+  db.insert({
+    't': DateTime.utc(2020).subtract(const Duration(days: 1)).toIso8601String(),
+  });
+}
+''');
+        expect(codes, isNot(contains('prefer_utc_for_storage')));
+      },
+    );
+
+    // Real positive: arithmetic recursion must stop at the first
+    // non-add/subtract call. `.toUtc().add(...).toLocal()`'s OUTERMOST
+    // form is `.toLocal()`, which is neither UTC nor UTC-preserving
+    // arithmetic, so it must still fire.
+    test(
+      'still fires when .toUtc().add(...) is followed by .toLocal()',
+      () async {
+        final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db) {
+  db.insert({
+    't': DateTime.now().toUtc().add(const Duration(days: 1)).toLocal().toIso8601String(),
+  });
+}
+''');
+        expect(codes, contains('prefer_utc_for_storage'));
+      },
+    );
+
+    // Real positive: `copyWith` is NOT UTC-preserving (it can flip the
+    // offset via an `isUtc:` argument), so arithmetic recursion must NOT
+    // extend to it -- even though the receiver chain contains `.toUtc()`.
+    test('still fires when .toUtc() is followed by .copyWith(...)', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db) {
+  db.insert({
+    't': DateTime.now().toUtc().copyWith(year: 2025).toIso8601String(),
+  });
+}
+''');
+      expect(codes, contains('prefer_utc_for_storage'));
+    });
+
+    // Real positive: a look-alike user type whose name merely starts with
+    // "DateTime" (`DateTimeBag`) must NOT be treated as UTC just because it
+    // has same-named `.utc()`/`.add()` members. The "is this UTC" check
+    // must resolve the real `dart:core.DateTime` element/library, not just
+    // prefix-match the type's display string.
+    test(
+      'still fires on a look-alike DateTimeBag type with .utc()/.add()',
+      () async {
+        final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class DateTimeBag {
+  DateTimeBag.utc(this.year);
+
+  final int year;
+
+  DateTimeBag add(Object duration) => this;
+
+  String toIso8601String() => '\$year';
+}
+
+class Db {
+  void insert(Object value) {}
+}
+
+void persist(Db db) {
+  db.insert({
+    't': DateTimeBag.utc(2020).add('x').toIso8601String(),
+  });
+}
+''');
+        expect(codes, contains('prefer_utc_for_storage'));
+      },
+    );
   });
 
   group('require_stream_error_handling', () {

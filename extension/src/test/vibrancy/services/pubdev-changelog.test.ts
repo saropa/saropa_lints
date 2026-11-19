@@ -10,7 +10,7 @@ import {
 
 /** pub.dev changelog HTML parse and fetch (fixtures + stubbed network). */
 
-const fixturesDir = path.join(__dirname, '..', '..', '..', 'src', 'test', 'fixtures');
+const fixturesDir = path.join(__dirname, '..', '..', '..', '..', 'src', 'test', 'fixtures');
 
 describe('pubdev-changelog', () => {
     describe('parseChangelogHtml', () => {

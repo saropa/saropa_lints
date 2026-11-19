@@ -113,10 +113,5 @@ void _bad1428() {
 
 // GOOD: Should NOT trigger avoid_large_images_in_memory
 void _good1428() {
-  Image.asset(
-    'large_photo.png',
-    width: 300,
-    height: 200,
-    cacheWidth: 300,
-  );
+  Image.asset('large_photo.png', width: 300, height: 200, cacheWidth: 300);
 }

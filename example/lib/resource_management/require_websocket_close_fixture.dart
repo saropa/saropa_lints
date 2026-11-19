@@ -114,7 +114,7 @@ class _bad969__ChatState extends State<Chat> {
     super.initState();
     _socket = WebSocket.connect('wss://example.com');
   }
-// Missing dispose
+  // Missing dispose
 }
 
 // GOOD: Should NOT trigger require_websocket_close

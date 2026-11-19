@@ -21,9 +21,11 @@ function matchGlob(filePath: string, pattern: string): boolean {
   // `**/` is replaced first to avoid the `*` pass eating the leading `*`.
   const re = pattern
     .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\*\*\//g, '(.*/)?')
-    .replace(/\*\*/g, '.*')
-    .replace(/\*/g, '[^/]*');
+    .replace(/\*\*\//g, '\x01')
+    .replace(/\*\*/g, '\0')
+    .replace(/\*/g, '[^/]*')
+    .replace(/\0/g, '.*')
+    .replace(/\x01/g, '(.*/)?');
   return new RegExp(`^${re}$`).test(filePath);
 }
 

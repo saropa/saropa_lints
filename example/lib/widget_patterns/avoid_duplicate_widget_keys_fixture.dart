@@ -119,8 +119,5 @@ void _bad1387() {
 
 // GOOD: Should NOT trigger avoid_duplicate_widget_keys
 void _good1387() {
-  [
-    Container(key: Key('item1')),
-    Container(key: Key('item2')),
-  ];
+  [Container(key: Key('item1')), Container(key: Key('item2'))];
 }

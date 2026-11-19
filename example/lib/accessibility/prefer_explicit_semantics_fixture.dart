@@ -116,10 +116,9 @@ class _bad15_StarRating extends StatelessWidget {
   Widget build(context) {
     return Row(
       children: List.generate(
-          5,
-          (i) => Icon(
-                i < rating ? Icons.star : Icons.star_border,
-              )),
+        5,
+        (i) => Icon(i < rating ? Icons.star : Icons.star_border),
+      ),
     ); // Screen reader sees nothing useful
   }
 }
@@ -131,10 +130,9 @@ class _good15_StarRating extends StatelessWidget {
       label: '$rating out of 5 stars',
       child: Row(
         children: List.generate(
-            5,
-            (i) => Icon(
-                  i < rating ? Icons.star : Icons.star_border,
-                )),
+          5,
+          (i) => Icon(i < rating ? Icons.star : Icons.star_border),
+        ),
       ),
     );
   }

@@ -213,8 +213,8 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
       }
 
       // Check the test body for problematic schemes
-      final NodeList<Expression> args = node.argumentList.arguments;
-      for (final Expression arg in args) {
+      final NodeList<Argument> args = node.argumentList.arguments;
+      for (final Argument arg in args) {
         if (arg is! FunctionExpression) continue;
 
         final String bodySource = arg.body.toSource();
@@ -325,7 +325,7 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
       if (methodName != 'launchUrl' && methodName != 'launch') return;
 
       // Check if this is a scheme that commonly needs fallback
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String argSource = args.first.toSource();
@@ -439,13 +439,13 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
       if (node.methodName.name != 'launchUrl') return;
 
       // Verify first argument is a Uri (url_launcher signature)
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       // Check if mode is specified
       bool hasMode = false;
-      for (final Expression arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'mode') {
+      for (final Argument arg in args) {
+        if (arg is NamedArgument && arg.name.lexeme == 'mode') {
           hasMode = true;
           break;
         }

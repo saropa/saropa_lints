@@ -147,6 +147,12 @@ void main() {
     );
 
     testRule(
+      'PreferMediaQueryWidthHeightOfRule',
+      'prefer_media_query_width_height_of',
+      () => PreferMediaQueryWidthHeightOfRule(),
+    );
+
+    testRule(
       'PreferEnumsByNameRule',
       'prefer_enums_by_name',
       () => PreferEnumsByNameRule(),

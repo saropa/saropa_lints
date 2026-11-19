@@ -1,0 +1,124 @@
+# BUG: `use_setstate_synchronously` — treats an `await` in an `if` block that always returns as an async gap for the code after the `if`
+
+**Status: Open**
+
+Created: 2026-10-29
+Rule: `use_setstate_synchronously`
+File: `lib/src/rules/widget/widget_lifecycle_rules.dart` (class at line 2317)
+Severity: False positive
+Rule version: see diagnostic | Since: unknown | Updated: 17.0.1-beta.2
+
+---
+
+## Summary
+
+The scanner sets `_seenAwait = true` when it visits an `await` inside an `if` block that ends in `return`, and never clears it after that block. The following `setState` is reported although control can only reach it without an await.
+
+---
+
+## Attribution Evidence
+
+```bash
+grep -rn "'use_setstate_synchronously'" lib/src/rules/
+# lib/src/rules/widget/widget_lifecycle_rules.dart:2337:    'use_setstate_synchronously',
+```
+
+**Rule class:** `UseSetStateSynchronouslyRule` (`lib/src/rules/widget/widget_lifecycle_rules.dart:2317`)
+**Diagnostic as seen in Problems panel:** `[use_setstate_synchronously] setState called after async gap without mounted check. ... {v11} (line 136, col 5)` (source: saropa_lints)
+
+---
+
+## Reproducer
+
+Standalone (needs the Flutter SDK). Real code: `lib/components/contact/culture/gap_filler/gap_filler_sheet_body.dart` lines 126-157 (`_GapFillerSheetBodyState._save`), the diagnostic is on line 136 col 5.
+
+```dart
+import 'package:flutter/widgets.dart';
+
+class Sheet extends StatefulWidget {
+  const Sheet({super.key});
+  @override
+  State<Sheet> createState() => _SheetState();
+}
+
+class _SheetState extends State<Sheet> {
+  bool _isBusy = false;
+
+  Future<void> _advance() async {}
+  Future<bool> _write() async => true;
+
+  Future<void> _save({required bool hasPicks}) async {
+    if (!hasPicks) {
+      await _advance(); // the only await so far sits in a branch that exits
+      return;
+    }
+    setState(() => _isBusy = true); // LINT — but no await has run on any path that reaches here
+    final bool ok = await _write();
+    if (!mounted) return;
+    setState(() => _isBusy = !ok);
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox();
+}
+```
+
+**Frequency:** Always for this pattern.
+
+---
+
+## Expected vs Actual
+
+| | Behavior |
+|---|---|
+| **Expected** | No diagnostic: no `await` can precede the `setState` on any reachable path |
+| **Actual** | Diagnostic on `setState` (line 136 col 5) |
+
+---
+
+## AST Context
+
+`ClassDeclaration(_GapFillerSheetBodyState extends State<GapFillerSheetBody>)` > `MethodDeclaration(_save, async)` > `BlockFunctionBody` > `Block` > statements: `IfStatement(!hasPicks)` > `Block` > [`ExpressionStatement(AwaitExpression(_advance()))`, `ReturnStatement`]; then sibling `ExpressionStatement` > `MethodInvocation(setState)` (reported). The only `AwaitExpression` before the reported node is inside the `if` block that ends in `return`.
+
+---
+
+## Root Cause
+
+`widget_lifecycle_rules.dart` `_OrderedSetStateScanner`: `visitAwaitExpression` (line 2450) sets `_seenAwait = true` and clears every guard; `visitBlock` walks statements in source order and never restores `_seenAwait` after a nested block that exits; `visitMethodInvocation` (line 2469) reports `setState` when `_seenAwait && !_isGuarded && !hasAncestorMountedCheck(node)`. Source order is used as a stand-in for execution order.
+
+---
+
+## Why the code is correct
+
+The `await _advance()` is inside an `if` block that always `return`s. Control flow cannot reach line 136 after that await. On every path that reaches the `setState`, no async gap has occurred yet, so `mounted` cannot have changed. The later `if (!mounted) return;` (line 148) guards the later `setState` correctly.
+
+## Affected project locations
+
+- `lib/components/contact/culture/gap_filler/gap_filler_sheet_body.dart:136` (reported by four rules: `use_setstate_synchronously`, `check_mounted_after_async`, `require_mounted_check`, `require_mounted_check_after_await`)
+
+---
+
+## Suggested Fix
+
+Make the "seen await" state flow-sensitive: restore the pre-branch value after a branch that always exits (`return`, `throw`, `break`, `continue`).
+
+---
+
+## Fixture Gap
+
+- GOOD: `if (x) { await a(); return; } setState(...);`
+- GOOD: `if (x) { await a(); throw StateError('x'); } setState(...);`
+- BAD: `if (x) { await a(); } setState(...);` (branch falls through)
+- BAD: `await a(); setState(...);`
+
+---
+
+## Environment
+
+- saropa_lints version: 17.0.1-beta.2 (installed, hosted); rule logic cross-checked against the repo source (17.0.1-beta.3)
+- Dart SDK: Dart SDK version: 3.13.7 (stable) (Thu Oct 22 14:28:57 2026 -0700) on "macos_arm64"
+- Triggering project: Saropa contacts app (`/Users/craighathaway/Documents/src/contacts`)
+
+## Status 2026-10-29
+
+Fixed in 17.0.1-beta.4 (see CHANGELOG).

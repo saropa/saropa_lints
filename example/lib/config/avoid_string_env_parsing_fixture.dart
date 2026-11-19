@@ -130,20 +130,11 @@ const _good1 = String.fromEnvironment(
   defaultValue: 'https://api.example.com',
 );
 
-const _good2 = int.fromEnvironment(
-  'MAX_RETRIES',
-  defaultValue: 3,
-);
+const _good2 = int.fromEnvironment('MAX_RETRIES', defaultValue: 3);
 
-const _good3 = bool.fromEnvironment(
-  'ENABLE_LOGS',
-  defaultValue: false,
-);
+const _good3 = bool.fromEnvironment('ENABLE_LOGS', defaultValue: false);
 
-const _good4 = String.fromEnvironment(
-  'BASE_URL',
-  defaultValue: '',
-);
+const _good4 = String.fromEnvironment('BASE_URL', defaultValue: '');
 
 // ============================================================================
 // FALSE POSITIVES: Should NOT trigger avoid_string_env_parsing
