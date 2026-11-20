@@ -87,6 +87,9 @@ AGENTS.md
 CLAUDE*.md
 CODEBASE_INDEX.md
 
+# Generated review queues (regenerated at publish time)
+plans/known_issues_review.md
+
 # Saropa Log Capture (index & cache)
 .saropa/
 *.vsix
