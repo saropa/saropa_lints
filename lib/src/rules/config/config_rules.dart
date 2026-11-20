@@ -4,6 +4,7 @@ import 'dart:io' show File;
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../conditional_import_utils.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -667,6 +668,10 @@ class AvoidStringEnvParsingRule extends SaropaLintRule {
 /// legitimate, required dependency rather than a portability risk.
 /// See bugs/avoid_platform_specific_imports_false_positive_analyzer_plugin.md.
 ///
+/// Also suppressed for files reachable only through the `dart.library.io`
+/// branch of a conditional import/export, including the whole transitive
+/// subtree that branch imports (see [isInNativeOnlyImportClosure]).
+///
 /// **BAD:**
 /// ```dart
 /// import 'dart:io';
@@ -778,6 +783,14 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
       for (final String dir in _platformDirs) {
         if (path.contains(dir)) return;
       }
+
+      // A file reachable only through the `if (dart.library.io)` branch of a
+      // conditional import/export (the io target itself, or any file only that
+      // target imports) is never compiled for web, so dart:io cannot break a
+      // web build there. Web-reachable files (importable from the stub path or
+      // unconditionally) are NOT in this closure and are still reported.
+      // Bug: bugs/avoid_platform_specific_imports_false_positive_io_only_subtree_of_conditional_export.md.
+      if (isInNativeOnlyImportClosure(context.filePath)) return;
 
       reporter.atNode(node);
     });

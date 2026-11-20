@@ -60,6 +60,64 @@ final Map<String, Set<String>> _nativeOnlyTargetsByProject = {};
 /// per project, alongside [_nativeOnlyTargetsByProject].
 final Map<String, Set<String>> _stubTargetsByProject = {};
 
+/// Cache: project root -> native-only targets PLUS every file whose importers
+/// are all native-only (the transitive io-only subtree). Built lazily per
+/// project in the same scan as [_nativeOnlyTargetsByProject].
+final Map<String, Set<String>> _nativeOnlyClosureByProject = {};
+
+/// Returns true if [filePath] is a native-only conditional target OR is
+/// reachable only through native-only files (e.g. every file imported solely by
+/// the `dart.library.io` branch of a conditional export). Such files are never
+/// compiled for web, so a `dart:io` import in them is legitimate.
+///
+/// Used by `avoid_platform_specific_imports`. Unlike
+/// [isNativeOnlyConditionalImportTarget] this follows imports transitively:
+/// the direct target set holds only the io entry file, but the files that
+/// entry file imports share the same web-unreachable fate. A file with ANY
+/// importer outside the native-only set (e.g. reachable from the stub/web
+/// path) is excluded, and a file with no importers is treated as a possible
+/// entry point and also excluded.
+bool isInNativeOnlyImportClosure(String? filePath) {
+  if (filePath == null || filePath.isEmpty) return false;
+  final projectRoot = ProjectContext.findProjectRoot(filePath);
+  if (projectRoot == null || projectRoot.isEmpty) return false;
+
+  // Populate the shared caches (the closure is built in the same scan).
+  _nativeOnlyTargetsByProject.putIfAbsent(
+    projectRoot,
+    () => _buildNativeOnlyTargets(projectRoot),
+  );
+  final closure = _nativeOnlyClosureByProject[projectRoot] ?? const <String>{};
+  return closure.contains(normalizePath(filePath));
+}
+
+/// Expands [seed] (native-only targets) with every file whose importers are
+/// ALL already native-only, iterating to a fixed point. [importers] maps a
+/// target path to the set of files that import/export it through an edge that
+/// can load on web (default URIs and non-native configurations). Cycles that
+/// are reachable only from each other never get added, which errs toward
+/// reporting rather than suppressing.
+Set<String> _expandNativeOnlyClosure(
+  Set<String> seed,
+  Map<String, Set<String>> importers,
+) {
+  final closure = <String>{...seed};
+  var changed = true;
+  while (changed) {
+    changed = false;
+    for (final entry in importers.entries) {
+      if (closure.contains(entry.key)) continue;
+      // Skip entry points: no importers means we cannot prove it is io-only.
+      if (entry.value.isEmpty) continue;
+      if (closure.containsAll(entry.value)) {
+        closure.add(entry.key);
+        changed = true;
+      }
+    }
+  }
+  return closure;
+}
+
 /// Returns true if [filePath] is the target of a conditional import that
 /// uses [dart.library.io] or [dart.library.ffi], so the file is only loaded
 /// on native (never on web). Such files do not need kIsWeb guards for
@@ -122,6 +180,8 @@ Set<String> _buildNativeOnlyTargets(String projectRoot) {
   final nativeOnly = <String>{};
   final unconditional = <String>{};
   final stubOnly = <String>{};
+  // target -> importing files, used to derive the transitive io-only subtree.
+  final importers = <String, Set<String>>{};
 
   try {
     for (final entity in libDir.listSync(recursive: true)) {
@@ -132,6 +192,7 @@ Set<String> _buildNativeOnlyTargets(String projectRoot) {
         nativeOnly,
         unconditional,
         stubOnly,
+        importers,
       );
       _collectSiblingStubTarget(entity.path, nativeOnly, stubOnly);
     }
@@ -145,7 +206,16 @@ Set<String> _buildNativeOnlyTargets(String projectRoot) {
   }
 
   _stubTargetsByProject[projectRoot] = stubOnly;
-  return nativeOnly.difference(unconditional);
+  final directTargets = nativeOnly.difference(unconditional);
+  // Bug fix (avoid_platform_specific_imports): files imported only by the io
+  // branch are never compiled for web either; extend the direct target set to
+  // that whole subtree. Kept in a separate cache so other rules that use the
+  // direct set keep their existing behavior.
+  _nativeOnlyClosureByProject[projectRoot] = _expandNativeOnlyClosure(
+    directTargets,
+    importers,
+  );
+  return directTargets;
 }
 
 /// Parse one file's `import`/`export` directives, recording io/ffi-conditional
@@ -162,6 +232,7 @@ void _collectTargetsFromFile(
   Set<String> nativeOnly,
   Set<String> unconditional,
   Set<String> stubOnly,
+  Map<String, Set<String>> importers,
 ) {
   final file = File(importingFilePath);
   if (!file.existsSync()) return;
@@ -205,14 +276,16 @@ void _collectTargetsFromFile(
       if (resolvedDefault != null) {
         resolvedDefaultPath = normalizePath(resolvedDefault);
         unconditional.add(resolvedDefaultPath);
+        // Default URI is a web-loadable edge: record who imports it.
+        importers
+            .putIfAbsent(resolvedDefaultPath, () => <String>{})
+            .add(normalizePath(importingFilePath));
       }
     }
 
     bool hasNativeOnlyConfig = false;
     for (final config in directive.configurations) {
       final conditionName = config.name.toSource();
-      if (!_nativeOnlyConditionNames.contains(conditionName)) continue;
-
       final uri = config.uri.stringValue;
       if (uri == null || uri.isEmpty) continue;
 
@@ -222,6 +295,18 @@ void _collectTargetsFromFile(
         projectRoot,
         packageName,
       );
+
+      // A non-native configuration (e.g. dart.library.html) is a normal
+      // web-loadable edge, so its importer counts against the closure.
+      if (!_nativeOnlyConditionNames.contains(conditionName)) {
+        if (resolved != null) {
+          importers
+              .putIfAbsent(normalizePath(resolved), () => <String>{})
+              .add(normalizePath(importingFilePath));
+        }
+        continue;
+      }
+
       if (resolved != null) {
         nativeOnly.add(normalizePath(resolved));
         hasNativeOnlyConfig = true;

@@ -360,6 +360,104 @@ environment:
       }
     });
   });
+
+  // See bugs/avoid_platform_specific_imports_false_positive_io_only_subtree_of_
+  // conditional_export.md: files imported only by the dart.library.io branch
+  // are never compiled for web, so avoid_platform_specific_imports must skip
+  // them; files also reachable from the stub/web path must still be flagged.
+  group('isInNativeOnlyImportClosure', () {
+    test('returns false for null or empty path', () {
+      expect(isInNativeOnlyImportClosure(null), isFalse);
+      expect(isInNativeOnlyImportClosure(''), isFalse);
+    });
+
+    test('FP case: file imported only by the io target is in the closure', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        _createTempProject(
+          dir.path,
+          importerContent: '''
+export 'stub.dart' if (dart.library.io) 'native_impl.dart';
+''',
+        );
+        final libDir = p.join(dir.path, 'lib');
+        // native_impl.dart pulls in server/auth_handler.dart, which in turn
+        // pulls in server/deep.dart: a two-level io-only subtree.
+        File(p.join(libDir, 'native_impl.dart')).writeAsStringSync('''
+import 'server/auth_handler.dart';
+''');
+        Directory(p.join(libDir, 'server')).createSync();
+        File(p.join(libDir, 'server', 'auth_handler.dart')).writeAsStringSync(
+          '''
+import 'dart:io';
+import 'deep.dart';
+''',
+        );
+        File(
+          p.join(libDir, 'server', 'deep.dart'),
+        ).writeAsStringSync("import 'dart:io';\n");
+        expect(
+          isInNativeOnlyImportClosure(
+            p.join(libDir, 'server', 'auth_handler.dart'),
+          ),
+          isTrue,
+        );
+        expect(
+          isInNativeOnlyImportClosure(p.join(libDir, 'server', 'deep.dart')),
+          isTrue,
+        );
+      } finally {
+        safeDeleteDir(dir);
+      }
+    });
+
+    // Positive case: the rule must still fire for web-reachable files.
+    test('file also imported from the stub/web path is NOT in the closure', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        _createTempProject(
+          dir.path,
+          importerContent: '''
+export 'stub.dart' if (dart.library.io) 'native_impl.dart';
+''',
+        );
+        final libDir = p.join(dir.path, 'lib');
+        File(p.join(libDir, 'native_impl.dart')).writeAsStringSync('''
+import 'shared.dart';
+''');
+        // The stub (web) branch also imports shared.dart, so web can load it.
+        File(p.join(libDir, 'stub.dart')).writeAsStringSync('''
+import 'shared.dart';
+''');
+        File(p.join(libDir, 'shared.dart')).writeAsStringSync(
+          "import 'dart:io';\n",
+        );
+        expect(
+          isInNativeOnlyImportClosure(p.join(libDir, 'shared.dart')),
+          isFalse,
+        );
+      } finally {
+        safeDeleteDir(dir);
+      }
+    });
+
+    test('file with no importers (possible entry point) is NOT in closure', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        _createTempProject(
+          dir.path,
+          importerContent: '''
+export 'stub.dart' if (dart.library.io) 'native_impl.dart';
+''',
+        );
+        final orphan = p.join(dir.path, 'lib', 'orphan.dart');
+        File(orphan).writeAsStringSync("import 'dart:io';\n");
+        expect(isInNativeOnlyImportClosure(orphan), isFalse);
+      } finally {
+        safeDeleteDir(dir);
+      }
+    });
+  });
 }
 
 /// Writes `pubspec.yaml`, stub/native impl files, and [importerContent] under [projectRoot]/lib.
