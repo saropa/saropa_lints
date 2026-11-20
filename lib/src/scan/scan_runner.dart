@@ -712,8 +712,13 @@ class ScanRunner {
     final visitorRule = _visitorRuleMap(registrations);
 
     final absFiles = files.map(p.absolute).map(p.normalize).toList();
+    // Root the collection at the PROJECT DIRECTORY, not at individual files.
+    // AnalysisContextCollection builds a full package-graph context per
+    // included path — passing N files creates N redundant contexts, blowing
+    // RSS past the limit before even one file is scanned (#402). A single
+    // project root shares one context across all files.
     final collection = AnalysisContextCollection(
-      includedPaths: absFiles,
+      includedPaths: [p.normalize(p.absolute(targetPath))],
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
 
@@ -728,6 +733,15 @@ class ScanRunner {
         : _defaultScanRssLimitMb;
 
     for (var i = 0; i < absFiles.length; i++) {
+      // A file outside the collection's root (e.g. an explicit path pointing
+      // elsewhere) makes contextFor throw StateError — skip it rather than
+      // crashing the entire scan.
+      try {
+        collection.contextFor(absFiles[i]);
+      } on StateError {
+        _err('  Skipping (outside analysis roots): ${absFiles[i]}');
+        continue;
+      }
       _showProgress(i, absFiles.length, diagnostics.length, absFiles[i], sw);
       await _scanSingleFileResolved(
         collection,
@@ -932,21 +946,77 @@ class ScanRunner {
     final dir = io.Directory(directory);
     if (!dir.existsSync()) return const [];
 
-    return dir
-        .listSync(recursive: true)
-        .whereType<io.File>()
-        .where((f) => f.path.endsWith('.dart'))
-        .where(
-          (f) => _shouldInclude(
-            f.path,
+    final results = <String>[];
+    _walkDartFiles(
+      dir,
+      excludePatterns,
+      includePatterns,
+      skipHardcodedExclusions,
+      directory,
+      results,
+    );
+    return results;
+  }
+
+  /// Walks [dir] one level at a time, skipping subdirectories that already
+  /// match an exclude pattern instead of listing them (#408 — `listSync`'s
+  /// built-in `recursive: true` enters every subdirectory before exclusions
+  /// can apply, so a permission-denied directory under an excluded path
+  /// crashes the scan with `PathAccessException` even when `--exclude-globs`
+  /// was told to skip it).
+  static void _walkDartFiles(
+    io.Directory dir,
+    List<RegExp> excludePatterns,
+    List<RegExp> includePatterns,
+    bool skipHardcodedExclusions,
+    String root,
+    List<String> results,
+  ) {
+    List<io.FileSystemEntity> entries;
+    try {
+      entries = dir.listSync();
+    } on io.FileSystemException {
+      // Permission-denied or otherwise unreadable directory: skip it rather
+      // than aborting the whole scan.
+      return;
+    }
+    for (final entry in entries) {
+      if (entry is io.Directory) {
+        // Mirror _shouldInclude's precedence at the directory level: an
+        // include-glob can still force a descent into an otherwise-excluded
+        // directory (e.g. `--include-globs "example/**"`), so only prune
+        // when nothing would rescue it.
+        final includeOverride = _matchesExcludeGlob(
+          entry.path,
+          includePatterns,
+          root,
+        );
+        if (!includeOverride) {
+          if (!skipHardcodedExclusions && _isExcluded(entry.path)) continue;
+          if (_matchesExcludeGlob(entry.path, excludePatterns, root)) {
+            continue;
+          }
+        }
+        _walkDartFiles(
+          entry,
+          excludePatterns,
+          includePatterns,
+          skipHardcodedExclusions,
+          root,
+          results,
+        );
+      } else if (entry is io.File &&
+          entry.path.endsWith('.dart') &&
+          _shouldInclude(
+            entry.path,
             excludePatterns,
             includePatterns,
             skipHardcodedExclusions,
-            directory,
-          ),
-        )
-        .map((f) => p.normalize(f.path))
-        .toList();
+            root,
+          )) {
+        results.add(p.normalize(entry.path));
+      }
+    }
   }
 
   /// Combined exclusion/inclusion check: a file is kept when it passes the

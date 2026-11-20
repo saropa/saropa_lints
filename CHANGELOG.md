@@ -66,7 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [17.3.0]
+
+[log](https://github.com/saropa/saropa_lints/blob/v17.3.0/CHANGELOG.md)
 
 ### Added
 
@@ -78,11 +80,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - The removed `saropaLints.scanOnSave.enabled` setting is now detected and flagged (output channel plus a one-time notification) instead of silently doing nothing; remove it from `settings.json`.
 - Fixed the "Explain rule" panel showing "Run analysis to see it in context" for a disabled rule that has never fired; it now explains the rule is disabled and suggests re-enabling it. No action required.
 - Fixed the "Explain rule" fallback panel showing an unbounded pack-label list; it now caps at 3 labels with a "(+N more)" indicator. No action required.
+- Fixed `scan --resolve` exceeding its memory limit after a single file on most projects by sharing one analysis context across all files instead of creating one per file ([#402](https://github.com/saropa/saropa_lints/issues/402)). No action required.
+- Fixed `scan --exclude-globs` crashing with a permission error when the excluded path contained an unreadable directory, because the scan listed every subdirectory before applying exclusions ([#408](https://github.com/saropa/saropa_lints/issues/408)). No action required.
 
 ### Internal
 
+- CI now runs `extension/scripts/check_l10n_keys.py --check-params`, failing when a literal `l10n()` key is missing from `en.json` or its call-site params do not match the catalog placeholders. Five checker false positives (variable, spread and webview-substituted params) are marked `l10n:passthrough`.
 - Added a GitHub Actions workflow that runs saropa_lints on pull requests.
+- Added a master switch card (`saropaLints.enabled`) to the Health Panel's Diagnostic Engines section; the Scan on Save card dims when it is off, since that is the only engine the setting gates.
 - The publish script now writes the known-issues review list to the ignored `reports/` folder and prints the queued packages, instead of committing a file to `bugs/`.
+- The Qwen translation prompt now includes a short glossary of domain terms (audit, suppress, gate, transitive, hotspot, tier, …) when a string contains them, fixing word-sense mistranslations found in a side-by-side review.
 
 ---
 
