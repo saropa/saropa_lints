@@ -123,3 +123,15 @@ void _good818() {
 
   List<User> _parseJson(String json) => jsonDecode(json);
 }
+
+// GOOD (FP guard): jsonEncode of a small literal map is bounded work, e.g. an
+// error response in a pure-Dart server handler. Must NOT lint.
+Future<void> _good818Literal(String message) async {
+  jsonEncode(<String, String>{'error': message});
+}
+
+// BAD: non-literal argument (unbounded size) still lints.
+// expect_lint: require_isolate_for_heavy
+Future<void> _bad818NonLiteral(String body) async {
+  jsonDecode(body);
+}

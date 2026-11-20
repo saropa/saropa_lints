@@ -129,6 +129,13 @@ void _good782() {
 // functions — a top-level function is never visited and would be a vacuous
 // (always-pass) fixture case regardless of whether the fix is correct.
 class _GoodCheapGetterCases {
+  // GOOD: `HttpRequest.method` is a dart:io SDK accessor over stored state;
+  // repeated reads in an if-chain must NOT be flagged (false-positive guard).
+  void goodHttpRequestMethod(HttpRequest request, String path) {
+    if (request.method == 'GET' && path == '/a') {}
+    if (request.method == 'POST' && path == '/b') {}
+  }
+
   // GOOD: `List.length` is a dart:core O(1) getter, not an expensive
   // computed value — repeating it must NOT be flagged.
   void goodListLength(List<String> rowValues, List<String> headers) {

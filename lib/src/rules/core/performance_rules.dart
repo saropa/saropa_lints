@@ -784,6 +784,33 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
     'last',
   };
 
+  /// True when [element] is declared in a `dart:` SDK library by a type that
+  /// is neither an `Iterable` (or subtype) nor a `Stream`. Those two families
+  /// can wrap a lazy pipeline where each getter read re-evaluates it, so they
+  /// must not be exempted; every other SDK getter is treated as cheap. The
+  /// declaring type is checked (not the receiver) because a lazy `Iterable`
+  /// resolves to the same-named getter as a concrete `List`.
+  static bool _isCheapSdkGetter(GetterElement element) {
+    final Element? enclosing = element.enclosingElement;
+    if (enclosing is! InterfaceElement) return false;
+    if (enclosing.library.uri.scheme != 'dart') return false;
+    // Iterable itself or any subtype (List, Set, ...): defer to the
+    // receiver-type allowlist below.
+    if (enclosing.thisType.isDartCoreIterable) return false;
+    for (final InterfaceType s in enclosing.allSupertypes) {
+      if (s.isDartCoreIterable) return false;
+    }
+    // Stream getters (length/first/last/...) return a new Future that
+    // subscribes each time — repeated reads are not a plain recompute.
+    // Only the getter DECLARED on Stream is excluded. Do not walk supertypes:
+    // `dart:io` `HttpRequest` implements `Stream<Uint8List>`, so a supertype
+    // check wrongly excluded `HttpRequest.method` (the original bug). Stream
+    // members inherited by a subtype resolve to Stream's own element, so they
+    // are still caught here.
+    if (enclosing.name == 'Stream') return false;
+    return true;
+  }
+
   /// True when [element]/[receiver] together prove the read is a `dart:core`
   /// O(1) accessor that is never worth caching:
   ///
@@ -800,6 +827,14 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
   ///   still tracked.
   static bool _isKnownCheapGetter(Element? element, Expression? receiver) {
     if (element is! GetterElement) return false;
+
+    // Bug fix (false positive on `HttpRequest.method`): getters declared in a
+    // `dart:` SDK library (HttpRequest.method/uri/headers, Uri.path, ...) are
+    // plain accessors over stored state. Flagging repeated reads of them is
+    // noise and caching adds nothing. The only SDK getters that are genuinely
+    // costly are lazy Iterable/Stream ones (O(n) per read), so those are
+    // excluded from this exemption and stay tracked.
+    if (_isCheapSdkGetter(element)) return true;
 
     if (element.name == 'hashCode') {
       final Element? enclosing = element.enclosingElement;
@@ -5086,6 +5121,11 @@ class RequireIsolateForHeavyRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (!_heavyOperations.contains(methodName)) return;
 
+      // FP fix: jsonEncode/jsonDecode of a map/list literal has statically
+      // bounded (tiny) size, e.g. `jsonEncode({'error': message})`. Isolate
+      // spawn overhead exceeds the work, so it is never "heavy".
+      if (_isBoundedJsonLiteralCall(node, methodName)) return;
+
       // Check if already inside compute() or Isolate.run()
       if (isInsideIsolate(node)) return;
 
@@ -5094,6 +5134,21 @@ class RequireIsolateForHeavyRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// True for `jsonEncode`/`jsonDecode` whose sole positional argument is a
+  /// map/list literal. Literal size is fixed at author time, so the call
+  /// cannot be large input; non-literal arguments (e.g. file contents) still
+  /// lint. Only the JSON names are exempt: other heavy names are unaffected.
+  static bool _isBoundedJsonLiteralCall(MethodInvocation node, String name) {
+    if (name != 'jsonEncode' && name != 'jsonDecode') return false;
+    // Types are inferred on purpose: analyzer 14.x types argument lists as
+    // NodeList<Argument>, older versions as NodeList<Expression>. Inference
+    // compiles under both; the `is` checks below work on either.
+    final args = node.argumentList.arguments;
+    if (args.isEmpty) return false;
+    final first = args.first;
+    return first is SetOrMapLiteral || first is ListLiteral;
   }
 }
 

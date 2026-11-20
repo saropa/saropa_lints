@@ -139,6 +139,23 @@ class C {
       expect(codes, isNot(contains('prefer_cached_getter')));
     });
 
+    test('does NOT flag repeated dart:io HttpRequest.method reads', () async {
+      // Regression: `HttpRequest.method` is an SDK accessor over stored
+      // state; repeating it in an if-chain must not be reported.
+      final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+import 'dart:io';
+
+class Router {
+  void dispatch(HttpRequest request, String path) {
+    if (request.method == 'GET' && path == '/a') {}
+    if (request.method == 'GET' && path == '/b') {}
+    if (request.method == 'POST' && path == '/c') {}
+  }
+}
+''');
+      expect(codes, isNot(contains('prefer_cached_getter')));
+    });
+
     test(
       'STILL flags a lazy Iterable .length read twice (genuinely O(n))',
       () async {
