@@ -1049,6 +1049,36 @@ def find_english_regressions(en_tree: object, old_tree: object, new_tree: object
     return found
 
 
+def existing_translations(en_tree: object, old_tree: object) -> dict[str, str]:
+    """Map English source string -> the non-English value already shipped for it.
+
+    Used to keep a good shipped translation when a (re-)translation attempt fails
+    and the engine falls back to English: without it, one failed Qwen call on a
+    pruned short label ("Mobile", "Web") trips the english-overwrite guard and
+    aborts the whole locale run. First shipped value per source string wins."""
+    found: dict[str, str] = {}
+
+    def walk(en: object, old: object) -> None:
+        if isinstance(en, dict):
+            for k, v in en.items():
+                walk(v, old.get(k) if isinstance(old, dict) else None)
+        elif isinstance(en, str) and isinstance(old, str) and old != en and old.strip():
+            found.setdefault(en, old)
+
+    walk(en_tree, old_tree)
+    return found
+
+
+def _shipped_values(en_tree: object, path: Path) -> dict[str, str]:
+    """existing_translations() for one shipped locale file; {} if absent/unreadable."""
+    if not path.exists():
+        return {}
+    try:
+        return existing_translations(en_tree, read_json(path))
+    except Exception:  # unreadable existing file: nothing to keep
+        return {}
+
+
 def _guard_english_overwrite(locale: str, en_tree: object, path: Path, new_tree: object) -> list[str]:
     if not path.exists():
         return []
@@ -1266,11 +1296,29 @@ def main() -> int:
             translator = HybridTranslator(locale, mt_cache)
             # One ``translate_text`` per distinct English string (MT + cache), not per JSON leaf.
             mapping = {s: translator.translate_text(s) for s in sorted_unique}
-            package_out = apply_string_map(package_en, mapping)
-            runtime_out = apply_string_map(runtime_en, mapping)
 
             package_out_path = root / f"package.nls.{locale}.json"
             runtime_out_path = root / "src" / "i18n" / "locales" / f"{locale}.json"
+
+            # A string whose retranslation failed comes back as English. If the
+            # shipped file already holds a real translation for it, keep that rather
+            # than regress to English (which the guard below would abort the locale
+            # over). Only fills strings the engines left untranslated.
+            kept = {**_shipped_values(package_en, package_out_path),
+                    **_shipped_values(runtime_en, runtime_out_path)}
+            for s, v in list(mapping.items()):
+                if v == s and s in kept:
+                    mapping[s] = kept[s]
+            package_out = apply_string_map(package_en, mapping)
+            runtime_out = apply_string_map(runtime_en, mapping)
+
+            # Persist the cache BEFORE the english-regression guard: the guard can
+            # abort the locale (return 1) and previously that discarded every
+            # translation made since the last periodic checkpoint, so a 319-string
+            # Qwen run with 4 unrelated failures re-paid for all 319 on the retry.
+            # The cache holds only engine output, so saving it here is always safe.
+            save_mt_cache(mt_cache)
+            save_provenance()
 
             if not getattr(args, "allow_english_fallback", False):
                 regressions = (
