@@ -710,6 +710,14 @@ def write_coverage_json(stats_by_locale: dict[str, LocaleStats], root: Path) -> 
         "locales": dict(sorted(locales.items())),
     }
     write_json(path, payload)
+    # Keep the README coverage table in step with the JSON it is generated from,
+    # so it never goes stale between runs. A failure here (README missing, markers
+    # absent) must not abort a translation run that already paid for its work.
+    try:
+        import coverage_report
+        coverage_report.update_readme(payload)
+    except Exception as exc:  # noqa: BLE001 - README refresh is best-effort
+        print(f"[i18n] README coverage block not updated: {exc}", flush=True)
 
 
 def write_fallback_report(report_path: Path) -> int:
