@@ -1,6 +1,6 @@
 {
   "about": {
-    "ruleCountStrip": "يتضمن هذا الإصدار حاليًا {total} قاعدة lint (أساسية {essential} · موصى بها {recommended} · احترافية {professional} · شاملة {comprehensive} · صارمة {pedantic} · {stylistic} أسلوبية اختيارية)"
+    "ruleCountStrip": "قواعد {total} lint تُوزع حاليًا في هذه الإصدار (الأساسية {essential} · الموصى بها {recommended} · المهنية {professional} · الشاملة {comprehensive} · الصارمة {pedantic} · {stylistic} المُفعَّلة اختياريًا من حيث الأسلوب)"
   },
   "welcome": {
     "panel": {
@@ -10,7 +10,7 @@
       "subtitle": "تحديث هذا الإصدار يغير محرك التشخيص الافتراضي. قراءة هذا قبل المتابعة العمل — يؤثر على ما ستراه في لوحة المشكلات."
     },
     "checkbox": {
-      "label": "покажи это в следующий раз",
+      "label": "أظهر هذا في المرة القادمة",
       "hint": "تحرك إلى الأسفل لفك هذا الإقفال. حتى ذلك الحين، سيتم عرض هذا الإشعار مجددًا.",
       "hintEnabled": "إلغاء تحديد هذا لوقف إعادة ظهور الإشعار."
     },
@@ -26,7 +26,7 @@
       "monitoring": {
         "header": "جديد: مراقبة صحة الجهاز",
         "body": "الإنطلاقة الآن تراقب ذاكرة الوصول العشوائي للنظام، كل خادم تحليل Dart، Flutter daemon، وعملية الخلفية — وليس فقط إنشاءها الخاص. مؤشر ميزانية أداة التطوير يحذّر عند تجاوز أداة التطوير لحصة قابلة للتخصيص من ذاكرة الوصول العشوائي، وتم اكتشاف العمليات المهجورة من الجلسات المتعثرة عند بدء التشغيل.",
-        "why": "غالبًا ما تُسرّب المشاريع الكبيرة خوادم التحليل. ستراه الآن قبل أن يتباطأ جهازك.",
+        "why": "القواعد الصارمة:\n1. عودة فقط النص المترجم.",
         "actionDashboard": "فتح حالة الجهاز",
         "actionThresholds": "ضبط القيم الدنيا"
       },
@@ -41,7 +41,7 @@
     "discover": {
       "header": "استكشف المراقبات",
       "findings": {
-        "label": "Findings Dashboard",
+        "label": "نتائج لوحة تحكم المعلومات Dashboard",
         "description": "كل التشخيصات عبر مشروعك، قابلة للتنقيح حسب الخطورة والقاعدة."
       },
       "packages": {
@@ -53,7 +53,7 @@
         "description": "حدد أي من القواعد التي تزيد عن 2300 قاعدة تعمل وأيها تُنفذ بمستوى خطورة معين."
       },
       "catalog": {
-        "label": "فهرس الأوامر",
+        "label": "قائمة القيادة كتالوج الأوامر",
         "description": "كل أمر Saropa Lints في قائمة قابلة للبحث واحدة."
       }
     }
@@ -75,26 +75,26 @@
     "report": {
       "title": "مراجعة Saropa Lints",
       "heading": "تقرير المراجعة",
-      "errorHeading": "فشل التدقيق",
-      "canceledHeading": "أُلغي التدقيق",
+      "errorHeading": "التحقق من الصحة فاشل",
+      "canceledHeading": "التحقق من الصحة تم إلغاؤه",
       "subtitle": "نتائج {count} · {timestamp}",
       "baselineSubtitle": "مقارنة مع الأساس من {date}",
       "searchPlaceholder": "فلتر حسب القاعدة، الملف، أو الرسالة…",
-      "filterTier": "المستوى",
+      "filterTier": "مستوى",
       "filterSeverity": "شدة الحالة:",
-      "filterImpact": "التأثير",
+      "filterImpact": "تأثير التأثير Impact impact",
       "filterBaselineStatus": "الأساسية",
       "baselineNew": "جديد",
       "baselineUnchanged": "غير مُغيّر",
       "saveBaseline": "احفظ كأساس مقارنة",
-      "copyJson": "نسخ JSON",
+      "copyJson": "نسخ JSON إلى النسخة.",
       "toggleGroup": "التبديل بين التجميع",
-      "colFile": "الملف",
+      "colFile": "ملفات الملفات File file",
       "colLine": "خط خط خط",
-      "colRule": "القاعدة",
+      "colRule": "قاعدة قانونية القواعد",
       "colSeverity": "شدة الحالة:",
-      "colTier": "المستوى",
-      "colMessage": "الرسالة",
+      "colTier": "مستوى",
+      "colMessage": "رسالة الرسالة الرسالية",
       "empty": "لا توجد نتائج — المشروع نظيف.",
       "filteredEmpty": "لا توجد نتائج تطابق bộ lọc الحالي.",
       "loadMore": "покажи больше",
@@ -104,7 +104,7 @@
       "exportJsonTitle": "تصدير نتائج المراجعة كJSON",
       "exportJsonSaved": "مراجعة JSON المصدر.",
       "exportJsonFailed": "لم يتم استيراد ملف JSON التقرير: {message}",
-      "clearRuleFilter": "مسح",
+      "clearRuleFilter": "واضحة واضحة صافية",
       "paginationNote": "الحد الأقصى للصفحات ينطبق على النتائج المرشَّحة.",
       "sevBarError": "أخطاء {count} ({pct}%)",
       "sevBarWarning": "تحذيرات {count} ({pct}%)",
@@ -135,7 +135,8 @@
     "baseline": {
       "progressTitle": "Saropa Lints: مسح المشروع بأكمله",
       "progressMessage": "ملفات {scanned}/{total} تم فحصها، تم العثور على {issues} مشكلة(ات)"
-    }
+    },
+    "legacyKeyWarning": "القاعدة الصارمة: \n1. عودة فقط النص المترجم. \n2. لا تشمل التوضيحات أو المقدمة أو الترميز المارك داون أو الاقتباسات المحيطة. \n3. قد يحتوي النص على رموز مُحلّية: رموز مُحلّية. انسخ كل واحدة منها إلى الترجمة بالضبط كما كُتبت، في الموقع النحوي الصحيح. لا تُرجم، تخلّي، أو تغيّر رمز مُحلّي. \n4. بالغ الأهمية: كل حرف من النص المخرج يجب أن يكون حرفًا عربيًا. اترجم كل كلمة إلى العربية — لا تترك أو تُعوّض أي كلمة باللغة اللاتينية، التايلاندية، العربية، الكيريلية، الكورية، اليابانية، أو أي خط آخر. المسافات، الأرقام، العلامات التفصيلية ورموز مُحلّية هي الاستثناءات فقط."
   },
   "featureInventory": {
     "export": {
@@ -161,8 +162,8 @@
       "unusedOnly": "غير مستخدم فقط",
       "usedOnly": "يُستخدم فقط",
       "deprecatedOnly": "القديمة فقط",
-      "expandAll": "توسيع الكل",
-      "collapseAll": "طيّ الكل",
+      "expandAll": "توسيع جميع التوسع.",
+      "collapseAll": "إنهيار كل شيء.",
       "indexLabel": "مؤشر الحزمة"
     },
     "summary": {
@@ -174,7 +175,7 @@
       "colAdopted": "تم الاقتباس",
       "colUnadopted": "غير مُعتمد",
       "colUsages": "الاستخدامات",
-      "colScore": "النتيجة"
+      "colScore": "النتيجة تسجيل النتائج."
     },
     "packages": {
       "title": "حزمة الطلبات الحمولة"
@@ -188,7 +189,7 @@
       "noFeatures": "تم العثور على سجل التغييرات، ولكن لم يتم استخراج أي ميزات منه.",
       "linkPubDev": "pub.dev",
       "linkDocs": "الوثائق التوثيقية وثائق",
-      "linkRepository": "المستودع"
+      "linkRepository": "مخزن البيانات Repository"
     },
     "category": {
       "heading": "{category} ({count})",
@@ -202,13 +203,13 @@
     },
     "feature": {
       "summary": "{symbols} · {usages} · v{version}",
-      "noApiNamed": "لا توجد واجهة API بهذا الاسم",
+      "noApiNamed": "لا يوجد واجهة برمجة تطبيقي مسمى",
       "usages": "استخدامات {count}",
       "usagesOne": "استخدام {count}",
       "usagesUnknown": "استخدام غير قابل للقياس",
       "apiHeading": "{symbol} ({count})",
       "viewCode": "عرض رمز العرض",
-      "viewDocs": "عرض الوثائق",
+      "viewDocs": "عرض المستندات.",
       "noUsages": "لم يتم العثور على استخدام في مصدر المشروع.",
       "moreUsages": "{count} أكثر استخدامات",
       "moreUsagesOne": "{count} أكثر استخدام"
@@ -224,24 +225,24 @@
     "title": "الأسلوب والآراء",
     "intro": "قواعد الأسلوب المختلفة ، غير فعالة افتراضيًا. قم بتشغيل ما يوافق فريقك عليه فقط. يتم تجميع الخيارات المتضاربة حتى تختار واحدة.",
     "searchPlaceholder": "قواعد أسلوب البحث...",
-    "pickOne": "اختر واحدًا",
-    "none": "بلا",
+    "pickOne": "اختر واحدة من بينها.",
+    "none": "لا، ليس هناك أيّ من ذلك.",
     "enableAll": "تمكين كل شيء",
     "disableAll": "تعطيل كل شيء",
     "noMatch": "لا يوجد قواعد أسلوب مطابقة.",
     "desc": {
-      "ordering_sorting": "يرتّب الأعضاء والمعاملات والحقول ومفاتيح الخرائط للحصول على تخطيط متوقع. كثير الضجيج على الكود الحالي — الأفضل للكود الجديد أو المستودعات الصغيرة.",
+      "ordering_sorting": "يُرتِّب العناصر، والمُعلَّمات، والحقول، وключа التصنيف لترتيب قابل للتنبؤ. يُنتج الكثير من الأخطاء في الكود الحالي — أفضل في الكود الجديد أو المستودعات الصغيرة.",
       "naming_conventions": "تسمية الملفات والأساليب والاستثناءات والإعادة للنداء وحوادث ووحدات الحالة. يمكن أن تكون صاخبة على قواعد الكود الكبيرة ؛ تمكين تدريجيا.",
       "boolean_naming": "يجب على البولية استخدام هو / لديه / يمكن / ينبغي أن تكون مقدمات حتى يكون النية واضحة في الشروط والآف آي.",
-      "code_style_preferences": "كيفية كتابة عبارات الإرجاع والشروط والحلقات — الإرجاع الفوري، وfor-in، وgetter مقابل الدالة، والاختصارات المشابهة.",
+      "code_style_preferences": "كيفية كتابة العودة، والشروط، والحلقات — العودة الفورية، for-in، getter مقابل طريقة، وغيرها من الاختصارات المماثلة.",
       "function_parameter_style": "وظائف السهم عندما تكون موجزة ، جميع المعلمات المسماة ، استدعاءات الرد في الخط ، ولا توجد إعادة تعيين للمعلم.",
-      "widget_style": "خيارات عناصر Flutter — SizedBox.square، وCenter بدلًا من Align، والمسافات بدلًا من SizedBox، وتجنّب shrinkWrap في القوائم القابلة للتمرير. لمشاريع Flutter فقط.",
+      "widget_style": "اختيارات ويدجت Flutter — SizedBox.square، center over align، spacing over SizedBox، وتجنب استخدام shrinkWrap في التمرير. Flutter مشاريع فقط.",
       "class_record_style": "فئة مقابل أنواع إعادة السجلات ، وبوابات التشديد الخاصة ، ووضح هذا حيث يوضح.",
-      "formatting": "موضع الأسطر الفارغة، والفواصل الختامية، وأسلوب القيم الحرفية والتعليقات. قد يكون كثير الضجيج — وقد تحتاج ملفات كثيرة إلى تعديل.",
+      "formatting": "الترتيب بين الأسطر الفارغة، والفاصلة المنقوطة النهائية، ونمط النصوص والتعليقات. قد تكون مزعجة — قد يحتاج العديد من الملفات إلى تعديلات.",
       "comments_documentation": "تنسيق TODO و FIXME ، حالة الجملة ، فترة بعد تعليقات doc ، /// أكثر من // ، ولا يوجد رمز للتعليق.",
       "testing_style": "تفضل توقع التأكيد على الاختبارات حتى يظهر الفشل المتوقع مقابل الواقعي.",
       "debug_test_utility": "مساعدات الاختبار مثل prefer_fail_test_case التي تفشل بصوت عال عندما يصل الاختبارات إلى مسار غير متوقع.",
-      "opinionated_rules": "خيارات أسلوبية متنوعة — أسماء موجزة، وenums شاملة، وعبارات الحماية، والشروط الإيجابية، وغيرها. قواعد كثيرة؛ وقد تكون كثيرة الضجيج."
+      "opinionated_rules": "خيارات أسلوب متنوعة — أسماء مختصرة، أنواع تعداد شاملة، عبارات حماية، شروط إيجابية، وغيرها. العديد من القواعد؛ قد تكون مزعجة."
     }
   },
   "packs": {
@@ -252,17 +253,17 @@
     "allPackagesHint": "كل حزمة متاحة، بما في ذلك تلك التي لم يتم الكشف عنها في هذا المشروع. تمكين القطيع من الاختيار في قواعده.",
     "versionGroup": {
       "tag": "اختر نسخة واحدة.",
-      "tooltip": "تستهدف هذه الحزم إصدارات رئيسية مختلفة من التبعية نفسها. لا تنطبق إلا حزمة واحدة في كل مرة — وتفعيل إحداها يعطّل الأخرى."
+      "tooltip": "هذه الحزم تستهدف إصدارات مختلفة من نفس الاعتماد. فقط واحدة منها تُفعَّل في وقت واحد — تفعيل واحدة تُطفئ الأخرى."
     },
     "domainDesc": {
       "state-management": "كتب بلوك، ريفربود، بروفايدر، جيت إكس و مكتبات الحالة والحقن التبعية ذات الصلة.",
       "networking-apis": "عملاء HTTP ، GraphQL ، Firebase ، Supabase ، والاتصال.",
-      "storage-persistence": "قواعد البيانات المحلية ومخازن المفتاح والقيمة — Drift وHive وIsar وsqflite وshared_preferences.",
-      "navigation-deep-links": "التوجيه ومعالجة الروابط العميقة — auto_route وgo_router وapp_links وurl_launcher وwebview.",
+      "storage-persistence": "قواعد صارمة:\n1. العودة فقط إلى النص المترجم.",
+      "navigation-deep-links": "التنقل والتعامل مع الروابط العميقة — auto_route، go_router، app_links، url_launcher، و webview.",
       "media-graphics": "الصور ، SVG ، الرسوم المتحركة ، الصوت ، الخرائط ، التقاطات ، ومحرك Flame.",
       "device-platform": "أجهزة الاستشعار والموقع والتصاريح والقياسات الحيوية والإخطارات والأعمال الخلفية.",
       "identity-sharing": "مزودي تسجيل الدخول والمشاركة ومراجعة التطبيقات.",
-      "utilities-config": "مساعدات مشتركة — UUIDs وإعدادات البيئة والخطوط وتوافق المجموعات.",
+      "utilities-config": "المساعدة العامة — UUIDs، تكوين البيئة، الخطوط، وتوافق المجموعات",
       "sdk-migrations": "Dart و Flutter قواعد ترقية الإصدار التي تم إزالة APIs أو تجاهلها في SDK معين."
     }
   },
@@ -273,19 +274,25 @@
     "tabBar": {
       "ariaLabel": "لوحات تحكم قواعد ومستويات التقييم"
     },
+    "ruleFinder": {
+      "disableButton": "تعطيل تعطيّل",
+      "disableTitle": "الغاء تفعيل هذه القاعدة للمشروع بأكمله — يكتب analysis_options_custom.yaml ويُعيد تشغيل التحليل",
+      "enableButton": "تم تفعيله",
+      "enableTitle": "إعادة تفعيل هذه القاعدة — تزيل الت覆盖 في analysis_options_custom.yaml وتُعيد تشغيل التحليل"
+    },
     "tab": {
-      "tier": "المستوى",
-      "packs": "حزم القواعد",
-      "overrides": "التجاوزات",
+      "tier": "مستوى",
+      "packs": "حزم القواعد عبارة عن مجموعة قواعد.",
+      "overrides": "التجاوزات تتجاهل.",
       "sdk": "نشر SDK",
       "configFile": "ملف التكوين",
       "automation": "التحكم الآلي",
       "extension": "التوسيع"
     },
     "common": {
-      "rule": "القاعدة",
+      "rule": "قاعدة قانونية القواعد",
       "add": "أضف",
-      "remove": "إزالة"
+      "remove": "إزالة Remove إزالت remove"
     },
     "sdk": {
       "summary": "حزمة التحويل {total} SDK تُطبَّق على هذا المشروع — {breaking} تغييرات مُكسِرة، {deprecation} إيقاف التحفيز.",
@@ -304,7 +311,7 @@
         "hint": "يحدد عدد المشكلات التي تظهر في علامة التبويب \"المسائل\" ومكان كتابة تقرير التحليل."
       },
       "maxIssues": {
-        "label": "الحد الأقصى للمشكلات",
+        "label": "أقصى عدد من المشكلات",
         "desc": "يحدّد عدد المشكلات غير الخطأ التي تُعرض في علامة التبويب \"المشاكل\". 0 يعني لا حدّ. لا تزال التفاصيل تظهر في ملف التقرير الكامل."
       },
       "output": {
@@ -313,7 +320,7 @@
       },
       "tierCap": {
         "title": "الحد الأقصى للدرجة",
-        "hint": "يحدّ من المستويات التي تعمل وقت التحليل، بغض النظر عن القواعد المفعّلة صراحةً. اتركه على «بلا» لاستخدام إعداد Tier في الإضافة.",
+        "hint": "القواعد الصارمة:\n1. العودة فقط إلى النص المترجم.",
         "none": "لا شيء (استخدم إعدادات القسم Tier)"
       },
       "saropaTier": {
@@ -356,7 +363,7 @@
       },
       "baseline": {
         "title": "الأساسية",
-        "hint": "يكتم خط الأساس المخالفات القائمة في المشروع بحيث لا تظهر بعد ذلك إلا النتائج المُضافة حديثًا.",
+        "hint": "قاعدة صارمة:\n1. عودة فقط النص المترجم.",
         "emptyHint": "لا توجد قاعدة مرجعية تم إنشاؤها بعد. إنشاء واحدة تثبيت اليوم's انتهاكات وتفعيل تثبيت القاعدة في التكوين.",
         "createButton": "إنشاء / تحديث نقطة البداية",
         "createTitle": "يقوم بتشغيل dart run saropa_lints:baseline — يكتب saropa_baseline.json ويقوم بتفعيله في التكوين.",
@@ -364,7 +371,7 @@
         "openTitle": "افتح saropa_baseline.json في المحرر.",
         "summary": "ملف(ات) {files}، انتهاك(ات) {violations} مُسجل(ة) — تم إنشاء {generated}.",
         "unknownDate": "في وقت غير معروف",
-        "count": "العدد",
+        "count": "العد Count إحصاء عدد",
         "diff": {
           "title": "الاختلاف عن الحالية",
           "counts": "{resolved} تم حلها منذ قاعدة المقارنة · {new} جديدة منذ قاعدة المقارنة.",
@@ -372,7 +379,7 @@
           "resolvedSection": "تم حلها ({count})",
           "newSection": "جديد منذ الأساس ({count})",
           "moreRows": "+{count} أكثر غير مُعرض.",
-          "fileCol": "الملف",
+          "fileCol": "ملفات الملفات File file",
           "lineCol": "خط خط خط"
         }
       },
@@ -385,9 +392,17 @@
     "automation": {
       "hint": "إعدادات التمديد التي تحكم متى تُجرى التحليل وطريقة عرض النتائج. هذه الإعدادات تتوافق مع نفس الإعدادات الموجودة في ملف > تفضيلات > إعدادات تحت Saropa Lints."
     },
+    "watcher": {
+      "title": "مراقب يتجاهل",
+      "hint": "الملفات والملفات الفolders VS Code's مراقبة الملفات يجب تجاهلها. العدود تأتي من مسح خطر العملة؛ استخدم القائمة لرؤية المسارات، ثم استبعدوها من التنبيه الذي يظهره المسح.",
+      "scanning": "المسح في المساحة العاملة...",
+      "affected": "{count} متأثراً",
+      "list": "قائمة",
+      "recommended": "القواعد الصارمة:\n1. العودة فقط إلى النص المترجم."
+    },
     "extension": {
       "hint": "خيارات العرض العامة للملحق",
-      "linkNote": "يوجد تشغيل/إيقاف الفحص عند الحفظ في صف الحالة بالشريط الجانبي؛ ويوجد مستوى التحليل في علامة التبويب Tier — وكلاهما يفعل أكثر من مجرد كتابة إعداد، لذا لم يُكرَّرا هنا."
+      "linkNote": "القواعد الصارمة:\n1. يتم التحقق من وجود التحليل عند حفظ الملف على/إيقاف تشغيله في صفوف حالة الشريط الجانبي؛ والمستوى التحليلي موجود في علامة التبويب المستوى — كلاهما يقوم بأكثر من مجرد كتابة الإعداد، لذلك لا يتم تكراره هنا."
     },
     "shortcuts": {
       "jumpToTab": "الانتقال إلى التبويب 1-7 (الدرجة، حزم القواعد، التجاوزات، نشر SDK، ملف التكوين، الأتمتة، التمديد)",
@@ -398,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "مستوى: {tier} · مسار: {lane}",
-      "descriptionNoLane": "Tier: {tier}"
+      "descriptionNoLane": "مستوى: {tier}"
     },
     "controls": {
       "laneLight": "خفيف — ~200 قاعدة داخل المحرر، باقي عند حفظ الملف",
@@ -413,12 +428,12 @@
   },
   "configSuggestions": {
     "enabledToast": "تم تفعيل حزمة قواعد {pack} في analysis_options.yaml",
-    "enableFailed": "تعذّر تفعيل حزمة القواعد {pack} — افتح لوحة حزم القواعد لتفعيلها"
+    "enableFailed": "تعذر تمكين حزمة قواعد {pack} — افتح لوحة معلومات حزم القواعد لتمكينها"
   },
   "startupNudge": {
-    "message": "Saropa Lints: ينطبق {count} من اقتراحات حزم القواعد على هذا المشروع.",
-    "review": "مراجعة",
-    "dismiss": "تجاهل",
+    "message": "Saropa Lints: هيئة البيانات الحيوية {count} حزمة قواعد اقتراحات (((s) تنطبق على هذا المشروع.",
+    "review": "مراجعة المراجعة Review Review",
+    "dismiss": "فصله من العمل",
     "reviewFailed": "تعذر فتح مراجعة حزمة قواعد Saropa Lints. {error}"
   },
   "opportunities": {
@@ -426,13 +441,13 @@
     "heroTitle": "تحديث فرص التحسينات",
     "subtitle": "{count} الحزم لديها ميزات لم يستخدمها مشروعك بعد.",
     "noScan": "قم بتشغيل مسح الحزمة أولاً للعثور على فرص الترقية.",
-    "openFileFailed": "تعذّر فتح {file} — ربما نُقل منذ آخر فحص.",
+    "openFileFailed": "لم يتم فتح {file} — قد تم نقله منذ آخر مسح.",
     "card": {
       "versionUpgrade": "تحديث متاح لـ {latest}",
-      "versionCurrent": "أحدث إصدار",
+      "versionCurrent": "عن آخر الأخبار حول أحدث الأحداث",
       "featuresTitle": "ميزات لم تستخدم بعد.",
       "locationsTitle": "حيث يستخدم مشروعك هذه الحزمة.",
-      "noLocations": "غير مستورد في مصدر المشروع — يُرجَّح أنه تبعية تطوير أو تبعية متعدية.",
+      "noLocations": "غير مستورد في مصادر المشروع — من المحتمل أن يكون اعتمادًا تطوريًا أو اعتمادًا غير مباشر.",
       "moreFiles": "و {count} المزيد من الملفات.",
       "openInDashboard": "افتح في لوحة تحكم الحزمة.",
       "writeReport": "اكتب تقرير"
@@ -454,17 +469,17 @@
     "section": {
       "version": "نسخة من النسخة",
       "changelog": "تغييرات في التغير",
-      "community": "المجتمع",
-      "dependencies": "التبعيات",
+      "community": "المجتمع المحلي.",
+      "dependencies": "التبعية: تعتمد على الاحتياجات.",
       "alerts": "تنبيهات تحذير",
       "platforms": "منصات المنصات",
       "suggestions": "اقتراحات: الاقتراحات هي",
-      "readmeImages": "صور README"
+      "readmeImages": "صور للقراءة في قناة README"
     },
     "header": {
       "logoAlt": "{name} شعار الشركة",
       "grade": "الدرجة {grade}",
-      "licenseTitle": "الترخيص",
+      "licenseTitle": "ترخيص الترخيص.",
       "published": "نشرت {date}"
     },
     "partialBanner": {
@@ -474,63 +489,63 @@
       "listTwo": "{first} و {second}.",
       "listMany": "{head}، و {last}.",
       "message": "بعض الأقسام لم تتمكن من تحميل: {list}.",
-      "retry": "إعادة المحاولة",
+      "retry": "حاول إعادة المحاولة.",
       "retrying": "إعادة المحاولة...",
-      "retryTitle": "أعد محاولة عمليات الجلب الفاشلة."
+      "retryTitle": "حاول مرة أخرى الوصول إلى الملفات الفاشلة."
     },
     "description": {
-      "readMore": "اقرأ المزيد"
+      "readMore": "اقرأ المزيد قراءة أكثر"
     },
     "version": {
       "constraint": "القيود المحددة",
-      "latest": "الأحدث",
-      "prerelease": "إصدار تجريبي",
+      "latest": "آخر الأخبار أحدث الأحدث",
+      "prerelease": "الإفراج المسبق عن النسخة السابقة.",
       "published": "نشر نشرت نُشر",
-      "update": "تحديث",
+      "update": "تحديث التحديث Update Update",
       "blockedBy": "تم حجبها بواسطة",
       "blockedVia": "{blocker} القبعات {dep} {constraint} ({resolvable} قابلة للتحليل ، {latest} أحدث)",
       "blockedViaSdk": "مُلصَّق بواسطة {blocker} (Flutter SDK) لـ {dep} ({resolvable} قابلة للحل، {latest} أحدث)",
-      "constrained": "مقيَّد",
+      "constrained": "مقيدة ومحكوم عليها.",
       "constrainedBy": "قيودك {constraint} تُحدِّد هذا ({resolvable} قابلة للحل، {latest} أحدث)",
       "pinHeld": "عقدت عقد",
       "pinDoNotUse": "لا تستخدمي.",
       "drift": "الانجراف عبر المشاريع.",
       "driftBehind": "خلف: {siblings} (لديك {own})",
       "driftDiffers": "يختلف: {siblings} (لديك {own})",
-      "codeSize": "حجم الكود",
+      "codeSize": "حجم الرمز: حجم الكود.",
       "archiveSize": "حجم الأرشيف",
       "bloat": "({rating}/10 تضخم)",
-      "onDisk": "على القرص",
-      "upgrade": "ترقية",
+      "onDisk": "على القرص On Disk",
+      "upgrade": "ترقية الترقيات الارتقاء",
       "upgrading": "الترقية...",
       "viewChangelog": "عرض سجل التغييرات"
     },
     "changelog": {
-      "intro": "ما الذي تغيّر من {from} إلى {to} — راجعه قبل الترقية.",
+      "intro": "ما الذي تغير من {from} إلى {to} — مراجعة قبل الترقية.",
       "versionDated": "{version} — {date}",
       "truncated": "يظهر {count} أحدث الإصدارات.",
       "viewFull": "عرض كامل سجل التغييرات على pub.dev"
     },
     "community": {
-      "stars": "النجوم",
-      "likes": "الإعجابات",
-      "report": "تقرير",
-      "openIssues": "المشكلات المفتوحة",
-      "openPrs": "طلبات السحب المفتوحة",
+      "stars": "النجوم نجوم نجمة",
+      "likes": "يحبّ الـ (Likes)",
+      "report": "تقرير التقرير تقرير",
+      "openIssues": "القضايا المفتوحة المسائل المفتحة.",
+      "openPrs": "العلاقات العامة المفتوحة (Open PRs)",
       "activity": "النشاط (90د)",
       "activityValue": "تم إغلاق قضايا {closed} ، وتم دمج PRs {merged}.",
       "noActivity": "لا نشاطات حديثة.",
       "lastCommit": "الالتزام الأخير",
-      "pubPoints": "نقاط Pub",
+      "pubPoints": "النقاط الحانات نقاط البار.",
       "verified": "(تم التحقق منه)",
-      "publisher": "الناشر",
+      "publisher": "الناشر ناشر النشر.",
       "flagged": "({count} مُعلم)",
-      "transitiveDeps": "التبعيات المتعدية",
+      "transitiveDeps": "الودائع الانتقالية Transitive Deps",
       "footprintBreakdown": "{unique} فريدة من نوعها &middot؛ +{shared} مشتركة = {total} إجمالي.",
       "footprintTooltip": "{own} الخاصة + ترانزيتيفات فريدة من نوعها {unique} + ترانسيتيفيات مشتركة {shared}. إزالة هذا الموقع يوفر {saved} (المواقع المشتركة تبقى سحبها من قبل الآخرين).",
       "trueFootprint": "بصمة أقدام حقيقية",
       "packagesCount": "{count} حزم",
-      "dependents": "الحزم التابعة"
+      "dependents": "المعتمدين على المعالجة."
     },
     "fileUsages": {
       "commentedOut": "المراجع مع التعليق:",
@@ -539,60 +554,60 @@
       "publicApiSurface": "سطح API العامة",
       "header": "استخدامات الملف ({label})",
       "commentedReexportTitle": "إعادة التصدير مع التعليقات خارجها.",
-      "reexportTitle": "أُعيد تصديره — جزء من واجهة API العامة لهذه المكتبة",
-      "reexportBadge": "إعادة تصدير"
+      "reexportTitle": "إعادة تصديرها - جزء من واجهة برمجة التطبيقات العامة لهذه المكتبة",
+      "reexportBadge": "إعادة التصدير - إعادة تصدير."
     },
     "opportunities": {
       "header": "الفرص ({count})",
       "viewCode": "عرض رمز العرض",
-      "viewDocs": "عرض الوثائق"
+      "viewDocs": "عرض المستندات."
     },
     "alerts": {
-      "archived": "مؤرشف — المستودع للقراءة فقط",
+      "archived": "مؤرشف - المستودع للقراءة فقط",
       "knownIssue": "المسألة المعروفة: {reason}",
-      "unused": "غير مستخدم — لم يُرصد أي استيراد",
-      "fix": "— الإصلاح: {version}"
+      "unused": "غير مستخدم - لم يتم اكتشاف أي واردات",
+      "fix": "- الإصلاح: {version}"
     },
     "versionGap": {
-      "versionTitle": "فجوة الإصدار",
-      "overrideTitle": "فجوة التجاوز",
+      "versionTitle": "نسخة الفجوة Gap Version",
+      "overrideTitle": "تجاوز ثغرة الفجوة.",
       "noDates": "لم يتمكن من تحديد تواريخ الإصدارات لهذا الحزمة.",
       "noItems": "لم يتم العثور على أي PR أو قضايا بين هذه الإصدارات.",
-      "prsMerged": "طلبات سحب مدمجة",
-      "issuesClosed": "مشكلات مغلقة",
+      "prsMerged": "اندمجت شركات PRs.",
+      "issuesClosed": "قضايا مغلقة.",
       "searchLabel": "البحث عن العلاقات العامة والقضايا.",
       "searchPlaceholder": "البحث عن العلاقات العامة والقضايا...",
       "filterAria": "مرشح حسب الفئة.",
-      "filterAll": "الكل",
-      "filterUnreviewed": "غير المراجَع",
-      "filterPrs": "طلبات السحب",
-      "filterIssues": "المشكلات",
-      "typePr": "طلب سحب",
+      "filterAll": "كل شيء، كل شيء.",
+      "filterUnreviewed": "غير المراجعة لم يتم مراجعتها.",
+      "filterPrs": "العلاقات العامة PRs",
+      "filterIssues": "القضايا المسائل قضايا.",
+      "typePr": "PR PR PRPR: تعني النمو.",
       "typeIssue": "موضوع القضية",
-      "reviewReviewed": "تمت المراجعة",
+      "reviewReviewed": "تمت مراجعتها.",
       "reviewApplicable": "المطبق المناسبة",
-      "reviewNotApplicable": "غير منطبق",
+      "reviewNotApplicable": "لا / لا N/A",
       "notesPlaceholder": "ملاحظات...ملاحظات",
-      "colType": "النوع",
-      "colTitle": "العنوان",
-      "colAuthor": "المؤلف",
-      "colReview": "المراجعة",
+      "colType": "نوع النوع نوع النموذج",
+      "colTitle": "عنوان العنوان عنوان العناوين",
+      "colAuthor": "المؤلف المكتوب مؤلف الكاتب",
+      "colReview": "مراجعة المراجعة Review Review",
       "summaryFooter": "تم فرز {triaged} من {total} | {applicable} قابل للتطبيق | {notApplicable} غير متاح | {unreviewed} المتبقية",
       "truncated": "النتائج مقطوعة إلى {limit} البنود."
     },
     "platforms": {
-      "wasm": "WASM"
+      "wasm": "وزم WASM."
     },
     "images": {
-      "alt": "صورة README"
+      "alt": "صورة README الصورة."
     },
     "links": {
       "viewOnPubDev": "عرض على pub.dev",
       "documentation": "الوثائق التوثيقية وثائق",
-      "changelog": "سجل التغييرات",
-      "versions": "الإصدارات",
-      "repository": "المستودع",
-      "openIssues": "المشكلات المفتوحة",
+      "changelog": "تغييرات التغيير.",
+      "versions": "النسخة الإصدارات Versions",
+      "repository": "مخزن البيانات Repository",
+      "openIssues": "القضايا المفتوحة المسائل المفتحة.",
       "reportIssue": "تقرير مسألة القضية"
     },
     "a11y": {
@@ -604,11 +619,11 @@
     }
   },
   "toolbar": {
-    "runAnalysis": "تشغيل التحليل",
-    "copyJson": "نسخ JSON",
-    "saveReport": "حفظ التقرير",
+    "runAnalysis": "تشغيل تحليل التحليل.",
+    "copyJson": "نسخ JSON إلى النسخة.",
+    "saveReport": "حفظ التقرير حفظ التقريرة.",
     "moreActions": "المزيد من الإجراءات",
-    "clearAll": "مسح الكل"
+    "clearAll": "كل شيء واضح تماما."
   },
   "loading": {
     "runningAnalysis": "تشغيل التحليل...",
@@ -620,23 +635,23 @@
   },
   "filter": {
     "activeLabel": "المرشحات النشطة:",
-    "chipRemove": "إزالة"
+    "chipRemove": "إزالة Remove إزالت remove"
   },
   "a11y": {
     "toggleFullWidth": "قم بتبديل تخطيط عرض العرض الكامل.",
     "expandRow": "توسيع صف الصف",
-    "comparisonDimension": "المقياس"
+    "comparisonDimension": "المقاييس المترية Metric"
   },
   "uiLanguage": {
     "pick": {
       "title": "لغة واجهة Saropa Lints",
       "placeholder": "اختر لغة الشريط الجانبي ولوحات المعلومات",
       "auto": "تلقائي (اتبع لغة عرض VS Code)",
-      "coverage": "تمت ترجمة {pct}% — يظهر الباقي بالإنجليزية"
+      "coverage": "تمت ترجمة {pct}% — بقية العروض باللغة الإنجليزية"
     },
     "reloadPrompt": "تم تعيين اللغة إلى {locale}. أعد تحميل النافذة لتحديث الشريط الجانبي وملصقات الأوامر.",
-    "reloadNow": "إعادة التحميل الآن",
-    "reloadLater": "لاحقًا"
+    "reloadNow": "أعد تحميل الآن.",
+    "reloadLater": "في وقت لاحق لاحقاً"
   },
   "statusBar": {
     "error": {
@@ -647,94 +662,94 @@
       "openViolations": "فتح تقرير المخالفات",
       "openPackageDashboard": "افتح لوحة تحكم الحزمة.",
       "openProcessHealth": "فتح حالة الصحة",
-      "commandCatalog": "فهرس الأوامر",
+      "commandCatalog": "قائمة القيادة كتالوج الأوامر",
       "about": "حول"
     },
     "tooltip": {
       "section": {
-        "status": "Status",
-        "project": "Project",
-        "problems": "Problems",
-        "memory": "Memory",
-        "actions": "Actions"
+        "status": "الوضع الحالي Status",
+        "project": "مشروع",
+        "problems": "مشكلات",
+        "memory": "الذاكرة",
+        "actions": "الإجراءات الأعمال"
       },
       "cause": {
-        "on": "Analysis is running: the setting and the analyzer plugin are both on.",
-        "off": "Analysis is off: the setting and the analyzer plugin are both off.",
-        "partialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on.",
-        "partialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on.",
-        "notSetUp": "saropa_lints is not set up in this project: it is not a dependency in pubspec.yaml and analysis_options.yaml has no plugin entry."
+        "on": "التحليل في التشغيل: إعدادات وملحق تحليل المُحلِّل كلاهما مُفعَّل.",
+        "off": "تحليل غير مفعل: إعدادات وملحق تحليل الملفات كلاهما غير مفعل.",
+        "partialSetting": "معظمًا مغلق: إعداد saropaLints.enabled مغلق بينما هو تحليل مُفعل.",
+        "partialPlugin": "جزئيًا مغلق: مُحلِّل المُسَمَّى مُغلَّق في analysis_options.yaml بينما الإعداد مُفعَّل.",
+        "notSetUp": "saropa_lints غير مُعداد في هذا المشروع: إنه ليس اعتمادًا في pubspec.yaml و analysis_options.yaml لا يحتوي على دخول للملحق."
       },
       "fix": {
-        "turnOn": "Fix: turn both on",
-        "setUp": "Fix: set up and turn on",
-        "title": "Turns the saropaLints.enabled setting and the analyzer plugin on together."
+        "turnOn": "إصلاح: قم بتشغيل الطرفين",
+        "setUp": "إصلاح: إعداد وتشغيل",
+        "title": "يُفعّل إعداد saropaLints.enabled وملحق تحليل الأخطاء معًا."
       },
       "pill": {
-        "statusOn": "Lints are running. Click to open the Violations Report.",
-        "findings": "Open the Violations Report.",
-        "vibrancy": "Open the Package Dashboard."
+        "statusOn": "التحليلات قيد التنفيذ. انقر لفتح تقرير المخالفات.",
+        "findings": "افتح تقرير المخالفات",
+        "vibrancy": "افتح لوحة تحكم الحزمة"
       },
       "project": {
-        "version": "Version",
-        "tier": "Tier",
-        "vibrancy": "Vibrancy",
-        "packages": "Packages scanned",
-        "packagesSuppressed": "{count} ({suppressed} suppressed)",
-        "score": "Lint score",
-        "scorePending": "run a full analysis (partial scan)",
-        "findings": "Findings",
-        "updates": "Updates available",
-        "actionItems": "Action items",
-        "route": "Route"
+        "version": "النسخة Version نسخة",
+        "tier": "مستوى",
+        "vibrancy": "الحيوية",
+        "packages": "الباقات الممسوحة",
+        "packagesSuppressed": "{count} ({suppressed} مُسَكَّن)",
+        "score": "نسبة التحقق من صحة الكود",
+        "scorePending": "تشغيل تحليل كامل (مسح جزئي)",
+        "findings": "النتائج التي توصلنا إليها",
+        "updates": "تحديثات متاحة",
+        "actionItems": "أوامر العمل",
+        "route": "المسار"
       },
       "findings": {
-        "allErrors": "{count} findings (all errors)",
-        "allErrorsOne": "1 finding (an error)",
-        "mixed": "{errors} errors · {warnings} warnings",
-        "noErrors": "{total} findings"
+        "allErrors": "{count} إيجاب (جميع الأخطاء)",
+        "allErrorsOne": "1 اكتشاف (خطأ)",
+        "mixed": "أخطاء {errors} · تحذيرات {warnings}",
+        "noErrors": "العثورات {total}"
       },
       "problem": {
-        "openCompat": "Open version compatibility card",
-        "reviewReadiness": "Review workspace issues"
+        "openCompat": "فتح بطاقة توافق الإصدار",
+        "reviewReadiness": "مراجعة مشاكل المساحة العاملة"
       },
       "memory": {
         "saropa": "Saropa Lints",
-        "none": "none running",
-        "processes": "{count} process(es) · {size} RSS",
-        "daemons": "Flutter daemons",
-        "daemonsValue": "{total} ({orphaned} orphaned)",
-        "scanDaemons": "Orphaned scan daemons",
-        "scanDaemonsValue": "{count}, use Clean Up to kill",
-        "other": "Other Dart",
-        "extHost": "Extension host",
+        "none": "لا شيء يعمل",
+        "processes": "عملية (ات) {count} · {size} RSS",
+        "daemons": "Flutter دايمونز",
+        "daemonsValue": "{total} ({orphaned} مهجور)",
+        "scanDaemons": "الخدمات المسح المهجورة",
+        "scanDaemonsValue": "{count}، استخدم تنظيف لقتل",
+        "other": "آخر Dart",
+        "extHost": "مُضيف التمديد",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
-        "ram": "Machine RAM",
-        "ramValue": "{free} free of {total}",
-        "trend": "RSS trend (last ~30 min)"
+        "ram": "ذاكرة الحاسوب RAM",
+        "ramValue": "{free} خالية من {total}",
+        "trend": "RSS تريند (الأخير ~30 دقيقة)"
       },
       "action": {
-        "turnOff": "Turn Lints off",
-        "turnOn": "Turn Lints on",
-        "turnBothOn": "Turn both on",
-        "versionCompat": "Version Compatibility"
+        "turnOff": "إيقاف التحقق من الأخطاء",
+        "turnOn": "التحقق من اللينتات تفعيلًا",
+        "turnBothOn": "أطفئهما كلاهما",
+        "versionCompat": "توافق الإصدار"
       }
     },
     "quickPick": {
       "title": "Saropa Lints",
-      "placeholder": "Pick an action"
+      "placeholder": "اختر إجراءً"
     }
   },
   "systemHealth": {
     "heapCap": {
-      "noneMessage": "يحتوي جهازك على {totalGb} من الذاكرة. لا يوجد حد أقصى للذاكرة لخادم تحليل Dart، لذا يمكن أن ينمو حتى يبطئ الجهاز أو يبدأ بالتبديل (swapping). الحد الموصى به: {recommendedGb}.",
-      "tooHighMessage": "يحتوي جهازك على {totalGb} من الذاكرة. يُسمح لخادم تحليل Dart باستخدام ما يصل إلى {capGb} (تم تعيينه في {location})، مما يترك حوالي {freeGb} لنظام التشغيل وVS Code وأدوات Dart الأخرى، لذا قد يبطئ الجهاز أو يبدأ بالتبديل. الحد الموصى به: {recommendedGb}.",
-      "locationGlobal": "إعدادات المستخدم لديك",
-      "locationWorkspace": "إعدادات مساحة العمل هذه",
-      "locationWorkspaceFolder": "إعدادات مجلد مساحة العمل هذا",
+      "noneMessage": "جهازك يملك {totalGb} من الذاكرة. خادم تحليل Dart لا يملك سقف ذاكرة، لذلك يمكنه التوسع حتى يبطئ الجهاز أو يبدأ في التبديل. المقترح هو وضع سقف: {recommendedGb}.",
+      "tooHighMessage": "جهازك يملك {totalGb} من الذاكرة. يُسمح لخادم التحليل Dart باستخدام حتى {capGb} (المُحدد في {location})، مما يترك حوالي {freeGb} للنظام التشغيلي، VS Code وأدوات أخرى Dart، لذلك قد يتباطأ الجهاز أو يُستخدم التبادل. الحد المقترح: {recommendedGb}.",
+      "locationGlobal": "إعدادات المستخدم الخاص بك",
+      "locationWorkspace": "إعدادات هذا المساحة العاملة",
+      "locationWorkspaceFolder": "هذا إعدادات مجلد مساحة العمل",
       "apply": "تطبيق {gb}",
-      "notNow": "ليس الآن",
-      "dontAskAgain": "لا تسأل مرة أخرى"
+      "notNow": "الآن لا",
+      "dontAskAgain": "لا تطرح السؤال مرة أخرى"
     },
     "statusBar": {
       "warning": "⚠ {size}",
@@ -761,16 +776,16 @@
     "action": {
       "cleanUp": "تنظيف",
       "openPanel": "فتح لوحة الصحة",
-      "dismiss": "تجاهل",
+      "dismiss": "فصله من العمل",
       "optimizeAnalysis": "تحسين التحليل",
       "dontShowAgain": "لا تظهر مرة أخرى",
       "openMachineDashboard": "فتح حالة الجهاز",
-      "restartAnalysisServer": "إعادة التشغيل"
+      "restartAnalysisServer": "إعادة تشغيل: إعادة التشغيل."
     },
     "cleanup": {
       "noOrphans": "لم يتم العثور على أي دايموندات مهجورة.",
       "confirm": "تم العثور على {count} عملية(s) daemon مهجورة باستخدام {size}. هل ترغب في إنهاؤها؟",
-      "killButton": "إنهاء العمليات اليتيمة",
+      "killButton": "قتل الأبناء غير المرتبطين",
       "cancelButton": "إلغاء الإلغاء"
     },
     "orphanPreflight": {
@@ -793,11 +808,11 @@
       "processes": "الإجراءات",
       "totalRss": "إجمالي RSS",
       "orphaned": "مهجور",
-      "refresh": "تحديث",
+      "refresh": "استرخاء وترفعه.",
       "colPid": "PID",
       "colParent": "الوالد",
       "colRss": "RSS",
-      "colType": "النوع",
+      "colType": "نوع النوع نوع النموذج",
       "colCommand": "التعليمات",
       "colAction": "الإجراء",
       "typeOrphan": "أُرَفَّه",
@@ -811,19 +826,21 @@
     "watcherExclude": {
       "prompt": "{count} تطبيق إستثناءات المراقبة الموصى بها مفقودة من هذا المشروع: {patterns}. إضافة هذه الإستثناءات تمنع VS Code من تتبع مصنفات البناء الكبيرة وملفات التصحيح التي تستهلك الذاكرة.",
       "addAll": "أضف جميعًا",
-      "dismiss": "تجاهل",
+      "dismiss": "فصله من العمل",
       "added": "أضيفت إعدادات استثناءات مراقبة الملفات {count} إلى إعدادات المشروع."
     },
     "nestedRoots": {
-      "prompt": "يحتوي {folders} على {count} من جذور حزم Dart المتداخلة التي يتجاهلها git. يتم تحليل كل منها كسياق منفصل وقد يضخّم ذلك استهلاك ذاكرة خادم التحليل.",
-      "fix": "استبعاد من التحليل",
-      "dismiss": "تجاهل",
-      "fixed": "تم استبعاد {folders} من التحليل ومن مراقبة الملفات."
+      "prompt": "{folders} تحتوي على {count} مجلدات جذر Dart مُهمَّزة بـ git. كل منها تُحلَّل كسياق منفصل ويمكن أن تُعَبِّئ ذاكرة خادم التحليل.",
+      "fix": "استبعد من التحليل",
+      "dismiss": "فصله من العمل",
+      "fixed": "تم استبعاد {folders} من التحليل ومراقبة الملفات."
     },
     "hazardScan": {
-      "warning": "تم العثور على ملف(ات) كبير(ة) {count} غير مستبعد(ة) من مراقبة الملفات: {files}. ويمكن أن يؤدي ذلك إلى استهلاك الذاكرة وانهيار VS Code.",
+      "warning": "تم العثور على {count} ملف(s) كبير(ة) داخل المجلد المفتوح \"{folder}\" (المسارات نسبيّة بالنسبة لهذا المجلد): {files}. VS Code يراقب كل ملف في المجلد للبحث عن التغييرات، ويمكن أن تبطئ الملفات الكبيرة هذا النظام أو تُنهكه.",
+      "andMore": "و {count} أكثر",
+      "unnamedFolder": "(المجلد غير المسمى)",
       "addExclusions": "استبعد من المراقب",
-      "dismiss": "تجاهل",
+      "dismiss": "فصله من العمل",
       "added": "تم إضافة نمط(ات) استثناء {count} لمراقبة المُراقب إلى إعدادات الفضاء العمل."
     }
   },
@@ -846,9 +863,9 @@
   },
   "machineDashboard": {
     "title": "صحة الجهاز",
-    "refresh": "تحديث",
+    "refresh": "استرخاء وترفعه.",
     "systemUnknown": "لا يمكن قراءة ذاكرة النظام على هذه المنصة.",
-    "platformUnsupported": "صحة الجهاز غير متوفرة على هذه المنصة — استعلامات العمليات مدعومة على ويندوز وماك أو إس ولينكس.",
+    "platformUnsupported": "ليست حالة الجهاز متاحة على هذه المنصة — دعم استعلامات العملية للويندوز و ماك أو إس و لينكس",
     "freeOf": "خالٍ من",
     "used": "مستخدم",
     "recommendationsTitle": "التوصيات",
@@ -860,13 +877,13 @@
       "analysisServer": "خوادم تحليل Dart",
       "flutterDaemon": "Flutter الدايمونز",
       "saropa": "Saropa Lints",
-      "otherDart": "其他 Dart 进程",
+      "otherDart": "أخرى Dart العمليات",
       "modelHost": "محرك الترجمة (Ollama)"
     },
     "recommendation": {
-      "heapCapTooHigh": "حد الذاكرة لخادم التحليل ({capMb} ميغابايت) يترك أقل من نصف ذاكرة هذا الجهاز لكل شيء آخر. الحد الموصى به: {recommendedMb} ميغابايت.",
-      "noHeapCapWithSuggestion": "لم يتم تكوين حد أقصى للذاكرة لخادم تحليل Dart. الحد الموصى به لهذا الجهاز: {mb} ميغابايت.",
-      "systemLowMemory": "المتاح من ذاكرة RAM على مستوى الجهاز هو {free} فقط من أصل {total}. أغلق التطبيقات غير المستخدمة أو نوافذ VS Code.",
+      "heapCapTooHigh": "الحد الأقصى لحجم الذاكرة ({capMb} ميغابايت) لخادم التحليل يترك أقل من نصف ذاكرة الوصول العشوائي لهذه الآلة للأشياء الأخرى. الحد الأقصى المقترح: {recommendedMb} ميغابايت.",
+      "noHeapCapWithSuggestion": "الخادم تحليلي Dart لا يحتوي على حد أقصى لذاكرة مُحدد. الحد المقترح لهذا الجهاز: {mb} ميغابايت.",
+      "systemLowMemory": "توجد فقط {free} من {total} من الذاكرة العشوائية (RAM) متوفرة على مستوى النظام. أغلق التطبيقات غير المستخدمة أو VS Code النوافذ.",
       "orphansFound": "عملية(ات) مهجورة {count} تستخدم {size} من الذاكرة من جلسة سابقة.",
       "analysisServerLarge": "عملية(ات) خدمة تحليل {count} Dart تستخدم حتى {size}. إعادة التشغيل تطلق الذاكرة.",
       "multipleAnalysisServers": "خوادم تحليل {count} Dart تعمل — من المرجح أن تكون واحدة لكل نافذة مفتوحة VS Code على مشاريع متشابكة.",
@@ -876,12 +893,12 @@
     },
     "action": {
       "reclaim": "استعادة",
-      "restartAnalysisServer": "إعادة التشغيل",
+      "restartAnalysisServer": "إعادة تشغيل: إعادة التشغيل.",
       "setHeapCap": "ضبط الحد الأقصى",
       "unloadModel": "إلغاء التحميل"
     },
     "heapCap": {
-      "promptWithRecommendation": "حد ذاكرة خادم التحليل بالميغابايت. الموصى به لذاكرة هذا الجهاز البالغة {totalGb}: {recommendedMb} ميغابايت.",
+      "promptWithRecommendation": "الحد الأقصى لحجم الذاكرة (heap) لخادم التحليل في ميجابايت. يُنصح بـ {recommendedMb} ميجابايت لهذا الجهاز {totalGb}.",
       "invalid": "أدخل عددًا صحيحًا من ميغابايت أكبر من 0.",
       "applied": "ضبط سعة الذاكرة (heap) للخادم الخاص بالتحليل إلى {mb} ميغا بايت. قم بإعادة تشغيل خادم التحليل ليصبح التغيير سارياً.",
       "restartNow": "إعادة التشغيل الآن"
@@ -913,7 +930,7 @@
     "notification": {
       "shedDisabled": "تم اكتشاف ضغط ذاكرة المُحلِّل (RSS {rssMb} ميغابايت، الحد الأدنى الناعم {softLimitMb} ميغابايت). تفعيل قواعد التخفيض تلقائيًا لتعطيل القواعد المكلفة تحت الضغط.",
       "enableButton": "تمكين Enable تمكين",
-      "learnMoreButton": "معرفة المزيد",
+      "learnMoreButton": "تعلم المزيد تعرّف على المزيد",
       "runInit": "أعد تشغيل \"dart run saropa_lints:init\" لإنشاء analysis_options_custom.yaml، ثم قم بتعيين shed_rules: true.",
       "enabledConfirmation": "القاعدة المُعلقة مُفعّلة في analysis_options_custom.yaml. سيقوم المُحلّل بتطبيق التغيير في إعادة التحميل التالية."
     },
@@ -941,7 +958,7 @@
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "الآن",
+      "justNow": "الآن فقط، والآن.",
       "minutesAgo": "منذ {min} د",
       "hoursAgo": "منذ {hr} س",
       "daysAgo": "منذ {day} يوم"
@@ -958,7 +975,7 @@
       "driftOnTitle": "Drift Advisor متصل: {label}",
       "driftOnPill": "التنجرف على · {count}",
       "driftOfflineTitle": "تم تفعيل مستشار Drift Advisor ولكن لم يتم العثور على خادم.",
-      "driftOfflinePill": "Drift غير متصل",
+      "driftOfflinePill": "الانجراف في وضع عدم الاتصال بالإنترنت.",
       "driftAuthRequiredTitle": "الخادم Drift Advisor تم العثور عليه لكنه يتطلب توكن أمان — قم بتعيين saropaLints.driftAdvisor.authToken",
       "driftAuthRequiredPill": "د rift يحتاج إلى توكين",
       "driftAuthFailedTitle": "تم رفض Drift Advisor التوكن المُحدد للتحقق من الهوية — انقر للتحديث",
@@ -976,40 +993,40 @@
     },
     "groupBy": {
       "severity": "شدة الحالة:",
-      "file": "الملف",
-      "impact": "التأثير",
-      "rule": "القاعدة",
+      "file": "ملفات الملفات File file",
+      "impact": "تأثير التأثير Impact impact",
+      "rule": "قاعدة قانونية القواعد",
       "owasp": "OWASP",
       "ruleType": "نوع القاعدة:",
-      "ruleStatus": "حالة القاعدة",
-      "tier": "المستوى",
+      "ruleStatus": "وضع القاعدة في الوضع",
+      "tier": "مستوى",
       "pack": "حزمة (s)"
     },
     "seg": {
       "toggleSeverityTitle": "التبديل {v} شدة الحالة."
     },
     "kpi": {
-      "visibleLabel": "النتائج المعروضة",
-      "allMatched": "الكل مطابق",
+      "visibleLabel": "النتائج المرئية التي توصل إليها.",
+      "allMatched": "كل متطابقة مطابقة.",
       "ofTotal": "من إجمالي {total}",
       "clearFiltersTitle": "انقر فوق لإزالة جميع المرشحات.",
       "errorsLabel": "الأخطاء أخطاء",
-      "errorsSubFix": "يجب إصلاحها",
-      "errorsSubClear": "لا شيء — سليم",
-      "errorsTitle": "تصفية النتائج إلى الأخطاء (يجب إصلاحها — معطّل / سيتعطل / قابل للاستغلال)",
-      "warningsLabel": "تحذيرات",
+      "errorsSubFix": "يجب أن يصلح إصلاح",
+      "errorsSubClear": "لا شيء - واضح",
+      "errorsTitle": "تصفية النتائج حسب الأخطاء (يجب إصلاحها - معطلة / ستتعطل / قابلة للاستغلال)",
+      "warningsLabel": "تحذيرات التحذير من التهديدات",
       "warningsSubBad": "يمكن أن تفشل أو تبدو سيئة.",
-      "warningsSubClear": "لا شيء — سليم",
+      "warningsSubClear": "لا شيء - واضح",
       "warningsTitle": "تصفية النتائج إلى التحذيرات (قد تفشل أو تبدو سيئة)",
-      "infoLabel": "معلومات",
-      "infoSub": "للعلم — الأسلوب / الاقتراحات",
-      "infoSubNone": "لا شيء",
-      "infoTitle": "تصفية النتائج إلى المعلومات (للعلم — الأسلوب والاقتراحات)",
-      "filesLabel": "الملفات المتأثرة",
+      "infoLabel": "معلومات معلومات معلومات",
+      "infoSub": "لمعلوماتك - الأسلوب / الاقتراحات",
+      "infoSubNone": "لا أحد، لا شيء.",
+      "infoTitle": "تصفية النتائج إلى معلومات (لمعلوماتك - الأسلوب والاقتراحات)",
+      "filesLabel": "الملفات المتأثرة متضررة.",
       "filesSubAcross": "في جميع أنحاء الصادرات التصدير.",
       "filesSubNone": "لا توجد ملفات متأثرة.",
       "filesTitle": "ملفات متميزة تساهم في اكتشاف واحد على الأقل.",
-      "topRuleLabel": "أعلى قاعدة",
+      "topRuleLabel": "القاعدة العليا هي قواعد الأعلى.",
       "topRuleTitle": "تصفية النتائج إلى قاعدة {name}.",
       "sectionHeading": "نظرة عامة",
       "sectionAria": "إحصائيات موجزة"
@@ -1017,20 +1034,20 @@
     "toolbar": {
       "ariaFiltersActions": "المرشحات والإجراءات.",
       "groupByFieldTitle": "نتائج المجموعة حسب البعد المختار.",
-      "groupByLabel": "تجميع حسب",
+      "groupByLabel": "المجموعة حسب المجموعات",
       "textFilterTitle": "تصفية النتائج حسب مسار الملف أو القاعدة أو نص الرسالة.",
       "textFilterPlaceholder": "تصفية حسب الملف، القاعدة أو الرسالة...",
-      "textFilterAria": "عامل تصفية النص",
+      "textFilterAria": "مرشح نصي للفلتر.",
       "clearTextFilterTitle": "صافي مرشح النص الفلتر.",
       "clearTextFilterAria": "صافي مرشح النص الفلتر.",
-      "recentFiltersTitle": "عوامل التصفية الأخيرة",
+      "recentFiltersTitle": "مرشحات الأخيرة المرشحون الحديثون",
       "clearRecentTitle": "مسح جميع المرشحات الأخيرة.",
-      "clearRecentButton": "مسح",
-      "recentFiltersListAria": "عوامل التصفية الأخيرة",
+      "clearRecentButton": "واضحة واضحة صافية",
+      "recentFiltersListAria": "مرشحات الأخيرة المرشحون الحديثون",
       "runAnalysisTitle": "تشغيل تحليل Saropa Lints التحليل.",
-      "severityGroupAria": "عامل تصفية الخطورة",
+      "severityGroupAria": "فلتر شدة الحالة.",
       "severityLabel": "شدة الحالة:",
-      "moreSummary": "المزيد",
+      "moreSummary": "أكثر",
       "moreChevron": "▾",
       "copyJsonTitle": "نسخ الانتهاكات التي تمت تصفيتها كـ JSON ({count})",
       "saveReportTitle": "حفظ الانتهاكات التي تمت تصفيتها كـ JSON إلى التقارير / YYYYMMDD/.",
@@ -1071,13 +1088,13 @@
       "resetAllTitle": "إعادة تعيين جميع المرشحات."
     },
     "menuPalette": {
-      "help": "مساعدة",
-      "groupBy": "تجميع حسب…",
+      "help": "مساعدة المساعدات المساعدة",
+      "groupBy": "...مجموعة من قبل مجموعة",
       "textFilter": "مُرشّح النصوص... مرشح نص.",
       "severityImpact": "فلتر شدة...",
       "hideRules": "اخف قواعد...",
-      "ruleMetadata": "بيانات القاعدة الوصفية",
-      "clearFilters": "مسح عوامل التصفية",
+      "ruleMetadata": "قاعدة الميتاداتا القاعدة.",
+      "clearFilters": "إزالة الفلاتر من المواد.",
       "clearSuppressions": "قمع واضح للقمع.",
       "clearFileFocus": "قم بتطهير التركيز على الملفات.",
       "matchActiveEditor": "مطابقة محرر النشط.",
@@ -1093,10 +1110,10 @@
       "reEnableNoneMessage": "لا توجد قواعد معطلة حاليًا عبر analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "إعادة تمكين قواعد المعطلة معطلًا.",
       "reEnableQuickPickPlaceholder": "حدد قاعدة واحدة أو أكثر لإعادة تمكينها.",
-      "menuGroupExport": "تصدير",
+      "menuGroupExport": "التصدير الصادرة.",
       "menuGroupBulk": "إجراءات كتلة",
       "menuGroupFilter": "فلتر & التركيز.",
-      "menuGroupOpen": "فتح لوحة المعلومات",
+      "menuGroupOpen": "افتح لوحة القيادة.",
       "menuGroupSystem": "نظام النظام System"
     },
     "progress": {
@@ -1105,19 +1122,19 @@
     },
     "topRules": {
       "sectionAria": "القواعد الأهم حسب العد",
-      "hideTitle": "إخفاء لي فقط — على مستوى مساحة العمل، ويمكن التراجع عنه عبر مسح عمليات الكتم",
-      "hideButton": "إخفاء",
-      "disableTitle": "تعطيل للمشروع بأكمله — يكتب analysis_options_custom.yaml ويعيد تشغيل التحليل",
+      "hideTitle": "الإخفاء لي فقط - على مستوى مساحة العمل، ويمكن عكسه عبر عمليات القمع الواضحة",
+      "hideButton": "اختبئ، تختفي.",
+      "disableTitle": "تعطيل المشروع بأكمله — يكتب analysis_options_custom.yaml ويعيد تشغيل التحليل",
       "disableButton": "تعطيل تعطيّل",
       "workspaceOnlyShort": "مساحة العمل فقط",
       "projectConfigShort": "config المشروع (يكتب analysis_options_custom.yaml)",
       "topRulesOne": "قاعدة {count} العليا",
       "topRulesOther": "قواعد {count} العليا",
       "colRank": "#",
-      "colRule": "القاعدة",
-      "colCount": "العدد",
+      "colRule": "قاعدة قانونية القواعد",
+      "colCount": "العد Count إحصاء عدد",
       "colSeverity": "شدة الحالة:",
-      "colActionsAria": "إجراءات الصف",
+      "colActionsAria": "إجراءات الصف صف.",
       "filesAffected": "الملفات المتأثرة ({count})",
       "howToFixHeading": "كيفية إصلاح",
       "owaspMobileLabel": "الجوال",
@@ -1128,19 +1145,19 @@
       "supersedesLabel": "يُلغي:"
     },
     "findings": {
-      "sectionAria": "النتائج",
-      "heading": "النتائج",
-      "expandAll": "توسيع الكل",
-      "collapseAll": "طيّ الكل",
+      "sectionAria": "النتائج التي توصلنا إليها",
+      "heading": "النتائج التي توصلنا إليها",
+      "expandAll": "توسيع جميع التوسع.",
+      "collapseAll": "إنهيار كل شيء.",
       "bulkSelected": "{count} محدد",
       "bulkCopy": "نسخ المحدد كـ JSON.",
       "selectAllTitle": "حدد جميع النتائج المرئية.",
       "selectAllAria": "حدد جميع النتائج المرئية.",
       "colSeverity": "شدة الحالة:",
-      "colRule": "القاعدة",
-      "colMessage": "الرسالة",
+      "colRule": "قاعدة قانونية القواعد",
+      "colMessage": "رسالة الرسالة الرسالية",
       "colLine": "خط خط خط",
-      "colActionsAria": "إجراءات الصف",
+      "colActionsAria": "إجراءات الصف صف.",
       "selectRowAria": "حدد هذا الصف العثور.",
       "copyRowTitle": "قم بنسخ هذه النتيجة كـ JSON.",
       "suppressedBadge": "تم تعطيل",
@@ -1153,48 +1170,48 @@
       "runAgain": "قم بتشغيل التحليل مرة أخرى.",
       "emptyNoViolations": "لا يوجد انتهاكات في آخر عملية تحليل.",
       "emptyNoMatch": "لا يوجد انتهاكات تتطابق مع المرشحات الحالية.",
-      "emptyHintNoData": "شغّل التحليل لملء `reports/.saropa_lints/violations.json`، ثم حدّث.",
+      "emptyHintNoData": "قم بتشغيل التحليل لملء `reports/.saropa_lints/violations.json`، ثم قم بالتحديث.",
       "emptyHintFilters": "ضبط المرشحات أو تشغيل التحليل مرة أخرى لمعرفة النتائج.",
       "reRunAnalysis": "تحليل إعادة التشغيل",
-      "resetFilters": "إعادة ضبط عوامل التصفية",
+      "resetFilters": "إعادة ضبط مرشحات الفلاتر.",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "مخططات التوزيع",
-      "heading": "التوزيع",
+      "sectionAria": "خلي مخطات المخططات.",
+      "heading": "مزيج Mix Mix المزيج",
       "metaClickSlice": "انقر فوق شريحة لتصفية.",
-      "severityMix": "توزيع الخطورة",
+      "severityMix": "مزيج من شدة الاختلاط.",
       "filterBarTitle": "تصفية إلى {key} فقط.",
-      "donutTotal": "الإجمالي"
+      "donutTotal": "إجمالي المجموع الكلي."
     },
     "todoHack": {
       "sectionAria": "تودو والهاكس.",
       "headingDisabled": "كل شيء & HACKS",
-      "metaDisabled": "الفحص معطّل",
-      "scanOff": "فحص مساحة العمل متوقف — فعّله لإظهار العلامات من ملفات المشروع.",
-      "enableScan": "تفعيل الفحص",
+      "metaDisabled": "تم تعطيل مسح الماسح الضوئي.",
+      "scanOff": "تم إيقاف فحص مساحة العمل - قم بتمكين إظهار العلامات من ملفات المشروع.",
+      "enableScan": "تمكين مسح المسح الضوئي.",
       "heading": "كل شيء & HACKS",
       "subsectionNone": "{title}: لا يوجد في نطاق الفحص.",
       "capNote": "وصل الفحص إلى حد ملفاته ، لذلك تم تخطي بعض الملفات.",
       "raiseCap": "رفع الحد الأقصى للحد.",
-      "notePill": "ملاحظة",
-      "todosLabel": "TODOs",
-      "hacksLabel": "HACKS"
+      "notePill": "ملاحظة ملاحظة الملاحظة",
+      "todosLabel": "كل شيء في العالم",
+      "hacksLabel": "الاكس هاكس HACKS"
     },
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "التكامل متوقف",
+      "metaOff": "التكامل خارج الاندماج.",
       "enableBlurb": "تمكين دمج Drift Advisor في اقتراحات قاعدة البيانات السطحية هنا.",
       "enable": "تمكين Enable تمكين",
       "headingNoServer": "Drift Advisor",
-      "metaNoServer": "لا يوجد خادم",
-      "noServerBlurb": "لم يُعثر على خادم Drift Advisor على المنافذ المهيَّأة.",
-      "retry": "إعادة المحاولة",
+      "metaNoServer": "لا يوجد خادم للخادم.",
+      "noServerBlurb": "لم يتم العثور على خادم Drift Advisor في المنافذ المهيئة.",
+      "retry": "حاول إعادة المحاولة.",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "متصل",
+      "metaConnected": "متصلة متصلة موصولة.",
       "noIssues": "متصل بـ {label} — لا توجد مشكلات حالية.",
-      "refresh": "تحديث",
+      "refresh": "استرخاء وترفعه.",
       "openBrowser": "افتح في متصفح المتصفح.",
       "headingIssues": "Drift Advisor",
       "disable": "تعطيل مستشار الانجراف Drift Advisor"
@@ -1209,20 +1226,20 @@
       "unsuppressButton": "إلغاء تفعيل",
       "unsuppressTitle": "أزل التخفيض بحيث يظهر هذا العثور في المسح العادي",
       "unsuppressHint": "لإلغاء تثبيت {rule} في {file}:{line}: قم بإزالة التعليق // ignore: فوق تلك السطر.",
-      "columnFile": "الملف",
+      "columnFile": "ملفات الملفات File file",
       "columnLine": "خط خط خط",
-      "columnRule": "القاعدة",
+      "columnRule": "قاعدة قانونية القواعد",
       "columnKind": "نوع",
       "columnAction": "الإجراء"
     },
     "suppressions": {
-      "sectionAria": "عمليات الكتم",
+      "sectionAria": "القمع الضغوطات.",
       "headingExport": "الحذف (التصدير)",
       "viewHidesHeading": "قضايا عرض الخيارات يخفي.",
-      "viewHidesMetaActive": "نشط",
-      "viewHidesMetaNone": "لا شيء",
-      "noneInExport": "لا توجد عمليات كتم للمحلّل في ملف التصدير الحالي `violations.json`. شغّل التحليل بعد تعديل التجاهلات أو خطوط الأساس لملئه.",
-      "totalRow": "الإجمالي — مسح عوامل التصفية وفتح النتائج",
+      "viewHidesMetaActive": "النشاط الفاعل active نشط فعال.",
+      "viewHidesMetaNone": "لا أحد، لا شيء.",
+      "noneInExport": "لا توجد عمليات إلغاء للمحلل في عملية التصدير الحالية `violations.json`. قم بتشغيل التحليل بعد تحرير التجاهلات أو الخطوط الأساسية المراد ملؤها.",
+      "totalRow": "الإجمالي - امسح عوامل التصفية وافتح النتائج",
       "byRule": "حسب القاعدة ({count})",
       "byFile": "حسب الملف ({count})",
       "noEntries": "لا يوجد إدخالات.",
@@ -1244,11 +1261,11 @@
     "script": {
       "announceCleared": "تم مسح جميع المرشحات.",
       "announceFiltersPrefix": "المرشحات:",
-      "announceStarted": "بدأ التحليل",
+      "announceStarted": "بدأت التحليلات.",
       "announceComplete": "تحليل كامل، اكتمال التحليل.",
-      "announceFailed": "فشل التحليل",
-      "removeRecentAria": "إزالة",
-      "removeRecentTitle": "إزالة",
+      "announceFailed": "فشلت التحليلات الفاشلة.",
+      "removeRecentAria": "إزالة Remove إزالت remove",
+      "removeRecentTitle": "إزالة Remove إزالت remove",
       "bulkSelectedTpl": "تم تحديد {n}",
       "announceSearchVerb": "البحث",
       "severitiesNoun": "الدرجات",
@@ -1265,32 +1282,48 @@
       "activateKpiSpace": "تنشيط بطاقة KPI المتركزة أو شريط الرسم البياني.",
       "showOverlay": "عرض هذا الاختصار التراكب الرقمي."
     },
-    "unknownAnalyzerKind": "غير معروف",
+    "unknownAnalyzerKind": "غير معروف مجهول غير معروف",
     "supplementary": {
       "scannerPromo": "تمكين ماسح الماسحة الضوئية TODO / HACK.",
-      "tooltipScanner": "ماسح نظام ملفات Saropa — يحصي علامات TODO/HACK المفتوحة في المصدر.",
+      "tooltipScanner": "الماسح الضوئي لنظام الملفات Saropa - يقوم بإحصاء علامات TODO/HACK المفتوحة في المصدر.",
       "tooltipPromoClickToOn": "انقر فوق لتمكين تمكين."
+    }
+  },
+  "ruleExplain": {
+    "toggle": {
+      "disableButton": "إيقاف هذا القاعدة",
+      "disableTitle": "الغاء تفعيل هذه القاعدة للمشروع بأكمله — يكتب analysis_options_custom.yaml. قم بتشغيل تحليل الكود مرة أخرى لرؤية التغيير الذي تم تطبيقه.",
+      "enableButton": "Reactivate هذا القاعدة",
+      "enableTitle": "استعادة تفعيل هذه القاعدة — تزيل الت覆盖 في analysis_options_custom.yaml. قم بتشغيل تحليل الأكواد مرة أخرى لرؤية التغيير الذي سيؤثر."
+    },
+    "noData": {
+      "heading": "لم تُفعَّل بعد",
+      "body": "هذه القاعدة لم تُطلق في أي مكان في مساحة العمل الخاصة بك بعد، لذا لا يوجد مشكلة محددة أو إصلاح لعرضه. قم بتشغيل التحليل لرؤيته في السياق، أو تحقق من حزمة القاعدة أدناه لمعرفة ما تبحث عنه.",
+      "bodyDisabled": "هذه القاعدة غير مفعلة في الوقت الحالي، لذا لن تظهر في نتائج التحليل. قم بتفعيلها أعلاه وتشغيل التحليل لرؤية ما تلتقطه.",
+      "tierLine": "تم إدراجها من المستوى: {tier}",
+      "packsLine": "قاعدة القواعد: {packs}",
+      "packsOverflow": "قاعدة القواعد: {packs} (+{count} أكثر)"
     }
   },
   "triageDash": {
     "showInIssues": "أظهر في القضايا.",
-    "disableRules": "تعطيل القواعد",
-    "enableRules": "تفعيل القواعد",
-    "issues": "المشكلات",
-    "off": "متوقف",
-    "on": "مفعّل",
-    "colRule": "القاعدة",
-    "colIssues": "المشكلات",
+    "disableRules": "تعطيل قواعد إيقاف التشغيل",
+    "enableRules": "قواعد تمكين تسمح.",
+    "issues": "القضايا المسائل قضايا.",
+    "off": "من وراءه، ومن خلفه.",
+    "on": "على أساس أنّه كان هناك",
+    "colRule": "قاعدة قانونية القواعد",
+    "colIssues": "القضايا المسائل قضايا.",
     "zeroIssueRules": "{count} قواعد بصفر مشاكل — مفعلة تلقائيًا في المستوى.",
     "disabledOverrides": "{count} قواعد معطلة بواسطة تجاوز في `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "فرز القواعد",
-    "hintNoViolations": "لا يوجد `reports/.saropa_lints/violations.json` بعد. شغّل التحليل، ثم حدّث علامة التبويب هذه.",
+    "summaryRuleTriage": "قاعدة التصفية الاختيارية القواعد",
+    "hintNoViolations": "لا يوجد `reports/.saropa_lints/violations.json` بعد. قم بتشغيل التحليل، ثم قم بتحديث هذه اللوحة.",
     "hintUnreadable": "لا توجد انتهاكات قابلة للقراءة التصدير. قم بتشغيل تحليل Saropa Lints أولاً.",
     "hintStale": "قد تكون بيانات التدقيق قديمة (التصدير {age} القديم). تحليل إعادة التشغيل للمجموعات الحالية.",
     "hintNoPerRule": "هذه الصادرات ليس لها أرقام إصدار لكل قاعدة. أعد تحليل مع إضافة Saropa Lints الحالية.",
     "hintBuildFailed": "لم يتمكن من بناء التفرز من هذا الصادرة. قم بإجراء تحليل جديد.",
     "summaryVolume": "قاعدة التدقيق (حجم / يجب إصلاحه / أسلوبي)",
-    "hintSameAsTree": "التجميع نفسه كما في شجرة Triage في شريط النشاط: صفِّ المشكلات، أو عطّل/فعّل القواعد في `analysis_options_custom.yaml`. قد تطلب المجموعات الكبيرة تأكيدًا."
+    "hintSameAsTree": "نفس التجميع مثل شجرة شريط أنشطة الفرز: قم بتصفية المشكلات، أو قم بتعطيل/تمكين القواعد في `analysis_options_custom.yaml`. قد تطلب المجموعات الكبيرة التأكيد."
   },
   "kbdOverlay": {
     "toggleTitle": "عرض اختصارات لوحة المفاتيح (?)",
@@ -1327,7 +1360,7 @@
       "fullReportGenerating": "توليد التقرير الكامل — كل حزمة تم فحصها، كل ميزة تم استخراجها من سجل التغييرات. هذا يعمل مرة واحدة لكل فحص ويظل مخزَّنًا حتى تقوم بالفحص مرة أخرى.",
       "knownIssues": "القضايا المعروفة",
       "knownIssuesDesc": "تصفح الثغرات المعروفة والإعلانات المقدمة ضد اعتمادياتك",
-      "compare": "مقارنة",
+      "compare": "مقارنة المقارنة.",
       "compareDesc": "قارن بين حزمة أو أكثر بشكل جانبي على основе النقاط، الحجم، والنشاط.",
       "settings": "تحديدات التسويات",
       "openButton": "فتح {tab}"
@@ -1340,7 +1373,7 @@
         "scan": "مسح",
         "display": "عرض",
         "weights": "وزن النقاط",
-        "upgrade": "الترقية",
+        "upgrade": "ترقية الترقيات الارتقاء",
         "watch": "مراقبة",
         "budget": "الميزانية",
         "vuln": "الاختراقات"
@@ -1349,7 +1382,7 @@
     "detailPane": {
       "aria": "تفاصيل الحزمة التفصيلية",
       "title": "تفاصيل الحزمة التفصيلية",
-      "close": "إغلاق التفاصيل",
+      "close": "تفاصيل عن قرب في التفاصيل.",
       "copyForAi": "نسخ استجابة الترقية لـ AI"
     },
     "status": {
@@ -1359,12 +1392,12 @@
       "flaggedCount": "{count} تم وضع علامة عليه",
       "flaggedTitle": "مهجورة أو في نهاية عمرها.",
       "lastScanLabel": "مسح {when} المسح الضوئي.",
-      "lastScanTitle": "وقت جلب بيانات لوحة المعلومات هذه — {timestamp}. انقر لإعادة الفحص والتحقق من تحديثات الحزم.",
+      "lastScanTitle": "عندما تم سحب بيانات هذه اللوحة — {timestamp}. انقر لمسح البيانات مرة أخرى وتحقق من تحديثات الحزم.",
       "lastScanUnknown": "تم مسحها (وقت غير معروف)",
       "lastScanUnknownTitle": "تم تشغيل هذا المسح قبل أن تتبع لوحة القيادة الطوابع الزمنية. انقر لإعادة المسح وتحقق من تحديثات الحزم."
     },
     "time": {
-      "justNow": "الآن",
+      "justNow": "الآن فقط، والآن.",
       "minutesAgo": "منذ {min} د",
       "hoursAgo": "منذ {hr} س",
       "daysAgo": "منذ {day} يوم"
@@ -1385,34 +1418,34 @@
       "projectGrade": "حزمة المشروع درجة الحزمة",
       "totalSize": "الحجم الإجمالي*",
       "gradeTooltip": "درجة المشروع {avgGrade}\nمتوسط الدرجات: {avgScore}/100\nالحزم: {pkgCount}\nأ:{a} ب:{b} ج:{c} E:{e} F:{f}",
-      "vibrantTitle": "نابض بالحياة",
-      "stableTitle": "مستقر",
-      "outdatedTitle": "قديم",
+      "vibrantTitle": "حيوية نابضة بالحياة.",
+      "stableTitle": "مستقر مستقرة.",
+      "outdatedTitle": "قديمة، عفا عليها الزمن.",
       "abandonedTitle": "هجرتهم وتركتهم",
       "eolTitle": "نهاية الحياة النهائية.",
       "updates": "تحديثات التحديثات",
-      "unused": "غير مستخدم",
-      "singleUse": "استخدام واحد",
+      "unused": "غير مستخدمة وغير مستعملة.",
+      "singleUse": "استخدام واحد فقط للاستخدام الواحد.",
       "vulnerable": "ضعيفه الضعيفة",
-      "overrides": "التجاوزات",
-      "caveatLine1": "*تُعرض أحجام الكود (lib + الأصول المعلنة)، ويُستخدم حجم أرشيف pub.dev عند تعذّر معرفة حجم الكود. لا يشمل dev_dependencies (build_runner وlints وsaropa_lints وغيرها) — فهي لا تُشحن أبدًا ضمن APK / IPA / حزمة الويب. سيكون حجم التطبيق الفعلي أصغر بعد tree shaking.",
+      "overrides": "التجاوزات تتجاهل.",
+      "caveatLine1": "*أحجام الأكواد المعروضة (lib + الأصول المعلنة)، تعود إلى حجم أرشيف pub.dev عندما لا يكون حجم الأكواد متاحًا. باستثناء dev_dependencies (build_runner، وlints، وsaropa_lints، وما إلى ذلك) - فهي لا يتم شحنها مطلقًا إلى حزمة APK / IPA / web. سيكون الحجم الفعلي للتطبيق أصغر بعد اهتزاز الشجرة.",
       "caveatLine2": "عتبات النشاط: 90d = قديمة ، 180d = نائمة (التزام + مواعيد الإفراج).",
-      "upgradeTitle": "الترقية مطلوبة"
+      "upgradeTitle": "تحتاج إلى الترقية"
     },
     "breakdown": {
-      "title": "لماذا التقدير {grade}؟ — متوسط {avgScore}/100 عبر {pkgCount} حزمة",
+      "title": "لماذا الصف {grade}؟ - متوسط ​​{avgScore}/100 عبر حزم {pkgCount}",
       "hint": "انقر لتوسيع النسخة.",
-      "distributionHeading": "التوزيع",
+      "distributionHeading": "التوزيع والتوزيع.",
       "signalsHeading": "إشارات المخاطر تسحب النتيجة إلى أسفل.",
       "signalFlagged": "{count} معلّمة (مهمولة / نهاية العمر)",
       "signalVulnerable": "{count} مع نقاط الضعف المعروفة.",
       "signalUpdates": "{count} لديها تحديثات متاحة.",
       "bottomHeading": "حزم أقل درجات النقاط.",
-      "thresholdsHeading": "كيف تُحوَّل الدرجات إلى تقديرات",
-      "thresholdA": "70+ — نابض بالحياة: صيانة نشطة، نُشر حديثًا",
-      "thresholdB": "40–69 — مستقر: لا يزال يُصان لكن بوتيرة أبطأ",
-      "thresholdC": "20–39 — قديم: فجوات طويلة بين الإصدارات",
-      "thresholdE": "أقل من 20 — مهجور: علامات على الخمول",
+      "thresholdsHeading": "كيف تربط الدرجات النتائج بالصفوف الدراسية.",
+      "thresholdA": "70+ — نابضة بالحياة: تمت صيانتها بنشاط، وتم نشرها مؤخرًا",
+      "thresholdB": "40–69 — مستقر: لا يزال موجودًا ولكنه يتباطأ",
+      "thresholdC": "20–39 — عفا عليها الزمن: فجوات طويلة بين الإصدارات",
+      "thresholdE": "أقل من 20 - مهجور: علامات الخمول",
       "thresholdF": "توقفت أو أرشفت في pub.dev (النتيجة غير مستخدمة)",
       "filterTooltip": "قم بتصفية جدول الحزم إلى هذه الفئة فقط.",
       "jumpTooltip": "قفز إلى {name} في جدول الحزم."
@@ -1422,126 +1455,126 @@
     },
     "sections": {
       "sizeDistribution": "التوزيع على الحجم توزيع الأحجام",
-      "sizeDistributionCaption": "لا يشمل dev_dependencies — فهي لا تُشحن أبدًا ضمن APK / IPA / حزمة الويب.",
-      "filters": "عوامل التصفية",
+      "sizeDistributionCaption": "باستثناء dev_dependencies - لا يتم شحنها مطلقًا إلى حزمة APK / IPA / web.",
+      "filters": "فلاتر الفلترات.",
       "packages": "حزمة الطلبات الحمولة"
     },
     "toolbar": {
       "openPubspecTitle": "افتح pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "نسخ تقرير JSON (جميع الصفوف + التفاصيل)",
-      "copyAllLabel": "نسخ",
+      "copyAllLabel": "نسخة نسخية نسخ",
       "copyOpportunitiesTitle": "نسخ إشارات ترقية الذكاء الاصطناعي لأعلى حزم أقل اعتمادا في علبة واحدة لصاق.",
       "copyOpportunitiesLabel": "نسخ فرص الذكاء الاصطناعي",
       "saveAllTitle": "حفظ JSON التقرير إلى التقارير / YYYYMMDD /...",
-      "saveAllLabel": "حفظ",
+      "saveAllLabel": "حفظ Save الاحتفاظ بإنقاذ",
       "saveUpgradeTitle": "حفظ تقرير من حزم فقط مع تحديث متاح للتقارير / YYYYMMDD /...",
       "saveUpgradeLabel": "حفظ تقرير الترقية في التقرير",
       "resetViewTitle": "إعادة تعيين المرشحات ، والفرز ، وحفظ حالة العرض.",
-      "resetViewLabel": "إعادة ضبط العرض",
-      "rescanTitle": "إعادة فحص الحزم — يمسح ذاكرة pub.dev المؤقتة ويعيد جلب الإصدارات",
-      "rescanLabel": "إعادة الفحص",
+      "resetViewLabel": "استعادة العرض الرؤية إعادة التعيين.",
+      "rescanTitle": "إعادة فحص الحزم - يمسح ذاكرة التخزين المؤقت pub.dev ويعيد جلب الإصدارات",
+      "rescanLabel": "إعادة مسح الماسح الضوئي.",
       "openOtherTitle": "افتح مشروع pubspec.yaml آخر في نافذة جديدة للفحص Vibrancy.",
       "openOtherLabel": "مشروع مفتوح...",
       "footprintGroupAria": "وضع البصمة القدمية لعمود الحجم.",
       "footprintGroupTitle": "ما يظهر عمود الحجم: حجم الكود الخاص فقط ، بالإضافة إلى الترانزيتيف الفريد (التكلفة إذا تم إزالته) ، أو بالإضافة إلى جميع الترانزيتف (المكس النظري). يعود إلى حجم الأرشيف عندما لا يكون حجم الكود متاحًا.",
-      "footprintLabel": "البصمة:",
+      "footprintLabel": "البصمة: بصمة أقدام.",
       "footprintOwnTitle": "حجم الرمز الخاص فقط (lib + declared assets) ؛ يعود إلى pub.dev حجم الأرشيف عندما لا يكون متاحًا.",
-      "footprintOwn": "الخاصة",
+      "footprintOwn": "ملكية الملكية الخاصة",
       "footprintUniqueTitle": "الحجم الخاص + العابرات المستخدمة فقط من قبل هذا dep (الوفورات إذا قمت بإزالتها)",
-      "footprintUnique": "+ الفريدة",
-      "footprintTotalTitle": "حجمها الخاص + جميع التبعيات المتعدية، بما فيها المشتركة مع تبعيات أخرى",
-      "footprintTotal": "+ الكل",
-      "searchLabel": "البحث في الحزم",
+      "footprintUnique": "+ فريدة من نوعها.",
+      "footprintTotalTitle": "حجمها الخاص + جميع المواد العابرة ، بما في ذلك تلك التي يتم مشاركتها مع الإدارات الأخرى.",
+      "footprintTotal": "+ كل + جميع",
+      "searchLabel": "حزم البحث عن الحزم",
       "searchPlaceholder": "البحث عن حزم...",
-      "clearSearchTitle": "مسح البحث",
-      "clearSearchAria": "مسح البحث",
+      "clearSearchTitle": "مسح البحث بحث واضح.",
+      "clearSearchAria": "مسح البحث بحث واضح.",
       "ageFilterTitle": "تصفية حسب عمر النشر نشر",
-      "publishedAgeLabel": "عمر النشر",
-      "ageMaxAll": "الكل",
+      "publishedAgeLabel": "نشر العمر السنوي.",
+      "ageMaxAll": "كل شيء، كل شيء.",
       "presetFilterTitle": "تطبيق إعدادات الفلتر السريعة المسبقة.",
-      "presetLabel": "إعداد مسبق",
-      "presetNone": "بلا",
-      "presetModernization": "التحديث",
-      "presetRiskHotspots": "بؤر المخاطر",
+      "presetLabel": "المجموعة السابقة Preset",
+      "presetNone": "لا، ليس هناك أيّ من ذلك.",
+      "presetModernization": "تحديث التحديث.",
+      "presetRiskHotspots": "نقاط الاحتباس الحراري للمخاطر.",
       "presetCleanup": "المرشحون لتنظيف المنطقة.",
-      "presetDirectOnly": "المباشرة فقط",
+      "presetDirectOnly": "مباشرة فقط مباشرة.",
       "devToggleTitle": "تضمين التبعيات dev في الجدول والإجمالي.",
-      "includeDev": "تضمين التطوير",
+      "includeDev": "تشمل dev dev.",
       "activeFiltersLabel": "المرشحات النشطة:",
-      "clearAllFilters": "مسح الكل"
+      "clearAllFilters": "كل شيء واضح تماما."
     },
     "columns": {
       "name": {
         "label": "حزمة الحزمة",
-        "tooltip": "اسم الحزمة — انقر لفتح إدخالها في pubspec.yaml"
+        "tooltip": "اسم الحزمة - انقر لفتح إدخال pubspec.yaml"
       },
       "version": {
         "label": "النسخة Version نسخة",
         "tooltip": "النسخة المثبتة من pubspec.lock"
       },
       "score": {
-        "label": "الفئة",
-        "tooltip": "تصنيف الحيوية ودرجة الصحة (0–10)"
+        "label": "فئة الفئة الدرجة فئة",
+        "tooltip": "تصنيف الحيوية والنتيجة الصحية (0-10)"
       },
       "published": {
         "label": "نشر نشرت نُشر",
         "tooltip": "تاريخ نشر النسخة المثبتة إلى pub.dev"
       },
       "activity": {
-        "label": "النشاط",
+        "label": "النشاط النشطة.",
         "tooltip": "درجة نشاط الترميز والإفراج من ارتكاب + نشر حديثية."
       },
       "likes": {
-        "label": "الإعجابات",
-        "tooltip": "إعجابات pub.dev — انقر لفتح صفحة درجة الحزمة"
+        "label": "يحبّ الـ (Likes)",
+        "tooltip": "إعجابات pub.dev - انقر لفتح صفحة نقاط الحزمة"
       },
       "downloads": {
         "label": "التنزيلات Downloads",
-        "tooltip": "تنزيلات pub.dev خلال آخر 30 يومًا — انقر لفتح صفحة درجة الحزمة"
+        "tooltip": "تنزيلات pub.dev في آخر 30 يومًا — انقر لفتح صفحة نقاط الحزمة"
       },
       "issues": {
-        "label": "المشكلات",
+        "label": "القضايا المسائل قضايا.",
         "tooltip": "إصدارات GitHub المفتوحة (لا تتضمن طلبات سحب عند توفرها)"
       },
       "prs": {
-        "label": "طلبات السحب",
+        "label": "العلاقات العامة PRs",
         "tooltip": "فتح GitHub طلبات سحب."
       },
       "size": {
-        "label": "الحجم",
+        "label": "حجم الحجم الوزن",
         "tooltip": "حجم الرمز (lib + declared assets) ؛ يعود إلى pub.dev حجم الأرشيف عندما لا يكون حجم الكود متاحًا."
       },
       "deps": {
-        "label": "التبعيات",
-        "tooltip": "التبعيات المتعدية المباشرة — تُميَّز التبعيات المشتركة"
+        "label": "مستودعات Deps.",
+        "tooltip": "التبعيات المتعدية المباشرة - تم تسليط الضوء على التبعيات المشتركة"
       },
       "files": {
         "label": "المراجع الإشارات",
-        "tooltip": "عدد ملفات المصدر التي تستورد هذه الحزمة — انقر للبحث"
+        "tooltip": "عدد الملفات المصدر التي تستورد هذه الحزمة — انقر للبحث"
       },
       "transitives": {
         "label": "العابرة Transitives",
         "tooltip": "عدد التبعيات العابرة (غير المباشرة) التي تستخدمها هذه الحزمة."
       },
       "vulns": {
-        "label": "الثغرات",
+        "label": "فولنز Vulns الفولنس",
         "tooltip": "ثغرات أمنية معروفة من قواعد البيانات الاستشارية OSV و GitHub."
       },
       "license": {
-        "label": "الترخيص",
+        "label": "ترخيص الترخيص.",
         "tooltip": "SPDX معرف ترخيص من pub.dev"
       },
       "update": {
-        "label": "تحديث",
+        "label": "تحديث التحديث Update Update",
         "tooltip": "تحديث الإصدار المتاح: التصحيحات الكبرى أو البسيطة أو الوصفة."
       },
       "opportunities": {
         "label": "الفرص والفرص",
-        "tooltip": "ميزات في سجل تغييرات هذه الحزمة لم تُستخدم بعد في الكود لديك — رتّب للعثور على الحزم الأقل استفادة"
+        "tooltip": "الميزات في سجل التغييرات هذا الحزمة لم تستخدم بعد في كودك — ترتيب لتحديد الحزم الأكثر تبنيًا منخفضًا"
       },
       "status": {
-        "label": "الحالة",
+        "label": "الوضع الحالي Status",
         "tooltip": "حالة الاستخدام: ما إذا كانت الحزمة تظهر غير مستخدمة في رمزك."
       },
       "description": {
@@ -1551,8 +1584,8 @@
     },
     "cells": {
       "noGithub": "لم يتم العثور على مستودع GitHub.",
-      "devBadge": "تطوير",
-      "transitiveBadge": "متعدية",
+      "devBadge": "ديفاد dev Dev",
+      "transitiveBadge": "الانتقالية transitive المتحولة",
       "opportunitiesTooltip": "الميزات غير المستخدمة: {features}",
       "publishDateUnavailable": "تاريخ النشر غير متوفر من pub.dev",
       "activityGradeUnavailable": "مستوى النشاط غير متوفر (بيانات الالتزام أو الإفراج المفقودة)",
@@ -1564,11 +1597,11 @@
       "sizeUnavailable": "الحجم غير متوفر من pub.dev",
       "noVulnerabilities": "لا يوجد نقاط ضعف معروفة.",
       "licenseUnspecified": "ترخيص غير محدد في pub.dev",
-      "unusedBadge": "غير مستخدم",
+      "unusedBadge": "غير مستخدمة وغير مستعملة.",
       "packageInUse": "الحزمة قيد الاستخدام."
     },
     "row": {
-      "expandDetails": "توسيع التفاصيل",
+      "expandDetails": "توسيع تفاصيل التفاصيل.",
       "copyRowJson": "نسخ الصف كـ JSON"
     },
     "shortcuts": {
@@ -1609,8 +1642,8 @@
       "noImports": "لم يتم الكشف عن أي ملف مصدر للصادرات.",
       "reExportLine": "{location} (إعادة التصدير)",
       "publicApiSurface": "سطح API العام — استخدام واحد على الأقل هو إعادة تصدير.",
-      "reExportedBadge": "أُعيد تصديره",
-      "openFileReferences": "فتح مراجع الملفات"
+      "reExportedBadge": "أعيد تصديرها.",
+      "openFileReferences": "فتح الملفات التي تشير إلى ملفات مفتوحة."
     },
     "deps": {
       "noTransitives": "لا توجد تعتمدات انتقالية.",
@@ -1633,8 +1666,8 @@
     },
     "detail": {
       "codeCommitActivity": "القانون يلتزم النشاط نشاط التزام.",
-      "releaseActivity": "نشاط الإصدارات",
-      "dormancySignal": "إشارة الخمول",
+      "releaseActivity": "نشاط الإصدار النشاط إطلاق.",
+      "dormancySignal": "إشارة الراحة هي إشارات النوم.",
       "ago": "{age} منذ فترة طويلة.",
       "qualityExample": "+مثال مثال",
       "qualityExampleTitle": "شحنات عرض تجريبي قابل للتشغيل.",
@@ -1644,64 +1677,64 @@
       "qualityToolsTitle": "أدوات صيانة السفن",
       "qualityDocs": "+docs المستندات",
       "qualityDocsTitle": "سفن تمتد الوثائق التوثيقية.",
-      "healthScore": "درجة الصحة",
-      "resolutionVelocity": "سرعة الحل",
-      "engagementLevel": "مستوى التفاعل",
+      "healthScore": "النتيجة الصحية Health Score",
+      "resolutionVelocity": "سرعة القرار Resolution Velocity سرعة التحكيم",
+      "engagementLevel": "مستوى المشاركة المستوى من التزام",
       "popularity": "الشعبية شعبية",
       "publisherTrust": "ثقة الناشر الثقة"
     }
   },
   "commandCatalog": {
     "documentTitle": "Saropa كتالوج الأوامر قائمة القيادة",
-    "skipLink": "انتقل إلى فهرس الأوامر",
+    "skipLink": "انقر إلى قائمة القيادة Skip to command catalog.",
     "heroTitle": "Saropa كتالوج الأوامر قائمة القيادة",
     "status": {
       "internalHidden": "{count} قائمة سياق فقط (مخفي)",
       "wordCommands": "الأوامر القيادية",
       "wordCategories": "فئات الفئات فئاته",
-      "wordRecent": "أخيرة"
+      "wordRecent": "الأخيرة الحديثة حديثة."
     },
     "search": {
       "placeholder": "عنوان البحث أو الوصف أو معرف الأوامر...",
-      "ariaLabel": "البحث في الأوامر",
-      "clearAria": "مسح البحث",
+      "ariaLabel": "الأوامر البحثية أوامر البحوث",
+      "clearAria": "مسح البحث بحث واضح.",
       "hintLine1": "يتطابق مع كل أمر من القيادة.",
-      "hintStrongTitle": "العنوان",
+      "hintStrongTitle": "عنوان العنوان عنوان اللقب",
       "hintStrongDesc": "وصف الوصف التوضيح",
-      "hintStrongId": "المعرّف",
+      "hintStrongId": "هوية المستخدم id",
       "hintLine2": "(توكينات id متباعدة أكثر — نوع",
-      "hintLine2kbd": "تشغيل التحليل",
+      "hintLine2kbd": "تحليل تشغيل التحليل.",
       "hintLine2End": "بدون نقاط)."
     },
     "toolbar": {
       "showInternal": "عرض أوامر قائمة السياق.",
-      "collapseAll": "طيّ الكل"
+      "collapseAll": "إنهيار كل شيء."
     },
     "recentPopover": {
       "title": "عمليات البحث الأخيرة",
       "clearTitle": "مسح جميع عمليات البحث الأخيرة.",
-      "clearButton": "مسح",
+      "clearButton": "واضحة واضحة صافية",
       "listAria": "عمليات البحث الأخيرة"
     },
     "filterChips": {
-      "ariaRegion": "عوامل التصفية النشطة",
+      "ariaRegion": "فلاتر نشطة الفلاتر النشطة.",
       "activeLabel": "المرشحات النشطة:",
-      "clearAll": "مسح الكل"
+      "clearAll": "كل شيء واضح تماما."
     },
     "bands": {
-      "frequentTitle": "الأكثر استخدامًا",
+      "frequentTitle": "متكرر كثير من الأحيان.",
       "frequentHint": "الأكثر استخداماً في جلساتك.",
-      "recentTitle": "الأخيرة",
-      "recentClear": "مسح",
+      "recentTitle": "مؤخراً حديثاً Recent",
+      "recentClear": "واضحة واضحة صافية",
       "recentHint": "انقر لتنفيذ مرة أخرى · أحدث أولاً"
     },
     "noResults": {
       "message": "لا توجد أوامر تتطابق مع بحثك.",
-      "reset": "إعادة ضبط عوامل التصفية"
+      "reset": "إعادة ضبط مرشحات الفلاتر."
     },
     "entry": {
       "internalBadgeTitle": "يتم تشغيله من قوائم السياق فقط.",
-      "internalBadge": "قائمة",
+      "internalBadge": "menu Menu Menu المنتجات",
       "copyTitle": "نسخ هوية الأمر ({id})",
       "copyAria": "نسخ هوية الأمر (Command ID)"
     },
@@ -1716,15 +1749,15 @@
     },
     "script": {
       "moreSuffix": "+{count} أكثر من ذلك.",
-      "showLess": "عرض أقل",
+      "showLess": "أظهر أقل من ذلك.",
       "runSingular": "تشغيل",
       "runPlural": "يُنفذ",
-      "recentWord": "أخيرة",
-      "expandAll": "توسيع الكل",
-      "collapseAll": "طيّ الكل",
+      "recentWord": "الأخيرة الحديثة حديثة.",
+      "expandAll": "توسيع جميع التوسع.",
+      "collapseAll": "إنهيار كل شيء.",
       "searchChip": "البحث: \"{query}\"",
       "internalChip": "عرض أوامر قائمة السياق.",
-      "removeFilterPrefix": "إزالة عامل التصفية ",
+      "removeFilterPrefix": "إزالة فلتر الفلتر.",
       "matchOne": "{count} تطابق",
       "matchOther": "{count} تطابقات"
     }
@@ -1741,40 +1774,40 @@
       "collect": "اكتشاف الملفات...",
       "firstRunHint": "يجمع التشغيل الأول الماسح الضوئي؛ تستغرق المشاريع الكبيرة لحظة قبل ظهور الملفات.",
       "paused": "توقف توقفت موقوفة",
-      "stopped": "توقف الفحص",
-      "elapsed": "المدة المنقضية",
+      "stopped": "توقفت عملية المسح.",
+      "elapsed": "مرت فترة من الزمن.",
       "phase": {
-        "parse": "تحليل الملفات",
+        "parse": "تحليل ملفات التفصيل.",
         "history": "قراءة تاريخ جيت",
         "blame": "عمر شفرة الحوسبة Age",
         "usage": "عد المراجع.",
         "score": "وظائف تسجيل النقاط"
       },
       "counter": {
-        "files": "الملفات",
+        "files": "ملفات الملفات.",
         "functions": "الوظائف وظائف",
-        "problems": "المشكلات المكتشفة"
+        "problems": "تم العثور على المشاكل التي وجدت."
       },
       "counters": {
-        "aria": "عدّادات الفحص المباشرة"
+        "aria": "عدادات المسح المباشر للكشف عن الحي."
       },
       "controls": {
-        "aria": "عناصر التحكم في الفحص"
+        "aria": "مسح أجهزة التحكم في المسح الضوئي."
       },
       "btn": {
         "pause": "توقف مؤقت وقف",
-        "resume": "استئناف",
-        "restart": "إعادة التشغيل",
+        "resume": "استمر في الاستئناف.",
+        "restart": "إعادة تشغيل: إعادة التشغيل.",
         "cancel": "إلغاء الإلغاء"
       },
       "preview": {
-        "heading": "المشكلات المكتشفة حتى الآن",
-        "empty": "لم تُكتشف أي مشكلات بعد…"
+        "heading": "المشاكل التي تم العثور عليها حتى الآن.",
+        "empty": "لم يتم العثور على أي مشاكل حتى الآن..."
       },
       "version": {
-        "engine": "المحرك",
+        "engine": "محرك المحرك المكوك محرك محرك",
         "detecting": "الكشف عن... كشف..",
-        "legacy": "قديم — لا يوجد تقدم مباشر (إصدار saropa_lints لهذا المشروع أقدم من هذه الميزة)"
+        "legacy": "الإرث - لا يوجد تقدم مباشر (saropa_lints لهذا المشروع يسبقه)"
       }
     },
     "runReportFirst": "قم بتشغيل التقرير مرة أخرى ، ثم نسخ JSON.",
@@ -1783,15 +1816,15 @@
     "panelTitle": "Saropa رمز لوحة المعلومات الصحية",
     "hero": {
       "title": "Saropa رمز لوحة المعلومات الصحية",
-      "generated": "تاريخ الإنشاء",
+      "generated": "تم إنشاء مكونات من المنتجات.",
       "functionOne": "{count} دالة",
       "functionOther": "{count} دوال",
       "avgFormat": "فيغ {score} ({grade})",
       "gatesFailing": "البوابات تفشل",
-      "gatesPassing": "بوابات ناجحة"
+      "gatesPassing": "بوابات تمر عبر البوابات."
     },
     "gate": {
-      "fallback": "فشلت بوابات الجودة — راجع العتبات في إعدادات Code Health.",
+      "fallback": "فشلت بوابات الجودة — قم بمراجعة الحدود في إعدادات Code Health.",
       "failingOne": "{count} بوابة فاشلة — راجع الحدود، أو انسخ JSON لفحص gates.violations.",
       "failingOther": "{count} بوابات فاشلة — راجع الحدود، أو انسخ JSON لفحص gates.violations.",
       "openSettingsTitle": "افتح إعدادات الصحة لعدم ضبط العتبات.",
@@ -1799,61 +1832,61 @@
     },
     "kpi": {
       "ariaLabel": "ملخص الصحة للكود",
-      "allClear": "لا توجد دوال مُعلَّمة في أي فئة — كل شيء سليم.",
+      "allClear": "لا توجد وظائف تم وضع علامة عليها في أي فئة - كل شيء واضح.",
       "clickToFilter": "انقر لترشيح الجدول إلى الوظائف التي تم وضع علامة {flag}.",
       "noFlagged": "لا توجد وظائف معلّمة {flag}.",
-      "unused": "غير مستخدم",
+      "unused": "غير مستخدمة وغير مستعملة.",
       "unusedSub": "وظائف لا يشار إليها في أي مكان.",
-      "uncovered": "غير مغطّى",
+      "uncovered": "كشف الغطاء عن السقف.",
       "uncoveredSub": "لا تغطية LCOV.",
-      "stubTested": "مختبر بـ stub فقط",
+      "stubTested": "اختبار الاختبار مع اختبار القشرة.",
       "stubTestedSub": "اختبارات موجودة ولكن تؤكد القليل.",
       "suspiciousCoverage": "تغطية مشبوهة للتغطية المشبوهة.",
       "suspiciousCoverageSub": "تغطية تبدو مصنوعة من البداية.",
-      "testDrift": "انجراف الاختبار",
+      "testDrift": "اختبار الانجراف في الاختبار.",
       "testDriftSub": "اختبارات تأخر وظيفة التشغيل."
     },
     "toolbar": {
       "ariaLabel": "القانون الإجراءات الصحية",
       "rescanTitle": "أعد تشغيل فحص صحة الرمز وتحديث لوحة القيادة هذه.",
-      "rescan": "إعادة الفحص",
+      "rescan": "إعادة مسح الماسح الضوئي.",
       "copyJsonTitle": "نسخ JSON الصحة الرمزية الخام إلى الحافظة.",
-      "copyJson": "نسخ JSON",
+      "copyJson": "نسخ JSON إلى النسخة.",
       "settingsTitle": "افتح إعدادات الصحة الخاصة بالرمز.",
-      "settingsButton": "إعدادات Code Health",
+      "settingsButton": "الرمز الإعدادات الصحية إعدادات الصحة",
       "filterTitle": "تصفية الصفوف حسب الاسم أو الملف أو العلم.",
-      "filterLabel": "تصفية الصفوف",
+      "filterLabel": "صفوف مرشحات الفلتر.",
       "filterPlaceholder": "صفوف الفلترات..."
     },
     "table": {
       "ariaLabel": "أسوأ الوظائف حسب النتيجة",
-      "heading": "أسوأ الدوال",
-      "colScore": "النتيجة",
-      "colFunction": "الدالة",
-      "colFile": "الملف",
+      "heading": "أسوأ وظائف الوظائف.",
+      "colScore": "النتيجة تسجيل النتائج.",
+      "colFunction": "وظيفة الوظيفة وظيفة.",
+      "colFile": "ملفات الملفات File file",
       "colLine": "خط خط خط",
-      "colUsage": "الاستخدام",
+      "colUsage": "الاستخدام Usage استخدام",
       "colCoverage": "تغطية التغطية المهنية",
       "colComplexity": "التعقيد تعقيد",
       "colFlags": "الأعلام العلم",
       "noMatch": "لا توجد وظائف مطابقة للفلاتر الحالية.",
       "resetFiltersTitle": "قم بإزالة البحث وأي فلتر أعلام نشط.",
-      "resetFilters": "إعادة ضبط عوامل التصفية",
+      "resetFilters": "إعادة ضبط مرشحات الفلاتر.",
       "expanderAriaCollapsed": "عرض تفاصيل القضية.",
       "expanderAriaExpanded": "إخفاء تفاصيل القضية.",
       "detailHeading": "لماذا حصلت هذه الوظيفة على {score}",
-      "detailNoIssues": "لا توجد علامات في هذا الصف — تنتج الدرجة عن قيم الأعمدة أعلاه (الاستخدام والتغطية والتعقيد والعمر والتوثيق).",
+      "detailNoIssues": "لا توجد علامات في هذا الصف - تعتمد النتيجة على قيم الأعمدة أعلاه (الاستخدام، والتغطية، والتعقيد، والعمر، والوثائق).",
       "suppressLabel": "قمع في ملف الملف.",
-      "suppressTooltip": "يكتب `// ignore_for_file: code_health:<flag>` في هذا الملف بحيث تتجاهل عمليات الفحص المستقبلية هذه العلامة في الملف بأكمله."
+      "suppressTooltip": "يكتب `// ignore_for_file: code_health:<flag>` في هذا الملف بحيث تتجاهل المسح المستقبل هذا العلم للملف بأكمله."
     },
     "flag": {
       "unused": {
-        "label": "غير مستخدم",
+        "label": "غير مستخدمة وغير مستعملة.",
         "evidence": "0 المتصلين",
         "rule": "تم وضع علامة عليها عندما لا يوجد ملف آخر يشير إلى هذا اسم الوظيفة."
       },
       "uncovered": {
-        "label": "غير مغطّى",
+        "label": "غير مغطى بالكشف.",
         "evidence": "{pct}% اختبارات الاختبار",
         "rule": "يتم وضع علامة عليها عندما يبلغ LCOV عن تغطية خط 0٪."
       },
@@ -1863,18 +1896,18 @@
         "rule": "يتم وضع علامة عليها عندما تتجاوز تعقيدات السيكلوماتيكي 10."
       },
       "undocumented": {
-        "label": "غير موثّق",
+        "label": "غير موثقة وغير مكتوبة.",
         "evidence": "CC {cc}، لا توجد وثيقة.",
         "rule": "يتم وضع علامة على عندما تكون الوظيفة المعقدة (CC > 10) ليس لديها تعليق doc."
       },
       "test_drift": {
-        "label": "انجراف الاختبار",
+        "label": "اختبار الانجراف drift test",
         "evidence": "اختبارات تأخر وظيفة التشغيل.",
         "rule": "يتم وضع علامة عليها عندما يكون أحدث ملف اختبار مرتبط أكبر سناً بكثير من الملف المصدر للدالة."
       },
       "stub_tested": {
-        "label": "مختبر بـ stub فقط",
-        "evidence": "تأكيدات ضعيفة",
+        "label": "اختبار الاختبار المختبر.",
+        "evidence": "يصرّ الوزن النحيف على أن يكون",
         "rule": "يتم وضع علامة عليها عندما يكون هناك اختبار مرتبط ولكن بالكاد يؤكد أي شيء."
       },
       "suspicious_coverage": {
@@ -1897,11 +1930,11 @@
     },
     "script": {
       "activeFiltersLabel": "المرشحات النشطة:",
-      "clearAll": "مسح الكل",
-      "neverRun": "لم يُشغَّل قط"
+      "clearAll": "كل شيء واضح تماما.",
+      "neverRun": "لا تجري أبداً، اركض.."
     },
     "freshness": {
-      "justNow": "الآن",
+      "justNow": "الآن فقط، والآن.",
       "minutesAgo": "منذ {min} د",
       "hoursAgo": "منذ {hr} س",
       "daysAgo": "منذ {day} يوم",
@@ -1917,11 +1950,11 @@
     },
     "scan": {
       "subtitle": "فحص حجم المشروع، والتعقيد، ونقاط الحرارة...",
-      "elapsed": "المدة المنقضية",
+      "elapsed": "مرت فترة من الزمن.",
       "cancel": "إلغاء الإلغاء",
-      "restart": "إعادة التشغيل",
+      "restart": "إعادة تشغيل: إعادة التشغيل.",
       "stopped": "остان",
-      "logHeading": "النشاط",
+      "logHeading": "النشاط النشطة.",
       "logEmpty": "لا يوجد إخراج بعد — هذا السجل يملأ فقط إذا أصدر المسح رسالة تشخيصية.",
       "progress": "{percent}% — {done}/{total} ملفات"
     },
@@ -1965,15 +1998,15 @@
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "بوابة_الجودة:\n  الشروط:\n    - المقياس: new_critical_issues\n      المرجع: مكافئ\n      القيمة: 0\n      on_fail: فشل",
-        "save": "حفظ",
+        "save": "حفظ Save الاحتفاظ بإنقاذ",
         "saved": "تم الحفظ",
         "saveError": "لم يتم حفظ"
       },
-      "colFile": "الملف",
+      "colFile": "ملفات الملفات File file",
       "colLineNum": "خط خط خط",
-      "colRule": "القاعدة",
+      "colRule": "قاعدة قانونية القواعد",
       "colSeverity": "شدة الحالة:",
-      "colMessage": "الرسالة",
+      "colMessage": "رسالة الرسالة الرسالية",
       "colKey": "الكلمة"
     },
     "shortcuts": {
@@ -1981,13 +2014,13 @@
       "showOverlay": "عرض هذا الاختصار التراكب الرقمي."
     },
     "hero": {
-      "files": "الملفات",
+      "files": "ملفات الملفات.",
       "lines": "السطور",
-      "size": "الحجم"
+      "size": "حجم الحجم الوزن"
     }
   },
   "suppressionsStrip": {
-    "noData": "لا يوجد violations.json بعد — شغّل التحليل لملء لقطة عمليات الكتم.",
+    "noData": "لا يوجد violations.json حتى الآن - قم بتشغيل التحليل لملء لقطة القمع.",
     "zeroTotal": "0 قمع المحلل في آخر صادرات.",
     "noKindBreakdown": "لا توجد تفاصيل حسب النوع في هذا التصدير.",
     "title": "الحذف (التصدير)",
@@ -2013,15 +2046,15 @@
     "noCountersTitle": "لا يوجد عدادات لإعادة ضبط.",
     "resetTitle": "إعادة تعيين جميع العدادات.",
     "refreshTitle": "إعادة تحميل عدادات القياس عن بعد من قرص.",
-    "refresh": "تحديث",
+    "refresh": "استرخاء وترفعه.",
     "copyTitle": "نسخ الصورة الفورية كـ JSON.",
-    "copyJson": "نسخ JSON",
-    "resetCounters": "إعادة ضبط العدّادات",
+    "copyJson": "نسخ JSON إلى النسخة.",
+    "resetCounters": "إعادة تعيين عدادات العدّادات.",
     "countersAria": "العدادات المضادة",
-    "countersHeading": "عدّادات الأحداث",
-    "thEvent": "الحدث",
-    "thCount": "العدد",
-    "emptyMessage": "لم تُسجَّل أي أحداث قياس عن بُعد بعد — افتح قاعدة من Findings Dashboard لبدء التقاط العدّادات.",
+    "countersHeading": "عدادات الأحداث العاملة في الحدث.",
+    "thEvent": "حدث حدث حدث حدث",
+    "thCount": "العد Count إحصاء عدد",
+    "emptyMessage": "لم يتم تسجيل أي أحداث قياس عن بعد حتى الآن - افتح قاعدة من لوحة معلومات النتائج لبدء التقاط العدادات.",
     "openFindingsTitle": "افتح لوحة تحكم النتائج Saropa.",
     "openFindings": "افتحوا لوحة تحكم النتائج.",
     "lastPropsHeading": "خصائص الحدث الأخير",
@@ -2035,8 +2068,8 @@
   "securityPosture": {
     "issueOne": "{count} مشكلة",
     "issueOther": "{count} مشاكل",
-    "noIssues": "لا توجد مشكلات",
-    "showIssues": "عرض المشكلات",
+    "noIssues": "لا توجد قضايا.",
+    "showIssues": "عرض القضايا المسألة.",
     "violationTooltip": "{count} انتهاك(انتهاكات) عبر {ruleCount} قاعدة (قواعد). انقر للإظهار في المشاكل.",
     "noViolationsTooltip": "لا يوجد انتهاكات تم وضعها في هذه الفئة."
   },
@@ -2047,28 +2080,28 @@
     },
     "table": {
       "row": {
-        "vibrancyGrade": "درجة الحيوية",
-        "category": "الفئة",
-        "latestVersion": "أحدث إصدار",
+        "vibrancyGrade": "درجة الحيوية Vibrancy Grade",
+        "category": "فئة الفئة الدرجة فئة",
+        "latestVersion": "أحدث نسخة من الإصدار الأخير",
         "published": "نشر نشرت نُشر",
-        "publisher": "الناشر",
-        "pubPoints": "نقاط Pub",
+        "publisher": "الناشر ناشر النشر.",
+        "pubPoints": "النقاط الحانات نقاط البار.",
         "githubStars": "GitHub نجوم النجوم",
-        "openIssues": "المشكلات المفتوحة",
-        "codeSize": "حجم الكود",
-        "bloatRating": "تقييم التضخم",
-        "license": "الترخيص",
+        "openIssues": "القضايا المفتوحة المسائل المفتحة.",
+        "codeSize": "حجم الرمز: حجم الكود.",
+        "bloatRating": "تقييم Bloat التورم.",
+        "license": "ترخيص الترخيص.",
         "platforms": "منصات المنصات",
         "inThisProject": "في هذا المشروع."
       },
       "value": {
-        "unverified": "— (غير مؤكد)",
-        "allPlatforms": "الكل",
-        "yes": "نعم",
-        "no": "لا"
+        "unverified": "— (لم يتم التحقق)",
+        "allPlatforms": "كل شيء، كل شيء.",
+        "yes": "نعم، نعم، أجل.",
+        "no": "لا، لا، كلاّ، لا."
       },
       "badge": {
-        "inProject": "في المشروع"
+        "inProject": "في المشروع In Project"
       }
     },
     "status": {
@@ -2079,9 +2112,9 @@
       "morePackages": "+{count} أكثر من ذلك."
     },
     "empty": {
-      "ariaLabel": "لا توجد حزم",
+      "ariaLabel": "لا حزمة، أي عبوات.",
       "message": "لم يتم اختيار أي حزم للمقارنة. انقر بزر الماوس الأيمن على حزمتين أو أكثر في لوحة تحكم الحزم واختر {compare}.",
-      "compareWord": "مقارنة",
+      "compareWord": "مقارنة المقارنة.",
       "openDashboard": "افتح لوحة تحكم الحزمة.",
       "openDashboardTitle": "افتح لوحة تحكم الحزمة Saropa."
     },
@@ -2102,10 +2135,10 @@
       "dimensionWinsOther": "{count} بعد الفوز يفوز.",
       "packages": "حزمة الطلبات الحمولة",
       "packagesTitle": "عدد الحزم مقارنة جنبا إلى جنب.",
-      "inComparison": "في المقارنة",
+      "inComparison": "في المقارنة بالمقارنة.",
       "dimensions": "الأبعاد: أبعاد",
       "dimensionsTitle": "عدد الأبعاد التي يمكن أن يتم فيها ترتيب الفائز.",
-      "ranked": "مرتّبة"
+      "ranked": "ترتيب الترتيبات المرتبة."
     },
     "toolbar": {
       "ariaLabel": "إجراءات المقارنة:",
@@ -2116,89 +2149,109 @@
   "debug": {
     "section": {
       "engines": "محركات التشخيص",
+      "enginesRecommendation": "مُوصى به: خادم LSP مُفعَّل (الافتراضي، الإصدار التجريبية)، مسح عند الحفظ مُفعَّل، تحليل مباشر مُطفأ (خادم LSP يغطي بالفعل التشخيص المباشر؛ قد تظهر تكراراً إذا كان كلاهما مُفعَّلاً)، إجراءات GitHub في CI مُفعَّل فقط إذا كنت ترغب في تفعيل التحقق من الجودة في طلبات الانسحاب. إذا توقفت قاعدة من العمل تحت خادم LSP، قم بتفعيل تحليل مباشر وتعطيل خادم LSP.",
       "log": "السجل"
     },
     "engine": {
+      "master": "Saropa Lints",
       "analyzerPlugin": "تحليل مباشر",
-      "scanDaemon": "الفحص عند الحفظ",
+      "scanDaemon": "التحقق من خلال التخزين المؤقت",
       "lspServer": "خادم LSP",
       "pid": "PID:",
       "rules": "القواعد:",
       "rss": "RSS:",
       "statusLabel": "الحالة:",
       "statusValue": {
-        "active": "نشط",
+        "active": "النشاط الفاعل active نشط فعال.",
         "idle": "غير نشط",
         "running": "التشغيل",
         "stopped": "остودت",
         "suspended": "متوقفة",
         "starting": "بدء",
         "scanning": "المسح",
-        "notConfigured": "غير مُهيأ"
+        "notConfigured": "غير مُconfigured"
       },
       "rssNote": {
-        "inProcess": "داخل العملية، ولا يمكن قياسه بشكل منفصل",
+        "inProcess": "قواعد صارمة:\n1. العودة فقط إلى النص المترجم.",
         "notRunning": "غير مُنفَّذ",
-        "remote": "يعمل على عدّائي GitHub المستضافين — لا يمكن قياسه من هنا"
+        "remote": "تعمل على مضيفي GitHub — لا يمكن قياسها من هنا"
       },
+      "masterOffHint": "قم بتشغيل المفتاح الرئيسي أولاً",
       "description": {
+        "master": "مفتاح تبديل عالمي للملحق (إعداد الملف الشخصي saropaLints.enabled). عندما يكون مغلقًا، تتوقف مسح عند حفظ الملف ويرسل القسم الجانبي تقريرًا بأن الملحق غير مفعل. يتم التحكم في تحليل الحالة الحية وخادم LSP بشكل منفصل.",
         "analyzerPlugin": "يُنفَّذ داخل خادم تحليل Dart — تُظهر خطوط التصحيح أثناء الكتابة، لا حاجة للمسح. تبديل الخيار يعيد كتابة المُضافات: حظر في analysis_options.yaml",
         "scanDaemon": "عملية خلفية تقوم بإعادة فحص المشروع بأكمله عند الحفظ وكتابة التقارير/.saropa_lints/violations.json. إيقافها يوقف العملية؛ الحفظ التالي يعاودها.",
-        "lspServer": "خادم لغة منفصل — ينشر التشخيصات في لوحة المشكلات للملفات المفتوحة وملفات مساحة العمل. يؤدي التبديل إلى كتابة الإعداد saropaLints.lspServer.enabled.",
-        "ci": "يقرأ ملف .github/workflows/saropa-lints.yml في شجرة العمل الخاصة بك ويكتب إليه لتفعيل أو تعطيل سير عمل GitHub Actions المرفق. يعكس هذا نسخة الفرع الحالي — نسخة الفرع الافتراضي هي التي تتحكم فعليًا في طلبات السحب، وقد تختلف النسختان. التبديل لا يشغّل أو يحذف سير العمل أبدًا؛ يبقى عليك مراجعة التغيير وتثبيته بنفسك."
+        "lspServer": "قواعد صارمة:\n1. عرض فقط النص المترجم.",
+        "ci": "يقرأ ويدخل ملف .github/workflows/saropa-lints.yml في شجرة العمل الخاصة بك لتمكين أو تعطيل تدفق العمل GitHub المدمج. هذا يعكس الملف في فرعك الحالي — نسخة الفرع الافتراضي هي ما يحدد في الواقع طلبات الانسحاب، ويمكن أن تختلف بينهما. التبديل لا يقوم بأي شيء أو يحذف التدفق؛ ما زلت تراجع وتُقدِّم التغيير بنفسك."
+      },
+      "recommended": {
+        "analyzerPlugin": "مُوصى به: إيقاف أثناء تشغيل خادم LSP. قم بتشغيله (مع إيقاف خادم LSP) إذا توقفت قاعدة ما عن العمل تحت LSP.",
+        "scanDaemon": "مُوصى به: مُفعَّل.",
+        "lspServer": "مُوصى به: مُفعَّل (القيمة الافتراضية، الإصدار التجريبى). يغطي التشخيص في الوقت الحقيقي.",
+        "ci": "مُوصى به: مُفعّل فقط إذا كنت ترغب في إجراء فحص مُغلق للطلبات."
       },
       "scanProgress": "مسح: {done}/{total} ملفات",
-      "ci": "GitHub Actions CI"
+      "ci": "GitHub الأفعال CI"
     },
     "toggle": {
       "on": "على",
       "off": "إف إف"
     },
     "action": {
-      "killAll": "القضاء على كل",
-      "restartAll": "إعادة التشغيل جميعًا",
+      "killAll": "القضاء على جميع {name}",
+      "restartAll": "إعادة التشغيل {name}",
       "killAllDescription": "يوقف فقط خادم LSP. لا يمكن إنهاء تحليل Plugin و Scan Daemon بشكل مستقل بعد — استخدم مفتاح التشغيل/الإيقاف الخاص بكل محرك بدلًا من ذلك.",
       "restartAllDescription": "يوقف ويُعيد تشغيل خادم LSP (أو يبدأه إذا لم يكن يعمل). لا يؤثر على مُحلِّل المُخطِّط ومسح Daemon — استخدم مفتاح التشغيل/الإيقاف الخاص بكل محرك بدلًا من ذلك."
     },
     "log": {
       "empty": "لا توجد سجلات تسجيل بعد.",
+      "masterToggleOn": "مُفتاح المُنظِّم: تم تفعيله...",
+      "masterToggleOff": "التحكم الرئيسي: تعطيل...",
       "killAll": "القتل الكل: توقف جميع المحركات القابلة للتحكم.",
-      "restartAll": "إعادة تشغيل الكل: أُعيد تشغيل جميع المحركات القابلة للتحكم.",
+      "restartAll": "إعادة التشغيل الكلية: تم إعادة تشغيل جميع المحركات القابلة للتحكم فيها.",
       "lspToggleOn": "خادم LSP: تم تفعيله...",
       "lspToggleOff": "خادم LSP: تعطيل...",
       "lspStarted": "خادم LSP: بدأ.",
+      "lspDisabledPrompt": "الخادم LSP مُعطَّل في الإعدادات (saropaLints.lspServer.enabled). هل ترغب في تمكينه وإطلاقه؟",
+      "lspEnableButton": "تمكين Enable تمكين",
       "lspStopped": "خادم LSP: توقف.",
+      "lspStartFailed": "خادم LSP: فشل في البدء (راجع رسالة الخطأ وقناة الزخرف Saropa Lints لLSP).",
       "analyzerToggleOn": "مُحلِّل المُوسِّع: تفعيل...",
       "analyzerToggleOff": "مُحلِّل المُوسِّع: إيقاف...",
       "daemonToggleOn": "مسح Daemon: استمرار...",
       "daemonToggleOff": "مسح Daemon: تعليق...",
-      "ciToggleOn": "CI: جارٍ التفعيل…",
-      "ciToggleOff": "CI: جارٍ التعطيل…"
+      "ciToggleOn": "CI: تفعيل...",
+      "ciToggleOff": "CI: تعطيل..."
+    },
+    "master": {
+      "updateFailed": "لم يتم تغيير مفتاح المُستَوي الرئيسي: {error}",
+      "overridden": "إعداد saropaLints.enabled على مستوى المجلد يتجاوز هذا الخيار. قم بتغييره في ملف settings.json للمجلد."
     },
     "sidebar": {
       "enginesLabel": "محركات: {count} تعمل"
     },
     "ci": {
-      "disableFailed": "تعذّر إيقاف CI: الملف {path} مفقود أو بنيته لا يعدّلها Saropa Lints تلقائيًا. لا يزال CI قيد التشغيل. افتح الملف وعطّل سير العمل يدويًا.",
-      "openWorkflow": "فتح سير العمل",
-      "openWorkflowFailed": "تعذّر فتح {path}.",
+      "disableFailed": "لم يتم إيقاف CI: {path} مفقود أو لديه هيكل Saropa Lints لن يتم تعديله تلقائيًا. CI لا يزال يعمل. افتح الملف وقم بإيقاف العملية يدويًا.",
+      "openWorkflow": "فتح تدفق العمل",
+      "openWorkflowFailed": "لم يتم فتح {path}.",
       "publish": {
         "heading": "نشر هذا التغيير",
-        "introEnable": "تمت كتابة {path} في شجرة العمل لديك. لن يعمل شيء في CI إلى أن يصبح على {base}. تضعه هذه الأوامر في فرع جديد باسم {branch} وتفتح طلب سحب للمراجعة — نفّذها بنفسك، أو اضغط الزر وسينفّذ Saropa Lints هذه الأوامر بالضبط.",
-        "introDisable": "تم تعديل {path} في شجرة العمل لديك لإيقاف جميع المهام. سيستمر تشغيل CI إلى أن يصل هذا التغيير إلى {base}. تضع هذه الأوامر التغيير في فرع جديد باسم {branch} وتفتح طلب سحب — نفّذها بنفسك، أو اضغط الزر وسينفّذ Saropa Lints هذه الأوامر بالضبط. لإيقاف CI فورًا، عطّل سير العمل من علامة تبويب Actions في المستودع.",
-        "commandsLabel": "الأوامر",
-        "copy": "نسخ",
-        "copied": "تم نسخ الأوامر إلى الحافظة.",
-        "createPr": "إنشاء فرع، وإيداع التغييرات، ودفعها، وفتح طلب سحب",
-        "notNow": "ليس الآن",
-        "noGitHubRemote": "المستودع البعيد origin لهذا المستودع ليس GitHub، لذا لا يمكن فتح طلب السحب نيابةً عنك. نفّذ الأوامر أعلاه وافتحه بالطريقة التي توفرها منصتك.",
-        "running": "جارٍ إنشاء الفرع ودفعه…",
-        "failed": "فشل {command}، لذا لم يتم دفع أي شيء. {details}",
-        "pushedNoPr": "تم دفع {branch}. تعذّر فتح طلب السحب تلقائيًا — افتحه من صفحة المقارنة.",
+        "introEnable": "تم كتابة {path} في شجرة العمل الخاصة بك. لا تعمل أي شيء في CI حتى تصبح على {base}. هذه الأوامر تضعها على فرع جديد يُسمى {branch} وتحفظ طلب سحب للتدقيق — قم بتشغيلها بنفسك، أو اضغط على الزر وستقوم Saropa Lints بتشغيل هذه الأوامر بالضبط.",
+        "introDisable": "تم تعديل {path} في شجرة العمل الخاصة بك لوقف كل مهمة. ستستمر CI في التشغيل حتى تصل {base}. هذه الأوامر تضع التغيير على فرع جديد يُسمى {branch} وتحفظ طلب سحب — قم بتشغيلها بنفسك، أو اضغط على الزر وستقوم Saropa Lints بتشغيل هذه الأوامر بالضبط. إذا كنت تريد توقف CI فورًا، فقم بتعطيل العملية من خلال علامة التبويب Actions في المستودع.",
+        "commandsLabel": "القيادة الأوامر أوامر.",
+        "copy": "نسخة نسخية نسخ",
+        "copied": "التعليمات المستنسخة إلى لصّاصة التّحويل.",
+        "createPr": "أنشئ فرعًا، وقم بالتحفظ، وارفع التغيير، وفتح طلب الانضمام",
+        "notNow": "الآن لا",
+        "noGitHubRemote": "الناتج الأصلي لهذا المستودع لا يساوي GitHub، لذا لا يمكن فتح طلب سحب لك. قم بتشغيل الأوامر أعلاه وافتحه بطريقة ما تفعلها مضيفك.",
+        "running": "إنشاء الفرع ودفعه...",
+        "failed": "فشل {command}، لذلك لم يتم إرسال أي شيء. {details}",
+        "pushedNoPr": "تم إرسال {branch}. لا يمكن فتح طلب السحب تلقائيًا — فتحه من صفحة المقارنة.",
         "openCompare": "فتح صفحة المقارنة",
-        "created": "تم فتح طلب سحب للفرع {branch}.",
-        "openPr": "فتح طلب السحب",
-        "notARepository": "تمت كتابة {path}، لكن هذا المجلد ليس مستودع git، لذا لا يوجد ما يمكن نشره."
+        "created": "طلب سحب مفتوح لـ {branch}.",
+        "openPr": "فتح طلب تعديل",
+        "notARepository": "تم كتابة {path} ولكن هذا المجلد ليس مستودع git، إذن لا يوجد شيء لنشره.",
+        "pubspecHasOtherEdits": "pubspec.yaml already had uncommitted edits of yours. A commit takes whole files, so publishing from here would push those edits too. Commit or stash them, then run the commands above yourself."
       }
     }
   },
@@ -2209,32 +2262,32 @@
     "section": {
       "version": "نسخة من النسخة",
       "update": "تحديث التحديثات",
-      "suggestion": "اقتراح",
-      "community": "المجتمع",
-      "dependencies": "التبعيات",
+      "suggestion": "الاقتراحات: اقتراح.",
+      "community": "المجتمع المحلي.",
+      "dependencies": "التبعية: تعتمد على الاحتياجات.",
       "alerts": "تنبيهات تحذير",
       "platforms": "منصات المنصات",
       "directDeps": "المستودعات المباشرة",
-      "readmeImages": "صور README"
+      "readmeImages": "صور للقراءة في قناة README"
     },
     "version": {
       "published": "نشرت: {date}",
-      "codeSize": "حجم الكود",
+      "codeSize": "حجم الرمز: حجم الكود.",
       "archive": "أرشيف الأرشيف",
       "sizeLabel": "{label}: {size}",
       "source": "المصدر: كود {code} · تعليقات {comments} · ملفات {files}",
       "replace": "استبدال: {summary}"
     },
     "update": {
-      "upgrade": "ترقية",
-      "changelog": "سجل التغييرات",
+      "upgrade": "ترقية الترقيات الارتقاء",
+      "changelog": "تغييرات التغيير.",
       "blockedBy": "تم حظرها بواسطة {package}"
     },
     "suggestion": {
       "migrateTo": "فكر في الهجرة إلى {package}.",
       "consider": "فكر في: {text}.",
       "alternatives": "البدائل: {names}",
-      "unused": "يبدو أن هذه الحزمة غير مستخدمة — فكّر في إزالتها."
+      "unused": "يبدو أن هذه الحزمة غير مستخدمة - فكر في إزالتها."
     },
     "community": {
       "issues": "{count} مشاكل",
@@ -2255,33 +2308,33 @@
     "dependencies": {
       "flagged": "({count} مُعلم)",
       "transitiveCount": "{count} حزم انتقالية",
-      "unique": "{count} فريدة",
+      "unique": "{count} فريدة من نوعها الفريدة.",
       "shared": "{count} المشتركة ({pct}٪)",
       "moreOverflow": "+{count} أكثر من ذلك.",
       "sharedList": "المشتركة: {names}"
     },
     "platforms": {
-      "wasm": "WASM"
+      "wasm": "وزم WASM."
     },
     "links": {
-      "viewFullDetails": "عرض التفاصيل الكاملة",
+      "viewFullDetails": "عرض التفاصيل الكاملة View Full Details",
       "pubDev": "pub.dev",
       "documentation": "الوثائق التوثيقية وثائق",
-      "changelog": "سجل التغييرات",
-      "repository": "المستودع",
-      "issues": "المشكلات",
+      "changelog": "تغييرات التغيير.",
+      "repository": "مخزن البيانات Repository",
+      "issues": "القضايا المسائل قضايا.",
       "reportIssue": "تقرير مسألة القضية"
     },
     "logoAlt": "{packageName} شعار الشركة",
-    "readMore": "المزيد",
-    "readmeImageAlt": "صورة README"
+    "readMore": "أكثر",
+    "readmeImageAlt": "صورة README الصورة."
   },
   "chart": {
     "toggle": {
-      "excludeShared": "استبعاد المشترك"
+      "excludeShared": "استبعاد المشتركة المستشارة."
     },
     "filter": {
-      "clear": "مسح"
+      "clear": "واضحة واضحة صافية"
     },
     "bucket": {
       "other": "غيرها ({count} {noun})",
@@ -2299,7 +2352,7 @@
     },
     "enableRule": {
       "done": "قاعدة تمكين {ruleId}. تحليل إعادة التشغيل لتطبيق.",
-      "runAnalysis": "تشغيل التحليل",
+      "runAnalysis": "تشغيل تحليل التحليل.",
       "noWorkspace": "افتح مجلد مساحة عمل لتمكين قاعدة."
     },
     "openFinding": {
@@ -2316,17 +2369,17 @@
     "nudge": {
       "message": "يستخدم هذا المشروع Drift Advisor. قم بتثبيت Saropa ملحق التقاط السجلات لترتيب SQL أثناء تشغيل مع هذه النتائج الثابتة.",
       "install": "قم بتثبيت التقاط السجلات.",
-      "dismiss": "تجاهل"
+      "dismiss": "فصله من العمل"
     },
     "driftRecommend": {
       "message": "يتم توصيل خادم Drift Advisor. قم بتثبيت إضافة Saropa Drift Advisor المستقلة للحصول على تجربة كاملة في لوحة المشاكل.",
-      "install": "تثبيت Drift Advisor",
-      "dismiss": "تجاهل"
+      "install": "قم بتثبيت مستشار الانجراف Drift Advisor.",
+      "dismiss": "فصله من العمل"
     }
   },
   "notify": {
     "activation": {
-      "cacheCleared": "تم مسح ذاكرة Vibrancy المؤقتة",
+      "cacheCleared": "تم مسح ذاكرة التخزين المؤقت لـ Vibrancy.",
       "copiedInfo": "نسخت معلومات {package} إلى لوحة المفاتيح.",
       "noPubspecOrLock": "لا يوجد pubspec.yaml/pubspec.lock في مساحة العمل.",
       "backfillComplete": "حزمة الحزم: النشاط البطيء تم استكمال ملء التاريخ مرة واحدة (تستورد لقطات {count}).",
@@ -2335,10 +2388,10 @@
       "proceedUpgrades": "المضي قدما مع {count} ترقية (((s)) ؟ الخطوات الفاشلة تتراجع وتستمر الخطة.",
       "actionExecute": "تنفيذ التنفيذ تنفيذه",
       "actionCancel": "إلغاء الإلغاء",
-      "upgradeStopped": "توقفت الترقية عند {failedAt} — اكتمل {completed}/{total}",
+      "upgradeStopped": "تحديث توقف عند {failedAt} — {completed}/{total} تم إنجازه",
       "upgradeAllComplete": "تمت بنجاح جميع الترقيات {count}.",
       "notPubspec": "الملف الذي تم اختياره ليس pubspec.yaml.",
-      "suppressedPackage": "تم كتم \"{package}\" — ستُخفى التشخيصات",
+      "suppressedPackage": "التحذير \"{package}\" تم إلغاء تفعيله — سيتم إخفاء التشخيصات",
       "noPackagesToSuppress": "لا توجد حزم لإخمادها.",
       "suppressedCount": "حزمة {count} المكبوتة (((s)",
       "noUnhealthyToSuppress": "لا توجد عبوات غير صحية للقمع.",
@@ -2349,76 +2402,81 @@
       "depsAlreadySorted": "التبعيات التي تم فرزها بالفعل.",
       "depsSorted": "{detail} في {sections}",
       "noPubspec": "لم يتم العثور على pubspec.yaml.",
-      "updatePrereleaseConfirm": "هل تريد تحديث {package} إلى الإصدار التجريبي {version}؟ قد تتضمن الإصدارات التجريبية تغييرات جذرية.",
+      "updatePrereleaseConfirm": "هل تريد تحديث {package} إلى النسخة التجريبية {version}؟ قد تحتوي النسخ التجريبية على تغييرات تؤدي إلى تشقق التطبيق.",
       "packageNotFound": "الحزمة {package} غير موجودة في pubspec.yaml",
       "updatedTo": "تم تحديث {package} إلى {version}",
       "ciRunScanFirst": "قم بتشغيل مسح أولاً لتوليد CI config مع عتبات مناسبة.",
       "noWorkspace": "لا يوجد مجلد مساحة عمل مفتوح يفتح",
       "ciOverwriteConfirm": "{path} موجود بالفعل. إعادة الكتابة؟",
       "actionOverwrite": "إزالة الكتابة فوقها",
-      "ciGenerated": "تم إنشاء مسار CI: {path}",
+      "ciGenerated": "流水线 توليد: {path}",
       "compareSelectCount": "حدد 2-3 حزم للمقارنة.",
       "compareMax": "أقصى 3 حزم للمقارنة.",
       "compareFetchFailed": "لم يتمكن من استلام بيانات حزمة كافية."
     },
     "main": {
       "brandPrefix": "Saropa Lints: {message}",
-      "regressionErrors": "{count} من الأخطاء{suffix} — عرض.",
-      "regressionScoreDipped": "انخفضت الدرجة إلى ما دون {threshold} — عرض المشكلات.",
+      "regressionErrors": "{count} خطأ{suffix} — عرض.",
+      "regressionScoreDipped": "الدرجة انخفضت تحت {threshold} — عرض المشكلات.",
       "actionViewViolations": "مشاهدة انتهاكات الرؤية",
-      "noErrors": "Saropa Lints: لا توجد أخطاء!",
-      "noWorkspaceOpenWorkspace": "Saropa Lints: لا يوجد مجلد مساحة عمل مفتوح. افتح مشروع Dart/Flutter أولًا.",
+      "noErrors": "Saropa Lints: هيئة إدارة المعلومات لا أخطاء، ولا خطأ!",
+      "noWorkspaceOpenWorkspace": "Saropa Lints: هيئة إدارة المعلومات لا يوجد مجلد مساحة عمل مفتوح. افتح مشروعك Dart/Flutter أولاً.",
       "lintIntegrationOffCannotAnalyze": "Saropa Lints: التحليل عند الحفظ غير مفعل. تفعيله قبل تشغيل التحليل.",
       "pluginAlive": "Saropa Lints على قيد الحياة: تم تفعيل قواعد {rules} ، وتم تحليل ملفات {files}.",
-      "openPubspecFailed": "تعذّر فتح pubspec.yaml: {message}",
-      "toggleSidebarSectionFailed": "Saropa Lints: تعذّر تبديل قسم الشريط الجانبي — {message}",
+      "openPubspecFailed": "فشل فتح pubspec.yaml: {message}",
+      "toggleSidebarSectionFailed": "Saropa Lints: فشل في تبديل قسم الشريط الجانبي — {message}",
       "openWorkspaceFirst": "افتح مجلد مساحة عمل أولاً.",
       "createInstructionsDone": "تم إنشاء .cursor/rules/saropa_lints_instructions.mdc لعملاء الذكاء الاصطناعي.",
-      "createInstructionsFailed": "تعذّر إنشاء تعليمات Saropa Lints: {message}",
+      "createInstructionsFailed": "فشل في إنشاء تعليمات Saropa Lints: {message}",
       "openFileForIssues": "افتح ملفًا لتظهر مشاكله في Saropa Lints.",
       "driftAdvisorNotConnected": "Drift Advisor غير متصل. انقر فوق تحديث بعد بدء تشغيل الخادم.",
       "noViolationsRunAnalysis": "لا يوجد انتهاكات في البيانات الحالية. قم بتحليل المعلومات أولاً.",
       "telemetryReset": "Saropa Lints: قاعدة ذات الصلة تعيد ضبط عدادات القياس عن بعد.",
       "noWorkspaceOpen": "لا يوجد مجلد مساحة عمل مفتوح.",
-      "noAnalysisReport": "Saropa Lints: لم يُعثر على تقرير تحليل ضمن reports/. شغّل «Saropa Lints: Run Analysis» أولًا.",
+      "noAnalysisReport": "Saropa Lints: هيئة إدارة المعلومات لم يتم العثور على تقرير تحليل تحت التقارير /. تشغيل \"Saropa Lints: قم بتشغيل \"تحليل\" أولاً.",
       "copiedReport": "نسخ {name} إلى الحافظة.",
-      "readReportFailed": "Saropa Lints: تعذّرت قراءة التقرير — {message}",
-      "openReportFailed": "Saropa Lints: تعذّر فتح التقرير — {message}",
+      "readReportFailed": "Saropa Lints: فشل في قراءة التقرير — {message}",
+      "openReportFailed": "Saropa Lints: فشل في فتح التقرير — {message}",
       "noAnalysisData": "لا توجد بيانات تحليل. قم بتحليل المعلومات أولاً.",
       "actionDisable": "تعطيل تعطيّل",
       "actionEnable": "تمكين Enable تمكين",
       "bulkRuleToggleConfirm": "{verb} {count} قاعدة؟ هذا تحديث analysis_options_custom.yaml",
       "setupPrompt": "اكتشف Saropa Lints مشروع Dart دون تكوين saropa_lints. قم بالإعداد الآن لأكثر من 2300+ من قواعد الوبر.",
       "actionSetUpProject": "إعداد المشروع إنشاء مشروع.",
-      "actionNotNow": "ليس الآن"
+      "actionNotNow": "ليس الآن وليس الآن"
+    },
+    "lsp": {
+      "noWorkspaceFolder": "Saropa Lints: لا يمكن بدء خادم LSP لأن لا يوجد مجلد مشروع مفتوح.",
+      "startFailed": "Saropa Lints: فشل في بدء خادم LSP. {reason}",
+      "settingWriteFailed": "Saropa Lints: لم يتم حفظ إعداد خادم LSP. {reason}"
     },
     "setup": {
       "requiresDartProject": "يحتاج Saropa Lints إلى مشروع Dart أو Flutter (لم يتم العثور على pubspec.yaml).",
-      "actionLearnMore": "معرفة المزيد",
+      "actionLearnMore": "تعلم المزيد تعرّف على المزيد",
       "noWorkspaceFolder": "لا يوجد مجلد مساحة عمل مفتوح.",
       "pubGetFailed": "Saropa Lints: فشل تحميل pub. {details}",
       "checkOutput": "تحقق من المخرج.",
       "baselineRunning": "إنشاء خط أساسي (saropa_baseline.json) لقمع الانتهاكات الحالية...",
       "baselineCreated": "تم إنشاء خط أساس: saropa_baseline.json.jso ساروپا_بيزلين .جسون يتم إخفاء النتائج الموجودة؛ لا يزال يتم التحقق من الرمز الجديد.",
-      "baselineFailed": "Saropa Lints: تعذّر إنشاء خط الأساس. {details}",
-      "pubGetNotResolved": "Saropa Lints: نجح pub get لكن لم يتم حل saropa_lints. تحقق من تنسيق pubspec.yaml.",
-      "configWriteFailedNs": "Saropa Lints: فشلت كتابة الإعدادات. {details}",
+      "baselineFailed": "Saropa Lints: هيئة البيانات الحيوية لم يتمكن من إنشاء خط أساس. {details}",
+      "pubGetNotResolved": "Saropa Lints: هيئة البيانات الجسدية نجحت في الحصول على المضاجعة ولكن لم يتم حل saropa_lints. تحقق من تنسيق pubspec.yaml.",
+      "configWriteFailedNs": "Saropa Lints: هيئة البيانات الحيوية فشل كتابة التكوين. {details}",
       "disabled": "Saropa Lints معطلة. لم يتم تغيير ملفات المشروع.",
       "disabledAnalyzer": "التكامل Saropa Lints تم إيقافه. سيتم إزالة إشعارات المدقق قريبًا؛ اضغط على مفتاح المسح عند حفظ الملف لاستعادة الإشعارات.",
       "reenabledPlugin": "تم إعادة تمكين مُساعِد Saropa Lints داخل العملية. إعادة تشغيل خادم تحليل Dart لتحميله مرة أخرى.",
       "reenableNothingToRestore": "Saropa Lints: لا شيء لاستعادة. لا يُعتبر المُتوَقِّف في العملية حاليًا مُعطَّلًا من خلال التوسِيع.",
-      "noOpenDartFiles": "Saropa Lints: لم يُعثر على ملفات Dart مفتوحة. أعد فتح ملف Dart أو أوقف إعداد «المحررات المفتوحة فقط».",
-      "configUpdated": "تم تحديث إعدادات Saropa Lints (tier: {tier}).",
+      "noOpenDartFiles": "Saropa Lints: هيئة إدارة المعلومات لم يتم العثور على أي ملفات مفتوحة Dart. أعد فتح ملف Dart أو قم بإيقاف تشغيل إعداد \"فتح المحررين فقط\".",
+      "configUpdated": "Saropa Lints config تم تحديثها (الدرجة: {tier}).) ، وذلك بسبب أنّه",
       "configWriteFailed": "فشل كتابة التكوين. {details}",
       "scaffoldGateTitle": "المكونات المحلل إضافة هيكل الهيكل الإسكاني.",
       "scaffoldGateDetail": "هذا يكتب حزمة جديدة Dart تحت مساحة العمل الخاصة بك (pubspec.yaml، lib/main.dart، README): برنامج إضافي custom_lint واحد يسجل Saropa ويترك خطافات لقواعدك الخاصة.\n\nاستخدم هذا فقط عندما تقوم بشحن قواعد المحلل المخصصة مع Saropa. يمكن للمشاريع العادية Saropa فقط تخطي ذلك ، يسمح المحلل بإدخال مكون إضافي واحد لكل سياق.\n\nالتالي: القادم اختر مجلدًا نسبيًا لمجال العمل. إذا كان هذا المجلد موجودًا بالفعل ، فسيتم طلبك قبل الكتابة فوق أي شيء.",
       "actionContinue": "استمروا استمرو",
-      "actionOpenGuide": "فتح الدليل",
+      "actionOpenGuide": "افتح دليل الإرشادات.",
       "scaffoldPathOutsideWorkspace": "يجب أن يكون مسار السقالة داخل مجلد مساحة العمل.",
       "scaffoldFolderExists": "المجلد موجود بالفعل: {folder}. .فهي يمكن إضافة الملفات أو الكتابة عليها. الاستمرار؟ استمر؟",
       "scaffoldCreated": "تم إنشاء السقالة المكونة من الإضافات المركبة. فتح المولد الرئيسي.دارت؟",
       "actionOpenMainDart": "افتح main.dart الرئيسي",
-      "actionOpenReadme": "فتح README",
+      "actionOpenReadme": "افتح README.",
       "scaffoldFailed": "فشل الشاشة. {details}",
       "scaffoldFailedHint": "تأكد من وجود saropa_lints في dev_dependencies وقم بتشغيل pub get.",
       "alreadyOnTier": "بالفعل على مستوى {tier}.",
@@ -2431,7 +2489,7 @@
       "pickerTitle": "Saropa Lints: تحديد مسار التحليل",
       "pickerPlaceholder": "الحالية: {lane}",
       "lightLabel": "خفيف (الافتراضي)",
-      "lightDescription": "تعمل نحو 200 قاعدة أخطاء/تحذيرات فقط داخل المحرر",
+      "lightDescription": "قواعد صارمة:\n1. عودة فقط النص المترجم.",
       "lightDetail": "كل شيء آخر يصل بعد بضع ثوانٍ، عند حفظ الملف، عبر خدمة المسح. ذاكرة قريبة من مستوى الأساس: +0.6% RSS قياس على مشروع كبير. موصى بها لمعظم المشاريع.",
       "fullLabel": "كامل",
       "fullDescription": "كل قاعدة مفعلة تعمل داخل المحرر",
@@ -2445,25 +2503,25 @@
       "enabledButPluginOff": "Saropa Lints قيد التشغيل، ولكن التشخيصات داخل المحرر متوقفة: تم إيقاف تشغيل المكون الإضافي للمحلل من هذا الملحق ولم يتم استعادته مطلقًا، لذا لا تظهر المشكلات إلا بعد الفحص. هل ترغب في استعادة التشخيصات المباشرة داخل المحرر، أم الاحتفاظ بالمسح الضوئي عند الحفظ فقط؟",
       "actionRestorePlugin": "استعادة التشخيص داخل المحرر",
       "actionKeepScanOnly": "احتفظ بمسح عند حفظ الملف فقط",
-      "disabledButPluginOn": "Saropa Lints متوقف، لكن إضافة المحلّل لا تزال مُعلنة في analysis_options.yaml، لذا ستُحمَّل وتستهلك عدة غيغابايتات في المرة القادمة التي يبدأ فيها خادم تحليل Dart. هل تريد إيقاف الإضافة أيضًا أم إبقاءها مفعّلة؟",
+      "disabledButPluginOn": "تم إيقاف Saropa Lints، ولكن لا يزال يتم الإعلان عن البرنامج الإضافي للمحلل في analysis_options.yaml، لذلك سيتم تحميل عدة غيغابايت والاحتفاظ بها في المرة التالية التي يبدأ فيها خادم التحليل Dart. هل تريد إيقاف تشغيل المكوّن الإضافي أيضًا أم إبقائه قيد التشغيل؟",
       "actionTurnOffPlugin": "الغاء تفعيل مُحلل المُساعِد",
       "actionKeepPluginOn": "احتفظ بالملحق مفعلًا"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} فاشل: {message}",
-      "crossFileGraphExportFailed": "فشل تصدير مخطط Saropa Lints: {message}",
-      "crossFileGraphNoDotFile": "اكتمل مخطط ما بين الملفات لكن لم يُعثر على ملف DOT.",
+      "crossFileGraphExportFailed": "فشل تصدير Saropa Lints graph: {message}",
+      "crossFileGraphNoDotFile": "تم الانتهاء من رسم بيانات الملفات المتقاطعة ولكن لم يتم العثور على ملف DOT.",
       "crossFileGraphExported": "تم تصدير الرسم البياني المشترك بين الملفات إلى التقارير/.saropa_lints/cross_file/import_graph.dot",
-      "crossFileHtmlReportFailed": "فشل تقرير HTML عبر الملفات: {message}",
+      "crossFileHtmlReportFailed": "تقرير HTML عبر الملفات فاشل: {message}",
       "crossFileReportNoIndex": "تم إكمال تقرير الملفات المتقاطعة ولكن لم يتم العثور على index.html.",
       "crossFileHtmlReportGenerated": "تم إنشاء تقرير HTML عبر الملفات.",
       "actionOpenInBrowser": "افتح في المتصفح.",
-      "actionOpenFile": "فتح الملف",
-      "crossFileSnapshotFailed": "فشلت لقطة عبر الملفات: {message}",
+      "actionOpenFile": "فتح ملف Open File.",
+      "crossFileSnapshotFailed": "فشل اقتطاع الملفات عبرية: {message}",
       "crossFileSnapshotNoJson": "تم الانتهاء من لقطة ملفات متقاطعة ولكن لم يتم العثور على ملف JSON.",
       "crossFileSnapshotWritten": "صورة فورية عبر الملفات مكتوبة إلى التقارير/.saropa_lints/cross_file_snapshot.json",
-      "crossFileNoWorkspace": "Saropa Lints: لم يُعثر على مساحة عمل Dart/Flutter. افتح مشروعًا يحتوي على pubspec.yaml أولًا.",
-      "crossFileMissingDep": "Saropa Lints: أضف saropa_lints إلى pubspec.yaml قبل تشغيل التحليل عبر الملفات.",
+      "crossFileNoWorkspace": "Saropa Lints: هيئة البيانات الحيوية لم يتم العثور على مساحة عمل Dart/Flutter. افتح مشروعًا مع pubspec.yaml أولا.",
+      "crossFileMissingDep": "Saropa Lints: هيئة البيانات الجسدية أضف saropa_lints إلى pubspec.yaml قبل تشغيل تحليل الملفات المتقاطعة.",
       "issuesNoViolationsRunAnalysis": "لا يوجد انتهاكات في البيانات الحالية. قم بتحليل المعلومات أولاً.",
       "issuesNoAnalysisData": "لا توجد بيانات تحليل. قم بتحليل المعلومات أولاً.",
       "issuesNoHotspots": "لم يتم العثور على أي نقاط ساخنة أمنية في التقرير الحالي.",
@@ -2475,14 +2533,14 @@
       "copyTreeSerializeTreeFailed": "لم تتمكن من تسلسل شجرة.",
       "copyTreeCopiedFull": "نسخ كامل شجرة {viewLabel} ({count} {branchNoun}) كـ JSON.",
       "projectMapNoProject": "Saropa Lints: افتح مشروع Dart أولاً.",
-      "projectMapMissingDep": "Saropa Lints: أضف saropa_lints إلى pubspec.yaml قبل تشغيل Saropa Project Map.",
+      "projectMapMissingDep": "Saropa Lints: هيئة البيانات الجسدية أضف saropa_lints إلى pubspec.yaml قبل تشغيل خريطة مشروع Saropa.",
       "projectMapNoHtml": "Saropa خريطة المشروع: لم يتم إنتاج تقرير HTML.",
-      "projectMapFailed": "فشل Saropa Project Map: {message}",
+      "projectMapFailed": "فشل خريطة مشروع Saropa: {message}",
       "projectMapScanFailed": "فشل مسح خريطة مشروع Saropa (الخروج {code}). {details}",
       "projectMapCouldNotOpen": "Saropa خريطة المشروع: لم تتمكن من فتح {file}.",
       "issuesNoQuickFix": "لا يوجد حل سريع متاح لهذا الانتهاك.",
       "issuesFileNotFound": "لم يتم العثور على الملف: {file}. .فهي إعادة تشغيل التحليل لتحديث.",
-      "actionFixAll": "إصلاح الكل",
+      "actionFixAll": "إصلاح كل شيء Fix All",
       "issuesConfirmFixAll": "إصلاح انتهاكات {count} في {fileName}؟",
       "issuesBulkFixResult": "تم إصلاح {fixed}. قم بتشغيل التحليل لتحديث النتيجة.",
       "issuesBulkFixResultSkipped": "تم إصلاح {fixed} ، وتخطي {skipped} (لا يوجد تصحيح متاح). قم بتشغيل التحليل لتحديث النتيجة.",
@@ -2500,18 +2558,18 @@
       "scanOnSaveBaselineCanceled": "تم إلغاء مسح المشروع بأكمله بعد {scanned}/{total} ملفات.",
       "scanOnSaveBaselineFailed": "فشل مسح المشروع بأكمله: {details}",
       "scanOnSaveBaselineDone": "مسح المشروع بأكمله اكتمل: {total} ملفات، {issues} مشكلة(ات).",
-      "codeHealthStartFailedDetails": "تعذّر بدء فحص Code Health ({command}): {details}",
+      "codeHealthStartFailedDetails": "فشل الاختبار الصحي في بدء تشغيل ({command}): {details} هيئة البشرة.",
       "codeHealthStartFailed": "فشل الاختبار الصحي للكود في البدء. تأكد من تثبيت Dart SDK.",
       "codeHealthScanFailed": "فشل مسح الرمز الصحي.",
-      "codeHealthScanFailedDetails": "فشل فحص Code Health: {details}",
-      "codeHealthGatesFailed": "Code Health: فشلت بوابات الجودة المهيَّأة. افتح إعدادات Code Health أو انسخ JSON لفحص gates.violations.",
+      "codeHealthScanFailedDetails": "فحص صحة الكود فشل: {details}",
+      "codeHealthGatesFailed": "الرمز الصحة: القانون الصحية: فشلت بوابات الجودة المهيئة. افتح إعدادات صحة الكود أو قم بنسخ JSON لفحص gates.violations.",
       "codeHealthInvalidJson": "أعاد Code Health خروجاً JSON غير صالح.",
-      "sidebarSectionUpdateFailed": "Saropa Lints: تعذّر تحديث قسم شريط النشاط — {message}"
+      "sidebarSectionUpdateFailed": "Saropa Lints: لم يتم تحديث قسم شريط الأنشطة — {message}"
     },
     "vibrancy": {
       "couldNotOpenPubspec": "لا يمكن فتح pubspec.yaml.",
-      "couldNotOpenFileRef": "تعذّر فتح مرجع الملف: {filePath}",
-      "savedReportJson": "تم حفظ JSON للتقرير: {path}",
+      "couldNotOpenFileRef": "لم يتم فتح مرجع الملف: {filePath}",
+      "savedReportJson": "التقرير المحفوظ JSON: {path}",
       "couldNotSaveReportJson": "لم يتم حفظ JSON التقرير.",
       "noPubspecFound": "لم يتم العثور على pubspec.yaml.",
       "noDependenciesSection": "لم يتم العثور على قسم الاعتمادات",
@@ -2519,7 +2577,7 @@
       "failedToAddToPubspec": "فشل في إضافة {name} إلى pubspec.yaml.",
       "needsPackageRow": "{actionLabel} يحتاج إلى صف حزمة من لوحة تحكم الحزم (لفتة المحرر).",
       "couldNotLocateConstraint": "لم يتمكن من تحديد موقع قيود الإصدار لـ {name}.",
-      "deletedFromPubspec": "تم حذف {name} من pubspec.yaml (نسخة احتياطية: {backupName})",
+      "deletedFromPubspec": "تم حذف {name} من pubspec.yaml (نسخة احتياطية: {backupName}) ، ويمكن أن يكون هذا هو السبب في",
       "runScanFirst": "قم بتشغيل مسح مسح لأول مرة.",
       "couldNotFindPubspec": "لم يتمكن من العثور على pubspec.yaml",
       "updatedPackage": "تم تحديث {name} إلى {constraint}",
@@ -2528,13 +2586,13 @@
       "maxPackagesToCompare": "أقصى 3 حزم للمقارنة.",
       "couldNotFindLocalSource": "لم يتم العثور على المصدر المحلي لـ {name}",
       "registryAuthAdded": "✓ إضافة مصادقة لـ {name}",
-      "registryAddFailed": "تعذّرت إضافة السجل: {message}",
+      "registryAddFailed": "فشل في إضافة السجل: {message}",
       "noConfiguredRegistries": "لا يوجد سجلات مُكوَّنة.",
       "registryAuthRemoved": "✓ إزالة المصادقة لـ {name}",
-      "registryRemoveFailed": "تعذّرت إزالة السجل: {message}",
+      "registryRemoveFailed": "فشل في إزالة السجل: {message}",
       "registryTokenUpdated": "✓ تم تحديث الرمز المميز.",
-      "registryTokenUpdateFailed": "تعذّر تحديث الرمز المميز: {message}",
-      "actionRemove": "إزالة",
+      "registryTokenUpdateFailed": "فشل تحديث التوكن: {message}",
+      "actionRemove": "إزالة Remove إزالت remove",
       "removeAuthPrompt": "إزالة المصادقة لـ {name}؟",
       "annotateInProgress": "التعليقات على الملاحظات قيد التنفيذ بالفعل",
       "noPubspecInWorkspace": "لم يتم العثور على pubspec.yaml في مساحة العمل.",
@@ -2543,53 +2601,53 @@
       "annotatedSummary": "الملاحظة {parts} في {basename}",
       "upgradeInProgress": "ويتم حالياً إجراء ترقية.",
       "couldNotReadConstraint": "لم يتمكن من قراءة القيود الخاصة بـ {name}",
-      "upgradeSuccess": "تمت ترقية {name} إلى {constraint} — نجحت جميع الاختبارات",
-      "upgradeRolledBack": "تم التراجع عن ترقية {name} — فشلت المرحلة {phase}. راجع المخرجات للتفاصيل.",
-      "saveTaskFailed": "فشلت مهمة الحفظ: {message}",
-      "openFolderBeforeCopyConfig": "Saropa Lints: افتح مجلد مساحة عمل قبل نسخ الإعدادات.",
-      "copiedConfigSnippet": "Saropa Lints: تم نسخ مقتطف الإعدادات (tier: {tier}، {packsLine}).",
-      "couldNotCopyClipboard": "Saropa Lints: تعذّر النسخ إلى الحافظة — {message}.",
-      "couldNotWriteRulePacks": "Saropa Lints: تعذّرت الكتابة إلى analysis_options.yaml (rule_packs).",
-      "couldNotReadPubspec": "Saropa Lints: تعذّرت قراءة pubspec.yaml.",
-      "noAdditionalSdkPacks": "Saropa Lints: لا توجد حزم SDK إضافية منطبقة لتفعيلها.",
+      "upgradeSuccess": "{name} تم تحديثه إلى {constraint} — جميع الاختبارات تمرر",
+      "upgradeRolledBack": "التحديث {name} تم إلغاؤه — {phase} فشل. راجع المخرجات للحصول على التفاصيل.",
+      "saveTaskFailed": "الحفظ فشل: {message}",
+      "openFolderBeforeCopyConfig": "Saropa Lints: هيئة إدارة المعلومات افتح مجلد مساحة عمل قبل نسخ التكوين.",
+      "copiedConfigSnippet": "Saropa Lints: هيئة البيانات الجسدية نسخ مقتطفات التكوين (الطبقة: {tier}، {packsLine}).فهي عبارة عن",
+      "couldNotCopyClipboard": "Saropa Lints: لم يتم نسخه إلى الحافظة — {message}.",
+      "couldNotWriteRulePacks": "Saropa Lints: هيئة البيانات الحيوية لم تتمكن من كتابة analysis_options.yaml (حزم_القواعد).",
+      "couldNotReadPubspec": "Saropa Lints: هيئة البيانات الحيوية لم يتمكن من قراءة pubspec.yaml.",
+      "noAdditionalSdkPacks": "Saropa Lints: هيئة إدارة المعلومات لا توجد حزم إضافية من SDK قابلة للتطبيق لتمكين.",
       "enabledApplicableSdkPacks": "Saropa Lints: تم تفعيل {added} قابل للتطبيق {modeLabel} حزمة(ات).",
-      "openFolderBeforeEnablePacks": "Saropa Lints: افتح مجلد مساحة عمل قبل تفعيل الحزم.",
-      "allApplicablePacksEnabled": "Saropa Lints: كل حزم القواعد المنطبقة مفعّلة بالفعل.",
+      "openFolderBeforeEnablePacks": "Saropa Lints: هيئة إدارة المعلومات افتح مجلد مساحة عمل قبل تمكين حزم.",
+      "allApplicablePacksEnabled": "Saropa Lints: هيئة إدارة المعلومات كل حزمة قواعد قابلة للتطبيق تمت بالفعل.",
       "noApplicablePacksDetected": "Saropa Lints: لم يتم اكتشاف أي حزم قواعد قابلة للتطبيق لهذا المشروع. قم بتشغيل الحزم بشكل فردي في لوحة التكوين.",
       "actionEnable": "تمكين Enable تمكين",
       "enableRecommendedPacksPrompt": "تمكين {count} الحزمة الموصى بها (((s)) ؟",
       "enablePacksDetail": "تحديث قاعدة قواعد التحقق rule_packs.enabled في analysis_options.yaml. {preview}",
-      "enabledRecommendedPacks": "Saropa Lints: تم تفعيل {count} من الحزم الموصى بها.",
+      "enabledRecommendedPacks": "Saropa Lints: هيئة البيانات الحيوية تمكين {count} الحزمة الموصى بها.",
       "enableModePacksPrompt": "تمكين حزمة {count} {modeLabel} ((s) ؟"
     },
     "misc": {
-      "actionDontAskForVersion": "عدم السؤال عن هذا الإصدار",
-      "actionLater": "لاحقًا",
+      "actionDontAskForVersion": "لا تطلب هذا الإصدار",
+      "actionLater": "في وقت لاحق لاحقاً",
       "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. هذا إصدار رئيسي وقد يتطلب تغييرات في الإعدادات — راجع سجل التغييرات.",
-      "upgradeCheckerMajorUpdate": "تحديث رئيسي",
+      "upgradeCheckerMajorUpdate": "تحديث كبير للتحديثات الرئيسية.",
       "upgradeCheckerMinorUpdate": "تحديثات طفيفة للتحديث",
-      "upgradeCheckerPatchUpdate": "تحديث تصحيحي",
+      "upgradeCheckerPatchUpdate": "تحديثات التصحيح Patch update",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
-      "upgradeCheckerPubspecNotFound": "Saropa Lints: تعذّر تحديث pubspec.yaml — لم يُعثر على إدخال saropa_lints.",
-      "upgradeCheckerCancelled": "تم إلغاء ترقية Saropa Lints. تم تحديث pubspec.yaml إلى ^{version}؛ شغّل `{cmd} pub get` للإنهاء، أو تراجع عن التغيير.",
+      "upgradeCheckerPubspecNotFound": "Saropa Lints: لم يتم تحديث pubspec.yaml — لم يتم العثور على سجل saropa_lints.",
+      "upgradeCheckerCancelled": "تم إلغاء تحديث Saropa Lints. تم تحديث pubspec.yaml إلى ^{version}؛ قم بتشغيل `{cmd} pub get` لإكمال العملية، أو استعادة التغيير.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: فشل الحصول على pub. {detail}",
       "upgradeCheckerCheckOutput": "تحقق من المخرج.",
       "upgradeCheckerUpgraded": "Saropa Lints تم ترقيته إلى {version}.",
-      "actionUpgrade": "ترقية",
+      "actionUpgrade": "ترقية الترقيات الارتقاء",
       "actionViewChangelog": "عرض سجل التغييرات",
       "healthCodeLensEnabled": "Saropa خريطة المشروع حرارة CodeLens تم تفعيل.",
       "healthCodeLensDisabled": "Saropa خريطة المشروع حرارة CodeLens معطلة.",
-      "reportViewCopiedPath": "تم نسخ مسار التقرير: {path}",
-      "reportViewCouldNotOpen": "تعذّر فتح ملف التقرير: {path}",
+      "reportViewCopiedPath": "مسار تقرير تم نسخه: {path}",
+      "reportViewCouldNotOpen": "لم يتم فتح ملف التقرير: {path}",
       "reportViewCopiedRowOne": "نسخ صف {count} إلى الحافظة.",
       "reportViewCopiedRowOther": "نسخت صفوف {count} إلى الحافظة.",
       "reportViewAlreadySuppressed": "'{flag}' مُسَكَّن بالفعل في {file}.",
       "reportViewSuppressed": "تم قمع \"{flag}\" في {file}.",
       "reportViewCouldNotSuppress": "لم تتمكن من قمع '{flag}' في {file}: {error} هي فيروس ثاني",
-      "actionRescan": "إعادة الفحص",
+      "actionRescan": "إعادة مسح الماسح الضوئي.",
       "bulkUpdateNoUpdates": "لا توجد تحديثات متاحة.",
       "bulkUpdateNoUpdatesFiltered": "لا توجد تحديثات {filter} متاحة.",
-      "bulkUpdateFailed": "فشل التحديث المجمّع: {error}",
+      "bulkUpdateFailed": "تحديث كتلة فاشل: {error}",
       "bulkUpdateUpdatedOne": "تم تحديث حزمة {count}.",
       "bulkUpdateUpdatedOther": "تم تحديث حزم {count}.",
       "detailViewConstraintNotFound": "لم يتمكن من تحديد موقع قيود الإصدار لـ {package}.",
@@ -2602,14 +2660,14 @@
     "subtitle": "تقليل ذاكرة المُحلّل عن طريق استبعاد الملفات غير الضرورية من التحليل",
     "emptyDescription": "اذهب إلى مساحة العمل الخاصة بك لتحديد الملفات والملفات التي تكلفك تكاليف عالية ويمكن استبعادها من مُحلل Dart لتقليل استخدام الذاكرة.",
     "scanButton": "مسح مساحة العمل",
-    "rescanButton": "إعادة الفحص",
+    "rescanButton": "إعادة مسح الماسح الضوئي.",
     "scanning": "مسح المساحة العاملة...",
     "openConfig": "فتح analysis_options.yaml",
     "lastScan": "المسح الأخير: {time}",
     "kpi": {
       "filesInScope": "ملفات في نطاق الاهتمام",
       "lines": "خطوط",
-      "files": "ملفات",
+      "files": "ملفات الملفات files",
       "estimatedCost": "التكلفة المقدرة للتحليل",
       "costUnits": "وحدات التكلفة",
       "potentialSavings": "الاقتصاد المحتمل",
@@ -2623,7 +2681,7 @@
     "applyAll": "تطبيق جميع",
     "applySelected": "تطبيق المحدد",
     "apply": "تطبيق",
-    "remove": "إزالة",
+    "remove": "إزالة Remove إزالت remove",
     "selectAll": "اختر كلها",
     "defaultLabel": "الافتراضي",
     "sortHint": "اضغط للترتيب",
@@ -2631,9 +2689,9 @@
     "previewLine": "معاينة السطر المحدد الذي سيتم إضافته",
     "previewApprox": "تقريبية — تطابق التخفيض الدقيق والوضع المعلمة مع ملفك عندما تُطبق",
     "col": {
-      "status": "الحالة",
+      "status": "الوضع الحالي Status",
       "pattern": "نمط",
-      "files": "الملفات",
+      "files": "ملفات الملفات.",
       "cost": "التكاليف المقدرة",
       "priority": "ال우선순위"
     },
@@ -2662,7 +2720,7 @@
       "removed": "أُزيلت نمط الاستثناء من analysis_options.yaml",
       "writeFailed": "لم يتم إمكانية الكتابة إلى analysis_options.yaml — قد يكون الملف مفقودًا",
       "syntaxFixed": "إصلاح سوء صياغة YAML غير صحيح في analysis_options.yaml للاستثناءات",
-      "syntaxFixedWithDuplicates": "تم إصلاح صيغة YAML غير الصالحة وإزالة {count} من أنماط الاستبعاد المكررة"
+      "syntaxFixedWithDuplicates": "أصلاح خطأ في تركيب YAML وحذف نمط(s) التهيئة المكرر {count}"
     },
     "syntaxWarning": {
       "message": "هذا الملف يحتوي على نمط استثناء مكتوب بطريقة تؤدي إلى تعطيل مُحلِّل Dart (نمط غير مُقوّى يبدأ بـ * غير صحيح في YAML).",
@@ -2675,7 +2733,7 @@
     "diffTitle": "مُحسّن تحليل: المقترحات التبعية"
   },
   "sidebarShell": {
-    "dashboardsViewTitle": "لوحات المعلومات"
+    "dashboardsViewTitle": "لوحات القيادة Dashboards"
   },
   "status": {
     "health": {
@@ -2726,6 +2784,23 @@
       "message": "هذا التقرير مُarked \"{status}\" لكنه ما زال في bugs/ — أرشيفه إلى plans/history/ قبل إغلاقه (انظر ISSUE_REPORT_GUIDE.md)."
     }
   },
+  "analyzerExclusions": {
+    "diagnostic": {
+      "missing": "المجلد \"{folder}\" تم تحليله لكنه لا يحتاج إلى ذلك. أضفه إلى dart.analysisExcludedFolders في .vscode/settings.json لتسريع إصلاحات السرعة وخفض استخدام الذاكرة.",
+      "missingCreate": "المجلد \"{folder}\" تم تحليله لكنه لا يحتاج إلى ذلك. أضفه إلى dart.analysisExcludedFolders (هذا ينشئ ملف .vscode/settings.json) لتسريع إصلاحات السرعة وخفض استخدام الذاكرة.",
+      "driftOnly": "المجلد \"{folder}\" موجود في المدقق: استثناء: من analysis_options.yaml، والذي فقط يخفي التشخيصات الخاصة به. كما يجب إضافته إلى dart.analysisExcludedFolders بحيث تتوقف خدمة التحليل عن تحليله.",
+      "imported": "مجلد \"{folder}\" يبدو قابلًا للإهمال، ولكن اعتماد مسار في pubspec.yaml يشير إليه، لذلك لا يُنصح بإهماله.",
+      "large": "ملفات {count} Dart تُحلَّل على جهاز يملك {ram} جيجابايت من الذاكرة العشوائية. استبعد المجلدات التي لا تحتاج إلى التحليل لتقليل استخدام الذاكرة وتأخير إصلاح الأخطاء السريعة.",
+      "largeNoRam": "ملفات {count} Dart تُحلَّل. استبعد المجلدات التي لا تحتاج إلى التحليل لتقليل استخدام الذاكرة وتأخير إصلاح السرعة."
+    },
+    "quickFix": {
+      "title": "أضف إلى dart.analysisExcludedFolders",
+      "pickPlaceholder": "اختر المجلدات التي يجب استبعادها من التحليل"
+    },
+    "error": {
+      "writeFailed": "لم يتم تحديث dart.analysisExcludedFolders: {error}"
+    }
+  },
   "docPlacement": {
     "diagnostic": {
       "message": "هذا المستند لا يزال يقرأ كعمل مفتوح ولكن تم تخزينه في الموقع الملفات/السجل — انتقل إليه {openIssuesDir} بدلًا من ذلك."
@@ -2740,7 +2815,7 @@
   },
   "sidebar": {
     "actions": {
-      "runAnalysisLabel": "تشغيل التحليل",
+      "runAnalysisLabel": "تشغيل تحليل التحليل.",
       "runAnalysisDescription": "إعادة تشغيل المدقق",
       "updateConfigLabel": "تحديث التكوين",
       "updateConfigDescription": "-initialize أو refresh خيارات التحليل"
@@ -2784,56 +2859,173 @@
   },
   "blastRadius": {
     "label": {
-      "upgrade": "ترقية",
-      "breaks": "يعطّل",
-      "breaksLower": "يعطّل",
-      "upgradeNotRecommended": "⚠️ الترقية غير موصى بها"
+      "upgrade": "ترقية الترقيات الارتقاء",
+      "breaks": "تقطع",
+      "breaksLower": "تقطع",
+      "upgradeNotRecommended": "⚠️ لا يُنصح بالتحديث"
     },
-    "notRecommended": "الترقية غير موصى بها",
-    "skipReason": "الترقية غير موصى بها: {summary}",
-    "sdkBlock": "يحتاج {pkg} {to} إلى {dep} {range}؛ بينما يثبّت Flutter الحزمة {dep} عند {pinned}",
+    "notRecommended": "تحديث غير موصى به",
+    "skipReason": "تحديث غير موصى به: {summary}",
+    "sdkBlock": "{pkg} {to} يحتاج {dep} {range}؛ Flutter يربط {dep} {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) عبر {chain}",
-    "unverified": "فحص الترقية غير مكتمل: تعذر جلب بيانات الاعتماديات للإصدار {to}",
+    "unverified": "التحقق من الترقية غير كامل: لا يمكن استرجاع بيانات الاعتماد لـ {to}",
     "summary": {
-      "heldBack": "{pkg} {to} مؤجَّل: {reason}",
-      "sdkBlocked": "{pkg} {to} محظور بسبب SDK: {sdk}",
-      "depCapped": "يحتاج {pkg} {to} إلى {dep} {range}، لكن {dep} مقيَّد بواسطة {cappers}",
-      "depHeldBack": "يحتاج {pkg} {to} إلى {dep} {range}، وهو مؤجَّل: {reason}",
-      "breaksOne": "سيؤدي {pkg} {to} إلى تعطيل {count} حزمة تابعة: {names}",
-      "breaksOther": "سيؤدي {pkg} {to} إلى تعطيل {count} حزم تابعة: {names}",
+      "heldBack": "{pkg} {to} معلق: {reason}",
+      "sdkBlocked": "{pkg} {to} مغلوب بواسطة SDK: {sdk}",
+      "depCapped": "{pkg} {to} يحتاج {dep} {range}، ولكن {dep} محدود بواسطة {cappers}",
+      "depHeldBack": "{pkg} {to} يحتاج {dep} {range}، وهو مُحَظَّر: {reason}",
+      "breaksOne": "{pkg} {to} سيؤدي إلى تكسير {count} تعتمد عليه: {names}",
+      "breaksOther": "{pkg} {to} سيؤدي إلى تكسير {count} الاعتماد: {names}",
       "safe": "{pkg} {from} -> {to} يبدو آمنًا",
-      "newestCompatible": "أحدث إصدار متوافق: {pkg} {version}"
+      "newestCompatible": "أحدث إصدار совместим: {pkg} {version}"
     }
   },
   "lifecycle": {
     "note": {
-      "statusMayBeOutdated": "قد تكون الحالة قديمة: مسجَّلة على أنها منتهية العمر، لكن pub.dev يُظهر أنها لم تُوقَف وأنها نُشرت خلال آخر 12 شهرًا.",
-      "maintenanceMode": "وضع الصيانة: يُتوقع فقط إصدار إصلاحات حرجة.",
-      "caution": "تنبيه: راجع المشكلة المعروفة قبل الاعتماد على هذه الحزمة.",
-      "unlisted": "غير مدرجة في pub.dev: مخفية من نتائج البحث؛ ويمكن للمستخدمين الحاليين الاستمرار في الاعتماد عليها."
+      "statusMayBeOutdated": "الحالة قد تكون قديمة: مسجلة كنهاية الحياة، ولكن pub.dev تظهر أنها لم تُوقف الإنتاج وتم نشرها خلال آخر 12 شهرًا.",
+      "maintenanceMode": "وضع الصيانة: يُتوقع فقط إصلاحات حاسمة.",
+      "caution": "تحذير: راجع المشكلة المعروفة قبل الاعتماد على هذا الحزمة.",
+      "unlisted": "غير متوفر في pub.dev: مخفي من نتائج البحث؛ يمكن للمستخدمين الحاليين الاعتماد عليه لا يزال."
     },
     "upgradeRequired": {
-      "diagnostic": "قم بترقية {name} — الإصدار المثبّت معطوب بشكل معروف",
-      "problem": "الدرجة {score}/100 — الإصدار المثبّت يحتاج إلى ترقية",
-      "insight": "الإصدار المثبّت معطوب بشكل معروف — الترقية مطلوبة"
+      "diagnostic": "تحديث {name} — إصدار مثبت معروف بأنه معطوب",
+      "problem": "النتيجة {score}/100 — إصدار المثبت يحتاج إلى الترقية",
+      "insight": "النسخة المثبتة معروفة كمكسورة — تحديث مطلوب"
+    }
+  },
+  "ruleMigration": {
+    "none": "لا تحتاج إلى نقل قواعد معدلة الاسم.",
+    "noWorkspace": "افتح مجلد مشروع Dart لتحويل أسماء القواعد.",
+    "pickTitle": "الانتقال إلى القواعد التي تم تغيير أسماؤها",
+    "pickPlaceholder": "اختر الملفات التي تريد تحديثها",
+    "fileHits": "{hits} تغيير(ات)",
+    "diffTitle": "قاعدة التسمية: {file}",
+    "confirm": "هل ترغب في تطبيق قواعد التسمية على ملف {count}؟ التغييرات مفتوحة للتدقيق.",
+    "apply": "تطبيق",
+    "progress": "نقل القواعد المعاد تسميتها",
+    "applied": "تم تحديث مرجع قاعدة {hits} في ملف {count}: {files}.",
+    "bareNames": "غير مُغيّر (تجاهل التعليقات دون المقدّمة saropa_lints): {items}.",
+    "clashes": "كلمة المرور القديمة والجديدة محددة، الرجاء دمجها يدويًا: {items}.",
+    "skipped": "ملغى: {items}.",
+    "failedRestored": "قاعدة الانتقال فشلت: {detail} تم استعادة جميع الملفات إلى محتواها السابق.",
+    "failedNotRestored": "قاعدة الانتقال فشلت: {detail} بعض الملفات لم تُستعاد تلقائيًا؛ راجعها باستخدام git.",
+    "offer": "هل تريد تغيير اسم قواعد {hits} في ملفات {count}؟",
+    "offerPreview": "معاينة",
+    "offerNotNow": "الآن لا"
+  },
+  "compat": {
+    "startup": {
+      "routeDependency": "الرحلة في pubspec (pubspec.yaml)",
+      "routePlugin": "المسار الخاص بالملحق (analysis_options.yaml)",
+      "routeBoth": "كلا الطرق (pubspec.yaml و analysis_options.yaml)",
+      "installedDisagree": "{pubspec} في pubspec.yaml و {plugin} في analysis_options.yaml",
+      "offer": "saropa_lints: مشروعك يستخدم {route} في {installed}. {offered} متاح ويعمل مع مشروعك Dart {dart}. هل ترغب في التحويل؟",
+      "offerNoDart": "saropa_lints: مشروعك يستخدم {route} في {installed}. {offered} متاح. هل ترغب في التحويل؟",
+      "offerRenames": "saropa_lints: مشروعك يستخدم {route} في {installed}. {offered} متاح ويعمل مع مشروعك Dart {dart}. تم تغيير قواعد {count} منذ {installed}. هل ترغب في التحويل؟",
+      "offerNoDartRenames": "saropa_lints: مشروعك يستخدم {route} في {installed}. {offered} متاح. تم تغيير اسم {count} من قواعد منذ {installed}. هل ترغب في التحويل؟",
+      "offerRenamesUnknown": "saropa_lints: مشروعك يستخدم {route} في {installed}. {offered} متاح ويعمل مع مشروعك Dart {dart}. سيتم التحقق من قواعد التسمية الجديدة بعد الترقية. هل ترغب في الترحيل؟",
+      "offerNoDartRenamesUnknown": "saropa_lints: مشروعك يستخدم {route} في {installed}. {offered} متاح. سيتم التحقق من قواعد التسمية الجديدة بعد الترقية. هل ترغب في التحويل؟",
+      "actionMigrate": "الانتقال"
+    },
+    "status": {
+      "pubspec": "saropa_lints: pubspec {version}",
+      "pubspecUnlocked": "saropa_lints: pubspec (لم يتم قفله بعد)",
+      "plugin": "saropa_lints: plugin route {version}",
+      "both": "saropa_lints: pubspec + plugin {version}",
+      "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (لا توافق)",
+      "neither": "saropa_lints: غير مُconfigured",
+      "localSource": "saropa_lints: المصدر المحلي",
+      "dartTooOld": "saropa_lints: يحتاج المُضاف إليه إلى إصدار أحدث من Dart",
+      "tipPubspec": "هذا المشروع يستخدم المسار pubspec: saropa_lints هو اعتماد في pubspec.yaml. تحصل على التشخيصات المحررية وال명령 السطرية (dart run saropa_lints:init, scan, baseline).",
+      "tipPlugin": "هذا المشروع يستخدم المُضاف الإضافي route: saropa_lints هو المُضاف المُحدد في analysis_options.yaml. تحصل فقط على التشخيصات الخاصة بالمحرر. أوامر سطر الأوامر (dart run saropa_lints:init، scan، baseline) تحتاج saropa_lints في pubspec.yaml.",
+      "tipBoth": "هذا المشروع يستخدم مسارات كلاهما وهم يتفقون. تحصل على تشخيصات المحرر وأوامر سطر الأوامر.",
+      "tipDisagree": "الاسماء pubspec.yaml و analysis_options.yaml مختلفة saropa_lints الإصدارات. يستخدم المحرر إصدار البرنامج المساعد ({plugin})؛ واستخدام أوامر سطر الأوامر إصدار pubspec.yaml ({pubspec}).",
+      "tipNeither": "saropa_lints غير مُعداد في هذا المشروع: إنه ليس اعتمادًا في pubspec.yaml ولا هو إضافة في analysis_options.yaml.",
+      "tipLocalSource": "يأتي saropa_lints من مسار محلي أو مصدر git، لذا تُعرض المُعلومات فقط ولا تُغيّر أي شيء.",
+      "tipDartTooOld": "الملحق المسار في analysis_options.yaml يحتاج إلى إصدار أحدث من Dart SDK من هذا المشروع، لذلك لا يمكن للمحرر تحميل الملحق."
+    },
+    "recommend": {
+      "latestOk": "saropa_lints {version} هو الإصدار الأحدث ويعمل مع هذا المشروع. استخدم ^{version}.",
+      "alreadyCorrect": "هذا المشروع يستخدم بالفعل التكوين المقترح saropa_lints. لا يوجد إجراء مطلوب.",
+      "needsNewerDart": "saropa_lints {newest} needs a newer Dart SDK than this project has ({dart}). Keep ^{chosen}, or upgrade Flutter to use {newest}.",
+      "metaExcludesPin": "saropa_lints {newest} يحتاج إلى حزمة ميتا أحدث من إصدار Flutter SDK الخاص بك ({pin}). احتفظ بـ ^{chosen}، أو قم بتحديث Flutter لاستخدام {newest}.",
+      "packageHoldsAnalyzer": "الحزمة {package} تمنع تحليل المُحلِّل، لذا لا يمكن تثبيت saropa_lints {newest}. استخدم ^{chosen}، أو تحديث {package} لاستخدام {newest}.",
+      "noVersionResolves": "لا يمكن تثبيت أي نسخة من saropa_lints كاعتماد لأن {package} يتطلب مُحلِّلًا أقدم. لا يزال маршрут الإضافة يعمل.",
+      "noPluginResolves": "لا يمكن تثبيت أي نسخة من saropa_lints كاعتماد، و{version} لم يمر عبر حل مُحلّل pub كملحق أيضًا ({package} يتطلب مُحلّلًا أقدم). لم يتم أي تغيير.",
+      "blockedUsePlugin": "{package} يمنع تحليل المُحلِّل، لذلك لا يمكن تثبيت saropa_lints كاعتماد. لا تتأثر مسار الإضافة: ضع إصدار الإضافة في analysis_options.yaml إلى {version}.",
+      "editorVsCli": "سيستخدم المحرر إصدار البرنامج المساعد {plugin}. تظل الأوامر في سطر الأوامر (dart run saropa_lints:init، scan، baseline) تستخدم إصدار pubspec.yaml {pubspec}.",
+      "cliNeedsPubspec": "dart run saropa_lints:init، scan و baseline تحتاج saropa_lints في pubspec.yaml.",
+      "pluginUnverified": "النسخة plugin {version} لا يمكن التحقق منها مع حل pub. يتم التوصية فقط من قيود Dart SDK.",
+      "pluginOnly": "حدد إصدار وحدة saropa_lints في analysis_options.yaml إلى {version}.",
+      "alignPlugin": "النسخة الخاصة بالملحق في analysis_options.yaml ({plugin}) تختلف عن النسخة المغلقة saropa_lints ({locked}). ضع نسخة الملحق إلى {locked}.",
+      "localSource": "يأتي saropa_lints من مصدر محلي {source}، لذا تُعرض المُلحق فقط حقائق و لا يُغيّر شيئًا.",
+      "noCompatible": "لا تعمل أي نسخة من نوع saropa_lints المنشورة مع هذا المشروع's Dart SDK.",
+      "noVersions": "لا توجد إصدارات saropa_lints متاحة للإقتراح.",
+      "probeFailed": "لم يتم التحقق من إصدار saropa_lints الذي يمكن استخدامه لهذا المشروع لأن أداة Dart لم تُنفذ ({detail}). تأكد من أن dart أو flutter موجودة في مسارك (PATH) وأنك متصل بالإنترنت، ثم قم بالتحقق مرة أخرى.",
+      "staleVersions": "قائمة الإصدارات لا يمكن تحديثها (غير متصلة بالإنترنت)، لذا قد تكون هذه النصيحة قديمة.",
+      "blockerSdk": "تتطلب saropa_lints {version} إصدارًا أحدث من Dart SDK من {dart}",
+      "blockerMeta": "saropa_lints {version} غير совместим с версией meta {pin}, которая зафиксирована вашим Flutter SDK.",
+      "blockerPackage": "{package} يمنع التثبيت من خلال طلب إصدار مختلف من مُحلل الأكواد.",
+      "fixFlutterUpgrade": "أعد تشغيل flutter upgrade.",
+      "fixUpgradeFlutterMeta": "تحديث Flutter إلى إصدار يحدد ميتا أحدث.",
+      "fixKeepVersion": "احفظ saropa_lints في ^{version}.",
+      "fixUpdateHolder": "تحديث {package} إلى إصدار يدعم مُحلِّلًا أحدث.",
+      "fixUsePluginRoute": "استخدم مسار الإضافة: ضع إصدار الإضافة في analysis_options.yaml إلى {version}.",
+      "fixPubspecFallback": "أو بقِ على مسار pubspec: استخدم saropa_lints ^{version}، أو قم بتحديث {package} إلى إصدار يدعم تحليلщикًا أحدث.",
+      "fixAlignPlugin": "حدد إصدار الإضافة في analysis_options.yaml إلى {version}."
+    },
+    "card": {
+      "heading": "توافق الإصدار",
+      "loading": "التحقق من إصدار saropa_lints الذي يمكن استخدامه لهذا المشروع...",
+      "notDetected": "غير مكتشف",
+      "dart": "Dart SDK",
+      "flutter": "Flutter SDK",
+      "lockedSaropa": "مق闭 saropa_lints",
+      "lockedAnalyzer": "مغلق تحليلатор",
+      "plugin": "نسخة الإضافة (analysis_options.yaml)",
+      "blockers": "ما الذي يمنع إصدارًا أحدث",
+      "fixes": "كيفية إصلاح",
+      "apply": "تطبيق",
+      "applying": "التطبيق...",
+      "preview": "مراجعة الفرق",
+      "refresh": "إعادة التحقق",
+      "diffTitle": "{file}: تغيير الإصدار المقترح",
+      "staleReloaded": "المشروع تغير أثناء مراجعتك لهذه البطاقة، لذا لم يتم تطبيق أي شيء. راجع النصائح المحدثة وانقر على تطبيق مرة أخرى.",
+      "loadFailed": "لم يتم التحقق من توافق الإصدار: {detail}",
+      "routeLabel": "تثبيت مسار",
+      "routes": {
+        "dependency": "الاعتماد في pubspec.yaml",
+        "plugin": "plugin في analysis_options.yaml فقط",
+        "both": "الاعتماد والملحقات",
+        "none": "لا يمكن إجراء أي تغيير"
+      }
+    },
+    "apply": {
+      "progress": "تطبيق تغيير إصدار saropa_lints",
+      "applied": "saropa_lints {version} مُثبت ومؤهل.",
+      "noChange": "لا تحتاج إلى إجراء أي تغييرات في الملفات.",
+      "failedRestored": "تم فشل تغيير الإصدار: {detail} pubspec.yaml و analysis_options.yaml تم استعادةهم إلى محتواهم السابق.",
+      "failedNotRestored": "التحديث الفاشل: {detail} لا يمكن استعادة الملفات تلقائيًا؛ راجع pubspec.yaml و analysis_options.yaml.",
+      "cancelledRestored": "تم إلغاء تغيير الإصدار. تم استعادة pubspec.yaml و analysis_options.yaml إلى محتواها السابق.",
+      "cancelledNotRestored": "تم إلغاء تغيير الإصدار، ولكن لم يتم استعادة الملفات تلقائيًا؛ راجع pubspec.yaml و analysis_options.yaml."
     }
   },
   "lintsSwitch": {
-    "statusOn": "Saropa Lints: On",
-    "statusOff": "Saropa Lints: Off",
-    "statusPartial": "Saropa Lints: Partly off",
-    "tooltipOn": "Saropa Lints is on (setting and analyzer plugin). Click to turn it off.",
-    "tooltipOff": "Saropa Lints is off (setting and analyzer plugin). Click to turn it on.",
-    "tooltipPartialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on. Click to fix (turns both on).",
-    "tooltipPartialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on. Click to fix (turns both on).",
-    "dashboardOff": "Lints are off.",
-    "dashboardPartialSetting": "Lints are partly off: the saropaLints.enabled setting is off.",
-    "dashboardPartialPlugin": "Lints are partly off: the analyzer plugin is off in analysis_options.yaml.",
-    "dashboardTurnOn": "Turn on",
-    "dashboardFix": "Fix",
-    "driftRowLabel": "Plugin version out of sync",
-    "driftRowDescription": "analysis_options.yaml says {configured}, pubspec.lock pins {pinned}. Click to sync.",
-    "driftSynced": "analysis_options.yaml plugin version updated to {pinned}."
+    "statusOn": "Saropa Lints: على",
+    "statusOff": "Saropa Lints: إيقاف",
+    "statusPartial": "Saropa Lints: جزئيًا خارجًا",
+    "tooltipOn": "Saropa Lints مفعل (الإعدادات وملحق تحليل) انقر لتعطيله.",
+    "tooltipOff": "Saropa Lints مغلق (إعدادات وملحق تحليل) انقر لتشغيله.",
+    "tooltipPartialSetting": "جزئيًا مغلق: إعداد saropaLints.enabled مغلق بينما هو تحليل plugin مفعل. انقر لتصحيح (ي Turn كلاهما على).",
+    "tooltipPartialPlugin": "جزئيًا مغلق: مُحلِّل المُسَمَّى مُطفَّل في analysis_options.yaml بينما الإعداد مُفعَّل. انقر لتصحيح (يُفعِّل كلاهما).",
+    "dashboardOff": "التحديثات مغلقة.",
+    "dashboardPartialSetting": "القواعد هي جزئياً مغلقة: إعداد saropaLints.enabled مغلق.",
+    "dashboardPartialPlugin": "التحليلات جزئيًا معطّلة: مُحلّل المُحلّل معطّل في analysis_options.yaml.",
+    "dashboardTurnOn": "الغاء التفعيل",
+    "dashboardFix": "إصلاح",
+    "driftRowLabel": "نسخة الإضافة غير متزامنة",
+    "driftRowDescription": "analysis_options.yaml يقول {configured}، pubspec.lock أكوام {pinned}. انقر ل Đồng bộ.",
+    "driftSynced": "تحديث إصدار وحدة analysis_options.yaml إلى {pinned}."
   }
 }
