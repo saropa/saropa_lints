@@ -94,3 +94,11 @@ linter:
   rules:
     - curly_braces_in_flow_control_structures
 
+# Dev-only: load the plugin from this checkout (path: .) so VS Code runs the
+# local rule source instead of a pub.dev snapshot. `path:` replaces `version:`
+# (the analyzer ignores the plugin without one of the two). Restart the Dart
+# analysis server after rule edits; it caches the plugin build.
+plugins:
+  saropa_lints:
+    path: .
+
