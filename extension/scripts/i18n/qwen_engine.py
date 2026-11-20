@@ -314,9 +314,26 @@ def _adopt_daemon(pid: int) -> None:
         _atexit_registered = True
 
 
+def parallel_requests() -> int:
+    """How many translation requests run concurrently (default 2, clamped 1-4).
+
+    Single-stream decoding left the GPU idle between short strings (10-30% busy);
+    2 concurrent streams fill those gaps for ~1 GB extra KV-cache VRAM on
+    qwen3:8b. Override with SAROPA_QWEN_PARALLEL; 1 restores serial behavior.
+    Single source of truth for both the daemon's OLLAMA_NUM_PARALLEL and the
+    client thread-pool size, so the two can never disagree.
+    """
+    raw = os.environ.get("SAROPA_QWEN_PARALLEL", "").strip()
+    try:
+        n = int(raw) if raw else 2
+    except ValueError:
+        n = 2
+    return max(1, min(4, n))
+
+
 def _daemon_popen_kwargs(ollama_bin: str) -> dict[str, object]:
     env = os.environ.copy()
-    env["OLLAMA_NUM_PARALLEL"] = "1"
+    env["OLLAMA_NUM_PARALLEL"] = str(parallel_requests())
     kw: dict[str, object] = {
         "stdout": subprocess.DEVNULL,
         "stderr": subprocess.DEVNULL,
@@ -1058,6 +1075,49 @@ def _ensure_ready() -> tuple[bool, str]:
 # Translation prompt + call
 # ---------------------------------------------------------------------------
 
+# Domain senses for English terms qwen3:8b mistranslated in a measured 40-string
+# de/ar/ja comparison (audit -> "appliance", suppress -> "install", gates -> "strict
+# rules", transitives -> "gerund"). The model picked the wrong *sense* of the word,
+# so the fix is disambiguation, not per-locale target words: one English gloss
+# serves all 24 locales and avoids shipping unverified translations as "truth".
+# Keys are lowercase word stems matched at a word start, so "suppress" also
+# covers "suppression" / "suppressions".
+_TERM_GLOSSARY: dict[str, str] = {
+    "audit": "a code-quality analysis report the extension runs on a project (not a financial audit, not an investigation)",
+    "suppress": "to silence a lint warning, e.g. with an ignore comment (not to install, not to oppress)",
+    "gate": "a pass/fail quality check in a CI pipeline (not a physical gate or door)",
+    "transitive": "an indirect package dependency, i.e. a dependency of a dependency (not a grammar term)",
+    "hotspot": "a code location with concentrated risk worth reviewing (not itself a vulnerability)",
+    "stub": "a fake placeholder implementation used in tests",
+    "tier": "a level in the lint rule set hierarchy (essential, recommended, professional, ...)",
+    "file watching": "monitoring files on disk for changes",
+    "scaffold": "generated starter code / project template",
+    "finding": "a single issue reported by code analysis",
+    "rule": "a lint rule that checks source code",
+}
+
+# Precompiled once: the prompt is built per string, tens of thousands of times per full run.
+_TERM_PATTERNS: dict[str, re.Pattern[str]] = {
+    term: re.compile(r"\b" + re.escape(term), re.IGNORECASE) for term in _TERM_GLOSSARY
+}
+
+
+def _glossary_block(text: str) -> str:
+    """Prompt section glossing only the domain terms present in *text*.
+
+    Empty when no term matches, so short unrelated labels keep the minimal prompt
+    (an irrelevant glossary invites a small model to translate terms that are not there).
+    """
+    hits = [f"- {term}: {gloss}" for term, gloss in _TERM_GLOSSARY.items()
+            if _TERM_PATTERNS[term].search(text)]
+    if not hits:
+        return ""
+    return (
+        "Terminology (English meaning in this software context — translate with the "
+        "matching technical sense in the target language):\n" + "\n".join(hits) + "\n\n"
+    )
+
+
 def _build_prompt(text: str, target_bcp47: str) -> str:
     lang_label = _LOCALE_LANGUAGE_NAMES.get(
         target_bcp47, f"the language with code '{target_bcp47}'",
@@ -1088,6 +1148,8 @@ def _build_prompt(text: str, target_bcp47: str) -> str:
         "Context: A VS Code extension for Dart/Flutter developers. The extension "
         "provides lint rules, code analysis, and project health tools. Tone "
         "should be professional and clear.\n\n"
+        # Glossary sits before the task so the model reads the senses before the text.
+        f"{_glossary_block(text)}"
         f"Task: Translate the following English text into {lang_label}.\n\n"
         "Strict Rules:\n"
         "1. Return ONLY the translated string output.\n"

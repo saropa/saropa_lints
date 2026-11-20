@@ -54,6 +54,7 @@ from mt_fallback import (
 from term_color import c
 from tree_translate import apply_string_map, collect_unique_strings
 from translator import HybridTranslator
+from vram_report import print_vram_report
 
 
 @dataclass
@@ -1220,6 +1221,7 @@ def main() -> int:
     # pulls a multi-GB model on first use). Printing it here unconditionally
     # meant a fully-cached run (nothing left to translate) paid that cost anyway.
     engine_announced = False
+    vram_reported = False
     mode_label = {
         "gaps": "gaps only", "upgrade": "gaps + upgrade low-quality to Qwen",
         "all": "force re-translate all",
@@ -1279,6 +1281,11 @@ def main() -> int:
                     print(f"[{c('blue', 'i18n')}] {describe_engine_availability()}", flush=True)
                     engine_announced = True
                 engine = active_engine_name(locale)
+                # Once per run, after the model is loaded so its VRAM is counted:
+                # show who else holds VRAM and how to free it (report only).
+                if engine == "qwen" and not vram_reported:
+                    print_vram_report()
+                    vram_reported = True
                 engine_label = {"qwen": "Qwen", "google": "Google"}.get(engine or "", "MT")
                 phase = c("gray", f"translating {pending} new strings via {engine_label}…")
             print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: {phase}", flush=True)
@@ -1301,7 +1308,9 @@ def main() -> int:
                 parts = ", ".join(f"{k}:{v}" for k, v in sorted(real.items()))
                 print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: engines -> {parts}", flush=True)
 
-            translator = HybridTranslator(locale, mt_cache)
+            # Prefetch above already attempted every pending string; mapping must
+            # only read its results, not re-run failed strings through Qwen+Google.
+            translator = HybridTranslator(locale, mt_cache, cache_only=True)
             # One ``translate_text`` per distinct English string (MT + cache), not per JSON leaf.
             mapping = {s: translator.translate_text(s) for s in sorted_unique}
 

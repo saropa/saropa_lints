@@ -84,7 +84,11 @@ class DictionaryTranslator:
 class HybridTranslator:
     """Curated dictionary first, then optional machine translation + cache."""
 
-    def __init__(self, locale: str, mt_cache: dict[str, str]) -> None:
+    def __init__(
+        self, locale: str, mt_cache: dict[str, str], *, cache_only: bool = False
+    ) -> None:
+        # cache_only: never call a live engine (see mt_fallback._translate_one).
+        self._cache_only = cache_only
         self.locale = locale
         self._table: Dict[str, str] = TRANSLATIONS.get(locale, {})
         self._mt_cache = mt_cache
@@ -102,7 +106,9 @@ class HybridTranslator:
         if from_dictionary:
             translated = self._table[text]
         else:
-            translated = machine_translate(text, self.locale, cache=self._mt_cache)
+            translated = machine_translate(
+                text, self.locale, cache=self._mt_cache, cache_only=self._cache_only
+            )
         out = restore_placeholders(source=text, translated=translated)
         # Placeholder-rename guard always applies — a curated entry with
         # mismatched {tokens} is a typo the user wants surfaced, not silently shipped.

@@ -767,9 +767,15 @@ def _qwen_fetch(locale: str, text: str) -> str | None:
 _engine_stats: dict[str, dict[str, int]] = {}
 
 
+# Guards the shared tallies/logs: parallel Qwen workers call _record_* at once
+# and ``d[k] = d.get(k, 0) + 1`` is a read-modify-write that loses counts.
+_state_lock = threading.Lock()
+
+
 def _record_engine(locale: str, engine: str) -> None:
-    _engine_stats.setdefault(locale, {})
-    _engine_stats[locale][engine] = _engine_stats[locale].get(engine, 0) + 1
+    with _state_lock:
+        _engine_stats.setdefault(locale, {})
+        _engine_stats[locale][engine] = _engine_stats[locale].get(engine, 0) + 1
 
 
 def engine_stats_for(locale: str) -> dict[str, int]:
@@ -783,7 +789,8 @@ _fallback_log: list[tuple[str, str, str]] = []
 
 
 def _record_fallback(locale: str, engine: str, text: str) -> None:
-    _fallback_log.append((locale, engine, text))
+    with _state_lock:
+        _fallback_log.append((locale, engine, text))
 
 
 def fallback_log() -> list[tuple[str, str, str]]:
@@ -797,8 +804,22 @@ def reset_engine_stats() -> None:
     _fallback_log.clear()
 
 
-def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: str) -> str:
-    """Translate one string under *primary* (Qwen or Google) with Google fallback."""
+def _translate_one(
+    locale: str,
+    text: str,
+    *,
+    cache: dict[str, str],
+    primary: str,
+    cache_only: bool = False,
+) -> str:
+    """Translate one string under *primary* (Qwen or Google) with Google fallback.
+
+    ``cache_only`` serves cache hits and otherwise returns the English source
+    WITHOUT any live engine call. The mapping pass after ``prefetch`` uses it:
+    strings the engines already failed on were not cached, so a live retry there
+    re-ran Qwen plus Google (28 s timeout + 6 s+ backoff) per failed string with
+    no output — a multi-minute apparent stall that repeated the failure anyway.
+    """
     key = _cache_key(locale, text, primary)
     cached = cache.get(key)
     if cached is not None and _cache_value_is_clean(text, cached):
@@ -814,6 +835,11 @@ def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: st
         _provenance[key] = any_prov or "legacy"
         _record_engine(locale, "cached")
         return any_cached
+
+    # No cache hit and live calls are forbidden: the prefetch pass already tried
+    # this string and failed, so report English (stats were recorded there).
+    if cache_only:
+        return text
 
     if stop_requested():
         return text
@@ -850,18 +876,20 @@ def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: st
     return text
 
 
-def machine_translate(text: str, locale: str, *, cache: dict[str, str]) -> str:
+def machine_translate(
+    text: str, locale: str, *, cache: dict[str, str], cache_only: bool = False
+) -> str:
     """Translate *text* from English to *locale*; update *cache* in memory.
 
     Uses the local Qwen/Ollama model as the primary engine when available,
-    falling back to Google per string.
+    falling back to Google per string. With ``cache_only`` no engine is called.
     """
     if locale == "en" or should_skip_machine_translate(text):
         return text
     primary = _primary_engine(locale)
     if primary is None:
         return text
-    return _translate_one(locale, text, cache=cache, primary=primary)
+    return _translate_one(locale, text, cache=cache, primary=primary, cache_only=cache_only)
 
 
 # Pace Google free tier (~5 req/s); ``prefetch`` does one call per string with this gap.
@@ -928,6 +956,68 @@ def count_pending_translations(
     return sum(1 for _ in _iter_pending_texts(locale, texts, cache=cache, dict_table=dict_table))
 
 
+def _prefetch_workers(primary: str) -> int:
+    """Concurrent request count: Qwen only (local GPU); Google stays serial so
+    its free-tier pacing gap keeps meaning something."""
+    if primary != "qwen":
+        return 1
+    try:
+        import qwen_engine
+    except ImportError:
+        return 1
+    return qwen_engine.parallel_requests()
+
+
+def _prefetch_parallel(
+    locale: str,
+    pending: list[str],
+    cache: dict[str, str],
+    primary: str,
+    workers: int,
+    progress: Callable[[int, int, str], None] | None,
+) -> None:
+    """Translate *pending* with a bounded thread pool.
+
+    Each task is keyed to its own source string and writes only
+    ``cache[key(src)]``, so concurrent results cannot be mismatched. Progress,
+    checkpointing and stop handling stay on the calling thread (as_completed
+    loop) so the progress bar and cache file writes are never concurrent.
+    Stop: queued-but-unstarted strings are skipped via ``stop_requested()``
+    inside the task; in-flight ones finish, matching the serial semantics.
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def task(src: str) -> str:
+        if stop_requested():
+            return src
+        _translate_one(locale, src, cache=cache, primary=primary)
+        return src
+
+    total = len(pending)
+    done = 0
+    pool = ThreadPoolExecutor(max_workers=workers)
+    try:
+        futures = [pool.submit(task, s) for s in pending]
+        for fut in as_completed(futures):
+            src = fut.result()
+            done += 1
+            if progress is not None:
+                progress(done, total, src)
+            if done % _CHECKPOINT_EVERY == 0:
+                # Workers are still inserting into cache/_provenance, and the
+                # streaming writer iterates its dict ("dictionary changed size
+                # during iteration" crashed a run). dict(d) is a single atomic
+                # C-level copy under the GIL, so write from a snapshot.
+                save_mt_cache(dict(cache))
+                _stream_dict_to_json(_PROVENANCE_PATH, dict(_provenance))
+    except BaseException:
+        # Hard abort (second Ctrl-C): drop queued work instead of waiting for
+        # every remaining string to run to completion.
+        pool.shutdown(wait=False, cancel_futures=True)
+        raise
+    pool.shutdown(wait=True)
+
+
 def prefetch_machine_translations(
     locale: str,
     texts: list[str],
@@ -936,7 +1026,7 @@ def prefetch_machine_translations(
     dict_table: dict[str, str],
     progress: Callable[[int, int, str], None] | None = None,
 ) -> None:
-    """Translate strings missing from *dict_table* and *cache* (sequential, rate-limited).
+    """Translate strings missing from *dict_table* and *cache* (Qwen: bounded thread pool; Google: sequential, rate-limited).
 
     Raises ``KeyboardInterrupt`` so the caller can save the partial cache and
     exit cleanly. Anything fetched before interrupt is already in *cache*.
@@ -963,6 +1053,10 @@ def prefetch_machine_translations(
         return
 
     total = len(pending)
+    workers = _prefetch_workers(primary)
+    if workers > 1:
+        _prefetch_parallel(locale, pending, cache, primary, workers, progress)
+        return
     for i, src in enumerate(pending):
         if stop_requested():
             break
