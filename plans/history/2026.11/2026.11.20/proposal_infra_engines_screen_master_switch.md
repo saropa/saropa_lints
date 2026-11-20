@@ -1,6 +1,6 @@
 # PROPOSAL: Show the `saropaLints.enabled` Master Switch on the Engines Screen
 
-**Status: Implemented**
+**Status: Implemented — Closed**
 
 Created: 2026-09-08
 Type: Tooling / Infrastructure
@@ -101,7 +101,7 @@ Accepted — option (b): the master switch card writes `saropaLints.enabled`; th
 
 ## Commits
 
-<!-- Add commit hashes as implementation lands -->
+- `5b0f3d381` feat: add master switch card to Health Panel Engines section
 
 ---
 
@@ -117,4 +117,4 @@ The Engines screen had no control for the extension-wide `saropaLints.enabled` s
 - A folder-level `saropaLints.enabled` value outranks the Workspace write: the master card shows a note when one exists, and a warning appears after a click that did not take effect.
 - Known, accepted: analyzer OFF still clears `saropaLints.enabled` via `runDisable` (option b).
 - Locale catalogs are stale for the new `en.json` keys; regeneration is a publish-time gate.
-- Status: visual verification at F5 (light and dark themes, ~380px) is pending, so this file stays in `bugs/` until a screenshot exists.
+- Status: verified at F5 in dark theme, wide, master OFF (screenshot not retained) — master card above engine cards, only Scan on Save dimmed. Master ON, light theme and ~380px were not checked (accepted by owner). Open observation: Scan on Save shows "stopped" with RSS 441M while master is OFF; the daemon process may not stop.
