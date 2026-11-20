@@ -1494,6 +1494,18 @@ class RequireDataEncryptionRule extends SaropaLintRule {
     RegExp(r'\bauthscheme\b'),
   ];
 
+  /// Receiver types whose `write` sends bytes over a network/stream rather than
+  /// persisting them (transport, not storage). Matched by exact element name.
+  static const Set<String> _networkSinkTypes = {
+    'HttpResponse',
+    'HttpRequest',
+    'IOSink',
+    'Socket',
+    'WebSocket',
+    'WebSocketSink',
+    'StreamSink',
+  };
+
   static final List<RegExp> _secureStorageTargetPatterns = [
     RegExp(r'\bsecure\b'),
     RegExp(r'\bencrypt\b'),
@@ -1589,6 +1601,12 @@ class RequireDataEncryptionRule extends SaropaLintRule {
       // a string (e.g. a hash input), it persists nothing.
       final String? targetType = target?.staticType?.element?.name;
       if (targetType == 'StringBuffer' || targetType == 'StringSink') return;
+
+      // Network/stream sinks transmit data, they do not persist it: e.g.
+      // `HttpResponse.write(jsonEncode(body))` in a dart:io server handler was
+      // flagged because the method name `write` matched. Exact element-name
+      // match (not substring) so `File.writeAsString` still fires.
+      if (targetType != null && _networkSinkTypes.contains(targetType)) return;
 
       // Clearing credentials (every field set to null) stores nothing.
       if (_onlyClearsFields(node.argumentList)) return;

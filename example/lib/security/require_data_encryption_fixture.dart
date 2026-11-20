@@ -103,6 +103,8 @@
 // Test fixture for: require_data_encryption
 // Source: lib\src\rules\security_rules.dart
 
+import 'dart:io' show HttpResponse;
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic box;
@@ -408,6 +410,11 @@ void _goodStringBufferWriteHashInput1010(List<String> tokenParts) {
     buffer.write(part);
   }
   buffer.write('credit_card');
+}
+
+// GOOD: `dart:io` HttpResponse.write is network output, not persistence.
+void _goodHttpResponseWrite(HttpResponse res, String password) {
+  res.write(password);
 }
 
 class SuccessCardGate1010 {

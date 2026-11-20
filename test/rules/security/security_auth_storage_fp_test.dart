@@ -249,6 +249,34 @@ Future<void> connect() async {
   // (relocated to plans/history/2026.09/2026.09.18/ once resolved).
   // --------------------------------------------------------------------------
   group('require_data_encryption', () {
+    // Bug: HttpResponse.write(jsonEncode(...)) was flagged as unencrypted
+    // storage; it is network output. Positive twin: File.writeAsString fires.
+    test('does NOT report HttpResponse.write of a sensitive-named body', () async {
+      const code = '''
+import 'dart:convert';
+import 'dart:io';
+
+Future<void> reply(HttpResponse res, Map<String, Object?> body) async {
+  res.write(jsonEncode(<String, Object?>{'password': body}));
+  await res.close();
+}
+''';
+      final codes = await reportedRuleCodes(RequireDataEncryptionRule(), code);
+      expect(codes.contains('require_data_encryption'), isFalse);
+    });
+
+    test('STILL reports File.writeAsString of a password', () async {
+      const code = '''
+import 'dart:io';
+
+Future<void> save(File file, String password) async {
+  await file.writeAsString(password);
+}
+''';
+      final codes = await reportedRuleCodes(RequireDataEncryptionRule(), code);
+      expect(codes.contains('require_data_encryption'), isTrue);
+    });
+
     test('does NOT report a spread auth-status/config metadata map', () async {
       const code = '''
 import 'dart:convert';
@@ -305,8 +333,10 @@ class Handler {
 import 'dart:convert';
 import 'dart:io';
 
-void sendHealth(HttpResponse res, String password) {
-  res.write(
+// Receiver is a File (persistence), not an HttpResponse: network sinks are
+// now exempt, so the "still reports" oracle must use a storage receiver.
+void sendHealth(File file, String password) {
+  file.writeAsString(
     jsonEncode(<String, dynamic>{'authScheme': 'basic', 'password': password}),
   );
 }
@@ -326,8 +356,9 @@ void sendHealth(HttpResponse res, String password) {
 import 'dart:convert';
 import 'dart:io';
 
-void sendHealth(HttpResponse res, String accessToken) {
-  res.write(
+// File receiver: HttpResponse is exempt as a network sink (see above).
+void sendHealth(File file, String accessToken) {
+  file.writeAsString(
     jsonEncode(<String, dynamic>{
       'authRequired': true,
       'accessToken': accessToken,
