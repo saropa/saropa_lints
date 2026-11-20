@@ -669,6 +669,17 @@ void main() {
       () => AvoidPositionalBooleanParametersRule(),
     );
 
+    // The removed duplicate rule `prefer_named_boolean_parameters` must keep
+    // resolving to the surviving rule so existing analysis_options entries
+    // (disable / severity override) still apply.
+    test('AvoidPositionalBooleanParametersRule keeps removed rule name as alias',
+        () {
+      expect(
+        AvoidPositionalBooleanParametersRule().configAliases,
+        contains('prefer_named_boolean_parameters'),
+      );
+    });
+
     testRule(
       'PreferNamedBoolParamsRule',
       'prefer_named_bool_params',

@@ -448,7 +448,7 @@ Coverage: 487 rules — 431 HAVE (89%), 16 PARTIAL, 40 TODO (8%)
 | `prefer-last` | HAVE | `prefer_list_last` |
 | `prefer-match-file-name` | HAVE | `prefer_match_file_name` |
 | `prefer-moving-to-variable` | HAVE | `prefer_moving_to_variable` |
-| `prefer-named-boolean-parameters` | HAVE | `prefer_named_boolean_parameters` |
+| `prefer-named-boolean-parameters` | HAVE | `avoid_positional_boolean_parameters_with_fix` |
 | `prefer-named-imports` | HAVE | `prefer_named_imports` |
 | `prefer-named-parameters` | HAVE | `prefer_named_parameters` |
 | `prefer-non-nulls` | PARTIAL | `avoid_unnecessary_nullable_parameters` — TODO extend, see [proposal](../../../plans/tier_2_high_value/proposal_extend_avoid_unnecessary_nullable_parameters_dcm_parity.md) |

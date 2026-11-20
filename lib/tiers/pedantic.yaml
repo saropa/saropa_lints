@@ -42,7 +42,6 @@ plugins:
       prefer_getter_over_method: true
       prefer_static_method: true
       prefer_named_parameters: true
-      prefer_named_boolean_parameters: true
       prefer_explicit_function_type: true
       prefer_explicit_parameter_names: true
       prefer_typedef_for_callbacks: true

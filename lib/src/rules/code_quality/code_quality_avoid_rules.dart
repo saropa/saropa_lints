@@ -4819,8 +4819,18 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
 /// ```dart
 /// void setPermissions({required bool canRead, required bool canWrite}) {}
 /// ```
+///
+/// Alias: `prefer_named_boolean_parameters` (removed duplicate rule; old
+/// `analysis_options.yaml` keys still resolve to this rule).
 class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
   AvoidPositionalBooleanParametersRule() : super(code: _code);
+
+  // The former standalone rule `prefer_named_boolean_parameters` was a full
+  // duplicate of this one (same detection, no quick fix). It was removed; this
+  // alias keeps existing `diagnostics:` / severity config entries naming the
+  // old rule working (disable and severity override resolve to this rule).
+  @override
+  List<String> get configAliases => const ['prefer_named_boolean_parameters'];
 
   @override
   LintImpact get impact => LintImpact.warning;
@@ -4887,11 +4897,11 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
   }
 }
 
-/// Prefer named boolean parameters for functions with few parameters.
+/// Reports usage of identifiers banned via `banned_usage` in
+/// `analysis_options_custom.yaml`.
 ///
-/// Flags positional bool parameters in functions with 1–3 parameters. Complements
-/// avoid_positional_boolean_parameters_with_fix; use one or the other. Excludes setters,
-/// operators, and @override methods.
+/// Each banned entry carries its own configured reason. (Previously this doc
+/// was a misplaced copy of the positional-bool rule description.)
 class BannedUsageRule extends SaropaLintRule {
   BannedUsageRule() : super(code: _code);
 

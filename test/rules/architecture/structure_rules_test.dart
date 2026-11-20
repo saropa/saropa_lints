@@ -121,11 +121,6 @@ void main() {
       () => PreferSortedParametersRule(),
     );
     testRule(
-      'PreferNamedBooleanParametersRule',
-      'prefer_named_boolean_parameters',
-      () => PreferNamedBooleanParametersRule(),
-    );
-    testRule(
       'PreferNamedImportsRule',
       'prefer_named_imports',
       () => PreferNamedImportsRule(),

@@ -156,7 +156,7 @@ Coverage: 128 rules — 115 HAVE (89%), 7 PARTIAL, 6 TODO (4%)
 | `prefer_first` | HAVE | `prefer_list_first` |
 | `prefer_iterable_of` | HAVE | `prefer_iterable_of` |
 | `prefer_last` | HAVE | `prefer_list_last` |
-| `prefer_named_boolean_parameters` | HAVE | `prefer_named_boolean_parameters` |
+| `prefer_named_boolean_parameters` | HAVE | `avoid_positional_boolean_parameters_with_fix` |
 | `prefer_return_await` | HAVE | `prefer_return_await` |
 | `prefer_switch_expression` | HAVE | `prefer_switch_expression` |
 

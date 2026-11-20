@@ -2725,7 +2725,6 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_material_theme_colors' moved to stylisticRules (opinionated)
   // 'prefer_methods_before_fields' moved to stylisticRules (opinionated)
   'prefer_moving_to_variable',
-  'prefer_named_boolean_parameters',
   'prefer_named_extensions',
   'prefer_named_parameters',
   'prefer_native_file_dialogs',

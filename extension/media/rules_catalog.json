@@ -32527,28 +32527,6 @@
         "web": []
       }
     },
-    "prefer_named_boolean_parameters": {
-      "ruleType": "codeSmell",
-      "ruleStatus": "ready",
-      "requiresReview": false,
-      "defaultReviewState": null,
-      "cweIds": [],
-      "certIds": [],
-      "tags": [
-        "architecture"
-      ],
-      "accuracyTarget": {
-        "expectZeroFalsePositives": true,
-        "description": "Code smell default target: zero false positives."
-      },
-      "correction": "Convert to a named parameter so call sites read as doThing(enabled: true), making the code self-documenting without requiring signature lookup.",
-      "problemMessage": "[prefer_named_boolean_parameters] Positional boolean parameter detected. Call sites like doThing(true) give no indication what the boolean controls, forcing readers to look up the function signature to understand the intent. {v5}",
-      "impact": "warning",
-      "owasp": {
-        "mobile": [],
-        "web": []
-      }
-    },
     "prefer_named_extensions": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",

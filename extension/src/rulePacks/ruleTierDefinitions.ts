@@ -1459,7 +1459,6 @@ export const RULE_TIER_BY_CODE: Readonly<Record<string, string>> = {
   'prefer_multi_provider': 'recommended',
   'prefer_mutable_collections': 'stylistic',
   'prefer_named_bool_params': 'pedantic',
-  'prefer_named_boolean_parameters': 'professional',
   'prefer_named_extensions': 'professional',
   'prefer_named_imports': 'stylistic',
   'prefer_named_parameters': 'professional',

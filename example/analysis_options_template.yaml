@@ -643,7 +643,6 @@ saropa_lints:
     - function_always_returns_same_value: false
     - prefer_getter_over_method: false
     - prefer_static_method: false
-    - prefer_named_boolean_parameters: false
     - prefer_explicit_function_type: false
     - prefer_explicit_parameter_names: false
     - prefer_typedef_for_callbacks: false

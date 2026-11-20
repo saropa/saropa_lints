@@ -374,7 +374,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidUnsafeCollectionMethodsRule.new,
   AvoidUnsafeWhereMethodsRule.new,
   PreferWhereOrNullRule.new,
-  PreferNamedBooleanParametersRule.new,
   PreferEarlyReturnRule.new,
   PreferMutableCollectionsRule.new,
   PreferRecordOverEquatableRule.new,

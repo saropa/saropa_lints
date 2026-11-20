@@ -862,7 +862,6 @@ const Map<String, Set<String>> kRuleThemePackCodesGenerated = {
     'prefer_import_over_part',
     'prefer_lazy_singleton_registration',
     'prefer_mixin_over_abstract',
-    'prefer_named_boolean_parameters',
     'prefer_named_imports',
     'prefer_named_parameters',
     'prefer_null_object_pattern',
