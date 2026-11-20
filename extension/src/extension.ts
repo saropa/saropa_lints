@@ -1736,6 +1736,27 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // so engine controls and the raw process table live in one place instead
   // of two. Only shown when saropaLints.debug.enabled is true.
   HealthPanel.configureEngines({
+    // Master switch — reads `saropaLints.enabled`, the single setting that
+    // gates scan-on-save and factors into analyzer/scan-daemon status. Shown
+    // as a header-level card above the per-engine cards so users can find
+    // and flip the extension-wide kill switch from the Engines screen.
+    getMasterSwitchStatus: (): EngineStatus => {
+      const enabled = vscode.workspace
+        .getConfiguration('saropaLints')
+        .get<boolean>('enabled', true) ?? true;
+      // A folder-level value beats the Workspace-scope write the card makes,
+      // so the click would appear to do nothing. Surface that on the card.
+      const folderOverride = vscode.workspace
+        .getConfiguration('saropaLints')
+        .inspect<boolean>('enabled')?.workspaceFolderValue !== undefined;
+      return {
+        key: 'master',
+        name: l10n('debug.engine.master'),
+        enabled,
+        status: enabled ? 'active' : 'stopped',
+        rssNote: folderOverride ? l10n('debug.master.overridden') : undefined,
+      };
+    },
     // Analyzer Plugin status — in-process, no PID or RSS available.
     // status is a machine key matching debug.engine.statusValue.* in en.json —
     // translated at display time in engineCardsHtml.ts, NOT here, so
@@ -1853,7 +1874,42 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   // Wire engine toggle events to actual engine start/stop actions.
   HealthPanel.onToggle(async ({ engine, enabled }) => {
-    if (engine === 'lspServer') {
+    if (engine === 'master') {
+      // Master switch — writes `saropaLints.enabled` only. It does not touch
+      // the analysis_options.yaml plugins block or the LSP setting; the scan
+      // daemon reacts to the setting change by itself (scanOnSaveController's
+      // onDidChangeConfiguration restarts it and clears its diagnostics).
+      HealthPanel.addLogEntry(
+        enabled ? l10n('debug.log.masterToggleOn') : l10n('debug.log.masterToggleOff'),
+      );
+      try {
+        await cfg.update('enabled', enabled, vscode.ConfigurationTarget.Workspace);
+      } catch (err) {
+        // Rejects when no workspace folder is open — without this the click
+        // would do nothing and say nothing.
+        vscode.window.showErrorMessage(
+          l10n('debug.master.updateFailed', { error: String(err) }),
+        );
+        // The setting is unchanged, so skip the context/status-bar updates
+        // below; they would show a state that was never applied. Re-render so
+        // the panel still reflects the real value.
+        HealthPanel.refreshIfOpen();
+        return;
+      }
+      // A folder-level value (multi-root) outranks the Workspace write: warn
+      // instead of leaving a click that silently changes nothing. Fresh
+      // getConfiguration — `cfg` is a snapshot taken before the write.
+      if (getConfig().get<boolean>('enabled', true) !== enabled) {
+        vscode.window.showWarningMessage(l10n('debug.master.overridden'));
+      }
+      updateContext(enabled, enabled ? issuesProvider.hasViolations() : false);
+      refreshAll();
+      updateAllStatusBars();
+      // The log entry above re-rendered the panel BEFORE the setting was
+      // written, so the master card would still show the old state. Re-render
+      // now that the new value is readable.
+      HealthPanel.refreshIfOpen();
+    } else if (engine === 'lspServer') {
       // Write the setting — the onDidChangeConfiguration listener starts/stops
       // the client and logs the result.
       HealthPanel.addLogEntry(
@@ -1875,19 +1931,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       // Reuses the exact mechanism behind the "Lint integration" sidebar
       // toggle (saropaLints.disable / .reenablePlugin) so this isn't a
       // second, subtly different way to flip the same YAML block.
+      // This toggle also writes `saropaLints.enabled`: runDisable() clears it
+      // itself (setup.ts), so the matching ON branch must restore it or the
+      // plugin block would be live while the extension stays disabled. The
+      // master switch card is therefore a second writer of the same key, not
+      // the sole one.
       HealthPanel.addLogEntry(
         enabled ? l10n('debug.log.analyzerToggleOn') : l10n('debug.log.analyzerToggleOff'),
       );
       if (enabled) {
         await runReenablePlugin(context);
-        // Restore the extension-level enabled flag that the OFF branch
-        // cleared — without this, the YAML plugin block is live but the
-        // extension stays disabled in workspace settings.
         await cfg.update('enabled', true, vscode.ConfigurationTarget.Workspace);
         updateContext(true, issuesProvider.hasViolations());
       } else {
         await runDisable(context);
-        await cfg.update('enabled', false, vscode.ConfigurationTarget.Workspace);
         updateContext(false, false);
       }
       refreshAll();

@@ -845,7 +845,10 @@ function appendHotspotsRow(
 
 // Maps the machine-readable EngineStatus.key to the debug.engine.* l10n
 // namespace, which uses 'analyzerPlugin' rather than 'analyzer'.
-const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer' | 'ci', string> = {
+// The 'master' entry is present only to satisfy the EngineStatus.key union —
+// the master engine is filtered out before this map is used (see appendEnginesRow).
+const ENGINE_NAME_KEY: Record<'master' | 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci', string> = {
+    master: 'master',
     analyzer: 'analyzerPlugin',
     scanDaemon: 'scanDaemon',
     lspServer: 'lspServer',
@@ -862,8 +865,11 @@ const ENGINE_NAME_KEY: Record<'analyzer' | 'scanDaemon' | 'lspServer' | 'ci', st
  * not an off switch.
  */
 function appendEnginesRow(items: LeafItem[]): void {
-    const engines = HealthPanel.getEngineStatuses();
-    if (!engines) return;
+    const allEngines = HealthPanel.getEngineStatuses();
+    if (!allEngines) return;
+    // Filter out the master pseudo-engine — it's a gate, not a countable
+    // engine. The sidebar row should read "Engines: 2 running", not 3.
+    const engines = allEngines.filter(e => e.key !== 'master');
     const running = engines.filter(e => e.enabled).length;
     const summary = engines
         .map(e => {

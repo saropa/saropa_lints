@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [17.3.0]
 
-[log](https://github.com/saropa/saropa_lints/blob/v17.3.0/CHANGELOG.md)
+Rules & Tiers results and the "Explain rule" panel can now turn a rule off without a trip to the Overrides tab, and several Health Panel dashboards render correctly again after a CSP directive was silently dropping their inline style updates. The scan CLI is more reliable on large or unusual project layouts: it no longer runs out of memory with `--resolve`, and `--exclude-globs` no longer crashes when the excluded path contains a directory the scan can't read. [log](https://github.com/saropa/saropa_lints/blob/v17.3.0/CHANGELOG.md)
 
 ### Added
 
@@ -87,7 +87,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - CI now runs `extension/scripts/check_l10n_keys.py --check-params`, failing when a literal `l10n()` key is missing from `en.json` or its call-site params do not match the catalog placeholders. Five checker false positives (variable, spread and webview-substituted params) are marked `l10n:passthrough`.
 - Added a GitHub Actions workflow that runs saropa_lints on pull requests.
-- Added a master switch card (`saropaLints.enabled`) to the Health Panel's Diagnostic Engines section; the Scan on Save card dims when it is off, since that is the only engine the setting gates.
+- Added a master switch card (`saropaLints.enabled`) to the Health Panel's Diagnostic Engines section; the Scan on Save card dims when it is off, since that is the only engine the setting gates. A folder-level override of the setting is flagged on the card and in a warning after a click.
 - The publish script now writes the known-issues review list to the ignored `reports/` folder and prints the queued packages, instead of committing a file to `bugs/`.
 - The Qwen translation prompt now includes a short glossary of domain terms (audit, suppress, gate, transitive, hotspot, tier, …) when a string contains them, fixing word-sense mistranslations found in a side-by-side review.
 

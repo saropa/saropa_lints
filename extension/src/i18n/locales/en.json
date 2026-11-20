@@ -2153,6 +2153,7 @@
       "log": "Log"
     },
     "engine": {
+      "master": "Saropa Lints",
       "analyzerPlugin": "Live Analysis",
       "scanDaemon": "Scan on Save",
       "lspServer": "LSP Server",
@@ -2175,7 +2176,9 @@
         "notRunning": "not running",
         "remote": "runs on GitHub's hosted runners — not measurable from here"
       },
+      "masterOffHint": "Enable the master switch first",
       "description": {
+        "master": "Extension-wide switch (saropaLints.enabled workspace setting). When off, Scan on Save stops and the sidebar reports the extension as disabled. Live Analysis and LSP Server have their own toggles.",
         "analyzerPlugin": "Runs inside the Dart analysis server — live squiggles in the editor as you type, no scan needed. Toggling rewrites the plugins: block in analysis_options.yaml.",
         "scanDaemon": "Background process that rescans the whole project on save and writes reports/.saropa_lints/violations.json. Toggling off suspends it; the next save resumes it.",
         "lspServer": "Separate language server — publishes diagnostics to the Problems panel for open and workspace files. Toggling writes the saropaLints.lspServer.enabled setting.",
@@ -2202,6 +2205,8 @@
     },
     "log": {
       "empty": "No log entries yet.",
+      "masterToggleOn": "Master switch: enabling…",
+      "masterToggleOff": "Master switch: disabling…",
       "killAll": "Kill All: stopped all controllable engines.",
       "restartAll": "Restart All: restarted all controllable engines.",
       "lspToggleOn": "LSP Server: enabling…",
@@ -2217,6 +2222,10 @@
       "daemonToggleOff": "Scan Daemon: suspending…",
       "ciToggleOn": "CI: enabling…",
       "ciToggleOff": "CI: disabling…"
+    },
+    "master": {
+      "updateFailed": "Could not change the master switch: {error}",
+      "overridden": "A folder-level saropaLints.enabled setting overrides this switch. Change it in the folder's settings.json."
     },
     "sidebar": {
       "enginesLabel": "Engines: {count} running"

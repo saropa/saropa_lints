@@ -9,8 +9,8 @@ import { formatBytes } from './processQuery';
  */
 export interface EngineStatus {
   /** Stable machine key for toggle messages and data-attributes.
-   *  Must match the message union: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci'. */
-  key: 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci';
+   *  Must match the message union: 'master' | 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci'. */
+  key: 'master' | 'analyzer' | 'scanDaemon' | 'lspServer' | 'ci';
   /** Display name shown in the panel header row — must come from l10n(). */
   name: string;
   /** Whether the user has toggled this engine on. */
@@ -36,6 +36,8 @@ export interface EngineStatus {
 
 /** Callback signatures the host supplies so the panel can read engine state. */
 export interface EngineStatusDeps {
+  /** Master switch (`saropaLints.enabled`) — gates all engines. */
+  getMasterSwitchStatus: () => EngineStatus;
   getAnalyzerPluginStatus: () => EngineStatus;
   getScanDaemonStatus: () => EngineStatus;
   getLspServerStatus: () => EngineStatus;
@@ -51,17 +53,76 @@ export interface EngineStatusDeps {
 // Section builders
 // ────────────────────────────────────────────────────────────────
 
-/** Render the "Diagnostic Engines" heading and one card per engine. */
-export function buildEnginesSection(engines: EngineStatus[]): string {
+/**
+ * Render the "Diagnostic Engines" heading, the master switch (if supplied),
+ * and one card per engine. When the master switch is off, ONLY the Scan
+ * Daemon card is dimmed and disabled: that is the sole engine gated by
+ * `saropaLints.enabled`. The analyzer plugin (YAML block) and LSP server
+ * (own setting) keep working independently, so their toggles stay live.
+ */
+export function buildEnginesSection(
+  engines: EngineStatus[],
+  masterEnabled?: boolean,
+): string {
+  // Derive the flag from the master entry when the caller omits it, so the
+  // card state and the dimming can never disagree.
+  const gateOpen = masterEnabled ?? engines.find((e) => e.key === 'master')?.enabled;
   const heading = escapeHtml(l10n('debug.section.engines'));
-  const cards = engines.map(buildEngineCard).join('');
   const summary = escapeHtml(l10n('debug.section.enginesRecommendation'));
+
+  // Separate the master pseudo-engine from the real engine cards.
+  const masterEngine = engines.find((e) => e.key === 'master');
+  const realEngines = engines.filter((e) => e.key !== 'master');
+
+  const masterCard = masterEngine ? buildMasterSwitchCard(masterEngine) : '';
+  const cards = realEngines
+    .map((e) => buildEngineCard(e, gateOpen === false && e.key === 'scanDaemon'))
+    .join('');
 
   return `<section class="engines-section">
   <h2 class="section-heading">${heading}</h2>
   <div class="engine-recommendation">${summary}</div>
+  ${masterCard}
   ${cards}
 </section>`;
+}
+
+/**
+ * Render the master switch card — visually distinct from per-engine cards
+ * (placed above them with a divider) since it gates all engines, not a peer.
+ */
+function buildMasterSwitchCard(engine: EngineStatus): string {
+  const onLabel = escapeHtml(l10n('debug.toggle.on'));
+  const offLabel = escapeHtml(l10n('debug.toggle.off'));
+  const onClass = engine.enabled ? 'toggle-btn toggle-on active' : 'toggle-btn toggle-on';
+  const offClass = engine.enabled ? 'toggle-btn toggle-off' : 'toggle-btn toggle-off active';
+  const description = escapeHtml(l10n('debug.engine.description.master'));
+
+  // Status pill uses 'active'/'stopped' — same keys the per-engine cards use.
+  const statusLabel = escapeHtml(l10n('debug.engine.statusLabel'));
+  const statusKey = engine.enabled ? 'active' : 'stopped';
+  const statusClass = statusColorClass(statusKey);
+  const statusText = escapeHtml(l10n(`debug.engine.statusValue.${statusKey}`));
+
+  // rssNote doubles as the master card's override warning (no RSS applies).
+  const note = engine.rssNote
+    ? `
+  <div class="engine-detail">${escapeHtml(engine.rssNote)}</div>`
+    : '';
+
+  return `<div class="engine-card master-switch-card" data-engine="master">
+  <div class="engine-header">
+    <span class="engine-name">${escapeHtml(engine.name)}</span>
+    <span class="engine-controls">
+      <button class="${onClass}" data-action="toggleOn">${onLabel}</button>
+      <button class="${offClass}" data-action="toggleOff">${offLabel}</button>
+    </span>
+  </div>
+  <div class="engine-description">${description}</div>
+  <div class="engine-detail">
+    <span class="engine-status"><span class="status-label">${statusLabel}</span> <span class="status-value ${statusClass}">${statusText}</span></span>
+  </div>${note}
+</div>`;
 }
 
 /**
@@ -71,8 +132,11 @@ export function buildEnginesSection(engines: EngineStatus[]): string {
  *   Name           [ON] [OFF]    PID: 12345
  *   Status: active
  *   Rules: 203 . RSS: 1.02 GB
+ *
+ * @param disabled When true, the engine is gated off by the master switch —
+ *   toggles are dimmed and non-interactive so the user can't flip a moot switch.
  */
-function buildEngineCard(engine: EngineStatus): string {
+function buildEngineCard(engine: EngineStatus, disabled = false): string {
   // Use the explicit key from EngineStatus — stable across locales,
   // unlike the display name which goes through l10n().
   const engineKey = engine.key;
@@ -86,10 +150,15 @@ function buildEngineCard(engine: EngineStatus): string {
   const recommended = escapeHtml(l10n(`debug.engine.recommended.${descriptionKey}`));
 
   // Toggle button labels — ON is highlighted when enabled, OFF when disabled.
+  // When the master switch is off, per-engine toggles are inert.
   const onLabel = escapeHtml(l10n('debug.toggle.on'));
   const offLabel = escapeHtml(l10n('debug.toggle.off'));
   const onClass = engine.enabled ? 'toggle-btn toggle-on active' : 'toggle-btn toggle-on';
   const offClass = engine.enabled ? 'toggle-btn toggle-off' : 'toggle-btn toggle-off active';
+  const disabledAttr = disabled ? ' disabled' : '';
+  const disabledTitle = disabled
+    ? ` title="${escapeHtml(l10n('debug.engine.masterOffHint'))}"`
+    : '';
 
   // PID display — omitted when the engine has no running process.
   const pidLabel = escapeHtml(l10n('debug.engine.pid'));
@@ -104,12 +173,12 @@ function buildEngineCard(engine: EngineStatus): string {
 
   const metricsLine = buildMetricsLine(engine);
 
-  return `<div class="engine-card" data-engine="${escapeHtml(engineKey)}">
+  return `<div class="engine-card${disabled ? ' engine-disabled' : ''}" data-engine="${escapeHtml(engineKey)}">
   <div class="engine-header">
     <span class="engine-name">${escapeHtml(engine.name)}</span>
-    <span class="engine-controls">
-      <button class="${onClass}" data-action="toggleOn">${onLabel}</button>
-      <button class="${offClass}" data-action="toggleOff">${offLabel}</button>
+    <span class="engine-controls"${disabledTitle}>
+      <button class="${onClass}"${disabledAttr} data-action="toggleOn">${onLabel}</button>
+      <button class="${offClass}"${disabledAttr} data-action="toggleOff">${offLabel}</button>
     </span>
     ${pidValue}
   </div>
@@ -178,8 +247,9 @@ function buildMetricsLine(engine: EngineStatus): string {
 export function buildActionsBar(): string {
   // Both buttons act on the LSP Server only; name it in the label.
   const target = { name: l10n('debug.engine.lspServer') };
-  const killLabel = escapeHtml(l10n('debug.action.killAll', target));
-  const restartLabel = escapeHtml(l10n('debug.action.restartAll', target));
+  // l10n:passthrough — `target` is a params object ({ name }) held in a variable; the key checker cannot see through it.
+  const killLabel = escapeHtml(l10n('debug.action.killAll', target)); // l10n:passthrough
+  const restartLabel = escapeHtml(l10n('debug.action.restartAll', target)); // l10n:passthrough
   const killDescription = escapeHtml(l10n('debug.action.killAllDescription'));
   const restartDescription = escapeHtml(l10n('debug.action.restartAllDescription'));
 
@@ -320,6 +390,22 @@ export function getEngineCardsStyles(): string {
 }
 .metric-sep {
   margin: 0 4px;
+}
+
+/* ── Master switch card — distinct from per-engine cards ──── */
+.master-switch-card {
+  border-bottom: 2px solid var(--vscode-widget-border, #e5e7eb);
+}
+.master-switch-card .engine-name {
+  font-size: 14px;
+}
+
+/* ── Engine cards gated off by the master switch ─────────── */
+.engine-disabled {
+  opacity: 0.45;
+  /* No pointer-events:none: the buttons carry the disabled attribute, and the
+     hover tooltip (masterOffHint) must stay reachable to explain why. */
+  cursor: not-allowed;
 }
 
 /* ── Status colors ────────────────────────────────────────── */

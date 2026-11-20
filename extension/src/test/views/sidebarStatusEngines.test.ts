@@ -149,6 +149,25 @@ describe('sidebar Status section — Engines row', () => {
     assert.strictEqual(enginesRow!.iconPath?.color, undefined, 'no warning color while something is running');
   });
 
+  it('does not count or list the master switch as an engine', () => {
+    // The master pseudo-engine is a gate, not a diagnostics source: with it
+    // enabled the row must still read "2 running" for two live engines, and
+    // its name must not appear in the per-engine summary.
+    sinon.stub(HealthPanel, 'getEngineStatuses').returns([
+      fakeEngine('master', true, 'active'),
+      fakeEngine('analyzer', true, 'active'),
+      fakeEngine('scanDaemon', false, 'stopped'),
+      fakeEngine('lspServer', true, 'running'),
+    ]);
+
+    const enginesRow = findEnginesRow(getStatusItems());
+
+    assert.ok(enginesRow, 'Engines row must be present');
+    const label = typeof enginesRow!.label === 'string' ? enginesRow!.label : enginesRow!.label?.label;
+    assert.strictEqual(label, 'Engines: 2 running');
+    assert.doesNotMatch(enginesRow!.description ?? '', /Saropa Lints/);
+  });
+
   it('warns (list.warningForeground) when zero engines are running', () => {
     sinon.stub(HealthPanel, 'getEngineStatuses').returns([
       fakeEngine('analyzer', false, 'stopped'),

@@ -62,8 +62,12 @@ export function buildHealthPanelHtml(render: HealthPanelRender): string {
   // wired, or the user is left with an edited working tree and no explanation.
   const publishHtml = buildCiPublishSection(render.ciPublish);
 
+  // Pass the master switch state to buildEnginesSection so per-engine
+  // cards are greyed out when the extension-level kill switch is off.
+  const masterEngine = engines?.find((e) => e.key === 'master');
+  const masterEnabled = masterEngine?.enabled;
   const enginesHtml = engines && engines.length > 0
-    ? `${buildEnginesSection(engines)}${buildActionsBar()}${buildLogSection(logEntries ?? [])}`
+    ? `${buildEnginesSection(engines, masterEnabled)}${buildActionsBar()}${buildLogSection(logEntries ?? [])}`
     : '';
 
   return `<!DOCTYPE html>
