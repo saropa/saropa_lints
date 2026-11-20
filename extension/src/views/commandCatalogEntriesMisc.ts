@@ -112,6 +112,22 @@ export const miscCatalogEntries: readonly CatalogEntry[] = [
     icon: 'link-external',
   },
   {
+    command: 'saropaLints.rateOnMarketplace',
+    title: 'Rate on VS Code Marketplace',
+    description:
+      'Open the Saropa Lints review page on the VS Code Marketplace. Ratings help other developers discover the extension.',
+    category: 'Views & Navigation',
+    icon: 'star-full',
+  },
+  {
+    command: 'saropaLints.rateOnOpenVsx',
+    title: 'Rate on Open VSX',
+    description:
+      'Open the Saropa Lints review page on the Open VSX Registry. Ratings help other developers discover the extension.',
+    category: 'Views & Navigation',
+    icon: 'star-full',
+  },
+  {
     command: 'saropaLints.toggleSidebarSection',
     title: 'Toggle Activity Bar Section',
     description: 'Show or hide a section in the Saropa Lints activity bar.',

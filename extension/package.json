@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "17.3.9",
+  "version": "17.4.9",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
@@ -585,6 +585,16 @@
         "command": "saropaLints.openPubDevSaropaLints",
         "title": "%command.openPubDevSaropaLints.title%",
         "icon": "$(link-external)"
+      },
+      {
+        "command": "saropaLints.rateOnMarketplace",
+        "title": "%command.rateOnMarketplace.title%",
+        "icon": "$(star-full)"
+      },
+      {
+        "command": "saropaLints.rateOnOpenVsx",
+        "title": "%command.rateOnOpenVsx.title%",
+        "icon": "$(star-full)"
       },
       {
         "command": "saropaLints.createSaropaInstructions",

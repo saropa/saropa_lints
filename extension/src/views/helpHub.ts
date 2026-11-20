@@ -37,6 +37,16 @@ const HELP_HUB_SPECS = [
         label: '$(link-external) Package on pub.dev',
         description: 'saropa_lints',
     },
+    {
+        commandId: 'saropaLints.rateOnMarketplace',
+        label: '$(star-full) Rate on VS Code Marketplace',
+        description: 'Help other developers find Saropa Lints',
+    },
+    {
+        commandId: 'saropaLints.rateOnOpenVsx',
+        label: '$(star-full) Rate on Open VSX',
+        description: 'Leave a rating on the open registry',
+    },
 ] as const satisfies readonly HelpHubPick[];
 
 /** Stable command order for unit tests (same order as the quick pick). */

@@ -66,6 +66,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [17.4.0]
+
+### Added
+
+- Added a "Rate Us" call-to-action on the What's New welcome panel with links to the VS Code Marketplace, Open VSX review pages, and GitHub Issues — a gradient-accented card with animated stars, centered between the discovery grid and the show-next-time checkbox.
+- Added a scan-gated rating nudge toast that appears after the user's 5th successful scan, linking to both extension stores and the GitHub issues page. Respects the proactive-nudge opt-out and defers gracefully on "Not now".
+- Added "Rate on VS Code Marketplace" and "Rate on Open VSX" entries to the Help Hub quick pick, so users can reach the review pages at any time.
+- Added `saropaLints.rateOnMarketplace` and `saropaLints.rateOnOpenVsx` commands (Command Palette + Command Catalog).
+
+---
+
 ## [17.3.0]
 
 Rules & Tiers results and the "Explain rule" panel can now turn a rule off without a trip to the Overrides tab, and several Health Panel dashboards render correctly again after a CSP directive was silently dropping their inline style updates. The scan CLI is more reliable on large or unusual project layouts: it no longer runs out of memory with `--resolve`, and `--exclude-globs` no longer crashes when the excluded path contains a directory the scan can't read. [log](https://github.com/saropa/saropa_lints/blob/v17.3.0/CHANGELOG.md)
@@ -99,6 +110,7 @@ Rules & Tiers results and the "Explain rule" panel can now turn a rule off witho
 
 ### Internal
 
+- Added "Dart SDK", "Flutter SDK", "Flutter daemons", and "Vibrancy" to `DO_NOT_TRANSLATE` in `extension/scripts/i18n/dictionaries.py`; these proper nouns no longer show as missing translations in every locale.
 - Added `extension/scripts/i18n/bad_translations.py`: detects mechanically defective machine translations (leaked shield sentinels and `⁇`, prompt echo, wrong script, hallucinated length, placeholder drift, blocklisted domain-term renderings from `bad_translations_blocklist.json`). `generate_locales.py` now auto-prunes flagged cache entries on every run so they are re-translated; `--check` exits 1 on any flagged shipped string and `--purge` clears the cache on demand.
 - Fixed `mt_fallback._SHIELD_RESIDUE_RE` missing bare `ZZ`, `_PH<n>_`, and `ПХ<n>` shield leaks, so such translations were accepted and cached at write time; they are now rejected before caching, matching `bad_translations.py`. `bad_translations.py --purge` now backs the cache up to `mt_strings.json.bak` first.
 - Fixed `generate_locales.py` aborting a locale (and discarding its translations) when Qwen failed on a few pruned short labels: the cache is now saved before the english-regression guard, and a string that falls back to English keeps its existing shipped translation instead of regressing.

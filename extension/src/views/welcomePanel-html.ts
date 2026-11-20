@@ -136,6 +136,25 @@ function buildDiscoveryGridHtml(): string {
 }
 
 /**
+ * Full-width call-to-action asking the user to rate the extension. Two buttons
+ * link out to the VS Code Marketplace and Open VSX review pages. Styled with
+ * a warm gradient background and star accents so it stands out from the
+ * functional cards above without clashing with the dashboard chrome.
+ */
+function buildRateCta(): string {
+  return `<section class="welcome-rate-cta">
+    <div class="welcome-rate-stars" aria-hidden="true">★ ★ ★ ★ ★</div>
+    <h2>${escapeHtml(l10n('rate.welcome.header'))}</h2>
+    <p>${escapeHtml(l10n('rate.welcome.body'))}</p>
+    <div class="welcome-rate-actions">
+      <button type="button" class="btn tier-1" data-action="rateMarketplace">${escapeHtml(l10n('rate.welcome.marketplace'))}</button>
+      <button type="button" class="btn" data-action="rateOpenVsx">${escapeHtml(l10n('rate.welcome.openVsx'))}</button>
+      <button type="button" class="btn" data-action="openGitHubIssues">${escapeHtml(l10n('rate.welcome.issues'))}</button>
+    </div>
+  </section>`;
+}
+
+/**
  * The "keep showing this" checkbox. Starts checked (default behavior: reappear on
  * every activation) and disabled (the user cannot opt out) — it only becomes
  * interactive once the client script detects the panel has been scrolled to the
@@ -182,6 +201,7 @@ export function buildWelcomePanelHtml(version: string, ruleCounts: RuleCountSumm
     ${statsHtml}
     ${cardsHtml}
     ${discoveryHtml}
+    ${buildRateCta()}
     ${buildShowNextTimeFooter()}
   </main>
   <script nonce="${nonce}">${getWelcomePanelScript()}</script>

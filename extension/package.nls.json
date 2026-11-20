@@ -113,6 +113,8 @@
   "command.showWelcome.title": "Saropa Lints: What's New",
   "command.openHelpHub.title": "Saropa Lints: Help",
   "command.openPubDevSaropaLints.title": "Saropa Lints: Open package on pub.dev",
+  "command.rateOnMarketplace.title": "Saropa Lints: Rate on VS Code Marketplace",
+  "command.rateOnOpenVsx.title": "Saropa Lints: Rate on Open VSX",
   "command.createSaropaInstructions.title": "Create Saropa Lints Instructions for AI Agents",
   "command.packageVibrancy.scan.title": "Scan Packages",
   "command.packageVibrancy.rescan.title": "Rescan Packages (Fresh)",

@@ -3038,5 +3038,31 @@
     "driftRowLabel": "Plugin version out of sync",
     "driftRowDescription": "analysis_options.yaml says {configured}, pubspec.lock pins {pinned}. Click to sync.",
     "driftSynced": "analysis_options.yaml plugin version updated to {pinned}."
+  },
+  "rate": {
+    "nudge": {
+      "message": "Saropa Lints is free and open source. A quick rating or review helps other developers discover it — and feedback and bug reports on GitHub keep it getting better.",
+      "marketplace": "Rate on Marketplace",
+      "openVsx": "Rate on Open VSX",
+      "dismiss": "Not now",
+      "never": "Don’t ask again"
+    },
+    "helpHub": {
+      "marketplace": {
+        "label": "Rate on VS Code Marketplace",
+        "description": "Leave a rating to help other developers find Saropa Lints"
+      },
+      "openVsx": {
+        "label": "Rate on Open VSX",
+        "description": "Leave a rating on the open registry"
+      }
+    },
+    "welcome": {
+      "header": "Free, open source, and built for the community",
+      "body": "Saropa Lints is open source and always will be. A quick rating helps other developers discover it. Found a bug or have a feature idea? Open an issue — every report makes the tool better for everyone.",
+      "marketplace": "Rate on VS Code Marketplace",
+      "openVsx": "Rate on Open VSX",
+      "issues": "Report an issue on GitHub"
+    }
   }
 }

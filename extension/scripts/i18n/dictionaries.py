@@ -23,6 +23,11 @@ DO_NOT_TRANSLATE: list[str] = [
     "saropa_quality_gate.yaml thresholds",
     "saropa_tier",
     "{grade} · {score}/100",
+    # Product/SDK proper nouns and the Saropa feature name — one spelling worldwide.
+    "Dart SDK",
+    "Flutter SDK",
+    "Flutter daemons",
+    "Vibrancy",
     # Dart analyzer comment directive — literal code syntax, never translated.
     "// ignore_for_file:",
 ]

@@ -152,6 +152,49 @@ body { max-width: 900px; margin: 0 auto; }
   color: var(--muted);
   font-size: var(--text-caption);
 }
+/* ── Rate-us CTA — warm gradient card between the discovery grid and the
+   show-next-time checkbox. The gradient uses chrome tokens mixed at low
+   opacity so it adapts to both light and dark themes automatically. ── */
+.welcome-rate-cta {
+  margin: var(--space-5) 0;
+  padding: var(--space-5) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--accent-good) 30%, var(--border));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-good) 8%, var(--surface-2)),
+    color-mix(in srgb, var(--accent-info) 8%, var(--surface-2))
+  );
+  text-align: center;
+}
+.welcome-rate-stars {
+  font-size: 28px;
+  letter-spacing: 6px;
+  color: var(--accent-good);
+  margin: 0 0 var(--space-2);
+  /* Gentle shimmer pulse so the stars catch the eye without being obnoxious. */
+  animation: rateStarPulse 3s ease-in-out infinite;
+}
+@keyframes rateStarPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.06); }
+}
+.welcome-rate-cta h2 {
+  font-size: var(--text-h3);
+  margin: 0 0 var(--space-2);
+}
+.welcome-rate-cta p {
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 520px;
+  margin: 0 auto var(--space-4);
+}
+.welcome-rate-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
 /* Narrow viewports (guideline: no horizontal scroll below ~380px) collapse both
    grids to a single column instead of squeezing 5 stat tiles or 2 discovery tiles. */
 @media (max-width: 480px) {

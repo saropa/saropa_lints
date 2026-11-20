@@ -100,6 +100,7 @@ import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { AnalysisOptimizerWebviewProvider } from './analysisOptimizer/analysisOptimizerWebviewProvider';
 import { registerAnalyzerExcludeDiffProvider } from './analysisOptimizer/analyzerExcludeDiffProvider';
 import { maybeShowStartupSuggestion } from './rulePacks/startupSuggestionNudge';
+import { maybePromptForRating, MARKETPLACE_REVIEW_URL, OPEN_VSX_REVIEW_URL } from './ratePrompt';
 import {
   openRuleExplainPanelForViolation,
   openRuleExplainPanel,
@@ -989,6 +990,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           updateAllStatusBars(data);
           updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
           runCelebrationIfNeeded(context.workspaceState, root, history, appended);
+          // After a successful scan, check whether the user has hit the
+          // threshold to be asked for a store rating / review.
+          void maybePromptForRating(context);
 
           // Fire the deferred tier-change toast now that live diagnostics
           // have settled — the dashboard and this toast read the same source.
@@ -2700,6 +2704,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.openPubDevSaropaLints', () => {
       void vscode.env.openExternal(vscode.Uri.parse('https://pub.dev/packages/saropa_lints'));
+    }),
+    // Store rating commands — opened from the Help Hub, Command Catalog, and
+    // the "Rate Us" CTA on the Welcome panel.
+    vscode.commands.registerCommand('saropaLints.rateOnMarketplace', () => {
+      void vscode.env.openExternal(vscode.Uri.parse(MARKETPLACE_REVIEW_URL));
+    }),
+    vscode.commands.registerCommand('saropaLints.rateOnOpenVsx', () => {
+      void vscode.env.openExternal(vscode.Uri.parse(OPEN_VSX_REVIEW_URL));
     }),
     // Creates .cursor/rules/saropa_lints_instructions.mdc from bundled template for AI agent guidelines.
     vscode.commands.registerCommand('saropaLints.createSaropaInstructions', async () => {

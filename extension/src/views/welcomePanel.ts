@@ -3,6 +3,7 @@ import { l10n } from '../i18n/runtime';
 import { buildWelcomePanelHtml } from './welcomePanel-html';
 import { fetchRuleCounts } from './ruleCountCliRunner';
 import { getProjectRoot } from '../projectRoot';
+import { MARKETPLACE_REVIEW_URL, OPEN_VSX_REVIEW_URL } from '../ratePrompt';
 
 /**
  * globalState key persisting whether the panel should keep auto-showing on activation.
@@ -26,6 +27,9 @@ type WelcomeMessage =
   | { type: 'openFindingsDashboard' }
   | { type: 'openPackageDashboard' }
   | { type: 'openRulesDashboard' }
+  | { type: 'rateMarketplace' }
+  | { type: 'rateOpenVsx' }
+  | { type: 'openGitHubIssues' }
   | { type: 'setShowNextTime'; value: boolean };
 
 /**
@@ -115,6 +119,15 @@ export class WelcomePanel implements vscode.Disposable {
         break;
       case 'openRulesDashboard':
         void vscode.commands.executeCommand('saropaLints.openConfigDashboard');
+        break;
+      case 'rateMarketplace':
+        void vscode.env.openExternal(vscode.Uri.parse(MARKETPLACE_REVIEW_URL));
+        break;
+      case 'rateOpenVsx':
+        void vscode.env.openExternal(vscode.Uri.parse(OPEN_VSX_REVIEW_URL));
+        break;
+      case 'openGitHubIssues':
+        void vscode.env.openExternal(vscode.Uri.parse('https://github.com/saropa/saropa_lints/issues'));
         break;
       case 'setShowNextTime':
         // Persisted immediately on toggle, not only on close — a webview tab can be
