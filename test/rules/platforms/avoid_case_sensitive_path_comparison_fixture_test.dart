@@ -551,10 +551,11 @@ void f(Request r, FakePath p) {
     // against a local derived from HttpRequest.uri.path — must NOT lint
     // because HTTP route paths are case-sensitive by RFC 3986.
 
-    test('does NOT fire on HttpRequest.uri.path via intermediate local '
-        'compared to a static const route constant with "path" in name',
-        () async {
-      await assertFixtureMarkers(rule, '''
+    test(
+      'does NOT fire on HttpRequest.uri.path via intermediate local '
+      'compared to a static const route constant with "path" in name',
+      () async {
+        await assertFixtureMarkers(rule, '''
 import 'dart:io';
 
 class ServerConstants {
@@ -574,7 +575,8 @@ class Router {
   }
 }
 ''');
-    });
+      },
+    );
 
     test('does NOT fire on HttpRequest.uri.path with 200+ intervening '
         'statements before the comparison (distance stress test)', () async {
@@ -582,16 +584,14 @@ class Router {
       // Verify _findLocalDeclaration reaches distant declarations.
       final buffer = StringBuffer();
       buffer.writeln("import 'dart:io';");
-      buffer.writeln(
-          'class S { static const String pathRoute = "/api/x"; }');
+      buffer.writeln('class S { static const String pathRoute = "/api/x"; }');
       buffer.writeln('Future<void> f(HttpRequest request) async {');
       buffer.writeln('  final req = request;');
       buffer.writeln('  final String path = req.uri.path;');
       for (int i = 0; i < 200; i++) {
         buffer.writeln('  if (path == "/route$i") {}');
       }
-      buffer.writeln(
-          '  // LINT_NOT: avoid_case_sensitive_path_comparison');
+      buffer.writeln('  // LINT_NOT: avoid_case_sensitive_path_comparison');
       buffer.writeln('  if (path == S.pathRoute) {}');
       buffer.writeln('}');
 

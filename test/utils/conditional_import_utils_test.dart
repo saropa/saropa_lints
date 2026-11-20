@@ -429,9 +429,9 @@ import 'shared.dart';
         File(p.join(libDir, 'stub.dart')).writeAsStringSync('''
 import 'shared.dart';
 ''');
-        File(p.join(libDir, 'shared.dart')).writeAsStringSync(
-          "import 'dart:io';\n",
-        );
+        File(
+          p.join(libDir, 'shared.dart'),
+        ).writeAsStringSync("import 'dart:io';\n");
         expect(
           isInNativeOnlyImportClosure(p.join(libDir, 'shared.dart')),
           isFalse,

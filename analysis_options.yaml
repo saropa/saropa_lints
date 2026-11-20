@@ -98,7 +98,9 @@ linter:
 # local rule source instead of a pub.dev snapshot. `path:` replaces `version:`
 # (the analyzer ignores the plugin without one of the two). Restart the Dart
 # analysis server after rule edits; it caches the plugin build.
-plugins:
-  saropa_lints:
-    path: .
+# >>> saropa_lints integration turned OFF by the VS Code extension — toggle "Lint integration" On to restore >>>
+# plugins:
+#   saropa_lints:
+#     path: .
 
+# <<< saropa_lints end of disabled integration block <<<

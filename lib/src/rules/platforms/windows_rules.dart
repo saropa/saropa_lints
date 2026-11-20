@@ -640,7 +640,8 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
     if (param.name != 'path') return false;
 
     // Walk up to the enclosing method/function to inspect sibling params.
-    final AstNode? functionNode = param.thisOrAncestorOfType<FunctionBody>()
+    final AstNode? functionNode = param
+        .thisOrAncestorOfType<FunctionBody>()
         ?.parent;
     final FormalParameterList? paramList = switch (functionNode) {
       MethodDeclaration m => m.parameters,

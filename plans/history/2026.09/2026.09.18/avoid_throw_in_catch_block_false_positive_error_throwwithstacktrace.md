@@ -1,6 +1,6 @@
 # BUG: `avoid_throw_in_catch_block` — Flags `throw Error.throwWithStackTrace(...)`, the Stack-Preserving Pattern It Recommends
 
-**Status: Open**
+**Status: Closed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -192,19 +192,23 @@ An Opus review of the initial fix found the guard was still incomplete on two ed
 
 ## Changes Made
 
-_Not yet — open report._
+See **Finish Report** and **Follow-up** sections above for complete details.
+
+- `lib/src/rules/flow/exception_rules.dart` — added `_throwsViaThrowWithStackTrace` semantic guard in `_ThrowVisitor`; follow-up added `element == null` fallback and `PrefixedIdentifier` support.
+- `example/lib/exception/avoid_throw_in_catch_block_fixture.dart` — added GOOD fixture cases for `Error.throwWithStackTrace` and `rethrow`.
+- `test/rules/flow/flow_fp_test.dart` — 7 new tests (4 initial + 3 follow-up): resolved, syntactic, and prefixed-import paths.
 
 ---
 
 ## Tests Added
 
-_Not yet — open report._
+7 tests in `test/rules/flow/flow_fp_test.dart` under group `avoid_throw_in_catch_block — Error.throwWithStackTrace exemption`. All 32 tests passing (29 pre-existing + 3 follow-up additions to the initial 4).
 
 ---
 
 ## Commits
 
-_Not yet — open report._
+Committed as part of the 2026-09-18 session work.
 
 ---
 

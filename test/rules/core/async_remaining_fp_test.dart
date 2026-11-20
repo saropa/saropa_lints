@@ -193,8 +193,10 @@ Map<String, Object?> toJson(Entry e) => {
 
     // Positive guard: one UTC constructor plus one non-UTC constructor is
     // not UTC by construction.
-    test('still fires when only one of two constructors supplies UTC', () async {
-      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+    test(
+      'still fires when only one of two constructors supplies UTC',
+      () async {
+        final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
 class Entry {
   Entry(DateTime now) : at = now.toUtc();
   Entry.local(DateTime now) : at = now;
@@ -205,8 +207,9 @@ Map<String, Object?> toJson(Entry e) => {
   'at': e.at.toIso8601String(),
 };
 ''');
-      expect(codes, contains('prefer_utc_for_storage'));
-    });
+        expect(codes, contains('prefer_utc_for_storage'));
+      },
+    );
 
     // Local-variable counterpart of the fix that IS sound: a `final` local
     // whose initializer is UTC, referenced later by a bare identifier with

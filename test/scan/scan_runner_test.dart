@@ -528,7 +528,8 @@ plugins:
   test('runResolved tracks skippedFileCount for out-of-root files', () async {
     // Pass an absolute path outside the project root. The resolved scan
     // should skip it via the contextFor guard and increment the counter.
-    final outsidePath = Directory(projectRoot).parent.path +
+    final outsidePath =
+        Directory(projectRoot).parent.path +
         Platform.pathSeparator +
         'nonexistent_outside.dart';
     final runner = ScanRunner(

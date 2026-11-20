@@ -251,8 +251,10 @@ Future<void> connect() async {
   group('require_data_encryption', () {
     // Bug: HttpResponse.write(jsonEncode(...)) was flagged as unencrypted
     // storage; it is network output. Positive twin: File.writeAsString fires.
-    test('does NOT report HttpResponse.write of a sensitive-named body', () async {
-      const code = '''
+    test(
+      'does NOT report HttpResponse.write of a sensitive-named body',
+      () async {
+        const code = '''
 import 'dart:convert';
 import 'dart:io';
 
@@ -261,9 +263,13 @@ Future<void> reply(HttpResponse res, Map<String, Object?> body) async {
   await res.close();
 }
 ''';
-      final codes = await reportedRuleCodes(RequireDataEncryptionRule(), code);
-      expect(codes.contains('require_data_encryption'), isFalse);
-    });
+        final codes = await reportedRuleCodes(
+          RequireDataEncryptionRule(),
+          code,
+        );
+        expect(codes.contains('require_data_encryption'), isFalse);
+      },
+    );
 
     test('STILL reports File.writeAsString of a password', () async {
       const code = '''
