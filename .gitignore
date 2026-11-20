@@ -96,3 +96,5 @@ plans/known_issues_review.md
 /docs/handover
 self_check/pubspec.lock
 test/aggregate/
+dtmpscan_stdout.txt
+dtmpscan_stderr.txt
