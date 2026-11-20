@@ -525,6 +525,24 @@ plugins:
     });
   });
 
+  test('runResolved tracks skippedFileCount for out-of-root files', () async {
+    // Pass an absolute path outside the project root. The resolved scan
+    // should skip it via the contextFor guard and increment the counter.
+    final outsidePath = Directory(projectRoot).parent.path +
+        Platform.pathSeparator +
+        'nonexistent_outside.dart';
+    final runner = ScanRunner(
+      targetPath: projectRoot,
+      dartFiles: [outsidePath],
+      tier: 'essential',
+      messageSink: (_) {},
+    );
+    final result = await runner.runResolved();
+    expect(result, isNotNull);
+    expect(result, isEmpty);
+    expect(runner.skippedFileCount, 1);
+  });
+
   group('ScanRunner.runResolvedWithCollection', () {
     // The daemon path: one collection built up front, reused across
     // requests. These tests pin that a shared collection produces the same
@@ -572,14 +590,18 @@ plugins:
       // The daemon path must degrade to "scanned nothing" rather than
       // throw out of contextFor.
       final collection = ScanRunner.buildProjectCollection(projectRoot);
-      final result = await ScanRunner(
+      final runner = ScanRunner(
         targetPath: projectRoot,
         dartFiles: ['lib/scan.dart'],
         tier: 'essential',
         messageSink: (_) {},
-      ).runResolvedWithCollection(collection);
+      );
+      final result = await runner.runResolvedWithCollection(collection);
       expect(result, isNotNull);
       expect(result, isEmpty);
+      // The skipped counter must reflect the excluded file so callers (the
+      // CLI) can exit non-zero when explicitly requested files were dropped.
+      expect(runner.skippedFileCount, 1);
     });
 
     test('invalid tier returns null (same contract as runResolved)', () async {

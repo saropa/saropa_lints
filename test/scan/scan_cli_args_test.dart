@@ -1284,4 +1284,26 @@ void main() {
     tags: ['slow'],
     timeout: const Timeout(Duration(minutes: 5)),
   );
+
+  group('--strict-files', () {
+    test('defaults to false', () {
+      final result = parseScanArgs(['scan', '.', '--tier', 'essential']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.strictFiles, isFalse);
+    });
+
+    test('sets strictFiles to true', () {
+      final result = parseScanArgs([
+        'scan',
+        '.',
+        '--tier',
+        'essential',
+        '--strict-files',
+        '--files',
+        'lib/main.dart',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.strictFiles, isTrue);
+    });
+  });
 }

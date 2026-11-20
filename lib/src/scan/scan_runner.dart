@@ -15,6 +15,7 @@ library;
 import 'dart:io' as io;
 
 import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/dart/analysis/analysis_context.dart';
 import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
@@ -151,6 +152,14 @@ class ScanRunner {
   /// Built by `_prepare` so [_collectDiagnostics] can stamp each diagnostic.
   Map<String, String> _ruleImpactMap = const {};
 
+  /// Files skipped because they fell outside the analysis context root during
+  /// a resolved scan. The CLI checks this after the scan to exit non-zero when
+  /// explicitly requested files could not be analyzed.
+  int _skippedFileCount = 0;
+
+  /// Number of files skipped for being outside the analysis context root.
+  int get skippedFileCount => _skippedFileCount;
+
   /// Builds an [AnalysisContextCollection] rooted at [projectRoot] for a
   /// long-lived caller (the scan daemon) to hold and reuse across many
   /// [runResolvedWithCollection] calls. This is the expensive step
@@ -198,6 +207,10 @@ class ScanRunner {
   /// fast, but rules registered on `addInstanceCreationExpression` and any
   /// type-based rule under-report — see [runResolved] for the resolved path.
   List<ScanDiagnostic>? run() {
+    // Reset per-run state for symmetry with the resolved paths — the
+    // syntactic pass never calls contextFor so skips can't happen today,
+    // but a reused ScanRunner must start clean regardless.
+    _skippedFileCount = 0;
     final plan = _prepare();
     if (plan == null) return null;
     if (plan.files.isEmpty) return const [];
@@ -220,6 +233,8 @@ class ScanRunner {
   /// materially slower and requires the target project to have had `pub get`
   /// run (otherwise units fail to resolve and are skipped with a message).
   Future<List<ScanDiagnostic>?> runResolved() async {
+    // Reset per-run state so a reused ScanRunner doesn't carry stale counts.
+    _skippedFileCount = 0;
     // Disable the Problems-tab cap when the caller requests complete output.
     if (disableIssueCap) ProgressTracker.setMaxIssues(0);
 
@@ -248,6 +263,8 @@ class ScanRunner {
   Future<List<ScanDiagnostic>?> runResolvedWithCollection(
     AnalysisContextCollection collection,
   ) async {
+    // Reset per-run state so a reused ScanRunner doesn't carry stale counts.
+    _skippedFileCount = 0;
     // Disable the Problems-tab cap when the caller requests complete output.
     if (disableIssueCap) ProgressTracker.setMaxIssues(0);
 
@@ -260,19 +277,24 @@ class ScanRunner {
     // For a save-triggered daemon request that must degrade to a skip — the
     // user saved a file their own config says not to analyze — not an error
     // response, so partition the request into scannable files + skips first.
+    // The resolved context is saved per file so _scanSingleFileResolved does
+    // not need to repeat the lookup (#bug: redundant contextFor).
     final absFiles = <String>[];
+    final fileContexts = <String, AnalysisContext>{};
     for (final f in plan.files.map(p.absolute).map(p.normalize)) {
       try {
-        collection.contextFor(f).changeFile(f);
+        final ctx = collection.contextFor(f);
+        ctx.changeFile(f);
         absFiles.add(f);
+        fileContexts[f] = ctx;
       } on StateError {
         _err('  Skipping (outside analysis roots or excluded): $f');
+        _skippedFileCount++;
       }
     }
     if (absFiles.isEmpty) return const [];
-    final affectedContexts = {
-      for (final f in absFiles) collection.contextFor(f),
-    };
+    // Deduplicate contexts — multiple files can share the same context.
+    final affectedContexts = fileContexts.values.toSet();
     for (final ctx in affectedContexts) {
       await ctx.applyPendingFileChanges();
     }
@@ -284,8 +306,14 @@ class ScanRunner {
     final diagnostics = <ScanDiagnostic>[];
     final visitorRule = _visitorRuleMap(registrations);
     for (final f in absFiles) {
+      // absFiles only contains paths that passed the contextFor guard above,
+      // so the lookup is guaranteed non-null. Assert to catch refactoring
+      // mistakes that break the invariant.
+      final ctx = fileContexts[f];
+      assert(ctx != null, 'fileContexts missing entry for $f');
+      if (ctx == null) continue;
       await _scanSingleFileResolved(
-        collection,
+        ctx,
         f,
         registrations,
         visitorRule,
@@ -736,15 +764,17 @@ class ScanRunner {
       // A file outside the collection's root (e.g. an explicit path pointing
       // elsewhere) makes contextFor throw StateError — skip it rather than
       // crashing the entire scan.
+      AnalysisContext fileContext;
       try {
-        collection.contextFor(absFiles[i]);
+        fileContext = collection.contextFor(absFiles[i]);
       } on StateError {
         _err('  Skipping (outside analysis roots): ${absFiles[i]}');
+        _skippedFileCount++;
         continue;
       }
       _showProgress(i, absFiles.length, diagnostics.length, absFiles[i], sw);
       await _scanSingleFileResolved(
-        collection,
+        fileContext,
         absFiles[i],
         registrations,
         visitorRule,
@@ -784,13 +814,14 @@ class ScanRunner {
   }
 
   Future<void> _scanSingleFileResolved(
-    AnalysisContextCollection collection,
+    AnalysisContext context,
     String filePath,
     List<_RuleRegistration> registrations,
     Map<AstVisitor<void>, String> visitorRule,
     List<ScanDiagnostic> diagnostics,
   ) async {
-    final session = collection.contextFor(filePath).currentSession;
+    // Context is resolved once by the caller — no redundant contextFor lookup.
+    final session = context.currentSession;
     final result = await session.getResolvedUnit(filePath);
     // A file outside the resolved package, or one whose project lacks
     // `pub get`, resolves to an error result with no usable unit. Skip it with

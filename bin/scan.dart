@@ -165,6 +165,25 @@ Future<void> main(List<String> args) async {
     exit(2);
   }
 
+  // Exit non-zero when explicitly requested files were skipped for being
+  // outside the analysis context root — a silent skip on exit 0 lets CI pass
+  // having scanned nothing. Only applies to --files / --files-from-stdin
+  // (directory discovery never produces out-of-root paths).
+  final skipped = runner.skippedFileCount;
+  if (skipped > 0 && dartFiles.isNotEmpty) {
+    if (!quiet) {
+      stderr.writeln(
+        '$skipped of ${dartFiles.length} requested file(s) skipped '
+        '(outside analysis roots).',
+      );
+    }
+    // All requested files skipped → exit 2 (input error, same as no-config).
+    // Check the count, not diagnostics.isEmpty — a partial skip where the
+    // scanned files had no findings is exit 1, not exit 2.
+    // --strict-files: ANY skip is a hard error (exit 2), not just all-skipped.
+    if (skipped >= dartFiles.length || parsed.strictFiles) exit(2);
+  }
+
   // --find-stale-ignores: detect ignore comments whose suppressed rule no
   // longer fires. Runs AFTER the scan so we have the full diagnostic set to
   // diff against the ignore directives in the source files.
@@ -278,7 +297,9 @@ Future<void> main(List<String> args) async {
       ? getRulesForTier(parsed.failOnTier!)
       : null;
 
-  final exitCode = _computeExitCode(
+  // Promote exit code to 1 when explicitly requested files were skipped, so
+  // CI never passes having silently dropped part of the requested scope.
+  var exitCode = _computeExitCode(
     filtered: filtered,
     allDiagnostics: effectiveDiagnostics,
     failOn: parsed.failOn,
@@ -287,6 +308,9 @@ Future<void> main(List<String> args) async {
     failOnCount: parsed.failOnCount,
     failOnImpactCount: parsed.failOnImpactCount,
   );
+  if (skipped > 0 && dartFiles.isNotEmpty && exitCode == 0) {
+    exitCode = 1;
+  }
 
   // Build --fail-on metadata for JSON output so consumers understand why
   // the exit code may disagree with an empty diagnostics array.

@@ -73,6 +73,7 @@ Rules & Tiers results and the "Explain rule" panel can now turn a rule off witho
 ### Added
 
 - Added a disable/enable action directly on Rules & Tiers rule-search results and on the standalone "Explain rule" panel, so a rule can be turned off without switching to the Overrides tab.
+- Added `--strict-files` flag to the scan CLI: exits 2 when ANY `--files` entry is skipped (outside the analysis root), not just when all are skipped. Use in CI pipelines that must guarantee every named file was analyzed.
 
 ### Fixed
 

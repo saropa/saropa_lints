@@ -64,6 +64,7 @@ class ScanCliArgs {
     this.excludeGlobs = const [],
     this.includeGlobs = const [],
     this.noExclude = false,
+    this.strictFiles = false,
   });
 
   final String path;
@@ -218,6 +219,12 @@ class ScanCliArgs {
   /// .dart file is scanned unconditionally. User-supplied --exclude-globs
   /// still apply. More composable than `--include-globs "**"`.
   final bool noExclude;
+
+  /// When true, ANY skipped file (outside the analysis context root) causes
+  /// exit 2 — not just the "all files skipped" case. Use in CI pipelines that
+  /// must guarantee every named file was analyzed. Only meaningful with
+  /// `--files` or `--files-from-stdin`.
+  final bool strictFiles;
 }
 
 /// Parses [args] for the scan command.
@@ -264,6 +271,7 @@ ScanParseResult parseScanArgs(
   bool laneStats = false;
   bool quiet = false;
   bool noExclude = false;
+  bool strictFiles = false;
 
   var i = 0;
   while (i < args.length) {
@@ -377,6 +385,14 @@ ScanParseResult parseScanArgs(
     // User-supplied --exclude-globs still apply.
     if (arg == '--no-exclude') {
       noExclude = true;
+      i++;
+      continue;
+    }
+    // Strict file mode: exit 2 when ANY --files entry is skipped (outside
+    // analysis roots), not just when ALL are. For CI that must guarantee
+    // complete coverage of the named file set.
+    if (arg == '--strict-files') {
+      strictFiles = true;
       i++;
       continue;
     }
@@ -638,6 +654,7 @@ ScanParseResult parseScanArgs(
       excludeGlobs: excludeGlobs,
       includeGlobs: includeGlobs,
       noExclude: noExclude,
+      strictFiles: strictFiles,
     ),
   );
 }
