@@ -1,0 +1,7 @@
+{
+  "_comment": "Known-wrong MT renderings of domain terms. en_regex matches the English source (case-insensitive); bad_regex matches the wrong rendering in the locale output. locale '*' applies to all. Add an entry whenever a bad rendering is found; the next generate run auto-prunes and re-translates matches.",
+  "entries": [
+    {"locale": "de", "en_regex": "file watching", "bad_regex": "Dateibewertung"},
+    {"locale": "de", "en_regex": "\\bgates?\\b", "bad_regex": "\\bTore?\\b"}
+  ]
+}

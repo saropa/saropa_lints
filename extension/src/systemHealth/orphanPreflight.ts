@@ -61,7 +61,8 @@ async function confirmReclaim(orphans: readonly HostProcessInfo[]): Promise<bool
   };
   const confirmLabel = l10n('systemHealth.orphanPreflight.confirmKill');
   const choice = await vscode.window.showWarningMessage(
-    l10n('systemHealth.orphanPreflight.confirmTitle', params),
+    // `params` is a variable ({ count, size }) the key checker cannot resolve; marker avoids a false mismatch.
+    l10n('systemHealth.orphanPreflight.confirmTitle', params), // l10n:passthrough
     {
       modal: true,
       detail: `${l10n('systemHealth.orphanPreflight.confirmDetail')}\n${orphans

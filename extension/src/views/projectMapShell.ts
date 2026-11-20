@@ -43,7 +43,8 @@ function shellStrings(): Record<string, string> {
     // interpolation happens client-side rather than resolving three separate
     // l10n() calls per tick, but the TEMPLATE itself still comes from the
     // catalog (never concatenated English fragments), per the i18n rule.
-    progressLabel: l10n('projectMap.scan.progress'),
+    // Template is sent raw; the webview script replaces {percent}/{done}/{total} per progress tick.
+    progressLabel: l10n('projectMap.scan.progress'), // l10n:passthrough
     running: l10n('projectMap.reports.running'),
     exitOk: l10n('projectMap.reports.exitOk'),
     exitFail: l10n('projectMap.reports.exitFail'),

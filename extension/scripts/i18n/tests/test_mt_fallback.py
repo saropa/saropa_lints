@@ -94,8 +94,18 @@ class TestSentinelIntegrity(unittest.TestCase):
 
 class TestResidueDetection(unittest.TestCase):
     def test_detects_legacy_and_current_residue(self) -> None:
-        for poisoned in ("Cannot reach q0q {target}", "v{version} ZZ3ZZ", "x ﷐ y"):
+        # "ZZ" (digits/closing half dropped), "_PH0_" and "ПХ0" are leaks seen in
+        # shipped locales that the original "ZZ\d+ZZ" pattern let through.
+        for poisoned in (
+            "Cannot reach q0q {target}", "v{version} ZZ3ZZ", "x ﷐ y",
+            "Fehler ZZ bei {name}", "Ошибка _PH0_ здесь", "Hata ПХ0 burada",
+        ):
             self.assertTrue(mt._SHIELD_RESIDUE_RE.search(poisoned), poisoned)
+
+    def test_residue_excused_when_source_contains_it(self) -> None:
+        # English that legitimately contains "ZZ" must not be rejected forever.
+        self.assertFalse(mt._has_residue("Use ZZ mode", "ZZ-Modus verwenden"))
+        self.assertTrue(mt._has_residue("Use mode", "Modus ZZ verwenden"))
 
     def test_clean_strings_not_flagged(self) -> None:
         for clean in ("normal {count} text", "Iraq is here", "pizzazz"):

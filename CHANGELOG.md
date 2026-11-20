@@ -82,12 +82,17 @@ Rules & Tiers results and the "Explain rule" panel can now turn a rule off witho
 - Fixed the "Explain rule" fallback panel showing an unbounded pack-label list; it now caps at 3 labels with a "(+N more)" indicator. No action required.
 - Fixed `scan --resolve` exceeding its memory limit after a single file on most projects by sharing one analysis context across all files instead of creating one per file ([#402](https://github.com/saropa/saropa_lints/issues/402)). No action required.
 - Fixed `scan --exclude-globs` crashing with a permission error when the excluded path contained an unreadable directory, because the scan listed every subdirectory before applying exclusions ([#408](https://github.com/saropa/saropa_lints/issues/408)). No action required.
+- Fixed `scan --files --resolve` silently exiting 0 when requested files fell outside the analysis context root, letting CI pass having scanned nothing. The scan now exits non-zero and prints which files were skipped. No action required.
 
 ### Internal
 
+- Added `extension/scripts/i18n/bad_translations.py`: detects mechanically defective machine translations (leaked shield sentinels and `⁇`, prompt echo, wrong script, hallucinated length, placeholder drift, blocklisted domain-term renderings from `bad_translations_blocklist.json`). `generate_locales.py` now auto-prunes flagged cache entries on every run so they are re-translated; `--check` exits 1 on any flagged shipped string and `--purge` clears the cache on demand.
+- Fixed `mt_fallback._SHIELD_RESIDUE_RE` missing bare `ZZ`, `_PH<n>_`, and `ПХ<n>` shield leaks, so such translations were accepted and cached at write time; they are now rejected before caching, matching `bad_translations.py`. `bad_translations.py --purge` now backs the cache up to `mt_strings.json.bak` first.
+- Added `extension/scripts/i18n/semantic_check.py`: ranks shipped translations by cross-lingual embedding similarity (local Ollama, default `bge-m3`) to surface meaning drift the mechanical detector cannot see. Report only, no translation performed; precision unmeasured.
 - CI now runs `extension/scripts/check_l10n_keys.py --check-params`, failing when a literal `l10n()` key is missing from `en.json` or its call-site params do not match the catalog placeholders. Five checker false positives (variable, spread and webview-substituted params) are marked `l10n:passthrough`.
 - Added a GitHub Actions workflow that runs saropa_lints on pull requests.
 - Added a master switch card (`saropaLints.enabled`) to the Health Panel's Diagnostic Engines section; the Scan on Save card dims when it is off, since that is the only engine the setting gates. A folder-level override of the setting is flagged on the card and in a warning after a click.
+- Eliminated redundant `contextFor` lookups in the resolved scan path: the analysis context is resolved once per file and passed through, removing 1-2 extra hash-map probes per file in `_scanFilesResolved` and `runResolvedWithCollection`.
 - The publish script now writes the known-issues review list to the ignored `reports/` folder and prints the queued packages, instead of committing a file to `bugs/`.
 - The Qwen translation prompt now includes a short glossary of domain terms (audit, suppress, gate, transitive, hotspot, tier, …) when a string contains them, fixing word-sense mistranslations found in a side-by-side review.
 

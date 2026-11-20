@@ -292,3 +292,8 @@ jobs:
           node-version: "22"
       - name: Verify extension manifest NLS keys
         run: node extension/scripts/verify-manifest-nls-keys.mjs
+      # Fails when any literal l10n('key') in extension/src is missing from en.json
+      # or its call-site params do not match the catalog placeholders. Stops a raw
+      # key from rendering in the UI. Unused-key output is a warning only.
+      - name: Verify l10n keys resolve against en.json
+        run: python3 extension/scripts/check_l10n_keys.py --check-params

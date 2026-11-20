@@ -97,7 +97,8 @@ export function isUpgradeSuppressed(r: VibrancyResult): boolean {
 
 /** Localized SDK conflict line, e.g. "analyzer 13.1.0 needs meta ^1.18.3; Flutter 3.44 pins meta 1.18.0". */
 export function formatSdkBlock(b: SdkBlock): string {
-    return l10n('blastRadius.sdkBlock', { ...b });
+    // Spread of the block record supplies every placeholder; the key checker ignores spreads, so mark it.
+    return l10n('blastRadius.sdkBlock', { ...b }); // l10n:passthrough
 }
 
 /** Localized one-line verdict summary (UI edge; computeBlastRadius stays pure). */

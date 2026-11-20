@@ -26,6 +26,7 @@ if sys.stderr.encoding != "utf-8":
 
 from dictionaries import COGNATES, DO_NOT_TRANSLATE, TRANSLATIONS
 from json_io import read_json, write_json
+from bad_translations import prune_bad_cache_entries
 from mt_fallback import (
     active_engine_name,
     cache_lookup,
@@ -1220,6 +1221,14 @@ def main() -> int:
                 if n:
                     print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: force -> cleared "
                           f"{n} entr{'y' if n == 1 else 'ies'} for re-translation", flush=True)
+            # Always (every mode): drop cached translations with an unambiguous
+            # defect (leaked sentinels, prompt echo, wrong script, hallucinated
+            # length, placeholder drift, blocklisted terms) so they are refilled as
+            # gaps instead of shipping. Manual overrides are never touched.
+            n_bad = prune_bad_cache_entries(mt_cache, locale, sorted_unique, dict_table)
+            if n_bad:
+                print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: cleared {n_bad} "
+                      f"defective translation{'' if n_bad == 1 else 's'} for re-translation", flush=True)
             pending = count_pending_translations(
                 locale, sorted_unique, cache=mt_cache, dict_table=dict_table
             )

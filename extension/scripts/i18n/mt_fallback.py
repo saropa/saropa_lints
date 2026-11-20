@@ -81,7 +81,11 @@ _DO_NOT_TRANSLATE = (
 # Detects leftover sentinel residue from this or any past shield scheme so cached
 # values poisoned by the old noncharacter/PUA shields get re-fetched: ASCII core
 # "ZZ<n>ZZ", PUA "q<n>q", and the raw marker code points.
-_SHIELD_RESIDUE_RE = re.compile(r"ZZ\d+ZZ|q\d+q|[﷐﷑]")
+# Bare "ZZ" is also residue: engines drop the digits/closing half, leaving "ZZ",
+# which the old "ZZ\d+ZZ" pattern missed so the value was cached. Mirrors
+# bad_translations._LEAK_RE so write-time rejection and post-hoc detection agree.
+# Also catches "_PH0_" / Cyrillic "ПХ0" leaks from engines rewriting a sentinel.
+_SHIELD_RESIDUE_RE = re.compile(r"ZZ|q\d+q|[﷐﷑]|_PH\d+_|ПХ\d")
 
 # LLM control tokens that must never appear in a cached translation. Rejects the
 # value so it heals on the next run. Covers Qwen, Llama, ChatML, and Mistral
@@ -614,8 +618,15 @@ def _accept(text: str, candidate: str) -> bool:
         and candidate.strip() != ""
         and candidate != text
         and _placeholders_preserved(text, candidate)
-        and not _SHIELD_RESIDUE_RE.search(candidate)
+        and not _has_residue(text, candidate)
     )
+
+
+def _has_residue(text: str, candidate: str) -> bool:
+    """True when *candidate* carries shield residue the English *text* does not.
+    A source that legitimately contains e.g. "ZZ" must not be rejected forever,
+    which would re-fetch it on every run."""
+    return any(m.group(0) not in text for m in _SHIELD_RESIDUE_RE.finditer(candidate))
 
 
 def _fetch_translation(translate_fn, text: str) -> str | None:
