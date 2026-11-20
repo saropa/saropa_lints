@@ -223,6 +223,38 @@ void goodHttpRoutePath(HttpRequest request) {
   if (path == '/api/health') {}
 }
 
+/// `HttpRequest.uri.path` stored through an intermediate `req` local and
+/// compared against a `static const String` route constant whose name
+/// contains "path" — the full chain from the drift-advisor router.
+class _ServerConstants {
+  // HTTP API route paths — NOT filesystem paths
+  static const String pathApiRoute = '/api/schema/declared';
+}
+
+void goodHttpRoutePathViaIntermediateReq(HttpRequest request) {
+  final req = request;
+  final String path = req.uri.path;
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (path == _ServerConstants.pathApiRoute) {}
+}
+
+// --- GOOD: route handler pattern — `String path` parameter alongside
+// an `HttpRequest` parameter. The path was extracted from
+// `request.uri.path` at the call site and passed through, so it's an
+// HTTP route path, not a filesystem path. ---
+
+/// Route handler with `String path` parameter alongside `HttpRequest` —
+/// the standard pattern when a router's dispatch method passes the
+/// extracted URI path to per-domain handler methods.
+Future<bool> goodRouteHandlerPathParameter(
+  HttpRequest request,
+  String path,
+) async {
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (path == _ServerConstants.pathApiRoute) {}
+  return false;
+}
+
 // --- BAD: an arbitrary `Uri.path` is still a filesystem path, not an HTTP
 // request path — the HTTP-Uri exemption must be narrow (traceably from an
 // HTTP request object), not a blanket exemption for every `Uri`. ---

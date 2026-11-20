@@ -613,8 +613,48 @@ class AvoidCaseSensitivePathComparisonRule extends SaropaLintRule {
         expr.offset,
       )?.initializer;
       if (initializer != null) return _isUriPathAccess(initializer);
+
+      // When `path` is a method parameter (not a local variable with a
+      // traceable initializer), the trace above returns null. Fall back
+      // to a structural heuristic: a `String path` parameter alongside
+      // an `HttpRequest`/shelf `Request` parameter is an HTTP route
+      // handler — the path came from the request URI at the call site.
+      if (element is FormalParameterElement &&
+          _isHttpRouteHandlerParameter(expr)) {
+        return true;
+      }
     }
 
+    return false;
+  }
+
+  /// Returns true when [param] is a `String`-typed parameter named `path`
+  /// in a function/method that also has a parameter whose type is
+  /// `HttpRequest` (dart:io) or `Request` (package:shelf) — the standard
+  /// route-handler signature. The caller already ensured the parameter
+  /// name triggered `_containsPathPattern`; this checks the structural
+  /// context that makes it an HTTP route path rather than a filesystem one.
+  bool _isHttpRouteHandlerParameter(SimpleIdentifier param) {
+    // Only exempt the exact name "path" — "filePath", "directoryPath"
+    // are filesystem paths even in a handler method.
+    if (param.name != 'path') return false;
+
+    // Walk up to the enclosing method/function to inspect sibling params.
+    final AstNode? functionNode = param.thisOrAncestorOfType<FunctionBody>()
+        ?.parent;
+    final FormalParameterList? paramList = switch (functionNode) {
+      MethodDeclaration m => m.parameters,
+      FunctionExpression f => f.parameters,
+      _ => null,
+    };
+    if (paramList == null) return false;
+
+    // Check if any sibling parameter has an HTTP request type.
+    for (final FormalParameter sibling in paramList.parameters) {
+      if (_isHttpRequestType(sibling.declaredFragment?.element.type)) {
+        return true;
+      }
+    }
     return false;
   }
 

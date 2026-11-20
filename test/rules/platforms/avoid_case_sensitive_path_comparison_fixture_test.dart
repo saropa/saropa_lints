@@ -546,5 +546,186 @@ void f(Request r, FakePath p) {
 }
 ''');
     });
+
+    // Bug repro: static const route constant with "path" in name compared
+    // against a local derived from HttpRequest.uri.path — must NOT lint
+    // because HTTP route paths are case-sensitive by RFC 3986.
+
+    test('does NOT fire on HttpRequest.uri.path via intermediate local '
+        'compared to a static const route constant with "path" in name',
+        () async {
+      await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+class ServerConstants {
+  static const String pathApiSchemaDeclared = '/api/schema/declared';
+  static const String pathApiSchemaDeclaredAlt = 'api/schema/declared';
+}
+
+class Router {
+  Future<void> dispatch(HttpRequest request) async {
+    final req = request;
+    final String path = req.uri.path;
+
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (path == ServerConstants.pathApiSchemaDeclared ||
+        path == ServerConstants.pathApiSchemaDeclaredAlt) {
+    }
+  }
+}
+''');
+    });
+
+    test('does NOT fire on HttpRequest.uri.path with 200+ intervening '
+        'statements before the comparison (distance stress test)', () async {
+      // The bug report describes 640 lines between declaration and use.
+      // Verify _findLocalDeclaration reaches distant declarations.
+      final buffer = StringBuffer();
+      buffer.writeln("import 'dart:io';");
+      buffer.writeln(
+          'class S { static const String pathRoute = "/api/x"; }');
+      buffer.writeln('Future<void> f(HttpRequest request) async {');
+      buffer.writeln('  final req = request;');
+      buffer.writeln('  final String path = req.uri.path;');
+      for (int i = 0; i < 200; i++) {
+        buffer.writeln('  if (path == "/route$i") {}');
+      }
+      buffer.writeln(
+          '  // LINT_NOT: avoid_case_sensitive_path_comparison');
+      buffer.writeln('  if (path == S.pathRoute) {}');
+      buffer.writeln('}');
+
+      await assertFixtureMarkers(rule, buffer.toString());
+    });
+
+    test('does NOT fire when path is a String parameter alongside an '
+        'HttpRequest parameter (route handler pattern)', () async {
+      // The real router passes `path` as a String parameter to _route*
+      // methods alongside the HttpRequest. The rule can't trace through
+      // the method boundary, but the co-presence of HttpRequest + a
+      // parameter named "path" is strong evidence of an HTTP route.
+      await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+class S { static const String pathApiSchema = '/api/schema'; }
+
+class Router {
+  Future<bool> routeSchemaApi(
+    HttpRequest request,
+    String path,
+  ) async {
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (path == S.pathApiSchema) {}
+    return false;
+  }
+}
+''');
+    });
+
+    test('fires on a String path parameter WITHOUT an HttpRequest sibling '
+        '(not a route handler)', () async {
+      // A method with a `String path` parameter but no HttpRequest
+      // sibling — this is a filesystem path method, not a route handler.
+      await assertFixtureMarkers(rule, '''
+class S { static const String pathConfig = '/etc/config'; }
+
+void processFile(String path) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (path == S.pathConfig) {}
+}
+''');
+    });
+
+    test('fires on a String path parameter alongside a user-defined '
+        'Request class (not dart:io HttpRequest)', () async {
+      // The sibling parameter is a user-defined class, not a real HTTP
+      // request type — the exemption must not apply.
+      await assertFixtureMarkers(rule, '''
+class FakeRequest { final Uri uri = Uri(); }
+class S { static const String pathRoute = '/api/x'; }
+
+void handle(FakeRequest request, String path) {
+  // LINT: avoid_case_sensitive_path_comparison
+  if (path == S.pathRoute) {}
+}
+''');
+    });
+
+    // Bug repro (root-detection with real dart:io Directory, reassigned
+    // loop variable): the upward-walk idiom must stay exempt when the
+    // compared directory is a real `Directory` reassigned AFTER the
+    // comparison (`dir = parent;`) and the walk sits beside a try/catch.
+    test('does NOT fire on dart:io Directory root walk with reassigned '
+        'loop variable', () async {
+      await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+Directory? findRoot(Directory start) {
+  var dir = start;
+  while (true) {
+    try {
+      if (dir.path.isEmpty) return null;
+    } on Object catch (_) {}
+    final parent = dir.parent;
+    // LINT_NOT: avoid_case_sensitive_path_comparison
+    if (parent.path == dir.path) break;
+    dir = parent;
+  }
+  return dir;
+}
+''');
+    });
+
+    // Bug repro (HTTP route, `HttpRequest req` parameter): path read into a
+    // local from `req.uri.path` and compared with `!=` against constants.
+    test('does NOT fire on != comparisons of a local from req.uri.path '
+        'against route constants', () async {
+      await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+class C {
+  static const String pathApiCompareReport = '/api/compare/report';
+  static const String pathApiCompareReportAlt = '/api/compare/report/';
+}
+
+Future<void> handle(HttpRequest req) async {
+  final path = req.uri.path;
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (path != C.pathApiCompareReport && path != C.pathApiCompareReportAlt) {
+    return;
+  }
+}
+''');
+    });
+
+    // Positive guard: two distinct File paths still lint.
+    test('fires on File(a).path == File(b).path', () async {
+      await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+bool same(String a, String b) {
+  // LINT: avoid_case_sensitive_path_comparison
+  return File(a).path == File(b).path;
+}
+''');
+    });
+
+    test('does NOT fire on HttpRequest.uri.path local compared to a static '
+        'const route constant (no intermediate req variable)', () async {
+      await assertFixtureMarkers(rule, '''
+import 'dart:io';
+
+class ServerConstants {
+  static const String pathApiRoute = '/api/health';
+}
+
+void f(HttpRequest request) {
+  final String path = request.uri.path;
+
+  // LINT_NOT: avoid_case_sensitive_path_comparison
+  if (path == ServerConstants.pathApiRoute) {}
+}
+''');
+    });
   });
 }
