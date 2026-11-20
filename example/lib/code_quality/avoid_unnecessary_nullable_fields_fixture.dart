@@ -115,6 +115,20 @@ class _bad203_Foo {
   _bad203_Foo(String n) : name = n;
 }
 
+// GOOD: conditional initializer with a null branch -- field is genuinely null
+// for some instances, so the nullable type is justified (no lint).
+class _GoodConditionalNull203 {
+  _GoodConditionalNull203({int? limit})
+    : _limiter = limit != null ? Object() : null;
+  final Object? _limiter;
+}
+
+// GOOD: `??` chain whose right side is nullable can still yield null.
+class _GoodNullableCoalesce203 {
+  _GoodNullableCoalesce203(String? a, String? b) : value = a ?? b;
+  final String? value;
+}
+
 // GOOD: Should NOT trigger avoid_unnecessary_nullable_fields
 class _GoodClass203 {
   String name; // Non-nullable since always assigned a non-null value

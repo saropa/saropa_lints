@@ -2114,7 +2114,12 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
           for (final ConstructorInitializer init in member.initializers) {
             if (init is ConstructorFieldInitializer) {
               constructorInitializedFields.add(init.fieldName.name);
-              if (init.expression is NullLiteral) {
+              // Bug fix: only a literal `null` was counted as a null
+              // assignment, so `cond ? Value() : null` (static type
+              // `Value?`) was reported even though the field is genuinely
+              // null for some instances. Any initializer that can yield
+              // null keeps the field's nullable type justified.
+              if (_initializerMayBeNull(init.expression)) {
                 assignedNullFields.add(init.fieldName.name);
               }
             }
@@ -2138,6 +2143,25 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
       }
     });
   }
+}
+
+/// Whether a constructor-initializer expression can evaluate to null.
+///
+/// Checks syntactically first (null literal, or a conditional / parenthesized
+/// expression with a null-yielding branch) so it works even when the static
+/// type is unavailable, then falls back to the resolved static type being
+/// nullable (covers `??` chains with a nullable right side, nullable calls).
+bool _initializerMayBeNull(Expression expr) {
+  if (expr is NullLiteral) return true;
+  if (expr is ParenthesizedExpression) {
+    return _initializerMayBeNull(expr.expression);
+  }
+  if (expr is ConditionalExpression) {
+    return _initializerMayBeNull(expr.thenExpression) ||
+        _initializerMayBeNull(expr.elseExpression);
+  }
+  final DartType? type = expr.staticType;
+  return type != null && type.nullabilitySuffix == NullabilitySuffix.question;
 }
 
 class _NullAssignmentChecker extends RecursiveAstVisitor<void> {
