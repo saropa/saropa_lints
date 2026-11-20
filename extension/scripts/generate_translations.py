@@ -40,10 +40,6 @@ def main() -> int:
         print(c("red", f"ERROR: {generate_script} not found."), file=sys.stderr)
         return 1
 
-    # Surface the porting guide where the pipeline is actually run, so it is
-    # found when someone wants to reuse this process in another project.
-    print(f"Porting this pipeline to another project: {script_dir / 'PORTING.md'}", flush=True)
-
     # Strip --no-commit before forwarding args to generate_locales.py,
     # which doesn't understand it.
     no_commit = "--no-commit" in sys.argv[1:]
