@@ -142,6 +142,25 @@ void something() {}
       );
     });
 
+    // Regression lock for the bare-statement form (no leading `throw`).
+    // No ThrowExpression node exists for it, so the rule must stay silent;
+    // pinned so a future visitor change cannot start flagging the
+    // stack-preserving call (downstream report: edits_batch_handler.dart).
+    test('does NOT flag bare Error.throwWithStackTrace(e, stack) statement',
+        () async {
+      const code = '''
+Future<void> run(Future<void> Function() op) async {
+  try {
+    await op();
+  } on Object catch (e, stack) {
+    Error.throwWithStackTrace(StateError('wrapped: \$e'), stack);
+  }
+}
+''';
+      final codes = await reportedRuleCodes(AvoidThrowInCatchBlockRule(), code);
+      expect(codes.contains('avoid_throw_in_catch_block'), isFalse);
+    });
+
     test('does NOT flag rethrow (control)', () async {
       const code = '''
 void main() {

@@ -136,6 +136,17 @@ void _good367() {
 }
 
 // GOOD: Should NOT trigger avoid_throw_in_catch_block
+// Bare-statement form (no `throw` keyword): Never-returning, preserves the
+// caught stack, and produces no ThrowExpression node for the rule to match.
+void _good369() {
+  try {
+    something();
+  } on Object catch (e, stack) {
+    Error.throwWithStackTrace(StateError('wrapped: $e'), stack);
+  }
+}
+
+// GOOD: Should NOT trigger avoid_throw_in_catch_block
 // rethrow is structurally exempt (RethrowExpression, not ThrowExpression).
 void _good368() {
   try {
