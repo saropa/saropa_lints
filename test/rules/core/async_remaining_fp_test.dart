@@ -158,6 +158,56 @@ HostStatement makeEntry() => HostStatement(at: DateTime.now().toUtc());
       expect(codes, contains('prefer_utc_for_storage'));
     });
 
+    // FP fix: a final field whose every constructor assigns a UTC value in
+    // its initializer list is UTC by construction; reading it must not lint.
+    test('does NOT fire on a final field set via .toUtc() in the constructor '
+        'initializer list', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Entry {
+  Entry(DateTime now) : at = now.toUtc();
+  final DateTime at;
+}
+
+Map<String, Object?> toJson(Entry e) => {
+  'at': e.at.toIso8601String(),
+};
+''');
+      expect(codes, isNot(contains('prefer_utc_for_storage')));
+    });
+
+    // Positive guard: the same shape with a non-UTC initializer must lint.
+    test('still fires on a final field set from DateTime.now() in the '
+        'constructor initializer list', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Entry {
+  Entry() : at = DateTime.now();
+  final DateTime at;
+}
+
+Map<String, Object?> toJson(Entry e) => {
+  'at': e.at.toIso8601String(),
+};
+''');
+      expect(codes, contains('prefer_utc_for_storage'));
+    });
+
+    // Positive guard: one UTC constructor plus one non-UTC constructor is
+    // not UTC by construction.
+    test('still fires when only one of two constructors supplies UTC', () async {
+      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+class Entry {
+  Entry(DateTime now) : at = now.toUtc();
+  Entry.local(DateTime now) : at = now;
+  final DateTime at;
+}
+
+Map<String, Object?> toJson(Entry e) => {
+  'at': e.at.toIso8601String(),
+};
+''');
+      expect(codes, contains('prefer_utc_for_storage'));
+    });
+
     // Local-variable counterpart of the fix that IS sound: a `final` local
     // whose initializer is UTC, referenced later by a bare identifier with
     // no `.toUtc()`/`.utc` in its own source. Unlike a field, a local

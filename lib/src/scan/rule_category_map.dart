@@ -1461,7 +1461,6 @@ const Map<String, String> ruleCategoryMap = <String, String>{
   'prefer_multi_provider': 'packages',
   'prefer_mutable_collections': 'stylistic',
   'prefer_named_bool_params': 'code_quality',
-  'prefer_named_boolean_parameters': 'architecture',
   'prefer_named_extensions': 'core',
   'prefer_named_imports': 'architecture',
   'prefer_named_parameters': 'architecture',

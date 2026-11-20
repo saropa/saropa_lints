@@ -7,6 +7,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../analyzer_compat.dart';
 import '../../early_exit_guard_utils.dart';
 import '../../async_context_utils.dart'
     show awaitConfinedToExitingBranches, containsAwait, isMapRemoveCall;
@@ -2163,6 +2164,13 @@ class PreferUtcForStorageRule extends SaropaLintRule {
             if (target is SimpleIdentifier && _isUpstreamUtc(target)) {
               return;
             }
+            // Field reads (`at`, `this.at`, `e.at`) whose every
+            // initialization site lives inside the declaring class and is UTC
+            // (field initializer or constructor initializer list). Fixes the
+            // false positive on `Entry(DateTime now) : at = now.toUtc();`.
+            if (_fieldIsAlwaysUtc(target)) {
+              return;
+            }
             reporter.atNode(node);
             return;
           }
@@ -2225,8 +2233,9 @@ class PreferUtcForStorageRule extends SaropaLintRule {
   /// `.toUtc()`/`.utc`: a local variable declared `final` whose initializer
   /// is UTC (e.g. `final utcNow = DateTime.now().toUtc();`).
   ///
-  /// Deliberately does NOT attempt the same trick for instance fields.
-  /// Tracing a field back to "every construction site supplies UTC" turns
+  /// Fields are handled separately by [_fieldIsAlwaysUtc], which inspects
+  /// only the declaring class. Do NOT extend it to trace construction sites:
+  /// tracing a field back to "every construction site supplies UTC" turns
   /// out to require whole-PROGRAM (not just whole-file) analysis: a field
   /// can be set via a redirecting factory constructor, a subclass
   /// constructor forwarding through `super(...)`, a mixin-application class
@@ -2247,6 +2256,79 @@ class PreferUtcForStorageRule extends SaropaLintRule {
     }
 
     return false;
+  }
+
+  /// Whether [target] reads a `final`, non-`late` instance field of a class
+  /// declared in THIS compilation unit whose every initialization is UTC.
+  ///
+  /// Why this is sound where the removed "trace construction sites"
+  /// approach was not: a `final` field can only be given a value by (a) its
+  /// own declaration initializer or (b) the initializer list / initializing
+  /// formals of generative constructors declared INSIDE the same class body.
+  /// Subclasses, redirecting factories, mixin applications, tear-offs and
+  /// other files can only reach those same constructors, never assign the
+  /// field themselves. So inspecting the class's own constructors is
+  /// complete. Anything unverifiable (`this.at` initializing formal, `late`,
+  /// non-final, class declared elsewhere) returns false => still reported.
+  static bool _fieldIsAlwaysUtc(Expression target) {
+    // Pick the identifier that names the field in each read shape.
+    final SimpleIdentifier? name = target is SimpleIdentifier
+        ? target
+        : target is PrefixedIdentifier
+        ? target.identifier
+        : target is PropertyAccess
+        ? target.propertyName
+        : null;
+    if (name == null) return false;
+
+    // A field read resolves to its synthetic getter; `.variable` is the field.
+    final Element? element = name.element;
+    if (element is! GetterElement) return false;
+    final Object? variable = element.variable;
+    if (variable is! FieldElement) return false;
+    // `late final` can be assigned from any method; non-final can be reassigned.
+    if (!variable.isFinal || variable.isLate || variable.isStatic) return false;
+
+    final AstNode root = name.root;
+    if (root is! CompilationUnit) return false;
+
+    final _FieldSites sites = _FieldSites(variable);
+    root.accept(sites);
+    final VariableDeclaration? declaration = sites.declaration;
+    final ClassDeclaration? owner = sites.owner;
+    // Declared in another file/part or inherited: cannot verify.
+    if (declaration == null || owner == null) return false;
+
+    // (a) `final DateTime at = x.toUtc();` — the only possible assignment.
+    final Expression? init = declaration.initializer;
+    if (init != null) return _expressionIsUtc(init);
+
+    // (b) No declaration initializer: every generative, non-redirecting
+    // constructor must assign the field a UTC value in its initializer list.
+    bool sawConstructor = false;
+    for (final ClassMember member in owner.bodyMembers) {
+      if (member is! ConstructorDeclaration) continue;
+      // Factories cannot initialize fields; they delegate to generative ones.
+      if (member.factoryKeyword != null) continue;
+      // `: this(...)` delegates to another constructor that is checked itself.
+      if (member.initializers.any(
+        (ConstructorInitializer i) => i is RedirectingConstructorInvocation,
+      )) {
+        continue;
+      }
+      sawConstructor = true;
+      bool utcAssigned = false;
+      for (final ConstructorInitializer i in member.initializers) {
+        if (i is ConstructorFieldInitializer &&
+            i.fieldName.name == variable.name &&
+            _expressionIsUtc(i.expression)) {
+          utcAssigned = true;
+        }
+      }
+      // Initializing formal (`this.at`) or missing/non-UTC assignment.
+      if (!utcAssigned) return false;
+    }
+    return sawConstructor;
   }
 
   /// Case 1: local variable declared `final` whose own initializer
@@ -2277,6 +2359,30 @@ class PreferUtcForStorageRule extends SaropaLintRule {
     if (initializer == null) return false;
 
     return _expressionIsUtc(initializer);
+  }
+}
+
+/// Finds the [VariableDeclaration] of a field and the [ClassDeclaration]
+/// that owns it, for [PreferUtcForStorageRule._fieldIsAlwaysUtc].
+class _FieldSites extends RecursiveAstVisitor<void> {
+  _FieldSites(this._field);
+
+  final FieldElement _field;
+  VariableDeclaration? declaration;
+  ClassDeclaration? owner;
+
+  @override
+  void visitClassDeclaration(ClassDeclaration node) {
+    for (final ClassMember member in node.bodyMembers) {
+      if (member is! FieldDeclaration) continue;
+      for (final VariableDeclaration v in member.fields.variables) {
+        if (v.declaredFragment?.element == _field) {
+          declaration = v;
+          owner = node;
+        }
+      }
+    }
+    super.visitClassDeclaration(node);
   }
 }
 

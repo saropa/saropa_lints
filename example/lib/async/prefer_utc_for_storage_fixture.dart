@@ -197,4 +197,27 @@ class HostStatement {
   };
 }
 
+// GOOD: final field UTC by construction (initializer list) — no lint.
+class UtcEntry {
+  UtcEntry(DateTime now) : at = now.toUtc();
+
+  final DateTime at;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'at': at.toIso8601String(),
+  };
+}
+
+// BAD: same shape but the initializer is local time — still lints.
+class LocalEntry {
+  LocalEntry() : at = DateTime.now();
+
+  final DateTime at;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    // expect_lint: prefer_utc_for_storage
+    'at': at.toIso8601String(),
+  };
+}
+
 HostStatement makeHostStatement() => HostStatement(at: DateTime.now().toUtc());
