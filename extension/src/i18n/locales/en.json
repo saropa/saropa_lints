@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "What's New in v16"
+      "title": "What's New"
     },
     "hero": {
       "subtitle": "This release changes the default diagnostic engine. Read this before you keep working — it affects what you'll see in the Problems panel."
@@ -2466,6 +2466,7 @@
       "reenabledPlugin": "Saropa Lints in-process plugin re-enabled. Restarting the Dart analysis server to reload it.",
       "reenableNothingToRestore": "Saropa Lints: nothing to restore. The in-process plugin is not currently disabled via the extension.",
       "noOpenDartFiles": "Saropa Lints: no open Dart files found. Re-open a Dart file or turn off the \"Open editors only\" setting.",
+      "analysisScanning": "Scanning workspace… {percent}% ({count} issues so far)",
       "configUpdated": "Saropa Lints config updated (tier: {tier}).",
       "configWriteFailed": "Config write failed. {details}",
       "scaffoldGateTitle": "Composite analyzer plugin scaffold",

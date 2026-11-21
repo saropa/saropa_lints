@@ -66,7 +66,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.4.0]
+## [17.4.0] — Unreleased
+
+Scan notifications are quieter: one progress notification replaces the stack of "N issues found" toasts while the workspace scan runs. The What's New panel no longer shows the red engine-change warning to fresh installs or unconfirmed upgrades, and it gains a "Rate Us" card, a rating nudge after your 5th successful scan, and Help Hub entries for the Marketplace and Open VSX review pages. [log](https://github.com/saropa/saropa_lints/blob/v17.4.0/CHANGELOG.md)
+
+### Changed
+
+- The "N issues found" warning no longer stacks a new toast for every auto-triggered analysis while the workspace scan is still running; a single progress notification shows the scan percentage and the running issue count, and the final toast appears once when the scan completes.
+- The What's New panel now shows the red "Default Diagnostic Engine Changed" card and its warning subtitle only when upgrading from a version before v16; fresh installs and upgrades the extension cannot confirm no longer see it. No action required.
 
 ### Added
 

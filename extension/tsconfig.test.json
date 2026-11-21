@@ -178,6 +178,7 @@
     "src/stale-ignore-commands.ts",
     "src/test/views/staleIgnoreCommands.test.ts",
     "src/test/formatAnalysisIssuesMessage.test.ts",
+    "src/test/analysisToastProgress.test.ts",
     "src/test/findLatestAnalysisReport.test.ts",
     "src/test/violationsReader.test.ts",
     "src/test/violationsReaderFilter.test.ts",

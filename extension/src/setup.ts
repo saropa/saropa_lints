@@ -20,6 +20,7 @@ import {
   type RuleLaneValue,
 } from './config/laneConfig';
 import { l10n } from './i18n/runtime';
+import { deferToastWhileScanning } from './analysisToastProgress';
 import { addDevDependency } from './pubspecDevDependency';
 import { chooseNewProjectConstraint, FALLBACK_CONSTRAINT, versionsWithin } from './compat/newProjectConstraint';
 import { getPubVersions } from './compat/pubVersions';
@@ -1611,8 +1612,31 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
   } else {
     const scope = openEditorsOnly ? 'open editors only' : undefined;
     logReport(`- Analysis reported ${violationCount} issues (live diagnostics)`);
-    // Pass the data directly — no need to re-read from the file we just wrote.
-    showAnalysisIssuesNotification(workspaceRoot, scope, data);
+    // Re-read helper honoring the same scope as the initial read, so the
+    // deferred toast below reports the settled count for the same file set.
+    const reread = (): ViolationsData =>
+      openEditorsOnly
+        ? readLiveViolationsForFiles(
+            workspaceRoot,
+            getOpenDartFilePaths(workspaceRoot).map((f) => path.join(workspaceRoot, f)),
+          )
+        : readLiveViolations(workspaceRoot);
+    // While the server's workspace scan is still running, `data` is a partial
+    // snapshot: toasting it stacked one warning per auto-trigger during a
+    // build, each with a different incomplete count. Show a single progress
+    // notification with a percentage instead, and toast once at the end.
+    const deferred = deferToastWhileScanning(
+      () => reread().violations.length,
+      () => {
+        const settled = reread();
+        if (settled.violations.length > 0) {
+          showAnalysisIssuesNotification(workspaceRoot, scope, settled);
+        }
+      },
+    );
+    // Not scanning: the count is final — pass the data directly, no need to
+    // re-read from the file we just wrote.
+    if (!deferred) showAnalysisIssuesNotification(workspaceRoot, scope, data);
   }
   logSuppressionSummary(workspaceRoot);
   // Tag the extension report with the extension + plugin versions so every

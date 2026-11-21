@@ -73,7 +73,7 @@ import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
 import { TodosAndHacksTreeProvider } from './views/todosAndHacksTree';
 import { showAboutPanel } from './views/aboutView';
-import { WelcomePanel, SHOW_ON_ACTIVATION_KEY } from './views/welcomePanel';
+import { WelcomePanel, SHOW_ON_ACTIVATION_KEY, recordActivationVersion } from './views/welcomePanel';
 import { registerIssuesViewCommands } from './commands/issuesViewCommands';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
@@ -200,6 +200,7 @@ import type { ExtensionHostMemory } from './systemHealth/types';
 import type { DartProcessSnapshot, HealthAssessment } from './systemHealth/types';
 import { HealthTrigger } from './systemHealth/types';
 import { SaropaLspClient } from './debug/saropaLspClient';
+import { setScanProgressProvider } from './analysisToastProgress';
 import type { EngineStatus } from './systemHealth/engineCardsHtml';
 import {
   ciWorkflowPathFromProject,
@@ -1616,6 +1617,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // When turned OFF, the analyzer plugin is re-enabled so the user keeps
   // diagnostics. Users can also toggle via the Health Panel engine cards.
   let lspClient: SaropaLspClient | undefined;
+  // Feed the LSP scan-progress tick to the analysis toast so it shows a
+  // percentage instead of stacking partial counts during a build. Reads the
+  // variable lazily because lspClient is re-created on restart.
+  setScanProgressProvider(() => lspClient?.lastScanProgress);
   const lspRoot = getProjectRoot();
   // The master switch `saropaLints.enabled` wins over `lspServer.enabled`.
   // English-only for now: new catalog keys need the owner's translation pipeline.
@@ -3447,6 +3452,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // welcomePanel.ts). This is deliberately stickier than a one-time "seen it" flag:
   // v16 changed the default diagnostic engine, and a single dismissible toast is not
   // enough weight for a change to what actually produces the user's diagnostics.
+  // Capture upgrade history first: decides whether the panel's red engine-change card
+  // renders (only for confirmed upgrades from before v16), then stores this version.
+  recordActivationVersion(context);
   if (context.globalState.get<boolean>(SHOW_ON_ACTIVATION_KEY, true)) {
     // Delayed so the sidebar and status bar finish their first render before
     // an editor tab steals focus.
