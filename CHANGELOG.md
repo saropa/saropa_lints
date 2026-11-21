@@ -66,9 +66,23 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.4.0]
+## [17.5.0]
 
-Scan notifications are quieter: one progress notification replaces the stack of "N issues found" toasts while the workspace scan runs. The What's New panel no longer shows the red engine-change warning to fresh installs or unconfirmed upgrades, and it gains a "Rate Us" card, a rating nudge after your 5th successful scan, and Help Hub entries for the Marketplace and Open VSX review pages. [log](https://github.com/saropa/saropa_lints/blob/v17.4.0/CHANGELOG.md)
+Polish translations in the extension are refreshed, and the release tooling no longer stalls on a stale version number. [log](https://github.com/saropa/saropa_lints/blob/v17.5.0/CHANGELOG.md)
+
+### Changed
+
+- Refreshed the Polish extension translations. No action required.
+
+### Internal
+
+- Publish script: a stale `pubspec.yaml` version found at the pre-commit check is now auto-corrected (and re-staged along with `extension/package.json`) instead of dead-ending at the Retry/Abort menu.
+
+---
+
+## [17.4.9]
+
+Scan notifications are quieter: one progress notification replaces the stack of "N issues found" toasts while the workspace scan runs. The What's New panel no longer shows the red engine-change warning to fresh installs or unconfirmed upgrades, and it gains a "Rate Us" card, a rating nudge after your 5th successful scan, and Help Hub entries for the Marketplace and Open VSX review pages. [log](https://github.com/saropa/saropa_lints/blob/v17.4.9/CHANGELOG.md)
 
 ### Changed
 
@@ -81,10 +95,6 @@ Scan notifications are quieter: one progress notification replaces the stack of 
 - Added a scan-gated rating nudge toast that appears after the user's 5th successful scan, linking to both extension stores and the GitHub issues page. Respects the proactive-nudge opt-out and defers gracefully on "Not now".
 - Added "Rate on VS Code Marketplace" and "Rate on Open VSX" entries to the Help Hub quick pick, so users can reach the review pages at any time.
 - Added `saropaLints.rateOnMarketplace` and `saropaLints.rateOnOpenVsx` commands (Command Palette + Command Catalog).
-
-### Internal
-
-- Publish script: a stale `pubspec.yaml` version found at the pre-commit check is now auto-corrected (and re-staged along with `extension/package.json`) instead of dead-ending at the Retry/Abort menu.
 
 ---
 
