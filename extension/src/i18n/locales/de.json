@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Was ist neu in v16"
+      "title": "Was ist neu"
     },
     "hero": {
       "subtitle": "Diese Version ändert die Standard-Diagnose-Engine. Lesen Sie dies, bevor Sie weiterarbeiten – es beeinflusst, was Sie im Problems-Panel sehen werden."

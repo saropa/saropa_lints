@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
 import { buildWelcomePanelHtml } from './welcomePanel-html';
+import { isUpgradingAcrossEngineChange, describeEngineCardReason } from './welcomePanelUpgrade';
+import { logReport } from '../reportWriter';
 import { fetchRuleCounts } from './ruleCountCliRunner';
 import { getProjectRoot } from '../projectRoot';
 import { MARKETPLACE_REVIEW_URL, OPEN_VSX_REVIEW_URL } from '../ratePrompt';
@@ -15,6 +17,38 @@ import { MARKETPLACE_REVIEW_URL, OPEN_VSX_REVIEW_URL } from '../ratePrompt';
  * diagnostic backend, and a single dismissible toast is not enough weight for that.
  */
 export const SHOW_ON_ACTIVATION_KEY = 'saropaLints.welcomeShowOnNextActivation';
+
+/** globalState key holding the extension version that last activated. */
+const LAST_ACTIVATED_VERSION_KEY = 'saropaLints.lastActivatedVersion';
+
+/**
+ * Whether this session is a confirmed upgrade across the engine change. Computed once
+ * per activation by recordActivationVersion() (before the stored version is
+ * overwritten) and read by the panel whenever it renders, so reopening the panel from
+ * the Command Palette in the same session shows the same content.
+ */
+let showEngineCard = false;
+
+/**
+ * Compares the previously stored version against the running one, then stores the
+ * running one. MUST be called once at activation before the panel can open: after
+ * this runs the old version is gone, so the upgrade decision is captured here.
+ */
+export function recordActivationVersion(context: vscode.ExtensionContext): void {
+  const current = (context.extension.packageJSON as { version: string }).version;
+  const previous = context.globalState.get<string>(LAST_ACTIVATED_VERSION_KEY);
+  showEngineCard = isUpgradingAcrossEngineChange(previous, current);
+  void context.globalState.update(LAST_ACTIVATED_VERSION_KEY, current);
+  // Debug trail: one line states every input and the outcome, so "why did (or didn't)
+  // the red card show?" is answerable from the extension report without guessing.
+  const showOnActivation = context.globalState.get<boolean>(SHOW_ON_ACTIVATION_KEY, true);
+  logReport(
+    `[welcome] previousVersion=${previous ?? '(none recorded)'} currentVersion=${current} ` +
+      `engineCard=${showEngineCard ? 'SHOWN' : 'hidden'} ` +
+      `reason=${describeEngineCardReason(previous, showEngineCard)} ` +
+      `autoShowOnActivation=${showOnActivation} (globalState ${SHOW_ON_ACTIVATION_KEY})`,
+  );
+}
 
 /** Message shapes the welcome webview can post back to the extension host. */
 type WelcomeMessage =
@@ -71,12 +105,15 @@ export class WelcomePanel implements vscode.Disposable {
     // the live count once the CLI resolves — same rationale as showAboutPanel: a
     // cold `dart run` can take a second or two, and the panel should never block on
     // a supplementary figure. See welcomePanelStats.ts.
-    this.panel.webview.html = buildWelcomePanelHtml(this.version, null);
+    // Log each render (not just activation): the panel can also be reopened from the
+    // Command Palette / Help Hub, and that path must be traceable too.
+    logReport(`[welcome] panel rendered: version=${this.version} engineCard=${showEngineCard ? 'SHOWN' : 'hidden'}`);
+    this.panel.webview.html = buildWelcomePanelHtml(this.version, null, showEngineCard);
     const projectRoot = getProjectRoot();
     if (projectRoot) {
       void fetchRuleCounts(projectRoot).then((counts) => {
         if (counts && !this.disposed) {
-          this.panel.webview.html = buildWelcomePanelHtml(this.version, counts);
+          this.panel.webview.html = buildWelcomePanelHtml(this.version, counts, showEngineCard);
         }
       });
     }

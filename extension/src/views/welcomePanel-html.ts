@@ -49,8 +49,8 @@ function buildDiscoveryTiles(): DiscoveryTile[] {
  * monitoring, and the reshuffled sidebar) — see plans/PLAN_welcome_flow.md for
  * the rationale behind picking exactly these three.
  */
-function buildCards(): WelcomeCard[] {
-  return [
+function buildCards(showEngineCard: boolean): WelcomeCard[] {
+  const cards: WelcomeCard[] = [
     {
       icon: '🚨',
       header: l10n('welcome.card.engine.header'),
@@ -85,6 +85,10 @@ function buildCards(): WelcomeCard[] {
       tone: 'accent-medium',
     },
   ];
+  // The critical engine-swap card is an upgrade warning, so it is dropped unless the
+  // caller confirmed the user is upgrading across the engine change (fresh installs
+  // and unknown-history users never see it).
+  return showEngineCard ? cards : cards.filter((c) => !c.critical);
 }
 
 function buildCardHtml(card: WelcomeCard): string {
@@ -172,7 +176,11 @@ function buildShowNextTimeFooter(): string {
   </div>`;
 }
 
-export function buildWelcomePanelHtml(version: string, ruleCounts: RuleCountSummary | null = null): string {
+export function buildWelcomePanelHtml(
+  version: string,
+  ruleCounts: RuleCountSummary | null = null,
+  showEngineCard = false,
+): string {
   const nonce = createWebviewCspNonce();
   const title = l10n('welcome.panel.title');
   const heroHtml = buildDashboardHero({
@@ -180,7 +188,11 @@ export function buildWelcomePanelHtml(version: string, ruleCounts: RuleCountSumm
     version,
     showFullWidthToggle: false,
   });
-  const cardsHtml = buildCards().map(buildCardHtml).join('\n');
+  const cardsHtml = buildCards(showEngineCard).map(buildCardHtml).join('\n');
+  // The subtitle warns about the engine change, so it only renders alongside the card.
+  const subtitleHtml = showEngineCard
+    ? `<p class="welcome-subtitle">${escapeHtml(l10n('welcome.hero.subtitle'))}</p>`
+    : '';
   const statsHtml = buildStatsStripHtml(buildWelcomeStats(ruleCounts));
   const discoveryHtml = buildDiscoveryGridHtml();
 
@@ -197,7 +209,7 @@ export function buildWelcomePanelHtml(version: string, ruleCounts: RuleCountSumm
 <body>
   <header>${heroHtml}</header>
   <main id="welcome-body" tabindex="-1">
-    <p class="welcome-subtitle">${escapeHtml(l10n('welcome.hero.subtitle'))}</p>
+    ${subtitleHtml}
     ${statsHtml}
     ${cardsHtml}
     ${discoveryHtml}

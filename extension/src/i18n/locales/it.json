@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Cosa c'è di Nuovo in v16"
+      "title": "Novità"
     },
     "hero": {
       "subtitle": "Questo rilascio modifica il motore diagnostico predefinito. Leggi questo prima di proseguire con il lavoro — influisce su ciò che vedrai nel pannello Problemi."

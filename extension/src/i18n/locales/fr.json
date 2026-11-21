@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Qu'est-ce qui est nouveau dans v16"
+      "title": "Quoi de neuf"
     },
     "hero": {
       "subtitle": "Cette version modifie le moteur de diagnostic par défaut. Lisez ceci avant de continuer votre travail — cela affecte ce que vous verrez dans le panneau Problèmes."

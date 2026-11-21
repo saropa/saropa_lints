@@ -98,3 +98,6 @@ self_check/pubspec.lock
 test/aggregate/
 dtmpscan_stdout.txt
 dtmpscan_stderr.txt
+
+# Saropa Capture
+reports/
