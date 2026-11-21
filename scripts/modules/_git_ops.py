@@ -172,9 +172,12 @@ def _verify_versions_on_disk(
     """
     # Lazy import to break circular dependency with _version_changelog
     # (_version_changelog imports tag_exists_on_remote from this module).
-    from scripts.modules._version_changelog import get_version_from_pubspec
+    from scripts.modules._version_changelog import (
+        get_version_from_pubspec,
+        set_version_in_pubspec,
+    )
 
-    # --- pubspec.yaml (mandatory) ---
+    # --- pubspec.yaml (mandatory, self-healing) ---
     pubspec_path = project_dir / "pubspec.yaml"
     try:
         actual = get_version_from_pubspec(pubspec_path)
@@ -183,12 +186,29 @@ def _verify_versions_on_disk(
         return False
 
     if actual != version:
-        print_error(
-            f"pubspec.yaml version mismatch: "
-            f"expected {version}, found {actual}. "
-            f"Refusing to proceed — the version write was skipped."
+        # Self-heal (same policy as package.json below): the publish
+        # script owns this field and `version` is the already-validated
+        # target, so a skipped/stale upstream write is fixed in place
+        # instead of dead-ending at the Retry/Abort menu — a Retry
+        # cannot fix it, because nothing re-runs the write. The re-read
+        # afterwards proves the write landed; if it still mismatches we
+        # fail as before rather than commit a wrong version.
+        set_version_in_pubspec(pubspec_path, version)
+        try:
+            actual = get_version_from_pubspec(pubspec_path)
+        except ValueError as exc:
+            print_error(f"Cannot read pubspec version after fix: {exc}")
+            return False
+        if actual != version:
+            print_error(
+                f"pubspec.yaml version mismatch: "
+                f"expected {version}, found {actual}. "
+                f"Auto-correction failed."
+            )
+            return False
+        print_warning(
+            f"pubspec.yaml had a stale version — auto-corrected to {version}."
         )
-        return False
     print_success(f"Verified pubspec.yaml version is {version}")
 
     # --- extension/package.json (self-healing) ---
@@ -502,6 +522,13 @@ def git_commit_and_push(
     # apply_version_and_rename_unreleased.
     if not _verify_versions_on_disk(project_dir, version):
         return False
+
+    # The verify step may have auto-corrected pubspec.yaml / package.json
+    # AFTER the staging above, which would leave the fix out of the commit.
+    # Re-stage just those two files so the healed versions are committed.
+    for rel in ("pubspec.yaml", "extension/package.json"):
+        if (project_dir / rel).exists():
+            run_command(["git", "add", rel], project_dir, f"Re-staging {rel}")
 
     result = safe_run(
         ["git", "status", "--porcelain"],

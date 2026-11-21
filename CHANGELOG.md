@@ -82,6 +82,10 @@ Scan notifications are quieter: one progress notification replaces the stack of 
 - Added "Rate on VS Code Marketplace" and "Rate on Open VSX" entries to the Help Hub quick pick, so users can reach the review pages at any time.
 - Added `saropaLints.rateOnMarketplace` and `saropaLints.rateOnOpenVsx` commands (Command Palette + Command Catalog).
 
+### Internal
+
+- Publish script: a stale `pubspec.yaml` version found at the pre-commit check is now auto-corrected (and re-staged along with `extension/package.json`) instead of dead-ending at the Retry/Abort menu.
+
 ---
 
 ## [17.3.0]
