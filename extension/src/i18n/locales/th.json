@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "มีอะไรใหม่"
+      "title": "อะไรใหม่ใน v16"
     },
     "hero": {
       "subtitle": "การอัปเดตนี้เปลี่ยนตัวขับเคลื่อนการวินิจฉัยเริ่มต้น โปรดอ่านก่อนที่คุณจะทำงานต่อ — มันส่งผลต่อสิ่งที่คุณจะเห็นในแผงปัญหา"
@@ -53,7 +53,7 @@
         "description": "กำหนดให้กฎที่มีมากกว่า 2,300 กฎทำงานและระดับความรุนแรงที่จะใช้"
       },
       "catalog": {
-        "label": "แค็ตตาล็อกคำสั่ง",
+        "label": "คาตอล็อกบัญชาการ Command Catalogue การกํากับและการใช้",
         "description": "คำสั่ง Saropa Lints ทุกตัวอยู่ในรายการที่สามารถค้นหาได้ในหนึ่งเดียว"
       }
     }
@@ -80,9 +80,9 @@
       "subtitle": "ผลการค้นหา {count} · {timestamp}",
       "baselineSubtitle": "เทียบกับฐานข้อมูลจาก {date}",
       "searchPlaceholder": "กรองด้วยกฎ ไฟล์ หรือข้อความ…",
-      "filterTier": "ระดับ",
+      "filterTier": "Tier 1 หลักทรัพย์",
       "filterSeverity": "ความรุนแรง Severity",
-      "filterImpact": "ผลกระทบ",
+      "filterImpact": "ผลการตรวจสอบ Impact",
       "filterBaselineStatus": "มาตรฐานพื้นฐาน",
       "baselineNew": "ใหม่",
       "baselineUnchanged": "ไม่เปลี่ยนแปลง",
@@ -90,11 +90,11 @@
       "copyJson": "สําเนา JSON",
       "toggleGroup": "สลับการจัดกลุ่ม",
       "colFile": "File รายการ",
-      "colLine": "บรรทัด",
-      "colRule": "กฎ",
+      "colLine": "สาย เส้น เส้น",
+      "colRule": "กฎหมาย สังกัด",
       "colSeverity": "ความรุนแรง Severity",
-      "colTier": "ระดับ",
-      "colMessage": "ข้อความ",
+      "colTier": "Tier 1 หลักทรัพย์",
+      "colMessage": "ข้อความข้อความ Message",
       "empty": "ไม่พบข้อผิดพลาด — โครงการนี้สะอาด",
       "filteredEmpty": "ไม่พบผลลัพธ์ที่ตรงกับกรองปัจจุบัน",
       "loadMore": "แสดงเพิ่ม",
@@ -135,7 +135,8 @@
     "baseline": {
       "progressTitle": "Saropa Lints: การสแกนทั้งโครงการ",
       "progressMessage": "ไฟล์ {scanned}/{total} ถูกสแกน พบปัญหา {issues} รายการ"
-    }
+    },
+    "legacyKeyWarning": "ค่า saropaLints.scanOnSave.enabled ไม่มีผล — การสแกนเมื่อบันทึกถูกควบคุมโดย saropaLints.enabled เท่านั้น ลบคีย์ที่ไม่ได้ใช้ออกจากตั้งค่าของคุณ"
   },
   "featureInventory": {
     "export": {
@@ -158,7 +159,7 @@
     "controls": {
       "filterLabel": "ตัวกรองคุณสมบัติ",
       "filterPlaceholder": "กรองด้วยข้อความคุณสมบัติ สัญลักษณ์ หรือเวอร์ชัน…",
-      "unusedOnly": "เฉพาะที่ไม่ได้ใช้",
+      "unusedOnly": "ไม่ใช่การใช้งานที่เหลือใช้เพียงอย่างเดียว",
       "usedOnly": "ใช้เฉพาะ",
       "deprecatedOnly": "ยกเลิกใช้แล้วเพียงแค่",
       "expandAll": "ขยายทั้งหมด Expand all",
@@ -168,13 +169,13 @@
     "summary": {
       "title": "สรุปแพ็กเกจ",
       "sortHint": "เลือกเพื่อเรียงลำดับตามคอลัมน์นี้",
-      "colPackage": "แพ็กเกจ",
+      "colPackage": "แพ็คเกจ Package สินค้า",
       "colVersion": "Version ฉบับฉบับ",
       "colFeatures": "คุณสมบัติ",
       "colAdopted": "นำเข้ามาใช้",
       "colUnadopted": "ไม่ได้รับการยอมรับ",
       "colUsages": "การใช้งาน",
-      "colScore": "คะแนน"
+      "colScore": "สกอร์คะแนน ผลบอล"
     },
     "packages": {
       "title": "แพ็คเกจ Packages สินค้า"
@@ -207,7 +208,7 @@
       "usagesOne": "การใช้งาน {count}",
       "usagesUnknown": "การใช้งานไม่สามารถวัดได้",
       "apiHeading": "{symbol} ({count})",
-      "viewCode": "ดูโค้ด",
+      "viewCode": "ดูโค้ด View Code (ดูรหัส)",
       "viewDocs": "ดู Docs รายการ",
       "noUsages": "ไม่พบการใช้งานในแหล่งข้อมูลของโครงการ",
       "moreUsages": "{count} ใช้ได้มากขึ้น",
@@ -226,22 +227,22 @@
     "searchPlaceholder": "กฎการค้นหา สไตล์ ...",
     "pickOne": "เลือก 1 ตัว",
     "none": "ไม่มี ไม่ มี",
-    "enableAll": "เปิดใช้งานทั้งหมด",
+    "enableAll": "Enable all เปิดให้ใช้งานทั้งหมด",
     "disableAll": "Disable all ปิดการใช้งานทั้งหมด",
     "noMatch": "ไม่มีกฎการใช้งานแบบตรงกันเลย",
     "desc": {
-      "ordering_sorting": "เรียงสมาชิก, ปาราเมตร, สนาม และคีย์แผนที่เพื่อการวางแผนแบบสามารถคาดเดาได้. เสียงดังมากในรหัสที่มีอยู่  ⁇ ดีที่สุดในรหัสใหม่หรือ repos รายเล็ก ๆ",
+      "ordering_sorting": "จัดเรียงสมาชิก ค่าพารามิเตอร์ ฟิลด์ และคีย์ของแมปเพื่อให้การจัดวางมีความคาดเดาได้ สร้างเสียงรบกวนมากเมื่อใช้งานกับโค้ดที่มีอยู่แล้ว — แนะนำให้ใช้กับโค้ดใหม่หรือโปรเจกต์ขนาดเล็ก",
       "naming_conventions": "การตั้งชื่อสําหรับไฟล์, วิธีการ, อุปนิสัยเว้นส่วน, callback และ Block เหตุการณ์และสถานะ. อาจเป็นเสียงดังในฐานโค้ดขนาดใหญ่; enable incrementally. enable เพิ่มเติม",
       "boolean_naming": "บูเลนต้องใช้ is/has/can/should prefix เพื่อให้ความตั้งใจชัดเจนในเงื่อนไขและ API",
-      "code_style_preferences": "วิธีการเขียน return, conditionals และ loops  ⁇ การคืนทันที, for-in, getter vs method และคําสั้นที่คล้ายๆ กัน",
+      "code_style_preferences": "การเขียน return, conditionals และ loops — return ทันที, for-in, getter vs method และ shorthand ที่คล้ายกัน",
       "function_parameter_style": "การทํางานของลูกศรเมื่อสั้น, ปาราเมตรที่มีชื่อทั้งหมด, callback ในเส้น และไม่มีการกําหนดใหม่พารา เมเตอร์.",
       "widget_style": "Flutter การเลือกวิดเจ็ต  ⁇ SizedBox.square, center over align, spacing over Sizedbox และหลีกเลี่ยงการย่อตัวในสกรอล _Flutter โครงการเท่านั้น",
       "class_record_style": "Class vs record return types, private underscore prefixes และ explicit this ที่มันชี้แจงให้ชัดเจน. รายการที่ได้รับความสนใจคือ การนําเสนอข้อมูลของคลาสส์กับบันทึก",
-      "formatting": "การวางเส้นว่าง, คอมม่าท้าย และสไตล์ literal และ comment. สามารถดังได้  ⁇ ไฟล์หลาย ๆ ฟิล์มอาจต้องการการแก้ไข",
+      "formatting": "การวางบรรทัดว่าง การใช้คอมม่าท้าย รวมถึงสไตล์ของลิเทอ럴และคอมเมนต์ อาจมีการแจ้งเตือนมาก — ไฟล์จำนวนมากอาจต้องการการแก้ไข",
       "comments_documentation": "รูปแบบ TODO และ FIXME, สัญญาณประโยค, ระยะเวลาหลังจากการแสดงความคิดเห็นของ doc, /// over //, และไม่มีรหัสที่ออกความเห็น.",
       "testing_style": "Prefer expect over assert ในการทดสอบ ดังนั้นความผิดพลาดแสดงให้เห็นว่าคาดหวังกับจริง",
       "debug_test_utility": "ตัวช่วยทดสอบ เช่น prefer_fail_test_case ที่ล้มเหลวอย่างดัง เมื่อการทดลองไปถึงเส้นทางที่ไม่คาดคิด",
-      "opinionated_rules": "การเลือกสไตล์ที่หลากหลาย  ⁇ ชื่อที่สั้น, enums ที่ครบถ้วน, ข้อคาดแค้น, เงื่อนไขทางด้านบวกและอื่น ๆ อีกมากมาย. กฎกติกามากมาย; อาจเป็นเสียงดังได้"
+      "opinionated_rules": "การเลือกสไตล์ต่าง ๆ — ชื่อที่กระชับ, enum ที่ครอบคลุม, ข้อความที่ป้องกัน, ข้อกำหนดที่เป็นบวก, และอื่น ๆ กฎมากมาย; อาจมีเสียงรบกวนมาก"
     }
   },
   "packs": {
@@ -258,11 +259,11 @@
       "state-management": "โบล็อก, Riverpod, Provider, GetX และสมุดการฉีดภาวะและความพึ่งพาที่เกี่ยวข้อง",
       "networking-apis": "คลินท์ HTTP, GraphQL, Firebase, Supabase และการเชื่อมต่อ",
       "storage-persistence": "ฐานข้อมูลท้องถิ่นและคีย์-มูลค่าของร้านค้า Drift, Hive, Isar, sqflite, shared_preferences. ความชอบที่แบ่งปันกัน",
-      "navigation-deep-links": "การจัดเส้นทางและการจัดการ Deep Link  ⁇ auto_route, go_router, app_links, url_launcher และ webview.com เป็นตัวเลือกที่ใช้ในการติดต่อกับระบบ",
+      "navigation-deep-links": "กฎที่เข้มงวด: \n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว \n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown รวมถึงเครื่องหมายอัญประกาศที่ครอบคลุม \n3. ข้อความอาจมีโทเคนที่ใช้แทนได้: โทเคนที่ใช้แทนได้ คัดลอกแต่ละตัวเข้าไปในการแปลแบบตรงตัว ตามตำแหน่งทางไวยากรณ์ที่ถูกต้อง ห้ามแปล ลบ หรือปรับรูปแบบโทเคนใดๆ \n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามปล่อยหรือแทนที่คำใดๆ ด้วยตัวอักษรละติน ไทย อารบิก ไซลิลิก เกาหลี ญี่ปุ่น หรืออักษรใดๆ ทั้งหมด ตัวอักษร ตัวเลข เครื่องหมายวรรคตอน และโทเคนที่ใช้แทนได้เป็นเพียงข้อยกเว้นเดียว",
       "media-graphics": "ภาพ, SVG, การ์ตูนอนิเมชั่น, เสียง, แผนที่, ผู้เก็บและเครื่องยนต์ Flame.",
       "device-platform": "เซนเซอร์, ตําแหน่ง, การอนุญาต, ไบโอเมทริกส์, คําแจ้งเตือน และงานเบื้องหลัง",
       "identity-sharing": "ผู้ให้บริการ Log-in, การแบ่งปัน และ In-App Review",
-      "utilities-config": "ผู้ช่วยด้าน  ⁇ UUIDs, การปรับแต่งสภาพแวดล้อม, ฟอนต์ และความเข้ากันของคอลเลกชัน",
+      "utilities-config": "เครื่องมือช่วยเหลือที่ใช้ได้ทั่วไป — UUIDs, ค่ากำหนดการแวดล้อม, ฟอนต์ และความเข้ากันได้กับการรวบรวมข้อมูล",
       "sdk-migrations": "Dart และ Flutter รูปแบบการอัพเกรดกฎที่ฟันธง API ถอนออกหรือหมดอายุใน SDK."
     }
   },
@@ -273,19 +274,25 @@
     "tabBar": {
       "ariaLabel": "แท็บแดชบอร์ดกฎและระดับ"
     },
+    "ruleFinder": {
+      "disableButton": "Disable ปิดการใช้งาน",
+      "disableTitle": "ปิดกฎนี้สำหรับโครงการทั้งหมด — เขียน analysis_options_custom.yaml และวิเคราะห์ซ้ำ",
+      "enableButton": "เปิดใช้งาน",
+      "enableTitle": "เปิดใช้งานกฎนี้อีกครั้ง — ลบการกำหนดค่าทับใน analysis_options_custom.yaml และเริ่มการวิเคราะห์อีกครั้ง"
+    },
     "tab": {
-      "tier": "ระดับ",
+      "tier": "Tier 1 หลักทรัพย์",
       "packs": "Rule Packs ปรับกฎการใช้งาน",
-      "overrides": "การแทนที่",
+      "overrides": "การยกเลิกการใช้งาน Overrides",
       "sdk": "การเปิดตัว SDK",
       "configFile": "ไฟล์กำหนดค่า",
       "automation": "ระบบอัตโนมัติ",
       "extension": "ต่อขยาย"
     },
     "common": {
-      "rule": "กฎ",
+      "rule": "กฎหมาย สังกัด",
       "add": "เพิ่ม",
-      "remove": "ลบ"
+      "remove": "Remove remove ถอดออก"
     },
     "sdk": {
       "summary": "ชุดการย้ายข้อมูล {total} SDK ใช้กับโปรเจ็กต์นี้ - {breaking} ใช้งานไม่ได้, {deprecation} เลิกใช้งานแล้ว",
@@ -373,7 +380,7 @@
           "newSection": "ใหม่ตั้งแต่พื้นฐาน ({count})",
           "moreRows": "+{count} ไม่แสดงเพิ่มเติม",
           "fileCol": "File รายการ",
-          "lineCol": "บรรทัด"
+          "lineCol": "สาย เส้น เส้น"
         }
       },
       "optimizer": {
@@ -384,6 +391,14 @@
     },
     "automation": {
       "hint": "การตั้งค่าส่วนขยายที่ควบคุมว่าการวิเคราะห์จะดำเนินการเมื่อใดและวิธีแสดงผลการสืบค้น สิ่งเหล่านี้สะท้อนการตั้งค่าเดียวกันในไฟล์ > การตั้งค่า > การตั้งค่าภายใต้ Saropa Lints"
+    },
+    "watcher": {
+      "title": "Watcher ข้าม",
+      "hint": "ไฟล์และโฟลเดอร์ VS Code ที่ตัวตรวจสอบไฟล์ควรจะไม่ติดตาม จำนวนมาจากการสแกนความเสี่ยงของงาน ใช้ List เพื่อดูเส้นทาง แล้วจึงยกเว้นพวกนั้นจากคำเตือนที่การสแกนแสดงให้เห็น",
+      "scanning": "กำลังสแกนงานพื้นที่ทำงาน...",
+      "affected": "{count} ได้รับผลกระทบ",
+      "list": "รายการ",
+      "recommended": "กฎที่เข้มงวด:"
     },
     "extension": {
       "hint": "การตั้งค่าการแสดงผลทั้งส่วนขยาย",
@@ -413,12 +428,12 @@
   },
   "configSuggestions": {
     "enabledToast": "ทําให้ {pack} รูลแพ็คใน analysis_options.yaml สามารถใช้งานได้",
-    "enableFailed": "ไม่สามารถเปิดใช้งาน {pack} รูเล็ปแพ็ค  ⁇ เปิดดัชบอร์ด Rule Packs เพื่อเปิดใช้งาน"
+    "enableFailed": "ไม่สามารถเปิดใช้งานชุดกฎ {pack} ได้ — เปิดแดชบอร์ดชุดกฎเพื่อเปิดใช้งานมัน"
   },
   "startupNudge": {
     "message": "Saropa Lints: เป็นการตรวจหา {count} คําแนะนําของกติกาชุด (s) ใช้กับโครงการนี้.",
-    "review": "การตรวจสอบ",
-    "dismiss": "ปิด",
+    "review": "การตรวจสอบ Review Review",
+    "dismiss": "ขอยกเลิกการทํางาน",
     "reviewFailed": "ไม่สามารถเปิดการตรวจสอบชุดกฎ Saropa Lints ได้ {error}"
   },
   "opportunities": {
@@ -426,13 +441,13 @@
     "heroTitle": "การอัพเกรด โอกาสการปรับปรุง",
     "subtitle": "{count} แพ็คเกจมีคุณสมบัติที่โครงการของคุณยังไม่ได้ใช้",
     "noScan": "วิ่งสแกนแพ็คเกจแรกเพื่อหาโอกาสในการอัพเกรด",
-    "openFileFailed": "ไม่สามารถเปิด {file}  ⁇ มันอาจย้ายไปตั้งแต่การสแกนครั้งสุดท้าย",
+    "openFileFailed": "เปิด {file} ไม่ได้ — อาจถูกย้ายไปแล้วตั้งแต่การสแกนครั้งสุดท้าย",
     "card": {
       "versionUpgrade": "อัพเดทที่พร้อมใช้งานใน {latest}",
       "versionCurrent": "เรื่องล่าสุดของ ธนกร",
       "featuresTitle": "คุณสมบัติที่ยังไม่ได้ใช้",
       "locationsTitle": "ที่โครงการของคุณใช้แพ็กเกจนี้",
-      "noLocations": "ไม่นําเข้าในโครงการที่มา  ⁇ เป็นไปได้ว่าการพึ่งพา dev หรือ transitive.",
+      "noLocations": "ไม่ได้ import ในแหล่งโค้ดของโครงการ — อาจเป็น dependency สำหรับการพัฒนาหรือ dependency แบบ transitve",
       "moreFiles": "และ {count} ไฟล์เพิ่มเติม",
       "openInDashboard": "เปิดใน แดชบอร์ด Package Dashboard",
       "writeReport": "เขียนรายงาน"
@@ -453,11 +468,11 @@
   "packageDetail": {
     "section": {
       "version": "VERSION การออกแบบ",
-      "changelog": "CHANGELOG",
+      "changelog": "CHANGELOG โปรแกรมการเปลี่ยนแปลง",
       "community": "สมาคม ชุมชน",
       "dependencies": "การติดตามการใช้งาน",
       "alerts": "การเตือน Alert",
-      "platforms": "แพลตฟอร์ม",
+      "platforms": "แพลตฟอร์ม (Platforms) การใช้งาน",
       "suggestions": "ข้อเสนอแนะ การให้คําแนะนํา",
       "readmeImages": "README IMAGES ภาพถ่ายจากหนังสือ"
     },
@@ -486,7 +501,7 @@
       "latest": "ใหม่ล่าสุด Latest",
       "prerelease": "การออกอากาศก่อนการปล่อย",
       "published": "พิมพ์ ออกไป ประกาศ",
-      "update": "อัปเดต",
+      "update": "Update อัพเดทอัปเดต",
       "blockedBy": "Blocked โดย บล็อกโดย",
       "blockedVia": "{blocker} ปิดกั้น {dep} {constraint} ({resolvable} สามารถแก้ไขได้, {latest} ล่าสุด)",
       "blockedViaSdk": "พินโดย {blocker} (Flutter SDK) สําหรับ {dep} ( {resolvable} สามารถแก้ไขได้, {latest} ล่าสุด)",
@@ -497,16 +512,16 @@
       "drift": "โครงการข้ามโครงงาน drift",
       "driftBehind": "ด้านหลัง: {siblings} (คุณมี {own})",
       "driftDiffers": "ความแตกต่าง: {siblings} (คุณมี {own})",
-      "codeSize": "ขนาดโค้ด",
+      "codeSize": "ขนาดโค้ด Code Size ขนาดรหัส",
       "archiveSize": "ขนาดอาร์คิฟ ไซส์",
       "bloat": "({rating}/10 บู๊บ)",
-      "onDisk": "บนดิสก์",
-      "upgrade": "อัปเกรด",
+      "onDisk": "ใน Disk On หน่วยงาน",
+      "upgrade": "อัพเกรดอัปเดรด Upgrade",
       "upgrading": "การอัพเกรด ...",
       "viewChangelog": "View Changelog รายการเปลี่ยนแปลง"
     },
     "changelog": {
-      "intro": "อะไรเปลี่ยนจาก {from} เป็น {to}  ⁇ การตรวจสอบก่อนการปรับปรุง.",
+      "intro": "สิ่งที่เปลี่ยนจาก {from} ไปยัง {to} — ตรวจสอบก่อนอัปเกรด",
       "versionDated": "{version} — {date}",
       "truncated": "แสดงการปล่อย {count} ล่าสุด.",
       "viewFull": "ดูบันทึกการเปลี่ยนแปลงฉบับเต็มบน pub.dev"
@@ -514,7 +529,7 @@
     "community": {
       "stars": "ดาวดวงดาว ธารา",
       "likes": "ชอบชอบ ความนิยม",
-      "report": "รายงาน",
+      "report": "รายงาน การทําความเข้าใจ",
       "openIssues": "Open Issues ปัญหาที่เปิด",
       "openPrs": "เปิด PRs",
       "activity": "กิจกรรม (90d)",
@@ -539,22 +554,22 @@
       "publicApiSurface": "พื้นผิว API สาธารณะ",
       "header": "การใช้ไฟล์ ({label})",
       "commentedReexportTitle": "การส่งออกใหม่ Commented-out",
-      "reexportTitle": "การส่งออกใหม่  ⁇  ส่วนหนึ่งของห้องสมุดนี้ API ประชาชน",
+      "reexportTitle": "นำออกซ้ำ — เป็นส่วนหนึ่งของ API สาธารณะของไลบรารีนี้",
       "reexportBadge": "การส่งออกใหม่ - re-export"
     },
     "opportunities": {
       "header": "โอกาส ({count})",
-      "viewCode": "ดูโค้ด",
+      "viewCode": "ดูโค้ด View Code (ดูรหัส)",
       "viewDocs": "ดู Docs รายการ"
     },
     "alerts": {
-      "archived": "ARCHIVED  ⁇  Repository เป็นการอ่านเท่านั้น",
+      "archived": "บันทึกถาวร — แหล่งข้อมูลเป็นแบบอ่านเท่านั้น",
       "knownIssue": "ปัญหาที่ทราบ: {reason}",
-      "unused": "ไม่ใช้งาน  ⁇  ไม่มีการตรวจพบสินค้านําเข้า",
-      "fix": "⁇  แก้ไข: {version}"
+      "unused": "ไม่ได้ใช้งาน — ไม่พบการนำเข้าใด ๆ",
+      "fix": "— แก้ไข: {version}"
     },
     "versionGap": {
-      "versionTitle": "ช่องว่างของเวอร์ชัน",
+      "versionTitle": "ช่องว่าง เวอร์ชั่น Gap Version",
       "overrideTitle": "ยกเลิกการใช้งาน Gap Gap",
       "noDates": "ไม่สามารถกําหนดวันที่ฉบับสําหรับแพ็กเกจนี้ได้",
       "noItems": "ไม่พบ PR หรือปัญหาใด ๆ ระหว่างเวอร์ชั่นเหล่านี้",
@@ -563,25 +578,25 @@
       "searchLabel": "ค้นหา PRs และประเด็น",
       "searchPlaceholder": "ค้นหา PRs และประเด็น ...",
       "filterAria": "สกรองตามหมวดหมู่ filter ตามประเภท",
-      "filterAll": "ทั้งหมด",
+      "filterAll": "ทั้งหมด ทุกอย่าง",
       "filterUnreviewed": "ไม่ผ่านการรีวิว Unreviewed",
-      "filterPrs": "PR",
-      "filterIssues": "ปัญหา",
-      "typePr": "PR",
-      "typeIssue": "ปัญหา",
+      "filterPrs": "PRs สายการค้า",
+      "filterIssues": "ปัญหาประเด็น Issues",
+      "typePr": "PR PR PR ปรุงเทพมหานคร",
+      "typeIssue": "ฉบับประเด็น Issue",
       "reviewReviewed": "รีวิวโดย Reviewed",
       "reviewApplicable": "การใช้งาน Applicable",
-      "reviewNotApplicable": "N/A",
+      "reviewNotApplicable": "N/A ไม่เห็น",
       "notesPlaceholder": "หมายเหตุ ...",
       "colType": "ประเภท",
       "colTitle": "ชื่อ หมวดหมู่",
-      "colAuthor": "ผู้เขียน",
-      "colReview": "การตรวจสอบ",
+      "colAuthor": "ผู้เขียน Author Author บันทึก",
+      "colReview": "การตรวจสอบ Review Review",
       "summaryFooter": "{triaged} ของ {total} คัดแยก | {applicable} ใช้ได้ | {notApplicable} ไม่มีข้อมูล | {unreviewed} เหลืออยู่ครับ",
       "truncated": "ผลลัพธ์ถูกตัดทอนเป็นรายการ {limit}"
     },
     "platforms": {
-      "wasm": "WASM"
+      "wasm": "WASM (วิสม) เป็นการใช้"
     },
     "images": {
       "alt": "README รูปภาพของ Readme"
@@ -604,7 +619,7 @@
     }
   },
   "toolbar": {
-    "runAnalysis": "เรียกใช้การวิเคราะห์",
+    "runAnalysis": "วิ่งวิเคราะห์ Run Analysis การวัด",
     "copyJson": "สําเนา JSON",
     "saveReport": "Save Report การบันทึกรายงาน",
     "moreActions": "การกระทํามากขึ้น กิจกรรมเพิ่มเติม",
@@ -620,23 +635,23 @@
   },
   "filter": {
     "activeLabel": "การกรองที่ทํางาน: Active Filter",
-    "chipRemove": "ลบ"
+    "chipRemove": "Remove remove ถอดออก"
   },
   "a11y": {
     "toggleFullWidth": "Toggle layout ความกว้างเต็ม",
-    "expandRow": "ขยายแถว",
-    "comparisonDimension": "เมตริก"
+    "expandRow": "ขยายแถว Expand Row (ขยายแถบ)",
+    "comparisonDimension": "เมทริกเมตริก Metric"
   },
   "uiLanguage": {
     "pick": {
       "title": "Saropa Lints ภาษา UI ของ UI",
       "placeholder": "เลือกภาษาสําหรับซิดบาร์และดัสช็อบ",
       "auto": "Auto (ตามภาษาแสดงของ VS Code)",
-      "coverage": "{pct}% แปลว่า  ⁇ rest shows ในภาษาอังกฤษ"
+      "coverage": "{pct}% แปลแล้ว — ส่วนที่เหลือแสดงเป็นภาษาอังกฤษ"
     },
     "reloadPrompt": "การตั้งภาษาเป็น {locale}. รีโลดหน้าต่างเพื่ออัพเดทซิดบาร์และเลเบลคําสั่ง",
     "reloadNow": "โหลดใหม่ตอนนี้",
-    "reloadLater": "ภายหลัง"
+    "reloadLater": "ภายหลัง ต่อไป ล่าสุด"
   },
   "statusBar": {
     "error": {
@@ -647,94 +662,94 @@
       "openViolations": "เปิดรายงานการละเมิด",
       "openPackageDashboard": "เปิด แดชบอร์ด Package Dashboard โดยเปิด",
       "openProcessHealth": "เปิดความสมบูรณ์ของกระบวนการ",
-      "commandCatalog": "แค็ตตาล็อกคำสั่ง",
+      "commandCatalog": "คาตอล็อกบัญชาการ Command Catalogue การกํากับและการใช้",
       "about": "เกี่ยวกับ"
     },
     "tooltip": {
       "section": {
-        "status": "Status",
-        "project": "Project",
-        "problems": "Problems",
-        "memory": "Memory",
-        "actions": "Actions"
+        "status": "สถานะ Status ฐานะ",
+        "project": "โครงการ",
+        "problems": "ปัญหา",
+        "memory": "หน่วยความจำ",
+        "actions": "การกระทําการดําเนินงาน Actions"
       },
       "cause": {
-        "on": "Analysis is running: the setting and the analyzer plugin are both on.",
-        "off": "Analysis is off: the setting and the analyzer plugin are both off.",
-        "partialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on.",
-        "partialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on.",
-        "notSetUp": "saropa_lints is not set up in this project: it is not a dependency in pubspec.yaml and analysis_options.yaml has no plugin entry."
+        "on": "การวิเคราะห์กำลังทำงาน: ตั้งค่าและปลั๊กอินวิเคราะห์อยู่ทั้งสองอยู่ในตำแหน่งที่เปิด",
+        "off": "การวิเคราะห์ถูกปิด: ทั้งการตั้งค่าและปลั๊กอินวิเคราะห์ถูกปิดอยู่",
+        "partialSetting": "ส่วนหนึ่งเปิด: ตั้งค่า saropaLints.enabled ปิดอยู่ขณะที่ปลั๊กอิน analyzer เปิดอยู่",
+        "partialPlugin": "ส่วนหนึ่งถูกปิด: ปลั๊กอินวิเคราะห์ถูกปิดใน analysis_options.yaml ขณะที่การตั้งค่าเป็นเปิด",
+        "notSetUp": "saropa_lints ไม่ได้รับการตั้งค่าในโครงการนี้: มันไม่ใช่ขึ้นอยู่กับ pubspec.yaml และ analysis_options.yaml ไม่มีการระบุ plugin"
       },
       "fix": {
-        "turnOn": "Fix: turn both on",
-        "setUp": "Fix: set up and turn on",
-        "title": "Turns the saropaLints.enabled setting and the analyzer plugin on together."
+        "turnOn": "แก้ไข: เปิดทั้งสองอย่าง",
+        "setUp": "แก้ไข: ตั้งค่าและเปิดใช้งาน",
+        "title": "เปิดใช้งานการตั้งค่า saropaLints.enabled และปลั๊กอิน analyzer พร้อมกัน"
       },
       "pill": {
-        "statusOn": "Lints are running. Click to open the Violations Report.",
-        "findings": "Open the Violations Report.",
-        "vibrancy": "Open the Package Dashboard."
+        "statusOn": "กฎเข้มงวด:\n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว\n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown และไม่ใช้เครื่องหมายอัญประกาศใด ๆ รอบข้อความ\n3. ข้อความอาจมีตัวแทนของโทเคน: โทเคนตัวแทน คัดลอกแต่ละตัวให้ตรงกับการเขียนที่ระบุไว้โดยไม่แปล ลบ หรือปรับรูปแบบ\n4. สำคัญมาก: ตัวอักษรทุกตัวของผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามเว้นหรือแทนที่คำใด ๆ ในอักษรละติน ไทย อารบิก เซอริลลิก คีริน ญี่ปุ่น หรืออักษรใด ๆ อื่น ๆ ตัวอักษร ตัวเลข จุดวรรค หรือโทเคนตัวแทนคือข้อยกเว้นเพียงอย่างเดียว",
+        "findings": "เปิดรายงานข้อผิดพลาด",
+        "vibrancy": "เปิดแพ็กเกจดัชบอร์ด"
       },
       "project": {
-        "version": "Version",
-        "tier": "Tier",
-        "vibrancy": "Vibrancy",
-        "packages": "Packages scanned",
-        "packagesSuppressed": "{count} ({suppressed} suppressed)",
-        "score": "Lint score",
-        "scorePending": "run a full analysis (partial scan)",
-        "findings": "Findings",
-        "updates": "Updates available",
-        "actionItems": "Action items",
-        "route": "Route"
+        "version": "Version ฉบับฉบับ",
+        "tier": "Tier 1 หลักทรัพย์",
+        "vibrancy": "ความสดใส",
+        "packages": "แพ็กเกจที่ถูกสแกน",
+        "packagesSuppressed": "{count} ({suppressed} ถูกปิด)",
+        "score": "คะแนนลิ้นต์",
+        "scorePending": "วิเคราะห์ทั้งหมด (การสแกนแบบบางส่วน)",
+        "findings": "ผลการค้นพบ รายงาน",
+        "updates": "อัปเดตพร้อมใช้งาน",
+        "actionItems": "ขั้นตอนการดำเนินการ",
+        "route": "เส้นทาง"
       },
       "findings": {
-        "allErrors": "{count} findings (all errors)",
-        "allErrorsOne": "1 finding (an error)",
-        "mixed": "{errors} errors · {warnings} warnings",
-        "noErrors": "{total} findings"
+        "allErrors": "ข้อผิดพลาด {count} (ทั้งหมด)",
+        "allErrorsOne": "1 ข้อผิดพลาด (ข้อผิดพลาด)",
+        "mixed": "ข้อผิดพลาด {errors} · คำเตือน {warnings}",
+        "noErrors": "{total} ข้อผิดพลาด"
       },
       "problem": {
-        "openCompat": "Open version compatibility card",
-        "reviewReadiness": "Review workspace issues"
+        "openCompat": "การเปิดบัตรความเข้ากันได้ของเวอร์ชัน",
+        "reviewReadiness": "ตรวจสอบปัญหาในพื้นที่ทำงาน"
       },
       "memory": {
         "saropa": "Saropa Lints",
-        "none": "none running",
-        "processes": "{count} process(es) · {size} RSS",
-        "daemons": "Flutter daemons",
-        "daemonsValue": "{total} ({orphaned} orphaned)",
-        "scanDaemons": "Orphaned scan daemons",
-        "scanDaemonsValue": "{count}, use Clean Up to kill",
-        "other": "Other Dart",
-        "extHost": "Extension host",
+        "none": "ไม่มีการดำเนินการ",
+        "processes": "กระบวนการ {count} · {size} RSS",
+        "daemons": "Flutter daemon",
+        "daemonsValue": "{total} ({orphaned} ทิ้งไว้)",
+        "scanDaemons": "Daemon ที่ถูกทอดทิ้งในการสแกน",
+        "scanDaemonsValue": "{count} ใช้ Clean Up เพื่อฆ่า",
+        "other": "อื่น ๆ Dart",
+        "extHost": "ตัวขยาย (Extension host)",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
-        "ram": "Machine RAM",
-        "ramValue": "{free} free of {total}",
-        "trend": "RSS trend (last ~30 min)"
+        "ram": "หน่วยความจำ RAM",
+        "ramValue": "{free} ฟรีจาก {total}",
+        "trend": "เทรนด์ RSS (ประมาณ 30 นาทีที่ผ่านมา)"
       },
       "action": {
-        "turnOff": "Turn Lints off",
-        "turnOn": "Turn Lints on",
-        "turnBothOn": "Turn both on",
-        "versionCompat": "Version Compatibility"
+        "turnOff": "ปิดกฎการตรวจสอบ",
+        "turnOn": "เปิดใช้งาน Lints",
+        "turnBothOn": "เปิดทั้งสอง",
+        "versionCompat": "เวอร์ชันความเข้ากันได้"
       }
     },
     "quickPick": {
       "title": "Saropa Lints",
-      "placeholder": "Pick an action"
+      "placeholder": "เลือกการกระทำ"
     }
   },
   "systemHealth": {
     "heapCap": {
-      "noneMessage": "เครื่องของคุณมีหน่วยความจำ {totalGb} เซิร์ฟเวอร์วิเคราะห์ Dart ไม่มีการกำหนดเพดานหน่วยความจำ จึงสามารถเติบโตได้เรื่อยๆ จนกว่าเครื่องจะช้าลงหรือเริ่มสลับหน่วยความจำ (swap) เพดานที่แนะนำ: {recommendedGb}",
-      "tooHighMessage": "เครื่องของคุณมีหน่วยความจำ {totalGb} เซิร์ฟเวอร์วิเคราะห์ Dart ได้รับอนุญาตให้ใช้ได้สูงสุด {capGb} (ตั้งค่าไว้ใน {location}) ซึ่งเหลือประมาณ {freeGb} สำหรับระบบปฏิบัติการ VS Code และเครื่องมือ Dart อื่นๆ เครื่องจึงอาจช้าลงหรือสลับหน่วยความจำ เพดานที่แนะนำ: {recommendedGb}",
+      "noneMessage": "เครื่องของคุณมี {totalGb} ของหน่วยความจำ เซิร์ฟเวอร์การวิเคราะห์ Dart ไม่มีขีดจำกัดด้านหน่วยความจำ ดังนั้นจึงสามารถเติบโตได้จนกว่าเครื่องจะช้าลงหรือเริ่มการสลับหน่วยความจำ ข้อแนะนำ: ขีดจำกัด {recommendedGb}",
+      "tooHighMessage": "เครื่องของคุณมีหน่วยความจำ {totalGb} จำนวนหนึ่ง เซิร์ฟเวอร์การวิเคราะห์ Dart ถูกอนุญาตให้ใช้ได้สูงสุด {capGb} (ตั้งค่าใน {location}) ซึ่งเหลือประมาณ {freeGb} สำหรับระบบปฏิบัติการ VS Code และเครื่องมืออื่นๆ Dart ดังนั้นเครื่องอาจช้าลงหรือเกิดการสลับหน่วยความจำ แนะนำให้ตั้งค่าขั้นสูงสุดที่ {recommendedGb}",
       "locationGlobal": "การตั้งค่าผู้ใช้ของคุณ",
       "locationWorkspace": "การตั้งค่าของพื้นที่ทำงานนี้",
-      "locationWorkspaceFolder": "การตั้งค่าของโฟลเดอร์พื้นที่ทำงานนี้",
+      "locationWorkspaceFolder": "โฟลเดอร์ตั้งค่าของพื้นที่ทำงานนี้",
       "apply": "ใช้ {gb}",
-      "notNow": "ยังไม่ใช่ตอนนี้",
-      "dontAskAgain": "ไม่ต้องถามอีก"
+      "notNow": "ไม่ตอนนี้",
+      "dontAskAgain": "อย่าถามอีก"
     },
     "statusBar": {
       "warning": "⚠ {size}",
@@ -761,11 +776,11 @@
     "action": {
       "cleanUp": "ทำความสะอาด",
       "openPanel": "เปิดแผงสุขภาพ",
-      "dismiss": "ปิด",
+      "dismiss": "ขอยกเลิกการทํางาน",
       "optimizeAnalysis": "ปรับปรุงการวิเคราะห์",
       "dontShowAgain": "อย่าแสดงอีกต่อไป",
       "openMachineDashboard": "เปิดเครื่องมือตรวจสอบสุขภาพ",
-      "restartAnalysisServer": "รีสตาร์ท"
+      "restartAnalysisServer": "Restart การเริ่มต้นใหม่"
     },
     "cleanup": {
       "noOrphans": "ไม่พบ daemon ที่ถูกทอดทิ้ง",
@@ -811,19 +826,21 @@
     "watcherExclude": {
       "prompt": "{count} ไฟล์ที่ควรจะตั้งค่าการติดตาม (file-watcher exclusion) ไม่ได้ถูกเพิ่มในพื้นที่ทำงานนี้: {patterns} การเพิ่มพวกมันจะป้องกัน VS Code ไม่ติดตามวัตถุการสร้างขนาดใหญ่และไฟล์การดัมพ์หน่วยความจำที่กินทรัพยากรความจำ",
       "addAll": "เพิ่มทั้งหมด",
-      "dismiss": "ปิด",
+      "dismiss": "ขอยกเลิกการทํางาน",
       "added": "เพิ่มการยกเว้น {count} ของไฟล์ watcher ไปยังการตั้งค่าของงาน (workspace)"
     },
     "nestedRoots": {
-      "prompt": "{folders} มีรากแพ็กเกจ Dart แบบซ้อนกัน {count} รายการที่ git ไม่สนใจ แต่ละรายการจะถูกวิเคราะห์เป็นบริบทแยกกัน และอาจทำให้หน่วยความจำของ analysis server พองตัวมาก",
-      "fix": "ยกเว้นจากการวิเคราะห์",
-      "dismiss": "ปิด",
-      "fixed": "ยกเว้น {folders} จากการวิเคราะห์และการเฝ้าดูไฟล์แล้ว"
+      "prompt": "{folders} มี {count} package root(s) ที่มีชื่อเป็น Dart ซ่อนอยู่ภายใต้ git แต่ละตัวถูกวิเคราะห์เป็นบริบทแยกต่างหากและอาจทำให้หน่วยความจำของเซิร์ฟเวอร์วิเคราะห์เต็มไป",
+      "fix": "แยกออกจากรายงานการวิเคราะห์",
+      "dismiss": "ขอยกเลิกการทํางาน",
+      "fixed": "{folders} ถูกยกเว้นจากการวิเคราะห์และการติดตามการเปลี่ยนแปลงไฟล์"
     },
     "hazardScan": {
-      "warning": "พบไฟล์ขนาดใหญ่ {count} ที่ไม่ได้ถูกตัดออกจากตัวติดตามไฟล์: {files} ไฟล์เหล่านี้อาจใช้หน่วยความจำจนหมดและทำให้ VS Code ล่ม",
+      "warning": "พบไฟล์ขนาดใหญ่ {count} ภายในโฟลเดอร์ที่เปิดอยู่ \"{folder}\" (เส้นทางเป็นแบบสัมพัทธ์ต่อจากโฟลเดอร์นี้): {files}. VS Code ติดตามการเปลี่ยนแปลงของไฟล์ทุกไฟล์ในโฟลเดอร์ และไฟล์ขนาดใหญ่สามารถทำให้ระบบช้าหรือล่มได้",
+      "andMore": "และ {count} มากขึ้น",
+      "unnamedFolder": "(โฟลเดอร์ที่ไม่มีชื่อ)",
       "addExclusions": "แยกออกจากรายการติดตาม",
-      "dismiss": "ปิด",
+      "dismiss": "ขอยกเลิกการทํางาน",
       "added": "เพิ่มรูปแบบการยกเว้น {count} watcher ไปยังตั้งค่าการทำงานร่วมกันของงาน"
     }
   },
@@ -848,7 +865,7 @@
     "title": "สุขภาพเครื่องมือ",
     "refresh": "สะดวกสบาย Refresh",
     "systemUnknown": "ระบบความจำไม่สามารถอ่านได้บนแพลตฟอร์มนี้",
-    "platformUnsupported": "ไม่รองรับการตรวจสอบสุขภาพเครื่องบนแพลตฟอร์มนี้ — การสอบถามกระบวนการรองรับ Windows, macOS และ Linux",
+    "platformUnsupported": "เครื่องมือตรวจสอบสุขภาพไม่สามารถใช้งานได้บนแพลตฟอร์มนี้ — ระบบรองรับการสืบค้นข้อมูลบน Windows, macOS และ Linux",
     "freeOf": "ฟรีของ",
     "used": "ใช้",
     "recommendationsTitle": "คำแนะนำ",
@@ -864,8 +881,8 @@
       "modelHost": "เครื่องมือแปลภาษา (Ollama)"
     },
     "recommendation": {
-      "heapCapTooHigh": "เพดาน heap ของเซิร์ฟเวอร์วิเคราะห์ ({capMb} MB) เหลือ RAM ของเครื่องนี้น้อยกว่าครึ่งหนึ่งสำหรับสิ่งอื่นๆ เพดานที่แนะนำ: {recommendedMb} MB",
-      "noHeapCapWithSuggestion": "ไม่ได้กำหนดค่าเพดานหน่วยความจำสำหรับเซิร์ฟเวอร์วิเคราะห์ Dart เพดานที่แนะนำสำหรับเครื่องนี้: {mb} MB",
+      "heapCapTooHigh": "การจำกัดขนาดหน่วยความจำของเซิร์ฟเวอร์การวิเคราะห์ ({capMb} MB) ทำให้เหลือพื้นที่หน่วยความจำในเครื่องนี้น้อยกว่าครึ่งสำหรับสิ่งอื่นๆ แนะนำให้ใช้ขนาดจำกัด: {recommendedMb} MB",
+      "noHeapCapWithSuggestion": "เซิร์ฟเวอร์การวิเคราะห์ Dart ไม่มีการกำหนดค่าขีดจำกัดของหน่วยความจำ ข้อแนะนำสำหรับเครื่องนี้: {mb} MB",
       "systemLowMemory": "มี RAM จำนวน {free} จากทั้งหมด {total} ที่ว่างอยู่ทั่วเครื่อง ปิดแอปที่ไม่ได้ใช้งานหรือ VS Code หน้าต่าง",
       "orphansFound": "กระบวนการที่ถูกทอดทิ้ง ({count}) กำลังยึดครองหน่วยความจำ {size} จากการประชุมก่อนหน้านี้",
       "analysisServerLarge": "กระบวนการวิเคราะห์เซิร์ฟเวอร์ {count} Dart กำลังใช้หน่วยความจำสูงสุดถึง {size}  การรีสตาร์ทจะปล่อยหน่วยความจำ",
@@ -876,12 +893,12 @@
     },
     "action": {
       "reclaim": "คืนค่า",
-      "restartAnalysisServer": "รีสตาร์ท",
+      "restartAnalysisServer": "Restart การเริ่มต้นใหม่",
       "setHeapCap": "ตั้งค่าขีดจำกัด",
       "unloadModel": "ยกเลิกการโหลด"
     },
     "heapCap": {
-      "promptWithRecommendation": "เพดาน heap ของเซิร์ฟเวอร์วิเคราะห์เป็น MB แนะนำสำหรับหน่วยความจำ {totalGb} ของเครื่องนี้: {recommendedMb} MB",
+      "promptWithRecommendation": "ขีดจำกัดขนาดหน่วยความจำของเซิร์ฟเวอร์การวิเคราะห์ในหน่วย MB แนะนำสำหรับเครื่องนี้ {totalGb}: {recommendedMb} MB",
       "invalid": "กรอกจำนวนเมกะไบต์ที่เป็นจำนวนเต็มและมากกว่า 0",
       "applied": "ตั้งค่าขนาดหน่วยความจำของเซิร์ฟเวอร์การวิเคราะห์เป็น {mb} MB ปิดและเปิดใหม่เซิร์ฟเวอร์การวิเคราะห์เพื่อให้การเปลี่ยนแปลงมีผล",
       "restartNow": "เริ่มต้นใหม่ตอนนี้"
@@ -912,7 +929,7 @@
     },
     "notification": {
       "shedDisabled": "ตรวจพบความดันหน่วยความจำของเครื่องมือวิเคราะห์ (RSS {rssMb} MB, ขีดจำกัดแบบอ่อน {softLimitMb} MB) ให้เปิดใช้งานการลดระดับกฎเพื่อปิดใช้งานกฎที่มีค่าใช้จ่ายสูงโดยอัตโนมัติเมื่อมีความดัน",
-      "enableButton": "เปิดใช้งาน",
+      "enableButton": "Enable enable เปิดให้ใช้ได้",
       "learnMoreButton": "เรียนรู้เพิ่มเติม Learn More",
       "runInit": "รัน 'dart run saropa_lints:init' เพื่อสร้าง analysis_options_custom.yaml จากนั้นตั้งค่า shed_rules: true",
       "enabledConfirmation": "กฎการตัดสินใจถูกเปิดใช้งานใน analysis_options_custom.yaml วิเคราะห์จะตรวจจับการเปลี่ยนแปลงในครั้งต่อไปที่โหลดใหม่"
@@ -977,12 +994,12 @@
     "groupBy": {
       "severity": "ความรุนแรง Severity",
       "file": "File รายการ",
-      "impact": "ผลกระทบ",
-      "rule": "กฎ",
+      "impact": "ผลการตรวจสอบ Impact",
+      "rule": "กฎหมาย สังกัด",
       "owasp": "OWASP",
       "ruleType": "รูปแบบกฎ กฎประเภท",
       "ruleStatus": "รูปแบบ Rule สถานะ",
-      "tier": "ระดับ",
+      "tier": "Tier 1 หลักทรัพย์",
       "pack": "แพ็ค (((s)"
     },
     "seg": {
@@ -993,18 +1010,18 @@
       "allMatched": "ทุกอย่างตรงกันหมดครับ",
       "ofTotal": "ของ {total} รวมทั้งหมด",
       "clearFiltersTitle": "คลิกเพื่อลบทุก filter",
-      "errorsLabel": "ข้อผิดพลาด",
+      "errorsLabel": "ความผิดพลาด Errors ข้อผิดพลาด",
       "errorsSubFix": "ต้องแก้ไขต้องแก้",
-      "errorsSubClear": "ไม่มี  ⁇  ชัดเจน",
-      "errorsTitle": "การกรองการพบความผิดพลาด (ต้องแก้ไข  ⁇  ทุบ / จะชน / ใช้ประโยชน์)",
+      "errorsSubClear": "ไม่มี — ชัดเจน",
+      "errorsTitle": "กรองการค้นพบข้อผิดพลาด (ต้องแก้ไข - ใช้งานไม่ได้ / จะขัดข้อง / สามารถหาประโยชน์ได้)",
       "warningsLabel": "คําเตือน การตักเตือน",
       "warningsSubBad": "อาจล้มเหลว หรือดูไม่ดี",
-      "warningsSubClear": "ไม่มี  ⁇  ชัดเจน",
+      "warningsSubClear": "ไม่มี — ชัดเจน",
       "warningsTitle": "การกรองการค้นพบเพื่อเตือน (อาจล้มเหลวหรือดูไม่ดี)",
-      "infoLabel": "ข้อมูล",
-      "infoSub": "FYI  ⁇  สไตล์ / ข้อเสนอแนะ",
-      "infoSubNone": "ไม่มี",
-      "infoTitle": "การกรองผลการค้นพบเพื่อให้มีข้อมูล (สําหรับความรู้ของคุณ:  ⁇  สไตล์และข้อเสนอแนะ)",
+      "infoLabel": "ข้อมูลข้อมูล ข้อมูล",
+      "infoSub": "FYI — สไตล์/ข้อเสนอแนะ",
+      "infoSubNone": "ไม่มีไม่มี ไม่มี",
+      "infoTitle": "กรองสิ่งที่ค้นพบเป็นข้อมูล (FYI — สไตล์และคำแนะนำ)",
       "filesLabel": "ไฟล์ที่ได้รับผลกระทบ",
       "filesSubAcross": "ทั่วทั้งการส่งออก การส่งออก",
       "filesSubNone": "ไม่มีไฟล์ใด ๆ ที่ได้รับผลกระทบ",
@@ -1030,7 +1047,7 @@
       "runAnalysisTitle": "วิ่ง Saropa Lints การวิเคราะห์การวิเคาระ",
       "severityGroupAria": "ฟิลเตอร์ความรุนแรง (Severity Filter)",
       "severityLabel": "ความรุนแรง Severity",
-      "moreSummary": "เพิ่มเติม",
+      "moreSummary": "More More มากยิ่งขึ้น",
       "moreChevron": "▾",
       "copyJsonTitle": "สําเนาความผิดที่กรองไว้เป็น JSON ({count})",
       "saveReportTitle": "เก็บการละเมิดที่กรองไว้เป็น JSON ไปยังรายงาน / YYYYMMDD /",
@@ -1071,13 +1088,13 @@
       "resetAllTitle": "กําหนดการรีเซ็ตทุกฟิลเตอร์"
     },
     "menuPalette": {
-      "help": "ช่วยเหลือ",
+      "help": "ช่วยเหลือ สนับสนุน",
       "groupBy": "กลุ่มโดย ... โดย...",
       "textFilter": "การกรองข้อความ ... สารวัด",
       "severityImpact": "ฟิลเตอร์ความรุนแรง ...",
       "hideRules": "ปิดกติกา...",
       "ruleMetadata": "กฎ Metadata ของข้อกําหนดการ",
-      "clearFilters": "ล้างตัวกรอง",
+      "clearFilters": "กรอง Clear Filters (กรองความสะอาด)",
       "clearSuppressions": "การยับยั้งที่ชัดเจน",
       "clearFileFocus": "Clear file focus ไฟล์โฟกัสชัดเจน",
       "matchActiveEditor": "คู่มือการแข่งขัน Active Editor",
@@ -1093,11 +1110,11 @@
       "reEnableNoneMessage": "ปัจจุบันไม่มีกฎใด ๆ ที่ถูกปิดการใช้งานผ่าน analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Re-enable disabled rules กฎกติกาที่ถูกปิดการใช้งาน",
       "reEnableQuickPickPlaceholder": "เลือกกฎหนึ่งหรือมากกว่ากฏที่จะเปิดใช้งานใหม่",
-      "menuGroupExport": "ส่งออก",
+      "menuGroupExport": "การส่งออก Export ส่งออก",
       "menuGroupBulk": "การดำเนินการแบบกลุ่ม",
       "menuGroupFilter": "การกรอง & โฟกัส",
       "menuGroupOpen": "เปิด Dashboard แล้วเปิด",
-      "menuGroupSystem": "ระบบ"
+      "menuGroupSystem": "ระบบ System System ระบบ"
     },
     "progress": {
       "runningLabel": "การวัดผลการวิเคราะห์ ...",
@@ -1107,17 +1124,17 @@
       "sectionAria": "กฎเกณฑ์สูงสุดตามจํานวน",
       "hideTitle": "ซ่อนสําหรับฉันเพียงระดับพื้นที่ทํางาน, สามารถกลับได้ผ่าน Clear Suppressions",
       "hideButton": "ซ่อนซ่อน หนี",
-      "disableTitle": "Disable for the whole project  ⁇  เขียน analysis_options_custom.yaml และทํางานการวิเคราะห์อีกครั้ง",
+      "disableTitle": "ปิดใช้งานสำหรับทั้งโปรเจ็กต์ — เขียน analysis_options_custom.yaml และดำเนินการวิเคราะห์อีกครั้ง",
       "disableButton": "Disable ปิดการใช้งาน",
       "workspaceOnlyShort": "เพียง workspace เท่านั้น",
       "projectConfigShort": "โครงการ config (เขียน analysis_options_custom.yaml)",
       "topRulesOne": "สูงสุด {count} กฎการปกครอง",
       "topRulesOther": "กฎ {count} ที่ดีที่สุด",
       "colRank": "#",
-      "colRule": "กฎ",
+      "colRule": "กฎหมาย สังกัด",
       "colCount": "นับนับ นับ นิยม",
       "colSeverity": "ความรุนแรง Severity",
-      "colActionsAria": "การดำเนินการของแถว",
+      "colActionsAria": "การกระทํา Row actions กิจกรรมแถว",
       "filesAffected": "ไฟล์ที่ได้รับผลกระทบ ({count})",
       "howToFixHeading": "วิธีแก้ไข",
       "owaspMobileLabel": "มือถือ",
@@ -1137,10 +1154,10 @@
       "selectAllTitle": "เลือกผลการค้นพบที่เห็นได้ทั้งหมด",
       "selectAllAria": "เลือกผลการค้นพบที่เห็นได้ทั้งหมด",
       "colSeverity": "ความรุนแรง Severity",
-      "colRule": "กฎ",
-      "colMessage": "ข้อความ",
-      "colLine": "บรรทัด",
-      "colActionsAria": "การดำเนินการของแถว",
+      "colRule": "กฎหมาย สังกัด",
+      "colMessage": "ข้อความข้อความ Message",
+      "colLine": "สาย เส้น เส้น",
+      "colActionsAria": "การกระทํา Row actions กิจกรรมแถว",
       "selectRowAria": "เลือกแถวการค้นหานี้",
       "copyRowTitle": "สําเนาการค้นพบนี้เป็น JSON",
       "suppressedBadge": "ยับยั้ง",
@@ -1153,47 +1170,47 @@
       "runAgain": "วิ่งการวิเคราะห์อีกครั้ง",
       "emptyNoViolations": "ไม่มีการละเมิดใน run การวิเคราะห์ล่าสุด.",
       "emptyNoMatch": "ไม่มีการละเมิดใด ๆ ที่ตรงกับกรองปัจจุบัน",
-      "emptyHintNoData": "เรียกใช้การวิเคราะห์เพื่อสร้าง `reports/.saropa_lints/violations.json` แล้วรีเฟรช",
+      "emptyHintNoData": "เรียกใช้การวิเคราะห์เพื่อเติมข้อมูล `reports/.saropa_lints/violations.json` จากนั้นรีเฟรช",
       "emptyHintFilters": "ปรับกรองหรือดําเนินการวิเคราะห์อีกครั้งเพื่อดูผลการค้นพบ",
-      "reRunAnalysis": "เรียกใช้การวิเคราะห์อีกครั้ง",
+      "reRunAnalysis": "การวิเคราะห์ Re-run Analysis (การทดลองใหม่)",
       "resetFilters": "การตั้งค่าฟิลเตอร์ Reset",
       "linePrefix": "L{line}"
     },
     "charts": {
       "sectionAria": "Mix chart ผสมการแสดงผล",
-      "heading": "สัดส่วน",
+      "heading": "Mix Mix ผสมกัน",
       "metaClickSlice": "คลิกชิ้นส่วนเพื่อกรอง",
       "severityMix": "การผสมความรุนแรง",
       "filterBarTitle": "การกรองที่ {key} เท่านั้น",
-      "donutTotal": "ทั้งหมด"
+      "donutTotal": "รายการรวมทั้งสิ้น"
     },
     "todoHack": {
       "sectionAria": "ทอดอส และ ฮัคซ์",
       "headingDisabled": "TODOs & HACKS โทโดส และ ฮักส์",
       "metaDisabled": "scan disabled การสแกนพิการ",
-      "scanOff": "การสแกนพื้นที่ทํางานถูกปิด  ⁇  สามารถที่จะใช้เครื่องหมายผิวจากไฟล์โครงการ",
-      "enableScan": "เปิดใช้งานการสแกน",
+      "scanOff": "การสแกนพื้นที่ทำงานปิดอยู่ — เปิดใช้งานเพื่อแสดงเครื่องหมายจากไฟล์โครงการ",
+      "enableScan": "Enable scan enable การสแกนเปิดใช้งาน",
       "heading": "TODOs & HACKS โทโดส และ ฮักส์",
       "subsectionNone": "{title}: ไม่มีในช่วงการสแกน",
       "capNote": "การสแกนถึงขีดจํากัดไฟล์ ดังนั้นบางไฟล์ถูกข้ามไป",
       "raiseCap": "เพิ่มขั้นต่ําการใช้งาน",
-      "notePill": "หมายเหตุ",
+      "notePill": "หมายเหตุ ข้อความข้อตกลง",
       "todosLabel": "TODOs ทอดอส",
       "hacksLabel": "HACKS ตะกอก"
     },
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "ปิดการเชื่อมต่อ",
+      "metaOff": "การรวมตัว off integration ออกจากการบูรณาการ",
       "enableBlurb": "เปิดให้ Drift Advisor รวมกับข้อมูลบนพื้นผิวจาก database ที่นี่",
-      "enable": "เปิดใช้งาน",
+      "enable": "Enable enable เปิดให้ใช้ได้",
       "headingNoServer": "Drift Advisor",
-      "metaNoServer": "ไม่มีเซิร์ฟเวอร์",
+      "metaNoServer": "ไม่มีเซอร์เวอร์ ไม่มีเซิร์ฟเวอร์",
       "noServerBlurb": "ไม่พบ Drift Advisor server บนพอร์ตที่กําหนดไว้",
       "retry": "Retry รีเทรนท์",
       "headingConnected": "Drift Advisor",
       "metaConnected": "สะดวกต่อเนื่อง",
-      "noIssues": "เชื่อมต่อกับ {label}  ⁇  ไม่มีปัญหาปัจจุบัน.",
+      "noIssues": "เชื่อมต่อกับ {label} แล้ว — ไม่มีปัญหาในปัจจุบัน",
       "refresh": "สะดวกสบาย Refresh",
       "openBrowser": "เปิดใน browser ใน Browser",
       "headingIssues": "Drift Advisor",
@@ -1210,8 +1227,8 @@
       "unsuppressTitle": "ลบการปิดกันเพื่อให้ผลการค้นหาปรากฏในสแกนปกติ",
       "unsuppressHint": "เพื่อเปิดการแจ้งเตือน {rule} ที่ {file}:{line} ให้ลบความคิดเห็น // ignore: ที่อยู่เหนือบรรทัดนั้น",
       "columnFile": "File รายการ",
-      "columnLine": "บรรทัด",
-      "columnRule": "กฎ",
+      "columnLine": "สาย เส้น เส้น",
+      "columnRule": "กฎหมาย สังกัด",
       "columnKind": "กฎที่เข้มงวด",
       "columnAction": "การกระทำ"
     },
@@ -1219,10 +1236,10 @@
       "sectionAria": "การกดความอ่อนแอ ความรู้สึก",
       "headingExport": "การลบ (การส่งออก)",
       "viewHidesHeading": "Issues view ซ่อนการดู",
-      "viewHidesMetaActive": "ใช้งานอยู่",
-      "viewHidesMetaNone": "ไม่มี",
+      "viewHidesMetaActive": "การทํางานที่มีความสามารถ Active",
+      "viewHidesMetaNone": "ไม่มีไม่มี ไม่มี",
       "noneInExport": "ไม่มีการกดตัววิเคราะห์ในปัจจุบัน `violations.json` ส่งออก. วิ่งการวิเคราะห์หลังจากแก้ไขไม่สนใจหรือเบสไลน์ที่จะประกอบ.",
-      "totalRow": "รวม  ⁇  ไฟล์ครีเออร์ใส และ เปิด พบ",
+      "totalRow": "รวม — ล้างตัวกรองและเปิดผลการสืบค้น",
       "byRule": "โดยกฎ ({count})",
       "byFile": "โดยไฟล์ ({count})",
       "noEntries": "ไม่มีรายการใดๆ",
@@ -1247,8 +1264,8 @@
       "announceStarted": "การวิเคราะห์เริ่มต้นการวิเคาระ",
       "announceComplete": "การวิเคราะห์ ครบถ้วน วิเคราะห ลงทะเบียน",
       "announceFailed": "การวิเคราะห์ล้มเหลว",
-      "removeRecentAria": "ลบ",
-      "removeRecentTitle": "ลบ",
+      "removeRecentAria": "Remove remove ถอดออก",
+      "removeRecentTitle": "Remove remove ถอดออก",
       "bulkSelectedTpl": "เลือกแล้ว {n} รายการ",
       "announceSearchVerb": "ค้นหา",
       "severitiesNoun": "ความรุนแรง",
@@ -1268,29 +1285,45 @@
     "unknownAnalyzerKind": "ไม่ทราบ ไม่ทราบ",
     "supplementary": {
       "scannerPromo": "เปิดให้ใช้งาน TODO / HACK สแกนเนอร์",
-      "tooltipScanner": "Saropa เครื่องสแกนระบบไฟล์  ⁇  นับเครื่องหมาย TODO/HACK ที่เปิดในแหล่ง",
+      "tooltipScanner": "เครื่องสแกนระบบไฟล์ Saropa — นับเครื่องหมาย TODO/HACK ที่เปิดอยู่ในแหล่งที่มา",
       "tooltipPromoClickToOn": "คลิกเพื่อเปิดใช้งาน enable"
+    }
+  },
+  "ruleExplain": {
+    "toggle": {
+      "disableButton": "ปิดกฎนี้",
+      "disableTitle": "ปิดกฎนี้สำหรับโครงการทั้งหมด — เขียน analysis_options_custom.yaml ให้รันการวิเคราะห์อีกครั้งเพื่อดูการเปลี่ยนแปลงที่มีผล",
+      "enableButton": "เปิดใช้งานกฎนี้อีกครั้ง",
+      "enableTitle": "เปิดใช้งานกฎนี้อีกครั้ง — ลบการกำหนดค่าทับใน analysis_options_custom.yaml ให้รันการวิเคราะห์อีกครั้งเพื่อดูการเปลี่ยนแปลงที่มีผล"
+    },
+    "noData": {
+      "heading": "ยังไม่ถูกกระตุ้น",
+      "body": "กฎนี้ยังไม่ได้ทำงานใด ๆ ในพื้นที่ทำงานของคุณเลย ดังนั้นจึงไม่มีปัญหาเฉพาะหรือวิธีแก้ไขที่จะแสดง ให้รันการวิเคราะห์เพื่อดูในบริบท หรือตรวจสอบชุดกฎของกฎนี้ด้านล่างเพื่อดูว่ามันมองหาอะไร",
+      "bodyDisabled": "กฎนี้ปัจจุบันถูกปิดใช้งาน ดังนั้นจึงไม่ปรากฏในผลการวิเคราะห์ ให้เปิดใช้งานมันข้างต้นแล้วรันการวิเคราะห์เพื่อดูว่ามันจับได้อะไร",
+      "tierLine": "รวมจาก tier: {tier}",
+      "packsLine": "กฎชุด: {packs}",
+      "packsOverflow": "กฎทั้งหมด: {packs} (+{count} มากขึ้น)"
     }
   },
   "triageDash": {
     "showInIssues": "แสดงในประเด็นต่างๆ",
     "disableRules": "Disable rules กฎการปิดใช้งาน",
     "enableRules": "กฎหมาย Enable (กฎให้เป็นไป)",
-    "issues": "ปัญหา",
+    "issues": "ปัญหาประเด็น Issues",
     "off": "ปิด",
-    "on": "เปิด",
-    "colRule": "กฎ",
-    "colIssues": "ปัญหา",
+    "on": "ในขณะที่ในขณะที่",
+    "colRule": "กฎหมาย สังกัด",
+    "colIssues": "ปัญหาประเด็น Issues",
     "zeroIssueRules": "{count} กฎที่ไม่มีปัญหา — เปิดใช้งานอัตโนมัติในระดับชั้น.",
     "disabledOverrides": "{count} กฎถูกปิดใช้งานโดยการลบล้างใน `analysis_options_custom.yaml`.",
     "summaryRuleTriage": "กฎการคัดเลือกกรอบ",
-    "hintNoViolations": "ยังไม่มี `reports/.saropa_lints/violations.json` เรียกใช้การวิเคราะห์ แล้วรีเฟรชแท็บนี้",
+    "hintNoViolations": "ยังไม่มี `reports/.saropa_lints/violations.json` เรียกใช้การวิเคราะห์ จากนั้นรีเฟรชแท็บนี้",
     "hintUnreadable": "ไม่มีการละเมิดที่อ่านได้ ส่งออก.ส่งออก. วิ่ง Saropa Lints การวิเคราะห์แรก.",
     "hintStale": "ข้อมูลการคัดเลือกอาจล้าสมัย (ส่งออกเป็น {age} เก่า). การวิเคราะห์การทํางานซ้ําสําหรับกลุ่มปัจจุบัน.",
     "hintNoPerRule": "การส่งออกนี้ไม่มีการนับจํานวนประกาศตามกฎหมาย วิเคราะห์ใหม่ด้วยโปรแกรม Saropa Lints ปัจจุบัน.",
     "hintBuildFailed": "ไม่สามารถสร้างการคัดเลือกจากสินค้าส่งออกนี้ได้ ทําการวิเคราะห์ใหม่ๆ",
     "summaryVolume": "การจัดลําดับกติกา (ปริมาณ / ต้องแก้ไข / สไตลิสติก)",
-    "hintSameAsTree": "การจัดกลุ่มเหมือนต้นไม้ Triage บน activity bar: กรอง Issues หรือปิด/เปิดกฎใน `analysis_options_custom.yaml` กลุ่มขนาดใหญ่อาจขอการยืนยัน"
+    "hintSameAsTree": "การจัดกลุ่มเดียวกันกับแผนผังแถบกิจกรรม Triage: กรองปัญหา หรือปิดใช้งาน/เปิดใช้งานกฎใน `analysis_options_custom.yaml` กลุ่มใหญ่อาจขอคำยืนยัน"
   },
   "kbdOverlay": {
     "toggleTitle": "แสดงทางลัดคีย์บอร์ด (?)",
@@ -1340,7 +1373,7 @@
         "scan": "สแกน",
         "display": "แสดง",
         "weights": "น้ำหนักคะแนน",
-        "upgrade": "อัปเกรด",
+        "upgrade": "อัพเกรดอัปเดรด Upgrade",
         "watch": "ดู",
         "budget": "งบประมาณ",
         "vuln": "ช่องโหว่"
@@ -1359,7 +1392,7 @@
       "flaggedCount": "ตั้งค่าสถานะ {count} รายการ",
       "flaggedTitle": "ทิ้งทิ้งหรือสิ้นอายุการใช้งาน",
       "lastScanLabel": "สแกน {when} ได้",
-      "lastScanTitle": "เมื่อข้อมูลดัชบอร์ดนี้ถูกนํามา  ⁇ {timestamp}. . . ผู้นําการเมือง คลิกเพื่อสแกนใหม่ และตรวจสอบการอัพเดทแพ็กเกจ",
+      "lastScanTitle": "เมื่อข้อมูลนี้ถูกดึงข้อมูล — {timestamp} คลิกเพื่อสแกนใหม่และตรวจสอบการอัปเดตแพ็กเกจ",
       "lastScanUnknown": "สแกน (เวลาไม่ทราบ)",
       "lastScanUnknownTitle": "การสแกนนี้ทํางานก่อนหน้าที่ดัชบอร์ดจะติดตามตราเวลา. คลิกเพื่อสแกนใหม่ และตรวจสอบการอัพเดทแพ็กเกจ"
     },
@@ -1387,20 +1420,20 @@
       "gradeTooltip": "เกรดโครงการ {avgGrade}\nคะแนนเฉลี่ย: {avgScore}/100\nแพ็คเกจ: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "สร้างความสดชื่น",
       "stableTitle": "สถานะ ราคาคงที่",
-      "outdatedTitle": "ล้าสมัย",
+      "outdatedTitle": "อายุเกินกว่าเดิม Outdated",
       "abandonedTitle": "ทิ้งทิ้ง ถูกทอดทิ้ง",
       "eolTitle": "การสิ้นสุดชีวิตของผู้ป่วย",
-      "updates": "การอัปเดต",
-      "unused": "ไม่ได้ใช้",
-      "singleUse": "ใช้ครั้งเดียว",
+      "updates": "อัพเดทอัปเดต Updates การปรับปรุง",
+      "unused": "ไม่ใช้งาน ยังไม่ถูกนํามาใช้",
+      "singleUse": "การใช้งานครั้งเดียว ใช้เพียงครั้งเดียว",
       "vulnerable": "แรงเปราะบาง (Vulnerable)",
-      "overrides": "การแทนที่",
+      "overrides": "การยกเลิกการใช้งาน Overrides",
       "caveatLine1": "* ขนาดโค้ดที่แสดง (lib + declared assets) โดยจะกลับไปที่ขนาดอาร์คิฟ pub.dev เมื่อไม่มีรุ่นโค้ตให้เลือก ไม่รวม dev_dependencies (build_runner, lints, saropa_lints ฯลฯ) พวกเขาไม่เคยส่งไปยัง APK / IPA / web bundle. ขนาด app ที่แท้จริงจะเล็กกว่าหลังจากการสั่นต้นไม้",
       "caveatLine2": "ขีดขั้นตอนการดําเนินงาน: 90d = หมดอายุ, 180d = หงาย (กําหนดเวลาในการทํา + การปล่อย).",
       "upgradeTitle": "ต้องอัปเกรด"
     },
     "breakdown": {
-      "title": "ทําไมคะแนน {grade}?  ⁇  {avgScore}/100 ค่าเฉลี่ยในแพ็คเกจของ {pkgCount}",
+      "title": "ทำไมต้องเกรด {grade}? — เฉลี่ย {avgScore}/100 จากแพ็คเกจ {pkgCount}",
       "hint": "คลิกเพื่อขยาย ขยาย",
       "distributionHeading": "การกระจายสินค้า Distribution",
       "signalsHeading": "สัญญาณความเสี่ยง ลากคะแนนลง",
@@ -1409,10 +1442,10 @@
       "signalUpdates": "{count} มีอัพเดทที่พร้อมใช้งาน",
       "bottomHeading": "แพ็คเกจที่มีคะแนนต่ําสุด",
       "thresholdsHeading": "วิธีการที่คะแนนจะโยงไปยังเกรด",
-      "thresholdA": "70+  ⁇  มีชีวิตชีวา: รักษารักษาอย่างเป็นกิจกรรม, พิมพ์ล่าสุด",
-      "thresholdB": "40 ⁇ 69  ⁇  สถานะ: ยังคงรักษาอยู่ แต่ช้าลง",
-      "thresholdC": "20 ⁇ 39  ⁇  เก่าแก่: มีช่องว่างที่นานระหว่างการปล่อย",
-      "thresholdE": "ต่ํากว่า 20  ⁇  ทิ้งทิ้ง: สัญญาณของการไม่ทํางาน",
+      "thresholdA": "70+ — มีชีวิตชีวา: ได้รับการดูแลอย่างแข็งขัน เผยแพร่เมื่อเร็วๆ นี้",
+      "thresholdB": "40–69 — เสถียร: ยังคงรักษาไว้แต่ชะลอตัว",
+      "thresholdC": "20–39 — ล้าสมัย: มีช่องว่างยาวระหว่างการเปิดตัว",
+      "thresholdE": "ต่ำกว่า 20 — ถูกทอดทิ้ง: สัญญาณของการไม่ใช้งาน",
       "thresholdF": "หยุดการดําเนินงานหรือเก็บอาร์คิฟในวันที่ pub.dev (คะแนนไม่ใช้)",
       "filterTooltip": "สกรองตารางแพ็กเกจให้เพียงประเภทนี้",
       "jumpTooltip": "กระโดดไปยัง {name} ในตารางแพ็คเก็จ"
@@ -1422,7 +1455,7 @@
     },
     "sections": {
       "sizeDistribution": "ขนาด การกระจายตัวขนาด",
-      "sizeDistributionCaption": "ไม่รวม dev_dependencies  ⁇  พวกเขาไม่เคยส่งไปยัง APK / IPA / web bundle.",
+      "sizeDistributionCaption": "ไม่รวม dev_dependencies — โดยจะไม่จัดส่งไปยัง APK / IPA / web Bundle",
       "filters": "ฟิลเตอร์ สกรอง",
       "packages": "แพ็คเกจ Packages สินค้า"
     },
@@ -1430,16 +1463,16 @@
       "openPubspecTitle": "เปิด pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "สําเนารายงาน JSON (ทุกแถว + รายละเอียด)",
-      "copyAllLabel": "คัดลอก",
+      "copyAllLabel": "สําเนาสําเนา Copy",
       "copyOpportunitiesTitle": "สําเนาข้อความการอัพเกรด AI สําหรับแพ็คเก็จที่ได้รับการรับรองสูงสุดในหนึ่งป้ายพีสต์",
       "copyOpportunitiesLabel": "การเลียนแบบโอกาสสําหรับ AI",
       "saveAllTitle": "เก็บรายงาน JSON เป็น รายงาน / YYYYMMDD / ...",
-      "saveAllLabel": "บันทึก",
+      "saveAllLabel": "Save Save การรักษา",
       "saveUpgradeTitle": "เก็บรายงานของแพ็คเกจเท่านั้น พร้อมกับการอัพเดทที่พร้อมสําหรับรายงาน/YYY YMMDD/...",
       "saveUpgradeLabel": "เก็บรายงานการอัพเกรด Save Upgrade Report",
       "resetViewTitle": "กําหนดฟิลเตอร์ใหม่, เรียงลําดับ และบันทึกภาพแสดงสถานะ",
       "resetViewLabel": "การดูการรีเซ็ต view reset",
-      "rescanTitle": "Rescan แพคเกจ  ⁇  ทําความสะอาด pub.dev cache และนํารุ่นมาใหม่",
+      "rescanTitle": "สแกนแพ็คเกจอีกครั้ง — ล้างแคช pub.dev และดึงข้อมูลเวอร์ชันอีกครั้ง",
       "rescanLabel": "Rescan รีสแกน",
       "openOtherTitle": "เปิดโครงการของ pubspec.yaml อีกรายในหน้าต่างใหม่สําหรับสแกน Vibrancy",
       "openOtherLabel": "โครงการเปิด ...",
@@ -1447,20 +1480,20 @@
       "footprintGroupTitle": "สิ่งที่คอลัมน์ Size แสดง: ขนาดโค้ดของตัวเองเท่านั้น บวกค่าผ่านเฉพาะ (ราคาถ้าถอดออก) หรือบวกค่าข้ามทั้งหมด (เทอริตี้สูงสุด). กลับไปที่ขนาดอาร์คิฟเมื่อไม่สามารถใช้งาน Code Size ได้",
       "footprintLabel": "รอยเท้า: Footprint",
       "footprintOwnTitle": "ขนาดโค้ดของตัวเองเท่านั้น (lib + declared assets) กลับมาเป็นขนาด pub.dev เมื่อไม่มีข้อมูล",
-      "footprintOwn": "ของตัวเอง",
+      "footprintOwn": "Own Own เจ้าของตัวเอง",
       "footprintUniqueTitle": "ขนาดของตัวเอง + ทรานซิทฟี ที่ใช้โดยสํานักงานนี้เท่านั้น (ประหยัดถ้าคุณลบมัน)",
       "footprintUnique": "+ เอกลักษณ์พิเศษ",
       "footprintTotalTitle": "ขนาดของตนเอง + ทรัพยากรผ่านทั้งหมด รวมถึงทรัพย์สินที่แบ่งปันกับหน่วยงานอื่น ๆ",
-      "footprintTotal": "+ ทั้งหมด",
+      "footprintTotal": "+ ทั้งหมด + ทุกคน",
       "searchLabel": "แพ็คเกจค้นหา ค้นหา",
       "searchPlaceholder": "ค้นหาแพ็คเกจ ...",
-      "clearSearchTitle": "ล้างการค้นหา",
-      "clearSearchAria": "ล้างการค้นหา",
+      "clearSearchTitle": "คลิก Clear Search เพื่อค้นหา",
+      "clearSearchAria": "คลิก Clear Search เพื่อค้นหา",
       "ageFilterTitle": "สกรองตามอายุการตีพิมพ์ ปรับปรุง",
       "publishedAgeLabel": "อายุที่ตีพิมพ์",
-      "ageMaxAll": "ทั้งหมด",
+      "ageMaxAll": "ทั้งหมด ทุกอย่าง",
       "presetFilterTitle": "ใช้การตั้งค่ากรองที่กําหนดไว apply quick filter presets",
-      "presetLabel": "ค่าที่ตั้งไว้ล่วงหน้า",
+      "presetLabel": "Preset ปรับปรุงก่อน",
       "presetNone": "ไม่มี ไม่ มี",
       "presetModernization": "การปรับปรุงใหม่ (Modernization)",
       "presetRiskHotspots": "จุดร้อนของความเสี่ยง (risk hotspots)",
@@ -1473,8 +1506,8 @@
     },
     "columns": {
       "name": {
-        "label": "แพ็กเกจ",
-        "tooltip": "ชื่อแพ็คเกจ  ⁇  คลิกเพื่อเปิด pubspec.yaml ข้อความ"
+        "label": "แพ็คเกจ Package สินค้า",
+        "tooltip": "ชื่อแพ็คเกจ — คลิกเพื่อเปิดรายการ pubspec.yaml"
       },
       "version": {
         "label": "Version ฉบับฉบับ",
@@ -1482,43 +1515,43 @@
       },
       "score": {
         "label": "ประเภท Category หมวดหมู่",
-        "tooltip": "การจัดลําดับความสดชื่นและคะแนนสุขภาพ (0 ⁇ 10)"
+        "tooltip": "การจำแนกความสั่นสะเทือนและคะแนนสุขภาพ (0–10)"
       },
       "published": {
         "label": "พิมพ์ ออกไป ประกาศ",
         "tooltip": "วันที่เวอร์ชั่นติดตั้งถูกตีพิมพ์ เป็น pub.dev"
       },
       "activity": {
-        "label": "กิจกรรม",
+        "label": "กิจกรรม Activity การดําเนินงาน",
         "tooltip": "คะแนนกิจกรรมการเขียนโค้ดและปล่อยจาก commit + publish recency"
       },
       "likes": {
         "label": "ชอบชอบ ความนิยม",
-        "tooltip": "pub.dev likes  ⁇  คลิกเพื่อเปิดหน้าคะแนนแพ็คเก็ต"
+        "tooltip": "ไลค์ pub.dev — คลิกเพื่อเปิดหน้าคะแนนแพ็คเกจ"
       },
       "downloads": {
         "label": "การดาวน์โหลด",
-        "tooltip": "pub.dev การดาวน์โหลดใน 30 วันที่ผ่านมา  ⁇  คลิกเพื่อเปิดหน้าคะแนนแพ็คเกจ"
+        "tooltip": "ดาวน์โหลด pub.dev ในช่วง 30 วันที่ผ่านมา — คลิกเพื่อเปิดหน้าคะแนนแพ็คเกจ"
       },
       "issues": {
-        "label": "ปัญหา",
+        "label": "ปัญหาประเด็น Issues",
         "tooltip": "เปิดประเด็น GitHub (ไม่รวมการขอถอนเมื่อมี)"
       },
       "prs": {
-        "label": "PR",
+        "label": "PRs สายการค้า",
         "tooltip": "เปิด GitHub pull request การเรียกใช้งาน"
       },
       "size": {
-        "label": "ขนาด",
+        "label": "ขนาด Size หน่วยงาน",
         "tooltip": "ขนาดโค้ด (lib + declared assets); กลับไปที่ขนาด pub.dev ของอาร์คิฟเมื่อไม่สามารถหาขนาดโค้ตได้"
       },
       "deps": {
-        "label": "Deps",
-        "tooltip": "การพึ่งพาทางแปรเปลี่ยนโดยตรง  ⁇  แบ่งปัน deps ส่อง"
+        "label": "Deps เดปส์ ดีพี",
+        "tooltip": "การพึ่งพาสกรรมกริยาโดยตรง - ไฮไลต์ deps ที่ใช้ร่วมกัน"
       },
       "files": {
-        "label": "การอ้างอิง",
-        "tooltip": "จํานวนไฟล์ที่มา ที่นําเข้าแพ็กเกจนี้  ⁇  คลิกเพื่อค้นหา"
+        "label": "อ้างอิง References ข้อความอ้างอี้",
+        "tooltip": "จำนวนไฟล์ต้นฉบับที่นำเข้าแพ็คเกจนี้ — คลิกเพื่อค้นหา"
       },
       "transitives": {
         "label": "Transitive ทรานซิทวิฟส์",
@@ -1533,7 +1566,7 @@
         "tooltip": "SPDX ตัวชี้ใบอนุญาตจาก pub.dev"
       },
       "update": {
-        "label": "อัปเดต",
+        "label": "Update อัพเดทอัปเดต",
         "tooltip": "การอัพเดทเวอร์ชั่นที่มีอยู่: หลัก, น้อยหรือแพตช์"
       },
       "opportunities": {
@@ -1551,8 +1584,8 @@
     },
     "cells": {
       "noGithub": "ไม่พบคลัง GitHub",
-      "devBadge": "dev",
-      "transitiveBadge": "ทรานซิทีฟ",
+      "devBadge": "dev dev dev หนังสือ",
+      "transitiveBadge": "ทันติ (transitive) เป็นการเปลี่ยนแปลง",
       "opportunitiesTooltip": "คุณสมบัติที่ไม่ได้ใช้: ไม่ใช้นักพนัน {features} การตรวจสอบ",
       "publishDateUnavailable": "วันที่ตีพิมพ์ไม่พร้อมจาก pub.dev",
       "activityGradeUnavailable": "ระดับกิจกรรมไม่พร้อมใช้งาน (ข้อมูลการ commit หรือ release หายไป)",
@@ -1564,7 +1597,7 @@
       "sizeUnavailable": "ขนาดไม่พร้อมจาก pub.dev",
       "noVulnerabilities": "ไม่มีความเปราะบางทางการทํางานที่รู้จัก",
       "licenseUnspecified": "ใบอนุญาตที่ไม่ได้กําหนดไว้ใน pub.dev",
-      "unusedBadge": "ไม่ได้ใช้",
+      "unusedBadge": "ไม่ใช้งาน ยังไม่ถูกนํามาใช้",
       "packageInUse": "แพ็คเกจกําลังใช้งาน"
     },
     "row": {
@@ -1608,7 +1641,7 @@
     "references": {
       "noImports": "ไม่พบข้อมูลการนําเข้าจาก source file",
       "reExportLine": "{location} (การส่งออกใหม่)",
-      "publicApiSurface": "Public API surface  ⁇  อย่างน้อยการใช้งานหนึ่งคือ การส่งออกใหม่",
+      "publicApiSurface": "พื้นที่ API สาธารณะ — มีอย่างน้อยหนึ่งการใช้งานที่เป็นการนำออกใหม่",
       "reExportedBadge": "นําออกใหม่นํากลับ",
       "openFileReferences": "เปิดอ้างอิงไฟล์ Open File"
     },
@@ -1633,21 +1666,21 @@
     },
     "detail": {
       "codeCommitActivity": "กฎหมาย Commit กิจกรรม",
-      "releaseActivity": "กิจกรรมการปล่อยเวอร์ชัน",
+      "releaseActivity": "กิจกรรมการปล่อย Release Activity การปล่อย",
       "dormancySignal": "สัญญาณ Dormancy การนอนหลับ",
-      "ago": "{age} เมื่อ หลาย วัน ที่ ผ่าน มา",
+      "ago": "{age} ครั้งก่อน",
       "qualityExample": "+ตัวอย่าง ตัวอย่าง",
       "qualityExampleTitle": "ส่งร่อง Demo ที่สามารถใช้ได้",
       "qualityTests": "+ทดสอบ ทดลอง",
       "qualityTestsTitle": "ส่งชุดทดสอบแบบซุઇટ",
-      "qualityTools": "+เครื่องมือ",
+      "qualityTools": "+เครื่องมือ tools เครื่องมือ",
       "qualityToolsTitle": "เครื่องมือบํารุงรักษาเรือ - อุปกรณ์งาน",
       "qualityDocs": "+docs เอกสาร",
       "qualityDocsTitle": "เรือขยายเอกสารการจัดส่ง",
       "healthScore": "Health Score คะแนนสุขภาพ",
       "resolutionVelocity": "ความเร็วการแก้ไข Resolution Velocity",
       "engagementLevel": "ระดับการรับผิดชอบ (Engagement Level)",
-      "popularity": "ความนิยม",
+      "popularity": "ความนิยม Popularity ความนิ ยม",
       "publisherTrust": "ผู้ประกาศ Trust Trust"
     }
   },
@@ -1664,12 +1697,12 @@
     "search": {
       "placeholder": "ชื่อค้นหา, คําอธิบาย หรือ ID การสั่งการ...",
       "ariaLabel": "คําสั่งค้นหา สั่งใช้",
-      "clearAria": "ล้างการค้นหา",
+      "clearAria": "คลิก Clear Search เพื่อค้นหา",
       "hintLine1": "ตรงกับคําสั่งของแต่ละคอมมานด์",
       "hintStrongTitle": "ชื่อ: หมวดหมู่",
       "hintStrongDesc": "คําอธิบาย Description รายละเอียด",
-      "hintStrongId": "id",
-      "hintLine2": "(ตัวกระทู้ id มีช่องว่างเกินไป  ⁇  ประเภท",
+      "hintStrongId": "id id id ทดลองเล่น",
+      "hintLine2": "(โทเค็น ID มีการเว้นระยะห่างด้วย — type",
       "hintLine2kbd": "Run Analysis การวิเคราะห์การวิ่ง",
       "hintLine2End": "โดยไม่มีจุด)"
     },
@@ -1684,7 +1717,7 @@
       "listAria": "การค้นหาล่าสุด"
     },
     "filterChips": {
-      "ariaRegion": "ตัวกรองที่ใช้อยู่",
+      "ariaRegion": "การกรอง Active Filter ที่ใช้ได้",
       "activeLabel": "การกรองที่ทํางาน: Active Filter",
       "clearAll": "เคลียร์ทุกที่"
     },
@@ -1701,7 +1734,7 @@
     },
     "entry": {
       "internalBadgeTitle": "กระตุ้นจากเมนูประโยคเท่านั้น",
-      "internalBadge": "เมนู",
+      "internalBadge": "เมนูเมนู menu",
       "copyTitle": "สําเนาไอดีคําสั่ง ({id})",
       "copyAria": "สําเนา command id ของคําสั่ง"
     },
@@ -1717,8 +1750,8 @@
     "script": {
       "moreSuffix": "+{count} มากขึ้น",
       "showLess": "แสดงน้อยกว่า Show less",
-      "runSingular": " ครั้ง",
-      "runPlural": " ครั้ง",
+      "runSingular": "วิ่งวิ่งวัด",
+      "runPlural": "รีวิว วิ่ง วิ่ง",
       "recentWord": "ล่าสุด ล่า ๆ",
       "expandAll": "ขยายทั้งหมด Expand all",
       "collapseAll": "พังหมดไปหมด",
@@ -1740,7 +1773,7 @@
       "launching": "การเปิดตัวสแกนเนอร์ ...",
       "collect": "การค้นพบไฟล์ ...",
       "firstRunHint": "การทํางานครั้งแรกจะรวบรวมสแกนเนอร์; โครงการใหญ่ใช้เวลาสักพักก่อนที่ไฟล์จะปรากฏ.",
-      "paused": "หยุดชั่วคราว",
+      "paused": "หยุดพัก / Paused สงบ",
       "stopped": "สแกนหยุดสก๊านแล้ว",
       "elapsed": "ผ่านไป สิ้นสุด",
       "phase": {
@@ -1752,7 +1785,7 @@
       },
       "counter": {
         "files": "ไฟล์ไฟล์ File",
-        "functions": "ฟังก์ชัน",
+        "functions": "การทํางาน Functions ฟังก์ชัน",
         "problems": "ปัญหาที่พบ ปัญหาการค้นหา"
       },
       "counters": {
@@ -1764,7 +1797,7 @@
       "btn": {
         "pause": "Pause หยุดพัก",
         "resume": "Resume เรียนต่อ",
-        "restart": "รีสตาร์ท",
+        "restart": "Restart การเริ่มต้นใหม่",
         "cancel": "ยกเลิก Cancel เลิก"
       },
       "preview": {
@@ -1772,7 +1805,7 @@
         "empty": "ยังไม่พบปัญหาอะไรเลย ..."
       },
       "version": {
-        "engine": "เอนจิน",
+        "engine": "เครื่องยนต์ Engine Engine มอเตอร์",
         "detecting": "การตรวจจับ ...",
         "legacy": "มรดก — ไม่มีความคืบหน้าสด (saropa_lints ของโปรเจ็กต์นี้มีมาก่อน)"
       }
@@ -1791,7 +1824,7 @@
       "gatesPassing": "ประตูผ่านไป ผ่านมา"
     },
     "gate": {
-      "fallback": "ประตูคุณภาพล้มเหลว  ⁇  การทบทวนขอบเขตในการตั้งค่า Code Health.",
+      "fallback": "ประตูคุณภาพล้มเหลว — ตรวจสอบเกณฑ์ในการตั้งค่าความสมบูรณ์ของโค้ด",
       "failingOne": "{count} เกตล้มเหลว — ตรวจสอบเกณฑ์ หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations.",
       "failingOther": "{count} เกตล้มเหลว — ตรวจสอบเกณฑ์ หรือคัดลอก JSON เพื่อตรวจสอบ gates.violations.",
       "openSettingsTitle": "เปิด Code Health settings เพื่อปรับขีดขั้นต่ํา",
@@ -1799,10 +1832,10 @@
     },
     "kpi": {
       "ariaLabel": "รหัส สรุปสุขภาพ",
-      "allClear": "ไม่มีฟังก์ชันที่ติดป้ายกํากับในทุกประเภท  ⁇  สะอาดทั้งหมด.",
+      "allClear": "ไม่มีฟังก์ชันที่ถูกตั้งค่าสถานะในทุกหมวดหมู่ — ทั้งหมดชัดเจน",
       "clickToFilter": "คลิกเพื่อกรองตารางไปยังฟังก์ชันที่ติดป้าย {flag}.",
       "noFlagged": "ไม่มีฟังก์ชันที่ติดป้าย {flag}.",
-      "unused": "ไม่ได้ใช้",
+      "unused": "ไม่ใช้งาน ยังไม่ถูกนํามาใช้",
       "unusedSub": "ฟังก์ชันที่ไม่ได้อ้างอิงในที่ไหน",
       "uncovered": "เปิดเผยไม่ปิดบัง",
       "uncoveredSub": "ไม่มีการครอบคลุม LCOV",
@@ -1810,7 +1843,7 @@
       "stubTestedSub": "การทดสอบมีอยู่ แต่ยืนยันน้อย",
       "suspiciousCoverage": "รายงานข่าวน่าสงสัย",
       "suspiciousCoverageSub": "รายงานการคุ้มครอง ดูเหมือนถูกสร้างขึ้น",
-      "testDrift": "ความคลาดเคลื่อนของการทดสอบ",
+      "testDrift": "การทดสอบ drift drift ทดลอง",
       "testDriftSub": "การทดสอบ lag ฟังก์ชันการทํางาน"
     },
     "toolbar": {
@@ -1828,12 +1861,12 @@
     "table": {
       "ariaLabel": "งานที่แย่ที่สุดตามคะแนน",
       "heading": "การทํางานที่แย่ที่สุด",
-      "colScore": "คะแนน",
-      "colFunction": "ฟังก์ชัน",
+      "colScore": "สกอร์คะแนน ผลบอล",
+      "colFunction": "Function การทํางาน Function งาน",
       "colFile": "File รายการ",
-      "colLine": "บรรทัด",
-      "colUsage": "การใช้งาน",
-      "colCoverage": "ความครอบคลุม",
+      "colLine": "สาย เส้น เส้น",
+      "colUsage": "การใช้งาน Usage Usage",
+      "colCoverage": "Coverage coverage การครอบคลุม",
       "colComplexity": "ความซับซ้อน ความยุ่งยาก",
       "colFlags": "ฟันธง ธง",
       "noMatch": "ไม่มีฟังก์ชันใด ๆ ที่ตรงกับกรองปัจจุบัน",
@@ -1842,13 +1875,13 @@
       "expanderAriaCollapsed": "แสดงรายละเอียดประเด็น Show issue details",
       "expanderAriaExpanded": "Hide issue details ซ่อนรายละเอียดประเด็น",
       "detailHeading": "ทําไมฟังก์ชันนี้ได้คะแนน {score}",
-      "detailNoIssues": "ไม่มีธงในแถวนี้  ⁇  คะแนนถูกผลักดันโดยค่าคอลัมน์ด้านบน (การใช้งาน, การครอบคลุม, ความซับซ้อน, อายุ, เอกสาร)",
+      "detailNoIssues": "ไม่มีแฟล็กในแถวนี้ — คะแนนขับเคลื่อนโดยค่าคอลัมน์ด้านบน (การใช้งาน ความครอบคลุม ความซับซ้อน อายุ เอกสารประกอบ)",
       "suppressLabel": "Suppress ในไฟล์",
       "suppressTooltip": "เขียน `// ignore_for_file: code_health:<flag>` เข้าไปในไฟล์นี้ เพื่อให้การสแกนภายหลังจะทิ้งฟันธงนี้สําหรับไฟล์ทั้งหมด"
     },
     "flag": {
       "unused": {
-        "label": "ไม่ได้ใช้",
+        "label": "ไม่ใช้งาน ยังไม่ถูกนํามาใช้",
         "evidence": "0 ผู้โทร",
         "rule": "ตราที่แสดงเมื่อไม่มีไฟล์อื่นอ้างอิง function name นี้."
       },
@@ -1858,7 +1891,7 @@
         "rule": "ตราที่ระบุเมื่อ LCOV รายงาน 0% การครอบคลุมสาย."
       },
       "complex": {
-        "label": "ซับซ้อน",
+        "label": "สถานที่ทับซ้อน ที่มีความยุ่งยาก",
         "evidence": "CC {cc} _ สายการบิน",
         "rule": "มีเครื่องหมายเมื่อความซับซ้อนของ cyclomatic มากกว่า 10"
       },
@@ -1868,7 +1901,7 @@
         "rule": "ตราเมื่อฟังก์ชันที่ซับซ้อน (CC > 10) ไม่มีการอธิบาย doc."
       },
       "test_drift": {
-        "label": "ความคลาดเคลื่อนของการทดสอบ",
+        "label": "การทดสอบ drift test ทดลองการลอย",
         "evidence": "การทดสอบ lag ฟังก์ชันการทํางาน",
         "rule": "ตราเมื่อไฟล์ทดสอบที่เชื่อมโยงใหม่ที่สุดมีอายุมากกว่า ไฟล์แหล่งของฟังก์ชัน"
       },
@@ -1883,7 +1916,7 @@
         "rule": "ตราประกอบเมื่อ LCOV รายงานความครอบคลุมสูง แต่ไม่มีการทดสอบอ้างอิงฟังก์ชัน"
       },
       "fresh_code": {
-        "label": "โค้ดใหม่",
+        "label": "รหัสใหม่ fresh code ครับ",
         "evidence": "CC {cc}, ปรับเขียนใหม่ล่าสุด",
         "rule": "มีเครื่องหมายเมื่อความซับซ้อนของ cyclomatic มากกว่า 10 และร่างหน้าที่ถูกเขียนหรือเขียนใหม่ภายใน 90 วันที่ผ่านมา. รหัสซับซ้อนที่เขียนใหม่ล่าสุดทําให้เกิดอุบัติเหตุบ่อยขึ้นมาก กว่ารหัสเก่าในการตรวจสอบความถูกต้อง"
       }
@@ -1919,9 +1952,9 @@
       "subtitle": "กำลังสแกนขนาดโปรเจ็กต์ ความซับซ้อน และฮอตสปอต...",
       "elapsed": "ผ่านไป สิ้นสุด",
       "cancel": "ยกเลิก Cancel เลิก",
-      "restart": "รีสตาร์ท",
+      "restart": "Restart การเริ่มต้นใหม่",
       "stopped": "หยุดแล้ว",
-      "logHeading": "กิจกรรม",
+      "logHeading": "กิจกรรม Activity การดําเนินงาน",
       "logEmpty": "ยังไม่มีผลลัพธ์ — บันทึกนี้จะถูกเติมข้อมูลเฉพาะเมื่อการสแกนพิมพ์ข้อความวินิจฉัย",
       "progress": "{percent}% — {done}/{total} ไฟล์"
     },
@@ -1965,15 +1998,15 @@
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "คุณภาพ_ประตู:\n  เงื่อนไข:\n    - ตัวชี้วัด: new_critical_issues\n      สหกรณ์: เทียบเท่า\n      ค่า: 0\n      on_fail: ล้มเหลว",
-        "save": "บันทึก",
+        "save": "Save Save การรักษา",
         "saved": "บันทึกแล้ว",
         "saveError": "ไม่สามารถบันทึกได้"
       },
       "colFile": "File รายการ",
-      "colLineNum": "บรรทัด",
-      "colRule": "กฎ",
+      "colLineNum": "สาย เส้น เส้น",
+      "colRule": "กฎหมาย สังกัด",
       "colSeverity": "ความรุนแรง Severity",
-      "colMessage": "ข้อความ",
+      "colMessage": "ข้อความข้อความ Message",
       "colKey": "คีย์"
     },
     "shortcuts": {
@@ -1983,11 +2016,11 @@
     "hero": {
       "files": "ไฟล์ไฟล์ File",
       "lines": "บรรทัด",
-      "size": "ขนาด"
+      "size": "ขนาด Size หน่วยงาน"
     }
   },
   "suppressionsStrip": {
-    "noData": "No violations.json yet  ⁇  รีบวินิจฉัยเพื่อเติมภาพถ่ายการกด.",
+    "noData": "ยังไม่มี violations.json อยู่ — ให้รันการวิเคราะห์เพื่อเติมเต็มการถ่ายภาพการปิดบัง",
     "zeroTotal": "0 การยับยั้งเครื่องวิเคราะห์ในการส่งออกล่าสุด.",
     "noKindBreakdown": "ไม่มีการแบ่งแยกตามประเภทในการส่งออกนี้",
     "title": "การลบ (การส่งออก)",
@@ -2021,8 +2054,8 @@
     "countersHeading": "เครื่องนับเหตุการณ์ Event Counter",
     "thEvent": "การจัดงาน Event",
     "thCount": "นับนับ นับ นิยม",
-    "emptyMessage": "ยังไม่มีเหตุการณ์ telemetry ที่บันทึกไว้เลย  ⁇  เปิดกฎจาก Findings Dashboard เพื่อเริ่มจับตัวเลข",
-    "openFindingsTitle": "เปิด Saropa Findings Dashboard. _ พบการค้นพบของ PH0__",
+    "emptyMessage": "ยังไม่มีการบันทึกเหตุการณ์การวัดและส่งข้อมูลทางไกล — เปิดกฎจากแดชบอร์ดผลการสืบค้นเพื่อเริ่มการจับตัวนับ",
+    "openFindingsTitle": "เปิดแดชบอร์ดผลการสืบค้นของ Saropa",
     "openFindings": "เปิดผลการค้นพบ Dashboard",
     "lastPropsHeading": "คุณสมบัติของเหตุการณ์ล่าสุด",
     "copiedJson": "Saropa Lints: สําเนากฎที่เกี่ยวข้องกับการวัดระยะไกล JSON.",
@@ -2036,7 +2069,7 @@
     "issueOne": "{count} ปัญหา",
     "issueOther": "{count} ปัญหา",
     "noIssues": "ไม่มีประเด็นใดๆ",
-    "showIssues": "แสดงปัญหา",
+    "showIssues": "แสดงปัญหา Show issues ส่งรายการ",
     "violationTooltip": "การละเมิด {count} รายการใน {ruleCount} กฎ คลิกเพื่อแสดงในปัญหา",
     "noViolationsTooltip": "ไม่มีการละเมิดที่พิมพ์ไปยังหมวดหมู่นี้."
   },
@@ -2055,17 +2088,17 @@
         "pubPoints": "ปับ พบ จุด",
         "githubStars": "GitHub ดาวดาวดวง",
         "openIssues": "Open Issues ปัญหาที่เปิด",
-        "codeSize": "ขนาดโค้ด",
+        "codeSize": "ขนาดโค้ด Code Size ขนาดรหัส",
         "bloatRating": "อัตราการประเมิน Bloat",
         "license": "ใบอนุญาต License",
-        "platforms": "แพลตฟอร์ม",
+        "platforms": "แพลตฟอร์ม Platforms เว็บไซต์",
         "inThisProject": "ในโครงการนี้ In This Project"
       },
       "value": {
-        "unverified": "⁇  (ไม่ถูกตรวจสอบ)",
-        "allPlatforms": "ทั้งหมด",
-        "yes": "ใช่",
-        "no": "ไม่"
+        "unverified": "— (ยังไม่ได้รับการยืนยัน)",
+        "allPlatforms": "ทั้งหมด ทุกอย่าง",
+        "yes": "ใช่ครับ ครับ จริงๆ",
+        "no": "ไม่ๆๆๆ ครับ"
       },
       "badge": {
         "inProject": "ในโครงการ In Project"
@@ -2116,9 +2149,11 @@
   "debug": {
     "section": {
       "engines": "เครื่องมือวินิจฉัย",
+      "enginesRecommendation": "แนะนำ: เซิร์ฟเวอร์ LSP เปิด (ค่าเริ่มต้น ตัวเบต้า), ตรวจหาข้อผิดพลาดเมื่อบันทึกเปิด, วิเคราะห์แบบเรียลไทม์ปิด (เซิร์ฟเวอร์ LSP ครอบคลุมการวิเคราะห์แบบเรียลไทม์แล้ว; หากเปิดทั้งสองจะแสดงข้อผิดพลาดซ้ำ), ตั้งค่า GitHub ให้ CI เปิดเพียงเมื่อคุณต้องการให้การรีวิวโค้ดผ่านการตรวจสอบอัตโนมัติ ถ้ากฎใดกฎหนึ่งหยุดทำงานภายใต้ LSP ให้เปิดวิเคราะห์แบบเรียลไทม์และปิดเซิร์ฟเวอร์ LSP",
       "log": "บันทึก"
     },
     "engine": {
+      "master": "Saropa Lints",
       "analyzerPlugin": "การวิเคราะห์แบบเรียลไทม์",
       "scanDaemon": "สแกนเมื่อบันทึก",
       "lspServer": "เซิร์ฟเวอร์ LSP",
@@ -2127,77 +2162,97 @@
       "rss": "RSS:",
       "statusLabel": "สถานะ:",
       "statusValue": {
-        "active": "ใช้งานอยู่",
+        "active": "การทํางานที่มีความสามารถ Active",
         "idle": "ว่าง",
         "running": "กำลังทำงาน",
         "stopped": "หยุด",
         "suspended": "หยุดใช้งาน",
         "starting": "เริ่มต้น",
         "scanning": "การสแกน",
-        "notConfigured": "ยังไม่ได้กำหนดค่า"
+        "notConfigured": "ไม่ได้กำหนดค่า"
       },
       "rssNote": {
         "inProcess": "ในกระบวนการเดียวกัน ไม่สามารถวัดแยกได้",
         "notRunning": "ไม่ได้รัน",
-        "remote": "ทำงานบนรันเนอร์ที่โฮสต์โดย GitHub — ไม่สามารถวัดได้จากที่นี่"
+        "remote": "ทำงานบน runners ที่ GitHub โฮสต์ — ไม่สามารถวัดได้จากที่นี่"
       },
+      "masterOffHint": "เปิดสวิตช์หลักก่อน",
       "description": {
+        "master": "สวิตช์ระดับตัวขยาย (การตั้งค่า saropaLints.enabled ของงาน) เมื่อปิด ระบบจะหยุดการสแกนเมื่อบันทึก และแถบข้างจะรายงานว่าตัวขยายถูกปิด ระบบวิเคราะห์แบบเรียลไทม์และเซิร์ฟเวอร์ LSP มีสวิตช์เปิด-ปิดของตนเอง",
         "analyzerPlugin": "ทำงานภายในเซิร์ฟเวอร์การวิเคราะห์ Dart — ลายเส้นสดๆ ในโปรแกรมแก้ไขขณะที่คุณพิมพ์ ไม่จำเป็นต้องสแกน การสลับจะเขียนปลั๊กอินใหม่: บล็อกใน analysis_options.yaml",
         "scanDaemon": "กระบวนการเบื้องหลังที่สแกนซ้ำทั้งโปรเจ็กต์ในการบันทึกและเขียนรายงาน/.saropa_lints/violations.json การสลับปิดจะเป็นการระงับ; บันทึกถัดไปจะดำเนินการต่อ",
         "lspServer": "เซิร์ฟเวอร์ภาษาแยกต่างหาก — เผยแพร่การวินิจฉัยไปยังแผงปัญหาสำหรับไฟล์เปิดและพื้นที่ทำงาน การสลับจะเขียนการตั้งค่า saropaLints.lspServer.enabled",
-        "ci": "อ่านและเขียนไฟล์ .github/workflows/saropa-lints.yml ในทรีการทำงานของคุณ เพื่อเปิดหรือปิดใช้งานเวิร์กโฟลว์ GitHub Actions ที่มาพร้อมกัน ซึ่งสะท้อนไฟล์ในสาขาปัจจุบันของคุณ — สำเนาในสาขาเริ่มต้นต่างหากที่ควบคุมพูลรีเควสต์จริง และทั้งสองอาจแตกต่างกันได้ การสลับจะไม่รันหรือลบเวิร์กโฟลว์เลย คุณยังคงต้องตรวจสอบและคอมมิตการเปลี่ยนแปลงด้วยตนเอง"
+        "ci": "อ่านและเขียนไฟล์ .github/workflows/saropa-lints.yml ในต้นไม้การทำงานของคุณเพื่อเปิดหรือปิดการทำงานของ Actions ที่รวมอยู่ใน GitHub ไฟล์นี้สะท้อนไฟล์ในสาขาปัจจุบันของคุณ — ไฟล์สำเนาของสาขาเริ่มต้นคือสิ่งที่ควบคุมการขอรับคำขอเปลี่ยนแปลงจริง และทั้งสองสามารถแยกกันได้ ไม่มีการรันหรือลบการทำงานเมื่อคุณสลับสวิตช์ คุณยังคงต้องตรวจสอบและบันทึกการเปลี่ยนแปลงด้วยตนเอง"
+      },
+      "recommended": {
+        "analyzerPlugin": "แนะนำ: ปิดขณะที่ LSP Server เปิดอยู่ ให้เปิด (พร้อมที่ LSP ปิด) หากกฎใดๆ หยุดทำงานภายใต้ LSP",
+        "scanDaemon": "แนะนำ: เปิดใช้งาน",
+        "lspServer": "แนะนำ: เปิด (ค่าเริ่มต้น ตัวเบต้า) ครอบคลุมการวินิจฉัยแบบเรียลไทม์",
+        "ci": "แนะนำ: เปิดเฉพาะหากคุณต้องการให้การรีวิวโค้ดผ่านการตรวจสอบคุณภาพ"
       },
       "scanProgress": "สแกน: {done}/{total} ไฟล์",
-      "ci": "GitHub Actions CI"
+      "ci": "GitHub งาน Actions CI"
     },
     "toggle": {
       "on": "บน",
       "off": "ปิด"
     },
     "action": {
-      "killAll": "ลบออกทั้งหมด",
-      "restartAll": "รีสตาร์ททั้งหมด",
+      "killAll": "ลบ {name} ทั้งหมด",
+      "restartAll": "รีสตาร์ท {name}",
       "killAllDescription": "บังคับหยุดเซิร์ฟเวอร์ LSP เท่านั้น ปลั๊กอินตัววิเคราะห์และการสแกน Daemon ยังไม่ถูกฆ่าแยกกัน — ใช้สวิตช์เปิด/ปิดของเครื่องยนต์แต่ละตัวแทน",
       "restartAllDescription": "หยุดและเปิดเซิร์ฟเวอร์ LSP อีกครั้ง (หรือเริ่มทำงานหากไม่ได้ทำงานอยู่) ปลั๊กอินตัววิเคราะห์และการสแกน Daemon จะไม่ได้รับผลกระทบ — ใช้ปุ่มเปิด/ปิดของเครื่องยนต์แต่ละตัวแทน"
     },
     "log": {
       "empty": "ยังไม่มีการบันทึกข้อมูลล็อก",
+      "masterToggleOn": "สวิตช์หลัก: กำลังเปิดใช้งาน…",
+      "masterToggleOff": "สวิตช์หลัก: ปิดการทำงาน...",
       "killAll": "หยุดทุกตัว: หยุดการทำงานของเครื่องมือทั้งหมดที่ควบคุมได้",
       "restartAll": "เริ่มต้นซ้ำทั้งหมด: เริ่มต้นซ้ำเครื่องยนต์ที่ควบคุมได้ทั้งหมด",
       "lspToggleOn": "เซิร์ฟเวอร์ LSP: การเปิดใช้งาน...",
       "lspToggleOff": "เซิร์ฟเวอร์ LSP: กำลังปิดใช้งาน…",
       "lspStarted": "เซิร์ฟเวอร์ LSP: เริ่มทำงานแล้ว",
+      "lspDisabledPrompt": "เซิร์ฟเวอร์ LSP ถูกปิดในตั้งค่า (saropaLints.lspServer.enabled) ให้เปิดใช้งานและเริ่มต้นใช้งาน?",
+      "lspEnableButton": "Enable enable เปิดให้ใช้ได้",
       "lspStopped": "เซิร์ฟเวอร์ LSP: หยุดทำงานแล้ว",
+      "lspStartFailed": "เซิร์ฟเวอร์ LSP: ล้มเหลวในการเริ่มต้น (ดูข้อความข้อผิดพลาดและช่องทางเอาต์พุต LSP Saropa Lints)",
       "analyzerToggleOn": "ปลั๊กอินวิเคราะห์: กำลังเปิดใช้งาน…",
       "analyzerToggleOff": "ปลั๊กอินวิเคราะห์: ปิดการทำงาน…",
       "daemonToggleOn": "สแกน Daemon: กลับมาดำเนินการต่อ...",
       "daemonToggleOff": "สแกน Daemon: กำลังระงับ…",
-      "ciToggleOn": "CI: กำลังเปิดใช้งาน…",
-      "ciToggleOff": "CI: กำลังปิดใช้งาน…"
+      "ciToggleOn": "CI: การเปิดใช้งาน…",
+      "ciToggleOff": "CI: ปิดการทำงาน..."
+    },
+    "master": {
+      "updateFailed": "ไม่สามารถเปลี่ยนสวิตช์หลักได้: {error}",
+      "overridden": "การตั้งค่า saropaLints.enabled ระดับโฟลเดอร์จะขัดแย้งกับสวิตช์นี้ โปรดเปลี่ยนแปลงใน settings.json ของโฟลเดอร์"
     },
     "sidebar": {
       "enginesLabel": "เครื่องยนต์: {count} กำลังทำงาน"
     },
     "ci": {
-      "disableFailed": "ปิด CI ไม่ได้: ไม่พบ {path} หรือมีโครงสร้างที่ Saropa Lints จะไม่แก้ไขให้อัตโนมัติ CI ยังทำงานอยู่ เปิดไฟล์แล้วปิดใช้งาน workflow ด้วยตนเอง",
+      "disableFailed": "ไม่สามารถปิด CI ได้: {path} ขาดหรือมีโครงสร้าง Saropa Lints จะไม่สามารถแก้ไขอัตโนมัติ ซีไอยังคงทำงานอยู่ ให้เปิดไฟล์แล้วปิด workflow ด้วยตนเอง",
       "openWorkflow": "เปิด workflow",
       "openWorkflowFailed": "เปิด {path} ไม่ได้",
-      "publish.commandsLabel": "คำสั่ง",
-      "publish.copied": "คัดลอกคำสั่งไปยังคลิปบอร์ดแล้ว",
-      "publish.copy": "คัดลอก",
-      "publish.createPr": "สร้างสาขา คอมมิต พุช และเปิด pull request",
-      "publish.created": "เปิด pull request สำหรับ {branch} แล้ว",
-      "publish.failed": "{command} ล้มเหลว จึงไม่มีอะไรถูกพุช {details}",
-      "publish.heading": "เผยแพร่การเปลี่ยนแปลงนี้",
-      "publish.introDisable": "{path} ถูกแก้ไขใน working tree ของคุณเพื่อระงับทุกงาน CI ยังคงทำงานต่อไปจนกว่าการเปลี่ยนแปลงนี้จะไปถึง {base} คำสั่งเหล่านี้จะวางการเปลี่ยนแปลงไว้บนสาขาใหม่ชื่อ {branch} และเปิด pull request — คุณรันเองได้ หรือกดปุ่มแล้ว Saropa Lints จะรันคำสั่งเหล่านี้ตามที่แสดงทุกประการ หากต้องการหยุด CI ทันที ให้ปิดใช้งาน workflow จากแท็บ Actions ของรีโพซิทอรี",
-      "publish.introEnable": "{path} ถูกเขียนลงใน working tree ของคุณแล้ว จะไม่มีอะไรทำงานใน CI จนกว่าจะไปถึง {base} คำสั่งเหล่านี้จะวางไฟล์ไว้บนสาขาใหม่ชื่อ {branch} และเปิด pull request เพื่อตรวจสอบ — คุณรันเองได้ หรือกดปุ่มแล้ว Saropa Lints จะรันคำสั่งเหล่านี้ตามที่แสดงทุกประการ",
-      "publish.noGitHubRemote": "รีโมต origin ของรีโพซิทอรีนี้ไม่ใช่ GitHub จึงไม่สามารถเปิด pull request ให้คุณได้ ให้รันคำสั่งด้านบนแล้วเปิดด้วยวิธีที่โฮสต์ของคุณรองรับ",
-      "publish.notARepository": "เขียน {path} แล้ว แต่โฟลเดอร์นี้ไม่ใช่รีโพซิทอรี git จึงไม่มีที่ให้เผยแพร่",
-      "publish.notNow": "ไม่ใช่ตอนนี้",
-      "publish.openCompare": "เปิดหน้าเปรียบเทียบ",
-      "publish.openPr": "เปิด pull request",
-      "publish.pushedNoPr": "พุช {branch} แล้ว แต่ไม่สามารถเปิด pull request ให้อัตโนมัติได้ — เปิดจากหน้าเปรียบเทียบ",
-      "publish.running": "กำลังสร้างสาขาและพุช…"
+      "publish": {
+        "heading": "เผยแพร่การเปลี่ยนแปลงนี้",
+        "introEnable": "{path} ได้ถูกเขียนในต้นไม้การทำงานของคุณแล้ว ไม่มีอะไรจะทำงานใน CI จนกว่ามันจะอยู่ใน {base} คำสั่งเหล่านี้จะวางมันบนกิ่งใหม่ที่เรียกว่า {branch} และเปิดคำขอตรวจสอบ (pull request) สำหรับการรีวิว — ให้คุณรันเอง หรือกดปุ่มแล้ว Saropa Lints จะรันคำสั่งเหล่านี้อย่างแน่นอน",
+        "introDisable": "{path} ได้รับการแก้ไขในต้นไม้การทำงานของคุณเพื่อหยุดการทำงานของทุกงาน ระบบ CI จะยังคงทำงานต่อไปจนกว่าจะถึง {base} คำสั่งเหล่านี้จะนำการเปลี่ยนแปลงไปไว้บนสาขาใหม่ที่เรียกว่า {branch} และเปิดการร้องขอการรวม (pull request) — คุณสามารถรันคำสั่งเหล่านี้เอง หรือกดปุ่มแล้ว Saropa Lints จะรันคำสั่งเหล่านี้โดยตรง เพื่อหยุดระบบ CI ทันที ให้ปิดการทำงานจากแท็บ Actions ของคลังต้นฉบับ",
+        "commandsLabel": "สั่งสั่งการ Commands",
+        "copy": "สําเนาสําเนา Copy",
+        "copied": "คำสั่งที่คัดลอกไปยังเครื่องมือคัดลอกข้อมูล",
+        "createPr": "สร้าง branch, commit, push และเปิด pull request",
+        "notNow": "ไม่ตอนนี้",
+        "noGitHubRemote": "การเชื่อมต่อจากแหล่งที่มาของคลังข้อมูลนี้ไม่ใช่ GitHub ดังนั้นจึงไม่สามารถเปิดคำขอการดึงข้อมูล (pull request) สำหรับคุณได้ ให้รันคำสั่งข้างต้นแล้วเปิดมันด้วยวิธีที่โฮสต์ของคุณกำหนดไว้",
+        "running": "กำลังสร้างสาขาและอัปโหลด...",
+        "failed": "{command} ล้มเหลว ดังนั้นจึงไม่มีการอัปโหลดใด ๆ ไป {details}",
+        "pushedNoPr": "บันทึก {branch} ไม่สามารถเปิดคำขอการดึงข้อมูลอัตโนมัติได้ — เปิดจากหน้าเปรียบเทียบแทน",
+        "openCompare": "เปิดหน้าเปรียบเทียบ",
+        "created": "เปิด Pull request สำหรับ {branch}",
+        "openPr": "เปิด pull request",
+        "notARepository": "{path} ถูกเขียน แต่โฟลเดอร์นี้ไม่ใช่การจัดการระบบ Git ดังนั้นจึงไม่มีอะไรที่จะเผยแพร่",
+        "pubspecHasOtherEdits": "pubspec.yaml ได้มีการแก้ไขที่ยังไม่ได้บันทึกของคุณแล้ว ในการบันทึก (commit) จะรวมไฟล์ทั้งหมด ดังนั้นการเผยแพร่จากที่นี่จะส่งการแก้ไขเหล่านั้นไปด้วย ให้คุณบันทึกหรือเก็บไว้ก่อน แล้วจึงดำเนินการตามคำสั่งข้างต้นเอง"
+      }
     }
   },
   "detailView": {
@@ -2206,25 +2261,25 @@
     },
     "section": {
       "version": "VERSION การออกแบบ",
-      "update": "อัปเดต",
+      "update": "อัพเดท UPDATE การอัปเดต",
       "suggestion": "การเสนอแนะ SUGGESTION",
       "community": "สมาคม ชุมชน",
       "dependencies": "การติดตามการใช้งาน",
       "alerts": "การเตือน Alert",
-      "platforms": "แพลตฟอร์ม",
-      "directDeps": "การพึ่งพาโดยตรง",
+      "platforms": "แพลตฟอร์ม (Platforms) การใช้งาน",
+      "directDeps": "การฝากเงินโดยตรง (Direct Deposits)",
       "readmeImages": "README IMAGES ภาพถ่ายจากหนังสือ"
     },
     "version": {
       "published": "ประกาศโดย: {date}",
-      "codeSize": "ขนาดโค้ด",
-      "archive": "ที่เก็บถาวร",
+      "codeSize": "ขนาดโค้ด Code Size ขนาดรหัส",
+      "archive": "อาร์คิฟอาริเวท Archives",
       "sizeLabel": "{label}: {size}",
       "source": "ที่มา: รหัส {code} · ความคิดเห็น {comments} · ไฟล์ {files}",
       "replace": "เปลี่ยน: {summary}"
     },
     "update": {
-      "upgrade": "อัปเกรด",
+      "upgrade": "อัพเกรดอัปเดรด Upgrade",
       "changelog": "Changelog รายการเปลี่ยนแปลง",
       "blockedBy": "ป้องกันโดย {package}"
     },
@@ -2259,7 +2314,7 @@
       "sharedList": "แบ่งปัน: {names}"
     },
     "platforms": {
-      "wasm": "WASM"
+      "wasm": "WASM (วิสม) เป็นการใช้"
     },
     "links": {
       "viewFullDetails": "ดูรายละเอียดเต็ม ภาพรวม",
@@ -2267,11 +2322,11 @@
       "documentation": "การเอกสาร หลักฐาน",
       "changelog": "Changelog รายการเปลี่ยนแปลง",
       "repository": "รวมข้อมูล Repository",
-      "issues": "ปัญหา",
+      "issues": "ปัญหาประเด็น Issues",
       "reportIssue": "รายงาน เรื่องประเด็น"
     },
     "logoAlt": "{packageName} โลโก้",
-    "readMore": "เพิ่มเติม",
+    "readMore": "มากกว่า>หวย หุ้น",
     "readmeImageAlt": "README รูปภาพของ Readme"
   },
   "chart": {
@@ -2287,7 +2342,7 @@
       "sharedTransitives": "การแบ่งปันทรานซิติฟ ({count})"
     },
     "noun": {
-      "package": "แพ็กเกจ",
+      "package": "แพ็คเกจ Package package ซองประกอบด้วย",
       "packages": "สินค้าของแพ็คเกจ"
     }
   },
@@ -2297,7 +2352,7 @@
     },
     "enableRule": {
       "done": "กฎที่เปิดใช้งาน {ruleId}. การใช้การวิเคราะห์ Re-Run",
-      "runAnalysis": "เรียกใช้การวิเคราะห์",
+      "runAnalysis": "วิ่งวิเคราะห์ Run Analysis การวัด",
       "noWorkspace": "เปิดโฟลเดอร์ workspace เพื่อเปิดใช้งานกฎ"
     },
     "openFinding": {
@@ -2314,12 +2369,12 @@
     "nudge": {
       "message": "โครงการนี้ใช้ Drift Advisor. ติดตั้ง Saropa Log Capture Extension เพื่อให้ SQL ที่ใช้ในช่วงเวลาทํางานสอดคล้องกับผลการค้นหาแบบสถิตเหล่านี้",
       "install": "ติดตั้ง Log Capture การบันทึกข้อมูล",
-      "dismiss": "ปิด"
+      "dismiss": "ขอยกเลิกการทํางาน"
     },
     "driftRecommend": {
       "message": "เซอร์เวอร์ Drift Advisor ถูกเชื่อมต่อ ติดตั้งการเพิ่ม Saropa Drift Advisor ที่เป็นตัวเดียว เพื่อให้ประสบการณ์ที่เต็มรูปแบบของ Problems-panel.",
       "install": "ติดตั้ง Drift Advisor ครับ",
-      "dismiss": "ปิด"
+      "dismiss": "ขอยกเลิกการทํางาน"
     }
   },
   "notify": {
@@ -2333,10 +2388,10 @@
       "proceedUpgrades": "ขั้นตอนต่อเนื่องกับ {count} การปรับปรุง (((s)? ขั้นตอนที่ล้มเหลวถอยกลับ และแผนการดําเนินต่อไป",
       "actionExecute": "ทํางาน Execute ประหาร",
       "actionCancel": "ยกเลิก Cancel เลิก",
-      "upgradeStopped": "การอัพเกรดหยุดใน {failedAt}  ⁇ {completed}/{total} จบการทําแล้วเสร็จ",
+      "upgradeStopped": "อัปเกรดหยุดที่ {failedAt} — {completed}/{total} ถูกดำเนินการแล้ว",
       "upgradeAllComplete": "การปรับปรุง {count} ทั้งหมดเสร็จสิ้นสําเร็จ",
       "notPubspec": "ไฟล์ที่เลือกไม่ใช่ pubspec.yaml.",
-      "suppressedPackage": "ปิด \"{package}\"  ⁇ การวินิจฉัยจะถูกซ่อนไว้",
+      "suppressedPackage": "ยับยั้ง \"{package}\" — ข้อความแจ้งเตือนจะถูกซ่อน",
       "noPackagesToSuppress": "ไม่มีแพ็คเกจที่จะกดขวาง",
       "suppressedCount": "ปกปิด {count} แพ็คเกจ (s)",
       "noUnhealthyToSuppress": "ไม่มีการบรรจุที่ไม่ดีต่อสุขภาพที่จะกดขวาง",
@@ -2361,15 +2416,15 @@
     },
     "main": {
       "brandPrefix": "Saropa Lints: {message}",
-      "regressionErrors": "{count} ความผิดพลาด{suffix}  ⁇ view.view. ภาพที่เห็น",
-      "regressionScoreDipped": "คะแนนตกต่ํากว่า {threshold}  ⁇ view issues.ดูประเด็นต่างๆ.",
+      "regressionErrors": "{count} ข้อผิดพลาด{suffix} — ดู",
+      "regressionScoreDipped": "คะแนนลดลงต่ำกว่า {threshold} — ดูปัญหา",
       "actionViewViolations": "View Violations การละเมิดความเห็น",
       "noErrors": "Saropa Lints: เป็นการประกอบของ ไม่มีความผิดพลาด!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: เป็นการประกอบของ ไม่มีโฟลเดอร์ workspace ที่เปิดอยู่ เปิดโครงการ Dart/Flutter ของคุณก่อน",
       "lintIntegrationOffCannotAnalyze": "Saropa Lints: การสแกนเมื่อบันทึกถูกปิด ให้เปิดใช้งานก่อนเริ่มการวิเคราะห์",
       "pluginAlive": "Saropa Lints ยังมีชีวิตอยู่: {rules} กฎเปิดใช้งาน, {files} ไฟล์วิเคราะห์.",
       "openPubspecFailed": "ไม่สามารถเปิด pubspec.yaml: {message} การตรวจสอบ",
-      "toggleSidebarSectionFailed": "Saropa Lints: เป็นการตรวจหา ไม่สามารถเปลี่ยนส่วน Sidebar ได้  ⁇ {message} การตรวจสอบ",
+      "toggleSidebarSectionFailed": "Saropa Lints: ล้มเหลวในการสลับส่วนของ Sidebar — {message}",
       "openWorkspaceFirst": "เปิดโฟลเดอร์ workspace ก่อน",
       "createInstructionsDone": "สร้าง .cursor/rules/saropa_lints_instructions.mdc สําหรับเอเยนต์ AI.",
       "createInstructionsFailed": "ไม่สามารถสร้าง Saropa Lints คําสั่ง: {message} การตรวจสอบ",
@@ -2380,15 +2435,20 @@
       "noWorkspaceOpen": "ไม่มีโฟลเดอร์ workspace เปิดอยู่ครับ",
       "noAnalysisReport": "Saropa Lints: เป็นการประกอบของ no analysis report found under reports/. ไม่มีรายงานการวิเคราะห์ที่พบภายใต้ รายงาน /. วิ่ง \"Saropa Lints: Run Analysis\" ก่อนครับ",
       "copiedReport": "สําเนา {name} ไปยัง clipboard.",
-      "readReportFailed": "Saropa Lints: เป็นการตรวจหา ไม่อ่านรายงาน  ⁇ {message} การตรวจสอบ",
-      "openReportFailed": "Saropa Lints: เป็นการตรวจหา ไม่สามารถเปิดรายงานได้  ⁇ {message} การตรวจสอบ",
+      "readReportFailed": "Saropa Lints: ไม่สามารถอ่านรายงานได้ — {message}",
+      "openReportFailed": "Saropa Lints: ไม่สามารถเปิดรายงานได้ — {message}",
       "noAnalysisData": "ไม่มีข้อมูลการวิเคราะห์ วิ่งวิเคราะห์ก่อน.",
       "actionDisable": "Disable ปิดการใช้งาน",
-      "actionEnable": "เปิดใช้งาน",
+      "actionEnable": "Enable enable เปิดให้ใช้ได้",
       "bulkRuleToggleConfirm": "{verb} {count} กฎกติกา? การอัพเดท analysis_options_custom.yaml.",
       "setupPrompt": "Saropa Lints พบโปรเจกต์ Dart ที่ไม่มี saropa_lints ตั้งค่า ตั้งค่าทันทีเพื่อกฎการตรวจสอบ 2300+ ข้อ",
       "actionSetUpProject": "ตั้งโครงการ Set Up Project จัดทําโครต",
-      "actionNotNow": "ไม่ใช่ตอนนี้"
+      "actionNotNow": "ไม่ตอนนี้ ไม่ใช่ ตอนนี้"
+    },
+    "lsp": {
+      "noWorkspaceFolder": "Saropa Lints: ไม่สามารถเริ่มต้นเซิร์ฟเวอร์ LSP ได้เนื่องจากไม่มีโฟลเดอร์งานที่เปิดอยู่",
+      "startFailed": "Saropa Lints: เซิร์ฟเวอร์ LSP ล้มเหลวในการเริ่มต้น {reason}",
+      "settingWriteFailed": "Saropa Lints: ไม่สามารถบันทึกการตั้งค่าเซิร์ฟเวอร์ LSP ได้ {reason}"
     },
     "setup": {
       "requiresDartProject": "Saropa Lints ต้องการโครงการ Dart หรือ Flutter (ไม่พบ pubspec.yaml)",
@@ -2406,12 +2466,12 @@
       "reenabledPlugin": "Saropa Lints ปลั๊กอินในกระบวนการถูกเปิดใช้งานอีกครั้ง กำลังเริ่มต้น Dart เซิร์ฟเวอร์การวิเคราะห์เพื่อโหลดมันใหม่",
       "reenableNothingToRestore": "Saropa Lints: ไม่มีอะไรให้กู้คืน ปลั๊กอินที่ทำงานในกระบวนการไม่ได้ถูกปิดใช้งานผ่านการขยายในขณะนี้",
       "noOpenDartFiles": "Saropa Lints: เป็นการประกอบของ ไม่พบไฟล์ Dart เปิด เปิดไฟล์ Dart อีกครั้ง หรือปิดการตั้งค่า \"เปิดเฉพาะบรรณาธิการ\"",
-      "configUpdated": "Saropa Lints config อัพเดทแล้ว (ชั้น: ระดับที่ 1 {tier}).การใช้งานของ PH0__",
+      "configUpdated": "Saropa Lints ได้รับการอัปเดต (tier: {tier})",
       "configWriteFailed": "Config write ไม่สําเร็จ {details} การเขียนการตั้งค่า",
       "scaffoldGateTitle": "พลัคนีวิเคราะห์ Composite Analyzer แพล็กกิน สะพานกาง",
       "scaffoldGateDetail": "การเขียน Dart แพ็กเกจใหม่ภายใต้พื้นที่ทํางานของคุณ (pubspec.yaml, lib/main.dart, README): one custom_lint plugin ที่บันทึก Saropa และทิ้ง Hooks สําหรับกฎของคุณเอง\n\nใช้เพียงเมื่อคุณส่งกฎการวิเคราะห์ตามสั่งร่วมกับ Saropa. โครงการ Saropa เท่านั้น สามารถข้ามมันได้ โดยที่ตัววิเคราะห์จะอนุญาตให้ plugin เข้ามาเพียงครั้งเดียวต่อ context.\n\nต่อไป:การพนันออนไลน์ เลือกโฟลเดอร์ที่เกี่ยวข้องกับพื้นที่ทํางาน ถ้าโฟลเดอร์นั้นมีอยู่แล้ว จะถูกถามก่อนที่จะเขียนมันไป",
       "actionContinue": "ต่อไปต่อมาต่อต่อไป",
-      "actionOpenGuide": "เปิดคู่มือ",
+      "actionOpenGuide": "เปิด Open Guide คู่มือ",
       "scaffoldPathOutsideWorkspace": "ทางเดินของ Scaffold ต้องอยู่ในโฟลเดอร์ workspace.",
       "scaffoldFolderExists": "โฟลเดอร์มีอยู่แล้ว: {folder}. . . ผู้นําการเมือง ไฟล์สามารถเพิ่มหรือเขียนบนมันได้ ต่อไป?",
       "scaffoldCreated": "การสร้างโครงการ Composite plugin scaffold ได้ถูกทําขึ้นแล้ว เปิดสร้างหลัก dart",
@@ -2429,7 +2489,7 @@
       "pickerTitle": "Saropa Lints: ตั้งค่าช่องทางการวิเคราะห์",
       "pickerPlaceholder": "ปัจจุบัน: {lane}",
       "lightLabel": "แสง (ค่าเริ่มต้น)",
-      "lightDescription": "กฎที่เข้มงวด:\n1. คืนเฉพาะข้อความที่แปลเพียงอย่างเดียว\n2. ห้ามใส่คำอธิบาย บทนำ หรือสัญลักษณ์ markdown และไม่ใช้เครื่องหมายคำพูดรอบข้อความ\n3. ข้อความอาจมีโทเคนสำหรับแทนที่: โทเคนสำหรับแทนที่ คัดลอกแต่ละตัวเข้าไปในการแปลแบบตรงตัว ตามตำแหน่งทางไวยากรณ์ที่ถูกต้อง ห้ามแปล ลบ หรือปรับรูปแบบโทเคน\n4. สำคัญมาก: ตัวอักษรทุกตัวในผลลัพธ์ต้องเป็นตัวอักษรไทย แปลคำทุกคำเป็นภาษาไทย — ห้ามเหลือหรือแทนที่คำใด ๆ ด้วยตัวอักษรละติน ไทย อารบิก เซอริลลิก เกาหลี ญี่ปุ่น หรืออักษรใด ๆ ทั้งหมด ตัวอักษร ตัวเลข เครื่องหมายวรรคตอน และโทเคนสำหรับแทนที่เป็นเพียงข้อยกเว้นเดียว",
+      "lightDescription": "กฎที่เข้มงวด:\n1. คืนค่าเฉพาะข้อความที่แปลเท่านั้น",
       "lightDetail": "สิ่งอื่นทั้งหมดจะมาถึงหลังจากไม่กี่วินาที บนการบันทึกผ่าน daemon ในการสแกน ความจำใกล้ระดับฐาน: +0.6% RSS วัดจากโปรเจกต์ขนาดใหญ่ แนะนำสำหรับโปรเจกต์ส่วนใหญ่",
       "fullLabel": "เต็ม",
       "fullDescription": "กฎทุกข้อที่เปิดใช้งานจะทำงานในตัวแก้ไขโค้ด",
@@ -2448,7 +2508,7 @@
       "actionKeepPluginOn": "รักษาปลั๊กอินไว้"
     },
     "commands": {
-      "crossFileCommandFailed": "Saropa Lints {title} ไม่สําเร็จ: การทําความผิดพลาด {message} การรักษาโรค",
+      "crossFileCommandFailed": "Saropa Lints {title} ล้มเหลว: {message}",
       "crossFileGraphExportFailed": "Saropa Lints กราฟ การส่งออกล้มเหลว: {message} การตรวจสอบ",
       "crossFileGraphNoDotFile": "กราฟ cross-file จบ แต่ไม่พบไฟล์ DOT",
       "crossFileGraphExported": "กราฟ cross-file นําเข้าสู่รายงาน /.saropa_lints/cross_file/import_graph.dot",
@@ -2456,7 +2516,7 @@
       "crossFileReportNoIndex": "รายงานการตัดไฟล์เสร็จสิ้น แต่ index.html ไม่พบ",
       "crossFileHtmlReportGenerated": "การสร้างรายงาน HTML cross-file.",
       "actionOpenInBrowser": "เปิดใน Browser",
-      "actionOpenFile": "เปิดไฟล์",
+      "actionOpenFile": "เปิด Open File File เคล็ดลับการเปิด",
       "crossFileSnapshotFailed": "การถ่ายภาพสัญลักษณ์ข้ามไฟล์ล้มเหลว: {message} การตรวจสอบ",
       "crossFileSnapshotNoJson": "จัดการถ่ายภาพสัญลักษณ์ครอสไฟล์เสร็จสิ้น แต่ไม่พบฟิล์ม JSON",
       "crossFileSnapshotWritten": "สน็อปช็อต cross-file เขียนไปยังรายงาน / .saropa_lints/cross_file_snapshot.json",
@@ -2504,7 +2564,7 @@
       "codeHealthScanFailedDetails": "รหัส Health scan ไม่สําเร็จ: {details} การตรวจสอบ",
       "codeHealthGatesFailed": "รหัส สุขภาพ: สาธารณสุข การตั้งค่า quality gates ที่ได้รับการปรับแต่งล้มเหลว. เปิดการตั้งค่า Code Health หรือสําเนา JSON เพื่อตรวจสอบ gates.violations.",
       "codeHealthInvalidJson": "Code Health คืนผลการออก JSON ที่ไม่ถูกต้อง.",
-      "sidebarSectionUpdateFailed": "Saropa Lints: เป็นการตรวจหา ไม่สามารถอัพเดทส่วน Activity Bar ได้  ⁇ {message} การตรวจสอบ"
+      "sidebarSectionUpdateFailed": "Saropa Lints: ไม่สามารถอัปเดตส่วนของแถบกิจกรรมได้ — {message}"
     },
     "vibrancy": {
       "couldNotOpenPubspec": "ไม่สามารถเปิด pubspec.yaml.",
@@ -2532,7 +2592,7 @@
       "registryRemoveFailed": "ไม่สามารถลบรีจิสทริก: {message} การตรวจสอบ",
       "registryTokenUpdated": "✓ โตเกนอัพเดทแล้ว",
       "registryTokenUpdateFailed": "ไม่สามารถอัพเดทต็อกเก็น: {message} การตรวจสอบ",
-      "actionRemove": "ลบ",
+      "actionRemove": "Remove remove ถอดออก",
       "removeAuthPrompt": "ลบการยืนยันตัวตนสําหรับ {name}?",
       "annotateInProgress": "การบรรยายความเห็นที่กําลังดําเนินการอยู่",
       "noPubspecInWorkspace": "ไม่พบ pubspec.yaml ใน workspace",
@@ -2541,12 +2601,12 @@
       "annotatedSummary": "แนะนํา {parts} ใน {basename}",
       "upgradeInProgress": "การปรับปรุงกําลังดําเนินการอยู่",
       "couldNotReadConstraint": "ไม่สามารถอ่านข้อจํากัดสําหรับ {name} ได้",
-      "upgradeSuccess": "{name} ปรับปรุงเป็น {constraint}  ⁇ ทดสอบผ่านทุกข้อ",
-      "upgradeRolledBack": "{name} การปรับปรุงการปรับระดับถอนกลับ  ⁇ {phase} ล้มเหลว. ดูผลิตสําหรับรายละเอียด.",
+      "upgradeSuccess": "{name} อัปเกรดเป็น {constraint} — ทุกการทดสอบผ่าน",
+      "upgradeRolledBack": "{name} ได้รับการอัปเกรดแล้วถูกยกเลิก — {phase} ล้มเหลว โปรดดูผลลัพธ์เพื่อรายละเอียดเพิ่มเติม",
       "saveTaskFailed": "Save task failed: การบันทึกงานล้มเหลว {message} การตรวจสอบ",
       "openFolderBeforeCopyConfig": "Saropa Lints: เป็นการประกอบของ เปิดโฟลเดอร์ workspace ก่อนการสําเนา config.",
       "copiedConfigSnippet": "Saropa Lints: สารที่ใช้ในการรักษา คอปิเน็ต config snippet ที่คัดลอก (ชั้น: {tier}, {packsLine}).การใช้งานของกระจก",
-      "couldNotCopyClipboard": "Saropa Lints: เป็นการตรวจหา ไม่สามารถสําเนาไปยัง clipboard  ⁇ {message}. . . ผู้นําการเมือง",
+      "couldNotCopyClipboard": "Saropa Lints: คัดลอกไปยังคลิปบอร์ดไม่ได้ — {message}",
       "couldNotWriteRulePacks": "Saropa Lints: เป็นการตรวจหา ไม่สามารถเขียน analysis_options.yaml (rule_packs) ได้",
       "couldNotReadPubspec": "Saropa Lints: เป็นการตรวจหา ไม่สามารถอ่าน pubspec.yaml.",
       "noAdditionalSdkPacks": "Saropa Lints: เป็นการประกอบของ ไม่มีแพ็ค SDK ที่ใช้ได้เพิ่มเติมที่จะเปิดให้.",
@@ -2554,26 +2614,26 @@
       "openFolderBeforeEnablePacks": "Saropa Lints: เป็นการประกอบของ เปิดโฟลเดอร์ workspace ก่อนเปิด packs.packs ให้ใช้งาน",
       "allApplicablePacksEnabled": "Saropa Lints: เป็นการประกอบของ ทุกแพ็คกติกาที่ใช้ได้ถูกเปิดให้ใช้แล้ว",
       "noApplicablePacksDetected": "Saropa Lints: ไม่พบชุดกฎที่ใช้ได้สำหรับโปรเจกต์นี้ ให้เปิดใช้งานชุดกฎแต่ละชุดในแดชบอร์ดการตั้งค่าแยกกัน",
-      "actionEnable": "เปิดใช้งาน",
+      "actionEnable": "Enable enable เปิดให้ใช้ได้",
       "enableRecommendedPacksPrompt": "เปิดตัว {count} แนะนําแพ็ค (((s)?",
       "enablePacksDetail": "สิ่งนี้จะอัปเดต rule_packs.enabled ใน analysis_options.yaml {preview}",
       "enabledRecommendedPacks": "Saropa Lints: เป็นการตรวจหา เปิดตัว {count} แนะนําแพ็ค (((s).",
       "enableModePacksPrompt": "เปิดตัว {count} {modeLabel} แพ็ค ((s) หรือไม่?"
     },
     "misc": {
-      "actionDontAskForVersion": "ไม่ต้องถามอีกสำหรับเวอร์ชันนี้",
-      "actionLater": "ภายหลัง",
-      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to} นี่คือเวอร์ชันหลัก (major) และอาจต้องเปลี่ยนแปลงการตั้งค่า — โปรดดู changelog",
-      "upgradeCheckerMajorUpdate": "อัปเดตหลัก",
-      "upgradeCheckerMinorUpdate": "อัปเดตย่อย",
-      "upgradeCheckerPatchUpdate": "อัปเดตแพตช์",
+      "actionDontAskForVersion": "อย่าขอเวอร์ชันนี้",
+      "actionLater": "ภายหลัง ต่อไป ล่าสุด",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. นี่คือเวอร์ชันหลัก และอาจต้องการการเปลี่ยนแปลงใน config — ดู changelog",
+      "upgradeCheckerMajorUpdate": "การอัพเดทหลัก Major update ครับ",
+      "upgradeCheckerMinorUpdate": "การอัพเดทเล็ก ๆ น้อย ๆ",
+      "upgradeCheckerPatchUpdate": "การอัพเดท Patch Update ของการแก้ไขปัญหา",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
-      "upgradeCheckerPubspecNotFound": "Saropa Lints: สารที่ใช้ในการรักษา ไม่สามารถอัพเดท pubspec.yaml  ⁇ saropa_lints ไม่พบรายการ.",
-      "upgradeCheckerCancelled": "ยกเลิกการอัปเกรด Saropa Lints แล้ว pubspec.yaml ถูกอัปเดตเป็น ^{version}; รัน `{cmd} pub get` เพื่อทำให้เสร็จ หรือย้อนการเปลี่ยนแปลง",
+      "upgradeCheckerPubspecNotFound": "Saropa Lints: ไม่สามารถอัปเดต pubspec.yaml ได้ — ไม่พบข้อมูล saropa_lints",
+      "upgradeCheckerCancelled": "Saropa Lints การอัปเกรดถูกยกเลิกแล้ว pubspec.yaml ถูกอัปเกรดเป็น ^{version}; ให้รัน `{cmd} pub get` เพื่อสิ้นสุด หรือย้อนกลับการเปลี่ยนแปลง",
       "upgradeCheckerPubGetFailed": "Saropa Lints: ผับล้มเหลว {detail}",
       "upgradeCheckerCheckOutput": "ตรวจสอบ Output.",
       "upgradeCheckerUpgraded": "Saropa Lints ปรับปรุงเป็น {version}.",
-      "actionUpgrade": "อัปเกรด",
+      "actionUpgrade": "อัพเกรดอัปเดรด Upgrade",
       "actionViewChangelog": "View Changelog รายการเปลี่ยนแปลง",
       "healthCodeLensEnabled": "Saropa โครงการ แผนที่ความร้อน CodeLens เปิดใช้งาน.",
       "healthCodeLensDisabled": "Saropa โครงการ แผนที่ความร้อน CodeLens ปิด.",
@@ -2607,7 +2667,7 @@
     "kpi": {
       "filesInScope": "ไฟล์ในขอบเขต",
       "lines": "บรรทัด",
-      "files": "ไฟล์",
+      "files": "การใช้งาน File files",
       "estimatedCost": "ค่าใช้จ่ายในการวิเคราะห์ประมาณ",
       "costUnits": "หน่วยต้นทุน",
       "potentialSavings": "ผลประโยชน์ที่อาจได้รับ",
@@ -2621,7 +2681,7 @@
     "applyAll": "ใช้ทุกข้อ",
     "applySelected": "ใช้การเลือก",
     "apply": "ใช้",
-    "remove": "ลบ",
+    "remove": "Remove remove ถอดออก",
     "selectAll": "เลือกทั้งหมด",
     "defaultLabel": "ค่าเริ่มต้น",
     "sortHint": "คลิกเพื่อเรียงลำดับ",
@@ -2724,6 +2784,23 @@
       "message": "รายงานนี้มีเครื่องหมายว่า \"{status}\" แต่ยังอยู่ใน bugs/ — ให้เก็บเข้าไปใน plans/history/ ก่อนปิด (ดู ISSUE_REPORT_GUIDE.md)"
     }
   },
+  "analyzerExclusions": {
+    "diagnostic": {
+      "missing": "โฟลเดอร์ \"{folder}\" ถูกวิเคราะห์แต่ไม่จำเป็นต้องทำ ให้เพิ่มเข้าไปใน dart.analysisExcludedFolders ใน .vscode/settings.json เพื่อเพิ่มความเร็วในการแก้ไขอย่างรวดเร็วและลดการใช้งานหน่วยความจำ",
+      "missingCreate": "โฟลเดอร์ \"{folder}\" ถูกวิเคราะห์แต่ไม่จำเป็นต้องทำ ให้เพิ่มเข้าไปใน dart.analysisExcludedFolders (จะสร้างไฟล์ .vscode/settings.json) เพื่อเพิ่มความเร็วในการแก้ไขอย่างรวดเร็วและลดการใช้งานหน่วยความจำ",
+      "driftOnly": "โฟลเดอร์ \"{folder}\" อยู่ใน analyzer: exclude: ของ analysis_options.yaml ซึ่งเพียงแค่ซ่อนการวินิจฉัย ให้เพิ่มเข้าไปใน dart.analysisExcludedFolders เพื่อให้เซิร์ฟเวอร์การวิเคราะห์หยุดวิเคราะห์มัน",
+      "imported": "โฟลเดอร์ \"{folder}\" ดูเหมือนจะสามารถตัดออกได้ แต่มีการพึ่งพาเส้นทางใน pubspec.yaml ที่ชี้ไปยังโฟลเดอร์นี้ ดังนั้นจึงไม่แนะนำให้ตัดออก",
+      "large": "ไฟล์ {count} Dart ถูกวิเคราะห์บนเครื่องมือที่มี {ram} GB ของ RAM ให้ยกเว้นโฟลเดอร์ที่ไม่จำเป็นต้องวิเคราะห์เพื่อลดการใช้งานหน่วยความจำและช้าลงในการแก้ไขอย่างรวดเร็ว",
+      "largeNoRam": "ไฟล์ {count} Dart ถูกวิเคราะห์ ให้ยกเลิกโฟลเดอร์ที่ไม่จำเป็นต้องวิเคราะห์ เพื่อลดการใช้งานหน่วยความจำและช้าลงในการแก้ไขอย่างรวดเร็ว"
+    },
+    "quickFix": {
+      "title": "เพิ่มลงใน dart.analysisExcludedFolders",
+      "pickPlaceholder": "เลือกโฟลเดอร์ที่ต้องการยกเว้นจากการวิเคราะห์"
+    },
+    "error": {
+      "writeFailed": "ไม่สามารถอัปเดต dart.analysisExcludedFolders: {error}"
+    }
+  },
   "docPlacement": {
     "diagnostic": {
       "message": "เอกสารนี้ยังคงอ่านได้เหมือนงานที่ยังไม่เสร็จแต่ถูกเก็บไว้ในตำแหน่งโฟลเดอร์ประวัติ — ย้ายไปที่ {openIssuesDir} แทน"
@@ -2738,7 +2815,7 @@
   },
   "sidebar": {
     "actions": {
-      "runAnalysisLabel": "เรียกใช้การวิเคราะห์",
+      "runAnalysisLabel": "วิ่งวิเคราะห์ Run Analysis การวัด",
       "runAnalysisDescription": "วิเคราะห์ซ้ำ",
       "updateConfigLabel": "อัปเดตคอนฟิก",
       "updateConfigDescription": "กำหนดค่าหรืออัปเดตตัวเลือกการวิเคราะห์"
@@ -2780,65 +2857,175 @@
     "noServerFound": "ไม่พบเซิร์ฟเวอร์ Drift Advisor ใดๆ อยู่ กรุณาเริ่มแอปของคุณพร้อมที่เซิร์ฟเวอร์กำลังทำงาน แล้วคลิก Refresh",
     "integrationOff": "การผสาน Drift Advisor ถูกปิด ให้เปิดใช้งานในตั้งค่า (saropaLints.driftAdvisor.integration) จากนั้นคลิก Refresh"
   },
-  "lifecycle": {
-    "note": {
-      "statusMayBeOutdated": "สถานะอาจล้าสมัย: บันทึกไว้ว่าสิ้นสุดอายุการใช้งาน แต่ pub.dev แสดงว่ายังไม่ถูกยกเลิกและเผยแพร่ภายใน 12 เดือนที่ผ่านมา",
-      "maintenanceMode": "โหมดบำรุงรักษา: คาดว่าจะมีเฉพาะการแก้ไขที่สำคัญเท่านั้น",
-      "caution": "ข้อควรระวัง: โปรดตรวจสอบปัญหาที่ทราบก่อนพึ่งพาแพ็กเกจนี้",
-      "unlisted": "ไม่แสดงรายการบน pub.dev: ถูกซ่อนจากผลการค้นหา ผู้ใช้เดิมยังพึ่งพาแพ็กเกจนี้ได้"
-    },
-    "upgradeRequired": {
-      "diagnostic": "อัปเกรด {name} — เวอร์ชันที่ติดตั้งมีข้อบกพร่องที่ทราบแล้ว",
-      "problem": "คะแนน {score}/100 — เวอร์ชันที่ติดตั้งต้องอัปเกรด",
-      "insight": "เวอร์ชันที่ติดตั้งมีข้อบกพร่องที่ทราบแล้ว — จำเป็นต้องอัปเกรด"
-    }
-  },
   "blastRadius": {
     "label": {
-      "upgrade": "อัปเกรด",
-      "breaks": "ทำให้พัง",
-      "breaksLower": "ทำให้พัง",
+      "upgrade": "อัพเกรดอัปเดรด Upgrade",
+      "breaks": "การแบ่งแยก",
+      "breaksLower": "การแบ่งส่วน",
       "upgradeNotRecommended": "⚠️ ไม่แนะนำให้อัปเกรด"
     },
     "notRecommended": "ไม่แนะนำให้อัปเกรด",
-    "skipReason": "ไม่แนะนำให้อัปเกรด: {summary}",
-    "sdkBlock": "{pkg} {to} ต้องใช้ {dep} {range}; Flutter ตรึง {dep} ไว้ที่ {pinned}",
+    "skipReason": "อัปเกรดไม่แนะนำ: {summary}",
+    "sdkBlock": "{pkg} {to} ต้องการ {dep} {range}; Flutter โพรติคอล {dep} {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) ผ่าน {chain}",
-    "unverified": "การตรวจสอบการอัปเกรดไม่สมบูรณ์: ไม่สามารถดึงข้อมูลการพึ่งพาของ {to} ได้",
+    "unverified": "ตรวจสอบการอัปเกรดไม่สมบูรณ์: ไม่สามารถดึงข้อมูลการขึ้นทะเบียนสำหรับ {to} ได้",
     "summary": {
-      "heldBack": "{pkg} {to} ถูกระงับไว้: {reason}",
-      "sdkBlocked": "{pkg} {to} ถูก SDK บล็อก: {sdk}",
-      "depCapped": "{pkg} {to} ต้องการ {dep} {range} แต่ {dep} ถูกจำกัดเวอร์ชันโดย {cappers}",
-      "depHeldBack": "{pkg} {to} ต้องใช้ {dep} {range} ซึ่งถูกระงับไว้: {reason}",
-      "breaksOne": "{pkg} {to} จะทำให้ผู้พึ่งพา {count} รายพัง: {names}",
-      "breaksOther": "{pkg} {to} จะทำให้ผู้พึ่งพา {count} รายพัง: {names}",
-      "safe": "{pkg} {from} -> {to} ดูปลอดภัย",
-      "newestCompatible": "เวอร์ชันล่าสุดที่เข้ากันได้: {pkg} {version}"
+      "heldBack": "{pkg} {to} ถูกยับยั้ง: {reason}",
+      "sdkBlocked": "{pkg} {to} ถูกบล็อกโดย SDK: {sdk}",
+      "depCapped": "{pkg} {to} ต้องการ {dep} {range} แต่ {dep} ถูกจำกัดโดย {cappers}",
+      "depHeldBack": "{pkg} {to} ต้องการ {dep} {range} ซึ่งถูกย้อนกลับ: {reason}",
+      "breaksOne": "{pkg} {to} จะทำให้ {count} ที่ขึ้นกับ: {names}",
+      "breaksOther": "{pkg} {to} จะทำให้ {count} ที่ขึ้นกับมันเสียหาย: {names}",
+      "safe": "{pkg} {from} -> {to} ปลอดภัย",
+      "newestCompatible": "เวอร์ชันใหม่สุดที่เข้ากันได้: {pkg} {version}"
     }
   },
-  "lifecycle.note.caution": "ข้อควรระวัง: ตรวจสอบปัญหาที่ทราบก่อนพึ่งพาแพ็กเกจนี้",
-  "lifecycle.note.maintenanceMode": "โหมดบำรุงรักษา: คาดว่าจะมีเฉพาะการแก้ไขที่สำคัญ",
-  "lifecycle.note.statusMayBeOutdated": "สถานะอาจล้าสมัย: บันทึกไว้ว่าสิ้นสุดอายุการใช้งาน แต่ pub.dev แสดงว่ายังไม่ถูกเลิกผลิตและเผยแพร่ภายใน 12 เดือนที่ผ่านมา",
-  "lifecycle.note.unlisted": "ไม่แสดงรายการบน pub.dev: ถูกซ่อนจากผลการค้นหา ผู้ใช้เดิมยังพึ่งพาได้",
-  "lifecycle.upgradeRequired.diagnostic": "อัปเกรด {name} — เวอร์ชันที่ติดตั้งมีข้อบกพร่องที่ทราบแล้ว",
-  "lifecycle.upgradeRequired.insight": "เวอร์ชันที่ติดตั้งมีข้อบกพร่องที่ทราบแล้ว — ต้องอัปเกรด",
-  "lifecycle.upgradeRequired.problem": "คะแนน {score}/100 — เวอร์ชันที่ติดตั้งต้องอัปเกรด",
+  "lifecycle": {
+    "note": {
+      "statusMayBeOutdated": "สถานะอาจมีอายุเก่า: บันทึกว่าเป็นสิ้นสุดการใช้งาน แต่ pub.dev แสดงว่าไม่ได้ถูกยกเลิกและได้รับการเผยแพร่ภายใน 12 เดือนที่ผ่านมา",
+      "maintenanceMode": "โหมดบำรุงรักษา: คาดว่าจะมีการแก้ไขเฉพาะที่สำคัญเท่านั้น",
+      "caution": "ข้อควรระวัง: ตรวจสอบปัญหาที่ทราบก่อนที่จะพึ่งพาแพ็กเกจนี้",
+      "unlisted": "ไม่แสดงใน pub.dev: ซ่อนจากผลการค้นหา; ผู้ใช้ที่มีอยู่ยังสามารถพึ่งพาได้"
+    },
+    "upgradeRequired": {
+      "diagnostic": "อัปเกรด {name} — รุ่นที่ติดตั้งเป็นที่รู้จักว่าเสียหาย",
+      "problem": "คะแนน {score}/100 — ต้องอัปเกรดเวอร์ชันที่ติดตั้ง",
+      "insight": "เวอร์ชันที่ติดตั้งแล้วเป็นเวอร์ชันที่รู้จักว่ามีปัญหา — ต้องอัปเกรด"
+    }
+  },
+  "ruleMigration": {
+    "none": "กฎที่มีการเปลี่ยนชื่อไม่จำเป็นต้องย้ายข้อมูล",
+    "noWorkspace": "เปิดโฟลเดอร์โปรเจกต์ Dart เพื่อเปลี่ยนชื่อกฎ",
+    "pickTitle": "ย้ายกฎที่เปลี่ยนชื่อ",
+    "pickPlaceholder": "เลือกไฟล์ที่ต้องการอัปเดต",
+    "fileHits": "{hits} การเปลี่ยนแปลง",
+    "diffTitle": "กฎการเปลี่ยนชื่อ: {file}",
+    "confirm": "ใช้กฎการเปลี่ยนชื่อเพื่อไฟล์ {count} ตัวนี้หรือไม่? ข้อแตกต่างถูกเปิดไว้สำหรับการตรวจสอบ",
+    "apply": "ใช้",
+    "progress": "ย้ายกฎที่เปลี่ยนชื่อแล้ว",
+    "applied": "อัปเดตข้อมูลเกี่ยวกับกฎ {hits} ในไฟล์ {count}: {files}",
+    "bareNames": "ไม่ได้เปลี่ยนแปลง (ละเว้นความเห็นที่ไม่มีคำนำหน้า saropa_lints): {items}",
+    "clashes": "ชื่อของกฎเก่าและกฎใหม่ได้รับการตั้งค่าแล้ว โปรดรวมเข้าด้วยกันด้วยตนเอง: {items}",
+    "skipped": "ข้าม: {items}.",
+    "failedRestored": "กฎการย้ายข้อกำหนดล้มเหลว: {detail} ไฟล์ทั้งหมดถูกกู้คืนกลับสู่เนื้อหาเดิม",
+    "failedNotRestored": "กฎการย้ายข้อกำหนดล้มเหลว: {detail} บางไฟล์ไม่สามารถกู้คืนอัตโนมัติได้; ตรวจสอบด้วย git",
+    "offer": "เปลี่ยนชื่อกฎ {hits} ที่ถูกเปลี่ยนชื่อในไฟล์ {count} หรือไม่?",
+    "offerPreview": "ตัวอย่าง",
+    "offerNotNow": "ไม่ตอนนี้"
+  },
+  "compat": {
+    "startup": {
+      "routeDependency": "เส้นทางใน pubspec (pubspec.yaml)",
+      "routePlugin": "เส้นทางของปลั๊กอิน (analysis_options.yaml)",
+      "routeBoth": "ทั้งสองเส้นทาง (pubspec.yaml และ analysis_options.yaml)",
+      "installedDisagree": "{pubspec} ใน pubspec.yaml และ {plugin} ใน analysis_options.yaml",
+      "offer": "saropa_lints: โครงการของคุณใช้ {route} ที่ {installed}  {offered} พร้อมใช้งานและทำงานร่วมกับ Dart {dart} ย้ายไปใช้?",
+      "offerNoDart": "saropa_lints: โครงการของคุณใช้ {route} ที่ {installed}  {offered} มีให้ใช้แล้ว ย้ายไปใช้?",
+      "offerRenames": "saropa_lints: โครงการของคุณใช้ {route} ที่ {installed}  {offered} พร้อมใช้งานและทำงานร่วมกับ Dart {dart} กฎ {count} ถูกเปลี่ยนชื่อตั้งแต่ {installed} ย้ายไปใช้?",
+      "offerNoDartRenames": "saropa_lints: โครงการของคุณใช้ {route} ที่ {installed}  {offered} มีให้ใช้แล้ว กฎของ {count} ถูกเปลี่ยนชื่อตั้งแต่ {installed} ย้ายไปใช้?",
+      "offerRenamesUnknown": "saropa_lints: โครงการของคุณใช้ {route} ที่ {installed}  {offered} พร้อมใช้งานและทำงานร่วมกับ Dart {dart} กฎที่เปลี่ยนชื่อจะถูกตรวจสอบหลังจากอัปเกรด ย้ายไปใช้?",
+      "offerNoDartRenamesUnknown": "saropa_lints: โครงการของคุณใช้ {route} ที่ {installed}  {offered} มีให้ใช้แล้ว กฎที่เปลี่ยนชื่อจะถูกตรวจสอบหลังจากอัปเกรด ย้ายไปใช้?",
+      "actionMigrate": "ย้าย"
+    },
+    "status": {
+      "pubspec": "saropa_lints: pubspec {version}",
+      "pubspecUnlocked": "saropa_lints: pubspec (ยังไม่ล็อก)",
+      "plugin": "saropa_lints: ปลั๊กอิน รูท {version}",
+      "both": "saropa_lints: pubspec + plugin {version}",
+      "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (ไม่เห็นด้วย)",
+      "neither": "saropa_lints: ไม่ได้กำหนด",
+      "localSource": "saropa_lints: แหล่งข้อมูลท้องถิ่น",
+      "dartTooOld": "saropa_lints: ปลั๊กอินต้องการเวอร์ชันใหม่ของ Dart",
+      "tipPubspec": "โครงการนี้ใช้ pubspec route: saropa_lints เป็น dependency ใน pubspec.yaml คุณจะได้รับ editor diagnostics และคำสั่งใน command line (dart run saropa_lints:init, scan, baseline)",
+      "tipPlugin": "โปรเจกต์นี้ใช้ปลั๊กอิน route: saropa_lints ถูกตั้งค่าเป็นปลั๊กอินใน analysis_options.yaml คุณจะได้รับการวินิจฉัยจากตัวแก้ไขเฉพาะ คำสั่งในบรรทัดคำสั่ง (dart run saropa_lints:init, scan, baseline) ต้องการ saropa_lints ใน pubspec.yaml",
+      "tipBoth": "โครงการนี้ใช้ทั้งสองรูปแบบของ routes และพวกเขาตกลงกัน คุณจะได้รับการวินิจฉัยจากตัวแก้ไขและคำสั่งในบรรทัดคำสั่ง",
+      "tipDisagree": "ชื่อ pubspec.yaml และ analysis_options.yaml ต่างกันในเวอร์ชัน saropa_lints โปรแกรมแก้ไขใช้เวอร์ชันของปลั๊กอิน ({plugin}) คำสั่งในบรรทัดคำสั่งใช้เวอร์ชัน pubspec.yaml ({pubspec})",
+      "tipNeither": "saropa_lints ไม่ได้รับการตั้งค่าในโครงการนี้: มันไม่ใช่ขึ้นอยู่กับ pubspec.yaml และไม่ใช่ปลั๊กอินใน analysis_options.yaml",
+      "tipLocalSource": "saropa_lints มาจากเส้นทางท้องถิ่นหรือแหล่งข้อมูล git ดังนั้นตัวขยายจึงแสดงข้อมูลเท่านั้นและไม่เปลี่ยนแปลงอะไร",
+      "tipDartTooOld": "ปลั๊กอินนี้ใน analysis_options.yaml ต้องการ Dart SDK ที่ใหม่กว่าที่โครงการนี้มี ดังนั้นโปรแกรมแก้ไขจึงไม่สามารถโหลดปลั๊กอินนี้ได้"
+    },
+    "recommend": {
+      "latestOk": "saropa_lints {version} เป็นเวอร์ชันใหม่ล่าสุด และสามารถใช้งานร่วมกับโปรเจกต์นี้ได้ ใช้ ^{version}",
+      "alreadyCorrect": "โปรเจกต์นี้ได้ใช้การตั้งค่า saropa_lints ที่แนะนำแล้ว ไม่จำเป็นต้องดำเนินการใดๆ",
+      "needsNewerDart": "saropa_lints {newest} ต้องการ SDK ที่ใหม่กว่า Dart ที่โครงการนี้มี ({dart}) รักษา ^{chosen} ไว้ หรืออัปเกรด Flutter เพื่อใช้ {newest}",
+      "metaExcludesPin": "saropa_lints {newest} ต้องการ meta package ที่ใหม่กว่า SDK ที่คุณติดตั้งไว้ใน Flutter ({pin}) รักษา ^{chosen} ไว้ หรืออัปเกรด Flutter เพื่อใช้ {newest}",
+      "packageHoldsAnalyzer": "แพ็กเกจ {package} ทำให้เครื่องมือวิเคราะห์ช้าลง ดังนั้น saropa_lints {newest} จึงไม่สามารถติดตั้งได้ ใช้ ^{chosen} หรืออัปเดต {package} เพื่อใช้ {newest}",
+      "noVersionResolves": "ไม่มีเวอร์ชัน saropa_lints ที่สามารถติดตั้งเป็นขึ้นต้นได้เนื่องจาก {package} ต้องการ analyzer ที่เก่ากว่า ฟังก์ชันการติดตั้งยังคงทำงานได้",
+      "noPluginResolves": "ไม่มีเวอร์ชัน saropa_lints ใดที่สามารถติดตั้งเป็นขึ้นต้นได้ และ {version} ก็ไม่สามารถผ่าน pub solver ได้ในฐานะปลั๊กอินเช่นกัน ({package} ต้องการ analyzer ที่เก่ากว่า) ไม่มีอะไรที่เปลี่ยนแปลงไป",
+      "blockedUsePlugin": "{package} ทำให้ analyzer ทำงานช้าลง ดังนั้น saropa_lints จึงไม่สามารถติดตั้งเป็น dependency ได้ ช่องทางของ plugin ไม่ได้รับผลกระทบ: ตั้งค่าเวอร์ชันของ plugin ใน analysis_options.yaml เป็น {version}",
+      "editorVsCli": "ตัวแก้ไขจะใช้เวอร์ชันของปลั๊กอิน {plugin} คำสั่งทางบรรทัดคำสั่ง (dart run saropa_lints:init, scan, baseline) ยังคงใช้เวอร์ชัน pubspec.yaml ที่เป็น {pubspec}",
+      "cliNeedsPubspec": "dart run saropa_lints:init, scan และ baseline ต้องการ saropa_lints ใน pubspec.yaml.",
+      "pluginUnverified": "ปลั๊กอินเวอร์ชัน {version} ไม่สามารถตรวจสอบได้กับ pub solver ได้ แนะนำจาก SDK constraint ของ Dart เท่านั้น",
+      "pluginOnly": "ตั้งค่าเวอร์ชันของปลั๊กอิน saropa_lints ใน analysis_options.yaml เป็น {version}",
+      "alignPlugin": "เวอร์ชันปลั๊กอินใน analysis_options.yaml ({plugin}) ต่างจากเวอร์ชันที่ล็อกไว้ saropa_lints ({locked}) ตั้งเวอร์ชันปลั๊กอินให้เป็น {locked}",
+      "localSource": "saropa_lints มาจากแหล่งข้อมูลท้องถิ่น {source} ดังนั้นตัวขยายจึงแสดงข้อมูลเท่านั้นและไม่เปลี่ยนแปลงอะไร",
+      "noCompatible": "เวอร์ชัน saropa_lints ที่เผยแพร่แล้วไม่มีเวอร์ชันใดที่ทำงานร่วมกับ SDK Dart ของโครงการนี้",
+      "noVersions": "ไม่มีเวอร์ชัน saropa_lints ที่สามารถแนะนำได้",
+      "probeFailed": "ไม่สามารถตรวจสอบเวอร์ชัน saropa_lints ที่โครงการนี้สามารถใช้ได้ เพราะเครื่องมือ Dart ไม่ได้ทำงาน ({detail}) โปรดตรวจสอบว่า dart หรือ flutter อยู่ใน PATH ของคุณ และคุณเชื่อมต่ออินเทอร์เน็ตแล้ว จากนั้นลองตรวจสอบอีกครั้ง",
+      "staleVersions": "รายการเวอร์ชันไม่สามารถอัปเดตได้ (ออฟไลน์) ดังนั้นคำแนะนำนี้อาจมีอายุมากแล้ว",
+      "blockerSdk": "saropa_lints {version} ต้องการ SDK ที่ใหม่กว่า Dart มากกว่า {dart}",
+      "blockerMeta": "saropa_lints {version} ไม่สามารถใช้งานร่วมกับเวอร์ชัน meta {pin} ที่ระบุไว้ใน SDK ของคุณ Flutter",
+      "blockerPackage": "{package} ป้องกันการติดตั้งโดยต้องการเวอร์ชันของ analyzer ที่ต่างออกไป",
+      "fixFlutterUpgrade": "รัน flutter upgrade",
+      "fixUpgradeFlutterMeta": "อัปเกรด Flutter เป็นเวอร์ชันที่ปล่อยออกมาซึ่งระบุ meta ที่ใหม่กว่า",
+      "fixKeepVersion": "รักษา saropa_lints ไว้ที่ ^{version}",
+      "fixUpdateHolder": "อัปเดต {package} เป็นเวอร์ชันที่รองรับ analyzer รุ่นใหม่",
+      "fixUsePluginRoute": "ใช้ปลั๊กอินรูเต: ตั้งค่าเวอร์ชันของปลั๊กอินใน analysis_options.yaml เป็น {version}",
+      "fixPubspecFallback": "หรืออยู่บนเส้นทาง pubspec: ใช้ saropa_lints ^{version} หรืออัปเดต {package} เป็นเวอร์ชันที่รองรับ analyzer ที่ใหม่กว่า",
+      "fixAlignPlugin": "ตั้งค่าเวอร์ชันของปลั๊กอินใน analysis_options.yaml เป็น {version}"
+    },
+    "card": {
+      "heading": "เวอร์ชันความเข้ากันได้",
+      "loading": "ตรวจสอบว่าโปรเจกต์นี้สามารถใช้เวอร์ชัน saropa_lints ใดได้...",
+      "notDetected": "ไม่พบ",
+      "dart": "Dart SDK",
+      "flutter": "Flutter SDK",
+      "lockedSaropa": "ถูกบล็อก saropa_lints",
+      "lockedAnalyzer": "กฎที่เข้มงวด",
+      "plugin": "เวอร์ชันของปลั๊กอิน (analysis_options.yaml)",
+      "blockers": "อะไรที่ขัดขวางเวอร์ชันใหม่กว่า",
+      "fixes": "วิธีแก้ไข",
+      "apply": "ใช้",
+      "applying": "กำลังประมวลผล...",
+      "preview": "การดูต่าง",
+      "refresh": "ตรวจสอบอีกครั้ง",
+      "diffTitle": "{file}: ร่างการเปลี่ยนเวอร์ชันที่เสนอ",
+      "staleReloaded": "โครงการเปลี่ยนแปลงขณะที่คุณกำลังดูบัตรนี้ ดังนั้นจึงไม่มีการนำไปใช้ ตรวจสอบคำแนะนำที่อัปเดตแล้ว และคลิก Apply อีกครั้ง",
+      "loadFailed": "ไม่สามารถตรวจสอบความเข้ากันได้ของเวอร์ชัน: {detail}",
+      "routeLabel": "ติดตั้งรูเติ้ยน",
+      "routes": {
+        "dependency": "ขึ้นอยู่กับ pubspec.yaml",
+        "plugin": "ติดตั้งปลั๊กอินใน analysis_options.yaml เท่านั้น",
+        "both": "กฎที่เข้มงวด:",
+        "none": "ไม่มีการเปลี่ยนแปลงที่เป็นไปได้"
+      }
+    },
+    "apply": {
+      "progress": "การปรับเปลี่ยนเวอร์ชัน saropa_lints",
+      "applied": "saropa_lints {version} ได้ติดตั้งและกำหนดค่าเรียบร้อยแล้ว",
+      "noChange": "ไม่มีการเปลี่ยนแปลงไฟล์ใดๆ ที่จำเป็น",
+      "failedRestored": "การเปลี่ยนเวอร์ชันล้มเหลว: {detail} pubspec.yaml และ analysis_options.yaml ถูกกู้คืนกลับสู่เนื้อหาเดิม",
+      "failedNotRestored": "การเปลี่ยนเวอร์ชันล้มเหลว: {detail} ไฟล์ไม่สามารถกู้คืนอัตโนมัติได้; ตรวจสอบ pubspec.yaml และ analysis_options.yaml",
+      "cancelledRestored": "การเปลี่ยนเวอร์ชันถูกยกเลิก ไฟล์ pubspec.yaml และ analysis_options.yaml ถูกกู้คืนกลับสู่เนื้อหาเดิม",
+      "cancelledNotRestored": "การเปลี่ยนเวอร์ชันถูกยกเลิก แต่ไฟล์ไม่สามารถกู้คืนอัตโนมัติได้; ตรวจสอบ pubspec.yaml และ analysis_options.yaml"
+    }
+  },
   "lintsSwitch": {
-    "statusOn": "Saropa Lints: On",
-    "statusOff": "Saropa Lints: Off",
-    "statusPartial": "Saropa Lints: Partly off",
-    "tooltipOn": "Saropa Lints is on (setting and analyzer plugin). Click to turn it off.",
-    "tooltipOff": "Saropa Lints is off (setting and analyzer plugin). Click to turn it on.",
-    "tooltipPartialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on. Click to fix (turns both on).",
-    "tooltipPartialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on. Click to fix (turns both on).",
-    "dashboardOff": "Lints are off.",
-    "dashboardPartialSetting": "Lints are partly off: the saropaLints.enabled setting is off.",
-    "dashboardPartialPlugin": "Lints are partly off: the analyzer plugin is off in analysis_options.yaml.",
-    "dashboardTurnOn": "Turn on",
-    "dashboardFix": "Fix",
-    "driftRowLabel": "Plugin version out of sync",
-    "driftRowDescription": "analysis_options.yaml says {configured}, pubspec.lock pins {pinned}. Click to sync.",
-    "driftSynced": "analysis_options.yaml plugin version updated to {pinned}."
+    "statusOn": "Saropa Lints: บน",
+    "statusOff": "Saropa Lints: ปิด",
+    "statusPartial": "Saropa Lints: บางส่วนไม่เปิด",
+    "tooltipOn": "Saropa Lints อยู่ใน (การตั้งค่าและการวิเคราะห์ปลั๊กอิน) คลิกเพื่อปิด",
+    "tooltipOff": "Saropa Lints ถูกปิด (การตั้งค่าและปลั๊กอินวิเคราะห์) คลิกเพื่อเปิดใช้งาน",
+    "tooltipPartialSetting": "ส่วนหนึ่งเปิด: ตั้งค่า saropaLints.enabled ปิดขณะที่ปลั๊กอิน analyzer เปิดอยู่ คลิกเพื่อแก้ไข (เปิดทั้งสองอย่าง)",
+    "tooltipPartialPlugin": "เปิดบางส่วน: ปลั๊กอินวิเคราะห์ถูกปิดใน analysis_options.yaml ขณะที่การตั้งค่าเปิดอยู่ คลิกเพื่อแก้ไข (เปิดทั้งสองอย่าง)",
+    "dashboardOff": "กฎการตรวจสอบยังไม่เปิดใช้งาน",
+    "dashboardPartialSetting": "กฎการตรวจสอบส่วนหนึ่งถูกปิด: ตั้งค่า saropaLints.enabled ถูกปิด",
+    "dashboardPartialPlugin": "กฎเครื่องมือตรวจสอบบางส่วนถูกปิด: ปลั๊กอินวิเคราะห์ถูกปิดใน analysis_options.yaml",
+    "dashboardTurnOn": "เปิดใช้งาน",
+    "dashboardFix": "แก้ไข",
+    "driftRowLabel": "เวอร์ชันปลั๊กอินไม่ตรงกับระบบ",
+    "driftRowDescription": "analysis_options.yaml กล่าวว่า {configured}, pubspec.lock บีบ {pinned} คลิกเพื่อซิงค์",
+    "driftSynced": "ปลั๊กอิน analysis_options.yaml ได้รับการอัปเดตเป็นเวอร์ชัน {pinned}"
   }
 }

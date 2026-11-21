@@ -4,7 +4,7 @@
   },
   "welcome": {
     "panel": {
-      "title": "Что нового"
+      "title": "Что нового в v16"
     },
     "hero": {
       "subtitle": "Этот выпуск изменяет стандартный диагностический движок. Прочтите это перед тем, как продолжить работу — это влияет на то, что вы увидите в панели Проблем."
@@ -53,7 +53,7 @@
         "description": "Настройте, какие из более чем 2 300 правил выполняются и при какой серьезности."
       },
       "catalog": {
-        "label": "Каталог команд",
+        "label": "Каталог команд каталога.",
         "description": "Каждая команда Saropa Lints в одном поисковом списке."
       }
     }
@@ -80,21 +80,21 @@
       "subtitle": "{count} результаты · {timestamp}",
       "baselineSubtitle": "Сравнение с базовой версией из {date}",
       "searchPlaceholder": "Фильтровать по правилу, файлу или сообщению…",
-      "filterTier": "Tier",
-      "filterSeverity": "Серьёзность",
+      "filterTier": "Уровень",
+      "filterSeverity": "Тяжесть тяжести.",
       "filterImpact": "Влияние",
       "filterBaselineStatus": "Бейслайн",
       "baselineNew": "Новый",
       "baselineUnchanged": "Неизменный",
       "saveBaseline": "Сохранить как базовый уровень",
-      "copyJson": "Копировать JSON",
+      "copyJson": "Копируйте JSON.",
       "toggleGroup": "Переключить группировку",
-      "colFile": "Файл",
-      "colLine": "Строка",
-      "colRule": "Правило",
-      "colSeverity": "Серьёзность",
-      "colTier": "Tier",
-      "colMessage": "Сообщение",
+      "colFile": "Файл файла файловой файл",
+      "colLine": "Линия, линия, линия.",
+      "colRule": "Статья Статья",
+      "colSeverity": "Тяжесть тяжести.",
+      "colTier": "Уровень",
+      "colMessage": "Сообщение сообщения Послание.",
       "empty": "Нет результатов — проект чистый.",
       "filteredEmpty": "Нет совпадений с текущими фильтрами.",
       "loadMore": "Показать больше",
@@ -104,7 +104,7 @@
       "exportJsonTitle": "Экспортировать результаты аудита в формате JSON",
       "exportJsonSaved": "Аудит JSON экспортирован.",
       "exportJsonFailed": "Не удалось экспортировать аудит JSON: {message}",
-      "clearRuleFilter": "Очистить",
+      "clearRuleFilter": "Чистый чистый Чистые Чистыми",
       "paginationNote": "Ограничение по страницам применяется к отфильтрованным результатам.",
       "sevBarError": "{count} ошибок ({pct}%)",
       "sevBarWarning": "{count} предупреждений ({pct}%)",
@@ -135,7 +135,8 @@
     "baseline": {
       "progressTitle": "Saropa Lints: сканирование всего проекта",
       "progressMessage": "Файлы {scanned}/{total} сканированы, найдено {issues} проблем(ы)"
-    }
+    },
+    "legacyKeyWarning": "saropaLints.scanOnSave.enabled не имеет эффекта — scan-on-save полностью контролируется saropaLints.enabled. Удалите неиспользуемый ключ из настроек."
   },
   "featureInventory": {
     "export": {
@@ -161,23 +162,23 @@
       "unusedOnly": "Не используется только",
       "usedOnly": "Используется только",
       "deprecatedOnly": "Устаревший только",
-      "expandAll": "Развернуть всё",
-      "collapseAll": "Свернуть всё",
+      "expandAll": "Расширить все расширение.",
+      "collapseAll": "Все рухнут, все разрушатся.",
       "indexLabel": "Индекс пакета"
     },
     "summary": {
       "title": "Обзор пакета",
       "sortHint": "Выберите для сортировки по этой колонке",
-      "colPackage": "Пакет",
-      "colVersion": "Версия",
+      "colPackage": "Пакетные услуги - это пакетная услуга.",
+      "colVersion": "Версия версии версии.",
       "colFeatures": "Функции",
       "colAdopted": "Принятые",
       "colUnadopted": "Не принятый",
       "colUsages": "Использования",
-      "colScore": "Балл"
+      "colScore": "Счетная оценка."
     },
     "packages": {
-      "title": "Пакеты"
+      "title": "Пакетные заказы - это пакетная продукция."
     },
     "empty": {
       "body": "Нет сканированных пакетов, поэтому нет функций для отображения."
@@ -187,8 +188,8 @@
       "noChangelog": "Нет changelog для этого пакета, поэтому его функции нельзя перечислить. Это ограничение источника функций, полученного из changelog, а не признак того, что пакет не имеет функций.",
       "noFeatures": "Был найден changelog, но из него не удалось извлечь никаких функций.",
       "linkPubDev": "pub.dev",
-      "linkDocs": "Документация",
-      "linkRepository": "Репозиторий"
+      "linkDocs": "Документация Документирование.",
+      "linkRepository": "Репозиторий данных."
     },
     "category": {
       "heading": "{category} ({count})",
@@ -207,8 +208,8 @@
       "usagesOne": "Использование {count}",
       "usagesUnknown": "использование не измеримо",
       "apiHeading": "{symbol} ({count})",
-      "viewCode": "Смотреть код",
-      "viewDocs": "Смотреть документацию",
+      "viewCode": "Просмотр кода просмотра.",
+      "viewDocs": "Просмотр документов.",
       "noUsages": "В проектном коде не найдено использования.",
       "moreUsages": "{count} больше использования",
       "moreUsagesOne": "{count} больше использования"
@@ -224,45 +225,45 @@
     "title": "Стиль и мнения.",
     "intro": "Описываемые правила стиля, отключенные по умолчанию. Включайте только то, с чем согласна ваша команда. Конфликтные варианты сгруппированы, так что выбирайте один.",
     "searchPlaceholder": "Правила стиля поиска... правила стиля поискового запроса.",
-    "pickOne": "Выберите один",
-    "none": "Нет",
-    "enableAll": "Включить все",
-    "disableAll": "Отключить все",
+    "pickOne": "Выберите один из них.",
+    "none": "Никто",
+    "enableAll": "Включить все Enable all.",
+    "disableAll": "Отключить все отключайте.",
     "noMatch": "Никаких правил стиля. совпадают.",
     "desc": {
-      "ordering_sorting": "Определяет члены, параметры, поля и ключи карты для предсказуемого макета. Очень шумный на существующем коде  ⁇ Лучше всего на новый код или небольшие репозитории.",
+      "ordering_sorting": "Сортирует члены, параметры, поля и ключи карт для предсказуемого расположения. Очень шумно на существующем коде — лучше на новом коде или маленьких репозиториях.",
       "naming_conventions": "Названия файлов, методов, исключений, обратных вызовов и событий блока. Может быть шумным на больших кодовых базах; Постепенно. позволить импроминантно .",
       "boolean_naming": "Булевые языки должны использовать префиксы is/has/can/should, чтобы намерение было ясным в условных и API.",
-      "code_style_preferences": "Как пишутся возвраты, условные и петли  ⁇ немедленный возврат, for-in, getter vs method и другие подобные сокращения.",
+      "code_style_preferences": "Как пишутся возвраты, условия и циклы — немедленный возврат, for-in, getter против метода, и подобные сокращения.",
       "function_parameter_style": "Функции стрелки, когда они краткие, со всеми названными параметрами, встроенными обратными вызовами и без перераспределения параметров.",
-      "widget_style": "Flutter выбор виджетов  ⁇ SizedBox.square, center over align, spacing over Sizedbox и избегание shrinkWrap в прокрутках. только для проектов Flutter.",
+      "widget_style": "Flutter выбор виджетов — SizedBox.square, центрирование над выравниванием, расстояние над SizedBox и избегание shrinkWrap в прокрутках. Flutter проекты.",
       "class_record_style": "Типы возвращения класса против записи, частные префиксы подчеркивания и явное это там, где оно уточняет.",
-      "formatting": "Размещение пустых линий, запятые и стиль буквального перевода и комментариев. Может быть шумным  ⁇ Многие файлы могут нуждаться в редактировании.",
+      "formatting": "Размещение пустых строк, запятые в конце, стиль строк и комментариев. Может быть шумным — многие файлы могут потребовать правок.",
       "comments_documentation": "Формат TODO и FIXME, случай предложения, период после комментариев doc, /// over //, без кода с отметками.",
       "testing_style": "Prefer expect over assert в тестах, так что сбой показывает ожидаемый против фактического.",
       "debug_test_utility": "Помощники тестирования, такие как prefer_fail_test_case, которые громко терпят неудачу при попадании теста на неожиданный путь.",
-      "opinionated_rules": "Различные варианты стиля  ⁇ краткие названия, исчерпывающие формулировки, опекунские положения, положительные условия и многое другое. Много правил; много правил. может быть шумным."
+      "opinionated_rules": "Разнообразные стилистические выборы — краткие имена, исчерпывающие перечисления, защитные условия, положительные условия и многое другое. Много правил; могут быть шумными."
     }
   },
   "packs": {
     "forYourProject": "Для вашего проекта.",
     "forYourProjectHint": "Пакеты, чья зависимость или SDK соответствует вашей спецификации. Эти правила применяются к коду, который вы фактически отправляете.",
     "noneDetected": "Пока нет пачек, соответствующих вашим зависимостям. Добавьте поддерживаемый пакет или откройте Все пакеты ниже.",
-    "allPackages": "Все пакеты",
+    "allPackages": "Все пакеты.",
     "allPackagesHint": "Каждая доступная упаковка, включая те, которые не были обнаружены в этом проекте. Позволять стае выбирать свои правила.",
     "versionGroup": {
       "tag": "Выберите одну версию.",
-      "tooltip": "Эти пакеты нацелены на различные основные версии одной и той же зависимости. Одновременно действует только один  ⁇ позволяет одному отключает другие."
+      "tooltip": "Эти пакеты ориентированы на разные основные версии одной и той же зависимости. Только один применяется одновременно — включение одного отключает остальные."
     },
     "domainDesc": {
       "state-management": "Блок, Riverpod, Provider, GetX и связанные с ними библиотеки состояния и инъекции зависимостей.",
       "networking-apis": "HTTP-клиенты, GraphQL, Firebase, Supabase и подключение.",
-      "storage-persistence": "Местные базы данных и хранилища ключей-ценностей  ⁇ Дрифт, Улей, Исар, sqflite, разделенные предпочтения.",
-      "navigation-deep-links": "Маршрутизация и обработка глубокой связи  ⁇ auto_route, go_router, app_links, url_launcher и webview. это все те же самые устройства, которые используют в своем роутере",
+      "storage-persistence": "Локальные базы данных и хранилища ключ-значение — Drift, Hive, Isar, sqflite, shared_preferences.",
+      "navigation-deep-links": "Правила строгие: \n1. Возвращайте ТОЛЬКО переведенную строку вывода. \n2. НЕ включайте объяснения, введение, markdown-обозначения или кавычки вокруг. \n3. Текст может содержать токены-заполнители: токены-заполнители. Копируйте каждый из них в перевод ТОЧНО как написано, в правильной грамматической позиции. Никогда не переводите, удаляйте или переписывайте токен. \n4. КРИТИЧЕСКИ ВАЖНО: каждый символ вывода должен быть кириллическим символом. Переводите КАЖДОЕ слово в кириллицу — НЕ оставляйте или заменяйте никакое слово на латиницу, тайский, арабский, кириллицу, корейский, японский или любой другой скрипт. Пробелы, цифры, пунктуация и токены-заполнители — единственные исключения.",
       "media-graphics": "Изображения, SVG-файлы, анимация, аудио, карты, сборщики и движок Flame.",
       "device-platform": "Датчики, местоположение, разрешения, биометрические данные, уведомления и фоновая работа.",
       "identity-sharing": "Поставщики услуг входа, обмен и рецензирование внутри приложения.",
-      "utilities-config": "Помощники по пересечению  ⁇ UUID, конфигурация среды, шрифты и совместимость с коллекцией.",
+      "utilities-config": "Помощники, применяемые в разных местах — UUIDs, конфигурация окружения, шрифты и совместимость с коллекциями.",
       "sdk-migrations": "Dart и Flutter версии обновления правил, которые флаг API-интерфейсов удалены или устарели в данном SDK."
     }
   },
@@ -273,19 +274,25 @@
     "tabBar": {
       "ariaLabel": "Панели навигации доски соответствий и уровней"
     },
+    "ruleFinder": {
+      "disableButton": "Disable отключить.",
+      "disableTitle": "Отключить этот правило для всего проекта — записать analysis_options_custom.yaml и перезапустить анализ",
+      "enableButton": "Включено",
+      "enableTitle": "Включить этот правило снова — удаляет переопределение в analysis_options_custom.yaml и снова запускает анализ"
+    },
     "tab": {
-      "tier": "Tier",
-      "packs": "Наборы правил",
-      "overrides": "Переопределения",
+      "tier": "Уровень",
+      "packs": "Пакеты правил - это пакеты правилов.",
+      "overrides": "Отменяет приоритеты.",
       "sdk": "Релиз SDK",
       "configFile": "Файл настроек",
       "automation": "Автоматизация",
       "extension": "Расширение"
     },
     "common": {
-      "rule": "Правило",
+      "rule": "Статья Статья",
       "add": "Добавить",
-      "remove": "Удалить"
+      "remove": "Удалить удалить убрать"
     },
     "sdk": {
       "summary": "{total} SDK миграция пакет(ы) применяются к этому проекту — {breaking} разрушительные, {deprecation} устаревание.",
@@ -364,7 +371,7 @@
         "openTitle": "Открыть saropa_baseline.json в редакторе.",
         "summary": "{files} файл(ов), {violations} нарушение(й) базируется — сгенерирован {generated}.",
         "unknownDate": "в неизвестное время",
-        "count": "Количество",
+        "count": "Считать, считать и считывать.",
         "diff": {
           "title": "Разница с текущим",
           "counts": "{resolved} решено с момента базовой версии · {new} новых с момента базовой версии.",
@@ -372,8 +379,8 @@
           "resolvedSection": "Решено ({count})",
           "newSection": "Новое с момента базовой версии ({count})",
           "moreRows": "+{count} больше не показывается.",
-          "fileCol": "Файл",
-          "lineCol": "Строка"
+          "fileCol": "Файл файла файловой файл",
+          "lineCol": "Линия, линия, линия."
         }
       },
       "optimizer": {
@@ -384,6 +391,14 @@
     },
     "automation": {
       "hint": "Настройки расширения, которые управляют тем, когда выполняется анализ и как отображаются результаты. Эти настройки соответствуют тем же настройкам в File > Preferences > Settings под Saropa Lints."
+    },
+    "watcher": {
+      "title": "Watcher исключает",
+      "hint": "Файлы и папки VS Code' файла watcher должны игнорировать. Счета берутся из сканирования пространства работы на опасность; используйте List, чтобы увидеть пути, а затем исключите их из предупреждения, которое показывает сканирование.",
+      "scanning": "Сканирование рабочей области...",
+      "affected": "{count} поврежден",
+      "list": "Список",
+      "recommended": "Рекомендуемые исключения, которые еще не в files.watcherExclude"
     },
     "extension": {
       "hint": "Предпочтения отображения на уровне расширения",
@@ -398,7 +413,7 @@
   "dashboards": {
     "lintsConfig": {
       "description": "Уровень: {tier} · Линия: {lane}",
-      "descriptionNoLane": "Tier: уровень, который соответствует уровню. {tier} Это - ПХО."
+      "descriptionNoLane": "Уровень: {tier}"
     },
     "controls": {
       "laneLight": "Свет — ~200 правил в редакторе, остальные при сохранении",
@@ -413,12 +428,12 @@
   },
   "configSuggestions": {
     "enabledToast": "Включил пакет правил {pack} в analysis_options.yaml",
-    "enableFailed": "Не удалось включить пакет правил {pack}  ⁇ Откройте панель Rule Packs, чтобы включить ее."
+    "enableFailed": "Не удалось включить набор правил {pack} — откройте панель наборов правил, чтобы включить его"
   },
   "startupNudge": {
     "message": "Saropa Lints: это число, которое соответствует числу {count} rule pack suggestion (s) применимы к этому проекту.",
     "review": "Проверка",
-    "dismiss": "Закрыть",
+    "dismiss": "Отпустить с работы.",
     "reviewFailed": "Не удалось открыть обзор набора правил Saropa Lints. {error}"
   },
   "opportunities": {
@@ -426,13 +441,13 @@
     "heroTitle": "Возможности для обновления возможностей.",
     "subtitle": "{count} пакеты содержат функции, которые ваш проект пока не использует.",
     "noScan": "Сначала выполните сканирование пакетов, чтобы найти возможности для обновления.",
-    "openFileFailed": "Не удалось открыть {file}  ⁇ Возможно, он переместился с момента последнего сканирования.",
+    "openFileFailed": "Не удалось открыть {file} — файл может быть перемещен с момента последнего сканирования.",
     "card": {
       "versionUpgrade": "обновление доступно для {latest}.",
-      "versionCurrent": "последняя версия",
+      "versionCurrent": "о последних новостях.",
       "featuresTitle": "Функции, которые еще не использовались.",
       "locationsTitle": "Где ваш проект использует этот пакет.",
-      "noLocations": "Не ввозится из источника проекта  ⁇ вероятность развития или транзитивной зависимости.",
+      "noLocations": "Не импортирован в исходный код проекта — вероятно, разработка или транзитивная зависимость.",
       "moreFiles": "и {count} больше файлов.",
       "openInDashboard": "Открыть в панели инструментов пакета.",
       "writeReport": "Написать отчет"
@@ -452,19 +467,19 @@
   },
   "packageDetail": {
     "section": {
-      "version": "ВЕРСИЯ",
-      "changelog": "СПИСОК ИЗМЕНЕНИЙ",
-      "community": "СООБЩЕСТВО",
-      "dependencies": "ЗАВИСИМОСТИ",
-      "alerts": "ПРЕДУПРЕЖДЕНИЯ",
-      "platforms": "ПЛАТФОРМЫ",
-      "suggestions": "РЕКОМЕНДАЦИИ",
+      "version": "Версия версии.",
+      "changelog": "Изменения в законодательстве.",
+      "community": "Сообщество - это сообщество.",
+      "dependencies": "зависимости от других.",
+      "alerts": "ВНИМАНИЯ - это предупреждения.",
+      "platforms": "ПЛАТФОРМЫ ПРОГРАММА платформы, на которых",
+      "suggestions": "Предложения, предложения.",
       "readmeImages": "README ИМГЕЙСИ изображения"
     },
     "header": {
-      "logoAlt": "{name} логотип с помощью _PH0_.",
+      "logoAlt": "{name} лого",
       "grade": "Степень {grade}.",
-      "licenseTitle": "Лицензия",
+      "licenseTitle": "Лицензия лицензия.",
       "published": "Опубликовано {date}."
     },
     "partialBanner": {
@@ -474,63 +489,63 @@
       "listTwo": "{first} и {second}.",
       "listMany": "{head}, и {last}.",
       "message": "Некоторые разделы не могли загрузиться: {list}.",
-      "retry": "Повторить",
+      "retry": "Попробуйте снова и снова.",
       "retrying": "Повторная попытка...",
       "retryTitle": "Попробуйте снова неудачные fetches."
     },
     "description": {
-      "readMore": "подробнее"
+      "readMore": "Читать далее Подробнее."
     },
     "version": {
-      "constraint": "Ограничение",
-      "latest": "Последняя",
-      "prerelease": "Предрелиз",
-      "published": "Опубликовано",
-      "update": "Обновить",
+      "constraint": "Ограничение ограничениями.",
+      "latest": "Последнее последнее последняя",
+      "prerelease": "Предепрессия - это предварительный выпуск.",
+      "published": "Издание Опубликовано Публикации.",
+      "update": "Обновлять",
       "blockedBy": "Блокированный от:",
       "blockedVia": "{blocker} капсулы {dep} {constraint} ({resolvable} разрешимо, {latest} последнее)",
       "blockedViaSdk": "закреплен {blocker} (Flutter SDK) для {dep} (разрешаемый {resolvable}, последняя версия {latest})",
-      "constrained": "Ограничено",
+      "constrained": "Ограниченный, ограниченный.",
       "constrainedBy": "Ваше ограничение {constraint} ограничивает это ({resolvable} разрешимо, {latest} последнее)",
-      "pinHeld": "Удержано",
+      "pinHeld": "Проводился, проводится.",
       "pinDoNotUse": "Не используйте не использовать.",
       "drift": "Дрейф между проектами.",
       "driftBehind": "Сзади: задней части. {siblings} (у вас есть {own})",
       "driftDiffers": "Отличия: отличается от других. {siblings} (у вас есть {own})",
-      "codeSize": "Размер кода",
-      "archiveSize": "Размер архива",
+      "codeSize": "Размер кода, размер кода.",
+      "archiveSize": "Размер архива - размер файла.",
       "bloat": "({rating}/10 вздутие живота)",
-      "onDisk": "На диске",
-      "upgrade": "Обновить",
+      "onDisk": "На диске на диске",
+      "upgrade": "Обновление обновления.",
       "upgrading": "Обновление... обновления.",
-      "viewChangelog": "Открыть список изменений"
+      "viewChangelog": "Просмотр журнала изменений."
     },
     "changelog": {
-      "intro": "Что изменилось с {from} на {to}  ⁇ Перед обновлением просмотрите.",
+      "intro": "Что изменилось с {from} до {to} — обзор перед обновлением.",
       "versionDated": "{version} — {date}",
       "truncated": "Показываем самые последние релизы {count}.",
       "viewFull": "Просмотр полного журнала изменений на pub.dev."
     },
     "community": {
-      "stars": "Звёзды",
-      "likes": "Лайки",
-      "report": "Отчёт",
-      "openIssues": "Открытые issues",
-      "openPrs": "Открытые PR",
+      "stars": "Звезды звезды звёзды",
+      "likes": "Любит нравится.",
+      "report": "Отчет, доклад, отчет.",
+      "openIssues": "Открытые вопросы.",
+      "openPrs": "Открытые PR-сообщения.",
       "activity": "Деятельность (90d)",
       "activityValue": "Проблемы {closed} закрыты, PR {merged} объединены",
       "noActivity": "Никакой недавней активности нет.",
-      "lastCommit": "Последний коммит",
-      "pubPoints": "Pub Points",
+      "lastCommit": "Последний Commit - последнее обязательство.",
+      "pubPoints": "Пуб Пойнты",
       "verified": "(проверенный)",
-      "publisher": "Издатель",
+      "publisher": "Издатель издатель.",
       "flagged": "({count} отмечен флагом)",
-      "transitiveDeps": "Транзитивные зависимости",
+      "transitiveDeps": "Транзитивные месторождения.",
       "footprintBreakdown": "{unique} уникальный &middot; +{shared} совместный = {total} общий",
       "footprintTooltip": "Собственный {own} + уникальные транзитивы {unique} + общие транзитивы {shared}. Удаление этого депа сохраняет {saved} (общие депы остаются доступными другим).",
-      "trueFootprint": "Реальный след",
+      "trueFootprint": "Истинный след - True Footprint (настоящий отпечаток).",
       "packagesCount": "{count} пакетов",
-      "dependents": "Зависимые"
+      "dependents": "Зависимые лица."
     },
     "fileUsages": {
       "commentedOut": "Комментированные ссылки:",
@@ -540,42 +555,42 @@
       "header": "Использование файлов ({label})",
       "commentedReexportTitle": "Комментированный реэкспорт без комментариев.",
       "reexportTitle": "Переэкспортированная часть этой библиотеки, публичный API.",
-      "reexportBadge": "реэкспорт"
+      "reexportBadge": "реэкспортный реэкспорт."
     },
     "opportunities": {
       "header": "Возможности ({count})",
-      "viewCode": "Смотреть код",
-      "viewDocs": "Смотреть документацию"
+      "viewCode": "Просмотр кода просмотра.",
+      "viewDocs": "Просмотр документов."
     },
     "alerts": {
-      "archived": "ARCHIVED  ⁇  репозиторий предназначен только для чтения.",
+      "archived": "АРХИВИРОВАННО — репозиторий является только для чтения",
       "knownIssue": "Известная проблема: {reason}",
-      "unused": "Неиспользованный  ⁇  не обнаружен импорт.",
-      "fix": "⁇  исправить: {version}"
+      "unused": "Не используется — не найдены импорты",
+      "fix": "— исправление: {version}"
     },
     "versionGap": {
-      "versionTitle": "Разрыв версий",
-      "overrideTitle": "Разрыв переопределения",
+      "versionTitle": "Версия Gap Гап-версия.",
+      "overrideTitle": "Опережайте Gap Gap.",
       "noDates": "Не удалось определить даты версий для этого пакета.",
       "noItems": "Между этими версиями не было обнаружено никаких PR или проблем.",
-      "prsMerged": "Слито PR",
-      "issuesClosed": "Закрыто issues",
+      "prsMerged": "PRs объединились.",
+      "issuesClosed": "Вопросы закрыты.",
       "searchLabel": "Поиск PR и проблемных вопросов.",
       "searchPlaceholder": "Поиск PRs и проблемы...",
       "filterAria": "Фильтр по категориям.",
       "filterAll": "Все",
       "filterUnreviewed": "Нерецензируемые",
       "filterPrs": "PR",
-      "filterIssues": "Issues",
-      "typePr": "PR",
-      "typeIssue": "Issue",
-      "reviewReviewed": "Проверено",
-      "reviewApplicable": "Применимо",
+      "filterIssues": "Вопросы, вопросы.",
+      "typePr": "PR PR PR - это и есть ПР.",
+      "typeIssue": "Выпуск выпуска Issue.",
+      "reviewReviewed": "Обзор, который мы провели.",
+      "reviewApplicable": "Применимо применимые.",
       "reviewNotApplicable": "Н/Д",
       "notesPlaceholder": "Заметки... записки.",
-      "colType": "Тип",
-      "colTitle": "Название",
-      "colAuthor": "Автор",
+      "colType": "Тип типа тип тип",
+      "colTitle": "Название Заголовок Титул",
+      "colAuthor": "Автор автор автора Автор.",
       "colReview": "Проверка",
       "summaryFooter": "{triaged} из {total} проверен | {applicable} применимо | {notApplicable} Н/Д | {unreviewed} осталось",
       "truncated": "Результаты сокращены до {limit} пунктов."
@@ -584,16 +599,16 @@
       "wasm": "WASM"
     },
     "images": {
-      "alt": "Изображение из README"
+      "alt": "README изображение образа."
     },
     "links": {
       "viewOnPubDev": "Вид на pub.dev.",
-      "documentation": "Документация",
-      "changelog": "Список изменений",
-      "versions": "Версии",
-      "repository": "Репозиторий",
-      "openIssues": "Открытые issues",
-      "reportIssue": "Сообщить о проблеме"
+      "documentation": "Документация Документирование.",
+      "changelog": "Changelog - это журнал изменений.",
+      "versions": "Версии версий.",
+      "repository": "Репозиторий данных.",
+      "openIssues": "Открытые вопросы.",
+      "reportIssue": "Отчет о выпуске доклада"
     },
     "a11y": {
       "skipToDetails": "Перейдите к деталям упаковки."
@@ -604,11 +619,11 @@
     }
   },
   "toolbar": {
-    "runAnalysis": "Запустить анализ",
-    "copyJson": "Копировать JSON",
-    "saveReport": "Сохранить отчёт",
-    "moreActions": "Другие действия",
-    "clearAll": "Очистить всё"
+    "runAnalysis": "Запустите анализ, выполните анализы.",
+    "copyJson": "Копируйте JSON.",
+    "saveReport": "Сохранить отчет в архиве.",
+    "moreActions": "Больше действий, больше мероприятий.",
+    "clearAll": "Все чисто, все ясно."
   },
   "loading": {
     "runningAnalysis": "Проводя анализ... анализы.",
@@ -620,23 +635,23 @@
   },
   "filter": {
     "activeLabel": "Активные фильтры:",
-    "chipRemove": "Удалить"
+    "chipRemove": "Удалить удалить убрать"
   },
   "a11y": {
     "toggleFullWidth": "Переключатель для полной ширины макета Toggle.",
-    "expandRow": "Развернуть строку",
-    "comparisonDimension": "Метрика"
+    "expandRow": "Расширить строку \"Развернуть\".",
+    "comparisonDimension": "Метрическая метрика."
   },
   "uiLanguage": {
     "pick": {
       "title": "Язык интерфейса Saropa Lints",
       "placeholder": "Выберите язык боковой панели и панелей",
       "auto": "Авто (следовать языку отображения VS Code)",
-      "coverage": "{pct}% переведено  ⁇ шоу отдыха на английском языке."
+      "coverage": "{pct}% переведен — остальное отображается на английском"
     },
     "reloadPrompt": "Язык установлен на {locale}. Перезагрузите окно, чтобы обновить этикетки боковой панели и команды.",
-    "reloadNow": "Перезагрузить сейчас",
-    "reloadLater": "Позже"
+    "reloadNow": "Перезагрузить сейчас.",
+    "reloadLater": "Позже позднее позже"
   },
   "statusBar": {
     "error": {
@@ -647,94 +662,94 @@
       "openViolations": "Открыть отчет о нарушениях",
       "openPackageDashboard": "Откройте панель инструментов пакета.",
       "openProcessHealth": "Открыть Процесс Здоровье",
-      "commandCatalog": "Каталог команд",
+      "commandCatalog": "Каталог команд каталога.",
       "about": "О программе"
     },
     "tooltip": {
       "section": {
-        "status": "Status",
-        "project": "Project",
-        "problems": "Problems",
-        "memory": "Memory",
-        "actions": "Actions"
+        "status": "Статус - это статус, состояние.",
+        "project": "Проект",
+        "problems": "Проблемы",
+        "memory": "Память",
+        "actions": "Действия Деяния действия."
       },
       "cause": {
-        "on": "Analysis is running: the setting and the analyzer plugin are both on.",
-        "off": "Analysis is off: the setting and the analyzer plugin are both off.",
-        "partialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on.",
-        "partialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on.",
-        "notSetUp": "saropa_lints is not set up in this project: it is not a dependency in pubspec.yaml and analysis_options.yaml has no plugin entry."
+        "on": "Анализ выполняется: настройка и плагин анализатора включены.",
+        "off": "Анализ отключен: настройка и плагин анализатора оба отключены.",
+        "partialSetting": "Частично отключено: настройка saropaLints.enabled отключена, а плагин анализатора включен.",
+        "partialPlugin": "Частично отключено: анализатор плагин отключен в analysis_options.yaml, при этом настройка включена.",
+        "notSetUp": "saropa_lints не настроен в этом проекте: он не является зависимостью в pubspec.yaml и analysis_options.yaml не имеет записи плагина."
       },
       "fix": {
-        "turnOn": "Fix: turn both on",
-        "setUp": "Fix: set up and turn on",
-        "title": "Turns the saropaLints.enabled setting and the analyzer plugin on together."
+        "turnOn": "Исправление: включить оба",
+        "setUp": "Исправление: настройка и включение",
+        "title": "Включает настройку saropaLints.enabled и анализатор плагин одновременно."
       },
       "pill": {
-        "statusOn": "Lints are running. Click to open the Violations Report.",
-        "findings": "Open the Violations Report.",
-        "vibrancy": "Open the Package Dashboard."
+        "statusOn": "Проверка выполняется. Нажмите, чтобы открыть отчет о нарушениях.",
+        "findings": "Открыть отчет о нарушениях.",
+        "vibrancy": "Откройте Панель пакетов."
       },
       "project": {
-        "version": "Version",
-        "tier": "Tier",
-        "vibrancy": "Vibrancy",
-        "packages": "Packages scanned",
-        "packagesSuppressed": "{count} ({suppressed} suppressed)",
-        "score": "Lint score",
-        "scorePending": "run a full analysis (partial scan)",
-        "findings": "Findings",
-        "updates": "Updates available",
-        "actionItems": "Action items",
-        "route": "Route"
+        "version": "Версия версии версии.",
+        "tier": "Уровень",
+        "vibrancy": "Яркость",
+        "packages": "Пакеты сканированы",
+        "packagesSuppressed": "{count} ({suppressed} подавлен)",
+        "score": "Оценка линта",
+        "scorePending": "выполнить полный анализ (частичный скан)",
+        "findings": "Результаты исследования.",
+        "updates": "Доступные обновления",
+        "actionItems": "Действия по выполнению",
+        "route": "Маршрут"
       },
       "findings": {
-        "allErrors": "{count} findings (all errors)",
-        "allErrorsOne": "1 finding (an error)",
-        "mixed": "{errors} errors · {warnings} warnings",
-        "noErrors": "{total} findings"
+        "allErrors": "{count} нарушения (все ошибки)",
+        "allErrorsOne": "1 нарушение (ошибка)",
+        "mixed": "{errors} ошибок · {warnings} предупреждений",
+        "noErrors": "{total} нарушения"
       },
       "problem": {
-        "openCompat": "Open version compatibility card",
-        "reviewReadiness": "Review workspace issues"
+        "openCompat": "Открыть карточку совместимости версий",
+        "reviewReadiness": "Проверить проблемы рабочей области"
       },
       "memory": {
         "saropa": "Saropa Lints",
-        "none": "none running",
-        "processes": "{count} process(es) · {size} RSS",
-        "daemons": "Flutter daemons",
-        "daemonsValue": "{total} ({orphaned} orphaned)",
-        "scanDaemons": "Orphaned scan daemons",
-        "scanDaemonsValue": "{count}, use Clean Up to kill",
-        "other": "Other Dart",
-        "extHost": "Extension host",
+        "none": "никаких запущенных",
+        "processes": "{count} процесс(ов) · {size} RSS",
+        "daemons": "Flutter демоны",
+        "daemonsValue": "{total} ({orphaned} орфанед)",
+        "scanDaemons": "Орфанированные сканеры",
+        "scanDaemonsValue": "{count}, используйте Clean Up, чтобы уничтожить",
+        "other": "Другие Dart",
+        "extHost": "Расширение-хост",
         "extHostValue": "{rss} RSS · {heap} / {heapTotal} heap",
-        "ram": "Machine RAM",
-        "ramValue": "{free} free of {total}",
-        "trend": "RSS trend (last ~30 min)"
+        "ram": "Машинная память RAM",
+        "ramValue": "{free} свободен от {total}",
+        "trend": "RSS тренд (последние ~30 мин)"
       },
       "action": {
-        "turnOff": "Turn Lints off",
-        "turnOn": "Turn Lints on",
-        "turnBothOn": "Turn both on",
-        "versionCompat": "Version Compatibility"
+        "turnOff": "Выключить линтеры",
+        "turnOn": "Включить линтеры",
+        "turnBothOn": "Включите оба",
+        "versionCompat": "Версия совместимости"
       }
     },
     "quickPick": {
       "title": "Saropa Lints",
-      "placeholder": "Pick an action"
+      "placeholder": "Выберите действие"
     }
   },
   "systemHealth": {
     "heapCap": {
-      "noneMessage": "На вашем компьютере {totalGb} памяти. Для сервера анализа Dart не задан предел памяти, поэтому он может расти, пока компьютер не замедлится или не начнёт использовать подкачку. Рекомендуемый предел: {recommendedGb}.",
-      "tooHighMessage": "На вашем компьютере {totalGb} памяти. Серверу анализа Dart разрешено использовать до {capGb} (задано в {location}), что оставляет около {freeGb} для ОС, VS Code и других инструментов Dart, поэтому компьютер может замедлиться или начать использовать подкачку. Рекомендуемый предел: {recommendedGb}.",
-      "locationGlobal": "ваших пользовательских настройках",
-      "locationWorkspace": "настройках этой рабочей области",
-      "locationWorkspaceFolder": "настройках этой папки рабочей области",
+      "noneMessage": "Ваша машина имеет {totalGb} памяти. Анализатор Dart не имеет ограничения по памяти, поэтому он может расти до тех пор, пока машина не замедлится или не начнет свапинг. Рекомендуемый лимит: {recommendedGb}.",
+      "tooHighMessage": "Ваша машина имеет {totalGb} памяти. Анализатор Dart разрешено использовать до {capGb} (установлено в {location}), что оставляет около {freeGb} для ОС, VS Code и других Dart инструментов, поэтому машина может замедлиться или использовать обмен. Рекомендуемый лимит: {recommendedGb}.",
+      "locationGlobal": "ваше пользовательские настройки",
+      "locationWorkspace": "настройки этого рабочего пространства",
+      "locationWorkspaceFolder": "настройки этого рабочего пространства",
       "apply": "Применить {gb}",
       "notNow": "Не сейчас",
-      "dontAskAgain": "Больше не спрашивать"
+      "dontAskAgain": "Не спрашивать снова"
     },
     "statusBar": {
       "warning": "⚠ {size}",
@@ -761,17 +776,17 @@
     "action": {
       "cleanUp": "Очистить",
       "openPanel": "Открыть панель здоровья",
-      "dismiss": "Закрыть",
+      "dismiss": "Отпустить с работы.",
       "optimizeAnalysis": "Оптимизировать Анализ",
       "dontShowAgain": "Не показывать снова",
       "openMachineDashboard": "Открыть состояние машины",
-      "restartAnalysisServer": "Перезапустить"
+      "restartAnalysisServer": "Перезагрузить, перезапустив."
     },
     "cleanup": {
       "noOrphans": "Нет найденных орфанов дэмонов.",
       "confirm": "Найдены {count} орфанные д демон процесс(а) с использованием {size}. Убить их?",
       "killButton": "Убить Орфанов",
-      "cancelButton": "Отмена"
+      "cancelButton": "Отменить отменить."
     },
     "orphanPreflight": {
       "found": "{count} орфанованные модели хост-процессов (процессов) из более ранней сессии держат {size} выделенной памяти.",
@@ -793,11 +808,11 @@
       "processes": "процессы",
       "totalRss": "общий RSS",
       "orphaned": "орфанед",
-      "refresh": "Обновить",
+      "refresh": "Освежите и освежайте.",
       "colPid": "PID",
       "colParent": "Родитель",
       "colRss": "RSS",
-      "colType": "Тип",
+      "colType": "Тип типа тип тип",
       "colCommand": "Команда",
       "colAction": "Действие",
       "typeOrphan": "Орфан",
@@ -811,19 +826,21 @@
     "watcherExclude": {
       "prompt": "Рекомендуемые {count} исключения файлового наблюдателя отсутствуют в этом рабочем пространстве: {patterns}. Добавление их предотвращает VS Code от отслеживания больших сборочных артефактов и дампов стека, которые тратят память.",
       "addAll": "Добавить всё",
-      "dismiss": "Закрыть",
+      "dismiss": "Отпустить с работы.",
       "added": "Добавлены {count} исключения файлового наблюдателя в настройки рабочего пространства."
     },
     "nestedRoots": {
-      "prompt": "{folders} содержит вложенные корни пакетов Dart (количество: {count}), которые git игнорирует. Каждый анализируется как отдельный контекст и может сильно раздувать память сервера анализа.",
+      "prompt": "{folders} содержит {count} вложенных Dart корня(а) пакета, которые git игнорирует. Каждый анализируется как отдельный контекст и может вызывать перегрузку памяти анализатора.",
       "fix": "Исключить из анализа",
-      "dismiss": "Закрыть",
-      "fixed": "{folders} исключено из анализа и наблюдения за файлами."
+      "dismiss": "Отпустить с работы.",
+      "fixed": "{folders} исключены из анализа и мониторинга файлов"
     },
     "hazardScan": {
-      "warning": "Найдены {count} большие файл(ы), не исключенные из наблюдения за файлами: {files}. Эти файлы могут исчерпать память и привести к сбою VS Code.",
+      "warning": "Найдены {count} больших файла(ов) внутри открытой папки \"{folder}\" (пути относительны по отношению к этой папке): {files}. VS Code наблюдает за каждым файлом в папке на изменения, и большие файлы могут замедлить его или завершить работу.",
+      "andMore": "и {count} больше",
+      "unnamedFolder": "(неименованный каталог)",
       "addExclusions": "Исключить из Watcher",
-      "dismiss": "Закрыть",
+      "dismiss": "Отпустить с работы.",
       "added": "Добавлены шаблоны исключения {count} наблюдателя в настройки рабочего пространства."
     }
   },
@@ -846,9 +863,9 @@
   },
   "machineDashboard": {
     "title": "Машинный здоровье",
-    "refresh": "Обновить",
+    "refresh": "Освежите и освежайте.",
     "systemUnknown": "На этой платформе не удалось прочитать системную память.",
-    "platformUnsupported": "Здоровье машины недоступно на этой платформе — запросы процессов поддерживаются в Windows, macOS и Linux.",
+    "platformUnsupported": "Машинный здоровье недоступен на этой платформе — поддержка запросов процессов Windows, macOS и Linux.",
     "freeOf": "бесплатный",
     "used": "использовано",
     "recommendationsTitle": "Рекомендации",
@@ -864,8 +881,8 @@
       "modelHost": "Система перевода (Ollama)"
     },
     "recommendation": {
-      "heapCapTooHigh": "Предел кучи сервера анализа ({capMb} МБ) оставляет менее половины ОЗУ этого компьютера для всего остального. Рекомендуемый предел: {recommendedMb} МБ.",
-      "noHeapCapWithSuggestion": "Для сервера анализа Dart не настроен предел памяти. Рекомендуемый предел для этого компьютера: {mb} МБ.",
+      "heapCapTooHigh": "Стек анализатора ({capMb} МБ) оставляет меньше половины оперативной памяти этого компьютера для всего остального. Рекомендуемый лимит: {recommendedMb} МБ.",
+      "noHeapCapWithSuggestion": "Анализатор Dart сервера не имеет настроенной памяти. Рекомендуемый лимит для этой машины: {mb} МБ.",
       "systemLowMemory": "Только {free} из {total} RAM свободно в системе. Закройте ненужные приложения или VS Code окна.",
       "orphansFound": "{count} процессы, оставленные без родителей, держат {size} памяти из более ранней сессии.",
       "analysisServerLarge": "Процесс(ы) сервера анализа {count} Dart используют до {size}. Перезапуск освобождает память.",
@@ -876,12 +893,12 @@
     },
     "action": {
       "reclaim": "Восстановить",
-      "restartAnalysisServer": "Перезапустить",
+      "restartAnalysisServer": "Перезагрузить, перезапустив.",
       "setHeapCap": "Установить лимит",
       "unloadModel": "Снять"
     },
     "heapCap": {
-      "promptWithRecommendation": "Предел кучи сервера анализа в МБ. Рекомендуется для {totalGb} этого компьютера: {recommendedMb} МБ.",
+      "promptWithRecommendation": "Анализ сервера кучи в МБ. Рекомендуется для этой машины {totalGb}: {recommendedMb} МБ.",
       "invalid": "Введите целое число мегабайт, большее 0.",
       "applied": "Установите лимит кучи анализатора в {mb} МБ. Перезапустите анализатор, чтобы изменения вступили в силу.",
       "restartNow": "Перезапустить сейчас"
@@ -912,8 +929,8 @@
     },
     "notification": {
       "shedDisabled": "Обнаружено давление на память анализатора (RSS {rssMb} МБ, мягкий лимит {softLimitMb} МБ). Включите правило сброса, чтобы автоматически отключать дорогие правила при давлении.",
-      "enableButton": "Включить",
-      "learnMoreButton": "Подробнее",
+      "enableButton": "Enable - включить.",
+      "learnMoreButton": "Узнайте больше узнайте больше",
       "runInit": "Запустите 'dart run saropa_lints:init', чтобы сгенерировать analysis_options_custom.yaml, затем установите shed_rules: true.",
       "enabledConfirmation": "Правило сброса включено в analysis_options_custom.yaml. Анализатор захватит изменения при следующем перезагрузке."
     },
@@ -941,13 +958,13 @@
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "только что",
+      "justNow": "Только что, сейчас.",
       "minutesAgo": "{min} мин. назад",
       "hoursAgo": "{hr} ч. назад",
       "daysAgo": "{day} д. назад"
     },
     "status": {
-      "updatedPrefix": "Обновлено",
+      "updatedPrefix": "Обновленный обновлён.",
       "refreshHint": "Нажмите, чтобы обновить информацию с анализатора.",
       "lastRunUnknown": "Последний пробег неизвестен.",
       "noTimestampTitle": "Нет временной метки на violations.json.",
@@ -958,7 +975,7 @@
       "driftOnTitle": "Drift Advisor подключен: {label} Это - ПХО.",
       "driftOnPill": "Дрейфуя по · {count}",
       "driftOfflineTitle": "Drift Advisor включен, но сервер не найден.",
-      "driftOfflinePill": "Drift не в сети",
+      "driftOfflinePill": "Дрейф в автономном режиме.",
       "driftAuthRequiredTitle": "Найден сервер Drift Advisor, но требуется токен аутентификации — установите saropaLints.driftAdvisor.authToken",
       "driftAuthRequiredPill": "Drift требует токен",
       "driftAuthFailedTitle": "Drift Advisor отклонил настроенный токен аутентификации — нажмите, чтобы обновить его",
@@ -975,41 +992,41 @@
       "qualityGateFailingPill": "Ворота не работают"
     },
     "groupBy": {
-      "severity": "Серьёзность",
-      "file": "Файл",
+      "severity": "Тяжесть тяжести.",
+      "file": "Файл файла файловой файл",
       "impact": "Влияние",
-      "rule": "Правило",
+      "rule": "Статья Статья",
       "owasp": "OWASP",
-      "ruleType": "Тип правила",
-      "ruleStatus": "Статус правила",
-      "tier": "Tier",
+      "ruleType": "Тип правила тип правил",
+      "ruleStatus": "Статус правила - это статус правил.",
+      "tier": "Уровень",
       "pack": "Пакет (ы)"
     },
     "seg": {
       "toggleSeverityTitle": "Переключатель {v} степень тяжести."
     },
     "kpi": {
-      "visibleLabel": "Видимые результаты",
-      "allMatched": "все совпали",
+      "visibleLabel": "Видимые находки - это результаты.",
+      "allMatched": "Все они совпадают.",
       "ofTotal": "из общего числа {total}.",
       "clearFiltersTitle": "Нажмите, чтобы очистить все фильтры.",
-      "errorsLabel": "Ошибки",
-      "errorsSubFix": "нужно исправить",
-      "errorsSubClear": "нет  ⁇  ясное",
-      "errorsTitle": "Фильтр обнаруживает ошибки (нужно исправить  ⁇  сломан / будет падать / эксплуатироваться)",
-      "warningsLabel": "Предупреждения",
+      "errorsLabel": "Ошибки ошибок.",
+      "errorsSubFix": "Должно быть, исправить.",
+      "errorsSubClear": "нет — ясно",
+      "errorsTitle": "Отфильтровать результаты по ошибкам (необходимо исправить — сломано/вылетит/можно использовать).",
+      "warningsLabel": "Предупреждения о предупреждении.",
       "warningsSubBad": "может потерпеть неудачу или выглядеть плохо.",
-      "warningsSubClear": "нет  ⁇  ясное",
+      "warningsSubClear": "нет — ясно",
       "warningsTitle": "Фильтруйте результаты на предупреждения (может не сработать или выглядеть плохо)",
-      "infoLabel": "Сведения",
-      "infoSub": "FYI  ⁇  стиль / предложения.",
-      "infoSubNone": "нет",
-      "infoTitle": "Фильтруйте результаты на информацию (для вашей информации  ⁇  стиль и предложения)",
-      "filesLabel": "Затронуто файлов",
+      "infoLabel": "Информация",
+      "infoSub": "К вашему сведению — стиль/предложения",
+      "infoSubNone": "Никакой, ни одной из них.",
+      "infoTitle": "Фильтрация результатов по информации (к вашему сведению — стиль и предложения)",
+      "filesLabel": "Затронутые файлы - это затронуты файлы.",
       "filesSubAcross": "по всему экспортному экспорту.",
       "filesSubNone": "никаких файлов не затронуто.",
       "filesTitle": "Отдельные файлы, вносившие по крайней мере один вклад в находку.",
-      "topRuleLabel": "Главное правило",
+      "topRuleLabel": "Верхнее правило - верховное правило.",
       "topRuleTitle": "Фильтруйте результаты для правила {name}.",
       "sectionHeading": "Обзор",
       "sectionAria": "Обзор статистики"
@@ -1017,20 +1034,20 @@
     "toolbar": {
       "ariaFiltersActions": "Фильтры и действия.",
       "groupByFieldTitle": "Результаты групповых исследований по выбранному измерению.",
-      "groupByLabel": "Группировать по",
+      "groupByLabel": "Группы по группам.",
       "textFilterTitle": "Фильтруйте результаты поиска по пути файла, правилу или тексту сообщения.",
       "textFilterPlaceholder": "Фильтровать по файлам, правилам или сообщениям...",
-      "textFilterAria": "Текстовый фильтр",
+      "textFilterAria": "Текстовый фильтр - это текстовая фильтрация.",
       "clearTextFilterTitle": "Чистый текстовый фильтр.",
       "clearTextFilterAria": "Чистый текстовый фильтр.",
-      "recentFiltersTitle": "Недавние фильтры",
+      "recentFiltersTitle": "Недавние фильтры.",
       "clearRecentTitle": "Очистить все последние фильтры.",
-      "clearRecentButton": "Очистить",
-      "recentFiltersListAria": "Недавние фильтры",
+      "clearRecentButton": "Чистый чистый Чистые Чистыми",
+      "recentFiltersListAria": "Недавние фильтры.",
       "runAnalysisTitle": "Запустите Saropa Lints анализ.",
-      "severityGroupAria": "Фильтр по серьёзности",
-      "severityLabel": "Серьёзность",
-      "moreSummary": "Ещё",
+      "severityGroupAria": "Фильтр тяжести фильтра.",
+      "severityLabel": "Тяжесть тяжести.",
+      "moreSummary": "Больше, больше, больше.",
       "moreChevron": "▾",
       "copyJsonTitle": "Копируйте отфильтрованные нарушения в виде JSON ({count})",
       "saveReportTitle": "Сохранить отфильтрованные нарушения в виде JSON для отчетов/YYY YMMDD/.",
@@ -1058,7 +1075,7 @@
       "includeSuppressedTitle": "Также включайте находки, обычно скрытые с помощью // ignore:, // ignore_for_file: или записи базовой линии — каждая помечена тем, как она была подавлена. Ваша конфигурация проекта не изменяется.",
       "runButton": "Запустить аудит",
       "runButtonTitle": "Запустите полный аудит проекта CLI и загрузите его результаты здесь",
-      "cancelButton": "Отмена",
+      "cancelButton": "Отменить отменить.",
       "runningLabel": "Аудит...",
       "runningMeta": "Запуск аудита CLI…",
       "statusFull": "Показывает полный аудит проекта из {time}",
@@ -1071,13 +1088,13 @@
       "resetAllTitle": "Сбросьте все фильтры."
     },
     "menuPalette": {
-      "help": "Справка",
+      "help": "Помочь помочь помочь.",
       "groupBy": "Группируйтесь по... группам.",
       "textFilter": "Текстовый фильтр... текстовый.",
       "severityImpact": "Фильтр тяжести... фильтр тяжёлости.",
       "hideRules": "Скрытые правила... скрытые правила.",
-      "ruleMetadata": "Метаданные правила",
-      "clearFilters": "Очистить фильтры",
+      "ruleMetadata": "Правило метаданных.",
+      "clearFilters": "Очистить фильтры.",
       "clearSuppressions": "Ясные подавления.",
       "clearFileFocus": "Очистить фокус файла от фокусировки.",
       "matchActiveEditor": "Сопоставьте активный редактор совпадений.",
@@ -1093,11 +1110,11 @@
       "reEnableNoneMessage": "В настоящее время правила не отключены через analysis_options_custom.yaml.",
       "reEnableQuickPickTitle": "Восстановить действие отключенных правил.",
       "reEnableQuickPickPlaceholder": "Выберите одну или несколько правил, чтобы снова включить их.",
-      "menuGroupExport": "Экспорт",
+      "menuGroupExport": "Экспортный экспорт.",
       "menuGroupBulk": "Массовые действия",
       "menuGroupFilter": "Фильтр и фокус.",
-      "menuGroupOpen": "Открыть панель",
-      "menuGroupSystem": "Система"
+      "menuGroupOpen": "Откройте приборную панель.",
+      "menuGroupSystem": "Система системы System."
     },
     "progress": {
       "runningLabel": "Проводя анализ... анализы.",
@@ -1105,19 +1122,19 @@
     },
     "topRules": {
       "sectionAria": "Топ-правила по подсчету.",
-      "hideTitle": "Спрячьте для меня только  ⁇  уровень рабочей зоны, обратимый через Clear Suppressions.",
-      "hideButton": "Скрыть",
-      "disableTitle": "Disable для всего проекта  ⁇  записывает analysis_options_custom.yaml и повторно запускает анализ",
-      "disableButton": "Отключить",
-      "workspaceOnlyShort": "только рабочая область",
+      "hideTitle": "Скрыть только для меня — на уровне рабочей области, обратимо с помощью Clear Suppressions.",
+      "hideButton": "Спрятать, прятаться.",
+      "disableTitle": "Отключить для всего проекта — записывает analysis_options_custom.yaml и повторно запускает анализ",
+      "disableButton": "Disable отключить.",
+      "workspaceOnlyShort": "Только рабочая площадь.",
       "projectConfigShort": "config проекта (записывает analysis_options_custom.yaml)",
       "topRulesOne": "Правило верхней {count} правилом.",
       "topRulesOther": "Топ- {count} правила",
       "colRank": "#",
-      "colRule": "Правило",
-      "colCount": "Количество",
-      "colSeverity": "Серьёзность",
-      "colActionsAria": "Действия со строкой",
+      "colRule": "Статья Статья",
+      "colCount": "Считать, считать и считывать.",
+      "colSeverity": "Тяжесть тяжести.",
+      "colActionsAria": "Действия в рядах Row actions",
       "filesAffected": "Затронутые файлы ({count})",
       "howToFixHeading": "Как исправить",
       "owaspMobileLabel": "Mobile",
@@ -1128,19 +1145,19 @@
       "supersedesLabel": "Поверхностно:"
     },
     "findings": {
-      "sectionAria": "Результаты",
-      "heading": "Результаты",
-      "expandAll": "Развернуть всё",
-      "collapseAll": "Свернуть всё",
+      "sectionAria": "Результаты исследования.",
+      "heading": "Результаты исследования.",
+      "expandAll": "Расширить все расширение.",
+      "collapseAll": "Все рухнут, все разрушатся.",
       "bulkSelected": "{count} выбрано",
       "bulkCopy": "Копируйте выбранное как JSON.",
       "selectAllTitle": "Выберите все видимые находки.",
       "selectAllAria": "Выберите все видимые находки.",
-      "colSeverity": "Серьёзность",
-      "colRule": "Правило",
-      "colMessage": "Сообщение",
-      "colLine": "Строка",
-      "colActionsAria": "Действия со строкой",
+      "colSeverity": "Тяжесть тяжести.",
+      "colRule": "Статья Статья",
+      "colMessage": "Сообщение сообщения Послание.",
+      "colLine": "Линия, линия, линия.",
+      "colActionsAria": "Действия в рядах Row actions",
       "selectRowAria": "Выберите этот поисковый ряд.",
       "copyRowTitle": "Копируйте этот результат в виде JSON.",
       "suppressedBadge": "Заглушенный",
@@ -1155,46 +1172,46 @@
       "emptyNoMatch": "Никаких нарушений не совпадает с текущими фильтрами.",
       "emptyHintNoData": "Запустите анализ, чтобы заполнить `reports/.saropa_lints/violations.json`, затем обновите.",
       "emptyHintFilters": "Настройте фильтры или запустите анализ снова, чтобы увидеть результаты.",
-      "reRunAnalysis": "Перезапустить анализ",
-      "resetFilters": "Сбросить фильтры",
+      "reRunAnalysis": "Анализ повторного запуска анализа.",
+      "resetFilters": "Сброс фильтров с нуля.",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "Диаграммы структуры",
-      "heading": "Структура",
+      "sectionAria": "Микширование диаграмм.",
+      "heading": "Смешивание",
       "metaClickSlice": "нажмите на кусочек, чтобы отфильтровать.",
-      "severityMix": "Структура по серьёзности",
+      "severityMix": "Смесь тяжести и степени тяжести.",
       "filterBarTitle": "Фильтр только на {key}.",
-      "donutTotal": "всего"
+      "donutTotal": "Общий общий суммарный объем."
     },
     "todoHack": {
       "sectionAria": "Тодо и хекс - это тодо и хиксы.",
       "headingDisabled": "Тодо и хаки - это то, что можно сделать.",
       "metaDisabled": "сканирование отключено",
-      "scanOff": "Сканирование рабочего пространства отключено  ⁇  Включить возможность маркировки поверхности из файлов проекта.",
-      "enableScan": "Включить сканирование",
+      "scanOff": "Сканирование рабочей области отключено — включите отображение маркеров из файлов проекта.",
+      "enableScan": "Включить сканирование с помощью настройки Scan.",
       "heading": "Тодо и хаки - это то, что можно сделать.",
       "subsectionNone": "{title}: нет в диапазоне сканирования.",
       "capNote": "Сканирование достигло своего лимита файлов, поэтому некоторые файлы были пропущены.",
       "raiseCap": "Поднимите лимитную ставку.",
-      "notePill": "заметка",
-      "todosLabel": "TODO",
-      "hacksLabel": "HACKS"
+      "notePill": "Примечание: Заметка.",
+      "todosLabel": "Всего, что есть.",
+      "hacksLabel": "ХАКСС - это топоры."
     },
     "drift": {
       "sectionAria": "Drift Advisor",
       "headingOff": "Drift Advisor",
-      "metaOff": "интеграция выключена",
+      "metaOff": "интеграция от интеграции.",
       "enableBlurb": "Включите интеграцию Drift Advisor с предложениями по базам данных поверхности здесь.",
-      "enable": "Включить",
+      "enable": "Enable - включить.",
       "headingNoServer": "Drift Advisor",
-      "metaNoServer": "нет сервера",
+      "metaNoServer": "Нет сервера, нет сервера.",
       "noServerBlurb": "Сервер Drift Advisor не найден на настроенных портах.",
-      "retry": "Повторить",
+      "retry": "Попробуйте снова и снова.",
       "headingConnected": "Drift Advisor",
-      "metaConnected": "подключено",
-      "noIssues": "Подключен к {label}  ⁇  нет текущих проблем.",
-      "refresh": "Обновить",
+      "metaConnected": "соединенные соединённые соединяемые",
+      "noIssues": "Подключен к {label} — текущих проблем нет.",
+      "refresh": "Освежите и освежайте.",
       "openBrowser": "Открыть в браузере.",
       "headingIssues": "Drift Advisor",
       "disable": "Отключить Drift Advisor от работы."
@@ -1209,20 +1226,20 @@
       "unsuppressButton": "Отключить",
       "unsuppressTitle": "Удалить подавление, чтобы это открытие отображалось в обычных сканированиях",
       "unsuppressHint": "Чтобы разрешить {rule} по {file}:{line}, удалите комментарий // ignore: над этой строкой.",
-      "columnFile": "Файл",
-      "columnLine": "Строка",
-      "columnRule": "Правило",
+      "columnFile": "Файл файла файловой файл",
+      "columnLine": "Линия, линия, линия.",
+      "columnRule": "Статья Статья",
       "columnKind": "Вид",
       "columnAction": "Действие"
     },
     "suppressions": {
-      "sectionAria": "Подавления",
+      "sectionAria": "Подавления подавлений.",
       "headingExport": "Удаления (экспорт)",
       "viewHidesHeading": "Проблемы скрывает вид просмотра.",
-      "viewHidesMetaActive": "активен",
-      "viewHidesMetaNone": "нет",
+      "viewHidesMetaActive": "активный",
+      "viewHidesMetaNone": "Никакой, ни одной из них.",
       "noneInExport": "В текущем экспорте `violations.json` нет подавлений анализатора. Запустите анализ после редактирования игнорируемых или базовых показателей для заполнения.",
-      "totalRow": "Общее  ⁇  прозрачные фильтры и открытые результаты.",
+      "totalRow": "Итого — очистить фильтры и открыть результаты",
       "byRule": "По правилу ({count})",
       "byFile": "По файлу ({count})",
       "noEntries": "Никаких записей.",
@@ -1243,12 +1260,12 @@
     },
     "script": {
       "announceCleared": "Все фильтры очищены.",
-      "announceFiltersPrefix": "Фильтры:",
-      "announceStarted": "Анализ запущен",
+      "announceFiltersPrefix": "Фильтры: фильтры для очистки воды.",
+      "announceStarted": "Начался анализ.",
       "announceComplete": "Анализ завершен, анализ выполнен.",
-      "announceFailed": "Ошибка анализа",
-      "removeRecentAria": "Удалить",
-      "removeRecentTitle": "Удалить",
+      "announceFailed": "Анализ не удался.",
+      "removeRecentAria": "Удалить удалить убрать",
+      "removeRecentTitle": "Удалить удалить убрать",
       "bulkSelectedTpl": "{n} выбрано",
       "announceSearchVerb": "Поиск",
       "severitiesNoun": "серьёзность",
@@ -1265,32 +1282,48 @@
       "activateKpiSpace": "Активировать ориентированную карту KPI или графическую строку.",
       "showOverlay": "Покажите этот краткий путь наложения."
     },
-    "unknownAnalyzerKind": "Неизвестно",
+    "unknownAnalyzerKind": "Неизвестный неизвестно не известное",
     "supplementary": {
       "scannerPromo": "Включить сканер TODO/HACK.",
-      "tooltipScanner": "Saropa сканер файловой системы  ⁇  подсчитывает открытые маркеры TODO/HACK в исходном коде.",
+      "tooltipScanner": "Сканер файловой системы Saropa — подсчитывает открытые маркеры TODO/HACK в исходном коде.",
       "tooltipPromoClickToOn": "Нажмите, чтобы включить."
+    }
+  },
+  "ruleExplain": {
+    "toggle": {
+      "disableButton": "Отключить этот правило",
+      "disableTitle": "Отключить этот правило для всего проекта — записать analysis_options_custom.yaml. Запустите анализ снова, чтобы увидеть изменения.",
+      "enableButton": "Включить этот правило снова",
+      "enableTitle": "Включить этот правило снова — удаляет переопределение в analysis_options_custom.yaml. Запустите анализ снова, чтобы увидеть изменения."
+    },
+    "noData": {
+      "heading": "Еще не запущено",
+      "body": "Этот правило не сработало ни в одном месте в вашем рабочем пространстве, поэтому нет конкретной проблемы или исправления, которые можно показать. Запустите анализ, чтобы увидеть его в контексте, или проверьте его набор правил ниже, чтобы узнать, что он ищет.",
+      "bodyDisabled": "Этот правило в настоящее время отключено, поэтому оно не появится в результатах анализа. Включите его выше и запустите анализ, чтобы увидеть, что оно поймает.",
+      "tierLine": "Включено из уровня: {tier}",
+      "packsLine": "Правило пакет: {packs}",
+      "packsOverflow": "Правило пакет: {packs} (+{count} больше)"
     }
   },
   "triageDash": {
     "showInIssues": "Покажите в вопросах.",
-    "disableRules": "Отключить правила",
-    "enableRules": "Включить правила",
-    "issues": "Issues",
-    "off": "Выкл.",
-    "on": "Вкл.",
-    "colRule": "Правило",
-    "colIssues": "Issues",
+    "disableRules": "Правила отключения правил.",
+    "enableRules": "Правила, которые позволяют сделать это.",
+    "issues": "Вопросы, вопросы.",
+    "off": "Вне и вне, в сторону.",
+    "on": "И вновь и вновью,",
+    "colRule": "Статья Статья",
+    "colIssues": "Вопросы, вопросы.",
     "zeroIssueRules": "{count} правил без проблем — автоматически включены на уровне.",
     "disabledOverrides": "{count} правил отключено переопределением в `analysis_options_custom.yaml`.",
-    "summaryRuleTriage": "Сортировка правил",
-    "hintNoViolations": "Файла `reports/.saropa_lints/violations.json` пока нет. Запустите анализ, затем обновите эту вкладку.",
+    "summaryRuleTriage": "Правило триажа по правилам.",
+    "hintNoViolations": "`reports/.saropa_lints/violations.json` пока нет. Запустите анализ, затем обновите эту вкладку.",
     "hintUnreadable": "Нет читаемых нарушений экспорта. Сначала запустите анализ Saropa Lints.",
     "hintStale": "Данные по триажу могут быть устаревшими (экспорт {age} старый). Анализ повторного запуска для текущих групп.",
     "hintNoPerRule": "Этот экспорт не имеет никакого правила выпуска. Повторный анализ с помощью текущего Saropa Lints плагина.",
     "hintBuildFailed": "Не удалось создать триаж из этого экспорта. Проведите новый анализ.",
     "summaryVolume": "Правило сортировки (объем / необходимость фиксации / стилистический)",
-    "hintSameAsTree": "Та же группировка, что и в дереве «Сортировка» на панели действий: фильтруйте Issues или включайте/отключайте правила в `analysis_options_custom.yaml`. Для больших групп может потребоваться подтверждение."
+    "hintSameAsTree": "Та же группировка, что и дерево панели действий Triage: фильтрация проблем или отключение/включение правил в `analysis_options_custom.yaml`. Большие группы могут попросить подтверждение."
   },
   "kbdOverlay": {
     "toggleTitle": "Показывать сокращения клавиатуры (?)",
@@ -1327,9 +1360,9 @@
       "fullReportGenerating": "Генерация полного отчета — каждый сканированный пакет, каждая извлеченная функция changelog. Это выполняется один раз на сканирование и остается в кэше до тех пор, пока вы не пересканируете.",
       "knownIssues": "Известные проблемы",
       "knownIssuesDesc": "Просмотрите известные уязвимости и уведомления, сообщенные по отношению к вашим зависимостям.",
-      "compare": "Сравнить",
+      "compare": "Сравните, сравнивайте.",
       "compareDesc": "Сравнивайте два или более пакета по оценке, размеру и активности side by side",
-      "settings": "Настройки",
+      "settings": "Настройки настройки.",
       "openButton": "Открыть {tab}"
     },
     "settingsTab": {
@@ -1340,16 +1373,16 @@
         "scan": "Сканировать",
         "display": "Показать",
         "weights": "Веса оценок",
-        "upgrade": "Обновление",
+        "upgrade": "Обновление обновления.",
         "watch": "Следить",
         "budget": "Бюджет",
         "vuln": "Уязвимости"
       }
     },
     "detailPane": {
-      "aria": "Сведения о пакете",
-      "title": "Сведения о пакете",
-      "close": "Закрыть сведения",
+      "aria": "Детали упаковки, детали упаковок.",
+      "title": "Детали упаковки, детали упаковок.",
+      "close": "Близкие детали, деталь.",
       "copyForAi": "Копируйте подсказку об обновлении для ИИ."
     },
     "status": {
@@ -1359,12 +1392,12 @@
       "flaggedCount": "{count} отмеченных",
       "flaggedTitle": "Заброшенные или находящиеся в конце срока службы.",
       "lastScanLabel": "Сканировано {when}.",
-      "lastScanTitle": "Когда данные этой панели были получены  ⁇ {timestamp}. . . это как раз то, что я хочу сказать Нажмите, чтобы повторно сканировать и проверить наличие обновлений пакетов.",
+      "lastScanTitle": "Когда эти данные панели управления были получены — {timestamp}. Нажмите, чтобы пересканировать и проверить обновления пакетов.",
       "lastScanUnknown": "Сканировано (время неизвестно)",
       "lastScanUnknownTitle": "Это сканирование было выполнено до того, как панель инструментов отслеживала временные метки. Нажмите, чтобы повторно сканировать и проверить наличие обновлений пакетов."
     },
     "time": {
-      "justNow": "только что",
+      "justNow": "Только что, сейчас.",
       "minutesAgo": "{min} мин. назад",
       "hoursAgo": "{hr} ч. назад",
       "daysAgo": "{day} д. назад"
@@ -1381,38 +1414,38 @@
     },
     "gaugeTitle": "Гласс пакета проекта: {grade}",
     "summary": {
-      "packages": "Пакеты",
+      "packages": "Пакетные заказы - это пакетная продукция.",
       "projectGrade": "Проектный пакет Степень проекта",
       "totalSize": "Общий размер*",
       "gradeTooltip": "Оценка проекта {avgGrade}\nСредний балл: {avgScore}/100\nПакеты: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "Активны",
-      "stableTitle": "Стабильны",
+      "vibrantTitle": "Живая, жизнерадостная.",
+      "stableTitle": "Стабильный стабильный.",
       "outdatedTitle": "Устаревший устаревшая",
-      "abandonedTitle": "Заброшены",
+      "abandonedTitle": "Оставленный в заброшенном состоянии.",
       "eolTitle": "Конец жизни.",
-      "updates": "Обновления",
-      "unused": "Не используется",
-      "singleUse": "Одноразовые",
-      "vulnerable": "Уязвимы",
-      "overrides": "Переопределения",
-      "caveatLine1": "*Показаны размеры кода (lib + declared assets), возвращающиеся к размеру архива pub.dev, когда размер кода недоступен. Исключает dev_dependencies (build_runner, lints, saropa_lints и т.д.)  ⁇  они никогда не отправляются в пакете APK / IPA / web bundle. Фактический размер приложения будет меньше после сотрясения дерева.",
+      "updates": "Обновления обновлений.",
+      "unused": "Неиспользованные, не используемые.",
+      "singleUse": "Одноразовые одноразовый.",
+      "vulnerable": "Уязвимые уязвимы.",
+      "overrides": "Отменяет приоритеты.",
+      "caveatLine1": "*Размеры кода, показанные (lib + объявленные активы), при недоступности размера кода используется размер архива pub.dev. Исключаются dev_dependencies (build_runner, проверки, saropa_lints и т.д.) — они никогда не отправляются в APK / IPA / веб-пакет. Фактический размер приложения будет меньше после tree shaking.",
       "caveatLine2": "Пороги активности: 90d = устаревшее, 180d = спящее (срок выполнения обязательств + отпуска).",
-      "upgradeTitle": "Требуется обновление"
+      "upgradeTitle": "Обновление требуется"
     },
     "breakdown": {
-      "title": "Почему оценка {grade}?  ⁇  {avgScore}/100 средний по всем пакетам {pkgCount}.",
+      "title": "Почему оценка {grade}? — Среднее значение {avgScore}/100 по пакетам {pkgCount}",
       "hint": "Нажмите, чтобы расширить.",
-      "distributionHeading": "Распределение",
+      "distributionHeading": "Распределение распределения.",
       "signalsHeading": "Сигналы риска, затягивающие счет вниз.",
       "signalFlagged": "{count} отмечен (напущенный / конец срока службы)",
       "signalVulnerable": "{count} с известными уязвимостями.",
       "signalUpdates": "{count} имеют доступные обновления.",
       "bottomHeading": "Пакеты с самым низким баллом - это пакеты, которые имеют самые низкие оценки.",
       "thresholdsHeading": "Как оценки соотносятся с оценками.",
-      "thresholdA": "70+  ⁇  Вибрирующий: активно поддерживается, недавно опубликован.",
-      "thresholdB": "40 ⁇ 69  ⁇  Стабильность: все еще сохраняется, но замедляется.",
-      "thresholdC": "20 ⁇ 39  ⁇  Устарело: длинные промежутки между выпусками.",
-      "thresholdE": "менее 20  ⁇  Оставленный: признаки бездействия.",
+      "thresholdA": "70+ — Яркий: активно поддерживается, недавно опубликован",
+      "thresholdB": "40–69 — Стабильный: все еще сохраняется, но замедляется.",
+      "thresholdC": "20–39 — Устарело: большие перерывы между релизами",
+      "thresholdE": "ниже 20 — Заброшено: признаки бездействия",
       "thresholdF": "Прекращено или архивировано на pub.dev (оценка не использовалась)",
       "filterTooltip": "Фильтруйте таблицу упаковок только по этой категории.",
       "jumpTooltip": "Перейти к {name} в таблице упаковки."
@@ -1422,86 +1455,86 @@
     },
     "sections": {
       "sizeDistribution": "Размер Распределение размера.",
-      "sizeDistributionCaption": "Исключает dev_dependencies  ⁇  они никогда не отправляются в пакете APK / IPA / web.",
-      "filters": "Фильтры",
-      "packages": "Пакеты"
+      "sizeDistributionCaption": "Исключает dev_dependencies — они никогда не отправляют в APK / IPA / веб-пакет.",
+      "filters": "Фильтры фильтров.",
+      "packages": "Пакетные заказы - это пакетная продукция."
     },
     "toolbar": {
       "openPubspecTitle": "Открыть pubspec.yaml.",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Копируйте отчет JSON (все строки + детали)",
-      "copyAllLabel": "Копировать",
+      "copyAllLabel": "Копировать, копировать.",
       "copyOpportunitiesTitle": "Копируйте подсказки для обновления ИИ в отношении наиболее недоиспользуемых пакетов в одну и ту же пасту.",
       "copyOpportunitiesLabel": "Копируйте возможности для ИИ.",
       "saveAllTitle": "Сохранить отчет JSON в отчетах/YYY YMMDD/...",
-      "saveAllLabel": "Сохранить",
+      "saveAllLabel": "Спасти спасать сохранить.",
       "saveUpgradeTitle": "Сохранить отчет только пакетов с доступным обновлением отчетов/YYY YMMDD/...",
       "saveUpgradeLabel": "Сохранить отчет об обновлении.",
       "resetViewTitle": "Сбросить фильтры, сортировать и сохранить состояние просмотра.",
-      "resetViewLabel": "Сбросить вид",
-      "rescanTitle": "Пересканирование пакетов  ⁇  очищает pub.dev кэш и повторно извлекает версии.",
-      "rescanLabel": "Пересканировать",
+      "resetViewLabel": "Снова настроить вид сброса.",
+      "rescanTitle": "Повторное сканирование пакетов — очищает кеш pub.dev и повторно выбирает версии.",
+      "rescanLabel": "Повторное сканирование",
       "openOtherTitle": "Откройте другой проект pubspec.yaml в новом окне для сканирования Vibrancy.",
       "openOtherLabel": "Открытый проект...",
       "footprintGroupAria": "Размер колонки в режиме отпечатка стопы.",
       "footprintGroupTitle": "Что показывает столбец Размер: только собственный размер кода, плюс уникальные транзитивы (стоимость при удалении) или плюс все транзитивы (теоретический максимум). Возвращается к размеру архива, когда размер кода недоступен.",
-      "footprintLabel": "След:",
+      "footprintLabel": "Отпечаток: отпечатки ног.",
       "footprintOwnTitle": "Только собственный размер кода (lib + объявленные активы); возвращается к pub.dev размерам архива, когда он недоступен.",
-      "footprintOwn": "Свой",
+      "footprintOwn": "Собственный",
       "footprintUniqueTitle": "Собственный размер + транзитивы, используемые только этим депо (экономия при его удалении)",
-      "footprintUnique": "+ Уникальные",
+      "footprintUnique": "+ Уникальный.",
       "footprintTotalTitle": "Собственный размер + все транзитные, включая те, которые разделяются с другими департаментами.",
-      "footprintTotal": "+ Все",
-      "searchLabel": "Поиск пакетов",
+      "footprintTotal": "+ Все + Все.",
+      "searchLabel": "Пакеты поиска поисковых запросов.",
       "searchPlaceholder": "Поиск посылок...",
-      "clearSearchTitle": "Очистить поиск",
-      "clearSearchAria": "Очистить поиск",
+      "clearSearchTitle": "Очистить поиск от поиска.",
+      "clearSearchAria": "Очистить поиск от поиска.",
       "ageFilterTitle": "Фильтр по возрасту публикации.",
-      "publishedAgeLabel": "Давность публикации",
+      "publishedAgeLabel": "Опубликованный возраст.",
       "ageMaxAll": "Все",
       "presetFilterTitle": "Применить быстрые фильтра предварительной настройки.",
-      "presetLabel": "Пресет",
-      "presetNone": "Нет",
-      "presetModernization": "Модернизация",
-      "presetRiskHotspots": "Зоны риска",
+      "presetLabel": "Предустановка",
+      "presetNone": "Никто",
+      "presetModernization": "Модернизация - это модернизация.",
+      "presetRiskHotspots": "Горячие точки риска",
       "presetCleanup": "Кандидаты на очистку.",
-      "presetDirectOnly": "Только прямые",
+      "presetDirectOnly": "Только прямой только.",
       "devToggleTitle": "Включите зависимости от dev в таблицы и суммы.",
-      "includeDev": "Включая dev",
+      "includeDev": "Включают dev.",
       "activeFiltersLabel": "Активные фильтры:",
-      "clearAllFilters": "Очистить всё"
+      "clearAllFilters": "Все чисто, все ясно."
     },
     "columns": {
       "name": {
-        "label": "Пакет",
-        "tooltip": "Название пакета  ⁇  нажмите, чтобы открыть pubspec.yaml запись."
+        "label": "Пакетные услуги - это пакетная услуга.",
+        "tooltip": "Имя пакета — щелкните, чтобы открыть запись в pubspec.yaml."
       },
       "version": {
-        "label": "Версия",
+        "label": "Версия версии версии.",
         "tooltip": "Установленная версия от pubspec.lock."
       },
       "score": {
-        "label": "Категория",
-        "tooltip": "Классификация жизнеспособности и оценка здоровья (0 ⁇ 10)"
+        "label": "Категория категории категория категорий.",
+        "tooltip": "Классификация жизнеспособности и оценка здоровья (0–10)"
       },
       "published": {
-        "label": "Опубликовано",
+        "label": "Издание Опубликовано Публикации.",
         "tooltip": "Дата публикации установленной версии на pub.dev."
       },
       "activity": {
-        "label": "Активность",
+        "label": "Деятельность - это деятельность.",
         "tooltip": "Кодирование и выпуск деятельности отметка из commit + publish recency."
       },
       "likes": {
-        "label": "Лайки",
-        "tooltip": "pub.dev likes  ⁇  нажмите, чтобы открыть страницу с результатами упаковки."
+        "label": "Любит нравится.",
+        "tooltip": "Нравится pub.dev — нажмите, чтобы открыть страницу оценки пакета."
       },
       "downloads": {
-        "label": "Загрузки",
-        "tooltip": "pub.dev загрузок в последние 30 дней  ⁇  нажмите, чтобы открыть страницу с баллами пакета."
+        "label": "Загрузки Скачивание.",
+        "tooltip": "загрузок pub.dev за последние 30 дней — нажмите, чтобы открыть страницу оценки пакета."
       },
       "issues": {
-        "label": "Issues",
+        "label": "Вопросы, вопросы.",
         "tooltip": "Открытые GitHub вопросы (исключает pull-запросы, когда они доступны)"
       },
       "prs": {
@@ -1509,50 +1542,50 @@
         "tooltip": "Открыть GitHub pull запросы."
       },
       "size": {
-        "label": "Размер",
+        "label": "Размер, размер, размеры.",
         "tooltip": "Размер кода (lib + declared assets); возвращается к pub.dev размеру архива, когда размеры кода недоступны."
       },
       "deps": {
-        "label": "Зависимости",
-        "tooltip": "Прямые переходные зависимости  ⁇  Общие депо выделены."
+        "label": "Деппы депо.",
+        "tooltip": "Прямые транзитивные зависимости — выделены общие зависимости"
       },
       "files": {
-        "label": "Ссылки",
-        "tooltip": "Количество исходных файлов, которые импортируют этот пакет  ⁇  нажмите для поиска."
+        "label": "Ссылки ссылок.",
+        "tooltip": "Количество исходных файлов, которые импортируют этот пакет — нажмите, чтобы найти"
       },
       "transitives": {
-        "label": "Транзитивные",
+        "label": "Транзитивные - транзитные.",
         "tooltip": "Количество переходных (косвенных) зависимостей, которые вводит этот пакет."
       },
       "vulns": {
-        "label": "Уязвимости",
+        "label": "Вулны - это вулны.",
         "tooltip": "Известные уязвимости безопасности из OSV и GitHub Консультативных баз данных."
       },
       "license": {
-        "label": "Лицензия",
+        "label": "Лицензия лицензия.",
         "tooltip": "SPDX идентификатор лицензии от pub.dev."
       },
       "update": {
-        "label": "Обновить",
+        "label": "Обновлять",
         "tooltip": "Доступное обновление версии: основное, второстепенное или патч."
       },
       "opportunities": {
-        "label": "Возможности",
-        "tooltip": "Функции в журнале изменений этого пакета, которые еще не использовались в вашем коде  ⁇ сортировать, чтобы найти самые малопринятые пакеты."
+        "label": "Возможности, возможности.",
+        "tooltip": "Функции в этом пакете changelog не использованные в вашем коде — сортировать, чтобы найти наиболее малоadopted пакеты"
       },
       "status": {
-        "label": "Статус",
+        "label": "Статус - это статус, состояние.",
         "tooltip": "Статус использования: показывает ли пакет неиспользованным в вашем коде."
       },
       "description": {
-        "label": "Описание",
+        "label": "Описание описания опись.",
         "tooltip": "Описание упаковки от pub.dev."
       }
     },
     "cells": {
       "noGithub": "Не найдено ни одного репозитория GitHub.",
       "devBadge": "dev",
-      "transitiveBadge": "транзитивная",
+      "transitiveBadge": "переходящий, преходящий.",
       "opportunitiesTooltip": "Неиспользуемые функции: не используются. {features} Это - ПХО.",
       "publishDateUnavailable": "Дата публикации недоступна с pub.dev.",
       "activityGradeUnavailable": "Класс деятельности недоступен (недостающие данные о коммите или релизе)",
@@ -1564,11 +1597,11 @@
       "sizeUnavailable": "Размер недоступен у pub.dev.",
       "noVulnerabilities": "Не известны уязвимости.",
       "licenseUnspecified": "Лицензия не указана на pub.dev.",
-      "unusedBadge": "Не используется",
+      "unusedBadge": "Неиспользованные, не используемые.",
       "packageInUse": "Пакет используется."
     },
     "row": {
-      "expandDetails": "Показать подробности",
+      "expandDetails": "Расширяйте детали деталей.",
       "copyRowJson": "Копируйте строку в JSON."
     },
     "shortcuts": {
@@ -1608,8 +1641,8 @@
     "references": {
       "noImports": "Никаких источников файлов импорта не обнаружено.",
       "reExportLine": "{location} (реэкспорт) - реэкспортировать.",
-      "publicApiSurface": "Общедоступная поверхность API  ⁇  по крайней мере одно использование является реэкспортом.",
-      "reExportedBadge": "Реэкспорт",
+      "publicApiSurface": "Публичный API — хотя бы одно использование является переэкспортом",
+      "reExportedBadge": "Реэкспортированный реэкспорт.",
       "openFileReferences": "Открыть ссылки на файлы."
     },
     "deps": {
@@ -1633,22 +1666,22 @@
     },
     "detail": {
       "codeCommitActivity": "Код совершить деятельность, чтобы совершить действие.",
-      "releaseActivity": "Активность релизов",
-      "dormancySignal": "Признак застоя",
+      "releaseActivity": "Релизная деятельность.",
+      "dormancySignal": "Сигнал покоя сигнализирует о спящем состоянии.",
       "ago": "{age} прошлое.",
       "qualityExample": "+примерный пример",
       "qualityExampleTitle": "Выпускается бегущая демо-версия.",
       "qualityTests": "+тесты",
       "qualityTestsTitle": "Отправляет тестовый комплект.",
-      "qualityTools": "+инструменты",
+      "qualityTools": "+инструменты для инструментов.",
       "qualityToolsTitle": "Инструменты для обслуживания судов инструментальная техника.",
-      "qualityDocs": "+документация",
+      "qualityDocs": "+докс",
       "qualityDocsTitle": "Суда расширяют документацию.",
-      "healthScore": "Оценка состояния",
+      "healthScore": "Health Score - показатель здоровья.",
       "resolutionVelocity": "Скорость разрешения Resolution Velocity (скорость разрешение).",
-      "engagementLevel": "Уровень вовлечённости",
-      "popularity": "Популярность",
-      "publisherTrust": "Доверие к издателю"
+      "engagementLevel": "Уровень вовлеченности уровень привлечения.",
+      "popularity": "Популярность популярность.",
+      "publisherTrust": "Издательский траст доверия."
     }
   },
   "commandCatalog": {
@@ -1657,51 +1690,51 @@
     "heroTitle": "Saropa Каталог команд каталога",
     "status": {
       "internalHidden": "{count} только контекстное меню (скрыто)",
-      "wordCommands": "команд",
-      "wordCategories": "категорий",
-      "wordRecent": "недавние"
+      "wordCommands": "Команды командные приказы.",
+      "wordCategories": "категории категорий категориями",
+      "wordRecent": "Недавние недавние последние"
     },
     "search": {
       "placeholder": "Поиск заголовка, описание или командный идентификатор...",
-      "ariaLabel": "Поиск команд",
-      "clearAria": "Очистить поиск",
+      "ariaLabel": "Поисковые команды поиск.",
+      "clearAria": "Очистить поиск от поиска.",
       "hintLine1": "Совпадает с каждой командной строкой.",
-      "hintStrongTitle": "название",
-      "hintStrongDesc": "описание",
-      "hintStrongId": "id",
-      "hintLine2": "(Токены id также расположены между  ⁇  типом.",
-      "hintLine2kbd": "запустить анализ",
+      "hintStrongTitle": "Название название титул",
+      "hintStrongDesc": "Описание описания опись описание.",
+      "hintStrongId": "id id id, что означает \"идеальный\".",
+      "hintLine2": "(идентификаторы тоже располагаются через интервал — введите",
+      "hintLine2kbd": "Run Analysis - анализ выполнения.",
       "hintLine2End": "без точек)."
     },
     "toolbar": {
       "showInternal": "Показывать команды контекстного меню.",
-      "collapseAll": "Свернуть всё"
+      "collapseAll": "Все рухнут, все разрушатся."
     },
     "recentPopover": {
-      "title": "Недавние запросы",
+      "title": "Последние поисковые запросы.",
       "clearTitle": "Очистить все недавние поиски.",
-      "clearButton": "Очистить",
-      "listAria": "Недавние запросы"
+      "clearButton": "Чистый чистый Чистые Чистыми",
+      "listAria": "Последние поисковые запросы."
     },
     "filterChips": {
-      "ariaRegion": "Активные фильтры",
+      "ariaRegion": "Активные фильтры - активные фильтра.",
       "activeLabel": "Активные фильтры:",
-      "clearAll": "Очистить всё"
+      "clearAll": "Все чисто, все ясно."
     },
     "bands": {
-      "frequentTitle": "Частые",
+      "frequentTitle": "Частое, частое.",
       "frequentHint": "Наиболее часто используемые в ваших сеансах.",
-      "recentTitle": "Недавние",
-      "recentClear": "Очистить",
+      "recentTitle": "Недавние Последние Недавнее",
+      "recentClear": "Чистый чистый Чистые Чистыми",
       "recentHint": "Нажмите, чтобы запустить снова · Новейшее сначала."
     },
     "noResults": {
       "message": "Никакие команды не соответствуют вашему поиску.",
-      "reset": "Сбросить фильтры"
+      "reset": "Сброс фильтров с нуля."
     },
     "entry": {
       "internalBadgeTitle": "Запускается только из контекстных меню.",
-      "internalBadge": "меню",
+      "internalBadge": "Меню меню мену.",
       "copyTitle": "Копировать командный id ({id})",
       "copyAria": "Копируйте командный идентификатор."
     },
@@ -1716,15 +1749,15 @@
     },
     "script": {
       "moreSuffix": "+{count} больше, чем",
-      "showLess": "Показать меньше",
-      "runSingular": " запуск",
-      "runPlural": " запусков",
-      "recentWord": "недавние",
-      "expandAll": "Развернуть всё",
-      "collapseAll": "Свернуть всё",
+      "showLess": "Показывать меньше показывают меньше.",
+      "runSingular": "Беги, беги, побегай.",
+      "runPlural": "Бежит, бегает, бежит.",
+      "recentWord": "Недавние недавние последние",
+      "expandAll": "Расширить все расширение.",
+      "collapseAll": "Все рухнут, все разрушатся.",
       "searchChip": "Поиск: \"{query}\"",
       "internalChip": "Показание команд контекстного меню.",
-      "removeFilterPrefix": "Удалить фильтр ",
+      "removeFilterPrefix": "Удалите фильтр с удалением.",
       "matchOne": "{count} совпадение",
       "matchOther": "{count} совпадений"
     }
@@ -1740,41 +1773,41 @@
       "launching": "Запуск сканера...",
       "collect": "Открытие файлов...",
       "firstRunHint": "Первый запуск компилирует сканер; большие проекты занимают мгновение, прежде чем файлы появляются.",
-      "paused": "Приостановлено",
-      "stopped": "Сканирование остановлено",
-      "elapsed": "Прошло",
+      "paused": "Пауза, приостановка",
+      "stopped": "Сканирование остановилось.",
+      "elapsed": "Прошло время, прошедшее.",
       "phase": {
-        "parse": "Разбор файлов",
+        "parse": "Рассматривает файлы для анализа.",
         "history": "Читание истории гитаристов.",
         "blame": "Эволюция вычислительного кода возраст.",
         "usage": "Подсчет ссылок.",
         "score": "Функции оценки баллов."
       },
       "counter": {
-        "files": "Файлы",
-        "functions": "Функции",
-        "problems": "Найдено проблем"
+        "files": "Файлы файлов.",
+        "functions": "Функции, функции.",
+        "problems": "Найдены проблемы, найденные проблемы."
       },
       "counters": {
         "aria": "Счетчики сканёров в реальном времени."
       },
       "controls": {
-        "aria": "Управление сканированием"
+        "aria": "Сканирование управления сканером."
       },
       "btn": {
-        "pause": "Пауза",
-        "resume": "Продолжить",
-        "restart": "Перезапустить",
-        "cancel": "Отмена"
+        "pause": "Пауза паузы.",
+        "resume": "Резюме, резюме.",
+        "restart": "Перезагрузить, перезапустив.",
+        "cancel": "Отменить отменить."
       },
       "preview": {
         "heading": "Проблемы, обнаруженные до сих пор.",
         "empty": "Пока не найдено никаких проблем..."
       },
       "version": {
-        "engine": "Движок",
+        "engine": "Двигатель",
         "detecting": "обнаруживая... выявляя...",
-        "legacy": "наследие  ⁇  нет живого прогресса (проект saropa_lints предшествует ему)"
+        "legacy": "наследие — нет живого прогресса (saropa_lints этого проекта предшествует ему)"
       }
     },
     "runReportFirst": "Запустите отчет снова, затем скопируйте JSON.",
@@ -1783,15 +1816,15 @@
     "panelTitle": "Saropa Код панели управления здоровьем.",
     "hero": {
       "title": "Saropa Код панели управления здоровьем.",
-      "generated": "Создано",
+      "generated": "генерируемой энергии.",
       "functionOne": "{count} функция",
       "functionOther": "{count} функций",
       "avgFormat": "avg {score} ({grade}) в течение месяца.",
-      "gatesFailing": "проверок не пройдено",
-      "gatesPassing": "проверок пройдено"
+      "gatesFailing": "Врата, которые терпят неудачу.",
+      "gatesPassing": "Проходящие ворота, проходящие через врата."
     },
     "gate": {
-      "fallback": "Качественные ворота не удались  ⁇  пересмотр пороговых значений в настройках Code Health.",
+      "fallback": "Не удалось выполнить контроль качества. Проверьте пороговые значения в настройках состояния кода.",
       "failingOne": "{count} шлюз завершился с ошибкой — проверьте пороги или скопируйте JSON для проверки gates.violations.",
       "failingOther": "{count} шлюзов завершились с ошибкой — проверьте пороги или скопируйте JSON для проверки gates.violations.",
       "openSettingsTitle": "Откройте настройки Кода здоровья, чтобы скорректировать пороговые значения.",
@@ -1799,61 +1832,61 @@
     },
     "kpi": {
       "ariaLabel": "Код медицинского резюме кода.",
-      "allClear": "Никаких функций, помеченных флагом в любой категории  ⁇  все чисто.",
+      "allClear": "Никаких помеченных функций ни в одной категории — все ясно.",
       "clickToFilter": "Нажмите, чтобы отфильтровать таблицу до функций с флагом {flag}.",
       "noFlagged": "Никаких функций не отмечено {flag}.",
-      "unused": "Не используется",
+      "unused": "Неиспользованные, не используемые.",
       "unusedSub": "функции, на которые нигде не ссылаются.",
-      "uncovered": "Не покрыто",
+      "uncovered": "Открытый, не покрытый.",
       "uncoveredSub": "отсутствие покрытия LCOV.",
-      "stubTested": "Тесты-заглушки",
+      "stubTested": "Стыб-тест с проверкой на наличие штанги.",
       "stubTestedSub": "Тесты существуют, но утверждают мало.",
       "suspiciousCoverage": "Подозрительные сообщения в СМИ.",
       "suspiciousCoverageSub": "Покрытие выглядит сфабрикованным.",
-      "testDrift": "Дрейф тестов",
+      "testDrift": "Испытание дрейфа испытания.",
       "testDriftSub": "Тесты отстают от функции, которая выполняется."
     },
     "toolbar": {
       "ariaLabel": "Кодекс Здравоохранные мероприятия.",
       "rescanTitle": "Повторите сканирование состояния кода и обновите эту панель.",
-      "rescan": "Пересканировать",
+      "rescan": "Повторное сканирование",
       "copyJsonTitle": "Копируйте JSON с необработанным кодом здоровья в клипборд.",
-      "copyJson": "Копировать JSON",
+      "copyJson": "Копируйте JSON.",
       "settingsTitle": "Откройте настройки Кода здоровья.",
       "settingsButton": "Код Установки здоровья.",
       "filterTitle": "Фильтруйте строки по имени, файлу или флагу.",
-      "filterLabel": "Фильтр строк",
+      "filterLabel": "Фильтровать строки",
       "filterPlaceholder": "Ряды фильтров..."
     },
     "table": {
       "ariaLabel": "Худшие функции по баллам.",
-      "heading": "Худшие функции",
-      "colScore": "Балл",
+      "heading": "Худшие функции - это худшие функции.",
+      "colScore": "Счетная оценка.",
       "colFunction": "Функция",
-      "colFile": "Файл",
-      "colLine": "Строка",
-      "colUsage": "Использование",
+      "colFile": "Файл файла файловой файл",
+      "colLine": "Линия, линия, линия.",
+      "colUsage": "Использование Употребление.",
       "colCoverage": "Покрытие охвата:",
-      "colComplexity": "Сложность",
-      "colFlags": "Флаги",
+      "colComplexity": "Сложность сложности.",
+      "colFlags": "Флаги, флаги - это знаки.",
       "noMatch": "Никакие функции не соответствуют текущим фильтрам.",
       "resetFiltersTitle": "Очистить поиск и любой активный флаг фильтр.",
-      "resetFilters": "Сбросить фильтры",
+      "resetFilters": "Сброс фильтров с нуля.",
       "expanderAriaCollapsed": "Показывать детали проблемы.",
       "expanderAriaExpanded": "Скрыть детали проблемы.",
       "detailHeading": "Почему эта функция набрала {score}?",
-      "detailNoIssues": "Никаких флагов в этом ряду  ⁇  балл определяется значениями вышеперечисленных столбцов (использование, охват, сложность, возраст, документация).",
+      "detailNoIssues": "В этой строке нет флажков — оценка определяется значениями столбца выше (использование, охват, сложность, возраст, документация).",
       "suppressLabel": "Suppress в файле подавлять.",
       "suppressTooltip": "Записывает `// ignore_for_file: code_health:<flag>` в этот файл, чтобы при будущих сканированиях флаг был удален для всего файла."
     },
     "flag": {
       "unused": {
-        "label": "не используется",
-        "evidence": "0 вызовов",
+        "label": "неиспользованные, неискормленные.",
+        "evidence": "0 звонков от абонентов.",
         "rule": "Флаг, когда никакой другой файл не ссылается на эту функцию. имя функции"
       },
       "uncovered": {
-        "label": "не покрыто",
+        "label": "не прикрытый, раскрытый.",
         "evidence": "{pct}% тесты тестирования.",
         "rule": "Флаг, когда LCOV сообщает о 0% покрытии линии."
       },
@@ -1863,18 +1896,18 @@
         "rule": "Флаг, когда цикломатическая сложность превышает 10."
       },
       "undocumented": {
-        "label": "без документации",
+        "label": "не имеющих документов.",
         "evidence": "CC {cc}, без документации.",
         "rule": "Флаг, когда комплексная функция (CC > 10) не имеет комментариев."
       },
       "test_drift": {
-        "label": "дрейф тестов",
+        "label": "Тест на дрейф тест на дрифт",
         "evidence": "Тесты отстают от функции, которая выполняется.",
         "rule": "Флаг, когда новый связанный тест-файл значительно старше исходного файла функции."
       },
       "stub_tested": {
-        "label": "тесты-заглушки",
-        "evidence": "слабые проверки",
+        "label": "Стропированный тест на прочность.",
+        "evidence": "тонкие утверждения утверждает.",
         "rule": "Флаг, когда связанный тест существует, но едва что утверждает."
       },
       "suspicious_coverage": {
@@ -1897,11 +1930,11 @@
     },
     "script": {
       "activeFiltersLabel": "Активные фильтры:",
-      "clearAll": "Очистить всё",
-      "neverRun": "ни разу не запускалось"
+      "clearAll": "Все чисто, все ясно.",
+      "neverRun": "Никогда не беги, никогда не убегай."
     },
     "freshness": {
-      "justNow": "только что",
+      "justNow": "Только что, сейчас.",
       "minutesAgo": "{min} мин. назад",
       "hoursAgo": "{hr} ч. назад",
       "daysAgo": "{day} д. назад",
@@ -1917,11 +1950,11 @@
     },
     "scan": {
       "subtitle": "Анализ размера проекта, сложности и горячих точек…",
-      "elapsed": "Прошло",
-      "cancel": "Отмена",
-      "restart": "Перезапустить",
+      "elapsed": "Прошло время, прошедшее.",
+      "cancel": "Отменить отменить.",
+      "restart": "Перезагрузить, перезапустив.",
       "stopped": "Остановлено",
-      "logHeading": "Активность",
+      "logHeading": "Деятельность - это деятельность.",
       "logEmpty": "Еще нет вывода — этот журнал заполняется только в том случае, если сканирование выводит сообщение диагностическое.",
       "progress": "{percent}% — {done}/{total} файлы"
     },
@@ -1965,15 +1998,15 @@
       "gate": {
         "editorLabel": "saropa_quality_gate.yaml thresholds",
         "placeholder": "качество_ворот:\n  условия:\n    - метрика: new_critical_issues\n      оп: уравнение\n      значение: 0\n      on_fail: неудача",
-        "save": "Сохранить",
+        "save": "Спасти спасать сохранить.",
         "saved": "Сохранено",
         "saveError": "Не удалось сохранить"
       },
-      "colFile": "Файл",
-      "colLineNum": "Строка",
-      "colRule": "Правило",
-      "colSeverity": "Серьёзность",
-      "colMessage": "Сообщение",
+      "colFile": "Файл файла файловой файл",
+      "colLineNum": "Линия, линия, линия.",
+      "colRule": "Статья Статья",
+      "colSeverity": "Тяжесть тяжести.",
+      "colMessage": "Сообщение сообщения Послание.",
       "colKey": "Ключ"
     },
     "shortcuts": {
@@ -1981,13 +2014,13 @@
       "showOverlay": "Покажите этот краткий путь наложения."
     },
     "hero": {
-      "files": "Файлы",
+      "files": "Файлы файлов.",
       "lines": "Строки",
-      "size": "Размер"
+      "size": "Размер, размер, размеры."
     }
   },
   "suppressionsStrip": {
-    "noData": "Нет violations.json еще  ⁇  запустите анализ, чтобы заполнить снимок подавления.",
+    "noData": "Еще нет violations.json — выполните анализ для заполнения снимка подавления.",
     "zeroTotal": "0 анализирующие подавления в последнем экспорте.",
     "noKindBreakdown": "В этом экспорте нет разбивки по видам.",
     "title": "Удаления (экспорт)",
@@ -2013,15 +2046,15 @@
     "noCountersTitle": "Нет счетчиков для сброса.",
     "resetTitle": "Сбросить все счетчики.",
     "refreshTitle": "Перезагрузите счетчики телеметрии с диска.",
-    "refresh": "Обновить",
+    "refresh": "Освежите и освежайте.",
     "copyTitle": "Копируйте снимок в виде JSON.",
-    "copyJson": "Копировать JSON",
-    "resetCounters": "Сбросить счётчики",
-    "countersAria": "Счётчики",
-    "countersHeading": "Счётчики событий",
+    "copyJson": "Копируйте JSON.",
+    "resetCounters": "Сброс счетчиков с нуля.",
+    "countersAria": "Счетчики счетов.",
+    "countersHeading": "Счетчики событий.",
     "thEvent": "Событие",
-    "thCount": "Количество",
-    "emptyMessage": "Пока не зарегистрировано ни одного события телеметрии  ⁇  Откройте правило из панели данных, чтобы начать запись счетчиков.",
+    "thCount": "Считать, считать и считывать.",
+    "emptyMessage": "События телеметрии пока не зарегистрированы — откройте правило на панели результатов, чтобы начать сбор данных счетчиков.",
     "openFindingsTitle": "Откройте Saropa Dashboard с результатами.",
     "openFindings": "Откройте панель инструментов \"Отзывы\".",
     "lastPropsHeading": "Свойства последнего события свойства последних событий.",
@@ -2035,8 +2068,8 @@
   "securityPosture": {
     "issueOne": "{count} проблема",
     "issueOther": "{count} проблем",
-    "noIssues": "Нет проблем",
-    "showIssues": "Показать проблемы",
+    "noIssues": "Никаких проблем нет.",
+    "showIssues": "Показывать проблемы с проблемами.",
     "violationTooltip": "{count} нарушений в {ruleCount} правилах. Нажмите, чтобы показать в Проблемах.",
     "noViolationsTooltip": "В этой категории не зафиксировано нарушений."
   },
@@ -2047,28 +2080,28 @@
     },
     "table": {
       "row": {
-        "vibrancyGrade": "Оценка активности",
-        "category": "Категория",
-        "latestVersion": "Последняя версия",
-        "published": "Опубликовано",
-        "publisher": "Издатель",
-        "pubPoints": "Pub Points",
-        "githubStars": "Звёзды GitHub",
-        "openIssues": "Открытые issues",
-        "codeSize": "Размер кода",
-        "bloatRating": "Рейтинг раздутости",
-        "license": "Лицензия",
-        "platforms": "Платформы",
+        "vibrancyGrade": "Вибрационная степень.",
+        "category": "Категория категории категория категорий.",
+        "latestVersion": "Последняя версия последней версии.",
+        "published": "Издание Опубликовано Публикации.",
+        "publisher": "Издатель издатель.",
+        "pubPoints": "Пуб Пойнты",
+        "githubStars": "GitHub Звезды звезды.",
+        "openIssues": "Открытые вопросы.",
+        "codeSize": "Размер кода, размер кода.",
+        "bloatRating": "Рейтинг Bloat Rating (надутость)",
+        "license": "Лицензия лицензия.",
+        "platforms": "Платформы платформ.",
         "inThisProject": "В этом проекте."
       },
       "value": {
-        "unverified": "⁇  (непроверенный)",
+        "unverified": "— (не проверено)",
         "allPlatforms": "Все",
-        "yes": "Да",
-        "no": "Нет"
+        "yes": "Да /нет",
+        "no": "Нет, нет, нет - это не так."
       },
       "badge": {
-        "inProject": "В проекте"
+        "inProject": "В проекте In Project."
       }
     },
     "status": {
@@ -2079,15 +2112,15 @@
       "morePackages": "+{count} больше, чем"
     },
     "empty": {
-      "ariaLabel": "Нет пакетов",
+      "ariaLabel": "Нет упаковок Никаких посылок.",
       "message": "Никаких упаковок не выбрано для сравнения. Правой кнопкой мыши нажмите два или более пакетов в панели инструментов Пакета и выберите {compare}.",
-      "compareWord": "Сравнить",
+      "compareWord": "Сравните, сравнивайте.",
       "openDashboard": "Откройте панель инструментов пакета.",
       "openDashboardTitle": "Откройте панель управления пакетами Saropa."
     },
     "a11y": {
       "skipToTable": "Перейдите к таблице сравнения.",
-      "recommendation": "Рекомендация",
+      "recommendation": "Рекомендация - это рекомендация.",
       "addingToProject": "Добавление {name} к проекту."
     },
     "shortcuts": {
@@ -2100,12 +2133,12 @@
       "leadingTitle": "Пакет, ведущий по наибольшему количеству измерений побеждает.",
       "dimensionWinsOne": "{count} измерение выигрывает.",
       "dimensionWinsOther": "{count} измерение выигрывает.",
-      "packages": "Пакеты",
+      "packages": "Пакетные заказы - это пакетная продукция.",
       "packagesTitle": "Количество упаковок, сравниваемых бок о бок.",
-      "inComparison": "в сравнении",
-      "dimensions": "Критерии",
+      "inComparison": "в сравнении с другими.",
+      "dimensions": "Размеры измерений.",
       "dimensionsTitle": "Количество измерений, в которых победитель может быть оценен.",
-      "ranked": "в рейтинге"
+      "ranked": "ранжировался по рейтингу."
     },
     "toolbar": {
       "ariaLabel": "Сравнительные действия - это сравнительные действия.",
@@ -2116,9 +2149,11 @@
   "debug": {
     "section": {
       "engines": "Диагностические движки",
+      "enginesRecommendation": "Рекомендуется: Сервер LSP ВКЛ (по умолчанию, бета), Сканирование при сохранении ВКЛ, Живой анализ ВЫКЛ (сервер LSP уже покрывает живую диагностику; оба включенных могут показывать дубликаты), GitHub Действия CI ВКЛ только если вы хотите, чтобы запросы на слияние проходили через проверку. Если правило перестает срабатывать при LSP, включите Живой анализ и выключите Сервер LSP.",
       "log": "Лог"
     },
     "engine": {
+      "master": "Saropa Lints",
       "analyzerPlugin": "Живой анализ",
       "scanDaemon": "Сканировать при сохранении",
       "lspServer": "LSP Сервер",
@@ -2127,7 +2162,7 @@
       "rss": "RSS:",
       "statusLabel": "Статус:",
       "statusValue": {
-        "active": "активен",
+        "active": "активный",
         "idle": "праздный",
         "running": "запуск",
         "stopped": "остановлено",
@@ -2139,35 +2174,48 @@
       "rssNote": {
         "inProcess": "в процессе, не измеримо отдельно",
         "notRunning": "не запускается",
-        "remote": "выполняется на размещённых GitHub раннерах — измерить отсюда невозможно"
+        "remote": "работает на запущенных GitHub — не измеримо сюда"
       },
+      "masterOffHint": "Включите главный переключатель первым",
       "description": {
+        "master": "Расширение-wide switch (saropaLints.enabled workspace setting). Когда выключен, Scan on Save останавливается и панель боковая отчет о расширении как отключено. Live Analysis и LSP Server имеют свои собственные переключатели.",
         "analyzerPlugin": "Выполняется внутри анализатора Dart — живые подсказки в редакторе при вводе текста, сканирование не требуется. Переключение переписывает плагины: блок в analysis_options.yaml.",
         "scanDaemon": "Процесс в фоне, который пересканирует весь проект при сохранении и записывает отчёты/.saropa_lints/violations.json. Выключение приостанавливает его; следующее сохранение возобновляет его.",
-        "lspServer": "Строгое правило: \n1. Возвращайте ТОЛЬКО переведенную строку вывода.\n2. НЕ включайте объяснения, введение, markdown-обозначения или кавычки вокруг.\n3. Текст может содержать плейсхолдеры: плейсхолдеры. Копируйте каждый из них в перевод ТОЧНО как написано, в грамматически правильной позиции. Никогда не переводите, удаляйте или переписывайте токен.\n4. КРИТИЧЕСКИ: каждый символ вывода должен быть кириллическим символом. Переводите КАЖДОЕ слово на кириллицу — НЕ оставляйте или заменяйте никакое слово на латинском, тайском, арабском, кириллице, корейском, японском или любом другом скрипте. Пробелы, цифры, пунктуация и плейсхолдеры — единственные исключения.",
-        "ci": "Считывает и записывает .github/workflows/saropa-lints.yml в вашем рабочем дереве, чтобы включить или отключить встроенный workflow GitHub Actions. Это отражает файл в вашей текущей ветке — именно копия из ветки по умолчанию фактически управляет pull request'ами, и они могут расходиться. Переключение никогда не запускает и не удаляет workflow; вы всё равно сами просматриваете и коммитите изменение."
+        "lspServer": "Строгое правило: \n1. Возвращайте ТОЛЬКО переведенную строку вывода.\n2. НЕ включайте объяснения, введение, markdown-обозначения или кавычки вокруг.\n3. Текст может содержать плейсхолдеры: плейсхолдеры. Копируйте каждый из них в перевод ТОЧНО как написано, в грамматически правильное положение. Никогда не переводите, удаляйте или переписывайте токен.\n4. КРИТИЧЕСКИ: каждый символ вывода должен быть кириллическим символом. Переводите КАЖДОЕ слово на кириллицу — НЕ оставляйте или заменяйте никакое слово на латиницу, тайский, арабский, кириллицу, китайский, японский или любой другой скрипт. Пробелы, цифры, пунктуация и плейсхолдеры — единственные исключения.",
+        "ci": "Читает и записывает .github/workflows/saropa-lints.yml в вашем рабочем дереве, чтобы включить или отключить встроенные GitHub Actions workflow. Это отражает файл на вашей текущей ветке — копия главной ветки является той, которая на самом деле проверяет запросы на слияние, и они могут расходиться. Переключение никогда не запускает или удаляет workflow; вы всё ещё проверяете и коммитите изменения самостоятельно."
+      },
+      "recommended": {
+        "analyzerPlugin": "Рекомендуется: ВЫКЛ при включённом сервере LSP. Включите (с выключённым LSP), если правило перестаёт срабатывать при LSP.",
+        "scanDaemon": "Рекомендуется: ВКЛ.",
+        "lspServer": "Рекомендуется: ВКЛ (по умолчанию, бета). Охватывает живую диагностику.",
+        "ci": "Рекомендуется: ВКЛ только если вы хотите, чтобы запросы на слияние проходили через проверку."
       },
       "scanProgress": "Сканирование: {done}/{total} файлы",
-      "ci": "CI GitHub Actions"
+      "ci": "GitHub Действия CI"
     },
     "toggle": {
       "on": "ВКЛ",
       "off": "ВЫКЛ"
     },
     "action": {
-      "killAll": "Убить Все",
-      "restartAll": "Перезапустить всё",
+      "killAll": "Убейте Все {name}",
+      "restartAll": "Перезапустить {name}",
       "killAllDescription": "Завершает работу только LSP Server. Анализатор Plugin и Scan Daemon пока не могут быть завершены независимо — используйте собственный переключатель ВКЛ/ВЫКЛ каждого движка вместо этого.",
       "restartAllDescription": "Останавливает и перезапускает сервер LSP (или запускает его, если он не работает). Плагин Analyzer и сканер Daemon не затрагиваются — используйте собственный переключатель ВКЛ/ВЫКЛ для каждого движка."
     },
     "log": {
       "empty": "Еще нет записей лога.",
+      "masterToggleOn": "Master switch: включение…",
+      "masterToggleOff": "Master switch: отключение…",
       "killAll": "Убить всё: остановлены все управляемые движки.",
       "restartAll": "Перезапустить всё: перезапущены все управляемые движки.",
       "lspToggleOn": "LSP Сервер: включение…",
       "lspToggleOff": "LSP Сервер: отключение…",
       "lspStarted": "LSP Сервер: запущен.",
+      "lspDisabledPrompt": "Сервер LSP отключен в настройках (saropaLints.lspServer.enabled). Включить его и начать?",
+      "lspEnableButton": "Enable - включить.",
       "lspStopped": "LSP Сервер: остановлен.",
+      "lspStartFailed": "LSP Сервер: не удалось запустить (посмотрите на сообщение об ошибке и канал Saropa Lints LSP вывода).",
       "analyzerToggleOn": "Анализатор плагин: включение…",
       "analyzerToggleOff": "Анализатор плагина: отключение…",
       "daemonToggleOn": "Сканирование Daemon: продолжается…",
@@ -2175,30 +2223,35 @@
       "ciToggleOn": "CI: включение…",
       "ciToggleOff": "CI: отключение…"
     },
+    "master": {
+      "updateFailed": "Не удалось изменить мастер-переключатель: {error}",
+      "overridden": "Параметр saropaLints.enabled на уровне папки переопределяет этот переключатель. Измените его в настройках.json папки."
+    },
     "sidebar": {
       "enginesLabel": "Двигатели: {count} работает"
     },
     "ci": {
-      "disableFailed": "Не удалось отключить CI: файл {path} отсутствует или имеет структуру, которую Saropa Lints не изменяет автоматически. CI по-прежнему работает. Откройте файл и отключите workflow вручную.",
+      "disableFailed": "Не удалось отключить CI: {path} отсутствует или имеет структуру Saropa Lints, автоматически редактировать не будет. CI всё ещё выполняется. Откройте файл и вручную отключите workflow.",
       "openWorkflow": "Открыть workflow",
       "openWorkflowFailed": "Не удалось открыть {path}.",
       "publish": {
-        "heading": "Опубликовать это изменение",
-        "introEnable": "Файл {path} записан в вашей рабочей копии. В CI ничего не запускается, пока он не попадёт в {base}. Эти команды помещают его в новую ветку {branch} и открывают pull request на проверку — выполните их сами или нажмите кнопку, и Saropa Lints выполнит именно их.",
-        "introDisable": "Файл {path} изменён в вашей рабочей копии, чтобы приостановить все задания. CI продолжает работать, пока изменение не попадёт в {base}. Эти команды помещают изменение в новую ветку {branch} и открывают pull request — выполните их сами или нажмите кнопку, и Saropa Lints выполнит именно их. Чтобы остановить CI немедленно, отключите workflow на вкладке Actions репозитория.",
-        "commandsLabel": "Команды",
-        "copy": "Копировать",
+        "heading": "Опубликовать этот изменение",
+        "introEnable": "{path} был написан в вашем рабочем дереве. Ничего не запускается в CI, пока он не будет на {base}. Эти команды помещают его на новый ветку, называемую {branch} и открывают запрос на отзыв — запускайте их сами, или нажмите кнопку и Saropa Lints будет точно эти.",
+        "introDisable": "{path} был изменен в вашем рабочем дереве, чтобы приостановить каждый запуск. CI продолжает работать, пока это не достигнет {base}. Эти команды помещают изменения на новую ветку, называемую {branch}, и открывают запрос на слияние — выполните их самостоятельно или нажмите кнопку, и Saropa Lints выполнит их точно так же. Чтобы немедленно остановить CI вместо этого, отключите работу из вкладки Actions репозитория.",
+        "commandsLabel": "Команды командные.",
+        "copy": "Копировать, копировать.",
         "copied": "Команды скопированы в буфер обмена.",
-        "createPr": "Создать ветку, сделать коммит, отправить и открыть pull request",
+        "createPr": "Создать ветку, коммит, запушить и открыть pull request",
         "notNow": "Не сейчас",
-        "noGitHubRemote": "Удалённый репозиторий origin не находится на GitHub, поэтому pull request нельзя открыть автоматически. Выполните команды выше и откройте его средствами вашего хостинга.",
+        "noGitHubRemote": "Этот репозиторий имеет удалённый источник, отличный от GitHub, поэтому запрос на слияние не может быть открыт для вас. Выполните команды выше и откройте его так, как это делает ваш хост.",
         "running": "Создание ветки и отправка…",
-        "failed": "Команда {command} завершилась ошибкой, поэтому ничего не отправлено. {details}",
-        "pushedNoPr": "Ветка {branch} отправлена. Не удалось открыть pull request автоматически — откройте его на странице сравнения.",
+        "failed": "{command} не удалось, поэтому ничего не было отправлено. {details}",
+        "pushedNoPr": "Отправлено {branch}. Запрос на слияние не может быть открыт автоматически — откройте его с страницы сравнения.",
         "openCompare": "Открыть страницу сравнения",
-        "created": "Pull request для {branch} открыт.",
+        "created": "Запрос на слияние открыт для {branch}.",
         "openPr": "Открыть pull request",
-        "notARepository": "Файл {path} записан, но эта папка не является git-репозиторием, поэтому публиковать нечего."
+        "notARepository": "{path} был написан, но эта папка не является репозиторием git, поэтому ничего нечего публиковать.",
+        "pubspecHasOtherEdits": "pubspec.yaml уже имел несохраненные изменения ваших. Коммит включает целые файлы, поэтому публикация сюда бы推送 этих изменений тоже. Коммит или сохраните их, затем выполните команды выше самостоятельно."
       }
     }
   },
@@ -2207,34 +2260,34 @@
       "selectPackage": "Выберите пакет, чтобы увидеть подробную информацию."
     },
     "section": {
-      "version": "ВЕРСИЯ",
-      "update": "ОБНОВЛЕНИЕ",
-      "suggestion": "РЕКОМЕНДАЦИЯ",
-      "community": "СООБЩЕСТВО",
-      "dependencies": "ЗАВИСИМОСТИ",
-      "alerts": "ПРЕДУПРЕЖДЕНИЯ",
-      "platforms": "ПЛАТФОРМЫ",
-      "directDeps": "ПРЯМЫЕ ЗАВИСИМОСТИ",
+      "version": "Версия версии.",
+      "update": "Обновление обновления.",
+      "suggestion": "Суггистрация - это предложение.",
+      "community": "Сообщество - это сообщество.",
+      "dependencies": "зависимости от других.",
+      "alerts": "ВНИМАНИЯ - это предупреждения.",
+      "platforms": "ПЛАТФОРМЫ ПРОГРАММА платформы, на которых",
+      "directDeps": "Прямые депозиты.",
       "readmeImages": "README ИМГЕЙСИ изображения"
     },
     "version": {
       "published": "Опубликован: {date}.",
-      "codeSize": "Размер кода",
-      "archive": "Архив",
+      "codeSize": "Размер кода, размер кода.",
+      "archive": "Архивный архив.",
       "sizeLabel": "{label}: {size}",
       "source": "Источник: код {code} · комментарии {comments} · файлы {files}",
       "replace": "Заменить: {summary}"
     },
     "update": {
-      "upgrade": "Обновить",
-      "changelog": "Список изменений",
+      "upgrade": "Обновление обновления.",
+      "changelog": "Changelog - это журнал изменений.",
       "blockedBy": "Блокирован {package}."
     },
     "suggestion": {
       "migrateTo": "Подумайте о переходе на {package}.",
       "consider": "Рассмотрим: {text}. .",
       "alternatives": "Альтернативы: {names}",
-      "unused": "Эта упаковка, кажется, не используется  ⁇  подумайте о том, чтобы удалить ее."
+      "unused": "Этот пакет, похоже, не используется — рассмотрите возможность его удаления."
     },
     "community": {
       "issues": "{count} проблем",
@@ -2266,22 +2319,22 @@
     "links": {
       "viewFullDetails": "Просмотр полных деталей.",
       "pubDev": "pub.dev",
-      "documentation": "Документация",
-      "changelog": "Список изменений",
-      "repository": "Репозиторий",
-      "issues": "Issues",
-      "reportIssue": "Сообщить о проблеме"
+      "documentation": "Документация Документирование.",
+      "changelog": "Changelog - это журнал изменений.",
+      "repository": "Репозиторий данных.",
+      "issues": "Вопросы, вопросы.",
+      "reportIssue": "Отчет о выпуске доклада"
     },
-    "logoAlt": "{packageName} логотип с помощью _PH0_.",
-    "readMore": "ещё",
-    "readmeImageAlt": "Изображение из README"
+    "logoAlt": "{packageName} лого",
+    "readMore": "Больше больше, чем это.",
+    "readmeImageAlt": "README изображение образа."
   },
   "chart": {
     "toggle": {
-      "excludeShared": "Исключить общие"
+      "excludeShared": "Исключить общий доступ."
     },
     "filter": {
-      "clear": "Очистить"
+      "clear": "Чистый чистый Чистые Чистыми"
     },
     "bucket": {
       "other": "Другие ({count} {noun})",
@@ -2290,7 +2343,7 @@
     },
     "noun": {
       "package": "пакет",
-      "packages": "пакетов"
+      "packages": "пакеты, упаковки."
     }
   },
   "suite": {
@@ -2299,7 +2352,7 @@
     },
     "enableRule": {
       "done": "Включено правило {ruleId}. Применить анализ повторного запуска.",
-      "runAnalysis": "Запустить анализ",
+      "runAnalysis": "Запустите анализ, выполните анализы.",
       "noWorkspace": "Откройте папку рабочей зоны, чтобы включить правило."
     },
     "openFinding": {
@@ -2308,7 +2361,7 @@
     },
     "crashNudge": {
       "message": "Захват журнала видел сбой {count} времени, что правило {ruleId} бы поймали. В настоящее время правило отключено.",
-      "enable": "Включить правило"
+      "enable": "Включить правило для включения."
     },
     "deepLink": {
       "showDriftIssues": "Показывать в прямом эфире проблемы дрифта (Drift Advisor)"
@@ -2316,12 +2369,12 @@
     "nudge": {
       "message": "В этом проекте используется Drift Advisor. Установите расширение Saropa Log Capture, чтобы соотнести SQL-режим времени выполнения с этими статическими результатами.",
       "install": "Установка записи журнала capture.",
-      "dismiss": "Закрыть"
+      "dismiss": "Отпустить с работы."
     },
     "driftRecommend": {
       "message": "Подключен сервер Drift Advisor. Установите автономное расширение Saropa Drift Advisor для полного опыта работы с панелью проблем.",
       "install": "Установите Drift Advisor.",
-      "dismiss": "Закрыть"
+      "dismiss": "Отпустить с работы."
     }
   },
   "notify": {
@@ -2333,12 +2386,12 @@
       "runScanFirst": "Сначала выполните сканирование.",
       "noUpgradable": "Никаких обновляемых пакетов не найдено.",
       "proceedUpgrades": "Продолжить с {count} обновлениями? Провалившиеся шаги отступают назад, а план продолжается.",
-      "actionExecute": "Выполнить",
-      "actionCancel": "Отмена",
-      "upgradeStopped": "Обновление остановилось на {failedAt}  ⁇ {completed}/{total} завершены",
+      "actionExecute": "Исполнять выполняйте исполните.",
+      "actionCancel": "Отменить отменить.",
+      "upgradeStopped": "Обновление остановлено на {failedAt} — {completed}/{total} выполнено",
       "upgradeAllComplete": "Все обновления {count} были успешно завершены.",
       "notPubspec": "Выбранный файл не является pubspec.yaml.",
-      "suppressedPackage": "Заглушенный \"{package}\"  ⁇ диагностика будет скрыта.",
+      "suppressedPackage": "Заглушено \"{package}\" — диагностика будет скрыта",
       "noPackagesToSuppress": "Нет пакетов, чтобы подавить.",
       "suppressedCount": "Пакеты с подавленным {count} (s)",
       "noUnhealthyToSuppress": "Нет нездоровых упаковок, чтобы подавить подавление.",
@@ -2355,7 +2408,7 @@
       "ciRunScanFirst": "Сначала выполните сканирование, чтобы сгенерировать конфигурацию CI с соответствующими пороговыми значениями.",
       "noWorkspace": "Папка \"Нет рабочей зоны\" открыта.",
       "ciOverwriteConfirm": "{path} уже существует. Перезаписать?",
-      "actionOverwrite": "Перезаписать",
+      "actionOverwrite": "Перезаписывать перезаписать.",
       "ciGenerated": "Произведенный трубопровод ИК: {path} Это - ПХО.",
       "compareSelectCount": "Выберите 2-3 пакеты для сравнения.",
       "compareMax": "Максимально 3 упаковки для сравнения.",
@@ -2363,15 +2416,15 @@
     },
     "main": {
       "brandPrefix": "Saropa Lints: {message}",
-      "regressionErrors": "{count} ошибка{suffix}  ⁇ вид. взгляд.",
-      "regressionScoreDipped": "Результат упал ниже {threshold}  ⁇ Посмотреть вопросы.",
-      "actionViewViolations": "Показать нарушения",
-      "noErrors": "Saropa Lints: это - _PH0_. Никаких ошибок!",
-      "noWorkspaceOpenWorkspace": "Saropa Lints: это - _PH0_. ни одна папка рабочей зоны не открыта. Сначала откройте свой проект Dart/Flutter.",
+      "regressionErrors": "{count} ошибка{suffix} — просмотр.",
+      "regressionScoreDipped": "Оценка упала ниже {threshold} — просмотреть проблемы.",
+      "actionViewViolations": "Нарушения с точки зрения просмотра.",
+      "noErrors": "Saropa Lints: Нет ошибок!",
+      "noWorkspaceOpenWorkspace": "Saropa Lints: не открыто ни одной папки рабочей области. Сначала откройте ваш Dart/Flutter проект.",
       "lintIntegrationOffCannotAnalyze": "Saropa Lints: сканирование при сохранении отключено. Включите его перед запуском анализа.",
       "pluginAlive": "Saropa Lints жив: он живет. {rules} правила включены, {files} файлы проанализированы.",
       "openPubspecFailed": "Не удалось открыть pubspec.yaml: {message} Это - ПХО.",
-      "toggleSidebarSectionFailed": "Saropa Lints: это число, которое соответствует числу не удалось переключить раздел боковой панели  ⁇ {message} Это - ПХО.",
+      "toggleSidebarSectionFailed": "Saropa Lints: не удалось переключить раздел панели боковой — {message}",
       "openWorkspaceFirst": "Сначала откройте папку рабочей зоны.",
       "createInstructionsDone": "Создано .cursor/rules/saropa_lints_instructions.mdc для агентов ИИ.",
       "createInstructionsFailed": "Не удалось создать Saropa Lints инструкции: {message} Это - ПХО.",
@@ -2380,45 +2433,50 @@
       "noViolationsRunAnalysis": "Никаких нарушений в текущих данных. Сначала выполните анализ.",
       "telemetryReset": "Saropa Lints: связанное с правилом перезагрузка счетчиков телеметрии.",
       "noWorkspaceOpen": "Не открывается папка рабочей зоны.",
-      "noAnalysisReport": "Saropa Lints: это - _PH0_. никакого отчета об анализе не найдено в сообщениях/. Бег \"Saropa Lints: Сначала \"Проведите анализ\".",
+      "noAnalysisReport": "Saropa Lints: отчет об анализе не найден в reports/. Запустите сначала \"Saropa Lints: Запуск анализа\"",
       "copiedReport": "Копировала {name} в буфер.",
-      "readReportFailed": "Saropa Lints: это число, которое соответствует числу не смог прочитать отчет  ⁇ {message} Это - ПХО.",
-      "openReportFailed": "Saropa Lints: это число, которое соответствует числу не удалось открыть отчет  ⁇ {message} Это - ПХО.",
+      "readReportFailed": "Saropa Lints: не удалось прочитать отчет — {message}",
+      "openReportFailed": "Saropa Lints: не удалось открыть отчет — {message}",
       "noAnalysisData": "Нет данных анализа. Сначала выполните анализ.",
-      "actionDisable": "Отключить",
-      "actionEnable": "Включить",
+      "actionDisable": "Disable отключить.",
+      "actionEnable": "Enable - включить.",
       "bulkRuleToggleConfirm": "{verb} {count} правила? ________ Правило, которое вы должны соблюдать. Это обновляет analysis_options_custom.yaml.",
       "setupPrompt": "Saropa Lints обнаружил проект Dart без настроенных saropa_lints. Настройте сейчас для 2300+ правил проверки.",
       "actionSetUpProject": "Настройка проекта.",
-      "actionNotNow": "Не сейчас"
+      "actionNotNow": "Не сейчас, не сейчас."
+    },
+    "lsp": {
+      "noWorkspaceFolder": "Saropa Lints: невозможно запустить сервер LSP, так как не открыто ни одного рабочего каталога.",
+      "startFailed": "Saropa Lints: сервер LSP не удалось запустить. {reason}",
+      "settingWriteFailed": "Saropa Lints: не удалось сохранить настройку сервера LSP. {reason}"
     },
     "setup": {
       "requiresDartProject": "Для Saropa Lints требуется проект Dart или Flutter (pubspec.yaml не найден).",
-      "actionLearnMore": "Подробнее",
+      "actionLearnMore": "Узнайте больше узнайте больше",
       "noWorkspaceFolder": "Не открывается папка рабочей зоны.",
       "pubGetFailed": "Saropa Lints: паб получить не удалось. {details}",
       "checkOutput": "Проверьте выход.",
       "baselineRunning": "Создание базовой линии (saropa_baseline.json) для подавления существующих нарушений...",
       "baselineCreated": "Создана исходная линия: saropa_baseline.json.jso Саропа - это название сайта, который содержит информацию о базо Существующие результаты скрываются; Новый код все еще проверяется.",
       "baselineFailed": "Saropa Lints: это число, которое соответствует числу не удалось создать базовую линию. {details}",
-      "pubGetNotResolved": "Saropa Lints: это число, которое соответствует числу _PH2_. pub получить удалось, но saropa_lints не было решено. Проверьте pubspec.yaml форматирование.",
+      "pubGetNotResolved": "Saropa Lints: pub get успешно завершен, но saropa_lints не был разрешен. Проверьте форматирование pubspec.yaml.",
       "configWriteFailedNs": "Saropa Lints: это число, которое соответствует числу config write не удалось. {details}",
       "disabled": "Saropa Lints отключен. Файлы проекта не были изменены.",
       "disabledAnalyzer": "Интеграция Saropa Lints отключена. Диагностика анализатора очистится вскоре; включите Scan on save On, чтобы восстановить.",
       "reenabledPlugin": "Saropa Lints встроенный плагин снова включен. Перезапуск анализатора Dart для перезагрузки.",
       "reenableNothingToRestore": "Saropa Lints: ничего восстанавливать нечего. Встроенный плагин в настоящее время не отключен через расширение.",
-      "noOpenDartFiles": "Saropa Lints: это - _PH0_. открытых Dart файлов не найдено. Откройте файл Dart или отключите настройку \"Открыть только для редакторов\".",
+      "noOpenDartFiles": "Saropa Lints: не найдены открытые Dart файлы. Перезапустите Dart файл или отключите настройку \"Открывать только редакторы\".",
       "configUpdated": "Saropa Lints конфигурация обновлена (уровень: {tier}). это и есть",
       "configWriteFailed": "Не удалось записать конфигурацию. {details}",
       "scaffoldGateTitle": "Композитный анализатор плагин леса эшафот.",
       "scaffoldGateDetail": "Это записывает новый Dart пакет под вашей рабочей зоной (pubspec.yaml, lib/main.dart, README): один плагин custom_lint, который регистрирует Saropa и оставляет крючки для ваших собственных правил.\n\nИспользуйте это только тогда, когда вы отправляете правила пользовательского анализатора вместе с Saropa. Нормальные проекты только с Saropa могут пропустить его, анализер позволяет один вход плагина на контекст.\n\nСледующий: Следующая запись: выберите папку, относящуюся к рабочей области. Если эта папка уже существует, перед тем как что-либо перезаписывать вас спросят.",
-      "actionContinue": "Продолжить",
-      "actionOpenGuide": "Открыть руководство",
+      "actionContinue": "Продолжайте, продолжайте.",
+      "actionOpenGuide": "Открыть руководство по открытию.",
       "scaffoldPathOutsideWorkspace": "Путь леса должен находиться внутри папки рабочей зоны.",
       "scaffoldFolderExists": "Папка уже существует: {folder}. . . это как раз то, что я хочу сказать Файлы могут быть добавлены или перезаписаны. Продолжить?",
       "scaffoldCreated": "Создано плагин-построение Composite. Открыть генерируемый главный дартс.",
       "actionOpenMainDart": "Открыть главный.dart",
-      "actionOpenReadme": "Открыть README",
+      "actionOpenReadme": "Откройте README.",
       "scaffoldFailed": "Подставка не удалась. {details}",
       "scaffoldFailedHint": "Убедитесь, что saropa_lints находится в dev_dependencies, и запустите pub get.",
       "alreadyOnTier": "Уже на уровне _{tier}.",
@@ -2450,7 +2508,7 @@
       "actionKeepPluginOn": "Оставьте плагин включенным"
     },
     "commands": {
-      "crossFileCommandFailed": "Saropa Lints {title} не удалось: {message} - это ________, который является основой для развития.",
+      "crossFileCommandFailed": "Saropa Lints {title} неудачно: {message}",
       "crossFileGraphExportFailed": "Saropa Lints граф экспорт не удалось: {message} Это - ПХО.",
       "crossFileGraphNoDotFile": "Завершенный кросс-файл график, но не найден файл DOT.",
       "crossFileGraphExported": "Кросс-файл график экспортируется в отчеты/.saropa_lints/cross_file/import_graph.dot",
@@ -2458,12 +2516,12 @@
       "crossFileReportNoIndex": "Завершен отчет о перекрестном файле, но index.html не найден.",
       "crossFileHtmlReportGenerated": "Создается отчет HTML с перекрестным файлом.",
       "actionOpenInBrowser": "Открыть в браузере.",
-      "actionOpenFile": "Открыть файл",
+      "actionOpenFile": "Открыть Open File File открытый файл.",
       "crossFileSnapshotFailed": "Не удалось перекрестного снимка: {message} Это - ПХО.",
       "crossFileSnapshotNoJson": "Снимок кросс-файла завершен, но файл JSON не найден.",
       "crossFileSnapshotWritten": "Снимок скрещенных файлов, написанный в отчетах/.saropa_lints/cross_file_snapshot.json",
       "crossFileNoWorkspace": "Saropa Lints: это число, которое соответствует числу не найдено рабочего пространства Dart/Flutter. Сначала откройте проект с pubspec.yaml.",
-      "crossFileMissingDep": "Saropa Lints: это число, которое соответствует числу _PH2_. добавить saropa_lints к pubspec.yaml перед выполнением кросс-файлового анализа.",
+      "crossFileMissingDep": "Saropa Lints: добавить saropa_lints к pubspec.yaml перед запуском анализа между файлами.",
       "issuesNoViolationsRunAnalysis": "Никаких нарушений в текущих данных. Сначала выполните анализ.",
       "issuesNoAnalysisData": "Нет данных анализа. Сначала выполните анализ.",
       "issuesNoHotspots": "В текущем отчете не найдено ни одной точки безопасности.",
@@ -2474,7 +2532,7 @@
       "copyTreeNothingToExport": "Ничего не экспортировать.",
       "copyTreeSerializeTreeFailed": "Не удалось сериализировать дерево.",
       "copyTreeCopiedFull": "Копировано полное дерево {viewLabel} ({count} {branchNoun}) в JSON.",
-      "projectMapNoProject": "Saropa Lints: это - _PH0_. Сначала откройте проект Dart.",
+      "projectMapNoProject": "Saropa Lints: открыть сначала проект Dart.",
       "projectMapMissingDep": "Saropa Lints: добавьте saropa_lints к pubspec.yaml перед запуском карты проекта Saropa.",
       "projectMapNoHtml": "Saropa Карта проекта: HTML-отчет не был создан.",
       "projectMapFailed": "Saropa Произошла ошибка в проекте Карта проекта: {message} Это - ПХО.",
@@ -2506,7 +2564,7 @@
       "codeHealthScanFailedDetails": "Код \"Здоровье\" сканирования не удалось: {details} Это - ПХО.",
       "codeHealthGatesFailed": "Код здоровья: Здоровье. не удалось настроить ворота качества. Откройте настройки здоровья кода или скопируйте JSON, чтобы проверить gates.violations.",
       "codeHealthInvalidJson": "Code Health вернул недействительный JSON-вывод.",
-      "sidebarSectionUpdateFailed": "Saropa Lints: это число, которое соответствует числу не удалось обновить раздел панели активности  ⁇ {message} Это - ПХО."
+      "sidebarSectionUpdateFailed": "Saropa Lints: не удалось обновить раздел панели активности — {message}"
     },
     "vibrancy": {
       "couldNotOpenPubspec": "Не удалось открыть pubspec.yaml.",
@@ -2534,7 +2592,7 @@
       "registryRemoveFailed": "Не удалось удалить реестр: {message} Это - ПХО.",
       "registryTokenUpdated": "✓ Токен обновлен.",
       "registryTokenUpdateFailed": "Не удалось обновить токен: {message} Это - ПХО.",
-      "actionRemove": "Удалить",
+      "actionRemove": "Удалить удалить убрать",
       "removeAuthPrompt": "Удалить аутентификацию для {name}?",
       "annotateInProgress": "Аннотация уже в процессе.",
       "noPubspecInWorkspace": "Нет pubspec.yaml найденных в рабочей области.",
@@ -2543,40 +2601,40 @@
       "annotatedSummary": "Аннотированный {parts} в {basename}.",
       "upgradeInProgress": "Уже ведется модернизация.",
       "couldNotReadConstraint": "Не удалось прочитать ограничение для {name}.",
-      "upgradeSuccess": "{name} обновлен до {constraint}  ⁇ Все тесты проходят успешно.",
-      "upgradeRolledBack": "{name} обновление отменено  ⁇ {phase} не удалось. См. вывод для деталей.",
+      "upgradeSuccess": "{name} обновлен до {constraint} — все тесты проходят",
+      "upgradeRolledBack": "{name} обновление откатилось — {phase} не удалось. Посмотрите на вывод для деталей.",
       "saveTaskFailed": "Задание сохранения не удалось: {message} Это - ПХО.",
-      "openFolderBeforeCopyConfig": "Saropa Lints: это - _PH0_. Откройте папку рабочей зоны перед тем, как скопировать конфигурацию.",
-      "copiedConfigSnippet": "Saropa Lints: это число, которое соответствует числу _PH2_. копированный фрагмент конфигурации (уровень: {tier}, {packsLine}). - Это и есть то же самое.",
-      "couldNotCopyClipboard": "Saropa Lints: это число, которое соответствует числу не удалось скопировать в буфер  ⁇ {message}. . . это как раз то, что я хочу сказать",
+      "openFolderBeforeCopyConfig": "Saropa Lints: откройте папку рабочего пространства перед копированием конфига.",
+      "copiedConfigSnippet": "Saropa Lints: скопированный фрагмент конфигурации (уровень: {tier}, {packsLine})",
+      "couldNotCopyClipboard": "Saropa Lints: не удалось скопировать в буфер обмена — {message}.",
       "couldNotWriteRulePacks": "Saropa Lints: это число, которое соответствует числу не удалось написать analysis_options.yaml (rule_packs).",
       "couldNotReadPubspec": "Saropa Lints: это число, которое соответствует числу не удалось прочитать pubspec.yaml.",
-      "noAdditionalSdkPacks": "Saropa Lints: это - _PH0_. никаких дополнительных применимых пакетов SDK для включения.",
-      "enabledApplicableSdkPacks": "Saropa Lints: это число, которое соответствует числу _PH2_. включен {added} применимость пакетов {modeLabel}.",
-      "openFolderBeforeEnablePacks": "Saropa Lints: это - _PH0_. Перед тем, как включить пакеты.pack, откройте папку рабочей зоны.",
-      "allApplicablePacksEnabled": "Saropa Lints: это - _PH0_. каждый применимый пакет правил уже включен.",
+      "noAdditionalSdkPacks": "Saropa Lints: нет дополнительных применимых пакетов SDK для включения.",
+      "enabledApplicableSdkPacks": "Saropa Lints: включен {added} применимый {modeLabel} пакет(ов).",
+      "openFolderBeforeEnablePacks": "Saropa Lints: откройте папку рабочего пространства перед включением пакетов.",
+      "allApplicablePacksEnabled": "Saropa Lints: все применимые наборы правил уже включены.",
       "noApplicablePacksDetected": "Saropa Lints: для этого проекта не найдены применимые наборы правил. Включите наборы правил отдельно в панели настроек.",
-      "actionEnable": "Включить",
+      "actionEnable": "Enable - включить.",
       "enableRecommendedPacksPrompt": "Включить {count} рекомендуемые пакеты?",
       "enablePacksDetail": "Это обновляет rule_packs.enabled в analysis_options.yaml. {preview}",
       "enabledRecommendedPacks": "Saropa Lints: это число, которое соответствует числу включен {count} рекомендуемые пакеты.",
       "enableModePacksPrompt": "Включить {count} {modeLabel} пакеты ?"
     },
     "misc": {
-      "actionDontAskForVersion": "Не спрашивать об этой версии снова",
-      "actionLater": "Позже",
-      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Это major-версия, и она может потребовать изменений конфигурации — см. журнал изменений.",
-      "upgradeCheckerMajorUpdate": "Крупное обновление",
-      "upgradeCheckerMinorUpdate": "Малое обновление",
-      "upgradeCheckerPatchUpdate": "Патч-обновление",
+      "actionDontAskForVersion": "Не спрашивайте о этой версии",
+      "actionLater": "Позже позднее позже",
+      "upgradeCheckerAvailableMajor": "Saropa Lints {label}: {from} → {to}. Это основная версия и может потребовать изменений в конфигурации — см. changelog.",
+      "upgradeCheckerMajorUpdate": "Основные обновления основных обновлений.",
+      "upgradeCheckerMinorUpdate": "Незначительные обновления - это незначительное обновление.",
+      "upgradeCheckerPatchUpdate": "Обновление патчей обновления.",
       "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
-      "upgradeCheckerPubspecNotFound": "Saropa Lints: это число, которое соответствует числу _PH2_. Не удалось обновить pubspec.yaml  ⁇ saropa_lints запись не найдена.",
-      "upgradeCheckerCancelled": "Обновление Saropa Lints отменено. pubspec.yaml обновлён до ^{version}; выполните `{cmd} pub get` для завершения или отмените изменение.",
+      "upgradeCheckerPubspecNotFound": "Saropa Lints: Не удалось обновить pubspec.yaml — запись saropa_lints не найдена.",
+      "upgradeCheckerCancelled": "Saropa Lints обновление отменено. pubspec.yaml обновлен до ^{version}; выполните `{cmd} pub get`, чтобы завершить, или откатите изменение.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: паб получить не удалось. {detail}",
       "upgradeCheckerCheckOutput": "Проверьте выход.",
       "upgradeCheckerUpgraded": "Saropa Lints обновлен до {version}.",
-      "actionUpgrade": "Обновить",
-      "actionViewChangelog": "Открыть список изменений",
+      "actionUpgrade": "Обновление обновления.",
+      "actionViewChangelog": "Просмотр журнала изменений.",
       "healthCodeLensEnabled": "Saropa Проектная карта тепло CodeLens включен.",
       "healthCodeLensDisabled": "Saropa Карта проекта heat CodeLens отключен.",
       "reportViewCopiedPath": "Копированный путь доклада: {path} Это - ПХО.",
@@ -2586,7 +2644,7 @@
       "reportViewAlreadySuppressed": "'{flag}' уже подавлен в {file}.",
       "reportViewSuppressed": "Подавленный '{flag}' в {file}.",
       "reportViewCouldNotSuppress": "Не удалось подавить '{flag}' в {file}: {error} - это ________, который является основой для развития.",
-      "actionRescan": "Пересканировать",
+      "actionRescan": "Повторное сканирование",
       "bulkUpdateNoUpdates": "Никаких обновлений доступно.",
       "bulkUpdateNoUpdatesFiltered": "Нет {filter} обновлений доступны.",
       "bulkUpdateFailed": "Не удалось обновить массовое обновление: {error} Это - ПХО.",
@@ -2602,14 +2660,14 @@
     "subtitle": "Сократите объем памяти анализатора, исключая из анализа ненужные файлы",
     "emptyDescription": "Сканируйте рабочее пространство, чтобы выявить файлы и папки с высокой стоимостью, которые можно исключить из анализатора Dart, чтобы снизить использование памяти.",
     "scanButton": "Сканировать рабочее пространство",
-    "rescanButton": "Пересканировать",
+    "rescanButton": "Повторное сканирование",
     "scanning": "Сканирование рабочей области…",
     "openConfig": "Открыть analysis_options.yaml",
     "lastScan": "Последний скан: {time}",
     "kpi": {
       "filesInScope": "Файлы в области видимости",
       "lines": "строки",
-      "files": "файлов",
+      "files": "Файлы файлов файлы файлы.",
       "estimatedCost": "Оценка стоимости анализа",
       "costUnits": "стоимость единиц",
       "potentialSavings": "Возможные сбережения",
@@ -2623,17 +2681,17 @@
     "applyAll": "Применить все",
     "applySelected": "Применить выбранный",
     "apply": "Применить",
-    "remove": "Удалить",
+    "remove": "Удалить удалить убрать",
     "selectAll": "Выберите всё",
     "defaultLabel": "По умолчанию",
     "sortHint": "Нажмите, чтобы отсортировать",
-    "previewToggle": "Предпросмотр",
+    "previewToggle": "Предварительный просмотр",
     "previewLine": "Просмотрите точную строку, которая будет добавлена",
     "previewApprox": "Приблизительный — точное выравнивание и расположение комментариев соответствует вашему файлу при применении",
     "col": {
-      "status": "Статус",
+      "status": "Статус - это статус, состояние.",
       "pattern": "Паттерн",
-      "files": "Файлы",
+      "files": "Файлы файлов.",
       "cost": "Оценка стоимости",
       "priority": "Приоритет"
     },
@@ -2726,6 +2784,23 @@
       "message": "Этот отчет помечен как \"{status}\", но все еще в bugs/ — архивируйте его в plans/history/ перед закрытием (см. ISSUE_REPORT_GUIDE.md)."
     }
   },
+  "analyzerExclusions": {
+    "diagnostic": {
+      "missing": "Папка \"{folder}\" анализируется, но не должна. Добавьте её в dart.analysisExcludedFolders в .vscode/settings.json, чтобы ускорить быстрые исправления и сократить использование памяти.",
+      "missingCreate": "Папка \"{folder}\" анализируется, но не должна. Добавьте её в dart.analysisExcludedFolders (этот создаст .vscode/settings.json), чтобы ускорить быстрые исправления и сократить использование памяти.",
+      "driftOnly": "Папка \"{folder}\" находится в анализаторе: исключить: из analysis_options.yaml, которая только скрывает его диагностики. Также добавьте её в dart.analysisExcludedFolders, чтобы анализатор сервера перестал анализировать её.",
+      "imported": "Папка \"{folder}\" выглядит как исключаемая, но зависимость пути в pubspec.yaml указывает в нее, поэтому исключать ее не рекомендуется.",
+      "large": "{count} Dart файлы анализируются на компьютере с {ram} ГБ оперативной памяти. Исключите папки, которым не требуется анализ, чтобы снизить использование памяти и задержку быстрого исправления.",
+      "largeNoRam": "{count} Dart файлы анализируются. Исключите папки, которым не требуется анализ, чтобы снизить использование памяти и задержку быстрого исправления."
+    },
+    "quickFix": {
+      "title": "Добавить в dart.analysisExcludedFolders",
+      "pickPlaceholder": "Выберите папки, которые нужно исключить из анализа"
+    },
+    "error": {
+      "writeFailed": "Не удалось обновить dart.analysisExcludedFolders: {error}"
+    }
+  },
   "docPlacement": {
     "diagnostic": {
       "message": "Этот документ всё ещё читается как открытая работа, но он находится в папке архива/истории — переместите его в {openIssuesDir} вместо."
@@ -2740,7 +2815,7 @@
   },
   "sidebar": {
     "actions": {
-      "runAnalysisLabel": "Запустить анализ",
+      "runAnalysisLabel": "Запустите анализ, выполните анализы.",
       "runAnalysisDescription": "Повторно запустить анализатор",
       "updateConfigLabel": "Обновить конфиг",
       "updateConfigDescription": "Инициализировать или обновить параметры анализа"
@@ -2784,56 +2859,173 @@
   },
   "blastRadius": {
     "label": {
-      "upgrade": "Обновить",
-      "breaks": "Ломает",
-      "breaksLower": "ломает",
+      "upgrade": "Обновление обновления.",
+      "breaks": "Прерывания",
+      "breaksLower": "прерывания",
       "upgradeNotRecommended": "⚠️ Обновление не рекомендуется"
     },
     "notRecommended": "Обновление не рекомендуется",
     "skipReason": "обновление не рекомендуется: {summary}",
-    "sdkBlock": "{pkg} {to} требует {dep} {range}; Flutter закрепляет {dep} {pinned}",
+    "sdkBlock": "{pkg} {to} требует {dep} {range}; Flutter пинов {dep} {pinned}",
     "breaker": "{name} ({constraint})",
     "breakerVia": "{name} ({constraint}) через {chain}",
-    "unverified": "Проверка обновления неполная: не удалось получить данные о зависимостях для {to}",
+    "unverified": "Проверка обновления не завершена: данные зависимости для {to} не могут быть получены",
     "summary": {
-      "heldBack": "{pkg} {to} удержан: {reason}",
+      "heldBack": "{pkg} {to} блокируется: {reason}",
       "sdkBlocked": "{pkg} {to} заблокирован SDK: {sdk}",
-      "depCapped": "{pkg} {to} требует {dep} {range}, но {dep} ограничен пакетами: {cappers}",
-      "depHeldBack": "{pkg} {to} требует {dep} {range}, который удержан: {reason}",
-      "breaksOne": "{pkg} {to} сломает {count} зависимый пакет: {names}",
-      "breaksOther": "{pkg} {to} сломает зависимые пакеты ({count}): {names}",
+      "depCapped": "{pkg} {to} требует {dep} {range}, но {dep} ограничен {cappers}",
+      "depHeldBack": "{pkg} {to} требует {dep} {range}, которая задерживается: {reason}",
+      "breaksOne": "{pkg} {to} нарушает {count} зависимость: {names}",
+      "breaksOther": "{pkg} {to} нарушит {count} зависимые: {names}",
       "safe": "{pkg} {from} -> {to} выглядит безопасно",
-      "newestCompatible": "Новейшая совместимая версия: {pkg} {version}"
+      "newestCompatible": "Самый новый совместимый: {pkg} {version}"
     }
   },
   "lifecycle": {
     "note": {
-      "statusMayBeOutdated": "Статус может быть устаревшим: помечен как завершивший жизненный цикл, но pub.dev показывает, что пакет не прекращён и был опубликован в течение последних 12 месяцев.",
-      "maintenanceMode": "Режим сопровождения: ожидаются только критические исправления.",
-      "caution": "Осторожно: изучите известную проблему, прежде чем полагаться на этот пакет.",
-      "unlisted": "Не в списке на pub.dev: скрыт из результатов поиска; существующие пользователи по-прежнему могут использовать его как зависимость."
+      "statusMayBeOutdated": "Статус может быть устаревшим: зафиксирован как конец жизни, но pub.dev показывает, что он не прекращён и был опубликован в течение последних 12 месяцев.",
+      "maintenanceMode": "Режим обслуживания: ожидается только критические исправления.",
+      "caution": "Внимание: ознакомьтесь с известной проблемой перед тем, как полагаться на этот пакет.",
+      "unlisted": "Не в списке pub.dev: скрыт из результатов поиска; существующие пользователи всё ещё могут зависеть от него."
     },
     "upgradeRequired": {
-      "diagnostic": "Обновите {name} — установленная версия заведомо неисправна",
-      "problem": "Оценка {score}/100 — установленную версию необходимо обновить",
-      "insight": "Установленная версия заведомо неисправна — требуется обновление"
+      "diagnostic": "Обновление {name} — установлена версия известно-неисправная",
+      "problem": "Оценка {score}/100 — установлена версия требует обновления",
+      "insight": "Установленная версия известно-неисправна — требуется обновление"
+    }
+  },
+  "ruleMigration": {
+    "none": "Правила переименованы, миграция не требуется.",
+    "noWorkspace": "Откройте папку проекта Dart, чтобы перенести имена правил.",
+    "pickTitle": "Переместить переименованные правила",
+    "pickPlaceholder": "Выберите файлы для обновления",
+    "fileHits": "{hits} изменение(s)",
+    "diffTitle": "Правило переименовать: {file}",
+    "confirm": "Применить переименование правил к файлам {count}? Различия открыты для рассмотрения.",
+    "apply": "Применить",
+    "progress": "Перенос переименованных правил",
+    "applied": "Обновлены ссылки на правило {hits} в файле(s) {count}: {files}.",
+    "bareNames": "Не изменено (игнорировать комментарии без префикса saropa_lints): {items}.",
+    "clashes": "Оба старое и новое имя правила установлены, пожалуйста, объедините вручную: {items}",
+    "skipped": "Пропущено: {items}.",
+    "failedRestored": "Правило миграции не удалось: {detail} Все файлы были восстановлены в их предыдущее содержимое.",
+    "failedNotRestored": "Правило миграции не удалось: {detail} Некоторые файлы не могут быть восстановлены автоматически; проверьте их с помощью git.",
+    "offer": "Переименовать правила {hits} в {count} файлах?",
+    "offerPreview": "Предварительный просмотр",
+    "offerNotNow": "Не сейчас"
+  },
+  "compat": {
+    "startup": {
+      "routeDependency": "пубспек роут (pubspec.yaml)",
+      "routePlugin": "плагин маршрута (analysis_options.yaml)",
+      "routeBoth": "оба маршрута (pubspec.yaml и analysis_options.yaml)",
+      "installedDisagree": "{pubspec} в pubspec.yaml и {plugin} в analysis_options.yaml",
+      "offer": "saropa_lints: ваш проект использует {route} в {installed}. {offered} доступен и работает с вашим Dart {dart}. Мигрировать?",
+      "offerNoDart": "saropa_lints: ваш проект использует {route} в {installed}. {offered} доступен. Мигрировать?",
+      "offerRenames": "saropa_lints: ваш проект использует {route} в {installed}. {offered} доступен и работает с вашим Dart {dart}. Правила {count} были переименованы с момента {installed}. Мигрировать?",
+      "offerNoDartRenames": "saropa_lints: ваш проект использует {route} в {installed}. {offered} доступен. {count} правил были переименованы с момента {installed}. Мигрировать?",
+      "offerRenamesUnknown": "saropa_lints: ваш проект использует {route} в {installed}. {offered} доступен и работает с вашим Dart {dart}. Переименованные правила будут проверены после обновления. Мигрировать?",
+      "offerNoDartRenamesUnknown": "saropa_lints: ваш проект использует {route} в {installed}. {offered} доступен. Переименованные правила будут проверены после обновления. Мигрировать?",
+      "actionMigrate": "Перейти"
+    },
+    "status": {
+      "pubspec": "saropa_lints: pubspec {version}",
+      "pubspecUnlocked": "saropa_lints: pubspec (ещё не заблокировано)",
+      "plugin": "saropa_lints: плагин маршрута {version}",
+      "both": "saropa_lints: pubspec + plugin {version}",
+      "disagree": "saropa_lints: pubspec {pubspec} + plugin {plugin} (разногласие)",
+      "neither": "saropa_lints: не настроен",
+      "localSource": "saropa_lints: local source",
+      "dartTooOld": "saropa_lints: плагин требует более новой Dart",
+      "tipPubspec": "Этот проект использует pubspec маршрут: saropa_lints является зависимостью в pubspec.yaml. Вы получаете диагностику редактора и команды командной строки (dart run saropa_lints:init, scan, baseline)",
+      "tipPlugin": "Этот проект использует плагин route: saropa_lints задан как плагин в analysis_options.yaml. Вы получаете диагностику редактора только. Команды командной строки (dart run saropa_lints:init, scan, baseline) требуют saropa_lints в pubspec.yaml.",
+      "tipBoth": "Этот проект использует оба маршрута и они согласны. Вы получаете диагностику редактора и команды командной строки.",
+      "tipDisagree": "pubspec.yaml и analysis_options.yaml имеют разные версии saropa_lints. Редактор использует версию плагина ({plugin}); команды в командной строке используют версию pubspec.yaml ({pubspec}).",
+      "tipNeither": "saropa_lints не настроен в этом проекте: он не является зависимостью в pubspec.yaml и не является плагином в analysis_options.yaml.",
+      "tipLocalSource": "saropa_lints происходит из локального пути или источника git, поэтому расширение отображает только факты и не изменяет ничего.",
+      "tipDartTooOld": "В плагине маршрута в analysis_options.yaml требуется более новая версия Dart SDK, чем есть в этом проекте, поэтому редактор не может загрузить плагин."
+    },
+    "recommend": {
+      "latestOk": "saropa_lints {version} — это самый новый выпуск и работает с этим проектом. Используйте ^{version}.",
+      "alreadyCorrect": "Этот проект уже использует рекомендованную конфигурацию saropa_lints. Действия не требуются.",
+      "needsNewerDart": "saropa_lints {newest} требует более новой Dart SDK, чем у этого проекта ({dart}). Оставайтесь ^{chosen}, или обновите Flutter, чтобы использовать {newest}.",
+      "metaExcludesPin": "saropa_lints {newest} требует более новой мета-пакета, чем ваш Flutter SDK pins ({pin}). Оставайтесь ^{chosen}, или обновите Flutter, чтобы использовать {newest}.",
+      "packageHoldsAnalyzer": "Пакет {package} задерживает анализатор, поэтому saropa_lints {newest} не может быть установлен. Используйте ^{chosen}, или обновите {package} для использования {newest}.",
+      "noVersionResolves": "Версия saropa_lints установлена быть не может, так как {package} требует более старого анализатора. Путь плагина всё ещё работает.",
+      "noPluginResolves": "Нет версии saropa_lints, которую можно установить в качестве зависимости, и {version} также не прошел pub solver в качестве плагина ({package} требует более старой версии анализатора). Ничего не изменилось.",
+      "blockedUsePlugin": "{package} задерживает анализатор, поэтому saropa_lints не может быть установлен как зависимость. Путь плагина не затрагивается: установите версию плагина в analysis_options.yaml как {version}.",
+      "editorVsCli": "Редактор будет использовать версию плагина {plugin}. Команда строки (dart run saropa_lints:init, scan, baseline) продолжает использовать версию pubspec.yaml {pubspec}.",
+      "cliNeedsPubspec": "dart run saropa_lints:init, scan и baseline нужен saropa_lints в pubspec.yaml.",
+      "pluginUnverified": "Версия плагина {version} не может быть проверена с помощью pub solver. Рекомендуется только из Dart ограничения SDK.",
+      "pluginOnly": "Установите версию плагина saropa_lints в analysis_options.yaml на {version}.",
+      "alignPlugin": "Версия плагина в analysis_options.yaml ({plugin}) отличается от заблокированной версии saropa_lints ({locked}). Установите версию плагина в {locked}.",
+      "localSource": "saropa_lints происходит из локального {source} источника, поэтому расширение показывает только факты и не изменяет ничего.",
+      "noCompatible": "Нет опубликованной версии saropa_lints, которая совместима с SDK Dart этого проекта.",
+      "noVersions": "Доступных версий saropa_lints для рекомендации нет.",
+      "probeFailed": "Не удалось определить, какую версию saropa_lints можно использовать в этом проекте, поскольку инструмент Dart не был запущен ({detail}). Убедитесь, что dart или flutter находятся в вашем PATH, и вы онлайн, затем проверьте снова.",
+      "staleVersions": "Список версий не может быть обновлён (оффлайн), поэтому это рекомендация может быть устаревшей.",
+      "blockerSdk": "saropa_lints {version} требует более новой Dart SDK, чем {dart}.",
+      "blockerMeta": "saropa_lints {version} с версией meta {pin}, закреплённой вашим Flutter SDK, несовместим.",
+      "blockerPackage": "{package} предотвращает установку, требуя другую версию анализатора.",
+      "fixFlutterUpgrade": "Запустите flutter upgrade.",
+      "fixUpgradeFlutterMeta": "Обновите Flutter до выпуска, который указывает на более новую мету.",
+      "fixKeepVersion": "Сохраняйте saropa_lints в ^{version}.",
+      "fixUpdateHolder": "Обновите {package} до версии, поддерживающей более новую версию анализатора.",
+      "fixUsePluginRoute": "Используйте плагин route: установите версию плагина в analysis_options.yaml в {version}.",
+      "fixPubspecFallback": "Или останьтесь на пути pubspec: используйте saropa_lints ^{version}, или обновите {package} до версии, поддерживающей более новую аналитику.",
+      "fixAlignPlugin": "Установите версию плагина в analysis_options.yaml в {version}."
+    },
+    "card": {
+      "heading": "Версия совместимости",
+      "loading": "Проверка версии saropa_lints, которую можно использовать для этого проекта...",
+      "notDetected": "не обнаружено",
+      "dart": "Dart SDK",
+      "flutter": "Flutter SDK",
+      "lockedSaropa": "Заблокировано saropa_lints",
+      "lockedAnalyzer": "Заблокированный анализатор",
+      "plugin": "Версия плагина (analysis_options.yaml)",
+      "blockers": "Что блокирует более новую версию",
+      "fixes": "Как исправить",
+      "apply": "Применить",
+      "applying": "Применяется...",
+      "preview": "Предварительный просмотр изменений",
+      "refresh": "Повторно проверить",
+      "diffTitle": "{file}: предложенный вариант изменения",
+      "staleReloaded": "Проект изменился, пока вы смотрели на эту карточку, поэтому ничего не было применено. Просмотрите обновленные рекомендации и нажмите Применить снова.",
+      "loadFailed": "Не удалось проверить совместимость версий: {detail}",
+      "routeLabel": "Установить маршрут",
+      "routes": {
+        "dependency": "Зависимость в pubspec.yaml",
+        "plugin": "Плагин в analysis_options.yaml только",
+        "both": "Зависимость и плагин",
+        "none": "Невозможно внести изменения"
+      }
+    },
+    "apply": {
+      "progress": "Применение изменения версии saropa_lints",
+      "applied": "saropa_lints {version} установлен и настроен.",
+      "noChange": "Не требуется вносить изменения в файлы.",
+      "failedRestored": "Изменение версии не удалось: {detail} pubspec.yaml и analysis_options.yaml были восстановлены в их предыдущее содержимое.",
+      "failedNotRestored": "Изменение версии не удалось: {detail} Файлы не могут быть восстановлены автоматически; проверьте pubspec.yaml и analysis_options.yaml.",
+      "cancelledRestored": "Изменение версии было отменено. pubspec.yaml и analysis_options.yaml были восстановлены в их предыдущее содержимое.",
+      "cancelledNotRestored": "Изменение версии было отменено, но файлы не могли быть восстановлены автоматически; проверьте pubspec.yaml и analysis_options.yaml."
     }
   },
   "lintsSwitch": {
-    "statusOn": "Saropa Lints: On",
-    "statusOff": "Saropa Lints: Off",
-    "statusPartial": "Saropa Lints: Partly off",
-    "tooltipOn": "Saropa Lints is on (setting and analyzer plugin). Click to turn it off.",
-    "tooltipOff": "Saropa Lints is off (setting and analyzer plugin). Click to turn it on.",
-    "tooltipPartialSetting": "Partly off: the saropaLints.enabled setting is off while the analyzer plugin is on. Click to fix (turns both on).",
-    "tooltipPartialPlugin": "Partly off: the analyzer plugin is off in analysis_options.yaml while the setting is on. Click to fix (turns both on).",
-    "dashboardOff": "Lints are off.",
-    "dashboardPartialSetting": "Lints are partly off: the saropaLints.enabled setting is off.",
-    "dashboardPartialPlugin": "Lints are partly off: the analyzer plugin is off in analysis_options.yaml.",
-    "dashboardTurnOn": "Turn on",
-    "dashboardFix": "Fix",
-    "driftRowLabel": "Plugin version out of sync",
-    "driftRowDescription": "analysis_options.yaml says {configured}, pubspec.lock pins {pinned}. Click to sync.",
-    "driftSynced": "analysis_options.yaml plugin version updated to {pinned}."
+    "statusOn": "Saropa Lints: На",
+    "statusOff": "Saropa Lints: Вкл",
+    "statusPartial": "Saropa Lints: Частично отключено",
+    "tooltipOn": "Saropa Lints включен (настройки и анализатор плагин). Нажмите, чтобы отключить.",
+    "tooltipOff": "Saropa Lints отключен (настройки и анализатор плагин). Нажмите, чтобы включить.",
+    "tooltipPartialSetting": "Частично отключено: настройка saropaLints.enabled отключена, а плагин анализатора включен. Нажмите, чтобы исправить (включает оба).",
+    "tooltipPartialPlugin": "Частично отключено: анализатор плагин отключен в analysis_options.yaml, хотя настройка включена. Нажмите, чтобы исправить (включает оба).",
+    "dashboardOff": "Проверка отключена.",
+    "dashboardPartialSetting": "Проверки частично отключены: настройка saropaLints.enabled отключена.",
+    "dashboardPartialPlugin": "Проверки частично отключены: плагин анализатора отключен в analysis_options.yaml.",
+    "dashboardTurnOn": "Включить",
+    "dashboardFix": "Исправить",
+    "driftRowLabel": "Версия плагина вне синхронизации",
+    "driftRowDescription": "analysis_options.yaml говорит {configured}, pubspec.lock пины {pinned}. Нажмите, чтобы синхронизировать.",
+    "driftSynced": "analysis_options.yaml плагин версии обновлен до {pinned}."
   }
 }
