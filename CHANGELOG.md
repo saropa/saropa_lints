@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.6.1] — Unreleased
+## [17.6.1]
 
 Scanning now uses your computer's cores while staying careful with its memory: large projects scan several times faster, the VS Code whole-project scan finishes in about a minute instead of tens of minutes, and a scan that would strain your machine slows itself down — and tells you how to fix it — instead of freezing it. [log](https://github.com/saropa/saropa_lints/blob/v17.6.1/CHANGELOG.md)
 
