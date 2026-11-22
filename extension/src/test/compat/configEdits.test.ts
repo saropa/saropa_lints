@@ -19,6 +19,7 @@ const AO = [
   '',
 ].join('\n');
 
+// Text-level edits to pubspec.yaml and analysis_options.yaml that preserve surrounding content.
 describe('applyRecommendation', () => {
   it('writes pubspec constraint as ^version', () => {
     const r = applyRecommendation({ pubspec: PUB }, { constraint: '16.10.0' });

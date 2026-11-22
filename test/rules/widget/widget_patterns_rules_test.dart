@@ -653,28 +653,34 @@ void main() {
       void writeManifest(String body) {
         final dir = Directory('${root.path}/android/app/src/main')
           ..createSync(recursive: true);
-        File('${dir.path}/AndroidManifest.xml').writeAsStringSync(
-          '<manifest>$body<application/></manifest>',
-        );
+        File(
+          '${dir.path}/AndroidManifest.xml',
+        ).writeAsStringSync('<manifest>$body<application/></manifest>');
       }
 
       test('silent when manifest declares the permission', () {
         writeManifest(
           '<uses-permission android:name="android.permission.RECORD_AUDIO"/>',
         );
-        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
-            isFalse);
+        expect(
+          RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+          isFalse,
+        );
       });
 
       test('reminds when manifest declares no permissions', () {
         writeManifest('');
-        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
-            isTrue);
+        expect(
+          RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+          isTrue,
+        );
       });
 
       test('silent when there is no manifest', () {
-        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
-            isFalse);
+        expect(
+          RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+          isFalse,
+        );
       });
 
       // Debug/profile source-set manifests count as declarations.
@@ -686,32 +692,41 @@ void main() {
           '<manifest><uses-permission android:name="android.permission.INTERNET"/>'
           '</manifest>',
         );
-        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
-            isFalse);
+        expect(
+          RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+          isFalse,
+        );
       });
 
       // A commented-out template entry declares nothing.
-      test('reminds when the only <uses-permission is inside an XML comment',
-          () {
+      test('reminds when the only <uses-permission is inside an XML comment', () {
         writeManifest(
           '<!-- <uses-permission android:name="android.permission.CAMERA"/> -->',
         );
-        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
-            isTrue);
+        expect(
+          RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+          isTrue,
+        );
       });
 
       // Cached verdict must refresh when the manifest changes on disk.
       test('verdict cache refreshes after the manifest is edited', () {
         writeManifest('');
-        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
-            isTrue);
-        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
-            isTrue);
+        expect(
+          RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+          isTrue,
+        );
+        expect(
+          RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+          isTrue,
+        );
         writeManifest(
           '<uses-permission android:name="android.permission.CAMERA"/>',
         );
-        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
-            isFalse);
+        expect(
+          RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+          isFalse,
+        );
       });
     });
 

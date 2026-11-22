@@ -44,44 +44,61 @@ class Text {
       '$preamble\nvoid f() {\n$body\n}\n',
     );
 
-    test('TextScaler.linear(1) on Text.rich is pinned off -> reported', () async {
-      expect(
-        await run('  Text.rich(TextSpan(style: TextStyle(fontSize: 14)), '
-            'textScaler: TextScaler.linear(1));'),
-        hasLength(1),
-      );
-    });
+    test(
+      'TextScaler.linear(1) on Text.rich is pinned off -> reported',
+      () async {
+        expect(
+          await run(
+            '  Text.rich(TextSpan(style: TextStyle(fontSize: 14)), '
+            'textScaler: TextScaler.linear(1));',
+          ),
+          hasLength(1),
+        );
+      },
+    );
 
     test('TextScaler.linear(1.0) is pinned off -> reported', () async {
       expect(
-        await run('  Text.rich(TextSpan(style: TextStyle(fontSize: 14)), '
-            'textScaler: const TextScaler.linear(1.0));'),
+        await run(
+          '  Text.rich(TextSpan(style: TextStyle(fontSize: 14)), '
+          'textScaler: const TextScaler.linear(1.0));',
+        ),
         hasLength(1),
       );
     });
 
-    test('textScaleFactor: 1.0 on Text.rich is pinned off -> reported', () async {
-      expect(
-        await run('  Text.rich(TextSpan(style: TextStyle(fontSize: 14)), '
-            'textScaleFactor: 1.0);'),
-        hasLength(1),
-      );
-    });
+    test(
+      'textScaleFactor: 1.0 on Text.rich is pinned off -> reported',
+      () async {
+        expect(
+          await run(
+            '  Text.rich(TextSpan(style: TextStyle(fontSize: 14)), '
+            'textScaleFactor: 1.0);',
+          ),
+          hasLength(1),
+        );
+      },
+    );
 
     test('linear(1.5) still scales -> silent', () async {
       expect(
-        await run('  Text.rich(TextSpan(style: TextStyle(fontSize: 14)), '
-            'textScaler: TextScaler.linear(1.5));'),
+        await run(
+          '  Text.rich(TextSpan(style: TextStyle(fontSize: 14)), '
+          'textScaler: TextScaler.linear(1.5));',
+        ),
         isEmpty,
       );
     });
 
-    test('Text.rich with no opt-out resolves to consumer Text -> silent', () async {
-      expect(
-        await run('  Text.rich(TextSpan(style: TextStyle(fontSize: 14)));'),
-        isEmpty,
-      );
-    });
+    test(
+      'Text.rich with no opt-out resolves to consumer Text -> silent',
+      () async {
+        expect(
+          await run('  Text.rich(TextSpan(style: TextStyle(fontSize: 14)));'),
+          isEmpty,
+        );
+      },
+    );
   });
 
   group('avoid_implicitly_nullable_extension_types - representation', () {
@@ -135,7 +152,9 @@ void tap() {}
 
     test('Semantics(onTap: null) does not excuse the detector', () async {
       expect(
-        await run('  Semantics(onTap: null, child: GestureDetector(onTap: tap));'),
+        await run(
+          '  Semantics(onTap: null, child: GestureDetector(onTap: tap));',
+        ),
         hasLength(1),
       );
     });
@@ -151,39 +170,49 @@ void tap() {}
 
     test('direct Semantics(onTap: fn) excuses the detector', () async {
       expect(
-        await run('  Semantics(onTap: tap, child: GestureDetector(onTap: tap));'),
+        await run(
+          '  Semantics(onTap: tap, child: GestureDetector(onTap: tap));',
+        ),
         isEmpty,
       );
     });
 
     test('Semantics three layers up still excuses the detector', () async {
       expect(
-        await run('  Semantics(onTap: tap, child: Box(child: Box(child: Box('
-            'child: GestureDetector(onTap: tap)))));'),
+        await run(
+          '  Semantics(onTap: tap, child: Box(child: Box(child: Box('
+          'child: GestureDetector(onTap: tap)))));',
+        ),
         isEmpty,
       );
     });
 
     test('Semantics four layers up does not excuse the detector', () async {
       expect(
-        await run('  Semantics(onTap: tap, child: Box(child: Box(child: Box('
-            'child: Box(child: GestureDetector(onTap: tap))))));'),
+        await run(
+          '  Semantics(onTap: tap, child: Box(child: Box(child: Box('
+          'child: Box(child: GestureDetector(onTap: tap))))));',
+        ),
         hasLength(1),
       );
     });
 
     test('Semantics wrapping a whole Scaffold does not excuse', () async {
       expect(
-        await run('  Semantics(onTap: tap, child: Scaffold('
-            'body: GestureDetector(onTap: tap)));'),
+        await run(
+          '  Semantics(onTap: tap, child: Scaffold('
+          'body: GestureDetector(onTap: tap)));',
+        ),
         hasLength(1),
       );
     });
 
     test('Semantics above a builder closure does not excuse rows', () async {
       expect(
-        await run('  Semantics(onTap: tap, child: ListView.builder('
-            'itemBuilder: (c, i) => GestureDetector(onTap: tap)));'),
+        await run(
+          '  Semantics(onTap: tap, child: ListView.builder('
+          'itemBuilder: (c, i) => GestureDetector(onTap: tap)));',
+        ),
         hasLength(1),
       );
     });
@@ -213,14 +242,19 @@ bool isMotionReduced = false;
 
     test('isMotionReduced ternary is still a guard', () async {
       expect(
-        await run('  AnimatedContainer(duration: isMotionReduced ? '
-            'Duration.zero : unreducedMotionDuration);'),
+        await run(
+          '  AnimatedContainer(duration: isMotionReduced ? '
+          'Duration.zero : unreducedMotionDuration);',
+        ),
         isEmpty,
       );
     });
 
     test('Duration.zero and parenthesized Duration.zero are silent', () async {
-      expect(await run('  AnimatedContainer(duration: Duration.zero);'), isEmpty);
+      expect(
+        await run('  AnimatedContainer(duration: Duration.zero);'),
+        isEmpty,
+      );
       expect(
         await run('  AnimatedContainer(duration: (Duration.zero));'),
         isEmpty,
@@ -264,10 +298,8 @@ abstract class BaseState<T> extends State<T> {
 }
 ''';
 
-    Future<List<int>> run(String body) => _lines(
-      AvoidPublicMembersInStatesRule(),
-      '$preamble\n$body\n',
-    );
+    Future<List<int>> run(String body) =>
+        _lines(AvoidPublicMembersInStatesRule(), '$preamble\n$body\n');
 
     test('override of a user State base class member is reported', () async {
       final String code = '''

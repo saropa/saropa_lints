@@ -10,6 +10,7 @@ import unittest
 from scripts.modules._git_ops import _is_auth_prompt_line
 
 
+# Line-matching cases only; no subprocess.
 class IsAuthPromptLineTest(unittest.TestCase):
     def test_matches_authorize_prompt(self) -> None:
         self.assertTrue(_is_auth_prompt_line("Please Authorize pub to continue"))

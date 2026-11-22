@@ -181,10 +181,11 @@ class S {
       expect(codes, isNot(contains('prefer_static_method')));
     });
 
-    test('does NOT flag a state-free method invoked through an instance '
-        'receiver from another class (making it static breaks callers)',
-        () async {
-      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+    test(
+      'does NOT flag a state-free method invoked through an instance '
+      'receiver from another class (making it static breaks callers)',
+      () async {
+        final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
 class Button {
   int buildTile(int a) => a + 1;
 }
@@ -194,8 +195,9 @@ class Host {
   int use() => button.buildTile(2);
 }
 ''');
-      expect(codes, isNot(contains('prefer_static_method')));
-    });
+        expect(codes, isNot(contains('prefer_static_method')));
+      },
+    );
 
     test('does NOT flag a state-free method invoked on a constructor-call '
         'receiver', () async {

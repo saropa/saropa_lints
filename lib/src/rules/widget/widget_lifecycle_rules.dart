@@ -5301,8 +5301,8 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   /// `State` (a user `BaseState<T> extends State<T>` in between). Unresolved
   /// chains return false so no evidence means no report.
   static bool _extendsStateTransitively(ClassDeclaration node) {
-    InterfaceElement? current = node.declaredFragment?.element.supertype
-        ?.element;
+    InterfaceElement? current =
+        node.declaredFragment?.element.supertype?.element;
     // Depth guard against pathological/cyclic hierarchies.
     for (int depth = 0; current != null && depth < 16; depth++) {
       if (current.name == 'State') return true;

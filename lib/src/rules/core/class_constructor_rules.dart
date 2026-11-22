@@ -429,7 +429,9 @@ class AvoidShadowingRule extends SaropaLintRule {
     FunctionBody body,
     Set<String> outer,
   ) {
-    final _ShadowingChecker checker = _ShadowingChecker(null, _code, {...outer});
+    final _ShadowingChecker checker = _ShadowingChecker(null, _code, {
+      ...outer,
+    });
     body.accept(checker);
     return checker.flagged;
   }

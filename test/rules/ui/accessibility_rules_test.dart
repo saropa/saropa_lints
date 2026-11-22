@@ -237,7 +237,11 @@ void main() {
       );
     });
     test('still matches built-in names', () {
-      for (final s in ['x.disableAnimations', 'reduceMotion', 'reducedMotion']) {
+      for (final s in [
+        'x.disableAnimations',
+        'reduceMotion',
+        'reducedMotion',
+      ]) {
         expect(reducedMotionPreferencePattern.hasMatch(s), isTrue, reason: s);
       }
     });

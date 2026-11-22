@@ -4,6 +4,7 @@ import { routeStatus } from '../../compat/routeStatus';
 const t = (k: string, p: Record<string, string> = {}) =>
   `${k.replace('compat.status.', '')}${Object.values(p).length ? `[${Object.values(p).join(',')}]` : ''}`;
 
+// Status text and tooltip key for each route state.
 describe('routeStatus', () => {
   it('maps every state to its text and tooltip key', () => {
     const cases: [Parameters<typeof routeStatus>[0], Parameters<typeof routeStatus>[1], string, string][] = [

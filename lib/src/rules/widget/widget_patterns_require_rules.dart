@@ -2578,8 +2578,10 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
         if (!file.existsSync()) return;
         final FileStat st = file.statSync();
         paths.add(file.path);
-        signature.write('${file.path}|${st.modified.microsecondsSinceEpoch}'
-            '|${st.size};');
+        signature.write(
+          '${file.path}|${st.modified.microsecondsSinceEpoch}'
+          '|${st.size};',
+        );
       } on FileSystemException {
         // Unreadable candidate: skip; it cannot prove a declaration.
       }

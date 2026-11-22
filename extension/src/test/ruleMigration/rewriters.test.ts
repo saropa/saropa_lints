@@ -8,6 +8,7 @@ const map = buildRenameMap([
   { old: 'b', new: 'c', since: '17.1.0' },
 ]);
 
+// Rename-map building and rewrites of ignores, YAML keys and baselines.
 describe('buildRenameMap', () => {
   it('collapses chains', () => {
     assert.strictEqual(map.get('a'), 'c');

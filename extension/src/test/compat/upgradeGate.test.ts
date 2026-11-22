@@ -15,6 +15,7 @@ const rec = (o: Partial<Recommendation> = {}): Recommendation => ({
   ...o,
 });
 
+// Gate deciding whether an upgrade is offered or applied automatically.
 describe('offerableVersion', () => {
   it('offers the recommended version when it differs from installed', () => {
     assert.strictEqual(offerableVersion(rec(), '16.0.0'), '16.10.0');

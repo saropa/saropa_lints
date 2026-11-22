@@ -6,6 +6,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { pathsFor } from '../../compat/compatController';
 
+// Path resolution for standalone and pub-workspace projects.
 describe('pathsFor', () => {
   it('uses the workspace root lock for a pub workspace member', () => {
     const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'compat-ws-'));

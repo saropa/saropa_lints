@@ -27,6 +27,7 @@ def _run(run_id: int, sha: str) -> dict:
     }
 
 
+# Runs for other commits must not be offered for retrigger.
 class OfferRetriggerHeadFilterTest(unittest.TestCase):
     def _offered(self, runs: list[dict], head: str | None) -> list[dict]:
         shown: list[dict] = []

@@ -6,6 +6,7 @@ from scripts.modules._extension_publish import extension_version_sync_error
 from scripts.modules._utils import extension_version_for
 
 
+# Pure-function checks of the version-sync error messages.
 class TestExtensionVersionSync(unittest.TestCase):
     def test_stable_maps_to_slot_nine(self) -> None:
         self.assertEqual(extension_version_for("17.0.0"), "17.0.9")

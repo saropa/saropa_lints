@@ -31,6 +31,7 @@ def git(cwd: Path, *args: str) -> str:
     ).stdout.strip()
 
 
+# Real git repos on purpose: the tag position after the move is what matters.
 class TestMoveMajorVersionTag(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = Path(tempfile.mkdtemp(prefix="saropa-majortag-"))

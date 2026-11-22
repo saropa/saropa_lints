@@ -2,6 +2,7 @@ import '../vibrancy/register-vscode-mock';
 import * as assert from 'node:assert';
 import { buildCompatSection } from '../../compat/compatCardHtml';
 
+// HTML rendering of the compatibility card section.
 describe('buildCompatSection', () => {
   it('renders nothing before the card is opened', () => {
     assert.strictEqual(buildCompatSection(undefined), '');

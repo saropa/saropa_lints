@@ -10,6 +10,7 @@ const VERSIONS: PubVersion[] = [
   V('16.7.0', '>=3.9.0 <4.0.0'),
 ];
 
+// Constraint picked for a new project from Dart SDK and available versions.
 describe('chooseNewProjectConstraint', () => {
   it('picks the newest stable the Dart SDK allows', async () => {
     assert.strictEqual(await chooseNewProjectConstraint('3.13.0', VERSIONS), '^17.1.0');

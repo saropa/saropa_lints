@@ -5,9 +5,10 @@ import 'package:test/test.dart';
 
 /// Collects the token for [name] from parsed [source] (real scanner tokens).
 Token _tokenNamed(String source, String name) {
-  Token? t = parseString(content: source, throwIfDiagnostics: false)
-      .unit
-      .beginToken;
+  Token? t = parseString(
+    content: source,
+    throwIfDiagnostics: false,
+  ).unit.beginToken;
   while (t != null && !t.isEof) {
     if (t.lexeme == name) return t;
     t = t.next;
@@ -22,7 +23,9 @@ void main() {
 
   test('contextual keyword `when` is not a reserved keyword label', () {
     expect(
-      InvalidRecordFieldNameRule.isReservedKeywordToken(_tokenNamed(src, 'when')),
+      InvalidRecordFieldNameRule.isReservedKeywordToken(
+        _tokenNamed(src, 'when'),
+      ),
       isFalse,
     );
   });

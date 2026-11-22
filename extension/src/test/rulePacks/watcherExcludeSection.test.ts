@@ -8,6 +8,7 @@ const rows = {
   'watcherExclude.maxFolderFiles': '<tr id="setting-row-b"></tr>',
 };
 
+// HTML for the watcher-exclude settings section.
 describe('buildWatcherExcludeSectionHtml', () => {
   it('shows counts and lists for files, folders and recommended excludes', () => {
     const html = buildWatcherExcludeSectionHtml(rows, {

@@ -14,6 +14,7 @@ const change = (file: string, before: string, after: string, hits: number): File
   findings: [],
 });
 
+// Migration report summaries and change selection.
 describe('ruleMigration report', () => {
   const changes = [change('/a.dart', 'x', 'y', 2), change('/b.dart', 'x', 'x', 0), change('/c.yaml', 'x', 'z', 1)];
 

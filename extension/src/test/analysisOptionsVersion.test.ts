@@ -1,6 +1,7 @@
 import * as assert from 'node:assert';
 import { readConfiguredPluginVersion } from '../analysisOptionsVersion';
 
+// Reading the configured plugin version from analysis_options.yaml text.
 describe('readConfiguredPluginVersion', () => {
   it('returns null for missing/empty content', () => {
     assert.strictEqual(readConfiguredPluginVersion(undefined), null);

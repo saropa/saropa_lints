@@ -27,6 +27,7 @@ function memStore(): PubVersionsStore & { value?: PubVersionsCache } {
   return s;
 }
 
+// pub.dev version fetch, parsing and cache behavior (fetch is stubbed).
 describe('getPubVersions', () => {
   it('parses versions and constraints and caches', async () => {
     const store = memStore();

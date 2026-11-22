@@ -11,6 +11,7 @@ from scripts.modules._utils import run_command, safe_run
 CWD = Path(".")
 
 
+# Child processes must be bounded: no stdin, hard timeout.
 class SafeRunTests(unittest.TestCase):
     def test_stdin_is_devnull_so_prompt_fails_fast(self):
         start = time.monotonic()

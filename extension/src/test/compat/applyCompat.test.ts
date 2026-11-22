@@ -32,6 +32,7 @@ function fake(over: Partial<ApplyDeps> = {}, initial: Record<string, string> = {
   return { deps, files, calls };
 }
 
+// Apply flow with in-memory file and resolver fakes: edit order, resolve, rollback.
 describe('applyCompatibility', () => {
   it('writes both files, resolves, then initializes config', async () => {
     const { deps, files, calls } = fake();

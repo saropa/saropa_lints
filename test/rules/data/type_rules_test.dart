@@ -383,15 +383,18 @@ void main() {
     });
 
     test('nullable and type-parameter representations are BAD cases', () {
-      const marker = r'expect_lint: avoid_implicitly_nullable_extension_types\n';
+      const marker =
+          r'expect_lint: avoid_implicitly_nullable_extension_types\n';
       expect(
-        RegExp(marker + r'extension type _BadET1224\(int\? value\)')
-            .hasMatch(src),
+        RegExp(
+          marker + r'extension type _BadET1224\(int\? value\)',
+        ).hasMatch(src),
         isTrue,
       );
       expect(
-        RegExp(marker + r'extension type _BadETParam<T>\(T value\)')
-            .hasMatch(src),
+        RegExp(
+          marker + r'extension type _BadETParam<T>\(T value\)',
+        ).hasMatch(src),
         isTrue,
       );
     });

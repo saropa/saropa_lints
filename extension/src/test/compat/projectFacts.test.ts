@@ -56,6 +56,7 @@ function write(root: string, rel: string, text: string): void {
 const crlf = (s: string): string => s.replace(/\n/g, '\r\n');
 const noFlutter = async (): Promise<string | null> => null;
 
+// Parsing of pubspec/lock/dart/flutter output into ProjectFacts.
 describe('projectFacts parsers', () => {
   it('parses Dart version', () => {
     assert.strictEqual(parseDartVersion('{"generatorVersion":"3.9.2"}'), '3.9.2');

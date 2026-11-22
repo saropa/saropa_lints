@@ -5,6 +5,7 @@ import * as path from 'node:path';
 import { atomicWrite } from '../../compat/atomicWrite';
 import { createLatestRequest } from '../../compat/latestRequest';
 
+// Atomic file replacement and latest-wins request guard.
 describe('atomicWrite', () => {
   it('replaces the file and leaves no temp file', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'aw-'));

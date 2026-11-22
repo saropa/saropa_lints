@@ -24,6 +24,7 @@ const ok: ProbeResult = { ok: true };
 const fail = (blockingPackage?: string): ProbeResult => ({ ok: false, blockingPackage, reason: 'x', raw: 'x' });
 const probeFor = (map: Record<string, ProbeResult>) => async (c: string) => map[c] ?? fail('analyzer');
 
+// Route/constraint choice from project facts, pub.dev versions and a stubbed solver probe.
 describe('recommend', () => {
   it('latest ok: ^newest, plugin version exact', async () => {
     const r = await recommend(facts(), VERSIONS, probeFor({ '^17.0.0': ok }));

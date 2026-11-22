@@ -3584,9 +3584,7 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
       for (final Argument arg in node.argumentList.arguments) {
         if (arg is NamedArgument && arg.name.lexeme == 'duration') {
           final String durationSource = arg.argumentExpression.toSource();
-          if (reducedMotionPreferencePattern.hasMatch(
-            durationSource,
-          )) {
+          if (reducedMotionPreferencePattern.hasMatch(durationSource)) {
             return; // Good - respects preference
           }
           // An explicit zero duration is already "no motion"; nothing to gate.
@@ -3668,7 +3666,8 @@ class _ReducedMotionIdentifierFinder extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (reducedMotionPreferencePattern.hasMatch(node.name) || _settle.hasMatch(node.name)) {
+    if (reducedMotionPreferencePattern.hasMatch(node.name) ||
+        _settle.hasMatch(node.name)) {
       found = true;
     }
   }

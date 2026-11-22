@@ -18,6 +18,7 @@ const REG = JSON.stringify({
   ],
 });
 
+// Rule-rename registry parsing, workspace scan and apply.
 describe('registry', () => {
   it('compares versions', () => {
     assert.strictEqual(compareVersions('16.7.0', '17.0.0'), -1);

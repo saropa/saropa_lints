@@ -415,9 +415,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
   /// True when the primary constructor's representation type is nullable
   /// (`T?`, `dynamic`, `Null`) or a bare type parameter, i.e. the extension
   /// type can end up nullable.
-  static bool _representationMayBeNullable(
-    PrimaryConstructorDeclaration ctor,
-  ) {
+  static bool _representationMayBeNullable(PrimaryConstructorDeclaration ctor) {
     final NodeList<FormalParameter> params = ctor.formalParameters.parameters;
     if (params.isEmpty) return false;
     final FormalParameter param = params.first;

@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [17.6.0] — Unreleased
+## [17.6.0]
 
 The extension's rating prompts, welcome panel, scan progress message and several other strings now read natively in all 24 supported languages instead of falling back to English. Eleven false positives are also fixed. [log](https://github.com/saropa/saropa_lints/blob/v17.6.0/CHANGELOG.md)
 

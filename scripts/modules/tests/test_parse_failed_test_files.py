@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 
+# Log text in, retry-target file list out.
 class TestParseFailedTestFiles(unittest.TestCase):
     def test_parses_failures_dedupes_and_skips_missing(self) -> None:
         from scripts.modules._publish_steps import _parse_failed_test_files
