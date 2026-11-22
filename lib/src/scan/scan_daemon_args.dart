@@ -38,6 +38,7 @@ class ScanDaemonOptions {
     required this.projectRoot,
     required this.tier,
     required this.maxRssMb,
+    this.maxIssues = 0,
   });
 
   /// Root of the project to scan; the analysis context collection is built
@@ -51,6 +52,11 @@ class ScanDaemonOptions {
   /// RSS ceiling in MB past which the daemon recycles itself (clean exit
   /// so the caller respawns a fresh process). Always positive.
   final int maxRssMb;
+
+  /// Cap on reported non-error diagnostics per request; `0` = unlimited
+  /// (default). The extension filters and renders the results itself, so a
+  /// hidden cap here only makes the Problems panel silently incomplete.
+  final int maxIssues;
 }
 
 /// Margin multiplier applied to the post-prewarm RSS when deriving the
@@ -89,9 +95,10 @@ ScanDaemonParseResult parseScanDaemonArgs(List<String> args) {
   final positionals = <String>[];
   String? tier;
   var maxRssMb = defaultMaxRssMb;
+  var maxIssues = 0;
   for (var i = 0; i < args.length; i++) {
     final arg = args[i];
-    if (arg == '--tier' || arg == '--max-rss-mb') {
+    if (arg == '--tier' || arg == '--max-rss-mb' || arg == '--max-issues') {
       // Both value-taking flags share the "next token is the value" shape;
       // a missing value (end of args) is a hard parse failure.
       if (i + 1 >= args.length) {
@@ -100,6 +107,14 @@ ScanDaemonParseResult parseScanDaemonArgs(List<String> args) {
       final value = args[++i];
       if (arg == '--tier') {
         tier = value;
+      } else if (arg == '--max-issues') {
+        final parsed = int.tryParse(value);
+        if (parsed == null || parsed < 0) {
+          return ScanDaemonParseInvalid(
+            '--max-issues requires a non-negative integer, got: $value',
+          );
+        }
+        maxIssues = parsed;
       } else {
         // The RSS ceiling must be a positive integer — zero/negative would
         // make the daemon recycle after its very first request forever.
@@ -126,6 +141,7 @@ ScanDaemonParseResult parseScanDaemonArgs(List<String> args) {
       projectRoot: positionals.first,
       tier: tier,
       maxRssMb: maxRssMb,
+      maxIssues: maxIssues,
     ),
   );
 }

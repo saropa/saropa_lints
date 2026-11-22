@@ -35,7 +35,7 @@
 ///
 /// Startup:
 ///   dart run saropa_lints:scan_daemon `<projectRoot>` [--tier `<tier>`]
-///       [--max-rss-mb `<mb>`]
+///       [--max-rss-mb `<mb>`] [--max-issues `<n>`]
 ///
 /// Once the initial collection build + prewarm finishes (slow — about a
 /// minute on a large project), the daemon writes one line to stdout:
@@ -223,8 +223,8 @@ Future<void> _handleScanRequest(
       // The daemon is a separate process from the analysis server, so RSS
       // is not shared — full lane is always correct here.
       lane: RuleLane.full,
-      // Keep the IDE issue cap — daemon output feeds the Problems tab.
-      // disableIssueCap: false (default),
+      // Uncapped unless --max-issues says otherwise (see ScanDaemonOptions).
+      maxIssues: options.maxIssues,
       // The extension sends explicit file paths — honor them without
       // applying hardcoded exclusions (same as lsp_server.dart).
       applyExclusionsToFileList: false,

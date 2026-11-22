@@ -1197,6 +1197,7 @@ export class ScanOnSaveController implements vscode.Disposable {
         const result = await runFastBaselineScan(root, tier, {
           resources,
           lowPriority: settings.lowPriority,
+          maxIssues: settings.maxIssues,
           isCanceled: () => token.isCancellationRequested,
           onProgress: (p) => {
             const pct = p.total > 0 ? Math.floor((p.done * 100) / p.total) : 0;

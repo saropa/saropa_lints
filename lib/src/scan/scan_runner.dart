@@ -65,6 +65,7 @@ class ScanRunner {
     this.lane = RuleLane.full,
     this.laneStats = false,
     this.disableIssueCap = false,
+    this.maxIssues,
     this.noExclude = false,
     List<String> excludeGlobs = const [],
     List<String> includeGlobs = const [],
@@ -173,6 +174,44 @@ class ScanRunner {
   /// are silently dropped after 500 issues and rules appear "silent".
   final bool disableIssueCap;
 
+  /// Cap on reported non-ERROR diagnostics (errors are never capped). `0` =
+  /// unlimited; null = leave the process-wide default (500, the IDE
+  /// Problems-tab safeguard) unless [disableIssueCap] is set. The scan CLI and
+  /// daemon pass `0` by default: a silent cap makes `--fail-on-count`
+  /// thresholds and CI reports wrong.
+  final int? maxIssues;
+
+  /// Applies [maxIssues] / [disableIssueCap] to the process-wide tracker and
+  /// returns the effective cap (0 = unlimited).
+  int _applyIssueCap() {
+    // Counters are process-wide statics; a reused process (the scan daemon,
+    // tests, a second run) must not inherit the previous run's count or a
+    // cap would trip on the first file. The cap setting itself survives reset.
+    ProgressTracker.reset();
+    final explicit = maxIssues;
+    if (explicit != null) {
+      ProgressTracker.setMaxIssues(explicit);
+    } else if (disableIssueCap) {
+      ProgressTracker.setMaxIssues(0);
+    }
+    return ProgressTracker.maxIssues;
+  }
+
+  /// Tells the user when output was trimmed, and how to lift the cap.
+  void _noteIssueCap(int cap, {int? dropped}) {
+    if (cap <= 0) return;
+    final trimmed = dropped != null
+        ? dropped > 0
+        : ProgressTracker.isLimitReached;
+    if (!trimmed) return;
+    _err(
+      'Output limited to about $cap non-error issue(s)'
+      '${dropped != null ? ' ($dropped more not shown)' : ''}. '
+      'Errors are never capped. Use --max-issues 0 (or a larger number) to '
+      'see everything.',
+    );
+  }
+
   /// Map from rule name to its declared LintImpact name (error/warning/info).
   /// Built by `_prepare` so [_collectDiagnostics] can stamp each diagnostic.
   Map<String, String> _ruleImpactMap = const {};
@@ -236,6 +275,7 @@ class ScanRunner {
     // syntactic pass never calls contextFor so skips can't happen today,
     // but a reused ScanRunner must start clean regardless.
     _skippedFileCount = 0;
+    final cap = _applyIssueCap();
     final plan = _prepare();
     if (plan == null) return null;
     if (plan.files.isEmpty) return const [];
@@ -244,7 +284,9 @@ class ScanRunner {
       plan.rules,
       () => ScanRuleContext(definingUnit: _dummyContextUnit()),
     );
-    return _scanFiles(plan.files, registrations);
+    final result = _scanFiles(plan.files, registrations);
+    _noteIssueCap(cap);
+    return result;
   }
 
   /// Number of files a scan would visit, without loading any rules. Lets the
@@ -377,7 +419,7 @@ class ScanRunner {
     // Capture the cap in the parent: workers run with it disabled (their
     // per-process counters would drop diagnostics that belong in the global
     // first N); it is applied once after the ordered merge.
-    final parentIssueCap = ProgressTracker.maxIssues;
+    final parentIssueCap = _applyIssueCap();
     final workerCount = jobs < 1 ? 1 : jobs;
     final limits = PressureLimits(
       maxMemoryMb:
@@ -461,13 +503,18 @@ class ScanRunner {
     // the same for every worker count.
     final out = <ScanDiagnostic>[];
     var nonError = 0;
+    var dropped = 0;
     for (final d in result.diagnostics) {
       if (parentIssueCap > 0 && d.severity.toUpperCase() != 'ERROR') {
         nonError++;
-        if (nonError > parentIssueCap + 1) continue;
+        if (nonError > parentIssueCap + 1) {
+          dropped++;
+          continue;
+        }
       }
       out.add(d);
     }
+    _noteIssueCap(parentIssueCap, dropped: dropped);
     return out;
   }
 
@@ -543,7 +590,7 @@ class ScanRunner {
     // Reset per-run state so a reused ScanRunner doesn't carry stale counts.
     _skippedFileCount = 0;
     // Disable the Problems-tab cap when the caller requests complete output.
-    if (disableIssueCap) ProgressTracker.setMaxIssues(0);
+    final cap = _applyIssueCap();
 
     final plan = _prepare();
     if (plan == null) return null;
@@ -553,7 +600,9 @@ class ScanRunner {
       plan.rules,
       () => ResolvedScanRuleContext(definingUnit: _dummyContextUnit()),
     );
-    return _scanFilesResolved(plan.files, registrations);
+    final result = await _scanFilesResolved(plan.files, registrations);
+    _noteIssueCap(cap);
+    return result;
   }
 
   /// Runs the resolved scan for [dartFiles] against an already-built
@@ -573,7 +622,7 @@ class ScanRunner {
     // Reset per-run state so a reused ScanRunner doesn't carry stale counts.
     _skippedFileCount = 0;
     // Disable the Problems-tab cap when the caller requests complete output.
-    if (disableIssueCap) ProgressTracker.setMaxIssues(0);
+    _applyIssueCap();
 
     final plan = _prepare();
     if (plan == null) return null;

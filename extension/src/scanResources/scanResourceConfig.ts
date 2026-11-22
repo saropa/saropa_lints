@@ -19,5 +19,6 @@ export function readScanResourceSettings(): ScanResourceSettings {
     lowPriority: cfg.get<unknown>('scan.lowPriority'),
     baselineMode: cfg.get<unknown>('scanOnSave.baselineMode'),
     notifyOnPressure: cfg.get<unknown>('scan.notifyOnPressure'),
+    maxIssues: cfg.get<unknown>('scan.maxIssues'),
   });
 }

@@ -78,10 +78,15 @@ Scanning now uses your computer's cores while staying careful with its memory: l
 - `scan --progress plain` prints a status line every 15 seconds, which is readable in CI logs; the GitHub Action gained `jobs` and `max-memory-mb` inputs.
 - VS Code: **Scan Whole Project for Issues** now defaults to a fast parallel scan (`saropaLints.scanOnSave.baselineMode`) and offers the type-aware deep scan afterwards with a time and memory estimate; no action required.
 - VS Code: **Saropa Lints: Scan Performance and Memory Settings…** shows what each profile (`gentle`, `balanced`, `fast`) would do on your machine and recommends one; fine-tune with `saropaLints.scan.maxWorkers` and `saropaLints.scan.maxMemoryMb`.
+- `scan --max-issues <n>` (also `SAROPA_LINTS_MAX`) sets how many non-error issues are reported; the default is now unlimited so reports and `--fail-on-count` thresholds are complete, and errors are never capped — pass `--max-issues 500` to restore the old cutoff.
+- A new `max_rss_mb` key in `analysis_options_custom.yaml` sets the live analyzer plugin's hard memory cap without needing an environment variable; `SAROPA_LINTS_MAX_RSS_MB` still overrides it.
+- VS Code: choosing the gentle profile (or opening a project on a small computer with no limits set) offers a one-click, machine-sized memory limit and graceful rule shedding for live analysis, then offers to restart the analysis server.
+- VS Code: `saropaLints.scan.maxIssues` controls the issue cap for whole-project and on-save scans (default unlimited).
 - VS Code: when free memory is low, the multi-GB type-aware scan is skipped or paused with a notification offering one-click fixes (use the fast scan, turn off type resolution, resume, or open settings) instead of starting on a struggling computer.
 
 ### Changed
 
+- The scan CLI and VS Code scan daemon no longer silently drop non-error issues beyond 500, which previously made reports and count-based CI thresholds incomplete; the analyzer plugin keeps its 500-issue Problems-tab default.
 - VS Code scan processes now run at reduced CPU priority (`saropaLints.scan.lowPriority`, on by default) so typing stays smooth during a scan; no action required.
 - A fast whole-project scan no longer overwrites findings from files that were already scanned with type resolution; no action required.
 

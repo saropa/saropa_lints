@@ -78,6 +78,7 @@ dart run saropa_lints scan /path/to/project
 | `--max-memory-mb <n>` | Memory budget for the whole scan process. The scan sheds workers as it nears the budget and ramps back up when memory frees; if a single worker still exceeds it the scan stops early with partial results and exit code `3`. Default: derived from the worker count and free memory. Also `SAROPA_LINTS_MAX_MEMORY_MB`. |
 | `--chunk-timeout <seconds>` | Restart a worker that is stuck on one chunk of files for this long and retry the chunk file by file; a file that hangs again is skipped and reported. Default `120`. |
 | `--progress <style>` | `auto` (default), `bar`, `plain`, `json`, `none`. `plain` prints one status line every 15 s — readable in CI logs. `json` emits `SAROPA_SCAN_EVENT {…}` lines on stderr for tooling (this is what the VS Code extension reads). |
+| `--max-issues <n>` | Cap on reported **non-error** issues; errors are never capped. `0` = unlimited, which is the **default** for `scan` (the IDE plugin keeps its own 500-issue Problems-tab default). When a cap trims output the scan says so on stderr. Also `SAROPA_LINTS_MAX`. |
 | `--slow-file-ms <n>` | Report files that take longer than this to scan (default `3000`). Useful for finding what makes a scan slow. |
 | `--quiet` / `-q` | Suppress all stderr progress and status messages. The caller gets only the exit code and stdout output (report or JSON). |
 | `--profile` | Record per-rule execution timing and write to `reports/.saropa_lints/rule_timings.json` (slowest first, with call counts and averages). |

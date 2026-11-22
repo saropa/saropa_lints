@@ -268,6 +268,22 @@ void main() {
       expect(a.progress, 'json');
       expect(a.slowFileMs, 500);
     });
+    test('--max-issues', () {
+      expect(ok(['--max-issues', '0']).maxIssues, 0);
+      expect(ok(['--max-issues', '250']).maxIssues, 250);
+      expect(ok([]).maxIssues, isNull);
+      for (final bad in [
+        ['--max-issues'],
+        ['--max-issues', '-1'],
+        ['--max-issues', 'lots'],
+      ]) {
+        expect(
+          parseScanArgs(['.', ...bad]),
+          isA<ScanParseInvalid>(),
+          reason: '$bad',
+        );
+      }
+    });
     test('rejects invalid values', () {
       for (final bad in [
         ['--jobs'],
@@ -292,9 +308,22 @@ void main() {
     late Directory dir;
     setUp(() {
       dir = Directory.systemTemp.createTempSync('scan_jobs_');
+      // Each file triggers several findings (null assertions, empty catch,
+      // dart:io in shared code) so comparisons are never vacuously equal.
       for (var i = 0; i < 24; i++) {
         File(p.join(dir.path, 'f$i.dart')).writeAsStringSync(
-          'import "dart:io";\nvoid f$i() { final x = 1; print(x); }\n',
+          "import 'dart:io';\n\n"
+          'int? maybe$i() => null;\n\n'
+          'void f$i(List<String> items) {\n'
+          '  final v = maybe$i()!;\n'
+          '  final w = maybe$i()!;\n'
+          '  try {\n'
+          "    print(File('x').readAsStringSync());\n"
+          '  } catch (e) {}\n'
+          '  for (var i = 0; i < items.length; i++) {\n'
+          '    print(items[i] + v.toString() + w.toString());\n'
+          '  }\n'
+          '}\n',
         );
       }
     });
@@ -302,7 +331,7 @@ void main() {
 
     ScanRunner make() => ScanRunner(
       targetPath: dir.path,
-      tier: 'essential',
+      tier: 'recommended',
       messageSink: (_) {},
     );
 
@@ -337,6 +366,52 @@ void main() {
       expect(r.lastParallelReport, isNotNull);
       expect(r.lastParallelReport!.filesScanned, 24);
       expect(r.lastParallelReport!.peakRssMb, greaterThan(0));
+    });
+
+    test(
+      '--max-issues caps non-errors identically for serial and parallel',
+      () async {
+        ScanRunner capped(int cap) => ScanRunner(
+          targetPath: dir.path,
+          tier: 'recommended',
+          messageSink: (_) {},
+          maxIssues: cap,
+        );
+        final unlimited = capped(0).run()!;
+        final nonError = unlimited.where((d) => d.severity != 'ERROR').length;
+        expect(
+          nonError,
+          greaterThan(5),
+          reason: 'fixture must produce enough issues',
+        );
+        final serial = capped(3).run()!;
+        final parallel = (await capped(3).runParallel(3))!;
+        expect(
+          serial.where((d) => d.severity != 'ERROR').length,
+          lessThan(nonError),
+        );
+        expect(
+          parallel.map((d) => d.toString()).toList(),
+          serial.map((d) => d.toString()).toList(),
+        );
+      },
+    );
+
+    test('maxIssues 0 lifts the cap entirely', () async {
+      final all = (await ScanRunner(
+        targetPath: dir.path,
+        tier: 'recommended',
+        messageSink: (_) {},
+        maxIssues: 0,
+      ).runParallel(2))!;
+      final serialAll = ScanRunner(
+        targetPath: dir.path,
+        tier: 'recommended',
+        messageSink: (_) {},
+        maxIssues: 0,
+      ).run()!;
+      expect(all.length, serialAll.length);
+      expect(all, isNotEmpty);
     });
 
     test('forceEngine runs even a single worker through the engine', () async {

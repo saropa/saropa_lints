@@ -41,6 +41,12 @@ describe('normalizeScanResourceSettings', () => {
     assert.strictEqual(s.lowPriority, false);
     assert.strictEqual(s.baselineMode, 'deep');
   });
+  it('defaults the issue cap to unlimited and clamps junk', () => {
+    assert.strictEqual(normalizeScanResourceSettings({}).maxIssues, 0);
+    assert.strictEqual(normalizeScanResourceSettings({ maxIssues: 250 }).maxIssues, 250);
+    assert.strictEqual(normalizeScanResourceSettings({ maxIssues: -9 }).maxIssues, 0);
+    assert.strictEqual(normalizeScanResourceSettings({ maxIssues: 'x' }).maxIssues, 0);
+  });
   it('treats 0 memory as automatic', () => {
     assert.strictEqual(normalizeScanResourceSettings({ maxMemoryMb: 0 }).maxMemoryMb, 0);
   });

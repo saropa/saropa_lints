@@ -72,6 +72,7 @@ class ScanCliArgs {
     this.chunkTimeoutSeconds,
     this.progress,
     this.slowFileMs,
+    this.maxIssues,
   });
 
   final String path;
@@ -253,6 +254,11 @@ class ScanCliArgs {
 
   /// `--slow-file-ms <n>`: report files that take longer than this.
   final int? slowFileMs;
+
+  /// `--max-issues <n>`: cap on reported NON-ERROR diagnostics (errors are
+  /// never capped). `0` = unlimited. Null = default (unlimited for the CLI;
+  /// `SAROPA_LINTS_MAX` is honored when set).
+  final int? maxIssues;
 }
 
 /// Parses [args] for the scan command.
@@ -305,6 +311,7 @@ ScanParseResult parseScanArgs(
   int? chunkTimeoutSeconds;
   String? progress;
   int? slowFileMs;
+  int? maxIssues;
 
   var i = 0;
   while (i < args.length) {
@@ -485,6 +492,18 @@ ScanParseResult parseScanArgs(
         );
       }
       progress = v;
+      i++;
+      continue;
+    }
+    if (arg == '--max-issues') {
+      i++;
+      final parsed = i < args.length ? int.tryParse(args[i]) : null;
+      if (parsed == null || parsed < 0) {
+        return ScanParseInvalid(
+          '--max-issues requires a non-negative integer (0 = unlimited).',
+        );
+      }
+      maxIssues = parsed;
       i++;
       continue;
     }
@@ -764,6 +783,7 @@ ScanParseResult parseScanArgs(
       chunkTimeoutSeconds: chunkTimeoutSeconds,
       progress: progress,
       slowFileMs: slowFileMs,
+      maxIssues: maxIssues,
     ),
   );
 }

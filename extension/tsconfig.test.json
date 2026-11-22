@@ -159,6 +159,7 @@
     "src/test/scanResources/scanResourcePicker.test.ts",
     "src/test/scanResources/fastBaselineRunner.test.ts",
     "src/test/scanResources/baselineBeforeChunk.test.ts",
+    "src/test/scanResources/pluginMemoryConfig.test.ts",
     "src/analysisOptionsVersion.ts",
     "src/test/analysisOptionsVersion.test.ts",
     "src/upgrade-checker.ts",

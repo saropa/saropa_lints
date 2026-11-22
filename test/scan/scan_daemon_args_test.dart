@@ -11,6 +11,7 @@ import 'package:saropa_lints/src/scan/scan_daemon_args.dart';
 import 'package:test/test.dart';
 
 void main() {
+  maxIssuesTests();
   group('parseScanDaemonArgs', () {
     test('positional project root with defaults', () {
       final result = parseScanDaemonArgs(<String>['D:/src/app']);
@@ -156,6 +157,29 @@ void main() {
       expect(
         resolveRssCeilingMb(configuredMb: 16384, postPrewarmRssMb: 3650),
         16384,
+      );
+    });
+  });
+}
+
+void maxIssuesTests() {
+  group('scan daemon --max-issues', () {
+    test('defaults to unlimited', () {
+      final r = parseScanDaemonArgs(['/p']) as ScanDaemonParseOk;
+      expect(r.options.maxIssues, 0);
+    });
+    test('parses a value and rejects bad ones', () {
+      final r =
+          parseScanDaemonArgs(['/p', '--max-issues', '200'])
+              as ScanDaemonParseOk;
+      expect(r.options.maxIssues, 200);
+      expect(
+        parseScanDaemonArgs(['/p', '--max-issues', '-4']),
+        isA<ScanDaemonParseInvalid>(),
+      );
+      expect(
+        parseScanDaemonArgs(['/p', '--max-issues']),
+        isA<ScanDaemonParseInvalid>(),
       );
     });
   });

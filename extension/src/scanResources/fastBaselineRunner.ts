@@ -42,6 +42,7 @@ export function buildFastBaselineArgs(
   projectRoot: string,
   tier: string,
   resources: Pick<ResolvedScanResources, 'jobs' | 'maxMemoryMb'>,
+  maxIssues = 0,
 ): string[] {
   return [
     projectRoot,
@@ -51,6 +52,8 @@ export function buildFastBaselineArgs(
     String(resources.jobs),
     '--max-memory-mb',
     String(resources.maxMemoryMb),
+    '--max-issues',
+    String(Math.max(0, Math.floor(maxIssues))),
     '--progress',
     'json',
     '--format',
@@ -61,6 +64,8 @@ export function buildFastBaselineArgs(
 export interface FastBaselineOptions {
   readonly resources: ResolvedScanResources;
   readonly lowPriority: boolean;
+  /** Non-error issue cap (0 = unlimited). */
+  readonly maxIssues?: number;
   readonly isCanceled: () => boolean;
   readonly onProgress?: (event: ScanProgressEvent) => void;
   readonly onThrottle?: (event: ScanThrottleEvent) => void;
@@ -84,7 +89,7 @@ export function runFastBaselineScan(
   options: FastBaselineOptions,
 ): Promise<FastBaselineResult> {
   return new Promise((resolvePromise) => {
-    const args = ['run', 'saropa_lints:scan', ...buildFastBaselineArgs(projectRoot, tier, options.resources)];
+    const args = ['run', 'saropa_lints:scan', ...buildFastBaselineArgs(projectRoot, tier, options.resources, options.maxIssues ?? 0)];
     const spec = lowPrioritySpec('dart', args, options.lowPriority);
     let child: ChildProcess;
     try {

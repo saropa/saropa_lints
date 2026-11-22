@@ -176,6 +176,7 @@ void _loadFromRoot(String? projectRoot) {
     _loadLogLevel(content, mainOptions);
     _loadMemoryMode(content, mainOptions);
     _loadShedRulesConfig(content);
+    _loadMaxRssConfig(content);
     _loadDiagnosticStatisticsConfig(content, projectRoot);
 
     // Tier cap. The in-process essential DEFAULT applies only when BOTH:
@@ -636,6 +637,43 @@ void _loadShedRulesConfig(String? content) {
     warningContext: 'Shedding not enabled.',
   );
   if (value == 'true') MemoryPressureHandler.enableShedding();
+}
+
+/// Parses `max_rss_mb:` (top-level key in `analysis_options_custom.yaml`):
+/// the hard memory cap for the analyzer plugin, in MB. The
+/// `SAROPA_LINTS_MAX_RSS_MB` env var still wins (resolved when the memory
+/// subsystem is armed); this key gives VS Code users a discoverable,
+/// extension-writable place to set it. `0` disables the cap; values below
+/// [MemoryPressureHandler.minConfiguredRssMb] are raised to it with a
+/// warning, because a cap the analyzer cannot fit under would pause every
+/// rule immediately.
+void _loadMaxRssConfig(String? content) {
+  final raw = _parseTopLevelScalar(content, 'max_rss_mb');
+  if (raw == null) {
+    MemoryPressureHandler.setConfiguredHardRssMb(null);
+    return;
+  }
+  final value = int.tryParse(raw.trim());
+  if (value == null || value < 0) {
+    PluginLogger.warning(
+      'Unrecognized max_rss_mb "$raw" in analysis_options_custom.yaml — '
+      'expected a whole number of MB (0 disables the cap). Using the '
+      'adaptive default.',
+    );
+    MemoryPressureHandler.setConfiguredHardRssMb(null);
+    return;
+  }
+  if (value > 0 && value < MemoryPressureHandler.minConfiguredRssMb) {
+    PluginLogger.warning(
+      'max_rss_mb $value is too low to analyze a project; using '
+      '${MemoryPressureHandler.minConfiguredRssMb}.',
+    );
+    MemoryPressureHandler.setConfiguredHardRssMb(
+      MemoryPressureHandler.minConfiguredRssMb,
+    );
+    return;
+  }
+  MemoryPressureHandler.setConfiguredHardRssMb(value);
 }
 
 /// Reads a config scalar preferring env var over yaml.

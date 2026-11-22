@@ -122,8 +122,13 @@ Future<void> main(List<String> args) async {
     lane: parseRuleLane(parsed.lane ?? 'full'),
     laneStats: parsed.laneStats,
     messageSink: parsed.quiet && parsed.progress != 'json' ? (_) {} : null,
-    // Keep the IDE issue cap — scan output may feed the Problems tab.
-    // disableIssueCap: false (default),
+    // Non-error output is uncapped by default for the CLI: a silent cap makes
+    // --fail-on-count thresholds and CI reports wrong. --max-issues N or the
+    // SAROPA_LINTS_MAX env var (shared with the IDE plugin) opt back in.
+    maxIssues:
+        parsed.maxIssues ??
+        int.tryParse(Platform.environment['SAROPA_LINTS_MAX'] ?? '') ??
+        0,
     excludeGlobs: excludeGlobs,
     includeGlobs: parsed.includeGlobs,
     // When the user explicitly names files via --files, honor that intent —
@@ -919,6 +924,12 @@ void _printUsage() {
   );
   print('                      SAROPA_SCAN_EVENT lines on stderr.');
   print('  --slow-file-ms <n>  Report files slower than this (default 3000).');
+  print(
+    '  --max-issues <n>    Cap reported NON-error issues (errors are never',
+  );
+  print(
+    '                      capped); 0 = unlimited (default). Also SAROPA_LINTS_MAX.',
+  );
   print(
     '  Exit codes: 0 clean, 1 findings, 2 error, 3 incomplete (stopped early).',
   );

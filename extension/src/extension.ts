@@ -156,6 +156,7 @@ import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
 import { ScanOnSaveController } from './scanOnSave/scanOnSaveController';
 import { showScanPerformancePicker } from './scanResources/scanResourcePicker';
+import { maybeOfferSmallMachineTuning } from './scanResources/pluginMemoryUi';
 import {
   runActivation as runVibrancyActivation,
   stopFreshnessWatcher,
@@ -659,6 +660,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     context.globalState,
   );
   context.subscriptions.push(scanOnSaveController);
+  // Small machine, no live-analysis limits configured yet: offer them once.
+  void maybeOfferSmallMachineTuning(context.globalState, getProjectRoot());
   setScanSuspendedProvider(() => scanOnSaveController.isDaemonSuspended);
 
   // Pubspec validation: inline diagnostics for dependency ordering,
@@ -2482,7 +2485,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         '**/{.dart_tool,build,node_modules,.git}/**',
         20000,
       );
-      await showScanPerformancePicker(files.length);
+      await showScanPerformancePicker(files.length, getProjectRoot());
     }),
     // Create a baseline (saropa_baseline.json) that suppresses existing
     // violations so only new code is flagged. Backs the "Create baseline"

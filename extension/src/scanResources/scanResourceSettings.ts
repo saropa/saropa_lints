@@ -38,6 +38,8 @@ export interface ScanResourceSettings {
   readonly baselineMode: BaselineMode;
   /** Show notifications when the scan throttles or the machine is tight. */
   readonly notifyOnPressure: boolean;
+  /** Cap on non-error issues per scan; 0 = unlimited (errors are never capped). */
+  readonly maxIssues: number;
 }
 
 export const DEFAULT_SETTINGS: ScanResourceSettings = {
@@ -47,6 +49,7 @@ export const DEFAULT_SETTINGS: ScanResourceSettings = {
   lowPriority: true,
   baselineMode: DEFAULT_BASELINE_MODE,
   notifyOnPressure: true,
+  maxIssues: 0,
 };
 
 function toInt(value: unknown, min: number, max: number, fallback: number): number {
@@ -66,6 +69,7 @@ export function normalizeScanResourceSettings(raw: {
   lowPriority?: unknown;
   baselineMode?: unknown;
   notifyOnPressure?: unknown;
+  maxIssues?: unknown;
 }): ScanResourceSettings {
   const profile: PerformanceProfile =
     raw.profile === 'gentle' || raw.profile === 'balanced' || raw.profile === 'fast'
@@ -86,6 +90,7 @@ export function normalizeScanResourceSettings(raw: {
     lowPriority: typeof raw.lowPriority === 'boolean' ? raw.lowPriority : true,
     baselineMode,
     notifyOnPressure: typeof raw.notifyOnPressure === 'boolean' ? raw.notifyOnPressure : true,
+    maxIssues: toInt(raw.maxIssues, 0, 10_000_000, 0),
   };
 }
 

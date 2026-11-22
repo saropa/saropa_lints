@@ -114,6 +114,13 @@ String buildMinimalConfig(
   buf.writeln(
     '# shed_rules: false # true disables low-severity rules under memory pressure',
   );
+  // max_rss_mb is the analyzer plugin's hard memory cap. Commented out: by
+  // default it adapts to the machine (60% of RAM). Set it lower on a small
+  // or shared machine; 0 disables the cap. The SAROPA_LINTS_MAX_RSS_MB env
+  // var overrides it.
+  buf.writeln(
+    '# max_rss_mb: 4096 # hard memory cap (MB) for live analysis; 0 = off; default adapts to RAM',
+  );
   buf.writeln();
 
   // rule_packs lives here (not under plugins > saropa_lints:) to avoid

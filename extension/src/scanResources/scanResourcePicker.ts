@@ -14,6 +14,8 @@ import {
   readMachineSnapshot,
   type MachineSnapshot,
 } from './machineResources';
+import { offerPluginTuning } from './pluginMemoryUi';
+import { recommendPluginMemory } from './pluginMemoryConfig';
 import { readScanResourceSettings } from './scanResourceConfig';
 import { formatMb } from './scanResourceNotices';
 import {
@@ -86,7 +88,10 @@ function profileDetail(profile: PerformanceProfile): string {
 }
 
 /** Opens the picker and applies the selection (or opens the settings page). */
-export async function showScanPerformancePicker(fileCount: number): Promise<void> {
+export async function showScanPerformancePicker(
+  fileCount: number,
+  root?: string,
+): Promise<void> {
   const settings = readScanResourceSettings();
   const machine = readMachineSnapshot();
   const choices = buildProfileChoices(settings, machine, fileCount);
@@ -131,5 +136,11 @@ export async function showScanPerformancePicker(fileCount: number): Promise<void
     await vscode.workspace
       .getConfiguration('saropaLints')
       .update('scan.performanceProfile', picked.profile, vscode.ConfigurationTarget.Global);
+    // The gentle profile also tightens live analysis (the analyzer plugin),
+    // which is where multi-GB growth actually happens — offer to apply it.
+    const rec = recommendPluginMemory(picked.profile, machine);
+    if (rec && root) {
+      await offerPluginTuning(root, rec, 'scanResources.plugin.offerAfterProfile');
+    }
   }
 }

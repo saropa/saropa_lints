@@ -1461,6 +1461,12 @@
             "default": true,
             "markdownDescription": "Run scan processes at reduced CPU priority so the editor stays responsive. Turn off only if scans take too long on a machine you are not using."
           },
+          "saropaLints.scan.maxIssues": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0,
+            "markdownDescription": "Maximum non-error issues a scan reports. **0** (default) reports everything; errors are never capped. Set a number only if the Problems panel becomes slow on a very large project. Does not affect the analyzer plugin's own `max_issues` limit (set that in `analysis_options_custom.yaml`)."
+          },
           "saropaLints.scan.notifyOnPressure": {
             "type": "boolean",
             "default": true,

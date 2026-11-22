@@ -3086,7 +3086,10 @@
       "turnOffTypeResolution": "Turn Off Type Resolution",
       "startAnyway": "Start Anyway",
       "notNow": "Not Now",
-      "neverAskDeep": "Don't Ask Again"
+      "neverAskDeep": "Don't Ask Again",
+      "applyPlugin": "Apply",
+      "noThanks": "No Thanks",
+      "restartAnalysisServer": "Restart Analysis Server"
     },
     "picker": {
       "title": "Scan Performance",
@@ -3104,6 +3107,12 @@
         "balanced": "Leaves one core free and uses up to half of free memory. Right for most machines.",
         "fast": "Uses every core and up to 70% of free memory. Finishes sooner but can slow the rest of your computer."
       }
+    },
+    "plugin": {
+      "offerAfterProfile": "Also limit live analysis (the Dart analyzer plugin) to about {limit} and shed low-severity rules gracefully when memory runs low? Without a limit, a large project can grow the analysis server to several GB.",
+      "offerSmallMachine": "This computer has {total} of memory. Limiting live analysis to about {limit}, and shedding low-severity rules gracefully when memory runs low, keeps it responsive. Apply this?",
+      "applied": "Saved: live analysis is limited to about {limit}. Restart the analysis server to apply it.",
+      "writeFailed": "Could not update analysis_options_custom.yaml. Check that the file is writable."
     }
   }
 }

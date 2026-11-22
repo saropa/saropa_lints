@@ -1277,6 +1277,24 @@ class MemoryPressureHandler {
   /// FileBudgetTracker to compute its file-skipping threshold.
   static int get hardRssLimitMb => _hardLimitMb;
 
+  /// Hard RSS cap from `max_rss_mb` in `analysis_options_custom.yaml`, applied
+  /// when [initializeCacheManagement] arms the valve. Precedence: the
+  /// `SAROPA_LINTS_MAX_RSS_MB` env var, then this, then the adaptive default.
+  /// `0` disables the valve, like the env var.
+  static int? _configuredHardRssMb;
+
+  /// Lowest cap the yaml key accepts. Below this the analyzer cannot hold a
+  /// medium project's element model, so the valve would pause rules on the
+  /// first file and look like a broken plugin.
+  static const int minConfiguredRssMb = 1024;
+
+  /// Records the yaml-configured cap (null clears it). Called by the config
+  /// loader before the memory subsystem is armed.
+  static void setConfiguredHardRssMb(int? mb) => _configuredHardRssMb = mb;
+
+  /// The yaml-configured cap, or null when none was set. Test/diagnostic read.
+  static int? get configuredHardRssMb => _configuredHardRssMb;
+
   /// Set the hard RSS cap (MB). 0 or negative disables the valve.
   static void setHardRssLimitMb(int mb) {
     _hardLimitMb = mb;
@@ -2601,7 +2619,8 @@ void initializeCacheManagement({
   final ramMb = _totalPhysicalMemoryMb();
 
   final adaptiveCap = _computeAdaptiveRssCap(hardRssLimitMb, ramMb: ramMb);
-  final effectiveCap = parsedCap ?? adaptiveCap;
+  final configuredCap = MemoryPressureHandler._configuredHardRssMb;
+  final effectiveCap = parsedCap ?? configuredCap ?? adaptiveCap;
   MemoryPressureHandler.setHardRssLimitMb(effectiveCap);
 
   // Graduated rule shedding is armed by the config loader
@@ -2629,6 +2648,8 @@ void initializeCacheManagement({
     // Log cap source so users understand the value.
     final capSource = parsedCap != null
         ? 'env SAROPA_LINTS_MAX_RSS_MB'
+        : configuredCap != null
+        ? 'max_rss_mb in analysis_options_custom.yaml'
         : adaptiveCap != hardRssLimitMb
         ? 'adaptive (60% of system RAM)'
         : 'default';

@@ -136,6 +136,9 @@ export class ScanDaemonClient {
     // An explicit memory setting also bounds the daemon: it recycles itself
     // (clean exit, respawn) once its RSS passes this ceiling.
     if (settings.maxMemoryMb > 0) args.push('--max-rss-mb', String(settings.maxMemoryMb));
+    // Complete results by default; the daemon would otherwise inherit the IDE's
+    // 500-issue cap and leave the Problems panel silently incomplete.
+    args.push('--max-issues', String(settings.maxIssues));
     const spec = lowPrioritySpec('dart', args, settings.lowPriority);
     const child = spawn(spec.command, [...spec.args], {
       cwd: resolveCliCwd(this._projectRoot),
