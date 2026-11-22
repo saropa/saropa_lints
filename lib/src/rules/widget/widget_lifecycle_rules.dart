@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:meta/meta.dart';
 
 import '../../async_context_utils.dart';
@@ -5099,6 +5100,11 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
   @override
   Set<String>? get requiredPatterns => const {'State'};
 
+  // Resolved elements are needed to tell WHERE an @override member was first
+  // declared (SDK / mixin vs. an app-defined State base class).
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_public_members_in_states',
     '[avoid_public_members_in_states] Public (non-underscore) member declared directly on a State<T> subclass. '
@@ -5181,7 +5187,10 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       // Only State<T> subclasses are in scope — a public member on any
       // other class is a normal, supported part of that class's API.
-      if (!_isStateSubclass(node)) return;
+      // Also covers subclasses of an app-defined State base class
+      // (`Sub extends BaseState<T>`), so overrides of that base class's
+      // members can be evaluated (see _overridesUserStateBase).
+      if (!_isStateSubclass(node) && !_extendsStateTransitively(node)) return;
 
       final Set<String> mixinExemptMethods = _mixinExemptMethods(node);
       for (final ClassMember member in node.bodyMembers) {
@@ -5271,17 +5280,79 @@ class AvoidPublicMembersInStatesRule extends SaropaLintRule {
       return;
     }
 
-    // FALSE-POSITIVE FIX: any `@override` member is exempt. An override's
-    // name and visibility are dictated by the supertype (Flutter SDK, a
-    // user-defined mixin's abstract hook, or an app base class), so the
-    // author cannot make it private or rename it. The old check only trusted
-    // Flutter-SDK supertypes and still flagged overrides of a same-package
-    // mixin contract (e.g. `mixin M on State<T> { Foo get hook; }`). Any
-    // genuinely leaky public member is still reported where it is *declared*
-    // (the mixin or base class), not at each forced implementation site.
-    if (_hasAnnotation(node.metadata, 'override')) return;
+    // FALSE-POSITIVE FIX: an `@override` member is exempt when its name and
+    // visibility are dictated by something the author cannot change: a
+    // Flutter/Dart SDK type or a mixin's hook (e.g.
+    // `mixin M on State<T> { Foo get hook; }`). The old check only trusted
+    // SDK supertypes and flagged mixin contracts. BUT an override of a member
+    // declared on an app-defined State base class (`BaseState<T> extends
+    // State<T>`) is still an author-controlled public surface leaking state,
+    // so it is reported (see _overridesUserStateBase). Unresolvable overrides
+    // stay exempt (no evidence of where they come from).
+    if (_hasAnnotation(node.metadata, 'override') &&
+        !_overridesUserStateBase(node)) {
+      return;
+    }
 
     reporter.atToken(node.name);
+  }
+
+  /// True when [node]'s resolved superclass chain reaches a class named
+  /// `State` (a user `BaseState<T> extends State<T>` in between). Unresolved
+  /// chains return false so no evidence means no report.
+  static bool _extendsStateTransitively(ClassDeclaration node) {
+    InterfaceElement? current = node.declaredFragment?.element.supertype
+        ?.element;
+    // Depth guard against pathological/cyclic hierarchies.
+    for (int depth = 0; current != null && depth < 16; depth++) {
+      if (current.name == 'State') return true;
+      current = current.supertype?.element;
+    }
+    return false;
+  }
+
+  /// True when every declaration [node] overrides lives in an app-defined
+  /// (non-SDK, non-mixin) class. Any SDK or mixin declarer makes the override
+  /// forced by that contract, so it returns false. Uses the resolved element's
+  /// enclosing element/library: SDK = `dart:` or `package:flutter/`.
+  bool _overridesUserStateBase(MethodDeclaration node) {
+    final ExecutableElement? element = node.declaredFragment?.element;
+    final String? name = element?.name;
+    final Element? enclosing = element?.enclosingElement;
+    if (element == null || name == null || enclosing is! InterfaceElement) {
+      return false;
+    }
+    bool userClassDeclares = false;
+    for (final InterfaceType type in enclosing.allSupertypes) {
+      final ExecutableElement? member = _lookupMember(type, element, name);
+      if (member == null) continue;
+      final Element? owner = member.enclosingElement;
+      if (owner == null) continue;
+      // Mixin hooks (including `mixin class`) are contracts, not State
+      // base-class API, so they exempt the override.
+      if (owner is MixinElement ||
+          (owner is ClassElement && owner.isMixinClass)) {
+        return false;
+      }
+      final String uri = owner.library?.uri.toString() ?? '';
+      if (uri.startsWith('dart:') || uri.startsWith('package:flutter/')) {
+        return false;
+      }
+      userClassDeclares = true;
+    }
+    return userClassDeclares;
+  }
+
+  /// Looks up the member matching [element]'s kind and [name] on [type].
+  static ExecutableElement? _lookupMember(
+    InterfaceType type,
+    ExecutableElement element,
+    String name,
+  ) {
+    if (element is MethodElement) return type.getMethod(name);
+    if (element is GetterElement) return type.getGetter(name);
+    if (element is SetterElement) return type.getSetter(name);
+    return null;
   }
 
   /// True when [metadata] carries an annotation literally named [name]

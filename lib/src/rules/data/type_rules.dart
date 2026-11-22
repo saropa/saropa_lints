@@ -412,8 +412,9 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
     });
   }
 
-  /// True when the primary constructor's representation type is nullable or a
-  /// bare type parameter, i.e. the extension type can end up nullable.
+  /// True when the primary constructor's representation type is nullable
+  /// (`T?`, `dynamic`, `Null`) or a bare type parameter, i.e. the extension
+  /// type can end up nullable.
   static bool _representationMayBeNullable(
     PrimaryConstructorDeclaration ctor,
   ) {
@@ -424,6 +425,11 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
     // untyped/unresolved parameter is not reported.
     final DartType? type = param.type?.type;
     if (type == null) return false;
+    // `dynamic` and `Null` carry a `none` nullability suffix yet admit null,
+    // so the suffix check alone would miss `extension type E(dynamic x)` and
+    // `extension type E(Null x)`; they must count as nullable explicitly.
+    if (type is DynamicType) return true;
+    if (type is InterfaceType && type.isDartCoreNull) return true;
     return type is TypeParameterType ||
         type.nullabilitySuffix == NullabilitySuffix.question;
   }

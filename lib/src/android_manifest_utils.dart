@@ -112,6 +112,14 @@ class AndroidManifestChecker {
     return content.contains(needle);
   }
 
+  /// Removes XML comments from [xml] (non-greedy, multi-line).
+  static String stripXmlComments(String xml) =>
+      xml.replaceAll(RegExp(r'<!--[\s\S]*?-->'), '');
+
+  /// Public wrapper over the project-root lookup (nearest ancestor directory
+  /// holding `pubspec.yaml`), so rules can cache per-project results.
+  static String? projectRootFor(String filePath) => _findProjectRoot(filePath);
+
   static String? _findProjectRoot(String filePath) {
     var current = filePath.replaceAll('\\', '/');
     while (current.contains('/')) {

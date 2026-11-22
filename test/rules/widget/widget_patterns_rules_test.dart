@@ -638,6 +638,7 @@ void main() {
 
       setUp(() {
         AndroidManifestChecker.clearCache();
+        RequirePermissionManifestAndroidRule.clearCache();
         root = Directory.systemTemp.createTempSync('perm_manifest_');
         File('${root.path}/pubspec.yaml').writeAsStringSync('name: x\n');
         Directory('${root.path}/lib').createSync();
@@ -672,6 +673,43 @@ void main() {
       });
 
       test('silent when there is no manifest', () {
+        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+            isFalse);
+      });
+
+      // Debug/profile source-set manifests count as declarations.
+      test('silent when only the debug manifest declares a permission', () {
+        writeManifest('');
+        final dir = Directory('${root.path}/android/app/src/debug')
+          ..createSync(recursive: true);
+        File('${dir.path}/AndroidManifest.xml').writeAsStringSync(
+          '<manifest><uses-permission android:name="android.permission.INTERNET"/>'
+          '</manifest>',
+        );
+        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+            isFalse);
+      });
+
+      // A commented-out template entry declares nothing.
+      test('reminds when the only <uses-permission is inside an XML comment',
+          () {
+        writeManifest(
+          '<!-- <uses-permission android:name="android.permission.CAMERA"/> -->',
+        );
+        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+            isTrue);
+      });
+
+      // Cached verdict must refresh when the manifest changes on disk.
+      test('verdict cache refreshes after the manifest is edited', () {
+        writeManifest('');
+        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+            isTrue);
+        expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
+            isTrue);
+        writeManifest(
+          '<uses-permission android:name="android.permission.CAMERA"/>',
+        );
         expect(RequirePermissionManifestAndroidRule.shouldRemind(dartFile),
             isFalse);
       });

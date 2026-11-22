@@ -9,6 +9,8 @@
 /// and tiers in `lib/src/tiers.dart` where applicable; see `plans/PLAN_comment_coverage.md`.
 library;
 
+import 'dart:io';
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/source_range.dart';
@@ -2543,17 +2545,86 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Per-project-root verdict cache: root -> (manifest stat signature, remind).
+  /// Why: the verdict only changes when a manifest changes, so the directory
+  /// scan and file reads run once per project instead of once per Dart file.
+  /// The signature (paths + mtime + size) invalidates it on manifest edits in
+  /// a long-lived analysis server.
+  static final Map<String, ({String signature, bool remind})> _verdictCache =
+      <String, ({String signature, bool remind})>{};
+
+  /// Clears the verdict cache (for tests).
+  static void clearCache() => _verdictCache.clear();
+
   /// Whether the reminder is warranted for the project containing [filePath].
   ///
-  /// True only when an AndroidManifest.xml exists but declares no
-  /// `<uses-permission>` at all. An import alone does not say which
-  /// permission is needed, so any declared permission means the developer has
-  /// already handled the manifest; a missing manifest (package, non-Android
-  /// project) means there is nothing to confirm, mirroring the iOS sibling.
+  /// True only when at least one AndroidManifest.xml exists but NONE of them
+  /// declares a `<uses-permission>` outside an XML comment. Besides the main
+  /// manifest this also reads the debug/profile (and any other source-set)
+  /// manifests under `android/app/src/*/AndroidManifest.xml`: a permission
+  /// declared only there is still a handled manifest. An import alone does not
+  /// say which permission is needed, so any real declaration means the
+  /// developer has handled the manifest; no manifest at all (package,
+  /// non-Android project) means nothing to confirm, mirroring the iOS sibling.
   static bool shouldRemind(String filePath) {
-    final manifest = AndroidManifestChecker.forFile(filePath);
-    if (manifest == null || !manifest.hasManifest) return false;
-    return !manifest.containsRaw('<uses-permission');
+    final String? root = AndroidManifestChecker.projectRootFor(filePath);
+    if (root == null) return false;
+
+    // Collect every candidate manifest path + stat signature (cheap stats).
+    final List<String> paths = <String>[];
+    final StringBuffer signature = StringBuffer();
+    void addCandidate(File file) {
+      try {
+        if (!file.existsSync()) return;
+        final FileStat st = file.statSync();
+        paths.add(file.path);
+        signature.write('${file.path}|${st.modified.microsecondsSinceEpoch}'
+            '|${st.size};');
+      } on FileSystemException {
+        // Unreadable candidate: skip; it cannot prove a declaration.
+      }
+    }
+
+    addCandidate(File('$root/android/AndroidManifest.xml'));
+    final Directory srcDir = Directory('$root/android/app/src');
+    try {
+      if (srcDir.existsSync()) {
+        for (final FileSystemEntity entry in srcDir.listSync()) {
+          if (entry is Directory) {
+            addCandidate(File('${entry.path}/AndroidManifest.xml'));
+          }
+        }
+      }
+    } on FileSystemException {
+      // Directory vanished mid-scan: treat as whatever was collected.
+    }
+    if (paths.isEmpty) {
+      _verdictCache.remove(root);
+      return false;
+    }
+
+    final String sig = signature.toString();
+    final cached = _verdictCache[root];
+    if (cached != null && cached.signature == sig) return cached.remind;
+
+    bool declaresPermission = false;
+    for (final String path in paths) {
+      try {
+        // Comments stripped so a commented-out template entry does not count.
+        final String xml = AndroidManifestChecker.stripXmlComments(
+          File(path).readAsStringSync(),
+        );
+        if (xml.contains('<uses-permission')) {
+          declaresPermission = true;
+          break;
+        }
+      } on FileSystemException {
+        // Unreadable manifest: cannot prove a declaration; keep scanning.
+      }
+    }
+    final bool remind = !declaresPermission;
+    _verdictCache[root] = (signature: sig, remind: remind);
+    return remind;
   }
 
   @override
@@ -2562,21 +2633,22 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     // FP fix: the rule used to report every permission_handler import without
-    // ever opening the manifest, so projects that already declared their
-    // permissions still got the reminder. Now stay silent when the manifest
-    // is absent (nothing to confirm) or already declares permissions.
-    if (!shouldRemind(context.filePath)) return;
-
+    // ever opening the manifest. The manifest lookup now runs lazily, only
+    // when a permission_handler import is actually seen (most files have none,
+    // so they pay no filesystem cost), and its verdict is cached per project.
     bool reported = false;
 
     context.addImportDirective((ImportDirective node) {
       if (reported) return;
 
       final uri = node.uri.stringValue ?? '';
-      if (uri.contains('permission_handler')) {
-        reporter.atNode(node);
-        reported = true;
-      }
+      if (!uri.startsWith('package:permission_handler')) return;
+
+      // Stay silent when the manifest is absent or already declares
+      // permissions; mark handled so the lookup is not repeated per import.
+      reported = true;
+      if (!shouldRemind(context.filePath)) return;
+      reporter.atNode(node);
     });
   }
 }

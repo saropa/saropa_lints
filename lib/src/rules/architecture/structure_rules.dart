@@ -2163,21 +2163,33 @@ class PreferStaticMethodRule extends SaropaLintRule {
     });
   }
 
-  /// True when any invocation in the same library resolves to [node] and has
-  /// an explicit receiver that is an instance expression (not a type name).
-  /// Why: `Type.method()` is a static-style call and would survive the
+  /// Per-compilation-unit cache of every element reached through an instance
+  /// receiver. Why: the old per-candidate walk re-visited the whole unit for
+  /// every method (O(methods x unit)); one pass per unit makes each lookup O(1).
+  /// Keyed by the unit root node so a re-parsed unit gets a fresh entry.
+  static final Expando<Set<Element>> _instanceCallTargets =
+      Expando<Set<Element>>('preferStaticMethodInstanceCallTargets');
+
+  /// True when any invocation in the same compilation unit resolves to [node]
+  /// and has an explicit receiver that is an instance expression (not a type
+  /// name). Why: `Type.method()` is a static-style call and would survive the
   /// change; `instance.method()` would not.
+  ///
+  /// Limitation: only the current compilation unit is scanned, so callers in
+  /// other files or libraries (e.g. a public method used elsewhere in the app)
+  /// are unseen and the method may still be reported.
   static bool _isCalledThroughInstance(MethodDeclaration node) {
     final Element? declared = node.declaredFragment?.element.baseElement;
-    final AstNode? root = node.root;
-    if (declared == null || root == null) return false;
-    bool found = false;
-    root.accept(
-      _InstanceCallFinder(declared, () {
-        found = true;
-      }),
-    );
-    return found;
+    final AstNode root = node.root;
+    if (declared == null) return false;
+    // Collect lazily on first candidate of this unit, then reuse.
+    Set<Element>? targets = _instanceCallTargets[root];
+    if (targets == null) {
+      targets = <Element>{};
+      root.accept(_InstanceCallFinder(targets));
+      _instanceCallTargets[root] = targets;
+    }
+    return targets.contains(declared);
   }
 
   bool _hasOverrideAnnotation(MethodDeclaration node) {
@@ -2234,13 +2246,20 @@ class PreferStaticMethodRule extends SaropaLintRule {
   }
 }
 
-/// Finds invocations of a specific method made through an instance receiver.
-/// Used by [PreferStaticMethodRule] to avoid flagging methods whose callers
-/// would break if the method became static.
+/// Collects every element invoked/torn-off through an instance receiver in a
+/// single pass. Used by [PreferStaticMethodRule] to avoid flagging methods
+/// whose callers would break if the method became static.
 class _InstanceCallFinder extends RecursiveAstVisitor<void> {
-  _InstanceCallFinder(this.target, this.onFound);
-  final Element target;
-  final void Function() onFound;
+  _InstanceCallFinder(this.targets);
+
+  /// Output set; filled during the walk.
+  final Set<Element> targets;
+
+  /// Records [element] (base element, so generic instantiations match).
+  void _record(Element? element) {
+    final Element? base = element?.baseElement;
+    if (base != null) targets.add(base);
+  }
 
   /// A receiver that names a type (`Foo.m`) is a static-style access and
   /// would survive the method becoming static; anything else is an instance.
@@ -2254,10 +2273,8 @@ class _InstanceCallFinder extends RecursiveAstVisitor<void> {
     // `this.m()` counts too: it needs an instance, and the rule's body scan
     // only covers calls made from inside the candidate method itself.
     final Expression? receiver = node.realTarget;
-    if (receiver != null &&
-        node.methodName.element?.baseElement == target &&
-        !_isTypeReceiver(receiver)) {
-      onFound();
+    if (receiver != null && !_isTypeReceiver(receiver)) {
+      _record(node.methodName.element);
     }
     super.visitMethodInvocation(node);
   }
@@ -2266,19 +2283,13 @@ class _InstanceCallFinder extends RecursiveAstVisitor<void> {
   // when `m` becomes static, so they are instance uses too.
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    if (node.identifier.element?.baseElement == target &&
-        !_isTypeReceiver(node.prefix)) {
-      onFound();
-    }
+    if (!_isTypeReceiver(node.prefix)) _record(node.identifier.element);
     super.visitPrefixedIdentifier(node);
   }
 
   @override
   void visitPropertyAccess(PropertyAccess node) {
-    if (node.propertyName.element?.baseElement == target &&
-        !_isTypeReceiver(node.realTarget)) {
-      onFound();
-    }
+    if (!_isTypeReceiver(node.realTarget)) _record(node.propertyName.element);
     super.visitPropertyAccess(node);
   }
 }

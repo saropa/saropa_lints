@@ -2784,6 +2784,9 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
     AstNode? current = style.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
+        // typeName is the constructor's TYPE (`Text` for `Text.rich(...)`;
+        // the `.rich` part lives in constructorName.name), so named
+        // constructors already resolve to the base widget name here.
         final String name = current.typeName;
         if (name == 'TextPainter') {
           // TextPainter scales only when given a textScaler (not noScaling).
@@ -2811,17 +2814,56 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
     final Expression? factor = consumer.getNamedParameterValue(
       'textScaleFactor',
     );
-    if (factor == null) return false;
-    final String src = factor.toSource().trim();
-    return src == '1.0' || src == '1';
+    // Literal check on the AST (not source text) so `1`, `1.0`, `(1)` and
+    // `const`-less spellings are all recognized as the pinned-off factor.
+    return factor != null && _isLiteralOne(factor);
   }
 
-  /// Whether a `textScaler:` argument expression turns scaling off.
+  /// Whether [expr] is the numeric literal 1 / 1.0 (parentheses ignored).
+  /// Why: `linear(1)` and `textScaleFactor: 1.0` multiply by 1, i.e. pin the
+  /// text at its design size exactly like `TextScaler.noScaling`.
+  static bool _isLiteralOne(Expression expr) {
+    Expression current = expr;
+    while (current is ParenthesizedExpression) {
+      current = current.expression;
+    }
+    if (current is IntegerLiteral) return current.value == 1;
+    if (current is DoubleLiteral) return current.value == 1.0;
+    return false;
+  }
+
+  /// Whether a `textScaler:` argument expression turns scaling off:
+  /// `TextScaler.noScaling` or `TextScaler.linear(1)` / `linear(1.0)`.
   // endsWith/equality instead of contains(): a substring match would also hit
   // unrelated identifiers (anti-pattern guard in test/integrity).
   static bool _disablesScaling(Expression scaler) {
+    // `TextScaler.linear(1)` resolved as a constructor call.
+    if (scaler is InstanceCreationExpression) {
+      return scaler.typeName == 'TextScaler' &&
+          scaler.constructorName.name?.name == 'linear' &&
+          _firstArgIsOne(scaler.argumentList);
+    }
+    // Same call when `TextScaler` is unresolved: parsed as a method call on
+    // the identifier `TextScaler`.
+    if (scaler is MethodInvocation) {
+      final Expression? target = scaler.target;
+      return target is SimpleIdentifier &&
+          target.name == 'TextScaler' &&
+          scaler.methodName.name == 'linear' &&
+          _firstArgIsOne(scaler.argumentList);
+    }
     final String src = scaler.toSource().trim();
     return src == 'noScaling' || src.endsWith('.noScaling');
+  }
+
+  /// True when the first positional argument is the literal 1 / 1.0.
+  static bool _firstArgIsOne(ArgumentList args) {
+    for (final Argument arg in args.arguments) {
+      // Named args (none exist on `linear`) are skipped; first positional wins.
+      if (arg is NamedArgument) continue;
+      return _isLiteralOne(arg.argumentExpression);
+    }
+    return false;
   }
 
   /// Max recursion depth for [_isHardcodedNumeric] — prevents stack

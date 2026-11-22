@@ -810,22 +810,73 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
     });
   }
 
-  /// True when an ancestor `Semantics` declares `onTap` or `onLongPress`.
+  /// Widgets that start a new page/route/overlay. A `Semantics` above one of
+  /// these describes the whole screen, never the detector underneath, so the
+  /// ancestor walk must stop here.
+  static const Set<String> _pageBoundaryWidgets = <String>{
+    'Scaffold',
+    'CupertinoPageScaffold',
+    'MaterialApp',
+    'CupertinoApp',
+    'WidgetsApp',
+    'Navigator',
+    'Dialog',
+    'AlertDialog',
+    'SimpleDialog',
+    'BottomSheet',
+    'Overlay',
+  };
+
+  /// Max widget layers allowed between the detector and an accepted
+  /// `Semantics` (e.g. Semantics > ExcludeSemantics > Padding > Detector;
+  /// a non-matching Semantics in between counts as a layer too).
+  /// Beyond that the Semantics is describing a larger region, not this hit
+  /// target, so it must not silence the rule.
+  static const int _maxSemanticsAncestorLayers = 3;
+
+  /// True when a NEAR ancestor `Semantics` declares a real `onTap` or
+  /// `onLongPress`.
   /// WHY: that Semantics node is the accessible action; the detector below it
   /// only handles pointer input, so flagging it is a false positive.
+  /// Bounded walk: stops at a page boundary ([_pageBoundaryWidgets]), at a
+  /// builder closure (a `FunctionExpression`: the Semantics above a list does
+  /// not describe each generated row), and after
+  /// [_maxSemanticsAncestorLayers] intervening widgets, so a Semantics that
+  /// wraps a whole page cannot excuse every detector inside it.
   static bool _hasSemanticsActionAncestor(AstNode start) {
     AstNode? current = start.parent;
+    int layers = 0;
     while (current != null) {
-      if (current is InstanceCreationExpression &&
-          current.constructorName.type.element?.name == 'Semantics') {
-        for (final Argument arg in current.argumentList.arguments) {
-          if (arg is NamedArgument) {
-            final String name = arg.name.lexeme;
-            if (name == 'onTap' || name == 'onLongPress') return true;
-          }
+      if (current is FunctionExpression) return false;
+      if (current is InstanceCreationExpression) {
+        // Too many widget layers already crossed: any Semantics further up
+        // describes a larger region than this hit target.
+        if (layers > _maxSemanticsAncestorLayers) return false;
+        final String? name = current.constructorName.type.element?.name;
+        if (name == 'Semantics') {
+          if (_declaresRealAction(current)) return true;
+        } else if (name != null && _pageBoundaryWidgets.contains(name)) {
+          return false;
         }
+        layers++;
       }
       current = current.parent;
+    }
+    return false;
+  }
+
+  /// True when [semantics] passes a non-null `onTap`/`onLongPress`.
+  /// WHY: `onTap: null` is the explicit "no action" spelling (often behind a
+  /// disabled-state ternary's literal branch) and exposes nothing to
+  /// assistive tech, so it must not count as the accessible action.
+  static bool _declaresRealAction(InstanceCreationExpression semantics) {
+    for (final Argument arg in semantics.argumentList.arguments) {
+      if (arg is! NamedArgument) continue;
+      final String name = arg.name.lexeme;
+      if ((name == 'onTap' || name == 'onLongPress') &&
+          arg.argumentExpression is! NullLiteral) {
+        return true;
+      }
     }
     return false;
   }
@@ -3539,7 +3590,9 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
             return; // Good - respects preference
           }
           // An explicit zero duration is already "no motion"; nothing to gate.
-          if (durationSource == 'Duration.zero') return;
+          // Checked on the AST so `const Duration.zero` / parenthesized forms
+          // are tolerated, not just the exact source text `Duration.zero`.
+          if (_isDurationZero(arg.argumentExpression)) return;
         }
       }
 
@@ -3560,6 +3613,30 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
       reporter.atNode(node.constructorName, code);
     });
   }
+
+  /// True for `Duration.zero` in any spelling: bare, parenthesized, or with a
+  /// `const` keyword (parsed as a named constructor call).
+  static bool _isDurationZero(Expression expr) {
+    Expression current = expr;
+    while (current is ParenthesizedExpression) {
+      current = current.expression;
+    }
+    if (current is PrefixedIdentifier) {
+      return current.prefix.name == 'Duration' &&
+          current.identifier.name == 'zero';
+    }
+    if (current is PropertyAccess) {
+      final Expression? target = current.target;
+      return target is SimpleIdentifier &&
+          target.name == 'Duration' &&
+          current.propertyName.name == 'zero';
+    }
+    if (current is InstanceCreationExpression) {
+      return current.constructorName.type.name.lexeme == 'Duration' &&
+          current.constructorName.name?.name == 'zero';
+    }
+    return false;
+  }
 }
 
 /// Single source of truth for reduce-motion names, shared by the rule's
@@ -3567,8 +3644,16 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
 /// `motionReduced` so project helpers named `isMotionReduced` are recognized
 /// (previously a false positive). Public so unit tests can exercise it.
 final RegExp reducedMotionPreferencePattern = RegExp(
-  r'disableAnimations|accessibleNavigation|reduce[d]?Motion|motionReduced',
-  caseSensitive: false,
+  // Identifier-boundary anchored: a name must start the identifier (or a
+  // camelCase hump) and not continue into lowercase letters, so
+  // `unreducedMotionDuration` (starts mid-word, lowercase `r`) no longer
+  // matches while `isMotionReduced` / `shouldReduceMotion` still do.
+  // Alternative A: first letter at an identifier start (any case).
+  // Alternative B: capitalized hump preceded by a lowercase letter or digit.
+  r'(?:(?<![A-Za-z0-9])(?:[dD]isableAnimations|[aA]ccessibleNavigation|'
+  r'[rR]educed?Motion|[mM]otionReduced)'
+  r'|(?<=[a-z0-9])(?:DisableAnimations|AccessibleNavigation|'
+  r'ReducedMotion|ReduceMotion|MotionReduced))(?![a-z])',
 );
 
 /// Finds an identifier (never a comment or string) naming the reduced-motion
